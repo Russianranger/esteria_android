@@ -1,0 +1,58 @@
+{
+  "additionalRegression": {
+    "androidExecuted": false,
+    "gameplayQualified": false,
+    "guestExecuted": false,
+    "receipt": "runtime/evidence/native-owner-confirmed-reap-host.json",
+    "scope": "actual-linux-x86_64-native-owner-and-12-jvm-jni-groups"
+  },
+  "artifacts": {
+    "application.apk": {
+      "bytes": 493590,
+      "sha256": "a38f5ffc475264befdb9d56699dba7de50d7ab2bea96ab93bd28d94400f15685"
+    },
+    "tests.apk": {
+      "bytes": 1746901,
+      "sha256": "c7b3babfb669c0e2459e4ad3f5467abe932ab7ddebfd53c30b98eb4e775a45af"
+    }
+  },
+  "checks": {
+    "androidApplicationBuild": true,
+    "androidTestCompilation": true,
+    "cleanupFailureHistoryBound": 16,
+    "competingShaderLeaseRefused": true,
+    "confirmedReapCleanupRetryFixture": true,
+    "confirmedStoppedRetryReleasesPresentationBindings": true,
+    "delayedPresentationChildKeepsAuthorityBindingsAndOwner": true,
+    "delayedShaderChildKeepsRealFileLock": true,
+    "existingPresentationProcessContracts": true,
+    "existingServiceGuardContracts": true,
+    "failedOwnerReplayRefused": true,
+    "hostFixtureDefinitionsExcludedFromApplication": true,
+    "interruptedCleanupKeepsOwner": true,
+    "launchFailureOwnershipRaceTrials": 200,
+    "legacyRegistryRetryReleasesOnlyAfterChildStops": true,
+    "lint": true,
+    "prelaunchGuardTimeoutRetainsLock": true,
+    "stagedOutputsPreserved": true
+  },
+  "command": "./gradlew --offline --no-daemon --init-script <temporary isolated-output init> :app:presentationOwnerTest :core:ownedLaunchFailureTest :core:presentationProcessTest :core:serviceOperationGuardTest :app:assembleDebug :app:assembleDebugAndroidTest :app:lintDebug",
+  "dateUtc": "2026-10-30",
+  "execution": {
+    "adreno": false,
+    "androidRuntime": false,
+    "controlledJavaBackend": true,
+    "gameplay": false,
+    "nativeJni": false,
+    "realFilesystemLocks": true,
+    "shaderGeneration": false,
+    "wineX11Session": false
+  },
+  "formatVersion": 1,
+  "hostFixtures": 3,
+  "hostJvmMaxHeapMiB": 32,
+  "launcherStartEnabled": false,
+  "result": "BUILD SUCCESSFUL in45s;83tasks;17executed/66up-to-date",
+  "scope": "host-java-presentation-shader-owner-fault-injection-only",
+  "selectedWineEnvironment": "existing RuntimeSetup.wineEnvironment selected-profile path unchanged"
+}

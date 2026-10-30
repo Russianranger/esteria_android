@@ -144,3 +144,10 @@ during import, with failed overlays preserving the active generation. See
 `runtime/client/CATALOG-IMPORT.md`. Binary MPQ contents, texture-bank decompression,
 geometry/coverage and referenced-art completeness remain separate validation;
 these checks do not resolve the missing actual catalog inputs.
+
+The transactional data-generation helper now composes the ordered extractors and
+original assembler/navigation tools in separate resumable phases. Available code
+and passing host storage/process contracts do not resolve absent base/custom
+MPQs. No maps, vmaps, mmaps, Cameras or matching DBC overlays have been generated
+from user data. See runtime/server/DATA-PREPARATION.md for the supported classical
+profile and remaining custom overlay/coverage/Android gates.

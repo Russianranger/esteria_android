@@ -70,6 +70,32 @@ matching client update are still pending. The launcher must bind the selected
 generation to its client/import/locale before providing
 `GX_VULKAN_SHADERS=Z:\\esteria-shaders`.
 
+## Retained Android helper ownership
+
+`ShaderSetup.begin(...)` allocates a handle and the real Android-side operation
+file lock before a helper can start. The service retains this handle while
+calling its single-use `prepare(...)`, then closes it off the main thread.
+Import activation and client startup must remain serialized until the handle is
+closed, including cleanup failures. The helper still receives the exact selected
+`WineRuntimeProfile` environment; no caller can substitute a runtime generation
+after allocation.
+
+Cancellation stops the complete owned guest. A cleanup timeout or interruption
+keeps its process, file lock, provider identities and strong owner retained;
+another shader setup cannot acquire that work directory. `close(Duration)` first
+requests cancellation and waits for the operation's safe boundary, then stops
+only the retained child. The guard budget is zero through30seconds, with the
+native owner's existing additional seven-second reap budget. It releases the file
+lock only when the child is confirmed dead. Failed/partial outputs are retained.
+Forced termination remains an error and never qualifies generated output.
+
+The compatibility `ShaderSetup.prepare(...)` uses the same retained handle. If
+its exceptional cleanup remains active, `retryPendingCleanup(context, root)` or
+the next compatibility prepare performs bounded cleanup of that exact child
+before new setup. Allocated/running jobs remain with their original caller and
+cannot be stolen. A failed handle never replays its helper. These APIs add no
+launcher START action or rendering qualification.
+
 ## Evidence boundary
 
 Eight host test groups cover real subprocess exit/deadline/output bounds and

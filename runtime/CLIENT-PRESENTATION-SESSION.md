@@ -17,8 +17,13 @@ preload file. The lock is packaged directly from its authoritative repository
 path. Inspection performs no network access. Startup re-resolves both installed
 generations and rejects a changed selection.
 
-`start(context, prepared, events)` also runs off the main thread. Each new session
-uses private canonical `files/s/<random>/` directories and a new 16-byte random
+Use `begin(context, prepared, events)` off the main thread and retain the returned
+owner in the service before calling its single-use `start()`. A startup exception
+keeps that owner available for `close()` and subsequent cleanup retries. The
+compatibility static `start(context, prepared, events)` also retains the owner
+internally before starting anything; failed cleanup can be retried through
+`retryPendingCleanup(context, prepared)`. Another session cannot replace the same
+work directory while its previous owner remains retained. Each new session uses private canonical `files/s/<random>/` directories and a new 16-byte random
 MIT-MAGIC-COOKIE-1 credential, stored as a mode-0600 Xauthority file. It starts:
 
 1. Android's private audio socket listener.
@@ -59,6 +64,23 @@ callback and cannot override a prior normal stop. It never claims a character or
 database save. Unexpected helper exit is a session failure. Residual socket paths
 are retained rather than blindly deleting an inode whose ownership changed.
 
+Startup and shutdown share a safe-boundary guard. A concurrent close requests
+cancellation before waiting, rejects new startup work, and preserves ownership if
+the requested wait expires. `close(Duration)` accepts zero through30seconds for
+that guard; each native child retains its existing additional seven-second reap
+budget. Calls must stay off the Android UI thread. A live child, bridge worker or
+interrupted cleanup keeps `isClosed()` false. Audio, Xauthority, exact IPC bindings,
+provider identities and the strong owner remain retained while a guest is alive.
+A later `close()` retries the same children and only removes Xauthority/registry
+ownership after every producer has stopped. The original cleanup failure remains
+available through `cleanupFailure()` even when a later retry releases resources.
+The shared Java process owner now keeps its creating thread alive and retries
+native cleanup when the backend throws or returns RUNNING. Neither status127 nor
+a finished latch can stand in for a confirmed reap. Its public stop remains
+bounded, failure history is capped, and final metrics publish only after actual
+termination. Immutable runtime generations are retained by the installer; this
+coordinator does not delete or replace them.
+
 The fixed optional `/esteria-turnip` provider destination is reserved, but this
 coordinator selects no Vulkan driver. A later verified Turnip adapter must select
 its exact manifest explicitly. Likewise, actual Wine audio requires its prepared
@@ -68,7 +90,11 @@ does not claim that prefix preparation has happened.
 
 Validation is deliberately separated. Java host contracts cover Xauthority
 encoding, mount isolation, fixed argument boundaries, auxiliary shutdown errors
-and concurrent stop semantics. The existing Android presentation/audio and native
+and concurrent stop semantics. The `:app:presentationOwnerTest` host fixtures
+exercise the real Java lifecycle owners with delayed controlled process backends,
+real file locks, interrupted cleanup and prelaunch cancellation. They do not run
+JNI, X11 or Android APIs; their Looper guard stub is excluded from every APK.
+The existing Android presentation/audio and native
 ARM64 guest-helper receipts cover individual components. This new combined
 Android session, authenticated X11 connection, GPU hardware, game pixels/audio
 and gameplay still require their own execution evidence. No Thor test is requested

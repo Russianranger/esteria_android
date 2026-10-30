@@ -110,3 +110,18 @@ instrumentation result rather than assuming18.
 `env -i`, absence from the Android-owner environment, and type/override rejection.
 New runtime/provider native gates pass41069065089 and41073499555; no full
 CommonMain/world, Android ARM64/Adreno or audible-device claim follows.
+
+## Confirmed native cleanup and data generation
+
+The presentation/shader owner fixtures cover delayed cleanup, actual Java file
+leases and concurrent prelaunch stop. Two hundred launch races and a repeated
+throwing/RUNNING native-backend cleanup case verify bounded caller timeouts with
+retained creating-thread ownership until confirmed reap. Separate real Linux
+C++/JNI12 groups pass; no Android-native cleanup equivalence is inferred.
+
+`python3 -m unittest tests.test_server_data_generation tests.test_assets` passes19
+checks: real Linux bounded child output/nonzero exit/cancellation/group cleanup,
+and synthetic generation interruption/retry/mutation/input-change contracts.
+The writing-descendant case may finish through immediate group cleanup or the
+deadline; it establishes bounded completion, not that both branches execute on
+every run. Actual MPQ conversion, map coverage and Android extraction are false.

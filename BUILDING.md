@@ -252,3 +252,9 @@ and refuses missing, changed or extra helpers. Run
 timeout/retry cases (bootstrap, installation guest and legacy bootstrap). These
 are owner/lease fault tests with Java backend fixtures, not native SQL execution.
 The staged coordinator deliberately cannot promote a playerbots-incomplete slot.
+
+Source-matched server data preparation now lives in
+`runtime/server_data_generation.py`; its fixed tool selection must be generated
+from verified ordered-reader and original assembler/navigation providers. See
+`runtime/server/DATA-PREPARATION.md`. This helper is not yet a launcher action,
+and the stock four-tool provider does not imply ordered-reader support.

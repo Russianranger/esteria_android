@@ -1,0 +1,20 @@
+// Host-only lifecycle fault injection. These sources/stubs never enter an APK.
+def presentationOwnerClasspath = files(providers.provider { android.bootClasspath },
+    providers.provider { tasks.named('compileDebugJavaWithJavac').get().destinationDirectory.get().asFile },
+    project(':core').layout.buildDirectory.dir('classes/java/main'))
+def compilePresentationOwner = tasks.register('compilePresentationOwnerFixture', JavaCompile) {
+    dependsOn 'compileDebugJavaWithJavac', ':core:classes'
+    source file('src/test/java/io/github/russianranger/esteria/runtime/PresentationShaderOwnerTests.java')
+    source file('src/test/java/android/os/Looper.java')
+    classpath = presentationOwnerClasspath
+    destinationDirectory = layout.buildDirectory.dir('presentationOwnerFixture')
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
+}
+tasks.register('presentationOwnerTest', JavaExec) {
+    dependsOn compilePresentationOwner
+    // The host Looper guard stub precedes android.jar, exclusively in this task.
+    classpath = files(compilePresentationOwner.flatMap { it.destinationDirectory }) + presentationOwnerClasspath
+    mainClass = 'io.github.russianranger.esteria.runtime.PresentationShaderOwnerTests'
+    maxHeapSize = '32m'
+}

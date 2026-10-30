@@ -1,6 +1,8 @@
 package io.github.russianranger.esteria.runtime;
 
 import android.content.Context;
+import android.os.Looper;
+import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
 import io.github.russianranger.esteria.core.runtime.process.ShaderRunPlan;
@@ -19,6 +21,8 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -44,42 +48,109 @@ public final class ShaderSetup {
             this.shaders=shaders;processLogs=logs;outputFiles=files;outputBytes=bytes;cancellationRequested=cancelled;
         }
     }
-    /** Off the main thread. Caller MUST serialize import activation and keep the
-     * client stopped until return. The local lock excludes only other shader jobs.
-     * Cancellation kills the complete owned guest. A completed atomic promotion
-     * may win that race; retained generations are never deleted or rolled back.
-     */
-    public static Result prepare(Context context,Path privateRoot,RuntimeSetup wine,ShaderToolsSetup tools,String locale,
-            RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled)throws IOException {
+    public enum State { ALLOCATED, RUNNING, SUCCEEDED, FAILED, CLOSED }
+    // A failed compatibility prepare() must not drop its process or real file
+    // lease when cleanup times out. New Handle callers share the same registry.
+    private static final Map<Path,Handle> OWNERS=new ConcurrentHashMap<>();
+    /** Off main thread. Allocate ownership and the exclusive file lease before
+     * starting any helper. Caller MUST serialize import activation and keep the
+     * client stopped until this handle is closed, including failed cleanup. */
+    public static Handle begin(Context context,Path privateRoot,RuntimeSetup wine,ShaderToolsSetup tools,String locale)throws IOException {
+        background();
         if(!privateRoot.equals(context.getFilesDir().getCanonicalFile().toPath()))
             throw new IOException("Shader setup requires private canonical application storage");
         tools.requireWineArchive(wine.archiveSha256());
-        if(wine.current()==null||tools.current()==null)throw new IOException("Prepare the pinned Wine runtime and shader tools first");
+        Path wineRoot=wine.current(),toolsRoot=tools.current();
+        if(wineRoot==null||toolsRoot==null)throw new IOException("Prepare the pinned Wine runtime and shader tools first");
         Path work=directories(privateRoot,"state/shader-work");
+        if(OWNERS.containsKey(work))throw new IOException("Shader owner remains active; close or retry cleanup first");
         Path lockPath=work.resolve(".android-shader-setup.lock");
         if(Files.exists(lockPath,LinkOption.NOFOLLOW_LINKS)&&!Files.isRegularFile(lockPath,LinkOption.NOFOLLOW_LINKS))
             throw new IOException("Invalid shader setup operation lock");
-        try(FileChannel channel=FileChannel.open(lockPath,StandardOpenOption.CREATE,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS)) {
+        FileChannel channel=FileChannel.open(lockPath,StandardOpenOption.CREATE,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS);
+        FileLock lock=null;
+        try {
             Files.setPosixFilePermissions(lockPath,PosixFilePermissions.fromString("rw-------"));
-            FileLock lock;
             try{lock=channel.tryLock();}catch(java.nio.channels.OverlappingFileLockException busy){throw new IOException("Shader setup is already running",busy);}
             if(lock==null)throw new IOException("Shader setup is already running");
-            try(FileLock held=lock){return run(context,privateRoot,work,wine,tools,locale,progress,cancelled);}
-        }
+            Handle owner=new Handle(context.getApplicationContext(),privateRoot,work,wine,tools,locale,wineRoot,toolsRoot,channel,lock);
+            retain(owner);return owner;
+        } catch(IOException|RuntimeException error){try{if(lock!=null)lock.release();}finally{channel.close();}throw error;}
     }
-    private static Result run(Context context,Path root,Path work,RuntimeSetup wine,ShaderToolsSetup tools,String locale,
+    private static void retain(Handle owner)throws IOException {
+        if(OWNERS.putIfAbsent(owner.work,owner)!=null)throw new IOException("Shader ownership is already retained");
+    }
+    /** Compatibility entrypoint. It retains failed child cleanup internally;
+     * a later prepare first retries that cleanup, never overlaps/replays it. */
+    public static Result prepare(Context context,Path privateRoot,RuntimeSetup wine,ShaderToolsSetup tools,String locale,
             RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled)throws IOException {
-        checkCancelled(cancelled);
-        ShaderRunPlan plan=new ShaderRunPlan(root.resolve("game"),tools.current(),work,tools.revision(),locale);
-        Path sessions=directories(root,"state/shader-operations");
-        Path session=sessions.resolve(UUID.randomUUID().toString().replace("-",""));
-        Files.createDirectory(session,PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------")));
-        checkCancelled(cancelled);
-        if(progress!=null)progress.update("shaders-generating","",0,-1);
-        OwnedProcess process=ProotProcess.start(context,wine.installer(),wine.packagePlan(),work,session,
-            plan.arguments,wine.wineEnvironment(),plan.mounts,null);
-        long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(125);
-        try {
+        retryPendingCleanup(context,privateRoot);
+        try(Handle owner=begin(context,privateRoot,wine,tools,locale)) {return owner.prepare(progress,cancelled);}
+    }
+    /** Known-child cleanup only, no shader replay or deletion of outputs. An
+     * allocated/running owner belongs to its caller and is never stolen. */
+    public static void retryPendingCleanup(Context context,Path privateRoot)throws IOException {
+        background();if(!privateRoot.equals(context.getFilesDir().getCanonicalFile().toPath()))
+            throw new IOException("Private canonical shader storage required");
+        retryPendingCleanup(privateRoot.resolve("state/shader-work"));
+    }
+    static void retryPendingCleanup(Path work)throws IOException {
+        Handle owner=OWNERS.get(work);if(owner==null)return;
+        if(owner.state!=State.FAILED&&!owner.operations.isStopRequested())
+            throw new IOException("Shader setup remains active; use its retained owner");
+        owner.close(Duration.ofSeconds(2));
+    }
+    public static final class Handle implements AutoCloseable {
+        private final Context context;
+        private final Path root,work,wineRoot,toolsRoot;
+        private final RuntimeSetup wine;
+        private final ShaderToolsSetup tools;
+        private final String locale;
+        private final FileChannel channel;
+        private final FileLock lock;
+        private final ServiceOperationGuard operations=new ServiceOperationGuard();
+        private volatile State state=State.ALLOCATED;
+        private OwnedProcess process;
+        private IOException cleanupFailure;
+        private Handle(Context context,Path root,Path work,RuntimeSetup wine,ShaderToolsSetup tools,String locale,
+                Path wineRoot,Path toolsRoot,FileChannel channel,FileLock lock) {
+            this.context=context;this.root=root;this.work=work;this.wine=wine;this.tools=tools;this.locale=locale;
+            this.wineRoot=wineRoot;this.toolsRoot=toolsRoot;this.channel=channel;this.lock=lock;
+        }
+        public State state(){return state;}
+        public IOException cleanupFailure(){return cleanupFailure;}
+        /** Single use. Keep this owner on failure; cancellation stops the
+         * complete owned guest. Atomic shader promotion may win that race. */
+        public Result prepare(RuntimeWork.Progress progress,RuntimeWork.Cancellation cancellation)throws IOException {
+            background();return operations.run(()->{
+                if(state!=State.ALLOCATED)throw new IOException("Shader setup already ran; retained state must not be replayed");
+                state=State.RUNNING;
+                RuntimeWork.Cancellation cancelled=()->operations.isStopRequested()||(cancellation!=null&&cancellation.isCancelled());
+                try {
+                    Result result=run(progress,cancelled);state=State.SUCCEEDED;return result;
+                }catch(IOException|RuntimeException error) {
+                    state=State.FAILED;
+                    if(process!=null&&process.isAlive()) {
+                        boolean interrupted=Thread.interrupted();
+                        try{process.stop(Duration.ZERO);}catch(IOException cleanup){cleanupFailure=cleanup;error.addSuppressed(cleanup);}
+                        finally{if(interrupted)Thread.currentThread().interrupt();}
+                    }
+                    throw error;
+                }
+            });
+        }
+        private Result run(RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled)throws IOException {
+            checkCancelled(cancelled);
+            if(!wineRoot.equals(wine.current())||!toolsRoot.equals(tools.current()))throw new IOException("Shader providers changed after allocation");
+            ShaderRunPlan plan=new ShaderRunPlan(root.resolve("game"),toolsRoot,work,tools.revision(),locale);
+            Path sessions=directories(root,"state/shader-operations");
+            Path session=sessions.resolve(UUID.randomUUID().toString().replace("-",""));
+            Files.createDirectory(session,PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------")));
+            checkCancelled(cancelled);
+            if(progress!=null)progress.update("shaders-generating","",0,-1);
+            process=ProotProcess.start(context,wine.installer(),wine.packagePlan(),work,session,
+                plan.arguments,wine.wineEnvironment(),plan.mounts,null);
+            long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(125);
             while(process.isAlive()) {
                 checkCancelled(cancelled);
                 if(System.nanoTime()>=deadline)throw new IOException("Shader setup timed out; previous and staged outputs were retained");
@@ -91,10 +162,22 @@ public final class ShaderSetup {
             Result result=validatePrepared(plan,tools.toolManifestSha256(),session.resolve("logs"),cancelled!=null&&cancelled.isCancelled());
             if(progress!=null)progress.update("shaders-prepared-not-render-qualified","",result.outputFiles,result.outputFiles);
             return result;
-        }finally {
-            if(process.isAlive()) {
-                boolean interrupted=Thread.interrupted();
-                try{process.stop(Duration.ZERO);}finally{if(interrupted)Thread.currentThread().interrupt();}
+        }
+        @Override public void close()throws IOException {close(Duration.ofSeconds(20));}
+        /** A timeout/interruption keeps the actual FileLock and providers until
+         * the process owner confirms its child has stopped. Retry this handle. */
+        public void close(Duration timeout)throws IOException {
+            background();if(timeout==null||timeout.isNegative()||timeout.compareTo(Duration.ofSeconds(30))>0)
+                throw new IllegalArgumentException("Shutdown timeout must be zero to 30 seconds");
+            try(ServiceOperationGuard.StopPermit permit=operations.stopWithin(timeout)) {
+                if(state==State.CLOSED)return;
+                IOException error=null;
+                if(process!=null) {
+                    try{process.stop(permit.remaining());}catch(IOException failure){error=failure;cleanupFailure=failure;}
+                    if(process.isAlive())throw error!=null?error:new IOException("Shader helper remains alive; file lease retained");
+                }
+                try{lock.release();}finally{try{channel.close();}finally{state=State.CLOSED;OWNERS.remove(work,this);}}
+                if(error!=null)throw error;
             }
         }
     }
@@ -210,6 +293,7 @@ public final class ShaderSetup {
             byte[] buffer=new byte[65536];for(int count;(count=input.read(buffer))!=-1;){total+=count;if(total>maximum)throw new IOException("Shader input grew beyond bound");digest.update(buffer,0,count);}
         }if(total!=maximum)throw new IOException("Shader input size changed");return hex(digest.digest());
     }
+    private static void background(){if(Looper.myLooper()==Looper.getMainLooper())throw new IllegalStateException("Shader lifecycle work must run off the UI thread");}
     private static void checkCancelled(RuntimeWork.Cancellation cancelled)throws IOException {
         if(Thread.currentThread().isInterrupted()||(cancelled!=null&&cancelled.isCancelled()))throw new RuntimeWork.CancelledException();
     }

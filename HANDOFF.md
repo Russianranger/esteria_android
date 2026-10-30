@@ -137,3 +137,16 @@ proofs, but optional APK packaging remains blocked by the real source seal.
 - WineRuntimeProfile is wired through shader and presentation guest launches;
   add retained owner/retry semantics for presentation/shader startup failures
   before composing the final client/server session.
+
+The confirmed-reap owner fix must remain intact: a throwing/RUNNING native
+terminate result retains the creating thread/handle; no fabricated127 status
+may release data/IPC leases. Presentation and shader begin/Handle APIs now give
+the service ownership before launch. Their legacy convenience APIs also retain
+failed cleanup internally.
+
+`runtime/server_data_generation.py` now implements phased ordered extraction and
+atomic format-checked data generations. See runtime/server/DATA-PREPARATION.md
+for real versus synthetic evidence and remaining Android/provider/overlay gates.
+Do not route Main START through this until complete setup/session prerequisites
+are established. Native bot schema41076505231 and source recovery41078079045
+passed; finish their exact provider/candidate retention without recompiling them.

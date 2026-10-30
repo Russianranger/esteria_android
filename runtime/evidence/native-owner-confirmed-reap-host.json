@@ -1,0 +1,32 @@
+{
+  "formatVersion": 1,
+  "scope": "linux-native-owner-and-jni",
+  "hostArchitecture": "x86_64",
+  "nativeOwnerPassed": true,
+  "jvmIntegrationGroups": 12,
+  "interactiveInputQualified": true,
+  "worldShutdownQualified": false,
+  "characterPersistenceQualified": false,
+  "androidCrossBuilt": false,
+  "androidExecuted": false,
+  "guestExecuted": false,
+  "gameplayQualified": false,
+  "sourceSha256": {
+    "app/src/main/java/io/github/russianranger/esteria/runtime/NativeProcessBridge.java": "540cbaa73f69149a2763878bd24b79d2fd1a3978c8e1cf6b9d3edc6ae6f209aa",
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/SessionSupervisor.java": "ed8df92912d21f6d0879c8fcf2db4b450aa32fd97b98b8a6956ab009d8fff221",
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/OwnedProcess.java": "5b20410d840c5b063167703d0835ae8544d1d4d2ed917119290cbf92c528227c",
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/ProotLaunch.java": "ff482a9a1680cfebf965fb664c4476d3b804d917c3178e125cf8251a2ee17d5e",
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/ShaderRunPlan.java": "fa3073a66bb7ae6cda442a748af74521c29f3b252927a0aae2231b37324a9aa7",
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/WorldConsoleShutdown.java": "b3f5208d9ae9c7471dae8ec9904a929ae2fe71d0580c3167d0eacef3610f522c",
+    "native/process-owner/CMakeLists.txt": "2deb11e1702a801c92efab0e1017491d870115bdcce79ae27fdd9458eba59ef7",
+    "native/process-owner/FTA-MIT-LICENSE.txt": "f9c4b27004805765d801d72b2d97dcfea8c05b4d5675d65545164090914ae354",
+    "native/process-owner/NativeOwnerInputTests.java": "57267d7633789dd15af159f95fe4c5682791afacd07e867a09636dd0918cc10f",
+    "native/process-owner/NativeOwnerIntegrationTest.java": "d8b3a18317d4826d80de1ecc55196beedbe339738f7a7f3c0f9776bf7138a0cf",
+    "native/process-owner/README.md": "5a6b57057c89accaa0bd9a1e0dd060ab3259b1d6fc6d7110a2124f921c053458",
+    "native/process-owner/jni_bridge.cpp": "a8a64f14899ba38bfe19027d72f8a5b5edd70950b612d85ef32e60440d281e54",
+    "native/process-owner/process_owner.cpp": "48f8cf19a4eba68d3f208aa7248d02319ebd43bec8160fb3776fb1f99cb81bcb",
+    "native/process-owner/process_owner.h": "fcb2aadff46e55fc2dc9e228de9e7a2fec9f9035dc3a272cbf369a012baa9709",
+    "native/process-owner/process_owner_test.cpp": "c1816851cdb3b9e9e692d77b18ac197b6a04b0a64887bf4302fa6efecdc16e20",
+    "tools/check_process_owner.py": "ad209ca751229612f9158967e1208b84edc92e61b7ea4a6702dd14e5591569c0"
+  }
+}

@@ -9,6 +9,7 @@ import android.system.OsConstants;
 import android.system.StructStat;
 import io.github.russianranger.esteria.core.presentation.InputSink;
 import io.github.russianranger.esteria.core.presentation.X11SessionPlan;
+import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
 import io.github.russianranger.esteria.core.runtime.process.ProotLaunch;
 import io.github.russianranger.esteria.runtime.GuestBridgeSetup;
@@ -16,6 +17,8 @@ import io.github.russianranger.esteria.runtime.ProotProcess;
 import io.github.russianranger.esteria.runtime.RuntimeSetup;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.concurrent.ConcurrentHashMap;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -60,10 +63,15 @@ public final class ClientPresentationSession implements AutoCloseable {
             return new Prepared(runtime,bridges,runtimeRoot,bridgeRoot,privateWork,lock);
         }
     }
+    // Also retain legacy start() failures: neither a caller exception nor GC may
+    // discard a still-running guest and its IPC/provider identities.
+    private static final Map<Path,ClientPresentationSession> OWNERS=new ConcurrentHashMap<>();
     private final Context context;
     private final Prepared prepared;
     private final Events events;
-    private final Handler main=new Handler(Looper.getMainLooper());
+    private final Handler main;
+    private final Path ownershipKey;
+    private final ServiceOperationGuard operations=new ServiceOperationGuard();
     private final Path session,endpoints,x11;
     private final int display;
     private final ProotLaunch.PresentationBindings bindings;
@@ -74,38 +82,74 @@ public final class ClientPresentationSession implements AutoCloseable {
     private InputBridge input;
     private SurfaceBridge surface;
     private Thread monitor;
-    private volatile boolean ready,closed;
-    private IOException closeFailure;
+    private volatile boolean ready,closed,started;
+    private volatile IOException closeFailure;
 
-    private ClientPresentationSession(Context context,Prepared prepared,Events events)throws IOException {
-        this.context=context.getApplicationContext();this.prepared=prepared;this.events=events;
-        Path root=this.context.getFilesDir().getCanonicalFile().toPath(),sessions=root.resolve("s");
-        if(!Files.exists(sessions,LinkOption.NOFOLLOW_LINKS))directory(sessions);
-        BridgePaths.directory(this.context,sessions.toFile());
-        SecureRandom random=new SecureRandom();byte[] token=new byte[8],cookie=new byte[16];random.nextBytes(token);random.nextBytes(cookie);
-        StringBuilder name=new StringBuilder();for(byte b:token)name.append(String.format(java.util.Locale.ROOT,"%02x",b&255));
-        session=directory(sessions.resolve(name.toString()));endpoints=directory(session.resolve("io"));x11=directory(session.resolve("x11"));
-        BridgePaths.endpoint(endpoints,"frame.sock",false);BridgePaths.endpoint(endpoints,"input.sock",false);BridgePaths.endpoint(endpoints,"audio.sock",false);
-        display=64+random.nextInt(16320);bindings=new ProotLaunch.PresentationBindings(endpoints,x11);
-        Path authority=endpoints.resolve("Xauthority");
-        try(java.nio.channels.SeekableByteChannel out=Files.newByteChannel(authority,
-                java.util.EnumSet.of(StandardOpenOption.CREATE_NEW,StandardOpenOption.WRITE),
-                PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-------")))) {
-            java.nio.ByteBuffer bytes=java.nio.ByteBuffer.wrap(X11SessionPlan.authority(display,cookie));while(bytes.hasRemaining())out.write(bytes);
-        }finally{java.util.Arrays.fill(cookie,(byte)0);}
+    private ClientPresentationSession(Context context,Prepared prepared,Events events,Path session,Path ownershipKey,int display,Handler main) {
+        this.context=context;this.prepared=prepared;this.events=events;this.main=main;this.ownershipKey=ownershipKey;
+        this.session=session;endpoints=session.resolve("io");x11=session.resolve("x11");this.display=display;
+        bindings=new ProotLaunch.PresentationBindings(endpoints,x11);
     }
-    public static ClientPresentationSession start(Context context,Prepared prepared,Events events)throws IOException {
+    /** Allocate/retain this owner before any Android bridge or guest starts.
+     * Keep it across start() failures and retry close() until isClosed(). */
+    public static ClientPresentationSession begin(Context context,Prepared prepared,Events events)throws IOException {
         background();if(prepared==null)throw new IOException("Verified presentation inputs required");
-        // Re-resolve active identities before making any socket/process. Replaced
-        // generations must be inspected again rather than silently substituted.
+        Context app=context.getApplicationContext();
+        Path privateRoot=app.getFilesDir().getCanonicalFile().toPath();
+        if(!prepared.work.startsWith(privateRoot)||prepared.work.equals(privateRoot))throw new IOException("Private presentation work required");
+        synchronized(OWNERS) {
+            if(OWNERS.containsKey(prepared.work))throw new IOException("Presentation ownership remains active; close or retry its retained owner first");
+            providersUnchanged(prepared);
+            Path root=app.getFilesDir().getCanonicalFile().toPath(),sessions=root.resolve("s");
+            if(!Files.exists(sessions,LinkOption.NOFOLLOW_LINKS))directory(sessions);
+            BridgePaths.directory(app,sessions.toFile());
+            SecureRandom random=new SecureRandom();byte[] token=new byte[8],cookie=new byte[16];random.nextBytes(token);random.nextBytes(cookie);
+            StringBuilder name=new StringBuilder();for(byte value:token)name.append(String.format(java.util.Locale.ROOT,"%02x",value&255));
+            Path session=directory(sessions.resolve(name.toString()));
+            Path endpoints=directory(session.resolve("io"));directory(session.resolve("x11"));
+            BridgePaths.endpoint(endpoints,"frame.sock",false);BridgePaths.endpoint(endpoints,"input.sock",false);BridgePaths.endpoint(endpoints,"audio.sock",false);
+            int display=64+random.nextInt(16320);
+            Path authority=endpoints.resolve("Xauthority");
+            try(java.nio.channels.SeekableByteChannel out=Files.newByteChannel(authority,
+                    java.util.EnumSet.of(StandardOpenOption.CREATE_NEW,StandardOpenOption.WRITE),
+                    PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-------")))) {
+                java.nio.ByteBuffer bytes=java.nio.ByteBuffer.wrap(X11SessionPlan.authority(display,cookie));while(bytes.hasRemaining())out.write(bytes);
+            }finally{java.util.Arrays.fill(cookie,(byte)0);}
+            ClientPresentationSession owner=new ClientPresentationSession(app,prepared,events,session,prepared.work,display,new Handler(Looper.getMainLooper()));
+            retain(owner);return owner;
+        }
+    }
+    private static void retain(ClientPresentationSession owner)throws IOException {
+        if(OWNERS.putIfAbsent(owner.ownershipKey,owner)!=null)throw new IOException("Presentation ownership is already retained");
+    }
+    private static void providersUnchanged(Prepared prepared)throws IOException {
         if(!prepared.runtimeRoot.equals(prepared.runtime.current())||!prepared.bridgeRoot.equals(prepared.bridges.current()))
             throw new IOException("Presentation providers changed after inspection");
-        ClientPresentationSession owner=new ClientPresentationSession(context,prepared,events);
-        try { owner.startComponents();return owner; }
-        catch(IOException|RuntimeException error) {
-            try { owner.close(); }catch(IOException cleanup){error.addSuppressed(cleanup);}
-            throw error;
-        }
+    }
+    /** Start using an owner the service already holds. No failed start releases
+     * a live child or binding. Startup is single-use, including failed attempts. */
+    public void start()throws IOException {
+        background();operations.run(()->{
+            if(started)throw new IOException("Presentation startup has already run");started=true;
+            try{check();providersUnchanged(prepared);startComponents();return null;}
+            catch(IOException|RuntimeException error){failure.compareAndSet(null,"presentation-startup-failed");throw error;}
+        });
+    }
+    /** Compatibility convenience. Failed cleanup remains strongly retained and
+     * excludes another start until retryPendingCleanup() confirms termination. */
+    public static ClientPresentationSession start(Context context,Prepared prepared,Events events)throws IOException {
+        ClientPresentationSession owner=begin(context,prepared,events);
+        try{owner.start();return owner;}
+        catch(IOException|RuntimeException error){try{owner.close();}catch(IOException cleanup){error.addSuppressed(cleanup);}throw error;}
+    }
+    /** Off main thread. Does not stop a successful active/prelaunch session. */
+    public static void retryPendingCleanup(Context context,Prepared prepared)throws IOException {
+        background();if(prepared==null)throw new IOException("Verified presentation inputs required");
+        Path root=context.getFilesDir().getCanonicalFile().toPath();
+        if(!prepared.work.startsWith(root)||prepared.work.equals(root))throw new IOException("Private presentation work required");
+        ClientPresentationSession owner=OWNERS.get(prepared.work);if(owner==null)return;
+        if(!owner.closing.get()&&owner.failure.get()==null)throw new IOException("Presentation session remains active; use its retained owner");
+        owner.close(Duration.ofSeconds(2));
     }
     private void startComponents()throws IOException {
         audio=AudioBridge.start(context,endpoints.toFile(),code->{if(code.endsWith("failed"))fail("presentation-audio-failed");});
@@ -169,7 +213,7 @@ public final class ClientPresentationSession implements AutoCloseable {
         if(bytes.length>65536)throw new IOException("Presentation readiness log grew beyond bounds");
         return ("\n"+new String(bytes,StandardCharsets.UTF_8)).contains("\n"+line+"\n");
     }
-    private void check()throws IOException {if(closing.get()||failure.get()!=null)throw new IOException("Presentation session is unavailable");}
+    private void check()throws IOException {if(closing.get()||operations.isStopRequested()||failure.get()!=null)throw new IOException("Presentation session is unavailable");}
     private void fail(String reason) {
         if(closing.get()||!failure.compareAndSet(null,reason))return;
         if(events!=null)main.post(()->events.failed(reason));
@@ -197,28 +241,43 @@ public final class ClientPresentationSession implements AutoCloseable {
     public boolean isReady(){return ready&&!closing.get()&&failure.get()==null;}
     /** Component-only metrics; does not imply pixels/audio/gameplay were observed. */
     public long[] diagnostics(){return new long[]{ready?1:0,closed?1:0,children.size(),failure.get()==null?0:1};}
-    public synchronized IOException cleanupFailure(){return closeFailure;}
-    @Override public synchronized void close()throws IOException {
-        background();
-        if(closed){if(closeFailure!=null)throw closeFailure;return;}
-        closing.set(true);ready=false;IOException error=null;
-        if(monitor!=null&&monitor!=Thread.currentThread()){monitor.interrupt();try{monitor.join(2000);if(monitor.isAlive())error=add(error,new IOException("Presentation monitor remains alive"));}
-            catch(InterruptedException interrupted){Thread.currentThread().interrupt();error=add(error,new IOException("Presentation close interrupted",interrupted));}}
-        // Close input first: production helper releases every held XTest state on EOF.
-        if(input!=null)try{input.close();}catch(IOException failure){error=add(error,failure);}
-        if(surface!=null)try{surface.close();}catch(IOException failure){error=add(error,failure);}
-        for(int i=children.size()-1;i>=0;i--)try{
-            OwnedProcess child=children.get(i);
-            if(!child.isAlive())error=add(error,new IOException("Presentation guest exited before requested shutdown"));
-            child.terminateAuxiliary();
-        }catch(IOException failure){error=add(error,failure);}
-        if(audio!=null)try{audio.close();}catch(IOException failure){error=add(error,failure);}
-        // Guest helpers remove only their own sockets. Keep residual endpoints
-        // for diagnosis rather than deleting a potentially changed inode.
-        try{Files.deleteIfExists(endpoints.resolve("Xauthority"));}catch(IOException failure){error=add(error,failure);}
-        closed=true;closeFailure=error;if(error!=null)throw error;
+    public IOException cleanupFailure(){return closeFailure;}
+    public boolean isClosed(){return closed;}
+    @Override public void close()throws IOException {close(Duration.ofSeconds(20));}
+    /** Bounded safe-boundary wait; each owned native cleanup has its existing
+     * seven-second reap budget. Failure preserves this owner for another close. */
+    public void close(Duration timeout)throws IOException {
+        background();if(timeout==null||timeout.isNegative()||timeout.compareTo(Duration.ofSeconds(30))>0)
+            throw new IllegalArgumentException("Shutdown timeout must be zero to 30 seconds");
+        boolean firstClose=!closing.getAndSet(true);ready=false;
+        try(ServiceOperationGuard.StopPermit ignored=operations.stopWithin(timeout)) {
+            if(closed){if(closeFailure!=null)throw closeFailure;return;}
+            IOException error=null;boolean stopped=true;
+            if(monitor!=null&&monitor!=Thread.currentThread()) {
+                monitor.interrupt();try{monitor.join(2000);if(monitor.isAlive()){stopped=false;error=add(error,new IOException("Presentation monitor remains alive"));}}
+                catch(InterruptedException interrupted){Thread.currentThread().interrupt();stopped=false;error=add(error,new IOException("Presentation close interrupted",interrupted));}
+            }
+            // Input EOF releases held XTest states before any guest is stopped.
+            if(input!=null)try{input.close();}catch(IOException failure){stopped=false;error=add(error,failure);}
+            if(surface!=null)try{surface.close();}catch(IOException failure){stopped=false;error=add(error,failure);}
+            for(int i=children.size()-1;i>=0;i--) {
+                OwnedProcess child=children.get(i);
+                if(firstClose&&!child.isAlive())error=add(error,new IOException("Presentation guest exited before requested shutdown"));
+                try{child.terminateAuxiliary();}catch(IOException failure){error=add(error,failure);}
+                if(child.isAlive())stopped=false;
+            }
+            // Retain audio, authority and every binding while any guest still
+            // owns them. A timeout is not final cleanup and must be retryable.
+            if(stopped) {
+                if(audio!=null)try{audio.close();}catch(IOException failure){stopped=false;error=add(error,failure);}
+                if(stopped)try{Files.deleteIfExists(endpoints.resolve("Xauthority"));}catch(IOException failure){stopped=false;error=add(error,failure);}
+            }
+            closeFailure=add(closeFailure,error);
+            if(stopped){closed=true;OWNERS.remove(ownershipKey,this);}
+            if(closeFailure!=null)throw closeFailure;
+        }
     }
-    private static IOException add(IOException first,IOException next){if(first==null)return next;first.addSuppressed(next);return first;}
+    private static IOException add(IOException first,IOException next){if(next==null)return first;if(first==null)return next;if(first!=next)first.addSuppressed(next);return first;}
     private static Path directory(Path path)throws IOException{return Files.createDirectory(path,PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------")));}
     private static void background(){if(Looper.myLooper()==Looper.getMainLooper())throw new IllegalStateException("Presentation lifecycle work must run off the UI thread");}
 }

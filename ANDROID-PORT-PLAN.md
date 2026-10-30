@@ -69,3 +69,8 @@ is the current provider gate. Production Wine source/publication and selected471
 component qualification pass, with consumer providers now measured against the
 new runtime. Bot schema integration and retained presentation/session ownership
 are the next implementation work before asset-backed world qualification.
+
+Native four-schema bot setup and exact server source retention now pass. Complete
+measured provider adoption, retain presentation/shader/native child ownership
+through failures, wire the new phased server-data generator into the Android
+setup owner, then compose the real local game session and asset-backed gates.

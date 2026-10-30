@@ -1,0 +1,346 @@
+#!/usr/bin/env python3
+"""Stopped-session, resumable preparation of source-matched server data.
+
+Each extractor runs in a fresh phase directory. Only completed, byte-verified
+phases are reused; interrupted raw vmap output is never passed to the assembler.
+The final pointer describes format-checked output, not coverage or gameplay.
+No network acquisition or modification of imported client files occurs here.
+"""
+from __future__ import annotations
+
+import argparse
+import errno
+import fcntl
+import hashlib
+import json
+import os
+from pathlib import Path
+import shutil
+import stat
+import subprocess
+import time
+import uuid
+
+try:
+    from . import shader_generation as storage, extractor_order as order, server_data_preflight as formats
+    from .owned_process_group import OwnedGroup
+except ImportError:
+    import shader_generation as storage
+    import extractor_order as order
+    import server_data_preflight as formats
+    from owned_process_group import OwnedGroup
+
+SCOPE = 'local-server-data-format-checked-not-world-qualified'
+PROGRAMS = ('map_extractor', 'vmap4_extractor', 'vmap4_assembler', 'mmaps_generator')
+CLIENT_REVISION = '471ee42faadf4a97a1d0a86989cf1452621f2dc5'
+MMAP_CONFIG = {'bytes': 7888, 'sha256': '324479ef3821a0f9ef0c3f2d6b42c011eba1c31148eeaccd6bed3250c3d9c306'}
+PROFILE = dict(classical=True, trial=False, streaming=False, directAccess=False,
+               retailVirtualProviders=False, parentDataVisible=False, installDataVisible=False)
+MAX_FILES, MAX_FILE, MAX_TOTAL, MAX_METADATA = 300000, 16 << 30, 96 << 30, 64 << 20
+CAPABILITY = b'esteria-classical-ordered-providers-v1; archive/folder/prefix; no conversion qualification'
+
+
+def require(condition, reason):
+    if not condition:
+        raise ValueError(reason)
+
+
+def walk_error(error):
+    raise error
+
+
+def document(path):
+    def unique(pairs):
+        result = {}
+        for key, value in pairs:
+            require(key not in result, 'duplicate server data metadata key')
+            result[key] = value
+        return result
+    return json.loads(storage.read(path, MAX_METADATA), object_pairs_hook=unique)
+
+
+def pin(value):
+    require(type(value) is dict and set(value) == {'bytes', 'sha256'} and
+            type(value['bytes']) is int and 0 < value['bytes'] <= MAX_FILE and
+            type(value['sha256']) is str and storage.HASH.fullmatch(value['sha256']), 'invalid data tool pin')
+    return value
+
+
+def tools_verified(root, selection):
+    """Selection comes from the app's verified provider, never user game content."""
+    root = storage.canonical(root)
+    require(type(selection) is dict and set(selection) == {'formatVersion', 'serverRevision', 'clientRevision',
+            'orderedSourceReceipt', 'files'} and type(selection['formatVersion']) is int and
+            selection['formatVersion'] == 1 and selection['serverRevision'] == formats.SERVER_REVISION and
+            selection['clientRevision'] == CLIENT_REVISION,
+            'unsupported server data tool selection')
+    pin(selection['orderedSourceReceipt'])
+    expected = {'bin/' + name for name in PROGRAMS} | {'etc/mmaps-config.yaml', 'provenance/ordered-source-receipt.json'}
+    require(type(selection['files']) is dict and set(selection['files']) == expected,
+            'complete fixed extraction tool closure required')
+    # The exact source config uses dataDir="./" and debugOutput=false. Do not
+    # accept a custom absolute destination merely because it has a valid hash.
+    require(selection['files']['etc/mmaps-config.yaml'] == MMAP_CONFIG,
+            'source-matched relative navigation configuration required')
+    require(selection['files']['provenance/ordered-source-receipt.json'] == selection['orderedSourceReceipt'],
+            'ordered source receipt differs from selected tool closure')
+    for name, identity in selection['files'].items():
+        require(storage.identity(root / name, MAX_FILE) == pin(identity), 'selected extraction tool bytes changed')
+        if name.startswith('bin/'):
+            require(os.access(root / name, os.X_OK), 'extraction tool is not executable')
+            with (root / name).open('rb') as source:
+                header = source.read(64)
+            require(len(header) == 64 and header[:7] == b'\x7fELF\x02\x01\x01' and
+                    header[16:18] in (b'\x02\x00', b'\x03\x00') and header[18:20] == b'\xb7\x00' and
+                    header[20:24] == b'\x01\x00\x00\x00', 'ARM64 ELF header required')
+    return hashlib.sha256(storage.encoded(selection)).hexdigest()
+
+
+def inventory(root):
+    """Hash a completed phase once, bounded and without following links."""
+    storage.canonical(root)
+    rows, total, entries = {}, 0, 0
+    for parent, dirs, files in os.walk(root, followlinks=False, onerror=walk_error):
+        require(len(Path(parent).relative_to(root).parts) <= 16, 'data output depth bound')
+        folded = set()
+        for name in dirs + files:
+            entries += 1
+            require(entries <= MAX_FILES, 'data output entry bound')
+            relative = (Path(parent) / name).relative_to(root).as_posix()
+            order.safe(relative, 1024)
+            require(name.casefold() not in folded, 'case-colliding data output')
+            folded.add(name.casefold())
+            storage.canonical(Path(parent) / name, directory=name in dirs)
+        for name in files:
+            path = Path(parent) / name
+            relative = path.relative_to(root).as_posix()
+            rows[relative] = storage.identity(path, MAX_FILE)
+            total += rows[relative]['bytes']
+            require(len(rows) <= MAX_FILES and total <= MAX_TOTAL, 'data output inventory bound')
+    require(rows, 'extractor produced no data files')
+    require(len(storage.encoded(rows)) <= MAX_METADATA, 'data output metadata bound')
+    return rows
+
+
+def clone(source, destination):
+    """Private output only: prefer hard links; bounded fallback handles Android denial."""
+    storage.canonical(source)
+    destination.mkdir(mode=0o700)
+    for parent, dirs, files in os.walk(source, followlinks=False, onerror=walk_error):
+        at = Path(parent)
+        target = destination / at.relative_to(source)
+        for name in dirs:
+            storage.canonical(at / name)
+            (target / name).mkdir(mode=0o700)
+        for name in files:
+            original = storage.canonical(at / name, False)
+            output = target / name
+            try:
+                os.link(original, output, follow_symlinks=False)
+            except OSError as error:
+                if error.errno not in (errno.EPERM, errno.EXDEV, errno.EOPNOTSUPP, errno.ENOSYS):
+                    raise
+                with original.open('rb') as incoming, output.open('xb') as outgoing:
+                    shutil.copyfileobj(incoming, outgoing, 128 << 10)
+                os.chmod(output, 0o600)
+
+
+def execute(command, cwd, log_path, timeout, *, cancelled=lambda: False):
+    """Actual serial child, reserved process-group identity and bounded private logs."""
+    require(type(timeout) is int and 0 < timeout <= 48 * 3600, 'invalid extraction deadline')
+    require(not cancelled(), 'data preparation cancelled')
+    with log_path.open('xb') as log:
+        os.chmod(log_path, 0o600)
+        child = subprocess.Popen(command, cwd=cwd, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT, start_new_session=True,
+            env={**os.environ, 'PYTHONDONTWRITEBYTECODE': '1', 'PYTHONNOUSERSITE': '1'})
+        owner = OwnedGroup(child)
+        os.set_blocking(child.stdout.fileno(), False)
+        deadline, written, observed, tail = time.monotonic() + timeout, 0, 0, b''
+        try:
+            while True:
+                require(not cancelled(), 'data preparation cancelled')
+                require(time.monotonic() < deadline, 'data preparation deadline exceeded')
+                while True:
+                    try:
+                        block = os.read(child.stdout.fileno(), 65536)
+                    except BlockingIOError:
+                        break
+                    if not block:
+                        break
+                    observed += len(block)
+                    keep = min(len(block), max(0, (4 << 20) - written))
+                    log.write(block[:keep]); written += keep
+                    tail = (tail + block[keep:])[-(256 << 10):]
+                    require(not cancelled() and time.monotonic() < deadline, 'data preparation interrupted')
+                status = owner.observe()
+                if status is not None:
+                    # Exit observed before reaping; drain the remaining bounded pipe.
+                    while True:
+                        try:
+                            block = os.read(child.stdout.fileno(), 65536)
+                        except BlockingIOError:
+                            break
+                        if not block:
+                            break
+                        observed += len(block)
+                        keep = min(len(block), max(0, (4 << 20) - written))
+                        log.write(block[:keep]); written += keep
+                        tail = (tail + block[keep:])[-(256 << 10):]
+                        require(not cancelled() and time.monotonic() < deadline, 'data preparation interrupted')
+                    break
+                time.sleep(.1)
+        finally:
+            try:
+                owner.stop(graceful_timeout=2, reap_timeout=5)
+            finally:
+                child.stdout.close()
+                if tail:
+                    log.write(b'\n[bounded log tail]\n' + tail)
+                log.flush(); os.fsync(log.fileno())
+        require(status == 0, 'extractor failed; active server data preserved')
+        return {'exitStatus': status, 'logBytesObserved': observed, 'logBytesRetained': log.tell()}
+
+
+def phase(root, name, action):
+    completed = root / (name + '-complete')
+    if completed.exists() or completed.is_symlink():
+        saved = document(completed / 'phase.json')
+        require(type(saved) is dict and set(saved) == {'phase', 'files'} and saved['phase'] == name and
+                saved['files'] == inventory(completed / 'data'), 'completed extraction phase changed')
+        return completed / 'data'
+    working = root / (name + '-' + uuid.uuid4().hex)
+    working.mkdir(mode=0o700)
+    data = working / 'data'; data.mkdir(mode=0o700)
+    action(data, working)
+    rows = inventory(data)
+    for relative in rows:
+        with (data / relative).open('rb') as source:
+            os.fsync(source.fileno())
+    for parent, _, _ in os.walk(data, topdown=False, onerror=walk_error):
+        storage.sync(Path(parent))
+    storage.atomic(working / 'phase.json', storage.encoded({'phase': name, 'files': rows}))
+    os.rename(working, completed); storage.sync(root)
+    return completed / 'data'
+
+
+def generate(store, game, generation, tools, selection, locale, *, threads=1, timeout=24 * 3600,
+             cancelled=lambda: False, progress=lambda phase: None):
+    require(type(threads) is int and threads in (1, 2), 'one or two extraction workers required')
+    require(type(timeout) is int and 0 < timeout <= 48 * 3600, 'invalid extraction deadline')
+    require(locale in order.LOCALES, 'explicit extraction locale required')
+    store, game, tools = storage.canonical(store, create=True), storage.canonical(game), storage.canonical(tools)
+    require(not any(a == b or a in b.parents or b in a.parents for a, b in
+                    ((store, game), (store, tools), (game, tools))), 'extraction roots must be separate')
+    lock = os.open(store / '.setup.lock', os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+    try:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        inputs = {'formatVersion': 1, 'importGeneration': generation, 'locale': locale, 'threads': threads,
+                  'importMetadata': storage.imported(game, generation),
+                  'toolSelectionSha256': tools_verified(tools, selection)}
+        key = hashlib.sha256(storage.encoded(inputs)).hexdigest()
+        staging = storage.canonical(store / 'staging', create=True)
+        generations = storage.canonical(store / 'generations', create=True)
+        destination = generations / key
+        if destination.exists() or destination.is_symlink():
+            receipt = document(destination / 'receipt.json')
+            require(type(receipt) is dict and set(receipt) == {'formatVersion', 'scope', 'generation', 'inputs',
+                    'files', 'preflight', 'worldQualified', 'androidQualified', 'gameplayQualified'} and
+                    type(receipt['formatVersion']) is int and receipt['formatVersion'] == 1 and receipt['scope'] == SCOPE and
+                    receipt['inputs'] == inputs and receipt['generation'] == key and
+                    all(receipt[name] is False for name in ('worldQualified', 'androidQualified', 'gameplayQualified')) and
+                    receipt['files'] == inventory(destination / 'data'), 'prepared server data changed')
+            preflight = formats.check_server_data(destination / 'data')
+            require(preflight['checks_passed'] and receipt['preflight'] == preflight,
+                    'prepared server data preflight changed')
+        else:
+            work = storage.canonical(staging / key, create=True)
+            source = game / 'generations' / generation / 'data'
+            plan_path = work / 'order.json'
+            if plan_path.exists() or plan_path.is_symlink():
+                plan = document(plan_path)
+                wire = order.wire(plan)
+                require(storage.read(work / 'order.tsv', order.MAX_MANIFEST) == wire,
+                        'cached extraction provider projection changed')
+            else:
+                progress('extraction-provider-order')
+                plan = order.plan(source, locale, profile=PROFILE)
+                wire = order.wire(plan)
+                storage.atomic(work / 'order.tsv', wire)
+                storage.atomic(plan_path, order.canonical(plan))
+            require(plan['configuredLocale'] == locale and plan['profile'] == PROFILE, 'extraction provider profile changed')
+            ordered = ['--esteria-order', str(work / 'order.tsv'), '--esteria-order-sha256', hashlib.sha256(wire).hexdigest(),
+                       '--esteria-input-root', str(source)]
+            deadline = time.monotonic() + timeout
+            def run(name, args, cwd, log):
+                progress('extraction-' + name)
+                remaining = int(deadline - time.monotonic())
+                require(remaining > 0, 'data preparation deadline exceeded')
+                return execute([str(tools / 'bin' / name), *args], cwd, log, remaining, cancelled=cancelled)
+            for name in PROGRAMS[:2]:
+                capability_log = work / ('capability-' + name + '-' + uuid.uuid4().hex + '.log')
+                run(name, ['--esteria-order-capabilities'], work, capability_log)
+                require(storage.read(capability_log, 4096).rstrip(b'\n') == CAPABILITY,
+                        'ordered extractor capability differs; no stock fallback')
+            maps = phase(work, 'maps-dbc-cameras', lambda data, at:
+                run('map_extractor', [*ordered, '-i', str(source), '-o', str(data), '-e', '7'], data, at / 'extract.log'))
+            raw = phase(work, 'raw-vmaps', lambda data, at:
+                run('vmap4_extractor', [*ordered, '-d', str(source / 'Data')], data, at / 'extract.log'))
+            def assemble(data, at):
+                (data / 'vmaps').mkdir(mode=0o700)
+                run('vmap4_assembler', [str(raw / 'Buildings'), str(data / 'vmaps')], data, at / 'extract.log')
+            vmaps = phase(work, 'assembled-vmaps', assemble)
+            def navigation(data, at):
+                clone(maps / 'maps', data / 'maps')
+                clone(vmaps / 'vmaps', data / 'vmaps')
+                run('mmaps_generator', ['--config', str(tools / 'etc/mmaps-config.yaml'), '--threads', str(threads), '--silent'],
+                    data, at / 'extract.log')
+            nav = phase(work, 'navigation', navigation)
+            final = work / ('final-' + uuid.uuid4().hex); final.mkdir(mode=0o700)
+            data = final / 'data'; data.mkdir(mode=0o700)
+            for base, names in ((maps, ('maps', 'dbc', 'Cameras')), (vmaps, ('vmaps',)), (nav, ('mmaps',))):
+                for name in names:
+                    clone(base / name, data / name)
+            preflight = formats.check_server_data(data)
+            require(preflight['checks_passed'], 'generated server data failed format preflight')
+            require(not cancelled() and storage.imported(game, generation) == inputs['importMetadata'] and
+                    tools_verified(tools, selection) == inputs['toolSelectionSha256'], 'extraction inputs changed before completion')
+            receipt = {'formatVersion': 1, 'scope': SCOPE, 'generation': key, 'inputs': inputs,
+                       'files': inventory(data), 'preflight': preflight,
+                       'worldQualified': False, 'androidQualified': False, 'gameplayQualified': False}
+            for relative in receipt['files']:
+                with (data / relative).open('rb') as source_file:
+                    os.fsync(source_file.fileno())
+            for parent, _, _ in os.walk(data, topdown=False, onerror=walk_error):
+                storage.sync(Path(parent))
+            storage.atomic(final / 'receipt.json', storage.encoded(receipt))
+            os.rename(final, destination); storage.sync(generations)
+        require(not cancelled() and storage.imported(game, generation) == inputs['importMetadata'],
+                'import changed before server data activation')
+        storage.atomic(store / 'current', (key + '\n').encode())
+        progress('extraction-format-checked')
+        return receipt
+    finally:
+        os.close(lock)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ('store', 'game', 'tools', 'selection'):
+        parser.add_argument('--' + name, type=Path, required=True)
+    parser.add_argument('--generation', required=True)
+    parser.add_argument('--locale', required=True)
+    parser.add_argument('--threads', type=int, default=1, choices=(1, 2))
+    args = parser.parse_args()
+    try:
+        receipt = generate(args.store, args.game, args.generation, args.tools, document(args.selection), args.locale,
+            threads=args.threads, progress=lambda value: print(value, flush=True))
+        print('Server data format checked: ' + receipt['generation'] + '; world coverage remains unqualified')
+        return 0
+    except (OSError, ValueError) as error:
+        print('Server data preparation failed (' + type(error).__name__ + '); active output preserved', flush=True)
+        return 1
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

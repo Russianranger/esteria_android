@@ -101,3 +101,18 @@ The Android Wine launch environment now accepts only an absent adaptation or the
 pinned string `WINE_ANDROID_PRIVATE_PE_COPY=1`, passes it through the isolated
 guest environment and rejects session overrides. Host argv checks, Android test
 compilation and lint pass; the current production lock remains unchanged.
+
+The actual native playerbots schema run41076505231 passes first/repeat/helper
+reentry/restart/final four-schema verification. Its measured helper is being
+retained as a separate candidate; no in-world AI or Android completion claim.
+Exact source recovery41078079045 passes all266 members and reproduces the
+original24,619,647-byte9f76881f source archive. The fallback full compile is
+cancelled after independent readback. Stock program/tool provider qualification
+can now consume those original source identities.
+
+Presentation/shader owners now retain active children, bindings and real file
+leases across failed startup/shutdown. The native creating thread also remains
+alive while termination/reaping is unconfirmed; callers get bounded timeouts.
+Controlled-owner/race fixtures, real Linux C++/JNI12 groups, APK/AndroidTest and
+lint pass. Transactional source-matched data preparation passes19 host checks;
+actual MPQ extraction, Android operation wiring and world validation remain open.

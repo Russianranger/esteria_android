@@ -22,6 +22,8 @@ public final class OwnedProcess implements SessionSupervisor.Child {
     public interface Backend {
         long start(Specification spec) throws IOException;
         int waitFor(long handle, long timeoutMillis) throws IOException;
+        /** A non-RUNNING result confirms owned group cleanup and leader reap.
+         * RUNNING/an exception leaves ownership with the creating thread. */
         int terminate(long handle) throws IOException;
         long[] diagnostics(long handle) throws IOException;
         default boolean writeInput(long handle,byte[] bytes,long timeoutMillis) throws IOException {
@@ -73,6 +75,7 @@ public final class OwnedProcess implements SessionSupervisor.Child {
     private volatile boolean stopRequested, forced, auxiliaryStop;
     private volatile long inputHandle;
     private volatile long[] metrics=new long[5];
+    private int rememberedFailures;
 
     private OwnedProcess(Backend backend, Specification spec, GracefulInputStop graceful) {
         this.backend=backend; this.graceful=graceful; this.interactiveInput=spec.interactiveInput;
@@ -146,10 +149,28 @@ public final class OwnedProcess implements SessionSupervisor.Child {
             inputHandle=0;
             if (shutdown!=null) shutdown.cancel(true);
             if (handle>0) {
-                if (status==RUNNING) try {
-                    forced=true; status=backend.terminate(handle);
-                    if (status==RUNNING) remember(new IOException("Native process cleanup remains incomplete"));
-                } catch (IOException e) { remember(e); }
+                boolean interrupted=false,incompleteReported=false;
+                // A failed TERM/KILL or reap deadline does not mean the child
+                // died. Keep its creating thread (and PDEATHSIG relationship)
+                // alive, retry only this opaque handle, and leave caller stop()
+                // bounded. Storage/binding owners continue to see isAlive().
+                while(status==RUNNING) {
+                    forced=true;
+                    try {
+                        int completed=backend.terminate(handle);
+                        if(completed!=RUNNING)status=completed;
+                        else if(!incompleteReported) {
+                            incompleteReported=true;
+                            remember(new IOException("Native process cleanup remains incomplete; owner retained"));
+                        }
+                    } catch(IOException error){remember(error);}
+                    if(status==RUNNING)try{Thread.sleep(100);}
+                    catch(InterruptedException error) {
+                        interrupted=true;
+                        if(!incompleteReported){incompleteReported=true;remember(new IOException("Native cleanup retry interrupted; owner retained",error));}
+                    }
+                }
+                if(interrupted)Thread.currentThread().interrupt();
                 try {
                     long[] observed=backend.diagnostics(handle);
                     if (observed.length!=5) throw new IOException("Invalid native process diagnostics");
@@ -157,11 +178,14 @@ public final class OwnedProcess implements SessionSupervisor.Child {
                     if (metrics[4]!=0) remember(new IOException("Native process log IO failed"));
                 } catch (IOException e) { remember(e); }
             }
-            if (status==RUNNING) status=127;
+            if(handle<=0 && status==RUNNING)status=127; // No published native handle was created.
             started.countDown(); finished.countDown();
         }
     }
-    private void remember(IOException error) { if (failure==null) failure=error; else failure.addSuppressed(error); }
+    private void remember(IOException error) {
+        if(failure==null){failure=error;rememberedFailures=1;}
+        else if(failure!=error && rememberedFailures<16){failure.addSuppressed(error);rememberedFailures++;}
+    }
     private void requestStop(Duration timeout) { requestStop(timeout,false); }
     private synchronized void requestStop(Duration timeout, boolean auxiliary) {
         if (auxiliary && graceful!=null) throw new IllegalStateException("A persistent component must use its graceful shutdown protocol");
