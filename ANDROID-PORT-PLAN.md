@@ -34,10 +34,10 @@ their original full-lock identity.
 | Milestone | Current state | Next evidence |
 | --- | --- | --- |
 | 1. Reproducible references | Exact pins, full Windows ARM64/x64 client and linked ARM64 server/tools complete; protocol layouts match. | Passed41051669638/41078079045; preserve exact sources and paired debug. |
-| 2. Client platform | Native ARM64 Wine entry/codec/software Vulkan/PCM and Android x64 entry/offline/loopback pass. | Selected471 component and compiled-auth pairing pass; Android presentation and full initialization remain. |
-| 3. Local services | Native compiled SQL/auth/SRP/ledger/restart passes for retained six-patch reference; Android x64 persistent MySQL service passes. | Native product composition passes on six/seven-patch builds; phone staged coordinator and three cleanup-owner fault cases pass host checks. Playerbots schema and owned four-schema finish pass natively; Android SQL remains. |
+| 2. Client platform | Full Windows ARM64/x64 and actual ARM64 Wine entry/codec/software Vulkan/FMOD/transport pass. Complete Retail-ON builds pass atceb; latestc8 all-five checks pass. Android x64 Surface/AudioTrack/ownership components pass. | App still selects471. Normal asset-backed initialization, actual Android ARM64 graphics/audio and gameplay remain. |
+| 3. Local services | Original seven-patch providers are public and source-preserved. Native ARM64 production typed Java/PRoot four-schema SQL/promotion/restart passes at7c; actual Android x64 MySQL service passes separately. | Finish original full x64 tools41119182502, then real native x64 SQL and the source-gated Android four-schema fixture. Rerun ARM64 after lease changes. |
 | 4. Matched gameplay | Current471/c0e/seven-patch SRP pairing passes41088546780; normal initialization/world remain untested. | Matched login, character/world/gameplay and actual persistence/bots. |
-| 5. Android application | Verified runtime/source import, UI review, controls/bridges, source-gated programs installer and content/schema adapters build. | Complete owned session, readiness, lifecycle and graceful saves. |
+| 5. Android application | Import/runtime/data/shader/SQL/game ownership and controls implemented; complete public-input APK passes CI and local byte readback. Actual Android update preservation and six-case handoff/shared-lease process-death recovery pass. | Qualify complete asset-backed session, input, audio, lifecycle and actual character saves. Offscreen graphics setup check has no hardware result here. |
 | 6. Thor candidate | Not ready; stable signing identity provisioned. | One coherent offline playable, update-compatible APK with available data and consolidated test. |
 
 ## Execution order
@@ -58,14 +58,18 @@ Application: `io.github.russianranger.esteria`. Immutable imported generations a
 A passed component test, compiled EXE, built APK or listening TCP port does not prove world playability. Keep compilation, host component tests, emulator tests and physical Thor tests separate in STATUS.md and TESTING.md. Missing content blocks only affected runtime qualification while independent work proceeds.
 
 
-Current order: complete the measured ordered/helper source seals and derived
-providers; finish public cohort consumption and atomic adoption/coherent APK;
-compose retained game/client ownership with the new local-world setup pipeline
-and service-owned presentation; then qualify actual imported-data world gameplay.
-Native current authentication, bot schema and owned installation finish pass.
-The exact exported-source server archive is retained; no full rebuild is needed.
+Current order: complete the running original x64 dbimport/helper build, bind only
+its actual measured outputs and execute native four-schema SQL. Complete the
+disabled Android qualification provider/fixture and its ownership/source review,
+then run real Android four-schema promotion/restart. Historical817 MySQL bytes
+must be admitted from their exact frozen source; current Java inherits no old
+runtime proof. Keep production ARM64 admission and the five save-selection fields.
 
-The retained game/session and service-owned presentation/control UI now compile
-and pass meaningful host ownership regressions. Public source-owned Wine cohort
-consumption and atomic seven-pin adoption pass. Complete derived tool/helper
-providers, inspect the coherent APK and run actual Android/native-data gates next.
+Runtime lease duplication now reserves canonical names before opening a file
+descriptor; actual Linux and Android process-death tests cover the POSIX hazard.
+Shaders/server data use the same effective locale. An explicit setup graphics
+check uses the existing pinned C probe before costly extraction. These changes
+do not provide missing MPQs/catalogs/DBC/maps or qualify normal world entry.
+After source/platform gates, validate real imported-data shaders, matched normal
+login, character/world play, audio, saves, one-to-four bots and offline lifecycle.
+Do not substitute synthetic fixtures for those asset-backed gates.

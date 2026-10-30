@@ -1,0 +1,94 @@
+{
+  "allSourceZipMembersReadAndCrcVerified": true,
+  "androidGuestExecuted": false,
+  "apkPayloadReadBackHere": false,
+  "deviceTestCandidate": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "integrationRevision": "84fa637867ad6c2c916a455c703e577cd60a298c",
+  "integrationSource": {
+    "allRegularFilesMatchExactGitBlobsOrDeclaredWrapperConversion": true,
+    "archiveRegularFileBytes": 10380906,
+    "canonicalGitBlobBytes": 10380900,
+    "declaredCheckoutConversions": {
+      "gradlew.bat": {
+        "archive": {
+          "bytes": 295,
+          "sha256": "21186e8f097fcc9e5f62ee0abf2d95b92f973b347d0c27f0205a336af8aa021d"
+        },
+        "canonical": {
+          "bytes": 289,
+          "sha256": "119ce8a4bfdf3024ba03cf9b6b810afd47b49e17999a0053bfe719effbad36ea"
+        },
+        "exactCrLfConversionVerified": true
+      }
+    },
+    "entireGzipCrcAndTrailerReadBack": true,
+    "executableModesMatchGit": true,
+    "trackedRegularFiles": 1058
+  },
+  "prootSource": {
+    "allMemberSizesAndSha256MatchActualCiInventory": true,
+    "allRelinkableObjectsHaveActualArm64RelocatableElfHeaders": true,
+    "entireGzipCrcAndTrailerReadBack": true,
+    "regularFileBytes": 1613364,
+    "regularFiles": 30,
+    "relinkableArm64Objects": 15
+  },
+  "runAttempt": 1,
+  "runtimeJsonIdentityComparison": {
+    "allBytesUnchanged": true,
+    "canonicalManifest": {
+      "bytes": 11020,
+      "sha256": "dd67c428ffbba290187d6db2b729787af12432e9d47340d8d39fb2f90c584a27"
+    },
+    "comparedRevision": "7c303665e8028aba86a7b87d543b2528d968b1ab",
+    "files": 74,
+    "lockFiles": 61,
+    "serialization": "Git-sorted {path,bytes,sha256} array, json.dumps(sort_keys=True,separators=(comma,colon)), UTF-8"
+  },
+  "scope": "independent-local-exact-integration-and-PRoot-source-readback",
+  "sourceArtifact": {
+    "bytes": 3737124,
+    "id": 13015065657,
+    "sha256": "c069b2045e86d4881b85b70c559848def90ccba9937ed720fb8cbe5df2b8b388"
+  },
+  "sourceArtifactMembers": {
+    "coherent-integration-source.tar.gz": {
+      "bytes": 2586693,
+      "sha256": "4cdfe38131c02a3849e3041bd9eeff128c7f2d15526bfc9b8ad623363ba7b5c9"
+    },
+    "proot-build/build-evidence.json": {
+      "bytes": 2099,
+      "sha256": "14d09032d6b44bbd4f58956861375c35721b46e286dfde1b0c2c3803842507f8"
+    },
+    "proot-build/proot-corresponding-source.tar.gz": {
+      "bytes": 1147814,
+      "sha256": "f48ae9176ea2f02c37a2cebd61c655779d4b4a261c6d14b7cd7563eb3623de0a"
+    }
+  },
+  "sourceDerivedDataHelperFiles": {
+    "extractor_order.py": {
+      "bytes": 9884,
+      "sha256": "5c6d30d23c2a8ebb13d037907cbcc6e7b67ea31f4b99798d925c5e3da756128c"
+    },
+    "owned_process_group.py": {
+      "bytes": 2795,
+      "sha256": "c19ed5c05e94d7b537df1055983fca75e20447f594419084f2207d60f99f138e"
+    },
+    "server_data_generation.py": {
+      "bytes": 29380,
+      "sha256": "72513fb5e0c1264f996fed74a96178a9789e14e97863d268da1170fa64f74cc6"
+    },
+    "server_data_preflight.py": {
+      "bytes": 27886,
+      "sha256": "8b9a1d44b70a8c1fce7a54e0ee39bba68621026f34270982cb68cb8d326374e0"
+    },
+    "shader_generation.py": {
+      "bytes": 19353,
+      "sha256": "8bb48952c36bdc4c69516c2ffa6f5c2d2eb59e84019e6420948d94bc81683ac5"
+    }
+  },
+  "sourceSnapshotExact": true,
+  "workflowRun": 41132701776
+}

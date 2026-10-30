@@ -1,0 +1,43 @@
+{
+  "actualCanonicalTestsRun": 1346,
+  "actualJavacEmbeddedCacheTestPassed": true,
+  "actualJobLogsReadBack": true,
+  "actualPassed": 1276,
+  "actualRealGitStatDirtyFixtureTestPassed": true,
+  "androidApiExecuted": false,
+  "errors": 0,
+  "explicitlySkipped": 70,
+  "failures": 0,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "observedAtUtc": "2026-10-30T21:52:04.417244+00:00",
+  "pendingUnpublishedX64FixtureQualifiedByThisRun": false,
+  "priorFailedRunPreserved": 41132701937,
+  "producer": {
+    "jobConclusion": "success",
+    "jobId": 124331205396,
+    "revision": "f44f854099f9abd70fd722633663e587278d5c0d",
+    "runId": 41133823889,
+    "workflowConclusion": "success",
+    "workflowStatus": "completed",
+    "workflowUpdatedAt": "2026-10-30T21:50:13Z"
+  },
+  "productionSourceAdmissionRelaxed": false,
+  "scope": "canonical tooling CI confirmation after isolated Java closure and Git fixture corrections",
+  "seconds": 46.019,
+  "sourceFiles": {
+    "tests/test_embedded_archive_cache.py": {
+      "bytes": 1249,
+      "sha256": "20f8ad9bcd5f120d83ca39907879c76c77ff40255389800276a854e8d4b6a28c"
+    },
+    "tests/test_public_local_server_profile.py": {
+      "bytes": 13695,
+      "sha256": "b12e21f36d817143ddab962825dc761929ffd6d39aa1710fcb367bda70ede9dd"
+    },
+    "tools/fetch_local_server_profile.py": {
+      "bytes": 14514,
+      "sha256": "adaf334102ec1736be6bd9cbf1d87f2c5d116f7bc3971b0633e9b8634b5ef887"
+    }
+  },
+  "sourceFilesMatchProducerGit": true
+}
