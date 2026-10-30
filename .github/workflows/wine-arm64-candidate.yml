@@ -18,32 +18,79 @@ concurrency:
   group: wine-arm64-candidate-${{ github.ref }}
   cancel-in-progress: false
 jobs:
+  toolchain-sources:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify fixed Git source capture guards
+        run: python3 -m unittest tests.test_wine_arm64_sources -v
+      - name: Capture and read back complete original toolchain Git objects before compiling Wine
+        run: |
+          mkdir -p out/wine-arm64-source-preflight
+          python3 runtime/wine-arm64/capture_toolchain_sources.py --lock runtime/wine-arm64/sources.lock.json \
+            --ca /etc/ssl/certs/ca-certificates.crt --output out/wine-arm64-toolchain-sources \
+            > out/wine-arm64-source-preflight/capture.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: native-arm64-wine-source-preflight-evidence-${{ github.sha }}
+          path: out/wine-arm64-source-preflight
+          retention-days: 14
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: success()
+        with:
+          name: native-arm64-wine-toolchain-sources-${{ github.sha }}
+          path: out/wine-arm64-toolchain-sources
+          retention-days: 14
+          compression-level: 0
+          if-no-files-found: error
   candidate:
+    needs: toolchain-sources
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 180
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
+      - name: Recover this successful preflight's exact retained toolchain sources
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: native-arm64-wine-toolchain-sources-${{ github.sha }}
+          path: out/wine-arm64-toolchain-sources
       - name: Validate candidate guards and record exact client source
         id: inputs
         run: |
           test "$(uname -m)" = aarch64
           python3 -m unittest tests.test_wine_arm64_candidate tests.test_wine_arm64_sources tests.test_wine_arm64_preparation tests.test_wine_qualification tests.test_wine_audio -v
+          python3 - <<'PY' > out/wine-arm64-source-transfer.json
+          import importlib.util,json
+          from pathlib import Path
+          path=Path('runtime/wine-arm64/capture_toolchain_sources.py')
+          spec=importlib.util.spec_from_file_location('source_capture',path)
+          module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+          print(json.dumps(module.verify_output(Path('runtime/wine-arm64/sources.lock.json'),Path('out/wine-arm64-toolchain-sources')),indent=2))
+          PY
           python3 -c 'import json;print("client_revision="+json.load(open("runtime/wine-arm64/sources.lock.json"))["clientQualification"]["sourceRevision"])' >> "$GITHUB_OUTPUT"
           mkdir -p out/wine-arm64-build
       - name: Build exact Wine and FEX against frozen Debian12 on native ARM64
         id: runtime
         run: |
           docker build --platform linux/arm64 --target runtime -f runtime/wine-arm64/Dockerfile \
+            --build-context toolchain-sources=./out/wine-arm64-toolchain-sources \
             --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
             -t esteria-wine-arm64:candidate . > out/wine-arm64-build/build.log 2>&1
       - name: Execute actual default and anonymous-copy ARM64 PE fixtures offline
         run: |
           docker build --platform linux/arm64 --target private-image-test-export -f runtime/wine-arm64/Dockerfile \
+            --build-context toolchain-sources=./out/wine-arm64-toolchain-sources \
             --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
             --output type=local,dest=out/wine-arm64-private-pe . > out/wine-arm64-build/private-pe-build.log 2>&1
       - name: Normalize and independently read back the fresh candidate rootfs
+        id: package
         run: |
           container=$(docker create esteria-wine-arm64:candidate)
           trap 'docker rm -f "$container" >/dev/null' EXIT
@@ -58,6 +105,7 @@ jobs:
         if: always() && steps.runtime.outcome == 'success'
         run: |
           docker build --platform linux/arm64 --target source-export -f runtime/wine-arm64/Dockerfile \
+            --build-context toolchain-sources=./out/wine-arm64-toolchain-sources \
             --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
             --output type=local,dest=out/wine-arm64-sources . > out/wine-arm64-build/source-build.log 2>&1
           sudo chown -R "$(id -u):$(id -g)" out/wine-arm64-sources
@@ -127,6 +175,14 @@ jobs:
         if: success()
         with:
           name: native-arm64-wine-candidate-${{ github.sha }}
+          path: out/wine-arm64-runtime
+          retention-days: 14
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: failure() && steps.package.outcome == 'success'
+        with:
+          name: unqualified-native-arm64-wine-build-${{ github.sha }}
           path: out/wine-arm64-runtime
           retention-days: 14
           compression-level: 0

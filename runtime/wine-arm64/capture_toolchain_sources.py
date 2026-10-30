@@ -3,9 +3,9 @@
 
 This never executes fetched source or follows .gitmodules URLs. Every gitlink
 must have an explicit repository/full-revision entry in its parent's submodules
-mapping. Git export attributes are disabled and every emitted blob is checked
-against its original Git object, so export-ignore/export-subst cannot silently
-remove or change corresponding source. No binary-rebuild equivalence is claimed.
+mapping. Source bytes come directly from cat-file, without Git archive or any
+attribute-driven worktree conversion. Every emitted blob is checked against its
+original Git object. No binary-rebuild equivalence is claimed.
 """
 import argparse
 import gzip
@@ -99,7 +99,7 @@ def child_limit():
     resource.setrlimit(resource.RLIMIT_FSIZE, (limit, limit))
 
 
-def git(repository, arguments, ca, output=None, limit=1024**2, timeout=900):
+def git(repository, arguments, ca, output=None, limit=1024**2, timeout=900, input_file=None):
     """Drain bounded output and reserve the leader identity through group cleanup."""
     command = ['git', '-c', 'http.sslCAInfo=' + str(ca), '-c', 'http.sslVerify=true',
                '-c', 'core.hooksPath=/dev/null', '-c', 'core.attributesFile=/dev/null',
@@ -111,7 +111,8 @@ def git(repository, arguments, ca, output=None, limit=1024**2, timeout=900):
     command += list(arguments)
     environment = dict(os.environ, GIT_TERMINAL_PROMPT='0', GIT_OPTIONAL_LOCKS='0',
                        GIT_TRACE='0', GIT_TRACE_CURL='0', GIT_CURL_VERBOSE='0')
-    process = subprocess.Popen(command, env=environment, stdin=subprocess.DEVNULL,
+    process = subprocess.Popen(command, env=environment,
+                               stdin=subprocess.DEVNULL if input_file is None else input_file,
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                start_new_session=True, preexec_fn=child_limit)
     owner = OwnedGroup(process)
@@ -164,9 +165,6 @@ def fetch(source, directory, ca):
     git(directory, ['fetch', '--quiet', '--no-tags', '--depth=1', source['repository'], source['revision']], ca)
     actual = git(directory, ['rev-parse', '--verify', 'FETCH_HEAD^{commit}'], ca).decode().strip()
     require(actual == source['revision'], 'toolchain-fetched-revision-differs')
-    # Attributes in this local file override the fetched tree's export rules.
-    (directory / 'info').mkdir(exist_ok=True)
-    (directory / 'info' / 'attributes').write_text('* -export-ignore -export-subst\n')
 
 
 def records(stream):
@@ -236,11 +234,19 @@ def snapshot(repository, source, ca, work, output, budget):
     blobs, byte_count = tree(repository, source, ca, work)
     budget['treeBytes'] += byte_count
     require(budget['treeBytes'] <= MAX_TOTAL_TREE, 'toolchain-all-source-byte-limit')
-    raw_archive = work / 'original.tar'
+    # cat-file without --filters/--textconv returns the original Git blobs.
+    # git archive also applies text/eol/ident/working-tree-encoding attributes,
+    # so disabling only export-ignore/export-subst does not preserve raw bytes.
+    raw_blobs = work / 'original.blobs'
+    requests = work / 'blob-requests'
+    ordered = sorted(blobs)
+    with requests.open('xb') as stream:
+        for path in ordered:
+            stream.write(blobs[path][1].encode() + b'\n')
+    with requests.open('rb') as incoming, raw_blobs.open('xb') as stream:
+        git(repository, ['cat-file', '--batch'], ca, input_file=incoming,
+            output=stream, limit=MAX_TREE + MAX_FILES * 128)
     prefix = source['name'] + '/'
-    with raw_archive.open('xb') as stream:
-        git(repository, ['archive', '--format=tar', '--prefix=' + prefix, source['revision']],
-            ca, output=stream, limit=MAX_TREE + MAX_FILES * 2048)
     target = output / (source['name'] + '.tar.gz')
     commit = git(repository, ['cat-file', 'commit', source['revision']], ca)
     require(hashlib.sha1(b'commit ' + str(len(commit)).encode() + b'\0' + commit).hexdigest() ==
@@ -250,22 +256,13 @@ def snapshot(repository, source, ca, work, output, budget):
     commit_file = output / (source['name'] + '.commit')
     commit_file.write_bytes(commit)
     retained = {}
-    seen = set()
-    with raw_archive.open('rb') as incoming, target.open('xb') as compressed:
+    with raw_blobs.open('rb') as incoming, target.open('xb') as compressed:
         with gzip.GzipFile(filename='', fileobj=compressed, mode='wb', mtime=0) as zipped:
-            with tarfile.open(fileobj=incoming, mode='r|') as original, \
-                    tarfile.open(fileobj=zipped, mode='w|', format=tarfile.GNU_FORMAT) as archive:
-                for item in original:
-                    if item.isdir():
-                        require(item.name == source['name'] or item.name.startswith(prefix),
-                                'toolchain-source-archive-prefix')
-                        original.members.clear()
-                        continue
-                    require(item.name.startswith(prefix), 'toolchain-source-archive-prefix')
-                    path = relative(item.name[len(prefix):])
-                    require(path in blobs and path not in seen, 'toolchain-source-archive-inventory')
-                    seen.add(path)
+            with tarfile.open(fileobj=zipped, mode='w|', format=tarfile.GNU_FORMAT) as archive:
+                for path in ordered:
                     mode, oid, size = blobs[path]
+                    require(incoming.readline(128) == f'{oid} blob {size}\n'.encode(),
+                            'toolchain-source-blob-header')
                     notice = NOTICE.fullmatch(PurePosixPath(path).name) is not None
                     require(not notice or size <= MAX_NOTICE, 'toolchain-notice-size-limit')
                     info = tarfile.TarInfo(prefix + path)
@@ -273,22 +270,21 @@ def snapshot(repository, source, ca, work, output, budget):
                     info.uid = info.gid = info.mtime = 0
                     info.uname = info.gname = ''
                     if mode == '120000':
-                        require(item.issym(), 'toolchain-source-symlink-type')
-                        data = item.linkname.encode('utf-8')
+                        require(0 < size <= 4096, 'toolchain-source-symlink-target')
+                        data = incoming.read(size)
                         # This is source data in a tar stream, never a host
                         # symlink. Preserve its original target bytes without
                         # resolving or extracting them.
-                        require(len(data) == size and 0 < size <= 4096 and '\0' not in item.linkname,
+                        require(len(data) == size and b'\0' not in data,
                                 'toolchain-source-symlink-target')
                         require(hashlib.sha1(b'blob ' + str(size).encode() + b'\0' + data).hexdigest() == oid,
                                 'toolchain-source-symlink-object')
                         info.type = tarfile.SYMTYPE
-                        info.linkname = item.linkname
+                        info.linkname = data.decode('utf-8')
                         archive.addfile(info)
                     else:
-                        require(item.isfile() and item.size == size, 'toolchain-source-blob-size')
                         info.size = size
-                        reader = BlobReader(original.extractfile(item), size, retain=notice)
+                        reader = BlobReader(incoming, size, retain=notice)
                         archive.addfile(info, reader)
                         require(reader.remaining == 0 and reader.git_sha.hexdigest() == oid,
                                 'toolchain-source-blob-object')
@@ -301,10 +297,10 @@ def snapshot(repository, source, ca, work, output, budget):
                             path_out.parent.mkdir(parents=True, exist_ok=True)
                             path_out.write_bytes(reader.saved)
                             retained[path] = dict(bytes=size, sha256=reader.sha.hexdigest())
-                    original.members.clear()
+                    require(incoming.read(1) == b'\n', 'toolchain-source-blob-terminator')
+                require(incoming.read(1) == b'', 'toolchain-source-blob-trailing-data')
         compressed.flush()
         os.fsync(compressed.fileno())
-    require(seen == set(blobs), 'toolchain-source-archive-missing-blobs')
     require(retained, 'toolchain-source-notices-missing')
     measured = identity(target)
     budget['archiveBytes'] += measured['bytes']

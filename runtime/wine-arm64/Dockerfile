@@ -90,11 +90,10 @@ COPY --from=private-image-test /private-pe-evidence/ /
 
 FROM builder AS corresponding-sources
 COPY --from=runtime /etc/esteria-wine-arm64.json /sources/runtime.json
+COPY --from=toolchain-sources / /sources/toolchain-sources/
 RUN --mount=type=secret,id=build_ca,required=true,mode=0444 \
     python3 /inputs/capture_sources.py --runtime /sources/runtime.json --build-packages /sources/build-packages.tsv \
-      --lock /inputs/sources.lock.json --ca /run/secrets/build_ca --output /package-sources \
-    && python3 /inputs/capture_toolchain_sources.py --lock /inputs/sources.lock.json \
-      --ca /run/secrets/build_ca --output /sources/toolchain-sources
+      --lock /inputs/sources.lock.json --ca /run/secrets/build_ca --output /package-sources
 FROM scratch AS source-export
 COPY --from=corresponding-sources /sources/ /wine/
 COPY --from=corresponding-sources /package-sources/ /debian/

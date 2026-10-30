@@ -3,7 +3,8 @@
 This recipe prepares a new Debian12 ARM64 candidate and runs native host gates.
 It does not select a replacement in the APK. The existing `f036c00a…` archive,
 `runtime/runtime-sources.lock.json` and every installed/provider binding stay
-unchanged. No native ARM64 build or execution success is claimed by these sources.
+unchanged. Native build/PE evidence is recorded below; full source closure and
+current-client qualification remain separate gates.
 
 The reviewed Wine adaptation already passed default/selected Linux x64 PE tests
 and actual Android13 x64 prefix, reconstructed entry, offline and loopback tests
@@ -25,12 +26,16 @@ Original Wine, FEX and bundled toolchain notices stay in the runtime. Complete
 original Wine/FEX/toolchain archives, the toolchain's recipe/LLVM/MinGW/LLDB-MI
 Git trees and original notices, all Debian runtime **and build** package sources,
 build logs and the complete integration tree form the separate source export.
-Each toolchain source archive is read back into Git blob/tree identities and
+Raw Git objects supply each source byte; Git archive/worktree text conversions
+cannot change the retained originals. Each source archive is read back into Git blob/tree identities and
 bound to the pinned raw commit object. Unlisted submodules, missing notices,
 changed archives and extra source files fail validation. The FEX version argument
 is `2510`; FEX's CMake code supplies its own `FEX-` prefix.
 
-`wine-arm64-candidate.yml` runs on a real `ubuntu-24.04-arm` worker. It requires:
+`wine-arm64-candidate.yml` first captures and verifies all fixed toolchain Git
+trees on a host worker. Only a successful preflight enables the real
+`ubuntu-24.04-arm` build. The same-run source artifact is independently checked
+again after download and supplied directly to the Docker source export. It requires:
 
 1. A source-built runtime and real original/selected ARM64 PE pair: relocation,
    image protections, code execution/cache flush, data/BSS, private isolation and
@@ -50,8 +55,34 @@ The measured candidate lock is an output of the build. The unchanged preparer
 accepts it only through `--lock`; the qualifier requires explicit `--runtime-lock`,
 `--bridge-input-lock` and `--private-pe-copy`. Selected execution must emit the
 real mapping marker. Runtime upload requires the entire host job to succeed;
-sources/evidence are retained separately on failures when available. No initialized
+sources/evidence are retained separately on failures when available. A packaged
+runtime from a later failed job is retained under an explicit `unqualified` name,
+independently of source closure; it cannot qualify a provider. No initialized
 prefix, client fixture or private session is exported in the runtime package.
+
+## First actual native result
+
+Run41051386531 at `b1d96ed0788e0e0d052db0dffe89f7d6c517d0c6` built the exact
+Wine/FEX runtime and passed both real native ARM64 PE modes: zero default and
+two selected adaptation markers, forced relocation, executable pages, data/BSS,
+private isolation, shared writes and normal cleanup. Its fresh archive readback
+passed 14,180 entries / 1,325,744,204 file bytes and 52 original runtime notices.
+The 282,627,881-byte archive had SHA-256
+`cf2e2bfa690d5883924f3b78c216c8b27e61045c13c4d85bf1b1ca75150266eb`.
+
+The strict source gate then stopped at `toolchain-source-blob-size`; current
+client fixtures did not run. It had downloaded 183 Debian source packages /
+583 originals before failing to retain the toolchain Git tree. Reproduction
+showed that `git archive` can apply CRLF, ident or encoding conversions despite
+disabling export-ignore/substitution. The exact original offending pathname was
+not recorded. Capture now reads raw `git cat-file --batch` objects and retains
+the same blob/tree/commit checks, with conversion and large-batch regressions.
+Actual complete LLVM capture must pass the new source preflight before rebuilding.
+
+Verified public receipts are in
+[`../evidence/wine-arm64-candidate-41051386531.json`](../evidence/wine-arm64-candidate-41051386531.json).
+That failed run retained only bounded logs/receipts, not the measured archive;
+the new failure-only upload prevents losing that output on later gate failures.
 
 ## Later provider transition
 

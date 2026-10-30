@@ -102,6 +102,70 @@ class ToolchainSources(unittest.TestCase):
         second, _ = self.capture('second')
         self.assertEqual((output / 'recipe.tar.gz').read_bytes(), (second / 'recipe.tar.gz').read_bytes())
 
+    def test_archive_worktree_conversions_cannot_change_retained_git_blobs(self):
+        working = self.root / 'recipe-work'
+        attributes = working / '.gitattributes'
+        attributes.write_text(attributes.read_text() +
+            'crlf.txt text eol=crlf\nident.txt ident\nencoded.txt text working-tree-encoding=UTF-16LE\n')
+        raw = {'crlf.txt': b'one\ntwo\n', 'ident.txt': b'$Id$\n', 'encoded.txt': b'abc\n'}
+        for name, data in raw.items():
+            (working / name).write_bytes(data.decode().encode('utf-16le') if name == 'encoded.txt' else data)
+        self.command('add', '.', cwd=working)
+        self.command('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid',
+                     'commit', '--quiet', '-m', 'Attribute conversion fixture', cwd=working)
+        revision = self.command('rev-parse', 'HEAD', cwd=working)
+        bare = self.root / 'with-conversions.git'
+        self.command('clone', '--quiet', '--bare', str(working), str(bare))
+        self.repositories[revision] = bare
+        self.lock['toolchain']['recipe']['revision'] = revision
+        self.lock['licenses']['fixture-license']['url'] = (
+            'https://raw.githubusercontent.com/fixture/recipe/' + revision + '/LICENSE')
+        self.save_lock()
+        # Reproduce the original failure: export overrides do not suppress
+        # checkout conversions in git archive. All three archived sizes differ
+        # from their actual Git blobs despite -export-ignore/-export-subst.
+        (bare / 'info/attributes').write_text('* -export-ignore -export-subst\n')
+        converted = subprocess.check_output(['git', '--git-dir=' + str(bare), 'archive', revision])
+        with tarfile.open(fileobj=io.BytesIO(converted)) as archive:
+            for name, data in raw.items():
+                self.assertNotEqual(archive.getmember(name).size, len(data))
+        output, proof = self.capture('raw-conversions')
+        with tarfile.open(output / 'recipe.tar.gz', 'r:gz') as archive:
+            for name, data in raw.items():
+                self.assertEqual(archive.extractfile('recipe/' + name).read(), data)
+        self.assertEqual(CAPTURE.verify_output(self.lock_path, output), proof)
+
+    def test_blob_batch_larger_than_pipe_buffers_completes_with_file_stdin(self):
+        working = self.root / 'recipe-work'
+        (working / 'bulk').mkdir()
+        # More than 64 KiB of object requests and 2 MiB of responses would
+        # deadlock a producer that writes pipe stdin before draining stdout.
+        for number in range(2048):
+            (working / 'bulk' / f'{number:04}').write_bytes(f'{number:04}\n'.encode() + b'x' * 1024)
+        self.command('add', '.', cwd=working)
+        self.command('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid',
+                     'commit', '--quiet', '-m', 'Large request and response fixture', cwd=working)
+        revision = self.command('rev-parse', 'HEAD', cwd=working)
+        bare = self.root / 'with-bulk.git'
+        self.command('clone', '--quiet', '--bare', str(working), str(bare))
+        self.repositories[revision] = bare
+        self.lock['toolchain']['recipe']['revision'] = revision
+        self.lock['licenses']['fixture-license']['url'] = (
+            'https://raw.githubusercontent.com/fixture/recipe/' + revision + '/LICENSE')
+        self.save_lock()
+        original = CAPTURE.git
+        requests = []
+        def bounded_git(repository, arguments, ca, **kwargs):
+            if arguments == ['cat-file', '--batch']:
+                incoming = kwargs['input_file']
+                self.assertTrue(os.path.isfile(incoming.name))
+                requests.append(os.fstat(incoming.fileno()).st_size)
+            return original(repository, arguments, ca, timeout=10, **kwargs)
+        with patch.object(CAPTURE, 'git', bounded_git):
+            output, proof = self.capture('large-batch')
+        self.assertGreater(requests[0], 65536)
+        self.assertEqual(CAPTURE.verify_output(self.lock_path, output), proof)
+
     def test_blob_mutation_with_updated_archive_hash_cannot_relabel_git_source(self):
         output, _ = self.capture()
         path = output / 'recipe.tar.gz'
