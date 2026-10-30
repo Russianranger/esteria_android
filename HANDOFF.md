@@ -1,119 +1,78 @@
 # Next-session handoff
 
-## Authorization and current result
+Continue toward a nearly complete local client/server APK for AYN Thor. User
+explicitly authorizes implementation, commits, branch pushes and CI. Push only
+client `android/arm64-port` and integration `android/client-server`; preserve
+both defaults and shared history. Server is read-only. No preliminary APK or
+Thor startup-test request. Do not imply execution continues without a real job.
 
-Continue toward a nearly complete local client/server APK for AYN Thor. Push only
-client `android/arm64-port` and integration `android/client-server`; server is read-only.
-Preserve default branches and shared history. Do not send preliminary APKs or
-claim background development without an actual running mechanism.
+## Current inputs and outcome
 
-The reconstructed ARM64 and x64 Windows clients build successfully. Real MySQL
-bootstrap/recovery/persistence tests pass on Linux. Android currently provides
-verified import, launcher UI and diagnostics, with gameplay deliberately gated.
-Read [STATUS.md](STATUS.md) and current Actions results before resuming; pending
-server/Wine jobs must not be converted into successful evidence without logs.
+The application lock pins client69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa,
+serverf35f04d01689f034778e3474b3c820092f51e461 and
+Eluna58d7652138887783228b9727bd1fa4e08f00342b, with six hashed server patches.
+The newer client development tip is97b347ee034551ea78dc905c3e209667534e6283.
+Fetch both branches and inspect Actions before interpreting pending results.
 
-## Current queued checkpoints
+The chosen path is reconstructed Windows ARM64 under local ARM64 Wine, plus a
+separate Ubuntu24 ARM64 MySQL/server guest. It is not native Android. Do not mix
+Ubuntu glibc2.39 server binaries into Debian12 Wine's glibc2.36 rootfs. The x64
+Android fixtures are component qualifications, not production ARM64 evidence.
 
-- Full EXE offline diagnostics pass all5 jobs41003225299 atcliente2718f6.
-  Tip9f2e759 builds both targets but fails the actual loopback gate. New3e9ef3a8
-  diagnoses phases and repairs lost timer wakes; inspect its actual result before
-  replacing the intentionally older69cc application provider.
-- Server40994809596 reached final linking after2,257objects. Patch5 supplies real
-  grid template definitions; patch6 omits README-only script directories while
-  preserving populated registrations. Run41005048019 is compiling with the saved cache; full server/auth
-  package remains unqualified until it succeeds.
-- Android tracer run41003838793 passes3vs0 control/protected survivors and saved
-  file/relaunch checks. Native stdin41003838751 and Android9-group41003838802 pass.
-  New remote-owner process-death fixture is separate pending evidence.
-- App writable UI review/activation, safe keep-current behavior and stale-decision
-  rejection pass actual adapter tests and combined APK checks. Future active
-  sessions must continue enforcing the stopped-client prerequisite.
-- Android database adapter compiles but remains outside launcher execution.
-  Read `runtime/ANDROID-DATABASE-SETUP.md`: fixed `/work/state`, persistent secrets
-  and partial state, no current SQL/schema-readiness claim. Actual x64 Android
-  MySQL fixture and native SQL backup/restore qualification remain work.
-- Exactb06 dependency prerelease is published and all9 stored assets reverified
-  in41003838795. Separate release lock contains durable URLs and hashes. Client
-  and guest-helper archival inputs still need equivalent durable retention.
+The app has resumable immutable imports, verified optional runtime providers,
+writable client/UI generations, review/activation, native presentation/input/audio
+bridges, process ownership, persistent bootstrap source packaging and diagnostics.
+Gameplay START remains gated. Latest all-four-provider ARM64 build passes core,
+APK/AndroidTest/lint and exact final-byte inventory checks. No user signing/update
+baseline, Android ARM64 execution, client/server login or world entry is qualified.
 
-## Next concrete work
+## Actual latest evidence and next work
 
-1. Fetch both development tips and inspect current Actions. Application client pin
-   is `69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa`; full ARM64/x64 builds and
-   native ARM64 Wine entry/codec/software Vulkan passed in `40989834370`. Codec also passed
-   `40985737329`. Neither starts the full game.
-2. Actual-EXE entry CI `40989834370` passed all five jobs at client
-   `f75c2c71d9bb76a6707bfb68b2bf615db544e5bf`, pinned to integration harness `9ee80cd`. Windows ARM64/x64 and native Linux ARM64 receipts, namespace completion and
-   process exit pass. Engine framebuffer/readback also passed run `40992315512`; continue Android bridge integration. Entry check
-   deliberately does not call CommonMain or consume game assets.
-3. Server run `40987376145` passed the third Eluna fix and failed module stat APIs
-   at 1,214/2,258 units. Inspect the new mod-attunement-plus semantic patch. Continue
-   real compile/link fixes as digest-checked patches in this repository. The next
-   workflow also binds enabled modules to actual binaries and emits a verified
-   GNU SQL/config/notice package. Source-profile package alone is unqualified.
-4. Android PRoot CI `40986376389` passed Bionic build/APK byte verification and
-   Linux x64/ARM64 descendant ownership. Minimal Android x64 PRoot/glibc execution passes below; production ARM64 remains open.
-   The Java runtime installer has passed the full pinned archive on Linux with
-   64 MiB heap, including forced hardlink copies. Android13 x86_64 installer/update
-   run `40995925492` passes all18 contracts and version-2 preservation. Android
-   native owner run `40994809786` passes six real shell-process groups. PRoot/glibc
-   run `40998008458` passes actual x64 private-ELF/dlopen/TLS/thread/fork/loopback
-   and relaunch persistence. Continue tracer-death and ARM64 integration. See
-   `runtime/ANDROID-INSTALLATION.md` and `runtime/proot/README.md`.
-5. Dependency image/MySQL/source-capture CI `40989666380` and normalized rootfs
-   package/readback run `40993458111` passed. Integrate the verified optional APK
-   provider and setup action, then establish actual server library closure.
-   Do not combine its glibc 2.39 binaries with Debian 12 Wine's glibc 2.36.
-   Keep all mutable databases outside replaceable runtime generations.
-6. Base SQL load/restart CI `40991449039` passed all 468 files; qualify the compiled dbimport and the separate playerbots
-   loader, then versioned upgrades with validated backup/restore. Real empty-DB
-   bootstrap and loopback realm repair pass; `40987376123` runs all eight realm
-   tests on MySQL 8.0.44. Owned-account fresh create/recovery/restart passes native
-   ARM64 MySQL run `40998008509`; actual pinned SRP C++ sources also pass locally
-   on x64. Implement real auth challenge/proof/realm-list qualification when
-   authserver is available. Repair advertised realm only after all module updates.
-7. Native process/Surface/audio/input bridge implementations and internal controller/IME
-   view are now present; guest ARM64 build `40995565147`, Android-owner and actual
-   Surface/AudioTrack run `40999380046` pass. Both native ARM64 Wine FMOD backends
-   pass client run `40998295147`. Reconstructed client/provider installation and
-   all four combined APK provider checks pass. Integrate
-   their qualified session lifecycle and
-   graceful server-save shutdown. Inspect read-only reference launcher code where
-   useful. Keep startup gated until component readiness is actually established.
-   Client setup now also prepares an owned mutable launch view when import data
-   exists. Do not bypass its loose-Interface gate; writable UI generation handling
-   is separate ongoing work. New tracer-death and actual authserver protocol
-   harnesses are compiled/reviewed but require their pending runtime results.
-8. Import authentic complete build 12340/custom data; generate shaders with the
-   corrected provider precedence, extract matched server assets, validate local
-   login/world/save/relog/bots/offline before any main Thor test.
+1. Full EXE offline checks passed all5 jobs41003225299 (cliente2718f6).
+   Positive transport run41006100154 passed actual x64 packet/stream I/O after
+   the timer-wake fix, then exposed a diagnostic-only missing Finalize() call.
+   Client97b347 fixes that; wait for complete Windows/Wine receipts before repinning.
+2. Server41005048019 compiles six-patch source using saved cache. Prior run linked
+   authserver/dbimport but failed final worldserver link after2,257objects. Patches5/6
+   repair real template visibility and README-only Custom registration. Complete
+   package, compiled SQL updater and real authentication harness remain unqualified.
+3. Proposed patch7 derives module configs from the selected main config's parent,
+   preserving defaults. Actual source-linked host ConfigMgr reference passes and
+   original-source negative control fails. It is not in sources.lock yet. Activate
+   after current link evidence; then materialize/check every enabled module config,
+   not just playerbots.conf. ConfigMgr success alone does not prove modules loaded.
+4. Base/account SQL runs pass. Backup41006179962 fails before dumping on a mysqldump
+   option accepted only by mysql. The corrected command and real host preflight
+   are implemented; actual ARM64 dump/restore/restart and repeat-wrapper must rerun.
+   Playerbots fourth-schema readiness reference is under development; no AI claim.
+5. Android stdin41003838802 passes9 groups; native stdin41003838751 passes12.
+   Tracer41003838793 passes3survivors versus0 protected plus saved-file relaunch.
+   Remote-owner41006180061 passes owner/tracer/guest exit and independent control
+   survival in4,115ms with nine pidfds. Whole-app death/ARM64/Wine remain open.
+6. Android MySQL41006572364 builds a separate exact x64 debug fixture. Require real
+   initialize→seed→repeat→verify SQL/UUID/credential evidence before enabling the
+   normal bootstrap adapter. Preserve /work/state and private secrets across updates.
+7. Turnip41006180058 builds Linux ARM64 Mesa KGSL plus X11 software WSI and real
+   glslang/SPIRV tools. A source build is not GPU/Android qualification. Existing
+   Debian22 Mesa DRM driver does not establish Adreno KGSL support.
+8. Shader staging helper uses strict pinned client translation, bounded processes,
+   exact input/tool provenance and atomic output promotion. Eight host groups pass;
+   synthetic structural SPIR-V tests are not real shaders. Complete tool packaging,
+   app setup adapter and actual data-based generation remain work.
+9. Durable server41003838795, guest41006572380 and client41006572426 dependency
+   releases are published and read-only/public-fetch verified. Scoped release locks
+   contain exact URLs/hashes; GitHub immutable=false is explicit. Unified clean
+   all-provider APK automation is next; never depend on expiring Actions artifacts.
 
-## Invariants
+## Missing content and acceptance
 
-- App identity: `io.github.russianranger.esteria`, minSdk 26/target 35,
-  JDK 17/Gradle 8.9/AGP 8.7.3. Keep one persistent private signing key before the
-  first user installation. Debug CI is not an update baseline.
-- Imported immutable generations, replaceable runtimes and mutable data/config/
-  WTF/cache/logs are separate. Direct SAF or ZIP imports stream with bounded
-  metadata; activation is atomic. Old generations still need a retention policy.
-- Core supervisor tracks dependencies and cleanup failures. Runtime-specific
-  process groups and world-save shutdown are not yet supplied by generic tests.
-  TCP listening alone is not authenticated/game readiness.
-- Keep 25 quests/254 container slots/32 client class capacity. Server class count
-  12 does not imply 32 playable classes. No 1,000-quest/254-class wire format.
-- `Wow.exe` alone was verified as 3.3.5.12340; it does not establish complete MPQ
-  compatibility. Do not execute the unchanged stock client as port completion.
-- Runtime/SQL/package manifests must record exact inputs and genuine qualification
-  scope. Missing custom content must not be fabricated or silently ignored.
+Only the supplied Wow.exe established3.3.5.12340. Full base MPQs, current custom
+provider stack/catalogs, matched DBC overlays/maps/vmaps/mmaps/Cameras and generated
+shaders are absent. See ASSET-REQUIREMENTS.md. Continue independent platform work;
+request precise files only when unavailable inputs prevent all remaining progress.
+Keep Retail/Forever disabled until complete local closure is prepared. Start bot
+qualification at a small measured population; current random population is zero.
 
-## Reproduction and access
-
-Clean builds use [BUILDING.md](BUILDING.md) and exact locks, not session paths.
-Public Git/API access works; this session's Git CLI had no push credential.
-The connected GitHub Git-object API can publish commits and fast-forward refs
-with an expected old SHA. Check for concurrent changes, never force-push.
-
-The working session has sibling `client-src`, `server-src`, `reference-fta`,
-downloaded toolchains and staged runtime. They are caches, not required source
-inputs. Proprietary user files, secrets and generated binaries remain outside Git.
+Read the scoped runtime qualification documents for exact hashes and limits. Do
+not infer world saves from a file fixture, game input from XTest, or Adreno rendering
+from Lavapipe. Main device testing requires one coherent expected-playable package.

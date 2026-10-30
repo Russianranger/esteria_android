@@ -69,7 +69,7 @@ no unpinned runtime package or replacement binary.
 
 ## Validation boundary
 
-Thirteen focused host guard tests pass, including real bounded subprocess output
+Sixteen focused host guard tests pass, including real bounded subprocess output
 draining/deadline cleanup, digest rejection before SQL, all-four-empty gating,
 partial-file preservation, no-replace publication and regular-file/link checks.
 The file-size limiter starts an isolated Python interpreter that applies the
@@ -85,8 +85,21 @@ are never artifact inputs.
 The first actual ARM64 run, `41003838768` at `3ae7b694`, passed the full source-base
 load/restart inside this harness, then stopped before dumping because the initial
 composition had not rendered the configuration required by realm/account helpers.
-The corrected composition now verifies the account fixture and renders those
-templates before provisioning. Full backup/restore execution is pending rerun; no
-dump, restore or setup-wrapper success is inferred from the earlier base-only pass.
+The corrected composition verifies the account fixture and renders those
+templates before provisioning. Actual run `41006179962` at `73f694c3` passed
+those stages and owned account creation, then failed at the dump stage. The dump
+command contained `--connect-timeout=3`, which MySQL's `mysql` client accepts but
+`mysqldump` rejects. This incompatibility was reproduced with the real host
+MySQL 8.0.46 client. The option is now retained only for the restoring `mysql`
+client; the dumper retains its owned-process deadline and authenticated socket.
+An initial `--help` pass now parses every exact dump flag with defaults and login
+files disabled before any source database is created. The corrected preflight
+passed with the real x86_64 host tool; exact pinned ARM64 execution is pending.
+Failures now export controlled classification and numeric process/MySQL error
+codes, never raw SQL diagnostics. Artifact `12955522230` from that run was
+downloaded and verified (6,241-byte ZIP SHA-256
+`84ad9fc9f886c76ad5c5ce3e6b91dfa9889e52145de5a84bdd10548ccdfc4e8d`).
+Full backup/restore execution is pending rerun; no dump, restore or setup-wrapper
+success is inferred from the preceding stages.
 No current result qualifies live saved-game restoration, upgrades across revisions,
 character saving/relogging, bot persistence, the Android helper, or gameplay.

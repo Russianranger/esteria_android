@@ -12,7 +12,12 @@ unqualified by this packaging step.
 New release-only metadata is in `dependency-release.lock.json`. The release tag
 identifies provider packaging revision `ae5534d0a9d7fb72c8e5a03dcfc65420c354e7bb`;
 the original helper build revision and artifact hashes are separately recorded.
-The GitHub release is not yet published; no durable download is claimed yet.
+The [public prerelease](https://github.com/Russianranger/esteria_android/releases/tag/deps-guest-bridges-ae5534d-a91e2e7cf749)
+is published. Read-only final verification passed in [run41006572380](https://github.com/Russianranger/esteria_android/actions/runs/41006572380).
+Its six complete stored assets and exact tag were verified, and an independent
+host fetch with no GitHub token reproduced all six hashes. The raw publication
+receipt and host fetch evidence are retained under `runtime/evidence/`. GitHub
+reports `immutable=false`; only the publisher no-overwrite rule is asserted.
 
 The workflow has three jobs: read-only validation of the original artifact;
 upload-only extension of one exact UI-created draft; read-only verification
@@ -49,5 +54,7 @@ Before publication, `stage --inputs original-artifact.zip --output new-candidate
 provides the same validation offline against the existing measured artifact.
 Local staging, payload export and provider rebuild reproduced the exact archive
 hash `a91e2e7cf74957c7caf2c7e85de2a6ee8952d273b3f5e3f18cecb06127791c39`.
-These are packaging checks; publication and authenticated/unauthenticated
-download qualification remain pending.
+These are packaging and distribution checks. Initial uploads stopped before
+mutation because the exact drafts did not yet exist; retrying only failed jobs
+after authorized draft creation passed. The final public fetch has no Actions
+artifact dependency. No Android execution or gameplay qualification is implied.

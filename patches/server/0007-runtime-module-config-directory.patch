@@ -1,0 +1,26 @@
+diff --git a/src/common/Configuration/Config.cpp b/src/common/Configuration/Config.cpp
+--- a/src/common/Configuration/Config.cpp
++++ b/src/common/Configuration/Config.cpp
+@@ -25,6 +25,7 @@
+ #include <algorithm>
+ #include <cctype>
+ #include <cstdlib>
++#include <filesystem>
+ #include <fstream>
+ #include <locale>
+ #include <mutex>
+@@ -762,8 +763,12 @@ bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/, bool isNeedPrintInfo
+         LOG_INFO("server.loading", "Loading Modules Configuration...");
+     }
+ 
+-    // Start loading module configs
+-    std::string const& moduleConfigPath = GetConfigPath() + "modules/";
++    // Keep modules beside the selected main configuration, including --config.
++    // The applications resolve their default filename using GetConfigPath(), so
++    // default desktop locations remain unchanged. A bare filename uses modules/
++    // relative to the same working directory as that main configuration.
++    std::string const moduleConfigPath =
++        (std::filesystem::path(GetFilename()).parent_path() / "modules").generic_string() + "/";
+ 
+     for (auto const& fileName : _additonalFiles)
+     {

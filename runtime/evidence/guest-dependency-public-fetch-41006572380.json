@@ -1,0 +1,47 @@
+{
+  "allStoredBytesVerified": true,
+  "androidRuntimeQualified": false,
+  "files": {
+    "NOTICE.txt": {
+      "bytes": 789,
+      "sha256": "0a2673d1de2a39f318c34547464659568c49e1dccd3bd240fc9c44e244756f6d"
+    },
+    "SHA256SUMS": {
+      "bytes": 446,
+      "sha256": "5dc65b899e766ad517bae86feff03c6ff6ae48424be1cb1f6f9dac28b8598a97"
+    },
+    "guest-bridge-input-lock.json": {
+      "bytes": 12807,
+      "sha256": "e983198e229ffad73d8fdc14cd6059029a5b6ba20d6e9509633db45df3e03ea4"
+    },
+    "guest-bridge-provider.json": {
+      "bytes": 7266,
+      "sha256": "608d7bd2ed2c41bfec9b1de7cbe3d66cb84ba60de5b4fb7ebcfa8a090dc6c02a"
+    },
+    "guest-bridges-arm64.tar.gz": {
+      "bytes": 469031,
+      "sha256": "a91e2e7cf74957c7caf2c7e85de2a6ee8952d273b3f5e3f18cecb06127791c39"
+    },
+    "release-manifest.json": {
+      "bytes": 1353,
+      "sha256": "8445a90ca06bf5eec2136d359505ab383066aee407e51b6d7ccb09b3361e103c"
+    }
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "githubTokenProvided": false,
+  "originalActionsArtifactRequired": false,
+  "publicationArtifact": {
+    "bytes": 829,
+    "id": 12956415060,
+    "sha256": "caf35433d6158a51d84b9a3830c4f5651e2cc84220ec82b75b1db27396938c5e"
+  },
+  "release": "https://github.com/Russianranger/esteria_android/releases/tag/deps-guest-bridges-ae5534d-a91e2e7cf749",
+  "releaseId": 428673215,
+  "repository": "Russianranger/esteria_android",
+  "scope": "independent-host-public-release-fetch",
+  "tag": "deps-guest-bridges-ae5534d-a91e2e7cf749",
+  "targetCommit": "ae5534d0a9d7fb72c8e5a03dcfc65420c354e7bb",
+  "workflowRevision": "edbcbb0438be6ef953cbc648068586fd0ce9121a",
+  "workflowRun": 41006572380
+}

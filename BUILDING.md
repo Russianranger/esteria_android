@@ -168,3 +168,11 @@ draft. Its upload job only attaches verified missing assets, then a separate
 read-only job verifies actual publication. It does not expand Actions permissions,
 change default branches or substitute another tag target. See
 `runtime/server/DEPENDENCY-RELEASE.md` for the concrete authentication boundary.
+
+
+The server, guest-helper and reconstructed-client dependency releases now have
+actual publication and independent public-fetch receipts. Their scoped
+`dependency-release.lock.json` files retain exact URLs/hashes without repinning the
+measured providers. See the three `DEPENDENCY-RELEASE.md` files. Shader setup's
+source-matched tool bundle and transactional helper are documented in
+`runtime/SHADER-GENERATION.md`; this is not yet enabled in normal launcher setup.

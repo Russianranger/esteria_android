@@ -49,3 +49,11 @@ Application: `io.github.russianranger.esteria`. Immutable imported generations a
 
 ## Evidence gates
 A passed component test, compiled EXE, built APK or listening TCP port does not prove world playability. Keep compilation, host component tests, emulator tests and physical Thor tests separate in STATUS.md and TESTING.md. Missing content blocks only affected runtime qualification while independent work proceeds.
+
+
+Latest integration priorities: complete source-backed server linking and compiled
+SQL/auth gates; qualify the real bootstrap under Android x64; finish strict local
+shader preparation and the pinned KGSL graphics build; then compose actual Wine
+client execution with native presentation. Durable dependency archives now allow
+clean build automation to avoid expiring CI inputs. Staging checks and emulator
+fixtures remain separate from complete ARM64 local gameplay acceptance.

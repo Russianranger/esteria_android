@@ -19,9 +19,14 @@ The corresponding-source receipt binds the six-patch integration source lock.
 Future published fetch checks the retained source lock instead of requiring
 unrelated server patch records in the current checkout to remain unchanged.
 
-Actual local source generation and full archive readback succeeded. Release
-publication and cross-repository artifact recovery using the Actions token
-remain unqualified until the workflow succeeds; no durable URL is claimed yet.
+The [public prerelease](https://github.com/Russianranger/esteria_android/releases/tag/deps-client-arm64-ae5534d-69ccfaa6)
+is published. [Run41006572426](https://github.com/Russianranger/esteria_android/actions/runs/41006572426)
+passed actual cross-repository Actions-token recovery, exact frozen-recipe source
+generation, draft upload and final read-only verification of the tag and seven
+complete assets. An independent host download with no GitHub token verified all
+seven files and source/PE/descriptor/import/notice checks. Raw publication and
+public-fetch evidence are retained under `runtime/evidence/`. GitHub reports
+`immutable=false`; the publisher does not overwrite assets or move tags.
 Initial source generation uses a separate clean checkout of the exact provider
 packaging revision and checks every generator input hash before executing its
 packager. Later server-lock edits therefore cannot change the retained source

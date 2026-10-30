@@ -8,7 +8,7 @@ Updated 2026-10-30 UTC. This is an implementation checkpoint, **not a device-tes
 `69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa`, server
 `f35f04d01689f034778e3474b3c820092f51e461`, and Eluna
 `58d7652138887783228b9727bd1fa4e08f00342b`. Three digest-checked Eluna declaration/include patches plus a server-root
-attunement stat-API compatibility patch are maintained here. Starting tips were client `800cdd2`, integration `6309c8f`,
+attunement stat-API compatibility patch, real grid-template includes, and source-empty script-directory filtering are maintained here (six patches). Starting tips were client `800cdd2`, integration `6309c8f`,
 and the same server revision. Work is on the two requested development branches;
 no default merge, history rewrite or server push has occurred.
 
@@ -17,19 +17,21 @@ no default merge, history rewrite or server push has occurred.
 The full reconstructed EXE's offline diagnostics pass Windows x64/ARM64 and
 native Linux ARM64 Wine in run41003225299, client
 `e2718f647a7f1efb9219106c7501f88a0bf06e4f`. New client tip
-`9f2e759970defbdec30a1584400869dcbb9f9c9c` builds both targets but fails its new
-positive loopback gate. Revision `3e9ef3a8bbb25a976b33be6dc3c166d3a2b41c05`
-adds phase diagnostics and repairs a source-demonstrated lost timer wake; actual
-runtime results remain pending. The application
-intentionally keeps the measured69cc provider until replacement qualification.
+`97b347ee034551ea78dc905c3e209667534e6283` corrects the final retention-test fixture.
+The preceding3e9 run41006100154 passed real x64 short/extended packet reads,
+queued sends, stream I/O and both connect/disconnect pairs after repairing lost
+network timer wakes; it then exposed the fixture's missing WDataStore Finalize().
+A complete transport receipt and Wine transport qualification remain pending.
+The application intentionally keeps the measured69cc provider.
 
 Server40994809596 compiled all2,257 objects and linked authserver/dbimport, then
 failed final worldserver linking on three missing grid-template instantiations
 and the README-only Custom directory's nonexistent loader. Minimal source-backed
 patches5/6 supply real template definitions and omit only source-empty directories.
 Corrected run41005048019 is compiling with the saved cache; no complete server
-package or auth/world success
-is claimed. Actual SQL backup/restore also needs its corrected fixture run.
+package or auth/world success is claimed. Backup run41006179962 passed source
+SQL, rendering and account setup, then rejected an unsupported mysqldump option.
+The correction has a real host option preflight; actual dump/restore remains open.
 
 Writable UI selection/review is integrated into the app with explicit divergence
 decisions and retained prior versions. Actual adapter32MiB tests, independent
@@ -41,14 +43,29 @@ Native Linux x64/ARM64 stdin tests pass12 real JNI groups in41003838751. Android
 x64 passes9 real owner groups in41003838802. Corrected tracer-death run41003838793
 observed3 control survivors versus0 protected survivors before alarms, plus3
 saved files read by a fresh guest. These are component results, not world saves,
-Android ARM64 guest execution or gameplay. Remote-owner process death is a new
-separate test; it must not claim isolated parent-death-signal causality.
+Android ARM64 guest execution or gameplay. Remote-owner run41006180061 now
+passes: owner/tracer/three guests exited within4,115ms while all separately owned
+controls survived; nine pidfds established exact identities. This is combined
+Android OS/ownership behavior, not isolated parent-death-signal causality.
 
 Dependency release41003838795 passed full original/source validation, upload to
 an exactb06 UI draft and independent read-only post-publication verification of
 all9 assets. The durable prerelease URL and per-file hashes are recorded in
 `runtime/server/dependency-release.lock.json`; GitHub immutable=false is explicit.
-No default branch, credential scope or repository security setting was changed.
+Guest and client input releases also pass actual public verification in
+41006572380/41006572426, including independent credential-free host downloads.
+Exact source companions and original license notices are retained. No default
+branch, credential scope or repository security setting was changed.
+
+The latest combined ARM64 APK passes clean core checks, application/instrumentation
+compilation, lint and all four final provider byte checks with six-patch source
+lock SHA256 `dbbf8983cfa2b429f7dd0c3308a2795ffbecd29e8019adf35348447e1eab41b0`.
+It remains an internal build, not an ARM64 execution or user device-test result.
+Android MySQL fixture41006572364 has built the exact x64 runtime image; actual
+emulator SQL results are pending. Turnip ARM64 build41006180058 is pending.
+Transactional shader-generation staging passes eight host groups, with actual
+subprocess bounds and explicitly synthetic storage fixtures. Real game MPQs,
+shader generation, Adreno rendering and launcher activation are still absent.
 
 ## Implemented and verified
 

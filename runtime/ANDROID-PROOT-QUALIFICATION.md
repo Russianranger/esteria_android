@@ -92,8 +92,8 @@ a false ownership pass. Pidfd or procfs restrictions fail the gate explicitly.
 A separate real graceful callback creates a stop request. Each guest writes and
 fsyncs its save record, parents wait for normal child exits, and a fresh guest
 invocation reads all three exact records back. This establishes fixture file
-persistence, not database/world save correctness. Android app-process death
-remains a separate unqualified gate.
+persistence, not database/world save correctness. Whole-application termination
+and production ARM64 execution remain separate unqualified gates.
 
 The corrected fixture passed on the actual Android13 x86_64 emulator in
 [run41003838793](https://github.com/Russianranger/esteria_android/actions/runs/41003838793)
@@ -113,7 +113,7 @@ was observed), so it cannot supply this execution evidence; the helper fails
 closed there. The normal CI VM passed this host pidfd gate in run41002275287.
 The corrected Android tracer result is recorded above.
 
-## Remote Android owner-process death extension (execution pending)
+## Remote Android owner-process death
 
 The explicit probe profile additionally compiles a nonexported bound Service in
 `:prootOwnerProbe`. Its manifest and Java source set are excluded from ordinary
@@ -138,7 +138,25 @@ also calls `ProcessList.killProcessGroup` after process/Binder death, so a contr
 spawned inside the killed Service could be removed by OS cgroup cleanup itself.
 The surviving control instead demonstrates that the test did not kill the whole
 app UID. Receipts keep `isolatedParentDeathSignalQualified` and whole-application
-`appDeathQualified` false. Actual execution of this new extension is pending.
+`appDeathQualified` false.
+
+Actual Android13 x86_64 execution passed in
+[run41006180061](https://github.com/Russianranger/esteria_android/actions/runs/41006180061),
+at `73f694c35ffaa6f0f7f8e9bab9eb30b79c84b5d4`. The remote Service, its tracer and
+all three detached guests exited while the instrumentation-owned control tracer
+and all three control guests remained alive. Nine process descriptors were
+verified and the observation completed in 4,115 ms, within the pre-alarm limit.
+All eight guest launches, the earlier patched/unpatched tracer cases and graceful
+save/relaunch checks passed. The separate clean ordinary APK build also passed
+the bounded manifest, DEX, asset and native-library exclusion check.
+
+Evidence ZIP 12956265170 has SHA-256
+`927cfd8fd99688e0e5b4ac0270199de33cfd3bd94be68ae4518a87e4338c89d6`.
+The actual probe APK is 2,271,150 bytes, SHA-256
+`ec374bd6e322bd8931e560b9221bfac4a6ad837a8ed40a478ce164fd33e4dd92`.
+This establishes Android emulator owner-process cleanup with the scope above;
+ARM64 guest execution, Wine, database/world saves, whole-app termination and Thor
+gameplay remain separate gates.
 
 To reproduce with Python3.12+, dpkg-deb, JDK17 and the documented Android SDK:
 

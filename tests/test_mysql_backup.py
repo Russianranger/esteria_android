@@ -37,7 +37,8 @@ class BackupGuards(unittest.TestCase):
         fixture = self.root / 'account-fixture'; fixture.mkdir()
         (fixture / 'account-fixture.json').write_text('{}\n')
         output = self.root / 'new-run'
-        with patch.object(backup, 'verify_tools', return_value={}), patch.object(backup.base, 'run') as engine:
+        with (patch.object(backup, 'verify_tools', return_value={}),
+              patch.object(backup, 'verify_dump_options'), patch.object(backup.base, 'run') as engine):
             with self.assertRaisesRegex(ValueError, 'account fixture manifest digest mismatch'):
                 backup.run(Path('/mysql'), Path('/mysqld'), Path('/dump'), self.root, '0' * 64,
                            self.root / 'lock', output, '8.0.46',
@@ -64,6 +65,7 @@ class BackupGuards(unittest.TestCase):
             events.append('realm')
             raise ValueError('intentional stop after configuration ordering check')
         with (patch.object(backup, 'verify_tools', return_value={}),
+              patch.object(backup, 'verify_dump_options'),
               patch.object(backup.account_fixture_tools, 'copy_fixture', return_value=provenance) as copied,
               patch.object(backup.base, 'run', side_effect=source),
               patch.object(backup, 'render', side_effect=render),
@@ -163,6 +165,42 @@ class BackupGuards(unittest.TestCase):
         self.assertTrue(all(arg in args for arg in ('--routines', '--events', '--triggers', '--set-gtid-purged=OFF')))
         self.assertFalse(any(arg.startswith(('--password', '-p')) for arg in args if arg != '--protocol=SOCKET'))
         self.assertNotIn('--all-databases', args)
+        self.assertNotIn('--connect-timeout=3', args)  # mysql accepts this; mysqldump does not.
+
+    def test_dump_option_preflight_runs_before_any_source_or_engine(self):
+        output = self.root / 'new-run'
+        with (patch.object(backup, 'verify_tools', return_value={}),
+              patch.object(backup, 'verify_dump_options', side_effect=backup.PrivateSqlFailure(
+                  2, b"unknown variable 'secret-value'")),
+              patch.object(backup.base, 'run') as engine,
+              patch.object(backup.account_fixture_tools, 'copy_fixture') as fixture):
+            with self.assertRaises(backup.PrivateSqlFailure):
+                backup.run(Path('/mysql'), Path('/mysqld'), Path('/dump'), self.root, '0' * 64,
+                           self.root / 'lock', output, '8.0.46',
+                           account_fixture=self.root, account_fixture_sha256='0' * 64)
+        engine.assert_not_called(); fixture.assert_not_called()
+        report = json.loads((output / 'qualification.json').read_text())
+        self.assertEqual(report['failure'], dict(kind='unsupported-command-option', exitCode=2))
+        self.assertFalse(report['dumpOptionsVerified'])
+        self.assertNotIn('secret-value', json.dumps(report))
+
+    def test_dump_option_preflight_uses_exact_flags_without_option_or_login_files(self):
+        def execute(command, incoming, outgoing, log, timeout):
+            self.assertEqual(command[1], '--no-defaults')
+            self.assertEqual(command[-1], '--help')
+            self.assertEqual(command[2:-1], backup.dump_arguments(Path('/dump'), Path('/x'), Path('/unused-state'))[2:])
+            self.assertEqual(backup.ENVIRONMENT['MYSQL_TEST_LOGIN_FILE'], os.devnull)
+            self.assertEqual(timeout, 15)
+            outgoing.write(b'mysqldump 8.0.46\nUsage: mysqldump [OPTIONS] database\n')
+        with patch.object(backup, 'run_private', side_effect=execute):
+            backup.verify_dump_options(Path('/dump'), self.root)
+
+    def test_failed_child_exports_only_classification_and_numeric_error(self):
+        command = [sys.executable, '-c', 'import os,sys; os.write(2,b"ERROR 1045 private-SQL-secret");sys.exit(2)']
+        with self.assertRaises(backup.PrivateSqlFailure) as error:
+            backup.run_private(command, subprocess.DEVNULL, subprocess.DEVNULL, self.root / 'failed.private-log')
+        self.assertEqual(error.exception.public, dict(kind='sql-process-exit', exitCode=2, mysqlErrorCode=1045))
+        self.assertNotIn('private-SQL-secret', str(error.exception))
 
     def test_actual_child_stderr_is_drained_and_bounded_privately(self):
         log = self.root / 'private.log'

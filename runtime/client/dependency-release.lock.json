@@ -77,5 +77,51 @@
       "sha256": "9d3096e8cc1d2a650353886800e8192dfe78f0b352fede322a39002e545b4152"
     }
   },
-  "published": null
+  "published": {
+    "assets": {
+      "NOTICE.txt": {
+        "bytes": 1340,
+        "sha256": "07268b21f9f08843bbbb42aa1fdfcd3c8ed8e052ab470eb42a1e0458dd898b42",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-client-arm64-ae5534d-69ccfaa6/NOTICE.txt"
+      },
+      "SHA256SUMS": {
+        "bytes": 547,
+        "sha256": "73cb0e96a229377ac1f628d306fb8de9aab595f7fe95f7123f82987ed1ac713f",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-client-arm64-ae5534d-69ccfaa6/SHA256SUMS"
+      },
+      "client-corresponding-source.tar.gz": {
+        "bytes": 23401759,
+        "sha256": "0ea2fa4f4997cee49cea73a06bf19977d2981285db6179a35f16921546a7bc48",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-client-arm64-ae5534d-69ccfaa6/client-corresponding-source.tar.gz"
+      },
+      "client-input-lock.json": {
+        "bytes": 492,
+        "sha256": "644849e771f7f2668553111db935fe2fff20b2a574187b340e070a7e1a2b7600",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-client-arm64-ae5534d-69ccfaa6/client-input-lock.json"
+      },
+      "reconstructed-client-arm64-original.zip": {
+        "bytes": 45120553,
+        "sha256": "4298480be53ddc2e614a06e8acd130139015ad52994e766eecee5f5d374327e4",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-client-arm64-ae5534d-69ccfaa6/reconstructed-client-arm64-original.zip"
+      },
+      "release-manifest.json": {
+        "bytes": 1507,
+        "sha256": "e702bc1f81e33f1a62c71fd0c0a52ce6455ca23164c9377cd497eaf930ad9c37",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-client-arm64-ae5534d-69ccfaa6/release-manifest.json"
+      },
+      "source-receipt.json": {
+        "bytes": 3513,
+        "sha256": "0bea5cdcadbff68c7ad6eda98ce298ef92f7b1939b86da9812295ec863a884ff",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-client-arm64-ae5534d-69ccfaa6/source-receipt.json"
+      }
+    },
+    "formatVersion": 1,
+    "githubImmutable": false,
+    "publisherNeverOverwrites": true,
+    "releaseId": 428673412,
+    "repository": "Russianranger/esteria_android",
+    "tag": "deps-client-arm64-ae5534d-69ccfaa6",
+    "targetCommit": "ae5534d0a9d7fb72c8e5a03dcfc65420c354e7bb",
+    "url": "https://github.com/Russianranger/esteria_android/releases/tag/deps-client-arm64-ae5534d-69ccfaa6"
+  }
 }

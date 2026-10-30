@@ -1,0 +1,42 @@
+{
+  "assets": {
+    "NOTICE.txt": {
+      "bytes": 789,
+      "sha256": "0a2673d1de2a39f318c34547464659568c49e1dccd3bd240fc9c44e244756f6d",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-guest-bridges-ae5534d-a91e2e7cf749/NOTICE.txt"
+    },
+    "SHA256SUMS": {
+      "bytes": 446,
+      "sha256": "5dc65b899e766ad517bae86feff03c6ff6ae48424be1cb1f6f9dac28b8598a97",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-guest-bridges-ae5534d-a91e2e7cf749/SHA256SUMS"
+    },
+    "guest-bridge-input-lock.json": {
+      "bytes": 12807,
+      "sha256": "e983198e229ffad73d8fdc14cd6059029a5b6ba20d6e9509633db45df3e03ea4",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-guest-bridges-ae5534d-a91e2e7cf749/guest-bridge-input-lock.json"
+    },
+    "guest-bridge-provider.json": {
+      "bytes": 7266,
+      "sha256": "608d7bd2ed2c41bfec9b1de7cbe3d66cb84ba60de5b4fb7ebcfa8a090dc6c02a",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-guest-bridges-ae5534d-a91e2e7cf749/guest-bridge-provider.json"
+    },
+    "guest-bridges-arm64.tar.gz": {
+      "bytes": 469031,
+      "sha256": "a91e2e7cf74957c7caf2c7e85de2a6ee8952d273b3f5e3f18cecb06127791c39",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-guest-bridges-ae5534d-a91e2e7cf749/guest-bridges-arm64.tar.gz"
+    },
+    "release-manifest.json": {
+      "bytes": 1353,
+      "sha256": "8445a90ca06bf5eec2136d359505ab383066aee407e51b6d7ccb09b3361e103c",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-guest-bridges-ae5534d-a91e2e7cf749/release-manifest.json"
+    }
+  },
+  "formatVersion": 1,
+  "githubImmutable": false,
+  "publisherNeverOverwrites": true,
+  "releaseId": 428673215,
+  "repository": "Russianranger/esteria_android",
+  "tag": "deps-guest-bridges-ae5534d-a91e2e7cf749",
+  "targetCommit": "ae5534d0a9d7fb72c8e5a03dcfc65420c354e7bb",
+  "url": "https://github.com/Russianranger/esteria_android/releases/tag/deps-guest-bridges-ae5534d-a91e2e7cf749"
+}

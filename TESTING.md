@@ -148,3 +148,13 @@ bounded stdin, and eleven backup guard tests including the actual kernel output
 size limit. Full MySQL dump/restore, expanded Android process tests and corrected
 tracer-death control still require their CI results. See the scoped qualification
 documents; none of these host checks establishes login, world saving or Thor use.
+
+
+Current lifecycle evidence supersedes the pending qualifications above: stdin
+41003838802 and remote-owner41006180061 pass real Android13 x64 execution. The
+latest combined ARM64 all-provider APK passes clean core/build/instrumentation/lint
+and final provider hashes, without claiming ARM64 execution. Eight shader setup
+host groups validate transactions, exact tool closure and actual subprocess bounds;
+synthetic SPIR-V fixtures deliberately claim no semantic/rendering qualification.
+Backup41006179962 failed before dump on an unsupported dumper option; its correction
+requires actual rerun. See scoped qualification documents for full evidence.

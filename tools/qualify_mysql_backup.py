@@ -13,11 +13,13 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import signal
 import stat
 import struct
 import subprocess
 import sys
+import tempfile
 import threading
 
 if not __package__:
@@ -36,6 +38,18 @@ ROOT = Path(__file__).resolve().parents[1]
 MAX_DUMP = 4 * 1024 ** 3
 MAX_LOG = 64 * 1024
 ENVIRONMENT = {'PATH': '/usr/bin:/bin', 'LANG': 'C.UTF-8', 'MYSQL_TEST_LOGIN_FILE': os.devnull}
+
+
+class PrivateSqlFailure(ValueError):
+    """Export only controlled classification/numbers, never raw SQL diagnostics."""
+    def __init__(self, returncode, diagnostic):
+        super().__init__('private backup SQL process failed')
+        self.public = dict(kind='sql-process-exit', exitCode=returncode)
+        if b'unknown variable' in diagnostic or b'unknown option' in diagnostic:
+            self.public['kind'] = 'unsupported-command-option'
+        match = re.search(rb'(?:ERROR|Got error:)\s*([0-9]{1,5})\b', diagnostic)
+        if match:
+            self.public['mysqlErrorCode'] = int(match[1])
 
 
 def identity_file(path, maximum=MAX_DUMP):
@@ -99,7 +113,6 @@ def run_private(command, incoming, outgoing, log, timeout=900):
     reader.start()
     try:
         process.wait(timeout=timeout)
-        content.require(process.returncode == 0, 'private backup SQL process failed')
     finally:
         if process.poll() is None:
             os.killpg(process.pid, signal.SIGTERM)
@@ -116,11 +129,13 @@ def run_private(command, incoming, outgoing, log, timeout=900):
             stream.write(tail)
             stream.flush(); os.fsync(stream.fileno())
         content.require(not read_errors, 'private backup diagnostic read failed')
+    if process.returncode != 0:
+        raise PrivateSqlFailure(process.returncode, bytes(tail))
 
 
 def socket_arguments(options, state):
     return ['--defaults-file=' + str(options), '--protocol=SOCKET',
-            '--socket=' + str(state / 'run/mysql.sock'), '--connect-timeout=3']
+            '--socket=' + str(state / 'run/mysql.sock')]
 
 
 def dump_arguments(executable, options, state):
@@ -129,6 +144,20 @@ def dump_arguments(executable, options, state):
             '--routines', '--events', '--triggers', '--default-character-set=utf8mb4',
             '--order-by-primary', '--skip-comments', '--skip-dump-date', '--skip-add-locks',
             '--skip-disable-keys', '--column-statistics=0', '--databases', *db.DATABASES]
+
+
+def verify_dump_options(mysqldump, output):
+    # --help parses options and exits before connecting. Test the exact dump
+    # switches with no defaults/login files; no SQL or database is accessed.
+    command = dump_arguments(mysqldump, Path('/unused.cnf'), Path('/unused-state'))
+    command[1] = '--no-defaults'
+    command.append('--help')
+    with tempfile.TemporaryFile(dir=output) as help_file:
+        run_private(command, subprocess.DEVNULL, help_file, output / 'dump-options.private-log', timeout=15)
+        help_file.seek(0)
+        help_text = help_file.read(256 * 1024 + 1)
+    content.require(len(help_text) <= 256 * 1024 and b'mysqldump' in help_text and b'Usage:' in help_text,
+                    'pinned mysqldump help response missing or oversized')
 
 
 @contextmanager
@@ -174,6 +203,7 @@ def restore(mysql, state, version, backup, expected):
         base.empty_databases(connection)
         with backup.open('rb') as stream:
             run_private([str(mysql), *socket_arguments(options, state), '--skip-reconnect',
+                         '--connect-timeout=3',
                          '--binary-mode=1', '--local-infile=0', '--default-character-set=utf8mb4',
                          '--max-allowed-packet=1GB'], stream, subprocess.DEVNULL,
                         state / 'logs/restore.private-log')
@@ -199,6 +229,7 @@ def run(mysql, mysqld, mysqldump, fixture, expected, source_lock, output, versio
         mysqlVersion=version, tools=tools, fixtureManifestSha256=expected,
         accountFixtureManifestSha256=account_fixture_sha256,
         accountSourceVerified=False, sourceConfigurationRendered=False, sourceAccountProvisioned=False,
+        dumpOptionsVerified=False,
         qualificationSucceeded=False, sourceBaseSqlQualified=False, fullDumpRestored=False,
         setupWrapperFreshAndRepeatQualified=False,
         canonicalDumpMatched=False, ownedCredentialRowsRestored=False, restartPersistenceVerified=False,
@@ -207,6 +238,9 @@ def run(mysql, mysqld, mysqldump, fixture, expected, source_lock, output, versio
         androidRuntimeQualified=False, gameplayQualified=False)
     capture = None
     try:
+        evidence['phase'] = 'verify-pinned-dump-options'
+        verify_dump_options(mysqldump, output)
+        evidence['dumpOptionsVerified'] = True
         evidence['phase'] = 'verify-account-source-and-configuration-templates'
         verified_account_source = output / 'verified-account-source'
         account_manifest = account_fixture_tools.copy_fixture(
@@ -303,6 +337,11 @@ def run(mysql, mysqld, mysqldump, fixture, expected, source_lock, output, versio
                         privateDumpBytes=backup_identity['bytes'])
         # No dump/account hashes or rows are exported. Full SQL remains private.
         return evidence
+    except BaseException as error:
+        evidence['failure'] = error.public if isinstance(error, PrivateSqlFailure) else dict(
+            kind='operation-timeout' if isinstance(error, subprocess.TimeoutExpired) else 'operation-rejected',
+            exceptionType=type(error).__name__)
+        raise
     finally:
         if capture is not None:
             try:
