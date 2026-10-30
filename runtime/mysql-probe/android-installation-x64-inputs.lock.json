@@ -1,6 +1,6 @@
 {
   "androidRuntimeQualified": false,
-  "enabled": false,
+  "enabled": true,
   "formatVersion": 1,
   "fourSchemaCoordinatorQualified": false,
   "gameplayQualified": false,
@@ -33,13 +33,20 @@
   },
   "playerbotsAiQualified": false,
   "productionArm64ProviderQualified": false,
-  "provider": null,
-  "providerReadback": null,
+  "provider": {
+    "bytes": 26368,
+    "sha256": "666e7589d50175510070afe78e5a9af4aa7895928bd97b546370604e246c2359"
+  },
+  "providerReadback": {
+    "bytes": 1170,
+    "path": "runtime/evidence/android-installation-provider-fff211/provider-readback.json",
+    "sha256": "c090ba45911750a2d7edac2f295767cfa0854af712b3dd2e38c46a755811f48c"
+  },
   "repository": "Russianranger/esteria_android",
   "scope": "android-x64-installation-coordinator-input-selection",
   "serverDataQualified": false,
   "slotPromoted": false,
   "sqlExecuted": false,
-  "state": "native-x64-sql-qualified-provider-pending",
+  "state": "native-x64-sql-and-provider-measured",
   "worldserverQualified": false
 }

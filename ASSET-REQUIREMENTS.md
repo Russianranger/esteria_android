@@ -209,7 +209,59 @@ mandatory-file list. Unknown custom tables retain structural-only checks. These
 checks reject incompatible layouts early; they do not qualify rows, SQL overlays,
 world coverage or matched client/custom content. See runtime/server/DBC-PREFLIGHT.md.
 
-## Recommended first input set
+## Minimum for a first classic validation
+
+The practical first external input is the user's original build 12340 `Wow.exe`
+and complete `Data/` directory, including one complete installed locale. Preserve
+the original signed UI and ordinary model, texture, world, font and audio data.
+Account folders, saved passwords, logs, an initialized database and precomputed
+server maps are unnecessary for this first input. The app supplies its rebuilt
+client/runtime and local account configuration separately.
+
+At exact client `471ee42faadf4a97a1d0a86989cf1452621f2dc5`, conventional full-client
+startup requires `Data/common.MPQ`, `Data/<effective-locale>/locale-<locale>.MPQ`
+and `Data/<effective-locale>/speech-<locale>.MPQ`. `WoW/Source/Client.cpp` marks
+these kind1/availability2; failed `OpenArchiveWithRetry` reaches the nonoptional
+error branch and `StormExit` (lines 1445–1472). Other archive-table entries marked
+kind2 are optional to this engine branch. The importer's existing seven root-MPQ
+checks intentionally admit a conventional layout; they do not prove that every
+later engine requirement is satisfied. Keep the complete stock set rather than
+trimming it to that filename checklist.
+
+The existing setup helper already rejects a missing speech archive for the
+selected effective locale: `runtime/extractor_order.py` projects the same table
+and required/optional rules, and `runtime/server_data_generation.py` creates that
+plan before extractor processes. It selects the locale with the client's rotation
+rules and does not require speech archives for unused locales. No additional
+production check or optional-archive requirement was added by this audit.
+
+Normal initialization also requires authentic virtual `signaturefile`, the stock
+`DBFilesClient/*.dbc` stores and the signed `Interface/GlueXML/GlueXML.toc` and
+`Interface/FrameXML/FrameXML.toc` content closures. These are supplied by genuine
+client data, not reconstructed from code. The retained selected471 producer cache
+confirms signature checks remain enabled and `WOWDECOMP_RETAIL_ASSETS=OFF`.
+Retail/Forever data is therefore outside this selected binary's classic first
+pass; later enabled features still require their complete offline dependencies.
+
+Missing `Esteria*.bin` catalogs are not a global CommonMain/Glue abort condition.
+At this same revision, `WoW/Common/ComponentCore/EsteriaAppearance.cpp` treats a
+missing virtual `Esteria/<name>` or executable-adjacent `<name>` as an empty
+catalog. The affected custom race can lack textures, coverage or required model
+geometry; this is no assurance that it renders correctly. Classic races retain
+their normal CharSections path. Existing packers mostly repackage external
+catalog/model inputs. Drakonid coverage has a source recipe from the effective
+`ItemDisplayInfo.dbc`, but it has not been generated from user data here.
+
+The app can attempt maps/vmaps/mmaps/Cameras and Vulkan shader preparation from
+the genuine imported stack. Supported formats, complete shader listfiles, matching
+locale/provider order and actual conversion remain gates. It does not require
+the user to send generated outputs in advance. Full Esteria validation still needs
+the matched custom MPQ/model/catalog closure and any corresponding server DBC
+overlays/continuations for the features and world content under test. The first
+classic input permits that independent startup work while those custom features
+remain unqualified. See `runtime/evidence/classic-asset-minimum-471-audit.json`.
+
+## Recommended full Esteria input set
 
 Use the complete build 12340 client with its original MPQs and the matching
 Esteria client MPQ stack. Import the folder containing `Wow.exe` and `Data/`.

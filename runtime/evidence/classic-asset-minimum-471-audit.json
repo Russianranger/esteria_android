@@ -1,0 +1,181 @@
+{
+  "auditBoundary": {
+    "arbitraryOpaqueCustomArchivesScanned": false,
+    "assetsCreatedOrRepaired": false,
+    "buildsOrTestsRun": false,
+    "customAppearanceQualified": false,
+    "fullEsteriaObjectivePreserved": true,
+    "gameLoginQualified": false,
+    "gameplayQualified": false,
+    "newAssetDownloads": false,
+    "normalCommonMainExecuted": false,
+    "productionCodeChanged": false,
+    "signatureOrFeaturePolicyChanged": false,
+    "worldEntryQualified": false
+  },
+  "clientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "fixedClientGitInputsExact": true,
+  "fixedServerGitInputsExact": true,
+  "formatVersion": 1,
+  "integrationRevision": "fff2111453ac619d63feb779a67df0e760ee6e41",
+  "listedIntegrationInputsMatchRecordedCommit": true,
+  "observedAtUtc": "2026-10-30T23:13:52.200312+00:00",
+  "scope": "read-only-fixed-source-classic-asset-minimum-audit",
+  "selectedProducer": {
+    "artifactId": 12979433537,
+    "buildId": "41061576677.1",
+    "clientBuildManifest": {
+      "bytes": 2803,
+      "sha256": "ed34b6f648026073ba43203bee7e3dd1ca1d2413017fb99d8da54dab57808559"
+    },
+    "cmakeCache": {
+      "bytes": 17296,
+      "sha256": "f932f7f9dd0d3f62e067cc57d33aa81d2704ec19e2a727066989a02fecdacd07"
+    },
+    "originalArchive": {
+      "bytes": 45848847,
+      "sha256": "befac98c5c3434ea94dcb878f5da37f915946221fb17f1a7888c65f74bb846ad"
+    },
+    "retailAssetsEnabled": false,
+    "signatureChecksDisabled": false,
+    "workflowRun": 41061576677
+  },
+  "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
+  "smallestEventualExternalRequest": {
+    "customCatalogBundleGloballyRequired": false,
+    "forFirstClassicValidation": [
+      "Original Wow.exe with VERSIONINFO3.3.5.12340",
+      "Complete original Data directory, including one complete installed locale and its signed stock UI/art/audio/world data"
+    ],
+    "forRepresentativeCustomFeature": "Add only the matched effective MPQ/catalog/model/texture/geometry closure and corresponding server DBC overlays/continuations for the chosen custom race/map; later full Esteria coverage needs its complete matched stack.",
+    "precomputedServerMapsRequested": false,
+    "privateAccountFoldersOrPasswordsRequested": false
+  },
+  "sourceFindings": {
+    "appearanceAbsence": {
+      "classicPath": "CharacterComponent.cpp:1870-1879 keeps ordinary CharSections for classic races",
+      "customFeatureRisks": "Missing owned-race texture banks can leave null layers; missing coverage changes clothing shells; missing geometry can fail models that depend on replacement.",
+      "drakonidCoverageRecipe": "Server tools/drakonid_race_pack.py:435-447 derives coverage from effective imported ItemDisplayInfo.dbc; matching input has not been supplied.",
+      "fullCatalogBundleReproducibleFromPresentInputs": false,
+      "globalStartupFatalGateFound": false,
+      "loosePath": "<executable-directory>/<filename>",
+      "missingRead": "EsteriaAppearance.cpp:86-124 caches misses;151-186 returns empty selections",
+      "virtualPath": "Esteria/<filename>"
+    },
+    "conventionalFullClientMandatoryArchiveNames": [
+      "Data/common.MPQ",
+      "Data/<effective-locale>/locale-<locale>.MPQ",
+      "Data/<effective-locale>/speech-<locale>.MPQ"
+    ],
+    "existingEarlySetupRefusal": {
+      "behavior": "The exact classical provider-order plan checks required common/selected locale/selected speech before capability or map extractor processes.",
+      "existingNegativeControl": "tests/test_extractor_order.py:63-76 removes selected speech and requires mandatory-input refusal.",
+      "integrationSources": [
+        "runtime/extractor_order.py:149-155",
+        "runtime/server_data_generation.py:411-416,429-438"
+      ],
+      "present": true,
+      "testsRerunForThisAudit": false
+    },
+    "globalVirtualAssetGates": {
+      "signaturefile": "WoW/Source/Client.cpp:686-735 fatal load/authentication/version/scope checks",
+      "signedGlue": "CGlueMgr.cpp:739-800 loads/authenticates Interface/GlueXML/GlueXML.toc and closes on failure",
+      "signedWorldUi": "GameUI.cpp:1747-1795 checks Interface/FrameXML/FrameXML.toc plus Bindings.xml/digest",
+      "stockDbcs": "Client.cpp:1788 startup strings and1021 ClientDBInitialize; DBClient.cpp:1130-1155 loads all static stock stores; WowClientDB.h:104-162 fatal missing/malformed WDBC"
+    },
+    "mandatoryArchiveRule": {
+      "availability": "CheckDataFilesExist()+1; common.MPQ gives classical availability2",
+      "effectiveLocale": "CheckAvailableLocales:659-682 uses locale archive presence and twelve-locale rotation",
+      "openFailure": "OpenArchiveWithRetry:1130-1155 returns false; OpenArchives:1445-1472 fails only !optional, displays error, then StormExit",
+      "optionalRule": "kind2 stays optional; unused locales are not required",
+      "source": "WoW/Source/Client.cpp",
+      "tableLines": "157-187"
+    },
+    "shaderOutputs": {
+      "actualGenerationQualified": false,
+      "completeListfilesAndSupportedInputsStillRequired": true,
+      "externalPrebuiltSetRequired": false,
+      "runtimeDefaultPath": "<executable-directory>/VulkanShaders/{manifest.txt,index.txt,vertex/*.spv,pixel/*.spv}",
+      "sourceDefault": "CGxDeviceVulkanShader.cpp:247-279; GX_VULKAN_SHADERS overrides only through owned launcher bindings.",
+      "sourceMissingManifest": "Vulkan/Manifest.cpp:312-318 warns/returns false rather than a global startup abort; Android setup still requires prepared stages."
+    }
+  },
+  "sourceInputs": {
+    "client": {
+      "Engine/Source/Gx/CGxDeviceVulkan/CGxDeviceVulkanShader.cpp": {
+        "bytes": 16903,
+        "sha256": "6c73f257a7f995b5c7767a5b35ec79e9a6836e642ad6ae5f532a4c126900c7c5"
+      },
+      "Engine/Source/Gx/CGxDeviceVulkan/Vulkan/Manifest.cpp": {
+        "bytes": 15643,
+        "sha256": "807a07ff9fe4b4e642747cd259032ea36c625c6e03b4ea00cc222756867b44aa"
+      },
+      "Engine/Source/Model2/M2Shared.cpp": {
+        "bytes": 82516,
+        "sha256": "5526afc719a1d61400fed6aa69ca8803b40a8db4145a874cd1a515c4eea4090b"
+      },
+      "Tools/VulkanShaders/bls/archive.py": {
+        "bytes": 14233,
+        "sha256": "9494b952ad1431bd58dd2a30ecaac853b08e3dc59aa35490f66074d6a5ef6604"
+      },
+      "WoW/Common/ComponentCore/CharacterComponent.cpp": {
+        "bytes": 220412,
+        "sha256": "1812b516566878c183070e7ceff7175ff87058bd03f8ffab86dc21c32bd84f69"
+      },
+      "WoW/Common/ComponentCore/EsteriaAppearance.cpp": {
+        "bytes": 87201,
+        "sha256": "912042ba4d49b485ee7525dc69578fedce03878cef2cb65bada6b6b5e8adaa4d"
+      },
+      "WoW/Source/Client.cpp": {
+        "bytes": 73746,
+        "sha256": "1c656a2432cfb6aa485c8d56a973d604147b37ead064b19e2a5322b71fa91787"
+      },
+      "WoW/Source/DB/DBClient/DBClient.cpp": {
+        "bytes": 39325,
+        "sha256": "a08a4d5e1f2323f5c98fce0d8e48a9f637e22f367be0b331589277ac96c2ccef"
+      },
+      "WoW/Source/DB/WowClientDB.h": {
+        "bytes": 33779,
+        "sha256": "1850a4e2fb8cfc43c59e9fc13004b29e9645d4782eece71e19ff69b418607469"
+      },
+      "WoW/Source/Glue/CGlueMgr.cpp": {
+        "bytes": 85290,
+        "sha256": "4fa2e6f819cc727e0a113a3d69b48389e562842b14394427054766fba1da1b34"
+      },
+      "WoW/Source/Ui/GameUI.cpp": {
+        "bytes": 275955,
+        "sha256": "7af1a31c19b3e2d4c38f111b4d4c8c1dbae81cec0eeeb1370599d939fd7155ff"
+      }
+    },
+    "integration": {
+      "core/src/main/java/io/github/russianranger/esteria/core/importer/GameDataVerifier.java": {
+        "bytes": 14575,
+        "sha256": "33f1c8397f21d9a22e9ca7be3243ada2366a5d304304f01b3ac5f46c841ec21c"
+      },
+      "runtime/extractor_order.py": {
+        "bytes": 9884,
+        "sha256": "5c6d30d23c2a8ebb13d037907cbcc6e7b67ea31f4b99798d925c5e3da756128c"
+      },
+      "runtime/server_data_generation.py": {
+        "bytes": 29380,
+        "sha256": "72513fb5e0c1264f996fed74a96178a9789e14e97863d268da1170fa64f74cc6"
+      },
+      "tests/test_extractor_order.py": {
+        "bytes": 18167,
+        "sha256": "102a5660ff7d15db18762946f7cb910c0c9ea447a72edce4bf368757692f22b7"
+      }
+    },
+    "server": {
+      "tools/drakonid_race_pack.py": {
+        "bytes": 49977,
+        "sha256": "90e79a50c035656515499c46a3c14f017cda8dda4449464ae05c55d8fde6fa93"
+      },
+      "tools/pack_appearance_catalogs.py": {
+        "bytes": 2495,
+        "sha256": "d478ad345d8a6be0128c973a66ff850c4388af14222b06c0e32009b9081fb972"
+      }
+    }
+  },
+  "sourceSnapshotBoundary": "Fixed client/server canonical Git inputs and unchanged listed integration inputs match their exact revisions; the new documentation/audit receipt are uncommitted worktree additions.",
+  "sourceSnapshotExact": false
+}

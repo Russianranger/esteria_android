@@ -1,22 +1,44 @@
 {
-  "formatVersion": 1,
-  "scope": "android-x64-installation-provider-artifact-selection",
-  "repository": "Russianranger/esteria_android",
-  "enabled": false,
-  "state": "pending-actual-provider-artifact-measurement",
-  "producer": null,
-  "productArtifact": null,
-  "evidenceArtifact": null,
-  "measurementEvidence": null,
-  "providerDescriptor": null,
-  "productManifest": null,
-  "sqlExecuted": false,
   "androidRuntimeQualified": false,
-  "productionArm64ProviderQualified": false,
+  "enabled": true,
+  "evidenceArtifact": {
+    "bytes": 207104,
+    "id": 13019030483,
+    "sha256": "b6d93b39b72c932ca18abba0f4728b818a65a474480628151a3724d7857c453d"
+  },
+  "formatVersion": 1,
   "fourSchemaCoordinatorQualified": false,
-  "worldserverQualified": false,
-  "playerbotsAiQualified": false,
   "gameplayQualified": false,
+  "measurementEvidence": {
+    "bytes": 9474,
+    "path": "runtime/evidence/android-installation-provider-fff211-readback.json",
+    "sha256": "fad1c1e46bc02207f5fe724edccb3ef4657034d77b851aef61ea67de7542bc3a"
+  },
+  "playerbotsAiQualified": false,
+  "producer": {
+    "integrationRevision": "fff2111453ac619d63feb779a67df0e760ee6e41",
+    "job": 124356842748,
+    "workflowRun": 41141559961
+  },
+  "productArtifact": {
+    "bytes": 1969017146,
+    "id": 13019200327,
+    "sha256": "a591b642fef8bdc18067e51acdabb2dc22144996587f9af98bea1e37ad5f4d90"
+  },
+  "productManifest": {
+    "bytes": 45102,
+    "sha256": "662c069e722ee9820cd207eb7e2216fcaade70808f19fb9a275786c05f955936"
+  },
+  "productionArm64ProviderQualified": false,
+  "providerDescriptor": {
+    "bytes": 26368,
+    "sha256": "666e7589d50175510070afe78e5a9af4aa7895928bd97b546370604e246c2359"
+  },
+  "repository": "Russianranger/esteria_android",
+  "scope": "android-x64-installation-provider-artifact-selection",
+  "serverDataQualified": false,
   "slotPromoted": false,
-  "serverDataQualified": false
+  "sqlExecuted": false,
+  "state": "measured-provider-artifacts",
+  "worldserverQualified": false
 }

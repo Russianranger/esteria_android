@@ -35,16 +35,21 @@ Large source/build artifacts are fully verified in CI; label local-read boundari
   ELF62/debug/22library-source metadata is in x64-server-setup-build-817cbc proof.
   Small51,701B evidence read locally;868,530,955B complete artifact remains
   local-unread and requires full CI source/byte admission before execution.
-2. Measured native SQL input lock is now enabled from those actual build/MySQL/
-  public-content pins. Run existing native four-schema/reentry/ledger/restart
-  workflow and inspect actual completed receipts. No SQL proof exists yet for
-  these x64 tools; never transfer ARM64 or historical Java proof.
-3. Android x64 provider/fixture14-path implementation is reviewed/frozen:88focused
-  Python checks, actual delayed observer-owner groups, default AndroidTest compile/
-  lint and negative pending-profile admission pass. Default Android gate stays
-  OFF/null. Preserve exact905MB sourceZIP readback and P→Q unchanged-code binding.
-  Finish measurement/acquisition and actual emulator workflows, then bind real
-  native SQL/provider receipts. Observer must reap before DB/coordinator cleanup.
+2. Actual native x64 SQL41139757153/job124350948175@7d4 passes in245s:
+   original core/helper,52statements,29base31updates/30bot tables, reentry,
+   four-schema preservation, same-instance restart/probe cleanup/clean stop.
+   Exact rawqualification19483B/readback27894B and58Git/eightsource-profile pins
+   are preserved in runtime/evidence/x64-server-setup-sql-7d4b1cf-*.
+3. Actual provider measurement41141559961/job124356842748@fff211 passes; six
+   small receipts plus82P/current-code identities,207product/175source metadata,
+   canonicalP Git tar and14captured DSO/six original-debug bindings independently
+   checked. Descriptor26368B SHA666e7589d50175510070afe78e5a9af4aa7895928bd97b546370604e246c2359.
+   Complete artifact13019200327 is1,969,017,146B and NOT read locally; full CI
+   source/product readback and mandatory downstream acquisition remain explicit.
+   Measured provider/transport selectors are now enabled. Inspect actual Android
+   four-schema workflow next: full currentQ/frozenP/code/817source admission,
+   testAPK build, actual SQL/promotion/restart and receipts. Do not remeasure the
+   unchanged provider or claim Android success from selector/compile jobs.
 4. Android input-widget41138732113@50123a9 passes eight required groups and
    optional real registered-device ranges/camera/EOF cleanup. Preserve its actual
    proof and earlier1180 toolbar/IME-window failure. Kernel/physical delivery,
@@ -139,5 +144,12 @@ The first native x64 SQL run6e7 and diagnostic54d run failed before initializati
 Actual diagnostic frames isolated lock.parent patch resolution: an archived lock
 under runtime/server looked for patches there. The fix stages exact old lock and
 seven digest-bound original patches together under fresh source-profile, retaining
-unchanged locked_source verification.21focused real regressions pass. Inspect the
-new actual SQL job; do not rebuild original tools or weaken source checks.
+unchanged locked_source verification.21focused real regressions pass. Corrected native SQL41139757153 now passes; do not rebuild original tools or weaken source checks.
+
+Practical first game input is original12340 Wow.exe +complete Data with one
+complete installed locale. No global Esteria-catalog fatal gate was found in471;
+missing catalogs still block affected custom features. Keep signed UI policy,
+stock DB requirements, listfile requirement and real world validation explicit.
+Existing selected-speech refusal already precedes extraction. See source-bound
+classic-asset-minimum-471-audit.json; do not invent assets or over-require optional
+archives.

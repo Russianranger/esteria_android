@@ -1,0 +1,34 @@
+{
+  "allPackagedProviderFilesReadBack": true,
+  "allProgramElfAndCapturedLibraryBytesReadBack": true,
+  "androidRuntimeQualified": false,
+  "formatVersion": 1,
+  "fourSchemaCoordinatorQualified": false,
+  "fullOriginalSourcesAndPairedDebugReadBack": true,
+  "gameplayQualified": false,
+  "invocationScriptsHaveSeparateIdentities": true,
+  "nativeInputSelection": {
+    "bytes": 3333,
+    "sha256": "b4761fa5f6b1de914637c17f4248872b8749565738efb4e0098c8e13d4c4540a"
+  },
+  "nativeSqlReceipt": {
+    "bytes": 19483,
+    "sha256": "44448b43339efeaf6dad1421261c74c9fceab979779d1c70ae8a063907b76fed"
+  },
+  "originalElfBytesUnchanged": true,
+  "playerbotsAiQualified": false,
+  "productionArm64ProviderQualified": false,
+  "providerDescriptor": {
+    "bytes": 26368,
+    "sha256": "666e7589d50175510070afe78e5a9af4aa7895928bd97b546370604e246c2359"
+  },
+  "scope": "independent-android-x64-installation-provider-readback",
+  "serverDataQualified": false,
+  "slotPromoted": false,
+  "sourceCompanionManifest": {
+    "bytes": 116088,
+    "sha256": "cf972950e098bfa6adfc50746f97a8666ac64616de57c41ad17ace0157eac21b"
+  },
+  "sqlExecuted": false,
+  "worldserverQualified": false
+}

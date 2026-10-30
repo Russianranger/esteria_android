@@ -28,6 +28,7 @@ qualify Android ARM64, Adreno or Thor. Docker is for development only.
 | Independent full APK bytes |41129893343@7c attempt2:337,019,318B SHA68c55d9ef700e73c39ba62caac818a7072be70bc86846b3e3de05735aaf843b0. All127APK entries/eight provider archives/10,743 entries/1,196,665,936 regular bytes read. | Same provider/helper cohort as84fa; current whole APK identity differs. |
 | Public server preservation |41117618335:12assets/1,783,413,529B, complete source/debug and anonymous readback. Release429422570 at recipe7e498c50cdf55027e679d63e31f0a5e4b117f934. | GitHub immutable=false; pins/no replacement enforced. |
 | Native ARM64 Java coordinator |41132702177@84fa: actual four schemas, promotion, active reseed refusal, two clean stops, same UUID/restart;30bot tables/31updates.62exact Git inputs/191classes checked. | Linux payload-locator seam; no Android/world/character-save/bot-AI claim. |
+| Native x64 SQL |41139757153@7d4: actual original dbimport/52-statement helper,29base files/31updates,30bot tables, reentry, four-schema preservation, restart and clean stop pass in245s.58caller Git inputs/eight source-profile pins checked. | Native Linux x64; Android/world/AI remain false. |
 | Android13x64 MySQL |41109642918@4fd bootstrap/service lifecycle; fresh817 run41119182193 also passes. | Distinct runtime bytes; current code inherits no historical Java proof. |
 | Android recovery |41129893390@7c five handoff deaths;41132701736@84fa adds actual generic lease death/reacquisition. | Component-only; source/APK readbacks separate from full app restart. |
 | Android updates |41129893361 package/private-file/update contracts pass. | No delivered stable-key update baseline. |
@@ -83,17 +84,17 @@ qualify exclusive cache publication or ARM64 semantics.
 
 ## Active work and remaining gates
 
-1. Original full x64 build41119182502/job124281186151 succeeded:1850/1850
-   objects, original dbimport and52-statement helper, ELF62/source/debug/22library
-   source archives measured. Small evidence fully read;868MB component remains
-   local-unread and must pass full CI admission. Native SQL input selector is
-   enabled from these actual pins; execute four-schema/reentry/ledger/restart.
-2. Disabled Android x64 provider/fixture implementation and observer-before-DB
-   cleanup pass88focused tests, actual delayed-owner groups, default compilation/
-   lint and independent review. Its measurements remain null/OFF. Implement
-   measurement/acquisition/emulator workflows, bind only actual SQL/provider
-   receipts, then run Android SQL. Frozen817 source and unchanged five production
-   save-selection fields remain mandatory.
+1. Original x64 build41119182502 and actual native SQL41139757153 pass. Source/
+   debug/runtime preservation is complete; original868MB component is fully
+   admitted in CI, while local readback is bounded to source/receipt evidence.
+2. Provider measurement41141559961@fff211 passes full original source/runtime
+   acquisition, product construction and independent readback/seal. Six bounded
+   receipts and82P/current-code pins are independently read;1,969,017,146B complete
+   artifact remains local-metadata-only. Descriptor SHA666e7589d50175510070afe78e5a9af4aa7895928bd97b546370604e246c2359.
+   Genuine measured provider/transport selectors are now enabled for the test-only
+   Android four-schema fixture. Run its full source/product acquisition, build,
+   initialization/promotion/restart; no Android SQL success exists yet. Production
+   ARM64 admission and five save-selection fields remain unchanged.
 3. Preserve actual Android input-widget41138732113 success and its prior test-
    toolbar failure. Physical controller/kernel input, Wine and gameplay remain
    separate gates.
@@ -111,4 +112,10 @@ outside Git. See HANDOFF.md for the next concrete actions.
 First x64 SQL attempts stopped before initialization. The diagnostic run isolated
 a parent-relative source-lock/patch layout error. Exact historical lock bytes and
 seven digest-pinned patches are now staged together; unchanged source admission
-and real regression tests pass. The next actual SQL run remains required.
+and real regression tests pass. The corrected actual native SQL41139757153 passes; earlier failures remain retained.
+
+Selected471 normal startup needs authentic signed stock UI and stock ClientDB
+content. Complete12340 Data plus one complete locale is the practical first input;
+missing catalogs do not globally block classic-race bring-up. Existing setup
+requires selected speech before extraction. Full Esteria custom features and
+normal world content coverage remain separate validation gates.

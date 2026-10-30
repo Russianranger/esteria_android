@@ -38,7 +38,11 @@ class AndroidInstallationX64Provider(unittest.TestCase):
             provider.readback(self.root/'missing-product')
 
     def test_default_external_profile_refuses_before_frozen_checkout_or_runtime_access(self):
-        with patch.object(provider.gate.frozen_mysql,'inspect') as frozen, \
+        pending=dict(formatVersion=1,scope=provider.gate.SCOPE,repository='Russianranger/esteria_android',
+            enabled=False,state=provider.gate.PENDING,nativeSql=None,provider=None,providerReadback=None,
+            **{name:False for name in provider.gate.FALSE_FLAGS})
+        lock=self.put('external-pending.json',json.dumps(pending).encode())
+        with patch.object(provider.gate,'LOCK',lock),patch.object(provider.gate.frozen_mysql,'inspect') as frozen, \
                 patch.object(provider.subprocess,'run') as command, \
                 self.assertRaisesRegex(ValueError,'measured-native-sql-and-provider-required'):
             provider.verify_external(*(self.root/name for name in ('provider','source','mysql','proot')))

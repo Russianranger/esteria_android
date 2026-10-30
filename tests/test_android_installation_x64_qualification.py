@@ -164,9 +164,13 @@ class AndroidInstallationQualification(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'default-package'):
             qualification._manifest(axml(enabled=False), testing=True)
 
-    def test_real_pending_gate_refuses_before_artifact_or_apk_or_source_or_adb_or_output(self):
+    def test_pending_fixture_refuses_before_artifact_or_apk_or_source_or_adb_or_output(self):
         output = self.root / 'must-not-exist'
-        with patch.object(qualification.provider, 'verify') as provider, patch.object(qualification, 'verify_apks') as apk, \
+        pending=dict(formatVersion=1,scope=qualification.gate.SCOPE,repository='Russianranger/esteria_android',
+            enabled=False,state=qualification.gate.PENDING,nativeSql=None,provider=None,providerReadback=None,
+            **{name:False for name in qualification.gate.FALSE_FLAGS})
+        lock=self.root/'pending.json';lock.write_text(json.dumps(pending))
+        with patch.object(qualification.gate,'LOCK',lock),patch.object(qualification.provider, 'verify') as provider, patch.object(qualification, 'verify_apks') as apk, \
                 patch.object(qualification, 'source_snapshot') as source, patch.object(qualification, 'run_bounded') as adb, \
                 self.assertRaisesRegex(ValueError, 'measured-native-sql-and-provider-required'):
             qualification.qualify(*([self.root / 'missing'] * 6), 'a' * 40, self.root / 'source.tar.gz', output)
