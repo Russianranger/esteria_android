@@ -283,3 +283,46 @@ workflow builds/checks that selected profile, separate from the old combined
 release schema. `app/game-session.gradle` supplies gameSessionOwnerTest; regular
 Android CI runs it with data/world/presentation owners. Complete gameplay still
 requires the composed data tools and helper-augmented programs profiles.
+
+## Complete local-game provider profile
+
+The separate `.github/workflows/android-local-game-profile.yml` composes the
+selected public Wine/client/bridge/Turnip/shader cohort, source-built Bionic
+ARM64 PRoot, Ubuntu/MySQL dependencies, original server content, the measured
+helper-augmented program profile and composed data4. It excludes the stock
+extractor provider. Its APK is an internal packaging result until actual
+import, SQL/services, client/world and gameplay gates pass.
+
+Reproduce the server portion after the documented Python/JDK/SDK setup:
+
+```sh
+python3 tools/qualify_server_providers.py acquire --output out/stock-inputs
+python3 tools/qualify_server_providers.py build --inputs out/stock-inputs --output out/stock-providers
+python3 tools/qualify_playerbots_programs.py acquire --output out/helper-inputs
+python3 tools/qualify_playerbots_programs.py build --stock-providers out/stock-providers --inputs out/helper-inputs --output out/helper-providers
+python3 tools/prepare_data_tools_provider.py acquire --output out/data-inputs
+python3 tools/prepare_data_tools_provider.py build --inputs out/data-inputs --output out/data-providers
+```
+
+These exact artifact acquisitions require GitHub Actions access (`GITHUB_TOKEN`
+in CI); tokens are never build inputs or stored in providers. They verify full
+source/debug/runtime identities and preserve existing outputs rather than
+overwriting them. The stock acquisition requires at least16GiB free before
+starting; allow additional space for independent helper/source copies and the
+Wine/NDK toolchain. Durable preservation of the new server components is the
+next packaging task; current source identities are pinned, while Actions
+retention is finite.
+
+Use all the Wine/PRoot/runtime/content properties in the workflow, adding:
+
+```sh
+-PserverProgramsProfile=playerbots-schema-helper \
+-PserverProgramsProviderDir="$PWD/out/helper-providers/programs" \
+-PserverDataToolsProviderDir="$PWD/out/data-providers/provider"
+```
+
+Omit `serverExtractorsProviderDir` for this profile. Explicit
+`verify_wine_cohort_apk.py --server-profile local-game` additionally requires
+`--playerbots-programs-provider` and `--data-tools-provider`; it rechecks every
+selected source/debug companion and the complete actual APK inventory. The
+historical stock profile keeps its original default checker and workflow.

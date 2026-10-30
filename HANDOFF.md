@@ -93,3 +93,9 @@ are present. See ASSET-REQUIREMENTS.md; do not fabricate replacements.
 STATUS.md is the current overview. BUILDING.md/TESTING.md and scoped runtime
 proofs contain exact commands, receipts and boundaries. Keep private credentials,
 initialized databases/prefixes, signing keys, MPQs and saves out of Git/artifacts.
+
+Run/inspect `android-local-game-profile.yml` after the complete-profile commit.
+The legacy stock workflow remains separate. The new checker requires explicit
+helper+data4 together, rejects stock extractor assets, and performs full optional
+provider source/debug/APK verification. Durable server-component preservation
+is being implemented separately; do not replace exact inputs with floating URLs.

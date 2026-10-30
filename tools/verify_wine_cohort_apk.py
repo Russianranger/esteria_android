@@ -53,16 +53,54 @@ def verify(apk,directory,lock_path,source):
         hardwareQualified=False,commonMainQualified=False,assetsQualified=False,gameplayQualified=False)
 
 
+def server_profile_paths(args):
+    """Require an explicit, complete profile before opening large inputs.
+
+    The historical stock profile keeps its original default and verifier. The
+    local-game profile replaces both programs and extractors together; neither
+    optional provider is inferred from a directory or a caller's qualification
+    flag.
+    """
+    profile=getattr(args,'server_profile','stock')
+    programs=getattr(args,'playerbots_programs_provider',None)
+    data=getattr(args,'data_tools_provider',None)
+    require(profile in ('stock','local-game'),'coherent-apk-unknown-server-profile')
+    if profile=='stock':
+        require(programs is None and data is None,'coherent-apk-stock-profile-rejects-optional-providers')
+        return profile,[args.server_providers/name for name in ('programs','extractors','content')]
+    require(programs is not None and data is not None,'coherent-apk-local-game-profile-requires-both-providers')
+    return profile,[programs,data,args.server_providers/'content']
+
+
+def server_profile_checks(args,profile):
+    from tools import qualify_server_providers as stock
+    if profile=='stock':return stock.verify_final(args.server_providers,args.dependency_provider,args.apk)
+    from tools import provider_playerbots_programs as programs,provider_server_data_tools as data
+    # Each factory performs its own complete corresponding-source and paired
+    # debug verification. The helper profile also rechecks the original stock
+    # factory, rather than accepting a producer's boolean source claim.
+    checks=dict(programs=programs.verify(args.playerbots_programs_provider,apk=args.apk),
+        dataTools=data.verify(args.data_tools_provider,apk=args.apk),
+        content=stock.content.verify(args.server_providers/'content',apk=args.apk),
+        dependencies=stock.dependencies.verify(args.dependency_provider,apk=args.apk))
+    return dict(formatVersion=1,scope='four-server-component-local-game-install-profile-apk-byte-verification',
+        apk=stock.files.identity(args.apk),providers=checks,sourceCompanionAndPairedDebugVerified=True,
+        stockContentAndDatabaseRuntimeArchivesUnchanged=True,playerbotsSchemaHelperIncluded=True,
+        composedDataToolsIncluded=True,androidGuestExecuted=False,serverProgramsExecuted=False,
+        sqlExecuted=False,localWorldReadinessQualified=False,androidRuntimeQualified=False,
+        playerbotsAiQualified=False,gameplayQualified=False)
+
+
 def complete(args):
-    from tools import qualify_server_providers as stock, verify_android_proot as proot
+    from tools import verify_android_proot as proot
     from tools import package_combined_android as combined
+    profile,server_directories=server_profile_paths(args)
     proof=verify(args.apk,args.cohort_release,args.release_lock,args.packaging_source)
     proof['proot']=proot.verify(args.proot_provider,args.apk)
     proof['prootCorrespondingSources']=combined.proot_sources(args.proot_sources,args.proot_provider)
-    proof['serverProviders']=stock.verify_final(args.server_providers,args.dependency_provider,args.apk)
+    proof['serverProviders']=server_profile_checks(args,profile)
     notices=combined.ndk_notices(args.ndk_archive)
-    directories=[args.proot_provider,args.dependency_provider,
-        *(args.server_providers/name for name in ('programs','extractors','content'))]
+    directories=[args.proot_provider,args.dependency_provider,*server_directories]
     assets=json.loads(release.client.small(args.cohort_release/'provider-assets-receipt.json'))
     expected={'assets/'+name for name in assets['members']}
     for directory in directories:
@@ -84,10 +122,15 @@ def complete(args):
             require(archive.read('assets/'+name)==release.client.small(source),'coherent-apk-current-source-profile')
         require(archive.read('assets/runtime.properties')==release.client.small(release.ROOT/'app/src/main/assets/runtime.properties'),
             'coherent-apk-current-runtime-properties')
-    proof.update(scope='source-and-paired-debug-verified-stock-and-selected-wine-coherent-apk-bytes',
+    proof.update(scope='source-and-paired-debug-verified-stock-and-selected-wine-coherent-apk-bytes' if profile=='stock' else
+            'source-and-paired-debug-verified-local-game-profile-apk-bytes',
         completeAssetInventoryVerified=True,exactCurrentHelperClosureVerified=True,ndkNotices=notices,
-        stockServerProgramsContentAndExtractorsIncluded=True,composedDataToolsIncluded=False,
+        stockServerProgramsContentAndExtractorsIncluded=profile=='stock',composedDataToolsIncluded=profile=='local-game',
         debugAndSourceCompanionsKeptOutsideApk=True,serverProgramsExecuted=False,sqlExecuted=False)
+    if profile=='local-game':
+        proof.update(serverProfile=profile,playerbotsSchemaHelperIncluded=True,stockExtractorsIncluded=False,
+            localGameRuntimeExecutionQualified=False,localWorldReadinessQualified=False,playerbotsAiQualified=False,
+            gameLoginQualified=False,deviceTestCandidate=False)
     return proof
 
 
@@ -96,6 +139,9 @@ def main():
     for name in ('apk','cohort-release','release-lock','packaging-source','output'):parser.add_argument('--'+name,type=Path,required=True)
     for name in ('proot-provider','proot-sources','ndk-archive','server-providers','dependency-provider'):
         parser.add_argument('--'+name,type=Path,required=True)
+    parser.add_argument('--server-profile',choices=('stock','local-game'),default='stock')
+    parser.add_argument('--playerbots-programs-provider',type=Path)
+    parser.add_argument('--data-tools-provider',type=Path)
     args=parser.parse_args();require(not args.output.exists(),'cohort-apk-evidence-output-exists')
     result=complete(args)
     release.wine.write_new(args.output,release.encoded(result));print(json.dumps(result,indent=2))

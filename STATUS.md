@@ -232,3 +232,8 @@ APK compilation and lint passed the focused follow-up in25seconds/56tasks.
 Exact local source/log hashes and scope are in
 `runtime/evidence/support-session-integration-host.json`; Android service/world
 execution remains unqualified.
+
+The explicit complete local-game packaging workflow now selects both derived
+providers together, verifies all four server archives in one private Java store
+with32MiB heaps and retains every source/debug companion separately. Its checker
+passes59 focused tests and independent review; actual CI qualification is next.
