@@ -183,7 +183,11 @@ def build(directory, output):
 
 
 def verify(provider, apk=None):
-    pin = load_pin(); assets = archives.directory(provider / 'assets' / ASSETS)
+    pin = load_pin(); provider = archives.directory(provider)
+    require({p.name for p in provider.iterdir()} == {'assets'}, 'shader-provider-root-set-mismatch')
+    asset_root = archives.directory(provider / 'assets')
+    require({p.name for p in asset_root.iterdir()} == {ASSETS}, 'shader-provider-asset-root-set-mismatch')
+    assets = archives.directory(asset_root / ASSETS)
     require({p.name for p in assets.iterdir()} == NAMES, 'shader-provider-asset-set-mismatch')
     values = verify_archive(assets / ARCHIVE, pin); proof = descriptor(assets / ARCHIVE, pin)
     require(bundle.small(assets / 'provider.json', 65536) == encoded(proof) and

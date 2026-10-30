@@ -83,5 +83,18 @@ class ShaderProvider(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, 'must-be-stored'): provider.verify(self.output, path)
             else: self.assertTrue(provider.verify(self.output, path)['apkBytesVerified'])
 
+    def test_unlisted_provider_asset_sibling_is_rejected_without_removal(self):
+        provider.build(self.bundle, self.output)
+        for relative in ('unlisted.txt', 'assets/private.txt', 'assets/other-provider/input.txt'):
+            extra = self.output / relative; extra.parent.mkdir(parents=True, exist_ok=True)
+            extra.write_bytes(b'explicit synthetic unrelated file')
+            with self.assertRaisesRegex(ValueError, 'root-set-mismatch'):
+                provider.verify(self.output)
+            self.assertEqual(extra.read_bytes(), b'explicit synthetic unrelated file')
+            extra.unlink()
+            if relative.startswith('assets/other-provider/'):
+                extra.parent.rmdir()
+        self.assertTrue(provider.verify(self.output)['providerVerified'])
+
 
 if __name__ == '__main__': unittest.main()

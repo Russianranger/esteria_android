@@ -75,16 +75,21 @@ def verify(provider, proot_provider, apk=None):
                 with package.open(item) as stream:
                     require(archives.hash_stream(stream, pin['bytes']) == pin['sha256'], 'mysql-probe-apk-bytes-mismatch')
             # Verify the exact production helper assets rather than embedding a modified probe copy.
-            helper_manifest = package.getinfo('assets/database-setup/manifest.json')
-            require(helper_manifest.file_size <= 16384, 'mysql-probe-helper-manifest-limit')
-            helpers = json.loads(package.read(helper_manifest))
-            require(helpers.get('formatVersion') == 1 and set(helpers['files']) == {'mysql_bootstrap.py', 'android_database_setup.py'}, 'mysql-probe-helper-set')
-            for name, pin in helpers['files'].items():
-                source = builder.ROOT / 'runtime' / name
-                require(pin == builder.identity(source), 'mysql-probe-helper-source-mismatch')
-                entry = package.getinfo('assets/database-setup/' + name)
-                require(entry.file_size == pin['bytes'] and entry.file_size <= 131072 and
-                        package.read(entry) == source.read_bytes(), 'mysql-probe-helper-apk-mismatch')
+            for directory, names in {'database-setup': {'mysql_bootstrap.py', 'android_database_setup.py'},
+                                     'database-service': {'mysql_bootstrap.py', 'mysql_service.py'}}.items():
+                helper_manifest = package.getinfo('assets/' + directory + '/manifest.json')
+                require(helper_manifest.file_size <= 16384, 'mysql-probe-helper-manifest-limit')
+                helpers = json.loads(package.read(helper_manifest))
+                require(type(helpers) is dict and type(helpers.get('formatVersion')) is int and
+                        helpers['formatVersion'] == 1 and type(helpers.get('files')) is dict and
+                        set(helpers['files']) == names, 'mysql-probe-helper-set')
+                for name, pin in helpers['files'].items():
+                    source = builder.ROOT / 'runtime' / name
+                    require(type(pin) is dict and type(pin.get('bytes')) is int and
+                            pin == builder.identity(source), 'mysql-probe-helper-source-mismatch')
+                    entry = package.getinfo('assets/' + directory + '/' + name)
+                    require(entry.file_size == pin['bytes'] and entry.file_size <= 131072 and
+                            package.read(entry) == source.read_bytes(), 'mysql-probe-helper-apk-mismatch')
     return dict(providerVerified=True, apkVerified=apk is not None, scope=builder.SCOPE,
                 archive=proof['archive'], expectedMysqlSqlVersion=proof['expectedMysqlSqlVersion'],
                 androidMysqlQualified=False, productionAdapterQualified=False, arm64Qualified=False)

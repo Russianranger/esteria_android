@@ -5,6 +5,7 @@ on:
     paths:
       - runtime/mysql-probe/**
       - runtime/mysql_bootstrap.py
+      - runtime/mysql_service.py
       - runtime/android_database_setup.py
       - runtime/server/ubuntu.sources
       - runtime/server/inrelease.SHA256SUMS
@@ -15,6 +16,9 @@ on:
       - tools/verify_android_proot_probe.py
       - app/mysql-probe.gradle
       - app/database-setup.gradle
+      - app/database-service.gradle
+      - app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseService.java
+      - app/src/main/java/io/github/russianranger/esteria/runtime/GuestHelperAssets.java
       - app/src/androidTest/**/MySqlExecutionTest.java
       - tools/*android_mysql*.py
       - tests/test_android_mysql_probe.py
@@ -149,6 +153,7 @@ jobs:
             out/mysql-sources
             runtime/mysql-probe
             runtime/mysql_bootstrap.py
+            runtime/mysql_service.py
             runtime/android_database_setup.py
             runtime/server/capture_sources.py
             runtime/server/ubuntu.sources
@@ -158,6 +163,9 @@ jobs:
             tools/prepare_runtime.py
             app/mysql-probe.gradle
             app/database-setup.gradle
+            app/database-service.gradle
+            app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseService.java
+            app/src/main/java/io/github/russianranger/esteria/runtime/GuestHelperAssets.java
             app/src/androidTest/java/io/github/russianranger/esteria/runtime/MySqlExecutionTest.java
             ${{ runner.temp }}/proot-probe/corresponding-source.tar.gz
             LICENSE

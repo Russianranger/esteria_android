@@ -11,10 +11,13 @@ import io.github.russianranger.esteria.core.runtime.install.RuntimeInstaller;
 import io.github.russianranger.esteria.core.runtime.install.RuntimePackagePlan;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
+import io.github.russianranger.esteria.core.runtime.process.ProotLaunch;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -23,12 +26,16 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.security.MessageDigest;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -178,5 +185,125 @@ public final class MySqlExecutionTest {
                 .put("instanceIdentityVerified",true).put("persistentMarkerRestored",true).put("credentialsPreserved",true).put("cleanShutdown",true).put("repeatBootstrapPreserved",true)
                 .put("productionAdapterQualified",false).put("arm64Qualified",false).put("serverSchemasQualified",false).put("worldserverQualified",false).put("gameplayQualified",false);
         copy(root.getParent().resolve("mysql-probe-qualification.json"),receipt.toString(2).getBytes(StandardCharsets.UTF_8));
+    }
+
+    @Test public void actualJavaServiceAdapterOwnsReadinessShutdownAndRestart()throws Exception {
+        Context context=InstrumentationRegistry.getInstrumentation().getTargetContext();
+        assertTrue(BuildConfig.DEBUG);assertTrue(BuildConfig.MYSQL_PROBE_PACKAGED);
+        assertFalse(BuildConfig.PROOT_PACKAGED);assertFalse(BuildConfig.SERVER_RUNTIME_PACKAGED);
+        assertEquals(33,Build.VERSION.SDK_INT);assertEquals(35,context.getApplicationInfo().targetSdkVersion);
+        assertTrue(Arrays.asList(Build.SUPPORTED_ABIS).contains("x86_64"));
+        Path appRoot=context.getFilesDir().getCanonicalFile().toPath();
+        // A separately owned fresh fixture never adopts the earlier bootstrap test or a player's saves.
+        Path root=directory(appRoot.resolve("mysql-service-probe-session"));
+        Path stateRoot=GuestHelperAssets.directory(appRoot,"state");
+        Path work=directory(stateRoot.resolve("server-work")),sessions=directory(root.resolve("sessions"));
+        directory(work.resolve("home"));directory(work.resolve("state"));directory(work.resolve("setup-results"));
+        directory(work.resolve("probe-results"));Path helpers=directory(work.resolve("helpers"));
+        byte[] raw=asset(context,"mysql-probe/provider.json",65536);
+        JSONObject proof=new JSONObject(new String(raw,StandardCharsets.UTF_8));
+        RuntimePackagePlan plan=plan(proof,raw);String version=proof.getString("expectedMysqlSqlVersion");
+        JSONObject inputs=proof.getJSONObject("sourceInputs");
+        for(String family:Arrays.asList("database-setup","database-service")) {
+            JSONObject manifest=new JSONObject(new String(asset(context,family+"/manifest.json",16384),StandardCharsets.UTF_8)).getJSONObject("files");
+            assertEquals(2,manifest.length());
+            for(String name:family.equals("database-setup")?Arrays.asList("mysql_bootstrap.py","android_database_setup.py"):
+                    Arrays.asList("mysql_bootstrap.py","mysql_service.py")) {
+                byte[] bytes=asset(context,family+"/"+name,131072);JSONObject pin=manifest.getJSONObject(name);
+                assertEquals(pin.getLong("bytes"),bytes.length);assertEquals(pin.getString("sha256"),hash(bytes));
+                assertEquals(inputs.getJSONObject("runtime/"+name).getString("sha256"),hash(bytes));
+                if(family.equals("database-setup"))copy(helpers.resolve(name),bytes);
+            }
+        }
+        byte[] guest=asset(context,"mysql-probe/guest_check.py",65536);
+        assertEquals(inputs.getJSONObject("runtime/mysql-probe/guest_check.py").getString("sha256"),hash(guest));
+        copy(helpers.resolve("guest_check.py"),guest);
+        copy(work.resolve(".mysql-probe-owner"),(hash(raw)+"\n").getBytes(StandardCharsets.US_ASCII));
+        Path nativeRoot=java.nio.file.Paths.get(context.getApplicationInfo().nativeLibraryDir);
+        JSONObject proot=new JSONObject(new String(asset(context,"proot-probe/build-evidence.json",65536),StandardCharsets.UTF_8));
+        for(String name:Arrays.asList("libproot_probe.so","libproot_probe_loader.so")) {
+            Path file=nativeRoot.resolve(name);JSONObject pin=proot.getJSONObject("nativeFiles").getJSONObject(name);
+            assertTrue(Files.isExecutable(file));assertEquals(pin.getLong("bytes"),Files.size(file));assertEquals(pin.getString("sha256"),fileHash(file));
+        }
+        Path archive=new EmbeddedArchiveCache(root.resolve("cache")).obtain(plan.archiveName,plan.archiveBytes,plan.archiveSha256,
+                offset->openArchive(context,offset),RuntimeWork.NONE,RuntimeWork.NEVER_CANCELLED);
+        RuntimeInstaller installer=new RuntimeInstaller(root.resolve("runtime"));
+        RuntimeInstaller.Result installed=installer.install(archive,plan,RuntimeWork.NONE,RuntimeWork.NEVER_CANCELLED);
+        Path rootfs=installer.resolveCurrent(plan);assertNotNull(rootfs);
+        String initial=UUID.randomUUID().toString().replace("-","");
+        execute(nativeRoot,rootfs,work,sessions,"initialize","android_database_setup.py",new String[]{"--expected-version",version,"--operation-id",initial});
+        JSONObject initialized=json(work.resolve("setup-results/"+initial+".json"));String uuid=initialized.getString("uuid");
+        noReadiness(initialized,"initialized",version,uuid);
+        String seed=UUID.randomUUID().toString().replace("-","");
+        execute(nativeRoot,rootfs,work,sessions,"seed","guest_check.py",new String[]{"--operation","seed","--expected-version",version,"--operation-id",seed});
+        sqlResult(json(work.resolve("probe-results/"+seed+".json")),"seed",version,uuid);
+        Map<String,String> retained=new TreeMap<>();
+        for(String name:Arrays.asList("database-bootstrap.json","accounts/database-secret","accounts/database-root-secret",".android-mysql-probe-marker.json"))
+            retained.put(name,fileHash(work.resolve("state/"+name)));
+        AtomicInteger launches=new AtomicInteger();
+        ServerDatabaseService.InstalledRuntime runtime=new ServerDatabaseService.InstalledRuntime(){
+            @Override public Path current()throws IOException{return installer.resolveCurrent(plan);}
+            @Override public String expectedMysqlVersion(){return version;}
+            @Override public OwnedProcess launch(Path persistent,Path session,List<String> command,OwnedProcess.GracefulInputStop shutdown)throws IOException {
+                assertEquals(work,persistent);assertEquals(rootfs,current());
+                Path temporary=directory(session.resolve("tmp")),logs=directory(session.resolve("logs"));
+                // Same argument builder, actual JNI owner and pipe as production; only the verified x64 tracer differs.
+                OwnedProcess.Specification base=ProotLaunch.create(nativeRoot.resolve("libproot_probe.so"),
+                        nativeRoot.resolve("libproot_probe_loader.so"),rootfs,persistent,temporary,logs,command,Collections.emptyMap());
+                OwnedProcess.Specification interactive=new OwnedProcess.Specification(base.executable,base.arguments,base.environment,
+                        base.cwd,base.stdout,base.stderr,true);
+                OwnedProcess child=OwnedProcess.startInteractive(new NativeProcessBridge(),interactive,shutdown);
+                launches.incrementAndGet();return child;
+            }
+        };
+        for(int cycle=0;cycle<2;cycle++) {
+            ServerDatabaseService.Handle child=ServerDatabaseService.startInstalled(context,appRoot,runtime);
+            try {
+                ServerDatabaseService.awaitReady(child,System.nanoTime()+TimeUnit.SECONDS.toNanos(150),new AtomicBoolean(false));
+                assertEquals(uuid,child.instanceUuid());assertTrue(child.isAlive());
+                ServerDatabaseService.Handle duplicate=null;
+                try {duplicate=ServerDatabaseService.startInstalled(context,appRoot,runtime);fail("Duplicate Java database lease must be rejected");}
+                catch(IOException expected){assertTrue(child.isAlive());}
+                finally {if(duplicate!=null)duplicate.stop(Duration.ZERO);}
+                assertEquals(cycle+1,launches.get());
+                child.stop(Duration.ofSeconds(30));assertFalse(child.isAlive());assertEquals(0,child.exitCode());
+                JSONObject stopped=json(child.privateSessionDirectory().resolve("stopped.json"));
+                assertTrue(stopped.getBoolean("engineStarted")&&stopped.getBoolean("readyBeforeStop")&&stopped.getBoolean("cleanEngineExit"));
+                assertEquals(uuid,stopped.getString("uuid"));assertEquals("command",stopped.getString("stopReason"));
+            } finally {
+                try {child.stop(Duration.ofSeconds(30));}
+                finally {serviceDiagnostics(appRoot,root,child,cycle);}
+            }
+            try(FileChannel lease=FileChannel.open(work.resolve(".android-database-setup.lock"),StandardOpenOption.WRITE);
+                    FileLock released=lease.tryLock()) {assertNotNull("Completed service must release the setup/session lease",released);}
+            for(Map.Entry<String,String> item:retained.entrySet())
+                assertTrue("Credential, bootstrap and marker identities remain private and unchanged",item.getValue().equals(fileHash(work.resolve("state/"+item.getKey()))));
+            String verified=UUID.randomUUID().toString().replace("-","");
+            execute(nativeRoot,rootfs,work,sessions,"verify-"+cycle,"guest_check.py",new String[]{"--operation","verify","--expected-version",version,"--operation-id",verified});
+            sqlResult(json(work.resolve("probe-results/"+verified+".json")),"verify",version,uuid);
+        }
+        assertEquals(2,launches.get());assertEquals(rootfs,installer.resolveCurrent(plan));
+        JSONObject receipt=new JSONObject().put("formatVersion",1).put("scope","android-13-x86_64-java-mysql-service-lifecycle")
+                .put("sourceRevision",BuildConfig.SOURCE_REVISION).put("fingerprint",Build.FINGERPRINT).put("api",33).put("targetSdk",35).put("abi","x86_64")
+                .put("mysqlVersion",version).put("runtimeProviderSha256",hash(raw)).put("runtimeArchiveSha256",plan.archiveSha256).put("runtimeGeneration",installed.generation)
+                .put("prootBuildEvidence",proot).put("serviceLaunches",2).put("verificationGuestLaunches",4).put("duplicateStartAttempts",2)
+                .put("exactServiceHelpersVerified",true).put("verifiedX64RuntimeOnly",true).put("realJavaAdapterExecuted",true)
+                .put("ownedLoopbackSqlReady",true).put("duplicateLeaseRejected",true).put("explicitShutdownAcknowledged",true)
+                .put("leaseReleasedAfterStop",true).put("sameInstanceRestarted",true).put("markerRestoredAfterEachStop",true).put("credentialsPreserved",true)
+                .put("productionAdapterQualified",false).put("arm64Qualified",false).put("serverSchemasQualified",false).put("worldserverQualified",false).put("gameplayQualified",false);
+        copy(appRoot.resolve("mysql-service-probe-qualification.json"),receipt.toString(2).getBytes(StandardCharsets.UTF_8));
+    }
+
+    private static void serviceDiagnostics(Path appRoot,Path fixture,ServerDatabaseService.Handle child,int cycle)throws Exception {
+        Path destination=directory(fixture.resolve("sessions/service-"+cycle)),logs=directory(destination.resolve("logs"));
+        String operation=child.privateSessionDirectory().getFileName().toString();assertTrue(operation.matches("[a-f0-9]{32}"));
+        Map<String,Path> sources=new TreeMap<>();
+        for(String stream:Arrays.asList("stdout","stderr"))sources.put(stream+".log",appRoot.resolve("state/database-service-operations/"+operation+"/logs/"+stream+".log"));
+        sources.put("engine-private.log",child.privateSessionDirectory().resolve("engine-private.log"));
+        for(Map.Entry<String,Path> item:sources.entrySet())if(Files.isRegularFile(item.getValue(),LinkOption.NOFOLLOW_LINKS)) {
+            byte[] bytes;try(InputStream input=Files.newInputStream(item.getValue())){bytes=read(input,65536);}
+            String redacted=new String(bytes,StandardCharsets.UTF_8).replaceAll("(?i)[a-f0-9]{64}","[redacted-generated-secret]");
+            copy(logs.resolve(item.getKey()),redacted.getBytes(StandardCharsets.UTF_8));
+        }
     }
 }

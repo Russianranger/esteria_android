@@ -59,3 +59,16 @@ It compiles the combined app but does not run it on Android. Focused guards also
 exercise preservation and source-object validation using explicitly synthetic,
 unexecuted objects. Neither result establishes login, world entry, gameplay,
 audio, character persistence, bot behavior, or persistent-key installation.
+
+The follow-up run [41013086386](https://github.com/Russianranger/esteria_android/actions/runs/41013086386)
+at `9d413c2d19906021c391e4616647910dd0535b2a` passed the complete pipeline with both
+database setup and persistent-service helper families included in the exact asset
+and source checks. Its APK is 120,902,752 bytes, SHA-256
+`dbb432f667700c19f6cb23494847cbb4fd1fcb68fb83df0d52165d485626f5be`.
+The binary artifact was downloaded and hash-verified; seven native/provider
+payloads and both helper families were independently read back, with helper bytes
+compared to that exact committed revision. The 980,156,354-byte source artifact
+was checked by the CI sealer and not downloaded locally. Full identities and the
+source-bound receipt are in `runtime/evidence/combined-android-build-41013086386.json`.
+This remains compilation/packaging evidence; its Android execution and gameplay
+flags are false.

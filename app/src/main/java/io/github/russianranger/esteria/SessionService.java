@@ -43,6 +43,7 @@ import io.github.russianranger.esteria.runtime.ServerRuntimeSetup;
 import io.github.russianranger.esteria.runtime.GuestBridgeSetup;
 import io.github.russianranger.esteria.runtime.ClientRuntimeSetup;
 import io.github.russianranger.esteria.runtime.ClientLaunchSetup;
+import io.github.russianranger.esteria.runtime.ShaderToolsSetup;
 
 /** Foreground owner of large import jobs. Runtime launch remains gated until qualified binaries exist. */
 public final class SessionService extends Service {
@@ -193,6 +194,8 @@ public final class SessionService extends Service {
         if (bridges != null) bridges.requireWineArchive(setup.archiveSha256());
         ClientRuntimeSetup client = BuildConfig.CLIENT_RUNTIME_PACKAGED ? new ClientRuntimeSetup(this, root) : null;
         if (client != null) client.requireWineArchive(setup.archiveSha256());
+        ShaderToolsSetup shaders = BuildConfig.SHADER_TOOLS_PACKAGED ? new ShaderToolsSetup(this, root) : null;
+        if (shaders != null) shaders.requireWineArchive(setup.archiveSha256());
         final long[] lastUpdate = {0};
         RuntimeInstaller.Result result = setup.prepare((phase, path, completed, total) -> {
             long now = android.os.SystemClock.elapsedRealtime();
@@ -221,6 +224,20 @@ public final class SessionService extends Service {
             log("Guest bridges prepared generation=" + support.generation + " reusedFiles=" + support.reusedFiles
                     + " copiedBytes=" + support.copiedBytes + " archiveSha256=" + bridges.archiveSha256()
                     + " gameRuntimeQualified=false");
+        }
+        if (shaders != null) {
+            status = "Preparing offline shader tools…";
+            RuntimeInstaller.Result installed = shaders.prepare((phase, path, completed, total) -> {
+                long now = android.os.SystemClock.elapsedRealtime();
+                if (now - lastUpdate[0] >= 250 || completed == total) {
+                    lastUpdate[0] = now;
+                    status = "Preparing offline shader tools…\n" + mib(completed)
+                            + (total >= 0 ? " / " + mib(total) : "") + " MiB";
+                }
+            }, cancelled::get);
+            log("Shader tools prepared generation=" + installed.generation + " revision=" + shaders.revision()
+                    + " reusedFiles=" + installed.reusedFiles + " copiedBytes=" + installed.copiedBytes
+                    + " archiveSha256=" + shaders.archiveSha256() + " gameAssetShadersQualified=false");
         }
         if (client != null) {
             status = "Preparing reconstructed client files…";
@@ -363,6 +380,21 @@ public final class SessionService extends Service {
                 facts.put("runtime.reconstructedClient.prepared", String.valueOf(client.current() != null));
             } catch (IOException error) {
                 facts.put("runtime.reconstructedClient.installationError", error.getMessage());
+            }
+        }
+        facts.put("runtime.shaderTools.packaged", String.valueOf(BuildConfig.SHADER_TOOLS_PACKAGED));
+        facts.put("runtime.shaderTools.prepared", "false");
+        if (BuildConfig.SHADER_TOOLS_PACKAGED) {
+            try {
+                ShaderToolsSetup shaders = new ShaderToolsSetup(this, root);
+                shaders.requireWineArchive(new RuntimeSetup(this, root).archiveSha256());
+                facts.put("runtime.shaderTools.archiveSha256", shaders.archiveSha256());
+                facts.put("runtime.shaderTools.sourceRevision", shaders.revision());
+                facts.put("runtime.shaderTools.toolManifestSha256", shaders.toolManifestSha256());
+                facts.put("runtime.shaderTools.expectedGeneration", shaders.generation());
+                facts.put("runtime.shaderTools.prepared", String.valueOf(shaders.current() != null));
+            } catch (IOException error) {
+                facts.put("runtime.shaderTools.installationError", error.getMessage());
             }
         }
         facts.put("proot.packaged", String.valueOf(BuildConfig.PROOT_PACKAGED));

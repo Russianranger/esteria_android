@@ -94,6 +94,45 @@ Production adapter, ARM64, game schema, worldserver and gameplay flags stay fals
 Even a successful x64 emulator result cannot establish that the ARM64 binaries
 or the production `ServerDatabaseSetup`/`ProotProcess` adapter execute correctly.
 
+## Java database-service lifecycle gate
+
+The qualifier additionally invokes
+`actualJavaServiceAdapterOwnsReadinessShutdownAndRestart` as a separate mandatory
+instrumentation test. It owns another fresh runtime and the canonical private
+`state/server-work` directory, refusing an existing directory. Exact source-bound
+setup and service helpers are verified before execution. The existing bootstrap
+and socket-only marker fixture initialize this new instance; no game schemas or
+player state are adopted.
+
+The real `ServerDatabaseService` Java lifecycle runs twice against that instance.
+Each cycle requires authenticated readiness from the unchanged `mysql_service.py`,
+the same instance UUID, a live native owner, rejection of a duplicate Java lease
+without launching another process, and acknowledged command shutdown with an
+unforced zero exit. A separate socket-only guest then restarts the database and
+reads the original marker. Bootstrap receipt, both credentials and private marker
+identity must remain unchanged, and the Java lease must be independently acquirable
+after each stop.
+
+A package-private `InstalledRuntime` seam supplies only this test's independently
+verified x64 runtime and tracer. The public application entry point still constructs
+the production `ServerRuntimeSetup`/`ProotProcess` implementation, with all ARM64
+provider checks intact. Both paths use the same PRoot argument builder, actual JNI
+process owner, interactive shutdown pipe, helper installer and readiness reader.
+There is no launcher activation or alternate production provider configuration.
+
+The persistent Python helper uses an exclusively created private `s-XXXXXXXX`
+directory directly under `/work` for its UNIX socket. The Java adapter checks the
+translated physical path bound before starting. Long operation UUIDs remain in
+receipts and PID files; only empty directories still matching their original inode
+are removed, and crash leftovers are preserved rather than reused.
+
+The new receipt has scope `android-13-x86_64-java-mysql-service-lifecycle`.
+`androidJavaDatabaseServiceLifecycleQualified` requires both actual instrumentation
+success and exact receipt/input validation. ARM64, full production runtime,
+application schema updates, worldserver and gameplay remain explicitly unqualified.
+The Java/test source compiles and lint passes; actual execution of this new gate
+is pending. The measured bootstrap result below predates this additional gate.
+
 ## Current evidence
 
 Native CI run [41010011663](https://github.com/Russianranger/esteria_android/actions/runs/41010011663)

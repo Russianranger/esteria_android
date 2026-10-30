@@ -31,7 +31,10 @@ INPUTS = ('runtime/mysql-probe/Dockerfile', 'runtime/mysql-probe/Dockerfile.dock
           'tools/qualify_android_mysql.py', 'runtime/mysql-probe/record_runtime.py',
           'runtime/mysql-probe/guest_check.py', 'runtime/mysql-probe/mysql-binaries.SHA256SUMS',
           'runtime/server/ubuntu.sources', 'runtime/server/inrelease.SHA256SUMS', 'runtime/server/capture_sources.py',
-          'runtime/mysql_bootstrap.py', 'runtime/android_database_setup.py',
+          'runtime/mysql_bootstrap.py', 'runtime/android_database_setup.py', 'runtime/mysql_service.py',
+          'app/database-service.gradle',
+          'app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseService.java',
+          'app/src/main/java/io/github/russianranger/esteria/runtime/GuestHelperAssets.java',
           'tools/build_android_mysql_probe.py', 'tools/verify_android_mysql_probe.py',
           'tools/package_server_runtime.py', 'tools/prepare_runtime.py')
 NAMES = {ARCHIVE, 'provider.json', 'runtime.json', 'sources.lock.json', 'guest_check.py', 'NOTICE.txt'}

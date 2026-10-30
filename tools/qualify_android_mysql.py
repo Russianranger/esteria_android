@@ -19,6 +19,10 @@ FLAGS = ('exactBootstrapHelpersVerified', 'runtimeInstalledByProductionInstaller
          'rootSqlAuthenticated', 'applicationSqlAuthenticated', 'socketOnly', 'instanceIdentityVerified',
          'persistentMarkerRestored', 'credentialsPreserved', 'cleanShutdown', 'repeatBootstrapPreserved')
 FALSE_FLAGS = ('productionAdapterQualified', 'arm64Qualified', 'serverSchemasQualified', 'worldserverQualified', 'gameplayQualified')
+SERVICE_SCOPE = 'android-13-x86_64-java-mysql-service-lifecycle'
+SERVICE_FLAGS = ('exactServiceHelpersVerified', 'verifiedX64RuntimeOnly', 'realJavaAdapterExecuted',
+    'ownedLoopbackSqlReady', 'duplicateLeaseRejected', 'explicitShutdownAcknowledged',
+    'leaseReleasedAfterStop', 'sameInstanceRestarted', 'markerRestoredAfterEachStop', 'credentialsPreserved')
 
 
 def validate_receipt(value, revision, fingerprint, proof_raw, proot):
@@ -33,6 +37,23 @@ def validate_receipt(value, revision, fingerprint, proof_raw, proot):
             re.fullmatch('[a-f0-9]{64}', value.get('runtimeGeneration', '')) and value.get('prootBuildEvidence') == proot, 'mysql-receipt-build-identity')
     require(all(value.get(flag) is True for flag in FLAGS), 'mysql-receipt-missing-behavior')
     require(all(value.get(flag) is False for flag in FALSE_FLAGS), 'mysql-receipt-overclaim')
+
+
+def validate_service_receipt(value, revision, fingerprint, proof_raw, proot):
+    proof = json.loads(proof_raw)
+    require(type(value.get('formatVersion')) is int and value['formatVersion'] == 1 and
+            value.get('scope') == SERVICE_SCOPE and value.get('sourceRevision') == revision and
+            value.get('fingerprint') == fingerprint and value.get('abi') == 'x86_64', 'mysql-service-receipt-identity')
+    for name, expected in (('api', 33), ('targetSdk', 35), ('serviceLaunches', 2),
+                           ('verificationGuestLaunches', 4), ('duplicateStartAttempts', 2)):
+        require(type(value.get(name)) is int and value[name] == expected, 'mysql-service-receipt-count-' + name)
+    require(value.get('mysqlVersion') == proof['expectedMysqlSqlVersion'] and
+            value.get('runtimeProviderSha256') == hashlib.sha256(proof_raw).hexdigest() and
+            value.get('runtimeArchiveSha256') == proof['archive']['sha256'] and
+            re.fullmatch('[a-f0-9]{64}', value.get('runtimeGeneration', '')) and
+            value.get('prootBuildEvidence') == proot, 'mysql-service-receipt-build-identity')
+    require(all(value.get(flag) is True for flag in SERVICE_FLAGS), 'mysql-service-receipt-missing-behavior')
+    require(all(value.get(flag) is False for flag in FALSE_FLAGS), 'mysql-service-receipt-overclaim')
 
 
 def main():
@@ -51,7 +72,8 @@ def main():
     report = dict(formatVersion=1, scope=SCOPE, sourceRevision=args.source_revision,
                   apk=dict(bytes=args.apk.stat().st_size, sha256=digest(args.apk)),
                   testApk=dict(bytes=args.test_apk.stat().st_size, sha256=digest(args.test_apk)),
-                  androidMysqlBootstrapQualified=False, **{key: False for key in FALSE_FLAGS})
+                  androidMysqlBootstrapQualified=False, androidJavaDatabaseServiceLifecycleQualified=False,
+                  **{key: False for key in FALSE_FLAGS})
     installed = False; failure = None
     def command(label, words, timeout=180, allow_failure=False):
         code, text = run_bounded([args.adb, *words], args.output / (label + '.log'), timeout)
@@ -78,10 +100,26 @@ def main():
         evidence = json.loads(raw)
         validate_receipt(evidence, args.source_revision, properties['ro.build.fingerprint'], proof_raw, proot)
         report['appEvidence'] = evidence; report['androidMysqlBootstrapQualified'] = True
+        _, result = command('mysql-service-test', ['shell', 'am', 'instrument', '-w', '-r', '-e', 'class',
+            PACKAGE + '.runtime.MySqlExecutionTest#actualJavaServiceAdapterOwnsReadinessShutdownAndRestart',
+            PACKAGE + '.test/androidx.test.runner.AndroidJUnitRunner'], timeout=1800)
+        require(instrument_passed(result), 'mysql-service-instrumentation-did-not-pass')
+        _, raw = command('service-app-receipt', ['exec-out', 'run-as', PACKAGE, 'cat', 'files/mysql-service-probe-qualification.json'])
+        require(len(raw.encode()) <= 65536, 'mysql-service-receipt-size-limit')
+        evidence = json.loads(raw)
+        validate_service_receipt(evidence, args.source_revision, properties['ro.build.fingerprint'], proof_raw, proot)
+        report['serviceAppEvidence'] = evidence; report['androidJavaDatabaseServiceLifecycleQualified'] = True
     except Exception as error:
         failure = error; report['error'] = str(error)
     finally:
         if installed:
+            for phase in ('initialize', 'seed', 'verify-0', 'verify-1', 'service-0', 'service-1'):
+                for name in ('stdout.log', 'stderr.log', 'engine-private.log'):
+                    try:
+                        command('service-' + phase + '-' + name, ['exec-out', 'run-as', PACKAGE, 'cat',
+                            'files/mysql-service-probe-session/sessions/' + phase + '/logs/' + name], allow_failure=True)
+                    except Exception as error:
+                        report.setdefault('diagnosticErrors', []).append(str(error))
             for phase in ('initialize', 'seed', 'verify', 'repeat'):
                 for stream in ('stdout', 'stderr'):
                     try:
@@ -105,7 +143,9 @@ def main():
                 try:
                     command(label, words, allow_failure=label != 'stop-owned-test-app')
                 except Exception as error:
-                    report['androidMysqlBootstrapQualified'] = False; report.setdefault('cleanupErrors', []).append(str(error))
+                    report['androidMysqlBootstrapQualified'] = False
+                    report['androidJavaDatabaseServiceLifecycleQualified'] = False
+                    report.setdefault('cleanupErrors', []).append(str(error))
                     if failure is None: failure = error
         report['completedAtUnix'] = int(time.time())
         (args.output / 'qualification.json').write_text(json.dumps(report, indent=2) + '\n')

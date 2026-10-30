@@ -53,6 +53,45 @@ public final class SupportBundleTest {
                     throw new AssertionError("partial credential line leaked");
             }
         }
-        System.out.println("SupportBundle: bounded export, credential redaction and traversal tests passed");
+        // The integrated app emits more than 64 fields once all provider and
+        // performance facts are present. Every retained field must reach export.
+        Map<String, String> complete = new LinkedHashMap<>();
+        for (int i = 0; i < SupportBundle.MAX_FACTS; i++) complete.put("component.fact" + i, "verified-value-" + i);
+        ByteArrayOutputStream large = new ByteArrayOutputStream();
+        SupportBundle.write(large, complete, Collections.emptyMap());
+        String metadata = readMetadata(large);
+        for (Map.Entry<String, String> fact : complete.entrySet())
+            if (!metadata.contains(fact.getKey() + "=" + fact.getValue() + "\n"))
+                throw new AssertionError("complete provider metadata was lost");
+        complete.put("one.too.many", "refuse");
+        rejectedBeforeOutput(complete);
+        complete.clear();
+        StringBuilder wide = new StringBuilder(); for (int i = 0; i < 6000; i++) wide.append('\u4e16');
+        for (int i = 0; i < 15; i++) complete.put("unicode" + i, wide.toString());
+        rejectedBeforeOutput(complete); // 90,000 characters exceed 256 KiB in UTF-8.
+        complete.clear();
+        StringBuilder ascii = new StringBuilder(); for (int i = 0; i < 8192; i++) ascii.append('x');
+        for (int i = 0; i < 33; i++) complete.put("large" + i, ascii.toString());
+        rejectedBeforeOutput(complete);
+        System.out.println("SupportBundle: complete provider metadata, UTF-8 bounds, credential redaction and traversal tests passed");
+    }
+    private static String readMetadata(ByteArrayOutputStream output) throws IOException {
+        try (ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(output.toByteArray()))) {
+            ZipEntry entry = zip.getNextEntry();
+            if (entry == null || !"status.txt".equals(entry.getName())) throw new AssertionError("missing metadata");
+            ByteArrayOutputStream data = new ByteArrayOutputStream(); byte[] buffer = new byte[8192];
+            for (int n; (n = zip.read(buffer)) != -1;) data.write(buffer, 0, n);
+            if (data.size() > SupportBundle.MAX_METADATA_BYTES) throw new AssertionError("metadata byte bound exceeded");
+            return new String(data.toByteArray(), StandardCharsets.UTF_8);
+        }
+    }
+    private static void rejectedBeforeOutput(Map<String, String> facts) throws IOException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        try {
+            SupportBundle.write(output, facts, Collections.emptyMap());
+            throw new AssertionError("over-limit diagnostic metadata accepted");
+        } catch (IOException expected) {
+            if (output.size() != 0) throw new AssertionError("invalid metadata wrote a partial archive");
+        }
     }
 }

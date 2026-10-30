@@ -1,0 +1,80 @@
+{
+  "artifact": {
+    "bytes": 5883,
+    "downloadedAndHashVerified": true,
+    "id": 12958039637,
+    "sha256": "dd4fbe536737da392b6eea429616da88486e34aaa17b411b1062d74673b2e3e5"
+  },
+  "conclusion": "success",
+  "databaseServiceExecuted": false,
+  "formatVersion": 1,
+  "integrationRevision": "9d413c2d19906021c391e4616647910dd0535b2a",
+  "jobId": 123923142306,
+  "receipt": {
+    "arm64GuestExecuted": false,
+    "artifacts": {
+      "initialApk": {
+        "bytes": 258877,
+        "sha256": "65b53476c0125707887053bb5057d8da2d5e706d95dc0ab6e7ae9c1103b6a710"
+      },
+      "testApk": {
+        "bytes": 1723541,
+        "sha256": "1fd4e8c072b2d25e1143ec3e48ff835a80f25a846ebcced6635d13e9e29c435a"
+      },
+      "updateApk": {
+        "bytes": 258837,
+        "sha256": "53a70830b06d0c3d87a2fb520c319fd65b5c6744ae2dbe7ec59ee573b9ede19d"
+      }
+    },
+    "completedAtUnix": 1793341193,
+    "databaseHelperAssetContractGroups": 6,
+    "databaseHelperAssetsQualified": true,
+    "databaseServiceExecuted": false,
+    "emulatorProperties": {
+      "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+      "ro.build.version.sdk": "33",
+      "ro.kernel.qemu": "1",
+      "ro.product.cpu.abi": "x86_64"
+    },
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "runtimeContractGroups": 18,
+    "runtimeFilesystemQualified": true,
+    "sameJobDebugKeyUpdatePreservedRuntimeAndSentinel": true,
+    "scope": "android-13-x86_64-installer-and-apk-update",
+    "userSigningIdentityQualified": false
+  },
+  "receiptIdentity": {
+    "bytes": 1121,
+    "sha256": "1312e6087ea78b40455b9aaf73a3df38fd3ac3bb173a119085390508bd7b8beb"
+  },
+  "runId": 41013086426,
+  "runUrl": "https://github.com/Russianranger/esteria_android/actions/runs/41013086426",
+  "scope": "independent-readback-of-android-helper-installer-qualification",
+  "sixIndividualInstrumentationSuccesses": {
+    "actualBundledHelpersInstallAndRepeatWithoutRewriting": {
+      "bytes": 865,
+      "sha256": "8a3f9d43a8d374682b2cb40f7380899c48abb1f1f0d6449ad3d135d491acb0b2"
+    },
+    "changedExistingHelperIsPreservedAndRefused": {
+      "bytes": 844,
+      "sha256": "66b4656d8eabc6df1b8926a020c8f9f5cfafdc6456805dcffa2b6e039a6e9e7e"
+    },
+    "expectedHelperSymlinkNeverReplacesOrWritesItsTarget": {
+      "bytes": 863,
+      "sha256": "1160dc7f13ceb0e327489c39b3bff8fea782444756e01a9e46d93664ec7dfd79"
+    },
+    "extraModulesNativeExtensionsAndCachesCannotEnterImportPath": {
+      "bytes": 877,
+      "sha256": "6ea5535a346368bad6b1ecf9878fb332fb2e6a1f95557f9aaa3a72e76d6d3e1b"
+    },
+    "partialGenerationResumesAndRetainsHarmlessInterruptedWrite": {
+      "bytes": 877,
+      "sha256": "d2dd884de2b4538481ae333d1dd8adb740ff9ee09ae3cce102adb32dfe774a22"
+    },
+    "temporarySymlinkDoesNotBypassClosure": {
+      "bytes": 833,
+      "sha256": "9237ab52a6507c838dd71f3622b7568edaef31212445fb4e872377527f8bbb27"
+    }
+  }
+}

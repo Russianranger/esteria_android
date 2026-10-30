@@ -99,5 +99,30 @@ class MySqlProbe(unittest.TestCase):
         self.assertEqual(source['mysql']['sourceArchives'], production['mysql']['sourceArchives'])
         self.assertTrue(all(row['architecture']=='amd64' for row in source['mysql']['binaryPackages']))
 
+    def test_java_service_receipt_requires_real_lifecycle_and_exact_fixture(self):
+        proof = dict(expectedMysqlSqlVersion='8.0.46-0ubuntu0.24.04.4', archive=dict(sha256='a'*64))
+        raw = build.encoded(proof); proot = {'fixture': 'pinned-only'}
+        good = dict(formatVersion=1, scope=qualify.SERVICE_SCOPE, sourceRevision='b'*40,
+            fingerprint='fixture', abi='x86_64', api=33, targetSdk=35, serviceLaunches=2,
+            verificationGuestLaunches=4, duplicateStartAttempts=2,
+            mysqlVersion=proof['expectedMysqlSqlVersion'], runtimeProviderSha256=hashlib.sha256(raw).hexdigest(),
+            runtimeArchiveSha256='a'*64, runtimeGeneration='c'*64, prootBuildEvidence=proot,
+            **{name: True for name in qualify.SERVICE_FLAGS}, **{name: False for name in qualify.FALSE_FLAGS})
+        qualify.validate_service_receipt(good, 'b'*40, 'fixture', raw, proot)
+        mutations = {name: False for name in qualify.SERVICE_FLAGS}
+        mutations.update({name: True for name in qualify.FALSE_FLAGS})
+        mutations.update(formatVersion=True, scope=qualify.SCOPE, sourceRevision='e'*40, fingerprint='other',
+            api=32, targetSdk=28, abi='arm64-v8a', serviceLaunches=1, verificationGuestLaunches=3,
+            duplicateStartAttempts=True, mysqlVersion='8.0.46-other', runtimeProviderSha256='d'*64,
+            runtimeArchiveSha256='d'*64, runtimeGeneration='not-a-generation', prootBuildEvidence={})
+        for key, value in mutations.items():
+            changed = copy.deepcopy(good); changed[key] = value
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                qualify.validate_service_receipt(changed, 'b'*40, 'fixture', raw, proot)
+        for flag in qualify.SERVICE_FLAGS:
+            changed = copy.deepcopy(good); changed[flag] = 1
+            with self.subTest(integerBoolean=flag), self.assertRaises(ValueError):
+                qualify.validate_service_receipt(changed, 'b'*40, 'fixture', raw, proot)
+
 
 if __name__ == '__main__': unittest.main()

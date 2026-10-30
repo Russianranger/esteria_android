@@ -97,6 +97,13 @@ true. No server, Android, imported-content or gameplay qualification changed.
 
 All public asset lengths, hashes and fixed URLs are now recorded, so normal
 `fetch` needs no original Actions artifact. A separate credential-free public
-fetch/export check is added to the preservation workflow; its actual result is
-pending the next run and must not be inferred from the authenticated release API
-readback above.
+fetch/export check passed in workflow41015479853 at
+`386b537723f4cf8f60920b7e92ff02959246f484`. It explicitly used an empty
+`GITHUB_TOKEN` and `Github(None)`, downloaded all seven pinned public files,
+read back the archive/source/compiler identities and recreated the Android
+provider. Its470-byte receipt SHA-256 is
+`05c429f769f731e192a35d037f6fb5a898c371472e584f0d5b95d039d7746ea2`;
+the independently downloaded1,291-byte artifact SHA-256 is
+`2b20df066e66620a94ea5f70b49a183de70534c4f423b76748f8c9c96f80ea32`.
+This establishes public acquisition without an Actions artifact or credentials,
+while all Android, imported-game shader and gameplay flags remain false.

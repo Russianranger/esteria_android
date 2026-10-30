@@ -97,3 +97,14 @@ pins twice plus metadata), rather than rescanning the extra 1 GB. Evidence SHA25
 This full-input host proof complements the Android fixture run; neither establishes
 Android execution of the installed ARM64 binaries. The emulator update uses one
 isolated debug key, not the future persistent user-signing identity.
+
+The follow-up Android13 x64 run
+[41013086426](https://github.com/Russianranger/esteria_android/actions/runs/41013086426)
+at `9d413c2d19906021c391e4616647910dd0535b2a` passed those 18 contracts and
+same-job update preservation again, plus all six real-APK database-helper asset
+groups. They cover exact installation/reuse, partial resume, preserving changed
+existing bytes, rejecting extra importable files, and rejecting helper/temporary
+symlinks without modifying their targets. The downloaded evidence ZIP and all six
+individual success logs were independently verified; identities and the receipt
+are in `runtime/evidence/android-helper-installer-41013086426.json`. These asset
+checks did not execute Python or MySQL, and used the isolated job signing key.

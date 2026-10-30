@@ -16,6 +16,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -26,6 +27,15 @@ import org.json.JSONObject;
 /** Persistent database component; launcher activation awaits actual runtime gates. */
 public final class ServerDatabaseService {
     private ServerDatabaseService(){ }
+    /** Internal seam for an already verified runtime. The public entry point
+     * below always uses ServerRuntimeSetup and the production PRoot inspector.
+     * Only androidTest supplies the independently verified x64 probe runtime. */
+    interface InstalledRuntime {
+        Path current() throws IOException;
+        String expectedMysqlVersion();
+        OwnedProcess launch(Path work,Path session,List<String> command,
+                            OwnedProcess.GracefulInputStop shutdown) throws IOException;
+    }
     public static final class Handle implements SessionSupervisor.Child {
         private final OwnedProcess process;
         private final FileChannel leaseChannel;
@@ -75,9 +85,24 @@ public final class ServerDatabaseService {
     }
     /** Caller retains this child and always stops it, including failed readiness. */
     public static Handle start(Context context,Path root,ServerRuntimeSetup runtime) throws IOException {
+        return startInstalled(context,root,new InstalledRuntime(){
+            @Override public Path current() throws IOException {return runtime.current();}
+            @Override public String expectedMysqlVersion(){return runtime.expectedMysqlVersion();}
+            @Override public OwnedProcess launch(Path work,Path session,List<String> command,
+                    OwnedProcess.GracefulInputStop shutdown) throws IOException {
+                return ProotProcess.startInteractive(context,runtime.installer(),runtime.packagePlan(),work,session,
+                        command,Collections.emptyMap(),Collections.emptyList(),shutdown);
+            }
+        });
+    }
+    static Handle startInstalled(Context context,Path root,InstalledRuntime runtime) throws IOException {
         if(!root.equals(context.getFilesDir().getCanonicalFile().toPath()) || runtime.current()==null)
             throw new IOException("Prepared runtime and canonical private storage required");
         Path work=GuestHelperAssets.directory(root,"state/server-work");
+        // PRoot expands guest UNIX sockets to these physical Android filenames.
+        // mysql_service.py creates only s-XXXXXXXX/m.sock directly below /work.
+        if(work.resolve("s-12345678/m.sock").toString().getBytes(StandardCharsets.UTF_8).length>100)
+            throw new IOException("Private database socket path exceeds the Android address bound");
         Path lockPath=work.resolve(".android-database-setup.lock");
         if(Files.exists(lockPath,LinkOption.NOFOLLOW_LINKS) && !Files.isRegularFile(lockPath,LinkOption.NOFOLLOW_LINKS))
             throw new IOException("Invalid database ownership lock");
@@ -95,10 +120,10 @@ public final class ServerDatabaseService {
             String operation=UUID.randomUUID().toString().replace("-","");
             Path session=sessions.resolve(operation);
             Files.createDirectory(session,PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------")));
-            OwnedProcess process=ProotProcess.startInteractive(context,runtime.installer(),runtime.packagePlan(),work,session,
+            OwnedProcess process=runtime.launch(work,session,
                     Arrays.asList("/usr/bin/python3","-B","-s","-E","/work/service-helpers/"+generation+"/mysql_service.py",
                             "--expected-version",runtime.expectedMysqlVersion(),"--operation-id",operation),
-                    Collections.emptyMap(),Collections.emptyList(),child->{
+                    child->{
                         if(!child.writeInput("shutdown\n".getBytes(StandardCharsets.US_ASCII),Duration.ofSeconds(1)))
                             throw new IOException("Database shutdown request was not delivered");
                     });

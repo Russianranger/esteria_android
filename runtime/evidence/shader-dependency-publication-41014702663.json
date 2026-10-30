@@ -61,9 +61,40 @@
       "url": "https://github.com/Russianranger/esteria_android/releases/tag/deps-shader-tools-c77db08-7937274c8379"
     }
   },
-  "credentialFreePublicFetchIndependentlyVerified": false,
+  "credentialFreePublicFetchIndependentlyVerified": true,
   "nativeCompilerQualifiedInSeparateFixture": true,
   "androidRuntimeQualified": false,
   "gameAssetShadersQualified": false,
-  "gameplayQualified": false
+  "gameplayQualified": false,
+  "publicFetchEvidence": {
+    "workflowRun": 41015479853,
+    "workflowRevision": "386b537723f4cf8f60920b7e92ff02959246f484",
+    "workflowConclusion": "success",
+    "receiptArtifact": {
+      "id": 12959646731,
+      "bytes": 1291,
+      "sha256": "2b20df066e66620a94ea5f70b49a183de70534c4f423b76748f8c9c96f80ea32",
+      "downloadVerified": true
+    },
+    "receipt": {
+      "bytes": 470,
+      "sha256": "05c429f769f731e192a35d037f6fb5a898c371472e584f0d5b95d039d7746ea2",
+      "result": {
+        "actionsArtifactRequired": false,
+        "androidRuntimeQualified": false,
+        "apkBytesVerified": false,
+        "archive": {
+          "assetPath": "shader-tools/shader-tools-arm64.archive",
+          "bytes": 10635594,
+          "file": "shader-tools-arm64.tar.gz",
+          "sha256": "7937274c8379882a045fb93c50ea9bb8575e25d5f769f7d8a3077d1518522c57"
+        },
+        "credentialFreePublicFetchVerified": true,
+        "gameAssetShadersQualified": false,
+        "gameplayQualified": false,
+        "providerVerified": true
+      }
+    },
+    "githubTokenConfiguredForPublicFetch": false
+  }
 }
