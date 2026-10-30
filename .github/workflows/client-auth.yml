@@ -15,13 +15,14 @@ on:
       - runtime/server/compiled-reference.lock.json
       - tools/prepare_client_auth_inputs.py
       - tools/qualify_client_auth.py
+      - tools/mysql_init_trace.py
+      - tests/test_mysql_init_trace.py
       - tools/client_auth_contract.py
       - tools/prepare_server_requalification.py
       - tools/qualify_dbimport.py
       - tools/initialize_server_schema.py
       - runtime/server_schema_baseline.py
       - runtime/mysql_bootstrap.py
-      - runtime/provision_local_realm.py
       - runtime/server_schema_adaptations.py
       - runtime/server/appearance-schema-v1.sql
       - runtime/server/appearance-schema.lock.json
@@ -33,6 +34,11 @@ on:
       - tools/render_server_config.py
       - runtime/server_config.py
       - runtime/server_updater.py
+      - runtime/server_update_setup.py
+      - runtime/server_schema_setup.py
+      - runtime/server_content.py
+      - runtime/provision_local_account.py
+      - runtime/provision_local_realm.py
       - runtime/owned_process_group.py
   workflow_dispatch:
 permissions:

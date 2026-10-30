@@ -76,6 +76,11 @@ def verify_base(lock):
             'native-arm64-tool-image-required')
     require(identity('/etc/esteria-server-runtime.json') == lock['base']['metadata'],
             'tool-image-base-metadata-mismatch')
+    metadata = json.loads(Path('/etc/esteria-server-runtime.json').read_text())
+    dependency = lock['diagnosticAddition']['dependency']
+    libc = [row for row in metadata['packages'] if row['package'].split(':')[0] == dependency['name']]
+    require(len(libc) == 1 and libc[0]['architecture'] == 'arm64' and libc[0]['version'] == dependency['installed'],
+            'tool-diagnostic-base-dependency-mismatch')
 
 
 def main():

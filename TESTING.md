@@ -11,7 +11,9 @@ python3 tools/verify_protocol.py --client ../client-src --server ../server-src
 Use documented SDK/JDK/NDK dependencies and exact source locks from BUILDING.md.
 Run focused affected groups first. Real-MySQL and native/emulator fixtures require
 explicit disposable environments; skipped tests are not execution evidence.
-Changing an optional provider/ABI profile requires a clean app build. After
+The importer now passes24 behavior groups under32MiB, including selection-catalog
+validation and failed-overlay/corrected-retry preservation. Changing an optional
+provider/ABI profile requires a clean app build. After
 assembly, verify every selected provider against the final APK, including stored
 archive bytes, original metadata/notices and exact source companions.
 

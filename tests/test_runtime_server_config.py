@@ -98,6 +98,16 @@ class RuntimeServerConfiguration(unittest.TestCase):
         self.assertFalse(proof['moduleStartupQualified']); self.assertFalse(proof['gameplayQualified'])
         self.assertEqual(self.secret.read_bytes(), before_secret)
 
+    def test_expected_private_generation_is_read_only_and_matches_renderer_exactly(self):
+        self.runtime_render()
+        expected = self.files()
+        directory = (self.state / 'config/current').resolve()
+        before = {path: path.stat().st_mtime_ns for path in [self.secret, directory, *directory.rglob('*')]}
+        files = runtime.expected_private_files_verified(self.content, self.state, self.data, self.mysql,
+            profile=self.profile, secret='a' * 64)
+        self.assertEqual({name: value.encode() for name, value in files.items()}, expected)
+        self.assertEqual({path: path.stat().st_mtime_ns for path in before}, before)
+
     def test_host_preserves_noncanonical_input_json_hash_semantics(self):
         inventory = self.root / 'noncanonical-inventory.json'
         compiled = self.root / 'noncanonical-compiled.json'

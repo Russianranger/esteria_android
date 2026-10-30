@@ -30,7 +30,7 @@ exact reviewed files. Source revisions embedded in APKs are authoritative.
 - Android x64 Wine41046942035 passes reconstructed entry/offline/loopback after
   source-owned private-PE anonymous-copy adaptation. No CommonMain, graphics,
   audio, ARM64 or world claim. Original Android policy/targetSDK35 are unchanged.
-- Production ARM64 adaptation recipe/workflow is published atb1d96ed. It keeps
+- Production ARM64 build/PE fixture/runtime readback pass41051386531. Source export failed attribute-filtered Git archive bytes;681b2e9 adds raw-blob export and a source-first preflight. Current0f runtime gates remain pending. It keeps
   the old production runtime/provider hashes untouched. Follow its actual build,
   complete original/source capture and native current0f component gates next.
 - Seven-patch linked server/full50 ConfigMgr pass; exact source-isolated rebuild
@@ -68,7 +68,8 @@ exact reviewed files. Source revisions embedded in APKs are authoritative.
    providers against a new Wine hash only after measurement; bindings are exact.
 2. Pass the matched current0f/compiled-server auth gate; keep initialization
    failures distinct from protocol failures. Run actual playerbots schema gate.
-3. Complete reusable updater/ledger/account/realm APIs on the same live engine.
+3. Portable updater/ledger/account/realm APIs are implemented and independently
+   reviewed; follow their new actual native composition gate on the same engine.
    Compose them after the explicit original baseline + separate source-derived
    appearance adaptation; never rewrite original SQL/updater ledger history.
 4. Fresh-slot/workspace ownership and atomic promotion/recovery storage now pass
@@ -98,3 +99,13 @@ working content set. Do not fabricate assets or enable online CDN gameplay.
 
 Keep six project records current and push meaningful checkpoints. State clearly
 which real CI mechanisms remain running; do not imply invisible background work.
+
+
+Loose selection catalogs now receive complete bounded source-derived record
+checks;24 importer groups/32MiB and overlay rollback/corrected retry pass. The
+presentation toolbar reserves its own space and the game view retains its aspect
+ratio. Java/AndroidTest/lint pass; complete presentation remains a separate gate.
+The combined APK source sealer now declares/hashes all nine schema helpers,
+including nested SQL inputs; an old exact-inventory failure must be rerun rather
+than bypassed. Extractors have native CLI and actual Java archive install/reuse
+proofs, but optional APK packaging remains blocked by the real source seal.

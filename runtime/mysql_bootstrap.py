@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 from contextlib import contextmanager
+import errno
 import fcntl
 import hashlib
 import json
@@ -17,6 +18,7 @@ from pathlib import Path
 import re
 import secrets
 import selectors
+import stat
 import subprocess
 import tempfile
 import threading
@@ -157,18 +159,83 @@ def read_secret(path: Path, *, create: bool = False) -> str:
     return secret
 
 
+class _StateLease:
+    """Opaque capability; constructing this type does not register a lease."""
+    __slots__ = ()
+
+
+_STATE_LEASES = {}
+
+
+def _check_state_lease(state: Path, lease):
+    state = private_path(Path(state))
+    record = _STATE_LEASES.get(lease) if isinstance(lease, _StateLease) else None
+    if record is None or record['pid'] != os.getpid() or record['thread'] is not threading.current_thread() or \
+            record['state'] != state:
+        raise BootstrapError('State lease is not active for this process, thread and exact state path')
+    try:
+        stream = record['stream']
+        if stream.closed or stream.fileno() != record['fd']:
+            raise BootstrapError('State lease descriptor is closed or changed')
+        info = os.fstat(record['fd'])
+        current = private_path(state / '.mysql-bootstrap.lock').lstat()
+        if not stat.S_ISREG(info.st_mode) or not stat.S_ISREG(current.st_mode) or \
+                info.st_nlink != 1 or current.st_nlink != 1 or info.st_mode & 0o077 or \
+                (info.st_dev, info.st_ino) != record['inode'] or \
+                (current.st_dev, current.st_ino) != record['inode']:
+            raise BootstrapError('State lease lock descriptor or contained path identity changed')
+    except (OSError, ValueError) as error:
+        raise BootstrapError('State lease descriptor or path is no longer active') from error
+    return lease
+
+
 @contextmanager
 def state_lock(state: Path):
-    private_path(state)
+    state = private_path(Path(state))
     state.mkdir(mode=0o700, parents=True, exist_ok=True)
     lock_path = private_path(state / '.mysql-bootstrap.lock')
-    with lock_path.open('a') as stream:
-        os.chmod(lock_path, 0o600)
+    descriptor = os.open(lock_path, os.O_WRONLY | os.O_APPEND | os.O_CREAT | os.O_NOFOLLOW | os.O_NONBLOCK, 0o600)
+    stream = os.fdopen(descriptor, 'a')
+    lease = _StateLease()
+    try:
+        info = os.fstat(descriptor)
+        if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
+            raise BootstrapError('Bootstrap lock must be an unshared regular file')
+        os.fchmod(descriptor, 0o600)
         try:
             fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError as error:
             raise BootstrapError('Another bootstrap operation owns this installation') from error
-        yield
+        _STATE_LEASES[lease] = dict(pid=os.getpid(), thread=threading.current_thread(), state=state,
+                                    stream=stream, fd=descriptor, inode=(info.st_dev, info.st_ino))
+        _check_state_lease(state, lease)
+        yield lease
+        _check_state_lease(state, lease)
+    finally:
+        _STATE_LEASES.pop(lease, None)
+        try:
+            stream.close()
+        except OSError as error:
+            if error.errno != errno.EBADF:
+                raise
+
+
+@contextmanager
+def state_scope(state: Path, lease=None):
+    """Acquire normally, or reuse only a real same-thread active state lease.
+
+    Supplied capabilities neither acquire nor release the outer file lock. Their
+    exact state/process/thread/descriptor/path identity is checked on both sides.
+    """
+    if lease is None:
+        with state_lock(state) as active:
+            yield active
+    else:
+        _check_state_lease(state, lease)
+        try:
+            yield lease
+        finally:
+            _check_state_lease(state, lease)
 
 
 @contextmanager

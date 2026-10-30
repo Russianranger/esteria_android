@@ -88,7 +88,8 @@ def result(content, bootstrap, operation, applied, appearance_proofs):
         androidRuntimeQualified=False, gameplayQualified=False)
 
 
-def initialize(content, connection, state, version, apply, *, progress=None, cancelled=None):
+def initialize(content, connection, state, version, apply, *, progress=None, cancelled=None,
+               state_lease=None, on_baseline_complete=None):
     """Apply exact bases/prerequisites; `apply(database, path)` runs owned SQL.
 
     `content` must come from server_content.verify with application/engine pins.
@@ -96,6 +97,9 @@ def initialize(content, connection, state, version, apply, *, progress=None, can
     this function independently authenticates its version/UUID/path/user/endpoint.
     Cancellation is immediate before SQL and between files. An executing file
     must finish or fail through its owner's bounded process lifecycle.
+    A real ``state_lease`` reuses the caller's active file lock. The completion
+    observer receives the actual underlying proof only after the new complete
+    journal is durable; historical verification never calls that observer.
     """
     require(isinstance(content, packaged.VerifiedContent), 'Verified immutable server content required')
     checkpoint(cancelled)
@@ -109,7 +113,7 @@ def initialize(content, connection, state, version, apply, *, progress=None, can
     identities[APPEARANCE_PATH] = appearance.proof['sqlIdentity']
     require(len(paths) == len(set(paths)), 'Duplicate source baseline path')
     checkpoint(cancelled)
-    with db.state_lock(state):
+    with db.state_scope(state, state_lease):
         bootstrap = db.read_receipt(state / 'database-bootstrap.json', version)
         require(bootstrap['datadir'] == str(state / 'database') and
                 db.datadir_uuid(state / 'database') == bootstrap['uuid'], 'Persistent database identity changed')
@@ -182,6 +186,8 @@ def initialize(content, connection, state, version, apply, *, progress=None, can
             journal.update(phase='baseline-complete', pending=None,
                            sourceDerivedAdaptations=proof['sourceDerivedAdaptations'])
             db.atomic_json(journal_path, journal)
+            if on_baseline_complete is not None:
+                on_baseline_complete(proof)
             return result(content, bootstrap, 'initialized-source-baseline', paths, proof['sourceDerivedAdaptations'])
         finally:
             require(connection.query("SELECT RELEASE_LOCK('esteria-local-bootstrap')") == ['1'],

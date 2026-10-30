@@ -1,0 +1,61 @@
+{
+  "actualSqlExecuted": false,
+  "androidRuntimeQualified": false,
+  "completeProductionSetupCoordinatorActivated": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "historicalRendererParity": {
+    "bytes": 757,
+    "sha256": "0a531dff3a67373bde0e21f87317ce0b5f4fc2d26572906de443252f14469733"
+  },
+  "implementation": {
+    "runtime/provision_local_account.py": {
+      "bytes": 19542,
+      "sha256": "e5d2c7d35e83176841107da200ff737bdb8e3671e1a5db91f9438c4228f6701d"
+    },
+    "runtime/provision_local_realm.py": {
+      "bytes": 25452,
+      "sha256": "703ed8a0f1f011191fdf4374aa7e999ca5cff5a87cd4e6e7b3907d7d1c53c994"
+    },
+    "runtime/server_config.py": {
+      "bytes": 21005,
+      "sha256": "8c22c17f6fc7b28f842c49793f9d89b84cbea3f6ce5a1d638b503c97d932f472"
+    },
+    "tests/test_runtime_local_provisioning.py": {
+      "bytes": 17156,
+      "sha256": "cd0a6b7d832b4b99dc184c9bf9037134f6ed65f82d7f8a5fbdffd54f45a7b510"
+    },
+    "tests/test_runtime_server_config.py": {
+      "bytes": 11236,
+      "sha256": "0c165c46a21a1b12021f3b9e0cce932c33c3ae4838c41e7c9f58cff7df3fe715"
+    }
+  },
+  "independentReviewCleared": true,
+  "nativeArm64RuntimeQualified": false,
+  "scope": "portable-local-realm-account-api-host-fixtures-only",
+  "sourceLock": {
+    "bytes": 2170,
+    "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+  },
+  "tests": {
+    "actualIncompleteUpdaterRejectedBeforeMutation": true,
+    "actualVerifiedContentFixtures": true,
+    "callerSqlLocksPreserved": true,
+    "combined": 53,
+    "expiredAndForgedStateLeaseRejected": true,
+    "full50ModuleConfigComparedToSharedRenderer": true,
+    "hostCliPolicyPreserved": true,
+    "missingCompletedAccountRecreationRefused": true,
+    "newRuntimeApiTests": 11,
+    "oldAccountCredentialsReusedWithoutReset": true,
+    "ownSqlAcquisitionsReleased": true,
+    "passed": 52,
+    "positiveCompletedUpdaterGateMocked": true,
+    "realCallerStateLeasePreserved": true,
+    "realMysqlFixtureSkipped": true,
+    "remoteAdminSoapAndModuleRehashRejected": true,
+    "runtimeRootLookupUsed": false,
+    "skipped": 1,
+    "syntheticSourceSqlNeverExecuted": true
+  }
+}

@@ -25,6 +25,8 @@ public final class ImporterTests {
     public static void main(String[] args) throws Exception {
         run("PE version resource validates exact build", ImporterTests::versionResources);
         run("MPQ signature and table bounds", ImporterTests::mpqBounds);
+        run("Esteria selection catalogs validate complete bounded records", ImporterTests::selectionCatalogs);
+        run("invalid catalog update preserves active assets and permits corrected retry", ImporterTests::catalogUpdate);
         run("folder import and repeat skips copied bytes", ImporterTests::folderCommit);
         run("cancel resumes completed files without publication", ImporterTests::resume);
         run("partial journal record and changed staged file recover", ImporterTests::journalRecovery);
@@ -66,6 +68,55 @@ public final class ImporterTests {
         write(client.resolve("Data/enUS/locale-enUS.MPQ"), mpq());
         write(client.resolve("Interface/AddOns/MyAddon/config.txt"), "old config".getBytes(StandardCharsets.UTF_8));
         return client;
+    }
+    private static byte[] selectionCatalog() {
+        ByteBuffer bytes = ByteBuffer.allocate(12 + 6 * 156).order(ByteOrder.LITTLE_ENDIAN);
+        bytes.putInt(0x314d4845).putInt(1).putInt(6);
+        int[] targets = {3, 15, 5199, 8, 0x80000000, 15};
+        int[] values = {301, 0, 29999, 16, 51, 1};
+        for (int kind = 0; kind < 6; kind++) {
+            int at = 12 + kind * 156;
+            bytes.position(at); bytes.putInt(0).putInt(kind).putInt(targets[kind]).putInt(values[kind]);
+            bytes.putInt(-1).putInt((255 << 16) | 31).putInt(0);
+            if (kind == 1 || kind == 5) bytes.put("Character\\Test.blp".getBytes(StandardCharsets.US_ASCII));
+            if (kind == 3) bytes.put("1:0".getBytes(StandardCharsets.US_ASCII));
+        }
+        return bytes.array();
+    }
+    private static void selectionCatalogs() throws Exception {
+        Path file = temp().resolve("catalog.bin"); byte[] valid = selectionCatalog();
+        write(file, valid); GameDataVerifier.verifyKnownFile(file, "EsteriaNaga.bin");
+        // The production reader's unsigned high-bit helmet mask and all six
+        // record kinds are present. These are format fixtures, not game assets.
+        for (int[] change : new int[][]{{0, 0}, {4, 2}, {8, 16385}, {12, 2}, {16, 6},
+                {12 + 156 + 8, 16}, {12 + 2 * 156 + 12, 30000}, {12 + 16, 32}, {12 + 16, 256 << 16}}) {
+            byte[] bad = valid.clone(); ByteBuffer.wrap(bad).order(ByteOrder.LITTLE_ENDIAN).putInt(change[0], change[1]);
+            write(file, bad); fails(() -> GameDataVerifier.verifyKnownFile(file, "Data/patch-Z.MPQ/Esteria/EsteriaNaga.bin"), "invalid catalog field");
+        }
+        byte[] bad = valid.clone(); Arrays.fill(bad, 12 + 28, 12 + 156, (byte) 'x');
+        write(file, bad); fails(() -> GameDataVerifier.verifyKnownFile(file, "EsteriaNaga.bin"), "unterminated catalog path");
+        write(file, Arrays.copyOf(valid, valid.length - 1));
+        fails(() -> GameDataVerifier.verifyKnownFile(file, "EsteriaNaga.bin"), "truncated record");
+        write(file, Arrays.copyOf(valid, valid.length + 1));
+        fails(() -> GameDataVerifier.verifyKnownFile(file, "EsteriaNaga.bin"), "undeclared trailing bytes");
+    }
+    private static void catalogUpdate() throws Exception {
+        Path root = temp(), source = client(root), overlay = root.resolve("custom-package");
+        byte[] original = selectionCatalog(); write(source.resolve("EsteriaNaga.bin"), original);
+        GameDataImporter importer = importer(root);
+        GameDataImporter.Result before = folder(importer, source, GameDataImporter.ImportKind.BASE_CLIENT);
+        byte[] invalid = original.clone(); ByteBuffer.wrap(invalid).order(ByteOrder.LITTLE_ENDIAN).putInt(4, 2);
+        Path replacement = overlay.resolve("EsteriaNaga.bin"); write(replacement, invalid);
+        fails(() -> folder(importer, overlay, GameDataImporter.ImportKind.CONTENT_OVERLAY), "unsupported catalog version");
+        check(importer.resolveCurrent().equals(before.gameDirectory) &&
+                Arrays.equals(Files.readAllBytes(before.gameDirectory.resolve("EsteriaNaga.bin")), original), "failed catalog update changed active data");
+        long prior = Files.getLastModifiedTime(replacement).toMillis();
+        byte[] corrected = original.clone(); ByteBuffer.wrap(corrected).order(ByteOrder.LITTLE_ENDIAN).putInt(12 + 12, 302);
+        write(replacement, corrected); Files.setLastModifiedTime(replacement, FileTime.fromMillis(prior + 2000));
+        GameDataImporter.Result after = folder(importer, overlay, GameDataImporter.ImportKind.CONTENT_OVERLAY);
+        check(!after.generation.equals(before.generation) &&
+                Arrays.equals(Files.readAllBytes(after.gameDirectory.resolve("EsteriaNaga.bin")), corrected) &&
+                Arrays.equals(Files.readAllBytes(before.gameDirectory.resolve("EsteriaNaga.bin")), original), "corrected catalog update did not preserve prior version");
     }
     private static byte[] pe(int build) {
         ByteBuffer b = ByteBuffer.allocate(1024).order(ByteOrder.LITTLE_ENDIAN);

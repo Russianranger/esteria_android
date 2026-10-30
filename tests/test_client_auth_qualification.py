@@ -4,6 +4,8 @@ import os
 from pathlib import Path
 import tempfile
 import subprocess
+import sys
+import types
 import unittest
 from unittest import mock
 from tools import client_auth_contract as contract
@@ -11,6 +13,34 @@ from tools import qualify_client_auth as qualifier
 
 
 class ClientAuthQualification(unittest.TestCase):
+    def test_separate_traced_success_cannot_change_failed_normal_qualification(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary);log=root/'normal-initialize-private.log'
+            log.write_text('[ERROR] [MY-013236] private detail\n');log.chmod(0o600)
+            before=dict(phase='fresh-compiled-updater',qualificationSucceeded=False,
+                reconstructedClientAuthenticated=False,ownedLoopbackListenerVerified=False,expectedExit=1)
+            result=dict(before)
+            public=dict(scope='diagnostic-only',exitCode=0,qualificationSucceeded=False)
+            trace=types.ModuleType('tools.mysql_init_trace')
+            trace.diagnose=mock.Mock(return_value=types.SimpleNamespace(as_dict=lambda:dict(public)))
+            with mock.patch.object(sys.modules['tools'],'mysql_init_trace',trace,create=True):
+                qualifier.record_initialization_failure(result,log,Path('/mysqld'),root)
+            self.assertEqual({key:result[key] for key in before},before)
+            self.assertEqual(result['mysqlInitializationTrace'],public)
+            trace.diagnose.assert_called_once_with(Path('/mysqld'),root)
+            self.assertEqual(log.read_text(),'[ERROR] [MY-013236] private detail\n')
+
+    def test_tracing_is_restricted_to_normal_fresh_initialization_failure(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary);log=root/'normal-initialize-private.log'
+            trace=types.ModuleType('tools.mysql_init_trace');trace.diagnose=mock.Mock()
+            with mock.patch.object(sys.modules['tools'],'mysql_init_trace',trace,create=True):
+                for phase,text in (('start-owned-mysql','[ERROR] [MY-013236] private\n'),
+                                   ('fresh-compiled-updater','[Note] normal startup\n')):
+                    log.write_text(text);log.chmod(0o600)
+                    qualifier.record_initialization_failure(dict(phase=phase),log,Path('/mysqld'),root)
+            trace.diagnose.assert_not_called()
+
     def test_mysql_initialization_diagnostics_export_only_error_codes_and_numeric_errno(self):
         with tempfile.TemporaryDirectory() as temporary:
             path=Path(temporary)/'initialize-private.log'

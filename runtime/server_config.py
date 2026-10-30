@@ -164,65 +164,44 @@ def _module_configurations(server, inventory, compiled, inventory_identity, comp
     return files, proof
 
 
-def _render(server: Path, state: Path, data: Path, sql_source: Path, mysql_client: Path,
-            *, profile: dict, module_preparer=None) -> dict:
-    for path in (state, data, sql_source, mysql_client):
-        if not path.is_absolute():
-            raise ValueError('All runtime paths must be absolute in the runtime namespace')
-        quoted(path)
-    state.mkdir(parents=True, exist_ok=True)
-    plain_directory(state)
-    for name in ('config', 'accounts', 'database', 'logs', 'run', 'run/authserver', 'run/worldserver'):
-        (state / name).mkdir(mode=0o700, exist_ok=True)
-        plain_directory(state / name)
-    lock_fd = os.open(state / 'config/.render.lock', os.O_CREAT | os.O_WRONLY | os.O_NOFOLLOW | os.O_NONBLOCK, 0o600)
-    if not stat.S_ISREG(os.fstat(lock_fd).st_mode):
-        os.close(lock_fd)
-        raise ValueError('Configuration lock is not a regular file')
-    with os.fdopen(lock_fd, 'a') as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX)
-        secret_path = state / 'accounts/database-secret'
-        if not secret_path.exists():
-            write_private(secret_path, secrets.token_hex(32) + '\n')
-        secret = bounded_plain(secret_path, 66).decode('ascii').strip()
-        if not re.fullmatch(r'[a-f0-9]{64}', secret):
-            raise ValueError('Existing database secret is invalid; refusing replacement')
-        os.chmod(secret_path, 0o600)
-        # Connection strings deliberately contain semicolons, unlike paths.
-        def database_info(name):
-            return '"' + f'127.0.0.1;{profile["database_port"]};esteria;{secret};{name}' + '"'
-        common = {'BindIP': quoted('127.0.0.1'), 'LogsDir': quoted(state / 'logs'),
-                  'SourceDirectory': quoted(sql_source), 'MySQLExecutable': quoted(mysql_client),
-                  'LoginDatabaseInfo': database_info('acore_auth'),
-                  'LoginDatabase.WorkerThreads': 1, 'LoginDatabase.SynchThreads': 1}
-        auth = common | {'RealmServerPort': profile['auth_port'], 'TempDir': quoted(state / 'run/authserver')}
-        world = common | {'WorldServerPort': profile['world_port'], 'DataDir': quoted(data),
-                          'TempDir': quoted(state / 'run/worldserver'),
-                          'WorldDatabaseInfo': database_info('acore_world'),
-                          'CharacterDatabaseInfo': database_info('acore_characters'),
-                          'WorldDatabase.WorkerThreads': 1, 'WorldDatabase.SynchThreads': 1,
-                          'CharacterDatabase.WorkerThreads': 1, 'CharacterDatabase.SynchThreads': 1,
-                          'Console.Enable': 1, 'Ra.Enable': 0, 'SOAP.Enabled': 0,
-                          'Wintergrasp.DeferShutdownTimer': 0,
-                          'Network.Threads': 1, 'MapUpdate.Threads': 1}
-        bots = profile['playerbots'] | {'PlayerbotsDatabaseInfo': database_info('acore_playerbots')}
-        main_templates = {name: bounded_plain(server.absolute() / name, 4 << 20) for name in (
-            'src/server/apps/authserver/authserver.conf.dist', 'src/server/apps/worldserver/worldserver.conf.dist')}
-        files = {
-            'authserver.conf': overlay(main_templates['src/server/apps/authserver/authserver.conf.dist'].decode('utf-8'), auth),
-            'worldserver.conf': overlay(main_templates['src/server/apps/worldserver/worldserver.conf.dist'].decode('utf-8'), world),
-            'modules/playerbots.conf': overlay(bounded_plain(server.absolute() / 'modules/mod-playerbots/conf/playerbots.conf.dist', 4 << 20).decode('utf-8'), bots),
-        }
-        files['worldserver.conf'] = disable_unqualified_lua(files['worldserver.conf'])
-        module_proof = None
-        if module_preparer is not None:
-            module_files, module_proof = module_preparer(bots, main_templates)
-            files.update(module_files)
-            files['module-configuration.json'] = json.dumps(module_proof, sort_keys=True, indent=2) + '\n'
-        socket = state / 'run/mysql.sock'
-        if len(os.fsencode(socket)) > 100:
-            raise ValueError('MySQL socket path exceeds portable Unix socket path limit; use a shorter runtime mount')
-        files['mysql.cnf'] = f'''# Generated local MySQL 8 profile; persistent data is never deleted.
+def _configuration_files(server: Path, state: Path, data: Path, sql_source: Path, mysql_client: Path,
+                         *, profile: dict, secret: str, module_preparer=None):
+    """Compute private configuration bytes; no state, credential or pointer writes."""
+    # Connection strings deliberately contain semicolons, unlike paths.
+    def database_info(name):
+        return '"' + f'127.0.0.1;{profile["database_port"]};esteria;{secret};{name}' + '"'
+    common = {'BindIP': quoted('127.0.0.1'), 'LogsDir': quoted(state / 'logs'),
+              'SourceDirectory': quoted(sql_source), 'MySQLExecutable': quoted(mysql_client),
+              'LoginDatabaseInfo': database_info('acore_auth'),
+              'LoginDatabase.WorkerThreads': 1, 'LoginDatabase.SynchThreads': 1}
+    auth = common | {'RealmServerPort': profile['auth_port'], 'TempDir': quoted(state / 'run/authserver')}
+    world = common | {'WorldServerPort': profile['world_port'], 'DataDir': quoted(data),
+                      'TempDir': quoted(state / 'run/worldserver'),
+                      'WorldDatabaseInfo': database_info('acore_world'),
+                      'CharacterDatabaseInfo': database_info('acore_characters'),
+                      'WorldDatabase.WorkerThreads': 1, 'WorldDatabase.SynchThreads': 1,
+                      'CharacterDatabase.WorkerThreads': 1, 'CharacterDatabase.SynchThreads': 1,
+                      'Console.Enable': 1, 'Ra.Enable': 0, 'SOAP.Enabled': 0,
+                      'Wintergrasp.DeferShutdownTimer': 0,
+                      'Network.Threads': 1, 'MapUpdate.Threads': 1}
+    bots = profile['playerbots'] | {'PlayerbotsDatabaseInfo': database_info('acore_playerbots')}
+    main_templates = {name: bounded_plain(server.absolute() / name, 4 << 20) for name in (
+        'src/server/apps/authserver/authserver.conf.dist', 'src/server/apps/worldserver/worldserver.conf.dist')}
+    files = {
+        'authserver.conf': overlay(main_templates['src/server/apps/authserver/authserver.conf.dist'].decode('utf-8'), auth),
+        'worldserver.conf': overlay(main_templates['src/server/apps/worldserver/worldserver.conf.dist'].decode('utf-8'), world),
+        'modules/playerbots.conf': overlay(bounded_plain(server.absolute() / 'modules/mod-playerbots/conf/playerbots.conf.dist', 4 << 20).decode('utf-8'), bots),
+    }
+    files['worldserver.conf'] = disable_unqualified_lua(files['worldserver.conf'])
+    module_proof = None
+    if module_preparer is not None:
+        module_files, module_proof = module_preparer(bots, main_templates)
+        files.update(module_files)
+        files['module-configuration.json'] = json.dumps(module_proof, sort_keys=True, indent=2) + '\n'
+    socket = state / 'run/mysql.sock'
+    if len(os.fsencode(socket)) > 100:
+        raise ValueError('MySQL socket path exceeds portable Unix socket path limit; use a shorter runtime mount')
+    files['mysql.cnf'] = f'''# Generated local MySQL 8 profile; persistent data is never deleted.
 [mysqld]
 bind-address=127.0.0.1
 port={profile['database_port']}
@@ -247,6 +226,35 @@ port={profile['database_port']}
 user=esteria
 password={secret}
 '''
+    return files, module_proof
+
+
+def _render(server: Path, state: Path, data: Path, sql_source: Path, mysql_client: Path,
+            *, profile: dict, module_preparer=None) -> dict:
+    for path in (state, data, sql_source, mysql_client):
+        if not path.is_absolute():
+            raise ValueError('All runtime paths must be absolute in the runtime namespace')
+        quoted(path)
+    state.mkdir(parents=True, exist_ok=True)
+    plain_directory(state)
+    for name in ('config', 'accounts', 'database', 'logs', 'run', 'run/authserver', 'run/worldserver'):
+        (state / name).mkdir(mode=0o700, exist_ok=True)
+        plain_directory(state / name)
+    lock_fd = os.open(state / 'config/.render.lock', os.O_CREAT | os.O_WRONLY | os.O_NOFOLLOW | os.O_NONBLOCK, 0o600)
+    if not stat.S_ISREG(os.fstat(lock_fd).st_mode):
+        os.close(lock_fd)
+        raise ValueError('Configuration lock is not a regular file')
+    with os.fdopen(lock_fd, 'a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        secret_path = state / 'accounts/database-secret'
+        if not secret_path.exists():
+            write_private(secret_path, secrets.token_hex(32) + '\n')
+        secret = bounded_plain(secret_path, 66).decode('ascii').strip()
+        if not re.fullmatch(r'[a-f0-9]{64}', secret):
+            raise ValueError('Existing database secret is invalid; refusing replacement')
+        os.chmod(secret_path, 0o600)
+        files, module_proof = _configuration_files(server, state, data, sql_source, mysql_client,
+            profile=profile, secret=secret, module_preparer=module_preparer)
         digest = hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest()
         generations = state / 'config/generations'
         generations.mkdir(exist_ok=True)
@@ -334,13 +342,11 @@ def _sealed_profile(profile):
     return dict(_LOCAL_PORTS, playerbots=dict(bots))
 
 
-def render_verified(content, state: Path, data: Path, mysql: Path, *, profile: dict) -> dict:
-    """Render every selected module using a real verified extracted generation.
+# The portable provisioning APIs use exactly the renderer's reviewed policy.
+sealed_profile = _sealed_profile
 
-    The caller keeps that generation immutable and its runtime/session stopped.
-    Metadata and source template bytes are rechecked before any activation. This
-    API has no legacy or partial-module mode and executes no database/server.
-    """
+
+def _verified_preparer(content, profile):
     if not isinstance(content, packaged.VerifiedContent) or content.source != content.root / 'source':
         raise ValueError('Verified extracted server content required')
     profile = _sealed_profile(profile)
@@ -359,4 +365,31 @@ def render_verified(content, state: Path, data: Path, mysql: Path, *, profile: d
     _validate_modules(compiled, inventory)
     prepare = lambda bots, main: _module_configurations(content.source, inventory, compiled,
         identities['content-manifest'], identities['compiled-modules'], bots, main)
+    return profile, prepare
+
+
+def expected_private_files_verified(content, state: Path, data: Path, mysql: Path, *, profile: dict, secret: str):
+    """Read-only expected full generation. Returned strings contain a password;
+    keep them private and never include them in receipts or support exports.
+    """
+    for path in (state, data, mysql):
+        if not path.is_absolute():
+            raise ValueError('Explicit absolute runtime configuration paths required')
+        quoted(path)
+    if not isinstance(secret, str) or not re.fullmatch('[a-f0-9]{64}', secret):
+        raise ValueError('Existing private configuration credential required')
+    profile, prepare = _verified_preparer(content, profile)
+    files, _proof = _configuration_files(content.source, state, data, content.source, mysql,
+        profile=profile, secret=secret, module_preparer=prepare)
+    return files
+
+
+def render_verified(content, state: Path, data: Path, mysql: Path, *, profile: dict) -> dict:
+    """Render every selected module using a real verified extracted generation.
+
+    The caller keeps that generation immutable and its runtime/session stopped.
+    Metadata and source template bytes are rechecked before any activation. This
+    API has no legacy or partial-module mode and executes no database/server.
+    """
+    profile, prepare = _verified_preparer(content, profile)
     return _render(content.source, state, data, content.source, mysql, profile=profile, module_preparer=prepare)

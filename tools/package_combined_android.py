@@ -36,7 +36,11 @@ NDK_NOTICES = {'NDK-28.2.13676358-NOTICE.txt': 'android-ndk-r28c/NOTICE',
                'LLVM-RUNTIME-NOTICE.txt': 'android-ndk-r28c/toolchains/llvm/prebuilt/linux-x86_64/NOTICE',
                'NDK-SYSROOT-NOTICE.txt': 'android-ndk-r28c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/NOTICE'}
 HELPER_SETS = {'database-setup': ('mysql_bootstrap.py', 'android_database_setup.py'),
-               'database-service': ('mysql_bootstrap.py', 'mysql_service.py')}
+               'database-service': ('mysql_bootstrap.py', 'mysql_service.py'),
+               'server-schema': ('android_server_schema_setup.py', 'mysql_bootstrap.py', 'mysql_service.py',
+                                 'server_content.py', 'server_schema_setup.py', 'server_schema_baseline.py',
+                                 'server_schema_adaptations.py', 'server/appearance-schema-v1.sql',
+                                 'server/appearance-schema.lock.json')}
 
 
 def ndk_notices(path):
@@ -72,7 +76,7 @@ def verify_helpers(archive):
                     'combined-apk-helper-source-mismatch')
             records[name] = dict(bytes=len(expected), sha256=hashlib.sha256(expected).hexdigest())
         manifest = archive.getinfo('assets/' + directory + '/manifest.json')
-        require(manifest.file_size <= 4096, 'combined-apk-helper-manifest-mismatch')
+        require(manifest.file_size <= 16384, 'combined-apk-helper-manifest-mismatch')
         parsed = json.loads(archive.read(manifest))
         require(type(parsed) is dict and type(parsed.get('formatVersion')) is int and
                 type(parsed.get('files')) is dict and

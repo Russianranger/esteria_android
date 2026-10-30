@@ -2,8 +2,9 @@
 """Stage exact signed-index packages/sources for an offline test-only image.
 
 No resolver, APT, dpkg, guest executable or database runs on this host. The
-selection is the original signed APT solver result; alternate transport may
-deliver only the identical signed-index bytes.
+selection preserves the original signed APT solver result plus the explicit
+single-package diagnostic addition. Alternate transport may deliver only the
+identical signed-index bytes; the base packages cannot be replaced.
 """
 from __future__ import annotations
 
@@ -54,8 +55,17 @@ def load_lock(path=LOCK):
     require(lock.get('selectionComplete') is True and lock.get('missing') == [] and
             lock.get('snapshot') == '20261029T000000Z', 'tool-selection-incomplete')
     packages = lock.get('packages', [])
-    require(len(packages) == 32 and len({r['name'] for r in packages}) == 32 and
-            {'git', 'binutils', 'iproute2'} <= {r['name'] for r in packages}, 'tool-selection-contract')
+    require(len(packages) == 33 and len({r['name'] for r in packages}) == 33 and
+            {'git', 'binutils', 'iproute2', 'strace'} <= {r['name'] for r in packages}, 'tool-selection-contract')
+    diagnostic = lock.get('diagnosticAddition', {})
+    require(diagnostic.get('scope') == 'single-signed-index-package-with-no-base-replacement' and
+            diagnostic.get('name') == 'strace' and diagnostic.get('version') == '6.8-0ubuntu2' and
+            diagnostic.get('originalSolverPackages') == 32 and
+            diagnostic.get('dependency') == dict(name='libc6', required='>= 2.38', installed='2.39-0ubuntu8.9',
+                                                  boundByBaseDpkgStatus=True), 'tool-diagnostic-selection-contract')
+    tracer = next(row for row in packages if row['name'] == 'strace')
+    require(tracer['version'] == diagnostic['version'] and tracer['architecture'] == 'arm64' and
+            tracer['dependencyFields'] == {'Depends': 'libc6 (>= 2.38)'}, 'tool-diagnostic-package-contract')
     sources = lock.get('sources', [])
     source_keys = {(r['name'], r['version']) for r in sources}
     require(len(source_keys) == len(sources) and

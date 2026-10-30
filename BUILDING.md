@@ -236,3 +236,11 @@ module-loader header supplement is separately hash-pinned and retained.
 adaptation for the production architecture. Its generated candidate locks remain
 separate from the old production runtime and archive-bound client/bridge/graphics
 providers until the actual new runtime is measured and requalified.
+
+
+`-PserverExtractorsProviderDir=<verified-provider>` selects the four source-matched
+ARM64 extraction tools, exact mmaps YAML and original notices. Its pin is pending
+the same actual complete-source rebuild as server programs; default builds leave
+it disabled. See `runtime/server/EXTRACTOR-PROVIDER.md`. Native CLI success does
+not authorize custom Esteria MPQ conversion: current extractor archive ordering
+and loose providers differ from the reconstructed reader and need adaptation.

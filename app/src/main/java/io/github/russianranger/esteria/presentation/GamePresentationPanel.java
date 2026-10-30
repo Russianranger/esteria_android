@@ -58,17 +58,24 @@ public final class GamePresentationPanel extends FrameLayout {
     }
 
     private final SessionEvents events;
+    private final FrameLayout viewport;
     private final TextView message;
     private final Button keyboard, stop;
     private ClientPresentationSession session;
     private GameInputView game;
     private boolean attached, foreground, failed, stopRequested;
+    private int videoWidth, videoHeight;
 
     public GamePresentationPanel(Context context, SessionEvents events, Actions actions) {
         super(context); uiThread();
         if (events == null || actions == null) throw new IllegalArgumentException("Session events and stop owner are required");
         this.events = events;
         setBackgroundColor(Color.BLACK);
+        LinearLayout layout = new LinearLayout(context);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        viewport = new FrameLayout(context);
+        viewport.addOnLayoutChangeListener((view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> fitGame());
+        layout.addView(viewport, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0, 1));
         LinearLayout controls = new LinearLayout(context);
         controls.setOrientation(LinearLayout.HORIZONTAL); controls.setGravity(Gravity.CENTER_VERTICAL);
         controls.setBackgroundColor(Color.argb(225, 20, 27, 34));
@@ -87,7 +94,8 @@ public final class GamePresentationPanel extends FrameLayout {
             message.setText("Stopping session…"); actions.requestStop();
         });
         controls.addView(stop);
-        addView(controls, new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM));
+        layout.addView(controls, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        addView(layout, new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
     }
 
     /** Bind on the UI thread after the owner has started the real session off it. */
@@ -105,7 +113,7 @@ public final class GamePresentationPanel extends FrameLayout {
         });
         session = value; game = view;
         if (!foreground) game.pauseInput();
-        addView(game, 0, new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        viewport.addView(game, new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, Gravity.CENTER));
         if (events.width > 0) frameSize(events.width, events.height);
         message.setText("Camera controls · Y: pointer");
         if (foreground && attached && hasWindowFocus()) resumeView(); else pauseView();
@@ -131,10 +139,30 @@ public final class GamePresentationPanel extends FrameLayout {
     /** Detach a closed/replaced session; process shutdown remains with its owner. */
     public void unbind() {
         uiThread(); pauseView();
-        if (game != null) removeView(game);
+        if (game != null) viewport.removeView(game);
         game = null; session = null;
     }
-    private void frameSize(int width, int height) { if (game != null && !failed) game.frameSize(width, height); }
+    private void frameSize(int width, int height) {
+        if (game != null && !failed) {
+            game.frameSize(width, height);
+            videoWidth = width; videoHeight = height; fitGame();
+        }
+    }
+    /** Keep every game pixel visible and touchable above the launcher controls. */
+    private void fitGame() {
+        if (game == null || videoWidth <= 0 || videoHeight <= 0 || viewport.getWidth() <= 0 || viewport.getHeight() <= 0) return;
+        int width = viewport.getWidth();
+        int height = Math.max(1, (int) ((long) width * videoHeight / videoWidth));
+        if (height > viewport.getHeight()) {
+            height = viewport.getHeight();
+            width = Math.max(1, (int) ((long) height * videoWidth / videoHeight));
+        }
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) game.getLayoutParams();
+        if (params.width != width || params.height != height) {
+            params.width = width; params.height = height; params.gravity = Gravity.CENTER;
+            game.setLayoutParams(params);
+        }
+    }
     private void showFailure() {
         failed = true; pauseView(); message.setText("Display or input stopped. Export the support bundle from the launcher.");
     }

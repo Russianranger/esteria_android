@@ -1,0 +1,254 @@
+{
+  "androidProviderCreated": false,
+  "androidRuntimeQualified": false,
+  "archiveAndInventoryReadbackIndependentlyRepeated": true,
+  "archives": {
+    "debug": {
+      "archive": {
+        "bytes": 25375231,
+        "sha256": "40e7880bc1ac15391cb63cf61bdc58fb5b90f267f7b93fdf65966a3a0deb7a10"
+      },
+      "fileBytes": 111805329,
+      "regularFiles": 84
+    },
+    "runtime": {
+      "archive": {
+        "bytes": 2495044,
+        "sha256": "2bce13256ac609a7bcb01fd2a7e5352fde29fa19e18a5d269c566acb22f86515"
+      },
+      "fileBytes": 7423422,
+      "regularFiles": 76
+    }
+  },
+  "artifacts": {
+    "extractorDebug": {
+      "bytes": 26093154,
+      "id": 12976736772,
+      "sha256": "3c5364d89fffb7b2ff0509e94bad34dac3ae8439d5b4305554b0db13a5b60dba"
+    },
+    "hostEvidence": {
+      "bytes": 6539,
+      "id": 12975804634,
+      "sha256": "ebb734dd5401b3781b54242a485ca18994983a8f30e29c3ee5707cfe86dbd28d"
+    },
+    "nativeEvidence": {
+      "bytes": 75700,
+      "id": 12976931041,
+      "sha256": "2c0000c058ba7578d46585ba55e4d8451ddbcba77db038b6bc3f0483e9b25fbc"
+    },
+    "runtimeTransfer": {
+      "bytes": 192900091,
+      "id": 12975909369,
+      "sha256": "e8f2053d6cc55299203db4def614d5f93b2b4f6ef4627eee0d0f63ea01b7e51e"
+    }
+  },
+  "clientMpqConversionQualified": false,
+  "clientMpqsSupplied": false,
+  "customEsteriaDataLoadOrderQualified": false,
+  "emptyWorkingDirectoriesUnchanged": true,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "isolatedSourceRebuildQualified": false,
+  "limitations": [
+    "Native ARM64 Linux argument/configuration entry only; no map, DBC, camera, vmap or mmap conversion.",
+    "The current stock MPQ ordering does not establish arbitrary Esteria archive or loose-provider precedence.",
+    "The shared isolated seven-program source rebuild remains separate and was still running when this evidence was recorded."
+  ],
+  "nativeCases": {
+    "map-usage": {
+      "arguments": [
+        "-i"
+      ],
+      "exitCode": 1,
+      "program": "map_extractor",
+      "sourceExpectedOutputTokensMatched": true
+    },
+    "mmaps-argument-validation": {
+      "arguments": [
+        "--silent",
+        "--help"
+      ],
+      "exitCode": 255,
+      "program": "mmaps_generator",
+      "sourceExpectedOutputTokensMatched": true
+    },
+    "mmaps-default-configuration-validation": {
+      "arguments": [
+        "--config",
+        "@CONFIG@",
+        "--silent"
+      ],
+      "exitCode": 253,
+      "program": "mmaps_generator",
+      "sourceExpectedOutputTokensMatched": true
+    },
+    "vmap-assembler-usage": {
+      "arguments": [
+        "--usage",
+        "unused",
+        "unused"
+      ],
+      "exitCode": 1,
+      "program": "vmap4_assembler",
+      "sourceExpectedOutputTokensMatched": true
+    },
+    "vmap-extractor-usage": {
+      "arguments": [
+        "-?"
+      ],
+      "exitCode": 1,
+      "program": "vmap4_extractor",
+      "sourceExpectedOutputTokensMatched": true
+    }
+  },
+  "nativeExternalNetworkingDisabled": true,
+  "nativeRootReadOnly": true,
+  "originalBuild": {
+    "bytes": 32521,
+    "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+  },
+  "originalBuildId": "41019374697.1",
+  "originalConfiguration": {
+    "bytes": 7888,
+    "installedPath": "etc/mmaps-config.yaml",
+    "originalPath": "bin/mmaps-config.yaml",
+    "sha256": "324479ef3821a0f9ef0c3f2d6b42c011eba1c31148eeaccd6bed3250c3d9c306"
+  },
+  "originalDefaultMmapsConfigParsed": true,
+  "originalInstallArtifactDownloadedLocally": false,
+  "originalModules": {
+    "bytes": 5348,
+    "sha256": "6459b6a1acab2c62c474e4c6ab3eb651daa21f697ccd628e93a38bad298bbdd1"
+  },
+  "originalNoticeFiles": 66,
+  "packageReceipt": {
+    "bytes": 70343,
+    "sha256": "ec9252de82070bd0dd3bb436562b477bb03903ae9ae47132ec9f82ed5a861b1f"
+  },
+  "packagingPin": {
+    "bytes": 3953,
+    "sha256": "9bc560fe67edc2e6de7bce445c9a7cd47f0ce20fb39b529679eacc98ac898a4d"
+  },
+  "producerMappedBytesAndPairedDebugVerified": true,
+  "programs": {
+    "map_extractor": {
+      "debug": {
+        "bytes": 4127496,
+        "sha256": "063e2f6285d4c2f409dc1e3099cf640c5f84c16989c924ae62bc05bffbd6d878"
+      },
+      "debugLinkVerified": true,
+      "original": {
+        "bytes": 4543616,
+        "sha256": "383987681708dd251826f1268ac64aad9fe3196556ebd85b52d40aed2d65b92a"
+      },
+      "runtimeBytesPreserved": true,
+      "stripped": {
+        "bytes": 462176,
+        "sha256": "88e3526f2a33d9fa698b52e0858a2d3e3abfae62f4a805ac32d0ddbac2cb63fb"
+      }
+    },
+    "mmaps_generator": {
+      "debug": {
+        "bytes": 30166640,
+        "sha256": "b2049b90e67fb4be2566cb9ee91dc8543c6664c3ef9b9c57ad6a1f08140bba0c"
+      },
+      "debugLinkVerified": true,
+      "original": {
+        "bytes": 31970816,
+        "sha256": "39848b8d25c08c171a1db6b74d998478db10d0f110b8fa622af88064846a76c2"
+      },
+      "runtimeBytesPreserved": true,
+      "stripped": {
+        "bytes": 1839280,
+        "sha256": "3c9c3ff993300a5fff9ec0e65ec717faeb5894e15b0f481cd72be138b0765c34"
+      }
+    },
+    "vmap4_assembler": {
+      "debug": {
+        "bytes": 14495760,
+        "sha256": "c8399443e06951b32468ad17695da6f416833ece0bf99a3558906c02cdac1e26"
+      },
+      "debugLinkVerified": true,
+      "original": {
+        "bytes": 15503760,
+        "sha256": "0d2ef2ddad39eb9404ebda636c74a83c81d1c8655ab0c8750d5a8a7b849a740b"
+      },
+      "runtimeBytesPreserved": true,
+      "stripped": {
+        "bytes": 1051576,
+        "sha256": "b5ec1b64ff59a98bfd2de159bf6f6bbec4ed69363d53910d7321f357d59440f6"
+      }
+    },
+    "vmap4_extractor": {
+      "debug": {
+        "bytes": 11196640,
+        "sha256": "9b610d3bed2c321f080fde9953e2f44a9c27961b937e11cd58a6133f32fb61e1"
+      },
+      "debugLinkVerified": true,
+      "original": {
+        "bytes": 12008376,
+        "sha256": "0843e4f0584969b36e85db7b141879b470a9cb3bed7e43fe0d8d6c76907ebdcd"
+      },
+      "runtimeBytesPreserved": true,
+      "stripped": {
+        "bytes": 856264,
+        "sha256": "47dfffecb476b3685d781325e915ea24954b080c9c6e6a356240d365454e75f0"
+      }
+    }
+  },
+  "receipts": {
+    "auth-qualification.json": {
+      "bytes": 4443,
+      "sha256": "22924528c96cc4c62967f582d42d63b2be2975c0452a508745d84c2afa13ea13"
+    },
+    "dependency-image-check.json": {
+      "bytes": 1433,
+      "sha256": "ded60395aa7547a75286b373acbc9e674e63cac21333f4cf735a7bb78242fa63"
+    },
+    "environment-receipt.json": {
+      "bytes": 3471,
+      "sha256": "df6cf904c6c2b5b98553d377c98ba7411b07affff20875da5906ad70db43318f"
+    },
+    "extractor-cli.json": {
+      "bytes": 2860,
+      "sha256": "27e1eb1ed3ffa9b65b0c824da90f22c349e068df8d3b7c1362701be62267c5e5"
+    },
+    "loader-smoke.json": {
+      "bytes": 2427,
+      "sha256": "33fee9aefde98026139c3ba059f296b958cf813d13eb1f48d7bf74c749b74a09"
+    },
+    "qualification.json": {
+      "bytes": 170126,
+      "sha256": "f4bd787404787142ed96dac329b6419bcc12340bde8cbcfca457740c5caf3445"
+    }
+  },
+  "recordedAtUtc": "2026-10-30T12:33:47Z",
+  "runtimeExtractedAndFourElf183HeadersCheckedWithoutLocalExecution": true,
+  "sameJobDerivedServerSqlAuthQualified": true,
+  "scope": "actual-seven-patch-server-extractor-packaging-and-native-cli-only",
+  "sourceCompanionComplete": false,
+  "sourceInputs": {
+    "archive": {
+      "bytes": 18216368,
+      "file": "server-engine-source-inputs.tar.gz",
+      "sha256": "8c820a962947d2b8e2028c434ccedc969127716390f557626444d23ff8e15b99"
+    },
+    "manifest": {
+      "bytes": 1581647,
+      "sha256": "c19dda3ad0732d9b4b852cb0207432a32f877917fb2f0e9cf9075634f82678ef"
+    },
+    "receipt": {
+      "bytes": 1746751,
+      "sha256": "46a4ef82021d49699694bccab545591f3debbd6f4ab9e208c54e4796326bc03e"
+    }
+  },
+  "sourceLockSha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1",
+  "workflow": {
+    "conclusion": "success",
+    "hostJob": 124058805300,
+    "integrationRevision": "5c6f8d26813128a4763506cf3e38d10997f1935a",
+    "nativeJob": 124062185354,
+    "repository": "Russianranger/esteria_android",
+    "run": 41054451870
+  }
+}

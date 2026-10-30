@@ -102,6 +102,38 @@ class PackagedSchemaGuards(unittest.TestCase):
         self.assertEqual(journal.stat().st_mode & 0o777, 0o600)
         self.assertNotIn('credentials', first)
 
+    def test_outer_lease_and_actual_completion_callback_do_not_replay_or_release_file_lock(self):
+        callbacks = []
+        def completed(proof):
+            self.assertEqual(len(self.connection.applied), 9)
+            journal = setup.private_journal(self.state / setup.JOURNAL)
+            self.assertEqual(journal['phase'], 'baseline-complete')
+            self.assertEqual(journal['completed'][-1], setup.APPEARANCE_PATH)
+            self.assertTrue(proof['baselineImportCompleted'])
+            self.assertEqual(proof['sourceDerivedAdaptations'], journal['sourceDerivedAdaptations'])
+            callbacks.append(proof)
+        with db.state_lock(self.state) as lease:
+            first = self.run_setup(state_lease=lease, on_baseline_complete=completed)
+            before = (self.state / setup.JOURNAL).read_bytes()
+            second = self.run_setup(state_lease=lease, on_baseline_complete=completed)
+            with self.assertRaisesRegex(db.BootstrapError, 'Another bootstrap operation'):
+                with db.state_lock(self.state): self.fail('nested setup released outer lock')
+        self.assertEqual(len(callbacks), 1); self.assertEqual(len(self.connection.applied), 9)
+        self.assertEqual(first['operation'], 'initialized-source-baseline')
+        self.assertEqual(second['operation'], 'already-prepared')
+        self.assertEqual((self.state / setup.JOURNAL).read_bytes(), before)
+
+    def test_failed_baseline_never_calls_completion_observer(self):
+        callbacks = []
+        def failing(database, path):
+            self.connection.apply(database, path)
+            raise RuntimeError('private fixture SQL failure')
+        with self.assertRaises(RuntimeError):
+            setup.initialize(self.content, self.connection, self.state, '8.0.46', failing,
+                             on_baseline_complete=callbacks.append)
+        self.assertEqual(callbacks, [])
+        self.assertEqual(setup.private_journal(self.state / setup.JOURNAL)['phase'], 'importing')
+
     def test_all_four_nonempty_databases_block_before_journal_or_sql(self):
         for name in baseline.DB_ORDER:
             self.connection = Connection(self); self.connection.tables[name] = ['saved_character']

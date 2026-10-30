@@ -54,3 +54,10 @@ support and actual keyboard/game field tests remain open.
 Run `./gradlew :core:gameInputTest`. These checks establish mapping/state behavior,
 not physical Thor controller layout, Wine focus, game combat/quest functionality,
 or combined-runtime latency.
+
+
+The presentation panel now reserves space for its Keyboard/Stop controls and
+fits the game Surface to the remaining viewport with its source aspect ratio.
+The toolbar no longer covers the bottom hotbar, and touch coordinates are local
+to the fitted game view. Application Java/lint pass; complete guest gameplay,
+controller usability and hardware presentation remain separate qualifications.

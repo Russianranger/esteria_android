@@ -60,6 +60,7 @@ public final class GameDataVerifier {
         String lower = relativePath.toLowerCase(Locale.ROOT);
         if (lower.endsWith(".mpq")) verifyMpq(file);
         if (lower.equals("wow.exe")) verifyWowVersion(file);
+        EsteriaCatalogVerifier.verifyKnown(file, relativePath);
     }
 
     private static Path childIgnoringCase(Path parent, String name) throws IOException {

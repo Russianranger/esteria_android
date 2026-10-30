@@ -251,6 +251,27 @@ def configure_account(connection, state, receipt, *, verify_only=False):
     return operation
 
 
+def provision_verified(content, connection, state, version, *, profile, data, mysql, expected_uuid, verify_service, verify_only=False, state_lease=None):
+    """One owned account using the caller's live service; no ROOT or SQL process."""
+    state = Path(state)
+    schemas = {'account': ACCOUNT_SCHEMA_SHA256, 'realmcharacters': TRACKER_SCHEMA_SHA256}
+    with realm._verified_context(content, connection, state, version, profile=profile, data=data, mysql=mysql, expected_uuid=expected_uuid,
+            verify_service=verify_service, account_schemas=schemas, account_lock=True, state_lease=state_lease) as (receipt, generation, completed):
+        realm.check_schema(connection)
+        check_schema(connection)
+        operation = configure_account(connection, state, receipt, verify_only=verify_only)
+    evidence = dict(formatVersion=1, scope='owned-verified-content-local-account-after-compiled-updater-and-realm',
+        operation=operation, serverRevision=realm.SERVER_REVISION, mysqlUuid=receipt['uuid'], mysqlVersion=version,
+        sourceLockSha256=content.receipt['sourceLockSha256'], contentReceipt=content.identities['receipt'],
+        compiledModules=content.receipt['compiledModules'], configGeneration=generation, realmId=1, expansion=2,
+        sourceAccountSha256=ACCOUNT_SCHEMA_SHA256, sourceTrackerSha256=TRACKER_SCHEMA_SHA256,
+        completedUpdaterVerified=completed['compiledUpdaterCompleted'], credentialsPrivate=True,
+        existingCredentialsReset=False, charactersCreated=False, authProtocolQualified=False,
+        androidRuntimeQualified=False, gameplayQualified=False)
+    db.atomic_json(state / 'local-account.json', evidence)
+    return evidence
+
+
 def provision(mysql, state, version, *, verify_only=False):
     db.exact_version(version)
     state = db.private_path(state)

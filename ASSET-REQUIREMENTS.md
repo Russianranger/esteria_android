@@ -137,3 +137,10 @@ bindings and actual Java/APK readback are recorded in
 `runtime/evidence/server-content-android-packaging-host.json`. This resolves
 available source SQL packaging; it supplies no missing MPQs, DBC overlays, maps,
 appearance banks or generated shaders. The Lua-disabled policy remains explicit.
+
+
+Loose selection catalogs now receive bounded source-derived structural checks
+during import, with failed overlays preserving the active generation. See
+`runtime/client/CATALOG-IMPORT.md`. Binary MPQ contents, texture-bank decompression,
+geometry/coverage and referenced-art completeness remain separate validation;
+these checks do not resolve the missing actual catalog inputs.

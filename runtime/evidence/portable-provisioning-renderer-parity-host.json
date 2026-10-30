@@ -1,0 +1,20 @@
+{
+  "actualServerExecuted": false,
+  "allConfigurationFileBytesEqual": true,
+  "androidRuntimeQualified": false,
+  "completeModuleGenerationBytes": 14298,
+  "completeModuleGenerationFiles": 54,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "generationDigestsAndResultsEqual": true,
+  "legacyGenerationFiles": 4,
+  "readOnlyExpectedFilesEqualRenderer": true,
+  "reference": {
+    "bytes": 19568,
+    "commit": "5c6f8d26813128a4763506cf3e38d10997f1935a",
+    "gitBlob": "c7cee3809b5c2b0b4e8ef6f95152ab2522967c6e",
+    "sha256": "b1980602cf13c7974cd11f7c00d67a826e88cc21cc83b64bf2c2f7964c1566ba"
+  },
+  "scope": "host-configuration-refactor-byte-parity-only",
+  "sourceTemplates": "metadata-verified synthetic50-module fixture; no C++/SQL execution"
+}

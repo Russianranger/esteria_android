@@ -38,14 +38,17 @@ on:
       - tools/render_server_config.py
       - runtime/server_config.py
       - runtime/server_updater.py
+      - runtime/server_update_setup.py
+      - runtime/server_schema_setup.py
+      - runtime/server_content.py
+      - runtime/provision_local_account.py
+      - runtime/provision_local_realm.py
       - runtime/owned_process_group.py
       - runtime/server/Dockerfile
       - runtime/server/sources.lock.json
       - runtime/server-lua-map.json
       - config/local-server.json
       - runtime/mysql_bootstrap.py
-      - runtime/provision_local_account.py
-      - runtime/provision_local_realm.py
       - .github/workflows/server-requalification.yml
   pull_request:
     paths:
@@ -84,14 +87,17 @@ on:
       - tools/render_server_config.py
       - runtime/server_config.py
       - runtime/server_updater.py
+      - runtime/server_update_setup.py
+      - runtime/server_schema_setup.py
+      - runtime/server_content.py
+      - runtime/provision_local_account.py
+      - runtime/provision_local_realm.py
       - runtime/owned_process_group.py
       - runtime/server/Dockerfile
       - runtime/server/sources.lock.json
       - runtime/server-lua-map.json
       - config/local-server.json
       - runtime/mysql_bootstrap.py
-      - runtime/provision_local_account.py
-      - runtime/provision_local_realm.py
       - .github/workflows/server-requalification.yml
   workflow_dispatch:
 permissions:

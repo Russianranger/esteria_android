@@ -16,9 +16,12 @@ class AuthToolTests(unittest.TestCase):
 
     def test_reviewed_signed_selection_has_complete_sources_and_exact_base(self):
         lock = prepare.load_lock()
-        self.assertEqual(len(lock['packages']), 32)
-        self.assertEqual(sum(r['bytes'] for r in lock['packages']), 21178262)
-        self.assertEqual(sum(len(r['files']) for r in lock['sources']), 64)
+        self.assertEqual(len(lock['packages']), 33)
+        self.assertEqual(sum(r['bytes'] for r in lock['packages']), 21655740)
+        self.assertEqual(sum(len(r['files']) for r in lock['sources']), 67)
+        tracer = next(row for row in lock['packages'] if row['name'] == 'strace')
+        self.assertEqual(tracer['sha256'], '41a1f7409e46251b6e66db834456cbda1e4f0bf58c52d015a0130630f6ef0a24')
+        self.assertEqual(tracer['dependencyFields'], {'Depends': 'libc6 (>= 2.38)'})
         self.assertEqual(lock['solver']['logSha256'],
                          '44cdd4317e1f80246d024d6bc7641943fa6240e4b01d463f11535df815602554')
         self.assertEqual(lock['base']['dpkgStatus']['sha256'],

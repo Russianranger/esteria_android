@@ -41,6 +41,7 @@ import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import io.github.russianranger.esteria.runtime.RuntimeSetup;
 import io.github.russianranger.esteria.runtime.ServerRuntimeSetup;
 import io.github.russianranger.esteria.runtime.ServerProgramsSetup;
+import io.github.russianranger.esteria.runtime.ServerExtractorsSetup;
 import io.github.russianranger.esteria.runtime.ServerContentSetup;
 import io.github.russianranger.esteria.runtime.GuestBridgeSetup;
 import io.github.russianranger.esteria.runtime.ClientRuntimeSetup;
@@ -302,9 +303,11 @@ public final class SessionService extends Service {
         ServerRuntimeSetup setup = new ServerRuntimeSetup(this, root);
         ServerProgramsSetup programs = BuildConfig.SERVER_PROGRAMS_PACKAGED ? new ServerProgramsSetup(this, root) : null;
         ServerContentSetup content = BuildConfig.SERVER_CONTENT_PACKAGED ? new ServerContentSetup(this, root) : null;
+        ServerExtractorsSetup extractors = BuildConfig.SERVER_EXTRACTORS_PACKAGED ? new ServerExtractorsSetup(this, root) : null;
         // Validate the complete selected pair before either installation can change its pointer.
         if (programs != null) programs.requireServerRuntimeArchive(setup.archiveSha256());
         if (content != null) content.requireServerRuntimeArchive(setup.archiveSha256());
+        if (extractors != null) extractors.requireServerRuntimeArchive(setup.archiveSha256());
         final long[] lastUpdate = {0};
         // prepare() reuses a verified dependency generation without opening its archive.
         // Continue after reuse so an app update can add a new programs generation.
@@ -351,6 +354,20 @@ public final class SessionService extends Service {
                     + " archiveSha256=" + content.archiveSha256() + " receiptSha256=" + content.receiptSha256()
                     + " reusedFiles=" + installed.reusedFiles + " copiedBytes=" + installed.copiedBytes
                     + " schemaInitialized=false gameRuntimeQualified=false");
+        }
+        if (extractors != null) {
+            status = "Preparing bundled data tools…";
+            RuntimeInstaller.Result installed = extractors.prepare(setup.archiveSha256(), (phase, path, completed, total) -> {
+                long now = android.os.SystemClock.elapsedRealtime();
+                if (now - lastUpdate[0] >= 250 || completed == total) {
+                    lastUpdate[0] = now;
+                    status = "Preparing bundled data tools…\n" + mib(completed)
+                            + (total >= 0 ? " / " + mib(total) : "") + " MiB";
+                }
+            }, cancelled::get);
+            log("Server extractors prepared generation=" + installed.generation + " archiveSha256=" + extractors.archiveSha256()
+                    + " reusedFiles=" + installed.reusedFiles + " copiedBytes=" + installed.copiedBytes
+                    + " clientDataConverted=false customDataLoadOrderQualified=false androidRuntimeQualified=false");
         }
         status = programs == null
                 ? "Database and server dependencies are prepared. Local server startup is still under development."
@@ -419,6 +436,19 @@ public final class SessionService extends Service {
                 facts.put("runtime.serverContent.expectedGeneration", content.generation());
                 facts.put("runtime.serverContent.prepared", String.valueOf(content.current() != null));
             } catch (IOException error) { facts.put("runtime.serverContent.installationError", error.getMessage()); }
+        }
+        facts.put("runtime.serverExtractors.packaged", String.valueOf(BuildConfig.SERVER_EXTRACTORS_PACKAGED));
+        facts.put("runtime.serverExtractors.prepared", "false");
+        facts.put("runtime.serverExtractors.customDataLoadOrderQualified", "false");
+        if (BuildConfig.SERVER_EXTRACTORS_PACKAGED) {
+            try {
+                ServerExtractorsSetup tools = new ServerExtractorsSetup(this, root);
+                tools.requireServerRuntimeArchive(new ServerRuntimeSetup(this, root).archiveSha256());
+                facts.put("runtime.serverExtractors.archiveSha256", tools.archiveSha256());
+                facts.put("runtime.serverExtractors.sourcePinSha256", BuildConfig.SERVER_EXTRACTORS_PIN);
+                facts.put("runtime.serverExtractors.expectedGeneration", tools.generation());
+                facts.put("runtime.serverExtractors.prepared", String.valueOf(tools.current() != null));
+            } catch (IOException error) { facts.put("runtime.serverExtractors.installationError", error.getMessage()); }
         }
         facts.put("runtime.guestBridges.packaged", String.valueOf(BuildConfig.GUEST_BRIDGES_PACKAGED));
         facts.put("runtime.guestBridges.prepared", "false");

@@ -35,7 +35,8 @@ class CombinedPackageGuards(unittest.TestCase):
         # Source-byte packaging fixtures only; these Python snippets are never executed.
         repository = self.root / 'helper-repository'; (repository / 'runtime').mkdir(parents=True)
         for name in {name for names in bundle.HELPER_SETS.values() for name in names}:
-            (repository / 'runtime' / name).write_bytes(('fixture source: ' + name + '\n').encode())
+            source = repository / 'runtime' / name; source.parent.mkdir(parents=True, exist_ok=True)
+            source.write_bytes(('fixture source: ' + name + '\n').encode())
         path = self.root / 'helpers.zip'
         with zipfile.ZipFile(path, 'w') as archive:
             for directory, names in bundle.HELPER_SETS.items():
@@ -54,7 +55,11 @@ class CombinedPackageGuards(unittest.TestCase):
 
     def test_setup_and_service_helpers_are_both_exact_source_bound(self):
         self.assertEqual(bundle.HELPER_SETS, {'database-setup': ('mysql_bootstrap.py', 'android_database_setup.py'),
-                                            'database-service': ('mysql_bootstrap.py', 'mysql_service.py')})
+                                            'database-service': ('mysql_bootstrap.py', 'mysql_service.py'),
+                                            'server-schema': ('android_server_schema_setup.py', 'mysql_bootstrap.py', 'mysql_service.py',
+                                                              'server_content.py', 'server_schema_setup.py', 'server_schema_baseline.py',
+                                                              'server_schema_adaptations.py', 'server/appearance-schema-v1.sql',
+                                                              'server/appearance-schema.lock.json')})
         repository, path = self.helper_fixture()
         with patch.object(bundle, 'ROOT', repository), zipfile.ZipFile(path) as archive:
             bundle.verify_helpers(archive)
@@ -114,11 +119,17 @@ class CombinedPackageGuards(unittest.TestCase):
         for name in ('ESTERIA-GPL-3.0.txt', 'FTA-MIT-LICENSE.txt'):
             payload['assets/notices/' + name] = b'fixture notice'
         for mutation, reason in [('none', None), ('missing', 'asset-inventory'),
-                                 ('changed', 'embedded-source-lock'), ('extra', 'asset-inventory')]:
+                                 ('changed', 'embedded-source-lock'), ('extra', 'asset-inventory'),
+                                 ('schema_missing', 'asset-inventory'), ('schema_changed', 'helper-source-mismatch'),
+                                 ('schema_extra', 'asset-inventory')]:
             contents = dict(payload)
             if mutation == 'missing': del contents['assets/x11-runtime.lock.json']
             if mutation == 'changed': contents['assets/x11-runtime.lock.json'] = b'X' * len(contents['assets/x11-runtime.lock.json'])
             if mutation == 'extra': contents['assets/foreign-private-file'] = b'never permitted'
+            if mutation == 'schema_missing': del contents['assets/server-schema/server/appearance-schema-v1.sql']
+            if mutation == 'schema_changed':
+                name = 'assets/server-schema/server/appearance-schema-v1.sql'; contents[name] = b'X' * len(contents[name])
+            if mutation == 'schema_extra': contents['assets/server-schema/server/unapproved.py'] = b'never permitted'
             path = self.root / (mutation + '.zip')
             with zipfile.ZipFile(path, 'w') as archive:
                 for name, data in contents.items(): archive.writestr(name, data)

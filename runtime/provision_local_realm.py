@@ -148,8 +148,8 @@ def generation_files(directory):
     return files
 
 
-def active_config(state, password):
-    """Resolve only the renderer's contained generation pointer, not arbitrary links."""
+def _active_generation(state, password):
+    """Resolve and validate one contained generation without repository policy reads."""
     current = state / 'config/current'
     db.private_path(current.parent)
     require(current.is_symlink(), 'No active rendered configuration generation')
@@ -167,6 +167,12 @@ def active_config(state, password):
     require(world == {'BindIP': '"127.0.0.1"', 'RealmID': str(REALM_ID),
                       'WorldServerPort': str(WORLD_PORT), 'LoginDatabaseInfo': connection},
             'World configuration is not local realm 1 on port 8085')
+    return digest, files
+
+
+def active_config(state, password):
+    """Host policy adapter; existing CLI/source gates remain unchanged."""
+    digest, _files = _active_generation(state, password)
     profile = json.loads(read_text(ROOT / 'config/local-server.json'))
     require(all(profile.get(key) == value for key, value in
                 (('database_port', db.PORT), ('auth_port', AUTH_PORT), ('world_port', WORLD_PORT),
@@ -241,6 +247,153 @@ def configure_row(connection, *, verify_only=False):
         raise
     require(connection.query(ROW_SQL) == [EXPECTED_ROW], 'Realm endpoint changed after commit')
     return operation
+
+
+def verified_sources(content, requirements):
+    """Recheck source-bound bytes without a checkout, Git, or a ROOT lookup."""
+    try:
+        from . import server_content as packaged, server_schema_baseline as baseline
+    except ImportError:
+        import server_content as packaged
+        import server_schema_baseline as baseline
+    require(isinstance(content, packaged.VerifiedContent) and content.source == content.root / 'source',
+            'Verified extracted provisioning content required')
+    require(content.manifest.get('source') == content.receipt.get('source') == content.compiled.get('source') and
+            content.manifest['source'].get('commit') == SERVER_REVISION and
+            content.manifest.get('sourceLockSha256') == content.receipt.get('sourceLockSha256') ==
+            content.compiled.get('sourceLockSha256'), 'Provisioning source selection differs')
+    for name, expected in (('content-manifest', content.manifest), ('compiled-modules', content.compiled)):
+        relative = 'metadata/' + name + '.json'
+        pin = content.identities['files'].get(relative)
+        require(pin == content.receipt['archiveFiles'].get(relative) and
+                baseline.file_identity(content.root / relative) == pin and
+                json.loads(read_text(content.root / relative, 16 * 1024**2)) == expected,
+                'Provisioning metadata changed after content verification')
+    for name, digest in requirements.items():
+        require(isinstance(name, str) and re.fullmatch('[A-Za-z0-9_]+', name) and
+                isinstance(digest, str) and re.fullmatch('[a-f0-9]{64}', digest), 'Invalid provisioning source schema pin')
+        relative = 'data/sql/base/db_auth/' + name + '.sql'
+        pin = content.manifest['files'].get(relative)
+        require(isinstance(pin, dict) and pin.get('sha256') == digest,
+                'Reviewed provisioning source schema differs')
+        identity = {key: pin[key] for key in ('bytes', 'sha256')}
+        archive = content.receipt['archiveFiles'].get('source/' + relative, {})
+        require(identity == content.identities['files'].get('source/' + relative) and
+                identity == {key: archive.get(key) for key in identity} and
+                baseline.file_identity(content.source / relative) == identity,
+                'Packaged provisioning source schema changed')
+
+
+def active_config_verified(content, state, password, *, profile, data, mysql):
+    """Compare every private config byte with the source/policy renderer; no ROOT."""
+    try:
+        from . import server_config as configurations
+    except ImportError:
+        import server_config as configurations
+    expected = configurations.expected_private_files_verified(content, state, Path(data), Path(mysql),
+        profile=profile, secret=password)
+    digest, files = _active_generation(state, password)
+    require(files == expected, 'Active complete configuration differs from verified source and local policy')
+    require(settings(files['worldserver.conf'], ('Expansion',)) == {'Expansion': '2'},
+            'Local runtime provisioning requires reviewed expansion 2')
+    return digest
+
+
+@contextmanager
+def named_locks(connection, names):
+    """Release only this invocation's acquisitions on a caller-owned connection."""
+    acquired = []
+    try:
+        for name in names:
+            require(name in ('esteria-local-bootstrap', 'esteria-local-realm', 'esteria-local-account'),
+                    'Unexpected provisioning lock name')
+            require(connection.query("SELECT GET_LOCK('" + name + "',0)") == ['1'],
+                    'Another operation owns local provisioning')
+            acquired.append(name)
+        yield
+    finally:
+        failed = False
+        for name in reversed(acquired):
+            try:
+                failed = connection.query("SELECT RELEASE_LOCK('" + name + "')") != ['1'] or failed
+            except Exception:
+                failed = True
+        require(not failed, 'Provisioning SQL lock release failed; owned service retained')
+
+
+@contextmanager
+def _verified_context(content, connection, state, version, *, profile, data, mysql, expected_uuid, verify_service,
+                     account_schemas=None, account_lock=False, state_lease=None):
+    """Caller retains its live engine/service lease. This helper owns no process.
+
+    The completed compiled-updater verifier is read-only and inherits these
+    state/bootstrap locks; it never releases them or imports host tooling.
+    """
+    try:
+        from . import server_schema_setup as schema, server_schema_baseline as baseline, server_update_setup as updates
+    except ImportError:
+        import server_schema_setup as schema
+        import server_schema_baseline as baseline
+        import server_update_setup as updates
+    db.exact_version(version)
+    require(callable(verify_service) and isinstance(expected_uuid, str) and
+            re.fullmatch('[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}', expected_uuid),
+            'Explicit live service verifier and instance UUID required')
+    require(Path(state).is_absolute(), 'Absolute owned provisioning state required')
+    state = db.private_path(Path(state))
+    require(account_schemas is None or set(account_schemas) == {'account', 'realmcharacters'},
+            'Only reviewed account schema sources may extend realm provisioning')
+    requirements = {'realmlist': SCHEMA_SHA256} | (account_schemas or {})
+    verified_sources(content, requirements)
+    with db.state_scope(state, state_lease), config_lock(state):
+        receipt = db.read_receipt(state / 'database-bootstrap.json', version)
+        require(receipt['uuid'] == expected_uuid and receipt['datadir'] == str(state / 'database') and
+                db.datadir_uuid(state / 'database') == expected_uuid, 'Provisioning instance identity changed')
+        credentials = schema.credential_identity(state)
+        password = db.read_secret(state / 'accounts/database-secret')
+        generation = active_config_verified(content, state, password, profile=profile, data=data, mysql=mysql)
+        locks = ('esteria-local-bootstrap', 'esteria-local-realm') + (('esteria-local-account',) if account_lock else ())
+        with named_locks(connection, locks):
+            require(verify_service() is not False, 'Owned provisioning service changed')
+            db.check_receipt(receipt, db.identity(connection, version)); db.check_listener(connection, None)
+            require(connection.query('SELECT CURRENT_USER()') in (['esteria@127.0.0.1'], ['esteria@localhost']),
+                    'Unexpected authenticated provisioning account')
+            completed = updates.verify_completed_update(content, connection, state, version,
+                expected_uuid=expected_uuid, verify_service=verify_service)
+            updater_identity = baseline.file_identity(state / updates.JOURNAL)
+            yield receipt, generation, completed
+            require(baseline.file_identity(state / updates.JOURNAL) == updater_identity and
+                    schema.credential_identity(state) == credentials and
+                    active_config_verified(content, state, password, profile=profile, data=data, mysql=mysql) == generation,
+                    'Updater journal, credentials or configuration changed during provisioning')
+            verified_sources(content, requirements)
+            db.check_receipt(receipt, db.identity(connection, version)); db.check_listener(connection, None)
+            require(verify_service() is not False, 'Owned provisioning service changed')
+
+
+def provision_verified(content, connection, state, version, *, profile, data, mysql, expected_uuid, verify_service, verify_only=False, state_lease=None):
+    """Provision only realm 1 after the real owned updater/ledger gate completes."""
+    try:
+        from . import server_schema_setup as schema
+    except ImportError:
+        import server_schema_setup as schema
+    state = Path(state)
+    with _verified_context(content, connection, state, version, profile=profile, data=data, mysql=mysql, expected_uuid=expected_uuid,
+                          verify_service=verify_service, state_lease=state_lease) as (receipt, generation, completed):
+        account_before = schema.account_identity(state)
+        check_schema(connection)
+        operation = configure_row(connection, verify_only=verify_only)
+        require(schema.account_identity(state) == account_before, 'Private account intent changed during realm provisioning')
+    evidence = dict(formatVersion=1, scope='owned-verified-content-local-realm-after-compiled-updater',
+        operation=operation, mysqlUuid=receipt['uuid'], mysqlVersion=version, serverRevision=SERVER_REVISION,
+        sourceLockSha256=content.receipt['sourceLockSha256'], contentReceipt=content.identities['receipt'],
+        compiledModules=content.receipt['compiledModules'], configGeneration=generation,
+        sourceRealmlistSha256=SCHEMA_SHA256, realmId=REALM_ID, address=LOOPBACK, localAddress=LOOPBACK,
+        localSubnetMask=SUBNET, worldPort=WORLD_PORT, authPort=AUTH_PORT, clientBuild=CLIENT_BUILD,
+        sqlEndpointVerified=True, completedUpdaterVerified=completed['compiledUpdaterCompleted'],
+        serverStarted=False, gameSchemaSetQualified=False, androidRuntimeQualified=False, gameplayQualified=False)
+    db.atomic_json(state / 'realm-loopback.json', evidence)
+    return evidence
 
 
 def provision(mysql, state, version, *, verify_only=False):

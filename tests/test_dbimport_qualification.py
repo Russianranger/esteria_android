@@ -153,6 +153,51 @@ class QualificationGuards(unittest.TestCase):
             self.assertEqual((output / 'dbimport-first.log').read_text(), '[redacted] [redacted]')
 
 
+class PackagedUpdaterHook(unittest.TestCase):
+    def private_log(self, root, raw=b'private child output\x00\xff'):
+        state = root / 'state'
+        operation = state / 'run' / ('updater-' + 'a' * 32)
+        (operation / 'logs').mkdir(parents=True)
+        (state / 'logs').mkdir()
+        path = operation / 'logs/updater-private.log'; path.write_bytes(raw); path.chmod(0o600)
+        journal = dict(invocation=str(operation), run=dict(exitCode=0, diagnosticBytes=len(raw),
+            diagnosticSha256=hashlib.sha256(raw).hexdigest()))
+        return state, path, journal
+
+    def test_product_log_is_exact_private_and_cannot_overwrite_previous_diagnostics(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            state, source, journal = self.private_log(Path(temporary))
+            qualify.packaged_updater_log(state, journal)
+            target = state / 'logs/dbimport-first.log'
+            self.assertEqual(target.read_bytes(), source.read_bytes())
+            self.assertEqual(target.stat().st_mode & 0o777, 0o600)
+            with self.assertRaises(FileExistsError):qualify.packaged_updater_log(state, journal)
+
+    def test_changed_shared_or_foreign_product_log_never_reaches_export_path(self):
+        for change in ('bytes', 'shared', 'public-mode', 'foreign-operation'):
+            with self.subTest(change=change), tempfile.TemporaryDirectory() as temporary:
+                state, source, journal = self.private_log(Path(temporary))
+                if change == 'bytes':source.write_bytes(b'changed private child output')
+                elif change == 'shared':os.link(source, source.with_name('linked'))
+                elif change == 'public-mode':source.chmod(0o644)
+                else:journal['invocation'] = str(Path(temporary) / ('updater-' + 'a' * 32))
+                with self.assertRaises(ValueError):qualify.packaged_updater_log(state, journal)
+                self.assertFalse((state / 'logs/dbimport-first.log').exists())
+
+    def test_native_hook_cannot_invent_or_reuse_a_baseline_proof(self):
+        # A real first import must invoke the callback. A historical or missing
+        # proof cannot reach the updater, even if an ordinary receipt is true.
+        for operation in ('initialized-source-baseline', 'already-prepared'):
+            with self.subTest(operation=operation), \
+                    patch.object(qualify.product_schema, 'initialize', return_value=dict(operation=operation)), \
+                    patch.object(qualify.product_setup, 'prepare') as prepare, \
+                    self.assertRaisesRegex(ValueError, 'actual first-import proof'):
+                qualify.run_packaged_updater(object(), Path('/install'), Path('/template'), identity(b'template'),
+                    {'dbimport': identity(b'program')}, Path('/mysql'), '8.0.46', Path('/state'),
+                    object(), Path('/options'), object(), lambda: None, {})
+            prepare.assert_not_called()
+
+
 class ContentExtraction(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(); self.addCleanup(self.temporary.cleanup)

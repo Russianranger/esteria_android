@@ -190,6 +190,21 @@ def initialization_failure_codes(path):
                 osErrorNumbers=system,startupErrors=startup_errors,privateLogTextExported=False)
 
 
+def record_initialization_failure(result, initialize_log, mysqld, private):
+    if not os.path.lexists(initialize_log):return
+    try:
+        diagnostic=initialization_failure_codes(initialize_log)
+        result['mysqlInitializationDiagnostic']=diagnostic
+        if result['phase']=='fresh-compiled-updater' and 'MY-013236' in diagnostic['mysqlErrorCodes']:
+            # Preserve the failed normal fixture. A separate diagnostic never
+            # authenticates/provisions or changes the failed qualification.
+            try:
+                from tools import mysql_init_trace
+                result['mysqlInitializationTrace']=mysql_init_trace.diagnose(mysqld,private).as_dict()
+            except BaseException:result['mysqlInitializationTraceUnavailable']=True
+    except BaseException:result['mysqlInitializationDiagnosticUnavailable']=True
+
+
 def worker(plan_path):
     require(os.getpid()==1 and os.geteuid()==0 and os.environ.get('ESTERIA_AUTH_NAMESPACE')=='1',
             'authentication-worker-requires-owned-pid-namespace')
@@ -285,9 +300,7 @@ def worker(plan_path):
         failed=True;result['failureType']=type(error).__name__ # Never export exception text containing SQL or credentials.
         result['failureLocations']=failure_locations(error)
         initialize_log=private/'server/private-state/logs/mysql-initialize-engine.log'
-        if os.path.lexists(initialize_log):
-            try:result['mysqlInitializationDiagnostic']=initialization_failure_codes(initialize_log)
-            except BaseException:result['mysqlInitializationDiagnosticUnavailable']=True
+        record_initialization_failure(result,initialize_log,Path(plan['mysqld']),private)
     finally:
         cleanup=[]
         if wine_started:

@@ -52,7 +52,7 @@ public final class ProotMountTests {
             check(!fixture.create(List.of()).arguments.contains(fixture.data+":/esteria-data!"),"No implicit data exposure");
             check(fixture.create(List.of(new ProotLaunch.Mount(fixture.binary,"/esteria-shader-tools")))
                     .arguments.contains(fixture.binary+":/esteria-shader-tools!"),"Fixed shader tools binding is explicit and does not follow guest links");
-            for(String target:List.of("/esteria-server-programs","/esteria-server-content")) {
+            for(String target:List.of("/esteria-server-programs","/esteria-server-content","/esteria-server-extractors")) {
                 check(fixture.create(List.of(new ProotLaunch.Mount(fixture.binary,target))).arguments
                     .contains(fixture.binary+":"+target+"!"),"Fixed server providers are exact no-dereference mounts");
                 rejects(()->new ProotLaunch.Mount(fixture.binary,target+"/source"));

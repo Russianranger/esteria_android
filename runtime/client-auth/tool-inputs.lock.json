@@ -11,6 +11,19 @@
       "sha256": "3aa480f48fd36cea1253557976163dc2da0707eef72dbef18d028196888b05b1"
     }
   },
+  "diagnosticAddition": {
+    "dependency": {
+      "boundByBaseDpkgStatus": true,
+      "installed": "2.39-0ubuntu8.9",
+      "name": "libc6",
+      "required": ">= 2.38"
+    },
+    "name": "strace",
+    "originalSolverPackages": 32,
+    "reason": "Observe owned fresh-MySQL initialization file failures in disposable CI only",
+    "scope": "single-signed-index-package-with-no-base-replacement",
+    "version": "6.8-0ubuntu2"
+  },
   "formatVersion": 1,
   "gameplayQualified": false,
   "inRelease": [
@@ -667,6 +680,22 @@
       },
       "suite": "noble-updates",
       "version": "1:2.43.0-1ubuntu7.4"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 477478,
+      "dependencyFields": {
+        "Depends": "libc6 (>= 2.38)"
+      },
+      "filename": "pool/main/s/strace/strace_6.8-0ubuntu2_arm64.deb",
+      "name": "strace",
+      "sha256": "41a1f7409e46251b6e66db834456cbda1e4f0bf58c52d015a0130630f6ef0a24",
+      "source": {
+        "name": "strace",
+        "version": "6.8-0ubuntu2"
+      },
+      "suite": "noble",
+      "version": "6.8-0ubuntu2"
     }
   ],
   "scope": "compiled-client-auth-test-tools",
@@ -1143,6 +1172,28 @@
       "name": "perl",
       "suite": "noble-updates",
       "version": "5.38.2-3.2ubuntu0.6"
+    },
+    {
+      "files": [
+        {
+          "bytes": 2285,
+          "filename": "pool/main/s/strace/strace_6.8-0ubuntu2.dsc",
+          "sha256": "330679ec872f5d097809a28fe0bcd4fe3a0ba2a57e639feec53ffc3745aa831b"
+        },
+        {
+          "bytes": 2457948,
+          "filename": "pool/main/s/strace/strace_6.8.orig.tar.xz",
+          "sha256": "ba6950a96824cdf93a584fa04f0a733896d2a6bc5f0ad9ffe505d9b41e970149"
+        },
+        {
+          "bytes": 21776,
+          "filename": "pool/main/s/strace/strace_6.8-0ubuntu2.debian.tar.xz",
+          "sha256": "6efc6fde478f3beb37dbd246f1e9fe4f13e74eef794b5b66d7589f0933bc351b"
+        }
+      ],
+      "name": "strace",
+      "suite": "noble",
+      "version": "6.8-0ubuntu2"
     }
   ],
   "testImageBuilt": false,

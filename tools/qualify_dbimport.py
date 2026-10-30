@@ -43,6 +43,10 @@ from runtime import provision_local_realm as realm
 from runtime import server_schema_adaptations as adaptations
 from runtime import server_content as product_content
 from runtime import server_updater as product_updater
+from runtime import server_schema_setup as product_schema
+from runtime import server_update_setup as product_setup
+from runtime import server_config as product_config
+from runtime import provision_local_account as account
 from runtime.owned_process_group import OwnedGroup
 
 require = base.content.require
@@ -183,6 +187,97 @@ expected_updates = product_updater.expected_updates
 schema_snapshot = product_updater.schema_snapshot
 
 
+def packaged_updater_log(state, journal):
+    """Retain the actual product child's bounded tail in the existing exporter."""
+    operation = Path(journal.get('invocation', ''))
+    require(operation.parent == state / 'run' and re.fullmatch('updater-[a-f0-9]{32}', operation.name),
+            'product updater private operation path differs')
+    source = operation / 'logs/updater-private.log'
+    run = journal.get('run', {})
+    require(type(run.get('diagnosticBytes')) is int and 0 <= run['diagnosticBytes'] <= LOG_LIMIT and
+            re.fullmatch('[a-f0-9]{64}', run.get('diagnosticSha256', '')),
+            'product updater diagnostic identity missing')
+    with product_updater.plain_file(source) as incoming:
+        info = os.fstat(incoming.fileno())
+        require(info.st_nlink == 1 and info.st_uid == os.geteuid() and not info.st_mode & 0o077,
+                'shared or nonprivate product updater diagnostic refused')
+        raw = incoming.read(LOG_LIMIT + 1)
+    require(len(raw) == run['diagnosticBytes'] and hashlib.sha256(raw).hexdigest() == run['diagnosticSha256'],
+            'product updater diagnostic changed')
+    target = db.private_path(state / 'logs/dbimport-first.log')
+    with target.open('xb') as outgoing:
+        os.fchmod(outgoing.fileno(), 0o600)
+        outgoing.write(raw); outgoing.flush(); os.fsync(outgoing.fileno())
+
+
+def run_packaged_updater(verified, install, template, template_identity, programs, mysql, version,
+                         state, connection, options, lease, verify_service, evidence):
+    """Exercise real product journals before qualification-only probe tables."""
+    proofs = []
+    prepared = product_schema.initialize(verified, connection, state, version,
+        lambda database, sql: base.apply_base(mysql, options, 'acore_' + database,
+                                              sql, state / 'logs/sql-client.log'),
+        state_lease=lease, on_baseline_complete=proofs.append)
+    require(len(proofs) == 1 and proofs[0].get('baselineImportCompleted') is True and
+            prepared.get('operation') == 'initialized-source-baseline',
+            'product baseline did not produce its actual first-import proof')
+    evidence['sourceBaseline'] = proofs[0]
+    evidence['packagedRuntimeBaseline'] = prepared
+    evidence['compiledUpdaterAttempted'] = True
+    plan = product_setup.prepare(verified, install / 'bin/dbimport', programs['dbimport'], template,
+        template_identity, mysql, original_build_identity=verified.compiled['serverBuild'])
+    try:
+        executed = product_setup.apply(plan, connection, state, version,
+                                        state_lease=lease, verify_service=verify_service)
+    finally:
+        journal_path = state / product_setup.JOURNAL
+        if os.path.lexists(journal_path):
+            observed = product_schema.private_journal(journal_path)
+            evidence['compiledUpdaterExecuted'] = observed.get('compiledUpdaterExecuted') is True
+    require(executed.get('compiledUpdaterExecuted') is True and executed.get('compiledUpdaterCompleted') is True and
+            executed.get('sourceLedgersVerified') is True, 'product compiled updater did not complete')
+    journal = product_schema.private_journal(state / product_setup.JOURNAL)
+    require(journal.get('phase') == 'complete' and journal.get('run', {}).get('exitCode') == 0,
+            'product compiled updater journal is incomplete')
+    packaged_updater_log(state, journal)
+    evidence['firstUpdater'] = journal['run']
+    evidence['packagedRuntimeUpdater'] = executed
+    repeated = product_setup.apply(plan, connection, state, version,
+                                    state_lease=lease, verify_service=verify_service)
+    require(repeated.get('compiledUpdaterExecuted') is False and repeated.get('sourceLedgersVerified') is True,
+            'product completed repeat replayed or failed ledger verification')
+    evidence['packagedRuntimeUpdaterReentry'] = repeated
+    checked = product_setup.verify_completed_update(verified, connection, state, version,
+        expected_uuid=executed['mysqlUuid'], verify_service=verify_service)
+    require(checked.get('compiledUpdaterExecuted') is False and checked.get('sourceLedgersVerified') is True,
+            'product read-only completed verifier failed')
+    evidence['packagedRuntimeUpdaterReadOnly'] = checked
+
+
+def provision_packaged_runtime(verified, connection, state, version, mysql, data, lease, verify_service):
+    """Compose actual product configuration/realm/account on the same instance."""
+    profile = json.loads(config.PROFILE.read_bytes())
+    rendered = product_config.render_verified(verified, state, data, mysql, profile=profile)
+    require(rendered.get('module_configurations_complete') is True,
+            'product configuration omitted compiled module files')
+    bootstrap = db.read_receipt(state / 'database-bootstrap.json', version)
+    arguments = dict(profile=profile, data=data, mysql=mysql, expected_uuid=bootstrap['uuid'],
+                     verify_service=verify_service, state_lease=lease)
+    local_realm = realm.provision_verified(verified, connection, state, version, **arguments)
+    local_account = account.provision_verified(verified, connection, state, version, **arguments)
+    require(local_realm.get('completedUpdaterVerified') is True and local_realm.get('sqlEndpointVerified') is True and
+            local_account.get('completedUpdaterVerified') is True and local_account.get('credentialsPrivate') is True,
+            'product realm or account composition did not verify its owned updater')
+    after_account = product_setup.verify_completed_update(verified, connection, state, version,
+        expected_uuid=bootstrap['uuid'], verify_service=verify_service)
+    require(after_account.get('compiledUpdaterExecuted') is False and after_account.get('sourceLedgersVerified') is True,
+            'product updater verifier rejected the subsequently owned account')
+    return dict(scope='actual-product-config-updater-realm-account-before-native-probe-tables',
+        configuration=rendered, realm=local_realm, account=local_account,
+        updaterAfterAccount=after_account, mysqlUuid=bootstrap['uuid'],
+        androidRuntimeQualified=False, gameplayQualified=False)
+
+
 def markers(connection, token, *, create=False):
     for name in DATABASES:
         table = '`acore_' + name + '`.`esteria_dbimport_probe`'
@@ -232,6 +327,9 @@ def run(install, content_directory, receipt_sha256, lock_path, mysql, mysqld, ve
     try:
         receipt, manifest, compiled = unpack_content(content_directory, receipt_sha256, lock_path, output / 'content')
         build, template, programs, derivative = select_install(install, compiled, lock_path, engine_derivative_receipt)
+        template_rows = [row for row in build['files'] if row['path'] == template.relative_to(install).as_posix()]
+        require(len(template_rows) == 1, 'selected updater template is absent from original build receipt')
+        template_identity = {key: template_rows[0][key] for key in ('bytes', 'sha256')}
         verified = verify_runtime_content(output / 'content', content_directory, receipt_sha256,
                                           lock_path, manifest, compiled)
         evidence['packagedRuntimeContent'] = dict(scope='actual-immutable-content-no-git-runtime-consumer',
@@ -250,7 +348,7 @@ def run(install, content_directory, receipt_sha256, lock_path, mysql, mysqld, ve
         source = verified.source
         expected = {name: expected_updates(source, manifest, name) for name in DATABASES}
         password = db.read_secret(state / 'accounts/database-secret', create=True)
-        with db.state_lock(state):
+        with db.state_lock(state) as lease:
             db.initialize(mysqld, mysql, state, version)
             evidence['initializedNewInstance'] = True
             configuration = render_importer(template, source, state, mysql, password)
@@ -260,19 +358,19 @@ def run(install, content_directory, receipt_sha256, lock_path, mysql, mysqld, ve
                 require(connection.query("SELECT GET_LOCK('esteria-local-bootstrap',0)") == ['1'],
                         'another operation owns fixture instance')
                 base.empty_databases(connection)
-                evidence['sourceBaseline'] = adaptations.initialize(connection, source, manifest,
-                    lambda database, sql: base.apply_base(mysql, options, 'acore_' + database,
-                                                          sql, state / 'logs/sql-client.log'),
-                    baseline_initializer=baseline.initialize)
-                evidence['compiledUpdaterAttempted'] = True
-                require(files.identity(install / 'bin/dbimport') == programs['dbimport'],
-                        'selected dbimport identity changed before execution')
-                evidence['firstUpdater'] = run_importer(install / 'bin/dbimport', configuration,
-                    state / 'logs/dbimport-first.log',
-                    on_started=lambda: evidence.update(compiledUpdaterExecuted=True))
+                def verify_service():
+                    require(capture.process.poll() is None, 'owned qualification MySQL service exited')
+                    db.check_receipt(db.read_receipt(state / 'database-bootstrap.json', version),
+                                     db.identity(connection, version))
+                run_packaged_updater(verified, install, template, template_identity, programs, mysql, version,
+                                     state, connection, options, lease, verify_service, evidence)
                 evidence['compiledUpdaterCompleted'] = True
                 schema_snapshot(connection, expected)
                 evidence['coreModuleUpdatesQualified'] = True
+                evidence['packagedRuntimeProvisioning'] = provision_packaged_runtime(verified, connection, state,
+                    version, mysql, output / 'unavailable-game-data', lease, verify_service)
+                account_journal = (state / account.JOURNAL).read_bytes()
+                bootstrap = db.read_receipt(state / 'database-bootstrap.json', version)
                 token = hashlib.sha256(base.canonical_identity(receipt['archive'])).hexdigest()
                 markers(connection, token, create=True)
                 before = schema_snapshot(connection, expected)
@@ -281,6 +379,10 @@ def run(install, content_directory, receipt_sha256, lock_path, mysql, mysqld, ve
                 evidence['secondUpdater'] = run_importer(install / 'bin/dbimport', configuration, state / 'logs/dbimport-second.log')
                 markers(connection, token)
                 require(schema_snapshot(connection, expected) == before, 'same-revision updater changed table/ledger set')
+                require((state / account.JOURNAL).read_bytes() == account_journal,
+                        'same-revision updater changed the private product account journal')
+                account.configure_account(connection, state, bootstrap, verify_only=True)
+                evidence['packagedAccountPreservedAcrossUpdater'] = True
                 evidence['sameRevisionReentryVerified'] = True
                 # Component check only; the final application gate also awaits playerbots/world startup.
                 realm.check_schema(connection)
@@ -296,6 +398,10 @@ def run(install, content_directory, receipt_sha256, lock_path, mysql, mysqld, ve
                 require(schema_snapshot(connection, expected) == before, 'database schema/ledger changed after clean restart')
                 realm.check_schema(connection)
                 realm.configure_row(connection, verify_only=True)
+                require((state / account.JOURNAL).read_bytes() == account_journal,
+                        'restart changed the private product account journal')
+                account.configure_account(connection, state, bootstrap, verify_only=True)
+                evidence['packagedAccountPreservedAfterRestart'] = True
                 evidence['restartPersistenceVerified'] = True
                 evidence['playerbotsDatabaseUntouched'] = True
             base.stop_owned(capture)

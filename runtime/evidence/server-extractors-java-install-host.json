@@ -1,0 +1,39 @@
+{
+  "androidRuntimeQualified": false,
+  "appSourceLock": {
+    "bytes": 2170,
+    "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+  },
+  "archive": {
+    "bytes": 2495044,
+    "file": "server-extractors-runtime-arm64.tar.gz",
+    "sha256": "2bce13256ac609a7bcb01fd2a7e5352fde29fa19e18a5d269c566acb22f86515"
+  },
+  "cachedArchivePathDidNotExist": true,
+  "cachedCopiedBytes": 0,
+  "cachedReusedFiles": 76,
+  "clientMpqConversionQualified": false,
+  "elfPrograms": 4,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "installedFileBytes": 7423422,
+  "maximumHeapBytes": 33554432,
+  "originalBuild": {
+    "bytes": 32521,
+    "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+  },
+  "originalNoticeFiles": 66,
+  "pendingProviderPin": {
+    "bytes": 24138,
+    "sha256": "80f8708b2ceb96843ad2cc215e8659770b800bd321ef49450a2fed6a36250088"
+  },
+  "productionProviderCreated": false,
+  "requiredAndInstalledFiles": 76,
+  "requiredElfMachine": 183,
+  "scope": "actual-extractor-archive-generic-java-installer-host-only",
+  "sourceCompanionComplete": false,
+  "validatorSource": {
+    "bytes": 14251,
+    "sha256": "9e03c4c473d090171aa32034524c7a422d12f92e31e83e21529ad7e284834c85"
+  }
+}

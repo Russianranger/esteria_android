@@ -1,0 +1,385 @@
+"""Journal one exact compiled-updater operation on an already owned SQL service.
+
+This module neither initializes a database nor starts a MySQL/auth/world service.
+The caller retains its exclusive service lease. Interrupted or failed updater
+intent is preserved and refused; completed repeats verify ledgers without replay.
+"""
+from __future__ import annotations
+
+from dataclasses import dataclass
+import copy
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import secrets
+import stat
+
+try:
+    from . import mysql_bootstrap as db, server_content as packaged, server_updater as updater
+    from . import server_schema_setup as schema, server_schema_baseline as baseline
+except ImportError:
+    import mysql_bootstrap as db
+    import server_content as packaged
+    import server_updater as updater
+    import server_schema_setup as schema
+    import server_schema_baseline as baseline
+
+JOURNAL = '.server-compiled-updater.json'
+SCOPE = 'owned-packaged-content-compiled-updater-only'
+BLOCK = 128 * 1024
+require = schema.require
+
+
+class UpdateCancelled(RuntimeError):
+    pass
+
+
+@dataclass(frozen=True)
+class Preparation:
+    content: packaged.VerifiedContent
+    executable: Path
+    selected_program_identity: dict
+    template: Path
+    template_identity: dict
+    mysql: Path
+    original_build_identity: dict
+    expected: dict
+    binding: dict
+
+
+def checkpoint(cancelled):
+    if cancelled is not None and cancelled():
+        raise UpdateCancelled('Compiled updater cancelled before durable execution intent')
+
+
+def _pin(value):
+    require(isinstance(value, dict) and set(value) == {'bytes', 'sha256'} and
+            type(value.get('bytes')) is int and 0 <= value['bytes'] <= 4 * 1024**3 and
+            isinstance(value.get('sha256'), str) and re.fullmatch('[0-9a-f]{64}', value['sha256']),
+            'Explicit compiled updater artifact identity required')
+    return dict(value)
+
+
+def _hash(path, pin, *, progress=None, cancelled=None, capture=False):
+    checkpoint(cancelled)
+    pin = _pin(pin)
+    sha256, sha1, count, chunks = hashlib.sha256(), hashlib.sha1(), 0, []
+    with updater.plain_file(path) as stream:
+        before = os.fstat(stream.fileno())
+        require(before.st_size == pin['bytes'] and before.st_nlink == 1, 'Updater artifact size or sharing changed')
+        while block := stream.read(BLOCK):
+            checkpoint(cancelled)
+            count += len(block)
+            require(count <= pin['bytes'], 'Updater artifact grew during verification')
+            sha256.update(block); sha1.update(block)
+            if capture: chunks.append(block)
+            if progress is not None:
+                progress(dict(phase='verify-updater-input', bytes=count, totalBytes=pin['bytes']))
+            checkpoint(cancelled)
+        after = os.fstat(stream.fileno())
+    require(count == pin['bytes'] and sha256.hexdigest() == pin['sha256'] and
+            (before.st_size, before.st_mtime_ns, before.st_ctime_ns) ==
+            (after.st_size, after.st_mtime_ns, after.st_ctime_ns), 'Updater artifact identity changed')
+    return sha1.hexdigest(), b''.join(chunks) if capture else None
+
+
+def _content_inputs(content, *, progress=None, cancelled=None):
+    checkpoint(cancelled)
+    require(isinstance(content, packaged.VerifiedContent) and content.source == content.root / 'source',
+            'Verified extracted updater content required')
+    metadata = {}
+    for name, expected, maximum in (('content-manifest', content.manifest, 16 * 1024**2),
+                                     ('compiled-modules', content.compiled, 1024**2)):
+        relative = 'metadata/' + name + '.json'
+        pin = _pin(content.identities['files'][relative])
+        require(pin == content.receipt['archiveFiles'][relative] and pin['bytes'] <= maximum,
+                'Archived updater metadata binding differs')
+        _, raw = _hash(content.root / relative, pin, progress=progress, cancelled=cancelled, capture=True)
+        require(json.loads(raw) == expected, 'Archived updater metadata object changed')
+        metadata[name] = pin
+    require(content.manifest.get('source') == content.compiled.get('source') == content.receipt.get('source') and
+            content.manifest.get('sourceLockSha256') == content.compiled.get('sourceLockSha256') ==
+            content.receipt.get('sourceLockSha256'), 'Updater source selection differs')
+    expected = {}
+    for database in updater.DATABASES:
+        expected[database] = {}
+        for row in content.manifest['databases'][database]['updateOrder']:
+            path = row['path']; packaged._path(path)
+            pin = _pin({key: content.manifest['files'][path][key] for key in ('bytes', 'sha256')})
+            archive_pin = content.receipt['archiveFiles']['source/' + path]
+            require(pin == {key: archive_pin[key] for key in ('bytes', 'sha256')}, 'Updater SQL payload binding differs')
+            digest, _ = _hash(content.source / path, pin, progress=progress, cancelled=cancelled)
+            name = Path(path).name
+            require(name not in expected[database] and row['state'] in ('RELEASED', 'ARCHIVED', 'PENDING', 'CUSTOM', 'MODULE'),
+                    'Duplicate or invalid selected updater SQL')
+            expected[database][name] = (digest, row['state'])
+    binding = dict(contentReceipt=copy.deepcopy(content.identities['receipt']),
+        source=copy.deepcopy(content.manifest['source']), sourceLockSha256=content.receipt['sourceLockSha256'],
+        compiledModules=metadata['compiled-modules'], contentManifest=metadata['content-manifest'],
+        originalBuild=_pin(content.compiled.get('serverBuild')),
+        selectedUpdatesSha256=hashlib.sha256(updater.canonical_identity(expected)).hexdigest())
+    return expected, binding
+
+
+def prepare(content, executable, selected_program_identity, template, template_identity, mysql,
+            *, original_build_identity, progress=None, cancelled=None):
+    """Bind caller-verified engine pins to real verified content, without SQL."""
+    expected, binding = _content_inputs(content, progress=progress, cancelled=cancelled)
+    selected_program_identity, template_identity = _pin(selected_program_identity), _pin(template_identity)
+    original_build_identity = _pin(original_build_identity)
+    require(original_build_identity == binding['originalBuild'],
+            'Updater original build differs from the original compiled selection')
+    executable, template, mysql = (Path(path) for path in (executable, template, mysql))
+    require(all(path.is_absolute() for path in (executable, template, mysql)) and
+            selected_program_identity['bytes'] > 0 and template_identity['bytes'] <= 2 * 1024**2,
+            'Absolute bounded updater/template/client paths required')
+    executable, template, mysql = (db.private_path(path) for path in (executable, template, mysql))
+    require(mysql.is_file() and os.access(executable, os.X_OK), 'Selected updater or MySQL client unavailable')
+    _hash(executable, selected_program_identity, progress=progress, cancelled=cancelled)
+    _hash(template, template_identity, progress=progress, cancelled=cancelled)
+    binding.update(selectedProgram=selected_program_identity, template=template_identity,
+                   executablePath=str(executable), templatePath=str(template), mysqlPath=str(mysql))
+    return Preparation(content, executable, selected_program_identity, template, template_identity,
+                       mysql, original_build_identity, expected, binding)
+
+
+def _service(verify_service):
+    if verify_service is not None:
+        require(verify_service() is not False, 'Owned database service identity changed')
+
+
+def _instance(connection, state, version):
+    bootstrap = db.read_receipt(state / 'database-bootstrap.json', version)
+    require(bootstrap['datadir'] == str(state / 'database') and db.datadir_uuid(state / 'database') == bootstrap['uuid'],
+            'Updater persistent database identity changed')
+    db.check_receipt(bootstrap, db.identity(connection, version)); db.check_listener(connection, None)
+    require(connection.query('SELECT CURRENT_USER()') in (['esteria@127.0.0.1'], ['esteria@localhost']),
+            'Unexpected updater database account')
+    return bootstrap
+
+
+def _credentials(state):
+    """Validate/hash existing secrets without chmod, creation or replacement."""
+    result = {}
+    for name in ('database-secret', 'database-root-secret'):
+        path = state / 'accounts' / name
+        with updater.plain_file(path) as stream:
+            info = os.fstat(stream.fileno())
+            require(info.st_uid == os.geteuid() and info.st_nlink == 1 and not info.st_mode & 0o077 and
+                    info.st_size <= 66, 'Updater credential must be an owned unshared private file')
+            raw = stream.read(67)
+        require(len(raw) == info.st_size and re.fullmatch(b'[a-f0-9]{64}', raw.strip()),
+                'Existing updater database credential is invalid')
+        result[name] = dict(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest())
+    return result
+
+
+def _untouched(connection):
+    require(connection.query('SELECT COUNT(*) FROM `acore_auth`.`account`') == ['0'] and
+            connection.query('SELECT COUNT(*) FROM `acore_characters`.`characters`') == ['0'],
+            'Existing accounts or characters preserved; updater adoption refused')
+    snapshot = {}
+    for name in baseline.DB_ORDER:
+        tables = connection.query('SHOW TABLES FROM `acore_' + name + '`')
+        if name == 'playerbots':
+            require(not tables, 'Unregistered playerbots database must remain empty')
+        else:
+            require('updates' in tables and 'updates_include' in tables, 'Completed source baseline ledgers required')
+        rows = [] if name == 'playerbots' else connection.query(
+            'SELECT name,hash,state FROM `acore_' + name + '`.`updates` ORDER BY name')
+        snapshot[name] = dict(tablesSha256=hashlib.sha256(updater.canonical_identity(tables)).hexdigest(),
+                              ledgerSha256=hashlib.sha256(updater.canonical_identity(rows)).hexdigest())
+    return snapshot
+
+
+def _receipt(binding, bootstrap, operation, executed, snapshot):
+    return dict(formatVersion=1, scope=SCOPE, operation=operation, qualificationSucceeded=True,
+        mysqlUuid=bootstrap['uuid'], mysqlVersion=bootstrap['version'],
+        contentReceipt=binding['contentReceipt'], sourceLockSha256=binding['sourceLockSha256'],
+        source=copy.deepcopy(binding['source']), compiledModules=binding['compiledModules'],
+        contentManifest=binding['contentManifest'], selectedUpdatesSha256=binding['selectedUpdatesSha256'],
+        originalBuild=binding['originalBuild'], selectedProgram=binding['selectedProgram'],
+        template=binding['template'], compiledUpdaterExecuted=executed, compiledUpdaterCompleted=True,
+        sourceLedgersVerified=True, credentialsAndAccountJournalPreserved=True, baselineJournalUnchanged=True,
+        databaseSnapshots=snapshot, gameSchemasQualified=False, existingSaveUpgradesQualified=False,
+        playerbotsRuntimeQualified=False, authserverExecuted=False, worldserverExecuted=False,
+        androidRuntimeQualified=False, gameplayQualified=False)
+
+
+def _verify_completed(content, connection, state, version, expected_uuid, verify_service,
+                      content_binding, expected, *, cancelled=None):
+    checkpoint(cancelled); _service(verify_service)
+    require(connection.query("SELECT IS_USED_LOCK('esteria-local-bootstrap') = CONNECTION_ID()") == ['1'],
+            'Caller must own the bootstrap SQL lock during completed updater verification')
+    bootstrap = _instance(connection, state, version)
+    require(bootstrap['uuid'] == expected_uuid, 'Completed updater service UUID differs from caller ownership')
+    path, baseline_path = state / JOURNAL, state / schema.JOURNAL
+    journal, baseline_journal = schema.private_journal(path), schema.private_journal(baseline_path)
+    journal_identity, baseline_identity = baseline.file_identity(path), baseline.file_identity(baseline_path)
+    credentials, account = _credentials(state), schema.account_identity(state)
+    binding = journal.get('binding')
+    require(type(journal.get('formatVersion')) is int and journal['formatVersion'] == 1 and journal.get('scope') == SCOPE and
+            journal.get('phase') == 'complete' and journal.get('compiledUpdaterExecuted') is True and
+            type(journal.get('run', {}).get('exitCode')) is int and journal['run']['exitCode'] == 0 and isinstance(binding, dict),
+            'Private completed compiled updater journal required')
+    require(all(binding.get(key) == value for key, value in content_binding.items() if key not in
+                ('selectedProgram', 'template', 'executablePath', 'templatePath', 'mysqlPath')) and
+            binding.get('credentials') == credentials and binding.get('baselineJournal') == baseline_identity and
+            binding.get('mysqlUuid') == expected_uuid and binding.get('mysqlVersion') == version and
+            binding.get('datadir') == bootstrap['datadir'], 'Completed updater source or private binding changed')
+    require(_pin(binding.get('selectedProgram'))['bytes'] > 0 and
+            0 < _pin(binding.get('template'))['bytes'] <= 2 * 1024**2, 'Invalid historical updater artifact sizes')
+    require(all(isinstance(binding.get(key), str) and Path(binding[key]).is_absolute()
+                for key in ('executablePath', 'templatePath', 'mysqlPath')), 'Invalid historical updater artifact paths')
+    baseline_binding = baseline_journal.get('binding', {})
+    require(type(baseline_journal.get('formatVersion')) is int and baseline_journal['formatVersion'] == 1 and
+            baseline_journal.get('phase') == 'baseline-complete' and baseline_journal.get('pending') is None and
+            baseline_journal.get('completed') == baseline_binding.get('paths') and
+            all(baseline_binding.get(key) == value for key, value in dict(mysqlUuid=expected_uuid,
+                mysqlVersion=version, datadir=bootstrap['datadir'], credentials=credentials,
+                contentReceipt=content_binding['contentReceipt'], sourceLockSha256=content_binding['sourceLockSha256'],
+                compiledModules=content.receipt['compiledModules']).items()), 'Completed source baseline binding changed')
+    checkpoint(cancelled)
+    snapshot = updater.schema_snapshot(connection, expected)
+    require(snapshot == journal.get('snapshot'), 'Completed updater live ledger or table set changed')
+    checkpoint(cancelled); _service(verify_service)
+    require(_instance(connection, state, version)['uuid'] == expected_uuid and
+            _credentials(state) == credentials and schema.account_identity(state) == account and
+            baseline.file_identity(path) == journal_identity and baseline.file_identity(baseline_path) == baseline_identity,
+            'Completed updater private context changed during verification')
+    return dict(_receipt(binding, bootstrap, 'verified-completed-updater', False, snapshot),
+                journalIdentity=journal_identity, baselineJournalIdentity=baseline_identity)
+
+
+def verify_completed_update(content, connection, state, version, *, expected_uuid, verify_service,
+                            progress=None, cancelled=None):
+    """Read-only readiness check inside the caller's retained locks and lease.
+
+    The caller holds its state/config/service lease and bootstrap SQL named lock.
+    This function takes/releases no locks, rewrites no journal, and hashes no
+    historical executable/template. It verifies current content and source SQL,
+    private completed bindings and live source ledgers before caller mutations.
+    """
+    require(callable(verify_service), 'Explicit retained service verifier required')
+    state = Path(state)
+    require(state.is_absolute(), 'Absolute owned updater state required')
+    state = db.private_path(state)
+    expected, binding = _content_inputs(content, progress=progress, cancelled=cancelled)
+    return _verify_completed(content, connection, state, version, expected_uuid,
+                             verify_service, binding, expected, cancelled=cancelled)
+
+
+def apply(plan, connection, state, version, *, progress=None, cancelled=None, verify_service=None, state_lease=None):
+    """Execute once after a real completed baseline; repeats validate without replay.
+
+    Cancellation is honored before durable intent. After intent, the selected
+    updater must finish within its shared timeout; cancellation never implies a
+    mid-SQL rollback. Callers check cancellation again before any later stage.
+    ``verify_service`` may raise or return False if its retained owner changed.
+    An optional real ``state_lease`` is forwarded through completed-baseline
+    validation and reused for this updater's state scope without relocking.
+    """
+    require(isinstance(plan, Preparation), 'Prepared exact updater selection required')
+    checkpoint(cancelled); state = Path(state)
+    require(state.is_absolute(), 'Absolute owned updater state required')
+    state = db.private_path(state)
+    # A missing/partial baseline is never converted into a fresh initialization.
+    baseline_path = state / schema.JOURNAL
+    previous = schema.private_journal(baseline_path)
+    require(previous.get('phase') == 'baseline-complete', 'Completed source baseline journal required before updater')
+    baseline_identity = baseline.file_identity(baseline_path)
+    def no_baseline_sql(*_args):
+        raise db.BootstrapError('Updater must never initialize or replay a source baseline')
+    _service(verify_service)
+    baseline_result = schema.initialize(plan.content, connection, state, version, no_baseline_sql,
+                                        cancelled=cancelled, state_lease=state_lease)
+    require(baseline_result.get('operation') == 'already-prepared' and
+            baseline.file_identity(baseline_path) == baseline_identity, 'Completed source baseline changed')
+    _service(verify_service)
+    refreshed = prepare(plan.content, plan.executable, plan.selected_program_identity, plan.template,
+        plan.template_identity, plan.mysql, original_build_identity=plan.original_build_identity,
+        progress=progress, cancelled=cancelled)
+    require(refreshed.binding == plan.binding and refreshed.expected == plan.expected, 'Prepared updater selection changed')
+    with db.state_scope(state, state_lease):
+        checkpoint(cancelled)
+        require(baseline.file_identity(baseline_path) == baseline_identity, 'Completed baseline journal changed before updater lock')
+        bootstrap = _instance(connection, state, version)
+        require(connection.query("SELECT GET_LOCK('esteria-local-bootstrap',0)") == ['1'], 'Another operation owns updater instance')
+        try:
+            credentials, account = _credentials(state), schema.account_identity(state)
+            binding = dict(plan.binding, baselineJournal=baseline_identity, credentials=credentials,
+                mysqlUuid=bootstrap['uuid'], mysqlVersion=version, datadir=bootstrap['datadir'])
+            path = state / JOURNAL
+            if os.path.lexists(path):
+                journal = schema.private_journal(path)
+                require(type(journal.get('formatVersion')) is int and journal['formatVersion'] == 1 and
+                        journal.get('scope') == SCOPE and journal.get('binding') == binding,
+                        'Updater source, engine, credentials or instance changed; upgrade/adoption refused')
+                if journal.get('phase') == 'complete':
+                    return _verify_completed(plan.content, connection, state, version, bootstrap['uuid'],
+                        verify_service, plan.binding, plan.expected, cancelled=cancelled)
+                require(journal.get('phase') == 'prepared' and journal.get('compiledUpdaterExecuted') is False,
+                        'Interrupted or failed updater preserved; replay refused')
+                require(account is None and _untouched(connection) == journal.get('before'),
+                        'Prepared updater state changed; adoption refused')
+            else:
+                require(account is None, 'Existing account journal preserved; fresh updater adoption refused')
+                before = _untouched(connection)
+                checkpoint(cancelled)
+                journal = dict(formatVersion=1, scope=SCOPE, binding=binding, phase='prepared',
+                               compiledUpdaterExecuted=False, before=before)
+                db.atomic_json(path, journal)
+            checkpoint(cancelled)
+            run = db.private_path(state / 'run'); updater.config.plain_directory(run)
+            operation = run / ('updater-' + secrets.token_hex(16)); operation.mkdir(mode=0o700)
+            (operation / 'run').mkdir(mode=0o700); (operation / 'logs').mkdir(mode=0o700)
+            _hash(plan.template, plan.template_identity, cancelled=cancelled)
+            password = db.read_secret(state / 'accounts/database-secret')
+            configuration = updater.render_importer(plan.template, plan.content.source, operation, plan.mysql, password)
+            configuration_pin = baseline.file_identity(configuration)
+            _hash(plan.template, plan.template_identity, cancelled=cancelled)
+            _hash(plan.executable, plan.selected_program_identity, cancelled=cancelled)
+            _service(verify_service); _instance(connection, state, version)
+            require(_credentials(state) == credentials and schema.account_identity(state) == account and
+                    baseline.file_identity(baseline_path) == baseline_identity, 'Private updater binding changed before execution')
+            checkpoint(cancelled)
+            journal.update(phase='in-flight', invocation=str(operation))
+            db.atomic_json(path, journal)  # Must be durable BEFORE Popen, never in on_started.
+            started = False
+            def on_started():
+                nonlocal started
+                started = True
+            # Observers may request cancellation here; this committed unit still
+            # executes. Observer exceptions cannot strand an unlaunched intent.
+            if progress is not None:
+                try: progress(dict(phase='compiled-updater-intent-committed'))
+                except Exception: pass
+            try:
+                # Recheck after observers and durable intent, directly before
+                # process creation. This committed unit no longer polls cancel.
+                _service(verify_service); _instance(connection, state, version)
+                require(_credentials(state) == credentials and schema.account_identity(state) == account and
+                        baseline.file_identity(baseline_path) == baseline_identity,
+                        'Private updater binding changed immediately before execution')
+                _hash(plan.template, plan.template_identity)
+                _hash(configuration, configuration_pin)
+                _hash(plan.executable, plan.selected_program_identity)
+                execution = updater.run_importer(plan.executable, configuration,
+                    operation / 'logs/updater-private.log', on_started=on_started)
+                require(started, 'Updater did not establish actual process creation')
+                _instance(connection, state, version); _service(verify_service)
+                snapshot = updater.schema_snapshot(connection, plan.expected)
+                require(_credentials(state) == credentials and schema.account_identity(state) == account and
+                        baseline.file_identity(baseline_path) == baseline_identity, 'Private identities changed during updater')
+                journal.update(phase='complete', compiledUpdaterExecuted=True, run=execution, snapshot=snapshot)
+                db.atomic_json(path, journal)
+                return _receipt(plan.binding, bootstrap, 'executed-compiled-updater', True, snapshot)
+            except BaseException:
+                journal.update(phase='failed', compiledUpdaterExecuted=started)
+                db.atomic_json(path, journal)
+                raise
+        finally:
+            require(connection.query("SELECT RELEASE_LOCK('esteria-local-bootstrap')") == ['1'],
+                    'Updater operation lock release failed; state preserved')
