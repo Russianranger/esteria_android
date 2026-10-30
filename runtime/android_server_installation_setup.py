@@ -240,14 +240,41 @@ def finish_playerbots(verified, connection, state, version, *, helper, helper_id
                       helper_receipt, helper_receipt_identity, native_receipt, native_receipt_identity,
                       mysql, data, profile, expected_uuid, verify_service, progress=None, cancelled=None,
                       state_lease=None, staged_data=None):
+    """Fixed production ARM64 admission followed by the shared finish kernel.
+
+    Neither this public function nor the CLI accepts a policy, plan, bypass flag
+    or result from its caller. A qualification-only source wrapper may use the
+    private kernel with a separately measured architecture's real admission.
+    """
+    def verify_helper():
+        return _helper_inputs(verified, helper, helper_identity, helper_receipt, helper_receipt_identity,
+            native_receipt, native_receipt_identity, progress=progress, cancelled=cancelled)
+    def prepare_helper():
+        return playerbots.prepare(verified, Path(helper), Path(helper_receipt), helper_receipt_identity['sha256'],
+            mysql, progress=progress, cancelled=cancelled)
+    return _finish_playerbots(verified, connection, state, version, helper=helper, helper_identity=helper_identity,
+        helper_receipt=helper_receipt, helper_receipt_identity=helper_receipt_identity,
+        native_receipt=native_receipt, native_receipt_identity=native_receipt_identity,
+        mysql=mysql, data=data, profile=profile, expected_uuid=expected_uuid, verify_service=verify_service,
+        progress=progress, cancelled=cancelled, state_lease=state_lease, staged_data=staged_data,
+        prepare_helper=prepare_helper, verify_helper=verify_helper)
+
+
+def _finish_playerbots(verified, connection, state, version, *, helper, helper_identity,
+                      helper_receipt, helper_receipt_identity, native_receipt, native_receipt_identity,
+                      mysql, data, profile, expected_uuid, verify_service, prepare_helper, verify_helper,
+                      progress=None, cancelled=None, state_lease=None, staged_data=None):
     """Finish the fourth source schema on the caller's same retained engine.
 
+    Source-owned admission produces a real Preparation, never a fabricated SQL
+    result. This private seam is absent from the public function and CLI.
     The original staged marker is immutable. A private transition intent permits
     cancellation before the PB SQL intent without adopting arbitrary configs.
     Shared PB journals retain their own uncertain-execution refusal semantics.
     No baseline/updater, engine start/stop, promotion or gameplay is performed.
     """
     require(isinstance(verified, packaged.VerifiedContent) and callable(verify_service) and
+            callable(prepare_helper) and callable(verify_helper) and
             isinstance(expected_uuid, str) and re.fullmatch('[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}', expected_uuid),
             'Verified content and retained installation service required')
     db.exact_version(version); state, mysql, data = (Path(path) for path in (state, mysql, data))
@@ -261,11 +288,11 @@ def finish_playerbots(verified, connection, state, version, *, helper, helper_id
         if progress is not None: progress(dict(phase=name))
     with db.state_scope(state, state_lease) as lease:
         phase('installation-playerbots-proofs')
-        _helper_inputs(verified, helper, helper_identity, helper_receipt, helper_receipt_identity,
-                       native_receipt, native_receipt_identity, progress=progress, cancelled=cancelled)
-        plan = playerbots.prepare(verified, Path(helper), Path(helper_receipt), helper_receipt_identity['sha256'],
-                                  mysql, progress=progress, cancelled=cancelled)
-        require(plan.executable_identity == helper_identity and plan.helper_receipt_identity == helper_receipt_identity,
+        verify_helper()
+        plan = prepare_helper()
+        require(isinstance(plan, playerbots.Preparation) and plan.content is verified and
+                plan.executable == Path(helper) and plan.mysql == mysql and
+                plan.executable_identity == helper_identity and plan.helper_receipt_identity == helper_receipt_identity,
                 'Sealed playerbots helper selection differs')
         with realm.config_lock(state), realm.named_locks(connection,
                 ('esteria-local-bootstrap', 'esteria-local-realm', 'esteria-local-account')):
@@ -371,8 +398,7 @@ def finish_playerbots(verified, connection, state, version, *, helper, helper_id
                     realm.active_config_verified(verified, state, db.read_secret(state / 'accounts/database-secret'),
                         profile=profile, data=data, mysql=mysql) == final_generation,
                     'Installation private source, credentials, account or configuration changed')
-            _helper_inputs(verified, helper, helper_identity, helper_receipt, helper_receipt_identity,
-                           native_receipt, native_receipt_identity, progress=progress, cancelled=cancelled)
+            verify_helper()
             _finish_public_receipts(verified, state, staged, final_generation, transitioning=True)
             phase('installation-four-schemas-verified')
             report = dict(formatVersion=1, scope=VERIFIED_SCOPE, mysqlUuid=expected_uuid, mysqlVersion=version,
@@ -421,6 +447,16 @@ def selection(path, phase='core'):
 
 def run(state, session, content_root, receipt_path, programs_root, service_session, mysql, data, profile_path,
         version, operation, service_operation, uuid, *, interrupted=lambda: False, phase='core'):
+    """Fixed production entry point; architecture admission is not caller input."""
+    return _run(state, session, content_root, receipt_path, programs_root, service_session, mysql, data, profile_path,
+        version, operation, service_operation, uuid, interrupted=interrupted, phase=phase,
+        finish_phase=finish_playerbots)
+
+
+def _run(state, session, content_root, receipt_path, programs_root, service_session, mysql, data, profile_path,
+         version, operation, service_operation, uuid, *, finish_phase, interrupted=lambda: False, phase='core'):
+    """Shared owned-service/selection kernel for source-owned entry wrappers."""
+    require(callable(finish_phase), 'Source-owned installation finish function required')
     db.exact_version(version)
     require(re.fullmatch('[a-f0-9]{32}', operation) and re.fullmatch('[a-f0-9]{32}', service_operation) and
             isinstance(uuid, str) and re.fullmatch('[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}', uuid),
@@ -465,7 +501,7 @@ def run(state, session, content_root, receipt_path, programs_root, service_sessi
                     require(staged.get('selectedProgram') == selected['program'] and
                             schema.private_journal(state / updates.JOURNAL).get('binding', {}).get('template') == selected['template'],
                             'Playerbots selection differs from the staged original programs')
-                    report = finish_playerbots(verified, connection, state, version,
+                    report = finish_phase(verified, connection, state, version,
                         helper=programs_root / 'helpers/playerbots-schema', helper_identity=pins['executable'],
                         helper_receipt=programs_root / 'provenance/playerbots-helper-build.json', helper_receipt_identity=pins['buildReceipt'],
                         native_receipt=programs_root / 'provenance/playerbots-native-sql.json', native_receipt_identity=pins['nativeReceipt'],

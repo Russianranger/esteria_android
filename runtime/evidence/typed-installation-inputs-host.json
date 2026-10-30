@@ -1,0 +1,204 @@
+{
+  "boundaries": {
+    "androidX64CoordinatorExecuted": false,
+    "characterPersistenceQualified": false,
+    "clientPinChanged": false,
+    "currentNativeArm64JavaRegressionExecuted": false,
+    "existingSaveUpgradeExecuted": false,
+    "gameplayQualified": false,
+    "playerbotsAiQualified": false,
+    "positiveProviderExists": false,
+    "productionArm64ProviderChanged": false,
+    "qualificationInputSelectionEnabled": false,
+    "serverPinChanged": false,
+    "worldQualified": false
+  },
+  "compatibilitySourceAssertions": {
+    "abi183ProductionAdmissionPreserved": true,
+    "activeSaveSelectionKeys": [
+      "sourceLock",
+      "runtimeArchive",
+      "programsArchive",
+      "contentReceipt",
+      "compiledModules"
+    ],
+    "baselineRevision": "4de3785228fe1e079083c8fb1ae4814671333b0e",
+    "helperGenerationAddedToSaveSelection": false,
+    "newSaveFormatOrMigration": false,
+    "priorReceiptAndSaveFormatCompatibilityIsSourceAndHostEvidenceOnly": true,
+    "unchangedJavaAdmissionAndReceiptValidationBodies": [
+      "playerbotsSelection",
+      "validate",
+      "validateHelper",
+      "validateStopped",
+      "validateComplete",
+      "requireRecordedFile"
+    ],
+    "unchangedPublicPythonArgumentSignatures": [
+      "finish_playerbots",
+      "run"
+    ],
+    "unchangedPythonAstBodies": [
+      "_helper_inputs",
+      "compose",
+      "selection",
+      "main"
+    ],
+    "unchangedWholeFiles": [
+      "app/src/main/java/io/github/russianranger/esteria/runtime/ServerRuntimeSetup.java",
+      "app/src/main/java/io/github/russianranger/esteria/runtime/ServerProgramsSetup.java",
+      "app/src/main/java/io/github/russianranger/esteria/runtime/ServerContentSetup.java",
+      "app/src/main/java/io/github/russianranger/esteria/runtime/InstalledProot.java",
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/FreshServerInstallations.java"
+    ]
+  },
+  "formatVersion": 1,
+  "gitHeadAtObservation": "4de3785228fe1e079083c8fb1ae4814671333b0e",
+  "implementation": {
+    "completeHelperProofRecheckedBeforeFinalReceipt": true,
+    "fixedCompiledDebugProviderPinRequired": true,
+    "fixedPublicArm64HelperAdmissionAndCli": true,
+    "nativePayloadRecheckedBeforeEveryQualifiedLaunch": true,
+    "ordinaryPublicProviderConstructorsUnchanged": true,
+    "packagePrivateTypedInputsAndPrivateProductionAdapter": true,
+    "privatePythonKernelRequiresRealBoundPreparation": true,
+    "qualificationPayloadConstructorPrivate": true,
+    "qualificationPayloadFactoryAcceptsNoCallerPathOrPin": true
+  },
+  "nativeJavaCompilation": {
+    "androidApiQualified": false,
+    "buildReceipt": {
+      "bytes": 53844,
+      "path": "runtime/evidence/typed-installation-native-java-build-host.json",
+      "sha256": "6dea311153559d30aedc9b0f553e55553a8efed7a7b463595ec14949cd9cafec"
+    },
+    "compiledClassFiles": 188,
+    "everyBuildSourceStillMatches": true,
+    "hostMachine": "x86_64",
+    "javaCoordinatorExecuted": false,
+    "jniLibrary": {
+      "bytes": 328744,
+      "sha256": "0ce9c633de651663b32b76f191c64fe2ea876eb14232a6e787c30a4ec84cc154"
+    },
+    "productionCoordinatorCompiled": true,
+    "productionProotProcessCompiled": true,
+    "recordedProjectSourceInputs": 60,
+    "sourceSnapshotMatchesGitHead": false,
+    "sqlExecuted": false
+  },
+  "observedAtUtc": "2026-10-30T20:58:56.467730+00:00",
+  "pendingGradleGate": {
+    "commandTask": "help",
+    "exitCode": 1,
+    "expectedMeasurementGateRefused": true,
+    "fixturePathsCreated": false,
+    "guestOrSqlExecuted": false,
+    "profile": "explicitx64PRoot/MySQL/installationproperties",
+    "reason": "android-installation-x64-measured-native-sql-and-provider-required"
+  },
+  "python": {
+    "command": "python3 -m unittest tests.test_android_server_installation_setup tests.test_runtime_playerbots_setup tests.test_server_installation_qualification tests.test_server_installation_inputs tests.test_java_server_installation_qualification tests.test_android_installation_x64_inputs",
+    "durationSeconds": 5.65,
+    "errors": 0,
+    "exitCode": 0,
+    "failures": 0,
+    "skipped": 0,
+    "testsRun": 60
+  },
+  "requiredFollowThrough": [
+    "Run the current native ARM64 Java SQL/promotion/restart workflow after publication",
+    "Review exact future native x64 source/SQL and independent readback receipts",
+    "Measure provider in a native-qualified/provider-pending stage before pinning it",
+    "Implement the qualification-only provider and Android adapter/instrumentation using this seam",
+    "Execute real Android13 x64 coordinator before claiming Android installation qualification"
+  ],
+  "scope": "typed-installation-inputs-modified-source-host-and-sdk-only",
+  "sdk": {
+    "actionableTasks": 54,
+    "buildSuccessful": true,
+    "command": "./gradlew --offline --no-daemon :core:freshServerInstallationsTest :app:compileDebugJavaWithJavac :app:compileDebugAndroidTestJavaWithJavac :app:serverInstallationOwnerTest :app:localServerSessionOwnerTest :app:gameSessionOwnerTest :app:lintDebug",
+    "durationSeconds": 52,
+    "environment": "JDK17/Gradle8.9/SDK35; existing local output-directory init script only",
+    "executedTasks": 16,
+    "exitCode": 0,
+    "freshInstallationCoreFixturePassed": true,
+    "fullProductionApkDuplicated": false,
+    "gameOwnerHostGroups": 8,
+    "installationOwnerHostGroups": 4,
+    "localServerOwnerHostGroups": 3,
+    "nullQualificationPayloadRefusedBeforeJni": true,
+    "pendingAdmissionRefusedBeforeBootstrapOrRuntimeAccess": true,
+    "upToDateTasks": 38
+  },
+  "sourceFiles": {
+    ".github/workflows/java-server-installation-native.yml": {
+      "bytes": 11248,
+      "sha256": "6a52231a9c811c9036485b86a49e165eb5479e61ab30dcf5a9846bf87b4d8200"
+    },
+    "app/build.gradle": {
+      "bytes": 11469,
+      "sha256": "9838cf277575dcc4c06843155b74a0f872c199d1edfe6347b1ac66089aa86360"
+    },
+    "app/server-installation-probe.gradle": {
+      "bytes": 4632,
+      "sha256": "3973052bc781d4653435e1d4cd60fd825a8ca285a6ee84272f59c20d001fd1a1"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ProotProcess.java": {
+      "bytes": 17351,
+      "sha256": "02141e0e5e56c2edfc99709b76dd9668e426106167a47f5c6f87f7b038850512"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseService.java": {
+      "bytes": 17621,
+      "sha256": "5bf448b120222b58734c08197308133aa8706fa973326810984b366a07b32e08"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseSetup.java": {
+      "bytes": 18724,
+      "sha256": "90ffa8c5e06537e833a8c918e8e58e385cbbe655b43f8de8b3fd8bc3f8076fcc"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerInstallationSetup.java": {
+      "bytes": 45822,
+      "sha256": "f004e28f8ab986f62c0efa0e2383aaa061cff821b17acf8887504bff7e0232e5"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/runtime/ServerInstallationOwnerTests.java": {
+      "bytes": 18579,
+      "sha256": "be1a8e4af113238dc6a2b09d450f585dc442a9b0dc052558c40903f4bd94ec50"
+    },
+    "runtime/android_server_installation_setup.py": {
+      "bytes": 41474,
+      "sha256": "fe45968a0c3a32d559de27f591b5e968139e2f4ab5f04b4fc57e4bc98a330df6"
+    },
+    "runtime/mysql-probe/ANDROID-INSTALLATION-X64-PLAN.md": {
+      "bytes": 6779,
+      "sha256": "a297c2e89a108d4ce27c73e6a1410422e024798a7ea3a5391e2d1ef2f96d3c4d"
+    },
+    "runtime/mysql-probe/android-installation-x64-inputs.lock.json": {
+      "bytes": 566,
+      "sha256": "585b76019f3db1fc6e3472abecdaae3bc3d2fee11966afab4ce26a7cea509994"
+    },
+    "tests/native-java-installation/src/android/content/Context.java": {
+      "bytes": 707,
+      "sha256": "6084dec8efeeef0633df75007f17a4faff109636469de190649106290012eee0"
+    },
+    "tests/native-java-installation/src/android/content/pm/ApplicationInfo.java": {
+      "bytes": 268,
+      "sha256": "b42fd2379346bc431245da4c591fff1aef0b20498004e6324019b94e454d86ac"
+    },
+    "tests/test_android_installation_x64_inputs.py": {
+      "bytes": 18273,
+      "sha256": "1623ecfa8161c68b54032c8b1d2394085c79781680938566f17ad5fa22e56a1e"
+    },
+    "tests/test_android_server_installation_setup.py": {
+      "bytes": 34294,
+      "sha256": "419bdb5de94e3e76e3c1edd953ed6218f04a5214f0efa099f4893276d71661b7"
+    },
+    "tools/android_installation_x64_inputs.py": {
+      "bytes": 15382,
+      "sha256": "ae97b155627ef591f3dde25c74c1e032ed6726c3db5ec046a1a861a52d488245"
+    },
+    "tools/qualify_java_server_installation.py": {
+      "bytes": 15020,
+      "sha256": "0667a620e5f84f270a769b5835da3c14d58c7e83cd06b342cd8c0fc765aeb08e"
+    }
+  },
+  "sourceState": "modified-worktree-exact-file-identities"
+}

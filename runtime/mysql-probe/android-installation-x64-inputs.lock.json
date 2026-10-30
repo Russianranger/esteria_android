@@ -1,0 +1,18 @@
+{
+  "formatVersion": 1,
+  "scope": "android-x64-installation-coordinator-input-selection",
+  "repository": "Russianranger/esteria_android",
+  "enabled": false,
+  "state": "pending-native-x64-sql-and-provider-measurement",
+  "nativeSql": null,
+  "provider": null,
+  "sqlExecuted": false,
+  "androidRuntimeQualified": false,
+  "productionArm64ProviderQualified": false,
+  "fourSchemaCoordinatorQualified": false,
+  "worldserverQualified": false,
+  "playerbotsAiQualified": false,
+  "gameplayQualified": false,
+  "slotPromoted": false,
+  "serverDataQualified": false
+}

@@ -1,4 +1,6 @@
 import copy
+from dataclasses import replace
+from functools import partial
 import hashlib
 import json
 from pathlib import Path
@@ -249,6 +251,7 @@ class InstallationPlayerbotsFinish(unittest.TestCase):
     def account(self, *args, **kwargs): return self.local('account', *args, **kwargs)
 
     def finish(self, **kwargs):
+        entry = kwargs.pop('_entry', setup.finish_playerbots)
         arguments = dict(helper=self.helper, helper_identity=self.helper_pin, helper_receipt=self.helper_receipt,
             helper_receipt_identity=self.build_pin, native_receipt=self.native_path, native_receipt_identity=self.native_pin,
             mysql=self.mysql, data=self.final_data, staged_data=self.data, profile=self.profile, expected_uuid=self.uuid,
@@ -258,7 +261,60 @@ class InstallationPlayerbotsFinish(unittest.TestCase):
         with patch.object(updater, 'run_importer', side_effect=self.fixture.runner), \
                 patch.object(schema, 'initialize', side_effect=AssertionError('Finish replayed source baseline')), \
                 patch.object(updates, 'apply', side_effect=AssertionError('Finish replayed compiled updater')):
-            return setup.finish_playerbots(self.content, self.connection, self.state, '8.0.46', **arguments)
+            return entry(self.content, self.connection, self.state, '8.0.46', **arguments)
+
+    def test_public_finish_keeps_fixed_arm64_admission_before_prepare_and_after_real_host_child(self):
+        calls = []; verify = setup._helper_inputs; prepare = playerbots.prepare
+        def checked(*args, **kwargs):
+            calls.append('arm64-proof'); return verify(*args, **kwargs)
+        def prepared(*args, **kwargs):
+            calls.append('real-preparation'); return prepare(*args, **kwargs)
+        with patch.object(setup, '_helper_inputs', side_effect=checked), \
+                patch.object(playerbots, 'prepare', side_effect=prepared):
+            result = self.finish()
+        self.assertEqual(calls, ['arm64-proof', 'real-preparation', 'arm64-proof'])
+        self.assertEqual(len(self.fixture.runs), 1)
+        self.assertTrue(result['fourSchemasVerified'])
+        self.assertFalse(result['androidRuntimeQualified'])
+
+    def test_private_kernel_rejects_foreign_preparation_before_config_transition_or_sql(self):
+        plan = playerbots.prepare(self.content, self.helper, self.helper_receipt, self.build_pin['sha256'], self.mysql)
+        foreign = dict(bytes=1, sha256='0' * 64)
+        for changed in (object(), replace(plan, content=copy.copy(self.content)),
+                replace(plan, executable=self.helper.with_name('foreign-helper')),
+                replace(plan, executable_identity=foreign), replace(plan, helper_receipt_identity=foreign),
+                replace(plan, mysql=self.mysql.with_name('foreign-mysql'))):
+            with self.subTest(plan=type(changed).__name__), \
+                    patch.object(playerbots, 'apply', side_effect=AssertionError('Foreign preparation reached SQL')) as apply:
+                entry = partial(setup._finish_playerbots, prepare_helper=lambda: changed, verify_helper=lambda: None)
+                with self.assertRaisesRegex(db.BootstrapError, 'Sealed playerbots helper selection differs'):
+                    self.finish(_entry=entry)
+                apply.assert_not_called()
+            self.assertFalse((self.state / setup.FINISH_JOURNAL).exists())
+            self.assertFalse((self.state / setup.VERIFIED_REPORT).exists())
+            self.assertEqual((self.state / setup.STAGED_REPORT).read_bytes(), self.staged)
+        self.assertFalse(self.fixture.runs)
+
+    def test_private_kernel_rechecks_admitted_proofs_before_publishing_final_report(self):
+        calls = []
+        def checked():
+            calls.append('proof')
+            if len(calls) == 2: raise db.BootstrapError('fixture proof changed after helper')
+            return setup._helper_inputs(self.content, self.helper, self.helper_pin, self.helper_receipt, self.build_pin,
+                self.native_path, self.native_pin)
+        entry = partial(setup._finish_playerbots, verify_helper=checked,
+            prepare_helper=lambda: playerbots.prepare(self.content, self.helper, self.helper_receipt,
+                self.build_pin['sha256'], self.mysql))
+        with self.assertRaisesRegex(db.BootstrapError, 'proof changed after helper'):
+            self.finish(_entry=entry)
+        self.assertEqual(calls, ['proof', 'proof'])
+        self.assertEqual(len(self.fixture.runs), 1)
+        self.assertEqual(schema.private_journal(self.state / playerbots.JOURNAL)['phase'], 'complete')
+        self.assertFalse((self.state / setup.VERIFIED_REPORT).exists())
+        self.assertEqual((self.state / setup.STAGED_REPORT).read_bytes(), self.staged)
+        resumed = self.finish()
+        self.assertFalse(resumed['compiledPlayerbotsLoaderExecuted'])
+        self.assertEqual(len(self.fixture.runs), 1)
 
     def test_real_host_child_and_reentry_keep_outer_lease_and_original_stage(self):
         private = {name:(self.state / name).read_bytes() for name in
@@ -349,7 +405,7 @@ class InstallationPlayerbotsFinish(unittest.TestCase):
                 self.finish(**{name:dict(bytes=1,sha256='0'*64)})
         for name, value in (('qualificationSucceeded', False), ('sourceLockSha256', '0'*64),
                             ('preparedStatementCount', True), ('helperBuildReceipt', dict(bytes=1,sha256='0'*64)),
-                            ('worldserverExecuted', True)):
+                            ('worldserverExecuted', True), ('scope', 'disposable-native-x64-measured-setup-four-schema-sql')):
             original = copy.deepcopy(self.native); self.native[name] = value; self.write_native()
             with self.subTest(field=name), self.assertRaises(db.BootstrapError): self.finish()
             self.native = original; self.write_native()

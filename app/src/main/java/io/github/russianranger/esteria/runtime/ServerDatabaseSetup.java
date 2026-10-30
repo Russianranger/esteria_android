@@ -55,16 +55,23 @@ public final class ServerDatabaseSetup {
             throw new IOException("Database setup requires private canonical application storage");
         retryPendingCleanup(context,privateRoot,Duration.ofSeconds(2));
         if (runtime.current()==null) throw new IOException("Prepare the server dependencies before database setup");
-        return prepareWork(context,privateRoot,directories(privateRoot,"state/server-work"),runtime,progress,cancelled,null);
+        return prepareWork(context,privateRoot,directories(privateRoot,"state/server-work"),
+            ServerDatabaseService.installedRuntime(context,runtime),progress,cancelled,null);
     }
     /** The fresh coordinator retains this token until the complete operation
      * and any required process cleanup have finished. Never accepts an arbitrary path. */
     static Result prepareFresh(Context context,Path privateRoot,ServerRuntimeSetup runtime,
             FreshServerInstallations.Workspace workspace,RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled,
             java.util.function.Consumer<BootstrapLease> processOwner) throws IOException {
+        return prepareFreshInstalled(context,privateRoot,ServerDatabaseService.installedRuntime(context,runtime),workspace,
+            progress,cancelled,processOwner);
+    }
+    static Result prepareFreshInstalled(Context context,Path privateRoot,ServerDatabaseService.InstallationRuntime runtime,
+            FreshServerInstallations.Workspace workspace,RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled,
+            java.util.function.Consumer<BootstrapLease> processOwner)throws IOException {
         if(!privateRoot.equals(context.getFilesDir().getCanonicalFile().toPath()) || processOwner==null)
             throw new IOException("Canonical private storage and a retained bootstrap owner required");
-        workspace.requireRuntimeArchive(runtime.packagePlan().archiveSha256);
+        workspace.requireRuntimeArchive(runtime.archiveSha256());
         if(runtime.current()==null)throw new IOException("Prepare the selected server runtime before fresh database setup");
         return prepareWork(context,privateRoot,workspace.directoryFor(privateRoot),runtime,progress,cancelled,processOwner);
     }
@@ -125,7 +132,7 @@ public final class ServerDatabaseSetup {
             if(failure!=null)throw new IOException("Previous database cleanup finished with a failure; preserved state requires setup recovery",failure);
         }
     }
-    private static Result prepareWork(Context context,Path privateRoot,Path work,ServerRuntimeSetup runtime,
+    private static Result prepareWork(Context context,Path privateRoot,Path work,ServerDatabaseService.InstallationRuntime runtime,
             RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled,java.util.function.Consumer<BootstrapLease> processOwner) throws IOException {
         Path lockPath=work.resolve(".android-database-setup.lock");
         if(Files.exists(lockPath,LinkOption.NOFOLLOW_LINKS) && !regular(lockPath))throw new IOException("Invalid database operation lock");
@@ -146,7 +153,7 @@ public final class ServerDatabaseSetup {
             else if(!transferred)ownership.close();
         }
     }
-    private static Result run(Context context,Path root,Path work,ServerRuntimeSetup runtime,
+    private static Result run(Context context,Path root,Path work,ServerDatabaseService.InstallationRuntime runtime,
             RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled,BootstrapLease ownership) throws IOException {
         checkCancelled(cancelled);
         String helperGeneration=installHelpers(context,work);
@@ -157,9 +164,9 @@ public final class ServerDatabaseSetup {
         Files.createDirectory(session,PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------")));
         checkCancelled(cancelled);
         if (progress!=null) progress.update("database-initializing","",0,-1);
-        OwnedProcess process=ProotProcess.start(context,runtime.installer(),runtime.packagePlan(),work,session,
+        OwnedProcess process=runtime.launch(work,session,
             Arrays.asList("/usr/bin/python3","-B","-s","-E","/work/helpers/"+helperGeneration+"/android_database_setup.py",
-                "--expected-version",runtime.expectedMysqlVersion(),"--operation-id",id),Collections.emptyMap(),null);
+                "--expected-version",runtime.expectedMysqlVersion(),"--operation-id",id),Collections.emptyList());
         ownership.process=process;
         boolean cancelSeen=false;
         long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(12);

@@ -48,6 +48,23 @@ class ServerSetupX64Sql(unittest.TestCase):
             sql.run(self.root, self.root / 'absent', self.root, self.root, '8.0.46')
         selection.assert_not_called(); initialize.assert_not_called()
 
+    def test_enabled_acquisition_requires_explicit_frozen_source_before_output_or_network(self):
+        with patch.object(sql, 'load_selection', return_value={'enabled': True}), \
+                patch.object(sql.remote, 'Github') as api, \
+                self.assertRaisesRegex(ValueError, 'explicit-frozen-mysql-consumer'):
+            sql.acquire(self.root / 'absent')
+        api.assert_not_called(); self.assertFalse((self.root / 'absent').exists())
+
+    def test_current_caller_snapshot_cannot_transfer_historical_runtime_scope(self):
+        inputs = sql.caller_files()
+        snapshot = dict(scope='current-native-x64-sql-caller-source-only', integrationRevision='a'*40,
+            sourceInputs=inputs, sourceSnapshotExact=True, historicalRuntimeQualificationTransferred=False)
+        self.assertEqual(sql.verify_caller(snapshot), snapshot)
+        for changed in (dict(sourceSnapshotExact=False), dict(historicalRuntimeQualificationTransferred=True),
+                dict(sourceInputs={}), dict(integrationRevision='floating')):
+            with self.subTest(changed=changed), self.assertRaisesRegex(ValueError, 'current-caller-source-differs'):
+                sql.verify_caller(dict(snapshot, **changed))
+
     def test_restored_mysql_descriptor_and_archive_are_bound_to_original_measured_selection(self):
         assets = self.root / 'mysql/provider/assets/mysql-probe'; assets.mkdir(parents=True)
         archive = dict(bytes=1234, sha256='a'*64)
@@ -55,7 +72,7 @@ class ServerSetupX64Sql(unittest.TestCase):
         path = assets / 'provider.json'; path.write_bytes(raw)
         selected = dict(files={'provider/assets/mysql-probe/provider.json': sql.selection.files.identity(path),
             'provider/assets/mysql-probe/' + sql.mysql_inputs.retained.builder.ARCHIVE: archive})
-        with patch.object(sql.mysql_inputs, 'load_pin', return_value=selected):
+        with patch.object(sql.frozen_mysql, 'input_selection', return_value=selected):
             self.assertEqual(sql.mysql_descriptor(self.root)['archive'], archive)
             changed = json.loads(raw); changed['archive']['sha256'] = 'b'*64; path.write_bytes(sql.encode(changed))
             with self.assertRaisesRegex(ValueError, 'file-changed'): sql.mysql_descriptor(self.root)

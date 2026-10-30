@@ -22,6 +22,7 @@ if not __package__:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from tools import server_setup_x64_sql_inputs as selection
 from tools import fetch_android_mysql_fixture as mysql_inputs
+from tools import fetch_android_mysql_fixture_frozen as frozen_mysql
 from tools import prepare_server_requalification as remote
 from tools import qualify_server_providers as transfer
 from tools import release_local_server_components as release
@@ -54,11 +55,45 @@ def load_selection():
     return selection.load_pin(require_enabled=True)
 
 
-def acquire(output, api=None):
+def caller_files():
+    names = {path.relative_to(ROOT).as_posix() for path in (ROOT / 'runtime').rglob('*.py')
+        if '__pycache__' not in path.parts}
+    names.update(('tools/qualify_server_setup_x64_sql.py', 'tools/server_setup_x64_sql_inputs.py',
+        'tools/fetch_android_mysql_fixture_frozen.py', 'tools/qualify_playerbots_component.py',
+        'tools/qualify_dbimport.py', 'tools/qualify_base_sql.py', 'config/local-server.json'))
+    require(1 <= len(names) <= 512, 'x64-sql-current-caller-source-bound')
+    return {name: selection.files.identity(ROOT / name) for name in sorted(names)}
+
+
+def verify_caller(snapshot):
+    require(type(snapshot) is dict and snapshot.get('scope') == 'current-native-x64-sql-caller-source-only' and
+        re.fullmatch('[0-9a-f]{40}', snapshot.get('integrationRevision', '')) and
+        snapshot.get('sourceSnapshotExact') is True and snapshot.get('sourceInputs') == caller_files() and
+        snapshot.get('historicalRuntimeQualificationTransferred') is False, 'x64-sql-current-caller-source-differs')
+    return snapshot
+
+
+def caller_snapshot():
+    import subprocess
+    names = caller_files()
+    git = ['git', '-c', 'safe.directory=' + str(ROOT), '-C', str(ROOT)]
+    revision = subprocess.check_output([*git, 'rev-parse', 'HEAD'], text=True).strip()
+    require(re.fullmatch('[0-9a-f]{40}', revision), 'x64-sql-current-caller-revision-required')
+    for name, row in names.items():
+        raw = subprocess.check_output([*git, 'show', revision + ':' + name])
+        require(dict(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest()) == row,
+            'x64-sql-current-caller-must-match-git')
+    return dict(scope='current-native-x64-sql-caller-source-only', integrationRevision=revision,
+        sourceInputs=names, sourceSnapshotExact=True, historicalRuntimeQualificationTransferred=False)
+
+
+def acquire(output, frozen_consumer_source=None, api=None):
     pin = load_selection()
+    require(frozen_consumer_source is not None, 'x64-sql-explicit-frozen-mysql-consumer-required')
     output = Path(os.path.abspath(output)); selection.archives.directory(output.parent, create=True)
     require(not os.path.lexists(output), 'x64-sql-existing-inputs-preserved')
     require(shutil.disk_usage(output.parent).free >= pin['minimumFreeBytes'], 'x64-sql-inputs-require-sixteen-GiB-free')
+    caller = caller_snapshot()
     api = api or remote.Github(os.environ.get('GITHUB_TOKEN'))
     output = fresh(output)
     producer = pin['build']['producer']
@@ -70,7 +105,7 @@ def acquire(output, api=None):
         api.download(remote.API + '/actions/artifacts/' + str(row['id']) + '/zip', output / (name + '.zip'), row)
         selection.pinned(output / (name + '.zip'), row)
     component = selection.restore_component_zip(output / 'complete.zip', output / 'component', pin)
-    mysql = mysql_inputs.acquire(output / 'mysql', api)
+    mysql = frozen_mysql.acquire(frozen_consumer_source, output / 'mysql')
     # Download only the already publicly verified content bundle and its bounded
     # original member inventory. The large ARM64 programs bundle is unnecessary.
     content = pin['serverContent']; public_lock = selection.small(ROOT / content['releaseSelection']['path'])
@@ -88,6 +123,7 @@ def acquire(output, api=None):
     content_proof = provider.verify(output / 'content-provider')
     proof = dict(formatVersion=1, scope='measured-x64-setup-sql-inputs-ready-no-execution',
         selectionIdentity=selection.files.identity(selection.LOCK), component=component, mysql=mysql,
+        currentNativeCaller=verify_caller(caller),
         originalPublicContent=content_proof, contentOriginIsOriginalArm64Packaging=True,
         selectedX64ToolsSqlQualified=False, sqlExecuted=False, **{name: False for name in FALSE_FLAGS})
     release.engine.put_metadata(output / 'preparation.json', proof)
@@ -96,7 +132,7 @@ def acquire(output, api=None):
 
 def mysql_descriptor(inputs):
     """Rebind restored metadata to the exact measured MySQL byte selection."""
-    locked = mysql_inputs.load_pin()
+    locked = frozen_mysql.input_selection()
     path = inputs / 'mysql/provider/assets/mysql-probe/provider.json'
     selection.pinned(path, locked['files']['provider/assets/mysql-probe/provider.json'])
     value = selection.small(path)
@@ -112,6 +148,7 @@ def prepare_image(inputs, output):
     require(proof.get('scope') == 'measured-x64-setup-sql-inputs-ready-no-execution' and
         proof.get('selectionIdentity') == selection.files.identity(selection.LOCK) and proof.get('sqlExecuted') is False,
         'x64-sql-preparation-required')
+    verify_caller(proof.get('currentNativeCaller'))
     provider_root = inputs / 'mysql/provider/assets/mysql-probe'
     descriptor = mysql_descriptor(inputs)
     archive = provider_root / mysql_inputs.retained.builder.ARCHIVE
@@ -244,6 +281,7 @@ def run(inputs, output, mysql, mysqld, version):
     require(prepared.get('scope') == 'measured-x64-setup-sql-inputs-ready-no-execution' and
         prepared.get('selectionIdentity') == selection.files.identity(selection.LOCK) and prepared.get('sqlExecuted') is False,
         'x64-sql-exact-preparation-required')
+    caller = verify_caller(prepared.get('currentNativeCaller'))
     component = inputs / 'component' / pin['build']['componentPrefix']
     admitted = selection.admit_component(component, pin)
     mysql_provider = mysql_descriptor(inputs)
@@ -257,6 +295,7 @@ def run(inputs, output, mysql, mysqld, version):
     evidence = dict(formatVersion=1, scope=SCOPE, phase='verify-inputs', qualificationSucceeded=False,
         inputSelection=selection.files.identity(selection.LOCK), buildProducer=pin['build']['producer'],
         actualX64BuildReceipt=pin['build']['buildReceipt'], actualX64LibrarySourceReadback=pin['build']['librarySourceReadback'],
+        currentNativeCaller=caller,
         originalMysqlArchive=selection.identity(mysql_provider['archive']), mysqlVersion=version,
         contentOriginIsOriginalArm64Packaging=True, originalArm64ReceiptReusedForX64Qualification=False,
         selectedX64ToolsSqlQualified=False, sqlExecuted=False, **{name: False for name in FALSE_FLAGS})
@@ -349,6 +388,7 @@ def run(inputs, output, mysql, mysqld, version):
                     finalFourSchemaProductVerification=True, coreSchemasLedgersCredentialsAccountPreserved=True,
                     databaseSnapshot=pb_before)
             base.stop_owned(capture); capture = None
+            verify_caller(caller)
             evidence.update(cleanShutdownVerified=True, selectedX64ToolsSqlQualified=True,
                 capturedLoaderAndLibraryCompatibilityQualified=True, qualificationSucceeded=True, phase='complete')
         return checks.public_record(evidence)
@@ -368,13 +408,14 @@ def run(inputs, output, mysql, mysqld, version):
 def main():
     parser = argparse.ArgumentParser(description=__doc__); sub = parser.add_subparsers(dest='operation', required=True)
     acquire_parser = sub.add_parser('acquire'); acquire_parser.add_argument('--output', type=Path, required=True)
+    acquire_parser.add_argument('--frozen-consumer-source', type=Path, required=True)
     image = sub.add_parser('image-context')
     for name in ('inputs', 'output'): image.add_argument('--' + name, type=Path, required=True)
     execute = sub.add_parser('run')
     for name in ('inputs', 'output', 'mysql', 'mysqld'): execute.add_argument('--' + name, type=Path, required=True)
     execute.add_argument('--expected-version', required=True)
     args = parser.parse_args()
-    if args.operation == 'acquire': value = acquire(args.output)
+    if args.operation == 'acquire': value = acquire(args.output, args.frozen_consumer_source)
     elif args.operation == 'image-context': value = prepare_image(args.inputs, args.output)
     else: value = run(args.inputs, args.output, args.mysql, args.mysqld, args.expected_version)
     print(json.dumps(value, sort_keys=True, indent=2))

@@ -1,0 +1,141 @@
+{
+  "androidGuestExecuted": false,
+  "command": "python3 -m unittest discover -s tests -q",
+  "errors": 0,
+  "explicitlySkipped": 55,
+  "failures": 0,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "gitHead": "4de3785228fe1e079083c8fb1ae4814671333b0e",
+  "hostArchitecture": "x86_64",
+  "log": {
+    "bytes": 1526,
+    "sha256": "bf368610c29f5c25ced3e6fffa7e75f5675d94ef2076f08fbe19e47eaa28b1f2"
+  },
+  "modifiedSourceFiles": {
+    ".github/workflows/android-handoff-recovery.yml": {
+      "bytes": 8312,
+      "sha256": "659d6f27c62db864598ff1a1fadb42825e828ec0d44c9273a418aab9cc350a70"
+    },
+    ".github/workflows/android-mysql-inputs.yml": {
+      "bytes": 3400,
+      "sha256": "40606b74b3ba43480d5c15b877e7f9e71686ac066a10614b4e38cf2fc536a16f"
+    },
+    ".github/workflows/java-server-installation-native.yml": {
+      "bytes": 11248,
+      "sha256": "6a52231a9c811c9036485b86a49e165eb5479e61ab30dcf5a9846bf87b4d8200"
+    },
+    ".github/workflows/server-setup-x64-sql.yml": {
+      "bytes": 5738,
+      "sha256": "9eb993567b83ca5f821d89441bf8fb28909d89b1df1c9814d302e599f50743ff"
+    },
+    "app/build.gradle": {
+      "bytes": 11469,
+      "sha256": "9838cf277575dcc4c06843155b74a0f872c199d1edfe6347b1ac66089aa86360"
+    },
+    "app/handoff-probe.gradle": {
+      "bytes": 5208,
+      "sha256": "0888888c09c6eb7b5d302e81edaee3e4ceba00909a0b1cb2f0efdb1142ba3115"
+    },
+    "app/server-installation-probe.gradle": {
+      "bytes": 4632,
+      "sha256": "3973052bc781d4653435e1d4cd60fd825a8ca285a6ee84272f59c20d001fd1a1"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/core/runtime/install/LocalHandoffRecoveryInstrumentedTest.java": {
+      "bytes": 11635,
+      "sha256": "e507497b4d463105a48ec9f3e2ec5c1804c6250fa837990dc35df1ebb750fceb"
+    },
+    "app/src/handoffProbe/java/io/github/russianranger/esteria/core/runtime/install/HandoffProbeService.java": {
+      "bytes": 11294,
+      "sha256": "0d5017a41e10bb930b1d2ec9f9cb303a01eb0e106e478e458f116652948991bd"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ProotProcess.java": {
+      "bytes": 17351,
+      "sha256": "02141e0e5e56c2edfc99709b76dd9668e426106167a47f5c6f87f7b038850512"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseService.java": {
+      "bytes": 17621,
+      "sha256": "5bf448b120222b58734c08197308133aa8706fa973326810984b366a07b32e08"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseSetup.java": {
+      "bytes": 18724,
+      "sha256": "90ffa8c5e06537e833a8c918e8e58e385cbbe655b43f8de8b3fd8bc3f8076fcc"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerInstallationSetup.java": {
+      "bytes": 45822,
+      "sha256": "f004e28f8ab986f62c0efa0e2383aaa061cff821b17acf8887504bff7e0232e5"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/runtime/ServerInstallationOwnerTests.java": {
+      "bytes": 18579,
+      "sha256": "be1a8e4af113238dc6a2b09d450f585dc442a9b0dc052558c40903f4bd94ec50"
+    },
+    "runtime/android_server_installation_setup.py": {
+      "bytes": 41474,
+      "sha256": "fe45968a0c3a32d559de27f591b5e968139e2f4ab5f04b4fc57e4bc98a330df6"
+    },
+    "tests/native-java-installation/src/android/content/Context.java": {
+      "bytes": 707,
+      "sha256": "6084dec8efeeef0633df75007f17a4faff109636469de190649106290012eee0"
+    },
+    "tests/native-java-installation/src/android/content/pm/ApplicationInfo.java": {
+      "bytes": 268,
+      "sha256": "b42fd2379346bc431245da4c591fff1aef0b20498004e6324019b94e454d86ac"
+    },
+    "tests/test_android_handoff.py": {
+      "bytes": 14712,
+      "sha256": "742306c8cbe80e7a7d3039d56169ee824aff124ec3293cb6b5ab823ccba07eef"
+    },
+    "tests/test_android_installation_x64_inputs.py": {
+      "bytes": 18273,
+      "sha256": "1623ecfa8161c68b54032c8b1d2394085c79781680938566f17ad5fa22e56a1e"
+    },
+    "tests/test_android_mysql_fixture_frozen.py": {
+      "bytes": 6247,
+      "sha256": "f2c291ee638e3aa4ae90d4fc48818329cda9d53a2ef100fa29b5ae00c9604575"
+    },
+    "tests/test_android_mysql_fixture_inputs.py": {
+      "bytes": 9333,
+      "sha256": "a701e4d4d060201ab60905139876a9a9ecc431f9c9b992aac1319ef1286f0d5f"
+    },
+    "tests/test_android_server_installation_setup.py": {
+      "bytes": 34294,
+      "sha256": "419bdb5de94e3e76e3c1edd953ed6218f04a5214f0efa099f4893276d71661b7"
+    },
+    "tests/test_server_setup_x64_sql.py": {
+      "bytes": 11124,
+      "sha256": "93b979200e6c01c86045d20642aec69416a1255f8b7fb882ad4cdcdfa3b187c8"
+    },
+    "tools/android_installation_x64_inputs.py": {
+      "bytes": 15382,
+      "sha256": "ae97b155627ef591f3dde25c74c1e032ed6726c3db5ec046a1a861a52d488245"
+    },
+    "tools/fetch_android_mysql_fixture_frozen.py": {
+      "bytes": 16538,
+      "sha256": "ff76580150c93b3131851518e743bc0b1e5f720c3e9b54e2df0bec4159d0d506"
+    },
+    "tools/qualify_android_handoff.py": {
+      "bytes": 24941,
+      "sha256": "9f90c3297691396176b2a32bcb5ffa6912e0682de51cbd6d3224b7249d4d5084"
+    },
+    "tools/qualify_java_server_installation.py": {
+      "bytes": 15020,
+      "sha256": "0667a620e5f84f270a769b5835da3c14d58c7e83cd06b342cd8c0fc765aeb08e"
+    },
+    "tools/qualify_server_setup_x64_sql.py": {
+      "bytes": 28513,
+      "sha256": "018b56d9709ca78ff66b40ad2bfd52a15c67937c744c488ae4211da6e3f2809b"
+    },
+    "tools/server_setup_x64_sql_inputs.py": {
+      "bytes": 24177,
+      "sha256": "b338374ec14d09427b7158a1f1502811ed6a161bd84f914a854a8c49632d3841"
+    }
+  },
+  "nativeArmSqlExecuted": false,
+  "passed": 1289,
+  "pythonVersion": "3.12.14",
+  "scope": "host-python-modified-typed-installation-frozen-consumer-and-handoff-regression-only",
+  "seconds": 40.188,
+  "sourceSnapshotExact": false,
+  "testsRun": 1344,
+  "worldQualified": false
+}

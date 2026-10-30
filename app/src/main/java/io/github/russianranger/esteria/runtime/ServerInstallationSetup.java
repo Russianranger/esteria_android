@@ -48,28 +48,83 @@ public final class ServerInstallationSetup {
             configurationGeneration=report.getString("configGeneration");privateProcessLogs=logs;reportJson=report.toString();
         }
     }
+    /** Internal source-admitted inputs. Ordinary entry points always construct
+     * ProductionInputs. The separate debug fixture must admit its exact actual
+     * build/source/SQL receipts before it can implement this contract; no Intent
+     * or caller-authored completion flag is accepted by the coordinator. */
+    interface InstalledInputs {
+        ServerDatabaseService.InstallationRuntime runtime();
+        void requireCurrentSelection()throws IOException;
+        Path programsDirectory()throws IOException;
+        RuntimePackagePlan programsPlan();
+        String programsArchiveSha256();
+        Path contentDirectory()throws IOException;
+        Path contentReceiptPath()throws IOException;
+        String contentReceiptSha256();
+        String sourceLockSha256();
+        JSONObject serverSource()throws IOException;
+        JSONObject compiledModulesIdentity()throws IOException;
+        JSONObject measuredPlayerbotsSelection()throws IOException;
+        default HelperSelection helpers()throws IOException{return new HelperSelection("server-installation",HELPERS,"android_server_installation_setup.py");}
+    }
+    static final class HelperSelection {
+        final String prefix,entry;final Set<String> files;
+        HelperSelection(String prefix,Set<String> files,String entry)throws IOException {
+            if(prefix==null||!prefix.matches("[a-z-]+")||files==null||files.isEmpty()||files.size()>32||
+                    entry==null||!entry.matches("[a-z][a-z0-9_]*\\.py")||!files.contains(entry)||!files.contains("local-server.json"))
+                throw new IOException("Fixed source-owned installation helper selection required");
+            this.prefix=prefix;this.files=Set.copyOf(files);this.entry=entry;
+        }
+    }
+    private static final class ProductionInputs implements InstalledInputs {
+        private final ServerRuntimeSetup runtime;
+        private final ServerProgramsSetup programs;
+        private final ServerContentSetup content;
+        private final ServerDatabaseService.InstallationRuntime installedRuntime;
+        ProductionInputs(Context context,ServerRuntimeSetup runtime,ServerProgramsSetup programs,ServerContentSetup content) {
+            this.runtime=runtime;this.programs=programs;this.content=content;
+            installedRuntime=ServerDatabaseService.installedRuntime(context,runtime);
+        }
+        public ServerDatabaseService.InstallationRuntime runtime(){return installedRuntime;}
+        public void requireCurrentSelection()throws IOException {
+            if(runtime==null||programs==null||content==null||runtime.current()==null||programs.current()==null||content.current()==null)
+                throw new IOException("Sealed immutable server dependencies, programs and content are required");
+            programs.requireServerRuntimeArchive(runtime.packagePlan().archiveSha256);content.requireServerRuntimeArchive(runtime.packagePlan().archiveSha256);
+            if(!programs.sourceLockSha256().equals(content.sourceLockSha256())||
+                    !same(pin(programs.packagePlan(),"provenance/server-modules.json"),content.compiledModulesIdentity()))
+                throw new IOException("Programs and content source/module selections differ");
+        }
+        public Path programsDirectory()throws IOException{return programs.current();}
+        public RuntimePackagePlan programsPlan(){return programs.packagePlan();}
+        public String programsArchiveSha256(){return programs.archiveSha256();}
+        public Path contentDirectory()throws IOException{return content.current();}
+        public Path contentReceiptPath()throws IOException{return content.receiptPath();}
+        public String contentReceiptSha256(){return content.receiptSha256();}
+        public String sourceLockSha256(){return content.sourceLockSha256();}
+        public JSONObject serverSource()throws IOException{return content.serverSource();}
+        public JSONObject compiledModulesIdentity()throws IOException{return content.compiledModulesIdentity();}
+        public JSONObject measuredPlayerbotsSelection()throws IOException{return playerbotsSelection(programs);}
+    }
     /** Opens ownership before any native work, so callers retain this handle
      * across prepare failures. requiredFreeBytes is the caller's setup reserve;
      * serverData is its separate canonical imported-data directory (not qualified here). */
     public static Handle beginFresh(Context context,Path root,ServerRuntimeSetup runtime,ServerProgramsSetup programs,
             ServerContentSetup content,Path serverData,long requiredFreeBytes) throws IOException {
+        return beginInstalled(context,root,new ProductionInputs(context,runtime,programs,content),serverData,requiredFreeBytes);
+    }
+    static Handle beginInstalled(Context context,Path root,InstalledInputs inputs,Path serverData,long requiredFreeBytes)throws IOException {
         if(!root.equals(context.getFilesDir().getCanonicalFile().toPath()))throw new IOException("Private canonical application storage required");
-        if(runtime.current()==null || programs.current()==null || content.current()==null)
-            throw new IOException("Prepare the sealed server dependencies, programs and content first");
+        if(inputs==null)throw new IOException("Admitted installation inputs are required");
+        inputs.requireCurrentSelection();ServerDatabaseService.InstallationRuntime runtime=inputs.runtime();
         if(!serverData.equals(serverData.toRealPath()) || !serverData.startsWith(root) || serverData.equals(root) ||
                 !Files.isDirectory(serverData,LinkOption.NOFOLLOW_LINKS))throw new IOException("Separate private canonical server data required");
-        for(Path installed:Arrays.asList(runtime.current(),programs.current(),content.current(),root.resolve("db"),
+        for(Path installed:Arrays.asList(runtime.current(),inputs.programsDirectory(),inputs.contentDirectory(),root.resolve("db"),
                 root.resolve("state"),root.resolve("runtimes"),root.resolve("runtime-embedded-cache")))
             if(serverData.startsWith(installed) || installed.startsWith(serverData))
                 throw new IOException("Imported server data must be separate from runtime and database workspaces");
-        programs.requireServerRuntimeArchive(runtime.packagePlan().archiveSha256);
-        content.requireServerRuntimeArchive(runtime.packagePlan().archiveSha256);
-        if(!programs.sourceLockSha256().equals(content.sourceLockSha256()) ||
-                !same(pin(programs.packagePlan(),"provenance/server-modules.json"),content.compiledModulesIdentity()))
-            throw new IOException("Programs and content use different server source/module selections");
-        FreshServerInstallations.Selection selected=selection(runtime,programs,content);
+        FreshServerInstallations.Selection selected=selection(inputs);
         FreshServerInstallations.Attempt attempt=new FreshServerInstallations(root).begin(selected,requiredFreeBytes);
-        try {return new Handle(context.getApplicationContext(),root,runtime,programs,content,serverData,attempt,attempt.retainWorkspace());}
+        try {return new Handle(context.getApplicationContext(),root,inputs,serverData,attempt,attempt.retainWorkspace());}
         catch(IOException|RuntimeException error){attempt.close();throw error;}
     }
     /** Resolves only a proof-bound promoted database. It does not start a service,
@@ -85,9 +140,12 @@ public final class ServerInstallationSetup {
      * replacement database. Checks the measured helper before allocating SQL. */
     public static FreshServerInstallations.Active completedOrNull(Context context,Path root,ServerRuntimeSetup runtime,
             ServerProgramsSetup programs,ServerContentSetup content) throws IOException {
+        return completedInstalledOrNull(context,root,new ProductionInputs(context,runtime,programs,content));
+    }
+    static FreshServerInstallations.Active completedInstalledOrNull(Context context,Path root,InstalledInputs inputs)throws IOException {
         if(!root.equals(context.getFilesDir().getCanonicalFile().toPath()))throw new IOException("Private canonical application storage required");
-        JSONObject helper=playerbotsSelection(programs);
-        FreshServerInstallations.Active active=new FreshServerInstallations(root).active(selection(runtime,programs,content));
+        JSONObject helper=inputs.measuredPlayerbotsSelection();
+        FreshServerInstallations.Active active=new FreshServerInstallations(root).active(selection(inputs));
         if(active==null) {
             if(Files.exists(root.resolve("state/server-work"),LinkOption.NOFOLLOW_LINKS))
                 throw new IOException("Legacy server state is retained; explicit migration is required before local world setup");
@@ -98,12 +156,12 @@ public final class ServerInstallationSetup {
             byte[] raw=read(work.resolve("state/server-setup-complete.json"),128<<10);
             if(!hash(raw).equals(active.setupReceiptSha256))throw new IOException("Promoted setup receipt differs from its proof");
             JSONObject report=new JSONObject(new String(raw,StandardCharsets.UTF_8));
-            validateComplete(report,helper,active.mysqlUuid,runtime.expectedMysqlVersion());
+            validateComplete(report,helper,active.mysqlUuid,inputs.runtime().expectedMysqlVersion());
             requireRecordedFile(work.resolve("state/server-installation-verified.json"),report.getJSONObject("fourSchemaReceipt"));
-            if(!content.sourceLockSha256().equals(report.getString("sourceLockSha256")) ||
-                    !same(content.compiledModulesIdentity(),report.getJSONObject("compiledModules")) ||
-                    !content.receiptSha256().equals(report.getJSONObject("contentReceipt").getString("sha256")) ||
-                    !same(pin(programs.packagePlan(),"provenance/server-build.json"),report.getJSONObject("originalBuild")))
+            if(!inputs.sourceLockSha256().equals(report.getString("sourceLockSha256")) ||
+                    !same(inputs.compiledModulesIdentity(),report.getJSONObject("compiledModules")) ||
+                    !inputs.contentReceiptSha256().equals(report.getJSONObject("contentReceipt").getString("sha256")) ||
+                    !same(pin(inputs.programsPlan(),"provenance/server-build.json"),report.getJSONObject("originalBuild")))
                 throw new IOException("Promoted setup source/content selection differs");
             String operation=report.getString("serviceOperationId");
             Path stopped=work.resolve("mysql-sessions").resolve(operation).resolve("stopped.json");
@@ -118,24 +176,17 @@ public final class ServerInstallationSetup {
             return active;
         } catch(JSONException error){throw new IOException("Invalid promoted installation receipt",error);}
     }
-    private static FreshServerInstallations.Selection selection(ServerRuntimeSetup runtime,ServerProgramsSetup programs,
-            ServerContentSetup content) throws IOException {
-        if(runtime==null || programs==null || content==null || runtime.current()==null || programs.current()==null || content.current()==null)
-            throw new IOException("Sealed immutable server dependencies, programs and content are required");
-        programs.requireServerRuntimeArchive(runtime.packagePlan().archiveSha256);content.requireServerRuntimeArchive(runtime.packagePlan().archiveSha256);
-        if(!programs.sourceLockSha256().equals(content.sourceLockSha256()) ||
-                !same(pin(programs.packagePlan(),"provenance/server-modules.json"),content.compiledModulesIdentity()))
-            throw new IOException("Programs and content source/module selections differ");
-        return new FreshServerInstallations.Selection(Map.of("sourceLock",content.sourceLockSha256(),
-            "runtimeArchive",runtime.packagePlan().archiveSha256,"programsArchive",programs.archiveSha256(),
-            "contentReceipt",content.receiptSha256(),"compiledModules",sha(content.compiledModulesIdentity())));
+    private static FreshServerInstallations.Selection selection(InstalledInputs inputs) throws IOException {
+        inputs.requireCurrentSelection();
+        return new FreshServerInstallations.Selection(Map.of("sourceLock",inputs.sourceLockSha256(),
+            "runtimeArchive",inputs.runtime().archiveSha256(),"programsArchive",inputs.programsArchiveSha256(),
+            "contentReceipt",inputs.contentReceiptSha256(),"compiledModules",sha(inputs.compiledModulesIdentity())));
     }
     public static final class Handle implements AutoCloseable {
         private final Context context;
         private final Path root,data;
-        private final ServerRuntimeSetup runtime;
-        private final ServerProgramsSetup programs;
-        private final ServerContentSetup content;
+        private final ServerDatabaseService.InstallationRuntime runtime;
+        private final InstalledInputs inputs;
         private final FreshServerInstallations.Attempt attempt;
         private final FreshServerInstallations.Workspace workspace;
         private final ServiceOperationGuard operations=new ServiceOperationGuard();
@@ -149,7 +200,11 @@ public final class ServerInstallationSetup {
         private boolean promotionAttempted;
         private Handle(Context context,Path root,ServerRuntimeSetup runtime,ServerProgramsSetup programs,ServerContentSetup content,
                 Path data,FreshServerInstallations.Attempt attempt,FreshServerInstallations.Workspace workspace) {
-            this.context=context;this.root=root;this.runtime=runtime;this.programs=programs;this.content=content;
+            this(context,root,new ProductionInputs(context,runtime,programs,content),data,attempt,workspace);
+        }
+        private Handle(Context context,Path root,InstalledInputs inputs,Path data,FreshServerInstallations.Attempt attempt,
+                FreshServerInstallations.Workspace workspace) {
+            this.context=context;this.root=root;this.inputs=inputs;this.runtime=inputs.runtime();
             this.data=data;this.attempt=attempt;this.workspace=workspace;
         }
         public State state(){return state;}
@@ -165,20 +220,21 @@ public final class ServerInstallationSetup {
                 RuntimeWork.Cancellation cancelled=()->operations.isStopRequested() || (cancellation!=null && cancellation.isCancelled());
                 try {
                     check(cancelled);
+                    inputs.requireCurrentSelection();
                     setupProcessWorkspace=attempt.retainWorkspace();
                     ServerDatabaseSetup.Result bootstrap;
-                    try {bootstrap=ServerDatabaseSetup.prepareFresh(context,root,runtime,workspace,progress,cancelled,
+                    try {bootstrap=ServerDatabaseSetup.prepareFreshInstalled(context,root,runtime,workspace,progress,cancelled,
                             lease->{bootstrapLease=lease;});}
                     finally {releaseStoppedSetupProcess();}
                     if(bootstrap.cancellationRequested)throw new RuntimeWork.CancelledException();
                     check(cancelled);
-                    database=ServerDatabaseService.startFresh(context,root,runtime,attempt);
+                    database=ServerDatabaseService.startFreshInstalled(context,root,runtime,attempt);
                     try {ServerDatabaseService.awaitReady(database,System.nanoTime()+TimeUnit.MINUTES.toNanos(3),cancelled);}
                     catch(java.util.concurrent.CancellationException error){throw new RuntimeWork.CancelledException();}
                     catch(InterruptedException error){Thread.currentThread().interrupt();throw new IOException("Database readiness interrupted; owner retained",error);}
                     check(cancelled);
                     result=database.withReadyLease(runtime.current(),(serviceOperation,version,uuid)->
-                        runGuest(this,context,root,runtime,programs,content,data,database,serviceOperation,version,uuid,progress,cancelled,false));
+                        runGuest(this,context,root,inputs,data,database,serviceOperation,version,uuid,progress,cancelled,false));
                     state=State.STAGED_PENDING_PLAYERBOTS;return result;
                 } catch(IOException|RuntimeException error){state=State.FAILED;throw error;}
             });
@@ -190,13 +246,13 @@ public final class ServerInstallationSetup {
                 if(state!=State.STAGED_PENDING_PLAYERBOTS || database==null || !database.isAlive())
                     throw new IOException("A staged owned live database is required before playerbots setup");
                 // Current three-program providers refuse here, before SQL or a new process.
-                playerbotsSelection(programs);selection(runtime,programs,content);
+                inputs.measuredPlayerbotsSelection();selection(inputs);
                 state=State.VERIFYING_PLAYERBOTS;
                 RuntimeWork.Cancellation cancelled=()->operations.isStopRequested() || (cancellation!=null && cancellation.isCancelled());
                 try {
                     check(cancelled);
                     result=database.withReadyLease(runtime.current(),(serviceOperation,version,uuid)->
-                        runGuest(this,context,root,runtime,programs,content,data,database,serviceOperation,version,uuid,progress,cancelled,true));
+                        runGuest(this,context,root,inputs,data,database,serviceOperation,version,uuid,progress,cancelled,true));
                     state=State.SCHEMAS_VERIFIED;return result;
                 } catch(IOException|RuntimeException error){state=State.FAILED;throw error;}
             });
@@ -209,13 +265,13 @@ public final class ServerInstallationSetup {
             return operations.run(()->{
                 if(state!=State.SCHEMAS_VERIFIED || result==null || database==null)
                     throw new IOException("Live four-schema verification is required before clean-stop promotion");
-                JSONObject helper=playerbotsSelection(programs);
-                selection(runtime,programs,content);
+                JSONObject helper=inputs.measuredPlayerbotsSelection();
+                selection(inputs);
                 try {
                     // Refresh live four-schema checks immediately before shutdown.
                     // Completed finish reentry cannot replay its updater or loader.
                     result=database.withReadyLease(runtime.current(),(serviceOperation,version,uuid)->
-                        runGuest(this,context,root,runtime,programs,content,data,database,serviceOperation,version,uuid,null,
+                        runGuest(this,context,root,inputs,data,database,serviceOperation,version,uuid,null,
                             ()->operations.isStopRequested(),true));
                     JSONObject verified=new JSONObject(result.reportJson);
                     String operation=verified.getString("serviceOperationId"),version=verified.getString("mysqlVersion"),uuid=verified.getString("mysqlUuid");
@@ -292,36 +348,37 @@ public final class ServerInstallationSetup {
             }
         }
     }
-    private static Result runGuest(Handle owner,Context context,Path root,ServerRuntimeSetup runtime,ServerProgramsSetup programs,
-            ServerContentSetup content,Path data,ServerDatabaseService.Handle service,String serviceOperation,String version,String uuid,
+    private static Result runGuest(Handle owner,Context context,Path root,InstalledInputs inputs,
+            Path data,ServerDatabaseService.Handle service,String serviceOperation,String version,String uuid,
             RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled,boolean playerbots) throws IOException {
         check(cancelled);Path work=service.privateWorkDirectory();
-        String generation=GuestHelperAssets.install(context,"server-installation",GuestHelperAssets.directory(work,"installation-helpers"),HELPERS);
+        inputs.requireCurrentSelection();HelperSelection helpers=inputs.helpers();
+        String generation=GuestHelperAssets.install(context,helpers.prefix,GuestHelperAssets.directory(work,"installation-helpers"),helpers.files);
         String operation=UUID.randomUUID().toString().replace("-","");
         Path operationFiles=GuestHelperAssets.directory(work,"installation-operations").resolve(operation);createPrivate(operationFiles);
         Path processSession=GuestHelperAssets.directory(root,"state/server-installation-processes").resolve(operation);createPrivate(processSession);
         owner.diagnosticLogs=Map.of("setup.installation.stdout.log",processSession.resolve("logs/stdout.log"),
             "setup.installation.stderr.log",processSession.resolve("logs/stderr.log"));
         try {
-            byte[] receipt=read(content.receiptPath(),16<<20);
-            if(!hash(receipt).equals(content.receiptSha256()))throw new IOException("Server content receipt changed");
+            byte[] receipt=read(inputs.contentReceiptPath(),16<<20);
+            if(!hash(receipt).equals(inputs.contentReceiptSha256()))throw new IOException("Server content receipt changed");
             write(operationFiles.resolve("content-receipt.json"),receipt);
-            byte[] profile=asset(context,"server-installation/local-server.json",65536);
+            byte[] profile=asset(context,helpers.prefix+"/local-server.json",65536);
             JSONObject selected=new JSONObject().put("formatVersion",1).put("scope","android-owned-server-installation-selection")
-                .put("source",content.serverSource()).put("sourceLockSha256",content.sourceLockSha256())
-                .put("contentReceipt",identity(receipt)).put("compiledModules",content.compiledModulesIdentity())
-                .put("program",pin(programs.packagePlan(),"bin/dbimport")).put("template",pin(programs.packagePlan(),"etc/dbimport.conf.dist"))
-                .put("originalBuild",pin(programs.packagePlan(),"provenance/server-build.json")).put("profile",identity(profile));
-            if(playerbots)selected.put("playerbotsHelper",playerbotsSelection(programs));
+                .put("source",inputs.serverSource()).put("sourceLockSha256",inputs.sourceLockSha256())
+                .put("contentReceipt",identity(receipt)).put("compiledModules",inputs.compiledModulesIdentity())
+                .put("program",pin(inputs.programsPlan(),"bin/dbimport")).put("template",pin(inputs.programsPlan(),"etc/dbimport.conf.dist"))
+                .put("originalBuild",pin(inputs.programsPlan(),"provenance/server-build.json")).put("profile",identity(profile));
+            if(playerbots)selected.put("playerbotsHelper",inputs.measuredPlayerbotsSelection());
             write(operationFiles.resolve("selection.json"),(selected.toString()+"\n").getBytes(StandardCharsets.UTF_8));check(cancelled);
             owner.setupProcessWorkspace=owner.attempt.retainWorkspace();
             OwnedProcess process;
-            try {process=ProotProcess.start(context,runtime.installer(),runtime.packagePlan(),work,processSession,
-                Arrays.asList("/usr/bin/python3","-B","-s","-E","/work/installation-helpers/"+generation+"/android_server_installation_setup.py",
+            try {process=inputs.runtime().launch(work,processSession,
+                Arrays.asList("/usr/bin/python3","-B","-s","-E","/work/installation-helpers/"+generation+"/"+helpers.entry,
                     "--expected-version",version,"--operation-id",operation,"--service-operation-id",serviceOperation,"--instance-uuid",uuid,
                     "--phase",playerbots?"playerbots":"core"),
-                Collections.emptyMap(),Arrays.asList(new ProotLaunch.Mount(content.current(),ServerContentSetup.guestMount()),
-                    new ProotLaunch.Mount(programs.current(),ServerProgramsSetup.guestMount()),new ProotLaunch.Mount(data,"/esteria-data")),null);
+                Arrays.asList(new ProotLaunch.Mount(inputs.contentDirectory(),ServerContentSetup.guestMount()),
+                    new ProotLaunch.Mount(inputs.programsDirectory(),ServerProgramsSetup.guestMount()),new ProotLaunch.Mount(data,"/esteria-data")));
                 owner.setupProcess=process;
             } catch(IOException|RuntimeException error){owner.releaseStoppedSetupProcess();throw error;}
             boolean cancelSeen=false;String lastProgress="";long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(90);

@@ -59,6 +59,12 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
+      - name: Check out only the exact original x64 MySQL consumer recipe
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: 817cbc229f4dcc24beb169ecc72838fab4d1df32
+          path: frozen-mysql-consumer
+          persist-credentials: false
       - name: Read every pinned x64 runtime tool source debug and public SQL input
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -66,6 +72,7 @@ jobs:
           test "$(uname -m)" = x86_64
           mkdir -p out/x64-native-sql-evidence out/x64-native-sql-work
           python3 tools/qualify_server_setup_x64_sql.py acquire --output out/x64-native-sql-inputs \
+            --frozen-consumer-source "$GITHUB_WORKSPACE/frozen-mysql-consumer" \
             > out/x64-native-sql-acquisition-private.log 2>&1
           python3 tools/qualify_server_setup_x64_sql.py image-context \
             --inputs out/x64-native-sql-inputs --output out/x64-native-sql-image \

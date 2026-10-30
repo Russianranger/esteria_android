@@ -1,0 +1,64 @@
+// No fixture class, service or asset enters an ordinary ARM64 application.
+def handoffProbe = providers.gradleProperty('handoffEmulatorTest').getOrElse('false').toBoolean()
+android.defaultConfig.buildConfigField 'boolean', 'HANDOFF_EMULATOR_TEST', handoffProbe ? 'true' : 'false'
+if (handoffProbe) {
+    def providersForbidden = ['prootProviderDir', 'prootProbeProviderDir', 'mysqlProbeProviderDir', 'wineProbeProviderDir',
+        'serverRuntimeProviderDir', 'clientRuntimeProviderDir', 'guestBridgeProviderDir', 'shaderToolsProviderDir',
+        'turnipProviderDir', 'serverProgramsProviderDir', 'serverExtractorsProviderDir', 'serverContentProviderDir', 'serverDataToolsProviderDir']
+    if (providers.gradleProperty('nativeBridgeAbi').getOrElse('arm64-v8a') != 'x86_64' ||
+        providers.gradleProperty('nativeRuntimeBridge').getOrElse('false').toBoolean() ||
+        providers.gradleProperty('presentationEmulatorTest').getOrElse('false').toBoolean() ||
+        providersForbidden.any { providers.gradleProperty(it).isPresent() })
+        throw new GradleException('Handoff qualification requires an explicit x64 debug-only profile without native/guest/runtime providers')
+    androidComponents.beforeVariants(androidComponents.selector().withBuildType('release')) { variant -> variant.enable = false }
+    android.sourceSets.debug.java.srcDir('src/handoffProbe/java')
+    android.sourceSets.debug.manifest.srcFile('src/handoffProbe/AndroidManifest.xml')
+    def handoffInputs = ['app/build.gradle', 'app/handoff-probe.gradle', 'app/src/handoffProbe/AndroidManifest.xml',
+        'app/src/handoffProbe/java/io/github/russianranger/esteria/core/runtime/install/HandoffProbeService.java',
+        'app/src/androidTest/java/io/github/russianranger/esteria/core/runtime/install/LocalHandoffRecoveryInstrumentedTest.java',
+        'core/src/main/java/io/github/russianranger/esteria/core/runtime/install/LocalAccountHandoff.java',
+        'core/src/main/java/io/github/russianranger/esteria/core/runtime/install/LocalHandoffRecovery.java',
+        'core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ClientLaunchView.java',
+        'core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeFiles.java',
+        'core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeWork.java', 'sources.lock.json',
+        'tools/qualify_android_handoff.py', 'tests/test_android_handoff.py', '.github/workflows/android-handoff-recovery.yml']
+    def revision = providers.gradleProperty('sourceRevision').getOrElse('local-uncommitted')
+    def generated = layout.buildDirectory.dir('generated/handoffProbeEvidence')
+    def evidence = tasks.register('generateHandoffProbeEvidence') {
+        inputs.files(handoffInputs.collect { rootProject.file(it) })
+        inputs.property('sourceRevision', revision)
+        outputs.dir(generated)
+        doLast {
+            def hash = { byte[] bytes -> java.security.MessageDigest.getInstance('SHA-256').digest(bytes).encodeHex().toString() }
+            def sourceInputs = [:]
+            handoffInputs.each { name ->
+                def source = rootProject.file(name)
+                if (!source.isFile() || source.length() <= 0 || source.length() > 512 * 1024)
+                    throw new GradleException('Missing or oversized handoff fixture source input: ' + name)
+                byte[] bytes = source.bytes
+                sourceInputs[name] = [bytes: bytes.length, sha256: hash(bytes)]
+            }
+            def git = { List<String> words ->
+                def output = new ByteArrayOutputStream(), error = new ByteArrayOutputStream()
+                def result = rootProject.exec { workingDir rootProject.projectDir; commandLine(['git'] + words)
+                    standardOutput output; errorOutput error; ignoreExitValue true }
+                return result.exitValue == 0 ? output.toByteArray() : null
+            }
+            byte[] head = git(['rev-parse', 'HEAD'])
+            byte[] status = git(['status', '--porcelain', '--untracked-files=normal'])
+            boolean exact = (revision ==~ /[0-9a-f]{40}/) && head != null && new String(head, 'US-ASCII').trim() == revision && status != null && status.length == 0
+            if (exact) handoffInputs.each { name ->
+                byte[] canonical = git(['show', revision + ':' + name])
+                if (canonical == null || canonical.length != sourceInputs[name].bytes || hash(canonical) != sourceInputs[name].sha256) exact = false
+            }
+            def target = new File(generated.get().asFile, 'handoff-probe/build-evidence.json')
+            target.parentFile.mkdirs()
+            target.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson([formatVersion: 1,
+                scope: 'android-x64-handoff-fixture-build-only', sourceRevision: revision,
+                sourceSnapshotExact: exact, sourceInputs: sourceInputs, productionRuntimeQualified: false,
+                androidExecutionQualified: false, arm64Qualified: false, gameplayQualified: false])) + '\n'
+        }
+    }
+    android.sourceSets.debug.assets.srcDir(generated)
+    tasks.named('preBuild').configure { dependsOn evidence }
+}

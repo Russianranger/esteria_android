@@ -19,6 +19,7 @@ import zlib
 if not __package__:sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from tools import build_server_setup_x64_probe as builder
 from tools import fetch_android_mysql_fixture as mysql
+from tools import fetch_android_mysql_fixture_frozen as frozen_mysql
 from tools import fetch_local_server_profile as public
 from tools import provider_client_runtime as zips
 from tools import prepare_runtime as archives, verify_server_build as files
@@ -101,7 +102,9 @@ def load_pin(*,require_enabled=False):
     validate_source_readback(actual.get('actualLibrarySourceReadback'),pin)
     selected=pin['mysql'];require(type(selected) is dict and set(selected)=={'selection','fullReadbackEvidence'},
         'x64-sql-input-mysql-selection-schema')
-    record(selected['selection'],'runtime/mysql-probe/qualified-inputs.lock.json');mysql_pin=mysql.load_pin()
+    # Keep old runtime/source evidence separate from later Java adapters. Host
+    # acquisition explicitly verifies and executes only the frozen817 recipe.
+    record(selected['selection'],'runtime/mysql-probe/qualified-inputs.lock.json');mysql_pin=frozen_mysql.input_selection()
     wrapper=record(selected['fullReadbackEvidence'])
     require(wrapper.get('scope')=='actual-ci-retained-android-x64-mysql-input-source-consumer-and-small-local-readback' and
         wrapper.get('consumer',{}).get('workflowRun')==41119182469 and

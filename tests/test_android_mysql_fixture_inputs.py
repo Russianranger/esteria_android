@@ -34,8 +34,16 @@ class AndroidMysqlFixtureInputs(unittest.TestCase):
             for member, raw in payload.items(): archive.writestr(member, raw)
         return path
 
-    def test_actual_selection_has_positive_android_evidence_and_exact_nine_inputs(self):
-        pin = fixture.load_pin()
+    def test_original_selection_remains_exact_when_current_recipe_changes(self):
+        from tools import fetch_android_mysql_fixture_frozen as frozen
+        pin = frozen.input_selection()
+        expected = {name: fixture.files.identity(fixture.ROOT / name) for name in fixture.retained.builder.INPUTS}
+        if expected == pin['providerSourceInputs']:
+            self.assertEqual(fixture.load_pin(), pin)
+        else:
+            # The default consumer must keep refusing a new adapter as the old
+            # producer. Explicit frozen-recipe reuse has a separate source gate.
+            with self.assertRaisesRegex(ValueError, 'current-provider-recipe-differs'): fixture.load_pin()
         self.assertEqual(len(pin['files']), 9)
         self.assertEqual(pin['producer']['workflowRun'], 41109642918)
         self.assertEqual(pin['artifacts']['completeSources']['id'], 13006281602)

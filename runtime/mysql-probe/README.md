@@ -270,3 +270,22 @@ That final emulator gate must execute actual bootstrap, four-schema setup,
 clean-stop promotion, active-save reseeding refusal and same-instance restart;
 compilation, the existing service fixture and ARM64 receipts cannot stand in
 for it. Production provider admission and the application ABI remain ARM64.
+
+## Reusing the original runtime after Java owner changes
+
+The default `fetch_android_mysql_fixture.py` deliberately checks all21 original
+provider inputs against current source. Later database/coordinator owner changes
+must fail that check; they do not inherit the old Android result. Use the
+explicit full-checkout guard and frozen consumer described in
+`FROZEN-CONSUMER.md` to recover the same original runtime/source bytes. The
+workflow checks out817cbc229f4dcc24beb169ecc72838fab4d1df32 separately and verifies
+all982 canonical tracked files, rejecting ignored/shadow Python files, hidden
+Git flags and arbitrary checkout conversions before invoking its fixed script.
+
+The historical acquisition receipt remains unchanged. A separate wrapper
+receipt records current caller hashes and the exact frozen source verification.
+Native x64 SQL preparation requires this explicit frozen source path; its own
+current Python source/Git snapshot and later SQL execution are independent of
+the original4fd32df Java-service qualification. No on-device runtime needs a Git
+checkout, and no current owner or kernel is qualified by merely recovering the
+old payload.

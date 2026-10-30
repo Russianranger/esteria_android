@@ -7,7 +7,10 @@ on:
       - runtime/mysql-probe/qualified-inputs.lock.json
       - runtime/evidence/android-mysql-service-4fd32df-readback.json
       - tools/fetch_android_mysql_fixture.py
+      - tools/fetch_android_mysql_fixture_frozen.py
       - tests/test_android_mysql_fixture_inputs.py
+      - tests/test_android_mysql_fixture_frozen.py
+      - runtime/mysql-probe/FROZEN-CONSUMER.md
       - .github/workflows/android-mysql-inputs.yml
 permissions:
   contents: read
@@ -24,9 +27,15 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
+      - name: Check out the exact qualified historical MySQL consumer
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: 817cbc229f4dcc24beb169ecc72838fab4d1df32
+          path: frozen-mysql-consumer
+          persist-credentials: false
       - name: Check measured input selection and bounded source transactions
         run: |
-          python3 -m unittest tests.test_android_mysql_fixture_inputs tests.test_android_mysql_retention -v
+          python3 -m unittest tests.test_android_mysql_fixture_inputs tests.test_android_mysql_retention tests.test_android_mysql_fixture_frozen -v
           mkdir -p out/android-mysql-inputs
       - name: Read every original x64 input source and APK byte without APT or guest execution
         env:
@@ -35,17 +44,19 @@ jobs:
           python3 - <<'PY'
           import json,os
           from pathlib import Path
-          from tools import fetch_android_mysql_fixture as fixture
+          from tools import fetch_android_mysql_fixture_frozen as fixture
           report=Path('out/android-mysql-inputs')
           try:
-              proof=fixture.acquire(Path(os.environ['RUNNER_TEMP'])/'verified-android-mysql-fixture')
-              (report/'acquisition.json').write_bytes(fixture.encode(proof))
+              proof=fixture.acquire(Path('frozen-mysql-consumer'),Path(os.environ['RUNNER_TEMP'])/'verified-android-mysql-fixture')
+              encoded=lambda value:(json.dumps(value,sort_keys=True,indent=2)+'\n').encode()
+              (report/'acquisition.json').write_bytes(encoded(proof['actualOriginalAcquisition']))
+              (report/'frozen-consumer-readback.json').write_bytes(encoded(proof))
           except Exception as error:
               # Do not export raw exception messages, download URLs or tokens.
-              (report/'failure.json').write_bytes(fixture.encode(dict(formatVersion=1,
-                  scope='retained-android-x64-mysql-inputs-failure',**fixture.failure_context(error),
+              (report/'failure.json').write_bytes((json.dumps(dict(formatVersion=1,
+                  scope='retained-android-x64-mysql-inputs-failure',exceptionType=type(error).__name__,
                   completeInputReadback=False,guestExecuted=False,sqlExecuted=False,
-                  arm64Qualified=False,gameplayQualified=False)))
+                  arm64Qualified=False,gameplayQualified=False),sort_keys=True,indent=2)+'\n').encode())
               raise SystemExit('Retained MySQL fixture admission failed: '+type(error).__name__) from None
           PY
       - name: Retain bounded input and source readback evidence

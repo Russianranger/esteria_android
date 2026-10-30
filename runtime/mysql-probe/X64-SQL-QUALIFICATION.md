@@ -28,6 +28,14 @@ and library source archive. The new compile-command bytes are not present in the
 original complete artifact; their retained identity is explicitly metadata only.
 Production ARM64 helper admission remains unchanged.
 
+The original x64 MySQL descriptor and runtime still name their exact4fd32df
+producer and817cbc full-source consumer. Later Java coordinator changes do not
+relabel that historical proof. Host acquisition requires an explicit clean
+817cbc consumer checkout, verifies its complete Git/blob roster, and executes
+only that fixed verified consumer. The normal current-source consumer guard
+remains strict. Current caller code and any later Android coordinator execution
+are recorded separately from this frozen runtime preparation.
+
 ## Loader and data boundaries
 
 The compiler's captured loader/libc/Boost closure may have different patch-level

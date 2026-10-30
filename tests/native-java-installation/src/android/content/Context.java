@@ -11,4 +11,7 @@ public final class Context {
     public Context getApplicationContext(){return this;}
     public File getFilesDir(){return files;}
     public AssetManager getAssets(){return assets;}
+    public android.content.pm.ApplicationInfo getApplicationInfo(){
+        throw new UnsupportedOperationException("Android APK payload lookup is unavailable in native host qualification");
+    }
 }

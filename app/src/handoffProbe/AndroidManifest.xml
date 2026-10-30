@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <service android:name=".SessionService" android:foregroundServiceType="dataSync|specialUse" />
+        <service android:name=".core.runtime.install.HandoffProbeService" android:exported="false"
+            android:process=":handoffProbe" android:stopWithTask="true" />
+    </application>
+</manifest>

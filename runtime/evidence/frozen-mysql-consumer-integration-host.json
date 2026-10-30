@@ -1,0 +1,128 @@
+{
+  "androidRuntimeQualified": false,
+  "bothWorkflowsUseExplicitFrozen817Checkout": true,
+  "consumerWorkflowUnittestGroups": 22,
+  "currentJavaOwnersQualifiedByHistoricalRuntime": false,
+  "currentNativeCallerSourceSnapshotSeparateFromHistoricalRuntime": true,
+  "defaultConsumerImplementationChanged": false,
+  "defaultCurrentSourceGuard": "refused-current-provider-recipe-differs",
+  "exactUnittestCommand": "python3 -m unittest tests.test_android_mysql_fixture_frozen tests.test_android_mysql_fixture_inputs tests.test_android_mysql_retention tests.test_android_mysql_probe tests.test_server_setup_x64_sql_inputs tests.test_server_setup_x64_sql -v",
+  "formatVersion": 1,
+  "fourSchemaCoordinatorQualified": false,
+  "frozenCheckout": {
+    "allTrackedFileIdentitiesCanonicalJsonSha256": "d51395d0173a1e966261ceb6526c90bbf0236885c44be9986fca59309d8e4d92",
+    "allTrackedGitAndCheckoutBytesVerified": true,
+    "canonicalGitFileBytes": 9522109,
+    "fileCount": 982,
+    "noHiddenIndexFlags": true,
+    "noIgnoredOrUntrackedFiles": true,
+    "revision": "817cbc229f4dcc24beb169ecc72838fab4d1df32",
+    "validatedCheckoutConversions": [
+      {
+        "canonical": {
+          "bytes": 289,
+          "sha256": "119ce8a4bfdf3024ba03cf9b6b810afd47b49e17999a0053bfe719effbad36ea"
+        },
+        "checkout": {
+          "bytes": 295,
+          "sha256": "21186e8f097fcc9e5f62ee0abf2d95b92f973b347d0c27f0205a336af8aa021d"
+        },
+        "conversion": "declared-lf-to-crlf",
+        "path": "gradlew.bat"
+      }
+    ]
+  },
+  "gameplayQualified": false,
+  "groupsPassed": 47,
+  "nativeSqlSelectionEnabled": false,
+  "nativeSqlWorkflowUnittestGroups": 19,
+  "originalAcquisitionOrLargeArchivesExecutedLocally": false,
+  "originalRuntimeProducer": {
+    "integrationRevision": "4fd32df287961b9cc5175213a6fe85eac1c6d868",
+    "job": 124248431316,
+    "workflowRun": 41109642918
+  },
+  "originalRuntimeSelection": {
+    "bytes": 6228,
+    "sha256": "5268fa26eb1e2165f0cf5ff9f90686792abb4af6b9af48288d75932009bf853d"
+  },
+  "playerbotsAiQualified": false,
+  "productionArm64ProviderQualified": false,
+  "repositoryHeadAtCheck": "4de3785228fe1e079083c8fb1ae4814671333b0e",
+  "scope": "host-explicit-frozen-mysql-runtime-reuse-and-current-native-caller-integration",
+  "sourceFiles": {
+    ".github/workflows/android-mysql-inputs.yml": {
+      "bytes": 3400,
+      "sha256": "40606b74b3ba43480d5c15b877e7f9e71686ac066a10614b4e38cf2fc536a16f"
+    },
+    ".github/workflows/server-setup-x64-sql.yml": {
+      "bytes": 5738,
+      "sha256": "9eb993567b83ca5f821d89441bf8fb28909d89b1df1c9814d302e599f50743ff"
+    },
+    "runtime/mysql-probe/FROZEN-CONSUMER.md": {
+      "bytes": 2322,
+      "sha256": "d97e4c1b893ac00e20d7d7cc346013330e225fcc39f4a3eecf17758a6563ccfa"
+    },
+    "runtime/mysql-probe/README.md": {
+      "bytes": 17994,
+      "sha256": "4867481e4600fd29894f74d460327bca8d6cfcfaa31b2478393553c49c8d3a69"
+    },
+    "runtime/mysql-probe/X64-SQL-QUALIFICATION.md": {
+      "bytes": 5929,
+      "sha256": "e30193fdc68fc4c4cb91656e7db1ce6d6be39d0ef621926644283971d483ec8a"
+    },
+    "tests/test_android_mysql_fixture_frozen.py": {
+      "bytes": 6247,
+      "sha256": "f2c291ee638e3aa4ae90d4fc48818329cda9d53a2ef100fa29b5ae00c9604575"
+    },
+    "tests/test_android_mysql_fixture_inputs.py": {
+      "bytes": 9333,
+      "sha256": "a701e4d4d060201ab60905139876a9a9ecc431f9c9b992aac1319ef1286f0d5f"
+    },
+    "tests/test_server_setup_x64_sql.py": {
+      "bytes": 11124,
+      "sha256": "93b979200e6c01c86045d20642aec69416a1255f8b7fb882ad4cdcdfa3b187c8"
+    },
+    "tools/fetch_android_mysql_fixture_frozen.py": {
+      "bytes": 16538,
+      "sha256": "ff76580150c93b3131851518e743bc0b1e5f720c3e9b54e2df0bec4159d0d506"
+    },
+    "tools/qualify_server_setup_x64_sql.py": {
+      "bytes": 28513,
+      "sha256": "018b56d9709ca78ff66b40ad2bfd52a15c67937c744c488ae4211da6e3f2809b"
+    },
+    "tools/server_setup_x64_sql_inputs.py": {
+      "bytes": 24177,
+      "sha256": "b338374ec14d09427b7158a1f1502811ed6a161bd84f914a854a8c49632d3841"
+    }
+  },
+  "sourceSnapshotExact": false,
+  "sqlExecuted": false,
+  "unittestModules": [
+    {
+      "module": "tests.test_android_mysql_fixture_frozen",
+      "tests": 9
+    },
+    {
+      "module": "tests.test_android_mysql_fixture_inputs",
+      "tests": 7
+    },
+    {
+      "module": "tests.test_android_mysql_retention",
+      "tests": 6
+    },
+    {
+      "module": "tests.test_android_mysql_probe",
+      "tests": 6
+    },
+    {
+      "module": "tests.test_server_setup_x64_sql_inputs",
+      "tests": 9
+    },
+    {
+      "module": "tests.test_server_setup_x64_sql",
+      "tests": 10
+    }
+  ],
+  "worldserverQualified": false
+}

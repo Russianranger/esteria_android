@@ -6,6 +6,7 @@ import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
 import io.github.russianranger.esteria.core.runtime.install.FreshServerInstallations;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
+import io.github.russianranger.esteria.core.runtime.process.ProotLaunch;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
@@ -38,6 +39,13 @@ public final class ServerDatabaseService {
         String expectedMysqlVersion();
         OwnedProcess launch(Path work,Path session,List<String> command,
                             OwnedProcess.GracefulInputStop shutdown) throws IOException;
+    }
+    /** Source-admitted archive selection shared by bootstrap, service and setup.
+     * Production callers always receive the adapter below. A qualification
+     * adapter must bind its own actual measured provider before entering here. */
+    interface InstallationRuntime extends InstalledRuntime {
+        String archiveSha256();
+        OwnedProcess launch(Path work,Path session,List<String> command,List<ProotLaunch.Mount> mounts)throws IOException;
     }
     public static final class Handle implements SessionSupervisor.Child {
         private final OwnedProcess process;
@@ -119,10 +127,15 @@ public final class ServerDatabaseService {
     public static Handle start(Context context,Path root,ServerRuntimeSetup runtime) throws IOException {
         return startInstalled(context,root,installedRuntime(context,runtime));
     }
-    private static InstalledRuntime installedRuntime(Context context,ServerRuntimeSetup runtime) {
-        return new InstalledRuntime(){
+    static InstallationRuntime installedRuntime(Context context,ServerRuntimeSetup runtime) {
+        return new InstallationRuntime(){
             @Override public Path current() throws IOException {return runtime.current();}
             @Override public String expectedMysqlVersion(){return runtime.expectedMysqlVersion();}
+            @Override public String archiveSha256(){return runtime.packagePlan().archiveSha256;}
+            @Override public OwnedProcess launch(Path work,Path session,List<String> command,List<ProotLaunch.Mount> mounts)throws IOException {
+                return ProotProcess.start(context,runtime.installer(),runtime.packagePlan(),work,session,command,
+                    Collections.emptyMap(),mounts,null);
+            }
             @Override public OwnedProcess launch(Path work,Path session,List<String> command,
                     OwnedProcess.GracefulInputStop shutdown) throws IOException {
                 return ProotProcess.startInteractive(context,runtime.installer(),runtime.packagePlan(),work,session,
@@ -132,17 +145,23 @@ public final class ServerDatabaseService {
     }
     /** The handle retains a child workspace token until its owned service exits. */
     static Handle startFresh(Context context,Path root,ServerRuntimeSetup runtime,FreshServerInstallations.Attempt attempt) throws IOException {
+        return startFreshInstalled(context,root,installedRuntime(context,runtime),attempt);
+    }
+    static Handle startFreshInstalled(Context context,Path root,InstallationRuntime runtime,FreshServerInstallations.Attempt attempt)throws IOException {
         FreshServerInstallations.Workspace workspace=attempt.retainWorkspace();
         try {
-            workspace.requireRuntimeArchive(runtime.packagePlan().archiveSha256);
-            return startAtWorkspace(context,root,installedRuntime(context,runtime),workspace.directoryFor(root),workspace);
+            workspace.requireRuntimeArchive(runtime.archiveSha256());
+            return startAtWorkspace(context,root,runtime,workspace.directoryFor(root),workspace);
         } catch(IOException|RuntimeException error){workspace.close();throw error;}
     }
     /** Existing promoted storage is started directly, never initialized again. */
     static Handle startActive(Context context,Path root,ServerRuntimeSetup runtime,FreshServerInstallations.Active active) throws IOException {
-        if(!active.runtimeArchiveSha256.equals(runtime.packagePlan().archiveSha256))
+        return startActiveInstalled(context,root,installedRuntime(context,runtime),active);
+    }
+    static Handle startActiveInstalled(Context context,Path root,InstallationRuntime runtime,FreshServerInstallations.Active active)throws IOException {
+        if(!active.runtimeArchiveSha256.equals(runtime.archiveSha256()))
             throw new IOException("Active database requires its pinned server runtime; existing state retained");
-        return startAtWorkspace(context,root,installedRuntime(context,runtime),active.directoryFor(root),null);
+        return startAtWorkspace(context,root,runtime,active.directoryFor(root),null);
     }
     static Handle startInstalled(Context context,Path root,InstalledRuntime runtime) throws IOException {
         if(!root.equals(context.getFilesDir().getCanonicalFile().toPath()) || runtime.current()==null)throw new IOException("Canonical private application storage required");

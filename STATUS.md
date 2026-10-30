@@ -7,7 +7,7 @@ candidate has been delivered or requested.
 
 - Application branch: android/client-server; package: io.github.russianranger.esteria.
 - Selected client binary:471ee42faadf4a97a1d0a86989cf1452621f2dc5.
-- Client development branch android/arm64-port:671db06afd85fe2f6116b9fd59f5abf3170e2ef2. The application pin remains471.
+- Client development branch android/arm64-port:cebfd5c560d8f7224e4798fa57a319f3ff18a31c. The offline fix is671db06; separate full Retail-ON Windows builds41127220146 now pass on ARM64/x64. The application pin remains471.
 - Server:f35f04d01689f034778e3474b3c820092f51e461; Eluna:58d7652138887783228b9727bd1fa4e08f00342b; seven exact adaptation patches.
 - App source-lock SHA256:dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90. Archived server-build lock stays5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1.
 - Protocol:254 container slots,25 quests,32 client class capacity; all215 player descriptors match the server. This is layout evidence, not gameplay qualification.
@@ -89,17 +89,16 @@ field-count/packed-stride checks for112 active stores. All have SQL fallback;
 missing/unknown custom rows remain unqualified.55 focused tests and actual pinned
 source regeneration pass; valid v1 preflight reports remain unchanged.
 
-The last broad modified-worktree Python pass ran1291 checks in35.363s:1236 passed,
+The last broad modified-worktree Python pass ran1344 checks in40.188s:1289 passed,
 55 explicit skips, zero failures/errors. Exact tested source identities are
 retained. Host tests/compilation do not establish Android gameplay.
 
 ## Remaining gates
 
-1. Run the complete APK profile from the newly admitted public server inputs.
+1. Preserve the successful public-input APK evidence; rerun native ARM64 Java SQL/promotion/restart after the typed installation seam.
 2. Finish actual x64 original dbimport/helper build41119182502, new SQL receipts,
-   then the private Android four-schema coordinator qualification seam.
-3. Inspect the stat workflow after its scoped disk cleanup; keep production cache
-   OFF until source-owned publication/capability gates are implemented and proven.
+   then finish the disabled private Android four-schema coordinator adapter/provider.
+3. Run Android handoff recovery on the five real remote-process death phases. Keep production cache OFF; hardlink publication remains unqualified.
 4. Import real12340 MPQs and matched Esteria content; generate server data/shaders,
    validate normal login/characters/world/gameplay, persistence and audio. No complete
    base/custom client data is available here. See ASSET-REQUIREMENTS.md.
@@ -126,3 +125,12 @@ original57-byte wire/privacy and owner fixtures pass. SDK69 tasks/34s includes
 Core recovery, eight GameSession owner groups, app/AndroidTest compilation and
 lint. Client471 is unchanged; actual Android death/restart and normal login remain
 separate gates. Accounts, passwords and databases are not changed by recovery.
+
+The typed installed-input seam now reuses the production Java/Python setup kernel
+without changing ARM64 admission, helper receipts or the five save-selection
+bindings. Its debug x64 capability remains disabled until positive SQL/provider
+measurements exist. The exact historical817 MySQL consumer runs only from a fully
+verified frozen checkout; current Java changes inherit no historical SQL proof.
+Focused Python/SDK/native-Java compilation checks pass. A debug-only Android
+handoff fixture is excluded from ordinary APKs; actual emulator execution and
+the new native ARM64 regression remain pending after publication.

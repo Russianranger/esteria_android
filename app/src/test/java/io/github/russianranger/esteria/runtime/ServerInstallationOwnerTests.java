@@ -2,7 +2,9 @@ package io.github.russianranger.esteria.runtime;
 
 import android.content.Context;
 import io.github.russianranger.esteria.core.runtime.install.FreshServerInstallations;
+import io.github.russianranger.esteria.core.runtime.install.RuntimePackagePlan;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
+import io.github.russianranger.esteria.core.runtime.process.ProotLaunch;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -18,6 +20,7 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.json.JSONObject;
 
 /** Host fault injection for private owner cleanup only. It deliberately creates
  * no provider proof, SQL process, Android service or complete installation. */
@@ -151,8 +154,58 @@ public final class ServerInstallationOwnerTests {
             try(var paths=Files.walk(root)){for(Path path:paths.sorted(Comparator.reverseOrder()).toArray(Path[]::new))Files.delete(path);}
         }
     }
+    /** A pending qualification is not a runtime and cannot initialize SQL. This
+     * fixture deliberately supplies no successful provider or helper result. */
+    private static void pendingInputsFixture()throws Exception {
+        Path root=Files.createTempDirectory("esteria-installation-pending-inputs-").toRealPath();
+        ServerInstallationSetup.Handle owner=null;
+        try {
+            FreshServerInstallations store=new FreshServerInstallations(root);
+            FreshServerInstallations.Selection selected=new FreshServerInstallations.Selection(Map.of("sourceLock","a".repeat(64),
+                "runtimeArchive","b".repeat(64),"programsArchive","c".repeat(64),"contentReceipt","d".repeat(64),"compiledModules","e".repeat(64)));
+            FreshServerInstallations.Attempt attempt=store.begin(selected,1);FreshServerInstallations.Workspace workspace=attempt.retainWorkspace();
+            Path work=workspace.directory();Files.writeString(work.resolve("retained-pending-input"),"NO_QUALIFIED_RUNTIME\n");
+            AtomicInteger checked=new AtomicInteger();
+            ServerDatabaseService.InstallationRuntime unavailable=new ServerDatabaseService.InstallationRuntime(){
+                public Path current(){throw new AssertionError("Pending admission inspected a runtime");}
+                public String archiveSha256(){throw new AssertionError("Pending admission selected an archive");}
+                public String expectedMysqlVersion(){throw new AssertionError("Pending admission selected SQL version");}
+                public OwnedProcess launch(Path persistent,Path session,List<String> command,OwnedProcess.GracefulInputStop shutdown){throw new AssertionError("Pending admission launched a service");}
+                public OwnedProcess launch(Path persistent,Path session,List<String> command,List<ProotLaunch.Mount> mounts){throw new AssertionError("Pending admission launched a helper");}
+            };
+            ServerInstallationSetup.InstalledInputs inputs=new ServerInstallationSetup.InstalledInputs(){
+                public ServerDatabaseService.InstallationRuntime runtime(){return unavailable;}
+                public void requireCurrentSelection()throws IOException{checked.incrementAndGet();throw new IOException("TEST_ONLY_MEASUREMENTS_PENDING");}
+                public Path programsDirectory(){throw new AssertionError("Unadmitted programs read");}
+                public RuntimePackagePlan programsPlan(){throw new AssertionError("Unadmitted program plan read");}
+                public String programsArchiveSha256(){throw new AssertionError("Unadmitted program archive read");}
+                public Path contentDirectory(){throw new AssertionError("Unadmitted content read");}
+                public Path contentReceiptPath(){throw new AssertionError("Unadmitted content receipt read");}
+                public String contentReceiptSha256(){throw new AssertionError("Unadmitted receipt hash read");}
+                public String sourceLockSha256(){throw new AssertionError("Unadmitted source read");}
+                public JSONObject serverSource(){throw new AssertionError("Unadmitted source selection read");}
+                public JSONObject compiledModulesIdentity(){throw new AssertionError("Unadmitted modules read");}
+                public JSONObject measuredPlayerbotsSelection(){throw new AssertionError("Unadmitted helper read");}
+            };
+            Constructor<ServerInstallationSetup.Handle> constructor=ServerInstallationSetup.Handle.class.getDeclaredConstructor(Context.class,
+                Path.class,ServerInstallationSetup.InstalledInputs.class,Path.class,FreshServerInstallations.Attempt.class,FreshServerInstallations.Workspace.class);
+            constructor.setAccessible(true);owner=constructor.newInstance(null,root,inputs,root,attempt,workspace);
+            try{owner.prepare(null,()->false);throw new AssertionError("Pending qualification initialized setup");}
+            catch(IOException expected){check(expected.getMessage().equals("TEST_ONLY_MEASUREMENTS_PENDING"),"Exact admission refusal remains visible");}
+            check(checked.get()==1&&owner.state()==ServerInstallationSetup.State.FAILED,"Actual owner refused before bootstrap");
+            check(!Files.exists(work.resolve("state/database-bootstrap.json"))&&!Files.exists(work.resolve("mysql-sessions")),"Pending admission created no SQL/service state");
+            owner.close(Duration.ofSeconds(1));check(owner.state()==ServerInstallationSetup.State.CLOSED,"Pending owner can cleanly release its empty workspace");
+            check(Files.readString(work.resolve("retained-pending-input")).equals("NO_QUALIFIED_RUNTIME\n"),"Pending input refusal preserved prior bytes");
+            try{ProotProcess.qualificationPayload(null);throw new AssertionError("An absent context or measured profile minted a payload");}catch(IOException expected){ }
+            try{ProotProcess.startQualified(null,null,null,null,null,null,List.of(),Map.of(),List.of());throw new AssertionError("Null qualification payload launched");}catch(IOException expected){ }
+            try{ProotProcess.startInteractiveQualified(null,null,null,null,null,null,List.of(),Map.of(),List.of(),null);throw new AssertionError("Null interactive qualification payload launched");}catch(IOException expected){ }
+        }finally {
+            if(owner!=null&&owner.state()!=ServerInstallationSetup.State.CLOSED)try{owner.close(Duration.ofSeconds(1));}catch(IOException expected){ }
+            try(var paths=Files.walk(root)){for(Path path:paths.sorted(Comparator.reverseOrder()).toArray(Path[]::new))Files.delete(path);}
+        }
+    }
     public static void main(String[] arguments) throws Exception {
-        fixture("bootstrap");fixture("installation");legacyFixture();
-        System.out.println("Retained setup owner passed3 actual cleanup-timeout/retry cases including legacy public-path ownership; Java backend fixtures only, no SQL/Android execution");
+        fixture("bootstrap");fixture("installation");legacyFixture();pendingInputsFixture();
+        System.out.println("Retained setup owner passed4 actual cleanup-timeout/retry/pending-admission cases including legacy public-path ownership; Java backend fixtures only, no SQL/Android execution");
     }
 }

@@ -1,0 +1,63 @@
+// A separately measured debug fixture. Normal and release APKs grant no probe
+// authority; a property alone cannot enable an unmeasured native SQL selection.
+def installationProbeProvider = providers.gradleProperty('serverInstallationProbeProviderDir').orNull
+def installationProbePin = ''
+if (installationProbeProvider) {
+    if (providers.gradleProperty('nativeRuntimeBridge').getOrElse('false') != 'true' ||
+        providers.gradleProperty('nativeBridgeAbi').getOrElse('arm64-v8a') != 'x86_64' ||
+        !providers.gradleProperty('prootProbeProviderDir').isPresent() ||
+        !providers.gradleProperty('mysqlProbeProviderDir').isPresent() ||
+        ['prootProviderDir','serverRuntimeProviderDir','serverProgramsProviderDir','serverContentProviderDir',
+         'clientRuntimeProviderDir','guestBridgeProviderDir','wineProbeProviderDir'].any { providers.gradleProperty(it).isPresent() } ||
+        providers.gradleProperty('presentationEmulatorTest').getOrElse('false') == 'true')
+        throw new GradleException('Installation probe requires the separate x86_64 PRoot/MySQL debug profile')
+    def checkedSelection = new ByteArrayOutputStream()
+    exec {
+        workingDir rootProject.projectDir
+        commandLine 'python3','tools/android_installation_x64_inputs.py','--require-enabled'
+        standardOutput = checkedSelection
+    }
+    def selection = new groovy.json.JsonSlurper().parseText(checkedSelection.toString('UTF-8'))
+    def provider = file(installationProbeProvider).canonicalFile
+    def descriptor = new File(provider,'assets/installation-probe/provider.json')
+    if (!descriptor.isFile() || descriptor.length() != selection.provider.bytes || descriptor.length() > (128L << 10))
+        throw new GradleException('Measured installation probe descriptor is missing')
+    installationProbePin = java.security.MessageDigest.getInstance('SHA-256').digest(descriptor.bytes).encodeHex().toString()
+    if (installationProbePin != selection.provider.sha256)
+        throw new GradleException('Installation probe differs from its independent measured pin')
+    def proof = new groovy.json.JsonSlurper().parse(descriptor)
+    if (proof.formatVersion != 1 || proof.scope != 'android-x86-64-server-installation-probe-only' ||
+        !(proof.packagedFiles instanceof Map) || proof.packagedFiles.isEmpty() || proof.packagedFiles.size() > 64)
+        throw new GradleException('Unexpected installation probe provider scope')
+    def wanted = ['assets/installation-probe/provider.json'] as Set
+    proof.packagedFiles.each { name, pin ->
+        if (!(name ==~ /assets\/(?:installation-probe|installation-probe-helpers)\/[A-Za-z0-9_.\/-]+/) ||
+            name.split('/').any { it in ['', '.', '..'] } || !(pin.bytes instanceof Number) || pin.bytes <= 0 ||
+            pin.bytes > (4L << 30) || !(pin.sha256 ==~ /[a-f0-9]{64}/))
+            throw new GradleException('Invalid fixed installation probe file selection')
+        def selected = new File(provider,name)
+        if (!selected.isFile() || selected.canonicalFile != selected.absoluteFile || selected.length() != pin.bytes)
+            throw new GradleException('Installation probe file is missing or linked')
+        def digest = java.security.MessageDigest.getInstance('SHA-256')
+        selected.withInputStream { input ->
+            byte[] block = new byte[65536]
+            for (int count; (count = input.read(block)) != -1;) digest.update(block,0,count)
+        }
+        if (digest.digest().encodeHex().toString() != pin.sha256)
+            throw new GradleException('Installation probe file bytes differ')
+        wanted.add(name)
+    }
+    def actual = [] as Set
+    provider.eachFileRecurse { item ->
+        if (item.canonicalFile != item.absoluteFile) throw new GradleException('Installation probe contains a link')
+        if (!item.isDirectory()) {
+            if (!item.isFile()) throw new GradleException('Installation probe contains a special file')
+            actual.add(provider.toPath().relativize(item.toPath()).toString().replace(File.separatorChar,'/' as char))
+        }
+    }
+    if (actual != wanted) throw new GradleException('Installation probe provider file closure differs')
+    androidComponents.beforeVariants(androidComponents.selector().withBuildType('release')) { variant -> variant.enable = false }
+    android.sourceSets.main.assets.srcDir(new File(provider,'assets'))
+}
+android.defaultConfig.buildConfigField 'boolean','SERVER_INSTALLATION_PROBE_PACKAGED',installationProbeProvider ? 'true' : 'false'
+android.defaultConfig.buildConfigField 'String','SERVER_INSTALLATION_PROBE_PIN','"' + installationProbePin + '"'

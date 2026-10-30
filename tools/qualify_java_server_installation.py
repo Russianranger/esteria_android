@@ -125,6 +125,8 @@ def build(json_source, java_home, output):
         SERVER_CONTENT_PIN=files.identity(content.LOCK)['sha256'])
     require(re.fullmatch('[a-f0-9]{40}', fields['SOURCE_REVISION']), 'java-installation-source-revision-required')
     text = 'package io.github.russianranger.esteria;\npublic final class BuildConfig {\n'
+    text += 'public static final boolean DEBUG=false,SERVER_INSTALLATION_PROBE_PACKAGED=false;\n'
+    text += 'public static final String SERVER_INSTALLATION_PROBE_PIN="";\n'
     text += 'public static final boolean SERVER_PROGRAMS_PACKAGED=true,SERVER_CONTENT_PACKAGED=true;\n'
     for name, value in fields.items():
         require(re.fullmatch('[a-f0-9]{40}|[a-f0-9]{64}', value), 'java-installation-build-constant-format')
@@ -154,7 +156,7 @@ def build(json_source, java_home, output):
             license=files.identity(json_source / 'LICENSE')),
         nativeJniLibrary=files.identity(native / 'libesteria_process.so'), hostMachine=os.uname().machine,
         classFiles={str(path.relative_to(classes)): files.identity(path) for path in sorted(classes.rglob('*.class'))},
-        replacedAndroidClasses=['android.content.Context', 'android.content.res.AssetManager',
+        replacedAndroidClasses=['android.content.Context', 'android.content.pm.ApplicationInfo', 'android.content.res.AssetManager',
             'android.content.res.AssetFileDescriptor', 'io.github.russianranger.esteria.runtime.InstalledProot'],
         productionProotProcessCompiled=True, productionCoordinatorCompiled=True,
         javaCoordinatorExecuted=False, sqlExecuted=False, slotPromoted=False,
