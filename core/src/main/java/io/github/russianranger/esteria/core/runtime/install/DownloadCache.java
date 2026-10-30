@@ -58,7 +58,7 @@ public final class DownloadCache {
             }
             long offset=0;
             if(Files.exists(partial,LinkOption.NOFOLLOW_LINKS)) {RuntimeFiles.plain(partial);offset=Files.size(partial);RuntimeFiles.require(offset<=bytes,"Partial download exceeds pinned size");}
-            RuntimeFiles.require(Files.getFileStore(root).getUsableSpace()>=bytes-offset+(16L<<20),"Insufficient storage for runtime download");
+            RuntimeFiles.require(root.toFile().getUsableSpace()>=bytes-offset+(16L<<20),"Insufficient storage for runtime download");
             MessageDigest hash=RuntimeFiles.digest();
             byte[] buffer=new byte[RuntimeFiles.BUFFER];
             if(offset>0) {

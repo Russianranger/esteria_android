@@ -69,7 +69,7 @@ public final class RuntimeInstaller {
             Path rootfs=RuntimeFiles.directory(staging.resolve("rootfs")),tmp=RuntimeFiles.directory(staging.resolve("temporary"));
             Budget budget=new Budget(plan.limits.maxMetadataBytes);
             Path journal=staging.resolve("journal.tsv");Map<String,Saved> saved=readJournal(journal,budget,plan);
-            RuntimeFiles.require(Files.getFileStore(root).getUsableSpace()>=remainingBytes(saved,rootfs,plan)+(64L<<20),"Insufficient storage for staged runtime");
+            RuntimeFiles.require(root.toFile().getUsableSpace()>=remainingBytes(saved,rootfs,plan)+(64L<<20),"Insufficient storage for staged runtime");
             State state=new State(plan,budget,rootfs,tmp,journal,saved,progress,cancellation);
             MessageDigest compressedHash=RuntimeFiles.digest();
             try(InputStream file=Files.newInputStream(archive,LinkOption.NOFOLLOW_LINKS);

@@ -318,10 +318,11 @@ public final class SessionService extends Service {
             facts.put("snapshot.thermal.status", "unavailable: " + unavailable.getClass().getSimpleName());
         }
         try {
-            java.nio.file.FileStore storage = Files.getFileStore(root);
+            // Android intentionally rejects Files.getFileStore; File uses statvfs.
+            java.io.File storage = root.toFile();
             facts.put("snapshot.storage.freeBytes", String.valueOf(storage.getUsableSpace()));
             facts.put("snapshot.storage.totalBytes", String.valueOf(storage.getTotalSpace()));
-        } catch (IOException | RuntimeException unavailable) {
+        } catch (RuntimeException unavailable) {
             facts.put("snapshot.storage.status", "unavailable: " + unavailable.getClass().getSimpleName());
         }
     }

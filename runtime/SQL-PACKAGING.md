@@ -251,3 +251,93 @@ bytes**, compressed to **167,542,391 bytes**, SHA-256
 Every archived payload was read back and checked. Its receipt explicitly leaves
 compiled-module selection unverified and Lua disabled; it is a packaging result,
 not a successfully initialized server or Android candidate.
+
+## Disposable base-schema qualification
+
+`tools/qualify_base_sql.py` separates host source preparation from engine execution:
+
+```sh
+python3 tools/qualify_base_sql.py prepare --server sources/server \
+  --output out/base-sql-fixture
+python3 tools/qualify_base_sql.py qualify --fixture /fixture \
+  --fixture-sha256 EXACT_PREPARED_MANIFEST_SHA256 \
+  --mysql /usr/bin/mysql --mysqld /usr/sbin/mysqld \
+  --expected-version EXACT_PINNED_MYSQL_VERSION --output /state/new-fixture
+```
+
+Preparation reads exact Git objects for the pinned server, validates the reviewed
+Eluna-only patches, and records SHA-256 plus Git blob identities for **468 base
+files / 381,481,395 bytes**. The counts are 22 auth, 108 characters, 309 world and
+29 playerbots. Only immediate `.sql` files are selected, sorted exactly as the
+base-population phase does. Local modified/untracked files never become inputs.
+The prepared fixture can be mounted read-only into the server dependency image;
+Git and build tools are not needed inside that runtime.
+
+Qualification requires a completely new private output directory. It rechecks
+the manifest digest, current source lock, safe paths, exact file counts and both
+content identities before starting MySQL. An existing output, partial fixture or
+save directory is preserved and rejected. It initializes its own authenticated
+MySQL instance, verifies all four application databases are empty before the first
+SQL file, and stops on the first SQL failure. After import it checks exact table
+sets, writes disposable persistence markers, shuts down cleanly, restarts and
+checks every table and marker again. A failed attempt is retained for inspection
+and cannot be resumed by replaying bases.
+
+The base SQL is a real intermediate compatibility check: upstream snapshots were
+produced with MySQL 8.4.3, while the pinned dependency image currently provides
+MySQL 8.0.46. Successful import must be observed; file presence alone is not
+compatibility evidence. The `.github/workflows/base-sql.yml` job runs this test in
+a native ARM64 container with external networking disabled. It exports only
+receipts and bounded redacted diagnostics. Private credentials, option files,
+initialized databases and SQL payloads are excluded from CI uploads.
+
+The locally prepared fixture's manifest SHA-256 is
+`dfb5b9a05f5a59e94efecff53e9e8f0bfbc50d46d30821d18429ff4d645739f1`.
+Every staged SQL file was independently read back and verified against both
+identities. This is source preparation evidence; actual MySQL base qualification
+is reported by the dedicated workflow's receipt, not inferred from these hashes.
+
+`qualification.json` deliberately retains `compiledUpdaterExecuted=false`,
+`moduleUpdatesApplied=false`, `playerbotsRuntimeQualified=false`,
+`databaseUpgradeQualified=false`, `gameSchemasQualified=false` and
+`gameplayQualified=false`. Base import and disposable marker persistence do not
+establish prepared-statement compatibility, applied module schemas, character
+saving, bots or a valid deployed content set.
+
+## Actual updater boundary and saved-state protection
+
+**The pinned `dbimport --dry-run` is mutating. Never use it as a read-only preview
+against saved games or a live database.** In `src/tools/dbimport/Main.cpp`, the
+flag merely sets `sConfigMgr->setDryRun(true)`. `DBUpdater::ApplyFile` still invokes
+the external MySQL client with the SQL file; dry-run suppresses prompts and normal
+SQL-error throwing so processing can continue. The process reports the accumulated
+failed-update count at exit. Likewise, dbimport's advertised `--version` does not
+have an early-exit branch; use only the audited loader-smoke commands.
+
+The actual `DatabaseLoader::Load()` order is open all registered pools, populate
+all eligible empty databases, update all registered databases, then prepare SQL
+statements. dbimport registers auth, characters and world in that order. Compiled
+`AC_MODULES_LIST` controls allowed auto-discovered module SQL, and the populated
+`updates` / `updates_include` tables govern the update ledger. A sorted list of
+all historical SQL is not a valid existing-database migration plan.
+
+Playerbots is a distinct loader invoked by the module's world-server
+`OnDatabasesLoading()` hook. dbimport does not register that pool. Loading its 29
+base files in the disposable test does not qualify this runtime hook or its update
+ledger. The full updater test must exercise the actual compiled module and confirm
+its prepared statements and persistent bot state.
+
+For saved-state upgrades, first stop and verify ownership of all writers, produce
+a verified backup, restore it into a separate staging instance, and run the exact
+compiled updater there with recorded source/module/configuration identities.
+Only an explicitly qualified version transition may later promote a staged copy;
+failed imports and migrations must preserve the previous generation. No live-save
+upgrade or promotion mechanism is enabled by this base-only tool. Reassert and
+verify the authenticated loopback realm only after all core, module and playerbots
+updates have completed, because module SQL can rewrite the endpoint.
+
+Focused guard checks:
+
+```sh
+python3 -m unittest tests.test_base_sql -v
+```

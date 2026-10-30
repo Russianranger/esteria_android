@@ -1,0 +1,115 @@
+name: Pinned server base SQL qualification
+on:
+  push:
+    branches: [android/client-server]
+    paths:
+      - sources.lock.json
+      - patches/server/**
+      - tools/qualify_base_sql.py
+      - tools/manifest_server_content.py
+      - tools/package_server_content.py
+      - runtime/mysql_bootstrap.py
+      - runtime/server/**
+      - tests/test_base_sql.py
+      - .github/workflows/base-sql.yml
+  pull_request:
+    paths:
+      - tools/qualify_base_sql.py
+      - tests/test_base_sql.py
+      - .github/workflows/base-sql.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: base-sql-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  base-schemas:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Check source and fresh-fixture safety contracts
+        run: |
+          test "$(uname -m)" = aarch64
+          python3 -m unittest tests.test_base_sql tests.test_server_runtime_inputs -v
+          mkdir -p out/base-sql-evidence out/base-sql-private
+      - name: Fetch the exact server Git tree and stage only authenticated base SQL
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, subprocess
+          source = json.loads(pathlib.Path('sources.lock.json').read_text())['sources']['server']
+          root = pathlib.Path('out/base-sql-source')
+          subprocess.run(['git', 'init', str(root)], check=True)
+          subprocess.run(['git', '-C', str(root), 'remote', 'add', 'origin', source['url']], check=True)
+          subprocess.run(['git', '-C', str(root), 'fetch', '--depth', '1', '--filter=blob:none',
+                          'origin', source['commit']], check=True)
+          PY
+          python3 tools/qualify_base_sql.py prepare --server out/base-sql-source \
+            --output out/base-sql-fixture --allow-source-fetch
+          python3 - <<'PY'
+          import hashlib, os, pathlib
+          digest = hashlib.sha256(pathlib.Path('out/base-sql-fixture/base-fixture.json').read_bytes()).hexdigest()
+          with open(os.environ['GITHUB_ENV'], 'a') as output:
+              output.write('ESTERIA_BASE_FIXTURE_SHA256=' + digest + '\n')
+          PY
+      - name: Build the pinned native ARM64 MySQL dependency image
+        run: |
+          docker build --platform linux/arm64 --target runtime \
+            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
+            -t esteria-base-sql:qualification runtime/server \
+            > out/base-sql-evidence/image-build.log 2>&1
+          container=$(docker create esteria-base-sql:qualification)
+          trap 'docker rm -f "$container" >/dev/null' EXIT
+          docker cp "$container:/etc/esteria-server-runtime.json" out/base-sql-evidence/server-runtime.json
+          docker image inspect esteria-base-sql:qualification --format '{{.Id}}' > out/base-sql-evidence/image-id.txt
+          python3 - <<'PY'
+          import json, os, pathlib
+          runtime = json.loads(pathlib.Path('out/base-sql-evidence/server-runtime.json').read_text())
+          with open(os.environ['GITHUB_ENV'], 'a') as output:
+              output.write('ESTERIA_MYSQL_SQL_VERSION=' + runtime['expectedMysqlSqlVersion'] + '\n')
+          PY
+      - name: Import authentic source bases and test restart persistence with external network disabled
+        run: |
+          docker run --rm --init --network none \
+            --env PYTHONDONTWRITEBYTECODE=1 \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/base-sql-fixture,dst=/fixture,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/base-sql-private,dst=/state" \
+            --workdir /qualification esteria-base-sql:qualification \
+            python3 tools/qualify_base_sql.py qualify --fixture /fixture \
+            --fixture-sha256 "$ESTERIA_BASE_FIXTURE_SHA256" \
+            --mysql /usr/bin/mysql --mysqld /usr/sbin/mysqld \
+            --expected-version "$ESTERIA_MYSQL_SQL_VERSION" --output /state/run \
+            > out/base-sql-evidence/qualification.log 2>&1
+      - name: Collect receipts and bounded redacted diagnostics only
+        if: always()
+        run: |
+          sudo python3 - <<'PY'
+          import hashlib, json, pathlib, shutil
+          source = pathlib.Path('out/base-sql-private/run')
+          target = pathlib.Path('out/base-sql-evidence')
+          names = ['qualification.json', 'sql-failure.txt', 'mysql-initialize-engine.log',
+                   'mysql-bootstrap-engine.log', 'mysql-base-engine.log', 'mysql-base-restart-engine.log']
+          for name in names:
+              path = source / name
+              if path.is_file():
+                  shutil.copyfile(path, target / name)
+          receipt = target / 'qualification.json'
+          runtime = target / 'server-runtime.json'
+          if receipt.is_file() and runtime.is_file():
+              metadata = dict(formatVersion=1, scope='native-arm64-disposable-base-SQL',
+                  qualificationSha256=hashlib.sha256(receipt.read_bytes()).hexdigest(),
+                  runtimeManifestSha256=hashlib.sha256(runtime.read_bytes()).hexdigest(),
+                  externalNetworkDisabled=True, compiledUpdaterExecuted=False,
+                  existingSaveUpgradesQualified=False, androidRuntimeQualified=False, gameplayQualified=False)
+              (target / 'environment-receipt.json').write_text(json.dumps(metadata, indent=2) + '\n')
+          PY
+          sudo chown -R "$(id -u):$(id -g)" out/base-sql-evidence
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: base-sql-qualification-${{ github.sha }}
+          path: out/base-sql-evidence
+          retention-days: 14
+          if-no-files-found: error

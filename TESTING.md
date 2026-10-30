@@ -54,7 +54,10 @@ Native Linux ARM64 Wine codec run `40985737329` and software Vulkan run
 texture lifetime operations using the pinned Lavapipe stack. Its receipt SHA-256 is
 `26e27a5437dd2785ed6b8db05b7281b7a45306696c1f58360709052f515cefc0`.
 Validation layers were unavailable; this is not hardware Vulkan or world rendering.
-The optional actual-client entry fixture still needs execution results.
+The actual-client entry fixture passes on Windows x64/ARM64 and native Linux
+ARM64 Wine in run `40989834370`, with seven receipt checks and clean namespace exit.
+Qualification SHA-256: `a7686069cd8e62eb8cb2075380e5cbb7390b2e42718c318413261cffc54141a6`.
+It returns before CommonMain/assets; Wine DbgHelp unwinds only one frame.
 
 Android APK compilation/lint and launcher host tests are passing checks. No Android
 emulator or physical Thor gameplay result has been recorded. Display/audio/input,
@@ -83,7 +86,9 @@ install -r`, and verifies both survive with zero runtime recopy. The harness
 refuses a physical device or preexisting app and requires an explicit completed
 JUnit result for each phase. It records APK hashes and emulator properties.
 
-Local instrumentation compile and Android lint pass. Emulator execution is pending
-CI. A successful run would qualify these Android filesystem/update behaviors, not
+Local instrumentation compile and Android lint pass. First emulator run
+`40990723608` failed because Android rejects `Files.getFileStore`; runtime download,
+runtime extraction, game import, ZIP staging and storage diagnostics now use
+`File` storage queries. Free-space reserves remain enforced. Rerun is pending. A successful run would qualify these Android filesystem/update behaviors, not
 ARM64 PRoot/Wine, audio/display, gameplay, or the user's persistent signing key.
 Both test versions use one isolated CI debug key.

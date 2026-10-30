@@ -210,7 +210,7 @@ public final class GameDataImporter {
         long total = 0, remaining = 0;
         for (Entry entry : entries) { total += entry.size; if (!reusable(data, entry, saved.get(entry.path))) remaining += entry.size; }
         long reserve = 64L << 20;
-        if (Files.getFileStore(root).getUsableSpace() < remaining + reserve) throw new IOException("Not enough free storage for staged import (needs " + (remaining + reserve) + " bytes)");
+        if (root.toFile().getUsableSpace() < remaining + reserve) throw new IOException("Not enough free storage for staged import (needs " + (remaining + reserve) + " bytes)");
         long completed = 0, copiedBytes = 0;
         int copied = 0, reused = 0, finished = 0;
         byte[] buffer = new byte[128 * 1024];

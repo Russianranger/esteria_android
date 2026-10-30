@@ -16,12 +16,12 @@ server/Wine jobs must not be converted into successful evidence without logs.
 ## Next concrete work
 
 1. Fetch both development tips and inspect current Actions. Application client pin
-   is `08e6d453733cff08f47eeb76dec5211749594753`; full ARM64/x64 builds and
-   native ARM64 Wine software Vulkan passed in `40986534025`. Codec also passed
+   is `f75c2c71d9bb76a6707bfb68b2bf615db544e5bf`; full ARM64/x64 builds and
+   native ARM64 Wine entry/codec/software Vulkan passed in `40989834370`. Codec also passed
    `40985737329`. Neither starts the full game.
-2. Inspect actual-EXE entry CI `40989834370` at client
-   `f75c2c71d9bb76a6707bfb68b2bf615db544e5bf`, pinned to integration harness `9ee80cd`. Verify Windows ARM64/x64 and native
-   Linux ARM64 receipts, namespace completion and actual process exit. Entry check
+2. Actual-EXE entry CI `40989834370` passed all five jobs at client
+   `f75c2c71d9bb76a6707bfb68b2bf615db544e5bf`, pinned to integration harness `9ee80cd`. Windows ARM64/x64 and native Linux ARM64 receipts, namespace completion and
+   process exit pass. Continue engine-frame readback and Android bridge integration. Entry check
    deliberately does not call CommonMain or consume game assets.
 3. Inspect server run `40987376145` after the third Eluna include patch. Continue
    real compile/link fixes as digest-checked patches in this repository. The next
@@ -32,7 +32,8 @@ server/Wine jobs must not be converted into successful evidence without logs.
    The Java runtime installer has passed the full pinned archive on Linux with
    64 MiB heap. Continue process-owner adapter and Android filesystem/execution
    qualification; the new Android13 x86_64 installer/APK-update workflow is compiled
-   but pending execution. See `runtime/ANDROID-INSTALLATION.md` and `runtime/proot/README.md`.
+   but its first emulator run found Android getFileStore unsupported. The File-based
+   fix is ready; inspect the next emulator run. See `runtime/ANDROID-INSTALLATION.md` and `runtime/proot/README.md`.
 5. Dependency image/MySQL/source-capture CI `40989666380` passed; continue verified
    GNU rootfs packaging and actual server library closure.
    Do not combine its glibc 2.39 binaries with Debian 12 Wine's glibc 2.36.

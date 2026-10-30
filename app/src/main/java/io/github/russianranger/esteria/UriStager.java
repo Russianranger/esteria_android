@@ -55,7 +55,7 @@ final class UriStager {
         long offset = info.reliable() && Files.isRegularFile(partial) ? Files.size(partial) : 0;
         if (offset > info.size && info.size >= 0) offset = 0;
         long remaining = info.size >= 0 ? info.size - offset : RESERVE;
-        if (Files.getFileStore(directory).getUsableSpace() < remaining + RESERVE)
+        if (directory.toFile().getUsableSpace() < remaining + RESERVE)
             throw new IOException("Not enough storage to stage this archive. A ZIP copy is needed before extraction.");
         try (InputStream input = resolver.openInputStream(uri); RandomAccessFile output = new RandomAccessFile(partial.toFile(), "rw")) {
             if (input == null) throw new IOException("The selected document could not be opened");

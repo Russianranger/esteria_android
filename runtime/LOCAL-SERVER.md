@@ -151,3 +151,28 @@ alias covers upstream `HONORBALE` versus server `HONORABLE`; no field is silentl
 ignored. Server `MAX_CLASSES=12` denotes its stock playable range; the client's 32
 is mask capacity, not 32 implemented classes. This is layout evidence, not login,
 appearance transport, custom-race, inventory, or persistence qualification.
+
+## Schema qualification and the mutating dbimport preview flag
+
+**Do not run the pinned `dbimport --dry-run` against live state as a preview: it
+executes SQL.** Its flag changes prompting and SQL-error handling, while
+`DBUpdater::ApplyFile` still runs the MySQL client. Its advertised `--version`
+also lacks an early return. Use only source-audited process-smoke commands.
+
+`tools/qualify_base_sql.py` and the `base-sql.yml` workflow provide an intermediate
+fresh-base test using the pinned native ARM64 dependency image. Source preparation
+stages 468 exact Git SQL files, then the engine-side command verifies their hashes
+before creating a new private disposable MySQL instance. Existing or partial
+output directories are rejected and preserved. The test checks all four databases
+are empty before import, verifies exact table sets, and checks disposable markers
+after a clean restart. It does not accept the application's live database path.
+Only redacted bounded diagnostics and receipts may be exported; never upload its
+private state or credentials.
+
+This test does not run the compiled updater, apply module updates, prepare server
+statements or qualify a saved-game upgrade. dbimport registers only auth,
+characters and world; the playerbots loader runs from a world-server module hook.
+Their real update ledgers and all post-update loopback realm checks remain required
+before game launch. Existing saves require a verified backup/restore and a staged,
+qualified version transition; base SQL must never be replayed over them. See
+[SQL-PACKAGING.md](SQL-PACKAGING.md) for exact source behavior, commands and gates.
