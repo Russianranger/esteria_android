@@ -1,0 +1,166 @@
+{
+  "androidProviderCreated": false,
+  "androidRuntimeQualified": false,
+  "archive": {
+    "bytes": 108559554,
+    "file": "playerbots-helper-complete-sources.tar.gz",
+    "sha256": "eb7d1a77484943ad2e16d022877671426c28e4e3d7e3d8a1b166073950fc5c0f"
+  },
+  "archiveEntries": 6372,
+  "archiveFileBytes": 440875864,
+  "archiveReadbackVerified": true,
+  "artifact": {
+    "bytes": 109880204,
+    "id": 12997208259,
+    "sha256": "96dbf23fbfe9640528fdce28e71bd8ac0c5ffc261dd5124d7f8a24bf723587ae"
+  },
+  "bitIdenticalExecutableClaimed": false,
+  "compilerExecutedHere": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "helperExecutedHere": false,
+  "helperRuntime": {
+    "buildReceipt": {
+      "bytes": 32008,
+      "sha256": "82b9c7c852164f303500214e044f07bf5eb389fa2f3f03b9f6cdc962a5bba602"
+    },
+    "executable": {
+      "bytes": 25188512,
+      "sha256": "b7d9b72c17f32294915f0a474283c543057ffb7de7b3f93015c2e7e179bfcf25"
+    },
+    "guestPath": "/esteria-server-programs/helpers/playerbots-schema",
+    "name": "playerbots-schema",
+    "nativeSqlReceipt": {
+      "bytes": 37703,
+      "sha256": "56288b2ea7046fa256bdd53113701bd59236d5d8403a3a16f32b5fcf0ab53c42"
+    }
+  },
+  "helperSourceCompanionComplete": true,
+  "nativeObservationReceipt": {
+    "bytes": 42641,
+    "sha256": "fdd3d688f44f7b07f0ce26094ee47c7386ef54a2b456508b1279d58176c57bd7"
+  },
+  "originalBuild": {
+    "bytes": 32521,
+    "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+  },
+  "originalHelperAndNativeReceiptsUnchanged": true,
+  "originalModules": {
+    "bytes": 5348,
+    "sha256": "6459b6a1acab2c62c474e4c6ab3eb651daa21f697ccd628e93a38bad298bbdd1"
+  },
+  "originalNativeObjectsObserved": false,
+  "originalProgramsArchive": {
+    "bytes": 21996594,
+    "file": "server-programs-runtime-arm64.tar.gz",
+    "sha256": "df7e0b33e4048daf780ebf31c0a7f9a10b1f74ea42f4de100ca18ed1a65b673e"
+  },
+  "originalThreeProgramSourceQualification": {
+    "archive": {
+      "bytes": 24619647,
+      "sha256": "9f76881f06a7c998e0dba9d4a226c623021ed6ad8b87074aa7a861eafbb96d80"
+    },
+    "qualification": {
+      "bytes": 23757,
+      "sha256": "bcb421500351886cd9daa280e6ba75c57b6e64b689a3a7410fa7104640a58de9"
+    },
+    "receipt": {
+      "bytes": 49875,
+      "sha256": "fae08a831fb0a55d22c3ea330677671cf72045e2abe8fc229ba90494794aa4f4"
+    }
+  },
+  "originalThreeProgramsAndReceiptsUnchanged": true,
+  "playerbotsAiQualified": false,
+  "producer": {
+    "integrationRevision": "9aa691435740f188a987eacf822447ec7fdb70bc",
+    "job": 124213741205,
+    "workflowRun": 41099467799
+  },
+  "productionActivated": false,
+  "receipt": {
+    "bytes": 1320302,
+    "file": "playerbots-source-receipt.json",
+    "sha256": "633cfa8f18bb887249d643b7eaf249e1bfe7bd30daf572e18084574ca8ec046d"
+  },
+  "replayPlan": {
+    "bytes": 2053,
+    "sha256": "df4ff3a28994fa2c8556c4dde47a6112e6af79742349f6f0d03004682a0168fb"
+  },
+  "requiredServerRuntimeArchive": {
+    "bytes": 112374096,
+    "file": "server-runtime-arm64.tar.gz",
+    "sha256": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5"
+  },
+  "scope": "actual-playerbots-helper-corresponding-source-anchor",
+  "serverBuildSourceLock": {
+    "bytes": 2170,
+    "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+  },
+  "serverSource": {
+    "branch": "main",
+    "commit": "f35f04d01689f034778e3474b3c820092f51e461",
+    "patches": [
+      {
+        "path": "patches/server/0001-eluna-declare-area-trigger.patch",
+        "sha256": "c26b145188c5f97bf30d032e1fe3bd7fe17aa1f8f0daa6793e51f5d830fe7aa6",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0002-eluna-include-map-manager.patch",
+        "sha256": "4e277dbe56c31ae30640c8e9ad4dee12e944e0f051d9bdc8d62aaa239c50433f",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0003-eluna-hooks-include-types.patch",
+        "sha256": "5999402d985fcc709abdc90bb4272072d1d5e3e261b2cc7ec19460320c14295f",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0004-attunement-stat-api.patch",
+        "sha256": "d9ef6ca8f96ab186c37c072b22143cdded9976aa3a62d083f893c502a5745cb8"
+      },
+      {
+        "path": "patches/server/0005-script-grid-templates.patch",
+        "sha256": "6b459c90839e7831df8533966442fabd476ae1773f0302c50ccc8a997f157369"
+      },
+      {
+        "path": "patches/server/0006-empty-script-modules.patch",
+        "sha256": "ea0beb357c71d8b8c187af9d4afede520e7ac9877e40fbdc5fab99d54fc21f97"
+      },
+      {
+        "path": "patches/server/0007-runtime-module-config-directory.patch",
+        "sha256": "5e41d474179ef553ec9c2544de947a3724885fd7f3ac233af3d89797acd032ff"
+      }
+    ],
+    "submodules": {
+      "src/server/game/LuaEngine": "58d7652138887783228b9727bd1fa4e08f00342b"
+    },
+    "url": "https://github.com/Russianranger/EsteriaWoW.git"
+  },
+  "sourceCoverage": {
+    "bytes": 785897,
+    "sha256": "3d79a20ab4dfb8cb831161417c61cfd8afda05ef1212ac2007e79979ec00a4ef"
+  },
+  "sourceInputLock": {
+    "bytes": 4330,
+    "sha256": "240843bb757645c5c05d889c065fc21fda095755f586bfc489ed6296ce2c0010"
+  },
+  "sourceObservation": {
+    "executable": {
+      "bytes": 25189160,
+      "sha256": "f327179c8467e51afe18d3542fad9186551474c69fae541db3f0461eac5a9542"
+    },
+    "integrationRevision": "9d20c3bea4f9f2ea7cdfb0915cef1b7ed23faab6",
+    "observedLinks": 1,
+    "observedObjects": 201,
+    "receipt": {
+      "bytes": 42641,
+      "sha256": "fdd3d688f44f7b07f0ce26094ee47c7386ef54a2b456508b1279d58176c57bd7"
+    },
+    "sqlQualificationTransferred": false,
+    "workflowRun": 41095126547
+  },
+  "sqlExecutedHere": false,
+  "state": "verified-native-capture-and-source-only-archive-readback",
+  "worldserverQualified": false
+}

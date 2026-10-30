@@ -172,6 +172,20 @@ def verify_runtime(path,pin):
         require(seen=={'bin/'+name for name in PROGRAMS},'server-data-tools-runtime-program-closure')
 
 
+def verify_reference_image(cli,pin):
+    accepted=cli.get('referenceImageReadback')
+    require(type(accepted) is dict and set(accepted)=={'identity','receipt'},
+            'server-data-tools-native-reference-image-receipt-required')
+    identity(accepted['identity']);image=accepted['receipt']
+    require(type(image) is dict and type(image.get('formatVersion')) is int and image['formatVersion']==1 and
+            image.get('scope')=='native-arm64-dependency-image-readback' and
+            image.get('runtimeArchive')==pin['requiredServerRuntimeArchive'] and
+            all(image.get(k) is True for k in ('actualImageMetadataAndElfHashesVerified','nativePythonExecuted')) and
+            all(image.get(k) is False for k in ('mysqlServerExecuted','databaseInitialized','esteriaServerExecuted',
+                                              'androidRuntimeQualified','gameplayQualified')),
+            'server-data-tools-native-reference-image-selection-or-gates')
+
+
 def verify_sources(directory,pin):
     qualified=pin['actualOrderedSourceQualification'];original=stock.load_pin()
     expected={'package-receipt.json':pin['packageReceipt'],SOURCE_RECEIPT:qualified['receipt'],
@@ -229,6 +243,7 @@ def verify_sources(directory,pin):
             cli.get('programs')=={name:pair['stripped'] for name,pair in pin['programPairs'].items()} and
             cli.get('configuration')==identity(pin['configuration']) and all(cli.get(k) is False for k in FALSE_FLAGS),
             'server-data-tools-real-derived-native-cli-required')
+    verify_reference_image(cli,pin)
     receipt,_=shared.read_json(directory/'package-receipt.json',16<<20)
     require(receipt.get('scope')=='composed-linux-arm64-server-data-tools-runtime' and
             receipt.get('archive')==pin['archive'] and receipt.get('archiveFiles')==pin['files'] and

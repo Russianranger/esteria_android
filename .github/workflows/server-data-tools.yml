@@ -1,0 +1,200 @@
+name: Source-sealed composed data tools and native four-tool CLI
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - .github/workflows/server-data-tools.yml
+      - runtime/server/data-tools-provider.lock.json
+      - tools/prepare_server_data_tools.py
+      - tools/package_server_data_tools.py
+      - tools/qualify_server_data_tools.py
+      - tools/provider_server_data_tools.py
+      - tests/test_data_tools_inputs.py
+      - tests/test_package_server_data_tools.py
+      - tests/test_data_tools_qualification.py
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: composed-server-data-tools-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  package:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    outputs:
+      package_receipt_sha256: ${{ steps.identities.outputs.package_receipt_sha256 }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Require actual source outputs and check packaging guards
+        run: |
+          test "$(uname -m)" = x86_64
+          mkdir -p out/data-tools-evidence
+          python3 -m unittest tests.test_data_tools_inputs tests.test_package_server_data_tools \
+            tests.test_data_tools_qualification tests.test_server_data_tools_provider -v
+          python3 - <<'PY'
+          from tools import provider_server_data_tools as provider
+          provider.load_source_qualification()
+          PY
+      - name: Acquire exact ordered source and original stock extractor inputs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/prepare_server_data_tools.py acquire --output out/data-tools-inputs \
+            > out/data-tools-evidence/acquisition.log 2>&1
+          cp out/data-tools-inputs/data-tools-acquisition.json out/data-tools-evidence/
+      - name: Acquire exact host strip tool and preserve its original notices
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, stat, zipfile
+          from tools import prepare_runtime as archives, server_engine_elf as elf
+          lock=json.loads(elf.TOOL_LOCK.read_bytes())
+          ndk=archives.fetch(lock['ndkArchive'],pathlib.Path('out/data-tools-tool-inputs'))
+          tool=pathlib.Path('out/data-tools-tool/llvm-objcopy');tool.parent.mkdir(mode=0o700)
+          with zipfile.ZipFile(ndk) as archive:
+              entry=archive.getinfo(elf.NDK_TOOL)
+              if stat.S_IFMT(entry.external_attr>>16)!=stat.S_IFREG or entry.file_size!=lock['executable']['bytes']:
+                  raise ValueError('exact original regular objcopy required')
+              with archive.open(entry) as source,tool.open('xb') as target:
+                  if archives.hash_stream(source,entry.file_size,target)!=lock['executable']['sha256']:
+                      raise ValueError('objcopy identity differs')
+              notices=pathlib.Path('out/data-tools-tool-notices');notices.mkdir(mode=0o700)
+              entries=[item for item in archive.infolist() if item.filename=='android-ndk-r28c/NOTICE' or
+                  item.filename.startswith('android-ndk-r28c/toolchains/llvm/prebuilt/linux-x86_64/NOTICE')]
+              if not entries:raise ValueError('original strip-tool notices missing')
+              for index,item in enumerate(entries):
+                  if stat.S_IFMT(item.external_attr>>16)!=stat.S_IFREG or item.file_size>16<<20:
+                      raise ValueError('regular bounded strip-tool notice required')
+                  (notices/(str(index)+'-'+pathlib.Path(item.filename).name)).write_bytes(archive.read(item))
+          tool.chmod(0o555)
+          proof=elf.verify_tool(ndk,tool.absolute(),lock['ndkArchive'])
+          pathlib.Path('out/data-tools-evidence/strip-tool.json').write_text(json.dumps(proof,indent=2)+'\n')
+          PY
+      - name: Derive only ordered readers and compose unchanged stock tools
+        run: |
+          python3 tools/package_server_data_tools.py \
+            --ordered-payload out/data-tools-inputs/payload --ordered-sources out/data-tools-inputs/ordered-sources \
+            --stock-package out/data-tools-inputs/stock-package \
+            --ndk-archive out/data-tools-tool-inputs/android-ndk-r28c-linux.zip \
+            --objcopy "$GITHUB_WORKSPACE/out/data-tools-tool/llvm-objcopy" --output out/data-tools-package \
+            > out/data-tools-evidence/packaging.log 2>&1
+      - name: Bind transfer receipt and completely read back original paired debug
+        id: identities
+        run: |
+          python3 - <<'PY'
+          import json,os,pathlib
+          from tools import package_server_engine as engine,provider_server_extractors as stock,verify_server_build as files
+          package=pathlib.Path('out/data-tools-package');receipt=json.loads((package/'stock-package-receipt.json').read_text())
+          pin=stock.load_pin(sealed=True);stock.validate_package(receipt,pin)
+          debug=pathlib.Path('out/data-tools-inputs/stock-debug/stock-extractors-debug-arm64.tar.gz')
+          if files.identity(debug)!=engine.identity(pin['debugArchive']):raise ValueError('original stock debug identity differs')
+          inventory=receipt['packages']['debug']['inventory'];engine.verify_archive(debug,inventory)
+          result=dict(formatVersion=1,scope='original-stock-extractor-debug-readback-for-composed-tools',
+              archive=files.identity(debug),members=len(inventory),allMembersReadback=True,androidRuntimeQualified=False,gameplayQualified=False)
+          pathlib.Path('out/data-tools-evidence/stock-debug-readback.json').write_text(json.dumps(result,indent=2)+'\n')
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output:
+              output.write('package_receipt_sha256='+files.identity(package/'package-receipt.json')['sha256']+'\n')
+          PY
+      - name: Retain composed runtime, complete sources, paired debug and fixture replay inputs
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: composed-data-tools-package-${{ github.sha }}
+          path: |
+            out/data-tools-package/
+            out/data-tools-inputs/original-sealed/
+            out/data-tools-inputs/native-ordered-build.json
+            out/data-tools-inputs/stock-debug/
+            out/data-tools-tool-notices/
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+      - name: Retain bounded host receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: composed-data-tools-packaging-evidence-${{ github.sha }}
+          path: out/data-tools-evidence/
+          retention-days: 30
+          if-no-files-found: error
+  native:
+    needs: package
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: composed-data-tools-package-${{ github.sha }}
+          path: out/transfer
+      - name: Build and read back exact published Ubuntu MySQL reference without APT
+        run: |
+          test "$(uname -m)" = aarch64
+          mkdir -p out/data-tools-native-evidence out/data-tools-native-state
+          env -u GITHUB_TOKEN python3 tools/release_server_dependencies.py prepare --output out/data-tools-dependency-release \
+            > out/data-tools-native-evidence/dependency-download.log 2>&1
+          python3 tools/prepare_server_dependency_image.py --inputs out/data-tools-dependency-release \
+            --output out/data-tools-dependency-image > out/data-tools-native-evidence/dependency-context.log 2>&1
+          cp out/data-tools-dependency-image/context-receipt.json out/data-tools-native-evidence/
+          rm -rf out/data-tools-dependency-release
+          docker build --network none --platform linux/arm64 -t esteria-data-tools-reference:verified \
+            out/data-tools-dependency-image/context > out/data-tools-native-evidence/image-build.log 2>&1
+          docker image inspect esteria-data-tools-reference:verified --format '{{.Id}}' \
+            > out/data-tools-native-evidence/image-id.txt
+          docker run --rm --network none --read-only \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/tools/verify_server_dependency_image.py,dst=/verify-image.py,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/data-tools-dependency-image/context-receipt.json,dst=/context-receipt.json,readonly" \
+            esteria-data-tools-reference:verified python3 /verify-image.py --context-receipt /context-receipt.json \
+            > out/data-tools-native-evidence/dependency-image-check.json
+      - name: Run all four derived entry points and exact YAML in the reference image
+        env:
+          EXPECTED_PACKAGE: ${{ needs.package.outputs.package_receipt_sha256 }}
+        run: |
+          image_check=$(sha256sum out/data-tools-native-evidence/dependency-image-check.json | cut -d' ' -f1)
+          docker run --rm --init --network none --read-only --user "$(id -u):$(id -g)" \
+            --tmpfs /tmp:rw,nosuid,nodev,size=128m --env PYTHONDONTWRITEBYTECODE=1 \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/data-tools-native-state,dst=/state" \
+            --workdir /qualification esteria-data-tools-reference:verified python3 tools/qualify_server_data_tools.py cli \
+            --package /qualification/out/transfer/data-tools-package --expected-package-receipt-sha256 "$EXPECTED_PACKAGE" \
+            --reference-image-check /qualification/out/data-tools-native-evidence/dependency-image-check.json \
+            --expected-reference-image-check-sha256 "$image_check" --output /state/cli \
+            > out/data-tools-native-evidence/native-cli-phase.log 2>&1
+          cp out/data-tools-native-state/cli/native-cli-phase.json out/data-tools-native-evidence/
+      - name: Prepare original seven-patch source for small synthetic fixtures only
+        run: |
+          python3 tools/prepare_server_data_tools.py fixture-source --inputs out/transfer/data-tools-inputs \
+            --output out/data-tools-fixture > out/data-tools-native-evidence/fixture-source.log 2>&1
+          cp out/data-tools-fixture/fixture-source.json out/data-tools-native-evidence/
+          # These build only test bridges; no engine or extractor target is rebuilt.
+          if ! command -v gcc >/dev/null || ! command -v g++ >/dev/null || \
+              ! test -r /usr/include/openssl/sha.h || ! test -r /usr/include/bzlib.h || ! test -r /usr/include/zlib.h; then
+            sudo apt-get -o Acquire::Retries=3 update
+            sudo apt-get -o Acquire::Retries=3 install -y build-essential libssl-dev libbz2-dev zlib1g-dev
+          fi
+          dpkg-query -W gcc g++ libssl-dev libbz2-dev zlib1g-dev > out/data-tools-native-evidence/fixture-packages.txt
+      - name: Exercise the actual stripped ordered pair through synthetic source-bound lookups
+        env:
+          EXPECTED_PACKAGE: ${{ needs.package.outputs.package_receipt_sha256 }}
+        run: |
+          phase=$(sha256sum out/data-tools-native-state/cli/native-cli-phase.json | cut -d' ' -f1)
+          python3 tools/qualify_server_data_tools.py lookup --package out/transfer/data-tools-package \
+            --expected-package-receipt-sha256 "$EXPECTED_PACKAGE" --cli-phase out/data-tools-native-state/cli \
+            --expected-cli-phase-sha256 "$phase" --fixture-source out/data-tools-fixture/base/source \
+            --output out/data-tools-lookup > out/data-tools-native-evidence/lookup.log 2>&1
+          cp out/data-tools-lookup/native-cli.json out/data-tools-native-evidence/
+          cp out/data-tools-lookup/lookup-result.json out/data-tools-native-evidence/
+          cp out/data-tools-lookup/logs/synthetic-lookups.log out/data-tools-native-evidence/
+      - name: Retain typed CLI and source-bound lookup receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: composed-data-tools-native-evidence-${{ github.sha }}
+          path: out/data-tools-native-evidence/
+          retention-days: 30
+          if-no-files-found: error

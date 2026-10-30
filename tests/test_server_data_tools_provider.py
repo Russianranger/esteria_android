@@ -90,5 +90,21 @@ class PendingDataToolsProvider(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'measured-native-source-inputs-differ'):provider.load_source_qualification()
         with self.assertRaisesRegex(ValueError,'real-ordered-source-qualification-required'):provider.load_source_qualification()
 
+    def test_native_reference_image_must_match_the_required_runtime_and_safe_readback_scope(self):
+        image=dict(formatVersion=1,scope='native-arm64-dependency-image-readback',
+                   runtimeArchive=self.pin['requiredServerRuntimeArchive'],
+                   actualImageMetadataAndElfHashesVerified=True,nativePythonExecuted=True,
+                   mysqlServerExecuted=False,databaseInitialized=False,esteriaServerExecuted=False,
+                   androidRuntimeQualified=False,gameplayQualified=False)
+        cli=dict(referenceImageReadback=dict(identity=dict(bytes=7,sha256='7'*64),receipt=image))
+        provider.verify_reference_image(cli,self.pin)
+        for key,value in (('runtimeArchive',dict(bytes=1,file='other.tar.gz',sha256='0'*64)),
+                          ('nativePythonExecuted',False),('databaseInitialized',True),('androidRuntimeQualified',True)):
+            changed=copy.deepcopy(cli);changed['referenceImageReadback']['receipt'][key]=value
+            with self.subTest(key=key),self.assertRaisesRegex(ValueError,'reference-image-selection-or-gates'):
+                provider.verify_reference_image(changed,self.pin)
+        with self.assertRaisesRegex(ValueError,'reference-image-receipt-required'):
+            provider.verify_reference_image({},self.pin)
+
 
 if __name__=='__main__':unittest.main()
