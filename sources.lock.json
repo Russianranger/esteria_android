@@ -3,7 +3,7 @@
   "sources": {
     "client": {
       "url": "https://github.com/Russianranger/wowdecomp_esteria.git",
-      "commit": "69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa",
+      "commit": "0f931bbade36a4b197725d691b8eff7caea7b3be",
       "branch": "android/arm64-port",
       "submodules": {},
       "patches": []
@@ -42,6 +42,10 @@
         {
           "path": "patches/server/0006-empty-script-modules.patch",
           "sha256": "ea0beb357c71d8b8c187af9d4afede520e7ac9877e40fbdc5fab99d54fc21f97"
+        },
+        {
+          "path": "patches/server/0007-runtime-module-config-directory.patch",
+          "sha256": "5e41d474179ef553ec9c2544de947a3724885fd7f3ac233af3d89797acd032ff"
         }
       ]
     }

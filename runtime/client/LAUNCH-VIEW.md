@@ -35,10 +35,13 @@ content is present without an active reviewed writable UI selection**.
 constructor accepts only a typed `ClientUiStore.Selection`; it binds the exact
 import/root/work store and is revalidated before preparation and argument use.
 See [WRITABLE-UI.md](WRITABLE-UI.md). A preparation result alone is not permission
-to skip this gate. Client revisions
-that implement a separately reviewed local-offline policy will need their own
-qualified launch-argument addition; the current pinned 69cc client has no such
-mode and the view does not invent an unsupported flag.
+to skip this gate. The selected client
+`0f931bbade36a4b197725d691b8eff7caea7b3be` implements the separately reviewed
+`--local-offline` policy. `Plan.arguments()` still does not add that flag or start
+the client. A future admitted full-client session must require the matching
+offline-capable provider, explicitly add the flag and qualify that Android
+session. The historical 69cc provider had no such mode; its source and execution
+evidence remain preserved. Preparing either view is not an offline gameplay claim.
 
 The layout is:
 
@@ -76,8 +79,13 @@ other environment settings, prefix, home and display/audio session locations.
 
 ## Source audit and loopback configuration
 
-Audit reference: reconstructed client
-`69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa`.
+The original writable-path audit used reconstructed client
+`69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa`. The selected provider now uses
+`0f931bbade36a4b197725d691b8eff7caea7b3be`; the path/overlay requirements remain,
+with the additional opt-in policy in `Engine/Source/Platform/LocalOffline.h` and
+the actual command parser. Asset-free native Windows and ARM64 Linux Wine
+fixtures verified that policy and loopback boundaries. They did not initialize
+the game or qualify Android gameplay.
 
 - `WoW/Source/Client.cpp`, `SetPaths`, sets both OS current directory and SFile
   base path from `-datadir`. `InitializeGlobal` loads `Config.wtf` and RunOnce
@@ -94,11 +102,12 @@ Audit reference: reconstructed client
   host:port, otherwise defaulting to 3724. Managed configuration contains only
   `realmList=127.0.0.1:3724`, empty `realmListbn`, empty `portal`, and empty
   `serverAlert`. It contains no account or password.
-- The current C++ source does not define `patchlist`, `loginserver`, or
+- The audited C++ source does not define `patchlist`, `loginserver`, or
   `patchprompt` CVars. Adding those strings would not implement an offline
-  policy. `CGlueMgr.cpp` attempts a server-alert URL download, and other streaming,
-  patch, Battle.net and extension paths require explicit local-offline controls.
-  Empty configuration values alone do **not** prove zero external traffic.
+  policy. The default client retains server-alert, streaming, patch, Battle.net
+  and extension network paths. The selected 0f revision adds explicit local-offline
+  controls; callers must actually enable that mode. Empty configuration values
+  alone do **not** prove zero external traffic.
 - Root `WoW.mfil`, updater executables and imported `Config.wtf` are not added to
   the view. This avoids silently importing a root streaming setup, but it does
   not qualify all other code paths or incomplete MPQ content.

@@ -1,14 +1,22 @@
 # Reconstructed client binary provider
 
 `tools/provider_client_runtime.py` builds a host-verified APK asset provider from
-the actual reconstructed Windows ARM64 client artifact. The initial input is
-client `69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa`, build `40992315512.1`,
-[artifact 12949534555](https://github.com/Russianranger/wowdecomp_esteria/actions/runs/40992315512/artifacts/12949534555).
-`android-provider.lock.json` pins its 45,120,553-byte ZIP and SHA-256
-`4298480be53ddc2e614a06e8acd130139015ad52994e766eecee5f5d374327e4`, measured
+the actual reconstructed Windows ARM64 client artifact. The selected input is
+client `0f931bbade36a4b197725d691b8eff7caea7b3be`, build `41012726334.1`,
+[artifact 12958691770](https://github.com/Russianranger/wowdecomp_esteria/actions/runs/41012726334/artifacts/12958691770).
+`android-provider.lock.json` pins its 45,848,368-byte ZIP and SHA-256
+`1fd6176727065f50a926b45a3d81df1bfd0ea33c330e9fb9131ff30ad170b94e`, measured
 against GitHub's artifact digest. The tool requires the same clean source revision
 as application `sources.lock.json`; a changed source pin requires a newly measured
 artifact pin. It never chooses a floating branch or accepts a stock `Wow.exe`.
+
+That client revision passed all five CI jobs, including native Windows x64/ARM64
+and native Linux ARM64 Wine execution. The latter exercised real executable entry,
+offline network policy, loopback transport and synthetic Grunt authentication,
+codec, software Vulkan graphics and captured FMOD output. These asset-free fixture
+results are separate from Android execution or matched world gameplay. The new
+provider binds the exact seven-patch server source lock; the earlier 69cc provider
+and its already-published source release remain preserved as historical inputs.
 
 Only `WowClient64.exe` and matching `XvidDecoder.dll` enter the binary directory.
 The tool reuses the exact committed client's PE parser, validates actual AA64
@@ -59,13 +67,13 @@ client repository; generated binaries are never committed to either repository.
 
 ```sh
 python3 tools/fetch_sources.py client --output sources
-python3 tools/provider_client_runtime.py build --artifact /cache/arm64-69cc.zip \
+python3 tools/provider_client_runtime.py build --artifact /cache/arm64-auth-0f.zip \
   --client-source sources/client --provider /tmp/new-client-provider
-python3 tools/provider_client_runtime.py verify --artifact /cache/arm64-69cc.zip \
+python3 tools/provider_client_runtime.py verify --artifact /cache/arm64-auth-0f.zip \
   --client-source sources/client --provider /tmp/new-client-provider
 python3 tools/package_client_sources.py --client-source sources/client \
   --xvid-source /cache/xvidcore-1.3.7.tar.gz --output /tmp/new-client-sources
-ESTERIA_CLIENT_ARTIFACT=/cache/arm64-69cc.zip ESTERIA_CLIENT_SOURCE="$PWD/sources/client" \
+ESTERIA_CLIENT_ARTIFACT=/cache/arm64-auth-0f.zip ESTERIA_CLIENT_SOURCE="$PWD/sources/client" \
   python3 -m unittest tests.test_client_runtime_provider -v
 ```
 
@@ -94,7 +102,8 @@ registers `datadir` as a string; `SCmd.cpp` accepts the next token. `SetPaths()`
 sets both the process working directory and SFile base path to that directory,
 then reads the `Data\` subtree. The launcher uses `/work/launch/<generation>` as
 the writable view, `/esteria-data` as the separately bound imported generation,
-and a validated guest-only `Data` link from the view to `/esteria-data/Data`.
+and a real `Data` overlay directory containing validated per-file guest links
+plus private root/locale realmlist overrides for loopback routing.
 `WTF`, `Cache`, `Logs`, and `Screenshots` link to persistent `/work/client-state`
 paths. Binding an immutable imported root directly as the working directory
 would mix mutable settings into imported assets.

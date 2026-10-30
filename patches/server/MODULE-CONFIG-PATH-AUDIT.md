@@ -42,6 +42,10 @@ rewriting its configuration. The patched executable SHA-256 was
 `86483df486b43645983e8a9b6e12c6f52f760b937e8ae9b589d135ce337e3f8e`;
 the unpatched control was
 `1aa0021565d1989e7c79d089bce31e9ef3cb6620dc397e7ed0fedba8817c3a58`.
-This isolated host evidence does not establish ARM64/common-target integration,
-world startup or gameplay. Source-lock activation awaits the existing full
-server link gate and the next native reference build.
+The six-patch native ARM64 server linked, installed and passed its build-host
+loader checks in run `41005048019`. Patch 0007 is now selected in the application
+source lock alongside measured reconstructed client `0f931bba`; the earlier
+six-patch binaries remain separately pinned for runtime qualification. This
+isolated x86_64 host evidence does not establish the new ARM64/common-target
+integration, full compiled module-list parsing, world startup or gameplay.
+Those native reference and runtime gates remain required for the new selection.

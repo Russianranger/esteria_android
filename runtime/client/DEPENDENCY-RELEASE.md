@@ -1,7 +1,18 @@
 # Durable reconstructed client inputs
 
-The release candidate retains the proven client 69cc build; it does not promote
-the later loopback fixture while its actual execution failure is being resolved.
+The next selected provider is client `0f931bbade36a4b197725d691b8eff7caea7b3be`,
+build `41012726334.1`, paired with the seven-patch server source lock. Its exact
+original ZIP and newly retained complete source companion have been checked
+locally. Publication of its separate durable prerelease is pending the exact
+integration packaging checkpoint; no new download URL is claimed yet. The old
+69cc release remains intact. Until the new release is published and its receipt
+recorded, the default release validator deliberately refuses the old release
+metadata against the newly selected provider pin.
+
+## Preserved initial release
+
+The original durable release retains client 69cc, selected before the later
+offline, loopback and authentication fixture changes were qualified.
 The exact original 45,120,553-byte Actions ZIP is retained without repacking it.
 It includes compiler diagnostics and PDB symbols as well as WowClient64.exe and
 XvidDecoder.dll. A separate 23,401,759-byte source companion retains the complete
@@ -11,11 +22,11 @@ imported game data or private runtime state is added. Existing component
 licenses are preserved; the integration GPL license does not relicense client
 code, which has no top-level license at the selected pin.
 
-`android-provider.lock.json` remains byte-for-byte unchanged. New release metadata
-is in `dependency-release.lock.json`; target/tag refers to integration provider
+Its original input-lock bytes remain in the release and Git history. Historical
+release metadata in `dependency-release.lock.json` identifies integration provider
 packaging revision `ae5534d0a9d7fb72c8e5a03dcfc65420c354e7bb`, and client source
 revision `69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa` remains separately explicit.
-The corresponding-source receipt binds the six-patch integration source lock.
+The initial corresponding-source receipt binds the six-patch integration source lock.
 Future published fetch checks the retained source lock instead of requiring
 unrelated server patch records in the current checkout to remain unchanged.
 

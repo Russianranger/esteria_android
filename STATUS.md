@@ -5,10 +5,10 @@ Updated 2026-10-30 UTC. This is an implementation checkpoint, **not a device-tes
 ## Sources and ownership
 
 `sources.lock.json` is authoritative for application inputs. It pins client
-`69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa`, server
+`0f931bbade36a4b197725d691b8eff7caea7b3be`, server
 `f35f04d01689f034778e3474b3c820092f51e461`, and Eluna
 `58d7652138887783228b9727bd1fa4e08f00342b`. Three digest-checked Eluna declaration/include patches plus a server-root
-attunement stat-API compatibility patch, real grid-template includes, and source-empty script-directory filtering are maintained here (six patches). Starting tips were client `800cdd2`, integration `6309c8f`,
+attunement stat-API compatibility patch, real grid-template includes, source-empty script-directory filtering, and module-config paths relative to the selected main config are maintained here (seven patches). Starting tips were client `800cdd2`, integration `6309c8f`,
 and the same server revision. Work is on the two requested development branches;
 no default merge, history rewrite or server push has occurred.
 
@@ -24,19 +24,29 @@ jobs41007556042 and25 actual host compiler tests. Development tip
 3f9389ccfdb0431d281e281c49193c8064c70b62 passes real Grunt/SRP positive and
 negative controlled-peer tests on Windows ARM64/x64 in41010223296. The compiled
 server pairing is implemented separately and awaits its actual runtime gate.
-New tip0f931bbade36a4b197725d691b8eff7caea7b3be adds the exact-source Wine Grunt gate.
+Client0f931bbade36a4b197725d691b8eff7caea7b3be passes all five jobs41012726334,
+including the actual ARM64 Wine Grunt positive/negative controlled-peer gate.
 The preceding3e9 run41006100154 passed real x64 short/extended packet reads,
 queued sends, stream I/O and both connect/disconnect pairs after repairing lost
 network timer wakes; it then exposed the fixture's missing WDataStore Finalize().
 The complete transport receipt and Wine transport gate now pass.
-The application intentionally keeps the measured69cc provider.
+The application now selects the measured0f provider and seven-patch server source.
+The exact new provider/source companion pass eight host groups. This is a
+dependency-preparation checkpoint: the existing69 dependency release remains
+unchanged, and combined fetching will refuse it until the new exact release is
+published and verified. Source-lock SHA256 is
+`5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1`.
 
 Server40994809596 compiled all2,257 objects and linked authserver/dbimport, then
 failed final worldserver linking on three missing grid-template instantiations
 and the README-only Custom directory's nonexistent loader. Minimal source-backed
 patches5/6 supply real template definitions and omit only source-empty directories.
-Corrected run41005048019 is linking with the saved cache; no complete server
-package or auth/world success is claimed. Native ARM64 backup41013086447 now
+Corrected run41005048019 linked all application/tools executables and passed
+loader/module/source-package checks. Its first runtime gate rejected a content
+consumer provenance mismatch before MySQL or SQL started. The corrected consumer
+now requires all five producer identity fields; a separate exact-binary runtime
+job tests the retained six-patch payload without recompilation. No auth/world
+success is claimed. Native ARM64 backup41013086447 now
 passes complete 367,899,260-byte dump equality after fresh restore and restart,
 including account journal and repeated setup preservation. Harness-only charset
 normalization was corrected without changing server tables or comparison gates.
@@ -91,6 +101,14 @@ adapter now compile and pass core/lint plus all five final APK provider checks.
 The original sources and notices are retained. A separately verified seven-file
 durable dependency release is being published; real imported-game generation
 remains unqualified.
+
+Android x64 Wine run41015479987 passed complete original-source sealing and APK
+validation, then failed prefix initialization while making ntdll executable.
+No reconstructed-client execution occurred. A five-case mmap/mprotect diagnostic
+now measures actual return/errno values without executing mapped bytes; the
+Android cause remains unproven. The owned display/input/audio coordinator now
+builds with authenticated shared X11 endpoints, lifecycle mute and reverse cleanup.
+It has not executed as a complete Android presentation session.
 
 ## Implemented and verified
 

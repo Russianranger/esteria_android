@@ -1,14 +1,14 @@
 {
   "formatVersion": 1,
   "scope": "measured-reconstructed-client-provider-inputs",
-  "sourceRevision": "69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa",
-  "workflowRun": 40992315512,
-  "buildId": "40992315512.1",
-  "artifactId": 12949534555,
+  "sourceRevision": "0f931bbade36a4b197725d691b8eff7caea7b3be",
+  "workflowRun": 41012726334,
+  "buildId": "41012726334.1",
+  "artifactId": 12958691770,
   "artifact": {
-    "bytes": 45120553,
-    "sha256": "4298480be53ddc2e614a06e8acd130139015ad52994e766eecee5f5d374327e4"
+    "bytes": 45848368,
+    "sha256": "1fd6176727065f50a926b45a3d81df1bfd0ea33c330e9fb9131ff30ad170b94e"
   },
-  "buildManifestSha256": "1c153e0d2c2f5a8ce29db975431fdc8cefe0827ce12e77f33a0fe0ede0d4c841",
+  "buildManifestSha256": "bccde6ee90f688b27ac9790e2aa29d70d270dad2b324a54e92a1bdf72bd58b40",
   "androidRuntimeQualified": false
 }

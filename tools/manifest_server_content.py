@@ -33,11 +33,13 @@ SUPPORTED_PATCHES = {
     '0004-attunement-stat-api.patch': 'd9ef6ca8f96ab186c37c072b22143cdded9976aa3a62d083f893c502a5745cb8',
     '0005-script-grid-templates.patch': '6b459c90839e7831df8533966442fabd476ae1773f0302c50ccc8a997f157369',
     '0006-empty-script-modules.patch': 'ea0beb357c71d8b8c187af9d4afede520e7ac9877e40fbdc5fab99d54fc21f97',
+    '0007-runtime-module-config-directory.patch': '5e41d474179ef553ec9c2544de947a3724885fd7f3ac233af3d89797acd032ff',
 }
 ROOT_CPP_PATCHES = {
     '0004-attunement-stat-api.patch': 'module C++ stat API compatibility; legacy display-only primary stats retained',
     '0005-script-grid-templates.patch': 'instantiate existing grid/player visitor templates in three script callers',
     '0006-empty-script-modules.patch': 'omit loader calls only for source-empty script directories; populated scripts retained',
+    '0007-runtime-module-config-directory.patch': 'resolve module configurations beside the selected main configuration; default resolution retained',
 }
 MAX_TREE_BYTES = 16 * 1024 * 1024
 MAX_METADATA_BYTES = 2 * 1024 * 1024
@@ -93,6 +95,7 @@ def adaptation_records(source):
         result.append(dict(path=patch['path'], sha256=patch['sha256'], submodule=patch.get('submodule'),
             effect=ROOT_CPP_PATCHES.get(name, 'Eluna C++ declaration/include compatibility'),
             scriptRegistrationPolicyChanged=name == '0006-empty-script-modules.patch',
+            runtimeConfigurationPathChanged=name == '0007-runtime-module-config-directory.patch',
             sqlOrLuaInputsChanged=False, moduleSelectionChanged=False, updaterOrderingChanged=False))
     return result
 

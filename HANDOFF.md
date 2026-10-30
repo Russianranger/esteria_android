@@ -8,9 +8,13 @@ Thor startup-test request. Do not imply execution continues without a real job.
 
 ## Current inputs and outcome
 
-The application lock pins client69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa,
+The application lock pins client0f931bbade36a4b197725d691b8eff7caea7b3be,
 serverf35f04d01689f034778e3474b3c820092f51e461 and
-Eluna58d7652138887783228b9727bd1fa4e08f00342b, with six hashed server patches.
+Eluna58d7652138887783228b9727bd1fa4e08f00342b, with seven hashed server patches. Source-lock SHA256 is
+5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1.
+The new client provider/source companion are measured and verified; publish their
+new exact durable release next. The old69 release remains intact and is rejected
+by current-pin fetch checks during this explicit dependency-preparation interval.
 The newer client development tip is0f931bbade36a4b197725d691b8eff7caea7b3be;
 its workflow pins integration0146ca89307eb3c00c09b7fbecdf3e301bd9bd53 for Wine Grunt.
 Fetch both branches and inspect Actions before interpreting pending results.
@@ -37,15 +41,18 @@ ARM64 execution, client/server login or world entry is qualified.
    Client97b347 fixes that and all five jobs41007244092 pass. Strict shader source
    926a also passes all five jobs41007556042. Client3f9389 adds actual Grunt/SRP
    callbacks against a controlled local peer; Windows ARM64/x64 in41010223296 pass.
-   Real compiled-server pairing is separate; the application still pins69cc.
-2. Server41005048019 compiles six-patch source using saved cache. Prior run linked
-   authserver/dbimport but failed final worldserver link after2,257objects. Patches5/6
-   repair real template visibility and README-only Custom registration. Complete
-   package, compiled SQL updater and real authentication harness remain unqualified.
+   Client0f all five jobs41012726334 pass including native ARM64 Wine Grunt.
+   Real compiled-server pairing is separate; application pins now select0f.
+2. Server41005048019 linked the complete six-patch source and passed loader,
+   generated-module selection and source packaging. Its first runtime gate stopped
+   before SQL because the consumer omitted three producer provenance fields.
+   That strict consumer is fixed and regression-tested. server-requalification.yml
+   now tests the retained exact linked artifact without another full compile.
+   No actual compiled SQL/auth success is claimed yet.
 3. Proposed patch7 derives module configs from the selected main config's parent,
    preserving defaults. Actual source-linked host ConfigMgr reference passes and
-   original-source negative control fails. It is not in sources.lock yet. Activate
-   after current link evidence; complete source-bound module rendering is now
+   original-source negative control fails. It is now in sources.lock with client0f.
+   Complete source-bound module rendering is
    implemented. Qualifiers must pass both verified source inventory and actual
    compiled selection. ConfigMgr success alone does not prove modules loaded.
 4. Native ARM64 backup41013086447 passes complete367,899,260-byte dump equality
@@ -87,6 +94,12 @@ ARM64 execution, client/server login or world entry is qualified.
     command/EOF/helper-signal shutdown with unchanged UUID/credentials/markers.
     The real Android adapter lifecycle fixture is in progress; PRoot expands socket
     paths, so its exclusive socket directory must remain short. Keep gameplay gated.
+
+11. Android x64 Wine41015479987 passed full source/APK gates, then failed ntdll
+    executable-page protection before client execution. Exact numeric memory-map
+    diagnostics are running next; do not treat an inferred execmod restriction as
+    established. No Android policy or target SDK is weakened. Owned authenticated
+    X11/input/audio composition now builds; complete Android execution is separate.
 
 ## Missing content and acceptance
 
