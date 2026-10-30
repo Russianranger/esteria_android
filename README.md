@@ -10,6 +10,8 @@ A local client/server application for AYN Thor Max, in active bring-up. Target: 
 - [Validation gates](TESTING.md)
 - [Next-session handoff](HANDOFF.md)
 - [Local server requirements](runtime/LOCAL-SERVER.md)
+- [Pinned runtime preparation](runtime/PACKAGING.md)
+- [Native ARM64 Wine qualification](runtime/WINE-QUALIFICATION.md)
 
 Development branches: `Russianranger/wowdecomp_esteria:android/arm64-port` and this repository's `android/client-server`. The server is consumed at a fixed revision without modifying its repository. `sources.lock.json` selects exact source inputs; do not vendor a divergent client engine here.
 

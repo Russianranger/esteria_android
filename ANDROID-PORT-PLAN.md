@@ -14,6 +14,25 @@ Build the reconstructed client as Windows ARM64, run it in a local ARM64 Wine ru
 
 Native Android is a later platform path: current root CMake deliberately rejects it, and removing that guard alone would not implement the Windows services, presentation, sound and input backends. Avoid doubling the platform rewrite before a reconstructed client reference build and protocol baseline exist. Wine/PRoot/display/audio payloads still need exact source pins, corresponding sources and device qualification; a proposed runtime is not a qualified one.
 
+The complete reconstructed Windows ARM64 and x64 builds now pass, including the
+source-built movie DLL's actual load/decode test. This supports the selected bring-up
+path but does not qualify Wine, Android, graphics or game protocol behavior. The
+pinned Debian 12 Wine candidate is staged and measured; the Ubuntu 24.04 server
+needs a separate compatible dependency environment. No CPU translation should be
+needed for the selected AA64 client/server code, but Wine/PRoot/display overhead,
+combined memory and Thor thermals remain measurements to make, not assumed gains.
+
+## Milestone state
+
+| Milestone | State | Next evidence |
+| --- | --- | --- |
+| 1. Pinned reference builds | Branches, locks, protocol checks, full ARM64/x64 client builds complete; server build in progress. | Native Linux ARM64 server link/install and artifact provenance. |
+| 2. Executable client platform | ARM64 algorithms, crash path and real codec implemented; Windows client compiles. | Linux ARM64 Wine execution, Vulkan presentation, then Android display/input/audio. |
+| 3. Local server/database | Real host MySQL bootstrap/recovery/persistence passed. | Packaged ARM64 MySQL/server rootfs, source-backed game schemas and data loading. |
+| 4. Matched gameplay | Not qualified. | Login, character creation, world entry, Esteria extensions and persistent saves with real content. |
+| 5. Android integration | Import/recovery, launcher controls, diagnostics and generic supervisor implemented. | Runtime installation, process adapter, in-game controls, keyboard, shutdown and lifecycle. |
+| 6. Thor candidate | Not ready. | One signed update-compatible package with all required host/emulator/gameplay gates, then consolidated Thor test. |
+
 ## Execution order
 1. Pin sources and Eluna, create repeatable source preparation and field-layout tests. Build x64 + ARM64 client and Linux ARM64 server continuously.
 2. Remove x86 assumptions with real portable kernels, CPU discovery, decompression and movie codec. Keep desktop behavior. Inspect every compile failure; do not silently disable audio/gameplay.

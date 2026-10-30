@@ -7,10 +7,48 @@ python3 tools/verify_protocol.py --client ../client-src --server ../server-src
 ```
 The actual-source protocol verifier generates the selected 25/254/32 descriptors and compares every player field to pinned server offsets and sizes. It also checks mask counts, container slots and server size-comment consistency. This verifies layout, not login, appearance transport or world behavior.
 
-Java core tests use synthetic files and child processes, with no game data or database required. Android CI also compiles and lints the application. Client portable tests exercise algorithms; the Windows matrix must separately build real executables.
+Java core tests use synthetic files and child processes, with no game data or
+database required. Run `./gradlew :core:check :app:assembleDebug :app:lintDebug`.
+The importer runs with a 32 MiB heap and a larger streaming input. Tests cover
+interruption/reuse, immutable overlays, malformed archive/provider metadata,
+bounded inventories, cancellation and prior-generation preservation. SAF Android
+provider behavior remains a separate emulator/device check.
+
+The client CI matrix separately builds full Windows x64 and ARM64 binaries,
+validates PE provenance, and invokes the actual movie DLL through a synthetic
+compressed-frame driver. Linux x64 and native ARM64 component tests cover portable
+algorithms. None of these tests start the full game.
+
+## Real database evidence
+
+Database run [40983978344](https://github.com/Russianranger/esteria_android/actions/runs/40983978344)
+passed both real-engine fixtures. The dedicated MySQL 8.0.44 service verifies
+authentication/provisioning/locks/ownership/preservation. Host MySQL 8.0.46 verifies
+fresh initialization, secure setup, datadir promotion/recovery, restart and SQL
+persistence. The logs record exact engine versions. The bootstrap only creates
+empty application databases. Game-schema load, migrations, character saves and
+Android MySQL remain unqualified. Ordinary discovery reports these fixtures as
+skipped unless their explicit environment and disposable engine are provided.
+
+## Wine and Android evidence boundaries
+
+The candidate Wine archive is measured and staged with checked file hashes and
+architecture. Its actual client execution requires the separate native Linux ARM64
+fixture in [runtime/WINE-QUALIFICATION.md](runtime/WINE-QUALIFICATION.md). Keep
+its resulting qualification JSON and logs; authored tests or absent physical DLL
+files for API-set names do not establish loader success or failure.
+
+Android APK compilation/lint and launcher host tests are passing checks. No Android
+emulator or physical Thor gameplay result has been recorded. Display/audio/input,
+PRoot execution, full local client/server startup and offline play need actual
+runtime validation. Keep launcher memory/thermal diagnostics labeled as launcher
+observations until the combined runtime can be measured.
 
 ## Not yet qualified
-MySQL initialization/migration, server data loading, Wine client launch, Vulkan world rendering, full audio/input, character login/create/world entry, combat/loot/quests, save/relog, bots, offline play, update-signature continuity and Android low-memory recovery have not passed end-to-end validation.
+Game-schema initialization/migration, server data loading, full Wine client launch,
+Vulkan world rendering, audio/input, character login/create/world entry,
+combat/loot/quests, save/relog, bots, offline play, update-signature continuity and
+Android low-memory recovery have not passed end-to-end validation.
 
 Do not ask the owner to install a foundation APK. The main Thor test comes after one coherent candidate is expected to cover all requested gameplay. A narrow device-only diagnostic is allowed only when evidence shows useful independent work cannot continue.
 
