@@ -1,0 +1,190 @@
+{
+  "formatVersion": 1,
+  "scope": "verified-retained-native-arm64-runtime-and-full-sources-only",
+  "runtimeInput": {
+    "formatVersion": 1,
+    "scope": "measured-native-arm64-wine-host-candidate-inputs",
+    "sourceRevision": "681b2e9f30b19e94bf8e8de44f67fedba5033c8a",
+    "workflowRun": 41057900330,
+    "artifactId": 12982441891,
+    "artifact": {
+      "bytes": 282903224,
+      "sha256": "2c1b248bdc3605505bf6248066ccd6ed323242bbf2f04e08cab772aff11c87df"
+    },
+    "files": {
+      "candidate-runtime.lock.json": {
+        "bytes": 102647,
+        "sha256": "5816a07061c308a6a515d3747da2b7e3adfb8b22b6e6827819f590b1214fe04b"
+      },
+      "package-build-receipt.json": {
+        "bytes": 19890,
+        "sha256": "db0f3431aa47c20e41219201246c3f406f46598235e35c31d1f4b45577523f37"
+      },
+      "runtime.json": {
+        "bytes": 66640,
+        "sha256": "4b731a5f450a556632c598ddebda2ec3f814c8d7ea2c9e1529d6c80c8773e0a5"
+      },
+      "sources.lock.json": {
+        "bytes": 18146,
+        "sha256": "077fb2b0883986338b6755e53f5cede08bd63ed1834783e7e6cd079e0ec0c16d"
+      },
+      "wine-arm64.manifest.json": {
+        "bytes": 66773,
+        "sha256": "d6c98cca860d324113c434cd0ccd1709e19e2dfac1a03b1f248b479f50303267"
+      },
+      "wine-arm64.tar.gz": {
+        "bytes": 282628308,
+        "sha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46"
+      }
+    },
+    "sourcesArtifactId": 12982282257,
+    "sourcesArtifact": {
+      "bytes": 1681474721,
+      "sha256": "38e16617545abb16f995ba75a8b52b8ca2bacad5d2688adf3646911f16c8fb06"
+    },
+    "sourcesPrefix": "wine-arm64-sources/",
+    "sourceReadbackReceipt": {
+      "bytes": 1530,
+      "sha256": "da37376ccb72d18b2b50f327ed12a65ceccce665f2ef399be8e571b0b6f95b1c"
+    },
+    "hostQualificationReceipt": {
+      "bytes": 20396,
+      "sha256": "fdefa5c028aa21a5bb4b94b408725d7062d7b5f7eba8b6704224dd70c8d2dfd4"
+    },
+    "evidenceArtifactId": 12981467294,
+    "evidenceArtifact": {
+      "bytes": 181600,
+      "sha256": "b9bb18a04d3c529b4153eb3077438159c10fcdcf35f75718f340e6d2f7790e7a"
+    },
+    "sourceBuildPassed": true,
+    "originalNativeClientRevision": "0f931bbade36a4b197725d691b8eff7caea7b3be",
+    "originalNativeClientComponentGatesPassed": true,
+    "androidQualified": false,
+    "gameplayQualified": false
+  },
+  "sourceReadback": {
+    "formatVersion": 1,
+    "scope": "read-back-source-owned-arm64-wine-candidate-originals",
+    "sourceRevision": "681b2e9f30b19e94bf8e8de44f67fedba5033c8a",
+    "runtimeMetadataSha256": "4b731a5f450a556632c598ddebda2ec3f814c8d7ea2c9e1529d6c80c8773e0a5",
+    "sourceLockSha256": "077fb2b0883986338b6755e53f5cede08bd63ed1834783e7e6cd079e0ec0c16d",
+    "debianSourcePackages": 183,
+    "originalDebianFiles": 583,
+    "debianSourceBytes": 858739837,
+    "originalArchives": {
+      "fex-2510-source-with-submodules.tar.gz": {
+        "bytes": 222845230,
+        "sha256": "8a10a8e63cdea41a6c70b0f14d487fe4cb3f11c8fb5baba3e42090098e2745be"
+      },
+      "llvm-mingw-20250920-ucrt-ubuntu-22.04-aarch64.tar.xz": {
+        "bytes": 75125388,
+        "sha256": "bce5cc755c613515fd44e1ee9523123d854103abae147571adb645450036274d"
+      },
+      "wine-arm64ec-source.tar.gz": {
+        "bytes": 53416396,
+        "sha256": "93ffcd86d3f518934da5c93c768d43afe7e97d66f04f355d914f5cfb6731ac74"
+      }
+    },
+    "toolchainSources": {
+      "sourceTrees": 4,
+      "originalNotices": 47,
+      "archiveBytes": 252021269,
+      "manifest": {
+        "bytes": 13790,
+        "sha256": "fc41f799c6122fb880e8809df75d9fd993b831d78d4d688be8ef56523a698f83"
+      },
+      "allSelectedGitBlobsReadBack": true,
+      "binaryRebuildEquivalent": false,
+      "androidRuntimeQualified": false
+    },
+    "fexNotices": 22,
+    "adaptationSources": 5,
+    "completeIntegrationTreeReadBack": true,
+    "allOriginalSourcesReadBack": true,
+    "androidQualified": false,
+    "gameClientQualified": false,
+    "gameplayQualified": false
+  },
+  "inputTransport": "public-write-once-prerelease",
+  "publicRelease": {
+    "assets": {
+      "NOTICE.txt": {
+        "bytes": 921,
+        "sha256": "e69aced36b63f65cd98361d9bdeef883c56f846716b1dac04773610d6f93283f",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/NOTICE.txt"
+      },
+      "SHA256SUMS": {
+        "bytes": 883,
+        "sha256": "17fb320c10abe67161f67855391bdc4aa6985f2ef9bf5d87449cc33afd4e7987",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/SHA256SUMS"
+      },
+      "candidate-runtime.lock.json": {
+        "bytes": 102647,
+        "sha256": "5816a07061c308a6a515d3747da2b7e3adfb8b22b6e6827819f590b1214fe04b",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/candidate-runtime.lock.json"
+      },
+      "package-build-receipt.json": {
+        "bytes": 19890,
+        "sha256": "db0f3431aa47c20e41219201246c3f406f46598235e35c31d1f4b45577523f37",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/package-build-receipt.json"
+      },
+      "release-manifest.json": {
+        "bytes": 8980,
+        "sha256": "b354f9c944a729ea3420f26c8987b3e0b4d27f0af88463bb965d34c4bd82d99b",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/release-manifest.json"
+      },
+      "runtime-input.lock.json": {
+        "bytes": 2084,
+        "sha256": "e5fd2de4935cbf10372cc18c23dec387478867a624d984b568e09a4a0b0515c0",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/runtime-input.lock.json"
+      },
+      "runtime.json": {
+        "bytes": 66640,
+        "sha256": "4b731a5f450a556632c598ddebda2ec3f814c8d7ea2c9e1529d6c80c8773e0a5",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/runtime.json"
+      },
+      "sources.lock.json": {
+        "bytes": 18146,
+        "sha256": "077fb2b0883986338b6755e53f5cede08bd63ed1834783e7e6cd079e0ec0c16d",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/sources.lock.json"
+      },
+      "wine-arm64-corresponding-sources.zip": {
+        "bytes": 1681474721,
+        "sha256": "38e16617545abb16f995ba75a8b52b8ca2bacad5d2688adf3646911f16c8fb06",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/wine-arm64-corresponding-sources.zip"
+      },
+      "wine-arm64.manifest.json": {
+        "bytes": 66773,
+        "sha256": "d6c98cca860d324113c434cd0ccd1709e19e2dfac1a03b1f248b479f50303267",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/wine-arm64.manifest.json"
+      },
+      "wine-arm64.tar.gz": {
+        "bytes": 282628308,
+        "sha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/wine-arm64.tar.gz"
+      }
+    },
+    "formatVersion": 1,
+    "githubImmutable": false,
+    "publisherNeverOverwrites": true,
+    "releaseId": 429140832,
+    "repository": "Russianranger/esteria_android",
+    "tag": "deps-wine-arm64-681b2e9-c0e13ed15a69",
+    "targetCommit": "75f50445112818c97f8d8e575d2b1c21e59af6e5",
+    "url": "https://github.com/Russianranger/esteria_android/releases/tag/deps-wine-arm64-681b2e9-c0e13ed15a69"
+  },
+  "releaseSelection": {
+    "bytes": 9204,
+    "sha256": "cf2f7ac0dd633cde9b273fa6b3886ef370ba3ac65bbdccb0884095b99df4b958"
+  },
+  "consumerSource": {
+    "bytes": 8229,
+    "sha256": "b19359fbb7c79b2931f6dcef9a47f8d1fd131f4dbbfee2d2da55cb5b089ac745"
+  },
+  "historicalProducerRecipeGitBlobsVerified": true,
+  "originalWholeSourceZipReadBack": true,
+  "runtimeRecompiled": false,
+  "selectedClientExecuted": false,
+  "androidQualified": false,
+  "gameplayQualified": false
+}

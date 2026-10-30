@@ -67,3 +67,12 @@ are not selected here. This workflow proves host installation and APK byte
 binding only after an actual successful run. It does not qualify custom client
 data conversion, Android guest execution, server database authentication, world
 entry or gameplay, and it does not activate a production package.
+
+Run `41081388547` at `74c1f1af` passed every gate, including complete paired debug
+readback, all four Java installs/cached repeats at 32 MiB, APK/AndroidTest builds
+and lint. The resulting installation-profile APK is 305,336,846 bytes. Its four
+archives contain 10,528 entries and 1,112,744,025 expanded bytes. The bounded proof
+and all four Java manifests were independently downloaded and checked; the large
+APK/assets and source/debug outputs were verified on CI and retained separately.
+Exact identities and scope are recorded in
+[`server-stock-provider-profile-41081388547.json`](../evidence/server-stock-provider-profile-41081388547.json).

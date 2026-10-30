@@ -846,10 +846,11 @@
     "runtimeArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
     "scope": "native-arm64-candidate-runtime-turnip-and-compiler-components-only"
   },
+  "allFourProviderPackagesCreatedAndReadBack": true,
   "allRequestedNativeComponentGatesPassed": true,
   "androidQualified": false,
   "audibleOutputQualified": false,
-  "completeProviderRepackPendingSourceOnlyArtifact": true,
+  "completeProviderRepackPendingSourceOnlyArtifact": false,
   "conclusion": "success",
   "evidenceArtifact": {
     "bytes": 111241,
@@ -894,6 +895,10 @@
     "sha256": "cd80feb7bece90f3c16a4a68365c63711eeec2ad10bfb487e78147090084776c"
   },
   "packagingSourceRecovery": {
+    "actualTurnipRecipeClosureFilesAdded": [
+      "ANDROID-PACKAGING.md",
+      "android-provider.lock.json"
+    ],
     "allOriginalMembersCopiedAndReadBackUnchanged": true,
     "binariesRebuilt": false,
     "originalFileAlreadyRetainedInsideIntegrationSourceTar": true,
@@ -915,7 +920,14 @@
       "sourcePath": "runtime/turnip/.dockerignore",
       "sourceRevision": "75f50445112818c97f8d8e575d2b1c21e59af6e5"
     },
-    "sourceOnlyCiArtifactRegistrationPending": true,
+    "sourceCompleteArtifact": {
+      "bytes": 269250352,
+      "id": 12989171109,
+      "sha256": "02d8f9384d3d884e25184137e4c6b97ee482b61a3f3f9719f925e084bae69182"
+    },
+    "sourceOnlyCiArtifactRegistrationPending": false,
+    "sourceOnlyProducerRevision": "bed4c62e52655519a402712b34fb5340db92bb99",
+    "sourceOnlyWorkflowRun": 41079114080,
     "strictProviderMeasurementRejectedMissingFile": true
   },
   "productionPinsChanged": false,

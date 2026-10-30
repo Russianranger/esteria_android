@@ -1,0 +1,97 @@
+{
+  "allFourProviderPackagesCreatedAndIndependentlyReadBack": true,
+  "allSourcesRetainedAndReadBack": true,
+  "androidQualified": false,
+  "clientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "coherentApkVerificationPending": true,
+  "durableCohortPublicationPending": true,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "hardwareQualified": false,
+  "originalClientPeBytesUnchanged": true,
+  "productionPinsChanged": false,
+  "providers": {
+    "client": {
+      "archive": {
+        "bytes": 7313293,
+        "sha256": "5997af5a94a1151e708cf80fa9931e4055a887598e01c9cf21e6b3af0d438759"
+      },
+      "descriptor": {
+        "bytes": 6867,
+        "sha256": "cc619845e8feffb3d77892c94b5825a86bacd5d575471ef6ebe9953578872b65"
+      },
+      "inputLockSha256": "7ecb7dfd4e9917e742fb467d81a72af9273394c8488e5a6cb3e25fa70c29ed5b",
+      "localProvider": "/tmp/esteria-wine-providers-75f5044/client-provider"
+    },
+    "guest-bridges": {
+      "archive": {
+        "bytes": 469117,
+        "sha256": "7e0356f14bf3654a0e1ecc903726bd479fea0c761c8a4e8a4356e2e476726a55"
+      },
+      "descriptor": {
+        "bytes": 7367,
+        "sha256": "dc941ac94d697549844eb61022c0587c7af8d71b8029a592db791b36ac0638b4"
+      },
+      "inputLockSha256": "2829cef5a81fbdcceeaa47b7cec9fe00274e4d0308c5d8242c722e0667e5616b",
+      "localProvider": "/tmp/esteria-wine-providers-75f5044/bridge-provider"
+    },
+    "shader-tools": {
+      "archive": {
+        "bytes": 10652649,
+        "sha256": "c48c4d78952d4a2c02c26b7a6da0087d29b21eb19a81b643cb5a9a97cf7389af"
+      },
+      "descriptor": {
+        "bytes": 12709,
+        "sha256": "cdffebe458994cd6fa8d87a2cd42cdce30234125af8bded2c6bb44552ff84b7c"
+      },
+      "inputLockSha256": "738784d15c24788c478b2fb61a2947588c142a7d8c752d753c92c74cde920f48",
+      "localProvider": "/tmp/esteria-wine-providers-75f5044/shader-provider-verified"
+    },
+    "turnip": {
+      "archive": {
+        "bytes": 3283344,
+        "sha256": "445c38ddf7e66f65ee90aa7fd2006db88d6fecd72c8567d801f2ee4c4000a772"
+      },
+      "descriptor": {
+        "bytes": 13101,
+        "sha256": "290d0b020715382beaa6eb49781ca9e97aba8260e5a8e9d8680db3cb1b02572c"
+      },
+      "inputLockSha256": "879c79db15622cfa155aad0b1d901fc322559e7fbc7245c5d73b234ed499df91",
+      "localProvider": "/tmp/esteria-wine-providers-75f5044/turnip-provider"
+    }
+  },
+  "runtimeArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+  "runtimeManifestSha256": "d6c98cca860d324113c434cd0ccd1709e19e2dfac1a03b1f248b479f50303267",
+  "runtimeProfile": {
+    "bytes": 105545,
+    "sha256": "562bf73630b7217c2c3ae0adf85b7a16d6979d3c257227e287757c9cbc3154c7"
+  },
+  "scope": "measured-source-owned-arm64-wine-cohort-packaging-only",
+  "sourceCompanions": {
+    "client": {
+      "bytes": 23460042,
+      "sha256": "32e241b061f9b9d40fd1ce38be9e491e0749f8656d574c4b38fe0cc112eecba8"
+    },
+    "guestOriginal": {
+      "bytes": 143760843,
+      "sha256": "2b326ecee4a3d90996818857f2847b21477f11492f53f5b372de5260588e5590"
+    },
+    "runtimePublic": {
+      "bytes": 1681474721,
+      "sha256": "38e16617545abb16f995ba75a8b52b8ca2bacad5d2688adf3646911f16c8fb06",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/wine-arm64-corresponding-sources.zip"
+    },
+    "shader": {
+      "bytes": 10647552,
+      "sha256": "887ae09458b3f4185d4ed9c78e67b647184907cd98bf375d7b9782783bd0c143"
+    },
+    "turnipOriginalNative": {
+      "bytes": 269241367,
+      "sha256": "cd80feb7bece90f3c16a4a68365c63711eeec2ad10bfb487e78147090084776c"
+    },
+    "turnipSourceComplete": {
+      "bytes": 269250352,
+      "sha256": "02d8f9384d3d884e25184137e4c6b97ee482b61a3f3f9719f925e084bae69182"
+    }
+  }
+}

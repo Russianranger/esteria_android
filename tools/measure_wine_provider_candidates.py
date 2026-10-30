@@ -152,6 +152,22 @@ def selected_payload(path, kind, old):
             require(total <= limits['fileBytes'], 'provider-measurement-selected-payload-bound')
             raw[logical] = data
         if kind == 'turnip':
+            # The older template predates repository packaging documentation.
+            # Retain every recipe file declared by this actual build too; each
+            # was independently checked against the producer Git blob above.
+            build=json.loads(raw['provenance/turnip-build.json'])
+            for name,pin in build.get('recipeSources',{}).items():
+                require(type(name) is str and re.fullmatch('[A-Za-z0-9_.-]{1,100}',name) and name not in ('.','..'),
+                        'provider-measurement-recipe-name')
+                logical='provenance/build-recipe/'+name
+                if logical in raw:continue
+                entry='turnip/corresponding-source/build-recipe/'+name
+                data=member(archive,entry,limits['memberBytes'])
+                require(byte_identity(data)==pin and sources.get('runtime/turnip/'+name)==pin,
+                        'provider-measurement-declared-recipe-source-mismatch')
+                total+=len(data);require(total<=limits['fileBytes'],'provider-measurement-selected-payload-bound')
+                raw[logical]=data;entries[logical]=entry
+            require(len(raw)<limits['entries']-len(turnip.GENERATED),'provider-measurement-provider-file-count')
             shader = member(archive, 'turnip/shader-runtime-check/qualification.json', 65536)
             turnip.files.qualification(json.loads(shader))
         else: shader = None

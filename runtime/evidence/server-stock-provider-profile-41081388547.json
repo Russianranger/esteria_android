@@ -1,0 +1,304 @@
+{
+  "actualArchiveInstallAndCachedReuse": {
+    "content": {
+      "androidRuntimeQualified": false,
+      "cachedArchiveRequired": false,
+      "cachedCopiedBytes": 0,
+      "entries": 4063,
+      "fileBytes": 654243888,
+      "firstCopiedBytes": 654243888,
+      "gameplayQualified": false,
+      "generation": "ebdf3e2b2ec3766d18af0442cf01a228a6d9adba00e41a996af3089251d78edf",
+      "packageKey": "server-content-arm64",
+      "scope": "host-java-exact-server-archive-install-and-cached-reuse"
+    },
+    "dependencies": {
+      "androidRuntimeQualified": false,
+      "cachedArchiveRequired": false,
+      "cachedCopiedBytes": 0,
+      "entries": 6263,
+      "fileBytes": 385051708,
+      "firstCopiedBytes": 385051708,
+      "gameplayQualified": false,
+      "generation": "a216314af433bdf81250be1168e719148f46143a8c78b78e0c06e894acfdaaf0",
+      "packageKey": "server-arm64",
+      "scope": "host-java-exact-server-archive-install-and-cached-reuse"
+    },
+    "extractors": {
+      "androidRuntimeQualified": false,
+      "cachedArchiveRequired": false,
+      "cachedCopiedBytes": 0,
+      "entries": 76,
+      "fileBytes": 7423422,
+      "firstCopiedBytes": 7423422,
+      "gameplayQualified": false,
+      "generation": "b76275bbe654070d1391cc12d7f3cd76e772f97f0af367d16e07b01e17bea457",
+      "packageKey": "server-extractors-arm64",
+      "scope": "host-java-exact-server-archive-install-and-cached-reuse"
+    },
+    "programs": {
+      "androidRuntimeQualified": false,
+      "cachedArchiveRequired": false,
+      "cachedCopiedBytes": 0,
+      "entries": 126,
+      "fileBytes": 66025007,
+      "firstCopiedBytes": 66025007,
+      "gameplayQualified": false,
+      "generation": "41f30793c177cb5140076ff28b63bfe2ae493630dc4bc6f1cf8837825cb53d92",
+      "packageKey": "server-programs-arm64",
+      "scope": "host-java-exact-server-archive-install-and-cached-reuse"
+    }
+  },
+  "allWorkflowStepsSucceeded": true,
+  "androidGuestExecuted": false,
+  "androidInstrumentationExecuted": false,
+  "androidRuntimeQualified": false,
+  "apkVerification": {
+    "androidGuestExecuted": false,
+    "androidRuntimeQualified": false,
+    "apk": {
+      "bytes": 305336846,
+      "sha256": "5a8057577a8a3f586ca9d2d325c333aa51c01a09b01cb2de3e266c55fa177fa2"
+    },
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "originalRuntimeArchivesUnchanged": true,
+    "providers": {
+      "content": {
+        "androidRuntimeQualified": false,
+        "apkBytesVerified": true,
+        "archive": {
+          "assetPath": "server-content/server-content.archive",
+          "bytes": 167585802,
+          "file": "server-content.tar.gz",
+          "sha256": "0f41b2deea5344fcea4cbc70bbddf0bab1dfda1cd0346e23e92592aac63056e6"
+        },
+        "archiveEntries": 4063,
+        "archiveFileBytes": 654243888,
+        "fullSourceSelectedInventoryVerified": true,
+        "gameplayQualified": false,
+        "providerVerified": true,
+        "sqlExecuted": false
+      },
+      "dependencies": {
+        "androidRuntimeQualified": false,
+        "apkBytesVerified": true,
+        "archive": {
+          "assetPath": "server-runtime/server-runtime-arm64.archive",
+          "bytes": 112374096,
+          "file": "server-runtime-arm64.tar.gz",
+          "sha256": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5"
+        },
+        "maximumPhysicalFileBytes": 388996294,
+        "providerVerified": true
+      },
+      "extractors": {
+        "androidRuntimeQualified": false,
+        "apkBytesVerified": true,
+        "clientMpqConversionQualified": false,
+        "customEsteriaDataLoadOrderQualified": false,
+        "gameLoginQualified": false,
+        "gameplayQualified": false,
+        "nativeArgumentConfigQualified": true,
+        "pairedDebugVerified": true,
+        "providerVerified": true,
+        "sourceCompanionVerified": true
+      },
+      "programs": {
+        "androidRuntimeQualified": false,
+        "apkBytesVerified": true,
+        "gameLoginQualified": false,
+        "gameplayQualified": false,
+        "nativeAuthWorldVersionQualified": true,
+        "pairedDebugVerified": true,
+        "providerVerified": true,
+        "sourceCompanionVerified": true
+      }
+    },
+    "scope": "four-server-component-install-profile-apk-byte-verification",
+    "serverProgramsExecuted": false,
+    "sourceCompanionAndPairedDebugVerified": true,
+    "sqlExecuted": false
+  },
+  "artifacts": {
+    "extractorSourcesDebug": {
+      "bytes": 50142591,
+      "id": 12989189254,
+      "sha256": "227dc7d3f01b168ffab1323e4b0cffd5309158c1bc8a01ccf154e0f4ec84afec"
+    },
+    "installProfileApkAndAssets": {
+      "bytes": 612986029,
+      "id": 12989497636,
+      "sha256": "39440f77cc66e7cfa10fcc4d1f3bcce6a1e03e481b729746338d551d7fd50df8"
+    },
+    "programSourcesDebug": {
+      "bytes": 1107682461,
+      "id": 12990046760,
+      "sha256": "702ffe0865d47bc331c23fb151c5854c733a76c563ba8d531f0178cddcfbf58d"
+    }
+  },
+  "evidenceArtifact": {
+    "bytes": 27380,
+    "id": 12988979635,
+    "independentlyDownloadedAndHashVerified": true,
+    "sha256": "b5b42fcb12f65ed83fcfab185c3e4e05f3b5c3ce09cd67679ad56c90a5b75cae"
+  },
+  "exactProviderInputs": {
+    "completeSources": {
+      "bytes": 24704454,
+      "id": 12989185143,
+      "integrationRevision": "880d6a5424d6a10e145eb12fc460a114fe0108d7",
+      "members": {
+        "qualification.json": {
+          "bytes": 23757,
+          "sha256": "bcb421500351886cd9daa280e6ba75c57b6e64b689a3a7410fa7104640a58de9",
+          "target": "sealed/qualification.json"
+        },
+        "retention-recovery-receipt.json": {
+          "bytes": 10561,
+          "sha256": "988a774b276aac55d56616b93fd177c70719ead7ed7a451ae85cddfe20a6e18f",
+          "target": "sealed/retention-recovery-receipt.json"
+        },
+        "sealed-source-receipt.json": {
+          "bytes": 49875,
+          "sha256": "fae08a831fb0a55d22c3ea330677671cf72045e2abe8fc229ba90494794aa4f4",
+          "target": "sealed/sealed-source-receipt.json"
+        },
+        "server-engine-complete-sources.tar.gz": {
+          "bytes": 24619647,
+          "sha256": "9f76881f06a7c998e0dba9d4a226c623021ed6ad8b87074aa7a861eafbb96d80",
+          "target": "sealed/server-engine-complete-sources.tar.gz"
+        }
+      },
+      "sha256": "899e91a5349ebb39343c8bc4b9f7e04c9f7dff5dd61177be61f23c3f0fc557f0",
+      "workflowRun": 41078079045
+    },
+    "engineDebug": {
+      "bytes": 1083562454,
+      "id": 12975824427,
+      "integrationRevision": "5c6f8d26813128a4763506cf3e38d10997f1935a",
+      "members": {
+        "server-engine-package/server-engine-debug-arm64.tar.gz": {
+          "bytes": 1082880246,
+          "sha256": "facc75680f3fb1b205a98960d6ea5a0d565cb2a2b4bd56303dd6625fd4854a24",
+          "target": "engine/server-engine-debug-arm64.tar.gz"
+        }
+      },
+      "sha256": "3d8579701b8c2e63b808ed6e18a3fd544d422b2f52bc2ea3e8e2b8a2217df7e1",
+      "workflowRun": 41054451870
+    },
+    "extractorDebug": {
+      "bytes": 26093154,
+      "id": 12976736772,
+      "integrationRevision": "5c6f8d26813128a4763506cf3e38d10997f1935a",
+      "members": {
+        "server-extractors-package/server-extractors-debug-arm64.tar.gz": {
+          "bytes": 25375231,
+          "sha256": "40e7880bc1ac15391cb63cf61bdc58fb5b90f267f7b93fdf65966a3a0deb7a10",
+          "target": "extractors/server-extractors-debug-arm64.tar.gz"
+        }
+      },
+      "sha256": "3c5364d89fffb7b2ff0509e94bad34dac3ae8439d5b4305554b0db13a5b60dba",
+      "workflowRun": 41054451870
+    },
+    "native": {
+      "bytes": 75700,
+      "id": 12976931041,
+      "integrationRevision": "5c6f8d26813128a4763506cf3e38d10997f1935a",
+      "members": {
+        "extractor-cli.json": {
+          "bytes": 2860,
+          "sha256": "27e1eb1ed3ffa9b65b0c824da90f22c349e068df8d3b7c1362701be62267c5e5",
+          "target": "native/native-cli.json"
+        },
+        "loader-smoke.json": {
+          "bytes": 2427,
+          "sha256": "33fee9aefde98026139c3ba059f296b958cf813d13eb1f48d7bf74c749b74a09",
+          "target": "native/native-loader.json"
+        }
+      },
+      "sha256": "2c0000c058ba7578d46585ba55e4d8451ddbcba77db038b6bc3f0483e9b25fbc",
+      "workflowRun": 41054451870
+    },
+    "runtime": {
+      "bytes": 192900091,
+      "id": 12975909369,
+      "integrationRevision": "5c6f8d26813128a4763506cf3e38d10997f1935a",
+      "members": {
+        "engine-inputs/content/package-receipt.json": {
+          "bytes": 1343739,
+          "sha256": "1c00990e090e85af0232fe633b64e2718071a5f8e81f3b0ca1c8f2b214ffb3af",
+          "target": "content/package-receipt.json"
+        },
+        "engine-inputs/content/server-content.tar.gz": {
+          "bytes": 167585802,
+          "sha256": "0f41b2deea5344fcea4cbc70bbddf0bab1dfda1cd0346e23e92592aac63056e6",
+          "target": "content/server-content.tar.gz"
+        },
+        "server-engine-package/package-receipt.json": {
+          "bytes": 34652,
+          "sha256": "bb62ad200ac9be9b756616e351bf591508eedb7420f9fd39d5ea0544ae1cc548",
+          "target": "engine/package-receipt.json"
+        },
+        "server-engine-package/server-engine-runtime-arm64.tar.gz": {
+          "bytes": 21352885,
+          "sha256": "00bd0a5829caec2a2b11d4e85bd261b67461c04e6755bb332d37d393311c6ccb",
+          "target": "engine/server-engine-runtime-arm64.tar.gz"
+        },
+        "server-extractors-package/package-receipt.json": {
+          "bytes": 70343,
+          "sha256": "ec9252de82070bd0dd3bb436562b477bb03903ae9ae47132ec9f82ed5a861b1f",
+          "target": "extractors/package-receipt.json"
+        },
+        "server-extractors-package/server-extractors-runtime-arm64.tar.gz": {
+          "bytes": 2495044,
+          "sha256": "2bce13256ac609a7bcb01fd2a7e5352fde29fa19e18a5d269c566acb22f86515",
+          "target": "extractors/server-extractors-runtime-arm64.tar.gz"
+        }
+      },
+      "sha256": "e8f2053d6cc55299203db4def614d5f93b2b4f6ef4627eee0d0f63ea01b7e51e",
+      "workflowRun": 41054451870
+    }
+  },
+  "formatVersion": 1,
+  "fullSourceAndDebugReadbackPerformedOnCi": true,
+  "gameplayQualified": false,
+  "independentSmallProofAndFourJavaManifestReadback": true,
+  "integrationRevision": "74c1f1afb9787739dd9be012efa176ce7b9d196c",
+  "javaMaximumHeapBytes": 33554432,
+  "job": 124151141676,
+  "largeOutputArtifactsIndependentlyDownloaded": false,
+  "rawAcquisition": {
+    "bytes": 5281,
+    "sha256": "017fed7673e99950cdbe628115b1a04d1a350ec0ef5bc62f793781ff2cd411f7"
+  },
+  "rawProviderBuild": {
+    "bytes": 1988,
+    "sha256": "f797ed772883a6ad6e7b7c6e1cbfba9a1dfad04cb17f4e99e5d093a230666dcc"
+  },
+  "rawQualification": {
+    "bytes": 4658,
+    "sha256": "98ace1ea21949777e059d1ff19466942bcccfc6ac71b375844a9ca501489976b"
+  },
+  "runUrl": "https://github.com/Russianranger/esteria_android/actions/runs/41081388547",
+  "scope": "actual-source-debug-host-installer-and-apk-byte-qualified-stock-server-profile",
+  "serverProgramsExecuted": false,
+  "sourceQualification": {
+    "archive": {
+      "bytes": 24619647,
+      "sha256": "9f76881f06a7c998e0dba9d4a226c623021ed6ad8b87074aa7a861eafbb96d80"
+    },
+    "qualification": {
+      "bytes": 23757,
+      "sha256": "bcb421500351886cd9daa280e6ba75c57b6e64b689a3a7410fa7104640a58de9"
+    },
+    "receipt": {
+      "bytes": 49875,
+      "sha256": "fae08a831fb0a55d22c3ea330677671cf72045e2abe8fc229ba90494794aa4f4"
+    }
+  },
+  "sqlExecuted": false,
+  "totalArchiveEntries": 10528,
+  "totalFileBytes": 1112744025,
+  "workflowRun": 41081388547
+}

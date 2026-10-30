@@ -1,4 +1,5 @@
 {
+  "allElevenPublicAssetsAndEntireOriginalSourcesReadBackWithoutApplicationToken": true,
   "allElevenStoredAssetsDownloadedAndHashedByFinalCiVerifier": true,
   "androidQualified": false,
   "entireOriginalSourceZipExtractedAndOriginalSourceClosureVerifiedByCi": true,
@@ -22,6 +23,8 @@
   "originalProducerWorkflowRun": 41057900330,
   "packagingRecipeRevision": "75f50445112818c97f8d8e575d2b1c21e59af6e5",
   "productionPinsChanged": false,
+  "publicAnonymousConsumerWorkflowJob": 124143157443,
+  "publicAnonymousConsumerWorkflowRun": 41079114080,
   "publicApiTagAndAllAssetDigestsIndependentlyMatched": true,
   "publicationIntegrationRevision": "f403a2868d3a3fdf9db2677506c87ac5c79a9f81",
   "publicationJobs": [

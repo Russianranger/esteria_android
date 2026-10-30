@@ -1,0 +1,702 @@
+{
+  "androidQualified": false,
+  "binariesRebuilt": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "hardwareQualified": false,
+  "newRuntimeExecutionQualified": false,
+  "originalArtifact": {
+    "bytes": 269241367,
+    "id": 12986648082,
+    "runId": 41073499555,
+    "sha256": "cd80feb7bece90f3c16a4a68365c63711eeec2ad10bfb487e78147090084776c",
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/41073499555/artifacts/12986648082",
+    "workflowPath": ".github/workflows/wine-arm64-provider-candidate.yml"
+  },
+  "originalMemberBytesUnchanged": true,
+  "originalMembers": {
+    "source-selection/adoption-preparation.json": {
+      "bytes": 6396,
+      "sha256": "f818c45fc8b2f47463431cc7c525c9bc6b8b2f31eef64dbfd7e6aabc660ba163"
+    },
+    "source-selection/input-evidence.json": {
+      "bytes": 4082,
+      "sha256": "af33860503ad8a92260639c54d5f1cd9b4344513aaa35b39fcb5fb38142ca934"
+    },
+    "source-selection/integration-revision.txt": {
+      "bytes": 41,
+      "sha256": "db8c1aec849bda417ac3270c6000a27d919f4fcc8b1dda60511507a294d6f349"
+    },
+    "source-selection/integration-source.tar": {
+      "bytes": 6184960,
+      "sha256": "b7dcbc15c52077219963422a9775aa3f4351a135d820e261fa919f97a799326a"
+    },
+    "source-selection/runtime-sources.proposed.lock.json": {
+      "bytes": 105545,
+      "sha256": "562bf73630b7217c2c3ae0adf85b7a16d6979d3c257227e287757c9cbc3154c7"
+    },
+    "source-selection/x11-runtime.lock.json": {
+      "bytes": 14313,
+      "sha256": "828f3a7843f7073648e95fe52edfd69834ccb480073a42f52bf68b0b8f3d12e5"
+    },
+    "turnip/bin/esteria-turnip-probe": {
+      "bytes": 74368,
+      "sha256": "f8786b9906a2e9753eaa73d75de849d2fc31872d5781ee73821c3cd9f2476f92"
+    },
+    "turnip/bin/glslangValidator": {
+      "bytes": 8234112,
+      "sha256": "279cb8d922fa71319e12eb63b46a1c6f80938d07747cec73326ec64928a044fc"
+    },
+    "turnip/bin/spirv-val": {
+      "bytes": 1935648,
+      "sha256": "d15718f68eea0d17bdc1ded9bfb85b9e43d5a519308c245ff32e86efadeb7ae4"
+    },
+    "turnip/corresponding-source/build-recipe/ANDROID-PACKAGING.md": {
+      "bytes": 5162,
+      "sha256": "82b9a64f548bfcc52c8c9f6d10b2b90a79f3734eee3fc003f4e1044791fcc248"
+    },
+    "turnip/corresponding-source/build-recipe/Dockerfile": {
+      "bytes": 1086,
+      "sha256": "a89cfdfd358fc718218b6b12a7feb64fdd7f45c58593ea01585425b7ef928f09"
+    },
+    "turnip/corresponding-source/build-recipe/README.md": {
+      "bytes": 7288,
+      "sha256": "47f0e2b9dddd692e39c3f99d5ed114b1dcf016b8f2ad8f751da0749931274b36"
+    },
+    "turnip/corresponding-source/build-recipe/android-provider.lock.json": {
+      "bytes": 16051,
+      "sha256": "a2999f5172d139ea37cec712662ffc17303cb2d78d8356095c11c8f671f887d4"
+    },
+    "turnip/corresponding-source/build-recipe/build.sh": {
+      "bytes": 2320,
+      "sha256": "9866ef7e9fd8dae6a5079b37e8232c864114f4b88542754e48fafa6c4d5e444a"
+    },
+    "turnip/corresponding-source/build-recipe/debian.sources": {
+      "bytes": 434,
+      "sha256": "8e8f7c4f33e39696a188e01bb6e385daf17a006eb573bc84af073ebcc4fc9f65"
+    },
+    "turnip/corresponding-source/build-recipe/fetch_sources.py": {
+      "bytes": 5418,
+      "sha256": "90f7b5a750391599911d8b69cb0681c346e549f2013cf799641949c757acd3f9"
+    },
+    "turnip/corresponding-source/build-recipe/inrelease.SHA256SUMS": {
+      "bytes": 455,
+      "sha256": "2acec858821beef422f424794c5577adf01ef084787ca42616c5cb78a72b1413"
+    },
+    "turnip/corresponding-source/build-recipe/packages.txt": {
+      "bytes": 767,
+      "sha256": "89d0bec77bab06399ee57be1603d082521eebb903ad40fcf7b95e7c76e1a1f03"
+    },
+    "turnip/corresponding-source/build-recipe/probe.c": {
+      "bytes": 17766,
+      "sha256": "2f071971b16f6eaacba9a9d95358ea28c782536a584f83147a8cff923fba9cbf"
+    },
+    "turnip/corresponding-source/build-recipe/probe.frag": {
+      "bytes": 102,
+      "sha256": "ae5d45bff00d2287752eec77c055d454c5b8588e8720885a8bd1ff7f791830e1"
+    },
+    "turnip/corresponding-source/build-recipe/probe.vert": {
+      "bytes": 155,
+      "sha256": "dd3b4afa79ffe81c1f6c1df03f671398c97b2bc9a7ea90dad2648769067067d3"
+    },
+    "turnip/corresponding-source/build-recipe/qualify_shaders.py": {
+      "bytes": 2878,
+      "sha256": "fd39918a5223dd81519041323c0f06382947f39722d5a3db3917baeb6e16e41e"
+    },
+    "turnip/corresponding-source/build-recipe/record_build.py": {
+      "bytes": 8959,
+      "sha256": "82b94f7ab1344e6026ee1524668b4abe1b8ea3e4212189952783bf13bc052e6d"
+    },
+    "turnip/corresponding-source/build-recipe/run_probe.py": {
+      "bytes": 7186,
+      "sha256": "671d44f9aec71f13f303d745cf145fa8ac4deaccbefe8911ad2b610be90f35c6"
+    },
+    "turnip/corresponding-source/build-recipe/sources.lock.json": {
+      "bytes": 43088,
+      "sha256": "f92f119d657feaa7548e84196d20c59a9050b91a62f171de8249b75e23a8645f"
+    },
+    "turnip/corresponding-source/original-archives/SOURCE-MANIFEST.json": {
+      "bytes": 10336,
+      "sha256": "00946836cbd257438edc3868bdd6b6c185f4a8c662eec1e9e44885bc078e1530"
+    },
+    "turnip/corresponding-source/original-archives/binutils_2.40-2.debian.tar.xz": {
+      "bytes": 102476,
+      "sha256": "a71c03e51d7ac2be8d97daa29dc02e578978c8eeddfd51045502fd008cec8adc"
+    },
+    "turnip/corresponding-source/original-archives/binutils_2.40-2.dsc": {
+      "bytes": 11692,
+      "sha256": "cd75da7829d819189ba6154d408666373b307e222b393223804c4c4a7156f421"
+    },
+    "turnip/corresponding-source/original-archives/binutils_2.40.orig.tar.xz": {
+      "bytes": 25364048,
+      "sha256": "d78c2d2eb24a9be1e02f8854cb1bd435556d7f584fb6bfb6b07e6527d43fc41d"
+    },
+    "turnip/corresponding-source/original-archives/bison_3.8.2+dfsg-1.debian.tar.xz": {
+      "bytes": 11164,
+      "sha256": "e878473ddbc8601c1b9b8558fab86950ae6ae5b7c146802d587e284d5e1c9abb"
+    },
+    "turnip/corresponding-source/original-archives/bison_3.8.2+dfsg-1.dsc": {
+      "bytes": 1855,
+      "sha256": "62069748f3e82bff18e7e1e4f96e7a55606305623be4bec435d4d016e7c4c7d9"
+    },
+    "turnip/corresponding-source/original-archives/bison_3.8.2+dfsg.orig.tar.xz": {
+      "bytes": 2654920,
+      "sha256": "dff8a3c96dd34121828f62a7fa49e1f7765815b89e59f564e8d2a9e71c177be5"
+    },
+    "turnip/corresponding-source/original-archives/cmake_3.25.1-1.debian.tar.xz": {
+      "bytes": 32496,
+      "sha256": "0b9ef6b8e74dc4dfd757f43ac3ae0b2abde0745d58d0a43f81bcbd78c1a68035"
+    },
+    "turnip/corresponding-source/original-archives/cmake_3.25.1-1.dsc": {
+      "bytes": 3887,
+      "sha256": "508b262eee8f18c8924bb4e1b89596fb208efa2fe6bde270d16552d1dc3a0d65"
+    },
+    "turnip/corresponding-source/original-archives/cmake_3.25.1.orig.tar.gz": {
+      "bytes": 10561054,
+      "sha256": "1c511d09516af493694ed9baf13c55947a36389674d657a2d5e0ccedc6b291d8"
+    },
+    "turnip/corresponding-source/original-archives/expat_2.5.0-1+deb12u5.debian.tar.xz": {
+      "bytes": 67940,
+      "sha256": "08bda5605c940a2068a8f5df2a798524d8f403eae6d01e4f7039074a8e244d9e"
+    },
+    "turnip/corresponding-source/original-archives/expat_2.5.0-1+deb12u5.dsc": {
+      "bytes": 1427,
+      "sha256": "ef1c606d8e386052d3aea9b3b5ec43f3902107c007150960521781aa59ab1247"
+    },
+    "turnip/corresponding-source/original-archives/expat_2.5.0.orig.tar.gz": {
+      "bytes": 8320988,
+      "sha256": "ab00ee05c7067fd10a35c5d2a4922ebba746ddd50ff83b79c828da17bbdf1757"
+    },
+    "turnip/corresponding-source/original-archives/flex_2.6.4-8.2.diff.gz": {
+      "bytes": 60738,
+      "sha256": "c2ee0c631289f8a4f945a4c62ac05b7fe4abee9c72be1ab5604b9cc44a3d8678"
+    },
+    "turnip/corresponding-source/original-archives/flex_2.6.4-8.2.dsc": {
+      "bytes": 2107,
+      "sha256": "5c77d8dda81631d43361e6cf29f5901bcaf0c20935f0a2c9a21bffa7a8666e22"
+    },
+    "turnip/corresponding-source/original-archives/flex_2.6.4.orig.tar.gz": {
+      "bytes": 1419096,
+      "sha256": "e87aae032bf07c26f85ac0ed3250998c37621d95f8bd748b31f15b33c45ee995"
+    },
+    "turnip/corresponding-source/original-archives/gcc-12_12.2.0-14+deb12u1.debian.tar.xz": {
+      "bytes": 1675204,
+      "sha256": "59f7f7763a0c355e3f27ff9e7ac80d06382b29939361a87e7b139226bfe7402e"
+    },
+    "turnip/corresponding-source/original-archives/gcc-12_12.2.0-14+deb12u1.dsc": {
+      "bytes": 27330,
+      "sha256": "3aed0b189189c744dc9f4b74798a51d3e512ea85e492568db788a927c88e20ba"
+    },
+    "turnip/corresponding-source/original-archives/gcc-12_12.2.0.orig.tar.gz": {
+      "bytes": 87090343,
+      "sha256": "b8298be16aeeb96a889c6afed0a8e2241b47452e89cc81fe65ea849d5c740fcb"
+    },
+    "turnip/corresponding-source/original-archives/gcc-defaults_1.203.dsc": {
+      "bytes": 12592,
+      "sha256": "39417c8e6cf5bfa22b1c58f004e9f7630725ace3138a216ba64ec75d83c3fceb"
+    },
+    "turnip/corresponding-source/original-archives/gcc-defaults_1.203.tar.xz": {
+      "bytes": 45208,
+      "sha256": "bbf861f5502592b91602392123b482f9fb521948a8994057d152486f78b200b0"
+    },
+    "turnip/corresponding-source/original-archives/glibc_2.36-9+deb12u14.debian.tar.xz": {
+      "bytes": 918488,
+      "sha256": "cf4ac9cd98185452cae3ef34e2e4ee12753e3d93fd0c62c61396d4a47eec902f"
+    },
+    "turnip/corresponding-source/original-archives/glibc_2.36-9+deb12u14.dsc": {
+      "bytes": 9765,
+      "sha256": "cfe1f0b8dc1fa211ce5a45b3725cc38b29f88667f1140ebdca6de35cf9c6f1fd"
+    },
+    "turnip/corresponding-source/original-archives/glibc_2.36.orig.tar.xz": {
+      "bytes": 19363988,
+      "sha256": "a543c02070d46ccaf866957efd13f10c924daa74c86a90a0254db09a92a708ee"
+    },
+    "turnip/corresponding-source/original-archives/glslang-14.3.0.tar.gz": {
+      "bytes": 3858944,
+      "sha256": "dc52424b8d3b302038068537084dfc557c870a9bfaec77c1ee025bba38148177"
+    },
+    "turnip/corresponding-source/original-archives/libx11_1.8.4-2+deb12u2.diff.gz": {
+      "bytes": 115499,
+      "sha256": "3b3b43eabf8a58dda4442031652cc2294b50fe46129d6943937bf320d8a62243"
+    },
+    "turnip/corresponding-source/original-archives/libx11_1.8.4-2+deb12u2.dsc": {
+      "bytes": 2544,
+      "sha256": "d7374ec568d895f9e5919ebdbd94301e2acb9e8b307a39ac8708082aa1757fa3"
+    },
+    "turnip/corresponding-source/original-archives/libx11_1.8.4.orig.tar.gz": {
+      "bytes": 3168573,
+      "sha256": "efd3a3a43c1f177edc2c205bedb0719b6648203595e54c0b83a32576aeaca7cd"
+    },
+    "turnip/corresponding-source/original-archives/libx11_1.8.4.orig.tar.gz.asc": {
+      "bytes": 801,
+      "sha256": "9d9a6bcdd81a40ed377b2981a4d40a0db1315d095e9ccc35a0ba78e692df8591"
+    },
+    "turnip/corresponding-source/original-archives/libxcb_1.15-1.diff.gz": {
+      "bytes": 26267,
+      "sha256": "639c719ed06ffc397b200a209abd1a049e21e9e19431fb14c9ca870de01a6eac"
+    },
+    "turnip/corresponding-source/original-archives/libxcb_1.15-1.dsc": {
+      "bytes": 5344,
+      "sha256": "f689569f33e70ca4c95c91b094d0659eb49a958d9ac43186640338f9290e298b"
+    },
+    "turnip/corresponding-source/original-archives/libxcb_1.15.orig.tar.gz": {
+      "bytes": 650774,
+      "sha256": "1cb65df8543a69ec0555ac696123ee386321dfac1964a3da39976c9a05ad724d"
+    },
+    "turnip/corresponding-source/original-archives/libxshmfence_1.3-1.diff.gz": {
+      "bytes": 17456,
+      "sha256": "85422af90300523b8fb27e697b59418f18bd7cd5c849161fd0be64c91ce94698"
+    },
+    "turnip/corresponding-source/original-archives/libxshmfence_1.3-1.dsc": {
+      "bytes": 2096,
+      "sha256": "7da3e1195622ab34427bd5d09167b1f44ed1a3e828782fa8e618f1181c56194a"
+    },
+    "turnip/corresponding-source/original-archives/libxshmfence_1.3.orig.tar.gz": {
+      "bytes": 378960,
+      "sha256": "7eb3d46ad91bab444f121d475b11b39273142d090f7e9ac43e6a87f4ff5f902c"
+    },
+    "turnip/corresponding-source/original-archives/libzstd_1.5.4+dfsg2-5.debian.tar.xz": {
+      "bytes": 216092,
+      "sha256": "82ce911445772861d0838bd4545f93bc50658bc7f3cefdb17a307dfb8ffca5d8"
+    },
+    "turnip/corresponding-source/original-archives/libzstd_1.5.4+dfsg2-5.dsc": {
+      "bytes": 2589,
+      "sha256": "8f602f92b575aa8b5e979196fb6ee82d78f233521dc9636526d3ecba1f63c1b1"
+    },
+    "turnip/corresponding-source/original-archives/libzstd_1.5.4+dfsg2.orig.tar.xz": {
+      "bytes": 1582660,
+      "sha256": "8cf4bbb65e77ec348d052c8d6230eba66d435bddf64c8b5be2fcb16880c19953"
+    },
+    "turnip/corresponding-source/original-archives/libzstd_1.5.4+dfsg2.orig.tar.xz.asc": {
+      "bytes": 833,
+      "sha256": "be007507630aabfc7d88d5d3c467115935ca22025253491d525e0119bbb23d40"
+    },
+    "turnip/corresponding-source/original-archives/make-dfsg_4.3-4.1.diff.gz": {
+      "bytes": 50940,
+      "sha256": "753c254ecaba425ebe2e0a0fb4d299847701e1c3eeb43df563e39975cae56b4c"
+    },
+    "turnip/corresponding-source/original-archives/make-dfsg_4.3-4.1.dsc": {
+      "bytes": 2019,
+      "sha256": "d2523d94f4d4198df6801f238d36cf0dea2ab5521f1d19ee76b2e8ee1f1918bb"
+    },
+    "turnip/corresponding-source/original-archives/make-dfsg_4.3.orig.tar.gz": {
+      "bytes": 1845906,
+      "sha256": "be4c17542578824e745f83bcd2a9ba264206187247cb6a5f5df99b0a9d1f9047"
+    },
+    "turnip/corresponding-source/original-archives/mako_1.2.4+ds-1.debian.tar.xz": {
+      "bytes": 13120,
+      "sha256": "0d7dca172b3d02731d238e9ee7f8639bd94a75732494b20013828ea51012fdc2"
+    },
+    "turnip/corresponding-source/original-archives/mako_1.2.4+ds-1.dsc": {
+      "bytes": 2381,
+      "sha256": "c5df8fbe29c23408c9b61ae7723eda4b79740821c2eb11445bd31921ce362226"
+    },
+    "turnip/corresponding-source/original-archives/mako_1.2.4+ds.orig.tar.gz": {
+      "bytes": 197349,
+      "sha256": "4306f78852944384e39fd5b58fcf8f5d2a7ef1ad6a5651970f04ade9b6a1c562"
+    },
+    "turnip/corresponding-source/original-archives/mesa-26.1.4.tar.xz": {
+      "bytes": 77677128,
+      "sha256": "072705caa9adf4740f1489194b13e278ad959166863b5271fe423a86353c9ab6"
+    },
+    "turnip/corresponding-source/original-archives/meson-1.7.2.tar.gz": {
+      "bytes": 4859848,
+      "sha256": "3ea1b5b69d4348c34e5148c8953f513b4369a234ef9342467da75667f283585a"
+    },
+    "turnip/corresponding-source/original-archives/ninja-build_1.11.1-2~deb12u1.debian.tar.xz": {
+      "bytes": 6644,
+      "sha256": "7b5b097db291f6cc0693cc34d592bebe402f8e6722334235abe95c9d43706eb2"
+    },
+    "turnip/corresponding-source/original-archives/ninja-build_1.11.1-2~deb12u1.dsc": {
+      "bytes": 2057,
+      "sha256": "6235cfc4d7971bd470a46157abe83d6fc254eec6ba664084ee5f0996739aa2fe"
+    },
+    "turnip/corresponding-source/original-archives/ninja-build_1.11.1.orig.tar.gz": {
+      "bytes": 229479,
+      "sha256": "31747ae633213f1eda3842686f83c2aa1412e0f5691d1c14dbbcc67fe7400cea"
+    },
+    "turnip/corresponding-source/original-archives/pkgconf_1.8.1-1.debian.tar.xz": {
+      "bytes": 15060,
+      "sha256": "bd9330105d17bf4b9a9d2aaba4a150b35da21b7ba4b45d4bf7e034fa6e53ba2f"
+    },
+    "turnip/corresponding-source/original-archives/pkgconf_1.8.1-1.dsc": {
+      "bytes": 1570,
+      "sha256": "cf1f645d7a9522354a334130a55d16be7d62e304070d6675f826844b143dc47e"
+    },
+    "turnip/corresponding-source/original-archives/pkgconf_1.8.1.orig.tar.xz": {
+      "bytes": 302372,
+      "sha256": "644361ada2942be05655d4452eb018791647c31bba429b287f1f68deb2dc6840"
+    },
+    "turnip/corresponding-source/original-archives/python-packaging_23.0-1.debian.tar.xz": {
+      "bytes": 2880,
+      "sha256": "4a5121cbcb292c239d237e7c742d177bb79184e8a19f00b8a3c364b746f43a31"
+    },
+    "turnip/corresponding-source/original-archives/python-packaging_23.0-1.dsc": {
+      "bytes": 1945,
+      "sha256": "2de4fcdc6f6fdbcf7cf389dbd4d1249db21bb5ac31cd003d8631be0328836ecf"
+    },
+    "turnip/corresponding-source/original-archives/python-packaging_23.0.orig.tar.gz": {
+      "bytes": 126241,
+      "sha256": "b6ad297f8907de0fa2fe1ccbd26fdaf387f5f47c7275fedf8cce89f99446cf97"
+    },
+    "turnip/corresponding-source/original-archives/python3-defaults_3.11.2-1.dsc": {
+      "bytes": 2961,
+      "sha256": "75cac54d11a4f7bc2c88eeeabddd74dc27b072c3bd515e71c8be2641b062e980"
+    },
+    "turnip/corresponding-source/original-archives/python3-defaults_3.11.2-1.tar.gz": {
+      "bytes": 145949,
+      "sha256": "21ba2c8fcf78161b73f98f9d1c3432be10d9f45e7783501f08cace5ad4115808"
+    },
+    "turnip/corresponding-source/original-archives/pyyaml_6.0-3.debian.tar.xz": {
+      "bytes": 7800,
+      "sha256": "a9d739ae15665b3e74913d62dd1afb7e7d37c8f55517da7f9c6035d831739a39"
+    },
+    "turnip/corresponding-source/original-archives/pyyaml_6.0-3.dsc": {
+      "bytes": 2094,
+      "sha256": "0dfe6bb274f4377d5a5f6a0119e84793d847680d78cad033ff6d6ff4590668e6"
+    },
+    "turnip/corresponding-source/original-archives/pyyaml_6.0.orig.tar.gz": {
+      "bytes": 124996,
+      "sha256": "68fb519c14306fec9720a2a5b45bc9f0c8d1b9c72adf45c37baedfcd949c35a2"
+    },
+    "turnip/corresponding-source/original-archives/spirv-headers-2acb319af38d43be3ea76bfabf3998e5281d8d12.tar.gz": {
+      "bytes": 522013,
+      "sha256": "425da1e3e4ba8de41dc8c8273d281ae82f1e18a397ec476649df3c832e242329"
+    },
+    "turnip/corresponding-source/original-archives/spirv-tools-0cfe9e7219148716dfd30b37f4d21753f098707a.tar.gz": {
+      "bytes": 3173510,
+      "sha256": "a5277538fec0868452b1f616553c2fca80939a6a3ee0b7322e21ff063750a482"
+    },
+    "turnip/corresponding-source/original-archives/vulkan-loader_1.3.239.0-1.debian.tar.xz": {
+      "bytes": 8956,
+      "sha256": "c38c319e1137549ddea481b811cfb39bca015ddc11876a915ad78c664cb7746e"
+    },
+    "turnip/corresponding-source/original-archives/vulkan-loader_1.3.239.0-1.dsc": {
+      "bytes": 2252,
+      "sha256": "991b9b9043c2b4b4e8bcb455b42cb01d2a83a7a54355bb8b6037eba1e8cfe08d"
+    },
+    "turnip/corresponding-source/original-archives/vulkan-loader_1.3.239.0.orig.tar.xz": {
+      "bytes": 2422936,
+      "sha256": "90ca97151d774ea3f00129ad32be03cdfa310215651ceec0cd9fc2d0d1804d86"
+    },
+    "turnip/corresponding-source/original-archives/zlib_1.2.13.dfsg-1.debian.tar.xz": {
+      "bytes": 15700,
+      "sha256": "f66cf3d4f2d7defcd4d1fd1fb0a11ee39f1e01b42ec7d059c9dc5c1695133c44"
+    },
+    "turnip/corresponding-source/original-archives/zlib_1.2.13.dfsg-1.dsc": {
+      "bytes": 2399,
+      "sha256": "3fa1e6b2fc525062aa88207dda52fed8e045373c809d362fe8a2bfbf7cf515a8"
+    },
+    "turnip/corresponding-source/original-archives/zlib_1.2.13.dfsg.orig.tar.bz2": {
+      "bytes": 1239825,
+      "sha256": "71feb7947e3c00ef125f83b79a4e529bde31171e5babe48b391f06758d1ab0a1"
+    },
+    "turnip/installed-build-packages.txt": {
+      "bytes": 7288,
+      "sha256": "6161b008d19c7f2b07040dd04379a9450a030db21b62ca5aa23f3009b3345c94"
+    },
+    "turnip/lib/libvulkan_freedreno.so": {
+      "bytes": 15957640,
+      "sha256": "a373ecc89b6c5bcb53f117c52328389891902fe56b71c3195af888717a003b58"
+    },
+    "turnip/no-gpu-check/exclusive-icd.json": {
+      "bytes": 138,
+      "sha256": "4cfd6949470a375acd71fa54fc1aa9c00b187510ea821b33b1abf2b2644ddcb2"
+    },
+    "turnip/no-gpu-check/probe.json": {
+      "bytes": 362,
+      "sha256": "927997bf9b07aba6854719a7ef9c2e4efbb6d4cb4ad4b317913f3014d461090f"
+    },
+    "turnip/no-gpu-check/probe.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "turnip/no-gpu-check/qualification.json": {
+      "bytes": 1685,
+      "sha256": "2768e79d8b8b7c77bb668fd737029300297453e92c5d89dce0b86868050e2299"
+    },
+    "turnip/notices/ESTERIA-GPL-3.0": {
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    "turnip/notices/GLSLANG-LICENSE.txt": {
+      "bytes": 54705,
+      "sha256": "adb783e734e906d1f46db5df29991dbde84bdb0ceab502ac2febb44fe3c2b5f4"
+    },
+    "turnip/notices/MESA-LICENSE.rst": {
+      "bytes": 1816,
+      "sha256": "0d1a0472ecc81830e75c20d59b0ea02841e3db21255e0ebad97ab682c54d6615"
+    },
+    "turnip/notices/MESA-licenses/Apache-2.0": {
+      "bytes": 10045,
+      "sha256": "7e4d3fba250d15e9e0afa380d4b611828fa2560cc8fdebe95bcf2f01a487de12"
+    },
+    "turnip/notices/MESA-licenses/BSL-1.0": {
+      "bytes": 1649,
+      "sha256": "9b9fea7520a816107fcac2598b7c0155222f16bc430e989706b22f4367f1df7d"
+    },
+    "turnip/notices/MESA-licenses/GPL-1.0-or-later": {
+      "bytes": 13047,
+      "sha256": "8ff76f1528e6e4e9400c0f6b1f2d19d4979aaac3bcc44bb707a55389132825c4"
+    },
+    "turnip/notices/MESA-licenses/GPL-2.0-only": {
+      "bytes": 18424,
+      "sha256": "6667ad4063569cd53b13500550d93fcd3dc11bcf82c5514296af013a0b720ba5"
+    },
+    "turnip/notices/MESA-licenses/MIT": {
+      "bytes": 1372,
+      "sha256": "323c587d0ccf10e376f8bf9a7f31fb4ca6078105194b42e0b1e0ee2bc9bde71f"
+    },
+    "turnip/notices/MESA-licenses/SGI-B-2.0": {
+      "bytes": 1822,
+      "sha256": "686bf035a1fd22076416fd3b90370ac67771e884bf57f55693d51f8ce7c710a7"
+    },
+    "turnip/notices/MESA-licenses/exceptions/Linux-Syscall-Note": {
+      "bytes": 1257,
+      "sha256": "9b4084655174654608fd037e9ddb4feeadfada01cd042e9c17b05aa7105b2b9f"
+    },
+    "turnip/notices/MESON-COPYING": {
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "turnip/notices/SPIRV-HEADERS-LICENSE": {
+      "bytes": 4812,
+      "sha256": "ff04ae7e6a468587fe59434fee2e67c0e2a749b592c794b764ff80f30b94a084"
+    },
+    "turnip/notices/SPIRV-TOOLS-LICENSE": {
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "turnip/notices/binutils-copyright": {
+      "bytes": 1795,
+      "sha256": "a81bdd422c2c015deca84bf6ad249bf0d7d19885fc01d1894463291b0b7313e1"
+    },
+    "turnip/notices/bison-copyright": {
+      "bytes": 776,
+      "sha256": "0870e455b94b9043e84948624d3368d9a45d10674ae4398762b99bb2c328dffd"
+    },
+    "turnip/notices/cmake-copyright": {
+      "bytes": 29578,
+      "sha256": "b70ca2018b7fd516ac9b9953678c1a9733eb9e15f3cfbe9b26c137ef0dbd5782"
+    },
+    "turnip/notices/flex-copyright": {
+      "bytes": 25695,
+      "sha256": "908e7be25f1d5848fc378b76bdbaed59f3d1e19ae61fdeb9d1ad12640bf0e078"
+    },
+    "turnip/notices/g++-12-copyright": {
+      "bytes": 68194,
+      "sha256": "da8191658b3452ce9caf31638ba61dab31a38c619fa39df119812e050f592fd3"
+    },
+    "turnip/notices/g++-copyright": {
+      "bytes": 2196,
+      "sha256": "156004744edbf17a975f0004ac4a9295b160ab403d646c445235711255ca9ff8"
+    },
+    "turnip/notices/gcc-12-copyright": {
+      "bytes": 68194,
+      "sha256": "da8191658b3452ce9caf31638ba61dab31a38c619fa39df119812e050f592fd3"
+    },
+    "turnip/notices/gcc-copyright": {
+      "bytes": 2196,
+      "sha256": "156004744edbf17a975f0004ac4a9295b160ab403d646c445235711255ca9ff8"
+    },
+    "turnip/notices/libc6-copyright": {
+      "bytes": 25467,
+      "sha256": "40c7e1f2118531f038ca22999bd976901254e1bc5cd1b0f0211bdd064c599987"
+    },
+    "turnip/notices/libc6-dev-copyright": {
+      "bytes": 25467,
+      "sha256": "40c7e1f2118531f038ca22999bd976901254e1bc5cd1b0f0211bdd064c599987"
+    },
+    "turnip/notices/libexpat1-dev-copyright": {
+      "bytes": 1756,
+      "sha256": "60919fe1a156395ff14511bb6ff79756c50ade2fff59ac60c9bae1d8a7fe6292"
+    },
+    "turnip/notices/libstdc++-12-dev-copyright": {
+      "bytes": 68194,
+      "sha256": "da8191658b3452ce9caf31638ba61dab31a38c619fa39df119812e050f592fd3"
+    },
+    "turnip/notices/libvulkan-dev-copyright": {
+      "bytes": 1964,
+      "sha256": "c579213e28f67944a7e407816b8a8e1d2d2406b3d820e420aa923807c450dc07"
+    },
+    "turnip/notices/libvulkan1-copyright": {
+      "bytes": 1964,
+      "sha256": "c579213e28f67944a7e407816b8a8e1d2d2406b3d820e420aa923807c450dc07"
+    },
+    "turnip/notices/libx11-dev-copyright": {
+      "bytes": 47102,
+      "sha256": "0b380a7fd5b2228f26e9585e56f14812efd3350f3df307507d2bc055dfd8de3e"
+    },
+    "turnip/notices/libx11-xcb-dev-copyright": {
+      "bytes": 47102,
+      "sha256": "0b380a7fd5b2228f26e9585e56f14812efd3350f3df307507d2bc055dfd8de3e"
+    },
+    "turnip/notices/libxcb-dri3-dev-copyright": {
+      "bytes": 1781,
+      "sha256": "4f7cb9db6bf6542f5417e3d674c780d3a5fd12291a54d63054fb576ee0cfae80"
+    },
+    "turnip/notices/libxcb-present-dev-copyright": {
+      "bytes": 1781,
+      "sha256": "4f7cb9db6bf6542f5417e3d674c780d3a5fd12291a54d63054fb576ee0cfae80"
+    },
+    "turnip/notices/libxcb-randr0-dev-copyright": {
+      "bytes": 1781,
+      "sha256": "4f7cb9db6bf6542f5417e3d674c780d3a5fd12291a54d63054fb576ee0cfae80"
+    },
+    "turnip/notices/libxcb-shm0-dev-copyright": {
+      "bytes": 1781,
+      "sha256": "4f7cb9db6bf6542f5417e3d674c780d3a5fd12291a54d63054fb576ee0cfae80"
+    },
+    "turnip/notices/libxcb-sync-dev-copyright": {
+      "bytes": 1781,
+      "sha256": "4f7cb9db6bf6542f5417e3d674c780d3a5fd12291a54d63054fb576ee0cfae80"
+    },
+    "turnip/notices/libxcb-xfixes0-dev-copyright": {
+      "bytes": 1781,
+      "sha256": "4f7cb9db6bf6542f5417e3d674c780d3a5fd12291a54d63054fb576ee0cfae80"
+    },
+    "turnip/notices/libxcb1-dev-copyright": {
+      "bytes": 1781,
+      "sha256": "4f7cb9db6bf6542f5417e3d674c780d3a5fd12291a54d63054fb576ee0cfae80"
+    },
+    "turnip/notices/libxshmfence-dev-copyright": {
+      "bytes": 1215,
+      "sha256": "6a76b32c9174c0cb9e3d94c323a14d33d6a42bd2a61579b189cbc5addeb94abe"
+    },
+    "turnip/notices/libzstd-dev-copyright": {
+      "bytes": 5389,
+      "sha256": "35e85e8e9bbb71492c5f5dddf39ed65b68775a02ad8d710c25d097b497f06c49"
+    },
+    "turnip/notices/make-copyright": {
+      "bytes": 2093,
+      "sha256": "16deb73e706ec72758ce5e079a80d1aab17f3834449da9b718c4a4b60eb1f6ec"
+    },
+    "turnip/notices/ninja-build-copyright": {
+      "bytes": 1350,
+      "sha256": "1134fe05b5a52ce2a81fb233e421655bb45e5f5db74164478ea85343baf52b86"
+    },
+    "turnip/notices/pkg-config-copyright": {
+      "bytes": 7501,
+      "sha256": "676c75e54ff7e3b9892940fbf1b31763cb6f2a6527a5607a3640ac59a2441fba"
+    },
+    "turnip/notices/python3-copyright": {
+      "bytes": 16122,
+      "sha256": "5b274dbb44b28a54b795b9471c07ab045054d6b8a86273cb9feb632b6fd2760d"
+    },
+    "turnip/notices/python3-mako-copyright": {
+      "bytes": 3740,
+      "sha256": "536a6333473d40687bf8c46a5fbbd84c398ae5f69f53519ad680514651442072"
+    },
+    "turnip/notices/python3-packaging-copyright": {
+      "bytes": 2444,
+      "sha256": "51fe4bbadf841c4e4d02ad97ba375bcde0ae11a51da62ae16fdcbe723d3cdad2"
+    },
+    "turnip/notices/python3-yaml-copyright": {
+      "bytes": 1484,
+      "sha256": "26fdc211f61903eb5d63aef0be53269c9362fb7c0a944eb87001a935ac6e8e51"
+    },
+    "turnip/notices/zlib1g-dev-copyright": {
+      "bytes": 2927,
+      "sha256": "9e5b96d63773a5d177ba264254390f792be07e41748ebd94730981c6cac31cc6"
+    },
+    "turnip/shader-runtime-check/compile-validate-disassemble.log": {
+      "bytes": 1960,
+      "sha256": "a97781867ba11d4e60b1c7ca1f41b8969f4569a268eefa89fbccaca3efc80730"
+    },
+    "turnip/shader-runtime-check/fixture.vert": {
+      "bytes": 53,
+      "sha256": "fd28b7db774a0dfcf7acb29167c833e273c4cd398cbbcef4894a7f20c861aff4"
+    },
+    "turnip/shader-runtime-check/independent-valid-spirv.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "turnip/shader-runtime-check/invalid-glsl.log": {
+      "bytes": 544,
+      "sha256": "10211e01f0356b55b2f1a89e1cac8264eb5552fced8ed4bfc95d7761df193c16"
+    },
+    "turnip/shader-runtime-check/invalid-spirv.log": {
+      "bytes": 44,
+      "sha256": "1b2379c273ad5db7480c4b37ece20953064d68eb91be6df1fac1b6724358223e"
+    },
+    "turnip/shader-runtime-check/invalid.vert": {
+      "bytes": 54,
+      "sha256": "a8e911df1a7bde4982d528dd8f5427e06e7f940bd2f64f135c183c4a21aafeae"
+    },
+    "turnip/shader-runtime-check/malformed.spv": {
+      "bytes": 680,
+      "sha256": "2025b2104365d700bb9f5f732692b7fe816d2f505e2cb13af5fd58568ac4ff12"
+    },
+    "turnip/shader-runtime-check/qualification.json": {
+      "bytes": 431,
+      "sha256": "95a25f419d3f73bb1ba6b6ce31551eaa8524939de25d8d5a69106fe3a463d213"
+    },
+    "turnip/shader-runtime-check/valid.spv": {
+      "bytes": 680,
+      "sha256": "81a2caac921b3a622ab9fa6c58928bc61e1805c2eb0bfd933a06266fa07f6a0e"
+    },
+    "turnip/shader-tool-check/compile-validate-disassemble.log": {
+      "bytes": 1936,
+      "sha256": "f92a009c681b012daded92ff4afce63ea2a2d71033598e34ecac0a6b26d64fa5"
+    },
+    "turnip/shader-tool-check/fixture.vert": {
+      "bytes": 53,
+      "sha256": "fd28b7db774a0dfcf7acb29167c833e273c4cd398cbbcef4894a7f20c861aff4"
+    },
+    "turnip/shader-tool-check/independent-valid-spirv.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "turnip/shader-tool-check/invalid-glsl.log": {
+      "bytes": 448,
+      "sha256": "e2edb04a60fd0a1d75c9295f6e35f197105c73efca35600742b26fd87cbd5195"
+    },
+    "turnip/shader-tool-check/invalid-spirv.log": {
+      "bytes": 44,
+      "sha256": "1b2379c273ad5db7480c4b37ece20953064d68eb91be6df1fac1b6724358223e"
+    },
+    "turnip/shader-tool-check/invalid.vert": {
+      "bytes": 54,
+      "sha256": "a8e911df1a7bde4982d528dd8f5427e06e7f940bd2f64f135c183c4a21aafeae"
+    },
+    "turnip/shader-tool-check/malformed.spv": {
+      "bytes": 680,
+      "sha256": "2025b2104365d700bb9f5f732692b7fe816d2f505e2cb13af5fd58568ac4ff12"
+    },
+    "turnip/shader-tool-check/qualification.json": {
+      "bytes": 431,
+      "sha256": "95a25f419d3f73bb1ba6b6ce31551eaa8524939de25d8d5a69106fe3a463d213"
+    },
+    "turnip/shader-tool-check/valid.spv": {
+      "bytes": 680,
+      "sha256": "81a2caac921b3a622ab9fa6c58928bc61e1805c2eb0bfd933a06266fa07f6a0e"
+    },
+    "turnip/turnip-build.json": {
+      "bytes": 20904,
+      "sha256": "bf283d2674459fb0dbd2d5feb8452c86a3f2284f7234a78fd2b864818a788220"
+    },
+    "turnip/turnip-icd.json": {
+      "bytes": 135,
+      "sha256": "c70fd636fbd1ba1649ef788f17316f092a091b95d87a2de3abb2109fea67bf82"
+    }
+  },
+  "originalNativeProducerRevision": "75f50445112818c97f8d8e575d2b1c21e59af6e5",
+  "originalNativeWorkflowRun": 41073499555,
+  "restoredSource": {
+    "actualBuildReceipt": {
+      "bytes": 20904,
+      "sha256": "bf283d2674459fb0dbd2d5feb8452c86a3f2284f7234a78fd2b864818a788220"
+    },
+    "bytes": 18,
+    "gitBlob": "8d35cb3277ff6eb0d637147c09e95934604a431c",
+    "path": "turnip/corresponding-source/build-recipe/.dockerignore",
+    "retainedIntegrationArchive": {
+      "bytes": 6184960,
+      "path": "source-selection/integration-source.tar"
+    },
+    "sha256": "05cc6ae53cfd6129f1d7010aa874c6cf0a6019b1adfeff3f4fab27f2d04f43ca",
+    "sourcePath": "runtime/turnip/.dockerignore",
+    "sourceRevision": "75f50445112818c97f8d8e575d2b1c21e59af6e5"
+  },
+  "scope": "exact-retained-turnip-recipe-source-only-recovery"
+}

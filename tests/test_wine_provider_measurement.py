@@ -152,6 +152,25 @@ class ProviderMeasurement(unittest.TestCase):
         self.assertFalse(result['productionPinsChanged'] or result['androidQualified'] or result['hardwareQualified'])
         for name, raw in original.items(): self.assertEqual((self.source / name).read_bytes(), raw)
 
+    def test_new_declared_recipe_source_is_preserved_only_after_producer_git_and_receipt_match(self):
+        name='runtime/turnip/additional.txt';data=b'additional exact producer source\n'
+        self.catalog[name]=data;(self.source/name).write_bytes(data)
+        build=json.loads(self.turnip_raw['provenance/turnip-build.json'])
+        build['recipeSources']['additional.txt']=measure.byte_identity(data)
+        self.turnip_raw['provenance/turnip-build.json']=measure.encoded(build)
+        check=json.loads(self.turnip_raw['provenance/no-gpu-check.json'])
+        check['buildReceiptSha256']=measure.byte_identity(self.turnip_raw['provenance/turnip-build.json'])['sha256']
+        self.turnip_raw['provenance/no-gpu-check.json']=measure.encoded(check)
+        self.write_zip('turnip')
+        with zipfile.ZipFile(self.zips['turnip'],'a') as archive:
+            item=zipfile.ZipInfo('turnip/corresponding-source/build-recipe/additional.txt')
+            item.external_attr=(stat.S_IFREG|0o644)<<16;archive.writestr(item,data)
+        api=json.loads(self.metadata['turnip'].read_bytes());identity=measure.client.identity(self.zips['turnip'])
+        api.update(size_in_bytes=identity['bytes'],digest='sha256:'+identity['sha256']);self.metadata['turnip'].write_bytes(measure.encoded(api))
+        self.measure();value=json.loads((self.output/'turnip.proposed.lock.json').read_bytes())
+        self.assertEqual(len(value['files']),69)
+        self.assertEqual(value['files']['provenance/build-recipe/additional.txt']['sha256'],measure.byte_identity(data)['sha256'])
+
     def test_run_metadata_rejects_failed_foreign_or_different_producer_before_archive_use(self):
         for key, wrong in (('id', True), ('head_sha', 'a' * 40), ('head_branch', 'main'), ('path', 'other.yml'),
                            ('status', 'in_progress'), ('conclusion', 'failure'), ('event', 'pull_request'),

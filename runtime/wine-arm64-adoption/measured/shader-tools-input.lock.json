@@ -1,0 +1,322 @@
+{
+  "androidQualified": false,
+  "artifact": {
+    "bytes": 269250352,
+    "id": 12989171109,
+    "originalBuildRunId": 41073499555,
+    "runId": 41079114080,
+    "sha256": "02d8f9384d3d884e25184137e4c6b97ee482b61a3f3f9719f925e084bae69182",
+    "sourceRecoveryRevision": "bed4c62e52655519a402712b34fb5340db92bb99",
+    "sourceRecoveryRunId": 41079114080
+  },
+  "bundleReceiptSha256": "99dca7fe4217264272e4630dd9499a3dc0a722d01f62f33a553dee768a32cf6d",
+  "clientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "compilerBuildSha256": "bf283d2674459fb0dbd2d5feb8452c86a3f2284f7234a78fd2b864818a788220",
+  "compilerIntegrationRevision": "75f50445112818c97f8d8e575d2b1c21e59af6e5",
+  "files": {
+    "NOTICE.txt": {
+      "bytes": 392,
+      "sha256": "2618d313f4c2719c5da1595ed8c4f248ad6d5c1334c1612198451b8c9172ec0d"
+    },
+    "corresponding-source/glslang-14.3.0.tar.gz": {
+      "bytes": 3858944,
+      "sha256": "dc52424b8d3b302038068537084dfc557c870a9bfaec77c1ee025bba38148177"
+    },
+    "corresponding-source/spirv-headers-2acb319af38d43be3ea76bfabf3998e5281d8d12.tar.gz": {
+      "bytes": 522013,
+      "sha256": "425da1e3e4ba8de41dc8c8273d281ae82f1e18a397ec476649df3c832e242329"
+    },
+    "corresponding-source/spirv-tools-0cfe9e7219148716dfd30b37f4d21753f098707a.tar.gz": {
+      "bytes": 3173510,
+      "sha256": "a5277538fec0868452b1f616553c2fca80939a6a3ee0b7322e21ff063750a482"
+    },
+    "notices/ESTERIA-GPL-3.0": {
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    "notices/GLSLANG-LICENSE.txt": {
+      "bytes": 54705,
+      "sha256": "adb783e734e906d1f46db5df29991dbde84bdb0ceab502ac2febb44fe3c2b5f4"
+    },
+    "notices/SPIRV-HEADERS-LICENSE": {
+      "bytes": 4812,
+      "sha256": "ff04ae7e6a468587fe59434fee2e67c0e2a749b592c794b764ff80f30b94a084"
+    },
+    "notices/SPIRV-TOOLS-LICENSE": {
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "notices/binutils-copyright": {
+      "bytes": 1795,
+      "sha256": "a81bdd422c2c015deca84bf6ad249bf0d7d19885fc01d1894463291b0b7313e1"
+    },
+    "notices/bison-copyright": {
+      "bytes": 776,
+      "sha256": "0870e455b94b9043e84948624d3368d9a45d10674ae4398762b99bb2c328dffd"
+    },
+    "notices/cmake-copyright": {
+      "bytes": 29578,
+      "sha256": "b70ca2018b7fd516ac9b9953678c1a9733eb9e15f3cfbe9b26c137ef0dbd5782"
+    },
+    "notices/flex-copyright": {
+      "bytes": 25695,
+      "sha256": "908e7be25f1d5848fc378b76bdbaed59f3d1e19ae61fdeb9d1ad12640bf0e078"
+    },
+    "notices/g++-12-copyright": {
+      "bytes": 68194,
+      "sha256": "da8191658b3452ce9caf31638ba61dab31a38c619fa39df119812e050f592fd3"
+    },
+    "notices/g++-copyright": {
+      "bytes": 2196,
+      "sha256": "156004744edbf17a975f0004ac4a9295b160ab403d646c445235711255ca9ff8"
+    },
+    "notices/gcc-12-copyright": {
+      "bytes": 68194,
+      "sha256": "da8191658b3452ce9caf31638ba61dab31a38c619fa39df119812e050f592fd3"
+    },
+    "notices/gcc-copyright": {
+      "bytes": 2196,
+      "sha256": "156004744edbf17a975f0004ac4a9295b160ab403d646c445235711255ca9ff8"
+    },
+    "notices/libc6-copyright": {
+      "bytes": 25467,
+      "sha256": "40c7e1f2118531f038ca22999bd976901254e1bc5cd1b0f0211bdd064c599987"
+    },
+    "notices/libc6-dev-copyright": {
+      "bytes": 25467,
+      "sha256": "40c7e1f2118531f038ca22999bd976901254e1bc5cd1b0f0211bdd064c599987"
+    },
+    "notices/libexpat1-dev-copyright": {
+      "bytes": 1756,
+      "sha256": "60919fe1a156395ff14511bb6ff79756c50ade2fff59ac60c9bae1d8a7fe6292"
+    },
+    "notices/libstdc++-12-dev-copyright": {
+      "bytes": 68194,
+      "sha256": "da8191658b3452ce9caf31638ba61dab31a38c619fa39df119812e050f592fd3"
+    },
+    "notices/libvulkan-dev-copyright": {
+      "bytes": 1964,
+      "sha256": "c579213e28f67944a7e407816b8a8e1d2d2406b3d820e420aa923807c450dc07"
+    },
+    "notices/libvulkan1-copyright": {
+      "bytes": 1964,
+      "sha256": "c579213e28f67944a7e407816b8a8e1d2d2406b3d820e420aa923807c450dc07"
+    },
+    "notices/libx11-dev-copyright": {
+      "bytes": 47102,
+      "sha256": "0b380a7fd5b2228f26e9585e56f14812efd3350f3df307507d2bc055dfd8de3e"
+    },
+    "notices/libx11-xcb-dev-copyright": {
+      "bytes": 47102,
+      "sha256": "0b380a7fd5b2228f26e9585e56f14812efd3350f3df307507d2bc055dfd8de3e"
+    },
+    "notices/libxcb-dri3-dev-copyright": {
+      "bytes": 1781,
+      "sha256": "4f7cb9db6bf6542f5417e3d674c780d3a5fd12291a54d63054fb576ee0cfae80"
+    },
+    "notices/libxcb-present-dev-copyright": {
+      "bytes": 1781,
+      "sha256": "4f7cb9db6bf6542f5417e3d674c780d3a5fd12291a54d63054fb576ee0cfae80"
+    },
+    "notices/libxcb-randr0-dev-copyright": {
+      "bytes": 1781,
+      "sha256": "4f7cb9db6bf6542f5417e3d674c780d3a5fd12291a54d63054fb576ee0cfae80"
+    },
+    "notices/libxcb-shm0-dev-copyright": {
+      "bytes": 1781,
+      "sha256": "4f7cb9db6bf6542f5417e3d674c780d3a5fd12291a54d63054fb576ee0cfae80"
+    },
+    "notices/libxcb-sync-dev-copyright": {
+      "bytes": 1781,
+      "sha256": "4f7cb9db6bf6542f5417e3d674c780d3a5fd12291a54d63054fb576ee0cfae80"
+    },
+    "notices/libxcb-xfixes0-dev-copyright": {
+      "bytes": 1781,
+      "sha256": "4f7cb9db6bf6542f5417e3d674c780d3a5fd12291a54d63054fb576ee0cfae80"
+    },
+    "notices/libxcb1-dev-copyright": {
+      "bytes": 1781,
+      "sha256": "4f7cb9db6bf6542f5417e3d674c780d3a5fd12291a54d63054fb576ee0cfae80"
+    },
+    "notices/libxshmfence-dev-copyright": {
+      "bytes": 1215,
+      "sha256": "6a76b32c9174c0cb9e3d94c323a14d33d6a42bd2a61579b189cbc5addeb94abe"
+    },
+    "notices/libzstd-dev-copyright": {
+      "bytes": 5389,
+      "sha256": "35e85e8e9bbb71492c5f5dddf39ed65b68775a02ad8d710c25d097b497f06c49"
+    },
+    "notices/make-copyright": {
+      "bytes": 2093,
+      "sha256": "16deb73e706ec72758ce5e079a80d1aab17f3834449da9b718c4a4b60eb1f6ec"
+    },
+    "notices/ninja-build-copyright": {
+      "bytes": 1350,
+      "sha256": "1134fe05b5a52ce2a81fb233e421655bb45e5f5db74164478ea85343baf52b86"
+    },
+    "notices/pkg-config-copyright": {
+      "bytes": 7501,
+      "sha256": "676c75e54ff7e3b9892940fbf1b31763cb6f2a6527a5607a3640ac59a2441fba"
+    },
+    "notices/python3-copyright": {
+      "bytes": 16122,
+      "sha256": "5b274dbb44b28a54b795b9471c07ab045054d6b8a86273cb9feb632b6fd2760d"
+    },
+    "notices/python3-mako-copyright": {
+      "bytes": 3740,
+      "sha256": "536a6333473d40687bf8c46a5fbbd84c398ae5f69f53519ad680514651442072"
+    },
+    "notices/python3-packaging-copyright": {
+      "bytes": 2444,
+      "sha256": "51fe4bbadf841c4e4d02ad97ba375bcde0ae11a51da62ae16fdcbe723d3cdad2"
+    },
+    "notices/python3-yaml-copyright": {
+      "bytes": 1484,
+      "sha256": "26fdc211f61903eb5d63aef0be53269c9362fb7c0a944eb87001a935ac6e8e51"
+    },
+    "notices/zlib1g-dev-copyright": {
+      "bytes": 2927,
+      "sha256": "9e5b96d63773a5d177ba264254390f792be07e41748ebd94730981c6cac31cc6"
+    },
+    "provenance/build-recipe-reference/sources.lock.json": {
+      "bytes": 43088,
+      "sha256": "9bc783e6240d3314a8245f88a3ce8eb5a8d583e360f330f780cd71080bf2d8d1"
+    },
+    "provenance/build-recipe/.dockerignore": {
+      "bytes": 18,
+      "sha256": "05cc6ae53cfd6129f1d7010aa874c6cf0a6019b1adfeff3f4fab27f2d04f43ca"
+    },
+    "provenance/build-recipe/ANDROID-PACKAGING.md": {
+      "bytes": 5162,
+      "sha256": "82b9a64f548bfcc52c8c9f6d10b2b90a79f3734eee3fc003f4e1044791fcc248"
+    },
+    "provenance/build-recipe/Dockerfile": {
+      "bytes": 1086,
+      "sha256": "a89cfdfd358fc718218b6b12a7feb64fdd7f45c58593ea01585425b7ef928f09"
+    },
+    "provenance/build-recipe/README.md": {
+      "bytes": 7288,
+      "sha256": "47f0e2b9dddd692e39c3f99d5ed114b1dcf016b8f2ad8f751da0749931274b36"
+    },
+    "provenance/build-recipe/android-provider.lock.json": {
+      "bytes": 16051,
+      "sha256": "a2999f5172d139ea37cec712662ffc17303cb2d78d8356095c11c8f671f887d4"
+    },
+    "provenance/build-recipe/build.sh": {
+      "bytes": 2320,
+      "sha256": "9866ef7e9fd8dae6a5079b37e8232c864114f4b88542754e48fafa6c4d5e444a"
+    },
+    "provenance/build-recipe/debian.sources": {
+      "bytes": 434,
+      "sha256": "8e8f7c4f33e39696a188e01bb6e385daf17a006eb573bc84af073ebcc4fc9f65"
+    },
+    "provenance/build-recipe/fetch_sources.py": {
+      "bytes": 5418,
+      "sha256": "90f7b5a750391599911d8b69cb0681c346e549f2013cf799641949c757acd3f9"
+    },
+    "provenance/build-recipe/inrelease.SHA256SUMS": {
+      "bytes": 455,
+      "sha256": "2acec858821beef422f424794c5577adf01ef084787ca42616c5cb78a72b1413"
+    },
+    "provenance/build-recipe/packages.txt": {
+      "bytes": 767,
+      "sha256": "89d0bec77bab06399ee57be1603d082521eebb903ad40fcf7b95e7c76e1a1f03"
+    },
+    "provenance/build-recipe/probe.c": {
+      "bytes": 17766,
+      "sha256": "2f071971b16f6eaacba9a9d95358ea28c782536a584f83147a8cff923fba9cbf"
+    },
+    "provenance/build-recipe/probe.frag": {
+      "bytes": 102,
+      "sha256": "ae5d45bff00d2287752eec77c055d454c5b8588e8720885a8bd1ff7f791830e1"
+    },
+    "provenance/build-recipe/probe.vert": {
+      "bytes": 155,
+      "sha256": "dd3b4afa79ffe81c1f6c1df03f671398c97b2bc9a7ea90dad2648769067067d3"
+    },
+    "provenance/build-recipe/qualify_shaders.py": {
+      "bytes": 2878,
+      "sha256": "fd39918a5223dd81519041323c0f06382947f39722d5a3db3917baeb6e16e41e"
+    },
+    "provenance/build-recipe/record_build.py": {
+      "bytes": 8959,
+      "sha256": "82b94f7ab1344e6026ee1524668b4abe1b8ea3e4212189952783bf13bc052e6d"
+    },
+    "provenance/build-recipe/run_probe.py": {
+      "bytes": 7186,
+      "sha256": "671d44f9aec71f13f303d745cf145fa8ac4deaccbefe8911ad2b610be90f35c6"
+    },
+    "provenance/build-recipe/sources.lock.json": {
+      "bytes": 43088,
+      "sha256": "f92f119d657feaa7548e84196d20c59a9050b91a62f171de8249b75e23a8645f"
+    },
+    "provenance/bundle.json": {
+      "bytes": 4498,
+      "sha256": "99dca7fe4217264272e4630dd9499a3dc0a722d01f62f33a553dee768a32cf6d"
+    },
+    "provenance/client-shader-README.md": {
+      "bytes": 8033,
+      "sha256": "5bf2fa8cfdc5a866a0930ce31957ff8660b53f84f836467c01bb7f50f53b6815"
+    },
+    "provenance/shader-tool-qualification.json": {
+      "bytes": 431,
+      "sha256": "95a25f419d3f73bb1ba6b6ce31551eaa8524939de25d8d5a69106fe3a463d213"
+    },
+    "provenance/turnip-build.json": {
+      "bytes": 20904,
+      "sha256": "bf283d2674459fb0dbd2d5feb8452c86a3f2284f7234a78fd2b864818a788220"
+    },
+    "tools/bin/glslangValidator": {
+      "bytes": 8234112,
+      "sha256": "279cb8d922fa71319e12eb63b46a1c6f80938d07747cec73326ec64928a044fc"
+    },
+    "tools/bls/__init__.py": {
+      "bytes": 113,
+      "sha256": "123dfa2801174ab77864b01a0b19fc7bf5918c5754ce00415808813440071ce2"
+    },
+    "tools/bls/archive.py": {
+      "bytes": 14233,
+      "sha256": "9494b952ad1431bd58dd2a30ecaac853b08e3dc59aa35490f66074d6a5ef6604"
+    },
+    "tools/bls/dx9ir.py": {
+      "bytes": 14911,
+      "sha256": "fbcd88b95182335dc9d420030f8b216e65597553d990d5bed8d4771c1ea372b1"
+    },
+    "tools/bls/emitter.py": {
+      "bytes": 38313,
+      "sha256": "232e0b0fcdcf338a274a284ab00c4afe548e92f33b80ea57434e6f138bb25fa4"
+    },
+    "tools/bls/mpq_extract.py": {
+      "bytes": 12465,
+      "sha256": "b0db43564227c85e4aa13cadfcc379b4b0695ee19b6054746d7c9e2657a7b524"
+    },
+    "tools/bls/translate.py": {
+      "bytes": 18296,
+      "sha256": "1de24962edbe7d520f78488aac5ab946f54fe4d6776af178d630b402093a1794"
+    },
+    "tools/shader-tools.json": {
+      "bytes": 1210,
+      "sha256": "36e3032524c2136c4273908f887a1ca59ebb414e806f52d47e778332ed4acda6"
+    },
+    "tools/translate_shaders.py": {
+      "bytes": 5871,
+      "sha256": "41412a994ebbacf3661b991b7fca592bb0ac0f1295ba4bd9c8b14aff4012efe1"
+    }
+  },
+  "formatVersion": 1,
+  "gameAssetShadersQualified": false,
+  "gameplayQualified": false,
+  "helper": {
+    "bytes": 19353,
+    "gitBlob": "9f2eab5b4126c51239896da184e4aadd4803ba7f",
+    "gitMode": "100644",
+    "installedPath": "helpers/shader_generation.py",
+    "revision": "bed4c62e52655519a402712b34fb5340db92bb99",
+    "sha256": "8bb48952c36bdc4c69516c2ffa6f5c2d2eb59e84019e6420948d94bc81683ac5",
+    "source": "runtime/shader_generation.py"
+  },
+  "nativeCompilerFixtureQualified": true,
+  "requiredWineArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+  "scope": "measured-offline-shader-provider-inputs",
+  "toolManifestSha256": "36e3032524c2136c4273908f887a1ca59ebb414e806f52d47e778332ed4acda6"
+}
