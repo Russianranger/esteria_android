@@ -144,3 +144,17 @@ build/lint and metadata guards pass. Its actual ordered source/derived native
 provider remains gated/pending; no archive identity was invented. Strong ordered
 source capture now models actual compiler and linker dependency records
 separately; fresh native observation remains required after this correction. The already sealed stock provider remains unchanged.
+
+## Actual ordered source observation and retained data owner
+
+Native ARM64 run41095126683 passed the two-target offline build, ordered-reader
+lookups and complete dependency capture:210 compiler objects and two final ELF
+link records. The bounded evidence ZIP and all observation metadata were read
+back. Full105MB payload/source composition is the next separate CI gate;
+sourceCompanionComplete remains false until it passes. No game assets converted.
+
+The Android data operation now retains real setup/import file locks until its
+child is reaped; interruption preserves imported and generated data. Four actual
+Java ownership/importer/progress fixtures, APK/AndroidTest/lint and exact helper
+readback pass. Its positive composed-provider and Android execution gates remain
+pending. It is included in the regular host behavior workflow.

@@ -1,0 +1,63 @@
+{
+  "artifacts": {
+    "application.apk": {
+      "bytes": 670055,
+      "sha256": "fb03e20caf36135457e41e4c6676ce58d1ee8ac84d174b9895f5c4b00fd54de9"
+    },
+    "tests.apk": {
+      "bytes": 1751581,
+      "sha256": "d9959a76fcaf84157fd22dcd9ed126ddaaf11310dd126523000369eb8781ab4e"
+    }
+  },
+  "buildResult": "BUILD SUCCESSFUL in30s;84tasks;15executed/69up-to-date",
+  "buildScope": "Internal default debug APK from a parallel development working tree; no runtime archives or user-test candidate",
+  "command": "./gradlew --offline --no-daemon --init-script <temporary isolated-output init> :app:serverDataSetupOwnerTest :core:serverDataRunPlanTest :core:serverDataToolSelectionTest :app:assembleDebug :app:assembleDebugAndroidTest :app:lintDebug",
+  "dateUtc": "2026-10-30",
+  "execution": {
+    "android": false,
+    "extractor": false,
+    "gameInput": false,
+    "gameplay": false,
+    "native": false,
+    "sourceQualifiedProvider": false,
+    "world": false
+  },
+  "formatVersion": 1,
+  "hostChecks": {
+    "actualControlledJavaOwnedProcess": true,
+    "actualImporterExclusionBeforeSnapshot": true,
+    "actualJavaFileLocks": true,
+    "boundedIncrementalPhaseParser": true,
+    "canonicalSelectionAtomicWrite": true,
+    "importAdmittedAfterKnownReap": true,
+    "maxHeapMiB": 32,
+    "ownerFixtureGroups": 4,
+    "prelaunchCancellationRetainsLeases": true,
+    "secondaryLockFailureUnwindsFirstLease": true,
+    "symlinkTargetRefusedAndPreserved": true
+  },
+  "implementation": {
+    "deadlineHours": 24,
+    "derivedWork": "private-root/server-data-work",
+    "existingHelperFiles": 5,
+    "extraHelperFiles": 0,
+    "importLock": "game/import.lock",
+    "mainOrUiActivated": false,
+    "newArchiveFlags": false,
+    "publicProvider": "typed-source-qualified-ServerDataToolsSetup-only",
+    "returnedBinding": "metadata-format-only-after-normal-zero-and-unchanged-inputs",
+    "setupLock": ".android-server-data-setup.lock",
+    "sourceProviderPositiveGate": "pending-measured-source-and-native-cli-provider"
+  },
+  "independentReview": "Clear from full50_review; no edits/repeated builds",
+  "scope": "host-retained-server-data-operation-owner-only",
+  "validation": {
+    "androidApplicationBuild": true,
+    "androidTestCompilation": true,
+    "coreCanonicalSelectionPassed": true,
+    "coreRunPlanPassed": true,
+    "existingFiveHelperBytesReadBack": true,
+    "hostFixtureDefinitionsExcluded": true,
+    "lint": true
+  }
+}

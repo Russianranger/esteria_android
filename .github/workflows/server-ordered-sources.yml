@@ -1,0 +1,71 @@
+name: Retain complete ordered extractor source companion
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - .github/workflows/server-ordered-sources.yml
+      - runtime/server/ordered-tools-inputs.lock.json
+      - tools/prepare_ordered_extractor_sources.py
+      - tools/seal_ordered_extractor_sources.py
+      - tools/verify_target_dependency_observation.py
+      - tests/test_ordered_source_inputs.py
+      - tests/test_ordered_extractor_sources.py
+      - runtime/server/ORDERED-SOURCE-SEAL.md
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: ordered-extractor-source-retention-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  ordered-sources:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          # Export recipes from the separately pinned native integration commit.
+          fetch-depth: 0
+      - name: Check sealed-input and retained graph guards
+        run: |
+          python3 -m unittest tests.test_ordered_source_inputs tests.test_ordered_extractor_sources \
+            tests.test_target_dependency_observation -v
+          mkdir -p out/ordered-source-evidence
+          python3 - <<'PY'
+          from tools import seal_ordered_extractor_sources as source
+          source.load_pin()
+          PY
+      - name: Acquire exact native payload and original source companion
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/prepare_ordered_extractor_sources.py --output out/ordered-source-inputs \
+            > out/ordered-source-evidence/acquisition.log 2>&1
+          cp out/ordered-source-inputs/acquisition.json out/ordered-source-evidence/
+      - name: Compose and read back the separate source-only companion
+        run: |
+          python3 tools/seal_ordered_extractor_sources.py \
+            --ordered-payload out/ordered-source-inputs/payload \
+            --original-sealed out/ordered-source-inputs/original-sealed \
+            --integration-git-root . --client-readme out/ordered-source-inputs/client-reference/README.md \
+            --output out/ordered-complete-sources > out/ordered-source-evidence/sealing.log 2>&1
+          cp out/ordered-complete-sources/ordered-source-receipt.json out/ordered-source-evidence/
+      - name: Retain complete source archive and its separate positive receipt
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: complete-ordered-extractor-sources-${{ github.sha }}
+          path: out/ordered-complete-sources/
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+      - name: Retain bounded source-composition evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ordered-source-retention-evidence-${{ github.sha }}
+          path: out/ordered-source-evidence/
+          retention-days: 30
+          if-no-files-found: error

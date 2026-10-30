@@ -37,7 +37,7 @@ jobs:
       - name: Verify wrapper and source behavior, compile launcher, run Android lint
         run: |
           sha256sum --check gradle/wrapper/SHA256SUMS
-          ./gradlew --no-daemon :core:check :app:serverInstallationOwnerTest :app:presentationOwnerTest :app:localServerSessionOwnerTest :app:assembleDebug :app:lintDebug -PsourceRevision="${GITHUB_SHA}"
+          ./gradlew --no-daemon :core:check :app:serverInstallationOwnerTest :app:presentationOwnerTest :app:localServerSessionOwnerTest :app:serverDataSetupOwnerTest :app:assembleDebug :app:lintDebug -PsourceRevision="${GITHUB_SHA}"
       - name: Upload internal CI evidence (not a gameplay candidate)
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:

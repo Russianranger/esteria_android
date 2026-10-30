@@ -1,0 +1,162 @@
+{
+  "adaptationLock": {
+    "bytes": 10416,
+    "sha256": "6963915b2b2923940a91ebbe5f01113e4e3b1f172f9fbffc9b9db8ce87923cc0"
+  },
+  "allRawRecordCountsAndMetadataHashesRechecked": true,
+  "androidRuntimeQualified": false,
+  "boundedEvidenceZipIndependentlyReadback": true,
+  "clientMpqConversionQualified": false,
+  "clientMpqsSupplied": false,
+  "clientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "compilerCacheDisabled": true,
+  "completeNativePayloadLocallyReadback": false,
+  "customEsteriaDataLoadOrderQualified": false,
+  "dependenciesNotNewerThanObject": true,
+  "dependencyObservation": {
+    "bytes": 3571508,
+    "sha256": "229eea9562dd96230e7d8581b4faa4c03cadac9dcf89f2191fe25b226752927e"
+  },
+  "evidenceArtifact": {
+    "bytes": 498743,
+    "id": 12995587509,
+    "sha256": "09c875a25684ec758cbbdcd60d72904e08fcbf7f1ab0a36a271644d583c6881c"
+  },
+  "finalLinkProgramIdentitiesMatched": true,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "generatedMetadataStabilizationBuild": {
+    "exitCode": 0,
+    "observedSeconds": 0.691,
+    "output": {
+      "bytes": 762,
+      "sha256": "c9f6bb210522d93af6cfc247fadaa442e44abccc010fa02c2d5422b4aea5d99b"
+    }
+  },
+  "globalServerPatchListChanged": false,
+  "integrationRevision": "9d20c3bea4f9f2ea7cdfb0915cef1b7ed23faab6",
+  "job": 124198766454,
+  "linkDependenciesNotNewerThanOutput": true,
+  "nativeCompile": {
+    "exitCode": 0,
+    "observedSeconds": 104.694,
+    "output": {
+      "bytes": 23315,
+      "sha256": "73cb5cff33dc3c1feeae3ad7de2e78f88f919843a89313fdeff0b1d74a60d4c0"
+    }
+  },
+  "nativeGateSucceeded": true,
+  "nativeInputLock": {
+    "bytes": 3391,
+    "sha256": "b82abde4df6fa5b630d91973ae500f33266433ef80ad6f92e2f562d877f417ad"
+  },
+  "nativeReceipt": {
+    "bytes": 35935,
+    "sha256": "be05f185c75d20bbcc79374ff4df5f1fa79e90252a9cafd532f4084ebaa60edf"
+  },
+  "observed": {
+    "generatedFiles": 2,
+    "linkElfMachines": [
+      183
+    ],
+    "linkMetadataSha256": "ecbd935b3c96377e4222bb2dabebddb335cecffaaa692c0be6e20e5d2e1ec0e7",
+    "links": 2,
+    "localLinkInputs": 24,
+    "objectElfMachines": [
+      183
+    ],
+    "objectMetadataSha256": "43440e94e496d32088fbda5f2ed2e799eea769fdb77a200c1a9109a3b85e9e5f",
+    "objects": 210,
+    "projectFiles": 544,
+    "rawNinjaDependencyRecords": 212,
+    "retainedFiles": {
+      "generated/jemalloc_internal_defs.h": {
+        "bytes": 11173,
+        "sha256": "0f1d5d5699125fd7d7469f0aeb72ad1286a485b8f65044099a524577ad8a93af"
+      },
+      "generated/revision.h": {
+        "bytes": 1114,
+        "sha256": "719a9d09c6ee28d6c37ec21ee0db78eeaab2210625674b24080292eee478e88e"
+      },
+      "ninja-deps.txt": {
+        "bytes": 3211384,
+        "sha256": "7e502681a8d4156718cdf13960b5bb755713ec210fd3e2cb9557f9467f8e5a08"
+      },
+      "ninja-target-commands.txt": {
+        "bytes": 459986,
+        "sha256": "d26c00487a06f8cf90f72d359845799adec700c47bd3f7b4c848a3b8d486ae6f"
+      },
+      "observation.json": {
+        "bytes": 3571508,
+        "sha256": "229eea9562dd96230e7d8581b4faa4c03cadac9dcf89f2191fe25b226752927e"
+      }
+    },
+    "systemHeaders": 2231,
+    "systemLinkInputs": 28
+  },
+  "originalLinkInputBytesIndependentlyReadback": false,
+  "originalObjectBytesIndependentlyReadback": false,
+  "originalServerBuildSourceLock": {
+    "bytes": 2170,
+    "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+  },
+  "originalSourceQualification": {
+    "archive": {
+      "bytes": 24619647,
+      "sha256": "9f76881f06a7c998e0dba9d4a226c623021ed6ad8b87074aa7a861eafbb96d80"
+    },
+    "qualification": {
+      "bytes": 23757,
+      "sha256": "bcb421500351886cd9daa280e6ba75c57b6e64b689a3a7410fa7104640a58de9"
+    },
+    "receipt": {
+      "bytes": 49875,
+      "sha256": "fae08a831fb0a55d22c3ea330677671cf72045e2abe8fc229ba90494794aa4f4"
+    }
+  },
+  "payloadArtifact": {
+    "bytes": 105175041,
+    "id": 12995223075,
+    "sha256": "63dc34c1a5f4d670dcd845670ef1524925ffefbb7817e56fbe553095ff8744f7"
+  },
+  "programs": {
+    "map_extractor": {
+      "bytes": 6034448,
+      "elf": {
+        "class": "ELF64",
+        "endianness": "little",
+        "interpreter": "/lib/ld-linux-aarch64.so.1",
+        "machine": "AArch64",
+        "type": "DYN"
+      },
+      "sha256": "4f849420fa05b5c73ad42d4aeaf3c92c69799a331132a174ad198c910d3eb3f0"
+    },
+    "vmap4_extractor": {
+      "bytes": 13692552,
+      "elf": {
+        "class": "ELF64",
+        "endianness": "little",
+        "interpreter": "/lib/ld-linux-aarch64.so.1",
+        "machine": "AArch64",
+        "type": "DYN"
+      },
+      "sha256": "f8611925ac55b7cc623970d0d76697aac4efb111c7f7d77b3d82577b9e1ee66e"
+    }
+  },
+  "relevantBuildEnvironmentMatchedBeforeAndAfter": true,
+  "scope": "actual-native-arm64-ordered-extractor-source-and-link-observation",
+  "serverProgramsReplaced": false,
+  "sourceCompanionComplete": false,
+  "syntheticLookupTests": {
+    "exitCode": 0,
+    "observedSeconds": 6.779,
+    "output": {
+      "bytes": 6015,
+      "sha256": "c40b58c3725851f669bb9da58b8c1269f35ab20357e6fc340887aeec2bbf365f"
+    }
+  },
+  "systemHeaderSourcesCopied": false,
+  "systemLinkSourcesCopied": false,
+  "workflowRun": 41095126683,
+  "worldQualified": false
+}

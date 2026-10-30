@@ -21,3 +21,23 @@ def packageServerData = tasks.register('packageServerData') {
 }
 android.sourceSets.main.assets.srcDir(serverDataAssets)
 tasks.named('preBuild').configure { dependsOn packageServerData }
+
+// Retained source-qualified operation owner, with actual importer/file locks.
+// Controlled Java backends only; no tool/provider/Android execution is claimed.
+def dataOwnerClasspath = files(providers.provider { android.bootClasspath },
+    providers.provider { tasks.named('compileDebugJavaWithJavac').get().destinationDirectory.get().asFile },
+    project(':core').layout.buildDirectory.dir('classes/java/main'))
+def compileDataOwner = tasks.register('compileServerDataSetupOwnerFixture', JavaCompile) {
+    dependsOn 'compileDebugJavaWithJavac', ':core:classes'
+    source file('src/test/java/io/github/russianranger/esteria/runtime/ServerDataSetupOwnerTests.java')
+    source file('src/test/java/android/os/Looper.java')
+    classpath = dataOwnerClasspath
+    destinationDirectory = layout.buildDirectory.dir('serverDataSetupOwnerFixture')
+    sourceCompatibility = '17'; targetCompatibility = '17'
+}
+tasks.register('serverDataSetupOwnerTest', JavaExec) {
+    dependsOn compileDataOwner
+    classpath = files(compileDataOwner.flatMap { it.destinationDirectory }) + dataOwnerClasspath
+    mainClass = 'io.github.russianranger.esteria.runtime.ServerDataSetupOwnerTests'
+    maxHeapSize = '32m'
+}
