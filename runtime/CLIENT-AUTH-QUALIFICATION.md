@@ -3,9 +3,25 @@
 `tools/qualify_client_auth.py` pairs the actual source-built Windows ARM64 client
 with the exact compiled Esteria authserver and local MySQL. It reuses the existing
 updater, configuration, account, realm and owned-process helpers without changing
-`qualify_authserver.py` or adopting its previous state. The source implementation,
-input staging and nine host contract guards exist; actual paired execution is pending. No
-compiled-server client compatibility, Android or gameplay pass is claimed.
+`qualify_authserver.py` or adopting its previous state.
+
+Actual paired execution passed in
+[run `41060555263`](https://github.com/Russianranger/esteria_android/actions/runs/41060555263)
+at integration revision `ad5785ff1f3242453a9fe72a5b2efb200ac47129`.
+[The compact proof](evidence/client-auth-41060555263.json) binds the exact
+47,747-byte artifact and public receipts. Client revision `0f931bba…b3be`, build
+`41012726334.1`, authenticated against retained six-patch server build
+`41005048019.1` under its original `dbbf8983…41b0` lock. This qualifies their
+named authentication exchange; the current seven-patch client/server pair,
+normal game initialization, imported assets and Android execution remain
+separate gates.
+
+The normal untraced invocation passed the owned listener, actual Grunt/SRP
+callbacks, persisted 40-byte session key, local realm and joined worker/timer
+teardown checks. Credentials, trackers and updater ledgers remained unchanged;
+all services stopped cleanly and the private key file was removed. No diagnostic
+fallback was used. Realm 1 retained its world-offline flag and advertised
+`127.0.0.1:8085`; `CommonMain` and game assets were not started.
 
 The client `--auth-check --local-offline` path uses its real Grunt timer, SRP
 exchange, stream parser, realm callback and network workers before `CommonMain`.
@@ -23,7 +39,7 @@ not an Android runtime requirement. The prepared Debian Wine filesystem is a
 separate dependency closure. It is never overlaid onto the Ubuntu server files.
 
 Inputs are the exact installed server tree plus matching immutable content
-package/receipt, current source lock, native MySQL programs/version, a fresh
+package/receipt, matching original server-build source lock, native MySQL programs/version, a fresh
 `prepare_runtime.py` Wine result, and the original ARM64 client Actions ZIP with
 its measured SHA256/size and clean matching source checkout. The committed
 client parser verifies both PE images and generated build12340/254/25/32
@@ -80,9 +96,11 @@ authentication result.
 
 The qualification-only extension now uses the exact published dependency rootfs
 and a separate offline tool bundle. `runtime/client-auth/tool-inputs.lock.json`
-pins all32 packages selected by that signed APT result, all20 corresponding source
-packages/64 original files, both verified InReleases, four index hashes, and the
-full solver-log identity. `prepare_client_auth_tools.py` accepts only those exact
+pins the original 32 solver packages plus one separately recorded signed-index
+`strace` addition: 33 packages and 21 corresponding source packages/67 original
+files. The addition uses the exact base's existing libc6 dependency, replacing
+no base package. Both verified InReleases, four index hashes and the original
+solver-log identity remain bound. `prepare_client_auth_tools.py` accepts only those exact
 bytes from the official Ubuntu pool or the original snapshot; it performs no new
 resolution or version substitution. Source files stay outside the image context
 and are retained in a separate test-input artifact. The Android runtime recipe
@@ -91,21 +109,25 @@ and dependency payload do not gain these tools.
 Both images build with networking disabled. Before installation, the actual
 dependency metadata and complete dpkg-status file must match the measured
 published rootfs. After offline `dpkg -i`, its package inventory must equal the
-unchanged original set plus exactly the32 selected packages; missing dependencies,
+unchanged original set plus exactly the 33 selected packages; missing dependencies,
 upgrades and extra packages fail. Actual native Git/readelf/ip/unshare version
 commands must execute, then the original MySQL/Python ELF identities and fresh
-state are rechecked. Host pin/bounds/transaction guards are not execution proof;
-the replacement image and compiled-pair gates remain pending their actual run.
-Actual host preparation fetched and verified all96 files (98,721,169 bytes),
-checked every `.deb` Package/Version/Architecture against its pin, and repeated
-staging successfully with downloads disabled. The six new host guards pass;
-the broader authentication/schema/process selection passes36 tests.
+state are rechecked. Actual run `41060555263` passed these image gates and
+prepared all 33 exact binary packages and 67 source files before its successful
+compiled-pair exchange. Source files remain in their separate input artifact.
 
 During execution the
 disposable container is read-only and has no network interface beyond loopback;
 namespace privileges allow the composer to create its own owned PID, mount and
-network namespaces. Only the newly created `/state` and temporary filesystem are
-writable. Credentials are generated inside this fresh state and never become
+network namespaces. The same new private host directory is mounted at `/state`
+for Wine and `/var/lib/mysql/esteria-client-auth` for the owned SQL fixture;
+the temporary filesystem is also writable. The image preflight requires an
+unused destination with plain directory parents. An earlier separate diagnostic
+[recorded `openat`/`EACCES` on its owned staging directory](evidence/client-auth-initialization-41058676745.json),
+before the fallback directory creation returned `EEXIST`; the security mechanism
+was not established. The successful retry uses MySQL's intended data tree,
+without changing its binary or the container's isolation policy.
+Credentials are generated inside this fresh state and never become
 Docker arguments, environment variables, or artifacts. Both source checkouts
 avoid persisted GitHub credentials, and the execution step receives no token.
 

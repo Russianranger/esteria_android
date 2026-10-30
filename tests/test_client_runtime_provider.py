@@ -5,6 +5,7 @@ from pathlib import Path
 import stat
 import struct
 import tempfile
+import types
 import unittest
 import warnings
 from unittest.mock import patch
@@ -18,6 +19,16 @@ class ClientProviderBounds(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
+
+    def test_only_exact_source_advertised_handoff_capability_is_packaged(self):
+        self.assertIsNone(provider.capabilities(types.SimpleNamespace()))
+        expected = copy.deepcopy(provider.LOCAL_ACCOUNT_CAPABILITIES)
+        self.assertEqual(expected, provider.capabilities(types.SimpleNamespace(CAPABILITIES=expected)))
+        for key, bad in [('version', True), ('bytes', 57.0), ('flag', '--other'), ('endpoint', 'remote:3724'),
+                         ('filename', '../Esteria-local-login.bin'), ('requires', [])]:
+            value = copy.deepcopy(expected);value['local_account_handoff'][key] = bad
+            with self.subTest(key=key), self.assertRaisesRegex(ValueError, 'unsupported-client-capabilities'):
+                provider.capabilities(types.SimpleNamespace(CAPABILITIES=value))
 
     def archive(self, extra=None):
         path = self.root / 'fixture.zip'

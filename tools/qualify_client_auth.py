@@ -88,7 +88,9 @@ def prepare_client(artifact, source, revision, expected_sha, expected_bytes, fix
     expected=dict(schema_version=1,component='esteria-reconstructed-client',evidence='build-only',architecture='ARM64',
         source_revision=revision,build_id=manifest.get('build_id'),protocol=dict(parser.PROTOCOL),
         descriptor_manifest=parser.descriptor_info(fixture/'limits.json'),files=images)
-    require(type(expected['build_id']) is str and re.fullmatch(r'[0-9]+\.[0-9]+',expected['build_id']) and manifest==expected,
+    selected_capabilities=client.capabilities(parser)
+    if selected_capabilities is not None:expected['capabilities']=selected_capabilities
+    require(type(expected['build_id']) is str and re.fullmatch(r'[0-9]+\.[0-9]+',expected['build_id']) and client.encoded(manifest)==client.encoded(expected),
             'client-auth-manifest-source-or-image-mismatch')
     require(manifest['protocol']==dict(build=12340,container_slots=254,quest_slots=25,max_class_id=32),'client-auth-protocol-mismatch')
     for name in client.BINARIES:client.no_delay_imports(fixture/name)

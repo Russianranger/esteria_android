@@ -44,8 +44,20 @@ The native qualifier now exercises these real product journals, their completed
 verifiers, the complete runtime renderer and the portable realm/account APIs
 before adding qualification-only probe tables. Its original second actual
 updater, marker and restart checks remain, with owned-account preservation
-checks added. Focused host tests cover these guards; actual native execution of
-this new composition remains pending its workflow result.
+checks added. Actual native ARM64 execution passed in
+[run `41058676309`](https://github.com/Russianranger/esteria_android/actions/runs/41058676309)
+at integration revision `b258529f695be0de810040eacb0ee07e483b11d4`.
+[The compact proof](../evidence/server-product-composition-41058676309.json)
+binds its artifact and public receipts: 442 journaled initialization files
+(441 original-source files plus the separate appearance adaptation), the first
+real updater, completed repeat and read-only checks, all 50 config files, local realm
+and ordinary owned account used the same database UUID. Account intent and rows
+survived the second actual updater and clean restart; the following compiled
+authserver also passed its SRP6/session-key exchange and clean shutdown.
+
+This result reuses original six-patch build `41005048019.1` and source lock
+`dbbf8983…41b0`. Current seven-patch derivatives are qualified separately. It is
+host-native execution of the product helpers, not execution on an Android phone.
 
 These receipts qualify only their named components. The separately identified
 fresh appearance adaptation remains source-derived, not recovered original DDL.

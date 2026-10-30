@@ -1,0 +1,139 @@
+{
+  "androidRuntimeQualified": false,
+  "artifact": {
+    "bytes": 45855,
+    "id": 12978680597,
+    "sha256": "c0e5ffa0cbf8ecb771752aa764c1f704ddb6bde292319a9c571271a16f42e424",
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/41058676745/artifacts/12978680597"
+  },
+  "diagnosedSecurityMechanism": null,
+  "diagnosticAcceptedAsNormalQualification": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "integrationRevision": "b258529f695be0de810040eacb0ee07e483b11d4",
+  "normalAttempt": {
+    "cleanupFailures": [],
+    "expectedExit": 1,
+    "failureLocations": [
+      "client-auth/worker:230",
+      "compiled-updater/run:352",
+      "mysql-bootstrap/initialize:544"
+    ],
+    "failureType": "BootstrapError",
+    "logsComplete": true,
+    "mysqlInitializationDiagnostic": {
+      "mysqlErrorCodes": [
+        "MY-010119",
+        "MY-013236"
+      ],
+      "osErrorNumbers": [
+        17
+      ],
+      "privateLogTextExported": false,
+      "scope": "mysql-initialization-failure-typed-codes-only",
+      "startupErrors": [
+        {
+          "kind": "create-directory",
+          "osErrorNumbers": [
+            17
+          ],
+          "pathRole": "owned-staging-datadir"
+        }
+      ]
+    },
+    "networkIsolated": true,
+    "ownedLoopbackListenerVerified": false,
+    "persistedSessionKeyVerified": false,
+    "phase": "fresh-compiled-updater",
+    "privateKeyRemoved": true,
+    "reconstructedClientAuthenticated": false
+  },
+  "originalQualificationSucceeded": false,
+  "privateTraceTextExported": false,
+  "receiptFiles": {
+    "environment-receipt.json": {
+      "bytes": 3622,
+      "sha256": "9c8828cf93b977c228ef9be98722a655a67bae41c332c63e5897d192bdd68071"
+    },
+    "qualification.json": {
+      "bytes": 6356,
+      "sha256": "0ee254c14736afefa386e47e4ba2fbfcbe699925c958e7b862300f69840a755e"
+    },
+    "worker.json": {
+      "bytes": 2912,
+      "sha256": "12d3cca4ed769fa642f64d102790a6d0f6621c0af459ffa215acd15688b1c3fd"
+    }
+  },
+  "scope": "failed-normal-client-auth-initialization-and-separate-file-syscall-diagnostic",
+  "separateDiagnostic": {
+    "accountQualified": false,
+    "androidRuntimeQualified": false,
+    "bytesCaptured": 9367,
+    "bytesObserved": 9367,
+    "captureDrained": true,
+    "captureFailed": false,
+    "exitCode": 1,
+    "failedFileCalls": [
+      {
+        "errno": "EACCES",
+        "pathRole": "owned-staging-datadir",
+        "syscall": "openat"
+      },
+      {
+        "errno": "EEXIST",
+        "pathRole": "owned-staging-datadir",
+        "syscall": "mkdirat"
+      },
+      {
+        "errno": "ENOENT",
+        "pathRole": "owned-staging-datadir",
+        "syscall": "newfstatat"
+      },
+      {
+        "errno": "EINVAL",
+        "pathRole": "owned-staging-datadir",
+        "syscall": "readlinkat"
+      },
+      {
+        "errno": "EINVAL",
+        "pathRole": "owned-state",
+        "syscall": "readlinkat"
+      },
+      {
+        "errno": "ENOENT",
+        "pathRole": "absolute-outside-owned-state",
+        "syscall": "openat"
+      },
+      {
+        "errno": "ENOENT",
+        "pathRole": "absolute-outside-owned-state",
+        "syscall": "faccessat"
+      },
+      {
+        "errno": "EINVAL",
+        "pathRole": "absolute-outside-owned-state",
+        "syscall": "readlinkat"
+      }
+    ],
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "parserLineTruncated": false,
+    "processGroupCleaned": true,
+    "protocolQualified": false,
+    "qualificationSucceeded": false,
+    "scope": "mysql-initialization-file-syscall-diagnostic-only",
+    "sqlAuthenticated": false,
+    "sqlQualified": false,
+    "started": true,
+    "timedOut": false,
+    "traceComplete": true,
+    "traceTruncated": false,
+    "tracedInitializationSucceeded": false
+  },
+  "workflow": {
+    "id": 41058676745,
+    "overallConclusion": "failure",
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/41058676745"
+  },
+  "worldEntryQualified": false
+}

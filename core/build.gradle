@@ -105,3 +105,11 @@ tasks.register('ownedLaunchFailureTest', JavaExec) {
     maxHeapSize = '32m'
 }
 check.dependsOn ownedLaunchFailureTest
+
+tasks.register('localAccountHandoffTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.runtime.install.LocalAccountHandoffTests'
+    maxHeapSize = '32m'
+}
+check.dependsOn localAccountHandoffTest

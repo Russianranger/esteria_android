@@ -34,6 +34,9 @@ public final class RuntimeInstallationInstrumentedTest {
             }
         }
     }
+    @Test public void privateLocalLoginHandoffContracts() throws Exception {
+        LocalAccountHandoffTests.main(new String[]{context().getCacheDir().getCanonicalPath()});
+    }
     @Test public void seedBeforeUpdate() throws Exception {
         assertEquals("CI starts with the first build", 1, context().getPackageManager().getPackageInfo(context().getPackageName(), 0).versionCode);
         Path root = updateRoot();

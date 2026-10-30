@@ -5,6 +5,8 @@ import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import io.github.russianranger.esteria.BuildConfig;
 import io.github.russianranger.esteria.core.runtime.install.EmbeddedArchiveCache;
+import io.github.russianranger.esteria.core.runtime.install.ClientLaunchView;
+import io.github.russianranger.esteria.core.runtime.install.LocalAccountHandoff;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeInstaller;
 import io.github.russianranger.esteria.core.runtime.install.RuntimePackagePlan;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
@@ -20,6 +22,9 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -31,6 +36,7 @@ public final class ClientRuntimeSetup {
     private final RuntimePackagePlan plan;
     private final String revision, buildId, wineArchive;
     private final long freshFreeBytes;
+    private final boolean localAccountHandoff;
 
     public ClientRuntimeSetup(Context context, Path privateRoot) throws IOException {
         assets = context.getApplicationContext().getAssets();
@@ -50,6 +56,8 @@ public final class ClientRuntimeSetup {
             if (protocol.length() != 4 || protocol.getInt("build") != 12340 || protocol.getInt("container_slots") != 254 ||
                     protocol.getInt("quest_slots") != 25 || protocol.getInt("max_class_id") != 32)
                 throw new IOException("Reconstructed client protocol does not match the selected server");
+            localAccountHandoff = proof.has("capabilities");
+            if (localAccountHandoff) requireLocalLoginCapability(proof.getJSONObject("capabilities"));
             wineArchive = proof.getString("requiredWineArchiveSha256");
             if (!wineArchive.matches("[0-9a-f]{64}") ||
                     !wineArchive.equals(proof.getJSONObject("requiredWineRuntime").getString("archiveSha256")))
@@ -105,6 +113,49 @@ public final class ClientRuntimeSetup {
     public String archiveSha256() { return plan.archiveSha256; }
     public String sourceRevision() { return revision; }
     public String buildId() { return buildId; }
+
+    /** The live session owner must establish the owned account and both local services first. */
+    public LocalAccountHandoff prepareLocalLogin(ClientLaunchView.Plan viewPlan, ClientLaunchView.Result view, char[] username, char[] password) throws IOException {
+        localLoginArguments();
+        if (viewPlan == null || view == null || !generation().equals(viewPlan.clientGeneration) || !viewPlan.generation.equals(view.generation))
+            throw new IOException("Prepared client view does not match the local login provider");
+        // The launch view verifies/copies this provider's PE files separately.
+        return LocalAccountHandoff.create(view, username, password);
+    }
+
+    public List<String> localLoginArguments() throws IOException {
+        if (!localAccountHandoff) throw new IOException("Selected reconstructed client does not support private local login");
+        Path root = current();
+        if (root == null) throw new IOException("Reconstructed client is not installed");
+        Path manifest = root.resolve("metadata/client-build.json");
+        RuntimePackagePlan.RequiredFile pin = plan.required.get("metadata/client-build.json");
+        if (!Files.isRegularFile(manifest, LinkOption.NOFOLLOW_LINKS) || pin.bytes > 128 * 1024 || Files.size(manifest) != pin.bytes)
+            throw new IOException("Installed reconstructed client manifest differs");
+        byte[] raw;
+        try (InputStream input = Files.newInputStream(manifest, LinkOption.NOFOLLOW_LINKS);
+             ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[4096];
+            for (int count; (count = input.read(buffer)) != -1;) {
+                if (output.size() + count > 128 * 1024) throw new IOException("Installed client manifest exceeds limit");
+                output.write(buffer, 0, count);
+            }
+            raw = output.toByteArray();
+        }
+        if (raw.length != pin.bytes || !hash(raw).equals(pin.sha256)) throw new IOException("Installed reconstructed client manifest differs");
+        try { requireLocalLoginCapability(new JSONObject(new String(raw, StandardCharsets.UTF_8)).getJSONObject("capabilities")); }
+        catch (JSONException error) { throw new IOException("Invalid installed local login capability", error); }
+        return Collections.unmodifiableList(Arrays.asList("--local-offline", "--local-login"));
+    }
+
+    private static void requireLocalLoginCapability(JSONObject all) throws IOException, JSONException {
+        JSONObject capability = all.getJSONObject("local_account_handoff");
+        if (all.length() != 1 || capability.length() != 7 || !Integer.valueOf(1).equals(capability.get("version")) ||
+                !Integer.valueOf(LocalAccountHandoff.BYTES).equals(capability.get("bytes")) ||
+                !"--local-login".equals(capability.get("flag")) || !LocalAccountHandoff.FILENAME.equals(capability.get("filename")) ||
+                !"ESTLOGN1".equals(capability.get("format")) || !"127.0.0.1:3724".equals(capability.get("endpoint")) ||
+                capability.getJSONArray("requires").length() != 1 || !"--local-offline".equals(capability.getJSONArray("requires").get(0)))
+            throw new IOException("Unsupported reconstructed client local login capability");
+    }
     public void requireWineArchive(String actual) throws IOException {
         if (!wineArchive.equals(actual)) throw new IOException("Reconstructed client requires a different pinned Wine runtime");
     }

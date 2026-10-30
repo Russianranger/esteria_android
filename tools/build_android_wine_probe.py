@@ -97,7 +97,9 @@ def client_payload(artifact, source, assets, pin):
     expected = dict(schema_version=1,component='esteria-reconstructed-client',evidence='build-only',architecture='x64',
                     source_revision=pin['sourceRevision'],build_id=pin['buildId'],protocol=dict(parser.PROTOCOL),
                     descriptor_manifest=parser.descriptor_info(assets/'client/limits.json'),files=images)
-    require(json.loads(manifest_raw) == expected, 'wine-client-manifest-actual-images')
+    selected_capabilities=client.capabilities(parser)
+    if selected_capabilities is not None:expected['capabilities']=selected_capabilities
+    require(client.encoded(json.loads(manifest_raw)) == client.encoded(expected), 'wine-client-manifest-actual-images')
     for name in client.BINARIES: client.no_delay_imports(assets/'client'/name)
     for name in VALIDATORS:
         target=assets/'helpers'/name; target.parent.mkdir(exist_ok=True)

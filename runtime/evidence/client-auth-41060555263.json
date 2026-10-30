@@ -1,0 +1,179 @@
+{
+  "androidRuntimeQualified": false,
+  "artifact": {
+    "bytes": 47747,
+    "id": 12980910036,
+    "sha256": "ee9e5dbb36e8f2fce5b1086a188972bdf9970fb8a9b5076e9fd89417a602d349",
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/41060555263/artifacts/12980910036"
+  },
+  "client": {
+    "artifact": {
+      "bytes": 45848368,
+      "sha256": "1fd6176727065f50a926b45a3d81df1bfd0ea33c330e9fb9131ff30ad170b94e"
+    },
+    "authDiagnosticSourceSha256": "e14c192971cdebb6cf495df992790565ac2a50b89bcbdcf6f1cb8116a3fa9a5f",
+    "buildId": "41012726334.1",
+    "manifestSha256": "bccde6ee90f688b27ac9790e2aa29d70d270dad2b324a54e92a1bdf72bd58b40",
+    "sourceRevision": "0f931bbade36a4b197725d691b8eff7caea7b3be"
+  },
+  "clientReceipt": {
+    "architecture": "ARM64",
+    "assetsLoaded": false,
+    "authentications": 1,
+    "checks": {
+      "actualCommandParser": true,
+      "connectedCallback": true,
+      "connectionRefsReleased": true,
+      "controlledDisconnect": true,
+      "gruntTimerJoined": true,
+      "gruntTimerThread": true,
+      "localOfflineEnabled": true,
+      "networkThreadsJoined": true,
+      "newSessionRequest": true,
+      "realmListCallback": true,
+      "serverProofVerified": true,
+      "twoWorkerThreads": true,
+      "versionChallengeObserved": true
+    },
+    "commonMainStarted": false,
+    "compiledServerQualified": false,
+    "fixtureId": "173cde23e278b5dff28da0266c70cea9",
+    "gameplayQualified": false,
+    "privateSessionKeyBytes": 40,
+    "protocolBuild": 12340,
+    "realmBuildPresent": false,
+    "realmFlags": 2,
+    "realmId": 1,
+    "realms": 1,
+    "schemaVersion": 1,
+    "scope": "executable-grunt-authentication-only",
+    "versionChecksumQualified": false,
+    "worldEndpoint": "127.0.0.1:8085",
+    "worldEntryQualified": false
+  },
+  "currentSevenPatchClientPairQualified": false,
+  "diagnosticFallbackUsed": false,
+  "executionEnvironment": "native-linux-arm64-owned-loopback-namespace-and-debian-wine",
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "integrationRevision": "ad5785ff1f3242453a9fe72a5b2efb200ac47129",
+  "mysqlStateMountPreflight": {
+    "databaseOrClientExecuted": false,
+    "destinationAbsent": true,
+    "formatVersion": 1,
+    "presentParentsArePlainDirectories": true,
+    "scope": "client-auth-mysql-state-mount-preflight"
+  },
+  "normalUntracedQualification": true,
+  "qualification": {
+    "namespaceExit": 0,
+    "phase": "complete",
+    "qualificationSucceeded": true,
+    "scope": "disposable-linux-arm64-reconstructed-client-compiled-authserver",
+    "versionChecksumQualified": false
+  },
+  "receiptFiles": {
+    "environment-receipt.json": {
+      "bytes": 3911,
+      "sha256": "e4be21787ebe3391e8898c7bb48f1cef7e48aa9ab1b9075fed751376876bda01"
+    },
+    "mysql-state-mount-preflight.json": {
+      "bytes": 178,
+      "sha256": "75557c27fa99475f6f9014cca2988a8bfba75658956edae37fcf9624ab8736e7"
+    },
+    "original-server-sources.lock.json": {
+      "bytes": 1983,
+      "sha256": "dbbf8983cfa2b429f7dd0c3308a2795ffbecd29e8019adf35348447e1eab41b0"
+    },
+    "qualification.json": {
+      "bytes": 6929,
+      "sha256": "e08967a8195349fc7447b87732198a450892be7ac232b233c767a1a07aa403c2"
+    },
+    "server-build.json": {
+      "bytes": 32342,
+      "sha256": "bfb6d211d86261a3a71a52ad16786db404a0f32e399b7897c074699504c5720f"
+    },
+    "tool-image-check.json": {
+      "bytes": 4328,
+      "sha256": "484e24099dcd8929cc48854e6fdf6f70ee57b6402f7b57e3e818639073bd7df2"
+    },
+    "worker.json": {
+      "bytes": 3599,
+      "sha256": "3a04b69838d116a428e81881618b110c645a09513be74b1adb99d6ef210db0d0"
+    }
+  },
+  "scope": "actual-reconstructed-arm64-client-compiled-retained-authserver-normal-srp-exchange",
+  "server": {
+    "authserver": {
+      "bytes": 34991328,
+      "sha256": "7298e7cfa5c6ea85cdaf62be5dc2f25ce99cc67863eef39c588a2edce694cb3f"
+    },
+    "buildId": "41005048019.1",
+    "source": {
+      "branch": "main",
+      "commit": "f35f04d01689f034778e3474b3c820092f51e461",
+      "patches": [
+        {
+          "path": "patches/server/0001-eluna-declare-area-trigger.patch",
+          "sha256": "c26b145188c5f97bf30d032e1fe3bd7fe17aa1f8f0daa6793e51f5d830fe7aa6",
+          "submodule": "src/server/game/LuaEngine"
+        },
+        {
+          "path": "patches/server/0002-eluna-include-map-manager.patch",
+          "sha256": "4e277dbe56c31ae30640c8e9ad4dee12e944e0f051d9bdc8d62aaa239c50433f",
+          "submodule": "src/server/game/LuaEngine"
+        },
+        {
+          "path": "patches/server/0003-eluna-hooks-include-types.patch",
+          "sha256": "5999402d985fcc709abdc90bb4272072d1d5e3e261b2cc7ec19460320c14295f",
+          "submodule": "src/server/game/LuaEngine"
+        },
+        {
+          "path": "patches/server/0004-attunement-stat-api.patch",
+          "sha256": "d9ef6ca8f96ab186c37c072b22143cdded9976aa3a62d083f893c502a5745cb8"
+        },
+        {
+          "path": "patches/server/0005-script-grid-templates.patch",
+          "sha256": "6b459c90839e7831df8533966442fabd476ae1773f0302c50ccc8a997f157369"
+        },
+        {
+          "path": "patches/server/0006-empty-script-modules.patch",
+          "sha256": "ea0beb357c71d8b8c187af9d4afede520e7ac9877e40fbdc5fab99d54fc21f97"
+        }
+      ],
+      "submodules": {
+        "src/server/game/LuaEngine": "58d7652138887783228b9727bd1fa4e08f00342b"
+      },
+      "url": "https://github.com/Russianranger/EsteriaWoW.git"
+    },
+    "sourceLockSha256": "dbbf8983cfa2b429f7dd0c3308a2795ffbecd29e8019adf35348447e1eab41b0"
+  },
+  "wineRuntime": {
+    "archiveSha256": "f036c00a290abb953bec26be80c4d8fe492fd986e7a589c51008124432c8641e",
+    "preparedReceiptSha256": "67ce1aa0d90c1199bd4fc5be4538f36c247f1905d761285efbda90c2e7b5664a"
+  },
+  "worker": {
+    "cleanShutdownVerified": true,
+    "cleanupFailures": [],
+    "clientReceiptSha256": "cc9fdbb92102c7fcf0c4a0757e6c54eee566b84f28404cde0202e130677811b2",
+    "compiledUpdaterReceiptSha256": "ab3d243b6d4fa9bc18df880fd689883d75e5f122667701673a3b0ab096a51d27",
+    "credentialsAndTrackersPreserved": true,
+    "expectedExit": 0,
+    "logsComplete": true,
+    "networkIsolated": true,
+    "ownedLoopbackListenerVerified": true,
+    "persistedSessionKeyVerified": true,
+    "phase": "complete",
+    "privateKeyRemoved": true,
+    "reconstructedClientAuthenticated": true,
+    "schemaLedgerPreserved": true,
+    "scope": "disposable-linux-arm64-reconstructed-client-compiled-authserver",
+    "workerCompleted": true
+  },
+  "workflow": {
+    "id": 41060555263,
+    "overallConclusion": "success",
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/41060555263"
+  },
+  "worldEntryQualified": false
+}

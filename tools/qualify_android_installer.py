@@ -118,6 +118,7 @@ def main():
     for method in SCHEMA_HELPER_METHODS:
         test(method, SCHEMA_HELPER_TEST)
     test('runtimeContracts')
+    test('privateLocalLoginHandoffContracts')
     test('seedBeforeUpdate')
     command('install-update-preserving-data', ['install', '-r', str(args.update_apk)])
     test('verifyAfterUpdate')
@@ -127,6 +128,7 @@ def main():
         schemaHelperAssetContractGroups=len(SCHEMA_HELPER_METHODS), schemaHelperAssetsQualified=True, schemaSqlExecuted=False,
         databaseServiceExecuted=False,
         runtimeFilesystemQualified=True, sameJobDebugKeyUpdatePreservedRuntimeAndSentinel=True,
+        privateLocalLoginHandoffFilesystemQualified=True, clientLoginExecuted=False,
         userSigningIdentityQualified=False, arm64GuestExecuted=False, gameplayQualified=False,
         completedAtUnix=int(time.time()))
     (args.output / 'qualification.json').write_text(json.dumps(receipt, indent=2) + '\n')

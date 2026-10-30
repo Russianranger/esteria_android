@@ -29,6 +29,11 @@ SOURCE_LOCK = ROOT / 'sources.lock.json'
 ASSETS = 'assets/client-runtime'
 ARCHIVE = 'client-arm64.archive'
 MARKER = 'client-runtime.json'
+LOCAL_ACCOUNT_CAPABILITIES = {'local_account_handoff': {
+    'version': 1, 'flag': '--local-login', 'requires': ['--local-offline'],
+    'filename': 'Esteria-local-login.bin', 'format': 'ESTLOGN1', 'bytes': 57,
+    'endpoint': '127.0.0.1:3724',
+}}
 META_LIMIT = 2 * 1024**2
 BINARIES = ('WowClient64.exe', 'XvidDecoder.dll')
 SELECTED = {
@@ -54,6 +59,14 @@ require = archives.require
 
 def encoded(value):
     return (json.dumps(value, sort_keys=True, indent=2) + '\n').encode()
+
+
+def capabilities(parser):
+    """Older measured clients retain byte-identical providers and gain no capability."""
+    if not hasattr(parser, 'CAPABILITIES'):return None
+    require(encoded(parser.CAPABILITIES) == encoded(LOCAL_ACCOUNT_CAPABILITIES),
+            'unsupported-client-capabilities')
+    return parser.CAPABILITIES
 
 
 def small(path, maximum=META_LIMIT):
@@ -169,7 +182,9 @@ def prepare(artifact, source, tree, pin, source_bytes):
                     architecture='ARM64', source_revision=pin['sourceRevision'], build_id=pin['buildId'],
                     protocol=dict(parser.PROTOCOL), descriptor_manifest=parser.descriptor_info(tree / 'metadata/limits.json'),
                     files=actual)
-    require(manifest == expected, 'client-build-manifest-differs-from-actual-images')
+    selected_capabilities = capabilities(parser)
+    if selected_capabilities is not None:expected['capabilities'] = selected_capabilities
+    require(encoded(manifest) == encoded(expected), 'client-build-manifest-differs-from-actual-images')
     for name in BINARIES:no_delay_imports(tree / 'bin' / name)
     imports = sorted({name.casefold() for image in actual for name in image['imports']})
     require('xviddecoder.dll' in imports, 'client-local-codec-import-missing')
@@ -201,6 +216,7 @@ def prepare(artifact, source, tree, pin, source_bytes):
         requiredWineRuntime=dict(archiveSha256=wine['archive']['sha256'], manifestSha256=wine['manifest']['sha256']),
         windowsCompatibilityRuntimeRequired=True, androidRuntimeQualified=False, gameInitializationQualified=False,
         gameLoginQualified=False)
+    if selected_capabilities is not None:marker['capabilities'] = selected_capabilities
     (tree / MARKER).write_bytes(encoded(marker))
     inventory = {str(path.relative_to(tree)): identity(path) for path in sorted(tree.rglob('*')) if path.is_file()}
     for image in actual:
@@ -277,6 +293,7 @@ def run(artifact, source, output, verify=False, apk=None):
             freshSetupFreeBytes=archive.stat().st_size + limits['fileBytes'] + 80 * 1024**2,
             archiveVerified=True, peHeadersAndDirectImportsVerified=True, completeDynamicImportClosureQualified=False,
             androidRuntimeQualified=False, gameInitializationQualified=False, gameLoginQualified=False)
+        if 'capabilities' in marker:proof['capabilities'] = marker['capabilities']
         require(len(encoded(proof)) <= META_LIMIT, 'client-provider-metadata-limit')
         (assets / 'provider.json').write_bytes(encoded(proof))
         (assets / 'NOTICE.txt').write_bytes(NOTICE)

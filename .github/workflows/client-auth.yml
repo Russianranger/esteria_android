@@ -154,7 +154,11 @@ jobs:
                   continue
               if not stat.S_ISDIR(info.st_mode):
                   raise ValueError('mysql-state-mount-parent-is-not-a-plain-directory')
-          if os.path.lexists(target):
+          try:
+              target.lstat()
+          except FileNotFoundError:
+              pass
+          else:
               raise ValueError('mysql-state-mount-destination-must-be-absent')
           print(json.dumps(dict(formatVersion=1, scope='client-auth-mysql-state-mount-preflight',
               presentParentsArePlainDirectories=True, destinationAbsent=True,

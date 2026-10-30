@@ -85,6 +85,7 @@ dependencies {
 def installerTestFixture = tasks.register('copyInstallerTestFixture', Copy) {
     from rootProject.file('core/src/test/java')
     include '**/runtime/install/RuntimeInstallerTests.java'
+    include '**/runtime/install/LocalAccountHandoffTests.java'
     into layout.buildDirectory.dir('generated/installerTestFixture')
 }
 android.sourceSets.androidTest.java.srcDir(layout.buildDirectory.dir('generated/installerTestFixture'))
