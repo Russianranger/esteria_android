@@ -53,6 +53,13 @@ class IsolatedEnvironment(unittest.TestCase):
         self.assertFalse(result['exactEnvironmentMatched']);self.assertTrue(result['relevantBuildEnvironmentMatched'])
         self.assertEqual(result['relevantMismatchFields'],[])
 
+    def test_gcc_resolved_executable_alias_preserves_vendor_version_and_binary_gate(self):
+        original='g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 FSF\n'
+        resolved=original.replace('g++ (','aarch64-linux-gnu-g++-13 (',1)
+        self.assertEqual(build.compiler_banner_identity(original),build.compiler_banner_identity(resolved))
+        self.assertNotEqual(build.compiler_banner_identity(original),build.compiler_banner_identity(resolved.replace('13.3.0','13.4.0')))
+        self.assertNotEqual(build.compiler_banner_identity(original),build.compiler_banner_identity(resolved.replace('Ubuntu','Other')))
+
     def test_original_environment_bytes_and_existing_receipt_are_never_rebound(self):
         self.environment.write_bytes(b'changed')
         with self.assertRaisesRegex(ValueError,'environment-bytes-changed'):self.verify(self.expected)

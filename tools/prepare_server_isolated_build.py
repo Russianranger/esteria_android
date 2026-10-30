@@ -134,6 +134,13 @@ def os_family(text):
     return {key:fields.get(key) for key in ('ID','VERSION_ID','VERSION_CODENAME')}
 
 
+def compiler_banner_identity(text):
+    # GCC prints argv[0] in the first line: the original producer called g++,
+    # while our byte-verified executable is reached through its resolved name.
+    # Preserve the entire vendor/version/copyright text; normalize only that alias.
+    return re.sub(r'\A[A-Za-z0-9_+./-]+ (?=\(Ubuntu )','<compiler> ',text,count=1)
+
+
 def observed_binary_inputs(inputs):
     """These current identities are evidence; unknown original hashes are never invented."""
     paths=set()
@@ -153,8 +160,10 @@ def verify_environment(inputs, output, observed=None):
             'original-build-environment-bytes-changed')
     expected = json.loads(expected_path.read_text()); actual = observed if observed is not None else observed_environment()
     mismatch = sorted(key for key in set(expected)|set(actual) if expected.get(key) != actual.get(key))
-    fatal=[key for key in ('platform','compiler_sha256','compiler_version','compiler_target','cmake_version')
+    fatal=[key for key in ('platform','compiler_sha256','compiler_target','cmake_version')
            if expected.get(key)!=actual.get(key)]
+    if compiler_banner_identity(expected.get('compiler_version',''))!=compiler_banner_identity(actual.get('compiler_version','')):
+        fatal.append('compiler_version')
     if os_family(expected.get('os',''))!=os_family(actual.get('os','')):fatal.append('os-family')
     versions=package_versions(actual['packages']); original_versions=package_versions(expected['packages'])
     relevant=pin['originalBuildEnvironment']['relevantPackages']
@@ -167,6 +176,8 @@ def verify_environment(inputs, output, observed=None):
         mismatchFields=mismatch,exactEnvironmentMatched=not mismatch,
         relevantMismatchFields=fatal,relevantBuildEnvironmentMatched=not fatal,
         relevantPackageVersions=relevant,compilerCacheDisabled=True,
+        expectedCompilerBanner=expected.get('compiler_version'),observedCompilerBanner=actual.get('compiler_version'),
+        compilerBannerAliasOnlyNormalized=True,
         observedBinaryInputs=observed_binary_inputs(inputs) if observed is None else {},
         observedBinaryInputsComparedToUnknownOriginalHashes=False,
         sourceCompanionComplete=False,isolatedSourceRebuildQualified=False,
