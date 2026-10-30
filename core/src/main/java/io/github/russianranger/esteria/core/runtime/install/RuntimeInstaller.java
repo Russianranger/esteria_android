@@ -26,18 +26,23 @@ import java.util.zip.GZIPInputStream;
 
 /** Streaming, resumable GNU tar installation. Published roots are immutable data. */
 public final class RuntimeInstaller {
+    private static final int COPY_METADATA_LIMIT=4*1024*1024;
     public static final class Result {
         public final Path rootfs;
         public final String generation;
         public final int reusedFiles;
         public final long copiedBytes;
         public final boolean alreadyInstalled,directorySyncSupported;
-        Result(Path rootfs,String generation,int reusedFiles,long copiedBytes,boolean alreadyInstalled,boolean sync){this.rootfs=rootfs;this.generation=generation;this.reusedFiles=reusedFiles;this.copiedBytes=copiedBytes;this.alreadyInstalled=alreadyInstalled;this.directorySyncSupported=sync;}
+        public final long hardLinkCopies,hardLinkCopyBytes;
+        Result(Path rootfs,String generation,int reusedFiles,long copiedBytes,boolean alreadyInstalled,boolean sync) throws IOException {this.rootfs=rootfs;this.generation=generation;this.reusedFiles=reusedFiles;this.copiedBytes=copiedBytes;this.alreadyInstalled=alreadyInstalled;this.directorySyncSupported=sync;long[] links=linkMetrics(rootfs.getParent());hardLinkCopies=links[0];hardLinkCopyBytes=links[1];}
     }
+    interface HardLinks { void create(Path output,Path target) throws IOException; }
+    private final HardLinks hardLinks;
     private final Path root;
     public final boolean directorySyncSupported;
-    public RuntimeInstaller(Path root) throws IOException {
-        this.root=RuntimeFiles.directory(root);RuntimeFiles.directory(this.root.resolve("generations"));RuntimeFiles.directory(this.root.resolve("staging"));
+    public RuntimeInstaller(Path root) throws IOException { this(root,Files::createLink); }
+    RuntimeInstaller(Path root,HardLinks hardLinks) throws IOException {
+        this.hardLinks=hardLinks;this.root=RuntimeFiles.directory(root);RuntimeFiles.directory(this.root.resolve("generations"));RuntimeFiles.directory(this.root.resolve("staging"));
         directorySyncSupported=RuntimeFiles.sync(this.root);
     }
     public Path resolveCurrent(RuntimePackagePlan plan) throws IOException {
@@ -90,7 +95,7 @@ public final class RuntimeInstaller {
                 for(Map.Entry<String,Entry> entry:state.entries.entrySet())if(entry.getValue().kind=='d')RuntimeFiles.require(RuntimeFiles.sync(rootfs.resolve(entry.getKey())),"Runtime directory sync failed");
                 RuntimeFiles.require(RuntimeFiles.sync(rootfs),"Runtime root sync failed");
             }
-            RuntimeFiles.atomicText(staging.resolve("complete"),"format=1\ngeneration="+plan.generation+"\nsourcePin="+plan.sourcePinSha256+"\narchiveSha256="+plan.archiveSha256+"\nentries="+state.count+"\nfileBytes="+state.bytes+"\nfiles="+state.files+"\ndirectorySync="+directorySyncSupported+"\ngameplayQualified=false\n",directorySyncSupported);
+            RuntimeFiles.atomicText(staging.resolve("complete"),"format=1\ngeneration="+plan.generation+"\nsourcePin="+plan.sourcePinSha256+"\narchiveSha256="+plan.archiveSha256+"\nentries="+state.count+"\nfileBytes="+state.bytes+"\nfiles="+state.files+"\nhardLinkCopies="+state.linkCopies+"\nhardLinkCopyBytes="+state.linkBytes+"\ndirectorySync="+directorySyncSupported+"\ngameplayQualified=false\n",directorySyncSupported);
             promote(staging,generation,plan);progress.update("runtime-prepared",plan.packageId,state.bytes,plan.expectedFileBytes);
             return new Result(generation.resolve("rootfs"),plan.generation,state.reused,state.copied,false,directorySyncSupported);
         }
@@ -106,8 +111,45 @@ public final class RuntimeInstaller {
         RuntimeFiles.require("1".equals(receipt.getProperty("format"))&&plan.generation.equals(receipt.getProperty("generation"))&&plan.sourcePinSha256.equals(receipt.getProperty("sourcePin"))&&plan.archiveSha256.equals(receipt.getProperty("archiveSha256"))&&Long.toString(plan.expectedEntries).equals(receipt.getProperty("entries"))&&Long.toString(plan.expectedFileBytes).equals(receipt.getProperty("fileBytes"))&&"false".equals(receipt.getProperty("gameplayQualified")),"Runtime completion receipt differs");
         int files;try{files=Integer.parseInt(receipt.getProperty("files","-1"));}catch(NumberFormatException invalid){throw new IOException("Invalid runtime receipt",invalid);}
         RuntimeFiles.require(files>=plan.required.size()&&files<=plan.expectedEntries,"Invalid runtime file count");
+        long[] links=linkMetrics(generation);RuntimeFiles.require(links[0]<=plan.expectedEntries&&links[1]<=plan.limits.maxFileBytes-plan.expectedFileBytes,"Invalid hardlink-copy receipt");
+        verifyCopiedLinks(generation,plan,links);
         verifyRequired(generation.resolve("rootfs"),plan,RuntimeWork.NEVER_CANCELLED);
         return files;
+    }
+    private static long[] linkMetrics(Path generation)throws IOException{
+        Properties receipt=new Properties();receipt.load(new java.io.StringReader(RuntimeFiles.smallText(generation.resolve("complete"),2048)));
+        try{long count=Long.parseLong(receipt.getProperty("hardLinkCopies","0")),bytes=Long.parseLong(receipt.getProperty("hardLinkCopyBytes","0"));RuntimeFiles.require(count>=0&&bytes>=0,"Negative hardlink copy metrics");return new long[]{count,bytes};}
+        catch(NumberFormatException invalid){throw new IOException("Invalid hardlink copy metrics",invalid);}
+    }
+    private static String privateFileMode(Path path)throws IOException{
+        String mode=java.nio.file.attribute.PosixFilePermissions.toString(Files.getPosixFilePermissions(path,LinkOption.NOFOLLOW_LINKS));
+        RuntimeFiles.require(mode.equals("rw-------")||mode.equals("rwx------"),"Runtime hardlink copy is not private");return mode;
+    }
+    private static void verifyCopiedLinks(Path generation,RuntimePackagePlan plan,long[] expected)throws IOException{
+        Path metadata=generation.resolve("hardlink-copies.tsv");
+        if(!Files.exists(metadata,LinkOption.NOFOLLOW_LINKS)){
+            RuntimeFiles.require(expected[0]==0&&expected[1]==0,"Runtime hardlink-copy metadata missing");return;
+        }
+        String text=RuntimeFiles.smallText(metadata,(int)Math.min(COPY_METADATA_LIMIT,plan.limits.maxMetadataBytes));
+        RuntimeFiles.require(text.startsWith("esteria-hardlink-copies-v1\n")&&text.endsWith("\n"),"Invalid hardlink-copy metadata");
+        long count=0,total=0;Set<String> aliases=new HashSet<>();Path rootfs=generation.resolve("rootfs");
+        // The metadata is private application state. As with the extraction
+        // journal, unchanged size/mtime avoids reading all duplicate DRI images.
+        for(String line:text.substring("esteria-hardlink-copies-v1\n".length()).split("\n")){
+            if(line.isEmpty())continue;String[] cols=line.split("\t",-1);RuntimeFiles.require(cols.length==6,"Invalid hardlink-copy record");
+            try{
+                String alias=RuntimeFiles.memberPath(utf8(Base64.getDecoder().decode(cols[0])),plan.limits.maxPathBytes);
+                String target=RuntimeFiles.memberPath(utf8(Base64.getDecoder().decode(cols[1])),plan.limits.maxPathBytes);
+                long bytes=Long.parseLong(cols[2]),modified=Long.parseLong(cols[4]);RuntimeFiles.hashPin(cols[3]);
+                RuntimeFiles.require(!alias.equals(target)&&aliases.add(alias)&&++count<=expected[0]&&bytes>=0&&bytes<=plan.limits.maxMemberBytes&&
+                    bytes<=expected[1]-total&&modified>=0,"Invalid hardlink-copy identity");total+=bytes;
+                Path output=rootfs.resolve(alias);RuntimeFiles.plain(output);RuntimeFiles.plain(rootfs.resolve(target));
+                RuntimeFiles.require(Files.size(output)==bytes&&privateFileMode(output).equals(cols[5]),"Prepared runtime hardlink copy metadata changed");
+                if(Files.getLastModifiedTime(output,LinkOption.NOFOLLOW_LINKS).toMillis()!=modified)
+                    RuntimeFiles.require(RuntimeFiles.hashFile(output,bytes,RuntimeWork.NEVER_CANCELLED).equals(cols[3]),"Prepared runtime hardlink copy hash changed");
+            }catch(IllegalArgumentException invalid){throw new IOException("Invalid hardlink-copy record",invalid);}
+        }
+        RuntimeFiles.require(count==expected[0]&&total==expected[1],"Hardlink-copy inventory differs from receipt");
     }
     private static void verifyRequired(Path rootfs,RuntimePackagePlan plan,RuntimeWork.Cancellation cancellation)throws IOException{
         for(Map.Entry<String,RuntimePackagePlan.RequiredFile> item:plan.required.entrySet()){
@@ -161,7 +203,8 @@ public final class RuntimeInstaller {
         final RuntimeWork.Progress progress;final RuntimeWork.Cancellation cancel;
         final Map<String,Entry> entries=new HashMap<>();final Set<String> parents=new HashSet<>(),found=new HashSet<>();
         final byte[] buffer=new byte[RuntimeFiles.BUFFER];
-        long count,bytes,copied;int files,reused;
+        final StringBuilder linkMetadata=new StringBuilder("esteria-hardlink-copies-v1\n");
+        long count,bytes,copied,linkBytes;int files,reused,linkCopies;
         State(RuntimePackagePlan plan,Budget budget,Path rootfs,Path tmp,Path journal,Map<String,Saved> saved,RuntimeWork.Progress progress,RuntimeWork.Cancellation cancel){this.plan=plan;this.budget=budget;this.rootfs=rootfs;this.tmp=tmp;this.journal=journal;this.saved=saved;this.progress=progress;this.cancel=cancel;}
         void member(Tar tar,Header header)throws IOException{
             RuntimeWork.check(cancel);count++;RuntimeFiles.require(count<=plan.limits.maxEntries,"Too many runtime entries");
@@ -229,18 +272,50 @@ public final class RuntimeInstaller {
                 public java.nio.file.FileVisitResult visitFile(Path path,java.nio.file.attribute.BasicFileAttributes attrs)throws IOException{verify(path,attrs);return java.nio.file.FileVisitResult.CONTINUE;}
             });
         }
+        void verifyLinkCopy(Path output,Path target)throws IOException{
+            long length=Files.size(target);RuntimeFiles.require(length<=plan.limits.maxFileBytes-plan.expectedFileBytes-linkBytes,"Runtime hardlink copies exceed expanded-byte limit");
+            String hash=RuntimeFiles.hashFile(output,length,cancel),mode=privateFileMode(output);
+            RuntimeFiles.require(hash.equals(RuntimeFiles.hashFile(target,length,cancel))&&mode.equals(privateFileMode(target)),"Resumed runtime hardlink copy differs");
+            String record=Base64.getEncoder().encodeToString(rootfs.relativize(output).toString().getBytes(StandardCharsets.UTF_8))+"\t"+
+                Base64.getEncoder().encodeToString(rootfs.relativize(target).toString().getBytes(StandardCharsets.UTF_8))+"\t"+length+"\t"+hash+"\t"+
+                Files.getLastModifiedTime(output,LinkOption.NOFOLLOW_LINKS).toMillis()+"\t"+mode+"\n";
+            RuntimeFiles.require(record.length()<=Math.min(COPY_METADATA_LIMIT,plan.limits.maxMetadataBytes)-linkMetadata.length(),"Hardlink-copy metadata limit");
+            budget.add(record.length()*4L+64);linkMetadata.append(record);
+            linkCopies++;linkBytes+=length;
+        }
+        void copyLink(Path output,Path target)throws IOException{
+            long length=Files.size(target);RuntimeFiles.require(length<=plan.limits.maxFileBytes-plan.expectedFileBytes-linkBytes,"Runtime hardlink copies exceed expanded-byte limit");
+            RuntimeFiles.require(root.toFile().getUsableSpace()>=length+(64L<<20),"Insufficient storage for hardlink copy");
+            Path partial=tmp.resolve("current-link");if(Files.exists(partial,LinkOption.NOFOLLOW_LINKS)){RuntimeFiles.plain(partial);Files.delete(partial);}
+            MessageDigest digest=RuntimeFiles.digest();long total=0;
+            try(InputStream input=Files.newInputStream(target,LinkOption.NOFOLLOW_LINKS);FileChannel outputFile=FileChannel.open(partial,StandardOpenOption.CREATE_NEW,StandardOpenOption.WRITE)){
+                RuntimeFiles.privateMode(partial,false,false);int amount;
+                while((amount=input.read(buffer))!=-1){RuntimeWork.check(cancel);total+=amount;RuntimeFiles.require(total<=length,"Runtime hardlink target grew");digest.update(buffer,0,amount);ByteBuffer block=ByteBuffer.wrap(buffer,0,amount);while(block.hasRemaining())outputFile.write(block);progress.update("copy-runtime-link",rootfs.relativize(output).toString(),total,length);}
+                outputFile.force(true);
+            }
+            RuntimeFiles.require(total==length&&RuntimeFiles.hashFile(partial,length,cancel).equals(RuntimeFiles.hex(digest.digest())),"Runtime hardlink copy readback failed");
+            RuntimeFiles.privateMode(partial,false,Files.isExecutable(target));RuntimeWork.check(cancel);
+            Files.move(partial,output,StandardCopyOption.ATOMIC_MOVE);verifyLinkCopy(output,target);copied+=length;
+        }
         void links()throws IOException{
+            // A cancelled copy may be followed by a retry on a filesystem which
+            // now supports real hardlinks. Never promote the abandoned partial.
+            Path oldPartial=tmp.resolve("current-link");if(Files.exists(oldPartial,LinkOption.NOFOLLOW_LINKS)){RuntimeFiles.plain(oldPartial);Files.delete(oldPartial);}
             for(Map.Entry<String,Entry> item:entries.entrySet()){
                 RuntimeWork.check(cancel);Entry entry=item.getValue();if(entry.kind!='l')continue;
                 Path output=rootfs.resolve(item.getKey()),target=rootfs.resolve(entry.target);RuntimeFiles.directory(output.getParent());
                 if(entry.hard){Entry destination=entries.get(entry.target);RuntimeFiles.require(destination!=null&&destination.kind=='f',"Runtime hardlink target is not a regular archive file");RuntimeFiles.plain(target);
-                    if(Files.exists(output,LinkOption.NOFOLLOW_LINKS)){RuntimeFiles.plain(output);RuntimeFiles.require(Files.isSameFile(output,target),"Resumed runtime hardlink differs");}else Files.createLink(output,target);
+                    if(Files.exists(output,LinkOption.NOFOLLOW_LINKS)){
+                        RuntimeFiles.plain(output);if(!Files.isSameFile(output,target))verifyLinkCopy(output,target);
+                    }else try{hardLinks.create(output,target);}
+                    catch(java.nio.file.AccessDeniedException | UnsupportedOperationException unavailable){copyLink(output,target);}
                 }else{
                     Path relative=output.getParent().relativize(target);if(relative.toString().isEmpty())relative=Paths.get(".");
                     if(Files.exists(output,LinkOption.NOFOLLOW_LINKS))RuntimeFiles.require(Files.isSymbolicLink(output)&&Files.readSymbolicLink(output).equals(relative),"Resumed runtime symlink differs");
                     else Files.createSymbolicLink(output,relative);
                 }
             }
+            RuntimeFiles.atomicText(rootfs.getParent().resolve("hardlink-copies.tsv"),linkMetadata.toString(),directorySyncSupported);
         }
     }
     static String linkTarget(String name,String raw,boolean hard,int maximum)throws IOException{

@@ -89,6 +89,26 @@ JUnit result for each phase. It records APK hashes and emulator properties.
 Local instrumentation compile and Android lint pass. First emulator run
 `40990723608` failed because Android rejects `Files.getFileStore`; runtime download,
 runtime extraction, game import, ZIP staging and storage diagnostics now use
-`File` storage queries. Free-space reserves remain enforced. Rerun is pending. A successful run would qualify these Android filesystem/update behaviors, not
+`File` storage queries. Free-space reserves remain enforced. The second emulator run `40991448984` then exposed app-private hardlink denial.
+The explicit verified-copy fallback adds an 18th contract; the next rerun is pending. A successful run would qualify these Android filesystem/update behaviors, not
 ARM64 PRoot/Wine, audio/display, gameplay, or the user's persistent signing key.
 Both test versions use one isolated CI debug key.
+
+## Native presentation, input and process gates
+
+`tools/check_process_owner.py` builds and executes the native C++ owner and real
+JVM/JNI adapter fixtures. The separate Android owner workflow requires x86_64 JNI
+on an Android13 emulator and executes `/system/bin/sh`; it does not skip a missing
+bridge or claim ARM64 guest execution. Host owner, JNI, NDK ARM64 build, native
+APK validation and Android compile/lint pass; emulator owner execution is pending.
+
+Six bounded JVM PCM/input protocol groups and the production native Surface decoder
+with host socketpairs/test-only ANativeWindow stubs pass. Guest helper ARM64 builds
+use pinned Debian12 inputs and source companions. Actual Android Surface/AudioTrack
+playback and Wine guest input/audio remain separate gates. `runtime/CONTROLS.md`
+describes the initial internal controller/IME router and remaining device checks.
+
+The actual engine frame readback passed in Wine run `40992315512`: receipt SHA256
+`69bfe354c777abf78e54ed033849235928edf742efdfce3371bca4c1e01379c4`.
+This includes exact BGRA/partial-clear pixels and embedded engine presentation,
+using llvmpipe LLVM15.0.6 with validation layers unavailable. It is not world rendering.

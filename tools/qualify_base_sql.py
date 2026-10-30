@@ -94,9 +94,7 @@ def locked_source(lock_path):
     lock = fetch_sources.load_lock(lock_path)
     pin = lock['sources']['server']
     content.require(pin['commit'] == content.SUPPORTED_SERVER, 'unreviewed server base SQL revision')
-    for scope, path in fetch_sources.patch_inputs(pin, lock_path.parent):
-        content.require(scope == content.ELUNA and content.SUPPORTED_PATCHES.get(path.name) ==
-                        hashlib.sha256(path.read_bytes()).hexdigest(), 'base SQL source adaptations require review')
+    content.validate_patch_contract(pin, lock_path.parent)
     return pin, hashlib.sha256(lock_bytes).hexdigest()
 
 

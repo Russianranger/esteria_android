@@ -16,3 +16,13 @@ Evidence: native ARM64 CI run `40979894616`, job `123817047329`, failed compilin
 `ElunaEventMgr.cpp` and `ElunaInstanceAI.cpp` at `LuaEngine.h:80/566` with the missing
 type. The patch applies cleanly to the exact pinned Eluna commit. A subsequent full
 server build is still required to establish compilation beyond this failure.
+
+`0004-attunement-stat-api.patch` applies at the server root to
+`modules/mod-attunement-plus/src/mod_attunement_plus.cpp`. It preserves the removed
+primary-stat display-field operation through a local compatibility helper and maps
+flat armor/AP modifiers to the current `HandleStatFlatModifier` API. This is not a
+claim that primary-stat gameplay bonuses worked before or are now qualified: the
+old API was display-only, contrary to the module's original comments. The comments
+are corrected. SQL/Lua/configuration/module discovery remain unchanged. See
+[ATTUNEMENT-API-AUDIT.md](ATTUNEMENT-API-AUDIT.md) for pinned upstream/current source
+comparison, known gameplay limitations and targeted compilation evidence.

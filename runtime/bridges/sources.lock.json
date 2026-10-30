@@ -1,0 +1,545 @@
+{
+  "snapshot": "20261029T000000Z",
+  "keyring": {
+    "path": "usr/share/keyrings/debian-archive-keyring.gpg",
+    "bytes": 55918,
+    "sha256": "506b815cbb32d9b6066b4a2aa524071e071761e7e7f68c3ac74f3061ba852017"
+  },
+  "inRelease": [
+    {
+      "suite": "bookworm-security",
+      "bytes": 34770,
+      "sha256": "1a6375632d9d8cbfd9665858174b6abaf50e046eacfd15a160226c4ac2188af7"
+    },
+    {
+      "suite": "bookworm-updates",
+      "bytes": 55403,
+      "sha256": "f805c7af2f793f5647abb73884264b508089ae34310bba99da40b10cff275ede"
+    },
+    {
+      "suite": "bookworm",
+      "bytes": 151075,
+      "sha256": "77737fa4b34f2693e982cc9ee35736816c35a7778fc2d326cc1bbf5b301fe1aa"
+    }
+  ],
+  "indexes": [
+    {
+      "suite": "bookworm-updates",
+      "uri": "https://snapshot.debian.org/archive/debian/20261029T000000Z",
+      "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/dists/bookworm-updates/main/binary-arm64/Packages.xz",
+      "path": "main/binary-arm64/Packages.xz",
+      "bytes": 6936,
+      "sha256": "5dfd52317071685ad6e58c4ef0720128b7db68624079f83be02bdf55f07ac070",
+      "file": "bookworm-updates-Packages.xz"
+    },
+    {
+      "suite": "bookworm-updates",
+      "uri": "https://snapshot.debian.org/archive/debian/20261029T000000Z",
+      "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/dists/bookworm-updates/main/source/Sources.xz",
+      "path": "main/source/Sources.xz",
+      "bytes": 3288,
+      "sha256": "45fcd5257b7ad716ef3b674305dd678ad2d6e6198a0dd7a8f45bb0e8d3f3a7f3",
+      "file": "bookworm-updates-Sources.xz"
+    },
+    {
+      "suite": "bookworm-security",
+      "uri": "https://snapshot.debian.org/archive/debian-security/20261029T000000Z",
+      "url": "https://snapshot.debian.org/archive/debian-security/20261029T000000Z/dists/bookworm-security/main/binary-arm64/Packages.xz",
+      "path": "main/binary-arm64/Packages.xz",
+      "bytes": 356272,
+      "sha256": "330d9b021273d7911f3acd6a675b0181b3880e607420a00b56301d479a2652a8",
+      "file": "bookworm-security-Packages.xz"
+    },
+    {
+      "suite": "bookworm-security",
+      "uri": "https://snapshot.debian.org/archive/debian-security/20261029T000000Z",
+      "url": "https://snapshot.debian.org/archive/debian-security/20261029T000000Z/dists/bookworm-security/main/source/Sources.xz",
+      "path": "main/source/Sources.xz",
+      "bytes": 284360,
+      "sha256": "a46e0aff39c05b4def827fc36cdca03d1613ef7859ae5a97d399b7d8dfdd7a5b",
+      "file": "bookworm-security-Sources.xz"
+    },
+    {
+      "suite": "bookworm",
+      "uri": "https://snapshot.debian.org/archive/debian/20261029T000000Z",
+      "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/dists/bookworm/main/binary-arm64/Packages.xz",
+      "path": "main/binary-arm64/Packages.xz",
+      "bytes": 8689464,
+      "sha256": "2ddb1737692e8c45c53e8d57c0ce4cd21c78c5703b830c3226b1423566a06c00",
+      "file": "bookworm-Packages.xz"
+    },
+    {
+      "suite": "bookworm",
+      "uri": "https://snapshot.debian.org/archive/debian/20261029T000000Z",
+      "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/dists/bookworm/main/source/Sources.xz",
+      "path": "main/source/Sources.xz",
+      "bytes": 9491888,
+      "sha256": "92d11a035571df011f06f28c61cb9825130ef1d92abb2f2e0525e8674dc44af8",
+      "file": "bookworm-Sources.xz"
+    }
+  ],
+  "packages": [
+    {
+      "package": "libasound2-dev",
+      "version": "1.2.8-1+b1",
+      "architecture": "arm64",
+      "sourcePackage": "alsa-lib",
+      "sourceVersion": "1.2.8-1",
+      "suite": "bookworm",
+      "bytes": 109772,
+      "sha256": "263668e5ce831d3a8426bd342beba7e94925e893a4a5a285252b8f3ed6b3f5ee",
+      "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/a/alsa-lib/libasound2-dev_1.2.8-1+b1_arm64.deb"
+    },
+    {
+      "package": "binutils",
+      "version": "2.40-2",
+      "architecture": "arm64",
+      "sourcePackage": "binutils",
+      "sourceVersion": "2.40-2",
+      "suite": "bookworm",
+      "bytes": 64944,
+      "sha256": "546129bb85470fa3b5398d7429cd87c5353ab47f37e9d5e28abc57e6923a24fa",
+      "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/b/binutils/binutils_2.40-2_arm64.deb"
+    },
+    {
+      "package": "gcc-12",
+      "version": "12.2.0-14+deb12u1",
+      "architecture": "arm64",
+      "sourcePackage": "gcc-12",
+      "sourceVersion": "12.2.0-14+deb12u1",
+      "suite": "bookworm",
+      "bytes": 16300644,
+      "sha256": "d4f6bc31cefeb188eddc7e0f738f51c12f863cd03502935c388a9f305f558996",
+      "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/g/gcc-12/gcc-12_12.2.0-14+deb12u1_arm64.deb"
+    },
+    {
+      "package": "gcc",
+      "version": "4:12.2.0-3",
+      "architecture": "arm64",
+      "sourcePackage": "gcc-defaults",
+      "sourceVersion": "1.203",
+      "suite": "bookworm",
+      "bytes": 5244,
+      "sha256": "81e86d3d3cd6731201b88fe5d8881aa281d7ffbfd8cc1c269c7a116c7b405e8d",
+      "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/g/gcc-defaults/gcc_12.2.0-3_arm64.deb"
+    },
+    {
+      "package": "libc6",
+      "version": "2.36-9+deb12u14",
+      "architecture": "arm64",
+      "sourcePackage": "glibc",
+      "sourceVersion": "2.36-9+deb12u14",
+      "suite": "bookworm",
+      "bytes": 2324660,
+      "sha256": "01f4330719fd4f65580e16ea5a0527f372fca750e8f588d26deaf09f2d3b1cf4",
+      "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/g/glibc/libc6_2.36-9+deb12u14_arm64.deb"
+    },
+    {
+      "package": "libc6-dev",
+      "version": "2.36-9+deb12u14",
+      "architecture": "arm64",
+      "sourcePackage": "glibc",
+      "sourceVersion": "2.36-9+deb12u14",
+      "suite": "bookworm",
+      "bytes": 1435692,
+      "sha256": "8bc395bf2ee9939f1a6ae395f974cffdcf541d98f99adfe89ce7e4bef36d159e",
+      "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/g/glibc/libc6-dev_2.36-9+deb12u14_arm64.deb"
+    },
+    {
+      "package": "libx11-dev",
+      "version": "2:1.8.4-2+deb12u2",
+      "architecture": "arm64",
+      "sourcePackage": "libx11",
+      "sourceVersion": "2:1.8.4-2+deb12u2",
+      "suite": "bookworm",
+      "bytes": 817724,
+      "sha256": "34bfc833561de983cfb4475523fedc13abb4faee14a876300de659591779add8",
+      "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/libx/libx11/libx11-dev_1.8.4-2+deb12u2_arm64.deb"
+    },
+    {
+      "package": "libxext-dev",
+      "version": "2:1.3.4-1+b1",
+      "architecture": "arm64",
+      "sourcePackage": "libxext",
+      "sourceVersion": "2:1.3.4-1",
+      "suite": "bookworm",
+      "bytes": 107072,
+      "sha256": "07f5e3efeba9564071885b2d0d2ba277692fa309a9f05ef862688af0022b1fcf",
+      "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/libx/libxext/libxext-dev_1.3.4-1+b1_arm64.deb"
+    },
+    {
+      "package": "libxfixes-dev",
+      "version": "1:6.0.0-2",
+      "architecture": "arm64",
+      "sourcePackage": "libxfixes",
+      "sourceVersion": "1:6.0.0-2",
+      "suite": "bookworm",
+      "bytes": 25192,
+      "sha256": "25266e1bd10c7624210abf3aa3eb85e3886b6c8c08b2ecc396b8a04f24c10082",
+      "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/libx/libxfixes/libxfixes-dev_6.0.0-2_arm64.deb"
+    },
+    {
+      "package": "libxtst-dev",
+      "version": "2:1.2.3-1.1",
+      "architecture": "arm64",
+      "sourcePackage": "libxtst",
+      "sourceVersion": "2:1.2.3-1.1",
+      "suite": "bookworm",
+      "bytes": 32296,
+      "sha256": "4e205710dd04f9e9ee360da0161c155be01086e36462fead392b707b3857b4f2",
+      "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/libx/libxtst/libxtst-dev_1.2.3-1.1_arm64.deb"
+    },
+    {
+      "package": "libxtst6",
+      "version": "2:1.2.3-1.1",
+      "architecture": "arm64",
+      "sourcePackage": "libxtst",
+      "sourceVersion": "2:1.2.3-1.1",
+      "suite": "bookworm",
+      "bytes": 27804,
+      "sha256": "ef2a1b9ac3f2620d96e17744e41c4eefb7f491eee3bcc5bc1e592180b2d94128",
+      "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/libx/libxtst/libxtst6_1.2.3-1.1_arm64.deb"
+    },
+    {
+      "package": "make",
+      "version": "4.3-4.1",
+      "architecture": "arm64",
+      "sourcePackage": "make-dfsg",
+      "sourceVersion": "4.3-4.1",
+      "suite": "bookworm",
+      "bytes": 391184,
+      "sha256": "7ef5f5c0e3f909c811f941598107119af0a0554641b5cc590f584cea6a55d204",
+      "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/m/make-dfsg/make_4.3-4.1_arm64.deb"
+    }
+  ],
+  "sources": [
+    {
+      "package": "alsa-lib",
+      "version": "1.2.8-1",
+      "suite": "bookworm",
+      "archives": [
+        {
+          "file": "alsa-lib_1.2.8-1.dsc",
+          "bytes": 2875,
+          "sha256": "6a9814b8083486a434b22028bcfb0d652f30b9c945f8c14e4462845710130e52",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/a/alsa-lib/alsa-lib_1.2.8-1.dsc"
+        },
+        {
+          "file": "alsa-lib_1.2.8.orig.tar.bz2",
+          "bytes": 1091475,
+          "sha256": "1ab01b74e33425ca99c2e36c0844fd6888273193bd898240fe8f93accbcbf347",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/a/alsa-lib/alsa-lib_1.2.8.orig.tar.bz2"
+        },
+        {
+          "file": "alsa-lib_1.2.8.orig.tar.bz2.asc",
+          "bytes": 833,
+          "sha256": "079a4da0b0276def3b7f816995858be41a46ba5a77097940e7d69469ff8e3cc2",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/a/alsa-lib/alsa-lib_1.2.8.orig.tar.bz2.asc"
+        },
+        {
+          "file": "alsa-lib_1.2.8-1.debian.tar.xz",
+          "bytes": 32520,
+          "sha256": "58761e6731656727c8463e9019df879c8dccaabc07bd47a1abc8846aecae0b2a",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/a/alsa-lib/alsa-lib_1.2.8-1.debian.tar.xz"
+        }
+      ]
+    },
+    {
+      "package": "binutils",
+      "version": "2.40-2",
+      "suite": "bookworm",
+      "archives": [
+        {
+          "file": "binutils_2.40-2.dsc",
+          "bytes": 11692,
+          "sha256": "cd75da7829d819189ba6154d408666373b307e222b393223804c4c4a7156f421",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/b/binutils/binutils_2.40-2.dsc"
+        },
+        {
+          "file": "binutils_2.40.orig.tar.xz",
+          "bytes": 25364048,
+          "sha256": "d78c2d2eb24a9be1e02f8854cb1bd435556d7f584fb6bfb6b07e6527d43fc41d",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/b/binutils/binutils_2.40.orig.tar.xz"
+        },
+        {
+          "file": "binutils_2.40-2.debian.tar.xz",
+          "bytes": 102476,
+          "sha256": "a71c03e51d7ac2be8d97daa29dc02e578978c8eeddfd51045502fd008cec8adc",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/b/binutils/binutils_2.40-2.debian.tar.xz"
+        }
+      ]
+    },
+    {
+      "package": "gcc-12",
+      "version": "12.2.0-14+deb12u1",
+      "suite": "bookworm-security",
+      "archives": [
+        {
+          "file": "gcc-12_12.2.0-14+deb12u1.dsc",
+          "bytes": 27330,
+          "sha256": "3aed0b189189c744dc9f4b74798a51d3e512ea85e492568db788a927c88e20ba",
+          "url": "https://snapshot.debian.org/archive/debian-security/20261029T000000Z/pool/updates/main/g/gcc-12/gcc-12_12.2.0-14+deb12u1.dsc"
+        },
+        {
+          "file": "gcc-12_12.2.0.orig.tar.gz",
+          "bytes": 87090343,
+          "sha256": "b8298be16aeeb96a889c6afed0a8e2241b47452e89cc81fe65ea849d5c740fcb",
+          "url": "https://snapshot.debian.org/archive/debian-security/20261029T000000Z/pool/updates/main/g/gcc-12/gcc-12_12.2.0.orig.tar.gz"
+        },
+        {
+          "file": "gcc-12_12.2.0-14+deb12u1.debian.tar.xz",
+          "bytes": 1675204,
+          "sha256": "59f7f7763a0c355e3f27ff9e7ac80d06382b29939361a87e7b139226bfe7402e",
+          "url": "https://snapshot.debian.org/archive/debian-security/20261029T000000Z/pool/updates/main/g/gcc-12/gcc-12_12.2.0-14+deb12u1.debian.tar.xz"
+        }
+      ]
+    },
+    {
+      "package": "gcc-defaults",
+      "version": "1.203",
+      "suite": "bookworm",
+      "archives": [
+        {
+          "file": "gcc-defaults_1.203.dsc",
+          "bytes": 12592,
+          "sha256": "39417c8e6cf5bfa22b1c58f004e9f7630725ace3138a216ba64ec75d83c3fceb",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/g/gcc-defaults/gcc-defaults_1.203.dsc"
+        },
+        {
+          "file": "gcc-defaults_1.203.tar.xz",
+          "bytes": 45208,
+          "sha256": "bbf861f5502592b91602392123b482f9fb521948a8994057d152486f78b200b0",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/g/gcc-defaults/gcc-defaults_1.203.tar.xz"
+        }
+      ]
+    },
+    {
+      "package": "glibc",
+      "version": "2.36-9+deb12u14",
+      "suite": "bookworm",
+      "archives": [
+        {
+          "file": "glibc_2.36-9+deb12u14.dsc",
+          "bytes": 9765,
+          "sha256": "cfe1f0b8dc1fa211ce5a45b3725cc38b29f88667f1140ebdca6de35cf9c6f1fd",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/g/glibc/glibc_2.36-9+deb12u14.dsc"
+        },
+        {
+          "file": "glibc_2.36.orig.tar.xz",
+          "bytes": 19363988,
+          "sha256": "a543c02070d46ccaf866957efd13f10c924daa74c86a90a0254db09a92a708ee",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/g/glibc/glibc_2.36.orig.tar.xz"
+        },
+        {
+          "file": "glibc_2.36-9+deb12u14.debian.tar.xz",
+          "bytes": 918488,
+          "sha256": "cf4ac9cd98185452cae3ef34e2e4ee12753e3d93fd0c62c61396d4a47eec902f",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/g/glibc/glibc_2.36-9+deb12u14.debian.tar.xz"
+        }
+      ]
+    },
+    {
+      "package": "libx11",
+      "version": "2:1.8.4-2+deb12u2",
+      "suite": "bookworm-security",
+      "archives": [
+        {
+          "file": "libx11_1.8.4-2+deb12u2.dsc",
+          "bytes": 2544,
+          "sha256": "d7374ec568d895f9e5919ebdbd94301e2acb9e8b307a39ac8708082aa1757fa3",
+          "url": "https://snapshot.debian.org/archive/debian-security/20261029T000000Z/pool/updates/main/libx/libx11/libx11_1.8.4-2+deb12u2.dsc"
+        },
+        {
+          "file": "libx11_1.8.4.orig.tar.gz",
+          "bytes": 3168573,
+          "sha256": "efd3a3a43c1f177edc2c205bedb0719b6648203595e54c0b83a32576aeaca7cd",
+          "url": "https://snapshot.debian.org/archive/debian-security/20261029T000000Z/pool/updates/main/libx/libx11/libx11_1.8.4.orig.tar.gz"
+        },
+        {
+          "file": "libx11_1.8.4.orig.tar.gz.asc",
+          "bytes": 801,
+          "sha256": "9d9a6bcdd81a40ed377b2981a4d40a0db1315d095e9ccc35a0ba78e692df8591",
+          "url": "https://snapshot.debian.org/archive/debian-security/20261029T000000Z/pool/updates/main/libx/libx11/libx11_1.8.4.orig.tar.gz.asc"
+        },
+        {
+          "file": "libx11_1.8.4-2+deb12u2.diff.gz",
+          "bytes": 115499,
+          "sha256": "3b3b43eabf8a58dda4442031652cc2294b50fe46129d6943937bf320d8a62243",
+          "url": "https://snapshot.debian.org/archive/debian-security/20261029T000000Z/pool/updates/main/libx/libx11/libx11_1.8.4-2+deb12u2.diff.gz"
+        }
+      ]
+    },
+    {
+      "package": "libxext",
+      "version": "2:1.3.4-1",
+      "suite": "bookworm",
+      "archives": [
+        {
+          "file": "libxext_1.3.4-1.dsc",
+          "bytes": 2118,
+          "sha256": "25024f57d955739c6b858822bf93ec3c71400b56fc0d666826f440e3661fd7c0",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/libx/libxext/libxext_1.3.4-1.dsc"
+        },
+        {
+          "file": "libxext_1.3.4.orig.tar.gz",
+          "bytes": 494434,
+          "sha256": "8ef0789f282826661ff40a8eef22430378516ac580167da35cc948be9041aac1",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/libx/libxext/libxext_1.3.4.orig.tar.gz"
+        },
+        {
+          "file": "libxext_1.3.4-1.diff.gz",
+          "bytes": 12509,
+          "sha256": "b975870d6a7b791ffbe2d57efdf6e20c250c5e76d12e45b04c8655f593bb8337",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/libx/libxext/libxext_1.3.4-1.diff.gz"
+        }
+      ]
+    },
+    {
+      "package": "libxfixes",
+      "version": "1:6.0.0-2",
+      "suite": "bookworm",
+      "archives": [
+        {
+          "file": "libxfixes_6.0.0-2.dsc",
+          "bytes": 2240,
+          "sha256": "d1958d4b89d749c7d05df7d6ec2215bf11527f9ae914c0f2da48672c6165c65e",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/libx/libxfixes/libxfixes_6.0.0-2.dsc"
+        },
+        {
+          "file": "libxfixes_6.0.0.orig.tar.gz",
+          "bytes": 387810,
+          "sha256": "82045da5625350838390c9440598b90d69c882c324ca92f73af9f0e992cb57c7",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/libx/libxfixes/libxfixes_6.0.0.orig.tar.gz"
+        },
+        {
+          "file": "libxfixes_6.0.0.orig.tar.gz.asc",
+          "bytes": 195,
+          "sha256": "e5598f42aa32140936c7772ab4d99ba35ecb859c29adc1703bb51440e7a54928",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/libx/libxfixes/libxfixes_6.0.0.orig.tar.gz.asc"
+        },
+        {
+          "file": "libxfixes_6.0.0-2.diff.gz",
+          "bytes": 17318,
+          "sha256": "24f13645909ecfd63a21568e515cfc962692c468d7dcf8cb97212d2445f60a3b",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/libx/libxfixes/libxfixes_6.0.0-2.diff.gz"
+        }
+      ]
+    },
+    {
+      "package": "libxtst",
+      "version": "2:1.2.3-1.1",
+      "suite": "bookworm",
+      "archives": [
+        {
+          "file": "libxtst_1.2.3-1.1.dsc",
+          "bytes": 2248,
+          "sha256": "ca51260a4a4fc34b244819065ab03d7a722678e9dd9dbd1ea8d86f74aaacc00c",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/libx/libxtst/libxtst_1.2.3-1.1.dsc"
+        },
+        {
+          "file": "libxtst_1.2.3.orig.tar.gz",
+          "bytes": 400197,
+          "sha256": "a0c83acce02d4923018c744662cb28eb0dbbc33b4adc027726879ccf68fbc2c2",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/libx/libxtst/libxtst_1.2.3.orig.tar.gz"
+        },
+        {
+          "file": "libxtst_1.2.3-1.1.diff.gz",
+          "bytes": 9598,
+          "sha256": "4f7eef30f2a860bc649e470d844d0b90bcc7cf7c5bf98fb02f29163b692a5948",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/libx/libxtst/libxtst_1.2.3-1.1.diff.gz"
+        }
+      ]
+    },
+    {
+      "package": "make-dfsg",
+      "version": "4.3-4.1",
+      "suite": "bookworm",
+      "archives": [
+        {
+          "file": "make-dfsg_4.3-4.1.dsc",
+          "bytes": 2019,
+          "sha256": "d2523d94f4d4198df6801f238d36cf0dea2ab5521f1d19ee76b2e8ee1f1918bb",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/m/make-dfsg/make-dfsg_4.3-4.1.dsc"
+        },
+        {
+          "file": "make-dfsg_4.3.orig.tar.gz",
+          "bytes": 1845906,
+          "sha256": "be4c17542578824e745f83bcd2a9ba264206187247cb6a5f5df99b0a9d1f9047",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/m/make-dfsg/make-dfsg_4.3.orig.tar.gz"
+        },
+        {
+          "file": "make-dfsg_4.3-4.1.diff.gz",
+          "bytes": 50940,
+          "sha256": "753c254ecaba425ebe2e0a0fb4d299847701e1c3eeb43df563e39975cae56b4c",
+          "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/m/make-dfsg/make-dfsg_4.3-4.1.diff.gz"
+        }
+      ]
+    }
+  ],
+  "formatVersion": 1,
+  "scope": "guest-bridge-build-inputs-only",
+  "architecture": "arm64",
+  "runtimeArchiveSha256": "f036c00a290abb953bec26be80c4d8fe492fd986e7a589c51008124432c8641e",
+  "baseImageReference": "docker.io/library/debian@sha256:7ccb8b5b60c7654f5b795d94ee7d751cd0811500803f0b09cefcd555e755a55a",
+  "baseImageEvidence": {
+    "repository": "library/debian",
+    "tag": "bookworm-slim",
+    "indexDigest": "sha256:99c0b25c46d0214d5a2091092e7908907dcaecd6a962cde0ac700acee222b6f3",
+    "arm64ManifestDigest": "sha256:7ccb8b5b60c7654f5b795d94ee7d751cd0811500803f0b09cefcd555e755a55a",
+    "manifest": {
+      "schemaVersion": 2,
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "config": {
+        "mediaType": "application/vnd.oci.image.config.v1+json",
+        "digest": "sha256:6c51fdfbb33b6cf6dc1d727bd44cb92b7a51299ec66e54d3e7b0f844989adde0",
+        "size": 468,
+        "data": "eyJjb25maWciOnsiRW52IjpbIlBBVEg9L3Vzci9sb2NhbC9zYmluOi91c3IvbG9jYWwvYmluOi91c3Ivc2JpbjovdXNyL2Jpbjovc2JpbjovYmluIl0sIkVudHJ5cG9pbnQiOltdLCJDbWQiOlsiYmFzaCJdfSwiY3JlYXRlZCI6IjIwMjYtMTAtMjdUMDA6MDA6MDBaIiwiaGlzdG9yeSI6W3siY3JlYXRlZCI6IjIwMjYtMTAtMjdUMDA6MDA6MDBaIiwiY3JlYXRlZF9ieSI6IiMgZGViaWFuLnNoIC0tYXJjaCAnYXJtNjQnIG91dC8gJ2Jvb2t3b3JtJyAnQDE3OTMwNTkyMDAnIiwiY29tbWVudCI6ImRlYnVlcnJlb3R5cGUgMC4xNyJ9XSwicm9vdGZzIjp7InR5cGUiOiJsYXllcnMiLCJkaWZmX2lkcyI6WyJzaGEyNTY6ODE5N2Q5YzE0YjIyZDRjZDc5MTk4YzA3MjJhMTgwMzU3NjBhODU2MTMyMTFmMjEyN2VlNmY1ODg4NzM1Y2E5OCJdfSwib3MiOiJsaW51eCIsImFyY2hpdGVjdHVyZSI6ImFybTY0IiwidmFyaWFudCI6InY4In0K"
+      },
+      "layers": [
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:f791e47cf52abf7b364878f2141547e3781072e437f599f6632849d88fca8ca4",
+          "size": 28137951
+        }
+      ]
+    },
+    "config": {
+      "config": {
+        "Env": [
+          "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        ],
+        "Entrypoint": [],
+        "Cmd": [
+          "bash"
+        ]
+      },
+      "created": "2026-10-27T00:00:00Z",
+      "history": [
+        {
+          "created": "2026-10-27T00:00:00Z",
+          "created_by": "# debian.sh --arch 'arm64' out/ 'bookworm' '@1793059200'",
+          "comment": "debuerreotype 0.17"
+        }
+      ],
+      "rootfs": {
+        "type": "layers",
+        "diff_ids": [
+          "sha256:8197d9c14b22d4cd79198c0722a18035760a85613211f2127ee6f5888735ca98"
+        ]
+      },
+      "os": "linux",
+      "architecture": "arm64",
+      "variant": "v8"
+    },
+    "annotations": {
+      "com.docker.official-images.bashbrew.arch": "arm64v8",
+      "org.opencontainers.image.base.name": "scratch",
+      "org.opencontainers.image.created": "2026-10-27T00:00:00Z",
+      "org.opencontainers.image.revision": "e36653f9967231373aeba7cff2102fd004ac4f4a",
+      "org.opencontainers.image.source": "https://github.com/debuerreotype/docker-debian-artifacts.git",
+      "org.opencontainers.image.url": "https://hub.docker.com/_/debian",
+      "org.opencontainers.image.version": "bookworm-slim"
+    }
+  },
+  "androidQualified": false
+}

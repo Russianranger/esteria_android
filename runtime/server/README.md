@@ -73,8 +73,10 @@ atomic promotion, restart and persistence test inside the image with external
 network disabled. It then builds the corresponding-source export. Its artifacts are internal build evidence/source companions. The first
 passing combined artifact was 948,408,822 bytes; evidence, runtime and sources
 are now separate artifacts so inspection does not require the large source
-download. The normalized rootfs package still needs its own CI readback and
-Android qualification.
+download. Native ARM64 run `40993458111` at integration commit
+`b06de55f5b17f27ae9659abcfdaf93a61b749a9e` subsequently passed rootfs
+normalization, full archive readback, offline MySQL initialization/persistence
+and corresponding-source export. Android execution remains unqualified.
 
 ## Corresponding sources and notices
 
@@ -133,3 +135,31 @@ python3 tools/package_server_runtime.py \
   --runtime-metadata /private/server-runtime.json \
   --output /private/new-server-runtime-package
 ```
+
+## Measured package checkpoint
+
+Run `40993458111` produced `server-runtime-arm64.tar.gz`: 112,374,096 bytes,
+SHA-256 `21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5`.
+Its 6,263 entries contain 385,051,708 regular-file bytes and 546 links. The
+1,915-byte package receipt has SHA-256
+`05153c6c03856071f0c0452f6075ae4b9ea2e1f1d0fbcc32f33319a9599adb9f`.
+The matching runtime metadata records 133 binary packages and 89 source packages;
+the corresponding-source export contains 278 files totaling 954,006,914 bytes.
+
+An independent host download verified the Actions ZIP identity, inner archive
+identity and receipt, then extracted and reread every staged regular file with
+the bounded runtime reader. This validates archive transport and filesystem
+content only. No host-stage executable was run and no Android server-runtime
+qualification is implied. MySQL execution evidence comes from the separate
+native ARM64 container test.
+
+Artifacts for this checkpoint:
+
+- [Small evidence](https://github.com/Russianranger/esteria_android/actions/runs/40993458111/artifacts/12949992985).
+- [Dependency runtime archive](https://github.com/Russianranger/esteria_android/actions/runs/40993458111/artifacts/12949858359).
+- [Corresponding source companion](https://github.com/Russianranger/esteria_android/actions/runs/40993458111/artifacts/12950466782).
+
+Actions artifacts have a 14-day retention period. A release must retain these
+exact runtime bytes and their source/recipe companion at durable URLs before an
+application build pins them for setup. No release download URL or enabled Android
+installation profile is established by this checkpoint.

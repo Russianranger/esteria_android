@@ -183,7 +183,8 @@ public final class SessionService extends Service {
         }, cancelled::get);
         status = "Client runtime files are prepared. Local services and gameplay are still under development.";
         log("Runtime prepared generation=" + result.generation + " reusedFiles=" + result.reusedFiles
-                + " copiedBytes=" + result.copiedBytes + " directorySyncSupported=" + result.directorySyncSupported
+                + " copiedBytes=" + result.copiedBytes + " hardLinkCopies=" + result.hardLinkCopies
+                + " hardLinkCopyBytes=" + result.hardLinkCopyBytes + " directorySyncSupported=" + result.directorySyncSupported
                 + " gameRuntimeQualified=false");
     }
     private void exportBundle(Uri destination) throws Exception {

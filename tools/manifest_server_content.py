@@ -30,7 +30,9 @@ SUPPORTED_PATCHES = {
     '0001-eluna-declare-area-trigger.patch': 'c26b145188c5f97bf30d032e1fe3bd7fe17aa1f8f0daa6793e51f5d830fe7aa6',
     '0002-eluna-include-map-manager.patch': '4e277dbe56c31ae30640c8e9ad4dee12e944e0f051d9bdc8d62aaa239c50433f',
     '0003-eluna-hooks-include-types.patch': '5999402d985fcc709abdc90bb4272072d1d5e3e261b2cc7ec19460320c14295f',
+    '0004-attunement-stat-api.patch': 'd9ef6ca8f96ab186c37c072b22143cdded9976aa3a62d083f893c502a5745cb8',
 }
+ROOT_CPP_PATCHES = {'0004-attunement-stat-api.patch'}
 MAX_TREE_BYTES = 16 * 1024 * 1024
 MAX_METADATA_BYTES = 2 * 1024 * 1024
 MAX_FILES = 40000
@@ -58,6 +60,31 @@ SERVER_PREFIXES = ('data/sql', 'modules', 'src/server/database', 'src/cmake/macr
 def require(value, message):
     if not value:
         raise ValueError(message)
+
+
+def patch_scope(name):
+    return None if name in ROOT_CPP_PATCHES else ELUNA
+
+
+def validate_patch_contract(source, root):
+    """Only individually audited, digest-bound non-content adaptations are allowed."""
+    for scope, path in fetch_sources.patch_inputs(source, root):
+        require(scope == patch_scope(path.name) and SUPPORTED_PATCHES.get(path.name) ==
+                hashlib.sha256(path.read_bytes()).hexdigest(),
+                'new patch or scope requires runtime-content contract review')
+
+
+def adaptation_records(source):
+    result = []
+    for patch in source.get('patches', []):
+        name = PurePosixPath(patch['path']).name
+        require(patch.get('submodule') == patch_scope(name) and patch['sha256'] == SUPPORTED_PATCHES.get(name),
+                'source adaptation was not reviewed for runtime-content effects')
+        result.append(dict(path=patch['path'], sha256=patch['sha256'], submodule=patch.get('submodule'),
+            effect='module C++ stat API compatibility; legacy display-only primary stats retained'
+                   if name in ROOT_CPP_PATCHES else 'Eluna C++ declaration/include compatibility',
+            sqlOrLuaInputsChanged=False, moduleSelectionChanged=False, updaterOrderingChanged=False))
+    return result
 
 
 def safe_path(value):
@@ -296,6 +323,7 @@ def make_manifest(server, eluna, source, lock_digest, modules, profile, content_
     blockers.append(dict(code='lua-installation-map-unqualified',
                          detail='Candidates remain at source paths; no runtime script set or collision policy selected.'))
     return dict(formatVersion=1, scope='source-content-inventory', source=source,
+                sourceAdaptations=adaptation_records(source),
                 sourceLockSha256=lock_digest, sourceTree=server.tree, elunaTree=eluna.tree,
                 profile=profile, enabledModules=sorted(modules), contentSha256Complete=content_hashes,
                 loaderContract=dict(baseOrder='immediate .sql paths lexicographically; only on empty database',
@@ -353,11 +381,7 @@ def main():
     source = lock['sources']['server']
     require(source['commit'] == SUPPORTED_SERVER and source['submodules'].get(ELUNA) == SUPPORTED_ELUNA,
             'source revision changed: re-audit loader contract before generating a manifest')
-    patches = fetch_sources.patch_inputs(source, args.lock.parent)
-    for scope, path in patches:
-        # Reviewed declarations/includes do not change SQL or Lua execution order.
-        require(scope == ELUNA and SUPPORTED_PATCHES.get(path.name) == hashlib.sha256(path.read_bytes()).hexdigest(),
-                'new patch requires runtime-content contract review')
+    validate_patch_contract(source, args.lock.parent)
     server = GitObjects(args.server, source['commit'], args.allow_source_fetch, SERVER_PREFIXES)
     eluna = GitObjects(args.server / ELUNA, source['submodules'][ELUNA], args.allow_source_fetch)
     if args.all_source_modules:

@@ -3,6 +3,10 @@ def sourceLock = new groovy.json.JsonSlurper().parse(rootProject.file('sources.l
 def clientRevision = sourceLock.sources.client.commit
 def serverRevision = sourceLock.sources.server.commit
 def prootProvider = providers.gradleProperty('prootProviderDir').orNull
+def nativeBridge = providers.gradleProperty('nativeRuntimeBridge').getOrElse('false').toBoolean()
+def nativeAbi = providers.gradleProperty('nativeBridgeAbi').getOrElse('arm64-v8a')
+if (!(nativeAbi in ['arm64-v8a', 'x86_64']) || (prootProvider && nativeAbi != 'arm64-v8a'))
+    throw new GradleException('Native bridge ABI must be arm64-v8a, or x86_64 without the ARM64 PRoot provider')
 if (!(clientRevision ==~ /[0-9a-f]{40}/) || !(serverRevision ==~ /[0-9a-f]{40}/))
     throw new GradleException('sources.lock.json requires full client and server commit SHAs')
 android {
@@ -20,10 +24,15 @@ android {
         buildConfigField 'String', 'CLIENT_REVISION', '"' + clientRevision + '"'
         buildConfigField 'String', 'SERVER_REVISION', '"' + serverRevision + '"'
         buildConfigField 'boolean', 'PROOT_PACKAGED', prootProvider ? 'true' : 'false'
-        ndk { abiFilters 'arm64-v8a' }
+        ndk { abiFilters nativeBridge ? nativeAbi : 'arm64-v8a' }
+        if (nativeBridge) externalNativeBuild { cmake { arguments '-DANDROID_STL=c++_static' } }
     }
     compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
     buildFeatures { buildConfig true }
+    if (nativeBridge) {
+        ndkVersion '28.2.13676358'
+        externalNativeBuild { cmake { path rootProject.file('native/CMakeLists.txt'); version '3.22.1' } }
+    }
     packaging { jniLibs {
         useLegacyPackaging true // Android installs process payloads in nativeLibraryDir.
         keepDebugSymbols += ['**/libproot.so', '**/libproot-loader.so'] // Preserve verified ELF hashes.
@@ -69,6 +78,15 @@ def sourcePins = tasks.register('generateSourcePins', Copy) {
     from rootProject.file('sources.lock.json')
     from rootProject.file('runtime/runtime-sources.lock.json')
     into layout.buildDirectory.dir('generated/sourcePins')
+}
+if (nativeBridge) {
+    def nativeNotices = tasks.register('copyNativeNotices', Copy) {
+        from rootProject.file('native/process-owner/FTA-MIT-LICENSE.txt')
+        from(rootProject.file('LICENSE')) { rename { 'ESTERIA-GPL-3.0.txt' } }
+        into layout.buildDirectory.dir('generated/nativeNotices/notices')
+    }
+    android.sourceSets.main.assets.srcDir(layout.buildDirectory.dir('generated/nativeNotices'))
+    tasks.named('preBuild').configure { dependsOn nativeNotices }
 }
 android.sourceSets.main.assets.srcDir(layout.buildDirectory.dir('generated/sourcePins'))
 tasks.named('preBuild').configure { dependsOn sourcePins }

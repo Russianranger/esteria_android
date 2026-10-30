@@ -108,3 +108,13 @@ content. All 20 discovered server-Lua candidates have explicit dependency decisi
 in `runtime/server-lua-map.json`; the intermediate profile disables Lua until
 matching AIO, schemas, custom races/maps and appearances can be qualified.
 The full Esteria script and custom-content requirements remain open.
+
+## Generated local runtime inputs
+
+The source-built X11 frame/XTest helpers and ALSA PCM plugin are under
+`native/guest-bridges`, with pinned Debian12 ARM64 inputs and corresponding sources
+in `runtime/bridges`. These are generated runtime components, not substitutes for
+missing game assets. Their new CI build/execution gates remain separate from client
+data, DBC, shaders, full-game audio and Adreno qualification. The Ubuntu ARM64
+MySQL dependency archive has passed native image, archive readback, source capture
+and host staging; `runtime/server/README.md` records its exact identities.

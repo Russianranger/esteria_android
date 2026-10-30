@@ -25,3 +25,19 @@ tasks.register('runtimeInstallerTest', JavaExec) {
     maxHeapSize = '64m'
 }
 check.dependsOn runtimeInstallerTest
+
+tasks.register('gameInputTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.input.GameInputRouterTest'
+    maxHeapSize = '32m'
+}
+check.dependsOn gameInputTest
+
+tasks.register('presentationProtocolTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.presentation.PcmProtocolTests'
+    maxHeapSize = '32m'
+}
+check.dependsOn presentationProtocolTest

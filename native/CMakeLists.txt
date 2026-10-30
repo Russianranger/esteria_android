@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.22)
+project(esteria_android_bridges LANGUAGES C CXX)
+add_subdirectory(process-owner)
+if(ANDROID_ABI STREQUAL "arm64-v8a")
+    add_subdirectory(presentation)
+else()
+    message(STATUS "Presentation is ARM64-only; this build qualifies process ownership only")
+endif()

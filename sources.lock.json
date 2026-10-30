@@ -3,7 +3,7 @@
   "sources": {
     "client": {
       "url": "https://github.com/Russianranger/wowdecomp_esteria.git",
-      "commit": "f75c2c71d9bb76a6707bfb68b2bf615db544e5bf",
+      "commit": "69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa",
       "branch": "android/arm64-port",
       "submodules": {},
       "patches": []
@@ -30,6 +30,10 @@
           "path": "patches/server/0003-eluna-hooks-include-types.patch",
           "sha256": "5999402d985fcc709abdc90bb4272072d1d5e3e261b2cc7ec19460320c14295f",
           "submodule": "src/server/game/LuaEngine"
+        },
+        {
+          "path": "patches/server/0004-attunement-stat-api.patch",
+          "sha256": "d9ef6ca8f96ab186c37c072b22143cdded9976aa3a62d083f893c502a5745cb8"
         }
       ]
     }

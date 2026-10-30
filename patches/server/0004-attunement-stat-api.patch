@@ -1,0 +1,89 @@
+diff --git a/modules/mod-attunement-plus/src/mod_attunement_plus.cpp b/modules/mod-attunement-plus/src/mod_attunement_plus.cpp
+--- a/modules/mod-attunement-plus/src/mod_attunement_plus.cpp
++++ b/modules/mod-attunement-plus/src/mod_attunement_plus.cpp
+@@ -6,16 +6,16 @@
+  * mod-attunement-plus
+  * Echoes of the Worldsoul stat application module for AzerothCore
+  *
+- * Applies absorbed stats from attuned items to players via the
+- * proper stat pipeline (ApplyStatBuffMod), so all secondary stats
+- * (attack power, spell power, health from stamina, etc.) update correctly.
++ * Applies absorbed armor and attack-power bonuses through the core stat pipeline.
++ * Primary-stat entries preserve the former ApplyStatBuffMod display-field behavior;
++ * they do not independently establish primary/secondary gameplay-stat bonuses.
+  *
+  * How it works:
+  *   1. On player login and stat update events, reads ap_item_snapshot
+  *      for this player's account, filtered by armor class.
+  *   2. Calculates absorbed stats using mastery rank, level scalar,
+  *      and talent bonuses stored in ap_mastery and ap_talents.
+- *   3. Applies the delta via ApplyStatBuffMod.
++ *   3. Applies flat armor/AP modifiers and primary-stat display deltas.
+  *   4. A WorldScript re-applies stats every 10 seconds to pick up
+  *      mid-session attunement changes without requiring a relog.
+  *
+@@ -398,6 +398,16 @@
+ };
+ static std::unordered_map<uint32, ApSinkApplied> g_sinkApplied;
+ 
++// Compatibility with the removed Unit::ApplyStatBuffMod: that API only changed
++// POSSTAT/NEGSTAT display fields. UpdateStatBuffMod(stat) recomputes those fields
++// from equipment/auras and is not an amount/apply replacement. Keep this adapter
++// explicit rather than silently introducing a new permanent combat-stat source.
++static void ApplyAttunementStatDisplay(Player* player, Stats stat, float amount, bool apply)
++{
++    uint16 const field = static_cast<uint16>((amount > 0.0f ? UNIT_FIELD_POSSTAT0 : UNIT_FIELD_NEGSTAT0) + static_cast<uint16>(stat));
++    player->ApplyModSignedFloatValue(field, amount, apply);
++}
++
+ static void ApplyAttunementStats(Player* player, bool apply)
+ {
+     uint32 guid = player->GetGUID().GetCounter();
+@@ -409,17 +419,17 @@
+         for (int i = 0; i < 5; ++i)
+         {
+             if (it->second[i] > 0.0f)
+-                player->ApplyStatBuffMod(AP_STATS[i], it->second[i], false);
++                ApplyAttunementStatDisplay(player, AP_STATS[i], it->second[i], false);
+         }
+         if (it->second[5] > 0.0f)
+         {
+-            player->HandleStatModifier(UNIT_MOD_ARMOR, TOTAL_VALUE,it->second[5], false);
++            player->HandleStatFlatModifier(UNIT_MOD_ARMOR, TOTAL_VALUE,it->second[5], false);
+             player->UpdateArmor();
+         }
+         if (it->second[6] > 0.0f)
+         {
+             float apBonus = std::floor(it->second[6] * 7.0f);
+-            player->HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, apBonus, false);
++            player->HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, apBonus, false);
+         }
+         g_appliedStats.erase(it);
+     }
+@@ -663,7 +673,7 @@
+         float val = std::floor(newStats[i]);
+         if (val > 0.0f)
+         {
+-            player->ApplyStatBuffMod(AP_STATS[i], val, true);
++            ApplyAttunementStatDisplay(player, AP_STATS[i], val, true);
+             cached[i] = val;
+         }
+     }
+@@ -672,7 +682,7 @@
+     float armorVal = std::floor(newStats[5]);
+     if (armorVal > 0.0f)
+     {
+-        player->HandleStatModifier(UNIT_MOD_ARMOR, TOTAL_VALUE,armorVal, true);
++        player->HandleStatFlatModifier(UNIT_MOD_ARMOR, TOTAL_VALUE,armorVal, true);
+         player->UpdateArmor();
+         cached[5] = armorVal;
+     }
+@@ -682,7 +692,7 @@
+     if (weaponDpsVal > 0.0f)
+     {
+         float apBonus = std::floor(weaponDpsVal * 7.0f);
+-        player->HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, apBonus, true);
++        player->HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, apBonus, true);
+         player->UpdateAttackPowerAndDamage();
+         cached[6] = weaponDpsVal;
+     }

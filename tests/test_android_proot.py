@@ -128,6 +128,10 @@ class AndroidProot(unittest.TestCase):
                 for path in assets.iterdir(): archive.write(path, 'assets/proot/' + path.name)
             with mock.patch.object(builder, 'LOCK', lock):
                 self.assertTrue(verifier.verify(root / 'provider', apk)['apkBytesVerified'])
+                original = apk.read_bytes()
+                with zipfile.ZipFile(apk, 'a') as archive: archive.writestr('lib/arm64-v8a/libunknown.so', elf())
+                with self.assertRaisesRegex(ValueError, 'unexpected-apk-native-payload'): verifier.verify(root / 'provider', apk)
+                apk.write_bytes(original)
                 changed = copy.deepcopy(proof); changed['androidRuntimeQualified'] = True
                 with self.assertRaises(ValueError): verifier.validate_proof(changed)
                 with (native / 'libproot.so').open('ab') as stream: stream.write(b'changed')

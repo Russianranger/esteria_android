@@ -16,14 +16,15 @@ server/Wine jobs must not be converted into successful evidence without logs.
 ## Next concrete work
 
 1. Fetch both development tips and inspect current Actions. Application client pin
-   is `f75c2c71d9bb76a6707bfb68b2bf615db544e5bf`; full ARM64/x64 builds and
+   is `69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa`; full ARM64/x64 builds and
    native ARM64 Wine entry/codec/software Vulkan passed in `40989834370`. Codec also passed
    `40985737329`. Neither starts the full game.
 2. Actual-EXE entry CI `40989834370` passed all five jobs at client
    `f75c2c71d9bb76a6707bfb68b2bf615db544e5bf`, pinned to integration harness `9ee80cd`. Windows ARM64/x64 and native Linux ARM64 receipts, namespace completion and
-   process exit pass. Continue engine-frame readback and Android bridge integration. Entry check
+   process exit pass. Engine framebuffer/readback also passed run `40992315512`; continue Android bridge integration. Entry check
    deliberately does not call CommonMain or consume game assets.
-3. Inspect server run `40987376145` after the third Eluna include patch. Continue
+3. Server run `40987376145` passed the third Eluna fix and failed module stat APIs
+   at 1,214/2,258 units. Inspect the new mod-attunement-plus semantic patch. Continue
    real compile/link fixes as digest-checked patches in this repository. The next
    workflow also binds enabled modules to actual binaries and emits a verified
    GNU SQL/config/notice package. Source-profile package alone is unqualified.
@@ -33,16 +34,18 @@ server/Wine jobs must not be converted into successful evidence without logs.
    64 MiB heap. Continue process-owner adapter and Android filesystem/execution
    qualification; the new Android13 x86_64 installer/APK-update workflow is compiled
    but its first emulator run found Android getFileStore unsupported. The File-based
-   fix is ready; inspect the next emulator run. See `runtime/ANDROID-INSTALLATION.md` and `runtime/proot/README.md`.
+   fix passed its prior point; hardlink denial is now handled by verified immutable copies. Inspect the next emulator run. See `runtime/ANDROID-INSTALLATION.md` and `runtime/proot/README.md`.
 5. Dependency image/MySQL/source-capture CI `40989666380` passed; continue verified
    GNU rootfs packaging and actual server library closure.
    Do not combine its glibc 2.39 binaries with Debian 12 Wine's glibc 2.36.
    Keep all mutable databases outside replaceable runtime generations.
-6. Qualify actual fresh game schemas with dbimport and the separate playerbots
+6. Base SQL load/restart CI `40991449039` passed all 468 files; qualify the compiled dbimport and the separate playerbots
    loader, then versioned upgrades with validated backup/restore. Real empty-DB
    bootstrap and loopback realm repair pass; `40987376123` runs all eight realm
    tests on MySQL 8.0.44. Repair advertised realm only after all module updates.
-7. Integrate actual display/audio/input, controller and keyboard, lifecycle and
+7. Native process/Surface/audio/input bridge implementations and internal controller/IME
+   view are now present; inspect new guest ARM64 and Android-owner CI. Integrate
+   their qualified session lifecycle and
    graceful server-save shutdown. Inspect read-only reference launcher code where
    useful. Keep startup gated until component readiness is actually established.
 8. Import authentic complete build 12340/custom data; generate shaders with the

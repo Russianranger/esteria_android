@@ -107,7 +107,7 @@ def main():
     command('install-update-preserving-data', ['install', '-r', str(args.update_apk)])
     test('verifyAfterUpdate')
     receipt = dict(formatVersion=1, scope='android-13-x86_64-installer-and-apk-update',
-        emulatorProperties=properties, artifacts=artifacts, runtimeContractGroups=17,
+        emulatorProperties=properties, artifacts=artifacts, runtimeContractGroups=18,
         runtimeFilesystemQualified=True, sameJobDebugKeyUpdatePreservedRuntimeAndSentinel=True,
         userSigningIdentityQualified=False, arm64GuestExecuted=False, gameplayQualified=False,
         completedAtUnix=int(time.time()))

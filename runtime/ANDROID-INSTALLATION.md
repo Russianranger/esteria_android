@@ -2,8 +2,8 @@
 
 The launcher offers explicit preparation of the pinned Wine archive. Setup runs as
 foreground work with progress, cancellation and a persisted interruption marker.
-It downloads approximately 585 MiB and expands about 2.46 GiB; initial setup needs
-roughly 3.2 GiB of free storage before game assets. It does not launch Wine or
+It downloads approximately 585 MiB. Original file payload is about 2.46 GiB;
+Android hardlink copies add about 0.94 GiB. Initial setup needs roughly 4.2 GiB of free storage before game assets. It does not launch Wine or
 claim gameplay readiness. Runtime startup remains gated.
 
 ## Storage and recovery
@@ -65,3 +65,31 @@ Run the bounded behavior checks with:
 
 Changing `-PprootProviderDir` should be followed by `:app:clean` before rebuilding,
 so previously merged assets cannot contaminate verification.
+
+## Android hardlink behavior
+
+Android13 emulator run `40991448984` reached extraction after the storage-probe
+fix but denied `Files.createLink` in app-private storage. The installer now falls
+back only for denied/unsupported hardlinks, writing immutable duplicate bytes
+through a bounded temporary file, fsync/readback/hash checks and atomic promotion.
+It preserves executable permissions, verifies copies again on interrupted resume,
+and records `hardLinkCopies` / `hardLinkCopyBytes` in the completion receipt and
+support log. Extra physical space and the expanded-byte ceiling remain enforced.
+The initial archive's 45 hardlinks refer to immutable regular-file payloads; mutable
+database state is never imported through this mechanism. A forced-denial and
+interrupted-copy regression brings the host installer suite to 18 groups. The
+updated Android emulator qualification remains pending.
+
+The exact 45-copy overhead is 1,008,166,513 bytes. Combined archive and file payload
+need 4,258,882,859 bytes before reserve. Copied aliases have a bounded private
+metadata inventory; unchanged size/mtime/private mode avoids rereading another
+1 GB on ordinary cached verification. Timestamp-changed copies are rehashed; size
+or mode changes fail. This shares the private-cache integrity model of the normal
+resume journal, not a claim of an immutable OS filesystem or an adversarial audit.
+
+The full archive was also exercised with all hardlinks deliberately denied on a
+Linux host under 64 MiB heap: all 45 copies passed and total copied bytes were
+3,645,965,754. A cached repeat copied zero and read about 94 MB (the required
+pins twice plus metadata), rather than rescanning the extra 1 GB. Evidence SHA256:
+`9f13d0ecbfe65b4b502693892c84651b8c2587f4151a4323ffb1e1afad77182c`.
+This full-input host proof does not replace the pending Android emulator rerun.

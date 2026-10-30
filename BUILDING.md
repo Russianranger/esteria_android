@@ -99,3 +99,13 @@ checks, not user-deliverable update candidates.
 
 ## Signing and reproducibility
 Keep `*.jks`, `*.keystore`, private runtime configurations and game assets out of Git. A user-deliverable development APK must use one persistent privately stored key and carry the application/client/server source revisions and runtime hashes. This is not yet a bit-identical reproducible APK promise: SDK/compiler/runtime package locks and release signing qualification remain to be completed.
+
+## Optional native application bridges
+
+`-PnativeRuntimeBridge=true` builds process ownership and ARM64 presentation JNI
+with NDK `28.2.13676358`, CMake `3.22.1`, static libc++ and 16 KiB ELF alignment.
+Combine it with the verified PRoot provider for internal ARM64 build checks.
+`-PnativeBridgeAbi=x86_64` builds only the process JNI for emulator qualification
+and rejects the ARM64 PRoot provider. Neither build property enables gameplay.
+See `runtime/ANDROID-EXECUTION.md`, `runtime/ANDROID-OWNER-QUALIFICATION.md` and
+`runtime/PRESENTATION-AUDIO.md` for exact scope and source provenance.

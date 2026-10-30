@@ -10,8 +10,13 @@ The contract is reviewed against server
 `f35f04d01689f034778e3474b3c820092f51e461` and Eluna
 `58d7652138887783228b9727bd1fa4e08f00342b`. A changed server/Eluna revision or an
 unreviewed adaptation patch fails explicitly so this model cannot silently drift
-from the compiled updater. The current three Eluna declaration/include patches are
-recorded and do not alter SQL discovery or Lua ordering.
+from the compiled updater. The current three Eluna declaration/include patches and the server-root attunement
+C++ API compatibility patch are individually digest- and scope-checked. They do not
+alter SQL/Lua inputs, module discovery or updater ordering. `sourceAdaptations`
+records each reviewed scope and effect; unknown or moved patches fail explicitly.
+The attunement patch preserves historical display-only primary-stat behavior and
+does not qualify that gameplay feature; see
+[the semantic audit](../patches/server/ATTUNEMENT-API-AUDIT.md).
 
 ## Generate a manifest
 
@@ -265,8 +270,8 @@ python3 tools/qualify_base_sql.py qualify --fixture /fixture \
   --expected-version EXACT_PINNED_MYSQL_VERSION --output /state/new-fixture
 ```
 
-Preparation reads exact Git objects for the pinned server, validates the reviewed
-Eluna-only patches, and records SHA-256 plus Git blob identities for **468 base
+Preparation reads exact Git objects for the pinned server, validates the individually reviewed
+C++ patch scopes/digests, and records SHA-256 plus Git blob identities for **468 base
 files / 381,481,395 bytes**. The counts are 22 auth, 108 characters, 309 world and
 29 playerbots. Only immediate `.sql` files are selected, sorted exactly as the
 base-population phase does. Local modified/untracked files never become inputs.

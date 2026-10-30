@@ -1,0 +1,49 @@
+name: Pinned ARM64 display and audio helpers
+on:
+  push:
+    branches: [android/client-server]
+    paths: [native/guest-bridges/**, native/presentation/**, runtime/bridges/**, runtime/bridge-reference.json, .github/workflows/guest-bridges.yml]
+  pull_request:
+    paths: [native/guest-bridges/**, native/presentation/**, runtime/bridges/**, .github/workflows/guest-bridges.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: guest-bridges-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Verify build-input and ELF rejection contracts
+        run: python3 -m unittest tests.test_guest_bridge_inputs -v
+      - name: Build exact Debian12 ARM64 guest helpers and retain corresponding sources
+        run: |
+          test "$(uname -m)" = aarch64
+          mkdir -p out/guest-bridges
+          docker build --platform linux/arm64 --target guest-export \
+            --build-context bridge-src=./native \
+            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
+            --build-arg INTEGRATION_REVISION="$GITHUB_SHA" \
+            --output type=local,dest=out/guest-bridges/payload runtime/bridges \
+            > out/guest-bridges/build.log 2>&1
+          sudo chown -R "$(id -u):$(id -g)" out/guest-bridges
+          cp LICENSE out/guest-bridges/payload/notices/ESTERIA-GPL-3.0
+          cp runtime/bridge-reference.json out/guest-bridges/payload/corresponding-source/
+      - name: Preserve build evidence
+        if: always()
+        run: sudo chown -R "$(id -u):$(id -g)" out/guest-bridges
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: unqualified-linux-arm64-guest-bridges-${{ github.sha }}
+          path: |
+            out/guest-bridges
+            runtime/bridges
+            runtime/bridge-reference.json
+            native/guest-bridges
+            native/presentation
+            LICENSE
+          retention-days: 14

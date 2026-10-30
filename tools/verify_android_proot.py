@@ -7,9 +7,10 @@ from pathlib import Path
 import zipfile
 
 try:
-    from . import android_elf, build_android_proot as builder, prepare_runtime as packages
+    from . import android_elf, android_jni_elf, build_android_proot as builder, prepare_runtime as packages
 except ImportError:
     import android_elf
+    import android_jni_elf
     import build_android_proot as builder
     import prepare_runtime as packages
 
@@ -42,6 +43,7 @@ def validate_payload(data, name, proof):
 
 
 def verify(provider, apk=None):
+    bridges = {}
     provider = packages.directory(provider)
     native = packages.directory(provider / 'jniLibs/arm64-v8a')
     assets = packages.directory(provider / 'assets/proot')
@@ -64,8 +66,20 @@ def verify(provider, apk=None):
         with packages.plain_file(apk) as stream, zipfile.ZipFile(stream) as archive:
             names = archive.namelist()
             packages.require(len(names) == len(set(names)), 'duplicate-apk-entry')
-            packages.require({n for n in names if n.startswith('lib/')} ==
-                             {'lib/arm64-v8a/' + n for n in NAMES}, 'unexpected-apk-native-payload')
+            native_paths = {n for n in names if n.startswith('lib/')}
+            expected = {'lib/arm64-v8a/' + n for n in NAMES}
+            optional = {'lib/arm64-v8a/' + n for n in android_jni_elf.DEPENDENCIES}
+            packages.require(expected <= native_paths <= expected | optional, 'unexpected-apk-native-payload')
+            for path in native_paths - expected:
+                entry = archive.getinfo(path)
+                packages.require(entry.file_size <= 16 * 1024 * 1024, 'apk-jni-size-limit')
+                data = archive.read(entry); name = path.rsplit('/', 1)[1]
+                bridges[name] = dict(bytes=len(data), sha256=hashlib.sha256(data).hexdigest(), elf=android_jni_elf.inspect(data,name))
+            if bridges:
+                for label, source in [('FTA-MIT-LICENSE.txt',builder.ROOT / 'native/process-owner/FTA-MIT-LICENSE.txt'),
+                                      ('ESTERIA-GPL-3.0.txt',builder.ROOT / 'LICENSE')]:
+                    entry = archive.getinfo('assets/notices/' + label)
+                    packages.require(entry.file_size <= 128 * 1024 and archive.read(entry) == source.read_bytes(), 'apk-native-notice-mismatch')
             for name in NAMES:
                 entry = archive.getinfo('lib/arm64-v8a/' + name)
                 packages.require(entry.file_size <= 16 * 1024 * 1024, 'apk-elf-size-limit')
@@ -76,6 +90,7 @@ def verify(provider, apk=None):
                                  'apk-provider-metadata-mismatch')
     return dict(androidBridgeBuilt=True, androidBridgeExecuted=False,
                 androidRuntimeQualified=False, apkBytesVerified=apk is not None,
+                sourceBuiltJniBridges=bridges,
                 payloads={name: value['sha256'] for name, value in proof['payloads'].items()})
 
 

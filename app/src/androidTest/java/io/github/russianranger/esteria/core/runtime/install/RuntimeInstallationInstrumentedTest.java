@@ -60,7 +60,8 @@ public final class RuntimeInstallationInstrumentedTest {
         RuntimeInstaller.Result result = RuntimeInstallerTests.install(installer, archive, plan);
         assertTrue(result.alreadyInstalled);
         assertEquals(0, result.copiedBytes);
-        assertTrue(Files.isSameFile(active.resolve("tool-hard"), active.resolve("usr/bin/tool")));
+        assertTrue(Files.isSameFile(active.resolve("tool-hard"), active.resolve("usr/bin/tool")) || result.hardLinkCopies == 1);
+        assertArrayEquals(Files.readAllBytes(active.resolve("tool-hard")), Files.readAllBytes(active.resolve("usr/bin/tool")));
         assertEquals("persistent-private-state", new String(Files.readAllBytes(root.resolve("character-save-sentinel")), StandardCharsets.UTF_8));
     }
 }

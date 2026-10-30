@@ -30,6 +30,7 @@ public final class RuntimeInstallerTests {
         passed=0;
         temporaryRoot=args.length==0?null:java.nio.file.Paths.get(args[0]).toRealPath();
         run("atomic install, safe guest links and cached repeat",RuntimeInstallerTests::installation);
+        run("denied hardlinks use verified resumable immutable copies",RuntimeInstallerTests::hardlinkCopy);
         run("cancel and resume verified files without activation",RuntimeInstallerTests::resume);
         run("torn resume journal and changed staged file recover",RuntimeInstallerTests::journalRecovery);
         run("failed update preserves active runtime and unrelated saves",RuntimeInstallerTests::failedUpdate);
@@ -91,16 +92,42 @@ public final class RuntimeInstallerTests {
     static RuntimeInstaller.Result install(RuntimeInstaller installer,Path archive,RuntimePackagePlan plan)throws IOException{return installer.install(archive,plan,RuntimeWork.NONE,RuntimeWork.NEVER_CANCELLED);}
     static void installation()throws Exception{
         Path root=temp();List<Member> members=base();members.get(0).mode=04755;Path archive=tar(root,members);RuntimePackagePlan plan=plan(archive,members);RuntimeInstaller installer=new RuntimeInstaller(root.resolve("store"));
-        RuntimeInstaller.Result result=install(installer,archive,plan);check(result.copiedBytes==26&&result.reusedFiles==0,"all regular bytes copied");
-        check(Files.readSymbolicLink(result.rootfs.resolve("tool-link")).toString().equals("usr/bin/tool"),"absolute guest link rewritten");check(Files.isSameFile(result.rootfs.resolve("tool-hard"),result.rootfs.resolve("usr/bin/tool")),"hardlink uses real target");
+        RuntimeInstaller.Result result=install(installer,archive,plan);check(result.copiedBytes==26+result.hardLinkCopyBytes&&result.reusedFiles==0,"all regular bytes copied");
+        check(Files.readSymbolicLink(result.rootfs.resolve("tool-link")).toString().equals("usr/bin/tool"),"absolute guest link rewritten");check(Files.isSameFile(result.rootfs.resolve("tool-hard"),result.rootfs.resolve("usr/bin/tool"))||result.hardLinkCopies==1,"hardlink is linked or explicitly copied");
+        check(Arrays.equals(Files.readAllBytes(result.rootfs.resolve("tool-hard")),Files.readAllBytes(result.rootfs.resolve("usr/bin/tool"))),"hardlink content retained");
         check(Files.isExecutable(result.rootfs.resolve("usr/bin/tool")),"execute mode preserved privately");
         check(Files.readSymbolicLink(result.rootfs.resolve("usr/bin/X11")).toString().equals("."),"same-directory symlink stays dot, not empty");
         Files.delete(archive);RuntimeInstaller.Result repeat=install(installer,archive,plan);check(repeat.alreadyInstalled&&repeat.copiedBytes==0&&repeat.reusedFiles==2,"repeat reuses completed private generation");check(installer.resolveCurrent(plan).equals(result.rootfs),"current generation");
     }
+    static void hardlinkCopy()throws Exception{
+        Path root=temp();List<Member> members=base();members.get(0).mode=0755;Path archive=tar(root,members);RuntimePackagePlan plan=plan(archive,members);
+        RuntimeInstaller installer=new RuntimeInstaller(root.resolve("store"),(output,target)->{throw new java.nio.file.AccessDeniedException(output.toString());});
+        AtomicBoolean cancelled=new AtomicBoolean();
+        fail(()->installer.install(archive,plan,(phase,path,done,total)->{if(phase.equals("copy-runtime-link"))cancelled.set(true);},cancelled::get));
+        check(installer.resolveCurrent(plan)==null,"interrupted link copy cannot activate");
+        check(Files.exists(root.resolve("store/staging").resolve(plan.generation).resolve("temporary/current-link")),"cancelled copy remains owned staging data");
+        RuntimeInstaller.Result result=install(installer,archive,plan);
+        check(result.hardLinkCopies==1&&result.hardLinkCopyBytes==15&&!Files.isSameFile(result.rootfs.resolve("tool-hard"),result.rootfs.resolve("usr/bin/tool")),"copy metrics record real extra storage");
+        check(Files.isExecutable(result.rootfs.resolve("tool-hard")),"copied link keeps executable mode");
+        check(install(installer,archive,plan).hardLinkCopies==1,"cached receipt preserves copy metrics");
+        check(!Files.exists(result.rootfs.getParent().resolve("temporary/current-link")),"completed generation has no abandoned copy");
+        Path alias=result.rootfs.resolve("tool-hard");long modified=Files.getLastModifiedTime(alias).toMillis();
+        Files.setPosixFilePermissions(alias,java.nio.file.attribute.PosixFilePermissions.fromString("rwxr-----"));
+        fail(()->installer.resolveCurrent(plan));RuntimeFiles.privateMode(alias,false,true);
+        Files.write(alias,bytes("modified-copy!!"));Files.setLastModifiedTime(alias,FileTime.fromMillis(modified+1000));
+        fail(()->installer.resolveCurrent(plan));fail(()->install(installer,archive,plan));
+        Files.write(alias,bytes("executable-data"));Files.setLastModifiedTime(alias,FileTime.fromMillis(modified+2000));
+        check(installer.resolveCurrent(plan).equals(result.rootfs),"timestamp-changed but authentic copy is rehashed and accepted");
+        Path store=root.resolve("retry-native");RuntimeInstaller denied=new RuntimeInstaller(store,(output,target)->{throw new java.nio.file.AccessDeniedException(output.toString());});cancelled.set(false);
+        fail(()->denied.install(archive,plan,(phase,path,done,total)->{if(phase.equals("copy-runtime-link"))cancelled.set(true);},cancelled::get));
+        RuntimeInstaller.Result retried=install(new RuntimeInstaller(store),archive,plan);
+        check(!Files.exists(retried.rootfs.getParent().resolve("temporary/current-link")),"retry cleans abandoned copy even when native linking becomes available");
+        if(retried.hardLinkCopies==0)check(Files.isSameFile(retried.rootfs.resolve("tool-hard"),retried.rootfs.resolve("usr/bin/tool")),"host retry actually used native hardlink");
+    }
     static void resume()throws Exception{
         Path root=temp();List<Member> members=base();Path archive=tar(root,members);RuntimePackagePlan plan=plan(archive,members);RuntimeInstaller installer=new RuntimeInstaller(root.resolve("store"));AtomicBoolean cancel=new AtomicBoolean();
         fail(()->installer.install(archive,plan,(phase,path,done,total)->{if(phase.equals("runtime-file-prepared"))cancel.set(true);},cancel::get));check(installer.resolveCurrent(plan)==null,"cancel does not activate");
-        RuntimeInstaller.Result result=install(installer,archive,plan);check(result.reusedFiles==1&&result.copiedBytes==11,"resume skips copied and read-back file");
+        RuntimeInstaller.Result result=install(installer,archive,plan);check(result.reusedFiles==1&&result.copiedBytes==11+result.hardLinkCopyBytes,"resume skips copied and read-back file");
     }
     static void journalRecovery()throws Exception{
         Path root=temp();List<Member> members=base();Path archive=tar(root,members);RuntimePackagePlan plan=plan(archive,members);RuntimeInstaller installer=new RuntimeInstaller(root.resolve("store"));AtomicBoolean cancel=new AtomicBoolean();

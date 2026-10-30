@@ -1,0 +1,30 @@
+name: Native process ownership and JNI
+on:
+  push:
+    branches: [android/client-server]
+    paths: ['native/process-owner/**', 'core/src/main/java/**/process/**', 'app/src/main/java/**/NativeProcessBridge.java', 'tools/check_process_owner.py', '.github/workflows/process-owner.yml']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ownership:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '17.0.13+11'
+      - name: Real native owner and JVM adapter qualification
+        run: python3 tools/check_process_owner.py --output "$RUNNER_TEMP/owner-evidence"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: process-owner-${{ matrix.runner }}-${{ github.sha }}
+          path: ${{ runner.temp }}/owner-evidence/process-owner-evidence.json
+          retention-days: 14

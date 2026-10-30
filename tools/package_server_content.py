@@ -57,7 +57,7 @@ def validate_inventory(manifest, server, eluna, source, lock_sha):
     content.require(manifest.get('profile') in ('all-source-static', 'explicit-module-list'), 'unknown content profile')
     expected = content.make_manifest(server, eluna, source, lock_sha, manifest['enabledModules'],
                                      manifest['profile'], False)
-    for key in ('sourceTree', 'elunaTree', 'enabledModules', 'loaderContract', 'databases', 'modules'):
+    for key in ('sourceTree', 'elunaTree', 'sourceAdaptations', 'enabledModules', 'loaderContract', 'databases', 'modules'):
         content.require(manifest.get(key) == expected[key], 'content inventory contract changed: ' + key)
     for field in ('files', 'elunaFiles'):
         content.require(set(manifest[field]) == set(expected[field]), 'content file set differs from pinned source')
@@ -350,9 +350,7 @@ def main():
     source = lock['sources']['server']
     content.require(source['commit'] == content.SUPPORTED_SERVER and
                     source['submodules'].get(content.ELUNA) == content.SUPPORTED_ELUNA, 'unreviewed source contract')
-    for scope, path in fetch_sources.patch_inputs(source, args.lock.parent):
-        content.require(scope == content.ELUNA and content.SUPPORTED_PATCHES.get(path.name) == hashlib.sha256(path.read_bytes()).hexdigest(),
-                        'unreviewed runtime-content adaptation')
+    content.validate_patch_contract(source, args.lock.parent)
     manifest, manifest_id = modules.read_json(args.manifest)
     lua_map, lua_id = modules.read_json(args.lua_map)
     module_receipt, module_id = modules.read_json(args.module_receipt) if args.module_receipt else (None, None)
