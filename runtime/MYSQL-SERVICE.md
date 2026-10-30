@@ -63,5 +63,14 @@ back and their hashes matched. The earlier run also passed the engine fixture,
 but failed evidence export because `sudo` removed the source revision variable;
 the corrected workflow restores file ownership before binding that envelope.
 
+The short-socket correction also passed the unchanged native three-cycle fixture
+in [run 41015153591](https://github.com/Russianranger/esteria_android/actions/runs/41015153591)
+at `2df6c813f60d1ab50874b092226ce0baac792ba9`. Its artifact `12958689902`
+is 11,366 bytes, SHA-256
+`c6c67df48907ef4609300a5de46c2cbdb1459f354938dadb76eb84eb2b5d0a66`;
+downloaded source/runtime envelope and qualification hashes were verified.
+This proves native service behavior after the path change. Android's translated
+socket address still requires the separate emulator execution gate.
+
 Android adapter execution is a separate follow-on gate. This result does not
 qualify game schema/module updates, character saves, bots or world gameplay.

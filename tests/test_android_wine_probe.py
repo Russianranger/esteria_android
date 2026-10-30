@@ -5,10 +5,31 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
+import importlib.util
 from tools import build_android_wine_probe as build, verify_android_wine_probe as verify, qualify_android_wine as qualify
 
 
 class WineProbeGuards(unittest.TestCase):
+    def test_mapping_diagnostic_uses_only_owned_fixed_bytes_and_never_executes_them(self):
+        path = build.ROOT / 'runtime/wine-probe/guest_check.py'
+        spec = importlib.util.spec_from_file_location('wine_guest_mapping_review', path)
+        guest = importlib.util.module_from_spec(spec); spec.loader.exec_module(guest)
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            result = guest.mapping_diagnostics(root)
+            self.assertEqual(result['scope'], 'mapping-permission-diagnostic-only')
+            self.assertTrue(result['privateFileUnchanged'])
+            self.assertFalse(result['mappedBytesExecuted']); self.assertFalse(result['wineQualified'])
+            self.assertEqual(len(result['cases']), 5)
+            self.assertEqual(len({row['case'] for row in result['cases']}), 5)
+            payload = (root / 'mapping-diagnostic.bin').read_bytes()
+            self.assertEqual(hashlib.sha256(payload).hexdigest(), result['fixtureSha256'])
+            self.assertEqual((root / 'mapping-diagnostic.bin').stat().st_mode & 0o777, 0o600)
+            for row in result['cases']:
+                self.assertIs(type(row['mmapErrno']), int)
+                if row['mprotectErrno'] is not None: self.assertIs(type(row['mprotectErrno']), int)
+            with self.assertRaises(FileExistsError): guest.mapping_diagnostics(root)
+
     def test_receipt_requires_every_phase_and_exact_source_identity(self):
         proof=dict(archive=dict(sha256='a'*64),clientInput=dict(sourceRevision='b'*40,artifact=dict(sha256='c'*64)),wineVersion='wine-10.13')
         raw=build.encoded(proof);proot={'source':'fixture-only'}

@@ -1,0 +1,47 @@
+{
+  "formatVersion": 1,
+  "scope": "turnip-provider-host-packaging-and-installation-only",
+  "integrationBuildRevision": "46a54a223720cdc230074aa6a43f10370718af71",
+  "inputLockSha256": "a2999f5172d139ea37cec712662ffc17303cb2d78d8356095c11c8f671f887d4",
+  "archive": {
+    "assetPath": "turnip/turnip-arm64.archive",
+    "bytes": 3276348,
+    "file": "turnip-arm64.tar.gz",
+    "sha256": "6d7617c7240876fd7f318ab313eff83b47ed691c5b1639a9f06fc34e913e323c"
+  },
+  "requiredFiles": 70,
+  "requiredFileBytes": 16811661,
+  "sourceCompanion": {
+    "allLockedOriginalSourcesVerified": true,
+    "androidQualified": false,
+    "artifact": {
+      "bytes": 267870390,
+      "id": 12958015255,
+      "runId": 41009954190,
+      "sha256": "7a84cde62abb837f8a2d0a066fd91adf58feb53b7916a3120c7ef2224438b706"
+    },
+    "completeGuestRootfsSourceClosure": false,
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "hardwareQualified": false,
+    "integrationRevision": "46a54a223720cdc230074aa6a43f10370718af71",
+    "originalArchiveBytes": 260796568,
+    "originalArchives": 68,
+    "scope": "turnip-original-source-companion",
+    "sourceManifestSha256": "00946836cbd257438edc3868bdd6b6c185f4a8c662eec1e9e44885bc078e1530"
+  },
+  "hostInstallerHeapMiB": 32,
+  "actualArchiveInstalled": true,
+  "cachedGenerationReusedWithoutArchive": true,
+  "independentSourceAndElfReadbackPassed": true,
+  "packagingGuardGroupsPassed": 6,
+  "optionalApkCompiled": true,
+  "androidTestSourcesCompiled": true,
+  "androidLintPassed": true,
+  "storedApkArchiveVerified": true,
+  "nativeNoGpuQualifiedInSeparateFixture": true,
+  "hardwareQualified": false,
+  "androidRuntimeQualified": false,
+  "x11PresentationQualified": false,
+  "gameplayQualified": false
+}

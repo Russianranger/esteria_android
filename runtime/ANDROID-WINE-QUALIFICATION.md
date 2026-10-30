@@ -72,7 +72,8 @@ The workflow retains this companion even when subsequent Android execution fails
 The fixture and source guards pass on the development host using the actual
 selected client artifact and real x64 PRoot source objects. These are source,
 packaging and receipt checks. A completed Android execution receipt is required
-before claiming the named Wine/client diagnostic behavior; it is currently pending.
+before claiming the named Wine/client diagnostic behavior; the first actual run
+failed before client execution, as detailed below.
 
 The measured runtime from successful source build41011458046 passed another
 complete local archive readback: 10,191 entries, 673,993,620 regular-file bytes and
@@ -83,3 +84,22 @@ The opt-in native x64 APK, instrumentation APK and Android lint build passed in
 This local test APK is 204,295,879 bytes, SHA-256
 `de01a7befee0aa58833acae5803787267f404ea572b91d648d530b661ab88218`;
 it has not been executed on Android and is not a Thor candidate.
+
+Actual emulator run41015479987 at integration
+`386b537723f4cf8f60920b7e92ff02959246f484` passed original artifact recovery,
+complete Wine/Debian source validation, source sealing, APK build and byte checks.
+Its prefix phase exited 1: Wine could not change `ntdll.dll`'s `.text` section
+protection and then reported exception-stack overflow. No reconstructed-client
+phase ran and all execution qualification flags remain false. Evidence artifact
+12960040385 is 53,716 bytes, SHA-256
+`1a2bfc95c1408dc970f819adda13bd85e25ce2af34ae18b8b42cea58a9d6865b`.
+The complete retained corresponding-source artifact12959298932 is 929,858,045
+bytes, SHA-256 `d1f70a1a25117aa50c0bb2dfe93294d8ff1883206b46d2f86c2b0f90e5253095`.
+
+The next diagnostic compares anonymous, direct file-backed RX/RWX, and clean or
+modified private file-backed RW-to-RX mappings inside the same guest/private
+filesystem. It reports exact syscall success and numeric errno, verifies its
+fixed fixture bytes remain unchanged, and never executes mapped bytes. Wine's
+existing prefix/client failure gate is unchanged. Whether Android rejects a
+particular transition remains a hypothesis until this comparison runs; no
+target-SDK, permission, SELinux or device policy changes are made.
