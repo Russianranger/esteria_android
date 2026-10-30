@@ -1,0 +1,97 @@
+{
+  "actualLocalReadback": {
+    "all2MemberCrcAndShaVerified": true,
+    "all58CurrentNativeCallerGitBlobsVerified": true,
+    "independentNativeSqlReadbackAdmissionPassed": true,
+    "nativeSqlAdmissionPassed": true,
+    "original6486ByteArtifactReadCompletely": true,
+    "originalQualificationBytesRetained": true,
+    "originalSourceLockAndAll7PatchIdentitiesVerified": true
+  },
+  "actualNativeSelection": {
+    "evidenceArtifact": {
+      "bytes": 6486,
+      "id": 13018403038,
+      "sha256": "1090770a534de7f969d319bfec505b0e16008b09a9f7541f8c2c37fb91a6a82e"
+    },
+    "inputSelection": {
+      "bytes": 3333,
+      "path": "runtime/mysql-probe/server-setup-x64-sql-inputs.lock.json",
+      "sha256": "b4761fa5f6b1de914637c17f4248872b8749565738efb4e0098c8e13d4c4540a"
+    },
+    "producer": {
+      "integrationRevision": "7d4b1cfdf2556c1943d6c7e8ff18b2892a2b84d6",
+      "job": 124350948175,
+      "workflowRun": 41139757153
+    },
+    "qualification": {
+      "bytes": 19483,
+      "path": "runtime/evidence/x64-server-setup-sql-7d4b1cf-qualification.json",
+      "sha256": "44448b43339efeaf6dad1421261c74c9fceab979779d1c70ae8a063907b76fed"
+    },
+    "readback": {
+      "bytes": 27894,
+      "path": "runtime/evidence/x64-server-setup-sql-7d4b1cf-readback.json",
+      "sha256": "99ffaee09b2090f25b68f2ff37a8fe55658ced3cb14874c4d88a77979ea4b6e7"
+    }
+  },
+  "actualNativeSqlFacts": {
+    "actualCoreCompositionAndHelperAndReentryAndCleanRestartQualified": true,
+    "playerbotsTables": 30,
+    "playerbotsUpdates": 31,
+    "preparedStatements": 52,
+    "selectedUpdates": 31,
+    "sourceBaseFiles": 29
+  },
+  "boundaries": {
+    "allTransportSelectionsNull": true,
+    "androidExecutionEnabled": false,
+    "androidQualified": false,
+    "baselinePendingRefusalRemainsFixtureOwned": true,
+    "gameplayQualified": false,
+    "measurementNativeReady": true,
+    "nativeSqlReexecutedLocally": false,
+    "playerbotsAiQualified": false,
+    "positiveProviderConstructed": false,
+    "productionArm64Qualified": false,
+    "providerDescriptorSelected": false,
+    "providerReadbackSelected": false,
+    "sdkOrAdbExecutedLocally": false,
+    "thorQualified": false,
+    "transportEnabled": false,
+    "worldserverQualified": false
+  },
+  "formatVersion": 1,
+  "hostTests": {
+    "output": {
+      "bytes": 166,
+      "sha256": "84eda9d1b9e46379dde6264178ec9f89aec55ddbfbe1ddd66018275a961fcecb"
+    },
+    "passed": 67,
+    "seconds": 0.92,
+    "suites": [
+      "tests.test_android_installation_x64_inputs",
+      "tests.test_android_installation_x64_provider_artifacts",
+      "tests.test_android_installation_x64_qualification",
+      "tests.test_android_installation_x64_provider",
+      "tests.test_android_installation_x64_entry"
+    ],
+    "tests": 67
+  },
+  "integrationRevisionBeforeUncommittedBinding": "9026f1d6b98cc9ad42683cf113c3ab6d870f391d",
+  "scope": "actual-native-x64-sql-selected-for-provider-measurement-only",
+  "sourceFiles": {
+    "runtime/mysql-probe/android-installation-x64-inputs.lock.json": {
+      "bytes": 1542,
+      "sha256": "ed049b2055e340f7a73ee9f191279bbb6696603890d369d2a41eb3bdacd03b4e"
+    },
+    "tests/test_android_installation_x64_inputs.py": {
+      "bytes": 21804,
+      "sha256": "6eff1edb3358fcedac8c89573feb12d273f5a47d9bfe1235677fca63a7b9e9f2"
+    },
+    "tests/test_android_installation_x64_provider.py": {
+      "bytes": 18864,
+      "sha256": "489d9098790a57fe6d4a8f2d5d4b5b531c282a94b967e8fc65e645a4c7674fdc"
+    }
+  }
+}

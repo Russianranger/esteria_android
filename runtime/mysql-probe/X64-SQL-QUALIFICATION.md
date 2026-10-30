@@ -71,6 +71,10 @@ The source-backed public content provider supplies the real base/update SQL,
 module templates and notices. The original `dbimport.conf.dist` is extracted
 from the pinned server source archive by exact member identity. Missing game
 data is a separately named unavailable path; this gate starts no world server.
+The host content verifier resolves patch paths relative to its source-lock
+directory. The harness therefore stages the exact historical lock beside all
+seven digest-bound original patches in a fresh source profile and reuses the
+unchanged verifier. The caller receipt records all eight source identities.
 
 ## Native execution contract
 
@@ -91,6 +95,17 @@ SQL receipt:
 - Clean MySQL stop, same-instance restart and preserved private journals/rows.
 - Removal of the disposable marker and a final four-schema verification.
 
+Actual run41139757153/job124350948175 at
+7d4b1cfdf2556c1943d6c7e8ff18b2892a2b84d6 completed successfully. Its native SQL
+step took245 seconds and demonstrated every boundary above, including the real
+52-statement helper,29 source base files,31 source updates,30 resulting Playerbots
+tables and unchanged core credentials/account rows. The complete6,486-byte
+evidence ZIP was read and both members passed CRC/SHA checks; all58 current caller
+source identities match that exact Git revision. The original19,483-byte receipt
+and independent readback are retained as
+`runtime/evidence/x64-server-setup-sql-7d4b1cf-qualification.json` and
+`runtime/evidence/x64-server-setup-sql-7d4b1cf-readback.json`.
+
 Existing output is never adopted, cleared or reseeded. Failure preserves its
 fresh private state and reports a typed phase/class. Only bounded public JSON
 receipts are exported; database files, account/credential contents, option files,
@@ -108,9 +123,10 @@ world/gameplay, character persistence and bot AI unqualified.
 python3 -m unittest tests.test_server_setup_x64_sql_inputs tests.test_server_setup_x64_sql -v
 ```
 
-Nineteen host groups pass. They include actual ELF/debug splitting and CRCs,
+Twenty-one host groups pass. They include actual ELF/debug splitting and CRCs,
 real captured-loader execution of a harmless host utility, ELF/library mutation
 refusal, original source-template extraction, source archive mutation refusal,
 private-configuration checks, restored MySQL descriptor/archive identity checks
-and strict pending-selection boundaries. They do
+bounded private-detail-free source failure frames, real historical-lock/patch
+layout reproduction and strict pending-selection boundaries. They do
 not execute MySQL, populate schemas or qualify the actual new x64 component.

@@ -31,12 +31,21 @@ class AndroidInstallationX64Inputs(unittest.TestCase):
         self.lock.write_text(json.dumps(value))
         with patch.object(inputs, 'LOCK', self.lock): return inputs.load_pin(require_enabled=required)
 
-    def test_real_pending_lock_refuses_required_mode_before_underlying_input_admission(self):
-        self.assertEqual(inputs.load_pin(), self.pending)
+    def test_pending_fixture_refuses_required_mode_before_underlying_input_admission(self):
+        self.assertEqual(self.load(self.pending), self.pending)
         with patch.object(inputs.native, 'load_pin') as native, \
                 self.assertRaisesRegex(ValueError, 'measured-native-sql-and-provider-required'):
-            inputs.load_pin(require_enabled=True)
+            self.load(self.pending,required=True)
         native.assert_not_called()
+
+    def test_committed_selection_is_admitted_without_assuming_future_measurements_are_pending(self):
+        selected=inputs.load_pin()
+        self.assertIn(selected['state'],(inputs.PENDING,inputs.PROVIDER_PENDING,inputs.MEASURED))
+        if not selected['enabled']:
+            self.assertIsNone(selected['provider']);self.assertIsNone(selected['providerReadback'])
+            with self.assertRaisesRegex(ValueError,'measured-native-sql-and-provider-required'):
+                inputs.load_pin(require_enabled=True)
+        else:self.assertEqual(selected['state'],inputs.MEASURED)
 
     def test_pending_selection_cannot_smuggle_unmeasured_provider_or_runtime_claim(self):
         for change in (dict(enabled=1), dict(nativeSql={}), dict(provider=pin(b'unmeasured')),

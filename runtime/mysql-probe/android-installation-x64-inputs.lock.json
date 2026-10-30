@@ -1,19 +1,45 @@
 {
-  "formatVersion": 1,
-  "scope": "android-x64-installation-coordinator-input-selection",
-  "repository": "Russianranger/esteria_android",
+  "androidRuntimeQualified": false,
   "enabled": false,
-  "state": "pending-native-x64-sql-and-provider-measurement",
-  "nativeSql": null,
+  "formatVersion": 1,
+  "fourSchemaCoordinatorQualified": false,
+  "gameplayQualified": false,
+  "nativeSql": {
+    "evidenceArtifact": {
+      "bytes": 6486,
+      "id": 13018403038,
+      "sha256": "1090770a534de7f969d319bfec505b0e16008b09a9f7541f8c2c37fb91a6a82e"
+    },
+    "inputSelection": {
+      "bytes": 3333,
+      "path": "runtime/mysql-probe/server-setup-x64-sql-inputs.lock.json",
+      "sha256": "b4761fa5f6b1de914637c17f4248872b8749565738efb4e0098c8e13d4c4540a"
+    },
+    "producer": {
+      "integrationRevision": "7d4b1cfdf2556c1943d6c7e8ff18b2892a2b84d6",
+      "job": 124350948175,
+      "workflowRun": 41139757153
+    },
+    "qualification": {
+      "bytes": 19483,
+      "path": "runtime/evidence/x64-server-setup-sql-7d4b1cf-qualification.json",
+      "sha256": "44448b43339efeaf6dad1421261c74c9fceab979779d1c70ae8a063907b76fed"
+    },
+    "readback": {
+      "bytes": 27894,
+      "path": "runtime/evidence/x64-server-setup-sql-7d4b1cf-readback.json",
+      "sha256": "99ffaee09b2090f25b68f2ff37a8fe55658ced3cb14874c4d88a77979ea4b6e7"
+    }
+  },
+  "playerbotsAiQualified": false,
+  "productionArm64ProviderQualified": false,
   "provider": null,
   "providerReadback": null,
-  "sqlExecuted": false,
-  "androidRuntimeQualified": false,
-  "productionArm64ProviderQualified": false,
-  "fourSchemaCoordinatorQualified": false,
-  "worldserverQualified": false,
-  "playerbotsAiQualified": false,
-  "gameplayQualified": false,
+  "repository": "Russianranger/esteria_android",
+  "scope": "android-x64-installation-coordinator-input-selection",
+  "serverDataQualified": false,
   "slotPromoted": false,
-  "serverDataQualified": false
+  "sqlExecuted": false,
+  "state": "native-x64-sql-qualified-provider-pending",
+  "worldserverQualified": false
 }

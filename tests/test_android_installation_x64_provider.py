@@ -25,12 +25,16 @@ class AndroidInstallationX64Provider(unittest.TestCase):
 
     def test_pending_gate_refuses_before_output_or_source_admission(self):
         target = self.root / 'must-not-exist'
-        with patch.object(provider, 'source_snapshot') as source, \
+        pending=dict(formatVersion=1,scope=provider.gate.SCOPE,repository='Russianranger/esteria_android',
+            enabled=False,state=provider.gate.PENDING,nativeSql=None,provider=None,providerReadback=None,
+            **{name:False for name in provider.gate.FALSE_FLAGS})
+        lock=self.put('pending.json',json.dumps(pending).encode())
+        with patch.object(provider.gate,'LOCK',lock),patch.object(provider, 'source_snapshot') as source, \
                 patch.object(provider.native, 'admit_component') as component, \
                 self.assertRaisesRegex(ValueError, 'native-sql-measurement-required'):
             provider.build(self.root / 'missing-input', target)
         source.assert_not_called(); component.assert_not_called(); self.assertFalse(target.exists())
-        with self.assertRaisesRegex(ValueError,'native-sql-measurement-required'):
+        with patch.object(provider.gate,'LOCK',lock),self.assertRaisesRegex(ValueError,'native-sql-measurement-required'):
             provider.readback(self.root/'missing-product')
 
     def test_default_external_profile_refuses_before_frozen_checkout_or_runtime_access(self):
