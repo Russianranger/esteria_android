@@ -98,6 +98,7 @@ def verify(provider, apk=None):
     sources = {'prootSourceLockSha256': 'runtime/proot/sources.lock.json', 'glibcLockSha256': 'native/proot-probe/glibc.lock.json',
                'builderSha256': 'tools/build_android_proot_probe.py', 'guestSourceSha256': 'native/proot-probe/guest.c',
                'pluginSourceSha256': 'native/proot-probe/plugin.c', 'ownershipPatchSha256': 'runtime/proot/proot-exitkill.patch',
+               'renameCompatibilityPatchSha256': 'native/proot-probe/proot-x64-renameat.patch',
                'ownershipGuestSourceSha256': 'native/proot-probe/ownership_guest.c',
                'ownerServiceSourceSha256': 'app/src/prootProbe/java/io/github/russianranger/esteria/runtime/ProbeOwnerService.java',
                'ownerServiceManifestSha256': 'app/src/prootProbe/AndroidManifest.xml',

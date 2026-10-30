@@ -176,3 +176,39 @@ python3 tools/qualify_android_proot.py --provider /tmp/new-proot-probe/provider 
 The probe provider is mutually exclusive with the production ARM64 provider and
 the separate presentation emulator profile. Do not distribute its APK as a Thor
 candidate or a normal application update. It uses only a disposable CI debug key.
+## Android x64 legacy rename compatibility (pending runtime gate)
+
+The real Android MySQL fixture in run `41007887632` started guest Python and
+executed `mysqld --version`, then failed its first atomic journal replacement:
+`OSError`, errno38, `mysql_bootstrap.atomic_json` at `os.replace`. Android13's
+Bionic syscall lists permit `renameat` for all supported ABIs but list legacy
+`rename` only for32-bit applications. The existing PRoot SIGSYS restart path has
+a rename adapter, but it did not make this actual x64 operation succeed.
+
+The separate x64 probe builder now applies
+`native/proot-probe/proot-x64-renameat.patch`. After ordinary rename path and
+extension processing, and after saving the original translated-register snapshot,
+it changes only the kernel-facing call to
+`renameat(AT_FDCWD, translated_old, AT_FDCWD, translated_new)`. The normal rename
+exit, current-directory and extension bookkeeping retains its original argument
+layout. The patch is guarded to Android and native x64 ABI, is applied equally to
+both ownership comparators, and does not change the ARM64 builder/payload or any
+Android policy, permissions or filesystem behavior.
+
+The actual glibc guest now forces `SYS_rename` and checks replacing an existing
+file while an open descriptor retains the old inode, source disappearance,
+self-rename, missing-source errno, moving a symlink itself, and moving its current
+directory with correct guest `getcwd`. It flushes state and verifies exact bytes,
+link contents and the renamed directory on the second process launch. The
+instrumentation and host receipt require both new markers; previous successful
+receipts do not qualify this added behavior. Native compilation and source review
+are separate from the new Android execution and MySQL rerun, which are pending.
+Two clean native builds reproduced the new protected and control tracer bytes;
+the loader bytes remain identical. All five provider/receipt guards pass with the
+actual rebuilt provider. The x64 native APK, instrumentation and lint also pass,
+and the final local APK matches the pinned provider bytes. These are build checks.
+
+Primary Android13 source:
+`platform/bionic`, tag `android-13.0.0_r37`, `libc/SYSCALLS.TXT` and
+`libc/SECCOMP_ALLOWLIST_APP.TXT` at
+https://android.googlesource.com/platform/bionic/+/refs/tags/android-13.0.0_r37/libc/.

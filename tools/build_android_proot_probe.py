@@ -25,9 +25,9 @@ except ImportError:
 ROOT = Path(__file__).resolve().parents[1]
 INPUTS = ROOT / 'native/proot-probe'
 NATIVE_PINS = {
-    'libproot_probe.so': {'bytes': 277512, 'sha256': '4e06b8d9037dd62b92983a2e4202e8f7aeb750329160fdf7f8bfe83324415263'},
+    'libproot_probe.so': {'bytes': 277720, 'sha256': '8901163fb083b63e741b7c6bc7958cf82c646bb1d897052c39c3dc8e427526c5'},
     'libproot_probe_loader.so': {'bytes': 18344, 'sha256': '4a324117c6a16fe996af18ea388191379f5517309e963c80186fd3563a78410a'},
-    'libproot_probe_control.so': {'bytes': 277512, 'sha256': 'aea88557d140c04ec60a7e3687dc5b78e7c85ccfece436fd1bb955f336a9fe92'},
+    'libproot_probe_control.so': {'bytes': 277720, 'sha256': '29dbcbbab429fc77bbf45580a35b6d2c659f19162b9bf764b43ebb2da625f970'},
 }
 
 
@@ -75,6 +75,11 @@ def build(args):
         archive.extractall(source, filter='data')
     subprocess.run(['git', 'apply', '--check', str(patch)], cwd=tracer, check=True)
     subprocess.run(['git', 'apply', str(patch)], cwd=tracer, check=True)
+    # Equivalent legacy rename compatibility is confined to this Android x64
+    # fixture; the production ARM64 builder and byte pins remain unchanged.
+    rename_patch = INPUTS / 'proot-x64-renameat.patch'
+    subprocess.run(['git', 'apply', '--check', str(rename_patch)], cwd=tracer, check=True)
+    subprocess.run(['git', 'apply', str(rename_patch)], cwd=tracer, check=True)
     makefile = tracer / 'src/GNUmakefile'
     makefile.write_text(proot.replace_exact(makefile.read_text(),
         '$(ROSEGMENT),-z,noexecstack', '$(ROSEGMENT),-z,noexecstack,-z,max-page-size=16384'))
@@ -163,6 +168,7 @@ def build(args):
         ownerServiceSourceSha256=proot.digest(ROOT / 'app/src/prootProbe/java/io/github/russianranger/esteria/runtime/ProbeOwnerService.java'),
         ownerServiceManifestSha256=proot.digest(ROOT / 'app/src/prootProbe/AndroidManifest.xml'),
         ownerDeathTestSourceSha256=proot.digest(ROOT / 'app/src/androidTest/java/io/github/russianranger/esteria/runtime/RemoteOwnerDeathProbe.java'),
+        renameCompatibilityPatchSha256=proot.digest(rename_patch),
         nativeFiles=NATIVE_PINS, rootfsFiles=root_files, glibcVersion='2.36',
         androidProotExecuted=False, arm64GuestExecuted=False, gameplayQualified=False)
     packages.write_json(assets / 'build-evidence.json', evidence)

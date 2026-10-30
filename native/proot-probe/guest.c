@@ -13,6 +13,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/syscall.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -47,12 +48,69 @@ static int child(const char *port_text, const char *version) {
     require(memcmp(reply, "ok", sizeof(reply)) == 0, "loopback response");
     require(close(socket_fd) == 0, "child socket close"); return 17;
 }
+static void exact_file(const char *name, const char *content) {
+    int fd = open(name, O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
+    require(fd >= 0, "rename persisted file open");
+    char value[64]; size_t length = strlen(content);
+    require(length < sizeof(value), "rename fixture size");
+    transfer(fd, value, length, 0);
+    char extra;
+    require(!memcmp(value, content, length) && read(fd, &extra, 1) == 0 && close(fd) == 0,
+            "rename persisted exact bytes");
+}
+static void create_file(const char *name, const char *content) {
+    int fd = open(name, O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC | O_NOFOLLOW, 0600);
+    require(fd >= 0, "rename exclusive file create");
+    transfer(fd, (void *)content, strlen(content), 1);
+    require(fsync(fd) == 0 && close(fd) == 0, "rename file flush");
+}
+static void rename_check(const char *work, int writing) {
+    require(chdir(work) == 0, "rename guest working directory");
+    if (writing) {
+        create_file("rename-target", "old inode\n");
+        int previous = open("rename-target", O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
+        require(previous >= 0, "retain old target descriptor");
+        create_file("rename-temporary", "new committed inode\n");
+        /* Force the x64 legacy number; libc cannot hide missing compatibility. */
+        require(syscall(SYS_rename, "rename-temporary", "rename-target") == 0, "legacy rename replaces existing target");
+        char old[sizeof("old inode\n") - 1]; transfer(previous, old, sizeof(old), 0);
+        require(!memcmp(old, "old inode\n", sizeof(old)) && close(previous) == 0, "replacement retains old open inode");
+        require(access("rename-temporary", F_OK) < 0 && errno == ENOENT, "rename source removed");
+        require(syscall(SYS_rename, "rename-target", "rename-target") == 0, "same-path rename is unchanged");
+        errno = 0;
+        require(syscall(SYS_rename, "missing-source", "rename-target") < 0 && errno == ENOENT, "rename missing source errno");
+        create_file("rename-link-source-target", "link destination unchanged\n");
+        require(symlink("rename-link-source-target", "rename-link-source") == 0, "rename source symlink");
+        create_file("rename-link", "replace me\n");
+        require(syscall(SYS_rename, "rename-link-source", "rename-link") == 0, "rename moves symlink itself");
+        require(mkdir("rename-old-dir", 0700) == 0 && chdir("rename-old-dir") == 0, "rename current directory setup");
+        create_file("retained.txt", "cwd preserved\n");
+        require(syscall(SYS_rename, "../rename-old-dir", "../rename-new-dir") == 0, "legacy rename moves cwd");
+        char expected[4096], actual[4096];
+        int count = snprintf(expected, sizeof(expected), "%s/rename-new-dir", work);
+        require(count > 0 && (size_t)count < sizeof(expected) && getcwd(actual, sizeof(actual)) &&
+                strcmp(expected, actual) == 0, "renamed cwd remains correct in guest namespace");
+        exact_file("retained.txt", "cwd preserved\n");
+        require(chdir(work) == 0, "restore work after renamed cwd");
+        int directory = open(".", O_RDONLY | O_DIRECTORY | O_CLOEXEC);
+        require(directory >= 0 && fsync(directory) == 0 && close(directory) == 0, "rename directory durability");
+    }
+    exact_file("rename-target", "new committed inode\n");
+    exact_file("rename-link-source-target", "link destination unchanged\n");
+    exact_file("rename-new-dir/retained.txt", "cwd preserved\n");
+    char target[64]; ssize_t length = readlink("rename-link", target, sizeof(target));
+    require(length == (ssize_t)strlen("rename-link-source-target") &&
+            !memcmp(target, "rename-link-source-target", (size_t)length), "renamed symlink persisted unchanged");
+    printf("ESTERIA_ANDROID_RENAME_PROBE legacy=1 atomicReplace=1 oldDescriptor=1 missingSourceErrno=1 symlink=1 cwd=1 persistence=%s\n",
+           writing ? "write" : "verify");
+}
 int main(int argc, char **argv) {
     alarm(20); /* Bound a failed socket/child fixture even if the host misses it. */
     if (argc == 4 && strcmp(argv[1], "--child") == 0) return child(argv[2], argv[3]);
     require(argc == 5, "usage: probe WORK PLUGIN GLIBC write|verify");
     require(strcmp(gnu_get_libc_version(), argv[3]) == 0, "parent glibc version");
     require(strcmp(argv[4], "write") == 0 || strcmp(argv[4], "verify") == 0, "persistence mode");
+    rename_check(argv[1], strcmp(argv[4], "write") == 0);
     void *library = dlopen(argv[2], RTLD_NOW | RTLD_LOCAL);
     require(library != NULL, "dlopen");
     tls_function function = (tls_function)dlsym(library, "esteria_probe_tls");

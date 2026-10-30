@@ -192,7 +192,8 @@ public final class ProotExecutionTest {
                 environment,work,run.resolve("stdout.log"),run.resolve("stderr.log")),null);
             try { await(child); }
             finally { if(child.isAlive())try{child.stop(Duration.ZERO);}catch(IOException forced){ /* Original assertion remains failure. */ } }
-            String expected="ESTERIA_ANDROID_GLIBC_PROBE glibc=2.36 dlopen=1 tls=1 fork=1 exec=1 loopback=1 persistence="+mode+" childExit=17\n";
+            String expected="ESTERIA_ANDROID_RENAME_PROBE legacy=1 atomicReplace=1 oldDescriptor=1 missingSourceErrno=1 symlink=1 cwd=1 persistence="+mode+"\n"
+                +"ESTERIA_ANDROID_GLIBC_PROBE glibc=2.36 dlopen=1 tls=1 fork=1 exec=1 loopback=1 persistence="+mode+" childExit=17\n";
             assertEquals("Actual guest marker and counts",expected,read(run.resolve("stdout.log")));
             assertEquals(expected.getBytes(StandardCharsets.UTF_8).length,child.diagnostics()[0]);
             assertEquals("esteria-local-runtime-persistence\n",read(work.resolve("persistent-probe.txt")));
@@ -205,6 +206,7 @@ public final class ProotExecutionTest {
             .put("sourceRevision",BuildConfig.SOURCE_REVISION).put("fingerprint",Build.FINGERPRINT).put("api",Build.VERSION.SDK_INT)
             .put("targetSdk",context.getApplicationInfo().targetSdkVersion).put("abi","x86_64").put("glibcVersion","2.36")
             .put("guestLaunches",8).put("guestChildExit",17).put("buildEvidence",build)
+            .put("legacyRenameReplacementVerified",true).put("renamePersistenceVerified",true)
             .put("androidProotExecuted",true).put("privateElfLoaderExecuted",true).put("directPrivateBionicExecRejected",true)
             .put("dynamicLibraryAndTlsVerified",true).put("forkExecLoopbackVerified",true).put("relaunchPersistenceVerified",true)
             .put("androidTracerDeathQualified",true).put("pidfdIdentityVerified",true).put("controlSurvivors",3).put("patchedSurvivors",0)

@@ -16,6 +16,7 @@ PACKAGE='io.github.russianranger.esteria'
 SCOPE='android-13-x86_64-proot-glibc-execution'
 FLAGS=('androidProotExecuted','privateElfLoaderExecuted','directPrivateBionicExecRejected',
        'dynamicLibraryAndTlsVerified','forkExecLoopbackVerified','relaunchPersistenceVerified',
+       'legacyRenameReplacementVerified','renamePersistenceVerified',
        'androidTracerDeathQualified','pidfdIdentityVerified','gracefulGuestStopVerified','userSpaceWaitArmed',
        'androidOwnerProcessDeathQualified','ownerDeathControlTracerSurvived','ownerDeathProtectedTracerExited')
 
