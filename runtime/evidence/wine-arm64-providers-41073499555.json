@@ -1,0 +1,927 @@
+{
+  "actualAuthenticatedX11": {
+    "androidQualified": false,
+    "authentication": {
+      "actualApplicationFormatterExecuted": true,
+      "display": 64,
+      "hostJavaExecutables": {
+        "java": {
+          "bytes": 70704,
+          "sha256": "185fdd3e40d7736c600cb948403f77fd3421e8877e2ff13271673f28a501531f"
+        },
+        "javac": {
+          "bytes": 70736,
+          "sha256": "3d0a318a9c874cacbd69a6ac51c3c6fe95eee6e6558c8a3f3ef1711746b6ef00"
+        }
+      },
+      "privateCookiesExported": false,
+      "sources": {
+        "core/src/main/java/io/github/russianranger/esteria/core/presentation/X11SessionPlan.java": {
+          "bytes": 2458,
+          "sha256": "6f5a912fd4a067f3d8820c4818502a3b3d7d12f2ab62b991a7023bfaa9d990a0"
+        },
+        "tests/fixtures/X11AuthorityFixture.java": {
+          "bytes": 2225,
+          "sha256": "ee6f94afc0d77854bdcfb0cb112fa6c77b999ae5ad94d725f116dee3975e0d08"
+        }
+      }
+    },
+    "binaries": {
+      "bridgeReceiptSha256": "9a44c3edfd19ca5aa2e320bfd9841f2b92fef3dab83b046a75477c2a310a405e",
+      "helper": {
+        "architecture": "arm64",
+        "bytes": 73392,
+        "interpreter": "/lib/ld-linux-aarch64.so.1",
+        "maxGlibc": "2.34",
+        "needed": [
+          "ld-linux-aarch64.so.1",
+          "libX11.so.6",
+          "libXext.so.6",
+          "libc.so.6"
+        ],
+        "sha256": "1402acc34f52e33177d9bef1b57b46532d192a5ac3b2eb0675973c80e6b0a014"
+      },
+      "inputLockSha256": "241729a2da2c6e88df431c9d68f00e37873c0616d81981a354e12b58046384e9",
+      "integrationRevision": "75f50445112818c97f8d8e575d2b1c21e59af6e5",
+      "observer": {
+        "architecture": "arm64",
+        "bytes": 72416,
+        "interpreter": "/lib/ld-linux-aarch64.so.1",
+        "maxGlibc": "2.34",
+        "needed": [
+          "libX11.so.6",
+          "libc.so.6"
+        ],
+        "sha256": "2f77b245183e2be268160588d11c98c62141207c9325feab1fc9b23d2ab0b691"
+      },
+      "observerReceiptSha256": "3613856028f1e4d4fc8c9ce73021bc63f36e53d2c940b378839d5f1d54005744"
+    },
+    "controllerQualified": false,
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "linuxArm64AuthenticatedX11InputQualified": true,
+    "linuxArm64X11InputQualified": true,
+    "namespaceExit": 0,
+    "processNamespaceExited": true,
+    "runtimeArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+    "runtimeLockSha256": "5816a07061c308a6a515d3747da2b7e3adfb8b22b6e6827819f590b1214fe04b",
+    "runtimeReceiptSha256": "f850e9a83b7d4cf243c2fb39da575385cbeadc5e759289d17912f612c2ed596a",
+    "scope": "native-linux-arm64-x11-input-fixture",
+    "wineClientExecuted": false,
+    "worker": {
+      "authenticatedServerCommand": true,
+      "displayExit": 0,
+      "displayForced": false,
+      "displayReady": true,
+      "displayStopped": true,
+      "expectedExit": 0,
+      "helperExit": 0,
+      "helperForced": false,
+      "helperReady": true,
+      "logStreamsDrained": true,
+      "logWritesSucceeded": true,
+      "logsWithinLimit": true,
+      "missingCookie": {
+        "exitCode": 3,
+        "listenerCreated": false,
+        "logDrained": true,
+        "readyMarker": false
+      },
+      "networkIsolated": true,
+      "observerExit": 0,
+      "observerReceipt": {
+        "absoluteMotion": true,
+        "acknowledgments": 15,
+        "androidQualified": false,
+        "buttons": true,
+        "controllerQualified": false,
+        "formatVersion": 1,
+        "gameplayQualified": false,
+        "groupsPassed": 7,
+        "keyboardAndShift": true,
+        "observedEvents": 16,
+        "reconnectNeutral": true,
+        "relativeMotion": true,
+        "releaseOnEof": true,
+        "scope": "native-linux-arm64-x11-input-fixture",
+        "unsupportedKeyRejected": true
+      },
+      "observerReceiptSha256": "6978f8b7264c314ab077a1f92034cd114f7ce15303b309fb00d5b4bfa82e94a0",
+      "positiveHelperReadyMarker": true,
+      "receiptValidated": true,
+      "socketRemoved": true,
+      "workerCompleted": true,
+      "wrongCookie": {
+        "exitCode": 3,
+        "listenerCreated": false,
+        "logDrained": true,
+        "readyMarker": false
+      }
+    },
+    "x11ElfImagesVerified": 49,
+    "x11RuntimeLockSha256": "828f3a7843f7073648e95fe52edfd69834ccb480073a42f52bf68b0b8f3d12e5"
+  },
+  "actualTurnipAndCompilerCandidateRuntime": {
+    "actualCandidateRuntimeIcdProbe": {
+      "androidQualified": false,
+      "buildReceiptSha256": "bf283d2674459fb0dbd2d5feb8452c86a3f2284f7234a78fd2b864818a788220",
+      "driver": {
+        "architecture": "arm64",
+        "bytes": 15957640,
+        "interpreter": [],
+        "maxGlibc": "2.34",
+        "maxGlibcxx": "3.4.29",
+        "needed": [
+          "libX11-xcb.so.1",
+          "libc.so.6",
+          "libexpat.so.1",
+          "libgcc_s.so.1",
+          "libm.so.6",
+          "libstdc++.so.6",
+          "libxcb-randr.so.0",
+          "libxcb-shm.so.0",
+          "libxcb-xfixes.so.0",
+          "libxcb.so.1",
+          "libz.so.1",
+          "libzstd.so.1"
+        ],
+        "sha256": "a373ecc89b6c5bcb53f117c52328389891902fe56b71c3195af888717a003b58"
+      },
+      "formatVersion": 1,
+      "gameplayQualified": false,
+      "hardwareQualified": false,
+      "probe": {
+        "architecture": "arm64",
+        "bytes": 74368,
+        "interpreter": [
+          "/lib/ld-linux-aarch64.so.1"
+        ],
+        "maxGlibc": "2.34",
+        "maxGlibcxx": null,
+        "needed": [
+          "libc.so.6",
+          "libvulkan.so.1"
+        ],
+        "sha256": "f8786b9906a2e9753eaa73d75de849d2fc31872d5781ee73821c3cd9f2476f92"
+      },
+      "qualified": true,
+      "receipt": {
+        "androidQualified": false,
+        "deviceId": 0,
+        "deviceName": "",
+        "directIcdNoDevicesVerified": true,
+        "formatVersion": 2,
+        "gameplayQualified": false,
+        "icdLoaded": true,
+        "loaderEnumerationResult": -3,
+        "noKgslHostVerified": true,
+        "pixelsVerified": 0,
+        "scope": "linux-arm64-turnip-kgsl-component-probe",
+        "turnip740ShaderReadbackQualified": false,
+        "vendorId": 0,
+        "x11PresentationQualified": false
+      },
+      "scope": "pinned-linux-arm64-turnip-probe",
+      "sourceRevision": "75f50445112818c97f8d8e575d2b1c21e59af6e5",
+      "x11PresentationQualified": false
+    },
+    "actualCandidateRuntimeShaderCompiler": {
+      "androidQualified": false,
+      "formatVersion": 1,
+      "gameAssetShadersQualified": false,
+      "gameplayQualified": false,
+      "invalidGlslRejected": true,
+      "invalidSpirvRejected": true,
+      "qualified": true,
+      "scope": "native-linux-arm64-shader-tools-only",
+      "spirvDisassembled": true,
+      "spirvValidated": true,
+      "validGlslCompiled": true,
+      "validSpirvSha256": "81a2caac921b3a622ab9fa6c58928bc61e1805c2eb0bfd933a06266fa07f6a0e"
+    },
+    "androidQualified": false,
+    "compiledReceipt": {
+      "androidQualified": false,
+      "binaries": {
+        "bin/esteria-turnip-probe": {
+          "architecture": "arm64",
+          "bytes": 74368,
+          "interpreter": [
+            "/lib/ld-linux-aarch64.so.1"
+          ],
+          "maxGlibc": "2.34",
+          "maxGlibcxx": null,
+          "needed": [
+            "libc.so.6",
+            "libvulkan.so.1"
+          ],
+          "sha256": "f8786b9906a2e9753eaa73d75de849d2fc31872d5781ee73821c3cd9f2476f92"
+        },
+        "bin/glslangValidator": {
+          "architecture": "arm64",
+          "bytes": 8234112,
+          "interpreter": [
+            "/lib/ld-linux-aarch64.so.1"
+          ],
+          "maxGlibc": "2.34",
+          "maxGlibcxx": "3.4.29",
+          "needed": [
+            "libc.so.6",
+            "libm.so.6",
+            "libstdc++.so.6"
+          ],
+          "sha256": "279cb8d922fa71319e12eb63b46a1c6f80938d07747cec73326ec64928a044fc"
+        },
+        "bin/spirv-val": {
+          "architecture": "arm64",
+          "bytes": 1935648,
+          "interpreter": [
+            "/lib/ld-linux-aarch64.so.1"
+          ],
+          "maxGlibc": "2.34",
+          "maxGlibcxx": "3.4.29",
+          "needed": [
+            "libc.so.6",
+            "libstdc++.so.6"
+          ],
+          "sha256": "d15718f68eea0d17bdc1ded9bfb85b9e43d5a519308c245ff32e86efadeb7ae4"
+        },
+        "lib/libvulkan_freedreno.so": {
+          "architecture": "arm64",
+          "bytes": 15957640,
+          "interpreter": [],
+          "maxGlibc": "2.34",
+          "maxGlibcxx": "3.4.29",
+          "needed": [
+            "libX11-xcb.so.1",
+            "libc.so.6",
+            "libexpat.so.1",
+            "libgcc_s.so.1",
+            "libm.so.6",
+            "libstdc++.so.6",
+            "libxcb-randr.so.0",
+            "libxcb-shm.so.0",
+            "libxcb-xfixes.so.0",
+            "libxcb.so.1",
+            "libz.so.1",
+            "libzstd.so.1"
+          ],
+          "sha256": "a373ecc89b6c5bcb53f117c52328389891902fe56b71c3195af888717a003b58"
+        }
+      },
+      "compiled": true,
+      "formatVersion": 1,
+      "gameplayQualified": false,
+      "hardwareQualified": false,
+      "inputLockSha256": "f92f119d657feaa7548e84196d20c59a9050b91a62f171de8249b75e23a8645f",
+      "integrationRevision": "75f50445112818c97f8d8e575d2b1c21e59af6e5",
+      "mesonOptions": {
+        "allow-broken-lto": false,
+        "allow-fallback-for": [
+          "perfetto"
+        ],
+        "allow-kcmp": "auto",
+        "amd-use-llvm": true,
+        "amdgpu-virtio": false,
+        "android-libbacktrace": "auto",
+        "android-libperfetto": "auto",
+        "android-strict": true,
+        "android-stub": false,
+        "auto_features": "auto",
+        "b_asneeded": true,
+        "b_colorout": "always",
+        "b_coverage": false,
+        "b_lto": false,
+        "b_lto_threads": 0,
+        "b_lundef": true,
+        "b_ndebug": "if-release",
+        "b_pch": true,
+        "b_pgo": "off",
+        "b_pie": false,
+        "b_sanitize": "none",
+        "b_staticpic": true,
+        "backend": "ninja",
+        "backend_max_links": 0,
+        "bindir": "bin",
+        "build-aco-tests": false,
+        "build-radv-tests": false,
+        "build-tests": false,
+        "build.c_args": [],
+        "build.c_link_args": [],
+        "build.c_std": "c11",
+        "build.cmake_prefix_path": [],
+        "build.cpp_args": [],
+        "build.cpp_debugstl": false,
+        "build.cpp_eh": "default",
+        "build.cpp_link_args": [],
+        "build.cpp_rtti": true,
+        "build.cpp_std": "c++17",
+        "build.pkg_config_path": [],
+        "buildtype": "release",
+        "c_args": [],
+        "c_link_args": [],
+        "c_std": "c11",
+        "cmake_prefix_path": [],
+        "cpp_args": [],
+        "cpp_debugstl": false,
+        "cpp_eh": "default",
+        "cpp_link_args": [],
+        "cpp_rtti": true,
+        "cpp_std": "c++17",
+        "custom-shader-replacement": "",
+        "d3d-drivers-path": "",
+        "datadir": "share",
+        "datasources": [
+          "auto"
+        ],
+        "debug": false,
+        "default_both_libraries": "shared",
+        "default_library": "shared",
+        "display-info": "auto",
+        "draw-use-llvm": false,
+        "dri-drivers-path": "",
+        "egl": "disabled",
+        "egl-lib-suffix": "",
+        "egl-native-platform": "auto",
+        "enable-glcpp-tests": true,
+        "errorlogs": true,
+        "execmem": true,
+        "expat": "auto",
+        "force_fallback_for": [],
+        "freedreno-kmds": [
+          "kgsl"
+        ],
+        "gallium-d3d10-dll-name": "libgallium_d3d10",
+        "gallium-d3d10umd": false,
+        "gallium-d3d12-graphics": "auto",
+        "gallium-d3d12-video": "auto",
+        "gallium-drivers": [],
+        "gallium-extra-hud": false,
+        "gallium-mediafoundation": "auto",
+        "gallium-mediafoundation-test": false,
+        "gallium-rusticl": false,
+        "gallium-rusticl-enable-drivers": [
+          "auto"
+        ],
+        "gallium-va": "auto",
+        "gallium-wgl-dll-name": "libgallium_wgl",
+        "gbm": "disabled",
+        "gbm-backends-path": "",
+        "genvslite": "vs2022",
+        "gles-lib-suffix": "",
+        "gles1": "disabled",
+        "gles2": "disabled",
+        "glvnd": "auto",
+        "glvnd-vendor-name": "mesa",
+        "glx": "disabled",
+        "glx-direct": true,
+        "glx-read-only-text": false,
+        "gpuvis": false,
+        "html-docs": "disabled",
+        "html-docs-path": "",
+        "imagination-srv": false,
+        "imagination-uscgen-devices": [],
+        "includedir": "include",
+        "infodir": "share/info",
+        "install-intel-gpu-tests": false,
+        "install-mesa-clc": false,
+        "install-precomp-compiler": false,
+        "install_umask": 18,
+        "intel-elk": true,
+        "intel-rt": "auto",
+        "intel-virtio-experimental": false,
+        "layout": "mirror",
+        "legacy-wayland": [],
+        "legacy-x11": [],
+        "libdir": "lib",
+        "libexecdir": "libexec",
+        "libgbm-external": false,
+        "libunwind": "disabled",
+        "licensedir": "",
+        "llvm": "disabled",
+        "llvm-orcjit": false,
+        "lmsensors": "auto",
+        "localedir": "share/locale",
+        "localstatedir": "var",
+        "mandir": "share/man",
+        "mediafoundation-codecs": [
+          "all"
+        ],
+        "mediafoundation-store-dll": false,
+        "mesa-clc": "auto",
+        "mesa-clc-bundle-headers": "auto",
+        "microsoft-clc": "auto",
+        "min-windows-version": 8,
+        "moltenvk-dir": "",
+        "opengl": false,
+        "optimization": "3",
+        "perfetto": false,
+        "pkg_config_path": [],
+        "pkgconfig.relocatable": false,
+        "platform-sdk-version": 35,
+        "platforms": [
+          "x11"
+        ],
+        "power8": "auto",
+        "precomp-compiler": "auto",
+        "prefer_static": false,
+        "prefix": "/esteria-turnip",
+        "python.allow_limited_api": true,
+        "python.bytecompile": 0,
+        "python.install_env": "prefix",
+        "python.platlibdir": "",
+        "python.purelibdir": "",
+        "radeonsi-build-id": "",
+        "radv-build-id": "",
+        "sbindir": "sbin",
+        "selinux": true,
+        "shader-cache": "enabled",
+        "shader-cache-default": true,
+        "shader-cache-max-size": "",
+        "shared-glapi": "auto",
+        "shared-llvm": "auto",
+        "sharedstatedir": "com",
+        "spirv-to-dxil": false,
+        "spirv-tools": "auto",
+        "split-debug": "disabled",
+        "sse2": true,
+        "static-libclc": [],
+        "stdsplit": true,
+        "strip": false,
+        "sysconfdir": "etc",
+        "sysprof": false,
+        "teflon": false,
+        "tools": [],
+        "unity": "off",
+        "unity_size": 4,
+        "unversion-libgallium": false,
+        "va-libs-path": "",
+        "valgrind": "disabled",
+        "video-codecs": [],
+        "virtgpu_kumquat": false,
+        "vmware-mks-stats": false,
+        "vsenv": false,
+        "vulkan-beta": false,
+        "vulkan-drivers": [
+          "freedreno"
+        ],
+        "vulkan-icd-dir": "",
+        "vulkan-layers": [],
+        "vulkan-manifest-per-architecture": true,
+        "warning_level": "1",
+        "werror": false,
+        "wrap_mode": "nofallback",
+        "xlib-lease": "disabled",
+        "xmlconfig": "enabled",
+        "zlib": "enabled",
+        "zstd": "enabled"
+      },
+      "noticeInventoryScope": "source-build-notices-before-integration-license",
+      "notices": {
+        "notices/GLSLANG-LICENSE.txt": {
+          "bytes": 54705,
+          "sha256": "adb783e734e906d1f46db5df29991dbde84bdb0ceab502ac2febb44fe3c2b5f4"
+        },
+        "notices/MESA-LICENSE.rst": {
+          "bytes": 1816,
+          "sha256": "0d1a0472ecc81830e75c20d59b0ea02841e3db21255e0ebad97ab682c54d6615"
+        },
+        "notices/MESA-licenses/Apache-2.0": {
+          "bytes": 10045,
+          "sha256": "7e4d3fba250d15e9e0afa380d4b611828fa2560cc8fdebe95bcf2f01a487de12"
+        },
+        "notices/MESA-licenses/BSL-1.0": {
+          "bytes": 1649,
+          "sha256": "9b9fea7520a816107fcac2598b7c0155222f16bc430e989706b22f4367f1df7d"
+        },
+        "notices/MESA-licenses/GPL-1.0-or-later": {
+          "bytes": 13047,
+          "sha256": "8ff76f1528e6e4e9400c0f6b1f2d19d4979aaac3bcc44bb707a55389132825c4"
+        },
+        "notices/MESA-licenses/GPL-2.0-only": {
+          "bytes": 18424,
+          "sha256": "6667ad4063569cd53b13500550d93fcd3dc11bcf82c5514296af013a0b720ba5"
+        },
+        "notices/MESA-licenses/MIT": {
+          "bytes": 1372,
+          "sha256": "323c587d0ccf10e376f8bf9a7f31fb4ca6078105194b42e0b1e0ee2bc9bde71f"
+        },
+        "notices/MESA-licenses/SGI-B-2.0": {
+          "bytes": 1822,
+          "sha256": "686bf035a1fd22076416fd3b90370ac67771e884bf57f55693d51f8ce7c710a7"
+        },
+        "notices/MESA-licenses/exceptions/Linux-Syscall-Note": {
+          "bytes": 1257,
+          "sha256": "9b4084655174654608fd037e9ddb4feeadfada01cd042e9c17b05aa7105b2b9f"
+        },
+        "notices/MESON-COPYING": {
+          "bytes": 11358,
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        },
+        "notices/SPIRV-HEADERS-LICENSE": {
+          "bytes": 4812,
+          "sha256": "ff04ae7e6a468587fe59434fee2e67c0e2a749b592c794b764ff80f30b94a084"
+        },
+        "notices/SPIRV-TOOLS-LICENSE": {
+          "bytes": 11358,
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        },
+        "notices/binutils-copyright": {
+          "bytes": 1795,
+          "sha256": "a81bdd422c2c015deca84bf6ad249bf0d7d19885fc01d1894463291b0b7313e1"
+        },
+        "notices/bison-copyright": {
+          "bytes": 776,
+          "sha256": "0870e455b94b9043e84948624d3368d9a45d10674ae4398762b99bb2c328dffd"
+        },
+        "notices/cmake-copyright": {
+          "bytes": 29578,
+          "sha256": "b70ca2018b7fd516ac9b9953678c1a9733eb9e15f3cfbe9b26c137ef0dbd5782"
+        },
+        "notices/flex-copyright": {
+          "bytes": 25695,
+          "sha256": "908e7be25f1d5848fc378b76bdbaed59f3d1e19ae61fdeb9d1ad12640bf0e078"
+        },
+        "notices/g++-12-copyright": {
+          "bytes": 68194,
+          "sha256": "da8191658b3452ce9caf31638ba61dab31a38c619fa39df119812e050f592fd3"
+        },
+        "notices/g++-copyright": {
+          "bytes": 2196,
+          "sha256": "156004744edbf17a975f0004ac4a9295b160ab403d646c445235711255ca9ff8"
+        },
+        "notices/gcc-12-copyright": {
+          "bytes": 68194,
+          "sha256": "da8191658b3452ce9caf31638ba61dab31a38c619fa39df119812e050f592fd3"
+        },
+        "notices/gcc-copyright": {
+          "bytes": 2196,
+          "sha256": "156004744edbf17a975f0004ac4a9295b160ab403d646c445235711255ca9ff8"
+        },
+        "notices/libc6-copyright": {
+          "bytes": 25467,
+          "sha256": "40c7e1f2118531f038ca22999bd976901254e1bc5cd1b0f0211bdd064c599987"
+        },
+        "notices/libc6-dev-copyright": {
+          "bytes": 25467,
+          "sha256": "40c7e1f2118531f038ca22999bd976901254e1bc5cd1b0f0211bdd064c599987"
+        },
+        "notices/libexpat1-dev-copyright": {
+          "bytes": 1756,
+          "sha256": "60919fe1a156395ff14511bb6ff79756c50ade2fff59ac60c9bae1d8a7fe6292"
+        },
+        "notices/libstdc++-12-dev-copyright": {
+          "bytes": 68194,
+          "sha256": "da8191658b3452ce9caf31638ba61dab31a38c619fa39df119812e050f592fd3"
+        },
+        "notices/libvulkan-dev-copyright": {
+          "bytes": 1964,
+          "sha256": "c579213e28f67944a7e407816b8a8e1d2d2406b3d820e420aa923807c450dc07"
+        },
+        "notices/libvulkan1-copyright": {
+          "bytes": 1964,
+          "sha256": "c579213e28f67944a7e407816b8a8e1d2d2406b3d820e420aa923807c450dc07"
+        },
+        "notices/libx11-dev-copyright": {
+          "bytes": 47102,
+          "sha256": "0b380a7fd5b2228f26e9585e56f14812efd3350f3df307507d2bc055dfd8de3e"
+        },
+        "notices/libx11-xcb-dev-copyright": {
+          "bytes": 47102,
+          "sha256": "0b380a7fd5b2228f26e9585e56f14812efd3350f3df307507d2bc055dfd8de3e"
+        },
+        "notices/libxcb-dri3-dev-copyright": {
+          "bytes": 1781,
+          "sha256": "4f7cb9db6bf6542f5417e3d674c780d3a5fd12291a54d63054fb576ee0cfae80"
+        },
+        "notices/libxcb-present-dev-copyright": {
+          "bytes": 1781,
+          "sha256": "4f7cb9db6bf6542f5417e3d674c780d3a5fd12291a54d63054fb576ee0cfae80"
+        },
+        "notices/libxcb-randr0-dev-copyright": {
+          "bytes": 1781,
+          "sha256": "4f7cb9db6bf6542f5417e3d674c780d3a5fd12291a54d63054fb576ee0cfae80"
+        },
+        "notices/libxcb-shm0-dev-copyright": {
+          "bytes": 1781,
+          "sha256": "4f7cb9db6bf6542f5417e3d674c780d3a5fd12291a54d63054fb576ee0cfae80"
+        },
+        "notices/libxcb-sync-dev-copyright": {
+          "bytes": 1781,
+          "sha256": "4f7cb9db6bf6542f5417e3d674c780d3a5fd12291a54d63054fb576ee0cfae80"
+        },
+        "notices/libxcb-xfixes0-dev-copyright": {
+          "bytes": 1781,
+          "sha256": "4f7cb9db6bf6542f5417e3d674c780d3a5fd12291a54d63054fb576ee0cfae80"
+        },
+        "notices/libxcb1-dev-copyright": {
+          "bytes": 1781,
+          "sha256": "4f7cb9db6bf6542f5417e3d674c780d3a5fd12291a54d63054fb576ee0cfae80"
+        },
+        "notices/libxshmfence-dev-copyright": {
+          "bytes": 1215,
+          "sha256": "6a76b32c9174c0cb9e3d94c323a14d33d6a42bd2a61579b189cbc5addeb94abe"
+        },
+        "notices/libzstd-dev-copyright": {
+          "bytes": 5389,
+          "sha256": "35e85e8e9bbb71492c5f5dddf39ed65b68775a02ad8d710c25d097b497f06c49"
+        },
+        "notices/make-copyright": {
+          "bytes": 2093,
+          "sha256": "16deb73e706ec72758ce5e079a80d1aab17f3834449da9b718c4a4b60eb1f6ec"
+        },
+        "notices/ninja-build-copyright": {
+          "bytes": 1350,
+          "sha256": "1134fe05b5a52ce2a81fb233e421655bb45e5f5db74164478ea85343baf52b86"
+        },
+        "notices/pkg-config-copyright": {
+          "bytes": 7501,
+          "sha256": "676c75e54ff7e3b9892940fbf1b31763cb6f2a6527a5607a3640ac59a2441fba"
+        },
+        "notices/python3-copyright": {
+          "bytes": 16122,
+          "sha256": "5b274dbb44b28a54b795b9471c07ab045054d6b8a86273cb9feb632b6fd2760d"
+        },
+        "notices/python3-mako-copyright": {
+          "bytes": 3740,
+          "sha256": "536a6333473d40687bf8c46a5fbbd84c398ae5f69f53519ad680514651442072"
+        },
+        "notices/python3-packaging-copyright": {
+          "bytes": 2444,
+          "sha256": "51fe4bbadf841c4e4d02ad97ba375bcde0ae11a51da62ae16fdcbe723d3cdad2"
+        },
+        "notices/python3-yaml-copyright": {
+          "bytes": 1484,
+          "sha256": "26fdc211f61903eb5d63aef0be53269c9362fb7c0a944eb87001a935ac6e8e51"
+        },
+        "notices/zlib1g-dev-copyright": {
+          "bytes": 2927,
+          "sha256": "9e5b96d63773a5d177ba264254390f792be07e41748ebd94730981c6cac31cc6"
+        }
+      },
+      "probeShaders": {
+        "frag": {
+          "bytes": 380,
+          "sha256": "cdf99264aa0f821592fcb00998ca0fe3777f8aa67eccf7869dbf0cd8e7036f1c"
+        },
+        "vert": {
+          "bytes": 1088,
+          "sha256": "9b8d9fe6800142435463d409052692822be6a2af096490ff9dd5a6111c1511b4"
+        }
+      },
+      "recipeSources": {
+        ".dockerignore": {
+          "bytes": 18,
+          "sha256": "05cc6ae53cfd6129f1d7010aa874c6cf0a6019b1adfeff3f4fab27f2d04f43ca"
+        },
+        "ANDROID-PACKAGING.md": {
+          "bytes": 5162,
+          "sha256": "82b9a64f548bfcc52c8c9f6d10b2b90a79f3734eee3fc003f4e1044791fcc248"
+        },
+        "Dockerfile": {
+          "bytes": 1086,
+          "sha256": "a89cfdfd358fc718218b6b12a7feb64fdd7f45c58593ea01585425b7ef928f09"
+        },
+        "README.md": {
+          "bytes": 7288,
+          "sha256": "47f0e2b9dddd692e39c3f99d5ed114b1dcf016b8f2ad8f751da0749931274b36"
+        },
+        "android-provider.lock.json": {
+          "bytes": 16051,
+          "sha256": "a2999f5172d139ea37cec712662ffc17303cb2d78d8356095c11c8f671f887d4"
+        },
+        "build.sh": {
+          "bytes": 2320,
+          "sha256": "9866ef7e9fd8dae6a5079b37e8232c864114f4b88542754e48fafa6c4d5e444a"
+        },
+        "debian.sources": {
+          "bytes": 434,
+          "sha256": "8e8f7c4f33e39696a188e01bb6e385daf17a006eb573bc84af073ebcc4fc9f65"
+        },
+        "fetch_sources.py": {
+          "bytes": 5418,
+          "sha256": "90f7b5a750391599911d8b69cb0681c346e549f2013cf799641949c757acd3f9"
+        },
+        "inrelease.SHA256SUMS": {
+          "bytes": 455,
+          "sha256": "2acec858821beef422f424794c5577adf01ef084787ca42616c5cb78a72b1413"
+        },
+        "packages.txt": {
+          "bytes": 767,
+          "sha256": "89d0bec77bab06399ee57be1603d082521eebb903ad40fcf7b95e7c76e1a1f03"
+        },
+        "probe.c": {
+          "bytes": 17766,
+          "sha256": "2f071971b16f6eaacba9a9d95358ea28c782536a584f83147a8cff923fba9cbf"
+        },
+        "probe.frag": {
+          "bytes": 102,
+          "sha256": "ae5d45bff00d2287752eec77c055d454c5b8588e8720885a8bd1ff7f791830e1"
+        },
+        "probe.vert": {
+          "bytes": 155,
+          "sha256": "dd3b4afa79ffe81c1f6c1df03f671398c97b2bc9a7ea90dad2648769067067d3"
+        },
+        "qualify_shaders.py": {
+          "bytes": 2878,
+          "sha256": "fd39918a5223dd81519041323c0f06382947f39722d5a3db3917baeb6e16e41e"
+        },
+        "record_build.py": {
+          "bytes": 8959,
+          "sha256": "82b94f7ab1344e6026ee1524668b4abe1b8ea3e4212189952783bf13bc052e6d"
+        },
+        "run_probe.py": {
+          "bytes": 7186,
+          "sha256": "671d44f9aec71f13f303d745cf145fa8ac4deaccbefe8911ad2b610be90f35c6"
+        },
+        "sources.lock.json": {
+          "bytes": 43088,
+          "sha256": "f92f119d657feaa7548e84196d20c59a9050b91a62f171de8249b75e23a8645f"
+        }
+      },
+      "runtimeArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+      "scope": "linux-arm64-turnip-kgsl-build-only",
+      "selectedPackages": {
+        "binutils": "2.40-2",
+        "bison": "2:3.8.2+dfsg-1+b1",
+        "cmake": "3.25.1-1",
+        "flex": "2.6.4-8.2",
+        "g++": "4:12.2.0-3",
+        "g++-12": "12.2.0-14+deb12u1",
+        "gcc": "4:12.2.0-3",
+        "gcc-12": "12.2.0-14+deb12u1",
+        "libc6": "2.36-9+deb12u14",
+        "libc6-dev": "2.36-9+deb12u14",
+        "libexpat1-dev": "2.5.0-1+deb12u5",
+        "libstdc++-12-dev": "12.2.0-14+deb12u1",
+        "libvulkan-dev": "1.3.239.0-1",
+        "libvulkan1": "1.3.239.0-1",
+        "libx11-dev": "2:1.8.4-2+deb12u2",
+        "libx11-xcb-dev": "2:1.8.4-2+deb12u2",
+        "libxcb-dri3-dev": "1.15-1",
+        "libxcb-present-dev": "1.15-1",
+        "libxcb-randr0-dev": "1.15-1",
+        "libxcb-shm0-dev": "1.15-1",
+        "libxcb-sync-dev": "1.15-1",
+        "libxcb-xfixes0-dev": "1.15-1",
+        "libxcb1-dev": "1.15-1",
+        "libxshmfence-dev": "1.3-1",
+        "libzstd-dev": "1.5.4+dfsg2-5",
+        "make": "4.3-4.1",
+        "ninja-build": "1.11.1-2~deb12u1",
+        "pkg-config": "1.8.1-1",
+        "python3": "3.11.2-1+b1",
+        "python3-mako": "1.2.4+ds-1",
+        "python3-packaging": "23.0-1",
+        "python3-yaml": "6.0-3+b2",
+        "zlib1g-dev": "1:1.2.13.dfsg-1"
+      },
+      "shaderToolEvidence": {
+        "bytes": 431,
+        "result": {
+          "androidQualified": false,
+          "formatVersion": 1,
+          "gameAssetShadersQualified": false,
+          "gameplayQualified": false,
+          "invalidGlslRejected": true,
+          "invalidSpirvRejected": true,
+          "qualified": true,
+          "scope": "native-linux-arm64-shader-tools-only",
+          "spirvDisassembled": true,
+          "spirvValidated": true,
+          "validGlslCompiled": true,
+          "validSpirvSha256": "81a2caac921b3a622ab9fa6c58928bc61e1805c2eb0bfd933a06266fa07f6a0e"
+        },
+        "sha256": "95a25f419d3f73bb1ba6b6ce31551eaa8524939de25d8d5a69106fe3a463d213"
+      },
+      "upstream": {
+        "glslang": {
+          "bytes": 3858944,
+          "file": "glslang-14.3.0.tar.gz",
+          "prefix": "glslang-fa9c3deb49e035a8abcabe366f26aac010f6cbfb",
+          "revision": "fa9c3deb49e035a8abcabe366f26aac010f6cbfb",
+          "sha256": "dc52424b8d3b302038068537084dfc557c870a9bfaec77c1ee025bba38148177",
+          "url": "https://codeload.github.com/KhronosGroup/glslang/tar.gz/fa9c3deb49e035a8abcabe366f26aac010f6cbfb",
+          "version": "14.3.0"
+        },
+        "mesa": {
+          "bytes": 77677128,
+          "checksumSource": "https://docs.mesa3d.org/relnotes/26.1.4.html",
+          "file": "mesa-26.1.4.tar.xz",
+          "prefix": "mesa-26.1.4",
+          "sha256": "072705caa9adf4740f1489194b13e278ad959166863b5271fe423a86353c9ab6",
+          "url": "https://archive.mesa3d.org/mesa-26.1.4.tar.xz",
+          "version": "26.1.4"
+        },
+        "meson": {
+          "bytes": 4859848,
+          "file": "meson-1.7.2.tar.gz",
+          "prefix": "meson-082917b40c8416bde925c64d22a2e60b2c059120",
+          "revision": "082917b40c8416bde925c64d22a2e60b2c059120",
+          "sha256": "3ea1b5b69d4348c34e5148c8953f513b4369a234ef9342467da75667f283585a",
+          "url": "https://codeload.github.com/mesonbuild/meson/tar.gz/082917b40c8416bde925c64d22a2e60b2c059120",
+          "version": "1.7.2"
+        },
+        "spirv-headers": {
+          "bytes": 522013,
+          "file": "spirv-headers-2acb319af38d43be3ea76bfabf3998e5281d8d12.tar.gz",
+          "prefix": "SPIRV-Headers-2acb319af38d43be3ea76bfabf3998e5281d8d12",
+          "revision": "2acb319af38d43be3ea76bfabf3998e5281d8d12",
+          "sha256": "425da1e3e4ba8de41dc8c8273d281ae82f1e18a397ec476649df3c832e242329",
+          "url": "https://codeload.github.com/KhronosGroup/SPIRV-Headers/tar.gz/2acb319af38d43be3ea76bfabf3998e5281d8d12"
+        },
+        "spirv-tools": {
+          "bytes": 3173510,
+          "file": "spirv-tools-0cfe9e7219148716dfd30b37f4d21753f098707a.tar.gz",
+          "prefix": "SPIRV-Tools-0cfe9e7219148716dfd30b37f4d21753f098707a",
+          "revision": "0cfe9e7219148716dfd30b37f4d21753f098707a",
+          "sha256": "a5277538fec0868452b1f616553c2fca80939a6a3ee0b7322e21ff063750a482",
+          "url": "https://codeload.github.com/KhronosGroup/SPIRV-Tools/tar.gz/0cfe9e7219148716dfd30b37f4d21753f098707a"
+        }
+      },
+      "x11PresentationQualified": false
+    },
+    "gameplayQualified": false,
+    "productionProvidersRebound": false,
+    "runtimeArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+    "scope": "native-arm64-candidate-runtime-turnip-and-compiler-components-only"
+  },
+  "allRequestedNativeComponentGatesPassed": true,
+  "androidQualified": false,
+  "audibleOutputQualified": false,
+  "completeProviderRepackPendingSourceOnlyArtifact": true,
+  "conclusion": "success",
+  "evidenceArtifact": {
+    "bytes": 111241,
+    "id": 12986114342,
+    "sha256": "e43c57d3e7cbd866004be04c4161ae51a9f5700ba48d8b0db7c7b77f1f6ad204"
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "hardwareQualified": false,
+  "independentLocalReadback": {
+    "actualCandidateRuntimeNoGpuAndShaderReceiptsRevalidated": true,
+    "actualX11WorkerAndObserverReceiptsRevalidated": true,
+    "evidenceZipAndBothEntireOriginalProviderZipsReadBack": true,
+    "receipts": {
+      "turnip-runtime-validation.json": {
+        "bytes": 24828,
+        "sha256": "21d3f1034941f74600e653b58de39d2ecbbb2a203c4dbe95888abb254b0dff0b"
+      },
+      "x11/observer-receipt.json": {
+        "bytes": 422,
+        "sha256": "7130e1341e72ad5e317c80234a0890b1266a43c766f0079daa8bedc5935d5e89"
+      },
+      "x11/qualification.json": {
+        "bytes": 4039,
+        "sha256": "a405c5a628a6d28449dceb370b5aeccbcec4b0186f19ac5e2b3c76407eff7f73"
+      },
+      "x11/worker-result.json": {
+        "bytes": 1293,
+        "sha256": "e82522b1e8407280213829928e78bcc65b60a2e8d0d8058655df848accf4abb9"
+      }
+    }
+  },
+  "integrationRevision": "75f50445112818c97f8d8e575d2b1c21e59af6e5",
+  "originalBridgeArtifact": {
+    "bytes": 143760843,
+    "id": 12985639875,
+    "sha256": "2b326ecee4a3d90996818857f2847b21477f11492f53f5b372de5260588e5590"
+  },
+  "originalTurnipArtifact": {
+    "bytes": 269241367,
+    "id": 12986648082,
+    "sha256": "cd80feb7bece90f3c16a4a68365c63711eeec2ad10bfb487e78147090084776c"
+  },
+  "packagingSourceRecovery": {
+    "allOriginalMembersCopiedAndReadBackUnchanged": true,
+    "binariesRebuilt": false,
+    "originalFileAlreadyRetainedInsideIntegrationSourceTar": true,
+    "originalMemberBytes": 294123594,
+    "originalMembers": 166,
+    "restoredSource": {
+      "actualBuildReceipt": {
+        "bytes": 20904,
+        "sha256": "bf283d2674459fb0dbd2d5feb8452c86a3f2284f7234a78fd2b864818a788220"
+      },
+      "bytes": 18,
+      "gitBlob": "8d35cb3277ff6eb0d637147c09e95934604a431c",
+      "path": "turnip/corresponding-source/build-recipe/.dockerignore",
+      "retainedIntegrationArchive": {
+        "bytes": 6184960,
+        "path": "source-selection/integration-source.tar"
+      },
+      "sha256": "05cc6ae53cfd6129f1d7010aa874c6cf0a6019b1adfeff3f4fab27f2d04f43ca",
+      "sourcePath": "runtime/turnip/.dockerignore",
+      "sourceRevision": "75f50445112818c97f8d8e575d2b1c21e59af6e5"
+    },
+    "sourceOnlyCiArtifactRegistrationPending": true,
+    "strictProviderMeasurementRejectedMissingFile": true
+  },
+  "productionPinsChanged": false,
+  "repository": "Russianranger/esteria_android",
+  "runtimeArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+  "scope": "actual-native-linux-arm64-new-wine-x11-and-turnip-component-evidence",
+  "workflowJob": 124123439639,
+  "workflowRun": 41073499555
+}

@@ -55,7 +55,8 @@ def artifact_prefix(pin):
     prefix = pin.get('artifactPrefix', PREFIX)
     require(prefix in (PREFIX, 'turnip/'), 'turnip-artifact-prefix')
     if prefix != PREFIX:
-        require(pin['artifact'].get('workflowPath') == '.github/workflows/wine-arm64-provider-candidate.yml',
+        require(pin['artifact'].get('workflowPath') in ('.github/workflows/wine-arm64-provider-candidate.yml',
+                '.github/workflows/wine-arm64-provider-source-recovery.yml'),
                 'turnip-selected-artifact-workflow')
     return prefix
 

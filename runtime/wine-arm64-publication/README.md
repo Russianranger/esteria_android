@@ -52,3 +52,24 @@ replace assets, or change settings. After UI publication,
 `verify-published --release-lock ... --inputs out/wine-release --output NEW`
 produces a separate publication receipt. Preserve that receipt and the exact
 release lock beside the release; adoption remains a separate reviewed step.
+
+The actual final publication receipt now lives separately in
+`published-release.json`; the exact release-lock schema remains unchanged.
+Run41074190885 passed staging, upload-only draft validation and final public tag /
+all-11-asset byte readback. GitHub reports `immutable: false`; the publisher's
+no-overwrite policy is distinct from GitHub-enforced immutability.
+
+The public consumer avoids the 14-day Actions input lifetime:
+
+```sh
+python3 tools/fetch_wine_arm64_release.py \
+  --release-lock runtime/wine-arm64-publication/dependency-release.lock.json \
+  --publication-receipt runtime/wine-arm64-publication/published-release.json \
+  --output /fresh/public-wine-inputs
+```
+
+It checks the producer recipe against exact historical Git blobs, validates live
+tag/asset metadata and every complete public asset, then reads back the entire
+original source ZIP and source closure. Its output is compatible with the
+retained-runtime preparation path. The source-recovery workflow exercises this
+public consumer without an application token before future provider adoption.

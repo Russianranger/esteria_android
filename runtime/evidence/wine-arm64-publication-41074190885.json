@@ -1,0 +1,112 @@
+{
+  "allElevenStoredAssetsDownloadedAndHashedByFinalCiVerifier": true,
+  "androidQualified": false,
+  "entireOriginalSourceZipExtractedAndOriginalSourceClosureVerifiedByCi": true,
+  "finalPublicationReceipt": {
+    "bytes": 3527,
+    "sha256": "0cf34337c9f003ba92c6f5d81a9970feff4a8e2ea986605030ed6c49850f131f"
+  },
+  "finalReceiptArtifact": {
+    "bytes": 1132,
+    "id": 12986314092,
+    "sha256": "1176fb00838bc1baa1b6bbe8872d7597efd809fac2ac161a863c27fbcfbc6757"
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "githubImmutable": false,
+  "hardwareQualified": false,
+  "independentLocalReceiptZipReadBack": true,
+  "largeSourceZipDownloadedLocally": false,
+  "noNewBinaryBuild": true,
+  "originalProducerRevision": "681b2e9f30b19e94bf8e8de44f67fedba5033c8a",
+  "originalProducerWorkflowRun": 41057900330,
+  "packagingRecipeRevision": "75f50445112818c97f8d8e575d2b1c21e59af6e5",
+  "productionPinsChanged": false,
+  "publicApiTagAndAllAssetDigestsIndependentlyMatched": true,
+  "publicationIntegrationRevision": "f403a2868d3a3fdf9db2677506c87ac5c79a9f81",
+  "publicationJobs": [
+    {
+      "conclusion": "success",
+      "id": 124125867547,
+      "name": "validate"
+    },
+    {
+      "conclusion": "success",
+      "id": 124126894863,
+      "name": "upload-draft"
+    },
+    {
+      "conclusion": "success",
+      "id": 124128383737,
+      "name": "verify-publication"
+    }
+  ],
+  "publicationWorkflowRun": 41074190885,
+  "publishedAssets": {
+    "NOTICE.txt": {
+      "bytes": 921,
+      "sha256": "e69aced36b63f65cd98361d9bdeef883c56f846716b1dac04773610d6f93283f",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/NOTICE.txt"
+    },
+    "SHA256SUMS": {
+      "bytes": 883,
+      "sha256": "17fb320c10abe67161f67855391bdc4aa6985f2ef9bf5d87449cc33afd4e7987",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/SHA256SUMS"
+    },
+    "candidate-runtime.lock.json": {
+      "bytes": 102647,
+      "sha256": "5816a07061c308a6a515d3747da2b7e3adfb8b22b6e6827819f590b1214fe04b",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/candidate-runtime.lock.json"
+    },
+    "package-build-receipt.json": {
+      "bytes": 19890,
+      "sha256": "db0f3431aa47c20e41219201246c3f406f46598235e35c31d1f4b45577523f37",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/package-build-receipt.json"
+    },
+    "release-manifest.json": {
+      "bytes": 8980,
+      "sha256": "b354f9c944a729ea3420f26c8987b3e0b4d27f0af88463bb965d34c4bd82d99b",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/release-manifest.json"
+    },
+    "runtime-input.lock.json": {
+      "bytes": 2084,
+      "sha256": "e5fd2de4935cbf10372cc18c23dec387478867a624d984b568e09a4a0b0515c0",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/runtime-input.lock.json"
+    },
+    "runtime.json": {
+      "bytes": 66640,
+      "sha256": "4b731a5f450a556632c598ddebda2ec3f814c8d7ea2c9e1529d6c80c8773e0a5",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/runtime.json"
+    },
+    "sources.lock.json": {
+      "bytes": 18146,
+      "sha256": "077fb2b0883986338b6755e53f5cede08bd63ed1834783e7e6cd079e0ec0c16d",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/sources.lock.json"
+    },
+    "wine-arm64-corresponding-sources.zip": {
+      "bytes": 1681474721,
+      "sha256": "38e16617545abb16f995ba75a8b52b8ca2bacad5d2688adf3646911f16c8fb06",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/wine-arm64-corresponding-sources.zip"
+    },
+    "wine-arm64.manifest.json": {
+      "bytes": 66773,
+      "sha256": "d6c98cca860d324113c434cd0ccd1709e19e2dfac1a03b1f248b479f50303267",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/wine-arm64.manifest.json"
+    },
+    "wine-arm64.tar.gz": {
+      "bytes": 282628308,
+      "sha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/wine-arm64.tar.gz"
+    }
+  },
+  "publisherNeverOverwrites": true,
+  "releaseId": 429140832,
+  "releaseSelection": {
+    "bytes": 9204,
+    "sha256": "cf2f7ac0dd633cde9b273fa6b3886ef370ba3ac65bbdccb0884095b99df4b958"
+  },
+  "releaseUrl": "https://github.com/Russianranger/esteria_android/releases/tag/deps-wine-arm64-681b2e9-c0e13ed15a69",
+  "repository": "Russianranger/esteria_android",
+  "scope": "public-source-owned-arm64-wine-original-binary-and-source-publication",
+  "tag": "deps-wine-arm64-681b2e9-c0e13ed15a69"
+}

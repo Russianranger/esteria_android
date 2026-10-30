@@ -4,12 +4,29 @@ on:
   push:
     branches: [android/client-server]
     paths:
-      - runtime/wine-arm64-adoption/**
+      - runtime/wine-arm64-adoption/x11-runtime.lock.json
+      - native/guest-bridges/**
+      - native/guest-tests/**
+      - native/presentation/**
+      - runtime/bridges/Dockerfile
+      - runtime/bridges/capture_sources.py
+      - runtime/bridges/record_build.py
+      - runtime/bridges/record_x11_fixture.py
+      - runtime/bridges/sources.lock.json
+      - runtime/turnip/Dockerfile
+      - runtime/turnip/build.sh
+      - runtime/turnip/fetch_sources.py
+      - runtime/turnip/record_build.py
+      - runtime/turnip/run_probe.py
+      - runtime/turnip/qualify_shaders.py
+      - runtime/turnip/probe.c
+      - runtime/turnip/probe.vert
+      - runtime/turnip/probe.frag
+      - runtime/turnip/sources.lock.json
       - tools/prepare_wine_arm64_adoption.py
       - tools/measure_wine_x11_closure.py
       - tests/test_wine_adoption.py
       - tests/test_wine_x11_closure.py
-      - .github/workflows/wine-arm64-provider-candidate.yml
 permissions:
   contents: read
   actions: read
@@ -145,6 +162,7 @@ jobs:
           path: out/wine-provider-candidate/evidence
           retention-days: 14
           if-no-files-found: warn
+          include-hidden-files: true
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -154,6 +172,7 @@ jobs:
             out/wine-provider-candidate/source-selection
           retention-days: 14
           if-no-files-found: warn
+          include-hidden-files: true
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -163,3 +182,4 @@ jobs:
             out/wine-provider-candidate/source-selection
           retention-days: 14
           if-no-files-found: warn
+          include-hidden-files: true

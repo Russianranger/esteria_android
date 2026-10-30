@@ -1,0 +1,99 @@
+name: Recover exact retained Wine provider recipe source
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - tools/recover_wine_provider_sources.py
+      - tests/test_wine_source_recovery.py
+      - tools/fetch_wine_arm64_release.py
+      - tests/test_public_wine_inputs.py
+      - runtime/wine-arm64-publication/published-release.json
+      - .github/workflows/wine-arm64-provider-source-recovery.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: wine-arm64-provider-source-recovery-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  recover:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify source-only guards without executing or building a binary
+        run: |
+          python3 -m unittest tests.test_wine_source_recovery tests.test_wine_provider_measurement -v
+          git fetch --no-tags --depth 1 origin 75f50445112818c97f8d8e575d2b1c21e59af6e5
+          mkdir -p out/recovery-evidence
+      - name: Recover exact successful original artifact through supported read-only Actions API
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          from tools.release_server_dependencies import Github,API
+          from tools.measure_wine_provider_candidates import RUN,run_metadata,artifact_metadata
+          root=Path(os.environ['RUNNER_TEMP'])/'turnip-source-originals';root.mkdir()
+          api=Github(os.environ['GITHUB_TOKEN'])
+          run=api.json('/actions/runs/'+str(RUN));run_metadata(run)
+          row=api.json('/actions/artifacts/12986648082')
+          expected=dict(bytes=269241367,sha256='cd80feb7bece90f3c16a4a68365c63711eeec2ad10bfb487e78147090084776c')
+          assert row['size_in_bytes']==expected['bytes'] and row['digest']=='sha256:'+expected['sha256']
+          api.download(API+'/actions/artifacts/12986648082/zip',root/'turnip.zip',expected)
+          artifact_metadata('turnip',root/'turnip.zip',row)
+          for name,value in [('run.json',run),('artifact.json',row)]:
+            (root/name).write_text(json.dumps(value,indent=2)+'\n')
+          PY
+          python3 tools/recover_wine_provider_sources.py \
+            --run-metadata "$RUNNER_TEMP/turnip-source-originals/run.json" \
+            --artifact-metadata "$RUNNER_TEMP/turnip-source-originals/artifact.json" \
+            --original-zip "$RUNNER_TEMP/turnip-source-originals/turnip.zip" \
+            --output out/source-complete-provider \
+            > out/recovery-evidence/source-recovery-result.json
+          cp out/source-complete-provider/source-recovery.json out/recovery-evidence/
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: success()
+        with:
+          name: source-complete-native-arm64-new-wine-turnip-75f50445112818c97f8d8e575d2b1c21e59af6e5-${{ github.sha }}
+          path: out/source-complete-provider
+          include-hidden-files: true
+          retention-days: 14
+          if-no-files-found: error
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: wine-provider-source-recovery-evidence-${{ github.sha }}
+          path: out/recovery-evidence
+          retention-days: 14
+          if-no-files-found: warn
+  public-inputs:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test public identity and complete-source consumer rejection boundaries
+        run: |
+          python3 -m unittest tests.test_public_wine_inputs -v
+          git fetch --no-tags --depth 1 origin 75f50445112818c97f8d8e575d2b1c21e59af6e5
+          git fetch --no-tags --depth 1 origin 681b2e9f30b19e94bf8e8de44f67fedba5033c8a
+          mkdir -p out/public-input-evidence
+      - name: Download all public assets without an application token and read back entire original sources
+        run: |
+          python3 tools/fetch_wine_arm64_release.py \
+            --release-lock runtime/wine-arm64-publication/dependency-release.lock.json \
+            --publication-receipt runtime/wine-arm64-publication/published-release.json \
+            --output "$RUNNER_TEMP/public-wine-inputs" > out/public-input-evidence/consumer.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: public-wine-original-source-consumer-${{ github.sha }}
+          path: out/public-input-evidence
+          retention-days: 14
+          if-no-files-found: warn

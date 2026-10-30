@@ -98,6 +98,8 @@ class TurnipProvider(unittest.TestCase):
         for name,row in self.pin['files'].items():row['zipEntry'] = self.entries[name]
         self.write_zip()
         self.assertTrue(provider.verify_sources(self.artifact,self.pin)['allLockedOriginalSourcesVerified'])
+        self.pin['artifact']['workflowPath'] = '.github/workflows/wine-arm64-provider-source-recovery.yml'
+        self.assertTrue(provider.verify_sources(self.artifact,self.pin)['allLockedOriginalSourcesVerified'])
         for prefix in ('../turnip/','arbitrary/','out/turnip/'):
             changed = dict(self.pin,artifactPrefix=prefix)
             with self.assertRaisesRegex(ValueError,'artifact-prefix'):provider.verify_sources(self.artifact,changed)
