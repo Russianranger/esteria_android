@@ -49,3 +49,26 @@ execution workflow therefore uses the ordinary authorized Actions read API,
 streams its exact 876,847,394-byte archive, and requires full source/descriptor
 validation before building/executing the fixture. Local ZIP/manifest checks do
 not claim that larger source-content validation or an Android execution result.
+
+The actual Android mapping comparison in run41017052972 found `EACCES` only
+when adding executable permission to a modified private file-backed page.
+Anonymous modified pages and direct/clean file mappings succeeded. The next
+source build applies the exact locked `android-private-pe-copy.patch`; only
+`WINE_ANDROID_PRIVATE_PE_COPY=1` selects anonymous private PE image copies.
+The default desktop path and real shared-section mappings remain unchanged.
+Checked reads, bounded zero tails and failed final protections cannot silently
+report a loaded image. The Android helper explicitly selects this profile.
+
+The `private-image-test-export` Docker target executes the same source-built PE
+EXE/DLL pair under default and opt-in modes on Linux x64. It checks image data,
+BSS, relocation with an occupied preferred base, actual page protections, and
+shared writes across a live child, while retaining bounded public evidence.
+Test prefixes and test executables are never exported into the runtime rootfs.
+This host gate must pass before binary artifacts are published; it does not
+qualify Android or ARM64. Patch, test sources and process-owner helper bytes are
+hashed in `sources.lock.json` and retained with the complete corresponding sources.
+The measured `runtime-input.lock.json` must be replaced only after the new source
+build, host gate, archive readback and source export succeed; its previous
+unadapted runtime is intentionally incompatible with the new source lock.
+The exact mapping evidence, source rationale, shared-section bounds and helper
+validation are recorded in [PRIVATE-PE-COPY.md](PRIVATE-PE-COPY.md).

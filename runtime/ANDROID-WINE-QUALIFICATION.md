@@ -96,10 +96,21 @@ phase ran and all execution qualification flags remain false. Evidence artifact
 The complete retained corresponding-source artifact12959298932 is 929,858,045
 bytes, SHA-256 `d1f70a1a25117aa50c0bb2dfe93294d8ff1883206b46d2f86c2b0f90e5253095`.
 
-The next diagnostic compares anonymous, direct file-backed RX/RWX, and clean or
-modified private file-backed RW-to-RX mappings inside the same guest/private
-filesystem. It reports exact syscall success and numeric errno, verifies its
-fixed fixture bytes remain unchanged, and never executes mapped bytes. Wine's
-existing prefix/client failure gate is unchanged. Whether Android rejects a
-particular transition remains a hypothesis until this comparison runs; no
-target-SDK, permission, SELinux or device policy changes are made.
+Actual run41017052972 at `2ccb114cd1fa4a0beb70dffbf671d36b6d9c9ae4`
+measured five mapping cases inside the same guest/private filesystem. Anonymous
+modified RW-to-RX, direct file RX/RWX, and clean private file RW-to-RX succeeded.
+Only modified private file RW-to-RX failed, with errno13 (`EACCES`). The fixed
+fixture's backing bytes remained unchanged and no mapped bytes were executed.
+The exact report and artifact identity are retained in
+[`evidence/android-wine-mappings-41017052972.json`](evidence/android-wine-mappings-41017052972.json).
+Wine still failed at prefix initialization; the matrix does not qualify Wine.
+
+The subsequent source-owned adaptation is explicitly selected with
+`WINE_ANDROID_PRIVATE_PE_COPY=1`; the default Wine path remains unchanged. It
+copies private PE image bytes into anonymous reserved pages, preserves normal
+relocations/final protections, and leaves shared-section mappings on their
+existing path. The host gate compares actual default/opt-in PE behavior before
+the rebuilt runtime can be published. That host gate and a fresh Android Wine
+execution remain pending. No target-SDK, permission, SELinux or device policy
+changes are made; ARM64 instruction-cache and executable-image behavior require
+their own later execution proof.

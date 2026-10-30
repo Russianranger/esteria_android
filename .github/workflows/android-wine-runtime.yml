@@ -8,10 +8,17 @@ on:
       - runtime/wine-probe/Dockerfile.dockerignore
       - runtime/wine-probe/record_runtime.py
       - runtime/wine-probe/capture_sources.py
+      - runtime/wine-probe/apply_adaptations.py
+      - runtime/wine-probe/android-private-pe-copy.patch
+      - runtime/wine-probe/private_pe_*
       - runtime/bridges/debian.sources
       - runtime/bridges/inrelease.SHA256SUMS
       - tools/package_android_wine_runtime.py
+      - tools/owned_process_group.py
       - tests/test_android_wine_runtime.py
+      - tests/test_wine_adaptations.py
+      - tests/test_wine_private_pe_copy.py
+      - tests/test_wine_private_pe_fixture.py
       - .github/workflows/android-wine-runtime.yml
   workflow_dispatch:
 permissions:
@@ -28,7 +35,7 @@ jobs:
       - name: Validate package boundaries
         run: |
           test "$(uname -m)" = x86_64
-          python3 -m unittest tests.test_android_wine_runtime -v
+          python3 -m unittest tests.test_android_wine_runtime tests.test_wine_adaptations tests.test_wine_private_pe_copy tests.test_wine_private_pe_fixture -v
           mkdir -p out/wine-build
       - name: Build exact Wine source against signed frozen Debian12
         id: runtime
@@ -36,6 +43,11 @@ jobs:
           docker build --platform linux/amd64 --target runtime -f runtime/wine-probe/Dockerfile \
             --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
             -t esteria-wine-probe:qualification . > out/wine-build/build.log 2>&1
+      - name: Compare original and anonymous private PE loading on the host
+        run: |
+          docker build --platform linux/amd64 --target private-image-test-export -f runtime/wine-probe/Dockerfile \
+            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
+            --output type=local,dest=out/wine-private-pe-check . > out/wine-build/private-pe-build.log 2>&1
       - name: Normalize and independently read back the fresh rootfs
         run: |
           container=$(docker create esteria-wine-probe:qualification)
@@ -61,7 +73,9 @@ jobs:
         if: always()
         with:
           name: wine-x64-runtime-evidence-${{ github.sha }}
-          path: out/wine-build
+          path: |
+            out/wine-build
+            out/wine-private-pe-check
           if-no-files-found: warn
           retention-days: 14
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

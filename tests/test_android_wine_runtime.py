@@ -26,6 +26,7 @@ class WineRuntime(unittest.TestCase):
             sourceLockSha256=hashlib.sha256(package.LOCK.read_bytes()).hexdigest(), baseImage=lock['baseImage']['reference'],
             snapshot=lock['snapshot']['id'], wineRevision=lock['wine']['revision'],
             wineSourceArchiveSha256=lock['wine']['sourceArchive']['sha256'], wineVersion='wine-10.13',
+            privatePeCopyProfile=lock['wine'].get('androidPrivatePeCopy'),
             packages=[dict(package='libc6:amd64', version='fixture', architecture='amd64', sourcePackage='glibc', sourceVersion='fixture')],
             sourcePackages=[dict(package='glibc', version='fixture')], images={},
             **{flag:False for flag in ('prefixInitialized','clientIncluded','clientExecuted','androidRuntimeQualified','arm64Qualified','gameplayQualified')})
@@ -68,6 +69,7 @@ class WineRuntime(unittest.TestCase):
         changes={'wineRevision':'a'*40,'wineSourceArchiveSha256':'b'*64,'sourceLockSha256':'c'*64,
                  'architecture':'arm64','sourcePackages':[],'images':{},'prefixInitialized':True,
                  'clientExecuted':True,'androidRuntimeQualified':True,'gameplayQualified':True}
+        changes['privatePeCopyProfile']={'unverified':'different'}
         for key,value in changes.items():
             changed=copy.deepcopy(self.doc);changed[key]=value
             with self.subTest(key=key),self.assertRaises(ValueError): package.metadata(json.dumps(changed).encode())
@@ -80,7 +82,8 @@ class WineRuntime(unittest.TestCase):
 
     def test_forged_false_marker_cannot_package_existing_wine_prefix(self):
         for path in ('root/.wine/system.reg','home/alice/.wine/user.reg','work/prefix/system.reg',
-                     'prefix/drive_c/old.exe','client/Esteria-entry-check.json','session/old-log'):
+                     'prefix/drive_c/old.exe','client/Esteria-entry-check.json','session/old-log',
+                     'private-pe-fixtures/private-pe-check.exe','private-pe-evidence/receipt.json'):
             self.prepare([(path,b'old-session')])
             self.assertFalse(self.doc['prefixInitialized'])
             with self.subTest(path=path),self.assertRaisesRegex(ValueError,'wine-prefix-or-session-state'):

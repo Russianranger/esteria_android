@@ -30,6 +30,10 @@ IMAGES = {'wine': '/opt/wine/bin/wine', 'wineserver': '/opt/wine/bin/wineserver'
 INPUTS = ('runtime/wine-probe/sources.lock.json', 'runtime/wine-probe/Dockerfile',
           'runtime/wine-probe/Dockerfile.dockerignore', 'runtime/wine-probe/record_runtime.py',
           'runtime/wine-probe/capture_sources.py', 'runtime/bridges/debian.sources',
+          'runtime/wine-probe/apply_adaptations.py', 'runtime/wine-probe/android-private-pe-copy.patch',
+          'runtime/wine-probe/private_pe_check.c', 'runtime/wine-probe/private_pe_fixture.c',
+          'runtime/wine-probe/private_pe_check.py',
+          'tools/owned_process_group.py',
           'runtime/bridges/inrelease.SHA256SUMS', 'tools/package_android_wine_runtime.py',
           'tools/package_server_runtime.py', 'tools/prepare_runtime.py', 'tools/provider_server_runtime.py')
 require = archives.require
@@ -50,6 +54,7 @@ def metadata(raw):
             value.get('baseImage') == lock['baseImage']['reference'] and value.get('snapshot') == lock['snapshot']['id'] and
             value.get('wineRevision') == lock['wine']['revision'] and
             value.get('wineSourceArchiveSha256') == lock['wine']['sourceArchive']['sha256'], 'wine-runtime-source-selection')
+    require(value.get('privatePeCopyProfile') == lock['wine'].get('androidPrivatePeCopy'), 'wine-runtime-private-image-profile')
     require(isinstance(value.get('wineVersion'), str) and
             re.fullmatch(r'wine-10\.13(?:[ -][^\r\n]{1,80})?', value['wineVersion']), 'wine-runtime-version')
     for key in ('prefixInitialized', 'clientIncluded', 'clientExecuted', 'androidRuntimeQualified', 'arm64Qualified', 'gameplayQualified'):
@@ -87,7 +92,7 @@ def fresh_export(source):
                     total <= LIMITS['fileBytes'], 'wine-input-inventory-limit')
             if member.name not in ('.', './'):
                 name = archives.member_path(member.name)
-                require(not re.match(r'^(?:root/\.wine|home/[^/]+/\.wine|work|prefix|client|session)(?:/|$)', name),
+                require(not re.match(r'^(?:root/\.wine|home/[^/]+/\.wine|work|prefix|client|session|private-pe-fixtures|private-pe-evidence)(?:/|$)', name),
                         'wine-prefix-or-session-state:' + name)
             archive.members.clear()
     source.seek(0)

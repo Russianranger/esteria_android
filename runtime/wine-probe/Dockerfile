@@ -12,9 +12,13 @@ RUN --mount=type=secret,id=build_ca,required=true,mode=0444 \
     && apt-get -o Acquire::https::CaInfo=/run/secrets/build_ca dist-upgrade -y --no-install-recommends
 
 FROM base AS builder
+COPY runtime/wine-probe/apply_adaptations.py runtime/wine-probe/android-private-pe-copy.patch \
+     runtime/wine-probe/private_pe_check.c runtime/wine-probe/private_pe_fixture.c \
+     runtime/wine-probe/private_pe_check.py /opt/esteria-wine-probe/
+COPY tools/owned_process_group.py /opt/esteria-wine-probe/
 RUN --mount=type=secret,id=build_ca,required=true,mode=0444 \
     apt-get -o Acquire::https::CaInfo=/run/secrets/build_ca install -y --no-install-recommends \
-      ca-certificates curl python3 build-essential gcc-mingw-w64-x86-64 \
+      ca-certificates curl python3 build-essential patch gcc-mingw-w64-x86-64 \
       bison flex pkg-config libfreetype-dev libfontconfig-dev libx11-dev libxext-dev \
       libxrender-dev libxrandr-dev libxi-dev libxcursor-dev libxfixes-dev libxinerama-dev \
       libxxf86vm-dev libxcomposite-dev libxdamage-dev libvulkan-dev libgl-dev \
@@ -27,6 +31,16 @@ RUN --mount=type=secret,id=build_ca,required=true,mode=0444 \
     && echo '93ffcd86d3f518934da5c93c768d43afe7e97d66f04f355d914f5cfb6731ac74  /sources/wine-arm64ec-source.tar.gz' | sha256sum --check \
     && tar --no-same-owner -xzf /sources/wine-arm64ec-source.tar.gz -C /src \
     && echo 'e237fa56668030e928551ddd60f05df5fe957f75eab874bbd017e085ed722e7c  /src/wine/COPYING.LIB' | sha256sum --check
+RUN python3 /opt/esteria-wine-probe/apply_adaptations.py \
+      --lock /opt/esteria-wine-probe/sources.lock.json --inputs /opt/esteria-wine-probe \
+      --source /src/wine --output /sources/android-private-pe-copy \
+    && mkdir /private-pe-fixtures \
+    && x86_64-w64-mingw32-gcc -O2 -Wall -Wextra -Werror -static-libgcc -shared \
+      /opt/esteria-wine-probe/private_pe_fixture.c -o /private-pe-fixtures/private-pe-fixture.dll -Wl,--image-base,0x180000000 \
+    && x86_64-w64-mingw32-objcopy --set-section-flags .shared=alloc,load,data,contents,share /private-pe-fixtures/private-pe-fixture.dll \
+    && x86_64-w64-mingw32-gcc -O2 -Wall -Wextra -Werror -static-libgcc \
+      /opt/esteria-wine-probe/private_pe_check.c -o /private-pe-fixtures/private-pe-check.exe \
+    && cp /opt/esteria-wine-probe/private_pe_check.py /opt/esteria-wine-probe/owned_process_group.py /private-pe-fixtures/
 RUN cd /wine-build \
     && /src/wine/configure --prefix=/opt/wine --enable-win64 --with-mingw=yes --disable-tests \
        --without-wayland --without-gstreamer --without-cups --without-sane --without-gphoto \
@@ -49,6 +63,14 @@ RUN python3 /opt/esteria-wine-probe/record_runtime.py \
       --lock /opt/esteria-wine-probe/sources.lock.json --output /etc/esteria-wine-probe.json \
     && rm -rf /var/lib/apt/lists/* /var/log/*
 CMD ["/opt/wine/bin/wine", "--version"]
+
+FROM runtime AS private-image-test
+COPY --from=builder /private-pe-fixtures /private-pe-fixtures
+RUN python3 /private-pe-fixtures/private_pe_check.py --wine /opt/wine/bin/wine \
+      --wineserver /opt/wine/bin/wineserver --exe /private-pe-fixtures/private-pe-check.exe \
+      --dll /private-pe-fixtures/private-pe-fixture.dll --output /private-pe-evidence
+FROM scratch AS private-image-test-export
+COPY --from=private-image-test /private-pe-evidence/ /
 
 FROM builder AS corresponding-sources
 COPY --from=runtime /etc/esteria-wine-probe.json /sources/runtime.json

@@ -5,3 +5,5 @@
 !runtime/bridges/inrelease.SHA256SUMS
 !runtime/wine-probe
 !runtime/wine-probe/**
+!tools
+!tools/owned_process_group.py

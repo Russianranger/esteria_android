@@ -1,0 +1,77 @@
+{
+  "formatVersion": 1,
+  "scope": "android13-x64-private-image-mapping-diagnostic",
+  "sourceRevision": "2ccb114cd1fa4a0beb70dffbf671d36b6d9c9ae4",
+  "workflowRun": 41017052972,
+  "evidenceArtifact": {
+    "id": 12960078291,
+    "bytes": 69032,
+    "sha256": "93d248b066a28773d8eb860f0e30f4fd4093e64733f31d7792b90e2611cf07be"
+  },
+  "actualGuestMappingReport": {
+    "cases": [
+      {
+        "case": "anonymous-dirty-rw-to-rx",
+        "finalProtection": 5,
+        "initialProtection": 3,
+        "mmapErrno": 0,
+        "mmapSucceeded": true,
+        "modified": true,
+        "mprotectErrno": 0,
+        "mprotectSucceeded": true
+      },
+      {
+        "case": "file-direct-rx",
+        "finalProtection": null,
+        "initialProtection": 5,
+        "mmapErrno": 0,
+        "mmapSucceeded": true,
+        "modified": false,
+        "mprotectErrno": null,
+        "mprotectSucceeded": null
+      },
+      {
+        "case": "file-direct-rwx",
+        "finalProtection": null,
+        "initialProtection": 7,
+        "mmapErrno": 0,
+        "mmapSucceeded": true,
+        "modified": false,
+        "mprotectErrno": null,
+        "mprotectSucceeded": null
+      },
+      {
+        "case": "file-clean-rw-to-rx",
+        "finalProtection": 5,
+        "initialProtection": 3,
+        "mmapErrno": 0,
+        "mmapSucceeded": true,
+        "modified": false,
+        "mprotectErrno": 0,
+        "mprotectSucceeded": true
+      },
+      {
+        "case": "file-dirty-rw-to-rx",
+        "finalProtection": 5,
+        "initialProtection": 3,
+        "mmapErrno": 0,
+        "mmapSucceeded": true,
+        "modified": true,
+        "mprotectErrno": 13,
+        "mprotectSucceeded": false
+      }
+    ],
+    "fixtureSha256": "41ee3a429c04bac63f5605b072c4b732a6ed1a14d5f4a4b513113d002ce6fea7",
+    "formatVersion": 1,
+    "mappedBytesExecuted": false,
+    "pageBytes": 4096,
+    "privateFileUnchanged": true,
+    "scope": "mapping-permission-diagnostic-only",
+    "wineQualified": false
+  },
+  "winePrefixExit": 1,
+  "reconstructedClientExecuted": false,
+  "androidWineQualified": false,
+  "arm64Qualified": false,
+  "gameplayQualified": false
+}

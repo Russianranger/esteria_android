@@ -1,0 +1,209 @@
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -3035,6 +3035,65 @@
+ }
+ 
+ 
++/* Android's app policy permits anonymous executable memory but rejects
++ * granting execute permission after a private file mapping has been modified.
++ * This explicitly selected PE-only copy path keeps the original anonymous
++ * image reservation. Desktop/default and shared-section mappings are unchanged.
++ * Like the surrounding Wine code, these additions are LGPL-2.1-or-later.
++ */
++static NTSTATUS read_private_pe_file( void *buffer, size_t size, int fd, off_t offset,
++                                     off_t file_size, size_t max_zero_tail )
++{
++    size_t available, done = 0;
++    ssize_t count;
++
++    if (offset < 0 || file_size < 0 || offset > file_size) return STATUS_INVALID_IMAGE_FORMAT;
++    available = size;
++    if ((ULONGLONG)available > (ULONGLONG)(file_size - offset)) available = file_size - offset;
++    if (size - available > max_zero_tail || (size && !available)) return STATUS_INVALID_IMAGE_FORMAT;
++    while (done < available)
++    {
++        size_t chunk = min( available - done, 1024 * 1024 );
++        count = pread( fd, (char *)buffer + done, chunk, offset + done );
++        if (count < 0 && errno == EINTR) continue;
++        /* EOF earlier than the captured fstat size means the input changed. */
++        if (count <= 0) return STATUS_INVALID_IMAGE_FORMAT;
++        done += count;
++    }
++    if (available < size) memset( (char *)buffer + available, 0, size - available );
++    return STATUS_SUCCESS;
++}
++
++/* Reject overlapping/oversized sections before making any shared mappings.
++ * Otherwise a later private copy could modify a prior shared-file mapping.
++ * The opt-in profile deliberately bounds the number of sections to 256.
++ */
++static NTSTATUS validate_private_pe_sections( const IMAGE_SECTION_HEADER *sections, unsigned int count,
++                                             SIZE_T header_size, SIZE_T total_size, SIZE_T align_mask )
++{
++    unsigned int i, j;
++    SIZE_T starts[256], ends[256];
++
++    if (count > 256 || header_size > total_size || align_mask == (SIZE_T)-1 ||
++        (align_mask & (align_mask + 1))) return STATUS_INVALID_IMAGE_FORMAT;
++    for (i = 0; i < count; i++)
++    {
++        SIZE_T size = sections[i].Misc.VirtualSize ? sections[i].Misc.VirtualSize : sections[i].SizeOfRawData;
++        SIZE_T rounded = ROUND_SIZE( 0, size, align_mask );
++        starts[i] = sections[i].VirtualAddress;
++        if (rounded < size || starts[i] > total_size || rounded > total_size - starts[i])
++            return STATUS_INVALID_IMAGE_FORMAT;
++        ends[i] = starts[i] + rounded;
++        if (!rounded) continue;
++        if (starts[i] < header_size || (starts[i] & align_mask)) return STATUS_INVALID_IMAGE_FORMAT;
++        for (j = 0; j < i; j++)
++            if (ends[j] > starts[j] && starts[i] < ends[j] && starts[j] < ends[i])
++                return STATUS_INVALID_IMAGE_FORMAT;
++    }
++    return STATUS_SUCCESS;
++}
++
++
+ /***********************************************************************
+  *           map_image_into_view
+  *
+@@ -3057,21 +3116,37 @@
+     char *ptr = view->base;
+     SIZE_T header_size, header_map_size, total_size = view->size;
+     SIZE_T align_mask = max( image_info->alignment - 1, page_mask );
++    const char *copy_setting = getenv( "WINE_ANDROID_PRIVATE_PE_COPY" );
++    BOOL private_pe_copy = copy_setting && !strcmp( copy_setting, "1" );
+     INT_PTR delta;
+ 
+     TRACE_(module)( "mapping PE file %s at %p-%p\n", debugstr_w(filename), ptr, ptr + total_size );
+ 
+     /* map the header */
+ 
+-    fstat( fd, &st );
++    if (private_pe_copy)
++    {
++        if (fstat( fd, &st ) || st.st_size < 0) return STATUS_INVALID_IMAGE_FORMAT;
++    }
++    else fstat( fd, &st );
+     header_size = min( image_info->header_size, st.st_size );
+     header_map_size = min( image_info->header_map_size, ROUND_SIZE( 0, st.st_size, host_page_mask ));
+-    if ((status = map_pe_header( view->base, header_size, header_map_size, fd, &removable )))
++    if (private_pe_copy)
++    {
++        if (!header_size || header_size > view->size) return STATUS_INVALID_IMAGE_FORMAT;
++        if ((status = read_private_pe_file( view->base, header_size, fd, 0, st.st_size, 0 ))) return status;
++    }
++    else if ((status = map_pe_header( view->base, header_size, header_map_size, fd, &removable )))
+         return status;
+ 
+     status = STATUS_INVALID_IMAGE_FORMAT;  /* generic error */
+     dos = (IMAGE_DOS_HEADER *)ptr;
++    if (private_pe_copy && (header_size < sizeof(*dos) || dos->e_lfanew < 0 ||
++        (ULONGLONG)dos->e_lfanew > header_size || sizeof(*nt) > header_size - dos->e_lfanew))
++        return status;
+     nt = (IMAGE_NT_HEADERS *)(ptr + dos->e_lfanew);
++    if (private_pe_copy && (ROUND_SIZE( 0, header_size, align_mask ) < header_size ||
++        ROUND_SIZE( 0, header_size, align_mask ) > total_size)) return status;
+     header_end = ptr + ROUND_SIZE( 0, header_size, align_mask );
+     memset( ptr + header_size, 0, header_end - (ptr + header_size) );
+     if ((char *)(nt + 1) > header_end) return status;
+@@ -3095,8 +3170,12 @@
+         /* in that case Windows simply maps in the whole file */
+ 
+         total_size = min( total_size, ROUND_SIZE( 0, st.st_size, page_mask ));
+-        if (map_file_into_view( view, fd, 0, total_size, 0, VPROT_COMMITTED | VPROT_READ | VPROT_WRITECOPY,
+-                                removable ) != STATUS_SUCCESS) goto done;
++        if (private_pe_copy)
++        {
++            if (read_private_pe_file( ptr, total_size, fd, 0, st.st_size, page_mask ) != STATUS_SUCCESS) goto done;
++        }
++        else if (map_file_into_view( view, fd, 0, total_size, 0, VPROT_COMMITTED | VPROT_READ | VPROT_WRITECOPY,
++                                     removable ) != STATUS_SUCCESS) goto done;
+ 
+         /* check that all sections are loaded at the right offset */
+         if (nt->OptionalHeader.FileAlignment != nt->OptionalHeader.SectionAlignment) goto done;
+@@ -3107,7 +3186,11 @@
+         }
+ 
+         /* set the image protections */
+-        set_vprot( view, ptr, total_size, VPROT_COMMITTED | VPROT_READ | VPROT_WRITECOPY | VPROT_EXEC );
++#ifdef HAVE___CLEAR_CACHE
++        if (private_pe_copy) __clear_cache( ptr, ptr + total_size );
++#endif
++        if (!set_vprot( view, ptr, total_size, VPROT_COMMITTED | VPROT_READ | VPROT_WRITECOPY | VPROT_EXEC ) &&
++            private_pe_copy) goto done;
+ 
+         /* no relocations are performed on non page-aligned binaries */
+         status = STATUS_SUCCESS;
+@@ -3116,6 +3199,9 @@
+ 
+ 
+     /* map all the sections */
++
++    if (private_pe_copy && validate_private_pe_sections( sec, nt->FileHeader.NumberOfSections,
++            header_end - ptr, total_size, align_mask ) != STATUS_SUCCESS) goto done;
+ 
+     for (i = pos = 0; i < nt->FileHeader.NumberOfSections; i++)
+     {
+@@ -3185,9 +3271,11 @@
+         if (sec[i].PointerToRawData >= st.st_size ||
+             end > ((st.st_size + sector_align) & ~sector_align) ||
+             end < file_start ||
+-            map_file_into_view( view, fd, sec[i].VirtualAddress, file_size, file_start,
+-                                VPROT_COMMITTED | VPROT_READ | VPROT_WRITECOPY,
+-                                removable ) != STATUS_SUCCESS)
++            (private_pe_copy ? read_private_pe_file( ptr + sec[i].VirtualAddress, file_size, fd,
++                                                    file_start, st.st_size, sector_align ) :
++             map_file_into_view( view, fd, sec[i].VirtualAddress, file_size, file_start,
++                                 VPROT_COMMITTED | VPROT_READ | VPROT_WRITECOPY,
++                                 removable )) != STATUS_SUCCESS)
+         {
+             ERR_(module)( "Could not map %s section %.8s, file probably truncated\n",
+                           debugstr_w(filename), sec[i].Name );
+@@ -3250,7 +3338,8 @@
+ 
+     /* set the image protections */
+ 
+-    set_vprot( view, ptr, ROUND_SIZE( 0, header_size, align_mask ), VPROT_COMMITTED | VPROT_READ );
++    if (!set_vprot( view, ptr, ROUND_SIZE( 0, header_size, align_mask ), VPROT_COMMITTED | VPROT_READ ) &&
++        private_pe_copy) goto done;
+ 
+     for (i = 0; i < nt->FileHeader.NumberOfSections; i++)
+     {
+@@ -3266,9 +3355,17 @@
+         if (sec[i].Characteristics & IMAGE_SCN_MEM_WRITE)   vprot |= VPROT_WRITECOPY;
+         if (sec[i].Characteristics & IMAGE_SCN_MEM_EXECUTE) vprot |= VPROT_EXEC;
+ 
+-        if (!set_vprot( view, ptr + sec[i].VirtualAddress, size, vprot ) && (vprot & VPROT_EXEC))
+-            ERR( "failed to set %08x protection on %s section %.8s, noexec filesystem?\n",
+-                 sec[i].Characteristics, debugstr_w(filename), sec[i].Name );
++#ifdef HAVE___CLEAR_CACHE
++        if (private_pe_copy && (vprot & VPROT_EXEC))
++            __clear_cache( ptr + sec[i].VirtualAddress, ptr + sec[i].VirtualAddress + size );
++#endif
++        if (!set_vprot( view, ptr + sec[i].VirtualAddress, size, vprot ))
++        {
++            if (vprot & VPROT_EXEC)
++                ERR( "failed to set %08x protection on %s section %.8s, noexec filesystem?\n",
++                     sec[i].Characteristics, debugstr_w(filename), sec[i].Name );
++            if (private_pe_copy) goto done;
++        }
+     }
+ 
+ #ifdef VALGRIND_LOAD_PDB_DEBUGINFO
+@@ -3277,6 +3374,16 @@
+     status = STATUS_SUCCESS;
+ 
+ done:
++    if (private_pe_copy && status == STATUS_SUCCESS)
++    {
++        /* The caller holds virtual_mutex. Fixed one-time diagnostic only. */
++        static BOOL reported;
++        if (!reported)
++        {
++            reported = TRUE;
++            WINE_MESSAGE( "ESTERIA_PRIVATE_PE_COPY mapped\n" );
++        }
++    }
+     free( sections );
+     return status;
+ }

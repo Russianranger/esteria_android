@@ -109,6 +109,26 @@ def runtime_sources(path, pin, runtime_raw):
         wrappers={'wine/wine-arm64ec-source.tar.gz','wine/Wine-COPYING.LIB','wine/wine-build-config.log',
                   'wine/build-packages.tsv','wine/runtime.json','debian/runtime.json','debian/sources.lock.json',
                   'debian/SOURCE-MANIFEST.json','integration-source.tar','integration-revision.txt'}
+        adaptations={}
+        if 'androidPrivatePeCopy' in lock['wine']:
+            profile=lock['wine']['androidPrivatePeCopy']
+            require(type(profile) is dict and profile.get('environment')=={'WINE_ANDROID_PRIVATE_PE_COPY':'1'} and
+                    type(profile.get('patches')) is list and 0<len(profile['patches'])<=4 and
+                    type(profile.get('testSources')) is dict and 0<len(profile['testSources'])<=8,
+                    'wine-source-adaptation-profile')
+            adaptations=dict(profile['testSources'])
+            for item in profile['patches']:
+                require(type(item) is dict and set(item)=={'file','bytes','sha256'} and
+                        item['file'] not in adaptations and item['file'].endswith('.patch'),
+                        'wine-source-adaptation-patch')
+                adaptations[item['file']]={key:item[key] for key in ('bytes','sha256')}
+            for name,expected in adaptations.items():
+                require(re.fullmatch('[A-Za-z0-9][A-Za-z0-9_.-]{0,95}',name) and type(expected) is dict and
+                        set(expected)=={'bytes','sha256'} and type(expected.get('bytes')) is int and
+                        0<expected['bytes']<=262144 and re.fullmatch('[a-f0-9]{64}',expected.get('sha256','')),
+                        'wine-source-adaptation-identity')
+                wrappers.add('wine/android-private-pe-copy/'+name)
+            require(sum(expected['bytes'] for expected in adaptations.values())<=1048576,'wine-source-adaptation-total')
         require(set(members)==wrappers|{'debian/'+name for name in files}, 'wine-source-unexpected-or-missing-member')
         for name,expected in (('wine/runtime.json',runtime_raw),('debian/runtime.json',runtime_raw),
                               ('debian/sources.lock.json',source_lock),
@@ -116,6 +136,8 @@ def runtime_sources(path, pin, runtime_raw):
             require(zip_read(archive,members[name])==expected, 'wine-source-wrapper-content')
         require(re.fullmatch('[a-f0-9]{40}',pin['sourceRevision']), 'wine-source-build-revision')
         verify_zip_member(archive,members['wine/wine-arm64ec-source.tar.gz'],lock['wine']['sourceArchive'])
+        for name,expected in adaptations.items():
+            verify_zip_member(archive,members['wine/android-private-pe-copy/'+name],expected)
         license_raw=zip_read(archive,members['wine/Wine-COPYING.LIB'])
         require(hashlib.sha256(license_raw).hexdigest()==lock['wine']['licenseFileSha256'], 'wine-source-license')
         descriptors=set()

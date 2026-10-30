@@ -89,7 +89,7 @@ def environment():
     # No host proxy, online update channel or arbitrary command is inherited.
     return dict(HOME='/work/home', PATH='/opt/wine/bin:/usr/bin:/bin', LANG='C.UTF-8',
                 TMPDIR='/tmp', WINEPREFIX=str(PREFIX), WINEARCH='win64', WINEDEBUG='-all,err+all',
-                WINEESYNC='0', WINEFSYNC='0',
+                WINEESYNC='0', WINEFSYNC='0', WINE_ANDROID_PRIVATE_PE_COPY='1',
                 WINEDLLOVERRIDES='winemenubuilder.exe=d;mscoree,mshtml=')
 
 

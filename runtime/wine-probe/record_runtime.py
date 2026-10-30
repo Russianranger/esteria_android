@@ -81,6 +81,7 @@ def main():
                   sourceLockSha256=hashlib.sha256(raw).hexdigest(), baseImage=lock['baseImage']['reference'],
                   snapshot=lock['snapshot']['id'], wineRevision=lock['wine']['revision'],
                   wineSourceArchiveSha256=lock['wine']['sourceArchive']['sha256'], wineVersion=version,
+                  privatePeCopyProfile=lock['wine']['androidPrivatePeCopy'],
                   packages=packages, sourcePackages=source_inventory(packages), images=images,
                   prefixInitialized=False, clientIncluded=False, clientExecuted=False,
                   androidRuntimeQualified=False, arm64Qualified=False, gameplayQualified=False)

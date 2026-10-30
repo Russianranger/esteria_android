@@ -85,7 +85,37 @@
       "--without-gphoto"
     ],
     "license": "LGPL-2.1-or-later",
-    "licenseFileSha256": "e237fa56668030e928551ddd60f05df5fe957f75eab874bbd017e085ed722e7c"
+    "licenseFileSha256": "e237fa56668030e928551ddd60f05df5fe957f75eab874bbd017e085ed722e7c",
+    "androidPrivatePeCopy": {
+      "environment": {
+        "WINE_ANDROID_PRIVATE_PE_COPY": "1"
+      },
+      "patches": [
+        {
+          "file": "android-private-pe-copy.patch",
+          "bytes": 9732,
+          "sha256": "0f4d5b1feb2c14ae98acac215d1cf06732f9a46f325292ebd00a536ade7b5e0e"
+        }
+      ],
+      "testSources": {
+        "private_pe_check.c": {
+          "bytes": 9950,
+          "sha256": "ccf282af51b6cb4be7cacba10f58085d37a313758edce132e3859a0689782424"
+        },
+        "private_pe_fixture.c": {
+          "bytes": 767,
+          "sha256": "64dd325dd5c2926e9561dd43e47ea979bc14fd26d3dd4b17f120881e4b98de76"
+        },
+        "private_pe_check.py": {
+          "bytes": 10004,
+          "sha256": "83bbb8b38b0a752b853d630f7507d29ab240c4104f1959011bb2158199885c87"
+        },
+        "owned_process_group.py": {
+          "bytes": 2795,
+          "sha256": "c19ed5c05e94d7b537df1055983fca75e20447f594419084f2207d60f99f138e"
+        }
+      }
+    }
   },
-  "note": "Same Wine source as ARM64 candidate; independently built x86_64 GNU/Linux fixture. No FEX, CPU translation, ARM64 or gameplay qualification. Signed frozen Debian repository selects all OS/build packages; exact installed binary/source inventory accompanies exported runtime."
+  "note": "Same upstream Wine source as ARM64 candidate, with an exact opt-in private-PE adaptation for the independently built x86_64 GNU/Linux Android fixture. Default Wine behavior is unchanged. No FEX, CPU translation, ARM64 or gameplay qualification. Signed frozen Debian repositories select all OS/build packages; exact installed binary/source inventory and all adaptation/test sources accompany the exported runtime."
 }

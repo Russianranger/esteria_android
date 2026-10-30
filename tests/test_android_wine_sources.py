@@ -22,7 +22,7 @@ class WineSources(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup);self.root=Path(self.tmp.name)
 
-    def fixture(self,change=None):
+    def fixture(self,change=None,adapted=False):
         runtime_raw=b'{"scope":"synthetic-unexecuted"}\n'
         runtime=dict(packages=[dict(sourcePackage='base',sourceVersion='1')])
         payload={};rows=[]
@@ -34,6 +34,12 @@ class WineSources(unittest.TestCase):
                 payload['debian/'+file]=data;rows.append(dict(file=file,**identity(data)))
         wine=b'unexecuted original Wine fixture';license=b'fixture license'
         lock=dict(wine=dict(sourceArchive=identity(wine),licenseFileSha256=identity(license)['sha256']))
+        if adapted:
+            patch_bytes=b'exact synthetic Wine patch';fixture_bytes=b'exact synthetic PE fixture'
+            lock['wine']['androidPrivatePeCopy']=dict(environment={'WINE_ANDROID_PRIVATE_PE_COPY':'1'},
+                patches=[dict(file='image.patch',**identity(patch_bytes))],testSources={'fixture.c':identity(fixture_bytes)})
+            payload['wine/android-private-pe-copy/image.patch']=patch_bytes
+            payload['wine/android-private-pe-copy/fixture.c']=fixture_bytes
         raw=json.dumps(lock).encode();lock_path=self.root/'sources.lock.json';lock_path.write_bytes(raw)
         manifest=dict(formatVersion=1,scope='installed-debian-runtime-and-wine-build-corresponding-sources',
                       sourceLockSha256=identity(raw)['sha256'],runtimeManifestSha256=identity(runtime_raw)['sha256'],
@@ -52,8 +58,8 @@ class WineSources(unittest.TestCase):
         pin=dict(sourcesArtifact=sources.identity(archive),sourceManifest=identity(payload['debian/SOURCE-MANIFEST.json']),sourceRevision='a'*40)
         return archive,pin,runtime_raw,runtime,lock_path
 
-    def check(self,change=None):
-        archive,pin,raw,runtime,lock=self.fixture(change)
+    def check(self,change=None,adapted=False):
+        archive,pin,raw,runtime,lock=self.fixture(change,adapted)
         with patch.object(sources.wine.runtime,'LOCK',lock),patch.object(sources.wine.runtime,'metadata',return_value=(runtime,{})):
             return sources.runtime_sources(archive,pin,raw)
 
@@ -82,6 +88,15 @@ class WineSources(unittest.TestCase):
     def test_build_source_revision_cannot_be_relabelled(self):
         def modify(payload,manifest):payload['integration-revision.txt']=b'b'*40+b'\n'
         with self.assertRaisesRegex(ValueError,'wrapper-content'):self.check(modify)
+
+    def test_adaptation_patch_and_test_source_closure_is_exact(self):
+        good=self.check(adapted=True)
+        self.assertIn('wine/android-private-pe-copy/image.patch',good['wrappers'])
+        def corrupt(payload,manifest):
+            key='wine/android-private-pe-copy/image.patch';payload[key]=b'X'*len(payload[key])
+        with self.assertRaisesRegex(ValueError,'hash-mismatch'):self.check(corrupt,adapted=True)
+        def missing(payload,manifest):payload.pop('wine/android-private-pe-copy/fixture.c')
+        with self.assertRaisesRegex(ValueError,'unexpected-or-missing'):self.check(missing,adapted=True)
 
     def test_zip64_directory_is_bounded_and_readable(self):
         archive,pin,raw,runtime,lock=self.fixture()
