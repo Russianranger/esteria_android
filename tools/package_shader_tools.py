@@ -143,7 +143,21 @@ def license_bytes(archive, prefix, name):
     return result
 
 
-def build(output, client, client_revision, payload, build_sha256, integration, integration_revision):
+def build_input(integration, integration_revision, selected=None):
+    raw, original = checkout_blob(integration, integration_revision, 'runtime/turnip/sources.lock.json')
+    if selected is None: return raw, raw, None
+    chosen = small(selected); base = json.loads(raw); value = json.loads(chosen)
+    require(type(base) is dict and type(value) is dict and
+            re.fullmatch('[0-9a-f]{64}', value.get('runtimeArchiveSha256', '')),
+            'selected-compiler-runtime-binding')
+    expected = dict(base, runtimeArchiveSha256=value['runtimeArchiveSha256'])
+    require(value == expected, 'selected-compiler-build-lock-changes-other-inputs')
+    return chosen, raw, dict(source='runtime/turnip/sources.lock.json', committedSource=original,
+        selectedSource=dict(bytes=len(chosen), sha256=hashlib.sha256(chosen).hexdigest()),
+        onlyRuntimeArchiveBindingChanged=True)
+
+
+def build(output, client, client_revision, payload, build_sha256, integration, integration_revision, build_input_lock=None):
     output = Path(output).absolute(); payload = Path(payload).absolute()
     require(output.parent == output.parent.resolve() and output.parent.is_dir() and
             not os.path.lexists(output), 'fresh-canonical-output-required')
@@ -155,7 +169,7 @@ def build(output, client, client_revision, payload, build_sha256, integration, i
             receipt.get('integrationRevision') == integration_revision and receipt.get('compiled') is True and
             all(receipt.get(k) is False for k in ('hardwareQualified', 'androidQualified',
                 'x11PresentationQualified', 'gameplayQualified')), 'build-source-or-scope-mismatch')
-    lock_raw, _ = checkout_blob(integration, integration_revision, 'runtime/turnip/sources.lock.json')
+    lock_raw, original_lock, selected_input = build_input(integration, integration_revision, build_input_lock)
     lock = json.loads(lock_raw)
     require(receipt.get('inputLockSha256') == hashlib.sha256(lock_raw).hexdigest() and
             receipt.get('runtimeArchiveSha256') == lock['runtimeArchiveSha256'] and
@@ -186,9 +200,13 @@ def build(output, client, client_revision, payload, build_sha256, integration, i
               clientRevision=client_revision, files=files)))
         write(stage / 'provenance/turnip-build.json', receipt_raw)
         write(stage / 'provenance/shader-tool-qualification.json', evidence)
+        if selected_input is not None:
+            write(stage / 'provenance/build-recipe-reference/sources.lock.json', original_lock)
         for name, pin in recipe.items():
             require(re.fullmatch('[A-Za-z0-9_.-]{1,100}', name) and name not in ('.', '..'), 'recipe-name-invalid')
             raw, actual = checkout_blob(integration, integration_revision, 'runtime/turnip/' + name)
+            if name == 'sources.lock.json' and selected_input is not None:
+                raw = lock_raw; actual = dict(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest())
             require(pin == {k: actual[k] for k in ('bytes', 'sha256')} and
                     small(payload / 'corresponding-source/build-recipe' / name) == raw, 'recipe-source-mismatch')
             write(stage / 'provenance/build-recipe' / name, raw)
@@ -226,6 +244,7 @@ def build(output, client, client_revision, payload, build_sha256, integration, i
             completeGuestRootfsSourceClosure=False, nativeCompilerFixtureQualified=True,
             androidQualified=False, gameAssetShadersQualified=False, gameplayQualified=False,
             toolManifestSha256=identity(stage / 'tools/shader-tools.json')['sha256'])
+        if selected_input is not None: report['selectedBuildInput'] = selected_input
         write(stage / 'provenance/bundle.json', encoded(report))
         write(stage / 'NOTICE.txt', b'Exact committed Esteria shader translator sources and glslang/SPIRV tools.\n'
               b'Original license notices are retained; the client repository has no top-level LICENSE.\n'
@@ -247,9 +266,11 @@ def main():
     for name in ('client', 'client-revision', 'turnip-payload', 'build-sha256',
                  'integration', 'integration-revision', 'output'):
         parser.add_argument('--' + name, required=True)
+    parser.add_argument('--build-input-lock', type=Path,
+                        help='exact retained source lock differing only in the Wine runtime archive binding')
     args = parser.parse_args()
     result = build(args.output, args.client, args.client_revision, Path(args.turnip_payload),
-                   args.build_sha256, args.integration, args.integration_revision)
+                   args.build_sha256, args.integration, args.integration_revision, args.build_input_lock)
     print(json.dumps(result, sort_keys=True))
 
 

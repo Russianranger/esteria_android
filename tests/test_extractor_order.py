@@ -159,6 +159,17 @@ class RealArchiveReader(Planner):
         self.archive('Data/patch-2.MPQ',{logical:b'two'})
         self.assertEqual(self.result()['sha256'],hashlib.sha256(b'two').hexdigest())
 
+    def test_actual_reader_full_capability_c_string_matches_native_packager(self):
+        from tools import build_ordered_extractors as build
+        programs=json.loads(os.environ.get('ESTERIA_ORDERED_EXTRACTOR_PROGRAMS','[]')) or self.bridges
+        expected=self.pin['contract']+build.CAPABILITY_SUFFIX
+        for program in programs:
+            result=subprocess.run([program,'--esteria-order-capabilities'],capture_output=True,text=True,timeout=10)
+            self.assertEqual((result.returncode,result.stdout),(0,expected+'\n'),result.stderr)
+            adaptation.engine.modules.verify_literals(Path(program),adaptation.files.identity(Path(program)),[expected])
+            with self.assertRaisesRegex(ValueError,'literal absent'):
+                adaptation.engine.modules.verify_literals(Path(program),adaptation.files.identity(Path(program)),[self.pin['contract']])
+
     def test_loose_folder_wins_in_same_order_and_its_case_insensitive_member_is_read(self):
         logical='World/Maps/Test/Test.wdt';self.archive('Data/patch-a.MPQ',{logical:b'archive'})
         self.put('Data/patch-z-extra.MPQ/world/maps/test/test.WDT',b'loose')

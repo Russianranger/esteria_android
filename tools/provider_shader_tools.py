@@ -45,8 +45,8 @@ def safe(name):
     return name
 
 
-def load_pin():
-    pin = json.loads(bundle.small(LOCK, 65536))
+def load_pin(input_lock=None):
+    pin = json.loads(bundle.small(input_lock if input_lock is not None else LOCK, 65536))
     require(pin.get('formatVersion') == 1 and pin.get('scope') == 'measured-offline-shader-provider-inputs' and
             pin.get('nativeCompilerFixtureQualified') is True and
             all(pin.get(k) is False for k in ('androidQualified', 'gameAssetShadersQualified', 'gameplayQualified')),
@@ -146,7 +146,7 @@ def verify_archive(path, pin):
     return values
 
 
-def descriptor(path, pin):
+def descriptor(path, pin, input_lock=None):
     archive = bundle.identity(path, LIMITS['fileBytes']); required = inventory(pin)
     required = {name: dict(row, **({'elfMachine': 183} if name == COMPILER else {})) for name, row in sorted(required.items())}
     total = sum(row['bytes'] for row in required.values())
@@ -154,7 +154,7 @@ def descriptor(path, pin):
         archive=dict(archive, file='shader-tools-arm64.tar.gz', assetPath=ASSETS + '/' + ARCHIVE),
         archiveEntries=len(required), archiveFileBytes=total, requiredFiles=required, limits=LIMITS,
         freshSetupFreeBytes=archive['bytes'] + total + LIMITS['metadataBytes'] + (64 << 20),
-        inputLockSha256=bundle.identity(LOCK)['sha256'], clientRevision=pin['clientRevision'],
+        inputLockSha256=bundle.identity(input_lock if input_lock is not None else LOCK)['sha256'], clientRevision=pin['clientRevision'],
         compilerIntegrationRevision=pin['compilerIntegrationRevision'], compilerBuildSha256=pin['compilerBuildSha256'],
         bundleReceiptSha256=pin['bundleReceiptSha256'], toolManifestSha256=pin['toolManifestSha256'],
         helperSourceRevision=pin['helper']['revision'], requiredWineArchiveSha256=pin['requiredWineArchiveSha256'],
@@ -163,8 +163,8 @@ def descriptor(path, pin):
     require(len(encoded(proof)) <= 65536, 'shader-provider-descriptor-bound'); return proof
 
 
-def build(directory, output):
-    pin = load_pin(); files = selected_files(directory, pin)
+def build(directory, output, input_lock=None):
+    pin = load_pin(input_lock); files = selected_files(directory, pin)
     output = Path(os.path.abspath(output)); archives.directory(output.parent)
     require(not os.path.lexists(output), 'shader-provider-output-exists')
     stage = Path(tempfile.mkdtemp(prefix='.' + output.name + '.', dir=output.parent))
@@ -172,24 +172,24 @@ def build(directory, output):
         assets = stage / 'assets' / ASSETS; assets.mkdir(parents=True)
         write_archive(assets / ARCHIVE, files, inventory(pin))
         values = verify_archive(assets / ARCHIVE, pin)
-        proof = descriptor(assets / ARCHIVE, pin)
+        proof = descriptor(assets / ARCHIVE, pin, input_lock)
         for name, data in {'provider.json': encoded(proof), 'bundle.json': values['provenance/bundle.json'], 'NOTICE.txt': NOTICE}.items():
             bundle.write(assets / name, data)
-        verify(stage)
+        verify(stage,input_lock=input_lock)
         for path, _, _ in os.walk(stage, topdown=False): bundle.sync_directory(path)
         publish_directory(stage, output); bundle.sync_directory(output.parent); return proof
     finally:
         if stage.exists(): shutil.rmtree(stage)
 
 
-def verify(provider, apk=None):
-    pin = load_pin(); provider = archives.directory(provider)
+def verify(provider, apk=None, input_lock=None):
+    pin = load_pin(input_lock); provider = archives.directory(provider)
     require({p.name for p in provider.iterdir()} == {'assets'}, 'shader-provider-root-set-mismatch')
     asset_root = archives.directory(provider / 'assets')
     require({p.name for p in asset_root.iterdir()} == {ASSETS}, 'shader-provider-asset-root-set-mismatch')
     assets = archives.directory(asset_root / ASSETS)
     require({p.name for p in assets.iterdir()} == NAMES, 'shader-provider-asset-set-mismatch')
-    values = verify_archive(assets / ARCHIVE, pin); proof = descriptor(assets / ARCHIVE, pin)
+    values = verify_archive(assets / ARCHIVE, pin); proof = descriptor(assets / ARCHIVE, pin, input_lock)
     require(bundle.small(assets / 'provider.json', 65536) == encoded(proof) and
             bundle.small(assets / 'bundle.json') == values['provenance/bundle.json'] and
             bundle.small(assets / 'NOTICE.txt') == NOTICE, 'shader-provider-metadata-mismatch')
@@ -212,7 +212,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__); commands = parser.add_subparsers(dest='command', required=True)
     create = commands.add_parser('build'); create.add_argument('--bundle', type=Path, required=True); create.add_argument('--output', type=Path, required=True)
     check = commands.add_parser('verify'); check.add_argument('--provider', type=Path, required=True); check.add_argument('--apk', type=Path)
-    args = parser.parse_args(); result = build(args.bundle, args.output) if args.command == 'build' else verify(args.provider, args.apk)
+    for command in (create,check): command.add_argument('--input-lock',type=Path,help='explicit separately measured provider input lock')
+    args = parser.parse_args(); result = build(args.bundle, args.output, args.input_lock) if args.command == 'build' else verify(args.provider, args.apk, args.input_lock)
     print(json.dumps(result, indent=2))
 
 

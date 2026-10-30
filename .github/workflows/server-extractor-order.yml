@@ -35,6 +35,18 @@ jobs:
           test "$(uname -m)" = aarch64
           python3 -m unittest tests.test_extractor_order tests.test_ordered_extractor_build -v
           mkdir -p out/ordered-evidence
+          # Reproduce the upload traversal failure using the real runner uid.
+          fixture=$(mktemp -d out/publication-owner.XXXXXX)
+          sudo chown root:root "$fixture"
+          sudo mkdir "$fixture/payload"
+          sudo mkdir -m 700 "$fixture/private"
+          sudo chown "$(id -u):$(id -g)" "$fixture/payload"
+          if test -d "$fixture/payload"; then exit 1; fi
+          sudo chown "$(id -u):$(id -g)" "$fixture"
+          test -d "$fixture/payload"
+          test "$(stat -c %a "$fixture")" = 700
+          if test -r "$fixture/private"; then exit 1; fi
+          sudo rm -rf -- "$fixture"
       - name: Select unchanged archived server lock and exact client ordering sources
         run: |
           python3 - <<'PY'
@@ -106,6 +118,10 @@ jobs:
                           (target/(path.stem+'-tail.log')).write_bytes(stream.read(256*1024))
           PY
           sudo chown -R "$(id -u):$(id -g)" out/ordered-evidence
+          # The native builder creates this owned parent root:root 0700.
+          if sudo test -d out/ordered-build; then
+            sudo chown "$(id -u):$(id -g)" out/ordered-build
+          fi
           if test -d out/ordered-build/payload; then sudo chown -R "$(id -u):$(id -g)" out/ordered-build/payload; fi
       - name: Retain new unsealed extractor binaries and selected replay inputs separately
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

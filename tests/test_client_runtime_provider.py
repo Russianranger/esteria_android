@@ -1,9 +1,12 @@
 import copy
+from contextlib import redirect_stdout
+import io
 import json
 import os
 from pathlib import Path
 import stat
 import struct
+import sys
 import tempfile
 import types
 import unittest
@@ -29,6 +32,51 @@ class ClientProviderBounds(unittest.TestCase):
             value = copy.deepcopy(expected);value['local_account_handoff'][key] = bad
             with self.subTest(key=key), self.assertRaisesRegex(ValueError, 'unsupported-client-capabilities'):
                 provider.capabilities(types.SimpleNamespace(CAPABILITIES=value))
+
+    def test_runtime_override_preserves_raw_identity_and_rejects_wrong_schema_pins_or_environment(self):
+        default_raw, default, wine = provider.runtime_selection()
+        self.assertEqual(default_raw, provider.archives.DEFAULT_LOCK.read_bytes())
+        self.assertEqual(wine, default['packages']['wine-arm64'])
+        value = dict(formatVersion=1, packages={'wine-arm64': dict(
+            marker={'architecture': 'arm64'}, archive=dict(file='wine.tar.gz', bytes=32, sha256='a' * 64,
+                url='https://example.com/wine.tar.gz'), manifest=dict(file='wine.json', bytes=16, sha256='b' * 64,
+                url='https://example.com/wine.json'), wineEnvironment={'WINE_ANDROID_PRIVATE_PE_COPY': '1'})})
+        path = self.root / 'runtime.json'; path.write_text('\n' + json.dumps(value))
+        raw, lock, selected = provider.runtime_selection(path)
+        self.assertEqual(raw, path.read_bytes()); self.assertEqual(lock, value)
+        self.assertEqual(selected, value['packages']['wine-arm64'])
+        changes = [lambda v: v.update(formatVersion=True), lambda v: v.update(packages=[]),
+            lambda v: v['packages']['wine-arm64']['marker'].update(architecture='x64'),
+            lambda v: v['packages']['wine-arm64']['archive'].update(bytes=True),
+            lambda v: v['packages']['wine-arm64']['archive'].update(file='../wine.tar.gz'),
+            lambda v: v['packages']['wine-arm64']['archive'].update(sha256=0),
+            lambda v: v['packages']['wine-arm64']['manifest'].update(bytes=provider.META_LIMIT + 1),
+            lambda v: v['packages']['wine-arm64']['manifest'].update(sha256='bad'),
+            lambda v: v['packages']['wine-arm64']['manifest'].update(file='wine.tar.gz', url='https://example.com/wine.tar.gz'),
+            lambda v: v['packages']['wine-arm64']['archive'].update(url='http://example.com/wine.tar.gz'),
+            lambda v: v['packages']['wine-arm64']['archive'].update(url='https://user:private@example.com/wine.tar.gz'),
+            lambda v: v['packages']['wine-arm64']['archive'].update(url='https://example.com/wine.tar.gz?token=private'),
+            lambda v: v['packages']['wine-arm64']['archive'].update(url='https://example.com/other'),
+            lambda v: v['packages']['wine-arm64'].update(wineEnvironment={'WINE_ANDROID_PRIVATE_PE_COPY': 1}),
+            lambda v: v['packages']['wine-arm64'].update(wineEnvironment={'LD_PRELOAD': '/unmeasured.so'})]
+        for change in changes:
+            altered = copy.deepcopy(value); change(altered); path.write_text(json.dumps(altered))
+            with self.subTest(change=change), self.assertRaises(ValueError): provider.runtime_selection(path)
+        # URL-free measured candidate locks are usable; an override is not a download.
+        for item in value['packages']['wine-arm64'].values():
+            if type(item) is dict: item.pop('url', None)
+        for environment in ({}, {'WINE_ANDROID_PRIVATE_PE_COPY': '1'}):
+            value['packages']['wine-arm64']['wineEnvironment'] = environment
+            path.write_text(json.dumps(value)); self.assertEqual(provider.runtime_selection(path)[1], value)
+
+    def test_provider_cli_passes_optional_runtime_without_changing_omitted_selection(self):
+        args = ['provider_client_runtime.py', 'build', '--artifact', '/client.zip', '--client-source', '/source',
+                '--provider', '/provider']
+        with patch.object(sys, 'argv', args), patch.object(provider, 'run', return_value={}) as run, redirect_stdout(io.StringIO()):
+            provider.main(); self.assertIsNone(run.call_args.args[-1])
+        with patch.object(sys, 'argv', args + ['--runtime-lock', '/runtime.json']), \
+             patch.object(provider, 'run', return_value={}) as run, redirect_stdout(io.StringIO()):
+            provider.main(); self.assertEqual(run.call_args.args[-1], Path('/runtime.json'))
 
     def archive(self, extra=None):
         path = self.root / 'fixture.zip'

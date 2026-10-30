@@ -51,6 +51,15 @@ require = archives.require
 encoded = files.encoded
 
 
+def artifact_prefix(pin):
+    prefix = pin.get('artifactPrefix', PREFIX)
+    require(prefix in (PREFIX, 'turnip/'), 'turnip-artifact-prefix')
+    if prefix != PREFIX:
+        require(pin['artifact'].get('workflowPath') == '.github/workflows/wine-arm64-provider-candidate.yml',
+                'turnip-selected-artifact-workflow')
+    return prefix
+
+
 def identity_bytes(data):
     return dict(bytes=len(data), sha256=hashlib.sha256(data).hexdigest())
 
@@ -63,18 +72,19 @@ def safe(name):
     return name
 
 
-def load_pin():
-    pin = json.loads(files.small(LOCK, 65536))
+def load_pin(input_lock=None):
+    pin = json.loads(files.small(input_lock if input_lock is not None else LOCK, 65536))
     require(type(pin.get('formatVersion')) is int and pin['formatVersion'] == 1 and
             pin.get('scope') == 'measured-turnip-kgsl-provider-inputs' and pin.get('nativeNoGpuQualified') is True and
             all(pin.get(k) is False for k in FALSE_FLAGS) and re.fullmatch('[0-9a-f]{40}', pin['integrationRevision']),
             'turnip-input-scope')
+    prefix = artifact_prefix(pin)
     require(type(pin['files']) is dict and 1 <= len(pin['files']) < LIMITS['entries'] - len(GENERATED), 'turnip-file-count')
     for name, row in pin['files'].items():
         safe(name); safe(row['zipEntry'])
         require(set(row) == {'bytes', 'sha256', 'zipEntry'} and type(row['bytes']) is int and
                 0 < row['bytes'] <= LIMITS['memberBytes'] and re.fullmatch('[0-9a-f]{64}', row['sha256']) and
-                row['zipEntry'].startswith(PREFIX), 'turnip-file-pin')
+                row['zipEntry'].startswith(prefix), 'turnip-file-pin')
     require(not pin['files'].keys() & GENERATED.keys() and
             sum(r['bytes'] for r in pin['files'].values()) < LIMITS['fileBytes'], 'turnip-total-size')
     require(set(BINARIES) <= pin['files'].keys() and 0 < pin['artifact']['bytes'] <= 512 << 20 and
@@ -147,7 +157,7 @@ def verify_sources(artifact, pin):
     with archives.plain_file(artifact) as incoming, checked_zip(incoming, selected, maximum_entries=2048) as archive:
         lock_name = pin['files']['provenance/build-recipe/sources.lock.json']
         raw = zip_metadata(archive, lock_name)
-        expected = source_pins(json.loads(raw)); base = PREFIX + 'corresponding-source/original-archives/'
+        expected = source_pins(json.loads(raw)); base = artifact_prefix(pin) + 'corresponding-source/original-archives/'
         manifest_row = pin['files']['provenance/source-manifest.json']; raw = zip_metadata(archive, manifest_row)
         manifest = json.loads(raw)
         require(manifest == dict(formatVersion=1, scope='exact-upstream-and-direct-build-input-sources',
@@ -209,7 +219,7 @@ def verify_archive(path, pin):
     return values
 
 
-def descriptor(path, pin):
+def descriptor(path, pin, input_lock=None):
     archive = files.identity(path, LIMITS['fileBytes']); required = inventory(pin)
     required = {n: dict(row, **({'elfMachine': 183} if n in BINARIES else {})) for n, row in sorted(required.items())}
     total = sum(r['bytes'] for r in required.values())
@@ -217,7 +227,7 @@ def descriptor(path, pin):
         archive=dict(archive, file='turnip-arm64.tar.gz', assetPath=ASSETS + '/' + ARCHIVE), requiredFiles=required,
         archiveEntries=len(required), archiveFileBytes=total, limits=LIMITS,
         freshSetupFreeBytes=archive['bytes'] + total + LIMITS['metadataBytes'] + (64 << 20),
-        inputLockSha256=files.identity(LOCK)['sha256'], integrationRevision=pin['integrationRevision'],
+        inputLockSha256=files.identity(input_lock if input_lock is not None else LOCK)['sha256'], integrationRevision=pin['integrationRevision'],
         buildReceiptSha256=pin['buildReceiptSha256'], requiredWineArchiveSha256=pin['requiredWineArchiveSha256'],
         guestMount='/esteria-turnip', icdPath='/esteria-turnip/etc/turnip-icd.json',
         sourceCompanionArtifact=pin['artifact'], sourceCompanionRequired=True, archiveVerified=True,
@@ -226,8 +236,8 @@ def descriptor(path, pin):
     require(len(encoded(result)) <= 65536, 'turnip-descriptor-bound'); return result
 
 
-def build(artifact, output):
-    pin = load_pin(); source_receipt = verify_sources(artifact, pin)
+def build(artifact, output, input_lock=None):
+    pin = load_pin(input_lock); source_receipt = verify_sources(artifact, pin)
     output = Path(os.path.abspath(output)); archives.directory(output.parent)
     require(not os.path.lexists(output), 'turnip-provider-output-exists')
     stage = Path(tempfile.mkdtemp(prefix='.' + output.name + '.', dir=output.parent))
@@ -240,24 +250,24 @@ def build(artifact, output):
             destination.flush(); os.fsync(destination.fileno())
         files.write(sources / 'source-receipt.json', encoded(source_receipt))
         write_archive(assets / ARCHIVE, sources / SOURCE, pin); verify_archive(assets / ARCHIVE, pin)
-        proof = descriptor(assets / ARCHIVE, pin)
+        proof = descriptor(assets / ARCHIVE, pin, input_lock)
         files.write(assets / 'provider.json', encoded(proof)); files.write(assets / 'NOTICE.txt', NOTICE)
-        verify(stage)
+        verify(stage,input_lock=input_lock)
         for directory, _, _ in os.walk(stage, topdown=False): files.sync_directory(directory)
         publish_directory(stage, output); files.sync_directory(output.parent); return proof
     finally:
         if stage.exists(): shutil.rmtree(stage)
 
 
-def verify(provider, apk=None):
-    pin = load_pin(); provider = archives.directory(provider)
+def verify(provider, apk=None, input_lock=None):
+    pin = load_pin(input_lock); provider = archives.directory(provider)
     require({p.name for p in provider.iterdir()} == {'assets', 'sources'}, 'turnip-provider-root-closure')
     require({p.name for p in archives.directory(provider / 'assets').iterdir()} == {ASSETS}, 'turnip-provider-assets-closure')
     assets = archives.directory(provider / 'assets' / ASSETS); sources = archives.directory(provider / 'sources')
     require({p.name for p in assets.iterdir()} == NAMES and
             {p.name for p in sources.iterdir()} == {SOURCE, 'source-receipt.json'}, 'turnip-provider-file-set')
     require(files.small(sources / 'source-receipt.json') == encoded(verify_sources(sources / SOURCE, pin)), 'turnip-source-receipt-differs')
-    verify_archive(assets / ARCHIVE, pin); proof = descriptor(assets / ARCHIVE, pin)
+    verify_archive(assets / ARCHIVE, pin); proof = descriptor(assets / ARCHIVE, pin, input_lock)
     require(files.small(assets / 'provider.json', 65536) == encoded(proof) and
             files.small(assets / 'NOTICE.txt') == NOTICE, 'turnip-provider-metadata-differs')
     if apk is not None:
@@ -278,7 +288,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__); commands = parser.add_subparsers(dest='command', required=True)
     create = commands.add_parser('build'); create.add_argument('--artifact', type=Path, required=True); create.add_argument('--output', type=Path, required=True)
     check = commands.add_parser('verify'); check.add_argument('--provider', type=Path, required=True); check.add_argument('--apk', type=Path)
-    args = parser.parse_args(); print(json.dumps(build(args.artifact, args.output) if args.command == 'build' else verify(args.provider, args.apk), indent=2))
+    for command in (create,check): command.add_argument('--input-lock',type=Path,help='explicit separately measured provider input lock')
+    args = parser.parse_args(); print(json.dumps(build(args.artifact, args.output, args.input_lock) if args.command == 'build' else verify(args.provider, args.apk, args.input_lock), indent=2))
 
 
 if __name__ == '__main__': main()

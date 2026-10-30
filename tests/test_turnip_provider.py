@@ -90,6 +90,20 @@ class TurnipProvider(unittest.TestCase):
             row = dict(self.pin['files']['provenance/source-manifest.json'], bytes=2<<20)
             with self.assertRaisesRegex(ValueError, 'metadata-bound'): provider.zip_metadata(archive, row)
 
+    def test_separate_known_candidate_artifact_layout_keeps_full_original_source_checks(self):
+        self.pin['artifactPrefix'] = 'turnip/'
+        self.pin['artifact']['workflowPath'] = '.github/workflows/wine-arm64-provider-candidate.yml'
+        self.entries = {name:'turnip/'+entry.removeprefix(provider.PREFIX) for name,entry in self.entries.items()}
+        self.original_name = 'turnip/'+self.original_name.removeprefix(provider.PREFIX)
+        for name,row in self.pin['files'].items():row['zipEntry'] = self.entries[name]
+        self.write_zip()
+        self.assertTrue(provider.verify_sources(self.artifact,self.pin)['allLockedOriginalSourcesVerified'])
+        for prefix in ('../turnip/','arbitrary/','out/turnip/'):
+            changed = dict(self.pin,artifactPrefix=prefix)
+            with self.assertRaisesRegex(ValueError,'artifact-prefix'):provider.verify_sources(self.artifact,changed)
+        self.pin['artifact']['workflowPath'] = '.github/workflows/turnip.yml'
+        with self.assertRaisesRegex(ValueError,'artifact-workflow'):provider.verify_sources(self.artifact,self.pin)
+
 
 class MeasuredTurnipPin(unittest.TestCase):
     def test_successful_no_gpu_build_has_no_hardware_or_android_claim(self):

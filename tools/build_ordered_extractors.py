@@ -25,6 +25,7 @@ from tools import verify_server_build as files
 
 ROOT=Path(__file__).resolve().parents[1]
 TARGETS=('map_extractor','vmap4_extractor')
+CAPABILITY_SUFFIX='; archive/folder/prefix; no conversion qualification'
 RECIPES=('runtime/extractor_order.py','runtime/server/extractor-order.lock.json',
  'runtime/server/extractor-order/EsteriaArchiveOrder.h','runtime/server/extractor-order/0001-explicit-ordered-providers.patch',
  'runtime/server/EXTRACTOR-ORDER.md','tools/prepare_ordered_extractors.py','tools/build_ordered_extractors.py',
@@ -151,7 +152,7 @@ def build(prepared,acquired,original_lock,environment,policy_sources,output,*,in
         for name in TARGETS:
             executable=output/'build/bin'/name
             programs[name]=dict(files.identity(executable),elf=files.elf_header(executable,executable=True))
-            engine.modules.verify_literals(executable,engine.identity(programs[name]),[pin['contract']])
+            engine.modules.verify_literals(executable,engine.identity(programs[name]),[pin['contract']+CAPABILITY_SUFFIX])
             proof[name+'Capability']=run([executable,'--esteria-order-capabilities'],name+'-capability',30)
         require(all(not (output/'build/bin'/n).exists() for n in ('authserver','worldserver','dbimport','mmaps_generator','vmap4_assembler')),
                 'ordered-build-produced-unrequested-server-or-tool-target')

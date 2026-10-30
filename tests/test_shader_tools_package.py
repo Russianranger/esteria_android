@@ -137,5 +137,37 @@ class ShaderToolsPackage(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'not-arm64-elf'):
             package.measure_elf(self.payload / 'bin/glslangValidator')
 
+    def test_explicit_runtime_binding_retains_actual_build_input_and_committed_reference(self):
+        original = (self.integration/'runtime/turnip/sources.lock.json').read_bytes()
+        value = json.loads(original); value['runtimeArchiveSha256'] = 'c'*64
+        chosen = self.root/'selected.json'; chosen.write_bytes(package.encoded(value))
+        retained = self.payload/'corresponding-source/build-recipe/sources.lock.json'
+        retained.write_bytes(chosen.read_bytes())
+        self.receipt.update(inputLockSha256=identity(chosen.read_bytes())['sha256'], runtimeArchiveSha256='c'*64)
+        self.receipt['recipeSources']['sources.lock.json'] = identity(chosen.read_bytes()); self.update_receipt()
+        with patch.object(package,'measure_elf',return_value=self.measured):
+            report = package.build(self.output,self.client,self.client_revision,self.payload,self.build_sha,
+                                   self.integration,self.integration_revision,chosen)
+        self.assertEqual((self.output/'provenance/build-recipe/sources.lock.json').read_bytes(),chosen.read_bytes())
+        self.assertEqual((self.output/'provenance/build-recipe-reference/sources.lock.json').read_bytes(),original)
+        self.assertEqual(report['wineRuntimeArchiveSha256'],'c'*64)
+        self.assertTrue(report['selectedBuildInput']['onlyRuntimeArchiveBindingChanged'])
+        self.assertEqual(report['selectedBuildInput']['selectedSource'],identity(chosen.read_bytes()))
+        self.assertFalse(report['androidQualified'] or report['gameAssetShadersQualified'])
+
+    def test_explicit_build_selection_cannot_change_other_sources_or_ignore_actual_retained_bytes(self):
+        value = json.loads((self.integration/'runtime/turnip/sources.lock.json').read_bytes())
+        chosen = self.root/'selected.json'; value['runtimeArchiveSha256']='c'*64
+        changed = copy.deepcopy(value); changed['packages'] = []
+        chosen.write_bytes(package.encoded(changed))
+        with self.assertRaisesRegex(ValueError,'changes-other-inputs'):
+            package.build_input(self.integration,self.integration_revision,chosen)
+        chosen.write_bytes(package.encoded(value))
+        self.receipt.update(inputLockSha256=identity(chosen.read_bytes())['sha256'],runtimeArchiveSha256='c'*64)
+        self.receipt['recipeSources']['sources.lock.json'] = identity(chosen.read_bytes()); self.update_receipt()
+        with patch.object(package,'measure_elf',return_value=self.measured),self.assertRaisesRegex(ValueError,'recipe-source-mismatch'):
+            package.build(self.output,self.client,self.client_revision,self.payload,self.build_sha,
+                          self.integration,self.integration_revision,chosen)
+
 
 if __name__ == '__main__': unittest.main()

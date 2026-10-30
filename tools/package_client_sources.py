@@ -70,8 +70,12 @@ def input_selection(source_lock=None, client_input_lock=None):
     return source_bytes, lock, pin_bytes, pin, selected
 
 
-def build(source, xvid, output, source_lock=None, client_input_lock=None):
+def build(source, xvid, output, source_lock=None, client_input_lock=None, runtime_lock=None):
     source_bytes, lock, pin_bytes, pin, selected = input_selection(source_lock, client_input_lock)
+    runtime_raw, _, _ = client.runtime_selection(runtime_lock)
+    if runtime_lock is not None:
+        selected = dict(selected or {}, **{client.RUNTIME_INPUT: dict(bytes=len(runtime_raw),
+            sha256=hashlib.sha256(runtime_raw).hexdigest())})
     source_pin = lock['sources']['client']
     client.require(source_pin['commit'] == pin['sourceRevision'] and not source_pin['patches'] and
                    not source_pin['submodules'], 'client-source-companion-pin-mismatch')
@@ -99,7 +103,8 @@ def build(source, xvid, output, source_lock=None, client_input_lock=None):
         for path in (client.PIN, client.SOURCE_LOCK, client.archives.DEFAULT_LOCK,
                      *(client.ROOT / 'tools' / name for name in helpers), Path(__file__).resolve(), client.ROOT / 'LICENSE'):
             relative = path.relative_to(client.ROOT);target = recipes / relative
-            data = source_bytes if path == client.SOURCE_LOCK else pin_bytes if path == client.PIN else client.small(path)
+            data = (source_bytes if path == client.SOURCE_LOCK else pin_bytes if path == client.PIN else
+                    runtime_raw if path == client.archives.DEFAULT_LOCK else client.small(path))
             target.parent.mkdir(parents=True, exist_ok=True);target.write_bytes(data)
         (tree / 'README.txt').write_bytes(README)
         inventory = {str(path.relative_to(tree)): client.identity(path) for path in sorted(tree.rglob('*')) if path.is_file()}
@@ -126,8 +131,9 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--source-lock', type=Path, help='explicit source-lock input; requires --client-input-lock')
     parser.add_argument('--client-input-lock', type=Path, help='explicit measured client input; requires --source-lock')
+    parser.add_argument('--runtime-lock', type=Path, help='retain an explicit measured Wine runtime profile at its canonical recipe path')
     args = parser.parse_args();print(json.dumps(build(args.client_source, args.xvid_source, args.output,
-        args.source_lock, args.client_input_lock), indent=2))
+        args.source_lock, args.client_input_lock, args.runtime_lock), indent=2))
 
 
 if __name__ == '__main__':main()

@@ -15,6 +15,7 @@ import tarfile
 import tempfile
 import types
 import zipfile
+from urllib.parse import urlsplit
 
 try:
     from . import prepare_runtime as archives, fetch_sources
@@ -29,6 +30,8 @@ SOURCE_LOCK = ROOT / 'sources.lock.json'
 ASSETS = 'assets/client-runtime'
 ARCHIVE = 'client-arm64.archive'
 MARKER = 'client-runtime.json'
+RUNTIME_INPUT = 'runtime/runtime-sources.lock.json'
+PRIVATE_PE_ENVIRONMENT = {'WINE_ANDROID_PRIVATE_PE_COPY': '1'}
 LOCAL_ACCOUNT_CAPABILITIES = {'local_account_handoff': {
     'version': 1, 'flag': '--local-login', 'requires': ['--local-offline'],
     'filename': 'Esteria-local-login.bin', 'format': 'ESTLOGN1', 'bytes': 57,
@@ -59,6 +62,39 @@ require = archives.require
 
 def encoded(value):
     return (json.dumps(value, sort_keys=True, indent=2) + '\n').encode()
+
+
+def runtime_selection(path=None):
+    """Read one exact runtime profile without changing historical defaults."""
+    raw = small(path if path is not None else archives.DEFAULT_LOCK)
+    lock = json.loads(raw)
+    if path is not None:
+        require(type(lock) is dict and type(lock.get('formatVersion')) is int and lock['formatVersion'] == 1 and
+                type(lock.get('packages')) is dict and type(lock['packages'].get('wine-arm64')) is dict,
+                'client-selected-runtime-schema')
+        wine = lock['packages']['wine-arm64']
+        require(type(wine.get('marker')) is dict and wine['marker'].get('architecture') == 'arm64',
+                'client-selected-runtime-architecture')
+        for name in ('archive', 'manifest'):
+            pin = wine.get(name)
+            require(type(pin) is dict and {'file', 'bytes', 'sha256'} <= set(pin) <= {'file', 'bytes', 'sha256', 'url'},
+                    'client-selected-runtime-' + name + '-pin')
+            require(type(pin.get('file')) is str and re.fullmatch('[A-Za-z0-9][A-Za-z0-9._+-]{0,255}', pin['file']) and
+                    type(pin.get('sha256')) is str, 'client-selected-runtime-' + name + '-pin')
+            archives.pin_identity(pin)
+            require(len(pin['file'].encode()) <= 256 and (name != 'manifest' or pin['bytes'] <= META_LIMIT),
+                    'client-selected-runtime-' + name + '-bound')
+            if 'url' in pin:
+                require(type(pin['url']) is str, 'client-selected-runtime-url')
+                url = urlsplit(pin['url'])
+                require(url.scheme == 'https' and url.hostname and url.username is None and url.password is None and
+                        not url.query and not url.fragment and url.path.endswith('/' + pin['file']),
+                        'client-selected-runtime-url')
+        require(wine['archive']['file'] != wine['manifest']['file'], 'client-selected-runtime-file-collision')
+        environment = wine.get('wineEnvironment', {})
+        require(type(environment) is dict and environment in ({}, PRIVATE_PE_ENVIRONMENT),
+                'client-selected-runtime-environment')
+    return raw, lock, lock['packages']['wine-arm64']
 
 
 def capabilities(parser):
@@ -156,7 +192,8 @@ def no_delay_imports(path):
             require(stream.read(8) == bytes(8), 'client-delay-imports-not-supported')
 
 
-def prepare(artifact, source, tree, pin, source_bytes):
+def prepare(artifact, source, tree, pin, source_bytes, runtime_lock=None):
+    runtime_raw, _, wine = runtime_selection(runtime_lock)
     lock = json.loads(source_bytes);source_pin = lock['sources']['client']
     require(source_pin['commit'] == pin['sourceRevision'] and not source_pin['patches'] and
             not source_pin['submodules'], 'client-source-pin-mismatch')
@@ -205,7 +242,6 @@ def prepare(artifact, source, tree, pin, source_bytes):
             else:target.write_bytes(data)
     (tree / 'NOTICE.txt').write_bytes(NOTICE)
     (tree / 'metadata/sources.lock.json').write_bytes(source_bytes)
-    wine = json.loads(small(archives.DEFAULT_LOCK))['packages']['wine-arm64']
     marker = dict(formatVersion=1, scope='packaged-reconstructed-windows-arm64-client',
         source=source_pin, sourceLockSha256=hashlib.sha256(source_bytes).hexdigest(), inputArtifact=pin,
         buildId=pin['buildId'], protocol=manifest['protocol'], executable='bin/WowClient64.exe',
@@ -217,6 +253,8 @@ def prepare(artifact, source, tree, pin, source_bytes):
         windowsCompatibilityRuntimeRequired=True, androidRuntimeQualified=False, gameInitializationQualified=False,
         gameLoginQualified=False)
     if selected_capabilities is not None:marker['capabilities'] = selected_capabilities
+    if runtime_lock is not None:
+        marker['selectedInputs'] = {RUNTIME_INPUT: dict(bytes=len(runtime_raw), sha256=hashlib.sha256(runtime_raw).hexdigest())}
     (tree / MARKER).write_bytes(encoded(marker))
     inventory = {str(path.relative_to(tree)): identity(path) for path in sorted(tree.rglob('*')) if path.is_file()}
     for image in actual:
@@ -266,7 +304,7 @@ def verify_apk(apk, assets):
                 require(archives.hash_stream(incoming, entry.file_size) == expected['sha256'], 'apk-client-asset-hash-mismatch')
 
 
-def run(artifact, source, output, verify=False, apk=None):
+def run(artifact, source, output, verify=False, apk=None, runtime_lock=None):
     require(apk is None or verify, 'apk-check-requires-verified-provider')
     pin_bytes = small(PIN);pin = json.loads(pin_bytes)
     require(pin.get('formatVersion') == 1 and pin.get('scope') == 'measured-reconstructed-client-provider-inputs' and
@@ -277,7 +315,7 @@ def run(artifact, source, output, verify=False, apk=None):
     stage = Path(tempfile.mkdtemp(prefix='.client-provider-', dir=output.parent))
     try:
         tree = stage / 'tree';tree.mkdir()
-        marker, inventory = prepare(artifact, source, tree, pin, source_bytes)
+        marker, inventory = prepare(artifact, source, tree, pin, source_bytes, runtime_lock)
         provider = stage / 'provider';assets = provider / ASSETS;assets.mkdir(parents=True)
         archive = assets / ARCHIVE;write_archive(archive, tree, inventory)
         limits = audit(archive, inventory)
@@ -294,6 +332,7 @@ def run(artifact, source, output, verify=False, apk=None):
             archiveVerified=True, peHeadersAndDirectImportsVerified=True, completeDynamicImportClosureQualified=False,
             androidRuntimeQualified=False, gameInitializationQualified=False, gameLoginQualified=False)
         if 'capabilities' in marker:proof['capabilities'] = marker['capabilities']
+        if 'selectedInputs' in marker:proof['selectedInputs'] = marker['selectedInputs']
         require(len(encoded(proof)) <= META_LIMIT, 'client-provider-metadata-limit')
         (assets / 'provider.json').write_bytes(encoded(proof))
         (assets / 'NOTICE.txt').write_bytes(NOTICE)
@@ -319,8 +358,10 @@ def main():
     parser.add_argument('--client-source', type=Path, required=True)
     parser.add_argument('--provider', type=Path, required=True)
     parser.add_argument('--apk', type=Path, help='verify exact embedded asset inventory and bytes; verify command only')
+    parser.add_argument('--runtime-lock', type=Path, help='explicit measured Wine runtime profile; default historical production lock')
     args = parser.parse_args()
-    print(json.dumps(run(args.artifact, args.client_source, args.provider, args.command == 'verify', args.apk), indent=2))
+    print(json.dumps(run(args.artifact, args.client_source, args.provider, args.command == 'verify', args.apk,
+                         args.runtime_lock), indent=2))
 
 
 if __name__ == '__main__':main()

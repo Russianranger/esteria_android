@@ -1,9 +1,13 @@
 """Explicit input selection retains immutable recipes and unchanged old defaults."""
 import copy
+from contextlib import redirect_stdout
 import hashlib
+import io
 import json
 import os
 from pathlib import Path
+import sys
+import tarfile
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -31,6 +35,52 @@ class ClientSourceInputs(unittest.TestCase):
         self.assertEqual(result[:4], (self.source_raw, self.source, self.pin_raw, self.pin))
         self.assertIsNone(result[4])
         self.assertIsNone(release.selected_inputs({}))
+
+    def test_runtime_override_retains_exact_raw_lock_at_canonical_recipe_path(self):
+        xvid = self.root / 'xvid.tar.gz'; xvid.write_bytes(b'unchanged upstream source fixture')
+        recipe = ('URL https://downloads.xvid.com/downloads/xvidcore-1.3.7.tar.gz\nURL_HASH SHA256=' +
+                  hashlib.sha256(xvid.read_bytes()).hexdigest() + '\n').encode()
+        def archive(*args, **kwargs):
+            self.assertEqual(args[0], ['git', 'archive', '--format=tar', self.pin['sourceRevision']])
+            kwargs['stdout'].write(b'complete synthetic Git tree fixture')
+        runtime = self.root / 'selected-runtime.json'
+        profile = json.loads(provider.archives.DEFAULT_LOCK.read_bytes())
+        profile['packages']['wine-arm64']['archive']['sha256'] = 'e' * 64
+        profile['packages']['wine-arm64']['wineEnvironment'] = {'WINE_ANDROID_PRIVATE_PE_COPY': '1'}
+        runtime.write_text('\n' + json.dumps(profile))
+        with patch.object(provider.fetch_sources, 'verify_checkout'), patch.object(provider, 'source_blob', return_value=recipe), \
+             patch.object(sources.subprocess, 'run', side_effect=archive):
+            default = sources.build(self.root, xvid, self.root / 'default-fixture')
+            explicit = sources.build(self.root, xvid, self.root / 'selected-fixture', runtime_lock=runtime)
+            expected = provider.identity(runtime)
+            self.assertNotIn('selectedInputs', default)
+            self.assertEqual(explicit['selectedInputs'], {provider.RUNTIME_INPUT: expected})
+            canonical = 'integration-recipe/' + provider.RUNTIME_INPUT
+            self.assertEqual(explicit['members'][canonical], expected)
+            with tarfile.open(self.root / 'selected-fixture/client-corresponding-source.tar.gz', 'r:gz') as retained:
+                self.assertEqual(retained.extractfile(canonical).read(), runtime.read_bytes())
+            self.assertNotEqual(default['archive'], explicit['archive'])
+            # Selecting identical default bytes adds only the external receipt;
+            # the corresponding-source archive itself remains byte-identical.
+            runtime.write_bytes(provider.archives.DEFAULT_LOCK.read_bytes())
+            identical = sources.build(self.root, xvid, self.root / 'identical-fixture', runtime_lock=runtime)
+            self.assertEqual(identical['archive'], default['archive'])
+            self.assertEqual(identical['members'], default['members'])
+            self.source_path.write_bytes(self.source_raw); self.pin_path.write_bytes(self.pin_raw)
+            paired = sources.build(self.root, xvid, self.root / 'paired-fixture', self.source_path, self.pin_path, runtime)
+            self.assertEqual(set(paired['selectedInputs']), {'sources.lock.json',
+                'runtime/client/android-provider.lock.json', provider.RUNTIME_INPUT})
+            with self.assertRaisesRegex(ValueError, 'paired-client-source-inputs'):
+                sources.build(self.root, xvid, self.root / 'bad-pair', self.source_path, runtime_lock=runtime)
+
+    def test_source_cli_passes_runtime_without_changing_existing_source_input_pair(self):
+        args = ['package_client_sources.py', '--client-source', '/source', '--xvid-source', '/xvid.tar.gz', '--output', '/output']
+        with patch.object(sys, 'argv', args), patch.object(sources, 'build', return_value={}) as build, redirect_stdout(io.StringIO()):
+            sources.main(); self.assertEqual(build.call_args.args[-3:], (None, None, None))
+        args += ['--runtime-lock', '/runtime.json', '--source-lock', '/source.json', '--client-input-lock', '/client.json']
+        with patch.object(sys, 'argv', args), patch.object(sources, 'build', return_value={}) as build, redirect_stdout(io.StringIO()):
+            sources.main()
+            self.assertEqual(build.call_args.args[-3:], (Path('/source.json'), Path('/client.json'), Path('/runtime.json')))
 
     def test_both_overrides_are_required_before_opening_files(self):
         with patch.object(provider, 'small', side_effect=AssertionError('must reject before reading')):

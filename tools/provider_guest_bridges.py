@@ -76,8 +76,8 @@ def safe_path(name):
     return name
 
 
-def load_pin():
-    pin = json.loads(read_small(LOCK))
+def load_pin(input_lock=None, bridge_input_lock=None):
+    pin = json.loads(read_small(input_lock if input_lock is not None else LOCK))
     require(pin.get('formatVersion') == 1 and pin.get('scope') == 'measured-guest-bridge-provider-inputs' and
             pin.get('androidRuntimeQualified') is False and 0 < len(pin['files']) <= 120, 'invalid-bridge-provider-pin')
     total = 0
@@ -88,9 +88,12 @@ def load_pin():
                 all(c in '0123456789abcdef' for c in row['sha256']), 'invalid-bridge-file-hash')
         total += row['bytes']
     require(total <= LIMITS['fileBytes'] and not (pin['files'].keys() & GENERATED.keys()), 'bridge-package-size-or-name-limit')
+    if bridge_input_lock is not None:
+        require('runtime/bridges/sources.lock.json' in pin['repositoryInputs'], 'bridge-selected-build-lock-not-retained')
     for rel, row in pin['repositoryInputs'].items():
         safe_path(rel)
-        require(identity(read_small(ROOT / rel, LIMITS['memberBytes'])) == {k:row[k] for k in ('bytes', 'sha256')},
+        source = bridge_input_lock if bridge_input_lock is not None and rel == 'runtime/bridges/sources.lock.json' else ROOT / rel
+        require(identity(read_small(source, LIMITS['memberBytes'])) == {k:row[k] for k in ('bytes', 'sha256')},
                 'bridge-source-input-changed:' + rel)
         require(pin['files'][row['installedPath']]['sha256'] == row['sha256'], 'bridge-source-pin-disagreement')
     return pin
@@ -186,7 +189,7 @@ def read_archive(path):
     return payload
 
 
-def descriptor(archive, payload, pin):
+def descriptor(archive, payload, pin, input_lock=None):
     receipt = validate_payload(payload, pin)
     with archives.plain_file(archive) as stream:
         size=os.fstat(stream.fileno()).st_size
@@ -196,7 +199,7 @@ def descriptor(archive, payload, pin):
     total=sum(row['bytes'] for row in required.values())
     result=dict(formatVersion=1, scope='android-guest-bridge-install-only', packageKey='guest-bridges-arm64',
                 archive=archive_pin, archiveEntries=len(payload), archiveFileBytes=total, requiredFiles=required, limits=LIMITS,
-                freshSetupFreeBytes=size+total+LIMITS['metadataBytes']+(64<<20), inputLockSha256=identity(read_small(LOCK))['sha256'],
+                freshSetupFreeBytes=size+total+LIMITS['metadataBytes']+(64<<20), inputLockSha256=identity(read_small(input_lock if input_lock is not None else LOCK))['sha256'],
                 bridgeBuildSha256=identity(payload[RECEIPT])['sha256'], sourceArtifact=pin['artifact'],
                 integrationRevision=pin['integrationRevision'], requiredWineArchiveSha256=receipt['runtimeArchiveSha256'],
                 guestMount='/esteria-bridges', alsaConfigPath='/esteria-bridges/etc/alsa-esteria.conf',
@@ -207,8 +210,8 @@ def descriptor(archive, payload, pin):
     return result
 
 
-def build(artifact, output, payload_dir=None):
-    pin=load_pin()
+def build(artifact, output, payload_dir=None, input_lock=None, bridge_input_lock=None):
+    pin=load_pin(input_lock, bridge_input_lock)
     require((artifact is None) != (payload_dir is None), 'choose-bridge-artifact-or-rebuilt-payload')
     payload=read_payload(payload_dir,pin) if payload_dir is not None else read_artifact(artifact,pin)
     output=Path(os.path.abspath(output));archives.directory(output.parent,create=True)
@@ -217,18 +220,18 @@ def build(artifact, output, payload_dir=None):
     try:
         assets=stage/'assets'/ASSET_DIR;assets.mkdir(parents=True,mode=0o700)
         write_archive(assets/ASSET_ARCHIVE,payload)
-        proof=descriptor(assets/ASSET_ARCHIVE,read_archive(assets/ASSET_ARCHIVE),pin)
+        proof=descriptor(assets/ASSET_ARCHIVE,read_archive(assets/ASSET_ARCHIVE),pin,input_lock)
         (assets/'provider.json').write_bytes(encoded(proof));(assets/'bridge-build.json').write_bytes(payload[RECEIPT]);(assets/'NOTICE.txt').write_bytes(NOTICE)
-        verify(stage);publish_directory(stage,output);archives.sync_directory(output.parent)
+        verify(stage,input_lock=input_lock,bridge_input_lock=bridge_input_lock);publish_directory(stage,output);archives.sync_directory(output.parent)
         return proof
     finally:
         if stage.exists():shutil.rmtree(stage)
 
 
-def verify(provider, apk=None):
-    pin=load_pin();assets=archives.directory(provider/'assets'/ASSET_DIR)
+def verify(provider, apk=None, input_lock=None, bridge_input_lock=None):
+    pin=load_pin(input_lock,bridge_input_lock);assets=archives.directory(provider/'assets'/ASSET_DIR)
     require({p.name for p in assets.iterdir()} == NAMES,'bridge-provider-file-set-mismatch')
-    payload=read_archive(assets/ASSET_ARCHIVE);expected=descriptor(assets/ASSET_ARCHIVE,payload,pin)
+    payload=read_archive(assets/ASSET_ARCHIVE);expected=descriptor(assets/ASSET_ARCHIVE,payload,pin,input_lock)
     require(read_small(assets/'provider.json') == encoded(expected) and read_small(assets/'NOTICE.txt') == NOTICE and
             read_small(assets/'bridge-build.json') == payload[RECEIPT], 'bridge-provider-metadata-mismatch')
     if apk:
@@ -248,7 +251,10 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__);commands=parser.add_subparsers(dest='command',required=True)
     create=commands.add_parser('build');inputs=create.add_mutually_exclusive_group(required=True);inputs.add_argument('--artifact',type=Path);inputs.add_argument('--payload',type=Path);create.add_argument('--output',type=Path,required=True)
     check=commands.add_parser('verify');check.add_argument('--provider',type=Path,required=True);check.add_argument('--apk',type=Path)
-    args=parser.parse_args();result=build(args.artifact,args.output,args.payload) if args.command=='build' else verify(args.provider,args.apk)
+    for command in (create,check):
+        command.add_argument('--input-lock',type=Path,help='explicit separately measured provider input lock')
+        command.add_argument('--bridge-input-lock',type=Path,help='exact selected bridge source lock retained by provider')
+    args=parser.parse_args();result=build(args.artifact,args.output,args.payload,args.input_lock,args.bridge_input_lock) if args.command=='build' else verify(args.provider,args.apk,args.input_lock,args.bridge_input_lock)
     print(json.dumps(result,indent=2))
 
 

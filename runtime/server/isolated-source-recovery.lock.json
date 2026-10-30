@@ -1,0 +1,38 @@
+{
+  "formatVersion": 1,
+  "scope": "exact-successful-isolated-build-source-retention-recovery",
+  "repository": "Russianranger/esteria_android",
+  "workflowRun": 41051669638,
+  "job": 124048975394,
+  "integrationRevision": "23f727a46de8c95ebca7fc698f6c82028c0ce033",
+  "evidenceArtifact": {
+    "id": 12986007765,
+    "bytes": 70012,
+    "sha256": "8c3b0eef1c6e17f0109a0977f56a24bb7582ed2c900916e92c251e4978b62744"
+  },
+  "qualification": {
+    "bytes": 23757,
+    "sha256": "bcb421500351886cd9daa280e6ba75c57b6e64b689a3a7410fa7104640a58de9"
+  },
+  "sealedReceipt": {
+    "bytes": 49875,
+    "sha256": "fae08a831fb0a55d22c3ea330677671cf72045e2abe8fc229ba90494794aa4f4"
+  },
+  "archive": {
+    "bytes": 24619647,
+    "file": "server-engine-complete-sources.tar.gz",
+    "sha256": "9f76881f06a7c998e0dba9d4a226c623021ed6ad8b87074aa7a861eafbb96d80"
+  },
+  "archiveEntries": 266,
+  "archiveFileBytes": 126583360,
+  "originalWorkspace": "/home/runner/work/esteria_android/esteria_android",
+  "originalPrepared": "out/isolated-tree",
+  "originalInputs": "out/isolated-inputs",
+  "originalOutput": "out/isolated-rebuild",
+  "originalProtocol": "out/protocol-reference",
+  "minimumFreeBytes": 17179869184,
+  "fullServerCompilationPerformed": false,
+  "newNativeQualificationClaimed": false,
+  "androidRuntimeQualified": false,
+  "gameplayQualified": false
+}
