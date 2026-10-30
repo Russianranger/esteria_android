@@ -1,0 +1,170 @@
+{
+  "androidRuntimeQualified": false,
+  "artifact": {
+    "bytes": 2966301,
+    "id": 12972651813,
+    "sha256": "7838101ade58c52e738917e9f57dfff57324ae01cbff15501be889eb2afbe263",
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/41041859706/artifacts/12972651813"
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "installedArchive": {
+    "bytes": 1168482466,
+    "id": 12973175329,
+    "qualifiedAsGameplayRuntime": false,
+    "sha256": "6e18f94fbb02e8b62f2cd024e84f7b30cf4b1ca7b0c5faea8569b3791e3bb0ce"
+  },
+  "integrationRevision": "e1341cf658d972d66bd05c90150eb7bf3c3db0df",
+  "moduleConfigurationReceipt": {
+    "bytes": 4704,
+    "sha256": "e305e1c5dead0553add0771d71614e828b1d741238a15c5512953d63878c9a29"
+  },
+  "moduleConfigurations": {
+    "allSelectedModulesParsed": true,
+    "compileCommands": {
+      "bytes": 48530266,
+      "sha256": "d180e8de5928bec34cacd71b60291ca4e546d0a04714bd449bb028aa4814dc80"
+    },
+    "compiledModules": {
+      "bytes": 5348,
+      "sha256": "51db56d12ae46ec7e919e4ef1c2994ccdcd710e1ef6b5a84e86fc442b5c0e686"
+    },
+    "configFiles": [
+      "mod_achievements.conf",
+      "mod_account_mount.conf",
+      "adaptive_autoattack.conf",
+      "mod_ahbot.conf",
+      "mod_aoe_loot.conf",
+      "AutoBalance.conf",
+      "mod_azeroth_plex.conf",
+      "mod_battlemon.conf",
+      "mod_battlemon_battles.conf",
+      "mod_battlemon_overworld.conf",
+      "challenge_modes.conf",
+      "ChatTransmitter.conf",
+      "classless_wildcard.conf",
+      "mod_congratsonlevel.conf",
+      "mod-corpse-respawn.conf",
+      "mod_dungeon_clear.conf",
+      "mod_dungeon_master.conf",
+      "mod_esteria_chat.conf",
+      "fly-anywhere.conf",
+      "mod_guildhouse.conf",
+      "mod_improved_bank.conf",
+      "individualProgression.conf",
+      "individual_xp.conf",
+      "instance-reset.conf",
+      "mod_item_upgrade.conf",
+      "mod_launcher_api.conf",
+      "mod_loot_beam.conf",
+      "mod_loyal_steed.conf",
+      "mod-mana-loot-pet.conf",
+      "mod-mana-speedflying.conf",
+      "mod_mythic_plus.conf",
+      "mod_nemesis_system.conf",
+      "mod_no_hearthstone_cooldown.conf",
+      "NoProfessionLimit.conf",
+      "mod_npc_beastmaster.conf",
+      "playerbots.conf",
+      "premium.conf",
+      "profession_experience.conf",
+      "random_enchants.conf",
+      "reward_system.conf",
+      "reward_shop.conf",
+      "seasonpass.conf",
+      "SoloLfg.conf",
+      "mod_starterguild.conf",
+      "mod_startingpet.conf",
+      "transmog.conf",
+      "mod_two_names.conf",
+      "mod_worgoblin.conf",
+      "WorldChat.conf",
+      "mod_wxl_dbc.conf"
+    ],
+    "executable": {
+      "bytes": 9187984,
+      "sha256": "bb553f0a0b8dc7ee1d1d1019922dedec97e34e31f1a3c56faaa1593dda26bced"
+    },
+    "moduleConfigurationProof": {
+      "bytes": 11088,
+      "sha256": "8bc3e6ba20e86ebc2156b591ad73c92794c4b4439d0c9b6a1832005d8cd99e4b"
+    },
+    "moduleCount": 50,
+    "moduleGameplayHooksQualified": false,
+    "qualificationSucceeded": true,
+    "referenceInputs": {
+      "tests/config_path_reference.cmake": {
+        "bytes": 1071,
+        "sha256": "7edb126ada44a9a452f490919db7ad5dbee42ab6eeeb8e9831d5a884cdad83fc"
+      },
+      "tests/module_configs_reference.cpp": {
+        "bytes": 4891,
+        "sha256": "d558f2d2b68ce7ad5ec101071cde26ca30d810be4a497142b231813b7ba87aee"
+      },
+      "tests/srp6_reference.cmake": {
+        "bytes": 1415,
+        "sha256": "ef9813ea2fdcf40ee470fc4f354467bc5130f369d9f9e8479e9b6a45fe40a152"
+      }
+    },
+    "reloadValuesVerified": true,
+    "renderedPolicyValuesVerified": true,
+    "scope": "native-arm64-actual-ConfigMgr-compiled-world-module-selection",
+    "sourceConfigurationPreserved": true,
+    "sqlExecuted": false,
+    "worldserverExecuted": false
+  },
+  "playerbotsReferenceBuild": {
+    "actualDatabaseSourcesAndDefinitionVerified": true,
+    "compileCommands": {
+      "bytes": 48530266,
+      "sha256": "d180e8de5928bec34cacd71b60291ca4e546d0a04714bd449bb028aa4814dc80"
+    },
+    "compiledModules": {
+      "bytes": 5348,
+      "sha256": "51db56d12ae46ec7e919e4ef1c2994ccdcd710e1ef6b5a84e86fc442b5c0e686"
+    },
+    "databaseExecuted": false,
+    "executable": {
+      "bytes": 25183072,
+      "sha256": "cbc7c5dc1b418e835b7778b73e5015284cf943b15e2b9fe2234db74aae230b07"
+    },
+    "playerbotsAiQualified": false,
+    "referenceInputs": {
+      "tests/playerbots_database_reference.cmake": {
+        "bytes": 1075,
+        "sha256": "254a8946088c364bff34a901acc546b747e2cf5fe1cda4a61e5b11d3d26fc61a"
+      },
+      "tests/playerbots_database_reference.cpp": {
+        "bytes": 2552,
+        "sha256": "75c54da4fcae709d23723a0c8dfa7c0affc7d97ecf310a47f293e0071dae7da0"
+      },
+      "tests/srp6_reference.cmake": {
+        "bytes": 1415,
+        "sha256": "ef9813ea2fdcf40ee470fc4f354467bc5130f369d9f9e8479e9b6a45fe40a152"
+      }
+    },
+    "scope": "build-only-playerbots-database-reference",
+    "serverBuild": {
+      "bytes": 32521,
+      "sha256": "b21bd7bc8462c9330b5924526613f73ff42e10863bc109c4a885db632b437572"
+    },
+    "worldserverQualified": false
+  },
+  "playerbotsReferenceReceipt": {
+    "bytes": 4553,
+    "sha256": "f007309c82ea0d3edf65ae0f9c89397a3338131476668a6c7675d9d89c667d74"
+  },
+  "playerbotsRuntimeQualified": false,
+  "scope": "native-arm64-complete-compiled-module-configurations-and-playerbots-reference-build",
+  "serverAdaptations": 7,
+  "serverBuildId": "41041859706.1",
+  "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
+  "sourceLockSha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1",
+  "workflow": {
+    "followingFailedStep": "compiled-updater-auth-playerbots-database",
+    "id": 41041859706,
+    "overallConclusion": "failure",
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/41041859706"
+  },
+  "worldEntryQualified": false
+}

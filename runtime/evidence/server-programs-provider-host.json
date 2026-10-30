@@ -1,0 +1,78 @@
+{
+  "androidRuntimeQualified": false,
+  "dateUtc": "2026-10-30",
+  "defaultAndroidBuild": {
+    "apk": {
+      "bytes": 294323,
+      "sha256": "e99ea77c2d375f4a6cc49519e6a4ec0c52815911ccdae253222f77aa65aeff72"
+    },
+    "appJavaCompiled": true,
+    "command": "./gradlew --offline --no-daemon :app:clean :app:assembleDebug :app:assembleDebugAndroidTest :app:lintDebug",
+    "embeddedApplicationSourceLockVerified": true,
+    "instrumentationApk": {
+      "bytes": 1737833,
+      "sha256": "c955d4b929082f5da140bb11d9bb3b5c3aaa5f33d2ec7a86f80243fa19e3d4cb"
+    },
+    "instrumentationApkAssembled": true,
+    "instrumentationExecuted": false,
+    "jdk": 17,
+    "lintPassed": true,
+    "passed": true,
+    "serverProgramsAssetAbsent": true,
+    "serverProgramsPackaged": false
+  },
+  "focusedTests": {
+    "command": "python3 -m unittest tests.test_server_programs_provider -v",
+    "groups": 8,
+    "passed": true,
+    "syntheticFixturesDoNotQualifyProduction": true
+  },
+  "formatVersion": 1,
+  "gameLoginQualified": false,
+  "gameplayQualified": false,
+  "hostPayloadAudit": {
+    "archive": {
+      "bytes": 21996594,
+      "file": "server-programs-runtime-arm64.tar.gz",
+      "sha256": "df7e0b33e4048daf780ebf31c0a7f9a10b1f74ea42f4de100ca18ed1a65b673e"
+    },
+    "command": "python3 tools/provider_server_programs.py audit --package ../engine-notice-package-41043905821 --original-receipt ../engine-ci-41043905821/package/package-receipt.json --native-loader ../engine-ci-41043905821/native/loader-smoke.json",
+    "fileBytes": 66025007,
+    "files": 126,
+    "nativeLoaderReceipt": {
+      "bytes": 2427,
+      "file": "native-loader.json",
+      "sha256": "33fee9aefde98026139c3ba059f296b958cf813d13eb1f48d7bf74c749b74a09"
+    },
+    "nativeLoaderReceiptVerified": true,
+    "noticePackageReceipt": {
+      "bytes": 70817,
+      "file": "package-receipt.json",
+      "sha256": "6385c162579f0e04c8dcc47595bc108a1baf91ca773c9c11aa93005511914d36"
+    },
+    "originalNoticeFiles": 66,
+    "originalPackageReceipt": {
+      "bytes": 34652,
+      "file": "package-receipt.json",
+      "sha256": "bb62ad200ac9be9b756616e351bf591508eedb7420f9fd39d5ea0544ae1cc548"
+    },
+    "passed": true,
+    "serverExecutedDuringAudit": false
+  },
+  "productionProfileRefusal": {
+    "command": "./gradlew --offline --no-daemon help -PserverProgramsProviderDir=/private/unsealed-provider",
+    "expectedRefusalObserved": true,
+    "message": "Server programs require the actual pinned complete-source rebuild receipt; current provider is unsealed"
+  },
+  "productionProviderCreated": false,
+  "providerPin": {
+    "bytes": 30945,
+    "sha256": "3895738fad66e4fae9b97a334ffdac460d33f5da9895243288a37df0e2a28611"
+  },
+  "scope": "host-server-programs-provider-implementation",
+  "sourceCompanionComplete": false,
+  "sourceLock": {
+    "bytes": 2170,
+    "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+  }
+}

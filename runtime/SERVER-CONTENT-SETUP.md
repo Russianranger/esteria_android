@@ -92,10 +92,19 @@ native qualifier also calls this exact no-Git verifier after immutable archive,
 source, installed build and complete compiled-selection validation, before an
 engine or SQL. It consumes the actual extracted content and paired module object;
 its separate `packagedRuntimeContent` receipt records full byte readback without
-claiming Android execution. That positive native-format result remains pending.
-The current
-full compiled gate still reports missing appearance schemas before the explicit
-adaptation is qualified. No appearance rows or game asset content are seeded.
-The same native adaptation and the phone journal call the same implementation;
-actual binary-storage/restart and compiled prepared-statement gates remain
-pending. Launcher START remains gated.
+claiming Android execution. Native ARM64 run
+[41046942015](https://github.com/Russianranger/esteria_android/actions/runs/41046942015)
+at integration `1e2a0d1b2f51d31493820edfaa08eaed03723639` now passes this exact
+consumer over 4,063 actual packaged files / 654,242,827 bytes, bound to the
+retained six-patch installed build and full compiled object. Its original SQL,
+same-revision reentry, ledger checks and clean restart also pass. The following
+auth stage still fails on the earlier configuration-generation consumer mismatch.
+Exact artifact/member bindings are in
+`evidence/server-content-readback-41046942015.json`.
+
+The same native adaptation and the phone journal call the same implementation.
+Separate native binary-storage/restart and compiled database-pool startup now pass
+as recorded in `server/APPEARANCE-SCHEMA.md`. No appearance rows or game assets are
+seeded. The complete phone journal/adapter, current seven-patch application,
+authentication/world gameplay and Android execution remain unqualified. Launcher
+START remains gated.

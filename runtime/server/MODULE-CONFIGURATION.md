@@ -79,5 +79,20 @@ The workflow retains no private configurations or logs in public artifacts.
 The auth and reconstructed-client qualification compositions now use the same
 complete metadata renderer, after requiring both main source templates to match
 the installed build. This prepares world module configurations; authserver itself
-does not load the world's CONFIG_FILE_LIST. Actual native ARM64 execution, module
-hooks, schema loading, world entry and Android remain open gates.
+does not load the world's CONFIG_FILE_LIST.
+
+Native ARM64 run [41041859706](https://github.com/Russianranger/esteria_android/actions/runs/41041859706)
+at integration `e1341cf658d972d66bd05c90150eb7bf3c3db0df` now passes the actual
+source/build-bound ConfigMgr gate for all 50 compiled world module configurations:
+every selected file parses, fixture reload values and rendered policies verify,
+and original configuration bytes remain unchanged. Its public receipt identifies
+a 9,187,984-byte reference, SHA-256
+`bb553f0a0b8dc7ee1d1d1019922dedec97e34e31f1a3c56faaa1593dda26bced`.
+The matching source lock is the current seven-patch
+`5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1`.
+Exact receipt/artifact bindings are in
+`runtime/evidence/server-module-configurations-41041859706.json`.
+
+The later compiled SQL/auth/playerbots composition still fails in that earlier
+snapshot. ConfigMgr starts neither worldserver nor SQL; module gameplay hooks,
+playerbots execution, world entry and Android remain separate gates.

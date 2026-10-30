@@ -11,6 +11,20 @@ from tools import qualify_client_auth as qualifier
 
 
 class ClientAuthQualification(unittest.TestCase):
+    def test_mysql_initialization_diagnostics_export_only_error_codes_and_numeric_errno(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            path=Path(temporary)/'initialize-private.log'
+            path.write_bytes(b'[Note] [MY-010116] private-startup\n[ERROR] [MY-010119] '
+                b'password=private-secret; SELECT private FROM accounts; (OS errno 30)\n'
+                b'[ERROR] [MY-000077] private-path Errcode: 13\n')
+            path.chmod(0o600)
+            result=qualifier.initialization_failure_codes(path)
+            self.assertEqual(result['mysqlErrorCodes'],['MY-000077','MY-010119'])
+            self.assertEqual(result['osErrorNumbers'],[13,30]);self.assertFalse(result['privateLogTextExported'])
+            self.assertNotIn('private',json.dumps(result).replace('privateLogTextExported',''))
+            os.link(path,path.with_name('shared'))
+            with self.assertRaises(ValueError):qualifier.initialization_failure_codes(path)
+
     def test_worker_failure_locations_never_export_error_text_or_unowned_frames(self):
         try:
             qualifier.prepare_client(Path('/unused'),Path('/unused'),'invalid','private-secret',1,Path('/unused'))

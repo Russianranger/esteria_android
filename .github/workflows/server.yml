@@ -32,8 +32,6 @@ on:
       - tests/test_empty_script_modules.py
       - tools/qualify_base_sql.py
       - tools/render_server_config.py
-      - runtime/mysql_bootstrap.py
-      - runtime/provision_local_realm.py
       - runtime/provision_local_account.py
       - tests/test_local_account.py
       - tests/srp6_reference.cpp
@@ -81,8 +79,6 @@ on:
       - tests/test_empty_script_modules.py
       - tools/qualify_base_sql.py
       - tools/render_server_config.py
-      - runtime/mysql_bootstrap.py
-      - runtime/provision_local_realm.py
       - runtime/provision_local_account.py
       - tests/test_local_account.py
       - tests/srp6_reference.cpp

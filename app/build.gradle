@@ -166,6 +166,7 @@ apply from: 'database-setup.gradle'
 apply from: 'mysql-probe.gradle'
 apply from: 'shader-provider.gradle'
 apply from: 'turnip-provider.gradle'
+apply from: 'server-programs.gradle'
 apply from: 'wine-probe.gradle'
 
 // Exact source-built X11/ALSA payload, separate from the Wine rootfs and saves.

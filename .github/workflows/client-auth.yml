@@ -20,6 +20,8 @@ on:
       - tools/qualify_dbimport.py
       - tools/initialize_server_schema.py
       - runtime/server_schema_baseline.py
+      - runtime/mysql_bootstrap.py
+      - runtime/provision_local_realm.py
       - runtime/server_schema_adaptations.py
       - runtime/server/appearance-schema-v1.sql
       - runtime/server/appearance-schema.lock.json

@@ -1,0 +1,123 @@
+name: Isolated corresponding-source server rebuild
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - .github/workflows/server-isolated-build.yml
+      - runtime/server/isolated-build.lock.json
+      - tools/prepare_server_isolated_build.py
+      - tools/prepare_server_isolated_sources.py
+      - tools/qualify_server_isolated_build.py
+      - tests/test_server_isolated_*.py
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: isolated-server-sources-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  isolated-rebuild:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Check isolated-source, native environment and completion guards
+        run: |
+          test "$(uname -m)" = aarch64
+          python3 -m unittest tests.test_server_isolated_environment tests.test_server_isolated_sources \
+            tests.test_server_isolated_build tests.test_server_engine_notices -v
+          mkdir -p out/isolated-evidence
+      - name: Acquire exact retained sources and original native build metadata
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/prepare_server_isolated_build.py acquire --output out/isolated-inputs \
+            > out/isolated-evidence/acquisition.log 2>&1
+          cp out/isolated-inputs/acquisition.json out/isolated-evidence/
+      - name: Install original build dependencies and check relevant toolchain and ABI inputs
+        run: |
+          mapfile -t build_packages < <(python3 tools/prepare_server_isolated_build.py packages)
+          test "${#build_packages[@]}" = 10
+          sudo apt-get -o Acquire::Retries=3 update
+          sudo apt-get -o Acquire::Retries=3 install -y "${build_packages[@]}"
+          python3 tools/prepare_server_isolated_build.py environment --inputs out/isolated-inputs \
+            --output out/isolated-evidence/environment.json
+      - name: Replay exactly seven patches in the plain exported source tree
+        run: |
+          python3 tools/prepare_server_isolated_sources.py --source-inputs out/isolated-inputs/source-inputs \
+            --output out/isolated-tree > out/isolated-evidence/source-preparation.json
+          test ! -e out/isolated-tree/source/.git
+          test ! -e out/isolated-tree/source/Harvested
+          test ! -e out/isolated-tree/source/Data
+      - name: Prepare current exact client layout metadata without executing a client
+        run: |
+          env -u GITHUB_TOKEN python3 tools/prepare_server_isolated_build.py protocol \
+            --output out/protocol-reference > out/isolated-evidence/protocol-inputs.json
+      - name: Compile all actual server targets with no cache, repository or external network
+        env:
+          CCACHE_DISABLE: '1'
+        run: |
+          # Preserve the measured original PATH, including its CMake3.31.6.
+          # Only this owned process tree enters the new network namespace.
+          sudo env PATH="$PATH" PYTHONDONTWRITEBYTECODE=1 CCACHE_DISABLE=1 \
+            unshare --net -- sh -c 'ip link set lo up; exec "$@"' sh \
+            python3 tools/qualify_server_isolated_build.py \
+            --prepared "$GITHUB_WORKSPACE/out/isolated-tree" \
+            --inputs "$GITHUB_WORKSPACE/out/isolated-inputs" \
+            --protocol-manifest "$GITHUB_WORKSPACE/out/protocol-reference/limits.json" \
+            --output "$GITHUB_WORKSPACE/out/isolated-rebuild" \
+            > out/isolated-evidence/rebuild.log 2>&1
+      - name: Collect typed completion receipts and bounded public compiler diagnostics
+        if: always()
+        run: |
+          sudo python3 - <<'PY'
+          import json,pathlib,shutil
+          from tools import verify_server_build as files
+          source=pathlib.Path('out/isolated-rebuild');target=pathlib.Path('out/isolated-evidence')
+          target.mkdir(parents=True,exist_ok=True)
+          for name in ('qualification.json','sealed/sealed-source-receipt.json'):
+              path=source/name
+              if path.is_file():
+                  if path.stat().st_size>16*1024**2:raise ValueError('public source receipt bound')
+                  shutil.copyfile(path,target/path.name)
+          logs=source/'diagnostics'
+          if logs.is_dir():
+              for path in logs.iterdir():
+                  if not path.is_file():continue
+                  if path.suffix=='.json' and path.stat().st_size<=16*1024**2:
+                      shutil.copyfile(path,target/path.name)
+                  elif path.suffix=='.log':
+                      with path.open('rb') as stream:
+                          stream.seek(max(0,path.stat().st_size-256*1024))
+                          (target/(path.stem+'-tail.log')).write_bytes(stream.read(256*1024))
+          evidence=dict(formatVersion=1,scope='isolated-native-arm64-source-rebuild-environment',
+              fullServerRepositoryFetched=False,assetTreesFetched=False,compilerCacheDisabled=True,
+              externalNetworkDisabledDuringCompile=True,originalReceiptsPreserved=True,
+              androidRuntimeQualified=False,gameplayQualified=False,
+              files={p.name:files.identity(p) for p in target.iterdir() if p.is_file()})
+          (target/'environment-receipt.json').write_text(json.dumps(evidence,indent=2)+'\n')
+          PY
+          sudo chown -R "$(id -u):$(id -g)" out/isolated-evidence
+          if test -d out/isolated-rebuild/sealed; then
+            sudo chown -R "$(id -u):$(id -g)" out/isolated-rebuild/sealed
+          fi
+      - name: Retain corresponding sources only after the complete isolated rebuild gate
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: success()
+        with:
+          name: isolated-server-complete-sources-${{ github.sha }}
+          compression-level: 0
+          path: out/isolated-rebuild/sealed/
+          retention-days: 30
+          if-no-files-found: error
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: isolated-server-source-rebuild-evidence-${{ github.sha }}
+          path: out/isolated-evidence/
+          retention-days: 30
+          if-no-files-found: error

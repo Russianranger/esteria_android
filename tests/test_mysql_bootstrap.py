@@ -22,7 +22,7 @@ from runtime.mysql_bootstrap import (BootstrapError, DATABASES, FORMAT, Mysql,
                                      atomic_json, identity, initialize, option_file,
                                      private_path, provision, read_secret, state_lock,
                                      verify, exact_version, EngineCapture, ENGINE_LOG_LIMIT,
-                                     run_engine)
+                                     run_engine, initialization_command)
 
 
 def preserve_engine_diagnostics(state: Path):
@@ -66,6 +66,32 @@ def initialization_state():
 
 
 class FilesystemGuards(unittest.TestCase):
+    def test_fresh_initializer_uses_exclusive_private_temporary_storage(self):
+        with tempfile.TemporaryDirectory() as name:
+            root=Path(name); run=root/'run';run.mkdir(mode=0o700)
+            stage=root/'database-initializing'
+            command=initialization_command(Path('/exact/mysqld'),stage,run)
+            temporary=run/'initialize-tmp'
+            self.assertIn('--tmpdir='+str(temporary),command)
+            self.assertIn('--datadir='+str(stage),command)
+            self.assertIn('--no-defaults',command);self.assertIn('--skip-networking',command)
+            self.assertEqual(temporary.stat().st_mode&0o777,0o700)
+            marker=temporary/'preserve';marker.write_bytes(b'uncertain prior temporary state')
+            with self.assertRaises(FileExistsError):initialization_command(Path('/exact/mysqld'),stage,run)
+            self.assertEqual(marker.read_bytes(),b'uncertain prior temporary state')
+
+    def test_initializer_temporary_path_cannot_follow_links_or_select_multiple_directories(self):
+        with tempfile.TemporaryDirectory() as name:
+            root=Path(name);run=root/'run';run.mkdir();outside=root/'outside';outside.mkdir()
+            (run/'initialize-tmp').symlink_to(outside,target_is_directory=True)
+            with self.assertRaisesRegex(BootstrapError,'Symlink'):
+                initialization_command(Path('/mysqld'),root/'stage',run)
+            self.assertEqual(list(outside.iterdir()),[])
+            other=root/'multiple:paths';other.mkdir()
+            with self.assertRaisesRegex(BootstrapError,'multiple directories'):
+                initialization_command(Path('/mysqld'),root/'stage',other)
+            self.assertFalse((other/'initialize-tmp').exists())
+
     def test_legacy_hidden_staging_is_preserved_not_reinitialized(self):
         with tempfile.TemporaryDirectory() as name:
             state = Path(name)

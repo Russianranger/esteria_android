@@ -89,9 +89,15 @@ readback verified both executed modes, zero/two branch markers, all image/shared
 checks and clean teardown. The exact new runtime is now selected only for the
 separate x64 Android fixture. Its complete source ZIP must pass the existing
 Android CI consumer before APK construction or execution; full local source-ZIP
-readback was unavailable at the connector's download limit. See
+readback was unavailable at the connector's download limit. The consumer and
+actual Android13 x64 prefix/entry/offline/loopback diagnostics all passed in
+run41046942035 at `1e2a0d1b2f51d31493820edfaa08eaed03723639`. Independent
+receipt readback confirms normal phase/Wine-server exits and actual adaptation
+markers. Dirty private-file RW-to-RX still fails with errno13 in that guest.
+See
 [`../evidence/wine-private-pe-host-41040860418.json`](../evidence/wine-private-pe-host-41040860418.json).
 
-A fresh Android prefix and reconstructed-client diagnostics remain pending.
+The Android evidence and original receipts are retained in
+[`../evidence/android-wine-client-41046942035.json`](../evidence/android-wine-client-41046942035.json).
 Production ARM64, normal game initialization, hardware graphics and gameplay
 remain unqualified; the production ARM64 provider is unchanged.

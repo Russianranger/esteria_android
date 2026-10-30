@@ -40,6 +40,7 @@ import io.github.russianranger.esteria.core.runtime.install.RuntimeInstaller;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import io.github.russianranger.esteria.runtime.RuntimeSetup;
 import io.github.russianranger.esteria.runtime.ServerRuntimeSetup;
+import io.github.russianranger.esteria.runtime.ServerProgramsSetup;
 import io.github.russianranger.esteria.runtime.GuestBridgeSetup;
 import io.github.russianranger.esteria.runtime.ClientRuntimeSetup;
 import io.github.russianranger.esteria.runtime.ClientLaunchSetup;
@@ -298,11 +299,12 @@ public final class SessionService extends Service {
     private void prepareServerRuntime() throws IOException {
         status = "Preparing bundled database and server dependencies…";
         ServerRuntimeSetup setup = new ServerRuntimeSetup(this, root);
-        if (setup.current() != null) {
-            status = "Database and server dependencies are already prepared. Local server startup is still under development.";
-            return;
-        }
+        ServerProgramsSetup programs = BuildConfig.SERVER_PROGRAMS_PACKAGED ? new ServerProgramsSetup(this, root) : null;
+        // Validate the complete selected pair before either installation can change its pointer.
+        if (programs != null) programs.requireServerRuntimeArchive(setup.archiveSha256());
         final long[] lastUpdate = {0};
+        // prepare() reuses a verified dependency generation without opening its archive.
+        // Continue after reuse so an app update can add a new programs generation.
         RuntimeInstaller.Result result = setup.prepare((phase, path, completed, total) -> {
             long now = android.os.SystemClock.elapsedRealtime();
             if (now - lastUpdate[0] >= 250 || completed == total) {
@@ -312,11 +314,29 @@ public final class SessionService extends Service {
                         + (path == null || path.isEmpty() ? "" : "\n" + path);
             }
         }, cancelled::get);
-        status = "Database and server dependencies are prepared. Local server startup is still under development.";
         log("Server dependencies prepared generation=" + result.generation + " reusedFiles=" + result.reusedFiles
                 + " copiedBytes=" + result.copiedBytes + " hardLinkCopies=" + result.hardLinkCopies
                 + " hardLinkCopyBytes=" + result.hardLinkCopyBytes + " directorySyncSupported=" + result.directorySyncSupported
                 + " mysqlVersion=" + setup.expectedMysqlVersion() + " gameRuntimeQualified=false");
+        if (programs != null) {
+            status = "Preparing bundled server programs…";
+            RuntimeInstaller.Result installed = programs.prepare(setup.archiveSha256(), (phase, path, completed, total) -> {
+                long now = android.os.SystemClock.elapsedRealtime();
+                if (now - lastUpdate[0] >= 250 || completed == total) {
+                    lastUpdate[0] = now;
+                    status = "Preparing bundled server programs…\n" + mib(completed)
+                            + (total >= 0 ? " / " + mib(total) : "") + " MiB"
+                            + (path == null || path.isEmpty() ? "" : "\n" + path);
+                }
+            }, cancelled::get);
+            log("Server programs prepared generation=" + installed.generation + " revision=" + BuildConfig.SERVER_PROGRAMS_REVISION
+                    + " archiveSha256=" + programs.archiveSha256() + " sourcePinSha256=" + BuildConfig.SERVER_PROGRAMS_PIN
+                    + " reusedFiles=" + installed.reusedFiles + " copiedBytes=" + installed.copiedBytes
+                    + " androidRuntimeQualified=false gameRuntimeQualified=false");
+        }
+        status = programs == null
+                ? "Database and server dependencies are prepared. Local server startup is still under development."
+                : "Database dependencies and server programs are prepared. Local server startup is still under development.";
     }
     private void exportBundle(Uri destination) throws Exception {
         if (destination == null || !"content".equals(destination.getScheme())) throw new IOException("No export destination selected");
@@ -351,6 +371,23 @@ public final class SessionService extends Service {
                 facts.put("runtime.server.prepared", String.valueOf(setup.current() != null));
             } catch (IOException error) {
                 facts.put("runtime.server.installationError", error.getMessage());
+            }
+        }
+        facts.put("runtime.serverPrograms.packaged", String.valueOf(BuildConfig.SERVER_PROGRAMS_PACKAGED));
+        facts.put("runtime.serverPrograms.prepared", "false");
+        facts.put("runtime.serverPrograms.androidExecutionQualified", "false");
+        if (BuildConfig.SERVER_PROGRAMS_PACKAGED) {
+            facts.put("runtime.serverPrograms.sourceRevision", BuildConfig.SERVER_PROGRAMS_REVISION);
+            facts.put("runtime.serverPrograms.sourcePinSha256", BuildConfig.SERVER_PROGRAMS_PIN);
+            try {
+                ServerProgramsSetup programs = new ServerProgramsSetup(this, root);
+                ServerRuntimeSetup dependencies = new ServerRuntimeSetup(this, root);
+                programs.requireServerRuntimeArchive(dependencies.archiveSha256());
+                facts.put("runtime.serverPrograms.archiveSha256", programs.archiveSha256());
+                facts.put("runtime.serverPrograms.expectedGeneration", programs.generation());
+                facts.put("runtime.serverPrograms.prepared", String.valueOf(programs.current() != null));
+            } catch (IOException error) {
+                facts.put("runtime.serverPrograms.installationError", error.getMessage());
             }
         }
         facts.put("runtime.guestBridges.packaged", String.valueOf(BuildConfig.GUEST_BRIDGES_PACKAGED));

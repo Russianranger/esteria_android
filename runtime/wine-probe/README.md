@@ -16,8 +16,9 @@ copy space. These archives are intermediate qualification inputs, not a user APK
 An isolated debug APK will subsequently use the already qualified x64 Bionic
 PRoot/loader and real native process owner to execute the actual reconstructed
 Windows x64 client's entry/offline diagnostics, followed by its bounded transport
-diagnostic after upstream qualification. This is pending: no Android Wine,
-ARM64, graphics, audio, authentication, world-entry or gameplay pass is claimed.
+diagnostic after upstream qualification. The actual Android13 x64 diagnostic
+result is recorded below; ARM64, graphics, audio, authentication, world entry
+and gameplay remain separate gates.
 
 Build on an x86_64 Docker host with `runtime/wine-probe/Dockerfile` and target
 `runtime`, mounting a trusted HTTPS CA bundle as BuildKit secret `build_ca`.
@@ -82,8 +83,15 @@ The new corresponding-source ZIP is 877,662,810 bytes, SHA-256
 Its successful same-run export and small manifest (158 source packages / 505
 original Debian files) are verified. Its complete local download/readback was
 unavailable at the connector's limit. The existing Android workflow must stream
-and validate that complete ZIP before it builds or executes the new fixture;
-that consumer check and Android Wine execution remain pending. Public host and
+and validate that complete ZIP before it builds or executes the new fixture.
+That consumer check and the four actual Android x64 phases passed in
+run41046942035 at `1e2a0d1b2f51d31493820edfaa08eaed03723639`: fresh prefix,
+reconstructed entry, offline policy and loopback transport, with normal Wine
+teardown. The original receipts were independently revalidated. This is the
+separate emulator component, not production ARM64 or gameplay. Public Android
+evidence is in
+[`../evidence/android-wine-client-41046942035.json`](../evidence/android-wine-client-41046942035.json).
+Public host and
 artifact evidence is in
 [`../evidence/wine-private-pe-host-41040860418.json`](../evidence/wine-private-pe-host-41040860418.json).
 The exact mapping evidence, source rationale, shared-section bounds and helper

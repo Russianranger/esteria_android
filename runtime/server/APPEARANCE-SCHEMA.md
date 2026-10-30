@@ -51,8 +51,25 @@ rows. Its returned `sourceDerivedAdaptations` proof is separate from the origina
 baseline receipt: original `sourceFiles`, `appliedFiles` and ledgers are untouched.
 A failure preserves partial tables; the next call refuses the nonempty instance.
 
-Host guards cover identity/selection, empty-state refusal, unchanged baseline
-evidence, exact additions, no seeded rows and failure preservation. Native MySQL
-binary roundtrip/restart, actual CharacterDatabase prepared statements, canonical
-updater/authentication, world entry, saved appearances and Android remain separate
-execution gates. This adaptation alone qualifies none of them.
+Native ARM64 run [41045808679](https://github.com/Russianranger/esteria_android/actions/runs/41045808679)
+at integration `8433a5d4e4bf943204f1159af21d4fbcf67e26b4` now passes the separate
+MySQL `8.0.46-0ubuntu0.24.04.4` storage gate: exact 49/132-byte NUL/high-byte
+`REPLACE`/read/delete, clean restart, byte-for-byte persistence and removal of all
+fixture rows. Its receipt keeps C++ wire-payload parsing and character creation
+false; raw binary storage is the measured scope.
+
+The unchanged retained six-patch compiled importer from build `41005048019.1`
+then passes actual database-pool/prepared-statement startup, all selected original
+SQL/update-ledger checks, same-revision reentry, local realm reassertion and clean
+restart. Source-derived table evidence remains separate from canonical SQL. The
+workflow subsequently fails before authserver startup because its realm helper
+still hashes only four legacy configuration files while the renderer hashes the
+complete module selection. This later failure does not qualify authentication.
+
+Public artifact `12973155745` is 706,752 bytes, SHA-256
+`0e0069f94ce06e3256e0e189915f6f1ef5267ea0fba320401b5932912fc6656a`.
+The compact receipt bindings are in
+`runtime/evidence/server-schema-components-41045808679.json`. Seven-patch compiled
+qualification, actual auth/client pairing, world entry, saved appearances and
+Android remain separate gates. No gameplay result follows from these component
+passes.

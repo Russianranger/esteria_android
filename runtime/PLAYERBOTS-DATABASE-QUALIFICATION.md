@@ -60,5 +60,14 @@ are checked, and executes the fresh updater/auth/playerbots composition inside t
 pinned MySQL runtime with external networking disabled. It also gates all selected
 world module configurations through real ConfigMgr before SQL qualification.
 Public evidence includes the reference receipt and database qualification receipt;
-raw playerbots SQL logs and database contents remain private. Actual ARM64 linking
-and MySQL execution of this newly enabled reference remain pending.
+raw playerbots SQL logs and database contents remain private. Native ARM64 build
+`41041859706.1` now links this exact reference and passes its real database-source,
+definition and compiled-module binding checks. Its public receipt identifies the
+25,183,072-byte reference as SHA-256
+`cbc7c5dc1b418e835b7778b73e5015284cf943b15e2b9fe2234db74aae230b07`;
+its build-only receipt explicitly keeps `databaseExecuted` false. The same run
+passes actual ConfigMgr parsing/reload of all 50 selected module configurations,
+then fails the earlier snapshot's SQL/auth composition before playerbots database
+execution. See `runtime/evidence/server-module-configurations-41041859706.json`.
+Actual fourth-schema execution, prepared statements, reentry/persistence and bot
+AI remain unqualified.

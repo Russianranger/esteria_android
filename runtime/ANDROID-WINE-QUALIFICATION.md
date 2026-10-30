@@ -122,10 +122,45 @@ artifacts. Independent local readback verified the 193,915,627-byte runtime,
 10,191 entries, 673,995,738 file bytes, 964 links and required ELF/PE hashes.
 The 877,662,810-byte source ZIP's same-run identity and small source manifest are
 verified; the complete source ZIP was unavailable for local readback because of
-the connector's download limit. The Android workflow must validate every byte,
-descriptor and adaptation source before APK construction or execution. Its new
-consumer check and fresh Android Wine execution remain pending. Public artifact
+the connector's download limit. The Android workflow subsequently validated every
+byte, descriptor and adaptation source before APK construction and execution.
+Public host artifact
 identities, the original host receipt and readback counts are retained in
 [`evidence/wine-private-pe-host-41040860418.json`](evidence/wine-private-pe-host-41040860418.json).
 No target-SDK, permission, SELinux or device policy changes are made; ARM64
 instruction-cache and executable-image behavior require their own execution proof.
+
+## Actual adapted Android x64 result
+
+[Run 41046942035](https://github.com/Russianranger/esteria_android/actions/runs/41046942035)
+at `1e2a0d1b2f51d31493820edfaa08eaed03723639` passed the complete source
+consumer/sealer, exact APK checks and actual Android13 x64 execution at target35.
+The production installer prepared the verified runtime. Four owned guest launches
+initialized a fresh Wine prefix and ran the reconstructed client's entry, offline
+policy and real loopback transport diagnostics; every phase and Wine server
+stopped normally. The instrumentation completed in 195.713 seconds.
+
+The original C++ receipts pass the exact pinned client validators again on
+independent readback. Entry covered CRT/FP state, Storm allocation, C++ unwind
+and fibers. Offline policy rejected remote destinations while preserving failure
+callbacks. Loopback transport verified two connections, two received/sent frames,
+1,027 received stream bytes, 1,031 sent stream bytes, joined workers and disconnect
+callbacks. The adaptation marker appears in all four phases. The same guest's
+diagnostic still rejects dirty private-file RW-to-RX with errno13 while anonymous
+RW-to-RX succeeds, so this result does not depend on a relaxed Android policy.
+
+The evidence artifact12972908507 is 79,793 bytes, SHA-256
+`3a153b96c6d7d28697b52d4a650ab38135312dfebd376a4b0c977d0ede6fa330`.
+The complete sealed source companion12973192610 is 930,887,035 bytes, SHA-256
+`e293979c2f0cc219091bccba3ad64e2d11ad5566a67e5ee01b85e96fb3a85074`.
+CI read back all 158 Wine/Debian source packages / 505 original files and all
+15 actual x64 talloc relinkable objects before execution. The small public
+receipts and artifact identities are retained in
+[`evidence/android-wine-client-41046942035.json`](evidence/android-wine-client-41046942035.json).
+The large final companion was not downloaded locally.
+
+This establishes the named reconstructed-client diagnostics through PRoot/Wine
+on the Android x64 emulator. The headless prefix still emits display/COM/USB
+diagnostics; graphics and those optional services are not qualified by zero exits.
+CommonMain and asset loading did not run. Production ARM64, Thor, graphics,
+audio, authentication, world entry and gameplay remain unqualified by this result.

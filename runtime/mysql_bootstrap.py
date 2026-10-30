@@ -390,6 +390,21 @@ def _cnf_path(path: Path) -> str:
     return '"' + text + '"'
 
 
+def initialization_command(mysqld: Path, stage: Path, run: Path) -> list[str]:
+    """Keep fresh-engine temporary writes in a new, owned private directory."""
+    temporary = private_path(run / 'initialize-tmp')
+    if ':' in str(temporary):
+        raise BootstrapError('Initialization temporary path must not select multiple directories')
+    # A leftover is recovery state, even if empty. Never adopt or clear it.
+    temporary.mkdir(mode=0o700)
+    sync_directory(run)
+    command = [str(mysqld), '--no-defaults', '--initialize-insecure', f'--datadir={stage}',
+               f'--tmpdir={temporary}', '--skip-networking', '--secure-file-priv=NULL']
+    if os.geteuid() == 0:
+        command.append('--user=root')
+    return command
+
+
 def initialize(mysqld: Path, mysql: Path, state: Path, expected_version: str) -> dict:
     """Stage a brand-new instance. Never call --initialize over existing storage."""
     exact_version(expected_version)
@@ -456,10 +471,7 @@ def initialize(mysqld: Path, mysql: Path, state: Path, expected_version: str) ->
         stage.mkdir(mode=0o700)
         progress = {'format': FORMAT, 'version': expected_version, 'phase': 'initializing'}
         atomic_json(journal, progress)
-        command = [str(mysqld), '--no-defaults', '--initialize-insecure', f'--datadir={stage}',
-                   '--skip-networking', '--secure-file-priv=NULL']
-        if os.geteuid() == 0:
-            command.append('--user=root')
+        command = initialization_command(mysqld, stage, run)
         returncode = run_engine(command, state / 'logs/mysql-initialize-engine.log', timeout=180)
         if returncode:
             raise BootstrapError(f'Fresh MySQL initialization failed (exit {returncode}); staging and logs/mysql-initialize-engine.log were preserved')

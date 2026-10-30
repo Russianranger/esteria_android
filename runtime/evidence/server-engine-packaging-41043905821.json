@@ -1,0 +1,222 @@
+{
+  "androidProviderCreated": false,
+  "androidRuntimeQualified": false,
+  "artifacts": {
+    "debug": {
+      "bytes": 1083562454,
+      "id": 12970664314,
+      "sha256": "9d4213bc341f0dfbc7cd7b6a6329aa81723543d6d3e17d275512ad6ef51d7f3d"
+    },
+    "nativeEvidence": {
+      "bytes": 63299,
+      "id": 12970954377,
+      "sha256": "39fb18aa7807fe1d06fdd5d8fd2a17cbb56f7aad60c5dd7a3b9f348b691f18ac"
+    },
+    "packagingEvidence": {
+      "bytes": 5247,
+      "id": 12971811817,
+      "sha256": "04308a841dfa58a840baacd5ee17a1571e6a337ca50ce5a20e943e96f75dcbd9"
+    },
+    "runtime": {
+      "bytes": 190334300,
+      "id": 12972136136,
+      "sha256": "98e624cd1c73b8a0f3d84ba666ba86874d7c00b41c8be9b4291d3e7f18a60955"
+    },
+    "sourceInputs": {
+      "bytes": 19963445,
+      "id": 12971996464,
+      "sha256": "18378ef039e07579893d4991f8e1065ddd24f99905e088e4be132d5ffdb4b756"
+    }
+  },
+  "artifactsRetentionDays": 30,
+  "configurationTemplates": 53,
+  "debugArchive": {
+    "bytes": 1082880246,
+    "sha256": "facc75680f3fb1b205a98960d6ea5a0d565cb2a2b4bd56303dd6625fd4854a24"
+  },
+  "durableRelease": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "hostPackageJob": {
+    "conclusion": "success",
+    "id": 124023130800
+  },
+  "independentHostAarch64Executed": false,
+  "independentHostRuntimeArchiveAndExpandedFilesReadBack": true,
+  "integrationRevision": "ceb444418421f165a0fab5d7c5f8751a4a13c61e",
+  "isolatedSourceRebuildQualified": false,
+  "nativeLoaderSmoke": {
+    "authWorldVersionExecuted": true,
+    "outputs": {
+      "authserver": "AzerothCore rev. f35f04d01689+ 2026-10-28 12:35:08 -0500 (HEAD branch) (Unix, RelWithDebInfo, Static)",
+      "worldserver": "AzerothCore rev. f35f04d01689+ 2026-10-28 12:35:08 -0500 (HEAD branch) (Unix, RelWithDebInfo, Static)"
+    },
+    "qualificationSucceeded": true,
+    "receipt": {
+      "bytes": 2427,
+      "sha256": "33fee9aefde98026139c3ba059f296b958cf813d13eb1f48d7bf74c749b74a09"
+    },
+    "scope": "native-arm64-derived-auth-world-version-only"
+  },
+  "nativeReferenceJob": {
+    "conclusion": "failure",
+    "id": 124025697568
+  },
+  "nativeSql": {
+    "compiledUpdaterAttempted": true,
+    "compiledUpdaterCompleted": false,
+    "compiledUpdaterExecuted": true,
+    "failure": "compiled dbimport failed (exit 1); partial fixture preserved",
+    "initializedNewInstance": true,
+    "observedMissingTables": [
+      "acore_characters.character_body_shape",
+      "acore_characters.character_retail_look"
+    ],
+    "ownedAuthenticationStarted": false,
+    "qualificationSucceeded": false,
+    "receipt": {
+      "bytes": 162221,
+      "sha256": "0a172b2e7b96be19e096a9f0a6c7b9ae45b61dcc23d13ba662593c32db60a83e"
+    }
+  },
+  "originalBuildId": "41019374697.1",
+  "originalIntegrationRevision": "e9dcb61d8d8c40fc683ac2a67bbf15a8eb538300",
+  "originalReceiptsPreserved": true,
+  "packageReceipt": {
+    "bytes": 34652,
+    "sha256": "bb62ad200ac9be9b756616e351bf591508eedb7420f9fd39d5ea0544ae1cc548"
+  },
+  "producerBothArchivesReadBack": true,
+  "producerLoadedBytesAndDebugPairVerified": true,
+  "programs": {
+    "authserver": {
+      "debug": {
+        "bytes": 33394888,
+        "sha256": "71052571b414372ee2aacc88bb4e65d0d97f0c2eacfb617cd4b74b5bc7edc7b0"
+      },
+      "original": {
+        "bytes": 35077368,
+        "sha256": "e477158fd3b6d9301101fc6dd149280d51bb16b73250f03d9036fa6b670ac6ca"
+      },
+      "stripped": {
+        "bytes": 1709864,
+        "sha256": "04cbda982ca1385903929eb46ca52b7cb41ca222e8a48f9898af716d2b878531"
+      }
+    },
+    "dbimport": {
+      "debug": {
+        "bytes": 25310768,
+        "sha256": "06622d868130849a8b9da0f2a62fe3eeb03f8ba776c667cd14e2663a4b9ee60d"
+      },
+      "original": {
+        "bytes": 26656208,
+        "sha256": "5816e3fe9c8bdb185db037389b059299ca3a1fb3fc305c071bea4b2159c95439"
+      },
+      "stripped": {
+        "bytes": 1379920,
+        "sha256": "f452ef5c7ab90451e9060bdace1ba866a93da768145428b15ddc25a7e73b6c24"
+      }
+    },
+    "worldserver": {
+      "debug": {
+        "bytes": 2587747032,
+        "sha256": "8b408f8170bd43566db3b58b1acc8f65756283034ba1f9891c7a0cc80b68b0c2"
+      },
+      "original": {
+        "bytes": 2646753984,
+        "sha256": "664890944222b4cf4cb368a4613ceba0951efc0035570ee099afc9d47d6d3128"
+      },
+      "stripped": {
+        "bytes": 59025784,
+        "sha256": "9757f0bbb2ee159d18070d8f5fe7ecdf5b4b8b7171116198039f418d5ec13aa1"
+      }
+    }
+  },
+  "runtimeArchive": {
+    "bytes": 21352885,
+    "sha256": "00bd0a5829caec2a2b11d4e85bd261b67461c04e6755bb332d37d393311c6ccb"
+  },
+  "runtimeFileBytes": 62886162,
+  "runtimeFiles": 60,
+  "scope": "actual-seven-patch-engine-derivatives-and-native-reference",
+  "sourceCompanionComplete": false,
+  "sourceInputs": {
+    "adaptedCopies": {
+      "bytes": 227898,
+      "files": 9
+    },
+    "adaptedCopiesHashAndBlobAddressesVerified": true,
+    "adaptedCopiesVerified": 9,
+    "allPristineGitBlobAddressesVerified": true,
+    "androidRuntimeQualified": false,
+    "archive": {
+      "bytes": 18216368,
+      "file": "server-engine-source-inputs.tar.gz",
+      "sha256": "8c820a962947d2b8e2028c434ccedc969127716390f557626444d23ff8e15b99"
+    },
+    "archiveEntries": 5135,
+    "archiveFileBytes": 122042628,
+    "artifactId": 12971996464,
+    "artifactZip": {
+      "bytes": 19963445,
+      "sha256": "18378ef039e07579893d4991f8e1065ddd24f99905e088e4be132d5ffdb4b756"
+    },
+    "auditedOriginalNoticeBlobsReverified": 65,
+    "completeArchiveReadbackVerified": true,
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "isolatedSourceRebuildQualified": false,
+    "manifest": {
+      "bytes": 1581647,
+      "sha256": "c19dda3ad0732d9b4b852cb0207432a32f877917fb2f0e9cf9075634f82678ef"
+    },
+    "noGitConfigurationArchived": true,
+    "observedServerIncludeDirectories": 340,
+    "observedServerSources": 2199,
+    "originalBuild": {
+      "bytes": 32521,
+      "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+    },
+    "originalCompiledModules": {
+      "bytes": 5348,
+      "sha256": "6459b6a1acab2c62c474e4c6ab3eb651daa21f697ccd628e93a38bad298bbdd1"
+    },
+    "originalIntegrationRevision": "e9dcb61d8d8c40fc683ac2a67bbf15a8eb538300",
+    "originalLuaArchive": {
+      "bytes": 252651,
+      "sha256": "b9e2e4aad6789b3b63a056d442f7b39f0ecfca3ae0f1fc0ae4e9614401b69f4b"
+    },
+    "originalLuaArchiveHashVerified": true,
+    "originalSourceNoticesRetained": true,
+    "pristineAndAdaptedFilesSeparatelyIdentified": true,
+    "pristineGitBlobsVerified": 5119,
+    "pristineGitInputs": {
+      "eluna": {
+        "bytes": 4047291,
+        "files": 204
+      },
+      "integration": {
+        "bytes": 1569993,
+        "files": 177
+      },
+      "server": {
+        "bytes": 65757714,
+        "files": 4738
+      }
+    },
+    "receipt": {
+      "bytes": 1746751,
+      "sha256": "46a4ef82021d49699694bccab545591f3debbd6f4ab9e208c54e4796326bc03e"
+    },
+    "scope": "independent-actual-seven-patch-source-input-readback",
+    "sourceCompanionComplete": false,
+    "sourceLock": {
+      "bytes": 2170,
+      "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+    },
+    "transitiveIncludeClosureProved": false,
+    "workflowRun": 41043905821
+  },
+  "sourceLockSha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1",
+  "workflowRun": 41043905821
+}

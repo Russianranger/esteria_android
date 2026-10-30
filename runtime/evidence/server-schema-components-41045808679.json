@@ -1,0 +1,126 @@
+{
+  "androidRuntimeQualified": false,
+  "appearanceStorage": {
+    "binaryRoundtripVerified": true,
+    "characterCreationQualified": false,
+    "cleanRestartPersistenceVerified": true,
+    "cppWirePayloadParsingQualified": false,
+    "fixtureRowsRemoved": true,
+    "originalSourceSchemasQualified": false,
+    "qualificationSucceeded": true,
+    "replaceReadDeleteVerified": true,
+    "schemas": {
+      "character_body_shape": {
+        "binaryBytes": 49,
+        "columns": [
+          "guid\tint unsigned\tNO\tPRI",
+          "data\tbinary(49)\tNO\t"
+        ],
+        "engine": "InnoDB"
+      },
+      "character_retail_look": {
+        "binaryBytes": 132,
+        "columns": [
+          "guid\tint unsigned\tNO\tPRI",
+          "data\tbinary(132)\tNO\t"
+        ],
+        "engine": "InnoDB"
+      }
+    }
+  },
+  "artifact": {
+    "bytes": 706752,
+    "id": 12973155745,
+    "sha256": "0e0069f94ce06e3256e0e189915f6f1ef5267ea0fba320401b5932912fc6656a",
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/41045808679/artifacts/12973155745"
+  },
+  "compiledUpdater": {
+    "compiledAutoPopulationQualified": false,
+    "compiledUpdaterCompleted": true,
+    "compiledUpdaterExecuted": true,
+    "coreModuleUpdatesQualified": true,
+    "firstUpdater": {
+      "diagnosticBytes": 57113,
+      "diagnosticSha256": "dc0e171ca84e4a5000b2c643478f548feaf805e6f28d7e4342c5af7ef3bf52f1",
+      "exitCode": 0
+    },
+    "gameSchemasQualified": false,
+    "loopbackRealmVerifiedAfterDbimport": true,
+    "playerbotsDatabaseUntouched": true,
+    "qualificationSucceeded": true,
+    "restartPersistenceVerified": true,
+    "sameRevisionReentryVerified": true,
+    "secondUpdater": {
+      "diagnosticBytes": 5392,
+      "diagnosticSha256": "a290dba53b5d737d07c426d34680392c39e47408f92df5869e1350ede9b9262d",
+      "exitCode": 0
+    }
+  },
+  "executionEnvironment": "native-linux-arm64-disposable-network-none",
+  "existingSaveUpgradesQualified": false,
+  "externalNetworkDisabled": true,
+  "followingAuthDiagnosis": {
+    "detail": "Renderer hashes complete selected module configurations and module proof; active_config still hashes only the four legacy files.",
+    "privateSqlOrCredentialsExported": false,
+    "scope": "host-reproduced-config-generation-consumer-mismatch"
+  },
+  "followingAuthProbe": {
+    "moduleConfigurationsPrepared": true,
+    "ownedLoopbackListenerVerified": false,
+    "persistedSessionKeyVerified": false,
+    "qualificationSucceeded": false,
+    "reconstructedClientExecuted": false,
+    "srpProofVerified": false
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "integrationRevision": "8433a5d4e4bf943204f1159af21d4fbcf67e26b4",
+  "mysqlVersion": "8.0.46-0ubuntu0.24.04.4",
+  "originalServerBuildId": "41005048019.1",
+  "playerbotsRuntimeQualified": false,
+  "receiptFiles": {
+    "appearance-qualification.json": {
+      "bytes": 6420,
+      "sha256": "755f123633ade2dba0c9caa6186b66183a60e507712489a99915cedaeef7b948"
+    },
+    "auth-qualification.json": {
+      "bytes": 2519,
+      "sha256": "01320427e5ecc605ff2fbd06d25a691e1012d1893cc530228d143471c1a91d40"
+    },
+    "environment-receipt.json": {
+      "bytes": 3947,
+      "sha256": "ac3271dd6119323fc5d4617176080c156ae5768132592fb6bb135d97b37a4468"
+    },
+    "qualification.json": {
+      "bytes": 167702,
+      "sha256": "cfec566409dca1ee5a8fed104d81c9d368208c6ced0e4e636e305ff1666c6852"
+    }
+  },
+  "scope": "native-arm64-fresh-source-baseline-derived-appearance-and-compiled-updater-components",
+  "sourceDerivedAdaptation": {
+    "adaptationId": "character-appearance-empty-v1",
+    "canonicalOriginal": false,
+    "exactEmptyTableAdditionVerified": true,
+    "metadataIdentity": {
+      "bytes": 7783,
+      "sha256": "6ccf5e363ec3daa5c37cbbe753d29a7e6b5d10f18eef407b700fc0d67985428d"
+    },
+    "originalSourceFilesUnchanged": true,
+    "rowsSeeded": false,
+    "sourceDerived": true,
+    "sqlExecuted": true,
+    "sqlIdentity": {
+      "bytes": 790,
+      "sha256": "8e35e8e41d74979eaa98f6f2d824d831b73f63a4a6b2f573b869484b2ff15d46"
+    },
+    "updaterLedgerRowsWritten": false
+  },
+  "sourceLockSha256": "dbbf8983cfa2b429f7dd0c3308a2795ffbecd29e8019adf35348447e1eab41b0",
+  "workflow": {
+    "failedFollowingStep": "auth-protocol-probe",
+    "id": 41045808679,
+    "overallConclusion": "failure",
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/41045808679"
+  },
+  "worldEntryQualified": false
+}

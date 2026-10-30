@@ -1,0 +1,48 @@
+{
+  "androidRuntimeQualified": false,
+  "dateUtc": "2026-10-30",
+  "formatVersion": 1,
+  "gameLoginQualified": false,
+  "gameplayQualified": false,
+  "implementation": {
+    "dependencyArchivePreflightBeforeInstallation": true,
+    "executableLaunchAdded": false,
+    "mainStartActivationAdded": false,
+    "mutableStateInitializationAdded": false,
+    "optionalProgramsRequirePackagedProfile": true,
+    "publicDiagnostics": [
+      "packaged",
+      "prepared",
+      "sourceRevision",
+      "sourcePinSha256",
+      "archiveSha256",
+      "expectedGeneration",
+      "androidExecutionQualified"
+    ],
+    "usesExistingArchiveReuseInstaller": true,
+    "verifiedDependencyReuseContinuesToPrograms": true
+  },
+  "productionProviderCreated": false,
+  "scope": "host-server-programs-setup-service-integration",
+  "serviceSource": {
+    "bytes": 40690,
+    "path": "app/src/main/java/io/github/russianranger/esteria/SessionService.java",
+    "sha256": "a4ba1b4641b8f2f688c733cddc3dc4952cbaa21d00b3fecc50359e03441d4f17"
+  },
+  "sourceCompanionComplete": false,
+  "sourceLock": {
+    "bytes": 2170,
+    "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+  },
+  "validation": {
+    "androidExecutionPerformed": false,
+    "cachedProgramsInstallationExecutedHere": false,
+    "command": "./gradlew --offline --no-daemon :app:compileDebugJavaWithJavac :app:lintDebug",
+    "javaCompiled": true,
+    "jdk": 17,
+    "lintPassed": true,
+    "passed": true,
+    "productionProgramsBranchExecuted": false,
+    "productionProviderProfileEnabled": false
+  }
+}

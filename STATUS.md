@@ -14,6 +14,27 @@ no default merge, history rewrite or server push has occurred.
 
 ## Latest implementation checkpoint
 
+Android13 x64 Wine run41046942035 now executes the reconstructed client entry,
+offline component diagnostics and real loopback transport after the source-owned
+private-PE mapping adaptation. All original source inputs were verified before
+execution. This is an emulator component result, not ARM64, CommonMain, rendering,
+audio or world gameplay. The separate production ARM64 Wine adaptation is underway.
+
+Native ARM64 retained-server run41045808679 passes fresh compiled SQL, exact
+original updater ledgers, reentry and restart. Appearance49/132-byte binary
+storage also survives restart. Run41046942015 additionally verifies all4,063
+phone-side source-content files without Git. Authentication then stopped before
+the engine because the realm reader still expected the old four-file config
+layout; the reviewed fix now accepts the exact complete50-module generation.
+Client/auth qualification separately receives an owned MySQL initialization
+TMP directory and bounded numeric-only diagnostics; actual results are pending.
+
+The measured server runtime is21,996,594bytes with all126program/config/provenance/
+notice files. Native executable loading and bounded Java installation/reuse pass.
+The optional Android programs installer is integrated but remains source-gated:
+its clean isolated ARM64 source rebuild must succeed before packaging is enabled.
+This checkpoint publishes that reproducible build workflow. No user-test APK is ready.
+
 The full reconstructed EXE's offline diagnostics pass Windows x64/ARM64 and
 native Linux ARM64 Wine in run41003225299, client
 `e2718f647a7f1efb9219106c7501f88a0bf06e4f`. New client tip

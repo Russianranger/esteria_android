@@ -13,6 +13,7 @@ from runtime import mysql_bootstrap as db
 from runtime import provision_local_realm as realm
 from tools.render_server_config import render
 from tests.test_server_config import fixture
+from tests import test_server_config as config_fixture
 
 FIXTURE = Path(__file__).parent / 'fixtures/realmlist-f35f04d.sql'
 FIXTURE_SHA256 = 'e3743af73bd7cf4b75f2cd49a0269a31a5fc842cd78682f58ea0c4021d2d191f'
@@ -42,6 +43,116 @@ def publish_config(state, change):
     current.unlink()
     current.symlink_to('generations/' + digest)
     return digest
+
+
+def rendered_complete(root):
+    server = fixture(root)
+    world = server / 'src/server/apps/worldserver/worldserver.conf.dist'
+    with world.open('a') as output:
+        output.write('\nRealmID = 1\n')
+    inventory, compiled = config_fixture.ServerConfigTests().module_fixture(root, server)
+    state = root / 'state'
+    render(server, state, root / 'data', root / 'sql', Path('/usr/bin/mysql'),
+           module_inventory=inventory, compiled_modules=compiled)
+    return state
+
+
+def republish_complete(state, change):
+    current = state / 'config/current'
+    files = realm.generation_files(current.resolve())
+    change(files)
+    digest = hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest()
+    target = state / 'config/generations' / digest
+    target.mkdir()
+    for name, text in files.items():
+        path = target / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text)
+    current.unlink()
+    current.symlink_to('generations/' + digest)
+    return digest
+
+
+class CompleteRealmConfigurations(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name)
+        self.state = rendered_complete(self.root)
+        self.secret = db.read_secret(self.state / 'accounts/database-secret')
+        self.current = self.state / 'config/current'
+
+    def test_actual_renderer_complete_generation_is_accepted_and_every_module_is_hashed(self):
+        self.assertEqual(realm.active_config(self.state, self.secret), self.current.resolve().name)
+        files = realm.generation_files(self.current.resolve())
+        proof = json.loads(files['module-configuration.json'])
+        self.assertEqual(set(files), {'authserver.conf', 'worldserver.conf', 'mysql.cnf',
+                                     'module-configuration.json'} | {'modules/' + name for name in proof['configFiles']})
+        module = next(path for path in sorted((self.current / 'modules').iterdir()) if path.name != 'playerbots.conf')
+        with module.open('a') as output:
+            output.write('\nChanged = 1\n')
+        with self.assertRaisesRegex(db.BootstrapError, 'generation has changed'):
+            realm.active_config(self.state, self.secret)
+
+    def test_extra_missing_nested_and_case_colliding_generation_members_are_rejected(self):
+        for kind in ('extra', 'missing', 'nested', 'case'):
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as temporary:
+                state = rendered_complete(Path(temporary)); current = state / 'config/current'
+                if kind == 'extra': (current / 'modules/undeclared.conf').write_text('Unexpected = 1\n')
+                elif kind == 'missing': (current / 'modules/playerbots.conf').unlink()
+                elif kind == 'nested': (current / 'modules/nested').mkdir()
+                else: (current / 'modules/PLAYERBOTS.conf').write_text('Unexpected = 1\n')
+                with self.assertRaises(db.BootstrapError):
+                    realm.active_config(state, db.read_secret(state / 'accounts/database-secret'))
+
+    def test_invalid_duplicate_or_unsafe_declarations_fail_even_with_rehashed_generation(self):
+        original = os.readlink(self.current)
+        changes = ('duplicate', 'case', 'path', 'missing-playerbots', 'wrong-scope', 'source-lock', 'qualified', 'format')
+        for kind in changes:
+            def change(files):
+                proof = json.loads(files['module-configuration.json'])
+                if kind == 'duplicate': proof['configFiles'].append(proof['configFiles'][0])
+                elif kind == 'case': proof['configFiles'].append(proof['configFiles'][0].upper())
+                elif kind == 'path': proof['configFiles'][0] = '../escaped.conf'
+                elif kind == 'missing-playerbots': proof['configFiles'].remove('playerbots.conf')
+                elif kind == 'wrong-scope': proof['scope'] = 'module-startup-qualified'
+                elif kind == 'source-lock': proof['sourceLockSha256'] = 'not-a-hash'
+                elif kind == 'qualified': proof['moduleStartupQualified'] = True
+                else: proof['formatVersion'] = True
+                files['module-configuration.json'] = json.dumps(proof)
+            with self.subTest(kind=kind):
+                republish_complete(self.state, change)
+                with self.assertRaises(db.BootstrapError): realm.active_config(self.state, self.secret)
+                self.current.unlink(); self.current.symlink_to(original)
+
+    def test_duplicate_json_proof_keys_and_symlink_or_special_members_are_rejected(self):
+        proof = self.current / 'module-configuration.json'
+        raw = proof.read_bytes()
+        proof.write_bytes(raw.replace(b'"formatVersion": 1', b'"formatVersion": 1, "formatVersion": 1'))
+        with self.assertRaisesRegex(db.BootstrapError, 'Duplicate module'):
+            realm.active_config(self.state, self.secret)
+        proof.write_bytes(raw)
+        target = self.current / 'modules/playerbots.conf'
+        original = target.read_bytes(); target.unlink()
+        target.symlink_to(self.root / 'outside')
+        with self.assertRaises(db.BootstrapError): realm.active_config(self.state, self.secret)
+        target.unlink(); os.mkfifo(target)
+        with self.assertRaises(db.BootstrapError): realm.active_config(self.state, self.secret)
+        target.unlink(); target.write_bytes(original)
+        modules = self.current.resolve() / 'modules'
+        retained = modules.with_name('retained-modules')
+        modules.rename(retained); modules.symlink_to(retained, target_is_directory=True)
+        with self.assertRaises(db.BootstrapError): realm.active_config(self.state, self.secret)
+
+    def test_module_and_total_byte_limits_are_enforced_before_generation_acceptance(self):
+        target = self.current / 'modules/playerbots.conf'
+        raw = target.read_bytes()
+        target.write_bytes(b'x' * (realm.MAX_MODULE_CONFIG + 1))
+        with self.assertRaisesRegex(db.BootstrapError, 'metadata bound'):
+            realm.active_config(self.state, self.secret)
+        target.write_bytes(raw)
+        with patch.object(realm, 'MAX_GENERATION_CONFIG', 100), self.assertRaisesRegex(db.BootstrapError, 'total metadata bound'):
+            realm.active_config(self.state, self.secret)
 
 
 class RealmGuards(unittest.TestCase):

@@ -1,0 +1,27 @@
+// Optional immutable server programs. Installation never launches local services.
+def serverProgramsProvider = providers.gradleProperty('serverProgramsProviderDir').orNull
+def serverProgramsPinFile = rootProject.file('runtime/server/programs-provider.lock.json')
+def serverProgramsPin = new groovy.json.JsonSlurper().parse(serverProgramsPinFile)
+def serverProgramsPinHash = java.security.MessageDigest.getInstance('SHA-256').digest(serverProgramsPinFile.bytes).encodeHex().toString()
+android.defaultConfig.buildConfigField 'boolean', 'SERVER_PROGRAMS_PACKAGED', serverProgramsProvider ? 'true' : 'false'
+android.defaultConfig.buildConfigField 'String', 'SERVER_PROGRAMS_REVISION', '"' + serverProgramsPin.serverRevision + '"'
+android.defaultConfig.buildConfigField 'String', 'SERVER_PROGRAMS_PIN', '"' + serverProgramsPinHash + '"'
+if (serverProgramsProvider) {
+    if (serverProgramsPin.state != 'sealed-source-and-native-loader' || serverProgramsPin.sourceCompanionComplete != true ||
+        serverProgramsPin.sourceQualification == null)
+        throw new GradleException('Server programs require the actual pinned complete-source rebuild receipt; current provider is unsealed')
+    if (providers.gradleProperty('nativeBridgeAbi').getOrElse('arm64-v8a') != 'arm64-v8a' ||
+        providers.gradleProperty('presentationEmulatorTest').getOrElse('false') == 'true' ||
+        ['prootProbeProviderDir', 'mysqlProbeProviderDir', 'wineProbeProviderDir'].any { providers.gradleProperty(it).isPresent() })
+        throw new GradleException('Server programs use only the production ARM64 profile, separately from emulator fixtures')
+    if (!providers.gradleProperty('serverRuntimeProviderDir').isPresent())
+        throw new GradleException('Server programs require their separately verified Ubuntu ARM64 server dependency provider')
+    def provider = file(serverProgramsProvider)
+    android.sourceSets.main.assets.srcDir(new File(provider, 'assets'))
+    android.androidResources.noCompress += ['archive']
+    def verifyServerPrograms = tasks.register('verifyServerProgramsProvider', Exec) {
+        workingDir rootProject.projectDir
+        commandLine 'python3', 'tools/provider_server_programs.py', 'verify', '--provider', provider.absolutePath
+    }
+    tasks.named('preBuild').configure { dependsOn verifyServerPrograms }
+}

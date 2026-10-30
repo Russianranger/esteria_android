@@ -1,0 +1,47 @@
+{
+  "androidRuntimeQualified": false,
+  "artifact": {
+    "bytes": 706939,
+    "id": 12972419054,
+    "sha256": "ca098d79f287877674eb67b1491bc872db0123c0ba802e8ae7c81335592a15ab",
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/41046942015/artifacts/12972419054"
+  },
+  "canonicalSevenPatchApplicationQualified": false,
+  "cleanRestartPersistenceVerified": true,
+  "compiledUpdaterQualified": true,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "integrationRevision": "1e2a0d1b2f51d31493820edfaa08eaed03723639",
+  "originalServerBuildId": "41005048019.1",
+  "packagedRuntimeContent": {
+    "allPackagedBytesReadBack": true,
+    "androidRuntimeQualified": false,
+    "bytes": 654242827,
+    "contentReceipt": {
+      "bytes": 1343560,
+      "sha256": "94cfb36e7a57e658e38b4a979d98ce1057a475b0de313f67b979ac49fed1b205"
+    },
+    "files": 4063,
+    "gameplayQualified": false,
+    "installedBuildAndModuleSelectionChecked": true,
+    "scope": "actual-immutable-content-no-git-runtime-consumer",
+    "sourceLockSha256": "dbbf8983cfa2b429f7dd0c3308a2795ffbecd29e8019adf35348447e1eab41b0",
+    "sqlExecutedByVerifier": false
+  },
+  "qualificationReceipt": {
+    "bytes": 168271,
+    "sha256": "775c88f9501abdea87d70eaec29206884904aa36ab2cfc2193e01811e55b6ecf"
+  },
+  "sameRevisionReentryVerified": true,
+  "scope": "native-arm64-actual-source-content-runtime-consumer-readback",
+  "sourceLockSha256": "dbbf8983cfa2b429f7dd0c3308a2795ffbecd29e8019adf35348447e1eab41b0",
+  "sourceScope": "retained-six-patch-build",
+  "verifierNeedsDocker": false,
+  "verifierNeedsGit": false,
+  "workflow": {
+    "followingAuthProbeQualified": false,
+    "id": 41046942015,
+    "overallConclusion": "failure",
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/41046942015"
+  }
+}

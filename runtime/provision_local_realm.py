@@ -29,6 +29,8 @@ SERVER_REVISION = 'f35f04d01689f034778e3474b3c820092f51e461'
 SCHEMA_SHA256 = 'b5c6d72b407dddb070a2ee497aa0500175c02f1a5288ee2716513821de71e78c'
 CONFIG_FILES = ('authserver.conf', 'worldserver.conf', 'modules/playerbots.conf', 'mysql.cnf')
 MAX_CONFIG = 2 * 1024 * 1024
+MAX_MODULE_CONFIG = 4 * 1024 * 1024
+MAX_GENERATION_CONFIG = 20 * 1024 * 1024
 REALM_ID, WORLD_PORT, AUTH_PORT, CLIENT_BUILD = 1, 8085, 3724, 12340
 LOOPBACK, SUBNET = '127.0.0.1', '255.255.255.255'
 EXPECTED_ROW = f'{REALM_ID}\t{LOOPBACK}\t{LOOPBACK}\t{SUBNET}\t{WORLD_PORT}\t{CLIENT_BUILD}'
@@ -55,13 +57,18 @@ def require(condition, message):
         raise db.BootstrapError(message)
 
 
-def read_text(path):
+def read_text(path, maximum=MAX_CONFIG):
     path = db.private_path(path)
     descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
     with os.fdopen(descriptor, 'rb') as stream:
-        require(stat.S_ISREG(os.fstat(stream.fileno()).st_mode), 'Configuration must be a regular file')
-        raw = stream.read(MAX_CONFIG + 1)
-    require(len(raw) <= MAX_CONFIG, 'Configuration exceeds metadata bound')
+        before = os.fstat(stream.fileno())
+        require(stat.S_ISREG(before.st_mode) and before.st_nlink == 1, 'Configuration must be an unshared regular file')
+        require(before.st_size <= maximum, 'Configuration exceeds metadata bound')
+        raw = stream.read(maximum + 1)
+        after = os.fstat(stream.fileno())
+        require((before.st_size, before.st_mtime_ns, before.st_ctime_ns) ==
+                (after.st_size, after.st_mtime_ns, after.st_ctime_ns), 'Configuration changed while reading')
+    require(len(raw) == before.st_size and len(raw) <= maximum, 'Configuration exceeds metadata bound')
     return raw.decode('utf-8')
 
 
@@ -76,6 +83,71 @@ def settings(text, selected):
     return result
 
 
+def generation_files(directory):
+    """Read the exact legacy or complete-module generation without following links."""
+    directory = db.private_path(directory)
+    require(stat.S_ISDIR(directory.lstat().st_mode), 'Configuration generation must be a directory')
+    proof_name = 'module-configuration.json'
+    files = {}
+    if os.path.lexists(directory / proof_name):
+        files[proof_name] = read_text(directory / proof_name)
+        def pairs(rows):
+            result = {}
+            for name, value in rows:
+                require(name not in result, 'Duplicate module configuration proof field')
+                result[name] = value
+            return result
+        proof = json.loads(files[proof_name], object_pairs_hook=pairs)
+        require(isinstance(proof, dict) and type(proof.get('formatVersion')) is int and
+                proof['formatVersion'] == 1 and
+                proof.get('scope') == 'prepared-module-configurations-not-startup-qualified' and
+                isinstance(proof.get('sourceLockSha256'), str) and
+                re.fullmatch('[0-9a-f]{64}', proof['sourceLockSha256']) and
+                proof.get('moduleStartupQualified') is False and proof.get('gameplayQualified') is False and
+                all(value is False for name, value in proof.items() if name.endswith('Qualified')),
+                'Invalid prepared module configuration proof')
+        names = proof.get('configFiles')
+        require(isinstance(names, list) and 1 <= len(names) <= 512 and
+                all(isinstance(name, str) and re.fullmatch(r'[A-Za-z0-9_.-]+\.conf', name) for name in names) and
+                len(names) == len({name.casefold() for name in names}) and 'playerbots.conf' in names,
+                'Invalid or ambiguous module configuration file selection')
+        expected = {'authserver.conf', 'worldserver.conf', 'mysql.cnf', proof_name} | {
+            'modules/' + name for name in names}
+    else:
+        expected = set(CONFIG_FILES)
+
+    def scan():
+        seen = set()
+        with os.scandir(directory) as entries:
+            for entry in entries:
+                info = entry.stat(follow_symlinks=False)
+                if entry.name == 'modules':
+                    require(stat.S_ISDIR(info.st_mode), 'Configuration modules must be an unlinked directory')
+                    with os.scandir(db.private_path(directory / entry.name)) as modules:
+                        for module in modules:
+                            name = 'modules/' + module.name
+                            info = module.stat(follow_symlinks=False)
+                            require(stat.S_ISREG(info.st_mode) and info.st_nlink == 1 and name in expected,
+                                    'Configuration generation has an unexpected module file, link or directory')
+                            seen.add(name)
+                            require(len(seen) <= len(expected), 'Configuration generation file count exceeds bound')
+                else:
+                    require(stat.S_ISREG(info.st_mode) and info.st_nlink == 1 and entry.name in expected,
+                            'Configuration generation has an unexpected file, link or directory')
+                    seen.add(entry.name)
+        require(seen == expected, 'Configuration generation file set differs from its declared selection')
+
+    scan()
+    total = len(files.get(proof_name, '').encode('utf-8'))
+    for name in sorted(expected - set(files)):
+        maximum = MAX_MODULE_CONFIG if name.startswith('modules/') else MAX_CONFIG
+        files[name] = read_text(directory / name, maximum)
+        total += len(files[name].encode('utf-8'))
+        require(total <= MAX_GENERATION_CONFIG, 'Configuration generation exceeds total metadata bound')
+    scan()
+    return files
+
+
 def active_config(state, password):
     """Resolve only the renderer's contained generation pointer, not arbitrary links."""
     current = state / 'config/current'
@@ -84,7 +156,7 @@ def active_config(state, password):
     target = os.readlink(current)
     require(re.fullmatch(r'generations/[0-9a-f]{64}', target), 'Invalid active configuration pointer')
     directory = db.private_path(current.parent / target)
-    files = {name: read_text(directory / name) for name in CONFIG_FILES}
+    files = generation_files(directory)
     digest = hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest()
     require(digest == target.split('/')[1], 'Active configuration generation has changed')
     auth = settings(files['authserver.conf'], ('BindIP', 'RealmServerPort', 'LoginDatabaseInfo'))

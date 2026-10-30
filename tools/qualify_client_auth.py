@@ -137,6 +137,24 @@ def failure_locations(error):
     return result[-8:]
 
 
+def initialization_failure_codes(path):
+    """Read owned bounded diagnostics, exporting numeric engine/OS codes only."""
+    path=db.private_path(path)
+    descriptor=os.open(path,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK)
+    with os.fdopen(descriptor,'rb') as stream:
+        info=os.fstat(stream.fileno())
+        require(stat.S_ISREG(info.st_mode) and info.st_uid==os.geteuid() and info.st_nlink==1 and
+                not info.st_mode&0o077,'private-mysql-initialization-diagnostic-contract')
+        raw=stream.read(db.ENGINE_LOG_LIMIT+1)
+    require(len(raw)<=db.ENGINE_LOG_LIMIT,'mysql-initialization-diagnostic-bound')
+    errors=b'\n'.join(line for line in raw.splitlines() if b'[ERROR]' in line)
+    engine=sorted({value.decode('ascii') for value in re.findall(rb'\bMY-[0-9]{6}\b',errors)})
+    system=sorted({int(value) for value in re.findall(rb'\b(?:OS errno\s*|errno[ =:]+|Errcode:\s*)([0-9]{1,4})\b',
+                                                    errors,re.I) if int(value)<=4095})
+    return dict(scope='mysql-initialization-failure-numeric-codes-only',mysqlErrorCodes=engine,
+                osErrorNumbers=system,privateLogTextExported=False)
+
+
 def worker(plan_path):
     require(os.getpid()==1 and os.geteuid()==0 and os.environ.get('ESTERIA_AUTH_NAMESPACE')=='1',
             'authentication-worker-requires-owned-pid-namespace')
@@ -231,6 +249,10 @@ def worker(plan_path):
     except BaseException as error:
         failed=True;result['failureType']=type(error).__name__ # Never export exception text containing SQL or credentials.
         result['failureLocations']=failure_locations(error)
+        initialize_log=private/'server/private-state/logs/mysql-initialize-engine.log'
+        if os.path.lexists(initialize_log):
+            try:result['mysqlInitializationDiagnostic']=initialization_failure_codes(initialize_log)
+            except BaseException:result['mysqlInitializationDiagnosticUnavailable']=True
     finally:
         cleanup=[]
         if wine_started:

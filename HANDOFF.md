@@ -130,6 +130,16 @@ from Lavapipe. Main device testing requires one coherent expected-playable packa
 
 ## Resume priorities
 
+Latest published implementation includes the full50-module configuration reader,
+owned MySQL initialize TMP directory, source-gated Android program installer and
+native isolated server source rebuild workflow. Inspect their actual new Actions
+before retrying. Android x64 Wine41046942035 passes reconstructed entry/offline/
+loopback component checks; adapt the same source patch in production ARM64 next.
+Server41045808679 passes compiled first/repeat/restart SQL and appearance storage;
+41046942015 also passes the actual4,063-file no-Git consumer. Those runs reached
+auth preparation but failed the now-fixed legacy configuration reader, so login
+remains unqualified. The app-owned content/schema entrypoint is being integrated.
+
 The user requests continued work until a nearly complete import-and-test package
 or 50% weekly usage. No current tool/account endpoint successfully exposes that
 weekly meter here; do not invent a reading or claim automatic quota enforcement.
