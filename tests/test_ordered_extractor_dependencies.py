@@ -19,6 +19,12 @@ class DependencyParsing(unittest.TestCase):
                     'orphan\n',good.replace('    ../','../')):
             with self.subTest(text=bad), self.assertRaises(ValueError):capture.parse_dependencies(bad)
 
+    def test_repeated_include_spellings_preserve_exact_advertised_raw_count(self):
+        raw='a.o: #deps 2, deps mtime 1 (VALID)\n    ../source/a.c\n    ../source/a.c\n\n'
+        self.assertEqual(capture.parse_dependencies(raw)['a.o']['dependencies'],['../source/a.c','../source/a.c'])
+        with self.assertRaisesRegex(ValueError,'count differs'):
+            capture.parse_dependencies(raw.replace('#deps 2','#deps 3'))
+
     def test_duplicate_compile_objects_or_ambiguous_arguments_refuse(self):
         row=dict(directory='/build',file='/source/a.c',command='/usr/bin/gcc -c /source/a.c -o a.o')
         self.assertEqual(len(capture.compile_database(json.dumps([row]).encode(),Path('/build'))),1)
@@ -134,6 +140,25 @@ class ActualHostDependencies(unittest.TestCase):
         path.write_bytes(b'not an ELF object');os.utime(path,ns=(before.st_atime_ns,before.st_mtime_ns))
         with self.assertRaisesRegex(ValueError,'ELF64 relocatable'):
             self.observe()
+
+    def test_explicit_single_target_keeps_the_same_closed_dependency_checks(self):
+        build=self.root/'single-build';build.mkdir();target=capture.TARGETS[0]
+        (build/'generated.h').write_bytes((self.build/'generated.h').read_bytes())
+        (build/'build.ninja').write_text((self.build/'build.ninja').read_text().replace(str(self.build),str(build)))
+        row=dict(self.rows[0]);row['directory']=str(build)
+        row['arguments']=[value.replace(str(self.build),str(build)) for value in row['arguments']]
+        commands=build/'compile_commands.json';commands.write_text(json.dumps([row]))
+        subprocess.run([str(self.ninja),'-C',str(build),target],check=True,capture_output=True,timeout=30)
+        proof=capture.capture(build,self.prepared,commands,self.ninja,self.run_command,
+            self.root/'single-observation',targets=(target,))
+        self.assertEqual(proof['targets'],[target]);self.assertEqual(proof['observedObjects'],1)
+        self.assertEqual(proof['scope'],'actual-target-source-and-dependency-observation')
+        self.assertTrue(proof['dependenciesNotNewerThanObject']);self.assertFalse(proof['sourceCompanionComplete'])
+        calls=len(self.calls)
+        for invalid in ((),['map_extractor'],('--bad-option',),(target,target)):
+            with self.subTest(targets=invalid),self.assertRaisesRegex(ValueError,'safe target tuple'):
+                capture.capture(build,self.prepared,commands,self.ninja,self.run_command,self.root/'invalid',targets=invalid)
+        self.assertEqual(len(self.calls),calls)
 
 
 if __name__=='__main__':unittest.main()

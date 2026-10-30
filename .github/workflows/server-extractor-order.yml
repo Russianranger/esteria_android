@@ -115,6 +115,8 @@ jobs:
               for path in logs.iterdir():
                   if not path.is_file():continue
                   if path.suffix=='.json' and path.stat().st_size<=16*1024**2:shutil.copyfile(path,target/path.name)
+                  elif path.name in ('ordered-ninja-deps.log','ordered-ninja-commands.log') and path.stat().st_size<=16*1024**2:
+                      shutil.copyfile(path,target/path.name)
                   elif path.suffix=='.log':
                       with path.open('rb') as stream:
                           stream.seek(max(0,path.stat().st_size-256*1024))

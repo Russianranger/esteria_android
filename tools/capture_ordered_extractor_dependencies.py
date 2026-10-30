@@ -6,6 +6,8 @@ process owner, raise on nonzero exit, and return the Path of its complete stdout
 log. This module reads and copies those logs into a fresh output directory. It
 does not run a compiler, copy objects/ELFs, or supply a source-completeness claim.
 The caller establishes the fresh native build, exact recipes and ABI environment.
+An explicit safe ``targets`` tuple may select another closed native component;
+the default remains the two ordered extractors with identical checks.
 """
 from __future__ import annotations
 
@@ -91,8 +93,11 @@ def parse_dependencies(text):
     header = re.compile(r'^(.*): #deps ([0-9]+), deps mtime ([0-9]+) \(([^)]+)\)$')
     def finish():
         if current is not None:
-            require(len(current['dependencies']) == current['count'] and
-                    len(set(current['dependencies'])) == current['count'], 'Ninja dependency count differs')
+            # Ninja/GCC can report a repeated include spelling. Preserve its raw
+            # count; identities are closed separately by canonical dependency path.
+            require(len(current['dependencies']) == current['count'],
+                    'Ninja dependency count differs: declared='+str(current['count'])+
+                    ' observed='+str(len(current['dependencies'])))
     for line in text.splitlines():
         if not line:
             continue
@@ -198,7 +203,7 @@ def write_new(path, raw):
     path.chmod(0o444)
 
 
-def capture(build: Path, prepared: Path, commands: Path, ninja: Path, run, output: Path):
+def capture(build: Path, prepared: Path, commands: Path, ninja: Path, run, output: Path, *, targets=TARGETS):
     """Return a typed observation receipt; ``output`` contains source-only evidence.
 
     The returned receipt inventories every output file. It is returned to the
@@ -206,6 +211,11 @@ def capture(build: Path, prepared: Path, commands: Path, ninja: Path, run, outpu
     inventory. Project inputs and system headers are hashed separately; system
     sources are not copied and unknown original system hashes are not compared.
     """
+    require(type(targets) is tuple and 0 < len(targets) <= 8 and
+            all(type(name) is str and re.fullmatch(r'[A-Za-z0-9_][A-Za-z0-9_+.-]{0,127}',name) for name in targets) and
+            len(set(targets)) == len(targets),
+            'explicit safe target tuple required')
+    scope='actual-ordered-target-source-and-dependency-observation' if targets==TARGETS else 'actual-target-source-and-dependency-observation'
     build, prepared = canonical_directory(build), canonical_directory(prepared)
     commands, ninja, output = absolute(commands), absolute(ninja), absolute(output)
     require(callable(run) and not os.path.lexists(output), 'fresh dependency observation output required')
@@ -218,8 +228,9 @@ def capture(build: Path, prepared: Path, commands: Path, ninja: Path, run, outpu
     database = compile_database(database_raw, build)
     output.mkdir(mode=0o700)
     deps_path = Path(run([str(ninja), '-C', str(build), '-t', 'deps'], 'ordered-ninja-deps', 120))
-    command_path = Path(run([str(ninja), '-C', str(build), '-t', 'commands', *TARGETS], 'ordered-ninja-commands', 120))
+    command_path = Path(run([str(ninja), '-C', str(build), '-t', 'commands', *targets], 'ordered-ninja-commands', 120))
     deps_raw, deps_identity = text_file(deps_path); command_raw, command_identity = text_file(command_path)
+    write_new(output / 'ninja-deps.txt', deps_raw); write_new(output / 'ninja-target-commands.txt', command_raw)
     records = parse_dependencies(deps_raw.decode('utf-8'))
     target = target_commands(command_raw.decode('utf-8'), build)
     observed = {}; objects = {}; project = {}; generated = {}; system = {}; machines = set()
@@ -298,17 +309,16 @@ def capture(build: Path, prepared: Path, commands: Path, ninja: Path, run, outpu
     require(text_file(commands)[1] == database_identity and text_file(deps_path)[1] == deps_identity and
             text_file(command_path)[1] == command_identity and identity(ninja) == ninja_identity,
             'observation command inputs changed before completion')
-    write_new(output / 'ninja-deps.txt', deps_raw); write_new(output / 'ninja-target-commands.txt', command_raw)
     object_rows = {path.relative_to(build).as_posix(): value for path, value in objects.items()}
-    observation = dict(formatVersion=1, scope='actual-ordered-target-source-and-dependency-observation',
-        targets=list(TARGETS), objects=object_rows, projectFiles=project, generatedFiles=generated, systemHeaders=system,
+    observation = dict(formatVersion=1, scope=scope,
+        targets=list(targets), objects=object_rows, projectFiles=project, generatedFiles=generated, systemHeaders=system,
         actualTargetSourceDependencyObservation=True, dependencyIdentitiesObservedAfterBuild=True,
         dependenciesNotNewerThanObject=True, systemHeaderSourcesCopied=False,
         unknownOriginalSystemHashesCompared=False, sourceCompanionComplete=False,
         androidRuntimeQualified=False, customEsteriaDataLoadOrderQualified=False, worldQualified=False, gameplayQualified=False)
     write_new(output / 'observation.json', encoded(observation))
     inventory = {path.relative_to(output).as_posix(): identity(path) for path in sorted(output.rglob('*')) if path.is_file()}
-    return dict(formatVersion=1, scope=observation['scope'], targets=list(TARGETS), compileCommands=database_identity,
+    return dict(formatVersion=1, scope=observation['scope'], targets=list(targets), compileCommands=database_identity,
         ninja=dict(path=str(ninja), **ninja_identity), observedObjects=len(objects), observedProjectFiles=len(project),
         observedGeneratedFiles=len(generated), observedSystemHeaders=len(system), objectElfMachines=sorted(machines),
         objectMetadataSha256=hashlib.sha256(encoded(object_rows)).hexdigest(), outputFiles=inventory,
