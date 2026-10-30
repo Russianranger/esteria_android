@@ -6,6 +6,7 @@ on:
       - sources.lock.json
       - tools/fetch_sources.py
       - tools/verify_protocol.py
+      - tests/native/**
       - tools/verify_server_build.py
       - tests/test_server_build.py
       - patches/server/**
@@ -15,6 +16,7 @@ on:
       - sources.lock.json
       - tools/fetch_sources.py
       - tools/verify_protocol.py
+      - tests/native/**
       - tools/verify_server_build.py
       - tests/test_server_build.py
       - patches/server/**
@@ -86,6 +88,11 @@ jobs:
         run: python3 tools/fetch_sources.py all
       - name: Verify client and server field layouts
         run: python3 tools/verify_protocol.py --client sources/client --server sources/server
+      - name: Compile the actual Eluna hook header without implicit precompiled includes
+        run: >-
+          g++ -std=c++20 -DELUNA_AZEROTHCORE -fsyntax-only
+          -Isources/server/src/common -Isources/server/src/common/Platform
+          -Isources/server/src/server/game/LuaEngine/hooks tests/native/eluna_hooks.cpp
       - name: Verify server artifact checker behavior
         run: python3 -m unittest tests.test_server_build -v
       - name: Configure ARM64 server

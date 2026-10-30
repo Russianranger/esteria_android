@@ -19,11 +19,14 @@ server/Wine jobs must not be converted into successful evidence without logs.
    source/runtime locks and exact CI/artifact identities. Client full-build/DLL
    smoke pass is `b335a3111cd64e69d5ceaebc73fb4daa57eed560`, run `40983191169`.
    Application source lock currently uses full-build-proven `a3683cc`.
-2. Complete native ARM64 Wine codec execution and asset-free Vulkan fixture.
+2. Native ARM64 Wine codec execution passed at client `61ad13e`, run `40985737329`.
+   Complete the asset-free Vulkan fixtures at client `08e6d45`, run `40986534025`.
    Use the pinned preparer and `runtime/WINE-QUALIFICATION.md`; keep external
    networking isolated and distinguish native Linux ARM64 from Android.
 3. Inspect the latest server run after `40983190300`, which exposed the missing
-   `MapMgr.h` include now fixed by patch 0002. Fix any further compile/link error
+   `MapMgr.h` include fixed by patch 0002. Follow-up `c2408d5` failed missing
+   integer/size types in Hooks.h, now fixed by patch 0003 with standalone-header
+   compilation. Fix any further compile/link error
    via ordered digest-checked patches here. Package the installed binaries plus SQL,
    modules/Lua, extractors, configs and notices; install target alone is incomplete.
 4. Inspect the new Android PRoot CI and Linux ownership matrix. Two local clean

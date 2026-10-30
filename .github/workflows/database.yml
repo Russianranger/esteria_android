@@ -5,6 +5,11 @@ on:
     paths:
       - runtime/mysql_bootstrap.py
       - tests/test_mysql_bootstrap.py
+      - runtime/provision_local_realm.py
+      - tests/test_local_realm.py
+      - tests/fixtures/realmlist-f35f04d.sql
+      - config/local-server.json
+      - tools/render_server_config.py
       - .github/workflows/database.yml
   pull_request:
   workflow_dispatch:
@@ -113,4 +118,63 @@ jobs:
         if: always()
         run: |
           docker rm --force --volumes esteria-mysql-test || true
+          rm -f "$ESTERIA_MYSQL_ADMIN_OPTIONS"
+  realm:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      ESTERIA_MYSQL_VERSION: 8.0.44
+      ESTERIA_REALM_INTEGRATION: '1'
+      ESTERIA_MYSQL_ADMIN_OPTIONS: /tmp/esteria-realm-admin.cnf
+      ESTERIA_MYSQL_DIAGNOSTICS_DIR: /tmp/esteria-realm-diagnostics
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Install SQL client for isolated realm fixture
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mysql-client
+          mysql --no-defaults --version > mysql-client-version.txt
+      - name: Start separate disposable MySQL 8 instance
+        shell: python
+        run: |
+          import os, pathlib, secrets, subprocess
+          password = secrets.token_hex(32)
+          config = pathlib.Path(os.environ['ESTERIA_MYSQL_ADMIN_OPTIONS'])
+          fd = os.open(config, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+          with os.fdopen(fd, 'w') as output:
+              output.write('[client]\nuser=root\npassword=' + password + '\n')
+          environment = dict(os.environ, MYSQL_ROOT_PASSWORD=password, MYSQL_ROOT_HOST='127.0.0.1')
+          subprocess.run(['docker', 'run', '--detach', '--name', 'esteria-realm-test', '--network', 'host',
+                          '--env', 'MYSQL_ROOT_PASSWORD', '--env', 'MYSQL_ROOT_HOST',
+                          'mysql:' + os.environ['ESTERIA_MYSQL_VERSION'],
+                          '--port=13306', '--bind-address=127.0.0.1', '--mysqlx=OFF',
+                          '--innodb-buffer-pool-size=128M', '--performance-schema=OFF'],
+                         env=environment, check=True)
+      - name: Verify local realm repair, identity checks and preservation
+        run: python3 -m unittest tests.test_local_realm -v
+      - name: Retain bounded engine diagnostics on failure
+        if: failure()
+        shell: python
+        run: |
+          import pathlib, sys, tempfile
+          sys.path.insert(0, 'tests')
+          from test_mysql_bootstrap import preserve_engine_diagnostics
+          from runtime.mysql_bootstrap import run_engine
+          with tempfile.TemporaryDirectory(prefix='est-realm-log-') as directory:
+              state = pathlib.Path(directory)
+              run_engine(['docker', 'logs', '--tail', '200', 'esteria-realm-test'],
+                         state / 'logs/mysql-container-engine.log', timeout=15)
+              preserve_engine_diagnostics(state)
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: mysql-realm-qualification-${{ github.sha }}
+          path: |
+            mysql-client-version.txt
+            /tmp/esteria-realm-diagnostics/*.log
+          retention-days: 14
+      - name: Remove dedicated realm fixture and credential
+        if: always()
+        run: |
+          docker rm --force --volumes esteria-realm-test || true
           rm -f "$ESTERIA_MYSQL_ADMIN_OPTIONS"

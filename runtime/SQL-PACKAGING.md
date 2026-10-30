@@ -10,7 +10,7 @@ The contract is reviewed against server
 `f35f04d01689f034778e3474b3c820092f51e461` and Eluna
 `58d7652138887783228b9727bd1fa4e08f00342b`. A changed server/Eluna revision or an
 unreviewed adaptation patch fails explicitly so this model cannot silently drift
-from the compiled updater. The current two Eluna declaration/include patches are
+from the compiled updater. The current three Eluna declaration/include patches are
 recorded and do not alter SQL discovery or Lua ordering.
 
 ## Generate a manifest

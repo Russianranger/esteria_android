@@ -1,0 +1,14 @@
+diff --git a/hooks/Hooks.h b/hooks/Hooks.h
+--- a/hooks/Hooks.h
++++ b/hooks/Hooks.h
+@@ -9,7 +9,10 @@
+ 
+ #if defined ELUNA_CMANGOS
+ #include "Platform/Define.h"
++#elif defined ELUNA_AZEROTHCORE
++#include "Define.h"
+ #endif
++#include <stddef.h>
+ #include <utility>
+ 
+ struct EventEntry

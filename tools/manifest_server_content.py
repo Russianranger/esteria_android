@@ -29,6 +29,7 @@ ELUNA = 'src/server/game/LuaEngine'
 SUPPORTED_PATCHES = {
     '0001-eluna-declare-area-trigger.patch': 'c26b145188c5f97bf30d032e1fe3bd7fe17aa1f8f0daa6793e51f5d830fe7aa6',
     '0002-eluna-include-map-manager.patch': '4e277dbe56c31ae30640c8e9ad4dee12e944e0f051d9bdc8d62aaa239c50433f',
+    '0003-eluna-hooks-include-types.patch': '5999402d985fcc709abdc90bb4272072d1d5e3e261b2cc7ec19460320c14295f',
 }
 MAX_TREE_BYTES = 16 * 1024 * 1024
 MAX_METADATA_BYTES = 2 * 1024 * 1024
