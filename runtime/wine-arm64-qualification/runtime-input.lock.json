@@ -1,0 +1,61 @@
+{
+  "formatVersion": 1,
+  "scope": "measured-native-arm64-wine-host-candidate-inputs",
+  "sourceRevision": "681b2e9f30b19e94bf8e8de44f67fedba5033c8a",
+  "workflowRun": 41057900330,
+  "artifactId": 12982441891,
+  "artifact": {
+    "bytes": 282903224,
+    "sha256": "2c1b248bdc3605505bf6248066ccd6ed323242bbf2f04e08cab772aff11c87df"
+  },
+  "files": {
+    "candidate-runtime.lock.json": {
+      "bytes": 102647,
+      "sha256": "5816a07061c308a6a515d3747da2b7e3adfb8b22b6e6827819f590b1214fe04b"
+    },
+    "package-build-receipt.json": {
+      "bytes": 19890,
+      "sha256": "db0f3431aa47c20e41219201246c3f406f46598235e35c31d1f4b45577523f37"
+    },
+    "runtime.json": {
+      "bytes": 66640,
+      "sha256": "4b731a5f450a556632c598ddebda2ec3f814c8d7ea2c9e1529d6c80c8773e0a5"
+    },
+    "sources.lock.json": {
+      "bytes": 18146,
+      "sha256": "077fb2b0883986338b6755e53f5cede08bd63ed1834783e7e6cd079e0ec0c16d"
+    },
+    "wine-arm64.manifest.json": {
+      "bytes": 66773,
+      "sha256": "d6c98cca860d324113c434cd0ccd1709e19e2dfac1a03b1f248b479f50303267"
+    },
+    "wine-arm64.tar.gz": {
+      "bytes": 282628308,
+      "sha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46"
+    }
+  },
+  "sourcesArtifactId": 12982282257,
+  "sourcesArtifact": {
+    "bytes": 1681474721,
+    "sha256": "38e16617545abb16f995ba75a8b52b8ca2bacad5d2688adf3646911f16c8fb06"
+  },
+  "sourcesPrefix": "wine-arm64-sources/",
+  "sourceReadbackReceipt": {
+    "bytes": 1530,
+    "sha256": "da37376ccb72d18b2b50f327ed12a65ceccce665f2ef399be8e571b0b6f95b1c"
+  },
+  "hostQualificationReceipt": {
+    "bytes": 20396,
+    "sha256": "fdefa5c028aa21a5bb4b94b408725d7062d7b5f7eba8b6704224dd70c8d2dfd4"
+  },
+  "evidenceArtifactId": 12981467294,
+  "evidenceArtifact": {
+    "bytes": 181600,
+    "sha256": "b9bb18a04d3c529b4153eb3077438159c10fcdcf35f75718f340e6d2f7790e7a"
+  },
+  "sourceBuildPassed": true,
+  "originalNativeClientRevision": "0f931bbade36a4b197725d691b8eff7caea7b3be",
+  "originalNativeClientComponentGatesPassed": true,
+  "androidQualified": false,
+  "gameplayQualified": false
+}

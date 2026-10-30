@@ -31,9 +31,13 @@ exact reviewed files. Source revisions embedded in APKs are authoritative.
 - Android x64 Wine41046942035 passes reconstructed entry/offline/loopback after
   source-owned private-PE anonymous-copy adaptation. No CommonMain, graphics,
   audio, ARM64 or world claim. Original Android policy/targetSDK35 are unchanged.
-- Production ARM64 build/PE fixture/runtime readback pass41051386531. Source export failed attribute-filtered Git archive bytes;681b2e9 adds raw-blob export and a source-first preflight. Current0f runtime gates remain pending. It keeps
-  the old production runtime/provider hashes untouched. Follow its actual build,
-  complete original/source capture and native current0f component gates next.
+- Production ARM64 Wine/FEX run41057900330 passes the source-owned build, both
+  real PE modes, complete183-package/583-original source closure and exact0f
+  codec/entry/offline/transport/Grunt/software Vulkan/frame/texture/captured PCM
+  scopes. Runtime c0e13ed1 is282,628,308bytes; corresponding sources38e16617
+  are1,681,474,721bytes. Independent streaming runtime and PCM analysis pass.
+  New471 pairing must run against retained artifacts without rebuilding Wine.
+  Old productionf036 and all existing consumer bindings remain unchanged.
 - Seven-patch linked server/full50 ConfigMgr pass; exact source-isolated rebuild
   fixes published ata3f0a49 (compiler invocation alias) and23f727a (the original
   850-byte modules/ModulesScriptLoader.h supplement). Follow current configure/
@@ -72,7 +76,7 @@ exact reviewed files. Source revisions embedded in APKs are authoritative.
 2. Keep the passed matched0f/six-patch auth proof distinct from normal game login;
    run the selected new-client/seven-patch pairing and actual playerbots schema gate.
 3. Portable updater/ledger/account/realm APIs are implemented and independently
-   reviewed; actual native composition passes41058676309 and41058676543 on one UUID.
+   reviewed; actual native composition passes41058676309 and41058676543, each on its own unchanged UUID.
    Compose them after the explicit original baseline + separate source-derived
    appearance adaptation; never rewrite original SQL/updater ledger history.
 4. Fresh-slot/workspace ownership and atomic promotion/recovery storage now pass

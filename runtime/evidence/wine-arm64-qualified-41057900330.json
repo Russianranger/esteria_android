@@ -1,0 +1,1489 @@
+{
+  "formatVersion": 1,
+  "scope": "observed-native-linux-arm64-source-owned-wine-and-0f-client-component-gates",
+  "workflowRun": 41057900330,
+  "sourceRevision": "681b2e9f30b19e94bf8e8de44f67fedba5033c8a",
+  "runConclusion": "success",
+  "runtimeInput": {
+    "formatVersion": 1,
+    "scope": "measured-native-arm64-wine-host-candidate-inputs",
+    "sourceRevision": "681b2e9f30b19e94bf8e8de44f67fedba5033c8a",
+    "workflowRun": 41057900330,
+    "artifactId": 12982441891,
+    "artifact": {
+      "bytes": 282903224,
+      "sha256": "2c1b248bdc3605505bf6248066ccd6ed323242bbf2f04e08cab772aff11c87df"
+    },
+    "files": {
+      "candidate-runtime.lock.json": {
+        "bytes": 102647,
+        "sha256": "5816a07061c308a6a515d3747da2b7e3adfb8b22b6e6827819f590b1214fe04b"
+      },
+      "package-build-receipt.json": {
+        "bytes": 19890,
+        "sha256": "db0f3431aa47c20e41219201246c3f406f46598235e35c31d1f4b45577523f37"
+      },
+      "runtime.json": {
+        "bytes": 66640,
+        "sha256": "4b731a5f450a556632c598ddebda2ec3f814c8d7ea2c9e1529d6c80c8773e0a5"
+      },
+      "sources.lock.json": {
+        "bytes": 18146,
+        "sha256": "077fb2b0883986338b6755e53f5cede08bd63ed1834783e7e6cd079e0ec0c16d"
+      },
+      "wine-arm64.manifest.json": {
+        "bytes": 66773,
+        "sha256": "d6c98cca860d324113c434cd0ccd1709e19e2dfac1a03b1f248b479f50303267"
+      },
+      "wine-arm64.tar.gz": {
+        "bytes": 282628308,
+        "sha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46"
+      }
+    },
+    "sourcesArtifactId": 12982282257,
+    "sourcesArtifact": {
+      "bytes": 1681474721,
+      "sha256": "38e16617545abb16f995ba75a8b52b8ca2bacad5d2688adf3646911f16c8fb06"
+    },
+    "sourcesPrefix": "wine-arm64-sources/",
+    "sourceReadbackReceipt": {
+      "bytes": 1530,
+      "sha256": "da37376ccb72d18b2b50f327ed12a65ceccce665f2ef399be8e571b0b6f95b1c"
+    },
+    "hostQualificationReceipt": {
+      "bytes": 20396,
+      "sha256": "fdefa5c028aa21a5bb4b94b408725d7062d7b5f7eba8b6704224dd70c8d2dfd4"
+    },
+    "evidenceArtifactId": 12981467294,
+    "evidenceArtifact": {
+      "bytes": 181600,
+      "sha256": "b9bb18a04d3c529b4153eb3077438159c10fcdcf35f75718f340e6d2f7790e7a"
+    },
+    "sourceBuildPassed": true,
+    "originalNativeClientRevision": "0f931bbade36a4b197725d691b8eff7caea7b3be",
+    "originalNativeClientComponentGatesPassed": true,
+    "androidQualified": false,
+    "gameplayQualified": false
+  },
+  "runtimeBuildReceipt": {
+    "androidQualified": false,
+    "archive": {
+      "bytes": 282628308,
+      "file": "wine-arm64.tar.gz",
+      "sha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46"
+    },
+    "archiveEntries": 14180,
+    "archiveFileBytes": 1325744204,
+    "archiveReadBack": true,
+    "arm64Qualified": false,
+    "candidateLockSha256": "5816a07061c308a6a515d3747da2b7e3adfb8b22b6e6827819f590b1214fe04b",
+    "clientIncluded": false,
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "installLimits": {
+      "entries": 14180,
+      "fileBytes": 2333910717,
+      "memberBytes": 111631520,
+      "metadataBytes": 2097152,
+      "pathBytes": 4096
+    },
+    "maximumHardLinkCopies": 45,
+    "maximumHardLinkCopyBytes": 1008166513,
+    "maximumPhysicalFileBytes": 2333910717,
+    "requiredFiles": {
+      "etc/esteria-wine-arm64.json": {
+        "bytes": 66640,
+        "sha256": "4b731a5f450a556632c598ddebda2ec3f814c8d7ea2c9e1529d6c80c8773e0a5"
+      },
+      "opt/wine/bin/wine": {
+        "bytes": 67744,
+        "elfClass": 2,
+        "elfMachine": 183,
+        "sha256": "7d7f35b538ccf2e998fe0bb6c46a2ef0e24ade47e0aefc1df653f80f73ad68c3"
+      },
+      "opt/wine/bin/wineserver": {
+        "bytes": 725840,
+        "elfClass": 2,
+        "elfMachine": 183,
+        "sha256": "d2761747e82e560aba395b2b70061c196ee0d943dfd17ea7ed4f7e81b35ea266"
+      },
+      "opt/wine/lib/wine/aarch64-unix/ntdll.so": {
+        "bytes": 531176,
+        "elfClass": 2,
+        "elfMachine": 183,
+        "sha256": "70a81a6b936851bd5675551c9ced3d6c9707f1e9033737ea0dbe96728631875b"
+      },
+      "opt/wine/lib/wine/aarch64-unix/winealsa.so": {
+        "bytes": 134144,
+        "elfClass": 2,
+        "elfMachine": 183,
+        "sha256": "cc3de8fd246ebdb46879a05debfa451437d5dd7fc655bd249165606c23c882ab"
+      },
+      "opt/wine/lib/wine/aarch64-unix/winevulkan.so": {
+        "bytes": 854160,
+        "elfClass": 2,
+        "elfMachine": 183,
+        "sha256": "1f3ad380d36fb467988d20eea122b0000fe52afc1258f7eb9635963fad45ef68"
+      },
+      "opt/wine/lib/wine/aarch64-windows/kernel32.dll": {
+        "bytes": 1114112,
+        "peMachine": "0xaa64",
+        "sha256": "366e1aeb898a451da12334ca74013df911f8a93dad1585c74588a55c14920dfa"
+      },
+      "opt/wine/lib/wine/aarch64-windows/libarm64ecfex.dll": {
+        "bytes": 5533696,
+        "peMachine": "0x8664",
+        "sha256": "94921e14efca94833a9b12cbb33c9dec641b65d321f062168fb241dec8334fc1"
+      },
+      "opt/wine/lib/wine/aarch64-windows/libwow64fex.dll": {
+        "bytes": 4943872,
+        "peMachine": "0xaa64",
+        "sha256": "824bf9082e2cf4a7b1bd7571e8ef00c35543d528fbc3cc6efd3a566c391dfc93"
+      },
+      "opt/wine/lib/wine/aarch64-windows/msvcp140.dll": {
+        "bytes": 2031616,
+        "peMachine": "0xaa64",
+        "sha256": "aa135ed8f237f0d0fe2a49cdc79b2a643b99c7890e5646b2e64f83e937e0762f"
+      },
+      "opt/wine/lib/wine/aarch64-windows/ntdll.dll": {
+        "bytes": 1769472,
+        "peMachine": "0xaa64",
+        "sha256": "ee9faf7292b63a890ed1d42e65b79dffd83f7650d82f21d2d9b54a838aa2d6e4"
+      },
+      "opt/wine/lib/wine/aarch64-windows/vcruntime140.dll": {
+        "bytes": 589824,
+        "peMachine": "0xaa64",
+        "sha256": "1e9fa0575cf8d4b0bf508e51eb1a4009597be7558c0f25d4d12914505a747067"
+      },
+      "opt/wine/lib/wine/aarch64-windows/vcruntime140_1.dll": {
+        "bytes": 589824,
+        "peMachine": "0x8664",
+        "sha256": "63cffb993489fed81f43a0358f9264c04d29d379fa2f51f5f886c3df296c1ba0"
+      },
+      "opt/wine/lib/wine/aarch64-windows/vulkan-1.dll": {
+        "bytes": 655360,
+        "peMachine": "0xaa64",
+        "sha256": "f259c3b3f69d8e0046e49f9e0031063766c8d718ddc2986a1d82fa3e2520b71b"
+      },
+      "opt/wine/lib/wine/aarch64-windows/winealsa.drv": {
+        "bytes": 589824,
+        "peMachine": "0xaa64",
+        "sha256": "ea1da4bccb4188f34148f55daaff9acea37f2d172b8ff09ab9c311ccd6611595"
+      },
+      "opt/wine/lib/wine/aarch64-windows/wininet.dll": {
+        "bytes": 1245184,
+        "peMachine": "0xaa64",
+        "sha256": "3009a684d276ce1c73fafb7f3d9ad7c2617636ef2205a550eb1a2f4a9d954c11"
+      },
+      "opt/wine/lib/wine/aarch64-windows/ws2_32.dll": {
+        "bytes": 851968,
+        "peMachine": "0xaa64",
+        "sha256": "f9b8a289ab4d8134368ebb4efae17ab9fe7dfafd4bb2ebc0267a51b893975c88"
+      },
+      "opt/wine/lib/wine/i386-windows/ntdll.dll": {
+        "bytes": 626688,
+        "peMachine": "0x14c",
+        "sha256": "bd65f71863fd43c8027b179991964bdf644e5e8ed4f89a02f23bec8d5c393de1"
+      },
+      "usr/bin/Xtigervnc": {
+        "bytes": 2719912,
+        "elfClass": 2,
+        "elfMachine": 183,
+        "sha256": "d89fedbd07ad83a7ccc669396f3030e9940dad2a30bf299a063093e6efa913de"
+      },
+      "usr/bin/python3.11": {
+        "bytes": 6616880,
+        "elfClass": 2,
+        "elfMachine": 183,
+        "sha256": "2ceb9199570aaf34a254b9ea88b1d77f38530833e2a12688d002a59c905b51b2"
+      },
+      "usr/lib/aarch64-linux-gnu/libasound.so.2.0.0": {
+        "bytes": 1116648,
+        "elfClass": 2,
+        "elfMachine": 183,
+        "sha256": "9fade6b3aedf1ba944e6795b52b74378f2f89166b92ee542582171416a76572d"
+      },
+      "usr/lib/aarch64-linux-gnu/libvulkan.so.1.3.239": {
+        "bytes": 526896,
+        "elfClass": 2,
+        "elfMachine": 183,
+        "sha256": "605f52f426f01a2c468ecd920b3de31452fde495f2c0d99602fffb93e782767c"
+      },
+      "usr/lib/aarch64-linux-gnu/libvulkan_lvp.so": {
+        "bytes": 6569376,
+        "elfClass": 2,
+        "elfMachine": 183,
+        "sha256": "ce6f6917dd22ed612ae8649a9eb9c615a973a2e9eb9a58b8cc8655f22c933c6b"
+      },
+      "usr/lib/os-release": {
+        "bytes": 267,
+        "sha256": "59a77b5f2666d9c85c489bd1911a6eebbd91ef22fe48b90a3b75f1b21f3844d4"
+      },
+      "usr/share/alsa/alsa.conf": {
+        "bytes": 10117,
+        "sha256": "ea7c6cedb7da16ba51a0fea3e960416a2240e29c1f5d42e475c1dfcd19eb74ee"
+      },
+      "usr/share/doc/esteria-wine-arm64/COPYING.LIB": {
+        "bytes": 26434,
+        "sha256": "e237fa56668030e928551ddd60f05df5fe957f75eab874bbd017e085ed722e7c"
+      },
+      "usr/share/doc/esteria-wine-arm64/fex/External/Catch2/LICENSE.txt": {
+        "bytes": 1338,
+        "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566"
+      },
+      "usr/share/doc/esteria-wine-arm64/fex/External/Vulkan-Headers/LICENSE.md": {
+        "bytes": 458,
+        "sha256": "ac24e5ea920e4318e4d02c4086ae51f53cfb03feed06c18df1019e7ada1ec7bc"
+      },
+      "usr/share/doc/esteria-wine-arm64/fex/External/Vulkan-Headers/LICENSES/Apache-2.0.txt": {
+        "bytes": 11358,
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      "usr/share/doc/esteria-wine-arm64/fex/External/Vulkan-Headers/LICENSES/MIT.txt": {
+        "bytes": 1084,
+        "sha256": "1ca3502222d967f3be5751c55f6b7ee735b5383909c3b501495f54b216dbf227"
+      },
+      "usr/share/doc/esteria-wine-arm64/fex/External/cephes/LICENSE": {
+        "bytes": 4754,
+        "sha256": "edf1440b625e6d434a986cdb535c702001afab8959d94ce6275441a58cfd0ebb"
+      },
+      "usr/share/doc/esteria-wine-arm64/fex/External/fex-posixtest-bins/src/COPYING": {
+        "bytes": 17992,
+        "sha256": "32b1062f7da84967e7019d01ab805935caa7ab7321a7ced0e30ebe75e5df1670"
+      },
+      "usr/share/doc/esteria-wine-arm64/fex/External/fmt/LICENSE": {
+        "bytes": 1431,
+        "sha256": "07580f2a3b35709ce703d523f447b242f6dfec7582a8c0df102c7fa2849375f8"
+      },
+      "usr/share/doc/esteria-wine-arm64/fex/External/jemalloc/COPYING": {
+        "bytes": 1709,
+        "sha256": "94aa2caa98c25d942f58b956c71dba6a99ff98fc3a31cbc669fe2a4cd0268b53"
+      },
+      "usr/share/doc/esteria-wine-arm64/fex/External/jemalloc_glibc/COPYING": {
+        "bytes": 1709,
+        "sha256": "94aa2caa98c25d942f58b956c71dba6a99ff98fc3a31cbc669fe2a4cd0268b53"
+      },
+      "usr/share/doc/esteria-wine-arm64/fex/External/range-v3/LICENSE.txt": {
+        "bytes": 7233,
+        "sha256": "2b74ee37dd1a90b2b385534b7dbc171938409bda468673a123ff25302c9c5739"
+      },
+      "usr/share/doc/esteria-wine-arm64/fex/External/robin-map/LICENSE": {
+        "bytes": 1102,
+        "sha256": "11f2c685ba565a31aef1219f63a7a8845602c97bff70016b9e3278dfe51a2ec5"
+      },
+      "usr/share/doc/esteria-wine-arm64/fex/External/tiny-json/LICENSE": {
+        "bytes": 1068,
+        "sha256": "83c6abf07e7123427303b5f12cd995122c372a5cb96815ec130a18628396fb7c"
+      },
+      "usr/share/doc/esteria-wine-arm64/fex/External/tracy/LICENSE": {
+        "bytes": 1618,
+        "sha256": "16f7df4828bd89c880c17dd2f45e834b754b6d5e8c9a9ee886af1be4b89475ca"
+      },
+      "usr/share/doc/esteria-wine-arm64/fex/External/tracy/examples/ToyPathTracer/license.md": {
+        "bytes": 1210,
+        "sha256": "88d9b4eb60579c191ec391ca04c16130572d7eedc4a86daa58bf28c6e14c9bcd"
+      },
+      "usr/share/doc/esteria-wine-arm64/fex/External/tracy/public/libbacktrace/LICENSE": {
+        "bytes": 1478,
+        "sha256": "ef8a9b3247488f8901ca60de9b17b745d7bd67e5ec1e622f80d62364572200d8"
+      },
+      "usr/share/doc/esteria-wine-arm64/fex/External/xxhash/LICENSE": {
+        "bytes": 1389,
+        "sha256": "6ffedbc0f7878612d2b23589f1ff2ab15633e1df7963a5d9fc750ec5500c7e7a"
+      },
+      "usr/share/doc/esteria-wine-arm64/fex/External/xxhash/cli/COPYING": {
+        "bytes": 18092,
+        "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643"
+      },
+      "usr/share/doc/esteria-wine-arm64/fex/External/xxhash/tests/bench/LICENSE": {
+        "bytes": 18092,
+        "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643"
+      },
+      "usr/share/doc/esteria-wine-arm64/fex/External/xxhash/tests/collisions/LICENSE": {
+        "bytes": 18092,
+        "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643"
+      },
+      "usr/share/doc/esteria-wine-arm64/fex/FEXCore/LICENSE": {
+        "bytes": 1094,
+        "sha256": "f34a779f56b36d22b20e1b990d23e583a6a7ca071331925fa46156441c77a1ee"
+      },
+      "usr/share/doc/esteria-wine-arm64/fex/LICENSE": {
+        "bytes": 1094,
+        "sha256": "f34a779f56b36d22b20e1b990d23e583a6a7ca071331925fa46156441c77a1ee"
+      },
+      "usr/share/doc/esteria-wine-arm64/fex/NOTICE-MANIFEST.json": {
+        "bytes": 3153,
+        "sha256": "10efd00aac0db20dee914d662a659ab2623f86b20d85ed431ec28d8c03aeab44"
+      },
+      "usr/share/doc/esteria-wine-arm64/fex/Source/Common/cpp-optparse/LICENSE": {
+        "bytes": 1082,
+        "sha256": "d638447635afa6837615553bcebbba60bc80a0e62ed9b158b4ed969e8bb72421"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/LICENSE.TXT": {
+        "bytes": 15141,
+        "sha256": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/aarch64-w64-mingw32/share/mingw32/COPYING": {
+        "bytes": 2326,
+        "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/aarch64-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt": {
+        "bytes": 10936,
+        "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/aarch64-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt": {
+        "bytes": 5905,
+        "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/aarch64-w64-mingw32/share/mingw32/COPYING.winpthreads.txt": {
+        "bytes": 2883,
+        "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/aarch64-w64-mingw32/share/mingw32/COPYING.winstorecompat.txt": {
+        "bytes": 1099,
+        "sha256": "fa7368d1f93d890c173177475d8ec7aff265a7d08f1f364d66f74d138978ce36"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/arm64ec-w64-mingw32/share/mingw32/COPYING": {
+        "bytes": 2326,
+        "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/arm64ec-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt": {
+        "bytes": 10936,
+        "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/arm64ec-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt": {
+        "bytes": 5905,
+        "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/arm64ec-w64-mingw32/share/mingw32/COPYING.winpthreads.txt": {
+        "bytes": 2883,
+        "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/arm64ec-w64-mingw32/share/mingw32/COPYING.winstorecompat.txt": {
+        "bytes": 1099,
+        "sha256": "fa7368d1f93d890c173177475d8ec7aff265a7d08f1f364d66f74d138978ce36"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/armv7-w64-mingw32/share/mingw32/COPYING": {
+        "bytes": 2326,
+        "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/armv7-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt": {
+        "bytes": 10936,
+        "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/armv7-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt": {
+        "bytes": 5905,
+        "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/armv7-w64-mingw32/share/mingw32/COPYING.winpthreads.txt": {
+        "bytes": 2883,
+        "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/armv7-w64-mingw32/share/mingw32/COPYING.winstorecompat.txt": {
+        "bytes": 1099,
+        "sha256": "fa7368d1f93d890c173177475d8ec7aff265a7d08f1f364d66f74d138978ce36"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/i686-w64-mingw32/share/mingw32/COPYING": {
+        "bytes": 2326,
+        "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/i686-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt": {
+        "bytes": 10936,
+        "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/i686-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt": {
+        "bytes": 5905,
+        "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/i686-w64-mingw32/share/mingw32/COPYING.winpthreads.txt": {
+        "bytes": 2883,
+        "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/i686-w64-mingw32/share/mingw32/COPYING.winstorecompat.txt": {
+        "bytes": 1099,
+        "sha256": "fa7368d1f93d890c173177475d8ec7aff265a7d08f1f364d66f74d138978ce36"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/share/gendef/COPYING": {
+        "bytes": 35147,
+        "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/share/widl/COPYING": {
+        "bytes": 2326,
+        "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/x86_64-w64-mingw32/share/mingw32/COPYING": {
+        "bytes": 2326,
+        "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/x86_64-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt": {
+        "bytes": 10936,
+        "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/x86_64-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt": {
+        "bytes": 5905,
+        "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/x86_64-w64-mingw32/share/mingw32/COPYING.winpthreads.txt": {
+        "bytes": 2883,
+        "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177"
+      },
+      "usr/share/doc/esteria-wine-arm64/toolchain/x86_64-w64-mingw32/share/mingw32/COPYING.winstorecompat.txt": {
+        "bytes": 1099,
+        "sha256": "fa7368d1f93d890c173177475d8ec7aff265a7d08f1f364d66f74d138978ce36"
+      },
+      "usr/share/vulkan/icd.d/lvp_icd.aarch64.json": {
+        "bytes": 162,
+        "sha256": "0950c584a06fc5531dbaedef764764cd8f4af5e4390d416971db7c62e85da22f"
+      }
+    },
+    "runtimeMetadataSha256": "4b731a5f450a556632c598ddebda2ec3f814c8d7ea2c9e1529d6c80c8773e0a5",
+    "runtimeNoticesVerified": 52,
+    "scope": "packaged-source-built-native-arm64-wine-candidate",
+    "sourceCompanionRequired": true,
+    "sourceInputs": {
+      "runtime/bridges/debian.sources": {
+        "bytes": 434,
+        "sha256": "8e8f7c4f33e39696a188e01bb6e385daf17a006eb573bc84af073ebcc4fc9f65"
+      },
+      "runtime/bridges/inrelease.SHA256SUMS": {
+        "bytes": 455,
+        "sha256": "2acec858821beef422f424794c5577adf01ef084787ca42616c5cb78a72b1413"
+      },
+      "runtime/wine-arm64/Dockerfile": {
+        "bytes": 7504,
+        "sha256": "a313c84e979dae58f04eab3864d123229330455ec92a64fc0bfc7764ec5301c5"
+      },
+      "runtime/wine-arm64/Dockerfile.dockerignore": {
+        "bytes": 379,
+        "sha256": "94409ccfbb556bfaff2d011d11c3689b34d9ccdad3402a9e7b8504e5e8a4c1b5"
+      },
+      "runtime/wine-arm64/README.md": {
+        "bytes": 6814,
+        "sha256": "43b740192ca4bd2408069b4e4788b21f9a3cae4e8906053c5d969313ffc40ca5"
+      },
+      "runtime/wine-arm64/capture_toolchain_sources.py": {
+        "bytes": 30645,
+        "sha256": "16b729041d06223d0bbdf8a4081cc1dcc97a1b1399232685b63de1894dab71af"
+      },
+      "runtime/wine-arm64/fetch_inputs.py": {
+        "bytes": 3976,
+        "sha256": "7c54e1a2ba841465f788a61f16d7c82100c534ec6c740b7a8e866cb6b9db0025"
+      },
+      "runtime/wine-arm64/private_pe_check.c": {
+        "bytes": 9950,
+        "sha256": "9f5243e12dfb4d6ad1c1ea416530f5c5ce3f924a865944b5fbf9a61f42b05458"
+      },
+      "runtime/wine-arm64/private_pe_check.py": {
+        "bytes": 10028,
+        "sha256": "493b8dfdc42decfd72b91084be424041b7bdc6d5cf81c5adb623e7b65485b700"
+      },
+      "runtime/wine-arm64/private_pe_fixture.c": {
+        "bytes": 767,
+        "sha256": "64dd325dd5c2926e9561dd43e47ea979bc14fd26d3dd4b17f120881e4b98de76"
+      },
+      "runtime/wine-arm64/record_runtime.py": {
+        "bytes": 6600,
+        "sha256": "e0863092ec74f59d330ddd2a9fc4bc018ff813fa91afccd759943d23f68b392c"
+      },
+      "runtime/wine-arm64/sources.lock.json": {
+        "bytes": 18146,
+        "sha256": "077fb2b0883986338b6755e53f5cede08bd63ed1834783e7e6cd079e0ec0c16d"
+      },
+      "runtime/wine-probe/android-private-pe-copy.patch": {
+        "bytes": 9732,
+        "sha256": "0f4d5b1feb2c14ae98acac215d1cf06732f9a46f325292ebd00a536ade7b5e0e"
+      },
+      "runtime/wine-probe/apply_adaptations.py": {
+        "bytes": 3535,
+        "sha256": "e10f8f4aac362554d0270b33e60e7464e3828ffb21d10cf6db1501f4ded93ef0"
+      },
+      "runtime/wine-probe/capture_sources.py": {
+        "bytes": 2676,
+        "sha256": "718c966a54b76196979d2cfb8d68cd37f284d2707584cd0b5188f35a359fa221"
+      },
+      "tools/owned_process_group.py": {
+        "bytes": 2795,
+        "sha256": "c19ed5c05e94d7b537df1055983fca75e20447f594419084f2207d60f99f138e"
+      },
+      "tools/package_server_content.py": {
+        "bytes": 19732,
+        "sha256": "7a23e7e2b40c55a5a581be825d91d95411ed70be6444d1a838ed468edc4069e6"
+      },
+      "tools/package_server_runtime.py": {
+        "bytes": 13619,
+        "sha256": "e3fca010d44223bab12f34fe5f8bc984e21e518419f60edf72acdd6299fb93f7"
+      },
+      "tools/package_wine_arm64_candidate.py": {
+        "bytes": 16986,
+        "sha256": "72206aa78302bc1bd707d8a8cd02bdd042d57c02b93873cb463564f01d10e04b"
+      },
+      "tools/prepare_runtime.py": {
+        "bytes": 22126,
+        "sha256": "113ae7612cba7f557fab79550448578a9a6b8ceb674cff80b38fcf40e8257078"
+      },
+      "tools/provider_server_runtime.py": {
+        "bytes": 10458,
+        "sha256": "64d52409befc871d90591753a522b8f7627787757869c2b219c2c6510ed7a0cb"
+      }
+    },
+    "sourceLockSha256": "077fb2b0883986338b6755e53f5cede08bd63ed1834783e7e6cd079e0ec0c16d"
+  },
+  "hostQualification": {
+    "bytes": 20396,
+    "sha256": "fdefa5c028aa21a5bb4b94b408725d7062d7b5f7eba8b6704224dd70c8d2dfd4",
+    "receipt": {
+      "formatVersion": 1,
+      "scope": "native-linux-arm64-wine-component-fixtures",
+      "runtimeArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+      "runtimeReceiptSha256": "f850e9a83b7d4cf243c2fb39da575385cbeadc5e759289d17912f612c2ed596a",
+      "runtimeLockSha256": "5816a07061c308a6a515d3747da2b7e3adfb8b22b6e6827819f590b1214fe04b",
+      "privatePeCopyRequested": true,
+      "privatePeCopyMarkerObserved": true,
+      "wineEnvironment": {
+        "WINE_ANDROID_PRIVATE_PE_COPY": "1"
+      },
+      "bridgeInputLockSha256": "15ea7a93be54f32d0ee997df1d1afcd8e6b14dd190d640b46a11e2fcf5c794f0",
+      "client": {
+        "sourceRevision": "0f931bbade36a4b197725d691b8eff7caea7b3be",
+        "buildId": "41012726334.1",
+        "clientManifestSha256": "bccde6ee90f688b27ac9790e2aa29d70d270dad2b324a54e92a1bdf72bd58b40",
+        "files": {
+          "WowClient64.exe": {
+            "bytes": 20780032,
+            "sha256": "52a8a21a1d30878da5f28f3760562fcda1bcb83f3adf3c9b6baccc83672dce7f",
+            "peMachine": "0xaa64",
+            "dll": false
+          },
+          "XvidDecoder.dll": {
+            "bytes": 566272,
+            "sha256": "7e4844b6ac9691835a13fdd840c77db541b6b2e67c3b3f6af07d5916adcbc7a8",
+            "peMachine": "0xaa64",
+            "dll": true
+          },
+          "test_xvid_adapter.exe": {
+            "bytes": 379904,
+            "sha256": "7b3c1cbab867634f406d2c1aff8a45f2ae87bf4057ab854a40ef9a97db8db7ac",
+            "peMachine": "0xaa64",
+            "dll": false
+          },
+          "fmod_output_device.exe": {
+            "bytes": 793088,
+            "sha256": "0b11208bbaf7389de4d1a617962377f029fc3266659d5f9e193425d18fe71e9f",
+            "peMachine": "0xaa64",
+            "dll": false
+          },
+          "presentation_device.exe": {
+            "bytes": 320000,
+            "sha256": "83730115596ea01b28c79436f363415e3559b36abd123e88e4ab5855f75d5208",
+            "peMachine": "0xaa64",
+            "dll": false
+          },
+          "texture_device.exe": {
+            "bytes": 292864,
+            "sha256": "0d0ed59f39da90d647627dcaaf288415929ad454dad9501a3a5b9f768eee1604",
+            "peMachine": "0xaa64",
+            "dll": false
+          }
+        }
+      },
+      "directImports": {
+        "advapi32.dll": {
+          "provider": "wine-file",
+          "peMachine": "0xaa64"
+        },
+        "api-ms-win-crt-convert-l1-1-0.dll": {
+          "provider": "not-a-file",
+          "apiSetName": true,
+          "resolutionQualified": false
+        },
+        "api-ms-win-crt-environment-l1-1-0.dll": {
+          "provider": "not-a-file",
+          "apiSetName": true,
+          "resolutionQualified": false
+        },
+        "api-ms-win-crt-filesystem-l1-1-0.dll": {
+          "provider": "not-a-file",
+          "apiSetName": true,
+          "resolutionQualified": false
+        },
+        "api-ms-win-crt-heap-l1-1-0.dll": {
+          "provider": "not-a-file",
+          "apiSetName": true,
+          "resolutionQualified": false
+        },
+        "api-ms-win-crt-locale-l1-1-0.dll": {
+          "provider": "not-a-file",
+          "apiSetName": true,
+          "resolutionQualified": false
+        },
+        "api-ms-win-crt-math-l1-1-0.dll": {
+          "provider": "not-a-file",
+          "apiSetName": true,
+          "resolutionQualified": false
+        },
+        "api-ms-win-crt-multibyte-l1-1-0.dll": {
+          "provider": "not-a-file",
+          "apiSetName": true,
+          "resolutionQualified": false
+        },
+        "api-ms-win-crt-runtime-l1-1-0.dll": {
+          "provider": "not-a-file",
+          "apiSetName": true,
+          "resolutionQualified": false
+        },
+        "api-ms-win-crt-stdio-l1-1-0.dll": {
+          "provider": "not-a-file",
+          "apiSetName": true,
+          "resolutionQualified": false
+        },
+        "api-ms-win-crt-string-l1-1-0.dll": {
+          "provider": "not-a-file",
+          "apiSetName": true,
+          "resolutionQualified": false
+        },
+        "api-ms-win-crt-time-l1-1-0.dll": {
+          "provider": "not-a-file",
+          "apiSetName": true,
+          "resolutionQualified": false
+        },
+        "api-ms-win-crt-utility-l1-1-0.dll": {
+          "provider": "not-a-file",
+          "apiSetName": true,
+          "resolutionQualified": false
+        },
+        "d3d11.dll": {
+          "provider": "wine-file",
+          "peMachine": "0xaa64"
+        },
+        "d3dcompiler_47.dll": {
+          "provider": "wine-file",
+          "peMachine": "0xaa64"
+        },
+        "dbghelp.dll": {
+          "provider": "wine-file",
+          "peMachine": "0xaa64"
+        },
+        "dinput8.dll": {
+          "provider": "wine-file",
+          "peMachine": "0xaa64"
+        },
+        "dxgi.dll": {
+          "provider": "wine-file",
+          "peMachine": "0xaa64"
+        },
+        "gdi32.dll": {
+          "provider": "wine-file",
+          "peMachine": "0xaa64"
+        },
+        "hid.dll": {
+          "provider": "wine-file",
+          "peMachine": "0xaa64"
+        },
+        "imm32.dll": {
+          "provider": "wine-file",
+          "peMachine": "0xaa64"
+        },
+        "kernel32.dll": {
+          "provider": "wine-file",
+          "peMachine": "0xaa64"
+        },
+        "msacm32.dll": {
+          "provider": "wine-file",
+          "peMachine": "0xaa64"
+        },
+        "msvcp140.dll": {
+          "provider": "wine-file",
+          "peMachine": "0xaa64"
+        },
+        "ole32.dll": {
+          "provider": "wine-file",
+          "peMachine": "0xaa64"
+        },
+        "opengl32.dll": {
+          "provider": "wine-file",
+          "peMachine": "0xaa64"
+        },
+        "setupapi.dll": {
+          "provider": "wine-file",
+          "peMachine": "0xaa64"
+        },
+        "shell32.dll": {
+          "provider": "wine-file",
+          "peMachine": "0xaa64"
+        },
+        "user32.dll": {
+          "provider": "wine-file",
+          "peMachine": "0xaa64"
+        },
+        "vcruntime140.dll": {
+          "provider": "wine-file",
+          "peMachine": "0xaa64"
+        },
+        "version.dll": {
+          "provider": "wine-file",
+          "peMachine": "0xaa64"
+        },
+        "wininet.dll": {
+          "provider": "wine-file",
+          "peMachine": "0xaa64"
+        },
+        "winmm.dll": {
+          "provider": "wine-file",
+          "peMachine": "0xaa64"
+        },
+        "ws2_32.dll": {
+          "provider": "wine-file",
+          "peMachine": "0xaa64"
+        },
+        "xviddecoder.dll": {
+          "provider": "client-build",
+          "peMachine": "0xaa64"
+        }
+      },
+      "androidRuntimeQualified": false,
+      "clientExecutableLaunchAttempted": true,
+      "clientExecutableEntryReached": true,
+      "gameInitializationStarted": false,
+      "renderingQualified": false,
+      "audioQualified": false,
+      "gameLoginQualified": false,
+      "serverRuntimeIncluded": false,
+      "linuxArm64CodecQualified": true,
+      "processNamespaceExited": true,
+      "linuxArm64VulkanPresentationQualified": true,
+      "linuxArm64VulkanTextureLifecycleQualified": true,
+      "linuxArm64ClientEntryQualified": true,
+      "clientEntryRequested": true,
+      "linuxArm64ClientOfflineBoundariesQualified": true,
+      "clientOfflineRequested": true,
+      "linuxArm64ClientLoopbackTransportQualified": true,
+      "clientLoopbackRequested": true,
+      "linuxArm64ClientGruntSyntheticPeerQualified": true,
+      "clientAuthPeer": {
+        "sourceRevision": "0f931bbade36a4b197725d691b8eff7caea7b3be",
+        "path": "Tools/PlatformTests/auth_peer.py",
+        "bytes": 8376,
+        "sha256": "3535fb9f48c4247156c1c1ada27ab4960bb78b1c020a846e641ae2b45d7d8f36"
+      },
+      "linuxArm64VulkanEngineFrameReadbackQualified": true,
+      "engineFrameReadbackRequired": true,
+      "linuxArm64FmodPcmTransportQualified": true,
+      "audioRequested": true,
+      "audioBridge": {
+        "integrationRevision": "681b2e9f30b19e94bf8e8de44f67fedba5033c8a",
+        "buildReceiptSha256": "ba6f6208ebb02c6ab0f664dc055974cc231a43aaa5e57d16edc822127b6805cc",
+        "inputLockSha256": "15ea7a93be54f32d0ee997df1d1afcd8e6b14dd190d640b46a11e2fcf5c794f0",
+        "plugin": {
+          "bytes": 71088,
+          "sha256": "bb2f32c2def9e712630ea282aca06fe38bf563b03b07d0672ddf273a18ebb16c",
+          "architecture": "arm64",
+          "needed": [
+            "ld-linux-aarch64.so.1",
+            "libasound.so.2",
+            "libc.so.6"
+          ],
+          "maxGlibc": "2.17",
+          "interpreter": null
+        },
+        "softwareAudio": {
+          "components": {
+            "opt/wine/lib/wine/aarch64-unix/winealsa.so": {
+              "bytes": 134144,
+              "elfClass": 2,
+              "elfMachine": 183,
+              "sha256": "cc3de8fd246ebdb46879a05debfa451437d5dd7fc655bd249165606c23c882ab"
+            },
+            "opt/wine/lib/wine/aarch64-windows/winealsa.drv": {
+              "bytes": 589824,
+              "peMachine": "0xaa64",
+              "sha256": "ea1da4bccb4188f34148f55daaff9acea37f2d172b8ff09ab9c311ccd6611595"
+            },
+            "usr/lib/aarch64-linux-gnu/libasound.so.2.0.0": {
+              "bytes": 1116648,
+              "elfClass": 2,
+              "elfMachine": 183,
+              "sha256": "9fade6b3aedf1ba944e6795b52b74378f2f89166b92ee542582171416a76572d"
+            },
+            "usr/share/alsa/alsa.conf": {
+              "bytes": 10117,
+              "sha256": "ea7c6cedb7da16ba51a0fea3e960416a2240e29c1f5d42e475c1dfcd19eb74ee"
+            }
+          },
+          "formatVersion": 1,
+          "runtimeArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46"
+        }
+      },
+      "softwareGraphics": {
+        "components": {
+          "opt/wine/lib/wine/aarch64-unix/winevulkan.so": {
+            "bytes": 854160,
+            "elfClass": 2,
+            "elfMachine": 183,
+            "sha256": "1f3ad380d36fb467988d20eea122b0000fe52afc1258f7eb9635963fad45ef68"
+          },
+          "usr/lib/aarch64-linux-gnu/libvulkan.so.1.3.239": {
+            "bytes": 526896,
+            "elfClass": 2,
+            "elfMachine": 183,
+            "sha256": "605f52f426f01a2c468ecd920b3de31452fde495f2c0d99602fffb93e782767c"
+          },
+          "usr/lib/aarch64-linux-gnu/libvulkan_lvp.so": {
+            "bytes": 6569376,
+            "elfClass": 2,
+            "elfMachine": 183,
+            "sha256": "ce6f6917dd22ed612ae8649a9eb9c615a973a2e9eb9a58b8cc8655f22c933c6b"
+          },
+          "usr/share/vulkan/icd.d/lvp_icd.aarch64.json": {
+            "bytes": 162,
+            "sha256": "0950c584a06fc5531dbaedef764764cd8f4af5e4390d416971db7c62e85da22f"
+          }
+        },
+        "expectedAdapterPrefix": "Vulkan adapter: llvmpipe",
+        "icdApiVersion": "1.1.230",
+        "icdLibrary": "/usr/lib/aarch64-linux-gnu/libvulkan_lvp.so",
+        "icdPath": "usr/share/vulkan/icd.d/lvp_icd.aarch64.json",
+        "runtimeArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+        "status": "separate-software-reference-only"
+      },
+      "graphicsRequested": [
+        "presentation",
+        "texture"
+      ],
+      "namespaceExit": 0,
+      "worker": {
+        "displayReady": true,
+        "prefixExit": 0,
+        "fixtureExit": 0,
+        "codecMessageMatched": true,
+        "networkIsolated": true,
+        "expectedExit": 0,
+        "workerCompleted": true,
+        "privatePeCopyRequested": true,
+        "privatePeCopyMarkerObserved": true,
+        "clientEntry": {
+          "launchAttempted": true,
+          "exitCode": 0,
+          "messageObserved": true,
+          "receiptValidated": true,
+          "receipt": {
+            "schemaVersion": 1,
+            "scope": "executable-entry-only",
+            "architecture": "ARM64",
+            "protocolBuild": 12340,
+            "extensionVersion": 4,
+            "checks": {
+              "imageEntryReached": true,
+              "crtInitialized": true,
+              "stormAllocator": true,
+              "cppUnwind": true,
+              "mainFiber": true,
+              "fiberReturn": true,
+              "fpControlRead": true
+            },
+            "commonMainStarted": false,
+            "assetsLoaded": false
+          },
+          "receiptSha256": "0ed74a49d5f65c792391394fda20187fe07e9d99d3f6de582db17a07e25d356b"
+        },
+        "clientOffline": {
+          "-local-offline": {
+            "exitCode": 0,
+            "receiptValidated": true,
+            "receipt": {
+              "schemaVersion": 1,
+              "scope": "executable-local-offline-boundaries-only",
+              "architecture": "ARM64",
+              "protocolBuild": 12340,
+              "checks": {
+                "actualCommandParser": true,
+                "osUrlRejected": true,
+                "blizzardUrlRejected": true,
+                "initiationFailureCallbacksPreserved": true,
+                "trackerReturned": true,
+                "hostConnectionRejected": true,
+                "numericConnectionRejected": true,
+                "invalidPortRejected": true,
+                "connectFailureCallbacks": true,
+                "connectionRefsReleased": true
+              },
+              "remoteAttemptsRejected": 3,
+              "failureCallbacks": 3,
+              "commonMainStarted": false,
+              "assetsLoaded": false,
+              "loopbackGameplayQualified": false
+            },
+            "receiptSha256": "a0a8ea79b80b80bf73766539cc4d6f64c38c4f599e760b7cf267a7f0f1a027c2"
+          },
+          "--local-offline": {
+            "exitCode": 0,
+            "receiptValidated": true,
+            "receipt": {
+              "schemaVersion": 1,
+              "scope": "executable-local-offline-boundaries-only",
+              "architecture": "ARM64",
+              "protocolBuild": 12340,
+              "checks": {
+                "actualCommandParser": true,
+                "osUrlRejected": true,
+                "blizzardUrlRejected": true,
+                "initiationFailureCallbacksPreserved": true,
+                "trackerReturned": true,
+                "hostConnectionRejected": true,
+                "numericConnectionRejected": true,
+                "invalidPortRejected": true,
+                "connectFailureCallbacks": true,
+                "connectionRefsReleased": true
+              },
+              "remoteAttemptsRejected": 3,
+              "failureCallbacks": 3,
+              "commonMainStarted": false,
+              "assetsLoaded": false,
+              "loopbackGameplayQualified": false
+            },
+            "receiptSha256": "a0a8ea79b80b80bf73766539cc4d6f64c38c4f599e760b7cf267a7f0f1a027c2"
+          }
+        },
+        "clientLoopback": {
+          "exitCode": 0,
+          "receiptValidated": true,
+          "receipt": {
+            "schemaVersion": 1,
+            "scope": "executable-loopback-transport-only",
+            "architecture": "ARM64",
+            "protocolBuild": 12340,
+            "checks": {
+              "actualCommandParser": true,
+              "localOfflineEnabled": true,
+              "twoWorkerThreads": true,
+              "loopbackConnectCallbacks": true,
+              "partialFrameHeaders": true,
+              "shortAndExtendedFrameBytes": true,
+              "queuedPacketSendBytes": true,
+              "streamReadAndSendBytes": true,
+              "controlledDisconnectCallbacks": true,
+              "connectionRefsReleased": true,
+              "networkThreadsJoined": true,
+              "stopTimeoutRetainsNetwork": true
+            },
+            "connections": 2,
+            "receivedFrames": 2,
+            "sentFrames": 2,
+            "receivedStreamBytes": 1027,
+            "sentStreamBytes": 1031,
+            "commonMainStarted": false,
+            "assetsLoaded": false,
+            "authenticationQualified": false,
+            "gameplayQualified": false
+          },
+          "receiptSha256": "bb8f70ff9fda6fb9939fa4046ff613249220e29d3e6bf30bfc6365300197aaee"
+        },
+        "clientAuth": {
+          "scope": "linux-arm64-wine-grunt-synthetic-peer-only",
+          "cases": [
+            {
+              "mode": "valid",
+              "exitCode": 0,
+              "peerVerifiedClientProof": true,
+              "peerObservedClose": true
+            },
+            {
+              "mode": "bad-server-proof",
+              "exitCode": 65,
+              "peerVerifiedClientProof": true,
+              "peerObservedClose": true
+            },
+            {
+              "mode": "remote-realm",
+              "exitCode": 65,
+              "peerVerifiedClientProof": true,
+              "peerObservedClose": true
+            }
+          ],
+          "qualified": true,
+          "privateOutputsRemoved": true,
+          "existingOutputsPreserved": true,
+          "receiptValidated": true,
+          "compiledServerQualified": false,
+          "gameInitializationStarted": false,
+          "worldEntryQualified": false,
+          "gameplayQualified": false,
+          "receipt": {
+            "schemaVersion": 1,
+            "scope": "executable-grunt-authentication-only",
+            "architecture": "ARM64",
+            "protocolBuild": 12340,
+            "fixtureId": "92a2512a468041ce0c720e99bdf9f722",
+            "checks": {
+              "actualCommandParser": true,
+              "localOfflineEnabled": true,
+              "twoWorkerThreads": true,
+              "gruntTimerThread": true,
+              "connectedCallback": true,
+              "newSessionRequest": true,
+              "versionChallengeObserved": true,
+              "serverProofVerified": true,
+              "realmListCallback": true,
+              "controlledDisconnect": true,
+              "connectionRefsReleased": true,
+              "gruntTimerJoined": true,
+              "networkThreadsJoined": true
+            },
+            "authentications": 1,
+            "realms": 1,
+            "realmId": 1,
+            "worldEndpoint": "127.0.0.1:8085",
+            "realmFlags": 6,
+            "realmBuildPresent": true,
+            "privateSessionKeyBytes": 40,
+            "versionChecksumQualified": false,
+            "commonMainStarted": false,
+            "assetsLoaded": false,
+            "compiledServerQualified": false,
+            "worldEntryQualified": false,
+            "gameplayQualified": false
+          },
+          "receiptSha256": "7d7a210adefff1a46425c240451c71adadf13e407080f1ca9f528dcbf1f64f5a",
+          "privateSessionKeyMatched": true
+        },
+        "graphics": {
+          "presentation": {
+            "exitCode": 0,
+            "messageMatched": true,
+            "adapter": "Vulkan adapter: llvmpipe (LLVM 15.0.6, 128 bits); VID 10005 DID 0000, api 1.3.230, driver 0.0.1",
+            "softwareAdapterMatched": true,
+            "validationCallbackActive": false,
+            "engineFrameMessageMatched": true
+          },
+          "texture": {
+            "exitCode": 0,
+            "messageMatched": true,
+            "adapter": "Vulkan adapter: llvmpipe (LLVM 15.0.6, 128 bits); VID 10005 DID 0000, api 1.3.230, driver 0.0.1",
+            "softwareAdapterMatched": true,
+            "validationCallbackActive": false
+          }
+        },
+        "audio": {
+          "winmm": {
+            "driverSelectionExit": 0,
+            "fixtureExit": 0,
+            "messageMatched": true,
+            "outputDevice": "FMOD output: WinMM; device: Out: default; version: 00040907",
+            "wineStopExit": 0,
+            "wineWaitExit": 0,
+            "pcmEofDrained": true,
+            "pcm": {
+              "scope": "linux-fmod-wine-alsa-pcm-capture-only",
+              "playbackClock": "simulated-monotonic",
+              "androidAudioQualified": false,
+              "audibleOutputQualified": false,
+              "physicalLatencyQualified": false,
+              "failures": [],
+              "totalBytes": 489688,
+              "streams": [
+                {
+                  "commands": 1346,
+                  "configured": true,
+                  "cleanEof": true,
+                  "frames": 122422,
+                  "strongSamples": [
+                    91999,
+                    87999
+                  ],
+                  "rms": [
+                    5129.0945000660595,
+                    5129.1209418041335
+                  ],
+                  "amplitudes1k2k": [
+                    [
+                      6423.348745049501,
+                      0.023782289986380788
+                    ],
+                    [
+                      0.034634297757317294,
+                      6423.378519790296
+                    ]
+                  ],
+                  "knownStereoSignalMatched": true,
+                  "file": "audio-winmm-captured-00.s16le",
+                  "bytes": 489688,
+                  "sha256": "179fc76896d4149232f9cc8bcf41a99a81f12e39a9176cd52ca9b8c1173dfaad"
+                }
+              ],
+              "pcmSignalQualified": true
+            }
+          },
+          "dsound": {
+            "driverSelectionExit": 0,
+            "fixtureExit": 0,
+            "messageMatched": true,
+            "outputDevice": "FMOD output: DirectSound; device: Out: default; version: 00040907",
+            "wineStopExit": 0,
+            "wineWaitExit": 0,
+            "pcmEofDrained": true,
+            "pcm": {
+              "scope": "linux-fmod-wine-alsa-pcm-capture-only",
+              "playbackClock": "simulated-monotonic",
+              "androidAudioQualified": false,
+              "audibleOutputQualified": false,
+              "physicalLatencyQualified": false,
+              "failures": [],
+              "totalBytes": 495296,
+              "streams": [
+                {
+                  "commands": 1185,
+                  "configured": true,
+                  "cleanEof": true,
+                  "frames": 123824,
+                  "strongSamples": [
+                    91999,
+                    87999
+                  ],
+                  "rms": [
+                    5099.974694601087,
+                    5100.000986219435
+                  ],
+                  "amplitudes1k2k": [
+                    [
+                      6350.6202357091515,
+                      0.023513014477909846
+                    ],
+                    [
+                      0.03424215014897191,
+                      6350.64967332478
+                    ]
+                  ],
+                  "knownStereoSignalMatched": true,
+                  "file": "audio-dsound-captured-00.s16le",
+                  "bytes": 495296,
+                  "sha256": "de168b9df7794e0dceece890a38abfb4765dbc48eca65cb86ccf27faf957950c"
+                }
+              ],
+              "pcmSignalQualified": true
+            }
+          }
+        },
+        "wineStopExit": 0,
+        "wineStopSource": "audio-dsound",
+        "wineWaitExit": 0,
+        "logStreamsDrained": true,
+        "logsWithinLimit": true,
+        "logWritesSucceeded": true
+      }
+    }
+  },
+  "privatePeFixture": {
+    "bytes": 6215,
+    "sha256": "1045009269f043bf0d881b3a98f83f797af66f0d1bd07ed1b755a77a1342f5e6",
+    "receipt": {
+      "formatVersion": 1,
+      "scope": "native-linux-arm64-wine-original-vs-private-image-copy",
+      "qualified": true,
+      "androidQualified": false,
+      "arm64GameClientQualified": false,
+      "gameClientQualified": false,
+      "modes": [
+        {
+          "mode": "original",
+          "privateCopyRequested": false,
+          "qualified": true,
+          "captures": {
+            "original-boot.log": {
+              "exitCode": 0,
+              "logBytes": 4317,
+              "logSha256": "0527bf35438bc549bd39630aded7ce77f8cb4fe299d0dd4db4edbf5a1b3c1875"
+            },
+            "original-fixture.log": {
+              "exitCode": 0,
+              "logBytes": 135,
+              "logSha256": "4148e4870e7916b3d1dc0519b7348fb3ed1979b4efad85d7c921a17cea36fc94"
+            },
+            "original-stop.log": {
+              "exitCode": 0,
+              "logBytes": 0,
+              "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "original-wait.log": {
+              "exitCode": 0,
+              "logBytes": 0,
+              "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          "privateCopyBranchMarkers": 0,
+          "forcedRelocation": true,
+          "sectionProtectionsVerified": true,
+          "initializedDataVerified": true,
+          "zeroFillVerified": true,
+          "dirtyTextExecutableAgain": true,
+          "privateDataIsolated": true,
+          "sharedWritableCrossProcess": true,
+          "backingImagesUnchanged": true,
+          "cleanupFailures": []
+        },
+        {
+          "mode": "private-copy",
+          "privateCopyRequested": true,
+          "qualified": true,
+          "captures": {
+            "private-copy-boot.log": {
+              "exitCode": 0,
+              "logBytes": 4972,
+              "logSha256": "012be71135fe6da18b58853bc7a881a2c5145670373b513d351e9eb3dc26e593"
+            },
+            "private-copy-fixture.log": {
+              "exitCode": 0,
+              "logBytes": 197,
+              "logSha256": "e66b4829925accea5541186e4fad141d08a690d382d922a50ea69838a8995dcc"
+            },
+            "private-copy-stop.log": {
+              "exitCode": 0,
+              "logBytes": 0,
+              "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "private-copy-wait.log": {
+              "exitCode": 0,
+              "logBytes": 0,
+              "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          "privateCopyBranchMarkers": 2,
+          "forcedRelocation": true,
+          "sectionProtectionsVerified": true,
+          "initializedDataVerified": true,
+          "zeroFillVerified": true,
+          "dirtyTextExecutableAgain": true,
+          "privateDataIsolated": true,
+          "sharedWritableCrossProcess": true,
+          "backingImagesUnchanged": true,
+          "cleanupFailures": []
+        }
+      ],
+      "images": {
+        "exe": {
+          "bytes": 93184,
+          "sha256": "4e5fc754a765cb438995a0c8edee7ffec2799c4a9a827a0db47410eed4c18ec5",
+          "machine": "arm64",
+          "sections": [
+            {
+              "name": ".text",
+              "flags": 1610612768,
+              "rawBytes": 11264
+            },
+            {
+              "name": ".rdata",
+              "flags": 1073741888,
+              "rawBytes": 5632
+            },
+            {
+              "name": ".buildid",
+              "flags": 1073741888,
+              "rawBytes": 512
+            },
+            {
+              "name": ".data",
+              "flags": 3221225536,
+              "rawBytes": 512
+            },
+            {
+              "name": ".pdata",
+              "flags": 1073741888,
+              "rawBytes": 512
+            },
+            {
+              "name": ".tls",
+              "flags": 3221225536,
+              "rawBytes": 512
+            },
+            {
+              "name": ".reloc",
+              "flags": 1107296320,
+              "rawBytes": 512
+            },
+            {
+              "name": "/4",
+              "flags": 1107296320,
+              "rawBytes": 6656
+            },
+            {
+              "name": "/43",
+              "flags": 1107296320,
+              "rawBytes": 19968
+            },
+            {
+              "name": "/55",
+              "flags": 1107296320,
+              "rawBytes": 10240
+            },
+            {
+              "name": "/67",
+              "flags": 1107296320,
+              "rawBytes": 9728
+            },
+            {
+              "name": "/18",
+              "flags": 1107296320,
+              "rawBytes": 1024
+            },
+            {
+              "name": "/32",
+              "flags": 1107296320,
+              "rawBytes": 17408
+            }
+          ]
+        },
+        "dll": {
+          "bytes": 65024,
+          "sha256": "3e8aa227f488992de5fb73c308e30a15a41ecc5d8fac13adb8d734e99210c4f0",
+          "machine": "arm64",
+          "sections": [
+            {
+              "name": ".text",
+              "flags": 1610612768,
+              "rawBytes": 5632
+            },
+            {
+              "name": ".rdata",
+              "flags": 1073741888,
+              "rawBytes": 3072
+            },
+            {
+              "name": ".buildid",
+              "flags": 1073741888,
+              "rawBytes": 512
+            },
+            {
+              "name": ".data",
+              "flags": 3221225536,
+              "rawBytes": 512
+            },
+            {
+              "name": ".pdata",
+              "flags": 1073741888,
+              "rawBytes": 512
+            },
+            {
+              "name": ".shared",
+              "flags": 3489660992,
+              "rawBytes": 512
+            },
+            {
+              "name": ".tls",
+              "flags": 3221225536,
+              "rawBytes": 512
+            },
+            {
+              "name": ".reloc",
+              "flags": 1107296320,
+              "rawBytes": 512
+            },
+            {
+              "name": "/4",
+              "flags": 1107296320,
+              "rawBytes": 4608
+            },
+            {
+              "name": "/43",
+              "flags": 1107296320,
+              "rawBytes": 13824
+            },
+            {
+              "name": "/55",
+              "flags": 1107296320,
+              "rawBytes": 7680
+            },
+            {
+              "name": "/67",
+              "flags": 1107296320,
+              "rawBytes": 9216
+            },
+            {
+              "name": "/18",
+              "flags": 1107296320,
+              "rawBytes": 1024
+            },
+            {
+              "name": "/32",
+              "flags": 1107296320,
+              "rawBytes": 11264
+            }
+          ]
+        }
+      },
+      "wineExecutable": {
+        "bytes": 67744,
+        "sha256": "7d7f35b538ccf2e998fe0bb6c46a2ef0e24ade47e0aefc1df653f80f73ad68c3"
+      },
+      "wineServer": {
+        "bytes": 725840,
+        "sha256": "d2761747e82e560aba395b2b70061c196ee0d943dfd17ea7ed4f7e81b35ea266"
+      },
+      "privatePrefixesRemoved": true
+    }
+  },
+  "sourceReadback": {
+    "bytes": 1530,
+    "sha256": "da37376ccb72d18b2b50f327ed12a65ceccce665f2ef399be8e571b0b6f95b1c",
+    "receipt": {
+      "formatVersion": 1,
+      "scope": "read-back-source-owned-arm64-wine-candidate-originals",
+      "sourceRevision": "681b2e9f30b19e94bf8e8de44f67fedba5033c8a",
+      "runtimeMetadataSha256": "4b731a5f450a556632c598ddebda2ec3f814c8d7ea2c9e1529d6c80c8773e0a5",
+      "sourceLockSha256": "077fb2b0883986338b6755e53f5cede08bd63ed1834783e7e6cd079e0ec0c16d",
+      "debianSourcePackages": 183,
+      "originalDebianFiles": 583,
+      "debianSourceBytes": 858739837,
+      "originalArchives": {
+        "fex-2510-source-with-submodules.tar.gz": {
+          "bytes": 222845230,
+          "sha256": "8a10a8e63cdea41a6c70b0f14d487fe4cb3f11c8fb5baba3e42090098e2745be"
+        },
+        "llvm-mingw-20250920-ucrt-ubuntu-22.04-aarch64.tar.xz": {
+          "bytes": 75125388,
+          "sha256": "bce5cc755c613515fd44e1ee9523123d854103abae147571adb645450036274d"
+        },
+        "wine-arm64ec-source.tar.gz": {
+          "bytes": 53416396,
+          "sha256": "93ffcd86d3f518934da5c93c768d43afe7e97d66f04f355d914f5cfb6731ac74"
+        }
+      },
+      "toolchainSources": {
+        "sourceTrees": 4,
+        "originalNotices": 47,
+        "archiveBytes": 252021269,
+        "manifest": {
+          "bytes": 13790,
+          "sha256": "fc41f799c6122fb880e8809df75d9fd993b831d78d4d688be8ef56523a698f83"
+        },
+        "allSelectedGitBlobsReadBack": true,
+        "binaryRebuildEquivalent": false,
+        "androidRuntimeQualified": false
+      },
+      "fexNotices": 22,
+      "adaptationSources": 5,
+      "completeIntegrationTreeReadBack": true,
+      "allOriginalSourcesReadBack": true,
+      "androidQualified": false,
+      "gameClientQualified": false,
+      "gameplayQualified": false
+    }
+  },
+  "independentLocalRuntimeReadback": {
+    "entries": 14180,
+    "fileBytes": 1325744204,
+    "linkCount": 1029,
+    "componentIdentitiesValidated": true
+  },
+  "localFullSourceCompanionReadback": false,
+  "sourceCompanionFullReadbackInCi": true,
+  "originalCppReceiptsRevalidated": true,
+  "qualifiedClientRevision": "0f931bbade36a4b197725d691b8eff7caea7b3be",
+  "new471ClientOnThisRuntimeQualified": false,
+  "androidQualified": false,
+  "hardwareGraphicsQualified": false,
+  "audibleOutputQualified": false,
+  "gameplayQualified": false,
+  "productionProviderChanged": false,
+  "successfulSameRunSourceCompanionProvenanceVerified": true,
+  "privatePeCaptureHashesRevalidated": true,
+  "capturedPcmBytesAndStereoSignalsIndependentlyReanalyzed": true,
+  "softwareGraphicsSuccessLogsRevalidated": true
+}
