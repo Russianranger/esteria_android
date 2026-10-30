@@ -76,10 +76,23 @@ public final class ServerInstallationSetup {
      * qualify game data or accept a caller-authored completion Boolean. */
     public static FreshServerInstallations.Active completed(Context context,Path root,ServerRuntimeSetup runtime,
             ServerProgramsSetup programs,ServerContentSetup content) throws IOException {
+        FreshServerInstallations.Active active=completedOrNull(context,root,runtime,programs,content);
+        if(active==null)throw new IOException("A complete source-bound fresh installation is required");
+        return active;
+    }
+    /** Absence alone returns null. An incompatible, partial or changed active
+     * installation still throws; callers must never catch it and initialize a
+     * replacement database. Checks the measured helper before allocating SQL. */
+    public static FreshServerInstallations.Active completedOrNull(Context context,Path root,ServerRuntimeSetup runtime,
+            ServerProgramsSetup programs,ServerContentSetup content) throws IOException {
         if(!root.equals(context.getFilesDir().getCanonicalFile().toPath()))throw new IOException("Private canonical application storage required");
         JSONObject helper=playerbotsSelection(programs);
         FreshServerInstallations.Active active=new FreshServerInstallations(root).active(selection(runtime,programs,content));
-        if(active==null)throw new IOException("A complete source-bound fresh installation is required");
+        if(active==null) {
+            if(Files.exists(root.resolve("state/server-work"),LinkOption.NOFOLLOW_LINKS))
+                throw new IOException("Legacy server state is retained; explicit migration is required before local world setup");
+            return null;
+        }
         Path work=active.directoryFor(root);
         try {
             byte[] raw=read(work.resolve("state/server-setup-complete.json"),128<<10);

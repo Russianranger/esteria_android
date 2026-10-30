@@ -33,10 +33,10 @@ their original full-lock identity.
 
 | Milestone | Current state | Next evidence |
 | --- | --- | --- |
-| 1. Reproducible references | Exact pins, full Windows ARM64/x64 client and linked ARM64 server/tools complete; protocol layouts match. | Isolated exported-source server rebuild/source seal. |
-| 2. Client platform | Native ARM64 Wine entry/codec/software Vulkan/PCM and Android x64 entry/offline/loopback pass. | Selected471 pairing on the built source-owned Wine runtime, Android presentation and full initialization. |
-| 3. Local services | Native compiled SQL/auth/SRP/ledger/restart passes for retained six-patch reference; Android x64 persistent MySQL service passes. | Native product composition passes on six/seven-patch builds; phone staged coordinator and three cleanup-owner fault cases pass host checks. Playerbots schema, Android SQL and production ARM64 execution remain. |
-| 4. Matched gameplay | Real reconstructed-client/compiled-server SRP pairing passes41060555263; normal game initialization/world remain untested. | Matched login, character/world/gameplay and actual persistence/bots. |
+| 1. Reproducible references | Exact pins, full Windows ARM64/x64 client and linked ARM64 server/tools complete; protocol layouts match. | Passed41051669638/41078079045; preserve exact sources and paired debug. |
+| 2. Client platform | Native ARM64 Wine entry/codec/software Vulkan/PCM and Android x64 entry/offline/loopback pass. | Selected471 component and compiled-auth pairing pass; Android presentation and full initialization remain. |
+| 3. Local services | Native compiled SQL/auth/SRP/ledger/restart passes for retained six-patch reference; Android x64 persistent MySQL service passes. | Native product composition passes on six/seven-patch builds; phone staged coordinator and three cleanup-owner fault cases pass host checks. Playerbots schema and owned four-schema finish pass natively; Android SQL remains. |
+| 4. Matched gameplay | Current471/c0e/seven-patch SRP pairing passes41088546780; normal initialization/world remain untested. | Matched login, character/world/gameplay and actual persistence/bots. |
 | 5. Android application | Verified runtime/source import, UI review, controls/bridges, source-gated programs installer and content/schema adapters build. | Complete owned session, readiness, lifecycle and graceful saves. |
 | 6. Thor candidate | Not ready; stable signing identity provisioned. | One coherent offline playable, update-compatible APK with available data and consolidated test. |
 
@@ -58,29 +58,9 @@ Application: `io.github.russianranger.esteria`. Immutable imported generations a
 A passed component test, compiled EXE, built APK or listening TCP port does not prove world playability. Keep compilation, host component tests, emulator tests and physical Thor tests separate in STATUS.md and TESTING.md. Missing content blocks only affected runtime qualification while independent work proceeds.
 
 
-Latest integration priorities: follow actual production ARM64 Wine and isolated
-server source builds; pass matched compiled authentication; compose portable
-updater/config/account/realm setup on the owned MySQL service; finish fresh-slot
-promotion/recovery and server data extraction; then complete client presentation
-and matched world/gameplay gates. Exact current evidence is in STATUS.md.
-
-The full exported-source server compile has passed; exact sealed-source retention
-is the current provider gate. Production Wine source/publication and selected471
-component qualification pass, with consumer providers now measured against the
-new runtime. Bot schema integration and retained presentation/session ownership
-are the next implementation work before asset-backed world qualification.
-
-Native four-schema bot setup and exact server source retention now pass. Complete
-measured provider adoption, retain presentation/shader/native child ownership
-through failures, wire the new phased server-data generator into the Android
-setup owner, then compose the real local game session and asset-backed gates.
-
-The data generation's source/input/manifest verifier and five-file APK helper
-closure now pass local contract/build/readback gates. Connect them to the retained
-setup and auth/world session owners only after the actual ordered tool provider
-is complete; keep format readiness separate from world coverage and gameplay.
-
-The current matched client/Wine/seven-patch authentication and native four-schema
-installation finish now pass. Complete the source-qualified composed data-tools
-and playerbots-helper providers, retained data operation and client/server
-coordinator, then use actual imported assets for world/controller/save/bot gates.
+Current order: complete the measured ordered/helper source seals and derived
+providers; finish public cohort consumption and atomic adoption/coherent APK;
+compose retained game/client ownership with the new local-world setup pipeline
+and service-owned presentation; then qualify actual imported-data world gameplay.
+Native current authentication, bot schema and owned installation finish pass.
+The exact exported-source server archive is retained; no full rebuild is needed.

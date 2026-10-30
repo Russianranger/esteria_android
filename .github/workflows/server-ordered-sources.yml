@@ -23,9 +23,6 @@ jobs:
     if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
-    env:
-      # The source sealer deliberately refuses outputs inside its Git input.
-      ORDERED_SOURCE_OUTPUT: ${{ runner.temp }}/esteria-ordered-complete-sources-${{ github.run_id }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -50,17 +47,19 @@ jobs:
           cp out/ordered-source-inputs/acquisition.json out/ordered-source-evidence/
       - name: Compose and read back the separate source-only companion
         run: |
+          # The source sealer refuses outputs inside its Git input.
+          source_output="$RUNNER_TEMP/esteria-ordered-complete-sources-$GITHUB_RUN_ID"
           python3 tools/seal_ordered_extractor_sources.py \
             --ordered-payload out/ordered-source-inputs/payload \
             --original-sealed out/ordered-source-inputs/original-sealed \
             --integration-git-root . --client-readme out/ordered-source-inputs/client-reference/README.md \
-            --output "$ORDERED_SOURCE_OUTPUT" > out/ordered-source-evidence/sealing.log 2>&1
-          cp "$ORDERED_SOURCE_OUTPUT/ordered-source-receipt.json" out/ordered-source-evidence/
+            --output "$source_output" > out/ordered-source-evidence/sealing.log 2>&1
+          cp "$source_output/ordered-source-receipt.json" out/ordered-source-evidence/
       - name: Retain complete source archive and its separate positive receipt
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: complete-ordered-extractor-sources-${{ github.sha }}
-          path: ${{ env.ORDERED_SOURCE_OUTPUT }}/
+          path: ${{ runner.temp }}/esteria-ordered-complete-sources-${{ github.run_id }}/
           compression-level: 0
           retention-days: 30
           if-no-files-found: error

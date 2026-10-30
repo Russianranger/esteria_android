@@ -19,6 +19,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import io.github.russianranger.esteria.runtime.ClientLaunchSetup;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,11 +35,14 @@ public final class MainActivity extends Activity {
     private TextView uiReview;
     private String displayedUiDigest;
     private boolean bound;
+    private Spinner clientLanguage;
+    private static final String[] CLIENT_LOCALES={"enUS","enGB","ruRU","deDE","esES","esMX","frFR","koKR","zhCN","zhTW","enCN","enTW"};
     private final Runnable refresh = new Runnable() {
         public void run() {
             if (service != null) {
                 status.setText(service.status());
                 for (Button action : actions) action.setEnabled(!service.busy());
+                if(clientLanguage!=null)clientLanguage.setEnabled(!service.busy());
                 cancel.setEnabled(service.busy());
                 ClientLaunchSetup.UiReview review=service.uiReview();
                 if(review==null) {
@@ -72,12 +77,27 @@ public final class MainActivity extends Activity {
         button(layout, "Import client ZIP", () -> chooseArchive(BASE));
         button(layout, "Add custom content folder", () -> chooseFolder(OVERLAY_FOLDER));
         button(layout, "Add custom content ZIP", () -> chooseArchive(OVERLAY));
-        button(layout, "Prepare client runtime · 585 MiB download", () -> operation(new Intent(this, SessionService.class).setAction(SessionService.PREPARE_RUNTIME)));
-        TextView runtimeNote = text("Runtime setup uses about 4.2 GiB plus space retained by earlier versions. Interrupted setup can resume. Local services and gameplay are still under development.", 13, Color.rgb(145, 163, 177));
+        button(layout, "Prepare client runtime", () -> operation(new Intent(this, SessionService.class).setAction(SessionService.PREPARE_RUNTIME)));
+        TextView runtimeNote = text("Initial runtime setup may download files. Progress shows the copied size; interrupted setup can resume. Previous versions and imported game data are retained.", 13, Color.rgb(145, 163, 177));
         layout.addView(runtimeNote);
         if (BuildConfig.SERVER_RUNTIME_PACKAGED) {
             button(layout, "Prepare server dependencies · bundled", () -> operation(new Intent(this, SessionService.class).setAction(SessionService.PREPARE_SERVER_RUNTIME)));
-            layout.addView(text("Database and server dependencies are included in this build. Setup needs about 560 MiB of free space and can resume after interruption. Database initialization and local server startup are still under development.", 13, Color.rgb(145, 163, 177)));
+            layout.addView(text("Prepare the bundled server files before preparing the local world. Imported game data, database files and saved characters are stored separately from application updates.", 13, Color.rgb(145, 163, 177)));
+        }
+        if(BuildConfig.SERVER_DATA_TOOLS_PACKAGED&&BuildConfig.SERVER_PROGRAMS_PACKAGED&&BuildConfig.SERVER_CONTENT_PACKAGED&&BuildConfig.SHADER_TOOLS_PACKAGED) {
+            layout.addView(text("Imported client language",14,Color.rgb(184,199,211)));
+            clientLanguage=new Spinner(this);
+            ArrayAdapter<String> languages=new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,CLIENT_LOCALES);
+            languages.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);clientLanguage.setAdapter(languages);
+            String selected=getPreferences(MODE_PRIVATE).getString("clientLanguage","enUS");
+            for(int i=0;i<CLIENT_LOCALES.length;i++)if(CLIENT_LOCALES[i].equals(selected))clientLanguage.setSelection(i);
+            layout.addView(clientLanguage);
+            button(layout,"Prepare local world",()->{
+                String locale=(String)clientLanguage.getSelectedItem();
+                getPreferences(MODE_PRIVATE).edit().putString("clientLanguage",locale).apply();
+                operation(new Intent(this,SessionService.class).setAction(SessionService.PREPARE_WORLD).putExtra(SessionService.WORLD_LOCALE,locale));
+            });
+            layout.addView(text("This prepares world data, graphics data and the local database. Use the language of the imported client. Initial preparation can take a long time; completed stages are reused. Fresh database setup reserves 4 GiB in addition to world data.",13,Color.rgb(145,163,177)));
         }
         uiReview=text("",14,Color.rgb(220,186,113)); uiReview.setTextIsSelectable(true);
         uiReview.setPadding(0,dp(16),0,dp(8)); uiReview.setVisibility(View.GONE); layout.addView(uiReview);

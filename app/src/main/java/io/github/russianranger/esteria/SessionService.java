@@ -47,6 +47,10 @@ import io.github.russianranger.esteria.runtime.GuestBridgeSetup;
 import io.github.russianranger.esteria.runtime.ClientRuntimeSetup;
 import io.github.russianranger.esteria.runtime.ClientLaunchSetup;
 import io.github.russianranger.esteria.runtime.ShaderToolsSetup;
+import io.github.russianranger.esteria.runtime.TurnipSetup;
+import io.github.russianranger.esteria.runtime.ServerDataToolsSetup;
+import io.github.russianranger.esteria.runtime.LocalWorldSetup;
+import java.time.Duration;
 
 /** Foreground owner of large import jobs. Runtime launch remains gated until qualified binaries exist. */
 public final class SessionService extends Service {
@@ -56,6 +60,8 @@ public final class SessionService extends Service {
     static final String START = "io.github.russianranger.esteria.START";
     static final String PREPARE_RUNTIME = "io.github.russianranger.esteria.PREPARE_RUNTIME";
     static final String PREPARE_SERVER_RUNTIME = "io.github.russianranger.esteria.PREPARE_SERVER_RUNTIME";
+    static final String PREPARE_WORLD = "io.github.russianranger.esteria.PREPARE_WORLD";
+    static final String WORLD_LOCALE = "worldLocale";
     static final String ACCEPT_UI = "io.github.russianranger.esteria.ACCEPT_UI";
     static final String KEEP_UI = "io.github.russianranger.esteria.KEEP_UI";
     static final String UI_REVIEW_DIGEST = "uiReviewDigest";
@@ -73,6 +79,11 @@ public final class SessionService extends Service {
     private volatile SafTreeSource activeFolderSource;
     // Ephemeral decisions are never restored as approval after service/process recreation.
     private volatile ClientLaunchSetup.UiReview pendingUiReview;
+    // The worker retains this handle across every failure until all setup
+    // children and their data/import leases have confirmed cleanup.
+    private volatile LocalWorldSetup.Handle worldSetup;
+    private volatile LocalWorldSetup.Result preparedWorld;
+    private volatile String activeAction;
     private Path root;
     String status() { return status; }
     boolean busy() { return busy.get(); }
@@ -104,8 +115,9 @@ public final class SessionService extends Service {
             return START_NOT_STICKY;
         }
         // A repeated startForegroundService call still requires a foreground response.
-        foreground("Preparing Esteria");
+        foreground("Preparing Esteria",busy.get()?activeAction:intent.getAction());
         if (!busy.compareAndSet(false, true)) return START_NOT_STICKY;
+        activeAction=intent.getAction();
         cancelled.set(false);
         String operationId = UUID.randomUUID().toString();
         getSharedPreferences("session", MODE_PRIVATE).edit().putString("operation", operationId)
@@ -118,6 +130,7 @@ public final class SessionService extends Service {
                 else if (START.equals(intent.getAction())) checkLaunch();
                 else if (PREPARE_RUNTIME.equals(intent.getAction())) prepareRuntime();
                 else if (PREPARE_SERVER_RUNTIME.equals(intent.getAction())) prepareServerRuntime();
+                else if (PREPARE_WORLD.equals(intent.getAction())) prepareWorld(intent.getStringExtra(WORLD_LOCALE));
                 else if (ACCEPT_UI.equals(intent.getAction())) acceptUiReview(intent.getStringExtra(UI_REVIEW_DIGEST));
                 else if (KEEP_UI.equals(intent.getAction())) keepCurrentUi(intent.getStringExtra(UI_REVIEW_DIGEST));
                 else throw new IOException("Unknown operation");
@@ -199,6 +212,8 @@ public final class SessionService extends Service {
         if (client != null) client.requireWineArchive(setup.archiveSha256());
         ShaderToolsSetup shaders = BuildConfig.SHADER_TOOLS_PACKAGED ? new ShaderToolsSetup(this, root) : null;
         if (shaders != null) shaders.requireWineArchive(setup.archiveSha256());
+        TurnipSetup graphics = BuildConfig.TURNIP_PACKAGED ? new TurnipSetup(this,root) : null;
+        if (graphics != null) graphics.requireWineArchive(setup.archiveSha256());
         final long[] lastUpdate = {0};
         RuntimeInstaller.Result result = setup.prepare((phase, path, completed, total) -> {
             long now = android.os.SystemClock.elapsedRealtime();
@@ -241,6 +256,13 @@ public final class SessionService extends Service {
             log("Shader tools prepared generation=" + installed.generation + " revision=" + shaders.revision()
                     + " reusedFiles=" + installed.reusedFiles + " copiedBytes=" + installed.copiedBytes
                     + " archiveSha256=" + shaders.archiveSha256() + " gameAssetShadersQualified=false");
+        }
+        if (graphics != null) {
+            status="Preparing graphics support…";
+            RuntimeInstaller.Result installed=graphics.prepare((phase,path,completed,total)->
+                status="Preparing graphics support…\n"+mib(completed)+(total>=0?" / "+mib(total):"")+" MiB",cancelled::get);
+            log("Graphics provider prepared generation="+installed.generation+" archiveSha256="+graphics.archiveSha256()
+                +" hardwareQualified=false");
         }
         if (client != null) {
             status = "Preparing reconstructed client files…";
@@ -304,10 +326,12 @@ public final class SessionService extends Service {
         ServerProgramsSetup programs = BuildConfig.SERVER_PROGRAMS_PACKAGED ? new ServerProgramsSetup(this, root) : null;
         ServerContentSetup content = BuildConfig.SERVER_CONTENT_PACKAGED ? new ServerContentSetup(this, root) : null;
         ServerExtractorsSetup extractors = BuildConfig.SERVER_EXTRACTORS_PACKAGED ? new ServerExtractorsSetup(this, root) : null;
+        ServerDataToolsSetup dataTools = BuildConfig.SERVER_DATA_TOOLS_PACKAGED ? new ServerDataToolsSetup(this,root) : null;
         // Validate the complete selected pair before either installation can change its pointer.
         if (programs != null) programs.requireServerRuntimeArchive(setup.archiveSha256());
         if (content != null) content.requireServerRuntimeArchive(setup.archiveSha256());
         if (extractors != null) extractors.requireServerRuntimeArchive(setup.archiveSha256());
+        if (dataTools != null) dataTools.requireServerRuntimeArchive(setup.archiveSha256());
         final long[] lastUpdate = {0};
         // prepare() reuses a verified dependency generation without opening its archive.
         // Continue after reuse so an app update can add a new programs generation.
@@ -369,9 +393,66 @@ public final class SessionService extends Service {
                     + " reusedFiles=" + installed.reusedFiles + " copiedBytes=" + installed.copiedBytes
                     + " clientDataConverted=false customDataLoadOrderQualified=false androidRuntimeQualified=false");
         }
+        if(dataTools!=null) {
+            status="Preparing world data tools…";
+            RuntimeInstaller.Result installed=dataTools.prepare(setup.archiveSha256(),(phase,path,completed,total)->
+                status="Preparing world data tools…\n"+mib(completed)+(total>=0?" / "+mib(total):"")+" MiB",cancelled::get);
+            log("Composed data tools prepared generation="+installed.generation+" archiveSha256="+dataTools.archiveSha256()
+                +" clientDataConverted=false worldQualified=false");
+        }
         status = programs == null
                 ? "Database and server dependencies are prepared. Local server startup is still under development."
                 : "Database dependencies and server programs are prepared. Local server startup is still under development.";
+    }
+    private void prepareWorld(String locale)throws IOException {
+        if(locale==null||!java.util.Set.of("deDE","enGB","enUS","esES","frFR","koKR","zhCN","zhTW","enCN","enTW","esMX","ruRU").contains(locale))
+            throw new IOException("Select the language of the imported client before preparing the world");
+        if(!BuildConfig.SERVER_RUNTIME_PACKAGED||!BuildConfig.SERVER_PROGRAMS_PACKAGED||!BuildConfig.SERVER_CONTENT_PACKAGED||
+                !BuildConfig.SERVER_DATA_TOOLS_PACKAGED||!BuildConfig.SHADER_TOOLS_PACKAGED)
+            throw new IOException("This build does not include the complete source-qualified local world setup profile");
+        preparedWorld=null;pendingUiReview=null;
+        ServerRuntimeSetup server=new ServerRuntimeSetup(this,root);
+        ServerProgramsSetup programs=new ServerProgramsSetup(this,root);
+        ServerContentSetup content=new ServerContentSetup(this,root);
+        ServerDataToolsSetup tools=new ServerDataToolsSetup(this,root);
+        RuntimeSetup wine=new RuntimeSetup(this,root);ShaderToolsSetup shaders=new ShaderToolsSetup(this,root);
+        status="Preparing the local world. Completed data is reused when its inputs match…";
+        // Four GiB is a conservative free-space policy for fresh database work,
+        // separate from imported/extracted assets; no device footprint claim.
+        LocalWorldSetup.Handle owner=LocalWorldSetup.begin(this,root,server,programs,content,tools,wine,shaders,locale,1,4L<<30);
+        worldSetup=owner;
+        Throwable operationFailure=null;LocalWorldSetup.Result result;
+        try {
+            result=owner.prepare((phase,path,completed,total)->{
+                String label=phase.startsWith("server-data")?"Preparing world data":phase.startsWith("shader")?"Preparing graphics data":"Preparing the local database";
+                status=label+"…"+(path==null||path.isEmpty()?"":"\n"+path);
+            },cancelled::get);
+            log("World setup completed dataGeneration="+result.data.generation+" shaders="+result.shaders.generation
+                +" installation="+result.installation.slotId+" reusedInstallation="+result.reusedInstallation
+                +" worldQualified=false gameplayQualified=false");
+        }catch(IOException|RuntimeException error){operationFailure=error;throw error;}
+        finally {
+            IOException cleanup=closeWorldSetup(owner);
+            if(cleanup!=null){if(operationFailure!=null)operationFailure.addSuppressed(cleanup);else throw cleanup;}
+        }
+        preparedWorld=result;
+        status="World data, shaders and the local database are prepared. World entry has not yet been validated.";
+    }
+    /** Keep the foreground operation busy while actual cleanup is outstanding.
+     * This worker is the explicit retry mechanism; no new setup/import can run. */
+    private IOException closeWorldSetup(LocalWorldSetup.Handle owner) {
+        IOException failure=null;boolean interrupted=Thread.interrupted();
+        while(owner.state()!=LocalWorldSetup.State.CLOSED) {
+            try{owner.close(Duration.ofSeconds(20));}
+            catch(IOException error){if(failure==null)failure=error;else if(failure!=error&&failure.getSuppressed().length<15)failure.addSuppressed(error);}
+            catch(RuntimeException error){IOException wrapped=new IOException("Local setup cleanup failed; ownership retained",error);
+                if(failure==null)failure=wrapped;else if(failure.getSuppressed().length<15)failure.addSuppressed(wrapped);}
+            if(owner.state()!=LocalWorldSetup.State.CLOSED) {
+                status="Stopping local setup safely. Data remains in use until cleanup finishes…";
+                try{Thread.sleep(250);}catch(InterruptedException ignored){interrupted=true;}
+            }
+        }
+        worldSetup=null;if(interrupted)Thread.currentThread().interrupt();return failure;
     }
     private void exportBundle(Uri destination) throws Exception {
         if (destination == null || !"content".equals(destination.getScheme())) throw new IOException("No export destination selected");
@@ -385,6 +466,16 @@ public final class SessionService extends Service {
         facts.put("device.model", Build.MODEL); facts.put("device.manufacturer", Build.MANUFACTURER);
         facts.put("device.abis", android.text.TextUtils.join(",", Build.SUPPORTED_ABIS));
         facts.put("status", previousStatus); facts.put("runtime.qualified", "false");
+        LocalWorldSetup.Handle setupOwner=worldSetup;
+        facts.put("worldSetup.retained",Boolean.toString(setupOwner!=null));
+        if(setupOwner!=null)facts.put("worldSetup.state",setupOwner.state().name());
+        LocalWorldSetup.Result world=preparedWorld;
+        if(world!=null) {
+            facts.put("worldSetup.dataGeneration",world.data.generation);
+            facts.put("worldSetup.shaderGeneration",world.shaders.generation);
+            facts.put("worldSetup.installationSlot",world.installation.slotId);
+            facts.put("worldSetup.gameplayQualified","false");
+        }
         try {
             RuntimeSetup setup = new RuntimeSetup(this, root);
             facts.put("runtime.client.archiveSha256", setup.archiveSha256());
@@ -546,7 +637,7 @@ public final class SessionService extends Service {
         }
         status = "Support bundle saved. It contains status and bounded, redacted logs; no game assets or databases.";
     }
-    private void foreground(String text) {
+    private void foreground(String text,String action) {
         Intent open = new Intent(this, MainActivity.class);
         Intent cancel = new Intent(this, SessionService.class).setAction(CANCEL);
         Notification notification = new Notification.Builder(this, CHANNEL)
@@ -554,7 +645,10 @@ public final class SessionService extends Service {
                 .setContentIntent(PendingIntent.getActivity(this, 0, open, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT))
                 .addAction(new Notification.Action.Builder(null, "Stop", PendingIntent.getService(this, 1, cancel, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT)).build())
                 .setOngoing(true).build();
-        if (Build.VERSION.SDK_INT >= 29) startForeground(NOTIFICATION, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+        if(Build.VERSION.SDK_INT>=34&&(START.equals(action)||PREPARE_WORLD.equals(action)))
+            startForeground(NOTIFICATION,notification,ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
+        else if (Build.VERSION.SDK_INT >= 29) startForeground(NOTIFICATION, notification,
+            START.equals(action)||PREPARE_WORLD.equals(action)?0:ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
         else startForeground(NOTIFICATION, notification);
     }
     private String readAsset(String name) throws IOException {
@@ -631,9 +725,11 @@ public final class SessionService extends Service {
     }
     private static long mib(long value) { return value / (1024 * 1024); }
     private static boolean isRuntimeSetup(String action) {
-        return PREPARE_RUNTIME.equals(action) || PREPARE_SERVER_RUNTIME.equals(action) || ACCEPT_UI.equals(action) || KEEP_UI.equals(action);
+        return PREPARE_RUNTIME.equals(action) || PREPARE_SERVER_RUNTIME.equals(action) || PREPARE_WORLD.equals(action) || ACCEPT_UI.equals(action) || KEEP_UI.equals(action);
     }
     private static String setupPaused(String action, boolean interrupted) {
+        if(PREPARE_WORLD.equals(action))return "Local world setup "+(interrupted?"was interrupted":"paused")
+            +". Choose Prepare local world to reuse completed data. Previous databases and saves are retained.";
         if(ACCEPT_UI.equals(action)||KEEP_UI.equals(action))return "UI preparation " + (interrupted ? "was interrupted" : "paused")
                 + ". Prior UI generations and saved variables are retained. Choose Prepare client runtime to check the current selection and review again.";
         String label = PREPARE_SERVER_RUNTIME.equals(action) ? "Prepare server dependencies" : "Prepare client runtime";

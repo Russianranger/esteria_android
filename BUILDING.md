@@ -268,3 +268,11 @@ The composed data-tools profile uses `app/server-data-tools.gradle`, remains
 default false while its source/native pin is pending, and is mutually exclusive
 with the stock extractors property. The standalone new-cohort packaging workflow
 is separate from the historical two-key client release/combined sealer.
+
+The complete local setup profile adds `app/world-setup.gradle` and
+`:app:localWorldSetupOwnerTest`. Its launcher action requires the composed tools,
+measured helper-augmented programs, content and shader profiles; a stock server
+profile fails before SQL allocation. Prepare client/server runtimes first, then
+select the imported client language for Prepare local world. Data/setup children
+remain owned through cancellation and cleanup; the4GiB fresh SQL reserve is a
+conservative policy separate from imported/extracted assets.

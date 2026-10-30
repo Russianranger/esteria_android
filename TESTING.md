@@ -146,3 +146,9 @@ groups:38 passed and one managed-proc check skipped, three real Java owner/lease
 APK/AndroidTest/lint/source-helper readback. These are not actual server world or
 Android execution gates. ServerDataToolSelection also matches the Python canonical
 fixture exactly; the composed provider's source/native positive gate is pending.
+
+Local world setup adds `:app:localWorldSetupOwnerTest`: two actual Java cleanup
+graph/importer/prelaunch fixtures at32MiB. The delayed shader owner keeps the
+data/import and outer locks until known reap; a forced-cleanup diagnostic remains
+a failure even after leases release. Regular Android CI also runs the four
+serverDataSetupOwnerTest groups. No Android/SQL/gameplay execution is implied.

@@ -162,3 +162,7 @@ assets; their receipts explicitly exclude CommonMain/world. No available-code or
 source-provider result supplies absent base/custom MPQs, appearance banks, DBC
 overlays, geographical coverage or generated shaders. These remain actual data
 validation gates after the ongoing independent integration work.
+
+The launcher setup pipeline can now compose data, shader and SQL adapters under
+one retained import lease. This adds no game inputs or prepared content: real
+12340/custom MPQs, matching overlays and actual conversion/coverage remain open.

@@ -1,0 +1,125 @@
+{
+  "androidProviderCreated": false,
+  "androidRuntimeQualified": false,
+  "candidateRegistration": {
+    "artifact": {
+      "bytes": 40130109,
+      "id": 12990195617,
+      "sha256": "73952c331659db612669b16c6221ac58195da35bd802b69fdaffa312eca6b7b5"
+    },
+    "candidateArchive": {
+      "bytes": 40112280,
+      "sha256": "70dfcdda9ff389d0467aceed5b5951f4261f0ad210e8bc3356d9dacc2bd8792d"
+    },
+    "candidatePin": {
+      "bytes": 13654,
+      "sha256": "602e7d0da21baf6549272c7aab8c9d8d2ad87c83f601ce487d16d02b4ac6b757"
+    },
+    "helperInputLock": {
+      "bytes": 10344,
+      "sha256": "58b0e480e577bd3e8605865d65f2ec5bb090cd1477ef92acd40f463f77ad33a6"
+    },
+    "producer": {
+      "integrationRevision": "eb11d0719032bd9dc40498bfdb4888fd3162bc35",
+      "workflowRun": 41081216973
+    }
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "nativeCapture": {
+    "artifact": {
+      "bytes": 206956721,
+      "id": 12996850776,
+      "sha256": "5400a6efde8daeef086aec7be363b02a2aa0a709bd232de2ca2dbef027c7fc17"
+    },
+    "dependencyObservation": {
+      "bytes": 3853796,
+      "sha256": "5cd4340b857ea9c7820af5a3432105df93726f1412ed52dde93d8207afbcf0bc"
+    },
+    "executable": {
+      "bytes": 25189160,
+      "sha256": "f327179c8467e51afe18d3542fad9186551474c69fae541db3f0461eac5a9542"
+    },
+    "integrationRevision": "9d20c3bea4f9f2ea7cdfb0915cef1b7ed23faab6",
+    "job": 124198764762,
+    "observedLinks": 1,
+    "observedObjects": 201,
+    "receipt": {
+      "bytes": 42641,
+      "sha256": "fdd3d688f44f7b07f0ce26094ee47c7386ef54a2b456508b1279d58176c57bd7"
+    },
+    "workflowRun": 41095126547
+  },
+  "originalBuild": {
+    "bytes": 32521,
+    "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+  },
+  "originalModules": {
+    "bytes": 5348,
+    "sha256": "6459b6a1acab2c62c474e4c6ab3eb651daa21f697ccd628e93a38bad298bbdd1"
+  },
+  "originalSourceQualification": {
+    "archive": {
+      "bytes": 24619647,
+      "sha256": "9f76881f06a7c998e0dba9d4a226c623021ed6ad8b87074aa7a861eafbb96d80"
+    },
+    "qualification": {
+      "bytes": 23757,
+      "sha256": "bcb421500351886cd9daa280e6ba75c57b6e64b689a3a7410fa7104640a58de9"
+    },
+    "receipt": {
+      "bytes": 49875,
+      "sha256": "fae08a831fb0a55d22c3ea330677671cf72045e2abe8fc229ba90494794aa4f4"
+    }
+  },
+  "originalThreeProgramsReplaced": false,
+  "productionActivated": false,
+  "scope": "playerbots-helper-corresponding-source-inputs",
+  "serverBuildSourceLock": {
+    "bytes": 2170,
+    "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+  },
+  "serverSource": {
+    "branch": "main",
+    "commit": "f35f04d01689f034778e3474b3c820092f51e461",
+    "patches": [
+      {
+        "path": "patches/server/0001-eluna-declare-area-trigger.patch",
+        "sha256": "c26b145188c5f97bf30d032e1fe3bd7fe17aa1f8f0daa6793e51f5d830fe7aa6",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0002-eluna-include-map-manager.patch",
+        "sha256": "4e277dbe56c31ae30640c8e9ad4dee12e944e0f051d9bdc8d62aaa239c50433f",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0003-eluna-hooks-include-types.patch",
+        "sha256": "5999402d985fcc709abdc90bb4272072d1d5e3e261b2cc7ec19460320c14295f",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0004-attunement-stat-api.patch",
+        "sha256": "d9ef6ca8f96ab186c37c072b22143cdded9976aa3a62d083f893c502a5745cb8"
+      },
+      {
+        "path": "patches/server/0005-script-grid-templates.patch",
+        "sha256": "6b459c90839e7831df8533966442fabd476ae1773f0302c50ccc8a997f157369"
+      },
+      {
+        "path": "patches/server/0006-empty-script-modules.patch",
+        "sha256": "ea0beb357c71d8b8c187af9d4afede520e7ac9877e40fbdc5fab99d54fc21f97"
+      },
+      {
+        "path": "patches/server/0007-runtime-module-config-directory.patch",
+        "sha256": "5e41d474179ef553ec9c2544de947a3724885fd7f3ac233af3d89797acd032ff"
+      }
+    ],
+    "submodules": {
+      "src/server/game/LuaEngine": "58d7652138887783228b9727bd1fa4e08f00342b"
+    },
+    "url": "https://github.com/Russianranger/EsteriaWoW.git"
+  },
+  "sourceCompanionComplete": false,
+  "state": "measured-native-helper-dependency-capture"
+}

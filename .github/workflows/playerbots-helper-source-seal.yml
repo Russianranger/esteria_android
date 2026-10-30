@@ -1,0 +1,133 @@
+name: Compose the separately measured Playerbots helper source companion
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - .github/workflows/playerbots-helper-source-seal.yml
+      - tools/prepare_playerbots_source_companion.py
+      - tools/seal_playerbots_helper_sources.py
+      - tests/test_playerbots_source_inputs.py
+      - tests/test_playerbots_source_companion.py
+      - runtime/server/playerbots-sources-inputs.lock.json
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: playerbots-helper-source-seal-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  source-only-composition:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Check source composition and bounded exact transfer guards
+        run: |
+          python3 -m unittest tests.test_playerbots_source_inputs tests.test_playerbots_source_companion -v
+          mkdir -p out/playerbots-source-seal-evidence
+      - name: Acquire only measured helper capture, registered candidate and original source triple
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/prepare_playerbots_source_companion.py --output out/playerbots-source-seal-inputs \
+            > out/playerbots-source-seal-evidence/input-acquisition-private.log 2>&1
+          cp out/playerbots-source-seal-inputs/preparation.json out/playerbots-source-seal-evidence/input-preparation.json
+      - name: Fetch only the two exact historical integration recipe commits
+        run: |
+          mapfile -t revisions < <(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('out/playerbots-source-seal-inputs')
+          original=json.loads((root/'candidate/companion/build-payload/helper-build.json').read_text())
+          native=json.loads((root/'native/source-build.json').read_text())
+          for revision in sorted({original['integrationRevision'],native['integrationRevision']}):
+              if len(revision)!=40 or any(c not in '0123456789abcdef' for c in revision):
+                  raise ValueError('exact-integration-recipe-commit-required')
+              print(revision)
+          PY
+          )
+          test "${#revisions[@]}" = 2
+          git -c safe.directory="$GITHUB_WORKSPACE" fetch --no-tags --depth=1 origin "${revisions[@]}"
+      - name: Reconstruct, verify and compose sources offline without compiling or executing SQL
+        id: seal
+        run: |
+          umask 077
+          test "$(pwd -P)" = "$GITHUB_WORKSPACE"
+          sudo env PATH="$PATH" PYTHONDONTWRITEBYTECODE=1 GIT_OPTIONAL_LOCKS=0 GIT_NO_LAZY_FETCH=1 \
+            GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=safe.directory GIT_CONFIG_VALUE_0="$GITHUB_WORKSPACE" \
+            unshare --net -- sh -c 'ip link set lo up; exec "$@"' sh \
+            python3 tools/seal_playerbots_helper_sources.py \
+            --payload "$GITHUB_WORKSPACE/out/playerbots-source-seal-inputs/native" \
+            --candidate "$GITHUB_WORKSPACE/out/playerbots-source-seal-inputs/candidate" \
+            --original-sealed "$GITHUB_WORKSPACE/out/playerbots-source-seal-inputs/original/sealed" \
+            --integration-git-root "$GITHUB_WORKSPACE" \
+            --output "$GITHUB_WORKSPACE/out/playerbots-helper-source-sealed" \
+            > out/playerbots-source-seal-evidence/sealing-private.log 2>&1
+      - name: Collect bounded source-only receipt and artifact identities
+        if: always()
+        run: |
+          sudo env ESTERIA_HELPER_SEAL_REVISION="$GITHUB_SHA" python3 - <<'PY'
+          from pathlib import Path
+          import json,os,re
+          from tools import seal_playerbots_helper_sources as sources,verify_server_build as files
+          target=Path('out/playerbots-source-seal-evidence');target.mkdir(parents=True,exist_ok=True)
+          sealed=Path('out/playerbots-helper-source-sealed')
+          names=(sources.SOURCE_ARCHIVE,sources.RECEIPT)
+          identities={name:files.identity(sealed/name) for name in names if (sealed/name).is_file()}
+          if (sealed/sources.RECEIPT).is_file():
+              raw=(sealed/sources.RECEIPT).read_bytes()
+              if len(raw)>8*1024*1024:raise ValueError('source-receipt-bound')
+              (target/sources.RECEIPT).write_bytes(raw)
+          # Export only bounded typed exceptions/reason tokens, never traceback
+          # bodies, URLs, credentials or arbitrary diagnostic messages.
+          failures={}
+          allowed={'ValueError','RuntimeError','FileNotFoundError','PermissionError','CalledProcessError',
+              'HTTPError','URLError','EOFError','OSError','KeyError','TypeError','JSONDecodeError'}
+          for name,label in (('input-acquisition-private.log','inputAcquisition'),('sealing-private.log','sourceComposition')):
+              path=target/name
+              if not path.is_file():continue
+              with path.open('rb') as stream:
+                  stream.seek(max(0,path.stat().st_size-65536));text=stream.read(65536).decode('utf-8','replace')
+              rows=re.findall(r'(?m)^([A-Za-z][A-Za-z0-9_.]{0,95}): ([^\r\n]{0,512})$',text)
+              if rows:
+                  kind,message=rows[-1];kind=kind.rsplit('.',1)[-1]
+                  if kind in allowed:
+                      record={'exceptionClass':kind}
+                      if re.fullmatch(r'(?:helper-source|target-observation)-[A-Za-z0-9:-]{1,160}',message):
+                          record['reasonCode']=message
+                      failures[label]=record
+              path.unlink()
+          receipt=dict(formatVersion=1,scope='playerbots-helper-source-only-composition-environment',
+              integrationRevision=os.environ['ESTERIA_HELPER_SEAL_REVISION'],
+              files={p.name:files.identity(p) for p in target.iterdir() if p.is_file()},sourcePackageFiles=identities,
+              failures=failures,
+              compilerExecuted=False,helperExecuted=False,sqlExecuted=False,originalThreeProgramsRebuilt=False,
+              providerActivated=False,androidRuntimeQualified=False,gameplayQualified=False)
+          (target/'environment-receipt.json').write_text(json.dumps(receipt,sort_keys=True,indent=2)+'\n')
+          PY
+          sudo chown -R "$(id -u):$(id -g)" out/playerbots-source-seal-evidence
+          if sudo test -d out/playerbots-helper-source-sealed; then
+            sudo chown -R "$(id -u):$(id -g)" out/playerbots-helper-source-sealed
+          fi
+      - name: Retain the new corresponding-source archive and separate sealing receipt
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always() && steps.seal.outcome == 'success'
+        with:
+          name: playerbots-helper-source-sealed-${{ github.sha }}
+          path: out/playerbots-helper-source-sealed/
+          include-hidden-files: true
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: playerbots-helper-source-seal-evidence-${{ github.sha }}
+          path: out/playerbots-source-seal-evidence/
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error

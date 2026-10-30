@@ -1,0 +1,48 @@
+{
+  "androidBuild": {
+    "androidTestCompiled": true,
+    "applicationCompiled": true,
+    "existingDataOwnerGroups": 4,
+    "existingSessionOwnerGroups": 3,
+    "lint": true,
+    "result": "BUILD SUCCESSFUL in35s;83tasks"
+  },
+  "artifacts": {
+    "application.apk": {
+      "bytes": 677295,
+      "sha256": "3477b651fb971677332610c34e86bf5f0a11ea46aba2275a965d21a10a68e1f7"
+    },
+    "tests.apk": {
+      "bytes": 1751581,
+      "sha256": "d9959a76fcaf84157fd22dcd9ed126ddaaf11310dd126523000369eb8781ab4e"
+    }
+  },
+  "buildScope": "Internal default debug APK from parallel development workspace; no runtime archives or device-test candidate",
+  "dateUtc": "2026-10-30",
+  "focusedHostFixture": {
+    "actualFileLocks": true,
+    "actualImporterExclusionUntilKnownReap": true,
+    "actualProductionCloseMethods": true,
+    "controlledJavaNativeBackend": true,
+    "groups": 2,
+    "maxHeapMiB": 32,
+    "outputPreserved": true,
+    "prelaunchCancellationRetained": true,
+    "result": "BUILD SUCCESSFUL in20s;28tasks",
+    "uncleanCleanupDiagnosticPreserved": true
+  },
+  "formatVersion": 1,
+  "qualification": {
+    "androidExecution": false,
+    "assetConversion": false,
+    "gameplay": false,
+    "guestExecution": false,
+    "saveRelog": false,
+    "shaderGeneration": false,
+    "slotPromotion": false,
+    "sqlExecution": false,
+    "worldEntry": false
+  },
+  "review": "Independent LocalWorldSetup/nullable completion/Service/Main review clear after legacy-state early refusal fix",
+  "scope": "host-retained-local-world-setup-and-launcher-wiring-only"
+}

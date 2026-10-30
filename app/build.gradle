@@ -198,3 +198,4 @@ apply from: 'server-data.gradle'
 apply from: 'server-session.gradle'
 
 apply from: 'server-data-tools.gradle'
+apply from: 'world-setup.gradle'
