@@ -53,35 +53,101 @@ public final class ServerDatabaseSetup {
             RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled) throws IOException {
         if (!privateRoot.equals(context.getFilesDir().getCanonicalFile().toPath()))
             throw new IOException("Database setup requires private canonical application storage");
+        retryPendingCleanup(context,privateRoot,Duration.ofSeconds(2));
         if (runtime.current()==null) throw new IOException("Prepare the server dependencies before database setup");
-        return prepareWork(context,privateRoot,directories(privateRoot,"state/server-work"),runtime,progress,cancelled);
+        return prepareWork(context,privateRoot,directories(privateRoot,"state/server-work"),runtime,progress,cancelled,null);
     }
     /** The fresh coordinator retains this token until the complete operation
      * and any required process cleanup have finished. Never accepts an arbitrary path. */
     static Result prepareFresh(Context context,Path privateRoot,ServerRuntimeSetup runtime,
-            FreshServerInstallations.Workspace workspace,RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled) throws IOException {
-        if(!privateRoot.equals(context.getFilesDir().getCanonicalFile().toPath()))
-            throw new IOException("Canonical private application storage required");
+            FreshServerInstallations.Workspace workspace,RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled,
+            java.util.function.Consumer<BootstrapLease> processOwner) throws IOException {
+        if(!privateRoot.equals(context.getFilesDir().getCanonicalFile().toPath()) || processOwner==null)
+            throw new IOException("Canonical private storage and a retained bootstrap owner required");
         workspace.requireRuntimeArchive(runtime.packagePlan().archiveSha256);
         if(runtime.current()==null)throw new IOException("Prepare the selected server runtime before fresh database setup");
-        return prepareWork(context,privateRoot,workspace.directoryFor(privateRoot),runtime,progress,cancelled);
+        return prepareWork(context,privateRoot,workspace.directoryFor(privateRoot),runtime,progress,cancelled,processOwner);
+    }
+    static final class BootstrapLease implements AutoCloseable {
+        private final FileChannel channel;
+        private final FileLock lock;
+        private OwnedProcess process;
+        private boolean closed;
+        private boolean operationActive=true;
+        BootstrapLease(FileChannel channel,FileLock lock){this.channel=channel;this.lock=lock;}
+        OwnedProcess process(){return process;}
+        @Override public synchronized void close() throws IOException {
+            if(closed)return;
+            if(process!=null && process.isAlive())throw new IOException("Bootstrap process is still owned; database lease retained");
+            try{lock.release();}finally{try{channel.close();}finally{closed=true;}}
+        }
+    }
+    // Legacy callers do not return a retained Handle. Keep their process and
+    // file lease strongly reachable until a bounded retry confirms cleanup.
+    private static final java.util.concurrent.ConcurrentHashMap<Path,BootstrapLease> LEGACY_OWNERS=
+        new java.util.concurrent.ConcurrentHashMap<>();
+    static void retainLegacy(Path work,BootstrapLease ownership) throws IOException {
+        if(LEGACY_OWNERS.putIfAbsent(work,ownership)!=null)
+            throw new IOException("Previous database setup cleanup remains owned");
+    }
+    static void finishLegacy(Path work,BootstrapLease ownership) throws IOException {
+        synchronized(ownership) {
+            ownership.operationActive=false;
+            if(ownership.process==null || !ownership.process.isAlive()) {
+                ownership.close();LEGACY_OWNERS.remove(work,ownership);
+            }
+        }
+    }
+    static boolean legacyCleanupPending(Path work){return LEGACY_OWNERS.containsKey(work);}
+    /** Off main thread; operates only on this process's retained child, never a
+     * discovered PID. It does not initialize SQL or claim successful recovery. */
+    public static void retryPendingCleanup(Context context,Path privateRoot,Duration timeout) throws IOException {
+        if(!privateRoot.equals(context.getFilesDir().getCanonicalFile().toPath()))
+            throw new IOException("Database cleanup requires canonical private storage");
+        retryLegacyCleanup(privateRoot.resolve("state/server-work"),timeout);
+    }
+    static void retryLegacyCleanup(Path work,Duration timeout) throws IOException {
+        if(timeout==null || timeout.isNegative() || timeout.compareTo(Duration.ofSeconds(30))>0)
+            throw new IllegalArgumentException("Cleanup timeout must be zero to 30 seconds");
+        BootstrapLease ownership=LEGACY_OWNERS.get(work);
+        if(ownership==null)return;
+        synchronized(ownership) {
+            if(ownership.operationActive)throw new IOException("Database setup is still running; its lease is retained");
+            IOException failure=null;
+            if(ownership.process!=null && ownership.process.isAlive()) {
+                try{ownership.process.stop(timeout);}
+                catch(IOException error) {
+                    if(ownership.process.isAlive())throw new IOException("Database cleanup remains active; process and file lease retained",error);
+                    failure=error;
+                }
+            }
+            ownership.close();LEGACY_OWNERS.remove(work,ownership);
+            if(failure!=null)throw new IOException("Previous database cleanup finished with a failure; preserved state requires setup recovery",failure);
+        }
     }
     private static Result prepareWork(Context context,Path privateRoot,Path work,ServerRuntimeSetup runtime,
-            RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled) throws IOException {
+            RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled,java.util.function.Consumer<BootstrapLease> processOwner) throws IOException {
         Path lockPath=work.resolve(".android-database-setup.lock");
-        if (Files.exists(lockPath,LinkOption.NOFOLLOW_LINKS) && !regular(lockPath))
-            throw new IOException("Invalid database operation lock");
-        try (FileChannel channel=FileChannel.open(lockPath,StandardOpenOption.CREATE,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS)) {
+        if(Files.exists(lockPath,LinkOption.NOFOLLOW_LINKS) && !regular(lockPath))throw new IOException("Invalid database operation lock");
+        FileChannel channel=FileChannel.open(lockPath,StandardOpenOption.CREATE,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS);
+        BootstrapLease ownership=null;boolean transferred=false,legacyRegistered=false;
+        try {
             Files.setPosixFilePermissions(lockPath,PosixFilePermissions.fromString("rw-------"));
             FileLock lock;
-            try { lock=channel.tryLock(); }
-            catch (java.nio.channels.OverlappingFileLockException busy) { throw new IOException("Database setup is already running",busy); }
-            if (lock==null) throw new IOException("Database setup is already running");
-            try (FileLock held=lock) { return run(context,privateRoot,work,runtime,progress,cancelled); }
+            try{lock=channel.tryLock();}catch(java.nio.channels.OverlappingFileLockException busy){throw new IOException("Database setup is already running",busy);}
+            if(lock==null)throw new IOException("Database setup is already running");
+            ownership=new BootstrapLease(channel,lock);
+            if(processOwner!=null){processOwner.accept(ownership);transferred=true;}
+            else {retainLegacy(work,ownership);legacyRegistered=true;}
+            return run(context,privateRoot,work,runtime,progress,cancelled,ownership);
+        } finally {
+            if(ownership==null)channel.close();
+            else if(legacyRegistered)finishLegacy(work,ownership);
+            else if(!transferred)ownership.close();
         }
     }
     private static Result run(Context context,Path root,Path work,ServerRuntimeSetup runtime,
-            RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled) throws IOException {
+            RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled,BootstrapLease ownership) throws IOException {
         checkCancelled(cancelled);
         String helperGeneration=installHelpers(context,work);
         directories(work,"state"); directories(work,"setup-results");
@@ -94,6 +160,7 @@ public final class ServerDatabaseSetup {
         OwnedProcess process=ProotProcess.start(context,runtime.installer(),runtime.packagePlan(),work,session,
             Arrays.asList("/usr/bin/python3","-B","-s","-E","/work/helpers/"+helperGeneration+"/android_database_setup.py",
                 "--expected-version",runtime.expectedMysqlVersion(),"--operation-id",id),Collections.emptyMap(),null);
+        ownership.process=process;
         boolean cancelSeen=false;
         long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(12);
         try {

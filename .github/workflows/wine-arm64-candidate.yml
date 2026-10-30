@@ -9,7 +9,9 @@ on:
       - tools/verify_wine_arm64_sources.py
       - tools/qualify_wine_arm64.py
       - tools/wine_audio.py
-      - tests/test_wine_arm64_*.py
+      - tests/test_wine_arm64_candidate.py
+      - tests/test_wine_arm64_sources.py
+      - tests/test_wine_arm64_preparation.py
       - .github/workflows/wine-arm64-candidate.yml
   workflow_dispatch:
 permissions:

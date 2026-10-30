@@ -39,7 +39,7 @@ final class GuestHelperAssets {
         return target;
     }
     static String install(Context context,String assetPrefix,Path generations,Set<String> expected) throws IOException {
-        if(!assetPrefix.matches("[a-z-]+") || expected.isEmpty() || expected.size()>16)
+        if(!assetPrefix.matches("[a-z-]+") || expected.isEmpty() || expected.size()>32)
             throw new IOException("Invalid bundled helper set");
         byte[] manifest=asset(context,assetPrefix+"/manifest.json",16384);
         String generation=sha256(manifest);

@@ -70,9 +70,10 @@ exact reviewed files. Source revisions embedded in APKs are authoritative.
 
 ## Concrete continuation
 
-1. Finish actual isolated source rebuild and ARM64 Wine build. Preserve exact
-   successful artifacts, source receipts and complete original notices. Repack
-   providers against a new Wine hash only after measurement; bindings are exact.
+1. Finish the isolated server source rebuild. The source-owned ARM64 Wine build
+   and native0f gates pass; selected471 pairing has its own requalification.
+   Adopt only the measured runtime and complete sources, then rebuild/reverify
+   every affected provider binding. Wine itself does not need recompiling.
 2. Keep the passed matched0f/six-patch auth proof distinct from normal game login;
    run the selected new-client/seven-patch pairing and actual playerbots schema gate.
 3. Portable updater/ledger/account/realm APIs are implemented and independently
@@ -80,8 +81,9 @@ exact reviewed files. Source revisions embedded in APKs are authoritative.
    Compose them after the explicit original baseline + separate source-derived
    appearance adaptation; never rewrite original SQL/updater ledger history.
 4. Fresh-slot/workspace ownership and atomic promotion/recovery storage now pass
-   host checks, including200 exceptional-launch ownership races. Complete its
-   real setup coordinator and Android execution. Cancelled/failed fresh stages must not overwrite active/legacy
+   host checks, including200 exceptional-launch ownership races. The staged coordinator now implements real phase APIs and retains all process/
+   file/workspace owners through failures, including legacy bootstrap cleanup.
+   Run actual Android SQL and add the qualified playerbots phase before promotion. Cancelled/failed fresh stages must not overwrite active/legacy
    saves. Baseline-only proof cannot promote a gameplay database. Current partial
    schema journals conservatively refuse replay; preserve them for diagnosis.
 5. Wire app-owned local services/client session, authenticated X11, lifecycle,

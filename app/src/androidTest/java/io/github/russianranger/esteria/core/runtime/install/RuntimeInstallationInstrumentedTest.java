@@ -36,6 +36,9 @@ public final class RuntimeInstallationInstrumentedTest {
     }
     @Test public void privateLocalLoginHandoffContracts() throws Exception {
         LocalAccountHandoffTests.main(new String[]{context().getCacheDir().getCanonicalPath()});
+        android.os.Bundle observations = new android.os.Bundle();
+        observations.putString("esteriaHandoffHardLinksCreated", Boolean.toString(LocalAccountHandoffTests.hardLinkCreationPermitted));
+        InstrumentationRegistry.getInstrumentation().sendStatus(0, observations);
     }
     @Test public void seedBeforeUpdate() throws Exception {
         assertEquals("CI starts with the first build", 1, context().getPackageManager().getPackageInfo(context().getPackageName(), 0).versionCode);

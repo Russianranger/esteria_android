@@ -14,6 +14,7 @@ PACKAGE = 'io.github.russianranger.esteria'
 TEST = PACKAGE + '.core.runtime.install.RuntimeInstallationInstrumentedTest'
 HELPER_TEST = PACKAGE + '.runtime.DatabaseServiceAssetsTest'
 SCHEMA_HELPER_TEST = PACKAGE + '.runtime.ServerSchemaAssetsTest'
+INSTALLATION_HELPER_TEST = PACKAGE + '.runtime.ServerInstallationAssetsTest'
 SCHEMA_HELPER_METHODS = ('nestedOriginalSourcesInstallAndResumeWithoutRewriting',
     'unexpectedNestedModuleIsPreservedAndRefused',
     'linkedResourceDirectoryIsPreservedAndRefused')
@@ -113,12 +114,16 @@ def main():
             test_class + '#' + method, PACKAGE + '.test/androidx.test.runner.AndroidJUnitRunner'], timeout=600)
         if not instrument_passed(output):
             raise RuntimeError(method + ' did not report one successful test')
+        return output
     for method in HELPER_METHODS:
         test(method, HELPER_TEST)
     for method in SCHEMA_HELPER_METHODS:
         test(method, SCHEMA_HELPER_TEST)
+    test('completeInstallationHelperClosureInstallsAndReusesExactBytes', INSTALLATION_HELPER_TEST)
     test('runtimeContracts')
-    test('privateLocalLoginHandoffContracts')
+    handoff = test('privateLocalLoginHandoffContracts')
+    link_policy = re.findall(r'^INSTRUMENTATION_STATUS: esteriaHandoffHardLinksCreated=(true|false)\s*$', handoff, re.M)
+    if len(link_policy) != 1:raise RuntimeError('Missing handoff filesystem link-policy observation')
     test('seedBeforeUpdate')
     command('install-update-preserving-data', ['install', '-r', str(args.update_apk)])
     test('verifyAfterUpdate')
@@ -126,9 +131,12 @@ def main():
         emulatorProperties=properties, artifacts=artifacts, runtimeContractGroups=18,
         databaseHelperAssetContractGroups=len(HELPER_METHODS), databaseHelperAssetsQualified=True,
         schemaHelperAssetContractGroups=len(SCHEMA_HELPER_METHODS), schemaHelperAssetsQualified=True, schemaSqlExecuted=False,
+        installationHelperAssetFiles=17, installationHelperAssetsQualified=True, installationSetupExecuted=False,
         databaseServiceExecuted=False,
         runtimeFilesystemQualified=True, sameJobDebugKeyUpdatePreservedRuntimeAndSentinel=True,
         privateLocalLoginHandoffFilesystemQualified=True, clientLoginExecuted=False,
+        handoffHardLinkCreationPermitted=link_policy[0] == 'true',
+        handoffMultiLinkNegativeExecuted=link_policy[0] == 'true',
         userSigningIdentityQualified=False, arm64GuestExecuted=False, gameplayQualified=False,
         completedAtUnix=int(time.time()))
     (args.output / 'qualification.json').write_text(json.dumps(receipt, indent=2) + '\n')

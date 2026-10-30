@@ -40,7 +40,13 @@ HELPER_SETS = {'database-setup': ('mysql_bootstrap.py', 'android_database_setup.
                'server-schema': ('android_server_schema_setup.py', 'mysql_bootstrap.py', 'mysql_service.py',
                                  'server_content.py', 'server_schema_setup.py', 'server_schema_baseline.py',
                                  'server_schema_adaptations.py', 'server/appearance-schema-v1.sql',
-                                 'server/appearance-schema.lock.json')}
+                                 'server/appearance-schema.lock.json'),
+               'server-installation': ('android_server_installation_setup.py', 'android_server_schema_setup.py',
+                    'mysql_bootstrap.py', 'mysql_service.py', 'server_content.py', 'server_schema_setup.py',
+                    'server_schema_baseline.py', 'server_schema_adaptations.py', 'server_update_setup.py',
+                    'server_updater.py', 'owned_process_group.py', 'server_config.py', 'provision_local_realm.py',
+                    'provision_local_account.py', 'server/appearance-schema-v1.sql', 'server/appearance-schema.lock.json',
+                    'local-server.json')}
 
 
 def ndk_notices(path):
@@ -65,19 +71,36 @@ def verify_ndk_notices(archive, expected):
             require(client.archives.hash_stream(stream, item.file_size) == proof['sha256'], 'combined-apk-toolchain-notice-hash-mismatch')
 
 
+def helper_source_path(directory, name):
+    require(directory in HELPER_SETS and name in HELPER_SETS[directory], 'combined-unknown-helper-source')
+    return 'config/local-server.json' if (directory, name) == ('server-installation', 'local-server.json') else 'runtime/' + name
+
+
 def verify_helpers(archive):
+    def unique_fields(rows):
+        result = {}
+        for name, value in rows:
+            require(name not in result, 'combined-apk-helper-manifest-mismatch')
+            result[name] = value
+        return result
+    all_names = archive.namelist()
     for directory, names in HELPER_SETS.items():
+        prefix = 'assets/' + directory + '/'
+        actual = [name for name in all_names if name.startswith(prefix) and not name.endswith('/')]
+        expected = {prefix + name for name in (*names, 'manifest.json')}
+        require(len(actual) == len(set(actual)) and set(actual) == expected,
+                'combined-apk-helper-inventory-mismatch')
         records = {}
         for name in names:
-            source = ROOT / 'runtime' / name
+            source = ROOT / helper_source_path(directory, name)
             expected = client.small(source)
-            info = archive.getinfo('assets/' + directory + '/' + name)
+            info = archive.getinfo(prefix + name)
             require(info.file_size == len(expected) and archive.read(info) == expected,
                     'combined-apk-helper-source-mismatch')
             records[name] = dict(bytes=len(expected), sha256=hashlib.sha256(expected).hexdigest())
-        manifest = archive.getinfo('assets/' + directory + '/manifest.json')
+        manifest = archive.getinfo(prefix + 'manifest.json')
         require(manifest.file_size <= 16384, 'combined-apk-helper-manifest-mismatch')
-        parsed = json.loads(archive.read(manifest))
+        parsed = json.loads(archive.read(manifest), object_pairs_hook=unique_fields)
         require(type(parsed) is dict and type(parsed.get('formatVersion')) is int and
                 type(parsed.get('files')) is dict and
                 all(type(pin) is dict and type(pin.get('bytes')) is int for pin in parsed['files'].values()) and

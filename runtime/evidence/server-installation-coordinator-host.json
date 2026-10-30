@@ -1,0 +1,194 @@
+{
+  "androidBuild": {
+    "androidTestCompilationPassed": true,
+    "apkAssemblyPassed": true,
+    "javaCompilationPassed": true,
+    "lintPassed": true,
+    "outputsOutsideWorkspaceSync": true,
+    "previousWorkspaceBuildPackagingFailedOnVanishingSyncTemporaryDex": true
+  },
+  "androidSetupExecuted": false,
+  "androidTestApk": {
+    "bytes": 1746753,
+    "sha256": "c3959ce03ab38ed5d8c21a9d3cc42604fd551311a3302bc8bd18a4901784c972"
+  },
+  "apk": {
+    "bytes": 468075,
+    "sha256": "2f730a388361b3a7d25bd9eecb9e8f1eb28c380f93b92f95fe6d49e45d82274b"
+  },
+  "apkHelpers": {
+    "allBytesEqualSources": true,
+    "combinedVerifierPassedActualApk": true,
+    "completeLocalImportClosure": true,
+    "files": 17,
+    "filesIdentity": {
+      "android_server_installation_setup.py": {
+        "bytes": 14011,
+        "sha256": "5e341fb479b15611887b7ea6445d4ed00cfe3c0840412c52babe9988b74df802"
+      },
+      "android_server_schema_setup.py": {
+        "bytes": 11875,
+        "sha256": "9526275258a6b98930e3253c0011627844ed10e1816658b3d5d07e23cd3dfd02"
+      },
+      "local-server.json": {
+        "bytes": 858,
+        "sha256": "6750fa3e1a7c0101b5922f4163c6dfa87d90faba25ce011d5a36de8a578e2d4d"
+      },
+      "mysql_bootstrap.py": {
+        "bytes": 32698,
+        "sha256": "e69d5b64c4a5f5ace86fa521589d5a64613f601c59aedb011b42a1e5b743b47d"
+      },
+      "mysql_service.py": {
+        "bytes": 18078,
+        "sha256": "8b30e9598f20ee715685a51aba59cefcafc6213d9d5d5cb6c6f3a73efa6b71c2"
+      },
+      "owned_process_group.py": {
+        "bytes": 2795,
+        "sha256": "c19ed5c05e94d7b537df1055983fca75e20447f594419084f2207d60f99f138e"
+      },
+      "provision_local_account.py": {
+        "bytes": 19542,
+        "sha256": "e5d2c7d35e83176841107da200ff737bdb8e3671e1a5db91f9438c4228f6701d"
+      },
+      "provision_local_realm.py": {
+        "bytes": 25452,
+        "sha256": "703ed8a0f1f011191fdf4374aa7e999ca5cff5a87cd4e6e7b3907d7d1c53c994"
+      },
+      "server/appearance-schema-v1.sql": {
+        "bytes": 790,
+        "sha256": "8e35e8e41d74979eaa98f6f2d824d831b73f63a4a6b2f573b869484b2ff15d46"
+      },
+      "server/appearance-schema.lock.json": {
+        "bytes": 7783,
+        "sha256": "6ccf5e363ec3daa5c37cbbe753d29a7e6b5d10f18eef407b700fc0d67985428d"
+      },
+      "server_config.py": {
+        "bytes": 21005,
+        "sha256": "8c22c17f6fc7b28f842c49793f9d89b84cbea3f6ce5a1d638b503c97d932f472"
+      },
+      "server_content.py": {
+        "bytes": 20541,
+        "sha256": "e32102ba850f4df7201c39c53e6c5530e59992cef1d3587ac809aca2ad681f8c"
+      },
+      "server_schema_adaptations.py": {
+        "bytes": 6316,
+        "sha256": "a49e1f8477d8b840964ce47783ed5af6873dc0dcde5b4a52280b696159082b44"
+      },
+      "server_schema_baseline.py": {
+        "bytes": 8606,
+        "sha256": "21d0bd526145f6699db90e9f90bb3ec01cf15316b59e27f8db6649f03480df20"
+      },
+      "server_schema_setup.py": {
+        "bytes": 11262,
+        "sha256": "6ed4f83f882101a8af0f06212c870cf71b2cee81a654b2ad4c14d9f83ef08026"
+      },
+      "server_update_setup.py": {
+        "bytes": 24352,
+        "sha256": "af325de4785a90436cafad41dcd955355b50871587be2a514e47e55a9f16b38b"
+      },
+      "server_updater.py": {
+        "bytes": 7250,
+        "sha256": "018956f4c4fab6bc684f466ab7e0d2b6874954b00b15faedee8654661874032e"
+      }
+    },
+    "pythonModules": 14,
+    "staleProviderArchiveAssetsAbsent": true
+  },
+  "applicationSourceLock": {
+    "bytes": 2170,
+    "sha256": "dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90"
+  },
+  "completeSetupProofEmitted": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "hostTests": {
+    "bootstrapFileLeaseRetainedDuringLiveChildCleanup": true,
+    "closeRetryAllowsDistinctFreshSlot": true,
+    "combinedPackagingChecks": 15,
+    "dbNotStoppedWhileInstallationHelperAlive": true,
+    "failedSlotBytesPreserved": true,
+    "legacyCleanupFileLeaseExcludesAnotherBootstrap": true,
+    "legacyConcurrentPrelaunchRetryRefused": true,
+    "legacyKnownStoppedCleanupRetryReleasesLease": true,
+    "legacyPublicPathCleanupStronglyRetained": true,
+    "operatingSystemChildExecutedByOwnerTest": false,
+    "orchestrationCases": 7,
+    "ownerHeapMiB": 32,
+    "ownerUsesRealJavaThreadsAndFileLocks": true,
+    "phaseTestsMockRuntimeCalls": true,
+    "realStateLeaseForwarded": true,
+    "relatedPythonChecks": 29,
+    "retainedOwnerCleanupTimeoutCases": 3,
+    "totalFocusedPythonChecks": 44
+  },
+  "implementation": {
+    ".github/workflows/android.yml": {
+      "bytes": 3650,
+      "sha256": "6c1da793cdc816465ddd604a037350ce02bb309b0e6ceb985451189387b7932c"
+    },
+    "app/build.gradle": {
+      "bytes": 10506,
+      "sha256": "70e2c11307cdbc552c46de58a6593050aeafaf1e310e7b34c2991876d06fe546"
+    },
+    "app/server-installation.gradle": {
+      "bytes": 3185,
+      "sha256": "a8457b7d560244294a14f7b218aac7980934a6fe9e2de35df22774747fa737d7"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/runtime/ServerInstallationAssetsTest.java": {
+      "bytes": 2521,
+      "sha256": "6a3b5ae7926713211658c6c2c6bbf7beb42d5fcf6b431e9ab036f8af26d93ccf"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/GuestHelperAssets.java": {
+      "bytes": 7797,
+      "sha256": "b27921fc56209fbbfb97a62249a2e731f9edcc9cc4106861e1f74f4b55ae16cf"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseService.java": {
+      "bytes": 15872,
+      "sha256": "73d945838d6e29f017a16e458cdbbe5adc674211fb4b818d212e20889c6b6b45"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseSetup.java": {
+      "bytes": 18174,
+      "sha256": "5d9adf505f476bcf5809050f1b2fdc03de4c57d54791e2dd1cda2788ea0eb3ec"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerInstallationSetup.java": {
+      "bytes": 23083,
+      "sha256": "7c26972cb78967edc493013553b4ebacdd3e3cb3dc6e2f8f77eae86d58036f26"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/runtime/ServerInstallationOwnerTests.java": {
+      "bytes": 11332,
+      "sha256": "a60f2acba9b266c82c3e378ec7f6a8c49e2c8c159feafde5fa4af02220281af5"
+    },
+    "runtime/android_server_installation_setup.py": {
+      "bytes": 14011,
+      "sha256": "5e341fb479b15611887b7ea6445d4ed00cfe3c0840412c52babe9988b74df802"
+    },
+    "tests/test_android_server_installation_setup.py": {
+      "bytes": 9639,
+      "sha256": "524ce41db1daf7873443de6b41a2186958aa7fe24647af96e403ed72a17145fc"
+    },
+    "tests/test_combined_android.py": {
+      "bytes": 17431,
+      "sha256": "6d7c80315e654bac9f97c66e6accabf831aa3a4c9e1e73a7c0b6645f258e3ce8"
+    },
+    "tools/package_combined_android.py": {
+      "bytes": 19962,
+      "sha256": "d78d86d33ac4a13e023e448f2d11e5bd370ab227494fc04c230396d6e9db644c"
+    },
+    "tools/qualify_android_installer.py": {
+      "bytes": 7582,
+      "sha256": "0b734299ea434e3af426c79091752298998e15d164f561f4ed96a7deebd387ea"
+    }
+  },
+  "limitations": [
+    "The new coordinator phase tests mock runtime APIs; real native source7 primitive qualification is recorded separately.",
+    "Complete promotion is blocked until the actual source-bound playerbots schema helper is implemented and qualified.",
+    "The17-file helper Android filesystem test is compiled and scheduled by CI; actual Android execution is pending.",
+    "Default internal APK contains source helpers without a sealed server programs provider."
+  ],
+  "mainStartActivated": false,
+  "nativeArm64CoordinatorExecuted": false,
+  "playerbotsSchemaExecuted": false,
+  "scope": "android-owned-server-installation-coordinator-host-and-source-package-only",
+  "serverBuildSourceLockSha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1",
+  "slotPromoted": false
+}

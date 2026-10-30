@@ -244,3 +244,11 @@ the same actual complete-source rebuild as server programs; default builds leave
 it disabled. See `runtime/server/EXTRACTOR-PROVIDER.md`. Native CLI success does
 not authorize custom Esteria MPQ conversion: current extractor archive ordering
 and loose providers differ from the reconstructed reader and need adaptation.
+
+The staged phone setup helper is packaged from17 exact source/profile inputs by
+`app/server-installation.gradle`; the final APK sealer checks every nested byte
+and refuses missing, changed or extra helpers. Run
+`./gradlew :app:serverInstallationOwnerTest` for its three32MiB Java cleanup
+timeout/retry cases (bootstrap, installation guest and legacy bootstrap). These
+are owner/lease fault tests with Java backend fixtures, not native SQL execution.
+The staged coordinator deliberately cannot promote a playerbots-incomplete slot.

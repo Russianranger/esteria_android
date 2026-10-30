@@ -4,6 +4,7 @@ import android.content.Context;
 import io.github.russianranger.esteria.core.runtime.SessionSupervisor;
 import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
 import io.github.russianranger.esteria.core.runtime.install.FreshServerInstallations;
+import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
@@ -183,8 +184,11 @@ public final class ServerDatabaseService {
         }
     }
     public static void awaitReady(Handle child,long deadlineNanos,AtomicBoolean cancelled) throws IOException,InterruptedException {
+        awaitReady(child,deadlineNanos,(RuntimeWork.Cancellation)cancelled::get);
+    }
+    static void awaitReady(Handle child,long deadlineNanos,RuntimeWork.Cancellation cancelled) throws IOException,InterruptedException {
         while(true) {
-            if(cancelled.get())throw new java.util.concurrent.CancellationException("Database startup cancelled");
+            if(cancelled.isCancelled())throw new java.util.concurrent.CancellationException("Database startup cancelled");
             if(!child.isAlive())throw new IOException("Database service exited before readiness (exit "+child.exitCode()+")");
             if(System.nanoTime()>=deadlineNanos)throw new IOException("Database live readiness timed out");
             Path file=child.guestSession.resolve("ready.json");

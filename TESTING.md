@@ -53,8 +53,9 @@ methods in addition to the existing database helper contracts. Their actual
 emulator results are pending publication/CI; local compilation and APK closure
 alone do not qualify Android behavior.
 
-Initial partial baseline journals still refuse replay. Fresh-installation slot
-and promotion recovery work is ongoing; never erase/reinitialize an active or
+Initial partial baseline journals still refuse replay. The staged fresh-installation coordinator retains all bootstrap/guest/database
+and workspace owners through errors; three Java timeout/retry tests and strict17-
+helper APK readback pass. Actual Android SQL and complete promotion remain open; never erase/reinitialize an active or
 legacy database to make a test pass. Never claim clean saving after forced stop.
 
 ## Shutdown and Android API regression checks
@@ -68,7 +69,10 @@ report success. Ten host groups pass; this is not game-save qualification.
 The first handoff emulator run41064257662 exposed unsupported Android13
 `Path.of` in the shared test fixture. The fixture and two production launch-view
 uses now use Android-compatible `Paths.get`; the actual emulator rerun is pending.
-Its file-mode/link and handoff behavior must pass before claiming Android support.
+A later actual run reached file consumption/cleanup, then Android denied creating
+a hard-link fixture. The shared contract now records that policy separately from
+the host multi-link rejection case; single-link/mode enforcement is unchanged.
+Its complete emulator rerun must pass before claiming Android handoff support.
 Fresh-slot low-storage tests inject a measured-zero space report against real
 filesystem transactions, avoiding any assumption about the host disk capacity.
 The production free-space calculation and32GiB reserve bound remain unchanged.

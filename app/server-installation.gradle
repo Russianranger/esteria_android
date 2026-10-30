@@ -1,0 +1,49 @@
+// Complete source helper closure; no runtime provider or launch action is enabled.
+def installationHelpers = ['android_server_installation_setup.py', 'android_server_schema_setup.py',
+    'mysql_bootstrap.py', 'mysql_service.py', 'server_content.py', 'server_schema_setup.py',
+    'server_schema_baseline.py', 'server_schema_adaptations.py', 'server_update_setup.py',
+    'server_updater.py', 'owned_process_group.py', 'server_config.py', 'provision_local_realm.py',
+    'provision_local_account.py', 'server/appearance-schema-v1.sql', 'server/appearance-schema.lock.json']
+def installationInputs = installationHelpers.collectEntries { name -> [(name): rootProject.file('runtime/' + name)] }
+installationInputs['local-server.json'] = rootProject.file('config/local-server.json')
+def installationAssets = layout.buildDirectory.dir('generated/serverInstallation')
+def packageServerInstallation = tasks.register('packageServerInstallation') {
+    inputs.files(installationInputs.values())
+    outputs.dir(installationAssets)
+    doLast {
+        def directory = new File(installationAssets.get().asFile, 'server-installation')
+        delete directory
+        directory.mkdirs()
+        def records = new TreeMap()
+        installationInputs.each { name, source ->
+            byte[] bytes = source.bytes
+            if (bytes.length == 0 || bytes.length > 131072) throw new GradleException('Unexpected installation helper size')
+            def destination = new File(directory, name)
+            destination.parentFile.mkdirs(); destination.bytes = bytes
+            records[name] = [bytes: bytes.length, sha256: java.security.MessageDigest.getInstance('SHA-256').digest(bytes).encodeHex().toString()]
+        }
+        new File(directory, 'manifest.json').text = groovy.json.JsonOutput.toJson([formatVersion: 1, files: records]) + '\n'
+    }
+}
+android.sourceSets.main.assets.srcDir(installationAssets)
+tasks.named('preBuild').configure { dependsOn packageServerInstallation }
+
+// Fault-injection cleanup test runs the real Java owner with Android API stubs;
+// no runtime provider, native process, SQL instance or Android execution is faked.
+def installationOwnerClasspath = files(providers.provider { android.bootClasspath },
+    providers.provider { tasks.named('compileDebugJavaWithJavac').get().destinationDirectory.get().asFile },
+    project(':core').layout.buildDirectory.dir('classes/java/main'))
+def compileInstallationOwner = tasks.register('compileServerInstallationOwnerFixture', JavaCompile) {
+    dependsOn 'compileDebugJavaWithJavac', ':core:classes'
+    source file('src/test/java/io/github/russianranger/esteria/runtime/ServerInstallationOwnerTests.java')
+    classpath = installationOwnerClasspath
+    destinationDirectory = layout.buildDirectory.dir('installationOwnerFixture')
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
+}
+tasks.register('serverInstallationOwnerTest', JavaExec) {
+    dependsOn compileInstallationOwner
+    classpath = installationOwnerClasspath + files(compileInstallationOwner.flatMap { it.destinationDirectory })
+    mainClass = 'io.github.russianranger.esteria.runtime.ServerInstallationOwnerTests'
+    maxHeapSize = '32m'
+}

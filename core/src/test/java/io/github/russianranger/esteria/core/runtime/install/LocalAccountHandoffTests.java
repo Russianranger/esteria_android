@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 public final class LocalAccountHandoffTests {
+    public static boolean hardLinkCreationPermitted;
     private static void writeText(Path path, String text) throws IOException { Files.write(path, text.getBytes(StandardCharsets.UTF_8)); }
     private static String readText(Path path) throws IOException { return new String(Files.readAllBytes(path), StandardCharsets.UTF_8); }
     private interface Checked { void run() throws Exception; }
@@ -45,8 +46,16 @@ public final class LocalAccountHandoffTests {
             Files.copy(original, target); Files.setPosixFilePermissions(target, PosixFilePermissions.fromString("rw-------"));
             fails(replaced::close); check(Files.exists(target)); Files.delete(target); Files.delete(original);
             LocalAccountHandoff linked = LocalAccountHandoff.create(view, username, password);
-            Path alias = root.resolve("alias"); Files.createLink(alias, target);
-            fails(linked::close); check(Files.exists(alias)); Files.delete(alias); linked.close();
+            Path alias = root.resolve("alias");
+            hardLinkCreationPermitted = false;
+            try { Files.createLink(alias, target); hardLinkCreationPermitted = true; }
+            catch (AccessDeniedException denied) {
+                // Android's private storage may prohibit creating links. Keep its
+                // observed policy distinct from the host multi-link negative test.
+                check(!Files.exists(alias, LinkOption.NOFOLLOW_LINKS) && Files.size(target) == 57);
+            }
+            if (hardLinkCreationPermitted) { fails(linked::close); check(Files.exists(alias)); Files.delete(alias); }
+            linked.close();
             Files.createSymbolicLink(target, saved.resolve("Config.wtf"));
             fails(() -> LocalAccountHandoff.create(view, username, password)); Files.delete(target);
             for (String boundary : new String[]{"created", "written", "synced"}) {

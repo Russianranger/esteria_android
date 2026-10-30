@@ -34,8 +34,8 @@ their original full-lock identity.
 | Milestone | Current state | Next evidence |
 | --- | --- | --- |
 | 1. Reproducible references | Exact pins, full Windows ARM64/x64 client and linked ARM64 server/tools complete; protocol layouts match. | Isolated exported-source server rebuild/source seal. |
-| 2. Client platform | Native ARM64 Wine entry/codec/software Vulkan/PCM and Android x64 entry/offline/loopback pass. | New source-owned production ARM64 Wine build, Android presentation and full initialization. |
-| 3. Local services | Native compiled SQL/auth/SRP/ledger/restart passes for retained six-patch reference; Android x64 persistent MySQL service passes. | Native product composition passes on six/seven-patch builds; phone coordinator, playerbots schema and production ARM64 execution remain. |
+| 2. Client platform | Native ARM64 Wine entry/codec/software Vulkan/PCM and Android x64 entry/offline/loopback pass. | Selected471 pairing on the built source-owned Wine runtime, Android presentation and full initialization. |
+| 3. Local services | Native compiled SQL/auth/SRP/ledger/restart passes for retained six-patch reference; Android x64 persistent MySQL service passes. | Native product composition passes on six/seven-patch builds; phone staged coordinator and three cleanup-owner fault cases pass host checks. Playerbots schema, Android SQL and production ARM64 execution remain. |
 | 4. Matched gameplay | Real reconstructed-client/compiled-server SRP pairing passes41060555263; normal game initialization/world remain untested. | Matched login, character/world/gameplay and actual persistence/bots. |
 | 5. Android application | Verified runtime/source import, UI review, controls/bridges, source-gated programs installer and content/schema adapters build. | Complete owned session, readiness, lifecycle and graceful saves. |
 | 6. Thor candidate | Not ready; stable signing identity provisioned. | One coherent offline playable, update-compatible APK with available data and consolidated test. |

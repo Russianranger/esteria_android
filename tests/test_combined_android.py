@@ -34,15 +34,16 @@ class CombinedPackageGuards(unittest.TestCase):
     def helper_fixture(self, changed_service=False, changed_manifest=False, manifest_version=1):
         # Source-byte packaging fixtures only; these Python snippets are never executed.
         repository = self.root / 'helper-repository'; (repository / 'runtime').mkdir(parents=True)
-        for name in {name for names in bundle.HELPER_SETS.values() for name in names}:
-            source = repository / 'runtime' / name; source.parent.mkdir(parents=True, exist_ok=True)
-            source.write_bytes(('fixture source: ' + name + '\n').encode())
+        for directory, names in bundle.HELPER_SETS.items():
+            for name in names:
+                source = repository / bundle.helper_source_path(directory, name); source.parent.mkdir(parents=True, exist_ok=True)
+                source.write_bytes(('fixture source: ' + name + '\n').encode())
         path = self.root / 'helpers.zip'
         with zipfile.ZipFile(path, 'w') as archive:
             for directory, names in bundle.HELPER_SETS.items():
                 records = {}
                 for name in names:
-                    source = repository / 'runtime' / name
+                    source = repository / bundle.helper_source_path(directory, name)
                     records[name] = bundle.identity(source)
                     data = source.read_bytes()
                     if changed_service and directory == 'database-service' and name == 'mysql_service.py':
@@ -59,7 +60,11 @@ class CombinedPackageGuards(unittest.TestCase):
                                             'server-schema': ('android_server_schema_setup.py', 'mysql_bootstrap.py', 'mysql_service.py',
                                                               'server_content.py', 'server_schema_setup.py', 'server_schema_baseline.py',
                                                               'server_schema_adaptations.py', 'server/appearance-schema-v1.sql',
-                                                              'server/appearance-schema.lock.json')})
+                                                              'server/appearance-schema.lock.json'),
+            'server-installation': ('android_server_installation_setup.py', 'android_server_schema_setup.py', 'mysql_bootstrap.py',
+                'mysql_service.py', 'server_content.py', 'server_schema_setup.py', 'server_schema_baseline.py', 'server_schema_adaptations.py',
+                'server_update_setup.py', 'server_updater.py', 'owned_process_group.py', 'server_config.py', 'provision_local_realm.py',
+                'provision_local_account.py', 'server/appearance-schema-v1.sql', 'server/appearance-schema.lock.json', 'local-server.json')})
         repository, path = self.helper_fixture()
         with patch.object(bundle, 'ROOT', repository), zipfile.ZipFile(path) as archive:
             bundle.verify_helpers(archive)
@@ -82,6 +87,28 @@ class CombinedPackageGuards(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'helper-manifest-mismatch'):
                 bundle.verify_helpers(archive)
 
+    def test_installation_helper_manifest_inventory_and_profile_are_strict(self):
+        repository, path = self.helper_fixture()
+        self.assertEqual(len(bundle.HELPER_SETS['server-installation']), 17)
+        self.assertTrue((repository / 'config/local-server.json').is_file())
+        with zipfile.ZipFile(path) as archive:
+            original = {name: archive.read(name) for name in archive.namelist()}
+        for change, reason in [('extra', 'helper-inventory'), ('missing', 'helper-inventory'),
+                               ('changed', 'helper-source'), ('profile', 'helper-source'), ('duplicate_json', 'helper-manifest')]:
+            contents = dict(original); prefix = 'assets/server-installation/'
+            if change == 'extra': contents[prefix + 'server/unapproved.py'] = b'unapproved'
+            if change == 'missing': del contents[prefix + 'server/appearance-schema.lock.json']
+            if change in ('changed', 'profile'):
+                name = prefix + ('local-server.json' if change == 'profile' else 'server/appearance-schema-v1.sql')
+                contents[name] = b'X' * len(contents[name])
+            if change == 'duplicate_json':
+                name = prefix + 'manifest.json'; contents[name] = contents[name].replace(b'{', b'{"formatVersion":1,', 1)
+            modified = self.root / ('installation-' + change + '.zip')
+            with zipfile.ZipFile(modified, 'w') as archive:
+                for name, raw in contents.items(): archive.writestr(name, raw)
+            with self.subTest(change=change), patch.object(bundle, 'ROOT', repository), zipfile.ZipFile(modified) as archive:
+                with self.assertRaisesRegex(ValueError, reason): bundle.verify_helpers(archive)
+
     def test_unknown_assets_still_fail_the_exact_inventory_gate(self):
         path = self.root / 'foreign-assets.zip'
         with zipfile.ZipFile(path, 'w') as archive:
@@ -103,7 +130,7 @@ class CombinedPackageGuards(unittest.TestCase):
         for directory, names in bundle.HELPER_SETS.items():
             records = {}
             for name in names:
-                source = bundle.ROOT / 'runtime' / name
+                source = bundle.ROOT / bundle.helper_source_path(directory, name)
                 payload['assets/' + directory + '/' + name] = source.read_bytes()
                 records[name] = bundle.identity(source)
             payload['assets/' + directory + '/manifest.json'] = json.dumps(dict(formatVersion=1, files=records)).encode()
@@ -121,7 +148,9 @@ class CombinedPackageGuards(unittest.TestCase):
         for mutation, reason in [('none', None), ('missing', 'asset-inventory'),
                                  ('changed', 'embedded-source-lock'), ('extra', 'asset-inventory'),
                                  ('schema_missing', 'asset-inventory'), ('schema_changed', 'helper-source-mismatch'),
-                                 ('schema_extra', 'asset-inventory')]:
+                                 ('schema_extra', 'asset-inventory'), ('installation_missing', 'asset-inventory'),
+                                 ('installation_changed', 'helper-source-mismatch'), ('installation_extra', 'asset-inventory'),
+                                 ('installation_profile', 'helper-source-mismatch'), ('installation_manifest', 'helper-manifest-mismatch')]:
             contents = dict(payload)
             if mutation == 'missing': del contents['assets/x11-runtime.lock.json']
             if mutation == 'changed': contents['assets/x11-runtime.lock.json'] = b'X' * len(contents['assets/x11-runtime.lock.json'])
@@ -130,6 +159,15 @@ class CombinedPackageGuards(unittest.TestCase):
             if mutation == 'schema_changed':
                 name = 'assets/server-schema/server/appearance-schema-v1.sql'; contents[name] = b'X' * len(contents[name])
             if mutation == 'schema_extra': contents['assets/server-schema/server/unapproved.py'] = b'never permitted'
+            if mutation == 'installation_missing': del contents['assets/server-installation/server/appearance-schema.lock.json']
+            if mutation == 'installation_changed':
+                name = 'assets/server-installation/server/appearance-schema-v1.sql'; contents[name] = b'X' * len(contents[name])
+            if mutation == 'installation_extra': contents['assets/server-installation/unapproved.py'] = b'never permitted'
+            if mutation == 'installation_profile':
+                name = 'assets/server-installation/local-server.json'; contents[name] = b'X' * len(contents[name])
+            if mutation == 'installation_manifest':
+                name = 'assets/server-installation/manifest.json'; proof = json.loads(contents[name]); proof['files'].pop('owned_process_group.py')
+                contents[name] = json.dumps(proof).encode()
             path = self.root / (mutation + '.zip')
             with zipfile.ZipFile(path, 'w') as archive:
                 for name, data in contents.items(): archive.writestr(name, data)
