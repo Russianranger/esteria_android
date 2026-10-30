@@ -632,7 +632,20 @@
     },
     "url": "https://github.com/Russianranger/EsteriaWoW.git"
   },
-  "sourceCompanionComplete": false,
-  "sourceQualification": null,
-  "state": "pending-sealed-source-rebuild"
+  "sourceCompanionComplete": true,
+  "sourceQualification": {
+    "archive": {
+      "bytes": 24619647,
+      "sha256": "9f76881f06a7c998e0dba9d4a226c623021ed6ad8b87074aa7a861eafbb96d80"
+    },
+    "qualification": {
+      "bytes": 23757,
+      "sha256": "bcb421500351886cd9daa280e6ba75c57b6e64b689a3a7410fa7104640a58de9"
+    },
+    "receipt": {
+      "bytes": 49875,
+      "sha256": "fae08a831fb0a55d22c3ea330677671cf72045e2abe8fc229ba90494794aa4f4"
+    }
+  },
+  "state": "sealed-source-and-native-cli"
 }

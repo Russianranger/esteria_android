@@ -21,9 +21,9 @@ class ExtractorProvider(unittest.TestCase):
         path = self.root / 'pin.json'; path.write_bytes(provider.encoded(pin))
         return patch.object(provider, 'LOCK', path)
 
-    def test_actual_measured_inventory_and_pending_source_contract(self):
+    def test_actual_measured_inventory_and_exact_retained_source_contract(self):
         pin = self.pin
-        self.assertEqual(pin['state'], 'pending-sealed-source-rebuild')
+        self.assertEqual(pin['state'], 'sealed-source-and-native-cli')
         self.assertEqual((pin['archive']['bytes'], pin['archiveEntries'], pin['archiveFileBytes']), (2495044, 76, 7423422))
         self.assertEqual(pin['archive']['sha256'], '2bce13256ac609a7bcb01fd2a7e5352fde29fa19e18a5d269c566acb22f86515')
         self.assertEqual(set(pin['programPairs']), set(provider.PROGRAMS))
@@ -35,19 +35,23 @@ class ExtractorProvider(unittest.TestCase):
         self.assertEqual(len(descriptor['requiredFiles']), 76)
         self.assertEqual({n for n,r in descriptor['requiredFiles'].items() if r.get('elfMachine') == 183},
                          {'bin/' + n for n in provider.PROGRAMS})
-        self.assertFalse(descriptor['sourceCompanionVerified'])
-        self.assertIsNone(pin['sourceQualification'])
+        self.assertTrue(descriptor['sourceCompanionVerified'])
+        self.assertEqual(pin['sourceQualification']['archive'],dict(bytes=24619647,
+            sha256='9f76881f06a7c998e0dba9d4a226c623021ed6ad8b87074aa7a861eafbb96d80'))
         for flag in provider.FALSE_FLAGS: self.assertFalse(pin[flag])
 
     def test_pending_build_and_verify_refuse_before_output_changes(self):
         output = self.root / 'existing'; output.mkdir(); marker = output / 'saved'; marker.write_bytes(b'keep')
-        with self.assertRaisesRegex(ValueError, 'real-sealed-source-receipt-required'):
-            provider.build(self.root, self.root, self.root, self.root, output)
-        with self.assertRaisesRegex(ValueError, 'real-sealed-source-receipt-required'): provider.verify(output)
+        pending=copy.deepcopy(self.pin);pending.update(state='pending-sealed-source-rebuild',sourceCompanionComplete=False,sourceQualification=None)
+        with self.locked(pending):
+            with self.assertRaisesRegex(ValueError, 'real-sealed-source-receipt-required'):
+                provider.build(self.root, self.root, self.root, self.root, output)
+            with self.assertRaisesRegex(ValueError, 'real-sealed-source-receipt-required'): provider.verify(output)
+        (self.root/'pin.json').unlink()
         self.assertEqual(marker.read_bytes(), b'keep'); self.assertEqual(list(self.root.iterdir()), [output])
 
     def test_source_boolean_without_real_pinned_receipts_never_enables_provider(self):
-        pin = copy.deepcopy(self.pin); pin['sourceCompanionComplete'] = True
+        pin = copy.deepcopy(self.pin); pin.update(state='pending-sealed-source-rebuild',sourceCompanionComplete=True,sourceQualification=None)
         with self.locked(pin), self.assertRaisesRegex(ValueError, 'sealing-state-inconsistent'): provider.load_pin()
         pin['state'] = 'sealed-source-and-native-cli'
         with self.locked(pin), self.assertRaisesRegex(ValueError, 'real-sealed-source-receipt-required'):
@@ -141,7 +145,7 @@ class ActualRetainedInputs(unittest.TestCase):
                 archive=dict(file=provider.SOURCE_ARCHIVE,**q['archive']),qualification=q['qualification'],
                 sourceInputArchive=provider.identity(pin['originalSourceInputs']['archive']),
                 sourceInputReceipt=pin['originalSourceInputs']['receipt'],originalBuild=pin['originalBuild'],
-                originalCompiledModules=pin['originalModules'],sourceLock=pin['appSourceLock'])
+                originalCompiledModules=pin['originalModules'],sourceLock=pin['serverBuildSourceLock'])
             (companion/'sealed-source-receipt.json').write_bytes(provider.encoded(sealed))
             q['receipt'] = provider.files.identity(companion/'sealed-source-receipt.json')
             with self.assertRaisesRegex(ValueError,'actual-full-source-rebuild-required'): provider.verify_sources(companion,pin)

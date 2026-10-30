@@ -100,3 +100,16 @@ and the isolated build lock are supplied by the recorded integration revision.
 This artifact is not a complete source companion. A later measured strip/debug derivative and provider rebind
 requires actual native results and the corresponding source gates; pending flags
 are not flipped by these host tests.
+
+Native ARM64 run `41076785723` completed this separate target build and passed
+29 synthetic tests against both newly compiled map/vmap programs. It retained a
+unsealed payload with the source inputs, recipes and unstripped programs. Its
+receipt declares 45 inputs; the uploader's default hidden-file policy omitted
+the inventoried `.github` workflow, available from recorded integration
+`bcfa2c75`, and added the separate build receipt. Later uploads explicitly include
+that curated hidden recipe. This payload is not a sealed source companion.
+The bounded public proof is recorded in
+[`server-ordered-extractors-41076785723.json`](../evidence/server-ordered-extractors-41076785723.json).
+The original four-tool Android provider remains unchanged. No real client data
+was converted, and the custom-data, source-sealing and Android boundaries above
+remain pending.

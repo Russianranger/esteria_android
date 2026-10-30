@@ -38,3 +38,12 @@ The ordinary isolated and ordered-extractor workflows separately fix publication
 parent ownership while preserving `0700`. The native ordered workflow includes
 an actual runner-uid traversal regression. No SQL, Android runtime, custom client
 data conversion or gameplay qualification follows from these operations.
+
+Recovery run `41078079045` at `880d6a54` succeeded and retained the exact original
+archive. Independent full download/readback checked its 266 members and the
+original `9f76881f` compressed hash, plus unchanged qualification/sealing receipt
+bytes. The composed public proof is
+[`server-source-rebuild-retained-41078079045.json`](../evidence/server-source-rebuild-retained-41078079045.json).
+This closes retention for the original seven-program source companion. Provider
+creation still checks the corresponding complete paired debug archives and
+native loader/CLI receipts before producing APK assets.

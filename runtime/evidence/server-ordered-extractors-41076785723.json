@@ -1,0 +1,189 @@
+{
+  "actualTargetCompileSucceeded": true,
+  "adaptationLock": {
+    "bytes": 10416,
+    "sha256": "6963915b2b2923940a91ebbe5f01113e4e3b1f172f9fbffc9b9db8ce87923cc0"
+  },
+  "androidRuntimeQualified": false,
+  "capabilities": {
+    "map_extractor": {
+      "exitCode": 0,
+      "observedSeconds": 0.023,
+      "output": {
+        "bytes": 91,
+        "sha256": "64d28e45c45e6c0c699754f46221aec32e98544a3cd71f8b99078ad1512c38bb"
+      }
+    },
+    "vmap4_extractor": {
+      "exitCode": 0,
+      "observedSeconds": 0.003,
+      "output": {
+        "bytes": 91,
+        "sha256": "64d28e45c45e6c0c699754f46221aec32e98544a3cd71f8b99078ad1512c38bb"
+      }
+    }
+  },
+  "clientMpqConversionQualified": false,
+  "clientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "compile": {
+    "exitCode": 0,
+    "observedSeconds": 103.405,
+    "output": {
+      "bytes": 23315,
+      "sha256": "307817739829dd9cd56970bbb724497f9fbe3e51a40b2866806feef94939eeb2"
+    }
+  },
+  "compileCommands": {
+    "bytes": 57376083,
+    "sha256": "18a6aaad2116be0534e8f7c8dd3d871a1e0e70532cbac8b67fbf6f7c9b716f43"
+  },
+  "compilerCacheDisabled": true,
+  "configure": {
+    "exitCode": 0,
+    "observedSeconds": 3.302,
+    "output": {
+      "bytes": 10755,
+      "sha256": "0e0d73f6f0c5a72ccf36776b7cfe509aad87cdc5a402599ae268386acf54738a"
+    }
+  },
+  "customEsteriaDataLoadOrderQualified": false,
+  "declaredPayloadInputs": 45,
+  "environment": {
+    "afterReceipt": {
+      "bytes": 8532,
+      "sha256": "4f0f8dfa6e392a8ec39df6fe47595fac9d27e28c9b337715a5964ec89194739b"
+    },
+    "beforeReceipt": {
+      "bytes": 8532,
+      "sha256": "4f0f8dfa6e392a8ec39df6fe47595fac9d27e28c9b337715a5964ec89194739b"
+    },
+    "compilerExecutables": {
+      "g++": {
+        "bytes": 990040,
+        "path": "/usr/bin/aarch64-linux-gnu-g++-13",
+        "sha256": "fc02363794280f404c6ca6f5da1c8fe469be902e9de140d35d8573bb3393f53b"
+      },
+      "gcc": {
+        "bytes": 990040,
+        "path": "/usr/bin/aarch64-linux-gnu-gcc-13",
+        "sha256": "a20520ee21543f243d40636a9181a142c45ecd989de31ab86b99a8ea5ada870d"
+      }
+    },
+    "compilerLaunchers": {
+      "CMAKE_CXX_COMPILER_LAUNCHER": "",
+      "CMAKE_C_COMPILER_LAUNCHER": ""
+    },
+    "network": {
+      "externalNetworkingAvailable": false,
+      "interfaces": [
+        "lo"
+      ]
+    },
+    "relevantAfter": true,
+    "relevantBefore": true
+  },
+  "evidenceArtifact": {
+    "bytes": 34950,
+    "id": 12987836551,
+    "independentlyDownloadedAndHashVerified": true,
+    "sha256": "8fe19f81f3d681d3523e1a7a35170b2dfb0ec0c2d0086a7adbd41a89863b4424"
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "globalServerPatchListChanged": false,
+  "hiddenWorkflowRetention": {
+    "omissionInferredFromUploadPolicyAndCounts": true,
+    "path": "recipes/.github/workflows/server-extractor-order.yml",
+    "retrievableFromIntegrationRevision": "bcfa2c757f2a8de4e0458228816265409c02e643",
+    "subsequentCuratedUploadsIncludeHiddenFiles": true
+  },
+  "integrationRevision": "bcfa2c757f2a8de4e0458228816265409c02e643",
+  "isolatedFullServerRebuildQualified": false,
+  "job": 124134989903,
+  "nativeOrderedLookupQualified": true,
+  "onlyRequestedToolsBuilt": true,
+  "orderedBuildReceipt": {
+    "bytes": 32157,
+    "sha256": "84cc70a85a9214b6658b5f1bd27811d0b1681f6ac942f82749c688819f8e5428"
+  },
+  "originalBuild": {
+    "bytes": 32521,
+    "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+  },
+  "originalInputsUnchanged": true,
+  "originalModules": {
+    "bytes": 5348,
+    "sha256": "6459b6a1acab2c62c474e4c6ab3eb651daa21f697ccd628e93a38bad298bbdd1"
+  },
+  "originalPreparationReceipt": {
+    "bytes": 5930,
+    "sha256": "6ff44e6198a2c54660c4c85388f6511d5adcb54b3e0ae8d2933871bb61fe0e4f"
+  },
+  "payloadArtifact": {
+    "bytes": 97850818,
+    "id": 12988136313,
+    "independentFullDownloadReadbackPerformed": false,
+    "retentionSucceeded": true,
+    "sha256": "7a43c0609c14d105ea8a88e370464deff10956528b24ac61b554a26e5948eeab"
+  },
+  "programs": {
+    "map_extractor": {
+      "bytes": 6034448,
+      "elf": {
+        "class": "ELF64",
+        "endianness": "little",
+        "interpreter": "/lib/ld-linux-aarch64.so.1",
+        "machine": "AArch64",
+        "type": "DYN"
+      },
+      "sha256": "4f849420fa05b5c73ad42d4aeaf3c92c69799a331132a174ad198c910d3eb3f0"
+    },
+    "vmap4_extractor": {
+      "bytes": 13692552,
+      "elf": {
+        "class": "ELF64",
+        "endianness": "little",
+        "interpreter": "/lib/ld-linux-aarch64.so.1",
+        "machine": "AArch64",
+        "type": "DYN"
+      },
+      "sha256": "f8611925ac55b7cc623970d0d76697aac4efb111c7f7d77b3d82577b9e1ee66e"
+    }
+  },
+  "proprietaryClientDataSupplied": false,
+  "runUrl": "https://github.com/Russianranger/esteria_android/actions/runs/41076785723",
+  "scope": "actual-native-arm64-ordered-map-vmap-build-and-synthetic-lookup-proof",
+  "separateBuildReceiptAddedOutsideDeclaredInputInventory": true,
+  "serverBuildSourceLock": {
+    "bytes": 2170,
+    "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+  },
+  "serverProgramsReplaced": false,
+  "sourceCompanionComplete": false,
+  "sourceInputArchive": {
+    "bytes": 18216368,
+    "sha256": "8c820a962947d2b8e2028c434ccedc969127716390f557626444d23ff8e15b99"
+  },
+  "sourceInputReceipt": {
+    "bytes": 1746751,
+    "sha256": "46a4ef82021d49699694bccab545591f3debbd6f4ab9e208c54e4796326bc03e"
+  },
+  "syntheticLookups": {
+    "actualNewMapAndVmapMpqFileConstructorsExecuted": true,
+    "encryptedFilePayloads": "refused before decoding; no qualification",
+    "exitCode": 0,
+    "fixtureScope": "generated classic MPQs with encrypted tables plus owned loose folder providers; no proprietary assets",
+    "output": {
+      "bytes": 5797,
+      "sha256": "b8053c7cfe6de4ba99c755406740a699fdbba449cc8963167e789ef1fc2d5854"
+    },
+    "tests": 29
+  },
+  "targets": [
+    "map_extractor",
+    "vmap4_extractor"
+  ],
+  "uploadedFilesReported": 45,
+  "workflow": ".github/workflows/server-extractor-order.yml",
+  "workflowRun": 41076785723
+}

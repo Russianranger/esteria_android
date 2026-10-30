@@ -12,15 +12,16 @@ The original 66 source/Lua notices stay in the runtime archive. Four paired debu
 files, compile commands, original provenance and packaging recipes stay outside
 the APK in the separate debug archive.
 
-The production pin remains `pending-sealed-source-rebuild`. Both `build` and
-`verify` refuse production output until the actual shared isolated source rebuild
-completes. A source boolean change is insufficient: an updated reviewed pin must
-contain the exact complete archive, sealed receipt and qualification identities.
+The reviewed pin now selects the actual shared isolated source rebuild and exact
+retained archive from run `41078079045`. A source boolean change is insufficient:
+the pin contains the complete archive, sealed receipt and qualification identities.
 The helper reads the entire source archive and paired extractor debug archive,
 checks their original source/build/module bindings, requires all four extractor
 targets in the actual successful full rebuild and keeps original unsealed
 receipts unchanged. It uses the same complete source companion as server
 programs, without requiring the three server-program debug files for extraction.
+`PROVIDER-QUALIFICATION.md` describes the full source/debug and installation-profile
+APK checks; optional packaging remains disabled by default.
 
 Once those real inputs exist, the build interface is:
 

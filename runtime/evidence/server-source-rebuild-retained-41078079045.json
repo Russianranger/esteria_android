@@ -1,0 +1,193 @@
+{
+  "actualInstalledPrograms": {
+    "authserver": {
+      "bytes": 35084240,
+      "elf": {
+        "class": "ELF64",
+        "endianness": "little",
+        "interpreter": "/lib/ld-linux-aarch64.so.1",
+        "machine": "AArch64",
+        "type": "DYN"
+      },
+      "sha256": "2dafe904f1f434d304746016315fc8213b582d30ce7f22e3afb6fb4673c46624"
+    },
+    "dbimport": {
+      "bytes": 26661168,
+      "elf": {
+        "class": "ELF64",
+        "endianness": "little",
+        "interpreter": "/lib/ld-linux-aarch64.so.1",
+        "machine": "AArch64",
+        "type": "DYN"
+      },
+      "sha256": "62fb1268fb4a544acee2b20278781ec4bf3bd5516c86764a17791d63c59c933d"
+    },
+    "map_extractor": {
+      "bytes": 4546608,
+      "elf": {
+        "class": "ELF64",
+        "endianness": "little",
+        "interpreter": "/lib/ld-linux-aarch64.so.1",
+        "machine": "AArch64",
+        "type": "DYN"
+      },
+      "sha256": "cd9018132d9a0b8c59cf4e1eb51f3b09d0f2d33f490f29425a7b93e98bccedd5"
+    },
+    "mmaps_generator": {
+      "bytes": 31978216,
+      "elf": {
+        "class": "ELF64",
+        "endianness": "little",
+        "interpreter": "/lib/ld-linux-aarch64.so.1",
+        "machine": "AArch64",
+        "type": "DYN"
+      },
+      "sha256": "72d63a1cf58ef189b2b49df1acd2659224428a4ddfa953e5a097c9e970910ea8"
+    },
+    "vmap4_assembler": {
+      "bytes": 15508368,
+      "elf": {
+        "class": "ELF64",
+        "endianness": "little",
+        "interpreter": "/lib/ld-linux-aarch64.so.1",
+        "machine": "AArch64",
+        "type": "DYN"
+      },
+      "sha256": "964b8190d67da22d57be5a96772a5444a948b213df94042d65efaeb0f78b48ca"
+    },
+    "vmap4_extractor": {
+      "bytes": 12012416,
+      "elf": {
+        "class": "ELF64",
+        "endianness": "little",
+        "interpreter": "/lib/ld-linux-aarch64.so.1",
+        "machine": "AArch64",
+        "type": "DYN"
+      },
+      "sha256": "0829e928d7cb682f3deafadf4a8e7c99e4d33923a86c8cc219fbdba10edf2ed4"
+    },
+    "worldserver": {
+      "bytes": 2646890744,
+      "elf": {
+        "class": "ELF64",
+        "endianness": "little",
+        "interpreter": "/lib/ld-linux-aarch64.so.1",
+        "machine": "AArch64",
+        "type": "DYN"
+      },
+      "sha256": "e110be690c92de86405338090b98414c0983cfe1cfde5098345005daa0bd5644"
+    }
+  },
+  "androidProviderCreated": false,
+  "androidRuntimeQualified": false,
+  "archiveEntries": 266,
+  "archiveFileBytes": 126583360,
+  "formatVersion": 1,
+  "fullBuild": {
+    "exitCode": 0,
+    "observedSeconds": 9834.2,
+    "output": {
+      "bytes": 588628,
+      "sha256": "92a1c52327c90374b2d1958c6c7e00028747d8d3d7e8b37d5efc4466e194c675"
+    }
+  },
+  "gameplayQualified": false,
+  "independentReadback": {
+    "completeSourceArchiveHashVerified": true,
+    "everyMemberHashAndModeVerified": true,
+    "fullArtifactDownloadedAndHashVerified": true,
+    "originalQualificationAndSealedReceiptHashesVerified": true
+  },
+  "install": {
+    "exitCode": 0,
+    "observedSeconds": 7.505,
+    "output": {
+      "bytes": 13390,
+      "sha256": "485205f540b0275162375815dabac96e8ee85cafc7cefbf0ed41b2ca6b38318c"
+    }
+  },
+  "isolatedSourceRebuildQualified": true,
+  "network": {
+    "externalNetworkingAvailable": false,
+    "interfaces": [
+      "lo"
+    ]
+  },
+  "observedIncludeDirectoriesCovered": 340,
+  "observedSourcesCovered": 2199,
+  "originalBuild": {
+    "bytes": 32521,
+    "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+  },
+  "originalBuildGate": {
+    "failureOnly": "source archive upload could not traverse root-owned0700 parent",
+    "fullCompileStepSucceeded": true,
+    "integrationRevision": "23f727a46de8c95ebca7fc698f6c82028c0ce033",
+    "job": 124048975394,
+    "qualification": {
+      "bytes": 23757,
+      "sha256": "bcb421500351886cd9daa280e6ba75c57b6e64b689a3a7410fa7104640a58de9"
+    },
+    "runConclusion": "failure",
+    "sealedSourceReceipt": {
+      "bytes": 49875,
+      "sha256": "fae08a831fb0a55d22c3ea330677671cf72045e2abe8fc229ba90494794aa4f4"
+    },
+    "workflow": ".github/workflows/server-isolated-build.yml",
+    "workflowRun": 41051669638
+  },
+  "originalCompiledModules": {
+    "bytes": 5348,
+    "sha256": "6459b6a1acab2c62c474e4c6ab3eb651daa21f697ccd628e93a38bad298bbdd1"
+  },
+  "pairedDebugProviderReadbackPending": true,
+  "recordedArchivalVersions": {
+    "authserver": "AzerothCore rev. f35f04d01689+ 2026-10-28 12:35:08 -0500 (Archived source package branch) (Unix, RelWithDebInfo, Static)",
+    "worldserver": "AzerothCore rev. f35f04d01689+ 2026-10-28 12:35:08 -0500 (Archived source package branch) (Unix, RelWithDebInfo, Static)"
+  },
+  "referenceBuild": {
+    "exitCode": 0,
+    "observedSeconds": 4.981,
+    "output": {
+      "bytes": 854,
+      "sha256": "665afd3abbdcec0690cf9e6e5da0cefb0e17ce9f1cd7d561028c867dedd68384"
+    }
+  },
+  "relevantEnvironmentAfter": true,
+  "relevantEnvironmentBefore": true,
+  "retentionRecovery": {
+    "allStepsSucceeded": true,
+    "artifact": {
+      "bytes": 24704454,
+      "id": 12989185143,
+      "sha256": "899e91a5349ebb39343c8bc4b9f7e04c9f7dff5dd61177be61f23c3f0fc557f0"
+    },
+    "configureAndRevisionMetadataOnly": true,
+    "exactOriginalCompressedArchiveMatched": true,
+    "fullServerCompilationPerformed": false,
+    "integrationRevision": "880d6a5424d6a10e145eb12fc460a114fe0108d7",
+    "job": 124139543031,
+    "newNativeQualificationClaimed": false,
+    "originalReceiptsByteIdentical": true,
+    "recoveryReceipt": {
+      "bytes": 10561,
+      "sha256": "988a774b276aac55d56616b93fd177c70719ead7ed7a451ae85cddfe20a6e18f"
+    },
+    "workflow": ".github/workflows/server-source-recovery.yml",
+    "workflowRun": 41078079045
+  },
+  "scope": "actual-native-server-source-rebuild-and-byte-identical-retention-recovery",
+  "sourceArchive": {
+    "bytes": 24619647,
+    "file": "server-engine-complete-sources.tar.gz",
+    "sha256": "9f76881f06a7c998e0dba9d4a226c623021ed6ad8b87074aa7a861eafbb96d80"
+  },
+  "sourceBitIdenticalBinaryClaimed": false,
+  "sourceCompanionComplete": true,
+  "sourceLock": {
+    "bytes": 2170,
+    "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+  },
+  "sqlExecuted": false,
+  "worldserverSessionStarted": false
+}

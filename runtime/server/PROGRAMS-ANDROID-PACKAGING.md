@@ -3,9 +3,11 @@
 `tools/provider_server_programs.py` and `ServerProgramsSetup` implement the
 install-only boundary for the actual stripped seven-patch ARM64 programs. The
 optional `serverProgramsProviderDir` profile remains disabled by default. The
-checked-in `programs-provider.lock.json` is explicitly pending: it records actual
-measured bytes and native loader evidence, while complete-source rebuilding is
-still required. A pending pin cannot create or package a production provider.
+checked-in `programs-provider.lock.json` now binds the actual complete source
+rebuild and byte-identical retained archive from run `41078079045`, separately
+from its original native loader evidence. Provider creation still performs full
+paired-debug and source readback. The four-component CI profile is described in
+`PROVIDER-QUALIFICATION.md`; Android runtime and gameplay remain unqualified.
 
 The actual runtime archive is 21,996,594 bytes, SHA-256
 `df7e0b33e4048daf780ebf31c0a7f9a10b1f74ea42f4de100ca18ed1a65b673e`.
@@ -52,7 +54,7 @@ Debug member hashes must match the original↔stripped↔debug identities. Nativ
 version execution establishes a loader component only; dbimport execution, SQL,
 Android, game login and gameplay qualification remain separate.
 
-The pending measured payload can already be audited without creating a provider:
+The measured payload can be audited without creating a provider:
 
 ```sh
 python3 tools/provider_server_programs.py audit \

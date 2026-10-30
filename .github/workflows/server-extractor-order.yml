@@ -130,6 +130,7 @@ jobs:
           name: separate-ordered-extractors-${{ github.sha }}
           compression-level: 0
           path: out/ordered-build/payload/
+          include-hidden-files: true
           retention-days: 30
           if-no-files-found: error
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

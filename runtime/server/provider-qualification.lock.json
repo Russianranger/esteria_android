@@ -1,0 +1,124 @@
+{
+  "androidRuntimeQualified": false,
+  "artifacts": {
+    "completeSources": {
+      "bytes": 24704454,
+      "id": 12989185143,
+      "integrationRevision": "880d6a5424d6a10e145eb12fc460a114fe0108d7",
+      "members": {
+        "qualification.json": {
+          "bytes": 23757,
+          "sha256": "bcb421500351886cd9daa280e6ba75c57b6e64b689a3a7410fa7104640a58de9",
+          "target": "sealed/qualification.json"
+        },
+        "retention-recovery-receipt.json": {
+          "bytes": 10561,
+          "sha256": "988a774b276aac55d56616b93fd177c70719ead7ed7a451ae85cddfe20a6e18f",
+          "target": "sealed/retention-recovery-receipt.json"
+        },
+        "sealed-source-receipt.json": {
+          "bytes": 49875,
+          "sha256": "fae08a831fb0a55d22c3ea330677671cf72045e2abe8fc229ba90494794aa4f4",
+          "target": "sealed/sealed-source-receipt.json"
+        },
+        "server-engine-complete-sources.tar.gz": {
+          "bytes": 24619647,
+          "sha256": "9f76881f06a7c998e0dba9d4a226c623021ed6ad8b87074aa7a861eafbb96d80",
+          "target": "sealed/server-engine-complete-sources.tar.gz"
+        }
+      },
+      "sha256": "899e91a5349ebb39343c8bc4b9f7e04c9f7dff5dd61177be61f23c3f0fc557f0",
+      "workflowRun": 41078079045
+    },
+    "engineDebug": {
+      "bytes": 1083562454,
+      "id": 12975824427,
+      "integrationRevision": "5c6f8d26813128a4763506cf3e38d10997f1935a",
+      "members": {
+        "server-engine-package/server-engine-debug-arm64.tar.gz": {
+          "bytes": 1082880246,
+          "sha256": "facc75680f3fb1b205a98960d6ea5a0d565cb2a2b4bd56303dd6625fd4854a24",
+          "target": "engine/server-engine-debug-arm64.tar.gz"
+        }
+      },
+      "sha256": "3d8579701b8c2e63b808ed6e18a3fd544d422b2f52bc2ea3e8e2b8a2217df7e1",
+      "workflowRun": 41054451870
+    },
+    "extractorDebug": {
+      "bytes": 26093154,
+      "id": 12976736772,
+      "integrationRevision": "5c6f8d26813128a4763506cf3e38d10997f1935a",
+      "members": {
+        "server-extractors-package/server-extractors-debug-arm64.tar.gz": {
+          "bytes": 25375231,
+          "sha256": "40e7880bc1ac15391cb63cf61bdc58fb5b90f267f7b93fdf65966a3a0deb7a10",
+          "target": "extractors/server-extractors-debug-arm64.tar.gz"
+        }
+      },
+      "sha256": "3c5364d89fffb7b2ff0509e94bad34dac3ae8439d5b4305554b0db13a5b60dba",
+      "workflowRun": 41054451870
+    },
+    "native": {
+      "bytes": 75700,
+      "id": 12976931041,
+      "integrationRevision": "5c6f8d26813128a4763506cf3e38d10997f1935a",
+      "members": {
+        "extractor-cli.json": {
+          "bytes": 2860,
+          "sha256": "27e1eb1ed3ffa9b65b0c824da90f22c349e068df8d3b7c1362701be62267c5e5",
+          "target": "native/native-cli.json"
+        },
+        "loader-smoke.json": {
+          "bytes": 2427,
+          "sha256": "33fee9aefde98026139c3ba059f296b958cf813d13eb1f48d7bf74c749b74a09",
+          "target": "native/native-loader.json"
+        }
+      },
+      "sha256": "2c0000c058ba7578d46585ba55e4d8451ddbcba77db038b6bc3f0483e9b25fbc",
+      "workflowRun": 41054451870
+    },
+    "runtime": {
+      "bytes": 192900091,
+      "id": 12975909369,
+      "integrationRevision": "5c6f8d26813128a4763506cf3e38d10997f1935a",
+      "members": {
+        "engine-inputs/content/package-receipt.json": {
+          "bytes": 1343739,
+          "sha256": "1c00990e090e85af0232fe633b64e2718071a5f8e81f3b0ca1c8f2b214ffb3af",
+          "target": "content/package-receipt.json"
+        },
+        "engine-inputs/content/server-content.tar.gz": {
+          "bytes": 167585802,
+          "sha256": "0f41b2deea5344fcea4cbc70bbddf0bab1dfda1cd0346e23e92592aac63056e6",
+          "target": "content/server-content.tar.gz"
+        },
+        "server-engine-package/package-receipt.json": {
+          "bytes": 34652,
+          "sha256": "bb62ad200ac9be9b756616e351bf591508eedb7420f9fd39d5ea0544ae1cc548",
+          "target": "engine/package-receipt.json"
+        },
+        "server-engine-package/server-engine-runtime-arm64.tar.gz": {
+          "bytes": 21352885,
+          "sha256": "00bd0a5829caec2a2b11d4e85bd261b67461c04e6755bb332d37d393311c6ccb",
+          "target": "engine/server-engine-runtime-arm64.tar.gz"
+        },
+        "server-extractors-package/package-receipt.json": {
+          "bytes": 70343,
+          "sha256": "ec9252de82070bd0dd3bb436562b477bb03903ae9ae47132ec9f82ed5a861b1f",
+          "target": "extractors/package-receipt.json"
+        },
+        "server-extractors-package/server-extractors-runtime-arm64.tar.gz": {
+          "bytes": 2495044,
+          "sha256": "2bce13256ac609a7bcb01fd2a7e5352fde29fa19e18a5d269c566acb22f86515",
+          "target": "extractors/server-extractors-runtime-arm64.tar.gz"
+        }
+      },
+      "sha256": "e8f2053d6cc55299203db4def614d5f93b2b4f6ef4627eee0d0f63ea01b7e51e",
+      "workflowRun": 41054451870
+    }
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "minimumFreeBytes": 17179869184,
+  "scope": "exact-stock-server-provider-qualification-inputs"
+}

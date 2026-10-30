@@ -15,27 +15,33 @@ class ServerProgramsProvider(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory(prefix='server-programs-test-')
         self.addCleanup(temporary.cleanup); self.root = Path(temporary.name).resolve()
 
-    def test_measured_pin_keeps_complete_real_payload_and_pending_source_gate(self):
+    def test_measured_pin_keeps_complete_real_payload_and_exact_retained_source_gate(self):
         pin = self.pin
-        self.assertEqual(pin['state'], 'pending-sealed-source-rebuild')
+        self.assertEqual(pin['state'], 'sealed-source-and-native-loader')
         self.assertEqual(pin['archiveEntries'], 126); self.assertEqual(pin['archiveFileBytes'], 66025007)
         self.assertEqual(len(pin['noticeFiles']), 66)
         self.assertEqual(pin['archive']['bytes'], 21996594)
         self.assertEqual(pin['archive']['sha256'], 'df7e0b33e4048daf780ebf31c0a7f9a10b1f74ea42f4de100ca18ed1a65b673e')
-        self.assertIsNone(pin['sourceQualification']); self.assertFalse(pin['sourceCompanionComplete'])
+        self.assertTrue(pin['sourceCompanionComplete'])
+        self.assertEqual(pin['sourceQualification']['archive'],dict(bytes=24619647,
+            sha256='9f76881f06a7c998e0dba9d4a226c623021ed6ad8b87074aa7a861eafbb96d80'))
         for flags in ('androidRuntimeQualified', 'gameplayQualified'): self.assertFalse(pin[flags])
         self.assertEqual(set(pin['programPairs']), {'authserver', 'worldserver', 'dbimport'})
         self.assertEqual(provider.descriptor(pin)['guestMount'], '/esteria-server-programs')
 
     def test_production_build_and_verify_refuse_pending_before_touching_outputs(self):
         output = self.root / 'preserved'; output.mkdir(); marker = output / 'save'; marker.write_bytes(b'keep')
-        with self.assertRaisesRegex(ValueError, 'real-sealed-source-receipt-required'):
-            provider.build(*([self.root] * 5), output)
-        with self.assertRaisesRegex(ValueError, 'real-sealed-source-receipt-required'): provider.verify(output)
+        pending=copy.deepcopy(self.pin);pending.update(state='pending-sealed-source-rebuild',sourceCompanionComplete=False,sourceQualification=None)
+        lock=self.root/'pending.json';lock.write_bytes(provider.encoded(pending))
+        with patch.object(provider,'LOCK',lock):
+            with self.assertRaisesRegex(ValueError, 'real-sealed-source-receipt-required'):
+                provider.build(*([self.root] * 5), output)
+            with self.assertRaisesRegex(ValueError, 'real-sealed-source-receipt-required'): provider.verify(output)
+        lock.unlink()
         self.assertEqual(marker.read_bytes(), b'keep'); self.assertEqual(list(self.root.iterdir()), [output])
 
     def test_fake_source_boolean_and_missing_receipt_never_enable_provider(self):
-        pin = copy.deepcopy(self.pin); pin['sourceCompanionComplete'] = True
+        pin = copy.deepcopy(self.pin); pin.update(state='pending-sealed-source-rebuild',sourceCompanionComplete=True,sourceQualification=None)
         lock = self.root / 'pin.json'; lock.write_bytes(provider.encoded(pin))
         with patch.object(provider, 'LOCK', lock), self.assertRaisesRegex(ValueError, 'sealing-state-inconsistent'): provider.load_pin()
         pin['state'] = 'sealed-source-and-native-loader'; lock.write_bytes(provider.encoded(pin))

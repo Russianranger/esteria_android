@@ -1,0 +1,190 @@
+name: Stock server source debug and install profile qualification
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - .github/workflows/server-provider-qualification.yml
+      - tools/qualify_server_providers.py
+      - runtime/server/provider-qualification.lock.json
+      - runtime/server/programs-provider.lock.json
+      - runtime/server/extractors-provider.lock.json
+      - runtime/server/PROVIDER-QUALIFICATION.md
+      - tests/test_server_provider_qualification.py
+      - tests/ServerArchiveInstallReference.java
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: stock-server-provider-qualification-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  install-profile:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '17.0.13+11'
+      - name: Check provider source and acquisition refusal boundaries
+        run: |
+          test "$(uname -m)" = x86_64
+          mkdir -p out/provider-evidence out/provider-logs
+          python3 -m unittest tests.test_server_provider_qualification \
+            tests.test_server_programs_provider tests.test_server_extractors_provider \
+            tests.test_server_content_provider tests.test_server_provider_sources \
+            tests.test_server_engine_notices -v
+      - name: Stream exact retained stock packages debug pairs and complete sources
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/qualify_server_providers.py acquire --output out/provider-inputs \
+            > out/provider-logs/acquisition.log 2>&1
+      - name: Reproduce original notices and build source verified stock providers
+        id: providers
+        run: |
+          python3 tools/qualify_server_providers.py build --inputs out/provider-inputs --output out/providers \
+            > out/provider-logs/provider-build.log 2>&1
+      - name: Build the separately pinned database dependency provider
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/release_server_dependencies.py prepare --output "$RUNNER_TEMP/server-release" \
+            > out/provider-logs/dependency-acquisition.log 2>&1
+          python3 tools/provider_server_runtime.py build --package "$RUNNER_TEMP/server-release" \
+            --output out/dependency-provider > out/provider-logs/dependency-provider.log 2>&1
+      - name: Install the exact Android command line tools
+        run: |
+          export ANDROID_HOME="$RUNNER_TEMP/esteria-android-sdk"
+          mkdir -p "$ANDROID_HOME/cmdline-tools"
+          curl --fail --location --retry 3 https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -o "$RUNNER_TEMP/android-commandline.zip"
+          echo '2d2d50857e4eb553af5a6dc3ad507a17adf43d115264b1afc116f95c92e5e258  '"$RUNNER_TEMP/android-commandline.zip" | sha256sum --check
+          unzip -q "$RUNNER_TEMP/android-commandline.zip" -d "$ANDROID_HOME/cmdline-tools"
+          mv "$ANDROID_HOME/cmdline-tools/cmdline-tools" "$ANDROID_HOME/cmdline-tools/12.0"
+          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "$ANDROID_HOME/cmdline-tools/12.0/bin" >> "$GITHUB_PATH"
+      - name: Install Android platform 35 and build tools 35
+        run: |
+          (set +o pipefail; yes | sdkmanager --sdk_root="$ANDROID_HOME" --licenses >/dev/null)
+          sdkmanager --sdk_root="$ANDROID_HOME" 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Check core behavior and build the four server component installation profile
+        run: |
+          sha256sum --check gradle/wrapper/SHA256SUMS
+          ./gradlew --no-daemon :core:check :app:clean :app:assembleDebug \
+            :app:assembleDebugAndroidTest :app:lintDebug \
+            -PsourceRevision="$GITHUB_SHA" \
+            -PserverRuntimeProviderDir="$GITHUB_WORKSPACE/out/dependency-provider" \
+            -PserverProgramsProviderDir="$GITHUB_WORKSPACE/out/providers/programs" \
+            -PserverExtractorsProviderDir="$GITHUB_WORKSPACE/out/providers/extractors" \
+            -PserverContentProviderDir="$GITHUB_WORKSPACE/out/providers/content" \
+            > out/provider-logs/gradle.log 2>&1
+      - name: Install every exact archive and reuse its cached generation with a 32 MiB Java heap
+        run: |
+          mkdir -p out/java-reference
+          javac -cp core/build/classes/java/main -d out/java-reference tests/ServerArchiveInstallReference.java
+          for component in dependencies programs extractors content; do
+            if test "$component" = dependencies; then
+              provider="$GITHUB_WORKSPACE/out/dependency-provider"
+            else
+              provider="$GITHUB_WORKSPACE/out/providers/$component"
+            fi
+            manifest="$GITHUB_WORKSPACE/out/provider-evidence/java-$component.tsv"
+            selection="$GITHUB_WORKSPACE/out/provider-evidence/java-$component-input.json"
+            python3 tools/qualify_server_providers.py java-manifest --provider "$provider" \
+              --output "$manifest" > "$selection"
+            archive=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["archive"])' "$selection")
+            java -Xmx32m -cp core/build/classes/java/main:out/java-reference ServerArchiveInstallReference \
+              "$manifest" "$archive" "$RUNNER_TEMP/server-provider-java-stores/$component" \
+              > "out/provider-evidence/java-$component.json"
+          done
+      - name: Recheck full source debug companions and every selected APK asset byte
+        id: verified
+        run: |
+          python3 tools/qualify_server_providers.py verify-apk --providers out/providers \
+            --dependency-provider out/dependency-provider --apk app/build/outputs/apk/debug/app-debug.apk \
+            > out/provider-logs/apk-verification.log 2>&1
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          from tools import package_server_engine as engine
+          target=Path('out/provider-evidence')
+          references={name:json.loads((target/('java-'+name+'.json')).read_text())
+              for name in ('dependencies','programs','extractors','content')}
+          for value in references.values():
+              assert value['scope']=='host-java-exact-server-archive-install-and-cached-reuse'
+              assert value['cachedCopiedBytes']==0 and value['cachedArchiveRequired'] is False
+              assert value['androidRuntimeQualified'] is False and value['gameplayQualified'] is False
+          apk=json.loads(Path('out/providers/apk-verification.json').read_text())
+          engine.put_metadata(target/'qualification.json',dict(formatVersion=1,
+              scope='host-java-and-apk-byte-only-stock-server-provider-qualification',
+              integrationRevision=os.environ['GITHUB_SHA'],javaMaximumHeapBytes=32*1024**2,
+              actualArchiveInstallAndCachedReuse=references,apkVerification=apk,
+              androidInstrumentationExecuted=False,androidGuestExecuted=False,
+              serverProgramsExecuted=False,sqlExecuted=False,androidRuntimeQualified=False,gameplayQualified=False))
+          PY
+      - name: Collect typed proof and bounded diagnostics even after a failed gate
+        if: always()
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import shutil
+          target=Path('out/provider-evidence');target.mkdir(parents=True,exist_ok=True)
+          for name in ('out/provider-inputs/acquisition.json','out/providers/provider-build.json',
+                       'out/providers/apk-verification.json'):
+              path=Path(name)
+              if path.is_file() and path.stat().st_size<=16*1024**2:shutil.copyfile(path,target/path.name)
+          for path in Path('out/provider-logs').glob('*.log'):
+              if not path.is_file():continue
+              with path.open('rb') as stream:
+                  stream.seek(max(0,path.stat().st_size-256*1024))
+                  (target/(path.stem+'-tail.log')).write_bytes(stream.read(256*1024))
+          PY
+      - name: Retain verified program corresponding sources and paired debug files outside APK assets
+        if: always() && steps.providers.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: stock-server-programs-source-debug-${{ github.sha }}
+          path: out/providers/programs/sources/
+          include-hidden-files: true
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+      - name: Retain verified stock extractor corresponding sources and paired debug files outside APK assets
+        if: always() && steps.providers.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: stock-server-extractors-source-debug-${{ github.sha }}
+          path: out/providers/extractors/sources/
+          include-hidden-files: true
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+      - name: Retain the unqualified installation profile APK and verified provider assets
+        if: always() && steps.verified.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: unqualified-four-server-component-install-profile-${{ github.sha }}
+          path: |
+            app/build/outputs/apk/debug/app-debug.apk
+            app/build/outputs/apk/androidTest/debug/*.apk
+            out/dependency-provider/assets/
+            out/providers/programs/assets/
+            out/providers/extractors/assets/
+            out/providers/content/assets/
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+      - name: Retain bounded provider qualification evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: stock-server-provider-qualification-evidence-${{ github.sha }}
+          path: out/provider-evidence/
+          retention-days: 30
+          if-no-files-found: error
