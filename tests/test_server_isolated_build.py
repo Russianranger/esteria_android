@@ -134,10 +134,11 @@ class ExactSourcePreparation(unittest.TestCase):
                 name = pin['sourceInputs'][field]['file']
                 shutil.copyfile(retained / 'source-inputs' / name, root / 'source-inputs' / name)
             shutil.copytree(retained / 'original-build-environment', root / 'environment')
+            shutil.copytree(retained/'supplements',root/'supplements')
             (root / 'acquisition.json').write_bytes(isolated.engine.canonical(dict(formatVersion=1,
                 scope='isolated-source-build-inputs-acquired', inputLock=isolated.files.identity(isolated.inputs.LOCK))))
             receipt, _, manifest = isolated.verify_prepared(prepared, root)
-            self.assertEqual(receipt['selectedSourceFiles'], 4942)
+            self.assertEqual(receipt['selectedSourceFiles'], 4943)
             self.assertEqual(len(manifest['compilerCoverage']['observedServerSources']), 2199)
             self.assertEqual(len(manifest['compilerCoverage']['observedServerIncludeDirectories']), 340)
             self.assertFalse(receipt['sourceCompanionComplete'])

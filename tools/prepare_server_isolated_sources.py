@@ -22,6 +22,7 @@ if not __package__:
 from tools import fetch_sources, manifest_server_content as content, manifest_server_modules as modules
 from tools import package_server_content as package, package_server_engine_source_inputs as inputs
 from tools import prepare_runtime as archives, verify_server_build as files
+from tools import prepare_server_isolated_build as build_inputs
 
 ROOT = Path(__file__).resolve().parents[1]
 CURRENT_LOCK = ROOT / 'sources.lock.json'
@@ -278,7 +279,23 @@ endif()
                 buildMetadataAdaptations=changed, semanticPatchSetChanged=False, fabricatedGitMetadata=False)
 
 
-def prepare(source_inputs, output):
+def add_supplements(stage, directory, manifest):
+    expected=build_inputs.load_pin()['sourceSupplements']
+    directory=archives.directory(Path(os.path.abspath(directory)))
+    require({p.relative_to(directory).as_posix() for p in files.installed_files(directory)}==set(expected),
+            'isolated-source-supplement-file-set')
+    for name,row in expected.items():
+        require(row['sourceCommit']==manifest['source']['commit'] and name.endswith('.h'),
+                'isolated-source-supplement-source')
+        source=directory/name;check_blob(source,row)
+        require(not os.path.lexists(stage/'source'/name),'isolated-source-supplement-overwrite')
+        raw=source.read_bytes()
+        write_new(stage/'source'/name,raw)
+        write_new(stage/'provenance/source-supplements'/name,raw,0o444)
+    return expected
+
+
+def prepare(source_inputs, output, supplements=None):
     source_inputs = archives.directory(Path(os.path.abspath(source_inputs)))
     output = Path(os.path.abspath(output)); archives.directory(output.parent, create=True)
     require(not os.path.lexists(output) and source_inputs not in output.parents and output not in source_inputs.parents,
@@ -297,6 +314,7 @@ def prepare(source_inputs, output):
         extract_verified(archive, receipt['archiveFiles'], stage)
         manifest, build, counts, selected = validate_tree(stage, receipt)
         patches = replay_patches(stage, manifest, selected)
+        supplemental=add_supplements(stage,supplements,manifest) if supplements is not None else {}
         lua = extract_lua(stage); revision = adapt_revision(stage, build)
         require(files.identity(source_inputs / 'source-inputs-receipt.json') == receipt_identity and
                 files.identity(archive) == archive_identity, 'isolated-source-input-changed-during-preparation')
@@ -304,7 +322,7 @@ def prepare(source_inputs, output):
             sourceInputReceipt=receipt_identity, sourceInputArchive=archive_identity, sourceManifest=receipt['manifest'],
             sourceLock=manifest['sourceLock'], originalBuild=manifest['originalBuild'],
             originalCompiledModules=manifest['originalCompiledModules'], compileCommands=manifest['compileCommands'],
-            pristineInputCounts=counts, selectedSourceFiles=len(selected),
+            pristineInputCounts=counts, selectedSourceFiles=len(selected)+len(supplemental),sourceSupplements=supplemental,
             observedSourceFiles=len(manifest['compilerCoverage']['observedServerSources']),
             observedIncludeDirectories=len(manifest['compilerCoverage']['observedServerIncludeDirectories']),
             semanticPatchReplay=patches, originalLua=lua, archivalRevision=revision,
@@ -323,8 +341,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source-inputs', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--supplements',type=Path)
     args = parser.parse_args()
-    print(json.dumps(prepare(args.source_inputs, args.output), indent=2))
+    print(json.dumps(prepare(args.source_inputs, args.output,args.supplements), indent=2))
 
 
 if __name__ == '__main__': main()

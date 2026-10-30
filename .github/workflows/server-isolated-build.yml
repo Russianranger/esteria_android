@@ -49,6 +49,7 @@ jobs:
       - name: Replay exactly seven patches in the plain exported source tree
         run: |
           python3 tools/prepare_server_isolated_sources.py --source-inputs out/isolated-inputs/source-inputs \
+            --supplements out/isolated-inputs/supplements \
             --output out/isolated-tree > out/isolated-evidence/source-preparation.json
           test ! -e out/isolated-tree/source/.git
           test ! -e out/isolated-tree/source/Harvested

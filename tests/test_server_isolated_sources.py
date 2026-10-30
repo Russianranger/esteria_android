@@ -160,4 +160,21 @@ class OriginalLuaAndArchivalMetadata(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'version-output-required'):isolated.archival_revision(build)
 
 
+class SourceSupplement(unittest.TestCase):
+    def test_exact_same_commit_header_added_and_mutation_or_overwrite_refused(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);stage=root/'stage';stage.mkdir();source=root/'supplements/modules/ModulesScriptLoader.h'
+            source.parent.mkdir(parents=True);source.write_bytes(b'// original header fixture\n')
+            row=isolated.inputs.local_identity(source);row['sourceCommit']='a'*40
+            pin={'sourceSupplements':{'modules/ModulesScriptLoader.h':row}}
+            manifest={'source':{'commit':'a'*40}}
+            with patch.object(isolated.build_inputs,'load_pin',return_value=pin):
+                result=isolated.add_supplements(stage,root/'supplements',manifest)
+                self.assertEqual(result,pin['sourceSupplements'])
+                self.assertEqual((stage/'source/modules/ModulesScriptLoader.h').read_bytes(),source.read_bytes())
+                with self.assertRaisesRegex(ValueError,'overwrite'):isolated.add_supplements(stage,root/'supplements',manifest)
+                source.write_bytes(b'changed')
+                with self.assertRaisesRegex(ValueError,'git-blob-mismatch'):isolated.add_supplements(stage,root/'supplements',manifest)
+
+
 if __name__=='__main__':unittest.main()

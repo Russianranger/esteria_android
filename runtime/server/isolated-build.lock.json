@@ -162,5 +162,16 @@
   "sourceCompanionComplete": false,
   "isolatedSourceRebuildQualified": false,
   "androidRuntimeQualified": false,
-  "gameplayQualified": false
+  "gameplayQualified": false,
+  "sourceSupplements": {
+    "modules/ModulesScriptLoader.h": {
+      "bytes": 850,
+      "sha256": "cee2616d8f99a84111b5c2380946c316623b418fa615836b5afac8c235a4efb3",
+      "gitBlob": "ec59e9b309673d1cfd50d62e8d3f1d4485a851ea",
+      "gitMode": "100644",
+      "sourceCommit": "f35f04d01689f034778e3474b3c820092f51e461",
+      "url": "https://raw.githubusercontent.com/Russianranger/EsteriaWoW/f35f04d01689f034778e3474b3c820092f51e461/modules/ModulesScriptLoader.h",
+      "reason": "Observed isolated CMake target requires this root modules header; omitted by original partial source selection"
+    }
+  }
 }

@@ -48,6 +48,13 @@ def load_pin():
             relevant.get('libstdc++-13-dev:arm64') and relevant.get('libmysqlclient-dev') and
             relevant.get('binutils') and 'nodejs' not in relevant and 'ccache' not in relevant,
             'isolated-relevant-build-package-selection')
+    require(set(pin.get('sourceSupplements',{}))=={'modules/ModulesScriptLoader.h'},'isolated-source-supplement-set')
+    for name,row in pin['sourceSupplements'].items():
+        require(row.get('sourceCommit')==json.loads((ROOT/'sources.lock.json').read_text())['sources']['server']['commit'] and
+                row.get('url')=='https://raw.githubusercontent.com/Russianranger/EsteriaWoW/'+row['sourceCommit']+'/'+name and
+                row.get('gitMode')=='100644' and re.fullmatch('[0-9a-f]{40}',row.get('gitBlob','')) and
+                type(row.get('bytes')) is int and 0<row['bytes']<=256*1024 and
+                re.fullmatch('[0-9a-f]{64}',row.get('sha256','')),'isolated-source-supplement-pin')
     return pin
 
 
@@ -89,6 +96,16 @@ def acquire(output, api=None):
                 for name, identity in row['files'].items():
                     copy_member(archive,members,name,output/'environment'/name,identity)
         target.unlink()
+    for name,row in pin['sourceSupplements'].items():
+        cache=output/'supplement-cache'
+        source=archives.fetch(dict(row,file=Path(name).name),cache)
+        target=output/'supplements'/name;target.parent.mkdir(parents=True,exist_ok=True,mode=0o700)
+        with files.plain_file(source) as incoming,target.open('xb') as copied:
+            shutil.copyfileobj(incoming,copied,128*1024)
+        raw=target.read_bytes()
+        require(hashlib.sha1(('blob '+str(len(raw))+'\0').encode()+raw).hexdigest()==row['gitBlob'],
+                'isolated-source-supplement-git-blob')
+        target.chmod(0o444)
     expected = json.loads((output/'environment/cache-environment.json').read_text())
     require(canonical_hash(expected) == pin['originalBuildEnvironment']['canonicalEnvironmentSha256'] and
             expected['compiler_sha256'] == pin['originalBuildEnvironment']['compilerSha256'],
@@ -96,6 +113,7 @@ def acquire(output, api=None):
     receipt = dict(formatVersion=1,scope='isolated-source-build-inputs-acquired',
         inputLock=files.identity(LOCK),sourceArtifact=pin['sourceInputs']['artifact'],
         originalEnvironmentArtifact=pin['originalBuildEnvironment']['artifact'],
+        sourceSupplements=pin['sourceSupplements'],
         originalEnvironmentFingerprint=canonical_hash(expected), sourceRepositoryFetched=False,
         assetTreesFetched=False,sourceCompanionComplete=False,isolatedSourceRebuildQualified=False,
         androidRuntimeQualified=False,gameplayQualified=False)

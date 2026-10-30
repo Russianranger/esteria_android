@@ -143,6 +143,12 @@ def verify_prepared(prepared, acquired):
     expected.update({engine.content.ELUNA + '/' + name: row for name, row in manifest['pristineGitFiles']['eluna'].items()})
     for row in manifest['adaptedFiles']: expected[row['path']] = row['adapted']
     for row in archival['buildMetadataAdaptations']: expected[row['path']] = row['prepared']
+    require(receipt.get('sourceSupplements')==pin['sourceSupplements'],'isolated-source-supplement-receipt-mismatch')
+    for name,row in pin['sourceSupplements'].items():
+        require(row['sourceCommit']==manifest['source']['commit'],'isolated-source-supplement-commit-mismatch')
+        for path in (acquired/'supplements'/name,prepared/'provenance/source-supplements'/name):
+            preparation.check_blob(path,row)
+        expected[name]=row
     for root, rows in ((prepared / 'source', expected), (prepared / 'integration', manifest['pristineGitFiles']['integration'])):
         actual = {path.relative_to(root).as_posix() for path in files.installed_files(root)}
         require(actual == set(rows), 'isolated-prepared-tree-file-set-changed')
@@ -238,6 +244,8 @@ def collect_source_files(prepared, acquired, output, protocol_manifest, proof):
         add('inputs/source-inputs/' + path.name, path)
     for path in files.installed_files(acquired / 'environment'):
         add('inputs/environment/' + path.name, path)
+    for path in files.installed_files(acquired/'supplements'):
+        add('inputs/supplements/'+path.relative_to(acquired/'supplements').as_posix(),path)
     add('inputs/acquisition.json', acquired / 'acquisition.json')
     add('recipes/runtime/server/isolated-build.lock.json', inputs.LOCK)
     add('recipes/.github/workflows/server-isolated-build.yml', WORKFLOW)
@@ -377,6 +385,7 @@ def qualify(prepared, acquired, protocol_manifest, output):
             scope='offline-native-arm64-source-rebuild-recipe', workingDirectory='archive-root',
             originalSourceInputsRetained='inputs/source-inputs', sourcePreparationCommand=[
                 'python3', 'recipes/tools/prepare_server_isolated_sources.py', '--source-inputs', 'inputs/source-inputs',
+                '--supplements','inputs/supplements',
                 '--output', 'prepared'], buildCommand=['python3', 'recipes/tools/qualify_server_isolated_build.py',
                 '--prepared', 'prepared', '--inputs', 'inputs', '--protocol-manifest', 'protocol/limits.json', '--output', 'rebuild'],
             requiresNativeLinuxArm64=True, requiresLoopbackOnlyNetworkNamespace=True,
