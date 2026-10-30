@@ -122,6 +122,21 @@ def typed_success(value, exit_code):
             'schemaLedgerPreserved','cleanShutdownVerified','privateKeyRemoved','logsComplete')))
 
 
+def failure_locations(error):
+    """Fixed owned-module labels/functions/lines only; never exception text."""
+    allowed={str(Path(module.__file__).resolve()):label for module,label in (
+        (db,'mysql-bootstrap'),(base,'base-sql'),(importer,'compiled-updater'),(server,'authserver'))}
+    allowed[str(Path(__file__).resolve())]='client-auth'
+    result=[]; current=error.__traceback__; count=0
+    while current is not None and count<64:
+        count+=1; code=current.tb_frame.f_code
+        label=allowed.get(str(Path(code.co_filename).resolve()))
+        if label and re.fullmatch('[A-Za-z_][A-Za-z0-9_]{0,63}',code.co_name):
+            result.append(label+'/'+code.co_name+':'+str(current.tb_lineno))
+        current=current.tb_next
+    return result[-8:]
+
+
 def worker(plan_path):
     require(os.getpid()==1 and os.geteuid()==0 and os.environ.get('ESTERIA_AUTH_NAMESPACE')=='1',
             'authentication-worker-requires-owned-pid-namespace')
@@ -215,6 +230,7 @@ def worker(plan_path):
         result['phase']='controlled-shutdown'
     except BaseException as error:
         failed=True;result['failureType']=type(error).__name__ # Never export exception text containing SQL or credentials.
+        result['failureLocations']=failure_locations(error)
     finally:
         cleanup=[]
         if wine_started:

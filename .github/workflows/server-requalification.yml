@@ -8,6 +8,13 @@ on:
       - runtime/server/compiled-reference.lock.json
       - tools/qualify_dbimport.py
       - tools/initialize_server_schema.py
+      - runtime/server_schema_baseline.py
+      - runtime/server_schema_adaptations.py
+      - runtime/server/appearance-schema-v1.sql
+      - runtime/server/appearance-schema.lock.json
+      - tools/qualify_appearance_schema.py
+      - tests/test_server_schema_adaptations.py
+      - tests/test_appearance_schema_qualification.py
       - tests/test_server_schema_baseline.py
       - tools/qualify_authserver.py
       - tools/auth_protocol.py
@@ -44,6 +51,13 @@ on:
       - runtime/server/compiled-reference.lock.json
       - tools/qualify_dbimport.py
       - tools/initialize_server_schema.py
+      - runtime/server_schema_baseline.py
+      - runtime/server_schema_adaptations.py
+      - runtime/server/appearance-schema-v1.sql
+      - runtime/server/appearance-schema.lock.json
+      - tools/qualify_appearance_schema.py
+      - tests/test_server_schema_adaptations.py
+      - tests/test_appearance_schema_qualification.py
       - tests/test_server_schema_baseline.py
       - tools/qualify_authserver.py
       - tools/auth_protocol.py
@@ -89,7 +103,7 @@ jobs:
       - name: Verify staging, source packaging and process ownership guards
         run: |
           test "$(uname -m)" = aarch64
-          python3 -m unittest tests.test_server_requalification tests.test_server_package tests.test_dbimport_qualification tests.test_server_schema_baseline tests.test_owned_process_group tests.test_server_dependency_image tests.test_server_dependency_image_readback -v
+          python3 -m unittest tests.test_server_requalification tests.test_server_package tests.test_dbimport_qualification tests.test_server_schema_baseline tests.test_server_schema_adaptations tests.test_appearance_schema_qualification tests.test_owned_process_group tests.test_server_dependency_image tests.test_server_dependency_image_readback -v
           mkdir -p out/server-requalification-evidence out/server-requalification-private
       - name: Fetch exact linked artifacts and repack their original source content
         env:
@@ -139,6 +153,21 @@ jobs:
               output.write('ESTERIA_SERVER_REFERENCE_VERSION=' + runtime['expectedMysqlSqlVersion'] + '\n')
               output.write('ESTERIA_SERVER_REFERENCE_CONTENT=' + hashlib.sha256((root/'content/package-receipt.json').read_bytes()).hexdigest() + '\n')
           PY_IMAGE
+      - name: Qualify separate appearance binary storage and clean restart
+        run: |
+          mkdir -p out/server-appearance-private
+          docker run --rm --init --network none \
+            --env PYTHONDONTWRITEBYTECODE=1 \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/server-appearance-private,dst=/appearance-state" \
+            --workdir /qualification esteria-server-reference:qualification \
+            python3 tools/qualify_appearance_schema.py \
+            --content /qualification/out/server-reference/content \
+            --content-receipt-sha256 "$ESTERIA_SERVER_REFERENCE_CONTENT" \
+            --lock /qualification/out/server-reference/locked/sources.lock.json \
+            --mysql /usr/bin/mysql --mysqld /usr/sbin/mysqld \
+            --expected-version "$ESTERIA_SERVER_REFERENCE_VERSION" --output /appearance-state/run \
+            > out/server-requalification-evidence/appearance-storage.log 2>&1
       - name: Run real compiled updater and authentication against fresh owned state
         run: |
           docker run --rm --init --network none \
@@ -162,6 +191,10 @@ jobs:
           import hashlib, json, os, pathlib, shutil
           source = pathlib.Path('out/server-requalification-private/run')
           target = pathlib.Path('out/server-requalification-evidence'); target.mkdir(parents=True, exist_ok=True)
+          appearance = pathlib.Path('out/server-appearance-private/run/appearance-qualification.json')
+          if appearance.is_file():
+              if appearance.stat().st_size > 1048576: raise ValueError('appearance public receipt bound')
+              shutil.copyfile(appearance, target/appearance.name)
           for name in ['qualification.json', 'auth-qualification.json', 'dbimport-first.log', 'dbimport-second.log',
                        'authserver-redacted.log', 'mysql-initialize-engine.log', 'mysql-bootstrap-engine.log',
                        'mysql-base-engine.log', 'mysql-base-restart-engine.log']:

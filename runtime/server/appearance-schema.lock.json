@@ -1,0 +1,193 @@
+{
+  "adaptationId": "character-appearance-empty-v1",
+  "analogyBindings": {
+    "data/sql/updates/pending_db_characters/rev_20261023233000000_character_form_look.sql": {
+      "bytes": 496,
+      "gitBlob": "09574881e7769aceeabac48c0254952265ff74a6",
+      "sha256": "47b855551301348bb22eb7fd7969a63d13fea849d36fa45a01a16303ec97b4d9"
+    }
+  },
+  "canonicalOriginal": false,
+  "choices": {
+    "binaryStorage": "Fixed BINARY matches exact C++ read size; alternative binary types are not recovered canonical DDL.",
+    "charset": "utf8mb4_unicode_ci retained as canonical form-table style; binary data has no text semantics.",
+    "defaults": "None inferred.",
+    "engine": "InnoDB preserves caller transaction behavior; analogous canonical form table uses InnoDB.",
+    "foreignKeys": "None inferred; source explicitly deletes appearance rows.",
+    "primaryKey": "One row per character guid; primary key chosen explicitly.",
+    "seedRows": "None.",
+    "updaterLedger": "Never written by this adaptation."
+  },
+  "formatVersion": 1,
+  "qualification": {
+    "androidRuntimeQualified": false,
+    "existingSaveUpgradesQualified": false,
+    "gameplayQualified": false,
+    "hostGuardsOnly": true,
+    "nativeMysqlExecutionQualified": false,
+    "preparedStatementsQualified": false,
+    "worldserverQualified": false
+  },
+  "runtimeRequirements": {
+    "allFourDatabasesFreshBeforeBaseline": true,
+    "canonicalUpdaterStillRequired": true,
+    "cppCheckoutRequired": false,
+    "gitRequired": false,
+    "originalSourceSqlModified": false,
+    "rowsCreated": 0,
+    "tablesAbsentBeforeAdaptation": true
+  },
+  "scope": "source-derived-empty-character-appearance-schema",
+  "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
+  "sourceBindings": {
+    "src/server/database/Database/Field.cpp": {
+      "bytes": 9784,
+      "gitBlob": "b60f20d8af914ebfa15d691cb95aab4a3aec918e",
+      "sha256": "787d3c2f40ff705c9fe06d120d35137e413e07be95b975f10d897384e3c25302"
+    },
+    "src/server/database/Database/Implementation/CharacterDatabase.cpp": {
+      "bytes": 92598,
+      "gitBlob": "773c95fd756a0da7f6612a3c656cb53b3145a77c",
+      "sha256": "45755c532fac889be7d437516ce3c38d11e69c09b985e880865fd2a697fb4751"
+    },
+    "src/server/database/Database/MySQLPreparedStatement.cpp": {
+      "bytes": 7130,
+      "gitBlob": "e2c35034afdad782fe2dff5996c683eacab9988b",
+      "sha256": "4cc5942e262324922937d47ddc304b9c3f391662fd752b8c20c8d2467a35a0b3"
+    },
+    "src/server/game/Entities/Object/ObjectGuid.h": {
+      "bytes": 13987,
+      "gitBlob": "a32bb2fc9e75f11921771aa46e25477dd75c5820",
+      "sha256": "045a25328991531906fef89d46fdb44cdb297fd303a0c5e3de3e8b0f887c2825"
+    },
+    "src/server/game/Entities/Player/Player.cpp": {
+      "bytes": 629592,
+      "gitBlob": "fa63d42e9f374289db7ef066f3ebbb2aa192a5bd",
+      "sha256": "f798d0ab33f70f80771edc0d277a7396c7f5f480d4a52517a56027296ace85c3"
+    },
+    "src/server/game/Entities/Player/PlayerMisc.cpp": {
+      "bytes": 21160,
+      "gitBlob": "919df3fc218c6a050307f3ef69e4b605f3ce52ff",
+      "sha256": "993680ac8dc380d8e33e521cbba54dabdfc58f195304c6ba6216eef8eb3e9ea4"
+    },
+    "src/server/game/Handlers/CharacterHandler.cpp": {
+      "bytes": 126131,
+      "gitBlob": "cacd64b465c386355dc9ea9b0025c625b9d3c7bd",
+      "sha256": "38d4843a585ee3e792508c5407651aaa5ea1b2aa867fe4defb44faa66fbf037b"
+    },
+    "src/server/shared/BodyShapeWire.h": {
+      "bytes": 4724,
+      "gitBlob": "1ac31b47b84af6d65866340122a5abaa993a951d",
+      "sha256": "3fc3b8c9090ef9584f9e4cda2995d3179c9f0bd8439478331aec8dc387e03cfe"
+    },
+    "src/server/shared/RetailLookWire.h": {
+      "bytes": 5382,
+      "gitBlob": "b60883e3b4b721ce8cd1aa190dfe154ebaa98ce3",
+      "sha256": "be1364eddcba0c1b1c4bb16461fddb07c697d718e60830e7efef37a8b8cdc68c"
+    }
+  },
+  "sourceDerived": true,
+  "sql": {
+    "identity": {
+      "bytes": 790,
+      "sha256": "8e35e8e41d74979eaa98f6f2d824d831b73f63a4a6b2f573b869484b2ff15d46"
+    },
+    "path": "runtime/server/appearance-schema-v1.sql"
+  },
+  "supportedSourceSelections": {
+    "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1": {
+      "branch": "main",
+      "commit": "f35f04d01689f034778e3474b3c820092f51e461",
+      "patches": [
+        {
+          "path": "patches/server/0001-eluna-declare-area-trigger.patch",
+          "sha256": "c26b145188c5f97bf30d032e1fe3bd7fe17aa1f8f0daa6793e51f5d830fe7aa6",
+          "submodule": "src/server/game/LuaEngine"
+        },
+        {
+          "path": "patches/server/0002-eluna-include-map-manager.patch",
+          "sha256": "4e277dbe56c31ae30640c8e9ad4dee12e944e0f051d9bdc8d62aaa239c50433f",
+          "submodule": "src/server/game/LuaEngine"
+        },
+        {
+          "path": "patches/server/0003-eluna-hooks-include-types.patch",
+          "sha256": "5999402d985fcc709abdc90bb4272072d1d5e3e261b2cc7ec19460320c14295f",
+          "submodule": "src/server/game/LuaEngine"
+        },
+        {
+          "path": "patches/server/0004-attunement-stat-api.patch",
+          "sha256": "d9ef6ca8f96ab186c37c072b22143cdded9976aa3a62d083f893c502a5745cb8"
+        },
+        {
+          "path": "patches/server/0005-script-grid-templates.patch",
+          "sha256": "6b459c90839e7831df8533966442fabd476ae1773f0302c50ccc8a997f157369"
+        },
+        {
+          "path": "patches/server/0006-empty-script-modules.patch",
+          "sha256": "ea0beb357c71d8b8c187af9d4afede520e7ac9877e40fbdc5fab99d54fc21f97"
+        },
+        {
+          "path": "patches/server/0007-runtime-module-config-directory.patch",
+          "sha256": "5e41d474179ef553ec9c2544de947a3724885fd7f3ac233af3d89797acd032ff"
+        }
+      ],
+      "submodules": {
+        "src/server/game/LuaEngine": "58d7652138887783228b9727bd1fa4e08f00342b"
+      },
+      "url": "https://github.com/Russianranger/EsteriaWoW.git"
+    },
+    "dbbf8983cfa2b429f7dd0c3308a2795ffbecd29e8019adf35348447e1eab41b0": {
+      "branch": "main",
+      "commit": "f35f04d01689f034778e3474b3c820092f51e461",
+      "patches": [
+        {
+          "path": "patches/server/0001-eluna-declare-area-trigger.patch",
+          "sha256": "c26b145188c5f97bf30d032e1fe3bd7fe17aa1f8f0daa6793e51f5d830fe7aa6",
+          "submodule": "src/server/game/LuaEngine"
+        },
+        {
+          "path": "patches/server/0002-eluna-include-map-manager.patch",
+          "sha256": "4e277dbe56c31ae30640c8e9ad4dee12e944e0f051d9bdc8d62aaa239c50433f",
+          "submodule": "src/server/game/LuaEngine"
+        },
+        {
+          "path": "patches/server/0003-eluna-hooks-include-types.patch",
+          "sha256": "5999402d985fcc709abdc90bb4272072d1d5e3e261b2cc7ec19460320c14295f",
+          "submodule": "src/server/game/LuaEngine"
+        },
+        {
+          "path": "patches/server/0004-attunement-stat-api.patch",
+          "sha256": "d9ef6ca8f96ab186c37c072b22143cdded9976aa3a62d083f893c502a5745cb8"
+        },
+        {
+          "path": "patches/server/0005-script-grid-templates.patch",
+          "sha256": "6b459c90839e7831df8533966442fabd476ae1773f0302c50ccc8a997f157369"
+        },
+        {
+          "path": "patches/server/0006-empty-script-modules.patch",
+          "sha256": "ea0beb357c71d8b8c187af9d4afede520e7ac9877e40fbdc5fab99d54fc21f97"
+        }
+      ],
+      "submodules": {
+        "src/server/game/LuaEngine": "58d7652138887783228b9727bd1fa4e08f00342b"
+      },
+      "url": "https://github.com/Russianranger/EsteriaWoW.git"
+    }
+  },
+  "tables": {
+    "character_body_shape": {
+      "data": "BINARY(49) NOT NULL",
+      "guid": "INT UNSIGNED NOT NULL",
+      "primaryKey": [
+        "guid"
+      ]
+    },
+    "character_retail_look": {
+      "data": "BINARY(132) NOT NULL",
+      "guid": "INT UNSIGNED NOT NULL",
+      "primaryKey": [
+        "guid"
+      ]
+    }
+  }
+}

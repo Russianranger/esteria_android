@@ -42,6 +42,7 @@ except ImportError:
     from owned_process_group import OwnedGroup
 from runtime import mysql_bootstrap as db
 from runtime import provision_local_realm as realm
+from runtime import server_schema_adaptations as adaptations
 
 require = base.content.require
 DATABASES = ('auth', 'characters', 'world')
@@ -314,6 +315,9 @@ def run(install, content_directory, receipt_sha256, lock_path, mysql, mysqld, ve
     capture = None
     try:
         receipt, manifest, compiled = unpack_content(content_directory, receipt_sha256, lock_path, output / 'content')
+        # Validate the separate integration SQL/audit contract before starting
+        # an engine. Original packaged SQL and ledger expectations stay exact.
+        adaptations.prepare(manifest)
         build, template, programs, derivative = select_install(install, compiled, lock_path, engine_derivative_receipt)
         if derivative is not None:
             evidence['engineDerivative'] = derivative
@@ -332,9 +336,10 @@ def run(install, content_directory, receipt_sha256, lock_path, mysql, mysqld, ve
                 require(connection.query("SELECT GET_LOCK('esteria-local-bootstrap',0)") == ['1'],
                         'another operation owns fixture instance')
                 base.empty_databases(connection)
-                evidence['sourceBaseline'] = baseline.initialize(connection, source, manifest,
+                evidence['sourceBaseline'] = adaptations.initialize(connection, source, manifest,
                     lambda database, sql: base.apply_base(mysql, options, 'acore_' + database,
-                                                          sql, state / 'logs/sql-client.log'))
+                                                          sql, state / 'logs/sql-client.log'),
+                    baseline_initializer=baseline.initialize)
                 evidence['compiledUpdaterAttempted'] = True
                 require(files.identity(install / 'bin/dbimport') == programs['dbimport'],
                         'selected dbimport identity changed before execution')

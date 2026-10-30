@@ -19,6 +19,10 @@ on:
       - tools/prepare_server_requalification.py
       - tools/qualify_dbimport.py
       - tools/initialize_server_schema.py
+      - runtime/server_schema_baseline.py
+      - runtime/server_schema_adaptations.py
+      - runtime/server/appearance-schema-v1.sql
+      - runtime/server/appearance-schema.lock.json
       - tests/test_server_schema_baseline.py
       - tools/qualify_authserver.py
       - tools/owned_process_group.py

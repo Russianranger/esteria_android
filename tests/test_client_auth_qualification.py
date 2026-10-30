@@ -11,6 +11,15 @@ from tools import qualify_client_auth as qualifier
 
 
 class ClientAuthQualification(unittest.TestCase):
+    def test_worker_failure_locations_never_export_error_text_or_unowned_frames(self):
+        try:
+            qualifier.prepare_client(Path('/unused'),Path('/unused'),'invalid','private-secret',1,Path('/unused'))
+        except Exception as error:
+            locations=qualifier.failure_locations(error)
+        self.assertTrue(locations)
+        self.assertTrue(all(location.startswith('client-auth/') for location in locations))
+        self.assertNotIn('private-secret',json.dumps(locations));self.assertNotIn('test_',json.dumps(locations))
+
     def test_readonly_source_verification_uses_exact_trust_and_no_index_writes(self):
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary); revision='a'*40
