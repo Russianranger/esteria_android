@@ -12,6 +12,19 @@ The full payload readback and this separate source composition remain the x64
 workflow's responsibility; the native receipt still has
 `sourceCompanionComplete=false`.
 
+Source-only run `41097592284` at `2ca73e3f07b515549c170a6fb0978fb091909ab5`
+subsequently passed composition and retention. The exact 64,983,534-byte artifact
+ZIP and all 5,675 source archive members (240,249,815 expanded bytes) received
+independent full readback. The archive is 63,802,409 bytes with SHA-256
+`5fb68b3d204a50c6573857a63192aeff3c92733def9ec69348998624b5571786`;
+its separate 1,180,783-byte receipt has SHA-256
+`1cbf3a0d25980a3a4785ce7ee50a6de061b6d20875d364a4ae3c8d3c43656149`.
+`runtime/evidence/server-ordered-sources-retained-41097592284.json` records this
+readback. The measured native input lock remains unchanged. The existing data
+tools provider lock now carries these source-output identities in the
+`source-sealed-pending-derived-native-cli` state; unmeasured runtime and pair
+fields remain null, and production provider creation is still refused.
+
 ```sh
 python3 tools/seal_ordered_extractor_sources.py \
   --ordered-payload out/ordered-inputs/payload \

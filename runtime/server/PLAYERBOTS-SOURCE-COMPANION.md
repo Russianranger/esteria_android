@@ -51,8 +51,11 @@ python3 tools/seal_playerbots_helper_sources.py \
   --candidate source-inputs/candidate \
   --original-sealed source-inputs/original/sealed \
   --integration-git-root . \
-  --output playerbots-helper-sources
+  --output ../playerbots-helper-sources
 ```
+
+The new output must be outside the read-only integration checkout and every
+input tree. CI uses a fresh directory below the runner's separate temporary root.
 
 The host integration repository must already contain the exact initial-helper
 and native-observation recipe commits, plus the current sealing commit. A CI

@@ -1,5 +1,22 @@
 {
-  "actualOrderedSourceQualification": null,
+  "actualOrderedSourceQualification": {
+    "archive": {
+      "bytes": 63802409,
+      "sha256": "5fb68b3d204a50c6573857a63192aeff3c92733def9ec69348998624b5571786"
+    },
+    "dependencyObservation": {
+      "bytes": 3571508,
+      "sha256": "229eea9562dd96230e7d8581b4faa4c03cadac9dcf89f2191fe25b226752927e"
+    },
+    "nativeBuild": {
+      "bytes": 35935,
+      "sha256": "be05f185c75d20bbcc79374ff4df5f1fa79e90252a9cafd532f4084ebaa60edf"
+    },
+    "receipt": {
+      "bytes": 1180783,
+      "sha256": "1cbf3a0d25980a3a4785ce7ee50a6de061b6d20875d364a4ae3c8d3c43656149"
+    }
+  },
   "androidRuntimeQualified": false,
   "appSourceLock": {
     "bytes": 2170,
@@ -23,6 +40,26 @@
   "guestMount": "/esteria-server-extractors",
   "nativeArgumentConfigQualified": false,
   "nativeCliReceipt": null,
+  "orderedSourceArtifact": {
+    "bytes": 64983534,
+    "id": 12995999246,
+    "integrationRevision": "2ca73e3f07b515549c170a6fb0978fb091909ab5",
+    "job": 124207264042,
+    "members": {
+      "ordered-extractor-complete-sources.tar.gz": {
+        "bytes": 63802409,
+        "sha256": "5fb68b3d204a50c6573857a63192aeff3c92733def9ec69348998624b5571786",
+        "target": "ordered-sources/ordered-extractor-complete-sources.tar.gz"
+      },
+      "ordered-source-receipt.json": {
+        "bytes": 1180783,
+        "sha256": "1cbf3a0d25980a3a4785ce7ee50a6de061b6d20875d364a4ae3c8d3c43656149",
+        "target": "ordered-sources/ordered-source-receipt.json"
+      }
+    },
+    "sha256": "ccd1565e069144d3e67403c4c90cc1c212e683d51e0eb01cc0b973657b08d245",
+    "workflowRun": 41097592284
+  },
   "originalNoticesPreserved": false,
   "originalServerSourceQualification": {
     "archive": {
@@ -107,7 +144,7 @@
     },
     "url": "https://github.com/Russianranger/EsteriaWoW.git"
   },
-  "sourceCompanionComplete": false,
-  "state": "pending-ordered-source-and-derived-native-cli",
+  "sourceCompanionComplete": true,
+  "state": "source-sealed-pending-derived-native-cli",
   "toolSelection": null
 }

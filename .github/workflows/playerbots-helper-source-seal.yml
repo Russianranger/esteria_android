@@ -65,17 +65,18 @@ jobs:
             --candidate "$GITHUB_WORKSPACE/out/playerbots-source-seal-inputs/candidate" \
             --original-sealed "$GITHUB_WORKSPACE/out/playerbots-source-seal-inputs/original/sealed" \
             --integration-git-root "$GITHUB_WORKSPACE" \
-            --output "$GITHUB_WORKSPACE/out/playerbots-helper-source-sealed" \
+            --output "$RUNNER_TEMP/esteria-playerbots-helper-source-sealed" \
             > out/playerbots-source-seal-evidence/sealing-private.log 2>&1
       - name: Collect bounded source-only receipt and artifact identities
         if: always()
         run: |
-          sudo env ESTERIA_HELPER_SEAL_REVISION="$GITHUB_SHA" python3 - <<'PY'
+          sudo env ESTERIA_HELPER_SEAL_REVISION="$GITHUB_SHA" \
+            ESTERIA_HELPER_SEALED_OUTPUT="$RUNNER_TEMP/esteria-playerbots-helper-source-sealed" python3 - <<'PY'
           from pathlib import Path
           import json,os,re
           from tools import seal_playerbots_helper_sources as sources,verify_server_build as files
           target=Path('out/playerbots-source-seal-evidence');target.mkdir(parents=True,exist_ok=True)
-          sealed=Path('out/playerbots-helper-source-sealed')
+          sealed=Path(os.environ['ESTERIA_HELPER_SEALED_OUTPUT'])
           names=(sources.SOURCE_ARCHIVE,sources.RECEIPT)
           identities={name:files.identity(sealed/name) for name in names if (sealed/name).is_file()}
           if (sealed/sources.RECEIPT).is_file():
@@ -121,15 +122,15 @@ jobs:
           (target/'environment-receipt.json').write_text(json.dumps(receipt,sort_keys=True,indent=2)+'\n')
           PY
           sudo chown -R "$(id -u):$(id -g)" out/playerbots-source-seal-evidence
-          if sudo test -d out/playerbots-helper-source-sealed; then
-            sudo chown -R "$(id -u):$(id -g)" out/playerbots-helper-source-sealed
+          if sudo test -d "$RUNNER_TEMP/esteria-playerbots-helper-source-sealed"; then
+            sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/esteria-playerbots-helper-source-sealed"
           fi
       - name: Retain the new corresponding-source archive and separate sealing receipt
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always() && steps.seal.outcome == 'success'
         with:
           name: playerbots-helper-source-sealed-${{ github.sha }}
-          path: out/playerbots-helper-source-sealed/
+          path: ${{ runner.temp }}/esteria-playerbots-helper-source-sealed/
           include-hidden-files: true
           compression-level: 0
           retention-days: 30

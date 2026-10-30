@@ -12,7 +12,18 @@ from tools import provider_server_data_tools as provider
 class PendingDataToolsProvider(unittest.TestCase):
     def setUp(self):
         temporary=tempfile.TemporaryDirectory(prefix='pending-data-tools-')
-        self.addCleanup(temporary.cleanup);self.root=Path(temporary.name);self.pin=provider.load_pin()
+        self.addCleanup(temporary.cleanup);self.root=Path(temporary.name)
+        # Pending-state refusals remain explicit fixtures after the production
+        # pin advances to a real source-only or fully measured selection.
+        self.pin=json.loads(provider.LOCK.read_text())
+        self.pin.update(state='pending-ordered-source-and-derived-native-cli',sourceCompanionComplete=False,
+                        nativeArgumentConfigQualified=False,originalNoticesPreserved=False)
+        for name in ('archive','archiveEntries','archiveFileBytes','packageReceipt','programPairs','nativeCliReceipt',
+                     'files','toolSelection','actualOrderedSourceQualification','orderedStripReceipt','debugArchives'):
+            self.pin[name]=None
+        self.pending_lock=self.root/'pending-provider.lock.json';self.pending_lock.write_bytes(provider.encoded(self.pin))
+        selected=patch.object(provider,'LOCK',self.pending_lock);selected.start();self.addCleanup(selected.stop)
+        self.pin=provider.load_pin()
 
     def locked(self,pin):
         path=self.root/'pin.json';path.write_bytes(provider.encoded(pin));return patch.object(provider,'LOCK',path)
@@ -34,7 +45,7 @@ class PendingDataToolsProvider(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'real-ordered-source'):provider.verify(output)
         with self.assertRaisesRegex(ValueError,'pending-descriptor'):provider.descriptor(self.pin)
         self.assertEqual((output/'private-save').read_bytes(),b'keep')
-        self.assertEqual(set(self.root.iterdir()),{output})
+        self.assertEqual(set(self.root.iterdir()),{output,self.pending_lock})
 
     def test_positive_flags_cannot_replace_measured_native_dependency_capture(self):
         from tools import seal_ordered_extractor_sources as ordered
