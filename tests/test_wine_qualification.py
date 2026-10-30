@@ -111,11 +111,48 @@ class WineQualification(unittest.TestCase):
         flags = qualification.qualification_flags(result, ['presentation', 'texture'], namespace_exit=1)
         self.assertTrue(flags['linuxArm64CodecQualified'])
         self.assertTrue(flags['linuxArm64VulkanPresentationQualified'])
+        self.assertFalse(flags['linuxArm64VulkanEngineFrameReadbackQualified'])
         self.assertFalse(flags['linuxArm64VulkanTextureLifecycleQualified'])
         for abnormal in (0, 137, -9):
             self.assertFalse(any(qualification.qualification_flags(result, ['presentation', 'texture'], abnormal).values()))
         result['logStreamsDrained'] = False
         self.assertFalse(any(qualification.qualification_flags(result, ['presentation', 'texture'], 1).values()))
+
+    def test_engine_frame_readback_requires_its_own_marker_and_completed_presentation(self):
+        presentation = dict(exitCode=0, messageMatched=True, softwareAdapterMatched=True,
+                            engineFrameMessageMatched=True, validationCallbackActive=False)
+        result = dict(displayReady=True, networkIsolated=True, prefixExit=0, fixtureExit=0, codecMessageMatched=True,
+                      wineStopExit=0, logStreamsDrained=True, logsWithinLimit=True, logWritesSucceeded=True,
+                      workerCompleted=True, expectedExit=0, graphics={'presentation': presentation})
+        key = 'linuxArm64VulkanEngineFrameReadbackQualified'
+        self.assertTrue(qualification.qualification_flags(result, ['presentation'])[key])
+        self.assertFalse(qualification.qualification_flags(result, [])[key])
+        for field, value in (('engineFrameMessageMatched', False), ('messageMatched', False),
+                             ('softwareAdapterMatched', False), ('exitCode', 1)):
+            with self.subTest(field=field):
+                saved = presentation[field]
+                presentation[field] = value
+                self.assertFalse(qualification.qualification_flags(result, ['presentation'])[key])
+                presentation[field] = saved
+        self.assertFalse(qualification.qualification_flags(result, ['presentation'], -9)[key])
+
+    def test_engine_frame_success_line_is_captured_across_pipe_writes(self):
+        marker = qualification.ENGINE_FRAME_SUCCESS
+        code = ('import os,sys,time\n'
+                'os.write(1,sys.argv[1][:17].encode()); time.sleep(.02)\n'
+                'os.write(1,(sys.argv[1][17:]+"\\r\\n").encode())\n')
+        for index, line in enumerate((marker, marker + ' incomplete')):
+            capture = qualification.Capture([sys.executable, '-c', code, line], self.root / f'frame-{index}.log',
+                                             line_prefixes=(marker.encode(),))
+            self.assertEqual(capture.wait(3).exit_code, 0)
+            self.assertTrue(capture.finish(2))
+            self.assertEqual(capture.lines[marker] == marker, index == 0)
+
+    def test_required_engine_readback_without_presentation_is_rejected_before_execution(self):
+        with patch.object(qualification.subprocess, 'Popen', side_effect=AssertionError('must not execute')):
+            with self.assertRaisesRegex(ValueError, 'requires-presentation-driver'):
+                qualification.qualify(self.root, self.root, self.root / 'driver', self.root / 'output',
+                                      require_engine_frame=True)
 
     def test_checked_in_graphics_pin_matches_runtime_and_requires_real_identities(self):
         lock = json.loads(qualification.packages.DEFAULT_LOCK.read_text())

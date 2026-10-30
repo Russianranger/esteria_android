@@ -29,6 +29,7 @@ GUEST = '/esteria-qualification'
 SUCCESS = 'Movie adapter (DLL): BGRA/VFLIP, output bounds, skipped frames and slot lifecycle passed'
 ENTRY_SUCCESS = 'PASS: Esteria executable entry/CRT/allocator/exception/fiber roundtrip (entry-check only)'
 ENTRY_RECEIPT = 'Esteria-entry-check.json'
+ENGINE_FRAME_SUCCESS = 'PASS: Engine Vulkan frame BGRA readback, partial clears and embedded-shader presentation'
 LOG_LIMIT = 16 * 1024 * 1024
 VULKAN_FIXTURES = {
     'presentation': ('presentation_device.exe',
@@ -297,7 +298,7 @@ def worker(runtime, output):
             capture = run_logged(guest_command(root, '/opt/wine/bin/wine', GUEST + '/' + filename,
                                                graphics=plan['softwareGraphics']),
                 output / (name + '.log'), 180, captures, needle=message.encode(),
-                line_prefixes=(b'Vulkan adapter:', b'Vulkan validation callback:'))
+                line_prefixes=(b'Vulkan adapter:', b'Vulkan validation callback:', ENGINE_FRAME_SUCCESS.encode()))
             matched = capture.matched.wait(timeout=5)
             adapter = capture.lines.get('Vulkan adapter:', '')
             observed = dict(exitCode=capture.exit_code, messageMatched=matched, adapter=adapter,
@@ -305,8 +306,12 @@ def worker(runtime, output):
                             validationCallbackActive=capture.lines.get('Vulkan validation callback:') ==
                             'Vulkan validation callback: active')
             result['graphics'][name] = observed
+            if name == 'presentation':
+                observed['engineFrameMessageMatched'] = capture.lines.get(ENGINE_FRAME_SUCCESS) == ENGINE_FRAME_SUCCESS
             packages.require(capture.exit_code == 0 and matched and observed['softwareAdapterMatched'],
                              name + '-vulkan-fixture-failed')
+            if name == 'presentation' and plan.get('engineFrameReadbackRequired'):
+                packages.require(observed['engineFrameMessageMatched'], 'engine-frame-readback-marker-missing')
         result['expectedExit'] = 0
         return 0
     except Exception as error:
@@ -366,7 +371,7 @@ def qualification_flags(result, requested, namespace_exit=0, client_entry=False)
     flags = {'linuxArm64CodecQualified': bool(common and result.get('fixtureExit') == 0 and
                                               result.get('codecMessageMatched') is True),
              'linuxArm64VulkanPresentationQualified': False, 'linuxArm64VulkanTextureLifecycleQualified': False,
-             'linuxArm64ClientEntryQualified': False}
+             'linuxArm64ClientEntryQualified': False, 'linuxArm64VulkanEngineFrameReadbackQualified': False}
     if client_entry:
         entry = result.get('clientEntry', {})
         flags['linuxArm64ClientEntryQualified'] = bool(common and entry.get('launchAttempted') is True and
@@ -377,10 +382,15 @@ def qualification_flags(result, requested, namespace_exit=0, client_entry=False)
                       observed.get('softwareAdapterMatched') is True)
         flags['linuxArm64VulkanPresentationQualified' if name == 'presentation' else
               'linuxArm64VulkanTextureLifecycleQualified'] = passed
+        if name == 'presentation':
+            flags['linuxArm64VulkanEngineFrameReadbackQualified'] = bool(
+                passed and observed.get('engineFrameMessageMatched') is True)
     return flags
 
 
-def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=False):
+def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=False, require_engine_frame=False):
+    packages.require(not require_engine_frame or 'presentation' in (graphics or {}),
+                     'engine-frame-readback-requires-presentation-driver')
     packages.require(platform.machine().lower() in ('aarch64', 'arm64'), 'native-arm64-host-required')
     packages.require(os.geteuid() == 0, 'invoke-qualification-with-sudo')
     runtime = packages.directory(runtime)
@@ -421,7 +431,7 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
             os.fsync(dst.fileno())
     packages.write_json(fixture / 'qualification-plan.json',
                         dict(graphicsRequested=list(graphics), softwareGraphics=software_graphics,
-                             clientEntryRequested=client_entry))
+                             clientEntryRequested=client_entry, engineFrameReadbackRequired=require_engine_frame))
     report = dict(formatVersion=1, scope='native-linux-arm64-wine-component-fixtures',
                   runtimeArchiveSha256=package['archive']['sha256'], runtimeReceiptSha256=prepared_sha,
                   client=client, directImports=imports_report(manifest, prepared),
@@ -431,6 +441,7 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
                   linuxArm64CodecQualified=False, processNamespaceExited=False,
                   linuxArm64VulkanPresentationQualified=False, linuxArm64VulkanTextureLifecycleQualified=False,
                   linuxArm64ClientEntryQualified=False, clientEntryRequested=client_entry,
+                  linuxArm64VulkanEngineFrameReadbackQualified=False, engineFrameReadbackRequired=require_engine_frame,
                   softwareGraphics=software_graphics, graphicsRequested=list(graphics))
     command = namespace_command(Path(__file__).resolve(), runtime, output, os.geteuid() == 0)
     child = None
@@ -458,6 +469,8 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
             key = ('linuxArm64VulkanPresentationQualified' if name == 'presentation' else
                    'linuxArm64VulkanTextureLifecycleQualified')
             packages.require(report[key], name + '-vulkan-not-qualified')
+        if require_engine_frame:
+            packages.require(report['linuxArm64VulkanEngineFrameReadbackQualified'], 'engine-frame-readback-not-qualified')
         packages.require(report['namespaceExit'] == 0, 'wine-worker-exit-failed')
         return report
     except Exception as error:
@@ -488,6 +501,8 @@ def main():
     parser.add_argument('--presentation-driver', type=Path)
     parser.add_argument('--texture-driver', type=Path)
     parser.add_argument('--client-entry-check', action='store_true', help='Launch the verified full PE in its explicit entry-only mode')
+    parser.add_argument('--require-engine-frame-readback', action='store_true',
+                        help='Require the presentation driver to pass real engine scene readback and embedded shaders')
     parser.add_argument('--output', type=Path, required=True, help='New evidence directory')
     parser.add_argument('--namespace-worker', action='store_true', help=argparse.SUPPRESS)
     args = parser.parse_args()
@@ -499,9 +514,10 @@ def main():
     graphics = {name: path.absolute() for name, path in
                 (('presentation', args.presentation_driver), ('texture', args.texture_driver)) if path is not None}
     result = qualify(args.runtime, args.client_dir.absolute(), args.driver.absolute(), args.output, graphics,
-                     args.client_entry_check)
+                     args.client_entry_check, args.require_engine_frame_readback)
     print(json.dumps({key: result[key] for key in ('linuxArm64CodecQualified', 'linuxArm64VulkanPresentationQualified',
                                                  'linuxArm64VulkanTextureLifecycleQualified', 'linuxArm64ClientEntryQualified',
+                                                 'linuxArm64VulkanEngineFrameReadbackQualified',
                                                  'androidRuntimeQualified')}))
     return 0
 

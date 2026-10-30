@@ -57,6 +57,23 @@ The command still exits nonzero if any
 requested check fails. Validation callback availability is recorded separately;
 an unavailable layer never becomes a validation-layer pass.
 
+Newer presentation drivers also exercise the real engine frame module: two
+full-target clears, two in-pass green rectangles, exact BGRA readback of the
+resulting 4x4 scene regions, and two presentations through the engine's embedded
+SPIR-V shaders. Add `--require-engine-frame-readback` with the presentation driver
+to make this additional scope mandatory. The harness records
+`linuxArm64VulkanEngineFrameReadbackQualified` only when that driver's exact
+additional success line, the ordinary presentation success marker, software
+adapter identity, zero process exit and normal owned cleanup all pass. Earlier
+drivers can still qualify basic presentation; they cannot acquire the new flag
+without the additional marker. Missing the required marker fails the command.
+
+This checks pixels before the embedded presentation shader, not pixels displayed
+by the compositor. It establishes neither data-derived game shader correctness
+nor world rendering. The exact new marker is
+`PASS: Engine Vulkan frame BGRA readback, partial clears and embedded-shader presentation`.
+This new scope is implemented but awaits the paired client CI execution.
+
 ## Full executable entry check
 
 Add `--client-entry-check` to copy the already-hashed `WowClient64.exe` into the
@@ -112,11 +129,11 @@ VCRUNTIME140_1. The latter's x64 machine value in the candidate is not a blocker
 for an unused import. CRT API-set forwarding still needs loader execution.
 
 The optional software Vulkan fixtures do not establish Adreno performance,
-Android presentation, game-shader correctness, or scene rendering. The generic
+Android presentation, game-shader correctness, or world rendering. The generic
 Android/game/rendering qualification fields remain false; Linux software
-presentation and texture lifecycle have explicit separate fields.
+presentation, engine frame readback and texture lifecycle have explicit separate fields.
 
-Run the fourteen host guard/manifest/capture/scope tests with:
+Run the host guard/manifest/capture/scope tests with:
 
 ```sh
 python3 -m unittest tests.test_wine_qualification -v
