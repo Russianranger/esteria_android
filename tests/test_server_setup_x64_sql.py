@@ -181,5 +181,29 @@ class ServerSetupX64Sql(unittest.TestCase):
         self.assertEqual(sql.failure_diagnostic(ValueError(private)),
             dict(sourceFrames=[], privateDetailsExcluded=True))
 
+    def test_original_source_lock_and_seven_real_patches_keep_relative_verifier_layout(self):
+        project = self.root / 'project'; original = sql.ROOT / 'runtime/server/server-build-sources.lock.json'
+        metadata = json.loads(original.read_bytes()); source = metadata['sources']['server']
+        nested = project / 'runtime/server/server-build-sources.lock.json'; nested.parent.mkdir(parents=True)
+        shutil.copyfile(original, nested)
+        for row in source['patches']:
+            target = project / row['path']; target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(sql.ROOT / row['path'], target)
+        admitted = dict(allRuntimeOriginalDebugLibraryNoticeAndSourceFilesVerified=True,
+            build=dict(sourceLock=sql.selection.files.identity(original), serverSource=source))
+        with self.assertRaises(FileNotFoundError): sql.base.locked_source(nested)
+        with patch.object(sql, 'ROOT', project):
+            lock, proof = sql.stage_source_profile(self.root / 'source-profile', admitted)
+            selected, digest = sql.base.locked_source(lock)
+            self.assertEqual(selected, source); self.assertEqual(digest, admitted['build']['sourceLock']['sha256'])
+            self.assertTrue(proof['originalRelativePatchLayoutVerified']); self.assertEqual(len(proof['patches']), 7)
+            with self.assertRaisesRegex(ValueError, 'existing-output-preserved'):
+                sql.stage_source_profile(lock.parent, admitted)
+            changed = project / source['patches'][0]['path']; changed.write_bytes(changed.read_bytes() + b'changed')
+            absent = self.root / 'refused-before-output'
+            with self.assertRaisesRegex(ValueError, 'patch digest mismatch'):
+                sql.stage_source_profile(absent, admitted)
+            self.assertFalse(absent.exists())
+
 
 if __name__ == '__main__': unittest.main()

@@ -56,8 +56,9 @@ private account/config/save siblings are preserved through recovery.
 
 IME Done/soft Enter atomically submits pending text+Enter; typed zero-enqueue
 batch rejection retains the draft. Closed/replaced connections refuse callbacks.
-Actual Android widget/keyboard/controller-event qualification is now being added;
-full Wine input and physical controls remain separate gates.
+Actual Android13x64 run41138732113 passes eight widget/IME groups and optional
+registered-axis/camera/EOF cleanup with eight real ranges. Constructed events
+remain distinct from kernel/physical delivery, full Wine input and gameplay.
 
 Shader/data preparation selects the same source-defined effective locale while
 retaining the requested locale. Unsupported winning enCN/enTW aliases fail
@@ -93,8 +94,9 @@ qualify exclusive cache publication or ARM64 semantics.
    measurement/acquisition/emulator workflows, bind only actual SQL/provider
    receipts, then run Android SQL. Frozen817 source and unchanged five production
    save-selection fields remain mandatory.
-3. Finish actual Android input-widget qualification; keep registered-axis tests
-   conditional on a real emulator InputDevice with proper MotionRanges.
+3. Preserve actual Android input-widget41138732113 success and its prior test-
+   toolbar failure. Physical controller/kernel input, Wine and gameplay remain
+   separate gates.
 4. Import real12340 MPQs and matched Esteria catalogs/textures/DBC/maps; generate
    shaders and validate normal login, characters/world, combat/loot/inventory/
    quests/audio/saves/relog. No complete base/custom data is available here.
@@ -105,3 +107,8 @@ Private persistent RSA4096 signing is provisioned; public certificate is in
 app/development-signing.lock.json. Defaults/server repository remain unchanged.
 Assets, initialized databases/prefixes, saves, credentials and private keys stay
 outside Git. See HANDOFF.md for the next concrete actions.
+
+First x64 SQL attempts stopped before initialization. The diagnostic run isolated
+a parent-relative source-lock/patch layout error. Exact historical lock bytes and
+seven digest-pinned patches are now staged together; unchanged source admission
+and real regression tests pass. The next actual SQL run remains required.

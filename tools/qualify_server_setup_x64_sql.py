@@ -76,7 +76,9 @@ def caller_files():
         if '__pycache__' not in path.parts}
     names.update(('tools/qualify_server_setup_x64_sql.py', 'tools/server_setup_x64_sql_inputs.py',
         'tools/fetch_android_mysql_fixture_frozen.py', 'tools/qualify_playerbots_component.py',
-        'tools/qualify_dbimport.py', 'tools/qualify_base_sql.py', 'config/local-server.json'))
+        'tools/qualify_dbimport.py', 'tools/qualify_base_sql.py', 'config/local-server.json',
+        'runtime/server/server-build-sources.lock.json'))
+    names.update(path.relative_to(ROOT).as_posix() for path in (ROOT / 'patches/server').glob('*.patch'))
     require(1 <= len(names) <= 512, 'x64-sql-current-caller-source-bound')
     return {name: selection.files.identity(ROOT / name) for name in sorted(names)}
 
@@ -289,6 +291,35 @@ def x64_playerbots_plan(verified, admitted, invocation, mysql):
         selection.identity(admitted['sourceReadback']['buildReceipt']), mysql, expected, binding)
 
 
+def stage_source_profile(output, admitted):
+    """Keep the exact historical lock beside its digest-bound patch paths.
+
+    The unchanged host content verifier resolves patches relative to the lock's
+    parent. The archived lock lives under runtime/server in the current source;
+    its seven project-relative patch paths must retain their original layout.
+    """
+    require(admitted.get('allRuntimeOriginalDebugLibraryNoticeAndSourceFilesVerified') is True,
+        'x64-sql-complete-source-admission-required')
+    original = ROOT / 'runtime/server/server-build-sources.lock.json'
+    expected = selection.identity(admitted['build']['sourceLock'])
+    selection.pinned(original, expected)
+    source = base.fetch_sources.load_lock(original)['sources']['server']
+    require(source == admitted['build']['serverSource'], 'x64-sql-original-source-profile-differs')
+    base.content.validate_patch_contract(source, ROOT)
+    patches = {}
+    for row in source['patches']:
+        path = ROOT / row['path']; identity = selection.files.identity(path)
+        require(identity['sha256'] == row['sha256'], 'x64-sql-original-source-patch-changed')
+        patches[row['path']] = identity
+    output = fresh(output); target = output / 'sources.lock.json'
+    release.engine.copy_verified(original, target, expected, 0o400)
+    for name, identity in patches.items():
+        release.engine.copy_verified(ROOT / name, output / name, identity, 0o400)
+    selected, lock_sha = base.locked_source(target)
+    require(selected == source and lock_sha == expected['sha256'], 'x64-sql-staged-source-profile-differs')
+    return target, dict(lock=expected, patches=patches, originalRelativePatchLayoutVerified=True)
+
+
 def run(inputs, output, mysql, mysqld, version):
     require(platform.system() == 'Linux' and platform.machine() == 'x86_64', 'x64-sql-native-linux-x86-64-required')
     pin = load_selection()  # Pending selection refuses before output or SQL.
@@ -328,7 +359,8 @@ def run(inputs, output, mysql, mysqld, version):
                 ('server-content.tar.gz', assets / provider.ARCHIVE)):
             release.engine.copy_verified(original, source / name, selection.files.identity(original), 0o400)
         receipt_sha = selection.files.identity(source / 'package-receipt.json')['sha256']
-        lock = ROOT / 'runtime/server/server-build-sources.lock.json'
+        evidence['phase'] = 'stage-original-source-profile'
+        lock, evidence['sourceBuildProfile'] = stage_source_profile(output / 'source-profile', admitted)
         evidence['phase'] = 'extract-original-content-package'
         receipt, manifest, compiled = importer.unpack_content(source, receipt_sha, lock, output / 'content')
         evidence['phase'] = 'verify-product-source-content'

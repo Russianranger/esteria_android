@@ -62,14 +62,15 @@ available to retry. Transport I/O errors and ambiguous individual-key overload
 still fail the session. Ordinary 64-character text plus Enter is accepted, while a heavily
 shifted draft needing more than the unchanged 256-event transport limit is
 rejected explicitly before any event is queued; shorten it or commit it first.
-These guards have host sequence/lifecycle evidence, not actual Android IME or
-in-game field qualification.
+These guards have host sequence/lifecycle evidence and Android13 x64 real-widget
+InputConnection component evidence. The visible software keyboard was exercised;
+IME-service action delivery into an in-game field remains unqualified.
 
 Every new Android input connection receives a distinct generation, and closing
 it invalidates its own composition before Android's base close callback runs.
 An older connection cannot type into its replacement during the same shown
-keyboard session. Actual replacement/close callbacks remain Android validation
-gates; the source wiring is compiled and reviewed.
+keyboard session. The Android component test now exercises real widget-created
+connections and their replacement/close methods; game-field behavior remains open.
 
 Run `./gradlew :core:gameInputTest`. These checks establish mapping/state behavior,
 not physical Thor controller layout, Wine focus, game combat/quest functionality,
@@ -82,11 +83,13 @@ The toolbar no longer covers the bottom hotbar, and touch coordinates are local
 to the fitted game view. Application Java/lint pass; complete guest gameplay,
 controller usability and hardware presentation remain separate qualifications.
 
-`android-presentation.yml` now also prepares a real Android13 x64 widget/IME
-component case: visible software keyboard, composition plus Done/Enter, bounded
+Actual `android-presentation.yml` run 41138732113 at 50123a9d passes eight Android 13
+x64 widget/IME groups: visible keyboard, composition plus Done/Enter, bounded
 whole-batch retry, stale/closed connections, touch and constructed controller
-KeyEvents. A test-only uinput registration can additionally supply real framework
-joystick ranges for constructed MotionEvents; unavailable registration leaves
-stick/camera qualification false. No Android execution result is claimed until
-that exact workflow runs. The fixed recording sink does not exercise Wine/X11,
-physical controller delivery or game fields. See `ANDROID-INPUT-QUALIFICATION.md`.
+KeyEvents. The test-only uinput registration was available: eight real framework
+joystick ranges, constructed MotionEvents, Choreographer camera integration and
+owned EOF/device-removal cleanup passed. The fixed recording sink does not
+exercise Wine/X11, kernel/physical controller delivery or game fields. An earlier
+bottom-toolbar injection failure remains preserved separately. See
+`ANDROID-INPUT-QUALIFICATION.md` and the exact actual-run receipt in
+`runtime/evidence/android-input-widget-41138732113.json`.

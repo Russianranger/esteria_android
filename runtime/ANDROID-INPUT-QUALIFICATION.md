@@ -53,3 +53,14 @@ Local Python admission tests and Java/Android compilation are preparatory eviden
 An actual workflow result is required for Android IME/widget qualification; that
 result still cannot establish in-game typing, camera usability, combat or Thor
 controls.
+
+Actual run 41138732113 at 50123a9d99c5cb82fba107f1315589f7635dff35 passes both
+instrumented cases: six Surface/audio groups and eight widget/IME groups.
+Registered controller support was available, with eight validated real motion
+ranges and confirmed EOF/removal cleanup. All 21 small-artifact members were read
+back and the exact-source receipt validators passed. This establishes the
+component scope above; kernel/physical controller delivery, the production
+presentation session, Wine/X11 and game fields remain untested. The earlier
+run 41137790996 target-UID mismatch is retained additively; its test-only toolbar
+was moved above the Surface to keep rapid reopen taps outside the docked IME.
+See `runtime/evidence/android-input-widget-41138732113.json` for exact identities.

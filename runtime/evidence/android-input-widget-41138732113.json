@@ -1,0 +1,355 @@
+{
+  "actualRegisteredDeviceDiagnostics": {
+    "boundedLogcatLines": [
+      "10-30 22:35:41.469  3814  3853 I UinputCommandDevice: uinput device 1 created: version = 5, fd = 42",
+      "10-30 22:35:41.489   481   586 I InputReader: Device added: id=15, eventHubId=14, name='Esteria-Component-Gamepad', descriptor='78e7beed547509f4bad502ebc4b5e1661f62b095',sources=KEYBOARD | GAMEPAD | JOYSTICK",
+      "10-30 22:35:41.657  3814  3853 I UinputDevice: Device closed.",
+      "10-30 22:35:41.658   481   586 I InputReader: Device removed: id=15, eventHubId=14, name='Esteria-Component-Gamepad', descriptor='78e7beed547509f4bad502ebc4b5e1661f62b095', sources=KEYBOARD | GAMEPAD | JOYSTICK"
+    ],
+    "eventHubId": 14,
+    "frameworkAddAndRemoveObserved": true,
+    "frameworkDeviceId": 15,
+    "name": "Esteria-Component-Gamepad",
+    "nativeDeviceCreateAndCloseObserved": true,
+    "nativeUinputVersion": 5,
+    "sourceClasses": [
+      "KEYBOARD",
+      "GAMEPAD",
+      "JOYSTICK"
+    ]
+  },
+  "artifact": {
+    "all21MembersReadAndCrcVerified": true,
+    "bytes": 48163,
+    "downloadVerified": true,
+    "id": 13018031105,
+    "members": {
+      "app-input-receipt.log": {
+        "bytes": 1745,
+        "sha256": "0dcb8cf115bf68b5b29cf13349950961bb15dc939691cc23088d8a9fa5d777f2"
+      },
+      "app-receipt.log": {
+        "bytes": 1268,
+        "sha256": "d704c3c7cc46b64c3f1fd341a9188a5e2292c07bb920911c4f7b1cd59944fc3d"
+      },
+      "available-input-methods.log": {
+        "bytes": 190,
+        "sha256": "f68b7b98a60fa225d044badecf43a8965815043206e5afe57c50d92d2c831724"
+      },
+      "bounded-logcat.log": {
+        "bytes": 266071,
+        "sha256": "eb6df6cb1ddf0ad54517e71154da79b4d0ad2e0caf05d0690343677516d303fb"
+      },
+      "default-input-method.log": {
+        "bytes": 76,
+        "sha256": "2a774a2e41afc19b41619afbe7add50c5a04408e0d69b5adf64b38a00faf06c5"
+      },
+      "enable-emulator-software-keyboard.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "grant-fixture-notification-permission.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "hardware-ime-setting-before.log": {
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      },
+      "install-app.log": {
+        "bytes": 36,
+        "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+      },
+      "install-tests.log": {
+        "bytes": 36,
+        "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+      },
+      "preexisting.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "presentation-audio-contracts.log": {
+        "bytes": 834,
+        "sha256": "0ecc211d8b47b85ca2eaed84163b957b1057e1837299f09e8bc488ca4f824c71"
+      },
+      "qualification.json": {
+        "bytes": 4514,
+        "sha256": "8852a9dfef1566ca4875c01f574884c429d26ad323c22b2ac21ae264f195b4fb"
+      },
+      "restore-emulator-software-keyboard-setting.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ro.build.fingerprint.log": {
+        "bytes": 81,
+        "sha256": "74f45a5b5c9c2e0e9fe31b30e7fecac3d7eed0ec13131a36513c9da0e27ee79d"
+      },
+      "ro.build.version.sdk.log": {
+        "bytes": 3,
+        "sha256": "19b8d5c59e421f037fe563007c7254eb8d98bc221b278c3db3e5fdbbfd52e273"
+      },
+      "ro.kernel.qemu.log": {
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      },
+      "ro.product.cpu.abi.log": {
+        "bytes": 7,
+        "sha256": "aaf631698ae5160ceb04a97681a14887fdcab47cd6e0f163c87485b3b1340b62"
+      },
+      "serial.log": {
+        "bytes": 14,
+        "sha256": "0115c661660f4cd9f62719a1c0f968c833c3295da9713cc8b6d915f739be272e"
+      },
+      "stop-owned-test-app.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "widget-ime-input-contracts.log": {
+        "bytes": 832,
+        "sha256": "d0d060b80158f7d6f4e7f900a18927b86a96f3dae96518d50a287406b18bb352"
+      }
+    },
+    "sha256": "680967cbffd768a685330b7cd115ebe29dc1ca2fd8b11f932767cea23a6e14f1"
+  },
+  "earlierFailurePreserved": {
+    "bytes": 11268,
+    "failureRevision": "1180deff97f37afa58de439ad07441ab7941f886",
+    "failureRun": 41137790996,
+    "path": "runtime/evidence/android-input-widget-41137790996-failure.json",
+    "sha256": "cf7b8806e62487c36b52f5a6d5b7cf7761d76940379ee58f39013ea556d4a540"
+  },
+  "formatVersion": 1,
+  "jobId": 124347514630,
+  "limitations": [
+    "The real visible software keyboard and actual widget InputConnection methods were exercised; IME service Done delivery into an in-game field was not tested.",
+    "Controller KeyEvents and public removal callbacks were constructed. Optional MotionEvents used a genuinely registered framework device and real ranges; no evdev packet or physical controller was used.",
+    "A fixed256-event recording sink models atomic acceptance/consumer progress only; no InputBridge socket, X11, Wine, production presentation session or game process ran.",
+    "Android13 x86_64 component results do not qualify ARM64, Thor, Adreno, audible hardware output, combat, quest interactions or gameplay."
+  ],
+  "observedAtUtc": "2026-10-30T22:37:23.233181+00:00",
+  "producerGitInputs": {
+    ".github/workflows/android-presentation.yml": {
+      "bytes": 4409,
+      "sha256": "75585daecae66450767b2c1da7bf8f6876e82b5d5025962a0c7d9844498382c5"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/presentation/GameInputAndroidTest.java": {
+      "bytes": 23589,
+      "sha256": "220af6bc0977d844d161a97a00fbc05b161e9c67084962dccdd53715749feb91"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/presentation/PresentationAudioTest.java": {
+      "bytes": 24024,
+      "sha256": "556a4b967f590fd9fb173f4569a2da381c5a1e9a5985fe9faee808bf7f59f4c0"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/presentation/RegisteredInputFixture.java": {
+      "bytes": 16532,
+      "sha256": "d73132d230691d86ffb723a2c91818615bc7e1664d6851084b0f024b91b49a36"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/input/GameInputView.java": {
+      "bytes": 15771,
+      "sha256": "03370da0939e2a60a4714bbc3404b75ea8a648bae53f962e8b74dd76841586d1"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/presentation/GamePresentationPanel.java": {
+      "bytes": 9668,
+      "sha256": "f0b4e59b2140bfc7606eea2a21c5fad69a3408f7efbe15ce23c8f274ef6668e9"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/input/GameInputRouter.java": {
+      "bytes": 6893,
+      "sha256": "f3508f2ea63a3ef3bcc4d11ed4ffa0b7d05b2829c839a2e736d1df87b0982f84"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/input/KeyboardText.java": {
+      "bytes": 5090,
+      "sha256": "b4ca85731bedfc6ceb3687817184533953edb379c190698c72946587527c1b61"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/presentation/InputSink.java": {
+      "bytes": 1151,
+      "sha256": "e96d947d64bc76581183044bc2032c583fdafa383c0a499d78e4c0877286bc2d"
+    },
+    "runtime/ANDROID-INPUT-QUALIFICATION.md": {
+      "bytes": 3836,
+      "sha256": "8e88d5117f0235368c1905fad2720fd1571545fba059ef1ba1c9c652e1654f27"
+    },
+    "runtime/CONTROLS.md": {
+      "bytes": 5667,
+      "sha256": "e90a6460747454fb5c0ca176c9033bbd9a3f34653eb836291251ad8fdd97dd03"
+    },
+    "runtime/evidence/android-input-widget-host.json": {
+      "bytes": 5836,
+      "sha256": "1938dcdcfebf34881355de0342d4e9556d125db6e5f4e648a076b22ac6ae6be8"
+    },
+    "tests/test_android_presentation_qualification.py": {
+      "bytes": 7088,
+      "sha256": "162eb3b9fa78102aae3a40d76990499d1dba7a6848a47fd5612d94af72cc84c3"
+    },
+    "tools/qualify_android_presentation.py": {
+      "bytes": 12864,
+      "sha256": "a33f8b40af2b72559b51dfabc25e41d230e0970ede48f73b883d29d0f04cf2c6"
+    }
+  },
+  "qualificationBoundary": {
+    "adrenoQualified": false,
+    "androidWineExecuted": false,
+    "arm64Qualified": false,
+    "audibleHardwareOutputQualified": false,
+    "deviceTestCandidate": false,
+    "gameplayQualified": false,
+    "inputBridgeSocketExecuted": false,
+    "kernelControllerEventDeliveryQualified": false,
+    "physicalControllerQualified": false,
+    "productionPresentationPanelSessionQualified": false,
+    "realAndroid13X64WidgetImeCallbacksQualified": true,
+    "recordingSinkOnly": true,
+    "registeredFrameworkControllerAdapterComponentQualified": true,
+    "x11GuestExecuted": false
+  },
+  "rawQualification": {
+    "adrenoQualified": false,
+    "androidEmulatorSurfaceAudioQualified": true,
+    "androidEmulatorWidgetImeInputQualified": true,
+    "androidWineExecuted": false,
+    "apk": {
+      "bytes": 1131812,
+      "native": {
+        "lib/x86_64/libesteria-presentation.so": {
+          "bytes": 8056,
+          "sha256": "254ec807ca6c93a4eceaf4ce74f2d831aae120a24b2d0a903997149c62d8fd2c"
+        },
+        "lib/x86_64/libesteria_process.so": {
+          "bytes": 517632,
+          "sha256": "28174b3c8677d644c37535304885de7737c6b96c5435dd0f987ada026dae7364"
+        }
+      },
+      "sha256": "1df629fcf5ad14ff80bc50e6b50ab76bd9fd591ab26987d370bec5a7745f3a00"
+    },
+    "appEvidence": {
+      "abi": "x86_64",
+      "adrenoQualified": false,
+      "androidWineExecuted": false,
+      "api": 33,
+      "arm64GuestExecuted": false,
+      "audibleOutputQualified": false,
+      "audioActivePeerShutdownVerified": true,
+      "audioInvalidHandshakeRecovered": true,
+      "audioResetVerified": true,
+      "audioTrackAcceptedFrames": 4992,
+      "audioTrackPlayedFrames": 4992,
+      "fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+      "formatVersion": 1,
+      "gameplayQualified": false,
+      "groupsPassed": 6,
+      "invalidFrameRejected": true,
+      "nativeSurfaceExecuted": true,
+      "pausedSurfaceCreationBlocked": true,
+      "pausedSurfaceRecreationBlocked": true,
+      "privateChildSymlinkRejected": true,
+      "privateRootAliasVerified": true,
+      "privateSocketCleanupVerified": true,
+      "rgbaReadbackVerified": true,
+      "scope": "android-13-x86_64-surface-audiotrack-protocol-fixtures",
+      "sourceRevision": "50123a9d99c5cb82fba107f1315589f7635dff35",
+      "surfaceLifecycleCleanupVerified": true,
+      "surfaceLifecycleConnections": 2,
+      "surfaceLifecyclePeerEofs": 2,
+      "surfacePausePeerEofVerified": true,
+      "surfaceRecreationVerified": true,
+      "surfaceResumeFrameVerified": true,
+      "surfaceResumeIdempotentVerified": true,
+      "targetSdk": 35,
+      "x11GuestExecuted": false
+    },
+    "appInputEvidence": {
+      "abi": "x86_64",
+      "acceptedConnectionDuplicateRefused": true,
+      "androidWineExecuted": false,
+      "api": 33,
+      "arm64Qualified": false,
+      "backAndPauseDiscardedDraft": true,
+      "batchCapacityRefusals": 1,
+      "closedConnectionRefused": true,
+      "composingDoneAtomic": true,
+      "constructedMotionEventWithRealDevice": true,
+      "controllerCameraMotionQualified": true,
+      "controllerKeyEventsConstructed": true,
+      "controllerKeyEventsVerified": true,
+      "controllerModeAndPauseReleased": true,
+      "controllerRemovalCallbackConstructed": true,
+      "controllerRemovalReleased": true,
+      "controllerStickMotionQualified": true,
+      "editorInfoVerified": true,
+      "fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+      "formatVersion": 1,
+      "gameplayQualified": false,
+      "groupsPassed": 8,
+      "hardwareQualified": false,
+      "imeNullAtomic": true,
+      "inputBridgeSocketExecuted": false,
+      "kernelControllerEventDeliveryQualified": false,
+      "physicalControllerQualified": false,
+      "plain64AndShiftedCapVerified": true,
+      "productionPresentationPanelSessionQualified": false,
+      "realWidgetSurfaceReady": true,
+      "recordingSinkCapacity": 256,
+      "recordingSinkOnly": true,
+      "registeredControllerAvailable": true,
+      "registeredControllerAxisRangeCount": 8,
+      "registeredControllerEofRemovalVerified": true,
+      "registeredControllerUnavailableReason": "none",
+      "replacedConnectionRefused": true,
+      "scope": "android-13-x86_64-widget-ime-input-recording-component",
+      "softEnterAtomic": true,
+      "sourceRevision": "50123a9d99c5cb82fba107f1315589f7635dff35",
+      "targetSdk": 35,
+      "touchKeyboardOpenedAndHidden": true,
+      "touchPointerAndCancelVerified": true,
+      "wholeBatchRetryPreserved": true,
+      "x11GuestExecuted": false
+    },
+    "arm64GuestExecuted": false,
+    "audibleOutputQualified": false,
+    "completedAtUnix": 1793399744,
+    "emulatorProperties": {
+      "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+      "ro.build.version.sdk": "33",
+      "ro.kernel.qemu": "1",
+      "ro.product.cpu.abi": "x86_64"
+    },
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "scope": "android-13-x86_64-surface-audiotrack-protocol-fixtures",
+    "sourceRevision": "50123a9d99c5cb82fba107f1315589f7635dff35",
+    "testApk": {
+      "bytes": 1802853,
+      "sha256": "1f8c2fca9aebf8f3cb85e5810b3a6cf13cc8c845b81d305bbba6ada35ada0eee"
+    },
+    "x11GuestExecuted": false
+  },
+  "readbackValidation": {
+    "actionableTasks": 84,
+    "actualBuildLine": "BUILD SUCCESSFUL in 1m 4s",
+    "actualChoreographerCameraIntegrationVerified": true,
+    "apkPayloadDownloadedLocally": false,
+    "bothAppReceiptLogsMatchAggregate": true,
+    "bothExactSourceValidatorsPassed": true,
+    "bothInstrumentedCasesReportedPass": true,
+    "constructedMotionEventsUsedRegisteredDeviceId": true,
+    "exactSourceApiAbiFingerprintChecked": true,
+    "executedTasks": 84,
+    "optionalRegisteredControllerAvailable": true,
+    "rawJobLog": {
+      "bytes": 85618,
+      "sha256": "447ef0f32973fcf38fd6dfef2edc8b4a9ecc72b2f335f2679994d51b08e2ca11"
+    },
+    "realJoystickMotionRangesVerified": 8,
+    "registeredDeviceOwnedEofAndActualRemovalVerified": true,
+    "requiredImeTouchButtonChecksAllTrue": true,
+    "softwareKeyboardRestoreCommandCompleted": true
+  },
+  "runAttempt": 1,
+  "scope": "observed-android-13-x64-widget-ime-touch-and-registered-controller-recording-component",
+  "sourceRevision": "50123a9d99c5cb82fba107f1315589f7635dff35",
+  "sourceSnapshotExact": true,
+  "workflowCompletionConfirmed": true,
+  "workflowConclusion": "success",
+  "workflowRun": 41138732113,
+  "workflowStatus": "completed",
+  "workflowUrl": "https://github.com/Russianranger/esteria_android/actions/runs/41138732113"
+}

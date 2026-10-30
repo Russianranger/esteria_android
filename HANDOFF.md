@@ -45,11 +45,11 @@ Large source/build artifacts are fully verified in CI; label local-read boundari
   OFF/null. Preserve exact905MB sourceZIP readback and P→Q unchanged-code binding.
   Finish measurement/acquisition and actual emulator workflows, then bind real
   native SQL/provider receipts. Observer must reap before DB/coordinator cleanup.
-4. Complete the new Android input-widget instrumentation group. It uses real
-   SurfaceView/InputConnection/KeyEvent/touch and a bounded recording sink; no Wine
-   or game claim. Register a real emulator uinput InputDevice only if supported;
-   preserve MotionRange admission. Coordinate the shared SDK, then freeze/publish
-   and run the real Android13x64 presentation workflow.
+4. Android input-widget41138732113@50123a9 passes eight required groups and
+   optional real registered-device ranges/camera/EOF cleanup. Preserve its actual
+   proof and earlier1180 toolbar/IME-window failure. Kernel/physical delivery,
+   production panel session, Wine/X11/ARM64/gameplay are still false. No rerun of
+   the green component is needed without a relevant change.
 5. Continue real data/gameplay gates below; do not request a basic Thor startup test.
 
 ## Completed evidence to preserve
@@ -134,3 +134,10 @@ Random/autologin bots remain OFF; schema proof is not AI. Deliver one stable-key
 signed APK with exact revisions, working link, update steps, consolidated test
 and support export only when coherent. Do not imply autonomous agent work after
 ending the session; identify any actual running CI separately.
+
+The first native x64 SQL run6e7 and diagnostic54d run failed before initialization.
+Actual diagnostic frames isolated lock.parent patch resolution: an archived lock
+under runtime/server looked for patches there. The fix stages exact old lock and
+seven digest-bound original patches together under fresh source-profile, retaining
+unchanged locked_source verification.21focused real regressions pass. Inspect the
+new actual SQL job; do not rebuild original tools or weaken source checks.
