@@ -9,6 +9,48 @@ from tools import qualify_android_presentation as presentation
 
 
 class AndroidPresentationQualification(unittest.TestCase):
+    def test_widget_ime_requires_every_check_and_preserves_execution_boundary(self):
+        receipt = dict(formatVersion=1, scope=presentation.INPUT_SCOPE, sourceRevision='a' * 40, fingerprint='fixture',
+                       abi='x86_64', api=33, targetSdk=35, groupsPassed=8, recordingSinkCapacity=256,
+                       batchCapacityRefusals=1, controllerStickMotionQualified=False, controllerCameraMotionQualified=False,
+                       registeredControllerAvailable=False, constructedMotionEventWithRealDevice=False,
+                       registeredControllerEofRemovalVerified=False, registeredControllerAxisRangeCount=0,
+                       registeredControllerUnavailableReason='registration-not-observed',
+                       **{flag: True for flag in presentation.INPUT_FLAGS},
+                       **{flag: False for flag in presentation.INPUT_UNQUALIFIED})
+        presentation.validate_input_receipt(receipt, 'a' * 40, 'fixture')
+        failures = [(flag, False) for flag in presentation.INPUT_FLAGS] + [(flag, True) for flag in presentation.INPUT_UNQUALIFIED]
+        failures += [('api', True), ('targetSdk', 34), ('groupsPassed', 7), ('recordingSinkCapacity', 257),
+                     ('batchCapacityRefusals', True), ('batchCapacityRefusals', 0),
+                     ('controllerStickMotionQualified', True), ('controllerCameraMotionQualified', True),
+                     ('controllerStickMotionQualified', 0), ('controllerCameraMotionQualified', None),
+                     ('registeredControllerAvailable', True), ('constructedMotionEventWithRealDevice', True),
+                     ('registeredControllerEofRemovalVerified', True), ('registeredControllerAxisRangeCount', True),
+                     ('registeredControllerUnavailableReason', 'ignored'),
+                     ('scope', presentation.SCOPE), ('sourceRevision', 'b' * 40), ('fingerprint', 'different'), ('abi', 'arm64-v8a')]
+        for key, value in failures:
+            changed = copy.deepcopy(receipt); changed[key] = value
+            with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                presentation.validate_input_receipt(changed, 'a' * 40, 'fixture')
+        for key in (*presentation.INPUT_FLAGS, *presentation.INPUT_UNQUALIFIED, 'recordingSinkCapacity',
+                    'controllerStickMotionQualified', 'controllerCameraMotionQualified', 'registeredControllerAvailable',
+                    'constructedMotionEventWithRealDevice', 'registeredControllerEofRemovalVerified',
+                    'registeredControllerAxisRangeCount', 'registeredControllerUnavailableReason'):
+            changed = copy.deepcopy(receipt); del changed[key]
+            with self.subTest(missing=key), self.assertRaises(ValueError):
+                presentation.validate_input_receipt(changed, 'a' * 40, 'fixture')
+        registered = copy.deepcopy(receipt)
+        for key in ('registeredControllerAvailable', 'constructedMotionEventWithRealDevice',
+                    'registeredControllerEofRemovalVerified', 'controllerStickMotionQualified', 'controllerCameraMotionQualified'):
+            registered[key] = True
+        registered.update(registeredControllerAxisRangeCount=8, registeredControllerUnavailableReason='none')
+        presentation.validate_input_receipt(registered, 'a' * 40, 'fixture')
+        for key, value in [('registeredControllerEofRemovalVerified', False), ('registeredControllerAxisRangeCount', 7),
+                           ('constructedMotionEventWithRealDevice', False), ('registeredControllerUnavailableReason', 'registration-not-observed')]:
+            changed = copy.deepcopy(registered); changed[key] = value
+            with self.subTest(registered_key=key), self.assertRaises(ValueError):
+                presentation.validate_input_receipt(changed, 'a' * 40, 'fixture')
+
     def test_every_real_check_and_exact_emulator_scope_are_required(self):
         receipt = dict(formatVersion=1, scope=presentation.SCOPE, sourceRevision='a' * 40, fingerprint='fixture',
                        abi='x86_64', api=33, targetSdk=35, groupsPassed=6,

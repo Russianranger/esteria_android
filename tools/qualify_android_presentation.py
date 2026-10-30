@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run real Surface/AudioTrack protocol fixtures on a disposable Android13 x64 emulator."""
+"""Run real Surface/AudioTrack and widget/IME fixtures on a disposable Android13 x64 emulator."""
 import argparse
 import hashlib
 import json
@@ -16,7 +16,9 @@ except ImportError:
 
 PACKAGE = 'io.github.russianranger.esteria'
 TEST = PACKAGE + '.presentation.PresentationAudioTest#actualSurfaceAndAudioTrackContracts'
+INPUT_TEST = PACKAGE + '.presentation.GameInputAndroidTest#actualImeTouchAndControllerCallbacks'
 SCOPE = 'android-13-x86_64-surface-audiotrack-protocol-fixtures'
+INPUT_SCOPE = 'android-13-x86_64-widget-ime-input-recording-component'
 FLAGS = ('nativeSurfaceExecuted', 'rgbaReadbackVerified', 'surfaceRecreationVerified', 'invalidFrameRejected',
          'audioResetVerified', 'audioInvalidHandshakeRecovered', 'privateSocketCleanupVerified',
          'privateRootAliasVerified', 'privateChildSymlinkRejected', 'audioActivePeerShutdownVerified',
@@ -24,6 +26,16 @@ FLAGS = ('nativeSurfaceExecuted', 'rgbaReadbackVerified', 'surfaceRecreationVeri
          'pausedSurfaceRecreationBlocked', 'surfaceResumeIdempotentVerified', 'surfaceLifecycleCleanupVerified')
 UNQUALIFIED = ('arm64GuestExecuted', 'androidWineExecuted', 'x11GuestExecuted', 'audibleOutputQualified',
                'adrenoQualified', 'gameplayQualified')
+INPUT_FLAGS = ('realWidgetSurfaceReady', 'touchKeyboardOpenedAndHidden', 'editorInfoVerified',
+               'composingDoneAtomic', 'softEnterAtomic', 'imeNullAtomic', 'wholeBatchRetryPreserved',
+               'replacedConnectionRefused', 'closedConnectionRefused', 'acceptedConnectionDuplicateRefused',
+               'plain64AndShiftedCapVerified', 'backAndPauseDiscardedDraft', 'controllerKeyEventsVerified',
+               'controllerKeyEventsConstructed', 'controllerRemovalCallbackConstructed',
+               'controllerRemovalReleased', 'controllerModeAndPauseReleased', 'touchPointerAndCancelVerified',
+               'recordingSinkOnly')
+INPUT_UNQUALIFIED = ('androidWineExecuted', 'x11GuestExecuted', 'inputBridgeSocketExecuted',
+                     'physicalControllerQualified', 'productionPresentationPanelSessionQualified',
+                     'kernelControllerEventDeliveryQualified', 'arm64Qualified', 'gameplayQualified', 'hardwareQualified')
 
 
 def require(condition, reason):
@@ -67,6 +79,27 @@ def validate_receipt(value, revision, fingerprint):
     require(all(value.get(flag) is False for flag in UNQUALIFIED), 'presentation-receipt-overclaims-scope')
 
 
+def validate_input_receipt(value, revision, fingerprint):
+    require(type(value.get('formatVersion')) is int and value['formatVersion'] == 1 and
+            value.get('scope') == INPUT_SCOPE and value.get('sourceRevision') == revision and
+            value.get('fingerprint') == fingerprint and value.get('abi') == 'x86_64', 'input-receipt-identity')
+    for key, expected in (('api', 33), ('targetSdk', 35), ('groupsPassed', 8),
+                          ('recordingSinkCapacity', 256), ('batchCapacityRefusals', 1)):
+        require(type(value.get(key)) is int and value[key] == expected, 'input-receipt-count-' + key)
+    require(all(value.get(flag) is True for flag in INPUT_FLAGS), 'input-receipt-missing-check')
+    require(all(value.get(flag) is False for flag in INPUT_UNQUALIFIED), 'input-receipt-overclaims-scope')
+    registered = value.get('registeredControllerAvailable')
+    require(type(registered) is bool, 'input-receipt-registered-controller-type')
+    for key in ('controllerStickMotionQualified', 'controllerCameraMotionQualified',
+                'constructedMotionEventWithRealDevice', 'registeredControllerEofRemovalVerified'):
+        require(type(value.get(key)) is bool, 'input-receipt-controller-qualification-type')
+        require(value[key] is registered, 'unregistered-controller-motion-or-cleanup-cannot-be-qualified')
+    require(type(value.get('registeredControllerAxisRangeCount')) is int and
+            value['registeredControllerAxisRangeCount'] == (8 if registered else 0), 'input-receipt-controller-range-count')
+    require(value.get('registeredControllerUnavailableReason') == ('none' if registered else 'registration-not-observed'),
+            'input-receipt-controller-availability-reason')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--adb', default='adb')
@@ -81,8 +114,10 @@ def main():
     args.output.mkdir(parents=True, exist_ok=False)
     report = dict(formatVersion=1, scope=SCOPE, sourceRevision=args.source_revision, apk=identity,
                   testApk=dict(bytes=args.test_apk.stat().st_size, sha256=digest(args.test_apk)),
-                  androidEmulatorSurfaceAudioQualified=False, **{key: False for key in UNQUALIFIED})
+                  androidEmulatorSurfaceAudioQualified=False, androidEmulatorWidgetImeInputQualified=False,
+                  **{key: False for key in UNQUALIFIED})
     installed = False
+    previous_hardware_ime = None
     failure = None
 
     def command(label, words, timeout=180, allow_failure=False):
@@ -113,9 +148,33 @@ def main():
         validate_receipt(evidence, args.source_revision, properties['ro.build.fingerprint'])
         report['appEvidence'] = evidence
         report['androidEmulatorSurfaceAudioQualified'] = True
+        _, previous = command('hardware-ime-setting-before', ['shell', 'settings', 'get', 'secure', 'show_ime_with_hard_keyboard'])
+        require(previous.strip() in ('null', '0', '1'), 'unknown-hardware-ime-setting-refused')
+        previous_hardware_ime = previous.strip()
+        command('enable-emulator-software-keyboard', ['shell', 'settings', 'put', 'secure', 'show_ime_with_hard_keyboard', '1'])
+        command('default-input-method', ['shell', 'settings', 'get', 'secure', 'default_input_method'])
+        command('available-input-methods', ['shell', 'ime', 'list', '-s'])
+        _, input_result = command('widget-ime-input-contracts', ['shell', 'am', 'instrument', '-w', '-r', '-e', 'class', INPUT_TEST,
+                                  PACKAGE + '.test/androidx.test.runner.AndroidJUnitRunner'], timeout=180)
+        require(instrument_passed(input_result), 'android-widget-ime-input-test-did-not-pass')
+        _, input_raw = command('app-input-receipt', ['exec-out', 'run-as', PACKAGE, 'cat', 'files/input-widget-qualification.json'])
+        require(len(input_raw.encode()) <= 65536, 'oversized-app-input-receipt')
+        input_evidence = json.loads(input_raw)
+        validate_input_receipt(input_evidence, args.source_revision, properties['ro.build.fingerprint'])
+        report['appInputEvidence'] = input_evidence
+        report['androidEmulatorWidgetImeInputQualified'] = True
     except Exception as error:
         failure = error; report['error'] = str(error)
     finally:
+        if previous_hardware_ime is not None:
+            try:
+                restore = (['shell', 'settings', 'delete', 'secure', 'show_ime_with_hard_keyboard']
+                           if previous_hardware_ime == 'null' else
+                           ['shell', 'settings', 'put', 'secure', 'show_ime_with_hard_keyboard', previous_hardware_ime])
+                command('restore-emulator-software-keyboard-setting', restore)
+            except Exception as error:
+                report['androidEmulatorWidgetImeInputQualified'] = False
+                report.setdefault('cleanupErrors', []).append(str(error)); failure = failure or error
         if installed:
             for label, words in [('bounded-logcat', ['logcat', '-d', '-t', '1500']),
                                  ('stop-owned-test-app', ['shell', 'am', 'force-stop', PACKAGE])]:
@@ -123,6 +182,7 @@ def main():
                     command(label, words, allow_failure=label == 'bounded-logcat')
                 except Exception as error:
                     report['androidEmulatorSurfaceAudioQualified'] = False
+                    report['androidEmulatorWidgetImeInputQualified'] = False
                     report.setdefault('cleanupErrors', []).append(str(error)); failure = failure or error
         report['completedAtUnix'] = int(time.time())
         (args.output / 'qualification.json').write_text(json.dumps(report, indent=2) + '\n')

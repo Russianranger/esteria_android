@@ -1,4 +1,4 @@
-name: Android 13 Surface and AudioTrack
+name: Android 13 Surface, AudioTrack and IME input
 on:
   push:
     branches: [android/client-server]
@@ -10,6 +10,8 @@ on:
       - app/src/main/java/**/presentation/**
       - app/src/main/java/**/input/**
       - app/src/androidTest/**/PresentationAudioTest.java
+      - app/src/androidTest/**/GameInputAndroidTest.java
+      - app/src/androidTest/**/RegisteredInputFixture.java
       - app/build.gradle
       - tools/qualify_android_presentation.py
       - tests/test_android_presentation_qualification.py
@@ -61,7 +63,7 @@ jobs:
             -PnativeRuntimeBridge=true -PnativeBridgeAbi=x86_64 -PpresentationEmulatorTest=true -PsourceRevision="$GITHUB_SHA"
           cp app/build/outputs/apk/debug/app-debug.apk out/android-presentation/app.apk
           cp app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk out/android-presentation/tests.apk
-      - name: Execute Android Surface pixels, paused lifecycle and AudioTrack clock
+      - name: Execute Android Surface, AudioTrack, real IME and bounded widget input
         uses: ReactiveCircus/android-emulator-runner@324029e2f414c084d8b15ba075288885e74aef9c # v2.34.0
         with:
           api-level: 33

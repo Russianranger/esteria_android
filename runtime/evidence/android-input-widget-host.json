@@ -1,0 +1,119 @@
+{
+  "executionBoundary": {
+    "androidControllerMotionQualified": false,
+    "androidUinputCapabilityObservedHere": false,
+    "androidWidgetOrImeExecutedHere": false,
+    "androidWineExecuted": false,
+    "arm64Qualified": false,
+    "deviceTestCandidate": false,
+    "gameplayQualified": false,
+    "hardwareQualified": false,
+    "inputBridgeSocketExecuted": false,
+    "kernelControllerEventDeliveryQualified": false,
+    "physicalControllerQualified": false,
+    "productionPresentationPanelSessionQualified": false,
+    "x11GuestExecuted": false
+  },
+  "formatVersion": 1,
+  "hostChecks": {
+    "apkAssembled": false,
+    "directInitialAndroid35Jdk17JavacPassed": true,
+    "emulatorRun": false,
+    "executionOverclaimsRefused": true,
+    "finalAndroidTestJavaCompilationPassed": true,
+    "finalLintPassed": true,
+    "gradleActionableTasks": 46,
+    "gradleBuildLine": "BUILD SUCCESSFUL in 17s",
+    "gradleCommand": "env JAVA_HOME=/workspace/scratch/6ba4742880b1/toolchain/jdk/usr/lib/jvm/java-17-openjdk-amd64 ANDROID_HOME=/workspace/scratch/6ba4742880b1/toolchain/android-sdk GRADLE_OPTS= ./gradlew --offline --no-daemon --init-script /tmp/esteria-wine-profile-xdyphqjf/outputs.gradle :app:compileDebugAndroidTestJavaWithJavac :app:lintDebug",
+    "gradleCompletionLog": {
+      "bytes": 2729,
+      "sha256": "6cba2c961c5b43a91edf663b9b81ffe6230367949618021ba2cf8abbeab51a38"
+    },
+    "gradleCompletionLogRetainedLocallyAt": "/tmp/esteria-input-widget-gradle.log",
+    "gradleExecutedTasks": 6,
+    "gradleUpToDateTasks": 40,
+    "negativeControlsRejectWrongApiAbiRevisionFingerprintAndBooleanCounts": true,
+    "negativeControlsRequireEveryImeTouchButtonCheck": true,
+    "optionalRegisteredMotionHasStrictAvailabilityRangeCleanupAgreement": true,
+    "pythonCommand": "python3 -m unittest tests.test_android_presentation_qualification -v",
+    "pythonGroupsPassed": 3
+  },
+  "integrationHeadAtObservation": "02f65872b5205b638e9dcb2f0e7ed3edc3b9715e",
+  "observedAtUtc": "2026-10-30T22:19:39.452969+00:00",
+  "preparedAndroidCases": {
+    "actualTouchCoordinateConversionAndCancelCallbacks": true,
+    "boundedUinputStdoutBytes": 8192,
+    "constructedControllerKeyEventsAndRemovalPauseRelease": true,
+    "constructedMotionEventsOnRegisteredDeviceAndActualChoreographer": true,
+    "fixedRecordingSinkEventCapacity": 256,
+    "fixedUinputCleanupBudgetMillis": 4000,
+    "fixedUinputRegistrationDeadlineMillis": 5000,
+    "optionalRealUinputRegistrationAndRangeLookup": true,
+    "pendingTextDoneSoftEnterAndImeNullAtomicSubmission": true,
+    "plain64ShiftedCapAndBackPauseDiscard": true,
+    "realAttachedSurfaceWidgetAndVisibleSoftwareKeyboard": true,
+    "registeredDeviceRequiresOwnedEofAndRemoval": true,
+    "replacedClosedAndAcceptedConnectionsRejectLateCallbacks": true,
+    "typedWholeBatchRefusalRetainsDraftAndAllowsExactRetry": true,
+    "unavailableFacilityDoesNotQualifyStickOrCamera": true
+  },
+  "scope": "host-compile-and-admission-for-pending-android-13-x64-widget-ime-input-case",
+  "sourceChanges": "AndroidTest and qualification tooling only; the sole existing fixture change exposes its source-owned synthetic frame producer within the test package. No production behavior, provider, source pin or app/build.gradle change.",
+  "sourceSnapshotExact": false,
+  "testedWorktreeSourceInputs": {
+    ".github/workflows/android-presentation.yml": {
+      "bytes": 4409,
+      "sha256": "75585daecae66450767b2c1da7bf8f6876e82b5d5025962a0c7d9844498382c5"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/presentation/GameInputAndroidTest.java": {
+      "bytes": 23387,
+      "sha256": "8aff3f1d46d3d5fe68bb48e332beb71badcbc0da0971a179bacca64ef70d3944"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/presentation/PresentationAudioTest.java": {
+      "bytes": 24024,
+      "sha256": "556a4b967f590fd9fb173f4569a2da381c5a1e9a5985fe9faee808bf7f59f4c0"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/presentation/RegisteredInputFixture.java": {
+      "bytes": 16532,
+      "sha256": "d73132d230691d86ffb723a2c91818615bc7e1664d6851084b0f024b91b49a36"
+    },
+    "runtime/ANDROID-INPUT-QUALIFICATION.md": {
+      "bytes": 3836,
+      "sha256": "8e88d5117f0235368c1905fad2720fd1571545fba059ef1ba1c9c652e1654f27"
+    },
+    "runtime/CONTROLS.md": {
+      "bytes": 5667,
+      "sha256": "e90a6460747454fb5c0ca176c9033bbd9a3f34653eb836291251ad8fdd97dd03"
+    },
+    "tests/test_android_presentation_qualification.py": {
+      "bytes": 7088,
+      "sha256": "162eb3b9fa78102aae3a40d76990499d1dba7a6848a47fd5612d94af72cc84c3"
+    },
+    "tools/qualify_android_presentation.py": {
+      "bytes": 12864,
+      "sha256": "a33f8b40af2b72559b51dfabc25e41d230e0970ede48f73b883d29d0f04cf2c6"
+    }
+  },
+  "unchangedProductionDependencies": {
+    "app/src/main/java/io/github/russianranger/esteria/input/GameInputView.java": {
+      "bytes": 15771,
+      "sha256": "03370da0939e2a60a4714bbc3404b75ea8a648bae53f962e8b74dd76841586d1"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/presentation/GamePresentationPanel.java": {
+      "bytes": 9668,
+      "sha256": "f0b4e59b2140bfc7606eea2a21c5fad69a3408f7efbe15ce23c8f274ef6668e9"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/input/GameInputRouter.java": {
+      "bytes": 6893,
+      "sha256": "f3508f2ea63a3ef3bcc4d11ed4ffa0b7d05b2829c839a2e736d1df87b0982f84"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/input/KeyboardText.java": {
+      "bytes": 5090,
+      "sha256": "b4ca85731bedfc6ceb3687817184533953edb379c190698c72946587527c1b61"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/presentation/InputSink.java": {
+      "bytes": 1151,
+      "sha256": "e96d947d64bc76581183044bc2032c583fdafa383c0a499d78e4c0877286bc2d"
+    }
+  }
+}

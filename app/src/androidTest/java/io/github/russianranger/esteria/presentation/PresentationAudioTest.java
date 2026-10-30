@@ -63,7 +63,7 @@ public final class PresentationAudioTest {
         } catch (IOException error) { socket.close(); throw error; }
     }
 
-    private static final class Frames implements AutoCloseable {
+    static final class Frames implements AutoCloseable {
         final LocalSocket bound = new LocalSocket();
         final LocalServerSocket server;
         final Thread worker;

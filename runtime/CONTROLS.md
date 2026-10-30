@@ -81,3 +81,12 @@ fits the game Surface to the remaining viewport with its source aspect ratio.
 The toolbar no longer covers the bottom hotbar, and touch coordinates are local
 to the fitted game view. Application Java/lint pass; complete guest gameplay,
 controller usability and hardware presentation remain separate qualifications.
+
+`android-presentation.yml` now also prepares a real Android13 x64 widget/IME
+component case: visible software keyboard, composition plus Done/Enter, bounded
+whole-batch retry, stale/closed connections, touch and constructed controller
+KeyEvents. A test-only uinput registration can additionally supply real framework
+joystick ranges for constructed MotionEvents; unavailable registration leaves
+stick/camera qualification false. No Android execution result is claimed until
+that exact workflow runs. The fixed recording sink does not exercise Wine/X11,
+physical controller delivery or game fields. See `ANDROID-INPUT-QUALIFICATION.md`.
