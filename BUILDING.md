@@ -124,3 +124,11 @@ documented explicit emulator-only properties. The production ABI stays ARM64.
 `presentationEmulatorTest=true` requires an x86_64 debug/test native build;
 `prootProbeProviderDir` selects a separate source-verified emulator fixture.
 Neither may substitute emulator binaries for the ARM64 production provider.
+
+`-PguestBridgeProviderDir=<verified-provider>` additionally bundles the pinned
+ARM64 X11 frame/input helpers and ALSA output plugin. See
+`runtime/bridges/ANDROID-PACKAGING.md` for source rebuild and verification. The
+existing client setup action installs these into a separate generation after
+checking the exact Wine archive identity. Repeating setup of a verified Wine
+generation does not reopen or download its archive. Final APK validation must
+check each selected provider, not only successful assembly.

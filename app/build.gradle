@@ -4,6 +4,7 @@ def clientRevision = sourceLock.sources.client.commit
 def serverRevision = sourceLock.sources.server.commit
 def prootProvider = providers.gradleProperty('prootProviderDir').orNull
 def serverProvider = providers.gradleProperty('serverRuntimeProviderDir').orNull
+def guestBridgeProvider = providers.gradleProperty('guestBridgeProviderDir').orNull
 def nativeBridge = providers.gradleProperty('nativeRuntimeBridge').getOrElse('false').toBoolean()
 def nativeAbi = providers.gradleProperty('nativeBridgeAbi').getOrElse('arm64-v8a')
 def presentationEmulator = providers.gradleProperty('presentationEmulatorTest').getOrElse('false').toBoolean()
@@ -30,6 +31,7 @@ android {
         buildConfigField 'String', 'SERVER_REVISION', '"' + serverRevision + '"'
         buildConfigField 'boolean', 'PROOT_PACKAGED', prootProvider ? 'true' : 'false'
         buildConfigField 'boolean', 'SERVER_RUNTIME_PACKAGED', serverProvider ? 'true' : 'false'
+        buildConfigField 'boolean', 'GUEST_BRIDGES_PACKAGED', guestBridgeProvider ? 'true' : 'false'
         buildConfigField 'boolean', 'PRESENTATION_EMULATOR_TEST', presentationEmulator ? 'true' : 'false'
         ndk { abiFilters nativeBridge ? nativeAbi : 'arm64-v8a' }
         if (nativeBridge) externalNativeBuild { cmake {
@@ -126,3 +128,14 @@ if (serverProvider) {
 }
 
 apply from: 'proot-probe.gradle'
+
+// Exact source-built X11/ALSA payload, separate from the Wine rootfs and saves.
+if (guestBridgeProvider) {
+    def provider = file(guestBridgeProvider)
+    android.sourceSets.main.assets.srcDir(new File(provider, 'assets'))
+    def verifyGuestBridges = tasks.register('verifyGuestBridgeProvider', Exec) {
+        workingDir rootProject.projectDir
+        commandLine 'python3', 'tools/provider_guest_bridges.py', 'verify', '--provider', provider.absolutePath
+    }
+    tasks.named('preBuild').configure { dependsOn verifyGuestBridges }
+}

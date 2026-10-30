@@ -19,7 +19,7 @@ TEST = PACKAGE + '.presentation.PresentationAudioTest#actualSurfaceAndAudioTrack
 SCOPE = 'android-13-x86_64-surface-audiotrack-protocol-fixtures'
 FLAGS = ('nativeSurfaceExecuted', 'rgbaReadbackVerified', 'surfaceRecreationVerified', 'invalidFrameRejected',
          'audioResetVerified', 'audioInvalidHandshakeRecovered', 'privateSocketCleanupVerified',
-         'privateRootAliasVerified', 'privateChildSymlinkRejected')
+         'privateRootAliasVerified', 'privateChildSymlinkRejected', 'audioActivePeerShutdownVerified')
 UNQUALIFIED = ('arm64GuestExecuted', 'androidWineExecuted', 'x11GuestExecuted', 'audibleOutputQualified',
                'adrenoQualified', 'gameplayQualified')
 

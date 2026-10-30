@@ -40,6 +40,7 @@ import io.github.russianranger.esteria.core.runtime.install.RuntimeInstaller;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import io.github.russianranger.esteria.runtime.RuntimeSetup;
 import io.github.russianranger.esteria.runtime.ServerRuntimeSetup;
+import io.github.russianranger.esteria.runtime.GuestBridgeSetup;
 
 /** Foreground owner of large import jobs. Runtime launch remains gated until qualified binaries exist. */
 public final class SessionService extends Service {
@@ -171,10 +172,8 @@ public final class SessionService extends Service {
     private void prepareRuntime() throws IOException {
         status = "Preparing client runtime…";
         RuntimeSetup setup = new RuntimeSetup(this, root);
-        if (setup.current() != null) {
-            status = "The current client runtime files are already prepared. Local services and gameplay are still under development.";
-            return;
-        }
+        GuestBridgeSetup bridges = BuildConfig.GUEST_BRIDGES_PACKAGED ? new GuestBridgeSetup(this, root) : null;
+        if (bridges != null) bridges.requireWineArchive(setup.archiveSha256());
         final long[] lastUpdate = {0};
         RuntimeInstaller.Result result = setup.prepare((phase, path, completed, total) -> {
             long now = android.os.SystemClock.elapsedRealtime();
@@ -190,6 +189,21 @@ public final class SessionService extends Service {
                 + " copiedBytes=" + result.copiedBytes + " hardLinkCopies=" + result.hardLinkCopies
                 + " hardLinkCopyBytes=" + result.hardLinkCopyBytes + " directorySyncSupported=" + result.directorySyncSupported
                 + " gameRuntimeQualified=false");
+        if (bridges != null) {
+            status = "Preparing display, input and audio support…";
+            RuntimeInstaller.Result support = bridges.prepare((phase, path, completed, total) -> {
+                long now = android.os.SystemClock.elapsedRealtime();
+                if (now - lastUpdate[0] >= 250 || completed == total) {
+                    lastUpdate[0] = now;
+                    status = "Preparing display, input and audio support…\n" + mib(completed)
+                            + (total >= 0 ? " / " + mib(total) : "") + " MiB";
+                }
+            }, cancelled::get);
+            log("Guest bridges prepared generation=" + support.generation + " reusedFiles=" + support.reusedFiles
+                    + " copiedBytes=" + support.copiedBytes + " archiveSha256=" + bridges.archiveSha256()
+                    + " gameRuntimeQualified=false");
+        }
+        status = "Client runtime files are prepared. Local services and gameplay are still under development.";
     }
     private void prepareServerRuntime() throws IOException {
         status = "Preparing bundled database and server dependencies…";
@@ -247,6 +261,20 @@ public final class SessionService extends Service {
                 facts.put("runtime.server.prepared", String.valueOf(setup.current() != null));
             } catch (IOException error) {
                 facts.put("runtime.server.installationError", error.getMessage());
+            }
+        }
+        facts.put("runtime.guestBridges.packaged", String.valueOf(BuildConfig.GUEST_BRIDGES_PACKAGED));
+        facts.put("runtime.guestBridges.prepared", "false");
+        if (BuildConfig.GUEST_BRIDGES_PACKAGED) {
+            try {
+                GuestBridgeSetup bridges = new GuestBridgeSetup(this, root);
+                bridges.requireWineArchive(new RuntimeSetup(this, root).archiveSha256());
+                facts.put("runtime.guestBridges.archiveSha256", bridges.archiveSha256());
+                facts.put("runtime.guestBridges.requiredWineArchiveSha256", bridges.requiredWineArchiveSha256());
+                facts.put("runtime.guestBridges.expectedGeneration", bridges.generation());
+                facts.put("runtime.guestBridges.prepared", String.valueOf(bridges.current() != null));
+            } catch (IOException error) {
+                facts.put("runtime.guestBridges.installationError", error.getMessage());
             }
         }
         facts.put("proot.packaged", String.valueOf(BuildConfig.PROOT_PACKAGED));

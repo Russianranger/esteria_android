@@ -63,9 +63,15 @@ public final class RuntimeSetup {
 
     public RuntimeInstaller.Result prepare(RuntimeWork.Progress progress, RuntimeWork.Cancellation cancelled)
             throws IOException {
+        RuntimeInstaller installer = new RuntimeInstaller(store);
+        // A verified active generation is sufficient for repeat/offline setup.
+        // RuntimeInstaller returns it before opening the archive; do not hash or
+        // redownload 613 MB just to add an independently packaged bridge update.
+        if (installer.resolveCurrent(plan) != null)
+            return installer.install(cache.resolve("unused-completed-generation"), plan, progress, cancelled);
         Path archive = new DownloadCache(cache).obtain(download, plan.archiveName, plan.archiveBytes,
                 plan.archiveSha256, progress, cancelled);
-        return new RuntimeInstaller(store).install(archive, plan, progress, cancelled);
+        return installer.install(archive, plan, progress, cancelled);
     }
 
     public Path current() throws IOException { return new RuntimeInstaller(store).resolveCurrent(plan); }

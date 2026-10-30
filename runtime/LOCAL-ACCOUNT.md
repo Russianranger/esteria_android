@@ -96,6 +96,26 @@ with no stubs or substitute crypto. Boost 1.83 headers were obtained from the
 pinned Ubuntu package SHA256
 `1412e461d573f66c9d5c7af63696a1d01e11a4724215299a3cf6afd1bcdd3d7f`;
 unrelated unused utility sections were eliminated at link time. This is isolated
-host crypto evidence; real MySQL and ARM64 common-target workflow results remain
-pending publication/execution. No auth challenge, world entry,
+host crypto evidence; the ARM64 common-target C++ workflow remains pending.
+No auth challenge, world entry,
 existing-save upgrade, module account behavior, or Android gameplay is qualified.
+
+The actual ARM64 MySQL phase passed in [run 40998008509](https://github.com/Russianranger/esteria_android/actions/runs/40998008509),
+job `123875576596`, integration revision
+`69b6b9e46ae91dac012dfb55463b81d0652191b8`. MySQL
+`8.0.46-0ubuntu0.24.04.4` ran with external networking disabled. The exact 22 auth
+bases loaded; owned-account creation, unchanged repeat credentials, interrupted
+commit recovery, collision/schema-drift rejection, and clean-restart persistence
+all passed. The full 468-file base fixture also passed in that job.
+
+The account evidence artifact is `12951864061` (8,842 bytes), ZIP SHA256
+`f034ce232eac6d10355bcda2eef866d9bda5f4d39dd63067bbe43ffb40516d4f`;
+download and receipt readback were independently verified. Its qualification
+receipt SHA256 is
+`6c67ff662a12c1165bdad9b6b3330feeb5452af0f99c9365776d52e25c9bc0fa`,
+and the runtime manifest SHA256 is
+`3aa480f48fd36cea1253557976163dc2da0707eef72dbef18d028196888b05b1`.
+The source fixture manifest is
+`54cccae6362ed4cad7d656b3bf12e9da4333c08297af2bb282190f53660eff33`.
+This qualifies the disposable account/bootstrap behavior, not a running
+authserver, client login, world gameplay, or upgrades of existing saves.

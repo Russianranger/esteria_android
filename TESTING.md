@@ -118,3 +118,16 @@ The actual engine frame readback passed in Wine run `40992315512`: receipt SHA25
 `69bfe354c777abf78e54ed033849235928edf742efdfce3371bca4c1e01379c4`.
 This includes exact BGRA/partial-clear pixels and embedded engine presentation,
 using llvmpipe LLVM15.0.6 with validation layers unavailable. It is not world rendering.
+
+Actual Android PRoot/glibc run `40998008458` at integration `69b6b9e` passes the
+two-launch native x64 fixture at API33/target35. It verifies private ELF loading,
+glibc2.36 dlopen/TLS/pthreads, fork/exec, loopback and persisted bytes, with empty
+guest stderr. Artifact SHA256 is
+`9f08e7cc1461f04467730d7b25e1513b1284d91a9041c3bae187b7a1e176f2a9`.
+See `runtime/ANDROID-PROOT-QUALIFICATION.md`; production ARM64, Wine and
+tracer/app-death behavior are explicitly outside this result.
+
+The real ARM64 owned-account qualification passes run `40998008509`, receipt
+SHA256 `6c67ff662a12c1165bdad9b6b3330feeb5452af0f99c9365776d52e25c9bc0fa`.
+It uses a separate fresh exact-MySQL8.0.46 fixture, not a replay over saved game
+state. `runtime/LOCAL-ACCOUNT.md` records source-matched SRP and recovery scope.

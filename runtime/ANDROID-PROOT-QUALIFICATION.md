@@ -40,9 +40,16 @@ passes explicit argv/environment directly because it contains no coreutils.
 Passing this probe would establish the named Android x86_64 loader behavior.
 It would **not** qualify Android ARM64, AYN Thor, Adreno, Wine, app-death recovery,
 full rootfs services, database saves, or gameplay. Their receipt flags remain false.
-Current implementation is compiled; the hosted execution result must be inspected
-before claiming Android PRoot qualification. Native Linux fixture tests establish
-the diagnostic program's logic only.
+Run [40998008458](https://github.com/Russianranger/esteria_android/actions/runs/40998008458)
+passed on Android13 x86_64 at integration revision
+`69b6b9e46ae91dac012dfb55463b81d0652191b8`. Both real guest invocations exited0,
+reported glibc2.36 and every expected dynamic-library/thread/fork/exec/loopback
+marker, retained the exact persistent file, and produced empty stderr. The
+receipt confirms API33/targetSdk35, rejected direct private Bionic execution,
+and successful execution through the installed tracer/loader. The evidence ZIP
+SHA-256 is `9f08e7cc1461f04467730d7b25e1513b1284d91a9041c3bae187b7a1e176f2a9`.
+This qualifies the stated x86_64 scope only. Native Linux fixture tests separately
+establish diagnostic logic; they are not the Android evidence.
 
 To reproduce with Python3.12+, dpkg-deb, JDK17 and the documented Android SDK:
 

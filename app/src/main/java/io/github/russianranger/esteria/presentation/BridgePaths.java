@@ -1,6 +1,7 @@
 package io.github.russianranger.esteria.presentation;
 
 import android.content.Context;
+import android.net.LocalServerSocket;
 import android.system.ErrnoException;
 import android.system.Os;
 import android.system.OsConstants;
@@ -16,6 +17,17 @@ import java.nio.file.Paths;
 /** Socket endpoints are contained in one caller-owned private session directory. */
 final class BridgePaths {
     private BridgePaths() {}
+    /** Closing an fd on another thread does not reliably interrupt accept(2).
+     * Shutdown the owned listener first so Android's blocking accept wakes. */
+    static void stopAccept(LocalServerSocket listener) throws IOException {
+        java.io.FileDescriptor descriptor = listener == null ? null : listener.getFileDescriptor();
+        if (descriptor == null || !descriptor.valid()) return;
+        try { Os.shutdown(descriptor, OsConstants.SHUT_RDWR); }
+        catch (ErrnoException error) {
+            if (error.errno != OsConstants.EBADF && error.errno != OsConstants.ENOTCONN)
+                throw new IOException("Cannot stop private socket listener", error);
+        }
+    }
     static Path directory(Context context, File directory) throws IOException {
         Path advertisedRoot = context.getFilesDir().toPath().toAbsolutePath().normalize();
         Path root = advertisedRoot.toRealPath();

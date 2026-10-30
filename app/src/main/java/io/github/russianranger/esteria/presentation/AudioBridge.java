@@ -162,6 +162,10 @@ public final class AudioBridge implements AutoCloseable {
         @Override public synchronized void close() {
             ended = true;
             if (track != null) { track.release(); track = null; }
+            // Like accept, another thread's blocking read can retain the
+            // underlying socket after close(fd); shutdown wakes that read.
+            try { socket.shutdownInput(); socket.shutdownOutput(); }
+            catch (IOException ignored) { /* Closing still follows; joins verify the worker stops. */ }
             try { socket.close(); } catch (IOException ignored) { /* A second close is harmless. */ }
         }
     }
@@ -169,6 +173,7 @@ public final class AudioBridge implements AutoCloseable {
     @Override public void close() throws IOException {
         closed = true;
         IOException failure = null;
+        try { BridgePaths.stopAccept(server); } catch (IOException error) { failure = error; }
         try { if (server != null) server.close(); } catch (IOException error) { failure = error; }
         try { bound.close(); } catch (IOException error) { if (failure == null) failure = error; }
         List<Playback> active; List<Thread> pending;

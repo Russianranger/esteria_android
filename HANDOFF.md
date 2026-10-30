@@ -33,8 +33,9 @@ server/Wine jobs must not be converted into successful evidence without logs.
    The Java runtime installer has passed the full pinned archive on Linux with
    64 MiB heap, including forced hardlink copies. Android13 x86_64 installer/update
    run `40995925492` passes all18 contracts and version-2 preservation. Android
-   native owner run `40994809786` passes six real shell-process groups. Continue
-   actual emulator PRoot/glibc execution and ARM64 integration. See
+   native owner run `40994809786` passes six real shell-process groups. PRoot/glibc
+   run `40998008458` passes actual x64 private-ELF/dlopen/TLS/thread/fork/loopback
+   and relaunch persistence. Continue tracer-death and ARM64 integration. See
    `runtime/ANDROID-INSTALLATION.md` and `runtime/proot/README.md`.
 5. Dependency image/MySQL/source-capture CI `40989666380` and normalized rootfs
    package/readback run `40993458111` passed. Integrate the verified optional APK
@@ -44,7 +45,10 @@ server/Wine jobs must not be converted into successful evidence without logs.
 6. Base SQL load/restart CI `40991449039` passed all 468 files; qualify the compiled dbimport and the separate playerbots
    loader, then versioned upgrades with validated backup/restore. Real empty-DB
    bootstrap and loopback realm repair pass; `40987376123` runs all eight realm
-   tests on MySQL 8.0.44. Repair advertised realm only after all module updates.
+   tests on MySQL 8.0.44. Owned-account fresh create/recovery/restart passes native
+   ARM64 MySQL run `40998008509`; actual pinned SRP C++ sources also pass locally
+   on x64. Implement real auth challenge/proof/realm-list qualification when
+   authserver is available. Repair advertised realm only after all module updates.
 7. Native process/Surface/audio/input bridge implementations and internal controller/IME
    view are now present; guest ARM64 build `40995565147` and Android-owner CI pass. Integrate
    their qualified session lifecycle and

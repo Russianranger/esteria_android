@@ -164,8 +164,13 @@ surface recreation, and streams PCM through real `AudioTrack` while checking
 accepted frames, playback-head progress and reset. Malformed frames/handshakes,
 socket cleanup, and Android's trusted app-directory alias are also checked.
 `tools/qualify_android_presentation.py` binds the receipt to the measured APK/JNI
-images, source revision and emulator fingerprint. This newly authored gate is
-not yet reported as passed. It does not exercise the guest X11 producers, Wine,
+images, source revision and emulator fingerprint. The first emulator run
+`40998008540` reached actual pixel/recreation checks, then caught an Android
+listener-shutdown failure: closing a listening fd did not wake its blocked
+accept worker. Listener and idle audio cancellation now explicitly shut down
+their owned sockets before close; the same bounded worker joins remain required.
+An added fixture stops audio with an established peer still connected. The
+corrected gate is not yet reported as passed. It does not exercise the guest X11 producers, Wine,
 ARM64 execution, on-screen presentation, audible hardware output, or Adreno.
 
 Docker and filesystem Unix socket creation are unavailable in the current host;

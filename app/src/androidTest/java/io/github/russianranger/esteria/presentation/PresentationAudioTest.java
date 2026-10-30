@@ -104,8 +104,9 @@ public final class PresentationAudioTest {
             closed = true;
             LocalSocket socket = current;
             if (socket != null) socket.close();
+            BridgePaths.stopAccept(server);
             server.close(); bound.close(); worker.join(4000);
-            assertFalse("Synthetic frame producer must stop", worker.isAlive());
+            assertFalse("Synthetic frame producer must stop: " + Arrays.toString(worker.getStackTrace()), worker.isAlive());
             BridgePaths.deleteOwnedSocket(path, device, inode);
             if (failure.get() != null) throw new AssertionError("Synthetic frame producer failed", failure.get());
         }
@@ -225,6 +226,10 @@ public final class PresentationAudioTest {
                     DataOutputStream output = new DataOutputStream(recovered.getOutputStream());
                     for (int value : new int[]{PCM_MAGIC,1,48000,2,64}) word(output, value);
                     output.flush(); assertEquals(0, word(new DataInputStream(recovered.getInputStream())));
+                    // The owner must stop an established idle worker while
+                    // its peer remains connected, not depend on peer EOF.
+                    audio.close();
+                    assertEquals(-1, recovered.getInputStream().read());
                 }
             }
             assertFalse(Files.exists(root.resolve("audio.sock")));
@@ -237,6 +242,7 @@ public final class PresentationAudioTest {
                     .put("invalidFrameRejected",true).put("audioTrackAcceptedFrames",acceptedFrames)
                     .put("audioTrackPlayedFrames",playedFrames).put("audioResetVerified",true)
                     .put("audioInvalidHandshakeRecovered",true).put("privateSocketCleanupVerified",true)
+                    .put("audioActivePeerShutdownVerified",true)
                     .put("privateRootAliasVerified",true).put("privateChildSymlinkRejected",true)
                     .put("arm64GuestExecuted",false).put("androidWineExecuted",false).put("x11GuestExecuted",false)
                     .put("audibleOutputQualified",false).put("adrenoQualified",false).put("gameplayQualified",false);
