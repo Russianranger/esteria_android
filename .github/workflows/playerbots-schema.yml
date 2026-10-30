@@ -1,0 +1,132 @@
+name: Playerbots database component and fresh schema
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - .github/workflows/playerbots-schema.yml
+      - tools/build_playerbots_component.py
+      - tools/prepare_server_isolated_build.py
+      - tools/prepare_server_isolated_sources.py
+      - tools/qualify_server_isolated_build.py
+      - tools/verify_playerbots_reference.py
+      - tests/test_playerbots_component_build.py
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: playerbots-schema-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  playerbots-schema:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Check narrow build and archived input guards
+        run: |
+          test "$(uname -m)" = aarch64
+          python3 -m unittest tests.test_playerbots_component_build tests.test_server_isolated_environment \
+            tests.test_server_isolated_sources tests.test_server_isolated_build -v
+          mkdir -p out/playerbots-evidence
+      - name: Select the unchanged archived server lock after validating current app binding
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          from tools import server_provider_sources as sources
+          from tools import prepare_server_isolated_build as build
+          pin=json.loads(Path('runtime/server/programs-provider.lock.json').read_text())
+          sources.validate_current(pin,Path('sources.lock.json'))
+          path=Path('out/playerbots-original-sources.lock.json')
+          with path.open('xb') as stream:stream.write(pin['serverBuildSourceLockText'].encode('utf-8'))
+          path.chmod(0o444)
+          build.load_pin(path)
+          PY
+      - name: Acquire exact retained source archive, receipts, header and original toolchain metadata
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/prepare_server_isolated_build.py acquire --output out/playerbots-inputs \
+            --original-lock out/playerbots-original-sources.lock.json \
+            > out/playerbots-evidence/acquisition.log 2>&1
+          cp out/playerbots-inputs/acquisition.json out/playerbots-evidence/
+      - name: Install exact original development packages and verify relevant compiler environment
+        run: |
+          mapfile -t build_packages < <(python3 tools/prepare_server_isolated_build.py packages \
+            --original-lock out/playerbots-original-sources.lock.json)
+          test "${#build_packages[@]}" = 10
+          sudo apt-get -o Acquire::Retries=3 update
+          sudo apt-get -o Acquire::Retries=3 install -y "${build_packages[@]}"
+          python3 tools/prepare_server_isolated_build.py environment --inputs out/playerbots-inputs \
+            --original-lock out/playerbots-original-sources.lock.json \
+            --output out/playerbots-evidence/environment.json
+      - name: Prepare exact seven-patch plain source export without a repository or game assets
+        run: |
+          python3 tools/prepare_server_isolated_sources.py --source-inputs out/playerbots-inputs/source-inputs \
+            --supplements out/playerbots-inputs/supplements \
+            --original-lock out/playerbots-original-sources.lock.json \
+            --output out/playerbots-prepared > out/playerbots-evidence/source-preparation.json
+          test ! -e out/playerbots-prepared/source/.git
+          test ! -e out/playerbots-prepared/source/Harvested
+          test ! -e out/playerbots-prepared/source/Data
+      - name: Build only the real playerbots database reference with cache and external network disabled
+        id: component
+        run: |
+          sudo env PATH="$PATH" PYTHONDONTWRITEBYTECODE=1 CCACHE_DISABLE=1 \
+            unshare --net -- sh -c 'ip link set lo up; exec "$@"' sh \
+            python3 tools/build_playerbots_component.py \
+            --prepared "$GITHUB_WORKSPACE/out/playerbots-prepared" \
+            --inputs "$GITHUB_WORKSPACE/out/playerbots-inputs" \
+            --original-lock "$GITHUB_WORKSPACE/out/playerbots-original-sources.lock.json" \
+            --environment "$GITHUB_WORKSPACE/out/playerbots-evidence/environment.json" \
+            --integration-revision "$GITHUB_SHA" \
+            --output "$GITHUB_WORKSPACE/out/playerbots-component" \
+            > out/playerbots-evidence/build.log 2>&1
+      # The separate native SQL step consumes payload/bin/playerbots-schema and
+      # payload/helper-build.json inside the verified compiler-free engine image.
+      # Its fresh-instance, reentry and restart receipt is separate from this build.
+      - name: Collect build-only receipts and bounded compiler diagnostics
+        if: always()
+        run: |
+          sudo python3 - <<'PY'
+          from pathlib import Path
+          import shutil
+          source=Path('out/playerbots-component');target=Path('out/playerbots-evidence')
+          target.mkdir(parents=True,exist_ok=True)
+          receipt=source/'qualification.json'
+          if receipt.is_file():shutil.copyfile(receipt,target/'helper-build.json')
+          logs=source/'diagnostics'
+          if logs.is_dir():
+              for path in logs.iterdir():
+                  if not path.is_file():continue
+                  if path.suffix=='.json' and path.stat().st_size<=16*1024**2:
+                      shutil.copyfile(path,target/path.name)
+                  elif path.suffix=='.log':
+                      with path.open('rb') as stream:
+                          stream.seek(max(0,path.stat().st_size-256*1024))
+                          (target/(path.stem+'-tail.log')).write_bytes(stream.read(256*1024))
+          PY
+          sudo chown -R "$(id -u):$(id -g)" out/playerbots-evidence
+          if test -d out/playerbots-component/payload; then
+            sudo chown -R "$(id -u):$(id -g)" out/playerbots-component/payload
+          fi
+      - name: Retain separately measured helper and all original source inputs
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always() && steps.component.outcome == 'success'
+        with:
+          name: playerbots-schema-helper-${{ github.sha }}
+          compression-level: 0
+          path: out/playerbots-component/payload/
+          retention-days: 30
+          if-no-files-found: error
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: playerbots-schema-evidence-${{ github.sha }}
+          path: out/playerbots-evidence/
+          retention-days: 30
+          if-no-files-found: error

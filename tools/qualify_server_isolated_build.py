@@ -90,9 +90,10 @@ def run_owned(arguments, log, environment, *, cwd=None, timeout=MAX_BUILD_SECOND
         selector.close(); process.stdout.close(); owner.stop(graceful_timeout=0)
 
 
-def verify_prepared(prepared, acquired):
+def verify_prepared(prepared, acquired, original_lock=None):
     """Rehash the exact prepared source, semantic patches, metadata and Lua tree."""
-    pin = inputs.load_pin()
+    pin = inputs.load_pin(original_lock)
+    source_lock = inputs.selected_source_lock(original_lock)
     acquisition, _ = modules.read_json(acquired / 'acquisition.json')
     require(acquisition.get('formatVersion') == 1 and acquisition.get('scope') == 'isolated-source-build-inputs-acquired' and
             acquisition.get('inputLock') == files.identity(inputs.LOCK), 'isolated-acquisition-receipt-mismatch')
@@ -115,7 +116,7 @@ def verify_prepared(prepared, acquired):
             receipt.get('sourceInputReceipt') == files.identity(source_root / pin['sourceInputs']['receipt']['file']) and
             receipt.get('sourceInputArchive') == files.identity(source_root / pin['sourceInputs']['archive']['file']) and
             receipt.get('sourceManifest') == manifest_identity == original_receipt.get('manifest') and
-            receipt.get('sourceLock') == original_receipt.get('sourceLock') == files.identity(ROOT / 'sources.lock.json') and
+            receipt.get('sourceLock') == original_receipt.get('sourceLock') == files.identity(source_lock) and
             receipt.get('semanticPatchReplay', {}).get('exactAdaptedCopiesReproduced') is True and
             receipt.get('gitMetadataPresent') is False and receipt.get('assetTreesIncluded') is False,
             'isolated-prepared-source-receipt-mismatch')

@@ -16,10 +16,13 @@ import sys
 
 if not __package__: sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from tools import prepare_runtime as archives, prepare_server_requalification as reference
-from tools import provider_client_runtime as client, verify_server_build as files
+from tools import provider_client_runtime as client, verify_server_build as files, fetch_sources, server_provider_sources
 
 ROOT = Path(__file__).resolve().parents[1]
 LOCK = ROOT / 'runtime/server/isolated-build.lock.json'
+ARCHIVED_LOCK = ROOT / 'runtime/server/server-build-sources.lock.json'
+ARCHIVED_LOCK_IDENTITY = dict(bytes=2170,
+    sha256='5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1')
 require = files.require
 
 
@@ -28,11 +31,30 @@ def canonical_hash(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()
 
 
-def load_pin():
+def selected_source_lock(original_lock=None):
+    """An explicit archived lock may differ only in the current client inputs."""
+    current_path = ROOT / 'sources.lock.json'
+    if original_lock is None and files.identity(current_path) == ARCHIVED_LOCK_IDENTITY:
+        return current_path
+    selected = Path(original_lock) if original_lock is not None else ARCHIVED_LOCK
+    require(files.identity(selected) == ARCHIVED_LOCK_IDENTITY,
+        'isolated-original-source-lock-pin-mismatch')
+    original = fetch_sources.load_lock(selected)
+    current = fetch_sources.load_lock(current_path)
+    require(type(original.get('schema')) is int and original['schema'] == 1 and
+            type(current.get('schema')) is int and current['schema'] == 1 and
+            server_provider_sources.same(current['sources']['server'], original['sources']['server']) and
+            server_provider_sources.same(current.get('compatibility'), original.get('compatibility')),
+            'isolated-current-server-or-compatibility-differs-from-original')
+    return selected
+
+
+def load_pin(original_lock=None):
     pin, _ = reference.modules.read_json(LOCK)
+    source_lock = selected_source_lock(original_lock)
     require(pin.get('formatVersion') == 1 and pin.get('scope') == 'measured-seven-patch-isolated-source-rebuild-inputs' and
             pin.get('minimumFreeBytes') == 16 * 1024**3 and
-            files.identity(ROOT/'sources.lock.json')['sha256'] == pin.get('sourceLockSha256'),
+            files.identity(source_lock)['sha256'] == pin.get('sourceLockSha256'),
             'isolated-build-input-selection-mismatch')
     for field in ('sourceInputs', 'originalBuildEnvironment'):
         row = pin[field]; item = row['artifact']
@@ -50,7 +72,7 @@ def load_pin():
             'isolated-relevant-build-package-selection')
     require(set(pin.get('sourceSupplements',{}))=={'modules/ModulesScriptLoader.h'},'isolated-source-supplement-set')
     for name,row in pin['sourceSupplements'].items():
-        require(row.get('sourceCommit')==json.loads((ROOT/'sources.lock.json').read_text())['sources']['server']['commit'] and
+        require(row.get('sourceCommit')==json.loads(source_lock.read_text())['sources']['server']['commit'] and
                 row.get('url')=='https://raw.githubusercontent.com/Russianranger/EsteriaWoW/'+row['sourceCommit']+'/'+name and
                 row.get('gitMode')=='100644' and re.fullmatch('[0-9a-f]{40}',row.get('gitBlob','')) and
                 type(row.get('bytes')) is int and 0<row['bytes']<=256*1024 and
@@ -69,8 +91,8 @@ def copy_member(archive, members, name, target, expected):
     target.chmod(0o444)
 
 
-def acquire(output, api=None):
-    pin = load_pin(); output = Path(os.path.abspath(output)); archives.directory(output.parent, create=True)
+def acquire(output, api=None, *, original_lock=None):
+    pin = load_pin(original_lock); output = Path(os.path.abspath(output)); archives.directory(output.parent, create=True)
     require(not os.path.lexists(output), 'existing-isolated-inputs-preserved')
     require(shutil.disk_usage(output.parent).free >= pin['minimumFreeBytes'], 'isolated-build-requires-16-GiB-free')
     api = api or reference.Github(os.environ.get('GITHUB_TOKEN'))
@@ -172,8 +194,8 @@ def observed_binary_inputs(inputs):
     return {str(path):files.identity(path) for path in sorted(paths)}
 
 
-def verify_environment(inputs, output, observed=None):
-    pin = load_pin(); expected_path = inputs/'environment/cache-environment.json'
+def verify_environment(inputs, output, observed=None, *, original_lock=None):
+    pin = load_pin(original_lock); expected_path = inputs/'environment/cache-environment.json'
     require(files.identity(expected_path) == pin['originalBuildEnvironment']['files']['cache-environment.json'],
             'original-build-environment-bytes-changed')
     expected = json.loads(expected_path.read_text()); actual = observed if observed is not None else observed_environment()
@@ -233,14 +255,14 @@ def protocol_inputs(output):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__);sub=parser.add_subparsers(dest='operation',required=True)
-    p=sub.add_parser('acquire');p.add_argument('--output',type=Path,required=True)
-    p=sub.add_parser('packages')
-    p=sub.add_parser('environment');p.add_argument('--inputs',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
+    p=sub.add_parser('acquire');p.add_argument('--output',type=Path,required=True);p.add_argument('--original-lock',type=Path)
+    p=sub.add_parser('packages');p.add_argument('--original-lock',type=Path)
+    p=sub.add_parser('environment');p.add_argument('--inputs',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--original-lock',type=Path)
     p=sub.add_parser('protocol');p.add_argument('--output',type=Path,required=True)
     args=parser.parse_args()
-    if args.operation=='packages':print('\n'.join(load_pin()['originalBuildEnvironment']['directPackages']));return
-    if args.operation=='acquire':result=acquire(args.output)
-    elif args.operation=='environment':result=verify_environment(args.inputs,args.output)
+    if args.operation=='packages':print('\n'.join(load_pin(args.original_lock)['originalBuildEnvironment']['directPackages']));return
+    if args.operation=='acquire':result=acquire(args.output,original_lock=args.original_lock)
+    elif args.operation=='environment':result=verify_environment(args.inputs,args.output,original_lock=args.original_lock)
     else:result=protocol_inputs(args.output)
     print(json.dumps(result,indent=2))
 

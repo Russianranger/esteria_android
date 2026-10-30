@@ -85,11 +85,12 @@ def check_blob(path, expected):
     return actual
 
 
-def validate_tree(stage, receipt):
+def validate_tree(stage, receipt, original_lock=None):
     manifest, manifest_identity = modules.read_json(stage / 'provenance/metadata/source-inputs.json', limit=8*1024**2)
     require(manifest_identity == receipt.get('manifest') and manifest.get('formatVersion') == 1 and
             manifest.get('scope') == 'unsealed-engine-source-input-preservation', 'isolated-source-manifest-mismatch')
-    lock = fetch_sources.load_lock(CURRENT_LOCK); current_identity = files.identity(CURRENT_LOCK)
+    selected = build_inputs.selected_source_lock(original_lock)
+    lock = fetch_sources.load_lock(selected); current_identity = files.identity(selected)
     require(manifest.get('sourceLock') == receipt.get('sourceLock') == current_identity and
             manifest.get('source') == lock['sources']['server'],
             'isolated-source-current-lock-mismatch')
@@ -279,8 +280,8 @@ endif()
                 buildMetadataAdaptations=changed, semanticPatchSetChanged=False, fabricatedGitMetadata=False)
 
 
-def add_supplements(stage, directory, manifest):
-    expected=build_inputs.load_pin()['sourceSupplements']
+def add_supplements(stage, directory, manifest, original_lock=None):
+    expected=build_inputs.load_pin(original_lock)['sourceSupplements']
     directory=archives.directory(Path(os.path.abspath(directory)))
     require({p.relative_to(directory).as_posix() for p in files.installed_files(directory)}==set(expected),
             'isolated-source-supplement-file-set')
@@ -295,7 +296,7 @@ def add_supplements(stage, directory, manifest):
     return expected
 
 
-def prepare(source_inputs, output, supplements=None):
+def prepare(source_inputs, output, supplements=None, *, original_lock=None):
     source_inputs = archives.directory(Path(os.path.abspath(source_inputs)))
     output = Path(os.path.abspath(output)); archives.directory(output.parent, create=True)
     require(not os.path.lexists(output) and source_inputs not in output.parents and output not in source_inputs.parents,
@@ -312,9 +313,9 @@ def prepare(source_inputs, output, supplements=None):
     stage = Path(tempfile.mkdtemp(prefix='.' + output.name + '.stage-', dir=output.parent))
     try:
         extract_verified(archive, receipt['archiveFiles'], stage)
-        manifest, build, counts, selected = validate_tree(stage, receipt)
+        manifest, build, counts, selected = validate_tree(stage, receipt, original_lock)
         patches = replay_patches(stage, manifest, selected)
-        supplemental=add_supplements(stage,supplements,manifest) if supplements is not None else {}
+        supplemental=add_supplements(stage,supplements,manifest,original_lock) if supplements is not None else {}
         lua = extract_lua(stage); revision = adapt_revision(stage, build)
         require(files.identity(source_inputs / 'source-inputs-receipt.json') == receipt_identity and
                 files.identity(archive) == archive_identity, 'isolated-source-input-changed-during-preparation')
@@ -342,8 +343,9 @@ def main():
     parser.add_argument('--source-inputs', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--supplements',type=Path)
+    parser.add_argument('--original-lock',type=Path)
     args = parser.parse_args()
-    print(json.dumps(prepare(args.source_inputs, args.output,args.supplements), indent=2))
+    print(json.dumps(prepare(args.source_inputs, args.output,args.supplements,original_lock=args.original_lock), indent=2))
 
 
 if __name__ == '__main__': main()

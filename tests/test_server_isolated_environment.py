@@ -22,7 +22,11 @@ class IsolatedEnvironment(unittest.TestCase):
         self.inputs = self.root/'inputs';(self.inputs/'environment').mkdir(parents=True)
         raw=json.dumps(self.expected).encode();self.environment=self.inputs/'environment/cache-environment.json'
         self.environment.write_bytes(raw)
-        self.pin=copy.deepcopy(build.load_pin())
+        # The app client may advance independently of the retained server build.
+        provider=json.loads((build.ROOT/'runtime/server/programs-provider.lock.json').read_text())
+        self.original_lock=self.root/'original-sources.lock.json'
+        self.original_lock.write_text(provider['serverBuildSourceLockText'])
+        self.pin=copy.deepcopy(build.load_pin(self.original_lock))
         self.pin['originalBuildEnvironment']['files']['cache-environment.json']=dict(bytes=len(raw),sha256=hashlib.sha256(raw).hexdigest())
         self.pin['originalBuildEnvironment']['relevantPackages']={'fixture':'1'}
 
@@ -79,17 +83,17 @@ class IsolatedEnvironment(unittest.TestCase):
         api=Mock();output=self.root/'new'
         with patch.object(build.shutil,'disk_usage',return_value=shutil._ntuple_diskusage(20,20,0)),\
              self.assertRaisesRegex(ValueError,'16-GiB-free'):
-            build.acquire(output,api)
+            build.acquire(output,api,original_lock=self.original_lock)
         api.json.assert_not_called();api.download.assert_not_called();self.assertFalse(output.exists())
         output.mkdir();(output/'marker').write_text('preserved')
-        with self.assertRaisesRegex(ValueError,'inputs-preserved'):build.acquire(output,api)
+        with self.assertRaisesRegex(ValueError,'inputs-preserved'):build.acquire(output,api,original_lock=self.original_lock)
         self.assertEqual((output/'marker').read_text(),'preserved')
 
     def test_remote_artifact_substitution_refused_before_download(self):
         api=Mock();api.json.return_value={'id':0}
         with patch.object(build.shutil,'disk_usage',return_value=shutil._ntuple_diskusage(32*1024**3,0,32*1024**3)),\
              self.assertRaisesRegex(ValueError,'remote-artifact-mismatch'):
-            build.acquire(self.root/'new',api)
+            build.acquire(self.root/'new',api,original_lock=self.original_lock)
         api.download.assert_not_called();self.assertFalse((self.root/'new/acquisition.json').exists())
 
     def test_protocol_pin_reader_rejects_other_client_before_network(self):
@@ -102,12 +106,20 @@ class IsolatedEnvironment(unittest.TestCase):
 
     def test_protocol_extraction_uses_actual_build_identity_and_limits_without_pe_execution(self):
         pin=json.loads(build.client.small(build.client.PIN))
+        # Self-contained published-artifact fixture: a newer current client may
+        # be selected before its dependency release has a published section.
+        protocol_root=self.root/'protocol-root';(protocol_root/'runtime/client').mkdir(parents=True)
+        (protocol_root/'sources.lock.json').write_bytes((build.ROOT/'sources.lock.json').read_bytes())
+        (protocol_root/'runtime/client/dependency-release.lock.json').write_text(json.dumps(dict(
+            sourceRevision=pin['sourceRevision'],published=dict(assets={
+                'reconstructed-client-arm64-original.zip':dict(pin['artifact'])}))))
         original=self.root/'client.zip';manifest=b'{"fixture":"client build only"}\n';limits=b'{"fixture":"limits only"}\n'
         with zipfile.ZipFile(original,'w') as archive:
             archive.writestr('bin/Win/ARM64/client-build.json',manifest)
             archive.writestr('build/client/generated/limits/limits.json',limits)
         pin['buildManifestSha256']=hashlib.sha256(manifest).hexdigest()
-        with patch.object(build.client,'small',return_value=json.dumps(pin).encode()),\
+        with patch.object(build,'ROOT',protocol_root),\
+             patch.object(build.client,'small',return_value=json.dumps(pin).encode()),\
              patch.object(build.archives,'fetch',return_value=original),\
              patch.object(build.client,'checked_zip',side_effect=lambda source:zipfile.ZipFile(source)):
             receipt=build.protocol_inputs(self.root/'protocol')
