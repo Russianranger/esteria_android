@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "target": {
+    "abi": "arm64-v8a",
+    "api": 26,
+    "minimumLoadAlignment": 16384
+  },
+  "source": {
+    "file": "runtime-corresponding-sources.tar.gz",
+    "url": "https://github.com/Russianranger/uo-android-launcher/releases/download/v0.2.0/runtime-corresponding-sources.tar.gz",
+    "bytes": 114558388,
+    "sha256": "492043660b1370e1910c8b8ca2b93be1f637f4929034f575591f14e67e015243"
+  },
+  "ndk": {
+    "file": "android-ndk-r28c-linux.zip",
+    "url": "https://dl.google.com/android/repository/android-ndk-r28c-linux.zip",
+    "bytes": 722261334,
+    "sha256": "dfb20d396df28ca02a8c708314b814a4d961dc9074f9a161932746f815aa552f",
+    "version": "28.2.13676358"
+  },
+  "components": {
+    "proot-source.tar.gz": "d43ad342bb2e8f4d2afe6119b5ec3a1d8bb912d5897e2db7d2ddf928548c1c84",
+    "talloc-2.4.3.tar.gz": "dc46c40b9f46bb34dd97fe41f548b0e8b247b77a918576733c528e83abd854dd",
+    "build-proot.sh": "7ddcee055714f27c2a53fea816c8d43171efc54b655771e979735a30ba343319",
+    "native/proot-sysvipc.patch": "e8e3cb956bdb8b1bcbdf72a23b67ad86fc33fa51430f3a1ee37e1a053f5f0330",
+    "native/proot-acceleration.patch": "46ab8e6f80260044bccbd831e22a7fc3a376e45ef945772cac790485ab70306f"
+  },
+  "prootCommit": "7266fb3e8516535682f5a9c8f3a7e70f6506eddb",
+  "tallocVersion": "2.4.3",
+  "ownershipPatch": {
+    "path": "runtime/proot/proot-exitkill.patch",
+    "sha256": "509160bd6ec3663d525fa0e795a7bb45b8ccc283a6de8e1398e8cd6624fe86de"
+  },
+  "recipeReference": {
+    "repository": "https://github.com/Russianranger/fta-launcher",
+    "commit": "7a9ce45988f295824d20c9ff7436a77a0baa4f07",
+    "path": "tools/build_client_bridge.py",
+    "license": "MIT"
+  },
+  "expectedPayloads": {
+    "libproot.so": {
+      "bytes": 263712,
+      "sha256": "46dcafabc77b386a7127f6cb7c71bdac03c372ff6bb4db0e1e9493ee29332adb"
+    },
+    "libproot-loader.so": {
+      "bytes": 18296,
+      "sha256": "614591192bb34c98cc6cef528fb74ecfc1c97d0fabf4e352df1f16873c71d447"
+    }
+  }
+}

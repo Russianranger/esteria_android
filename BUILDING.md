@@ -59,6 +59,14 @@ Android command-line tools 12.0 with a checked SHA-256 rather than assuming
 `sdkmanager` exists on the runner. Use `-PsourceRevision=<full-application-commit>`
 for recorded build provenance. Gradle embeds the complete source lock as well.
 
+## Android native process bridge
+
+[runtime/proot/README.md](runtime/proot/README.md) provides the exact source/NDK
+inputs, one-job Bionic ARM64 build, corresponding-source companion, provider
+validation and APK byte check. Pass `-PprootProviderDir=<verified-provider>` to
+include the real PRoot/loader executables. Plain launcher builds remain valid
+without that provider. Build success does not qualify Android guest execution.
+
 ## Runtime staging and database qualification
 
 [runtime/PACKAGING.md](runtime/PACKAGING.md) describes the pinned Wine candidate

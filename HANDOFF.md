@@ -26,9 +26,10 @@ server/Wine jobs must not be converted into successful evidence without logs.
    `MapMgr.h` include now fixed by patch 0002. Fix any further compile/link error
    via ordered digest-checked patches here. Package the installed binaries plus SQL,
    modules/Lua, extractors, configs and notices; install target alone is incomplete.
-4. Build Bionic ARM64 PRoot/loader from pinned source. Package executables through
-   Android nativeLibraryDir. Reuse read-only FTA approaches where compatible,
-   preserving notices. Implement actual process ownership and runtime installation.
+4. Inspect the new Android PRoot CI and Linux ownership matrix. Two local clean
+   Bionic builds and APK payload checks already pass. Continue actual Android
+   execution, runtime installation and process-owner integration; see
+   `runtime/proot/README.md`. Preserve nativeLibraryDir packaging and source notices.
 5. Pin a matching server rootfs/MySQL package. Ubuntu 24.04 server binaries cannot
    be assumed to run in the Debian 12 Wine rootfs. Keep mutable databases outside
    replaceable runtime trees. MySQL 8 is required; MariaDB is not qualified.

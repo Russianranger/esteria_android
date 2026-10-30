@@ -6,6 +6,8 @@ on:
       - sources.lock.json
       - tools/fetch_sources.py
       - tools/verify_protocol.py
+      - tools/verify_server_build.py
+      - tests/test_server_build.py
       - patches/server/**
       - .github/workflows/server.yml
   pull_request:
@@ -13,6 +15,8 @@ on:
       - sources.lock.json
       - tools/fetch_sources.py
       - tools/verify_protocol.py
+      - tools/verify_server_build.py
+      - tests/test_server_build.py
       - patches/server/**
       - .github/workflows/server.yml
   workflow_dispatch:
@@ -37,7 +41,7 @@ jobs:
         run: |
           mkdir -p out/diagnostics
           sudo apt-get update
-          sudo apt-get install -y ccache cmake ninja-build g++ libboost-all-dev libssl-dev libmysqlclient-dev mysql-client libreadline-dev libbz2-dev zlib1g-dev
+          sudo apt-get install -y binutils ccache cmake ninja-build g++ libboost-all-dev libssl-dev libmysqlclient-dev mysql-client libreadline-dev libbz2-dev zlib1g-dev
           dpkg-query -W > out/diagnostics/build-packages.txt
           uname -a > out/diagnostics/build-host.txt
       - name: Identify exact cache environment and source inputs
@@ -82,6 +86,8 @@ jobs:
         run: python3 tools/fetch_sources.py all
       - name: Verify client and server field layouts
         run: python3 tools/verify_protocol.py --client sources/client --server sources/server
+      - name: Verify server artifact checker behavior
+        run: python3 -m unittest tests.test_server_build -v
       - name: Configure ARM64 server
         run: |
           set -o pipefail
@@ -105,19 +111,33 @@ jobs:
         with:
           path: ${{ env.CCACHE_DIR }}
           key: server-ccache-v1-${{ steps.cache-identity.outputs.environment }}-${{ steps.cache-identity.outputs.source }}-${{ steps.cache-identity.outputs.patches }}-${{ github.run_id }}-${{ github.run_attempt }}
-      - name: Install and record provenance
+      - name: Install build-only binaries and preserve notices
+        id: install
         run: |
           cmake --install out/server
           cp sources.lock.json out/server-install/
+          mkdir -p out/server-install/notices/EsteriaWoW
+          cp sources/server/LICENSE sources/server/AUTHORS out/server-install/notices/EsteriaWoW/
           uname -a > out/server-install/build-host.txt
           dpkg-query -W > out/server-install/build-packages.txt
-          find out/server-install -type f -print0 | sort -z | xargs -0 sha256sum > out/server-install.sha256
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - name: Verify ARM64 artifacts and source-confirmed host loader smoke
+        id: verify-artifacts
+        run: |
+          set -o pipefail
+          python3 tools/verify_server_build.py \
+            --install out/server-install --server sources/server \
+            --cmake-cache out/server/CMakeCache.txt \
+            --packages out/server-install/build-packages.txt \
+            --host out/server-install/build-host.txt \
+            --revision "${GITHUB_SHA}" --build-id "${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}" \
+            --loader-smoke 2>&1 | tee out/diagnostics/artifact-verification.log
+      - name: Retain installed unqualified binaries even when verification fails
+        if: always() && steps.install.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: esteria-linux-arm64-server-${{ github.sha }}
+          name: unqualified-esteria-linux-arm64-server-${{ github.sha }}
           path: |
             out/server-install/
-            out/server-install.sha256
           if-no-files-found: error
           retention-days: 14
       - name: Preserve build diagnostics on failure or success

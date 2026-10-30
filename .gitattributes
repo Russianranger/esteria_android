@@ -3,6 +3,8 @@
 gradlew text eol=lf
 *.sh text eol=lf
 *.bat text eol=crlf
+# Unified diff context preserves upstream tabs and blank context-line prefixes.
+*.patch -whitespace
 
 # Explicit case-insensitive extension patterns protect imported/runtime artifacts if
 # they are intentionally tracked later. Proprietary game data is not committed.

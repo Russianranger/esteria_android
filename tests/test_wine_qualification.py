@@ -88,6 +88,42 @@ class WineQualification(unittest.TestCase):
         self.assertNotIn('HOME=/root', command)
         self.assertTrue(all('TOKEN' not in part for part in command))
 
+    def test_forced_vulkan_driver_and_observed_device_identity(self):
+        command = qualification.guest_command(Path('/r'), 'fixture', graphics={'icdPath': 'usr/share/vulkan/icd.d/lvp.json'})
+        self.assertIn('VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/lvp.json', command)
+        self.assertIn('LIBGL_ALWAYS_SOFTWARE=1', command)
+        code = ('import os\nos.write(1,b"Vulkan adapter: llvmp")\n'
+                'os.write(1,b"ipe (LLVM); driver 0\\nVulkan validation callback: unavailable\\nPASS\\n")')
+        capture = qualification.Capture([sys.executable, '-c', code], self.root / 'graphics.log', needle=b'PASS',
+            line_prefixes=(b'Vulkan adapter:', b'Vulkan validation callback:'))
+        self.assertEqual(capture.wait(3).exit_code, 0)
+        self.assertTrue(capture.finish(2))
+        self.assertTrue(capture.matched.is_set())
+        self.assertEqual(capture.lines['Vulkan adapter:'], 'Vulkan adapter: llvmpipe (LLVM); driver 0')
+
+    def test_graphics_receipt_keeps_codec_and_presentation_scope_separate(self):
+        result = dict(displayReady=True, networkIsolated=True, prefixExit=0, fixtureExit=0, codecMessageMatched=True,
+                      wineStopExit=0, logStreamsDrained=True, logsWithinLimit=True, logWritesSucceeded=True,
+                      graphics={'presentation': dict(exitCode=0, messageMatched=True, softwareAdapterMatched=True,
+                                                      validationCallbackActive=False),
+                                'texture': dict(exitCode=1, messageMatched=False, softwareAdapterMatched=False)})
+        flags = qualification.qualification_flags(result, ['presentation', 'texture'])
+        self.assertTrue(flags['linuxArm64CodecQualified'])
+        self.assertTrue(flags['linuxArm64VulkanPresentationQualified'])
+        self.assertFalse(flags['linuxArm64VulkanTextureLifecycleQualified'])
+        result['logStreamsDrained'] = False
+        self.assertFalse(any(qualification.qualification_flags(result, ['presentation', 'texture']).values()))
+
+    def test_checked_in_graphics_pin_matches_runtime_and_requires_real_identities(self):
+        lock = json.loads(qualification.packages.DEFAULT_LOCK.read_text())
+        graphics = lock['softwareGraphics']
+        self.assertEqual(graphics['runtimeArchiveSha256'], lock['packages']['wine-arm64']['archive']['sha256'])
+        self.assertEqual(graphics['icdApiVersion'], '1.1.230')
+        for name, expected in graphics['components'].items():
+            qualification.packages.pin_identity(dict(file=Path(name).name, **expected))
+        with self.assertRaises(FileNotFoundError):
+            qualification.graphics_identity(self.root, lock)
+
     def test_unqualified_host_or_direct_worker_invocation_never_starts_processes(self):
         with patch.object(qualification.platform, 'machine', return_value='x86_64'), \
              patch.object(qualification.subprocess, 'Popen', side_effect=AssertionError('must not execute')):

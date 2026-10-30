@@ -165,6 +165,22 @@ public final class SessionService extends Service {
         facts.put("device.model", Build.MODEL); facts.put("device.manufacturer", Build.MANUFACTURER);
         facts.put("device.abis", android.text.TextUtils.join(",", Build.SUPPORTED_ABIS));
         facts.put("status", previousStatus); facts.put("runtime.qualified", "false");
+        facts.put("proot.packaged", String.valueOf(BuildConfig.PROOT_PACKAGED));
+        facts.put("proot.androidExecutionQualified", "false");
+        if (BuildConfig.PROOT_PACKAGED) {
+            JSONObject bridge = new JSONObject(readAsset("proot/build-evidence.json"));
+            facts.put("proot.sourceLockSha256", bridge.getString("sourceLockSha256"));
+            facts.put("proot.ndkVersion", bridge.getString("ndkVersion"));
+            for (String name : new String[]{"libproot.so", "libproot-loader.so"})
+                facts.put("proot.payload." + name + ".sha256", bridge.getJSONObject("payloads").getJSONObject(name).getString("sha256"));
+            try {
+                io.github.russianranger.esteria.runtime.InstalledProot.inspect(this);
+                facts.put("proot.installedBytesVerified", "true");
+            } catch (IOException error) {
+                facts.put("proot.installedBytesVerified", "false");
+                facts.put("proot.installationError", error.getMessage());
+            }
+        }
         addPerformanceSnapshot(facts);
         Properties runtime = new Properties();
         try (InputStream input = getAssets().open("runtime.properties")) { runtime.load(input); }

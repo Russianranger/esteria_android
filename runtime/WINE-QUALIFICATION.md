@@ -27,6 +27,33 @@ sudo -n python3 tools/qualify_wine_arm64.py \
   --output "$RUNNER_TEMP/wine-codec-evidence"
 ```
 
+To qualify the software Vulkan reference in the same isolated session, add
+either or both optional drivers from the **same workflow's ARM64 artifact**:
+
+```sh
+  --presentation-driver /path/to/artifact/build/vulkan/Release/presentation_device.exe \
+  --texture-driver /path/to/artifact/build/vulkan/Release/texture_device.exe
+```
+
+Each driver is checked as an ARM64 PE executable and its exact hash is included
+in the report. The lock separately pins the measured Lavapipe ICD JSON, native
+Vulkan loader, Mesa library and Wine Vulkan Unix bridge. Their hashes and ELF
+architecture are checked before execution. The selected ICD's API declaration
+is 1.1.230. Only that ICD is offered through `VK_ICD_FILENAMES`; an observed
+`Vulkan adapter: llvmpipe...` line is also required. Environment selection alone
+cannot pass the software-device check. These additions do not alter the base
+package identity used by the initial codec-only CI run.
+
+The presentation driver uses the real engine Win32 surface/swapchain path and
+clears, submits and presents 16 frames across a resize. The texture driver uses
+the real Vulkan image tracking implementation for 20,000 simultaneous images
+and 30,000 total create/destroy operations. Each needs zero exit and its exact
+success marker. Presentation and texture flags are separate from codec; a
+later graphics failure does not erase an earlier qualified codec result when
+owned cleanup and logs remain valid. The command still exits nonzero if any
+requested check fails. Validation callback availability is recorded separately;
+an unavailable layer never becomes a validation-layer pass.
+
 The output directory must be new. Logs, identities, per-import file/machine
 diagnostics, worker exit status and `qualification.json` are retained on success
 or a running-test failure. A sudo invocation hands the new evidence files back
@@ -48,11 +75,11 @@ output pipes. Overflow, write failure or an undrained stream fails the gate. The
 namespace exits. The host's mounts and network remain unchanged. Namespace
 support failures are reported; there is no weaker silent fallback.
 
-Pass requires display readiness, successful Wine initialization, the driver's
+Codec pass requires display readiness, successful Wine initialization, the driver's
 zero exit and exact success message, successful Wine stop and observed namespace
 exit. It establishes **Linux ARM64 Wine + real Xvid DLL** execution only. The
 client executable is hashed for matched-build provenance but is not started.
-The fixture does not validate other client imports, Vulkan rendering, Android
+The codec fixture does not validate other client imports, Vulkan rendering, Android
 process policy, presentation, input, audio, server startup, login or gameplay.
 Reports explicitly keep those qualifications false.
 
@@ -61,7 +88,12 @@ MSVCP140 and VCRUNTIME140, whose measured Wine files are AA64. It does not impor
 VCRUNTIME140_1. The latter's x64 machine value in the candidate is not a blocker
 for an unused import. CRT API-set forwarding still needs loader execution.
 
-Run the nine host guard/manifest/capture tests with:
+The optional software Vulkan fixtures do not establish Adreno performance,
+Android presentation, game-shader correctness, or scene rendering. The generic
+Android/game/rendering qualification fields remain false; Linux software
+presentation and texture lifecycle have explicit separate fields.
+
+Run the twelve host guard/manifest/capture/graphics-scope tests with:
 
 ```sh
 python3 -m unittest tests.test_wine_qualification -v

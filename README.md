@@ -10,6 +10,7 @@ A local client/server application for AYN Thor Max, in active bring-up. Target: 
 - [Validation gates](TESTING.md)
 - [Next-session handoff](HANDOFF.md)
 - [Local server requirements](runtime/LOCAL-SERVER.md)
+- [Android native process bridge](runtime/proot/README.md)
 - [Pinned runtime preparation](runtime/PACKAGING.md)
 - [Native ARM64 Wine qualification](runtime/WINE-QUALIFICATION.md)
 

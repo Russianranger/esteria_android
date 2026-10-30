@@ -1,0 +1,15 @@
+--- a/src/tracee/event.c
++++ b/src/tracee/event.c
+@@ -505,7 +505,11 @@
+ 				PTRACE_O_TRACEVFORKDONE	|
+ 				PTRACE_O_TRACEEXEC	|
+ 				PTRACE_O_TRACECLONE	|
+-				PTRACE_O_TRACEEXIT);
++				PTRACE_O_TRACEEXIT	|
++				/* Keep every traced descendant owned if Android kills
++				 * the tracer. Both SETOPTIONS attempts retain EXITKILL;
++				 * an unsupported kernel must fail before guest entry. */
++				PTRACE_O_EXITKILL);
+ 
+ 			/* Distinguish some events from others and
+ 			 * automatically trace each new process with

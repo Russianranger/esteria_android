@@ -242,5 +242,38 @@
       "Exact raw SELECT VERSION() string in package manifest"
     ],
     "sharesWineRootfs": false
+  },
+  "softwareGraphics": {
+    "status": "candidate-static-identities-only",
+    "runtimeArchiveSha256": "f036c00a290abb953bec26be80c4d8fe492fd986e7a589c51008124432c8641e",
+    "icdPath": "usr/share/vulkan/icd.d/lvp_icd.aarch64.json",
+    "icdLibrary": "/usr/lib/aarch64-linux-gnu/libvulkan_lvp.so",
+    "icdApiVersion": "1.1.230",
+    "expectedAdapterPrefix": "Vulkan adapter: llvmpipe",
+    "components": {
+      "usr/share/vulkan/icd.d/lvp_icd.aarch64.json": {
+        "bytes": 162,
+        "sha256": "0950c584a06fc5531dbaedef764764cd8f4af5e4390d416971db7c62e85da22f"
+      },
+      "usr/lib/aarch64-linux-gnu/libvulkan_lvp.so": {
+        "bytes": 6569376,
+        "sha256": "ce6f6917dd22ed612ae8649a9eb9c615a973a2e9eb9a58b8cc8655f22c933c6b",
+        "elfMachine": 183,
+        "elfClass": 2
+      },
+      "usr/lib/aarch64-linux-gnu/libvulkan.so.1.3.239": {
+        "bytes": 526896,
+        "sha256": "605f52f426f01a2c468ecd920b3de31452fde495f2c0d99602fffb93e782767c",
+        "elfMachine": 183,
+        "elfClass": 2
+      },
+      "opt/wine/lib/wine/aarch64-unix/winevulkan.so": {
+        "bytes": 7364296,
+        "sha256": "8ff12f6fbb27f2e9192300ceaadb18aaee37b58cb68e5de81ce137b7f16fdd51",
+        "elfMachine": 183,
+        "elfClass": 2
+      }
+    },
+    "note": "Software reference only; no Android display, Adreno driver, or game-frame validation."
   }
 }
