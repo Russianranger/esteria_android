@@ -95,12 +95,50 @@ invocation reads all three exact records back. This establishes fixture file
 persistence, not database/world save correctness. Android app-process death
 remains a separate unqualified gate.
 
+The corrected fixture passed on the actual Android13 x86_64 emulator in
+[run41003838793](https://github.com/Russianranger/esteria_android/actions/runs/41003838793)
+at `3ae7b69412fec80dfe35f69e89a29d5eb728a665`. Its verified receipt records
+three unpatched survivors after 1,383 ms, zero patched survivors after 478 ms,
+all three armed flags, three graceful save records and a successful fresh guest
+readback. Six real guest invocations completed. Evidence ZIP 12954448262 has
+SHA-256 `034527c4d8acb7bf17763b038ff9c6667fda1f5e8f6ccbc3851acb3d54900fcd`.
+The checked APK is 2,262,394 bytes, SHA-256
+`e98abdee2eb9282a5c0c9abb69769a7c9ab2cf59d680d409602f066c840dff5e`.
+ARM64, Android Wine, whole-application death and gameplay remain unqualified.
+
 `tools/check_proot_probe_pidfd.py` runs real Linux/JVM pidfd identity, isolated
 termination and stale-handle tests in the normal CI VM. The managed development
 host has different syscall/procfs PID namespaces (`getpid=5`, `/proc/self=133684`
 was observed), so it cannot supply this execution evidence; the helper fails
 closed there. The normal CI VM passed this host pidfd gate in run41002275287.
-The corrected Android ownership result remains pending.
+The corrected Android tracer result is recorded above.
+
+## Remote Android owner-process death extension (execution pending)
+
+The explicit probe profile additionally compiles a nonexported bound Service in
+`:prootOwnerProbe`. Its manifest and Java source set are excluded from ordinary
+APK builds; release variants remain disabled for the probe profile. A real
+`OwnedProcess` in this separate Android process starts the pinned tracer/loader
+and three detached guests. The surviving instrumentation process owns another
+matching chain as a control. No arbitrary program/path is accepted by the Service.
+
+Instrumentation checks the Service's UID, executable and kernel start time using
+a retained pidfd, and verifies both tracers and all six guest identities/armed
+flags. It kills only the exact Service descriptor, requires its tracer and three
+guests to exit, and requires the instrumentation-owned tracer and three guests to
+remain alive. All observations must finish within 25 seconds of the prelaunch clock;
+cleanup signals only retained descriptors and then stops the owned control.
+The complete test now requires eight guest launches and nine verified handles
+for this additional case. The existing separate graceful-persistence case remains.
+
+This measures combined Android and application ownership cleanup, **not isolated
+PDEATHSIG behavior**. Android13's
+[ActivityManagerService.appDiedLocked](https://github.com/aosp-mirror/platform_frameworks_base/blob/android-13.0.0_r1/services/core/java/com/android/server/am/ActivityManagerService.java#L3293)
+also calls `ProcessList.killProcessGroup` after process/Binder death, so a control
+spawned inside the killed Service could be removed by OS cgroup cleanup itself.
+The surviving control instead demonstrates that the test did not kill the whole
+app UID. Receipts keep `isolatedParentDeathSignalQualified` and whole-application
+`appDeathQualified` false. Actual execution of this new extension is pending.
 
 To reproduce with Python3.12+, dpkg-deb, JDK17 and the documented Android SDK:
 

@@ -98,7 +98,10 @@ def verify(provider, apk=None):
     sources = {'prootSourceLockSha256': 'runtime/proot/sources.lock.json', 'glibcLockSha256': 'native/proot-probe/glibc.lock.json',
                'builderSha256': 'tools/build_android_proot_probe.py', 'guestSourceSha256': 'native/proot-probe/guest.c',
                'pluginSourceSha256': 'native/proot-probe/plugin.c', 'ownershipPatchSha256': 'runtime/proot/proot-exitkill.patch',
-               'ownershipGuestSourceSha256': 'native/proot-probe/ownership_guest.c'}
+               'ownershipGuestSourceSha256': 'native/proot-probe/ownership_guest.c',
+               'ownerServiceSourceSha256': 'app/src/prootProbe/java/io/github/russianranger/esteria/runtime/ProbeOwnerService.java',
+               'ownerServiceManifestSha256': 'app/src/prootProbe/AndroidManifest.xml',
+               'ownerDeathTestSourceSha256': 'app/src/androidTest/java/io/github/russianranger/esteria/runtime/RemoteOwnerDeathProbe.java'}
     for field, path in sources.items(): require(receipt[field] == identity((ROOT / path).read_bytes())['sha256'], 'stale-probe-source-receipt')
     require(receipt['nativeFiles'] == builder.NATIVE_PINS and set(receipt['rootfsFiles']) == ROOTFS, 'probe-file-inventory')
     require(receipt.get('unpatchedControlIncluded') is True, 'probe-needs-explicit-negative-control')
@@ -134,10 +137,44 @@ def verify(provider, apk=None):
                 apkVerified=bool(apk), androidProotExecuted=False, arm64GuestExecuted=False)
 
 
+def verify_owner_only_apk(apk):
+    """Check a separately rebuilt ordinary x64 owner APK excludes the debug probe."""
+    require(0 < apk.stat().st_size <= 64 * 1024**2, 'ordinary-apk-size-limit')
+    with zipfile.ZipFile(apk) as archive:
+        names = archive.namelist(); require(len(names) == len(set(names)), 'duplicate-ordinary-apk-entry')
+        natives = {name for name in names if name.startswith('lib/') and not name.endswith('/')}
+        require(natives == {'lib/x86_64/libesteria_process.so'}, 'ordinary-apk-has-test-natives')
+        require(not any(name.startswith('assets/proot-probe/') for name in names), 'ordinary-apk-has-test-assets')
+        owner = archive.getinfo('lib/x86_64/libesteria_process.so')
+        require(64 <= owner.file_size <= 16 * 1024**2, 'ordinary-owner-size-limit'); elf(archive.read(owner), 'owner')
+        manifest = archive.getinfo('AndroidManifest.xml')
+        require(8 <= manifest.file_size <= 1024**2, 'ordinary-manifest-size-limit')
+        data = archive.read(manifest); require(data[:4] == b'\x03\x00\x08\x00', 'ordinary-manifest-format')
+        for encoding in ('utf-8', 'utf-16le'):
+            require('ProbeOwnerService'.encode(encoding) not in data and 'prootOwnerProbe'.encode(encoding) not in data,
+                    'ordinary-apk-has-test-service')
+        dex = [item for item in archive.infolist() if item.filename.endswith('.dex')]
+        require(dex and all(8 <= item.file_size <= 16 * 1024**2 for item in dex) and
+                sum(item.file_size for item in dex) <= 32 * 1024**2, 'ordinary-dex-size-limit')
+        for item in dex:
+            data = archive.read(item); require(data[:4] == b'dex\n', 'ordinary-dex-format')
+            require(b'Lio/github/russianranger/esteria/runtime/ProbeOwnerService;' not in data,
+                    'ordinary-apk-has-test-class')
+    return dict(scope='ordinary-x86_64-owner-apk-inventory-only', probeServiceExcluded=True,
+                probeNativePayloadExcluded=True, androidExecutionQualified=False)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--provider', type=Path, required=True); parser.add_argument('--apk', type=Path)
-    args = parser.parse_args(); print(json.dumps(verify(args.provider, args.apk)))
+    parser.add_argument('--provider', type=Path); parser.add_argument('--apk', type=Path)
+    parser.add_argument('--owner-only-apk', type=Path)
+    args = parser.parse_args()
+    if args.owner_only_apk:
+        require(args.provider is None and args.apk is None, 'ordinary-apk-check-is-separate')
+        result = verify_owner_only_apk(args.owner_only_apk)
+    else:
+        require(args.provider is not None, 'probe-provider-required'); result = verify(args.provider, args.apk)
+    print(json.dumps(result))
 
 
 if __name__ == '__main__': main()

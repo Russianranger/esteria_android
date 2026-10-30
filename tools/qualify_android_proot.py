@@ -16,21 +16,24 @@ PACKAGE='io.github.russianranger.esteria'
 SCOPE='android-13-x86_64-proot-glibc-execution'
 FLAGS=('androidProotExecuted','privateElfLoaderExecuted','directPrivateBionicExecRejected',
        'dynamicLibraryAndTlsVerified','forkExecLoopbackVerified','relaunchPersistenceVerified',
-       'androidTracerDeathQualified','pidfdIdentityVerified','gracefulGuestStopVerified','userSpaceWaitArmed')
+       'androidTracerDeathQualified','pidfdIdentityVerified','gracefulGuestStopVerified','userSpaceWaitArmed',
+       'androidOwnerProcessDeathQualified','ownerDeathControlTracerSurvived','ownerDeathProtectedTracerExited')
 
 
 def validate_receipt(value,revision,fingerprint,build):
     require(type(value.get('formatVersion')) is int and value['formatVersion']==1 and value.get('scope')==SCOPE and
             value.get('sourceRevision')==revision and value.get('fingerprint')==fingerprint and value.get('abi')=='x86_64' and
             value.get('glibcVersion')=='2.36','proot-receipt-identity')
-    for key,expected in (('api',33),('targetSdk',35),('guestLaunches',6),('guestChildExit',17),
-                         ('controlSurvivors',3),('patchedSurvivors',0),('detachedTraceesPerCase',3),('gracefulSavedFilesRestored',3)):
+    for key,expected in (('api',33),('targetSdk',35),('guestLaunches',8),('guestChildExit',17),
+                         ('controlSurvivors',3),('patchedSurvivors',0),('detachedTraceesPerCase',3),('gracefulSavedFilesRestored',3),
+                         ('ownerDeathVerifiedHandles',9),('ownerDeathControlSurvivors',3),('ownerDeathProtectedSurvivors',0)):
         require(type(value.get(key)) is int and value[key]==expected,'proot-receipt-count-'+key)
-    for key in ('controlObservationMillis','patchedObservationMillis'):
+    for key in ('controlObservationMillis','patchedObservationMillis','ownerDeathObservationMillis'):
         require(type(value.get(key)) is int and 0<=value[key]<25000,'proot-receipt-alarm-budget-'+key)
     require(value.get('buildEvidence')==build,'proot-receipt-build-differs')
     require(all(value.get(flag) is True for flag in FLAGS),'proot-receipt-missing-check')
-    require(all(value.get(flag) is False for flag in ('arm64GuestExecuted','appDeathQualified','wineQualified','gameplayQualified')),'proot-receipt-overclaims-scope')
+    require(all(value.get(flag) is False for flag in ('arm64GuestExecuted','appDeathQualified','wineQualified','gameplayQualified',
+            'isolatedParentDeathSignalQualified')),'proot-receipt-overclaims-scope')
 
 
 def main():
@@ -47,7 +50,8 @@ def main():
     report=dict(formatVersion=1,scope=SCOPE,sourceRevision=args.source_revision,
         apk=dict(bytes=args.apk.stat().st_size,sha256=digest(args.apk)),
         testApk=dict(bytes=args.test_apk.stat().st_size,sha256=digest(args.test_apk)),
-        androidProotGlibcQualified=False,androidTracerDeathQualified=False,arm64GuestExecuted=False,appDeathQualified=False,wineQualified=False,gameplayQualified=False)
+        androidProotGlibcQualified=False,androidTracerDeathQualified=False,androidOwnerProcessDeathQualified=False,
+        isolatedParentDeathSignalQualified=False,arm64GuestExecuted=False,appDeathQualified=False,wineQualified=False,gameplayQualified=False)
     installed=False;failure=None
     def command(label,words,timeout=180,allow_failure=False):
         code,text=run_bounded([args.adb,*words],args.output/(label+'.log'),timeout)
@@ -71,6 +75,7 @@ def main():
         require(len(raw.encode())<=65536,'oversized-app-receipt')
         evidence=json.loads(raw);validate_receipt(evidence,args.source_revision,properties['ro.build.fingerprint'],build)
         report['appEvidence']=evidence;report['androidProotGlibcQualified']=True;report['androidTracerDeathQualified']=True
+        report['androidOwnerProcessDeathQualified']=True
     except Exception as error:
         failure=error;report['error']=str(error)
     finally:
@@ -81,11 +86,15 @@ def main():
                             for mode in ('ownership-control','ownership-patched','ownership-graceful') for stream in ('stdout','stderr')]
             diagnostics += [('graceful-relaunch-'+stream,['exec-out','run-as',PACKAGE,'cat','files/proot-probe-session/ownership-graceful/verify/'+stream+'.log'])
                             for stream in ('stdout','stderr')]
+            diagnostics += [('owner-process-'+mode+'-'+stream,['exec-out','run-as',PACKAGE,'cat',
+                            'files/proot-probe-session/owner-process-death/'+mode+'/logs/'+stream+'.log'])
+                            for mode in ('control','service') for stream in ('stdout','stderr')]
             diagnostics += [('bounded-logcat',['logcat','-d','-t','1500']),('stop-owned-test-app',['shell','am','force-stop',PACKAGE])]
             for label,words in diagnostics:
                 try:command(label,words,allow_failure=label!='stop-owned-test-app')
                 except Exception as error:
-                    report['androidProotGlibcQualified']=False;report['androidTracerDeathQualified']=False;report.setdefault('cleanupErrors',[]).append(str(error))
+                    report['androidProotGlibcQualified']=False;report['androidTracerDeathQualified']=False
+                    report['androidOwnerProcessDeathQualified']=False;report.setdefault('cleanupErrors',[]).append(str(error))
                     if failure is None:failure=error
         report['completedAtUnix']=int(time.time())
         (args.output/'qualification.json').write_text(json.dumps(report,indent=2)+'\n')

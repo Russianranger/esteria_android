@@ -200,10 +200,11 @@ public final class ProotExecutionTest {
         long controlMillis=ownershipCase(backend,controlTracer,loader,rootfs,root,"ownership-control",false,false);
         long patchedMillis=ownershipCase(backend,tracer,loader,rootfs,root,"ownership-patched",true,false);
         ownershipCase(backend,tracer,loader,rootfs,root,"ownership-graceful",true,true);
+        JSONObject ownerDeath=RemoteOwnerDeathProbe.run(context,root,tracer,loader);
         JSONObject receipt=new JSONObject().put("formatVersion",1).put("scope","android-13-x86_64-proot-glibc-execution")
             .put("sourceRevision",BuildConfig.SOURCE_REVISION).put("fingerprint",Build.FINGERPRINT).put("api",Build.VERSION.SDK_INT)
             .put("targetSdk",context.getApplicationInfo().targetSdkVersion).put("abi","x86_64").put("glibcVersion","2.36")
-            .put("guestLaunches",6).put("guestChildExit",17).put("buildEvidence",build)
+            .put("guestLaunches",8).put("guestChildExit",17).put("buildEvidence",build)
             .put("androidProotExecuted",true).put("privateElfLoaderExecuted",true).put("directPrivateBionicExecRejected",true)
             .put("dynamicLibraryAndTlsVerified",true).put("forkExecLoopbackVerified",true).put("relaunchPersistenceVerified",true)
             .put("androidTracerDeathQualified",true).put("pidfdIdentityVerified",true).put("controlSurvivors",3).put("patchedSurvivors",0)
@@ -211,6 +212,7 @@ public final class ProotExecutionTest {
             .put("detachedTraceesPerCase",3).put("gracefulGuestStopVerified",true).put("gracefulSavedFilesRestored",3)
             .put("controlObservationMillis",controlMillis).put("patchedObservationMillis",patchedMillis)
             .put("arm64GuestExecuted",false).put("appDeathQualified",false).put("wineQualified",false).put("gameplayQualified",false);
+        for(java.util.Iterator<String> keys=ownerDeath.keys();keys.hasNext();){String key=keys.next();receipt.put(key,ownerDeath.get(key));}
         Files.write(root.getParent().resolve("proot-probe-qualification.json"),receipt.toString(2).getBytes(StandardCharsets.UTF_8),StandardOpenOption.CREATE_NEW);
         // The disposable harness exports bounded logs before stopping this app.
     }

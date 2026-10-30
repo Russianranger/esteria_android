@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <!-- Lint31.7.3 examines this overlay alone for foreground types. Repeat
+             the actual main service declaration; merged behavior is unchanged. -->
+        <service android:name=".SessionService" android:foregroundServiceType="dataSync|specialUse" />
+        <!-- This manifest is selected only by the emulator probe debug profile. -->
+        <service android:name=".runtime.ProbeOwnerService" android:exported="false"
+            android:process=":prootOwnerProbe" android:stopWithTask="true" />
+    </application>
+</manifest>

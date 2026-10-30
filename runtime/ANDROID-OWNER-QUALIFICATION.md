@@ -23,8 +23,8 @@ argv without a shell wrapper. This does not initialize or save a real database.
 The expanded nine-group fixture also requires binary stdin/EOF, a real full-pipe
 timeout with no partial command, close/write cancellation, closed-reader EPIPE
 without host termination, and exact `server shutdown 1` delivery to a normal-exit
-shell fixture. These new checks are pending actual emulator execution; the earlier
-six-group pass below does not qualify them. Receipts must explicitly retain false
+shell fixture. All nine groups passed actual emulator execution in the run recorded
+below. Receipts must explicitly retain false
 world-shutdown and character-persistence fields. See [WORLD-SHUTDOWN.md](WORLD-SHUTDOWN.md).
 
 The harness requires one completed successful JUnit result, then retrieves the
@@ -61,3 +61,14 @@ passed all six groups on the Android 13 x86_64 emulator at integration revision
 SHA-256 is `555d4665600634db0fe54b9818e556a1da9e0ef4706b58516518823796f6d1d6`.
 This qualifies the stated system-process scope only; the separate gates above
 remain open.
+
+Run [41003838802](https://github.com/Russianranger/esteria_android/actions/runs/41003838802)
+passed all nine groups on Android13 x86_64 at integration
+`3ae7b69412fec80dfe35f69e89a29d5eb728a665`. The receipt requires true binary
+stdin/EOF, backpressure/close, EPIPE and console-command fixture checks, while
+world shutdown and character persistence remain false. Artifact `12954512975`
+is 46,859 bytes with SHA-256
+`557633efe5b3f16b0a1bb02031fc1a8dd20a11f78f8c77a7099067d28899aae6`.
+At the same revision, native Linux x64 and ARM64
+[run 41003838751](https://github.com/Russianranger/esteria_android/actions/runs/41003838751)
+passed the native ownership suite and all 12 real JVM/JNI groups.

@@ -160,6 +160,9 @@ def build(args):
         builderSha256=proot.digest(Path(__file__)), guestSourceSha256=proot.digest(INPUTS / 'guest.c'),
         pluginSourceSha256=proot.digest(INPUTS / 'plugin.c'), ownershipPatchSha256=proot.digest(patch),
         ownershipGuestSourceSha256=proot.digest(INPUTS / 'ownership_guest.c'), unpatchedControlIncluded=True,
+        ownerServiceSourceSha256=proot.digest(ROOT / 'app/src/prootProbe/java/io/github/russianranger/esteria/runtime/ProbeOwnerService.java'),
+        ownerServiceManifestSha256=proot.digest(ROOT / 'app/src/prootProbe/AndroidManifest.xml'),
+        ownerDeathTestSourceSha256=proot.digest(ROOT / 'app/src/androidTest/java/io/github/russianranger/esteria/runtime/RemoteOwnerDeathProbe.java'),
         nativeFiles=NATIVE_PINS, rootfsFiles=root_files, glibcVersion='2.36',
         androidProotExecuted=False, arm64GuestExecuted=False, gameplayQualified=False)
     packages.write_json(assets / 'build-evidence.json', evidence)
@@ -168,7 +171,9 @@ def build(args):
         archive.add(original, arcname='original-proot')
         for pin, path in inputs:
             archive.add(path, arcname='original-debian/' + pin['file'])
-        for name in ('native/proot-probe', 'tools/build_android_proot_probe.py', 'tools/verify_android_proot_probe.py', 'tools/build_android_proot.py',
+        for name in ('native/proot-probe', 'app/src/prootProbe', 'app/proot-probe.gradle',
+                     'app/src/androidTest/java/io/github/russianranger/esteria/runtime/RemoteOwnerDeathProbe.java',
+                     'tools/build_android_proot_probe.py', 'tools/verify_android_proot_probe.py', 'tools/build_android_proot.py',
                      'tools/prepare_runtime.py', 'tools/android_elf.py', 'runtime/proot', 'LICENSE'):
             archive.add(ROOT / name, arcname='esteria/' + name)
         archive.add(source / 'talloc-2.4.3/bin/default', arcname='talloc-relinkable-objects',

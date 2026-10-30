@@ -10,6 +10,8 @@ if (probeProvider) {
         throw new GradleException('PRoot probe requires the separate x86_64 owner-only test configuration')
     def provider = file(probeProvider)
     androidComponents.beforeVariants(androidComponents.selector().withBuildType('release')) { variant -> variant.enable = false }
+    android.sourceSets.debug.java.srcDir('src/prootProbe/java')
+    android.sourceSets.debug.manifest.srcFile('src/prootProbe/AndroidManifest.xml')
     android.sourceSets.main.jniLibs.srcDir(new File(provider, 'jniLibs'))
     android.sourceSets.main.assets.srcDir(new File(provider, 'assets'))
     android.packaging.jniLibs.keepDebugSymbols += ['**/libproot_probe.so', '**/libproot_probe_loader.so', '**/libproot_probe_control.so']

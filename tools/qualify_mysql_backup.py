@@ -29,6 +29,8 @@ from runtime import provision_local_account as account
 from runtime import provision_local_realm as realm
 from tools import manifest_server_content as content
 from tools import qualify_base_sql as base
+from tools import qualify_local_account as account_fixture_tools
+from tools.render_server_config import render
 
 ROOT = Path(__file__).resolve().parents[1]
 MAX_DUMP = 4 * 1024 ** 3
@@ -186,7 +188,8 @@ def probe_snapshot(connection, intent):
     return dict(probes=probes, trackers=trackers, tables=tables)
 
 
-def run(mysql, mysqld, mysqldump, fixture, expected, source_lock, output, version):
+def run(mysql, mysqld, mysqldump, fixture, expected, source_lock, output, version, *,
+        account_fixture, account_fixture_sha256):
     db.exact_version(version)
     output = db.private_path(output)
     content.require(not output.exists(), 'existing backup qualification preserved; use a fresh directory')
@@ -194,6 +197,8 @@ def run(mysql, mysqld, mysqldump, fixture, expected, source_lock, output, versio
     output.mkdir(mode=0o700, parents=True)
     evidence = dict(formatVersion=1, scope='disposable-native-arm64-four-database-logical-backup',
         mysqlVersion=version, tools=tools, fixtureManifestSha256=expected,
+        accountFixtureManifestSha256=account_fixture_sha256,
+        accountSourceVerified=False, sourceConfigurationRendered=False, sourceAccountProvisioned=False,
         qualificationSucceeded=False, sourceBaseSqlQualified=False, fullDumpRestored=False,
         setupWrapperFreshAndRepeatQualified=False,
         canonicalDumpMatched=False, ownedCredentialRowsRestored=False, restartPersistenceVerified=False,
@@ -202,6 +207,11 @@ def run(mysql, mysqld, mysqldump, fixture, expected, source_lock, output, versio
         androidRuntimeQualified=False, gameplayQualified=False)
     capture = None
     try:
+        evidence['phase'] = 'verify-account-source-and-configuration-templates'
+        verified_account_source = output / 'verified-account-source'
+        account_manifest = account_fixture_tools.copy_fixture(
+            account_fixture, account_fixture_sha256, source_lock, verified_account_source)
+        evidence['accountSourceVerified'] = True
         evidence['phase'] = 'create-new-source-from-verified-bases'
         # Sole source creator: no option permits attaching this test to live data.
         source_result = base.run(mysql, mysqld, fixture, expected, source_lock, output / 'source', version)
@@ -209,11 +219,26 @@ def run(mysql, mysqld, mysqldump, fixture, expected, source_lock, output, versio
         evidence['sourceBaseSqlQualified'] = True
         evidence['source'] = source_result['source']
         evidence['sourceLockSha256'] = source_result['sourceLockSha256']
+        content.require(account_manifest['source'] == source_result['source'] and
+                        account_manifest['sourceLockSha256'] == source_result['sourceLockSha256'],
+                        'account configuration and base SQL source identities differ')
         source = output / 'source/private-state'
+        evidence['phase'] = 'render-source-configuration-with-existing-database-secret'
+        secret_path = source / 'accounts/database-secret'
+        existing_secret = secret_path.read_bytes()
+        render(verified_account_source, source, output / 'unavailable-game-data',
+               output / 'source/verified-source', mysql)
+        content.require(secret_path.read_bytes() == existing_secret,
+                        'configuration rendering changed existing database credentials')
+        evidence['sourceConfigurationRendered'] = True
+        evidence['phase'] = 'start-owned-source-database'
         capture = db.EngineCapture(base.engine_command(mysqld, source), source / 'logs/mysql-backup-engine.log')
         base.wait_owned(mysql, source, version, capture)
+        evidence['phase'] = 'provision-source-local-realm'
         realm.provision(mysql, source, version)
+        evidence['phase'] = 'provision-source-local-account'
         account.provision(mysql, source, version)
+        evidence['sourceAccountProvisioned'] = True
         journal_bytes = (source / account.JOURNAL).read_bytes()
         original = db.read_receipt(source / 'database-bootstrap.json', version)
         intent = account.read_intent(source / account.JOURNAL, original)
@@ -291,6 +316,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--fixture', type=Path, required=True)
     parser.add_argument('--fixture-sha256', required=True)
+    parser.add_argument('--account-fixture', type=Path, required=True)
+    parser.add_argument('--account-fixture-sha256', required=True)
     parser.add_argument('--mysql', type=Path, default=Path('/usr/bin/mysql'))
     parser.add_argument('--mysqld', type=Path, default=Path('/usr/sbin/mysqld'))
     parser.add_argument('--mysqldump', type=Path, default=Path('/usr/bin/mysqldump'))
@@ -300,7 +327,8 @@ def main():
     args = parser.parse_args()
     try:
         result = run(args.mysql, args.mysqld, args.mysqldump, args.fixture, args.fixture_sha256,
-                     args.lock, args.output, args.expected_version)
+                     args.lock, args.output, args.expected_version,
+                     account_fixture=args.account_fixture, account_fixture_sha256=args.account_fixture_sha256)
         print(json.dumps(result, indent=2))
         return 0
     except BaseException:

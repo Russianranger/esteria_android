@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 import hashlib
+import json
 import os
 from pathlib import Path
 import subprocess
@@ -27,9 +28,60 @@ class BackupGuards(unittest.TestCase):
         with patch.object(backup, 'verify_tools') as tools, patch.object(backup.base, 'run') as engine:
             with self.assertRaisesRegex(ValueError, 'existing backup qualification preserved'):
                 backup.run(Path('/mysql'), Path('/mysqld'), Path('/dump'), self.root, '0' * 64,
-                           self.root / 'lock', self.root, '8.0.46')
+                           self.root / 'lock', self.root, '8.0.46',
+                           account_fixture=self.root, account_fixture_sha256='0' * 64)
         tools.assert_not_called(); engine.assert_not_called()
         self.assertEqual(saved.read_bytes(), b'keep this')
+
+    def test_account_fixture_digest_gate_precedes_source_database_creation(self):
+        fixture = self.root / 'account-fixture'; fixture.mkdir()
+        (fixture / 'account-fixture.json').write_text('{}\n')
+        output = self.root / 'new-run'
+        with patch.object(backup, 'verify_tools', return_value={}), patch.object(backup.base, 'run') as engine:
+            with self.assertRaisesRegex(ValueError, 'account fixture manifest digest mismatch'):
+                backup.run(Path('/mysql'), Path('/mysqld'), Path('/dump'), self.root, '0' * 64,
+                           self.root / 'lock', output, '8.0.46',
+                           account_fixture=fixture, account_fixture_sha256='0' * 64)
+        engine.assert_not_called()
+        report = json.loads((output / 'qualification.json').read_text())
+        self.assertFalse(report['accountSourceVerified'])
+        self.assertFalse(report['sourceBaseSqlQualified'])
+
+    def test_verified_templates_render_before_realm_and_account_without_sql_reimport(self):
+        output = self.root / 'new-run'; events = []
+        provenance = dict(source={'commit': 'source-fixture'}, sourceLockSha256='b' * 64)
+        def source(*args):
+            events.append('bases')
+            secret = output / 'source/private-state/accounts/database-secret'
+            secret.parent.mkdir(parents=True); secret.write_bytes(b'a' * 64 + b'\n')
+            return dict(provenance, qualificationSucceeded=True)
+        def render(templates, state, data, sql, mysql):
+            events.append('render')
+            self.assertEqual(templates, output / 'verified-account-source')
+            self.assertEqual(sql, output / 'source/verified-source')
+            self.assertEqual((state / 'accounts/database-secret').read_bytes(), b'a' * 64 + b'\n')
+        def realm(*args):
+            events.append('realm')
+            raise ValueError('intentional stop after configuration ordering check')
+        with (patch.object(backup, 'verify_tools', return_value={}),
+              patch.object(backup.account_fixture_tools, 'copy_fixture', return_value=provenance) as copied,
+              patch.object(backup.base, 'run', side_effect=source),
+              patch.object(backup, 'render', side_effect=render),
+              patch.object(backup.db, 'EngineCapture', side_effect=lambda *a: events.append('engine') or Mock()),
+              patch.object(backup.base, 'wait_owned'), patch.object(backup.base, 'stop_owned'),
+              patch.object(backup.realm, 'provision', side_effect=realm),
+              patch.object(backup.account, 'provision') as provision):
+            with self.assertRaisesRegex(ValueError, 'intentional stop'):
+                backup.run(Path('/mysql'), Path('/mysqld'), Path('/dump'), self.root, '0' * 64,
+                           self.root / 'lock', output, '8.0.46',
+                           account_fixture=self.root / 'fixture', account_fixture_sha256='c' * 64)
+        copied.assert_called_once_with(self.root / 'fixture', 'c' * 64, self.root / 'lock', output / 'verified-account-source')
+        self.assertEqual(events, ['bases', 'render', 'engine', 'realm'])
+        provision.assert_not_called()
+        report = json.loads((output / 'qualification.json').read_text())
+        self.assertTrue(report['accountSourceVerified'] and report['sourceConfigurationRendered'])
+        self.assertFalse(report['sourceAccountProvisioned'])
+        self.assertEqual(report['phase'], 'provision-source-local-realm')
 
     def test_digest_failure_happens_before_restore_connection_or_sql(self):
         sql = self.root / 'private.sql'; sql.write_bytes(b'private original account rows')

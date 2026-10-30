@@ -5,13 +5,14 @@ rootfs and its complete corresponding sources in this repository. This is a
 dependency prerelease, not an application/device candidate. It contains no APK,
 WoW data, compiled Esteria auth/world server, game SQL, account or save files.
 
-The planned tag is `deps-server-arm64-b06de55-21a9e8020aac`, pointing exactly to
-the original integration commit `b06de55f5b17f27ae9659abcfdaf93a61b749a9e`.
-Publication has **not** been established merely by adding this workflow.
-`dependency-release.lock.json` initially has `published: null`; clean-build
-downloads deliberately fail until an actual successful publication is recorded.
-The original artifacts expire on 2026-11-13, so the initial preservation run must
-complete before they disappear. Expired/missing originals fail closed.
+The [published dependency prerelease](https://github.com/Russianranger/esteria_android/releases/tag/deps-server-arm64-b06de55-21a9e8020aac)
+uses tag `deps-server-arm64-b06de55-21a9e8020aac`, pointing exactly to the original
+integration commit `b06de55f5b17f27ae9659abcfdaf93a61b749a9e`. Publication completed
+on 2026-10-30 and all nine uploaded assets were independently read back by the
+workflow's final read-only job. `dependency-release.lock.json` records the actual
+public URLs and exact hashes; clean-build fetching no longer needs expiring
+Actions artifacts. GitHub reports `immutable: false`; only the publisher's own
+write-once policy and pinned byte identities are asserted.
 
 ## Validation before publication
 
@@ -70,6 +71,11 @@ substituting a default-branch tag or broadening token permissions.
 
 ## Record successful publication without changing provider identities
 
+The initial publication receipt is retained at
+`runtime/evidence/server-dependency-publication-41003838795.json` and copied to
+the release lock's `published` member. The following procedure also applies to
+future independently pinned dependency releases.
+
 After the workflow succeeds, retrieve its `server-dependency-publication-receipt`
 artifact and inspect `published-release.json`. It contains the actual release ID,
 public URLs and exact hashes after stored-byte verification. Copy that complete
@@ -107,7 +113,7 @@ release verification and interrupted-draft resume without overwrites. The actual
 measured runtime and its installed-package notice graph can be verified locally.
 Full original source ZIP validation and actual publication require the workflow;
 the connector's 512 MiB download cap prevented local recovery of that ZIP.
-No release or clean-build URL is claimed until the successful receipt is recorded.
+No release or clean-build URL is accepted until the successful receipt is recorded.
 
 On 2026-10-30, [run 41002275307](https://github.com/Russianranger/esteria_android/actions/runs/41002275307)
 at integration `ce45a79fb3786ab0e16ea8055a2c2bd0fbb7d444` completed the read-only
@@ -133,6 +139,21 @@ provider/source lock bytes remain unchanged. The split authenticated UI and
 asset-upload workflow above is the subsequent implementation; its success is
 not inferred from these earlier validation results. Repository permissions/settings
 are not changed by this workflow.
+
+Subsequent [run 41003838795](https://github.com/Russianranger/esteria_android/actions/runs/41003838795)
+at `3ae7b69412fec80dfe35f69e89a29d5eb728a665` passed all three jobs. Authorized UI
+publication finalized release `428655644` at `2026-10-30T04:39:27Z`; final read-only
+job `123894755853` verified the exact original tag and all stored assets, including
+the complete corresponding-source ZIP. Receipt artifact `12955150760` was a
+1,009-byte ZIP with SHA-256
+`883f9f8bd86d30f8e35ff1487d9ac0a9b0ec1f41f0dcaa5fc86af3db66100b62`.
+Provider and runtime source-lock bytes were not changed to add transport URLs.
+
+A subsequent clean local `fetch` with `GITHUB_TOKEN` explicitly unset downloaded
+and verified all four runtime inputs from those public release URLs. The public
+source ZIP's unauthenticated HEAD returned its exact 954,236,077-byte size; its
+full bytes had already been verified by the final workflow job. The local fetch
+receipt is `runtime/evidence/server-dependency-public-fetch-41003838795.json`.
 
 References: [GitHub release API](https://docs.github.com/en/rest/releases/releases),
 [release immutability](https://docs.github.com/en/code-security/concepts/supply-chain-security/immutable-releases).

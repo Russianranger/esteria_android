@@ -12,6 +12,22 @@ from tests.test_android_jni_elf import fixture
 
 
 class ProbeContracts(unittest.TestCase):
+    def test_ordinary_owner_inventory_rejects_probe_components(self):
+        owner=fixture();struct.pack_into('<H',owner,18,62)
+        base={'lib/x86_64/libesteria_process.so':owner,'AndroidManifest.xml':b'\x03\x00\x08\x00'+bytes(4),
+              'classes.dex':b'dex\n035\x00'}
+        with tempfile.TemporaryDirectory() as raw:
+            apk=Path(raw)/'inventory-fixture.apk'
+            def package(values):
+                with zipfile.ZipFile(apk,'w',compression=zipfile.ZIP_DEFLATED) as archive:
+                    for name,data in values.items():archive.writestr(name,data)
+            package(base);verifier.verify_owner_only_apk(apk)
+            for name,data in [('lib/x86_64/libesteria_probe_process.so',owner),('assets/proot-probe/rootfs/probe',b'fixture'),
+                              ('AndroidManifest.xml',base['AndroidManifest.xml']+'ProbeOwnerService'.encode('utf-16le')),
+                              ('classes.dex',base['classes.dex']+b'Lio/github/russianranger/esteria/runtime/ProbeOwnerService;'),
+                              ('classes.dex',bytes(16*1024**2+1))]:
+                changed=dict(base);changed[name]=data;package(changed)
+                with self.subTest(name=name,size=len(data)),self.assertRaises(ValueError):verifier.verify_owner_only_apk(apk)
     def test_owner_elf_checks_real_abi_and_bounds(self):
         data=fixture();struct.pack_into('<H',data,18,62);verifier.elf(data,'owner')
         for offset,fmt,value in [(18,'<H',183),(24,'<Q',384),(64+48,'<Q',4096),(64+4,'<I',7),(64+3*56+4,'<I',7)]:
@@ -24,9 +40,11 @@ class ProbeContracts(unittest.TestCase):
     def test_exact_receipt_checks_all_runtime_results(self):
         build={'pinned':'fixture-only'}
         good=dict(formatVersion=1,scope=qualification.SCOPE,sourceRevision='a'*40,fingerprint='fixture',abi='x86_64',
-                  glibcVersion='2.36',api=33,targetSdk=35,guestLaunches=6,guestChildExit=17,buildEvidence=build,
+                  glibcVersion='2.36',api=33,targetSdk=35,guestLaunches=8,guestChildExit=17,buildEvidence=build,
                   controlSurvivors=3,patchedSurvivors=0,detachedTraceesPerCase=3,gracefulSavedFilesRestored=3,
-                  controlObservationMillis=900,patchedObservationMillis=300,
+                  controlObservationMillis=900,patchedObservationMillis=300,ownerDeathObservationMillis=1700,
+                  ownerDeathVerifiedHandles=9,ownerDeathControlSurvivors=3,ownerDeathProtectedSurvivors=0,
+                  isolatedParentDeathSignalQualified=False,
                   arm64GuestExecuted=False,appDeathQualified=False,wineQualified=False,gameplayQualified=False)
         good.update({flag:True for flag in qualification.FLAGS})
         qualification.validate_receipt(good,'a'*40,'fixture',build)
@@ -34,7 +52,9 @@ class ProbeContracts(unittest.TestCase):
         changes.update(arm64GuestExecuted=True,appDeathQualified=True,wineQualified=True,gameplayQualified=True,
                        sourceRevision='b'*40,fingerprint='different',api=32,targetSdk=28,guestLaunches=1,guestChildExit=0,
                        controlSurvivors=0,patchedSurvivors=1,detachedTraceesPerCase=2,gracefulSavedFilesRestored=0,
-                       controlObservationMillis=25000,patchedObservationMillis=-1,
+                       controlObservationMillis=25000,patchedObservationMillis=-1,ownerDeathObservationMillis=25000,
+                       ownerDeathVerifiedHandles=8,ownerDeathControlSurvivors=0,ownerDeathProtectedSurvivors=1,
+                       isolatedParentDeathSignalQualified=True,
                        glibcVersion='2.39',abi='arm64-v8a',buildEvidence={})
         for name,value in changes.items():
             invalid=copy.deepcopy(good);invalid[name]=value

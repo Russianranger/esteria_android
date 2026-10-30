@@ -136,10 +136,12 @@ jobs:
             --env PYTHONDONTWRITEBYTECODE=1 \
             --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
             --mount "type=bind,src=$GITHUB_WORKSPACE/out/base-sql-fixture,dst=/fixture,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/local-account-fixture,dst=/account-fixture,readonly" \
             --mount "type=bind,src=$GITHUB_WORKSPACE/out/mysql-backup-private,dst=/state" \
             --workdir /qualification esteria-base-sql:qualification \
             python3 tools/qualify_mysql_backup.py --fixture /fixture \
             --fixture-sha256 "$ESTERIA_BASE_FIXTURE_SHA256" \
+            --account-fixture /account-fixture --account-fixture-sha256 "$ESTERIA_ACCOUNT_FIXTURE_SHA256" \
             --expected-version "$ESTERIA_MYSQL_SQL_VERSION" --output /state/run \
             > out/mysql-backup-evidence/qualification.log 2>&1
       - name: Collect receipts and bounded redacted diagnostics only

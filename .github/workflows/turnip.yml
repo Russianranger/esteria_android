@@ -1,0 +1,45 @@
+name: Pinned ARM64 Turnip KGSL build
+on:
+  push:
+    branches: [android/client-server]
+    paths: [runtime/turnip/**, tests/test_turnip_build.py, .github/workflows/turnip.yml]
+  pull_request:
+    paths: [runtime/turnip/**, tests/test_turnip_build.py, .github/workflows/turnip.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: turnip-build-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Check pinned inputs source extraction and qualification boundaries
+        run: python3 -m unittest tests.test_turnip_build -v
+      - name: Source-build glibc ARM64 KGSL driver and actual shader probe
+        run: |
+          test "$(uname -m)" = aarch64
+          mkdir -p out/turnip
+          docker build --platform linux/arm64 --target turnip-export \
+            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
+            --build-arg INTEGRATION_REVISION="$GITHUB_SHA" \
+            --output type=local,dest=out/turnip/payload runtime/turnip \
+            > out/turnip/build.log 2>&1
+          sudo chown -R "$(id -u):$(id -g)" out/turnip
+          cp LICENSE out/turnip/payload/notices/ESTERIA-GPL-3.0
+      - name: Preserve build-only evidence
+        if: always()
+        run: sudo chown -R "$(id -u):$(id -g)" out/turnip
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: unqualified-adreno-turnip-linux-arm64-${{ github.sha }}
+          path: |
+            out/turnip
+            runtime/turnip
+            LICENSE
+          retention-days: 14
+          if-no-files-found: error

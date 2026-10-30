@@ -11,6 +11,11 @@ The source is created solely by `qualify_base_sql.run`: authenticated bootstrap,
 harness then provisions the owned local account and loopback realm, and adds
 explicit disposable probes containing binary bytes, UTF-8 text, empty strings
 and SQL NULL in each database. These probes are not characters or bots.
+Before provisioning, the separately hashed account fixture supplies the exact
+server configuration templates. Its complete provenance is checked, and the
+existing renderer creates the active private configuration while preserving the
+database secret already created by bootstrap. No account SQL is replayed from
+that second fixture.
 
 Only the harness's own engine runs. An authenticated root socket connection must
 match the bootstrap UUID/datadir/version before taking a global read lock.
@@ -64,7 +69,7 @@ no unpinned runtime package or replacement binary.
 
 ## Validation boundary
 
-Eleven focused host guard tests pass, including real bounded subprocess output
+Thirteen focused host guard tests pass, including real bounded subprocess output
 draining/deadline cleanup, digest rejection before SQL, all-four-empty gating,
 partial-file preservation, no-replace publication and regular-file/link checks.
 The file-size limiter starts an isolated Python interpreter that applies the
@@ -77,6 +82,11 @@ log, qualification receipt and runtime/environment identity. SQL dumps, SQL
 errors, all account rows, credentials, and private database/configuration trees
 are never artifact inputs.
 
-The real MySQL backup/restore run is pending publication/execution. No current
-result qualifies live saved-game restoration, upgrades across revisions,
+The first actual ARM64 run, `41003838768` at `3ae7b694`, passed the full source-base
+load/restart inside this harness, then stopped before dumping because the initial
+composition had not rendered the configuration required by realm/account helpers.
+The corrected composition now verifies the account fixture and renders those
+templates before provisioning. Full backup/restore execution is pending rerun; no
+dump, restore or setup-wrapper success is inferred from the earlier base-only pass.
+No current result qualifies live saved-game restoration, upgrades across revisions,
 character saving/relogging, bot persistence, the Android helper, or gameplay.

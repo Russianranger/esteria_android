@@ -199,7 +199,20 @@ exact typed fields and keeps CommonMain/assets/loopback-gameplay flags false.
 Both spellings plus all namespace, shutdown and log gates are required for
 `linuxArm64ClientOfflineBoundariesQualified`. A prior entry/codec result cannot
 substitute for this scope. Actual successful local login and full offline gameplay
-are separate gates. The new diagnostic/harness is awaiting its paired execution.
+are separate gates.
+
+This offline-boundary gate passed actual Windows ARM64/x64 and Linux ARM64 Wine
+execution in run [41003225299](https://github.com/Russianranger/wowdecomp_esteria/actions/runs/41003225299),
+client `e2718f647a7f1efb9219106c7501f88a0bf06e4f`, integration harness
+`ce45a79fb3786ab0e16ea8055a2c2bd0fbb7d444`, Wine job `123894865848`.
+Both exact offline receipts have SHA-256
+`a0a8ea79b80b80bf73766539cc4d6f64c38c4f599e760b7cf267a7f0f1a027c2`.
+The downloaded/read-back combined qualification receipt hashes to
+`8b39094c1550c7af17fd665c81188c33b6ee5c70501755324a1f3673f8a336b2`;
+artifact `12954553048` is 142,372,348 bytes with ZIP SHA-256
+`cfcb872a9fc6ddc849f65f4c7a41cea590602cd493539951dac502c37787f061`.
+All earlier codec, entry, software graphics and captured FMOD transport gates also
+passed with namespace exit zero. Android and gameplay fields remain false.
 
 The optional `--client-loopback-check` requires the entry and offline checks and
 runs the same hash-verified full client executable with

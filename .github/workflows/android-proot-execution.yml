@@ -10,6 +10,8 @@ on:
       - app/build.gradle
       - app/src/androidTest/**/ProotExecutionTest.java
       - app/src/androidTest/**/ProbeProcessHandles.java
+      - app/src/androidTest/**/RemoteOwnerDeathProbe.java
+      - app/src/prootProbe/**
       - native/CMakeLists.txt
       - tools/build_android_proot_probe.py
       - tools/verify_android_proot_probe.py
@@ -75,6 +77,10 @@ jobs:
           cp app/build/outputs/apk/debug/app-debug.apk out/android-proot/probe.apk
           cp app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk out/android-proot/tests.apk
           python3 tools/verify_android_proot_probe.py --provider "$RUNNER_TEMP/proot-probe/provider" --apk out/android-proot/probe.apk
+      - name: Ensure ordinary owner APK excludes all probe components
+        run: |
+          ./gradlew --no-daemon :app:clean :app:assembleDebug -PnativeRuntimeBridge=true -PnativeBridgeAbi=x86_64 -PsourceRevision="$GITHUB_SHA"
+          python3 tools/verify_android_proot_probe.py --owner-only-apk app/build/outputs/apk/debug/app-debug.apk > out/android-proot/ordinary-inventory.json
       - name: Execute actual PRoot loader and glibc from app-private storage
         uses: ReactiveCircus/android-emulator-runner@324029e2f414c084d8b15ba075288885e74aef9c
         with:
@@ -94,6 +100,7 @@ jobs:
           name: android-13-x64-proot-evidence-${{ github.sha }}
           path: |
             out/android-proot/evidence
+            out/android-proot/ordinary-inventory.json
             ${{ runner.temp }}/proot-probe/build-evidence.json
             ${{ runner.temp }}/proot-probe/build.log
             ${{ runner.temp }}/proot-probe/control-build.log

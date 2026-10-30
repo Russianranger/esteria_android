@@ -111,5 +111,4 @@ new-source conflict reports, both old/candidate stale-report rejection, explicit
 retained-generation activation, unchanged imported bytes/WTF, source and baseline
 mutation rejection, unsafe links/ownership/cycles, and the typed launch-view
 integration. These fixtures are synthetic and execute no game or Android process.
-The full app's pending-review presentation and session-stopped enforcement are
-still required before exposing this API as a gameplay action.
+The application now presents bounded divergence reports and exact-digest decisions; see [APP-UI-REVIEW.md](APP-UI-REVIEW.md). Full gameplay startup remains gated, satisfying the stopped-client precondition. A future active-session adapter must explicitly hold that precondition across preparation, review and activation.

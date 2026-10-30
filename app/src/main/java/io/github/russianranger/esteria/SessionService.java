@@ -52,6 +52,9 @@ public final class SessionService extends Service {
     static final String START = "io.github.russianranger.esteria.START";
     static final String PREPARE_RUNTIME = "io.github.russianranger.esteria.PREPARE_RUNTIME";
     static final String PREPARE_SERVER_RUNTIME = "io.github.russianranger.esteria.PREPARE_SERVER_RUNTIME";
+    static final String ACCEPT_UI = "io.github.russianranger.esteria.ACCEPT_UI";
+    static final String KEEP_UI = "io.github.russianranger.esteria.KEEP_UI";
+    static final String UI_REVIEW_DIGEST = "uiReviewDigest";
     private static final String CHANNEL = "esteria-session";
     private static final int NOTIFICATION = 1001;
     final class LocalBinder extends Binder { SessionService service() { return SessionService.this; } }
@@ -64,9 +67,12 @@ public final class SessionService extends Service {
     private int latestStartId;
     private volatile String status = "Ready to import your 3.3.5a build 12340 client folder or ZIP.";
     private volatile SafTreeSource activeFolderSource;
+    // Ephemeral decisions are never restored as approval after service/process recreation.
+    private volatile ClientLaunchSetup.UiReview pendingUiReview;
     private Path root;
     String status() { return status; }
     boolean busy() { return busy.get(); }
+    ClientLaunchSetup.UiReview uiReview() { return pendingUiReview; }
     @Override public IBinder onBind(Intent intent) { return binder; }
     @Override public void onCreate() {
         super.onCreate();
@@ -108,7 +114,14 @@ public final class SessionService extends Service {
                 else if (START.equals(intent.getAction())) checkLaunch();
                 else if (PREPARE_RUNTIME.equals(intent.getAction())) prepareRuntime();
                 else if (PREPARE_SERVER_RUNTIME.equals(intent.getAction())) prepareServerRuntime();
+                else if (ACCEPT_UI.equals(intent.getAction())) acceptUiReview(intent.getStringExtra(UI_REVIEW_DIGEST));
+                else if (KEEP_UI.equals(intent.getAction())) keepCurrentUi(intent.getStringExtra(UI_REVIEW_DIGEST));
                 else throw new IOException("Unknown operation");
+            } catch (ClientLaunchSetup.ReviewRequired review) {
+                pendingUiReview=review.review;
+                status="Review the imported UI changes below. Your current UI and saved variables are retained.";
+                log("UI review pending digest="+review.review.digest+" currentChanges="+review.review.currentChanges
+                        +" candidateChanges="+review.review.candidateChanges+" conflicts="+review.review.conflicts);
             } catch (RuntimeWork.CancelledException e) {
                 status = setupPaused(intent.getAction(), false);
                 log("Runtime setup paused");
@@ -138,6 +151,7 @@ public final class SessionService extends Service {
         if (uri == null) throw new IOException("No source selected");
         GameDataImporter.ImportKind kind = intent.getBooleanExtra("overlay", false)
                 ? GameDataImporter.ImportKind.CONTENT_OVERLAY : GameDataImporter.ImportKind.BASE_CLIENT;
+        pendingUiReview=null;
         GameDataImporter importer = new GameDataImporter(root.resolve("game"));
         GameDataImporter.Result result;
         if (intent.getBooleanExtra("folder", false)) {
@@ -172,6 +186,7 @@ public final class SessionService extends Service {
         throw new IOException("This build has no qualified client/server session adapter");
     }
     private void prepareRuntime() throws IOException {
+        pendingUiReview=null;
         status = "Preparing client runtime…";
         RuntimeSetup setup = new RuntimeSetup(this, root);
         GuestBridgeSetup bridges = BuildConfig.GUEST_BRIDGES_PACKAGED ? new GuestBridgeSetup(this, root) : null;
@@ -220,24 +235,48 @@ public final class SessionService extends Service {
             log("Reconstructed client prepared generation=" + installed.generation + " revision=" + client.sourceRevision()
                     + " build=" + client.buildId() + " reusedFiles=" + installed.reusedFiles
                     + " copiedBytes=" + installed.copiedBytes + " gameRuntimeQualified=false");
-            ClientLaunchSetup.Prepared prepared=ClientLaunchSetup.prepare(this,root,client,(phase,path,completed,total)-> {
-                long now=android.os.SystemClock.elapsedRealtime();
-                if (now-lastUpdate[0]>=250||completed==total) {
-                    lastUpdate[0]=now;
-                    status="Preparing persistent client settings and launch files…";
-                }
-            },cancelled::get);
-            if (prepared!=null) {
-                log("Client view prepared generation=" + prepared.view.generation + " reusedExecutables="
-                        + prepared.view.reusedExecutables + " deferredLooseTrees=" + prepared.plan.deferredLooseTrees
-                        + " gameRuntimeQualified=false");
-                if (!prepared.plan.deferredLooseTrees.isEmpty()) {
-                    status="Client runtime files are prepared. Imported loose Interface content requires writable UI integration before gameplay.";
-                    return;
-                }
-            }
+            prepareClientView(client,null);
         }
         status = "Client runtime files are prepared. Local services and gameplay are still under development.";
+    }
+    /** All setup operations share the service worker; START remains gated, so the client is stopped.
+     * A future gameplay adapter must hold the stopped-session guard across this complete call.
+     */
+    private void prepareClientView(ClientRuntimeSetup client,String acceptedDigest) throws IOException {
+        status="Preparing persistent client settings and launch files…";
+        final long[] lastUpdate={0};
+        ClientLaunchSetup.Prepared prepared=ClientLaunchSetup.prepare(this,root,client,acceptedDigest,(phase,path,completed,total)-> {
+            long now=android.os.SystemClock.elapsedRealtime();
+            if(now-lastUpdate[0]>=250||completed==total) {
+                lastUpdate[0]=now;
+                status="client-ui-assessing".equals(phase) ? "Checking changes in writable UI files…"
+                        : "Preparing persistent client settings and launch files…";
+            }
+        },cancelled::get);
+        if(prepared!=null)log("Client view prepared generation="+prepared.view.generation+" reusedExecutables="
+                +prepared.view.reusedExecutables+" gameRuntimeQualified=false");
+        pendingUiReview=null;
+    }
+    private ClientLaunchSetup.UiReview requireDisplayedReview(String digest) throws IOException {
+        ClientLaunchSetup.UiReview pending=pendingUiReview;
+        if(digest==null||pending==null||!pending.digest.equals(digest))
+            throw new IOException("The UI review is no longer current. Prepare client runtime to get a new report.");
+        return pending;
+    }
+    private void acceptUiReview(String digest) throws IOException {
+        requireDisplayedReview(digest);
+        if(!BuildConfig.CLIENT_RUNTIME_PACKAGED)throw new IOException("This build has no packaged reconstructed client");
+        pendingUiReview=null;
+        // This path uses already prepared binaries; it does not redownload or rescan the Wine archive.
+        prepareClientView(new ClientRuntimeSetup(this,root),digest);
+        status="Imported UI version selected. Previous UI files and saved variables are retained. Gameplay remains under development.";
+        log("Reviewed UI version selected; previous generations retained; gameRuntimeQualified=false");
+    }
+    private void keepCurrentUi(String digest) throws IOException {
+        requireDisplayedReview(digest);
+        pendingUiReview=null;
+        status="Current UI retained. The newly imported content is not ready to launch with that UI. Choose Prepare client runtime to review again.";
+        log("UI review dismissed; existing UI pointer preserved");
     }
     private void prepareServerRuntime() throws IOException {
         status = "Preparing bundled database and server dependencies…";
@@ -341,6 +380,14 @@ public final class SessionService extends Service {
                 facts.put("proot.installedBytesVerified", "false");
                 facts.put("proot.installationError", error.getMessage());
             }
+        }
+        ClientLaunchSetup.UiReview review=pendingUiReview;
+        facts.put("clientUi.reviewPending",Boolean.toString(review!=null));
+        if(review!=null) {
+            facts.put("clientUi.reviewDigest",review.digest);
+            facts.put("clientUi.currentChanges",Integer.toString(review.currentChanges));
+            facts.put("clientUi.candidateChanges",Integer.toString(review.candidateChanges));
+            facts.put("clientUi.conflicts",Integer.toString(review.conflicts));
         }
         addPerformanceSnapshot(facts);
         Properties runtime = new Properties();
@@ -454,9 +501,11 @@ public final class SessionService extends Service {
     }
     private static long mib(long value) { return value / (1024 * 1024); }
     private static boolean isRuntimeSetup(String action) {
-        return PREPARE_RUNTIME.equals(action) || PREPARE_SERVER_RUNTIME.equals(action);
+        return PREPARE_RUNTIME.equals(action) || PREPARE_SERVER_RUNTIME.equals(action) || ACCEPT_UI.equals(action) || KEEP_UI.equals(action);
     }
     private static String setupPaused(String action, boolean interrupted) {
+        if(ACCEPT_UI.equals(action)||KEEP_UI.equals(action))return "UI preparation " + (interrupted ? "was interrupted" : "paused")
+                + ". Prior UI generations and saved variables are retained. Choose Prepare client runtime to check the current selection and review again.";
         String label = PREPARE_SERVER_RUNTIME.equals(action) ? "Prepare server dependencies" : "Prepare client runtime";
         return "Runtime setup " + (interrupted ? "was interrupted" : "paused") + ". Choose " + label
                 + " to resume; current data and saves are preserved.";

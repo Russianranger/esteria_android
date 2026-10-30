@@ -40,12 +40,15 @@ The source supports this intended cleanup sequence:
   paths. Some bot group cleanup is queued after the world loop, so this source
   trace does not establish complete bot persistence.
 
-Host evidence: the real native owner suite and 12 Linux JVM/JNI groups pass,
+Host evidence: the real native owner suite and 12 Linux JVM/JNI groups pass on
+native Linux x64 and ARM64 in [run 41003838751](https://github.com/Russianranger/esteria_android/actions/runs/41003838751),
 including exact binary stdin, EOF, bounded backpressure with zero partial writes,
 close/write races, EPIPE, handle closure and the exact shutdown line delivered to
 a fixture that exits normally. Android API26 ARM64 cross-compilation passes.
-The Android13 x64 owner instrumentation now requires equivalent stream and
-console-fixture checks; execution of those new checks is pending CI. These
+The Android13 x64 owner instrumentation passed all nine groups, including
+equivalent stream and console-fixture checks, in
+[run 41003838802](https://github.com/Russianranger/esteria_android/actions/runs/41003838802).
+Both runs used integration `3ae7b69412fec80dfe35f69e89a29d5eb728a665`. These
 fixtures execute no world server and prove neither character saving nor bot
 persistence. Actual world shutdown, authenticated database shutdown, restart and
 character/bot relog remain required integration gates.

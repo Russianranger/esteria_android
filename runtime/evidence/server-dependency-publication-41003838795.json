@@ -1,0 +1,57 @@
+{
+  "assets": {
+    "NOTICE.txt": {
+      "bytes": 509,
+      "sha256": "8b5721d0b505ca133c5a9e84ea57b9ac08d150d564c8e6f587c53e49c6eec1c7",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-server-arm64-b06de55-21a9e8020aac/NOTICE.txt"
+    },
+    "SHA256SUMS": {
+      "bytes": 725,
+      "sha256": "aa6aec31cdea468c7b3fd342a1d3e7b6b9a82d0834efa4924c1e9e00ad567438",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-server-arm64-b06de55-21a9e8020aac/SHA256SUMS"
+    },
+    "package-receipt.json": {
+      "bytes": 1915,
+      "sha256": "05153c6c03856071f0c0452f6075ae4b9ea2e1f1d0fbcc32f33319a9599adb9f",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-server-arm64-b06de55-21a9e8020aac/package-receipt.json"
+    },
+    "release-manifest.json": {
+      "bytes": 1733,
+      "sha256": "17ea7eb90a94053f1de5bd89e6ae6204262ce0b7d9c3a7de16067d825dc9c4be",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-server-arm64-b06de55-21a9e8020aac/release-manifest.json"
+    },
+    "server-runtime-arm64.tar.gz": {
+      "bytes": 112374096,
+      "sha256": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-server-arm64-b06de55-21a9e8020aac/server-runtime-arm64.tar.gz"
+    },
+    "server-runtime-corresponding-sources.zip": {
+      "bytes": 954236077,
+      "sha256": "b09599218a1a62a8e131eeedc47f6c8c19e2d39936d4e0aed7261e365f409bc1",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-server-arm64-b06de55-21a9e8020aac/server-runtime-corresponding-sources.zip"
+    },
+    "server-runtime-source-manifest.json": {
+      "bytes": 53668,
+      "sha256": "635b966d617ffd2763d51412c67fa52c90dc1d9311ca2e489408c09362024688",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-server-arm64-b06de55-21a9e8020aac/server-runtime-source-manifest.json"
+    },
+    "server-runtime.json": {
+      "bytes": 34299,
+      "sha256": "3aa480f48fd36cea1253557976163dc2da0707eef72dbef18d028196888b05b1",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-server-arm64-b06de55-21a9e8020aac/server-runtime.json"
+    },
+    "sources.lock.json": {
+      "bytes": 6578,
+      "sha256": "2efac3a6a310c4add3a0407f0044ac608706aa748730351d45ea4c67bdfd0a47",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-server-arm64-b06de55-21a9e8020aac/sources.lock.json"
+    }
+  },
+  "formatVersion": 1,
+  "githubImmutable": false,
+  "publisherNeverOverwrites": true,
+  "releaseId": 428655644,
+  "repository": "Russianranger/esteria_android",
+  "tag": "deps-server-arm64-b06de55-21a9e8020aac",
+  "targetCommit": "b06de55f5b17f27ae9659abcfdaf93a61b749a9e",
+  "url": "https://github.com/Russianranger/esteria_android/releases/tag/deps-server-arm64-b06de55-21a9e8020aac"
+}

@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import io.github.russianranger.esteria.runtime.ClientLaunchSetup;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +29,9 @@ public final class MainActivity extends Activity {
     private final List<Button> actions = new ArrayList<>();
     private SessionService service;
     private TextView status;
-    private Button cancel;
+    private Button cancel, useImportedUi, keepCurrentUi;
+    private TextView uiReview;
+    private String displayedUiDigest;
     private boolean bound;
     private final Runnable refresh = new Runnable() {
         public void run() {
@@ -36,6 +39,16 @@ public final class MainActivity extends Activity {
                 status.setText(service.status());
                 for (Button action : actions) action.setEnabled(!service.busy());
                 cancel.setEnabled(service.busy());
+                ClientLaunchSetup.UiReview review=service.uiReview();
+                if(review==null) {
+                    displayedUiDigest=null; uiReview.setVisibility(View.GONE);
+                    useImportedUi.setVisibility(View.GONE); keepCurrentUi.setVisibility(View.GONE);
+                } else {
+                    // The click sends the digest of the report actually shown, never a newer service value.
+                    if(!review.digest.equals(displayedUiDigest)) uiReview.setText(review.text);
+                    displayedUiDigest=review.digest; uiReview.setVisibility(View.VISIBLE);
+                    useImportedUi.setVisibility(View.VISIBLE); keepCurrentUi.setVisibility(View.VISIBLE);
+                }
             }
             ui.postDelayed(this, 250);
         }
@@ -66,6 +79,11 @@ public final class MainActivity extends Activity {
             button(layout, "Prepare server dependencies · bundled", () -> operation(new Intent(this, SessionService.class).setAction(SessionService.PREPARE_SERVER_RUNTIME)));
             layout.addView(text("Database and server dependencies are included in this build. Setup needs about 560 MiB of free space and can resume after interruption. Database initialization and local server startup are still under development.", 13, Color.rgb(145, 163, 177)));
         }
+        uiReview=text("",14,Color.rgb(220,186,113)); uiReview.setTextIsSelectable(true);
+        uiReview.setPadding(0,dp(16),0,dp(8)); uiReview.setVisibility(View.GONE); layout.addView(uiReview);
+        useImportedUi=button(layout,"Use imported UI version",()->reviewDecision(SessionService.ACCEPT_UI));
+        keepCurrentUi=button(layout,"Keep current UI",()->reviewDecision(SessionService.KEEP_UI));
+        useImportedUi.setVisibility(View.GONE); keepCurrentUi.setVisibility(View.GONE);
         button(layout, "Start local game", () -> operation(new Intent(this, SessionService.class).setAction(SessionService.START)));
         button(layout, "Export support bundle", this::chooseExport);
         cancel = new Button(this); cancel.setText(R.string.stop_session); cancel.setEnabled(false);
@@ -77,9 +95,9 @@ public final class MainActivity extends Activity {
         if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
             requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 20);
     }
-    private void button(LinearLayout layout, String label, Runnable action) {
+    private Button button(LinearLayout layout, String label, Runnable action) {
         Button button = new Button(this); button.setText(label); button.setOnClickListener(v -> action.run());
-        button.setFocusable(true); actions.add(button); layout.addView(button);
+        button.setFocusable(true); actions.add(button); layout.addView(button); return button;
     }
     private TextView text(String text, int size, int color) {
         TextView view = new TextView(this); view.setText(text); view.setTextSize(size); view.setTextColor(color); return view;
@@ -113,6 +131,11 @@ public final class MainActivity extends Activity {
                     .putExtra("overlay", request == OVERLAY || request == OVERLAY_FOLDER)
                     .putExtra("folder", request == BASE_FOLDER || request == OVERLAY_FOLDER));
         } else if (request == EXPORT) operation(new Intent(this, SessionService.class).setAction(SessionService.EXPORT).setData(uri));
+    }
+    private void reviewDecision(String action) {
+        String digest=displayedUiDigest;
+        if(digest!=null)operation(new Intent(this,SessionService.class).setAction(action)
+                .putExtra(SessionService.UI_REVIEW_DIGEST,digest));
     }
     private void operation(Intent intent) { startForegroundService(intent); }
     @Override protected void onStart() {

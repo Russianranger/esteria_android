@@ -15,20 +15,27 @@ server/Wine jobs must not be converted into successful evidence without logs.
 
 ## Current queued checkpoints
 
-- Client offline/timer tip: `e2718f647a7f1efb9219106c7501f88a0bf06e4f`; inspect its
-  full Windows/Wine run before regenerating the intentionally older69cc provider.
-- Server40994809596 remains active; auth and backup harnesses are ready for actual
-  binary/engine runs. Do not infer success from its long compile duration.
-- Android tracer control correction uses three armed CPU-only waits after all
-  syscalls. Prior41002275287 failed SIGSYS in the unpatched control; rerun required.
-- Bounded stdin/world shutdown adapter and writable UI store pass host tests;
-  actual Android/world-save and app review integration are next.
-- Android database setup source/asset adapter compiles. Read
-  `runtime/ANDROID-DATABASE-SETUP.md`; fixed `/work/state`, existing secrets and
-  interrupted state must be preserved. No live-service readiness claim.
-- Exactb06 dependency UI draft exists; automated upload only and post-publication
-  read-only verification avoid Actions release-create permissions. Verify assets
-  before browser publication; do not change the target/default branch.
+- Full EXE offline diagnostics pass all5 jobs41003225299 atcliente2718f6.
+  Tip9f2e759 builds both targets but fails the actual loopback gate. New3e9ef3a8
+  diagnoses phases and repairs lost timer wakes; inspect its actual result before
+  replacing the intentionally older69cc application provider.
+- Server40994809596 reached final linking after2,257objects. Patch5 supplies real
+  grid template definitions; patch6 omits README-only script directories while
+  preserving populated registrations. Run41005048019 is compiling with the saved cache; full server/auth
+  package remains unqualified until it succeeds.
+- Android tracer run41003838793 passes3vs0 control/protected survivors and saved
+  file/relaunch checks. Native stdin41003838751 and Android9-group41003838802 pass.
+  New remote-owner process-death fixture is separate pending evidence.
+- App writable UI review/activation, safe keep-current behavior and stale-decision
+  rejection pass actual adapter tests and combined APK checks. Future active
+  sessions must continue enforcing the stopped-client prerequisite.
+- Android database adapter compiles but remains outside launcher execution.
+  Read `runtime/ANDROID-DATABASE-SETUP.md`: fixed `/work/state`, persistent secrets
+  and partial state, no current SQL/schema-readiness claim. Actual x64 Android
+  MySQL fixture and native SQL backup/restore qualification remain work.
+- Exactb06 dependency prerelease is published and all9 stored assets reverified
+  in41003838795. Separate release lock contains durable URLs and hashes. Client
+  and guest-helper archival inputs still need equivalent durable retention.
 
 ## Next concrete work
 

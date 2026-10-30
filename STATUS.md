@@ -14,27 +14,41 @@ no default merge, history rewrite or server push has occurred.
 
 ## Latest implementation checkpoint
 
-Client branch tip `e2718f647a7f1efb9219106c7501f88a0bf06e4f` adds opt-in local
-offline mode and initializes the actual timer for its pre-game diagnostic. The
-first new full x64 diagnostic exposed that missing dependency; corrected runtime
-results are pending. The application deliberately keeps its measured69cc provider.
-Native ARM64 server run40994809596 is still compiling; no link/auth/world success
-is claimed. The new backup/restore and real auth-protocol harnesses require their
-actual workflow results.
+The full reconstructed EXE's offline diagnostics pass Windows x64/ARM64 and
+native Linux ARM64 Wine in run41003225299, client
+`e2718f647a7f1efb9219106c7501f88a0bf06e4f`. New client tip
+`9f2e759970defbdec30a1584400869dcbb9f9c9c` builds both targets but fails its new
+positive loopback gate. Revision `3e9ef3a8bbb25a976b33be6dc3c166d3a2b41c05`
+adds phase diagnostics and repairs a source-demonstrated lost timer wake; actual
+runtime results remain pending. The application
+intentionally keeps the measured69cc provider until replacement qualification.
 
-Writable Interface generations and typed client-view selection pass bounded
-host tests and independent review. Twelve real Linux JNI process groups pass,
-including atomic bounded stdin and the source-supported world shutdown command;
-actual world saves are unqualified. The Android database adapter compiles/lints,
-with six preservation guards; it does not enable launcher database execution yet.
-Android tracer-death run41002275287 failed because the control used a syscall
-rejected after tracing stopped. The corrected, armed CPU-only control is published
-for a new emulator run; the failing control is not cleanup success.
+Server40994809596 compiled all2,257 objects and linked authserver/dbimport, then
+failed final worldserver linking on three missing grid-template instantiations
+and the README-only Custom directory's nonexistent loader. Minimal source-backed
+patches5/6 supply real template definitions and omit only source-empty directories.
+Corrected run41005048019 is compiling with the saved cache; no complete server
+package or auth/world success
+is claimed. Actual SQL backup/restore also needs its corrected fixture run.
 
-Dependency release run41002275307 validated all original/source/notice inputs,
-then hit GitHub's token permission limit before publication. An exactb06 UI draft
-is prepared; narrowly scoped asset upload and read-only verification remain pending.
-No durable dependency URL is claimed before that completes.
+Writable UI selection/review is integrated into the app with explicit divergence
+decisions and retained prior versions. Actual adapter32MiB tests, independent
+review, combined all4-provider APK, instrumentation compilation, lint and final
+provider byte checks pass. Android database preparation is implemented but is
+not launched by normal setup until its platform qualification succeeds.
+
+Native Linux x64/ARM64 stdin tests pass12 real JNI groups in41003838751. Android13
+x64 passes9 real owner groups in41003838802. Corrected tracer-death run41003838793
+observed3 control survivors versus0 protected survivors before alarms, plus3
+saved files read by a fresh guest. These are component results, not world saves,
+Android ARM64 guest execution or gameplay. Remote-owner process death is a new
+separate test; it must not claim isolated parent-death-signal causality.
+
+Dependency release41003838795 passed full original/source validation, upload to
+an exactb06 UI draft and independent read-only post-publication verification of
+all9 assets. The durable prerelease URL and per-file hashes are recorded in
+`runtime/server/dependency-release.lock.json`; GitHub immutable=false is explicit.
+No default branch, credential scope or repository security setting was changed.
 
 ## Implemented and verified
 
@@ -65,7 +79,7 @@ No durable dependency URL is claimed before that completes.
 | Captured reconstructed audio | WinMM and DirectSound both pass real native ARM64 Wine PCM transport in client [CI 40998295147](https://github.com/Russianranger/wowdecomp_esteria/actions/runs/40998295147), revision `243b6c4`. Correct stereo signals, 122,414/123,344 frames, exact END callbacks, clean EOF and Wine teardown are required. | Synthetic FMOD sound, not game music/audio on Android or Thor. |
 | Android Surface and AudioTrack | Actual native pixels/recreation and AudioTrack clock/reset/private-socket cleanup pass Android13 x64 [CI 40999380046](https://github.com/Russianranger/esteria_android/actions/runs/40999380046). Audio accepted and played both4,992 frames. | Offscreen synthetic socket producers; no guest X11, Wine, Adreno, audible hardware or game presentation qualification. |
 | ARM64 host XTest input | Real pinned X11 server/helper passes seven groups,16 observed input events and15 acknowledgements with normal cleanup in [CI 41000334310](https://github.com/Russianranger/esteria_android/actions/runs/41000334310). Production helper bytes match the packaged61bf build. | Host X11 behavior, not Android controller/game input. |
-| Mutable client view | Exact PE copies/resume, persistent WTF/cache/logs/screenshots, loopback locale overlays, canonical view over case-insensitive imported names, guest-only links and preservation checks pass32MiB tests. Service prepares the view after verified client installation when imported data exists. | No client execution. Writable Interface preservation and typed selection are implemented; app review/activation integration remains underway; generated shaders and actual content still required. |
+| Mutable client view | Exact PE copies/resume, persistent WTF/cache/logs/screenshots, loopback locale overlays, canonical view over case-insensitive imported names, guest-only links and preservation checks pass32MiB tests. Service prepares the view after verified client installation when imported data exists. | No client execution. Writable Interface preservation and typed selection are implemented; app review/activation is implemented and host-tested; generated shaders and actual content still required. |
 
 The supplied 7,702,016-byte `Wow.exe` passes structural PE VERSIONINFO inspection
 for **3.3.5.12340**, SHA-256
