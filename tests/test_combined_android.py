@@ -64,7 +64,9 @@ class CombinedPackageGuards(unittest.TestCase):
             'server-installation': ('android_server_installation_setup.py', 'android_server_schema_setup.py', 'mysql_bootstrap.py',
                 'mysql_service.py', 'server_content.py', 'server_schema_setup.py', 'server_schema_baseline.py', 'server_schema_adaptations.py',
                 'server_update_setup.py', 'server_updater.py', 'server_playerbots_setup.py', 'owned_process_group.py', 'server_config.py', 'provision_local_realm.py',
-                'provision_local_account.py', 'server/appearance-schema-v1.sql', 'server/appearance-schema.lock.json', 'local-server.json')})
+                'provision_local_account.py', 'server/appearance-schema-v1.sql', 'server/appearance-schema.lock.json', 'local-server.json'),
+            'server-data': ('server_data_generation.py', 'server_data_preflight.py', 'shader_generation.py',
+                'extractor_order.py', 'owned_process_group.py')})
         repository, path = self.helper_fixture()
         with patch.object(bundle, 'ROOT', repository), zipfile.ZipFile(path) as archive:
             bundle.verify_helpers(archive)

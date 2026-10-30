@@ -150,3 +150,10 @@ for real versus synthetic evidence and remaining Android/provider/overlay gates.
 Do not route Main START through this until complete setup/session prerequisites
 are established. Native bot schema41076505231 and source recovery41078079045
 passed; finish their exact provider/candidate retention without recompiling them.
+
+Data helpers are now packaged under `assets/server-data` (five source files);
+ServerDataAssets installs them and ServerDataRunPlan fixes the guest command and
+source-selection identity. `verify_completed` also binds retained order.json/tsv.
+The world session mounts a completed generation at /esteria-data and must verify
+DataDir=/esteria-data/data. Main START remains closed. Finish the measured
+composed ordered-tool provider and Android operation owner before UI activation.

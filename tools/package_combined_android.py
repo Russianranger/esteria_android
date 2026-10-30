@@ -46,7 +46,9 @@ HELPER_SETS = {'database-setup': ('mysql_bootstrap.py', 'android_database_setup.
                     'server_schema_baseline.py', 'server_schema_adaptations.py', 'server_update_setup.py',
                     'server_updater.py', 'server_playerbots_setup.py', 'owned_process_group.py', 'server_config.py', 'provision_local_realm.py',
                     'provision_local_account.py', 'server/appearance-schema-v1.sql', 'server/appearance-schema.lock.json',
-                    'local-server.json')}
+                    'local-server.json'),
+               'server-data': ('server_data_generation.py', 'server_data_preflight.py', 'shader_generation.py',
+                    'extractor_order.py', 'owned_process_group.py')}
 
 
 def ndk_notices(path):

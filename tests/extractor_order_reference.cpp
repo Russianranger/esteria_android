@@ -37,6 +37,20 @@ static void Create(const char* path,const char* inputPath) {
 int main(int argc,char** argv) {
     try {
         if(argc==4 && std::string(argv[1])=="--create-fixture") {Create(argv[2],argv[3]);return 0;}
+        bool mapArguments=argc>1 && std::string(argv[1])=="--check-map-conversion-argv";
+        bool vmapArguments=argc>1 && std::string(argv[1])=="--check-vmap-conversion-argv";
+        if(mapArguments || vmapArguments) {
+            // Fixture-only dispatch. The production Bootstrap parses the exact
+            // conversion arguments, but no extractor main or asset conversion runs.
+            for(int i=1;i<argc;i++){argv[i]=argv[i+1];}
+            --argc;
+            int result=EsteriaOrder::Bootstrap(argc,argv);
+            EsteriaOrder::Need(result==-1 && EsteriaOrder::Active(),"actual ordered conversion argument parsing failed");
+            if(mapArguments)EsteriaOrder::Need(argc==5 && std::string(argv[1])=="-o" && std::string(argv[2])=="owned-output" &&
+                std::string(argv[3])=="-e" && std::string(argv[4])=="7","map conversion arguments changed");
+            else EsteriaOrder::Need(argc==1,"vmap conversion arguments changed");
+            std::puts("{\"scope\":\"actual-ordered-bootstrap-only\",\"conversionExecuted\":false}");return 0;
+        }
         int status=EsteriaOrder::Bootstrap(argc,argv);if(status>=0)return status;
         if(!EsteriaOrder::MemberProbe().empty()) {std::vector<char> bytes;bool found=EsteriaOrder::Read(EsteriaOrder::MemberProbe(),bytes);
             return EsteriaOrder::EmitProbe(bytes.data(),bytes.size(),found);}

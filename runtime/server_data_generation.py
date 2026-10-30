@@ -207,7 +207,8 @@ def phase(root, name, action):
     if completed.exists() or completed.is_symlink():
         saved = document(completed / 'phase.json')
         require(type(saved) is dict and set(saved) == {'phase', 'files'} and saved['phase'] == name and
-                saved['files'] == inventory(completed / 'data'), 'completed extraction phase changed')
+                storage.encoded(saved['files']) == storage.encoded(inventory(completed / 'data')),
+                'completed extraction phase changed')
         return completed / 'data'
     working = root / (name + '-' + uuid.uuid4().hex)
     working.mkdir(mode=0o700)
@@ -224,6 +225,56 @@ def phase(root, name, action):
     return completed / 'data'
 
 
+def verify_completed(destination, expected_inputs=None, *, expected_generation=None):
+    """Read-only format/source binding for setup and the internal world gate.
+
+    A caller must additionally compare the selected import and verified provider
+    identities. This returns no world-coverage or gameplay qualification.
+    """
+    destination = storage.canonical(destination)
+    selected_generation = destination.name if expected_generation is None else expected_generation
+    require(type(selected_generation) is str and storage.HASH.fullmatch(selected_generation),
+            'full prepared data generation identity required')
+    receipt = document(destination / 'receipt.json')
+    require(type(receipt) is dict and set(receipt) == {'formatVersion', 'scope', 'generation', 'inputs',
+            'files', 'providerOrder', 'preflight', 'worldQualified', 'androidQualified', 'gameplayQualified'} and
+            type(receipt['formatVersion']) is int and receipt['formatVersion'] == 1 and receipt['scope'] == SCOPE and
+            all(receipt[name] is False for name in ('worldQualified', 'androidQualified', 'gameplayQualified')),
+            'invalid prepared server data receipt')
+    inputs = receipt['inputs']
+    require(type(inputs) is dict and set(inputs) == {'formatVersion', 'importGeneration', 'clientRevision',
+            'serverRevision', 'locale', 'threads', 'importMetadata', 'toolSelectionSha256'} and
+            type(inputs['formatVersion']) is int and inputs['formatVersion'] == 1 and
+            inputs['clientRevision'] == CLIENT_REVISION and inputs['serverRevision'] == formats.SERVER_REVISION and
+            inputs['locale'] in order.LOCALES and type(inputs['threads']) is int and inputs['threads'] in (1, 2) and
+            type(inputs['importGeneration']) is str and storage.HASH.fullmatch(inputs['importGeneration']) and
+            type(inputs['toolSelectionSha256']) is str and storage.HASH.fullmatch(inputs['toolSelectionSha256']) and
+            type(inputs['importMetadata']) is dict and 0 < len(inputs['importMetadata']) <= 96,
+            'prepared data input selection differs')
+    for name, identity in inputs['importMetadata'].items():
+        order.safe(name, 1024); pin(identity)
+    key = hashlib.sha256(storage.encoded(inputs)).hexdigest()
+    require(receipt['generation'] == key == selected_generation and
+            (expected_inputs is None or storage.encoded(inputs) == storage.encoded(expected_inputs)),
+            'prepared data generation/source selection differs')
+    provider = receipt['providerOrder']
+    require(type(provider) is dict and set(provider) == {'effectiveLocale', 'manifest', 'wire'} and
+            provider['effectiveLocale'] in order.LOCALES, 'prepared provider order metadata differs')
+    for name, identity in (('order.json', provider['manifest']), ('order.tsv', provider['wire'])):
+        require(storage.identity(destination / name, order.MAX_MANIFEST) == pin(identity),
+                'prepared provider order bytes changed')
+    plan = document(destination / 'order.json')
+    require(plan['configuredLocale'] == inputs['locale'] and plan['effectiveLocale'] == provider['effectiveLocale'] and
+            plan['profile'] == PROFILE and storage.read(destination / 'order.tsv', order.MAX_MANIFEST) == order.wire(plan),
+            'prepared provider projection differs')
+    require(storage.encoded(receipt['files']) == storage.encoded(inventory(destination / 'data')),
+            'prepared server data changed')
+    preflight = formats.check_server_data(destination / 'data')
+    require(preflight['checks_passed'] and storage.encoded(receipt['preflight']) == storage.encoded(preflight),
+            'prepared server data preflight changed')
+    return receipt
+
+
 def generate(store, game, generation, tools, selection, locale, *, threads=1, timeout=24 * 3600,
              cancelled=lambda: False, progress=lambda phase: None):
     require(type(threads) is int and threads in (1, 2), 'one or two extraction workers required')
@@ -236,6 +287,7 @@ def generate(store, game, generation, tools, selection, locale, *, threads=1, ti
     try:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         inputs = {'formatVersion': 1, 'importGeneration': generation, 'locale': locale, 'threads': threads,
+                  'clientRevision': CLIENT_REVISION, 'serverRevision': formats.SERVER_REVISION,
                   'importMetadata': storage.imported(game, generation),
                   'toolSelectionSha256': tools_verified(tools, selection)}
         key = hashlib.sha256(storage.encoded(inputs)).hexdigest()
@@ -243,16 +295,7 @@ def generate(store, game, generation, tools, selection, locale, *, threads=1, ti
         generations = storage.canonical(store / 'generations', create=True)
         destination = generations / key
         if destination.exists() or destination.is_symlink():
-            receipt = document(destination / 'receipt.json')
-            require(type(receipt) is dict and set(receipt) == {'formatVersion', 'scope', 'generation', 'inputs',
-                    'files', 'preflight', 'worldQualified', 'androidQualified', 'gameplayQualified'} and
-                    type(receipt['formatVersion']) is int and receipt['formatVersion'] == 1 and receipt['scope'] == SCOPE and
-                    receipt['inputs'] == inputs and receipt['generation'] == key and
-                    all(receipt[name] is False for name in ('worldQualified', 'androidQualified', 'gameplayQualified')) and
-                    receipt['files'] == inventory(destination / 'data'), 'prepared server data changed')
-            preflight = formats.check_server_data(destination / 'data')
-            require(preflight['checks_passed'] and receipt['preflight'] == preflight,
-                    'prepared server data preflight changed')
+            receipt = verify_completed(destination, inputs)
         else:
             work = storage.canonical(staging / key, create=True)
             source = game / 'generations' / generation / 'data'
@@ -283,9 +326,9 @@ def generate(store, game, generation, tools, selection, locale, *, threads=1, ti
                 require(storage.read(capability_log, 4096).rstrip(b'\n') == CAPABILITY,
                         'ordered extractor capability differs; no stock fallback')
             maps = phase(work, 'maps-dbc-cameras', lambda data, at:
-                run('map_extractor', [*ordered, '-i', str(source), '-o', str(data), '-e', '7'], data, at / 'extract.log'))
+                run('map_extractor', [*ordered, '-o', str(data), '-e', '7'], data, at / 'extract.log'))
             raw = phase(work, 'raw-vmaps', lambda data, at:
-                run('vmap4_extractor', [*ordered, '-d', str(source / 'Data')], data, at / 'extract.log'))
+                run('vmap4_extractor', ordered, data, at / 'extract.log'))
             def assemble(data, at):
                 (data / 'vmaps').mkdir(mode=0o700)
                 run('vmap4_assembler', [str(raw / 'Buildings'), str(data / 'vmaps')], data, at / 'extract.log')
@@ -307,12 +350,17 @@ def generate(store, game, generation, tools, selection, locale, *, threads=1, ti
                     tools_verified(tools, selection) == inputs['toolSelectionSha256'], 'extraction inputs changed before completion')
             receipt = {'formatVersion': 1, 'scope': SCOPE, 'generation': key, 'inputs': inputs,
                        'files': inventory(data), 'preflight': preflight,
+                       'providerOrder': {'effectiveLocale': plan['effectiveLocale'],
+                           'manifest': storage.identity(plan_path, order.MAX_MANIFEST),
+                           'wire': storage.identity(work / 'order.tsv', order.MAX_MANIFEST)},
                        'worldQualified': False, 'androidQualified': False, 'gameplayQualified': False}
             for relative in receipt['files']:
                 with (data / relative).open('rb') as source_file:
                     os.fsync(source_file.fileno())
             for parent, _, _ in os.walk(data, topdown=False, onerror=walk_error):
                 storage.sync(Path(parent))
+            storage.atomic(final / 'order.json', storage.read(plan_path, order.MAX_MANIFEST))
+            storage.atomic(final / 'order.tsv', wire)
             storage.atomic(final / 'receipt.json', storage.encoded(receipt))
             os.rename(final, destination); storage.sync(generations)
         require(not cancelled() and storage.imported(game, generation) == inputs['importMetadata'],

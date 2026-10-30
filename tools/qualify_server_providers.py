@@ -150,12 +150,18 @@ def java_manifest(provider,output):
 
 
 def verify_final(output,dependency_provider,apk):
+    import zipfile
+    from tools import package_combined_android as combined
     proofs={}
     for name,(module,_) in COMPONENTS.items():
         path=dependency_provider if name=='dependencies' else output/name
         proofs[name]=module.verify(path,apk=apk)
+    with zipfile.ZipFile(apk) as archive:
+        combined.verify_helpers(archive)
     receipt=dict(formatVersion=1,scope='four-server-component-install-profile-apk-byte-verification',
         apk=files.identity(apk),providers=proofs,sourceCompanionAndPairedDebugVerified=True,
+        exactSourceHelperClosureVerified=True,
+        helperFiles={name:len(rows) for name,rows in combined.HELPER_SETS.items()},
         originalRuntimeArchivesUnchanged=True,androidGuestExecuted=False,serverProgramsExecuted=False,
         sqlExecuted=False,androidRuntimeQualified=False,gameplayQualified=False)
     engine.put_metadata(output/'apk-verification.json',receipt);return receipt

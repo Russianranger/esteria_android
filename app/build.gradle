@@ -185,3 +185,5 @@ if (guestBridgeProvider) {
     }
     tasks.named('preBuild').configure { dependsOn verifyGuestBridges }
 }
+
+apply from: 'server-data.gradle'

@@ -1,0 +1,23 @@
+// Exact source-only closure; no executable provider or gameplay action enabled.
+def serverDataHelpers = ['server_data_generation.py', 'server_data_preflight.py',
+    'shader_generation.py', 'extractor_order.py', 'owned_process_group.py']
+def serverDataAssets = layout.buildDirectory.dir('generated/serverData')
+def packageServerData = tasks.register('packageServerData') {
+    inputs.files(serverDataHelpers.collect { rootProject.file('runtime/' + it) })
+    outputs.dir(serverDataAssets)
+    doLast {
+        def directory = new File(serverDataAssets.get().asFile, 'server-data')
+        delete directory
+        directory.mkdirs()
+        def records = new TreeMap()
+        serverDataHelpers.each { name ->
+            byte[] bytes = rootProject.file('runtime/' + name).bytes
+            if (bytes.length == 0 || bytes.length > 131072) throw new GradleException('Unexpected server data helper size')
+            new File(directory, name).bytes = bytes
+            records[name] = [bytes: bytes.length, sha256: java.security.MessageDigest.getInstance('SHA-256').digest(bytes).encodeHex().toString()]
+        }
+        new File(directory, 'manifest.json').text = groovy.json.JsonOutput.toJson([formatVersion: 1, files: records]) + '\n'
+    }
+}
+android.sourceSets.main.assets.srcDir(serverDataAssets)
+tasks.named('preBuild').configure { dependsOn packageServerData }

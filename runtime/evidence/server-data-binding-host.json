@@ -1,0 +1,19 @@
+{
+  "formatVersion": 1,
+  "scope": "host-completed-data-binding-and-apk-helper-integration",
+  "focusedPythonChecksPassed": 44,
+  "dataAndAssetChecksPassed": 23,
+  "combinedPackageChecksPassed": 15,
+  "javaRunPlanGuardsPassed": true,
+  "defaultApkAndAndroidTestBuildPassed": true,
+  "lintPassed": true,
+  "exactDataHelperFilesReadBack": 5,
+  "separateApkProof": "runtime/evidence/server-data-helper-apk-host.json",
+  "actualExtractionExecuted": false,
+  "androidInstrumentationExecuted": false,
+  "worldQualified": false,
+  "gameplayQualified": false,
+  "serverProviderHelperClosureChecksPassed": 6,
+  "actualCppOrderedBootstrapCommandCheckPassed": true,
+  "cppCheckScope": "real pinned Bootstrap argument parsing only; no extraction"
+}

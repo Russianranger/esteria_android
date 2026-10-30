@@ -258,3 +258,7 @@ Source-matched server data preparation now lives in
 from verified ordered-reader and original assembler/navigation providers. See
 `runtime/server/DATA-PREPARATION.md`. This helper is not yet a launcher action,
 and the stock four-tool provider does not imply ordered-reader support.
+
+`app/server-data.gradle` packages exactly five helpers. The combined APK sealer
+checks that same closure. `:core:serverDataRunPlanTest` verifies fixed commands,
+private separate paths and source/import changes without running an extractor.

@@ -1,0 +1,38 @@
+{
+  "formatVersion": 1,
+  "scope": "host-apk-server-data-helper-byte-readback",
+  "apk": {
+    "bytes": 615548,
+    "sha256": "64e27d24b5c4ccf99e8b3a47e84fd55c5dfe2937e842d7ef20b8cce3e5d224bc"
+  },
+  "helperFiles": {
+    "extractor_order.py": {
+      "bytes": 9884,
+      "sha256": "5c6d30d23c2a8ebb13d037907cbcc6e7b67ea31f4b99798d925c5e3da756128c"
+    },
+    "owned_process_group.py": {
+      "bytes": 2795,
+      "sha256": "c19ed5c05e94d7b537df1055983fca75e20447f594419084f2207d60f99f138e"
+    },
+    "server_data_generation.py": {
+      "bytes": 22202,
+      "sha256": "995c98bf718b4b6d54cb630e1e9123f8330a7da20c942325fbb09a53c2cf61bd"
+    },
+    "server_data_preflight.py": {
+      "bytes": 7025,
+      "sha256": "2fb019dd90804fe65187d4b223c643d04c4e644d8b7530e8a1fdee197c0ba083"
+    },
+    "shader_generation.py": {
+      "bytes": 19353,
+      "sha256": "8bb48952c36bdc4c69516c2ffa6f5c2d2eb59e84019e6420948d94bc81683ac5"
+    }
+  },
+  "exactFiveHelperFilesVerified": true,
+  "hostRunPlanGuardsPassed": true,
+  "parallelUnpublishedWorkspaceChangesMayBeIncluded": true,
+  "cleanCheckoutApkQualified": false,
+  "androidInstrumentationExecuted": false,
+  "dataPreparationExecuted": false,
+  "worldQualified": false,
+  "gameplayQualified": false
+}

@@ -152,6 +152,20 @@ class RealArchiveReader(Planner):
     def result(self,member='World/Maps/Test/Test.wdt',locale='enUS'):
         got=self.invoke(member,locale);self.assertEqual(got.returncode,0,got.stderr);return json.loads(got.stdout)
 
+    def test_actual_bootstrap_accepts_data_conversion_argv_without_legacy_input_selectors(self):
+        wire=order.wire(self.plan('enUS'));manifest=self.base/'conversion-ordered.tsv';manifest.write_bytes(wire)
+        selection=['--esteria-order',str(manifest),'--esteria-input-root',str(self.root),
+                   '--esteria-order-sha256',hashlib.sha256(wire).hexdigest()]
+        for mode,tail in [('map',['-o','owned-output','-e','7']),('vmap',[])]:
+            command=[str(self.executable),'--check-'+mode+'-conversion-argv',*selection,*tail]
+            result=subprocess.run(command,capture_output=True,text=True,timeout=10)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertEqual(json.loads(result.stdout),{'scope':'actual-ordered-bootstrap-only','conversionExecuted':False})
+            for legacy in ('-i','-d'):
+                rejected=subprocess.run([*command,legacy,str(self.root)],capture_output=True,text=True,timeout=10)
+                self.assertNotEqual(rejected.returncode,0)
+                self.assertIn('legacy input selection is forbidden',rejected.stderr)
+
     def test_actual_encrypted_table_mpqs_follow_lexical_order_not_numeric(self):
         logical='World/Maps/Test/Test.wdt'
         self.archive('Data/common.MPQ',{logical:b'base'})

@@ -27,36 +27,33 @@ Wine/glibc2.36. APK identity remains `io.github.russianranger.esteria`.
 | Protocol | All215 player descriptors match; containers254/574DWORDs, quests25, player1326DWORDs/42mask words. Client class capacity32, serverMAX_CLASSES12. | Inventory/appearance/custom races need real matched gameplay. |
 | Android Wine | Android13 x64 run41046942035 passes reconstructed entry, offline diagnostics and actual loopback transport with source-owned PE mapping adaptation. | Emulator component evidence; production ARM64, graphics/audio and full game remain open. |
 | Production ARM64 Wine | Actual frozen-source Wine/FEX build, complete source closure and native client0f codec/entry/offline/transport/Grunt/software Vulkan/frame/texture/captured WinMM+DirectSound pass41057900330. Independent runtime readback covers14,180entries/1,325,744,204filebytes. | Selected471 component pairing passes41069065089. Android ARM64/Adreno and complete game remain open. Production still uses oldf036 until matched providers are adopted. |
-| Server build | Seven-patch server links/installs all programs/tools; actual full50 ConfigMgr parse/reload passes41041859706. | Complete isolated compile and typed verification pass41051669638; source upload failed on parent ownership. Exact source-package recovery and retention remain open. |
+| Server build | Seven-patch server links/installs all programs/tools; actual full50 ConfigMgr parse/reload passes41041859706. | Full isolated compile/verification pass41051669638; exact source recovery/retention passes41078079045, including all266 members. Paired source/debug/provider APK checks pass41081388547; Android/world remain open. |
 | Retained server SQL/auth | Native ARM64 run41050050193 passes compiled first/repeat SQL, exact ledgers/restart, real SRP/M2, persisted40-byte session key, owned loopback realm/listener, credentials/trackers and clean shutdown. | This measured input is six-patch build41005048019.1; no reconstructed client/world/Android execution. |
 | Appearance storage | Exact source-derived49/132-byte binary tables pass NUL/high-byte roundtrip, REPLACE/read/delete and restart with fixture rows removed. | No canonical original creator was found; provenance remains explicit. Actual game saves/transport unqualified. |
-| Server runtime packaging | Current seven-patch stripped SQL/auth/restart gates pass41050050294; native ARM64 loading of actual stripped auth/world programs passes; worldserver shrinks2.65GB→59MB, paired debug data retained outside APK. Runtime plus original notices is21,996,594bytes. | Programs provider stays disabled until complete corresponding-source rebuild proof. |
-| Extraction tools | Native CLI/configuration gates pass41054451870 for all four actual source-matched tools;2,495,044byte archive/76files. Source-gated Android installer is integrated. | Real MPQ conversion, custom archive-order parity, source seal and Android execution remain open. |
+| Server runtime packaging | Current seven-patch stripped SQL/auth/restart gates pass41050050294; native ARM64 loading of actual stripped auth/world programs passes; worldserver shrinks2.65GB→59MB, paired debug data retained outside APK. Runtime plus original notices is21,996,594bytes. | Complete corresponding sources are now retained; four-component source/debug/APK/Java32MiB checks pass41081388547. Default packaging remains optional; Android/world unqualified. |
+| Extraction tools | Native CLI/configuration gates pass41054451870 for all four actual source-matched tools;2,495,044byte archive/76files. Source-gated Android installer is integrated. | Stock four-tool source/debug packaging passes41081388547. Ordered two-reader compile/real lookup passes41081388483; separate ordered source closure, actual conversion and Android remain open. |
 | Phone-side server sources | Exact seven-patch content package:4,063 files/654,243,888bytes. Actual32MiB Java install, cached zero-copy reuse and complete no-Git product verification pass. | SQL execution through the Android adapter is not yet qualified. |
 | Android schema adapter | Streams SQL using the caller's same owned database lease, verifies source/module/UUID identities and journals durable file boundaries. Host subprocess/concurrency tests and APK/AndroidTest/lint pass. | Actual native ARM64 composition passes41058676309 (six-patch) and41058676543 (seven-patch): baseline, updater/reentry,50configs, realm/account and restart share one UUID. Partial baselines currently refuse replay; fresh-slot storage/recovery and typed workspaces pass host checks; the staged phone coordinator now retains bootstrap/guest/database/workspace ownership with three host timeout/retry cases passing. Actual Android SQL and playerbots-complete promotion remain pending. |
 | MySQL persistence | Native ARM64 service/restart/backup passes; Android13 x64 actual Java service41016293760 passes two live cycles, ownership and UUID/credential/marker preservation. | Production ARM64 and existing game-save upgrades/restores remain open. |
 | Presentation and controls | Actual Android x64 Surface/AudioTrack lifecycle, native ARM64 authenticated X11/XTest, Wine FMOD capture, process ownership/remote cleanup pass separately. | Complete Wine/X11/audio/controller session and Adreno execution unqualified. |
 | Application/import | Resumable SAF/ZIP imports,12340 PE/MPQ checks, immutable overlays, mutable UI review, runtime setup and support export build/lint. Android filesystem/update instrumentation passes. | Main START stays gated; launcher controls are not game controls. |
 
-## Latest application checkpoint
+## Current package evidence
 
-The new optional server-content provider preserves the original archive, SQL,
-configuration templates and notices. Dependency/content final APK bytes and nine
-source-helper assets pass actual readback after a clean build. The local internal
-APK is280,688,121bytes, SHA256
-`1ab14bee98289a4d0d13cabd08c55069b9c3650292fe3edfa98109d39d60afa2`.
-It is a packaging check without PRoot/programs, not a user installation candidate.
-See `runtime/evidence/server-content-android-packaging-host.json` for exact inputs.
+The four-component server installation profile from41081388547 at74c1f1a
+passes complete source/debug validation, all selected APK bytes and real Java
+32MiB fresh/cache installation:10,528 entries/1,112,744,025 installed bytes,
+cached copies0. Its305,336,846-byte APK (SHA256
+`5a8057577a8a3f586ca9d2d325c333aa51c01a09b01cb2de3e266c55fa177fa2`)
+is internal packaging evidence, not a playable device candidate.
 
 The persistent RSA4096 development certificate is provisioned, privately backed
 up and recorded in `app/development-signing.lock.json`. No delivered update
-baseline exists. Never commit signing keys, credentials, user MPQs or databases.
-Durable server dependencies, guest helpers, reconstructed client0f and shader
-tools have independently verified public release locks. Optional Turnip loading
-without a GPU is separate from Adreno qualification.
-Client471's separate durable release is published and all seven public downloads
-pass actual byte/source readback. Publication workflow41066742791 passes; its
-GitHub immutability flag remains false, independently of publisher no-overwrite checks.
+baseline exists. Keep signing keys, credentials, MPQs and databases outside Git.
+Client471 and production Wine's separate durable releases pass actual public
+download/source readback; GitHub reports immutability=false. The new measured
+Wine client/bridge/Turnip/shader cohort still awaits coherent APK verification and
+durable cohort publication; historical global provider pins remain unchanged.
 
 ## Blockers and next implementation
 
@@ -66,9 +63,9 @@ GitHub immutability flag remains false, independently of publisher no-overwrite 
   clean shutdown. It exits before CommonMain/assets/world; its server is the
   retained six-patch reference. The source-owned normal login handoff also passes
   all five client jobs41061576677; Android writer and actual Glue login remain separate gates.
-- Finish the isolated seven-patch server rebuild, source seal and programs APK
-  provider; qualify the new production ARM64 Wine archive before rebinding
-  client/bridges/shader/Turnip packages to its exact hash.
+- Preserve the measured server programs/debug/source provider and Wine cohort
+  durably, then verify one coherent client/server/runtime APK. The isolated server
+  source gate and new Wine component/native provider gates now pass.
 - Finish phone-owned compiled updater/configuration/account/realm setup and
   the complete fresh-slot setup coordinator; then compose auth/world/client ownership,
   readiness and graceful saves.
@@ -116,3 +113,11 @@ alive while termination/reaping is unconfirmed; callers get bounded timeouts.
 Controlled-owner/race fixtures, real Linux C++/JNI12 groups, APK/AndroidTest and
 lint pass. Transactional source-matched data preparation passes19 host checks;
 actual MPQ extraction, Android operation wiring and world validation remain open.
+
+The data-preparation APK integration now builds with five exact source helpers;
+all five final APK byte identities pass readback. Completed data keeps its
+provider manifests, typed source/input bindings and a reusable read-only verifier.
+Forty-four focused Python checks, Java fixed-command guards, APK/AndroidTest
+and lint pass. Actual extraction and the new helper's Android installation remain
+separate gates. Auth/world session implementation is in progress with retained
+children, authenticated readiness and source-supported graceful shutdown.

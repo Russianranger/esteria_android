@@ -4,6 +4,7 @@ import fcntl
 import hashlib
 import os
 from pathlib import Path
+import shutil
 import struct
 import sys
 import tempfile
@@ -49,6 +50,7 @@ class ServerDataGenerationTests(unittest.TestCase):
         if name == 'map_extractor':
             self.assertEqual(command[command.index('-e') + 1], '7')
             self.assertIn('--esteria-order', command)
+            self.assertNotIn('-i', command)
             for name in ('maps', 'dbc', 'Cameras'):
                 (cwd / name).mkdir()
             (cwd / 'maps/0000000.map').write_bytes(struct.pack('<4s10I', b'MAPS', 9, 12340, *([0] * 8)))
@@ -56,6 +58,7 @@ class ServerDataGenerationTests(unittest.TestCase):
             (cwd / 'Cameras/test.m2').write_bytes(b'MD20' + struct.pack('<I', 264))
         elif name == 'vmap4_extractor':
             self.assertIn('--esteria-order', command)
+            self.assertNotIn('-d', command)
             (cwd / 'Buildings').mkdir()
             (cwd / 'Buildings/dir_bin').write_bytes(b'not real raw vector data')
         elif name == 'vmap4_assembler':
@@ -134,6 +137,45 @@ class ServerDataGenerationTests(unittest.TestCase):
             path.write_bytes(data.storage.encoded(proof))
             with self.assertRaisesRegex(ValueError, 'preflight changed'):
                 self.generate()
+
+    def test_completed_readonly_binding_requires_exact_input_selection(self):
+        with patch.object(data, 'execute', side_effect=self.fake_execute):
+            first = self.generate()
+        generation = self.store / 'generations' / first['generation']
+        self.assertEqual(data.verify_completed(generation, first['inputs']), first)
+        selected = dict(first['inputs']); selected['toolSelectionSha256'] = 'e' * 64
+        with self.assertRaisesRegex(ValueError, 'generation/source selection'):
+            data.verify_completed(generation, selected)
+
+    def test_retained_provider_projection_mutation_is_refused(self):
+        with patch.object(data, 'execute', side_effect=self.fake_execute):
+            first = self.generate()
+        generation = self.store / 'generations' / first['generation']
+        projection = generation / 'order.tsv'
+        projection.write_bytes(projection.read_bytes()[:-1] + b'x')
+        with self.assertRaisesRegex(ValueError, 'provider order bytes'):
+            data.verify_completed(generation)
+
+    def test_fixed_guest_alias_requires_explicit_external_generation_binding(self):
+        with patch.object(data, 'execute', side_effect=self.fake_execute):
+            first = self.generate()
+        alias = self.root / 'esteria-data'
+        shutil.copytree(self.store / 'generations' / first['generation'], alias)
+        with self.assertRaisesRegex(ValueError, 'generation identity'):
+            data.verify_completed(alias)
+        self.assertEqual(data.verify_completed(alias, first['inputs'], expected_generation=first['generation']), first)
+        with self.assertRaisesRegex(ValueError, 'generation/source selection'):
+            data.verify_completed(alias, first['inputs'], expected_generation='e' * 64)
+
+    def test_cached_preflight_numeric_boolean_is_not_a_typed_pass(self):
+        with patch.object(data, 'execute', side_effect=self.fake_execute):
+            first = self.generate()
+        generation = self.store / 'generations' / first['generation']
+        path = generation / 'receipt.json'
+        proof = data.document(path); proof['preflight']['checks_passed'] = 1
+        path.write_bytes(data.storage.encoded(proof))
+        with self.assertRaisesRegex(ValueError, 'preflight changed'):
+            data.verify_completed(generation)
 
     def test_directory_count_and_unreadable_subtree_fail_closed(self):
         source = self.root / 'many'; source.mkdir()

@@ -151,3 +151,8 @@ and passing host storage/process contracts do not resolve absent base/custom
 MPQs. No maps, vmaps, mmaps, Cameras or matching DBC overlays have been generated
 from user data. See runtime/server/DATA-PREPARATION.md for the supported classical
 profile and remaining custom overlay/coverage/Android gates.
+
+Completed generated data now retains its exact effective-provider manifest and
+wire projection, with source/import/tool-selection identities. The APK includes
+the preparation/preflight helper closure; this is code availability, not generated
+world data. Real base/custom inputs and matching DBC overlays remain unavailable.

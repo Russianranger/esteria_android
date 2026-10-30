@@ -1,5 +1,6 @@
 """Exact input/manifest guards; fixtures never qualify a native server or APK."""
 import copy
+from contextlib import ExitStack
 import hashlib
 import json
 from pathlib import Path
@@ -28,6 +29,28 @@ class ProviderQualificationGuards(unittest.TestCase):
         targets=[m['target'] for r in pin['artifacts'].values() for m in r['members'].values()]
         self.assertEqual(len(targets),len(set(targets)))
         self.assertFalse(pin['androidRuntimeQualified']);self.assertFalse(pin['gameplayQualified'])
+
+    def test_final_profile_requires_exact_current_apk_source_helper_closure(self):
+        from tools import package_combined_android as combined
+        output=self.root/'providers';output.mkdir();apk=self.root/'profile.apk'
+        with ExitStack() as stack:
+            for module,_ in qualification.COMPONENTS.values():
+                stack.enter_context(patch.object(module,'verify',return_value={'verified':True}))
+            with zipfile.ZipFile(apk,'w'):
+                pass
+            with self.assertRaisesRegex(ValueError,'helper-inventory'):
+                qualification.verify_final(output,self.root/'dependencies',apk)
+            with zipfile.ZipFile(apk,'w') as archive:
+                for directory,names in combined.HELPER_SETS.items():
+                    records={}
+                    for name in names:
+                        raw=(combined.ROOT/combined.helper_source_path(directory,name)).read_bytes()
+                        archive.writestr('assets/'+directory+'/'+name,raw);records[name]=identity(raw)
+                    archive.writestr('assets/'+directory+'/manifest.json',json.dumps({'formatVersion':1,'files':records}))
+            receipt=qualification.verify_final(output,self.root/'dependencies',apk)
+            self.assertTrue(receipt['exactSourceHelperClosureVerified'])
+            self.assertEqual(receipt['helperFiles']['server-data'],5)
+            self.assertFalse(receipt['androidGuestExecuted'])
 
     def test_wrong_remote_revision_or_zip_digest_refuses_before_extraction(self):
         pin=qualification.load_pin()['artifacts']['native'];api=Mock()

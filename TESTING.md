@@ -125,3 +125,17 @@ and synthetic generation interruption/retry/mutation/input-change contracts.
 The writing-descendant case may finish through immediate group cleanup or the
 deadline; it establishes bounded completion, not that both branches execute on
 every run. Actual MPQ conversion, map coverage and Android extraction are false.
+
+The newer completed-data/API/asset checkpoint passes44 Python checks (23 data/format,15 combined-package
+and6 provider helper-closure checks), Java fixed-command/path/import/tool-selection guards,
+APK/AndroidTest compilation and lint. All five APK helper source files match
+their generated hashes. The new emulator data-helper method is required by the
+installer qualifier but has not yet run in this checkpoint. See
+runtime/evidence/server-data-binding-host.json.
+
+The actual pinned C++ Bootstrap/libmpq fixture separately accepts the exact
+ordered map/vmap conversion arguments and rejects legacy -i/-d selectors. The
+bootstrap test executes no extractor main and converts no game assets. Completed
+data binding tests also enforce fixed-mount alias generation identity and typed
+preflight booleans. The server install-profile APK verifier now invokes the
+shared exact helper-closure check, including server-data5.

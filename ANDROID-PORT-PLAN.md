@@ -74,3 +74,8 @@ Native four-schema bot setup and exact server source retention now pass. Complet
 measured provider adoption, retain presentation/shader/native child ownership
 through failures, wire the new phased server-data generator into the Android
 setup owner, then compose the real local game session and asset-backed gates.
+
+The data generation's source/input/manifest verifier and five-file APK helper
+closure now pass local contract/build/readback gates. Connect them to the retained
+setup and auth/world session owners only after the actual ordered tool provider
+is complete; keep format readiness separate from world coverage and gameplay.
