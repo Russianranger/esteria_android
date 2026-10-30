@@ -57,8 +57,6 @@ jobs:
   selection:
     if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
     runs-on: ubuntu-24.04
-    env:
-      INSTALLATION_SELECTION_OUT: ${{ runner.temp }}/esteria-installation-selection
     outputs:
       enabled: ${{ steps.selection.outputs.enabled }}
     steps:
@@ -66,6 +64,9 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: Resolve private selection paths on the assigned runner
+        run: |
+          printf 'INSTALLATION_SELECTION_OUT=%s/esteria-installation-selection\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
       - name: Admit both measured provider and complete artifact transport before downloads
         id: selection
         run: |
@@ -95,6 +96,7 @@ jobs:
       - name: Check source admission, receipt validation and default-off execution boundaries
         run: |
           python3 -m unittest tests.test_android_installation_x64_inputs \
+            tests.test_android_installation_workflow_contexts \
             tests.test_android_installation_x64_provider tests.test_android_installation_x64_entry \
             tests.test_android_installation_x64_qualification tests.test_android_installation_x64_provider_artifacts -v
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -109,13 +111,14 @@ jobs:
     if: needs.selection.outputs.enabled == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 120
-    env:
-      INSTALLATION_OUT: ${{ runner.temp }}/esteria-installation-x64
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: Resolve private qualification paths on the assigned runner
+        run: |
+          printf 'INSTALLATION_OUT=%s/esteria-installation-x64\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
       - name: Admit the exact frozen consumer outside the clean activation checkout
         run: |
           test "$(uname -m)" = x86_64

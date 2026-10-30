@@ -31,7 +31,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - name: Check real source and default-off transport boundaries
-        run: python3 -m unittest tests.test_android_installation_x64_inputs tests.test_android_installation_x64_provider tests.test_android_installation_x64_entry tests.test_android_installation_x64_provider_artifacts -v
+        run: python3 -m unittest tests.test_android_installation_workflow_contexts tests.test_android_installation_x64_inputs tests.test_android_installation_x64_provider tests.test_android_installation_x64_entry tests.test_android_installation_x64_provider_artifacts -v
       - name: Require an actual separately qualified native four-schema SQL receipt
         id: selection
         run: |
@@ -47,14 +47,15 @@ jobs:
     if: needs.selection.outputs.nativeReady == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 120
-    env:
-      MEASUREMENT_ROOT: ${{ runner.temp }}/esteria-installation-provider-measurement
-      FROZEN_MYSQL_SOURCE: ${{ runner.temp }}/esteria-installation-frozen-mysql-817cbc
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: Resolve private measurement paths on the assigned runner
+        run: |
+          printf 'MEASUREMENT_ROOT=%s/esteria-installation-provider-measurement\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
+          printf 'FROZEN_MYSQL_SOURCE=%s/esteria-installation-frozen-mysql-817cbc\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
       - name: Prepare exact frozen runtime recipe outside the clean measurement checkout
         run: |
           git -c core.hooksPath=/dev/null worktree add --detach "$FROZEN_MYSQL_SOURCE" 817cbc229f4dcc24beb169ecc72838fab4d1df32

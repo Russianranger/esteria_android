@@ -1,0 +1,80 @@
+{
+  "actualReadbackVia": "GitHub connector approved actions/runs and actions/runs/jobs GET endpoints",
+  "actualRunReadback": [
+    {
+      "checkSuiteId": 111526381055,
+      "conclusion": "failure",
+      "createdAt": "2026-10-30T22:53:21Z",
+      "headSha": "7b9f77175f2424087052f3445c0b4a4efe2f1c41",
+      "id": 41141036519,
+      "jobs": 0,
+      "path": ".github/workflows/android-server-installation-x64.yml",
+      "status": "completed",
+      "updatedAt": "2026-10-30T22:53:21Z"
+    },
+    {
+      "checkSuiteId": 111526384652,
+      "conclusion": "failure",
+      "createdAt": "2026-10-30T22:53:21Z",
+      "headSha": "7b9f77175f2424087052f3445c0b4a4efe2f1c41",
+      "id": 41141037928,
+      "jobs": 0,
+      "path": ".github/workflows/android-installation-x64-provider.yml",
+      "status": "completed",
+      "updatedAt": "2026-10-30T22:53:21Z"
+    }
+  ],
+  "annotationUnavailable": "GitHub connector excludes check-suite annotation endpoint; no annotation text claimed",
+  "boundaries": {
+    "androidQualified": false,
+    "gameplayQualified": false,
+    "nativeSqlSelectionChanged": false,
+    "newGithubLoaderAcceptanceNotYetObserved": true,
+    "productionCodeChanged": false,
+    "providerAndTransportExecutionPinsStillOff": true,
+    "providerMeasurementNotRun": true,
+    "sdkOrAdbExecuted": false,
+    "sqlExecuted": false
+  },
+  "diagnosis": {
+    "genericYamlParsingPreviouslyInsufficient": true,
+    "invalidJobEnvRunnerContextFoundInBothFiles": true,
+    "officialContextReference": "https://docs.github.com/en/actions/reference/workflows-and-actions/contexts",
+    "scopeRule": "runner context is unavailable in job-level env; step env and step with may use runner context"
+  },
+  "fix": {
+    "fixedPathsWrittenToGithubEnv": true,
+    "runtimeRunnerTempResolvedByEarlyShellStep": true,
+    "setupSteps": 3,
+    "stepWithRunnerContextRetained": true,
+    "variables": 4
+  },
+  "formatVersion": 1,
+  "scope": "actual-github-workflow-load-failure-runner-context-fix-host-only",
+  "sourceFiles": {
+    ".github/workflows/android-installation-x64-provider.yml": {
+      "bytes": 4903,
+      "sha256": "342a7865616197573b2376dc702176f7d6c43090633fbe72f96369054799954c"
+    },
+    ".github/workflows/android-server-installation-x64.yml": {
+      "bytes": 12764,
+      "sha256": "b61239467ba36c0f900188de4caf3fd06a3c1ce5010c960805715fbcc79ecaf5"
+    },
+    "tests/test_android_installation_workflow_contexts.py": {
+      "bytes": 3636,
+      "sha256": "1a265e9a10604e131d34350dd5bf0f4a247cdefee41fc10ae307a1251b7a6683"
+    }
+  },
+  "verification": {
+    "actualBashPathInitializationWithSpacesPassed": true,
+    "allPassed": true,
+    "bashScriptsParsed": 16,
+    "combinedPassed": 70,
+    "combinedSeconds": 0.799,
+    "combinedTests": 70,
+    "contextRegressionTests": 3,
+    "embeddedPythonBodiesParsed": 4,
+    "independentReviewClear": true,
+    "yamlFilesParsed": 2
+  }
+}
