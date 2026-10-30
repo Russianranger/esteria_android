@@ -1,0 +1,38 @@
+From: Esteria Android portability
+Subject: Do not generate loader calls for source-empty script directories
+
+Pinned server: f35f04d01689f034778e3474b3c820092f51e461
+The tracked Custom directory contains only README.md. Its optional private scripts
+are git-ignored; no AddCustomScripts definition exists in the pinned source.
+Match the recursive AutoCollect input set before declaring a script module.
+Populated directories retain their loader requirement and registration behavior.
+No gameplay implementation or registration stub is introduced.
+
+--- a/src/cmake/macros/ConfigureScripts.cmake
++++ b/src/cmake/macros/ConfigureScripts.cmake
+@@ -54,7 +54,24 @@
+   foreach(SCRIPT_MODULE ${LOCALE_SCRIPT_MODULE_LIST})
+     GetPathToScriptModule(${SCRIPT_MODULE} SCRIPT_MODULE_PATH)
+     if(IS_DIRECTORY ${SCRIPT_MODULE_PATH})
+-      list(APPEND ${variable} ${SCRIPT_MODULE})
++      # Documentation-only directories (the pinned Custom directory) do not
++      # define an Add<Directory>Scripts loader. Match AutoCollect.cmake's
++      # recursive input extensions; never hide a populated module's missing
++      # loader or replace it with an empty registration function.
++      file(GLOB_RECURSE SCRIPT_MODULE_SOURCES FOLLOW_SYMLINKS
++        "${SCRIPT_MODULE_PATH}/*.c"
++        "${SCRIPT_MODULE_PATH}/*.cc"
++        "${SCRIPT_MODULE_PATH}/*.cpp"
++        "${SCRIPT_MODULE_PATH}/*.inl"
++        "${SCRIPT_MODULE_PATH}/*.def"
++        "${SCRIPT_MODULE_PATH}/*.h"
++        "${SCRIPT_MODULE_PATH}/*.hh"
++        "${SCRIPT_MODULE_PATH}/*.hpp")
++      if(SCRIPT_MODULE_SOURCES)
++        list(APPEND ${variable} ${SCRIPT_MODULE})
++      else()
++        message(STATUS "Skipping source-empty script directory: ${SCRIPT_MODULE}")
++      endif()
+     endif()
+   endforeach()
+   set(${variable} ${${variable}} PARENT_SCOPE)

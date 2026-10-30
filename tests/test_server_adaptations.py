@@ -16,8 +16,11 @@ class ReviewedAdaptations(unittest.TestCase):
         content.validate_patch_contract(self.source, content.ROOT)
         records = content.adaptation_records(self.source)
         root = [row for row in records if row['submodule'] is None]
-        self.assertEqual([Path(row['path']).name for row in root], ['0004-attunement-stat-api.patch'])
+        self.assertEqual([Path(row['path']).name for row in root], ['0004-attunement-stat-api.patch',
+            '0005-script-grid-templates.patch', '0006-empty-script-modules.patch'])
         self.assertIn('display-only', root[0]['effect'])
+        self.assertIn('templates', root[1]['effect'])
+        self.assertEqual([row['scriptRegistrationPolicyChanged'] for row in root], [False, False, True])
         self.assertTrue(all(not row[key] for row in records for key in
                             ('sqlOrLuaInputsChanged', 'moduleSelectionChanged', 'updaterOrderingChanged')))
 

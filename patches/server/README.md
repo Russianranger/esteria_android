@@ -26,3 +26,14 @@ old API was display-only, contrary to the module's original comments. The commen
 are corrected. SQL/Lua/configuration/module discovery remain unchanged. See
 [ATTUNEMENT-API-AUDIT.md](ATTUNEMENT-API-AUDIT.md) for pinned upstream/current source
 comparison, known gameplay limitations and targeted compilation evidence.
+
+`0005-script-grid-templates.patch` includes the existing `CellImpl.h` and
+`GridNotifiersImpl.h` template definitions in the three scripts whose player-grid
+visitors failed at final linking. It changes no visitor logic or protocol fields.
+
+`0006-empty-script-modules.patch` prevents generated `Add<Directory>Scripts` calls
+for directories containing no inputs accepted by the real recursive
+`CollectSourceFiles` helper. The pinned `Custom` directory contains only README.md;
+the patch does not add an empty registration function or suppress populated custom
+scripts. [LINKAGE-AUDIT.md](LINKAGE-AUDIT.md) records the source evidence and actual
+CMake fixture. Both patches remain unqualified at full server linking until CI.

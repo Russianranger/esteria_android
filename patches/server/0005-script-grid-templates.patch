@@ -1,0 +1,45 @@
+diff --git a/src/server/scripts/Kalimdor/zone_moonglade.cpp b/src/server/scripts/Kalimdor/zone_moonglade.cpp
+--- a/src/server/scripts/Kalimdor/zone_moonglade.cpp
++++ b/src/server/scripts/Kalimdor/zone_moonglade.cpp
+@@ -15,9 +15,9 @@
+  * with this program. If not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+-#include "Cell.h"
++#include "CellImpl.h"
+ #include "CreatureScript.h"
+-#include "GridNotifiers.h"
++#include "GridNotifiersImpl.h"
+ #include "Player.h"
+ #include "ScriptedCreature.h"
+ #include "ScriptedEscortAI.h"
+diff --git a/src/server/scripts/Northrend/zone_zuldrak.cpp b/src/server/scripts/Northrend/zone_zuldrak.cpp
+--- a/src/server/scripts/Northrend/zone_zuldrak.cpp
++++ b/src/server/scripts/Northrend/zone_zuldrak.cpp
+@@ -15,9 +15,10 @@
+  * with this program. If not, see <http://www.gnu.org/licenses/>.
+  */
+ 
++#include "CellImpl.h"
+ #include "CreatureScript.h"
+ #include "GameObjectScript.h"
+-#include "GridNotifiers.h"
++#include "GridNotifiersImpl.h"
+ #include "PassiveAI.h"
+ #include "Player.h"
+ #include "ScriptedCreature.h"
+diff --git a/src/server/scripts/OutdoorPvP/OutdoorPvPNA.cpp b/src/server/scripts/OutdoorPvP/OutdoorPvPNA.cpp
+--- a/src/server/scripts/OutdoorPvP/OutdoorPvPNA.cpp
++++ b/src/server/scripts/OutdoorPvP/OutdoorPvPNA.cpp
+@@ -17,9 +17,10 @@
+ 
+ #include "OutdoorPvPNA.h"
+ #include "AreaDefines.h"
++#include "CellImpl.h"
+ #include "CreatureScript.h"
+ #include "GameGraveyard.h"
+-#include "GridNotifiers.h"
++#include "GridNotifiersImpl.h"
+ #include "Language.h"
+ #include "MapMgr.h"
+ #include "ObjectMgr.h"

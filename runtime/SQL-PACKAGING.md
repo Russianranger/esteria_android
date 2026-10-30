@@ -10,10 +10,16 @@ The contract is reviewed against server
 `f35f04d01689f034778e3474b3c820092f51e461` and Eluna
 `58d7652138887783228b9727bd1fa4e08f00342b`. A changed server/Eluna revision or an
 unreviewed adaptation patch fails explicitly so this model cannot silently drift
-from the compiled updater. The current three Eluna declaration/include patches and the server-root attunement
-C++ API compatibility patch are individually digest- and scope-checked. They do not
-alter SQL/Lua inputs, module discovery or updater ordering. `sourceAdaptations`
+from the compiled updater. The three Eluna declaration/include patches and the
+server-root attunement, grid-template and source-empty script-directory patches
+are individually digest- and scope-checked. They do not alter SQL/Lua inputs,
+`AC_MODULES_LIST` selection or updater ordering. The sixth patch explicitly changes
+script-loader generation to omit directories with no collectable source inputs;
+populated custom scripts remain selected. `sourceAdaptations`
 records each reviewed scope and effect; unknown or moved patches fail explicitly.
+Its `scriptRegistrationPolicyChanged` field distinguishes that CMake policy change
+from the unrelated module SQL-selection flag. See the
+[linkage audit](../patches/server/LINKAGE-AUDIT.md).
 The attunement patch preserves historical display-only primary-stat behavior and
 does not qualify that gameplay feature; see
 [the semantic audit](../patches/server/ATTUNEMENT-API-AUDIT.md).

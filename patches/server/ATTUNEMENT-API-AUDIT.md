@@ -67,8 +67,11 @@ fixture containing the exact pinned original module bytes. The resulting file
 matched the reviewed adaptation. The source repository's working tree was not
 modified. The server workflow now compiles the actual attunement translation unit
 first, using the configured ARM64 headers/options, before continuing the full build.
-Its success is pending the next real CI run; no local full module compilation or
-runtime bonus test is claimed.
+The exact ARM64 object compiled successfully in run `40994809596`, job
+`123865355694`, at 2026-10-30 03:01:51 UTC. The full build then compiled all remaining
+sources and linked authserver/dbimport, but worldserver failed on separate template
+and source-empty Custom registration symbols; see [LINKAGE-AUDIT.md](LINKAGE-AUDIT.md).
+This establishes actual module compilation, not runtime bonus behavior.
 
 Only one C++ module source and its comments are changed. SQL, Lua, configuration,
 module discovery, updater ordering and network fields are unchanged. The centralized

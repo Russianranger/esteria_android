@@ -17,6 +17,7 @@ on:
       - tests/auth_srp_reference.cpp
       - tests/test_dbimport_qualification.py
       - tests/test_server_adaptations.py
+      - tests/test_empty_script_modules.py
       - tools/qualify_base_sql.py
       - tools/render_server_config.py
       - runtime/mysql_bootstrap.py
@@ -48,6 +49,7 @@ on:
       - tests/auth_srp_reference.cpp
       - tests/test_dbimport_qualification.py
       - tests/test_server_adaptations.py
+      - tests/test_empty_script_modules.py
       - tools/qualify_base_sql.py
       - tools/render_server_config.py
       - runtime/mysql_bootstrap.py
@@ -136,7 +138,7 @@ jobs:
           -Isources/server/src/common -Isources/server/src/common/Platform
           -Isources/server/src/server/game/LuaEngine/hooks tests/native/eluna_hooks.cpp
       - name: Verify server artifact checker behavior
-        run: python3 -m unittest tests.test_server_build tests.test_dbimport_qualification tests.test_server_adaptations tests.test_local_account tests.test_auth_protocol tests.test_authserver_qualification -v
+        run: python3 -m unittest tests.test_server_build tests.test_dbimport_qualification tests.test_server_adaptations tests.test_empty_script_modules tests.test_local_account tests.test_auth_protocol tests.test_authserver_qualification -v
       - name: Configure ARM64 server
         run: |
           set -o pipefail
@@ -160,6 +162,11 @@ jobs:
           cmake --build out/server --parallel 1 \
             --target modules/CMakeFiles/modules.dir/mod-attunement-plus/src/mod_attunement_plus.cpp.o \
             2>&1 | tee out/diagnostics/attunement-compile.log
+          cmake --build out/server --parallel 2 \
+            --target src/server/scripts/CMakeFiles/scripts.dir/Kalimdor/zone_moonglade.cpp.o \
+                     src/server/scripts/CMakeFiles/scripts.dir/Northrend/zone_zuldrak.cpp.o \
+                     src/server/scripts/CMakeFiles/scripts.dir/OutdoorPvP/OutdoorPvPNA.cpp.o \
+            2>&1 | tee out/diagnostics/grid-script-compile.log
           cmake --build out/server --parallel 2 2>&1 | tee out/diagnostics/build.log
       - name: Record compiler cache evidence
         if: always() && steps.compile.outcome != 'skipped' && steps.cache-restore.outcome == 'success'
