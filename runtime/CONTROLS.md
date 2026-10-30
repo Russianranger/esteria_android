@@ -1,9 +1,9 @@
 # Initial controller and keyboard implementation
 
 `GameInputRouter` and `GameInputView` are implemented against the real XTest
-transport and Surface bridge. They are internal components awaiting owned runtime
-session wiring; the launcher does not yet activate a game view. Host behavior
-checks pass. Actual Android/controller and game UI behavior are not qualified.
+transport and Surface bridge, connected through the Service-owned presentation
+panel. Host behavior checks pass. Actual Android/controller and game UI behavior
+are not qualified by those checks.
 The mapping assumes the client's standard keyboard bindings and a US X11 keymap.
 Existing custom keybindings can differ and must be surfaced in setup, not overwritten.
 
@@ -43,13 +43,33 @@ late callbacks cannot type into a resumed game. Composition backspace and Enter
 operate on the staged draft before any guest text is emitted; unsupported dead
 keys are rejected without crashing the input callback.
 
-The view exposes `showKeyboard()` / `hideKeyboard()` for the future accessible
-in-game toolbar. The initial IME adapter supports printable ASCII, Tab, Enter and
+The presentation toolbar exposes `showKeyboard()` / `hideKeyboard()`. The initial
+IME adapter supports printable ASCII, Tab, Enter and
 backspace. It stages composition, validates complete commits, emits explicit Shift
 plus base keys, and atomically reserves at most 256 input events (64 characters)
 before queueing a commit. Unsupported Unicode or larger pastes are rejected without
 partial text. Text is not logged or included in support receipts. Unicode layout
 support and actual keyboard/game field tests remain open.
+
+Software-keyboard Done, generic Enter actions and Enter key events submit the
+pending composition followed by Enter in one accepted sequence. The keyboard
+hides only after acceptance; closing that connection and invalidating its
+generation prevents a later action/key callback from submitting twice. Back,
+pause and focus loss discard the draft and reject stale callbacks. Unsupported
+editor actions preserve the draft and return false. A whole-batch capacity refusal
+happens before any event is accepted, retains the draft and leaves the keyboard
+available to retry. Transport I/O errors and ambiguous individual-key overload
+still fail the session. Ordinary 64-character text plus Enter is accepted, while a heavily
+shifted draft needing more than the unchanged 256-event transport limit is
+rejected explicitly before any event is queued; shorten it or commit it first.
+These guards have host sequence/lifecycle evidence, not actual Android IME or
+in-game field qualification.
+
+Every new Android input connection receives a distinct generation, and closing
+it invalidates its own composition before Android's base close callback runs.
+An older connection cannot type into its replacement during the same shown
+keyboard session. Actual replacement/close callbacks remain Android validation
+gates; the source wiring is compiled and reviewed.
 
 Run `./gradlew :core:gameInputTest`. These checks establish mapping/state behavior,
 not physical Thor controller layout, Wine focus, game combat/quest functionality,

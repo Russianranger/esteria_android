@@ -52,7 +52,7 @@ public final class GameInputView extends SurfaceView implements SurfaceHolder.Ca
     private boolean act(Action action) {
         if (failed) return false;
         try { action.run(); return true; }
-        catch (KeyboardText.RejectedText rejection) { if (events != null) events.rejected(rejection.getMessage()); return false; }
+        catch (KeyboardText.RejectedText | InputSink.BatchRejected rejection) { if (events != null) events.rejected(rejection.getMessage()); return false; }
         catch (IOException | RuntimeException error) { fail(error.getMessage()); return false; }
     }
     private void fail(String reason) {
@@ -219,13 +219,23 @@ public final class GameInputView extends SurfaceView implements SurfaceHolder.Ca
     @Override public InputConnection onCreateInputConnection(EditorInfo info) {
         info.inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
         info.imeOptions = EditorInfo.IME_ACTION_DONE | EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING;
-        final long generation = keyboardGeneration;
+        final long generation = ++keyboardGeneration;
         return new BaseInputConnection(this, false) {
             private final KeyboardText.Composition composing = new KeyboardText.Composition();
             private boolean ready() {
-                boolean valid = !failed && keyboard && !sessionPaused && attached && surfaceReady && hasWindowFocus() && generation == keyboardGeneration;
-                if (!valid) composing.clear();
+                boolean valid = composing.isOpen() && !failed && keyboard && !sessionPaused && attached && surfaceReady && hasWindowFocus() && generation == keyboardGeneration;
+                if (!valid) composing.invalidate();
                 return valid;
+            }
+            private boolean submitEditor() {
+                if(!ready())return false;
+                boolean accepted=act(()->composing.submit(sink));
+                if(accepted)hideKeyboard();
+                return accepted;
+            }
+            @Override public void closeConnection() {
+                composing.invalidate();
+                super.closeConnection();
             }
             @Override public boolean commitText(CharSequence text, int position) {
                 return ready() && act(() -> composing.commit(sink, text));
@@ -241,13 +251,14 @@ public final class GameInputView extends SurfaceView implements SurfaceHolder.Ca
                 return act(() -> composing.delete(sink, before));
             }
             @Override public boolean performEditorAction(int action) {
-                boolean result = finishComposingText(); if (result) hideKeyboard(); return result;
+                if(action!=EditorInfo.IME_ACTION_DONE&&action!=EditorInfo.IME_NULL)return false;
+                return submitEditor();
             }
             @Override public boolean sendKeyEvent(KeyEvent event) {
                 if (!ready()) return false;
                 if (event.getAction() != KeyEvent.ACTION_DOWN) return true;
                 if (event.getKeyCode() == KeyEvent.KEYCODE_DEL) return act(() -> composing.delete(sink, 1));
-                if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) return act(() -> composing.enter(sink));
+                if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) return submitEditor();
                 int code = event.getUnicodeChar();
                 if ((code & KeyCharacterMap.COMBINING_ACCENT) != 0 || !Character.isValidCodePoint(code)) {
                     if (events != null) events.rejected("Dead-key composition is not supported by this keyboard bridge");

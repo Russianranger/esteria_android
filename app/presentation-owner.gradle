@@ -5,14 +5,23 @@ def presentationOwnerClasspath = files(providers.provider { android.bootClasspat
 def compilePresentationOwner = tasks.register('compilePresentationOwnerFixture', JavaCompile) {
     dependsOn 'compileDebugJavaWithJavac', ':core:classes'
     source file('src/test/java/io/github/russianranger/esteria/runtime/PresentationShaderOwnerTests.java')
+    source file('src/test/java/io/github/russianranger/esteria/presentation/InputBatchReservationTests.java')
     source file('src/test/java/android/os/Looper.java')
+    source file('src/test/java/android/net/LocalSocket.java')
     classpath = presentationOwnerClasspath
     destinationDirectory = layout.buildDirectory.dir('presentationOwnerFixture')
     sourceCompatibility = '17'
     targetCompatibility = '17'
 }
-tasks.register('presentationOwnerTest', JavaExec) {
+tasks.register('inputBatchReservationTest', JavaExec) {
     dependsOn compilePresentationOwner
+    // Only queue policy runs. The fixture socket stub refuses any actual I/O.
+    classpath = files(compilePresentationOwner.flatMap { it.destinationDirectory }) + presentationOwnerClasspath
+    mainClass = 'io.github.russianranger.esteria.presentation.InputBatchReservationTests'
+    maxHeapSize = '32m'
+}
+tasks.register('presentationOwnerTest', JavaExec) {
+    dependsOn compilePresentationOwner, 'inputBatchReservationTest'
     // The host Looper guard stub precedes android.jar, exclusively in this task.
     classpath = files(compilePresentationOwner.flatMap { it.destinationDirectory }) + presentationOwnerClasspath
     mainClass = 'io.github.russianranger.esteria.runtime.PresentationShaderOwnerTests'

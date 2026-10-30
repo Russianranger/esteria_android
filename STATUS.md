@@ -159,3 +159,10 @@ Retained229MB input and905MB complete-source archives are pinned separately;
 full large-archive consumption is a new CI gate, not a local readback claim.
 An original-target x64 dbimport/Playerbots helper build is prepared for subsequent
 four-schema/coordinator qualification. Production ARM64 provider pins are unchanged.
+
+Software-keyboard Done/Enter now submits pending text plus Enter atomically and
+hides only after acceptance. Typed whole-batch backpressure preserves the draft
+for retry; transport/individual-event failures remain visible. Replacement and
+closed IME connections reject late callbacks. Core, actual InputBridge queue
+policy, four presentation owner groups, Java compilation and lint pass42 tasks
+in37s. Actual Android IME/client fields remain unqualified.

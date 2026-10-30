@@ -1,0 +1,143 @@
+{
+  "actualHostValidation": {
+    "checks": [
+      "Existing movement/camera/mode/touch-source ownership and neutralization",
+      "Existing ASCII/Shift/composition editing",
+      "64 plain characters plus Enter in one130-eventsequence",
+      "64 shifted characters plus Enter refused before any events; retained draft later commits as256events",
+      "Pending editor draft precedes Enter and closes its connection",
+      "Already committed text receives only Enter without duplicated text",
+      "Late repeated submission on closed connection rejected",
+      "Typed whole-batch refusal emits nothing and preserves open draft for exact retry",
+      "Invalidated Back/pause connection rejects late commit/submission and new connection has no stale text"
+    ],
+    "fixture": "io.github.russianranger.esteria.core.input.GameInputRouterTest",
+    "maximumHeapBytes": 33554432,
+    "observedOutput": "Controller/keyboard: movement, camera, mode, touch ownership, neutralization, ASCII/composition, atomic editor submission, queue refusal and late-callback checks passed",
+    "runner": "Gradle JavaExec against the exact compiled modified Core sources"
+  },
+  "androidSdkValidation": {
+    "actionableTasks": 42,
+    "apkDuplicated": false,
+    "buildSuccessful": true,
+    "command": "./gradlew --offline --no-daemon :core:gameInputTest :app:inputBatchReservationTest :app:presentationOwnerTest :app:compileDebugJavaWithJavac :app:lintDebug",
+    "durationSeconds": 37,
+    "environment": "JDK17/Gradle8.9/SDK35; existing local output-directory init script only",
+    "executedTasks": 16,
+    "exitCode": 0,
+    "presentationOwnerHostGroupsPassed": 4,
+    "upToDateTasks": 26
+  },
+  "boundaries": {
+    "actualAndroidImeExecutionQualified": false,
+    "actualClientFieldSubmissionQualified": false,
+    "actualControllerHardwareQualified": false,
+    "actualWineInputQualified": false,
+    "gameplayQualified": false,
+    "unicodeSupportAdded": false,
+    "worldQualified": false
+  },
+  "defect": "Android advertises IME_ACTION_DONE but its previous action handler only finished composition and hid the keyboard, omitting the client Enter event.",
+  "files": {
+    "app/presentation-owner.gradle": {
+      "bytes": 1852,
+      "sha256": "11e14f39939296edd64d87aad994bff56fac7803342d5269c592577145938013"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/input/GameInputView.java": {
+      "bytes": 15771,
+      "sha256": "03370da0939e2a60a4714bbc3404b75ea8a648bae53f962e8b74dd76841586d1"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/presentation/InputBridge.java": {
+      "bytes": 7458,
+      "sha256": "1b56a934c7c263d94bc4c019382facdaf0533a45f89eeef63c9453c7080215d1"
+    },
+    "app/src/test/java/android/net/LocalSocket.java": {
+      "bytes": 1161,
+      "sha256": "b08f584335ed631fff5c1833bda84166c906f5ff6f7416f1b6022935acd83dda"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/presentation/InputBatchReservationTests.java": {
+      "bytes": 5510,
+      "sha256": "1e1fa72f36b0512d369a49e52148c253654ee790f4228431fb089d10443c65fe"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/input/GameInputRouter.java": {
+      "bytes": 6893,
+      "sha256": "f3508f2ea63a3ef3bcc4d11ed4ffa0b7d05b2829c839a2e736d1df87b0982f84"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/input/KeyboardText.java": {
+      "bytes": 5090,
+      "sha256": "b4ca85731bedfc6ceb3687817184533953edb379c190698c72946587527c1b61"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/presentation/InputSink.java": {
+      "bytes": 1151,
+      "sha256": "e96d947d64bc76581183044bc2032c583fdafa383c0a499d78e4c0877286bc2d"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/input/GameInputRouterTest.java": {
+      "bytes": 7969,
+      "sha256": "6509be6b5b7db381114d1f17a02c570e7ecdb3c26348dad4c3247d2250fb0b75"
+    },
+    "runtime/CONTROLS.md": {
+      "bytes": 5030,
+      "sha256": "9023b5e9d6bbf295554c5a6c039c0eec476bb7adcd7494725423f9ed0dbed021"
+    }
+  },
+  "formatVersion": 1,
+  "gitHeadAtObservation": "817cbc229f4dcc24beb169ecc72838fab4d1df32",
+  "implementation": {
+    "acceptedActions": [
+      "EditorInfo.IME_ACTION_DONE",
+      "EditorInfo.IME_NULL",
+      "soft KEYCODE_ENTER ACTION_DOWN"
+    ],
+    "clientSourcePinChanged": false,
+    "closeConnectionInvalidatesBeforeBaseClose": true,
+    "closedConnectionAndKeyboardGenerationRejectLateRepeat": true,
+    "closedMalformedAndIndividualOverflowErrorsRemainFatal": true,
+    "controllerMappingsChanged": false,
+    "hideOnlyAfterAcceptance": true,
+    "newInputConnectionReceivesDistinctGeneration": true,
+    "oneAcceptedTextAndEnterSequence": true,
+    "textCharacterLimit": 64,
+    "transportEventLimit": 256,
+    "unsupportedActionsReturnFalsePreservingDraft": true,
+    "userTextIncludedInNewDiagnostics": false,
+    "wholeBatchCapacityRejectionTypedNonfatalBeforeAnyEnqueue": true
+  },
+  "independentSourceReview": {
+    "clear": true,
+    "covers": [
+      "Core atomic submission and draft retention",
+      "Typed InputBridge reservation boundary and actual queue fixture",
+      "GameInputView nonfatal rejection and connection generation/close wiring",
+      "Host-only Gradle/socket seam separation"
+    ],
+    "reviewer": "android_stat"
+  },
+  "inputBatchReservation": {
+    "actualSocketQualified": false,
+    "actualX11Qualified": false,
+    "checks": [
+      "Actual256-event pending queue remains byte-identical after valid atomic batch rejection",
+      "Keys, button mask and open transport remain unchanged after rejection",
+      "Malformed keysym while full remains ordinary IOException rather than retryable rejection",
+      "After simulated writer progress, retained draft plus Enter queues exact12ordered packets",
+      "Malformed oversized batch, closed transport and ambiguous individual-key overflow are not labeled retryable",
+      "Individual overflow retains existing disconnect/clear behavior"
+    ],
+    "fixture": "io.github.russianranger.esteria.presentation.InputBatchReservationTests",
+    "maximumHeapBytes": 33554432,
+    "observedOutput": "Actual InputBridge: atomic full-queue refusal, unchanged held state, exact draft retry and fatal individual/closed guards passed; no socket or X11 execution",
+    "runsActualInputBridgeMethods": true,
+    "transportSeam": "Task-only android.net.LocalSocket constructor/cleanup stub; all connect/read/write APIs refuse execution. No writer is started."
+  },
+  "observedAtUtc": "2026-10-30T19:56:12.385173+00:00",
+  "reviewBoundary": "Android action filtering, UI hiding, per-connection generation and close invalidation were compiled/linted and independently source-reviewed. Host fixtures execute actual Core event construction/connection state and real InputBridge queue/held-state methods. The task-only socket stub refuses all connect/read/write. No Android IME callback, socket ACK, X11 event or guest client execution is claimed. Only a validated whole-batch capacity refusal is nonfatal; other transport errors retain the existing fatal policy.",
+  "scope": "ime-editor-submission-host-and-android-compilation-only",
+  "selectedClient": {
+    "bytes": 93155,
+    "file": "Engine/Source/Frame/CSimpleEditBox.cpp",
+    "observedContract": "CSimpleEditBox KEY_ENTER invokes RunOnEnterPressedScript or inserts newline for a multiline field",
+    "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+    "sha256": "9fc0462531f80bb9748a6eacad6fe539f33dc15e13fbf5241fabbb993e9ce6c9"
+  },
+  "sourceState": "modified-worktree-exact-file-identities"
+}

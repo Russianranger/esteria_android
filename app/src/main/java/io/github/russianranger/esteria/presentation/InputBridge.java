@@ -70,8 +70,6 @@ public final class InputBridge implements InputSink, AutoCloseable {
         if (closed) throw new IOException("Input transport is closed");
         if (keysyms == null || down == null || keysyms.length != down.length || keysyms.length > QUEUE_LIMIT)
             throw new IOException("Invalid atomic input sequence");
-        if (pending.size() + keysyms.length > QUEUE_LIMIT)
-            throw new IOException("Input sequence exceeds available queue capacity");
         List<byte[]> batch = new ArrayList<>(keysyms.length);
         Set<Integer> held = new HashSet<>(keys);
         for (int i = 0; i < keysyms.length; ++i) {
@@ -80,6 +78,8 @@ public final class InputBridge implements InputSink, AutoCloseable {
             if (held.size() > 128) throw new IOException("Too many held keys in input sequence");
         }
         // Validation and capacity reservation finish before any event becomes visible to the writer.
+        if (pending.size() + batch.size() > QUEUE_LIMIT)
+            throw new InputSink.BatchRejected("Input is busy; try again");
         pending.addAll(batch); keys.clear(); keys.addAll(held); notifyAll();
     }
     @Override public synchronized void pointer(int x, int y, int mask) throws IOException {
