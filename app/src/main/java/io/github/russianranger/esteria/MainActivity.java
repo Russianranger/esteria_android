@@ -54,7 +54,7 @@ public final class MainActivity extends Activity {
                 status.setText(service.status());
                 for (Button action : actions) action.setEnabled(!service.busy());
                 startGame.setEnabled(!service.busy()&&completeProfile());
-                exportSupport.setEnabled(!service.busy()||service.game()!=null);
+                exportSupport.setEnabled(service.supportExportAvailable());
                 launcherForceStop.setVisibility(service.forceStopAvailable()?View.VISIBLE:View.GONE);
                 launcherForceStop.setEnabled(service.forceStopAvailable());
                 if(clientLanguage!=null)clientLanguage.setEnabled(!service.busy());

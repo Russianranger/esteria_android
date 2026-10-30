@@ -83,6 +83,7 @@ public final class SessionService extends Service {
     private boolean destroyed;
     private int latestStartId;
     private volatile String status = "Ready to import your 3.3.5a build 12340 client folder or ZIP.";
+    private volatile String supportStatus="";
     private volatile SafTreeSource activeFolderSource;
     // Ephemeral decisions are never restored as approval after service/process recreation.
     private volatile ClientLaunchSetup.UiReview pendingUiReview;
@@ -104,8 +105,9 @@ public final class SessionService extends Service {
         if(busy.get()){keepAwake();main.postDelayed(this,60*1000L);}
     }};
     private Path root;
-    String status() { return status; }
+    String status() { String support=supportStatus;return status+(support.isEmpty()?"":"\n"+support); }
     boolean busy() { return busy.get(); }
+    boolean supportExportAvailable(){return !exporting.get()&&!(busy.get()&&EXPORT.equals(activeAction));}
     ClientLaunchSetup.UiReview uiReview() { return pendingUiReview; }
     GameSession.Handle game() { return game; }
     GamePresentationPanel.SessionEvents presentationEvents() { return gameEvents; }
@@ -153,15 +155,16 @@ public final class SessionService extends Service {
         }
         // A repeated startForegroundService call still requires a foreground response.
         foreground("Preparing Esteria",busy.get()?activeAction:intent.getAction());
-        if(EXPORT.equals(intent.getAction())&&busy.get()&&game!=null) {
-            if(exporting.compareAndSet(false,true))supportWorker.execute(()->{
-                try{exportBundle(intent.getData());}catch(Exception error){status="Support export failed: "+error.getMessage();log(status);}
+        if(EXPORT.equals(intent.getAction())&&busy.get()) {
+            if(!EXPORT.equals(activeAction)&&exporting.compareAndSet(false,true))supportWorker.execute(()->{
+                try{exportBundle(intent.getData());}catch(Exception error){supportStatus="Support export failed: "+error.getMessage();log(supportStatus);}
                 finally{exporting.set(false);}
             });
             return START_NOT_STICKY;
         }
         if (!busy.compareAndSet(false, true)) return START_NOT_STICKY;
         activeAction=intent.getAction();
+        if(!EXPORT.equals(activeAction))supportStatus="";
         cancelled.set(false);
         keepAwake();
         main.removeCallbacks(wakeHeartbeat);main.postDelayed(wakeHeartbeat,60*1000L);
@@ -192,6 +195,7 @@ public final class SessionService extends Service {
                 status = "Import paused. Select the same folder or archive to resume where source metadata permits; existing game data is unchanged.";
                 log("Import paused");
             } catch (Exception e) {
+                if(EXPORT.equals(intent.getAction()))supportStatus="";
                 status = START.equals(intent.getAction())?(lastRecoveryRequired?"The local session stopped with recovery checks required. Export the support bundle for details."
                         :"Local startup or shutdown did not complete normally. Export the support bundle for details.")
                         :cancelled.get() ? "Operation cancelled. Existing game data remains active."
@@ -573,7 +577,7 @@ public final class SessionService extends Service {
     }
     private void exportBundle(Uri destination) throws Exception {
         if (destination == null || !"content".equals(destination.getScheme())) throw new IOException("No export destination selected");
-        String previousStatus = status; status = "Writing support bundle…";
+        String previousStatus = status; supportStatus = "Writing support bundle…";
         Map<String, String> facts = new LinkedHashMap<>();
         facts.put("app.id", BuildConfig.APPLICATION_ID); facts.put("app.version", BuildConfig.VERSION_NAME);
         facts.put("app.sourceRevision", BuildConfig.SOURCE_REVISION);
@@ -788,7 +792,7 @@ public final class SessionService extends Service {
             if (output == null) throw new IOException("Export destination could not be opened");
             SupportBundle.write(output, facts, logs);
         }
-        status = "Support bundle saved. It contains status and bounded, redacted logs; no game assets or databases.";
+        supportStatus = "Support bundle saved. It contains status and bounded, redacted logs; no game assets or databases.";
     }
     private static String optionalMetric(java.util.OptionalLong value){return value.isPresent()?Long.toString(value.getAsLong()):"unavailable";}
     @SuppressLint("ApplySharedPref") // Keep fixed log selection with the retained operation's recovery state.

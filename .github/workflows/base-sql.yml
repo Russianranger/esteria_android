@@ -18,6 +18,10 @@ on:
       - tools/render_server_config.py
       - config/local-server.json
       - runtime/server/**
+      - tests/test_server_dependency_image.py
+      - tools/verify_server_dependency_image.py
+      - tools/prepare_server_dependency_image.py
+      - tools/release_server_dependencies.py
       - tests/test_base_sql.py
       - tests/test_local_account.py
       - tests/test_local_account_qualification.py
@@ -40,6 +44,10 @@ on:
       - runtime/provision_local_account.py
       - runtime/provision_local_realm.py
       - runtime/server/**
+      - tests/test_server_dependency_image.py
+      - tools/verify_server_dependency_image.py
+      - tools/prepare_server_dependency_image.py
+      - tools/release_server_dependencies.py
       - tools/render_server_config.py
       - config/local-server.json
       - tests/test_base_sql.py
@@ -64,7 +72,7 @@ jobs:
       - name: Check source and fresh-fixture safety contracts
         run: |
           test "$(uname -m)" = aarch64
-          python3 -m unittest tests.test_base_sql tests.test_server_runtime_inputs tests.test_local_account tests.test_local_account_qualification tests.test_mysql_backup tests.test_android_database_setup -v
+          python3 -m unittest tests.test_base_sql tests.test_server_runtime_inputs tests.test_local_account tests.test_local_account_qualification tests.test_mysql_backup tests.test_android_database_setup tests.test_server_dependency_image -v
           mkdir -p out/base-sql-evidence out/base-sql-private out/local-account-evidence out/local-account-private out/mysql-backup-evidence out/mysql-backup-private
       - name: Fetch the exact server Git tree and stage only authenticated base SQL
         run: |
@@ -88,21 +96,28 @@ jobs:
               output.write('ESTERIA_BASE_FIXTURE_SHA256=' + digest + '\n')
               output.write('ESTERIA_ACCOUNT_FIXTURE_SHA256=' + hashlib.sha256(pathlib.Path('out/local-account-fixture/account-fixture.json').read_bytes()).hexdigest() + '\n')
           PY
-      - name: Build the pinned native ARM64 MySQL dependency image
+      - name: Prepare and read back the exact published dependency image without APT
         run: |
-          docker build --platform linux/arm64 --target runtime \
-            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
-            -t esteria-base-sql:qualification runtime/server \
-            > out/base-sql-evidence/image-build.log 2>&1
-          container=$(docker create esteria-base-sql:qualification)
-          trap 'docker rm -f "$container" >/dev/null' EXIT
-          docker cp "$container:/etc/esteria-server-runtime.json" out/base-sql-evidence/server-runtime.json
+          env -u GITHUB_TOKEN python3 tools/release_server_dependencies.py prepare --output out/base-sql-dependency-release \
+            > out/base-sql-evidence/dependency-download.log 2>&1
+          python3 tools/prepare_server_dependency_image.py --inputs out/base-sql-dependency-release \
+            --output out/base-sql-dependency-image > out/base-sql-evidence/dependency-context.log 2>&1
+          cp out/base-sql-dependency-image/context-receipt.json out/base-sql-evidence/dependency-context.json
+          cp out/base-sql-dependency-release/server-runtime.json out/base-sql-evidence/server-runtime.json
+          rm -rf out/base-sql-dependency-release
+          docker build --network none --platform linux/arm64 -t esteria-base-sql:qualification \
+            out/base-sql-dependency-image/context > out/base-sql-evidence/image-build.log 2>&1
           docker image inspect esteria-base-sql:qualification --format '{{.Id}}' > out/base-sql-evidence/image-id.txt
+          docker run --rm --network none --read-only \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/tools/verify_server_dependency_image.py,dst=/verify-image.py,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/base-sql-dependency-image/context-receipt.json,dst=/context-receipt.json,readonly" \
+            esteria-base-sql:qualification /usr/bin/python3 /verify-image.py --context-receipt /context-receipt.json \
+            > out/base-sql-evidence/dependency-image-check.json
           python3 - <<'PY'
           import json, os, pathlib
-          runtime = json.loads(pathlib.Path('out/base-sql-evidence/server-runtime.json').read_text())
+          check = json.loads(pathlib.Path('out/base-sql-evidence/dependency-image-check.json').read_text())
           with open(os.environ['GITHUB_ENV'], 'a') as output:
-              output.write('ESTERIA_MYSQL_SQL_VERSION=' + runtime['expectedMysqlSqlVersion'] + '\n')
+              output.write('ESTERIA_MYSQL_SQL_VERSION=' + check['expectedMysqlSqlVersion'] + '\n')
           PY
       - name: Import authentic source bases and test restart persistence with external network disabled
         run: |

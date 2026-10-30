@@ -237,3 +237,12 @@ The explicit complete local-game packaging workflow now selects both derived
 providers together, verifies all four server archives in one private Java store
 with32MiB heaps and retains every source/debug companion separately. Its checker
 passes59 focused tests and independent review; actual CI qualification is next.
+
+Support export stays available during imports, setup, running games and retained
+cleanup. A separate single-flight worker preserves the operation status and its
+foreground lifetime; APK/compile/lint and independent concurrency review pass.
+Two native MySQL qualification jobs failed before engine startup on remote APT
+HTTP502. Their workflow fix consumes the exact already published21a runtime,
+verifies its complete sources/native bytes and builds offline; actual reruns are
+pending. The separate x64 emulator snapshot also returned503 before execution;
+this does not establish an Android SQL regression.

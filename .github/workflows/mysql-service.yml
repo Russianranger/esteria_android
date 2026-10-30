@@ -6,6 +6,10 @@ on:
       - runtime/mysql_service.py
       - runtime/mysql_bootstrap.py
       - runtime/server/**
+      - tests/test_server_dependency_image.py
+      - tools/verify_server_dependency_image.py
+      - tools/prepare_server_dependency_image.py
+      - tools/release_server_dependencies.py
       - tools/owned_process_group.py
       - tests/test_mysql_service.py
       - .github/workflows/mysql-service.yml
@@ -14,6 +18,10 @@ on:
       - runtime/mysql_service.py
       - runtime/mysql_bootstrap.py
       - runtime/server/**
+      - tests/test_server_dependency_image.py
+      - tools/verify_server_dependency_image.py
+      - tools/prepare_server_dependency_image.py
+      - tools/release_server_dependencies.py
       - tools/owned_process_group.py
       - tests/test_mysql_service.py
       - .github/workflows/mysql-service.yml
@@ -32,23 +40,30 @@ jobs:
       - name: Check service ownership and startup guards
         run: |
           test "$(uname -m)" = aarch64
-          python3 -m unittest tests.test_mysql_service.ServiceGuards tests.test_owned_process_group -v
+          python3 -m unittest tests.test_mysql_service.ServiceGuards tests.test_owned_process_group tests.test_server_dependency_image -v
           mkdir -p out/mysql-service-evidence out/mysql-service-private
-      - name: Build exact pinned native ARM64 dependency image
+      - name: Prepare and read back the exact published dependency image without APT
         run: |
-          docker build --platform linux/arm64 --target runtime \
-            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
-            -t esteria-mysql-service:qualification runtime/server \
-            > out/mysql-service-evidence/image-build.log 2>&1
-          container=$(docker create esteria-mysql-service:qualification)
-          trap 'docker rm -f "$container" >/dev/null' EXIT
-          docker cp "$container:/etc/esteria-server-runtime.json" out/mysql-service-evidence/server-runtime.json
+          env -u GITHUB_TOKEN python3 tools/release_server_dependencies.py prepare --output out/mysql-service-dependency-release \
+            > out/mysql-service-evidence/dependency-download.log 2>&1
+          python3 tools/prepare_server_dependency_image.py --inputs out/mysql-service-dependency-release \
+            --output out/mysql-service-dependency-image > out/mysql-service-evidence/dependency-context.log 2>&1
+          cp out/mysql-service-dependency-image/context-receipt.json out/mysql-service-evidence/dependency-context.json
+          cp out/mysql-service-dependency-release/server-runtime.json out/mysql-service-evidence/server-runtime.json
+          rm -rf out/mysql-service-dependency-release
+          docker build --network none --platform linux/arm64 -t esteria-mysql-service:qualification \
+            out/mysql-service-dependency-image/context > out/mysql-service-evidence/image-build.log 2>&1
           docker image inspect esteria-mysql-service:qualification --format '{{.Id}}' > out/mysql-service-evidence/image-id.txt
+          docker run --rm --network none --read-only \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/tools/verify_server_dependency_image.py,dst=/verify-image.py,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/mysql-service-dependency-image/context-receipt.json,dst=/context-receipt.json,readonly" \
+            esteria-mysql-service:qualification /usr/bin/python3 /verify-image.py --context-receipt /context-receipt.json \
+            > out/mysql-service-evidence/dependency-image-check.json
           python3 - <<'PY'
           import json, os, pathlib
-          runtime = json.loads(pathlib.Path('out/mysql-service-evidence/server-runtime.json').read_text())
+          check = json.loads(pathlib.Path('out/mysql-service-evidence/dependency-image-check.json').read_text())
           with open(os.environ['GITHUB_ENV'], 'a') as output:
-              output.write('ESTERIA_MYSQL_SERVICE_VERSION=' + runtime['expectedMysqlSqlVersion'] + '\n')
+              output.write('ESTERIA_MYSQL_SERVICE_VERSION=' + check['expectedMysqlSqlVersion'] + '\n')
           PY
       - name: Exercise exact service CLI and restart persistence without external network
         run: |

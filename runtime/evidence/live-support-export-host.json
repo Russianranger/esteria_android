@@ -1,0 +1,30 @@
+{
+  "androidServiceExecuted": false,
+  "checks": {
+    "apkAndLintPassed": true,
+    "completionWaitsForExportReviewed": true,
+    "finalCompilationAndLintPassed": true,
+    "operationStatusPreservedReviewed": true,
+    "singleFlightAdmissionReviewed": true
+  },
+  "dateUtc": "2026-10-30",
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "headRevision": "7a7166e04c0aaec66d627bc57a87b6aef5de3cb3",
+  "log": {
+    "bytes": 2279,
+    "sha256": "37f56ee142703daf587f0ccbc1caf6d29858a5b8cda81c68ea45e2450ddb26fd"
+  },
+  "scope": "host-compiled-live-support-export-adapter",
+  "sourceFiles": {
+    "app/src/main/java/io/github/russianranger/esteria/MainActivity.java": {
+      "bytes": 17644,
+      "sha256": "7c994a7e91ed0b9bd0f01db01aba9764fdd74f7743d06bdfb98b468298361a8d"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/SessionService.java": {
+      "bytes": 66820,
+      "sha256": "02ae91b9d638aa49beac88bc0dc1b8c14ce5d8284a37fb571d2c375321baf62a"
+    }
+  },
+  "workingTreeHadUncommittedImplementation": true
+}

@@ -1,0 +1,68 @@
+{
+  "androidRuntimeQualified": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "integrationRevision": "05925dddb1327a6ed266ce62f018ff2eb447f0f3",
+  "localValidation": {
+    "dockerExecuted": false,
+    "relevantGuardTestsPassed": 87,
+    "relevantGuardTestsRun": 87,
+    "skipped": 0,
+    "yamlSyntaxPassed": true
+  },
+  "observations": [
+    {
+      "actualPreflightGuardTestsPassed": 60,
+      "artifact": {
+        "bytes": 2476,
+        "id": 13001277680,
+        "sha256": "7f6bdf73e5f2dfee1e14e6188a09a8fff91f9a559b946196263f17a562b4f4a4"
+      },
+      "failurePhase": "old-apt-dependency-image-build",
+      "failureReason": "Pinned Ubuntu snapshot returned HTTP502; absent authenticated InRelease inputs correctly failed the existing hash gate.",
+      "imageBuildLog": {
+        "bytes": 15873,
+        "sha256": "bd771028616663c963d125fa26a443df80331b370e344405dff45a1400e0edb3"
+      },
+      "job": 124238891681,
+      "jobConclusion": "failure",
+      "mysqlEngineStarted": false,
+      "sqlExecuted": false,
+      "workflowRun": 41106872864
+    },
+    {
+      "actualPreflightGuardTestsPassed": 21,
+      "artifact": {
+        "bytes": 2488,
+        "id": 13001152925,
+        "sha256": "f627be60f593c7c0019663ee5ea58008f714d7c69b0088cef05a921dc8a21a94"
+      },
+      "failurePhase": "old-apt-dependency-image-build",
+      "failureReason": "Pinned Ubuntu snapshot returned HTTP502; absent authenticated InRelease inputs correctly failed the existing hash gate.",
+      "imageBuildLog": {
+        "bytes": 15992,
+        "sha256": "71b4ee09c47ae0aa3b30dd56621c941f52a92bb361948c0db5922e9eb39eee2a"
+      },
+      "job": 124238893174,
+      "jobConclusion": "failure",
+      "mysqlEngineStarted": false,
+      "sqlExecuted": false,
+      "workflowRun": 41106872824
+    }
+  ],
+  "replacement": {
+    "completeSourceAndNativeImageReadbackRequired": true,
+    "dependencyImageBuildNetworkDisabled": true,
+    "mysqlVersionChanged": false,
+    "newNativeMysqlQualificationCompleted": false,
+    "runtimeArchive": {
+      "bytes": 112374096,
+      "file": "server-runtime-arm64.tar.gz",
+      "sha256": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5"
+    },
+    "source": "existing-published-exact-server-dependency-runtime",
+    "sourcePinsChanged": false,
+    "sqlOrServiceCommandsChanged": false
+  },
+  "scope": "observed-dependency-download-failure-before-mysql-qualification"
+}
