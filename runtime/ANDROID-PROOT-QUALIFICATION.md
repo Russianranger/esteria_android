@@ -224,6 +224,19 @@ This establishes the specified legacy rename semantics through the Android x64
 loader; the MySQL service rerun is a separate gate. ARM64, Wine and gameplay
 execution remain unqualified by this test.
 
+The additional relinkable-object provenance receipt passed the same actual
+Android gate in [run41013086363](https://github.com/Russianranger/esteria_android/actions/runs/41013086363)
+at `9d413c2d19906021c391e4616647910dd0535b2a`. Its complete build evidence,
+including all 15 object hashes, matches an independent local build. All 50 members
+of the retained CI source archive were separately read back, including the
+original archives, exact tracked recipes and the 15 matched x64 relinkable objects.
+Evidence ZIP12958543058 SHA-256 is
+`635ab21f45f3985e24fed4acf868a656fbb60780ef258b19fa8e7967f2a3a736`;
+source ZIP12958319067 SHA-256 is
+`8b15db3f3260f695ee4bc38e4b1874f16328ae2693f8099f141f7b4152c053be`.
+The actual checked APK is 2,296,343 bytes, SHA-256
+`31d6cf3187a7083dfdc8864879d00396f72ab9d342be9f805888bb1611f08424`.
+
 Primary Android13 source:
 `platform/bionic`, tag `android-13.0.0_r37`, `libc/SYSCALLS.TXT` and
 `libc/SECCOMP_ALLOWLIST_APP.TXT` at

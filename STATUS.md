@@ -35,11 +35,15 @@ Server40994809596 compiled all2,257 objects and linked authserver/dbimport, then
 failed final worldserver linking on three missing grid-template instantiations
 and the README-only Custom directory's nonexistent loader. Minimal source-backed
 patches5/6 supply real template definitions and omit only source-empty directories.
-Corrected run41005048019 is compiling with the saved cache; no complete server
-package or auth/world success is claimed. Actual backup dump, restore, account
-and repeated setup checks pass; full canonical equality identifies a harness-only
-charset normalization. The narrow explicit-charset correction preserves all strict
-comparison gates; native run41011458127 is pending.
+Corrected run41005048019 is linking with the saved cache; no complete server
+package or auth/world success is claimed. Native ARM64 backup41013086447 now
+passes complete 367,899,260-byte dump equality after fresh restore and restart,
+including account journal and repeated setup preservation. Harness-only charset
+normalization was corrected without changing server tables or comparison gates.
+Native ARM64 persistent-service41013380186 passes three live SQL cycles,
+UUID/credentials/four-schema persistence, duplicate-owner rejection and clean
+command/EOF/signal shutdown. Android application-service execution remains open;
+its emulator fixture is being implemented, including short translated socket paths.
 
 Writable UI selection/review is integrated into the app with explicit divergence
 decisions and retained prior versions. Actual adapter32MiB tests, independent
@@ -82,6 +86,11 @@ No Adreno execution, Android GPU compatibility or hardware rendering is claimed.
 Transactional shader-generation staging passes eight host groups, with actual
 subprocess bounds and explicitly synthetic storage fixtures. Real game MPQs,
 shader generation, Adreno rendering and launcher activation are still absent.
+The exact926a translator/8a compiler provider and Android transactional setup
+adapter now compile and pass core/lint plus all five final APK provider checks.
+The original sources and notices are retained. A separately verified seven-file
+durable dependency release is being published; real imported-game generation
+remains unqualified.
 
 ## Implemented and verified
 

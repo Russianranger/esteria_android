@@ -48,11 +48,12 @@ ARM64 execution, client/server login or world entry is qualified.
    after current link evidence; complete source-bound module rendering is now
    implemented. Qualifiers must pass both verified source inventory and actual
    compiled selection. ConfigMgr success alone does not prove modules loaded.
-4. Base/account SQL and actual backup dump/restore/setup repetition pass. Strict
-   complete dump equality in41009954140 identifies a harness-only text-column
-   charset normalization. The fixture now declares that existing charset explicitly;
-   the full-byte equality gate remains unchanged and requires a new ARM64 run.
-   Playerbots fourth-schema source reference is implemented but not yet executed.
+4. Native ARM64 backup41013086447 passes complete367,899,260-byte dump equality
+   after fresh restore and restart, account journal preservation and repeated setup.
+   The exact harness charset correction leaves server tables/strict gates intact.
+   See runtime/MYSQL-BACKUP-QUALIFICATION.md for receipt/artifact identities.
+   Existing-save restore/upgrades remain unqualified. Playerbots fourth-schema
+   source reference is implemented but not yet executed.
 5. Android stdin41003838802 passes9 groups; native stdin41003838751 passes12.
    Tracer41003838793 passes3survivors versus0 protected plus saved-file relaunch.
    Remote-owner41006180061 passes owner/tracer/guest exit and independent control
@@ -69,8 +70,10 @@ ARM64 execution, client/server login or world entry is qualified.
 8. Shader staging helper uses strict pinned client translation, bounded processes,
    exact input/tool provenance and atomic output promotion. Eight host groups pass;
    synthetic structural SPIR-V tests are not real shaders. Exact926a translator
-   plus actual8a ARM64 compiler/source bundle packages and verifies successfully;
-   optional APK provider/app setup adapter and actual data-based generation remain work.
+   plus actual8a ARM64 compiler/source bundle packages and verifies successfully.
+   Optional APK provider and Android transactional setup now build/lint and pass
+   all five final-provider checks. Durable dependency publication is in progress;
+   actual Android compiler execution/data-based generation remains unqualified.
 9. Durable server41003838795, guest41006572380 and client41006572426 dependency
    releases are published and read-only/public-fetch verified. Scoped release locks
    contain exact URLs/hashes; GitHub immutable=false is explicit. Unified clean
@@ -80,8 +83,10 @@ ARM64 execution, client/server login or world entry is qualified.
     preflight, upgrade refusal, owned PID/UUID/loopback authentication, bounded
     logs, explicit shutdown and joined engine. Its new Android adapter has an
     exclusive setup/session lease and requires live and clean-stop receipts.
-    The separate mysql-service.yml actual runtime gate remains pending; do not
-    infer a live service from a setup receipt or enable gameplay prematurely.
+    Native ARM64 mysql-service.yml run41013380186 passes three SQL cycles and
+    command/EOF/helper-signal shutdown with unchanged UUID/credentials/markers.
+    The real Android adapter lifecycle fixture is in progress; PRoot expands socket
+    paths, so its exclusive socket directory must remain short. Keep gameplay gated.
 
 ## Missing content and acceptance
 

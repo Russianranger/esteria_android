@@ -69,6 +69,27 @@ no unpinned runtime package or replacement binary.
 
 ## Validation boundary
 
+Native ARM64 run [41013086447](https://github.com/Russianranger/esteria_android/actions/runs/41013086447)
+at integration `9d413c2d19906021c391e4616647910dd0535b2a` **passed** with exact
+MySQL `8.0.46-0ubuntu0.24.04.4` and external networking disabled. The full
+367,899,260-byte logical dump matched byte for byte after fresh restore and again
+after a clean restart. Account salt/verifier/tracker, all probes and the original
+instance's credential journal were preserved. The exact setup wrapper also passed
+fresh initialization and repeated initialization without changing credentials or
+UUID. Table counts were auth 24, characters 110, world 311 and playerbots 31;
+each includes two qualification-only probe tables.
+
+The downloaded 7,670-byte artifact `12959055014` has ZIP SHA-256
+`995283e76273c0f8228d5bd080f5786d813128416f5954bceb802f00199f3166`.
+Its qualification receipt SHA-256 is
+`320888941257b09b7a78cb3d3c204b8b4abc64c229405e05e592e3275373fecb`,
+and its measured runtime manifest SHA-256 is
+`3aa480f48fd36cea1253557976163dc2da0707eef72dbef18d028196888b05b1`;
+both match the independently checked environment receipt. This qualifies this
+fresh, isolated native Linux fixture only. Existing-save restoration, account
+journal rebinding, schema upgrades, actual characters/bots and Android execution
+remain separate, unqualified work.
+
 Twenty focused host guard tests pass, including real bounded subprocess output
 draining/deadline cleanup, digest rejection before SQL, all-four-empty gating,
 partial-file preservation, no-replace publication and regular-file/link checks.
@@ -94,7 +115,7 @@ MySQL 8.0.46 client. The option is now retained only for the restoring `mysql`
 client; the dumper retains its owned-process deadline and authenticated socket.
 An initial `--help` pass now parses every exact dump flag with defaults and login
 files disabled before any source database is created. The corrected preflight
-passed with the real x86_64 host tool; exact pinned ARM64 execution is pending.
+passed with the real x86_64 host tool before the subsequent ARM64 runs below.
 Failures now export controlled classification and numeric process/MySQL error
 codes, never raw SQL diagnostics. Artifact `12955522230` from that run was
 downloaded and verified (6,241-byte ZIP SHA-256
@@ -109,8 +130,8 @@ The next run adds a bounded first-difference diagnostic containing only SQL
 statement kind, schema/table/column identifiers, line lengths and position. No
 row values or per-line hashes leave the private fixture. This does not relax
 the byte-for-byte gate; even a difference limited to an auto-increment counter
-still fails. Full preservation qualification awaits that investigation and the
-subsequent clean restart comparisons.
+still fails. Those investigation and restart gates are resolved by the passing
+`41013086447` fixture above; the intermediate findings remain recorded below.
 
 Run `41009954140` at `46a54a22` located that mismatch precisely: the harness-only
 `acore_auth.esteria_backup_probe.note` column definition changed from 62 to 84
@@ -132,10 +153,10 @@ The base-loader, compiled-updater and playerbots-reference fixture token columns
 now declare `CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci` explicitly. That
 preserves their inherited bootstrap database collation, which differs from the
 backup probe's intentionally chosen Unicode collation. No imported server table
-is changed, and all complete-dump identity checks remain strict. The next exact
-ARM64 run must establish the result. A small local x86_64 MySQL
+is changed, and all complete-dump identity checks remain strict. The subsequent
+exact ARM64 run `41013086447` passed all checks above. A small local x86_64 MySQL
 8.0.46 instance initialized, but this host denied Unix-socket binding before
-SQL readiness; no local SQL round-trip is claimed. The diagnostic run's verified
+SQL readiness; no local SQL round-trip is claimed. The earlier `46a54a22` diagnostic run's verified
 6,422-byte artifact `12957775001` has ZIP SHA-256
 `19763d0e3026848bb82d7fc885f8ce90f54a801d0a32a435db90ef6c14bfe432`.
 No current result qualifies live saved-game restoration, upgrades across revisions,

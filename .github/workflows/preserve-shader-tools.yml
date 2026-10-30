@@ -1,0 +1,131 @@
+name: Preserve measured shader tools
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - runtime/shaders/dependency-release.lock.json
+      - tools/release_shader_tools.py
+      - tests/test_shader_release.py
+      - .github/workflows/preserve-shader-tools.yml
+permissions:
+  contents: read
+concurrency:
+  group: preserve-measured-shader-tools
+  cancel-in-progress: false
+jobs:
+  validate:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Test exact closure, publication refusal and immutable recovery
+        run: python3 -m unittest tests.test_shader_release tests.test_shader_provider tests.test_shader_tools_package tests.test_provider_publication -v
+      - name: Read exact original source pins only when no durable receipt exists
+        id: sources
+        run: |
+          python3 - <<'PY'
+          import os
+          from tools.release_shader_tools import load_lock
+          lock, pin = load_lock()
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+              out.write('original_required=' + ('false' if lock.get('published') else 'true') + '\n')
+              out.write('client_revision=' + pin['clientRevision'] + '\n')
+              out.write('compiler_revision=' + pin['compilerIntegrationRevision'] + '\n')
+          PY
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        if: steps.sources.outputs.original_required == 'true'
+        with:
+          repository: Russianranger/wowdecomp_esteria
+          ref: ${{ steps.sources.outputs.client_revision }}
+          path: out/client-source
+          persist-credentials: false
+          sparse-checkout: Tools/VulkanShaders
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        if: steps.sources.outputs.original_required == 'true'
+        with:
+          ref: ${{ steps.sources.outputs.compiler_revision }}
+          path: out/compiler-source
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /runtime/turnip/
+            /LICENSE
+      - name: Rebuild selected inputs from originals, or fetch pinned durable files
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/release_shader_tools.py prepare --inputs out/original-turnip-artifact.zip \
+            --client-source out/client-source --compiler-source out/compiler-source --output out/release-candidate
+          python3 tools/release_shader_tools.py export-provider \
+            --inputs out/release-candidate --output out/verified-provider
+      - name: Transfer only validated public dependency files
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: validated-shader-tool-release
+          path: out/release-candidate/
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 3
+  upload-draft:
+    needs: validate
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: validated-shader-tool-release
+          path: out/release-candidate
+      - name: Upload only missing files to the exact authorized UI-created draft
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/release_shader_tools.py upload-draft \
+            --inputs out/release-candidate --output out/draft-assets-verified.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: shader-tool-draft-upload-receipt
+          path: out/draft-assets-verified.json
+          if-no-files-found: error
+          retention-days: 14
+  verify-publication:
+    needs: [validate, upload-draft]
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: validated-shader-tool-release
+          path: out/release-candidate
+      - name: Read-only verification of actual published tag and every asset
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/release_shader_tools.py verify-published \
+            --inputs out/release-candidate --output out/published-release.json --wait-seconds 1200
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: shader-tool-publication-receipt
+          path: out/published-release.json
+          if-no-files-found: error
+          retention-days: 14
