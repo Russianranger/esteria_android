@@ -1,0 +1,45 @@
+{
+  "allRequiredFilesHashed": true,
+  "androidRuntimeQualified": false,
+  "apkProviderCreated": false,
+  "arm64ElfHeadersVerified": [
+    "bin/authserver",
+    "bin/dbimport",
+    "bin/worldserver"
+  ],
+  "cachedGenerationArchiveOpened": false,
+  "cachedGenerationCopiedBytes": 0,
+  "cachedGenerationReusedFiles": 126,
+  "coreSources": {
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ClientLaunchView.java": "c150bf8b697e354f659829a652824d07060a3e978592c3c8a20b323299506c17",
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ClientUiStore.java": "506c34861b643f4442142bdfa14af32cde8fce21ed31d6a0d06fd98c1c1b712e",
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/DownloadCache.java": "2a4493d41860c98b2ea9639b66c52499868d22332b81f273b1d5819807286461",
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/EmbeddedArchiveCache.java": "224a86ac24ab3c5080869de48efd2783bdbbfb0107a6fc1514ede8cab8be38eb",
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ImportedUiSource.java": "4543f39127bc8dfba6ca7aa6362ecc765a108676d82b472607640a88cd2fdc2d",
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeFiles.java": "a61d4c4518e63825dcb3013e7af199edddbf92cd8f06eb93547391737635eb64",
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeInstaller.java": "843968c15b088b501df93db1a395c6e392175f9589ad9250364583ef31b05723",
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimePackagePlan.java": "e035eb2981be83545b9cd03957cbf64e4eb81aaecc3181bb08e7cf4868dd036f",
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeWork.java": "36ee9284e1a0bfa4734f979506db964c4d23d3c1699ce94b496906dff0f1b5c0",
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/UiFiles.java": "431243f76e2aee6bc72de80487a9d5021b5fd931ee574a2d76a7de35b8d79826"
+  },
+  "engineWorkflowRun": 41043905821,
+  "fileBytes": 66025007,
+  "fileCount": 126,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "guestServerExecuted": false,
+  "initialCopiedBytes": 66025007,
+  "maximumJavaHeapBytes": 33554432,
+  "noticeAugmentedArchive": {
+    "bytes": 21996594,
+    "file": "server-programs-runtime-arm64.tar.gz",
+    "sha256": "df7e0b33e4048daf780ebf31c0a7f9a10b1f74ea42f4de100ca18ed1a65b673e"
+  },
+  "noticeAugmentedReceipt": {
+    "bytes": 70817,
+    "sha256": "6385c162579f0e04c8dcc47595bc108a1baf91ca773c9c11aa93005511914d36"
+  },
+  "scope": "host-java-server-programs-installer-only",
+  "sourceCompanionComplete": false,
+  "validatorSourceSha256": "9deb3f91066008f903d978b41c15a1f79e0092969ea6520afda475a481b4c037"
+}

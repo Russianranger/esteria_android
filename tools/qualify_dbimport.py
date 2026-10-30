@@ -43,6 +43,7 @@ except ImportError:
 from runtime import mysql_bootstrap as db
 from runtime import provision_local_realm as realm
 from runtime import server_schema_adaptations as adaptations
+from runtime import server_content as product_content
 
 require = base.content.require
 DATABASES = ('auth', 'characters', 'world')
@@ -162,6 +163,16 @@ def select_install(install, compiled, lock_path, engine_derivative_receipt=None)
     programs = {Path(row['path']).name: {key: row[key] for key in ('bytes', 'sha256')}
                 for row in build['files'] if row['path'] in ('bin/authserver', 'bin/worldserver', 'bin/dbimport')}
     return build, template, programs, None
+
+
+def verify_runtime_content(extracted, content_directory, receipt_sha256, lock_path, manifest, compiled):
+    """Exercise the phone's no-Git consumer using the installed-bound selection."""
+    source, lock_sha = base.locked_source(lock_path)
+    verified = product_content.verify(extracted, content_directory / 'package-receipt.json', receipt_sha256,
+                                      source, lock_sha, compiled)
+    require(verified.manifest == manifest and verified.compiled == compiled,
+            'runtime content consumer differs from verified native selection')
+    return verified
 
 
 def render_importer(template, source, state, mysql, password):
@@ -315,15 +326,23 @@ def run(install, content_directory, receipt_sha256, lock_path, mysql, mysqld, ve
     capture = None
     try:
         receipt, manifest, compiled = unpack_content(content_directory, receipt_sha256, lock_path, output / 'content')
+        build, template, programs, derivative = select_install(install, compiled, lock_path, engine_derivative_receipt)
+        verified = verify_runtime_content(output / 'content', content_directory, receipt_sha256,
+                                          lock_path, manifest, compiled)
+        evidence['packagedRuntimeContent'] = dict(scope='actual-immutable-content-no-git-runtime-consumer',
+            contentReceipt=verified.identities['receipt'], sourceLockSha256=receipt['sourceLockSha256'],
+            files=len(verified.identities['files']),
+            bytes=sum(row['bytes'] for row in verified.identities['files'].values()),
+            installedBuildAndModuleSelectionChecked=True, allPackagedBytesReadBack=True,
+            sqlExecutedByVerifier=False, androidRuntimeQualified=False, gameplayQualified=False)
         # Validate the separate integration SQL/audit contract before starting
         # an engine. Original packaged SQL and ledger expectations stay exact.
         adaptations.prepare(manifest)
-        build, template, programs, derivative = select_install(install, compiled, lock_path, engine_derivative_receipt)
         if derivative is not None:
             evidence['engineDerivative'] = derivative
         evidence.update(source=receipt['source'], sourceLockSha256=receipt['sourceLockSha256'],
                         serverBuildId=build['buildId'], compiledModules=compiled['enabledModules'])
-        source = output / 'content/source'
+        source = verified.source
         expected = {name: expected_updates(source, manifest, name) for name in DATABASES}
         password = db.read_secret(state / 'accounts/database-secret', create=True)
         with db.state_lock(state):

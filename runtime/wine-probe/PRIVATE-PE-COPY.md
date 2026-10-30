@@ -82,7 +82,16 @@ zero-tail, overlap/alignment and original-input preservation tests pass. A
 separate read-only scan of703 actual Wine/client x64 PE headers found no conflicts
 with the new non-flat bounds. These checks do not execute the adapted Wine.
 
-The full source build, default-versus-selected PE reference, fresh Android prefix
-and reconstructed-client diagnostics must pass before any new runtime provider
-is selected. Android ARM64, normal game initialization, hardware graphics and
-gameplay remain unqualified.
+The full source build and actual default-versus-selected PE reference passed in
+run41040860418 at `824ca6df8ff158e4e38c9a7e9adc67405876f19b`, followed by fresh
+runtime archive readback and complete source export. Independent host receipt
+readback verified both executed modes, zero/two branch markers, all image/shared
+checks and clean teardown. The exact new runtime is now selected only for the
+separate x64 Android fixture. Its complete source ZIP must pass the existing
+Android CI consumer before APK construction or execution; full local source-ZIP
+readback was unavailable at the connector's download limit. See
+[`../evidence/wine-private-pe-host-41040860418.json`](../evidence/wine-private-pe-host-41040860418.json).
+
+A fresh Android prefix and reconstructed-client diagnostics remain pending.
+Production ARM64, normal game initialization, hardware graphics and gameplay
+remain unqualified; the production ARM64 provider is unchanged.

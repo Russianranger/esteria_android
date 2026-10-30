@@ -1,39 +1,39 @@
 {
   "formatVersion": 1,
   "scope": "measured-x86-64-wine-runtime-inputs",
-  "sourceRevision": "f963225d900961c3696880bc6c0c537aa741577f",
-  "workflowRun": 41011458046,
-  "artifactId": 12958765990,
+  "sourceRevision": "824ca6df8ff158e4e38c9a7e9adc67405876f19b",
+  "workflowRun": 41040860418,
+  "artifactId": 12972375421,
   "artifact": {
-    "bytes": 193970776,
-    "sha256": "fe02046e9df946a1dfdf66ce097a4172e3ea82a442e3da33cbd5ae1253c3c337"
+    "bytes": 193973735,
+    "sha256": "68281be02314df628fe5ddde0b0707ac9ae7d3e07158b9dc57ef8191eb954592"
   },
   "files": {
     "package-receipt.json": {
-      "bytes": 5120,
-      "sha256": "3016222e104e7b9d06069f5a98a41091ff9d07bce5591481353703507f8f8f48"
+      "bytes": 6075,
+      "sha256": "cae13a19530d009a01c82ee8909d96fbb94b8a90c2c6a5a924b09d76a99b095f"
     },
     "runtime.json": {
-      "bytes": 45342,
-      "sha256": "2f688501801c32d0c7cbeac2ea6bdbd23a841fd8690901a221454cb63a7a19b1"
+      "bytes": 46263,
+      "sha256": "00e95871898082359ba37dcd0f625bd2d07bb41d3fe01a994376d4b1e3e739f0"
     },
     "sources.lock.json": {
-      "bytes": 4126,
-      "sha256": "0024d51e1703fb57bd5d370cda78029b57bcaf4d8e415b80a02a4267fdfad9ac"
+      "bytes": 5246,
+      "sha256": "76113e65b9f63ae1d4d84eb2bbab615e3b0337b5924fdae7a4286f37a06dcc00"
     },
     "wine-x86-64.tar.gz": {
-      "bytes": 193915664,
-      "sha256": "23d3378b0607240144f17a9b8d8a1b6626c90e73aa7f146fdb8873a5ce002488"
+      "bytes": 193915627,
+      "sha256": "2f198ec88dcff9a64975cbb16ff7fbf8eb2fa04d5c37ac1c49bfd450efb8fe2a"
     }
   },
-  "sourcesArtifactId": 12958965238,
+  "sourcesArtifactId": 12971832532,
   "sourcesArtifact": {
-    "bytes": 876847394,
-    "sha256": "721d59ec818eaab74c27c1b0d7e1fd9e28b0505828f741241a37fa2dded67e7e"
+    "bytes": 877662810,
+    "sha256": "c2fd83866b2b772e4165e3c182ecdf86ffdb41057d09c835057b279444495500"
   },
   "sourceManifest": {
     "bytes": 94425,
-    "sha256": "838f02522e5ee71e0d94e260e7b210d95541e35b7cea6ab5da688993d5eccdf0"
+    "sha256": "d23c08e20b1af40464a1090bac7a7a8793595570e464c3c67647fa8931264fb1"
   },
   "sourceBuildPassed": true,
   "androidRuntimeQualified": false,

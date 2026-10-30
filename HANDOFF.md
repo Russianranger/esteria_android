@@ -108,9 +108,11 @@ ARM64 execution, client/server login or world entry is qualified.
     executable-page protection before client execution. Run41017052972 establishes
     errno13 only for dirty private-file RW→RX; anonymous/clean/direct cases pass.
     Source-owned Wine private-PE copy adaptation is published at824ca6d; source
-    build/host original-versus-opt-in execution run41040860418 is pending. Do not
-    repin the Android fixture until successful same-run runtime/source artifacts
-    and host receipt are verified. No Android policy or target SDK is weakened. Owned authenticated
+    build/host original-versus-opt-in execution run41040860418 now passes with
+    full source export. Its exact test-runtime pin is updated; the next Android
+    workflow must fully validate the877MB source ZIP before APK construction and
+    execution. Local full-source download exceeded the connector size cap; no
+    local full-source validation is claimed. No Android policy or target SDK is weakened. Owned authenticated
     X11/input/audio composition now builds; complete Android execution is separate.
 
 ## Missing content and acceptance
@@ -138,12 +140,20 @@ If the user reports the threshold, finish a concrete checkpoint and stop.
   input/source bytes and image readback before running a guest, without device Docker.
 - Complete real native source-baseline/updater/auth/playerbots qualifications. The
   full50 ConfigMgr native workflow remains distinct from passed x64 source tests.
-- Produce measured stripped server-program/runtime+debug artifacts; original
-  seven-patch worldserver contains2.6GB debug data. The preparatory packager alone
-  does not supply a complete source companion or Android provider.
+- Server derivative41043905821 now has actual21,352,885-byte runtime archive and
+  paired1,082,880,246-byte debug archive; worldserver strips to59,025,784bytes.
+  NativeARM64 program loader/version checks pass; fullSQL/auth still hits the
+  appearance-store prerequisite now implemented. Sourceinputs/notices export is
+  verified, but isolated source rebuild/source closure/Android provider remain work.
 - Pass the adapted Wine host fixture, repin exact successful runtime/source
   artifacts, rerun actual Android x64 reconstructed-client diagnostics, then
   port/qualify the same adaptation in the production ARM64 runtime.
 - Actual Android Surface lifecycle41019374598 passes six groups, exactly two
   connections/two peer EOFs, paused creation/recreation and real AudioTrack clock.
   Complete guest X11/Wine/Adreno presentation remains unqualified.
+
+The reusable phone-side content verifier and fresh-schema journal now consume
+immutable packaged source/module metadata without Git or Docker. Original SQL
+and explicit source-derived appearance adaptation remain separate in receipts.
+Caller still owns the MySQL connection/process and helper generation; app
+activation and compiled updater composition remain to be wired/qualified.

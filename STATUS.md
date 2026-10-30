@@ -188,3 +188,16 @@ debug archive from verified linked inputs. Complete source sealing, measured
 server derivative, Android provider installation and service composition are next.
 Durable native dependency images avoid re-resolving the same Ubuntu snapshot on
 every runtime-only gate. The full local game remains the active objective.
+
+Wine source41040860418 now passes actual default/opt-in PE loading, shared/private
+section/protection/relocation tests and complete source export. The exact new x64
+runtime/source pin is selected for the next mandatory Android qualifier; no
+adapted Android execution or production ARM64 runtime swap is claimed.
+
+Actual server derivative41043905821 is21.35MB compressed/62.89MB installed,
+including three programs,53templates and4provenance files. Its native ARM64
+loader checks pass. Debugs and source/notices remain outside the runtime; complete
+isolated-source rebuild and Android provider are next. A separate fresh-only
+source-derived schema implements the two49/132-byte appearance stores required
+by exact C++ bind/read contracts, with no invented asset rows or updater ledgers.
+Actual storage/restart/fullprepared-statement tests are running separately.

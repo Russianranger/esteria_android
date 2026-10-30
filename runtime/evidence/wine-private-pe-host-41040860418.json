@@ -1,0 +1,373 @@
+{
+  "formatVersion": 1,
+  "scope": "observed-native-linux-x64-wine-private-pe-copy-host-reference",
+  "run": {
+    "id": 41040860418,
+    "head_sha": "824ca6df8ff158e4e38c9a7e9adc67405876f19b",
+    "status": "completed",
+    "conclusion": "success",
+    "path": ".github/workflows/android-wine-runtime.yml",
+    "created_at": "2026-10-30T10:27:15Z",
+    "updated_at": "2026-10-30T11:00:08Z"
+  },
+  "evidenceArtifact": {
+    "id": 12972261131,
+    "bytes": 98597,
+    "sha256": "faf03160d40fc373bbfcc5892452d2f1c053fd1be603b5586ab9090fef73f360",
+    "downloadVerified": true
+  },
+  "qualification": {
+    "bytes": 7560,
+    "sha256": "dd2dc5e1ad333ece5f60e846833debb5e239405769eb16e6957ae27fb0f5ce2a",
+    "receipt": {
+      "formatVersion": 1,
+      "scope": "native-linux-x64-wine-original-vs-private-image-copy",
+      "qualified": true,
+      "androidQualified": false,
+      "arm64Qualified": false,
+      "gameClientQualified": false,
+      "modes": [
+        {
+          "mode": "original",
+          "privateCopyRequested": false,
+          "qualified": true,
+          "captures": {
+            "original-boot.log": {
+              "exitCode": 0,
+              "logBytes": 3913,
+              "logSha256": "a9ef2b206beefc27fdb7dc453b916a4a3bec473d2b518dcae21363035ac9e55d"
+            },
+            "original-fixture.log": {
+              "exitCode": 0,
+              "logBytes": 135,
+              "logSha256": "4148e4870e7916b3d1dc0519b7348fb3ed1979b4efad85d7c921a17cea36fc94"
+            },
+            "original-stop.log": {
+              "exitCode": 0,
+              "logBytes": 0,
+              "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "original-wait.log": {
+              "exitCode": 0,
+              "logBytes": 0,
+              "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          "privateCopyBranchMarkers": 0,
+          "forcedRelocation": true,
+          "sectionProtectionsVerified": true,
+          "initializedDataVerified": true,
+          "zeroFillVerified": true,
+          "dirtyTextExecutableAgain": true,
+          "privateDataIsolated": true,
+          "sharedWritableCrossProcess": true,
+          "backingImagesUnchanged": true,
+          "cleanupFailures": []
+        },
+        {
+          "mode": "private-copy",
+          "privateCopyRequested": true,
+          "qualified": true,
+          "captures": {
+            "private-copy-boot.log": {
+              "exitCode": 0,
+              "logBytes": 4506,
+              "logSha256": "f353e716eb756aa643b4dba91f73231f2ed9efeb2c5fe8d848fecb4e1406b4b1"
+            },
+            "private-copy-fixture.log": {
+              "exitCode": 0,
+              "logBytes": 197,
+              "logSha256": "e66b4829925accea5541186e4fad141d08a690d382d922a50ea69838a8995dcc"
+            },
+            "private-copy-stop.log": {
+              "exitCode": 0,
+              "logBytes": 0,
+              "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "private-copy-wait.log": {
+              "exitCode": 0,
+              "logBytes": 0,
+              "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          "privateCopyBranchMarkers": 2,
+          "forcedRelocation": true,
+          "sectionProtectionsVerified": true,
+          "initializedDataVerified": true,
+          "zeroFillVerified": true,
+          "dirtyTextExecutableAgain": true,
+          "privateDataIsolated": true,
+          "sharedWritableCrossProcess": true,
+          "backingImagesUnchanged": true,
+          "cleanupFailures": []
+        }
+      ],
+      "images": {
+        "exe": {
+          "bytes": 259031,
+          "sha256": "da11181ab238ca4197d9fa93023b3c318dde0f898beea71b6d014da82ba3f8fe",
+          "machine": "x86_64",
+          "sections": [
+            {
+              "name": ".text",
+              "flags": 1610612832,
+              "rawBytes": 32256
+            },
+            {
+              "name": ".data",
+              "flags": 3221225536,
+              "rawBytes": 512
+            },
+            {
+              "name": ".rdata",
+              "flags": 1073741888,
+              "rawBytes": 5120
+            },
+            {
+              "name": ".pdata",
+              "flags": 1073741888,
+              "rawBytes": 1536
+            },
+            {
+              "name": ".xdata",
+              "flags": 1073741888,
+              "rawBytes": 1536
+            },
+            {
+              "name": ".bss",
+              "flags": 3221225600,
+              "rawBytes": 0
+            },
+            {
+              "name": ".idata",
+              "flags": 3221225536,
+              "rawBytes": 3072
+            },
+            {
+              "name": ".CRT",
+              "flags": 3221225536,
+              "rawBytes": 512
+            },
+            {
+              "name": ".tls",
+              "flags": 3221225536,
+              "rawBytes": 512
+            },
+            {
+              "name": ".reloc",
+              "flags": 1107296320,
+              "rawBytes": 512
+            },
+            {
+              "name": "/4",
+              "flags": 1107296320,
+              "rawBytes": 2048
+            },
+            {
+              "name": "/19",
+              "flags": 1107296320,
+              "rawBytes": 73728
+            },
+            {
+              "name": "/31",
+              "flags": 1107296320,
+              "rawBytes": 13312
+            },
+            {
+              "name": "/45",
+              "flags": 1107296320,
+              "rawBytes": 27648
+            },
+            {
+              "name": "/57",
+              "flags": 1107296320,
+              "rawBytes": 8704
+            },
+            {
+              "name": "/70",
+              "flags": 1107296320,
+              "rawBytes": 1024
+            },
+            {
+              "name": "/81",
+              "flags": 1107296320,
+              "rawBytes": 6144
+            },
+            {
+              "name": "/97",
+              "flags": 1107296320,
+              "rawBytes": 31232
+            },
+            {
+              "name": "/113",
+              "flags": 1107296320,
+              "rawBytes": 1536
+            }
+          ]
+        },
+        "dll": {
+          "bytes": 86582,
+          "sha256": "33812e3befd19534a189b1be84ea3db32aa94e4fcdbcd0317b8c2a0f58b20d95",
+          "machine": "x86_64",
+          "sections": [
+            {
+              "name": ".text",
+              "flags": 1610612832,
+              "rawBytes": 5120
+            },
+            {
+              "name": ".data",
+              "flags": 3221225536,
+              "rawBytes": 512
+            },
+            {
+              "name": ".shared",
+              "flags": 3489660992,
+              "rawBytes": 512
+            },
+            {
+              "name": ".rdata",
+              "flags": 1073741888,
+              "rawBytes": 1536
+            },
+            {
+              "name": ".pdata",
+              "flags": 1073741888,
+              "rawBytes": 512
+            },
+            {
+              "name": ".xdata",
+              "flags": 1073741888,
+              "rawBytes": 512
+            },
+            {
+              "name": ".bss",
+              "flags": 3221225600,
+              "rawBytes": 0
+            },
+            {
+              "name": ".edata",
+              "flags": 1073741888,
+              "rawBytes": 512
+            },
+            {
+              "name": ".idata",
+              "flags": 3221225536,
+              "rawBytes": 1024
+            },
+            {
+              "name": ".CRT",
+              "flags": 3221225536,
+              "rawBytes": 512
+            },
+            {
+              "name": ".tls",
+              "flags": 3221225536,
+              "rawBytes": 512
+            },
+            {
+              "name": ".reloc",
+              "flags": 1107296320,
+              "rawBytes": 512
+            },
+            {
+              "name": "/4",
+              "flags": 1107296320,
+              "rawBytes": 1024
+            },
+            {
+              "name": "/19",
+              "flags": 1107296320,
+              "rawBytes": 28672
+            },
+            {
+              "name": "/31",
+              "flags": 1107296320,
+              "rawBytes": 5632
+            },
+            {
+              "name": "/45",
+              "flags": 1107296320,
+              "rawBytes": 6144
+            },
+            {
+              "name": "/57",
+              "flags": 1107296320,
+              "rawBytes": 2560
+            },
+            {
+              "name": "/70",
+              "flags": 1107296320,
+              "rawBytes": 512
+            },
+            {
+              "name": "/81",
+              "flags": 1107296320,
+              "rawBytes": 2560
+            },
+            {
+              "name": "/97",
+              "flags": 1107296320,
+              "rawBytes": 4608
+            },
+            {
+              "name": "/113",
+              "flags": 1107296320,
+              "rawBytes": 512
+            }
+          ]
+        }
+      },
+      "wineExecutable": {
+        "bytes": 14616,
+        "sha256": "7fd2a799b45968f097001c5f02354725d9f21308d85db45d6b1a7389abeb3680"
+      },
+      "wineServer": {
+        "bytes": 693488,
+        "sha256": "e057903b70eee33c7b5366586778d1410aab0e1cfaf606f681f2818cf1ac3110"
+      },
+      "privatePrefixesRemoved": true
+    }
+  },
+  "runtimeArtifact": {
+    "id": 12972375421,
+    "bytes": 193973735,
+    "sha256": "68281be02314df628fe5ddde0b0707ac9ae7d3e07158b9dc57ef8191eb954592",
+    "downloadVerified": true
+  },
+  "runtimeArchive": {
+    "bytes": 193915627,
+    "sha256": "2f198ec88dcff9a64975cbb16ff7fbf8eb2fa04d5c37ac1c49bfd450efb8fe2a"
+  },
+  "runtimeReadback": {
+    "entries": 10191,
+    "fileBytes": 673995738,
+    "linkCount": 964,
+    "componentIdentitiesValidated": true
+  },
+  "runtimeHardlinkBudget": {
+    "copies": 14,
+    "copyBytes": 313010682,
+    "maximumPhysicalFileBytes": 987006420
+  },
+  "sourcesArtifact": {
+    "id": 12971832532,
+    "bytes": 877662810,
+    "sha256": "c2fd83866b2b772e4165e3c182ecdf86ffdb41057d09c835057b279444495500",
+    "successfulSameRunExportVerified": true,
+    "localFullZipReadback": false,
+    "preExecutionFullZipReadback": "required-by-Android-CI"
+  },
+  "sourceManifest": {
+    "bytes": 94425,
+    "sha256": "d23c08e20b1af40464a1090bac7a7a8793595570e464c3c67647fa8931264fb1",
+    "sourcePackages": 158,
+    "originalDebianFiles": 505
+  },
+  "sourceInputsVerified": true,
+  "hostCapturesRevalidated": true,
+  "androidQualified": false,
+  "arm64Qualified": false,
+  "gameClientQualified": false,
+  "gameplayQualified": false
+}

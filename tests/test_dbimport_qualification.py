@@ -8,6 +8,7 @@ import subprocess
 import tarfile
 import tempfile
 import unittest
+import types
 from unittest.mock import Mock, patch
 
 from tools import qualify_dbimport as qualify
@@ -22,6 +23,24 @@ def source_identity(data):
 
 
 class QualificationGuards(unittest.TestCase):
+    def test_phone_content_consumer_gets_complete_installed_bound_source_and_module_object(self):
+        source = dict(commit='f' * 40, patches=[dict(path='reviewed')])
+        manifest = dict(source=source); compiled = dict(enabledModules=['actual'], serverBuild={'sha256': 'a' * 64})
+        verified = types.SimpleNamespace(manifest=manifest, compiled=compiled)
+        with patch.object(qualify.base, 'locked_source', return_value=(source, 'b' * 64)), \
+                patch.object(qualify.product_content, 'verify', return_value=verified) as verify:
+            observed = qualify.verify_runtime_content(Path('/extracted'), Path('/package'), 'c' * 64,
+                Path('/lock'), manifest, compiled)
+        self.assertIs(observed, verified)
+        verify.assert_called_once_with(Path('/extracted'), Path('/package/package-receipt.json'), 'c' * 64,
+                                       source, 'b' * 64, compiled)
+
+    def test_runtime_consumer_mismatch_cannot_reach_native_sql(self):
+        with patch.object(qualify.base, 'locked_source', return_value=({}, 'b' * 64)), \
+                patch.object(qualify.product_content, 'verify', return_value=types.SimpleNamespace(
+                    manifest={'changed': True}, compiled={})), self.assertRaisesRegex(ValueError, 'differs from verified native'):
+            qualify.verify_runtime_content(Path('/extracted'), Path('/package'), 'c' * 64, Path('/lock'), {}, {})
+
     def test_execution_evidence_requires_real_process_creation_and_records_nonzero_child(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary); started = Mock()

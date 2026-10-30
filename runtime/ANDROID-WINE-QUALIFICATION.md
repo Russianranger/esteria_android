@@ -109,8 +109,23 @@ The subsequent source-owned adaptation is explicitly selected with
 `WINE_ANDROID_PRIVATE_PE_COPY=1`; the default Wine path remains unchanged. It
 copies private PE image bytes into anonymous reserved pages, preserves normal
 relocations/final protections, and leaves shared-section mappings on their
-existing path. The host gate compares actual default/opt-in PE behavior before
-the rebuilt runtime can be published. That host gate and a fresh Android Wine
-execution remain pending. No target-SDK, permission, SELinux or device policy
-changes are made; ARM64 instruction-cache and executable-image behavior require
-their own later execution proof.
+existing path. Actual source build41040860418 at
+`824ca6df8ff158e4e38c9a7e9adc67405876f19b` passed both default and selected host
+PE modes, runtime packaging/readback and complete corresponding-source export.
+The independently checked host receipt confirms real DLL execution, forced
+relocation, protections, initialized data/BSS, dirty executable-page restoration,
+private isolation and live shared-section writes. Both modes stopped cleanly;
+the default emitted zero adaptation markers and the selected mode emitted two.
+
+The measured runtime lock selects that successful run's exact runtime/source
+artifacts. Independent local readback verified the 193,915,627-byte runtime,
+10,191 entries, 673,995,738 file bytes, 964 links and required ELF/PE hashes.
+The 877,662,810-byte source ZIP's same-run identity and small source manifest are
+verified; the complete source ZIP was unavailable for local readback because of
+the connector's download limit. The Android workflow must validate every byte,
+descriptor and adaptation source before APK construction or execution. Its new
+consumer check and fresh Android Wine execution remain pending. Public artifact
+identities, the original host receipt and readback counts are retained in
+[`evidence/wine-private-pe-host-41040860418.json`](evidence/wine-private-pe-host-41040860418.json).
+No target-SDK, permission, SELinux or device policy changes are made; ARM64
+instruction-cache and executable-image behavior require their own execution proof.
