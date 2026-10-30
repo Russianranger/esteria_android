@@ -17,6 +17,10 @@ def identity(data):
     return {'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()}
 
 
+def source_identity(data):
+    return identity(data) | {'gitBlob': hashlib.sha1(b'blob ' + str(len(data)).encode() + b'\0' + data).hexdigest()}
+
+
 class QualificationGuards(unittest.TestCase):
     def test_existing_state_never_calls_engine(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -132,11 +136,11 @@ class ContentExtraction(unittest.TestCase):
             path = qualify.base.content.DATABASES[database][1] + '/updates.sql'
             data = b'CREATE TABLE updates (name VARCHAR(255));\n'
             self.manifest['databases'][database] = dict(base=[path], updateOrder=[], executionOrderQualified=True)
-            self.manifest['files'][path] = identity(data)
+            self.manifest['files'][path] = source_identity(data)
             self.payload['source/' + path] = data
         for path in qualify.base.content.MAIN_CONFIG_TEMPLATES:
             data = b'# Synthetic source configuration template\n'
-            self.manifest['files'][path] = identity(data)
+            self.manifest['files'][path] = source_identity(data)
             self.payload['source/' + path] = data
         self.compiled = dict(formatVersion=1, scope='compiled-server-module-selection',
             generatedListsMatchInstalledBinaries=True, source=self.pin, sourceLockSha256='2' * 64,
@@ -158,6 +162,9 @@ class ContentExtraction(unittest.TestCase):
         receipt = dict(formatVersion=1, scope='immutable-server-source-content-package', source=self.pin,
             sourceLockSha256='2' * 64, moduleSelectionVerified=not unqualified, archiveReadBackVerified=True,
             archive=qualify.files.identity(archive), archiveFiles={name: identity(data) for name, data in payload.items()})
+        for name, row in receipt['archiveFiles'].items():
+            if name.startswith('source/') and name[7:] in self.manifest['files']:
+                row.update(origin='server', source=name[7:], gitBlob=self.manifest['files'][name[7:]]['gitBlob'])
         if wrong_hash:
             next(iter(receipt['archiveFiles'].values()))['sha256'] = '0' * 64
         path = self.package / 'package-receipt.json'; path.write_text(json.dumps(receipt))
@@ -179,6 +186,23 @@ class ContentExtraction(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'member digest mismatch'):
             qualify.unpack_content(self.package, digest, self.lock, self.root / 'partial')
         self.assertTrue((self.root / 'partial').exists())
+
+    def test_source_provenance_cannot_be_missing_rebound_or_extended_even_with_valid_bytes(self):
+        self.write()
+        path = self.package / 'package-receipt.json'
+        original = json.loads(path.read_text())
+        selected = next(name for name in original['archiveFiles'] if name.startswith('source/'))
+        for index, change in enumerate(('missing', 'origin', 'source', 'gitBlob', 'extra')):
+            receipt = json.loads(json.dumps(original))
+            row = receipt['archiveFiles'][selected]
+            if change == 'missing':
+                del row['gitBlob']
+            else:
+                row[change] = '0' * 40 if change == 'gitBlob' else 'different-source'
+            path.write_text(json.dumps(receipt))
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            with self.subTest(change=change), self.assertRaisesRegex(ValueError, 'payload identity differs'):
+                qualify.unpack_content(self.package, digest, self.lock, self.root / ('changed-' + str(index)))
 
     def test_manual_sql_cannot_enter_source_payload(self):
         digest = self.write(extra={'source/modules/manual/uninstall.sql': b'DROP TABLE characters;'})

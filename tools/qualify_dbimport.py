@@ -109,7 +109,9 @@ def unpack_content(directory, expected_receipt_sha256, lock_path, destination):
             'package payload differs from source-selected SQL/config/notices/Lua')
     for origin, path, target in payload:
         row = manifest['files' if origin == 'server' else 'elunaFiles'][path]
-        require(inventory[target] == {key: row[key] for key in ('bytes', 'sha256')},
+        expected = {key: row[key] for key in ('bytes', 'sha256', 'gitBlob')}
+        expected.update(origin=origin, source=path)
+        require(inventory[target] == expected,
                 'archive payload identity differs from source inventory')
     for name in DATABASES:
         plan = manifest['databases'][name]

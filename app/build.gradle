@@ -95,6 +95,7 @@ tasks.named('preBuild').configure { dependsOn installerTestFixture }
 def sourcePins = tasks.register('generateSourcePins', Copy) {
     from rootProject.file('sources.lock.json')
     from rootProject.file('runtime/runtime-sources.lock.json')
+    from rootProject.file('runtime/bridges/x11-runtime.lock.json')
     into layout.buildDirectory.dir('generated/sourcePins')
 }
 if (nativeBridge) {
@@ -164,6 +165,7 @@ apply from: 'proot-probe.gradle'
 apply from: 'database-setup.gradle'
 apply from: 'mysql-probe.gradle'
 apply from: 'shader-provider.gradle'
+apply from: 'wine-probe.gradle'
 
 // Exact source-built X11/ALSA payload, separate from the Wine rootfs and saves.
 if (guestBridgeProvider) {

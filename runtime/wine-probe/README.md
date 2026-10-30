@@ -35,4 +35,17 @@ at installation because this pinned Wine revision has no `install-strip` target.
 The recipe uses its actual `install` target with `INSTALL_PROGRAM_FLAGS=-s`;
 the pinned `tools/makedep.c` supplies the correct native/PE `STRIPPROG` for each
 installed program. Silent make mode avoids clipping compiler diagnostics behind
-BuildKit's command-output limit. The corrected runtime build remains pending.
+BuildKit's command-output limit. The corrected source/runtime build and complete
+source export passed in run41011458046 at
+`f963225d900961c3696880bc6c0c537aa741577f`; exact runtime and source artifact bytes
+are now pinned in `runtime-input.lock.json`. The normalized runtime is 193,915,664
+compressed bytes and 673,993,620 regular-file bytes; hardlink-copy fallback can
+require 313,010,682 additional bytes. It contains no initialized Wine prefix.
+The source manifest records 158 source packages and 505 original Debian files.
+
+The Android fixture is documented in `runtime/ANDROID-WINE-QUALIFICATION.md`.
+The source ZIP exceeds the connector's 512 MiB local download limit. The separate
+execution workflow therefore uses the ordinary authorized Actions read API,
+streams its exact 876,847,394-byte archive, and requires full source/descriptor
+validation before building/executing the fixture. Local ZIP/manifest checks do
+not claim that larger source-content validation or an Android execution result.

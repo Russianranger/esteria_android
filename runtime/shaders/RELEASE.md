@@ -4,7 +4,7 @@ The selected dependency is the exact source-backed compiler/translator/helper
 provider introduced at integration `c77db0854c79f2829c0e3394b99609f5455e5bd6`.
 It contains no APK, game assets, generated game shaders or private state.
 
-The proposed prerelease tag is `deps-shader-tools-c77db08-7937274c8379`, targeting
+The published prerelease tag is `deps-shader-tools-c77db08-7937274c8379`, targeting
 that full commit. `dependency-release.lock.json` binds the original compiler
 artifact, exact provider input lock and archive. The seven prepared public files
 are the 10,635,594-byte archive, original input lock, provider descriptor, bundle
@@ -35,8 +35,8 @@ The same preparation has been run locally against the measured267,867,656-byte
 original ZIP and both exact source checkouts. It recreated the expected provider
 archive and all seven release files. Exporting those validated release files back
 to an Android provider produced the same archive and descriptor. This readback
-is packaging evidence only; publication remains pending until a public receipt
-has been obtained and recorded in the release lock.
+is packaging evidence only. The actual publication receipt has now been
+obtained, independently downloaded and recorded in the release lock.
 
 For a local reproduction, with Python3.11+, Git and readelf:
 
@@ -79,3 +79,24 @@ or temporary alternative. Existing output directories are always preserved.
 The Docker compiler recipe and every selected original input remain in the
 archive and exact source revisions as the rebuild path; a changed compiler or
 helper requires a new measured provider and release identity.
+
+## Recorded publication
+
+[The exact prerelease](https://github.com/Russianranger/esteria_android/releases/tag/deps-shader-tools-c77db08-7937274c8379)
+is public as release428717546. Workflow41014702663 at
+`188b24959752fa18241b1362eb407860fc055121` rebuilt the candidate, uploaded only
+missing draft files, and re-downloaded/verified all seven stored assets after
+publication. The884-byte publication receipt artifact SHA-256 is
+`9aef9b7f95c5a58453f17885a5bfef7052d1c52699115e16d53899bf948339cc`;
+its2,382-byte JSON SHA-256 is
+`6d0e8e43e5204ae1e551f73a3564617ce9322f681cab940775e1e66f51ae9a3a`.
+The downloaded receipt is retained in
+[the scoped evidence record](../evidence/shader-dependency-publication-41014702663.json).
+GitHub reports `githubImmutable=false`; the publisher's no-overwrite policy is
+true. No server, Android, imported-content or gameplay qualification changed.
+
+All public asset lengths, hashes and fixed URLs are now recorded, so normal
+`fetch` needs no original Actions artifact. A separate credential-free public
+fetch/export check is added to the preservation workflow; its actual result is
+pending the next run and must not be inferred from the authenticated release API
+readback above.

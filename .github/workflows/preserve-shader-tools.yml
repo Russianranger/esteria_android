@@ -123,9 +123,27 @@ jobs:
         run: |
           python3 tools/release_shader_tools.py verify-published \
             --inputs out/release-candidate --output out/published-release.json --wait-seconds 1200
+      - name: Independently fetch public files without credentials and recreate provider
+        env:
+          GITHUB_TOKEN: ''
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          from tools import release_shader_tools as release
+          lock, pin = release.load_lock()
+          lock['published'] = json.loads(Path('out/published-release.json').read_bytes())
+          release.fetch(release.publication.Github(None), Path('out/anonymous-release'), lock, pin)
+          result = release.export_provider(Path('out/anonymous-release'), Path('out/anonymous-provider'), lock, pin)
+          result.update(credentialFreePublicFetchVerified=True, actionsArtifactRequired=False)
+          Path('out/public-fetch-verified.json').write_bytes(release.shared.encoded(result))
+          print(json.dumps(result, indent=2))
+          PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: shader-tool-publication-receipt
-          path: out/published-release.json
+          path: |
+            out/published-release.json
+            out/public-fetch-verified.json
           if-no-files-found: error
           retention-days: 14

@@ -20,5 +20,52 @@
   },
   "artifactPrefix": "out/turnip/payload/",
   "originalRunConclusion": "failure",
-  "originalRunScope": "Native compiler fixture passed; separate no-GPU driver probe failed. Compiler receipt is independently required."
+  "originalRunScope": "Native compiler fixture passed; separate no-GPU driver probe failed. Compiler receipt is independently required.",
+  "published": {
+    "assets": {
+      "NOTICE.txt": {
+        "bytes": 943,
+        "sha256": "595ee3056f485a66ce61418d935e882d3abf1e07fe48bf4dd839c778fbf2f518",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-shader-tools-c77db08-7937274c8379/NOTICE.txt"
+      },
+      "SHA256SUMS": {
+        "bytes": 523,
+        "sha256": "fb52609b9e1df66792628e4aaadf48ed38ad22ccd988c79cecc288623f9d8c9a",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-shader-tools-c77db08-7937274c8379/SHA256SUMS"
+      },
+      "bundle.json": {
+        "bytes": 4011,
+        "sha256": "6106d53fd5a63438606743f1b9dff142e9dbb19131b10b65b75adf79c5bab48e",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-shader-tools-c77db08-7937274c8379/bundle.json"
+      },
+      "release-manifest.json": {
+        "bytes": 1630,
+        "sha256": "552cd7c51aa28ae13cff8c6ba6ee8e03d676d04bce9bd9b40e9bf133e59165f8",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-shader-tools-c77db08-7937274c8379/release-manifest.json"
+      },
+      "shader-tools-arm64.tar.gz": {
+        "bytes": 10635594,
+        "sha256": "7937274c8379882a045fb93c50ea9bb8575e25d5f769f7d8a3077d1518522c57",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-shader-tools-c77db08-7937274c8379/shader-tools-arm64.tar.gz"
+      },
+      "shader-tools-input-lock.json": {
+        "bytes": 11851,
+        "sha256": "a7a2ceb0d04367817c0a80c58c5fc9120d7e4c623ca3286dcc2ea07b82b697b1",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-shader-tools-c77db08-7937274c8379/shader-tools-input-lock.json"
+      },
+      "shader-tools-provider.json": {
+        "bytes": 12199,
+        "sha256": "768a82490197714e5a96f8cb0ebecd670a3d4c9183538ed055322ea422ae5865",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-shader-tools-c77db08-7937274c8379/shader-tools-provider.json"
+      }
+    },
+    "formatVersion": 1,
+    "githubImmutable": false,
+    "publisherNeverOverwrites": true,
+    "releaseId": 428717546,
+    "repository": "Russianranger/esteria_android",
+    "tag": "deps-shader-tools-c77db08-7937274c8379",
+    "targetCommit": "c77db0854c79f2829c0e3394b99609f5455e5bd6",
+    "url": "https://github.com/Russianranger/esteria_android/releases/tag/deps-shader-tools-c77db08-7937274c8379"
+  }
 }

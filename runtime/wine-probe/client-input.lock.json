@@ -1,0 +1,18 @@
+{
+  "formatVersion": 1,
+  "scope": "measured-reconstructed-x64-diagnostic-inputs",
+  "sourceRevision": "97b347ee034551ea78dc905c3e209667534e6283",
+  "workflowRun": 41007244092,
+  "buildId": "41007244092.1",
+  "artifactId": 12956910089,
+  "artifact": {
+    "bytes": 41353266,
+    "sha256": "096f7a7579c510505f760e578af4495cb85832c34c45a7dfe8597633b1475ac9"
+  },
+  "buildManifestSha256": "b6334088bb4bb9da4afc40022180bf5a67e96d5460a2eef68f16db207bf00c12",
+  "windowsEntryOfflineLoopbackPassed": true,
+  "nativeLoopbackEvidenceSha256": "de013675ef55392641f3eb67fd8e4ec83e6f0a76f5e0b952e5c329f7b3fb9b0a",
+  "androidRuntimeQualified": false,
+  "arm64Qualified": false,
+  "gameplayQualified": false
+}

@@ -1,0 +1,27 @@
+// Emulator-only Wine diagnostics; never enables the production ARM64 runtime.
+def wineProbeProvider = providers.gradleProperty('wineProbeProviderDir').orNull
+android.defaultConfig.buildConfigField 'boolean', 'WINE_PROBE_PACKAGED', wineProbeProvider ? 'true' : 'false'
+if (wineProbeProvider) {
+    def prootProbeProvider = providers.gradleProperty('prootProbeProviderDir').orNull
+    def runtimePackage = providers.gradleProperty('wineProbeRuntimePackage').orNull
+    def clientArtifact = providers.gradleProperty('wineProbeClientArtifact').orNull
+    def clientSource = providers.gradleProperty('wineProbeClientSource').orNull
+    if (providers.gradleProperty('nativeRuntimeBridge').getOrElse('false') != 'true' ||
+        providers.gradleProperty('nativeBridgeAbi').getOrElse('arm64-v8a') != 'x86_64' ||
+        !prootProbeProvider || !runtimePackage || !clientArtifact || !clientSource ||
+        ['prootProviderDir', 'serverRuntimeProviderDir', 'clientRuntimeProviderDir', 'guestBridgeProviderDir',
+         'mysqlProbeProviderDir', 'shaderToolsProviderDir'].any { providers.gradleProperty(it).isPresent() } ||
+        providers.gradleProperty('presentationEmulatorTest').getOrElse('false') == 'true')
+        throw new GradleException('Wine probe requires isolated x86_64 PRoot plus exact runtime/client build inputs')
+    androidComponents.beforeVariants(androidComponents.selector().withBuildType('release')) { variant -> variant.enable = false }
+    def provider = file(wineProbeProvider)
+    android.sourceSets.main.assets.srcDir(new File(provider, 'assets'))
+    android.sourceSets.androidTest.java.srcDir('src/wineProbeAndroidTest/java')
+    def verifyWineProbe = tasks.register('verifyWineProbeProvider', Exec) {
+        workingDir rootProject.projectDir
+        commandLine 'python3', 'tools/verify_android_wine_probe.py', '--provider', provider.absolutePath,
+            '--proot-provider', file(prootProbeProvider).absolutePath, '--runtime-package', file(runtimePackage).absolutePath,
+            '--client-artifact', file(clientArtifact).absolutePath, '--client-source', file(clientSource).absolutePath
+    }
+    tasks.named('preBuild').configure { dependsOn verifyWineProbe }
+}

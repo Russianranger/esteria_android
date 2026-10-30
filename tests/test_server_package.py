@@ -7,9 +7,11 @@ import subprocess
 import tarfile
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from tools import manifest_server_content as content
 from tools import package_server_content as package
+from tools import qualify_dbimport as consumer
 
 
 class Packaging(unittest.TestCase):
@@ -86,6 +88,30 @@ class Packaging(unittest.TestCase):
             self.assertFalse(any(name.startswith('lua_scripts/') for name in names))
             review = json.load(archive.extractfile('metadata/content-manifest.json'))
             self.assertIn('modules/mod-one/data/sql/manual/uninstall.sql', review['files'])
+
+    def test_actual_git_packager_round_trips_through_runtime_consumer_with_full_provenance(self):
+        manifest = copy.deepcopy(self.manifest)
+        manifest['contentSha256Complete'] = True
+        manifest['databases']['auth']['executionOrderQualified'] = True
+        for name in ('characters', 'world'):
+            manifest['databases'][name] = dict(base=[], updateOrder=[], executionOrderQualified=True)
+        compiled = dict(formatVersion=1, scope='compiled-server-module-selection',
+            generatedListsMatchInstalledBinaries=True, source=manifest['source'],
+            sourceLockSha256=manifest['sourceLockSha256'], enabledModules=['mod-one'],
+            configFiles=['one.conf'], binaries={'worldserver': {}, 'dbimport': {}})
+        output = self.root / 'producer'
+        receipt = package.build_package(output, manifest, {'sha256': 'd' * 64, 'bytes': 123},
+            compiled, {'sha256': 'f' * 64, 'bytes': 123}, self.lua,
+            {'sha256': 'e' * 64, 'bytes': 123}, self.server, self.eluna)
+        digest = hashlib.sha256((output / 'package-receipt.json').read_bytes()).hexdigest()
+        with patch.object(consumer.base, 'locked_source', return_value=(manifest['source'], manifest['sourceLockSha256'])):
+            observed, inventory, selected = consumer.unpack_content(output, digest, self.root / 'lock', self.root / 'consumer')
+        self.assertEqual((observed, inventory, selected), (receipt, manifest, compiled))
+        self.assertEqual((self.root / 'consumer/source/data/sql/base/db_auth/base.sql').read_bytes(),
+                         self.data['data/sql/base/db_auth/base.sql'])
+        notice = 'source/' + content.ELUNA + '/docs/LICENSE.md'
+        self.assertEqual(receipt['archiveFiles'][notice]['origin'], 'eluna')
+        self.assertEqual((self.root / 'consumer' / notice).read_bytes(), b'eluna notice')
 
     def test_hash_failure_preserves_old_packages_and_publishes_nothing(self):
         self.build('existing')
