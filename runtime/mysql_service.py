@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 from contextlib import contextmanager
+import errno
 import fcntl
 import json
 import os
@@ -19,6 +20,7 @@ import signal
 import stat
 import subprocess
 import sys
+import tempfile
 import time
 
 if __package__:
@@ -93,8 +95,34 @@ def captured_identity(state: Path, version: str):
         return expected, credential.decode('ascii')
 
 
-def engine_command(mysqld: Path, state: Path, session: Path):
-    socket = session / 'mysql.sock'
+@contextmanager
+def short_socket(work: Path):
+    """One exclusively owned short path; long operation paths remain metadata only.
+
+    PRoot translates a guest UNIX socket to its physical Android filename. A
+    fresh s-XXXXXXXX/m.sock below /work fits where the 32-character operation
+    directory does not. Never reuse or recursively remove a crash leftover.
+    """
+    work = plain_directory(work)
+    directory = Path(tempfile.mkdtemp(prefix='s-', dir=work))
+    original = directory.lstat()
+    try:
+        require(re.fullmatch(r's-[a-z0-9_]{8}', directory.name), 'unexpected socket directory name')
+        yield directory / 'm.sock'
+    finally:
+        current = directory.lstat()
+        require(stat.S_ISDIR(current.st_mode) and (current.st_dev, current.st_ino) ==
+                (original.st_dev, original.st_ino), 'owned socket directory identity changed; retained')
+        try:
+            directory.rmdir()  # Only our still-owned empty directory can disappear.
+        except OSError as error:
+            if error.errno not in (errno.ENOTEMPTY, errno.EEXIST):
+                raise
+            # Forced interruption can leave socket/lock files. Preserve them;
+            # the next run receives a new exclusive path, never an adopted one.
+
+
+def engine_command(mysqld: Path, state: Path, session: Path, socket: Path):
     require(len(os.fsencode(socket)) <= 100, 'database socket path is too long')
     # No defaults file or persisted server-variable overrides can change this
     # listener, datadir or log destination. All engine output goes to a bounded
@@ -259,7 +287,6 @@ def serve(state: Path, session: Path, mysql: Path, mysqld: Path, version: str,
     try:
         with ownership(state):
             expected, password = captured_identity(state, version)
-            command = engine_command(mysqld, state, session)
             try:
                 check_stop()
             except StopRequested as stop:
@@ -269,8 +296,9 @@ def serve(state: Path, session: Path, mysql: Path, mysqld: Path, version: str,
                 check_stop()
             except StopRequested as stop:
                 return stopped_receipt(session, expected, operation, False, stop.reason, False)
-            with db.option_file(session, 'esteria', password) as options:
+            with db.option_file(session, 'esteria', password) as options, short_socket(state.parent) as socket:
                 password = None
+                command = engine_command(mysqld, state, session, socket)
                 capture = db.EngineCapture(command, session / 'engine-private.log')
                 try:
                     deadline = time.monotonic() + startup_timeout

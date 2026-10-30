@@ -120,11 +120,46 @@ class ServiceGuards(unittest.TestCase):
             service.preflight_engine(executable, VERSION)
 
     def test_engine_arguments_cannot_enable_defaults_upgrade_or_remote_listener(self):
-        command = service.engine_command(Path('/usr/sbin/mysqld'), self.state, self.session)
+        command = service.engine_command(Path('/usr/sbin/mysqld'), self.state, self.session, self.root / 's-fixture0/m.sock')
         for item in ('--no-defaults', '--persisted-globals-load=OFF', '--upgrade=NONE',
                      '--bind-address=127.0.0.1', '--port=13306', '--mysqlx=OFF'):
             self.assertIn(item, command)
         self.assertFalse(any(x.startswith(('--initialize', '--defaults-file', '--password')) for x in command))
+
+    def test_short_socket_is_exclusive_private_and_keeps_operation_pid_identity(self):
+        with service.short_socket(self.root) as first:
+            self.assertEqual(first.name, 'm.sock')
+            self.assertEqual(first.parent.stat().st_mode & 0o777, 0o700)
+            with service.short_socket(self.root) as second:
+                self.assertNotEqual(first.parent, second.parent)
+            self.assertFalse(second.parent.exists())
+            command = service.engine_command(Path('/usr/sbin/mysqld'), self.state, self.session, first)
+            self.assertIn('--socket=' + str(first), command)
+            self.assertIn('--pid-file=' + str(self.session / 'mysql.pid'), command)
+        self.assertFalse(first.parent.exists())
+        # Physical Android expansion, rather than only the shorter PRoot name.
+        physical = Path('/data/user/0/io.github.russianranger.esteria/files/state/server-work')
+        self.assertGreater(len(os.fsencode(physical / 'mysql-sessions' / ('1'*32) / 'mysql.sock')), 108)
+        self.assertLessEqual(len(os.fsencode(physical / first.parent.name / first.name)), 100)
+
+    def test_short_socket_preserves_nonempty_crash_leftovers_and_never_reuses_them(self):
+        with service.short_socket(self.root) as first:
+            first.write_bytes(b'owned interruption fixture')
+        self.assertEqual(first.read_bytes(), b'owned interruption fixture')
+        with service.short_socket(self.root) as second:
+            self.assertNotEqual(first.parent, second.parent)
+        self.assertEqual(first.read_bytes(), b'owned interruption fixture')
+        link = self.root / 'linked-work'; link.symlink_to(self.root, target_is_directory=True)
+        with self.assertRaises(service.ServiceError):
+            with service.short_socket(link): pass
+
+    def test_short_socket_refuses_cleanup_of_replaced_directory(self):
+        with self.assertRaisesRegex(service.ServiceError, 'identity changed'):
+            with service.short_socket(self.root) as socket:
+                socket.parent.rename(self.root / 'original-owned-directory')
+                socket.parent.mkdir()
+                (socket.parent / 'unrelated').write_bytes(b'preserve')
+        self.assertEqual((socket.parent / 'unrelated').read_bytes(), b'preserve')
 
     def test_query_deadline_and_cancellation_precede_sql(self):
         inner = Mock(); check = Mock()
