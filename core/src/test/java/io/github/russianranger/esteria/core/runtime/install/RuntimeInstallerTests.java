@@ -23,9 +23,12 @@ import java.util.zip.GZIPOutputStream;
 public final class RuntimeInstallerTests {
     interface Test {void run()throws Exception;}
     private static int passed;
+    private static Path temporaryRoot;
     private static final RuntimePackagePlan.Limits LIMITS=new RuntimePackagePlan.Limits(50000,128L<<20,256L<<20,4096,32L<<20);
     private static final URI URI_PIN=URI.create("https://example.invalid/runtime.tar.gz");
     public static void main(String[] args)throws Exception{
+        passed=0;
+        temporaryRoot=args.length==0?null:java.nio.file.Paths.get(args[0]).toRealPath();
         run("atomic install, safe guest links and cached repeat",RuntimeInstallerTests::installation);
         run("cancel and resume verified files without activation",RuntimeInstallerTests::resume);
         run("torn resume journal and changed staged file recover",RuntimeInstallerTests::journalRecovery);
@@ -48,7 +51,7 @@ public final class RuntimeInstallerTests {
     static void run(String name,Test test)throws Exception{test.run();passed++;System.out.println("PASS "+name);}
     static void check(boolean value,String reason){if(!value)throw new AssertionError(reason);}
     static void fail(Test test)throws Exception{try{test.run();}catch(IOException expected){return;}throw new AssertionError("Expected IOException");}
-    static Path temp()throws IOException{return Files.createTempDirectory("esteria-runtime-test-").toRealPath();}
+    static Path temp()throws IOException{return (temporaryRoot==null?Files.createTempDirectory("esteria-runtime-test-"):Files.createTempDirectory(temporaryRoot,"runtime-test-")).toRealPath();}
     static byte[] bytes(String text){return text.getBytes(StandardCharsets.UTF_8);}
     static String sha(byte[] data){return RuntimeFiles.hex(RuntimeFiles.digest().digest(data));}
     static final class Member {

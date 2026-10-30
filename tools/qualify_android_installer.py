@@ -1,0 +1,118 @@
+#!/usr/bin/env python3
+"""Run filesystem/update contracts only on a disposable Android 13 x64 emulator."""
+from __future__ import annotations
+import argparse
+import hashlib
+import json
+import pathlib
+import re
+import subprocess
+import time
+import threading
+
+PACKAGE = 'io.github.russianranger.esteria'
+TEST = PACKAGE + '.core.runtime.install.RuntimeInstallationInstrumentedTest'
+
+def digest(path):
+    value = hashlib.sha256()
+    with path.open('rb') as stream:
+        for chunk in iter(lambda: stream.read(131072), b''):
+            value.update(chunk)
+    return value.hexdigest()
+
+def instrument_passed(output):
+    return bool(re.search(r'^OK \(1 test\)\s*$', output, re.M) and
+                re.search(r'^INSTRUMENTATION_CODE: -1\s*$', output, re.M) and
+                not re.search(r'FAILURES!!!|INSTRUMENTATION_FAILED|Process crashed|INSTRUMENTATION_STATUS_CODE: -[12]', output))
+
+def run_bounded(words, destination, timeout, limit=2 * 1024 * 1024):
+    """Drain the child continuously while retaining at most limit bytes."""
+    errors = []
+    retained = 0
+    truncated = False
+    with destination.open('xb') as log:
+        process = subprocess.Popen(words, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        def drain():
+            nonlocal retained, truncated
+            try:
+                while True:
+                    chunk = process.stdout.read(65536)
+                    if not chunk:
+                        break
+                    keep = min(len(chunk), limit - retained)
+                    log.write(chunk[:keep])
+                    retained += keep
+                    truncated = truncated or keep != len(chunk)
+            except Exception as error:
+                errors.append(error)
+        reader = threading.Thread(target=drain, daemon=True)
+        reader.start()
+        timed_out = False
+        try:
+            code = process.wait(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            timed_out = True
+            process.kill()
+            code = process.wait()
+        reader.join(timeout=5)
+        if reader.is_alive():
+            raise RuntimeError('Diagnostic pipe did not close after process exit')
+        process.stdout.close()
+        if errors:
+            raise RuntimeError('Diagnostic drain failed') from errors[0]
+        if timed_out:
+            raise RuntimeError('Command timed out; bounded log retained')
+    if truncated:
+        raise RuntimeError('Command exceeded diagnostic limit; bounded log retained')
+    return code, destination.read_text(errors='replace')
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--adb', default='adb')
+    parser.add_argument('--initial-apk', type=pathlib.Path, required=True)
+    parser.add_argument('--update-apk', type=pathlib.Path, required=True)
+    parser.add_argument('--test-apk', type=pathlib.Path, required=True)
+    parser.add_argument('--output', type=pathlib.Path, required=True)
+    args = parser.parse_args()
+    args.output.mkdir(parents=True, exist_ok=False)
+    def command(label, words, timeout=180, allow_failure=False):
+        destination = args.output / (label + '.log')
+        result, text = run_bounded([args.adb, *words], destination, timeout)
+        if result and not allow_failure:
+            raise RuntimeError(label + ' failed; see retained log')
+        return result, text
+    _, serial = command('serial', ['get-serialno'])
+    if not re.fullmatch(r'emulator-[0-9]+', serial.strip()):
+        raise RuntimeError('Qualification refuses physical/remote devices')
+    properties = {}
+    for name in ('ro.kernel.qemu', 'ro.build.version.sdk', 'ro.product.cpu.abi', 'ro.build.fingerprint'):
+        _, value = command(name, ['shell', 'getprop', name])
+        properties[name] = value.strip()
+    if (properties['ro.kernel.qemu'], properties['ro.build.version.sdk'], properties['ro.product.cpu.abi']) != ('1', '33', 'x86_64'):
+        raise RuntimeError('Requires a disposable Android 13 x86_64 emulator')
+    _, existing = command('preexisting-package', ['shell', 'pm', 'path', PACKAGE], allow_failure=True)
+    if 'package:' in existing:
+        raise RuntimeError('Refusing to overwrite a preexisting application installation')
+    artifacts = {name: {'bytes': path.stat().st_size, 'sha256': digest(path)} for name, path in (
+        ('initialApk', args.initial_apk), ('updateApk', args.update_apk), ('testApk', args.test_apk))}
+    command('install-initial', ['install', str(args.initial_apk)])
+    command('install-tests', ['install', str(args.test_apk)])
+    def test(method):
+        _, output = command(method, ['shell', 'am', 'instrument', '-w', '-r', '-e', 'class',
+            TEST + '#' + method, PACKAGE + '.test/androidx.test.runner.AndroidJUnitRunner'], timeout=600)
+        if not instrument_passed(output):
+            raise RuntimeError(method + ' did not report one successful test')
+    test('runtimeContracts')
+    test('seedBeforeUpdate')
+    command('install-update-preserving-data', ['install', '-r', str(args.update_apk)])
+    test('verifyAfterUpdate')
+    receipt = dict(formatVersion=1, scope='android-13-x86_64-installer-and-apk-update',
+        emulatorProperties=properties, artifacts=artifacts, runtimeContractGroups=17,
+        runtimeFilesystemQualified=True, sameJobDebugKeyUpdatePreservedRuntimeAndSentinel=True,
+        userSigningIdentityQualified=False, arm64GuestExecuted=False, gameplayQualified=False,
+        completedAtUnix=int(time.time()))
+    (args.output / 'qualification.json').write_text(json.dumps(receipt, indent=2) + '\n')
+    print(json.dumps(receipt, indent=2))
+
+if __name__ == '__main__':
+    main()

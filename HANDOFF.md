@@ -19,8 +19,8 @@ server/Wine jobs must not be converted into successful evidence without logs.
    is `08e6d453733cff08f47eeb76dec5211749594753`; full ARM64/x64 builds and
    native ARM64 Wine software Vulkan passed in `40986534025`. Codec also passed
    `40985737329`. Neither starts the full game.
-2. Publish/run the pending actual-EXE entry check from the client branch using
-   the newly pinned integration Wine harness. Verify Windows ARM64/x64 and native
+2. Inspect actual-EXE entry CI `40989834370` at client
+   `f75c2c71d9bb76a6707bfb68b2bf615db544e5bf`, pinned to integration harness `9ee80cd`. Verify Windows ARM64/x64 and native
    Linux ARM64 receipts, namespace completion and actual process exit. Entry check
    deliberately does not call CommonMain or consume game assets.
 3. Inspect server run `40987376145` after the third Eluna include patch. Continue
@@ -31,8 +31,10 @@ server/Wine jobs must not be converted into successful evidence without logs.
    Linux x64/ARM64 descendant ownership. Actual Android execution remains open.
    The Java runtime installer has passed the full pinned archive on Linux with
    64 MiB heap. Continue process-owner adapter and Android filesystem/execution
-   qualification; see `runtime/ANDROID-INSTALLATION.md` and `runtime/proot/README.md`.
-5. Inspect the new CI build of the reviewed, separately pinned Ubuntu 24.04 server/MySQL rootfs.
+   qualification; the new Android13 x86_64 installer/APK-update workflow is compiled
+   but pending execution. See `runtime/ANDROID-INSTALLATION.md` and `runtime/proot/README.md`.
+5. Dependency image/MySQL/source-capture CI `40989666380` passed; continue verified
+   GNU rootfs packaging and actual server library closure.
    Do not combine its glibc 2.39 binaries with Debian 12 Wine's glibc 2.36.
    Keep all mutable databases outside replaceable runtime generations.
 6. Qualify actual fresh game schemas with dbimport and the separate playerbots

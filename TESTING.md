@@ -72,3 +72,18 @@ Do not ask the owner to install a foundation APK. The main Thor test comes after
 
 ## Future consolidated Thor test
 Install/update with the stable signing identity; import verified data; start local play; create/select a character; move/look with controller; fight/loot/equip/quest; summon a small supported bot group; verify audio; exit/relaunch and confirm saves; repeat with networking disabled. Export one support bundle. Exact instructions and artifact identification must accompany the qualified candidate, not this preliminary gate description.
+
+## Android filesystem and APK-update instrumentation
+
+`.github/workflows/android-instrumentation.yml` builds an AndroidX instrumentation
+APK and two application versions, then runs only on a fresh Android 13 x86_64
+emulator. It reuses the same 17 installer contracts in app-private storage, stages
+a runtime and separate persistent-state marker, installs version 2 with `adb
+install -r`, and verifies both survive with zero runtime recopy. The harness
+refuses a physical device or preexisting app and requires an explicit completed
+JUnit result for each phase. It records APK hashes and emulator properties.
+
+Local instrumentation compile and Android lint pass. Emulator execution is pending
+CI. A successful run would qualify these Android filesystem/update behaviors, not
+ARM64 PRoot/Wine, audio/display, gameplay, or the user's persistent signing key.
+Both test versions use one isolated CI debug key.

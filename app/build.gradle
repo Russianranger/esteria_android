@@ -13,7 +13,8 @@ android {
         applicationId 'io.github.russianranger.esteria'
         minSdk 26
         targetSdk 35
-        versionCode 1
+        versionCode providers.gradleProperty('buildVersionCode').getOrElse('1').toInteger()
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         versionName '0.1.0-dev'
         buildConfigField 'String', 'SOURCE_REVISION', '"' + providers.gradleProperty('sourceRevision').getOrElse('local-uncommitted').replaceAll('[^a-zA-Z0-9._-]', '_') + '"'
         buildConfigField 'String', 'CLIENT_REVISION', '"' + clientRevision + '"'
@@ -47,7 +48,20 @@ android {
         }
     }
 }
-dependencies { implementation project(':core') }
+dependencies {
+    implementation project(':core')
+    androidTestImplementation 'androidx.test:runner:1.6.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+}
+
+// Reuse the exact host installer contracts on Android's real app-private filesystem.
+def installerTestFixture = tasks.register('copyInstallerTestFixture', Copy) {
+    from rootProject.file('core/src/test/java')
+    include '**/runtime/install/RuntimeInstallerTests.java'
+    into layout.buildDirectory.dir('generated/installerTestFixture')
+}
+android.sourceSets.androidTest.java.srcDir(layout.buildDirectory.dir('generated/installerTestFixture'))
+tasks.named('preBuild').configure { dependsOn installerTestFixture }
 
 // Package the authoritative lock file verbatim. Support exports distinguish source
 // pins from qualified runtime binaries; these pins alone never enable gameplay.

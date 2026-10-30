@@ -89,5 +89,13 @@ database CI tests real engines; ordinary Python discovery skips those fixtures.
 app setup adapter and bounded Java installer. [runtime/SQL-PACKAGING.md](runtime/SQL-PACKAGING.md)
 documents the source-backed module selection and reproducible GNU content archive.
 
+## Android instrumentation builds
+
+`./gradlew :app:assembleDebugAndroidTest` builds the pinned AndroidX runner and
+reuses the core installer test source directly. `-PbuildVersionCode=<positive-integer>`
+selects an increasing application version for update qualification. The emulator
+workflow tests versions 1 and 2 with the same job-local debug key; these are internal
+checks, not user-deliverable update candidates.
+
 ## Signing and reproducibility
 Keep `*.jks`, `*.keystore`, private runtime configurations and game assets out of Git. A user-deliverable development APK must use one persistent privately stored key and carry the application/client/server source revisions and runtime hashes. This is not yet a bit-identical reproducible APK promise: SDK/compiler/runtime package locks and release signing qualification remain to be completed.
