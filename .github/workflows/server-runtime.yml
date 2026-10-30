@@ -7,11 +7,19 @@ on:
       - runtime/mysql_bootstrap.py
       - tests/test_mysql_bootstrap.py
       - tests/test_server_runtime_inputs.py
+      - tests/test_server_runtime_package.py
+      - tools/package_server_runtime.py
+      - tools/prepare_runtime.py
+      - tools/package_server_content.py
       - .github/workflows/server-runtime.yml
   pull_request:
     paths:
       - runtime/server/**
       - tests/test_server_runtime_inputs.py
+      - tests/test_server_runtime_package.py
+      - tools/package_server_runtime.py
+      - tools/prepare_runtime.py
+      - tools/package_server_content.py
       - .github/workflows/server-runtime.yml
   workflow_dispatch:
     inputs:
@@ -33,7 +41,7 @@ jobs:
       - name: Check source pin contracts on native ARM64
         run: |
           test "$(uname -m)" = aarch64
-          python3 -m unittest tests.test_server_runtime_inputs -v
+          python3 -m unittest tests.test_server_runtime_inputs tests.test_server_runtime_package -v
           mkdir -p out/server-runtime
       - name: Build exact Ubuntu snapshot dependency image
         run: |
@@ -78,6 +86,18 @@ jobs:
               serverIncluded=False, androidRuntimeQualified=False, gameLoginQualified=False)
           (root / 'mysql-qualification.json').write_text(json.dumps(receipt, indent=2) + '\n')
           PY
+      - name: Package a fresh dependency rootfs without database state
+        run: |
+          container=$(docker create esteria-server-runtime:qualification)
+          trap 'docker rm -f "$container" >/dev/null' EXIT
+          docker export "$container" > out/server-runtime-export.tar
+          python3 tools/package_server_runtime.py \
+            --docker-export out/server-runtime-export.tar \
+            --runtime-metadata out/server-runtime/server-runtime.json \
+            --output out/server-runtime-package \
+            > out/server-runtime/package.log 2>&1
+          cp out/server-runtime-package/package-receipt.json out/server-runtime/runtime-package-receipt.json
+          rm out/server-runtime-export.tar
       - name: Download authenticated corresponding sources for installed packages
         if: github.event_name != 'workflow_dispatch' || inputs.capture_sources
         run: |
@@ -85,15 +105,39 @@ jobs:
             --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
             --output type=local,dest=out/server-runtime/sources runtime/server \
             > out/server-runtime/source-build.log 2>&1
+      - name: Retain small corresponding-source receipts separately
+        if: github.event_name != 'workflow_dispatch' || inputs.capture_sources
+        run: cp out/server-runtime/sources/SOURCE-MANIFEST.json out/server-runtime/source-manifest.json
       - name: Make owned diagnostic/source artifacts readable
         if: always()
         run: sudo chown -R "$(id -u):$(id -g)" out/server-runtime
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
-          name: unqualified-server-dependencies-${{ github.sha }}
+          name: server-dependency-evidence-${{ github.sha }}
           path: |
-            out/server-runtime
+            out/server-runtime/*.json
+            out/server-runtime/*.txt
+            out/server-runtime/*.log
+            out/server-runtime/mysql
             runtime/server
             LICENSE
+          retention-days: 14
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: unqualified-server-runtime-arm64-${{ github.sha }}
+          path: out/server-runtime-package
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: github.event_name != 'workflow_dispatch' || inputs.capture_sources
+        with:
+          name: server-runtime-corresponding-sources-${{ github.sha }}
+          path: |
+            out/server-runtime/sources
+            runtime/server
+            LICENSE
+          if-no-files-found: error
+          compression-level: 0
           retention-days: 14

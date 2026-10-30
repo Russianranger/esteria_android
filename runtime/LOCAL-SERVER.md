@@ -176,3 +176,19 @@ Their real update ledgers and all post-update loopback realm checks remain requi
 before game launch. Existing saves require a verified backup/restore and a staged,
 qualified version transition; base SQL must never be replayed over them. See
 [SQL-PACKAGING.md](SQL-PACKAGING.md) for exact source behavior, commands and gates.
+
+The native ARM64 base test now has measured passing evidence:
+[run 40991449039](https://github.com/Russianranger/esteria_android/actions/runs/40991449039),
+integration `57b635e0abaf59c5a59becfca2a064640d8185fe`, loaded all 468 source bases
+into MySQL `8.0.46-0ubuntu0.24.04.4` and preserved all expected tables/markers across
+a clean restart with external networking disabled. This validates base import on
+Linux ARM64 only.
+
+The server build workflow additionally prepares a separate
+`tools/qualify_dbimport.py` test after verified binaries and their matching content
+package exist. It uses the actual updater for auth/characters/world, verifies its
+selected update ledger and prepared-statement success, then tests same-revision
+reentry and restart persistence. It never adopts existing state or manually
+replays base/update SQL. Playerbots, final application readiness, saved-state
+upgrades and Android gameplay remain separately gated. Successful compiled updater
+execution is still pending; implementation and unit tests are not runtime evidence.

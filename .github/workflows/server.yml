@@ -9,6 +9,13 @@ on:
       - tools/manifest_server_content.py
       - tools/manifest_server_modules.py
       - tools/package_server_content.py
+      - tools/qualify_dbimport.py
+      - tests/test_dbimport_qualification.py
+      - tools/qualify_base_sql.py
+      - tools/render_server_config.py
+      - runtime/mysql_bootstrap.py
+      - runtime/provision_local_realm.py
+      - runtime/server/**
       - runtime/server-lua-map.json
       - tests/native/**
       - tools/verify_server_build.py
@@ -23,6 +30,13 @@ on:
       - tools/manifest_server_content.py
       - tools/manifest_server_modules.py
       - tools/package_server_content.py
+      - tools/qualify_dbimport.py
+      - tests/test_dbimport_qualification.py
+      - tools/qualify_base_sql.py
+      - tools/render_server_config.py
+      - runtime/mysql_bootstrap.py
+      - runtime/provision_local_realm.py
+      - runtime/server/**
       - runtime/server-lua-map.json
       - tests/native/**
       - tools/verify_server_build.py
@@ -38,7 +52,7 @@ concurrency:
 jobs:
   server:
     runs-on: ubuntu-24.04-arm
-    timeout-minutes: 180
+    timeout-minutes: 240
     env:
       CCACHE_DIR: ${{ github.workspace }}/.ccache-server
       CCACHE_BASEDIR: ${{ github.workspace }}
@@ -102,7 +116,7 @@ jobs:
           -Isources/server/src/common -Isources/server/src/common/Platform
           -Isources/server/src/server/game/LuaEngine/hooks tests/native/eluna_hooks.cpp
       - name: Verify server artifact checker behavior
-        run: python3 -m unittest tests.test_server_build -v
+        run: python3 -m unittest tests.test_server_build tests.test_dbimport_qualification -v
       - name: Configure ARM64 server
         run: |
           set -o pipefail
@@ -173,6 +187,72 @@ jobs:
             out/server-content/
             out/server-modules.json
             out/server-content-manifest.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Build pinned MySQL dependencies for compiled updater qualification
+        run: |
+          mkdir -p out/dbimport-evidence out/dbimport-private
+          docker build --platform linux/arm64 --target runtime \
+            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
+            -t esteria-dbimport:qualification runtime/server \
+            > out/dbimport-evidence/image-build.log 2>&1
+          container=$(docker create esteria-dbimport:qualification)
+          trap 'docker rm -f "$container" >/dev/null' EXIT
+          docker cp "$container:/etc/esteria-server-runtime.json" out/dbimport-evidence/server-runtime.json
+          docker image inspect esteria-dbimport:qualification --format '{{.Id}}' > out/dbimport-evidence/image-id.txt
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib
+          runtime = json.loads(pathlib.Path('out/dbimport-evidence/server-runtime.json').read_text())
+          digest = hashlib.sha256(pathlib.Path('out/server-content/package-receipt.json').read_bytes()).hexdigest()
+          with open(os.environ['GITHUB_ENV'], 'a') as output:
+              output.write('ESTERIA_DBIMPORT_MYSQL_VERSION=' + runtime['expectedMysqlSqlVersion'] + '\n')
+              output.write('ESTERIA_DBIMPORT_CONTENT_SHA256=' + digest + '\n')
+          PY
+      - name: Qualify actual compiled updater and same-revision persistence without external network
+        run: |
+          docker run --rm --init --network none \
+            --env PYTHONDONTWRITEBYTECODE=1 \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/dbimport-private,dst=/state" \
+            --workdir /qualification esteria-dbimport:qualification \
+            python3 tools/qualify_dbimport.py \
+            --install /qualification/out/server-install --content /qualification/out/server-content \
+            --content-receipt-sha256 "$ESTERIA_DBIMPORT_CONTENT_SHA256" \
+            --mysql /usr/bin/mysql --mysqld /usr/sbin/mysqld \
+            --expected-version "$ESTERIA_DBIMPORT_MYSQL_VERSION" --output /state/run \
+            > out/dbimport-evidence/qualification.log 2>&1
+      - name: Collect compiled updater receipts and bounded redacted diagnostics only
+        if: always() && steps.verify-artifacts.outcome == 'success'
+        run: |
+          mkdir -p out/dbimport-evidence
+          sudo python3 - <<'PY'
+          import hashlib, json, pathlib, shutil
+          source = pathlib.Path('out/dbimport-private/run')
+          target = pathlib.Path('out/dbimport-evidence')
+          names = ['qualification.json', 'mysql-initialize-engine.log', 'mysql-bootstrap-engine.log',
+                   'mysql-base-engine.log', 'mysql-base-restart-engine.log',
+                   'dbimport-first.log', 'dbimport-second.log']
+          for name in names:
+              path = source / name
+              if path.is_file():
+                  shutil.copyfile(path, target / name)
+          receipt = target / 'qualification.json'
+          runtime = target / 'server-runtime.json'
+          if receipt.is_file() and runtime.is_file():
+              metadata = dict(formatVersion=1, scope='native-arm64-disposable-compiled-dbimport',
+                  qualificationSha256=hashlib.sha256(receipt.read_bytes()).hexdigest(),
+                  runtimeManifestSha256=hashlib.sha256(runtime.read_bytes()).hexdigest(),
+                  externalNetworkDisabled=True, existingSaveUpgradesQualified=False,
+                  playerbotsRuntimeQualified=False, androidRuntimeQualified=False, gameplayQualified=False)
+              (target / 'environment-receipt.json').write_text(json.dumps(metadata, indent=2) + '\n')
+          PY
+          sudo chown -R "$(id -u):$(id -g)" out/dbimport-evidence
+      - name: Retain compiled updater qualification evidence
+        if: always() && steps.verify-artifacts.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dbimport-qualification-${{ github.sha }}
+          path: out/dbimport-evidence
           if-no-files-found: error
           retention-days: 14
       - name: Retain installed unqualified binaries even when verification fails

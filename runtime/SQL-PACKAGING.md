@@ -341,3 +341,78 @@ Focused guard checks:
 ```sh
 python3 -m unittest tests.test_base_sql -v
 ```
+
+## Measured native ARM64 base result
+
+[Base SQL run 40991449039](https://github.com/Russianranger/esteria_android/actions/runs/40991449039)
+at integration `57b635e0abaf59c5a59becfca2a064640d8185fe` passed the real import and
+clean restart test against **MySQL 8.0.46-0ubuntu0.24.04.4**. All 468 source files
+completed; the exact expected table sets were auth 22, characters 108, world 309
+and playerbots 29. Every disposable persistence marker survived restart. The
+container had external networking disabled throughout initialization/import/restart.
+
+Artifact `12949681239` was downloaded and its ZIP SHA-256 verified as
+`15a98a60a52030d66b969a481ece84732273f2f7768e2328502823c9e1de1c96`.
+The qualification receipt SHA-256 is
+`b3ec7962d19bfe816a36e83b9d89a8362d5350f49e7e7ebe50d5e139246f2c03`;
+the measured runtime manifest SHA-256 is
+`3aa480f48fd36cea1253557976163dc2da0707eef72dbef18d028196888b05b1`.
+This establishes base SQL compatibility on native ARM64 Linux, not complete game
+schemas or Android execution. The base fixture for this run is bound to its exact
+integration source lock; its manifest SHA differs from the earlier local staging
+record because the pinned client revision advanced before publication.
+
+## Compiled updater qualification
+
+`tools/qualify_dbimport.py` is the subsequent disposable qualification. The server
+workflow invokes it only after the actual ARM64 build, installed artifact check,
+compiled-module receipt and source-content package complete successfully. It runs
+inside the same pinned dependency image with external networking disabled.
+
+```sh
+python3 tools/qualify_dbimport.py \
+  --install /qualification/out/server-install \
+  --content /qualification/out/server-content \
+  --content-receipt-sha256 EXACT_PACKAGE_RECEIPT_SHA256 \
+  --mysql /usr/bin/mysql --mysqld /usr/sbin/mysqld \
+  --expected-version EXACT_PINNED_MYSQL_VERSION --output /state/new-fixture
+```
+
+The tool requires a completely new private fixture. It verifies the external
+package-receipt digest, archive digest, every archive member, source-selection
+manifest and compiled module list before initializing MySQL. Archive extraction
+uses the bounded GNU reader, accepts only the expected regular files, and excludes
+manual SQL. Every installed ELF and the selected installed `dbimport.conf.dist`
+template must match the exact server-build receipt; that receipt must match the
+compiled-module proof and current source lock.
+
+The actual dbimport executable performs base population, source-ledger updates,
+auto-discovered module SQL and prepared-statement setup. The harness does not
+manually replay these SQL files. It supplies loopback-only private configuration,
+uses no inherited database environment overrides, never passes `--dry-run` or
+`--version`, and treats a nonzero exit as a preserved failed fixture. Owned process
+groups and bounded private logs cover the updater's external MySQL subprocesses.
+
+After successful first import it checks every selected auth/character/world update
+name and state, plus SHA-1 hashes for non-archived entries. The archived hash skip
+matches the audited upstream default; it is not full archived-file revalidation.
+It inserts disposable markers, reruns the same revision, requires unchanged table
+sets and update ledgers, then checks markers and ledgers again after clean MySQL
+restart. This is same-revision reentry evidence, never an upgrade to user saves.
+
+The exact realmlist schema and loopback row are checked/reasserted after this
+three-database updater has completed. This is only a fixture component check: the
+final application gate remains false until all services, including the distinct
+playerbots loader, complete their updates and the authenticated endpoint is checked
+again. The harness verifies that playerbots stays empty because dbimport does not
+register it. It does not start auth/world servers, activate Lua, create characters
+or claim a complete schema/content set.
+
+Only receipts and bounded redacted engine/updater logs are uploaded. Private
+credentials, configuration, SQL copies and initialized databases remain outside
+artifacts. The tool and focused guards are implemented; successful compiled-updater
+execution remains pending the real server build and qualification run.
+
+```sh
+python3 -m unittest tests.test_dbimport_qualification -v
+```

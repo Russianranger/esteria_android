@@ -60,16 +60,21 @@ exact raw version, including the Ubuntu suffix.
 
 This environment has no Docker executable/daemon available, so the recipe has
 not been built locally. Unit tests cover architecture/source inventory and pin
-consistency. Real native ARM64 build, database initialization/persistence and
-the actual server ELF library closure remain required CI gates.
+consistency. The actual server ELF library closure and Android execution remain required
+gates. Native ARM64 CI run `40989666380` at integration commit
+`9ee80cd31b079e6dab8b41de2429030447665cf5` passed the real image build and
+offline MySQL initialization, promotion, restart and persisted-row test. It
+also completed authenticated corresponding-source export. These results
+establish dependency/database behavior in a Linux container only.
 
 `.github/workflows/server-runtime.yml` builds this image on an ARM64 runner,
 recovers measured metadata, and runs the existing fresh MySQL initialization,
 atomic promotion, restart and persistence test inside the image with external
-network disabled. It then builds the corresponding-source export. The authored
-workflow has not yet supplied a passing run. Its artifacts are internal build
-evidence/source companions; a final installable runtime archive still needs
-packaging and Android qualification.
+network disabled. It then builds the corresponding-source export. Its artifacts are internal build evidence/source companions. The first
+passing combined artifact was 948,408,822 bytes; evidence, runtime and sources
+are now separate artifacts so inspection does not require the large source
+download. The normalized rootfs package still needs its own CI readback and
+Android qualification.
 
 ## Corresponding sources and notices
 
@@ -94,3 +99,37 @@ release includes its original archives and recipe companion.
 The final application needs a verified runtime archive/import contract, exact
 server and SQL/module receipts, private persistent state and the Android PRoot
 process path. This dependency-image recipe does not enable the launch button.
+
+## Portable archive
+
+`tools/package_server_runtime.py` consumes `docker export` from a **fresh,
+stopped dependency-image container**, together with its measured JSON and the
+exact source lock. Never export an initialized game or database container.
+The tool emits `server-runtime-arm64.tar.gz`, a receipt, and source/runtime
+metadata into a new output directory. It never runs guest binaries or SQL.
+
+The input reader bounds Docker PAX/GNU metadata, members, paths and total bytes.
+The output uses only the GNU tar subset accepted by the runtime installer; it
+removes uid/gid, timestamps and setuid/setgid bits. Container hostname, hosts,
+resolver and machine-id files receive explicit portable/offline values. Device
+nodes, logs and ephemeral-tree contents are excluded. Database, state, game
+content and server mount points must be empty; MySQL credentials/history cause
+a failure. Every retained package copyright notice stays in the archive.
+
+After streaming compression, a separate full archive readback verifies the
+member/link graph, exact runtime receipt, Ubuntu version and measured native
+ARM64 executable hashes. Publication is atomic and refuses an existing target.
+The archive receipt does not assert Android installation, PRoot execution,
+server inclusion, game login or a full ELF dependency closure. Corresponding
+sources travel in the separate source artifact and must accompany a release.
+
+```sh
+container=$(docker create esteria-server-runtime:development)
+trap 'docker rm -f "$container" >/dev/null' EXIT
+docker export "$container" > /private/server-export.tar
+docker cp "$container:/etc/esteria-server-runtime.json" /private/server-runtime.json
+python3 tools/package_server_runtime.py \
+  --docker-export /private/server-export.tar \
+  --runtime-metadata /private/server-runtime.json \
+  --output /private/new-server-runtime-package
+```
