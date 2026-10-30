@@ -1,0 +1,97 @@
+{
+  "evidenceBoundaries": {
+    "actualAndroidCoordinatorExecuted": false,
+    "actualHostZipCrcShaAndMutationFixtures": true,
+    "artifactPinsInvented": false,
+    "defaultMysqlCurrentSourceGuardChanged": false,
+    "fullSourceReadbackRequiredBeforeApk": true,
+    "gameplayQualified": false,
+    "historicalJavaProofInherited": false,
+    "playerbotsAiQualified": false,
+    "positiveProviderMeasured": false,
+    "productionArm64Qualified": false,
+    "productionMainSourcesChanged": false,
+    "realGitProducerActivationAndReplacementAndCrLfFixtures": true,
+    "realOriginalProviderArtifactsDownloaded": false,
+    "sdkOrAdbExecuted": false,
+    "sourceRecipePAndCurrentExecutionQSeparatelyBound": true,
+    "sqlExecuted": false,
+    "thorQualified": false,
+    "worldserverExecuted": false
+  },
+  "formatVersion": 1,
+  "integrationRevisionBeforeUncommittedImplementation": "7d4b1cfdf2556c1943d6c7e8ff18b2892a2b84d6",
+  "pending": [
+    "Actual new native x64 four-schema SQL qualification and independent readback must be selected before provider measurement.",
+    "Exact measured provider/readback plus actual producer/artifact identities must be committed before acquisition or Android execution.",
+    "Full original provider/source/debug artifacts and actual emulator SQL/coordinator execution remain untested by this host checkpoint."
+  ],
+  "python": {
+    "existingProviderGateAndGuestTests": 40,
+    "newQualificationTests": 15,
+    "newTransportTests": 11,
+    "output": {
+      "bytes": 165,
+      "sha256": "d4792805554870c44dbd66a91ad91994b461561ddd65511210cf88a0ae69c3cb"
+    },
+    "passed": 66,
+    "seconds": 0.982,
+    "suites": [
+      "tests.test_android_installation_x64_provider_artifacts",
+      "tests.test_android_installation_x64_qualification",
+      "tests.test_android_installation_x64_provider",
+      "tests.test_android_installation_x64_inputs",
+      "tests.test_android_installation_x64_entry"
+    ],
+    "tests": 66
+  },
+  "scope": "android-x64-provider-transport-and-execution-workflows-host-implementation-only",
+  "sourceFiles": {
+    ".github/workflows/android-installation-x64-provider.yml": {
+      "bytes": 4716,
+      "sha256": "6ab398c2a1265778148edcdc9745947161f1105addd7b69d6eb42a4ccaebc8b1"
+    },
+    ".github/workflows/android-server-installation-x64.yml": {
+      "bytes": 12486,
+      "sha256": "136a15c4bb1910411112880b4eec5e2837e5b025ff284f6957fddbd9c1f0fe37"
+    },
+    "runtime/mysql-probe/ANDROID-INSTALLATION-X64-PLAN.md": {
+      "bytes": 12287,
+      "sha256": "32b1eb8fa2b974964824e7a3c4e3b5010c4bfd42e894938128995520fe83f99b"
+    },
+    "runtime/mysql-probe/ANDROID-INSTALLATION-X64-WORKFLOWS.md": {
+      "bytes": 5048,
+      "sha256": "792e91ad54c675f09da15c3065841cb38a227b28e06a3e2f518e9fe0b75eb945"
+    },
+    "runtime/mysql-probe/android-installation-x64-provider-artifacts.lock.json": {
+      "bytes": 685,
+      "sha256": "d8318ced6da9e5046c2570421a4b1a66a0aa3daeb66dccc9529939973ed29260"
+    },
+    "tests/test_android_installation_x64_provider_artifacts.py": {
+      "bytes": 12192,
+      "sha256": "99c7576479ead3cdbc4e08b886821a863faa4c86d0ee270c68d768a41c6aa8fc"
+    },
+    "tests/test_android_installation_x64_qualification.py": {
+      "bytes": 15399,
+      "sha256": "ba2d83e494b895ede1d44ae818bf5210a9f0525b124955cc06c1c30966939337"
+    },
+    "tools/android_installation_x64_provider_artifacts.py": {
+      "bytes": 19446,
+      "sha256": "b17ae24114ed31fb3c32e2cfa1707dd2225aefdb53aaff8dd336a5387b988279"
+    },
+    "tools/qualify_android_installation_x64.py": {
+      "bytes": 24418,
+      "sha256": "5c3eec952074c99c57f1bfc06e58d4da081b728cade0a1894ac6b66d3537c588"
+    }
+  },
+  "workflowValidation": {
+    "actualDefaultSelectionInspected": true,
+    "allParsed": true,
+    "androidExecutionEnabled": false,
+    "bashScripts": 13,
+    "embeddedPythonBodies": 4,
+    "providerMeasurementNativeReady": false,
+    "transportEnabled": false,
+    "yamlFiles": 2
+  }
+}

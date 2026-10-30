@@ -1,0 +1,91 @@
+name: Measure source-bound Android x64 installation provider
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - runtime/mysql-probe/android-installation-x64-inputs.lock.json
+      - runtime/mysql-probe/server-setup-x64-sql-inputs.lock.json
+      - tools/provider_android_installation_x64.py
+      - tools/android_installation_x64_provider_artifacts.py
+      - tests/test_android_installation_x64_provider*.py
+      - tests/android-installation-x64/**
+      - app/src/androidTest/**/InstallationX64*.java
+      - app/src/androidTest/**/ServerInstallationX64Test.java
+      - .github/workflows/android-installation-x64-provider.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: android-x64-installation-provider-measurement-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  selection:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04
+    outputs:
+      nativeReady: ${{ steps.selection.outputs.nativeReady }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check real source and default-off transport boundaries
+        run: python3 -m unittest tests.test_android_installation_x64_inputs tests.test_android_installation_x64_provider tests.test_android_installation_x64_entry tests.test_android_installation_x64_provider_artifacts -v
+      - name: Require an actual separately qualified native four-schema SQL receipt
+        id: selection
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          from tools import android_installation_x64_inputs as gate
+          value=gate.load_pin()
+          ready=value['state'] in (gate.PROVIDER_PENDING,gate.MEASURED)
+          if ready:gate.load_pin(require_native=True)
+          print('nativeReady='+str(ready).lower())
+          PY
+  measure:
+    needs: selection
+    if: needs.selection.outputs.nativeReady == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      MEASUREMENT_ROOT: ${{ runner.temp }}/esteria-installation-provider-measurement
+      FROZEN_MYSQL_SOURCE: ${{ runner.temp }}/esteria-installation-frozen-mysql-817cbc
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Prepare exact frozen runtime recipe outside the clean measurement checkout
+        run: |
+          git -c core.hooksPath=/dev/null worktree add --detach "$FROZEN_MYSQL_SOURCE" 817cbc229f4dcc24beb169ecc72838fab4d1df32
+          python3 tools/fetch_android_mysql_fixture_frozen.py --frozen-consumer-source "$FROZEN_MYSQL_SOURCE" > "$RUNNER_TEMP/installation-frozen-recipe-check.json"
+      - name: Read all actual original source debug runtime and content inputs without executing SQL
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          mkdir "$MEASUREMENT_ROOT"
+          python3 tools/qualify_server_setup_x64_sql.py acquire --output "$MEASUREMENT_ROOT/inputs" \
+            --frozen-consumer-source "$FROZEN_MYSQL_SOURCE" > "$MEASUREMENT_ROOT/acquisition-private.log" 2>&1
+      - name: Prepare the fixed source-bound provider and exact full source companion
+        run: |
+          python3 tools/provider_android_installation_x64.py build --inputs "$MEASUREMENT_ROOT/inputs" \
+            --output "$MEASUREMENT_ROOT/product" > "$MEASUREMENT_ROOT/provider-build.json"
+          python3 tools/android_installation_x64_provider_artifacts.py seal --product "$MEASUREMENT_ROOT/product" \
+            --evidence "$MEASUREMENT_ROOT/evidence" > "$MEASUREMENT_ROOT/seal-result.json"
+      - name: Preserve complete product and original source bytes for later exact acquisition
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: android-x64-installation-provider-complete-${{ github.sha }}
+          path: ${{ runner.temp }}/esteria-installation-provider-measurement/product/**
+          include-hidden-files: true
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+      - name: Preserve only bounded measurement and independent readback receipts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: android-x64-installation-provider-measurement-${{ github.sha }}
+          path: ${{ runner.temp }}/esteria-installation-provider-measurement/evidence/*.json
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error

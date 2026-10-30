@@ -1,0 +1,22 @@
+{
+  "formatVersion": 1,
+  "scope": "android-x64-installation-provider-artifact-selection",
+  "repository": "Russianranger/esteria_android",
+  "enabled": false,
+  "state": "pending-actual-provider-artifact-measurement",
+  "producer": null,
+  "productArtifact": null,
+  "evidenceArtifact": null,
+  "measurementEvidence": null,
+  "providerDescriptor": null,
+  "productManifest": null,
+  "sqlExecuted": false,
+  "androidRuntimeQualified": false,
+  "productionArm64ProviderQualified": false,
+  "fourSchemaCoordinatorQualified": false,
+  "worldserverQualified": false,
+  "playerbotsAiQualified": false,
+  "gameplayQualified": false,
+  "slotPromoted": false,
+  "serverDataQualified": false
+}

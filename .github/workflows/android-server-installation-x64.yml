@@ -1,0 +1,235 @@
+name: Measured Android 13 x64 four-schema installation and restart
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - runtime/mysql-probe/android-installation-x64-inputs.lock.json
+      - runtime/mysql-probe/android-installation-x64-provider-artifacts.lock.json
+      - runtime/mysql-probe/server-setup-x64-sql-inputs.lock.json
+      - runtime/android_server_installation_setup.py
+      - runtime/android_server_schema_setup.py
+      - runtime/android_database_setup.py
+      - runtime/mysql_bootstrap.py
+      - runtime/mysql_service.py
+      - runtime/server_content.py
+      - runtime/server_schema*.py
+      - runtime/server_update*.py
+      - runtime/server_playerbots_setup.py
+      - runtime/server_config.py
+      - runtime/owned_process_group.py
+      - runtime/provision_local_*.py
+      - runtime/server/appearance-schema*
+      - app/build.gradle
+      - app/server-installation-probe.gradle
+      - app/database-setup.gradle
+      - app/database-service.gradle
+      - app/src/main/java/io/github/russianranger/esteria/runtime/ServerInstallationSetup.java
+      - app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseSetup.java
+      - app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseService.java
+      - app/src/main/java/io/github/russianranger/esteria/runtime/ProotProcess.java
+      - app/src/main/java/io/github/russianranger/esteria/runtime/GuestHelperAssets.java
+      - app/src/androidTest/**/InstallationX64*.java
+      - app/src/androidTest/**/ServerInstallationX64Test.java
+      - core/src/main/java/**/FreshServerInstallations.java
+      - core/src/main/java/**/ExclusiveFileLease.java
+      - core/src/main/java/**/RuntimeFiles.java
+      - core/src/main/java/**/RuntimeInstaller.java
+      - core/src/main/java/**/RuntimeWork.java
+      - core/src/main/java/**/OwnedProcess.java
+      - core/src/main/java/**/ProotLaunch.java
+      - native/**
+      - config/local-server.json
+      - tests/android-installation-x64/**
+      - tests/native-java-installation/restart_probe.py
+      - tools/android_installation_x64*.py
+      - tools/provider_android_installation_x64.py
+      - tools/qualify_android_installation_x64.py
+      - tests/test_android_installation_x64*.py
+      - .github/workflows/android-server-installation-x64.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: measured-android-x64-installation-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  selection:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04
+    env:
+      INSTALLATION_SELECTION_OUT: ${{ runner.temp }}/esteria-installation-selection
+    outputs:
+      enabled: ${{ steps.selection.outputs.enabled }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Admit both measured provider and complete artifact transport before downloads
+        id: selection
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          from pathlib import Path
+          import json,os
+          from tools import android_installation_x64_inputs as selection
+          from tools import android_installation_x64_provider_artifacts as artifacts
+          measured=selection.load_pin()
+          transport=artifacts.load_pin()
+          enabled=measured['enabled'] and transport['enabled']
+          if enabled:
+              selection.load_pin(require_enabled=True)
+              artifacts.load_pin(require_enabled=True)
+          root=Path(os.environ['INSTALLATION_SELECTION_OUT']);root.mkdir(parents=True,exist_ok=False)
+          proof=dict(formatVersion=1,scope='android-x64-installation-execution-selection-only',
+              sourceRevision=os.environ['GITHUB_SHA'],executionEnabled=enabled,
+              providerState=measured['state'],transportState=transport['state'],
+              providerSelection=selection.native.files.identity(selection.LOCK),
+              transportSelection=selection.native.files.identity(artifacts.LOCK),
+              androidJavaCoordinatorQualified=False,fourSchemaCoordinatorQualified=False,
+              sqlExecuted=False,productionArm64ProviderQualified=False,thorQualified=False,
+              worldserverQualified=False,playerbotsAiQualified=False,gameplayQualified=False)
+          (root/'selection.json').write_text(json.dumps(proof,sort_keys=True,indent=2)+'\n')
+          print('enabled='+str(enabled).lower())
+          PY
+      - name: Check source admission, receipt validation and default-off execution boundaries
+        run: |
+          python3 -m unittest tests.test_android_installation_x64_inputs \
+            tests.test_android_installation_x64_provider tests.test_android_installation_x64_entry \
+            tests.test_android_installation_x64_qualification tests.test_android_installation_x64_provider_artifacts -v
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: android-x64-installation-execution-selection-${{ github.sha }}
+          path: ${{ env.INSTALLATION_SELECTION_OUT }}/selection.json
+          retention-days: 30
+          if-no-files-found: error
+  qualify:
+    needs: selection
+    if: needs.selection.outputs.enabled == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      INSTALLATION_OUT: ${{ runner.temp }}/esteria-installation-x64
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Admit the exact frozen consumer outside the clean activation checkout
+        run: |
+          test "$(uname -m)" = x86_64
+          git -c core.hooksPath=/dev/null worktree add --detach "$RUNNER_TEMP/esteria-installation-mysql-817cbc" 817cbc229f4dcc24beb169ecc72838fab4d1df32
+          python3 - <<'PY'
+          from pathlib import Path
+          import os
+          from tools import android_installation_x64_inputs as selection
+          from tools import android_installation_x64_provider_artifacts as artifacts
+          from tools import fetch_android_mysql_fixture_frozen as frozen
+          selection.load_pin(require_enabled=True);artifacts.load_pin(require_enabled=True)
+          frozen.inspect(Path(os.environ['RUNNER_TEMP'])/'esteria-installation-mysql-817cbc')
+          PY
+      - name: Read every independently measured provider and original source artifact byte
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$INSTALLATION_OUT"
+          python3 - <<'PY' > "$INSTALLATION_OUT/acquisition-private.log" 2>&1
+          from pathlib import Path
+          import os
+          from tools import android_installation_x64_provider_artifacts as artifacts
+          artifacts.acquire(Path(os.environ['INSTALLATION_OUT'])/'inputs',
+              Path(os.environ['RUNNER_TEMP'])/'esteria-installation-mysql-817cbc')
+          PY
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '17.0.13+11'
+      - name: Install the pinned Android SDK and native owner toolchain
+        run: |
+          export ANDROID_HOME="$RUNNER_TEMP/esteria-installation-sdk"
+          mkdir -p "$ANDROID_HOME/cmdline-tools"
+          curl --fail --location --retry 3 https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -o "$RUNNER_TEMP/installation-commandline.zip"
+          echo '2d2d50857e4eb553af5a6dc3ad507a17adf43d115264b1afc116f95c92e5e258  '"$RUNNER_TEMP/installation-commandline.zip" | sha256sum --check
+          unzip -q "$RUNNER_TEMP/installation-commandline.zip" -d "$ANDROID_HOME/cmdline-tools"
+          mv "$ANDROID_HOME/cmdline-tools/cmdline-tools" "$ANDROID_HOME/cmdline-tools/12.0"
+          export PATH="$ANDROID_HOME/cmdline-tools/12.0/bin:$PATH"
+          (set +o pipefail; yes | sdkmanager --sdk_root="$ANDROID_HOME" --licenses >/dev/null)
+          sdkmanager --sdk_root="$ANDROID_HOME" 'platforms;android-35' 'build-tools;35.0.0' 'ndk;28.2.13676358' 'cmake;3.22.1'
+          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "$ANDROID_HOME/cmdline-tools/12.0/bin" >> "$GITHUB_PATH"
+      - name: Build only the measured x64 coordinator fixture from exact activation source Q
+        run: |
+          sha256sum --check gradle/wrapper/SHA256SUMS
+          ./gradlew --no-daemon :app:clean :app:assembleDebug :app:assembleDebugAndroidTest :app:lintDebug \
+            -PnativeRuntimeBridge=true -PnativeBridgeAbi=x86_64 \
+            -PprootProbeProviderDir="$INSTALLATION_OUT/inputs/proot-provider" \
+            -PmysqlProbeProviderDir="$INSTALLATION_OUT/inputs/mysql-provider" \
+            -PserverInstallationProbeProviderDir="$INSTALLATION_OUT/inputs/provider" \
+            -PserverInstallationProbeFrozenSourceDir="$RUNNER_TEMP/esteria-installation-mysql-817cbc" \
+            -PsourceRevision="$GITHUB_SHA" > "$INSTALLATION_OUT/gradle-private.log" 2>&1
+          cp app/build/outputs/apk/debug/app-debug.apk "$INSTALLATION_OUT/probe.apk"
+          cp app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk "$INSTALLATION_OUT/tests.apk"
+      - name: Export complete source Q separately from the measured provider producer P
+        run: |
+          git archive --format=tar.gz --output="$INSTALLATION_OUT/activation-source.tar.gz" "$GITHUB_SHA"
+      - name: Enable KVM for the disposable x64 emulator
+        run: |
+          test -c /dev/kvm
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Execute the actual retained coordinator, four schemas, promotion and same-instance restart
+        uses: ReactiveCircus/android-emulator-runner@324029e2f414c084d8b15ba075288885e74aef9c # v2.34.0
+        with:
+          api-level: 33
+          arch: x86_64
+          target: google_apis
+          cores: 2
+          ram-size: 4096M
+          heap-size: 256M
+          disk-size: 8192M
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
+          disable-animations: true
+          script: >-
+            python3 tools/qualify_android_installation_x64.py
+            --apk "$INSTALLATION_OUT/probe.apk"
+            --test-apk "$INSTALLATION_OUT/tests.apk"
+            --provider "$INSTALLATION_OUT/inputs/provider"
+            --mysql-provider "$INSTALLATION_OUT/inputs/mysql-provider"
+            --proot-provider "$INSTALLATION_OUT/inputs/proot-provider"
+            --frozen-source "$RUNNER_TEMP/esteria-installation-mysql-817cbc"
+            --source-revision "$GITHUB_SHA"
+            --source-archive "$INSTALLATION_OUT/activation-source.tar.gz"
+            --output "$INSTALLATION_OUT/evidence"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: android-x64-installation-coordinator-evidence-${{ github.sha }}
+          path: |
+            ${{ env.INSTALLATION_OUT }}/evidence/*.json
+            ${{ env.INSTALLATION_OUT }}/inputs/acquisition.json
+          retention-days: 30
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: unqualified-android-x64-installation-apks-and-activation-source-${{ github.sha }}
+          path: |
+            ${{ env.INSTALLATION_OUT }}/probe.apk
+            ${{ env.INSTALLATION_OUT }}/tests.apk
+            ${{ env.INSTALLATION_OUT }}/activation-source.tar.gz
+            ${{ env.INSTALLATION_OUT }}/evidence/source-companion.json
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: measured-android-x64-installation-provider-original-sources-${{ github.sha }}
+          path: |
+            ${{ env.INSTALLATION_OUT }}/inputs/corresponding-source
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: warn

@@ -156,6 +156,10 @@ regression after the typed refactor passed at7c303665, recorded separately in
 later lease changes have their own separate validation. Actual x64 source-build
 artifacts and native SQL results have separate measured admission; this
 checkpoint supplies neither and keeps the selection disabled.
+The subsequent source-owned measurement/acquisition and Android execution
+workflow implementation is described in `ANDROID-INSTALLATION-X64-WORKFLOWS.md`.
+Its transport lock also starts disabled/null; workflow code and host checks are
+not a measured provider or successful Android execution.
 The final focused run also includes existing shared installation, Playerbots and
 native x64 input/SQL fixtures: 88 tests passed. The earlier repository-wide run
 covered an intermediate provider version; it does not replace these final
