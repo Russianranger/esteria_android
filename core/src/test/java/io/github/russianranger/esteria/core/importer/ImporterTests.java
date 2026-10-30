@@ -1,6 +1,8 @@
 package io.github.russianranger.esteria.core.importer;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ByteArrayInputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
@@ -10,6 +12,8 @@ import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
@@ -35,6 +39,12 @@ public final class ImporterTests {
         run("archive declared-size limits enforced", ImporterTests::sizeLimits);
         run("concurrent importer cannot publish over active work", ImporterTests::concurrency);
         run("64 MiB asset streams with a 32 MiB test heap", ImporterTests::boundedStreaming);
+        run("document source streams once and maps wrapped paths", ImporterTests::documentSource);
+        run("document cancellation resumes known identities", ImporterTests::documentResume);
+        run("document metadata changes reject publication", ImporterTests::documentMutation);
+        run("document paths IDs sizes and unknown times are bounded", ImporterTests::documentValidation);
+        run("incomplete client inventory fails before any asset is copied", ImporterTests::incompleteInventory);
+        run("metadata budget stops long-name inventories before heap pressure", ImporterTests::metadataBudget);
         System.out.println("Importer tests passed: " + passed);
     }
     private interface Test { void run() throws Exception; }
@@ -205,9 +215,17 @@ public final class ImporterTests {
         fails(() -> zip(importer(root), collision), "file parent collision");
     }
     private static void zipCorruption() throws Exception {
-        Path root = temp(), archive = zipEntries(root, new String[]{"x"}, new byte[][]{new byte[]{1,2,3}});
-        byte[] bytes = Files.readAllBytes(archive); bytes[31] ^= 0x7f; Files.write(archive, bytes);
-        fails(() -> zip(importer(root), archive), "payload CRC mismatch");
+        Path root = temp(), source = client(root);
+        List<String> names = new ArrayList<>(); List<byte[]> content = new ArrayList<>();
+        try (java.util.stream.Stream<Path> paths = Files.walk(source)) {
+            for (Path file : (Iterable<Path>) paths.filter(Files::isRegularFile)::iterator) { names.add(source.relativize(file).toString().replace('\\', '/')); content.add(Files.readAllBytes(file)); }
+        }
+        Path archive = zipEntries(root, names.toArray(new String[0]), content.toArray(new byte[0][]));
+        byte[] bytes = Files.readAllBytes(archive); ByteBuffer header = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN);
+        int payload = 30 + Short.toUnsignedInt(header.getShort(26)) + Short.toUnsignedInt(header.getShort(28));
+        bytes[payload] ^= 0x7f; Files.write(archive, bytes);
+        try { zip(importer(root), archive); throw new AssertionError("CRC corruption accepted"); }
+        catch (IOException expected) { check(expected.getMessage().contains("Truncated or corrupt source"), "CRC must be checked after valid inventory: " + expected.getMessage()); }
         Files.write(archive, Arrays.copyOf(bytes, bytes.length - 12)); fails(() -> zip(importer(root), archive), "truncated directory");
     }
     private static void zipSymlink() throws Exception {
@@ -250,5 +268,119 @@ public final class ImporterTests {
                 for (Path path : (Iterable<Path>) paths.sorted(java.util.Comparator.reverseOrder())::iterator) Files.deleteIfExists(path);
             }
         }
+    }
+    private static final class Documents implements GameDataImporter.InputSource {
+        final List<GameDataImporter.InputEntry> entries = new ArrayList<>();
+        final Map<String, byte[]> bytes = new LinkedHashMap<>();
+        final Map<String, Long> modified = new LinkedHashMap<>();
+        int snapshots, opened, closed, finalChecks;
+        boolean changedRoot, truncateStreams;
+        public String identity() { return "content://test-provider/tree/client"; }
+        public List<GameDataImporter.InputEntry> snapshot(GameDataImporter.Cancellation cancellation) { snapshots++; return entries; }
+        public InputStream open(GameDataImporter.InputEntry entry) {
+            opened++;
+            byte[] contents = bytes.get(entry.id);
+            return new ByteArrayInputStream(contents, 0, truncateStreams ? Math.max(0, contents.length - 1) : contents.length) {
+                @Override public void close() throws IOException { closed++; super.close(); }
+            };
+        }
+        public void verifyUnchanged(GameDataImporter.InputEntry entry) throws IOException {
+            byte[] data = bytes.get(entry.id);
+            if (data == null || data.length != entry.size || modified.get(entry.id) != entry.modifiedMillis) throw new IOException("Document changed");
+        }
+        public void verifySnapshot(List<GameDataImporter.InputEntry> snapshot) throws IOException {
+            finalChecks++; if (changedRoot) throw new IOException("Document root changed");
+            try { snapshot.clear(); throw new AssertionError("snapshot must be immutable"); } catch (UnsupportedOperationException expected) { }
+        }
+        void put(String id, String path, byte[] data, long time) {
+            entries.add(new GameDataImporter.InputEntry(id, path, data.length, time)); bytes.put(id, data); modified.put(id, time);
+        }
+    }
+    private static Documents documents(Path root, String prefix, long time) throws Exception {
+        Path source = client(root); Documents docs = new Documents();
+        try (java.util.stream.Stream<Path> paths = Files.walk(source)) {
+            for (Path file : (Iterable<Path>) paths.filter(Files::isRegularFile)::iterator) {
+                String relative = source.relativize(file).toString().replace('\\', '/');
+                docs.put("document:" + relative, prefix + relative, Files.readAllBytes(file), time);
+            }
+        }
+        return docs;
+    }
+    private static GameDataImporter.Result documentImport(GameDataImporter importer, Documents documents) throws IOException {
+        return importer.importSource(documents, GameDataImporter.ImportKind.BASE_CLIENT, GameDataImporter.NO_PROGRESS, GameDataImporter.NEVER_CANCELLED);
+    }
+    private static void documentSource() throws Exception {
+        Path root = temp(); Documents docs = documents(root, "SelectedClient/", 1234); GameDataImporter im = importer(root);
+        GameDataImporter.Result result = documentImport(im, docs);
+        check(docs.snapshots == 1 && docs.opened == 10 && docs.closed == 10 && docs.finalChecks == 1, "one inventory, bounded streams closed, final source check");
+        check(Files.exists(result.gameDirectory.resolve("Wow.exe")), "wrapper stripped without altering source document mapping");
+        GameDataImporter.Result repeated = documentImport(im, docs);
+        check(repeated.copiedBytes == 0 && repeated.generation.equals(result.generation) && docs.opened == 10, "stable provider identities avoid rereading assets");
+    }
+    private static void documentResume() throws Exception {
+        Path root = temp(); Documents docs = documents(root, "", 1234); GameDataImporter im = importer(root); AtomicBoolean cancelled = new AtomicBoolean();
+        fails(() -> im.importSource(docs, GameDataImporter.ImportKind.BASE_CLIENT, (p,b,t,n,f) -> { if (n == 4) cancelled.set(true); }, cancelled::get), "document cancellation");
+        check(im.resolveCurrent() == null && docs.opened == docs.closed, "cancel closes streams and preserves pointer");
+        GameDataImporter.Result result = documentImport(im, docs);
+        check(result.reusedFiles == 4 && result.copiedFiles == 6 && docs.opened == 10, "document resume skips four finished files");
+    }
+    private static void documentMutation() throws Exception {
+        Path root = temp(); Documents docs = documents(root, "", 1234); GameDataImporter im = importer(root); AtomicBoolean changed = new AtomicBoolean();
+        fails(() -> im.importSource(docs, GameDataImporter.ImportKind.BASE_CLIENT, (p,b,t,n,f) -> {
+            if (changed.compareAndSet(false, true)) {
+                String id = "document:" + p; byte[] replacement = docs.bytes.get(id).clone(); replacement[0] ^= 1;
+                docs.bytes.put(id, replacement); docs.modified.put(id, 5678L);
+            }
+        }, GameDataImporter.NEVER_CANCELLED), "metadata changed during document read");
+        check(im.resolveCurrent() == null, "changed provider source never publishes");
+        Path other = temp(); Documents moved = documents(other, "", 1234); moved.changedRoot = true;
+        fails(() -> documentImport(importer(other), moved), "changed provider root");
+        Path truncatedRoot = temp(); Documents truncated = documents(truncatedRoot, "", 1234); truncated.truncateStreams = true;
+        fails(() -> documentImport(importer(truncatedRoot), truncated), "provider stream shorter than reported document size");
+    }
+    private static void documentValidation() throws Exception {
+        Path root = temp(); Documents docs = documents(root, "", 0); GameDataImporter im = importer(root);
+        GameDataImporter.Result first = documentImport(im, docs), second = documentImport(im, docs);
+        check(!first.generation.equals(second.generation) && second.copiedFiles == 10, "unversioned documents never reuse old source assumptions");
+        Documents duplicate = documents(temp(), "", 1234); GameDataImporter.InputEntry entry = duplicate.entries.get(0);
+        duplicate.entries.add(new GameDataImporter.InputEntry(entry.id, "different", entry.size, entry.modifiedMillis));
+        fails(() -> documentImport(importer(temp()), duplicate), "duplicate opaque IDs");
+        Documents unknown = new Documents(); unknown.entries.add(new GameDataImporter.InputEntry("id", "Data/file", -1, 1234));
+        fails(() -> documentImport(importer(temp()), unknown), "unknown document size");
+        Documents unsafe = new Documents(); unsafe.put("id", "../escape", new byte[0], 1234);
+        fails(() -> documentImport(importer(temp()), unsafe), "provider path traversal");
+    }
+    private static void incompleteInventory() throws Exception {
+        Path root = temp(); Documents incomplete = documents(root, "", 1234);
+        incomplete.entries.removeIf(entry -> entry.relativePath.equals("Data/lichking.MPQ"));
+        GameDataImporter im = importer(root);
+        fails(() -> documentImport(im, incomplete), "missing required archive caught by snapshot layout");
+        check(incomplete.opened == 0 && im.resolveCurrent() == null, "no partial copy for a visibly incomplete client");
+    }
+    private static void metadataBudget() throws Exception {
+        GameDataImporter.MetadataBudget budget = new GameDataImporter.MetadataBudget();
+        StringBuilder longName = new StringBuilder(); for (int i = 0; i < 200; i++) longName.append('a');
+        int accepted = 0;
+        try {
+            for (; accepted < 10_000; accepted++) budget.add("Data/" + longName + "/asset-" + accepted + ".bin", "provider:" + longName + accepted, false);
+            throw new AssertionError("metadata budget was not enforced");
+        } catch (IOException expected) {
+            check(expected.getMessage().contains("memory budget") && accepted < 5000, "long names trigger a clear bounded inventory error");
+            check(budget.estimatedBytes() <= GameDataImporter.MetadataBudget.DEFAULT_MAX_BYTES, "budget never overruns");
+        }
+        Path root = temp(), source = client(root);
+        GameDataImporter.Limits small = new GameDataImporter.Limits(200_000, 32L << 30, 256L << 30, 8192);
+        GameDataImporter folder = new GameDataImporter(root.resolve("small-folder"), small);
+        try { folder(folder, source, GameDataImporter.ImportKind.BASE_CLIENT); throw new AssertionError("folder inventory budget ignored"); }
+        catch (IOException expected) { check(expected.getMessage().contains("memory budget"), "folder rejects metadata before copying"); }
+        Documents docs = documents(temp(), "", 1234);
+        try { documentImport(new GameDataImporter(root.resolve("small-documents"), small), docs); throw new AssertionError("document inventory budget ignored"); }
+        catch (IOException expected) { check(expected.getMessage().contains("memory budget") && docs.opened == 0, "provider metadata rejected before opening streams"); }
+        Path archive = root.resolve("many-names.zip");
+        try (ZipOutputStream zip = new ZipOutputStream(Files.newOutputStream(archive))) {
+            for (int i = 0; i < 50; i++) { zip.putNextEntry(new ZipEntry("Data/" + longName + "/entry-" + i)); zip.closeEntry(); }
+        }
+        try { zip(new GameDataImporter(root.resolve("small-zip"), small), archive); throw new AssertionError("ZIP metadata budget ignored"); }
+        catch (IOException expected) { check(expected.getMessage().contains("memory budget"), "central-directory budget rejects before ZipFile materialization"); }
     }
 }

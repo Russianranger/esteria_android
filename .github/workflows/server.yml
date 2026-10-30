@@ -4,12 +4,17 @@ on:
     branches: [android/client-server]
     paths:
       - sources.lock.json
-      - runtime/**
-      - config/**
-      - tools/**
-      - tests/**
+      - tools/fetch_sources.py
+      - tools/verify_protocol.py
+      - patches/server/**
       - .github/workflows/server.yml
   pull_request:
+    paths:
+      - sources.lock.json
+      - tools/fetch_sources.py
+      - tools/verify_protocol.py
+      - patches/server/**
+      - .github/workflows/server.yml
   workflow_dispatch:
 permissions:
   contents: read
@@ -20,26 +25,86 @@ jobs:
   server:
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 180
+    env:
+      CCACHE_DIR: ${{ github.workspace }}/.ccache-server
+      CCACHE_BASEDIR: ${{ github.workspace }}
+      CCACHE_MAXSIZE: 2G
+      CCACHE_COMPILERCHECK: content
+      CCACHE_COMPRESS: 'true'
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Install build dependencies
         run: |
+          mkdir -p out/diagnostics
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build g++ libboost-all-dev libssl-dev libmysqlclient-dev mysql-client libreadline-dev libbz2-dev zlib1g-dev
-      - name: Test integration tooling
-        run: python3 -m unittest discover -s tests -v
+          sudo apt-get install -y ccache cmake ninja-build g++ libboost-all-dev libssl-dev libmysqlclient-dev mysql-client libreadline-dev libbz2-dev zlib1g-dev
+          dpkg-query -W > out/diagnostics/build-packages.txt
+          uname -a > out/diagnostics/build-host.txt
+      - name: Identify exact cache environment and source inputs
+        id: cache-identity
+        shell: python
+        run: |
+          import hashlib, json, os, pathlib, platform, shutil, subprocess
+          def digest(data):
+              return hashlib.sha256(data).hexdigest()
+          compiler = pathlib.Path(shutil.which('g++')).resolve()
+          environment = {
+              'platform': platform.machine(),
+              'os': pathlib.Path('/etc/os-release').read_text(),
+              'packages': pathlib.Path('out/diagnostics/build-packages.txt').read_text(),
+              'compiler_sha256': digest(compiler.read_bytes()),
+              'compiler_version': subprocess.check_output(['g++', '--version'], text=True),
+              'compiler_target': subprocess.check_output(['g++', '-dumpmachine'], text=True),
+              'cmake_version': subprocess.check_output(['cmake', '--version'], text=True),
+              'ccache_version': subprocess.check_output(['ccache', '--version'], text=True),
+          }
+          source = json.loads(pathlib.Path('sources.lock.json').read_text())['sources']['server']
+          env_hash = digest(json.dumps(environment, sort_keys=True).encode())
+          patch_hash = digest(json.dumps({'submodules': source['submodules'], 'patches': source['patches']},
+                                        sort_keys=True).encode())
+          pathlib.Path('out/diagnostics/cache-environment.json').write_text(json.dumps(environment, indent=2))
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('environment=' + env_hash + '\nsource=' + source['commit'] + '\npatches=' + patch_hash + '\n')
+      - name: Restore compiler cache only from the same toolchain environment
+        id: cache-restore
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: server-ccache-v1-${{ steps.cache-identity.outputs.environment }}-${{ steps.cache-identity.outputs.source }}-${{ steps.cache-identity.outputs.patches }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            server-ccache-v1-${{ steps.cache-identity.outputs.environment }}-${{ steps.cache-identity.outputs.source }}-${{ steps.cache-identity.outputs.patches }}-
+            server-ccache-v1-${{ steps.cache-identity.outputs.environment }}-
+      - name: Configure bounded compiler cache
+        run: |
+          ccache --max-size=2G
+          ccache --zero-stats
       - name: Prepare pinned sources
         run: python3 tools/fetch_sources.py all
       - name: Verify client and server field layouts
         run: python3 tools/verify_protocol.py --client sources/client --server sources/server
       - name: Configure ARM64 server
-        run: >-
-          cmake -S sources/server -B out/server -G Ninja
-          -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/out/server-install
-          -DSCRIPTS=static -DMODULES=static -DAPPS_BUILD=all -DTOOLS_BUILD=all
-          -DELUNA=ON -DLUA_VERSION=lua52 -DLUA_STATIC=ON -DNOPCH=1
+        run: |
+          set -o pipefail
+          cmake -S sources/server -B out/server -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/out/server-install \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DSCRIPTS=static -DMODULES=static -DAPPS_BUILD=all -DTOOLS_BUILD=all \
+            -DELUNA=ON -DLUA_VERSION=lua52 -DLUA_STATIC=ON -DNOPCH=1 \
+            2>&1 | tee out/diagnostics/configure.log
       - name: Build with bounded concurrency
-        run: cmake --build out/server --parallel 2
+        id: compile
+        run: |
+          set -o pipefail
+          cmake --build out/server --parallel 2 2>&1 | tee out/diagnostics/build.log
+      - name: Record compiler cache evidence
+        if: always() && steps.compile.outcome != 'skipped' && steps.cache-restore.outcome == 'success'
+        run: ccache --show-stats > out/diagnostics/ccache-statistics.txt
+      - name: Save partial compiler work after success or failure
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        if: always() && steps.compile.outcome != 'skipped' && steps.cache-restore.outcome == 'success'
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: server-ccache-v1-${{ steps.cache-identity.outputs.environment }}-${{ steps.cache-identity.outputs.source }}-${{ steps.cache-identity.outputs.patches }}-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Install and record provenance
         run: |
           cmake --install out/server
@@ -54,4 +119,18 @@ jobs:
             out/server-install/
             out/server-install.sha256
           if-no-files-found: error
+          retention-days: 14
+      - name: Preserve build diagnostics on failure or success
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: esteria-linux-arm64-server-diagnostics-${{ github.sha }}
+          path: |
+            out/diagnostics/
+            out/server/CMakeCache.txt
+            out/server/CMakeFiles/CMakeConfigureLog.yaml
+            out/server/.ninja_log
+            sources.lock.json
+            patches/server/
+          if-no-files-found: warn
           retention-days: 14

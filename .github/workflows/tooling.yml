@@ -1,0 +1,46 @@
+name: Integration tooling behavior
+on:
+  push:
+    branches: [android/client-server]
+    paths:
+      - sources.lock.json
+      - config/**
+      - tools/**
+      - runtime/**
+      - patches/**
+      - tests/**
+      - .github/workflows/tooling.yml
+  pull_request:
+    paths:
+      - sources.lock.json
+      - config/**
+      - tools/**
+      - runtime/**
+      - patches/**
+      - tests/**
+      - .github/workflows/tooling.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: tooling-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  tooling:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Check Python syntax and validate pinned patch bytes
+        run: |
+          python3 -m compileall -q tools runtime tests
+          python3 - <<'PY'
+          from pathlib import Path
+          from tools.fetch_sources import load_lock, patch_inputs
+          root = Path.cwd()
+          lock = load_lock(root / 'sources.lock.json')
+          for source in lock['sources'].values():
+              patch_inputs(source, root)
+          PY
+      - name: Exercise tooling, import formats, configuration and filesystem recovery
+        run: python3 -m unittest discover -s tests -v

@@ -43,12 +43,16 @@ def load_lock(path: Path) -> dict:
                 raise ValueError("submodules must be pinned to full commit SHAs")
         for patch in source["patches"]:
             safe_relative(patch["path"])
+            if "submodule" in patch:
+                safe_relative(patch["submodule"])
+                if patch["submodule"] not in source["submodules"]:
+                    raise ValueError("patch submodule must be an exactly pinned source dependency")
             if not re.fullmatch(r"[0-9a-f]{64}", patch["sha256"]):
                 raise ValueError("patch requires SHA-256")
     return doc
 
 
-def patch_inputs(source: dict, root: Path) -> list[Path]:
+def patch_inputs(source: dict, root: Path) -> list[tuple[str | None, Path]]:
     result = []
     for spec in source["patches"]:
         path = (root / spec["path"]).resolve()
@@ -56,7 +60,10 @@ def patch_inputs(source: dict, root: Path) -> list[Path]:
             raise ValueError("patch escaped project root")
         if hashlib.sha256(path.read_bytes()).hexdigest() != spec["sha256"]:
             raise ValueError(f"patch digest mismatch: {path}")
-        result.append(path)
+        scope = spec.get("submodule")
+        if scope is not None and scope not in source["submodules"]:
+            raise ValueError("patch submodule must be an exactly pinned source dependency")
+        result.append((scope, path))
     return result
 
 
@@ -68,22 +75,17 @@ def reject_hidden_changes(path: Path) -> None:
         raise ValueError(f"{path}: assume-unchanged/skip-worktree flags hide source changes; use a fresh checkout")
 
 
-def verify_checkout(path: Path, source: dict, patches: list[Path]) -> None:
-    if run("git", "rev-parse", "HEAD", cwd=path) != source["commit"]:
+def verify_tree(path: Path, commit: str, patches: list[Path]) -> None:
+    if run("git", "rev-parse", "HEAD", cwd=path) != commit:
         raise ValueError(f"{path}: HEAD differs from lock; preserve this checkout and use a new output directory")
     reject_hidden_changes(path)
     # Expected modifications are exactly the indexed, pinned patches. Never reset.
-    if run("git", "diff", "--name-only", cwd=path):
+    # Patched submodule content is verified separately, including its own index.
+    # Changed submodule commits still appear and are rejected.
+    if run("git", "diff", "--name-only", "--ignore-submodules=dirty", cwd=path):
         raise ValueError(f"{path}: uncommitted source changes")
     if run("git", "ls-files", "--others", "--exclude-standard", cwd=path):
         raise ValueError(f"{path}: untracked source files")
-    for subpath, commit in source["submodules"].items():
-        module = path / subpath
-        reject_hidden_changes(module)
-        if run("git", "rev-parse", "HEAD", cwd=module) != commit:
-            raise ValueError(f"{subpath}: incorrect pinned submodule")
-        if run("git", "status", "--porcelain", cwd=module):
-            raise ValueError(f"{subpath}: modified submodule")
     # Compare the index with a temporary index derived from HEAD plus the patches.
     import os
     import tempfile
@@ -96,6 +98,15 @@ def verify_checkout(path: Path, source: dict, patches: list[Path]) -> None:
     actual = run("git", "write-tree", cwd=path)
     if expected != actual:
         raise ValueError(f"{path}: staged content differs from pinned patches")
+
+
+def verify_checkout(path: Path, source: dict, patches: list[tuple[str | None, Path]]) -> None:
+    verify_tree(path, source["commit"], [patch for scope, patch in patches if scope is None])
+    for subpath, commit in source["submodules"].items():
+        index_entry = run("git", "ls-files", "--stage", "--", subpath, cwd=path)
+        if index_entry != f"160000 {commit} 0\t{subpath}":
+            raise ValueError(f"{subpath}: index does not match pinned submodule commit")
+        verify_tree(path / subpath, commit, [patch for scope, patch in patches if scope == subpath])
 
 
 def fetch(name: str, source: dict, output: Path, root: Path, offline: bool) -> None:
@@ -115,8 +126,8 @@ def fetch(name: str, source: dict, output: Path, root: Path, offline: bool) -> N
     run("git", "checkout", "--detach", source["commit"], cwd=path)
     if source["submodules"]:
         run("git", "submodule", "update", "--init", "--recursive", "--depth", "1", cwd=path)
-    for patch in patches:
-        run("git", "apply", "--index", str(patch), cwd=path)
+    for scope, patch in patches:
+        run("git", "apply", "--index", str(patch), cwd=path / scope if scope else path)
     verify_checkout(path, source, patches)
     print(f"{name}: prepared {source['commit']}")
 

@@ -19,6 +19,7 @@ import secrets
 import selectors
 import subprocess
 import tempfile
+import threading
 import time
 import uuid as uuid_module
 
@@ -26,10 +27,76 @@ DATABASES = ('acore_auth', 'acore_world', 'acore_characters', 'acore_playerbots'
 HOSTS = ('127.0.0.1', 'localhost')
 PORT = 13306
 FORMAT = 1
+ENGINE_LOG_LIMIT = 64 * 1024
 
 
 class BootstrapError(RuntimeError):
     pass
+
+
+class EngineCapture:
+    """Capture only mysqld diagnostics, never SQL-client stderr, in a private bounded tail."""
+    def __init__(self, command: list[str], path: Path):
+        path = private_path(path)
+        path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+        descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        os.fchmod(descriptor, 0o600)
+        self.output = os.fdopen(descriptor, 'wb', buffering=0)
+        self.error = None
+        try:
+            self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=0)
+        except BaseException:
+            self.output.close()
+            raise
+        self.reader = threading.Thread(target=self._drain, name='esteria-mysqld-log', daemon=True)
+        self.reader.start()
+
+    def _drain(self):
+        tail = bytearray()
+        try:
+            while True:
+                block = self.process.stdout.read(8192)
+                if not block:
+                    break
+                tail.extend(block)
+                if len(tail) > ENGINE_LOG_LIMIT:
+                    del tail[:-ENGINE_LOG_LIMIT]
+                # Keep a readable bounded tail even if the owner is interrupted.
+                if self.error is None:
+                    try:
+                        self.output.seek(0)
+                        self.output.write(tail)
+                        self.output.truncate()
+                    except OSError as error:
+                        self.error = error  # Continue draining to prevent a blocked daemon.
+        except OSError as error:
+            self.error = error
+        finally:
+            try:
+                self.output.flush()
+                os.fsync(self.output.fileno())
+            except OSError as error:
+                self.error = error
+            self.output.close()
+            self.process.stdout.close()
+
+    def finish(self):
+        if self.process.poll() is None:
+            raise BootstrapError('Engine diagnostic capture must finish after process shutdown')
+        self.reader.join(timeout=5)
+        if self.reader.is_alive():
+            raise BootstrapError('Engine diagnostic reader did not finish after shutdown')
+
+
+def run_engine(command: list[str], path: Path, timeout: float) -> int:
+    capture = EngineCapture(command, path)
+    try:
+        return capture.process.wait(timeout=timeout)
+    finally:
+        if capture.process.poll() is None:
+            capture.process.kill()
+            capture.process.wait(timeout=5)
+        capture.finish()
 
 
 def exact_version(value: str) -> None:
@@ -384,9 +451,9 @@ def initialize(mysqld: Path, mysql: Path, state: Path, expected_version: str) ->
                    '--skip-networking', '--secure-file-priv=NULL']
         if os.geteuid() == 0:
             command.append('--user=root')
-        result = subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=180)
-        if result.returncode:
-            raise BootstrapError('Fresh MySQL initialization failed; staging was preserved')
+        returncode = run_engine(command, state / 'logs/mysql-initialize-engine.log', timeout=180)
+        if returncode:
+            raise BootstrapError(f'Fresh MySQL initialization failed (exit {returncode}); staging and logs/mysql-initialize-engine.log were preserved')
         progress['phase'] = 'initialized'
         atomic_json(journal, progress)
     owned_uuid = datadir_uuid(stage)
@@ -412,11 +479,12 @@ def initialize(mysqld: Path, mysql: Path, state: Path, expected_version: str) ->
     with os.fdopen(fd, 'w') as stream:
         stream.write('[mysqld]\nskip-networking\nmysqlx=OFF\nsecure-file-priv=NULL\n'
                      f'datadir={_cnf_path(stage)}\nsocket={_cnf_path(socket)}\npid-file={_cnf_path(pid_file)}\n'
-                     'innodb-buffer-pool-size=128M\nperformance-schema=OFF\n')
+                     'innodb-buffer-pool-size=128M\nperformance-schema=OFF\ngeneral-log=OFF\nslow-query-log=OFF\n')
     command = [str(mysqld), f'--defaults-file={config}']
     if os.geteuid() == 0:
         command.append('--user=root')
-    process = subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    capture = EngineCapture(command, state / 'logs/mysql-bootstrap-engine.log')
+    process = capture.process
     try:
         deadline = time.monotonic() + 90
         admin_options = None
@@ -425,7 +493,7 @@ def initialize(mysqld: Path, mysql: Path, state: Path, expected_version: str) ->
         with option_file(state, 'root', root_password) as secured, option_file(state, 'root', '') as initial:
             while time.monotonic() < deadline:
                 if process.poll() is not None:
-                    raise BootstrapError('Staged MySQL server exited before SQL readiness')
+                    raise BootstrapError(f'Staged MySQL server exited before SQL readiness (exit {process.returncode}); see logs/mysql-bootstrap-engine.log')
                 for candidate in (secured, initial):
                     try:
                         with Mysql(mysql, candidate, socket) as admin:
@@ -451,14 +519,17 @@ def initialize(mysqld: Path, mysql: Path, state: Path, expected_version: str) ->
         progress |= {'phase': 'ready-to-promote', 'uuid': report['uuid']}
         atomic_json(journal, progress)
     finally:
-        if process.poll() is None:
-            process.terminate()
-            try:
-                process.wait(timeout=60)
-            except subprocess.TimeoutExpired as error:
-                process.kill()
-                process.wait(timeout=5)
-                raise BootstrapError('Staged MySQL did not stop cleanly; staging preserved') from error
+        try:
+            if process.poll() is None:
+                process.terminate()
+                try:
+                    process.wait(timeout=60)
+                except subprocess.TimeoutExpired as error:
+                    process.kill()
+                    process.wait(timeout=5)
+                    raise BootstrapError('Staged MySQL did not stop cleanly; staging preserved') from error
+        finally:
+            capture.finish()
     if process.returncode != 0:
         raise BootstrapError('Staged MySQL shutdown failed; staging preserved')
     if target.exists():

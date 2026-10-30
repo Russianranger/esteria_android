@@ -15,14 +15,80 @@ import sys
 import tempfile
 import time
 import unittest
+from contextlib import contextmanager
+import re
 
 from runtime.mysql_bootstrap import (BootstrapError, DATABASES, FORMAT, Mysql,
                                      atomic_json, identity, initialize, option_file,
                                      private_path, provision, read_secret, state_lock,
-                                     verify, exact_version)
+                                     verify, exact_version, EngineCapture, ENGINE_LOG_LIMIT,
+                                     run_engine)
+
+
+def preserve_engine_diagnostics(state: Path):
+    """Export only bounded engine tails; never copy accounts, option files or datadirs."""
+    destination = os.environ.get('ESTERIA_MYSQL_DIAGNOSTICS_DIR')
+    if not destination:
+        return
+    target = private_path(Path(destination))
+    target.mkdir(mode=0o700, parents=True, exist_ok=True)
+    for name in ('mysql-initialize-engine.log', 'mysql-bootstrap-engine.log',
+                 'mysql-restart-engine.log', 'mysql-container-engine.log'):
+        source = private_path(state / 'logs' / name)
+        if not source.is_file():
+            continue
+        with source.open('rb') as stream:
+            stream.seek(max(0, source.stat().st_size - ENGINE_LOG_LIMIT))
+            content = stream.read(ENGINE_LOG_LIMIT)
+        if len(content) == ENGINE_LOG_LIMIT:
+            # A truncated first line could contain only part of a credential.
+            newline = content.find(b'\n')
+            content = content[newline + 1:] if newline >= 0 else b''
+        # Bootstrap secrets are exactly 64 hexadecimal characters. Preserve no
+        # such value even if an exceptional engine diagnostic includes SQL text.
+        content = re.sub(rb'[0-9a-fA-F]{64}', b'[redacted-64-hex-value]', content)
+        output = private_path(target / name)
+        fd = os.open(output, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        os.fchmod(fd, 0o600)
+        with os.fdopen(fd, 'wb') as stream:
+            stream.write(content)
+
+
+@contextmanager
+def initialization_state():
+    with tempfile.TemporaryDirectory(prefix='est-db-') as name:
+        state = Path(name)
+        try:
+            yield state
+        except BaseException:
+            preserve_engine_diagnostics(state)
+            raise
 
 
 class FilesystemGuards(unittest.TestCase):
+    def test_engine_diagnostics_are_bounded_private_and_redacted_for_export(self):
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+            log = root / 'state/logs/mysql-bootstrap-engine.log'
+            secret = 'a' * 64
+            code = "import sys;sys.stderr.write('x' * 200000 + '\\nengine-secret=" + secret + "\\nfinal diagnostic\\n')"
+            self.assertEqual(run_engine([sys.executable, '-c', code], log, timeout=10), 0)
+            self.assertLessEqual(log.stat().st_size, ENGINE_LOG_LIMIT)
+            self.assertEqual(log.stat().st_mode & 0o777, 0o600)
+            previous = os.environ.get('ESTERIA_MYSQL_DIAGNOSTICS_DIR')
+            os.environ['ESTERIA_MYSQL_DIAGNOSTICS_DIR'] = str(root / 'export')
+            try:
+                preserve_engine_diagnostics(root / 'state')
+            finally:
+                if previous is None:
+                    os.environ.pop('ESTERIA_MYSQL_DIAGNOSTICS_DIR')
+                else:
+                    os.environ['ESTERIA_MYSQL_DIAGNOSTICS_DIR'] = previous
+            exported = (root / 'export/mysql-bootstrap-engine.log').read_text()
+            self.assertNotIn(secret, exported)
+            self.assertTrue(exported.endswith('final diagnostic\n'))
+            self.assertNotIn('x' * 100, exported)
+
     def test_version_pin_accepts_full_distro_suffix_without_wildcards(self):
         for value in ('8.0.44', '8.0.44-0ubuntu0.24.04.2', '8.4.7-1ubuntu24.04', '8.0.44+vendor.1'):
             exact_version(value)
@@ -225,8 +291,7 @@ class RealMysqlInitialization(unittest.TestCase):
         mysql = Path(shutil.which('mysql') or '/missing/mysql')
         mysqld = Path(os.environ['ESTERIA_MYSQLD_PATH'])
         version = os.environ['ESTERIA_MYSQL_INITIALIZE_VERSION']
-        with tempfile.TemporaryDirectory(prefix='est-db-') as name:
-            state = Path(name)
+        with initialization_state() as state:
             password = read_secret(state / 'accounts/database-secret', create=True)
             with state_lock(state):
                 report = initialize(mysqld, mysql, state, version)
@@ -256,7 +321,8 @@ class RealMysqlInitialization(unittest.TestCase):
             if os.geteuid() == 0:
                 command.append('--user=root')
             for iteration in range(2):
-                process = subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                capture = EngineCapture(command, state / 'logs/mysql-restart-engine.log')
+                process = capture.process
                 try:
                     deadline = time.monotonic() + 90
                     while True:
@@ -275,14 +341,17 @@ class RealMysqlInitialization(unittest.TestCase):
                             app.query('INSERT INTO acore_characters.persistence_probe VALUES (1, 12340)')
                         self.assertEqual(app.query('SELECT value FROM acore_characters.persistence_probe WHERE id=1'), ['12340'])
                 finally:
-                    if process.poll() is None:
-                        process.terminate()
-                        try:
-                            process.wait(timeout=60)
-                        except subprocess.TimeoutExpired:
-                            process.kill()
-                            process.wait(timeout=5)
-                            self.fail('owned MySQL did not stop cleanly')
+                    try:
+                        if process.poll() is None:
+                            process.terminate()
+                            try:
+                                process.wait(timeout=60)
+                            except subprocess.TimeoutExpired:
+                                process.kill()
+                                process.wait(timeout=5)
+                                self.fail('owned MySQL did not stop cleanly')
+                    finally:
+                        capture.finish()
                 self.assertEqual(process.returncode, 0)
 
 

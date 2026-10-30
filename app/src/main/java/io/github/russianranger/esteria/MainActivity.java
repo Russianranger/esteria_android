@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class MainActivity extends Activity {
-    private static final int BASE = 10, OVERLAY = 11, EXPORT = 12;
+    private static final int BASE = 10, OVERLAY = 11, EXPORT = 12, BASE_FOLDER = 13, OVERLAY_FOLDER = 14;
     private final Handler ui = new Handler(Looper.getMainLooper());
     private final List<Button> actions = new ArrayList<>();
     private SessionService service;
@@ -53,9 +53,11 @@ public final class MainActivity extends Activity {
         int padding = dp(24); layout.setPadding(padding, padding, padding, padding); scroll.addView(layout);
         TextView title = text("ESTERIA", 34, Color.rgb(220, 186, 113)); layout.addView(title);
         TextView subtitle = text("Your local world", 18, Color.rgb(184, 199, 211)); layout.addView(subtitle);
-        TextView explanation = text("Import a World of Warcraft 3.3.5a build 12340 client ZIP. Custom content can be added later. Your imported data stays in the app between updates.\n\nZIP imports need space for an archive copy and the expanded files. Updates also keep previous data versions; automatic cleanup is not available yet.\n\nGameplay is unavailable in this development build.", 15, Color.rgb(184, 199, 211));
+        TextView explanation = text("Import your World of Warcraft 3.3.5a build 12340 client folder directly, or choose a ZIP. Custom content can be added later. Imported data stays in the app between updates.\n\nFolder imports avoid an extra archive copy. Keep the source folder unchanged until import finishes. ZIP imports need space for an archive copy and expanded files. Updates retain previous data versions; automatic cleanup is not available yet.\n\nGameplay is unavailable in this development build.", 15, Color.rgb(184, 199, 211));
         explanation.setPadding(0, dp(20), 0, dp(12)); layout.addView(explanation);
+        button(layout, "Import client folder", () -> chooseFolder(BASE_FOLDER));
         button(layout, "Import client ZIP", () -> chooseArchive(BASE));
+        button(layout, "Add custom content folder", () -> chooseFolder(OVERLAY_FOLDER));
         button(layout, "Add custom content ZIP", () -> chooseArchive(OVERLAY));
         button(layout, "Start local game", () -> operation(new Intent(this, SessionService.class).setAction(SessionService.START)));
         button(layout, "Export support bundle", this::chooseExport);
@@ -81,6 +83,11 @@ public final class MainActivity extends Activity {
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
         startActivityForResult(intent, request);
     }
+    private void chooseFolder(int request) {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+        startActivityForResult(intent, request);
+    }
     private void chooseExport() {
         startActivityForResult(new Intent(Intent.ACTION_CREATE_DOCUMENT).setType("application/zip")
                 .addCategory(Intent.CATEGORY_OPENABLE).putExtra(Intent.EXTRA_TITLE, "Esteria-support-" + System.currentTimeMillis() + ".zip"), EXPORT);
@@ -89,13 +96,15 @@ public final class MainActivity extends Activity {
         super.onActivityResult(request, result, data);
         if (result != RESULT_OK || data == null || data.getData() == null) return;
         Uri uri = data.getData();
-        if (request == BASE || request == OVERLAY) {
+        if (request == BASE || request == OVERLAY || request == BASE_FOLDER || request == OVERLAY_FOLDER) {
             try {
                 int readGrant = data.getFlags() & Intent.FLAG_GRANT_READ_URI_PERMISSION;
                 if (readGrant != 0) getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
             }
             catch (SecurityException ignored) { /* The current grant still permits this import. */ }
-            operation(new Intent(this, SessionService.class).setAction(SessionService.IMPORT).setData(uri).putExtra("overlay", request == OVERLAY));
+            operation(new Intent(this, SessionService.class).setAction(SessionService.IMPORT).setData(uri)
+                    .putExtra("overlay", request == OVERLAY || request == OVERLAY_FOLDER)
+                    .putExtra("folder", request == BASE_FOLDER || request == OVERLAY_FOLDER));
         } else if (request == EXPORT) operation(new Intent(this, SessionService.class).setAction(SessionService.EXPORT).setData(uri));
     }
     private void operation(Intent intent) { startForegroundService(intent); }

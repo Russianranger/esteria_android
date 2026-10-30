@@ -53,7 +53,8 @@ public final class SessionService extends Service {
     private final Handler main = new Handler(Looper.getMainLooper());
     private boolean destroyed;
     private int latestStartId;
-    private volatile String status = "Ready to import your 3.3.5a build 12340 client ZIP.";
+    private volatile String status = "Ready to import your 3.3.5a build 12340 client folder or ZIP.";
+    private volatile SafTreeSource activeFolderSource;
     private Path root;
     String status() { return status; }
     boolean busy() { return busy.get(); }
@@ -64,7 +65,7 @@ public final class SessionService extends Service {
             root = getFilesDir().getCanonicalFile().toPath();
             Files.createDirectories(root.resolve("state/logs"));
             if (getSharedPreferences("session", MODE_PRIVATE).getBoolean("interrupted", false))
-                status = "Previous operation was interrupted. Select the same archive to resume. Existing game data remains active.";
+                status = "Previous operation was interrupted. Select the same folder or archive to resume where source metadata permits. Existing game data remains active.";
             else if (new GameDataImporter(root.resolve("game")).resolveCurrent() != null)
                 status = "Client data is imported. Local runtime qualification is still pending.";
         } catch (IOException e) { status = "Storage unavailable: " + e.getMessage(); }
@@ -76,7 +77,7 @@ public final class SessionService extends Service {
         latestStartId = startId;
         if (intent == null) { stopSelf(startId); return START_NOT_STICKY; }
         if (CANCEL.equals(intent.getAction())) {
-            if (busy.get()) { cancelled.set(true); status = "Stopping at a safe point…"; }
+            if (busy.get()) { requestCancellation(); status = "Stopping at a safe point…"; }
             else stopSelf(startId);
             return START_NOT_STICKY;
         }
@@ -89,15 +90,16 @@ public final class SessionService extends Service {
         worker.execute(() -> {
             try {
                 if (root == null) throw new IOException("App storage is unavailable");
-                if (IMPORT.equals(intent.getAction())) importArchive(intent);
+                if (IMPORT.equals(intent.getAction())) importData(intent);
                 else if (EXPORT.equals(intent.getAction())) exportBundle(intent.getData());
                 else if (START.equals(intent.getAction())) checkLaunch();
                 else throw new IOException("Unknown operation");
             } catch (GameDataImporter.ImportCancelledException e) {
-                status = "Import paused. Select the same archive to resume; existing game data is unchanged.";
+                status = "Import paused. Select the same folder or archive to resume where source metadata permits; existing game data is unchanged.";
                 log("Import paused");
             } catch (Exception e) {
-                status = e.getClass().getSimpleName() + ": " + e.getMessage();
+                status = cancelled.get() ? "Operation cancelled. Existing game data remains active."
+                        : e.getClass().getSimpleName() + ": " + e.getMessage();
                 log(status);
             } finally {
                 // Serialize completion with onStartCommand. Publishing idle before stopSelf
@@ -113,19 +115,31 @@ public final class SessionService extends Service {
         });
         return START_NOT_STICKY;
     }
-    private void importArchive(Intent intent) throws Exception {
+    private void importData(Intent intent) throws Exception {
         Uri uri = intent.getData();
-        if (uri == null) throw new IOException("No archive selected");
+        if (uri == null) throw new IOException("No source selected");
         GameDataImporter.ImportKind kind = intent.getBooleanExtra("overlay", false)
                 ? GameDataImporter.ImportKind.CONTENT_OVERLAY : GameDataImporter.ImportKind.BASE_CLIENT;
-        Path archive = UriStager.stage(getContentResolver(), uri, root.resolve("imports"), cancelled,
-                (copied, total) -> status = "Copying archive: " + mib(copied) + (total >= 0 ? " / " + mib(total) : "") + " MiB");
         GameDataImporter importer = new GameDataImporter(root.resolve("game"));
-        GameDataImporter.Result result = importer.importZip(archive, kind, (path, bytes, total, count, files) ->
-                status = "Importing " + count + " / " + files + " files · " + mib(bytes) + " / " + mib(total) + " MiB\n" + path,
-                cancelled::get);
-        // Delete only the temporary ZIP after the importer has published a complete generation.
-        Files.deleteIfExists(archive);
+        GameDataImporter.Result result;
+        if (intent.getBooleanExtra("folder", false)) {
+            status = "Reading selected folder…";
+            try (SafTreeSource source = new SafTreeSource(getContentResolver(), uri, cancelled, (files, directories, reliableTimes) ->
+                    status = "Reading folder: " + files + " files, " + directories + " folders"
+                            + (reliableTimes ? "" : "\nThis provider omits modification times; interrupted imports must start a new copy."))) {
+                activeFolderSource = source;
+                result = importer.importSource(source, kind, (path, bytes, total, count, files) ->
+                        status = importProgress(path, bytes, total, count, files)
+                                + (source.hasReliableFileTimes() ? "" : "\nResume is unavailable for this source because some files have no modification time."), cancelled::get);
+            } finally { activeFolderSource = null; }
+        } else {
+            Path archive = UriStager.stage(getContentResolver(), uri, root.resolve("imports"), cancelled,
+                    (copied, total) -> status = "Copying archive: " + mib(copied) + (total >= 0 ? " / " + mib(total) : "") + " MiB");
+            result = importer.importZip(archive, kind, (path, bytes, total, count, files) ->
+                    status = importProgress(path, bytes, total, count, files), cancelled::get);
+            // Delete only the temporary ZIP after the importer has published a complete generation.
+            Files.deleteIfExists(archive);
+        }
         status = "Import complete: " + result.copiedFiles + " copied, " + result.reusedFiles + " resumed.\nBuild 12340 base checks passed; full Esteria content and runtime are not yet qualified.";
         log("Import complete generation=" + result.generation + " copied=" + result.copiedFiles + " reused=" + result.reusedFiles);
     }
@@ -261,9 +275,17 @@ public final class SessionService extends Service {
         } catch (IOException ignored) { }
     }
     private static long mib(long value) { return value / (1024 * 1024); }
-    @Override public void onDestroy() { destroyed = true; cancelled.set(true); worker.shutdown(); super.onDestroy(); }
+    private static String importProgress(String path, long bytes, long total, int count, int files) {
+        return "Importing " + count + " / " + files + " files · " + mib(bytes) + " / " + mib(total) + " MiB\n" + path;
+    }
+    private void requestCancellation() {
+        cancelled.set(true);
+        SafTreeSource source = activeFolderSource;
+        if (source != null) source.cancel();
+    }
+    @Override public void onDestroy() { destroyed = true; requestCancellation(); worker.shutdown(); super.onDestroy(); }
     @Override public void onTimeout(int startId, int foregroundServiceType) {
-        cancelled.set(true); status = "Android stopped the long import. Select the same archive to resume.";
+        requestCancellation(); status = "Android stopped the long import. Select the same source to resume where metadata permits.";
         stopForeground(STOP_FOREGROUND_REMOVE); stopSelf(startId);
     }
 }

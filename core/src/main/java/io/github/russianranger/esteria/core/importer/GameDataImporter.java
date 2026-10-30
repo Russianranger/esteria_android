@@ -20,6 +20,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -41,6 +43,29 @@ public final class GameDataImporter {
     public enum ImportKind { BASE_CLIENT, CONTENT_OVERLAY }
     public interface ProgressListener { void onProgress(String path, long completedBytes, long totalBytes, int completedFiles, int totalFiles); }
     public interface Cancellation { boolean isCancelled(); }
+    /** An observed source document. IDs are opaque tokens, never destination paths. */
+    public static final class InputEntry {
+        public final String id, relativePath;
+        public final long size, modifiedMillis;
+        public InputEntry(String id, String relativePath, long size, long modifiedMillis) {
+            this.id = id; this.relativePath = relativePath; this.size = size; this.modifiedMillis = modifiedMillis;
+        }
+    }
+    /**
+     * A seek-free folder/document adapter. The adapter must use MetadataBudget during inventory creation,
+     * return only regular documents, and reject aliases/cycles/special documents.
+     * snapshot is called exactly once. Each stream is opened/closed by this importer.
+     * verifyUnchanged must reject an ID, name, type, size or known-mtime change;
+     * verifySnapshot checks parent/root identities after all files. Unknown mtimes
+     * (<=0) disable resume across operations; unknown file sizes are never accepted.
+     */
+    public interface InputSource {
+        String identity();
+        List<InputEntry> snapshot(Cancellation cancellation) throws IOException;
+        InputStream open(InputEntry entry) throws IOException;
+        void verifyUnchanged(InputEntry entry) throws IOException;
+        void verifySnapshot(List<InputEntry> snapshot) throws IOException;
+    }
     public static final Cancellation NEVER_CANCELLED = () -> false;
     public static final ProgressListener NO_PROGRESS = (p, b, t, n, f) -> {};
     public static final class ImportCancelledException extends IOException {
@@ -58,12 +83,48 @@ public final class GameDataImporter {
     }
     public static final class Limits {
         public final int maxFiles;
-        public final long maxFileBytes, maxTotalBytes;
+        public final long maxFileBytes, maxTotalBytes, maxMetadataBytes;
         public Limits(int maxFiles, long maxFileBytes, long maxTotalBytes) {
+            this(maxFiles, maxFileBytes, maxTotalBytes, MetadataBudget.DEFAULT_MAX_BYTES);
+        }
+        public Limits(int maxFiles, long maxFileBytes, long maxTotalBytes, long maxMetadataBytes) {
             if (maxFiles < 1 || maxFileBytes < 1 || maxTotalBytes < maxFileBytes) throw new IllegalArgumentException("Invalid import limits");
-            this.maxFiles = maxFiles; this.maxFileBytes = maxFileBytes; this.maxTotalBytes = maxTotalBytes;
+            if (maxMetadataBytes < 1 || maxMetadataBytes > MetadataBudget.DEFAULT_MAX_BYTES) throw new IllegalArgumentException("Invalid metadata budget");
+            this.maxFiles = maxFiles; this.maxFileBytes = maxFileBytes; this.maxTotalBytes = maxTotalBytes; this.maxMetadataBytes = maxMetadataBytes;
         }
         public static Limits defaults() { return new Limits(200_000, 32L << 30, 256L << 30); }
+    }
+    /**
+     * Conservative cap for all simultaneously live source/validation/journal bookkeeping.
+     * Call before retaining a document during provider enumeration. This is an estimate
+     * with generous object/string/map overhead, not a measurement of JVM heap bytes.
+     */
+    public static final class MetadataBudget {
+        public static final long DEFAULT_MAX_BYTES = 16L << 20;
+        private final long maximum;
+        private long used;
+        public MetadataBudget() { this(DEFAULT_MAX_BYTES); }
+        public MetadataBudget(long maximum) {
+            if (maximum < 1 || maximum > DEFAULT_MAX_BYTES) throw new IllegalArgumentException("Invalid metadata budget");
+            this.maximum = maximum;
+        }
+        public void add(String relativePath, String documentId, boolean directory) throws IOException {
+            if (relativePath == null || documentId == null || relativePath.length() > 1024 || documentId.length() > 4096)
+                throw new IOException("Source metadata contains an oversized name or document identity");
+            int pathBytes = relativePath.getBytes(StandardCharsets.UTF_8).length, idBytes = documentId.getBytes(StandardCharsets.UTF_8).length;
+            if (pathBytes > 1024 || idBytes > 4096) throw new IOException("Source metadata contains an oversized name or document identity");
+            long cost = (directory ? 512L : 1024L) + pathBytes * 8L + idBytes * 6L;
+            // Validation holds canonical and case-folded parent names/maps together.
+            // Charging each parent again per file intentionally overestimates shared paths.
+            for (int slash = relativePath.indexOf('/'); slash >= 0; slash = relativePath.indexOf('/', slash + 1))
+                cost += 256L + relativePath.substring(0, slash).getBytes(StandardCharsets.UTF_8).length * 8L;
+            reserve(cost);
+        }
+        void reserve(long bytes) throws IOException {
+            if (bytes < 0 || bytes > maximum - used) throw new IOException("Source metadata exceeds the import memory budget (" + maximum + " estimated bytes); use a smaller content package");
+            used += bytes;
+        }
+        public long estimatedBytes() { return used; }
     }
     private final Path root;
     private final Limits limits;
@@ -104,9 +165,15 @@ public final class GameDataImporter {
         Path source = archive.toAbsolutePath().normalize();
         rejectSymlinkAncestors(source);
         try (ImportLock ignored = lock()) {
-            ZipSafety.inspect(source, limits.maxFiles, cancellation);
+            ZipSafety.inspect(source, limits.maxFiles, limits.maxMetadataBytes, cancellation);
             try (ZipSource input = new ZipSource(source)) { return importSource(input, kind, listener, cancellation); }
         }
+    }
+
+    /** Direct streaming from SAF or another bounded document provider; no ZIP copy is required. */
+    public Result importSource(InputSource source, ImportKind kind, ProgressListener listener, Cancellation cancellation) throws IOException {
+        if (source == null) throw new IllegalArgumentException("Input source must not be null");
+        try (ImportLock ignored = lock()) { return importSource(new ExternalSource(source), kind, listener, cancellation); }
     }
 
     private Result importSource(Source source, ImportKind kind, ProgressListener listener, Cancellation cancellation) throws IOException {
@@ -116,6 +183,7 @@ public final class GameDataImporter {
         if (entries.isEmpty()) throw new IOException("No files to import");
         if (kind == ImportKind.BASE_CLIENT) stripClientWrapper(entries);
         validateEntries(entries);
+        if (kind == ImportKind.BASE_CLIENT) GameDataVerifier.verifyBaseLayout(() -> entries.stream().map(entry -> entry.path).iterator());
         entries.sort(Comparator.comparing(e -> e.path));
         Path current = resolveCurrent();
         String base = kind == ImportKind.CONTENT_OVERLAY ? currentId() : "base";
@@ -228,9 +296,11 @@ public final class GameDataImporter {
 
     private void canonicalizeOverlayPaths(Path data, List<Entry> entries) throws IOException {
         Map<String, String> names = new HashMap<>();
+        MetadataBudget budget = new MetadataBudget(limits.maxMetadataBytes);
         try (java.util.stream.Stream<Path> paths = Files.walk(data)) {
             for (Path path : (Iterable<Path>) paths::iterator) {
                 String relative = data.relativize(path).toString().replace('\\', '/');
+                budget.add(relative, "", Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS));
                 names.put(relative.toLowerCase(Locale.ROOT), relative);
                 if (names.size() > limits.maxFiles * 2L) throw new IOException("Combined content manifest is too large");
             }
@@ -253,7 +323,9 @@ public final class GameDataImporter {
     private void validateEntries(List<Entry> entries) throws IOException {
         if (entries.size() > limits.maxFiles) throw new IOException("Too many import files");
         Map<String, Boolean> paths = new HashMap<>(); Map<String, String> spelling = new HashMap<>(); long total = 0;
+        MetadataBudget budget = new MetadataBudget(limits.maxMetadataBytes);
         for (Entry entry : entries) {
+            budget.add(entry.path, "", false);
             entry.path = validatePath(entry.path);
             if (entry.path.toLowerCase(Locale.ROOT).endsWith(".esteria-part") || entry.path.toLowerCase(Locale.ROOT).endsWith(".esteria-seed")) throw new IOException("Reserved staging filename");
             if (entry.size < 0 || entry.size > limits.maxFileBytes || entry.size > limits.maxTotalBytes - total) throw new IOException("Import size limit exceeded");
@@ -345,12 +417,14 @@ public final class GameDataImporter {
     private Map<String, Saved> readJournal(Path path) throws IOException {
         Map<String, Saved> entries = new HashMap<>();
         if (!Files.exists(path, LinkOption.NOFOLLOW_LINKS)) return entries;
-        if (!Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS) || Files.size(path) > limits.maxFiles * 2048L) throw new IOException("Invalid import journal");
+        if (!Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS) || Files.size(path) > Math.min(limits.maxFiles * 2048L, limits.maxMetadataBytes * 2)) throw new IOException("Invalid or excessive import journal");
+        MetadataBudget budget = new MetadataBudget(limits.maxMetadataBytes);
         try (BufferedReader in = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             String line; while ((line = boundedLine(in)) != null) {
                 try {
                     String[] parts = line.split("\t"); if (parts.length != 4 || !parts[3].matches("[0-9a-f]{64}")) continue;
                     String name = validatePath(new String(Base64.getDecoder().decode(parts[0]), StandardCharsets.UTF_8));
+                    if (!entries.containsKey(name)) budget.add(name, "", false);
                     entries.put(name, new Saved(Long.parseLong(parts[1]), Long.parseLong(parts[2])));
                     if (entries.size() > limits.maxFiles) throw new IOException("Excessive import journal entries");
                 } catch (IllegalArgumentException ignored) { /* Incomplete last record is safely recopied. */ }
@@ -389,19 +463,83 @@ public final class GameDataImporter {
     private static final class ImportLock implements AutoCloseable { final FileChannel channel; final FileLock lock; ImportLock(FileChannel c, FileLock l) { channel = c; lock = l; } public void close() throws IOException { try { lock.release(); } finally { channel.close(); } } }
     private static final class Entry { String path; final String original; final long size, modified, crc; Entry(String path, long size, long modified, long crc) { this.path = path; this.original = path; this.size = size; this.modified = modified; this.crc = crc; } }
     private interface Source { List<Entry> entries(Cancellation cancellation) throws IOException; String identity(); InputStream open(Entry entry) throws IOException; void verifyUnchanged(Entry entry) throws IOException; }
+    private final class ExternalSource implements Source {
+        private final InputSource input;
+        private final Map<String, InputEntry> byPath = new HashMap<>();
+        private List<InputEntry> snapshot;
+        private String sourceIdentity;
+        private Cancellation cancellation;
+        ExternalSource(InputSource input) { this.input = input; }
+        public List<Entry> entries(Cancellation cancellation) throws IOException {
+            this.cancellation = cancellation;
+            String identity = input.identity();
+            if (identity == null || identity.isEmpty() || identity.getBytes(StandardCharsets.UTF_8).length > 4096) throw new IOException("Invalid document source identity");
+            List<InputEntry> observed = input.snapshot(cancellation);
+            if (observed == null || observed.size() > limits.maxFiles) throw new IOException("Invalid or excessive document inventory");
+            if (observed.size() > limits.maxMetadataBytes / 1024) throw new IOException("Source metadata exceeds the import memory budget; use a smaller content package");
+            List<InputEntry> owned = new ArrayList<>(observed.size());
+            MetadataBudget budget = new MetadataBudget(limits.maxMetadataBytes);
+            Set<String> ids = new HashSet<>();
+            List<Entry> result = new ArrayList<>(observed.size());
+            boolean resumeSafe = true;
+            for (InputEntry entry : observed) {
+                checkCancelled(cancellation);
+                if (entry == null || entry.id == null || entry.id.isEmpty() || entry.id.getBytes(StandardCharsets.UTF_8).length > 4096 || !ids.add(entry.id))
+                    throw new IOException("Duplicate or invalid document ID");
+                if (entry.relativePath == null) throw new IOException("Document relative path is missing");
+                budget.add(entry.relativePath, entry.id, false);
+                validatePath(entry.relativePath);
+                if (entry.size < 0) throw new IOException("Document size is unknown: " + entry.relativePath);
+                if (byPath.put(entry.relativePath, entry) != null) throw new IOException("Duplicate document path");
+                if (entry.modifiedMillis <= 0) resumeSafe = false;
+                owned.add(entry); result.add(new Entry(entry.relativePath, entry.size, entry.modifiedMillis, -1));
+            }
+            owned.sort(Comparator.comparing(entry -> entry.relativePath));
+            snapshot = Collections.unmodifiableList(owned);
+            MessageDigest identityHash = sha256();
+            for (InputEntry entry : snapshot) {
+                byte[] path = entry.relativePath.getBytes(StandardCharsets.UTF_8), id = entry.id.getBytes(StandardCharsets.UTF_8);
+                identityHash.update(ByteBuffer.allocate(4).putInt(path.length).array()); identityHash.update(path);
+                identityHash.update(ByteBuffer.allocate(4).putInt(id.length).array()); identityHash.update(id);
+            }
+            sourceIdentity = identity + "\ndocuments=" + hex(identityHash.digest());
+            if (!resumeSafe) sourceIdentity += "\nunversioned=" + UUID.randomUUID();
+            return result;
+        }
+        public String identity() { return sourceIdentity; }
+        public InputStream open(Entry entry) throws IOException {
+            verifyUnchanged(entry);
+            InputStream stream = input.open(byPath.get(entry.original));
+            if (stream == null) throw new IOException("Document stream is unavailable: " + entry.path);
+            return stream;
+        }
+        public void verifyUnchanged(Entry entry) throws IOException {
+            checkCancelled(cancellation);
+            if (entry == null) {
+                for (InputEntry original : snapshot) { checkCancelled(cancellation); input.verifyUnchanged(original); }
+                input.verifySnapshot(snapshot);
+            } else input.verifyUnchanged(byPath.get(entry.original));
+        }
+    }
     private final class FolderSource implements Source {
         final Path source;
         List<Entry> snapshot;
         final Map<Path, Long> directoryTimes = new HashMap<>();
+        Cancellation cancellation;
         FolderSource(Path source) { this.source = source; }
         public String identity() { return source.toString(); }
         public List<Entry> entries(Cancellation cancellation) throws IOException {
+            this.cancellation = cancellation;
             List<Entry> entries = new ArrayList<>();
+            MetadataBudget budget = new MetadataBudget(limits.maxMetadataBytes);
             if (!Files.isDirectory(source, LinkOption.NOFOLLOW_LINKS)) throw new IOException("Client source is not a folder");
             Files.walkFileTree(source, new SimpleFileVisitor<Path>() {
                 @Override public FileVisitResult preVisitDirectory(Path directory, BasicFileAttributes attributes) throws IOException {
                     checkCancelled(cancellation);
                     if (directoryTimes.size() >= limits.maxFiles) throw new IOException("Too many source directories");
+                    String relative = source.relativize(directory).toString().replace('\\', '/');
+                    if (!relative.isEmpty()) validatePath(relative);
+                    budget.add(relative, "", true);
                     directoryTimes.put(directory, attributes.lastModifiedTime().toMillis());
                     return FileVisitResult.CONTINUE;
                 }
@@ -409,7 +547,10 @@ public final class GameDataImporter {
                     checkCancelled(cancellation);
                     if (!attributes.isRegularFile() || attributes.isSymbolicLink()) throw new IOException("Source symlinks and special files are forbidden");
                     if (entries.size() >= limits.maxFiles) throw new IOException("Too many source files");
-                    entries.add(new Entry(source.relativize(file).toString().replace('\\', '/'), attributes.size(), attributes.lastModifiedTime().toMillis(), -1));
+                    String relative = source.relativize(file).toString().replace('\\', '/');
+                    validatePath(relative);
+                    budget.add(relative, "", false);
+                    entries.add(new Entry(relative, attributes.size(), attributes.lastModifiedTime().toMillis(), -1));
                     return FileVisitResult.CONTINUE;
                 }
             });
@@ -419,8 +560,9 @@ public final class GameDataImporter {
         public InputStream open(Entry entry) throws IOException { verifyUnchanged(entry); return Files.newInputStream(source.resolve(entry.original), LinkOption.NOFOLLOW_LINKS); }
         public void verifyUnchanged(Entry entry) throws IOException {
             if (entry == null) {
-                for (Entry file : snapshot) verifyUnchanged(file);
+                for (Entry file : snapshot) { checkCancelled(cancellation); verifyUnchanged(file); }
                 for (Map.Entry<Path, Long> directory : directoryTimes.entrySet()) {
+                    checkCancelled(cancellation);
                     rejectSymlinkAncestors(directory.getKey());
                     if (Files.getLastModifiedTime(directory.getKey(), LinkOption.NOFOLLOW_LINKS).toMillis() != directory.getValue()) throw new IOException("Source directory changed during import");
                 }
@@ -437,11 +579,13 @@ public final class GameDataImporter {
         public String identity() { return source + "\n" + length + "\n" + modified; }
         public List<Entry> entries(Cancellation cancellation) throws IOException {
             List<Entry> entries = new ArrayList<>(); Set<String> allNames = new HashSet<>();
+            MetadataBudget budget = new MetadataBudget(limits.maxMetadataBytes);
             Enumeration<? extends ZipEntry> iterator = zip.entries();
             while (iterator.hasMoreElements()) {
                 checkCancelled(cancellation);
                 ZipEntry file = iterator.nextElement();
                 String name = file.getName(); String checked = file.isDirectory() ? name.substring(0, name.length() - 1) : name;
+                budget.add(checked, "", file.isDirectory());
                 validatePath(checked);
                 if (!allNames.add(checked.toLowerCase(Locale.ROOT))) throw new IOException("Duplicate ZIP entry: " + name);
                 if (allNames.size() > limits.maxFiles) throw new IOException("Too many ZIP entries");

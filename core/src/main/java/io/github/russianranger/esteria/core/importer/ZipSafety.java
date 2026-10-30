@@ -2,13 +2,14 @@ package io.github.russianranger.esteria.core.importer;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 /** Reads ZIP/ZIP64 central attributes absent from java.util.zip.ZipEntry. */
 final class ZipSafety {
     private ZipSafety() {}
 
-    static long inspect(Path zip, int maxEntries, GameDataImporter.Cancellation cancellation) throws IOException {
+    static long inspect(Path zip, int maxEntries, long maxMetadataBytes, GameDataImporter.Cancellation cancellation) throws IOException {
         if (cancellation == null) throw new IllegalArgumentException("Cancellation must not be null");
         try (RandomAccessFile f = new RandomAccessFile(zip.toFile(), "r")) {
             long end = -1;
@@ -36,6 +37,10 @@ final class ZipSafety {
             if (diskEntries != count || count > maxEntries) throw new IOException("Too many entries or split ZIP archive");
             GameDataVerifier.range(f, offset, size);
             if (offset + size != directoryEnd) throw new IOException("Unsupported trailing ZIP directory records");
+            // ZipFile retains central-directory bytes. Cap them before constructing it,
+            // then charge decoded names/maps and optional metadata as each entry is read.
+            GameDataImporter.MetadataBudget budget = new GameDataImporter.MetadataBudget(maxMetadataBytes);
+            budget.reserve(size);
             long at = offset;
             for (long i = 0; i < count; i++) {
                 if (cancellation.isCancelled() || Thread.currentThread().isInterrupted()) throw new GameDataImporter.ImportCancelledException();
@@ -50,8 +55,14 @@ final class ZipSafety {
                     if (type != 0 && type != 0100000 && type != 0040000) throw new IOException("ZIP symlinks and special files are forbidden");
                 }
                 if (GameDataVerifier.u16(f, at + 34) != 0) throw new IOException("Split ZIP entry");
-                long next = at + 46 + GameDataVerifier.u16(f, at + 28) + GameDataVerifier.u16(f, at + 30) + GameDataVerifier.u16(f, at + 32);
+                int nameLength = GameDataVerifier.u16(f, at + 28), extraLength = GameDataVerifier.u16(f, at + 30), commentLength = GameDataVerifier.u16(f, at + 32);
+                long next = at + 46 + nameLength + extraLength + commentLength;
                 if (next > offset + size) throw new IOException("ZIP central directory overrun");
+                if (nameLength == 0 || nameLength > 1025) throw new IOException("ZIP name exceeds the bounded metadata policy");
+                byte[] nameBytes = new byte[nameLength]; f.seek(at + 46); f.readFully(nameBytes);
+                String name = new String(nameBytes, StandardCharsets.UTF_8); boolean directory = name.endsWith("/");
+                budget.add(directory ? name.substring(0, name.length() - 1) : name, "", directory);
+                budget.reserve((extraLength + commentLength) * 2L);
                 at = next;
             }
             if (at != offset + size) throw new IOException("ZIP entry count does not match directory");

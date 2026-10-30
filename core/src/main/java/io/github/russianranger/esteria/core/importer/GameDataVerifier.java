@@ -5,13 +5,32 @@ import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /** Bounded structural checks, not a claim that arbitrary custom content is compatible. */
 public final class GameDataVerifier {
+    private static final String[] BASE_ARCHIVES = {"common.MPQ", "common-2.MPQ", "expansion.MPQ", "lichking.MPQ", "patch.MPQ", "patch-2.MPQ", "patch-3.MPQ"};
     private GameDataVerifier() {}
+
+    /** Cheap filename-layout preflight only; header and version checks still run while importing. */
+    static void verifyBaseLayout(Iterable<String> paths) throws IOException {
+        Set<String> missing = new HashSet<>(); missing.add("wow.exe");
+        for (String archive : BASE_ARCHIVES) missing.add("data/" + archive.toLowerCase(Locale.ROOT));
+        boolean locale = false;
+        for (String original : paths) {
+            String path = original.toLowerCase(Locale.ROOT); missing.remove(path);
+            if (path.startsWith("data/") && path.contains("/locale-")) {
+                String[] parts = path.split("/");
+                if (parts.length == 3 && parts[1].matches("[a-z]{4}") && parts[2].equals("locale-" + parts[1] + ".mpq")) locale = true;
+            }
+        }
+        if (!missing.isEmpty()) throw new IOException("Incomplete conventional build 12340 client layout; missing " + String.join(", ", new java.util.TreeSet<>(missing)));
+        if (!locale) throw new IOException("Missing Data/<locale>/locale-<locale>.MPQ");
+    }
 
     public static void verifyBaseClient(Path root) throws IOException {
         Path wow = childIgnoringCase(root, "Wow.exe");
@@ -19,7 +38,7 @@ public final class GameDataVerifier {
         verifyWowVersion(wow);
         Path data = childIgnoringCase(root, "Data");
         if (data == null || !Files.isDirectory(data)) throw new IOException("Missing Data directory");
-        for (String name : new String[]{"common.MPQ", "common-2.MPQ", "expansion.MPQ", "lichking.MPQ", "patch.MPQ", "patch-2.MPQ", "patch-3.MPQ"}) {
+        for (String name : BASE_ARCHIVES) {
             Path file = childIgnoringCase(data, name);
             if (file == null) throw new IOException("Missing base client archive Data/" + name);
             verifyMpq(file);
