@@ -3,7 +3,9 @@ package io.github.russianranger.esteria.runtime;
 import android.content.Context;
 import android.os.Handler;
 import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
+import io.github.russianranger.esteria.core.presentation.X11SessionPlan;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
+import io.github.russianranger.esteria.core.runtime.process.ProotLaunch;
 import io.github.russianranger.esteria.presentation.ClientPresentationSession;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -155,11 +157,49 @@ public final class PresentationShaderOwnerTests {
             remove(root);
         }
     }
+    /** Check the actual PRoot argv produced from the same client mounts used
+     * at launch. Helpers in separate PRoot processes cannot supply this bind. */
+    private static void clientAudioMount()throws Exception {
+        Path root=Files.createTempDirectory("esteria-client-audio-mount-").toRealPath();
+        try {
+            Path rootfs=Files.createDirectory(root.resolve("wine")),work=Files.createDirectory(root.resolve("work"));
+            Path temporary=Files.createDirectory(root.resolve("tmp")),logs=Files.createDirectory(root.resolve("logs"));
+            Path data=Files.createDirectory(root.resolve("data")),shaders=Files.createDirectory(root.resolve("shaders"));
+            Path bridge=Files.createDirectory(root.resolve("bridges"));
+            Files.createDirectories(bridge.resolve("etc"));Files.createDirectories(bridge.resolve("lib/alsa-lib"));
+            Files.writeString(bridge.resolve("etc/alsa-esteria.conf"),"TEST_ONLY_ALSA_CONFIGURATION");
+            Files.writeString(bridge.resolve("lib/alsa-lib/libasound_module_pcm_esteria.so"),"TEST_ONLY_PLUGIN_PATH");
+            Path tracer=Files.writeString(root.resolve("tracer"),"TEST_ONLY_NOT_EXECUTED");
+            Path loader=Files.writeString(root.resolve("loader"),"TEST_ONLY_NOT_EXECUTED");
+            check(tracer.toFile().setExecutable(true)&&loader.toFile().setExecutable(true),"Host executable fixture permission");
+            Path endpoints=Files.createDirectory(root.resolve("io")),x11=Files.createDirectory(root.resolve("x11"));
+            Method method=ClientPresentationSession.class.getDeclaredMethod("clientMounts",Path.class,Path.class,Path.class);
+            method.setAccessible(true);
+            @SuppressWarnings("unchecked") List<ProotLaunch.Mount> mounts=(List<ProotLaunch.Mount>)method.invoke(null,data,shaders,bridge);
+            Map<String,String> environment=X11SessionPlan.environment(987);
+            OwnedProcess.Specification specification=ProotLaunch.create(tracer,loader,rootfs,work,temporary,logs,
+                    List.of("/opt/wine/bin/wine","Z:\\work\\launch\\WowClient64.exe"),environment,mounts,
+                    new ProotLaunch.PresentationBindings(endpoints,x11));
+            List<String> argv=specification.arguments;
+            check(argv.contains("ALSA_CONFIG_PATH="+GuestBridgeSetup.alsaConfigPath()),"Wine retains the selected ALSA configuration");
+            for(String guest:List.of(GuestBridgeSetup.alsaConfigPath(),"/esteria-bridges/lib/alsa-lib/libasound_module_pcm_esteria.so")) {
+                Path actual=null;
+                for(int i=0;i+1<argv.size();i++)if(argv.get(i).equals("-b")) {
+                    String bind=argv.get(i+1);int colon=bind.indexOf(':');if(colon<0)continue;
+                    String destination=bind.substring(colon+1);if(destination.endsWith("!"))destination=destination.substring(0,destination.length()-1);
+                    if(guest.startsWith(destination+"/"))actual=Path.of(bind.substring(0,colon)).resolve(guest.substring(destination.length()+1));
+                }
+                check(actual!=null&&actual.startsWith(bridge)&&Files.isRegularFile(actual),"Wine ALSA path must resolve through its own verified provider bind: "+guest);
+            }
+            check(argv.contains(bridge+":"+GuestBridgeSetup.guestMount()+"!"),"Bridge bind cannot dereference a guest destination link");
+            check(!argv.contains(root+":/esteria-bridges!"),"Only the bridge provider is exposed, never the application root");
+        } finally { remove(root); }
+    }
     private static void remove(Path root)throws IOException {
         try(var paths=Files.walk(root)){for(Path path:paths.sorted(Comparator.reverseOrder()).toArray(Path[]::new))Files.delete(path);}
     }
     public static void main(String[] arguments)throws Exception {
-        presentationTimeout();shaderTimeout();shaderPrelaunchStop();
-        System.out.println("Presentation/shader owners passed3 host delayed-cleanup, interruption and prelaunch guard fixtures; no native or Android execution");
+        presentationTimeout();shaderTimeout();shaderPrelaunchStop();clientAudioMount();
+        System.out.println("Presentation/shader owners passed4 host delayed-cleanup, interruption, prelaunch guard and client ALSA mount fixtures; no native or Android execution");
     }
 }

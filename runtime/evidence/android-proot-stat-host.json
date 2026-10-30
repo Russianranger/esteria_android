@@ -1,0 +1,189 @@
+{
+  "androidTestApkBuild": {
+    "actionableTasks": 54,
+    "actualZipEntriesVerified": {
+      "assets/proot-stat-probe/ESTERIA-GPL-3.0.txt": {
+        "bytes": 35149,
+        "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+      },
+      "assets/proot-stat-probe/build-evidence.json": {
+        "bytes": 4714,
+        "sha256": "f7ee235101bcd706f8e963fe46fc338ff956a37d9db2aa3289d2ed2fec7b6dc6"
+      },
+      "assets/proot-stat-probe/probe-stat": {
+        "bytes": 17408,
+        "sha256": "a86939bfbf91df756a96658f4d21253814e0437d71a01d6701ddec81509a5dfe"
+      }
+    },
+    "apk": {
+      "bytes": 1829923,
+      "sha256": "bc4598c92e6b93954f830062df8c0e83dc758e16d967180a064a9ea6a743f489"
+    },
+    "durationSeconds": 16,
+    "environment": "JDK17 / Android SDK35 / Gradle8.9, offline cached dependencies; preexisting output-directory init script only",
+    "exitCode": 0,
+    "productionApkRebuilt": false,
+    "successful": true,
+    "task": ":app:assembleDebugAndroidTest"
+  },
+  "boundaries": {
+    "androidArm64Qualified": false,
+    "androidGuestExecuted": false,
+    "gameplayQualified": false,
+    "productionCacheEnabled": false,
+    "prootGuestExecuted": false,
+    "pythonRuntimeStatQualified": false,
+    "realBindAliasesQualified": false,
+    "sourceOwnedCapabilityCheckImplemented": false,
+    "thorQualified": false,
+    "unchangedMetadataCorruptionDetectionClaimed": false,
+    "worldQualified": false
+  },
+  "branch": "android/client-server",
+  "exactNdkFixture": {
+    "compilerSha256": "6156dd4e5e466333197a00b8d20bca72c292186643b749dcaaa3aa9164afb1de",
+    "fixture": {
+      "bytes": 17408,
+      "sha256": "a86939bfbf91df756a96658f4d21253814e0437d71a01d6701ddec81509a5dfe"
+    },
+    "glibcStartupInputs": {
+      "Scrt1.o": {
+        "bytes": 1632,
+        "sha256": "476c1939cbc572be9ca35ac2592e24a57c636003dd6c2d2ed4138cecde2a2ff9"
+      },
+      "crti.o": {
+        "bytes": 1072,
+        "sha256": "78acef26a7007f5320c98633376f2903e33895e694fbc2b91d189b38addbca8a"
+      },
+      "crtn.o": {
+        "bytes": 648,
+        "sha256": "121f2a5f12b13471dd8c7dabe3ff334df08540c270564d1a2b3c47ecbd8d3101"
+      }
+    },
+    "glibcVersion": "2.36",
+    "ndkVersion": "28.2.13676358",
+    "originalProotBuildEvidence": {
+      "bytes": 4833,
+      "sha256": "b5d14a16d9a83835e027d71d2e0a6f521280057de365244a8963e49b570a463a"
+    },
+    "originalProotNativeFiles": {
+      "libproot_probe.so": {
+        "bytes": 277720,
+        "sha256": "8901163fb083b63e741b7c6bc7958cf82c646bb1d897052c39c3dc8e427526c5"
+      },
+      "libproot_probe_control.so": {
+        "bytes": 277720,
+        "sha256": "29dbcbbab429fc77bbf45580a35b6d2c659f19162b9bf764b43ebb2da625f970"
+      },
+      "libproot_probe_loader.so": {
+        "bytes": 18344,
+        "sha256": "4a324117c6a16fe996af18ea388191379f5517309e963c80186fd3563a78410a"
+      }
+    },
+    "providerVerified": true,
+    "scope": "android-x86_64-glibc-stat-fixture-build-only",
+    "sourceSnapshotExact": false
+  },
+  "formatVersion": 1,
+  "gitHeadAtObservation": "7e498c50cdf55027e679d63e31f0a5e4b117f934",
+  "host": {
+    "machine": "x86_64",
+    "system": "Linux"
+  },
+  "hostTests": {
+    "cases": [
+      "Actual host mutations and reaped relaunch",
+      "Strict Android scope/source/alias/reaping admission guards",
+      "Hidden hardlink count/ctime mutation refusal",
+      "Symlink is not a substitute for a real bind alias",
+      "Missing/raw-syscall mismatched tuples refusal",
+      "Restored-mtime write requires changed ctime",
+      "Subsecond precision and directory mutation refusal"
+    ],
+    "command": "python3 -m unittest tests.test_android_proot_stat -v",
+    "durationSeconds": 0.554,
+    "errors": 0,
+    "exitCode": 0,
+    "failures": 0,
+    "skipped": 0,
+    "testsRun": 7
+  },
+  "instrumentationJavaCompile": {
+    "actionableTasks": 37,
+    "durationSeconds": 12,
+    "exitCode": 0,
+    "successful": true,
+    "task": ":app:compileDebugAndroidTestJavaWithJavac"
+  },
+  "ndkBuiltFixtureActuallyExecutedOnLinuxHost": {
+    "aliases": "Both absolute fixture arguments deliberately reference the same real host directory; no PRoot/bind alias qualification",
+    "bothExitCodes": [
+      0,
+      0
+    ],
+    "checks": {
+      "aliasAndRawSyscallTuplesMatched": true,
+      "arm64Qualified": false,
+      "directoryAddDeleteWithRestoredMtimeChangedCtime": true,
+      "finalNodes": 8,
+      "gameplayQualified": false,
+      "hardlinkAddDeleteChangedLinkCountAndCtime": true,
+      "leafOnlySymlinkProtectionClaimed": false,
+      "modeChangesVisible": true,
+      "nanosecondMtimePreserved": true,
+      "observations": 15,
+      "productionCacheEnabled": false,
+      "reapedGuestRelaunchTuplesStable": true,
+      "sameContentsReplacementChangedInode": true,
+      "sameLengthWriteRestoredMtimeChangedCtime": true,
+      "symlinkAncestorVisible": true,
+      "terminalSymlinkVisible": true,
+      "unchangedMetadataCorruptionDetectionClaimed": false
+    },
+    "guestProcesses": 2
+  },
+  "nextGate": "Commit exact fixture sources, then execute source-bound Android13 x86_64 PRoot workflow; this does not enable production cache or qualify ARM64",
+  "observedAtUtc": "2026-10-30T19:35:19.052725+00:00",
+  "repository": "Russianranger/esteria_android",
+  "scope": "android-proot-stat-source-modified-host-and-instrumentation-build-only",
+  "sourceInputs": {
+    ".github/workflows/android-proot-stat.yml": {
+      "bytes": 7502,
+      "sha256": "8d46cff6c36e99282a68f4e00e4809fcfc3ce43848ae59706ac2a2614ceb007a"
+    },
+    "LICENSE": {
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    "app/src/androidTest/assets/proot-stat-probe/.gitignore": {
+      "bytes": 129,
+      "sha256": "e8f2fe0b8f5bdc802946ca98d86e07ceb2a4021a9c8a93af4fb55c839e08ac74"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/runtime/ProotStatMetadataTest.java": {
+      "bytes": 12300,
+      "sha256": "e97df7e0d63aaf1c8c501e5b378cb3101556f998dd0ca2b216bbfe30a4d0c57d"
+    },
+    "native/proot-stat-probe/README.md": {
+      "bytes": 3260,
+      "sha256": "38cdd5fb762c439fe27359b50775242ded7faa931c8425b8d22ff6b4f048291b"
+    },
+    "native/proot-stat-probe/stat_probe.c": {
+      "bytes": 10184,
+      "sha256": "f156de731eb1272bfa6bc7dbed1a327cf0bcb43e072fcbe9e3448564bfe75ada"
+    },
+    "tests/test_android_proot_stat.py": {
+      "bytes": 6341,
+      "sha256": "fa3dac898946dd3b9a33f00fc162cf6113a3ab0040acb2f9378fbf84ef27ab13"
+    },
+    "tools/build_android_proot_stat_probe.py": {
+      "bytes": 9992,
+      "sha256": "84c68a94be2c66250d125292bbf3b2351d02f90509a93b74bbec5d278a583563"
+    },
+    "tools/qualify_android_proot_stat.py": {
+      "bytes": 11938,
+      "sha256": "2e8dad99c214179aee995a314a0d362d74d989dd375eef430da7e7f7e57282e8"
+    }
+  },
+  "sourceSnapshotExact": false,
+  "sourceState": "modified-worktree-exact-source-file-identities"
+}

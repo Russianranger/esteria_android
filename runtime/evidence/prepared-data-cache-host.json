@@ -1,0 +1,148 @@
+{
+  "activationGates": [
+    "Actual Android/PRoot stat semantics plus source-owned capability check",
+    "Production owner anchors only successful source-owned full-verification result",
+    "Fresh complete stat comparison after every import/data lease acquisition",
+    "No cache authority from caller boolean/path/self-declared hash"
+  ],
+  "allocationObservations": [
+    {
+      "maximumAllowedPeakBytes": 8388608,
+      "passed": true,
+      "payloadBytes": 67108872,
+      "receiptBytes": 2484,
+      "test": "test_large_file_streams_without_materializing_payload",
+      "tracedPeakBytes": 291629
+    },
+    {
+      "configuredMetadataCeilingBytes": 67108864,
+      "maximumAllowedPeakBytes": 524288,
+      "passed": true,
+      "receiptBytes": 2477,
+      "test": "test_tiny_metadata_read_does_not_allocate_configured_maximum",
+      "tracedPeakBytes": 12025
+    }
+  ],
+  "boundaries": {
+    "actualAndroidArm64Qualified": false,
+    "actualAndroidStatQualified": false,
+    "actualClientDataOrExtractionQualified": false,
+    "actualProotStatQualified": false,
+    "applicationCacheCallSitesAdded": false,
+    "characterPersistenceQualified": false,
+    "gameplayQualified": false,
+    "productionFastPathEnabled": false,
+    "sourceProviderSqlVerificationWeakened": false,
+    "thorQualified": false,
+    "worldQualified": false
+  },
+  "branch": "android/client-server",
+  "files": {
+    "core/build.gradle": {
+      "bytes": 5583,
+      "sha256": "7ba4bcb0e335e708c6e30544e125df20893e59c70d3df9e1cae5bfeac01f8b2d"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/PreparedDataCachePin.java": {
+      "bytes": 14809,
+      "sha256": "f9bcbdf96a3439c53a16c238e3927a7aec43bae85ee401d592b6a288ec5a8b56"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/install/PreparedDataCachePinTests.java": {
+      "bytes": 7715,
+      "sha256": "d97b4bbcde6d194140d133cb4ea8caf12d46761bf44d46356129c12e4268ca2c"
+    },
+    "runtime/extractor_order.py": {
+      "bytes": 9884,
+      "sha256": "5c6d30d23c2a8ebb13d037907cbcc6e7b67ea31f4b99798d925c5e3da756128c"
+    },
+    "runtime/owned_process_group.py": {
+      "bytes": 2795,
+      "sha256": "c19ed5c05e94d7b537df1055983fca75e20447f594419084f2207d60f99f138e"
+    },
+    "runtime/prepared_data_cache.py": {
+      "bytes": 15184,
+      "sha256": "302606e980bef1b066e98e6ed1c1e58fcf0bc76f6f0d5dc08c265e3f930d25bd"
+    },
+    "runtime/server/PREPARED-DATA-CACHE.md": {
+      "bytes": 4507,
+      "sha256": "4250e019f66e0b6910ea2060c93106b4415e6c106cb71de6b86eff94695daa66"
+    },
+    "runtime/server_data_generation.py": {
+      "bytes": 29380,
+      "sha256": "72513fb5e0c1264f996fed74a96178a9789e14e97863d268da1170fa64f74cc6"
+    },
+    "runtime/server_data_preflight.py": {
+      "bytes": 15268,
+      "sha256": "f69f84fad386f1d705a0268d95339d5a3ed070ac8694a8a29832f6ac01edf864"
+    },
+    "runtime/shader_generation.py": {
+      "bytes": 19353,
+      "sha256": "8bb48952c36bdc4c69516c2ffa6f5c2d2eb59e84019e6420948d94bc81683ac5"
+    },
+    "tests/test_prepared_data_cache.py": {
+      "bytes": 11297,
+      "sha256": "b922ec9f9f23e5b0926b7ef4c3336a2753af6c54008c818db22d9a80f90985c1"
+    },
+    "tests/test_server_data_generation.py": {
+      "bytes": 15337,
+      "sha256": "6dbd4cbd29c12cb82fd85b46bddc90dde3dcd27993e0f211e229873666467e71"
+    },
+    "tests/test_server_data_packages.py": {
+      "bytes": 10215,
+      "sha256": "937456c05bdae90cbe7877416bea1ddf89c503ba02116935015edc3fc0731aab"
+    }
+  },
+  "formatVersion": 1,
+  "gitHeadAtObservation": "7e498c50cdf55027e679d63e31f0a5e4b117f934",
+  "host": {
+    "machine": "x86_64",
+    "system": "Linux"
+  },
+  "java": {
+    "actionableTasks": 5,
+    "alsoPassed": [
+      "serverDataRunPlanTest",
+      "serverDataToolSelectionTest"
+    ],
+    "buildSuccessful": true,
+    "command": "./gradlew --offline --no-daemon :core:preparedDataCachePinTest :core:serverDataRunPlanTest :core:serverDataToolSelectionTest",
+    "durationSeconds": 9,
+    "environment": "JDK17/Gradle8.9; preexisting local output-directory init script only; no production source override",
+    "exitCode": 0,
+    "maximumHeapBytes": 33554432,
+    "observedOutput": [
+      "Prepared data private SHA index passed7 actual filesystem groups at bounded heap; fast path OFF, no guest/data producer qualification",
+      "Data command/source-metadata/import-change/path guards passed; no extraction execution claimed",
+      "Data tool selection matches Python canonical bytes; source/ABI/configuration/closure guards passed; no tool execution claimed"
+    ],
+    "preparedDataPrivateIndexActualFilesystemGroups": 7,
+    "streamedCandidateBytes": 50331648
+  },
+  "observedAtUtc": "2026-10-30T19:34:24.158207+00:00",
+  "python": {
+    "command": "python3 -m unittest tests.test_prepared_data_cache tests.test_server_data_generation tests.test_server_data_packages",
+    "durationSeconds": 3.21,
+    "errors": 0,
+    "exitCode": 0,
+    "failures": 0,
+    "skipped": 0,
+    "testGroups": {
+      "preparedDataCache": 15,
+      "serverDataGeneration": 17,
+      "suppliedServerData": 10
+    },
+    "testsRun": 42
+  },
+  "qualifiedBehavior": [
+    "Initial stable-descriptor full payload SHA-256 and exact retained header preflight",
+    "Fresh complete stat comparison reads zero prepared-data payload bytes",
+    "Nanosecond ctime detects same-size write with restored mtime on this Linux filesystem",
+    "Captured inode/directory/mode/link/receipt/helper/source mutations fail closed",
+    "Exclusive candidate publication preserves concurrent completed proof",
+    "Private copied SHA authority rejects candidate/cache/pin/pointer hard links and symlinks",
+    "Cancellation and failed resealing preserve prior receipt/proof",
+    "Tiny metadata reads allocate actual stable size rather than configured ceiling"
+  ],
+  "repository": "Russianranger/esteria_android",
+  "scope": "prepared-data-cache-modified-source-host-qualification-only",
+  "sourceState": "modified-worktree-exact-file-identities"
+}

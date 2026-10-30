@@ -58,7 +58,22 @@ def document(path):
             require(key not in result, 'duplicate server data metadata key')
             result[key] = value
         return result
-    return json.loads(storage.read(path, MAX_METADATA), object_pairs_hook=unique)
+    return json.loads(_metadata_bytes(path, MAX_METADATA), object_pairs_hook=unique)
+
+
+def _metadata_bytes(path, maximum):
+    """Allocate the actual metadata size, never the entire configured ceiling."""
+    path=storage.canonical(path,False)
+    descriptor=os.open(path,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK)
+    with os.fdopen(descriptor,'rb') as incoming:
+        before=os.fstat(incoming.fileno())
+        require(stat.S_ISREG(before.st_mode) and before.st_size<=maximum,'bounded regular data metadata required')
+        raw=incoming.read(before.st_size+1)
+        after=os.fstat(incoming.fileno())
+    fields=lambda info:(info.st_dev,info.st_ino,info.st_mode,info.st_size,info.st_mtime_ns,info.st_ctime_ns)
+    require(len(raw)==before.st_size and fields(before)==fields(after)==fields(path.lstat()),
+            'data metadata changed during read')
+    return raw
 
 
 def pin(value):
@@ -294,11 +309,12 @@ def phase(root, name, action):
     return completed / 'data'
 
 
-def verify_completed(destination, expected_inputs=None, *, expected_generation=None):
-    """Read-only format/source binding for setup and the internal world gate.
+def _completed_metadata(destination, expected_inputs=None, *, expected_generation=None):
+    """Metadata only. Its caller must independently verify the data payload.
 
-    A caller must additionally compare the selected import and verified provider
-    identities. This returns no world-coverage or gameplay qualification.
+    Kept private so a metadata receipt is never confused with verify_completed's
+    actual payload hashing and preflight. The optional, separately gated cache
+    sealer uses this same unchanged source/input/provider contract.
     """
     destination = storage.canonical(destination)
     selected_generation = destination.name if expected_generation is None else expected_generation
@@ -340,8 +356,15 @@ def verify_completed(destination, expected_inputs=None, *, expected_generation=N
                 'prepared provider order bytes changed')
     plan = document(destination / 'order.json')
     require(plan['configuredLocale'] == inputs['locale'] and plan['effectiveLocale'] == provider['effectiveLocale'] and
-            plan['profile'] == PROFILE and storage.read(destination / 'order.tsv', order.MAX_MANIFEST) == order.wire(plan),
+            plan['profile'] == PROFILE and _metadata_bytes(destination / 'order.tsv', order.MAX_MANIFEST) == order.wire(plan),
             'prepared provider projection differs')
+    return receipt
+
+
+def verify_completed(destination, expected_inputs=None, *, expected_generation=None):
+    """Full byte/header verification. This remains the production default."""
+    destination = storage.canonical(destination)
+    receipt = _completed_metadata(destination, expected_inputs, expected_generation=expected_generation)
     require(storage.encoded(receipt['files']) == storage.encoded(inventory(destination / 'data')),
             'prepared server data changed')
     preflight = formats.check_server_data(destination / 'data')

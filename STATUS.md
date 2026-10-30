@@ -123,3 +123,15 @@ workflow metadata still lags completed logs/retained results. No Android/world
 result is inferred. The next server-publication producer exports typed failure
 phase/reason tokens after its prior preparation/staging failure; exact inner
 cause was unavailable, so no source or network diagnosis was invented.
+
+The Wine client now receives its own verified bridge-provider mount so the
+selected ALSA configuration and PCM plugin resolve in that process. Compilation,
+four actual host ownership/launch-argument groups and Android lint pass; audible
+game output remains unqualified.
+
+Prepared-data cache primitives are implemented with a private SHA anchor, full
+stable-file verification before sealing and fresh file/directory stat comparison.
+Production remains OFF with no app call sites.42 focused Python checks and seven
+Core filesystem groups pass; small metadata allocation no longer reserves the
+64MiB ceiling. A separate source-built Android13 x64 PRoot stat qualification
+workflow is ready; its host fixture/APK checks are not Android execution evidence.

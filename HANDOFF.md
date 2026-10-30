@@ -115,3 +115,11 @@ was built with Retail assets disabled. The source fix is committed as671db06afd8
 Actual native Java SQL/promotion/restart now passes41109643068 at4fd32df.
 Preserve runtime/evidence/native-java-installation-41109643068.json; the Linux
 locator seam and unqualified Android/world scope remain explicit. Server-component measurement41113370383 at exact7e498c passes all twelve assets/1,783,413,529 bytes and all source/debug closures; the small measurement was independently read back. The full1.78GB candidate stays in CI. Finish exact-target owned draft binding, stored-byte upload/readback, UI publication and anonymous public readback before adopting public consumers. The browser release form cannot select arbitrary exact commits; a separate guarded metadata-only Actions creator is now implemented and independently reviewed. Its only mutation creates one empty exact-target draft; stored bytes and UI publication remain separate gates. The frozen uploader still never creates/finalizes releases, moves tags or replaces assets.
+
+The client ALSA mount omission is fixed and has an actual generated-argv
+regression. Cache primitives and a private SHA anchor are implemented/tested but
+production fast path stays OFF with no app call sites. Inspect the new separate
+Android13 x64 stat workflow outcome before any future platform decision; neither
+its host fixture nor x64 success qualifies Android ARM64/Thor stat behavior.
+Always retain full source/provider/SQL verification and perform fresh metadata
+comparison after each data/import lease boundary.

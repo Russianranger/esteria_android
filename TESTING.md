@@ -197,3 +197,20 @@ preparation, readonly binding, owner fixtures and actual helper/APK readback pas
 `runtime/evidence/server-data-input-import-host.json` for exact modified-worktree
 source identities, APK identities and helper hashes. Android, SQL, actual game
 assets/conversion and gameplay are explicitly unqualified by these fixtures.
+
+## Prepared-data cache and client audio mount
+
+`python3 -m unittest tests.test_prepared_data_cache tests.test_server_data_generation tests.test_server_data_packages -v`
+exercises stable full-byte sealing, changed ctime/inode/mode/link/directory
+refusals, cancellation, recovery and exclusive candidate publication.
+`:core:preparedDataCachePinTest` covers the private anchor with a32MiB heap.
+Production fast-path flags remain false. See runtime/server/PREPARED-DATA-CACHE.md.
+
+`:app:presentationOwnerTest` now checks the actual generated client PRoot
+arguments resolve both the selected ALSA configuration and PCM plugin through
+the verified bridge generation. Compilation/lint and path checks do not prove
+audible game output.
+
+The separate `android-proot-stat.yml` fixture tests real metadata mutations and
+reaped PRoot relaunch on Android13 x64. Its build-only/host receipts explicitly
+exclude Android and ARM64 execution until the actual workflow completes.

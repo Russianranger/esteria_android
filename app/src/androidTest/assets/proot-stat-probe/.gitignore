@@ -1,0 +1,4 @@
+# Generated, source-bound test fixture assets; never commit executable bytes.
+probe-stat
+build-evidence.json
+ESTERIA-GPL-3.0.txt

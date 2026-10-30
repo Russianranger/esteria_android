@@ -1,0 +1,49 @@
+{
+  "change": "The client mount plan binds the retained matching bridge generation, exposing its configured ALSA file and PCM plugin to the actual Wine process without binding application storage.",
+  "defect": "The Wine client inherited ALSA_CONFIG_PATH under /esteria-bridges but its separate PRoot invocation omitted the verified bridge provider bind. Helper invocations had the bind.",
+  "formatVersion": 1,
+  "gitHead": "7e498c50cdf55027e679d63e31f0a5e4b117f934",
+  "observedAtUtc": "2026-10-30",
+  "qualification": {
+    "androidArm64Executed": false,
+    "androidExecuted": false,
+    "androidLint": true,
+    "apkBuiltByThisCheck": false,
+    "audibleOutputQualified": false,
+    "gameplayQualified": false,
+    "hostFilesystemAndArgvFixtures": true,
+    "hostJavaCompilation": true,
+    "nativeProcessExecuted": false,
+    "wineClientExecuted": false
+  },
+  "scope": "host-java-client-alsa-mount-and-existing-presentation-owner-fixtures",
+  "sourceIdentity": "modified-worktree-files-below; gitHead alone does not identify tested source",
+  "sources": {
+    "app/src/main/java/io/github/russianranger/esteria/presentation/ClientPresentationSession.java": {
+      "bytes": 24849,
+      "sha256": "80d4ef98f70398ec758c851a3a7bc3138eedc3c4339f82dac3524e1d07c87c27"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/runtime/PresentationShaderOwnerTests.java": {
+      "bytes": 17478,
+      "sha256": "d8a2b56739016cbf2dea6c3cacac2d94687f408072427a3035610f0437506981"
+    }
+  },
+  "verification": {
+    "actionableTasks": 39,
+    "command": "./gradlew --offline --no-daemon --init-script <workspace-output-redirect> :app:compileDebugJavaWithJavac :app:presentationOwnerTest :app:lintDebug",
+    "compileSdk": 35,
+    "diffCheck": "passed",
+    "elapsedSeconds": 38,
+    "executedTasks": 12,
+    "gradleResult": "BUILD SUCCESSFUL",
+    "groups": [
+      "presentation delayed cleanup and interruption retains resources",
+      "shader delayed cleanup retains actual filesystem lease",
+      "shader prelaunch operation guard prevents premature lease release",
+      "actual ProotLaunch argv resolves both configured ALSA file and fixed PCM plugin path through the client provider bind; destination no-dereference and application-root exclusion checked"
+    ],
+    "jdk": 17,
+    "presentationOwnerGroups": 4,
+    "upToDateTasks": 27
+  }
+}

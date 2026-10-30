@@ -204,9 +204,7 @@ public final class ClientPresentationSession implements AutoCloseable {
             List<String> command=new ArrayList<>();command.add("/opt/wine/bin/wine");command.add(view.plan.windowsExecutable());
             command.addAll(view.plan.arguments());command.addAll(provider.localLoginArguments());
             Map<String,String> environment=new java.util.TreeMap<>(wineEnvironment());environment.putAll(view.plan.environment());
-            List<ProotLaunch.Mount> mounts=new ArrayList<>();
-            mounts.add(new ProotLaunch.Mount(view.importedData,"/esteria-data"));
-            mounts.add(new ProotLaunch.Mount(shaders.shaders,"/esteria-shaders"));
+            List<ProotLaunch.Mount> mounts=clientMounts(view.importedData,shaders.shaders,prepared.bridgeRoot);
             if(turnip!=null) {
                 turnip.requireWineArchive(prepared.runtime.archiveSha256());Path driver=turnip.current();
                 if(driver==null)throw new IOException("Selected Turnip generation is not prepared");
@@ -218,6 +216,16 @@ public final class ClientPresentationSession implements AutoCloseable {
                 prepared.work,process,command,prepared.runtime.wineEnvironment(environment),mounts,bindings);
             return client;
         });
+    }
+    /** The Wine process itself opens the selected ALSA configuration/plugin.
+     * Bind the verified bridge generation for it as well as the X11 helpers;
+     * a bind in another PRoot process is not visible to this client. */
+    private static List<ProotLaunch.Mount> clientMounts(Path importedData,Path shaders,Path bridgeRoot) {
+        List<ProotLaunch.Mount> mounts=new ArrayList<>();
+        mounts.add(new ProotLaunch.Mount(importedData,"/esteria-data"));
+        mounts.add(new ProotLaunch.Mount(shaders,"/esteria-shaders"));
+        mounts.add(new ProotLaunch.Mount(bridgeRoot,GuestBridgeSetup.guestMount()));
+        return mounts;
     }
     /** Source471 maps Alt+F4 through WM_CLOSE to normal engine shutdown. Queue
      * acceptance alone is not a close/save acknowledgment; the caller awaits

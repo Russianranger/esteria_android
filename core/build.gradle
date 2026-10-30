@@ -139,3 +139,12 @@ tasks.register('supportLogSelectionTest', JavaExec) {
     maxHeapSize = '32m'
 }
 check.dependsOn supportLogSelectionTest
+
+// Optional prepared-data optimization: no production cache is enabled here.
+tasks.register('preparedDataCachePinTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.runtime.install.PreparedDataCachePinTests'
+    maxHeapSize = '32m'
+}
+check.dependsOn preparedDataCachePinTest
