@@ -188,3 +188,15 @@ presentation/frame readback, texture lifecycle and FMOD transport gates all pass
 Exact capture counts, hashes and remaining audio scope limits are in
 [PCM-CAPTURE.md](PCM-CAPTURE.md). Android audio and complete game startup remain
 separate qualification work.
+
+The optional `--client-offline-check` additionally requires `--client-entry-check`
+and invokes the same verified full client twice as `--offline-check` with
+`-local-offline` and `--local-offline`. Each invocation must exit zero and write
+an exclusive, bounded receipt establishing actual SCmd parsing, both real HTTP
+initiation refusals, tracker return, three refused nonlocal/invalid game connects,
+three ordinary failure callbacks and released response refs. The checker requires
+exact typed fields and keeps CommonMain/assets/loopback-gameplay flags false.
+Both spellings plus all namespace, shutdown and log gates are required for
+`linuxArm64ClientOfflineBoundariesQualified`. A prior entry/codec result cannot
+substitute for this scope. Actual successful local login and full offline gameplay
+are separate gates. The new diagnostic/harness is awaiting its paired execution.

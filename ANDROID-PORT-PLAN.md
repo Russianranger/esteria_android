@@ -27,10 +27,10 @@ combined memory and Thor thermals remain measurements to make, not assumed gains
 | Milestone | State | Next evidence |
 | --- | --- | --- |
 | 1. Pinned reference builds | Branches, locks, protocol checks, full ARM64/x64 client builds complete; server build in progress. | Native Linux ARM64 server link/install and artifact provenance. |
-| 2. Executable client platform | ARM64 algorithms/crash/codec implemented; full Windows builds and Linux ARM64 Wine codec/software Vulkan pass. | Actual EXE entry and engine-frame readback now pass; next Android display/input/audio and full game startup. |
+| 2. Executable client platform | Full Windows builds and Linux ARM64 Wine entry/codec/Vulkan/PCM pass. Android13 x64 private-ELF, Surface/AudioTrack and ARM64 host XTest component gates pass. | Explicit offline-client startup, combined Android ARM64 execution and full game initialization. |
 | 3. Local server/database | Native ARM64 MySQL rootfs/source closure, fresh base SQL and restart persistence pass. Optional verified APK dependency provider and resumable setup implemented. | Complete server linking, compiled module/schema updates, owned local account and Android server execution. |
 | 4. Matched gameplay | Not qualified. | Login, character creation, world entry, Esteria extensions and persistent saves with real content. |
-| 5. Android integration | Import/recovery, bounded runtime setup, diagnostics, native process/Surface/audio bridges and internal controller/IME view implemented. Android13 installer/update and native owner pass. | Actual PRoot guest execution and Surface/AudioTrack emulator gates, then matched application session, game controls and lifecycle. |
+| 5. Android integration | Four verified providers, resumable setup, diagnostics and persistent mutable client view are integrated. Android13 installer/update, native owner, PRoot/glibc and Surface/AudioTrack pass. | Tracer-death/graceful ownership, writable loose UI, matched application session and controller/lifecycle gameplay. |
 | 6. Thor candidate | Not ready. | One signed update-compatible package with all required host/emulator/gameplay gates, then consolidated Thor test. |
 
 ## Execution order

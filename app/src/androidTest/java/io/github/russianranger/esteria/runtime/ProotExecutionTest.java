@@ -22,6 +22,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,7 +35,7 @@ import static org.junit.Assert.*;
 /** Actual Android x86_64 ptrace/loader/glibc probe; never enabled by ordinary builds. */
 @RunWith(AndroidJUnit4.class)
 public final class ProotExecutionTest {
-    private static final String[] MEMBERS={"probe","probe-plugin.so","lib/x86_64-linux-gnu/libc.so.6","lib64/ld-linux-x86-64.so.2"};
+    private static final String[] MEMBERS={"probe","probe-owner","probe-plugin.so","lib/x86_64-linux-gnu/libc.so.6","lib64/ld-linux-x86-64.so.2"};
     private static String hex(byte[] data) {
         StringBuilder value=new StringBuilder(); for(byte item:data)value.append(String.format(java.util.Locale.ROOT,"%02x",item&255)); return value.toString();
     }
@@ -54,18 +59,85 @@ public final class ProotExecutionTest {
         assertEquals(pin.getLong("bytes"),Files.size(path));assertEquals(pin.getString("sha256"),hash(path));
     }
     private static void await(OwnedProcess child) throws Exception {
+        await(child,0);
+    }
+    private static void await(OwnedProcess child,int expectedExit) throws Exception {
         long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(40);
         while(child.isAlive()&&System.nanoTime()<deadline)Thread.sleep(10);
         if(child.isAlive()){try{child.stop(Duration.ZERO);}finally{fail("Guest did not finish before deadline");}}
-        assertNull(child.failure());assertEquals("Real guest process exit",0,child.exitCode());assertEquals(0,child.diagnostics()[4]);
+        assertNull(child.failure());assertEquals("Real guest process exit",expectedExit,child.exitCode());assertEquals(0,child.diagnostics()[4]);
+    }
+    private static OwnedProcess.Specification ownershipSpec(Path tracer,Path loader,Path rootfs,Path work,Path temporary,Path logs,String mode) {
+        Map<String,String> environment=new HashMap<>();environment.put("PROOT_LOADER",loader.toString());
+        environment.put("PROOT_NO_SECCOMP","1");environment.put("PROOT_TMP_DIR",temporary.toString());environment.put("PATH","/system/bin");
+        return new OwnedProcess.Specification(tracer,Arrays.asList("--kill-on-exit","--sysvipc","-0","-r",rootfs.toString(),
+            "-b","/dev","-b","/proc","-b",work+":/work","-b",temporary+":/tmp","-w","/work","/probe-owner","/work",mode),
+            environment,work,logs.resolve("stdout.log"),logs.resolve("stderr.log"));
+    }
+    private static long ownershipCase(NativeProcessBridge backend,Path tracer,Path loader,Path rootfs,Path root,String name,boolean patched,boolean graceful) throws Exception {
+        // Begin before process creation, earlier than every guest alarm. A late
+        // observation must never turn the fixture's own timeout into EXITKILL proof.
+        long caseStarted=System.nanoTime();
+        Path session=directory(root.resolve(name));Path work=directory(session.resolve("work"));
+        Path temporary=directory(session.resolve("tmp")),logs=directory(session.resolve("logs"));
+        OwnedProcess child=OwnedProcess.start(backend,ownershipSpec(tracer,loader,rootfs,work,temporary,logs,graceful?"graceful":"forced"),
+            graceful?()->Files.write(work.resolve("stop"),new byte[]{1},StandardOpenOption.CREATE_NEW):null);
+        List<Long> watched=new ArrayList<>();List<Integer> pids=new ArrayList<>();long tracerHandle=0;
+        try {
+            Pattern pattern=Pattern.compile("^ESTERIA_PROOT_OWNER_PID ([1-9][0-9]*) ([1-9][0-9]*) ([1-9][0-9]*) ([1-9][0-9]*) ([1-9][0-9]*)$",Pattern.MULTILINE);
+            String handshake="";long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(10);
+            while(System.nanoTime()<deadline){handshake=read(logs.resolve("stdout.log"));if(handshake.chars().filter(ch->ch=='\n').count()==3)break;
+                assertTrue("Ownership guest ended before handshake",child.isAlive());Thread.sleep(10);}
+            assertEquals("Three bounded identity records",3,handshake.split("\n").length);
+            Matcher matcher=pattern.matcher(handshake);int tracerPid=0;long tracerTicks=0;
+            while(matcher.find()){
+                int pid=Integer.parseInt(matcher.group(1)),reportedTracer=Integer.parseInt(matcher.group(3));
+                long ticks=Long.parseLong(matcher.group(2)),reportedTracerTicks=Long.parseLong(matcher.group(4));
+                assertEquals("Every tracee must detach from the tracer's process group",pid,Integer.parseInt(matcher.group(5)));
+                if(tracerPid==0){tracerPid=reportedTracer;tracerTicks=reportedTracerTicks;tracerHandle=ProbeProcessHandles.watch(tracerPid,tracerTicks,0,tracer.toString(),"");}
+                assertEquals(tracerPid,reportedTracer);assertEquals(tracerTicks,reportedTracerTicks);assertNotEquals(tracerPid,pid);
+                pids.add(pid);watched.add(ProbeProcessHandles.watch(pid,ticks,tracerPid,loader.toString(),rootfs.resolve("probe-owner").toString()));
+            }
+            assertEquals(3,watched.size());assertEquals(3,new HashSet<>(pids).size());
+            for(long handle:watched)assertFalse("Tracee must be alive before the intervention",ProbeProcessHandles.exited(handle,0));
+            if(graceful){
+                child.stop(Duration.ofSeconds(5));assertFalse(child.wasForced());assertEquals(0,child.exitCode());assertNull(child.failure());
+                for(int pid:pids)assertEquals("graceful-persisted\n",read(work.resolve("saved-"+pid)));
+                for(long handle:watched)assertTrue("Graceful guest exited",ProbeProcessHandles.exited(handle,1000));
+                Path verifyLogs=directory(session.resolve("verify"));
+                OwnedProcess verify=OwnedProcess.start(backend,ownershipSpec(tracer,loader,rootfs,work,temporary,verifyLogs,"verify"),null);
+                try{await(verify);assertEquals("ESTERIA_PROOT_OWNER_SAVE_VERIFY 3\n",read(verifyLogs.resolve("stdout.log")));}
+                finally{if(verify.isAlive())try{verify.stop(Duration.ZERO);}catch(IOException ignored){ /* Original assertion fails. */ }}
+            }else{
+                assertTrue("Ownership intervention exceeded causal observation budget",System.nanoTime()-caseStarted<TimeUnit.SECONDS.toNanos(25));
+                ProbeProcessHandles.kill(tracerHandle);assertTrue("Only verified tracer was killed",ProbeProcessHandles.exited(tracerHandle,5000));
+                await(child,137);
+                for(long handle:watched)assertEquals(patched?"EXITKILL must terminate every detached tracee":"Unpatched control must retain every detached tracee",
+                    patched,ProbeProcessHandles.exited(handle,patched?5000:200));
+                assertTrue("Guest alarms cannot establish tracer-death qualification",System.nanoTime()-caseStarted<TimeUnit.SECONDS.toNanos(25));
+            }
+            return TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-caseStarted);
+        }finally{
+            IOException cleanup=null;
+            for(long handle:watched)try{ProbeProcessHandles.kill(handle);if(!ProbeProcessHandles.exited(handle,5000))throw new IOException("Verified guest cleanup timed out");}
+                catch(IOException failure){if(cleanup==null)cleanup=failure;else cleanup.addSuppressed(failure);}
+                finally{try{ProbeProcessHandles.close(handle);}catch(IOException failure){if(cleanup==null)cleanup=failure;else cleanup.addSuppressed(failure);}}
+            if(tracerHandle!=0)try{ProbeProcessHandles.kill(tracerHandle);if(!ProbeProcessHandles.exited(tracerHandle,5000))throw new IOException("Verified tracer cleanup timed out");}
+                catch(IOException failure){if(cleanup==null)cleanup=failure;else cleanup.addSuppressed(failure);}
+                finally{try{ProbeProcessHandles.close(tracerHandle);}catch(IOException failure){if(cleanup==null)cleanup=failure;else cleanup.addSuppressed(failure);}}
+            if(child.isAlive())try{child.stop(Duration.ZERO);}catch(IOException expectedForced){ /* Failure cleanup; never establishes a pass. */ }
+            if(cleanup!=null)throw cleanup;
+        }
     }
     @Test public void privateGlibcExecutesThroughApkLoader() throws Exception {
         Context context=InstrumentationRegistry.getInstrumentation().getTargetContext();
         assertEquals(33,Build.VERSION.SDK_INT);assertEquals(35,context.getApplicationInfo().targetSdkVersion);
+        assertTrue("Unpatched control exists only in debug qualification APKs",BuildConfig.DEBUG);
         assertTrue(Arrays.asList(Build.SUPPORTED_ABIS).contains("x86_64"));
         assertFalse("Production ARM64 provider must stay separate",BuildConfig.PROOT_PACKAGED);
         Path nativeRoot=java.nio.file.Paths.get(context.getApplicationInfo().nativeLibraryDir);
         Path tracer=nativeRoot.resolve("libproot_probe.so"),loader=nativeRoot.resolve("libproot_probe_loader.so");
+        Path controlTracer=nativeRoot.resolve("libproot_probe_control.so");
         assertTrue("Probe payload mandatory; missing is failure",Files.isExecutable(tracer)&&Files.isExecutable(loader));
         JSONObject build;
         try(InputStream input=context.getAssets().open("proot-probe/build-evidence.json")){
@@ -74,6 +146,7 @@ public final class ProotExecutionTest {
         assertEquals("android-13-x86_64-proot-glibc-probe-build-only",build.getString("scope"));
         assertIdentity(tracer,build.getJSONObject("nativeFiles").getJSONObject("libproot_probe.so"));
         assertIdentity(loader,build.getJSONObject("nativeFiles").getJSONObject("libproot_probe_loader.so"));
+        assertIdentity(controlTracer,build.getJSONObject("nativeFiles").getJSONObject("libproot_probe_control.so"));
         JSONObject files=build.getJSONObject("rootfsFiles");assertEquals(MEMBERS.length,files.length());
         Path root=directory(context.getFilesDir().toPath().toRealPath().resolve("proot-probe-session"));
         Path rootfs=directory(root.resolve("rootfs")),work=directory(root.resolve("work"));
@@ -116,12 +189,18 @@ public final class ProotExecutionTest {
             assertEquals(expected.getBytes(StandardCharsets.UTF_8).length,child.diagnostics()[0]);
             assertEquals("esteria-local-runtime-persistence\n",read(work.resolve("persistent-probe.txt")));
         }
+        long controlMillis=ownershipCase(backend,controlTracer,loader,rootfs,root,"ownership-control",false,false);
+        long patchedMillis=ownershipCase(backend,tracer,loader,rootfs,root,"ownership-patched",true,false);
+        ownershipCase(backend,tracer,loader,rootfs,root,"ownership-graceful",true,true);
         JSONObject receipt=new JSONObject().put("formatVersion",1).put("scope","android-13-x86_64-proot-glibc-execution")
             .put("sourceRevision",BuildConfig.SOURCE_REVISION).put("fingerprint",Build.FINGERPRINT).put("api",Build.VERSION.SDK_INT)
             .put("targetSdk",context.getApplicationInfo().targetSdkVersion).put("abi","x86_64").put("glibcVersion","2.36")
-            .put("guestLaunches",2).put("guestChildExit",17).put("buildEvidence",build)
+            .put("guestLaunches",6).put("guestChildExit",17).put("buildEvidence",build)
             .put("androidProotExecuted",true).put("privateElfLoaderExecuted",true).put("directPrivateBionicExecRejected",true)
             .put("dynamicLibraryAndTlsVerified",true).put("forkExecLoopbackVerified",true).put("relaunchPersistenceVerified",true)
+            .put("androidTracerDeathQualified",true).put("pidfdIdentityVerified",true).put("controlSurvivors",3).put("patchedSurvivors",0)
+            .put("detachedTraceesPerCase",3).put("gracefulGuestStopVerified",true).put("gracefulSavedFilesRestored",3)
+            .put("controlObservationMillis",controlMillis).put("patchedObservationMillis",patchedMillis)
             .put("arm64GuestExecuted",false).put("appDeathQualified",false).put("wineQualified",false).put("gameplayQualified",false);
         Files.write(root.getParent().resolve("proot-probe-qualification.json"),receipt.toString(2).getBytes(StandardCharsets.UTF_8),StandardOpenOption.CREATE_NEW);
         // The disposable harness exports bounded logs before stopping this app.

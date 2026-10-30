@@ -133,16 +133,29 @@ class Github:
 
     def download(self, url, target, expected):
         require(not os.path.lexists(target), 'download-output-exists')
-        with self.open(url, accept='application/octet-stream') as source, target.open('xb') as output:
-            digest = archives.hash_stream(source, expected['bytes'], output)
-            require(digest == expected['sha256'], 'download-hash-mismatch')
-            output.flush(); os.fsync(output.fileno())
+        # Actions returns its archive redirect through the JSON API media type.
+        # Release assets use octet-stream to select bytes instead of metadata.
+        actions = url.startswith(API + '/actions/artifacts/')
+        accept = 'application/vnd.github+json' if actions else 'application/octet-stream'
+        try:
+            with self.open(url, accept=accept) as source, target.open('xb') as output:
+                digest = archives.hash_stream(source, expected['bytes'], output)
+                require(digest == expected['sha256'], 'download-hash-mismatch')
+                output.flush(); os.fsync(output.fileno())
+        except HTTPError as error:
+            # Never render error.url/str(error): object-store redirects carry
+            # signed query credentials. The caller's original URL is public.
+            route = urlsplit(url).path
+            raise ValueError(f'download {route} failed with HTTP {error.code}; no token/redirect/response exported') from None
 
     def upload(self, release_id, name, path, expected):
-        with archives.plain_file(path) as source, self.open(
-                UPLOAD + '/releases/' + str(release_id) + '/assets?name=' + quote(name), method='POST', data=source,
-                headers={'Content-Type': 'application/octet-stream', 'Content-Length': str(expected['bytes'])}) as response:
-            data = response.read(MAX_JSON + 1)
+        try:
+            with archives.plain_file(path) as source, self.open(
+                    UPLOAD + '/releases/' + str(release_id) + '/assets?name=' + quote(name), method='POST', data=source,
+                    headers={'Content-Type': 'application/octet-stream', 'Content-Length': str(expected['bytes'])}) as response:
+                data = response.read(MAX_JSON + 1)
+        except HTTPError as error:
+            raise ValueError(f'release asset upload failed with HTTP {error.code}; no token/response exported') from None
         require(len(data) <= MAX_JSON, 'github-json-size-limit')
         return json.loads(data)
 

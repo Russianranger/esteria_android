@@ -1,0 +1,7 @@
+if(NOT ANDROID_ABI STREQUAL "x86_64" OR NOT ESTERIA_PROOT_EXECUTION_TEST)
+    message(FATAL_ERROR "Process identity helper is only for the opt-in x86_64 emulator test")
+endif()
+add_library(esteria_probe_process SHARED pidfd_jni.cpp)
+target_compile_features(esteria_probe_process PRIVATE cxx_std_17)
+target_compile_options(esteria_probe_process PRIVATE -Wall -Wextra -Werror)
+target_link_options(esteria_probe_process PRIVATE -Wl,-z,max-page-size=16384,-z,noexecstack)

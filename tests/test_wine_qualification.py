@@ -149,6 +149,35 @@ class WineQualification(unittest.TestCase):
         result = dict(base, wineStopExit=1, wineWaitExit=0)
         self.assertFalse(any(qualification.qualification_flags(result, []).values()))
 
+    def test_offline_receipt_requires_actual_callbacks_parser_and_narrow_scope(self):
+        value = dict(schemaVersion=1, scope='executable-local-offline-boundaries-only', architecture='ARM64',
+            protocolBuild=12340, remoteAttemptsRejected=3, failureCallbacks=3, commonMainStarted=False,
+            assetsLoaded=False, loopbackGameplayQualified=False, checks={name: True for name in qualification.OFFLINE_CHECKS})
+        path = self.root / 'offline.json';path.write_text(json.dumps(value));qualification.read_offline_receipt(path)
+        for key, wrong in [('architecture', 'x64'), ('failureCallbacks', 2), ('remoteAttemptsRejected', 0),
+                           ('schemaVersion', True), ('commonMainStarted', True), ('loopbackGameplayQualified', True)]:
+            changed = dict(value);changed[key] = wrong;path.write_text(json.dumps(changed))
+            with self.subTest(key=key), self.assertRaises(ValueError):qualification.read_offline_receipt(path)
+        for key in qualification.OFFLINE_CHECKS:
+            changed = dict(value, checks=dict(value['checks'], **{key: False}));path.write_text(json.dumps(changed))
+            with self.subTest(key=key), self.assertRaises(ValueError):qualification.read_offline_receipt(path)
+
+    def test_offline_scope_requires_both_spellings_and_clean_namespace_not_gameplay(self):
+        result = dict(displayReady=True, networkIsolated=True, prefixExit=0, fixtureExit=0, codecMessageMatched=True,
+            workerCompleted=True, expectedExit=0, wineStopExit=0, wineWaitExit=0, logStreamsDrained=True,
+            logsWithinLimit=True, logWritesSucceeded=True,
+            clientOffline={name: dict(exitCode=0, receiptValidated=True) for name in ('-local-offline', '--local-offline')})
+        key = 'linuxArm64ClientOfflineBoundariesQualified'
+        self.assertTrue(qualification.qualification_flags(result, [], client_offline=True)[key])
+        self.assertFalse(qualification.qualification_flags(result, [])[key])
+        for spelling in result['clientOffline']:
+            result['clientOffline'][spelling]['receiptValidated'] = False
+            self.assertFalse(qualification.qualification_flags(result, [], client_offline=True)[key])
+            result['clientOffline'][spelling]['receiptValidated'] = True
+        self.assertFalse(qualification.qualification_flags(result, [], namespace_exit=137, client_offline=True)[key])
+        with self.assertRaisesRegex(ValueError, 'offline-check-requires-client-entry'):
+            qualification.qualify(self.root, self.root, self.root / 'driver', self.root / 'out', client_offline=True)
+
     def test_forced_vulkan_driver_and_observed_device_identity(self):
         command = qualification.guest_command(Path('/r'), 'fixture', graphics={'icdPath': 'usr/share/vulkan/icd.d/lvp.json'})
         self.assertIn('VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/lvp.json', command)

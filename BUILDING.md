@@ -148,3 +148,9 @@ workflow. It validates original runtime and complete corresponding sources befor
 publishing a write-once, hash-pinned prerelease. Until the workflow succeeds and
 its actual publication receipt is committed, durable release availability is
 not established. It publishes no application APK or game data.
+
+Native builds also copy the exact installed NDK root, LLVM and sysroot notices
+into APK assets, covering the linked static C++/compiler runtime notices. Missing
+notice inputs fail the build. The mutable client view is exercised by
+`:core:clientLaunchViewTest`; see `runtime/client/LAUNCH-VIEW.md` for its stopped
+client requirement, loopback configuration and explicit loose-Interface gate.

@@ -12,7 +12,7 @@ except ImportError:
     import build_android_proot_probe as builder
 
 ROOT = Path(__file__).resolve().parents[1]
-ROOTFS = {'probe', 'probe-plugin.so', 'lib/x86_64-linux-gnu/libc.so.6', 'lib64/ld-linux-x86-64.so.2'}
+ROOTFS = {'probe', 'probe-owner', 'probe-plugin.so', 'lib/x86_64-linux-gnu/libc.so.6', 'lib64/ld-linux-x86-64.so.2'}
 NOTICES = {'libc6-copyright.txt', 'libc6-dev-copyright.txt', 'linux-libc-dev-copyright.txt',
            'proot-COPYING.txt', 'talloc-COPYING.txt', 'ESTERIA-GPL-3.txt', 'FTA-MIT-LICENSE.txt'}
 
@@ -97,15 +97,17 @@ def verify(provider, apk=None):
         require(receipt[field] is False, 'build-evidence-must-not-claim-execution')
     sources = {'prootSourceLockSha256': 'runtime/proot/sources.lock.json', 'glibcLockSha256': 'native/proot-probe/glibc.lock.json',
                'builderSha256': 'tools/build_android_proot_probe.py', 'guestSourceSha256': 'native/proot-probe/guest.c',
-               'pluginSourceSha256': 'native/proot-probe/plugin.c', 'ownershipPatchSha256': 'runtime/proot/proot-exitkill.patch'}
+               'pluginSourceSha256': 'native/proot-probe/plugin.c', 'ownershipPatchSha256': 'runtime/proot/proot-exitkill.patch',
+               'ownershipGuestSourceSha256': 'native/proot-probe/ownership_guest.c'}
     for field, path in sources.items(): require(receipt[field] == identity((ROOT / path).read_bytes())['sha256'], 'stale-probe-source-receipt')
     require(receipt['nativeFiles'] == builder.NATIVE_PINS and set(receipt['rootfsFiles']) == ROOTFS, 'probe-file-inventory')
+    require(receipt.get('unpatchedControlIncluded') is True, 'probe-needs-explicit-negative-control')
     for name, pin in builder.NATIVE_PINS.items():
         path = provider / 'jniLibs/x86_64' / name
         require(path.stat().st_size == pin['bytes'], 'probe-native-size')
         data = path.read_bytes()
         require(identity(data) == pin, 'probe-native-identity'); elf(data, 'loader' if 'loader' in name else 'tracer')
-    roles = {'probe': 'guest', 'probe-plugin.so': 'plugin', 'lib/x86_64-linux-gnu/libc.so.6': 'libc', 'lib64/ld-linux-x86-64.so.2': 'ld'}
+    roles = {'probe': 'guest', 'probe-owner': 'guest', 'probe-plugin.so': 'plugin', 'lib/x86_64-linux-gnu/libc.so.6': 'libc', 'lib64/ld-linux-x86-64.so.2': 'ld'}
     for name, role in roles.items():
         path = provider / 'assets/proot-probe/rootfs' / name
         require(path.stat().st_size <= 16 * 1024**2, 'probe-rootfs-file-limit')
@@ -116,9 +118,12 @@ def verify(provider, apk=None):
         with zipfile.ZipFile(apk) as archive:
             names = archive.namelist(); require(len(names) == len(set(names)), 'duplicate-apk-entry')
             natives = {name for name in names if name.startswith('lib/') and not name.endswith('/')}
-            require(natives == {'lib/x86_64/' + name for name in builder.NATIVE_PINS} | {'lib/x86_64/libesteria_process.so'}, 'probe-apk-native-inventory')
-            require(64 <= archive.getinfo('lib/x86_64/libesteria_process.so').file_size <= 16 * 1024**2, 'probe-owner-size-limit')
-            elf(archive.read('lib/x86_64/libesteria_process.so'), 'owner')
+            jni={'lib/x86_64/libesteria_process.so','lib/x86_64/libesteria_probe_process.so'}
+            require(natives == {'lib/x86_64/' + name for name in builder.NATIVE_PINS} | jni, 'probe-apk-native-inventory')
+            for name in sorted(jni):
+                require(64 <= archive.getinfo(name).file_size <= 16 * 1024**2, 'probe-owner-size-limit')
+            for name in sorted(jni):
+                elf(archive.read(name), 'owner')
             require({name for name in names if name.startswith('assets/proot-probe/') and not name.endswith('/')} ==
                     {name for name in expected if name.startswith('assets/')}, 'probe-apk-asset-inventory')
             for relative in expected:

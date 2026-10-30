@@ -49,3 +49,11 @@ tasks.register('prootMountTest', JavaExec) {
     maxHeapSize = '32m'
 }
 check.dependsOn prootMountTest
+
+tasks.register('clientLaunchViewTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.runtime.install.ClientLaunchViewTests'
+    maxHeapSize = '32m'
+}
+check.dependsOn clientLaunchViewTest

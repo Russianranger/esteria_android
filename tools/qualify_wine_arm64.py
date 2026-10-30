@@ -31,6 +31,10 @@ GUEST = '/esteria-qualification'
 SUCCESS = 'Movie adapter (DLL): BGRA/VFLIP, output bounds, skipped frames and slot lifecycle passed'
 ENTRY_SUCCESS = 'PASS: Esteria executable entry/CRT/allocator/exception/fiber roundtrip (entry-check only)'
 ENTRY_RECEIPT = 'Esteria-entry-check.json'
+OFFLINE_RECEIPT = 'Esteria-local-offline-check.json'
+OFFLINE_CHECKS = {'actualCommandParser', 'osUrlRejected', 'blizzardUrlRejected', 'initiationFailureCallbacksPreserved',
+                  'trackerReturned', 'hostConnectionRejected', 'numericConnectionRejected', 'invalidPortRejected',
+                  'connectFailureCallbacks', 'connectionRefsReleased'}
 ENGINE_FRAME_SUCCESS = 'PASS: Engine Vulkan frame BGRA readback, partial clears and embedded-shader presentation'
 LOG_LIMIT = 16 * 1024 * 1024
 VULKAN_FIXTURES = {
@@ -81,6 +85,21 @@ def pe_identity(path, dll):
         stream.seek(0)
         digest = packages.hash_stream(stream, size)
     return {'bytes': size, 'sha256': digest, 'peMachine': '0xaa64', 'dll': dll}
+
+
+def read_offline_receipt(path):
+    with packages.plain_file(path) as stream:data = stream.read(4097)
+    packages.require(len(data) <= 4096, 'client-offline-receipt-size-limit')
+    result = json.loads(data)
+    expected = dict(schemaVersion=1, scope='executable-local-offline-boundaries-only', architecture='ARM64',
+                    protocolBuild=12340, remoteAttemptsRejected=3, failureCallbacks=3,
+                    commonMainStarted=False, assetsLoaded=False, loopbackGameplayQualified=False)
+    packages.require(type(result) is dict and set(result) == set(expected) | {'checks'} and
+                     all(type(result[key]) is type(value) and result[key] == value for key, value in expected.items()),
+                     'client-offline-receipt-scope-mismatch')
+    packages.require(type(result['checks']) is dict and set(result['checks']) == OFFLINE_CHECKS and
+                     all(value is True for value in result['checks'].values()), 'client-offline-checks-incomplete')
+    return result, hashlib.sha256(data).hexdigest()
 
 
 def client_inputs(client_dir, driver):
@@ -298,6 +317,22 @@ def worker(runtime, output):
             value, digest = read_entry_receipt(receipt_path)
             entry.update(receipt=value, receiptSha256=digest, receiptValidated=True)
             packages.write_json(output / 'client-entry-check.json', value)
+        if plan.get('clientOfflineRequested'):
+            result['clientOffline'] = {}
+            receipt_path = fixture / OFFLINE_RECEIPT
+            packages.require(not os.path.lexists(receipt_path), 'client-offline-receipt-already-exists')
+            for spelling in ('-local-offline', '--local-offline'):
+                label = 'short' if spelling == '-local-offline' else 'long'
+                observed = dict(exitCode=None, receiptValidated=False)
+                result['clientOffline'][spelling] = observed
+                capture = run_logged(guest_command(root, '/opt/wine/bin/wine', GUEST + '/WowClient64.exe',
+                                     '--offline-check', spelling), output / ('client-offline-' + label + '.log'), 120, captures)
+                observed['exitCode'] = capture.exit_code
+                packages.require(capture.exit_code == 0, 'client-offline-process-failed')
+                value, digest = read_offline_receipt(receipt_path)
+                observed.update(receipt=value, receiptSha256=digest, receiptValidated=True)
+                packages.write_json(output / ('client-offline-' + label + '.json'), value)
+                if label == 'short':receipt_path.unlink() # Only this validated, private fixture receipt.
         result['graphics'] = {}
         for name in plan['graphicsRequested']:
             filename, message = VULKAN_FIXTURES[name]
@@ -391,7 +426,7 @@ def graphics_identity(root, lock):
     return candidate
 
 
-def qualification_flags(result, requested, namespace_exit=0, client_entry=False, audio=False):
+def qualification_flags(result, requested, namespace_exit=0, client_entry=False, audio=False, client_offline=False):
     # A deliberate handled fixture failure may preserve earlier passing scopes.
     # An abnormal namespace exit may not qualify anything, even if a receipt was
     # flushed just before the worker was killed.
@@ -406,7 +441,12 @@ def qualification_flags(result, requested, namespace_exit=0, client_entry=False,
                                               result.get('codecMessageMatched') is True),
              'linuxArm64VulkanPresentationQualified': False, 'linuxArm64VulkanTextureLifecycleQualified': False,
              'linuxArm64ClientEntryQualified': False, 'linuxArm64VulkanEngineFrameReadbackQualified': False,
-             'linuxArm64FmodPcmTransportQualified': False}
+             'linuxArm64FmodPcmTransportQualified': False, 'linuxArm64ClientOfflineBoundariesQualified': False}
+    if client_offline:
+        observed = result.get('clientOffline', {})
+        flags['linuxArm64ClientOfflineBoundariesQualified'] = bool(common and
+            set(observed) == {'-local-offline', '--local-offline'} and
+            all(case.get('exitCode') == 0 and case.get('receiptValidated') is True for case in observed.values()))
     if audio:
         flags['linuxArm64FmodPcmTransportQualified'] = bool(common and
             all(wine_audio.passed(result.get('audio', {}).get(name, {})) for name in wine_audio.BACKENDS))
@@ -427,7 +467,8 @@ def qualification_flags(result, requested, namespace_exit=0, client_entry=False,
 
 
 def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=False, require_engine_frame=False,
-            audio_driver=None, bridge_dir=None, bridge_revision=None):
+            audio_driver=None, bridge_dir=None, bridge_revision=None, client_offline=False):
+    packages.require(not client_offline or client_entry, 'offline-check-requires-client-entry-check')
     packages.require(not require_engine_frame or 'presentation' in (graphics or {}),
                      'engine-frame-readback-requires-presentation-driver')
     packages.require(bool(audio_driver) == bool(bridge_dir) == bool(bridge_revision), 'audio-driver-and-pinned-bridge-required-together')
@@ -483,6 +524,7 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
     packages.write_json(fixture / 'qualification-plan.json',
                         dict(graphicsRequested=list(graphics), softwareGraphics=software_graphics,
                              clientEntryRequested=client_entry, engineFrameReadbackRequired=require_engine_frame,
+                             clientOfflineRequested=client_offline,
                              audioRequested=bool(audio_driver)))
     report = dict(formatVersion=1, scope='native-linux-arm64-wine-component-fixtures',
                   runtimeArchiveSha256=package['archive']['sha256'], runtimeReceiptSha256=prepared_sha,
@@ -493,6 +535,7 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
                   linuxArm64CodecQualified=False, processNamespaceExited=False,
                   linuxArm64VulkanPresentationQualified=False, linuxArm64VulkanTextureLifecycleQualified=False,
                   linuxArm64ClientEntryQualified=False, clientEntryRequested=client_entry,
+                  linuxArm64ClientOfflineBoundariesQualified=False, clientOfflineRequested=client_offline,
                   linuxArm64VulkanEngineFrameReadbackQualified=False, engineFrameReadbackRequired=require_engine_frame,
                   linuxArm64FmodPcmTransportQualified=False, audioRequested=bool(audio_driver), audioBridge=audio_identity,
                   softwareGraphics=software_graphics, graphicsRequested=list(graphics))
@@ -505,7 +548,7 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
                      'ESTERIA_NAMESPACE_CHILD': '1'})
             try:
                 report['namespaceExit'] = child.wait(timeout=420 + 185 * len(graphics) + (125 if client_entry else 0) +
-                                                    (620 if audio_driver else 0))
+                                                    (620 if audio_driver else 0) + (250 if client_offline else 0))
             except subprocess.TimeoutExpired:
                 os.killpg(child.pid, signal.SIGKILL)
                 child.wait(timeout=15)
@@ -513,12 +556,14 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
         report['processNamespaceExited'] = True
         result, _ = read_json(output / 'worker-result.json')
         report['worker'] = result
-        report.update(qualification_flags(result, graphics, report['namespaceExit'], client_entry, bool(audio_driver)))
+        report.update(qualification_flags(result, graphics, report['namespaceExit'], client_entry, bool(audio_driver), client_offline))
         report['clientExecutableLaunchAttempted'] = result.get('clientEntry', {}).get('launchAttempted') is True
         report['clientExecutableEntryReached'] = report['linuxArm64ClientEntryQualified']
         packages.require(report['linuxArm64CodecQualified'], 'wine-codec-qualification-failed')
         if client_entry:
             packages.require(report['linuxArm64ClientEntryQualified'], 'client-entry-not-qualified')
+        if client_offline:
+            packages.require(report['linuxArm64ClientOfflineBoundariesQualified'], 'client-offline-boundaries-not-qualified')
         for name in graphics:
             key = ('linuxArm64VulkanPresentationQualified' if name == 'presentation' else
                    'linuxArm64VulkanTextureLifecycleQualified')
@@ -560,6 +605,7 @@ def main():
     parser.add_argument('--bridge-dir', type=Path, help='Matching source-built native guest bridge payload')
     parser.add_argument('--bridge-revision', help='Exact integration revision used to build the guest bridge')
     parser.add_argument('--client-entry-check', action='store_true', help='Launch the verified full PE in its explicit entry-only mode')
+    parser.add_argument('--client-offline-check', action='store_true', help='Exercise both real offline command spellings and refused remote paths')
     parser.add_argument('--require-engine-frame-readback', action='store_true',
                         help='Require the presentation driver to pass real engine scene readback and embedded shaders')
     parser.add_argument('--output', type=Path, required=True, help='New evidence directory')
@@ -575,11 +621,12 @@ def main():
     result = qualify(args.runtime, args.client_dir.absolute(), args.driver.absolute(), args.output, graphics,
                      args.client_entry_check, args.require_engine_frame_readback,
                      args.audio_driver.absolute() if args.audio_driver else None,
-                     args.bridge_dir.absolute() if args.bridge_dir else None, args.bridge_revision)
+                     args.bridge_dir.absolute() if args.bridge_dir else None, args.bridge_revision, args.client_offline_check)
     print(json.dumps({key: result[key] for key in ('linuxArm64CodecQualified', 'linuxArm64VulkanPresentationQualified',
                                                  'linuxArm64VulkanTextureLifecycleQualified', 'linuxArm64ClientEntryQualified',
                                                  'linuxArm64VulkanEngineFrameReadbackQualified',
                                                  'linuxArm64FmodPcmTransportQualified',
+                                                 'linuxArm64ClientOfflineBoundariesQualified',
                                                  'androidRuntimeQualified')}))
     return 0
 

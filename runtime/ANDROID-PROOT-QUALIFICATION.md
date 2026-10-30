@@ -17,7 +17,7 @@ Corresponding-source output contains original archives, patches, integration
 code, licenses and relinkable talloc objects; NDK proprietary tools are excluded.
 
 The mandatory instrumentation installs the real native owner, tracer and loader
-through Android's `nativeLibraryDir`, streams/readbacks the four exact Linux
+through Android's `nativeLibraryDir`, streams/readbacks the exact Linux
 files into private storage, and invokes PRoot using `PROOT_LOADER`. It verifies:
 
 - Direct execution of the identical Bionic tracer copied into private storage
@@ -50,6 +50,47 @@ and successful execution through the installed tracer/loader. The evidence ZIP
 SHA-256 is `9f08e7cc1461f04467730d7b25e1513b1284d91a9041c3bae187b7a1e176f2a9`.
 This qualifies the stated x86_64 scope only. Native Linux fixture tests separately
 establish diagnostic logic; they are not the Android evidence.
+
+## Tracer-death and graceful-stop extension
+
+The next qualification adds one source-built ownership guest and a separate
+byte-pinned tracer control whose only source difference is omission of EXITKILL.
+The probe profile disables release variants and requires a debug APK. Normal
+native builds explicitly set the test CMake option OFF; production ARM64 provider
+verification rejects these extra filenames. The control is never a selectable
+application runtime.
+
+The fixture forks twice and places each of three tracees in its own session,
+outside the native owner's process group. Their bounded handshake reports PID,
+kernel start time, kernel tracer PID/start time, and session identity. The
+emulator-only JNI observer opens pidfds, checks app UID, matching procfs PID
+namespace, exact start time, exact installed tracer/loader executable and the
+private guest's executable mapping before retaining opaque handles. Signals
+target only these descriptors; process names or recycled numeric PIDs are never
+signal targets.
+
+The test kills only the verified tracer. The unpatched control must leave all
+three detached tracees alive, whereas EXITKILL must terminate all three. Native
+process-group cleanup cannot create this result because every observed tracee
+has detached. `am force-stop` runs only after observations as final test cleanup,
+and cannot establish the ownership result. All retained descriptors receive
+explicit cleanup, poll and close; fixture alarms bound failures before a complete
+identity handshake. A strict 25-second budget starts before process creation and
+must contain all forced observations, so the 30-second guest alarms cannot create
+a false ownership pass. Pidfd or procfs restrictions fail the gate explicitly.
+
+A separate real graceful callback creates a stop request. Each guest writes and
+fsyncs its save record, parents wait for normal child exits, and a fresh guest
+invocation reads all three exact records back. This establishes fixture file
+persistence, not database/world save correctness. Android app-process death
+remains a separate unqualified gate.
+
+`tools/check_proot_probe_pidfd.py` runs real Linux/JVM pidfd identity, isolated
+termination and stale-handle tests in the normal CI VM. The managed development
+host has different syscall/procfs PID namespaces (`getpid=5`, `/proc/self=133684`
+was observed), so it cannot supply this execution evidence; the helper fails
+closed there. The extension has passed native/Java compilation, APK verification
+and harness tests; its new Android runtime result remains pending.
 
 To reproduce with Python3.12+, dpkg-deb, JDK17 and the documented Android SDK:
 

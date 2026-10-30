@@ -27,6 +27,7 @@ INPUTS = ROOT / 'native/proot-probe'
 NATIVE_PINS = {
     'libproot_probe.so': {'bytes': 277512, 'sha256': '4e06b8d9037dd62b92983a2e4202e8f7aeb750329160fdf7f8bfe83324415263'},
     'libproot_probe_loader.so': {'bytes': 18344, 'sha256': '4a324117c6a16fe996af18ea388191379f5517309e963c80186fd3563a78410a'},
+    'libproot_probe_control.so': {'bytes': 277512, 'sha256': 'aea88557d140c04ec60a7e3687dc5b78e7c85ccfece436fd1bb955f336a9fe92'},
 }
 
 
@@ -94,6 +95,17 @@ def build(args):
         environment.pop(name, None)
     with (work / 'build.log').open('x') as log:
         subprocess.run(['bash', str(script)], env=environment, check=True, stdout=log, stderr=log, timeout=1800)
+    binary = project / 'app/src/main/jniLibs/x86_64'
+    saved = work / 'native-binaries'; saved.mkdir()
+    for name in ('libproot.so', 'libproot-loader.so'):
+        shutil.copyfile(binary / name, saved / name)
+    # Negative control is byte-pinned and packaged only by the emulator/debug
+    # profile. Its only source difference is omission of mandatory EXITKILL.
+    subprocess.run(['git', 'apply', '--reverse', '--check', str(patch)], cwd=tracer, check=True)
+    subprocess.run(['git', 'apply', '--reverse', str(patch)], cwd=tracer, check=True)
+    with (work / 'control-build.log').open('x') as log:
+        subprocess.run(['bash', str(script)], env=environment, check=True, stdout=log, stderr=log, timeout=1800)
+    shutil.copyfile(binary / 'libproot.so', saved / 'libproot-control.so')
     # Extract authenticated data packages only. dpkg-deb --extract never runs
     # maintainer scripts; each complete archive was size/hash verified above.
     sysroot = work / 'glibc-sysroot'; sysroot.mkdir()
@@ -110,6 +122,9 @@ def build(args):
               str(startup / 'Scrt1.o'), str(startup / 'crti.o'), str(INPUTS / 'guest.c'),
               '-lc', str(startup / 'crtn.o'), '-o', str(objects / 'probe')],
         cc + ['-fPIC', '-shared', str(INPUTS / 'plugin.c'), '-lc', '-o', str(objects / 'probe-plugin.so')],
+        cc + ['-fPIE', '-pie', '-Wl,--dynamic-linker=/lib64/ld-linux-x86-64.so.2',
+              str(startup / 'Scrt1.o'), str(startup / 'crti.o'), str(INPUTS / 'ownership_guest.c'),
+              '-lc', str(startup / 'crtn.o'), '-o', str(objects / 'probe-owner')],
     ]
     with (work / 'guest-build.log').open('x') as log:
         for command in commands:
@@ -118,12 +133,13 @@ def build(args):
     libs = provider / 'jniLibs/x86_64'; libs.mkdir(parents=True)
     assets = provider / 'assets/proot-probe'; assets.mkdir(parents=True)
     rootfs = assets / 'rootfs'; rootfs.mkdir()
-    binary = project / 'app/src/main/jniLibs/x86_64'
-    for original_name, name in [('libproot.so', 'libproot_probe.so'), ('libproot-loader.so', 'libproot_probe_loader.so')]:
-        packages.require(identity(binary / original_name) == NATIVE_PINS[name], 'probe-native-build-differs-from-pin')
-        shutil.copyfile(binary / original_name, libs / name); (libs / name).chmod(0o755)
+    for original_name, name in [('libproot.so', 'libproot_probe.so'), ('libproot-loader.so', 'libproot_probe_loader.so'),
+                                ('libproot-control.so', 'libproot_probe_control.so')]:
+        packages.require(identity(saved / original_name) == NATIVE_PINS[name], 'probe-native-build-differs-from-pin')
+        shutil.copyfile(saved / original_name, libs / name); (libs / name).chmod(0o755)
     files = {
         'probe': objects / 'probe', 'probe-plugin.so': objects / 'probe-plugin.so',
+        'probe-owner': objects / 'probe-owner',
         'lib/x86_64-linux-gnu/libc.so.6': sysroot / 'lib/x86_64-linux-gnu/libc.so.6',
         'lib64/ld-linux-x86-64.so.2': sysroot / 'lib/x86_64-linux-gnu/ld-linux-x86-64.so.2',
     }
@@ -143,6 +159,7 @@ def build(args):
         prootSourceLockSha256=proot.digest(proot.LOCK), glibcLockSha256=proot.digest(INPUTS / 'glibc.lock.json'),
         builderSha256=proot.digest(Path(__file__)), guestSourceSha256=proot.digest(INPUTS / 'guest.c'),
         pluginSourceSha256=proot.digest(INPUTS / 'plugin.c'), ownershipPatchSha256=proot.digest(patch),
+        ownershipGuestSourceSha256=proot.digest(INPUTS / 'ownership_guest.c'), unpatchedControlIncluded=True,
         nativeFiles=NATIVE_PINS, rootfsFiles=root_files, glibcVersion='2.36',
         androidProotExecuted=False, arm64GuestExecuted=False, gameplayQualified=False)
     packages.write_json(assets / 'build-evidence.json', evidence)

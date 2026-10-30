@@ -101,6 +101,19 @@ if (nativeBridge) {
     def nativeNotices = tasks.register('copyNativeNotices', Copy) {
         from rootProject.file('native/process-owner/FTA-MIT-LICENSE.txt')
         from(rootProject.file('LICENSE')) { rename { 'ESTERIA-GPL-3.0.txt' } }
+        // Static libc++/compiler runtimes retain the exact installed NDK notices.
+        def llvmHost = {
+            def hosts = new File(android.ndkDirectory, 'toolchains/llvm/prebuilt').listFiles()?.findAll { it.isDirectory() }
+            if (hosts == null || hosts.size() != 1) throw new GradleException('Expected one installed NDK host toolchain')
+            hosts[0]
+        }
+        from({ new File(android.ndkDirectory, 'NOTICE') }) { rename { 'NDK-28.2.13676358-NOTICE.txt' } }
+        from({ new File(llvmHost(), 'NOTICE') }) { rename { 'LLVM-RUNTIME-NOTICE.txt' } }
+        from({ new File(llvmHost(), 'sysroot/NOTICE') }) { rename { 'NDK-SYSROOT-NOTICE.txt' } }
+        doFirst {
+            for (def notice : [new File(android.ndkDirectory, 'NOTICE'), new File(llvmHost(), 'NOTICE'), new File(llvmHost(), 'sysroot/NOTICE')])
+                if (!notice.isFile() || notice.length() == 0) throw new GradleException('Installed NDK runtime notice is missing')
+        }
         into layout.buildDirectory.dir('generated/nativeNotices/notices')
     }
     android.sourceSets.main.assets.srcDir(layout.buildDirectory.dir('generated/nativeNotices'))

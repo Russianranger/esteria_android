@@ -10,6 +10,11 @@ on:
       - tools/manifest_server_modules.py
       - tools/package_server_content.py
       - tools/qualify_dbimport.py
+      - tools/qualify_authserver.py
+      - tools/auth_protocol.py
+      - tests/test_auth_protocol.py
+      - tests/test_authserver_qualification.py
+      - tests/auth_srp_reference.cpp
       - tests/test_dbimport_qualification.py
       - tests/test_server_adaptations.py
       - tools/qualify_base_sql.py
@@ -36,6 +41,11 @@ on:
       - tools/manifest_server_modules.py
       - tools/package_server_content.py
       - tools/qualify_dbimport.py
+      - tools/qualify_authserver.py
+      - tools/auth_protocol.py
+      - tests/test_auth_protocol.py
+      - tests/test_authserver_qualification.py
+      - tests/auth_srp_reference.cpp
       - tests/test_dbimport_qualification.py
       - tests/test_server_adaptations.py
       - tools/qualify_base_sql.py
@@ -126,7 +136,7 @@ jobs:
           -Isources/server/src/common -Isources/server/src/common/Platform
           -Isources/server/src/server/game/LuaEngine/hooks tests/native/eluna_hooks.cpp
       - name: Verify server artifact checker behavior
-        run: python3 -m unittest tests.test_server_build tests.test_dbimport_qualification tests.test_server_adaptations tests.test_local_account -v
+        run: python3 -m unittest tests.test_server_build tests.test_dbimport_qualification tests.test_server_adaptations tests.test_local_account tests.test_auth_protocol tests.test_authserver_qualification -v
       - name: Configure ARM64 server
         run: |
           set -o pipefail
@@ -142,9 +152,11 @@ jobs:
         id: compile
         run: |
           set -o pipefail
-          cmake --build out/server --parallel 2 --target esteria_srp_reference \
+          cmake --build out/server --parallel 2 --target esteria_srp_reference esteria_auth_srp_reference \
             2>&1 | tee out/diagnostics/srp-reference-compile.log
           out/server/esteria_srp_reference > out/diagnostics/srp-reference.json
+          ESTERIA_AUTH_SRP_REFERENCE="$GITHUB_WORKSPACE/out/server/esteria_auth_srp_reference" \
+            python3 -m unittest tests.test_auth_protocol -v 2>&1 | tee out/diagnostics/auth-srp-reference.log
           cmake --build out/server --parallel 1 \
             --target modules/CMakeFiles/modules.dir/mod-attunement-plus/src/mod_attunement_plus.cpp.o \
             2>&1 | tee out/diagnostics/attunement-compile.log
@@ -225,14 +237,14 @@ jobs:
               output.write('ESTERIA_DBIMPORT_MYSQL_VERSION=' + runtime['expectedMysqlSqlVersion'] + '\n')
               output.write('ESTERIA_DBIMPORT_CONTENT_SHA256=' + digest + '\n')
           PY
-      - name: Qualify actual compiled updater and same-revision persistence without external network
+      - name: Qualify compiled updater and owned loopback authentication without external network
         run: |
           docker run --rm --init --network none \
             --env PYTHONDONTWRITEBYTECODE=1 \
             --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
             --mount "type=bind,src=$GITHUB_WORKSPACE/out/dbimport-private,dst=/state" \
             --workdir /qualification esteria-dbimport:qualification \
-            python3 tools/qualify_dbimport.py \
+            python3 tools/qualify_authserver.py \
             --install /qualification/out/server-install --content /qualification/out/server-content \
             --content-receipt-sha256 "$ESTERIA_DBIMPORT_CONTENT_SHA256" \
             --mysql /usr/bin/mysql --mysqld /usr/sbin/mysqld \
@@ -248,7 +260,7 @@ jobs:
           target = pathlib.Path('out/dbimport-evidence')
           names = ['qualification.json', 'mysql-initialize-engine.log', 'mysql-bootstrap-engine.log',
                    'mysql-base-engine.log', 'mysql-base-restart-engine.log',
-                   'dbimport-first.log', 'dbimport-second.log']
+                   'dbimport-first.log', 'dbimport-second.log', 'auth-qualification.json', 'authserver-redacted.log']
           for name in names:
               path = source / name
               if path.is_file():
@@ -262,6 +274,14 @@ jobs:
                   externalNetworkDisabled=True, existingSaveUpgradesQualified=False,
                   playerbotsRuntimeQualified=False, androidRuntimeQualified=False, gameplayQualified=False)
               (target / 'environment-receipt.json').write_text(json.dumps(metadata, indent=2) + '\n')
+              auth = target / 'auth-qualification.json'
+              if auth.is_file():
+                  metadata = dict(formatVersion=1, scope='native-arm64-disposable-auth-protocol-probe',
+                      qualificationSha256=hashlib.sha256(auth.read_bytes()).hexdigest(),
+                      runtimeManifestSha256=hashlib.sha256(runtime.read_bytes()).hexdigest(),
+                      externalNetworkDisabled=True, reconstructedClientExecuted=False,
+                      worldEntryQualified=False, androidRuntimeQualified=False, gameplayQualified=False)
+                  (target / 'auth-environment-receipt.json').write_text(json.dumps(metadata, indent=2) + '\n')
           PY
           sudo chown -R "$(id -u):$(id -g)" out/dbimport-evidence
       - name: Retain compiled updater qualification evidence

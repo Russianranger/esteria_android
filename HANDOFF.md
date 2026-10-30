@@ -57,6 +57,10 @@ server/Wine jobs must not be converted into successful evidence without logs.
    their qualified session lifecycle and
    graceful server-save shutdown. Inspect read-only reference launcher code where
    useful. Keep startup gated until component readiness is actually established.
+   Client setup now also prepares an owned mutable launch view when import data
+   exists. Do not bypass its loose-Interface gate; writable UI generation handling
+   is separate ongoing work. New tracer-death and actual authserver protocol
+   harnesses are compiled/reviewed but require their pending runtime results.
 8. Import authentic complete build 12340/custom data; generate shaders with the
    corrected provider precedence, extract matched server assets, validate local
    login/world/save/relog/bots/offline before any main Thor test.

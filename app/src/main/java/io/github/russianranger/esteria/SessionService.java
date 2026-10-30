@@ -42,6 +42,7 @@ import io.github.russianranger.esteria.runtime.RuntimeSetup;
 import io.github.russianranger.esteria.runtime.ServerRuntimeSetup;
 import io.github.russianranger.esteria.runtime.GuestBridgeSetup;
 import io.github.russianranger.esteria.runtime.ClientRuntimeSetup;
+import io.github.russianranger.esteria.runtime.ClientLaunchSetup;
 
 /** Foreground owner of large import jobs. Runtime launch remains gated until qualified binaries exist. */
 public final class SessionService extends Service {
@@ -219,6 +220,22 @@ public final class SessionService extends Service {
             log("Reconstructed client prepared generation=" + installed.generation + " revision=" + client.sourceRevision()
                     + " build=" + client.buildId() + " reusedFiles=" + installed.reusedFiles
                     + " copiedBytes=" + installed.copiedBytes + " gameRuntimeQualified=false");
+            ClientLaunchSetup.Prepared prepared=ClientLaunchSetup.prepare(this,root,client,(phase,path,completed,total)-> {
+                long now=android.os.SystemClock.elapsedRealtime();
+                if (now-lastUpdate[0]>=250||completed==total) {
+                    lastUpdate[0]=now;
+                    status="Preparing persistent client settings and launch files…";
+                }
+            },cancelled::get);
+            if (prepared!=null) {
+                log("Client view prepared generation=" + prepared.view.generation + " reusedExecutables="
+                        + prepared.view.reusedExecutables + " deferredLooseTrees=" + prepared.plan.deferredLooseTrees
+                        + " gameRuntimeQualified=false");
+                if (!prepared.plan.deferredLooseTrees.isEmpty()) {
+                    status="Client runtime files are prepared. Imported loose Interface content requires writable UI integration before gameplay.";
+                    return;
+                }
+            }
         }
         status = "Client runtime files are prepared. Local services and gameplay are still under development.";
     }

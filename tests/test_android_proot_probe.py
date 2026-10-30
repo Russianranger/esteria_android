@@ -24,13 +24,17 @@ class ProbeContracts(unittest.TestCase):
     def test_exact_receipt_checks_all_runtime_results(self):
         build={'pinned':'fixture-only'}
         good=dict(formatVersion=1,scope=qualification.SCOPE,sourceRevision='a'*40,fingerprint='fixture',abi='x86_64',
-                  glibcVersion='2.36',api=33,targetSdk=35,guestLaunches=2,guestChildExit=17,buildEvidence=build,
+                  glibcVersion='2.36',api=33,targetSdk=35,guestLaunches=6,guestChildExit=17,buildEvidence=build,
+                  controlSurvivors=3,patchedSurvivors=0,detachedTraceesPerCase=3,gracefulSavedFilesRestored=3,
+                  controlObservationMillis=900,patchedObservationMillis=300,
                   arm64GuestExecuted=False,appDeathQualified=False,wineQualified=False,gameplayQualified=False)
         good.update({flag:True for flag in qualification.FLAGS})
         qualification.validate_receipt(good,'a'*40,'fixture',build)
         changes={flag:False for flag in qualification.FLAGS}
         changes.update(arm64GuestExecuted=True,appDeathQualified=True,wineQualified=True,gameplayQualified=True,
                        sourceRevision='b'*40,fingerprint='different',api=32,targetSdk=28,guestLaunches=1,guestChildExit=0,
+                       controlSurvivors=0,patchedSurvivors=1,detachedTraceesPerCase=2,gracefulSavedFilesRestored=0,
+                       controlObservationMillis=25000,patchedObservationMillis=-1,
                        glibcVersion='2.39',abi='arm64-v8a',buildEvidence={})
         for name,value in changes.items():
             invalid=copy.deepcopy(good);invalid[name]=value
@@ -50,6 +54,7 @@ class BuiltProbeBounds(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'probe-apk-size-limit'):verifier.verify(provider,apk)
             with zipfile.ZipFile(apk,'w',compression=zipfile.ZIP_DEFLATED) as archive:
                 for name in verifier.builder.NATIVE_PINS:archive.writestr('lib/x86_64/'+name,b'fixture')
+                archive.writestr('lib/x86_64/libesteria_probe_process.so',b'fixture')
                 with archive.open('lib/x86_64/libesteria_process.so','w') as entry:
                     for _ in range(17):entry.write(bytes(1024**2))
             with mock.patch.object(zipfile.ZipFile,'read',side_effect=AssertionError('must reject size before inflate')):

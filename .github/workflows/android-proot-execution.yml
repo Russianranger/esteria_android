@@ -9,9 +9,12 @@ on:
       - app/proot-probe.gradle
       - app/build.gradle
       - app/src/androidTest/**/ProotExecutionTest.java
+      - app/src/androidTest/**/ProbeProcessHandles.java
+      - native/CMakeLists.txt
       - tools/build_android_proot_probe.py
       - tools/verify_android_proot_probe.py
       - tools/qualify_android_proot.py
+      - tools/check_proot_probe_pidfd.py
       - tests/test_android_proot_probe.py
       - .github/workflows/android-proot-execution.yml
   pull_request:
@@ -67,6 +70,7 @@ jobs:
           mkdir -p out/android-proot
           sha256sum --check gradle/wrapper/SHA256SUMS
           ESTERIA_PROOT_PROBE_PROVIDER="$RUNNER_TEMP/proot-probe/provider" python3 -m unittest tests.test_android_proot_probe tests.test_android_installer_qualification -v
+          python3 tools/check_proot_probe_pidfd.py
           ./gradlew --no-daemon :app:assembleDebug :app:assembleDebugAndroidTest :app:lintDebug -PnativeRuntimeBridge=true -PnativeBridgeAbi=x86_64 -PprootProbeProviderDir="$RUNNER_TEMP/proot-probe/provider" -PsourceRevision="$GITHUB_SHA"
           cp app/build/outputs/apk/debug/app-debug.apk out/android-proot/probe.apk
           cp app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk out/android-proot/tests.apk
@@ -92,6 +96,7 @@ jobs:
             out/android-proot/evidence
             ${{ runner.temp }}/proot-probe/build-evidence.json
             ${{ runner.temp }}/proot-probe/build.log
+            ${{ runner.temp }}/proot-probe/control-build.log
             ${{ runner.temp }}/proot-probe/guest-build.log
           if-no-files-found: warn
           retention-days: 14

@@ -194,6 +194,34 @@ class PublicationGuards(unittest.TestCase):
 
 
 class NetworkBoundary(unittest.TestCase):
+    def test_artifact_and_release_download_use_distinct_media_types(self):
+        client = release.Github('fixture-token-only')
+        requests = []
+        class Opener:
+            def open(self, request, **kwargs):
+                requests.append(request)
+                return io.BytesIO(b'fixture')
+        client.opener = Opener()
+        with tempfile.TemporaryDirectory() as directory:
+            expected = dict(bytes=7, sha256=hashlib.sha256(b'fixture').hexdigest())
+            client.download(release.API + '/actions/artifacts/1/zip', Path(directory) / 'artifact', expected)
+            client.download(release.API + '/releases/assets/1', Path(directory) / 'asset', expected)
+        self.assertEqual([row.get_header('Accept') for row in requests],
+                         ['application/vnd.github+json', 'application/octet-stream'])
+
+    def test_download_http_diagnostic_excludes_signed_url_and_response(self):
+        client = release.Github('fixture-token-only')
+        class Opener:
+            def open(self, request, **kwargs):
+                raise HTTPError('https://release-assets.githubusercontent.com/object?secret=hidden',
+                                403, 'private-response', {}, io.BytesIO(b'private-response'))
+        client.opener = Opener()
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(ValueError, r'download /repos/Russianranger/esteria_android/actions/artifacts/1/zip failed with HTTP 403') as caught:
+                client.download(release.API + '/actions/artifacts/1/zip', Path(directory) / 'artifact', {})
+        for private in ('hidden', 'private-response', 'fixture-token-only', 'release-assets'):
+            self.assertNotIn(private, str(caught.exception))
+
     def test_github_credential_never_follows_object_store_redirect(self):
         client = release.Github('fixture-token-only')
         requests = []
