@@ -8,7 +8,7 @@ server-repository writes or preliminary Thor APK requests.
 
 ## Exact selection
 
-- Client branch android/arm64-port and binary:471ee42faadf4a97a1d0a86989cf1452621f2dc5.
+- Selected client binary:471ee42faadf4a97a1d0a86989cf1452621f2dc5. Client development branch android/arm64-port is671db06afd85fe2f6116b9fd59f5abf3170e2ef2; keep the current application pin until a deliberate matched runtime/cohort requalification.
 - Server:f35f04d01689f034778e3474b3c820092f51e461; Eluna:58d7652138887783228b9727bd1fa4e08f00342b; seven exact adaptation patches.
 - App source lock SHA256:dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90. Archived server build lock stays5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1.
 - Rebuilt Windows ARM64 client under local Wine/Debian12; Linux ARM64 server/MySQL under separate Ubuntu24. This is compatibility execution. Keep glibc roots separate; x64 emulator evidence is not ARM64/Thor evidence.
@@ -110,13 +110,8 @@ actual APK helper readback pass; actual assets/world remain unavailable.
 
 A source audit found an optional Retail-enabled CascLib path where cached
 versions metadata can re-enable downloads behind mode=local. Current471 runtime
-was built with Retail assets disabled. A client-source fix is being implemented
-and must be qualified before any new binary/cohort or enabled optional asset
-feature is selected. Keep the current matched471 app pin until then.
+was built with Retail assets disabled. The source fix is committed as671db06afd85fe2f6116b9fd59f5abf3170e2ef2. Its new run41114326028 passes full Windows ARM64/x64 and Linux ARM64/x64 jobs; native ARM64 Wine also passes. All five jobs now report completed/success; the additive client-offline-casc-671db06-readback.json proof retains exact scope. Preserve the final additive proof before selecting any new binary/cohort or enabled optional asset feature. Keep the current matched471 app pin until then.
 
 Actual native Java SQL/promotion/restart now passes41109643068 at4fd32df.
 Preserve runtime/evidence/native-java-installation-41109643068.json; the Linux
-locator seam and unqualified Android/world scope remain explicit. Next inspect
-the fresh server-component measurement after the typed failure diagnostics fix:
-prior preparation/staging exited1 with unavailable inner logs. Exact twelve
-measured assets and an owned draft ID are still required before publication.
+locator seam and unqualified Android/world scope remain explicit. Server-component measurement41113370383 at exact7e498c passes all twelve assets/1,783,413,529 bytes and all source/debug closures; the small measurement was independently read back. The full1.78GB candidate stays in CI. Finish exact-target owned draft binding, stored-byte upload/readback, UI publication and anonymous public readback before adopting public consumers. The browser release form cannot select arbitrary exact commits; a separate guarded metadata-only Actions creator is now implemented and independently reviewed. Its only mutation creates one empty exact-target draft; stored bytes and UI publication remain separate gates. The frozen uploader still never creates/finalizes releases, moves tags or replaces assets.

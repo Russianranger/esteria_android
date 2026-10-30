@@ -1,0 +1,649 @@
+{
+  "additionalReferenceSourceFiles": {
+    "CMakeLists.txt": {
+      "bytes": 5927,
+      "sha256": "8d687001cbeee369b97c9270a26855d20b772dffd64d1bbe13604c921001de95"
+    }
+  },
+  "adrenoQualified": false,
+  "allFiveJobsCompletedSuccessfully": true,
+  "allTwelveModifiedClientFilesMatchExactDevelopmentGitRevision": true,
+  "androidArm64Executed": false,
+  "androidRuntimeQualified": false,
+  "applicationPinAdvanced": false,
+  "applicationSelectedClientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "applicationSourceLock": {
+    "bytes": 2170,
+    "sha256": "dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90"
+  },
+  "artifactMetadataOnly": [
+    {
+      "bytes": 142376060,
+      "digest": "sha256:9d2320c1f0d56208a62d52ed3719891d76d8f92f4af2bd53a49fd56db4274766",
+      "id": 13006610804,
+      "name": "linux-arm64-wine-671db06afd85fe2f6116b9fd59f5abf3170e2ef2"
+    },
+    {
+      "bytes": 41269352,
+      "digest": "sha256:8f39c94bf30416d453237eec57f6a3ee403c916033c7c0adc817be33b09aa6a3",
+      "id": 13005851788,
+      "name": "client-x64-671db06afd85fe2f6116b9fd59f5abf3170e2ef2"
+    },
+    {
+      "bytes": 45834339,
+      "digest": "sha256:0247ca95245d9f0e1221ff3c06f6e930be775fe5e02141f40d391a2aaad3ca0f",
+      "id": 13005552359,
+      "name": "client-ARM64-671db06afd85fe2f6116b9fd59f5abf3170e2ef2"
+    }
+  ],
+  "botAiQualified": false,
+  "cascLib": {
+    "archiveSha256": "1b59deebc82a4eb75c6e9ef463a7644b22231a4b3b0657ad9afe0dd5205fee3f",
+    "linuxParserAdaptation": "Exactly one checked build-tree LPDWORD spelling substitution to actual DWORD pointer; other upstream target inputs retained.",
+    "revision": "38a34665624b8775bb875274b36191b21c38d97b"
+  },
+  "characterPersistenceQualified": false,
+  "clientDevelopmentRevision": "671db06afd85fe2f6116b9fd59f5abf3170e2ef2",
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "jobResults": [
+    {
+      "conclusion": "success",
+      "id": 124264479241,
+      "name": "portable (ubuntu-24.04)",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run cmake -S Tools/PlatformTests -B build/portable -DCMAKE_BUILD_TYPE=Release",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run cmake --build build/portable --parallel 4",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run ctest --test-dir build/portable --output-on-failure",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Compile actual optional Retail/Forever source and pinned CascLib",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Preserve portable offline storage evidence",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run python3 -m unittest discover -s Tools/RuntimeManifest -v",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run python3 -m unittest discover -s Tools/VulkanShaders/tests -v",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run python3 -m unittest discover -s Tools/PlatformTests -p 'test_*.py' -v",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "conclusion": "success",
+      "id": 124264479503,
+      "name": "windows (ARM64, windows-11-arm, Visual Studio 18 2026, bin/Win/ARM64)",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Configure platform behavior tests",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Build platform behavior tests",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run native architecture and Windows differential tests",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Compile and exercise actual optional Retail/Forever source and pinned CascLib",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Configure matched reconstructed client",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Compile complete client",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Validate binary architecture and record runtime provenance",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Exercise packaged movie DLL on the native Windows runner",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Build asset-free Vulkan device fixtures",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Exercise actual client entry, offline policy, transport and Grunt SRP",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Build actual reconstructed FMOD output fixture",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Preserve diagnostics",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "conclusion": "success",
+      "id": 124264479707,
+      "name": "windows (x64, windows-2022, Visual Studio 17 2022, bin/Win)",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Configure platform behavior tests",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Build platform behavior tests",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run native architecture and Windows differential tests",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Compile and exercise actual optional Retail/Forever source and pinned CascLib",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Configure matched reconstructed client",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Compile complete client",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Validate binary architecture and record runtime provenance",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Exercise packaged movie DLL on the native Windows runner",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Build asset-free Vulkan device fixtures",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Exercise actual client entry, offline policy, transport and Grunt SRP",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Build actual reconstructed FMOD output fixture",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Preserve diagnostics",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "conclusion": "success",
+      "id": 124264479712,
+      "name": "portable (ubuntu-24.04-arm)",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run cmake -S Tools/PlatformTests -B build/portable -DCMAKE_BUILD_TYPE=Release",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run cmake --build build/portable --parallel 4",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run ctest --test-dir build/portable --output-on-failure",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Compile actual optional Retail/Forever source and pinned CascLib",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Preserve portable offline storage evidence",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run python3 -m unittest discover -s Tools/RuntimeManifest -v",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run python3 -m unittest discover -s Tools/VulkanShaders/tests -v",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run python3 -m unittest discover -s Tools/PlatformTests -p 'test_*.py' -v",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "conclusion": "success",
+      "id": 124269741141,
+      "name": "Native Linux ARM64 Wine execution",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Checkout the exact reviewed integration harness",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Checkout this exact client's committed synthetic auth peer",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Download this run's matching native ARM64 binaries",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Record native host and install namespace tools",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Prepare the exact verified ARM64 Wine candidate",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Build source-pinned native guest helpers for captured audio",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Execute client entry/offline/transport/Grunt, codec, graphics and captured FMOD audio",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Preserve guest build evidence permissions after success or failure",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Preserve execution evidence, including failed startup",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Checkout this exact client's committed synthetic auth peer",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Checkout the exact reviewed integration harness",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "status": "completed"
+        }
+      ]
+    }
+  ],
+  "nativeLinuxArm64Wine": {
+    "actualJobLogReadBack": true,
+    "actualPrintedQualification": {
+      "androidRuntimeQualified": false,
+      "linuxArm64ClientEntryQualified": true,
+      "linuxArm64ClientGruntSyntheticPeerQualified": true,
+      "linuxArm64ClientLoopbackTransportQualified": true,
+      "linuxArm64ClientOfflineBoundariesQualified": true,
+      "linuxArm64CodecQualified": true,
+      "linuxArm64FmodPcmTransportQualified": true,
+      "linuxArm64VulkanEngineFrameReadbackQualified": true,
+      "linuxArm64VulkanPresentationQualified": true,
+      "linuxArm64VulkanTextureLifecycleQualified": true
+    },
+    "compiledServerPairQualified": false,
+    "currentApplicationWineCohortQualified": false,
+    "decodedUtf8JobLog": {
+      "bytes": 34643,
+      "sha256": "3f40073982a2830e3dff1b620b737ca670d2719273b73563968107c1bb48b5bf"
+    },
+    "integrationHarnessRevision": "0146ca89307eb3c00c09b7fbecdf3e301bd9bd53",
+    "jobId": 124269741141,
+    "syntheticPeerClientRevision": "671db06afd85fe2f6116b9fd59f5abf3170e2ef2",
+    "wineEvidenceArchiveReadBackLocally": false
+  },
+  "normalAssetBackedCommonMainQualified": false,
+  "notes": [
+    "Linux x64 and native Linux ARM64 each execute nine platform tests plus two actual optional Retail/CascLib tests. Only Linux second Retail test uses the abort-on-socket/connect/getaddrinfo preload tripwire.",
+    "Windows ARM64 and x64 each execute nine platform tests plus one actual linked Retail test, compile the complete primary client and run the actual entry/offline/transport/Grunt synthetic-peer step.",
+    "The Wine job uses a historical exact integration harness and its selected runtime, not the currently adopted application c0e cohort or seven-patch compiled server. Its successful component scope does not authorize advancing the application pin.",
+    "Only the two small portable artifact archives were downloaded and fully read back locally. Windows and Wine binary/debug/evidence archive identities are API metadata; their archive bytes were not downloaded.",
+    "Decoded actual job logs are locally hashed as UTF-8 text supplied by the GitHub connector. These hashes do not assert identity with an original compressed logs archive.",
+    "Optional local-storage admission tests use synthetic metadata and files fixtures; they provide no real Retail/Forever assets, complete WoW client data or world gameplay."
+  ],
+  "observedAtUtc": "2026-10-30T19:34:39.595719Z",
+  "portable": {
+    "ubuntu-24.04": {
+      "actualPinnedCascLibLinked": true,
+      "artifact": {
+        "bytes": 10651,
+        "sha256": "8b3040899234fbc86f6de12e252f18f3c306704d192e946bf3691799cf659068"
+      },
+      "artifactId": 13005970930,
+      "cachedOnlineStorageRefusedBeforeBackend": true,
+      "everyMemberCrcAndSha256Verified": true,
+      "linuxPreloadSocketConnectDnsTripwirePassed": true,
+      "members": {
+        "portable/Testing/Temporary/LastTest.log": {
+          "bytes": 6523,
+          "sha256": "6a49723fe6af44759eb5a83899e09fa470aa49b1865f1b5ee2bbfa8ffb0ef00f"
+        },
+        "retail/CMakeCache.txt": {
+          "bytes": 19768,
+          "sha256": "bd09bead093a45c3e36223f412e8f0426ee7cea6b8f4c2037d1bb313e0b68f0b"
+        },
+        "retail/CMakeFiles/CMakeConfigureLog.yaml": {
+          "bytes": 60847,
+          "sha256": "9991cac65621326d8153570f75389197e91c39d936ae31ef14baaceb4676cc17"
+        },
+        "retail/Testing/Temporary/LastTest.log": {
+          "bytes": 2329,
+          "sha256": "2086b5bf34b17687802ea344c146e058c91399982de900f4a3e2f86141c39e28"
+        }
+      },
+      "platformTestsPassed": 9,
+      "retailTestsPassed": 2
+    },
+    "ubuntu-24.04-arm": {
+      "actualPinnedCascLibLinked": true,
+      "artifact": {
+        "bytes": 10569,
+        "sha256": "4f364de8796055405603f6c5b715625c1fd27a2d09c57657e3e52e76b476effe"
+      },
+      "artifactId": 13005316414,
+      "cachedOnlineStorageRefusedBeforeBackend": true,
+      "everyMemberCrcAndSha256Verified": true,
+      "linuxPreloadSocketConnectDnsTripwirePassed": true,
+      "members": {
+        "portable/Testing/Temporary/LastTest.log": {
+          "bytes": 6523,
+          "sha256": "bf329afde378a0d0a5132ff0b1f868346c3e286859a93e2a0827e6eed7a95018"
+        },
+        "retail/CMakeCache.txt": {
+          "bytes": 19770,
+          "sha256": "1df1abc8b946bec9e14a2dfa765ae001173b4628f30770c8056fa7921cf7429e"
+        },
+        "retail/CMakeFiles/CMakeConfigureLog.yaml": {
+          "bytes": 60528,
+          "sha256": "39615fdaa099984b21927925fc7bfe80a8131c3d2bf2eb5f5cc0ddc5b22cfa46"
+        },
+        "retail/Testing/Temporary/LastTest.log": {
+          "bytes": 2329,
+          "sha256": "3217ebe908a11972a505f0cbe0d968699f12e3ba38dd2eefc4887f344db6dd9a"
+        }
+      },
+      "platformTestsPassed": 9,
+      "retailTestsPassed": 2
+    }
+  },
+  "primaryClientRetailAssetsEnabled": false,
+  "primaryRetailFlagEvidence": "Workflow primary-client configure omits WOWDECOMP_RETAIL_ASSETS; exact root CMakeLists option defaults OFF. Separate RetailAssetTests target defines WOWDECOMP_RETAIL_ASSETS=1 and links actual pinned CascLib.",
+  "scope": "client-671-offline-casc-source-native-reference-and-wine-components-only",
+  "sourceFiles": {
+    ".github/workflows/arm64-client.yml": {
+      "bytes": 12169,
+      "sha256": "96939a07a90b83fcfe46e824cacde8ec4f3e4ce7b255e95e113bc548abf9d028"
+    },
+    "Engine/Source/Retail/CascSource.cpp": {
+      "bytes": 42248,
+      "sha256": "c915dd4970c35692cc6c25bc8c8fed3500e9bec7cb541a0169270668ef7cc44c"
+    },
+    "Engine/Source/Retail/CascSource.h": {
+      "bytes": 3011,
+      "sha256": "afa6877a884c0ab6c1aa698903e05af4e73eaf98eeeaddb3d8b86c47b65dd76d"
+    },
+    "Engine/Source/Retail/OfflineStorage.h": {
+      "bytes": 5254,
+      "sha256": "3a6c6c4d7a24a4bdfa5cd896db03659604e4a97c77d67eeda902d10902a105b7"
+    },
+    "Tools/PlatformTests/CMakeLists.txt": {
+      "bytes": 2472,
+      "sha256": "af6aff657822cb5119691045b0fb30c0032fe381e3d454c362f56002a254c957"
+    },
+    "Tools/PlatformTests/test_offline_casc.cpp": {
+      "bytes": 4607,
+      "sha256": "c20a5acb00bc0c95923d2a8f55ab683d2f50ff6a625824faf85de034cdf204bb"
+    },
+    "Tools/RetailAssets/CMakeLists.txt": {
+      "bytes": 668,
+      "sha256": "57aac47e818c769b0bdbc304600f8868d39a804b75772796da1dd4746fd9de36"
+    },
+    "Tools/RetailAssets/test_no_network.c": {
+      "bytes": 919,
+      "sha256": "d319db0c4ac7e8b48ad3d7c43daa5ea6f670ed5bbfcdcc1ea4f5cb746e97da98"
+    },
+    "Tools/RetailAssets/tests.cpp": {
+      "bytes": 130503,
+      "sha256": "68a613c525a5369324c547a1397a2035be814df3cce07b6a58e60d635e98e608"
+    },
+    "cmake/RetailAssets.cmake": {
+      "bytes": 5705,
+      "sha256": "ad932c56fa02a13ce806d355a1258a7e897087ef37520977dd4599f84f3b96e6"
+    },
+    "docs/android-arm64-platform.md": {
+      "bytes": 35836,
+      "sha256": "05cec5ae2f3e322808c86373edee1473cd5db078562ff8cbf9b2aac197f99d1d"
+    },
+    "docs/evidence/retail-offline-casc-host.json": {
+      "bytes": 4502,
+      "sha256": "ddd4e18d9f6209196f264cf048f1c1d4c2bee3cd7c55c73d9c4ab8a0c471e7c5"
+    }
+  },
+  "thorExecuted": false,
+  "windows": {
+    "ARM64": {
+      "actualClientEntryOfflineTransportAndGruntStepPassed": true,
+      "actualJobLogReadBack": true,
+      "actualPinnedCascLibLinked": true,
+      "authenticationScope": {
+        "architecture": "ARM64",
+        "compiledServerQualified": false,
+        "gameplayQualified": false,
+        "qualified": true,
+        "scope": "native-windows-reconstructed-grunt-synthetic-peer-only"
+      },
+      "completeClientCompileLinkPassed": true,
+      "decodedUtf8JobLog": {
+        "bytes": 847135,
+        "sha256": "1523420a22d7a5ca771a26fc0b696835b4262280fc2112b0f4d593e850aa696b"
+      },
+      "jobId": 124264479503,
+      "linuxPreloadTripwireUsed": false,
+      "packagedMovieDllCheckPassed": true,
+      "platformTestsPassed": 9,
+      "primaryBinaryArchiveReadBackLocally": false,
+      "retailTestsPassed": 1
+    },
+    "x64": {
+      "actualClientEntryOfflineTransportAndGruntStepPassed": true,
+      "actualJobLogReadBack": true,
+      "actualPinnedCascLibLinked": true,
+      "authenticationScope": {
+        "architecture": "x64",
+        "compiledServerQualified": false,
+        "gameplayQualified": false,
+        "qualified": true,
+        "scope": "native-windows-reconstructed-grunt-synthetic-peer-only"
+      },
+      "completeClientCompileLinkPassed": true,
+      "decodedUtf8JobLog": {
+        "bytes": 850684,
+        "sha256": "721eb729db9acdb3db0fc1892aae95ca1b7cab8500179a7ca1ab8d8cae9e1196"
+      },
+      "jobId": 124264479707,
+      "linuxPreloadTripwireUsed": false,
+      "packagedMovieDllCheckPassed": true,
+      "platformTestsPassed": 9,
+      "primaryBinaryArchiveReadBackLocally": false,
+      "retailTestsPassed": 1
+    }
+  },
+  "workflow": {
+    "conclusion": "success",
+    "createdAt": "2026-10-30T19:19:37Z",
+    "headBranch": "android/arm64-port",
+    "headSha": "671db06afd85fe2f6116b9fd59f5abf3170e2ef2",
+    "id": 41114326028,
+    "runAttempt": 1,
+    "runNumber": 24,
+    "status": "completed",
+    "updatedAt": "2026-10-30T19:32:58Z"
+  },
+  "worldQualified": false
+}

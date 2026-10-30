@@ -1,0 +1,61 @@
+name: Create explicitly measured local server draft metadata only
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - runtime/server-components-publication/draft-creation.lock.json
+permissions:
+  contents: read
+concurrency:
+  group: create-measured-local-server-draft-metadata
+  cancel-in-progress: false
+jobs:
+  validate:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Test refusal of existing releases tags changed measurements and metadata mutation
+        run: python3 -m unittest tests.test_local_server_draft_creation -v
+  create-metadata:
+    needs: validate
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Select only the explicitly committed measured recipe
+        id: selection
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          from tools.create_local_server_draft import load_pin
+          print('recipe_revision='+load_pin()['targetCommit'])
+          PY
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ steps.selection.outputs.recipe_revision }}
+          path: source-packaging
+          persist-credentials: false
+      - name: Validate the successful measured producer then create one empty exact-target draft
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/create_local_server_draft.py create --recipe-root source-packaging \
+            --output out/local-server-draft-created.json
+      - name: Retain actual Actions creation and stored metadata readback without claiming UI inspection
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: local-server-draft-metadata-creation
+          path: out/local-server-draft-created.json
+          retention-days: 30
+          if-no-files-found: warn

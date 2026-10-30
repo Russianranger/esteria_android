@@ -1,0 +1,179 @@
+{
+  "actualCiEvidence": {
+    "allCandidateAssetBytesReadBack": true,
+    "allOriginalSourceAndPairedDebugVerified": true,
+    "androidGuestExecuted": false,
+    "androidRuntimeQualified": false,
+    "assets": {
+      "NOTICE.txt": {
+        "bytes": 1071,
+        "sha256": "de1a80680d8ec657763f0bcc9db04d4c3e1616ce1aa2f6fa3b2a3ca49ed8cbb9"
+      },
+      "SHA256SUMS": {
+        "bytes": 1062,
+        "sha256": "1d68260f9c8bd5718f5e7c96c2c7cb2a908714238181b5b69b746b4c27f9f983"
+      },
+      "integration-recipe-receipt.json": {
+        "bytes": 175261,
+        "sha256": "3456ed08ecf2f88d8fd2f21d2535591009e6d9c250df1cfdc17eeea04b871eb1"
+      },
+      "integration-recipe.tar.gz": {
+        "bytes": 9708528,
+        "sha256": "2f9e32abaa89e7fb401107f6071150b75f350a182fcf7e5a73aa005c8f802345"
+      },
+      "providers-receipt.json": {
+        "bytes": 22318,
+        "sha256": "395b159771455015a1dc1b8ca7630be4f10987fb488e5220b19ddbf4bee229e1"
+      },
+      "release-manifest.json": {
+        "bytes": 3795,
+        "sha256": "6f91fb7c7e87b54292e4766989b5d13c857437bbfe7860db6855835f99882807"
+      },
+      "server-content-provider.tar.gz": {
+        "bytes": 168956728,
+        "sha256": "0fe3d5ec91f25295fcfff1acca898cfb36136ecbe40f1d65653f98817d58803e"
+      },
+      "server-data-tools-provider.tar.gz": {
+        "bytes": 105749018,
+        "sha256": "f1b480bf9adc5876c5410f8355be7988ce9757a15feb779b3d513f0464703d6d"
+      },
+      "server-dependency-publication.json": {
+        "bytes": 3012,
+        "sha256": "cdd9ba6779e95e8f5e12c4e76cebc7796229c4e4906afcec6d14849d89ee67e1"
+      },
+      "server-dependency-release.lock.json": {
+        "bytes": 6005,
+        "sha256": "a95a9a5557f3417ff84a1311d1747a0e98db39305505c741b642e2ecef9746d9"
+      },
+      "server-extractors-original-provider.tar.gz": {
+        "bytes": 52679938,
+        "sha256": "6dc20fea542fcd07a7ed45328cfe0c67efd86130492d4be827bcbf7f10eff610"
+      },
+      "server-programs-playerbots-provider.tar.gz": {
+        "bytes": 1446106793,
+        "sha256": "39004f06f823b8416422894329555e4ce0187b2a88e1cb81655afb8033888cc4"
+      }
+    },
+    "compilerExecuted": false,
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "helperExecuted": false,
+    "measuredLock": {
+      "bytes": 178909,
+      "sha256": "a8df3214ee533c42e86a226018941db3b8b481417b143eb38b0fc9e466a497c3"
+    },
+    "originalNestedArchiveBytesPreserved": true,
+    "playerbotsAiQualified": false,
+    "releasePublished": false,
+    "releaseUploaded": false,
+    "scope": "complete-local-server-publication-candidate-readback",
+    "sqlExecuted": false,
+    "targetCommit": "7e498c50cdf55027e679d63e31f0a5e4b117f934",
+    "worldserverQualified": false
+  },
+  "actualPreparationContext": {
+    "androidGuestExecuted": false,
+    "androidRuntimeQualified": false,
+    "arbitraryExceptionMessagesExported": false,
+    "candidateMeasurementPerformedHere": false,
+    "compilerExecuted": false,
+    "failures": {},
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "helperExecuted": false,
+    "lastPreparationPhase": "complete",
+    "playerbotsAiQualified": false,
+    "preparationPhasesReached": [
+      "stock-acquisition",
+      "stock-providers",
+      "helper-inputs",
+      "helper-provider",
+      "data-inputs",
+      "data-provider",
+      "complete-provider-verification",
+      "complete"
+    ],
+    "rawLogBodiesExported": false,
+    "releasePublicationPerformedHere": false,
+    "releaseUploadPerformedHere": false,
+    "scope": "bounded-local-server-publication-failure-context",
+    "sqlExecuted": false,
+    "worldserverQualified": false
+  },
+  "allFourMeasurementZipMembersReadBackLocally": true,
+  "allIndividualAssetsBelowTwoGiB": true,
+  "androidGuestExecuted": false,
+  "androidRuntimeQualified": false,
+  "assetCount": 12,
+  "candidateArtifact": {
+    "bytes": 1783415325,
+    "id": 13005720774,
+    "sha256": "c43816d55a51917d9daf8d18a014354b598e0dc0c695e4ec179ca1d05497d138"
+  },
+  "compilerExecuted": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "helperExecuted": false,
+  "independentLocalChecks": {
+    "actualTwelveAssetBytesReadBackLocally": false,
+    "allTrackedGitBlobAndSelectedInputHashesVerified": true,
+    "canonicalGitFileBytes": 8970425,
+    "canonicalRecipeArchive": {
+      "bytes": 9708528,
+      "sha256": "2f9e32abaa89e7fb401107f6071150b75f350a182fcf7e5a73aa005c8f802345"
+    },
+    "canonicalRecipeArchiveReproducedAndFullyReadBack": true,
+    "exactFrozenRecipeCommit": "7e498c50cdf55027e679d63e31f0a5e4b117f934",
+    "exactUiBodyVerified": true,
+    "localPython": "3.12.14",
+    "manifestAndChecksumsReconstructedAndVerified": true,
+    "recipeTrackedRegularFiles": 944
+  },
+  "largestAssetBytes": 1446106793,
+  "measuredLock": {
+    "bytes": 178909,
+    "sha256": "a8df3214ee533c42e86a226018941db3b8b481417b143eb38b0fc9e466a497c3"
+  },
+  "measurementArtifact": {
+    "bytes": 53715,
+    "id": 13003709209,
+    "sha256": "3064e90a98e7838ed18df29a32619fe42bd0a03e9aa6baf2132ace3405e19e86"
+  },
+  "measurementFiles": {
+    "failure-context.json": {
+      "bytes": 821,
+      "sha256": "b9c629860f69b9a69fb779a66a3f7b5544cf541b8c5e23e2af031b18864b4403"
+    },
+    "measured-release.lock.json": {
+      "bytes": 178909,
+      "sha256": "a8df3214ee533c42e86a226018941db3b8b481417b143eb38b0fc9e466a497c3"
+    },
+    "measurement.json": {
+      "bytes": 2555,
+      "sha256": "305cc17d2ccb0748f4999787328c9d9c861f4562de28a7341ba87ca4086d671e"
+    },
+    "release-body.txt": {
+      "bytes": 901,
+      "sha256": "42d5ed649ee3ff62fba05f4d7e2f27edec42b41a8c56d21a5815e4cd12af8c90"
+    }
+  },
+  "measurementZipCrcVerified": true,
+  "observedAt": "2026-10-30T19:22:51.182058+00:00",
+  "ownedDraftCreated": false,
+  "playerbotsAiQualified": false,
+  "producer": {
+    "conclusion": "success",
+    "integrationRevision": "7e498c50cdf55027e679d63e31f0a5e4b117f934",
+    "job": 124261187178,
+    "status": "completed",
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/41113370383",
+    "workflowRun": 41113370383
+  },
+  "releasePublished": false,
+  "releaseUploaded": false,
+  "scope": "actual-ci-complete-local-server-publication-measurement-and-bounded-independent-readback",
+  "sqlExecuted": false,
+  "state": "measured-unbound",
+  "totalAssetBytes": 1783413529,
+  "worldserverQualified": false
+}

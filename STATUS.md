@@ -5,7 +5,7 @@ candidate has been delivered or requested.
 
 ## Exact selection
 
-- Client:471ee42faadf4a97a1d0a86989cf1452621f2dc5 on android/arm64-port.
+- Selected client binary:471ee42faadf4a97a1d0a86989cf1452621f2dc5. Client development branch android/arm64-port now contains671db06afd85fe2f6116b9fd59f5abf3170e2ef2; the application pin remains471.
 - Server:f35f04d01689f034778e3474b3c820092f51e461; Eluna:58d7652138887783228b9727bd1fa4e08f00342b; seven hashed adaptation patches.
 - App source lock:dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90. Archived server build lock remains5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1.
 - App branch:android/client-server; package:io.github.russianranger.esteria. Defaults and server repository remain unchanged.
@@ -71,16 +71,15 @@ Persistent RSA4096 development identity is provisioned and privately backed up;
 public certificate is in app/development-signing.lock.json. No delivered update
 baseline exists. Signing keys, credentials, databases, prefixes and game assets
 stay outside source/artifacts. Client471, Wine cohort and Ubuntu dependencies
-have public source-backed releases. The new server-component preservation
-workflow first measures twelve fixed assets with complete source/debug copies;
-upload stays disabled until exact hashes and an owned draft release ID are bound.
+have public source-backed releases. Server-component preservation41113370383 at exact recipe7e498c50cdf55027e679d63e31f0a5e4b117f934 has verified twelve assets/1,783,413,529 bytes with complete original source/debug copies; the small measurement receipt was independently read back. Upload stays disabled until the measured hashes and an owned draft release ID are bound.
 Current helper/data4 inputs still depend on finite Actions retention until that
 publication and anonymous readback finish.
 
 ## Current blockers and next work
 
-1. Finish independent complete-profile APK readback and durable server-component
-   publication. Produce subsequent APKs from the same exact public inputs.
+1. Independent complete-profile APK readback now passes all127 APK entries and
+   eight embedded runtime archives. Finish durable server-component publication
+   and switch subsequent builds to the same exact public inputs.
 2. Native ARM64 Java coordination passes41109643068: real PRoot/JNI/SQL,
    four-schema completion, clean promotion, active-save reseeding refusal and
    persistent restart. Qualify the Android composition next. The Linux payload
@@ -107,7 +106,7 @@ See BUILDING.md, TESTING.md and HANDOFF.md for commands and scoped evidence.
 The first server-component measurement stopped on a GitHub internal error
 before job steps. An independently reproduced Windows-wrapper checkout EOL
 defect is fixed by archiving canonical Git blobs while strictly validating the
-sole declared CRLF conversion. A fresh exact-recipe measurement follows.
+sole declared CRLF conversion. The new exact-recipe measurement41113370383 passes; publication remains a separate gate.
 
 The server-content checkpoint passes31 Java importer groups at32MiB,67 focused
 Python checks and106 SDK tasks. The actual APK helper byte manifest matches its
