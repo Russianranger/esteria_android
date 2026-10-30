@@ -1,0 +1,82 @@
+name: Source-built x86_64 Wine guest for Android qualification
+on:
+  push:
+    branches: [android/client-server]
+    paths:
+      - runtime/wine-probe/sources.lock.json
+      - runtime/wine-probe/Dockerfile
+      - runtime/wine-probe/Dockerfile.dockerignore
+      - runtime/wine-probe/record_runtime.py
+      - runtime/wine-probe/capture_sources.py
+      - runtime/bridges/debian.sources
+      - runtime/bridges/inrelease.SHA256SUMS
+      - tools/package_android_wine_runtime.py
+      - tests/test_android_wine_runtime.py
+      - .github/workflows/android-wine-runtime.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: android-wine-runtime-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  runtime:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Validate package boundaries
+        run: |
+          test "$(uname -m)" = x86_64
+          python3 -m unittest tests.test_android_wine_runtime -v
+          mkdir -p out/wine-build
+      - name: Build exact Wine source against signed frozen Debian12
+        id: runtime
+        run: |
+          docker build --platform linux/amd64 --target runtime -f runtime/wine-probe/Dockerfile \
+            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
+            -t esteria-wine-probe:qualification . > out/wine-build/build.log 2>&1
+      - name: Normalize and independently read back the fresh rootfs
+        run: |
+          container=$(docker create esteria-wine-probe:qualification)
+          trap 'docker rm -f "$container" >/dev/null' EXIT
+          docker cp "$container:/etc/esteria-wine-probe.json" out/wine-build/runtime.json
+          docker export "$container" > out/wine-export.tar
+          python3 tools/package_android_wine_runtime.py --docker-export out/wine-export.tar \
+            --runtime-metadata out/wine-build/runtime.json --output out/wine-runtime > out/wine-build/package.json
+          rm out/wine-export.tar
+      - name: Retain complete Wine and Debian runtime/build package sources
+        if: always() && steps.runtime.outcome == 'success'
+        run: |
+          docker build --platform linux/amd64 --target source-export -f runtime/wine-probe/Dockerfile \
+            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
+            --output type=local,dest=out/wine-sources . > out/wine-build/source-build.log 2>&1
+          cp out/wine-sources/debian/SOURCE-MANIFEST.json out/wine-build/source-manifest.json
+          git archive --format=tar "$GITHUB_SHA" > out/wine-sources/integration-source.tar
+          printf '%s\n' "$GITHUB_SHA" > out/wine-sources/integration-revision.txt
+      - name: Make disposable build evidence readable
+        if: always()
+        run: sudo chown -R "$(id -u):$(id -g)" out
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: wine-x64-runtime-evidence-${{ github.sha }}
+          path: out/wine-build
+          if-no-files-found: warn
+          retention-days: 14
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: success()
+        with:
+          name: wine-x64-runtime-${{ github.sha }}
+          path: out/wine-runtime
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always() && steps.runtime.outcome == 'success'
+        with:
+          name: wine-x64-runtime-sources-${{ github.sha }}
+          path: out/wine-sources
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14

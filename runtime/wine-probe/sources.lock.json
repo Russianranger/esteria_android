@@ -1,0 +1,91 @@
+{
+  "formatVersion": 1,
+  "scope": "android-x86-64-wine-probe-source-inputs-only",
+  "architecture": "amd64",
+  "runtimeQualified": false,
+  "baseImage": {
+    "reference": "docker.io/library/debian@sha256:a3bba7dc7dbcc1f37c2856c51fc9a7fac96608f50cb87b1b4e4d8b8c85ae988e",
+    "indexDigest": "sha256:99c0b25c46d0214d5a2091092e7908907dcaecd6a962cde0ac700acee222b6f3",
+    "manifest": {
+      "annotations": {
+        "com.docker.official-images.bashbrew.arch": "amd64",
+        "org.opencontainers.image.base.name": "scratch",
+        "org.opencontainers.image.created": "2026-10-27T00:00:00Z",
+        "org.opencontainers.image.revision": "69faaf492e77aff83e4c7fc401017c9d25ecde24",
+        "org.opencontainers.image.source": "https://github.com/debuerreotype/docker-debian-artifacts.git",
+        "org.opencontainers.image.url": "https://hub.docker.com/_/debian",
+        "org.opencontainers.image.version": "bookworm-slim"
+      },
+      "digest": "sha256:a3bba7dc7dbcc1f37c2856c51fc9a7fac96608f50cb87b1b4e4d8b8c85ae988e",
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "platform": {
+        "architecture": "amd64",
+        "os": "linux"
+      },
+      "size": 1021
+    },
+    "config": {
+      "mediaType": "application/vnd.oci.image.config.v1+json",
+      "digest": "sha256:354cdc53abb843ea02e9a72c153b000c290014d8a90aba62897c143710a5667f",
+      "size": 453,
+      "data": "eyJjb25maWciOnsiRW52IjpbIlBBVEg9L3Vzci9sb2NhbC9zYmluOi91c3IvbG9jYWwvYmluOi91c3Ivc2JpbjovdXNyL2Jpbjovc2JpbjovYmluIl0sIkVudHJ5cG9pbnQiOltdLCJDbWQiOlsiYmFzaCJdfSwiY3JlYXRlZCI6IjIwMjYtMTAtMjdUMDA6MDA6MDBaIiwiaGlzdG9yeSI6W3siY3JlYXRlZCI6IjIwMjYtMTAtMjdUMDA6MDA6MDBaIiwiY3JlYXRlZF9ieSI6IiMgZGViaWFuLnNoIC0tYXJjaCAnYW1kNjQnIG91dC8gJ2Jvb2t3b3JtJyAnQDE3OTMwNTkyMDAnIiwiY29tbWVudCI6ImRlYnVlcnJlb3R5cGUgMC4xNyJ9XSwicm9vdGZzIjp7InR5cGUiOiJsYXllcnMiLCJkaWZmX2lkcyI6WyJzaGEyNTY6NDRhODc3OTRiNzM5ZDQ3MWVjMzYwYmVjNTZjYzBjZWFjNjQwZDA2YmJmNTc5ZWU3ZDkwNjFhMGI4OGQwOTgxOCJdfSwib3MiOiJsaW51eCIsImFyY2hpdGVjdHVyZSI6ImFtZDY0In0K"
+    },
+    "layers": [
+      {
+        "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+        "digest": "sha256:3c5439d0ae62993af4cc4e21b8c777297e81bc40e200d4633c85a3e0f977a3bc",
+        "size": 28247437
+      }
+    ]
+  },
+  "snapshot": {
+    "id": "20261029T000000Z",
+    "keyring": {
+      "path": "usr/share/keyrings/debian-archive-keyring.gpg",
+      "bytes": 55918,
+      "sha256": "506b815cbb32d9b6066b4a2aa524071e071761e7e7f68c3ac74f3061ba852017"
+    },
+    "inRelease": [
+      {
+        "suite": "bookworm-security",
+        "bytes": 34770,
+        "sha256": "1a6375632d9d8cbfd9665858174b6abaf50e046eacfd15a160226c4ac2188af7"
+      },
+      {
+        "suite": "bookworm-updates",
+        "bytes": 55403,
+        "sha256": "f805c7af2f793f5647abb73884264b508089ae34310bba99da40b10cff275ede"
+      },
+      {
+        "suite": "bookworm",
+        "bytes": 151075,
+        "sha256": "77737fa4b34f2693e982cc9ee35736816c35a7778fc2d326cc1bbf5b301fe1aa"
+      }
+    ]
+  },
+  "wine": {
+    "repository": "https://github.com/bylaws/wine",
+    "revision": "a6844d10622fc1a973ec1f22fc4f78a0fcd6cb29",
+    "version": "10.13",
+    "sourceArchive": {
+      "file": "wine-arm64ec-source.tar.gz",
+      "bytes": 53416396,
+      "sha256": "93ffcd86d3f518934da5c93c768d43afe7e97d66f04f355d914f5cfb6731ac74",
+      "url": "https://github.com/Russianranger/uo-android-launcher/releases/download/v0.2.0/wine-arm64ec-source.tar.gz"
+    },
+    "configure": [
+      "--prefix=/opt/wine",
+      "--enable-win64",
+      "--with-mingw=yes",
+      "--disable-tests",
+      "--without-wayland",
+      "--without-gstreamer",
+      "--without-cups",
+      "--without-sane",
+      "--without-gphoto"
+    ],
+    "license": "LGPL-2.1-or-later",
+    "licenseFileSha256": "e237fa56668030e928551ddd60f05df5fe957f75eab874bbd017e085ed722e7c"
+  },
+  "note": "Same Wine source as ARM64 candidate; independently built x86_64 GNU/Linux fixture. No FEX, CPU translation, ARM64 or gameplay qualification. Signed frozen Debian repository selects all OS/build packages; exact installed binary/source inventory accompanies exported runtime."
+}

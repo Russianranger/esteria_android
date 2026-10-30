@@ -66,3 +66,4 @@ jobs:
             LICENSE
           retention-days: 14
           if-no-files-found: error
+          include-hidden-files: true # Retain the measured build-recipe .dockerignore.

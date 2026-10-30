@@ -1,4 +1,5 @@
 import importlib.util
+import hashlib
 import io
 import json
 from pathlib import Path
@@ -19,6 +20,22 @@ fetch = module('fetch_sources'); record = module('record_build'); probe = module
 
 
 class TurnipBuild(unittest.TestCase):
+    def test_notice_identity_binds_bytes_and_rejects_links_or_special_files(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary); folder = root / 'notices'; folder.mkdir()
+            notice = folder / 'COPYING'; notice.write_bytes(b'original license text\n')
+            expected = {'bytes': notice.stat().st_size,
+                        'sha256': hashlib.sha256(notice.read_bytes()).hexdigest()}
+            self.assertEqual(record.notices(root), {'notices/COPYING': expected})
+            notice.write_bytes(b'altered license bytes\n')
+            self.assertNotEqual(record.notices(root)['notices/COPYING'], expected)
+            (folder / 'linked').symlink_to(notice)
+            with self.assertRaises(ValueError): record.notices(root)
+            (folder / 'linked').unlink()
+            import os
+            os.mkfifo(folder / 'fifo')
+            with self.assertRaises(ValueError): record.notices(root)
+
     def test_exact_source_snapshot_and_runtime_boundary(self):
         lock = json.loads((DIR / 'sources.lock.json').read_text())
         base = json.loads((ROOT / 'runtime/bridges/sources.lock.json').read_text())

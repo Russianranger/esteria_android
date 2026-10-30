@@ -1,0 +1,7 @@
+**
+!runtime
+!runtime/bridges
+!runtime/bridges/debian.sources
+!runtime/bridges/inrelease.SHA256SUMS
+!runtime/wine-probe
+!runtime/wine-probe/**

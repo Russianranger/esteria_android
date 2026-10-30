@@ -26,6 +26,26 @@ def identity(path):
         return dict(bytes=path.stat().st_size, sha256=hashlib.file_digest(source, 'sha256').hexdigest())
 
 
+def notices(root):
+    """Bind source-build license bytes, excluding the later integration LICENSE copy."""
+    selected = root / 'notices'
+    require(selected.is_dir() and not selected.is_symlink(), 'plain-notice-directory-required')
+    inventory = {}; total = 0; pending = [selected]
+    entries = 0
+    while pending:
+        for path in sorted(pending.pop().iterdir()):
+            entries += 1
+            require(entries <= 256 and not path.is_symlink(), 'notice-inventory-bound-or-link')
+            if path.is_dir():
+                pending.append(path); continue
+            require(path.is_file() and 0 < path.stat().st_size <= 4 * 1024**2, 'notice-file-bound')
+            pin = identity(path); total += pin['bytes']
+            require(total <= 16 * 1024**2, 'notice-total-bound')
+            inventory[path.relative_to(root).as_posix()] = pin
+    require(inventory, 'notice-inventory-empty')
+    return dict(sorted(inventory.items()))
+
+
 def elf(path, shared):
     with path.open('rb') as source: head = source.read(64)
     require(len(head) == 64 and head[:6] == b'\x7fELF\x02\x01' and struct.unpack_from('<H',head,18)[0] == 183, 'not-arm64-elf')
@@ -101,7 +121,8 @@ def main():
         upstream=lock['upstream'],binaries=binaries,selectedPackages=installed,mesonOptions=options,
         compiled=True,hardwareQualified=False,androidQualified=False,x11PresentationQualified=False,gameplayQualified=False,
         recipeSources={p.name:identity(p) for p in sorted(Path('/inputs').iterdir()) if p.is_file()},
-        probeShaders={stage:identity(Path('/build/probe.'+stage+'.spv')) for stage in ('vert','frag')})
+        probeShaders={stage:identity(Path('/build/probe.'+stage+'.spv')) for stage in ('vert','frag')},
+        notices=notices(Path('/out')), noticeInventoryScope='source-build-notices-before-integration-license')
     shader_path=Path('/out/shader-tool-check/qualification.json')
     shader_check=json.loads(shader_path.read_text())
     require(shader_check.get('scope') == 'native-linux-arm64-shader-tools-only' and shader_check.get('qualified') is True and
