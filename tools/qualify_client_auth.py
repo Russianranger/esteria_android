@@ -138,7 +138,7 @@ def failure_locations(error):
 
 
 def initialization_failure_codes(path):
-    """Read owned bounded diagnostics, exporting numeric engine/OS codes only."""
+    """Read private diagnostics, exporting numeric codes and fixed enums only."""
     path=db.private_path(path)
     descriptor=os.open(path,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK)
     with os.fdopen(descriptor,'rb') as stream:
@@ -151,13 +151,43 @@ def initialization_failure_codes(path):
     errors=b'\n'.join(line for line in lines if b'[ERROR]' in line)
     # Early mysys failures use an untagged `mysqld: ... (OS errno N)`
     # diagnostic. Keep their numeric errno without publishing the path/text.
-    startup=b'\n'.join(line for line in lines if re.match(
-        rb'(?:/[^\x00\r\n]*/)?mysqld(?:-debug)?:\s',line))
+    startup_lines=[]
+    startup_errors=[]
+    state=os.fsencode(path.parent.parent)
+    kinds=((b"Can't create directory ",'create-directory'),
+           (b"Can't create/write to file ",'create-write-file'),
+           (b"Can't change dir to ",'change-directory'),
+           (b"Can't get working directory ",'working-directory'),
+           (b'Error on realpath() on ','realpath'),
+           (b"Can't create symlink ",'create-symlink'))
+    for line in lines:
+        prefix=re.match(rb'(?:/[^\x00\r\n]*/)?mysqld(?:-debug)?:\s+',line)
+        if prefix is None:continue
+        startup_lines.append(line)
+        message=line[prefix.end():]
+        for literal,kind in kinds:
+            if not message.startswith(literal):continue
+            location=re.match(rb"'([^'\x00\r\n]{1,4096})'",message[len(literal):])
+            role='not-reported'
+            if location is not None:
+                selected=location[1].rstrip(b'/')
+                if selected==state+b'/database-initializing':role='owned-staging-datadir'
+                elif selected==state+b'/run/initialize-tmp':role='owned-initialization-tmpdir'
+                elif selected==state or selected.startswith(state+b'/'):role='owned-state'
+                elif selected.startswith(b'/'):role='absolute-outside-owned-state'
+                else:role='relative-path'
+            codes=sorted({int(value) for value in re.findall(
+                rb'\((?:OS errno|Error)\s+([0-9]{1,4})\b',message) if int(value)<=4095})
+            row=dict(kind=kind,pathRole=role,osErrorNumbers=codes)
+            if row not in startup_errors and len(startup_errors)<8:startup_errors.append(row)
+            break
+    startup=b'\n'.join(startup_lines)
     engine=sorted({value.decode('ascii') for value in re.findall(rb'\bMY-[0-9]{6}\b',errors)})
     system=sorted({int(value) for value in re.findall(rb'\b(?:OS errno\s*|errno[ =:]+|Errcode:\s*)([0-9]{1,4})\b',
                                                     errors+b'\n'+startup,re.I) if int(value)<=4095})
-    return dict(scope='mysql-initialization-failure-numeric-codes-only',mysqlErrorCodes=engine,
-                osErrorNumbers=system,privateLogTextExported=False)
+    system=sorted(set(system).union(code for row in startup_errors for code in row['osErrorNumbers']))
+    return dict(scope='mysql-initialization-failure-typed-codes-only',mysqlErrorCodes=engine,
+                osErrorNumbers=system,startupErrors=startup_errors,privateLogTextExported=False)
 
 
 def worker(plan_path):

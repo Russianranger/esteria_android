@@ -89,3 +89,19 @@ tasks.register('serviceOperationGuardTest', JavaExec) {
     maxHeapSize = '32m'
 }
 check.dependsOn serviceOperationGuardTest
+
+tasks.register('freshServerInstallationsTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.runtime.install.FreshServerInstallationsTests'
+    maxHeapSize = '32m'
+}
+check.dependsOn freshServerInstallationsTest
+
+tasks.register('ownedLaunchFailureTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.runtime.OwnedLaunchFailureTests'
+    maxHeapSize = '32m'
+}
+check.dependsOn ownedLaunchFailureTest

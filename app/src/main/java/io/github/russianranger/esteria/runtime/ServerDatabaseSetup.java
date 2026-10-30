@@ -2,6 +2,7 @@ package io.github.russianranger.esteria.runtime;
 
 import android.content.Context;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
+import io.github.russianranger.esteria.core.runtime.install.FreshServerInstallations;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -53,7 +54,20 @@ public final class ServerDatabaseSetup {
         if (!privateRoot.equals(context.getFilesDir().getCanonicalFile().toPath()))
             throw new IOException("Database setup requires private canonical application storage");
         if (runtime.current()==null) throw new IOException("Prepare the server dependencies before database setup");
-        Path work=directories(privateRoot,"state/server-work");
+        return prepareWork(context,privateRoot,directories(privateRoot,"state/server-work"),runtime,progress,cancelled);
+    }
+    /** The fresh coordinator retains this token until the complete operation
+     * and any required process cleanup have finished. Never accepts an arbitrary path. */
+    static Result prepareFresh(Context context,Path privateRoot,ServerRuntimeSetup runtime,
+            FreshServerInstallations.Workspace workspace,RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled) throws IOException {
+        if(!privateRoot.equals(context.getFilesDir().getCanonicalFile().toPath()))
+            throw new IOException("Canonical private application storage required");
+        workspace.requireRuntimeArchive(runtime.packagePlan().archiveSha256);
+        if(runtime.current()==null)throw new IOException("Prepare the selected server runtime before fresh database setup");
+        return prepareWork(context,privateRoot,workspace.directoryFor(privateRoot),runtime,progress,cancelled);
+    }
+    private static Result prepareWork(Context context,Path privateRoot,Path work,ServerRuntimeSetup runtime,
+            RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled) throws IOException {
         Path lockPath=work.resolve(".android-database-setup.lock");
         if (Files.exists(lockPath,LinkOption.NOFOLLOW_LINKS) && !regular(lockPath))
             throw new IOException("Invalid database operation lock");

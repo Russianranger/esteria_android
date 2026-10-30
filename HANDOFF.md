@@ -71,8 +71,9 @@ exact reviewed files. Source revisions embedded in APKs are authoritative.
 3. Complete reusable updater/ledger/account/realm APIs on the same live engine.
    Compose them after the explicit original baseline + separate source-derived
    appearance adaptation; never rewrite original SQL/updater ledger history.
-4. Finish fresh-installation slot/workspace ownership and atomic pointer
-   promotion. Cancelled/failed fresh stages must not overwrite active/legacy
+4. Fresh-slot/workspace ownership and atomic promotion/recovery storage now pass
+   host checks, including200 exceptional-launch ownership races. Complete its
+   real setup coordinator and Android execution. Cancelled/failed fresh stages must not overwrite active/legacy
    saves. Baseline-only proof cannot promote a gameplay database. Current partial
    schema journals conservatively refuse replay; preserve them for diagnosis.
 5. Wire app-owned local services/client session, authenticated X11, lifecycle,

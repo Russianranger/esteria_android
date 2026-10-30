@@ -97,7 +97,16 @@ public final class OwnedProcess implements SessionSupervisor.Child {
             Thread.currentThread().interrupt();
             throw new IOException("Process launch interrupted"+(interrupted?" during cleanup":""),e);
         }
-        if (child.failure!=null) throw child.failure;
+        if (child.failure!=null) {
+            // The started latch can be released before a subsequent ownership
+            // failure finishes native termination. Callers releasing storage
+            // leases on launch failure must not race that still-owned child.
+            boolean interrupted=false;
+            while(true) try {child.finished.await();break;}
+            catch(InterruptedException error){child.requestStop(Duration.ZERO);interrupted=true;}
+            if(interrupted)Thread.currentThread().interrupt();
+            throw child.failure;
+        }
         return child;
     }
     private void own(Specification spec) {

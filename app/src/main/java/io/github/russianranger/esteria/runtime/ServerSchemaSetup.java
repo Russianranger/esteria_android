@@ -63,7 +63,10 @@ public final class ServerSchemaSetup {
             ServerContentSetup content,ServerDatabaseService.Handle service,String serviceOperation,String version,String uuid,
             RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled) throws IOException {
         checkCancelled(cancelled,service);
-        Path work=GuestHelperAssets.directory(root,"state/server-work");
+        Path work=service.privateWorkDirectory();
+        if(!work.equals(work.toRealPath()) || (!work.equals(root.resolve("state/server-work")) &&
+                !(work.getParent().equals(root.resolve("db")) && work.getFileName().toString().matches("[a-f0-9]{16}"))))
+            throw new IOException("Schema service workspace is outside its owned installation");
         String generation=GuestHelperAssets.install(context,"server-schema",GuestHelperAssets.directory(work,"schema-helpers"),HELPERS);
         String operation=UUID.randomUUID().toString().replace("-","");
         Path guestOperations=GuestHelperAssets.directory(work,"schema-operations");

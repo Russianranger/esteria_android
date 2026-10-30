@@ -30,7 +30,7 @@ Wine/glibc2.36. APK identity remains `io.github.russianranger.esteria`.
 | Appearance storage | Exact source-derived49/132-byte binary tables pass NUL/high-byte roundtrip, REPLACE/read/delete and restart with fixture rows removed. | No canonical original creator was found; provenance remains explicit. Actual game saves/transport unqualified. |
 | Server runtime packaging | Current seven-patch stripped SQL/auth/restart gates pass41050050294; native ARM64 loading of actual stripped auth/world programs passes; worldserver shrinks2.65GB→59MB, paired debug data retained outside APK. Runtime plus original notices is21,996,594bytes. | Programs provider stays disabled until complete corresponding-source rebuild proof. |
 | Phone-side server sources | Exact seven-patch content package:4,063 files/654,243,888bytes. Actual32MiB Java install, cached zero-copy reuse and complete no-Git product verification pass. | SQL execution through the Android adapter is not yet qualified. |
-| Android schema adapter | Streams SQL using the caller's same owned database lease, verifies source/module/UUID identities and journals durable file boundaries. Host subprocess/concurrency tests and APK/AndroidTest/lint pass. | Complete compiled-updater/account/realm composition is next. Partial baselines currently refuse replay; fresh staging recovery is being implemented. |
+| Android schema adapter | Streams SQL using the caller's same owned database lease, verifies source/module/UUID identities and journals durable file boundaries. Host subprocess/concurrency tests and APK/AndroidTest/lint pass. | Complete compiled-updater/account/realm composition is next. Partial baselines currently refuse replay; fresh-slot storage/recovery and typed workspaces pass host checks; its complete setup coordinator is pending. |
 | MySQL persistence | Native ARM64 service/restart/backup passes; Android13 x64 actual Java service41016293760 passes two live cycles, ownership and UUID/credential/marker preservation. | Production ARM64 and existing game-save upgrades/restores remain open. |
 | Presentation and controls | Actual Android x64 Surface/AudioTrack lifecycle, native ARM64 authenticated X11/XTest, Wine FMOD capture, process ownership/remote cleanup pass separately. | Complete Wine/X11/audio/controller session and Adreno execution unqualified. |
 | Application/import | Resumable SAF/ZIP imports,12340 PE/MPQ checks, immutable overlays, mutable UI review, runtime setup and support export build/lint. Android filesystem/update instrumentation passes. | Main START stays gated; launcher controls are not game controls. |
@@ -61,7 +61,7 @@ without a GPU is separate from Adreno qualification.
   provider; qualify the new production ARM64 Wine archive before rebinding
   client/bridges/shader/Turnip packages to its exact hash.
 - Finish phone-owned compiled updater/configuration/account/realm setup and
-  fresh staging promotion/recovery; then compose auth/world/client ownership,
+  the complete fresh-slot setup coordinator; then compose auth/world/client ownership,
   readiness and graceful saves.
 - Prepare server maps/DBC/vmaps/mmaps/Cameras and shaders from imported12340
   client data. Full base MPQs and current matched Esteria content are absent.

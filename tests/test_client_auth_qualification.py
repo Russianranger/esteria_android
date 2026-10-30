@@ -47,9 +47,42 @@ class ClientAuthQualification(unittest.TestCase):
             result=qualifier.initialization_failure_codes(path)
             self.assertEqual(result['osErrorNumbers'],[2,13,30])
             self.assertEqual(result['mysqlErrorCodes'],['MY-010119'])
-            self.assertEqual(set(result),{'scope','mysqlErrorCodes','osErrorNumbers','privateLogTextExported'})
+            self.assertEqual(set(result),{'scope','mysqlErrorCodes','osErrorNumbers','startupErrors','privateLogTextExported'})
             self.assertFalse(result['privateLogTextExported'])
             self.assertNotIn('private',json.dumps(result).replace('privateLogTextExported',''))
+
+    def test_startup_error_classification_exports_only_fixed_kinds_and_path_roles(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            state=Path(temporary)/'owned';path=state/'logs/mysql-initialize-engine.log'
+            path.parent.mkdir(parents=True)
+            cases=[("Can't create directory ",str(state/'database-initializing')+'/',17,'create-directory','owned-staging-datadir'),
+                   ("Can't create/write to file ",str(state/'run/initialize-tmp'),30,'create-write-file','owned-initialization-tmpdir'),
+                   ("Can't change dir to ",str(state/'private-secret'),13,'change-directory','owned-state'),
+                   ('Error on realpath() on ','/private-secret/source',2,'realpath','absolute-outside-owned-state'),
+                   ("Can't create symlink ",'private-secret',17,'create-symlink','relative-path')]
+            path.write_text(''.join('/usr/sbin/mysqld: '+literal+"'"+location+"' ("+
+                ('Error' if kind=='realpath' else 'OS errno')+' '+str(code)+' - private-secret)\n'
+                for literal,location,code,kind,role in cases))
+            path.chmod(0o600)
+            result=qualifier.initialization_failure_codes(path)
+            self.assertEqual(result['startupErrors'],[dict(kind=kind,pathRole=role,osErrorNumbers=[code])
+                for literal,location,code,kind,role in cases])
+            self.assertEqual(result['osErrorNumbers'],[2,13,17,30])
+            self.assertNotIn('private-secret',json.dumps(result));self.assertNotIn(str(state),json.dumps(result))
+
+    def test_startup_classification_is_bounded_and_ignores_unrecognized_messages(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            path=Path(temporary)/'initialize-private.log'
+            path.write_text("unrelated: Can't create directory '/private' (OS errno 17 - private)\n"+
+                "mysqld: unknown private text '/private' (OS errno 18 - private)\n"+
+                ''.join("mysqld: Can't create directory '/private' (OS errno "+str(code)+" - private)\n"
+                        for code in range(9)))
+            path.chmod(0o600)
+            result=qualifier.initialization_failure_codes(path)
+            self.assertEqual(len(result['startupErrors']),8)
+            self.assertTrue(all(row['kind']=='create-directory' and row['pathRole']=='absolute-outside-owned-state'
+                                for row in result['startupErrors']))
+            self.assertEqual(result['osErrorNumbers'],list(range(9))+[18])
 
     def test_readonly_source_verification_uses_exact_trust_and_no_index_writes(self):
         with tempfile.TemporaryDirectory() as temporary:

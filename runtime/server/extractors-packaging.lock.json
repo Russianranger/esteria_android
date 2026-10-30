@@ -1,0 +1,140 @@
+{
+  "formatVersion": 1,
+  "scope": "exact-seven-patch-server-extractor-packaging-inputs",
+  "engineReferenceLock": {
+    "bytes": 1170,
+    "sha256": "8f9a9b1f3ece57ed0a2df34ce6f58c23968b12d2f6274739443a7e3514e4795d"
+  },
+  "sourceLockSha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1",
+  "originalBuild": {
+    "bytes": 32521,
+    "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+  },
+  "originalModules": {
+    "bytes": 5348,
+    "sha256": "6459b6a1acab2c62c474e4c6ab3eb651daa21f697ccd628e93a38bad298bbdd1"
+  },
+  "integrationRevision": "e9dcb61d8d8c40fc683ac2a67bbf15a8eb538300",
+  "buildId": "41019374697.1",
+  "originalFiles": {
+    "bin/map_extractor": {
+      "bytes": 4543616,
+      "sha256": "383987681708dd251826f1268ac64aad9fe3196556ebd85b52d40aed2d65b92a"
+    },
+    "bin/mmaps-config.yaml": {
+      "bytes": 7888,
+      "sha256": "324479ef3821a0f9ef0c3f2d6b42c011eba1c31148eeaccd6bed3250c3d9c306"
+    },
+    "bin/mmaps_generator": {
+      "bytes": 31970816,
+      "sha256": "39848b8d25c08c171a1db6b74d998478db10d0f110b8fa622af88064846a76c2"
+    },
+    "bin/vmap4_assembler": {
+      "bytes": 15503760,
+      "sha256": "0d2ef2ddad39eb9404ebda636c74a83c81d1c8655ab0c8750d5a8a7b849a740b"
+    },
+    "bin/vmap4_extractor": {
+      "bytes": 12008376,
+      "sha256": "0843e4f0584969b36e85db7b141879b470a9cb3bed7e43fe0d8d6c76907ebdcd"
+    }
+  },
+  "sourceFiles": {
+    "src/tools/map_extractor/System.cpp": {
+      "bytes": 37480,
+      "sha256": "07e1d9425b9e1b210cc6c015b67dff45ee605cf35eee687dab7b3bd709434c16"
+    },
+    "src/tools/mmaps_generator/PathGenerator.cpp": {
+      "bytes": 6875,
+      "sha256": "0723fd9c3833ae0242ca55fd83ea023caac090a1bf59906810ff1c29f524bc5b"
+    },
+    "src/tools/mmaps_generator/Config.cpp": {
+      "bytes": 12624,
+      "sha256": "f9110274e35f7b25dd7f880f9d905999818646d32e0153df844c96b6b69183b1"
+    },
+    "src/tools/mmaps_generator/mmaps-config.yaml": {
+      "bytes": 7888,
+      "sha256": "324479ef3821a0f9ef0c3f2d6b42c011eba1c31148eeaccd6bed3250c3d9c306"
+    },
+    "src/tools/vmap4_assembler/VMapAssembler.cpp": {
+      "bytes": 1562,
+      "sha256": "1fcec17e4a7def10e62f736a2d2f62416fa7a8d82d9a16c9a02aa0e7e50a9000"
+    },
+    "src/tools/vmap4_extractor/vmapexport.cpp": {
+      "bytes": 14784,
+      "sha256": "56999622c36deea1ad8768e8f9357d37e8a44c0e0ecb34e47e09932ae88834eb"
+    }
+  },
+  "cliCases": [
+    {
+      "name": "map-usage",
+      "program": "map_extractor",
+      "arguments": [
+        "-i"
+      ],
+      "exitCode": 1,
+      "contains": [
+        "Map & DBC Extractor",
+        "Usage:",
+        "Camera(4)"
+      ]
+    },
+    {
+      "name": "vmap-extractor-usage",
+      "program": "vmap4_extractor",
+      "arguments": [
+        "-?"
+      ],
+      "exitCode": 1,
+      "contains": [
+        "Extract V4.00 2012_02.",
+        "This message."
+      ]
+    },
+    {
+      "name": "vmap-assembler-usage",
+      "program": "vmap4_assembler",
+      "arguments": [
+        "--usage",
+        "unused",
+        "unused"
+      ],
+      "exitCode": 1,
+      "contains": [
+        "usage:",
+        "<raw data dir>",
+        "<vmap dest dir>"
+      ]
+    },
+    {
+      "name": "mmaps-argument-validation",
+      "program": "mmaps_generator",
+      "arguments": [
+        "--silent",
+        "--help"
+      ],
+      "exitCode": 255,
+      "contains": [
+        "invalid map id"
+      ]
+    },
+    {
+      "name": "mmaps-default-configuration-validation",
+      "program": "mmaps_generator",
+      "arguments": [
+        "--config",
+        "@CONFIG@",
+        "--silent"
+      ],
+      "exitCode": 253,
+      "contains": [
+        "'maps' directory is empty or does not exist"
+      ]
+    }
+  ],
+  "runtimeMount": "/esteria-server-extractors",
+  "sourceCompanionComplete": false,
+  "customEsteriaDataLoadOrderQualified": false,
+  "clientMpqConversionQualified": false,
+  "androidRuntimeQualified": false,
+  "gameplayQualified": false
+}

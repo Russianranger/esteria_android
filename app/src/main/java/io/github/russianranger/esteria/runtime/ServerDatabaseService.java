@@ -3,6 +3,7 @@ package io.github.russianranger.esteria.runtime;
 import android.content.Context;
 import io.github.russianranger.esteria.core.runtime.SessionSupervisor;
 import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
+import io.github.russianranger.esteria.core.runtime.install.FreshServerInstallations;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
@@ -41,20 +42,24 @@ public final class ServerDatabaseService {
         private final OwnedProcess process;
         private final FileChannel leaseChannel;
         private final FileLock lease;
-        private final Path guestSession,runtimeGeneration;
+        private final Path guestSession,runtimeGeneration,workDirectory;
+        private final FreshServerInstallations.Workspace freshWorkspace;
         private final String operation,version;
         private String instanceUuid;
         private boolean released;
         private final ServiceOperationGuard operations=new ServiceOperationGuard();
-        private Handle(OwnedProcess process,FileChannel channel,FileLock lease,Path session,String operation,String version,Path runtimeGeneration) {
-            this.process=process;leaseChannel=channel;this.lease=lease;guestSession=session;this.operation=operation;this.version=version;this.runtimeGeneration=runtimeGeneration;
+        private Handle(OwnedProcess process,FileChannel channel,FileLock lease,Path session,String operation,String version,Path runtimeGeneration,Path workDirectory,FreshServerInstallations.Workspace workspace) {
+            this.process=process;leaseChannel=channel;this.lease=lease;guestSession=session;this.operation=operation;this.version=version;this.runtimeGeneration=runtimeGeneration;this.workDirectory=workDirectory;freshWorkspace=workspace;
         }
         @Override public boolean isAlive(){return process.isAlive();}
         @Override public int exitCode(){return process.exitCode();}
         /** This identity is available only after live SQL readiness, not merely setup. */
         public String instanceUuid(){return instanceUuid;}
         public Path privateSessionDirectory(){return guestSession;}
+        Path privateWorkDirectory(){return workDirectory;}
         @Override public void stop(Duration timeout) throws IOException {
+            if(timeout==null || timeout.isNegative() || timeout.compareTo(Duration.ofSeconds(30))>0)
+                throw new IllegalArgumentException("Shutdown timeout must be between zero and 30 seconds");
             try(ServiceOperationGuard.StopPermit permit=operations.stopWithin(timeout)) {
                 stopOwned(permit.remaining());
             }
@@ -94,7 +99,7 @@ public final class ServerDatabaseService {
             });
         }
         private synchronized void release() throws IOException {
-            if(!released){released=true;try{lease.release();}finally{leaseChannel.close();}}
+            if(!released){released=true;try{lease.release();}finally{try{leaseChannel.close();}finally{if(freshWorkspace!=null)freshWorkspace.close();}}}
         }
         private void identity(JSONObject receipt,String scope) throws IOException,JSONException {
             String uuid=receipt.getString("uuid");
@@ -107,7 +112,10 @@ public final class ServerDatabaseService {
     }
     /** Caller retains this child and always stops it, including failed readiness. */
     public static Handle start(Context context,Path root,ServerRuntimeSetup runtime) throws IOException {
-        return startInstalled(context,root,new InstalledRuntime(){
+        return startInstalled(context,root,installedRuntime(context,runtime));
+    }
+    private static InstalledRuntime installedRuntime(Context context,ServerRuntimeSetup runtime) {
+        return new InstalledRuntime(){
             @Override public Path current() throws IOException {return runtime.current();}
             @Override public String expectedMysqlVersion(){return runtime.expectedMysqlVersion();}
             @Override public OwnedProcess launch(Path work,Path session,List<String> command,
@@ -115,13 +123,31 @@ public final class ServerDatabaseService {
                 return ProotProcess.startInteractive(context,runtime.installer(),runtime.packagePlan(),work,session,
                         command,Collections.emptyMap(),Collections.emptyList(),shutdown);
             }
-        });
+        };
+    }
+    /** The handle retains a child workspace token until its owned service exits. */
+    static Handle startFresh(Context context,Path root,ServerRuntimeSetup runtime,FreshServerInstallations.Attempt attempt) throws IOException {
+        FreshServerInstallations.Workspace workspace=attempt.retainWorkspace();
+        try {
+            workspace.requireRuntimeArchive(runtime.packagePlan().archiveSha256);
+            return startAtWorkspace(context,root,installedRuntime(context,runtime),workspace.directoryFor(root),workspace);
+        } catch(IOException|RuntimeException error){workspace.close();throw error;}
+    }
+    /** Existing promoted storage is started directly, never initialized again. */
+    static Handle startActive(Context context,Path root,ServerRuntimeSetup runtime,FreshServerInstallations.Active active) throws IOException {
+        if(!active.runtimeArchiveSha256.equals(runtime.packagePlan().archiveSha256))
+            throw new IOException("Active database requires its pinned server runtime; existing state retained");
+        return startAtWorkspace(context,root,installedRuntime(context,runtime),active.directoryFor(root),null);
     }
     static Handle startInstalled(Context context,Path root,InstalledRuntime runtime) throws IOException {
+        if(!root.equals(context.getFilesDir().getCanonicalFile().toPath()) || runtime.current()==null)throw new IOException("Canonical private application storage required");
+        return startAtWorkspace(context,root,runtime,GuestHelperAssets.directory(root,"state/server-work"),null);
+    }
+    private static Handle startAtWorkspace(Context context,Path root,InstalledRuntime runtime,Path work,
+            FreshServerInstallations.Workspace workspace) throws IOException {
         Path installed=runtime.current();
         if(!root.equals(context.getFilesDir().getCanonicalFile().toPath()) || installed==null)
             throw new IOException("Prepared runtime and canonical private storage required");
-        Path work=GuestHelperAssets.directory(root,"state/server-work");
         // PRoot expands guest UNIX sockets to these physical Android filenames.
         // mysql_service.py creates only s-XXXXXXXX/m.sock directly below /work.
         if(work.resolve("s-12345678/m.sock").toString().getBytes(StandardCharsets.UTF_8).length>100)
@@ -150,7 +176,7 @@ public final class ServerDatabaseService {
                         if(!child.writeInput("shutdown\n".getBytes(StandardCharsets.US_ASCII),Duration.ofSeconds(1)))
                             throw new IOException("Database shutdown request was not delivered");
                     });
-            return new Handle(process,channel,lock,guestSessions.resolve(operation),operation,runtime.expectedMysqlVersion(),installed);
+            return new Handle(process,channel,lock,guestSessions.resolve(operation),operation,runtime.expectedMysqlVersion(),installed,work,workspace);
         } catch(IOException|RuntimeException error) {
             try{if(lock!=null)lock.release();}finally{channel.close();}
             throw error;

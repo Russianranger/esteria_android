@@ -1,0 +1,87 @@
+{
+  "actualSqlExecuted": false,
+  "androidBuild": {
+    "androidTestJavaCompilationPassed": true,
+    "applicationJavaCompilationPassed": true,
+    "freshRuntimePreflightFollowupJavaCompilationPassed": true,
+    "lintPassed": true
+  },
+  "androidFreshSetupExecuted": false,
+  "completeProductionSetupProofEmitted": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "implementation": {
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseService.java": {
+      "bytes": 15566,
+      "sha256": "a64d8080a8f79e46d815fe96fe0580cae65b2293f57a48952f4fe3288d8b90a8"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseSetup.java": {
+      "bytes": 13975,
+      "sha256": "599ffd0642a419d86e0e03c78c5ce43560b8d8fe922a3da43d4f50a551e574dc"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerSchemaSetup.java": {
+      "bytes": 14144,
+      "sha256": "08d773cef9c842aca0e47efa6c95b089c1c4bf9c5619f2969aa2c8c065cb7c6e"
+    },
+    "core/build.gradle": {
+      "bytes": 3882,
+      "sha256": "2cc13e4f3cfae8b03976badf26b87ce2ef53375f1053c415664b137baaed10b5"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/FreshServerInstallations.java": {
+      "bytes": 19917,
+      "sha256": "a65a874f391240bae26033191d724da21fb65cd7af0352bece7501bf771908b3"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/OwnedProcess.java": {
+      "bytes": 12887,
+      "sha256": "f5b3d1e2bf4359cbb2db241c984411d85762faa70bcdc673a0b0ec8d59013848"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/OwnedLaunchFailureTests.java": {
+      "bytes": 3901,
+      "sha256": "676f11379a472800a2c96e2c9a7c9d2a650a33587c04ce2c23fe81f8d935f715"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/install/FreshServerInstallationsTests.java": {
+      "bytes": 10271,
+      "sha256": "048ce3d31ab3154cd582d97d1996cb848c538e5f71dca07b898c3d9bf3df6c83"
+    }
+  },
+  "ownershipTests": {
+    "concurrentStopDeadlineAndRetryPassed": true,
+    "exceptionsAfterCleanup": 141,
+    "exceptionsBeforeCleanup": 0,
+    "launchRaceTrials": 200,
+    "operatingSystemChildExecuted": false,
+    "realJavaOwnerThreads": true,
+    "retainedHandles": 59
+  },
+  "productionCoordinatorActivated": false,
+  "reviewed": true,
+  "scope": "fresh-server-storage-transactions-and-host-ownership-fixtures",
+  "sourceLock": {
+    "bytes": 2170,
+    "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+  },
+  "storageTests": {
+    "activeResolutionReadOnly": true,
+    "actualFilesystem": true,
+    "cancelledAttemptRetained": true,
+    "completePointerPromotion": true,
+    "datadirMoved": false,
+    "freshRuntimeSelectionPreflightVerified": true,
+    "heapMiB": 32,
+    "incompleteSetupFlagsRefused": true,
+    "interruptionCheckpoints": [
+      "allocated",
+      "proof-written",
+      "ready-written",
+      "active-pointer-written"
+    ],
+    "legacyCharacterSentinelPreserved": true,
+    "measuredStorageReserveEnforced": true,
+    "receiptInputs": "explicitly synthetic test fixture files",
+    "receiptTamperRefused": true,
+    "retainedChildTokensBlockPromotionAndAbandonment": true,
+    "retainedDataAutomaticallyDeleted": false,
+    "retryUsesNewSlot": true,
+    "sourceMismatchPreserved": true
+  }
+}

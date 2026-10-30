@@ -11,6 +11,10 @@ on:
       - tools/package_server_engine.py
       - tools/package_server_engine_source_inputs.py
       - tools/server_engine_elf.py
+      - tools/package_server_extractors.py
+      - runtime/server/extractors-packaging.lock.json
+      - runtime/server/EXTRACTOR-PACKAGING.md
+      - tests/test_server_extractors.py
       - tools/verify_server_engine_runtime.py
       - tools/qualify_dbimport.py
       - tools/qualify_authserver.py
@@ -40,6 +44,7 @@ jobs:
     outputs:
       receipt_sha256: ${{ steps.identities.outputs.receipt_sha256 }}
       content_receipt_sha256: ${{ steps.identities.outputs.content_receipt_sha256 }}
+      extractor_receipt_sha256: ${{ steps.identities.outputs.extractor_receipt_sha256 }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -51,6 +56,7 @@ jobs:
             tests.test_server_engine_package tests.test_server_engine_runtime \
             tests.test_server_engine_source_inputs tests.test_server_requalification \
             tests.test_dbimport_qualification tests.test_authserver_qualification -v
+          python3 -m unittest tests.test_server_extractors -v
           mkdir -p out/engine-evidence
       - name: Stream and verify exact seven-patch original inputs after disk preflight
         env:
@@ -110,6 +116,16 @@ jobs:
             --lua-archive out/engine-tool-inputs/lua-5.2.4.tar.gz \
             --output out/server-engine-source-inputs \
             > out/engine-evidence/source-input-packaging.log 2>&1
+      - name: Pair exact original extractor derivatives and retain original source notices
+        run: |
+          python3 tools/package_server_extractors.py build \
+            --install out/engine-inputs/install --compiled-modules out/engine-inputs/server-modules.json \
+            --compile-commands out/engine-inputs/compile_commands.json \
+            --lock out/engine-inputs/locked/sources.lock.json --server out/engine-inputs/sources/server \
+            --source-inputs out/server-engine-source-inputs \
+            --ndk-archive out/engine-tool-inputs/android-ndk-r28c-linux.zip \
+            --objcopy "$GITHUB_WORKSPACE/out/engine-tool/llvm-objcopy" \
+            --output out/server-extractors-package > out/engine-evidence/extractor-packaging.log 2>&1
       - name: Bind exact transfer receipt and source-content identities
         id: identities
         run: |
@@ -121,6 +137,7 @@ jobs:
           with open(os.environ['GITHUB_OUTPUT'],'a') as output:
               output.write('receipt_sha256='+proof['sha256']+'\n')
               output.write('content_receipt_sha256='+files.identity(pathlib.Path('out/engine-inputs/content/package-receipt.json'))['sha256']+'\n')
+              output.write('extractor_receipt_sha256='+files.identity(pathlib.Path('out/server-extractors-package/package-receipt.json'))['sha256']+'\n')
           target = pathlib.Path('out/engine-evidence')
           receipt = json.loads((package/'package-receipt.json').read_text())
           evidence = dict(formatVersion=1, scope='actual-source-built-engine-derivatives-host-packaged',
@@ -130,6 +147,17 @@ jobs:
               sourceCompanionComplete=False, androidProviderCreated=False,
               androidRuntimeQualified=False, gameplayQualified=False)
           (target/'packaging-environment.json').write_text(json.dumps(evidence,indent=2)+'\n')
+          extractor=pathlib.Path('out/server-extractors-package')
+          receipt=json.loads((extractor/'package-receipt.json').read_text())
+          evidence=dict(formatVersion=1,scope='actual-source-built-extractor-derivatives-host-packaged',
+              integrationRevision=os.environ['GITHUB_SHA'],originalBuildId='41019374697.1',
+              packageReceipt=files.identity(extractor/'package-receipt.json'),
+              packages={k:v['archive'] for k,v in receipt['packages'].items()},
+              programs={name:row['stripped'] for name,row in receipt['derivative']['programs'].items()},
+              originalNoticeBytesPreserved=True,aarch64InputsExecuted=False,sourceCompanionComplete=False,
+              clientMpqConversionQualified=False,customEsteriaDataLoadOrderQualified=False,
+              androidRuntimeQualified=False,gameplayQualified=False)
+          (target/'extractor-packaging-environment.json').write_text(json.dumps(evidence,indent=2)+'\n')
           PY
       - name: Retain paired debug symbols and original host-tool notices outside runtime
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -139,6 +167,17 @@ jobs:
           path: |
             out/server-engine-package/server-engine-debug-arm64.tar.gz
             out/server-engine-package/package-receipt.json
+            out/engine-tool-notices/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Retain four paired extractor debug files outside runtime
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: unsealed-server-extractors-debug-${{ github.sha }}
+          compression-level: 0
+          path: |
+            out/server-extractors-package/server-extractors-debug-arm64.tar.gz
+            out/server-extractors-package/package-receipt.json
             out/engine-tool-notices/
           retention-days: 30
           if-no-files-found: error
@@ -158,6 +197,8 @@ jobs:
           path: |
             out/server-engine-package/package-receipt.json
             out/server-engine-package/server-engine-runtime-arm64.tar.gz
+            out/server-extractors-package/package-receipt.json
+            out/server-extractors-package/server-extractors-runtime-arm64.tar.gz
             out/engine-inputs/content/
             out/engine-inputs/locked/
             out/engine-inputs/preparation.json
@@ -187,6 +228,7 @@ jobs:
         env:
           EXPECTED_ENGINE_RECEIPT: ${{ needs.package.outputs.receipt_sha256 }}
           EXPECTED_CONTENT_RECEIPT: ${{ needs.package.outputs.content_receipt_sha256 }}
+          EXPECTED_EXTRACTOR_RECEIPT: ${{ needs.package.outputs.extractor_receipt_sha256 }}
         run: |
           test "$(uname -m)" = aarch64
           mkdir -p out/engine-native-evidence out/engine-native-private
@@ -201,10 +243,17 @@ jobs:
           if not re.fullmatch('[0-9a-f]{64}',content): raise ValueError('exact producer content receipt required')
           if files.identity(pathlib.Path('out/transfer/engine-inputs/content/package-receipt.json'))['sha256'] != content:
               raise ValueError('cross-job source-content receipt changed')
+          expected=os.environ['EXPECTED_EXTRACTOR_RECEIPT']
+          if not re.fullmatch('[0-9a-f]{64}',expected): raise ValueError('exact producer extractor receipt required')
+          if files.identity(pathlib.Path('out/transfer/server-extractors-package/package-receipt.json'))['sha256'] != expected:
+              raise ValueError('cross-job extractor receipt changed')
           PY
           python3 tools/verify_server_engine_runtime.py extract \
             --package-receipt out/transfer/server-engine-package/package-receipt.json \
             --output out/engine-native-install > out/engine-native-evidence/extraction.json
+          python3 tools/package_server_extractors.py extract \
+            --package-receipt out/transfer/server-extractors-package/package-receipt.json \
+            --output out/extractors-native-install > out/engine-native-evidence/extractor-extraction.json
       - name: Build and read back exact published Ubuntu MySQL image without APT
         run: |
           env -u GITHUB_TOKEN python3 tools/release_server_dependencies.py prepare --output out/server-dependency-release \
@@ -221,6 +270,17 @@ jobs:
             --mount "type=bind,src=$GITHUB_WORKSPACE/out/server-dependency-image/context-receipt.json,dst=/context-receipt.json,readonly" \
             esteria-engine-reference:verified /usr/bin/python3 /verify-image.py --context-receipt /context-receipt.json \
             > out/engine-native-evidence/dependency-image-check.json
+      - name: Validate actual extractor native argument entry and original mmaps YAML without client data
+        run: |
+          docker run --rm --init --network none --read-only --tmpfs /tmp:rw,nosuid,nodev,size=16m \
+            --env PYTHONDONTWRITEBYTECODE=1 \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/engine-native-private,dst=/state" \
+            --workdir /qualification esteria-engine-reference:verified \
+            python3 tools/package_server_extractors.py smoke \
+            --install /qualification/out/extractors-native-install \
+            --package-receipt /qualification/out/transfer/server-extractors-package/package-receipt.json \
+            --output /state/extractor-cli.json > out/engine-native-evidence/extractor-cli.log 2>&1
       - name: Execute actual derived auth and world version entry on native ARM64
         run: |
           docker run --rm --init --network none --env PYTHONDONTWRITEBYTECODE=1 \
@@ -254,7 +314,7 @@ jobs:
           from tools import verify_server_build as files
           source=pathlib.Path('out/engine-native-private'); target=pathlib.Path('out/engine-native-evidence')
           target.mkdir(parents=True,exist_ok=True)
-          for relative in ('loader-smoke.json','run/qualification.json','run/auth-qualification.json',
+          for relative in ('loader-smoke.json','extractor-cli.json','run/qualification.json','run/auth-qualification.json',
                            'run/dbimport-first.log','run/dbimport-second.log','run/authserver-redacted.log',
                            'run/mysql-initialize-engine.log','run/mysql-bootstrap-engine.log',
                            'run/mysql-base-engine.log','run/mysql-base-restart-engine.log'):

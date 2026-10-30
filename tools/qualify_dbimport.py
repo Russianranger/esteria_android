@@ -30,7 +30,6 @@ try:
     from . import render_server_config as config
     from . import verify_server_build as files
     from . import initialize_server_schema as baseline
-    from .owned_process_group import OwnedGroup
 except ImportError:
     import prepare_runtime as archives
     import qualify_base_sql as base
@@ -39,11 +38,12 @@ except ImportError:
     import render_server_config as config
     import verify_server_build as files
     import initialize_server_schema as baseline
-    from owned_process_group import OwnedGroup
 from runtime import mysql_bootstrap as db
 from runtime import provision_local_realm as realm
 from runtime import server_schema_adaptations as adaptations
 from runtime import server_content as product_content
+from runtime import server_updater as product_updater
+from runtime.owned_process_group import OwnedGroup
 
 require = base.content.require
 DATABASES = ('auth', 'characters', 'world')
@@ -175,107 +175,12 @@ def verify_runtime_content(extracted, content_directory, receipt_sha256, lock_pa
     return verified
 
 
-def render_importer(template, source, state, mysql, password):
-    run = state / 'run/dbimport'
-    run.mkdir(mode=0o700)
-    settings = {'SourceDirectory': config.quoted(source), 'MySQLExecutable': config.quoted(mysql),
-                'LogsDir': config.quoted(state / 'logs'), 'TempDir': config.quoted(run),
-                'Updates.EnableDatabases': 7, 'Updates.AllowedModules': '"all"',
-                'Updates.AutoSetup': 0, 'Updates.Redundancy': 1, 'Updates.AllowRehash': 1,
-                'Updates.ArchivedRedundancy': 0, 'Updates.CleanDeadRefMaxCount': 0,
-                'Database.Reconnect.Attempts': 1, 'Database.Reconnect.Seconds': 1,
-                'Logger.root': '4,Console'}
-    for label, database in (('Login', 'auth'), ('Character', 'characters'), ('World', 'world')):
-        settings[label + 'DatabaseInfo'] = f'"127.0.0.1;{db.PORT};esteria;{password};acore_{database}"'
-        settings[label + 'Database.WorkerThreads'] = settings[label + 'Database.SynchThreads'] = 1
-    text = config.overlay(template.read_text(), settings)
-    path = run / 'dbimport.conf'
-    config.write_private(path, text)
-    return path
-
-
-def run_importer(executable, configuration, log, *, timeout=1800, on_started=None):
-    """Own the whole updater/mysql child process group; retain a bounded private tail."""
-    command = [str(executable), '--config', str(configuration)]
-    environment = {'PATH': '/usr/bin:/bin', 'LANG': 'C.UTF-8', 'LC_ALL': 'C.UTF-8',
-                   'AC_DISABLE_INTERACTIVE': '1', 'MYSQL_TEST_LOGIN_FILE': os.devnull}
-    descriptor = os.open(log, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
-    tail = bytearray()
-    child = None
-    group = None
-    try:
-        child = subprocess.Popen(command, cwd=configuration.parent, env=environment, umask=0o077,
-            stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, start_new_session=True)
-        group = OwnedGroup(child)
-        if on_started is not None:
-            on_started()
-        deadline = time.monotonic() + timeout
-        with selectors.DefaultSelector() as selector:
-            selector.register(child.stdout, selectors.EVENT_READ)
-            while selector.get_map():
-                require(time.monotonic() < deadline, 'owned dbimport timed out; partial fixture preserved')
-                for key, _ in selector.select(.2):
-                    block = os.read(key.fd, 8192)
-                    if not block:
-                        selector.unregister(key.fd)
-                        continue
-                    tail.extend(block)
-                    if len(tail) > LOG_LIMIT:
-                        del tail[:-LOG_LIMIT]
-            exit_code = group.wait(timeout=max(.01, deadline - time.monotonic()))
-        require(exit_code == 0, 'compiled dbimport failed (exit ' + str(exit_code) + '); partial fixture preserved')
-        return {'exitCode': exit_code, 'diagnosticBytes': len(tail),
-                'diagnosticSha256': hashlib.sha256(tail).hexdigest()}
-    finally:
-        try:
-            if group is not None:
-                group.stop()
-        finally:
-            if child is not None and child.stdout:
-                child.stdout.close()
-            with os.fdopen(descriptor, 'wb') as output:
-                output.write(tail)
-                output.flush()
-                os.fsync(output.fileno())
-
-
-def expected_updates(source, manifest, database):
-    result = {}
-    for item in manifest['databases'][database]['updateOrder']:
-        path = item['path']
-        digest = hashlib.sha1()
-        with files.plain_file(source / path) as stream:
-            while block := stream.read(base.content.CHUNK):
-                digest.update(block)
-        name = Path(path).name
-        require(name not in result, 'duplicate SQL basename in updater expectation')
-        result[name] = (digest.hexdigest(), item['state'])
-    return result
-
-
-def schema_snapshot(connection, expected):
-    result = {}
-    for name in DATABASES:
-        tables = connection.query('SHOW TABLES FROM `acore_' + name + '`')
-        require('updates' in tables and 'updates_include' in tables, 'compiled updater did not create its ledger')
-        rows = connection.query('SELECT name,hash,state FROM `acore_' + name + '`.`updates` ORDER BY name')
-        entries = {}
-        for row in rows:
-            fields = row.split('\t')
-            require(len(fields) == 3 and fields[0] not in entries, 'invalid or duplicate update ledger entry')
-            entries[fields[0]] = (fields[1].lower(), fields[2])
-        for filename, (digest, state) in expected[name].items():
-            require(filename in entries, 'source update missing from applied ledger: ' + name + '/' + filename)
-            observed = entries[filename]
-            # Pinned source intentionally skips archived hash redundancy by default.
-            require(observed[1] == state and (state == 'ARCHIVED' or observed[0] == digest),
-                    'source update ledger/hash differs: ' + name + '/' + filename)
-        result[name] = {'tableCount': len(tables), 'tablesSha256': hashlib.sha256(base.canonical_identity(tables)).hexdigest(),
-                        'ledgerRows': len(rows), 'ledgerSha256': hashlib.sha256(base.canonical_identity(rows)).hexdigest(),
-                        'sourceUpdateNamesVerified': len(expected[name])}
-    require(not connection.query('SHOW TABLES FROM `acore_playerbots`'),
-            'dbimport unexpectedly modified the unregistered playerbots database')
-    return result
+# The same primitives are used by native qualification and the product runtime.
+# Keep public names, signatures and OwnedGroup identity for existing callers.
+render_importer = product_updater.render_importer
+run_importer = product_updater.run_importer
+expected_updates = product_updater.expected_updates
+schema_snapshot = product_updater.schema_snapshot
 
 
 def markers(connection, token, *, create=False):
