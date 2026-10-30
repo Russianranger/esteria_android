@@ -46,3 +46,11 @@ python3 tools/qualify_android_owner.py \
 The managed development host's inability to run its own Android emulator does
 not count as an Android failure. The hosted emulator result is the execution
 gate, and must be read before this workflow is marked qualified.
+
+Run [40994809786](https://github.com/Russianranger/esteria_android/actions/runs/40994809786)
+passed all six groups on the Android 13 x86_64 emulator at integration revision
+`1f19c3abe5722ac06ab58f9af4e54b2f27f54ec8`. Its receipt reports targetSdk35,
+9,000,000 bytes drained and 8,388,608 retained per pipe. The evidence artifact
+SHA-256 is `555d4665600634db0fe54b9818e556a1da9e0ef4706b58516518823796f6d1d6`.
+This qualifies the stated system-process scope only; the separate gates above
+remain open.

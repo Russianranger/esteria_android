@@ -18,8 +18,10 @@ public final class RuntimeInstallationInstrumentedTest {
     private static Context context() {
         return InstrumentationRegistry.getInstrumentation().getTargetContext();
     }
-    private static Path updateRoot() {
-        return context().getFilesDir().toPath().resolve("instrumentation-update-contract");
+    private static Path updateRoot() throws java.io.IOException {
+        // Resolve Android's trusted /data/user/0 alias before strict no-link checks,
+        // just as SessionService does for the real application storage root.
+        return context().getFilesDir().toPath().toRealPath().resolve("instrumentation-update-contract");
     }
     @Test public void runtimeContracts() throws Exception {
         Path root = Files.createTempDirectory(context().getCacheDir().toPath(), "runtime-contracts-");
