@@ -1,0 +1,16 @@
+**
+!runtime
+!runtime/wine-arm64
+!runtime/wine-arm64/**
+!runtime/wine-probe
+!runtime/wine-probe/android-private-pe-copy.patch
+!runtime/wine-probe/apply_adaptations.py
+!runtime/wine-probe/capture_sources.py
+!runtime/bridges
+!runtime/bridges/debian.sources
+!runtime/bridges/inrelease.SHA256SUMS
+!tools
+!tools/prepare_runtime.py
+!tools/owned_process_group.py
+**/__pycache__
+**/*.pyc

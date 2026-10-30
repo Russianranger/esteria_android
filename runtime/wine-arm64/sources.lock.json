@@ -1,0 +1,432 @@
+{
+  "formatVersion": 1,
+  "scope": "source-owned-native-linux-arm64-wine-candidate-build-inputs",
+  "architecture": "arm64",
+  "runtimeQualified": false,
+  "oldProviderArchiveSha256": "f036c00a290abb953bec26be80c4d8fe492fd986e7a589c51008124432c8641e",
+  "baseImage": {
+    "reference": "docker.io/library/debian@sha256:7ccb8b5b60c7654f5b795d94ee7d751cd0811500803f0b09cefcd555e755a55a",
+    "indexDigest": "sha256:99c0b25c46d0214d5a2091092e7908907dcaecd6a962cde0ac700acee222b6f3",
+    "manifest": {
+      "schemaVersion": 2,
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "config": {
+        "mediaType": "application/vnd.oci.image.config.v1+json",
+        "digest": "sha256:6c51fdfbb33b6cf6dc1d727bd44cb92b7a51299ec66e54d3e7b0f844989adde0",
+        "size": 468,
+        "data": "eyJjb25maWciOnsiRW52IjpbIlBBVEg9L3Vzci9sb2NhbC9zYmluOi91c3IvbG9jYWwvYmluOi91c3Ivc2JpbjovdXNyL2Jpbjovc2JpbjovYmluIl0sIkVudHJ5cG9pbnQiOltdLCJDbWQiOlsiYmFzaCJdfSwiY3JlYXRlZCI6IjIwMjYtMTAtMjdUMDA6MDA6MDBaIiwiaGlzdG9yeSI6W3siY3JlYXRlZCI6IjIwMjYtMTAtMjdUMDA6MDA6MDBaIiwiY3JlYXRlZF9ieSI6IiMgZGViaWFuLnNoIC0tYXJjaCAnYXJtNjQnIG91dC8gJ2Jvb2t3b3JtJyAnQDE3OTMwNTkyMDAnIiwiY29tbWVudCI6ImRlYnVlcnJlb3R5cGUgMC4xNyJ9XSwicm9vdGZzIjp7InR5cGUiOiJsYXllcnMiLCJkaWZmX2lkcyI6WyJzaGEyNTY6ODE5N2Q5YzE0YjIyZDRjZDc5MTk4YzA3MjJhMTgwMzU3NjBhODU2MTMyMTFmMjEyN2VlNmY1ODg4NzM1Y2E5OCJdfSwib3MiOiJsaW51eCIsImFyY2hpdGVjdHVyZSI6ImFybTY0IiwidmFyaWFudCI6InY4In0K"
+      },
+      "layers": [
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:f791e47cf52abf7b364878f2141547e3781072e437f599f6632849d88fca8ca4",
+          "size": 28137951
+        }
+      ]
+    }
+  },
+  "snapshot": {
+    "id": "20261029T000000Z",
+    "keyring": {
+      "path": "usr/share/keyrings/debian-archive-keyring.gpg",
+      "bytes": 55918,
+      "sha256": "506b815cbb32d9b6066b4a2aa524071e071761e7e7f68c3ac74f3061ba852017"
+    },
+    "inRelease": [
+      {
+        "suite": "bookworm-security",
+        "bytes": 34770,
+        "sha256": "1a6375632d9d8cbfd9665858174b6abaf50e046eacfd15a160226c4ac2188af7"
+      },
+      {
+        "suite": "bookworm-updates",
+        "bytes": 55403,
+        "sha256": "f805c7af2f793f5647abb73884264b508089ae34310bba99da40b10cff275ede"
+      },
+      {
+        "suite": "bookworm",
+        "bytes": 151075,
+        "sha256": "77737fa4b34f2693e982cc9ee35736816c35a7778fc2d326cc1bbf5b301fe1aa"
+      }
+    ]
+  },
+  "wine": {
+    "repository": "https://github.com/bylaws/wine",
+    "revision": "a6844d10622fc1a973ec1f22fc4f78a0fcd6cb29",
+    "version": "10.13",
+    "sourceArchive": {
+      "file": "wine-arm64ec-source.tar.gz",
+      "bytes": 53416396,
+      "sha256": "93ffcd86d3f518934da5c93c768d43afe7e97d66f04f355d914f5cfb6731ac74",
+      "url": "https://github.com/Russianranger/uo-android-launcher/releases/download/v0.2.0/wine-arm64ec-source.tar.gz"
+    },
+    "configure": [
+      "--enable-archs=arm64ec,aarch64,i386",
+      "--with-mingw=clang",
+      "--disable-tests",
+      "--without-wayland",
+      "--without-gstreamer",
+      "--without-cups",
+      "--without-sane",
+      "--without-gphoto"
+    ],
+    "license": "LGPL-2.1-or-later",
+    "licenseFileSha256": "e237fa56668030e928551ddd60f05df5fe957f75eab874bbd017e085ed722e7c",
+    "androidPrivatePeCopy": {
+      "environment": {
+        "WINE_ANDROID_PRIVATE_PE_COPY": "1"
+      },
+      "patches": [
+        {
+          "file": "android-private-pe-copy.patch",
+          "bytes": 9732,
+          "sha256": "0f4d5b1feb2c14ae98acac215d1cf06732f9a46f325292ebd00a536ade7b5e0e"
+        }
+      ],
+      "testSources": {
+        "private_pe_check.c": {
+          "bytes": 9950,
+          "sha256": "9f5243e12dfb4d6ad1c1ea416530f5c5ce3f924a865944b5fbf9a61f42b05458"
+        },
+        "private_pe_fixture.c": {
+          "bytes": 767,
+          "sha256": "64dd325dd5c2926e9561dd43e47ea979bc14fd26d3dd4b17f120881e4b98de76"
+        },
+        "private_pe_check.py": {
+          "bytes": 10028,
+          "sha256": "493b8dfdc42decfd72b91084be424041b7bdc6d5cf81c5adb623e7b65485b700"
+        },
+        "owned_process_group.py": {
+          "bytes": 2795,
+          "sha256": "c19ed5c05e94d7b537df1055983fca75e20447f594419084f2207d60f99f138e"
+        }
+      }
+    }
+  },
+  "fex": {
+    "repository": "https://github.com/FEX-Emu/FEX",
+    "revision": "320c5f18475b0c8a7e99c51a5fdc5b5e35b147ab",
+    "archive": {
+      "file": "fex-2510-source-with-submodules.tar.gz",
+      "bytes": 222845230,
+      "sha256": "8a10a8e63cdea41a6c70b0f14d487fe4cb3f11c8fb5baba3e42090098e2745be",
+      "url": "https://github.com/Russianranger/uo-android-launcher/releases/download/v0.2.0/fex-2510-source-with-submodules.tar.gz"
+    },
+    "submodules": [
+      {
+        "path": "External/Catch2",
+        "revision": "8ac8190e494a381072c89f5e161b92a08d98b37b",
+        "url": "https://github.com/catchorg/Catch2.git"
+      },
+      {
+        "path": "External/Vulkan-Headers",
+        "revision": "cacef3039d277c448c89336290ec3937270b0996",
+        "url": "https://github.com/KhronosGroup/Vulkan-Headers.git"
+      },
+      {
+        "path": "External/drm-headers",
+        "revision": "0675d2f2910b46ba7e0fb9d6dff86f8d82b05660",
+        "url": "https://github.com/FEX-Emu/drm-headers.git"
+      },
+      {
+        "path": "External/fex-gcc-target-tests-bins",
+        "revision": "442678a134e2d25e759c430cca32e06e9e142f1f",
+        "url": "https://github.com/FEX-Emu/fex-gcc-target-tests-bins.git"
+      },
+      {
+        "path": "External/fex-gvisor-tests-bins",
+        "revision": "71349ae6d14ac2e3e792730e240aecd8076cee6c",
+        "url": "https://github.com/FEX-Emu/fex-gvisor-tests-bins.git"
+      },
+      {
+        "path": "External/fex-posixtest-bins",
+        "revision": "9ae29638f8000c1603f16385ed1cf6c4c23ee414",
+        "url": "https://github.com/FEX-Emu/fex-posixtest-bins.git"
+      },
+      {
+        "path": "External/fmt",
+        "revision": "e424e3f2e607da02742f73db84873b8084fc714c",
+        "url": "https://github.com/fmtlib/fmt.git"
+      },
+      {
+        "path": "External/jemalloc",
+        "revision": "ce24593018ca5d5af7e5661ceda9744e02b59f8f",
+        "url": "https://github.com/FEX-Emu/jemalloc.git"
+      },
+      {
+        "path": "External/jemalloc_glibc",
+        "revision": "8436195ad5e1bc347d9b39743af3d29abee59f06",
+        "url": "https://github.com/FEX-Emu/jemalloc.git"
+      },
+      {
+        "path": "External/range-v3",
+        "revision": "ca1388fb9da8e69314dda222dc7b139ca84e092f",
+        "url": "https://github.com/ericniebler/range-v3.git"
+      },
+      {
+        "path": "External/robin-map",
+        "revision": "d5683d9f1891e5b04e3e3b2192b5349dc8d814ea",
+        "url": "https://github.com/FEX-Emu/robin-map.git"
+      },
+      {
+        "path": "External/tracy",
+        "revision": "650c98ece70da9e155e7ba1c2b3ee16004aae118",
+        "url": "https://github.com/wolfpld/tracy"
+      },
+      {
+        "path": "External/vixl",
+        "revision": "ed690c9eca756be9acbdf1759035624ea3ce0eaa",
+        "url": "https://github.com/FEX-Emu/vixl.git"
+      },
+      {
+        "path": "External/xxhash",
+        "revision": "bbb27a5efb85b92a0486cf361a8635715a53f6ba",
+        "url": "https://github.com/Cyan4973/xxHash.git"
+      },
+      {
+        "path": "Source/Common/cpp-optparse",
+        "revision": "9f94388a339fcbb0bc95c17768eb786c85988f6e",
+        "url": "https://github.com/Sonicadvance1/cpp-optparse"
+      }
+    ],
+    "versionArgument": "2510; CMake prepends FEX-. Original recipe's FEX-2510 argument doubles it",
+    "surface": {
+      "wineArchitectures": [
+        "arm64ec",
+        "aarch64",
+        "i386"
+      ],
+      "fexArchitectures": [
+        "arm64ec",
+        "aarch64"
+      ]
+    },
+    "retention": "retain complete original archive and all bundled COPYING/LICENSE/NOTICE files; static CRT/libc++ dependencies also need toolchain notices"
+  },
+  "toolchain": {
+    "archive": {
+      "file": "llvm-mingw-20250920-ucrt-ubuntu-22.04-aarch64.tar.xz",
+      "bytes": 75125388,
+      "sha256": "bce5cc755c613515fd44e1ee9523123d854103abae147571adb645450036274d",
+      "url": "https://github.com/bylaws/llvm-mingw/releases/download/20250920/llvm-mingw-20250920-ucrt-ubuntu-22.04-aarch64.tar.xz",
+      "releaseAssetId": 296883239
+    },
+    "recipe": {
+      "repository": "https://github.com/bylaws/llvm-mingw",
+      "revision": "b21616256053c65c95e44c9a4477727e32351460",
+      "tag": "20250920"
+    },
+    "sourceRefs": [
+      {
+        "repository": "https://github.com/bylaws/llvm-project",
+        "revision": "c5668510b7c8a1881d5764d6a67ff253523d21e9",
+        "selection": "build-llvm.sh:19"
+      },
+      {
+        "repository": "https://github.com/mingw-w64/mingw-w64",
+        "revision": "311590a177efe7e5ec61bc3f265e4c810328f25e",
+        "selection": "build-mingw-w64.sh:21"
+      },
+      {
+        "repository": "https://github.com/lldb-tools/lldb-mi",
+        "revision": "f1fea743bf06a99b6e7f74085bd8c8db47999df5",
+        "selection": "build-lldb-mi.sh:19"
+      }
+    ],
+    "buildMode": "non-scheduled build.yml uses script defaults; scheduled builds override refs",
+    "binarySourcePairing": "LLVM commit is corroborated in the exact binary; MinGW and LLDB-MI refs are selected by the exact retained recipe, without claiming independently proven binary-source pairing.",
+    "nativeCompiler": {
+      "bytes": 110776,
+      "sha256": "335f44c36afa6e6d6842ef4583f3bec348a81cafc2fa10c8d95b894dbc0189d0",
+      "elfMachine": 183
+    },
+    "bundledNotices": {
+      "LICENSE.TXT": {
+        "bytes": 15141,
+        "sha256": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee"
+      },
+      "aarch64-w64-mingw32/share/mingw32/COPYING": {
+        "bytes": 2326,
+        "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+      },
+      "aarch64-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt": {
+        "bytes": 10936,
+        "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd"
+      },
+      "aarch64-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt": {
+        "bytes": 5905,
+        "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+      },
+      "aarch64-w64-mingw32/share/mingw32/COPYING.winpthreads.txt": {
+        "bytes": 2883,
+        "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177"
+      },
+      "aarch64-w64-mingw32/share/mingw32/COPYING.winstorecompat.txt": {
+        "bytes": 1099,
+        "sha256": "fa7368d1f93d890c173177475d8ec7aff265a7d08f1f364d66f74d138978ce36"
+      },
+      "arm64ec-w64-mingw32/share/mingw32/COPYING": {
+        "bytes": 2326,
+        "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+      },
+      "arm64ec-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt": {
+        "bytes": 10936,
+        "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd"
+      },
+      "arm64ec-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt": {
+        "bytes": 5905,
+        "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+      },
+      "arm64ec-w64-mingw32/share/mingw32/COPYING.winpthreads.txt": {
+        "bytes": 2883,
+        "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177"
+      },
+      "arm64ec-w64-mingw32/share/mingw32/COPYING.winstorecompat.txt": {
+        "bytes": 1099,
+        "sha256": "fa7368d1f93d890c173177475d8ec7aff265a7d08f1f364d66f74d138978ce36"
+      },
+      "armv7-w64-mingw32/share/mingw32/COPYING": {
+        "bytes": 2326,
+        "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+      },
+      "armv7-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt": {
+        "bytes": 10936,
+        "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd"
+      },
+      "armv7-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt": {
+        "bytes": 5905,
+        "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+      },
+      "armv7-w64-mingw32/share/mingw32/COPYING.winpthreads.txt": {
+        "bytes": 2883,
+        "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177"
+      },
+      "armv7-w64-mingw32/share/mingw32/COPYING.winstorecompat.txt": {
+        "bytes": 1099,
+        "sha256": "fa7368d1f93d890c173177475d8ec7aff265a7d08f1f364d66f74d138978ce36"
+      },
+      "i686-w64-mingw32/share/mingw32/COPYING": {
+        "bytes": 2326,
+        "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+      },
+      "i686-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt": {
+        "bytes": 10936,
+        "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd"
+      },
+      "i686-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt": {
+        "bytes": 5905,
+        "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+      },
+      "i686-w64-mingw32/share/mingw32/COPYING.winpthreads.txt": {
+        "bytes": 2883,
+        "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177"
+      },
+      "i686-w64-mingw32/share/mingw32/COPYING.winstorecompat.txt": {
+        "bytes": 1099,
+        "sha256": "fa7368d1f93d890c173177475d8ec7aff265a7d08f1f364d66f74d138978ce36"
+      },
+      "share/gendef/COPYING": {
+        "bytes": 35147,
+        "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+      },
+      "share/widl/COPYING": {
+        "bytes": 2326,
+        "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+      },
+      "x86_64-w64-mingw32/share/mingw32/COPYING": {
+        "bytes": 2326,
+        "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+      },
+      "x86_64-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt": {
+        "bytes": 10936,
+        "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd"
+      },
+      "x86_64-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt": {
+        "bytes": 5905,
+        "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+      },
+      "x86_64-w64-mingw32/share/mingw32/COPYING.winpthreads.txt": {
+        "bytes": 2883,
+        "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177"
+      },
+      "x86_64-w64-mingw32/share/mingw32/COPYING.winstorecompat.txt": {
+        "bytes": 1099,
+        "sha256": "fa7368d1f93d890c173177475d8ec7aff265a7d08f1f364d66f74d138978ce36"
+      }
+    }
+  },
+  "licenses": {
+    "llvm-license": {
+      "url": "https://raw.githubusercontent.com/bylaws/llvm-project/c5668510b7c8a1881d5764d6a67ff253523d21e9/llvm/LICENSE.TXT",
+      "bytes": 15141,
+      "sha256": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee"
+    },
+    "mingw-copying": {
+      "url": "https://raw.githubusercontent.com/mingw-w64/mingw-w64/311590a177efe7e5ec61bc3f265e4c810328f25e/COPYING",
+      "bytes": 2326,
+      "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+    },
+    "mingw-runtime-copying": {
+      "url": "https://raw.githubusercontent.com/mingw-w64/mingw-w64/311590a177efe7e5ec61bc3f265e4c810328f25e/COPYING.MinGW-w64-runtime/COPYING.MinGW-w64-runtime.txt",
+      "bytes": 10936,
+      "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd"
+    },
+    "mingw-winpthreads-copying": {
+      "url": "https://raw.githubusercontent.com/mingw-w64/mingw-w64/311590a177efe7e5ec61bc3f265e4c810328f25e/mingw-w64-libraries/winpthreads/COPYING",
+      "bytes": 2883,
+      "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177"
+    },
+    "mingw-winstorecompat-copying": {
+      "url": "https://raw.githubusercontent.com/mingw-w64/mingw-w64/311590a177efe7e5ec61bc3f265e4c810328f25e/mingw-w64-libraries/winstorecompat/COPYING",
+      "bytes": 1099,
+      "sha256": "fa7368d1f93d890c173177475d8ec7aff265a7d08f1f364d66f74d138978ce36"
+    },
+    "lldbmi-license": {
+      "url": "https://raw.githubusercontent.com/lldb-tools/lldb-mi/f1fea743bf06a99b6e7f74085bd8c8db47999df5/LICENSE.TXT",
+      "bytes": 15032,
+      "sha256": "76be4deddeef87f6fa9940f4992a9506c7bb222af60eb3b2a47cf65719528bbe"
+    },
+    "llvm-mingw-license": {
+      "url": "https://raw.githubusercontent.com/bylaws/llvm-mingw/b21616256053c65c95e44c9a4477727e32351460/LICENSE.txt",
+      "bytes": 1092,
+      "sha256": "8e5db0129069005be2a07be3297e198888fd72fad62a13a611504660c6b7e3c7"
+    },
+    "fex-license": {
+      "url": "https://raw.githubusercontent.com/FEX-Emu/FEX/320c5f18475b0c8a7e99c51a5fdc5b5e35b147ab/LICENSE",
+      "bytes": 1094,
+      "sha256": "f34a779f56b36d22b20e1b990d23e583a6a7ca071331925fa46156441c77a1ee"
+    }
+  },
+  "clientQualification": {
+    "formatVersion": 1,
+    "scope": "measured-reconstructed-client-provider-inputs",
+    "sourceRevision": "0f931bbade36a4b197725d691b8eff7caea7b3be",
+    "workflowRun": 41012726334,
+    "buildId": "41012726334.1",
+    "artifactId": 12958691770,
+    "artifact": {
+      "bytes": 45848368,
+      "sha256": "1fd6176727065f50a926b45a3d81df1bfd0ea33c330e9fb9131ff30ad170b94e"
+    },
+    "buildManifestSha256": "bccde6ee90f688b27ac9790e2aa29d70d270dad2b324a54e92a1bdf72bd58b40",
+    "androidRuntimeQualified": false
+  },
+  "note": "Separate measured candidate and native ARM64 gates only. Existing production runtime and all archive-bound providers remain unchanged. No Android, hardware graphics, authentication server or gameplay qualification.",
+  "qualificationReference": {
+    "productionRuntimeLock": {
+      "file": "runtime/runtime-sources.lock.json",
+      "bytes": 14211,
+      "sha256": "cd2f3d2d47e2ac0de845acc914e94013906836de9710dc290a6fa51c89bbf07d"
+    },
+    "bridgeInputLock": {
+      "file": "runtime/bridges/sources.lock.json",
+      "bytes": 23129,
+      "sha256": "be07f59cff79a6c0e746d4d9c2adbd816568903e312317ff58091f9747779af0"
+    },
+    "clientInputLock": {
+      "file": "runtime/client/android-provider.lock.json",
+      "bytes": 492,
+      "sha256": "ab3d912ad54fa2bc7ed8be05deaa58874b2f9f747caae954f7181daeafe665b6"
+    }
+  }
+}

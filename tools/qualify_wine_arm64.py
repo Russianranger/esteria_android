@@ -5,6 +5,7 @@ Requires a native ARM64 Linux host, unshare/mount/ip/chroot, and root.
 No Android, graphics, audio or gameplay qualification is implied.
 """
 import argparse
+from functools import partial
 import hashlib
 import json
 import os
@@ -39,6 +40,8 @@ OFFLINE_CHECKS = {'actualCommandParser', 'osUrlRejected', 'blizzardUrlRejected',
                   'connectFailureCallbacks', 'connectionRefsReleased'}
 ENGINE_FRAME_SUCCESS = 'PASS: Engine Vulkan frame BGRA readback, partial clears and embedded-shader presentation'
 LOG_LIMIT = 16 * 1024 * 1024
+PRIVATE_PE_ENVIRONMENT = {'WINE_ANDROID_PRIVATE_PE_COPY': '1'}
+PRIVATE_PE_MARKER = b'ESTERIA_PRIVATE_PE_COPY mapped'
 VULKAN_FIXTURES = {
     'presentation': ('presentation_device.exe',
                      'PASS: Vulkan Win32 clear/submit/present completed 16 frames across swapchain resize'),
@@ -171,7 +174,23 @@ def namespace_command(script, runtime, output, privileged):
         '--namespace-worker', '--runtime', str(runtime), '--output', str(output)]
 
 
-def guest_command(root, *command, graphics=None, audio=False):
+def runtime_selection(path=None, private_pe_copy=False):
+    """Select a separate measured candidate without changing production pins."""
+    packages.require(type(private_pe_copy) is bool, 'private-pe-copy-selection-must-be-boolean')
+    lock, digest = read_json(path if path is not None else packages.DEFAULT_LOCK)
+    packages.require(type(lock) is dict and type(lock.get('formatVersion')) is int and
+                     lock['formatVersion'] == 1, 'unsupported-runtime-lock-version')
+    package = lock['packages']['wine-arm64']
+    declared = package.get('wineEnvironment', {})
+    packages.require(type(declared) is dict and declared in ({}, PRIVATE_PE_ENVIRONMENT),
+                     'unsupported-wine-runtime-environment')
+    packages.require(not private_pe_copy or declared == PRIVATE_PE_ENVIRONMENT,
+                     'private-pe-copy-not-declared-by-selected-runtime')
+    return lock, digest, package, dict(PRIVATE_PE_ENVIRONMENT) if private_pe_copy else {}
+
+
+def guest_command(root, *command, graphics=None, audio=False, private_pe_copy=False):
+    packages.require(type(private_pe_copy) is bool, 'private-pe-copy-selection-must-be-boolean')
     environment = []
     if graphics:
         environment = ['VK_ICD_FILENAMES=/' + graphics['icdPath'], 'LIBGL_ALWAYS_SOFTWARE=1']
@@ -179,6 +198,8 @@ def guest_command(root, *command, graphics=None, audio=False):
     if audio:
         environment += [f'ALSA_CONFIG_PATH={GUEST}/alsa-qualification.conf', f'ESTERIA_AUDIO_SOCKET={GUEST}/audio.sock']
         overrides += ';winepulse.drv='
+    if private_pe_copy:
+        environment.append('WINE_ANDROID_PRIVATE_PE_COPY=1')
     return ['chroot', str(root), '/usr/bin/env', '-i',
             'PATH=/opt/wine/bin:/usr/bin:/bin', 'LANG=C.UTF-8', f'HOME={GUEST}/home',
             f'WINEPREFIX={GUEST}/prefix', 'WINEARCH=win64', 'DISPLAY=:8',
@@ -284,9 +305,14 @@ def worker(runtime, output):
     root = runtime / 'rootfs'
     fixture = root / GUEST.lstrip('/')
     plan, _ = read_json(fixture / 'qualification-plan.json')
+    private_pe_copy = plan.get('privatePeCopyRequested', False)
+    packages.require(type(private_pe_copy) is bool and plan.get('wineEnvironment', {}) ==
+                     (PRIVATE_PE_ENVIRONMENT if private_pe_copy else {}), 'worker-wine-environment-mismatch')
+    command_for_guest = partial(guest_command, private_pe_copy=private_pe_copy)
     result = {'displayReady': False, 'prefixExit': None, 'fixtureExit': None,
               'codecMessageMatched': False, 'networkIsolated': False,
-              'expectedExit': None, 'workerCompleted': False}
+              'expectedExit': None, 'workerCompleted': False,
+              'privatePeCopyRequested': private_pe_copy, 'privatePeCopyMarkerObserved': False}
     display = None
     captures = []
     try:
@@ -303,7 +329,7 @@ def worker(runtime, output):
         result['networkIsolated'] = True
         for name in ('home', 'prefix'):
             (fixture / name).mkdir(mode=0o700)
-        display_capture = Capture(guest_command(root, '/usr/bin/Xtigervnc', ':8', '-geometry', '640x480',
+        display_capture = Capture(command_for_guest(root, '/usr/bin/Xtigervnc', ':8', '-geometry', '640x480',
                                   '-depth', '24', '-rfbport', '-1', '-SecurityTypes', 'None',
                                   '-nolisten', 'tcp', '-ac'), output / 'display.log')
         captures.append(display_capture)
@@ -316,10 +342,10 @@ def worker(runtime, output):
                 break
             time.sleep(0.1)
         packages.require(result['displayReady'], 'headless-display-not-ready')
-        result['prefixExit'] = run_logged(guest_command(root, '/opt/wine/bin/wine', 'wineboot.exe', '-u'),
+        result['prefixExit'] = run_logged(command_for_guest(root, '/opt/wine/bin/wine', 'wineboot.exe', '-u'),
                                          output / 'wineboot.log', 180, captures).exit_code
         packages.require(result['prefixExit'] == 0, 'wine-prefix-failed')
-        codec = run_logged(guest_command(root, '/opt/wine/bin/wine',
+        codec = run_logged(command_for_guest(root, '/opt/wine/bin/wine',
             GUEST + '/test_xvid_adapter.exe', r'Z:\esteria-qualification\XvidDecoder.dll'),
             output / 'codec.log', 120, captures, needle=SUCCESS.encode())
         result['fixtureExit'] = codec.exit_code
@@ -330,7 +356,7 @@ def worker(runtime, output):
             packages.require(not os.path.lexists(receipt_path), 'client-entry-receipt-already-exists')
             entry = dict(launchAttempted=True, exitCode=None, messageObserved=False, receiptValidated=False)
             result['clientEntry'] = entry
-            capture = run_logged(guest_command(root, '/opt/wine/bin/wine', GUEST + '/WowClient64.exe',
+            capture = run_logged(command_for_guest(root, '/opt/wine/bin/wine', GUEST + '/WowClient64.exe',
                                                '--esteria-entry-check'),
                                  output / 'client-entry.log', 120, captures, needle=ENTRY_SUCCESS.encode())
             entry['exitCode'] = capture.exit_code
@@ -349,7 +375,7 @@ def worker(runtime, output):
                 label = 'short' if spelling == '-local-offline' else 'long'
                 observed = dict(exitCode=None, receiptValidated=False)
                 result['clientOffline'][spelling] = observed
-                capture = run_logged(guest_command(root, '/opt/wine/bin/wine', GUEST + '/WowClient64.exe',
+                capture = run_logged(command_for_guest(root, '/opt/wine/bin/wine', GUEST + '/WowClient64.exe',
                                      '--offline-check', spelling), output / ('client-offline-' + label + '.log'), 120, captures)
                 observed['exitCode'] = capture.exit_code
                 packages.require(capture.exit_code == 0, 'client-offline-process-failed')
@@ -362,7 +388,7 @@ def worker(runtime, output):
             packages.require(not os.path.lexists(receipt_path), 'client-loopback-receipt-already-exists')
             observed = dict(exitCode=None, receiptValidated=False)
             result['clientLoopback'] = observed
-            capture = run_logged(guest_command(root, '/opt/wine/bin/wine', GUEST + '/WowClient64.exe',
+            capture = run_logged(command_for_guest(root, '/opt/wine/bin/wine', GUEST + '/WowClient64.exe',
                                  '--loopback-check', '--local-offline'), output / 'client-loopback.log', 120, captures)
             observed['exitCode'] = capture.exit_code
             packages.require(capture.exit_code == 0, 'client-loopback-process-failed')
@@ -372,11 +398,11 @@ def worker(runtime, output):
         if plan.get('clientAuthPeer'):
             result['clientAuth'] = {}
             wine_auth.execute(root, fixture, GUEST, plan['clientAuthPeer'], result['clientAuth'],
-                              run_logged, guest_command, captures)
+                              run_logged, command_for_guest, captures)
         result['graphics'] = {}
         for name in plan['graphicsRequested']:
             filename, message = VULKAN_FIXTURES[name]
-            capture = run_logged(guest_command(root, '/opt/wine/bin/wine', GUEST + '/' + filename,
+            capture = run_logged(command_for_guest(root, '/opt/wine/bin/wine', GUEST + '/' + filename,
                                                graphics=plan['softwareGraphics']),
                 output / (name + '.log'), 180, captures, needle=message.encode(),
                 line_prefixes=(b'Vulkan adapter:', b'Vulkan validation callback:', ENGINE_FRAME_SUCCESS.encode()))
@@ -399,7 +425,7 @@ def worker(runtime, output):
             for backend in wine_audio.BACKENDS:
                 observed = {}
                 result['audio'][backend] = observed
-                wine_audio.execute(root, fixture, output, GUEST, backend, observed, run_logged, guest_command, captures)
+                wine_audio.execute(root, fixture, output, GUEST, backend, observed, run_logged, command_for_guest, captures)
         result['expectedExit'] = 0
         return 0
     except Exception as error:
@@ -407,7 +433,7 @@ def worker(runtime, output):
         result['expectedExit'] = 1
         return 1
     finally:
-        finish_wine(root, output, result, captures)
+        finish_wine(root, output, result, captures, command_for_guest)
         if display is not None:
             display.terminate()
             try:
@@ -419,6 +445,11 @@ def worker(runtime, output):
         result['logStreamsDrained'] = all([capture.finish(drain_deadline - time.monotonic()) for capture in captures])
         result['logsWithinLimit'] = all(not capture.truncated for capture in captures)
         result['logWritesSucceeded'] = all(capture.error is None for capture in captures)
+        try:
+            result['privatePeCopyMarkerObserved'] = private_pe_marker_observed(output, captures)
+        except (OSError, ValueError) as error:
+            result['privatePeCopyMarkerFailure'] = type(error).__name__
+            result['logWritesSucceeded'] = False
         if plan.get('clientAuthPeer'):
             try:
                 wine_auth.export_logs(fixture, output)
@@ -430,7 +461,21 @@ def worker(runtime, output):
         # services. The outer owner observes namespace process exit before pass.
 
 
-def finish_wine(root, output, result, captures):
+def private_pe_marker_observed(output, captures):
+    """Read only the drained, bounded logs owned by this qualification."""
+    for capture in captures:
+        path = Path(capture.log.name)
+        packages.require(path.parent == output and path.suffix == '.log', 'unexpected-owned-capture-path')
+        with packages.plain_file(path) as stream:
+            packages.require(path.stat().st_size <= LOG_LIMIT, 'qualification-capture-size-limit')
+            for line in stream:
+                if line.rstrip(b'\r\n') == PRIVATE_PE_MARKER:
+                    return True
+    return False
+
+
+def finish_wine(root, output, result, captures, command_for_guest=None):
+    command_for_guest = command_for_guest or guest_command
     # Each audio case stops and waits for this same private prefix before PCM
     # EOF is inspected. A second -k returns 1 when that server is already gone.
     # Reuse only the latest case's observed successful stop+wait, then require a
@@ -443,13 +488,13 @@ def finish_wine(root, output, result, captures):
         result['wineStopSource'] = 'audio-' + latest
     else:
         try:
-            result['wineStopExit'] = run_logged(guest_command(root, '/opt/wine/bin/wineserver', '-k'),
+            result['wineStopExit'] = run_logged(command_for_guest(root, '/opt/wine/bin/wineserver', '-k'),
                                                output / 'wine-stop.log', 15, captures).exit_code
             result['wineStopSource'] = 'final-cleanup'
         except Exception as error:
             result['wineStopFailure'] = str(error)
     try:
-        result['wineWaitExit'] = run_logged(guest_command(root, '/opt/wine/bin/wineserver', '-w'),
+        result['wineWaitExit'] = run_logged(command_for_guest(root, '/opt/wine/bin/wineserver', '-w'),
                                            output / 'wine-wait.log', 15, captures).exit_code
     except Exception as error:
         result['wineWaitFailure'] = str(error)
@@ -520,7 +565,8 @@ def qualification_flags(result, requested, namespace_exit=0, client_entry=False,
 
 
 def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=False, require_engine_frame=False,
-            audio_driver=None, bridge_dir=None, bridge_revision=None, client_offline=False, client_loopback=False, client_auth_source=None):
+            audio_driver=None, bridge_dir=None, bridge_revision=None, client_offline=False, client_loopback=False,
+            client_auth_source=None, runtime_lock=None, bridge_input_lock=None, private_pe_copy=False):
     packages.require(not client_auth_source or (client_entry and client_offline and client_loopback),
                      'auth-check-requires-entry-offline-and-loopback-checks')
     packages.require(not client_loopback or (client_entry and client_offline), 'loopback-check-requires-entry-and-offline-checks')
@@ -528,12 +574,12 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
     packages.require(not require_engine_frame or 'presentation' in (graphics or {}),
                      'engine-frame-readback-requires-presentation-driver')
     packages.require(bool(audio_driver) == bool(bridge_dir) == bool(bridge_revision), 'audio-driver-and-pinned-bridge-required-together')
+    packages.require(bridge_input_lock is None or audio_driver is not None, 'bridge-input-lock-requires-audio')
     packages.require(platform.machine().lower() in ('aarch64', 'arm64'), 'native-arm64-host-required')
     packages.require(os.geteuid() == 0, 'invoke-qualification-with-sudo')
     runtime = packages.directory(runtime)
     manifest, client = client_inputs(client_dir, driver)
-    lock, _ = read_json(packages.DEFAULT_LOCK)
-    package = lock['packages']['wine-arm64']
+    lock, runtime_lock_sha, package, wine_environment = runtime_selection(runtime_lock, private_pe_copy)
     prepared, prepared_sha = read_json(runtime / 'package-receipt.json')
     pin_sha = hashlib.sha256(json.dumps(package, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
     packages.require(prepared.get('archiveSha256') == package['archive']['sha256'] and
@@ -548,7 +594,8 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
     packages.directory(output.parent, create=True)
     output.mkdir(mode=0o700)
     root = runtime / 'rootfs'
-    audio_identity = wine_audio.bridge_identity(root, bridge_dir, bridge_revision, lock) if audio_driver else None
+    audio_identity = wine_audio.bridge_identity(root, bridge_dir, bridge_revision, lock,
+                                                bridge_input_lock) if audio_driver else None
     if audio_driver:
         client['files']['fmod_output_device.exe'] = pe_identity(audio_driver, False)
     graphics = graphics or {}
@@ -583,9 +630,14 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
                              clientEntryRequested=client_entry, engineFrameReadbackRequired=require_engine_frame,
                              clientOfflineRequested=client_offline, clientLoopbackRequested=client_loopback,
                              clientAuthPeer=auth_peer,
-                             audioRequested=bool(audio_driver)))
+                             audioRequested=bool(audio_driver), privatePeCopyRequested=private_pe_copy,
+                             wineEnvironment=wine_environment))
     report = dict(formatVersion=1, scope='native-linux-arm64-wine-component-fixtures',
                   runtimeArchiveSha256=package['archive']['sha256'], runtimeReceiptSha256=prepared_sha,
+                  runtimeLockSha256=runtime_lock_sha, privatePeCopyRequested=private_pe_copy,
+                  privatePeCopyMarkerObserved=False,
+                  wineEnvironment=wine_environment,
+                  bridgeInputLockSha256=audio_identity['inputLockSha256'] if audio_identity else None,
                   client=client, directImports=imports_report(manifest, prepared),
                   androidRuntimeQualified=False, clientExecutableLaunchAttempted=False,
                   clientExecutableEntryReached=False, gameInitializationStarted=False, renderingQualified=False,
@@ -617,6 +669,10 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
         report['processNamespaceExited'] = True
         result, _ = read_json(output / 'worker-result.json')
         report['worker'] = result
+        report['privatePeCopyMarkerObserved'] = result.get('privatePeCopyMarkerObserved')
+        packages.require(result.get('privatePeCopyRequested') is private_pe_copy and
+                         result.get('privatePeCopyMarkerObserved') is private_pe_copy,
+                         'wine-private-pe-copy-profile-not-observed')
         report.update(qualification_flags(result, graphics, report['namespaceExit'], client_entry, bool(audio_driver), client_offline,
                                           client_loopback, bool(auth_peer)))
         report['clientExecutableLaunchAttempted'] = result.get('clientEntry', {}).get('launchAttempted') is True
@@ -663,6 +719,12 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runtime', type=Path, required=True, help='New prepared bundle containing rootfs/ and receipt')
+    parser.add_argument('--runtime-lock', type=Path, default=packages.DEFAULT_LOCK,
+                        help='Exact runtime lock; defaults to the unchanged production candidate')
+    parser.add_argument('--bridge-input-lock', type=Path,
+                        help='Exact audio bridge source lock; defaults to runtime/bridges/sources.lock.json')
+    parser.add_argument('--private-pe-copy', action='store_true',
+                        help='Explicitly select anonymous private PE copies, only when the runtime lock declares them')
     parser.add_argument('--client-dir', type=Path)
     parser.add_argument('--driver', type=Path)
     parser.add_argument('--presentation-driver', type=Path)
@@ -690,7 +752,10 @@ def main():
                      args.client_entry_check, args.require_engine_frame_readback,
                      args.audio_driver.absolute() if args.audio_driver else None,
                      args.bridge_dir.absolute() if args.bridge_dir else None, args.bridge_revision, args.client_offline_check, args.client_loopback_check,
-                     args.client_auth_source.absolute() if args.client_auth_source else None)
+                     args.client_auth_source.absolute() if args.client_auth_source else None,
+                     args.runtime_lock.absolute(),
+                     args.bridge_input_lock.absolute() if args.bridge_input_lock else None,
+                     args.private_pe_copy)
     print(json.dumps({key: result[key] for key in ('linuxArm64CodecQualified', 'linuxArm64VulkanPresentationQualified',
                                                  'linuxArm64VulkanTextureLifecycleQualified', 'linuxArm64ClientEntryQualified',
                                                  'linuxArm64VulkanEngineFrameReadbackQualified',

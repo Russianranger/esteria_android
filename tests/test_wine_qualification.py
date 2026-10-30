@@ -131,6 +131,60 @@ class WineQualification(unittest.TestCase):
         self.assertIn('WINEPREFIX=/esteria-qualification/prefix', command)
         self.assertNotIn('HOME=/root', command)
         self.assertTrue(all('TOKEN' not in part for part in command))
+        self.assertNotIn('WINE_ANDROID_PRIVATE_PE_COPY=1', command)
+
+    def test_candidate_lock_requires_explicit_exact_private_image_profile(self):
+        lock = json.loads(qualification.packages.DEFAULT_LOCK.read_text())
+        original = qualification.runtime_selection()
+        self.assertEqual(original[0], lock)
+        self.assertEqual(original[3], {})
+        with self.assertRaisesRegex(ValueError, 'not-declared'):
+            qualification.runtime_selection(private_pe_copy=True)
+        candidate = self.root / 'candidate.json'
+        lock['packages']['wine-arm64']['wineEnvironment'] = {'WINE_ANDROID_PRIVATE_PE_COPY': '1'}
+        candidate.write_text(json.dumps(lock))
+        self.assertEqual(qualification.runtime_selection(candidate)[3], {})
+        selected = qualification.runtime_selection(candidate, True)
+        self.assertEqual(selected[1], hashlib.sha256(candidate.read_bytes()).hexdigest())
+        self.assertEqual(selected[3], {'WINE_ANDROID_PRIVATE_PE_COPY': '1'})
+        for wrong in ({'WINE_ANDROID_PRIVATE_PE_COPY': '0'}, {'LD_PRELOAD': '/tmp/extra.so'},
+                      {'WINE_ANDROID_PRIVATE_PE_COPY': '1', 'OTHER': '1'}, []):
+            lock['packages']['wine-arm64']['wineEnvironment'] = wrong
+            candidate.write_text(json.dumps(lock))
+            with self.subTest(wrong=wrong), self.assertRaisesRegex(ValueError, 'unsupported-wine'):
+                qualification.runtime_selection(candidate, True)
+
+    def test_private_image_profile_combines_with_audio_graphics_without_host_inheritance(self):
+        command = qualification.guest_command(self.root, '/opt/wine/bin/wine', 'fixture.exe', audio=True,
+                    graphics={'icdPath': 'usr/share/vulkan/icd.d/lvp.json'}, private_pe_copy=True)
+        self.assertEqual(command.count('WINE_ANDROID_PRIVATE_PE_COPY=1'), 1)
+        self.assertIn('ALSA_CONFIG_PATH=/esteria-qualification/alsa-qualification.conf', command)
+        self.assertIn('VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/lvp.json', command)
+        self.assertIn('-i', command)
+        with self.assertRaisesRegex(ValueError, 'must-be-boolean'):
+            qualification.guest_command(self.root, 'fixture', private_pe_copy=1)
+
+    def test_worker_rejects_undeclared_or_nonboolean_profile_before_mounting(self):
+        with patch.object(qualification.os, 'getpid', return_value=1), \
+             patch.object(qualification.os, 'geteuid', return_value=0), \
+             patch.dict(qualification.os.environ, {'ESTERIA_NAMESPACE_CHILD': '1'}), \
+             patch.object(qualification.subprocess, 'run', side_effect=AssertionError('must not mount')):
+            for plan in ({'privatePeCopyRequested': 1},
+                         {'privatePeCopyRequested': True, 'wineEnvironment': {}},
+                         {'privatePeCopyRequested': False, 'wineEnvironment': qualification.PRIVATE_PE_ENVIRONMENT}):
+                with self.subTest(plan=plan), patch.object(qualification, 'read_json', return_value=(plan, 'a' * 64)), \
+                     self.assertRaisesRegex(ValueError, 'worker-wine-environment-mismatch'):
+                    qualification.worker(self.root, self.root)
+
+    def test_selected_mode_requires_exact_marker_in_owned_bounded_logs(self):
+        path = self.root / 'wine.log'
+        capture = SimpleNamespace(log=SimpleNamespace(name=str(path)))
+        path.write_bytes(b'ESTERIA_PRIVATE_PE_COPY mapped incomplete\n')
+        self.assertFalse(qualification.private_pe_marker_observed(self.root, [capture]))
+        path.write_bytes(b'ESTERIA_PRIVATE_PE_COPY mapped\r\n')
+        self.assertTrue(qualification.private_pe_marker_observed(self.root, [capture]))
+        with self.assertRaisesRegex(ValueError, 'capture-path'):
+            qualification.private_pe_marker_observed(self.root / 'different', [capture])
 
     def test_audio_environment_explicitly_selects_private_source_plugin_and_disables_pulse(self):
         command = qualification.guest_command(Path('/rootfs'), 'fixture.exe', audio=True)

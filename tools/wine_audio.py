@@ -16,7 +16,7 @@ PLUGIN = 'libasound_module_pcm_esteria.so'
 BACKENDS = {'winmm': 'WinMM', 'dsound': 'DirectSound'}
 
 
-def bridge_identity(root, payload, revision, lock):
+def bridge_identity(root, payload, revision, lock, bridge_input_lock=None):
     packages.require(re.fullmatch('[0-9a-f]{40}', revision or '') is not None, 'exact-audio-bridge-revision-required')
     payload = packages.directory(payload)
     with packages.plain_file(payload / 'bridge-build.json') as stream:
@@ -36,10 +36,16 @@ def bridge_identity(root, payload, revision, lock):
             size = path.stat().st_size
             expected[str(path.relative_to(ROOT / 'native'))] = dict(bytes=size, sha256=packages.hash_stream(stream, size))
     packages.require(receipt.get('sources') == expected, 'audio-bridge-source-mismatch')
-    packages.require(receipt.get('inputLockSha256') == hashlib.sha256((ROOT / 'runtime/bridges/sources.lock.json').read_bytes()).hexdigest(),
+    selected_lock = bridge_input_lock if bridge_input_lock is not None else ROOT / 'runtime/bridges/sources.lock.json'
+    with packages.plain_file(selected_lock) as stream:
+        lock_raw = stream.read(packages.MAX_METADATA + 1)
+    packages.require(len(lock_raw) <= packages.MAX_METADATA, 'audio-bridge-input-lock-size-limit')
+    bridge_lock = json.loads(lock_raw)
+    packages.require(receipt.get('inputLockSha256') == hashlib.sha256(lock_raw).hexdigest(),
                      'audio-bridge-input-lock-mismatch')
     archive = lock['packages']['wine-arm64']['archive']['sha256']
-    packages.require(receipt.get('runtimeArchiveSha256') == archive and
+    packages.require(type(bridge_lock) is dict and bridge_lock.get('runtimeArchiveSha256') == archive and
+                     receipt.get('runtimeArchiveSha256') == archive and
                      lock['softwareAudio']['runtimeArchiveSha256'] == archive, 'audio-runtime-identity-mismatch')
     for name, expected in lock['softwareAudio']['components'].items():
         with packages.plain_file(root / name) as stream:

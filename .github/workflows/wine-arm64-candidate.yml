@@ -1,0 +1,146 @@
+name: Source-owned native ARM64 Wine candidate and client gates
+on:
+  push:
+    branches: [android/client-server]
+    paths:
+      - runtime/wine-arm64/**
+      - tools/package_wine_arm64_candidate.py
+      - tools/prepare_wine_arm64_candidate.py
+      - tools/verify_wine_arm64_sources.py
+      - tools/qualify_wine_arm64.py
+      - tools/wine_audio.py
+      - tests/test_wine_arm64_*.py
+      - .github/workflows/wine-arm64-candidate.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: wine-arm64-candidate-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  candidate:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Validate candidate guards and record exact client source
+        id: inputs
+        run: |
+          test "$(uname -m)" = aarch64
+          python3 -m unittest tests.test_wine_arm64_candidate tests.test_wine_arm64_sources tests.test_wine_arm64_preparation tests.test_wine_qualification tests.test_wine_audio -v
+          python3 -c 'import json;print("client_revision="+json.load(open("runtime/wine-arm64/sources.lock.json"))["clientQualification"]["sourceRevision"])' >> "$GITHUB_OUTPUT"
+          mkdir -p out/wine-arm64-build
+      - name: Build exact Wine and FEX against frozen Debian12 on native ARM64
+        id: runtime
+        run: |
+          docker build --platform linux/arm64 --target runtime -f runtime/wine-arm64/Dockerfile \
+            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
+            -t esteria-wine-arm64:candidate . > out/wine-arm64-build/build.log 2>&1
+      - name: Execute actual default and anonymous-copy ARM64 PE fixtures offline
+        run: |
+          docker build --platform linux/arm64 --target private-image-test-export -f runtime/wine-arm64/Dockerfile \
+            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
+            --output type=local,dest=out/wine-arm64-private-pe . > out/wine-arm64-build/private-pe-build.log 2>&1
+      - name: Normalize and independently read back the fresh candidate rootfs
+        run: |
+          container=$(docker create esteria-wine-arm64:candidate)
+          trap 'docker rm -f "$container" >/dev/null' EXIT
+          docker cp "$container:/etc/esteria-wine-arm64.json" out/wine-arm64-build/runtime.json
+          docker export "$container" > out/wine-arm64-export.tar
+          python3 tools/package_wine_arm64_candidate.py --docker-export out/wine-arm64-export.tar \
+            --runtime-metadata out/wine-arm64-build/runtime.json --output out/wine-arm64-runtime \
+            > out/wine-arm64-build/package.json
+          rm out/wine-arm64-export.tar
+      - name: Retain and independently verify all Wine FEX toolchain and Debian sources
+        id: sources
+        if: always() && steps.runtime.outcome == 'success'
+        run: |
+          docker build --platform linux/arm64 --target source-export -f runtime/wine-arm64/Dockerfile \
+            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
+            --output type=local,dest=out/wine-arm64-sources . > out/wine-arm64-build/source-build.log 2>&1
+          sudo chown -R "$(id -u):$(id -g)" out/wine-arm64-sources
+          git archive --format=tar "$GITHUB_SHA" > out/wine-arm64-sources/integration-source.tar
+          printf '%s\n' "$GITHUB_SHA" > out/wine-arm64-sources/integration-revision.txt
+          python3 tools/verify_wine_arm64_sources.py --sources out/wine-arm64-sources \
+            --runtime-metadata out/wine-arm64-sources/wine/runtime.json --revision "$GITHUB_SHA" \
+            > out/wine-arm64-build/source-readback.json
+      - name: Checkout the exact current reconstructed ARM64 client sources
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: Russianranger/wowdecomp_esteria
+          ref: ${{ steps.inputs.outputs.client_revision }}
+          path: out/wine-arm64-client-source
+          persist-credentials: false
+      - name: Recover full verified client original and source companion
+        run: |
+          python3 tools/release_client_inputs.py fetch --client-source out/wine-arm64-client-source \
+            --output out/wine-arm64-client-inputs > out/wine-arm64-build/client-inputs.json
+          python3 tools/prepare_wine_arm64_candidate.py --runtime-package out/wine-arm64-runtime \
+            --stage "$RUNNER_TEMP/wine-arm64-prepared" --bridge-context out/wine-arm64-bridge-context \
+            --client-artifact out/wine-arm64-client-inputs/reconstructed-client-arm64-original.zip \
+            --client-output out/wine-arm64-client-fixtures > out/wine-arm64-build/preparation.json
+      - name: Build a separate exact candidate-bound native audio bridge
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y iproute2 util-linux binutils
+          docker build --platform linux/arm64 --target guest-export \
+            --build-context bridge-src=./native \
+            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
+            --build-arg INTEGRATION_REVISION="$GITHUB_SHA" \
+            --output type=local,dest=out/wine-arm64-bridge out/wine-arm64-bridge-context \
+            > out/wine-arm64-build/bridge-build.log 2>&1
+          sudo chown -R "$(id -u):$(id -g)" out/wine-arm64-bridge
+          cp LICENSE out/wine-arm64-bridge/notices/ESTERIA-GPL-3.0
+          cp runtime/bridge-reference.json out/wine-arm64-bridge/corresponding-source/
+      - name: Execute current client codec entry offline transport Grunt Vulkan and captured PCM
+        run: |
+          sudo -n env GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=safe.directory \
+            GIT_CONFIG_VALUE_0="$GITHUB_WORKSPACE/out/wine-arm64-client-source" \
+            python3 tools/qualify_wine_arm64.py --runtime "$RUNNER_TEMP/wine-arm64-prepared" \
+            --runtime-lock "$GITHUB_WORKSPACE/out/wine-arm64-runtime/candidate-runtime.lock.json" \
+            --bridge-input-lock "$GITHUB_WORKSPACE/out/wine-arm64-bridge-context/sources.lock.json" --private-pe-copy \
+            --client-dir "$GITHUB_WORKSPACE/out/wine-arm64-client-fixtures/bin/Win/ARM64" \
+            --driver "$GITHUB_WORKSPACE/out/wine-arm64-client-fixtures/build/platform/Release/test_xvid_adapter.exe" \
+            --presentation-driver "$GITHUB_WORKSPACE/out/wine-arm64-client-fixtures/build/vulkan/Release/presentation_device.exe" \
+            --texture-driver "$GITHUB_WORKSPACE/out/wine-arm64-client-fixtures/build/vulkan/Release/texture_device.exe" \
+            --audio-driver "$GITHUB_WORKSPACE/out/wine-arm64-client-fixtures/build/audio/Release/fmod_output_device.exe" \
+            --client-entry-check --client-offline-check --client-loopback-check --require-engine-frame-readback \
+            --client-auth-source "$GITHUB_WORKSPACE/out/wine-arm64-client-source" \
+            --bridge-dir "$GITHUB_WORKSPACE/out/wine-arm64-bridge" --bridge-revision "$GITHUB_SHA" \
+            --output "$GITHUB_WORKSPACE/out/wine-arm64-client-evidence"
+      - name: Preserve disposable evidence permissions
+        if: always()
+        run: sudo chown -R "$(id -u):$(id -g)" out
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: native-arm64-wine-evidence-${{ github.sha }}
+          path: |
+            out/wine-arm64-build
+            out/wine-arm64-private-pe
+            out/wine-arm64-client-evidence
+          retention-days: 14
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: success()
+        with:
+          name: native-arm64-wine-candidate-${{ github.sha }}
+          path: out/wine-arm64-runtime
+          retention-days: 14
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always() && steps.sources.outcome == 'success'
+        with:
+          name: native-arm64-wine-corresponding-sources-${{ github.sha }}
+          path: |
+            out/wine-arm64-sources
+            out/wine-arm64-bridge/corresponding-source
+            out/wine-arm64-bridge/notices
+            out/wine-arm64-bridge-context
+            out/wine-arm64-client-inputs
+          retention-days: 14
+          compression-level: 0
+          if-no-files-found: error
