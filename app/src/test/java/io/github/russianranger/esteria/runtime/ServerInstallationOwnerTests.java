@@ -78,6 +78,21 @@ public final class ServerInstallationOwnerTests {
                 Object database=constructor.newInstance(start(databaseBackend,root),channel,lock,root.resolve("fixture-service"),"f".repeat(32),
                     "8.0.46",root,work,attempt.retainWorkspace());set(owner,"database",database);
             }
+            if(phase.equals("installation")) {
+                set(owner,"state",ServerInstallationSetup.State.STAGED_PENDING_PLAYERBOTS);
+                try{owner.finishPlayerbots(null,()->false);throw new AssertionError("An unsealed/missing helper cannot run SQL");}
+                catch(IOException expected){ }
+                check(owner.state()==ServerInstallationSetup.State.STAGED_PENDING_PLAYERBOTS,"Missing provider preserves the staged owner");
+                check(databaseBackend.stops.get()==0 && helperBackend.stops.get()==0,"Missing helper gate launches/stops no process");
+                try{owner.stopAndPromote(Duration.ZERO);throw new AssertionError("Pending fourth schema cannot promote");}
+                catch(IOException expected){ }
+                set(owner,"state",ServerInstallationSetup.State.SCHEMAS_VERIFIED);
+                try{owner.stopAndPromote(Duration.ZERO);throw new AssertionError("A state enum without a verified result cannot promote");}
+                catch(IOException expected){ }
+                check(!Files.exists(work.resolve("state/server-setup-complete.json")),"Refused completion writes no setup marker");
+                check(databaseBackend.stops.get()==0,"Refused promotion keeps the live database owner");
+                set(owner,"state",ServerInstallationSetup.State.FAILED);
+            }
             try{owner.close(Duration.ZERO);throw new AssertionError("A live cleanup child must retain its installation owner");}
             catch(IOException expected){check(helper.isAlive(),"First timeout must occur while backend cleanup remains active");}
             check(helperBackend.terminating.getCount()==0,"Actual owner cleanup path must be reached");

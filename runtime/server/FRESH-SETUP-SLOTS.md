@@ -33,9 +33,14 @@ UUID/version; and exact bootstrap, setup-completion and clean-stop receipt
 hashes. Required phase flags cover the source baseline, compiled updater/core
 ledgers, same-revision reentry, local loopback realm, local account, playerbots
 schema and clean engine shutdown. The storage layer verifies binding/file bytes;
-the future coordinator must validate real component receipt semantics before
-constructing this proof. Baseline-only completion cannot promote. No production
-coordinator emits such a proof in this checkpoint.
+the coordinator validates real component receipt semantics before constructing
+this proof. Its guarded fourth-schema/clean-stop path remains unavailable to the
+current three-program provider. Baseline-only completion cannot promote; no
+production provider or Main START action is enabled by this code checkpoint.
+The full exact MySQL 8 version string, including the Ubuntu release suffix, is
+retained in the proof and reconstructed without normalization. The public active
+setup-receipt hash is copied from that validated proof, and marker changes refuse
+reopening.
 
 Durable completion before pointer publication, and pointer publication before
 final journal update, both recover to the same complete slot. An uncommitted
@@ -63,5 +68,7 @@ interruption boundaries under a 32 MiB heap. Receipts are explicitly synthetic
 fixtures; no SQL or game server runs. A 200-trial real owner-thread/backend race
 suite observed 59 retained handles and 141 settled exceptions, with no exception
 escaping before cleanup. Fresh/guard/mount tests, application/test Java
-compilation and Android lint pass. Actual Android fresh setup, complete proof
-construction, SQL cancellation/retry and playable persistence remain unqualified.
+compilation and Android lint pass. Actual Android fresh setup, production complete proof
+construction and playable persistence remain unqualified. New coordinator host
+tests cover source-bound fourth-schema/config transition and cancellation/reentry;
+actual native qualification of that new composition remains separate.

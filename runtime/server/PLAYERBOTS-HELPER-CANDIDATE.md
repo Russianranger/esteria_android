@@ -48,8 +48,12 @@ receipts. It excludes duplicate input downloads from the upload. Authenticated
 Host fixtures cover validation and refusal paths only. A local full readback of
 the actual recovered 40-file payload, candidate and 45-member archive passed.
 The local archive contains 175,514,426 expanded bytes; its compressed identity is
-recorded separately from the original producer artifacts. A newly registered
-complete candidate CI artifact and source-sealed provider integration remain
-required before production adoption. `sourceCompanionComplete`,
+recorded separately from the original producer artifacts.
+[Source-only run `41081216973`](../evidence/server-playerbots-helper-candidate-41081216973.json)
+registered the complete 45-member mode-preserving archive and explicit recovery
+provenance. Its typed receipt pins match the local full readback; the large outer
+artifact was identified through GitHub metadata and was not downloaded again.
+Source-sealed helper/provider integration and native qualification of the new
+phone finish path remain required before production adoption. `sourceCompanionComplete`,
 `androidProviderCreated`, `productionActivated`, complete setup, Android runtime,
 world, playerbot AI and gameplay flags remain false.

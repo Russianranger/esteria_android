@@ -22,6 +22,7 @@ from tools import prepare_ordered_extractors as adaptation,prepare_runtime as ar
 from tools import prepare_server_isolated_build as inputs,qualify_server_isolated_build as isolated
 from tools import package_server_engine as engine,server_provider_sources as binding
 from tools import verify_server_build as files
+from tools import capture_ordered_extractor_dependencies as dependencies
 
 ROOT=Path(__file__).resolve().parents[1]
 TARGETS=('map_extractor','vmap4_extractor')
@@ -31,6 +32,7 @@ RECIPES=('runtime/extractor_order.py','runtime/server/extractor-order.lock.json'
  'runtime/server/EXTRACTOR-ORDER.md','tools/prepare_ordered_extractors.py','tools/build_ordered_extractors.py',
  'tools/prepare_server_isolated_build.py','tools/prepare_server_isolated_sources.py','tools/qualify_server_isolated_build.py',
  'tools/owned_process_group.py','tools/verify_server_build.py','tools/server_provider_sources.py',
+ 'tools/capture_ordered_extractor_dependencies.py','tests/test_ordered_extractor_dependencies.py',
  'tests/test_extractor_order.py','tests/extractor_order_reference.cpp','tests/extractor_mpqfile_reference.cpp',
  '.github/workflows/server-extractor-order.yml')
 require=files.require
@@ -148,6 +150,11 @@ def build(prepared,acquired,original_lock,environment,policy_sources,output,*,in
         require({str(adapted/'source'/n) for n in pin['adaptedFiles']}<=declared,'ordered-four-adapted-sources-not-in-build-commands')
         proof['phase']='build-two-targets';isolated.write_json(output/'qualification.json',proof)
         proof['compile']=run([cmake,'--build',output/'build','--parallel','2','--target',*TARGETS],'target-build',3600)
+        # The upstream revision.h custom target can run after GitRevision.cpp on
+        # the first pass. Replay only these same two targets before observing
+        # dependencies, so the final generated header is no newer than its object.
+        proof['generatedMetadataStabilizationBuild']=run([cmake,'--build',output/'build','--parallel','2',
+            '--target',*TARGETS],'target-metadata-stabilization',600)
         programs={}
         for name in TARGETS:
             executable=output/'build/bin'/name
@@ -158,6 +165,28 @@ def build(prepared,acquired,original_lock,environment,policy_sources,output,*,in
                 'ordered-build-produced-unrequested-server-or-tool-target')
         proof['programs']=programs
         proof['compileCommands']=files.identity(output/'build/compile_commands.json')
+        proof['phase']='observe-actual-target-source-dependencies';isolated.write_json(output/'qualification.json',proof)
+        ninja=shutil.which('ninja');require(ninja is not None,'ordered-Ninja-missing')
+        capture_output=output/'dependency-observation'
+        def capture_run(argv,label,timeout):
+            run(argv,label,timeout)
+            return output/('diagnostics/'+label+'.log')
+        observed=dependencies.capture(output/'build',adapted,output/'build/compile_commands.json',
+            Path(ninja).resolve(strict=True),capture_run,capture_output)
+        require(observed['objectElfMachines']==[183] and observed['observedObjects']==210 and
+                observed['dependenciesNotNewerThanObject'] is True and
+                observed['compileCommands']==proof['compileCommands'],'ordered-actual-native-object-observation-required')
+        observation,_=engine.modules.read_json(capture_output/'observation.json',limit=16*1024**2)
+        expected_project=dict(before)
+        for name,row in pin['adaptedFiles'].items():expected_project['source/'+name]=row
+        expected_project['source/'+pin['header']['installedPath']]=engine.identity(pin['header'])
+        require(all(expected_project.get(name)==row for name,row in observation['projectFiles'].items()),
+                'ordered-observed-project-dependency-not-in-exact-provided-source')
+        require({str(adapted/'source'/name) for name in pin['adaptedFiles']}<=
+                {row['source'] for row in observation['objects'].values()},'ordered-four-adapted-units-not-actually-compiled')
+        proof['targetSourceDependencies']=observed
+        engine.copy_verified(capture_output/'observation.json',output/'diagnostics/target-source-dependencies.json',
+            observed['outputFiles']['observation.json'],0o444)
         testenv=dict(env,ESTERIA_EXTRACTOR_SOURCE=str(prepared/'source'),
             ESTERIA_ORDERED_EXTRACTOR_PROGRAMS=json.dumps([str(output/'build/bin'/n) for n in TARGETS]))
         proof['phase']='actual-two-program-synthetic-lookups';isolated.write_json(output/'qualification.json',proof)
@@ -177,13 +206,23 @@ def build(prepared,acquired,original_lock,environment,policy_sources,output,*,in
             'build/commands.json':output/'diagnostics/commands.json'}
         for n in TARGETS:selected['bin/'+n]=output/'build/bin'/n
         for name in RECIPES:selected['recipes/'+name]=ROOT/name
+        captured=files.installed_files(capture_output)
+        require({p.relative_to(capture_output).as_posix() for p in captured}==set(observed['outputFiles']),
+                'ordered-dependency-observation-output-file-set-changed')
+        observation_pins={}
+        for path in captured:
+            relative=path.relative_to(capture_output).as_posix();name='build/dependency-observation/'+relative
+            selected[name]=path;observation_pins[name]=observed['outputFiles'][relative]
         for path in files.installed_files(policy_sources):selected['client-policy/'+path.relative_to(policy_sources).as_posix()]=path
         for path in files.installed_files(acquired/'environment'):selected['original-environment/'+path.name]=path
         for path in files.installed_files(acquired/'supplements'):selected['supplements/'+path.relative_to(acquired/'supplements').as_posix()]=path
         for name in ('environment-before.json','environment-after.json'):selected['build/'+name]=output/'diagnostics'/name
         inventory={}
         for name,path in selected.items():
-            row=files.identity(path);engine.copy_verified(path,payload/name,row,0o555 if name.startswith('bin/') else 0o444);inventory[name]=row
+            row=files.identity(path)
+            require(name not in observation_pins or row==observation_pins[name],
+                    'ordered-dependency-observation-output-identity-changed')
+            engine.copy_verified(path,payload/name,row,0o555 if name.startswith('bin/') else 0o444);inventory[name]=row
         proof.update(phase='complete',actualTargetCompileSucceeded=True,nativeOrderedLookupQualified=True,
             onlyRequestedToolsBuilt=True,compilerCacheDisabled=True,originalInputsUnchanged=True,payloadFiles=inventory)
         isolated.write_json(payload/'ordered-build.json',proof);isolated.write_json(output/'qualification.json',proof);return proof

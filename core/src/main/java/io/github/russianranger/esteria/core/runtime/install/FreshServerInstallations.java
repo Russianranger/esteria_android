@@ -57,7 +57,8 @@ public final class FreshServerInstallations {
             RuntimeFiles.require(completed!=null && completed.keySet().equals(FLAGS) &&
                 completed.values().stream().allMatch(Boolean.TRUE::equals),"Complete source/module/account/realm/bots and clean-stop proof required");
             RuntimeFiles.require(mysqlUuid!=null && mysqlUuid.matches("[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}") &&
-                mysqlVersion!=null && mysqlVersion.matches("[0-9]+\\.[0-9]+\\.[0-9]+") &&
+                mysqlVersion!=null && mysqlVersion.length()<=128 && mysqlVersion.matches("8\\.[0-9]+\\.[0-9]+(?:[-+~][A-Za-z0-9][A-Za-z0-9.+~_-]*)?") &&
+                !mysqlVersion.toLowerCase(java.util.Locale.ROOT).contains("mariadb") &&
                 serviceOperation!=null && serviceOperation.matches("[a-f0-9]{32}"),"Invalid fresh database identity");
             for(String hash:Arrays.asList(bootstrapReceipt,stoppedReceipt,setupReceipt))RuntimeFiles.hashPin(hash);
             TreeMap<String,String> proof=new TreeMap<>(selection.values);
@@ -78,10 +79,10 @@ public final class FreshServerInstallations {
         }
     }
     public static final class Active {
-        public final String slotId,mysqlUuid,proofSha256,runtimeArchiveSha256;
+        public final String slotId,mysqlUuid,proofSha256,runtimeArchiveSha256,setupReceiptSha256;
         public final Path work;
         private final Path applicationRoot;
-        private Active(Path root,String slot,Path work,PromotionProof proof){applicationRoot=root;slotId=slot;this.work=work;mysqlUuid=proof.values.get("mysqlUuid");proofSha256=proof.identity;runtimeArchiveSha256=proof.values.get("runtimeArchive");}
+        private Active(Path root,String slot,Path work,PromotionProof proof){applicationRoot=root;slotId=slot;this.work=work;mysqlUuid=proof.values.get("mysqlUuid");proofSha256=proof.identity;runtimeArchiveSha256=proof.values.get("runtimeArchive");setupReceiptSha256=proof.values.get("setupReceipt");}
         public Path directoryFor(Path root) throws IOException {
             RuntimeFiles.require(applicationRoot.equals(root) && work.equals(work.toRealPath()) &&
                 Files.isDirectory(work,LinkOption.NOFOLLOW_LINKS),"Active workspace belongs to another application or changed");
@@ -264,7 +265,8 @@ public final class FreshServerInstallations {
         String value=RuntimeFiles.smallText(path,bound);Map<String,String> result=new TreeMap<>();
         for(String line:value.split("\n",-1)) {
             if(line.isEmpty())continue;String[] pair=line.split("=",-1);
-            RuntimeFiles.require(pair.length==2 && pair[0].matches("[A-Za-z][A-Za-z0-9]*") && pair[1].matches("[A-Za-z0-9.-]+") &&
+            RuntimeFiles.require(pair.length==2 && pair[0].matches("[A-Za-z][A-Za-z0-9]*") &&
+                pair[1].matches(pair[0].equals("mysqlVersion")?"[A-Za-z0-9.+~_-]+":"[A-Za-z0-9.-]+") &&
                 result.put(pair[0],pair[1])==null,"Invalid or duplicate installation metadata");
         }
         RuntimeFiles.require(encode(result).equals(value),"Noncanonical installation metadata");return result;

@@ -113,3 +113,15 @@ The bounded public proof is recorded in
 The original four-tool Android provider remains unchanged. No real client data
 was converted, and the custom-data, source-sealing and Android boundaries above
 remain pending.
+
+The next target-build gate also observes every actual Ninja object dependency.
+It repeats only the same two targets once to settle the upstream `revision.h`
+metadata target, then requires all 210 built objects to match both the target
+commands and compile database. All four adapted source units must have actually
+compiled. Project dependencies must match the complete provided source overlay;
+generated text/headers and the full Ninja dependency/command logs are retained.
+Each dependency must be no newer than its referencing object and is rehashed
+after observation. System header identities are recorded separately, alongside
+the pinned build environment; they are not copied or compared to invented
+original hashes. These observations still require a separate composed source
+archive and sealing receipt before an ordered-tools provider can be created.

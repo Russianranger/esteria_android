@@ -11,8 +11,10 @@ on:
       - runtime/server/EXTRACTOR-ORDER.md
       - tools/prepare_ordered_extractors.py
       - tools/build_ordered_extractors.py
+      - tools/capture_ordered_extractor_dependencies.py
       - tests/test_extractor_order.py
       - tests/test_ordered_extractor_build.py
+      - tests/test_ordered_extractor_dependencies.py
       - tests/extractor_order_reference.cpp
       - tests/extractor_mpqfile_reference.cpp
 permissions:
@@ -33,7 +35,8 @@ jobs:
       - name: Check manifest and separate build guards before acquiring source
         run: |
           test "$(uname -m)" = aarch64
-          python3 -m unittest tests.test_extractor_order tests.test_ordered_extractor_build -v
+          python3 -m unittest tests.test_extractor_order tests.test_ordered_extractor_build \
+            tests.test_ordered_extractor_dependencies -v
           mkdir -p out/ordered-evidence
           # Reproduce the upload traversal failure using the real runner uid.
           fixture=$(mktemp -d out/publication-owner.XXXXXX)

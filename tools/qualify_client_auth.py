@@ -99,9 +99,11 @@ def prepare_client(artifact, source, revision, expected_sha, expected_bytes, fix
         authDiagnosticSourceSha256=hashlib.sha256(diagnostic).hexdigest())
 
 
-def prepared_wine(runtime):
-    runtime=client.archives.directory(runtime);lock,_=wine.read_json(client.archives.DEFAULT_LOCK)
-    package=lock['packages']['wine-arm64'];receipt,digest=wine.read_json(runtime/'package-receipt.json')
+def prepared_wine(runtime,runtime_lock=None,private_pe_copy=False):
+    runtime=client.archives.directory(runtime)
+    lock,lock_sha,package,environment=wine.runtime_selection(runtime_lock,private_pe_copy)
+    require(environment==package.get('wineEnvironment',{}),'authentication-runtime-profile-must-be-selected')
+    receipt,digest=wine.read_json(runtime/'package-receipt.json')
     pin=hashlib.sha256(json.dumps(package,sort_keys=True,separators=(',',':')).encode()).hexdigest()
     require(receipt.get('archiveSha256')==package['archive']['sha256'] and
             receipt.get('manifestSha256')==package['manifest']['sha256'] and receipt.get('packagePinSha256')==pin and
@@ -110,7 +112,8 @@ def prepared_wine(runtime):
     for name,expected in package['components'].items():
         with client.archives.plain_file(runtime/'rootfs'/name) as stream:
             client.archives.verify_stream(stream,dict(file=Path(name).name,**expected))
-    return dict(archiveSha256=package['archive']['sha256'],preparedReceiptSha256=digest)
+    return dict(archiveSha256=package['archive']['sha256'],preparedReceiptSha256=digest,
+                runtimeLockSha256=lock_sha,wineEnvironment=environment)
 
 
 def typed_success(value, exit_code):
@@ -211,6 +214,10 @@ def worker(plan_path):
     require(os.getpid()==1 and os.geteuid()==0 and os.environ.get('ESTERIA_AUTH_NAMESPACE')=='1',
             'authentication-worker-requires-owned-pid-namespace')
     plan,_=wine.read_json(plan_path);output=Path(plan['output']);private=output/'private';public=output/'evidence'
+    environment=plan.get('wineEnvironment',{})
+    require(type(environment) is dict and environment in ({},wine.PRIVATE_PE_ENVIRONMENT),'authentication-worker-wine-profile')
+    private_pe_copy=environment==wine.PRIVATE_PE_ENVIRONMENT
+    def guest_command(root,*command):return wine.guest_command(root,*command,private_pe_copy=private_pe_copy)
     root=Path(plan['runtime'])/'rootfs';fixture=root/wine.GUEST.lstrip('/')
     result=dict(formatVersion=1,scope=SCOPE,workerCompleted=False,expectedExit=None,phase='isolate',
         **{name:False for name in ('networkIsolated','ownedLoopbackListenerVerified','reconstructedClientAuthenticated',
@@ -229,19 +236,22 @@ def worker(plan_path):
         install=Path(plan['install']);content=Path(plan['content']);lock=Path(plan['lock'])
         mysql=Path(plan['mysql']);mysqld=Path(plan['mysqld']);version=plan['version']
         fresh=private/'server'
-        updated=importer.run(install,content,plan['contentReceiptSha256'],lock,mysql,mysqld,version,fresh)
+        derivative=Path(plan['engineDerivativeReceipt']) if plan.get('engineDerivativeReceipt') else None
+        selected={} if derivative is None else {'engine_derivative_receipt':derivative}
+        updated=importer.run(install,content,plan['contentReceiptSha256'],lock,mysql,mysqld,version,fresh,**selected)
         require(updated['qualificationSucceeded'],'compiled-updater-did-not-qualify')
         result['compiledUpdaterReceiptSha256']=identities.identity(fresh/'qualification.json')['sha256']
         state=fresh/'private-state';source=fresh/'content/source'
         manifest,_=modules.read_json(fresh/'content/metadata/content-manifest.json')
         compiled,_=modules.read_json(fresh/'content/metadata/compiled-modules.json')
-        build,_=importer.verify_install(install,compiled,lock)
+        build,_,programs,derivative_proof=importer.select_install(install,compiled,lock,derivative)
         binary=[row for row in build['files'] if row['path']=='bin/authserver']
         require(len(binary)==1 and binary[0].get('elf',{}).get('machine')=='AArch64','exact-arm64-authserver-required')
         binary=binary[0]
-        require(identities.identity(install/'bin/authserver')=={key:binary[key] for key in ('bytes','sha256')},'authserver-changed')
+        require(identities.identity(install/'bin/authserver')==programs['authserver'],'authserver-changed')
         result.update(serverBuildId=build['buildId'],serverSource=updated['source'],sourceLockSha256=updated['sourceLockSha256'],
-                      authserver={key:binary[key] for key in ('bytes','sha256')})
+                      authserver=programs['authserver'])
+        if derivative_proof is not None:result['engineDerivative']=derivative_proof
         server.render_runtime_config(install,fresh,source,build,state,mysql)
         password=db.read_secret(state/'accounts/database-secret');generation=realm.active_config(state,password)
         configuration=state/'config/generations'/generation/'authserver.conf'
@@ -260,7 +270,7 @@ def worker(plan_path):
         auth_capture=server.OwnedAuthserver(install/'bin/authserver',configuration,state/'logs/authserver-private.log')
         server.wait_authserver(auth_capture);result['ownedLoopbackListenerVerified']=True
         for name in ('home','prefix'):(fixture/name).mkdir(mode=0o700)
-        display=wine.Capture(wine.guest_command(root,'/usr/bin/Xtigervnc',':8','-geometry','640x480','-depth','24',
+        display=wine.Capture(guest_command(root,'/usr/bin/Xtigervnc',':8','-geometry','640x480','-depth','24',
             '-rfbport','-1','-SecurityTypes','None','-nolisten','tcp','-ac'),private/'display.log');captures.append(display)
         deadline=time.monotonic()+20;socket=root/'tmp/.X11-unix/X8'
         while time.monotonic()<deadline and display.process.poll() is None:
@@ -269,7 +279,7 @@ def worker(plan_path):
         require(display.process.poll() is None and socket.exists() and stat.S_ISSOCK(socket.lstat().st_mode),
                 'private-headless-display-not-ready')
         result['phase']='initialize-private-wine-prefix';wine_started=True
-        require(wine.run_logged(wine.guest_command(root,'/opt/wine/bin/wine','wineboot.exe','-u'),
+        require(wine.run_logged(guest_command(root,'/opt/wine/bin/wine','wineboot.exe','-u'),
             private/'wineboot.log',180,captures).exit_code==0,'private-wine-prefix-failed')
         require(server.owns_listener(auth_capture.process.pid) and auth_capture.group.observe() is None,
                 'owned-authserver-listener-lost-before-credentials')
@@ -280,7 +290,7 @@ def worker(plan_path):
             require(not os.path.lexists(fixture/name),'private-client-auth-output-already-exists')
         nonce=secrets.token_bytes(16);contract.write_input(fixture/contract.INPUT,intent,nonce)
         result['phase']='actual-reconstructed-grunt-client'
-        capture=wine.run_logged(wine.guest_command(root,'/opt/wine/bin/wine',wine.GUEST+'/WowClient64.exe',
+        capture=wine.run_logged(guest_command(root,'/opt/wine/bin/wine',wine.GUEST+'/WowClient64.exe',
             '--auth-check','--local-offline'),private/'client-auth.log',120,captures)
         require(capture.exit_code==0,'actual-grunt-client-failed')
         receipt,digest=contract.read_receipt(fixture/contract.RECEIPT,nonce);key=contract.read_key(fixture/contract.KEY)
@@ -307,7 +317,7 @@ def worker(plan_path):
         cleanup=[]
         if wine_started:
             for label,argument in (('stop','-k'),('wait','-w')):
-                try:require(wine.run_logged(wine.guest_command(root,'/opt/wine/bin/wineserver',argument),
+                try:require(wine.run_logged(guest_command(root,'/opt/wine/bin/wineserver',argument),
                     private/('wineserver-'+label+'.log'),30,captures).exit_code==0,'wine-clean-shutdown-failed')
                 except BaseException:cleanup.append('wine-'+label)
         for label,capture in (('authserver',auth_capture),('mysql',mysql_capture)):
@@ -322,6 +332,11 @@ def worker(plan_path):
             except BaseException:cleanup.append('display')
         for capture in captures:
             if not capture.finish(5) or capture.truncated or capture.error is not None:cleanup.append('private-log-drain')
+        if private_pe_copy:
+            try:
+                result['privatePeCopyMarkerObserved']=wine.private_pe_marker_observed(private,captures)
+                if not result['privatePeCopyMarkerObserved']:cleanup.append('selected-private-pe-copy-marker-missing')
+            except BaseException:cleanup.append('selected-private-pe-copy-marker-readback')
         try:
             for name in (contract.INPUT,contract.KEY):(fixture/name).unlink(missing_ok=True)
             result['privateKeyRemoved']=True
@@ -343,7 +358,8 @@ def worker(plan_path):
 
 def qualify(args):
     require(platform.machine().lower() in ('aarch64','arm64') and os.geteuid()==0,'native-arm64-root-environment-required')
-    runtime=client.archives.directory(args.runtime);runtime_proof=prepared_wine(runtime)
+    runtime=client.archives.directory(args.runtime)
+    runtime_proof=prepared_wine(runtime,getattr(args,'runtime_lock',None),getattr(args,'private_pe_copy',False))
     output=Path(os.path.abspath(args.output));client.archives.directory(output.parent,create=True)
     require(not os.path.lexists(output),'existing-client-auth-state-refused')
     root=runtime/'rootfs';fixture=root/wine.GUEST.lstrip('/')
@@ -358,7 +374,9 @@ def qualify(args):
         report['phase']='prepare-worker-plan'
         plan={name:str(getattr(args,name).resolve(strict=True)) for name in ('runtime','install','content','lock','mysql','mysqld')}
         plan.update(output=str(output),version=args.expected_version,contentReceiptSha256=args.content_receipt_sha256,
-                    client=report['client'])
+                    client=report['client'],wineEnvironment=runtime_proof['wineEnvironment'])
+        derivative=getattr(args,'engine_derivative_receipt',None)
+        if derivative is not None:plan['engineDerivativeReceipt']=str(derivative.resolve(strict=True))
         plan_path=output/'private/plan.json';db.atomic_json(plan_path,plan)
         command=['unshare','--mount','--propagation','private','--pid','--fork','--kill-child=SIGKILL','--mount-proc','--net',
             sys.executable,str(Path(__file__).resolve()),'--namespace-worker','--plan',str(plan_path)]
@@ -393,7 +411,11 @@ def main():
     parser.add_argument('--namespace-worker',action='store_true',help=argparse.SUPPRESS);parser.add_argument('--plan',type=Path,help=argparse.SUPPRESS)
     for name in ('runtime','install','content','lock','mysql','mysqld','client-artifact','client-source','output'):parser.add_argument('--'+name,type=Path)
     for name in ('client-revision','client-artifact-sha256','content-receipt-sha256','expected-version'):parser.add_argument('--'+name)
-    parser.add_argument('--client-artifact-bytes',type=int);args=parser.parse_args()
+    parser.add_argument('--client-artifact-bytes',type=int)
+    parser.add_argument('--runtime-lock',type=Path,help='explicit separately qualified Wine input; default remains historical')
+    parser.add_argument('--private-pe-copy',action='store_true',help='require the selected pinned private-PE profile and actual marker')
+    parser.add_argument('--engine-derivative-receipt',type=Path,help='exact paired original/stripped engine receipt; never rewrite originals')
+    args=parser.parse_args()
     try:
         if args.namespace_worker:return worker(args.plan)
         require(all(getattr(args,name) is not None for name in ('runtime','install','content','lock','mysql','mysqld',

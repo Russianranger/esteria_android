@@ -1,0 +1,64 @@
+{
+  "androidQualified": false,
+  "clientComponentProof": {
+    "bytes": 30846,
+    "path": "runtime/evidence/wine-arm64-selected471-41069065089.json",
+    "sha256": "db1671f91bb4fce833de9c00e7f49c5fbae1a64c76ea01d5366a82428bac798b"
+  },
+  "clientInput": {
+    "androidRuntimeQualified": false,
+    "artifact": {
+      "bytes": 45848847,
+      "sha256": "befac98c5c3434ea94dcb878f5da37f915946221fb17f1a7888c65f74bb846ad"
+    },
+    "artifactId": 12979433537,
+    "buildId": "41061576677.1",
+    "buildManifestSha256": "ed34b6f648026073ba43203bee7e3dd1ca1d2413017fb99d8da54dab57808559",
+    "formatVersion": 1,
+    "scope": "measured-reconstructed-client-provider-inputs",
+    "sourceRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+    "workflowRun": 41061576677
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "privatePeCopy": true,
+  "runtimeArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+  "scope": "separate-measured471-new-wine-seven-patch-auth-inputs",
+  "server": {
+    "artifact": {
+      "bytes": 190334300,
+      "id": 12975000396,
+      "sha256": "02dcbfd557d0ffed86f1f5284089345b3ecf679f1475bb2782aa8fe2721c00cd"
+    },
+    "integrationRevision": "870034ae997bbdba778770f0b1072821678cbf43",
+    "originalBuildId": "41019374697.1",
+    "packageReceipt": {
+      "bytes": 34652,
+      "sha256": "bb62ad200ac9be9b756616e351bf591508eedb7420f9fd39d5ea0544ae1cc548"
+    },
+    "programs": {
+      "authserver": {
+        "bytes": 1709864,
+        "sha256": "04cbda982ca1385903929eb46ca52b7cb41ca222e8a48f9898af716d2b878531"
+      },
+      "dbimport": {
+        "bytes": 1379920,
+        "sha256": "f452ef5c7ab90451e9060bdace1ba866a93da768145428b15ddc25a7e73b6c24"
+      },
+      "worldserver": {
+        "bytes": 59025784,
+        "sha256": "9757f0bbb2ee159d18070d8f5fe7ecdf5b4b8b7171116198039f418d5ec13aa1"
+      }
+    },
+    "runtimeArchive": {
+      "bytes": 21352885,
+      "sha256": "00bd0a5829caec2a2b11d4e85bd261b67461c04e6755bb332d37d393311c6ccb"
+    },
+    "serverSourceLock": {
+      "bytes": 2170,
+      "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+    },
+    "workflowRun": 41050050294
+  },
+  "thisTupleCompiledAuthQualified": false
+}

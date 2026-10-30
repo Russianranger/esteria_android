@@ -15,12 +15,44 @@ owned account APIs on the same UUID/service and state lease. Final realm/account
 verification must succeed. Credentials remain private; only public component
 identities and journal/receipt hashes enter its staged report.
 
-The result is explicitly `STAGED_PENDING_PLAYERBOTS`. It writes
-`server-installation-staged.json`; it does not write a complete setup receipt,
-publish a slot pointer or launch auth/world/client processes. Playerbots schema,
-complete setup, server-data qualification and gameplay flags remain false.
-The actual source-bound playerbots loader and native qualification are the next
-required phase before complete promotion can be implemented.
+The initial result remains `STAGED_PENDING_PLAYERBOTS` and writes only
+`server-installation-staged.json`. The original three-program provider cannot
+satisfy the new measured-helper namespace gate. Production activation and every
+Main START action remain closed while a complete helper/source provider is pending.
+
+The guarded `finishPlayerbots` path requires the sealed provider to contain the
+measured ARM64 helper and its exact build/native SQL receipts, preserving the
+original three-program identities. The fixed guest `--phase playerbots` invokes
+`finish_playerbots` on the same retained service and UUID. It validates the
+private staged source/baseline/core/account/credential bindings, writes a durable
+configuration-transition intent, and explicitly renders and verifies the complete
+configuration with `DataDir=/esteria-data/data`. The whole prepared generation
+is mounted once at `/esteria-data`; the earlier staged `/esteria-data` config and
+marker remain recorded as historical inputs. No baseline or compiled updater
+is replayed.
+
+The shared PB initializer and live core/PB/realm/account verifiers must finish
+before `SCHEMAS_VERIFIED` and `server-installation-verified.json` are returned.
+That receipt still reports engine stopped, complete setup, promotion, world,
+server-data qualification and gameplay as false. A cancelled known config
+transition can reenter only its exact old/final generations; uncertain PB intent
+continues to refuse replay.
+
+`stopAndPromote` repeats the completed live checks immediately before shutdown,
+then requires the actual owned stop acknowledgment to match UUID, service
+operation and full MySQL version, with started/ready/clean-exit true. Only then
+can it write the SQL-only `server-setup-complete.json`, release all workspace
+users and atomically promote the fixed slot. A timeout preserves its owner;
+promotion failure preserves the recovery records. This is initialization proof,
+not game-data, world, AI or Android qualification.
+
+`completed(...)` resolves the exact promoted source selection and validates the
+stored setup, helper, stop and private journal identities. The returned
+`FreshServerInstallations.Active.setupReceiptSha256` comes from the validated
+promotion proof, never by trusting the current marker. A later session may render
+its own verified config generation and refresh public realm/account receipts;
+the setup proof and private source/account journals remain unchanged. Live SQL
+and separately verified game-data readiness still precede any session launch.
 
 Cancellation before a phase is immediate. A source SQL file or compiled updater
 that already committed execution intent finishes its own safe boundary; then the
@@ -46,7 +78,7 @@ only after it stops. It does not initialize SQL, discover PIDs or label a failed
 cleanup as successful recovery. Thus a legacy caller discarding an exception
 cannot allow garbage collection to release a live child's database lease.
 
-The source helper package has 17 files, including all 14 local Python modules,
+The current source helper package has 18 files, including all 15 local Python modules,
 the sealed public profile and nested appearance SQL/audit resources. The bounded
 helper installer limit is 32 and its exact declared closure remains mandatory.
 Combined APK packaging explicitly checks these source bytes and manifest, with
@@ -54,19 +86,21 @@ strict missing/extra/tampered/profile/duplicate-JSON rejection. Unknown APK
 assets remain rejected. An Android helper filesystem test is scheduled in the
 existing disposable-emulator workflow.
 
-Host evidence is `runtime/evidence/server-installation-coordinator-host.json`.
-Seven phase-orchestration tests use mocked runtime calls and are not SQL evidence.
-The combined related Python suites pass 29 checks; packaging passes 15. Three real
-Java owner/file-lock fault cases deliberately block backend cleanup beyond its
-wait deadline, verify retained ownership, legacy startup exclusion and retry cleanup/new-slot allocation.
-Those tests run with a 32 MiB heap and Java backend fixtures, without starting an
-operating-system or SQL child. The main Android build workflow requires them.
+Historical `runtime/evidence/server-installation-coordinator-host.json` records
+the earlier 17-file source package and phase mocks; its APK hashes and source
+claims remain unchanged. Current focused Python suites pass 43 tests, including
+real host-child/PB-journal fixtures and config-transition/reentry/cancellation
+checks. These emulate SQL rows and do not qualify native or phone execution.
+Three Java owner/file-lock fault cases run at 32 MiB, checking retained cleanup,
+missing-helper/pending-promotion refusal and retry/new-slot allocation. Real
+filesystem tests verify proof-bound setup hashes, tamper rejection and exact
+suffix-bearing MySQL version reconstruction. SDK Java compilation and these
+focused owner/storage tasks pass.
 
-A fresh default application/test APK build and lint pass. The final host build
-used transient output directories outside workspace synchronization after an
-earlier attempt hit a disappearing sync-temporary DEX file during packaging. The actual APK's
-17 helper files and local import closure match repository sources, and stale
-provider archives are absent. The owner/entrypoint has not yet run on Android or
-native ARM64; separately recorded native source7 primitive composition and
-matched reconstructed-client SRP checks do not qualify this new coordinator.
-No Main START action is activated and no device-test package is delivered here.
+The prior actual seven-patch PB loader/core composition is recorded separately in
+[run 41076505231](../evidence/server-playerbots-schema-41076505231.json). It does
+not exercise this new finish/config-transition/clean-stop coordinator path.
+A reuse-only ARM64 qualification of that path is pending; it will consume the
+registered helper candidate and retained runtime without recompiling C++.
+Android execution, sealed helper-provider activation, world and gameplay remain
+unqualified. No Main START action or device-test package is delivered here.

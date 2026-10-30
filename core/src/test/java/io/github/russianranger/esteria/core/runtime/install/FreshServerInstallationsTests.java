@@ -30,13 +30,16 @@ public final class FreshServerInstallationsTests {
         RuntimeFiles.directory(path.getParent());Files.writeString(path,text);return RuntimeFiles.hashFile(path,Files.size(path),()->false);
     }
     private static FreshServerInstallations.PromotionProof fixtureProof(FreshServerInstallations.Attempt attempt) throws Exception {
+        return fixtureProof(attempt,"8.0.46");
+    }
+    private static FreshServerInstallations.PromotionProof fixtureProof(FreshServerInstallations.Attempt attempt,String version) throws Exception {
         try(FreshServerInstallations.Workspace workspace=attempt.retainWorkspace()) {
             Path work=workspace.directory();
             String bootstrap=file(work.resolve("state/database-bootstrap.json"),"TEST_ONLY_BOOTSTRAP_NO_MYSQL\n");
             String stopped=file(work.resolve("mysql-sessions/"+"f".repeat(32)+"/stopped.json"),"TEST_ONLY_STOP_NO_PROCESS\n");
             String setup=file(work.resolve("state/server-setup-complete.json"),"TEST_ONLY_COMPLETE_NO_RUNTIME_QUALIFICATION\n");
             file(work.resolve("state/database/characters.ibd"),"TEST_ONLY_CHARACTER_SENTINEL_RETAINED\n");
-            return new FreshServerInstallations.PromotionProof(attempt.selection,"01234567-89ab-4cde-8fab-0123456789ab","8.0.46","f".repeat(32),bootstrap,stopped,setup,flags());
+            return new FreshServerInstallations.PromotionProof(attempt.selection,"01234567-89ab-4cde-8fab-0123456789ab",version,"f".repeat(32),bootstrap,stopped,setup,flags());
         }
     }
     private static void successfulPromotionAndUpdatePreservation(Path root) throws Exception {
@@ -46,6 +49,16 @@ public final class FreshServerInstallationsTests {
             check(active.work.equals(root.resolve("db/"+attempt.slotId)),"Promotion must retain the original physical work path");
         }
         check(active.directoryFor(root).equals(active.work),"Typed active workspace retains its application root");
+        Path complete=active.work.resolve("state/server-setup-complete.json");
+        byte[] completeBytes=Files.readAllBytes(complete);
+        String completeHash=RuntimeFiles.hashFile(complete,completeBytes.length,RuntimeWork.NEVER_CANCELLED);
+        check(active.setupReceiptSha256.equals(completeHash),"Exposed setup identity comes from the validated promotion proof");
+        FreshServerInstallations.Active restored=new FreshServerInstallations(root).active(selection("a"));
+        check(restored.setupReceiptSha256.equals(completeHash),"Reopened active selection exposes the same proof-bound setup receipt");
+        Files.writeString(complete,"TEST_ONLY_UNTRUSTED_REPLACEMENT_RECEIPT\n");
+        check(active.setupReceiptSha256.equals(completeHash),"Existing typed identity never rehashes an untrusted current marker");
+        rejects(()->new FreshServerInstallations(root).active(selection("a")));
+        Files.write(complete,completeBytes);
         rejects(()->active.directoryFor(root.getParent()));
         Path sentinel=active.work.resolve("state/database/characters.ibd");byte[] saved=Files.readAllBytes(sentinel);
         Path pointer=root.resolve("state/server-installations/active");FileTime retained=FileTime.fromMillis(12345000);Files.setLastModifiedTime(pointer,retained);
@@ -53,6 +66,21 @@ public final class FreshServerInstallationsTests {
         check(Files.getLastModifiedTime(pointer).equals(retained),"Resolving active installation must not rewrite it");
         rejects(()->store.begin(selection("a"),1));rejects(()->store.active(selection("1")));
         check(java.util.Arrays.equals(saved,Files.readAllBytes(sentinel)),"Reinitialization/source mismatch preserve characters");
+    }
+    private static void exactVersionSuffixRoundTrip(Path root) throws Exception {
+        int index=0;
+        for(String version:new String[]{"8.0.46-0ubuntu0.24.04.4","8.0.46+pkg~build_1"}) {
+            Path directory=RuntimeFiles.directory(root.resolve("version"+(index++)));
+            FreshServerInstallations store=new FreshServerInstallations(directory);String expected;
+            try(FreshServerInstallations.Attempt attempt=store.begin(selection("a"),1)) {
+                FreshServerInstallations.Active active=attempt.promote(fixtureProof(attempt,version));
+                expected=active.setupReceiptSha256;
+                check(Files.readString(directory.resolve("state/server-installations/"+attempt.slotId+".proof"))
+                    .contains("mysqlVersion="+version+"\n"),"Exact version suffix is retained rather than stripped");
+            }
+            check(new FreshServerInstallations(directory).active(selection("a")).setupReceiptSha256.equals(expected),
+                "Suffix-bearing storage proof must reconstruct the same bound setup receipt");
+        }
     }
     private static void cancellationRetainsFailedSlotAndStartsFresh(Path root) throws Exception {
         FreshServerInstallations store=new FreshServerInstallations(root);Path old;String oldId;
@@ -105,6 +133,7 @@ public final class FreshServerInstallationsTests {
         Path root=Files.createTempDirectory("esteria-fresh-store-fixture-").toRealPath();
         try {
             successfulPromotionAndUpdatePreservation(RuntimeFiles.directory(root.resolve("promotion")));
+            exactVersionSuffixRoundTrip(RuntimeFiles.directory(root.resolve("version-suffix")));
             cancellationRetainsFailedSlotAndStartsFresh(RuntimeFiles.directory(root.resolve("cancellation")));
             // This test exercises same-process file-lock contention explicitly.
             Path partial=RuntimeFiles.directory(root.resolve("partial"));FreshServerInstallations store=new FreshServerInstallations(partial);
@@ -118,6 +147,11 @@ public final class FreshServerInstallationsTests {
             }
             Map<String,Boolean> incomplete=flags();incomplete.put("compiledUpdaterComplete",false);
             rejects(()->new FreshServerInstallations.PromotionProof(selection("a"),"01234567-89ab-4cde-8fab-0123456789ab","8.0.46","f".repeat(32),"a".repeat(64),"b".repeat(64),"c".repeat(64),incomplete));
+            new FreshServerInstallations.PromotionProof(selection("a"),"01234567-89ab-4cde-8fab-0123456789ab",
+                "8.0.46-0ubuntu0.24.04.4","f".repeat(32),"a".repeat(64),"b".repeat(64),"c".repeat(64),flags());
+            for(String invalid:new String[]{"8.0.*","8.0.46-MariaDB","9.0.1","8.0.46 latest","8.0.46\n"})
+                rejects(()->new FreshServerInstallations.PromotionProof(selection("a"),"01234567-89ab-4cde-8fab-0123456789ab",invalid,
+                    "f".repeat(32),"a".repeat(64),"b".repeat(64),"c".repeat(64),flags()));
             legacyAndStorageGuards(RuntimeFiles.directory(root.resolve("legacy")));
             Path noSpace=RuntimeFiles.directory(root.resolve("no-space"));
             FreshServerInstallations insufficient=new FreshServerInstallations(noSpace,phase->{ },directory->0);

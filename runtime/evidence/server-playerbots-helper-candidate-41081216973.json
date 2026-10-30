@@ -1,0 +1,192 @@
+{
+  "acquisition": {
+    "allDeclaredPayloadBytesReadBack": true,
+    "androidProviderCreated": false,
+    "androidRuntimeQualified": false,
+    "completedPayloadFiles": 40,
+    "evidenceArtifact": {
+      "bytes": 43600,
+      "id": 12987437305,
+      "sha256": "7f7136979756013bc863602e8610519060e01ed6a52119c92e0acb2df60418cc"
+    },
+    "extractedOriginalHelperFiles": 39,
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "helperArtifact": {
+      "bytes": 150197120,
+      "id": 12987248881,
+      "sha256": "a54b82cdc177614c7a31e39e1ac80ba35a22aacc7054aa54466c00c148e82992"
+    },
+    "helperBuildReceipt": {
+      "bytes": 32008,
+      "sha256": "82b9c7c852164f303500214e044f07bf5eb389fa2f3f03b9f6cdc962a5bba602"
+    },
+    "helperExecutable": {
+      "bytes": 25188512,
+      "sha256": "b7d9b72c17f32294915f0a474283c543057ffb7de7b3f93015c2e7e179bfcf25"
+    },
+    "helperExecuted": false,
+    "inputLock": {
+      "bytes": 10344,
+      "sha256": "58b0e480e577bd3e8605865d65f2ec5bb090cd1477ef92acd40f463f77ad33a6"
+    },
+    "nativeSqlReceipt": {
+      "bytes": 37703,
+      "sha256": "56288b2ea7046fa256bdd53113701bd59236d5d8403a3a16f32b5fcf0ab53c42"
+    },
+    "originalArtifactsAndReceiptsUnchanged": true,
+    "originalHelperArtifactComplete": false,
+    "originalServerProgramsRebuilt": false,
+    "producer": {
+      "integrationRevision": "6ce7a9f154b11f5e24ce2d228e613f06001b979f",
+      "workflowRun": 41076505231
+    },
+    "productionActivated": false,
+    "recoveredRecipes": {
+      "recipes/.github/workflows/playerbots-schema.yml": {
+        "gitBlob": "07932bf7acd594e660adde05b0576587cd97b0da",
+        "gitBlobAndSha256Verified": true,
+        "identity": {
+          "bytes": 14368,
+          "sha256": "c1fbb044e6a7687d0db84dbf225b6afa6f0bf3e4cb38b80ed6d75401bbae4e69"
+        },
+        "integrationPath": ".github/workflows/playerbots-schema.yml",
+        "integrationRevision": "6ce7a9f154b11f5e24ce2d228e613f06001b979f",
+        "missingFromOriginalArtifact": true,
+        "originalCommitPathVerified": true,
+        "sourceOnlyRecovery": true
+      }
+    },
+    "scope": "measured-playerbots-helper-source-only-acquisition",
+    "sourceCompanionComplete": false,
+    "sqlExecuted": false
+  },
+  "androidProviderCreated": false,
+  "androidRuntimeQualified": false,
+  "candidateCiArtifactRegistered": true,
+  "completeSetupQualified": false,
+  "environment": {
+    "androidProviderCreated": false,
+    "androidRuntimeQualified": false,
+    "compilerExecuted": false,
+    "files": {
+      "acquisition.json": {
+        "bytes": 2095,
+        "sha256": "024c0566515dd6950ed7b09c5511ed9832e358982655922eb9585fe390481438"
+      },
+      "preparation.json": {
+        "bytes": 1538,
+        "sha256": "f91f74d9d026aa5fed978a79afd73142aec007b71aa7b17b7bc64616a8a05460"
+      },
+      "preparation.log": {
+        "bytes": 1538,
+        "sha256": "f91f74d9d026aa5fed978a79afd73142aec007b71aa7b17b7bc64616a8a05460"
+      }
+    },
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "helperOrServerExecuted": false,
+    "integrationRevision": "eb11d0719032bd9dc40498bfdb4888fd3162bc35",
+    "originalHelperArtifactDeclaredIncomplete": true,
+    "productionActivated": false,
+    "scope": "source-only-playerbots-helper-candidate-registration",
+    "sourceCompanionComplete": false,
+    "sqlExecuted": false
+  },
+  "evidenceArtifact": {
+    "bytes": 3382,
+    "id": 12989586192,
+    "sha256": "c953111d8bbb71aa6e5e38af22d8908c593bb80f749d6bd8c431839673583b13"
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "helperExecutedHere": false,
+  "playerbotsAiQualified": false,
+  "preparation": {
+    "acquisitionReceipt": {
+      "bytes": 2095,
+      "sha256": "024c0566515dd6950ed7b09c5511ed9832e358982655922eb9585fe390481438"
+    },
+    "androidProviderCreated": false,
+    "androidRuntimeQualified": false,
+    "candidateAllBytesVerified": true,
+    "candidateArchive": {
+      "archiveReadbackVerified": true,
+      "bytes": 40112280,
+      "deterministicArchive": true,
+      "expandedBytes": 175514426,
+      "file": "candidate.tar.gz",
+      "fileModesPreserved": true,
+      "files": 45,
+      "sha256": "70dfcdda9ff389d0467aceed5b5951f4261f0ad210e8bc3356d9dacc2bd8792d"
+    },
+    "candidatePin": {
+      "bytes": 13654,
+      "sha256": "602e7d0da21baf6549272c7aab8c9d8d2ad87c83f601ce487d16d02b4ac6b757"
+    },
+    "completeSetupQualified": false,
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "helperBuildReceipt": {
+      "bytes": 32008,
+      "sha256": "82b9c7c852164f303500214e044f07bf5eb389fa2f3f03b9f6cdc962a5bba602"
+    },
+    "helperExecutable": {
+      "bytes": 25188512,
+      "sha256": "b7d9b72c17f32294915f0a474283c543057ffb7de7b3f93015c2e7e179bfcf25"
+    },
+    "helperOrServerExecutedHere": false,
+    "inputLock": {
+      "bytes": 10344,
+      "sha256": "58b0e480e577bd3e8605865d65f2ec5bb090cd1477ef92acd40f463f77ad33a6"
+    },
+    "nativeSqlReceipt": {
+      "bytes": 37703,
+      "sha256": "56288b2ea7046fa256bdd53113701bd59236d5d8403a3a16f32b5fcf0ab53c42"
+    },
+    "originalHelperArtifactComplete": false,
+    "productionActivated": false,
+    "scope": "prepared-optional-playerbots-helper-candidate",
+    "sourceCompanionComplete": false,
+    "sourceOnlyRecoveryVerified": true
+  },
+  "productionActivated": false,
+  "receiptFiles": {
+    "acquisition.json": {
+      "bytes": 2095,
+      "sha256": "024c0566515dd6950ed7b09c5511ed9832e358982655922eb9585fe390481438"
+    },
+    "environment-receipt.json": {
+      "bytes": 897,
+      "sha256": "ee63c30d1f3f9308e476c0cf971b6ccecfb212088c8cce7c9c13269cb7657e88"
+    },
+    "preparation.json": {
+      "bytes": 1538,
+      "sha256": "f91f74d9d026aa5fed978a79afd73142aec007b71aa7b17b7bc64616a8a05460"
+    },
+    "preparation.log": {
+      "bytes": 1538,
+      "sha256": "f91f74d9d026aa5fed978a79afd73142aec007b71aa7b17b7bc64616a8a05460"
+    }
+  },
+  "registeredArtifact": {
+    "bytes": 40130109,
+    "id": 12990195617,
+    "sha256": "73952c331659db612669b16c6221ac58195da35bd802b69fdaffa312eca6b7b5"
+  },
+  "registeredArtifactDownloadedHere": false,
+  "sameArchiveAsLocalFullReadback": true,
+  "sameCandidatePinAsLocalReadback": true,
+  "scope": "actual-source-only-playerbots-helper-candidate-registration",
+  "slotPromoted": false,
+  "sourceCompanionComplete": false,
+  "sqlExecutedHere": false,
+  "workflow": {
+    "conclusion": "success",
+    "id": 41081216973,
+    "integrationRevision": "eb11d0719032bd9dc40498bfdb4888fd3162bc35",
+    "repository": "Russianranger/esteria_android",
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/41081216973"
+  },
+  "worldserverQualified": false
+}

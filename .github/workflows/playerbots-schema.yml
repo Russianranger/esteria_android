@@ -25,7 +25,6 @@ on:
       - runtime/server_schema_adaptations.py
       - runtime/mysql_bootstrap.py
       - runtime/owned_process_group.py
-      - runtime/android_server_installation_setup.py
       - runtime/provision_local_realm.py
       - runtime/provision_local_account.py
       - runtime/server/server-build-sources.lock.json

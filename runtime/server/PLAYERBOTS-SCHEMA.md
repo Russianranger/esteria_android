@@ -70,8 +70,11 @@ producer Git blob was recovered and checked against the build receipt; the
 original ZIP remains unchanged and is explicitly recorded as incomplete. See
 [the separately staged helper candidate](PLAYERBOTS-HELPER-CANDIDATE.md).
 
-The phone coordinator remains staged pending playerbots. This phase does not
-create a complete setup marker, promote a slot or open normal START. A complete
-candidate CI artifact, sealed source/provider integration and phone composition
-remain separate gates. Playerbot AI, bot characters, world startup, existing-save
+The initial phone coordinator remains staged pending playerbots. A guarded
+finish/config-transition/clean-stop promotion implementation now has host tests,
+but the current three-program provider cannot admit its measured helper. This
+schema initializer itself does not create a complete setup marker, promote a
+slot or open normal START. The registered candidate archive, sealed helper/source
+provider integration and native qualification of the new finish composition are
+separate gates. Playerbot AI, bot characters, world startup, existing-save
 upgrades, Android runtime and gameplay remain unqualified.
