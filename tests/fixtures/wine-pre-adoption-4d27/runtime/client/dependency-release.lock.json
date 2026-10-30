@@ -1,0 +1,129 @@
+{
+  "formatVersion": 1,
+  "repository": "Russianranger/esteria_android",
+  "scope": "reconstructed-client-inputs-write-once-prerelease",
+  "tag": "deps-client-arm64-33cf433-471ee42f",
+  "targetCommit": "33cf433a907a9181d27a6962b1f07516afc0773d",
+  "sourceRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "workflowRun": 41061576677,
+  "buildId": "41061576677.1",
+  "providerLockSha256": "7ecb7dfd4e9917e742fb467d81a72af9273394c8488e5a6cb3e25fa70c29ed5b",
+  "artifact": {
+    "id": 12979433537,
+    "name": "client-ARM64-471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+    "bytes": 45848847,
+    "sha256": "befac98c5c3434ea94dcb878f5da37f915946221fb17f1a7888c65f74bb846ad"
+  },
+  "sourceArchive": {
+    "bytes": 23449963,
+    "sha256": "71f7bc4c3b1574de365418bffa2a8c74b299cf0635f45e292b30df20005259cd"
+  },
+  "sourceReceipt": {
+    "bytes": 3838,
+    "sha256": "e768b9dfec4cae999d6c4ca2b8d85a6ed998264b6f4779a57670e91f8533d615"
+  },
+  "xvid": {
+    "bytes": 820854,
+    "sha256": "abbdcbd39555691dd1c9b4d08f0a031376a3b211652c0d8b3b8aa9be1303ce2d",
+    "url": "https://downloads.xvid.com/downloads/xvidcore-1.3.7.tar.gz"
+  },
+  "generationInputs": {
+    "LICENSE": {
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    "runtime/runtime-sources.lock.json": {
+      "bytes": 14211,
+      "sha256": "cd2f3d2d47e2ac0de845acc914e94013906836de9710dc290a6fa51c89bbf07d"
+    },
+    "tools/fetch_sources.py": {
+      "bytes": 7393,
+      "sha256": "19ac32b6bcc9c869e7785f19e7bb1f8492f7b94bd839aa9c30a02eae476c598c"
+    },
+    "tools/manifest_server_content.py": {
+      "bytes": 23861,
+      "sha256": "12529786b59baee29e5f778cb8c0a557f005baa4a7b875d80f67e5d1e9458289"
+    },
+    "tools/manifest_server_modules.py": {
+      "bytes": 9119,
+      "sha256": "4e614b8c860ba2d9ef69d595f6fbbd51df440993f8c7a9a8e85d5d99533b9166"
+    },
+    "tools/package_client_sources.py": {
+      "bytes": 9406,
+      "sha256": "0c685e1e1659a7c3146854bba2182c09b641b7d43e8bd593494c93bc1cdc47d4"
+    },
+    "tools/package_server_content.py": {
+      "bytes": 19732,
+      "sha256": "7a23e7e2b40c55a5a581be825d91d95411ed70be6444d1a838ed468edc4069e6"
+    },
+    "tools/prepare_runtime.py": {
+      "bytes": 22126,
+      "sha256": "113ae7612cba7f557fab79550448578a9a6b8ceb674cff80b38fcf40e8257078"
+    },
+    "tools/provider_client_runtime.py": {
+      "bytes": 19310,
+      "sha256": "e0e50df80a77c6673019710b741e4ca8f6715f71f0b745bcdcf9bddcf22d3988"
+    },
+    "tools/verify_server_build.py": {
+      "bytes": 15540,
+      "sha256": "9d3096e8cc1d2a650353886800e8192dfe78f0b352fede322a39002e545b4152"
+    }
+  },
+  "selectedInputs": {
+    "runtime/client/android-provider.lock.json": {
+      "bytes": 492,
+      "sha256": "7ecb7dfd4e9917e742fb467d81a72af9273394c8488e5a6cb3e25fa70c29ed5b"
+    },
+    "sources.lock.json": {
+      "bytes": 2170,
+      "sha256": "dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90"
+    }
+  },
+  "published": {
+    "assets": {
+      "NOTICE.txt": {
+        "bytes": 1340,
+        "sha256": "07268b21f9f08843bbbb42aa1fdfcd3c8ed8e052ab470eb42a1e0458dd898b42",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-client-arm64-33cf433-471ee42f/NOTICE.txt"
+      },
+      "SHA256SUMS": {
+        "bytes": 547,
+        "sha256": "719289ddbb903762d02f83c6ba484780d940820ab338d68861621e52a1c41d98",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-client-arm64-33cf433-471ee42f/SHA256SUMS"
+      },
+      "client-corresponding-source.tar.gz": {
+        "bytes": 23449963,
+        "sha256": "71f7bc4c3b1574de365418bffa2a8c74b299cf0635f45e292b30df20005259cd",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-client-arm64-33cf433-471ee42f/client-corresponding-source.tar.gz"
+      },
+      "client-input-lock.json": {
+        "bytes": 492,
+        "sha256": "7ecb7dfd4e9917e742fb467d81a72af9273394c8488e5a6cb3e25fa70c29ed5b",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-client-arm64-33cf433-471ee42f/client-input-lock.json"
+      },
+      "reconstructed-client-arm64-original.zip": {
+        "bytes": 45848847,
+        "sha256": "befac98c5c3434ea94dcb878f5da37f915946221fb17f1a7888c65f74bb846ad",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-client-arm64-33cf433-471ee42f/reconstructed-client-arm64-original.zip"
+      },
+      "release-manifest.json": {
+        "bytes": 1507,
+        "sha256": "57c10836751b5f10370ddb4fdadb78b2e3cc591dd719c4ca6d60cb53c68c31bd",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-client-arm64-33cf433-471ee42f/release-manifest.json"
+      },
+      "source-receipt.json": {
+        "bytes": 3838,
+        "sha256": "e768b9dfec4cae999d6c4ca2b8d85a6ed998264b6f4779a57670e91f8533d615",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-client-arm64-33cf433-471ee42f/source-receipt.json"
+      }
+    },
+    "formatVersion": 1,
+    "githubImmutable": false,
+    "publisherNeverOverwrites": true,
+    "releaseId": 429089450,
+    "repository": "Russianranger/esteria_android",
+    "tag": "deps-client-arm64-33cf433-471ee42f",
+    "targetCommit": "33cf433a907a9181d27a6962b1f07516afc0773d",
+    "url": "https://github.com/Russianranger/esteria_android/releases/tag/deps-client-arm64-33cf433-471ee42f"
+  }
+}

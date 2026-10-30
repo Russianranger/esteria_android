@@ -1,0 +1,117 @@
+{
+  "files": {
+    "LICENSE": {
+      "bytes": 35149,
+      "gitBlob": "f288702d2fa16d3cdf0035b15a9fcbc552cd88e7",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    "native/guest-bridges/AUDIO-LICENSE": {
+      "bytes": 1075,
+      "gitBlob": "fcc37994333b753f1387e324ac4ec8f952a302d5",
+      "sha256": "dc18de7cb5064083e6cbe8fc6891de96b3700ed17891d03d1baa5e0097bd479e"
+    },
+    "native/guest-bridges/Makefile": {
+      "bytes": 926,
+      "gitBlob": "8bb825de83ed13572350a7fe48792a209df080fd",
+      "sha256": "cb83e03fbf1b29192039580cc8f60ac68a7f6571c6d73b2c34b9a97fd5a6f95a"
+    },
+    "native/guest-bridges/pcm_esteria.c": {
+      "bytes": 7449,
+      "gitBlob": "14928a80340e9f5716ad7aaddeda12a6dbb27547",
+      "sha256": "b520bd47cd2dd7e542ee88c6c518532ec9cd84b006bf7b8f912438a479897dc8"
+    },
+    "native/guest-bridges/private_socket.h": {
+      "bytes": 1888,
+      "gitBlob": "29759fbc82372efc1f1eb1f36d62a9012cf65291",
+      "sha256": "06d4335d1bc348e8630969b5940d9c7a0cf8658552ffdf005d581426f0af84a6"
+    },
+    "native/guest-bridges/x11_frame.c": {
+      "bytes": 6355,
+      "gitBlob": "321d2c0d743370c76b9226e8a5fbb9a400818f59",
+      "sha256": "58ac751cba2add9f48911bb78eaab1432b269adba7abc44f20635836ef1684cb"
+    },
+    "native/guest-bridges/x11_input.c": {
+      "bytes": 4627,
+      "gitBlob": "ab12a5d136cc1ff8d394b9fde5f8e773e46960ee",
+      "sha256": "ea42849c6cf80132da04b43d9fd771ed1f71dba5081607c586069ac257f59e52"
+    },
+    "native/presentation/frame_protocol.h": {
+      "bytes": 1388,
+      "gitBlob": "14c0151aaae06ac3f3734d33f9e798ebb3bd8b34",
+      "sha256": "e8a2a9dec44254049520ae5f21141d355a054e1afc9b4b83d87ce25c815881df"
+    },
+    "native/presentation/frame_transport.h": {
+      "bytes": 869,
+      "gitBlob": "65f494cfe631bee54608e336808e9f0fdbc1c48b",
+      "sha256": "53979f5450ca55c33899cc844403650296aacba8449bf2a313fefd87ff1325fd"
+    },
+    "runtime/bridge-reference.json": {
+      "bytes": 664,
+      "gitBlob": "e5944546cc2352139359b1e75553c5eb2aef4cfd",
+      "sha256": "6762304137005c31d1b7eeb847de6ffad0eaed4ba96d1771f48399babce3490f"
+    },
+    "runtime/bridges/android-provider.lock.json": {
+      "bytes": 12807,
+      "gitBlob": "d48ecb51ed8231ccd499bac088380c3dd849f2f7",
+      "sha256": "e983198e229ffad73d8fdc14cd6059029a5b6ba20d6e9509633db45df3e03ea4"
+    },
+    "runtime/bridges/dependency-release.lock.json": {
+      "bytes": 3029,
+      "gitBlob": "c8e1f284514da63e1fc15d1f949b9f797e34e245",
+      "sha256": "98d269c76a2f3e2dddc013b4a17ddb93e8ba893abe58d27997bac7e789da5d42"
+    },
+    "runtime/bridges/sources.lock.json": {
+      "bytes": 23129,
+      "gitBlob": "1e84f0220ed1a540dba2c7ab2e5586dd958077db",
+      "sha256": "be07f59cff79a6c0e746d4d9c2adbd816568903e312317ff58091f9747779af0"
+    },
+    "runtime/bridges/x11-runtime.lock.json": {
+      "bytes": 14313,
+      "gitBlob": "7c47fe8a868386710f794e85fc1c36aa5a833006",
+      "sha256": "f6a7cebc7d78933a05a074a7a152adc7a19b547e00192de6489d6b1bd7e15ccf"
+    },
+    "runtime/client/android-provider.lock.json": {
+      "bytes": 492,
+      "gitBlob": "4e2612b3fc3785ffe7cd8ef1193e991a18630e0a",
+      "sha256": "7ecb7dfd4e9917e742fb467d81a72af9273394c8488e5a6cb3e25fa70c29ed5b"
+    },
+    "runtime/client/dependency-release.lock.json": {
+      "bytes": 5474,
+      "gitBlob": "48d34b1a936f259ec9ce73a0881a48b3270bb05c",
+      "sha256": "3dcafa462901a6af8f216c00fd96ff318caeff14540107e822f5b8b65c7c0f9a"
+    },
+    "runtime/runtime-sources.lock.json": {
+      "bytes": 14211,
+      "gitBlob": "ac260020e4a1e59650a659ad2167d32a63f9feff",
+      "sha256": "cd2f3d2d47e2ac0de845acc914e94013906836de9710dc290a6fa51c89bbf07d"
+    },
+    "runtime/shader_generation.py": {
+      "bytes": 19353,
+      "gitBlob": "9f2eab5b4126c51239896da184e4aadd4803ba7f",
+      "sha256": "8bb48952c36bdc4c69516c2ffa6f5c2d2eb59e84019e6420948d94bc81683ac5"
+    },
+    "runtime/shaders/android-provider.lock.json": {
+      "bytes": 11851,
+      "gitBlob": "e461c085e2a0b1b4ae04409588e32c462ad4917d",
+      "sha256": "a7a2ceb0d04367817c0a80c58c5fc9120d7e4c623ca3286dcc2ea07b82b697b1"
+    },
+    "runtime/shaders/dependency-release.lock.json": {
+      "bytes": 3582,
+      "gitBlob": "95946f4a472f1cfcd479e46f5c0ebd4d4a6a9127",
+      "sha256": "d47efd9f922aeafd0221bb3cda27015f1ba85bff2963b93e7cdd174ae6d9c15d"
+    },
+    "runtime/turnip/android-provider.lock.json": {
+      "bytes": 16051,
+      "gitBlob": "db64ce22ff588edba55ec49ebdfff6aadb30d57f",
+      "sha256": "a2999f5172d139ea37cec712662ffc17303cb2d78d8356095c11c8f671f887d4"
+    },
+    "runtime/turnip/sources.lock.json": {
+      "bytes": 43088,
+      "gitBlob": "adbe4da9ad267f1d64529ce260cdf80d17a07467",
+      "sha256": "9bc783e6240d3314a8245f88a3ce8eb5a8d583e360f330f780cd71080bf2d8d1"
+    }
+  },
+  "formatVersion": 1,
+  "scope": "unmodified-original-raw-inputs-before-source-owned-cohort-adoption",
+  "sourceRevision": "4d27ba80aed0669bdbe15871ad5ddb59c14b3a39"
+}

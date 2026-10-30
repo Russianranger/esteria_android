@@ -9,6 +9,7 @@ from tools import prepare_wine_arm64_adoption as adoption
 from tools import wine_arm64_requalification as retained
 from tools import package_wine_arm64_candidate as package
 import tests.test_wine_arm64_candidate as fixtures
+from tests import historical_wine_inputs as historical
 
 
 class WineAdoptionInputs(unittest.TestCase):
@@ -23,7 +24,7 @@ class WineAdoptionInputs(unittest.TestCase):
 
     def test_android_plan_uses_measured_limits_without_duplicate_metadata_or_historical_notices(self):
         fixture, pin, _, proof, candidate = self.fixture()
-        previous = json.loads(adoption.RUNTIME_LOCK.read_bytes())
+        previous = historical.value('runtime/runtime-sources.lock.json')
         original = copy.deepcopy(candidate)
         value = adoption.proposal(candidate, proof, pin, previous, adoption.release_tag(pin))
         selected = value['packages']['wine-arm64']; profile = value['androidInstallation']
@@ -42,7 +43,7 @@ class WineAdoptionInputs(unittest.TestCase):
 
     def test_relabelled_archive_profile_and_changed_production_base_are_rejected(self):
         _, pin, _, proof, candidate = self.fixture()
-        previous = json.loads(adoption.RUNTIME_LOCK.read_bytes())
+        previous = historical.value('runtime/runtime-sources.lock.json')
         for key in ('archive', 'wineEnvironment'):
             bad = copy.deepcopy(candidate)
             bad['packages']['wine-arm64'][key] = {}
@@ -58,7 +59,9 @@ class WineAdoptionInputs(unittest.TestCase):
         fixture, pin, client, _, _ = self.fixture()
         before = {name: retained.client.identity(adoption.ROOT/name) for name in adoption.BOUND_INPUTS}
         output = fixture.root/'adoption'
-        with patch.object(retained, 'pins', return_value=(pin, client)):
+        legacy=historical.materialize(fixture.root/'legacy-production',adoption.BOUND_INPUTS)
+        with patch.object(retained, 'pins', return_value=(pin, client)), \
+                patch.object(adoption,'ROOT',legacy),patch.object(adoption,'RUNTIME_LOCK',legacy/'runtime/runtime-sources.lock.json'):
             report = adoption.prepare(fixture.output, output)
         self.assertEqual(before, {name: retained.client.identity(adoption.ROOT/name) for name in adoption.BOUND_INPUTS})
         self.assertEqual(set(p.name for p in output.iterdir()),
@@ -70,7 +73,7 @@ class WineAdoptionInputs(unittest.TestCase):
         self.assertNotEqual(report['originalNativeClientRevision'], report['selectedClientRevision'])
         archive = report['proposedRuntimeArchiveSha256']
         for kind, path in (('bridge', 'runtime/bridges'), ('turnip', 'runtime/turnip')):
-            source = json.loads((adoption.ROOT/path/'sources.lock.json').read_bytes())
+            source = json.loads((legacy/path/'sources.lock.json').read_bytes())
             rebuilt = json.loads((output/(kind+'-build-context')/'sources.lock.json').read_bytes())
             source['runtimeArchiveSha256'] = archive
             self.assertEqual(rebuilt, source)

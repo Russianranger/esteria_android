@@ -8,6 +8,7 @@ from unittest.mock import patch
 import zipfile
 
 from tests import test_shader_provider as fixtures
+from tests import historical_wine_inputs as historical
 from tools import release_shader_tools as release
 
 
@@ -106,8 +107,16 @@ class ShaderRelease(unittest.TestCase):
 
 
 class MeasuredReleasePin(unittest.TestCase):
+    def test_historical_release_rejects_newly_adopted_default_shader_provider(self):
+        with self.assertRaisesRegex(ValueError,'shader-provider-lock-changed'):
+            release.load_lock()
+
     def test_actual_pin_preserves_compiler_scope_and_all_three_originals(self):
-        lock, pin = release.load_lock()
+        with tempfile.TemporaryDirectory() as temporary:
+            root=historical.materialize(Path(temporary))
+            with patch.object(release,'LOCK',root/'runtime/shaders/dependency-release.lock.json'), \
+                    patch.object(release.provider,'ROOT',root),patch.object(release.provider,'LOCK',root/'runtime/shaders/android-provider.lock.json'):
+                lock, pin = release.load_lock()
         self.assertEqual(lock['archive']['sha256'], '7937274c8379882a045fb93c50ea9bb8575e25d5f769f7d8a3077d1518522c57')
         self.assertEqual(len([name for name in pin['files'] if name.startswith('corresponding-source/')]), 3)
         self.assertEqual(lock['originalRunConclusion'], 'failure')

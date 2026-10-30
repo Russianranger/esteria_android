@@ -1,0 +1,21 @@
+{
+  "formatVersion": 1,
+  "repository": "https://github.com/Russianranger/uo-android-launcher",
+  "revision": "922d0bbc702db2a1f5a46d8dfc14f77a8fdb712c",
+  "copiedMitSources": [
+    {
+      "path": "native/pcm_trasc.c",
+      "sha256": "733dd862b511b9830b8708d2fb3d389eb242f0f3ad30fa1f700d8fa1142e2e73"
+    },
+    {
+      "path": "native/audio-LICENSE",
+      "sha256": "dc18de7cb5064083e6cbe8fc6891de96b3700ed17891d03d1baa5e0097bd479e"
+    }
+  ],
+  "protocolReferences": [
+    "native/presentation/frame.h",
+    "native/presentation/android-surface.c",
+    "app/src/main/java/io/github/russianranger/trasc/AudioPcmSession.java"
+  ],
+  "androidQualified": false
+}

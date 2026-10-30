@@ -10,6 +10,7 @@ from unittest.mock import patch
 import zipfile
 
 from tools import provider_turnip as provider
+from tests import historical_wine_inputs as historical
 
 
 class TurnipProvider(unittest.TestCase):
@@ -108,8 +109,16 @@ class TurnipProvider(unittest.TestCase):
 
 
 class MeasuredTurnipPin(unittest.TestCase):
+    def test_current_cohort_preserves_original_native_and_separate_source_recovery_provenance(self):
+        pin=provider.load_pin()
+        self.assertEqual(pin['integrationRevision'],'75f50445112818c97f8d8e575d2b1c21e59af6e5')
+        self.assertEqual(pin['artifact']['originalNativeBuildArtifact']['runId'],41073499555)
+        self.assertEqual(pin['artifact']['runId'],41079114080)
+        self.assertTrue(pin['nativeNoGpuQualified'])
+        self.assertTrue(all(pin[key] is False for key in provider.FALSE_FLAGS))
+
     def test_successful_no_gpu_build_has_no_hardware_or_android_claim(self):
-        pin = provider.load_pin()
+        pin = provider.load_pin(historical.ROOT/'runtime/turnip/android-provider.lock.json')
         self.assertEqual(pin['integrationRevision'], '46a54a223720cdc230074aa6a43f10370718af71')
         self.assertTrue(pin['nativeNoGpuQualified'])
         self.assertTrue(all(pin[name] is False for name in provider.FALSE_FLAGS))

@@ -9,16 +9,20 @@ from unittest.mock import patch
 import zipfile
 
 from tools import measure_wine_provider_candidates as measure
+from tests import historical_wine_inputs as historical
 
 
 class ProviderMeasurement(unittest.TestCase):
     def setUp(self):
         temporary = tempfile.TemporaryDirectory(); self.addCleanup(temporary.cleanup)
         self.at = Path(temporary.name); self.source = self.at / 'source'; self.output = self.at / 'measured'
-        self.old_bridge = json.loads(measure.bridge.LOCK.read_bytes())
-        self.old_turnip = json.loads(measure.turnip.LOCK.read_bytes())
+        self.old_bridge = historical.value('runtime/bridges/android-provider.lock.json')
+        self.old_turnip = historical.value('runtime/turnip/android-provider.lock.json')
         self.catalog = {}
-        def source(name): self.catalog[name] = (measure.ROOT / name).read_bytes()
+        def source(name):
+            # Pin the old input rosters explicitly while leaving generated ELF
+            # and source mutation cases synthetic.
+            self.catalog[name] = historical.raw(name) if (historical.ROOT/name).is_file() else (measure.ROOT/name).read_bytes()
         for kind, template in (('bridges', self.old_bridge), ('turnip', self.old_turnip)):
             source('runtime/' + kind + '/android-provider.lock.json')
             for logical in template['files']:

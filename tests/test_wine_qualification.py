@@ -10,6 +10,7 @@ import unittest
 from unittest.mock import patch
 
 from tools import qualify_wine_arm64 as qualification
+from tests import historical_wine_inputs as historical
 
 
 def image(machine=0xaa64, dll=False):
@@ -138,8 +139,10 @@ class WineQualification(unittest.TestCase):
         original = qualification.runtime_selection()
         self.assertEqual(original[0], lock)
         self.assertEqual(original[3], {})
+        legacy=self.root/'historical.json'
+        legacy.write_bytes(historical.raw('runtime/runtime-sources.lock.json'))
         with self.assertRaisesRegex(ValueError, 'not-declared'):
-            qualification.runtime_selection(private_pe_copy=True)
+            qualification.runtime_selection(legacy,private_pe_copy=True)
         candidate = self.root / 'candidate.json'
         lock['packages']['wine-arm64']['wineEnvironment'] = {'WINE_ANDROID_PRIVATE_PE_COPY': '1'}
         candidate.write_text(json.dumps(lock))

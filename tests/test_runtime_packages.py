@@ -11,6 +11,7 @@ import unittest
 from unittest.mock import patch
 
 from tools import prepare_runtime as runtime
+from tests import historical_wine_inputs as historical
 
 
 class Response(io.BytesIO):
@@ -238,7 +239,12 @@ class RuntimePackages(unittest.TestCase):
             runtime.pin_identity(expected)
             self.assertEqual(expected['url'].split('/')[-1], expected['file'])
         self.assertFalse(lock['server']['sharesWineRootfs'])
-        self.assertFalse(package['abi']['directAndroidExec'])
+        # That field belongs to the original reference schema; do not invent it
+        # on the separately measured source-owned package.
+        original=historical.value('runtime/runtime-sources.lock.json')['packages']['wine-arm64']
+        self.assertFalse(original['abi']['directAndroidExec'])
+        self.assertEqual(package['marker']['architecture'],'arm64')
+        self.assertEqual(package['wineEnvironment'],{'WINE_ANDROID_PRIVATE_PE_COPY':'1'})
         self.assertEqual(package['components']['opt/wine/lib/wine/aarch64-windows/ntdll.dll']['peMachine'], '0xaa64')
 
 

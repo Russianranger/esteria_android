@@ -7,6 +7,7 @@ from unittest.mock import patch
 from tests.test_dependency_release import FakeGithub, pin
 from tools import dependency_publication as policy
 from tools import release_guest_bridges as guest
+from tests import historical_wine_inputs as historical
 
 
 class DraftGuards(unittest.TestCase):
@@ -81,11 +82,24 @@ class DraftGuards(unittest.TestCase):
 
 
 class GuestReleaseGuards(unittest.TestCase):
-    def test_current_pin_preserves_exact_measured_archive_and_original_lock(self):
+    def setUp(self):
+        temporary=tempfile.TemporaryDirectory();self.addCleanup(temporary.cleanup)
+        self.current_root=guest.provider.ROOT;self.current_pin=guest.provider.LOCK
+        self.reference=historical.materialize(Path(temporary.name))
+        for owner,name,value in ((guest,'LOCK',self.reference/'runtime/bridges/dependency-release.lock.json'),
+                (guest.provider,'ROOT',self.reference),(guest.provider,'LOCK',self.reference/'runtime/bridges/android-provider.lock.json')):
+            change=patch.object(owner,name,value);change.start();self.addCleanup(change.stop)
+
+    def test_historical_pin_preserves_exact_measured_archive_and_original_lock(self):
         lock, measured = guest.load_lock()
         self.assertEqual(lock['archive']['bytes'], 469031)
         self.assertEqual(lock['originalIntegrationRevision'], measured['integrationRevision'])
         self.assertNotEqual(lock['targetCommit'], lock['originalIntegrationRevision'])
+
+    def test_historical_release_rejects_newly_adopted_default_provider(self):
+        with patch.object(guest.provider,'ROOT',self.current_root),patch.object(guest.provider,'LOCK',self.current_pin):
+            with self.assertRaisesRegex(ValueError,'measured-provider-lock-changed'):
+                guest.load_lock()
 
     def test_existing_candidate_and_payload_destinations_are_preserved(self):
         with tempfile.TemporaryDirectory() as name:

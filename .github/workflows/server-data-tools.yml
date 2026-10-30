@@ -157,7 +157,8 @@ jobs:
         run: |
           image_check=$(sha256sum out/data-tools-native-evidence/dependency-image-check.json | cut -d' ' -f1)
           docker run --rm --init --network none --read-only --user "$(id -u):$(id -g)" \
-            --tmpfs /tmp:rw,nosuid,nodev,size=128m --env PYTHONDONTWRITEBYTECODE=1 \
+            --tmpfs "/tmp:rw,nosuid,nodev,size=128m,uid=$(id -u),gid=$(id -g),mode=0700" \
+            --env PYTHONDONTWRITEBYTECODE=1 \
             --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
             --mount "type=bind,src=$GITHUB_WORKSPACE/out/data-tools-native-state,dst=/state" \
             --workdir /qualification esteria-data-tools-reference:verified python3 tools/qualify_server_data_tools.py cli \
