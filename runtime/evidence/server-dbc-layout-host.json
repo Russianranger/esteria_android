@@ -1,0 +1,162 @@
+{
+  "activeStores": 112,
+  "activeStoresWithSqlFallback": 112,
+  "actualGameAssetsImported": false,
+  "actualMpqConversionExecuted": false,
+  "actualProviderArchiveBytesReadBackHere": false,
+  "actualServerSourceProjection": {
+    "serverPatches": [
+      {
+        "path": "patches/server/0001-eluna-declare-area-trigger.patch",
+        "sha256": "c26b145188c5f97bf30d032e1fe3bd7fe17aa1f8f0daa6793e51f5d830fe7aa6",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0002-eluna-include-map-manager.patch",
+        "sha256": "4e277dbe56c31ae30640c8e9ad4dee12e944e0f051d9bdc8d62aaa239c50433f",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0003-eluna-hooks-include-types.patch",
+        "sha256": "5999402d985fcc709abdc90bb4272072d1d5e3e261b2cc7ec19460320c14295f",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0004-attunement-stat-api.patch",
+        "sha256": "d9ef6ca8f96ab186c37c072b22143cdded9976aa3a62d083f893c502a5745cb8"
+      },
+      {
+        "path": "patches/server/0005-script-grid-templates.patch",
+        "sha256": "6b459c90839e7831df8533966442fabd476ae1773f0302c50ccc8a997f157369"
+      },
+      {
+        "path": "patches/server/0006-empty-script-modules.patch",
+        "sha256": "ea0beb357c71d8b8c187af9d4afede520e7ac9877e40fbdc5fab99d54fc21f97"
+      },
+      {
+        "path": "patches/server/0007-runtime-module-config-directory.patch",
+        "sha256": "5e41d474179ef553ec9c2544de947a3724885fd7f3ac233af3d89797acd032ff"
+      }
+    ],
+    "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
+    "sourceFiles": {
+      "modules/mod-wxl-dbc/src/WxlDbcRegistry.cpp": {
+        "bytes": 8923,
+        "sha256": "b36618468e76f57c95d63bd9690ad8a9f6fc251779242894b78de9a92261cef7"
+      },
+      "src/common/DataStores/DBCFileLoader.cpp": {
+        "bytes": 8974,
+        "sha256": "8c1996712c5d0e353c2bb7f75e0518c33b3975b0a15cb04da9dba2a581026fc3"
+      },
+      "src/common/DataStores/DBCFileLoader.h": {
+        "bytes": 4110,
+        "sha256": "f6e25acda7a1e82f0911200e523137df04e0fc15f30012542b5fc22d28082aa5"
+      },
+      "src/server/game/DataStores/DBCStores.cpp": {
+        "bytes": 49298,
+        "sha256": "d83093815f834c562fdd10d82bfb2748322415fad4924e21c33842f79c466168"
+      },
+      "src/server/shared/DataStores/DBCStore.cpp": {
+        "bytes": 2378,
+        "sha256": "63829b0b7e6b16f99327ab607625019fd891b747475ff97dd9bf91b64fd3cb1f"
+      },
+      "src/server/shared/DataStores/DBCfmt.h": {
+        "bytes": 8273,
+        "sha256": "9fbfb1f145d4db03d952311aa2bc05bb1c9496a980d2c42fe111c8b2d0d144a5"
+      }
+    }
+  },
+  "actualSqlRowsQueried": false,
+  "additionalRuntimeHelperDependencies": 0,
+  "androidGuestExecuted": false,
+  "androidRuntimeQualified": false,
+  "apkPackagingExecutedHere": false,
+  "continuationStores": 111,
+  "dateUtc": "2026-10-30",
+  "deviceTestCandidate": false,
+  "focusedTests": {
+    "errors": 0,
+    "failures": 0,
+    "log": {
+      "bytes": 10597,
+      "sha256": "9922cca2b6c7e7d95344ef3b137f77195b5703eee3e0ea83e78406fac4be737d"
+    },
+    "modules": [
+      "tests.test_server_dbc_layouts",
+      "tests.test_assets",
+      "tests.test_server_data_generation",
+      "tests.test_server_data_packages",
+      "tests.test_prepared_data_cache"
+    ],
+    "passed": 55,
+    "run": 55,
+    "seconds": 2.187,
+    "skipped": 0
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "generatedLayoutBlockReproducesExactPinnedSources": true,
+  "headRevision": "4a506e1532652b8cf6fec73eeb327734e151fee6",
+  "headerBehavior": {
+    "dbcHeaderReadBytes": 20,
+    "knownBaseContinuationLayoutAgreementPreserved": true,
+    "knownLocaleAndStandaloneContinuationLayoutsChecked": true,
+    "nativePointerSizeNotUsedForDiskStride": true,
+    "oldActivePointerPreservedOnFailure": true,
+    "packedByteColumnsUseOneDiskByte": true,
+    "selfConsistentWrongMapRefusedBeforeConversion": true,
+    "unknownCustomTablesRemainStructuralOnly": true
+  },
+  "host": {
+    "machine": "x86_64",
+    "python": "3.12.14",
+    "system": "Linux"
+  },
+  "missingTableCoverage": "unknown until actual combined file/SQL stores load",
+  "playerbotsAiQualified": false,
+  "preparationHelperGeneration": "8a463f722113934a64a042aa5975a9f24f5a1308c186a70ed41fe73d9cac6a5d",
+  "scope": "host-present-known-server-DBC-header-layout-admission-only",
+  "sourceFiles": {
+    "runtime/server/DBC-PREFLIGHT.md": {
+      "bytes": 4118,
+      "sha256": "7adaa05fb833d6a691c27d08bdc057ed54a85c006c3ada69f98151ce2d3c4f8e"
+    },
+    "runtime/server_data_preflight.py": {
+      "bytes": 27886,
+      "sha256": "8b9a1d44b70a8c1fce7a54e0ee39bba68621026f34270982cb68cb8d326374e0"
+    },
+    "tests/test_assets.py": {
+      "bytes": 3440,
+      "sha256": "2c2f42792667582a4ed14bb3219971cd1957348b0baa8c2e4aca43c056844767"
+    },
+    "tests/test_server_data_generation.py": {
+      "bytes": 15340,
+      "sha256": "0d61b6b3a1d9ffa70e88d6396ce59a9a81ba3326576f4aee043d3ac23df05147"
+    },
+    "tests/test_server_data_packages.py": {
+      "bytes": 10300,
+      "sha256": "0edfb0bfd6232a924a304818191b549a21bcfbf915fff97c9cb784d35e8fa26a"
+    },
+    "tests/test_server_dbc_layouts.py": {
+      "bytes": 8869,
+      "sha256": "c3d1e01ee6c5f93c0a40fb2eb7d6ce24a4a8bbb06311bdc008432f3d38a33205"
+    },
+    "tools/generate_server_dbc_layouts.py": {
+      "bytes": 7415,
+      "sha256": "8fa13fb4874ed5ca769c252cbacc4afba64ed7771e8c72b12ff68fd5af69c67f"
+    }
+  },
+  "validV1PreflightReportProjection": {
+    "priorSource": {
+      "bytes": 15268,
+      "sha256": "f69f84fad386f1d705a0268d95339d5a3ed070ac8694a8a29832f6ac01edf864"
+    },
+    "syntheticValidHeaderReport": {
+      "bytes": 900,
+      "sha256": "5fa577b958a6e811b48ffb7d7945d549c29a67412849dfb8595c703a7478f45d"
+    },
+    "unchangedAgainstHeadSource": true
+  },
+  "workingTreeHadUncommittedImplementation": true,
+  "worldserverQualified": false
+}

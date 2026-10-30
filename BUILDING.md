@@ -336,3 +336,26 @@ keeps format1. Do not alter the helper byte manifest independently of
 ServerDataRunPlan: the actual five-file manifest hash is checked against the
 preparer and APK. Source-side tests use explicitly synthetic tiny headers and
 do not qualify actual maps, DBC rows or world entry.
+
+## Durable complete local-server profile
+
+The helper/data4/content/original-extractor profile now has an actual public
+release and complete anonymous source/debug readback. The complete-game workflow
+selects it through `tools/fetch_local_server_profile.py` after verifying the bound
+lock and both raw publication receipts. It executes the separately checked-out
+exact7e498c recipe; it does not acquire those providers from Actions retention.
+The existing separate Ubuntu/MySQL dependency release is still required.
+
+```sh
+git fetch --no-tags origin 7e498c50cdf55027e679d63e31f0a5e4b117f934
+git worktree add --detach out/local-server-recipe 7e498c50cdf55027e679d63e31f0a5e4b117f934
+env -u GITHUB_TOKEN -u GH_TOKEN python3 tools/fetch_local_server_profile.py acquire \
+  --packaging-source out/local-server-recipe --output out/server-public-inputs \
+  --providers out/server-public-providers
+```
+
+The result contains programs, data-tools, extractors and content. Keep all source
+and paired debug companions outside the APK and retain them with distribution.
+Only programs/data-tools/content are selected for the complete application; the
+original extractors remain preserved comparison inputs. This gate qualifies
+source/package reproduction, not world entry or a Thor test candidate.

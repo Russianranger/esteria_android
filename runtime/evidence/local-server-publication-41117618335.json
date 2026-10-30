@@ -1,0 +1,136 @@
+{
+  "allTwelvePublicAssetsAnonymouslyDownloadedAndVerifiedInCi": true,
+  "androidRuntimeQualified": false,
+  "apkProducedByPublication": false,
+  "artifactMemberCrcVerified": true,
+  "artifactMembersFullyReadLocally": true,
+  "botAiQualified": false,
+  "completeOriginalSourceAndPairedDebugVerifiedInCi": true,
+  "draft": false,
+  "formatVersion": 1,
+  "fullStoredReleaseBytesReadBackInCi": true,
+  "gameAssetsIncluded": false,
+  "gameplayQualified": false,
+  "githubImmutable": false,
+  "integrationRevision": "0a6bc08417ee037286669784c97a54974bbe2817",
+  "jobs": [
+    {
+      "conclusion": "success",
+      "id": 124275817261,
+      "name": "validate",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 124278875336,
+      "name": "upload-draft",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 124280859304,
+      "name": "verify-publication",
+      "status": "completed"
+    }
+  ],
+  "largeReleasePayloadDownloadedLocally": false,
+  "metadataOrigin": "Actions-created, separately UI-inspected, manually published through authorized UI",
+  "normalLoginQualified": false,
+  "observedAtUtc": "2026-10-30T20:01:45.961169+00:00",
+  "originalNestedArchivesPreserved": true,
+  "ownedCreationRun": 41117178780,
+  "packagingRecipe": "7e498c50cdf55027e679d63e31f0a5e4b117f934",
+  "prerelease": true,
+  "publicAssetIdentities": {
+    "NOTICE.txt": {
+      "bytes": 1071,
+      "sha256": "de1a80680d8ec657763f0bcc9db04d4c3e1616ce1aa2f6fa3b2a3ca49ed8cbb9"
+    },
+    "SHA256SUMS": {
+      "bytes": 1062,
+      "sha256": "1d68260f9c8bd5718f5e7c96c2c7cb2a908714238181b5b69b746b4c27f9f983"
+    },
+    "integration-recipe-receipt.json": {
+      "bytes": 175261,
+      "sha256": "3456ed08ecf2f88d8fd2f21d2535591009e6d9c250df1cfdc17eeea04b871eb1"
+    },
+    "integration-recipe.tar.gz": {
+      "bytes": 9708528,
+      "sha256": "2f9e32abaa89e7fb401107f6071150b75f350a182fcf7e5a73aa005c8f802345"
+    },
+    "providers-receipt.json": {
+      "bytes": 22318,
+      "sha256": "395b159771455015a1dc1b8ca7630be4f10987fb488e5220b19ddbf4bee229e1"
+    },
+    "release-manifest.json": {
+      "bytes": 3795,
+      "sha256": "6f91fb7c7e87b54292e4766989b5d13c857437bbfe7860db6855835f99882807"
+    },
+    "server-content-provider.tar.gz": {
+      "bytes": 168956728,
+      "sha256": "0fe3d5ec91f25295fcfff1acca898cfb36136ecbe40f1d65653f98817d58803e"
+    },
+    "server-data-tools-provider.tar.gz": {
+      "bytes": 105749018,
+      "sha256": "f1b480bf9adc5876c5410f8355be7988ce9757a15feb779b3d513f0464703d6d"
+    },
+    "server-dependency-publication.json": {
+      "bytes": 3012,
+      "sha256": "cdd9ba6779e95e8f5e12c4e76cebc7796229c4e4906afcec6d14849d89ee67e1"
+    },
+    "server-dependency-release.lock.json": {
+      "bytes": 6005,
+      "sha256": "a95a9a5557f3417ff84a1311d1747a0e98db39305505c741b642e2ecef9746d9"
+    },
+    "server-extractors-original-provider.tar.gz": {
+      "bytes": 52679938,
+      "sha256": "6dc20fea542fcd07a7ed45328cfe0c67efd86130492d4be827bcbf7f10eff610"
+    },
+    "server-programs-playerbots-provider.tar.gz": {
+      "bytes": 1446106793,
+      "sha256": "39004f06f823b8416422894329555e4ce0187b2a88e1cb81655afb8033888cc4"
+    }
+  },
+  "publicPayloadBytes": 1783413529,
+  "publicProfileNowSelectable": true,
+  "publicationArtifact": {
+    "bytes": 2414,
+    "id": 13007841489,
+    "sha256": "20528233f3fa36f63fe6620843f5d53a943465cb973973f800894beb623a30aa"
+  },
+  "receipts": {
+    "draft-assets-verified.json": {
+      "bytes": 2135,
+      "sha256": "025c21bc277428556d9768b4a1de47fd3a6d8c668ce155133d39210766dab609"
+    },
+    "draft-created.json": {
+      "bytes": 3149,
+      "sha256": "eecf6623e561254bddbbd7a169dee2b602aa35297d0ecf768dd42260d221232b"
+    },
+    "draft-ui-inspection.json": {
+      "bytes": 1168,
+      "sha256": "4e756827c735a6b43a1bc4024fb745d6850100d35e1501dacb3e471b924a5a00"
+    },
+    "public-source-readback.json": {
+      "bytes": 2388,
+      "sha256": "684f1770e9ca5061feca037038f3f5f4fb79dd57740f96b33358eafa1142a651"
+    },
+    "published-release.json": {
+      "bytes": 4102,
+      "sha256": "e6b46909d12e8eac2e3d94dade1e07089b3fd962c86302f4f9fb1bcc65fe6925"
+    }
+  },
+  "releaseId": 429422570,
+  "scope": "independent-local-server-publication-and-anonymous-readback-receipts",
+  "storedReadinessArtifact": {
+    "bytes": 1115,
+    "id": 13006918262,
+    "sha256": "ec479da9b6ef6e6043bd18bcc672cd5b0bfc3dfd9ccefae24f53d18556d2f955"
+  },
+  "tagTargetIndependentlyReadBack": {
+    "sha": "7e498c50cdf55027e679d63e31f0a5e4b117f934",
+    "type": "commit"
+  },
+  "workflowRun": 41117618335,
+  "worldQualified": false
+}

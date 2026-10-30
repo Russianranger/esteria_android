@@ -9,7 +9,7 @@ from runtime import server_data_generation as data
 from tests import test_server_data_generation as fixtures
 
 
-def dbc(fields=1, stride=4, value=0):
+def dbc(fields=66, stride=264, value=0):
     return struct.pack('<4s4I', b'WDBC', 1, fields, stride, 1) + value.to_bytes(stride, 'little') + b'\0'
 
 
@@ -58,7 +58,7 @@ class SuppliedDataTests(unittest.TestCase):
         self.assertEqual((root/'dbc/Map.dbc').read_bytes(),supplied['dbc/Map.dbc'])
         self.assertEqual((root/'dbc-continuations/Map.dbc1-new').read_bytes(),supplied['dbc-continuations/Map.dbc1-new'])
         original=self.store/'staging'/proof['generation']/'maps-dbc-cameras-complete/data/dbc/Map.dbc'
-        self.assertEqual(original.read_bytes(),struct.pack('<4s4I',b'WDBC',0,1,4,1)+b'\0')
+        self.assertEqual(original.read_bytes(),struct.pack('<4s4I',b'WDBC',0,66,264,1)+b'\0')
         self.assertEqual(proof['preflight']['continuations']['order'],['Map.dbc1-new'])
 
     def test_replacement_import_generation_never_reuses_prior_continuations(self):
@@ -86,9 +86,10 @@ class SuppliedDataTests(unittest.TestCase):
                     with self.assertRaises(ValueError):self.generate()
                 self.assertEqual((self.store/'current').read_text(),'f'*64+'\n')
 
-    def test_continuation_layout_mismatch_with_generated_base_refuses_promotion(self):
+    def test_known_continuation_wrong_layout_refuses_before_conversion_or_promotion(self):
         self.prior();self.package(files={'dbc-continuations/Map.dbc1-new':dbc(fields=2,stride=8)})
-        with patch.object(data,'execute',side_effect=self.fake_execute),self.assertRaisesRegex(ValueError,'format preflight'):
+        with patch.object(data,'execute',side_effect=AssertionError('wrong known layout must refuse before conversion')),\
+                self.assertRaisesRegex(ValueError,'pinned server DBC layout'):
             self.generate()
         self.assertEqual((self.store/'current').read_text(),'f'*64+'\n')
 

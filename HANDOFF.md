@@ -1,125 +1,111 @@
 # Autonomous development handoff
 
 Continue toward one nearly complete local client/server Thor package, or the
-user's reported50% weekly usage threshold. No successful supported weekly meter
-is exposed here; never invent a reading. Development branch pushes, CI, signing,
-dependencies and parallel agents are authorized. No default merges, force pushes,
-server-repository writes or preliminary Thor APK requests.
+user's reported50% weekly usage threshold. No supported weekly meter is exposed;
+never invent a reading. Authorized branch pushes, workflows, builds, signing,
+dependencies and parallel agents require no repeated permission. No default
+merges, force pushes, server-repository writes or preliminary Thor APK requests.
 
-## Exact selection
+## Source and ownership
 
-- Selected client binary:471ee42faadf4a97a1d0a86989cf1452621f2dc5. Client development branch android/arm64-port is671db06afd85fe2f6116b9fd59f5abf3170e2ef2; keep the current application pin until a deliberate matched runtime/cohort requalification.
-- Server:f35f04d01689f034778e3474b3c820092f51e461; Eluna:58d7652138887783228b9727bd1fa4e08f00342b; seven exact adaptation patches.
-- App source lock SHA256:dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90. Archived server build lock stays5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1.
-- Rebuilt Windows ARM64 client under local Wine/Debian12; Linux ARM64 server/MySQL under separate Ubuntu24. This is compatibility execution. Keep glibc roots separate; x64 emulator evidence is not ARM64/Thor evidence.
-- Package io.github.russianranger.esteria. Persistent development key is outside Git and privately backed up; public certificate fingerprint is in app/development-signing.lock.json. No delivered update baseline exists.
+- App: Russianranger/esteria_android, android/client-server.
+- Selected client binary:471ee42faadf4a97a1d0a86989cf1452621f2dc5.
+- Client development: Russianranger/wowdecomp_esteria, android/arm64-port at671db06afd85fe2f6116b9fd59f5abf3170e2ef2. Its all-five-job41114326028 evidence is retained; app pin stays471 until deliberate matched runtime/cohort requalification.
+- Server:f35f04d01689f034778e3474b3c820092f51e461; Eluna:58d7652138887783228b9727bd1fa4e08f00342b; seven hashed adaptations.
+- App source lock:dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90. Archived server-build lock remains5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1.
+- Package io.github.russianranger.esteria. Persistent signing key is private and backed up; public certificate is in app/development-signing.lock.json. No delivered update baseline.
+- Rebuilt Windows ARM64/Wine/Debian12 plus Linux ARM64 server/MySQL/Ubuntu24 in separate PRoot roots. This is compatibility execution; x64 evidence is not ARM64/Thor evidence.
 
-Fetch requested branches and inspect current Actions before retrying old failures.
-CLI fetch works; GitHub Git-object publication uses expected-head leases when CLI
-push is unavailable. Never stage another agent's unfinished work. Preserve exact
-original receipts, source locks, paired debug, notices and historical proofs.
+Fetch branches and inspect current Actions before retrying failures. CLI fetch
+works. When CLI push is unavailable, supported GitHub Git-object publication uses
+an expected-head lease and preserves history. A single root publishes explicit
+frozen paths; never stage another agent's unfinished work. Keep original receipts,
+source locks, paired debug, notices and historical failures.
 
-## Passed gates to preserve
+## Current concrete work
 
-| Gate | Actual evidence |
-| --- | --- |
-| Client471 desktop/reference/components | All five41061576677 jobs; source-owned new Wine selected471 component requalification41069065089. |
-| Current matched authentication |41088546780: actual471/c0e/seven-patch auth,13 Grunt checks, persisted session key, loopback realm, clean owned shutdown. Stops before CommonMain. |
-| Full server sources |41051669638 original full offline compile; exact metadata-only recovery41078079045 retains all266members,9f76881f source archive. No full rebuild needed. |
-| Four stock server providers |41081388547: full sources/debug/APK bytes and Java32MiB fresh/cache installation. Internal305MB APK, no world. |
-| Playerbots schema |41076505231: real helper52statements, four-schema persistence/restart, candidate retained separately41081216973. Old b7 helper SQL proof stays distinct from newly observed f327 helper. |
-| Installation finish |41088296041: actual production MySQL owner, first/repeat/restart, nested DataDir, complete SQL-only marker and clean stop. Does not establish Java slot promotion. |
-| Ordered2 source observation |41095126683: actual native offline two-target build, lookup and210objects/two links. Full source seal is a separate source-only workflow. |
-| Helper source observation |41095126547: actual native201objects/one ARM64link. Full source seal is a separate source-only workflow. No SQL rerun. |
-| Wine publication |Separate c0e runtime/full source release and selected471 client release pass public readback. New cohort429283373 targets exact4d27ba80aed0669bdbe15871ad5ddb59c14b3a39 and contains19 verified assets; public anonymous consumer41098490533 and atomic seven-pin adoption now pass; actual coherent APK remains. |
-| Android owners |Presentation, shaders, native known-reap, database/schema, auth/world, data setup and local-world pipeline build/lint and focused Java/Python ownership fixtures pass. Actual Android full execution remains open. |
+The durable local-server release429422570 is public at recipe7e498c50cdf55027e679d63e31f0a5e4b117f934.
+41117618335 passes reproduction, owned-draft stored-byte upload, published target/
+ID/body verification and complete anonymous12-asset/source/debug readback. Exact
+raw receipts are under runtime/server-components-publication; aggregate proof is
+runtime/evidence/local-server-publication-41117618335.json. GitHub reports
+immutable=false. Never replace assets, move the tag or transfer proof to other
+bytes. The complete-profile consumer checks the exact frozen recipe before
+executing it and current provider guards afterward; run its actual new APK job.
 
-## Current follow-through
+The original complete-profile APK41107245856 at7a7166 passed all127 APK entries,
+eight runtime archives and four-component Java32MiB installation/cache checks.
+That historical proof is packaging only. New sources include real client ALSA
+mount, SAF relative stream resume and IME submission/backpressure/stale-connection
+fixes. Host/Core/SDK checks pass; normal asset-backed execution remains open.
 
-Coherent stock/Wine run41100858610 and the three7619 emulator component runs now
-report completed/success. Preserve their additive independent readback receipts;
-do not rewrite the older record of delayed workflow metadata. Data4 native run
-41103915829 passes5CLI/config,2capabilities and22 actual reader checks. Use its
-measured21ce4e1b runtime, complete source/debug pairs and the optional old-b7
-helper program profile in a new explicit complete-game packaging profile. Keep
-stock provider/release histories unchanged.
+Android13 x64 MySQL41109642918 at4fd32df now passes actual bootstrap and Java
+service lifecycle. Retained consumer41119182469 verifies both complete input/
+source ZIPs,275 source archives and original APK/PRoot. These inputs are pinned
+in runtime/mysql-probe/qualified-inputs.lock.json. The new original-target x64
+setup build41119182502 is compiling dbimport with its full static module graph
+and the actual Playerbots helper. Inspect actual results/source closure, then
+qualify four-schema SQL/restart on those exact x64 tools before adding a private
+Android ServerInstallationSetup fixture seam. Do not substitute ARM64 binaries or
+reuse their SQL/native receipts as x64 proof. No alternate/no-op target.
 
-The Service retains only fixed bounded support-log path metadata, including
-failed setup and stopped game streams. Validate it again before export. Native
-usage is visible-owned-group only; never sum it as complete guest memory or
-claim a bot population budget. Pending concrete work: publish qualified derived
-providers and complete-profile CI, then actual imported-data/world integration.
+The stat probe41117041928 reached a real Android guest and failed hardlink EACCES.
+The fix records explicit denial, unchanged tuples and false link qualification,
+then observes remaining cases. Second run41118768616 failed emulator system-
+image provisioning on disk space before guest execution. The scoped cleanup
+removes only completed job NDK/download after verified source/APK retention.
+Inspect its next actual result; production cache remains OFF with no app calls.
+Python cache os.link publication itself is an unqualified platform gate. Any
+future fast path needs full stable-file sealing, trusted private SHA authority,
+fresh complete stat comparison after each data/import lease boundary and actual
+source-owned Android capability/publication proof. Keep source/provider/SQL
+verification; never treat a caller boolean or self-hash as cache authority.
 
-## Next concrete work
+Known supplied DBC tables now use exact source-derived field/packed-stride
+schemas. All112 active stores have SQL fallback, so do not require every stock
+filename. Unknown custom tables/actual SQL rows/coverage remain unqualified.
+Valid v1 preflight reports remain unchanged; helper generation changes naturally.
+See runtime/server/DBC-PREFLIGHT.md and regenerate only from exact source pins.
 
-1. Ordered complete-source seal41097592284 passes full5675member readback;
-helper seal41099467799 passes full6372member readback. Preserve these outputs. The ordered immutable input lock is b82abde4df6fa5b630d91973ae500f33266433ef80ad6f92e2f562d877f417ad. Preserve it; record actual source outputs in the data-provider lock. Do not recompile the full worldserver or change original binaries for harness failures.
-2. Build/qualify the distinct ordered2+original2 data-tool provider and separate
-helper-augmented programs profile. Keep the qualified stock profiles unchanged.
-Only measured source/native CLI outputs may enable provider flags.
-3. New cohort public receipt, anonymous19-asset/entire Wine-source consumer and
-atomic seven-pin adoption now pass. Inspect the actual separate coherent-APK
-workflow/checker for its three-key client source schema; the historical two-key
-sealer stays unchanged.
-4. Retained GameSession and Service/Main activation now compile and pass focused
-Game8/World2/Presentation3 host ownership fixtures and independent review. Finish
-actual Android/service/runtime integration gates with complete providers. LocalWorldSetup
-holds the data/import owner through shaders and fresh SQL. GameSession must then
-hold import and client-view leases for all gameplay; start DB→auth/world→display/
-audio/input→one-use local login/client. Actual471 Alt+F4 supports graceful client
-close. Keep presentation alive until client reap, then world/auth, then database.
-A separately explicit force action must mark recovery required, not a clean save.
-5. The replaceable GamePresentationPanel/controller/touch/keyboard is connected
-to service-owned presentation. Foreground/wake/cleanup and explicit force survive
-view replacement; support export has a separate single-flight worker. Qualify
-actual Android execution; add combined child-process memory measurements before
-raising bots. CLIENT_STARTED is never login/world readiness.
-6. With real imported12340/custom assets, run actual extraction/shader setup,
-matched DBC/map coverage, normal Glue login, character/world, combat/loot/inventory/
-quest, audio, save/relog and one-to-four supported playerbots. Then produce one
-stable-key signed candidate and consolidated Thor test. Missing assets block
-these gates, not the independent implementation above.
+Last broad modified-worktree pass:1291 Python checks,1236 passed,55 explicit skips,
+zero failures/errors. See runtime/evidence/public-adoption-host-regression.json;
+source identities distinguish modified worktree from Git head.
 
-## Storage and data boundaries
+## Runtime invariants
 
-Imported game generations are under game, derived server data under
-server-data-work, client settings/UI under state/client-work, short database
-workspaces under db, immutable providers under runtimes and cached archives
-separately. SQL failures preserve partial fresh slots; they do not overwrite
-active or legacy saves. Cancelled extraction retains resumable completed phases.
-No actual full base MPQs/current custom content, extracted coverage or shaders
-are present. See ASSET-REQUIREMENTS.md; do not fabricate replacements.
+- Service owns setup/game/presentation across Activity changes. Setup holds
+  import/data leases through shaders and fresh SQL; GameSession retains import/
+  client view and starts DB→auth/world readiness→presentation→one-use local login.
+- Selected471 supports actual Alt+F4 close. Keep presentation until client reap,
+  then world/auth before DB. Retain owners after deadlines. Explicit force marks
+  recovery, never successful saving. Never initialize over active/legacy saves.
+- Controller/touch/IME use the actual XTest bridge. Keyboard whole-batch retry
+  requires typed zero-enqueue refusal; transport/individual errors remain fatal.
+  Do not log text. Actual Android IME/game fields remain a separate gate.
+- Support export is a separate single-flight worker during busy/retained states.
+  Revalidate fixed bounded persisted selections; exclude configs/accounts/private
+  engine captures. Native usage is visible-owned-group only, not whole guest or
+  bot budget. No arbitrary PID/path export surface.
+- Source-only bot schema is not bot AI. Start one-to-four precreated same-account/
+  faction nonheroic alts through SEC_PLAYER commands; random/autologin stays OFF.
 
-STATUS.md is the current overview. BUILDING.md/TESTING.md and scoped runtime
-proofs contain exact commands, receipts and boundaries. Keep private credentials,
-initialized databases/prefixes, signing keys, MPQs and saves out of Git/artifacts.
+## Assets and next gameplay gate
 
-Run/inspect `android-local-game-profile.yml` after the complete-profile commit.
-The legacy stock workflow remains separate. The new checker requires explicit
-helper+data4 together, rejects stock extractor assets, and performs full optional
-provider source/debug/APK verification. Durable server-component preservation
-is being implemented separately; do not replace exact inputs with floating URLs.
+No complete base12340 MPQs/current Esteria catalogs/textures/DBC/custom map closure
+or generated shaders are available here. Do not fabricate replacements. Continue
+independent implementation/CI; when exhausted, request the smallest precise input
+set in ASSET-REQUIREMENTS.md. Client build/real auth/component proofs do not supply
+normal CommonMain/world validation. Server-only continuation fragments also need
+matching full client DBC tables in its provider stack.
 
-Current source checkpoint adds typed EsteriaServerData input through the existing
-custom-content import route. Read runtime/server/IMPORTED-SERVER-DATA.md before
-changing layouts or input schemas. Preserve v1 generated inputs, strict v2
-manifest/helper/ancestry binding, atomic whole-namespace replacement, actual
-dbc-continuations layout/order and accurate user-supplied provenance. The large
-full-world import metadata ceiling remains explicit. Android/core owners and
-actual APK helper readback pass; actual assets/world remain unavailable.
+Read runtime/server/IMPORTED-SERVER-DATA.md before changing the custom import
+namespace, manifests, provenance or replacement behavior. Large full-world import
+metadata limits remain explicit; do not raise the heap or claim unsupported
+complete-world input scale. Assets, runtime generations, mutable client state,
+short DB workspaces and persistent saves remain separate. Keep private data and
+keys out of source/artifacts.
 
-A source audit found an optional Retail-enabled CascLib path where cached
-versions metadata can re-enable downloads behind mode=local. Current471 runtime
-was built with Retail assets disabled. The source fix is committed as671db06afd85fe2f6116b9fd59f5abf3170e2ef2. Its new run41114326028 passes full Windows ARM64/x64 and Linux ARM64/x64 jobs; native ARM64 Wine also passes. All five jobs now report completed/success; the additive client-offline-casc-671db06-readback.json proof retains exact scope. Preserve the final additive proof before selecting any new binary/cohort or enabled optional asset feature. Keep the current matched471 app pin until then.
-
-Actual native Java SQL/promotion/restart now passes41109643068 at4fd32df.
-Preserve runtime/evidence/native-java-installation-41109643068.json; the Linux
-locator seam and unqualified Android/world scope remain explicit. Server-component measurement41113370383 at exact7e498c passes all twelve assets/1,783,413,529 bytes and all source/debug closures; the small measurement was independently read back. The full1.78GB candidate stays in CI. Finish exact-target owned draft binding, stored-byte upload/readback, UI publication and anonymous public readback before adopting public consumers. The browser release form cannot select arbitrary exact commits; a separate guarded metadata-only Actions creator is now implemented and independently reviewed. Its only mutation creates one empty exact-target draft; stored bytes and UI publication remain separate gates. The frozen uploader still never creates/finalizes releases, moves tags or replaces assets.
-
-The client ALSA mount omission is fixed and has an actual generated-argv
-regression. Cache primitives and a private SHA anchor are implemented/tested but
-production fast path stays OFF with no app call sites. Inspect the new separate
-Android13 x64 stat workflow outcome before any future platform decision; neither
-its host fixture nor x64 success qualifies Android ARM64/Thor stat behavior.
-Always retain full source/provider/SQL verification and perform fresh metadata
-comparison after each data/import lease boundary.
+Then validate real extraction/shaders, matched DBC/maps, normal login, character
+creation/selection, world, controller camera/movement, combat/loot/inventory/quest,
+audio, saves/relog, small bots and offline lifecycle. Only after these gates deliver
+one coherent stable-key signed APK with a single consolidated Thor procedure.

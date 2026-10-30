@@ -201,3 +201,10 @@ provider locations are rejected with corrective instructions. Loose catalogs
 remain client-root Esteria*.bin or virtual Esteria paths inside effective MPQs.
 All content compatibility, coverage and Esteria-specific behavior still require
 the matched user assets and actual game execution.
+
+Known supplied base/locale/continuation DBC files now receive exact field-count
+and packed disk-stride checks derived from the112 active stores at pinnedf35.
+All stores have SQL fallback, so absence is not converted into an invented
+mandatory-file list. Unknown custom tables retain structural-only checks. These
+checks reject incompatible layouts early; they do not qualify rows, SQL overlays,
+world coverage or matched client/custom content. See runtime/server/DBC-PREFLIGHT.md.

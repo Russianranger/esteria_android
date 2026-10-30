@@ -1,0 +1,234 @@
+{
+  "boundaries": {
+    "androidArm64Qualified": false,
+    "androidX64StatObservationsCompleted": false,
+    "androidX64StatQualified": false,
+    "gameplayQualified": false,
+    "newCleanupHasNotExecutedOnCi": true,
+    "productionCacheEnabled": false,
+    "sourceSnapshotExact": true,
+    "thorQualified": false,
+    "worldQualified": false
+  },
+  "evidenceArtifact": {
+    "allMembersReadAndCrcVerified": true,
+    "bytes": 6220,
+    "id": 13007371645,
+    "members": {
+      "_temp/proot-probe/build-evidence.json": {
+        "bytes": 4833,
+        "sha256": "b5d14a16d9a83835e027d71d2e0a6f521280057de365244a8963e49b570a463a"
+      },
+      "_temp/stat-probe/build-evidence.json": {
+        "bytes": 4505,
+        "sha256": "102b0e081f9f271a89a877453588d1575304d54d41380bcd83b0cab28ff9ade5"
+      },
+      "_temp/stat-probe/build.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "esteria_android/esteria_android/out/android-proot-stat/gradle-tail.log": {
+        "bytes": 5861,
+        "sha256": "1f225081a32ec488fb197be0e60fa4d7c079a5ee310a93e165ab837e9a4a1d3b"
+      }
+    },
+    "sha256": "513d34339d73bb25582923201a4e8c9cc4c20d98b8aba2cef628ef5c2340b26a"
+  },
+  "exactSourceBuildReceipt": {
+    "androidExecuted": false,
+    "arm64Qualified": false,
+    "compileCommand": [
+      "/home/runner/work/_temp/esteria-stat-sdk/ndk/28.2.13676358/toolchains/llvm/prebuilt/linux-x86_64/bin/clang",
+      "--target=x86_64-linux-gnu",
+      "--sysroot=/home/runner/work/_temp/proot-probe/glibc-sysroot",
+      "-isystem",
+      "/home/runner/work/_temp/proot-probe/glibc-sysroot/usr/include/x86_64-linux-gnu",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-fno-stack-protector",
+      "-fuse-ld=lld",
+      "-nostdlib",
+      "-fPIE",
+      "-pie",
+      "-Wl,-z,noexecstack,-z,max-page-size=16384",
+      "-Wl,--dynamic-linker=/lib64/ld-linux-x86-64.so.2",
+      "-L/home/runner/work/_temp/proot-probe/glibc-sysroot/usr/lib/x86_64-linux-gnu",
+      "-L/home/runner/work/_temp/proot-probe/glibc-sysroot/lib/x86_64-linux-gnu",
+      "/home/runner/work/_temp/proot-probe/glibc-sysroot/usr/lib/x86_64-linux-gnu/Scrt1.o",
+      "/home/runner/work/_temp/proot-probe/glibc-sysroot/usr/lib/x86_64-linux-gnu/crti.o",
+      "/home/runner/work/esteria_android/esteria_android/native/proot-stat-probe/stat_probe.c",
+      "-lc",
+      "/home/runner/work/_temp/proot-probe/glibc-sysroot/usr/lib/x86_64-linux-gnu/crtn.o",
+      "-o",
+      "/home/runner/work/_temp/stat-probe/provider/assets/proot-stat-probe/probe-stat"
+    ],
+    "compilerSha256": "6156dd4e5e466333197a00b8d20bca72c292186643b749dcaaa3aa9164afb1de",
+    "fixture": {
+      "bytes": 18536,
+      "sha256": "a0e6aeec97fb7e218d98820c333b97d3c11f681ab79660ebc191dffc9fc762c2"
+    },
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "glibcStartupInputs": {
+      "Scrt1.o": {
+        "bytes": 1632,
+        "sha256": "476c1939cbc572be9ca35ac2592e24a57c636003dd6c2d2ed4138cecde2a2ff9"
+      },
+      "crti.o": {
+        "bytes": 1072,
+        "sha256": "78acef26a7007f5320c98633376f2903e33895e694fbc2b91d189b38addbca8a"
+      },
+      "crtn.o": {
+        "bytes": 648,
+        "sha256": "121f2a5f12b13471dd8c7dabe3ff334df08540c270564d1a2b3c47ecbd8d3101"
+      }
+    },
+    "glibcVersion": "2.36",
+    "ndkVersion": "28.2.13676358",
+    "originalProotNativeFiles": {
+      "libproot_probe.so": {
+        "bytes": 277720,
+        "sha256": "8901163fb083b63e741b7c6bc7958cf82c646bb1d897052c39c3dc8e427526c5"
+      },
+      "libproot_probe_control.so": {
+        "bytes": 277720,
+        "sha256": "29dbcbbab429fc77bbf45580a35b6d2c659f19162b9bf764b43ebb2da625f970"
+      },
+      "libproot_probe_loader.so": {
+        "bytes": 18344,
+        "sha256": "4a324117c6a16fe996af18ea388191379f5517309e963c80186fd3563a78410a"
+      }
+    },
+    "productionCacheEnabled": false,
+    "prootBuildEvidence": {
+      "bytes": 4833,
+      "sha256": "b5d14a16d9a83835e027d71d2e0a6f521280057de365244a8963e49b570a463a"
+    },
+    "prootGuestExecuted": false,
+    "scope": "android-x86_64-glibc-stat-fixture-build-only",
+    "sourceCompanion": {
+      "bytes": 28466945,
+      "sha256": "d9bc5d701ae74dd66ede9f880b02aee8215c8315dc88953edcf66b6eca89a829"
+    },
+    "sourceInputs": {
+      ".github/workflows/android-proot-stat.yml": {
+        "bytes": 7502,
+        "sha256": "8d46cff6c36e99282a68f4e00e4809fcfc3ce43848ae59706ac2a2614ceb007a"
+      },
+      "LICENSE": {
+        "bytes": 35149,
+        "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+      },
+      "app/src/androidTest/assets/proot-stat-probe/.gitignore": {
+        "bytes": 129,
+        "sha256": "e8f2fe0b8f5bdc802946ca98d86e07ceb2a4021a9c8a93af4fb55c839e08ac74"
+      },
+      "app/src/androidTest/java/io/github/russianranger/esteria/runtime/ProotStatMetadataTest.java": {
+        "bytes": 12300,
+        "sha256": "e97df7e0d63aaf1c8c501e5b378cb3101556f998dd0ca2b216bbfe30a4d0c57d"
+      },
+      "native/proot-stat-probe/README.md": {
+        "bytes": 4354,
+        "sha256": "20e6b5b20a4827e95acca122b454689e575ce79d92102706ff2f68db756c07b8"
+      },
+      "native/proot-stat-probe/stat_probe.c": {
+        "bytes": 10997,
+        "sha256": "9c87ed1e5a0b0ffa1ffd1d7a052c01be341ddcb0bf9ad6a578b859b796fe332f"
+      },
+      "tests/test_android_proot_stat.py": {
+        "bytes": 9029,
+        "sha256": "3ba5db9e995cee35f50d696e7bb1e7743d3803129af7160dbef22a0ba1f62eb1"
+      },
+      "tools/build_android_proot_stat_probe.py": {
+        "bytes": 9992,
+        "sha256": "ebbd6f56f0d8b652345e91ca4608555e8a06d32a29f8136b07e6f9d7c354fbab"
+      },
+      "tools/qualify_android_proot_stat.py": {
+        "bytes": 13610,
+        "sha256": "f18c2545872fac389b1ecccb8c83ecbabb2cdd7121d778da72ccd9ca35359fe4"
+      }
+    },
+    "sourceRevision": "9aad40851ed121bbcce4f8da830eca4d72ddd5d8",
+    "sourceSnapshotExact": true,
+    "unchangedMetadataCorruptionDetectionClaimed": false
+  },
+  "failure": {
+    "actualLog": "Warning: An error occurred while preparing SDK package Google APIs Intel x86_64 Atom System Image: No space left on device.",
+    "emulatorBooted": false,
+    "guestExecuted": false,
+    "instrumentedTestsExecuted": false,
+    "phase": "Google APIs Intel x86_64 Atom system-image provisioning before emulator boot",
+    "qualificationHarnessStarted": false
+  },
+  "focusedHostChecks": {
+    "command": "python3 -m unittest tests.test_android_proot_stat -v",
+    "covered": [
+      "Only exact completed-job NDK and commandline ZIP removed",
+      "Providers/source/receipts/sibling SDK tools retained byte-identically",
+      "Foreign SDK, aliased root/NDK, missing or changed retention and uncommitted fixture receipt refuse before deletion"
+    ],
+    "errors": 0,
+    "exactWorkflowGuardExecutedOnDisposableFilesystem": true,
+    "exitCode": 0,
+    "failures": 0,
+    "skipped": 0,
+    "testsRun": 12
+  },
+  "formatVersion": 1,
+  "jobConclusion": "failure",
+  "jobId": 124279762762,
+  "modifiedCleanupSourceInputs": {
+    ".github/workflows/android-proot-stat.yml": {
+      "bytes": 10836,
+      "sha256": "e051ae7d33ff2254dbdd6534c9a81829042f594e72e834faee121245f86a40f5"
+    },
+    "tests/test_android_proot_stat.py": {
+      "bytes": 13968,
+      "sha256": "b0e4289589dfdf3e260b5b6f06ec272e5ce3998ece0643954873f4dd3f858e70"
+    }
+  },
+  "nextChange": {
+    "broadRunnerOrSystemCleanup": false,
+    "exactDeletionPaths": [
+      "RUNNER_TEMP/esteria-stat-sdk/ndk/28.2.13676358",
+      "RUNNER_TEMP/android-commandline.zip"
+    ],
+    "requiredBeforeDeletion": [
+      "Canonical exact job-owned SDK/root with no symlink aliases",
+      "Exact committed fixture build receipt retained twice with matching bytes",
+      "Full source companion matches retained receipt byte count/SHA-256",
+      "Original PRoot provider receipt matches fixture pin"
+    ],
+    "retained": [
+      "Complete source companion",
+      "Both fixture build receipts",
+      "Original PRoot provider receipt",
+      "Provider executable and APKs",
+      "SDK platform-tools and emulator directories"
+    ],
+    "scope": "disposable CI job inputs only after APK verification"
+  },
+  "observedAtUtc": "2026-10-30T19:59:35.154773+00:00",
+  "repository": "Russianranger/esteria_android",
+  "retainedArtifactMetadataOnly": [
+    {
+      "bytes": 28475780,
+      "downloadedOrRead": false,
+      "id": 13008550088,
+      "role": "complete fixture plus original PRoot corresponding source",
+      "sha256": "038c71bf29f2356b66b62c285c8533a5dad50c156878592a29393e9b80995750"
+    },
+    {
+      "bytes": 4533543,
+      "downloadedOrRead": false,
+      "id": 13007117857,
+      "role": "internal x64 main and AndroidTest APKs",
+      "sha256": "89d54255539eaaab989d77a179eb24aced7332abd2e245a88abbadefe3934ae2"
+    }
+  ],
+  "runId": 41118768616,
+  "scope": "android-stat-followup-emulator-provisioning-enospc-and-narrow-cleanup-host-checks",
+  "sourceRevision": "9aad40851ed121bbcce4f8da830eca4d72ddd5d8"
+}

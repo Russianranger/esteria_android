@@ -54,7 +54,7 @@ class ServerDataGenerationTests(unittest.TestCase):
             for name in ('maps', 'dbc', 'Cameras'):
                 (cwd / name).mkdir()
             (cwd / 'maps/0000000.map').write_bytes(struct.pack('<4s10I', b'MAPS', 9, 12340, *([0] * 8)))
-            (cwd / 'dbc/Map.dbc').write_bytes(struct.pack('<4s4I', b'WDBC', 0, 1, 4, 1) + b'\0')
+            (cwd / 'dbc/Map.dbc').write_bytes(struct.pack('<4s4I', b'WDBC', 0, 66, 264, 1) + b'\0')
             (cwd / 'Cameras/test.m2').write_bytes(b'MD20' + struct.pack('<I', 264))
         elif name == 'vmap4_extractor':
             self.assertIn('--esteria-order', command)

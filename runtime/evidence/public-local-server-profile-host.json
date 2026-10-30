@@ -1,0 +1,115 @@
+{
+  "actionsArtifactsAcquiredHere": false,
+  "actualFrozenRecipeReadback": {
+    "canonicalGitBlobBytes": 8970425,
+    "declaredWindowsWrapperCrLfConversionAccepted": true,
+    "fullGitRosterAndEveryBlobAndCheckoutByteVerified": true,
+    "networkUsed": false,
+    "providerAssetBytesDownloaded": false,
+    "seconds": 1.874,
+    "targetCommit": "7e498c50cdf55027e679d63e31f0a5e4b117f934",
+    "temporaryWorktreeRemovedAfterReadback": true,
+    "trackedFiles": 944
+  },
+  "actualProviderArchiveBytesReadBackHere": false,
+  "actualPublicReleaseConsumed": false,
+  "androidGuestExecuted": false,
+  "androidRuntimeQualified": false,
+  "currentApplicationReleaseLock": {
+    "bytes": 357,
+    "sha256": "bfb68782475277d2db2b3ff50cdf1b48fae93872520d22eac6979a31fb7bdff3"
+  },
+  "currentSelection": {
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "publicationReceiptsPresent": false,
+    "recipeRevision": null,
+    "runtimeQualified": false,
+    "scope": "local-game-server-input-selection",
+    "source": "retained-actions"
+  },
+  "dateUtc": "2026-10-30",
+  "deviceTestCandidate": false,
+  "focusedTests": {
+    "errors": 0,
+    "failures": 0,
+    "log": {
+      "bytes": 6917,
+      "sha256": "95a29f944d8fa7f15d67c109f066fa68242596ed2f1a816da27ee7591be5d589"
+    },
+    "modules": [
+      "tests.test_public_local_server_profile",
+      "tests.test_local_server_components_release",
+      "tests.test_wine_cohort_apk",
+      "tests.test_qualified_data_tools_inputs"
+    ],
+    "passed": 32,
+    "run": 32,
+    "seconds": 4.304,
+    "skipped": 0
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "headRevision": "9ffc6083640a3f62a933aea594e60be978e044f5",
+  "host": {
+    "machine": "x86_64",
+    "python": "3.12.14",
+    "system": "Linux"
+  },
+  "measuredCandidateLock": {
+    "bytes": 178909,
+    "sha256": "a8df3214ee533c42e86a226018941db3b8b481417b143eb38b0fc9e466a497c3"
+  },
+  "playerbotsAiQualified": false,
+  "publicationReceiptFilesAbsent": [
+    "runtime/server-components-publication/published-release.json",
+    "runtime/server-components-publication/public-source-readback.json"
+  ],
+  "scope": "host-conditional-public-local-server-profile-admission-only",
+  "serverProgramsExecuted": false,
+  "sourceAdmissionBehavior": {
+    "currentAllFourProviderGuardsInvokedInAcquisitionFixture": true,
+    "existingOutputsPreserved": true,
+    "fixturePublicReceiptIsNotActualPublication": true,
+    "frozenFetchClearsTokenAndPythonPathVariables": true,
+    "fullTwelveAssetPublicationAndAnonymousSourceReceiptsRequired": true,
+    "hiddenIndexFlagsUntrackedFilesAndChangedGitBlobsRefuse": true,
+    "partialReceiptRefusesRatherThanFallingBack": true,
+    "staleSourceAndRecipePinsRefuse": true
+  },
+  "sourceFiles": {
+    ".github/workflows/android-local-game-profile.yml": {
+      "bytes": 25413,
+      "sha256": "8edaaa464afc3a361cc2d3d20b3dc85931df02020538debda1bc9a5f1a7a97a2"
+    },
+    "tests/test_local_server_components_release.py": {
+      "bytes": 15293,
+      "sha256": "5867cd350b25e8d1679f84cf035ec9aac6f8590d4beda647c212b32de3353473"
+    },
+    "tests/test_public_local_server_profile.py": {
+      "bytes": 12032,
+      "sha256": "96e9e21232f934d1bcdfdd0e36160cf8663f478bb7483708405d5348629202b9"
+    },
+    "tests/test_qualified_data_tools_inputs.py": {
+      "bytes": 2928,
+      "sha256": "3ce2160b9370bac5cd85cb0ad68a7f86006e415b6e8bb3fd84a2b536ce88360d"
+    },
+    "tests/test_wine_cohort_apk.py": {
+      "bytes": 11218,
+      "sha256": "ce95c3001bad8faea2e1b3992a9d0599ba1dbb4c8a3e15a66fb8ccea35d29a6b"
+    },
+    "tools/fetch_local_server_profile.py": {
+      "bytes": 14514,
+      "sha256": "adaf334102ec1736be6bd9cbf1d87f2c5d116f7bc3971b0633e9b8634b5ef887"
+    },
+    "tools/release_local_server_components.py": {
+      "bytes": 35256,
+      "sha256": "43ffa231c94898b76bd38653e45d672250d28c183eecf9ab65f901e811403736"
+    }
+  },
+  "sqlExecuted": false,
+  "workflowActuallyExecuted": false,
+  "workflowYamlParsedLocally": true,
+  "workingTreeHadUncommittedImplementation": true,
+  "worldserverQualified": false
+}

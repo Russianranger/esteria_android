@@ -1,0 +1,119 @@
+{
+  "actualCiEvidence": {
+    "allInstalledPackageSourceFilesReadBack": true,
+    "allNineRetainedInputsVerified": true,
+    "arm64Qualified": false,
+    "artifacts": {
+      "completeSources": {
+        "bytes": 905093502,
+        "id": 13006281602,
+        "sha256": "de0a9922035314e9d7a566490932475d276f8f29aba9b4fb09be717d2bada04c"
+      },
+      "inputs": {
+        "bytes": 229313210,
+        "id": 13006730600,
+        "sha256": "bf77256998e52f3de51497a6d0a88356ee88b325c853f0e564f0018f35ba73fd"
+      }
+    },
+    "completeSourceReadbackSummary": {
+      "allOriginalSourceZipMemberCount": 305,
+      "allOriginalSourceZipMemberIdentitiesSha256": "a394d630e9ef92b8ee718d73a761a8b1366008360bb63356f6ad46cbbc2dd88d",
+      "installedSourceArchiveBytes": 876239964,
+      "installedSourceArchiveFiles": 275,
+      "installedSourceDirectory": "esteria_android/esteria_android/out/mysql-sources",
+      "prootCorrespondingSource": {
+        "bytes": 28425243,
+        "path": "_temp/proot-probe/corresponding-source.tar.gz",
+        "sha256": "c21eb7f82d9b2899e9740fb8f0c402fb701c103989420ab78bf2a8ad47667c48"
+      },
+      "sourcePackages": 88
+    },
+    "everyOriginalInputAndSourceZipByteReadBack": true,
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "guestExecuted": false,
+    "inputSelection": {
+      "bytes": 6228,
+      "sha256": "5268fa26eb1e2165f0cf5ff9f90686792abb4af6b9af48288d75932009bf853d"
+    },
+    "originalApkVerified": true,
+    "producer": {
+      "integrationRevision": "4fd32df287961b9cc5175213a6fe85eac1c6d868",
+      "job": 124248431316,
+      "workflowRun": 41109642918
+    },
+    "productionAdapterQualified": false,
+    "prootProviderVerified": true,
+    "providerVerification": {
+      "androidMysqlQualified": false,
+      "apkVerified": true,
+      "archive": {
+        "assetPath": "mysql-probe/mysql-x86-64.archive",
+        "bytes": 112330756,
+        "file": "mysql-x86-64.tar.gz",
+        "sha256": "159c75f03fd851796f261688fec7a02f8fe1fec8cebb5701c2504bdb2304413f"
+      },
+      "arm64Qualified": false,
+      "expectedMysqlSqlVersion": "8.0.46-0ubuntu0.24.04.4",
+      "productionAdapterQualified": false,
+      "providerVerified": true,
+      "scope": "android-13-x86-64-mysql-probe-build-only"
+    },
+    "scope": "full-original-android-x64-mysql-fixture-input-and-source-readback",
+    "serverSchemasQualified": false,
+    "sqlExecuted": false
+  },
+  "allFourConsumerSourceInputsMatchExactGitBlobs": true,
+  "allRetainedSmallArtifactMembersReadAndCrcVerified": true,
+  "androidExecutedByConsumer": false,
+  "aptOrCompilerExecutedByConsumer": false,
+  "artifact": {
+    "bytes": 17057,
+    "id": 13008041034,
+    "sha256": "affb897594d55c8564420acfc8b303d8dd9a8bc2e3f05a5fe2a1d7ffea93c041"
+  },
+  "consumer": {
+    "conclusion": "success",
+    "integrationRevision": "817cbc229f4dcc24beb169ecc72838fab4d1df32",
+    "job": 124281186016,
+    "repository": "Russianranger/esteria_android",
+    "status": "completed",
+    "workflowRun": 41119182469
+  },
+  "decodedActualJobLog": {
+    "bytes": 19242,
+    "sha256": "66ce345c54cf98a04b0662fb4fe27f143d6621e6ef338a331df2796b45327180"
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "localOriginalInputAndSourceArchivesDownloaded": false,
+  "observedAtUtc": "2026-10-30T20:01:48.325570+00:00",
+  "originalLargeSourceReadbackPerformedOnCi": true,
+  "productionArm64Qualified": false,
+  "scope": "actual-ci-retained-android-x64-mysql-input-source-consumer-and-small-local-readback",
+  "serverSchemasQualified": false,
+  "smallArtifactMembers": {
+    "acquisition.json": {
+      "bytes": 65954,
+      "sha256": "6cd43fd351e820bcdd5dc23137c7b9c2d0e20f4997b5b7f6dbb0396d94d02626"
+    }
+  },
+  "sourceInputs": {
+    ".github/workflows/android-mysql-inputs.yml": {
+      "bytes": 2645,
+      "sha256": "e3ce3b5282cfe2a8950647c07caa3e304ad669ed53867d8d088e0a500c6bc50d"
+    },
+    "runtime/mysql-probe/qualified-inputs.lock.json": {
+      "bytes": 6228,
+      "sha256": "5268fa26eb1e2165f0cf5ff9f90686792abb4af6b9af48288d75932009bf853d"
+    },
+    "tests/test_android_mysql_fixture_inputs.py": {
+      "bytes": 8762,
+      "sha256": "92f1005383c3cf8818b87d4e5f8203133c3c2320eba4cbb9dbd7aeae637743c4"
+    },
+    "tools/fetch_android_mysql_fixture.py": {
+      "bytes": 15690,
+      "sha256": "9b8681d44d319902e21092a77d6fb52f434c3af78d0b968b80470a37c33872bf"
+    }
+  }
+}

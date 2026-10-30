@@ -81,6 +81,48 @@ jobs:
           python3 tools/verify_android_proot_probe.py --provider "$RUNNER_TEMP/proot-probe/provider" --apk app/build/outputs/apk/debug/app-debug.apk
           python3 tools/build_android_proot_stat_probe.py verify --provider "$RUNNER_TEMP/stat-probe/provider" \
             --test-apk app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+      - name: Release only this job's completed build inputs before emulator provisioning
+        run: |
+          python3 - <<'PY'
+          # BEGIN GUARDED STAT BUILD INPUT CLEANUP
+          import hashlib,json,os,shutil
+          from pathlib import Path
+          def cleanup_stat_build_inputs(root_value,sdk_value):
+              def need(ok,reason):
+                  if not ok:raise ValueError(reason)
+              root=Path(root_value)
+              need(root.is_absolute() and root.is_dir() and root.resolve(strict=True)==root,'canonical runner temporary directory required')
+              sdk=root/'esteria-stat-sdk'
+              need(sdk_value==str(sdk) and sdk.is_dir() and sdk.resolve(strict=True)==sdk,'only the exact job-owned stat SDK may be cleaned')
+              def plain(path,maximum):
+                  need(path.is_file() and not path.is_symlink() and path.resolve(strict=True)==path,'retained build input must be a canonical regular file')
+                  need(0<path.stat().st_size<=maximum,'retained build input exceeds bound')
+                  return path
+              def identity(path,maximum):
+                  plain(path,maximum);digest=hashlib.sha256();count=0
+                  with path.open('rb') as incoming:
+                      for block in iter(lambda:incoming.read(131072),b''):
+                          count+=len(block);need(count<=maximum,'retained build input grew');digest.update(block)
+                  need(count==path.stat().st_size,'retained build input changed size')
+                  return dict(bytes=count,sha256=digest.hexdigest())
+              retained=root/'stat-probe'
+              receipt=plain(retained/'provider/assets/proot-stat-probe/build-evidence.json',128<<10)
+              proof=json.loads(receipt.read_bytes())
+              need(proof.get('scope')=='android-x86_64-glibc-stat-fixture-build-only' and proof.get('sourceSnapshotExact') is True,'exact committed fixture receipt required before cleanup')
+              need(identity(receipt,128<<10)==identity(retained/'build-evidence.json',128<<10),'retained fixture receipts differ')
+              need(identity(retained/'corresponding-source.tar.gz',128<<20)==proof.get('sourceCompanion'),'complete corresponding source must remain retained')
+              need(identity(root/'proot-probe/provider/assets/proot-probe/build-evidence.json',128<<10)==proof.get('prootBuildEvidence'),'original PRoot provider receipt must remain retained')
+              ndk=sdk/'ndk/28.2.13676358';download=root/'android-commandline.zip'
+              need(ndk.is_dir() and not ndk.is_symlink() and ndk.resolve(strict=True)==ndk,'exact plain job-owned NDK directory required')
+              plain(download,256<<20)
+              # All retention/path checks precede either deletion. The finished
+              # APKs and qualifier need SDK platform-tools/emulator, not the NDK.
+              shutil.rmtree(ndk);download.unlink()
+              return dict(removed=['esteria-stat-sdk/ndk/28.2.13676358','android-commandline.zip'],
+                  providerReceiptsRetained=True,completeSourceCompanionRetained=True)
+          if __name__=='__main__':print(json.dumps(cleanup_stat_build_inputs(os.environ['RUNNER_TEMP'],os.environ['ANDROID_HOME']),sort_keys=True))
+          # END GUARDED STAT BUILD INPUT CLEANUP
+          PY
       - name: Observe actual Android guest tuples through both bound aliases
         uses: ReactiveCircus/android-emulator-runner@324029e2f414c084d8b15ba075288885e74aef9c
         with:

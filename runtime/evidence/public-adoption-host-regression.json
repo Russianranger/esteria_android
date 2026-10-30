@@ -1,0 +1,80 @@
+{
+  "androidGuestExecuted": false,
+  "command": "python3 -m unittest discover -s tests -q",
+  "configuredToolchains": [
+    "Android SDK CMake3.22.1",
+    "NDK28.2.13676358 LLVM tools for source-owned cross-compile checks"
+  ],
+  "errors": 0,
+  "explicitlySkipped": 55,
+  "failures": 0,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "gitHead": "4a506e1532652b8cf6fec73eeb327734e151fee6",
+  "hostArchitecture": "x86_64",
+  "log": {
+    "bytes": 1526,
+    "sha256": "de30906a2bf6987c4065e06d194a787058bc0813516441f55b9d3d5fe3fa4a1b"
+  },
+  "modifiedSourceFiles": {
+    ".github/workflows/android-local-game-profile.yml": {
+      "bytes": 25413,
+      "sha256": "8edaaa464afc3a361cc2d3d20b3dc85931df02020538debda1bc9a5f1a7a97a2"
+    },
+    ".github/workflows/android-proot-stat.yml": {
+      "bytes": 10836,
+      "sha256": "e051ae7d33ff2254dbdd6534c9a81829042f594e72e834faee121245f86a40f5"
+    },
+    "runtime/server-components-publication/public-source-readback.json": {
+      "bytes": 2388,
+      "sha256": "684f1770e9ca5061feca037038f3f5f4fb79dd57740f96b33358eafa1142a651"
+    },
+    "runtime/server-components-publication/published-release.json": {
+      "bytes": 4102,
+      "sha256": "e6b46909d12e8eac2e3d94dade1e07089b3fd962c86302f4f9fb1bcc65fe6925"
+    },
+    "runtime/server_data_preflight.py": {
+      "bytes": 27886,
+      "sha256": "8b9a1d44b70a8c1fce7a54e0ee39bba68621026f34270982cb68cb8d326374e0"
+    },
+    "tests/test_android_proot_stat.py": {
+      "bytes": 13968,
+      "sha256": "b0e4289589dfdf3e260b5b6f06ec272e5ce3998ece0643954873f4dd3f858e70"
+    },
+    "tests/test_assets.py": {
+      "bytes": 3440,
+      "sha256": "2c2f42792667582a4ed14bb3219971cd1957348b0baa8c2e4aca43c056844767"
+    },
+    "tests/test_public_local_server_profile.py": {
+      "bytes": 12032,
+      "sha256": "96e9e21232f934d1bcdfdd0e36160cf8663f478bb7483708405d5348629202b9"
+    },
+    "tests/test_server_data_generation.py": {
+      "bytes": 15340,
+      "sha256": "0d61b6b3a1d9ffa70e88d6396ce59a9a81ba3326576f4aee043d3ac23df05147"
+    },
+    "tests/test_server_data_packages.py": {
+      "bytes": 10300,
+      "sha256": "0edfb0bfd6232a924a304818191b549a21bcfbf915fff97c9cb784d35e8fa26a"
+    },
+    "tests/test_server_dbc_layouts.py": {
+      "bytes": 8869,
+      "sha256": "c3d1e01ee6c5f93c0a40fb2eb7d6ce24a4a8bbb06311bdc008432f3d38a33205"
+    },
+    "tools/fetch_local_server_profile.py": {
+      "bytes": 14514,
+      "sha256": "adaf334102ec1736be6bd9cbf1d87f2c5d116f7bc3971b0633e9b8634b5ef887"
+    },
+    "tools/generate_server_dbc_layouts.py": {
+      "bytes": 7415,
+      "sha256": "8fa13fb4874ed5ca769c252cbacc4afba64ed7771e8c72b12ff68fd5af69c67f"
+    }
+  },
+  "passed": 1236,
+  "pythonVersion": "3.12.14",
+  "scope": "host-python-modified-public-adoption-regression-only",
+  "seconds": 35.363,
+  "sourceSnapshotExact": false,
+  "testsRun": 1291,
+  "worldQualified": false
+}

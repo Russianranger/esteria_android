@@ -22,7 +22,7 @@ class AssetPreflightTests(unittest.TestCase):
         return file
 
     def test_dbc_continuation_uses_wdbc_and_lengths(self):
-        file = self.write('dbc/ChrRaces.dbc1-Esteria', struct.pack('<4s4I', b'WDBC', 2, 1, 4, 1) + b'\0' * 9)
+        file = self.write('dbc/ChrRaces.dbc1-Esteria', struct.pack('<4s4I', b'WDBC', 2, 69, 276, 1) + b'\0' * 553)
         assets.check_dbc(file)
         file.write_bytes(file.read_bytes()[:-1])
         with self.assertRaisesRegex(ValueError, 'declared length'):
@@ -51,7 +51,7 @@ class AssetPreflightTests(unittest.TestCase):
             assets.check_mmtile(file)
 
     def test_complete_synthetic_format_set_is_not_gameplay_qualification(self):
-        self.write('dbc/ChrRaces.dbc1-Esteria', struct.pack('<4s4I', b'WDBC', 0, 1, 4, 1) + b'\0')
+        self.write('dbc/ChrRaces.dbc1-Esteria', struct.pack('<4s4I', b'WDBC', 0, 69, 276, 1) + b'\0')
         self.write('maps/0000000.map', struct.pack('<4s10I', b'MAPS', 9, 12340, *([0] * 8)))
         self.write('vmaps/000.vmtree', b'VMAP_4.8')
         self.write('mmaps/000.mmap', b'\0' * 28)

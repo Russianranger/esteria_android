@@ -28,6 +28,11 @@ on:
       - 'tools/provider_server_data_tools.py'
       - 'tools/prepare_data_tools_provider.py'
       - 'tools/measure_server_data_tools.py'
+      - 'runtime/server-components-publication/dependency-release.lock.json'
+      - 'runtime/server-components-publication/published-release.json'
+      - 'runtime/server-components-publication/public-source-readback.json'
+      - 'tools/fetch_local_server_profile.py'
+      - 'tests/test_public_local_server_profile.py'
       - '.github/workflows/android-local-game-profile.yml'
 permissions:
   contents: read
@@ -41,6 +46,8 @@ jobs:
     outputs:
       selected: ${{ steps.profile.outputs.selected }}
       recipe: ${{ steps.profile.outputs.recipe }}
+      server_source: ${{ steps.profile.outputs.server_source }}
+      server_recipe: ${{ steps.profile.outputs.server_recipe }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -54,6 +61,10 @@ jobs:
           wine=json.loads(Path('runtime/runtime-sources.lock.json').read_bytes())['packages']['wine-arm64']
           environment=wine.get('wineEnvironment',{})
           assert type(environment) is dict and environment in ({},{'WINE_ANDROID_PRIVATE_PE_COPY':'1'})
+          from tools.fetch_local_server_profile import selection
+          server=selection()
+          print('server_source='+server['source'])
+          print('server_recipe='+(server['recipeRevision'] or ''))
           selected=bool(environment)
           print('selected='+str(selected).lower())
           if selected:
@@ -91,6 +102,12 @@ jobs:
           ref: ${{ needs.selection.outputs.recipe }}
           path: source-packaging
           persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        if: needs.selection.outputs.server_source == 'public-release'
+        with:
+          ref: ${{ needs.selection.outputs.server_recipe }}
+          path: server-source-packaging
+          persist-credentials: false
       - name: Recover original producer source history in the separate frozen recipe checkout
         working-directory: source-packaging
         run: git fetch --no-tags --depth 1 origin 75f50445112818c97f8d8e575d2b1c21e59af6e5
@@ -100,11 +117,37 @@ jobs:
           python3 -m unittest tests.test_wine_cohort_apk tests.test_public_wine_cohort \
             tests.test_server_provider_qualification tests.test_combined_android \
             tests.test_playerbots_programs_provider tests.test_playerbots_programs_qualification \
-            tests.test_server_data_tools_provider tests.test_qualified_data_tools_inputs -v
+            tests.test_server_data_tools_provider tests.test_qualified_data_tools_inputs \
+            tests.test_public_local_server_profile -v
           python3 tools/fetch_sources.py client --output sources
           git fetch --no-tags --depth 1 origin 75f50445112818c97f8d8e575d2b1c21e59af6e5
           git fetch --no-tags --depth 1 origin 681b2e9f30b19e94bf8e8de44f67fedba5033c8a
+      - name: Select provider paths without changing either exact input profile
+        env:
+          SERVER_INPUT_SOURCE: ${{ needs.selection.outputs.server_source }}
+        run: |
+          case "$SERVER_INPUT_SOURCE" in
+            public-release)
+              echo "SERVER_STOCK_PROVIDERS=$RUNNER_TEMP/public-server-providers" >> "$GITHUB_ENV"
+              echo "SERVER_HELPER_PROGRAMS_PROVIDER=$RUNNER_TEMP/public-server-providers/programs" >> "$GITHUB_ENV"
+              echo "SERVER_DATA_TOOLS_PROVIDER=$RUNNER_TEMP/public-server-providers/data-tools" >> "$GITHUB_ENV"
+              ;;
+            retained-actions)
+              echo "SERVER_STOCK_PROVIDERS=$RUNNER_TEMP/stock-providers" >> "$GITHUB_ENV"
+              echo "SERVER_HELPER_PROGRAMS_PROVIDER=$RUNNER_TEMP/helper-programs-providers/programs" >> "$GITHUB_ENV"
+              echo "SERVER_DATA_TOOLS_PROVIDER=$RUNNER_TEMP/data-tools-providers/provider" >> "$GITHUB_ENV"
+              ;;
+            *) exit 2 ;;
+          esac
+      - name: Restore all four exact public server providers through their frozen source recipe
+        if: needs.selection.outputs.server_source == 'public-release'
+        run: |
+          env -u GITHUB_TOKEN -u GH_TOKEN python3 tools/fetch_local_server_profile.py acquire \
+            --packaging-source "$GITHUB_WORKSPACE/server-source-packaging" \
+            --output "$RUNNER_TEMP/server-public-inputs" --providers "$RUNNER_TEMP/public-server-providers" \
+            > out/coherent-evidence/public-server-acquisition.json
       - name: Acquire qualified complete stock server sources and debug pairs before other large inputs
+        if: needs.selection.outputs.server_source == 'retained-actions'
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
@@ -117,6 +160,7 @@ jobs:
           # Build verified all complete source/debug copies retained under providers.
           rm -rf "$RUNNER_TEMP/stock-inputs"
       - name: Acquire the registered SQL-qualified helper and complete corresponding sources
+        if: needs.selection.outputs.server_source == 'retained-actions'
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
@@ -131,6 +175,7 @@ jobs:
           # the self-contained optional provider. Preserve those copies below.
           rm -rf "$RUNNER_TEMP/helper-programs-inputs"
       - name: Acquire and reproduce qualified composed data tools without a server rebuild
+        if: needs.selection.outputs.server_source == 'retained-actions'
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
@@ -201,9 +246,9 @@ jobs:
             -PshaderToolsProviderDir="$RUNNER_TEMP/cohort-providers/shader-provider-verified" \
             -PturnipProviderDir="$RUNNER_TEMP/cohort-providers/turnip-provider" \
             -PserverProgramsProfile=playerbots-schema-helper \
-            -PserverProgramsProviderDir="$RUNNER_TEMP/helper-programs-providers/programs" \
-            -PserverDataToolsProviderDir="$RUNNER_TEMP/data-tools-providers/provider" \
-            -PserverContentProviderDir="$RUNNER_TEMP/stock-providers/content" \
+            -PserverProgramsProviderDir="$SERVER_HELPER_PROGRAMS_PROVIDER" \
+            -PserverDataToolsProviderDir="$SERVER_DATA_TOOLS_PROVIDER" \
+            -PserverContentProviderDir="$SERVER_STOCK_PROVIDERS/content" \
             -PclientRuntimeArtifact="$RUNNER_TEMP/cohort-inputs/release/client-original.zip" \
             -PclientRuntimeSource="$GITHUB_WORKSPACE/sources/client" 2>&1 | tee out/coherent-logs/gradle.log
       - name: Install the complete selected server provider profile on a bounded Java heap
@@ -212,9 +257,9 @@ jobs:
           javac -cp core/build/classes/java/main -d out/java-reference tests/ServerArchiveInstallReference.java
           for component in programs data-tools content dependencies; do
             case "$component" in
-              programs) provider="$RUNNER_TEMP/helper-programs-providers/programs" ;;
-              data-tools) provider="$RUNNER_TEMP/data-tools-providers/provider" ;;
-              content) provider="$RUNNER_TEMP/stock-providers/content" ;;
+              programs) provider="$SERVER_HELPER_PROGRAMS_PROVIDER" ;;
+              data-tools) provider="$SERVER_DATA_TOOLS_PROVIDER" ;;
+              content) provider="$SERVER_STOCK_PROVIDERS/content" ;;
               dependencies) provider="$RUNNER_TEMP/server-provider" ;;
             esac
             python3 tools/qualify_server_providers.py java-manifest --provider "$provider" \
@@ -255,10 +300,10 @@ jobs:
             --proot-provider "$RUNNER_TEMP/proot-build/provider" \
             --proot-sources "$RUNNER_TEMP/proot-build/proot-corresponding-source.tar.gz" \
             --ndk-archive "$RUNNER_TEMP/android-ndk-r28c-linux.zip" \
-            --server-providers "$RUNNER_TEMP/stock-providers" --dependency-provider "$RUNNER_TEMP/server-provider" \
+            --server-providers "$SERVER_STOCK_PROVIDERS" --dependency-provider "$RUNNER_TEMP/server-provider" \
             --server-profile local-game \
-            --playerbots-programs-provider "$RUNNER_TEMP/helper-programs-providers/programs" \
-            --data-tools-provider "$RUNNER_TEMP/data-tools-providers/provider" \
+            --playerbots-programs-provider "$SERVER_HELPER_PROGRAMS_PROVIDER" \
+            --data-tools-provider "$SERVER_DATA_TOOLS_PROVIDER" \
             --output out/coherent-evidence/coherent-apk.json
           git archive --format=tar.gz --output="$RUNNER_TEMP/coherent-integration-source.tar.gz" "$GITHUB_SHA"
       - name: Retain the unqualified complete-provider APK and exact source-selection proof
@@ -313,7 +358,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: local-game-helper-program-source-debug-${{ github.sha }}
-          path: ${{ runner.temp }}/helper-programs-providers/programs/sources/
+          path: ${{ env.SERVER_HELPER_PROGRAMS_PROVIDER }}/sources/
           include-hidden-files: true
           compression-level: 0
           retention-days: 30
@@ -323,7 +368,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: local-game-original-stock-extractors-source-debug-${{ github.sha }}
-          path: ${{ runner.temp }}/stock-providers/extractors/sources/
+          path: ${{ env.SERVER_STOCK_PROVIDERS }}/extractors/sources/
           include-hidden-files: true
           compression-level: 0
           retention-days: 30
@@ -333,7 +378,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: local-game-data-tools-source-debug-${{ github.sha }}
-          path: ${{ runner.temp }}/data-tools-providers/provider/sources/
+          path: ${{ env.SERVER_DATA_TOOLS_PROVIDER }}/sources/
           include-hidden-files: true
           compression-level: 0
           retention-days: 30
