@@ -1,0 +1,89 @@
+name: Local database bootstrap
+on:
+  push:
+    branches: [android/client-server]
+    paths:
+      - runtime/mysql_bootstrap.py
+      - tests/test_mysql_bootstrap.py
+      - .github/workflows/database.yml
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  initialize:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      ESTERIA_MYSQL_INITIALIZE: '1'
+      ESTERIA_MYSQLD_PATH: /usr/sbin/mysqld
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Install real host MySQL for initialization qualification
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mysql-server mysql-client
+          sudo systemctl stop mysql
+          if test -f /etc/apparmor.d/usr.sbin.mysqld; then
+            sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld || true
+          fi
+          dpkg-query -W 'mysql*' > mysql-host-packages.txt
+      - name: Record exact diagnostic engine version
+        shell: python
+        run: |
+          import os, re, subprocess
+          result = subprocess.run(['/usr/sbin/mysqld', '--no-defaults', '--version'],
+                                  check=True, capture_output=True, text=True)
+          match = re.search(r'\bVer ([^\s]+)', result.stdout)
+          if not match:
+              raise RuntimeError('Cannot identify installed MySQL engine')
+          with open(os.environ['GITHUB_ENV'], 'a') as output:
+              output.write('ESTERIA_MYSQL_INITIALIZE_VERSION=' + match[1] + '\n')
+          with open('mysql-host-version.txt', 'w') as output:
+              output.write(result.stdout)
+      - name: Initialize, secure, promote, restart and verify persistent SQL data
+        run: python3 -m unittest discover -s tests -p test_mysql_bootstrap.py -v
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: mysql-host-qualification-${{ github.sha }}
+          path: |
+            mysql-host-version.txt
+            mysql-host-packages.txt
+          retention-days: 14
+  mysql:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      ESTERIA_MYSQL_VERSION: 8.0.44
+      ESTERIA_MYSQL_INTEGRATION: '1'
+      ESTERIA_MYSQL_ADMIN_OPTIONS: /tmp/esteria-mysql-admin.cnf
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Install SQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mysql-client
+      - name: Start dedicated loopback MySQL 8 fixture
+        shell: python
+        run: |
+          import os, pathlib, secrets, subprocess
+          password = secrets.token_hex(32)
+          config = pathlib.Path(os.environ['ESTERIA_MYSQL_ADMIN_OPTIONS'])
+          fd = os.open(config, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+          with os.fdopen(fd, 'w') as output:
+              output.write('[client]\nuser=root\npassword=' + password + '\n')
+          environment = dict(os.environ, MYSQL_ROOT_PASSWORD=password, MYSQL_ROOT_HOST='127.0.0.1')
+          subprocess.run(['docker', 'run', '--detach', '--name', 'esteria-mysql-test', '--network', 'host',
+                          '--env', 'MYSQL_ROOT_PASSWORD', '--env', 'MYSQL_ROOT_HOST',
+                          'mysql:' + os.environ['ESTERIA_MYSQL_VERSION'],
+                          '--port=13306', '--bind-address=127.0.0.1', '--mysqlx=OFF',
+                          '--innodb-buffer-pool-size=128M', '--performance-schema=OFF'],
+                         env=environment, check=True)
+      - name: Test real authentication, provisioning, locks and persistence
+        run: python3 -m unittest discover -s tests -p test_mysql_bootstrap.py -v
+      - name: Remove fixture and credential
+        if: always()
+        run: |
+          docker rm --force --volumes esteria-mysql-test || true
+          rm -f "$ESTERIA_MYSQL_ADMIN_OPTIONS"

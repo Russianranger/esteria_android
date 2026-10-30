@@ -1,7 +1,9 @@
 # Local server integration contract
 
-This is a source-verified setup contract and host-tested configuration renderer.
-It is not an installed or qualified Android runtime. No database has been initialized.
+This is a source-verified setup contract, host-tested configuration renderer and
+database bootstrap implementation. It is not an installed or qualified Android
+runtime. Real MySQL behavior has a dedicated CI test; check that run before claiming
+engine qualification. No game schemas or player accounts are populated by bootstrap.
 
 ## Pinned foundation
 
@@ -55,10 +57,11 @@ measurements are required before raising the ceiling.
    these local paths. `DBUpdater<PlayerbotsDatabaseConnection>` specifically reads
    `modules/mod-playerbots/data/sql/playerbots/base`. `cmake --install` alone does
    not establish this complete content package.
-3. Initialize a new database in staged storage with MySQL 8's supported procedure;
-   provision the persistent local `esteria` user and privileges for `acore_auth`,
-   `acore_world`, `acore_characters`, `acore_playerbots`. Secure root before opening
-   normal TCP service. Never rerun initialization over an existing data directory.
+3. Use `runtime/mysql_bootstrap.py` to initialize a new staged MySQL 8 instance,
+   secure root before TCP service, and provision the persistent local `esteria`
+   account for four empty databases. See the command contract below. Dedicated CI
+   exercises both fresh engine initialization and provisioning against a separately
+   started MySQL service. Check completed CI results for actual qualification.
 4. Execute schema initialization/update through the compiled updater with
    `AC_DISABLE_INTERACTIVE=1`; check exit and prepared-statement validation.
    Back up persistent databases before schema upgrades and record successful source
@@ -70,6 +73,73 @@ measurements are required before raising the ceiling.
    then client. Stop client/world/auth before MySQL. World installs SIGINT/SIGTERM
    handlers and its network teardown kicks/saves characters, but real shutdown and
    recovery must be tested before claiming persistence.
+
+## Database bootstrap command contract
+
+Run under the installation owner with umask 0077, after rendering configuration.
+The Python 3 standard-library script is intended for the eventual glibc runtime;
+Python, MySQL and that runtime are not yet packaged by the application. The example
+pin below is the exact version used by `.github/workflows/database.yml`; a runtime
+release must pin its MySQL binary and libraries separately too.
+Distribution suffixes are supported and must be pinned verbatim, for example
+`8.0.44-0ubuntu0.24.04.2`; bootstrap never strips them or compares only a prefix.
+
+```sh
+python3 runtime/mysql_bootstrap.py initialize \
+  --state-root /esteria/state --mysql /usr/bin/mysql --mysqld /usr/sbin/mysqld \
+  --expected-version 8.0.44
+```
+
+Initialization uses an installation-specific staging directory and a private Unix
+socket with TCP disabled. The server executable version, live SQL version/UUID and
+SQL datadir must agree with the owned staging instance before credentials change.
+Root credentials persist privately in `state/accounts/database-root-secret`; the
+application account uses the renderer's existing `database-secret`. Passwords are
+passed through mode-0600 temporary option files or SQL stdin, never argv or logs.
+Bootstrap creates only `acore_auth`, `acore_world`, `acore_characters`, and
+`acore_playerbots`, with local-only `esteria` accounts and per-database grants.
+It imports no tables, realm, player accounts or bot accounts.
+
+After a clean stop, staging is atomically renamed to `state/database`; an atomic
+receipt records engine version, UUID, absolute datadir and the four database names. An interrupted
+rename can finish its receipt only when the owned journal, staged receipt and
+promoted datadir UUID agree. Interrupted `--initialize`, unowned nonempty datadirs,
+unidentified sockets/PIDs, version changes and credential mismatches fail closed
+and preserve storage for recovery. Do not remove these safeguards to retry.
+Initialized staging can resume without calling `--initialize` again.
+
+Start MySQL under the process supervisor using the rendered `mysql.cnf`, which
+binds exclusively to `127.0.0.1:13306`. Then run:
+
+```sh
+python3 runtime/mysql_bootstrap.py verify \
+  --state-root /esteria/state --mysql /usr/bin/mysql --expected-version 8.0.44
+```
+
+`verify` authenticates as the persistent application account, matches the stored
+instance/version, verifies the loopback listener, and executes SQL in all four
+databases. A completed initialization receipt alone never reports SQL readiness.
+For a dedicated externally started empty instance, `provision --admin-options
+/private/admin.cnf` uses the same rules, plus a server-side advisory lock. It
+refuses to adopt preexisting Esteria databases/accounts without its own pending
+receipt. The CLI's filesystem lock also serializes operations for one installation.
+
+Host tests cover filesystem ownership, credentials, serialization and interrupted
+promotion. A separate CI job installs Ubuntu's current MySQL 8 package, records the
+full binary version/package versions, and exercises fresh initialization, private
+SQL bootstrap, clean stop, promotion, reconstructed promotion-interruption recovery,
+TCP readiness and marker-table persistence over two starts. This is host diagnostics
+against recorded runner packages, not a reproducibly packaged runtime dependency.
+The dedicated runner's system MySQL is stopped and its AppArmor profile unloaded
+for the test's private temporary datadir; this is not an Android deployment step.
+
+The explicit upstream MySQL 8.0.44 service test covers real authentication, empty DB
+creation, interrupted pre-DDL ownership, repeat provisioning, lock rejection,
+version/UUID/credential failure and preservation of a marker table. It runs only
+when `ESTERIA_MYSQL_INTEGRATION=1`, with a disposable loopback instance. Ordinary
+unit discovery reports both engine tests as skipped. Neither job qualifies Android
+execution, application schemas, backups/upgrades, world-server persistence or
+character saving.
 
 ## Evidence
 
