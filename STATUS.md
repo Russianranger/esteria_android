@@ -92,8 +92,12 @@ qualify exclusive cache publication or ARM64 semantics.
    receipts and82P/current-code pins are independently read;1,969,017,146B complete
    artifact remains local-metadata-only. Descriptor SHA666e7589d50175510070afe78e5a9af4aa7895928bd97b546370604e246c2359.
    Genuine measured provider/transport selectors are now enabled for the test-only
-   Android four-schema fixture. Run its full source/product acquisition, build,
-   initialization/promotion/restart; no Android SQL success exists yet. Production
+   Android four-schema fixture. Actual run41143986520@995 passes full source/
+   product acquisition, APK build/install and emulator admission, then fails
+   instrumentation after50.059s. The original collector discarded the private
+   failure before reading its receipt; exact SQL phase is unknown. The preserved
+   negative proof and qualifier-only bounded phase/source-frame collector fix
+   support a fresh rerun. All82 measured code pins remain byte-identical; production
    ARM64 admission and five save-selection fields remain unchanged.
 3. Preserve actual Android input-widget41138732113 success and its prior test-
    toolbar failure. Physical controller/kernel input, Wine and gameplay remain

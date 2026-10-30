@@ -1,0 +1,237 @@
+{
+  "activationSource": {
+    "sourceArchive": {
+      "bytes": 2776200,
+      "sha256": "bd7a902dacdaa9bcac87780ccc510a93f9f1704ca3365c64bcdfd606a90916f2"
+    },
+    "sourceFileBytes": 11290012,
+    "sourceFiles": 1109,
+    "sourceRevision": "9959658f0653e5caa82a6435b7ed0c72fc6af86c"
+  },
+  "actualFourSchemaSqlExecutionEstablished": false,
+  "actualJobStepConclusions": [
+    {
+      "conclusion": "success",
+      "name": "Read every independently measured provider and original source artifact byte",
+      "number": 5
+    },
+    {
+      "conclusion": "success",
+      "name": "Build only the measured x64 coordinator fixture from exact activation source Q",
+      "number": 8
+    },
+    {
+      "conclusion": "success",
+      "name": "Export complete source Q separately from the measured provider producer P",
+      "number": 9
+    },
+    {
+      "conclusion": "success",
+      "name": "Enable KVM for the disposable x64 emulator",
+      "number": 10
+    },
+    {
+      "conclusion": "failure",
+      "name": "Execute the actual retained coordinator, four schemas, promotion and same-instance restart",
+      "number": 11
+    },
+    {
+      "conclusion": "success",
+      "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+      "number": 12
+    },
+    {
+      "conclusion": "success",
+      "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+      "number": 13
+    },
+    {
+      "conclusion": "success",
+      "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+      "number": 14
+    }
+  ],
+  "allSmallArtifactZipBytesReadBack": true,
+  "androidX64CoordinatorQualified": false,
+  "apkAndCurrentSourceArtifact": {
+    "bytes": 298037375,
+    "downloadedLocally": false,
+    "id": 13020715321,
+    "sha256": "ba90f65e57b4602310a8591ddf03de1e13e4bbd67d0eece26a4806f124c2a4ed"
+  },
+  "authserverExecuted": false,
+  "characterPersistenceQualified": false,
+  "commandResults": [
+    {
+      "elapsedMilliseconds": 4,
+      "exitCode": 0,
+      "role": "serial"
+    },
+    {
+      "elapsedMilliseconds": 32,
+      "exitCode": 0,
+      "role": "ro.kernel.qemu"
+    },
+    {
+      "elapsedMilliseconds": 65,
+      "exitCode": 0,
+      "role": "ro.build.version.sdk"
+    },
+    {
+      "elapsedMilliseconds": 33,
+      "exitCode": 0,
+      "role": "ro.product.cpu.abi"
+    },
+    {
+      "elapsedMilliseconds": 32,
+      "exitCode": 0,
+      "role": "ro.build.fingerprint"
+    },
+    {
+      "elapsedMilliseconds": 65,
+      "exitCode": 1,
+      "role": "preexisting-app"
+    },
+    {
+      "elapsedMilliseconds": 65,
+      "exitCode": 1,
+      "role": "preexisting-tests"
+    },
+    {
+      "elapsedMilliseconds": 2975,
+      "exitCode": 0,
+      "role": "install-app"
+    },
+    {
+      "elapsedMilliseconds": 416,
+      "exitCode": 0,
+      "role": "install-tests"
+    },
+    {
+      "elapsedMilliseconds": 50059,
+      "exitCode": 0,
+      "role": "instrument"
+    },
+    {
+      "elapsedMilliseconds": 65,
+      "exitCode": 0,
+      "role": "stop-owned-fixture"
+    }
+  ],
+  "completeProductDownloadedLocally": false,
+  "currentSourceExportVerifiedInCi": true,
+  "debugApkAndroidTestBuildAndLintPassedInCi": true,
+  "emulatorProperties": {
+    "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+    "ro.build.version.sdk": "33",
+    "ro.kernel.qemu": "1",
+    "ro.product.cpu.abi": "x86_64"
+  },
+  "everySmallArtifactMemberCrcAndSha256Verified": true,
+  "evidenceArtifact": {
+    "bytes": 253998,
+    "id": 13020905038,
+    "sha256": "b5f28bd26d650d514a1a6397f472a6814bb27d5c8d16cbc70b8d2312c968fcd9"
+  },
+  "failure": {
+    "collectorFailureType": "ValueError",
+    "exactJavaExceptionOrAssertionAvailable": false,
+    "failedAppReceiptCollected": false,
+    "instrumentationElapsedMilliseconds": 50059,
+    "instrumentationExitCode": 0,
+    "instrumentationPassed": false,
+    "limitation": "The original collector rejected unsuccessful instrumentation before reading the fixed failed-app receipt. Private raw instrumentation output was deleted with temporary storage; this artifact does not establish the Java assertion, guest failure, or SQL phase.",
+    "phase": "actual-four-schema-coordinator"
+  },
+  "formatVersion": 1,
+  "fullMeasuredProviderAndOriginalSourceAcquisitionPassedInCi": true,
+  "gameplayQualified": false,
+  "historicalJavaServiceEvidenceAppliesToCurrentCaller": false,
+  "hostDiagnosticFollowup": {
+    "androidExecuted": false,
+    "currentExecutableSourcesStillMatchMeasuredProvider": true,
+    "diffCheckPassed": true,
+    "elapsedSeconds": 0.53,
+    "measuredProviderExecutableSourceFiles": 82,
+    "passed": 21,
+    "scope": "host-negative-collector-privacy-and-fixed-path-regression-only",
+    "sourceInputs": {
+      "tests/test_android_installation_x64_qualification.py": {
+        "bytes": 23577,
+        "sha256": "135f7058b3b3995cff2629f3700042c7fd092ab1384941a230e6477fc834b102"
+      },
+      "tools/qualify_android_installation_x64.py": {
+        "bytes": 35060,
+        "sha256": "c9aa2c79ca94ced437ca78de84ff1732e5a71edfea717f22bb52fe652de8c37a"
+      }
+    },
+    "testCommand": "python3 -m unittest tests.test_android_installation_x64_qualification -q",
+    "tests": 21
+  },
+  "nativeInputSelection": {
+    "bytes": 3333,
+    "sha256": "b4761fa5f6b1de914637c17f4248872b8749565738efb4e0098c8e13d4c4540a"
+  },
+  "nativeSqlReceipt": {
+    "bytes": 19483,
+    "sha256": "44448b43339efeaf6dad1421261c74c9fceab979779d1c70ae8a063907b76fed"
+  },
+  "nextAction": "Publish a qualifier-only collector fix that retains validated failed-app phase/type and source-only Java/Python locations before force-stop, then repeat this same measured provider on a fresh emulator. Main Java/guest code and all provider source-byte bindings remain unchanged.",
+  "originalSourcePreservationArtifact": {
+    "bytes": 1777732498,
+    "downloadedLocally": false,
+    "id": 13020545992,
+    "sha256": "b3152abba90dffb80f45b8a7357d51eb355a871e8f5c86ec4c2472b7dab7072a"
+  },
+  "playerbotsAiQualified": false,
+  "producer": {
+    "conclusion": "failure",
+    "integrationRevision": "9959658f0653e5caa82a6435b7ed0c72fc6af86c",
+    "job": 124364696182,
+    "status": "completed",
+    "workflow": ".github/workflows/android-server-installation-x64.yml",
+    "workflowRun": 41143986520
+  },
+  "productionArm64ProviderQualified": false,
+  "providerDescriptor": {
+    "bytes": 26368,
+    "sha256": "666e7589d50175510070afe78e5a9af4aa7895928bd97b546370604e246c2359"
+  },
+  "providerMeasurementRevision": "fff2111453ac619d63feb779a67df0e760ee6e41",
+  "rawMembers": {
+    "evidence/qualification.json": {
+      "bytes": 298675,
+      "sha256": "7b754afea52a79b78692b0f4f5e69b0347d1f785b2e6c0b2275386ace026c0dd"
+    },
+    "evidence/source-companion.json": {
+      "bytes": 282139,
+      "sha256": "6ae5ed99db309de398f56f836a62077deee1295c6e1c7bf8408110f6de6c3649"
+    },
+    "inputs/acquisition.json": {
+      "bytes": 272000,
+      "sha256": "6d6eb2f5880f4815b96316f7acdc18d18b84803845bd83086c81514fbf2d8e67"
+    }
+  },
+  "scope": "actual-android13-x64-four-schema-coordinator-failure-readback",
+  "serverDataQualified": false,
+  "slotPromotionEstablished": false,
+  "thorQualified": false,
+  "verifiedApksInCi": {
+    "apk": {
+      "bytes": 293175985,
+      "sha256": "635615d9c0c22eb09c504d0715da64f646caa4b7222ab3809cbdcf3efd7aac99"
+    },
+    "apkBuiltForActivationRevision": "9959658f0653e5caa82a6435b7ed0c72fc6af86c",
+    "compiledProviderSha256": "666e7589d50175510070afe78e5a9af4aa7895928bd97b546370604e246c2359",
+    "currentDatabaseHelperBytesVerified": true,
+    "defaultPackageVerified": true,
+    "exactSelectedAssetsVerified": true,
+    "fixedTestClassVerified": true,
+    "targetSdk": 35,
+    "testApk": {
+      "bytes": 1802517,
+      "sha256": "8c7e305a3b8a05e26b56bb827124af969516b7d18938178b7f258247a8f1743a"
+    }
+  },
+  "worldserverExecuted": false
+}

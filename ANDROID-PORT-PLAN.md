@@ -59,9 +59,10 @@ A passed component test, compiled EXE, built APK or listening TCP port does not 
 
 
 Current order: original x64 dbimport/helper41119182502 passed its full1850-object
-closure. Its actual native four-schema SQL41139757153 now passes; provider measurement41141559961 now passes; actual Android four-schema execution is next. Complete the
-disabled Android qualification provider/fixture and its ownership/source review,
-then run real Android four-schema promotion/restart. Historical817 MySQL bytes
+closure. Its actual native four-schema SQL41139757153 now passes; provider measurement41141559961 now passes; actual Android four-schema run41143986520 now builds/installs but fails before
+its old collector can preserve the private assertion. The measured fixture is
+enabled. Rerun with bounded failure diagnostics, fix the observed cause, then
+qualify real Android four-schema promotion/restart. Historical817 MySQL bytes
 must be admitted from their exact frozen source; current Java inherits no old
 runtime proof. Keep production ARM64 admission and the five save-selection fields.
 

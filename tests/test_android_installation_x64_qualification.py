@@ -183,8 +183,9 @@ class AndroidInstallationQualification(unittest.TestCase):
         calls = []
         def command(words, destination, timeout, limit):
             calls.append(words)
-            result = responses(len(calls), words)
-            return result
+            if 'force-stop' in words: return 0, ''
+            try: return responses(len(calls), words)
+            except IndexError: return 1, ''  # Best-effort diagnostic fixture is unavailable.
         def small(path, maximum): return mysql if 'mysql-probe' in str(path) else programs
         with patch.object(qualification, '_inputs', return_value=(selected, descriptor, native)), \
                 patch.object(qualification, 'source_snapshot', return_value={'hostNegativeFixtureOnly': True}), \
@@ -220,6 +221,98 @@ class AndroidInstallationQualification(unittest.TestCase):
         self.assertEqual(report['phase'], 'private-receipt-validation'); self.assertNotIn('appEvidence', report)
         for path in output.iterdir():
             self.assertNotIn('not-for-artifacts', path.read_text()); self.assertNotIn('/private/foreign', path.read_text())
+
+    def test_private_java_output_exports_only_known_classes_and_owned_source_line_locations(self):
+        owner = qualification.PACKAGE + '.runtime.ServerInstallationSetup'
+        raw = ('INSTRUMENTATION_STATUS: stack=java.io.IOException: password=NEVER_EXPORT /private/db\n'
+            '\tat ' + owner + '$Handle.secretValue(ServerInstallationSetup.java:42)\n'
+            '\tat ' + owner + '.method(/private/foreign.java:4)\n'
+            '\tat foreign.password.Secret.method(Secret.java:4)\n'
+            'Caused by: java.lang.AssertionError: nonce=NEVER_EXPORT\n'
+            'private.username.Exception: NEVER_EXPORT\n')
+        observed = qualification.java_failure_locations(raw)
+        self.assertEqual(observed['exceptionTypes'], ['java.io.IOException', 'java.lang.AssertionError'])
+        self.assertEqual(observed['sourceFrames'], [dict(className=owner, file='ServerInstallationSetup.java', line=42)])
+        self.assertNotIn('NEVER_EXPORT', json.dumps(observed)); self.assertNotIn('secretValue', json.dumps(observed))
+        self.assertNotIn('/private', json.dumps(observed))
+
+    def test_failed_private_receipt_projects_exact_identity_phase_and_classes_never_private_extras(self):
+        *_, provider_pin, original = fixture()
+        value = dict(original, qualificationSucceeded=False, phase='fresh-core-sql', failureType='IOException',
+            cleanupFailureType='AssertionError', privateCredentials='NEVER_EXPORT', callerPath='/private/foreign', pid=4567)
+        observed = qualification.failed_app_receipt(json.dumps(value), 'a' * 40, provider_pin)
+        self.assertEqual(observed, dict(sourceRevision='a' * 40, providerSha256=provider_pin['sha256'],
+            phase='fresh-core-sql', qualificationSucceeded=False, failureType='IOException', cleanupFailureType='AssertionError'))
+        for change in (dict(sourceRevision='b' * 40), dict(providerSha256='0' * 64), dict(phase='NEVER_EXPORT'),
+                dict(failureType='NEVER_EXPORT'), dict(cleanupFailureType='/private/path'), dict(api=True), dict(gameplayQualified=True)):
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                qualification.failed_app_receipt(json.dumps(dict(value, **change)), 'a' * 40, provider_pin)
+
+    def test_guest_log_discards_messages_paths_queries_and_unknown_helper_symbols(self):
+        raw = ('Traceback (most recent call last):\n'
+            '  File "/work/helpers/' + 'a' * 64 + '/mysql_bootstrap.py", line 42, in privateSecretMethod\n'
+            '  File "/private/password/foreign.py", line 42, in main\n'
+            'PermissionError: [Errno 13] NEVER_EXPORT credentials=/private/db\n'
+            'Database setup failed (PermissionError; errno=13; helperFrames=main:98,setup:42,NEVER_EXPORT:9); persistent state was preserved for recovery\n'
+            'Local database service failed (BootstrapError); private value NEVER_EXPORT\n')
+        observed = qualification.guest_failure_locations(raw)
+        self.assertEqual(observed['exceptionTypes'], ['BootstrapError', 'PermissionError'])
+        self.assertEqual(observed['sourceFrames'], [dict(module='mysql_bootstrap.py', line=42)])
+        self.assertEqual(observed['helperFrames'], [dict(function='main', line=98), dict(function='setup', line=42)])
+        self.assertEqual(observed['errno'], [13]); self.assertNotIn('NEVER_EXPORT', json.dumps(observed))
+        self.assertNotIn('/private', json.dumps(observed)); self.assertNotIn('privateSecretMethod', json.dumps(observed))
+
+    def test_diagnostics_use_only_fixed_log_families_and_strict_owned_operation_paths(self):
+        *_, provider_pin, original = fixture(); calls = []
+        failed = dict(original, qualificationSucceeded=False, phase='fresh-core-sql', failureType='IOException', secret='NEVER_EXPORT')
+        def command(label, words, *, timeout):
+            self.assertGreater(timeout, 0); self.assertLessEqual(timeout, 15)
+            calls.append((label, words))
+            if label == 'failed-app-receipt': return json.dumps(failed)
+            if label.startswith('guest-inventory-'):
+                family = words[4].split('/')[-1]
+                return '\n'.join(['files/state/' + family + '/' + 'b' * 32 + '/logs/stderr.log',
+                    'files/state/' + family + '/../accounts/database-secret',
+                    'files/state/' + family + '/' + 'b' * 32 + '/logs/engine-private.log',
+                    'files/state/' + family + '/1234/logs/stdout.log', '/private/NEVER_EXPORT'])
+            return 'Database setup failed (PermissionError; errno=13; helperFrames=setup:42); NEVER_EXPORT\n'
+        observed = qualification.failure_diagnostics(command, 'java.io.IOException: NEVER_EXPORT\n', 'a' * 40, provider_pin)
+        self.assertFalse(observed['qualificationSucceeded']); self.assertEqual(len(observed['guest']), 3)
+        reads = [words for _, words in calls if '65536' in words]
+        self.assertEqual(len(reads), 3)
+        for words, family in zip(reads, qualification.LOG_FAMILIES):
+            self.assertEqual(words, ['exec-out', 'run-as', qualification.PACKAGE, 'head', '-c', '65536',
+                'files/state/' + family + '/' + 'b' * 32 + '/logs/stderr.log'])
+        self.assertNotIn('b' * 32, json.dumps(observed)); self.assertNotIn('NEVER_EXPORT', json.dumps(observed))
+        self.assertNotIn('engine-private', json.dumps(observed)); self.assertNotIn('database-secret', json.dumps(observed))
+        self.assertFalse(any('(' in words or ')' in words for _, words in calls))
+
+    def test_expired_diagnostic_budget_stops_reads_without_changing_failure_scope(self):
+        *_, provider_pin, _ = fixture()
+        with patch.object(qualification.time, 'monotonic', side_effect=[0, 46, 46]), \
+                patch('builtins.print'), patch.object(qualification, 'java_failure_locations', return_value={}), \
+                patch.object(qualification, 'failed_app_receipt') as receipt:
+            calls = []
+            observed = qualification.failure_diagnostics(lambda *args, **kwargs: calls.append(args), '', 'a' * 40, provider_pin)
+        self.assertEqual(calls, []); receipt.assert_not_called()
+        self.assertTrue(observed['diagnosticBudgetExhausted']); self.assertFalse(observed['qualificationSucceeded'])
+
+    def test_failed_instrumentation_collects_safe_failure_before_unchanged_force_stop(self):
+        *_, provider_pin, original = fixture()
+        failed = dict(original, qualificationSucceeded=False, phase='fresh-core-sql', failureType='IOException', secret='NEVER_EXPORT')
+        startup = ['emulator-5554\n', '1\n', '33\n', 'x86_64\n', 'fresh-emulator-fingerprint\n', '', '', 'Success\n', 'Success\n']
+        def response(index, words):
+            if index <= len(startup): return 0, startup[index-1]
+            if 'instrument' in words: return 0, 'INSTRUMENTATION_STATUS: stack=java.io.IOException: NEVER_EXPORT\nFAILURES!!!\n'
+            if words[-1] == 'files/installation-x64-qualification.json': return 0, json.dumps(failed)
+            if 'find' in words: return 0, ''
+            return 1, 'NEVER_EXPORT'
+        calls, report, output = self.refused_device(response)
+        self.assertEqual(report['phase'], 'actual-four-schema-coordinator'); self.assertNotIn('appEvidence', report)
+        self.assertEqual(report['failureDiagnostics']['appFailure']['phase'], 'fresh-core-sql')
+        self.assertEqual(report['failureDiagnostics']['java']['exceptionTypes'], ['java.io.IOException'])
+        self.assertEqual(calls[-1][1:], ['shell', 'am', 'force-stop', qualification.PACKAGE])
+        self.assertNotIn('NEVER_EXPORT', (output / 'qualification.json').read_text())
 
 
 if __name__ == '__main__': unittest.main()

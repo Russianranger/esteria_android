@@ -46,10 +46,15 @@ Large source/build artifacts are fully verified in CI; label local-read boundari
    checked. Descriptor26368B SHA666e7589d50175510070afe78e5a9af4aa7895928bd97b546370604e246c2359.
    Complete artifact13019200327 is1,969,017,146B and NOT read locally; full CI
    source/product readback and mandatory downstream acquisition remain explicit.
-   Measured provider/transport selectors are now enabled. Inspect actual Android
-   four-schema workflow next: full currentQ/frozenP/code/817source admission,
-   testAPK build, actual SQL/promotion/restart and receipts. Do not remeasure the
-   unchanged provider or claim Android success from selector/compile jobs.
+   Measured provider/transport selectors are enabled. Actual Android995 run
+   41143986520/job124364696182 passes complete source/product admission, build,
+   install and fresh emulator checks, then fails instrumentation after50.059s.
+   Its old collector lost the failed app receipt/raw assertion; do not invent a
+   SQL phase. See android-installation-x64-9959658f-failure.json. Qualifier-only
+   diagnostics now collect bounded validated phase/class/source frames before
+   force-stop; all82 measured code pins remain identical. Run the fresh workflow,
+   inspect this exact failure, implement its real fix and rerun. Do not remeasure
+   unchanged provider bytes or claim Android success from build/admission jobs.
 4. Android input-widget41138732113@50123a9 passes eight required groups and
    optional real registered-device ranges/camera/EOF cleanup. Preserve its actual
    proof and earlier1180 toolbar/IME-window failure. Kernel/physical delivery,

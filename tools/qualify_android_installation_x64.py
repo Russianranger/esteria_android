@@ -3,13 +3,16 @@
 
 Provider measurement P, historical runtime producers and current activation Q
 retain separate identities. No receipt from those earlier gates is Android
-coordinator execution. Private app receipts and command output are validated in
-temporary storage; database state, journals, credentials and logcat are never
-collected. A missing measured selection refuses before output or ADB activity.
+coordinator execution. Private app receipts, JUnit output and bounded wrapper
+logs are parsed in temporary storage. Only whitelisted source locations and
+failure identities are exported; no raw output, database state, journals,
+credentials or logcat enter artifacts. A missing measured selection refuses
+before output or ADB activity.
 """
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
 import json
 import os
@@ -44,6 +47,146 @@ FALSE_FLAGS = ('productionArm64ProviderQualified', 'thorQualified', 'authserverE
 HELPERS = {'database-setup': ('mysql_bootstrap.py', 'android_database_setup.py'),
     'database-service': ('mysql_bootstrap.py', 'mysql_service.py')}
 require = gate.require
+JAVA_FAILURES = {'java.io.IOException', 'java.lang.AssertionError', 'java.lang.IllegalStateException',
+    'java.lang.IllegalArgumentException', 'java.lang.SecurityException', 'java.lang.NullPointerException',
+    'java.lang.UnsatisfiedLinkError', 'java.lang.RuntimeException', 'java.lang.Exception',
+    'java.util.concurrent.CancellationException', 'java.nio.file.FileSystemException',
+    'java.nio.file.NoSuchFileException', 'java.nio.file.AccessDeniedException',
+    'java.nio.file.FileAlreadyExistsException', 'org.json.JSONException'}
+PYTHON_FAILURES = {'BootstrapError', 'SchemaCancelled', 'ContentCancelled', 'UpdateCancelled', 'FileNotFoundError',
+    'PermissionError', 'OSError', 'ValueError', 'TypeError', 'RuntimeError', 'Exception', 'JSONDecodeError',
+    'KeyError', 'AssertionError', 'OverflowError', 'UnicodeDecodeError', 'TimeoutError', 'ImportError', 'ModuleNotFoundError'}
+FAILURE_PHASES = {'fresh-core-sql', 'actual-fourth-schema', 'clean-stop-promotion', 'refuse-active-reinitialization',
+    'restart-same-instance', 'second-clean-stop', 'complete'}
+LOG_FAMILIES = ('database-operations', 'database-service-operations', 'server-installation-processes')
+
+
+def _java_sources():
+    rows = {}
+    for name in ('ServerInstallationSetup', 'ServerDatabaseSetup', 'ServerDatabaseService', 'GuestHelperAssets',
+            'ProotProcess', 'NativeProcessBridge', 'ServerSourceSelection'):
+        rows[PACKAGE + '.runtime.' + name] = 'app/src/main/java/io/github/russianranger/esteria/runtime/' + name + '.java'
+    for name in ('ServerInstallationX64Test', 'InstallationX64Inputs', 'InstallationX64Lifetime'):
+        rows[PACKAGE + '.runtime.' + name] = 'app/src/androidTest/java/io/github/russianranger/esteria/runtime/' + name + '.java'
+    for family, names in (('install', ('FreshServerInstallations', 'RuntimeInstaller', 'RuntimeFiles', 'RuntimeWork')),
+            ('process', ('OwnedProcess', 'ProotLaunch'))):
+        for name in names:
+            rows[PACKAGE + '.core.runtime.' + family + '.' + name] = 'core/src/main/java/io/github/russianranger/esteria/core/runtime/' + family + '/' + name + '.java'
+    for name in ('ExclusiveFileLease', 'ServiceOperationGuard'):
+        rows[PACKAGE + '.core.runtime.' + name] = 'core/src/main/java/io/github/russianranger/esteria/core/runtime/' + name + '.java'
+    return rows
+
+
+def _source_lines(name):
+    path = ROOT / name
+    return len(path.read_bytes().splitlines()) if path.is_file() and not path.is_symlink() and path.stat().st_size <= 256 << 10 else 0
+
+
+def java_failure_locations(raw):
+    """Keep known exception classes and source-owned locations, never messages."""
+    require(type(raw) is str and len(raw.encode()) <= 256 << 10, 'installation-private-java-output-bound')
+    kinds = set(); frames = []; sources = _java_sources()
+    for line in raw.splitlines():
+        for prefix in ('INSTRUMENTATION_STATUS: stack=', 'INSTRUMENTATION_RESULT: shortMsg=', 'Caused by: ', 'Suppressed: '):
+            if line.startswith(prefix): line = line[len(prefix):]
+        kind = re.match(r'^([A-Za-z_][A-Za-z0-9_.]*)(?::|$)', line)
+        if kind and kind[1] in JAVA_FAILURES: kinds.add(kind[1])
+        frame = re.fullmatch(r'\s*at ([A-Za-z0-9_.$]+)\.[A-Za-z0-9_$<>]+\(([A-Za-z0-9_$]+\.java):([0-9]{1,5})\)\s*', line)
+        if frame:
+            outer = frame[1].split('$', 1)[0]; source = sources.get(outer)
+            if source and Path(source).name == frame[2] and 0 < int(frame[3]) <= _source_lines(source):
+                row = dict(className=outer, file=Path(source).name, line=int(frame[3]))
+                if row not in frames and len(frames) < 32: frames.append(row)
+    return dict(exceptionTypes=sorted(kinds), sourceFrames=frames)
+
+
+def failed_app_receipt(raw, revision, provider_pin):
+    """Select only fixed identity/phase/class fields from a private failed result."""
+    require(type(raw) is str and len(raw.encode()) <= 128 << 10, 'installation-private-failed-receipt-bound')
+    value = _json(raw)
+    require(type(value) is dict and type(value.get('formatVersion')) is int and value['formatVersion'] == 1 and
+        value.get('scope') == APP_SCOPE and value.get('sourceRevision') == revision and
+        value.get('providerSha256') == provider_pin['sha256'] and type(value.get('api')) is int and value['api'] == 33 and
+        value.get('abi') == 'x86_64' and type(value.get('phase')) is str and value['phase'] in FAILURE_PHASES and
+        type(value.get('qualificationSucceeded')) is bool and all(value.get(name) is False for name in FALSE_FLAGS),
+        'installation-private-failed-receipt-identity')
+    result = dict(sourceRevision=revision, providerSha256=provider_pin['sha256'], phase=value['phase'], qualificationSucceeded=False)
+    allowed = {name.rsplit('.', 1)[-1] for name in JAVA_FAILURES}
+    for name in ('failureType', 'cleanupFailureType'):
+        if name in value:
+            require(type(value[name]) is str and value[name] in allowed, 'installation-private-failure-class-refused')
+            result[name] = value[name]
+    return result
+
+
+def guest_failure_locations(raw):
+    """Parse only known Python modules/functions, exception classes and errno."""
+    require(type(raw) is str and len(raw.encode()) <= 64 << 10, 'installation-private-guest-log-bound')
+    modules = {name: 'runtime/' + name for name in provider.HELPERS if name.endswith('.py')}
+    modules['android_database_setup.py'] = 'runtime/android_database_setup.py'
+    modules['installation_x64_entry.py'] = 'tests/android-installation-x64/installation_x64_entry.py'
+    functions = set()
+    for source in modules.values():
+        if _source_lines(source):
+            functions.update(node.name for node in ast.walk(ast.parse((ROOT / source).read_bytes()))
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)))
+    kinds = set(); frames = []; helpers = []; errnos = set()
+    for line in raw.splitlines():
+        exception = re.match(r'^([A-Za-z_][A-Za-z0-9_]*)(?::|$)', line)
+        if exception and exception[1] in PYTHON_FAILURES: kinds.add(exception[1])
+        frame = re.fullmatch(r'\s*File "/work/(?:helpers|service-helpers|installation-helpers)/[a-f0-9]{64}/([A-Za-z_][A-Za-z0-9_]*\.py)", line ([0-9]{1,5}), in [A-Za-z_][A-Za-z0-9_]*\s*', line)
+        if frame and frame[1] in modules and 0 < int(frame[2]) <= _source_lines(modules[frame[1]]):
+            row = dict(module=frame[1], line=int(frame[2]))
+            if row not in frames and len(frames) < 32: frames.append(row)
+        failure = re.fullmatch(r'(Database setup|Local database service|Owned installation|Debug x64 installation) failed \(([A-Za-z_][A-Za-z0-9_]*)([^\n]*)\);[^\n]*', line)
+        if failure and failure[2] in PYTHON_FAILURES:
+            kinds.add(failure[2])
+            # Only the setup entry emits this source-defined structural detail.
+            if failure[1] == 'Database setup':
+                detail = re.fullmatch(r'(?:; errno=([0-9]{1,4}))?(?:; helperFrames=([A-Za-z0-9_:,]+))?', failure[3])
+                if detail:
+                    if detail[1] and int(detail[1]) <= 4095: errnos.add(int(detail[1]))
+                    for item in (detail[2] or '').split(','):
+                        parsed = re.fullmatch(r'([A-Za-z_][A-Za-z0-9_]*):([0-9]{1,5})', item)
+                        if parsed and parsed[1] in functions and 0 < int(parsed[2]) <= max(_source_lines(name) for name in modules.values()):
+                            row = dict(function=parsed[1], line=int(parsed[2]))
+                            if row not in helpers and len(helpers) < 16: helpers.append(row)
+    return dict(exceptionTypes=sorted(kinds), sourceFrames=frames, helperFrames=helpers, errno=sorted(errnos))
+
+
+def failure_diagnostics(command, instrumentation, revision, provider_pin):
+    """Best-effort fixed reads; no diagnostic failure grants qualification."""
+    deadline = time.monotonic() + 45
+    def read(label, words):
+        remaining = deadline - time.monotonic()
+        if remaining <= 0: raise TimeoutError('Diagnostic budget exhausted')
+        return command(label, words, timeout=min(15, remaining))
+    result = dict(formatVersion=1, scope='sanitized-owned-installation-failure-locations-only',
+        java=java_failure_locations(instrumentation), guest=[], qualificationSucceeded=False)
+    try:
+        raw = read('failed-app-receipt', ['exec-out', 'run-as', PACKAGE, 'head', '-c', '131073',
+            'files/installation-x64-qualification.json'])
+        result['appFailure'] = failed_app_receipt(raw, revision, provider_pin)
+    except Exception: result['failedAppReceiptUnavailable'] = True
+    for family_index, family in enumerate(LOG_FAMILIES):
+        if time.monotonic() >= deadline:
+            result['diagnosticBudgetExhausted'] = True; break
+        try:
+            raw = read('guest-inventory-' + str(family_index), ['exec-out', 'run-as', PACKAGE, 'find',
+                'files/state/' + family, '-mindepth', '3', '-maxdepth', '3', '-type', 'f'])
+            pattern = re.compile(r'files/state/' + re.escape(family) + r'/[a-f0-9]{32}/logs/(stdout|stderr)\.log')
+            candidates = sorted({line for line in raw.splitlines() if pattern.fullmatch(line)})[:4]
+            for index, path in enumerate(candidates):
+                if time.monotonic() >= deadline:
+                    result['diagnosticBudgetExhausted'] = True; break
+                try:
+                    raw = read('guest-read-' + str(family_index) + '-' + str(index),
+                        ['exec-out', 'run-as', PACKAGE, 'head', '-c', '65536', path])
+                    parsed = guest_failure_locations(raw)
+                    result['guest'].append(dict(role=family, stream=pattern.fullmatch(path)[1], **parsed))
+                except Exception: result['guestLogUnavailable'] = True
+        except Exception: result['guestInventoryUnavailable'] = True
+    return result
 
 
 def _identity(path, maximum=4 << 30):
@@ -263,7 +406,7 @@ def qualify(apk, test_apk, selected_provider, mysql_provider, proot_provider, fr
         nativeInputSelection=descriptor['nativeInputSelection'], activationSource=source, artifacts=verified,
         androidX64CoordinatorQualified=False, historicalJavaServiceEvidenceAppliesToCurrentCaller=False,
         **{name: False for name in FALSE_FLAGS})
-    attempted_install = False; failure = None; phase = 'emulator-admission'; summaries = []
+    attempted_install = False; failure = None; phase = 'emulator-admission'; summaries = []; instrumentation = ''
     def command(label, words, timeout=180, allow_failure=False):
         started = time.monotonic()
         with tempfile.TemporaryDirectory(prefix='esteria-installation-private-adb-') as temporary:
@@ -285,9 +428,12 @@ def qualify(apk, test_apk, selected_provider, mysql_provider, proot_provider, fr
         phase = 'install-current-activation'; attempted_install = True
         command('install-app', ['install', str(apk)]); command('install-tests', ['install', str(test_apk)])
         phase = 'actual-four-schema-coordinator'
-        result = command('instrument', ['shell', 'am', 'instrument', '-w', '-r', '-e', 'class', TEST,
-            PACKAGE + '.test/androidx.test.runner.AndroidJUnitRunner'], timeout=3600)
-        require(instrument_passed(result), 'installation-coordinator-instrumentation-did-not-pass')
+        instrumentation = command('instrument', ['shell', 'am', 'instrument', '-w', '-r', '-e', 'class', TEST,
+            PACKAGE + '.test/androidx.test.runner.AndroidJUnitRunner'], timeout=3600, allow_failure=True)
+        if summaries[-1]['exitCode'] != 0 or not instrument_passed(instrumentation):
+            try: report['failureDiagnostics'] = failure_diagnostics(command, instrumentation, revision, selected['provider'])
+            except Exception: report['diagnosticUnavailable'] = True
+            raise ValueError('installation-coordinator-instrumentation-did-not-pass')
         phase = 'private-receipt-validation'
         raw = command('receipt', ['exec-out', 'run-as', PACKAGE, 'cat', 'files/installation-x64-qualification.json'])
         require(len(raw.encode()) <= 128 << 10, 'installation-android-receipt-bound')
@@ -298,6 +444,9 @@ def qualify(apk, test_apk, selected_provider, mysql_provider, proot_provider, fr
         phase = 'complete'; report['androidX64CoordinatorQualified'] = True
     except Exception as error:
         failure = error; report['failureType'] = type(error).__name__
+        if phase in ('actual-four-schema-coordinator', 'private-receipt-validation') and 'failureDiagnostics' not in report:
+            try: report['failureDiagnostics'] = failure_diagnostics(command, instrumentation, revision, selected['provider'])
+            except Exception: report['diagnosticUnavailable'] = True
     finally:
         if attempted_install:
             try: command('stop-owned-fixture', ['shell', 'am', 'force-stop', PACKAGE])
