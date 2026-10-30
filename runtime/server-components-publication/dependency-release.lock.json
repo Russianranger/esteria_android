@@ -1,0 +1,12 @@
+{
+  "files": null,
+  "formatVersion": 1,
+  "ownedDraftReleaseId": null,
+  "recipeInputs": null,
+  "repository": "Russianranger/esteria_android",
+  "scope": "local-server-source-debug-provider-write-once-prerelease",
+  "selectedInputs": null,
+  "state": "pending-measurement",
+  "tag": "deps-local-server-f35f04d-21ce4e1b-b7d9b72c",
+  "targetCommit": null
+}

@@ -22,6 +22,7 @@ on:
       - app/src/androidTest/**/MySqlExecutionTest.java
       - tools/*android_mysql*.py
       - tests/test_android_mysql_probe.py
+      - tests/test_android_mysql_retention.py
       - .github/workflows/android-mysql.yml
   pull_request:
   workflow_dispatch:
@@ -43,7 +44,7 @@ jobs:
       - name: Check target isolation and create evidence directory
         run: |
           test "$(uname -m)" = x86_64
-          python3 -m unittest tests.test_android_mysql_probe tests.test_android_database_setup -v
+          python3 -m unittest tests.test_android_mysql_probe tests.test_android_mysql_retention tests.test_android_database_setup -v
           mkdir -p out/android-mysql
       - name: Build the exact fresh Ubuntu x64 dependency image
         id: runtime
@@ -93,6 +94,7 @@ jobs:
           python3 tools/build_android_proot_probe.py --sources "$RUNNER_TEMP/probe-cache/runtime-corresponding-sources.tar.gz" --ndk "$ANDROID_HOME/ndk/28.2.13676358" --cache "$RUNNER_TEMP/probe-cache" --download --work "$RUNNER_TEMP/proot-probe"
           python3 tools/verify_android_proot_probe.py --provider "$RUNNER_TEMP/proot-probe/provider"
       - name: Build the isolated MySQL fixture APK and verify exact packaged bytes
+        id: apk
         run: |
           sha256sum --check gradle/wrapper/SHA256SUMS
           python3 tools/verify_android_mysql_probe.py --provider out/mysql-provider --proot-provider "$RUNNER_TEMP/proot-probe/provider"
@@ -125,6 +127,7 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
       - name: Retain complete installed-package corresponding sources even after a test failure
+        id: sources
         if: always() && steps.runtime.outcome == 'success'
         run: |
           docker build --platform linux/amd64 --target source-export -f runtime/mysql-probe/Dockerfile \
@@ -146,7 +149,8 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        if: always() && steps.runtime.outcome == 'success'
+        id: source_bundle
+        if: always() && steps.sources.outcome == 'success'
         with:
           name: android-x64-mysql-fixture-sources-${{ github.sha }}
           path: |
@@ -171,4 +175,24 @@ jobs:
             LICENSE
           if-no-files-found: error
           compression-level: 0
-          retention-days: 14
+          retention-days: 30
+      - name: Preserve fresh x64 provider and APK bytes with their exact complete source artifact
+        id: retained_inputs
+        if: always() && steps.apk.outcome == 'success' && steps.sources.outcome == 'success' && steps.source_bundle.outcome == 'success'
+        env:
+          SOURCE_ARTIFACT_ID: ${{ steps.source_bundle.outputs.artifact-id }}
+          SOURCE_ARTIFACT_DIGEST: ${{ steps.source_bundle.outputs.artifact-digest }}
+        run: |
+          python3 tools/preserve_android_mysql_probe.py --provider out/mysql-provider \
+            --proot-provider "$RUNNER_TEMP/proot-probe/provider" --apk out/android-mysql/probe.apk \
+            --test-apk out/android-mysql/tests.apk --sources out/mysql-sources --revision "$GITHUB_SHA" \
+            --source-artifact-id "$SOURCE_ARTIFACT_ID" --source-artifact-digest "$SOURCE_ARTIFACT_DIGEST" \
+            --output out/mysql-retained-inputs > out/android-mysql/input-retention.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always() && steps.retained_inputs.outcome == 'success'
+        with:
+          name: fresh-android-x64-mysql-fixture-inputs-${{ github.sha }}
+          path: out/mysql-retained-inputs
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30

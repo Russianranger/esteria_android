@@ -1,0 +1,335 @@
+{
+  "androidArm64GameExecuted": false,
+  "dateUtc": "2026-10-30",
+  "formatVersion": 1,
+  "notes": [
+    "Full provider/source/debug/APK verification ran in the retained helper CI job. This local readback covers its bounded evidence ZIP, not the large original APK/source/debug assets.",
+    "Android usage fixture observed three visible native group members; visibility remains unverified and this cannot qualify whole-guest, combined-client/server or bot budgets."
+  ],
+  "results": {
+    "android-owner-usage": {
+      "artifactId": 13001711993,
+      "everyEvidenceMemberReadBackLocally": true,
+      "evidenceZip": {
+        "bytes": 47144,
+        "sha256": "18848242af4e72baabe0898f3311d5e8e49bfc1f1093f412da137063123b1143"
+      },
+      "largeApkSourceDebugReadBackLocally": false,
+      "members": {
+        "app-receipt.log": {
+          "bytes": 1009,
+          "sha256": "8cc5d80de37c2a89549b652bea833194615427c07d64c49d44c0694d961bc5d0"
+        },
+        "bounded-logcat.log": {
+          "bytes": 260366,
+          "sha256": "62750ffead4d6fa3cd47407ac2c0fbb5e515461705b0ae5cdc51991639f6df4c"
+        },
+        "install-app.log": {
+          "bytes": 36,
+          "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+        },
+        "install-tests.log": {
+          "bytes": 36,
+          "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+        },
+        "native-owner-contracts.log": {
+          "bytes": 804,
+          "sha256": "296f39e5b0bca2d7e79fa78a97622730427eba87f504e8e6889528b6c00b8ae1"
+        },
+        "native-owner-usage.log": {
+          "bytes": 816,
+          "sha256": "5917a823e36cc9cfcec75f665dbe2b779c99bfe2f8c54260c5e51e067bde5914"
+        },
+        "preexisting.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "qualification.json": {
+          "bytes": 3092,
+          "sha256": "6ffd16133e3f6802fe89dec7267ca1df99fb92cd58307ea45731c8471227cb21"
+        },
+        "ro.build.fingerprint.log": {
+          "bytes": 81,
+          "sha256": "74f45a5b5c9c2e0e9fe31b30e7fecac3d7eed0ec13131a36513c9da0e27ee79d"
+        },
+        "ro.build.version.sdk.log": {
+          "bytes": 3,
+          "sha256": "19b8d5c59e421f037fe563007c7254eb8d98bc221b278c3db3e5fdbbfd52e273"
+        },
+        "ro.kernel.qemu.log": {
+          "bytes": 2,
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+        },
+        "ro.product.cpu.abi.log": {
+          "bytes": 7,
+          "sha256": "aaf631698ae5160ceb04a97681a14887fdcab47cd6e0f163c87485b3b1340b62"
+        },
+        "serial.log": {
+          "bytes": 14,
+          "sha256": "0115c661660f4cd9f62719a1c0f968c833c3295da9713cc8b6d915f739be272e"
+        },
+        "stop-owned-test-app.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "usage-receipt.log": {
+          "bytes": 922,
+          "sha256": "6145f54eae1fc3b319a7db856970bfe2adbe78aa60cba1bbdf6e46949d531bc7"
+        }
+      },
+      "qualification": {
+        "androidNativeOwnerQualified": true,
+        "androidProotExecuted": false,
+        "apk": {
+          "bytes": 1067921,
+          "sha256": "edc3b230d772c0d75b293cab89672fb6a70206c2eb7133fdc979d613512a8795"
+        },
+        "appDeathQualified": false,
+        "appEvidence": {
+          "abi": "x86_64",
+          "androidProotExecuted": false,
+          "api": 33,
+          "appDeathQualified": false,
+          "arm64GuestExecuted": false,
+          "bothPipeBoundsVerified": true,
+          "characterPersistenceQualified": false,
+          "consoleCommandFixtureVerified": true,
+          "creatorThreadLifetimeVerified": true,
+          "failedExecRejected": true,
+          "fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+          "forcedAndFailedRequestVisible": true,
+          "formatVersion": 1,
+          "gameplayQualified": false,
+          "gracefulFixtureVerified": true,
+          "groupsPassed": 9,
+          "interactiveBackpressureAndCloseVerified": true,
+          "interactiveBinaryEofVerified": true,
+          "interactiveEpipeVerified": true,
+          "logReadBytesPerPipe": 9000000,
+          "logStoredBytesPerPipe": 8388608,
+          "nativeOwnerExecuted": true,
+          "scope": "android-13-x86_64-native-owner-system-shell",
+          "sourceRevision": "05925dddb1327a6ed266ce62f018ff2eb447f0f3",
+          "targetSdk": 35,
+          "unicodeAndExitVerified": true,
+          "worldShutdownQualified": false
+        },
+        "arm64GuestExecuted": false,
+        "botPopulationQualified": false,
+        "characterPersistenceQualified": false,
+        "combinedMemoryQualified": false,
+        "completedAtUnix": 1793384998,
+        "emulatorProperties": {
+          "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+          "ro.build.version.sdk": "33",
+          "ro.kernel.qemu": "1",
+          "ro.product.cpu.abi": "x86_64"
+        },
+        "formatVersion": 1,
+        "gameplayQualified": false,
+        "groupUsageObservation": {
+          "abi": "x86_64",
+          "api": 33,
+          "botPopulationQualified": false,
+          "combinedMemoryQualified": false,
+          "cpuMeasuredMembers": 3,
+          "cpuNanos": 0,
+          "diagnosticsAbiLength": 5,
+          "durationNanos": 1147240,
+          "fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+          "flags": 4096,
+          "formatVersion": 1,
+          "gameplayQualified": false,
+          "immutableLogPathsVerified": true,
+          "knownReapVerified": true,
+          "nativeOwnerUsageExecuted": true,
+          "pssBytes": 3035136,
+          "pssMeasuredMembers": 3,
+          "rssBytes": 10604544,
+          "rssMeasuredMembers": 3,
+          "scope": "visible-owned-native-group-members-only",
+          "sourceRevision": "05925dddb1327a6ed266ce62f018ff2eb447f0f3",
+          "startedMonotonicNanos": 58924426099,
+          "targetSdk": 35,
+          "unknownHandleRefused": true,
+          "visibleMembers": 3,
+          "visibleSetStable": true,
+          "wholeGroupMembershipVerified": false,
+          "wholeGuestUsageQualified": false
+        },
+        "scope": "android-13-x86_64-native-owner-system-shell",
+        "sourceRevision": "05925dddb1327a6ed266ce62f018ff2eb447f0f3",
+        "testApk": {
+          "bytes": 1753089,
+          "sha256": "19bd26561c88db50d0d1b84fb12f3a220f8955efe5b0cda518cca3aa4dfff258"
+        },
+        "wholeGuestUsageQualified": false,
+        "worldShutdownQualified": false
+      },
+      "runId": 41106872887,
+      "runUrl": "https://github.com/Russianranger/esteria_android/actions/runs/41106872887",
+      "sourceRevision": "05925dddb1327a6ed266ce62f018ff2eb447f0f3",
+      "workflowConclusion": "success",
+      "workflowStatus": "completed"
+    },
+    "helper-programs": {
+      "artifactId": 13002282000,
+      "everyEvidenceMemberReadBackLocally": true,
+      "evidenceZip": {
+        "bytes": 31154,
+        "sha256": "7a18dbc0e4b6071ff60ceaab0b5a06c38b2da92dbd6ca13ab7db13bb44a91cda"
+      },
+      "largeApkSourceDebugReadBackLocally": false,
+      "members": {
+        "dependency-acquisition-tail.log": {
+          "bytes": 110,
+          "sha256": "5d3e81dea3a4bdbc90c02cd799cdc3669f9f787ac129cd08efcd740453575ff9"
+        },
+        "dependency-provider-tail.log": {
+          "bytes": 2465,
+          "sha256": "91bc33041ef1b2e8d473c062fb812ca3a3fa4ea5c256349afa36cd0e7061ec09"
+        },
+        "gradle-tail.log": {
+          "bytes": 13594,
+          "sha256": "196927465c6074a9d3bd57f5323f0bd2a2871f8bc7cf18e1be3d459f3ed1fef2"
+        },
+        "helper-acquisition-tail.log": {
+          "bytes": 1231,
+          "sha256": "ea91f9938fd873625a3b16573c340340270fe786b86c4a49d3a00c78873cf894"
+        },
+        "helper-acquisition.json": {
+          "bytes": 1231,
+          "sha256": "ea91f9938fd873625a3b16573c340340270fe786b86c4a49d3a00c78873cf894"
+        },
+        "helper-build-tail.log": {
+          "bytes": 2148,
+          "sha256": "e8e42ce2959315ea1375b3a031ac74d2495ba379a462199cbfc2649ca7f67adf"
+        },
+        "helper-provider-build.json": {
+          "bytes": 2148,
+          "sha256": "e8e42ce2959315ea1375b3a031ac74d2495ba379a462199cbfc2649ca7f67adf"
+        },
+        "java-programs-input.json": {
+          "bytes": 218,
+          "sha256": "0c10ede4562c770cf7bd3654b3905549b8e24190971b703aff331c153794d96f"
+        },
+        "java-programs.json": {
+          "bytes": 358,
+          "sha256": "d665fa63b8aabb879e81c28627bc6e015028da4c367800c99ef00c4a2b3ecb4e"
+        },
+        "java-programs.tsv": {
+          "bytes": 15952,
+          "sha256": "81e3539e66d486d5f89ff1aa82810b832c330b6d94ed8eae8446b34f26c4de90"
+        },
+        "qualification.json": {
+          "bytes": 2572,
+          "sha256": "6a5af521aca640ed8e0e32d64a703dfb9cd340f71c30fdd79b56c6cd334fbef1"
+        },
+        "runtime-measurement.json": {
+          "bytes": 30893,
+          "sha256": "3a88c2897e85dd30c40edc5b30768cfae394dad839280f05362d665172d1f1ef"
+        },
+        "stock-acquisition-tail.log": {
+          "bytes": 5281,
+          "sha256": "08ec7bfa309bd06d3b441cbcbcf1ba6787bc9523ec2b28f1ea7d39318bacb895"
+        },
+        "stock-acquisition.json": {
+          "bytes": 5281,
+          "sha256": "017fed7673e99950cdbe628115b1a04d1a350ec0ef5bc62f793781ff2cd411f7"
+        },
+        "stock-build-tail.log": {
+          "bytes": 1988,
+          "sha256": "ce854d19d880063e40c106994d79f587bc88881cb7ed85320b9e6f9b41857701"
+        },
+        "stock-provider-build.json": {
+          "bytes": 1988,
+          "sha256": "f797ed772883a6ad6e7b7c6e1cbfba9a1dfad04cb17f4e99e5d093a230666dcc"
+        }
+      },
+      "qualification": {
+        "actualArchiveInstallAndCachedReuse": {
+          "androidRuntimeQualified": false,
+          "cachedArchiveRequired": false,
+          "cachedCopiedBytes": 0,
+          "entries": 131,
+          "fileBytes": 92638681,
+          "firstCopiedBytes": 92638681,
+          "gameplayQualified": false,
+          "generation": "d7a76adec6bf2c04fbfc954901cf8d647c822d37f8665d3ed33c1bdd47686810",
+          "packageKey": "server-programs-arm64",
+          "scope": "host-java-exact-server-archive-install-and-cached-reuse"
+        },
+        "androidGuestExecuted": false,
+        "androidInstrumentationExecuted": false,
+        "androidRuntimeQualified": false,
+        "apk": {
+          "bytes": 143847084,
+          "sha256": "187863d5ca142951810357468685fc2f25a403f2a44725ed12a918f4ab26ed53"
+        },
+        "compilerExecuted": false,
+        "formatVersion": 1,
+        "gameplayQualified": false,
+        "helperExecuted": false,
+        "integrationRevision": "05925dddb1327a6ed266ce62f018ff2eb447f0f3",
+        "javaMaximumHeapBytes": 33554432,
+        "originalHelperSqlProofPreserved": true,
+        "originalThreeProgramsAndReceiptsUnchanged": true,
+        "playerbotsAiQualified": false,
+        "providerVerification": {
+          "androidRuntimeQualified": false,
+          "apkBytesVerified": true,
+          "archive": {
+            "bytes": 30730491,
+            "file": "server-programs-runtime-arm64.tar.gz",
+            "sha256": "963a23c1390440260b85ffe164b2d7508c56b005b315dce8a919ae443a46d1bf"
+          },
+          "archiveEntries": 131,
+          "archiveFileBytes": 92638681,
+          "compilerExecuted": false,
+          "gameplayQualified": false,
+          "helperExecuted": false,
+          "helperNames": [
+            "playerbots-schema"
+          ],
+          "helperNativeProofTransferredToNewExecutable": false,
+          "helperSourceCompanionVerified": true,
+          "nativeHelperSqlProofPreserved": true,
+          "originalStockProviderVerification": {
+            "androidRuntimeQualified": false,
+            "apkBytesVerified": false,
+            "gameLoginQualified": false,
+            "gameplayQualified": false,
+            "nativeAuthWorldVersionQualified": true,
+            "pairedDebugVerified": true,
+            "providerVerified": true,
+            "sourceCompanionVerified": true
+          },
+          "originalThreeProgramsAndReceiptsUnchanged": true,
+          "pairedOriginalDebugVerified": true,
+          "playerbotsAiQualified": false,
+          "productionActivated": false,
+          "programNames": [
+            "authserver",
+            "worldserver",
+            "dbimport"
+          ],
+          "providerVerified": true,
+          "slotPromoted": false,
+          "sourceCompanionVerified": true,
+          "sqlExecuted": false,
+          "worldserverQualified": false
+        },
+        "scope": "host-java-and-apk-byte-only-optional-playerbots-programs-qualification",
+        "sqlExecuted": false,
+        "worldserverQualified": false
+      },
+      "runId": 41106873028,
+      "runUrl": "https://github.com/Russianranger/esteria_android/actions/runs/41106873028",
+      "sourceRevision": "05925dddb1327a6ed266ce62f018ff2eb447f0f3",
+      "workflowConclusion": "success",
+      "workflowStatus": "completed"
+    }
+  },
+  "scope": "optional-helper-provider-and-android-visible-usage-retained-evidence",
+  "worldGameplayQualified": false
+}

@@ -1,0 +1,47 @@
+{
+  "actualHostGuardTestsPassed": 13,
+  "additionalRetriesIntroduced": false,
+  "alternateRuntimeSubstituted": false,
+  "androidEmulatorStarted": false,
+  "androidRuntimeQualified": false,
+  "aptRetryAttemptsAlreadyObserved": 3,
+  "artifact": {
+    "bytes": 2425,
+    "id": 13002715858,
+    "sha256": "23801e6e431b323c65489e15add2c8025eda41f56394fcb1c59cfac1c7ab4a8d"
+  },
+  "failurePhase": "old-amd64-apt-dependency-image-build",
+  "failureReason": "All three pinned snapshot InRelease requests returned HTTP503; the existing hash gate correctly rejected absent authenticated inputs.",
+  "formatVersion": 1,
+  "freshRuntimePackaged": false,
+  "futureRetention": {
+    "actualNewRetentionExecuted": false,
+    "actualProductionConsumptionQualified": false,
+    "implemented": true,
+    "requiresExactUploadedSourceArtifactIdentity": true,
+    "requiresFreshProviderApkAndCompleteSourceExport": true,
+    "sourceAndBinaryArtifactsRetainedDays": 30
+  },
+  "gameplayQualified": false,
+  "imageBuildLog": {
+    "bytes": 15276,
+    "sha256": "55986b04e8162600b6de294ec0eaec0fe46e65ffa03165a2de3540ba0dcede0f"
+  },
+  "integrationRevision": "05925dddb1327a6ed266ce62f018ff2eb447f0f3",
+  "job": 124238893022,
+  "jobConclusion": "failure",
+  "localValidation": {
+    "relevantHostGuardTestsPassed": 19,
+    "relevantHostGuardTestsRun": 19,
+    "skipped": 0,
+    "sourceHashAndClosureFilesystemGuardsPassed": true,
+    "transactionTestUsesSyntheticProviderVerifier": true,
+    "yamlAndBashSyntaxPassed": true
+  },
+  "mysqlEngineStarted": false,
+  "offlineX64RuntimeInputAvailable": false,
+  "productionArm64InputsChanged": false,
+  "scope": "observed-x64-mysql-probe-dependency-unavailability-before-android",
+  "sqlExecuted": false,
+  "workflowRun": 41106872825
+}

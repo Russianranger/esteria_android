@@ -1,0 +1,182 @@
+name: Preserve complete local server providers sources and paired debug
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - runtime/server-components-publication/dependency-release.lock.json
+permissions:
+  contents: read
+concurrency:
+  group: preserve-local-server-components
+  cancel-in-progress: false
+jobs:
+  validate:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      recipe_revision: ${{ steps.selection.outputs.recipe_revision }}
+      publish_mode: ${{ steps.selection.outputs.publish_mode }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Preserve the explicit release selection and select its exact frozen recipe
+        id: selection
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json,os,re
+          lock=json.load(open('runtime/server-components-publication/dependency-release.lock.json'))
+          assert lock['state'] in ('pending-measurement','measured-unbound','owned-draft-bound')
+          revision=os.environ['GITHUB_SHA'] if lock['state']=='pending-measurement' else lock['targetCommit']
+          assert re.fullmatch('[0-9a-f]{40}',revision)
+          print('recipe_revision='+revision)
+          print('publish_mode='+('preserve' if lock['state']=='owned-draft-bound' else 'measure'))
+          PY
+          cp runtime/server-components-publication/dependency-release.lock.json "$RUNNER_TEMP/local-server-release.lock.json"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ steps.selection.outputs.recipe_revision }}
+          path: source-packaging
+          persist-credentials: false
+      - name: Check archive source and owned-draft refusal boundaries
+        working-directory: source-packaging
+        run: |
+          test "$(uname -m)" = x86_64
+          python3 -m unittest tests.test_local_server_components_release \
+            tests.test_playerbots_programs_provider tests.test_qualified_data_tools_inputs -v
+      - name: Reproduce complete provider source debug and notice packages without executing binaries
+        working-directory: source-packaging
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          RECIPE_REVISION: ${{ steps.selection.outputs.recipe_revision }}
+        run: |
+          mkdir -p out/publication-evidence
+          python3 tools/release_local_server_components.py prepare --output "$RUNNER_TEMP/local-server-components-inputs" \
+            > out/publication-evidence/preparation-private.log 2>&1
+          python3 tools/release_local_server_components.py stage --inputs "$RUNNER_TEMP/local-server-components-inputs" \
+            --target "$RECIPE_REVISION" --output out/release-candidate \
+            --release-lock "$RUNNER_TEMP/local-server-release.lock.json" \
+            > out/publication-evidence/staging-private.log 2>&1
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,os
+          from tools import release_local_server_components as release
+          candidate=Path('out/release-candidate')
+          measured=Path('out/measured-release.lock.json')
+          lock=release.load_lock(measured if measured.exists() else Path(os.environ['RUNNER_TEMP'])/'local-server-release.lock.json')
+          release.verify(candidate,lock)
+          target=Path('out/publication-evidence')
+          release.engine.put_metadata(target/'measured-release.lock.json',lock)
+          (target/'release-body.txt').write_text(release.body(lock))
+          release.engine.put_metadata(target/'measurement.json',dict(formatVersion=1,
+              scope='complete-local-server-publication-candidate-readback',targetCommit=lock['targetCommit'],
+              measuredLock=release.identity(target/'measured-release.lock.json'),
+              assets={p.name:release.identity(p) for p in sorted(candidate.iterdir())},
+              allCandidateAssetBytesReadBack=True,allOriginalSourceAndPairedDebugVerified=True,
+              originalNestedArchiveBytesPreserved=True,releaseUploaded=False,releasePublished=False,
+              **{name:False for name in release.FALSE_FLAGS}))
+          PY
+      - name: Retain the fully read-back candidate for separate owned-draft upload
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: validated-local-server-provider-release-candidate
+          path: source-packaging/out/release-candidate/
+          include-hidden-files: true
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: error
+      - name: Retain bounded measurement and exact UI draft body
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: local-server-provider-release-measurement
+          path: |
+            source-packaging/out/publication-evidence/measurement.json
+            source-packaging/out/publication-evidence/measured-release.lock.json
+            source-packaging/out/publication-evidence/release-body.txt
+          retention-days: 30
+          if-no-files-found: warn
+  upload-draft:
+    needs: validate
+    if: needs.validate.outputs.publish_mode == 'preserve'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Retain the explicit owned release lock before checking out its frozen recipe
+        run: cp runtime/server-components-publication/dependency-release.lock.json "$RUNNER_TEMP/local-server-release.lock.json"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.validate.outputs.recipe_revision }}
+          path: source-packaging
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: validated-local-server-provider-release-candidate
+          path: source-packaging/out/release-candidate
+      - name: Verify complete original source debug and add only missing exact assets to the bound draft
+        working-directory: source-packaging
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/release_local_server_components.py upload-draft --inputs out/release-candidate \
+            --release-lock "$RUNNER_TEMP/local-server-release.lock.json" --output out/draft-assets-verified.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: local-server-provider-draft-stored-byte-readiness
+          path: source-packaging/out/draft-assets-verified.json
+          retention-days: 30
+          if-no-files-found: error
+  verify-publication:
+    needs: [validate, upload-draft]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Retain the explicit owned release lock before checking out its frozen recipe
+        run: cp runtime/server-components-publication/dependency-release.lock.json "$RUNNER_TEMP/local-server-release.lock.json"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.validate.outputs.recipe_revision }}
+          path: source-packaging
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: validated-local-server-provider-release-candidate
+          path: source-packaging/out/release-candidate
+      - name: Verify the published tag and every stored asset byte without mutation
+        working-directory: source-packaging
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/release_local_server_components.py verify-published --inputs out/release-candidate \
+            --release-lock "$RUNNER_TEMP/local-server-release.lock.json" --output out/published-release.json --wait-seconds 1200
+      - name: Independently download every public asset anonymously and reverify full original source and debug
+        working-directory: source-packaging
+        run: |
+          env -u GITHUB_TOKEN python3 tools/release_local_server_components.py fetch-published \
+            --release-lock "$RUNNER_TEMP/local-server-release.lock.json" --output "$RUNNER_TEMP/local-server-public-readback" \
+            > out/public-source-readback.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: local-server-provider-publication-and-anonymous-source-readback
+          path: |
+            source-packaging/out/published-release.json
+            source-packaging/out/public-source-readback.json
+          retention-days: 30
+          if-no-files-found: error

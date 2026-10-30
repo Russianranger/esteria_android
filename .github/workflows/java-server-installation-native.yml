@@ -1,0 +1,161 @@
+name: Native ARM64 Java installation promotion and real SQL restart
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - .github/workflows/java-server-installation-native.yml
+      - tools/qualify_java_server_installation.py
+      - tests/native-java-installation/**
+      - tests/test_java_server_installation_qualification.py
+      - app/src/main/java/io/github/russianranger/esteria/runtime/ServerInstallationSetup.java
+      - app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseSetup.java
+      - app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseService.java
+      - app/src/main/java/io/github/russianranger/esteria/runtime/ProotProcess.java
+      - core/src/main/java/io/github/russianranger/esteria/core/runtime/install/FreshServerInstallations.java
+      - runtime/server/programs-playerbots-provider.lock.json
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: native-java-server-installation-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  java-promotion:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '17.0.13+11'
+      - name: Check the bounded qualification input and actual SQL observation guards
+        run: |
+          test "$(uname -m)" = aarch64
+          umask 077
+          mkdir -p out/java-installation-evidence out/java-installation-build-logs
+          python3 -m unittest tests.test_java_server_installation_qualification -v
+      - name: Acquire all original complete sources and paired debug before provider construction
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/qualify_server_providers.py acquire --output out/java-stock-inputs \
+            > out/java-installation-build-logs/stock-acquisition.log 2>&1
+          python3 tools/qualify_playerbots_programs.py acquire --output out/java-helper-inputs \
+            > out/java-installation-build-logs/helper-acquisition.log 2>&1
+          python3 tools/qualify_server_providers.py build --inputs out/java-stock-inputs --output out/java-stock-providers \
+            > out/java-installation-build-logs/stock-build.log 2>&1
+          python3 tools/qualify_playerbots_programs.py build --stock-providers out/java-stock-providers \
+            --inputs out/java-helper-inputs --output out/java-helper-providers \
+            > out/java-installation-build-logs/helper-build.log 2>&1
+      - name: Prepare exact dependency provider and compiler-free native SQL image
+        run: |
+          env -u GITHUB_TOKEN python3 tools/release_server_dependencies.py prepare --output out/java-dependency-inputs \
+            > out/java-installation-build-logs/dependency-download.log 2>&1
+          python3 tools/provider_server_runtime.py build --package out/java-dependency-inputs --output out/java-dependency-provider \
+            > out/java-installation-build-logs/dependency-provider.log 2>&1
+          python3 tools/prepare_server_dependency_image.py --inputs out/java-dependency-inputs --output out/java-dependency-image \
+            > out/java-installation-build-logs/dependency-context.log 2>&1
+          docker build --network none --platform linux/arm64 -t esteria-java-installation:verified out/java-dependency-image/context \
+            > out/java-installation-build-logs/image-build.log 2>&1
+          docker run --rm --network none --read-only \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/tools/verify_server_dependency_image.py,dst=/verify-image.py,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/java-dependency-image/context-receipt.json,dst=/context-receipt.json,readonly" \
+            esteria-java-installation:verified /usr/bin/python3 /verify-image.py --context-receipt /context-receipt.json \
+            > out/java-installation-evidence/dependency-image-check.json
+      - name: Build and actually qualify the same source-pinned Linux PRoot ownership implementation
+        run: |
+          curl --fail --location --retry 2 --max-time 600 \
+            https://github.com/Russianranger/uo-android-launcher/releases/download/v0.2.0/runtime-corresponding-sources.tar.gz \
+            -o "$RUNNER_TEMP/java-proot-sources.tar.gz"
+          python3 tools/qualify_proot_ownership.py --sources "$RUNNER_TEMP/java-proot-sources.tar.gz" --work "$RUNNER_TEMP/java-native-proot" \
+            > out/java-installation-build-logs/proot-build.log 2>&1
+      - name: Acquire the exact real JVM JSON implementation and compile production Java plus real JNI
+        run: |
+          git init "$RUNNER_TEMP/java-json-source"
+          git -C "$RUNNER_TEMP/java-json-source" remote add origin https://github.com/stleary/JSON-java.git
+          git -C "$RUNNER_TEMP/java-json-source" fetch --depth 1 origin f9b5587c87aaf02e4a5ed1991d48d6c05993624a
+          git -C "$RUNNER_TEMP/java-json-source" checkout --detach FETCH_HEAD
+          python3 tools/qualify_java_server_installation.py build --json-source "$RUNNER_TEMP/java-json-source" \
+            --java-home "$JAVA_HOME" --output out/java-installation-build \
+            > out/java-installation-build-logs/java-build.log 2>&1
+          python3 tools/qualify_java_server_installation.py prepare --dependency-provider out/java-dependency-provider \
+            --programs-provider out/java-helper-providers/programs --content-provider out/java-stock-providers/content \
+            --output out/java-installation-inputs > out/java-installation-build-logs/asset-preparation.log 2>&1
+      - name: Verify that the intended private MySQL mount destination is absent
+        run: |
+          docker run --rm --network none --read-only -i esteria-java-installation:verified /usr/bin/python3 - \
+            > out/java-installation-evidence/state-mount-preflight.json <<'PY'
+          import json,pathlib,stat
+          target=pathlib.Path('/var/lib/mysql/esteria-java-installation');current=pathlib.Path('/')
+          for part in target.parts[1:-1]:
+              current/=part
+              try: info=current.lstat()
+              except FileNotFoundError: continue
+              if not stat.S_ISDIR(info.st_mode):raise ValueError('nonplain-java-state-mount-parent')
+          try: target.lstat()
+          except FileNotFoundError: pass
+          else:raise ValueError('java-state-mount-destination-already-exists')
+          print(json.dumps(dict(formatVersion=1,destinationAbsent=True,presentParentsPlain=True,sqlExecuted=False),sort_keys=True))
+          PY
+      - name: Execute actual Java fresh-slot SQL finish promotion refusal and persistent restart offline
+        run: |
+          umask 077
+          mkdir -p out/java-installation-private
+          docker run --rm --init --network none --read-only --cap-add SYS_PTRACE --security-opt seccomp=unconfined \
+            --tmpfs /tmp:rw,nosuid,nodev,size=64m --env PYTHONDONTWRITEBYTECODE=1 \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
+            --mount "type=bind,src=$JAVA_HOME,dst=/qualification-jdk,readonly" \
+            --mount "type=bind,src=$RUNNER_TEMP/java-native-proot,dst=/native-proot,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/java-installation-private,dst=/var/lib/mysql/esteria-java-installation" \
+            --workdir /qualification esteria-java-installation:verified \
+            /usr/bin/python3 tools/qualify_java_server_installation.py run \
+            --build-directory /qualification/out/java-installation-build --assets /qualification/out/java-installation-inputs/assets \
+            --proot /native-proot --java-home /qualification-jdk \
+            --private-root /var/lib/mysql/esteria-java-installation/root \
+            --output /var/lib/mysql/esteria-java-installation/public-result.json \
+            --private-log /var/lib/mysql/esteria-java-installation/java-private.log \
+            > out/java-installation-private/runner-private.log 2>&1
+      - name: Collect only typed public receipts without private SQL logs credentials or databases
+        if: always()
+        run: |
+          sudo env ESTERIA_JAVA_REVISION="$GITHUB_SHA" ESTERIA_PROOT_EVIDENCE="$RUNNER_TEMP/java-native-proot/ownership-evidence.json" python3 - <<'PY'
+          import json,os,shutil
+          from pathlib import Path
+          from tools import verify_server_build as files
+          target=Path('out/java-installation-evidence');target.mkdir(parents=True,exist_ok=True)
+          for source,name in (('out/java-installation-private/public-result.json','java-installation-result.json'),
+              ('out/java-installation-build/build-receipt.json','java-build-receipt.json'),
+              ('out/java-installation-inputs/preparation.json','asset-preparation.json'),
+              ('out/java-helper-providers/provider-build.json','programs-provider-build.json')):
+              path=Path(source)
+              if path.is_file() and path.stat().st_size<=2*1024**2:shutil.copyfile(path,target/name)
+          for source,name in ((Path(os.environ['ESTERIA_PROOT_EVIDENCE']),'linux-proot-ownership.json'),):
+              if source.is_file():shutil.copyfile(source,target/name)
+          # Compilation/acquisition logs contain no executed SQL. Runtime output
+          # and all logs below java-installation-private remain excluded.
+          for path in Path('out/java-installation-build-logs').glob('*.log'):
+              with path.open('rb') as incoming:
+                  incoming.seek(max(0,path.stat().st_size-64*1024));(target/(path.stem+'-tail.log')).write_bytes(incoming.read(64*1024))
+          inventory={path.name:files.identity(path) for path in target.iterdir() if path.is_file()}
+          result=dict(formatVersion=1,scope='native-java-installation-qualification-environment',
+              integrationRevision=os.environ['ESTERIA_JAVA_REVISION'],files=inventory,
+              nativeExecutionContainerNetwork='none',readOnlyContainerRoot=True,
+              productionJavaCoordinatorAndProotProcessSelected=True,linuxPayloadLocatorReplacesAndroidApkLocator=True,
+              androidApiExecuted=False,androidRuntimeQualified=False,privateSqlLogsExported=False,
+              worldserverExecuted=False,gameplayQualified=False)
+          (target/'environment-receipt.json').write_text(json.dumps(result,sort_keys=True,indent=2)+'\n')
+          PY
+          sudo chown -R "$(id -u):$(id -g)" out/java-installation-evidence
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: native-java-installation-evidence-${{ github.sha }}
+          path: out/java-installation-evidence/
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error

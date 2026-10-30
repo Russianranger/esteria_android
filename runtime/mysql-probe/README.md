@@ -186,3 +186,27 @@ PRoot legacy-rename-to-renameat adaptation resolved it without changing the
 bootstrap helper or adding a destructive recovery path. Native ARM64 PRoot and
 the production provider were unchanged. Host archive/provenance guard tests
 remain useful but are separate from this measured emulator result.
+
+## Preserve fresh inputs after dependency recovery
+
+Run 41106872825 at 05925 failed before Android or MySQL started: the three pinned
+snapshot InRelease requests returned HTTP503 and their existing hash gate refused
+the absent inputs. The exact x64 source/version pins remain unchanged. This does
+not invalidate the earlier measured lifecycle result or qualify current code.
+The Docker/APT logs already showed three retry attempts; no retry increase or
+production ARM64 substitution is introduced.
+
+Future successful image/APK/source builds additionally retain
+`fresh-android-x64-mysql-fixture-inputs-<revision>` for 30 days. It contains only the
+verified fresh provider (including its rootfs archive), app/test APKs, source
+manifest and exact-file hash manifest. The manifest binds the separate complete
+installed-package source artifact's ID, SHA256 and matching source revision.
+The source artifact is retained for the same 30 days. Every original source file
+is hashed locally before the binary artifact is prepared; all runtime/APK checks
+remain mandatory. Emulator state, databases and credentials are excluded.
+
+This retention runs after successful complete source export/upload and APK
+verification, including when a later emulator test failed. Its manifest explicitly
+makes no Android execution, production ARM64 or offline-consumer qualification
+claim. An actual retained package must be independently consumed and pinned before
+it can replace the online dependency build. No such new x64 consumer pin exists.
