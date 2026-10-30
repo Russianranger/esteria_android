@@ -16,6 +16,12 @@ NEMESIS_IDENTITY = dict(bytes=3511,
     sha256='011af71320bd68d81f38f5e28b83b85b5be07b6f08f7c798429d71ea7a66b793',
     gitBlob='30eaf2801e7688213a0aac5d410028193bd621d2')
 NEMESIS_TABLES = ('character_nemesis', 'character_nemesis_monthly_kills')
+CUSTOM_RACE_DDL = 'data/sql/updates/pending_db_world/rev_20260929001000000.sql'
+CUSTOM_RACE_IDENTITY = dict(bytes=1642,
+    sha256='315941b5af6763f24dde75a704761fd7750eee375aebaa0de63c5971843042ed',
+    gitBlob='d39f0b23d7e9ed5af26e01e609d1ee3e74ef4ef3')
+CUSTOM_RACE_TABLES = ('custom_race_start_skill', 'custom_race_start_skill_exclude',
+                      'custom_race_start_spell', 'custom_race_start_spell_exclude')
 require = base.content.require
 
 
@@ -47,10 +53,23 @@ def selected_plan(source, manifest):
         identities[NEMESIS_BASE] = NEMESIS_IDENTITY
         prerequisites.append(dict(database='characters', path=NEMESIS_BASE,
                                   tables=list(NEMESIS_TABLES), source=NEMESIS_IDENTITY))
+    # The pinned pending updates mix epoch and calendar revision names. The
+    # compiled lexicographic order reaches Sethrak's DML before this pure DDL.
+    # Import the unchanged idempotent creator only on this new empty instance;
+    # the compiled updater must still execute and record the canonical file.
+    row = manifest['files'].get(CUSTOM_RACE_DDL, {})
+    require({key: row.get(key) for key in CUSTOM_RACE_IDENTITY} == CUSTOM_RACE_IDENTITY,
+            'canonical custom race source prerequisite changed')
+    require(any(row == dict(path=CUSTOM_RACE_DDL, state='PENDING', origin='base-updates_include')
+                for row in manifest['databases']['world']['updateOrder']),
+            'custom race prerequisite is absent from the actual updater selection')
+    identities[CUSTOM_RACE_DDL] = CUSTOM_RACE_IDENTITY
+    schema_prerequisites = [dict(database='world', path=CUSTOM_RACE_DDL,
+                                tables=list(CUSTOM_RACE_TABLES), source=CUSTOM_RACE_IDENTITY)]
     for path, row in identities.items():
         require(files.identity(source / path) == {key: row[key] for key in ('bytes', 'sha256')},
                 'baseline source bytes differ before initialization: ' + path)
-    return plan, prerequisites, identities
+    return plan, prerequisites, schema_prerequisites, identities
 
 
 def initialize(connection, source, manifest, apply):
@@ -61,7 +80,7 @@ def initialize(connection, source, manifest, apply):
     The unmodified core bases include their original ledgers. Only the compiled
     updater records subsequent canonical module/update hashes.
     """
-    plan, prerequisites, identities = selected_plan(source, manifest)
+    plan, prerequisites, schema_prerequisites, identities = selected_plan(source, manifest)
     base.empty_databases(connection)  # Includes playerbots, before ANY SQL.
     completed = []
     for database in DATABASES:
@@ -73,10 +92,10 @@ def initialize(connection, source, manifest, apply):
         expected = sorted(Path(path).stem for path in plan[database])
         require(sorted(connection.query('SHOW TABLES FROM `acore_' + database + '`')) == expected,
                 'source core baseline table set differs: ' + database)
-    for item in prerequisites:
+    for item in prerequisites + schema_prerequisites:
         current = connection.query('SHOW TABLES FROM `acore_' + item['database'] + '`')
         require(not set(item['tables']).intersection(current),
-                'existing module prerequisite tables preserved')
+                'existing prerequisite tables preserved')
         apply(item['database'], source / item['path'])
         completed.append(item['path'])
         require(sorted(connection.query('SHOW TABLES FROM `acore_' + item['database'] + '`')) ==
@@ -84,7 +103,8 @@ def initialize(connection, source, manifest, apply):
     require(not connection.query('SHOW TABLES FROM `acore_playerbots`'),
             'unregistered playerbots database must stay empty')
     return dict(scope='fresh-owned-source-baseline-before-compiled-updates', coreBaseOrder=plan,
-                documentedModulePrerequisites=prerequisites, appliedFiles=completed,
+                documentedModulePrerequisites=prerequisites, sourceSchemaPrerequisites=schema_prerequisites,
+                appliedFiles=completed,
                 sourceFiles=identities, syntheticUpdaterLedgerRowsWritten=False,
                 compiledAutoPopulationQualified=False, existingStateModified=False,
                 baselineImportCompleted=True)

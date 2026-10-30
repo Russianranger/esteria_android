@@ -2,9 +2,9 @@ name: Pinned ARM64 display and audio helpers
 on:
   push:
     branches: [android/client-server]
-    paths: [native/guest-bridges/**, native/guest-tests/**, native/presentation/**, runtime/bridges/**, runtime/bridge-reference.json, tools/qualify_x11_input.py, tests/test_x11_input_qualification.py, .github/workflows/guest-bridges.yml]
+    paths: [native/guest-bridges/**, native/guest-tests/**, native/presentation/**, runtime/bridges/**, runtime/bridge-reference.json, tools/qualify_x11_input.py, tests/test_x11_input_qualification.py, tests/fixtures/X11AuthorityFixture.java, core/src/main/java/io/github/russianranger/esteria/core/presentation/X11SessionPlan.java, .github/workflows/guest-bridges.yml]
   pull_request:
-    paths: [native/guest-bridges/**, native/guest-tests/**, native/presentation/**, runtime/bridges/**, tools/qualify_x11_input.py, tests/test_x11_input_qualification.py, .github/workflows/guest-bridges.yml]
+    paths: [native/guest-bridges/**, native/guest-tests/**, native/presentation/**, runtime/bridges/**, tools/qualify_x11_input.py, tests/test_x11_input_qualification.py, tests/fixtures/X11AuthorityFixture.java, core/src/main/java/io/github/russianranger/esteria/core/presentation/X11SessionPlan.java, .github/workflows/guest-bridges.yml]
   workflow_dispatch:
 permissions:
   contents: read
@@ -17,7 +17,13 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Install host formatter compiler and namespace diagnostics
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openjdk-17-jdk-headless iproute2 binutils
       - name: Verify build-input and ELF rejection contracts
+        env:
+          ESTERIA_REQUIRE_JAVA_TESTS: '1'
         run: python3 -m unittest tests.test_guest_bridge_inputs tests.test_x11_input_qualification -v
       - name: Build exact Debian12 ARM64 guest helpers and retain corresponding sources
         run: |
@@ -34,11 +40,9 @@ jobs:
           cp runtime/bridge-reference.json out/guest-bridges/payload/corresponding-source/
       - name: Prepare exact Wine-rootfs X11 implementation for offline native ARM64 input checks
         run: |
-          sudo apt-get update
-          sudo apt-get install -y iproute2 binutils
           python3 tools/prepare_runtime.py --cache "$RUNNER_TEMP/x11-runtime-cache" --download \
             --stage "$RUNNER_TEMP/x11-runtime" --report out/guest-bridges/x11-runtime-preparation.json
-      - name: Observe real XTest keys buttons motion acknowledgments and release on EOF
+      - name: Verify X11 cookie rejection then observe real XTest events and release on EOF
         run: |
           sudo python3 tools/qualify_x11_input.py --runtime "$RUNNER_TEMP/x11-runtime" \
             --bridge-dir "$GITHUB_WORKSPACE/out/guest-bridges/payload" --bridge-revision "$GITHUB_SHA" \
@@ -57,5 +61,8 @@ jobs:
             native/guest-bridges
             native/guest-tests
             native/presentation
+            core/src/main/java/io/github/russianranger/esteria/core/presentation/X11SessionPlan.java
+            tests/fixtures/X11AuthorityFixture.java
+            tools/qualify_x11_input.py
             LICENSE
           retention-days: 14

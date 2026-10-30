@@ -136,8 +136,7 @@ def worker(plan_path):
         require(identities.identity(install/'bin/authserver')=={key:binary[key] for key in ('bytes','sha256')},'authserver-changed')
         result.update(serverBuildId=build['buildId'],serverSource=updated['source'],sourceLockSha256=updated['sourceLockSha256'],
                       authserver={key:binary[key] for key in ('bytes','sha256')})
-        render_source=server.templates(install,fresh,source,build)
-        config.render(render_source,state,fresh/'unavailable-game-data',source,mysql)
+        server.render_runtime_config(install,fresh,source,build,state,mysql)
         password=db.read_secret(state/'accounts/database-secret');generation=realm.active_config(state,password)
         configuration=state/'config/generations'/generation/'authserver.conf'
         require(realm.settings(realm.read_text(configuration),('StrictVersionCheck',))=={'StrictVersionCheck':'0'},

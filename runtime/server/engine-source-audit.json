@@ -1,0 +1,768 @@
+{
+  "formatVersion": 1,
+  "scope": "six-patch-server-source-selection-audit",
+  "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
+  "elunaRevision": "58d7652138887783228b9727bd1fa4e08f00342b",
+  "observedIntegrationRevision": "ae5534d0a9d7fb72c8e5a03dcfc65420c354e7bb",
+  "observedBuildId": "41005048019.1",
+  "observedSourcesLock": {
+    "bytes": 1983,
+    "sha256": "dbbf8983cfa2b429f7dd0c3308a2795ffbecd29e8019adf35348447e1eab41b0"
+  },
+  "serverBuild": {
+    "bytes": 32342,
+    "sha256": "bfb6d211d86261a3a71a52ad16786db404a0f32e399b7897c074699504c5720f"
+  },
+  "compiledModules": {
+    "bytes": 5169,
+    "sha256": "ed5e3c6077f7afc1ac3c379743d26b33f4d5d701d124029a9f444a41f30b4a65"
+  },
+  "compileCommands": {
+    "bytes": 48517668,
+    "sha256": "c9af85dd0b5cb33e74d3d556ce837d57c4a62a7bcfe0ae4e6b11054b20245ea6"
+  },
+  "sourceFileCount": 2199,
+  "includeDirectoryCount": 340,
+  "enabledModuleCount": 52,
+  "enabledModules": [
+    "mod-account-achievements",
+    "mod-account-mounts",
+    "mod-adaptive-autoattack",
+    "mod-ah-bot",
+    "mod-aoe-loot",
+    "mod-attunement-plus",
+    "mod-autobalance",
+    "mod-azeroth-plex",
+    "mod-battlemon",
+    "mod-better-item-reloading",
+    "mod-challenge-modes",
+    "mod-chat-transmitter",
+    "mod-classless-wildcard",
+    "mod-congrats-on-level",
+    "mod-corpse-respawn",
+    "mod-custom-server",
+    "mod-dungeon-clear",
+    "mod-dungeon-master",
+    "mod-esteria-chat",
+    "mod-fly-anywhere",
+    "mod-guildhouse",
+    "mod-improved-bank",
+    "mod-individual-progression",
+    "mod-individual-xp",
+    "mod-instance-reset",
+    "mod-item-upgrade",
+    "mod-launcher-api",
+    "mod-loot-beam",
+    "mod-loyal-steed",
+    "mod-mana-loot-pet",
+    "mod-mana-speedflying",
+    "mod-mythic-plus",
+    "mod-nemesis-system",
+    "mod-no-hearthstone-cooldown",
+    "mod-no-profession-limit",
+    "mod-npc-beastmaster",
+    "mod-npc-services",
+    "mod-playerbots",
+    "mod-premium",
+    "mod-profession-experience",
+    "mod-random-enchants",
+    "mod-reward-played-time",
+    "mod-reward-shop",
+    "mod-seasonpass",
+    "mod-solo-lfg",
+    "mod-starter-guild",
+    "mod-starting-pet",
+    "mod-transmog",
+    "mod-two-names",
+    "mod-worgoblin-high-elf",
+    "mod-world-chat",
+    "mod-wxl-dbc"
+  ],
+  "sourceRootTrees": [
+    {
+      "path": "src",
+      "gitTreeSha1": "1edb95add470acfab8baece7f3dfa451f1f05197"
+    },
+    {
+      "path": "deps",
+      "gitTreeSha1": "6a2ee24959ca924b5bd5647ecc4b6eef8c545ee0"
+    },
+    {
+      "path": "conf/dist",
+      "gitTreeSha1": "91b4bd3725fedfd4deff90d77507f65b12791bef"
+    },
+    {
+      "path": "modules/mod-account-achievements",
+      "gitTreeSha1": "ded1f7dd583eb9f67c5d8fb4edfbdbece80b4c42"
+    },
+    {
+      "path": "modules/mod-account-mounts",
+      "gitTreeSha1": "4099302b9c13ff4e4e0aca7c4e849a0a7b742e8c"
+    },
+    {
+      "path": "modules/mod-adaptive-autoattack",
+      "gitTreeSha1": "576736da9e8a8f6da5b13283ae836b0cdecd1afa"
+    },
+    {
+      "path": "modules/mod-ah-bot",
+      "gitTreeSha1": "9a485fc7293b97a090c462e179a823cf38896e22"
+    },
+    {
+      "path": "modules/mod-aoe-loot",
+      "gitTreeSha1": "6d970fc4b29f3ed137b2a6cb9242eaef6ca3dd49"
+    },
+    {
+      "path": "modules/mod-attunement-plus",
+      "gitTreeSha1": "0c5e7854a617fb9157f66260550c58f7b1cc313e"
+    },
+    {
+      "path": "modules/mod-autobalance",
+      "gitTreeSha1": "f1a8e827fb39bd3c30e29ae398f7cbc048e1077f"
+    },
+    {
+      "path": "modules/mod-azeroth-plex",
+      "gitTreeSha1": "d2edb4d775074ecd36b3a2929db8278a0061a023"
+    },
+    {
+      "path": "modules/mod-battlemon",
+      "gitTreeSha1": "84157dc7790d6a2020a1e3c9d20ae8b2234e83c9"
+    },
+    {
+      "path": "modules/mod-better-item-reloading",
+      "gitTreeSha1": "b98fb34efd97f267c6b58d6d986819b2f3ab18da"
+    },
+    {
+      "path": "modules/mod-challenge-modes",
+      "gitTreeSha1": "a28ab6ea4744867790044b313f3363a4346cce40"
+    },
+    {
+      "path": "modules/mod-chat-transmitter",
+      "gitTreeSha1": "8deb763ae330f4f6352efa948edcec30f7fe2e54"
+    },
+    {
+      "path": "modules/mod-classless-wildcard",
+      "gitTreeSha1": "9e80e93341cadfcbc9c2c44d11558deb29ed9a46"
+    },
+    {
+      "path": "modules/mod-congrats-on-level",
+      "gitTreeSha1": "4244a1cec6ad243c133082368cac8d4386b719f7"
+    },
+    {
+      "path": "modules/mod-corpse-respawn",
+      "gitTreeSha1": "048a445d1f2a98dcef994c8f48b8e732041e523f"
+    },
+    {
+      "path": "modules/mod-custom-server",
+      "gitTreeSha1": "5bba3375e307c753c5f12f5f7a4892a3c4e4b11f"
+    },
+    {
+      "path": "modules/mod-dungeon-clear",
+      "gitTreeSha1": "6d0544b07bbaed88224bc734b1803a8bbb8d6ed6"
+    },
+    {
+      "path": "modules/mod-dungeon-master",
+      "gitTreeSha1": "68b9dc899f2426cb8ec0badec365f3aa8071cbdf"
+    },
+    {
+      "path": "modules/mod-esteria-chat",
+      "gitTreeSha1": "13a36c7fda29cf5d918c2b5e4656d0a48ff25803"
+    },
+    {
+      "path": "modules/mod-fly-anywhere",
+      "gitTreeSha1": "8419ec2abfda19c7fb1a4ae7840a231ccd806f99"
+    },
+    {
+      "path": "modules/mod-guildhouse",
+      "gitTreeSha1": "a1c7814c31618e7417507c5c1fa214c5ebd7ba24"
+    },
+    {
+      "path": "modules/mod-improved-bank",
+      "gitTreeSha1": "0d3410d2b64b446b0941a8c70d9209bc910f2eda"
+    },
+    {
+      "path": "modules/mod-individual-progression",
+      "gitTreeSha1": "333af689ed15896b4223fb16e90788aae53166fb"
+    },
+    {
+      "path": "modules/mod-individual-xp",
+      "gitTreeSha1": "f67b00bdb339f70585ef80063ca0c5e3e990c11f"
+    },
+    {
+      "path": "modules/mod-instance-reset",
+      "gitTreeSha1": "2d28d68e244f23f76b63fbbfbab158713f67b6e0"
+    },
+    {
+      "path": "modules/mod-item-upgrade",
+      "gitTreeSha1": "1d12ae4861bf82036b05751ead702923f8b32964"
+    },
+    {
+      "path": "modules/mod-launcher-api",
+      "gitTreeSha1": "72fa043af5175e2c5efa91fad6f04e95aaeecb99"
+    },
+    {
+      "path": "modules/mod-loot-beam",
+      "gitTreeSha1": "131aec730db37cbfdf30d36ee42a8a2513da8d98"
+    },
+    {
+      "path": "modules/mod-loyal-steed",
+      "gitTreeSha1": "ae3d333155e78e4bf7bfd5a81b4cec1b7e01cb85"
+    },
+    {
+      "path": "modules/mod-mana-loot-pet",
+      "gitTreeSha1": "9b9136615818aeb5b3d5cefe4a0e45f11b80436d"
+    },
+    {
+      "path": "modules/mod-mana-speedflying",
+      "gitTreeSha1": "c7c813479c6fc1ad0e074d240e0ea06fbf6ecd06"
+    },
+    {
+      "path": "modules/mod-mythic-plus",
+      "gitTreeSha1": "c44cb125b4ac62c55f6f4b0ca71d5a55f6910a52"
+    },
+    {
+      "path": "modules/mod-nemesis-system",
+      "gitTreeSha1": "77e0c30443f13045cba78b99e791a354ecd2f6cb"
+    },
+    {
+      "path": "modules/mod-no-hearthstone-cooldown",
+      "gitTreeSha1": "9ae589a86ab6fd3d05bd230464a5a6143b71442e"
+    },
+    {
+      "path": "modules/mod-no-profession-limit",
+      "gitTreeSha1": "fbd7198050ec3982d7d85aad33e32e91f5392591"
+    },
+    {
+      "path": "modules/mod-npc-beastmaster",
+      "gitTreeSha1": "30e668595ca09310419c1309b716367dc1799715"
+    },
+    {
+      "path": "modules/mod-npc-services",
+      "gitTreeSha1": "9f61424da444b7ee138189222b36491bb5f65df1"
+    },
+    {
+      "path": "modules/mod-playerbots",
+      "gitTreeSha1": "5fec2f9ebce6c2d8c23fd5aefe452f60a3555cd0"
+    },
+    {
+      "path": "modules/mod-premium",
+      "gitTreeSha1": "e5b991253f752ca66262bfb461dbbdf45ae4d118"
+    },
+    {
+      "path": "modules/mod-profession-experience",
+      "gitTreeSha1": "1f9437c3c30b9e3c8b8cf12ac17d2b9424a876ca"
+    },
+    {
+      "path": "modules/mod-random-enchants",
+      "gitTreeSha1": "4dfcb453f3f814cca90a355637bdfb3f392b4941"
+    },
+    {
+      "path": "modules/mod-reward-played-time",
+      "gitTreeSha1": "8354c28ba0fa9598f66b37c63b3c379b48a71c88"
+    },
+    {
+      "path": "modules/mod-reward-shop",
+      "gitTreeSha1": "5cbf72c1315e5d272d630e119f06aaa97c3c6c9d"
+    },
+    {
+      "path": "modules/mod-seasonpass",
+      "gitTreeSha1": "5527b4d63d00938398b9abf16bdfdf98a193fd3d"
+    },
+    {
+      "path": "modules/mod-solo-lfg",
+      "gitTreeSha1": "52706792d2971ab56242a5a1ff78ffe85209deee"
+    },
+    {
+      "path": "modules/mod-starter-guild",
+      "gitTreeSha1": "9f1d8b4bdb1a797f0c3237727625fe343350ae7f"
+    },
+    {
+      "path": "modules/mod-starting-pet",
+      "gitTreeSha1": "f5a0933f97e04620044831f03e1d3a8ecf75368e"
+    },
+    {
+      "path": "modules/mod-transmog",
+      "gitTreeSha1": "9f8eb3a3ed2ee6bca68a325f5d99447178454550"
+    },
+    {
+      "path": "modules/mod-two-names",
+      "gitTreeSha1": "e5ef6d160c414b48f6fb239c565464cd89f5fe81"
+    },
+    {
+      "path": "modules/mod-worgoblin-high-elf",
+      "gitTreeSha1": "1778332f41b24c1a6dcd66cffe3b87d9e4d2042f"
+    },
+    {
+      "path": "modules/mod-world-chat",
+      "gitTreeSha1": "1dc38b751aba09d9a2b50a710b9bb46fabaae89f"
+    },
+    {
+      "path": "modules/mod-wxl-dbc",
+      "gitTreeSha1": "e7edfa7ce928e9593fec2acf7a2010b4c9ac1204"
+    }
+  ],
+  "selection": {
+    "rootFiles": [
+      ".gitmodules",
+      "AUTHORS",
+      "CMakeLists.txt",
+      "LICENSE",
+      "README.md"
+    ],
+    "wholeTrees": [
+      "src",
+      "deps",
+      "conf/dist"
+    ],
+    "excludedSubtrees": [
+      "deps/acore/mysql-tools/bin"
+    ],
+    "moduleCodeSuffixes": [
+      ".c",
+      ".cc",
+      ".cmake",
+      ".cpp",
+      ".cxx",
+      ".h",
+      ".hh",
+      ".hpp",
+      ".hxx",
+      ".inc",
+      ".inl",
+      ".ipp",
+      ".sh",
+      ".tpp"
+    ],
+    "moduleRootBuildFiles": [
+      "CMakeLists.txt",
+      "*.cmake"
+    ],
+    "moduleConfigurationPattern": "conf/**/*.conf.dist",
+    "moduleNoticeBasenames": [
+      "LICENSE*",
+      "COPYING*",
+      "NOTICE*",
+      "AUTHORS*",
+      "COPYRIGHT*"
+    ],
+    "includeWholeElunaTree": true,
+    "selectedFiles": 4942,
+    "selectedBytes": 69805005,
+    "canonicalInventory": {
+      "bytes": 753578,
+      "sha256": "5aac794dfdd25e8874829d1450acf5861e05f64e933b755df83cd8a684ca17f9",
+      "encoding": "UTF-8 sorted-key compact JSON array in sorted path order, followed by LF; records path/mode/gitBlobSha1/bytes, plus gitRepository=Eluna on submodule files"
+    }
+  },
+  "noticeCandidates": [
+    {
+      "path": "AUTHORS",
+      "mode": "100644",
+      "gitBlobSha1": "c9155fdca512f9a0bca499dfdebc6cd3c51968df",
+      "bytes": 2897
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "ecbc0593737be657aef92e3adcf3bcbd6fdb812e",
+      "bytes": 18091
+    },
+    {
+      "path": "deps/SFMT/LICENSE.txt",
+      "mode": "100644",
+      "gitBlobSha1": "6f9c4a6d6a13aaf4a3cd667b484c591949d57e0a",
+      "bytes": 1706
+    },
+    {
+      "path": "deps/acore/joiner/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "1ce875873d862b9c6b8583c6be32a864921ba551",
+      "bytes": 34519
+    },
+    {
+      "path": "deps/argon2/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "fa611f7ac85c03ce552e0e8e65562f9b130ca2ba",
+      "bytes": 17879
+    },
+    {
+      "path": "deps/bzip2/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "cc614178cf79580e04671c4d6acfbe95028b1842",
+      "bytes": 1901
+    },
+    {
+      "path": "deps/fkYAML/fkYAML/node.hpp",
+      "mode": "100644",
+      "gitBlobSha1": "773e852cf7acd3a8b74af0b715d0349b1c3a6f28",
+      "bytes": 600305
+    },
+    {
+      "path": "deps/fmt/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "1cd1ef92696b65b2ecb0e560e622f0a0e869dcf3",
+      "bytes": 1431
+    },
+    {
+      "path": "deps/g3dlite/source/license.cpp",
+      "mode": "100644",
+      "gitBlobSha1": "e2b9f2583d50fee2eb99a73477771631a6219607",
+      "bytes": 3212
+    },
+    {
+      "path": "deps/gsoap/stdsoap2.cpp",
+      "mode": "100644",
+      "gitBlobSha1": "a07003174bf0b39a05f3d94c5d46c11115d40de6",
+      "bytes": 636890
+    },
+    {
+      "path": "deps/jemalloc/COPYING",
+      "mode": "100644",
+      "gitBlobSha1": "3b7fd3585d2b7c6997ba499253cbd773e5f2efb6",
+      "bytes": 1709
+    },
+    {
+      "path": "deps/jsonpath/LICENSE.APACHE2",
+      "mode": "100644",
+      "gitBlobSha1": "6366c04716fb9e88262da7cf0b5cdfa69dbd2c65",
+      "bytes": 586
+    },
+    {
+      "path": "deps/jsonpath/LICENSE.MIT",
+      "mode": "100644",
+      "gitBlobSha1": "6eafbd734a6e062459ba4b3b4a99f8aeb7178664",
+      "bytes": 1088
+    },
+    {
+      "path": "deps/libmpq/AUTHORS",
+      "mode": "100644",
+      "gitBlobSha1": "3d7da7bec9ab23973c422a5bff8d5e325a4be783",
+      "bytes": 245
+    },
+    {
+      "path": "deps/libmpq/COPYING",
+      "mode": "100644",
+      "gitBlobSha1": "4189933be9f243b1d99dc4f10ff544a35bc7b9ec",
+      "bytes": 17997
+    },
+    {
+      "path": "deps/libmpq/debian/copyright",
+      "mode": "100644",
+      "gitBlobSha1": "f014cf14de7a9e3b848fa5666c5fe4ca3a1d125e",
+      "bytes": 653
+    },
+    {
+      "path": "deps/lualib/lua/CMakeLists.txt",
+      "mode": "100644",
+      "gitBlobSha1": "9d6f3a8bb32a4b1fe6d62b8a52fdb468cb6b55aa",
+      "bytes": 5993
+    },
+    {
+      "path": "deps/recastnavigation/License.txt",
+      "mode": "100644",
+      "gitBlobSha1": "95f4bfc9654feb19d2a38705b9db243f0ae3cd54",
+      "bytes": 859
+    },
+    {
+      "path": "deps/semver_bash/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "04ac66f8f66276d9fd98eab604bf90638d623f43",
+      "bytes": 1515
+    },
+    {
+      "path": "deps/utf8cpp/utf8.h",
+      "mode": "100644",
+      "gitBlobSha1": "82b13f59f983c57ea5bba18bcb58f836eaba8d5e",
+      "bytes": 1521
+    },
+    {
+      "path": "deps/zlib/zlib.h",
+      "mode": "100644",
+      "gitBlobSha1": "8d4b932eaf6a0fbb8133b3ab49ba5ef587059fa0",
+      "bytes": 96829
+    },
+    {
+      "path": "modules/mod-account-achievements/LICENSE.md",
+      "mode": "100644",
+      "gitBlobSha1": "11e77635d81221af247b7ca02c43394fe504ea62",
+      "bytes": 34329
+    },
+    {
+      "path": "modules/mod-account-mounts/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "e20b431bcb69267acc39eaf8fdb94c30f40e3223",
+      "bytes": 34503
+    },
+    {
+      "path": "modules/mod-account-mounts/LICENSE.md",
+      "mode": "100644",
+      "gitBlobSha1": "11e77635d81221af247b7ca02c43394fe504ea62",
+      "bytes": 34329
+    },
+    {
+      "path": "modules/mod-adaptive-autoattack/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "ecbc0593737be657aef92e3adcf3bcbd6fdb812e",
+      "bytes": 18091
+    },
+    {
+      "path": "modules/mod-aoe-loot/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "dbbe3558157f5861bff35dcb37b328b679b0ccfd",
+      "bytes": 34520
+    },
+    {
+      "path": "modules/mod-better-item-reloading/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "552c40299cfebe4861f74bcea5dbad24a8d42ee4",
+      "bytes": 1061
+    },
+    {
+      "path": "modules/mod-challenge-modes/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "9031171d1c58e3493fb78c7542fe4893df90db23",
+      "bytes": 1068
+    },
+    {
+      "path": "modules/mod-chat-transmitter/libs/nlohmann/json.hpp",
+      "mode": "100644",
+      "gitBlobSha1": "a70aaf8cbcc6e5b5ebb052296dc6015c26f916ec",
+      "bytes": 926233
+    },
+    {
+      "path": "modules/mod-classless-wildcard/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "ecbc0593737be657aef92e3adcf3bcbd6fdb812e",
+      "bytes": 18091
+    },
+    {
+      "path": "modules/mod-congrats-on-level/LICENSE.md",
+      "mode": "100644",
+      "gitBlobSha1": "11e77635d81221af247b7ca02c43394fe504ea62",
+      "bytes": 34329
+    },
+    {
+      "path": "modules/mod-custom-server/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "d0882e0011a1616130c7bf0b6dbd9cbabd5dbb39",
+      "bytes": 1068
+    },
+    {
+      "path": "modules/mod-dungeon-clear/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "5ddcbdf0ebead8cfc8c44b80928ea5c87c07a771",
+      "bytes": 991
+    },
+    {
+      "path": "modules/mod-dungeon-master/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "e20b431bcb69267acc39eaf8fdb94c30f40e3223",
+      "bytes": 34503
+    },
+    {
+      "path": "modules/mod-fly-anywhere/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "d0882e0011a1616130c7bf0b6dbd9cbabd5dbb39",
+      "bytes": 1068
+    },
+    {
+      "path": "modules/mod-improved-bank/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "d0882e0011a1616130c7bf0b6dbd9cbabd5dbb39",
+      "bytes": 1068
+    },
+    {
+      "path": "modules/mod-individual-progression/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "9031171d1c58e3493fb78c7542fe4893df90db23",
+      "bytes": 1068
+    },
+    {
+      "path": "modules/mod-individual-xp/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "dbbe3558157f5861bff35dcb37b328b679b0ccfd",
+      "bytes": 34520
+    },
+    {
+      "path": "modules/mod-item-upgrade/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "d0882e0011a1616130c7bf0b6dbd9cbabd5dbb39",
+      "bytes": 1068
+    },
+    {
+      "path": "modules/mod-loyal-steed/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "940365c2cd046b9cdfbe086d379fda74e2eea0a4",
+      "bytes": 712
+    },
+    {
+      "path": "modules/mod-mythic-plus/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "d0882e0011a1616130c7bf0b6dbd9cbabd5dbb39",
+      "bytes": 1068
+    },
+    {
+      "path": "modules/mod-nemesis-system/ClientAddon/Ace3/LICENSE.txt",
+      "mode": "100644",
+      "gitBlobSha1": "866fc34ea592d49b1dc0b1b3827c24e7be138858",
+      "bytes": 1697
+    },
+    {
+      "path": "modules/mod-no-hearthstone-cooldown/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "0ad25db4bd1d86c452db3f9602ccdbe172438f52",
+      "bytes": 34523
+    },
+    {
+      "path": "modules/mod-no-profession-limit/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "ecbc0593737be657aef92e3adcf3bcbd6fdb812e",
+      "bytes": 18091
+    },
+    {
+      "path": "modules/mod-npc-beastmaster/LICENSE.md",
+      "mode": "100644",
+      "gitBlobSha1": "11e77635d81221af247b7ca02c43394fe504ea62",
+      "bytes": 34329
+    },
+    {
+      "path": "modules/mod-playerbots/AUTHORS.md",
+      "mode": "100644",
+      "gitBlobSha1": "6bf81c6fb27f6c7ab03cf81fd8c8687bfdae37e1",
+      "bytes": 2084
+    },
+    {
+      "path": "modules/mod-playerbots/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "d159169d1050894d3ea3b98e1c965c4058208fe1",
+      "bytes": 18092
+    },
+    {
+      "path": "modules/mod-premium/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "dbbe3558157f5861bff35dcb37b328b679b0ccfd",
+      "bytes": 34520
+    },
+    {
+      "path": "modules/mod-profession-experience/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "450f79b64dd9bc543ea7256e52fb5b69539ae1e8",
+      "bytes": 947
+    },
+    {
+      "path": "modules/mod-reward-played-time/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "dbbe3558157f5861bff35dcb37b328b679b0ccfd",
+      "bytes": 34520
+    },
+    {
+      "path": "modules/mod-reward-shop/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "dbbe3558157f5861bff35dcb37b328b679b0ccfd",
+      "bytes": 34520
+    },
+    {
+      "path": "modules/mod-seasonpass/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "593265c00cbde7a7eaa253d26b25c52c8c22278a",
+      "bytes": 34526
+    },
+    {
+      "path": "modules/mod-solo-lfg/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "9d5fa0f1f2dfd85f2818823ae72b054ce50d5508",
+      "bytes": 1063
+    },
+    {
+      "path": "modules/mod-starter-guild/LICENSE.md",
+      "mode": "100644",
+      "gitBlobSha1": "11e77635d81221af247b7ca02c43394fe504ea62",
+      "bytes": 34329
+    },
+    {
+      "path": "modules/mod-starting-pet/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "0ad25db4bd1d86c452db3f9602ccdbe172438f52",
+      "bytes": 34523
+    },
+    {
+      "path": "modules/mod-transmog/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "dbbe3558157f5861bff35dcb37b328b679b0ccfd",
+      "bytes": 34520
+    },
+    {
+      "path": "modules/mod-worgoblin-high-elf/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "0ad25db4bd1d86c452db3f9602ccdbe172438f52",
+      "bytes": 34523
+    },
+    {
+      "path": "modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/Dep_LuaSrcDiet/COPYRIGHT",
+      "mode": "100644",
+      "gitBlobSha1": "b91ffa8d4bb4be1d5423f6cb1fef1ddd4a8c36fb",
+      "bytes": 1733
+    },
+    {
+      "path": "modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/Dep_LuaSrcDiet/COPYRIGHT_Lua51",
+      "mode": "100644",
+      "gitBlobSha1": "3a53e741e0372e879886e1383ca604b57ed748d4",
+      "bytes": 1528
+    },
+    {
+      "path": "modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/Dep_Smallfolk/LICENSE.md",
+      "mode": "100644",
+      "gitBlobSha1": "4e1c163fd250c990e03686ef24eaf3a672d0cc4c",
+      "bytes": 1058
+    },
+    {
+      "path": "modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/Dep_crc32lua/COPYRIGHT",
+      "mode": "100644",
+      "gitBlobSha1": "0c4d3bdb68c59d7768148be1a3a3878abef91dc5",
+      "bytes": 1250
+    },
+    {
+      "path": "modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/lualzw-zeros/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "a8fc85148989bb19ca3c1b7b1b617fa087f2d862",
+      "bytes": 1057
+    },
+    {
+      "path": "modules/mod-world-chat/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "dbbe3558157f5861bff35dcb37b328b679b0ccfd",
+      "bytes": 34520
+    },
+    {
+      "path": "src/server/game/LuaEngine/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "9cecc1d4669ee8af2ca727a5d8cde10cd8b2d7cc",
+      "bytes": 35141,
+      "gitRepository": "Eluna"
+    },
+    {
+      "path": "src/server/game/LuaEngine/extensions/StackTracePlus/LICENSE",
+      "mode": "100644",
+      "gitBlobSha1": "49afdbbc39c2cc221581fae9b218a39806f4b3c9",
+      "bytes": 1077,
+      "gitRepository": "Eluna"
+    }
+  ],
+  "externalStaticInput": {
+    "name": "Lua",
+    "version": "5.2.4",
+    "url": "https://www.lua.org/ftp/lua-5.2.4.tar.gz",
+    "sha256": "b9e2e4aad6789b3b63a056d442f7b39f0ecfca3ae0f1fc0ae4e9614401b69f4b",
+    "declaration": {
+      "path": "deps/lualib/lua/CMakeLists.txt",
+      "mode": "100644",
+      "gitBlobSha1": "9d6f3a8bb32a4b1fe6d62b8a52fdb468cb6b55aa",
+      "bytes": 5993
+    },
+    "archiveLocallyVerified": false
+  },
+  "sourceCompanionComplete": false,
+  "isolatedSourceRebuildQualified": false,
+  "sevenPatchBuildVerified": false,
+  "androidRuntimeQualified": false,
+  "gameplayQualified": false
+}

@@ -20,6 +20,14 @@ on:
       - tools/prepare_runtime.py
       - tools/provider_client_runtime.py
       - tools/release_server_dependencies.py
+      - tools/prepare_server_dependency_image.py
+      - tools/verify_server_dependency_image.py
+      - tests/test_server_dependency_image.py
+      - tests/test_server_dependency_image_readback.py
+      - tools/provider_server_runtime.py
+      - tools/package_server_runtime.py
+      - runtime/server/dependency-release.lock.json
+      - runtime/server/android-provider.lock.json
       - tools/render_server_config.py
       - runtime/server/Dockerfile
       - runtime/server/sources.lock.json
@@ -48,6 +56,14 @@ on:
       - tools/prepare_runtime.py
       - tools/provider_client_runtime.py
       - tools/release_server_dependencies.py
+      - tools/prepare_server_dependency_image.py
+      - tools/verify_server_dependency_image.py
+      - tests/test_server_dependency_image.py
+      - tests/test_server_dependency_image_readback.py
+      - tools/provider_server_runtime.py
+      - tools/package_server_runtime.py
+      - runtime/server/dependency-release.lock.json
+      - runtime/server/android-provider.lock.json
       - tools/render_server_config.py
       - runtime/server/Dockerfile
       - runtime/server/sources.lock.json
@@ -73,7 +89,7 @@ jobs:
       - name: Verify staging, source packaging and process ownership guards
         run: |
           test "$(uname -m)" = aarch64
-          python3 -m unittest tests.test_server_requalification tests.test_server_package tests.test_dbimport_qualification tests.test_server_schema_baseline tests.test_owned_process_group -v
+          python3 -m unittest tests.test_server_requalification tests.test_server_package tests.test_dbimport_qualification tests.test_server_schema_baseline tests.test_owned_process_group tests.test_server_dependency_image tests.test_server_dependency_image_readback -v
           mkdir -p out/server-requalification-evidence out/server-requalification-private
       - name: Fetch exact linked artifacts and repack their original source content
         env:
@@ -87,23 +103,42 @@ jobs:
           cp out/server-reference/locked/sources.lock.json out/server-requalification-evidence/original-sources.lock.json
           cp out/server-reference/content/package-receipt.json out/server-requalification-evidence/repacked-content-receipt.json
           cp out/server-reference/original-content/package-receipt.json out/server-requalification-evidence/original-content-receipt.json
-      - name: Build exact pinned MySQL dependency environment
+      - name: Build and read back the exact published dependency image without APT
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
-          docker build --platform linux/arm64 --target runtime \
-            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
-            -t esteria-server-reference:qualification runtime/server \
+          test "$(uname -m)" = aarch64
+          python3 tools/release_server_dependencies.py prepare --output out/server-dependency-release \
+            > out/server-requalification-evidence/dependency-download.log 2>&1
+          python3 tools/prepare_server_dependency_image.py \
+            --inputs out/server-dependency-release --output out/server-dependency-image \
+            > out/server-requalification-evidence/dependency-context.log 2>&1
+          cp out/server-dependency-image/context-receipt.json out/server-requalification-evidence/dependency-context.json
+          # The complete source companion was reverified and remains on the
+          # durable release. Reclaim only this step's new download directory.
+          rm -rf out/server-dependency-release
+          docker build --network none --platform linux/arm64 \
+            -t esteria-server-reference:qualification out/server-dependency-image/context \
             > out/server-requalification-evidence/image-build.log 2>&1
+          docker image inspect esteria-server-reference:qualification --format '{{.Id}}' \
+            > out/server-requalification-evidence/image-id.txt
+          docker run --rm --network none --read-only \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/tools/verify_server_dependency_image.py,dst=/verify-image.py,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/server-dependency-image/context-receipt.json,dst=/context-receipt.json,readonly" \
+            esteria-server-reference:qualification /usr/bin/python3 /verify-image.py \
+            --context-receipt /context-receipt.json \
+            > out/server-requalification-evidence/dependency-image-check.json
           container=$(docker create esteria-server-reference:qualification)
           trap 'docker rm -f "$container" >/dev/null' EXIT
           docker cp "$container:/etc/esteria-server-runtime.json" out/server-requalification-evidence/server-runtime.json
-          python3 - <<'PY'
+          python3 - <<'PY_IMAGE'
           import hashlib, json, os, pathlib
           root = pathlib.Path('out/server-reference')
           runtime = json.loads(pathlib.Path('out/server-requalification-evidence/server-runtime.json').read_text())
           with open(os.environ['GITHUB_ENV'], 'a') as output:
               output.write('ESTERIA_SERVER_REFERENCE_VERSION=' + runtime['expectedMysqlSqlVersion'] + '\n')
               output.write('ESTERIA_SERVER_REFERENCE_CONTENT=' + hashlib.sha256((root/'content/package-receipt.json').read_bytes()).hexdigest() + '\n')
-          PY
+          PY_IMAGE
       - name: Run real compiled updater and authentication against fresh owned state
         run: |
           docker run --rm --init --network none \

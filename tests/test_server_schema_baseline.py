@@ -1,6 +1,9 @@
 import copy
 import hashlib
 from pathlib import Path
+import os
+import re
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -23,6 +26,8 @@ class Database:
         self.applied.append((database, str(path)))
         if path.name == Path(baseline.NEMESIS_BASE).name:
             self.tables[database].extend(baseline.NEMESIS_TABLES)
+        elif path.name == Path(baseline.CUSTOM_RACE_DDL).name:
+            self.tables[database].extend(baseline.CUSTOM_RACE_TABLES)
         else:
             self.tables[database].append(path.stem)
 
@@ -49,6 +54,11 @@ class BaselineGuards(unittest.TestCase):
         self.identity.start(); self.addCleanup(self.identity.stop)
         self.manifest['databases']['characters']['updateOrder'].append(
             dict(path=baseline.NEMESIS_BASE, state='MODULE', origin=baseline.NEMESIS_MODULE))
+        self.custom_race = self.add_source(baseline.CUSTOM_RACE_DDL, b'-- synthetic canonical DDL prerequisite\n')
+        self.race_identity = patch.object(baseline, 'CUSTOM_RACE_IDENTITY', self.custom_race)
+        self.race_identity.start(); self.addCleanup(self.race_identity.stop)
+        self.manifest['databases']['world']['updateOrder'].append(
+            dict(path=baseline.CUSTOM_RACE_DDL, state='PENDING', origin='base-updates_include'))
 
     def add_source(self, path, raw):
         target = self.root / path
@@ -62,11 +72,14 @@ class BaselineGuards(unittest.TestCase):
     def run_baseline(self):
         return baseline.initialize(self.db, self.root, self.manifest, self.db.apply)
 
-    def test_all_core_bases_precede_only_documented_prerequisite_and_no_ledger_writes(self):
+    def test_all_core_bases_precede_only_exact_prerequisites_and_no_ledger_writes(self):
         receipt = self.run_baseline()
         expected = [(database, str(self.root / path)) for database in baseline.DATABASES
                     for path in self.manifest['databases'][database]['base']]
-        self.assertEqual(self.db.applied, expected + [('characters', str(self.root / baseline.NEMESIS_BASE))])
+        self.assertEqual(self.db.applied, expected + [('characters', str(self.root / baseline.NEMESIS_BASE)),
+                                                   ('world', str(self.root / baseline.CUSTOM_RACE_DDL))])
+        self.assertEqual(receipt['sourceSchemaPrerequisites'], [dict(database='world',
+            path=baseline.CUSTOM_RACE_DDL, tables=list(baseline.CUSTOM_RACE_TABLES), source=self.custom_race)])
         self.assertFalse(receipt['syntheticUpdaterLedgerRowsWritten'])
         self.assertFalse(receipt['compiledAutoPopulationQualified'])
         self.assertTrue(receipt['baselineImportCompleted'])
@@ -126,7 +139,33 @@ class BaselineGuards(unittest.TestCase):
         self.manifest['enabledModules'] = []
         receipt = self.run_baseline()
         self.assertEqual(receipt['documentedModulePrerequisites'], [])
-        self.assertEqual(len(self.db.applied), 6)
+        self.assertEqual(len(self.db.applied), 7)
+        self.assertEqual(self.db.applied[-1], ('world', str(self.root / baseline.CUSTOM_RACE_DDL)))
+
+    def test_missing_changed_or_reclassified_custom_race_prerequisite_blocks_before_sql(self):
+        original = copy.deepcopy(self.manifest)
+        for change in ('missing', 'identity', 'state', 'bytes'):
+            with self.subTest(change=change):
+                self.manifest = copy.deepcopy(original)
+                target = self.root / baseline.CUSTOM_RACE_DDL
+                target.write_bytes(b'-- synthetic canonical DDL prerequisite\n')
+                if change == 'missing': self.manifest['databases']['world']['updateOrder'] = []
+                elif change == 'identity': self.manifest['files'][baseline.CUSTOM_RACE_DDL]['gitBlob'] = 'f' * 40
+                elif change == 'state': self.manifest['databases']['world']['updateOrder'][0]['state'] = 'MODULE'
+                else: target.write_bytes(b'changed DDL')
+                with self.assertRaises(ValueError): self.run_baseline()
+                self.assertEqual(self.db.applied, [])
+
+    def test_prerequisite_tables_appearing_after_core_import_are_preserved(self):
+        apply = self.db.apply
+        def unexpected(database, path):
+            apply(database, path)
+            if path.name == Path(baseline.NEMESIS_BASE).name:
+                self.db.tables['world'].append(baseline.CUSTOM_RACE_TABLES[0])
+        with self.assertRaisesRegex(ValueError, 'existing prerequisite tables preserved'):
+            baseline.initialize(self.db, self.root, self.manifest, unexpected)
+        self.assertNotIn(('world', str(self.root / baseline.CUSTOM_RACE_DDL)), self.db.applied)
+        self.assertIn(baseline.CUSTOM_RACE_TABLES[0], self.db.tables['world'])
 
     def test_wrong_table_set_stops_before_later_database_or_module(self):
         def wrong(database, path):
@@ -137,6 +176,29 @@ class BaselineGuards(unittest.TestCase):
 
 
 class ActualPinnedSource(unittest.TestCase):
+    def test_canonical_custom_race_creator_has_only_four_unchanged_idempotent_tables(self):
+        roots = (Path(__file__).resolve().parents[1] / 'sources/server',
+                 Path(__file__).resolve().parents[2] / 'server-src')
+        raw = None
+        for source in roots:
+            path = source / baseline.CUSTOM_RACE_DDL
+            if path.is_file():
+                raw = path.read_bytes(); break
+            if not (source / '.git').exists(): continue
+            result = subprocess.run(['git', 'show', baseline.base.content.SUPPORTED_SERVER + ':' + baseline.CUSTOM_RACE_DDL],
+                cwd=source, env=dict(os.environ, GIT_NO_LAZY_FETCH='1'), stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL, timeout=10)
+            if result.returncode == 0:
+                raw = result.stdout; break
+        if raw is None: self.skipTest('pinned canonical SQL unavailable; actual gate verifies bytes before import')
+        identity = dict(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest(),
+            gitBlob=hashlib.sha1(b'blob ' + str(len(raw)).encode() + b'\0' + raw).hexdigest())
+        self.assertEqual(identity, baseline.CUSTOM_RACE_IDENTITY)
+        self.assertEqual(re.findall(rb'CREATE TABLE IF NOT EXISTS `([^`]+)`', raw),
+                         [name.encode() for name in baseline.CUSTOM_RACE_TABLES])
+        statements = re.sub(rb'--[^\n]*', b'', raw)
+        self.assertIsNone(re.search(rb'\b(INSERT|UPDATE|DELETE|REPLACE|DROP|ALTER|TRUNCATE)\b', statements, re.I))
+
     def test_audited_nemesis_base_bytes_and_idempotent_creation_are_unchanged(self):
         roots = (Path(__file__).resolve().parents[1] / 'sources/server',
                  Path(__file__).resolve().parents[2] / 'server-src')

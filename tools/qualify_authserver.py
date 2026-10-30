@@ -132,23 +132,32 @@ def wait_authserver(capture):
 
 
 def templates(install, output, content_source, build):
+    """Bind both immutable main templates to the build and packaged source.
+
+    The verified content tree also holds the exact compiled module selection;
+    returning it permits the shared renderer to materialize every module.
+    """
     listed = {row['path']: row for row in build['files']}
-    target = output / 'auth-template-source'
-    target.mkdir(mode=0o700)
     for app in ('authserver', 'worldserver'):
         paths = [path for path in listed if Path(path).name == app + '.conf.dist']
         require(len(paths) == 1, 'matching installed server configuration template missing')
         row = listed[paths[0]]
         source = install / paths[0]
-        require(files.identity(source) == {key: row[key] for key in ('bytes', 'sha256')} and row['bytes'] <= 2 * 1024**2,
+        expected = {key: row[key] for key in ('bytes', 'sha256')}
+        require(files.identity(source) == expected and row['bytes'] <= 2 * 1024**2,
                 'installed server template differs from exact build receipt')
-        destination = target / ('src/server/apps/' + app + '/' + app + '.conf.dist')
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        config.write_private(destination, source.read_text())
-    relative = 'modules/mod-playerbots/conf/playerbots.conf.dist'
-    destination = target / relative; destination.parent.mkdir(parents=True)
-    config.write_private(destination, (content_source / relative).read_text())
-    return target
+        packaged = content_source / ('src/server/apps/' + app + '/' + app + '.conf.dist')
+        require(files.identity(packaged) == expected, 'source and installed main configuration templates differ')
+    return content_source
+
+
+def render_runtime_config(install, output, source, build, state, mysql):
+    result = config.render(templates(install, output, source, build), state,
+        output / 'unavailable-game-data', source, mysql,
+        module_inventory=output / 'content/metadata/content-manifest.json',
+        compiled_modules=output / 'content/metadata/compiled-modules.json')
+    require(result['module_configurations_complete'] is True, 'complete compiled module configurations required')
+    return result
 
 
 def export_auth_log(state, output, extra_secrets=()):
@@ -199,8 +208,9 @@ def run(install, content_directory, receipt_sha256, lock_path, mysql, mysqld, ve
         evidence.update(serverBuildId=build['buildId'], authserver={key:auth[0][key] for key in ('bytes','sha256')},
                         source=updated['source'], sourceLockSha256=updated['sourceLockSha256'])
         source = output / 'content/source'
-        render_source = templates(install, output, source, build)
-        config.render(render_source, state, output / 'unavailable-game-data', source, mysql)
+        rendered = render_runtime_config(install, output, source, build, state, mysql)
+        evidence['moduleConfigurationsPrepared'] = rendered['module_configurations_complete']
+        evidence['worldModuleConfigsLoadedByAuthserver'] = False
         password = db.read_secret(state / 'accounts/database-secret')
         generation = realm.active_config(state, password)
         configuration = state / 'config/generations' / generation / 'authserver.conf'

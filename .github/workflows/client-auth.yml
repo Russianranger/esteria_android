@@ -6,6 +6,12 @@ on:
       - .github/workflows/client-auth.yml
       - runtime/client/auth-reference.lock.json
       - runtime/client-auth/**
+      - tools/prepare_client_auth_tools.py
+      - tools/verify_client_auth_tools.py
+      - tests/test_client_auth_tools.py
+      - tools/prepare_server_dependency_image.py
+      - tools/verify_server_dependency_image.py
+      - runtime/server/dependency-release.lock.json
       - runtime/server/compiled-reference.lock.json
       - tools/prepare_client_auth_inputs.py
       - tools/qualify_client_auth.py
@@ -43,7 +49,7 @@ jobs:
       - name: Verify host and private authentication contracts
         run: |
           test "$(uname -m)" = aarch64
-          python3 -m unittest tests.test_client_auth_inputs tests.test_client_auth_qualification tests.test_server_requalification tests.test_server_schema_baseline tests.test_owned_process_group -v
+          python3 -m unittest tests.test_client_auth_inputs tests.test_client_auth_tools tests.test_client_auth_qualification tests.test_server_requalification tests.test_server_schema_baseline tests.test_owned_process_group -v
           mkdir -p out/client-auth-evidence out/client-auth-private
       - name: Fetch exact previously linked client and server inputs
         env:
@@ -63,20 +69,47 @@ jobs:
           python3 tools/prepare_runtime.py --download --cache "$RUNNER_TEMP/client-auth-wine-cache" \
             --stage "$GITHUB_WORKSPACE/out/client-auth-private/wine" \
             > out/client-auth-evidence/wine-preparation.log 2>&1
-      - name: Build the pinned native MySQL environment and namespace tools
+      - name: Prepare exact dependency and test-tool inputs without a new resolver
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
-          docker build --platform linux/arm64 --target runtime \
-            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
-            -t esteria-server-reference:qualification runtime/server \
+          python3 tools/release_server_dependencies.py prepare --output out/server-dependency-release \
+            > out/client-auth-evidence/dependency-download.log 2>&1
+          python3 tools/prepare_server_dependency_image.py \
+            --inputs out/server-dependency-release --output out/server-dependency-image \
+            > out/client-auth-evidence/dependency-context.log 2>&1
+          cp out/server-dependency-image/context-receipt.json out/client-auth-evidence/dependency-context.json
+          rm -rf out/server-dependency-release
+          python3 tools/prepare_client_auth_tools.py --download \
+            --cache "$RUNNER_TEMP/client-auth-tools-cache" --output out/client-auth-tools \
+            > out/client-auth-evidence/tool-preparation.log 2>&1
+          cp out/client-auth-tools/context-receipt.json out/client-auth-evidence/tool-context.json
+      - name: Build and verify native images with networking disabled
+        run: |
+          docker build --network none --platform linux/arm64 \
+            -t esteria-server-reference:qualification out/server-dependency-image/context \
             > out/client-auth-evidence/server-image-build.log 2>&1
-          docker build --platform linux/arm64 --file runtime/client-auth/Dockerfile \
-            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
-            -t esteria-client-auth:qualification . \
+          docker run --rm --network none --read-only \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/tools/verify_server_dependency_image.py,dst=/verify-image.py,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/server-dependency-image/context-receipt.json,dst=/context-receipt.json,readonly" \
+            esteria-server-reference:qualification /usr/bin/python3 /verify-image.py \
+            --context-receipt /context-receipt.json \
+            > out/client-auth-evidence/dependency-image-check.json
+          docker build --network none --platform linux/arm64 \
+            -t esteria-client-auth:qualification out/client-auth-tools/context \
             > out/client-auth-evidence/auth-image-build.log 2>&1
+          # Recheck original MySQL/Python ELF bytes and fresh state after tools install.
+          docker run --rm --network none --read-only \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/tools/verify_server_dependency_image.py,dst=/verify-image.py,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/server-dependency-image/context-receipt.json,dst=/context-receipt.json,readonly" \
+            esteria-client-auth:qualification /usr/bin/python3 /verify-image.py \
+            --context-receipt /context-receipt.json \
+            > out/client-auth-evidence/tool-image-base-check.json
           container=$(docker create esteria-client-auth:qualification)
           trap 'docker rm -f "$container" >/dev/null' EXIT
           docker cp "$container:/etc/esteria-server-runtime.json" out/client-auth-evidence/server-runtime.json
           docker cp "$container:/etc/esteria-client-auth-tool-packages.txt" out/client-auth-evidence/tool-packages.txt
+          docker cp "$container:/etc/esteria-client-auth-tools.json" out/client-auth-evidence/tool-image-check.json
           python3 - <<'PY'
           import hashlib, json, os, pathlib
           client = json.loads(pathlib.Path('runtime/client/auth-reference.lock.json').read_text())
@@ -143,3 +176,15 @@ jobs:
           path: out/client-auth-evidence
           retention-days: 14
           if-no-files-found: error
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: compiled-auth-test-tool-inputs-${{ github.sha }}
+          path: |
+            out/client-auth-tools/context-receipt.json
+            out/client-auth-tools/context/tool-inputs.lock.json
+            out/client-auth-tools/context/Dockerfile
+            out/client-auth-tools/context/verify.py
+            out/client-auth-tools/sources
+          retention-days: 14
+          if-no-files-found: warn

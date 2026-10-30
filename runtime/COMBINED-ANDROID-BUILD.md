@@ -72,3 +72,18 @@ was checked by the CI sealer and not downloaded locally. Full identities and the
 source-bound receipt are in `runtime/evidence/combined-android-build-41013086386.json`.
 This remains compilation/packaging evidence; its Android execution and gameplay
 flags are false.
+
+Run [41019374657](https://github.com/Russianranger/esteria_android/actions/runs/41019374657)
+at `e9dcb61d8d8c40fc683ac2a67bbf15a8eb538300` passed the full pipeline with the
+current `0f931bbade36a4b197725d691b8eff7caea7b3be` client and seven-patch source
+lock, using the newly published client release anonymously. The APK is
+120,954,858 bytes, SHA-256
+`de9780a4403dd5235d5759bebb915c6f043bf44ac85e5ce956b00eeff1c5ac20`.
+Independent readback verified its transport ZIP, APK, seven native/provider
+payloads, complete allowed asset inventory, NDK notice hashes, both helper
+families and source locks against the exact committed revision. The
+980,319,301-byte matching source artifact passed the CI sealer; its outer ZIP was
+not downloaded locally. Exact evidence is in
+`runtime/evidence/combined-android-build-41019374657.json`. This build includes
+the server dependency runtime, not the auth/world executables or Wine, and does
+not establish Android execution, game login, gameplay or persistent-key updates.

@@ -14,9 +14,11 @@ Eluna58d7652138887783228b9727bd1fa4e08f00342b, with seven hashed server patches.
 5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1.
 The new client provider/source companion and seven-file durable release are now
 published and anonymously fetched/verified at packaging27446b5. The old69 release
-remains intact. Rerun/inspect the current combined APK gate after the new public
-release receipt, without treating publication as a successful application build.
-The newer client development tip is0f931bbade36a4b197725d691b8eff7caea7b3be;
+remains intact. Current-pin combined run41019374657 now passes APK/lint/sealed-source/readback;
+its exact public evidence is in runtime/COMBINED-ANDROID-BUILD.md. This remains an
+internal package without the compiled server programs or qualified game session.
+The client development tip is4b16bece2b8396fb434b5289a40d8ae418c48e28 (docs only
+above the measured0f executable);
 its workflow pins integration0146ca89307eb3c00c09b7fbecdf3e301bd9bd53 for Wine Grunt.
 Fetch both branches and inspect Actions before interpreting pending results.
 
@@ -49,7 +51,11 @@ ARM64 execution, client/server login or world entry is qualified.
    before SQL because the consumer omitted three producer provenance fields.
    That strict consumer is fixed and regression-tested. server-requalification.yml
    now tests the retained exact linked artifact without another full compile.
-   No actual compiled SQL/auth success is claimed yet.
+   Seven-patch run41019374697 also links/installs and passes loader/module checks.
+   Its real baseline+Nemesis import succeeds, then dbimport stops at an epoch-named
+   race update before the calendar-named four-table creator. The exact fresh-only
+   creator prerequisite is now implemented; corrected native execution is pending.
+   No completed compiled SQL/auth success is claimed yet.
 3. Proposed patch7 derives module configs from the selected main config's parent,
    preserving defaults. Actual source-linked host ConfigMgr reference passes and
    original-source negative control fails. It is now in sources.lock with client0f.
@@ -101,8 +107,10 @@ ARM64 execution, client/server login or world entry is qualified.
 11. Android x64 Wine41015479987 passed full source/APK gates, then failed ntdll
     executable-page protection before client execution. Run41017052972 establishes
     errno13 only for dirty private-file RW→RX; anonymous/clean/direct cases pass.
-    The source-owned Wine private-PE mapping adaptation is in progress. No Android
-    policy or target SDK is weakened. Owned authenticated
+    Source-owned Wine private-PE copy adaptation is published at824ca6d; source
+    build/host original-versus-opt-in execution run41040860418 is pending. Do not
+    repin the Android fixture until successful same-run runtime/source artifacts
+    and host receipt are verified. No Android policy or target SDK is weakened. Owned authenticated
     X11/input/audio composition now builds; complete Android execution is separate.
 
 ## Missing content and acceptance
@@ -117,3 +125,25 @@ qualification at a small measured population; current random population is zero.
 Read the scoped runtime qualification documents for exact hashes and limits. Do
 not infer world saves from a file fixture, game input from XTest, or Adreno rendering
 from Lavapipe. Main device testing requires one coherent expected-playable package.
+
+## Resume priorities
+
+The user requests continued work until a nearly complete import-and-test package
+or 50% weekly usage. No current tool/account endpoint successfully exposes that
+weekly meter here; do not invent a reading or claim automatic quota enforcement.
+If the user reports the threshold, finish a concrete checkpoint and stop.
+
+- Use the durable Ubuntu dependency-image helper for runtime-only SQL/auth gates;
+  snapshot50x failures previously prevented execution. It verifies all preserved
+  input/source bytes and image readback before running a guest, without device Docker.
+- Complete real native source-baseline/updater/auth/playerbots qualifications. The
+  full50 ConfigMgr native workflow remains distinct from passed x64 source tests.
+- Produce measured stripped server-program/runtime+debug artifacts; original
+  seven-patch worldserver contains2.6GB debug data. The preparatory packager alone
+  does not supply a complete source companion or Android provider.
+- Pass the adapted Wine host fixture, repin exact successful runtime/source
+  artifacts, rerun actual Android x64 reconstructed-client diagnostics, then
+  port/qualify the same adaptation in the production ARM64 runtime.
+- Actual Android Surface lifecycle41019374598 passes six groups, exactly two
+  connections/two peer EOFs, paused creation/recreation and real AudioTrack clock.
+  Complete guest X11/Wine/Adreno presentation remains unqualified.

@@ -70,9 +70,38 @@ including real Grunt against the controlled peer; it did not qualify a compiled
 server. The application production source lock is not substituted for either
 reference.
 
-The qualification-only Docker extension installs Git, ELF/namespace tools and
-iproute2 from the same hash-checked Ubuntu snapshot as the server dependency
-image. It does not change the Android runtime recipe. During execution the
+The first compiled-pair run `41018243765` verified the exact client/server inputs,
+prepared Wine and built the dependency image. It then failed on Ubuntu snapshot
+HTTP503 responses while fetching test tools, before SQL or Grunt execution.
+Artifact12960742516 (SHA256
+`1ae48c1980bf0cbf6a9fe69e23ab3050ad0a4ca96ba1d784849e2bbd26cac3f0`)
+retains that actual APT solver log. This is an infrastructure failure, not an
+authentication result.
+
+The qualification-only extension now uses the exact published dependency rootfs
+and a separate offline tool bundle. `runtime/client-auth/tool-inputs.lock.json`
+pins all32 packages selected by that signed APT result, all20 corresponding source
+packages/64 original files, both verified InReleases, four index hashes, and the
+full solver-log identity. `prepare_client_auth_tools.py` accepts only those exact
+bytes from the official Ubuntu pool or the original snapshot; it performs no new
+resolution or version substitution. Source files stay outside the image context
+and are retained in a separate test-input artifact. The Android runtime recipe
+and dependency payload do not gain these tools.
+
+Both images build with networking disabled. Before installation, the actual
+dependency metadata and complete dpkg-status file must match the measured
+published rootfs. After offline `dpkg -i`, its package inventory must equal the
+unchanged original set plus exactly the32 selected packages; missing dependencies,
+upgrades and extra packages fail. Actual native Git/readelf/ip/unshare version
+commands must execute, then the original MySQL/Python ELF identities and fresh
+state are rechecked. Host pin/bounds/transaction guards are not execution proof;
+the replacement image and compiled-pair gates remain pending their actual run.
+Actual host preparation fetched and verified all96 files (98,721,169 bytes),
+checked every `.deb` Package/Version/Architecture against its pin, and repeated
+staging successfully with downloads disabled. The six new host guards pass;
+the broader authentication/schema/process selection passes36 tests.
+
+During execution the
 disposable container is read-only and has no network interface beyond loopback;
 namespace privileges allow the composer to create its own owned PID, mount and
 network namespaces. Only the newly created `/state` and temporary filesystem are

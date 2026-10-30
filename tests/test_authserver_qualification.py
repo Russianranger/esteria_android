@@ -15,6 +15,38 @@ class AuthserverGuards(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory(); self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
 
+    def template_fixture(self):
+        install = self.root / 'install'; content = self.root / 'content/source'; rows = []
+        for app in ('authserver', 'worldserver'):
+            relative = 'etc/' + app + '.conf.dist'
+            installed = install / relative; installed.parent.mkdir(parents=True, exist_ok=True)
+            installed.write_bytes((app + '\n').encode())
+            source = content / ('src/server/apps/' + app + '/' + app + '.conf.dist')
+            source.parent.mkdir(parents=True); source.write_bytes(installed.read_bytes())
+            rows.append(dict(path=relative, **auth.files.identity(installed)))
+        return install, content, {'files': rows}
+
+    def test_main_templates_must_match_installed_build_and_immutable_content(self):
+        install, content, build = self.template_fixture()
+        self.assertEqual(auth.templates(install, self.root, content, build), content)
+        changed = content / 'src/server/apps/worldserver/worldserver.conf.dist'
+        changed.write_bytes(b'changed source')
+        with patch.object(auth.config, 'render') as render, self.assertRaisesRegex(ValueError, 'templates differ'):
+            auth.render_runtime_config(install, self.root, content, build, self.root / 'state', Path('/mysql'))
+        render.assert_not_called()
+        self.assertFalse((self.root / 'state').exists())
+
+    def test_complete_module_metadata_is_passed_to_shared_renderer(self):
+        install, content, build = self.template_fixture()
+        with patch.object(auth.config, 'render', return_value={'module_configurations_complete': True}) as render:
+            auth.render_runtime_config(install, self.root, content, build, self.root / 'state', Path('/mysql'))
+        self.assertEqual(render.call_args.kwargs, dict(
+            module_inventory=self.root / 'content/metadata/content-manifest.json',
+            compiled_modules=self.root / 'content/metadata/compiled-modules.json'))
+        with patch.object(auth.config, 'render', return_value={'module_configurations_complete': False}), \
+                self.assertRaisesRegex(ValueError, 'complete compiled module'):
+            auth.render_runtime_config(install, self.root, content, build, self.root / 'state', Path('/mysql'))
+
     def proc(self, endpoint='0100007F:0E8C', inode='123', ipv6=False):
         root = self.root / 'proc'; process = root / '52'
         (process/'fd').mkdir(parents=True, exist_ok=True)

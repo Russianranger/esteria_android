@@ -8,7 +8,9 @@ import os
 from pathlib import Path
 import platform
 import re
+import shutil
 import stat
+import struct
 import subprocess
 import time
 
@@ -26,6 +28,106 @@ OBSERVER = 'esteria-x11-input-observer'
 CHECKS = ('absoluteMotion', 'relativeMotion', 'buttons', 'keyboardAndShift', 'releaseOnEof',
           'unsupportedKeyRejected', 'reconnectNeutral')
 UNQUALIFIED = ('androidQualified', 'controllerQualified', 'gameplayQualified')
+DISPLAY = 64
+READY = b'ESTERIA_X11_INPUT_READY protocol=1'
+FORMATTER_SOURCES = ('core/src/main/java/io/github/russianranger/esteria/core/presentation/X11SessionPlan.java',
+                     'tests/fixtures/X11AuthorityFixture.java')
+
+
+def authority_cookie(path):
+    """Check one bounded actual formatter record; cookie bytes are never evidence."""
+    with packages.plain_file(path) as stream:
+        info = os.fstat(stream.fileno())
+        packages.require(info.st_mode & 0o777 == 0o600 and info.st_size <= 256, 'authority-not-private-or-bounded')
+        data = stream.read(257)
+    packages.require(len(data) >= 2 and data[:2] == b'\xff\xff', 'authority-family')
+    fields = []; offset = 2
+    for _ in range(4):
+        packages.require(offset + 2 <= len(data), 'authority-truncated-length')
+        length = struct.unpack_from('!H', data, offset)[0]; offset += 2
+        packages.require(offset + length <= len(data), 'authority-truncated-field')
+        fields.append(data[offset:offset + length]); offset += length
+    packages.require(offset == len(data) and fields[:3] == [b'', str(DISPLAY).encode(), b'MIT-MAGIC-COOKIE-1']
+                     and len(fields[3]) == 16, 'authority-record-contract')
+    return fields[3]
+
+
+def server_command(path):
+    with packages.plain_file(path) as stream:
+        data = stream.read(4097)
+    packages.require(len(data) <= 4096, 'formatter-command-too-large')
+    command = data.decode('ascii').splitlines()
+    packages.require(command == ['/usr/bin/Xtigervnc', ':' + str(DISPLAY), '-geometry', '1280x720', '-depth', '24',
+                     '-nolisten', 'tcp', '-rfbport', '-1', '-auth', '/session/Xauthority', '-noreset'],
+                     'application-x11-command-contract-changed')
+    return command
+
+
+def prepare_authority(root, fixture, output):
+    # The measured archive already carries an empty /session mountpoint. Keep
+    # it intact; the worker binds this fresh fixture there in its own namespace.
+    target = packages.directory(root / 'session', create=True)
+    packages.require(not any(target.iterdir()), 'x11-session-mountpoint-not-empty')
+    session = fixture / 'auth-session'
+    packages.require(not os.path.lexists(session), 'fresh-authentication-session-required')
+    session.mkdir(mode=0o700)
+    classes = fixture / 'formatter-classes'; classes.mkdir(mode=0o700)
+    sources = {name: identity(ROOT / name) for name in FORMATTER_SOURCES}
+    executables = {name: Path(shutil.which(name) or '/missing-java-tool').resolve() for name in ('javac', 'java')}
+    tools = {name: identity(path) for name, path in executables.items()}
+    captures = []
+    clean = ['/usr/bin/env', '-i', 'PATH=/usr/bin:/bin', 'LANG=C.UTF-8', 'HOME=' + str(fixture)]
+    try:
+        compile_result = run_logged([*clean, str(executables['javac']), '--release', '17', '-d', str(classes),
+                                    *[str(ROOT / name) for name in FORMATTER_SOURCES]],
+                                   output / 'formatter-compile.log', 30, captures)
+        packages.require(compile_result.exit_code == 0, 'application-formatter-compilation-failed')
+        run = run_logged([*clean, str(executables['java']), '-cp', str(classes), 'X11AuthorityFixture',
+                          str(session), str(fixture / 'server-argv.txt'), str(DISPLAY)],
+                         output / 'formatter-run.log', 15, captures, needle=b'ESTERIA_X11_AUTHORITY_FORMATTED')
+        packages.require(run.exit_code == 0 and run.finish(5) and run.matched.is_set(), 'application-formatter-failed')
+        packages.require(authority_cookie(session / 'Xauthority') != authority_cookie(session / 'Xauthority-wrong'),
+                         'negative-cookie-not-distinct')
+        server_command(fixture / 'server-argv.txt')
+        packages.require(sources == {name: identity(ROOT / name) for name in FORMATTER_SOURCES}, 'formatter-source-changed')
+        return dict(actualApplicationFormatterExecuted=True, sources=sources, hostJavaExecutables=tools,
+                    display=DISPLAY, privateCookiesExported=False)
+    finally:
+        deadline = time.monotonic() + 5
+        packages.require(all([capture.finish(deadline - time.monotonic()) for capture in captures]) and
+                         all(not capture.truncated and capture.error is None for capture in captures),
+                         'formatter-capture-failed')
+
+
+def x11_command(root, authority, *command):
+    return guest_command(root, '/usr/bin/env', 'DISPLAY=:' + str(DISPLAY), 'XAUTHORITY=' + authority, *command)
+
+
+def rejected_helper(command, endpoint, log, captures):
+    packages.require(not os.path.lexists(endpoint), 'negative-input-endpoint-already-exists')
+    capture = Capture(command, log, needle=READY); captures.append(capture)
+    deadline = time.monotonic() + 10; listener = False
+    try:
+        while capture.process.poll() is None and time.monotonic() < deadline:
+            listener |= os.path.lexists(endpoint)
+            time.sleep(.01)
+        if capture.process.poll() is None:
+            raise ValueError('unauthenticated-helper-did-not-reject')
+        listener |= os.path.lexists(endpoint)
+        drained = capture.finish(5)
+        result = dict(exitCode=capture.process.returncode, listenerCreated=listener,
+                      readyMarker=capture.matched.is_set(), logDrained=drained)
+        packages.require(rejection_passed(result) and not capture.truncated and capture.error is None,
+                         'unauthenticated-helper-not-rejected-before-listener')
+        return result
+    finally:
+        if capture.process.poll() is None:
+            capture.process.kill(); capture.process.wait(timeout=5)
+
+
+def rejection_passed(value):
+    return (type(value) is dict and type(value.get('exitCode')) is int and value['exitCode'] == 3 and
+            value.get('listenerCreated') is False and value.get('readyMarker') is False and value.get('logDrained') is True)
 
 
 def identity(path):
@@ -106,8 +208,10 @@ def passed(result, namespace_exit):
             result['expectedExit'] == 0 and
             result.get('workerCompleted') is True and result.get('networkIsolated') is True and
             result.get('displayReady') is True and result.get('helperReady') is True and
-            result.get('observerExit') == 0 and result.get('receiptValidated') is True and
-            result.get('helperExit') == 0 and result.get('helperForced') is False and
+            result.get('authenticatedServerCommand') is True and result.get('positiveHelperReadyMarker') is True and
+            rejection_passed(result.get('missingCookie')) and rejection_passed(result.get('wrongCookie')) and
+            type(result.get('observerExit')) is int and result['observerExit'] == 0 and result.get('receiptValidated') is True and
+            type(result.get('helperExit')) is int and result['helperExit'] == 0 and result.get('helperForced') is False and
             result.get('socketRemoved') is True and result.get('displayStopped') is True and
             result.get('logStreamsDrained') is True and result.get('logsWithinLimit') is True and
             result.get('logWritesSucceeded') is True)
@@ -129,28 +233,43 @@ def worker(runtime, output):
         interfaces = json.loads(subprocess.check_output(['ip', '-j', 'link', 'show'], timeout=15))
         packages.require({item['ifname'] for item in interfaces} == {'lo'}, 'unexpected-network-interface')
         result['networkIsolated'] = True
-        display_capture = Capture(guest_command(root, '/usr/bin/Xtigervnc', ':8', '-geometry', '640x480',
-            '-depth', '24', '-rfbport', '-1', '-SecurityTypes', 'None', '-nolisten', 'tcp', '-ac'), output / 'display.log')
+        target = packages.directory(root / 'session')
+        packages.require(not any(target.iterdir()), 'x11-session-mountpoint-not-empty')
+        session = packages.directory(fixture / 'auth-session')
+        subprocess.run(['mount', '--bind', str(session), str(target)], check=True, timeout=15)
+        packages.require(authority_cookie(root / 'session/Xauthority') != authority_cookie(root / 'session/Xauthority-wrong'),
+                         'negative-cookie-not-distinct')
+        packages.require(not os.path.lexists(root / 'session/Xauthority-missing'), 'missing-cookie-file-present')
+        display_capture = Capture(guest_command(root, *server_command(fixture / 'server-argv.txt')), output / 'display.log')
+        result['authenticatedServerCommand'] = True
         captures.append(display_capture); display = display_capture.process
-        endpoint = root / 'tmp/.X11-unix/X8'
+        endpoint = root / ('tmp/.X11-unix/X' + str(DISPLAY))
         deadline = time.monotonic() + 20
         while time.monotonic() < deadline and display.poll() is None:
             if endpoint.exists() and stat.S_ISSOCK(endpoint.lstat().st_mode): result['displayReady'] = True; break
             time.sleep(.05)
         packages.require(result['displayReady'], 'x11-display-not-ready')
-        helper_capture = Capture(guest_command(root, GUEST + '/' + HELPER, GUEST + '/input.sock'), output / 'input-helper.log')
+        for label, filename in (('missingCookie', 'Xauthority-missing'), ('wrongCookie', 'Xauthority-wrong')):
+            socket_name = label + '.sock'
+            result[label] = rejected_helper(x11_command(root, '/session/' + filename,
+                GUEST + '/' + HELPER, GUEST + '/' + socket_name), fixture / socket_name,
+                output / (label + '.log'), captures)
+            packages.require(display.poll() is None, 'display-exited-during-authentication-check')
+        helper_capture = Capture(x11_command(root, '/session/Xauthority', GUEST + '/' + HELPER, GUEST + '/input.sock'),
+                                 output / 'input-helper.log', needle=READY)
         captures.append(helper_capture); helper = helper_capture.process
         endpoint = fixture / 'input.sock'; deadline = time.monotonic() + 10
         while time.monotonic() < deadline and helper.poll() is None:
             if endpoint.exists():
                 mode = endpoint.lstat().st_mode
                 packages.require(stat.S_ISSOCK(mode) and mode & 0o077 == 0, 'input-endpoint-not-private')
-                result['helperReady'] = True; break
+                if helper_capture.matched.is_set(): result['helperReady'] = True; break
             time.sleep(.05)
         packages.require(result['helperReady'], 'production-input-helper-not-ready')
+        result['positiveHelperReadyMarker'] = helper_capture.matched.is_set()
         receipt_path = fixture / 'x11-input-receipt.json'
         packages.require(not os.path.lexists(receipt_path), 'observer-receipt-already-exists')
-        observed = run_logged(guest_command(root, GUEST + '/' + OBSERVER, GUEST + '/input.sock',
+        observed = run_logged(x11_command(root, '/session/Xauthority', GUEST + '/' + OBSERVER, GUEST + '/input.sock',
                               GUEST + '/x11-input-receipt.json'), output / 'observer.log', 60, captures)
         result['observerExit'] = observed.exit_code
         packages.require(observed.exit_code == 0, 'actual-x11-observer-failed')
@@ -206,9 +325,11 @@ def qualify(runtime, payload, revision, output):
         (fixture / name).chmod(0o755)
     report = dict(formatVersion=1, scope=SCOPE, **runtime_identity, binaries=binaries,
                   linuxArm64X11InputQualified=False, processNamespaceExited=False, wineClientExecuted=False,
+                  linuxArm64AuthenticatedX11InputQualified=False,
                   **{key: False for key in UNQUALIFIED})
     child = None; capture = None
     try:
+        report['authentication'] = prepare_authority(runtime / 'rootfs', fixture, output)
         # env execs unshare; --kill-child binds its PID-namespace init's lifetime
         # to this owned process, including when the outer timeout kills it.
         command = ['/usr/bin/env', '-i', 'PATH=/usr/sbin:/usr/bin:/sbin:/bin', 'LANG=C.UTF-8',
@@ -222,6 +343,7 @@ def qualify(runtime, payload, revision, output):
         report.update(namespaceExit=code, processNamespaceExited=True, worker=result)
         report['linuxArm64X11InputQualified'] = (passed(result, code) and capture.finish(5) and
                                                 not capture.truncated and capture.error is None)
+        report['linuxArm64AuthenticatedX11InputQualified'] = report['linuxArm64X11InputQualified']
         packages.require(report['linuxArm64X11InputQualified'], 'actual-x11-input-not-qualified')
         return report
     except Exception as error:
@@ -231,6 +353,7 @@ def qualify(runtime, payload, revision, output):
         if child is not None and child.poll() is not None: report['processNamespaceExited'] = True
         if capture is not None and (not capture.finish(5) or capture.truncated or capture.error is not None):
             report['linuxArm64X11InputQualified'] = False
+            report['linuxArm64AuthenticatedX11InputQualified'] = False
             report['namespaceCaptureFailed'] = True
         packages.write_json(output / 'qualification.json', report)
         if os.environ.get('SUDO_UID', '').isdigit() and os.environ.get('SUDO_GID', '').isdigit():

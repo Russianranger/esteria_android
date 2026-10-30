@@ -54,7 +54,11 @@ private SQL diagnostics stay in the disposable fixture.
 Eleven focused host guards pass, including exact compile-source selection,
 module definitions, receipt rejection before database creation, real pinned
 configuration-key rendering, exact ledger checks, binary-safe private account
-comparison, existing-state preservation and completion-marker checks. Actual
-ARM64 linking and MySQL execution remain pending the full server build and
-activation of adaptation 0007. The main server workflow has not yet been wired
-to execute this reference.
+comparison, existing-state preservation and completion-marker checks. Adaptation 0007 is now selected. The native server workflow builds this reference
+from the actual database target, verifies its provenance after installed binaries
+are checked, and executes the fresh updater/auth/playerbots composition inside the
+pinned MySQL runtime with external networking disabled. It also gates all selected
+world module configurations through real ConfigMgr before SQL qualification.
+Public evidence includes the reference receipt and database qualification receipt;
+raw playerbots SQL logs and database contents remain private. Actual ARM64 linking
+and MySQL execution of this newly enabled reference remain pending.

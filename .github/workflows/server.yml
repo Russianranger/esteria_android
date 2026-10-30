@@ -15,6 +15,18 @@ on:
       - tools/owned_process_group.py
       - tests/test_owned_process_group.py
       - tools/qualify_authserver.py
+      - tools/qualify_module_configurations.py
+      - tests/module_configs_reference.cpp
+      - tests/config_path_reference.cpp
+      - tests/config_path_reference.cmake
+      - tests/test_module_configurations.py
+      - tests/test_config_path_reference.py
+      - tools/verify_playerbots_reference.py
+      - tools/qualify_playerbots_database.py
+      - tests/playerbots_database_reference.cpp
+      - tests/playerbots_database_reference.cmake
+      - tests/test_playerbots_reference.py
+      - tests/test_playerbots_qualification.py
       - tools/auth_protocol.py
       - tests/test_auth_protocol.py
       - tests/test_authserver_qualification.py
@@ -30,7 +42,12 @@ on:
       - tests/test_local_account.py
       - tests/srp6_reference.cpp
       - tests/srp6_reference.cmake
-      - runtime/server/**
+      - runtime/server/Dockerfile
+      - runtime/server/sources.lock.json
+      - runtime/server/ubuntu.sources
+      - runtime/server/inrelease.SHA256SUMS
+      - runtime/server/mysql-binaries.SHA256SUMS
+      - runtime/server/record_runtime.py
       - runtime/server-lua-map.json
       - tests/native/**
       - tools/verify_server_build.py
@@ -51,6 +68,18 @@ on:
       - tools/owned_process_group.py
       - tests/test_owned_process_group.py
       - tools/qualify_authserver.py
+      - tools/qualify_module_configurations.py
+      - tests/module_configs_reference.cpp
+      - tests/config_path_reference.cpp
+      - tests/config_path_reference.cmake
+      - tests/test_module_configurations.py
+      - tests/test_config_path_reference.py
+      - tools/verify_playerbots_reference.py
+      - tools/qualify_playerbots_database.py
+      - tests/playerbots_database_reference.cpp
+      - tests/playerbots_database_reference.cmake
+      - tests/test_playerbots_reference.py
+      - tests/test_playerbots_qualification.py
       - tools/auth_protocol.py
       - tests/test_auth_protocol.py
       - tests/test_authserver_qualification.py
@@ -66,7 +95,12 @@ on:
       - tests/test_local_account.py
       - tests/srp6_reference.cpp
       - tests/srp6_reference.cmake
-      - runtime/server/**
+      - runtime/server/Dockerfile
+      - runtime/server/sources.lock.json
+      - runtime/server/ubuntu.sources
+      - runtime/server/inrelease.SHA256SUMS
+      - runtime/server/mysql-binaries.SHA256SUMS
+      - runtime/server/record_runtime.py
       - runtime/server-lua-map.json
       - tests/native/**
       - tools/verify_server_build.py
@@ -76,6 +110,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
 concurrency:
   group: server-${{ github.ref }}
   cancel-in-progress: false
@@ -86,7 +121,7 @@ jobs:
     env:
       CCACHE_DIR: ${{ github.workspace }}/.ccache-server
       CCACHE_BASEDIR: ${{ github.workspace }}
-      CCACHE_MAXSIZE: 2G
+      CCACHE_MAXSIZE: 4G
       CCACHE_COMPILERCHECK: content
       CCACHE_COMPRESS: 'true'
     steps:
@@ -134,7 +169,16 @@ jobs:
             server-ccache-v1-${{ steps.cache-identity.outputs.environment }}-
       - name: Configure bounded compiler cache
         run: |
-          ccache --max-size=2G
+          python3 - <<'PY_CACHE'
+          import json, os, pathlib, shutil, subprocess
+          free = shutil.disk_usage('.').free
+          budget = '4G' if free >= 12 * 1024**3 else '2G'
+          subprocess.run(['ccache', '--max-size=' + budget], check=True)
+          with open(os.environ['GITHUB_ENV'], 'a') as output:
+              output.write('CCACHE_MAXSIZE=' + budget + '\n')
+          pathlib.Path('out/diagnostics/cache-budget.json').write_text(json.dumps(
+              dict(freeBytesAfterRestore=free, maximum=budget, expandedCacheMinimumFreeBytes=12 * 1024**3)))
+          PY_CACHE
           ccache --zero-stats
       - name: Prepare pinned sources
         run: python3 tools/fetch_sources.py all
@@ -146,7 +190,7 @@ jobs:
           -Isources/server/src/common -Isources/server/src/common/Platform
           -Isources/server/src/server/game/LuaEngine/hooks tests/native/eluna_hooks.cpp
       - name: Verify server artifact checker behavior
-        run: python3 -m unittest tests.test_owned_process_group tests.test_server_build tests.test_dbimport_qualification tests.test_server_schema_baseline tests.test_server_adaptations tests.test_empty_script_modules tests.test_local_account tests.test_auth_protocol tests.test_authserver_qualification -v
+        run: python3 -m unittest tests.test_owned_process_group tests.test_server_build tests.test_dbimport_qualification tests.test_server_schema_baseline tests.test_server_adaptations tests.test_empty_script_modules tests.test_local_account tests.test_auth_protocol tests.test_authserver_qualification tests.test_module_configurations tests.test_playerbots_reference tests.test_playerbots_qualification -v
       - name: Configure ARM64 server
         run: |
           set -o pipefail
@@ -163,7 +207,12 @@ jobs:
         run: |
           set -o pipefail
           cmake --build out/server --parallel 2 --target esteria_srp_reference esteria_auth_srp_reference \
+            esteria_config_path_reference esteria_module_configs_reference esteria_playerbots_database_reference \
             2>&1 | tee out/diagnostics/srp-reference-compile.log
+          ESTERIA_CONFIG_PATH_REFERENCE="$GITHUB_WORKSPACE/out/server/esteria_config_path_reference" \
+          ESTERIA_MODULE_CONFIG_REFERENCE="$GITHUB_WORKSPACE/out/server/esteria_module_configs_reference" \
+            python3 -m unittest tests.test_config_path_reference tests.test_module_configurations -v \
+            2>&1 | tee out/diagnostics/config-reference.log
           out/server/esteria_srp_reference > out/diagnostics/srp-reference.json
           ESTERIA_AUTH_SRP_REFERENCE="$GITHUB_WORKSPACE/out/server/esteria_auth_srp_reference" \
             python3 -m unittest tests.test_auth_protocol -v 2>&1 | tee out/diagnostics/auth-srp-reference.log
@@ -215,6 +264,12 @@ jobs:
           manifest = json.loads(pathlib.Path('out/server-modules.json').read_text())
           pathlib.Path('out/server-enabled-modules.json').write_text(json.dumps(manifest['enabledModules']))
           PY
+      - name: Bind the actual playerbots loader reference to this server build
+        run: |
+          python3 tools/verify_playerbots_reference.py \
+            --executable out/server/esteria_playerbots_database_reference --server sources/server \
+            --install out/server-install --compiled-modules out/server-modules.json \
+            --compile-commands out/server/compile_commands.json --output out/diagnostics/playerbots-reference.json
       - name: Package verified SQL and notices with explicit Lua policy
         run: |
           python3 tools/manifest_server_content.py --server sources/server \
@@ -233,13 +288,40 @@ jobs:
             out/server-content-manifest.json
           if-no-files-found: error
           retention-days: 14
-      - name: Build pinned MySQL dependencies for compiled updater qualification
+      - name: Parse and reload every actual compiled world module configuration
+        run: |
+          python3 tools/qualify_module_configurations.py \
+            --reference "$GITHUB_WORKSPACE/out/server/esteria_module_configs_reference" \
+            --server "$GITHUB_WORKSPACE/sources/server" --install "$GITHUB_WORKSPACE/out/server-install" \
+            --inventory "$GITHUB_WORKSPACE/out/server-content-manifest.json" \
+            --compiled-modules "$GITHUB_WORKSPACE/out/server-modules.json" \
+            --compile-commands "$GITHUB_WORKSPACE/out/server/compile_commands.json" \
+            --output "$RUNNER_TEMP/esteria-module-config" \
+            --evidence "$GITHUB_WORKSPACE/out/diagnostics/module-configurations.json"
+      - name: Build and read back published MySQL dependencies without APT
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           mkdir -p out/dbimport-evidence out/dbimport-private
-          docker build --platform linux/arm64 --target runtime \
-            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
-            -t esteria-dbimport:qualification runtime/server \
+          test "$(uname -m)" = aarch64
+          python3 tools/release_server_dependencies.py prepare --output out/server-dependency-release \
+            > out/dbimport-evidence/dependency-download.log 2>&1
+          python3 tools/prepare_server_dependency_image.py \
+            --inputs out/server-dependency-release --output out/server-dependency-image \
+            > out/dbimport-evidence/dependency-context.log 2>&1
+          cp out/server-dependency-image/context-receipt.json out/dbimport-evidence/dependency-context.json
+          # Reclaim only this step's download after all corresponding sources
+          # are verified. The public release preserves the complete companion.
+          rm -rf out/server-dependency-release
+          docker build --network none --platform linux/arm64 \
+            -t esteria-dbimport:qualification out/server-dependency-image/context \
             > out/dbimport-evidence/image-build.log 2>&1
+          docker run --rm --network none --read-only \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/tools/verify_server_dependency_image.py,dst=/verify-image.py,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/server-dependency-image/context-receipt.json,dst=/context-receipt.json,readonly" \
+            esteria-dbimport:qualification /usr/bin/python3 /verify-image.py \
+            --context-receipt /context-receipt.json \
+            > out/dbimport-evidence/dependency-image-check.json
           container=$(docker create esteria-dbimport:qualification)
           trap 'docker rm -f "$container" >/dev/null' EXIT
           docker cp "$container:/etc/esteria-server-runtime.json" out/dbimport-evidence/server-runtime.json
@@ -248,20 +330,25 @@ jobs:
           import hashlib, json, os, pathlib
           runtime = json.loads(pathlib.Path('out/dbimport-evidence/server-runtime.json').read_text())
           digest = hashlib.sha256(pathlib.Path('out/server-content/package-receipt.json').read_bytes()).hexdigest()
+          reference = hashlib.sha256(pathlib.Path('out/diagnostics/playerbots-reference.json').read_bytes()).hexdigest()
           with open(os.environ['GITHUB_ENV'], 'a') as output:
               output.write('ESTERIA_DBIMPORT_MYSQL_VERSION=' + runtime['expectedMysqlSqlVersion'] + '\n')
               output.write('ESTERIA_DBIMPORT_CONTENT_SHA256=' + digest + '\n')
+              output.write('ESTERIA_PLAYERBOTS_REFERENCE_SHA256=' + reference + '\n')
           PY
-      - name: Qualify compiled updater and owned loopback authentication without external network
+      - name: Qualify compiled updater, authentication and playerbots database without external network
         run: |
           docker run --rm --init --network none \
             --env PYTHONDONTWRITEBYTECODE=1 \
             --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
             --mount "type=bind,src=$GITHUB_WORKSPACE/out/dbimport-private,dst=/state" \
             --workdir /qualification esteria-dbimport:qualification \
-            python3 tools/qualify_authserver.py \
+            python3 tools/qualify_playerbots_database.py \
             --install /qualification/out/server-install --content /qualification/out/server-content \
             --content-receipt-sha256 "$ESTERIA_DBIMPORT_CONTENT_SHA256" \
+            --reference /qualification/out/server/esteria_playerbots_database_reference \
+            --reference-receipt /qualification/out/diagnostics/playerbots-reference.json \
+            --reference-receipt-sha256 "$ESTERIA_PLAYERBOTS_REFERENCE_SHA256" \
             --mysql /usr/bin/mysql --mysqld /usr/sbin/mysqld \
             --expected-version "$ESTERIA_DBIMPORT_MYSQL_VERSION" --output /state/run \
             > out/dbimport-evidence/qualification.log 2>&1
@@ -275,7 +362,8 @@ jobs:
           target = pathlib.Path('out/dbimport-evidence')
           names = ['qualification.json', 'mysql-initialize-engine.log', 'mysql-bootstrap-engine.log',
                    'mysql-base-engine.log', 'mysql-base-restart-engine.log',
-                   'dbimport-first.log', 'dbimport-second.log', 'auth-qualification.json', 'authserver-redacted.log']
+                   'dbimport-first.log', 'dbimport-second.log', 'auth-qualification.json', 'authserver-redacted.log',
+                   'playerbots-qualification.json']
           for name in names:
               path = source / name
               if path.is_file():
@@ -297,6 +385,14 @@ jobs:
                       externalNetworkDisabled=True, reconstructedClientExecuted=False,
                       worldEntryQualified=False, androidRuntimeQualified=False, gameplayQualified=False)
                   (target / 'auth-environment-receipt.json').write_text(json.dumps(metadata, indent=2) + '\n')
+              playerbots = target / 'playerbots-qualification.json'
+              if playerbots.is_file():
+                  metadata = dict(formatVersion=1, scope='native-arm64-disposable-playerbots-database-loader',
+                      qualificationSha256=hashlib.sha256(playerbots.read_bytes()).hexdigest(),
+                      runtimeManifestSha256=hashlib.sha256(runtime.read_bytes()).hexdigest(),
+                      externalNetworkDisabled=True, playerbotsAiQualified=False,
+                      worldEntryQualified=False, androidRuntimeQualified=False, gameplayQualified=False)
+                  (target / 'playerbots-environment-receipt.json').write_text(json.dumps(metadata, indent=2) + '\n')
           PY
           sudo chown -R "$(id -u):$(id -g)" out/dbimport-evidence
       - name: Retain compiled updater qualification evidence

@@ -180,7 +180,27 @@ both equal 4,992. Artifact `12952971767` has SHA256
 This does not exercise the guest X11 producers, Wine,
 ARM64 execution, on-screen presentation, audible hardware output, or Adreno.
 
+The later lifecycle regression passed on Android13 x86_64 in run
+[41019374598](https://github.com/Russianranger/esteria_android/actions/runs/41019374598)
+at `e9dcb61d8d8c40fc683ac2a67bbf15a8eb538300`. It adds a real `GameInputView`
+to the foreground Activity while paused and waits for actual SurfaceHolder
+callbacks. Creation and GONE/VISIBLE surface recreation while paused produce
+no connection or native frame. Each resume posts a native SurfaceView frame;
+pause and final removal produce two observed peer EOFs. Repeated resume retains
+the existing writer. The complete fixture passes six groups and sixteen required
+checks, with exactly two presentation connections and 4,992 PCM frames both
+accepted and played. Its input sink only records Java calls.
+
+`runtime/evidence/android-presentation-e9dcb61.json` preserves the exact APK/JNI,
+instrumentation, emulator and receipt identities. Artifact `12961241093` is
+50,277 bytes, SHA256
+`7e83764a8ca6e3117b46f6dd5e0d2670a46f6888faca6ec993afae28f6c4d548`;
+its downloaded qualification receipt is 2,607 bytes, SHA256
+`27586eab681e3cc6d399435fcbfa8397112e083823278ad8780adc1de88db4af`.
+This extends actual Android surface lifecycle evidence with synthetic producers;
+it does not qualify X11 input, Wine, ARM64, audible hardware output or Adreno.
+
 Docker and filesystem Unix socket creation are unavailable in the current host;
-native ARM64 guest execution, integrated on-screen Surface/audio lifecycle,
+native ARM64 guest execution, integrated guest X11-to-Surface/audio lifecycle,
 controller game behavior, sound, and Thor performance remain unpassed gates.
 No preliminary device installation or gameplay success is requested or claimed.

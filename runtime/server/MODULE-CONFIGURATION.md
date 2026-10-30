@@ -50,8 +50,10 @@ modules still require matching data and actual runtime validation.
 ## Loading and evidence boundary
 
 Patch7 makes the server resolve module configs next to its selected main config,
-preserving the existing default path. It is prepared and host-tested but remains
-outside the application source lock pending the current six-patch server build.
+preserving the existing default path. It is now selected by `sources.lock.json`
+with client `0f931bbade36a4b197725d691b8eff7caea7b3be`. Its actual source-linked
+x86 host reference verifies absolute, relative and bare configuration paths,
+reload, default-path preservation and missing-sibling refusal.
 Do not launch a complete world configuration through a binary that still bakes a
 CI runner config path. ConfigMgr can return success when module files are absent;
 readiness must check the actual loaded selection/values as well as file presence.
@@ -59,5 +61,23 @@ readiness must check the actual loaded selection/values as well as file presence
 Twenty-six related host groups pass (renderer, content inventory and deterministic
 package). A source-only exercise rendered all 50 committed module templates from
 server f35f04d after comparing their exact bytes with Git. Its selection record was
-synthetic; it does not qualify binary selection or module startup. Full compiled
-module configuration, schema loading, world entry and Android remain open gates.
+synthetic; it does not qualify binary selection or module startup. A further actual ConfigMgr x86 host fixture now parses all 50 real source templates,
+then changes fixture-only sentinels and verifies every value through actual reload.
+It checks the rendered Lua, bot command port, random population and controlled
+bot ceiling values and verifies that source configurations remain byte-identical.
+Template bytes were compared with the archived content receipt; installed binary
+selection was not independently reverified by that host exercise.
+
+`qualify_module_configurations.py` adds the native ARM64 gate: source/patch and
+installed receipts, real ConfigMgr/reference compile commands and integration
+source bytes must match before rendering the exact compiled world's selection.
+The reference links real `common`, copies configurations into a fresh private
+fixture, and never runs worldserver or SQL. Its public receipt binds source and
+executable hashes, exact selected filenames, parsed policies and reload evidence.
+The workflow retains no private configurations or logs in public artifacts.
+
+The auth and reconstructed-client qualification compositions now use the same
+complete metadata renderer, after requiring both main source templates to match
+the installed build. This prepares world module configurations; authserver itself
+does not load the world's CONFIG_FILE_LIST. Actual native ARM64 execution, module
+hooks, schema loading, world entry and Android remain open gates.

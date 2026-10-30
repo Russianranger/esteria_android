@@ -8,17 +8,17 @@ RUN --mount=type=secret,id=build_ca,required=true,mode=0444 \
     test "$(dpkg --print-architecture)" = arm64 \
     && printf '%s\n' '#!/bin/sh' 'exit 101' > /usr/sbin/policy-rc.d \
     && chmod 755 /usr/sbin/policy-rc.d \
-    && apt-get -o Acquire::https::CaInfo=/run/secrets/build_ca update \
+    && apt-get -o Acquire::Retries=3 -o Acquire::https::CaInfo=/run/secrets/build_ca update \
     && (cd /var/lib/apt/lists && sha256sum --check /opt/esteria-runtime/inrelease.SHA256SUMS) \
     && mkdir /tmp/esteria-mysql-pins \
     && (cd /tmp/esteria-mysql-pins \
-        && apt-get -o Acquire::https::CaInfo=/run/secrets/build_ca download \
+        && apt-get -o Acquire::Retries=3 -o Acquire::https::CaInfo=/run/secrets/build_ca download \
            mysql-server-core-8.0=8.0.46-0ubuntu0.24.04.4 \
            mysql-client-core-8.0=8.0.46-0ubuntu0.24.04.4 \
            libmysqlclient21=8.0.46-0ubuntu0.24.04.4 \
         && sha256sum --check /opt/esteria-runtime/mysql-binaries.SHA256SUMS) \
-    && apt-get -o Acquire::https::CaInfo=/run/secrets/build_ca dist-upgrade -y --no-install-recommends \
-    && apt-get -o Acquire::https::CaInfo=/run/secrets/build_ca install -y --no-install-recommends \
+    && apt-get -o Acquire::Retries=3 -o Acquire::https::CaInfo=/run/secrets/build_ca dist-upgrade -y --no-install-recommends \
+    && apt-get -o Acquire::Retries=3 -o Acquire::https::CaInfo=/run/secrets/build_ca install -y --no-install-recommends \
        ca-certificates python3 \
        mysql-server-core-8.0=8.0.46-0ubuntu0.24.04.4 \
        mysql-client-core-8.0=8.0.46-0ubuntu0.24.04.4 \
@@ -39,7 +39,7 @@ CMD ["/usr/bin/python3", "--version"]
 FROM runtime AS corresponding-sources
 COPY capture_sources.py /opt/esteria-runtime/
 RUN --mount=type=secret,id=build_ca,required=true,mode=0444 \
-    apt-get -o Acquire::https::CaInfo=/run/secrets/build_ca update \
+    apt-get -o Acquire::Retries=3 -o Acquire::https::CaInfo=/run/secrets/build_ca update \
     && (cd /var/lib/apt/lists && sha256sum --check /opt/esteria-runtime/inrelease.SHA256SUMS) \
     && python3 /opt/esteria-runtime/capture_sources.py \
        --runtime /etc/esteria-server-runtime.json --lock /opt/esteria-runtime/sources.lock.json \

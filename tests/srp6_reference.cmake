@@ -16,6 +16,7 @@ if(PROJECT_NAME STREQUAL "AzerothCore" AND CMAKE_CURRENT_SOURCE_DIR STREQUAL CMA
         target_link_libraries(esteria_auth_srp_reference PRIVATE common)
     endfunction()
     cmake_language(DEFER CALL esteria_add_srp_reference)
+    include("${CMAKE_CURRENT_LIST_DIR}/config_path_reference.cmake")
     include("${CMAKE_CURRENT_LIST_DIR}/playerbots_database_reference.cmake")
     cmake_language(DEFER CALL esteria_add_playerbots_database_reference)
 endif()

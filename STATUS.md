@@ -166,3 +166,25 @@ Historical server Z MPQs have inconsistent extents confirmed against raw Git blo
 they are not accepted as a complete content pack. Appearance packers require absent
 developer inputs. Exact scope is in [ASSET-REQUIREMENTS.md](ASSET-REQUIREMENTS.md).
 These gaps do not prevent the active platform, packaging, database and tooling work.
+
+
+## Current resume checkpoint
+
+The current0f/seven-patch combined build41019374657 passes all packaging/source
+checks; actual Android Surface lifecycle41019374598 passes its six groups. Exact
+receipts and deliberately false game/hardware fields are retained in runtime/evidence.
+Seven-patch server41019374697 is linked and installed. Its fresh baseline and
+Nemesis prerequisite import passed; the real updater then exposed the source's
+race-table creator ordering. The narrow canonical prerequisite is implemented,
+with native rerun pending. Authentication has not reached its completed gate.
+
+The source-owned Wine private-image adaptation is published824ca6d and now
+building in41040860418. Its original-versus-opt-in host fixture must pass before
+runtime export/repin and the next Android test. The APK still uses the previous
+production ARM64 Wine dependency; no adapted Android execution is claimed.
+
+The preparatory server-program packager can derive a stripped runtime plus paired
+debug archive from verified linked inputs. Complete source sealing, measured
+server derivative, Android provider installation and service composition are next.
+Durable native dependency images avoid re-resolving the same Ubuntu snapshot on
+every runtime-only gate. The full local game remains the active objective.

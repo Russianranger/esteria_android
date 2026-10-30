@@ -1,0 +1,94 @@
+{
+  "formatVersion": 1,
+  "scope": "observed-android-13-x86_64-paused-surface-lifecycle-and-audiotrack",
+  "runId": 41019374598,
+  "sourceRevision": "e9dcb61d8d8c40fc683ac2a67bbf15a8eb538300",
+  "runConclusion": "success",
+  "artifact": {
+    "id": 12961241093,
+    "bytes": 50277,
+    "sha256": "7e83764a8ca6e3117b46f6dd5e0d2670a46f6888faca6ec993afae28f6c4d548",
+    "downloadVerified": true
+  },
+  "qualification": {
+    "bytes": 2607,
+    "sha256": "27586eab681e3cc6d399435fcbfa8397112e083823278ad8780adc1de88db4af",
+    "receipt": {
+      "formatVersion": 1,
+      "scope": "android-13-x86_64-surface-audiotrack-protocol-fixtures",
+      "sourceRevision": "e9dcb61d8d8c40fc683ac2a67bbf15a8eb538300",
+      "apk": {
+        "bytes": 628156,
+        "sha256": "56652442a6eb58d261603b6233a0a8a94e7e65ff425febe74987ef6e57700410",
+        "native": {
+          "lib/x86_64/libesteria-presentation.so": {
+            "bytes": 8056,
+            "sha256": "254ec807ca6c93a4eceaf4ce74f2d831aae120a24b2d0a903997149c62d8fd2c"
+          },
+          "lib/x86_64/libesteria_process.so": {
+            "bytes": 472720,
+            "sha256": "e657f195b052b9fda5adb7415e0a2752dd901ef6e9bbc4963d93c36be54f4920"
+          }
+        }
+      },
+      "testApk": {
+        "bytes": 1738065,
+        "sha256": "2afae906403d8dc753f92a8288493e953ba5d2761a03d1d8ff05eac0585cdbd0"
+      },
+      "androidEmulatorSurfaceAudioQualified": true,
+      "arm64GuestExecuted": false,
+      "androidWineExecuted": false,
+      "x11GuestExecuted": false,
+      "audibleOutputQualified": false,
+      "adrenoQualified": false,
+      "gameplayQualified": false,
+      "emulatorProperties": {
+        "ro.kernel.qemu": "1",
+        "ro.build.version.sdk": "33",
+        "ro.product.cpu.abi": "x86_64",
+        "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys"
+      },
+      "appEvidence": {
+        "formatVersion": 1,
+        "scope": "android-13-x86_64-surface-audiotrack-protocol-fixtures",
+        "sourceRevision": "e9dcb61d8d8c40fc683ac2a67bbf15a8eb538300",
+        "api": 33,
+        "targetSdk": 35,
+        "fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+        "abi": "x86_64",
+        "groupsPassed": 6,
+        "nativeSurfaceExecuted": true,
+        "rgbaReadbackVerified": true,
+        "surfaceRecreationVerified": true,
+        "invalidFrameRejected": true,
+        "audioTrackAcceptedFrames": 4992,
+        "audioTrackPlayedFrames": 4992,
+        "audioResetVerified": true,
+        "audioInvalidHandshakeRecovered": true,
+        "privateSocketCleanupVerified": true,
+        "audioActivePeerShutdownVerified": true,
+        "pausedSurfaceCreationBlocked": true,
+        "surfaceResumeFrameVerified": true,
+        "surfacePausePeerEofVerified": true,
+        "pausedSurfaceRecreationBlocked": true,
+        "surfaceResumeIdempotentVerified": true,
+        "surfaceLifecycleCleanupVerified": true,
+        "surfaceLifecycleConnections": 2,
+        "surfaceLifecyclePeerEofs": 2,
+        "privateRootAliasVerified": true,
+        "privateChildSymlinkRejected": true,
+        "arm64GuestExecuted": false,
+        "androidWineExecuted": false,
+        "x11GuestExecuted": false,
+        "audibleOutputQualified": false,
+        "adrenoQualified": false,
+        "gameplayQualified": false
+      },
+      "completedAtUnix": 1793344989
+    }
+  },
+  "limitations": [
+    "Frame and PCM producers are synthetic; the recording input sink does not inject X11 events.",
+    "The Android13 x86_64 emulator result does not qualify ARM64 guest execution, Wine, Adreno, audible hardware output or gameplay."
+  ]
+}

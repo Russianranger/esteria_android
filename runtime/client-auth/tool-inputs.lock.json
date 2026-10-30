@@ -1,0 +1,1150 @@
+{
+  "androidRuntimeQualified": false,
+  "artifactsDownloaded": false,
+  "base": {
+    "dpkgStatus": {
+      "bytes": 125393,
+      "sha256": "1f26d7efff59a8d6ac8b399ca9ab49ce560959bf79401656a8a8afb98fb195c7"
+    },
+    "metadata": {
+      "bytes": 34299,
+      "sha256": "3aa480f48fd36cea1253557976163dc2da0707eef72dbef18d028196888b05b1"
+    }
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "inRelease": [
+    {
+      "bytes": 255850,
+      "sha256": "cdb2f31d809f589719a53c6ad15f255b27569c4059542ada282aaa21b8e164b0",
+      "signatureVerified": true,
+      "signerFingerprint": "F6ECB3762474EDA9D21B7022871920D1991BC93C",
+      "suite": "noble",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20261029T000000Z/dists/noble/InRelease"
+    },
+    {
+      "bytes": 126125,
+      "sha256": "e1c5857e7e172d38526c644d0a9726de89464923655593fcf0530eb49287a981",
+      "signatureVerified": true,
+      "signerFingerprint": "F6ECB3762474EDA9D21B7022871920D1991BC93C",
+      "suite": "noble-updates",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20261029T000000Z/dists/noble-updates/InRelease"
+    }
+  ],
+  "indexes": [
+    {
+      "bytes": 1376632,
+      "cached": true,
+      "path": "main/binary-arm64/Packages.xz",
+      "sha256": "4a1901e6124fb0a111f5dffc8f5c14474f449e2ecfa71f2eaf0b29917edb53f9",
+      "suite": "noble",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20261029T000000Z/dists/noble/main/binary-arm64/Packages.xz"
+    },
+    {
+      "bytes": 1383940,
+      "cached": true,
+      "path": "main/source/Sources.xz",
+      "sha256": "4f8e45d8f84dd2a6b7ce87695c70336114b9e96e6fd6db066c115f758e39308e",
+      "suite": "noble",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20261029T000000Z/dists/noble/main/source/Sources.xz"
+    },
+    {
+      "bytes": 1458900,
+      "cached": true,
+      "path": "main/binary-arm64/Packages.xz",
+      "sha256": "320a573507d8318ec5ae027634c51c206faba6f152ba089df023d7a659846826",
+      "suite": "noble-updates",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20261029T000000Z/dists/noble-updates/main/binary-arm64/Packages.xz"
+    },
+    {
+      "bytes": 579244,
+      "cached": true,
+      "path": "main/source/Sources.xz",
+      "sha256": "f89761e7a71d5015c1d93fcc0d3c70430cfdbb4680d4005e47e897c4928ab6b0",
+      "suite": "noble-updates",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20261029T000000Z/dists/noble-updates/main/source/Sources.xz"
+    }
+  ],
+  "keyring": {
+    "bytes": 3607,
+    "sha256": "80a36b0a6de2f69f49d2df75ef473ccde121e9e190b9ea01d20a4f63778d5c31"
+  },
+  "missing": [],
+  "packages": [
+    {
+      "architecture": "all",
+      "bytes": 3110182,
+      "dependencyFields": {
+        "Breaks": "libansicolor-perl (<< 5.01), libarchive-tar-perl (<< 2.40), libattribute-handlers-perl (<< 1.03), libautodie-perl (<< 2.36), libcpan-meta-perl (<< 2.150010), libcpan-meta-requirements-perl (<< 2.140), libcpan-meta-yaml-perl (<< 0.018), libdigest-perl (<< 1.20), libexperimental-perl (<< 0.031), libextutils-cbuilder-perl (<< 0.280238), libextutils-command-perl (<< 7.70), libextutils-install-perl (<< 2.22), libextutils-parsexs-perl (<< 3.510000), libfile-spec-perl (<< 3.8800), libhttp-tiny-perl (<< 0.086), libi18n-langtags-perl (<< 0.45), libio-zlib-perl (<< 1.14), libjson-pp-perl (<< 4.16000), liblocale-maketext-perl (<< 1.33), liblocale-maketext-simple-perl (<< 0.21.01), libmath-bigint-perl (<< 1.999837), libmath-complex-perl (<< 1.6200), libmodule-corelist-perl (<< 5.20231129), libmodule-load-conditional-perl (<< 0.74), libmodule-load-perl (<< 0.36), libmodule-metadata-perl (<< 1.000037), libnet-perl (<< 1:3.15), libnet-ping-perl (<< 2.76), libparams-check-perl (<< 0.38), libparent-perl (<< 0.241), libparse-cpan-meta-perl (<< 2.150010), libperl-ostype-perl (<< 1.010), libpod-escapes-perl (<< 1.07), libpod-simple-perl (<< 3.43), libtest-harness-perl (<< 3.44), libtest-simple-perl (<< 1.302194), libtest-tester-perl (<< 1.302194), libtest-use-ok-perl (<< 1.302194), libtext-balanced-perl (<< 2.06), libthread-queue-perl (<< 3.14), libtime-local-perl (<< 1.3000), libunicode-collate-perl (<< 1.31), libversion-perl (<< 1:0.9929), maildirsync (<< 1.2-2.1), perl (<< 5.38.2~), podlators-perl (<< 5.01)",
+        "Conflicts": "perl-modules (<< 5.22.0~)",
+        "Depends": "perl-base (>= 5.38.2-1)",
+        "Multi-Arch": "foreign",
+        "Pre-Depends": "dpkg (>= 1.17.17)",
+        "Provides": "perl-modules",
+        "Recommends": "perl (>= 5.38.2-1)",
+        "Replaces": "libansicolor-perl (<< 5.01), libarchive-tar-perl (<< 2.40), libattribute-handlers-perl (<< 1.03), libautodie-perl (<< 2.36), libcpan-meta-perl (<< 2.150010), libcpan-meta-requirements-perl (<< 2.140), libcpan-meta-yaml-perl (<< 0.018), libdigest-perl (<< 1.20), libexperimental-perl (<< 0.031), libextutils-cbuilder-perl (<< 0.280238), libextutils-command-perl (<< 7.70), libextutils-install-perl (<< 2.22), libextutils-parsexs-perl (<< 3.510000), libfile-spec-perl (<< 3.8800), libhttp-tiny-perl (<< 0.086), libi18n-langtags-perl (<< 0.45), libio-zlib-perl (<< 1.14), libjson-pp-perl (<< 4.16000), liblocale-maketext-perl (<< 1.33), liblocale-maketext-simple-perl (<< 0.21.01), libmath-bigint-perl (<< 1.999837), libmath-complex-perl (<< 1.6200), libmodule-corelist-perl (<< 5.20231129), libmodule-load-conditional-perl (<< 0.74), libmodule-load-perl (<< 0.36), libmodule-metadata-perl (<< 1.000037), libnet-perl (<< 1:3.15), libnet-ping-perl (<< 2.76), libparams-check-perl (<< 0.38), libparent-perl (<< 0.241), libparse-cpan-meta-perl (<< 2.150010), libperl-ostype-perl (<< 1.010), libpod-escapes-perl (<< 1.07), libpod-simple-perl (<< 3.43), libtest-harness-perl (<< 3.44), libtest-simple-perl (<< 1.302194), libtest-tester-perl (<< 1.302194), libtest-use-ok-perl (<< 1.302194), libtext-balanced-perl (<< 2.06), libthread-queue-perl (<< 3.14), libtime-local-perl (<< 1.3000), libunicode-collate-perl (<< 1.31), libversion-perl (<< 1:0.9929), perl-base (<< 5.22.0~), perl-modules, podlators-perl (<< 5.01)"
+      },
+      "filename": "pool/main/p/perl/perl-modules-5.38_5.38.2-3.2ubuntu0.6_all.deb",
+      "name": "perl-modules-5.38",
+      "sha256": "9c4c90145209d4f85be9255417008e8decb9cd5d189f446fd39ad096e31199cf",
+      "source": {
+        "name": "perl",
+        "version": "5.38.2-3.2ubuntu0.6"
+      },
+      "suite": "noble-updates",
+      "version": "5.38.2-3.2ubuntu0.6"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 34352,
+      "dependencyFields": {
+        "Breaks": "libgdbm6 (<< 1.23-5.1build1)",
+        "Depends": "libc6 (>= 2.34)",
+        "Multi-Arch": "same",
+        "Provides": "libgdbm6 (= 1.23-5.1build1)",
+        "Replaces": "libgdbm6"
+      },
+      "filename": "pool/main/g/gdbm/libgdbm6t64_1.23-5.1build1_arm64.deb",
+      "name": "libgdbm6t64",
+      "sha256": "acc12af7e644ac336024c5d24028b20814fadd272588be30fb792982217e2dd4",
+      "source": {
+        "name": "gdbm",
+        "version": "1.23-5.1build1"
+      },
+      "suite": "noble",
+      "version": "1.23-5.1build1"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 6578,
+      "dependencyFields": {
+        "Breaks": "libgdbm-compat4 (<< 1.23-5.1build1)",
+        "Depends": "libc6 (>= 2.33), libgdbm6t64 (>= 1.16)",
+        "Multi-Arch": "same",
+        "Provides": "libgdbm-compat4 (= 1.23-5.1build1)",
+        "Replaces": "libgdbm-compat4"
+      },
+      "filename": "pool/main/g/gdbm/libgdbm-compat4t64_1.23-5.1build1_arm64.deb",
+      "name": "libgdbm-compat4t64",
+      "sha256": "e5788a4d0477e0b5bf5cad8950cbd591698828836818c180c20da6f86d68bd37",
+      "source": {
+        "name": "gdbm",
+        "version": "1.23-5.1build1"
+      },
+      "suite": "noble",
+      "version": "1.23-5.1build1"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 4784712,
+      "dependencyFields": {
+        "Breaks": "libcompress-raw-bzip2-perl (<< 2.204.001), libcompress-raw-zlib-perl (<< 2.204.001), libcompress-zlib-perl (<< 2.204), libdigest-md5-perl (<< 2.58.01), libdigest-sha-perl (<< 6.04), libencode-perl (<< 3.19), libfilter-perl (<< 1.64), libio-compress-base-perl (<< 2.204), libio-compress-bzip2-perl (<< 2.204), libio-compress-perl (<< 2.204), libio-compress-zlib-perl (<< 2.204), libmime-base64-perl (<< 3.16.01), libperl5.38 (<< 5.38.2-3.2ubuntu0.6), libstorable-perl (<< 3.32), libsys-syslog-perl (<< 0.36), libthreads-perl (<< 2.36), libthreads-shared-perl (<< 1.68), libtime-hires-perl (<< 1.9775), libtime-piece-perl (<< 1.3401.01)",
+        "Depends": "libbz2-1.0, libc6 (>= 2.38), libcrypt1 (>= 1:4.1.0), libdb5.3t64, libgdbm-compat4t64 (>= 1.18-3), libgdbm6t64 (>= 1.21), zlib1g (>= 1:1.2.3.3), perl-modules-5.38 (>= 5.38.2-3.2ubuntu0.6)",
+        "Multi-Arch": "same",
+        "Provides": "libperl5.38 (= 5.38.2-3.2ubuntu0.6)",
+        "Replaces": "libarchive-tar-perl (<= 1.38-2), libcompress-raw-bzip2-perl (<< 2.204.001), libcompress-raw-zlib-perl (<< 2.204.001), libcompress-zlib-perl (<< 2.204), libdigest-md5-perl (<< 2.58.01), libdigest-sha-perl (<< 6.04), libencode-perl (<< 3.19), libio-compress-base-perl (<< 2.204), libio-compress-bzip2-perl (<< 2.204), libio-compress-perl (<< 2.204), libio-compress-zlib-perl (<< 2.204), libmime-base64-perl (<< 3.16.01), libmodule-corelist-perl (<< 2.14-2), libperl5.38, libstorable-perl (<< 3.32), libsys-syslog-perl (<< 0.36), libthreads-perl (<< 2.36), libthreads-shared-perl (<< 1.68), libtime-hires-perl (<< 1.9775), libtime-piece-perl (<< 1.3401.01), perl (<< 5.22.0~), perl-base (<< 5.22.0~)"
+      },
+      "filename": "pool/main/p/perl/libperl5.38t64_5.38.2-3.2ubuntu0.6_arm64.deb",
+      "name": "libperl5.38t64",
+      "sha256": "f9ef8a6909d0048cc4e4ce89c3c3ed010ba13e7932024d5744e38294e42b0925",
+      "source": {
+        "name": "perl",
+        "version": "5.38.2-3.2ubuntu0.6"
+      },
+      "suite": "noble-updates",
+      "version": "5.38.2-3.2ubuntu0.6"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 231438,
+      "dependencyFields": {
+        "Breaks": "apt-show-versions (<< 0.22.10), libdist-inkt-perl (<< 0.024-5), libmarc-charset-perl (<< 1.35-3), libperl-dev (<< 5.24.0~), perl-doc (<< 5.38.2-1), perl-modules-5.22, perl-modules-5.24, perl-modules-5.26 (<< 5.26.2-5)",
+        "Conflicts": "libjson-pp-perl (<< 2.27200-2)",
+        "Depends": "perl-base (= 5.38.2-3.2ubuntu0.6), perl-modules-5.38 (>= 5.38.2-3.2ubuntu0.6), libperl5.38t64 (= 5.38.2-3.2ubuntu0.6)",
+        "Multi-Arch": "allowed",
+        "Pre-Depends": "dpkg (>= 1.17.17)",
+        "Provides": "libansicolor-perl (= 5.01), libarchive-tar-perl (= 2.40), libattribute-handlers-perl (= 1.03), libautodie-perl (= 2.36), libcompress-raw-bzip2-perl (= 2.204.001), libcompress-raw-zlib-perl (= 2.204.001), libcompress-zlib-perl (= 2.204), libcpan-meta-perl (= 2.150010), libcpan-meta-requirements-perl (= 2.140), libcpan-meta-yaml-perl (= 0.018), libdigest-md5-perl (= 2.58.01), libdigest-perl (= 1.20), libdigest-sha-perl (= 6.04), libencode-perl (= 3.19), libexperimental-perl (= 0.031), libextutils-cbuilder-perl (= 0.280238), libextutils-command-perl (= 7.70), libextutils-install-perl (= 2.22), libextutils-parsexs-perl (= 3.510000), libfile-spec-perl (= 3.8800), libhttp-tiny-perl (= 0.086), libi18n-langtags-perl (= 0.45), libio-compress-base-perl (= 2.204), libio-compress-bzip2-perl (= 2.204), libio-compress-perl (= 2.204), libio-compress-zlib-perl (= 2.204), libio-zlib-perl (= 1.14), libjson-pp-perl (= 4.16000), liblocale-maketext-perl (= 1.33), liblocale-maketext-simple-perl (= 0.21.01), libmath-bigint-perl (= 1.999837), libmath-complex-perl (= 1.6200), libmime-base64-perl (= 3.16.01), libmodule-corelist-perl (= 5.20231129), libmodule-load-conditional-perl (= 0.74), libmodule-load-perl (= 0.36), libmodule-metadata-perl (= 1.000037), libnet-perl (= 1:3.15), libnet-ping-perl (= 2.76), libparams-check-perl (= 0.38), libparent-perl (= 0.241), libparse-cpan-meta-perl (= 2.150010), libperl-ostype-perl (= 1.010), libpod-escapes-perl (= 1.07), libpod-simple-perl (= 3.43), libstorable-perl (= 3.32), libsys-syslog-perl (= 0.36), libtest-harness-perl (= 3.44), libtest-simple-perl (= 1.302194), libtest-tester-perl (= 1.302194), libtest-use-ok-perl (= 1.302194), libtext-balanced-perl (= 2.06), libthread-queue-perl (= 3.14), libthreads-perl (= 2.36), libthreads-shared-perl (= 1.68), libtime-hires-perl (= 1.9775), libtime-local-perl (= 1.3000), libtime-piece-perl (= 1.3401.01), libunicode-collate-perl (= 1.31), libversion-perl (= 1:0.9929), libversion-requirements-perl, podlators-perl (= 5.01)",
+        "Recommends": "netbase",
+        "Replaces": "perl-base (<< 5.36.0-2), perl-modules (<< 5.22.0~)"
+      },
+      "filename": "pool/main/p/perl/perl_5.38.2-3.2ubuntu0.6_arm64.deb",
+      "name": "perl",
+      "sha256": "c8997d0e440f8f220981e25af1f63d1ab6a86afba770218a240cd5f385585aee",
+      "source": {
+        "name": "perl",
+        "version": "5.38.2-3.2ubuntu0.6"
+      },
+      "suite": "noble-updates",
+      "version": "5.38.2-3.2ubuntu0.6"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 58420,
+      "dependencyFields": {
+        "Breaks": "libelf1 (<< 0.190-1.1ubuntu0.1)",
+        "Depends": "libc6 (>= 2.38), libzstd1 (>= 1.5.5), zlib1g (>= 1:1.1.4)",
+        "Multi-Arch": "same",
+        "Provides": "libelf1 (= 0.190-1.1ubuntu0.1)",
+        "Replaces": "libelf1"
+      },
+      "filename": "pool/main/e/elfutils/libelf1t64_0.190-1.1ubuntu0.1_arm64.deb",
+      "name": "libelf1t64",
+      "sha256": "ba200bd93e3a1ade40e2c71540f55e7016c60f11e1b9fe1a76ef975de99b87f5",
+      "source": {
+        "name": "elfutils",
+        "version": "0.190-1.1ubuntu0.1"
+      },
+      "suite": "noble-updates",
+      "version": "0.190-1.1ubuntu0.1"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 167516,
+      "dependencyFields": {
+        "Depends": "libc6 (>= 2.38), libelf1t64 (>= 0.144), zlib1g (>= 1:1.2.3.3)",
+        "Multi-Arch": "same"
+      },
+      "filename": "pool/main/libb/libbpf/libbpf1_1.3.0-2build2_arm64.deb",
+      "name": "libbpf1",
+      "sha256": "bd7e0d87cdf6363691abd7b4470b5e43dc8cb91b874f054f6efd9421a7a88099",
+      "source": {
+        "name": "libbpf",
+        "version": "1.3.0-2build2"
+      },
+      "suite": "noble",
+      "version": "1:1.3.0-2build2"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 12372,
+      "dependencyFields": {
+        "Depends": "libc6 (>= 2.17)",
+        "Multi-Arch": "same"
+      },
+      "filename": "pool/main/libm/libmnl/libmnl0_1.0.5-2build1_arm64.deb",
+      "name": "libmnl0",
+      "sha256": "9442f15a4bbc6148e527045adaf85c86ae3ffe159176d6a5f3b471b49150e470",
+      "source": {
+        "name": "libmnl",
+        "version": "1.0.5-2build1"
+      },
+      "suite": "noble",
+      "version": "1.0.5-2build1"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 35914,
+      "dependencyFields": {
+        "Depends": "libc6 (>= 2.34)",
+        "Multi-Arch": "same"
+      },
+      "filename": "pool/main/i/iptables/libxtables12_1.8.10-3ubuntu2_arm64.deb",
+      "name": "libxtables12",
+      "sha256": "72cd6add0f8eaaa45f44dd5c0903df083ab3847091d0633b4e46e8f80443718a",
+      "source": {
+        "name": "iptables",
+        "version": "1.8.10-3ubuntu2"
+      },
+      "suite": "noble",
+      "version": "1.8.10-3ubuntu2"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 33472,
+      "dependencyFields": {
+        "Breaks": "libcap-bin",
+        "Depends": "libc6 (>= 2.38), libcap2 (>= 1:2.63)",
+        "Multi-Arch": "foreign",
+        "Recommends": "libpam-cap",
+        "Replaces": "libcap-bin"
+      },
+      "filename": "pool/main/libc/libcap2/libcap2-bin_2.66-5ubuntu2.4_arm64.deb",
+      "name": "libcap2-bin",
+      "sha256": "6c9cac86db2d4e0d7eebe8a79ceade3623ab91670a5a348a6efb7abed0abce06",
+      "source": {
+        "name": "libcap2",
+        "version": "1:2.66-5ubuntu2.4"
+      },
+      "suite": "noble-updates",
+      "version": "1:2.66-5ubuntu2.4"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 1125726,
+      "dependencyFields": {
+        "Conflicts": "arpd, iproute (<< 20130000-1)",
+        "Depends": "debconf (>= 0.5) | debconf-2.0, libbpf1 (>= 1:0.6.0), libc6 (>= 2.38), libcap2 (>= 1:2.10), libdb5.3t64, libelf1t64 (>= 0.131), libmnl0 (>= 1.0.3-4~), libselinux1 (>= 3.1~), libxtables12 (>= 1.6.0+snapshot20161117), libcap2-bin",
+        "Multi-Arch": "foreign",
+        "Provides": "arpd",
+        "Recommends": "libatm1t64 (>= 2.4.1-17~)",
+        "Replaces": "iproute"
+      },
+      "filename": "pool/main/i/iproute2/iproute2_6.1.0-1ubuntu6.4_arm64.deb",
+      "name": "iproute2",
+      "sha256": "5cc0bfac0a176309c10c6ef2796c550c6a0ecfc53b9f428b4a632b4f4a2ce8df",
+      "source": {
+        "name": "iproute2",
+        "version": "6.1.0-1ubuntu6.4"
+      },
+      "suite": "noble-updates",
+      "version": "6.1.0-1ubuntu6.4"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 34362,
+      "dependencyFields": {
+        "Depends": "libc6 (>= 2.38)",
+        "Multi-Arch": "same"
+      },
+      "filename": "pool/main/j/jansson/libjansson4_2.14-2build2_arm64.deb",
+      "name": "libjansson4",
+      "sha256": "a9d513eae76f4efb1c7370413bd21634fcfc0955e103d26af95f298af6c90abd",
+      "source": {
+        "name": "jansson",
+        "version": "2.14-2build2"
+      },
+      "suite": "noble",
+      "version": "2.14-2build2"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 74758,
+      "dependencyFields": {
+        "Depends": "libc6 (>= 2.17)",
+        "Multi-Arch": "same"
+      },
+      "filename": "pool/main/n/nghttp2/libnghttp2-14_1.59.0-1ubuntu0.4_arm64.deb",
+      "name": "libnghttp2-14",
+      "sha256": "ec812e0b82dfb315b140020f4c8434191a89cf42c49dbb82605d0892b6783b59",
+      "source": {
+        "name": "nghttp2",
+        "version": "1.59.0-1ubuntu0.4"
+      },
+      "suite": "noble-updates",
+      "version": "1.59.0-1ubuntu0.4"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 57436,
+      "dependencyFields": {
+        "Breaks": "libpsl5 (<< 0.21.2-1.1build1)",
+        "Depends": "libidn2-0 (>= 0.16), libc6 (>= 2.33), libunistring5 (>= 1.1)",
+        "Multi-Arch": "same",
+        "Provides": "libpsl5 (= 0.21.2-1.1build1)",
+        "Recommends": "publicsuffix (>= 20150507)",
+        "Replaces": "libpsl5"
+      },
+      "filename": "pool/main/libp/libpsl/libpsl5t64_0.21.2-1.1build1_arm64.deb",
+      "name": "libpsl5t64",
+      "sha256": "886d485c74567b855bcd19b6f353a769a08b58c111b2d8275a908a469c15d4bf",
+      "source": {
+        "name": "libpsl",
+        "version": "0.21.2-1.1build1"
+      },
+      "suite": "noble",
+      "version": "0.21.2-1.1build1"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 240286,
+      "dependencyFields": {
+        "Breaks": "binutils (<< 2.38.50.20220527-2), binutils-multiarch (<< 2.38.50.20220527-2)",
+        "Multi-Arch": "same",
+        "Replaces": "binutils (<< 2.38.50.20220527-2), binutils-multiarch (<< 2.38.50.20220527-2)"
+      },
+      "filename": "pool/main/b/binutils/binutils-common_2.42-4ubuntu2.10_arm64.deb",
+      "name": "binutils-common",
+      "sha256": "e2930005b9e4d599cfa8ebddd1d888cbcef7ebec38c8c7dfbc4babbdeaa52c3b",
+      "source": {
+        "name": "binutils",
+        "version": "2.42-4ubuntu2.10"
+      },
+      "suite": "noble-updates",
+      "version": "2.42-4ubuntu2.10"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 15428,
+      "dependencyFields": {
+        "Depends": "libc6 (>= 2.17)",
+        "Multi-Arch": "same"
+      },
+      "filename": "pool/main/b/binutils/libsframe1_2.42-4ubuntu2.10_arm64.deb",
+      "name": "libsframe1",
+      "sha256": "4e2ef8c92da324c7f8e8f055c8c698e37c93b886602766e7e72ac178835c9a31",
+      "source": {
+        "name": "binutils",
+        "version": "2.42-4ubuntu2.10"
+      },
+      "suite": "noble-updates",
+      "version": "2.42-4ubuntu2.10"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 766448,
+      "dependencyFields": {
+        "Breaks": "binutils (<< 2.29-6)",
+        "Depends": "libc6 (>= 2.38), libsframe1, libzstd1 (>= 1.5.5), zlib1g (>= 1:1.2.0), binutils-common (= 2.42-4ubuntu2.10)",
+        "Multi-Arch": "same",
+        "Replaces": "binutils (<< 2.29-6)"
+      },
+      "filename": "pool/main/b/binutils/libbinutils_2.42-4ubuntu2.10_arm64.deb",
+      "name": "libbinutils",
+      "sha256": "c86634a7471aa27439b9bef7bd91ca8136f01f938c93bf6abe16a8fca758e849",
+      "source": {
+        "name": "binutils",
+        "version": "2.42-4ubuntu2.10"
+      },
+      "suite": "noble-updates",
+      "version": "2.42-4ubuntu2.10"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 100868,
+      "dependencyFields": {
+        "Breaks": "libbinutils (<< 2.33.50.20191128-1~)",
+        "Depends": "libc6 (>= 2.17), zlib1g (>= 1:1.2.0)",
+        "Multi-Arch": "same",
+        "Replaces": "libbinutils (<< 2.33.50.20191128-1~)"
+      },
+      "filename": "pool/main/b/binutils/libctf-nobfd0_2.42-4ubuntu2.10_arm64.deb",
+      "name": "libctf-nobfd0",
+      "sha256": "c80063890a430e42181e7ad3f0277bb563abc22d556fd5e65c798c4ee8318684",
+      "source": {
+        "name": "binutils",
+        "version": "2.42-4ubuntu2.10"
+      },
+      "suite": "noble-updates",
+      "version": "2.42-4ubuntu2.10"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 95744,
+      "dependencyFields": {
+        "Depends": "libbinutils (= 2.42-4ubuntu2.10), libc6 (>= 2.33), zlib1g (>= 1:1.2.0)",
+        "Multi-Arch": "same"
+      },
+      "filename": "pool/main/b/binutils/libctf0_2.42-4ubuntu2.10_arm64.deb",
+      "name": "libctf0",
+      "sha256": "2516f90d292d01eefe9207a623251550d93665f25d262f206f5c6b803389ed6b",
+      "source": {
+        "name": "binutils",
+        "version": "2.42-4ubuntu2.10"
+      },
+      "suite": "noble-updates",
+      "version": "2.42-4ubuntu2.10"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 776452,
+      "dependencyFields": {
+        "Depends": "libbinutils (= 2.42-4ubuntu2.10), libc6 (>= 2.38), libgcc-s1 (>= 3.3.1), libstdc++6 (>= 13.1), zlib1g (>= 1:1.1.4)",
+        "Multi-Arch": "same"
+      },
+      "filename": "pool/main/b/binutils/libgprofng0_2.42-4ubuntu2.10_arm64.deb",
+      "name": "libgprofng0",
+      "sha256": "ee37f8539eab25c43bd622589932006c6ba90d44e2b7442325fc237f01a3ab5b",
+      "source": {
+        "name": "binutils",
+        "version": "2.42-4ubuntu2.10"
+      },
+      "suite": "noble-updates",
+      "version": "2.42-4ubuntu2.10"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 3304470,
+      "dependencyFields": {
+        "Breaks": "binutils (<< 2.29-6), binutils-dev (<< 2.38.50.20220609-2)",
+        "Depends": "binutils-common (= 2.42-4ubuntu2.10), libbinutils (= 2.42-4ubuntu2.10), libc6 (>= 2.38), libctf-nobfd0 (>= 2.36), libctf0 (>= 2.36), libgcc-s1 (>= 4.2), libgprofng0 (>= 2.41), libjansson4 (>= 2.14), libsframe1 (>= 2.41), libstdc++6 (>= 13.1), libzstd1 (>= 1.5.5), zlib1g (>= 1:1.1.4)",
+        "Multi-Arch": "allowed",
+        "Replaces": "binutils (<< 2.29-6), binutils-dev (<< 2.38.50.20220609-2)"
+      },
+      "filename": "pool/main/b/binutils/binutils-aarch64-linux-gnu_2.42-4ubuntu2.10_arm64.deb",
+      "name": "binutils-aarch64-linux-gnu",
+      "sha256": "b5311d11d56f2daa82e952612b9578ef675af67714edb9aef7e3dc6cf2531575",
+      "source": {
+        "name": "binutils",
+        "version": "2.42-4ubuntu2.10"
+      },
+      "suite": "noble-updates",
+      "version": "2.42-4ubuntu2.10"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 18116,
+      "dependencyFields": {
+        "Conflicts": "binutils-multiarch (<< 2.27-8), modutils (<< 2.4.19-1)",
+        "Depends": "binutils-common (= 2.42-4ubuntu2.10), libbinutils (= 2.42-4ubuntu2.10), binutils-aarch64-linux-gnu (= 2.42-4ubuntu2.10)",
+        "Provides": "binutils-gold, elf-binutils"
+      },
+      "filename": "pool/main/b/binutils/binutils_2.42-4ubuntu2.10_arm64.deb",
+      "name": "binutils",
+      "sha256": "f3333e2ef1b857f35905194f42e9541ff6a42bef8fbba6d8bb56abff460d4fa2",
+      "source": {
+        "name": "binutils",
+        "version": "2.42-4ubuntu2.10"
+      },
+      "suite": "noble-updates",
+      "version": "2.42-4ubuntu2.10"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 339950,
+      "dependencyFields": {
+        "Depends": "libc6 (>= 2.29)",
+        "Multi-Arch": "same"
+      },
+      "filename": "pool/main/b/brotli/libbrotli1_1.1.0-2ubuntu0.1_arm64.deb",
+      "name": "libbrotli1",
+      "sha256": "911411fb6fdfb4ab91dd4242f5a0a5e1f47b38e003a25c8dc7730238cb323e18",
+      "source": {
+        "name": "brotli",
+        "version": "1.1.0-2ubuntu0.1"
+      },
+      "suite": "noble-updates",
+      "version": "1.1.0-2ubuntu0.1"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 21552,
+      "dependencyFields": {
+        "Depends": "libc6 (>= 2.17), libdb5.3t64",
+        "Multi-Arch": "same"
+      },
+      "filename": "pool/main/c/cyrus-sasl2/libsasl2-modules-db_2.1.28+dfsg1-5ubuntu3.1_arm64.deb",
+      "name": "libsasl2-modules-db",
+      "sha256": "ee8237dfd0d26df4d5fbfd3a9b132ae9f34f05b4508176b8bd1839f12739d94c",
+      "source": {
+        "name": "cyrus-sasl2",
+        "version": "2.1.28+dfsg1-5ubuntu3.1"
+      },
+      "suite": "noble-updates",
+      "version": "2.1.28+dfsg1-5ubuntu3.1"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 54660,
+      "dependencyFields": {
+        "Depends": "libsasl2-modules-db (>= 2.1.28+dfsg1-5ubuntu3.1), libc6 (>= 2.38), libssl3t64 (>= 3.0.0)",
+        "Multi-Arch": "same",
+        "Recommends": "libsasl2-modules (>= 2.1.28+dfsg1-5ubuntu3.1)",
+        "Replaces": "libsasl2"
+      },
+      "filename": "pool/main/c/cyrus-sasl2/libsasl2-2_2.1.28+dfsg1-5ubuntu3.1_arm64.deb",
+      "name": "libsasl2-2",
+      "sha256": "05da24adf2b95285ce7eaf9a2ea902fbf4f756a796c8adbfd221d746035df44b",
+      "source": {
+        "name": "cyrus-sasl2",
+        "version": "2.1.28+dfsg1-5ubuntu3.1"
+      },
+      "suite": "noble-updates",
+      "version": "2.1.28+dfsg1-5ubuntu3.1"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 195858,
+      "dependencyFields": {
+        "Depends": "libc6 (>= 2.38), libgnutls30t64 (>= 3.8.2), libsasl2-2 (>= 2.1.28+dfsg1)",
+        "Multi-Arch": "same",
+        "Recommends": "libldap-common"
+      },
+      "filename": "pool/main/o/openldap/libldap2_2.6.10+dfsg-0ubuntu0.24.04.1_arm64.deb",
+      "name": "libldap2",
+      "sha256": "60893ca2782c2e52dc3b7b192be0169228beb91f7c87e93abaeca5871c5f16ee",
+      "source": {
+        "name": "openldap",
+        "version": "2.6.10+dfsg-0ubuntu0.24.04.1"
+      },
+      "suite": "noble-updates",
+      "version": "2.6.10+dfsg-0ubuntu0.24.04.1"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 57804,
+      "dependencyFields": {
+        "Depends": "libc6 (>= 2.34), libgmp10 (>= 2:6.3.0+dfsg), libgnutls30t64 (>= 3.8.1), libhogweed6t64, libnettle8t64, zlib1g (>= 1:1.1.4)",
+        "Multi-Arch": "same"
+      },
+      "filename": "pool/main/r/rtmpdump/librtmp1_2.4+20151223.gitfa8646d.1-2build7_arm64.deb",
+      "name": "librtmp1",
+      "sha256": "fb771b2743120d9d44ee9989fd485205680976f7bf89f2f1ac5df50238ea1db7",
+      "source": {
+        "name": "rtmpdump",
+        "version": "2.4+20151223.gitfa8646d.1-2build7"
+      },
+      "suite": "noble",
+      "version": "2.4+20151223.gitfa8646d.1-2build7"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 192306,
+      "dependencyFields": {
+        "Breaks": "remmina (<< 1.2.31.2+dfsg-1+), remmina-plugin-nx (<< 1.2.31.2+dfsg-1+), x2goclient (<< 4.1.2.1-1+)",
+        "Depends": "libc6 (>= 2.33), libgssapi-krb5-2 (>= 1.17), libssl3t64 (>= 3.0.0), zlib1g (>= 1:1.1.4)",
+        "Multi-Arch": "same"
+      },
+      "filename": "pool/main/libs/libssh/libssh-4_0.10.6-2ubuntu0.5_arm64.deb",
+      "name": "libssh-4",
+      "sha256": "f1b8da917a3d65ca77918027206b55b69d62795df2676c39828d4439bc97e68f",
+      "source": {
+        "name": "libssh",
+        "version": "0.10.6-2ubuntu0.5"
+      },
+      "suite": "noble-updates",
+      "version": "0.10.6-2ubuntu0.5"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 331078,
+      "dependencyFields": {
+        "Breaks": "libcurl3-gnutls (<< 8.5.0-2ubuntu10.16)",
+        "Depends": "libbrotli1 (>= 0.6.0), libc6 (>= 2.36), libgnutls30t64 (>= 3.8.2), libgssapi-krb5-2 (>= 1.17), libidn2-0 (>= 2.0.0), libldap2 (>= 2.6.2), libnettle8t64, libnghttp2-14 (>= 1.50.0), libpsl5t64 (>= 0.16.0), librtmp1 (>= 2.3), libssh-4 (>= 0.9.0), libzstd1 (>= 1.5.5), zlib1g (>= 1:1.1.4)",
+        "Multi-Arch": "same",
+        "Provides": "libcurl3-gnutls (= 8.5.0-2ubuntu10.16)",
+        "Recommends": "ca-certificates",
+        "Replaces": "libcurl3-gnutls"
+      },
+      "filename": "pool/main/c/curl/libcurl3t64-gnutls_8.5.0-2ubuntu10.16_arm64.deb",
+      "name": "libcurl3t64-gnutls",
+      "sha256": "057490ffc9901df7fe09913e381442fc7615bb972a1dc4198e38bcf840447e77",
+      "source": {
+        "name": "curl",
+        "version": "8.5.0-2ubuntu10.16"
+      },
+      "suite": "noble-updates",
+      "version": "8.5.0-2ubuntu10.16"
+    },
+    {
+      "architecture": "all",
+      "bytes": 25632,
+      "dependencyFields": {
+        "Depends": "perl:any",
+        "Multi-Arch": "foreign"
+      },
+      "filename": "pool/main/libe/liberror-perl/liberror-perl_0.17029-2_all.deb",
+      "name": "liberror-perl",
+      "sha256": "1907af6bf33dd8684447c09f216c675d2b8559fadd8ddace29fbf83c6fb2a636",
+      "source": {
+        "name": "liberror-perl",
+        "version": "0.17029-2"
+      },
+      "suite": "noble",
+      "version": "0.17029-2"
+    },
+    {
+      "architecture": "all",
+      "bytes": 1100786,
+      "dependencyFields": {
+        "Multi-Arch": "foreign"
+      },
+      "filename": "pool/main/g/git/git-man_2.43.0-1ubuntu7.4_all.deb",
+      "name": "git-man",
+      "sha256": "77f57651734edc24b5a9e7863bc261bf302060ac3c12bbb08a459966ea4d30a6",
+      "source": {
+        "name": "git",
+        "version": "1:2.43.0-1ubuntu7.4"
+      },
+      "suite": "noble-updates",
+      "version": "1:2.43.0-1ubuntu7.4"
+    },
+    {
+      "architecture": "arm64",
+      "bytes": 3773586,
+      "dependencyFields": {
+        "Breaks": "bash-completion (<< 1:1.90-1), cogito (<= 0.18.2+), dgit (<< 5.1~), git-buildpackage (<< 0.6.5), git-el (<< 1:2.32.0~rc2-1~), gitosis (<< 0.2+20090917-7), gitpkg (<< 0.15), guilt (<< 0.33), openssh-client (<< 1:6.8), stgit (<< 0.15), stgit-contrib (<< 0.15)",
+        "Depends": "libc6 (>= 2.38), libcurl3t64-gnutls (>= 7.63.0), libexpat1 (>= 2.0.1), libpcre2-8-0 (>= 10.34), zlib1g (>= 1:1.2.2), perl, liberror-perl, git-man (>> 1:2.43.0), git-man (<< 1:2.43.0-.)",
+        "Multi-Arch": "foreign",
+        "Provides": "git-completion, git-core",
+        "Recommends": "ca-certificates, patch, less, ssh-client"
+      },
+      "filename": "pool/main/g/git/git_2.43.0-1ubuntu7.4_arm64.deb",
+      "name": "git",
+      "sha256": "b46ef5ad7292f8ae69a7ec18c05e5b40f6c1fca837df2ce4b05b05bd46c9dc2b",
+      "source": {
+        "name": "git",
+        "version": "1:2.43.0-1ubuntu7.4"
+      },
+      "suite": "noble-updates",
+      "version": "1:2.43.0-1ubuntu7.4"
+    }
+  ],
+  "scope": "compiled-client-auth-test-tools",
+  "selectionComplete": true,
+  "snapshot": "20261029T000000Z",
+  "solver": {
+    "artifactId": 12960742516,
+    "artifactSha256": "1ae48c1980bf0cbf6a9fe69e23ab3050ad0a4ca96ba1d784849e2bbd26cac3f0",
+    "logName": "auth-image-build.log",
+    "logSha256": "44cdd4317e1f80246d024d6bc7641943fa6240e4b01d463f11535df815602554",
+    "snapshot": "20261029T000000Z"
+  },
+  "solverManifest": {
+    "bytes": 5858,
+    "sha256": "fb13de77a13030ab853a26d1fc1f239d3c4aa8a5ad3b2ef857d16e0614761f74"
+  },
+  "sources": [
+    {
+      "files": [
+        {
+          "bytes": 2608,
+          "filename": "pool/main/g/gdbm/gdbm_1.23-5.1build1.dsc",
+          "sha256": "70317d44b2f27b11ded9676d58e6c89de34994594797f6e2ac0707070599e457"
+        },
+        {
+          "bytes": 1115854,
+          "filename": "pool/main/g/gdbm/gdbm_1.23.orig.tar.gz",
+          "sha256": "74b1081d21fff13ae4bd7c16e5d6e504a4c26f7cde1dca0d963a484174bbcacd"
+        },
+        {
+          "bytes": 181,
+          "filename": "pool/main/g/gdbm/gdbm_1.23.orig.tar.gz.asc",
+          "sha256": "64ebb68cc68e8915d62cb20ea40323c00b56051f844589ee0a52169fff34cecb"
+        },
+        {
+          "bytes": 18524,
+          "filename": "pool/main/g/gdbm/gdbm_1.23-5.1build1.debian.tar.xz",
+          "sha256": "2561846bb0493ab9549fc46ea6431861a84111567b1c5f6bf1956feb8a389b49"
+        }
+      ],
+      "name": "gdbm",
+      "suite": "noble",
+      "version": "1.23-5.1build1"
+    },
+    {
+      "files": [
+        {
+          "bytes": 2796,
+          "filename": "pool/main/i/iptables/iptables_1.8.10-3ubuntu2.dsc",
+          "sha256": "7c07534b26de1db5efb044744f0404b466b2df39c8a45b2451720ad705de84eb"
+        },
+        {
+          "bytes": 641168,
+          "filename": "pool/main/i/iptables/iptables_1.8.10.orig.tar.xz",
+          "sha256": "5cc255c189356e317d070755ce9371eb63a1b783c34498fb8c30264f3cc59c9c"
+        },
+        {
+          "bytes": 30692,
+          "filename": "pool/main/i/iptables/iptables_1.8.10-3ubuntu2.debian.tar.xz",
+          "sha256": "9b2adc03e912f0d085cadbfe4d413ba8accad184b73a9c3b9d0aa0327ba6f069"
+        }
+      ],
+      "name": "iptables",
+      "suite": "noble",
+      "version": "1.8.10-3ubuntu2"
+    },
+    {
+      "files": [
+        {
+          "bytes": 2120,
+          "filename": "pool/main/j/jansson/jansson_2.14-2build2.dsc",
+          "sha256": "79f56ca657a0d680549bf9b0c4fdcf2fe824221bee7462c0ecad56baaeca0a21"
+        },
+        {
+          "bytes": 141500,
+          "filename": "pool/main/j/jansson/jansson_2.14.orig.tar.gz",
+          "sha256": "c739578bf6b764aa0752db9a2fdadcfe921c78f1228c7ec0bb47fa804c55d17b"
+        },
+        {
+          "bytes": 5580,
+          "filename": "pool/main/j/jansson/jansson_2.14-2build2.debian.tar.xz",
+          "sha256": "93fb8b5f8c4a8b098622d6865f36f0711a9ee42e104f34457c8503f218078e68"
+        }
+      ],
+      "name": "jansson",
+      "suite": "noble",
+      "version": "2.14-2build2"
+    },
+    {
+      "files": [
+        {
+          "bytes": 2024,
+          "filename": "pool/main/libb/libbpf/libbpf_1.3.0-2build2.dsc",
+          "sha256": "87023eb0efe8f19c9066433593b4218f623931d2b5bfb92d31796eace8bd2dbe"
+        },
+        {
+          "bytes": 999282,
+          "filename": "pool/main/libb/libbpf/libbpf_1.3.0.orig.tar.gz",
+          "sha256": "11db86acd627e468bc48b7258c1130aba41a12c4d364f78e184fd2f5a913d861"
+        },
+        {
+          "bytes": 7224,
+          "filename": "pool/main/libb/libbpf/libbpf_1.3.0-2build2.debian.tar.xz",
+          "sha256": "cf307f4a37e17847b5cf91b0ed5426c2213a4c0e30a9010a10d4854f23ebe156"
+        }
+      ],
+      "name": "libbpf",
+      "suite": "noble",
+      "version": "1.3.0-2build2"
+    },
+    {
+      "files": [
+        {
+          "bytes": 2085,
+          "filename": "pool/main/libe/liberror-perl/liberror-perl_0.17029-2.dsc",
+          "sha256": "48c6ca66e03144a8bec4f32b2419f34d70e8a00500b01ea3bb6a5cab0c03e164"
+        },
+        {
+          "bytes": 33304,
+          "filename": "pool/main/libe/liberror-perl/liberror-perl_0.17029.orig.tar.gz",
+          "sha256": "1a23f7913032aed6d4b68321373a3899ca66590f4727391a091ec19c95bf7adc"
+        },
+        {
+          "bytes": 4608,
+          "filename": "pool/main/libe/liberror-perl/liberror-perl_0.17029-2.debian.tar.xz",
+          "sha256": "60deb5d5cbc4b478f8db4cfa0ac6c512e85eea5fcd7fc7285c26a9942d3b8b67"
+        }
+      ],
+      "name": "liberror-perl",
+      "suite": "noble",
+      "version": "0.17029-2"
+    },
+    {
+      "files": [
+        {
+          "bytes": 2611,
+          "filename": "pool/main/libm/libmnl/libmnl_1.0.5-2build1.dsc",
+          "sha256": "87ea0b2b02fc4b9d408bd942fefb6dd15bb162b9d9acade2a78928441d4bcdb2"
+        },
+        {
+          "bytes": 314791,
+          "filename": "pool/main/libm/libmnl/libmnl_1.0.5.orig.tar.bz2",
+          "sha256": "274b9b919ef3152bfb3da3a13c950dd60d6e2bcd54230ffeca298d03b40d0525"
+        },
+        {
+          "bytes": 833,
+          "filename": "pool/main/libm/libmnl/libmnl_1.0.5.orig.tar.bz2.asc",
+          "sha256": "7175ee1de6c831e6d7ffae3540af7fcd9c64f302351af55ff12966ecbe6a5b71"
+        },
+        {
+          "bytes": 10092,
+          "filename": "pool/main/libm/libmnl/libmnl_1.0.5-2build1.debian.tar.xz",
+          "sha256": "ae1c404e109ed28b12c520780c16404732f19128f801108c26232982b751777f"
+        }
+      ],
+      "name": "libmnl",
+      "suite": "noble",
+      "version": "1.0.5-2build1"
+    },
+    {
+      "files": [
+        {
+          "bytes": 2425,
+          "filename": "pool/main/libp/libpsl/libpsl_0.21.2-1.1build1.dsc",
+          "sha256": "bc742d8be05151fc4e5a5e20f48a03a276dd3094286861f19da1346a0dd761b4"
+        },
+        {
+          "bytes": 1870352,
+          "filename": "pool/main/libp/libpsl/libpsl_0.21.2.orig.tar.xz",
+          "sha256": "11e34380f2c81d6e72c710464aae3b680df4ddcc1007826c630fb03c7ca6aa54"
+        },
+        {
+          "bytes": 12244,
+          "filename": "pool/main/libp/libpsl/libpsl_0.21.2-1.1build1.debian.tar.xz",
+          "sha256": "70e66bec75c564eee5ce7b1b422a51753601bd64d9738b68551127093321eabc"
+        }
+      ],
+      "name": "libpsl",
+      "suite": "noble",
+      "version": "0.21.2-1.1build1"
+    },
+    {
+      "files": [
+        {
+          "bytes": 2439,
+          "filename": "pool/main/r/rtmpdump/rtmpdump_2.4+20151223.gitfa8646d.1-2build7.dsc",
+          "sha256": "076006f9c26e898a8da252ee8dbd6f04252833fac08898b9fd9344ccba848853"
+        },
+        {
+          "bytes": 142213,
+          "filename": "pool/main/r/rtmpdump/rtmpdump_2.4+20151223.gitfa8646d.1.orig.tar.gz",
+          "sha256": "5c032f5c8cc2937eb55a81a94effdfed3b0a0304b6376147b86f951e225e3ab5"
+        },
+        {
+          "bytes": 8464,
+          "filename": "pool/main/r/rtmpdump/rtmpdump_2.4+20151223.gitfa8646d.1-2build7.debian.tar.xz",
+          "sha256": "bbc24a32c42f37238190944ecfc640387373d7dfa8e570fa23353d6a1f0e3d0b"
+        }
+      ],
+      "name": "rtmpdump",
+      "suite": "noble",
+      "version": "2.4+20151223.gitfa8646d.1-2build7"
+    },
+    {
+      "files": [
+        {
+          "bytes": 27567160,
+          "filename": "pool/main/b/binutils/binutils_2.42.orig.tar.xz",
+          "sha256": "f6e4d41fd5fc778b06b7891457b3620da5ecea1006c6a4a41ae998109f85a800"
+        },
+        {
+          "bytes": 196552,
+          "filename": "pool/main/b/binutils/binutils_2.42-4ubuntu2.10.debian.tar.xz",
+          "sha256": "6acc777971890cb1efaeeb33a0a5358651c71067ced69dcfd59da7d0977f7530"
+        },
+        {
+          "bytes": 10152,
+          "filename": "pool/main/b/binutils/binutils_2.42-4ubuntu2.10.dsc",
+          "sha256": "a14a8e2efdb3566955476bccd2248cebed5cf2a2f5d28e223d08200ec1a18d75"
+        }
+      ],
+      "name": "binutils",
+      "suite": "noble-updates",
+      "version": "2.42-4ubuntu2.10"
+    },
+    {
+      "files": [
+        {
+          "bytes": 512036,
+          "filename": "pool/main/b/brotli/brotli_1.1.0.orig.tar.gz",
+          "sha256": "10973f4b4199eafa1d5735ef661ddb2ec2f97319ee9fd1824d4aabe08cff5265"
+        },
+        {
+          "bytes": 7892,
+          "filename": "pool/main/b/brotli/brotli_1.1.0-2ubuntu0.1.debian.tar.xz",
+          "sha256": "744230cae71f1ba9fbef6b897195393dca0f94641b286a3a183898fe6a77ef59"
+        },
+        {
+          "bytes": 2376,
+          "filename": "pool/main/b/brotli/brotli_1.1.0-2ubuntu0.1.dsc",
+          "sha256": "20d71900a6ed7f7edf6ef3b0084892510aae1b3b72ed7b99f38919f802c2a779"
+        }
+      ],
+      "name": "brotli",
+      "suite": "noble-updates",
+      "version": "1.1.0-2ubuntu0.1"
+    },
+    {
+      "files": [
+        {
+          "bytes": 4372979,
+          "filename": "pool/main/c/curl/curl_8.5.0.orig.tar.gz",
+          "sha256": "05fc17ff25b793a437a0906e0484b82172a9f4de02be5ed447e0cab8c3475add"
+        },
+        {
+          "bytes": 97764,
+          "filename": "pool/main/c/curl/curl_8.5.0-2ubuntu10.16.debian.tar.xz",
+          "sha256": "4ccc6c6a0c4b41c4d753d60c2991541c7f2a41d81c0000f582cf6b4901c746a4"
+        },
+        {
+          "bytes": 3096,
+          "filename": "pool/main/c/curl/curl_8.5.0-2ubuntu10.16.dsc",
+          "sha256": "ff4ae5226e471829f638b94b1b8bb74bb2f7e57ca999353f6ad7274bf43a8abf"
+        }
+      ],
+      "name": "curl",
+      "suite": "noble-updates",
+      "version": "8.5.0-2ubuntu10.16"
+    },
+    {
+      "files": [
+        {
+          "bytes": 794540,
+          "filename": "pool/main/c/cyrus-sasl2/cyrus-sasl2_2.1.28+dfsg1.orig.tar.xz",
+          "sha256": "e796a5d85d1a85e1b433d43504e467f9075c7ebc0b45730a3996cf11b1deada4"
+        },
+        {
+          "bytes": 98324,
+          "filename": "pool/main/c/cyrus-sasl2/cyrus-sasl2_2.1.28+dfsg1-5ubuntu3.1.debian.tar.xz",
+          "sha256": "a1017cf9d4fd098325338d1d7f1f71cb87102934e7b35c8f5e726d246360689e"
+        },
+        {
+          "bytes": 3501,
+          "filename": "pool/main/c/cyrus-sasl2/cyrus-sasl2_2.1.28+dfsg1-5ubuntu3.1.dsc",
+          "sha256": "6ede2d7122c4ea1e807f45b647edbdf9fb1521ad09b0ca0b9b48f220ef33f23f"
+        }
+      ],
+      "name": "cyrus-sasl2",
+      "suite": "noble-updates",
+      "version": "2.1.28+dfsg1-5ubuntu3.1"
+    },
+    {
+      "files": [
+        {
+          "bytes": 9162766,
+          "filename": "pool/main/e/elfutils/elfutils_0.190.orig.tar.bz2",
+          "sha256": "8e00a3a9b5f04bc1dc273ae86281d2d26ed412020b391ffcc23198f10231d692"
+        },
+        {
+          "bytes": 46976,
+          "filename": "pool/main/e/elfutils/elfutils_0.190-1.1ubuntu0.1.debian.tar.xz",
+          "sha256": "4c3130951f7b865d50ff57379a258926a66bcd2753e3c12301bbb110fbb417fa"
+        },
+        {
+          "bytes": 3410,
+          "filename": "pool/main/e/elfutils/elfutils_0.190-1.1ubuntu0.1.dsc",
+          "sha256": "7852785ce5ce51a6dad0f6b67188d94ffedaffa6d0128fecabeb6a1ccc2aabea"
+        }
+      ],
+      "name": "elfutils",
+      "suite": "noble-updates",
+      "version": "0.190-1.1ubuntu0.1"
+    },
+    {
+      "files": [
+        {
+          "bytes": 7382996,
+          "filename": "pool/main/g/git/git_2.43.0.orig.tar.xz",
+          "sha256": "5446603e73d911781d259e565750dcd277a42836c8e392cac91cf137aa9b76ec"
+        },
+        {
+          "bytes": 796932,
+          "filename": "pool/main/g/git/git_2.43.0-1ubuntu7.4.debian.tar.xz",
+          "sha256": "da368dcd58b9889787e7448d907cfc7ac06536472f78421f91351eee71f6d74b"
+        },
+        {
+          "bytes": 2968,
+          "filename": "pool/main/g/git/git_2.43.0-1ubuntu7.4.dsc",
+          "sha256": "b00b55dcce31a063b783cd0e34fce02c24167fc9f32e2eb7bb2ff4a31652f7a5"
+        }
+      ],
+      "name": "git",
+      "suite": "noble-updates",
+      "version": "1:2.43.0-1ubuntu7.4"
+    },
+    {
+      "files": [
+        {
+          "bytes": 905512,
+          "filename": "pool/main/i/iproute2/iproute2_6.1.0.orig.tar.xz",
+          "sha256": "5ce12a0fec6b212725ef218735941b2dab76244db7e72646a76021b0537b43ab"
+        },
+        {
+          "bytes": 47000,
+          "filename": "pool/main/i/iproute2/iproute2_6.1.0-1ubuntu6.4.debian.tar.xz",
+          "sha256": "d127ad985c91e0cc4192876721e533efc893deed08e256b3662205d8401552cd"
+        },
+        {
+          "bytes": 2402,
+          "filename": "pool/main/i/iproute2/iproute2_6.1.0-1ubuntu6.4.dsc",
+          "sha256": "e1a68d3819d17295c958922bc5a4bd8a0df951d183e4414f9661a75a1e6e8ced"
+        }
+      ],
+      "name": "iproute2",
+      "suite": "noble-updates",
+      "version": "6.1.0-1ubuntu6.4"
+    },
+    {
+      "files": [
+        {
+          "bytes": 181592,
+          "filename": "pool/main/libc/libcap2/libcap2_2.66.orig.tar.xz",
+          "sha256": "15c40ededb3003d70a283fe587a36b7d19c8b3b554e33f86129c059a4bb466b2"
+        },
+        {
+          "bytes": 24724,
+          "filename": "pool/main/libc/libcap2/libcap2_2.66-5ubuntu2.4.debian.tar.xz",
+          "sha256": "7eb46752c6b59984494d2f641a049b9d4b394b7d1fe067729ccbc413c5943136"
+        },
+        {
+          "bytes": 2319,
+          "filename": "pool/main/libc/libcap2/libcap2_2.66-5ubuntu2.4.dsc",
+          "sha256": "8178019803f285b92e52e82cf84b0a6fc18840041270b2c588db826b8277e3e0"
+        }
+      ],
+      "name": "libcap2",
+      "suite": "noble-updates",
+      "version": "1:2.66-5ubuntu2.4"
+    },
+    {
+      "files": [
+        {
+          "bytes": 561036,
+          "filename": "pool/main/libs/libssh/libssh_0.10.6.orig.tar.xz",
+          "sha256": "1861d498f5b6f1741b6abc73e608478491edcf9c9d4b6630eef6e74596de9dc1"
+        },
+        {
+          "bytes": 833,
+          "filename": "pool/main/libs/libssh/libssh_0.10.6.orig.tar.xz.asc",
+          "sha256": "140420406d7796548b0beaf736e73864c32291787cf2bd3983fdbc41741494ae"
+        },
+        {
+          "bytes": 63744,
+          "filename": "pool/main/libs/libssh/libssh_0.10.6-2ubuntu0.5.debian.tar.xz",
+          "sha256": "5ea1b360802689a7daa557470a661665d95996ab8c0b8dc700083ed8caf8f8d8"
+        },
+        {
+          "bytes": 2857,
+          "filename": "pool/main/libs/libssh/libssh_0.10.6-2ubuntu0.5.dsc",
+          "sha256": "e5eb4bf8c16013acaab5a3ed38d3c4141b3d5fab317cbc8f11118ddd5b4479ad"
+        }
+      ],
+      "name": "libssh",
+      "suite": "noble-updates",
+      "version": "0.10.6-2ubuntu0.5"
+    },
+    {
+      "files": [
+        {
+          "bytes": 1055492,
+          "filename": "pool/main/n/nghttp2/nghttp2_1.59.0.orig.tar.gz",
+          "sha256": "0dd5c980f1262ff5f03676fd99f46f250b66c842f7d864fa1ca9f8453e5f8868"
+        },
+        {
+          "bytes": 18840,
+          "filename": "pool/main/n/nghttp2/nghttp2_1.59.0-1ubuntu0.4.debian.tar.xz",
+          "sha256": "f9f73792cc9c1b903dac7ab6742674e275cc8fb0489c536dba644baccc777119"
+        },
+        {
+          "bytes": 2624,
+          "filename": "pool/main/n/nghttp2/nghttp2_1.59.0-1ubuntu0.4.dsc",
+          "sha256": "2e88ef28abff157157454f097e50256dccafd071206623c0b9294e83457b919b"
+        }
+      ],
+      "name": "nghttp2",
+      "suite": "noble-updates",
+      "version": "1.59.0-1ubuntu0.4"
+    },
+    {
+      "files": [
+        {
+          "bytes": 3754560,
+          "filename": "pool/main/o/openldap/openldap_2.6.10+dfsg.orig.tar.xz",
+          "sha256": "e871102bda1e42155fd4d6be4825a297e1c593cb0907b84fc7dde888dc847877"
+        },
+        {
+          "bytes": 191132,
+          "filename": "pool/main/o/openldap/openldap_2.6.10+dfsg-0ubuntu0.24.04.1.debian.tar.xz",
+          "sha256": "91bdd643954645ce8ba51152516831ce4dcb497a222b88a5df847c4780e5f79e"
+        },
+        {
+          "bytes": 3653,
+          "filename": "pool/main/o/openldap/openldap_2.6.10+dfsg-0ubuntu0.24.04.1.dsc",
+          "sha256": "63be3643ff4157d84ef8bd9763fb7252695ceaea46773277600377417ecd21de"
+        }
+      ],
+      "name": "openldap",
+      "suite": "noble-updates",
+      "version": "2.6.10+dfsg-0ubuntu0.24.04.1"
+    },
+    {
+      "files": [
+        {
+          "bytes": 418808,
+          "filename": "pool/main/p/perl/perl_5.38.2.orig-regen-configure.tar.xz",
+          "sha256": "4d1b34cc058f9963cb89785ecc040d57f6d7725cd83329cfa4ef8b27566454d2"
+        },
+        {
+          "bytes": 13679524,
+          "filename": "pool/main/p/perl/perl_5.38.2.orig.tar.xz",
+          "sha256": "d91115e90b896520e83d4de6b52f8254ef2b70a8d545ffab33200ea9f1cf29e8"
+        },
+        {
+          "bytes": 184740,
+          "filename": "pool/main/p/perl/perl_5.38.2-3.2ubuntu0.6.debian.tar.xz",
+          "sha256": "5c94f7708145fbe1ca97233c5c83c2bb70c6875013fc17ac50137ec735242bb7"
+        },
+        {
+          "bytes": 3081,
+          "filename": "pool/main/p/perl/perl_5.38.2-3.2ubuntu0.6.dsc",
+          "sha256": "ece66ceafd3502733ece75ac7aaae4122123fde84921d95d5b8151ebf115057f"
+        }
+      ],
+      "name": "perl",
+      "suite": "noble-updates",
+      "version": "5.38.2-3.2ubuntu0.6"
+    }
+  ],
+  "testImageBuilt": false,
+  "toolingExecuted": false
+}

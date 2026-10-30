@@ -1,0 +1,26 @@
+{
+  "formatVersion": 1,
+  "scope": "server-engine-debug-separation-tool-only",
+  "host": "linux-x86_64",
+  "target": "linux-aarch64",
+  "ndkArchive": {
+    "file": "android-ndk-r28c-linux.zip",
+    "url": "https://dl.google.com/android/repository/android-ndk-r28c-linux.zip",
+    "version": "28.2.13676358",
+    "bytes": 722261334,
+    "sha256": "dfb20d396df28ca02a8c708314b814a4d961dc9074f9a161932746f815aa552f"
+  },
+  "executable": {
+    "archivePath": "android-ndk-r28c/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-objcopy",
+    "bytes": 5902232,
+    "sha256": "1da35c6bcee9649adcaadf8a493132c3b7205901149622836d28e42d7fca7267"
+  },
+  "versionLine": "LLVM version 19.0.1 (/mnt/disks/build-disk/src/android/llvm-r530567/out/llvm-project/llvm 97a699bf4812a18fb657c2779f5296a4ab2694d2)",
+  "operations": [
+    "--only-keep-debug ORIGINAL NAME.debug",
+    "--strip-unneeded --add-gnu-debuglink=NAME.debug ORIGINAL NAME"
+  ],
+  "actualServerDerivativeQualified": false,
+  "androidRuntimeQualified": false,
+  "gameplayQualified": false
+}
