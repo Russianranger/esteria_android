@@ -151,3 +151,11 @@ SAF archive resumption now advances relative to the provider stream, preserving
 file-slice origin and length accounting.32 importer groups at32MiB, real file
 descriptor/slice and5GiB offset regressions, app compilation and lint pass.
 Actual Android document-provider execution remains separate.
+
+Android13 x64 MySQL run41109642918 at4fd32df now reports completed/success:
+actual bootstrap66.491s and Java database-service lifecycle51.72s. Independent
+readback verifies123 small evidence members and21 producer source inputs.
+Retained229MB input and905MB complete-source archives are pinned separately;
+full large-archive consumption is a new CI gate, not a local readback claim.
+An original-target x64 dbimport/Playerbots helper build is prepared for subsequent
+four-schema/coordinator qualification. Production ARM64 provider pins are unchanged.

@@ -1,0 +1,73 @@
+{
+  "arm64Qualified": false,
+  "bothCompleteInputSourceArchivesReadBack": false,
+  "checks": {
+    "actualMeasuredPinAdmitted": true,
+    "actualSourceArchiveFileTamperRefused": true,
+    "changedMissingExtraDuplicateZipMembersRefused": true,
+    "exactUnittestCommand": "python3 -m unittest tests.test_android_mysql_fixture_inputs tests.test_android_mysql_retention tests.test_android_mysql_probe -v",
+    "existingOutputAndSpaceGuardRefusedBeforeNetwork": true,
+    "focusedUnittestGroups": 19,
+    "focusedUnittestPassed": true,
+    "foreignScopeAndOverclaimRefused": true,
+    "unittestModules": [
+      {
+        "module": "tests.test_android_mysql_fixture_inputs",
+        "tests": 7
+      },
+      {
+        "module": "tests.test_android_mysql_retention",
+        "tests": 6
+      },
+      {
+        "module": "tests.test_android_mysql_probe",
+        "tests": 6
+      }
+    ],
+    "workflowParsed": true,
+    "workflowUnittestGroups": 13,
+    "workflowUnittestModules": [
+      "tests.test_android_mysql_fixture_inputs",
+      "tests.test_android_mysql_retention"
+    ]
+  },
+  "coordinatorExecuted": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "guestExecuted": false,
+  "newConsumerNetworkExecuted": false,
+  "originalActualAndroidEvidencePreserved": true,
+  "originalAndroidReceiptLocallyRevalidated": true,
+  "repositoryHeadAtCheck": "0a6bc08417ee037286669784c97a54974bbe2817",
+  "scope": "host-retained-android-x64-mysql-input-consumer-guards-only",
+  "serverSchemasQualified": false,
+  "sourceFiles": {
+    ".github/workflows/android-mysql-inputs.yml": {
+      "bytes": 2645,
+      "sha256": "e3ce3b5282cfe2a8950647c07caa3e304ad669ed53867d8d088e0a500c6bc50d"
+    },
+    "runtime/evidence/android-mysql-service-4fd32df-readback.json": {
+      "bytes": 51192,
+      "sha256": "fc72640a12c394d382cd85b1c714a4f6cad45215fce445f9a45c17e86d215c9c"
+    },
+    "runtime/mysql-probe/README.md": {
+      "bytes": 16838,
+      "sha256": "9cb413f67a6c52aa91446e00274c9e2c5866e771c8166e2a07f03b5f7ce62202"
+    },
+    "runtime/mysql-probe/qualified-inputs.lock.json": {
+      "bytes": 6228,
+      "sha256": "5268fa26eb1e2165f0cf5ff9f90686792abb4af6b9af48288d75932009bf853d"
+    },
+    "tests/test_android_mysql_fixture_inputs.py": {
+      "bytes": 8762,
+      "sha256": "92f1005383c3cf8818b87d4e5f8203133c3c2320eba4cbb9dbd7aeae637743c4"
+    },
+    "tools/fetch_android_mysql_fixture.py": {
+      "bytes": 15690,
+      "sha256": "9b8681d44d319902e21092a77d6fb52f434c3af78d0b968b80470a37c33872bf"
+    }
+  },
+  "sourceInstalledArchiveFilesClaimedByOriginalReceipt": 275,
+  "sourceSnapshotExact": false,
+  "sqlExecuted": false
+}

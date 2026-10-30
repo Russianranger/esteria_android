@@ -1,0 +1,58 @@
+name: Retained Android x64 MySQL complete input and source readback
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - runtime/mysql-probe/qualified-inputs.lock.json
+      - runtime/evidence/android-mysql-service-4fd32df-readback.json
+      - tools/fetch_android_mysql_fixture.py
+      - tests/test_android_mysql_fixture_inputs.py
+      - .github/workflows/android-mysql-inputs.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: retained-android-x64-mysql-inputs-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  readback:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Check measured input selection and bounded source transactions
+        run: |
+          python3 -m unittest tests.test_android_mysql_fixture_inputs tests.test_android_mysql_retention -v
+          mkdir -p out/android-mysql-inputs
+      - name: Read every original x64 input source and APK byte without APT or guest execution
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          from tools import fetch_android_mysql_fixture as fixture
+          report=Path('out/android-mysql-inputs')
+          try:
+              proof=fixture.acquire(Path(os.environ['RUNNER_TEMP'])/'verified-android-mysql-fixture')
+              (report/'acquisition.json').write_bytes(fixture.encode(proof))
+          except Exception as error:
+              # Do not export raw exception messages, download URLs or tokens.
+              (report/'failure.json').write_bytes(fixture.encode(dict(formatVersion=1,
+                  scope='retained-android-x64-mysql-inputs-failure',**fixture.failure_context(error),
+                  completeInputReadback=False,guestExecuted=False,sqlExecuted=False,
+                  arm64Qualified=False,gameplayQualified=False)))
+              raise SystemExit('Retained MySQL fixture admission failed: '+type(error).__name__) from None
+          PY
+      - name: Retain bounded input and source readback evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: retained-android-x64-mysql-input-readback-${{ github.sha }}
+          path: out/android-mysql-inputs/*.json
+          retention-days: 30
+          if-no-files-found: error

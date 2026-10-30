@@ -214,3 +214,10 @@ audible game output.
 The separate `android-proot-stat.yml` fixture tests real metadata mutations and
 reaped PRoot relaunch on Android13 x64. Its build-only/host receipts explicitly
 exclude Android and ARM64 execution until the actual workflow completes.
+
+The retained x64 MySQL consumer is compiler-free and verifies the complete pinned
+input/source archives in `android-mysql-inputs.yml`. Its host guards run with
+`python3 -m unittest tests.test_android_mysql_fixture_inputs tests.test_android_mysql_retention tests.test_android_mysql_probe -v`
+(19 tests). `tests.test_server_setup_x64_probe` adds six build/ELF/source guards.
+`server-setup-x64-probe.yml` compiles the original dbimport target and real helper
+from exact source; compilation alone does not qualify SQL or Android coordination.

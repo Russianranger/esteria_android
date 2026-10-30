@@ -210,3 +210,63 @@ verification, including when a later emulator test failed. Its manifest explicit
 makes no Android execution, production ARM64 or offline-consumer qualification
 claim. An actual retained package must be independently consumed and pinned before
 it can replace the online dependency build. No such new x64 consumer pin exists.
+
+## Recovered current fixture and complete-source consumer
+
+Run41109642918 at4fd32df287961b9cc5175213a6fe85eac1c6d868 completed successfully,
+including the actual Android13 x64 bootstrap and Java database-service methods,
+complete installed-package source export and fresh-input retention. Bootstrap
+passed in66.491seconds; the Java service method passed in51.72seconds. The
+independent readback in
+`runtime/evidence/android-mysql-service-4fd32df-readback.json` checks all123
+members of the two bounded evidence ZIPs, both strict application receipts and
+all21 provider input files against exact producer Git blobs. The earlier05925
+snapshot failure remains a separate historical observation.
+
+The actual retained-input ZIP is229,313,210bytes, SHA256
+`bf77256998e52f3de51497a6d0a88356ee88b325c853f0e564f0018f35ba73fd`.
+The complete source ZIP is905,093,502bytes, SHA256
+`de0a9922035314e9d7a566490932475d276f8f29aba9b4fb09be717d2bada04c`.
+The latter contains275 installed-package source archives totaling876,239,964
+bytes, plus original recipes and the PRoot corresponding-source companion.
+The local evidence readback covers the retention receipt via standard HTTPS ZIP
+byte ranges; it does not claim full local readback of these large ZIPs.
+
+`qualified-inputs.lock.json` is now an explicit qualification-only selection of
+those measured outputs, bound to the actual positive Android evidence. The new
+consumer reads both entire original ZIPs in CI, restores and verifies every
+retained input, reads every source ZIP member, checks all275 source archives
+against their runtime-bound manifest, and recovers the exact verified PRoot
+provider from the original APK. It needs Python3.10+, the supported GitHub Actions
+artifact authentication and at least6GiB free scratch. It executes no packaged
+binary, guest, SQL or source script:
+
+```sh
+python3 tools/fetch_android_mysql_fixture.py --output out/verified-x64-mysql-fixture
+```
+
+`android-mysql-inputs.yml` runs this independent full-input/source readback without
+APT, Android SDK or an emulator. Its actual resulting acquisition receipt must
+be retained before claiming that this consumer has passed. The original exact
+source ZIP and expanded source closure remain beside the recovered provider,
+never inside production ARM64 assets. Retained Actions availability is finite;
+this test-only input selection does not establish durable public publication.
+
+The x64 MySQL payload contains no Esteria `dbimport` or playerbots schema helper.
+The production helpers/programs are ARM64 with architecture-specific source and
+native-SQL attestations. A full Android x64 four-schema installation coordinator
+therefore needs actual source-built x64 setup tools and new SQL receipts. The
+existing bootstrap/service result does not qualify `ServerInstallationSetup`,
+fresh-slot promotion, populated game schemas, ARM64, worldserver or gameplay.
+
+The next execution sequence is explicit: run `server-setup-x64-probe.yml` to
+build the original complete `dbimport` target and real52-statement Playerbots
+helper against the exact seven-patch source export. Preserve the resulting
+original/stripped/debug pairs and complete shared-library sources. Then run
+fresh x64 native core/updater/four-schema SQL and restart checks to produce new
+architecture-specific receipts. Only those measured outputs may feed a private
+Android-test runtime/component seam for the unchanged installation coordinator.
+That final emulator gate must execute actual bootstrap, four-schema setup,
+clean-stop promotion, active-save reseeding refusal and same-instance restart;
+compilation, the existing service fixture and ARM64 receipts cannot stand in
+for it. Production provider admission and the application ABI remain ARM64.

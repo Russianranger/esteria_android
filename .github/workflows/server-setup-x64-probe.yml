@@ -1,0 +1,102 @@
+name: Separate x64 server SQL setup tool source build
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - tools/build_server_setup_x64_probe.py
+      - tests/test_server_setup_x64_probe.py
+      - .github/workflows/server-setup-x64-probe.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: x64-server-setup-probe-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Check actual ELF package-source and architecture refusal behavior
+        run: |
+          test "$(uname -m)" = x86_64
+          python3 -m unittest tests.test_server_setup_x64_probe -v
+          mkdir -p out/x64-setup-evidence out/x64-setup-build
+      - name: Acquire and verify unchanged complete source inputs without asset trees
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/prepare_server_isolated_build.py acquire --output out/x64-setup-inputs \
+            > out/x64-setup-evidence/acquisition.log 2>&1
+          python3 tools/prepare_server_isolated_sources.py --source-inputs out/x64-setup-inputs/source-inputs \
+            --supplements out/x64-setup-inputs/supplements --output out/x64-setup-prepared \
+            > out/x64-setup-evidence/preparation.json
+      - name: Build the pinned snapshot x64 compiler image with hash-checked indexes
+        run: |
+          python3 tools/build_server_setup_x64_probe.py context --output out/x64-setup-context \
+            > out/x64-setup-evidence/context.json
+          docker build --platform linux/amd64 --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
+            -t esteria-x64-setup:qualification out/x64-setup-context > out/x64-setup-evidence/image-build.log 2>&1
+      - name: Compile original dbimport with full static module closure and real Playerbots helper offline
+        run: |
+          docker run --rm --network none --read-only --tmpfs /tmp:rw,nosuid,nodev,size=128m \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/x64-setup-build,dst=/build-output" \
+            --workdir /qualification esteria-x64-setup:qualification \
+            python3 tools/build_server_setup_x64_probe.py build \
+            --prepared /qualification/out/x64-setup-prepared --acquired /qualification/out/x64-setup-inputs \
+            --output /build-output/component --revision "$GITHUB_SHA" > out/x64-setup-evidence/build-private.log 2>&1
+      - name: Preserve authenticated corresponding sources for every copied shared library
+        run: |
+          docker run --rm --read-only --tmpfs /tmp:rw,nosuid,nodev,size=128m \
+            --env HTTP_PROXY --env HTTPS_PROXY --env NO_PROXY \
+            --mount "type=bind,src=/etc/ssl/certs/ca-certificates.crt,dst=/qualification-ca.pem,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/x64-setup-build,dst=/build-output" \
+            --workdir /qualification esteria-x64-setup:qualification \
+            python3 tools/build_server_setup_x64_probe.py capture-sources --output /build-output/component \
+            --ca /qualification-ca.pem > out/x64-setup-evidence/library-sources.log 2>&1
+      - name: Collect bounded build receipts without claiming SQL or Android execution
+        if: always()
+        run: |
+          sudo chown -R "$(id -u):$(id -g)" out/x64-setup-build
+          python3 - <<'PY'
+          from pathlib import Path
+          import shutil
+          root=Path('out/x64-setup-build/component');target=Path('out/x64-setup-evidence')
+          for name in ('qualification.json','failure.json','library-source-readback.json'):
+              source=root/name
+              if source.is_file() and source.stat().st_size<=2<<20:shutil.copyfile(source,target/name)
+          for name in ('configure.log','build.log'):
+              source=root/'diagnostics'/name
+              if source.is_file():
+                  with source.open('rb') as stream:
+                      stream.seek(max(0,source.stat().st_size-(64<<10)))
+                      (target/(name+'.tail')).write_bytes(stream.read(64<<10))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: x64-server-setup-build-evidence-${{ github.sha }}
+          path: out/x64-setup-evidence
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: success()
+        with:
+          name: x64-server-setup-tools-and-complete-library-sources-${{ github.sha }}
+          path: |
+            out/x64-setup-build/component/payload
+            out/x64-setup-build/component/corresponding-library-sources
+            out/x64-setup-build/component/library-runtime.json
+            out/x64-setup-build/component/library-source-readback.json
+            out/x64-setup-context
+          include-hidden-files: true
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30

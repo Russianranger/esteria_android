@@ -1,0 +1,1193 @@
+{
+  "actualInstrumentation": {
+    "bootstrapMethodsPassed": 1,
+    "bootstrapSeconds": 66.491,
+    "javaServiceSeconds": 51.72,
+    "serviceMethodsPassed": 1
+  },
+  "actualJobLogReadBack": true,
+  "actualQualification": {
+    "androidJavaDatabaseServiceLifecycleQualified": true,
+    "androidMysqlBootstrapQualified": true,
+    "apk": {
+      "bytes": 115117309,
+      "sha256": "49d56ba51104c625017d0f95b74571e8bdbeb47a5c96c991732c3a921b7417ab"
+    },
+    "appEvidence": {
+      "abi": "x86_64",
+      "api": 33,
+      "applicationSqlAuthenticated": true,
+      "arm64Qualified": false,
+      "cleanShutdown": true,
+      "credentialsPreserved": true,
+      "databaseInitialized": true,
+      "exactBootstrapHelpersVerified": true,
+      "fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+      "formatVersion": 1,
+      "gameplayQualified": false,
+      "guestLaunches": 4,
+      "instanceIdentityVerified": true,
+      "mysqlVersion": "8.0.46-0ubuntu0.24.04.4",
+      "persistentMarkerRestored": true,
+      "productionAdapterQualified": false,
+      "prootBuildEvidence": {
+        "androidProotExecuted": false,
+        "arm64GuestExecuted": false,
+        "builderSha256": "de7b6d905b334d00cf40fbb71df54944032b48c29f51e56dbfca47d29f1ccf57",
+        "compilerSha256": "6156dd4e5e466333197a00b8d20bca72c292186643b749dcaaa3aa9164afb1de",
+        "formatVersion": 1,
+        "gameplayQualified": false,
+        "glibcLockSha256": "8c72a53ec20d430c9a728ec2047be038dc7de62ae1cfd7a929412f567d0c08c0",
+        "glibcVersion": "2.36",
+        "guestSourceSha256": "5e98de4b1439f2c2f35a5a7a8108e86f54070e5a8c70b234daf15e775fd1a10f",
+        "nativeFiles": {
+          "libproot_probe.so": {
+            "bytes": 277720,
+            "sha256": "8901163fb083b63e741b7c6bc7958cf82c646bb1d897052c39c3dc8e427526c5"
+          },
+          "libproot_probe_control.so": {
+            "bytes": 277720,
+            "sha256": "29dbcbbab429fc77bbf45580a35b6d2c659f19162b9bf764b43ebb2da625f970"
+          },
+          "libproot_probe_loader.so": {
+            "bytes": 18344,
+            "sha256": "4a324117c6a16fe996af18ea388191379f5517309e963c80186fd3563a78410a"
+          }
+        },
+        "ndkVersion": "28.2.13676358",
+        "ownerDeathTestSourceSha256": "3519aac5705f1283079789ff99c228236bca817f720d7a51dea8e43622772ece",
+        "ownerServiceManifestSha256": "4f88a42892470ae50ae03286e666bbb869889b31fd8b2f61663a216052e3d66c",
+        "ownerServiceSourceSha256": "987abdb65d3a43a59c332102f103af340a2793f306071ed4082867a10ce39bf2",
+        "ownershipGuestSourceSha256": "99868eb91f6925d9fc20607c44103afc27fcfbef8146a9e0d1e7a59393b97b2e",
+        "ownershipPatchSha256": "509160bd6ec3663d525fa0e795a7bb45b8ccc283a6de8e1398e8cd6624fe86de",
+        "pluginSourceSha256": "5e78917619d3568470b2ed7471d3901591980ba1acdecaa088ff3e98db9f3556",
+        "prootSourceLockSha256": "d4383760217a5b71a4a28cd02d6fc354b5876ca9e21e1db0fe1c733564a58bf2",
+        "renameCompatibilityPatchSha256": "8ea4340df89b694e881e4804c312d71268071736a1883b4ffbc42015e9081152",
+        "rootfsFiles": {
+          "lib/x86_64-linux-gnu/libc.so.6": {
+            "bytes": 1926232,
+            "sha256": "6b4a45352fd0c540a9c7c718f35ce8c8e46a4e482f9d3885a910c32d1a0e1421"
+          },
+          "lib64/ld-linux-x86-64.so.2": {
+            "bytes": 215000,
+            "sha256": "02bcda52c1a5dfc236f94d9e5255b4a0e26347d8a372a5223b650e31f291ce3c"
+          },
+          "probe": {
+            "bytes": 16160,
+            "sha256": "b1dd5b28c57718e907f452629002e385be4677bd98f6595d9847a7d695c9d495"
+          },
+          "probe-owner": {
+            "bytes": 13312,
+            "sha256": "485785fd1949b29554f65d63edddf93ad151f23b305e6cfd9cf91a5daa53fd92"
+          },
+          "probe-plugin.so": {
+            "bytes": 3328,
+            "sha256": "5ed97ba5e696301162e9f5fa1e3e88a04b304f38f8d3c1fd2e9f0914ff9d5d6b"
+          }
+        },
+        "scope": "android-13-x86_64-proot-glibc-probe-build-only",
+        "tallocRelinkableObjects": {
+          "lib/replace/closefrom.c.1.o": {
+            "bytes": 2552,
+            "sha256": "8122c2b401a38a1ee1c443a6cfe77e35db6afadb7376e926db56173392d42b69"
+          },
+          "lib/replace/closefrom.c.2.o": {
+            "bytes": 2552,
+            "sha256": "c8b2c9490e2eb978f120d1ba6f4ed921ae11efed789214ace525bac46139457b"
+          },
+          "lib/replace/replace.c.1.o": {
+            "bytes": 4240,
+            "sha256": "bfe75df26e73ea9ac54d8058045845c2a4139fc6276944e554ecdc7c0f1a5c91"
+          },
+          "lib/replace/replace.c.2.o": {
+            "bytes": 4240,
+            "sha256": "22dcae9721b53f88f9012bb0ffacc97b932091ae498a511e69db1d5fcfec279e"
+          },
+          "lib/replace/replace.empty.c.4.o": {
+            "bytes": 752,
+            "sha256": "bc85561adcc6faa8c5b518b997b64bd63e949eff53ca593eabe461bb8e15dcd0"
+          },
+          "lib/replace/tests/getifaddrs.c.5.o": {
+            "bytes": 2776,
+            "sha256": "f496ccf3f552fbacc2eecab6e80d12e76d7d1027f3d015c1e191c859cec7d578"
+          },
+          "lib/replace/tests/main.c.6.o": {
+            "bytes": 1176,
+            "sha256": "e3effd1efeb627f1bb3843f32bf14c29bd2a431968e4e4cbde2b037b0a9fabaf"
+          },
+          "lib/replace/tests/os2_delete.c.5.o": {
+            "bytes": 6640,
+            "sha256": "8a5258c0a12704135201e456f0dee161d4002cdc07e00a294d9a5447999fae68"
+          },
+          "lib/replace/tests/strptime.c.5.o": {
+            "bytes": 4592,
+            "sha256": "7f9c83032ef6a878a42a08c7acbe4c0be55afce5f20464e170b65f972c2ff71a"
+          },
+          "lib/replace/tests/testsuite.c.5.o": {
+            "bytes": 152416,
+            "sha256": "17f83683d202e1d31549413d700fe64a36aa11a2ee57f3e08e1d9d1c656bdc2c"
+          },
+          "talloc.c.5.o": {
+            "bytes": 50152,
+            "sha256": "c64ec8122208efc66c6dc202d02e8e156920122b096ec7fd690ab9115e7adcf6"
+          },
+          "talloc.c.6.o": {
+            "bytes": 50152,
+            "sha256": "2cf0ba5bee3daa69ca5e71441889ee6492e16c4bdb03c476ad3abc4204d8a208"
+          },
+          "test_magic_differs_helper.c.3.o": {
+            "bytes": 1400,
+            "sha256": "0194aa52959af680cbcef51d7b5bffd98179ae778b339c25429860032f146ccd"
+          },
+          "testsuite.c.1.o": {
+            "bytes": 153112,
+            "sha256": "600e36e0b879dcd3b6ac865078c814d77792a968513c0ced6cebfb0218dba7c3"
+          },
+          "testsuite_main.c.1.o": {
+            "bytes": 1184,
+            "sha256": "53f634093ee45aca945f758762e51358b8f2fed36aab9b96941eb3971efe7e80"
+          }
+        },
+        "unpatchedControlIncluded": true
+      },
+      "repeatBootstrapPreserved": true,
+      "rootSqlAuthenticated": true,
+      "runtimeArchiveSha256": "159c75f03fd851796f261688fec7a02f8fe1fec8cebb5701c2504bdb2304413f",
+      "runtimeGeneration": "d0a45ce85275513b5aaa4a317dd77307ae82b49516662a41c7ee0cb84aca3d52",
+      "runtimeInstalledByProductionInstaller": true,
+      "runtimeProviderSha256": "a2005edbd843f56d3813a47572e1e5478043f9f6b4ded09481fc7996525a7afc",
+      "scope": "android-13-x86_64-mysql-bootstrap-and-restart",
+      "serverSchemasQualified": false,
+      "socketOnly": true,
+      "sourceRevision": "4fd32df287961b9cc5175213a6fe85eac1c6d868",
+      "targetSdk": 35,
+      "worldserverQualified": false
+    },
+    "arm64Qualified": false,
+    "completedAtUnix": 1793386907,
+    "emulatorProperties": {
+      "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+      "ro.build.version.sdk": "33",
+      "ro.kernel.qemu": "1",
+      "ro.product.cpu.abi": "x86_64"
+    },
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "productionAdapterQualified": false,
+    "scope": "android-13-x86_64-mysql-bootstrap-and-restart",
+    "serverSchemasQualified": false,
+    "serviceAppEvidence": {
+      "abi": "x86_64",
+      "api": 33,
+      "arm64Qualified": false,
+      "credentialsPreserved": true,
+      "duplicateLeaseRejected": true,
+      "duplicateStartAttempts": 2,
+      "exactServiceHelpersVerified": true,
+      "explicitShutdownAcknowledged": true,
+      "fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+      "formatVersion": 1,
+      "gameplayQualified": false,
+      "leaseReleasedAfterStop": true,
+      "markerRestoredAfterEachStop": true,
+      "mysqlVersion": "8.0.46-0ubuntu0.24.04.4",
+      "ownedLoopbackSqlReady": true,
+      "productionAdapterQualified": false,
+      "prootBuildEvidence": {
+        "androidProotExecuted": false,
+        "arm64GuestExecuted": false,
+        "builderSha256": "de7b6d905b334d00cf40fbb71df54944032b48c29f51e56dbfca47d29f1ccf57",
+        "compilerSha256": "6156dd4e5e466333197a00b8d20bca72c292186643b749dcaaa3aa9164afb1de",
+        "formatVersion": 1,
+        "gameplayQualified": false,
+        "glibcLockSha256": "8c72a53ec20d430c9a728ec2047be038dc7de62ae1cfd7a929412f567d0c08c0",
+        "glibcVersion": "2.36",
+        "guestSourceSha256": "5e98de4b1439f2c2f35a5a7a8108e86f54070e5a8c70b234daf15e775fd1a10f",
+        "nativeFiles": {
+          "libproot_probe.so": {
+            "bytes": 277720,
+            "sha256": "8901163fb083b63e741b7c6bc7958cf82c646bb1d897052c39c3dc8e427526c5"
+          },
+          "libproot_probe_control.so": {
+            "bytes": 277720,
+            "sha256": "29dbcbbab429fc77bbf45580a35b6d2c659f19162b9bf764b43ebb2da625f970"
+          },
+          "libproot_probe_loader.so": {
+            "bytes": 18344,
+            "sha256": "4a324117c6a16fe996af18ea388191379f5517309e963c80186fd3563a78410a"
+          }
+        },
+        "ndkVersion": "28.2.13676358",
+        "ownerDeathTestSourceSha256": "3519aac5705f1283079789ff99c228236bca817f720d7a51dea8e43622772ece",
+        "ownerServiceManifestSha256": "4f88a42892470ae50ae03286e666bbb869889b31fd8b2f61663a216052e3d66c",
+        "ownerServiceSourceSha256": "987abdb65d3a43a59c332102f103af340a2793f306071ed4082867a10ce39bf2",
+        "ownershipGuestSourceSha256": "99868eb91f6925d9fc20607c44103afc27fcfbef8146a9e0d1e7a59393b97b2e",
+        "ownershipPatchSha256": "509160bd6ec3663d525fa0e795a7bb45b8ccc283a6de8e1398e8cd6624fe86de",
+        "pluginSourceSha256": "5e78917619d3568470b2ed7471d3901591980ba1acdecaa088ff3e98db9f3556",
+        "prootSourceLockSha256": "d4383760217a5b71a4a28cd02d6fc354b5876ca9e21e1db0fe1c733564a58bf2",
+        "renameCompatibilityPatchSha256": "8ea4340df89b694e881e4804c312d71268071736a1883b4ffbc42015e9081152",
+        "rootfsFiles": {
+          "lib/x86_64-linux-gnu/libc.so.6": {
+            "bytes": 1926232,
+            "sha256": "6b4a45352fd0c540a9c7c718f35ce8c8e46a4e482f9d3885a910c32d1a0e1421"
+          },
+          "lib64/ld-linux-x86-64.so.2": {
+            "bytes": 215000,
+            "sha256": "02bcda52c1a5dfc236f94d9e5255b4a0e26347d8a372a5223b650e31f291ce3c"
+          },
+          "probe": {
+            "bytes": 16160,
+            "sha256": "b1dd5b28c57718e907f452629002e385be4677bd98f6595d9847a7d695c9d495"
+          },
+          "probe-owner": {
+            "bytes": 13312,
+            "sha256": "485785fd1949b29554f65d63edddf93ad151f23b305e6cfd9cf91a5daa53fd92"
+          },
+          "probe-plugin.so": {
+            "bytes": 3328,
+            "sha256": "5ed97ba5e696301162e9f5fa1e3e88a04b304f38f8d3c1fd2e9f0914ff9d5d6b"
+          }
+        },
+        "scope": "android-13-x86_64-proot-glibc-probe-build-only",
+        "tallocRelinkableObjects": {
+          "lib/replace/closefrom.c.1.o": {
+            "bytes": 2552,
+            "sha256": "8122c2b401a38a1ee1c443a6cfe77e35db6afadb7376e926db56173392d42b69"
+          },
+          "lib/replace/closefrom.c.2.o": {
+            "bytes": 2552,
+            "sha256": "c8b2c9490e2eb978f120d1ba6f4ed921ae11efed789214ace525bac46139457b"
+          },
+          "lib/replace/replace.c.1.o": {
+            "bytes": 4240,
+            "sha256": "bfe75df26e73ea9ac54d8058045845c2a4139fc6276944e554ecdc7c0f1a5c91"
+          },
+          "lib/replace/replace.c.2.o": {
+            "bytes": 4240,
+            "sha256": "22dcae9721b53f88f9012bb0ffacc97b932091ae498a511e69db1d5fcfec279e"
+          },
+          "lib/replace/replace.empty.c.4.o": {
+            "bytes": 752,
+            "sha256": "bc85561adcc6faa8c5b518b997b64bd63e949eff53ca593eabe461bb8e15dcd0"
+          },
+          "lib/replace/tests/getifaddrs.c.5.o": {
+            "bytes": 2776,
+            "sha256": "f496ccf3f552fbacc2eecab6e80d12e76d7d1027f3d015c1e191c859cec7d578"
+          },
+          "lib/replace/tests/main.c.6.o": {
+            "bytes": 1176,
+            "sha256": "e3effd1efeb627f1bb3843f32bf14c29bd2a431968e4e4cbde2b037b0a9fabaf"
+          },
+          "lib/replace/tests/os2_delete.c.5.o": {
+            "bytes": 6640,
+            "sha256": "8a5258c0a12704135201e456f0dee161d4002cdc07e00a294d9a5447999fae68"
+          },
+          "lib/replace/tests/strptime.c.5.o": {
+            "bytes": 4592,
+            "sha256": "7f9c83032ef6a878a42a08c7acbe4c0be55afce5f20464e170b65f972c2ff71a"
+          },
+          "lib/replace/tests/testsuite.c.5.o": {
+            "bytes": 152416,
+            "sha256": "17f83683d202e1d31549413d700fe64a36aa11a2ee57f3e08e1d9d1c656bdc2c"
+          },
+          "talloc.c.5.o": {
+            "bytes": 50152,
+            "sha256": "c64ec8122208efc66c6dc202d02e8e156920122b096ec7fd690ab9115e7adcf6"
+          },
+          "talloc.c.6.o": {
+            "bytes": 50152,
+            "sha256": "2cf0ba5bee3daa69ca5e71441889ee6492e16c4bdb03c476ad3abc4204d8a208"
+          },
+          "test_magic_differs_helper.c.3.o": {
+            "bytes": 1400,
+            "sha256": "0194aa52959af680cbcef51d7b5bffd98179ae778b339c25429860032f146ccd"
+          },
+          "testsuite.c.1.o": {
+            "bytes": 153112,
+            "sha256": "600e36e0b879dcd3b6ac865078c814d77792a968513c0ced6cebfb0218dba7c3"
+          },
+          "testsuite_main.c.1.o": {
+            "bytes": 1184,
+            "sha256": "53f634093ee45aca945f758762e51358b8f2fed36aab9b96941eb3971efe7e80"
+          }
+        },
+        "unpatchedControlIncluded": true
+      },
+      "realJavaAdapterExecuted": true,
+      "runtimeArchiveSha256": "159c75f03fd851796f261688fec7a02f8fe1fec8cebb5701c2504bdb2304413f",
+      "runtimeGeneration": "d0a45ce85275513b5aaa4a317dd77307ae82b49516662a41c7ee0cb84aca3d52",
+      "runtimeProviderSha256": "a2005edbd843f56d3813a47572e1e5478043f9f6b4ded09481fc7996525a7afc",
+      "sameInstanceRestarted": true,
+      "scope": "android-13-x86_64-java-mysql-service-lifecycle",
+      "serverSchemasQualified": false,
+      "serviceLaunches": 2,
+      "sourceRevision": "4fd32df287961b9cc5175213a6fe85eac1c6d868",
+      "targetSdk": 35,
+      "verificationGuestLaunches": 4,
+      "verifiedX64RuntimeOnly": true,
+      "worldserverQualified": false
+    },
+    "sourceRevision": "4fd32df287961b9cc5175213a6fe85eac1c6d868",
+    "testApk": {
+      "bytes": 1753173,
+      "sha256": "d545d9af871a261d19a959b20226319ff68d5bec56790d719143c5b665fe51f6"
+    },
+    "worldserverQualified": false
+  },
+  "allTwentyOneProviderInputsMatchExactProducerGitRevision": true,
+  "androidArm64Qualified": false,
+  "artifactMetadataOnly": [
+    {
+      "bytes": 229313210,
+      "id": 13006730600,
+      "name": "fresh-android-x64-mysql-fixture-inputs-4fd32df287961b9cc5175213a6fe85eac1c6d868",
+      "sha256": "bf77256998e52f3de51497a6d0a88356ee88b325c853f0e564f0018f35ba73fd"
+    },
+    {
+      "bytes": 905093502,
+      "id": 13006281602,
+      "name": "android-x64-mysql-fixture-sources-4fd32df287961b9cc5175213a6fe85eac1c6d868",
+      "sha256": "de0a9922035314e9d7a566490932475d276f8f29aba9b4fb09be717d2bada04c"
+    }
+  ],
+  "canonicalProviderIdentity": {
+    "bytes": 5405,
+    "sha256": "a2005edbd843f56d3813a47572e1e5478043f9f6b4ded09481fc7996525a7afc"
+  },
+  "canonicalProviderReadBackInApkLocally": false,
+  "decodedUtf8ActualJobLog": {
+    "bytes": 132821,
+    "sha256": "be9ebf40eb949a0c0379662b1ead019938400debdee91673489deb22722ac70f"
+  },
+  "everyWorkflowStepCompletedSuccessfully": true,
+  "evidenceArchives": {
+    "early": {
+      "artifactId": 13004490519,
+      "everyMemberCrcAndSha256Verified": true,
+      "members": {
+        "app-receipt.log": {
+          "bytes": 6319,
+          "sha256": "9f4ca424400fb478779b7fefe276e264494ba802d39cd8c44692ea75ccd4a377"
+        },
+        "bounded-logcat.log": {
+          "bytes": 234551,
+          "sha256": "8cb2ed2959f2c44b10c6707e1749a78340479851b36be542a4301d6861175437"
+        },
+        "initialize-engine-files.log": {
+          "bytes": 91,
+          "sha256": "96a575bedd6a91551a24169463ae73f09d2211ff0f3dbb0ffd14e556f1081c67"
+        },
+        "initialize-engine-mysql-bootstrap-engine.log.log": {
+          "bytes": 1088,
+          "sha256": "3fb4bba2c9c3a19b9d6d5198d364b4568d69246e88b0614d363fe5afdc318744"
+        },
+        "initialize-engine-mysql-initialize-engine.log.log": {
+          "bytes": 525,
+          "sha256": "78764048d6aa80081a6a068498801bf5a9115eca68563a26731a5479204023c2"
+        },
+        "initialize-stderr.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "initialize-stdout.log": {
+          "bytes": 69,
+          "sha256": "0364cbf611787f6b6d2c57698989632412e5f55d9359ecbc805cc018333c725d"
+        },
+        "install-app.log": {
+          "bytes": 36,
+          "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+        },
+        "install-tests.log": {
+          "bytes": 36,
+          "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+        },
+        "mysql-service-test.log": {
+          "bytes": 850,
+          "sha256": "04ecf6cb735b4b00c0054aa2bd49a9f1f5a226fe472f7cfd6871101fde88857f"
+        },
+        "mysql-test.log": {
+          "bytes": 833,
+          "sha256": "c514bfcf0c56fff2bdeebc0193d813beb1a4c46f961447f8404fd1eaf07d2bab"
+        },
+        "preexisting.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "qualification.json": {
+          "bytes": 14184,
+          "sha256": "2d9c505201b66e86359aca1a725b7e07b15ef56ae178109120cba9cf70318999"
+        },
+        "repeat-engine-files.log": {
+          "bytes": 141,
+          "sha256": "0d926807c60c84ed9461d32167460a77c3809b224f48949b602dd4c93902c5b5"
+        },
+        "repeat-engine-mysql-bootstrap-engine.log.log": {
+          "bytes": 1088,
+          "sha256": "3fb4bba2c9c3a19b9d6d5198d364b4568d69246e88b0614d363fe5afdc318744"
+        },
+        "repeat-engine-mysql-initialize-engine.log.log": {
+          "bytes": 525,
+          "sha256": "78764048d6aa80081a6a068498801bf5a9115eca68563a26731a5479204023c2"
+        },
+        "repeat-engine-probe-f5ca1ca698f7489f8613d89e5d389c83.log.log": {
+          "bytes": 1084,
+          "sha256": "0cdbf65fa20f397b1ff3eb967b41e145699f48177e680939537f3bccba1f03a7"
+        },
+        "repeat-stderr.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "repeat-stdout.log": {
+          "bytes": 69,
+          "sha256": "0364cbf611787f6b6d2c57698989632412e5f55d9359ecbc805cc018333c725d"
+        },
+        "ro.build.fingerprint.log": {
+          "bytes": 81,
+          "sha256": "74f45a5b5c9c2e0e9fe31b30e7fecac3d7eed0ec13131a36513c9da0e27ee79d"
+        },
+        "ro.build.version.sdk.log": {
+          "bytes": 3,
+          "sha256": "19b8d5c59e421f037fe563007c7254eb8d98bc221b278c3db3e5fdbbfd52e273"
+        },
+        "ro.kernel.qemu.log": {
+          "bytes": 2,
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+        },
+        "ro.product.cpu.abi.log": {
+          "bytes": 7,
+          "sha256": "aaf631698ae5160ceb04a97681a14887fdcab47cd6e0f163c87485b3b1340b62"
+        },
+        "seed-engine-files.log": {
+          "bytes": 141,
+          "sha256": "0d926807c60c84ed9461d32167460a77c3809b224f48949b602dd4c93902c5b5"
+        },
+        "seed-engine-mysql-bootstrap-engine.log.log": {
+          "bytes": 1088,
+          "sha256": "3fb4bba2c9c3a19b9d6d5198d364b4568d69246e88b0614d363fe5afdc318744"
+        },
+        "seed-engine-mysql-initialize-engine.log.log": {
+          "bytes": 525,
+          "sha256": "78764048d6aa80081a6a068498801bf5a9115eca68563a26731a5479204023c2"
+        },
+        "seed-engine-probe-f5ca1ca698f7489f8613d89e5d389c83.log.log": {
+          "bytes": 1084,
+          "sha256": "0cdbf65fa20f397b1ff3eb967b41e145699f48177e680939537f3bccba1f03a7"
+        },
+        "seed-stderr.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "seed-stdout.log": {
+          "bytes": 70,
+          "sha256": "86058f30580501c8de63c21d0215ad8bc3fd03b4a966b713f08525d674809452"
+        },
+        "serial.log": {
+          "bytes": 14,
+          "sha256": "0115c661660f4cd9f62719a1c0f968c833c3295da9713cc8b6d915f739be272e"
+        },
+        "service-app-receipt.log": {
+          "bytes": 6361,
+          "sha256": "e26945dbea034c54182011cf5d7845dd52c0b9d2ac15d960c8156afbfaad9468"
+        },
+        "service-initialize-engine-private.log.log": {
+          "bytes": 110,
+          "sha256": "e4197991ea3dc5d9d4ad4ab66739f04d84bde204fa6ecfe3a02eb3fe0f26545d"
+        },
+        "service-initialize-stderr.log.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "service-initialize-stdout.log.log": {
+          "bytes": 69,
+          "sha256": "0364cbf611787f6b6d2c57698989632412e5f55d9359ecbc805cc018333c725d"
+        },
+        "service-seed-engine-private.log.log": {
+          "bytes": 104,
+          "sha256": "477bc16842dc3f647785b8dbd933945cdb8e91f0c5dfad7dd3f78c2b6740fd7e"
+        },
+        "service-seed-stderr.log.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "service-seed-stdout.log.log": {
+          "bytes": 70,
+          "sha256": "86058f30580501c8de63c21d0215ad8bc3fd03b4a966b713f08525d674809452"
+        },
+        "service-service-0-engine-private.log.log": {
+          "bytes": 1085,
+          "sha256": "521baa9301158956055c2c2cd185f665fd50180979fdf7c19b3a49787bd4f3ee"
+        },
+        "service-service-0-stderr.log.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "service-service-0-stdout.log.log": {
+          "bytes": 98,
+          "sha256": "4ec5647f38ac5934dfa01c1847038589c2c61d310f75910fe1837fff04e2a2a3"
+        },
+        "service-service-1-engine-private.log.log": {
+          "bytes": 1085,
+          "sha256": "03ae90947a622275c9e05dd74196b514f1db1f04feaea8ba8f01c9fa0ff1ec15"
+        },
+        "service-service-1-stderr.log.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "service-service-1-stdout.log.log": {
+          "bytes": 98,
+          "sha256": "4ec5647f38ac5934dfa01c1847038589c2c61d310f75910fe1837fff04e2a2a3"
+        },
+        "service-verify-0-engine-private.log.log": {
+          "bytes": 108,
+          "sha256": "bc9edc86120611bd13f79a8c8e4ebc36b2ed1d3e84c7d5e5f1f09886d8138f20"
+        },
+        "service-verify-0-stderr.log.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "service-verify-0-stdout.log.log": {
+          "bytes": 72,
+          "sha256": "0a45b57732c1dc36801fc24fcaf2697c13658b9b1673cc49e4acbb077442d5fc"
+        },
+        "service-verify-1-engine-private.log.log": {
+          "bytes": 108,
+          "sha256": "8ec28080468011b8a0f7c09fad57c32998f2a38d58c1b646be0efa7acd4f9912"
+        },
+        "service-verify-1-stderr.log.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "service-verify-1-stdout.log.log": {
+          "bytes": 72,
+          "sha256": "0a45b57732c1dc36801fc24fcaf2697c13658b9b1673cc49e4acbb077442d5fc"
+        },
+        "stop-owned-test-app.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "verify-engine-files.log": {
+          "bytes": 191,
+          "sha256": "ae0273d5cb57a79af64b3dad742cfaf450495f6cc38426bef84ca1689a4c9c77"
+        },
+        "verify-engine-mysql-bootstrap-engine.log.log": {
+          "bytes": 1088,
+          "sha256": "3fb4bba2c9c3a19b9d6d5198d364b4568d69246e88b0614d363fe5afdc318744"
+        },
+        "verify-engine-mysql-initialize-engine.log.log": {
+          "bytes": 525,
+          "sha256": "78764048d6aa80081a6a068498801bf5a9115eca68563a26731a5479204023c2"
+        },
+        "verify-engine-probe-55d5b2b4c1504565adab89c72f3e44f9.log.log": {
+          "bytes": 1084,
+          "sha256": "628fcabef95743a45b42d13ca6ab63c296ffc517693666fea1af1b964ee50022"
+        },
+        "verify-engine-probe-f5ca1ca698f7489f8613d89e5d389c83.log.log": {
+          "bytes": 1084,
+          "sha256": "0cdbf65fa20f397b1ff3eb967b41e145699f48177e680939537f3bccba1f03a7"
+        },
+        "verify-stderr.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "verify-stdout.log": {
+          "bytes": 72,
+          "sha256": "0a45b57732c1dc36801fc24fcaf2697c13658b9b1673cc49e4acbb077442d5fc"
+        }
+      },
+      "zip": {
+        "bytes": 49027,
+        "sha256": "0b15b159a151cbe25a9f744dddbb1cf221e487ea49b94c73a59ada5f7915bbab"
+      }
+    },
+    "final": {
+      "artifactId": 13006495814,
+      "everyMemberCrcAndSha256Verified": true,
+      "members": {
+        "app/build/reports/lint-results-debug.html": {
+          "bytes": 89372,
+          "sha256": "4e01e33c164731e745b9d8626067c8ce310c78d6937d9844b18d3d712ad74c15"
+        },
+        "app/build/reports/lint-results-debug.txt": {
+          "bytes": 11730,
+          "sha256": "00ab767dea8859040afbfb250ec7e61a99980c3a5d0e2dade71e3b35d4f816ac"
+        },
+        "app/build/reports/lint-results-debug.xml": {
+          "bytes": 33356,
+          "sha256": "eb2675241b488c1c5424603dc756034a4dc1cb7aec401b55df8f86b2767c5ca0"
+        },
+        "out/android-mysql/apk-verification.json": {
+          "bytes": 478,
+          "sha256": "b78e23791ac1eb9b1f42c85d769dfdfe7014a1d6a26d24e1e602cf5f100baea9"
+        },
+        "out/android-mysql/evidence/app-receipt.log": {
+          "bytes": 6319,
+          "sha256": "9f4ca424400fb478779b7fefe276e264494ba802d39cd8c44692ea75ccd4a377"
+        },
+        "out/android-mysql/evidence/bounded-logcat.log": {
+          "bytes": 234551,
+          "sha256": "8cb2ed2959f2c44b10c6707e1749a78340479851b36be542a4301d6861175437"
+        },
+        "out/android-mysql/evidence/initialize-engine-files.log": {
+          "bytes": 91,
+          "sha256": "96a575bedd6a91551a24169463ae73f09d2211ff0f3dbb0ffd14e556f1081c67"
+        },
+        "out/android-mysql/evidence/initialize-engine-mysql-bootstrap-engine.log.log": {
+          "bytes": 1088,
+          "sha256": "3fb4bba2c9c3a19b9d6d5198d364b4568d69246e88b0614d363fe5afdc318744"
+        },
+        "out/android-mysql/evidence/initialize-engine-mysql-initialize-engine.log.log": {
+          "bytes": 525,
+          "sha256": "78764048d6aa80081a6a068498801bf5a9115eca68563a26731a5479204023c2"
+        },
+        "out/android-mysql/evidence/initialize-stderr.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "out/android-mysql/evidence/initialize-stdout.log": {
+          "bytes": 69,
+          "sha256": "0364cbf611787f6b6d2c57698989632412e5f55d9359ecbc805cc018333c725d"
+        },
+        "out/android-mysql/evidence/install-app.log": {
+          "bytes": 36,
+          "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+        },
+        "out/android-mysql/evidence/install-tests.log": {
+          "bytes": 36,
+          "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+        },
+        "out/android-mysql/evidence/mysql-service-test.log": {
+          "bytes": 850,
+          "sha256": "04ecf6cb735b4b00c0054aa2bd49a9f1f5a226fe472f7cfd6871101fde88857f"
+        },
+        "out/android-mysql/evidence/mysql-test.log": {
+          "bytes": 833,
+          "sha256": "c514bfcf0c56fff2bdeebc0193d813beb1a4c46f961447f8404fd1eaf07d2bab"
+        },
+        "out/android-mysql/evidence/preexisting.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "out/android-mysql/evidence/qualification.json": {
+          "bytes": 14184,
+          "sha256": "2d9c505201b66e86359aca1a725b7e07b15ef56ae178109120cba9cf70318999"
+        },
+        "out/android-mysql/evidence/repeat-engine-files.log": {
+          "bytes": 141,
+          "sha256": "0d926807c60c84ed9461d32167460a77c3809b224f48949b602dd4c93902c5b5"
+        },
+        "out/android-mysql/evidence/repeat-engine-mysql-bootstrap-engine.log.log": {
+          "bytes": 1088,
+          "sha256": "3fb4bba2c9c3a19b9d6d5198d364b4568d69246e88b0614d363fe5afdc318744"
+        },
+        "out/android-mysql/evidence/repeat-engine-mysql-initialize-engine.log.log": {
+          "bytes": 525,
+          "sha256": "78764048d6aa80081a6a068498801bf5a9115eca68563a26731a5479204023c2"
+        },
+        "out/android-mysql/evidence/repeat-engine-probe-f5ca1ca698f7489f8613d89e5d389c83.log.log": {
+          "bytes": 1084,
+          "sha256": "0cdbf65fa20f397b1ff3eb967b41e145699f48177e680939537f3bccba1f03a7"
+        },
+        "out/android-mysql/evidence/repeat-stderr.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "out/android-mysql/evidence/repeat-stdout.log": {
+          "bytes": 69,
+          "sha256": "0364cbf611787f6b6d2c57698989632412e5f55d9359ecbc805cc018333c725d"
+        },
+        "out/android-mysql/evidence/ro.build.fingerprint.log": {
+          "bytes": 81,
+          "sha256": "74f45a5b5c9c2e0e9fe31b30e7fecac3d7eed0ec13131a36513c9da0e27ee79d"
+        },
+        "out/android-mysql/evidence/ro.build.version.sdk.log": {
+          "bytes": 3,
+          "sha256": "19b8d5c59e421f037fe563007c7254eb8d98bc221b278c3db3e5fdbbfd52e273"
+        },
+        "out/android-mysql/evidence/ro.kernel.qemu.log": {
+          "bytes": 2,
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+        },
+        "out/android-mysql/evidence/ro.product.cpu.abi.log": {
+          "bytes": 7,
+          "sha256": "aaf631698ae5160ceb04a97681a14887fdcab47cd6e0f163c87485b3b1340b62"
+        },
+        "out/android-mysql/evidence/seed-engine-files.log": {
+          "bytes": 141,
+          "sha256": "0d926807c60c84ed9461d32167460a77c3809b224f48949b602dd4c93902c5b5"
+        },
+        "out/android-mysql/evidence/seed-engine-mysql-bootstrap-engine.log.log": {
+          "bytes": 1088,
+          "sha256": "3fb4bba2c9c3a19b9d6d5198d364b4568d69246e88b0614d363fe5afdc318744"
+        },
+        "out/android-mysql/evidence/seed-engine-mysql-initialize-engine.log.log": {
+          "bytes": 525,
+          "sha256": "78764048d6aa80081a6a068498801bf5a9115eca68563a26731a5479204023c2"
+        },
+        "out/android-mysql/evidence/seed-engine-probe-f5ca1ca698f7489f8613d89e5d389c83.log.log": {
+          "bytes": 1084,
+          "sha256": "0cdbf65fa20f397b1ff3eb967b41e145699f48177e680939537f3bccba1f03a7"
+        },
+        "out/android-mysql/evidence/seed-stderr.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "out/android-mysql/evidence/seed-stdout.log": {
+          "bytes": 70,
+          "sha256": "86058f30580501c8de63c21d0215ad8bc3fd03b4a966b713f08525d674809452"
+        },
+        "out/android-mysql/evidence/serial.log": {
+          "bytes": 14,
+          "sha256": "0115c661660f4cd9f62719a1c0f968c833c3295da9713cc8b6d915f739be272e"
+        },
+        "out/android-mysql/evidence/service-app-receipt.log": {
+          "bytes": 6361,
+          "sha256": "e26945dbea034c54182011cf5d7845dd52c0b9d2ac15d960c8156afbfaad9468"
+        },
+        "out/android-mysql/evidence/service-initialize-engine-private.log.log": {
+          "bytes": 110,
+          "sha256": "e4197991ea3dc5d9d4ad4ab66739f04d84bde204fa6ecfe3a02eb3fe0f26545d"
+        },
+        "out/android-mysql/evidence/service-initialize-stderr.log.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "out/android-mysql/evidence/service-initialize-stdout.log.log": {
+          "bytes": 69,
+          "sha256": "0364cbf611787f6b6d2c57698989632412e5f55d9359ecbc805cc018333c725d"
+        },
+        "out/android-mysql/evidence/service-seed-engine-private.log.log": {
+          "bytes": 104,
+          "sha256": "477bc16842dc3f647785b8dbd933945cdb8e91f0c5dfad7dd3f78c2b6740fd7e"
+        },
+        "out/android-mysql/evidence/service-seed-stderr.log.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "out/android-mysql/evidence/service-seed-stdout.log.log": {
+          "bytes": 70,
+          "sha256": "86058f30580501c8de63c21d0215ad8bc3fd03b4a966b713f08525d674809452"
+        },
+        "out/android-mysql/evidence/service-service-0-engine-private.log.log": {
+          "bytes": 1085,
+          "sha256": "521baa9301158956055c2c2cd185f665fd50180979fdf7c19b3a49787bd4f3ee"
+        },
+        "out/android-mysql/evidence/service-service-0-stderr.log.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "out/android-mysql/evidence/service-service-0-stdout.log.log": {
+          "bytes": 98,
+          "sha256": "4ec5647f38ac5934dfa01c1847038589c2c61d310f75910fe1837fff04e2a2a3"
+        },
+        "out/android-mysql/evidence/service-service-1-engine-private.log.log": {
+          "bytes": 1085,
+          "sha256": "03ae90947a622275c9e05dd74196b514f1db1f04feaea8ba8f01c9fa0ff1ec15"
+        },
+        "out/android-mysql/evidence/service-service-1-stderr.log.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "out/android-mysql/evidence/service-service-1-stdout.log.log": {
+          "bytes": 98,
+          "sha256": "4ec5647f38ac5934dfa01c1847038589c2c61d310f75910fe1837fff04e2a2a3"
+        },
+        "out/android-mysql/evidence/service-verify-0-engine-private.log.log": {
+          "bytes": 108,
+          "sha256": "bc9edc86120611bd13f79a8c8e4ebc36b2ed1d3e84c7d5e5f1f09886d8138f20"
+        },
+        "out/android-mysql/evidence/service-verify-0-stderr.log.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "out/android-mysql/evidence/service-verify-0-stdout.log.log": {
+          "bytes": 72,
+          "sha256": "0a45b57732c1dc36801fc24fcaf2697c13658b9b1673cc49e4acbb077442d5fc"
+        },
+        "out/android-mysql/evidence/service-verify-1-engine-private.log.log": {
+          "bytes": 108,
+          "sha256": "8ec28080468011b8a0f7c09fad57c32998f2a38d58c1b646be0efa7acd4f9912"
+        },
+        "out/android-mysql/evidence/service-verify-1-stderr.log.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "out/android-mysql/evidence/service-verify-1-stdout.log.log": {
+          "bytes": 72,
+          "sha256": "0a45b57732c1dc36801fc24fcaf2697c13658b9b1673cc49e4acbb077442d5fc"
+        },
+        "out/android-mysql/evidence/stop-owned-test-app.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "out/android-mysql/evidence/verify-engine-files.log": {
+          "bytes": 191,
+          "sha256": "ae0273d5cb57a79af64b3dad742cfaf450495f6cc38426bef84ca1689a4c9c77"
+        },
+        "out/android-mysql/evidence/verify-engine-mysql-bootstrap-engine.log.log": {
+          "bytes": 1088,
+          "sha256": "3fb4bba2c9c3a19b9d6d5198d364b4568d69246e88b0614d363fe5afdc318744"
+        },
+        "out/android-mysql/evidence/verify-engine-mysql-initialize-engine.log.log": {
+          "bytes": 525,
+          "sha256": "78764048d6aa80081a6a068498801bf5a9115eca68563a26731a5479204023c2"
+        },
+        "out/android-mysql/evidence/verify-engine-probe-55d5b2b4c1504565adab89c72f3e44f9.log.log": {
+          "bytes": 1084,
+          "sha256": "628fcabef95743a45b42d13ca6ab63c296ffc517693666fea1af1b964ee50022"
+        },
+        "out/android-mysql/evidence/verify-engine-probe-f5ca1ca698f7489f8613d89e5d389c83.log.log": {
+          "bytes": 1084,
+          "sha256": "0cdbf65fa20f397b1ff3eb967b41e145699f48177e680939537f3bccba1f03a7"
+        },
+        "out/android-mysql/evidence/verify-stderr.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "out/android-mysql/evidence/verify-stdout.log": {
+          "bytes": 72,
+          "sha256": "0a45b57732c1dc36801fc24fcaf2697c13658b9b1673cc49e4acbb077442d5fc"
+        },
+        "out/android-mysql/image-build.log": {
+          "bytes": 28944,
+          "sha256": "2db04a284babc9236a64bc22f2cbd086e49dbd083500cb8b692edda8d46d80ba"
+        },
+        "out/android-mysql/provider-build.json": {
+          "bytes": 5405,
+          "sha256": "88d4f39a04e29c79bb07454b7e226c297278b954e04b5ea9e1172cc43b395224"
+        },
+        "out/android-mysql/runtime.json": {
+          "bytes": 33125,
+          "sha256": "109ac9bc069911045ba9055c35b1822ec2c543b469aa66faf0acee905b92b024"
+        },
+        "out/android-mysql/source-build.log": {
+          "bytes": 96793,
+          "sha256": "75bf871ac7b73fbd2ef318264b23f7f43a35cf40591f65a4f8191d962e692b62"
+        },
+        "out/android-mysql/source-manifest.json": {
+          "bytes": 53070,
+          "sha256": "ca5c6d1ee9559430b62590d242788ff756393cc4d7de2248b943633b3221c04f"
+        }
+      },
+      "zip": {
+        "bytes": 115452,
+        "sha256": "9fa8db3a4b054ce089f026a54a3283ac8b2b7692e3828d189e5eace873f177cb"
+      }
+    }
+  },
+  "formatVersion": 1,
+  "freshSlotPromotionQualified": false,
+  "fullSourceArtifactBytesReadBackLocally": false,
+  "gameplayQualified": false,
+  "jobs": [
+    {
+      "conclusion": "success",
+      "id": 124248431316,
+      "name": "mysql",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Check target isolation and create evidence directory",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Build the exact fresh Ubuntu x64 dependency image",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Package and read back a rootfs without database state",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Enable KVM for the disposable emulator",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Install exact Android command-line tools and pinned toolchain",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Build the separate source-pinned x86_64 probe provider",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Build the isolated MySQL fixture APK and verify exact packaged bytes",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Execute real bootstrap, SQL authentication and persistent restart on Android13",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Publish bounded emulator diagnostics before source export",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Retain complete installed-package corresponding sources even after a test failure",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Make only disposable evidence/source output readable",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Preserve fresh x64 provider and APK bytes with their exact complete source artifact",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "status": "completed"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "This is a new actual successful run, distinct from the earlier05925 HTTP503 dependency failure. No previous failure receipt is rewritten.",
+    "Both methods run real Android13 x86_64 JNI/Bionic PRoot and real MySQL. The Java service runs two ready/shutdown/restart cycles, rejects two duplicate starts and preserves private marker/credential identities.",
+    "Four application schemas exist empty in the bootstrap fixture; the Esteria core/updater/playerbots schemas and full ServerInstallationSetup coordinator were not executed.",
+    "The two bounded evidence archives were fully read back. Only standard HTTPS ZIP central-directory/receipt byte ranges of the229313210-byte retained-input artifact were read locally; this is not full archive SHA verification.",
+    "The905093502-byte complete source artifact was not downloaded locally. Its exact API artifact identity and the source manifest/CI complete-source retention are recorded for a later full CI consumer.",
+    "Input retention itself deliberately reports androidExecutionSucceeded=false; actual Android success is independently bound by the separate instrumentation qualification receipt.",
+    "No production ARM64 provider, application ABI or game selection changed. No initialized database, private configuration, credentials or saves are copied by this readback."
+  ],
+  "observedAtUtc": "2026-10-30T19:45:57.075980Z",
+  "providerInputs": {
+    "app/database-service.gradle": {
+      "bytes": 1254,
+      "sha256": "bc6fcc3044d2ce4902c89dd84e84f1ef8c56a5441ec055604ec1673be8434149"
+    },
+    "app/mysql-probe.gradle": {
+      "bytes": 1624,
+      "sha256": "3ac7f3a969e1af31a2123fbfd9d3677b69e54ec78a06d8cbe4a64a342eaecb6e"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/runtime/MySqlExecutionTest.java": {
+      "bytes": 28348,
+      "sha256": "55a62b7cfad371948b87d84465dee8df827f37577148cbbe12c0103e10b55d59"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/GuestHelperAssets.java": {
+      "bytes": 7797,
+      "sha256": "b27921fc56209fbbfb97a62249a2e731f9edcc9cc4106861e1f74f4b55ae16cf"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseService.java": {
+      "bytes": 16233,
+      "sha256": "de6d8820d5e21ae6a6c4c0b53a2030ecb806d71682ebd2cbd0fe865ada184526"
+    },
+    "runtime/android_database_setup.py": {
+      "bytes": 5488,
+      "sha256": "a2bdc53753d8c301e6e8fa633a8e12026f7285881f08c22e2aedf6819d31a813"
+    },
+    "runtime/mysql-probe/Dockerfile": {
+      "bytes": 2912,
+      "sha256": "d516ea4ce52f6a71c71b1c9f3bd169729e5e288313b11b70644d516291c63ebf"
+    },
+    "runtime/mysql-probe/Dockerfile.dockerignore": {
+      "bytes": 179,
+      "sha256": "ff3705d5422ab933518a1e9a1898063dbfcf104abb472ca455f6dc73d87d9130"
+    },
+    "runtime/mysql-probe/guest_check.py": {
+      "bytes": 8978,
+      "sha256": "36fd8cd42851df051df421eec1df01fab9b711092ba21cc728daea8d5050fee9"
+    },
+    "runtime/mysql-probe/mysql-binaries.SHA256SUMS": {
+      "bytes": 361,
+      "sha256": "d1f390b4d9f9f63d62a069a202b824f9c273d6e3695b4a1f4a40357184184303"
+    },
+    "runtime/mysql-probe/record_runtime.py": {
+      "bytes": 4590,
+      "sha256": "02dc95b182414d78e890eb89ff6121d94d3a45ac268efa896fbba95ce6577cea"
+    },
+    "runtime/mysql_bootstrap.py": {
+      "bytes": 32698,
+      "sha256": "e69d5b64c4a5f5ace86fa521589d5a64613f601c59aedb011b42a1e5b743b47d"
+    },
+    "runtime/mysql_service.py": {
+      "bytes": 18078,
+      "sha256": "8b30e9598f20ee715685a51aba59cefcafc6213d9d5d5cb6c6f3a73efa6b71c2"
+    },
+    "runtime/server/capture_sources.py": {
+      "bytes": 3191,
+      "sha256": "5568e32bf0d912e45e65ffdfa02404d604138e86a8534d8c097b111b0445010b"
+    },
+    "runtime/server/inrelease.SHA256SUMS": {
+      "bytes": 413,
+      "sha256": "16405ad6b24709c3cc1ca2f249cf72590a8893a3e5b1263f299465915eabc39d"
+    },
+    "runtime/server/ubuntu.sources": {
+      "bytes": 204,
+      "sha256": "3bca581187f9aa8d51605ee49a8493619779338f630de58553ae7888aa82fd16"
+    },
+    "tools/build_android_mysql_probe.py": {
+      "bytes": 9284,
+      "sha256": "ece850eb73804ac85e5ce511c5d7085e35420ea2b1f628222daf813a149d84ed"
+    },
+    "tools/package_server_runtime.py": {
+      "bytes": 13619,
+      "sha256": "e3fca010d44223bab12f34fe5f8bc984e21e518419f60edf72acdd6299fb93f7"
+    },
+    "tools/prepare_runtime.py": {
+      "bytes": 22126,
+      "sha256": "113ae7612cba7f557fab79550448578a9a6b8ceb674cff80b38fcf40e8257078"
+    },
+    "tools/qualify_android_mysql.py": {
+      "bytes": 11098,
+      "sha256": "19d0c7ce57b2982c98c8a0857eb5c99ea76794d9c7ff957b892885bec6c94d49"
+    },
+    "tools/verify_android_mysql_probe.py": {
+      "bytes": 8006,
+      "sha256": "acb0b354745b48146060b1c105ca76dbea2b1fd8a0cdc9e8c0c38590b7078867"
+    }
+  },
+  "retainedInputReceipt": {
+    "fullRetainedInputZipBytesReadBackLocally": false,
+    "identity": {
+      "bytes": 2877,
+      "sha256": "c7d13e13035680c34d0d29be0812a694ba6cc6169f7871bfe41f5a1f987069cf"
+    },
+    "receiptCrcVerified": true,
+    "value": {
+      "androidExecutionSucceeded": false,
+      "arm64Qualified": false,
+      "databaseStateCopied": false,
+      "emulatorFilesystemCopied": false,
+      "files": {
+        "SOURCE-MANIFEST.json": {
+          "bytes": 53070,
+          "sha256": "ca5c6d1ee9559430b62590d242788ff756393cc4d7de2248b943633b3221c04f"
+        },
+        "probe.apk": {
+          "bytes": 115117309,
+          "sha256": "49d56ba51104c625017d0f95b74571e8bdbeb47a5c96c991732c3a921b7417ab"
+        },
+        "provider/assets/mysql-probe/NOTICE.txt": {
+          "bytes": 464,
+          "sha256": "7fa2782f291c372a236de8eb7acf18ae3467b1c8ee49b760ac2f9d3985f1f60d"
+        },
+        "provider/assets/mysql-probe/guest_check.py": {
+          "bytes": 8978,
+          "sha256": "36fd8cd42851df051df421eec1df01fab9b711092ba21cc728daea8d5050fee9"
+        },
+        "provider/assets/mysql-probe/mysql-x86-64.archive": {
+          "bytes": 112330756,
+          "sha256": "159c75f03fd851796f261688fec7a02f8fe1fec8cebb5701c2504bdb2304413f"
+        },
+        "provider/assets/mysql-probe/provider.json": {
+          "bytes": 5405,
+          "sha256": "a2005edbd843f56d3813a47572e1e5478043f9f6b4ded09481fc7996525a7afc"
+        },
+        "provider/assets/mysql-probe/runtime.json": {
+          "bytes": 33125,
+          "sha256": "109ac9bc069911045ba9055c35b1822ec2c543b469aa66faf0acee905b92b024"
+        },
+        "provider/assets/mysql-probe/sources.lock.json": {
+          "bytes": 6499,
+          "sha256": "012af95659e8ee2e98907d185ccdb5abc64e87614a9a4ee43b5b8679ff92b512"
+        },
+        "tests.apk": {
+          "bytes": 1753173,
+          "sha256": "d545d9af871a261d19a959b20226319ff68d5bec56790d719143c5b665fe51f6"
+        }
+      },
+      "formatVersion": 1,
+      "gameplayQualified": false,
+      "offlineConsumerPinCreated": false,
+      "productionAdapterQualified": false,
+      "providerVerification": {
+        "androidMysqlQualified": false,
+        "apkVerified": true,
+        "archive": {
+          "assetPath": "mysql-probe/mysql-x86-64.archive",
+          "bytes": 112330756,
+          "file": "mysql-x86-64.tar.gz",
+          "sha256": "159c75f03fd851796f261688fec7a02f8fe1fec8cebb5701c2504bdb2304413f"
+        },
+        "arm64Qualified": false,
+        "expectedMysqlSqlVersion": "8.0.46-0ubuntu0.24.04.4",
+        "productionAdapterQualified": false,
+        "providerVerified": true,
+        "scope": "android-13-x86-64-mysql-probe-build-only"
+      },
+      "rootfsAndApkBytesReadBack": true,
+      "scope": "retained-fresh-android-x86-64-mysql-fixture-inputs-only",
+      "serverSchemasQualified": false,
+      "sourceCompanionArtifact": {
+        "completeInstalledSourceFilesReadBack": true,
+        "id": 13006281602,
+        "sha256": "de0a9922035314e9d7a566490932475d276f8f29aba9b4fb09be717d2bada04c",
+        "sourceArchiveBytes": 876239964,
+        "sourceArchiveFiles": 275,
+        "sourceManifest": {
+          "bytes": 53070,
+          "sha256": "ca5c6d1ee9559430b62590d242788ff756393cc4d7de2248b943633b3221c04f"
+        },
+        "sourceRevision": "4fd32df287961b9cc5175213a6fe85eac1c6d868"
+      },
+      "sourceRevision": "4fd32df287961b9cc5175213a6fe85eac1c6d868"
+    },
+    "zipCentralDirectoryAndReceiptByteRangesReadBack": true
+  },
+  "scope": "independent-android-13-x64-mysql-and-java-service-4fd32df-readback",
+  "serverInstallationCoordinatorExecuted": false,
+  "serverSchemasQualified": false,
+  "sourceManifestReadBackLocally": true,
+  "thorQualified": false,
+  "workflow": {
+    "conclusion": "success",
+    "headSha": "4fd32df287961b9cc5175213a6fe85eac1c6d868",
+    "id": 41109642918,
+    "status": "completed",
+    "updatedAt": "2026-10-30T19:34:04Z"
+  },
+  "worldQualified": false
+}
