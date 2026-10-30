@@ -31,7 +31,7 @@ not qualify Android ARM64, Adreno or Thor.
 | Android13 x64 MySQL |41109642918 at4fd32df: bootstrap66.491s and actual Java service lifecycle51.72s. | No four-schema Android coordinator or ARM64 claim. |
 | Retained x64 SQL inputs |41119182469: full229MB input/905MB source readback,275 source archives/876,239,964 bytes and original APK/PRoot verified. | Qualification-only inputs; no new SQL/Android execution. |
 | Composed data4/helper providers |41103915829 native CLI/reader checks;41106873028 full source/debug/APK and Java32MiB fresh/cache checks. | Actual MPQ conversion, world coverage and bot AI untested. |
-| Complete local-game profile |41120449825 at19b6769: public-input ARM64 APK337,008,310 bytes; full CI APK/source/helper/native verification; four-component Java32MiB installation/cache. Independent source readback checks999 integration/30 PRoot files. Earlier7a7166 APK also has full local byte readback. | Current full APK payload read in CI, not locally; no complete runtime session. |
+| Complete local-game profile |41129893343 at7c303665 attempt2: ARM64 APK337,019,318 bytes; full CI and independent local APK/provider/helper readback. All1040 integration/30 PRoot files and15 ARM64 relink objects verified. Earlier19b public adoption and7a7166 local readbacks retained. | Packaging/source qualification; no complete runtime session. |
 | Server public preservation |41117618335:12 assets/1,783,413,529 bytes; complete source/debug, stored-byte readback and anonymous public verification. | Source/package preservation, no game data or APK. |
 | Android presentation/owners |7619 component runs and05925 native visible-group usage sampling pass. | x64 component evidence, no audible game, whole-guest memory or bot budget. |
 
@@ -141,7 +141,7 @@ Android installer/update41129893361 also passes. This establishes component
 recovery/update behavior, not full production/client/database restart or gameplay.
 
 Current complete-profile41129893343 attempt1 stopped on an interrupted public
-NDK HTTP/2 download before compilation; failed-job-only retry is running. The
+NDK HTTP/2 download before compilation; failed-job-only attempt2 passes; complete local readback is retained. The
 source change adds bounded retries for that transport failure; original exact
 NDK/source verification remains mandatory.
 
@@ -159,3 +159,12 @@ UUID persistence/restart (30 bot tables/31 updates). The small artifact is fully
 read and all60 compiled project inputs match producer Git. This proof excludes
 the subsequent lease migration, Android, bot AI and gameplay. Reusable client
 shader locale fallback is published separately atc8b0ab2; selected app471 stays.
+
+Canonical tooling84fa637 exposed two harness errors after1345 checks: isolated
+javac omitted ExclusiveFileLease, and a fixture restored file bytes without
+refreshing Git stat state before testing an independent rejection. The fixed
+Java harness passes with real JDK17;33 focused source/publication tests pass with
+a deterministic stat-cache regression. Production source admission is unchanged.
+The previously skipped real shader-compiler test now passes with measured local
+glslang14.3.0: three synthetic vertex/pixel/companion SPIR-V modules, disassembly
+and invalid-GLSL rejection. No real game-data shaders were generated.

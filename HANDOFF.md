@@ -168,3 +168,19 @@ UUID persistence/restart (30 bot tables/31 updates). The small artifact is fully
 read and all60 compiled project inputs match producer Git. This proof excludes
 the subsequent lease migration, Android, bot AI and gameplay. Reusable client
 shader locale fallback is published separately atc8b0ab2; selected app471 stays.
+
+Latest fully read-back complete APK is41129893343@7c303665 attempt2:
+337,019,318 bytes SHA68c55d9ef700e73c39ba62caac818a7072be70bc86846b3e3de05735aaf843b0.
+Full local APK/archive readback covers127 entries/eight provider archives/10,743
+entries/1,196,665,936 regular bytes. Source1040files +PRoot30/15relinkobjects and
+five exact helper sources match producer. See the three local-game-profile7c
+evidence files; prior HTTP/2 transport failure is retained separately. No runtime
+or signing claim. Current84fa637 source changes require their own validation.
+
+Canonical tooling41132701937@84fa637 failed two harness assumptions, fixed by
+including the actual new Core lease in isolated javac inputs and refreshing only
+the test Git fixture after restoring exact bytes. Production consumer remains
+byte-identical/strict. Inspect the new canonical tooling job before claiming CI
+green. Focused actual JDK17 and33 source/publication tests pass. The previously
+skipped actual local glslang compiler test also passes at clientc8b0ab2; synthetic
+three-module SPIR-V validation does not establish real game shader generation.

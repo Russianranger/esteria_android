@@ -13,6 +13,7 @@ class EmbeddedCacheHost(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             base='io/github/russianranger/esteria/core/runtime/install/'
             sources=[ROOT/'core/src/main/java'/base/(name+'.java') for name in ('RuntimeFiles','RuntimeWork','EmbeddedArchiveCache')]
+            sources.append(ROOT/'core/src/main/java/io/github/russianranger/esteria/core/runtime/ExclusiveFileLease.java')
             sources.append(ROOT/'core/src/test/java'/base/'EmbeddedArchiveCacheTests.java')
             subprocess.run(['javac','-d',directory,*map(str,sources)],check=True,capture_output=True,text=True)
             result=subprocess.run(['java','-Xmx32m','-cp',directory,'io.github.russianranger.esteria.core.runtime.install.EmbeddedArchiveCacheTests',directory+'/state'],check=True,capture_output=True,text=True,timeout=60)

@@ -135,7 +135,12 @@ class PublicLocalServerProfile(unittest.TestCase):
         path = source / 'tools/release_local_server_components.py'; original = path.read_bytes()
         path.write_bytes(b'# changed\n')
         with self.assertRaises((ValueError, subprocess.CalledProcessError)): consumer.recipe_checkout(source, lock)
-        path.write_bytes(original); (source / 'untracked.py').write_bytes(b'# untrusted\n')
+        path.write_bytes(original)
+        # Restoring bytes does not restore Git's cached stat tuple. Plumbing
+        # diff-files intentionally stays read-only; prepare a clean fixture
+        # explicitly before testing the independent untracked-file guard.
+        git('update-index', '--refresh')
+        (source / 'untracked.py').write_bytes(b'# untrusted\n')
         with self.assertRaisesRegex(ValueError, 'untracked-recipe-files'): consumer.recipe_checkout(source, lock)
         (source / 'untracked.py').unlink(); git('update-index', '--assume-unchanged', 'tools/release_local_server_components.py')
         with self.assertRaisesRegex(ValueError, 'hidden-index-flags'): consumer.recipe_checkout(source, lock)
@@ -144,6 +149,27 @@ class PublicLocalServerProfile(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'recipe-git-member'): consumer.recipe_checkout(source, wrong)
         wrong = copy.deepcopy(lock); wrong['recipeInputs']['sources.lock.json']['sha256'] = '0' * 64
         with self.assertRaisesRegex(ValueError, 'retained-recipe-git-blob'): consumer.recipe_checkout(source, wrong)
+
+    def test_stat_dirty_restoration_requires_fixture_refresh_without_relaxing_source_guards(self):
+        lock, source, git = self.recipe()
+        path = source / 'tools/release_local_server_components.py'
+        original = path.read_bytes(); before = path.stat()
+        path.write_bytes(b'# changed fixture bytes\n')
+        # Refresh never stages or blesses a changed file.
+        with self.assertRaises(subprocess.CalledProcessError): git('update-index', '--refresh')
+        path.write_bytes(original)
+        os.utime(path, ns=(before.st_atime_ns, before.st_mtime_ns + 2_000_000_000))
+        self.assertEqual(path.read_bytes(), original)
+        self.assertEqual(subprocess.run(['git', '-C', str(source), 'diff-files', '--quiet', '--'],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode, 1)
+        # Production must not mutate an index to make its checkout look clean.
+        with self.assertRaises(subprocess.CalledProcessError): consumer.recipe_checkout(source, lock)
+        git('update-index', '--refresh')
+        self.assertEqual(git('diff-files', '--quiet', '--'), b'')
+        self.assertEqual(consumer.recipe_checkout(source, lock), source)
+        path.write_bytes(b'# changed again after clean admission\n')
+        with self.assertRaises((ValueError, subprocess.CalledProcessError)):
+            consumer.recipe_checkout(source, lock)
 
     def test_existing_output_and_source_overlap_preserve_all_bytes(self):
         self.pending(); retained = self.root / 'retained'; retained.mkdir(); (retained / 'sentinel').write_bytes(b'keep')

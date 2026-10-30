@@ -1,0 +1,36 @@
+{
+  "actualErrors": 2,
+  "actualFixedCanonicalCiRun": "pending",
+  "actualSkipped": 70,
+  "actualTestsRun": 1345,
+  "androidExecuted": false,
+  "errors": [
+    {
+      "actualJdk17FocusedTestPassed": true,
+      "cause": "isolated javac source list omitted new Core ExclusiveFileLease dependency",
+      "fix": "include actual production dependency; no mock replacement",
+      "seconds": 1.105,
+      "test": "test_owned_asset_copy_resume_and_bounded_heap"
+    },
+    {
+      "cause": "fixture restored canonical bytes but assumed Git stat-cache was clean",
+      "followup": "separate deterministic fixture refresh correction; production source guard unchanged",
+      "test": "test_real_git_roster_full_working_bytes_untracked_and_hidden_flags"
+    }
+  ],
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "jobConclusion": "failure",
+  "jobId": 124327430663,
+  "observedAtUtc": "2026-10-30T21:45:40.232347+00:00",
+  "producerRevision": "84fa637867ad6c2c916a455c703e577cd60a298c",
+  "productionRuntimeBehaviorChangedByTheseTestFixes": false,
+  "runId": 41132701937,
+  "scope": "actual canonical tooling CI failure and isolated Java closure correction",
+  "sourceFiles": {
+    "tests/test_embedded_archive_cache.py": {
+      "bytes": 1249,
+      "sha256": "20f8ad9bcd5f120d83ca39907879c76c77ff40255389800276a854e8d4b6a28c"
+    }
+  }
+}

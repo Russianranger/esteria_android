@@ -1,0 +1,81 @@
+{
+  "allSourceZipMembersReadAndCrcVerified": true,
+  "androidGuestExecuted": false,
+  "apkPayloadReadBackHere": false,
+  "deviceTestCandidate": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "integrationRevision": "7c303665e8028aba86a7b87d543b2528d968b1ab",
+  "integrationSource": {
+    "allRegularFilesMatchExactGitBlobsOrDeclaredWrapperConversion": true,
+    "archiveRegularFileBytes": 10146280,
+    "canonicalGitBlobBytes": 10146274,
+    "declaredCheckoutConversions": {
+      "gradlew.bat": {
+        "archive": {
+          "bytes": 295,
+          "sha256": "21186e8f097fcc9e5f62ee0abf2d95b92f973b347d0c27f0205a336af8aa021d"
+        },
+        "canonical": {
+          "bytes": 289,
+          "sha256": "119ce8a4bfdf3024ba03cf9b6b810afd47b49e17999a0053bfe719effbad36ea"
+        },
+        "exactCrLfConversionVerified": true
+      }
+    },
+    "entireGzipCrcAndTrailerReadBack": true,
+    "trackedRegularFiles": 1040
+  },
+  "prootSource": {
+    "allMemberSizesAndSha256MatchActualCiInventory": true,
+    "allRelinkableObjectsHaveActualArm64ElfHeaders": true,
+    "entireGzipCrcAndTrailerReadBack": true,
+    "regularFileBytes": 1613364,
+    "regularFiles": 30,
+    "relinkableArm64Objects": 15
+  },
+  "runAttempt": 2,
+  "scope": "independent-local-complete-integration-and-PRoot-source-readback",
+  "sourceArtifact": {
+    "bytes": 3677330,
+    "id": 13013920253,
+    "sha256": "e43b4298aeabe87c98db41a3c0fc88d4dd277481adfb24a7c7c3f9ca2084ec17"
+  },
+  "sourceArtifactMembers": {
+    "coherent-integration-source.tar.gz": {
+      "bytes": 2526908,
+      "sha256": "ba50a85910439494a6cb844431c6db0c4e258620ebe60d96edbda165c410041d"
+    },
+    "proot-build/build-evidence.json": {
+      "bytes": 2099,
+      "sha256": "14d09032d6b44bbd4f58956861375c35721b46e286dfde1b0c2c3803842507f8"
+    },
+    "proot-build/proot-corresponding-source.tar.gz": {
+      "bytes": 1147805,
+      "sha256": "7fa5baa5f7d17de1db73e769a5a2951887cd60d9bf2ce65741b9d7c1fb10bdb5"
+    }
+  },
+  "sourceDerivedDataHelperFiles": {
+    "extractor_order.py": {
+      "bytes": 9884,
+      "sha256": "5c6d30d23c2a8ebb13d037907cbcc6e7b67ea31f4b99798d925c5e3da756128c"
+    },
+    "owned_process_group.py": {
+      "bytes": 2795,
+      "sha256": "c19ed5c05e94d7b537df1055983fca75e20447f594419084f2207d60f99f138e"
+    },
+    "server_data_generation.py": {
+      "bytes": 29380,
+      "sha256": "72513fb5e0c1264f996fed74a96178a9789e14e97863d268da1170fa64f74cc6"
+    },
+    "server_data_preflight.py": {
+      "bytes": 27886,
+      "sha256": "8b9a1d44b70a8c1fce7a54e0ee39bba68621026f34270982cb68cb8d326374e0"
+    },
+    "shader_generation.py": {
+      "bytes": 19353,
+      "sha256": "8bb48952c36bdc4c69516c2ffa6f5c2d2eb59e84019e6420948d94bc81683ac5"
+    }
+  },
+  "workflowRun": 41129893343
+}

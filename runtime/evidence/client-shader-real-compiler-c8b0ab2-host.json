@@ -1,0 +1,43 @@
+{
+  "actualSpirvMagicAndDisassemblyChecked": true,
+  "actualSyntheticVertexPixelAndCompanionModulesCompiled": 3,
+  "androidExecuted": false,
+  "clientRevision": "c8b0ab201f52e18ffaba1e6c55aad6e26c740251",
+  "command": "ESTERIA_TEST_GLSLANG=<measured host compiler> python3 -m unittest test_translate.ActualCompiler.test_real_emission_compilation_validation_disassembly_and_companion -v",
+  "compiler": {
+    "bytes": 8988768,
+    "sha256": "504232934d4b14b9051a60e1a05c53a5e57c7198a8e31b69d91b50c81df2e5e8",
+    "version": "Glslang Version: 11:14.3.0\nESSL Version: OpenGL ES GLSL 3.20 glslang Khronos. 14.3.0\nGLSL Version: 4.60 glslang Khronos. 14.3.0\nSPIR-V Version 0x00010600, Revision 1\nGLSL.std.450 Version 100, Revision 1\nKhronos Tool ID 8\nSPIR-V Generator Version 11\nGL_KHR_vulkan_glsl version 100\nARB_GL_gl_spirv version 100\n"
+  },
+  "compilerPackagedOrChangedByThisTest": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "invalidGlslRejectedByRealCompiler": true,
+  "observedAtUtc": "2026-10-30T21:43:05.147551+00:00",
+  "realGameAssetShadersGenerated": false,
+  "scope": "focused previously skipped actual host shader emission compilation validation disassembly and companion test",
+  "sourceFiles": {
+    "Tools/VulkanShaders/bls/archive.py": {
+      "bytes": 15843,
+      "sha256": "0d82ac31199b5e392b42c84e8fd7e01e7538daa3569ff17c96c9e8df3deb591f"
+    },
+    "Tools/VulkanShaders/bls/translate.py": {
+      "bytes": 18296,
+      "sha256": "1de24962edbe7d520f78488aac5ab946f54fe4d6776af178d630b402093a1794"
+    },
+    "Tools/VulkanShaders/tests/test_archive.py": {
+      "bytes": 11650,
+      "sha256": "a30265c484144d263f42d01ee1f0c00cc8dd65c3e56df178de0476acd1d81b43"
+    },
+    "Tools/VulkanShaders/tests/test_translate.py": {
+      "bytes": 9979,
+      "sha256": "2ac6a66249006e6edfd4bc4916506dfd52923032a03e5784b876dd5c94a0602c"
+    }
+  },
+  "sourceFilesMatchExactGitBlobs": true,
+  "testOutput": "test_real_emission_compilation_validation_disassembly_and_companion (test_translate.ActualCompiler.test_real_emission_compilation_validation_disassembly_and_companion) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.313s\n\nOK\n",
+  "testsPassed": 1,
+  "testsRun": 1,
+  "testsSkipped": 0,
+  "worldQualified": false
+}

@@ -1,0 +1,86 @@
+{
+  "actualCiFailure": {
+    "actualEarlierRefusal": "git diff-files --quiet exited1 after bytes were restored",
+    "ciGitVersionReported": "2.56",
+    "expectedRefusal": "public-server-profile-untracked-recipe-files",
+    "failureClassifiedAs": "fixture-clean-stat-cache-precondition-not-established",
+    "fullDiscovery": {
+      "errors": 2,
+      "run": 1345,
+      "seconds": 57.943,
+      "skipped": 70
+    },
+    "integrationRevision": "84fa637867ad6c2c916a455c703e577cd60a298c",
+    "otherJavacClosureFailureHandledSeparately": true,
+    "test": "tests.test_public_local_server_profile.PublicLocalServerProfile.test_real_git_roster_full_working_bytes_untracked_and_hidden_flags",
+    "workflowJob": 124327430663,
+    "workflowRun": 41132701937
+  },
+  "actualHostReproduction": {
+    "changedBytesAfterCleanAdmissionStillRefused": true,
+    "completeRecipeAdmissionAfterExplicitFixtureRefreshPassed": true,
+    "diffFilesAfterExplicitFixtureRefreshExit": 0,
+    "diffFilesBeforeExplicitFixtureRefreshExit": 1,
+    "explicitFixtureRefreshCommand": [
+      "git",
+      "update-index",
+      "--refresh"
+    ],
+    "gitVersion": "git version 2.51.1",
+    "productionRefusesStatDirtySource": true,
+    "refreshRefusesActuallyChangedBytesAndDoesNotStageThem": true,
+    "restoredWorkingFileBytesExactlyCanonical": true,
+    "sourceMtimeAdvancedNanoseconds": 2000000000
+  },
+  "androidGuestExecuted": false,
+  "androidRuntimeQualified": false,
+  "apkBuilt": false,
+  "ciReplacementRunExecutedHere": false,
+  "dateUtc": "2026-10-30",
+  "focusedTests": {
+    "errors": 0,
+    "failures": 0,
+    "log": {
+      "bytes": 7158,
+      "sha256": "1c41a2a01092fcd1ff5841c85d0c473b85acb79dfb5137e9620f3c415601ae63"
+    },
+    "modules": [
+      "tests.test_public_local_server_profile",
+      "tests.test_local_server_components_release",
+      "tests.test_wine_cohort_apk",
+      "tests.test_qualified_data_tools_inputs"
+    ],
+    "passed": 33,
+    "run": 33,
+    "seconds": 6.188,
+    "skipped": 0
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "gitHead": "84fa637867ad6c2c916a455c703e577cd60a298c",
+  "onlyTestFixtureBehaviorChanged": true,
+  "productionConsumerByteIdenticalToHead": true,
+  "productionIndexNotRefreshedToAdmitSource": true,
+  "productionStagedIndexHiddenFlagsUntrackedRosterAndWrapperConversionGuardsUnchanged": true,
+  "productionWholeBlobAndWorkingByteGuardsUnchanged": true,
+  "providerRebuilt": false,
+  "publicReleaseAssetBytesDownloaded": false,
+  "scope": "host-clean-Git-fixture-stat-refresh-regression-with-production-admission-unchanged",
+  "separateRootCiFailureReceipt": {
+    "bytes": 1340,
+    "sha256": "0af8c677a75f54b1257ef2635495301565196003fbe812f5a387ca3b5a0bce61"
+  },
+  "sourceFiles": {
+    "tests/test_public_local_server_profile.py": {
+      "bytes": 13695,
+      "sha256": "b12e21f36d817143ddab962825dc761929ffd6d39aa1710fcb367bda70ede9dd"
+    },
+    "tools/fetch_local_server_profile.py": {
+      "bytes": 14514,
+      "sha256": "adaf334102ec1736be6bd9cbf1d87f2c5d116f7bc3971b0633e9b8634b5ef887"
+    }
+  },
+  "sqlExecuted": false,
+  "workingTreeHadUncommittedTestFix": true,
+  "worldserverQualified": false
+}
