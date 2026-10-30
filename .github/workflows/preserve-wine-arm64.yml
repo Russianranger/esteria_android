@@ -1,0 +1,135 @@
+name: Preserve exact source-owned ARM64 Wine inputs
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - runtime/wine-arm64-publication/dependency-release.lock.json
+permissions:
+  contents: read
+concurrency:
+  group: preserve-source-owned-arm64-wine-inputs
+  cancel-in-progress: false
+jobs:
+  validate:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      recipe_revision: ${{ steps.selection.outputs.recipe_revision }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Select the exact separately published packaging recipe
+        id: selection
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json,re
+          lock=json.load(open('runtime/wine-arm64-publication/dependency-release.lock.json'))
+          revision=lock['targetCommit'];assert re.fullmatch('[0-9a-f]{40}',revision)
+          print('recipe_revision='+revision)
+          PY
+          cp runtime/wine-arm64-publication/dependency-release.lock.json "$RUNNER_TEMP/wine-release.lock.json"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ steps.selection.outputs.recipe_revision }}
+          path: source-packaging
+          persist-credentials: false
+      - name: Test exact original-source and upload-only rejection boundaries
+        working-directory: source-packaging
+        run: python3 -m unittest tests.test_wine_release -v
+      - name: Recover originals without a runtime rebuild and stage complete checked bytes
+        working-directory: source-packaging
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          git fetch --no-tags --depth 1 origin 681b2e9f30b19e94bf8e8de44f67fedba5033c8a
+          python3 tools/release_wine_arm64.py body --release-lock "$RUNNER_TEMP/wine-release.lock.json"
+          python3 tools/wine_arm64_requalification.py fetch --output "$RUNNER_TEMP/wine-release-inputs" \
+            > "$RUNNER_TEMP/wine-source-readback.json"
+          python3 tools/release_wine_arm64.py stage --release-lock "$RUNNER_TEMP/wine-release.lock.json" \
+            --runtime-input-lock runtime/wine-arm64-qualification/runtime-input.lock.json \
+            --inputs "$RUNNER_TEMP/wine-release-inputs" --output out/release-candidate
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: validated-source-owned-arm64-wine-release
+          path: source-packaging/out/release-candidate
+          compression-level: 0
+          retention-days: 3
+          if-no-files-found: error
+  upload-draft:
+    needs: validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Preserve explicit release selection before checking out its exact recipe
+        run: cp runtime/wine-arm64-publication/dependency-release.lock.json "$RUNNER_TEMP/wine-release.lock.json"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ needs.validate.outputs.recipe_revision }}
+          path: source-packaging
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: validated-source-owned-arm64-wine-release
+          path: source-packaging/out/release-candidate
+      - name: Revalidate entire source ZIP and add only missing exact owned-draft assets
+        working-directory: source-packaging
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          git fetch --no-tags --depth 1 origin 681b2e9f30b19e94bf8e8de44f67fedba5033c8a
+          python3 tools/release_wine_arm64.py upload-draft --release-lock "$RUNNER_TEMP/wine-release.lock.json" \
+            --inputs out/release-candidate --output out/draft-assets-verified.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: source-owned-arm64-wine-draft-readiness
+          path: source-packaging/out/draft-assets-verified.json
+          retention-days: 14
+          if-no-files-found: error
+  verify-publication:
+    needs: [validate, upload-draft]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Preserve explicit release selection before checking out its exact recipe
+        run: cp runtime/wine-arm64-publication/dependency-release.lock.json "$RUNNER_TEMP/wine-release.lock.json"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ needs.validate.outputs.recipe_revision }}
+          path: source-packaging
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: validated-source-owned-arm64-wine-release
+          path: source-packaging/out/release-candidate
+      - name: Verify actual UI publication tag and every stored byte without mutation
+        working-directory: source-packaging
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          git fetch --no-tags --depth 1 origin 681b2e9f30b19e94bf8e8de44f67fedba5033c8a
+          python3 tools/release_wine_arm64.py verify-published --release-lock "$RUNNER_TEMP/wine-release.lock.json" \
+            --inputs out/release-candidate --output out/published-release.json --wait-seconds 1200
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: source-owned-arm64-wine-publication-receipt
+          path: source-packaging/out/published-release.json
+          retention-days: 14
+          if-no-files-found: error

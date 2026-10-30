@@ -145,7 +145,7 @@ def fixture_receipt(value):
     return value
 
 
-def build_identity(payload, revision, package):
+def build_identity(payload, revision, package, bridge_input_lock=None):
     packages.require(re.fullmatch('[0-9a-f]{40}', revision or '') is not None, 'full-bridge-revision-required')
     payload = packages.directory(payload)
     receipt, receipt_sha = read_json(payload / 'bridge-build.json')
@@ -157,8 +157,14 @@ def build_identity(payload, revision, package):
                    for name in ('frame_protocol.h', 'frame_transport.h')]
     expected = {str(path.relative_to(ROOT / 'native')): identity(path) for path in source_paths if not path.is_dir()}
     packages.require(receipt.get('sources') == expected, 'bridge-source-identity')
-    input_sha = identity(ROOT / 'runtime/bridges/sources.lock.json')['sha256']
+    input_lock, input_sha = read_json(bridge_input_lock if bridge_input_lock is not None else
+                                      ROOT / 'runtime/bridges/sources.lock.json')
     packages.require(receipt.get('inputLockSha256') == input_sha, 'bridge-build-input-lock')
+    packages.require(type(input_lock) is dict and type(input_lock.get('formatVersion')) is int and
+                     input_lock['formatVersion'] == 1 and input_lock.get('scope') == 'guest-bridge-build-inputs-only' and
+                     input_lock.get('architecture') == 'arm64' and
+                     input_lock.get('runtimeArchiveSha256') == package['archive']['sha256'],
+                     'bridge-input-runtime-pin-mismatch')
     spec = importlib.util.spec_from_file_location('esteria_x11_build', ROOT / 'runtime/bridges/record_build.py')
     module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
     with packages.plain_file(payload / 'bin' / HELPER):
@@ -178,8 +184,10 @@ def build_identity(payload, revision, package):
                 inputLockSha256=input_sha, helper=helper, observer=observer)
 
 
-def validate_runtime(runtime):
-    lock, _ = read_json(packages.DEFAULT_LOCK)
+def validate_runtime(runtime, runtime_lock=None, x11_runtime_lock=None):
+    lock, lock_sha = read_json(runtime_lock if runtime_lock is not None else packages.DEFAULT_LOCK)
+    packages.require(type(lock) is dict and type(lock.get('formatVersion')) is int and lock['formatVersion'] == 1,
+                     'unsupported-runtime-lock-version')
     package = lock['packages']['wine-arm64']
     prepared, prepared_sha = read_json(runtime / 'package-receipt.json')
     pin_sha = hashlib.sha256(json.dumps(package, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
@@ -189,17 +197,25 @@ def validate_runtime(runtime):
                      prepared.get('preparerSha256') == identity(Path(packages.__file__))['sha256'] and
                      prepared.get('archiveExtracted') is True and prepared.get('stagedFilesReadBack') is True,
                      'fresh-runtime-preparation-required')
-    x11, x11_sha = read_json(ROOT / 'runtime/bridges/x11-runtime.lock.json')
+    x11, x11_sha = read_json(x11_runtime_lock if x11_runtime_lock is not None else
+                           ROOT / 'runtime/bridges/x11-runtime.lock.json')
+    packages.require(type(x11) is dict and type(x11.get('formatVersion')) is int and x11['formatVersion'] == 1 and
+                     x11.get('scope') == 'pinned-wine-rootfs-x11-static-library-closure' and
+                     x11.get('androidQualified') is False and x11.get('inputQualified') is False,
+                     'x11-runtime-lock-scope')
     packages.require(x11.get('runtimeArchiveSha256') == package['archive']['sha256'], 'x11-runtime-pin-mismatch')
     for name, expected in {**x11['components'], **x11['loaderConfiguration']}.items():
+        packages.member_path(name)
         with packages.plain_file(runtime / 'rootfs' / name) as stream:
             packages.verify_stream(stream, dict(file=Path(name).name, **expected))
             stream.seek(0); packages.inspect_component(stream.read(4096), expected)
     for name, target in x11['symlinks'].items():
+        packages.member_path(name)
         packages.require(os.readlink(runtime / 'rootfs' / name) == target, 'x11-loader-library-alias-mismatch')
     packages.require(x11.get('preloadFileAbsent') is True and not os.path.lexists(runtime / 'rootfs/etc/ld.so.preload'),
                      'x11-unexpected-global-preload')
-    return package, dict(runtimeArchiveSha256=package['archive']['sha256'], runtimeReceiptSha256=prepared_sha,
+    return package, dict(runtimeArchiveSha256=package['archive']['sha256'], runtimeLockSha256=lock_sha,
+                         runtimeReceiptSha256=prepared_sha,
                          x11RuntimeLockSha256=x11_sha, x11ElfImagesVerified=len(x11['components']))
 
 
@@ -307,12 +323,12 @@ def worker(runtime, output):
     return code
 
 
-def qualify(runtime, payload, revision, output):
+def qualify(runtime, payload, revision, output, runtime_lock=None, x11_runtime_lock=None, bridge_input_lock=None):
     packages.require(platform.machine().lower() in ('aarch64', 'arm64') and os.geteuid() == 0,
                      'native-arm64-root-host-required')
     runtime = packages.directory(runtime); payload = packages.directory(payload)
-    package, runtime_identity = validate_runtime(runtime)
-    binaries = build_identity(payload, revision, package)
+    package, runtime_identity = validate_runtime(runtime, runtime_lock, x11_runtime_lock)
+    binaries = build_identity(payload, revision, package, bridge_input_lock)
     packages.directory(output.parent, create=True); output.mkdir(mode=0o700)
     fixture = runtime / 'rootfs' / GUEST.lstrip('/')
     packages.require(not os.path.lexists(fixture), 'runtime-already-used-for-qualification')
@@ -369,12 +385,16 @@ def main():
     parser.add_argument('--runtime', type=Path, required=True)
     parser.add_argument('--bridge-dir', type=Path)
     parser.add_argument('--bridge-revision')
+    parser.add_argument('--runtime-lock', type=Path, help='separate exact runtime input lock; default production pins')
+    parser.add_argument('--x11-runtime-lock', type=Path, help='exact X11/loader closure bound to the selected runtime')
+    parser.add_argument('--bridge-input-lock', type=Path, help='exact build-input lock for the rebuilt guest bridges')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--namespace-worker', action='store_true', help=argparse.SUPPRESS)
     args = parser.parse_args()
     if args.namespace_worker: return worker(args.runtime, args.output)
     packages.require(args.bridge_dir is not None, 'source-built-bridge-payload-required')
-    qualify(args.runtime.absolute(), args.bridge_dir.absolute(), args.bridge_revision, args.output.absolute())
+    qualify(args.runtime.absolute(), args.bridge_dir.absolute(), args.bridge_revision, args.output.absolute(),
+            args.runtime_lock, args.x11_runtime_lock, args.bridge_input_lock)
     return 0
 
 

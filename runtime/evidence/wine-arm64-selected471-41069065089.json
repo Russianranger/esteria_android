@@ -1,0 +1,903 @@
+{
+  "adrenoHardwareQualified": false,
+  "androidArm64Qualified": false,
+  "androidProotExecutionQualified": false,
+  "assetsLoaded": false,
+  "audibleOutputQualified": false,
+  "commonMainStarted": false,
+  "compiledServerAuthenticationQualified": false,
+  "conclusion": "success",
+  "evidenceArtifact": {
+    "bytes": 86901,
+    "id": 12984756681,
+    "sha256": "612da5bf95095ed29cdf330b80f50e81db6e0efb1ef08f99b9cc92f690a7f71b"
+  },
+  "formatVersion": 1,
+  "fullRetainedRuntimeAndOriginalSourceConsumerReadback": {
+    "adaptationSources": 5,
+    "allOriginalSourcesReadBack": true,
+    "androidQualified": false,
+    "completeIntegrationTreeReadBack": true,
+    "debianSourceBytes": 858739837,
+    "debianSourcePackages": 183,
+    "fexNotices": 22,
+    "formatVersion": 1,
+    "gameClientQualified": false,
+    "gameplayQualified": false,
+    "originalArchives": {
+      "fex-2510-source-with-submodules.tar.gz": {
+        "bytes": 222845230,
+        "sha256": "8a10a8e63cdea41a6c70b0f14d487fe4cb3f11c8fb5baba3e42090098e2745be"
+      },
+      "llvm-mingw-20250920-ucrt-ubuntu-22.04-aarch64.tar.xz": {
+        "bytes": 75125388,
+        "sha256": "bce5cc755c613515fd44e1ee9523123d854103abae147571adb645450036274d"
+      },
+      "wine-arm64ec-source.tar.gz": {
+        "bytes": 53416396,
+        "sha256": "93ffcd86d3f518934da5c93c768d43afe7e97d66f04f355d914f5cfb6731ac74"
+      }
+    },
+    "originalDebianFiles": 583,
+    "runtimeMetadataSha256": "4b731a5f450a556632c598ddebda2ec3f814c8d7ea2c9e1529d6c80c8773e0a5",
+    "scope": "read-back-source-owned-arm64-wine-candidate-originals",
+    "sourceLockSha256": "077fb2b0883986338b6755e53f5cede08bd63ed1834783e7e6cd079e0ec0c16d",
+    "sourceRevision": "681b2e9f30b19e94bf8e8de44f67fedba5033c8a",
+    "toolchainSources": {
+      "allSelectedGitBlobsReadBack": true,
+      "androidRuntimeQualified": false,
+      "archiveBytes": 252021269,
+      "binaryRebuildEquivalent": false,
+      "manifest": {
+        "bytes": 13790,
+        "sha256": "fc41f799c6122fb880e8809df75d9fd993b831d78d4d688be8ef56523a698f83"
+      },
+      "originalNotices": 47,
+      "sourceTrees": 4
+    }
+  },
+  "gameplayQualified": false,
+  "independentLocalEvidenceReadback": {
+    "allNineGatesRecomputed": true,
+    "entireRetainedRuntimeAndOriginalSourceValidatedByConsumerCi": true,
+    "evidenceZipReadBack": true,
+    "gruntPositiveNegativePeerAndCleanupReadBack": true,
+    "largeSourceCompanionDownloadedLocally": false,
+    "pcm": {
+      "dsound": {
+        "amplitudes1k2k": [
+          [
+            6350.261243682519,
+            0.023511685318803117
+          ],
+          [
+            0.03424021448624575,
+            6350.290679634079
+          ]
+        ],
+        "bytes": 495324,
+        "frames": 123831,
+        "knownStereoSignalMatched": true,
+        "rms": [
+          5099.83054520638,
+          5099.856836081601
+        ],
+        "sha256": "67d7f3228ab140821dfa29a9baf56a590d2cab67a69a2a81975513472ff8f260",
+        "strongSamples": [
+          91999,
+          87999
+        ]
+      },
+      "winmm": {
+        "amplitudes1k2k": [
+          [
+            6423.401214386829,
+            0.023782484252805554
+          ],
+          [
+            0.03463458066872757,
+            6423.4309893708405
+          ]
+        ],
+        "bytes": 489684,
+        "frames": 122421,
+        "knownStereoSignalMatched": true,
+        "rms": [
+          5129.115448612574,
+          5129.1418904586435
+        ],
+        "sha256": "990cf91150e43ed1783ad98301df8efc004511ef286f31b8d98486b9935a857e",
+        "strongSamples": [
+          91999,
+          87999
+        ]
+      }
+    },
+    "retainedPcmBytesAndKnownStereoSignalsReanalyzed": true,
+    "strictOriginalCppReceiptsReadBack": true,
+    "workerReceiptMatched": true
+  },
+  "integrationRevision": "cec4413a94b4d7d0dcf592d64b781cf4066dca59",
+  "originalNativeClientRevision": "0f931bbade36a4b197725d691b8eff7caea7b3be",
+  "productionRuntimeOrProvidersChanged": false,
+  "publishedSelectedClientInputReadback": {
+    "NOTICE.txt": {
+      "bytes": 1340,
+      "sha256": "07268b21f9f08843bbbb42aa1fdfcd3c8ed8e052ab470eb42a1e0458dd898b42"
+    },
+    "SHA256SUMS": {
+      "bytes": 547,
+      "sha256": "719289ddbb903762d02f83c6ba484780d940820ab338d68861621e52a1c41d98"
+    },
+    "client-corresponding-source.tar.gz": {
+      "bytes": 23449963,
+      "sha256": "71f7bc4c3b1574de365418bffa2a8c74b299cf0635f45e292b30df20005259cd"
+    },
+    "client-input-lock.json": {
+      "bytes": 492,
+      "sha256": "7ecb7dfd4e9917e742fb467d81a72af9273394c8488e5a6cb3e25fa70c29ed5b"
+    },
+    "reconstructed-client-arm64-original.zip": {
+      "bytes": 45848847,
+      "sha256": "befac98c5c3434ea94dcb878f5da37f915946221fb17f1a7888c65f74bb846ad"
+    },
+    "release-manifest.json": {
+      "bytes": 1507,
+      "sha256": "57c10836751b5f10370ddb4fdadb78b2e3cc591dd719c4ca6d60cb53c68c31bd"
+    },
+    "source-receipt.json": {
+      "bytes": 3838,
+      "sha256": "e768b9dfec4cae999d6c4ca2b8d85a6ed998264b6f4779a57670e91f8533d615"
+    }
+  },
+  "qualification": {
+    "androidRuntimeQualified": false,
+    "audioBridge": {
+      "buildReceiptSha256": "311305aa008d08cf93d40e43bc344c0b05fa3d3a0af8a25083c8be51f99fdd3d",
+      "inputLockSha256": "241729a2da2c6e88df431c9d68f00e37873c0616d81981a354e12b58046384e9",
+      "integrationRevision": "cec4413a94b4d7d0dcf592d64b781cf4066dca59",
+      "plugin": {
+        "architecture": "arm64",
+        "bytes": 71088,
+        "interpreter": null,
+        "maxGlibc": "2.17",
+        "needed": [
+          "ld-linux-aarch64.so.1",
+          "libasound.so.2",
+          "libc.so.6"
+        ],
+        "sha256": "bb2f32c2def9e712630ea282aca06fe38bf563b03b07d0672ddf273a18ebb16c"
+      },
+      "softwareAudio": {
+        "components": {
+          "opt/wine/lib/wine/aarch64-unix/winealsa.so": {
+            "bytes": 134144,
+            "elfClass": 2,
+            "elfMachine": 183,
+            "sha256": "cc3de8fd246ebdb46879a05debfa451437d5dd7fc655bd249165606c23c882ab"
+          },
+          "opt/wine/lib/wine/aarch64-windows/winealsa.drv": {
+            "bytes": 589824,
+            "peMachine": "0xaa64",
+            "sha256": "ea1da4bccb4188f34148f55daaff9acea37f2d172b8ff09ab9c311ccd6611595"
+          },
+          "usr/lib/aarch64-linux-gnu/libasound.so.2.0.0": {
+            "bytes": 1116648,
+            "elfClass": 2,
+            "elfMachine": 183,
+            "sha256": "9fade6b3aedf1ba944e6795b52b74378f2f89166b92ee542582171416a76572d"
+          },
+          "usr/share/alsa/alsa.conf": {
+            "bytes": 10117,
+            "sha256": "ea7c6cedb7da16ba51a0fea3e960416a2240e29c1f5d42e475c1dfcd19eb74ee"
+          }
+        },
+        "formatVersion": 1,
+        "runtimeArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46"
+      }
+    },
+    "audioQualified": false,
+    "audioRequested": true,
+    "bridgeInputLockSha256": "241729a2da2c6e88df431c9d68f00e37873c0616d81981a354e12b58046384e9",
+    "client": {
+      "buildId": "41061576677.1",
+      "clientManifestSha256": "ed34b6f648026073ba43203bee7e3dd1ca1d2413017fb99d8da54dab57808559",
+      "files": {
+        "WowClient64.exe": {
+          "bytes": 20785152,
+          "dll": false,
+          "peMachine": "0xaa64",
+          "sha256": "06557024cfaa974d02482eb98fedc186bc6b323ca730178347e153105343e12a"
+        },
+        "XvidDecoder.dll": {
+          "bytes": 566272,
+          "dll": true,
+          "peMachine": "0xaa64",
+          "sha256": "b4c774430942d709ca7e3f03a1890d6aec7aaa2e432bee0e698e57027a70d006"
+        },
+        "fmod_output_device.exe": {
+          "bytes": 793088,
+          "dll": false,
+          "peMachine": "0xaa64",
+          "sha256": "816981dd4700e875f6ef0f2dc263aa38c87906c625780d8cde42125bda149dfd"
+        },
+        "presentation_device.exe": {
+          "bytes": 320000,
+          "dll": false,
+          "peMachine": "0xaa64",
+          "sha256": "d7d4962732c2539e93c4575d920772cb4e18f0db52febe50bbf8f9047c790d81"
+        },
+        "test_xvid_adapter.exe": {
+          "bytes": 379904,
+          "dll": false,
+          "peMachine": "0xaa64",
+          "sha256": "b2befc65790625d72f53350db6dc9998f484d465d765d3124a2afaf728e8f3bb"
+        },
+        "texture_device.exe": {
+          "bytes": 292864,
+          "dll": false,
+          "peMachine": "0xaa64",
+          "sha256": "11f6ff16d7f96ebec7afea796900d2eb9bf9ab6f897c78246a2851203ce908fc"
+        }
+      },
+      "sourceRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5"
+    },
+    "clientAuthPeer": {
+      "bytes": 8376,
+      "path": "Tools/PlatformTests/auth_peer.py",
+      "sha256": "3535fb9f48c4247156c1c1ada27ab4960bb78b1c020a846e641ae2b45d7d8f36",
+      "sourceRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5"
+    },
+    "clientEntryRequested": true,
+    "clientExecutableEntryReached": true,
+    "clientExecutableLaunchAttempted": true,
+    "clientLoopbackRequested": true,
+    "clientOfflineRequested": true,
+    "directImports": {
+      "advapi32.dll": {
+        "peMachine": "0xaa64",
+        "provider": "wine-file"
+      },
+      "api-ms-win-crt-convert-l1-1-0.dll": {
+        "apiSetName": true,
+        "provider": "not-a-file",
+        "resolutionQualified": false
+      },
+      "api-ms-win-crt-environment-l1-1-0.dll": {
+        "apiSetName": true,
+        "provider": "not-a-file",
+        "resolutionQualified": false
+      },
+      "api-ms-win-crt-filesystem-l1-1-0.dll": {
+        "apiSetName": true,
+        "provider": "not-a-file",
+        "resolutionQualified": false
+      },
+      "api-ms-win-crt-heap-l1-1-0.dll": {
+        "apiSetName": true,
+        "provider": "not-a-file",
+        "resolutionQualified": false
+      },
+      "api-ms-win-crt-locale-l1-1-0.dll": {
+        "apiSetName": true,
+        "provider": "not-a-file",
+        "resolutionQualified": false
+      },
+      "api-ms-win-crt-math-l1-1-0.dll": {
+        "apiSetName": true,
+        "provider": "not-a-file",
+        "resolutionQualified": false
+      },
+      "api-ms-win-crt-multibyte-l1-1-0.dll": {
+        "apiSetName": true,
+        "provider": "not-a-file",
+        "resolutionQualified": false
+      },
+      "api-ms-win-crt-runtime-l1-1-0.dll": {
+        "apiSetName": true,
+        "provider": "not-a-file",
+        "resolutionQualified": false
+      },
+      "api-ms-win-crt-stdio-l1-1-0.dll": {
+        "apiSetName": true,
+        "provider": "not-a-file",
+        "resolutionQualified": false
+      },
+      "api-ms-win-crt-string-l1-1-0.dll": {
+        "apiSetName": true,
+        "provider": "not-a-file",
+        "resolutionQualified": false
+      },
+      "api-ms-win-crt-time-l1-1-0.dll": {
+        "apiSetName": true,
+        "provider": "not-a-file",
+        "resolutionQualified": false
+      },
+      "api-ms-win-crt-utility-l1-1-0.dll": {
+        "apiSetName": true,
+        "provider": "not-a-file",
+        "resolutionQualified": false
+      },
+      "d3d11.dll": {
+        "peMachine": "0xaa64",
+        "provider": "wine-file"
+      },
+      "d3dcompiler_47.dll": {
+        "peMachine": "0xaa64",
+        "provider": "wine-file"
+      },
+      "dbghelp.dll": {
+        "peMachine": "0xaa64",
+        "provider": "wine-file"
+      },
+      "dinput8.dll": {
+        "peMachine": "0xaa64",
+        "provider": "wine-file"
+      },
+      "dxgi.dll": {
+        "peMachine": "0xaa64",
+        "provider": "wine-file"
+      },
+      "gdi32.dll": {
+        "peMachine": "0xaa64",
+        "provider": "wine-file"
+      },
+      "hid.dll": {
+        "peMachine": "0xaa64",
+        "provider": "wine-file"
+      },
+      "imm32.dll": {
+        "peMachine": "0xaa64",
+        "provider": "wine-file"
+      },
+      "kernel32.dll": {
+        "peMachine": "0xaa64",
+        "provider": "wine-file"
+      },
+      "msacm32.dll": {
+        "peMachine": "0xaa64",
+        "provider": "wine-file"
+      },
+      "msvcp140.dll": {
+        "peMachine": "0xaa64",
+        "provider": "wine-file"
+      },
+      "ole32.dll": {
+        "peMachine": "0xaa64",
+        "provider": "wine-file"
+      },
+      "opengl32.dll": {
+        "peMachine": "0xaa64",
+        "provider": "wine-file"
+      },
+      "setupapi.dll": {
+        "peMachine": "0xaa64",
+        "provider": "wine-file"
+      },
+      "shell32.dll": {
+        "peMachine": "0xaa64",
+        "provider": "wine-file"
+      },
+      "user32.dll": {
+        "peMachine": "0xaa64",
+        "provider": "wine-file"
+      },
+      "vcruntime140.dll": {
+        "peMachine": "0xaa64",
+        "provider": "wine-file"
+      },
+      "version.dll": {
+        "peMachine": "0xaa64",
+        "provider": "wine-file"
+      },
+      "wininet.dll": {
+        "peMachine": "0xaa64",
+        "provider": "wine-file"
+      },
+      "winmm.dll": {
+        "peMachine": "0xaa64",
+        "provider": "wine-file"
+      },
+      "ws2_32.dll": {
+        "peMachine": "0xaa64",
+        "provider": "wine-file"
+      },
+      "xviddecoder.dll": {
+        "peMachine": "0xaa64",
+        "provider": "client-build"
+      }
+    },
+    "engineFrameReadbackRequired": true,
+    "formatVersion": 1,
+    "gameInitializationStarted": false,
+    "gameLoginQualified": false,
+    "graphicsRequested": [
+      "presentation",
+      "texture"
+    ],
+    "linuxArm64ClientEntryQualified": true,
+    "linuxArm64ClientGruntSyntheticPeerQualified": true,
+    "linuxArm64ClientLoopbackTransportQualified": true,
+    "linuxArm64ClientOfflineBoundariesQualified": true,
+    "linuxArm64CodecQualified": true,
+    "linuxArm64FmodPcmTransportQualified": true,
+    "linuxArm64VulkanEngineFrameReadbackQualified": true,
+    "linuxArm64VulkanPresentationQualified": true,
+    "linuxArm64VulkanTextureLifecycleQualified": true,
+    "namespaceExit": 0,
+    "privatePeCopyMarkerObserved": true,
+    "privatePeCopyRequested": true,
+    "processNamespaceExited": true,
+    "renderingQualified": false,
+    "runtimeArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+    "runtimeLockSha256": "5816a07061c308a6a515d3747da2b7e3adfb8b22b6e6827819f590b1214fe04b",
+    "runtimeReceiptSha256": "f850e9a83b7d4cf243c2fb39da575385cbeadc5e759289d17912f612c2ed596a",
+    "scope": "native-linux-arm64-wine-component-fixtures",
+    "serverRuntimeIncluded": false,
+    "softwareGraphics": {
+      "components": {
+        "opt/wine/lib/wine/aarch64-unix/winevulkan.so": {
+          "bytes": 854160,
+          "elfClass": 2,
+          "elfMachine": 183,
+          "sha256": "1f3ad380d36fb467988d20eea122b0000fe52afc1258f7eb9635963fad45ef68"
+        },
+        "usr/lib/aarch64-linux-gnu/libvulkan.so.1.3.239": {
+          "bytes": 526896,
+          "elfClass": 2,
+          "elfMachine": 183,
+          "sha256": "605f52f426f01a2c468ecd920b3de31452fde495f2c0d99602fffb93e782767c"
+        },
+        "usr/lib/aarch64-linux-gnu/libvulkan_lvp.so": {
+          "bytes": 6569376,
+          "elfClass": 2,
+          "elfMachine": 183,
+          "sha256": "ce6f6917dd22ed612ae8649a9eb9c615a973a2e9eb9a58b8cc8655f22c933c6b"
+        },
+        "usr/share/vulkan/icd.d/lvp_icd.aarch64.json": {
+          "bytes": 162,
+          "sha256": "0950c584a06fc5531dbaedef764764cd8f4af5e4390d416971db7c62e85da22f"
+        }
+      },
+      "expectedAdapterPrefix": "Vulkan adapter: llvmpipe",
+      "icdApiVersion": "1.1.230",
+      "icdLibrary": "/usr/lib/aarch64-linux-gnu/libvulkan_lvp.so",
+      "icdPath": "usr/share/vulkan/icd.d/lvp_icd.aarch64.json",
+      "runtimeArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+      "status": "separate-software-reference-only"
+    },
+    "wineEnvironment": {
+      "WINE_ANDROID_PRIVATE_PE_COPY": "1"
+    },
+    "worker": {
+      "audio": {
+        "dsound": {
+          "driverSelectionExit": 0,
+          "fixtureExit": 0,
+          "messageMatched": true,
+          "outputDevice": "FMOD output: DirectSound; device: Out: default; version: 00040907",
+          "pcm": {
+            "androidAudioQualified": false,
+            "audibleOutputQualified": false,
+            "failures": [],
+            "pcmSignalQualified": true,
+            "physicalLatencyQualified": false,
+            "playbackClock": "simulated-monotonic",
+            "scope": "linux-fmod-wine-alsa-pcm-capture-only",
+            "streams": [
+              {
+                "amplitudes1k2k": [
+                  [
+                    6350.261243682519,
+                    0.023511685318803117
+                  ],
+                  [
+                    0.03424021448624575,
+                    6350.290679634079
+                  ]
+                ],
+                "bytes": 495324,
+                "cleanEof": true,
+                "commands": 1185,
+                "configured": true,
+                "file": "audio-dsound-captured-00.s16le",
+                "frames": 123831,
+                "knownStereoSignalMatched": true,
+                "rms": [
+                  5099.83054520638,
+                  5099.856836081601
+                ],
+                "sha256": "67d7f3228ab140821dfa29a9baf56a590d2cab67a69a2a81975513472ff8f260",
+                "strongSamples": [
+                  91999,
+                  87999
+                ]
+              }
+            ],
+            "totalBytes": 495324
+          },
+          "pcmEofDrained": true,
+          "wineStopExit": 0,
+          "wineWaitExit": 0
+        },
+        "winmm": {
+          "driverSelectionExit": 0,
+          "fixtureExit": 0,
+          "messageMatched": true,
+          "outputDevice": "FMOD output: WinMM; device: Out: default; version: 00040907",
+          "pcm": {
+            "androidAudioQualified": false,
+            "audibleOutputQualified": false,
+            "failures": [],
+            "pcmSignalQualified": true,
+            "physicalLatencyQualified": false,
+            "playbackClock": "simulated-monotonic",
+            "scope": "linux-fmod-wine-alsa-pcm-capture-only",
+            "streams": [
+              {
+                "amplitudes1k2k": [
+                  [
+                    6423.401214386829,
+                    0.023782484252805554
+                  ],
+                  [
+                    0.03463458066872757,
+                    6423.4309893708405
+                  ]
+                ],
+                "bytes": 489684,
+                "cleanEof": true,
+                "commands": 1346,
+                "configured": true,
+                "file": "audio-winmm-captured-00.s16le",
+                "frames": 122421,
+                "knownStereoSignalMatched": true,
+                "rms": [
+                  5129.115448612574,
+                  5129.1418904586435
+                ],
+                "sha256": "990cf91150e43ed1783ad98301df8efc004511ef286f31b8d98486b9935a857e",
+                "strongSamples": [
+                  91999,
+                  87999
+                ]
+              }
+            ],
+            "totalBytes": 489684
+          },
+          "pcmEofDrained": true,
+          "wineStopExit": 0,
+          "wineWaitExit": 0
+        }
+      },
+      "clientAuth": {
+        "cases": [
+          {
+            "exitCode": 0,
+            "mode": "valid",
+            "peerObservedClose": true,
+            "peerVerifiedClientProof": true
+          },
+          {
+            "exitCode": 65,
+            "mode": "bad-server-proof",
+            "peerObservedClose": true,
+            "peerVerifiedClientProof": true
+          },
+          {
+            "exitCode": 65,
+            "mode": "remote-realm",
+            "peerObservedClose": true,
+            "peerVerifiedClientProof": true
+          }
+        ],
+        "compiledServerQualified": false,
+        "existingOutputsPreserved": true,
+        "gameInitializationStarted": false,
+        "gameplayQualified": false,
+        "privateOutputsRemoved": true,
+        "privateSessionKeyMatched": true,
+        "qualified": true,
+        "receipt": {
+          "architecture": "ARM64",
+          "assetsLoaded": false,
+          "authentications": 1,
+          "checks": {
+            "actualCommandParser": true,
+            "connectedCallback": true,
+            "connectionRefsReleased": true,
+            "controlledDisconnect": true,
+            "gruntTimerJoined": true,
+            "gruntTimerThread": true,
+            "localOfflineEnabled": true,
+            "networkThreadsJoined": true,
+            "newSessionRequest": true,
+            "realmListCallback": true,
+            "serverProofVerified": true,
+            "twoWorkerThreads": true,
+            "versionChallengeObserved": true
+          },
+          "commonMainStarted": false,
+          "compiledServerQualified": false,
+          "fixtureId": "3a8878663aacb0f0dfa856d0a2932655",
+          "gameplayQualified": false,
+          "privateSessionKeyBytes": 40,
+          "protocolBuild": 12340,
+          "realmBuildPresent": true,
+          "realmFlags": 6,
+          "realmId": 1,
+          "realms": 1,
+          "schemaVersion": 1,
+          "scope": "executable-grunt-authentication-only",
+          "versionChecksumQualified": false,
+          "worldEndpoint": "127.0.0.1:8085",
+          "worldEntryQualified": false
+        },
+        "receiptSha256": "1b65bf789b9b656f56d6412580ef2bbffbae8ff2b6af9b479b1b8532effec312",
+        "receiptValidated": true,
+        "scope": "linux-arm64-wine-grunt-synthetic-peer-only",
+        "worldEntryQualified": false
+      },
+      "clientEntry": {
+        "exitCode": 0,
+        "launchAttempted": true,
+        "messageObserved": true,
+        "receipt": {
+          "architecture": "ARM64",
+          "assetsLoaded": false,
+          "checks": {
+            "cppUnwind": true,
+            "crtInitialized": true,
+            "fiberReturn": true,
+            "fpControlRead": true,
+            "imageEntryReached": true,
+            "mainFiber": true,
+            "stormAllocator": true
+          },
+          "commonMainStarted": false,
+          "extensionVersion": 4,
+          "protocolBuild": 12340,
+          "schemaVersion": 1,
+          "scope": "executable-entry-only"
+        },
+        "receiptSha256": "0ed74a49d5f65c792391394fda20187fe07e9d99d3f6de582db17a07e25d356b",
+        "receiptValidated": true
+      },
+      "clientLoopback": {
+        "exitCode": 0,
+        "receipt": {
+          "architecture": "ARM64",
+          "assetsLoaded": false,
+          "authenticationQualified": false,
+          "checks": {
+            "actualCommandParser": true,
+            "connectionRefsReleased": true,
+            "controlledDisconnectCallbacks": true,
+            "localOfflineEnabled": true,
+            "loopbackConnectCallbacks": true,
+            "networkThreadsJoined": true,
+            "partialFrameHeaders": true,
+            "queuedPacketSendBytes": true,
+            "shortAndExtendedFrameBytes": true,
+            "stopTimeoutRetainsNetwork": true,
+            "streamReadAndSendBytes": true,
+            "twoWorkerThreads": true
+          },
+          "commonMainStarted": false,
+          "connections": 2,
+          "gameplayQualified": false,
+          "protocolBuild": 12340,
+          "receivedFrames": 2,
+          "receivedStreamBytes": 1027,
+          "schemaVersion": 1,
+          "scope": "executable-loopback-transport-only",
+          "sentFrames": 2,
+          "sentStreamBytes": 1031
+        },
+        "receiptSha256": "bb8f70ff9fda6fb9939fa4046ff613249220e29d3e6bf30bfc6365300197aaee",
+        "receiptValidated": true
+      },
+      "clientOffline": {
+        "--local-offline": {
+          "exitCode": 0,
+          "receipt": {
+            "architecture": "ARM64",
+            "assetsLoaded": false,
+            "checks": {
+              "actualCommandParser": true,
+              "blizzardUrlRejected": true,
+              "connectFailureCallbacks": true,
+              "connectionRefsReleased": true,
+              "hostConnectionRejected": true,
+              "initiationFailureCallbacksPreserved": true,
+              "invalidPortRejected": true,
+              "numericConnectionRejected": true,
+              "osUrlRejected": true,
+              "trackerReturned": true
+            },
+            "commonMainStarted": false,
+            "failureCallbacks": 3,
+            "loopbackGameplayQualified": false,
+            "protocolBuild": 12340,
+            "remoteAttemptsRejected": 3,
+            "schemaVersion": 1,
+            "scope": "executable-local-offline-boundaries-only"
+          },
+          "receiptSha256": "a0a8ea79b80b80bf73766539cc4d6f64c38c4f599e760b7cf267a7f0f1a027c2",
+          "receiptValidated": true
+        },
+        "-local-offline": {
+          "exitCode": 0,
+          "receipt": {
+            "architecture": "ARM64",
+            "assetsLoaded": false,
+            "checks": {
+              "actualCommandParser": true,
+              "blizzardUrlRejected": true,
+              "connectFailureCallbacks": true,
+              "connectionRefsReleased": true,
+              "hostConnectionRejected": true,
+              "initiationFailureCallbacksPreserved": true,
+              "invalidPortRejected": true,
+              "numericConnectionRejected": true,
+              "osUrlRejected": true,
+              "trackerReturned": true
+            },
+            "commonMainStarted": false,
+            "failureCallbacks": 3,
+            "loopbackGameplayQualified": false,
+            "protocolBuild": 12340,
+            "remoteAttemptsRejected": 3,
+            "schemaVersion": 1,
+            "scope": "executable-local-offline-boundaries-only"
+          },
+          "receiptSha256": "a0a8ea79b80b80bf73766539cc4d6f64c38c4f599e760b7cf267a7f0f1a027c2",
+          "receiptValidated": true
+        }
+      },
+      "codecMessageMatched": true,
+      "displayReady": true,
+      "expectedExit": 0,
+      "fixtureExit": 0,
+      "graphics": {
+        "presentation": {
+          "adapter": "Vulkan adapter: llvmpipe (LLVM 15.0.6, 128 bits); VID 10005 DID 0000, api 1.3.230, driver 0.0.1",
+          "engineFrameMessageMatched": true,
+          "exitCode": 0,
+          "messageMatched": true,
+          "softwareAdapterMatched": true,
+          "validationCallbackActive": false
+        },
+        "texture": {
+          "adapter": "Vulkan adapter: llvmpipe (LLVM 15.0.6, 128 bits); VID 10005 DID 0000, api 1.3.230, driver 0.0.1",
+          "exitCode": 0,
+          "messageMatched": true,
+          "softwareAdapterMatched": true,
+          "validationCallbackActive": false
+        }
+      },
+      "logStreamsDrained": true,
+      "logWritesSucceeded": true,
+      "logsWithinLimit": true,
+      "networkIsolated": true,
+      "prefixExit": 0,
+      "privatePeCopyMarkerObserved": true,
+      "privatePeCopyRequested": true,
+      "wineStopExit": 0,
+      "wineStopSource": "audio-dsound",
+      "wineWaitExit": 0,
+      "workerCompleted": true
+    }
+  },
+  "qualificationSourceArtifact": {
+    "bytes": 1899284881,
+    "id": 12983707985,
+    "sha256": "9e625904863a2f4737f11dbcd0f6a0cd15f09448c80de6599ae691720d7c8b50"
+  },
+  "receipts": {
+    "client-evidence/qualification.json": {
+      "bytes": 20394,
+      "sha256": "3bf3c8ecd63fca63e764ff6eb98d30e1dd25917e0faad682e63ae6000a29684c"
+    },
+    "client-evidence/worker-result.json": {
+      "bytes": 9804,
+      "sha256": "0c742681a23f6e6f975747d6fba3a32d8902a6a3e4013efec19412dbe8054bc2"
+    },
+    "client-source-readback.json": {
+      "bytes": 955,
+      "sha256": "413a178d089c861073409a4247b0daee9f307578216e1d90c2ac94401e53e199"
+    },
+    "preparation.json": {
+      "bytes": 246312,
+      "sha256": "744cc895442cb2e1be916f3b384f01668e956eed83f23bddc1d516b681b71d89"
+    },
+    "runtime-source-readback.json": {
+      "bytes": 4082,
+      "sha256": "7ca34e9e862c7bacd5ce4674a2a002df42f8fac398ddc0a1f11f7e7412a09668"
+    }
+  },
+  "repository": "Russianranger/esteria_android",
+  "runtimeRecompiled": false,
+  "scope": "actual-native-linux-arm64-selected471-on-retained-source-owned-wine-component-evidence",
+  "selected471ActualComponentGatesPassed": true,
+  "selectedClientInput": {
+    "androidRuntimeQualified": false,
+    "artifact": {
+      "bytes": 45848847,
+      "sha256": "befac98c5c3434ea94dcb878f5da37f915946221fb17f1a7888c65f74bb846ad"
+    },
+    "artifactId": 12979433537,
+    "buildId": "41061576677.1",
+    "buildManifestSha256": "ed34b6f648026073ba43203bee7e3dd1ca1d2413017fb99d8da54dab57808559",
+    "formatVersion": 1,
+    "scope": "measured-reconstructed-client-provider-inputs",
+    "sourceRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+    "workflowRun": 41061576677
+  },
+  "selectedRuntimeInput": {
+    "androidQualified": false,
+    "artifact": {
+      "bytes": 282903224,
+      "sha256": "2c1b248bdc3605505bf6248066ccd6ed323242bbf2f04e08cab772aff11c87df"
+    },
+    "artifactId": 12982441891,
+    "evidenceArtifact": {
+      "bytes": 181600,
+      "sha256": "b9bb18a04d3c529b4153eb3077438159c10fcdcf35f75718f340e6d2f7790e7a"
+    },
+    "evidenceArtifactId": 12981467294,
+    "files": {
+      "candidate-runtime.lock.json": {
+        "bytes": 102647,
+        "sha256": "5816a07061c308a6a515d3747da2b7e3adfb8b22b6e6827819f590b1214fe04b"
+      },
+      "package-build-receipt.json": {
+        "bytes": 19890,
+        "sha256": "db0f3431aa47c20e41219201246c3f406f46598235e35c31d1f4b45577523f37"
+      },
+      "runtime.json": {
+        "bytes": 66640,
+        "sha256": "4b731a5f450a556632c598ddebda2ec3f814c8d7ea2c9e1529d6c80c8773e0a5"
+      },
+      "sources.lock.json": {
+        "bytes": 18146,
+        "sha256": "077fb2b0883986338b6755e53f5cede08bd63ed1834783e7e6cd079e0ec0c16d"
+      },
+      "wine-arm64.manifest.json": {
+        "bytes": 66773,
+        "sha256": "d6c98cca860d324113c434cd0ccd1709e19e2dfac1a03b1f248b479f50303267"
+      },
+      "wine-arm64.tar.gz": {
+        "bytes": 282628308,
+        "sha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46"
+      }
+    },
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "hostQualificationReceipt": {
+      "bytes": 20396,
+      "sha256": "fdefa5c028aa21a5bb4b94b408725d7062d7b5f7eba8b6704224dd70c8d2dfd4"
+    },
+    "originalNativeClientComponentGatesPassed": true,
+    "originalNativeClientRevision": "0f931bbade36a4b197725d691b8eff7caea7b3be",
+    "scope": "measured-native-arm64-wine-host-candidate-inputs",
+    "sourceBuildPassed": true,
+    "sourceReadbackReceipt": {
+      "bytes": 1530,
+      "sha256": "da37376ccb72d18b2b50f327ed12a65ceccce665f2ef399be8e571b0b6f95b1c"
+    },
+    "sourceRevision": "681b2e9f30b19e94bf8e8de44f67fedba5033c8a",
+    "sourcesArtifact": {
+      "bytes": 1681474721,
+      "sha256": "38e16617545abb16f995ba75a8b52b8ca2bacad5d2688adf3646911f16c8fb06"
+    },
+    "sourcesArtifactId": 12982282257,
+    "sourcesPrefix": "wine-arm64-sources/",
+    "workflowRun": 41057900330
+  },
+  "sourceArchiveRepacked": false,
+  "workflowJob": 124108045314,
+  "workflowPath": ".github/workflows/wine-arm64-requalification.yml",
+  "workflowRun": 41069065089,
+  "worldEntryQualified": false
+}

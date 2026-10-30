@@ -1,0 +1,372 @@
+{
+  "androidQualified": false,
+  "components": {
+    "usr/bin/Xtigervnc": {
+      "bytes": 2719912,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "d89fedbd07ad83a7ccc669396f3030e9940dad2a30bf299a063093e6efa913de"
+    },
+    "usr/bin/xkbcomp": {
+      "bytes": 209552,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "3771eeb1e05f06af1f4f0fbafb3500cdd0794ab268732f318d8b3433692ea7c5"
+    },
+    "usr/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1": {
+      "bytes": 202912,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "17538b8f9889a470c061f69a8fea8124da89627311cd16546c133a89f09056df"
+    },
+    "usr/lib/aarch64-linux-gnu/libGL.so.1.7.0": {
+      "bytes": 985192,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "99c2cde6f0586ad932d13c9cc344e752c694cd3d45a33d3b2633e0c971d7cef8"
+    },
+    "usr/lib/aarch64-linux-gnu/libGLX.so.0.0.0": {
+      "bytes": 199032,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "e2a6d5ea771bd4ab1b751528ba48264b41b63bce344041da599e37da251880a7"
+    },
+    "usr/lib/aarch64-linux-gnu/libGLdispatch.so.0.0.0": {
+      "bytes": 1575160,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "6d6da001d8112cdef30a72ed62b97f7e274cd81469effa759a133f9ba2c30c61"
+    },
+    "usr/lib/aarch64-linux-gnu/libX11.so.6.4.0": {
+      "bytes": 1329712,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "8371115a64330431c1e0f332ea668bbff10a11bef18e0800b5306ffdca595e1a"
+    },
+    "usr/lib/aarch64-linux-gnu/libXau.so.6.0.0": {
+      "bytes": 14416,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "d43657a20d5b1b779e91e417f31e3deaccbcede10d7dd38991e31b86e550152b"
+    },
+    "usr/lib/aarch64-linux-gnu/libXdmcp.so.6.0.0": {
+      "bytes": 22576,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "cff589ca553d339123ba32528cdf45f071761624aef1ebb4b3970fe9180b7e3b"
+    },
+    "usr/lib/aarch64-linux-gnu/libXext.so.6.4.0": {
+      "bytes": 134696,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "136fdffc957db4f1af62ca787fdd5f00053c2477e68ce93d52a57952acb1f8ea"
+    },
+    "usr/lib/aarch64-linux-gnu/libXfont2.so.2.0.0": {
+      "bytes": 202320,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "e531d6a6a82c026c6dc0b6936570d7aa8533fef2b746fe6423fa6dcc1391e288"
+    },
+    "usr/lib/aarch64-linux-gnu/libaudit.so.1.0.0": {
+      "bytes": 132984,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "5a22c8b2977c4e5d32688e5c1e2d8af3620c1798f94b64f7cd6a22c005abb5bd"
+    },
+    "usr/lib/aarch64-linux-gnu/libbrotlicommon.so.1.0.9": {
+      "bytes": 133232,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "2ce3a413fc7d78df3eaab94556ea2e7dc128964419dab6dd3da3970957419019"
+    },
+    "usr/lib/aarch64-linux-gnu/libbrotlidec.so.1.0.9": {
+      "bytes": 67688,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "a8678f6c5dc78b0ba8ca1c798055e04fa0fb9bfe04bded5c7a35bfb3df46bef2"
+    },
+    "usr/lib/aarch64-linux-gnu/libbsd.so.0.11.7": {
+      "bytes": 133944,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "24f2bb08fed31a04a80f4d0d0145f4cc5f42543af07a364b1fafdd3d2dcbe137"
+    },
+    "usr/lib/aarch64-linux-gnu/libbz2.so.1.0.4": {
+      "bytes": 70504,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "636189620fb8ac7497a8dfba3c77c001f0c27814b16ad822bcf4b8e11f1ffbf7"
+    },
+    "usr/lib/aarch64-linux-gnu/libc.so.6": {
+      "bytes": 1651408,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "e4ac8ae1d81e4865e3aadedb962879cf9415903b3f2ba81ec75e9962b86ab8b0"
+    },
+    "usr/lib/aarch64-linux-gnu/libcap-ng.so.0.0.0": {
+      "bytes": 67504,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "c84ade3b16a3af69ab562f49fd1269c1d6438280909b41a9185caa9e359cec0f"
+    },
+    "usr/lib/aarch64-linux-gnu/libcap.so.2.66": {
+      "bytes": 67552,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "dcb3587efc518852f7a1430594526ee9d7334126a9afb46f23cfa60f1b2d1927"
+    },
+    "usr/lib/aarch64-linux-gnu/libffi.so.8.1.2": {
+      "bytes": 68000,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "cbae420bdec2903fa5943664504b3540091651ac0af76403741a8c14d5b018da"
+    },
+    "usr/lib/aarch64-linux-gnu/libfontenc.so.1.0.0": {
+      "bytes": 30176,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "70d9bc8d141ed7ce1ffbcb5f8e396a7173b8709ab5dbe96b4c584a06ad5448c1"
+    },
+    "usr/lib/aarch64-linux-gnu/libfreetype.so.6.18.3": {
+      "bytes": 788568,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "aeb963698e88c23790f2db1bf36abdf650152253f7b25cdb90fee080c5e09c4a"
+    },
+    "usr/lib/aarch64-linux-gnu/libgcc_s.so.1": {
+      "bytes": 133448,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "046856f95f4636f1fc7c3a12bf4f3cd5634c2fc5145c3fdf7395d4f349fa69c7"
+    },
+    "usr/lib/aarch64-linux-gnu/libgcrypt.so.20.4.1": {
+      "bytes": 1000296,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "01c8f6929c4c5853f8204a727e2be5fc3f7cef3f850e2818558800aa5f78c80e"
+    },
+    "usr/lib/aarch64-linux-gnu/libgmp.so.10.4.1": {
+      "bytes": 529184,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "391b336ee37cd47a1d4748ba2d15bd125c1a082864f7bca9c92612f8a0ac305e"
+    },
+    "usr/lib/aarch64-linux-gnu/libgnutls.so.30.34.3": {
+      "bytes": 2303440,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "a28310df0a36465608473face05bf89b87759804bd0df83b161d564b9804b3fc"
+    },
+    "usr/lib/aarch64-linux-gnu/libgpg-error.so.0.33.1": {
+      "bytes": 198640,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "44c67a9e7a5cfc227e84dcb8f96463103c12415286a8e003bc66abebc4b1f6bd"
+    },
+    "usr/lib/aarch64-linux-gnu/libhogweed.so.6.6": {
+      "bytes": 329656,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "07ffe03d318b7819b94988a810b153909257f72fba0b1843ced7bc619312a93c"
+    },
+    "usr/lib/aarch64-linux-gnu/libidn2.so.0.3.8": {
+      "bytes": 198664,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "7a596ba5e585c8132d02ec8c3e83f15b1767ade6b735a4f0814ced6d0f1bf985"
+    },
+    "usr/lib/aarch64-linux-gnu/libjpeg.so.62.3.0": {
+      "bytes": 395264,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "4021b9b82df1affabe252aec393c00f2ec61b7ab570e760f4b4cf76db9b449ab"
+    },
+    "usr/lib/aarch64-linux-gnu/liblz4.so.1.9.4": {
+      "bytes": 199056,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "43109ed13afa34ff991ed73c4d520c5056378949b17d77c50d5773c5aa851439"
+    },
+    "usr/lib/aarch64-linux-gnu/liblzma.so.5.4.1": {
+      "bytes": 198584,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "924ccb8732eb12d1c09f992b1a42a1f2023b666ba54c2ba47af78b2277fe9376"
+    },
+    "usr/lib/aarch64-linux-gnu/libm.so.6": {
+      "bytes": 591960,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "3c4cb3be0b974edf05f023f85ab15107fb5afc2687163593d0d4cf8e80c17b39"
+    },
+    "usr/lib/aarch64-linux-gnu/libmd.so.0.0.5": {
+      "bytes": 67704,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "be8d151f2f06935db812859f575ec818af7fd93eaab0ec4e7dae9e5ad7ca38bb"
+    },
+    "usr/lib/aarch64-linux-gnu/libnettle.so.8.6": {
+      "bytes": 329736,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "d534bf67fcfa3c9bbead7a0a3d55244764eab87de1f85143948e6edbb74c4749"
+    },
+    "usr/lib/aarch64-linux-gnu/libp11-kit.so.0.3.0": {
+      "bytes": 1351264,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "d6cb9154d510d036aa7270369ba602df62e45caf9c410f6de2e60dca32e3a80e"
+    },
+    "usr/lib/aarch64-linux-gnu/libpam.so.0.85.1": {
+      "bytes": 67512,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "cb005bb0077bba0ed3b66cc7936c0ee5ecc72c7813e5ec813f442bb484f7fc43"
+    },
+    "usr/lib/aarch64-linux-gnu/libpcre2-8.so.0.11.2": {
+      "bytes": 592440,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "db182f6ef386601dc8085e0e30525bf4445b7e5540fd76430b0269de968fa7c9"
+    },
+    "usr/lib/aarch64-linux-gnu/libpixman-1.so.0.42.2": {
+      "bytes": 657360,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "e999186992ae77d42b482821f8a37115b88f02f914f6f7ac29d301baa3c3f097"
+    },
+    "usr/lib/aarch64-linux-gnu/libpng16.so.16.39.0": {
+      "bytes": 264040,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "d7c94cd4dc66ab143dcb8dca7c31b6c8dd5f7c876a77793ba4aeb6c5b94c54c0"
+    },
+    "usr/lib/aarch64-linux-gnu/libselinux.so.1": {
+      "bytes": 198800,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "6f51339a6f92f88785dfcfdb13194c3d10cb10ccee1d0ddb5b3e3445145c761c"
+    },
+    "usr/lib/aarch64-linux-gnu/libstdc++.so.6.0.30": {
+      "bytes": 2174296,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "532f3a12d7b8fef6cc7a064ea106b6c4ab2365674b73e743e4a385d4ffb6c8ab"
+    },
+    "usr/lib/aarch64-linux-gnu/libsystemd.so.0.35.0": {
+      "bytes": 923696,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "e38e0c11131d330c9a49a4a7f9437f8cf9d6a198355a47ecff02bc4aabe52171"
+    },
+    "usr/lib/aarch64-linux-gnu/libtasn1.so.6.6.3": {
+      "bytes": 133048,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "9ca4614b9dabf3c2a094dda8a0be33144144ded8094827db8ababcfc22f09d6a"
+    },
+    "usr/lib/aarch64-linux-gnu/libunistring.so.2.2.0": {
+      "bytes": 1771448,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "58aceeb77aed45910b4f5abc1d2c51a964a10d5008609e0b4b57dd4e7eeba570"
+    },
+    "usr/lib/aarch64-linux-gnu/libxcb.so.1.1.0": {
+      "bytes": 199544,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "a1087fa3ff008f9b38c7dc70f3f4734fc26cb513025c033acc4e3a9b17475aa4"
+    },
+    "usr/lib/aarch64-linux-gnu/libxkbfile.so.1.0.2": {
+      "bytes": 155632,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "8d8462b7082bd7eaf1ac03e0ea195e81c2bcd52d16db7a7bcd1a258c7322ad58"
+    },
+    "usr/lib/aarch64-linux-gnu/libz.so.1.2.13": {
+      "bytes": 133520,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "ffb1ab496e6eced03ab679075f9f2c415c7728a145cc7f63d614497102d73822"
+    },
+    "usr/lib/aarch64-linux-gnu/libzstd.so.1.5.4": {
+      "bytes": 657352,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "63ff891e4316be1d30a8e551ded6cbb0283772105b352103608e60c06c95ac15"
+    }
+  },
+  "entrypoints": [
+    "usr/bin/Xtigervnc",
+    "usr/bin/xkbcomp"
+  ],
+  "formatVersion": 1,
+  "inputQualified": false,
+  "loaderConfiguration": {
+    "etc/ld.so.cache": {
+      "bytes": 11647,
+      "sha256": "7e374c151b5f92e2e5f93f19ceedd78fa157c0baffdb13125f5a8423d50a6c78"
+    },
+    "etc/ld.so.conf": {
+      "bytes": 34,
+      "sha256": "d4b198c463418b493208485def26a6f4c57279467b9dfa491b70433cedb602e8"
+    },
+    "etc/ld.so.conf.d/aarch64-linux-gnu.conf": {
+      "bytes": 103,
+      "sha256": "0a4000ec63eff65b2a41d8cab5688b6bd81efab5fbcabd72036ece1d227bf08a"
+    },
+    "etc/ld.so.conf.d/libc.conf": {
+      "bytes": 44,
+      "sha256": "90d4c7e43e7661cd116010eb9f50ad5817e43162df344bd1ad10898851b15d41"
+    }
+  },
+  "preloadFileAbsent": true,
+  "runtimeArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+  "scope": "pinned-wine-rootfs-x11-static-library-closure",
+  "symlinks": {
+    "lib": "usr/lib",
+    "lib/ld-linux-aarch64.so.1": "aarch64-linux-gnu/ld-linux-aarch64.so.1",
+    "usr/lib/aarch64-linux-gnu/libGL.so.1": "libGL.so.1.7.0",
+    "usr/lib/aarch64-linux-gnu/libGLX.so.0": "libGLX.so.0.0.0",
+    "usr/lib/aarch64-linux-gnu/libGLdispatch.so.0": "libGLdispatch.so.0.0.0",
+    "usr/lib/aarch64-linux-gnu/libX11.so.6": "libX11.so.6.4.0",
+    "usr/lib/aarch64-linux-gnu/libXau.so.6": "libXau.so.6.0.0",
+    "usr/lib/aarch64-linux-gnu/libXdmcp.so.6": "libXdmcp.so.6.0.0",
+    "usr/lib/aarch64-linux-gnu/libXext.so.6": "libXext.so.6.4.0",
+    "usr/lib/aarch64-linux-gnu/libXfont2.so.2": "libXfont2.so.2.0.0",
+    "usr/lib/aarch64-linux-gnu/libaudit.so.1": "libaudit.so.1.0.0",
+    "usr/lib/aarch64-linux-gnu/libbrotlicommon.so.1": "libbrotlicommon.so.1.0.9",
+    "usr/lib/aarch64-linux-gnu/libbrotlidec.so.1": "libbrotlidec.so.1.0.9",
+    "usr/lib/aarch64-linux-gnu/libbsd.so.0": "libbsd.so.0.11.7",
+    "usr/lib/aarch64-linux-gnu/libbz2.so.1.0": "libbz2.so.1.0.4",
+    "usr/lib/aarch64-linux-gnu/libcap-ng.so.0": "libcap-ng.so.0.0.0",
+    "usr/lib/aarch64-linux-gnu/libcap.so.2": "libcap.so.2.66",
+    "usr/lib/aarch64-linux-gnu/libffi.so.8": "libffi.so.8.1.2",
+    "usr/lib/aarch64-linux-gnu/libfontenc.so.1": "libfontenc.so.1.0.0",
+    "usr/lib/aarch64-linux-gnu/libfreetype.so.6": "libfreetype.so.6.18.3",
+    "usr/lib/aarch64-linux-gnu/libgcrypt.so.20": "libgcrypt.so.20.4.1",
+    "usr/lib/aarch64-linux-gnu/libgmp.so.10": "libgmp.so.10.4.1",
+    "usr/lib/aarch64-linux-gnu/libgnutls.so.30": "libgnutls.so.30.34.3",
+    "usr/lib/aarch64-linux-gnu/libgpg-error.so.0": "libgpg-error.so.0.33.1",
+    "usr/lib/aarch64-linux-gnu/libhogweed.so.6": "libhogweed.so.6.6",
+    "usr/lib/aarch64-linux-gnu/libidn2.so.0": "libidn2.so.0.3.8",
+    "usr/lib/aarch64-linux-gnu/libjpeg.so.62": "libjpeg.so.62.3.0",
+    "usr/lib/aarch64-linux-gnu/liblz4.so.1": "liblz4.so.1.9.4",
+    "usr/lib/aarch64-linux-gnu/liblzma.so.5": "liblzma.so.5.4.1",
+    "usr/lib/aarch64-linux-gnu/libmd.so.0": "libmd.so.0.0.5",
+    "usr/lib/aarch64-linux-gnu/libnettle.so.8": "libnettle.so.8.6",
+    "usr/lib/aarch64-linux-gnu/libp11-kit.so.0": "libp11-kit.so.0.3.0",
+    "usr/lib/aarch64-linux-gnu/libpam.so.0": "libpam.so.0.85.1",
+    "usr/lib/aarch64-linux-gnu/libpcre2-8.so.0": "libpcre2-8.so.0.11.2",
+    "usr/lib/aarch64-linux-gnu/libpixman-1.so.0": "libpixman-1.so.0.42.2",
+    "usr/lib/aarch64-linux-gnu/libpng16.so.16": "libpng16.so.16.39.0",
+    "usr/lib/aarch64-linux-gnu/libstdc++.so.6": "libstdc++.so.6.0.30",
+    "usr/lib/aarch64-linux-gnu/libsystemd.so.0": "libsystemd.so.0.35.0",
+    "usr/lib/aarch64-linux-gnu/libtasn1.so.6": "libtasn1.so.6.6.3",
+    "usr/lib/aarch64-linux-gnu/libunistring.so.2": "libunistring.so.2.2.0",
+    "usr/lib/aarch64-linux-gnu/libxcb.so.1": "libxcb.so.1.1.0",
+    "usr/lib/aarch64-linux-gnu/libxkbfile.so.1": "libxkbfile.so.1.0.2",
+    "usr/lib/aarch64-linux-gnu/libz.so.1": "libz.so.1.2.13",
+    "usr/lib/aarch64-linux-gnu/libzstd.so.1": "libzstd.so.1.5.4"
+  }
+}

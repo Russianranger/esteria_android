@@ -1,0 +1,165 @@
+name: Source-owned ARM64 Wine provider rebuild candidates
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - runtime/wine-arm64-adoption/**
+      - tools/prepare_wine_arm64_adoption.py
+      - tools/measure_wine_x11_closure.py
+      - tests/test_wine_adoption.py
+      - tests/test_wine_x11_closure.py
+      - .github/workflows/wine-arm64-provider-candidate.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: wine-arm64-provider-candidate-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  rebuild:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify new input selection and existing rejection contracts
+        id: inputs
+        run: |
+          test "$(uname -m)" = aarch64
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y openjdk-17-jdk-headless iproute2 util-linux binutils
+          ESTERIA_REQUIRE_JAVA_TESTS=1 python3 -m unittest tests.test_wine_adoption tests.test_wine_x11_closure tests.test_x11_input_qualification -v
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          from tools.wine_arm64_requalification import pins
+          runtime,_=pins()
+          print('runtime_revision='+runtime['sourceRevision'])
+          PY
+          mkdir -p out/wine-provider-candidate/evidence out/wine-provider-candidate/source-selection
+      - name: Validate exact retained runtime and entire original source companion before execution
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          RUNTIME_REVISION: ${{ steps.inputs.outputs.runtime_revision }}
+        run: |
+          git fetch --no-tags --depth 1 origin "$RUNTIME_REVISION"
+          python3 tools/wine_arm64_requalification.py fetch --output "$RUNNER_TEMP/wine-provider-inputs" \
+            > out/wine-provider-candidate/evidence/runtime-source-readback.json
+          python3 tools/prepare_wine_arm64_adoption.py \
+            --runtime-package "$RUNNER_TEMP/wine-provider-inputs/runtime-package" \
+            --host-evidence runtime/evidence/wine-arm64-selected471-41069065089.json \
+            --output "$RUNNER_TEMP/wine-provider-adoption" \
+            > out/wine-provider-candidate/evidence/adoption-preparation.json
+          python3 tools/measure_wine_x11_closure.py \
+            --runtime-package "$RUNNER_TEMP/wine-provider-inputs/runtime-package" \
+            --output "$RUNNER_TEMP/wine-provider-x11" \
+            > out/wine-provider-candidate/evidence/x11-closure-measurement.json
+          cmp "$RUNNER_TEMP/wine-provider-x11/x11-runtime.proposed.lock.json" runtime/wine-arm64-adoption/x11-runtime.lock.json
+          python3 tools/prepare_runtime.py \
+            --lock "$RUNNER_TEMP/wine-provider-inputs/runtime-package/candidate-runtime.lock.json" \
+            --cache "$RUNNER_TEMP/wine-provider-inputs/runtime-package" --stage "$RUNNER_TEMP/wine-provider-runtime" \
+            --report out/wine-provider-candidate/evidence/runtime-preparation.json
+      - name: Seal actual inputs and complete current integration sources
+        run: |
+          cp "$RUNNER_TEMP/wine-provider-inputs/input-evidence.json" out/wine-provider-candidate/source-selection/
+          cp "$RUNNER_TEMP/wine-provider-adoption/adoption-preparation.json" out/wine-provider-candidate/source-selection/
+          cp "$RUNNER_TEMP/wine-provider-adoption/runtime-sources.proposed.lock.json" out/wine-provider-candidate/source-selection/
+          cp runtime/wine-arm64-adoption/x11-runtime.lock.json out/wine-provider-candidate/source-selection/
+          git archive --format=tar "$GITHUB_SHA" > out/wine-provider-candidate/source-selection/integration-source.tar
+          printf '%s\n' "$GITHUB_SHA" > out/wine-provider-candidate/source-selection/integration-revision.txt
+      - name: Rebuild exact X11 PCM helpers and source-owned observer against the new runtime
+        run: |
+          docker build --platform linux/arm64 --target x11-test-export --build-context bridge-src=./native \
+            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt --build-arg INTEGRATION_REVISION="$GITHUB_SHA" \
+            --output type=local,dest=out/wine-provider-candidate/bridge "$RUNNER_TEMP/wine-provider-adoption/bridge-build-context" \
+            > out/wine-provider-candidate/evidence/bridge-build.log 2>&1
+          sudo chown -R "$(id -u):$(id -g)" out/wine-provider-candidate/bridge
+          cp LICENSE out/wine-provider-candidate/bridge/notices/ESTERIA-GPL-3.0
+          cp runtime/bridge-reference.json out/wine-provider-candidate/bridge/corresponding-source/
+      - name: Execute actual application-formatted authenticated X11 against new pinned ELF closure
+        run: |
+          sudo python3 tools/qualify_x11_input.py --runtime "$RUNNER_TEMP/wine-provider-runtime" \
+            --runtime-lock "$RUNNER_TEMP/wine-provider-inputs/runtime-package/candidate-runtime.lock.json" \
+            --x11-runtime-lock runtime/wine-arm64-adoption/x11-runtime.lock.json \
+            --bridge-input-lock "$RUNNER_TEMP/wine-provider-adoption/bridge-build-context/sources.lock.json" \
+            --bridge-dir "$GITHUB_WORKSPACE/out/wine-provider-candidate/bridge" --bridge-revision "$GITHUB_SHA" \
+            --output "$GITHUB_WORKSPACE/out/wine-provider-candidate/evidence/x11"
+      - name: Rebuild exact KGSL Turnip and compiler tools with newly bound original source recipe
+        run: |
+          docker build --platform linux/arm64 --target build --tag "esteria-turnip-candidate:$GITHUB_SHA" \
+            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt --build-arg INTEGRATION_REVISION="$GITHUB_SHA" \
+            "$RUNNER_TEMP/wine-provider-adoption/turnip-build-context" \
+            > out/wine-provider-candidate/evidence/turnip-build.log 2>&1
+          container=$(docker create "esteria-turnip-candidate:$GITHUB_SHA" /bin/true)
+          trap 'docker rm -f "$container" >/dev/null 2>&1 || true' EXIT
+          mkdir -p out/wine-provider-candidate/turnip
+          docker cp "$container:/out/." out/wine-provider-candidate/turnip/
+          sudo chown -R "$(id -u):$(id -g)" out/wine-provider-candidate/turnip
+          cp LICENSE out/wine-provider-candidate/turnip/notices/ESTERIA-GPL-3.0
+      - name: Execute actual compiler fixtures and exact ICD without a GPU inside retained runtime
+        run: |
+          rootfs="$RUNNER_TEMP/wine-provider-runtime/rootfs"
+          payload="$GITHUB_WORKSPACE/out/wine-provider-candidate/turnip"
+          receipt_sha=$(sha256sum "$payload/turnip-build.json" | cut -d ' ' -f 1)
+          sudo mkdir "$rootfs/esteria-turnip-candidate"
+          sudo cp -a "$payload/bin" "$payload/lib" "$payload/turnip-build.json" "$rootfs/esteria-turnip-candidate/"
+          sudo cp "$payload/corresponding-source/build-recipe/run_probe.py" "$payload/corresponding-source/build-recipe/qualify_shaders.py" \
+            "$rootfs/esteria-turnip-candidate/"
+          sudo -n unshare --net chroot "$rootfs" /usr/bin/env -i PATH=/usr/bin:/bin LANG=C.UTF-8 \
+            /usr/bin/python3 /esteria-turnip-candidate/qualify_shaders.py --directory /esteria-turnip-candidate/bin \
+            --output /esteria-turnip-candidate/shader-runtime-check \
+            > out/wine-provider-candidate/evidence/shader-runtime.log 2>&1
+          sudo -n unshare --net chroot "$rootfs" /usr/bin/env -i PATH=/usr/bin:/bin LANG=C.UTF-8 \
+            /usr/bin/python3 /esteria-turnip-candidate/run_probe.py --payload /esteria-turnip-candidate \
+            --output /esteria-turnip-candidate/no-gpu-check --build-sha256 "$receipt_sha" \
+            --source-revision "$GITHUB_SHA" --expect-no-kgsl \
+            > out/wine-provider-candidate/evidence/turnip-runtime.log 2>&1
+          sudo cp -a "$rootfs/esteria-turnip-candidate/shader-runtime-check" "$rootfs/esteria-turnip-candidate/no-gpu-check" "$payload/"
+          sudo chown -R "$(id -u):$(id -g)" "$payload"
+          python3 - <<'PY' > out/wine-provider-candidate/evidence/turnip-runtime-validation.json
+          import json,os
+          from pathlib import Path
+          from runtime.turnip.record_build import validate_no_gpu
+          from tools.package_shader_tools import qualification
+          from tools.wine_arm64_requalification import pins
+          runtime,_=pins();p=Path('out/wine-provider-candidate/turnip')
+          build=json.loads((p/'turnip-build.json').read_text())
+          no_gpu=json.loads((p/'no-gpu-check/qualification.json').read_text())
+          shader=json.loads((p/'shader-runtime-check/qualification.json').read_text())
+          assert build['runtimeArchiveSha256']==runtime['files']['wine-arm64.tar.gz']['sha256']
+          assert build['integrationRevision']==os.environ['GITHUB_SHA']
+          assert no_gpu['qualified'] is True and no_gpu['hardwareQualified'] is False
+          validate_no_gpu(no_gpu['receipt']);qualification(shader)
+          print(json.dumps(dict(scope='native-arm64-candidate-runtime-turnip-and-compiler-components-only',
+            runtimeArchiveSha256=build['runtimeArchiveSha256'],compiledReceipt=build,
+            actualCandidateRuntimeIcdProbe=no_gpu,actualCandidateRuntimeShaderCompiler=shader,
+            productionProvidersRebound=False,androidQualified=False,gameplayQualified=False),indent=2))
+          PY
+      - name: Preserve candidate outputs and bounded diagnostics even after later qualification failures
+        if: always()
+        run: sudo chown -R "$(id -u):$(id -g)" out/wine-provider-candidate
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: native-arm64-new-wine-provider-evidence-${{ github.sha }}
+          path: out/wine-provider-candidate/evidence
+          retention-days: 14
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: unqualified-native-arm64-new-wine-guest-bridges-${{ github.sha }}
+          path: |
+            out/wine-provider-candidate/bridge
+            out/wine-provider-candidate/source-selection
+          retention-days: 14
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: unqualified-native-arm64-new-wine-turnip-${{ github.sha }}
+          path: |
+            out/wine-provider-candidate/turnip
+            out/wine-provider-candidate/source-selection
+          retention-days: 14
+          if-no-files-found: warn
