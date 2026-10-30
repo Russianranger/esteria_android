@@ -48,6 +48,7 @@ public final class SessionSupervisor implements AutoCloseable {
         Active(Component component, Child child) { this.component = component; this.child = child; }
     }
     private final Object lock = new Object();
+    private final Object cleanupLock = new Object();
     private final Observer observer;
     private final Duration stopTimeout;
     private final AtomicBoolean cancelled = new AtomicBoolean();
@@ -57,7 +58,9 @@ public final class SessionSupervisor implements AutoCloseable {
     private volatile String detail = "No session";
     private Thread monitor;
     private volatile Thread startupOwner;
-    private final CountDownLatch stopped = new CountDownLatch(1);
+    private volatile CountDownLatch stopped = new CountDownLatch(1);
+    private volatile Thread cleanupOwner;
+    private Exception terminationFailure;
 
     public SessionSupervisor(Observer observer, Duration stopTimeout) {
         if (stopTimeout.isNegative() || stopTimeout.isZero()) throw new IllegalArgumentException("Invalid stop timeout");
@@ -65,6 +68,14 @@ public final class SessionSupervisor implements AutoCloseable {
     }
     public State state() { return state; }
     public String detail() { return detail; }
+    /** Dependencies remain owned while a later child still needs shutdown. */
+    public List<String> retainedComponents() {
+        synchronized (lock) {
+            List<String> names = new ArrayList<>();
+            for (Active item : active) names.add(item.component.name);
+            return Collections.unmodifiableList(names);
+        }
+    }
 
     /** One supervisor instance owns one session. Call off the Android main thread. */
     public void start(List<Component> components) throws Exception {
@@ -141,23 +152,47 @@ public final class SessionSupervisor implements AutoCloseable {
         }
     }
     private void terminate(Exception failure) {
+        synchronized (cleanupLock) { terminateOwned(failure); }
+    }
+    private void terminateOwned(Exception failure) {
         if (!terminating.compareAndSet(false, true)) return;
-        cancelled.set(true);
-        emit(State.STOPPING, "Saving and stopping local services");
-        List<Active> reverse;
-        synchronized (lock) { reverse = new ArrayList<>(active); }
-        Collections.reverse(reverse);
-        for (Active item : reverse) {
-            try { item.child.stop(stopTimeout); }
-            catch (Exception cleanupFailure) {
-                if (failure == null) failure = new IOException("Shutdown failed for " + item.component.name, cleanupFailure);
-                else failure.addSuppressed(cleanupFailure);
+        CountDownLatch completion = stopped;
+        if (completion.getCount() == 0) { completion = new CountDownLatch(1); stopped = completion; }
+        cleanupOwner = Thread.currentThread();
+        try {
+            if (terminationFailure == null) terminationFailure = failure;
+            else if (failure != null && failure != terminationFailure) terminationFailure.addSuppressed(failure);
+            cancelled.set(true);
+            emit(State.STOPPING, "Saving and stopping local services");
+            List<Active> reverse;
+            synchronized (lock) { reverse = new ArrayList<>(active); }
+            Collections.reverse(reverse);
+            for (Active item : reverse) {
+                try { item.child.stop(stopTimeout); }
+                catch (Exception cleanupFailure) { rememberCleanupFailure(item.component.name, cleanupFailure); }
+                boolean alive = true;
+                try { alive = item.child.isAlive(); }
+                catch (RuntimeException observationFailure) { rememberCleanupFailure(item.component.name, observationFailure); }
+                if (alive) {
+                    // A running world/client must keep its database/display dependencies.
+                    rememberCleanupFailure(item.component.name, new IOException("Owned child is still active; retry shutdown"));
+                    break;
+                }
+                synchronized (lock) { active.remove(item); }
             }
+            List<String> retained = retainedComponents();
+            emit(terminationFailure == null ? State.STOPPED : State.FAILED,
+                    terminationFailure == null ? "Local session stopped" : terminationFailure.getClass().getSimpleName() + ": " +
+                    terminationFailure.getMessage() + (retained.isEmpty() ? "" : "; cleanup ownership retained for " + String.join(", ", retained)));
+        } finally {
+            cleanupOwner = null;
+            terminating.set(false);
+            completion.countDown();
         }
-        synchronized (lock) { active.clear(); }
-        emit(failure == null ? State.STOPPED : State.FAILED,
-                failure == null ? "Local session stopped" : failure.getClass().getSimpleName() + ": " + failure.getMessage());
-        stopped.countDown();
+    }
+    private void rememberCleanupFailure(String component, Exception failure) {
+        if (terminationFailure == null) terminationFailure = new IOException("Shutdown failed for " + component, failure);
+        else terminationFailure.addSuppressed(failure);
     }
     private void emit(State next, String message) {
         state = next; detail = message;
@@ -167,6 +202,10 @@ public final class SessionSupervisor implements AutoCloseable {
     }
     @Override public void close() {
         requestStop();
+        if (cleanupOwner == Thread.currentThread()) return;
+        // A subsequent close explicitly retries retained owners. Preserve the first
+        // failure even if cleanup succeeds later; it is not evidence of a clean save.
+        if (state == State.FAILED && activeCount() != 0) { terminate(null); return; }
         if (state != State.IDLE && !(state == State.STARTING && startupOwner == Thread.currentThread()) && monitor != Thread.currentThread()) {
             try { stopped.await(stopTimeout.toMillis() * Math.max(1, activeCount()) + 1000, TimeUnit.MILLISECONDS); }
             catch (InterruptedException e) { Thread.currentThread().interrupt(); }

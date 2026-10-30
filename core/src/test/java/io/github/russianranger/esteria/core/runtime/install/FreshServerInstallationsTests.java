@@ -119,8 +119,9 @@ public final class FreshServerInstallationsTests {
             Map<String,Boolean> incomplete=flags();incomplete.put("compiledUpdaterComplete",false);
             rejects(()->new FreshServerInstallations.PromotionProof(selection("a"),"01234567-89ab-4cde-8fab-0123456789ab","8.0.46","f".repeat(32),"a".repeat(64),"b".repeat(64),"c".repeat(64),incomplete));
             legacyAndStorageGuards(RuntimeFiles.directory(root.resolve("legacy")));
-            Path noSpace=RuntimeFiles.directory(root.resolve("no-space"));FreshServerInstallations insufficient=new FreshServerInstallations(noSpace);
-            rejects(()->insufficient.begin(selection("a"),32L<<30));
+            Path noSpace=RuntimeFiles.directory(root.resolve("no-space"));
+            FreshServerInstallations insufficient=new FreshServerInstallations(noSpace,phase->{ },directory->0);
+            rejects(()->insufficient.begin(selection("a"),1));
             try(var files=Files.list(noSpace.resolve("db"))){check(files.findAny().isEmpty(),"Insufficient storage allocates no database slot");}
             interruptedBoundaries(RuntimeFiles.directory(root.resolve("interruption")));
             System.out.println("Fresh installation promotion/cancellation/receipt binding/legacy preservation and interrupted filesystem recovery passed; synthetic receipts only, no SQL or runtime qualification");

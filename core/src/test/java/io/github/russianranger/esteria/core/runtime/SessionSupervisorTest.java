@@ -99,6 +99,76 @@ public final class SessionSupervisorTest {
             supervisor.close(); awaitTerminal(supervisor);
             check(supervisor.state() == SessionSupervisor.State.FAILED && supervisor.detail().contains("Shutdown failed"), "false successful shutdown");
         });
+        test("live failed child retains dependencies and supports explicit cleanup retry", () -> {
+            List<String> events = Collections.synchronizedList(new ArrayList<>());
+            Fake db = new Fake("database", events);
+            Process nativeChild = new ProcessBuilder("/bin/sh", "-c", "read line").start();
+            AtomicBoolean mayStop = new AtomicBoolean();
+            SessionSupervisor.Child world = new SessionSupervisor.Child() {
+                public boolean isAlive() { return nativeChild.isAlive(); }
+                public int exitCode() { return nativeChild.exitValue(); }
+                public void stop(Duration timeout) throws Exception {
+                    events.add("stop:world");
+                    if (!mayStop.get()) throw new IOException("Owned shutdown timed out");
+                    nativeChild.getOutputStream().write("stop\n".getBytes(java.nio.charset.StandardCharsets.US_ASCII));
+                    nativeChild.getOutputStream().flush();
+                    if (!nativeChild.waitFor(timeout.toMillis(), TimeUnit.MILLISECONDS)) throw new IOException("Test child did not exit");
+                }
+            };
+            SessionSupervisor supervisor = new SessionSupervisor(null, SECOND);
+            try {
+                supervisor.start(Arrays.asList(component("database", db), new SessionSupervisor.Component("world", () -> world, (p,d,c) -> { }, SECOND)));
+                supervisor.close(); awaitTerminal(supervisor);
+                check(world.isAlive() && db.alive && !events.contains("stop:database"), "dependency stopped while child remained live");
+                check(supervisor.retainedComponents().equals(Arrays.asList("database", "world")), "live owners lost");
+                check(supervisor.detail().contains("cleanup ownership retained"), "missing retained-owner evidence");
+                mayStop.set(true); supervisor.close();
+                check(!world.isAlive() && !db.alive && supervisor.retainedComponents().isEmpty(), "cleanup retry failed");
+                check(supervisor.state() == SessionSupervisor.State.FAILED && supervisor.detail().contains("Shutdown failed"), "retry erased failure");
+            } finally { nativeChild.destroyForcibly(); nativeChild.waitFor(2, TimeUnit.SECONDS); }
+        });
+        test("a stop method returning with a live child is never successful cleanup", () -> {
+            Fake db = new Fake("database", new ArrayList<>());
+            AtomicBoolean alive = new AtomicBoolean(true);
+            SessionSupervisor.Child broken = new SessionSupervisor.Child() {
+                public boolean isAlive() { return alive.get(); }
+                public int exitCode() { return 0; }
+                public void stop(Duration timeout) { }
+            };
+            SessionSupervisor supervisor = new SessionSupervisor(null, SECOND);
+            supervisor.start(Arrays.asList(component("database", db), new SessionSupervisor.Component("client", () -> broken, (p,d,c) -> { }, SECOND)));
+            supervisor.close(); awaitTerminal(supervisor);
+            check(db.alive && supervisor.state() == SessionSupervisor.State.FAILED && supervisor.retainedComponents().size() == 2,
+                    "live child/dependencies were abandoned");
+            alive.set(false); supervisor.close();
+            check(!db.alive && supervisor.retainedComponents().isEmpty(), "dead child cleanup did not release dependencies");
+        });
+        test("concurrent close waits for the active retained-owner retry", () -> {
+            Fake db = new Fake("database", new ArrayList<>());
+            AtomicBoolean retry = new AtomicBoolean(), alive = new AtomicBoolean(true), otherClosed = new AtomicBoolean();
+            CountDownLatch entered = new CountDownLatch(1), release = new CountDownLatch(1);
+            SessionSupervisor.Child child = new SessionSupervisor.Child() {
+                public boolean isAlive() { return alive.get(); }
+                public int exitCode() { return 0; }
+                public void stop(Duration timeout) throws Exception {
+                    if (!retry.get()) throw new IOException("Retain for retry");
+                    entered.countDown();
+                    if (!release.await(2, TimeUnit.SECONDS)) throw new IOException("Test retry not released");
+                    alive.set(false);
+                }
+            };
+            SessionSupervisor supervisor = new SessionSupervisor(null, SECOND);
+            supervisor.start(Arrays.asList(component("database", db), new SessionSupervisor.Component("client", () -> child, (p,d,c) -> { }, SECOND)));
+            supervisor.close(); awaitTerminal(supervisor); retry.set(true);
+            Thread first = new Thread(supervisor::close), second = new Thread(() -> { supervisor.close(); otherClosed.set(true); });
+            try {
+                first.start(); check(entered.await(1, TimeUnit.SECONDS), "cleanup retry not entered");
+                second.start(); second.join(150);
+                check(!otherClosed.get() && db.alive, "concurrent close skipped active cleanup");
+            } finally { release.countDown(); first.join(2000); second.join(2000); }
+            check(!first.isAlive() && !second.isAlive() && otherClosed.get() && !db.alive && supervisor.retainedComponents().isEmpty(),
+                    "concurrent cleanup did not complete");
+        });
         test("real process exit and bounded logs", () -> {
             Path dir = Files.createTempDirectory("esteria-process-test-"); Path log = dir.resolve("world.log");
             LoggedProcess child = LoggedProcess.start(Arrays.asList("/bin/sh", "-c", "i=0; while [ $i -lt 2000 ]; do echo abcdefghijklmnopqrstuvwxyz; i=$((i+1)); done"), dir, Collections.emptyMap(), log, 8192);

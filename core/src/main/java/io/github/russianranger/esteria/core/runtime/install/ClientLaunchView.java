@@ -155,7 +155,7 @@ public final class ClientLaunchView {
             for(String name:plan.directories)RuntimeFiles.directory(stage.resolve(name));
             for(Map.Entry<String,String> link:plan.links.entrySet()) {
                 RuntimeWork.check(cancellation);Path destination=stage.resolve(link.getKey());RuntimeFiles.directory(destination.getParent());
-                Path guest=Path.of(link.getValue());
+                Path guest=Paths.get(link.getValue());
                 if(Files.exists(destination,LinkOption.NOFOLLOW_LINKS))requireLink(destination,guest);
                 else Files.createSymbolicLink(destination,guest);
             }
@@ -182,7 +182,7 @@ public final class ClientLaunchView {
         RuntimeFiles.require(!Files.exists(view.resolve("EsteriaOff.txt"),LinkOption.NOFOLLOW_LINKS),"EsteriaOff.txt is not allowed in the managed launch view");
         for(String name:BINARIES)verifyPe(view.resolve(name),plan.binaries.get(name),name,cancellation);
         for(String name:plan.directories)existingDirectory(view.resolve(name));
-        for(Map.Entry<String,String> link:plan.links.entrySet())requireLink(view.resolve(link.getKey()),Path.of(link.getValue()));
+        for(Map.Entry<String,String> link:plan.links.entrySet())requireLink(view.resolve(link.getKey()),Paths.get(link.getValue()));
         for(String name:plan.configuration)RuntimeFiles.require(RuntimeFiles.smallText(view.resolve(name),1024).equals(LOCAL_REALM),"Local realm configuration changed; preserved");
         final int[] count={0};final Set<String> folded=new HashSet<>();
         Files.walkFileTree(view,EnumSet.noneOf(FileVisitOption.class),MAX_DEPTH+4,new SimpleFileVisitor<Path>() {

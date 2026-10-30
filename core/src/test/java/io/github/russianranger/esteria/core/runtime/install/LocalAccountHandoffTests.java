@@ -17,7 +17,7 @@ public final class LocalAccountHandoffTests {
     }
     public static void main(String[] args) throws Exception {
         Path root = args.length == 0 ? Files.createTempDirectory("esteria-handoff-") :
-                Files.createTempDirectory(Path.of(args[0]).toRealPath(), "esteria-handoff-");
+                Files.createTempDirectory(Paths.get(args[0]).toRealPath(), "esteria-handoff-");
         char[] username = "EST0123456789ABCD".toCharArray(), password = "ABCDEFGHJKLMNPQR".toCharArray();
         try {
             String generation = "a".repeat(64);

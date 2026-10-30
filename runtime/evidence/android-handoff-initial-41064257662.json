@@ -1,0 +1,20 @@
+{
+  "formatVersion": 1,
+  "scope": "android-13-handoff-fixture-api-failure",
+  "integrationRevision": "40d374eef77031c5c520ee1250f6511fa9907a9e",
+  "run": 41064257662,
+  "artifact": {
+    "id": 12981742394,
+    "bytes": 6185,
+    "sha256": "a230b3101f555b317d865ef2bc72af4b1ab0bebcf5530abf4cd3b4ed23c088b9"
+  },
+  "api": 33,
+  "abi": "x86_64",
+  "method": "privateLocalLoginHandoffContracts",
+  "failure": "java.lang.NoSuchMethodError: java.nio.file.Path.of",
+  "phase": "fixture-private-directory-creation",
+  "productionHandoffExecuted": false,
+  "handoffFilesystemQualified": false,
+  "gameplayQualified": false,
+  "correction": "Use java.nio.file.Paths.get in shared fixture and production launch view; await actual rerun"
+}

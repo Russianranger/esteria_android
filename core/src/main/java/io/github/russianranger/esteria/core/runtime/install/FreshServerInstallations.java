@@ -20,11 +20,16 @@ public final class FreshServerInstallations {
     private static final Set<String> FLAGS=Set.of("baselineComplete","compiledUpdaterComplete","coreLedgersVerified",
         "sameRevisionReentryVerified","localRealmVerified","localAccountVerified","playerbotsSchemaVerified","cleanEngineStopped");
     interface Checkpoint {void reached(String phase) throws IOException;}
+    interface FreeSpace {long available(Path directory) throws IOException;}
     private final Checkpoint checkpoint;
+    private final FreeSpace freeSpace;
     private final Path root,metadata,workspaces,legacy;
     public FreshServerInstallations(Path applicationRoot) throws IOException {this(applicationRoot,phase->{ });}
     FreshServerInstallations(Path applicationRoot,Checkpoint checkpoint) throws IOException {
-        this.checkpoint=checkpoint;
+        this(applicationRoot,checkpoint,directory->directory.toFile().getUsableSpace());
+    }
+    FreshServerInstallations(Path applicationRoot,Checkpoint checkpoint,FreeSpace freeSpace) throws IOException {
+        this.checkpoint=checkpoint;this.freeSpace=freeSpace;
         RuntimeFiles.require(applicationRoot.isAbsolute() && applicationRoot.equals(applicationRoot.toRealPath()) &&
             Files.isDirectory(applicationRoot,LinkOption.NOFOLLOW_LINKS),"Canonical private application storage required");
         root=applicationRoot;metadata=RuntimeFiles.directory(root.resolve("state/server-installations"));
@@ -94,7 +99,7 @@ public final class FreshServerInstallations {
         try {
             RuntimeFiles.require(!Files.exists(legacy,LinkOption.NOFOLLOW_LINKS),"Legacy server state preserved; explicit migration is required");
             RuntimeFiles.require(recoverActive(selection)==null,"An active database is already present; fresh initialization refused");
-            RuntimeFiles.require(workspaces.toFile().getUsableSpace()>=requiredFreeBytes,"Insufficient storage for a fresh server installation; retained data was not removed");
+            RuntimeFiles.require(freeSpace.available(workspaces)>=requiredFreeBytes,"Insufficient storage for a fresh server installation; retained data was not removed");
             Path staging=metadata.resolve("staging");
             if(Files.exists(staging,LinkOption.NOFOLLOW_LINKS)) {
                 String abandoned=readPointer(staging);Map<String,String> old=record(abandoned);

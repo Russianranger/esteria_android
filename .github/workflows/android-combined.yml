@@ -95,6 +95,7 @@ jobs:
           sdkmanager --sdk_root="$ANDROID_HOME" 'platforms;android-35' 'build-tools;35.0.0' 'cmake;3.22.1'
       - name: Clean profile, test core behavior, compile native ARM64 and lint combined app
         run: |
+          set -o pipefail
           sha256sum --check gradle/wrapper/SHA256SUMS
           ./gradlew --no-daemon :app:clean :core:check :app:assembleDebug :app:assembleDebugAndroidTest :app:lintDebug \
             -PsourceRevision="${GITHUB_SHA}" -PnativeRuntimeBridge=true -PnativeBridgeAbi=arm64-v8a \
