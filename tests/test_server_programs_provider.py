@@ -45,7 +45,7 @@ class ServerProgramsProvider(unittest.TestCase):
         for field in ('appSourceLock', 'requiredServerRuntimeArchive'):
             pin = copy.deepcopy(self.pin); pin[field]['sha256'] = '0' * 64
             lock = self.root / 'pin.json'; lock.write_bytes(provider.encoded(pin))
-            with self.subTest(field=field), patch.object(provider, 'LOCK', lock), self.assertRaisesRegex(ValueError, 'source-pin|dependency-selection'):
+            with self.subTest(field=field), patch.object(provider, 'LOCK', lock), self.assertRaisesRegex(ValueError, 'source-lock|dependency-selection'):
                 provider.load_pin()
 
     def test_no_arbitrary_executable_or_omitted_notice_can_be_relabelled(self):

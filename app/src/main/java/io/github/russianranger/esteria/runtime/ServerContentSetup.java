@@ -36,7 +36,7 @@ public final class ServerContentSetup {
     private final Path store, cache;
     private final RuntimePackagePlan plan;
     private final byte[] receipt;
-    private final String receiptHash, sourceLockHash, dependencyHash, sourceJson, compiledJson;
+    private final String receiptHash, sourceLockHash, appSourceLockHash, dependencyHash, sourceJson, compiledJson;
     private final long freshFreeBytes;
     private Path preparedReceipt;
 
@@ -53,11 +53,11 @@ public final class ServerContentSetup {
                     !proof.getBoolean("luaDisabled") || proof.getBoolean("androidRuntimeQualified") || proof.getBoolean("gameplayQualified") ||
                     !BuildConfig.SERVER_CONTENT_PIN.equals(proof.getString("inputLockSha256")))
                 throw new IOException("Server content scope or provider pin differs");
-            sourceLockHash = proof.getString("appSourceLockSha256");
+            appSourceLockHash = proof.getString("appSourceLockSha256");
             byte[] lock = asset("sources.lock.json", 65536);
-            if (!hash(lock).equals(sourceLockHash)) throw new IOException("Server content source lock differs from this application");
+            sourceLockHash = ServerSourceSelection.verify(lock, proof);
             JSONObject server = proof.getJSONObject("serverSource");
-            if (!sameJson(server, new JSONObject(new String(lock, StandardCharsets.UTF_8))
+            if (!ServerSourceSelection.sameJson(server, new JSONObject(new String(lock, StandardCharsets.UTF_8))
                     .getJSONObject("sources").getJSONObject("server")))
                 throw new IOException("Server content source selection differs");
             sourceJson = server.toString();
@@ -86,7 +86,7 @@ public final class ServerContentSetup {
                 throw new IOException("Server content metadata or compiled module pins differ");
             RuntimePackagePlan.Limits limits = new RuntimePackagePlan.Limits(bounds.getInt("entries"), bounds.getLong("memberBytes"),
                     bounds.getLong("fileBytes"), bounds.getInt("pathBytes"), bounds.getLong("metadataBytes"));
-            plan = new RuntimePackagePlan("server-content-arm64", hash(raw), archive.getString("file"), archive.getLong("bytes"),
+            plan = new RuntimePackagePlan("server-content-arm64", sourceLockHash, archive.getString("file"), archive.getLong("bytes"),
                     archive.getString("sha256"), proof.getLong("archiveEntries"), proof.getLong("archiveFileBytes"), limits, files);
             freshFreeBytes = proof.getLong("freshSetupFreeBytes");
             if (freshFreeBytes != plan.archiveBytes + plan.expectedFileBytes + limits.maxMetadataBytes + receipt.length + (64L << 20))
@@ -129,6 +129,7 @@ public final class ServerContentSetup {
     }
     public String receiptSha256() { return receiptHash; }
     public String sourceLockSha256() { return sourceLockHash; }
+    public String appSourceLockSha256() { return appSourceLockHash; }
     public JSONObject serverSource() throws IOException { return object(sourceJson); }
     public JSONObject compiledModulesIdentity() throws IOException { return object(compiledJson); }
     public Path receiptPath() throws IOException {
@@ -138,22 +139,6 @@ public final class ServerContentSetup {
     public static String guestMount() { return "/esteria-server-content"; }
     private static JSONObject object(String json) throws IOException {
         try { return new JSONObject(json); } catch (JSONException impossible) { throw new IOException("Invalid retained server selection", impossible); }
-    }
-    private static boolean sameJson(Object left, Object right) throws JSONException {
-        if (left instanceof JSONObject && right instanceof JSONObject) {
-            JSONObject a = (JSONObject) left, b = (JSONObject) right;
-            if (a.length() != b.length()) return false;
-            var names = a.keys();
-            while (names.hasNext()) { String name = names.next(); if (!b.has(name) || !sameJson(a.get(name), b.get(name))) return false; }
-            return true;
-        }
-        if (left instanceof JSONArray && right instanceof JSONArray) {
-            JSONArray a = (JSONArray) left, b = (JSONArray) right;
-            if (a.length() != b.length()) return false;
-            for (int i = 0; i < a.length(); i++) if (!sameJson(a.get(i), b.get(i))) return false;
-            return true;
-        }
-        return left.equals(right);
     }
     private InputStream openArchive(long offset) throws IOException {
         AssetFileDescriptor descriptor = assets.openFd(ARCHIVE); InputStream stream = null;

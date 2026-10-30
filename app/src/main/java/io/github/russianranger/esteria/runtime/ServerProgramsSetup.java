@@ -37,7 +37,7 @@ public final class ServerProgramsSetup {
     private final AssetManager assets;
     private final Path store, cache;
     private final RuntimePackagePlan plan;
-    private final String dependencyArchive;
+    private final String dependencyArchive, sourceLockHash, appSourceLockHash;
     private final long freshFreeBytes;
 
     public ServerProgramsSetup(Context context, Path privateRoot) throws IOException {
@@ -55,9 +55,10 @@ public final class ServerProgramsSetup {
                     proof.getBoolean("androidRuntimeQualified") || proof.getBoolean("gameLoginQualified") || proof.getBoolean("gameplayQualified") ||
                     !BuildConfig.SERVER_PROGRAMS_PIN.equals(proof.getString("inputLockSha256")) ||
                     !BuildConfig.SERVER_PROGRAMS_REVISION.equals(proof.getString("serverRevision")) ||
-                    !hash(asset("sources.lock.json", 65536)).equals(proof.getString("appSourceLockSha256")) ||
                     !guestMount().equals(proof.getString("guestMount")))
                 throw new IOException("Server programs scope, source or companion pin differs");
+            appSourceLockHash = proof.getString("appSourceLockSha256");
+            sourceLockHash = ServerSourceSelection.verify(asset("sources.lock.json", 65536), proof);
             dependencyArchive = proof.getString("requiredServerRuntimeArchiveSha256");
             if (!dependencyArchive.matches("[0-9a-f]{64}")) throw new IOException("Invalid server dependency identity");
             for (String identity : new String[]{"originalBuild", "originalModules", "debugArchive", "nativeLoaderReceipt"})
@@ -92,13 +93,14 @@ public final class ServerProgramsSetup {
             }
             requirePinned(files, "provenance/server-build.json", proof.getJSONObject("originalBuild"));
             requirePinned(files, "provenance/server-modules.json", proof.getJSONObject("originalModules"));
+            requirePinned(files, "provenance/sources.lock.json", proof.getJSONObject("serverBuildSourceLock"));
             if (!files.containsKey("provenance/server-engine-derivative.json") || !files.containsKey("provenance/sources.lock.json") ||
-                    !files.get("provenance/sources.lock.json").sha256.equals(proof.getString("appSourceLockSha256")) ||
+                    !files.get("provenance/sources.lock.json").sha256.equals(sourceLockHash) ||
                     noticeFiles != proof.getInt("originalNoticeFiles") || noticeFiles < 1)
                 throw new IOException("Server source provenance or original notices are incomplete");
             RuntimePackagePlan.Limits limits = new RuntimePackagePlan.Limits(bounds.getInt("entries"), bounds.getLong("memberBytes"),
                     bounds.getLong("fileBytes"), bounds.getInt("pathBytes"), bounds.getLong("metadataBytes"));
-            plan = new RuntimePackagePlan("server-programs-arm64", hash(raw), archive.getString("file"), archive.getLong("bytes"),
+            plan = new RuntimePackagePlan("server-programs-arm64", sourceLockHash, archive.getString("file"), archive.getLong("bytes"),
                     archive.getString("sha256"), proof.getLong("archiveEntries"), proof.getLong("archiveFileBytes"), limits, files);
             freshFreeBytes = proof.getLong("freshSetupFreeBytes");
             if (plan.expectedEntries != files.size() || freshFreeBytes != plan.archiveBytes + plan.expectedFileBytes + limits.maxMetadataBytes + (64L << 20))
@@ -127,6 +129,8 @@ public final class ServerProgramsSetup {
     public RuntimePackagePlan packagePlan() { return plan; }
     public Path current() throws IOException { return installer().resolveCurrent(plan); }
     public String generation() { return plan.generation; }
+    public String sourceLockSha256() { return sourceLockHash; }
+    public String appSourceLockSha256() { return appSourceLockHash; }
     public String archiveSha256() { return plan.archiveSha256; }
     public static String guestMount() { return "/esteria-server-programs"; }
     public static String programPath(Program program) {

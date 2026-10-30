@@ -30,6 +30,7 @@ public final class RuntimeInstallerTests {
         passed=0;
         temporaryRoot=args.length==0?null:java.nio.file.Paths.get(args[0]).toRealPath();
         run("atomic install, safe guest links and cached repeat",RuntimeInstallerTests::installation);
+        run("client-only APK source changes reuse unchanged server component generations",RuntimeInstallerTests::serverGeneration);
         run("denied hardlinks use verified resumable immutable copies",RuntimeInstallerTests::hardlinkCopy);
         run("cancel and resume verified files without activation",RuntimeInstallerTests::resume);
         run("torn resume journal and changed staged file recover",RuntimeInstallerTests::journalRecovery);
@@ -90,6 +91,30 @@ public final class RuntimeInstallerTests {
         return new RuntimePackagePlan("wine-test",sha(bytes("source-pin")),"fixture.tar.gz",Files.size(archive),RuntimeFiles.hashFile(archive,Files.size(archive),RuntimeWork.NEVER_CANCELLED),members.size(),total,limits,required);
     }
     static RuntimeInstaller.Result install(RuntimeInstaller installer,Path archive,RuntimePackagePlan plan)throws IOException{return installer.install(archive,plan,RuntimeWork.NONE,RuntimeWork.NEVER_CANCELLED);}
+    static void serverGeneration()throws Exception{
+        Path root=temp();List<Member> members=base();Path archive=tar(root,members);RuntimePackagePlan fixture=plan(archive,members);
+        String serverBuild=sha(bytes("archived-server-build-source-lock"));
+        String oldApp=sha(bytes("client-before")),newApp=sha(bytes("client-after"));
+        check(!oldApp.equals(newApp),"current APK identities differ");
+        for(String id:Arrays.asList("server-content-arm64","server-programs-arm64","server-extractors-arm64")){
+            // Current APK hashes are checked by the adapter. Both descriptors
+            // pass the unchanged archived server-build identity to this plan.
+            RuntimePackagePlan before=new RuntimePackagePlan(id,serverBuild,fixture.archiveName,fixture.archiveBytes,fixture.archiveSha256,fixture.expectedEntries,fixture.expectedFileBytes,fixture.limits,fixture.required);
+            RuntimePackagePlan after=new RuntimePackagePlan(id,serverBuild,fixture.archiveName,fixture.archiveBytes,fixture.archiveSha256,fixture.expectedEntries,fixture.expectedFileBytes,fixture.limits,fixture.required);
+            check(before.generation.equals(after.generation),"client-only APK identity does not recopy server component");
+            RuntimeInstaller installer=new RuntimeInstaller(root.resolve(id));RuntimeInstaller.Result first=install(installer,archive,before);
+            RuntimeInstaller.Result repeat=installer.install(root.resolve("missing-unused-archive"),after,RuntimeWork.NONE,RuntimeWork.NEVER_CANCELLED);
+            check(repeat.alreadyInstalled&&repeat.copiedBytes==0&&repeat.rootfs.equals(first.rootfs),"completed generation reused without archive recopy");
+            RuntimePackagePlan differentBuild=new RuntimePackagePlan(id,sha(bytes("changed-server-source")),fixture.archiveName,fixture.archiveBytes,fixture.archiveSha256,fixture.expectedEntries,fixture.expectedFileBytes,fixture.limits,fixture.required);
+            check(!before.generation.equals(differentBuild.generation),"server build drift changes generation");
+            RuntimePackagePlan differentArchive=new RuntimePackagePlan(id,serverBuild,fixture.archiveName,fixture.archiveBytes,sha(bytes("changed-artifact")),fixture.expectedEntries,fixture.expectedFileBytes,fixture.limits,fixture.required);
+            check(!before.generation.equals(differentArchive.generation),"artifact drift changes generation");
+            Map<String,RuntimePackagePlan.RequiredFile> changed=new LinkedHashMap<>(fixture.required);String name=changed.keySet().iterator().next();
+            RuntimePackagePlan.RequiredFile row=changed.get(name);changed.put(name,new RuntimePackagePlan.RequiredFile(row.bytes,sha(bytes("changed-required-file")),row.elfMachine,row.peMachine));
+            RuntimePackagePlan differentFile=new RuntimePackagePlan(id,serverBuild,fixture.archiveName,fixture.archiveBytes,fixture.archiveSha256,fixture.expectedEntries,fixture.expectedFileBytes,fixture.limits,changed);
+            check(!before.generation.equals(differentFile.generation),"required-file drift changes generation");
+        }
+    }
     static void installation()throws Exception{
         Path root=temp();List<Member> members=base();members.get(0).mode=04755;Path archive=tar(root,members);RuntimePackagePlan plan=plan(archive,members);RuntimeInstaller installer=new RuntimeInstaller(root.resolve("store"));
         RuntimeInstaller.Result result=install(installer,archive,plan);check(result.copiedBytes==26+result.hardLinkCopyBytes&&result.reusedFiles==0,"all regular bytes copied");

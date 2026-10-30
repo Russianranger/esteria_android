@@ -578,6 +578,18 @@
     "sha256": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5"
   },
   "scope": "measured-server-extractors-provider-inputs",
+  "serverBuildCompatibility": {
+    "base_client_build": 12340,
+    "client_class_capacity": 32,
+    "container_slots": 254,
+    "extended_limits": true,
+    "quest_log_slots": 25
+  },
+  "serverBuildSourceLock": {
+    "bytes": 2170,
+    "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+  },
+  "serverBuildSourceLockText": "{\n  \"schema\": 1,\n  \"sources\": {\n    \"client\": {\n      \"url\": \"https://github.com/Russianranger/wowdecomp_esteria.git\",\n      \"commit\": \"0f931bbade36a4b197725d691b8eff7caea7b3be\",\n      \"branch\": \"android/arm64-port\",\n      \"submodules\": {},\n      \"patches\": []\n    },\n    \"server\": {\n      \"url\": \"https://github.com/Russianranger/EsteriaWoW.git\",\n      \"commit\": \"f35f04d01689f034778e3474b3c820092f51e461\",\n      \"branch\": \"main\",\n      \"submodules\": {\n        \"src/server/game/LuaEngine\": \"58d7652138887783228b9727bd1fa4e08f00342b\"\n      },\n      \"patches\": [\n        {\n          \"path\": \"patches/server/0001-eluna-declare-area-trigger.patch\",\n          \"sha256\": \"c26b145188c5f97bf30d032e1fe3bd7fe17aa1f8f0daa6793e51f5d830fe7aa6\",\n          \"submodule\": \"src/server/game/LuaEngine\"\n        },\n        {\n          \"path\": \"patches/server/0002-eluna-include-map-manager.patch\",\n          \"sha256\": \"4e277dbe56c31ae30640c8e9ad4dee12e944e0f051d9bdc8d62aaa239c50433f\",\n          \"submodule\": \"src/server/game/LuaEngine\"\n        },\n        {\n          \"path\": \"patches/server/0003-eluna-hooks-include-types.patch\",\n          \"sha256\": \"5999402d985fcc709abdc90bb4272072d1d5e3e261b2cc7ec19460320c14295f\",\n          \"submodule\": \"src/server/game/LuaEngine\"\n        },\n        {\n          \"path\": \"patches/server/0004-attunement-stat-api.patch\",\n          \"sha256\": \"d9ef6ca8f96ab186c37c072b22143cdded9976aa3a62d083f893c502a5745cb8\"\n        },\n        {\n          \"path\": \"patches/server/0005-script-grid-templates.patch\",\n          \"sha256\": \"6b459c90839e7831df8533966442fabd476ae1773f0302c50ccc8a997f157369\"\n        },\n        {\n          \"path\": \"patches/server/0006-empty-script-modules.patch\",\n          \"sha256\": \"ea0beb357c71d8b8c187af9d4afede520e7ac9877e40fbdc5fab99d54fc21f97\"\n        },\n        {\n          \"path\": \"patches/server/0007-runtime-module-config-directory.patch\",\n          \"sha256\": \"5e41d474179ef553ec9c2544de947a3724885fd7f3ac233af3d89797acd032ff\"\n        }\n      ]\n    }\n  },\n  \"compatibility\": {\n    \"base_client_build\": 12340,\n    \"extended_limits\": true,\n    \"container_slots\": 254,\n    \"quest_log_slots\": 25,\n    \"client_class_capacity\": 32\n  }\n}\n",
   "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
   "serverSource": {
     "branch": "main",

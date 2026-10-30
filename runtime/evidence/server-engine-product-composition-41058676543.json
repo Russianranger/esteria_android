@@ -1,0 +1,487 @@
+{
+  "account": {
+    "authProtocolQualified": false,
+    "charactersCreated": false,
+    "completedUpdaterVerified": true,
+    "credentialsPrivate": true,
+    "existingCredentialsReset": false,
+    "expansion": 2,
+    "mysqlUuid": "c75367d2-d461-11f1-9455-ec9422ec3855",
+    "operation": "created-owned-account",
+    "realmId": 1,
+    "scope": "owned-verified-content-local-account-after-compiled-updater-and-realm"
+  },
+  "allProductStagesUseSameUuid": true,
+  "androidRuntimeQualified": false,
+  "artifact": {
+    "bytes": 79223,
+    "id": 12978941196,
+    "sha256": "6f13d4784d11693a6b93161c6ffa78a2fb2c528ed84f006c5c6121d457e57d79",
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/41058676543/artifacts/12978941196"
+  },
+  "baseline": {
+    "appliedFiles": 442,
+    "baselineImportCompleted": true,
+    "compiledUpdaterExecuted": false,
+    "liveSchemaReadinessVerified": false,
+    "operation": "initialized-source-baseline",
+    "scope": "owned-packaged-content-source-baseline-only"
+  },
+  "completedRepeat": {
+    "baselineJournalUnchanged": true,
+    "compiledUpdaterCompleted": true,
+    "compiledUpdaterExecuted": false,
+    "credentialsAndAccountJournalPreserved": true,
+    "databaseSnapshots": {
+      "auth": {
+        "ledgerRows": 25,
+        "ledgerSha256": "3af02abd4a9dc23a1338585d17b4b5dd56e230d27940f15bbafbb98edb8a223f",
+        "sourceUpdateNamesVerified": 25,
+        "tableCount": 23,
+        "tablesSha256": "fa7f8d310a546dc1178ab89cb683cd015a946e19bab238412d13bb3ab4d98672"
+      },
+      "characters": {
+        "ledgerRows": 105,
+        "ledgerSha256": "e3dbbeeec065f81e95ad61abd6ed875abba89582fe4f9906c78ad7268a9541ba",
+        "sourceUpdateNamesVerified": 105,
+        "tableCount": 176,
+        "tablesSha256": "72880eba1be47d33f088f36b0e6526bbe04d321f1b24c4a03e50fea21aa4d1da"
+      },
+      "world": {
+        "ledgerRows": 3340,
+        "ledgerSha256": "86cbb8ed2462d9da9bc7f0737c2e56ece4ac27c771c533ded0c1fe4ce12ee9a7",
+        "sourceUpdateNamesVerified": 3340,
+        "tableCount": 372,
+        "tablesSha256": "ac80a18647a08114bc05f034633269b055916c2fb34e5c825c954e47b428d91c"
+      }
+    },
+    "mysqlUuid": "c75367d2-d461-11f1-9455-ec9422ec3855",
+    "operation": "verified-completed-updater",
+    "originalBuild": {
+      "bytes": 32521,
+      "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+    },
+    "qualificationSucceeded": true,
+    "scope": "owned-packaged-content-compiled-updater-only",
+    "selectedProgram": {
+      "bytes": 1379920,
+      "sha256": "f452ef5c7ab90451e9060bdace1ba866a93da768145428b15ddc25a7e73b6c24"
+    },
+    "sourceLedgersVerified": true,
+    "template": {
+      "bytes": 12250,
+      "sha256": "8ce8122b1b6ba9e3ca7109d80ece04bf5670e5a04dcb44aff6454e85817dd61a"
+    }
+  },
+  "configuration": {
+    "auth_port": 3724,
+    "bot_limit": 4,
+    "database_port": 13306,
+    "lua_scripts_enabled": false,
+    "module_configurations_complete": true,
+    "module_startup_qualified": false,
+    "runtime_validated": false,
+    "world_port": 8085
+  },
+  "engineDerivative": {
+    "androidRuntimeQualified": false,
+    "debugArchiveIdentified": {
+      "bytes": 1082880246,
+      "sha256": "facc75680f3fb1b205a98960d6ea5a0d565cb2a2b4bd56303dd6625fd4854a24"
+    },
+    "debugArchiveReadBackHere": false,
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "originalBuild": {
+      "bytes": 32521,
+      "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+    },
+    "originalModules": {
+      "bytes": 5348,
+      "sha256": "6459b6a1acab2c62c474e4c6ab3eb651daa21f697ccd628e93a38bad298bbdd1"
+    },
+    "originalReceiptsUnchanged": true,
+    "packageReceipt": {
+      "bytes": 34652,
+      "sha256": "bb62ad200ac9be9b756616e351bf591508eedb7420f9fd39d5ea0544ae1cc548"
+    },
+    "programs": {
+      "authserver": {
+        "bytes": 1709864,
+        "sha256": "04cbda982ca1385903929eb46ca52b7cb41ca222e8a48f9898af716d2b878531"
+      },
+      "dbimport": {
+        "bytes": 1379920,
+        "sha256": "f452ef5c7ab90451e9060bdace1ba866a93da768145428b15ddc25a7e73b6c24"
+      },
+      "worldserver": {
+        "bytes": 59025784,
+        "sha256": "9757f0bbb2ee159d18070d8f5fe7ecdf5b4b8b7171116198039f418d5ec13aa1"
+      }
+    },
+    "runtimeArchive": {
+      "bytes": 21352885,
+      "sha256": "00bd0a5829caec2a2b11d4e85bd261b67461c04e6755bb332d37d393311c6ccb"
+    },
+    "scope": "verified-engine-derivative-program-selection",
+    "serverExecuted": false,
+    "sourceCompanionComplete": false
+  },
+  "executionEnvironment": "native-linux-arm64-disposable-network-none",
+  "existingSaveUpgradesQualified": false,
+  "externalNetworkDisabled": true,
+  "firstUpdater": {
+    "baselineJournalUnchanged": true,
+    "compiledUpdaterCompleted": true,
+    "compiledUpdaterExecuted": true,
+    "credentialsAndAccountJournalPreserved": true,
+    "databaseSnapshots": {
+      "auth": {
+        "ledgerRows": 25,
+        "ledgerSha256": "3af02abd4a9dc23a1338585d17b4b5dd56e230d27940f15bbafbb98edb8a223f",
+        "sourceUpdateNamesVerified": 25,
+        "tableCount": 23,
+        "tablesSha256": "fa7f8d310a546dc1178ab89cb683cd015a946e19bab238412d13bb3ab4d98672"
+      },
+      "characters": {
+        "ledgerRows": 105,
+        "ledgerSha256": "e3dbbeeec065f81e95ad61abd6ed875abba89582fe4f9906c78ad7268a9541ba",
+        "sourceUpdateNamesVerified": 105,
+        "tableCount": 176,
+        "tablesSha256": "72880eba1be47d33f088f36b0e6526bbe04d321f1b24c4a03e50fea21aa4d1da"
+      },
+      "world": {
+        "ledgerRows": 3340,
+        "ledgerSha256": "86cbb8ed2462d9da9bc7f0737c2e56ece4ac27c771c533ded0c1fe4ce12ee9a7",
+        "sourceUpdateNamesVerified": 3340,
+        "tableCount": 372,
+        "tablesSha256": "ac80a18647a08114bc05f034633269b055916c2fb34e5c825c954e47b428d91c"
+      }
+    },
+    "mysqlUuid": "c75367d2-d461-11f1-9455-ec9422ec3855",
+    "operation": "executed-compiled-updater",
+    "originalBuild": {
+      "bytes": 32521,
+      "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+    },
+    "qualificationSucceeded": true,
+    "scope": "owned-packaged-content-compiled-updater-only",
+    "selectedProgram": {
+      "bytes": 1379920,
+      "sha256": "f452ef5c7ab90451e9060bdace1ba866a93da768145428b15ddc25a7e73b6c24"
+    },
+    "sourceLedgersVerified": true,
+    "template": {
+      "bytes": 12250,
+      "sha256": "8ce8122b1b6ba9e3ca7109d80ece04bf5670e5a04dcb44aff6454e85817dd61a"
+    }
+  },
+  "followingCompiledAuth": {
+    "advertisedLoopbackRealmVerified": true,
+    "cleanShutdownVerified": true,
+    "clientBuild": 12340,
+    "credentialsAndTrackersPreserved": true,
+    "ownedLoopbackListenerVerified": true,
+    "persistedSessionKeyVerified": true,
+    "phase": "complete",
+    "qualificationSucceeded": true,
+    "reconstructedClientExecuted": false,
+    "schemaLedgerPreserved": true,
+    "scope": "disposable-native-ARM64-authserver-protocol-probe",
+    "srpProofVerified": true
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "integrationRevision": "b258529f695be0de810040eacb0ee07e483b11d4",
+  "mysqlUuid": "c75367d2-d461-11f1-9455-ec9422ec3855",
+  "mysqlVersion": "8.0.46-0ubuntu0.24.04.4",
+  "nativeExtractors": {
+    "cases": {
+      "map-usage": {
+        "exitCode": 1
+      },
+      "mmaps-argument-validation": {
+        "exitCode": 255
+      },
+      "mmaps-default-configuration-validation": {
+        "exitCode": 253
+      },
+      "vmap-assembler-usage": {
+        "exitCode": 1
+      },
+      "vmap-extractor-usage": {
+        "exitCode": 1
+      }
+    },
+    "clientMpqConversionQualified": false,
+    "clientMpqsSupplied": false,
+    "customEsteriaDataLoadOrderQualified": false,
+    "emptyWorkingDirectoriesUnchanged": true,
+    "originalDefaultMmapsConfigParsed": true,
+    "packageReceipt": {
+      "bytes": 70343,
+      "sha256": "ec9252de82070bd0dd3bb436562b477bb03903ae9ae47132ec9f82ed5a861b1f"
+    },
+    "programs": {
+      "map_extractor": {
+        "bytes": 462176,
+        "sha256": "88e3526f2a33d9fa698b52e0858a2d3e3abfae62f4a805ac32d0ddbac2cb63fb"
+      },
+      "mmaps_generator": {
+        "bytes": 1839280,
+        "sha256": "3c9c3ff993300a5fff9ec0e65ec717faeb5894e15b0f481cd72be138b0765c34"
+      },
+      "vmap4_assembler": {
+        "bytes": 1051576,
+        "sha256": "b5ec1b64ff59a98bfd2de159bf6f6bbec4ed69363d53910d7321f357d59440f6"
+      },
+      "vmap4_extractor": {
+        "bytes": 856264,
+        "sha256": "47dfffecb476b3685d781325e915ea24954b080c9c6e6a356240d365454e75f0"
+      }
+    },
+    "qualificationSucceeded": true,
+    "runtimeArchive": {
+      "bytes": 2495044,
+      "sha256": "2bce13256ac609a7bcb01fd2a7e5352fde29fa19e18a5d269c566acb22f86515"
+    },
+    "scope": "native-arm64-derived-extractor-argument-config-validation-only"
+  },
+  "nativeQualification": {
+    "coreModuleUpdatesQualified": true,
+    "packagedAccountPreservedAcrossUpdater": true,
+    "packagedAccountPreservedAfterRestart": true,
+    "restartPersistenceVerified": true,
+    "sameRevisionReentryVerified": true
+  },
+  "originalServerBuildId": "41019374697.1",
+  "packagedRuntimeContent": {
+    "allPackagedBytesReadBack": true,
+    "androidRuntimeQualified": false,
+    "bytes": 654243888,
+    "contentReceipt": {
+      "bytes": 1343739,
+      "sha256": "1c00990e090e85af0232fe633b64e2718071a5f8e81f3b0ca1c8f2b214ffb3af"
+    },
+    "files": 4063,
+    "gameplayQualified": false,
+    "installedBuildAndModuleSelectionChecked": true,
+    "scope": "actual-immutable-content-no-git-runtime-consumer",
+    "sourceLockSha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1",
+    "sqlExecutedByVerifier": false
+  },
+  "playerbotsRuntimeQualified": false,
+  "readOnlyVerification": {
+    "baselineJournalUnchanged": true,
+    "compiledUpdaterCompleted": true,
+    "compiledUpdaterExecuted": false,
+    "credentialsAndAccountJournalPreserved": true,
+    "databaseSnapshots": {
+      "auth": {
+        "ledgerRows": 25,
+        "ledgerSha256": "3af02abd4a9dc23a1338585d17b4b5dd56e230d27940f15bbafbb98edb8a223f",
+        "sourceUpdateNamesVerified": 25,
+        "tableCount": 23,
+        "tablesSha256": "fa7f8d310a546dc1178ab89cb683cd015a946e19bab238412d13bb3ab4d98672"
+      },
+      "characters": {
+        "ledgerRows": 105,
+        "ledgerSha256": "e3dbbeeec065f81e95ad61abd6ed875abba89582fe4f9906c78ad7268a9541ba",
+        "sourceUpdateNamesVerified": 105,
+        "tableCount": 176,
+        "tablesSha256": "72880eba1be47d33f088f36b0e6526bbe04d321f1b24c4a03e50fea21aa4d1da"
+      },
+      "world": {
+        "ledgerRows": 3340,
+        "ledgerSha256": "86cbb8ed2462d9da9bc7f0737c2e56ece4ac27c771c533ded0c1fe4ce12ee9a7",
+        "sourceUpdateNamesVerified": 3340,
+        "tableCount": 372,
+        "tablesSha256": "ac80a18647a08114bc05f034633269b055916c2fb34e5c825c954e47b428d91c"
+      }
+    },
+    "mysqlUuid": "c75367d2-d461-11f1-9455-ec9422ec3855",
+    "operation": "verified-completed-updater",
+    "originalBuild": {
+      "bytes": 32521,
+      "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+    },
+    "qualificationSucceeded": true,
+    "scope": "owned-packaged-content-compiled-updater-only",
+    "selectedProgram": {
+      "bytes": 1379920,
+      "sha256": "f452ef5c7ab90451e9060bdace1ba866a93da768145428b15ddc25a7e73b6c24"
+    },
+    "sourceLedgersVerified": true,
+    "template": {
+      "bytes": 12250,
+      "sha256": "8ce8122b1b6ba9e3ca7109d80ece04bf5670e5a04dcb44aff6454e85817dd61a"
+    }
+  },
+  "realm": {
+    "address": "127.0.0.1",
+    "authPort": 3724,
+    "clientBuild": 12340,
+    "completedUpdaterVerified": true,
+    "localAddress": "127.0.0.1",
+    "localSubnetMask": "255.255.255.255",
+    "mysqlUuid": "c75367d2-d461-11f1-9455-ec9422ec3855",
+    "operation": "reasserted-local-row",
+    "realmId": 1,
+    "scope": "owned-verified-content-local-realm-after-compiled-updater",
+    "sqlEndpointVerified": true,
+    "worldPort": 8085
+  },
+  "receiptFiles": {
+    "auth-qualification.json": {
+      "bytes": 4443,
+      "sha256": "6983560e04628426ac30a69d3664f832b00473bfd5e8e4d67a9e09638994bfc2"
+    },
+    "dependency-image-check.json": {
+      "bytes": 1433,
+      "sha256": "ded60395aa7547a75286b373acbc9e674e63cac21333f4cf735a7bb78242fa63"
+    },
+    "environment-receipt.json": {
+      "bytes": 3471,
+      "sha256": "6ce7462574eb244d49bbcc141f75531a971a3723b2e032ddd6eb308070457578"
+    },
+    "extractor-cli.json": {
+      "bytes": 2860,
+      "sha256": "27e1eb1ed3ffa9b65b0c824da90f22c349e068df8d3b7c1362701be62267c5e5"
+    },
+    "loader-smoke.json": {
+      "bytes": 2427,
+      "sha256": "33fee9aefde98026139c3ba059f296b958cf813d13eb1f48d7bf74c749b74a09"
+    },
+    "qualification.json": {
+      "bytes": 199601,
+      "sha256": "1f529f768273698a0a796388e7e5790ac2ddc5b59c84cda70c92547613064bac"
+    }
+  },
+  "scope": "native-arm64-actual-seven-patch-derived-product-schema-updater-config-realm-account-components",
+  "selectedConfigFiles": 50,
+  "source": {
+    "branch": "main",
+    "commit": "f35f04d01689f034778e3474b3c820092f51e461",
+    "patches": [
+      {
+        "path": "patches/server/0001-eluna-declare-area-trigger.patch",
+        "sha256": "c26b145188c5f97bf30d032e1fe3bd7fe17aa1f8f0daa6793e51f5d830fe7aa6",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0002-eluna-include-map-manager.patch",
+        "sha256": "4e277dbe56c31ae30640c8e9ad4dee12e944e0f051d9bdc8d62aaa239c50433f",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0003-eluna-hooks-include-types.patch",
+        "sha256": "5999402d985fcc709abdc90bb4272072d1d5e3e261b2cc7ec19460320c14295f",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0004-attunement-stat-api.patch",
+        "sha256": "d9ef6ca8f96ab186c37c072b22143cdded9976aa3a62d083f893c502a5745cb8"
+      },
+      {
+        "path": "patches/server/0005-script-grid-templates.patch",
+        "sha256": "6b459c90839e7831df8533966442fabd476ae1773f0302c50ccc8a997f157369"
+      },
+      {
+        "path": "patches/server/0006-empty-script-modules.patch",
+        "sha256": "ea0beb357c71d8b8c187af9d4afede520e7ac9877e40fbdc5fab99d54fc21f97"
+      },
+      {
+        "path": "patches/server/0007-runtime-module-config-directory.patch",
+        "sha256": "5e41d474179ef553ec9c2544de947a3724885fd7f3ac233af3d89797acd032ff"
+      }
+    ],
+    "submodules": {
+      "src/server/game/LuaEngine": "58d7652138887783228b9727bd1fa4e08f00342b"
+    },
+    "url": "https://github.com/Russianranger/EsteriaWoW.git"
+  },
+  "sourceBaseline": {
+    "baselineImportCompleted": true,
+    "compiledAutoPopulationQualified": false,
+    "existingStateModified": false,
+    "originalSqlFileCount": 441,
+    "scope": "fresh-owned-source-baseline-before-compiled-updates",
+    "syntheticUpdaterLedgerRowsWritten": false
+  },
+  "sourceCompanionComplete": false,
+  "sourceDerivedAdaptations": [
+    {
+      "adaptationId": "character-appearance-empty-v1",
+      "canonicalOriginal": false,
+      "exactEmptyTableAdditionVerified": true,
+      "metadataIdentity": {
+        "bytes": 7783,
+        "sha256": "6ccf5e363ec3daa5c37cbbe753d29a7e6b5d10f18eef407b700fc0d67985428d"
+      },
+      "originalSourceFilesUnchanged": true,
+      "rowsSeeded": false,
+      "sourceDerived": true,
+      "sqlExecuted": true,
+      "sqlIdentity": {
+        "bytes": 790,
+        "sha256": "8e35e8e41d74979eaa98f6f2d824d831b73f63a4a6b2f573b869484b2ff15d46"
+      },
+      "updaterLedgerRowsWritten": false
+    }
+  ],
+  "sourceLockSha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1",
+  "verificationAfterOwnedAccount": {
+    "baselineJournalUnchanged": true,
+    "compiledUpdaterCompleted": true,
+    "compiledUpdaterExecuted": false,
+    "credentialsAndAccountJournalPreserved": true,
+    "databaseSnapshots": {
+      "auth": {
+        "ledgerRows": 25,
+        "ledgerSha256": "3af02abd4a9dc23a1338585d17b4b5dd56e230d27940f15bbafbb98edb8a223f",
+        "sourceUpdateNamesVerified": 25,
+        "tableCount": 23,
+        "tablesSha256": "fa7f8d310a546dc1178ab89cb683cd015a946e19bab238412d13bb3ab4d98672"
+      },
+      "characters": {
+        "ledgerRows": 105,
+        "ledgerSha256": "e3dbbeeec065f81e95ad61abd6ed875abba89582fe4f9906c78ad7268a9541ba",
+        "sourceUpdateNamesVerified": 105,
+        "tableCount": 176,
+        "tablesSha256": "72880eba1be47d33f088f36b0e6526bbe04d321f1b24c4a03e50fea21aa4d1da"
+      },
+      "world": {
+        "ledgerRows": 3340,
+        "ledgerSha256": "86cbb8ed2462d9da9bc7f0737c2e56ece4ac27c771c533ded0c1fe4ce12ee9a7",
+        "sourceUpdateNamesVerified": 3340,
+        "tableCount": 372,
+        "tablesSha256": "ac80a18647a08114bc05f034633269b055916c2fb34e5c825c954e47b428d91c"
+      }
+    },
+    "mysqlUuid": "c75367d2-d461-11f1-9455-ec9422ec3855",
+    "operation": "verified-completed-updater",
+    "originalBuild": {
+      "bytes": 32521,
+      "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+    },
+    "qualificationSucceeded": true,
+    "scope": "owned-packaged-content-compiled-updater-only",
+    "selectedProgram": {
+      "bytes": 1379920,
+      "sha256": "f452ef5c7ab90451e9060bdace1ba866a93da768145428b15ddc25a7e73b6c24"
+    },
+    "sourceLedgersVerified": true,
+    "template": {
+      "bytes": 12250,
+      "sha256": "8ce8122b1b6ba9e3ca7109d80ece04bf5670e5a04dcb44aff6454e85817dd61a"
+    }
+  },
+  "workflow": {
+    "hostJob": 124072572381,
+    "id": 41058676543,
+    "nativeJob": 124075224082,
+    "overallConclusion": "success",
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/41058676543"
+  },
+  "worldEntryQualified": false
+}

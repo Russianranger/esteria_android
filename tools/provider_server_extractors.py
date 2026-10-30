@@ -15,9 +15,9 @@ import shutil
 import tempfile
 
 try:
-    from . import provider_server_programs as shared, package_server_extractors as package
+    from . import provider_server_programs as shared, package_server_extractors as package, server_provider_sources as source_binding
 except ImportError:
-    import provider_server_programs as shared, package_server_extractors as package
+    import provider_server_programs as shared, package_server_extractors as package, server_provider_sources as source_binding
 
 ROOT = Path(__file__).resolve().parents[1]
 LOCK = ROOT / 'runtime/server/extractors-provider.lock.json'
@@ -41,7 +41,8 @@ def load_pin(sealed=False):
             pin.get('state') in ('pending-sealed-source-rebuild', 'sealed-source-and-native-cli') and
             pin.get('nativeArgumentConfigQualified') is True and all(pin.get(k) is False for k in FALSE_FLAGS),
             'server-extractors-input-scope')
-    require(pin['appSourceLock'] == files.identity(ROOT / 'sources.lock.json') and
+    source_binding.validate_current(pin, ROOT / 'sources.lock.json')
+    require(pin['serverBuildSourceLock']['sha256'] == original['sourceLockSha256'] and
             pin['packagingPin'] == original_identity and pin['originalBuild'] == original['originalBuild'] and
             pin['originalModules'] == original['originalModules'] and pin['integrationRevision'] == original['integrationRevision'] and
             pin['buildId'] == original['buildId'] and pin['serverSource'] ==
@@ -64,7 +65,7 @@ def load_pin(sealed=False):
                 **original['originalFiles']['bin/mmaps-config.yaml']) and
             identity(pin['files'][package.CONFIG]) == identity(pin['configuration']), 'server-extractors-original-yaml-pin')
     for name, row in (('server-build.json', pin['originalBuild']), ('server-modules.json', pin['originalModules']),
-                      ('sources.lock.json', pin['appSourceLock']), ('extractors-packaging.lock.json', original_identity)):
+                      ('sources.lock.json', pin['serverBuildSourceLock']), ('extractors-packaging.lock.json', original_identity)):
         require(identity(pin['files']['provenance/' + name]) == row, 'server-extractors-original-provenance-pin')
     for key in ('packageReceipt', 'debugArchive', 'nativeCliReceipt', 'requiredServerRuntimeArchive'):
         identity(pin[key])
@@ -95,7 +96,7 @@ def validate_package(receipt, pin):
             set(receipt['notices']) == set(pin['noticeFiles']), 'server-extractors-original-package-receipt-required')
     require(derivative.get('formatVersion') == 1 and derivative.get('scope') == 'paired-linux-arm64-server-extractor-derivative' and
             derivative.get('runtimeMount') == '/esteria-server-extractors' and derivative.get('originalReceiptsPreserved') is True and
-            derivative['sourcesLock'] == pin['appSourceLock'] and derivative['serverSource'] == pin['serverSource'] and
+            derivative['sourcesLock'] == pin['serverBuildSourceLock'] and derivative['serverSource'] == pin['serverSource'] and
             derivative['originalBuild'] == pin['originalBuild'] and derivative['originalModules'] == pin['originalModules'] and
             derivative['integrationRevision'] == pin['integrationRevision'] and derivative['buildId'] == pin['buildId'] and
             derivative['packagingPin'] == pin['packagingPin'] and derivative['sourceInputs'] == pin['originalSourceInputs'] and
@@ -141,10 +142,11 @@ def verify_archive(path, pin, derivative):
                 tar.members.clear()
     require(json.loads(values['provenance/server-extractors-derivative.json']) == derivative,
             'server-extractors-archived-derivative-differs')
+    source_binding.validate_archived(values['provenance/sources.lock.json'], pin)
     build, compiled = (json.loads(values['provenance/' + n]) for n in ('server-build.json', 'server-modules.json'))
-    require(build['serverSource'] == pin['serverSource'] and build['sourcesLock'] == pin['appSourceLock'] and
+    require(build['serverSource'] == pin['serverSource'] and build['sourcesLock'] == pin['serverBuildSourceLock'] and
             compiled['serverBuild'] == pin['originalBuild'] and compiled['source'] == pin['serverSource'] and
-            compiled['sourceLockSha256'] == pin['appSourceLock']['sha256'] and
+            compiled['sourceLockSha256'] == pin['serverBuildSourceLock']['sha256'] and
             compiled['generatedListsMatchInstalledBinaries'] is True, 'server-extractors-build-module-source-binding')
 
 
@@ -187,13 +189,13 @@ def verify_sources(sources, pin):
             sealed.get('sourceInputArchive') == identity(pin['originalSourceInputs']['archive']) and
             sealed.get('sourceInputReceipt') == pin['originalSourceInputs']['receipt'] and
             sealed.get('originalBuild') == pin['originalBuild'] and sealed.get('originalCompiledModules') == pin['originalModules'] and
-            sealed.get('sourceLock') == pin['appSourceLock'], 'server-extractors-sealed-source-binding')
+            sealed.get('sourceLock') == pin['serverBuildSourceLock'], 'server-extractors-sealed-source-binding')
     require(qualified.get('formatVersion') == 1 and qualified.get('scope') == 'actual-native-arm64-isolated-server-source-rebuild' and
             qualified.get('phase') == 'complete' and all(qualified.get(k) is True for k in
                 ('sourceCompanionComplete', 'isolatedSourceRebuildQualified', 'transitiveIncludeClosureProved', 'fullCompileObserved',
                  'noCompilerCacheUsed', 'fullBuildAndReferencesPassed', 'authWorldVersionExecuted', 'originalSelectionPreserved')) and
             qualified.get('originalBuild') == pin['originalBuild'] and qualified.get('originalCompiledModules') == pin['originalModules'] and
-            qualified.get('sourceLock') == pin['appSourceLock'] and qualified.get('sourceBitIdenticalBinaryClaimed') is False and
+            qualified.get('sourceLock') == pin['serverBuildSourceLock'] and qualified.get('sourceBitIdenticalBinaryClaimed') is False and
             all(qualified.get(k) is False for k in shared.FALSE_FLAGS) and
             qualified.get('sqlExecuted') is False and qualified.get('worldserverSessionStarted') is False and
             all(qualified.get(k, {}).get('relevantBuildEnvironmentMatched') is True
@@ -219,7 +221,7 @@ def descriptor(pin):
         requiredFiles={n: dict(identity(row), **({'elfMachine': 183} if n.startswith('bin/') else {})) for n,row in sorted(pin['files'].items())},
         archiveEntries=pin['archiveEntries'], archiveFileBytes=pin['archiveFileBytes'], limits=LIMITS,
         freshSetupFreeBytes=pin['archive']['bytes']+pin['archiveFileBytes']+LIMITS['metadataBytes']+(64 << 20),
-        inputLockSha256=files.identity(LOCK)['sha256'], appSourceLockSha256=pin['appSourceLock']['sha256'],
+        inputLockSha256=files.identity(LOCK)['sha256'], **source_binding.descriptor_fields(pin),
         serverRevision=pin['serverRevision'], integrationRevision=pin['integrationRevision'], buildId=pin['buildId'],
         requiredServerRuntimeArchiveSha256=pin['requiredServerRuntimeArchive']['sha256'], guestMount='/esteria-server-extractors',
         programNames=list(PROGRAMS), originalBuild=pin['originalBuild'], originalModules=pin['originalModules'],

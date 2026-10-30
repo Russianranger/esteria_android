@@ -16,7 +16,7 @@ import zipfile
 
 if not __package__:sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from runtime import server_content as content
-from tools import prepare_runtime as archives,verify_server_build as files
+from tools import prepare_runtime as archives,verify_server_build as files,server_provider_sources as source_binding
 from tools import package_server_content as transaction,provider_client_runtime as zips
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -44,9 +44,7 @@ def load_pin():
             pin.get('luaDisabled') is True and pin.get('originalNoticesPreserved') is True and
             all(pin.get(k) is False for k in ('sqlExecuted','androidRuntimeQualified','gameplayQualified')),
             'server-content-pin-scope')
-    lock,_=read_json(ROOT/'sources.lock.json',65536)
-    require(pin.get('appSourceLock')==files.identity(ROOT/'sources.lock.json') and
-            pin.get('serverSource')==lock['sources']['server'],'server-content-current-source-selection')
+    source_binding.validate_current(pin,ROOT/'sources.lock.json')
     require(set(pin.get('requiredFiles',{}))==content.METADATA and
             pin['requiredFiles']['metadata/compiled-modules.json']==pin['compiledModules'] and
             pin['archive']['file']=='server-content.tar.gz','server-content-required-metadata-selection')
@@ -63,7 +61,7 @@ def load_pin():
 
 def validate_metadata(receipt,metadata,pin):
     require(receipt.get('formatVersion')==1 and receipt.get('scope')=='immutable-server-source-content-package' and
-            receipt.get('source')==pin['serverSource'] and receipt.get('sourceLockSha256')==pin['appSourceLock']['sha256'] and
+            receipt.get('source')==pin['serverSource'] and receipt.get('sourceLockSha256')==pin['serverBuildSourceLock']['sha256'] and
             receipt.get('moduleSelectionVerified') is True and receipt.get('archiveReadBackVerified') is True and
             receipt.get('luaMode')=='disabled' and receipt.get('luaFiles')==0 and receipt.get('sourceDirectory')=='source' and
             receipt.get('configurationRequirements')=={'Eluna.Enabled':False,'Eluna.ScriptPath':'lua_scripts'},
@@ -81,7 +79,7 @@ def validate_metadata(receipt,metadata,pin):
     plan={k:v for k,v in receipt.items() if k not in ('archive','archiveFiles','archiveReadBackVerified','deterministicArchive')}
     require(metadata['metadata/package-plan.json']==plan,'server-content-original-plan-selection')
     # Share the product's strict source/module/Lua selection. No Git or SQL runs.
-    payload=content._selection(manifest,compiled,lua,pin['serverSource'],pin['appSourceLock']['sha256'])
+    payload=content._selection(manifest,compiled,lua,pin['serverSource'],pin['serverBuildSourceLock']['sha256'])
     require(set(inventory)==set(payload)|content.METADATA,'server-content-source-payload-selection')
     for name,(origin,path,row) in payload.items():
         require(inventory[name]==dict(content._identity(row),gitBlob=row['gitBlob'],origin=origin,source=path),
@@ -126,8 +124,8 @@ def descriptor(package,pin,asset_archive=False):
     return dict(formatVersion=1,scope='android-server-content-install-only',packageKey='server-content-arm64',
         archive=dict(pin['archive'],assetPath=ASSETS+'/'+ARCHIVE),archiveEntries=pin['archiveEntries'],
         archiveFileBytes=pin['archiveFileBytes'],requiredFiles=pin['requiredFiles'],limits=limits,
-        inputLockSha256=files.identity(LOCK)['sha256'],appSourceLockSha256=pin['appSourceLock']['sha256'],
-        receipt=pin['receipt'],compiledModules=pin['compiledModules'],serverSource=pin['serverSource'],
+        inputLockSha256=files.identity(LOCK)['sha256'],**source_binding.descriptor_fields(pin),
+        receipt=pin['receipt'],compiledModules=pin['compiledModules'],
         requiredServerRuntimeArchiveSha256=pin['requiredServerRuntimeArchiveSha256'],originalNoticesPreserved=True,
         luaDisabled=True,archiveVerified=True,fullSourceSelectedInventoryVerified=True,elfIncluded=False,
         freshSetupFreeBytes=pin['archive']['bytes']+pin['archiveFileBytes']+limits['metadataBytes']+pin['receipt']['bytes']+(64<<20),

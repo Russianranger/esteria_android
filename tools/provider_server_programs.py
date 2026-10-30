@@ -17,12 +17,12 @@ import tempfile
 import zipfile
 
 try:
-    from . import prepare_runtime as archives, package_server_engine as engine
+    from . import prepare_runtime as archives, package_server_engine as engine, server_provider_sources as source_binding
     from . import package_shader_tools as files, package_server_content as transaction
     from . import verify_server_build as elf
     from .provider_client_runtime import checked_zip
 except ImportError:
-    import prepare_runtime as archives, package_server_engine as engine
+    import prepare_runtime as archives, package_server_engine as engine, server_provider_sources as source_binding
     import package_shader_tools as files, package_server_content as transaction
     import verify_server_build as elf
     from provider_client_runtime import checked_zip
@@ -79,8 +79,8 @@ def load_pin(sealed=False):
             pin.get('state') in ('pending-sealed-source-rebuild', 'sealed-source-and-native-loader') and
             all(pin.get(k) is False for k in FALSE_FLAGS) and pin.get('nativeAuthWorldVersionQualified') is True,
             'server-programs-input-scope')
-    require(identity(pin['appSourceLock']) == files.identity(ROOT / 'sources.lock.json') and
-            re.fullmatch('[0-9a-f]{40}', pin.get('serverRevision', '')) and
+    source_binding.validate_current(pin, ROOT / 'sources.lock.json')
+    require(re.fullmatch('[0-9a-f]{40}', pin.get('serverRevision', '')) and
             re.fullmatch('[0-9a-f]{40}', pin.get('integrationRevision', '')), 'server-programs-current-source-pin')
     total = validate_inventory(pin['files'], LIMITS['entries'], LIMITS['memberBytes'], LIMITS['fileBytes'])
     require(total == pin['archiveFileBytes'] and len(pin['files']) == pin['archiveEntries'] and
@@ -128,7 +128,8 @@ def validate_package(receipt, pin):
             set(receipt['notices']) == set(pin['noticeFiles']), 'server-programs-package-provenance-differs')
     require(derivative.get('formatVersion') == 1 and derivative.get('scope') == 'paired-linux-arm64-server-engine-derivative' and
             derivative.get('runtimeMount') == '/esteria-server-programs' and derivative.get('originalReceiptsPreserved') is True and
-            derivative['sourcesLock'] == pin['appSourceLock'] and derivative['originalBuild'] == pin['originalBuild'] and
+            derivative['serverSource'] == pin['serverSource'] and
+            derivative['sourcesLock'] == pin['serverBuildSourceLock'] and derivative['originalBuild'] == pin['originalBuild'] and
             derivative['originalModules'] == pin['originalModules'] and derivative['integrationRevision'] == pin['integrationRevision'] and
             derivative['buildId'] == pin['buildId'] and derivative['serverSource']['commit'] == pin['serverRevision'] and
             set(derivative['programs']) == set(PROGRAMS), 'server-programs-derivative-binding-differs')
@@ -156,13 +157,14 @@ def verify_archive(path, pin, derivative):
                     require(item.size <= 128 << 10, 'server-programs-provenance-bound')
                     with tar.extractfile(item) as incoming: values[item.name] = incoming.read(item.size + 1)
                 tar.members.clear()
+    source_binding.validate_archived(values['provenance/sources.lock.json'], pin)
     build = json.loads(values['provenance/server-build.json']); compiled = json.loads(values['provenance/server-modules.json'])
     require(json.loads(values['provenance/server-engine-derivative.json']) == derivative and
-            hashlib.sha256(values['provenance/sources.lock.json']).hexdigest() == pin['appSourceLock']['sha256'] and
+            hashlib.sha256(values['provenance/sources.lock.json']).hexdigest() == pin['serverBuildSourceLock']['sha256'] and
             hashlib.sha256(values['provenance/server-build.json']).hexdigest() == pin['originalBuild']['sha256'] and
             hashlib.sha256(values['provenance/server-modules.json']).hexdigest() == pin['originalModules']['sha256'] and
-            build['serverSource'] == derivative['serverSource'] and build['sourcesLock'] == pin['appSourceLock'] and
-            compiled['serverBuild'] == pin['originalBuild'] and compiled['sourceLockSha256'] == pin['appSourceLock']['sha256'] and
+            build['serverSource'] == derivative['serverSource'] and build['sourcesLock'] == pin['serverBuildSourceLock'] and
+            compiled['serverBuild'] == pin['originalBuild'] and compiled['sourceLockSha256'] == pin['serverBuildSourceLock']['sha256'] and
             compiled['generatedListsMatchInstalledBinaries'] is True and compiled['enabledModules'] == derivative['enabledModules'] and
             compiled['configFiles'] == derivative['configFiles'], 'server-programs-original-module-binding-differs')
     configs = {'etc/' + n + '.conf.dist' for n in PROGRAMS} | {'etc/modules/' + n + '.dist' for n in compiled['configFiles']}
@@ -238,13 +240,13 @@ def verify_sources(sources, pin):
             sealed.get('sourceInputArchive') == identity(pin['originalSourceInputs']['archive']) and
             sealed.get('sourceInputReceipt') == pin['originalSourceInputs']['receipt'] and
             sealed.get('originalBuild') == pin['originalBuild'] and sealed.get('originalCompiledModules') == pin['originalModules'] and
-            sealed.get('sourceLock') == pin['appSourceLock'], 'server-programs-sealed-source-binding-differs')
+            sealed.get('sourceLock') == pin['serverBuildSourceLock'], 'server-programs-sealed-source-binding-differs')
     require(qualified.get('formatVersion') == 1 and qualified.get('scope') == 'actual-native-arm64-isolated-server-source-rebuild' and
             qualified.get('phase') == 'complete' and all(qualified.get(k) is True for k in
                 ('sourceCompanionComplete', 'isolatedSourceRebuildQualified', 'transitiveIncludeClosureProved', 'fullCompileObserved',
                  'noCompilerCacheUsed', 'fullBuildAndReferencesPassed', 'authWorldVersionExecuted', 'originalSelectionPreserved')) and
             qualified.get('originalBuild') == pin['originalBuild'] and qualified.get('originalCompiledModules') == pin['originalModules'] and
-            qualified.get('sourceLock') == pin['appSourceLock'] and qualified.get('sourceBitIdenticalBinaryClaimed') is False and
+            qualified.get('sourceLock') == pin['serverBuildSourceLock'] and qualified.get('sourceBitIdenticalBinaryClaimed') is False and
             all(qualified.get(k) is False for k in FALSE_FLAGS) and
             qualified.get('network') == dict(interfaces=['lo'], externalNetworkingAvailable=False) and
             all(qualified.get(k, {}).get('exitCode') == 0 for k in ('configure', 'fullBuild', 'referenceBuild', 'install')),
@@ -265,7 +267,7 @@ def descriptor(pin):
         archive=dict(identity(pin['archive']), file=pin['archive']['file'], assetPath=ASSETS + '/' + ARCHIVE),
         requiredFiles=required, archiveEntries=pin['archiveEntries'], archiveFileBytes=pin['archiveFileBytes'], limits=LIMITS,
         freshSetupFreeBytes=pin['archive']['bytes']+pin['archiveFileBytes']+LIMITS['metadataBytes']+(64 << 20),
-        inputLockSha256=files.identity(LOCK)['sha256'], appSourceLockSha256=pin['appSourceLock']['sha256'],
+        inputLockSha256=files.identity(LOCK)['sha256'], **source_binding.descriptor_fields(pin),
         serverRevision=pin['serverRevision'], integrationRevision=pin['integrationRevision'], buildId=pin['buildId'],
         requiredServerRuntimeArchiveSha256=pin['requiredServerRuntimeArchive']['sha256'],
         guestMount='/esteria-server-programs', programNames=list(PROGRAMS), originalBuild=pin['originalBuild'],

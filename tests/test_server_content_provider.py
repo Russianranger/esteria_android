@@ -41,7 +41,9 @@ class ContentProvider(unittest.TestCase):
         receipt=self.package/'package-receipt.json';receipt.write_bytes(provider.encoded(r))
         self.receipt=r
         self.pin=dict(archive=dict(r['archive'],file='server-content.tar.gz'),receipt=provider.files.identity(receipt),
-            appSourceLock={'sha256':f.lock},serverSource=f.source,compiledModules=r['compiledModules'],
+            appSourceLock={'bytes':2170,'sha256':f.lock},serverBuildSourceLock={'bytes':2170,'sha256':f.lock},
+            serverBuildSourceLockText='synthetic fixture, not a production source lock',
+            serverBuildCompatibility={'fixture':True},serverSource=f.source,compiledModules=r['compiledModules'],
             originalBuild=f.compiled['serverBuild'],requiredFiles={n:r['archiveFiles'][n] for n in provider.content.METADATA},
             archiveEntries=len(r['archiveFiles']),archiveFileBytes=sum(row['bytes'] for row in r['archiveFiles'].values()),
             limits=dict(entries=128,memberBytes=max(row['bytes'] for row in r['archiveFiles'].values()),
