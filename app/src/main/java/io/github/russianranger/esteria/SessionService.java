@@ -50,6 +50,8 @@ import io.github.russianranger.esteria.runtime.ShaderToolsSetup;
 import io.github.russianranger.esteria.runtime.TurnipSetup;
 import io.github.russianranger.esteria.runtime.ServerDataToolsSetup;
 import io.github.russianranger.esteria.runtime.LocalWorldSetup;
+import io.github.russianranger.esteria.runtime.GameSession;
+import io.github.russianranger.esteria.presentation.GamePresentationPanel;
 import java.time.Duration;
 
 /** Foreground owner of large import jobs. Runtime launch remains gated until qualified binaries exist. */
@@ -62,6 +64,7 @@ public final class SessionService extends Service {
     static final String PREPARE_SERVER_RUNTIME = "io.github.russianranger.esteria.PREPARE_SERVER_RUNTIME";
     static final String PREPARE_WORLD = "io.github.russianranger.esteria.PREPARE_WORLD";
     static final String WORLD_LOCALE = "worldLocale";
+    static final String FORCE_STOP = "io.github.russianranger.esteria.FORCE_STOP";
     static final String ACCEPT_UI = "io.github.russianranger.esteria.ACCEPT_UI";
     static final String KEEP_UI = "io.github.russianranger.esteria.KEEP_UI";
     static final String UI_REVIEW_DIGEST = "uiReviewDigest";
@@ -70,6 +73,8 @@ public final class SessionService extends Service {
     final class LocalBinder extends Binder { SessionService service() { return SessionService.this; } }
     private final IBinder binder = new LocalBinder();
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
+    private final ExecutorService supportWorker = Executors.newSingleThreadExecutor();
+    private final AtomicBoolean exporting = new AtomicBoolean();
     private final AtomicBoolean cancelled = new AtomicBoolean();
     private final AtomicBoolean busy = new AtomicBoolean();
     private final Handler main = new Handler(Looper.getMainLooper());
@@ -84,10 +89,21 @@ public final class SessionService extends Service {
     private volatile LocalWorldSetup.Handle worldSetup;
     private volatile LocalWorldSetup.Result preparedWorld;
     private volatile String activeAction;
+    private volatile GameSession.Handle game;
+    private volatile GamePresentationPanel.SessionEvents gameEvents;
+    private volatile boolean lastRecoveryRequired,lastClientExitAcknowledged;
+    private PowerManager.WakeLock operationWake;
+    private long wakeRenewAfter;
+    private final Runnable wakeHeartbeat=new Runnable(){public void run(){
+        if(busy.get()){keepAwake();main.postDelayed(this,60*1000L);}
+    }};
     private Path root;
     String status() { return status; }
     boolean busy() { return busy.get(); }
     ClientLaunchSetup.UiReview uiReview() { return pendingUiReview; }
+    GameSession.Handle game() { return game; }
+    GamePresentationPanel.SessionEvents presentationEvents() { return gameEvents; }
+    boolean forceStopAvailable() { GameSession.Handle owner=game;return owner!=null&&owner.needsForceStop(); }
     @Override public IBinder onBind(Intent intent) { return binder; }
     @Override public void onCreate() {
         super.onCreate();
@@ -96,19 +112,30 @@ public final class SessionService extends Service {
             Files.createDirectories(root.resolve("state/logs"));
             if (getSharedPreferences("session", MODE_PRIVATE).getBoolean("interrupted", false)) {
                 String action = getSharedPreferences("session", MODE_PRIVATE).getString("operationAction", "");
-                status = isRuntimeSetup(action) ? setupPaused(action, true)
+                status = START.equals(action)?"The previous local session was interrupted. Startup will check the retained database and files; export a support bundle if it fails."
+                        :isRuntimeSetup(action) ? setupPaused(action, true)
                         : "Previous operation was interrupted. Select the same folder or archive to resume where source metadata permits. Existing game data remains active.";
             }
             else if (new GameDataImporter(root.resolve("game")).resolveCurrent() != null)
                 status = "Client data is imported. Local runtime qualification is still pending.";
+            lastRecoveryRequired=getSharedPreferences("session",MODE_PRIVATE).getBoolean("lastRecoveryRequired",false);
+            lastClientExitAcknowledged=getSharedPreferences("session",MODE_PRIVATE).getBoolean("lastClientExitAcknowledged",false);
         } catch (IOException e) { status = "Storage unavailable: " + e.getMessage(); }
         NotificationManager manager = getSystemService(NotificationManager.class);
         manager.createNotificationChannel(new NotificationChannel(CHANNEL, "Local game and imports", NotificationManager.IMPORTANCE_LOW));
+        PowerManager power=getSystemService(PowerManager.class);
+        if(power!=null){operationWake=power.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,BuildConfig.APPLICATION_ID+":local-operation");operationWake.setReferenceCounted(false);}
     }
     @SuppressLint("ApplySharedPref") // The recovery marker must be durable before touching imported data.
     @Override public int onStartCommand(Intent intent, int flags, int startId) {
         latestStartId = startId;
         if (intent == null) { stopSelf(startId); return START_NOT_STICKY; }
+        if(FORCE_STOP.equals(intent.getAction())) {
+            GameSession.Handle owner=game;
+            if(owner!=null)try{owner.requestForceStop();status="Force stop requested. The session will require recovery checks.";}
+                catch(IOException error){status=error.getMessage();}
+            return START_NOT_STICKY;
+        }
         if (CANCEL.equals(intent.getAction())) {
             if (busy.get()) { requestCancellation(); status = "Stopping at a safe point…"; }
             else stopSelf(startId);
@@ -116,9 +143,18 @@ public final class SessionService extends Service {
         }
         // A repeated startForegroundService call still requires a foreground response.
         foreground("Preparing Esteria",busy.get()?activeAction:intent.getAction());
+        if(EXPORT.equals(intent.getAction())&&busy.get()&&game!=null) {
+            if(exporting.compareAndSet(false,true))supportWorker.execute(()->{
+                try{exportBundle(intent.getData());}catch(Exception error){status="Support export failed: "+error.getMessage();log(status);}
+                finally{exporting.set(false);}
+            });
+            return START_NOT_STICKY;
+        }
         if (!busy.compareAndSet(false, true)) return START_NOT_STICKY;
         activeAction=intent.getAction();
         cancelled.set(false);
+        keepAwake();
+        main.removeCallbacks(wakeHeartbeat);main.postDelayed(wakeHeartbeat,60*1000L);
         String operationId = UUID.randomUUID().toString();
         getSharedPreferences("session", MODE_PRIVATE).edit().putString("operation", operationId)
                 .putString("operationAction", intent.getAction()).putBoolean("interrupted", true).commit();
@@ -127,7 +163,7 @@ public final class SessionService extends Service {
                 if (root == null) throw new IOException("App storage is unavailable");
                 if (IMPORT.equals(intent.getAction())) importData(intent);
                 else if (EXPORT.equals(intent.getAction())) exportBundle(intent.getData());
-                else if (START.equals(intent.getAction())) checkLaunch();
+                else if (START.equals(intent.getAction())) startLocalGame(intent.getStringExtra(WORLD_LOCALE));
                 else if (PREPARE_RUNTIME.equals(intent.getAction())) prepareRuntime();
                 else if (PREPARE_SERVER_RUNTIME.equals(intent.getAction())) prepareServerRuntime();
                 else if (PREPARE_WORLD.equals(intent.getAction())) prepareWorld(intent.getStringExtra(WORLD_LOCALE));
@@ -146,19 +182,23 @@ public final class SessionService extends Service {
                 status = "Import paused. Select the same folder or archive to resume where source metadata permits; existing game data is unchanged.";
                 log("Import paused");
             } catch (Exception e) {
-                status = cancelled.get() ? "Operation cancelled. Existing game data remains active."
+                status = START.equals(intent.getAction())?(lastRecoveryRequired?"The local session stopped with recovery checks required. Export the support bundle for details."
+                        :"Local startup or shutdown did not complete normally. Export the support bundle for details.")
+                        :cancelled.get() ? "Operation cancelled. Existing game data remains active."
                         : e.getClass().getSimpleName() + ": " + e.getMessage();
-                log(status);
+                log(status+" failure="+e.getClass().getSimpleName()+": "+e.getMessage());
             } finally {
                 // Serialize completion with onStartCommand. Publishing idle before stopSelf
                 // could otherwise cancel a newly queued import. A replaced service instance
                 // may own a newer recovery marker; never clear that instance's operation.
-                main.post(() -> {
+                main.post(new Runnable(){public void run(){
+                    if(exporting.get()){main.postDelayed(this,200);return;}
                     if (operationId.equals(getSharedPreferences("session", MODE_PRIVATE).getString("operation", "")))
                         getSharedPreferences("session", MODE_PRIVATE).edit().putBoolean("interrupted", false).commit();
                     if (!destroyed) { stopForeground(STOP_FOREGROUND_REMOVE); stopSelf(latestStartId); }
+                    main.removeCallbacks(wakeHeartbeat);releaseWake();
                     busy.set(false);
-                });
+                }});
             }
         });
         return START_NOT_STICKY;
@@ -192,15 +232,61 @@ public final class SessionService extends Service {
         status = "Import complete: " + result.copiedFiles + " copied, " + result.reusedFiles + " resumed.\nBuild 12340 base checks passed; full Esteria content and runtime are not yet qualified.";
         log("Import complete generation=" + result.generation + " copied=" + result.copiedFiles + " reused=" + result.reusedFiles);
     }
-    private void checkLaunch() throws Exception {
+    private void startLocalGame(String locale) throws IOException {
         if (new GameDataImporter(root.resolve("game")).resolveCurrent() == null) throw new IOException("Import a build 12340 client first");
-        Properties runtime = new Properties();
-        try (InputStream input = getAssets().open("runtime.properties")) { runtime.load(input); }
-        if (!"true".equals(runtime.getProperty("qualified")))
-            throw new IOException(runtime.getProperty("reason", "No qualified local runtime is installed"));
-        // A true manifest alone cannot establish a working runtime. Implement and qualify the
-        // platform session adapter before admitting any runtime to this build.
-        throw new IOException("This build has no qualified client/server session adapter");
+        if(!BuildConfig.PROOT_PACKAGED||!BuildConfig.CLIENT_RUNTIME_PACKAGED||!BuildConfig.GUEST_BRIDGES_PACKAGED||
+                !BuildConfig.TURNIP_PACKAGED||!BuildConfig.SERVER_RUNTIME_PACKAGED||!BuildConfig.SERVER_PROGRAMS_PACKAGED||
+                !BuildConfig.SERVER_CONTENT_PACKAGED||!BuildConfig.SERVER_DATA_TOOLS_PACKAGED||!BuildConfig.SHADER_TOOLS_PACKAGED)
+            throw new IOException("This build does not include the complete local game profile");
+        if(locale==null)locale=getSharedPreferences("world",MODE_PRIVATE).getString("locale",null);
+        if(locale==null)throw new IOException("Select the imported client language before starting");
+        prepareRuntime();prepareServerRuntime();prepareWorld(locale);
+        if(cancelled.get())throw new RuntimeWork.CancelledException();
+        LocalWorldSetup.Result setup=preparedWorld;
+        if(setup==null)throw new IOException("Local world setup did not complete");
+        GamePresentationPanel.SessionEvents relay=new GamePresentationPanel.SessionEvents(code->{
+            cancelled.set(true);status="A local session component stopped. Export the support bundle after shutdown.";log("Game component failure="+code);
+        });
+        gameEvents=relay;
+        GameSession.Handle owner=GameSession.begin(this,root,setup,new ClientRuntimeSetup(this,root),new GuestBridgeSetup(this,root),
+            new TurnipSetup(this,root),new GameSession.Events(){
+                public void frameSize(int width,int height){relay.frameSize(width,height);}
+                public void failed(String code){relay.failed(code);}
+                public void clientExited(int exitCode,boolean forced){cancelled.set(true);log("Client process exited code="+exitCode+" forced="+forced+" saveQualified=false");}
+            });
+        game=owner;lastRecoveryRequired=false;lastClientExitAcknowledged=false;
+        Throwable operationFailure=null;
+        try {
+            owner.start((phase,path,completed,total)->{keepAwake();status=phase.contains("database")?"Starting the local database…":phase.startsWith("server")?"Starting local services…":"Starting the reconstructed client…";},cancelled::get);
+            status="Local client started. Displayed login and world state have not been automatically verified.";
+            while(!cancelled.get()&&owner.state()==GameSession.State.CLIENT_STARTED&&owner.isClientAlive()) {
+                keepAwake();try{Thread.sleep(100);}catch(InterruptedException error){Thread.currentThread().interrupt();throw new IOException("Session worker interrupted",error);}
+            }
+        }catch(IOException|RuntimeException error){operationFailure=error;throw error;}
+        finally {
+            IOException cleanup=closeGame(owner);lastRecoveryRequired=owner.recoveryRequired();lastClientExitAcknowledged=owner.clientExitAcknowledged();
+            if(cleanup!=null){if(operationFailure!=null)operationFailure.addSuppressed(cleanup);else throw cleanup;}
+        }
+        status=lastRecoveryRequired?"Session stopped. Recovery checks are required before the next launch.":"Local session stopped.";
+    }
+    private IOException closeGame(GameSession.Handle owner) {
+        IOException failure=null;boolean interrupted=Thread.interrupted();
+        while(owner.state()!=GameSession.State.CLOSED) {
+            keepAwake();
+            try{owner.close(Duration.ofSeconds(30));}
+            catch(IOException error){if(failure==null)failure=error;else if(error!=failure&&failure.getSuppressed().length<15)failure.addSuppressed(error);}
+            catch(RuntimeException error){IOException wrapped=new IOException("Game cleanup failed; ownership retained",error);if(failure==null)failure=wrapped;else if(failure.getSuppressed().length<15)failure.addSuppressed(wrapped);}
+            if(owner.state()!=GameSession.State.CLOSED) {
+                status=owner.needsForceStop()?"The client has not closed. You can wait, or choose Force stop; unsaved client state may be lost."
+                    :"Stopping the local session. Its files remain in use until cleanup finishes…";
+                try{Thread.sleep(250);}catch(InterruptedException ignored){interrupted=true;}
+            }
+        }
+        log("Game owner closed clientExitAcknowledged="+owner.clientExitAcknowledged()+" recoveryRequired="+owner.recoveryRequired()
+            +" forced="+owner.wasForced()+" handoffRecoveryRequired="+owner.handoffRecoveryRequired()+" saveQualified=false");
+        getSharedPreferences("session",MODE_PRIVATE).edit().putBoolean("lastRecoveryRequired",owner.recoveryRequired())
+            .putBoolean("lastClientExitAcknowledged",owner.clientExitAcknowledged()).commit();
+        game=null;if(interrupted)Thread.currentThread().interrupt();return failure;
     }
     private void prepareRuntime() throws IOException {
         pendingUiReview=null;
@@ -216,6 +302,7 @@ public final class SessionService extends Service {
         if (graphics != null) graphics.requireWineArchive(setup.archiveSha256());
         final long[] lastUpdate = {0};
         RuntimeInstaller.Result result = setup.prepare((phase, path, completed, total) -> {
+            keepAwake();
             long now = android.os.SystemClock.elapsedRealtime();
             if (now - lastUpdate[0] >= 250 || completed == total) {
                 lastUpdate[0] = now;
@@ -232,6 +319,7 @@ public final class SessionService extends Service {
         if (bridges != null) {
             status = "Preparing display, input and audio support…";
             RuntimeInstaller.Result support = bridges.prepare((phase, path, completed, total) -> {
+                keepAwake();
                 long now = android.os.SystemClock.elapsedRealtime();
                 if (now - lastUpdate[0] >= 250 || completed == total) {
                     lastUpdate[0] = now;
@@ -246,6 +334,7 @@ public final class SessionService extends Service {
         if (shaders != null) {
             status = "Preparing offline shader tools…";
             RuntimeInstaller.Result installed = shaders.prepare((phase, path, completed, total) -> {
+                keepAwake();
                 long now = android.os.SystemClock.elapsedRealtime();
                 if (now - lastUpdate[0] >= 250 || completed == total) {
                     lastUpdate[0] = now;
@@ -267,6 +356,7 @@ public final class SessionService extends Service {
         if (client != null) {
             status = "Preparing reconstructed client files…";
             RuntimeInstaller.Result installed = client.prepare((phase, path, completed, total) -> {
+                keepAwake();
                 long now = android.os.SystemClock.elapsedRealtime();
                 if (now - lastUpdate[0] >= 250 || completed == total) {
                     lastUpdate[0] = now;
@@ -336,6 +426,7 @@ public final class SessionService extends Service {
         // prepare() reuses a verified dependency generation without opening its archive.
         // Continue after reuse so an app update can add a new programs generation.
         RuntimeInstaller.Result result = setup.prepare((phase, path, completed, total) -> {
+            keepAwake();
             long now = android.os.SystemClock.elapsedRealtime();
             if (now - lastUpdate[0] >= 250 || completed == total) {
                 lastUpdate[0] = now;
@@ -351,6 +442,7 @@ public final class SessionService extends Service {
         if (programs != null) {
             status = "Preparing bundled server programs…";
             RuntimeInstaller.Result installed = programs.prepare(setup.archiveSha256(), (phase, path, completed, total) -> {
+                keepAwake();
                 long now = android.os.SystemClock.elapsedRealtime();
                 if (now - lastUpdate[0] >= 250 || completed == total) {
                     lastUpdate[0] = now;
@@ -367,6 +459,7 @@ public final class SessionService extends Service {
         if (content != null) {
             status = "Preparing bundled server data…";
             RuntimeInstaller.Result installed = content.prepare(setup.archiveSha256(), (phase, path, completed, total) -> {
+                keepAwake();
                 long now = android.os.SystemClock.elapsedRealtime();
                 if (now - lastUpdate[0] >= 250 || completed == total) {
                     lastUpdate[0] = now;
@@ -382,6 +475,7 @@ public final class SessionService extends Service {
         if (extractors != null) {
             status = "Preparing bundled data tools…";
             RuntimeInstaller.Result installed = extractors.prepare(setup.archiveSha256(), (phase, path, completed, total) -> {
+                keepAwake();
                 long now = android.os.SystemClock.elapsedRealtime();
                 if (now - lastUpdate[0] >= 250 || completed == total) {
                     lastUpdate[0] = now;
@@ -424,6 +518,7 @@ public final class SessionService extends Service {
         Throwable operationFailure=null;LocalWorldSetup.Result result;
         try {
             result=owner.prepare((phase,path,completed,total)->{
+                keepAwake();
                 String label=phase.startsWith("server-data")?"Preparing world data":phase.startsWith("shader")?"Preparing graphics data":"Preparing the local database";
                 status=label+"…"+(path==null||path.isEmpty()?"":"\n"+path);
             },cancelled::get);
@@ -436,6 +531,7 @@ public final class SessionService extends Service {
             if(cleanup!=null){if(operationFailure!=null)operationFailure.addSuppressed(cleanup);else throw cleanup;}
         }
         preparedWorld=result;
+        getSharedPreferences("world",MODE_PRIVATE).edit().putString("locale",locale).apply();
         status="World data, shaders and the local database are prepared. World entry has not yet been validated.";
     }
     /** Keep the foreground operation busy while actual cleanup is outstanding.
@@ -443,6 +539,7 @@ public final class SessionService extends Service {
     private IOException closeWorldSetup(LocalWorldSetup.Handle owner) {
         IOException failure=null;boolean interrupted=Thread.interrupted();
         while(owner.state()!=LocalWorldSetup.State.CLOSED) {
+            keepAwake();
             try{owner.close(Duration.ofSeconds(20));}
             catch(IOException error){if(failure==null)failure=error;else if(failure!=error&&failure.getSuppressed().length<15)failure.addSuppressed(error);}
             catch(RuntimeException error){IOException wrapped=new IOException("Local setup cleanup failed; ownership retained",error);
@@ -466,6 +563,24 @@ public final class SessionService extends Service {
         facts.put("device.model", Build.MODEL); facts.put("device.manufacturer", Build.MANUFACTURER);
         facts.put("device.abis", android.text.TextUtils.join(",", Build.SUPPORTED_ABIS));
         facts.put("status", previousStatus); facts.put("runtime.qualified", "false");
+        GameSession.Handle gameOwner=game;
+        facts.put("game.retained",Boolean.toString(gameOwner!=null));
+        facts.put("game.lastRecoveryRequired",Boolean.toString(lastRecoveryRequired));
+        facts.put("game.lastClientExitAcknowledged",Boolean.toString(lastClientExitAcknowledged));
+        facts.put("game.characterSaveQualified","false");
+        if(gameOwner!=null) {
+            facts.put("game.state",gameOwner.state().name());
+            facts.put("game.clientAlive",Boolean.toString(gameOwner.isClientAlive()));
+            facts.put("game.needsExplicitForceStop",Boolean.toString(gameOwner.needsForceStop()));
+            facts.put("game.recoveryRequired",Boolean.toString(gameOwner.recoveryRequired()));
+            facts.put("game.handoffRecoveryRequired",Boolean.toString(gameOwner.handoffRecoveryRequired()));
+            if(gameOwner.presentation()!=null) {
+                long[] metrics=gameOwner.presentation().diagnostics();
+                facts.put("game.presentation.ready",Long.toString(metrics[0]));
+                facts.put("game.presentation.children",Long.toString(metrics[2]));
+                facts.put("game.presentation.failed",Long.toString(metrics[3]));
+            }
+        }
         LocalWorldSetup.Handle setupOwner=worldSetup;
         facts.put("worldSetup.retained",Boolean.toString(setupOwner!=null));
         if(setupOwner!=null)facts.put("worldSetup.state",setupOwner.state().name());
@@ -663,7 +778,7 @@ public final class SessionService extends Service {
     }
     /** Cheap observations captured only on explicit export; these are not gameplay measurements. */
     private void addPerformanceSnapshot(Map<String, String> facts) {
-        facts.put("snapshot.scope", "launcher-process observation; not a gameplay benchmark");
+        facts.put("snapshot.scope", "launcher-process and Android system observation; excludes child-process PSS; not a combined gameplay benchmark");
         facts.put("snapshot.capturedAtEpochMs", String.valueOf(System.currentTimeMillis()));
         try {
             ActivityManager manager = getSystemService(ActivityManager.class);
@@ -755,7 +870,14 @@ public final class SessionService extends Service {
         SafTreeSource source = activeFolderSource;
         if (source != null) source.cancel();
     }
-    @Override public void onDestroy() { destroyed = true; requestCancellation(); worker.shutdown(); super.onDestroy(); }
+    /** Bounded renewable CPU lease. Progress/monitor renew at most once a minute;
+     * even a lost callback cannot leave an indefinite power lease behind. */
+    private synchronized void keepAwake() {
+        long now=android.os.SystemClock.elapsedRealtime();
+        if(operationWake!=null&&now>=wakeRenewAfter){operationWake.acquire(10*60*1000L);wakeRenewAfter=now+60*1000L;}
+    }
+    private synchronized void releaseWake(){if(operationWake!=null&&operationWake.isHeld())operationWake.release();wakeRenewAfter=0;}
+    @Override public void onDestroy() { destroyed = true; requestCancellation(); worker.shutdown();supportWorker.shutdown();if(!busy.get())releaseWake();super.onDestroy(); }
     @Override public void onTimeout(int startId, int foregroundServiceType) {
         requestCancellation(); status = "Android stopped this setup operation. Start it again to resume completed work where supported.";
         stopForeground(STOP_FOREGROUND_REMOVE); stopSelf(startId);

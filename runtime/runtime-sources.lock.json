@@ -1,293 +1,36 @@
 {
-  "formatVersion": 1,
-  "purpose": "candidate acquisition and host staging; no Android or gameplay qualification",
-  "reference": {
-    "repository": "https://github.com/Russianranger/fta-launcher",
-    "revision": "7a9ce45988f295824d20c9ff7436a77a0baa4f07",
-    "path": "android/qualification/client-runtime-lock.json"
-  },
-  "packages": {
-    "wine-arm64": {
-      "status": "unqualified-candidate",
-      "release": "https://github.com/Russianranger/uo-android-launcher/releases/tag/v0.2.0",
-      "archive": {
-        "file": "client-runtime-arm64.tar.gz",
-        "bytes": 612917105,
-        "sha256": "f036c00a290abb953bec26be80c4d8fe492fd986e7a589c51008124432c8641e",
-        "url": "https://github.com/Russianranger/uo-android-launcher/releases/download/v0.2.0/client-runtime-arm64.tar.gz"
-      },
-      "manifest": {
-        "file": "client-runtime-manifest.json",
-        "bytes": 450,
-        "sha256": "d375adf23b621f83ef7b5fff95365312377399704abb486fd8d4164a1fe29a13",
-        "url": "https://github.com/Russianranger/uo-android-launcher/releases/download/v0.2.0/client-runtime-manifest.json"
-      },
-      "markerPath": "etc/memento-client-runtime.json",
-      "marker": {
-        "format": 2,
-        "architecture": "arm64",
-        "runtime": "fex-arm64ec-1",
-        "wine": "10.13-arm64ec",
-        "wine_commit": "a6844d10622fc1a973ec1f22fc4f78a0fcd6cb29",
-        "fex": "FEX-2510",
-        "fex_commit": "320c5f18475b0c8a7e99c51a5fdc5b5e35b147ab"
-      },
-      "manifestExtra": {
-        "source_commit": "0fca7bdc7045c2a1b70ce9f0bef6d31e968b42de"
-      },
-      "archiveEntries": 14092,
-      "archiveFileBytes": 2637799241,
-      "limits": {
-        "entries": 50000,
-        "memberBytes": 536870912,
-        "fileBytes": 4294967296,
-        "pathBytes": 4096
-      },
-      "components": {
-        "opt/wine/bin/wine": {
-          "bytes": 87152,
-          "sha256": "1164f99112773125c3a627a8c2ac874904394ea719b0ca77f83f2c73a8418669",
-          "elfMachine": 183,
-          "elfClass": 2
-        },
-        "opt/wine/bin/wineserver": {
-          "bytes": 4777352,
-          "sha256": "7167231900b0d10ad966224afa67342fe4e765a748b9df209a90544b76cc24b4",
-          "elfMachine": 183,
-          "elfClass": 2
-        },
-        "opt/wine/lib/wine/aarch64-windows/kernel32.dll": {
-          "bytes": 3538944,
-          "sha256": "ed8105ca1482393003821e9559c31b529a432fab6815f2f41a32bf895db288e8",
-          "peMachine": "0xaa64"
-        },
-        "opt/wine/lib/wine/aarch64-windows/libarm64ecfex.dll": {
-          "bytes": 5533696,
-          "sha256": "5040f73c2e3b5a0edc1c358421de70d719143862c8ddd5fe0870601499cb87dd",
-          "peMachine": "0x8664"
-        },
-        "opt/wine/lib/wine/aarch64-windows/libwow64fex.dll": {
-          "bytes": 4943872,
-          "sha256": "e0e05e7e8420c7b5357c1a49532441b1a475e448b181dc99bc5eacab77479f03",
-          "peMachine": "0xaa64"
-        },
-        "opt/wine/lib/wine/aarch64-windows/ntdll.dll": {
-          "bytes": 6946816,
-          "sha256": "b877d511cdbc5c0ae6667d3a3bb0656de1a1d3dde2c5913f21c61856341ecfb1",
-          "peMachine": "0xaa64"
-        },
-        "opt/wine/lib/wine/aarch64-windows/wininet.dll": {
-          "bytes": 3604480,
-          "sha256": "e9128dc91587f8cf52b25a95696a9853852427bd61cd57089882fb1f6da6ad54",
-          "peMachine": "0xaa64"
-        },
-        "opt/wine/lib/wine/aarch64-windows/wow64.dll": {
-          "bytes": 1310720,
-          "sha256": "3d72da6e8efd68ecb726e23395dcecd3b371a621b361739a24b24a2885e81e43",
-          "peMachine": "0xaa64"
-        },
-        "opt/wine/lib/wine/aarch64-windows/wow64win.dll": {
-          "bytes": 1245184,
-          "sha256": "6437058bc10811ae74961a88e9e624fa961b0d577d4771723f0aebc1d82d7bce",
-          "peMachine": "0xaa64"
-        },
-        "opt/wine/lib/wine/i386-windows/kernel32.dll": {
-          "bytes": 1318912,
-          "sha256": "6469211ce609f9ac8b4510bfaede42d700fed56b8bd772b4e8220073b89b6cf9",
-          "peMachine": "0x14c"
-        },
-        "opt/wine/lib/wine/i386-windows/ntdll.dll": {
-          "bytes": 2494464,
-          "sha256": "1708cfa458d1f5f69658731bae7ec655b2fa0d633a3cce742e0677cbfa0f9942",
-          "peMachine": "0x14c"
-        },
-        "opt/wine/lib/wine/i386-windows/wininet.dll": {
-          "bytes": 1150976,
-          "sha256": "28b4dca3ae2e16c2acb9cd01601d5230ee5c3ee90c555727135fa791c33cdbd8",
-          "peMachine": "0x14c"
-        },
-        "opt/wine/lib/wine/aarch64-windows/msvcp140.dll": {
-          "bytes": 6815744,
-          "sha256": "b888a4e08f5f47fc89aa311eb11dd3d794d6ec602eef9af2a6ec6160209d66d2",
-          "peMachine": "0xaa64"
-        },
-        "opt/wine/lib/wine/aarch64-windows/vcruntime140.dll": {
-          "bytes": 1048576,
-          "sha256": "de0ef65e60f43c4f44204fac21137bc003cca1afd403225c7a136d6db7a86c39",
-          "peMachine": "0xaa64"
-        },
-        "opt/wine/lib/wine/aarch64-windows/vcruntime140_1.dll": {
-          "bytes": 1048576,
-          "sha256": "f2ebff0e16f71c98411c9d7e10a5ced114c5fafaca0295477815f607703a0112",
-          "peMachine": "0x8664"
-        },
-        "opt/wine/lib/wine/aarch64-windows/vulkan-1.dll": {
-          "bytes": 1048576,
-          "sha256": "d86ee9a01da12a05ed98d0e84e701f16b3003402508875343093c444750b020a",
-          "peMachine": "0xaa64"
-        }
-      },
-      "metadataFiles": [
-        "etc/memento-client-packages.txt",
-        "usr/lib/os-release"
-      ],
-      "runtimeRecipe": {
-        "url": "https://raw.githubusercontent.com/Russianranger/uo-android-launcher/0fca7bdc7045c2a1b70ce9f0bef6d31e968b42de/client-runtime/Dockerfile",
-        "revision": "0fca7bdc7045c2a1b70ce9f0bef6d31e968b42de",
-        "sha256": "486f39b3110c8d0740bd4f7cbcb28d82434131bb86b53eadbd32936f1666f8bb",
-        "baseImage": "debian:bookworm-slim",
-        "baseImageDigest": null,
-        "note": "The original recipe has floating Debian package/base inputs. The existing binary archive is exact-hash pinned; byte-identical source rebuild is not claimed."
-      },
-      "abi": {
-        "host": "aarch64-linux-gnu",
-        "winePeArchitectures": [
-          "aarch64",
-          "arm64ec",
-          "i386"
-        ],
-        "directAndroidExec": false,
-        "serverRootfsCompatible": false,
-        "serverCompatibilityReason": "Current server CI uses Ubuntu 24.04; this candidate recipe uses Debian 12. Required glibc and C++/Boost/OpenSSL versions must be matched in a separate server rootfs.",
-        "unresolvedCrt": "vcruntime140_1.dll exists under aarch64-windows but its PE machine is 0x8664. Pure ARM64 client import resolution must be tested; directory name is not sufficient ABI evidence."
-      },
-      "sourceArchives": [
-        {
-          "file": "wine-arm64ec-source.tar.gz",
-          "bytes": 53416396,
-          "sha256": "93ffcd86d3f518934da5c93c768d43afe7e97d66f04f355d914f5cfb6731ac74",
-          "url": "https://github.com/Russianranger/uo-android-launcher/releases/download/v0.2.0/wine-arm64ec-source.tar.gz"
-        },
-        {
-          "file": "fex-2510-source-with-submodules.tar.gz",
-          "bytes": 222845230,
-          "sha256": "8a10a8e63cdea41a6c70b0f14d487fe4cb3f11c8fb5baba3e42090098e2745be",
-          "url": "https://github.com/Russianranger/uo-android-launcher/releases/download/v0.2.0/fex-2510-source-with-submodules.tar.gz"
-        },
-        {
-          "file": "runtime-corresponding-sources.tar.gz",
-          "bytes": 114558388,
-          "sha256": "492043660b1370e1910c8b8ca2b93be1f637f4929034f575591f14e67e015243",
-          "url": "https://github.com/Russianranger/uo-android-launcher/releases/download/v0.2.0/runtime-corresponding-sources.tar.gz"
-        }
-      ],
-      "licenseEvidence": [
-        {
-          "component": "Wine",
-          "license": "LGPL-2.1-or-later",
-          "url": "https://github.com/bylaws/wine/blob/a6844d10622fc1a973ec1f22fc4f78a0fcd6cb29/COPYING.LIB",
-          "sourceArchive": "wine-arm64ec-source.tar.gz",
-          "licenseFileSha256": "e237fa56668030e928551ddd60f05df5fe957f75eab874bbd017e085ed722e7c"
-        },
-        {
-          "component": "FEX",
-          "license": "MIT plus bundled dependency notices",
-          "url": "https://github.com/FEX-Emu/FEX/blob/320c5f18475b0c8a7e99c51a5fdc5b5e35b147ab/LICENSE",
-          "sourceArchive": "fex-2510-source-with-submodules.tar.gz",
-          "licenseFileSha256": "f34a779f56b36d22b20e1b990d23e583a6a7ca071331925fa46156441c77a1ee"
-        },
-        {
-          "component": "Debian runtime packages",
-          "license": "per package; retain usr/share/doc/*/copyright",
-          "inventoryPath": "etc/memento-client-packages.txt",
-          "sourceUrl": "https://snapshot.debian.org/",
-          "note": "Corresponding source closure for the exact Debian packages is not yet staged. Do not publish this as a complete binary/source distribution."
-        }
-      ],
-      "observedPackageVersions": {
-        "libc6:arm64": "2.36-9+deb12u14",
-        "libssl3:arm64": "3.0.20-1~deb12u2",
-        "libstdc++6:arm64": "12.2.0-14+deb12u1",
-        "libvulkan1:arm64": "1.3.239.0-1",
-        "python3": "3.11.2-1+b1",
-        "tigervnc-standalone-server": "1.12.0+dfsg-8"
-      },
-      "metadataSha256": {
-        "etc/memento-client-packages.txt": "d352e210a76cba919e036d4faa48a997054ee0c8ac598e2be98efe9f19a31fc9",
-        "usr/lib/os-release": "59a77b5f2666d9c85c489bd1911a6eebbd91ef22fe48b90a3b75f1b21f3844d4"
-      }
-    }
-  },
   "androidBridge": {
-    "status": "source-reference-only-not-packaged",
-    "repository": "https://github.com/termux/proot",
-    "revision": "7266fb3e8516535682f5a9c8f3a7e70f6506eddb",
     "license": "GPL-2.0-or-later",
+    "referenceBuildPath": "tools/build_client_bridge.py",
+    "referenceOwnershipPatch": "native/client-bridge/proot-exitkill.patch",
+    "repository": "https://github.com/termux/proot",
+    "requiredAbi": {
+      "androidApi": 26,
+      "loader": "AArch64 ET_EXEC, no interpreter/dependencies",
+      "minimumLoadAlignment": 16384,
+      "tracer": "AArch64 PIE, interpreter /system/bin/linker64, DT_NEEDED libc.so/libdl.so"
+    },
+    "requiredPackaging": "APK nativeLibraryDir with extractNativeLibs=true; imported guest binaries remain data. Never chmod+exec downloaded glibc programs directly from Android filesDir.",
+    "revision": "7266fb3e8516535682f5a9c8f3a7e70f6506eddb",
     "sourceArchive": "runtime-corresponding-sources.tar.gz",
     "sourceMember": "launcher-source/proot-source.tar.gz",
     "sourceMemberSha256": "d43ad342bb2e8f4d2afe6119b5ec3a1d8bb912d5897e2db7d2ddf928548c1c84",
+    "status": "source-reference-only-not-packaged",
     "talloc": {
-      "version": "2.4.3",
       "license": "LGPL-3.0-or-later",
       "sha256": "dc46c40b9f46bb34dd97fe41f548b0e8b247b77a918576733c528e83abd854dd",
-      "url": "https://www.samba.org/ftp/talloc/talloc-2.4.3.tar.gz"
-    },
-    "referenceBuildPath": "tools/build_client_bridge.py",
-    "referenceOwnershipPatch": "native/client-bridge/proot-exitkill.patch",
-    "requiredAbi": {
-      "tracer": "AArch64 PIE, interpreter /system/bin/linker64, DT_NEEDED libc.so/libdl.so",
-      "loader": "AArch64 ET_EXEC, no interpreter/dependencies",
-      "minimumLoadAlignment": 16384,
-      "androidApi": 26
-    },
-    "requiredPackaging": "APK nativeLibraryDir with extractNativeLibs=true; imported guest binaries remain data. Never chmod+exec downloaded glibc programs directly from Android filesDir."
-  },
-  "server": {
-    "status": "not-yet-packaged",
-    "architecture": "linux-arm64",
-    "requirements": [
-      "Ubuntu 24.04-compatible glibc/shared libraries matching the current server build",
-      "Python3 standard library",
-      "MySQL 8 mysql and mysqld plus dependencies",
-      "Exact raw SELECT VERSION() string in package manifest"
-    ],
-    "sharesWineRootfs": false
-  },
-  "softwareGraphics": {
-    "status": "candidate-static-identities-only",
-    "runtimeArchiveSha256": "f036c00a290abb953bec26be80c4d8fe492fd986e7a589c51008124432c8641e",
-    "icdPath": "usr/share/vulkan/icd.d/lvp_icd.aarch64.json",
-    "icdLibrary": "/usr/lib/aarch64-linux-gnu/libvulkan_lvp.so",
-    "icdApiVersion": "1.1.230",
-    "expectedAdapterPrefix": "Vulkan adapter: llvmpipe",
-    "components": {
-      "usr/share/vulkan/icd.d/lvp_icd.aarch64.json": {
-        "bytes": 162,
-        "sha256": "0950c584a06fc5531dbaedef764764cd8f4af5e4390d416971db7c62e85da22f"
-      },
-      "usr/lib/aarch64-linux-gnu/libvulkan_lvp.so": {
-        "bytes": 6569376,
-        "sha256": "ce6f6917dd22ed612ae8649a9eb9c615a973a2e9eb9a58b8cc8655f22c933c6b",
-        "elfMachine": 183,
-        "elfClass": 2
-      },
-      "usr/lib/aarch64-linux-gnu/libvulkan.so.1.3.239": {
-        "bytes": 526896,
-        "sha256": "605f52f426f01a2c468ecd920b3de31452fde495f2c0d99602fffb93e782767c",
-        "elfMachine": 183,
-        "elfClass": 2
-      },
-      "opt/wine/lib/wine/aarch64-unix/winevulkan.so": {
-        "bytes": 7364296,
-        "sha256": "8ff12f6fbb27f2e9192300ceaadb18aaee37b58cb68e5de81ce137b7f16fdd51",
-        "elfMachine": 183,
-        "elfClass": 2
-      }
-    },
-    "note": "Software reference only; no Android display, Adreno driver, or game-frame validation."
+      "url": "https://www.samba.org/ftp/talloc/talloc-2.4.3.tar.gz",
+      "version": "2.4.3"
+    }
   },
   "androidInstallation": {
     "formatVersion": 1,
-    "packageKey": "wine-arm64",
     "metadataBytes": 33554432,
+    "packageKey": "wine-arm64",
     "requiredMetadata": {
-      "etc/memento-client-runtime.json": {
-        "bytes": 215,
-        "sha256": "db1d304311c46e645d3907ac6abc866895ca4b2f04302b96f94c497d1e3a72c5"
-      },
-      "etc/memento-client-packages.txt": {
-        "bytes": 5804,
-        "sha256": "d352e210a76cba919e036d4faa48a997054ee0c8ac598e2be98efe9f19a31fc9"
+      "etc/esteria-wine-arm64.json": {
+        "bytes": 66640,
+        "sha256": "4b731a5f450a556632c598ddebda2ec3f814c8d7ea2c9e1529d6c80c8773e0a5"
       },
       "usr/lib/os-release": {
         "bytes": 267,
@@ -295,32 +38,2940 @@
       }
     }
   },
+  "formatVersion": 1,
+  "packages": {
+    "wine-arm64": {
+      "archive": {
+        "bytes": 282628308,
+        "file": "wine-arm64.tar.gz",
+        "sha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/wine-arm64.tar.gz"
+      },
+      "archiveEntries": 14180,
+      "archiveFileBytes": 1325744204,
+      "components": {
+        "opt/wine/bin/wine": {
+          "bytes": 67744,
+          "elfClass": 2,
+          "elfMachine": 183,
+          "sha256": "7d7f35b538ccf2e998fe0bb6c46a2ef0e24ade47e0aefc1df653f80f73ad68c3"
+        },
+        "opt/wine/bin/wineserver": {
+          "bytes": 725840,
+          "elfClass": 2,
+          "elfMachine": 183,
+          "sha256": "d2761747e82e560aba395b2b70061c196ee0d943dfd17ea7ed4f7e81b35ea266"
+        },
+        "opt/wine/lib/wine/aarch64-unix/ntdll.so": {
+          "bytes": 531176,
+          "elfClass": 2,
+          "elfMachine": 183,
+          "sha256": "70a81a6b936851bd5675551c9ced3d6c9707f1e9033737ea0dbe96728631875b"
+        },
+        "opt/wine/lib/wine/aarch64-unix/winealsa.so": {
+          "bytes": 134144,
+          "elfClass": 2,
+          "elfMachine": 183,
+          "sha256": "cc3de8fd246ebdb46879a05debfa451437d5dd7fc655bd249165606c23c882ab"
+        },
+        "opt/wine/lib/wine/aarch64-unix/winevulkan.so": {
+          "bytes": 854160,
+          "elfClass": 2,
+          "elfMachine": 183,
+          "sha256": "1f3ad380d36fb467988d20eea122b0000fe52afc1258f7eb9635963fad45ef68"
+        },
+        "opt/wine/lib/wine/aarch64-windows/kernel32.dll": {
+          "bytes": 1114112,
+          "peMachine": "0xaa64",
+          "sha256": "366e1aeb898a451da12334ca74013df911f8a93dad1585c74588a55c14920dfa"
+        },
+        "opt/wine/lib/wine/aarch64-windows/libarm64ecfex.dll": {
+          "bytes": 5533696,
+          "peMachine": "0x8664",
+          "sha256": "94921e14efca94833a9b12cbb33c9dec641b65d321f062168fb241dec8334fc1"
+        },
+        "opt/wine/lib/wine/aarch64-windows/libwow64fex.dll": {
+          "bytes": 4943872,
+          "peMachine": "0xaa64",
+          "sha256": "824bf9082e2cf4a7b1bd7571e8ef00c35543d528fbc3cc6efd3a566c391dfc93"
+        },
+        "opt/wine/lib/wine/aarch64-windows/msvcp140.dll": {
+          "bytes": 2031616,
+          "peMachine": "0xaa64",
+          "sha256": "aa135ed8f237f0d0fe2a49cdc79b2a643b99c7890e5646b2e64f83e937e0762f"
+        },
+        "opt/wine/lib/wine/aarch64-windows/ntdll.dll": {
+          "bytes": 1769472,
+          "peMachine": "0xaa64",
+          "sha256": "ee9faf7292b63a890ed1d42e65b79dffd83f7650d82f21d2d9b54a838aa2d6e4"
+        },
+        "opt/wine/lib/wine/aarch64-windows/vcruntime140.dll": {
+          "bytes": 589824,
+          "peMachine": "0xaa64",
+          "sha256": "1e9fa0575cf8d4b0bf508e51eb1a4009597be7558c0f25d4d12914505a747067"
+        },
+        "opt/wine/lib/wine/aarch64-windows/vcruntime140_1.dll": {
+          "bytes": 589824,
+          "peMachine": "0x8664",
+          "sha256": "63cffb993489fed81f43a0358f9264c04d29d379fa2f51f5f886c3df296c1ba0"
+        },
+        "opt/wine/lib/wine/aarch64-windows/vulkan-1.dll": {
+          "bytes": 655360,
+          "peMachine": "0xaa64",
+          "sha256": "f259c3b3f69d8e0046e49f9e0031063766c8d718ddc2986a1d82fa3e2520b71b"
+        },
+        "opt/wine/lib/wine/aarch64-windows/winealsa.drv": {
+          "bytes": 589824,
+          "peMachine": "0xaa64",
+          "sha256": "ea1da4bccb4188f34148f55daaff9acea37f2d172b8ff09ab9c311ccd6611595"
+        },
+        "opt/wine/lib/wine/aarch64-windows/wininet.dll": {
+          "bytes": 1245184,
+          "peMachine": "0xaa64",
+          "sha256": "3009a684d276ce1c73fafb7f3d9ad7c2617636ef2205a550eb1a2f4a9d954c11"
+        },
+        "opt/wine/lib/wine/aarch64-windows/ws2_32.dll": {
+          "bytes": 851968,
+          "peMachine": "0xaa64",
+          "sha256": "f9b8a289ab4d8134368ebb4efae17ab9fe7dfafd4bb2ebc0267a51b893975c88"
+        },
+        "opt/wine/lib/wine/i386-windows/ntdll.dll": {
+          "bytes": 626688,
+          "peMachine": "0x14c",
+          "sha256": "bd65f71863fd43c8027b179991964bdf644e5e8ed4f89a02f23bec8d5c393de1"
+        },
+        "usr/bin/Xtigervnc": {
+          "bytes": 2719912,
+          "elfClass": 2,
+          "elfMachine": 183,
+          "sha256": "d89fedbd07ad83a7ccc669396f3030e9940dad2a30bf299a063093e6efa913de"
+        },
+        "usr/bin/python3.11": {
+          "bytes": 6616880,
+          "elfClass": 2,
+          "elfMachine": 183,
+          "sha256": "2ceb9199570aaf34a254b9ea88b1d77f38530833e2a12688d002a59c905b51b2"
+        },
+        "usr/lib/aarch64-linux-gnu/libasound.so.2.0.0": {
+          "bytes": 1116648,
+          "elfClass": 2,
+          "elfMachine": 183,
+          "sha256": "9fade6b3aedf1ba944e6795b52b74378f2f89166b92ee542582171416a76572d"
+        },
+        "usr/lib/aarch64-linux-gnu/libvulkan.so.1.3.239": {
+          "bytes": 526896,
+          "elfClass": 2,
+          "elfMachine": 183,
+          "sha256": "605f52f426f01a2c468ecd920b3de31452fde495f2c0d99602fffb93e782767c"
+        },
+        "usr/lib/aarch64-linux-gnu/libvulkan_lvp.so": {
+          "bytes": 6569376,
+          "elfClass": 2,
+          "elfMachine": 183,
+          "sha256": "ce6f6917dd22ed612ae8649a9eb9c615a973a2e9eb9a58b8cc8655f22c933c6b"
+        },
+        "usr/share/alsa/alsa.conf": {
+          "bytes": 10117,
+          "sha256": "ea7c6cedb7da16ba51a0fea3e960416a2240e29c1f5d42e475c1dfcd19eb74ee"
+        },
+        "usr/share/doc/esteria-wine-arm64/COPYING.LIB": {
+          "bytes": 26434,
+          "sha256": "e237fa56668030e928551ddd60f05df5fe957f75eab874bbd017e085ed722e7c"
+        },
+        "usr/share/doc/esteria-wine-arm64/fex/External/Catch2/LICENSE.txt": {
+          "bytes": 1338,
+          "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566"
+        },
+        "usr/share/doc/esteria-wine-arm64/fex/External/Vulkan-Headers/LICENSE.md": {
+          "bytes": 458,
+          "sha256": "ac24e5ea920e4318e4d02c4086ae51f53cfb03feed06c18df1019e7ada1ec7bc"
+        },
+        "usr/share/doc/esteria-wine-arm64/fex/External/Vulkan-Headers/LICENSES/Apache-2.0.txt": {
+          "bytes": 11358,
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        },
+        "usr/share/doc/esteria-wine-arm64/fex/External/Vulkan-Headers/LICENSES/MIT.txt": {
+          "bytes": 1084,
+          "sha256": "1ca3502222d967f3be5751c55f6b7ee735b5383909c3b501495f54b216dbf227"
+        },
+        "usr/share/doc/esteria-wine-arm64/fex/External/cephes/LICENSE": {
+          "bytes": 4754,
+          "sha256": "edf1440b625e6d434a986cdb535c702001afab8959d94ce6275441a58cfd0ebb"
+        },
+        "usr/share/doc/esteria-wine-arm64/fex/External/fex-posixtest-bins/src/COPYING": {
+          "bytes": 17992,
+          "sha256": "32b1062f7da84967e7019d01ab805935caa7ab7321a7ced0e30ebe75e5df1670"
+        },
+        "usr/share/doc/esteria-wine-arm64/fex/External/fmt/LICENSE": {
+          "bytes": 1431,
+          "sha256": "07580f2a3b35709ce703d523f447b242f6dfec7582a8c0df102c7fa2849375f8"
+        },
+        "usr/share/doc/esteria-wine-arm64/fex/External/jemalloc/COPYING": {
+          "bytes": 1709,
+          "sha256": "94aa2caa98c25d942f58b956c71dba6a99ff98fc3a31cbc669fe2a4cd0268b53"
+        },
+        "usr/share/doc/esteria-wine-arm64/fex/External/jemalloc_glibc/COPYING": {
+          "bytes": 1709,
+          "sha256": "94aa2caa98c25d942f58b956c71dba6a99ff98fc3a31cbc669fe2a4cd0268b53"
+        },
+        "usr/share/doc/esteria-wine-arm64/fex/External/range-v3/LICENSE.txt": {
+          "bytes": 7233,
+          "sha256": "2b74ee37dd1a90b2b385534b7dbc171938409bda468673a123ff25302c9c5739"
+        },
+        "usr/share/doc/esteria-wine-arm64/fex/External/robin-map/LICENSE": {
+          "bytes": 1102,
+          "sha256": "11f2c685ba565a31aef1219f63a7a8845602c97bff70016b9e3278dfe51a2ec5"
+        },
+        "usr/share/doc/esteria-wine-arm64/fex/External/tiny-json/LICENSE": {
+          "bytes": 1068,
+          "sha256": "83c6abf07e7123427303b5f12cd995122c372a5cb96815ec130a18628396fb7c"
+        },
+        "usr/share/doc/esteria-wine-arm64/fex/External/tracy/LICENSE": {
+          "bytes": 1618,
+          "sha256": "16f7df4828bd89c880c17dd2f45e834b754b6d5e8c9a9ee886af1be4b89475ca"
+        },
+        "usr/share/doc/esteria-wine-arm64/fex/External/tracy/examples/ToyPathTracer/license.md": {
+          "bytes": 1210,
+          "sha256": "88d9b4eb60579c191ec391ca04c16130572d7eedc4a86daa58bf28c6e14c9bcd"
+        },
+        "usr/share/doc/esteria-wine-arm64/fex/External/tracy/public/libbacktrace/LICENSE": {
+          "bytes": 1478,
+          "sha256": "ef8a9b3247488f8901ca60de9b17b745d7bd67e5ec1e622f80d62364572200d8"
+        },
+        "usr/share/doc/esteria-wine-arm64/fex/External/xxhash/LICENSE": {
+          "bytes": 1389,
+          "sha256": "6ffedbc0f7878612d2b23589f1ff2ab15633e1df7963a5d9fc750ec5500c7e7a"
+        },
+        "usr/share/doc/esteria-wine-arm64/fex/External/xxhash/cli/COPYING": {
+          "bytes": 18092,
+          "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643"
+        },
+        "usr/share/doc/esteria-wine-arm64/fex/External/xxhash/tests/bench/LICENSE": {
+          "bytes": 18092,
+          "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643"
+        },
+        "usr/share/doc/esteria-wine-arm64/fex/External/xxhash/tests/collisions/LICENSE": {
+          "bytes": 18092,
+          "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643"
+        },
+        "usr/share/doc/esteria-wine-arm64/fex/FEXCore/LICENSE": {
+          "bytes": 1094,
+          "sha256": "f34a779f56b36d22b20e1b990d23e583a6a7ca071331925fa46156441c77a1ee"
+        },
+        "usr/share/doc/esteria-wine-arm64/fex/LICENSE": {
+          "bytes": 1094,
+          "sha256": "f34a779f56b36d22b20e1b990d23e583a6a7ca071331925fa46156441c77a1ee"
+        },
+        "usr/share/doc/esteria-wine-arm64/fex/NOTICE-MANIFEST.json": {
+          "bytes": 3153,
+          "sha256": "10efd00aac0db20dee914d662a659ab2623f86b20d85ed431ec28d8c03aeab44"
+        },
+        "usr/share/doc/esteria-wine-arm64/fex/Source/Common/cpp-optparse/LICENSE": {
+          "bytes": 1082,
+          "sha256": "d638447635afa6837615553bcebbba60bc80a0e62ed9b158b4ed969e8bb72421"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/LICENSE.TXT": {
+          "bytes": 15141,
+          "sha256": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/aarch64-w64-mingw32/share/mingw32/COPYING": {
+          "bytes": 2326,
+          "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/aarch64-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt": {
+          "bytes": 10936,
+          "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/aarch64-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt": {
+          "bytes": 5905,
+          "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/aarch64-w64-mingw32/share/mingw32/COPYING.winpthreads.txt": {
+          "bytes": 2883,
+          "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/aarch64-w64-mingw32/share/mingw32/COPYING.winstorecompat.txt": {
+          "bytes": 1099,
+          "sha256": "fa7368d1f93d890c173177475d8ec7aff265a7d08f1f364d66f74d138978ce36"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/arm64ec-w64-mingw32/share/mingw32/COPYING": {
+          "bytes": 2326,
+          "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/arm64ec-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt": {
+          "bytes": 10936,
+          "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/arm64ec-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt": {
+          "bytes": 5905,
+          "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/arm64ec-w64-mingw32/share/mingw32/COPYING.winpthreads.txt": {
+          "bytes": 2883,
+          "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/arm64ec-w64-mingw32/share/mingw32/COPYING.winstorecompat.txt": {
+          "bytes": 1099,
+          "sha256": "fa7368d1f93d890c173177475d8ec7aff265a7d08f1f364d66f74d138978ce36"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/armv7-w64-mingw32/share/mingw32/COPYING": {
+          "bytes": 2326,
+          "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/armv7-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt": {
+          "bytes": 10936,
+          "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/armv7-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt": {
+          "bytes": 5905,
+          "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/armv7-w64-mingw32/share/mingw32/COPYING.winpthreads.txt": {
+          "bytes": 2883,
+          "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/armv7-w64-mingw32/share/mingw32/COPYING.winstorecompat.txt": {
+          "bytes": 1099,
+          "sha256": "fa7368d1f93d890c173177475d8ec7aff265a7d08f1f364d66f74d138978ce36"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/i686-w64-mingw32/share/mingw32/COPYING": {
+          "bytes": 2326,
+          "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/i686-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt": {
+          "bytes": 10936,
+          "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/i686-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt": {
+          "bytes": 5905,
+          "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/i686-w64-mingw32/share/mingw32/COPYING.winpthreads.txt": {
+          "bytes": 2883,
+          "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/i686-w64-mingw32/share/mingw32/COPYING.winstorecompat.txt": {
+          "bytes": 1099,
+          "sha256": "fa7368d1f93d890c173177475d8ec7aff265a7d08f1f364d66f74d138978ce36"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/share/gendef/COPYING": {
+          "bytes": 35147,
+          "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/share/widl/COPYING": {
+          "bytes": 2326,
+          "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/x86_64-w64-mingw32/share/mingw32/COPYING": {
+          "bytes": 2326,
+          "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/x86_64-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt": {
+          "bytes": 10936,
+          "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/x86_64-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt": {
+          "bytes": 5905,
+          "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/x86_64-w64-mingw32/share/mingw32/COPYING.winpthreads.txt": {
+          "bytes": 2883,
+          "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177"
+        },
+        "usr/share/doc/esteria-wine-arm64/toolchain/x86_64-w64-mingw32/share/mingw32/COPYING.winstorecompat.txt": {
+          "bytes": 1099,
+          "sha256": "fa7368d1f93d890c173177475d8ec7aff265a7d08f1f364d66f74d138978ce36"
+        },
+        "usr/share/vulkan/icd.d/lvp_icd.aarch64.json": {
+          "bytes": 162,
+          "sha256": "0950c584a06fc5531dbaedef764764cd8f4af5e4390d416971db7c62e85da22f"
+        }
+      },
+      "limits": {
+        "entries": 14180,
+        "fileBytes": 2333910717,
+        "memberBytes": 111631520,
+        "pathBytes": 4096
+      },
+      "manifest": {
+        "bytes": 66773,
+        "file": "wine-arm64.manifest.json",
+        "sha256": "d6c98cca860d324113c434cd0ccd1709e19e2dfac1a03b1f248b479f50303267",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/wine-arm64.manifest.json"
+      },
+      "marker": {
+        "androidQualified": false,
+        "architecture": "arm64",
+        "baseImage": "docker.io/library/debian@sha256:7ccb8b5b60c7654f5b795d94ee7d751cd0811500803f0b09cefcd555e755a55a",
+        "clientIncluded": false,
+        "data": {
+          "usr/lib/os-release": {
+            "bytes": 267,
+            "sha256": "59a77b5f2666d9c85c489bd1911a6eebbd91ef22fe48b90a3b75f1b21f3844d4"
+          },
+          "usr/share/alsa/alsa.conf": {
+            "bytes": 10117,
+            "sha256": "ea7c6cedb7da16ba51a0fea3e960416a2240e29c1f5d42e475c1dfcd19eb74ee"
+          },
+          "usr/share/vulkan/icd.d/lvp_icd.aarch64.json": {
+            "bytes": 162,
+            "sha256": "0950c584a06fc5531dbaedef764764cd8f4af5e4390d416971db7c62e85da22f"
+          }
+        },
+        "fexRevision": "320c5f18475b0c8a7e99c51a5fdc5b5e35b147ab",
+        "fexSourceArchiveSha256": "8a10a8e63cdea41a6c70b0f14d487fe4cb3f11c8fb5baba3e42090098e2745be",
+        "formatVersion": 1,
+        "gameplayQualified": false,
+        "images": {
+          "asound": {
+            "bytes": 1116648,
+            "elfClass": 2,
+            "elfMachine": 183,
+            "path": "/usr/lib/aarch64-linux-gnu/libasound.so.2.0.0",
+            "sha256": "9fade6b3aedf1ba944e6795b52b74378f2f89166b92ee542582171416a76572d"
+          },
+          "i386Ntdll": {
+            "bytes": 626688,
+            "path": "/opt/wine/lib/wine/i386-windows/ntdll.dll",
+            "peMachine": "0x14c",
+            "sha256": "bd65f71863fd43c8027b179991964bdf644e5e8ed4f89a02f23bec8d5c393de1"
+          },
+          "kernel32.dll": {
+            "bytes": 1114112,
+            "path": "/opt/wine/lib/wine/aarch64-windows/kernel32.dll",
+            "peMachine": "0xaa64",
+            "sha256": "366e1aeb898a451da12334ca74013df911f8a93dad1585c74588a55c14920dfa"
+          },
+          "lavapipe": {
+            "bytes": 6569376,
+            "elfClass": 2,
+            "elfMachine": 183,
+            "path": "/usr/lib/aarch64-linux-gnu/libvulkan_lvp.so",
+            "sha256": "ce6f6917dd22ed612ae8649a9eb9c615a973a2e9eb9a58b8cc8655f22c933c6b"
+          },
+          "libarm64ecfex.dll": {
+            "bytes": 5533696,
+            "path": "/opt/wine/lib/wine/aarch64-windows/libarm64ecfex.dll",
+            "peMachine": "0x8664",
+            "sha256": "94921e14efca94833a9b12cbb33c9dec641b65d321f062168fb241dec8334fc1"
+          },
+          "libwow64fex.dll": {
+            "bytes": 4943872,
+            "path": "/opt/wine/lib/wine/aarch64-windows/libwow64fex.dll",
+            "peMachine": "0xaa64",
+            "sha256": "824bf9082e2cf4a7b1bd7571e8ef00c35543d528fbc3cc6efd3a566c391dfc93"
+          },
+          "msvcp140.dll": {
+            "bytes": 2031616,
+            "path": "/opt/wine/lib/wine/aarch64-windows/msvcp140.dll",
+            "peMachine": "0xaa64",
+            "sha256": "aa135ed8f237f0d0fe2a49cdc79b2a643b99c7890e5646b2e64f83e937e0762f"
+          },
+          "ntdll.dll": {
+            "bytes": 1769472,
+            "path": "/opt/wine/lib/wine/aarch64-windows/ntdll.dll",
+            "peMachine": "0xaa64",
+            "sha256": "ee9faf7292b63a890ed1d42e65b79dffd83f7650d82f21d2d9b54a838aa2d6e4"
+          },
+          "ntdllUnix": {
+            "bytes": 531176,
+            "elfClass": 2,
+            "elfMachine": 183,
+            "path": "/opt/wine/lib/wine/aarch64-unix/ntdll.so",
+            "sha256": "70a81a6b936851bd5675551c9ced3d6c9707f1e9033737ea0dbe96728631875b"
+          },
+          "python3": {
+            "bytes": 6616880,
+            "elfClass": 2,
+            "elfMachine": 183,
+            "path": "/usr/bin/python3.11",
+            "sha256": "2ceb9199570aaf34a254b9ea88b1d77f38530833e2a12688d002a59c905b51b2"
+          },
+          "vcruntime140.dll": {
+            "bytes": 589824,
+            "path": "/opt/wine/lib/wine/aarch64-windows/vcruntime140.dll",
+            "peMachine": "0xaa64",
+            "sha256": "1e9fa0575cf8d4b0bf508e51eb1a4009597be7558c0f25d4d12914505a747067"
+          },
+          "vcruntime140_1.dll": {
+            "bytes": 589824,
+            "path": "/opt/wine/lib/wine/aarch64-windows/vcruntime140_1.dll",
+            "peMachine": "0x8664",
+            "sha256": "63cffb993489fed81f43a0358f9264c04d29d379fa2f51f5f886c3df296c1ba0"
+          },
+          "vulkan-1.dll": {
+            "bytes": 655360,
+            "path": "/opt/wine/lib/wine/aarch64-windows/vulkan-1.dll",
+            "peMachine": "0xaa64",
+            "sha256": "f259c3b3f69d8e0046e49f9e0031063766c8d718ddc2986a1d82fa3e2520b71b"
+          },
+          "vulkanLoader": {
+            "bytes": 526896,
+            "elfClass": 2,
+            "elfMachine": 183,
+            "path": "/usr/lib/aarch64-linux-gnu/libvulkan.so.1.3.239",
+            "sha256": "605f52f426f01a2c468ecd920b3de31452fde495f2c0d99602fffb93e782767c"
+          },
+          "wine": {
+            "bytes": 67744,
+            "elfClass": 2,
+            "elfMachine": 183,
+            "path": "/opt/wine/bin/wine",
+            "sha256": "7d7f35b538ccf2e998fe0bb6c46a2ef0e24ade47e0aefc1df653f80f73ad68c3"
+          },
+          "wineAlsa": {
+            "bytes": 134144,
+            "elfClass": 2,
+            "elfMachine": 183,
+            "path": "/opt/wine/lib/wine/aarch64-unix/winealsa.so",
+            "sha256": "cc3de8fd246ebdb46879a05debfa451437d5dd7fc655bd249165606c23c882ab"
+          },
+          "wineVulkan": {
+            "bytes": 854160,
+            "elfClass": 2,
+            "elfMachine": 183,
+            "path": "/opt/wine/lib/wine/aarch64-unix/winevulkan.so",
+            "sha256": "1f3ad380d36fb467988d20eea122b0000fe52afc1258f7eb9635963fad45ef68"
+          },
+          "winealsa.drv": {
+            "bytes": 589824,
+            "path": "/opt/wine/lib/wine/aarch64-windows/winealsa.drv",
+            "peMachine": "0xaa64",
+            "sha256": "ea1da4bccb4188f34148f55daaff9acea37f2d172b8ff09ab9c311ccd6611595"
+          },
+          "wineserver": {
+            "bytes": 725840,
+            "elfClass": 2,
+            "elfMachine": 183,
+            "path": "/opt/wine/bin/wineserver",
+            "sha256": "d2761747e82e560aba395b2b70061c196ee0d943dfd17ea7ed4f7e81b35ea266"
+          },
+          "wininet.dll": {
+            "bytes": 1245184,
+            "path": "/opt/wine/lib/wine/aarch64-windows/wininet.dll",
+            "peMachine": "0xaa64",
+            "sha256": "3009a684d276ce1c73fafb7f3d9ad7c2617636ef2205a550eb1a2f4a9d954c11"
+          },
+          "ws2_32.dll": {
+            "bytes": 851968,
+            "path": "/opt/wine/lib/wine/aarch64-windows/ws2_32.dll",
+            "peMachine": "0xaa64",
+            "sha256": "f9b8a289ab4d8134368ebb4efae17ab9fe7dfafd4bb2ebc0267a51b893975c88"
+          },
+          "x11": {
+            "bytes": 2719912,
+            "elfClass": 2,
+            "elfMachine": 183,
+            "path": "/usr/bin/Xtigervnc",
+            "sha256": "d89fedbd07ad83a7ccc669396f3030e9940dad2a30bf299a063093e6efa913de"
+          }
+        },
+        "notices": {
+          "usr/share/doc/esteria-wine-arm64/COPYING.LIB": {
+            "bytes": 26434,
+            "sha256": "e237fa56668030e928551ddd60f05df5fe957f75eab874bbd017e085ed722e7c"
+          },
+          "usr/share/doc/esteria-wine-arm64/fex/External/Catch2/LICENSE.txt": {
+            "bytes": 1338,
+            "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566"
+          },
+          "usr/share/doc/esteria-wine-arm64/fex/External/Vulkan-Headers/LICENSE.md": {
+            "bytes": 458,
+            "sha256": "ac24e5ea920e4318e4d02c4086ae51f53cfb03feed06c18df1019e7ada1ec7bc"
+          },
+          "usr/share/doc/esteria-wine-arm64/fex/External/Vulkan-Headers/LICENSES/Apache-2.0.txt": {
+            "bytes": 11358,
+            "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+          },
+          "usr/share/doc/esteria-wine-arm64/fex/External/Vulkan-Headers/LICENSES/MIT.txt": {
+            "bytes": 1084,
+            "sha256": "1ca3502222d967f3be5751c55f6b7ee735b5383909c3b501495f54b216dbf227"
+          },
+          "usr/share/doc/esteria-wine-arm64/fex/External/cephes/LICENSE": {
+            "bytes": 4754,
+            "sha256": "edf1440b625e6d434a986cdb535c702001afab8959d94ce6275441a58cfd0ebb"
+          },
+          "usr/share/doc/esteria-wine-arm64/fex/External/fex-posixtest-bins/src/COPYING": {
+            "bytes": 17992,
+            "sha256": "32b1062f7da84967e7019d01ab805935caa7ab7321a7ced0e30ebe75e5df1670"
+          },
+          "usr/share/doc/esteria-wine-arm64/fex/External/fmt/LICENSE": {
+            "bytes": 1431,
+            "sha256": "07580f2a3b35709ce703d523f447b242f6dfec7582a8c0df102c7fa2849375f8"
+          },
+          "usr/share/doc/esteria-wine-arm64/fex/External/jemalloc/COPYING": {
+            "bytes": 1709,
+            "sha256": "94aa2caa98c25d942f58b956c71dba6a99ff98fc3a31cbc669fe2a4cd0268b53"
+          },
+          "usr/share/doc/esteria-wine-arm64/fex/External/jemalloc_glibc/COPYING": {
+            "bytes": 1709,
+            "sha256": "94aa2caa98c25d942f58b956c71dba6a99ff98fc3a31cbc669fe2a4cd0268b53"
+          },
+          "usr/share/doc/esteria-wine-arm64/fex/External/range-v3/LICENSE.txt": {
+            "bytes": 7233,
+            "sha256": "2b74ee37dd1a90b2b385534b7dbc171938409bda468673a123ff25302c9c5739"
+          },
+          "usr/share/doc/esteria-wine-arm64/fex/External/robin-map/LICENSE": {
+            "bytes": 1102,
+            "sha256": "11f2c685ba565a31aef1219f63a7a8845602c97bff70016b9e3278dfe51a2ec5"
+          },
+          "usr/share/doc/esteria-wine-arm64/fex/External/tiny-json/LICENSE": {
+            "bytes": 1068,
+            "sha256": "83c6abf07e7123427303b5f12cd995122c372a5cb96815ec130a18628396fb7c"
+          },
+          "usr/share/doc/esteria-wine-arm64/fex/External/tracy/LICENSE": {
+            "bytes": 1618,
+            "sha256": "16f7df4828bd89c880c17dd2f45e834b754b6d5e8c9a9ee886af1be4b89475ca"
+          },
+          "usr/share/doc/esteria-wine-arm64/fex/External/tracy/examples/ToyPathTracer/license.md": {
+            "bytes": 1210,
+            "sha256": "88d9b4eb60579c191ec391ca04c16130572d7eedc4a86daa58bf28c6e14c9bcd"
+          },
+          "usr/share/doc/esteria-wine-arm64/fex/External/tracy/public/libbacktrace/LICENSE": {
+            "bytes": 1478,
+            "sha256": "ef8a9b3247488f8901ca60de9b17b745d7bd67e5ec1e622f80d62364572200d8"
+          },
+          "usr/share/doc/esteria-wine-arm64/fex/External/xxhash/LICENSE": {
+            "bytes": 1389,
+            "sha256": "6ffedbc0f7878612d2b23589f1ff2ab15633e1df7963a5d9fc750ec5500c7e7a"
+          },
+          "usr/share/doc/esteria-wine-arm64/fex/External/xxhash/cli/COPYING": {
+            "bytes": 18092,
+            "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643"
+          },
+          "usr/share/doc/esteria-wine-arm64/fex/External/xxhash/tests/bench/LICENSE": {
+            "bytes": 18092,
+            "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643"
+          },
+          "usr/share/doc/esteria-wine-arm64/fex/External/xxhash/tests/collisions/LICENSE": {
+            "bytes": 18092,
+            "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643"
+          },
+          "usr/share/doc/esteria-wine-arm64/fex/FEXCore/LICENSE": {
+            "bytes": 1094,
+            "sha256": "f34a779f56b36d22b20e1b990d23e583a6a7ca071331925fa46156441c77a1ee"
+          },
+          "usr/share/doc/esteria-wine-arm64/fex/LICENSE": {
+            "bytes": 1094,
+            "sha256": "f34a779f56b36d22b20e1b990d23e583a6a7ca071331925fa46156441c77a1ee"
+          },
+          "usr/share/doc/esteria-wine-arm64/fex/NOTICE-MANIFEST.json": {
+            "bytes": 3153,
+            "sha256": "10efd00aac0db20dee914d662a659ab2623f86b20d85ed431ec28d8c03aeab44"
+          },
+          "usr/share/doc/esteria-wine-arm64/fex/Source/Common/cpp-optparse/LICENSE": {
+            "bytes": 1082,
+            "sha256": "d638447635afa6837615553bcebbba60bc80a0e62ed9b158b4ed969e8bb72421"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/LICENSE.TXT": {
+            "bytes": 15141,
+            "sha256": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/aarch64-w64-mingw32/share/mingw32/COPYING": {
+            "bytes": 2326,
+            "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/aarch64-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt": {
+            "bytes": 10936,
+            "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/aarch64-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt": {
+            "bytes": 5905,
+            "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/aarch64-w64-mingw32/share/mingw32/COPYING.winpthreads.txt": {
+            "bytes": 2883,
+            "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/aarch64-w64-mingw32/share/mingw32/COPYING.winstorecompat.txt": {
+            "bytes": 1099,
+            "sha256": "fa7368d1f93d890c173177475d8ec7aff265a7d08f1f364d66f74d138978ce36"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/arm64ec-w64-mingw32/share/mingw32/COPYING": {
+            "bytes": 2326,
+            "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/arm64ec-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt": {
+            "bytes": 10936,
+            "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/arm64ec-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt": {
+            "bytes": 5905,
+            "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/arm64ec-w64-mingw32/share/mingw32/COPYING.winpthreads.txt": {
+            "bytes": 2883,
+            "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/arm64ec-w64-mingw32/share/mingw32/COPYING.winstorecompat.txt": {
+            "bytes": 1099,
+            "sha256": "fa7368d1f93d890c173177475d8ec7aff265a7d08f1f364d66f74d138978ce36"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/armv7-w64-mingw32/share/mingw32/COPYING": {
+            "bytes": 2326,
+            "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/armv7-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt": {
+            "bytes": 10936,
+            "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/armv7-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt": {
+            "bytes": 5905,
+            "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/armv7-w64-mingw32/share/mingw32/COPYING.winpthreads.txt": {
+            "bytes": 2883,
+            "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/armv7-w64-mingw32/share/mingw32/COPYING.winstorecompat.txt": {
+            "bytes": 1099,
+            "sha256": "fa7368d1f93d890c173177475d8ec7aff265a7d08f1f364d66f74d138978ce36"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/i686-w64-mingw32/share/mingw32/COPYING": {
+            "bytes": 2326,
+            "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/i686-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt": {
+            "bytes": 10936,
+            "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/i686-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt": {
+            "bytes": 5905,
+            "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/i686-w64-mingw32/share/mingw32/COPYING.winpthreads.txt": {
+            "bytes": 2883,
+            "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/i686-w64-mingw32/share/mingw32/COPYING.winstorecompat.txt": {
+            "bytes": 1099,
+            "sha256": "fa7368d1f93d890c173177475d8ec7aff265a7d08f1f364d66f74d138978ce36"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/share/gendef/COPYING": {
+            "bytes": 35147,
+            "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/share/widl/COPYING": {
+            "bytes": 2326,
+            "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/x86_64-w64-mingw32/share/mingw32/COPYING": {
+            "bytes": 2326,
+            "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/x86_64-w64-mingw32/share/mingw32/COPYING.MinGW-w64-runtime.txt": {
+            "bytes": 10936,
+            "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/x86_64-w64-mingw32/share/mingw32/COPYING.MinGW-w64.txt": {
+            "bytes": 5905,
+            "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/x86_64-w64-mingw32/share/mingw32/COPYING.winpthreads.txt": {
+            "bytes": 2883,
+            "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177"
+          },
+          "usr/share/doc/esteria-wine-arm64/toolchain/x86_64-w64-mingw32/share/mingw32/COPYING.winstorecompat.txt": {
+            "bytes": 1099,
+            "sha256": "fa7368d1f93d890c173177475d8ec7aff265a7d08f1f364d66f74d138978ce36"
+          }
+        },
+        "packages": [
+          {
+            "architecture": "all",
+            "package": "adduser",
+            "sourcePackage": "adduser",
+            "sourceVersion": "3.134",
+            "version": "3.134"
+          },
+          {
+            "architecture": "arm64",
+            "package": "apt",
+            "sourcePackage": "apt",
+            "sourceVersion": "2.6.1",
+            "version": "2.6.1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "base-files",
+            "sourcePackage": "base-files",
+            "sourceVersion": "12.4+deb12u15",
+            "version": "12.4+deb12u15"
+          },
+          {
+            "architecture": "arm64",
+            "package": "base-passwd",
+            "sourcePackage": "base-passwd",
+            "sourceVersion": "3.6.1",
+            "version": "3.6.1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "bash",
+            "sourcePackage": "bash",
+            "sourceVersion": "5.2.15-2",
+            "version": "5.2.15-2+b13"
+          },
+          {
+            "architecture": "arm64",
+            "package": "bsdutils",
+            "sourcePackage": "util-linux",
+            "sourceVersion": "2.38.1-5+deb12u3",
+            "version": "1:2.38.1-5+deb12u3"
+          },
+          {
+            "architecture": "all",
+            "package": "ca-certificates",
+            "sourcePackage": "ca-certificates",
+            "sourceVersion": "20250419~deb12u2",
+            "version": "20250419~deb12u2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "coreutils",
+            "sourcePackage": "coreutils",
+            "sourceVersion": "9.1-1",
+            "version": "9.1-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "dash",
+            "sourcePackage": "dash",
+            "sourceVersion": "0.5.12-2",
+            "version": "0.5.12-2"
+          },
+          {
+            "architecture": "all",
+            "package": "debconf",
+            "sourcePackage": "debconf",
+            "sourceVersion": "1.5.82",
+            "version": "1.5.82"
+          },
+          {
+            "architecture": "all",
+            "package": "debian-archive-keyring",
+            "sourcePackage": "debian-archive-keyring",
+            "sourceVersion": "2023.3+deb12u2",
+            "version": "2023.3+deb12u2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "debianutils",
+            "sourcePackage": "debianutils",
+            "sourceVersion": "5.7-0.5~deb12u1",
+            "version": "5.7-0.5~deb12u1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "diffutils",
+            "sourcePackage": "diffutils",
+            "sourceVersion": "1:3.8-4",
+            "version": "1:3.8-4"
+          },
+          {
+            "architecture": "arm64",
+            "package": "dpkg",
+            "sourcePackage": "dpkg",
+            "sourceVersion": "1.21.23",
+            "version": "1.21.23"
+          },
+          {
+            "architecture": "arm64",
+            "package": "e2fsprogs",
+            "sourcePackage": "e2fsprogs",
+            "sourceVersion": "1.47.0-2",
+            "version": "1.47.0-2+b2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "findutils",
+            "sourcePackage": "findutils",
+            "sourceVersion": "4.9.0-4",
+            "version": "4.9.0-4"
+          },
+          {
+            "architecture": "arm64",
+            "package": "fontconfig-config",
+            "sourcePackage": "fontconfig",
+            "sourceVersion": "2.14.1-4",
+            "version": "2.14.1-4"
+          },
+          {
+            "architecture": "all",
+            "package": "fonts-liberation",
+            "sourcePackage": "fonts-liberation",
+            "sourceVersion": "1:1.07.4-11",
+            "version": "1:1.07.4-11"
+          },
+          {
+            "architecture": "arm64",
+            "package": "gcc-12-base:arm64",
+            "sourcePackage": "gcc-12",
+            "sourceVersion": "12.2.0-14+deb12u1",
+            "version": "12.2.0-14+deb12u1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "gpgv",
+            "sourcePackage": "gnupg2",
+            "sourceVersion": "2.2.40-1.1+deb12u2",
+            "version": "2.2.40-1.1+deb12u2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "grep",
+            "sourcePackage": "grep",
+            "sourceVersion": "3.8-5",
+            "version": "3.8-5"
+          },
+          {
+            "architecture": "arm64",
+            "package": "gzip",
+            "sourcePackage": "gzip",
+            "sourceVersion": "1.12-1",
+            "version": "1.12-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "hostname",
+            "sourcePackage": "hostname",
+            "sourceVersion": "3.23+nmu1",
+            "version": "3.23+nmu1"
+          },
+          {
+            "architecture": "all",
+            "package": "init-system-helpers",
+            "sourcePackage": "init-system-helpers",
+            "sourceVersion": "1.65.2+deb12u1",
+            "version": "1.65.2+deb12u1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libacl1:arm64",
+            "sourcePackage": "acl",
+            "sourceVersion": "2.3.1-3",
+            "version": "2.3.1-3"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libapt-pkg6.0:arm64",
+            "sourcePackage": "apt",
+            "sourceVersion": "2.6.1",
+            "version": "2.6.1"
+          },
+          {
+            "architecture": "all",
+            "package": "libasound2-data",
+            "sourcePackage": "alsa-lib",
+            "sourceVersion": "1.2.8-1",
+            "version": "1.2.8-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libasound2:arm64",
+            "sourcePackage": "alsa-lib",
+            "sourceVersion": "1.2.8-1",
+            "version": "1.2.8-1+b1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libasyncns0:arm64",
+            "sourcePackage": "libasyncns",
+            "sourceVersion": "0.8-6",
+            "version": "0.8-6+b3"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libattr1:arm64",
+            "sourcePackage": "attr",
+            "sourceVersion": "1:2.5.1-4",
+            "version": "1:2.5.1-4"
+          },
+          {
+            "architecture": "all",
+            "package": "libaudit-common",
+            "sourcePackage": "audit",
+            "sourceVersion": "1:3.0.9-1",
+            "version": "1:3.0.9-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libaudit1:arm64",
+            "sourcePackage": "audit",
+            "sourceVersion": "1:3.0.9-1",
+            "version": "1:3.0.9-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libblkid1:arm64",
+            "sourcePackage": "util-linux",
+            "sourceVersion": "2.38.1-5+deb12u3",
+            "version": "2.38.1-5+deb12u3"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libbrotli1:arm64",
+            "sourcePackage": "brotli",
+            "sourceVersion": "1.0.9-2+deb12u1",
+            "version": "1.0.9-2+deb12u1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libbsd0:arm64",
+            "sourcePackage": "libbsd",
+            "sourceVersion": "0.11.7-2",
+            "version": "0.11.7-2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libbz2-1.0:arm64",
+            "sourcePackage": "bzip2",
+            "sourceVersion": "1.0.8-5",
+            "version": "1.0.8-5+b1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libc-bin",
+            "sourcePackage": "glibc",
+            "sourceVersion": "2.36-9+deb12u14",
+            "version": "2.36-9+deb12u14"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libc6:arm64",
+            "sourcePackage": "glibc",
+            "sourceVersion": "2.36-9+deb12u14",
+            "version": "2.36-9+deb12u14"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libcap-ng0:arm64",
+            "sourcePackage": "libcap-ng",
+            "sourceVersion": "0.8.3-1",
+            "version": "0.8.3-1+b3"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libcap2:arm64",
+            "sourcePackage": "libcap2",
+            "sourceVersion": "1:2.66-4+deb12u3",
+            "version": "1:2.66-4+deb12u3+b1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libcom-err2:arm64",
+            "sourcePackage": "e2fsprogs",
+            "sourceVersion": "1.47.0-2",
+            "version": "1.47.0-2+b2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libcrypt1:arm64",
+            "sourcePackage": "libxcrypt",
+            "sourceVersion": "1:4.4.33-2",
+            "version": "1:4.4.33-2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libdb5.3:arm64",
+            "sourcePackage": "db5.3",
+            "sourceVersion": "5.3.28+dfsg2-1",
+            "version": "5.3.28+dfsg2-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libdbus-1-3:arm64",
+            "sourcePackage": "dbus",
+            "sourceVersion": "1.14.10-1~deb12u1",
+            "version": "1.14.10-1~deb12u1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libdebconfclient0:arm64",
+            "sourcePackage": "cdebconf",
+            "sourceVersion": "0.270",
+            "version": "0.270"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libdrm-amdgpu1:arm64",
+            "sourcePackage": "libdrm",
+            "sourceVersion": "2.4.114-1",
+            "version": "2.4.114-1+b1"
+          },
+          {
+            "architecture": "all",
+            "package": "libdrm-common",
+            "sourcePackage": "libdrm",
+            "sourceVersion": "2.4.114-1",
+            "version": "2.4.114-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libdrm-nouveau2:arm64",
+            "sourcePackage": "libdrm",
+            "sourceVersion": "2.4.114-1",
+            "version": "2.4.114-1+b1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libdrm-radeon1:arm64",
+            "sourcePackage": "libdrm",
+            "sourceVersion": "2.4.114-1",
+            "version": "2.4.114-1+b1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libdrm2:arm64",
+            "sourcePackage": "libdrm",
+            "sourceVersion": "2.4.114-1",
+            "version": "2.4.114-1+b1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libedit2:arm64",
+            "sourcePackage": "libedit",
+            "sourceVersion": "3.1-20221030-2",
+            "version": "3.1-20221030-2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libelf1:arm64",
+            "sourcePackage": "elfutils",
+            "sourceVersion": "0.188-2.1",
+            "version": "0.188-2.1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libexpat1:arm64",
+            "sourcePackage": "expat",
+            "sourceVersion": "2.5.0-1+deb12u5",
+            "version": "2.5.0-1+deb12u5"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libext2fs2:arm64",
+            "sourcePackage": "e2fsprogs",
+            "sourceVersion": "1.47.0-2",
+            "version": "1.47.0-2+b2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libffi8:arm64",
+            "sourcePackage": "libffi",
+            "sourceVersion": "3.4.4-1",
+            "version": "3.4.4-1"
+          },
+          {
+            "architecture": "all",
+            "package": "libfile-readbackwards-perl",
+            "sourcePackage": "libfile-readbackwards-perl",
+            "sourceVersion": "1.06-2",
+            "version": "1.06-2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libflac12:arm64",
+            "sourcePackage": "flac",
+            "sourceVersion": "1.4.2+ds-2",
+            "version": "1.4.2+ds-2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libfontconfig1:arm64",
+            "sourcePackage": "fontconfig",
+            "sourceVersion": "2.14.1-4",
+            "version": "2.14.1-4"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libfontenc1:arm64",
+            "sourcePackage": "libfontenc",
+            "sourceVersion": "1:1.1.4-1",
+            "version": "1:1.1.4-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libfreetype6:arm64",
+            "sourcePackage": "freetype",
+            "sourceVersion": "2.12.1+dfsg-5+deb12u4",
+            "version": "2.12.1+dfsg-5+deb12u4"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libgcc-s1:arm64",
+            "sourcePackage": "gcc-12",
+            "sourceVersion": "12.2.0-14+deb12u1",
+            "version": "12.2.0-14+deb12u1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libgcrypt20:arm64",
+            "sourcePackage": "libgcrypt20",
+            "sourceVersion": "1.10.1-3+deb12u1",
+            "version": "1.10.1-3+deb12u1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libgdbm-compat4:arm64",
+            "sourcePackage": "gdbm",
+            "sourceVersion": "1.23-3",
+            "version": "1.23-3"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libgdbm6:arm64",
+            "sourcePackage": "gdbm",
+            "sourceVersion": "1.23-3",
+            "version": "1.23-3"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libgl1-mesa-dri:arm64",
+            "sourcePackage": "mesa",
+            "sourceVersion": "22.3.6-1+deb12u2",
+            "version": "22.3.6-1+deb12u2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libgl1:arm64",
+            "sourcePackage": "libglvnd",
+            "sourceVersion": "1.6.0-1",
+            "version": "1.6.0-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libglapi-mesa:arm64",
+            "sourcePackage": "mesa",
+            "sourceVersion": "22.3.6-1+deb12u2",
+            "version": "22.3.6-1+deb12u2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libglvnd0:arm64",
+            "sourcePackage": "libglvnd",
+            "sourceVersion": "1.6.0-1",
+            "version": "1.6.0-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libglx-mesa0:arm64",
+            "sourcePackage": "mesa",
+            "sourceVersion": "22.3.6-1+deb12u2",
+            "version": "22.3.6-1+deb12u2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libglx0:arm64",
+            "sourcePackage": "libglvnd",
+            "sourceVersion": "1.6.0-1",
+            "version": "1.6.0-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libgmp10:arm64",
+            "sourcePackage": "gmp",
+            "sourceVersion": "2:6.2.1+dfsg1-1.1",
+            "version": "2:6.2.1+dfsg1-1.1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libgnutls30:arm64",
+            "sourcePackage": "gnutls28",
+            "sourceVersion": "3.7.9-2+deb12u7",
+            "version": "3.7.9-2+deb12u7"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libgpg-error0:arm64",
+            "sourcePackage": "libgpg-error",
+            "sourceVersion": "1.46-1",
+            "version": "1.46-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libgssapi-krb5-2:arm64",
+            "sourcePackage": "krb5",
+            "sourceVersion": "1.20.1-2+deb12u5",
+            "version": "1.20.1-2+deb12u5"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libhogweed6:arm64",
+            "sourcePackage": "nettle",
+            "sourceVersion": "3.8.1-2",
+            "version": "3.8.1-2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libice6:arm64",
+            "sourcePackage": "libice",
+            "sourceVersion": "2:1.0.10-1",
+            "version": "2:1.0.10-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libicu72:arm64",
+            "sourcePackage": "icu",
+            "sourceVersion": "72.1-3+deb12u1",
+            "version": "72.1-3+deb12u1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libidn2-0:arm64",
+            "sourcePackage": "libidn2",
+            "sourceVersion": "2.3.3-1",
+            "version": "2.3.3-1+b1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libjpeg62-turbo:arm64",
+            "sourcePackage": "libjpeg-turbo",
+            "sourceVersion": "1:2.1.5-2",
+            "version": "1:2.1.5-2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libk5crypto3:arm64",
+            "sourcePackage": "krb5",
+            "sourceVersion": "1.20.1-2+deb12u5",
+            "version": "1.20.1-2+deb12u5"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libkeyutils1:arm64",
+            "sourcePackage": "keyutils",
+            "sourceVersion": "1.6.3-2",
+            "version": "1.6.3-2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libkrb5-3:arm64",
+            "sourcePackage": "krb5",
+            "sourceVersion": "1.20.1-2+deb12u5",
+            "version": "1.20.1-2+deb12u5"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libkrb5support0:arm64",
+            "sourcePackage": "krb5",
+            "sourceVersion": "1.20.1-2+deb12u5",
+            "version": "1.20.1-2+deb12u5"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libllvm15:arm64",
+            "sourcePackage": "llvm-toolchain-15",
+            "sourceVersion": "1:15.0.6-4",
+            "version": "1:15.0.6-4+b1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "liblz4-1:arm64",
+            "sourcePackage": "lz4",
+            "sourceVersion": "1.9.4-1",
+            "version": "1.9.4-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "liblzma5:arm64",
+            "sourcePackage": "xz-utils",
+            "sourceVersion": "5.4.1-1+deb12u2",
+            "version": "5.4.1-1+deb12u2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libmd0:arm64",
+            "sourcePackage": "libmd",
+            "sourceVersion": "1.0.4-2",
+            "version": "1.0.4-2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libmount1:arm64",
+            "sourcePackage": "util-linux",
+            "sourceVersion": "2.38.1-5+deb12u3",
+            "version": "2.38.1-5+deb12u3"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libmp3lame0:arm64",
+            "sourcePackage": "lame",
+            "sourceVersion": "3.100-6",
+            "version": "3.100-6"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libmpg123-0:arm64",
+            "sourcePackage": "mpg123",
+            "sourceVersion": "1.31.2-1+deb12u1",
+            "version": "1.31.2-1+deb12u1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libncursesw6:arm64",
+            "sourcePackage": "ncurses",
+            "sourceVersion": "6.4-4",
+            "version": "6.4-4"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libnettle8:arm64",
+            "sourcePackage": "nettle",
+            "sourceVersion": "3.8.1-2",
+            "version": "3.8.1-2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libnsl2:arm64",
+            "sourcePackage": "libnsl",
+            "sourceVersion": "1.3.0-2",
+            "version": "1.3.0-2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libogg0:arm64",
+            "sourcePackage": "libogg",
+            "sourceVersion": "1.3.5-3",
+            "version": "1.3.5-3"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libopus0:arm64",
+            "sourcePackage": "opus",
+            "sourceVersion": "1.3.1-3",
+            "version": "1.3.1-3"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libp11-kit0:arm64",
+            "sourcePackage": "p11-kit",
+            "sourceVersion": "0.24.1-2",
+            "version": "0.24.1-2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libpam-modules-bin",
+            "sourcePackage": "pam",
+            "sourceVersion": "1.5.2-6+deb12u2",
+            "version": "1.5.2-6+deb12u2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libpam-modules:arm64",
+            "sourcePackage": "pam",
+            "sourceVersion": "1.5.2-6+deb12u2",
+            "version": "1.5.2-6+deb12u2"
+          },
+          {
+            "architecture": "all",
+            "package": "libpam-runtime",
+            "sourcePackage": "pam",
+            "sourceVersion": "1.5.2-6+deb12u2",
+            "version": "1.5.2-6+deb12u2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libpam0g:arm64",
+            "sourcePackage": "pam",
+            "sourceVersion": "1.5.2-6+deb12u2",
+            "version": "1.5.2-6+deb12u2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libpcre2-8-0:arm64",
+            "sourcePackage": "pcre2",
+            "sourceVersion": "10.42-1+deb12u2",
+            "version": "10.42-1+deb12u2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libperl5.36:arm64",
+            "sourcePackage": "perl",
+            "sourceVersion": "5.36.0-7+deb12u4",
+            "version": "5.36.0-7+deb12u4"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libpixman-1-0:arm64",
+            "sourcePackage": "pixman",
+            "sourceVersion": "0.42.2-1",
+            "version": "0.42.2-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libpng16-16:arm64",
+            "sourcePackage": "libpng1.6",
+            "sourceVersion": "1.6.39-2+deb12u6",
+            "version": "1.6.39-2+deb12u6"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libproc2-0:arm64",
+            "sourcePackage": "procps",
+            "sourceVersion": "2:4.0.2-3",
+            "version": "2:4.0.2-3"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libpulse0:arm64",
+            "sourcePackage": "pulseaudio",
+            "sourceVersion": "16.1+dfsg1-2",
+            "version": "16.1+dfsg1-2+b1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libpython3-stdlib:arm64",
+            "sourcePackage": "python3-defaults",
+            "sourceVersion": "3.11.2-1",
+            "version": "3.11.2-1+b1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libpython3.11-minimal:arm64",
+            "sourcePackage": "python3.11",
+            "sourceVersion": "3.11.2-6+deb12u9",
+            "version": "3.11.2-6+deb12u9"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libpython3.11-stdlib:arm64",
+            "sourcePackage": "python3.11",
+            "sourceVersion": "3.11.2-6+deb12u9",
+            "version": "3.11.2-6+deb12u9"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libreadline8:arm64",
+            "sourcePackage": "readline",
+            "sourceVersion": "8.2-1.3",
+            "version": "8.2-1.3"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libseccomp2:arm64",
+            "sourcePackage": "libseccomp",
+            "sourceVersion": "2.5.4-1+deb12u1",
+            "version": "2.5.4-1+deb12u1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libselinux1:arm64",
+            "sourcePackage": "libselinux",
+            "sourceVersion": "3.4-1",
+            "version": "3.4-1+b6"
+          },
+          {
+            "architecture": "all",
+            "package": "libsemanage-common",
+            "sourcePackage": "libsemanage",
+            "sourceVersion": "3.4-1",
+            "version": "3.4-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libsemanage2:arm64",
+            "sourcePackage": "libsemanage",
+            "sourceVersion": "3.4-1",
+            "version": "3.4-1+b5"
+          },
+          {
+            "architecture": "all",
+            "package": "libsensors-config",
+            "sourcePackage": "lm-sensors",
+            "sourceVersion": "1:3.6.0-7.1",
+            "version": "1:3.6.0-7.1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libsensors5:arm64",
+            "sourcePackage": "lm-sensors",
+            "sourceVersion": "1:3.6.0-7.1",
+            "version": "1:3.6.0-7.1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libsepol2:arm64",
+            "sourcePackage": "libsepol",
+            "sourceVersion": "3.4-2.1",
+            "version": "3.4-2.1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libsm6:arm64",
+            "sourcePackage": "libsm",
+            "sourceVersion": "2:1.2.3-1",
+            "version": "2:1.2.3-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libsmartcols1:arm64",
+            "sourcePackage": "util-linux",
+            "sourceVersion": "2.38.1-5+deb12u3",
+            "version": "2.38.1-5+deb12u3"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libsndfile1:arm64",
+            "sourcePackage": "libsndfile",
+            "sourceVersion": "1.2.0-1+deb12u1",
+            "version": "1.2.0-1+deb12u1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libsqlite3-0:arm64",
+            "sourcePackage": "sqlite3",
+            "sourceVersion": "3.40.1-2+deb12u2",
+            "version": "3.40.1-2+deb12u2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libss2:arm64",
+            "sourcePackage": "e2fsprogs",
+            "sourceVersion": "1.47.0-2",
+            "version": "1.47.0-2+b2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libssl3:arm64",
+            "sourcePackage": "openssl",
+            "sourceVersion": "3.0.22-1~deb12u2",
+            "version": "3.0.22-1~deb12u2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libstdc++6:arm64",
+            "sourcePackage": "gcc-12",
+            "sourceVersion": "12.2.0-14+deb12u1",
+            "version": "12.2.0-14+deb12u1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libsystemd0:arm64",
+            "sourcePackage": "systemd",
+            "sourceVersion": "252.39-1~deb12u2",
+            "version": "252.39-1~deb12u2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libtasn1-6:arm64",
+            "sourcePackage": "libtasn1-6",
+            "sourceVersion": "4.19.0-2+deb12u1",
+            "version": "4.19.0-2+deb12u1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libtinfo6:arm64",
+            "sourcePackage": "ncurses",
+            "sourceVersion": "6.4-4",
+            "version": "6.4-4"
+          },
+          {
+            "architecture": "all",
+            "package": "libtirpc-common",
+            "sourcePackage": "libtirpc",
+            "sourceVersion": "1.3.3+ds-1",
+            "version": "1.3.3+ds-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libtirpc3:arm64",
+            "sourcePackage": "libtirpc",
+            "sourceVersion": "1.3.3+ds-1",
+            "version": "1.3.3+ds-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libudev1:arm64",
+            "sourcePackage": "systemd",
+            "sourceVersion": "252.39-1~deb12u2",
+            "version": "252.39-1~deb12u2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libunistring2:arm64",
+            "sourcePackage": "libunistring",
+            "sourceVersion": "1.0-2",
+            "version": "1.0-2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libunwind8:arm64",
+            "sourcePackage": "libunwind",
+            "sourceVersion": "1.6.2-3",
+            "version": "1.6.2-3"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libuuid1:arm64",
+            "sourcePackage": "util-linux",
+            "sourceVersion": "2.38.1-5+deb12u3",
+            "version": "2.38.1-5+deb12u3"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libvorbis0a:arm64",
+            "sourcePackage": "libvorbis",
+            "sourceVersion": "1.3.7-1",
+            "version": "1.3.7-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libvorbisenc2:arm64",
+            "sourcePackage": "libvorbis",
+            "sourceVersion": "1.3.7-1",
+            "version": "1.3.7-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libvulkan1:arm64",
+            "sourcePackage": "vulkan-loader",
+            "sourceVersion": "1.3.239.0-1",
+            "version": "1.3.239.0-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libwayland-client0:arm64",
+            "sourcePackage": "wayland",
+            "sourceVersion": "1.21.0-1",
+            "version": "1.21.0-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libx11-6:arm64",
+            "sourcePackage": "libx11",
+            "sourceVersion": "2:1.8.4-2+deb12u2",
+            "version": "2:1.8.4-2+deb12u2"
+          },
+          {
+            "architecture": "all",
+            "package": "libx11-data",
+            "sourcePackage": "libx11",
+            "sourceVersion": "2:1.8.4-2+deb12u2",
+            "version": "2:1.8.4-2+deb12u2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libx11-xcb1:arm64",
+            "sourcePackage": "libx11",
+            "sourceVersion": "2:1.8.4-2+deb12u2",
+            "version": "2:1.8.4-2+deb12u2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxau6:arm64",
+            "sourcePackage": "libxau",
+            "sourceVersion": "1:1.0.9-1",
+            "version": "1:1.0.9-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxaw7:arm64",
+            "sourcePackage": "libxaw",
+            "sourceVersion": "2:1.0.14-1",
+            "version": "2:1.0.14-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxcb-dri2-0:arm64",
+            "sourcePackage": "libxcb",
+            "sourceVersion": "1.15-1",
+            "version": "1.15-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxcb-dri3-0:arm64",
+            "sourcePackage": "libxcb",
+            "sourceVersion": "1.15-1",
+            "version": "1.15-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxcb-glx0:arm64",
+            "sourcePackage": "libxcb",
+            "sourceVersion": "1.15-1",
+            "version": "1.15-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxcb-present0:arm64",
+            "sourcePackage": "libxcb",
+            "sourceVersion": "1.15-1",
+            "version": "1.15-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxcb-randr0:arm64",
+            "sourcePackage": "libxcb",
+            "sourceVersion": "1.15-1",
+            "version": "1.15-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxcb-shm0:arm64",
+            "sourcePackage": "libxcb",
+            "sourceVersion": "1.15-1",
+            "version": "1.15-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxcb-sync1:arm64",
+            "sourcePackage": "libxcb",
+            "sourceVersion": "1.15-1",
+            "version": "1.15-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxcb-xfixes0:arm64",
+            "sourcePackage": "libxcb",
+            "sourceVersion": "1.15-1",
+            "version": "1.15-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxcb1:arm64",
+            "sourcePackage": "libxcb",
+            "sourceVersion": "1.15-1",
+            "version": "1.15-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxcomposite1:arm64",
+            "sourcePackage": "libxcomposite",
+            "sourceVersion": "1:0.4.5-1",
+            "version": "1:0.4.5-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxcursor1:arm64",
+            "sourcePackage": "libxcursor",
+            "sourceVersion": "1:1.2.1-1",
+            "version": "1:1.2.1-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxdamage1:arm64",
+            "sourcePackage": "libxdamage",
+            "sourceVersion": "1:1.1.6-1",
+            "version": "1:1.1.6-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxdmcp6:arm64",
+            "sourcePackage": "libxdmcp",
+            "sourceVersion": "1:1.1.2-3",
+            "version": "1:1.1.2-3"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxext6:arm64",
+            "sourcePackage": "libxext",
+            "sourceVersion": "2:1.3.4-1",
+            "version": "2:1.3.4-1+b1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxfixes3:arm64",
+            "sourcePackage": "libxfixes",
+            "sourceVersion": "1:6.0.0-2",
+            "version": "1:6.0.0-2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxfont2:arm64",
+            "sourcePackage": "libxfont",
+            "sourceVersion": "1:2.0.6-1+deb12u1",
+            "version": "1:2.0.6-1+deb12u1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxi6:arm64",
+            "sourcePackage": "libxi",
+            "sourceVersion": "2:1.8-1",
+            "version": "2:1.8-1+b1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxinerama1:arm64",
+            "sourcePackage": "libxinerama",
+            "sourceVersion": "2:1.1.4-3",
+            "version": "2:1.1.4-3"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxkbfile1:arm64",
+            "sourcePackage": "libxkbfile",
+            "sourceVersion": "1:1.1.0-1",
+            "version": "1:1.1.0-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxml2:arm64",
+            "sourcePackage": "libxml2",
+            "sourceVersion": "2.9.14+dfsg-1.3~deb12u6",
+            "version": "2.9.14+dfsg-1.3~deb12u6"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxmu6:arm64",
+            "sourcePackage": "libxmu",
+            "sourceVersion": "2:1.1.3-3",
+            "version": "2:1.1.3-3"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxmuu1:arm64",
+            "sourcePackage": "libxmu",
+            "sourceVersion": "2:1.1.3-3",
+            "version": "2:1.1.3-3"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxpm4:arm64",
+            "sourcePackage": "libxpm",
+            "sourceVersion": "1:3.5.12-1.1+deb12u1",
+            "version": "1:3.5.12-1.1+deb12u1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxrandr2:arm64",
+            "sourcePackage": "libxrandr",
+            "sourceVersion": "2:1.5.2-2",
+            "version": "2:1.5.2-2+b1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxrender1:arm64",
+            "sourcePackage": "libxrender",
+            "sourceVersion": "1:0.9.10-1.1",
+            "version": "1:0.9.10-1.1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxshmfence1:arm64",
+            "sourcePackage": "libxshmfence",
+            "sourceVersion": "1.3-1",
+            "version": "1.3-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxt6:arm64",
+            "sourcePackage": "libxt",
+            "sourceVersion": "1:1.2.1-1.1",
+            "version": "1:1.2.1-1.1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxxf86vm1:arm64",
+            "sourcePackage": "libxxf86vm",
+            "sourceVersion": "1:1.1.4-1",
+            "version": "1:1.1.4-1+b2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libxxhash0:arm64",
+            "sourcePackage": "xxhash",
+            "sourceVersion": "0.8.1-1",
+            "version": "0.8.1-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libz3-4:arm64",
+            "sourcePackage": "z3",
+            "sourceVersion": "4.8.12-3.1",
+            "version": "4.8.12-3.1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "libzstd1:arm64",
+            "sourcePackage": "libzstd",
+            "sourceVersion": "1.5.4+dfsg2-5",
+            "version": "1.5.4+dfsg2-5"
+          },
+          {
+            "architecture": "arm64",
+            "package": "login",
+            "sourcePackage": "shadow",
+            "sourceVersion": "1:4.13+dfsg1-1+deb12u2",
+            "version": "1:4.13+dfsg1-1+deb12u2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "logsave",
+            "sourcePackage": "e2fsprogs",
+            "sourceVersion": "1.47.0-2",
+            "version": "1.47.0-2+b2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "mawk",
+            "sourcePackage": "mawk",
+            "sourceVersion": "1.3.4.20200120-3.1",
+            "version": "1.3.4.20200120-3.1"
+          },
+          {
+            "architecture": "all",
+            "package": "media-types",
+            "sourcePackage": "media-types",
+            "sourceVersion": "10.0.0",
+            "version": "10.0.0"
+          },
+          {
+            "architecture": "arm64",
+            "package": "mesa-vulkan-drivers:arm64",
+            "sourcePackage": "mesa",
+            "sourceVersion": "22.3.6-1+deb12u2",
+            "version": "22.3.6-1+deb12u2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "mount",
+            "sourcePackage": "util-linux",
+            "sourceVersion": "2.38.1-5+deb12u3",
+            "version": "2.38.1-5+deb12u3"
+          },
+          {
+            "architecture": "all",
+            "package": "ncurses-base",
+            "sourcePackage": "ncurses",
+            "sourceVersion": "6.4-4",
+            "version": "6.4-4"
+          },
+          {
+            "architecture": "arm64",
+            "package": "ncurses-bin",
+            "sourcePackage": "ncurses",
+            "sourceVersion": "6.4-4",
+            "version": "6.4-4"
+          },
+          {
+            "architecture": "arm64",
+            "package": "openssl",
+            "sourcePackage": "openssl",
+            "sourceVersion": "3.0.22-1~deb12u2",
+            "version": "3.0.22-1~deb12u2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "passwd",
+            "sourcePackage": "shadow",
+            "sourceVersion": "1:4.13+dfsg1-1+deb12u2",
+            "version": "1:4.13+dfsg1-1+deb12u2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "perl",
+            "sourcePackage": "perl",
+            "sourceVersion": "5.36.0-7+deb12u4",
+            "version": "5.36.0-7+deb12u4"
+          },
+          {
+            "architecture": "arm64",
+            "package": "perl-base",
+            "sourcePackage": "perl",
+            "sourceVersion": "5.36.0-7+deb12u4",
+            "version": "5.36.0-7+deb12u4"
+          },
+          {
+            "architecture": "all",
+            "package": "perl-modules-5.36",
+            "sourcePackage": "perl",
+            "sourceVersion": "5.36.0-7+deb12u4",
+            "version": "5.36.0-7+deb12u4"
+          },
+          {
+            "architecture": "arm64",
+            "package": "procps",
+            "sourcePackage": "procps",
+            "sourceVersion": "2:4.0.2-3",
+            "version": "2:4.0.2-3"
+          },
+          {
+            "architecture": "arm64",
+            "package": "python3",
+            "sourcePackage": "python3-defaults",
+            "sourceVersion": "3.11.2-1",
+            "version": "3.11.2-1+b1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "python3-minimal",
+            "sourcePackage": "python3-defaults",
+            "sourceVersion": "3.11.2-1",
+            "version": "3.11.2-1+b1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "python3.11",
+            "sourcePackage": "python3.11",
+            "sourceVersion": "3.11.2-6+deb12u9",
+            "version": "3.11.2-6+deb12u9"
+          },
+          {
+            "architecture": "arm64",
+            "package": "python3.11-minimal",
+            "sourcePackage": "python3.11",
+            "sourceVersion": "3.11.2-6+deb12u9",
+            "version": "3.11.2-6+deb12u9"
+          },
+          {
+            "architecture": "all",
+            "package": "readline-common",
+            "sourcePackage": "readline",
+            "sourceVersion": "8.2-1.3",
+            "version": "8.2-1.3"
+          },
+          {
+            "architecture": "arm64",
+            "package": "sed",
+            "sourcePackage": "sed",
+            "sourceVersion": "4.9-1+deb12u1",
+            "version": "4.9-1+deb12u1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "sysvinit-utils",
+            "sourcePackage": "sysvinit",
+            "sourceVersion": "3.06-4",
+            "version": "3.06-4"
+          },
+          {
+            "architecture": "arm64",
+            "package": "tar",
+            "sourcePackage": "tar",
+            "sourceVersion": "1.34+dfsg-1.2+deb12u1",
+            "version": "1.34+dfsg-1.2+deb12u1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "tigervnc-common",
+            "sourcePackage": "tigervnc",
+            "sourceVersion": "1.12.0+dfsg-8",
+            "version": "1.12.0+dfsg-8"
+          },
+          {
+            "architecture": "arm64",
+            "package": "tigervnc-standalone-server",
+            "sourcePackage": "tigervnc",
+            "sourceVersion": "1.12.0+dfsg-8",
+            "version": "1.12.0+dfsg-8"
+          },
+          {
+            "architecture": "all",
+            "package": "tzdata",
+            "sourcePackage": "tzdata",
+            "sourceVersion": "2026e-0+deb12u1",
+            "version": "2026e-0+deb12u1"
+          },
+          {
+            "architecture": "all",
+            "package": "usr-is-merged",
+            "sourcePackage": "usrmerge",
+            "sourceVersion": "37~deb12u1",
+            "version": "37~deb12u1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "util-linux",
+            "sourcePackage": "util-linux",
+            "sourceVersion": "2.38.1-5+deb12u3",
+            "version": "2.38.1-5+deb12u3"
+          },
+          {
+            "architecture": "arm64",
+            "package": "util-linux-extra",
+            "sourcePackage": "util-linux",
+            "sourceVersion": "2.38.1-5+deb12u3",
+            "version": "2.38.1-5+deb12u3"
+          },
+          {
+            "architecture": "all",
+            "package": "x11-common",
+            "sourcePackage": "xorg",
+            "sourceVersion": "1:7.7+23",
+            "version": "1:7.7+23"
+          },
+          {
+            "architecture": "arm64",
+            "package": "x11-xkb-utils",
+            "sourcePackage": "x11-xkb-utils",
+            "sourceVersion": "7.7+7",
+            "version": "7.7+7"
+          },
+          {
+            "architecture": "arm64",
+            "package": "xauth",
+            "sourcePackage": "xauth",
+            "sourceVersion": "1:1.1.2-1",
+            "version": "1:1.1.2-1"
+          },
+          {
+            "architecture": "all",
+            "package": "xfonts-base",
+            "sourcePackage": "xfonts-base",
+            "sourceVersion": "1:1.0.5+nmu1",
+            "version": "1:1.0.5+nmu1"
+          },
+          {
+            "architecture": "all",
+            "package": "xfonts-encodings",
+            "sourcePackage": "xfonts-encodings",
+            "sourceVersion": "1:1.0.4-2.2",
+            "version": "1:1.0.4-2.2"
+          },
+          {
+            "architecture": "arm64",
+            "package": "xfonts-utils",
+            "sourcePackage": "xfonts-utils",
+            "sourceVersion": "1:7.7+6",
+            "version": "1:7.7+6"
+          },
+          {
+            "architecture": "all",
+            "package": "xkb-data",
+            "sourcePackage": "xkeyboard-config",
+            "sourceVersion": "2.35.1-1",
+            "version": "2.35.1-1"
+          },
+          {
+            "architecture": "arm64",
+            "package": "zlib1g:arm64",
+            "sourcePackage": "zlib",
+            "sourceVersion": "1:1.2.13.dfsg-1",
+            "version": "1:1.2.13.dfsg-1"
+          }
+        ],
+        "prefixInitialized": false,
+        "privatePeCopyProfile": {
+          "environment": {
+            "WINE_ANDROID_PRIVATE_PE_COPY": "1"
+          },
+          "patches": [
+            {
+              "bytes": 9732,
+              "file": "android-private-pe-copy.patch",
+              "sha256": "0f4d5b1feb2c14ae98acac215d1cf06732f9a46f325292ebd00a536ade7b5e0e"
+            }
+          ],
+          "testSources": {
+            "owned_process_group.py": {
+              "bytes": 2795,
+              "sha256": "c19ed5c05e94d7b537df1055983fca75e20447f594419084f2207d60f99f138e"
+            },
+            "private_pe_check.c": {
+              "bytes": 9950,
+              "sha256": "9f5243e12dfb4d6ad1c1ea416530f5c5ce3f924a865944b5fbf9a61f42b05458"
+            },
+            "private_pe_check.py": {
+              "bytes": 10028,
+              "sha256": "493b8dfdc42decfd72b91084be424041b7bdc6d5cf81c5adb623e7b65485b700"
+            },
+            "private_pe_fixture.c": {
+              "bytes": 767,
+              "sha256": "64dd325dd5c2926e9561dd43e47ea979bc14fd26d3dd4b17f120881e4b98de76"
+            }
+          }
+        },
+        "scope": "source-built-native-arm64-wine-candidate",
+        "snapshot": "20261029T000000Z",
+        "softwareGraphicsIcd": {
+          "ICD": {
+            "api_version": "1.1.230",
+            "library_path": "/usr/lib/aarch64-linux-gnu/libvulkan_lvp.so"
+          },
+          "file_format_version": "1.0.0"
+        },
+        "sourceLockSha256": "077fb2b0883986338b6755e53f5cede08bd63ed1834783e7e6cd079e0ec0c16d",
+        "sourcePackages": [
+          {
+            "package": "acl",
+            "version": "2.3.1-3"
+          },
+          {
+            "package": "adduser",
+            "version": "3.134"
+          },
+          {
+            "package": "alsa-lib",
+            "version": "1.2.8-1"
+          },
+          {
+            "package": "apt",
+            "version": "2.6.1"
+          },
+          {
+            "package": "attr",
+            "version": "1:2.5.1-4"
+          },
+          {
+            "package": "audit",
+            "version": "1:3.0.9-1"
+          },
+          {
+            "package": "base-files",
+            "version": "12.4+deb12u15"
+          },
+          {
+            "package": "base-passwd",
+            "version": "3.6.1"
+          },
+          {
+            "package": "bash",
+            "version": "5.2.15-2"
+          },
+          {
+            "package": "brotli",
+            "version": "1.0.9-2+deb12u1"
+          },
+          {
+            "package": "bzip2",
+            "version": "1.0.8-5"
+          },
+          {
+            "package": "ca-certificates",
+            "version": "20250419~deb12u2"
+          },
+          {
+            "package": "cdebconf",
+            "version": "0.270"
+          },
+          {
+            "package": "coreutils",
+            "version": "9.1-1"
+          },
+          {
+            "package": "dash",
+            "version": "0.5.12-2"
+          },
+          {
+            "package": "db5.3",
+            "version": "5.3.28+dfsg2-1"
+          },
+          {
+            "package": "dbus",
+            "version": "1.14.10-1~deb12u1"
+          },
+          {
+            "package": "debconf",
+            "version": "1.5.82"
+          },
+          {
+            "package": "debian-archive-keyring",
+            "version": "2023.3+deb12u2"
+          },
+          {
+            "package": "debianutils",
+            "version": "5.7-0.5~deb12u1"
+          },
+          {
+            "package": "diffutils",
+            "version": "1:3.8-4"
+          },
+          {
+            "package": "dpkg",
+            "version": "1.21.23"
+          },
+          {
+            "package": "e2fsprogs",
+            "version": "1.47.0-2"
+          },
+          {
+            "package": "elfutils",
+            "version": "0.188-2.1"
+          },
+          {
+            "package": "expat",
+            "version": "2.5.0-1+deb12u5"
+          },
+          {
+            "package": "findutils",
+            "version": "4.9.0-4"
+          },
+          {
+            "package": "flac",
+            "version": "1.4.2+ds-2"
+          },
+          {
+            "package": "fontconfig",
+            "version": "2.14.1-4"
+          },
+          {
+            "package": "fonts-liberation",
+            "version": "1:1.07.4-11"
+          },
+          {
+            "package": "freetype",
+            "version": "2.12.1+dfsg-5+deb12u4"
+          },
+          {
+            "package": "gcc-12",
+            "version": "12.2.0-14+deb12u1"
+          },
+          {
+            "package": "gdbm",
+            "version": "1.23-3"
+          },
+          {
+            "package": "glibc",
+            "version": "2.36-9+deb12u14"
+          },
+          {
+            "package": "gmp",
+            "version": "2:6.2.1+dfsg1-1.1"
+          },
+          {
+            "package": "gnupg2",
+            "version": "2.2.40-1.1+deb12u2"
+          },
+          {
+            "package": "gnutls28",
+            "version": "3.7.9-2+deb12u7"
+          },
+          {
+            "package": "grep",
+            "version": "3.8-5"
+          },
+          {
+            "package": "gzip",
+            "version": "1.12-1"
+          },
+          {
+            "package": "hostname",
+            "version": "3.23+nmu1"
+          },
+          {
+            "package": "icu",
+            "version": "72.1-3+deb12u1"
+          },
+          {
+            "package": "init-system-helpers",
+            "version": "1.65.2+deb12u1"
+          },
+          {
+            "package": "keyutils",
+            "version": "1.6.3-2"
+          },
+          {
+            "package": "krb5",
+            "version": "1.20.1-2+deb12u5"
+          },
+          {
+            "package": "lame",
+            "version": "3.100-6"
+          },
+          {
+            "package": "libasyncns",
+            "version": "0.8-6"
+          },
+          {
+            "package": "libbsd",
+            "version": "0.11.7-2"
+          },
+          {
+            "package": "libcap-ng",
+            "version": "0.8.3-1"
+          },
+          {
+            "package": "libcap2",
+            "version": "1:2.66-4+deb12u3"
+          },
+          {
+            "package": "libdrm",
+            "version": "2.4.114-1"
+          },
+          {
+            "package": "libedit",
+            "version": "3.1-20221030-2"
+          },
+          {
+            "package": "libffi",
+            "version": "3.4.4-1"
+          },
+          {
+            "package": "libfile-readbackwards-perl",
+            "version": "1.06-2"
+          },
+          {
+            "package": "libfontenc",
+            "version": "1:1.1.4-1"
+          },
+          {
+            "package": "libgcrypt20",
+            "version": "1.10.1-3+deb12u1"
+          },
+          {
+            "package": "libglvnd",
+            "version": "1.6.0-1"
+          },
+          {
+            "package": "libgpg-error",
+            "version": "1.46-1"
+          },
+          {
+            "package": "libice",
+            "version": "2:1.0.10-1"
+          },
+          {
+            "package": "libidn2",
+            "version": "2.3.3-1"
+          },
+          {
+            "package": "libjpeg-turbo",
+            "version": "1:2.1.5-2"
+          },
+          {
+            "package": "libmd",
+            "version": "1.0.4-2"
+          },
+          {
+            "package": "libnsl",
+            "version": "1.3.0-2"
+          },
+          {
+            "package": "libogg",
+            "version": "1.3.5-3"
+          },
+          {
+            "package": "libpng1.6",
+            "version": "1.6.39-2+deb12u6"
+          },
+          {
+            "package": "libseccomp",
+            "version": "2.5.4-1+deb12u1"
+          },
+          {
+            "package": "libselinux",
+            "version": "3.4-1"
+          },
+          {
+            "package": "libsemanage",
+            "version": "3.4-1"
+          },
+          {
+            "package": "libsepol",
+            "version": "3.4-2.1"
+          },
+          {
+            "package": "libsm",
+            "version": "2:1.2.3-1"
+          },
+          {
+            "package": "libsndfile",
+            "version": "1.2.0-1+deb12u1"
+          },
+          {
+            "package": "libtasn1-6",
+            "version": "4.19.0-2+deb12u1"
+          },
+          {
+            "package": "libtirpc",
+            "version": "1.3.3+ds-1"
+          },
+          {
+            "package": "libunistring",
+            "version": "1.0-2"
+          },
+          {
+            "package": "libunwind",
+            "version": "1.6.2-3"
+          },
+          {
+            "package": "libvorbis",
+            "version": "1.3.7-1"
+          },
+          {
+            "package": "libx11",
+            "version": "2:1.8.4-2+deb12u2"
+          },
+          {
+            "package": "libxau",
+            "version": "1:1.0.9-1"
+          },
+          {
+            "package": "libxaw",
+            "version": "2:1.0.14-1"
+          },
+          {
+            "package": "libxcb",
+            "version": "1.15-1"
+          },
+          {
+            "package": "libxcomposite",
+            "version": "1:0.4.5-1"
+          },
+          {
+            "package": "libxcrypt",
+            "version": "1:4.4.33-2"
+          },
+          {
+            "package": "libxcursor",
+            "version": "1:1.2.1-1"
+          },
+          {
+            "package": "libxdamage",
+            "version": "1:1.1.6-1"
+          },
+          {
+            "package": "libxdmcp",
+            "version": "1:1.1.2-3"
+          },
+          {
+            "package": "libxext",
+            "version": "2:1.3.4-1"
+          },
+          {
+            "package": "libxfixes",
+            "version": "1:6.0.0-2"
+          },
+          {
+            "package": "libxfont",
+            "version": "1:2.0.6-1+deb12u1"
+          },
+          {
+            "package": "libxi",
+            "version": "2:1.8-1"
+          },
+          {
+            "package": "libxinerama",
+            "version": "2:1.1.4-3"
+          },
+          {
+            "package": "libxkbfile",
+            "version": "1:1.1.0-1"
+          },
+          {
+            "package": "libxml2",
+            "version": "2.9.14+dfsg-1.3~deb12u6"
+          },
+          {
+            "package": "libxmu",
+            "version": "2:1.1.3-3"
+          },
+          {
+            "package": "libxpm",
+            "version": "1:3.5.12-1.1+deb12u1"
+          },
+          {
+            "package": "libxrandr",
+            "version": "2:1.5.2-2"
+          },
+          {
+            "package": "libxrender",
+            "version": "1:0.9.10-1.1"
+          },
+          {
+            "package": "libxshmfence",
+            "version": "1.3-1"
+          },
+          {
+            "package": "libxt",
+            "version": "1:1.2.1-1.1"
+          },
+          {
+            "package": "libxxf86vm",
+            "version": "1:1.1.4-1"
+          },
+          {
+            "package": "libzstd",
+            "version": "1.5.4+dfsg2-5"
+          },
+          {
+            "package": "llvm-toolchain-15",
+            "version": "1:15.0.6-4"
+          },
+          {
+            "package": "lm-sensors",
+            "version": "1:3.6.0-7.1"
+          },
+          {
+            "package": "lz4",
+            "version": "1.9.4-1"
+          },
+          {
+            "package": "mawk",
+            "version": "1.3.4.20200120-3.1"
+          },
+          {
+            "package": "media-types",
+            "version": "10.0.0"
+          },
+          {
+            "package": "mesa",
+            "version": "22.3.6-1+deb12u2"
+          },
+          {
+            "package": "mpg123",
+            "version": "1.31.2-1+deb12u1"
+          },
+          {
+            "package": "ncurses",
+            "version": "6.4-4"
+          },
+          {
+            "package": "nettle",
+            "version": "3.8.1-2"
+          },
+          {
+            "package": "openssl",
+            "version": "3.0.22-1~deb12u2"
+          },
+          {
+            "package": "opus",
+            "version": "1.3.1-3"
+          },
+          {
+            "package": "p11-kit",
+            "version": "0.24.1-2"
+          },
+          {
+            "package": "pam",
+            "version": "1.5.2-6+deb12u2"
+          },
+          {
+            "package": "pcre2",
+            "version": "10.42-1+deb12u2"
+          },
+          {
+            "package": "perl",
+            "version": "5.36.0-7+deb12u4"
+          },
+          {
+            "package": "pixman",
+            "version": "0.42.2-1"
+          },
+          {
+            "package": "procps",
+            "version": "2:4.0.2-3"
+          },
+          {
+            "package": "pulseaudio",
+            "version": "16.1+dfsg1-2"
+          },
+          {
+            "package": "python3-defaults",
+            "version": "3.11.2-1"
+          },
+          {
+            "package": "python3.11",
+            "version": "3.11.2-6+deb12u9"
+          },
+          {
+            "package": "readline",
+            "version": "8.2-1.3"
+          },
+          {
+            "package": "sed",
+            "version": "4.9-1+deb12u1"
+          },
+          {
+            "package": "shadow",
+            "version": "1:4.13+dfsg1-1+deb12u2"
+          },
+          {
+            "package": "sqlite3",
+            "version": "3.40.1-2+deb12u2"
+          },
+          {
+            "package": "systemd",
+            "version": "252.39-1~deb12u2"
+          },
+          {
+            "package": "sysvinit",
+            "version": "3.06-4"
+          },
+          {
+            "package": "tar",
+            "version": "1.34+dfsg-1.2+deb12u1"
+          },
+          {
+            "package": "tigervnc",
+            "version": "1.12.0+dfsg-8"
+          },
+          {
+            "package": "tzdata",
+            "version": "2026e-0+deb12u1"
+          },
+          {
+            "package": "usrmerge",
+            "version": "37~deb12u1"
+          },
+          {
+            "package": "util-linux",
+            "version": "2.38.1-5+deb12u3"
+          },
+          {
+            "package": "vulkan-loader",
+            "version": "1.3.239.0-1"
+          },
+          {
+            "package": "wayland",
+            "version": "1.21.0-1"
+          },
+          {
+            "package": "x11-xkb-utils",
+            "version": "7.7+7"
+          },
+          {
+            "package": "xauth",
+            "version": "1:1.1.2-1"
+          },
+          {
+            "package": "xfonts-base",
+            "version": "1:1.0.5+nmu1"
+          },
+          {
+            "package": "xfonts-encodings",
+            "version": "1:1.0.4-2.2"
+          },
+          {
+            "package": "xfonts-utils",
+            "version": "1:7.7+6"
+          },
+          {
+            "package": "xkeyboard-config",
+            "version": "2.35.1-1"
+          },
+          {
+            "package": "xorg",
+            "version": "1:7.7+23"
+          },
+          {
+            "package": "xxhash",
+            "version": "0.8.1-1"
+          },
+          {
+            "package": "xz-utils",
+            "version": "5.4.1-1+deb12u2"
+          },
+          {
+            "package": "z3",
+            "version": "4.8.12-3.1"
+          },
+          {
+            "package": "zlib",
+            "version": "1:1.2.13.dfsg-1"
+          }
+        ],
+        "toolchainArchiveSha256": "bce5cc755c613515fd44e1ee9523123d854103abae147571adb645450036274d",
+        "wineRevision": "a6844d10622fc1a973ec1f22fc4f78a0fcd6cb29",
+        "wineSourceArchiveSha256": "93ffcd86d3f518934da5c93c768d43afe7e97d66f04f355d914f5cfb6731ac74",
+        "wineVersion": "wine-10.13"
+      },
+      "markerPath": "etc/esteria-wine-arm64.json",
+      "metadataFiles": [
+        "usr/lib/os-release"
+      ],
+      "release": "https://github.com/Russianranger/esteria_android/releases/tag/deps-wine-arm64-681b2e9-c0e13ed15a69",
+      "sourceArchives": [
+        {
+          "bytes": 53416396,
+          "file": "wine-arm64ec-source.tar.gz",
+          "sha256": "93ffcd86d3f518934da5c93c768d43afe7e97d66f04f355d914f5cfb6731ac74",
+          "url": "https://github.com/Russianranger/uo-android-launcher/releases/download/v0.2.0/wine-arm64ec-source.tar.gz"
+        },
+        {
+          "bytes": 222845230,
+          "file": "fex-2510-source-with-submodules.tar.gz",
+          "sha256": "8a10a8e63cdea41a6c70b0f14d487fe4cb3f11c8fb5baba3e42090098e2745be",
+          "url": "https://github.com/Russianranger/uo-android-launcher/releases/download/v0.2.0/fex-2510-source-with-submodules.tar.gz"
+        },
+        {
+          "bytes": 75125388,
+          "file": "llvm-mingw-20250920-ucrt-ubuntu-22.04-aarch64.tar.xz",
+          "releaseAssetId": 296883239,
+          "sha256": "bce5cc755c613515fd44e1ee9523123d854103abae147571adb645450036274d",
+          "url": "https://github.com/bylaws/llvm-mingw/releases/download/20250920/llvm-mingw-20250920-ucrt-ubuntu-22.04-aarch64.tar.xz"
+        }
+      ],
+      "sourceCompanion": {
+        "bytes": 1681474721,
+        "file": "wine-arm64-corresponding-sources.zip",
+        "originalArtifactId": 12982282257,
+        "originalProducerRevision": "681b2e9f30b19e94bf8e8de44f67fedba5033c8a",
+        "originalWorkflowRun": 41057900330,
+        "sha256": "38e16617545abb16f995ba75a8b52b8ca2bacad5d2688adf3646911f16c8fb06",
+        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-wine-arm64-681b2e9-c0e13ed15a69/wine-arm64-corresponding-sources.zip"
+      },
+      "status": "source-owned-native-arm64-host-measured-android-unqualified",
+      "wineEnvironment": {
+        "WINE_ANDROID_PRIVATE_PE_COPY": "1"
+      }
+    }
+  },
+  "purpose": "review-only source-owned ARM64 Wine proposal; publication and coherent providers required",
+  "reference": {
+    "path": "android/qualification/client-runtime-lock.json",
+    "repository": "https://github.com/Russianranger/fta-launcher",
+    "revision": "7a9ce45988f295824d20c9ff7436a77a0baa4f07"
+  },
+  "server": {
+    "architecture": "linux-arm64",
+    "requirements": [
+      "Ubuntu 24.04-compatible glibc/shared libraries matching the current server build",
+      "Python3 standard library",
+      "MySQL 8 mysql and mysqld plus dependencies",
+      "Exact raw SELECT VERSION() string in package manifest"
+    ],
+    "sharesWineRootfs": false,
+    "status": "not-yet-packaged"
+  },
   "softwareAudio": {
-    "formatVersion": 1,
-    "runtimeArchiveSha256": "f036c00a290abb953bec26be80c4d8fe492fd986e7a589c51008124432c8641e",
     "components": {
+      "opt/wine/lib/wine/aarch64-unix/winealsa.so": {
+        "bytes": 134144,
+        "elfClass": 2,
+        "elfMachine": 183,
+        "sha256": "cc3de8fd246ebdb46879a05debfa451437d5dd7fc655bd249165606c23c882ab"
+      },
+      "opt/wine/lib/wine/aarch64-windows/winealsa.drv": {
+        "bytes": 589824,
+        "peMachine": "0xaa64",
+        "sha256": "ea1da4bccb4188f34148f55daaff9acea37f2d172b8ff09ab9c311ccd6611595"
+      },
       "usr/lib/aarch64-linux-gnu/libasound.so.2.0.0": {
         "bytes": 1116648,
-        "sha256": "9fade6b3aedf1ba944e6795b52b74378f2f89166b92ee542582171416a76572d",
+        "elfClass": 2,
         "elfMachine": 183,
-        "elfClass": 2
+        "sha256": "9fade6b3aedf1ba944e6795b52b74378f2f89166b92ee542582171416a76572d"
       },
       "usr/share/alsa/alsa.conf": {
         "bytes": 10117,
         "sha256": "ea7c6cedb7da16ba51a0fea3e960416a2240e29c1f5d42e475c1dfcd19eb74ee"
-      },
-      "opt/wine/lib/wine/aarch64-unix/winealsa.so": {
-        "bytes": 462776,
-        "sha256": "aea857b5d08efb62046efa939b0df2f6be42ea4031debe4ff083e055b9599cc9",
-        "elfMachine": 183,
-        "elfClass": 2
-      },
-      "opt/wine/lib/wine/aarch64-windows/winealsa.drv": {
-        "bytes": 983040,
-        "sha256": "84d5571b6a065fa76fa436404acc7a99e8cfa930cd8d29509aa0246dcf09915a",
-        "peMachine": "0xaa64"
       }
     },
-    "note": "Source-built Esteria ALSA plugin and a captured known stereo signal are separately required. Simulated Linux playback clock; not Android or audible-output qualification."
+    "formatVersion": 1,
+    "runtimeArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46"
+  },
+  "softwareGraphics": {
+    "components": {
+      "opt/wine/lib/wine/aarch64-unix/winevulkan.so": {
+        "bytes": 854160,
+        "elfClass": 2,
+        "elfMachine": 183,
+        "sha256": "1f3ad380d36fb467988d20eea122b0000fe52afc1258f7eb9635963fad45ef68"
+      },
+      "usr/lib/aarch64-linux-gnu/libvulkan.so.1.3.239": {
+        "bytes": 526896,
+        "elfClass": 2,
+        "elfMachine": 183,
+        "sha256": "605f52f426f01a2c468ecd920b3de31452fde495f2c0d99602fffb93e782767c"
+      },
+      "usr/lib/aarch64-linux-gnu/libvulkan_lvp.so": {
+        "bytes": 6569376,
+        "elfClass": 2,
+        "elfMachine": 183,
+        "sha256": "ce6f6917dd22ed612ae8649a9eb9c615a973a2e9eb9a58b8cc8655f22c933c6b"
+      },
+      "usr/share/vulkan/icd.d/lvp_icd.aarch64.json": {
+        "bytes": 162,
+        "sha256": "0950c584a06fc5531dbaedef764764cd8f4af5e4390d416971db7c62e85da22f"
+      }
+    },
+    "expectedAdapterPrefix": "Vulkan adapter: llvmpipe",
+    "icdApiVersion": "1.1.230",
+    "icdLibrary": "/usr/lib/aarch64-linux-gnu/libvulkan_lvp.so",
+    "icdPath": "usr/share/vulkan/icd.d/lvp_icd.aarch64.json",
+    "runtimeArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+    "status": "separate-software-reference-only"
   }
 }

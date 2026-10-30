@@ -1,0 +1,107 @@
+{
+  "actualPublicSourcesPassed": true,
+  "allSevenNewIdentitiesMatchImmutableCohortSelection": true,
+  "androidQualified": false,
+  "files": {
+    "runtime/bridges/android-provider.lock.json": {
+      "current": {
+        "bytes": 12807,
+        "sha256": "e983198e229ffad73d8fdc14cd6059029a5b6ba20d6e9509633db45df3e03ea4"
+      },
+      "identity": {
+        "bytes": 12376,
+        "sha256": "2829cef5a81fbdcceeaa47b7cec9fe00274e4d0308c5d8242c722e0667e5616b"
+      },
+      "source": "runtime/wine-arm64-adoption/measured/guest-bridges-input.lock.json"
+    },
+    "runtime/bridges/sources.lock.json": {
+      "current": {
+        "bytes": 23129,
+        "sha256": "be07f59cff79a6c0e746d4d9c2adbd816568903e312317ff58091f9747779af0"
+      },
+      "identity": {
+        "bytes": 23129,
+        "sha256": "241729a2da2c6e88df431c9d68f00e37873c0616d81981a354e12b58046384e9"
+      },
+      "source": "runtime/wine-arm64-adoption/measured/bridge-sources.lock.json"
+    },
+    "runtime/bridges/x11-runtime.lock.json": {
+      "current": {
+        "bytes": 14313,
+        "sha256": "f6a7cebc7d78933a05a074a7a152adc7a19b547e00192de6489d6b1bd7e15ccf"
+      },
+      "identity": {
+        "bytes": 14313,
+        "sha256": "828f3a7843f7073648e95fe52edfd69834ccb480073a42f52bf68b0b8f3d12e5"
+      },
+      "source": "runtime/wine-arm64-adoption/x11-runtime.lock.json"
+    },
+    "runtime/runtime-sources.lock.json": {
+      "current": {
+        "bytes": 14211,
+        "sha256": "cd2f3d2d47e2ac0de845acc914e94013906836de9710dc290a6fa51c89bbf07d"
+      },
+      "identity": {
+        "bytes": 105545,
+        "sha256": "562bf73630b7217c2c3ae0adf85b7a16d6979d3c257227e287757c9cbc3154c7"
+      },
+      "source": "runtime/wine-arm64-adoption/measured/runtime-sources.proposed.lock.json"
+    },
+    "runtime/shaders/android-provider.lock.json": {
+      "current": {
+        "bytes": 11851,
+        "sha256": "a7a2ceb0d04367817c0a80c58c5fc9120d7e4c623ca3286dcc2ea07b82b697b1"
+      },
+      "identity": {
+        "bytes": 12463,
+        "sha256": "738784d15c24788c478b2fb61a2947588c142a7d8c752d753c92c74cde920f48"
+      },
+      "source": "runtime/wine-arm64-adoption/measured/shader-tools-input.lock.json"
+    },
+    "runtime/turnip/android-provider.lock.json": {
+      "current": {
+        "bytes": 16051,
+        "sha256": "a2999f5172d139ea37cec712662ffc17303cb2d78d8356095c11c8f671f887d4"
+      },
+      "identity": {
+        "bytes": 16435,
+        "sha256": "879c79db15622cfa155aad0b1d901fc322559e7fbc7245c5d73b234ed499df91"
+      },
+      "source": "runtime/wine-arm64-adoption/measured/turnip-input.lock.json"
+    },
+    "runtime/turnip/sources.lock.json": {
+      "current": {
+        "bytes": 43088,
+        "sha256": "9bc783e6240d3314a8245f88a3ce8eb5a8d583e360f330f780cd71080bf2d8d1"
+      },
+      "identity": {
+        "bytes": 43088,
+        "sha256": "f92f119d657feaa7548e84196d20c59a9050b91a62f171de8249b75e23a8645f"
+      },
+      "source": "runtime/wine-arm64-adoption/measured/turnip-sources.lock.json"
+    }
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "globalLocksEdited": false,
+  "hardwareQualified": false,
+  "nextGate": "actual-coherent-APK-build-and-byte-source-verification",
+  "originalNativeAndSourceRecoveryRunsRemainDistinct": true,
+  "publicSourceProof": {
+    "bytes": 17826,
+    "sha256": "9c0c4c76672d8bc2c3675b4818eeb0791315fb0468ca3467a88ff7272169602c"
+  },
+  "releaseSelection": {
+    "bytes": 15764,
+    "sha256": "a15491aa8a2f075794e3379813e1e4700753699f16ebedb2c68c4c9735c9cbdd"
+  },
+  "scope": "reviewed-public-source-bound-atomic-seven-file-adoption-preview",
+  "unchangedAppSource": {
+    "bytes": 2170,
+    "sha256": "dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90"
+  },
+  "unchangedClientInput": {
+    "bytes": 492,
+    "sha256": "7ecb7dfd4e9917e742fb467d81a72af9273394c8488e5a6cb3e25fa70c29ed5b"
+  }
+}

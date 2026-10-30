@@ -96,59 +96,90 @@ public final class ClientLaunchSetup {
         if (binaries==null) throw new IOException("Prepare the reconstructed client before its launch view");
         return prepareStored(root,binaries,client.packagePlan(),acceptedAssessment,progress,cancelled);
     }
-    // Kept independent of Android services so real persistence/review behavior can be host-tested.
-    static Prepared prepareStored(Path root,Path binaries,RuntimePackagePlan client,String acceptedAssessment,
-            RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled) throws IOException {
-        if (acceptedAssessment!=null&&!acceptedAssessment.matches("[a-f0-9]{64}"))
-            throw new IOException("Invalid UI review decision");
+    /** Exclusive writable-view lease. Only the runtime package can create it;
+     * the playing owner holds it until every client/presentation child is reaped. */
+    static final class Lease implements AutoCloseable {
+        final Path root,work;
+        private final FileChannel channel;
+        private final FileLock lock;
+        private boolean closed;
+        private Lease(Path root,Path work,FileChannel channel,FileLock lock) {
+            this.root=root;this.work=work;this.channel=channel;this.lock=lock;
+        }
+        void require(Path expected)throws IOException {
+            if(closed||!lock.isValid()||!root.equals(expected))throw new IOException("Owned client view lease is unavailable");
+        }
+        @Override public void close()throws IOException {
+            if(closed)return;try{lock.release();}finally{channel.close();closed=true;}
+        }
+    }
+    static Lease claim(Path root)throws IOException {
         if (!Files.isDirectory(root,LinkOption.NOFOLLOW_LINKS)||!root.toRealPath().equals(root))
             throw new IOException("Client view root must be canonical private storage");
-        RuntimeWork.Progress updates=progress==null ? RuntimeWork.NONE : progress;
-        RuntimeWork.Cancellation stop=cancelled==null ? RuntimeWork.NEVER_CANCELLED : cancelled;
-        Path work=root.resolve("state/client-work"), current=root;
-        for (Path part:root.relativize(work)) {
+        Path work=root.resolve("state/client-work"),current=root;
+        for(Path part:root.relativize(work)) {
             current=current.resolve(part);
-            if (!Files.exists(current,LinkOption.NOFOLLOW_LINKS))
-                Files.createDirectory(current,PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------")));
-            if (!Files.isDirectory(current,LinkOption.NOFOLLOW_LINKS)||!current.toRealPath().equals(current))
+            if(!Files.exists(current,LinkOption.NOFOLLOW_LINKS))Files.createDirectory(current,
+                PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------")));
+            if(!Files.isDirectory(current,LinkOption.NOFOLLOW_LINKS)||!current.toRealPath().equals(current))
                 throw new IOException("Client work directory must be a private canonical directory");
         }
         Path lockPath=work.resolve(".client-launch-setup.lock");
         if(Files.exists(lockPath,LinkOption.NOFOLLOW_LINKS)&&!Files.isRegularFile(lockPath,LinkOption.NOFOLLOW_LINKS))
             throw new IOException("Invalid client setup operation lock");
-        try(FileChannel channel=FileChannel.open(lockPath,StandardOpenOption.CREATE,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS)) {
+        FileChannel channel=FileChannel.open(lockPath,StandardOpenOption.CREATE,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS);
+        FileLock lock=null;
+        try {
             Files.setPosixFilePermissions(lockPath,PosixFilePermissions.fromString("rw-------"));
-            FileLock lock;
-            try { lock=channel.tryLock(); }
-            catch(java.nio.channels.OverlappingFileLockException busy) { throw new IOException("Client view preparation is already running",busy); }
-            if(lock==null)throw new IOException("Client view preparation is already running");
-            try(FileLock held=lock) {
-                if(stop.isCancelled()||Thread.currentThread().isInterrupted())throw new RuntimeWork.CancelledException();
-                GameDataImporter importer=new GameDataImporter(root.resolve("game"));
-                Path data=importer.resolveCurrent();
-                if(data==null) {
-                    if(acceptedAssessment!=null)throw new IOException("Imported data changed; prepare the runtime again before reviewing UI");
-                    return null;
-                }
-                String importedGeneration=data.getParent().getFileName().toString();
-                ImportedUiSource source=ImportedUiSource.fromImportStore(root.resolve("game"),importedGeneration,stop);
-                ClientUiStore ui=new ClientUiStore(work);
-                ClientUiStore.Candidate candidate=ui.prepare(source,updates,stop);
-                // Repeated preparation of the active inventory preserves mutations without a full UI hash.
-                // New source inventories and explicit review choices require a bounded live assessment.
-                if(acceptedAssessment!=null||!candidate.interfaceDirectory.equals(ui.current(stop))) {
-                    updates.update("client-ui-assessing","",0,-1);
-                    ClientUiStore.Assessment assessment=ui.assess(candidate,stop);
-                    if(acceptedAssessment!=null&&!acceptedAssessment.equals(assessment.digest))
-                        throw new ReviewRequired(assessment,true);
-                    if(acceptedAssessment==null&&assessment.requiresReview)throw new ReviewRequired(assessment,false);
-                    ui.activate(candidate,assessment.digest,acceptedAssessment!=null,stop);
-                }
-                if(!data.equals(importer.resolveCurrent()))throw new IOException("Imported data changed while preparing the view; retry after the import finishes");
-                ClientLaunchView.Plan plan=new ClientLaunchView.Plan(binaries,client,data,importedGeneration,ui.selectedFor(source,stop));
-                ClientLaunchView.Result view=new ClientLaunchView(work).prepare(plan,updates,stop);
-                return new Prepared(work,data,plan,view);
-            }
+            try{lock=channel.tryLock();}catch(java.nio.channels.OverlappingFileLockException busy){throw new IOException("Client view is already owned",busy);}
+            if(lock==null)throw new IOException("Client view is already owned");
+            return new Lease(root,work,channel,lock);
+        }catch(IOException|RuntimeException error){try{if(lock!=null)lock.release();}finally{channel.close();}throw error;}
+    }
+    static Prepared prepareUnderOwnedLease(Context context,Path root,ClientRuntimeSetup client,Lease lease,
+            RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled)throws IOException {
+        if(!root.equals(context.getFilesDir().getCanonicalFile().toPath()))throw new IOException("Private canonical client storage required");
+        Path binaries=client.current();if(binaries==null)throw new IOException("Prepare the reconstructed client first");
+        return prepareStoredUnderOwnedLease(root,binaries,client.packagePlan(),null,lease,progress,cancelled);
+    }
+    // Kept independent of Android services so real persistence/review behavior can be host-tested.
+    static Prepared prepareStored(Path root,Path binaries,RuntimePackagePlan client,String acceptedAssessment,
+            RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled)throws IOException {
+        try(Lease lease=claim(root)) {
+            return prepareStoredUnderOwnedLease(root,binaries,client,acceptedAssessment,lease,progress,cancelled);
         }
+    }
+    static Prepared prepareStoredUnderOwnedLease(Path root,Path binaries,RuntimePackagePlan client,String acceptedAssessment,Lease lease,
+            RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled)throws IOException {
+        lease.require(root);
+        if(acceptedAssessment!=null&&!acceptedAssessment.matches("[a-f0-9]{64}"))throw new IOException("Invalid UI review decision");
+        RuntimeWork.Progress updates=progress==null?RuntimeWork.NONE:progress;
+        RuntimeWork.Cancellation stop=cancelled==null?RuntimeWork.NEVER_CANCELLED:cancelled;
+        Path work=lease.work;
+        if(stop.isCancelled()||Thread.currentThread().isInterrupted())throw new RuntimeWork.CancelledException();
+        GameDataImporter importer=new GameDataImporter(root.resolve("game"));
+        Path data=importer.resolveCurrent();
+        if(data==null) {
+            if(acceptedAssessment!=null)throw new IOException("Imported data changed; prepare the runtime again before reviewing UI");
+            return null;
+        }
+        String importedGeneration=data.getParent().getFileName().toString();
+        ImportedUiSource source=ImportedUiSource.fromImportStore(root.resolve("game"),importedGeneration,stop);
+        ClientUiStore ui=new ClientUiStore(work);
+        ClientUiStore.Candidate candidate=ui.prepare(source,updates,stop);
+        // Repeated preparation of the active inventory preserves mutations without a full UI hash.
+        // New source inventories and explicit review choices require a bounded live assessment.
+        if(acceptedAssessment!=null||!candidate.interfaceDirectory.equals(ui.current(stop))) {
+            updates.update("client-ui-assessing","",0,-1);
+            ClientUiStore.Assessment assessment=ui.assess(candidate,stop);
+            if(acceptedAssessment!=null&&!acceptedAssessment.equals(assessment.digest))
+                throw new ReviewRequired(assessment,true);
+            if(acceptedAssessment==null&&assessment.requiresReview)throw new ReviewRequired(assessment,false);
+            ui.activate(candidate,assessment.digest,acceptedAssessment!=null,stop);
+        }
+        if(!data.equals(importer.resolveCurrent()))throw new IOException("Imported data changed while preparing the view; retry after the import finishes");
+        ClientLaunchView.Plan plan=new ClientLaunchView.Plan(binaries,client,data,importedGeneration,ui.selectedFor(source,stop));
+        ClientLaunchView.Result view=new ClientLaunchView(work).prepare(plan,updates,stop);
+        return new Prepared(work,data,plan,view);
     }
 }

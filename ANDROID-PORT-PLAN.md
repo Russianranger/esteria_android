@@ -64,3 +64,8 @@ compose retained game/client ownership with the new local-world setup pipeline
 and service-owned presentation; then qualify actual imported-data world gameplay.
 Native current authentication, bot schema and owned installation finish pass.
 The exact exported-source server archive is retained; no full rebuild is needed.
+
+The retained game/session and service-owned presentation/control UI now compile
+and pass meaningful host ownership regressions. Public source-owned Wine cohort
+consumption and atomic seven-pin adoption pass. Complete derived tool/helper
+providers, inspect the coherent APK and run actual Android/native-data gates next.

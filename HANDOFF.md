@@ -31,30 +31,33 @@ original receipts, source locks, paired debug, notices and historical proofs.
 | Installation finish |41088296041: actual production MySQL owner, first/repeat/restart, nested DataDir, complete SQL-only marker and clean stop. Does not establish Java slot promotion. |
 | Ordered2 source observation |41095126683: actual native offline two-target build, lookup and210objects/two links. Full source seal is a separate source-only workflow. |
 | Helper source observation |41095126547: actual native201objects/one ARM64link. Full source seal is a separate source-only workflow. No SQL rerun. |
-| Wine publication |Separate c0e runtime/full source release and selected471 client release pass public readback. New cohort429283373 targets exact4d27ba80aed0669bdbe15871ad5ddb59c14b3a39 and contains19 verified assets; public anonymous consumer/adoption are separate gates. |
+| Wine publication |Separate c0e runtime/full source release and selected471 client release pass public readback. New cohort429283373 targets exact4d27ba80aed0669bdbe15871ad5ddb59c14b3a39 and contains19 verified assets; public anonymous consumer41098490533 and atomic seven-pin adoption now pass; actual coherent APK remains. |
 | Android owners |Presentation, shaders, native known-reap, database/schema, auth/world, data setup and local-world pipeline build/lint and focused Java/Python ownership fixtures pass. Actual Android full execution remains open. |
 
 ## Next concrete work
 
-1. Finish the cheap ordered and helper source-only seals using retained native
-payloads. The ordered immutable input lock is b82abde4df6fa5b630d91973ae500f33266433ef80ad6f92e2f562d877f417ad. Preserve it; record actual source outputs in the data-provider lock. Do not recompile the full worldserver or change original binaries for harness failures.
+1. Ordered complete-source seal41097592284 passes full5675member readback;
+helper seal41099467799 passes full6372member readback. Preserve these outputs. The ordered immutable input lock is b82abde4df6fa5b630d91973ae500f33266433ef80ad6f92e2f562d877f417ad. Preserve it; record actual source outputs in the data-provider lock. Do not recompile the full worldserver or change original binaries for harness failures.
 2. Build/qualify the distinct ordered2+original2 data-tool provider and separate
 helper-augmented programs profile. Keep the qualified stock profiles unchanged.
 Only measured source/native CLI outputs may enable provider flags.
-3. Publish the new cohort public receipt, run its anonymous19-asset plus entire
-Wine-source consumer, then atomically adopt all seven exact global pins including
-X11 closure. Use the separate coherent-APK workflow/checker for its three-key
-client source schema; the historical two-key sealer stays unchanged.
-4. Complete retained GameSession and Service/Main activation. LocalWorldSetup
+3. New cohort public receipt, anonymous19-asset/entire Wine-source consumer and
+atomic seven-pin adoption now pass. Inspect the actual separate coherent-APK
+workflow/checker for its three-key client source schema; the historical two-key
+sealer stays unchanged.
+4. Retained GameSession and Service/Main activation now compile and pass focused
+Game8/World2/Presentation3 host ownership fixtures and independent review. Finish
+actual Android/service/runtime integration gates with complete providers. LocalWorldSetup
 holds the data/import owner through shaders and fresh SQL. GameSession must then
 hold import and client-view leases for all gameplay; start DB→auth/world→display/
 audio/input→one-use local login/client. Actual471 Alt+F4 supports graceful client
 close. Keep presentation alive until client reap, then world/auth, then database.
 A separately explicit force action must mark recovery required, not a clean save.
-5. Connect the existing replaceable GamePresentationPanel and controller/touch/
-keyboard to service-owned presentation, retain foreground lifetime and add real
-component failure/performance support facts. Do not equate CLIENT_STARTED with
-login/world readiness.
+5. The replaceable GamePresentationPanel/controller/touch/keyboard is connected
+to service-owned presentation. Foreground/wake/cleanup and explicit force survive
+view replacement; support export has a separate single-flight worker. Qualify
+actual Android execution; add combined child-process memory measurements before
+raising bots. CLIENT_STARTED is never login/world readiness.
 6. With real imported12340/custom assets, run actual extraction/shader setup,
 matched DBC/map coverage, normal Glue login, character/world, combat/loot/inventory/
 quest, audio, save/relog and one-to-four supported playerbots. Then produce one

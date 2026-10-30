@@ -1,0 +1,33 @@
+{
+  "actualPublicCohortAndEntireWineSourcesReadBack": true,
+  "adoptionPreview": {
+    "bytes": 3865,
+    "path": "runtime/wine-cohort-publication/adoption-ready.json",
+    "sha256": "580133588d1ca0c3614ce70d0522ff1d4bd22b72e76009f96222b2594f579520"
+  },
+  "androidQualified": false,
+  "coherentApkStillPending": true,
+  "evidenceArtifact": {
+    "bytes": 4492,
+    "id": 12997321606,
+    "sha256": "1d8a636384ec3553ff6b61021aa40846193c9489379420437ac65ae474806c3a"
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "hardwareQualified": false,
+  "integrationRevision": "3f9dad00843af93b5f0a36b9ff111b78c481b54d",
+  "productionPinsChanged": false,
+  "publicSourceProof": {
+    "bytes": 17826,
+    "path": "runtime/wine-cohort-publication/public-source-readback.json",
+    "sha256": "9c0c4c76672d8bc2c3675b4818eeb0791315fb0468ca3467a88ff7272169602c"
+  },
+  "recipeRevision": "4d27ba80aed0669bdbe15871ad5ddb59c14b3a39",
+  "releaseSelection": {
+    "bytes": 15764,
+    "sha256": "a15491aa8a2f075794e3379813e1e4700753699f16ebedb2c68c4c9735c9cbdd"
+  },
+  "scope": "independent-public-cohort-complete-source-qualification-receipt",
+  "workflowJob": 124210360172,
+  "workflowRun": 41098490533
+}

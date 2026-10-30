@@ -1,0 +1,18 @@
+// Retained client/server composition owner; fixture sources never enter an APK.
+def gameOwnerClasspath = files(providers.provider { android.bootClasspath },
+    providers.provider { tasks.named('compileDebugJavaWithJavac').get().destinationDirectory.get().asFile },
+    project(':core').layout.buildDirectory.dir('classes/java/main'))
+def compileGameOwner = tasks.register('compileGameSessionOwnerFixture', JavaCompile) {
+    dependsOn 'compileDebugJavaWithJavac', ':core:classes'
+    source file('src/test/java/io/github/russianranger/esteria/runtime/GameSessionOwnerTests.java')
+    source file('src/test/java/android/os/Looper.java')
+    classpath = gameOwnerClasspath
+    destinationDirectory = layout.buildDirectory.dir('gameSessionOwnerFixture')
+    sourceCompatibility = '17'; targetCompatibility = '17'
+}
+tasks.register('gameSessionOwnerTest', JavaExec) {
+    dependsOn compileGameOwner
+    classpath = files(compileGameOwner.flatMap { it.destinationDirectory }) + gameOwnerClasspath
+    mainClass = 'io.github.russianranger.esteria.runtime.GameSessionOwnerTests'
+    maxHeapSize = '32m'
+}

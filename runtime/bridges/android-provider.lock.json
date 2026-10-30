@@ -1,183 +1,185 @@
 {
   "androidRuntimeQualified": false,
   "artifact": {
-    "bytes": 142339282,
-    "id": 12951430269,
-    "sha256": "f3365863da63074fb18bf9809cb7df38c161d47e5efe40f2f32c1fe5f6847e3b",
-    "url": "https://github.com/Russianranger/esteria_android/actions/runs/40995565147/artifacts/12951430269"
+    "bytes": 143760843,
+    "id": 12985639875,
+    "runId": 41073499555,
+    "sha256": "2b326ecee4a3d90996818857f2847b21477f11492f53f5b372de5260588e5590",
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/41073499555/artifacts/12985639875",
+    "workflowPath": ".github/workflows/wine-arm64-provider-candidate.yml"
   },
   "files": {
     "bin/esteria-x11-frame": {
       "bytes": 72128,
       "payloadPath": "bin/esteria-x11-frame",
       "sha256": "4dfbc76dd7ada3d942cef56a56c9781b7828fae4dde166d1cae4e33d1bce25d2",
-      "zipEntry": "out/guest-bridges/payload/bin/esteria-x11-frame"
+      "zipEntry": "bridge/bin/esteria-x11-frame"
     },
     "bin/esteria-x11-input": {
       "bytes": 73392,
       "payloadPath": "bin/esteria-x11-input",
       "sha256": "1402acc34f52e33177d9bef1b57b46532d192a5ac3b2eb0675973c80e6b0a014",
-      "zipEntry": "out/guest-bridges/payload/bin/esteria-x11-input"
+      "zipEntry": "bridge/bin/esteria-x11-input"
     },
     "lib/alsa-lib/libasound_module_pcm_esteria.so": {
       "bytes": 71088,
       "payloadPath": "bin/libasound_module_pcm_esteria.so",
       "sha256": "bb2f32c2def9e712630ea282aca06fe38bf563b03b07d0672ddf273a18ebb16c",
-      "zipEntry": "out/guest-bridges/payload/bin/libasound_module_pcm_esteria.so"
+      "zipEntry": "bridge/bin/libasound_module_pcm_esteria.so"
     },
     "share/esteria-bridges/bridge-build.json": {
       "bytes": 3231,
       "payloadPath": "bridge-build.json",
-      "sha256": "78fb89e32f875aecbb49d56582e7085599d34293fd0d9328a75bd1b9202ca204",
-      "zipEntry": "out/guest-bridges/payload/bridge-build.json"
+      "sha256": "9a44c3edfd19ca5aa2e320bfd9841f2b92fef3dab83b046a75477c2a310a405e",
+      "zipEntry": "bridge/bridge-build.json"
     },
     "share/esteria-bridges/build-packages.txt": {
       "bytes": 5576,
       "payloadPath": "build-packages.txt",
       "sha256": "b535cea160ec6e01b329d37fbcf050c38774116f656158ddce2cb7705171c70b",
-      "zipEntry": "out/guest-bridges/payload/build-packages.txt"
+      "zipEntry": "bridge/build-packages.txt"
     },
     "share/esteria-bridges/corresponding-source/bridge-reference.json": {
       "bytes": 664,
       "payloadPath": "corresponding-source/bridge-reference.json",
       "sha256": "6762304137005c31d1b7eeb847de6ffad0eaed4ba96d1771f48399babce3490f",
-      "zipEntry": "out/guest-bridges/payload/corresponding-source/bridge-reference.json"
+      "zipEntry": "bridge/corresponding-source/bridge-reference.json"
     },
     "share/esteria-bridges/corresponding-source/build-recipe/Dockerfile": {
-      "bytes": 1889,
+      "bytes": 2716,
       "payloadPath": "corresponding-source/build-recipe/Dockerfile",
-      "sha256": "f37a46b9d9bd95a58f5ecbd4782536d62b1d5bb082eb0dea949666100f3f864a",
-      "zipEntry": "out/guest-bridges/payload/corresponding-source/build-recipe/Dockerfile"
+      "sha256": "79f87a6485e6fac56a2b6810c822467d2c3a5ae06c62f7472b4b0814706a700f",
+      "zipEntry": "bridge/corresponding-source/build-recipe/Dockerfile"
     },
     "share/esteria-bridges/corresponding-source/build-recipe/capture_sources.py": {
       "bytes": 2158,
       "payloadPath": "corresponding-source/build-recipe/capture_sources.py",
       "sha256": "96e24b2480b97897d919794e5088de12921fbbc605cfc6ce4725df1a6b0cf498",
-      "zipEntry": "out/guest-bridges/payload/corresponding-source/build-recipe/capture_sources.py"
+      "zipEntry": "bridge/corresponding-source/build-recipe/capture_sources.py"
     },
     "share/esteria-bridges/corresponding-source/build-recipe/debian.sources": {
       "bytes": 434,
       "payloadPath": "corresponding-source/build-recipe/debian.sources",
       "sha256": "8e8f7c4f33e39696a188e01bb6e385daf17a006eb573bc84af073ebcc4fc9f65",
-      "zipEntry": "out/guest-bridges/payload/corresponding-source/build-recipe/debian.sources"
+      "zipEntry": "bridge/corresponding-source/build-recipe/debian.sources"
     },
     "share/esteria-bridges/corresponding-source/build-recipe/inrelease.SHA256SUMS": {
       "bytes": 455,
       "payloadPath": "corresponding-source/build-recipe/inrelease.SHA256SUMS",
       "sha256": "2acec858821beef422f424794c5577adf01ef084787ca42616c5cb78a72b1413",
-      "zipEntry": "out/guest-bridges/payload/corresponding-source/build-recipe/inrelease.SHA256SUMS"
+      "zipEntry": "bridge/corresponding-source/build-recipe/inrelease.SHA256SUMS"
     },
     "share/esteria-bridges/corresponding-source/build-recipe/packages.txt": {
       "bytes": 266,
       "payloadPath": "corresponding-source/build-recipe/packages.txt",
       "sha256": "0668e11127bc1c74f139b96e9d57953ff4cb02fa77e88e7a7bda97af23069959",
-      "zipEntry": "out/guest-bridges/payload/corresponding-source/build-recipe/packages.txt"
+      "zipEntry": "bridge/corresponding-source/build-recipe/packages.txt"
     },
     "share/esteria-bridges/corresponding-source/build-recipe/record_build.py": {
       "bytes": 4522,
       "payloadPath": "corresponding-source/build-recipe/record_build.py",
       "sha256": "c2efaafe2235480de55fe08b641c56afa1b74a6c40c07d9e34c50ab375cf9842",
-      "zipEntry": "out/guest-bridges/payload/corresponding-source/build-recipe/record_build.py"
+      "zipEntry": "bridge/corresponding-source/build-recipe/record_build.py"
     },
     "share/esteria-bridges/corresponding-source/build-recipe/sources.lock.json": {
       "bytes": 23129,
       "payloadPath": "corresponding-source/build-recipe/sources.lock.json",
-      "sha256": "be07f59cff79a6c0e746d4d9c2adbd816568903e312317ff58091f9747779af0",
-      "zipEntry": "out/guest-bridges/payload/corresponding-source/build-recipe/sources.lock.json"
+      "sha256": "241729a2da2c6e88df431c9d68f00e37873c0616d81981a354e12b58046384e9",
+      "zipEntry": "bridge/corresponding-source/build-recipe/sources.lock.json"
     },
     "share/esteria-bridges/corresponding-source/guest-bridges/AUDIO-LICENSE": {
       "bytes": 1075,
       "payloadPath": "corresponding-source/guest-bridges/AUDIO-LICENSE",
       "sha256": "dc18de7cb5064083e6cbe8fc6891de96b3700ed17891d03d1baa5e0097bd479e",
-      "zipEntry": "out/guest-bridges/payload/corresponding-source/guest-bridges/AUDIO-LICENSE"
+      "zipEntry": "bridge/corresponding-source/guest-bridges/AUDIO-LICENSE"
     },
     "share/esteria-bridges/corresponding-source/guest-bridges/Makefile": {
       "bytes": 926,
       "payloadPath": "corresponding-source/guest-bridges/Makefile",
       "sha256": "cb83e03fbf1b29192039580cc8f60ac68a7f6571c6d73b2c34b9a97fd5a6f95a",
-      "zipEntry": "out/guest-bridges/payload/corresponding-source/guest-bridges/Makefile"
+      "zipEntry": "bridge/corresponding-source/guest-bridges/Makefile"
     },
     "share/esteria-bridges/corresponding-source/guest-bridges/pcm_esteria.c": {
       "bytes": 7449,
       "payloadPath": "corresponding-source/guest-bridges/pcm_esteria.c",
       "sha256": "b520bd47cd2dd7e542ee88c6c518532ec9cd84b006bf7b8f912438a479897dc8",
-      "zipEntry": "out/guest-bridges/payload/corresponding-source/guest-bridges/pcm_esteria.c"
+      "zipEntry": "bridge/corresponding-source/guest-bridges/pcm_esteria.c"
     },
     "share/esteria-bridges/corresponding-source/guest-bridges/private_socket.h": {
       "bytes": 1888,
       "payloadPath": "corresponding-source/guest-bridges/private_socket.h",
       "sha256": "06d4335d1bc348e8630969b5940d9c7a0cf8658552ffdf005d581426f0af84a6",
-      "zipEntry": "out/guest-bridges/payload/corresponding-source/guest-bridges/private_socket.h"
+      "zipEntry": "bridge/corresponding-source/guest-bridges/private_socket.h"
     },
     "share/esteria-bridges/corresponding-source/guest-bridges/x11_frame.c": {
       "bytes": 6355,
       "payloadPath": "corresponding-source/guest-bridges/x11_frame.c",
       "sha256": "58ac751cba2add9f48911bb78eaab1432b269adba7abc44f20635836ef1684cb",
-      "zipEntry": "out/guest-bridges/payload/corresponding-source/guest-bridges/x11_frame.c"
+      "zipEntry": "bridge/corresponding-source/guest-bridges/x11_frame.c"
     },
     "share/esteria-bridges/corresponding-source/guest-bridges/x11_input.c": {
       "bytes": 4627,
       "payloadPath": "corresponding-source/guest-bridges/x11_input.c",
       "sha256": "ea42849c6cf80132da04b43d9fd771ed1f71dba5081607c586069ac257f59e52",
-      "zipEntry": "out/guest-bridges/payload/corresponding-source/guest-bridges/x11_input.c"
+      "zipEntry": "bridge/corresponding-source/guest-bridges/x11_input.c"
     },
     "share/esteria-bridges/corresponding-source/original-archives/SOURCE-MANIFEST.json": {
       "bytes": 7272,
       "payloadPath": "corresponding-source/original-archives/SOURCE-MANIFEST.json",
       "sha256": "3f6502c5e59ecbbdb987b7ed8ea761f0445c076463ddee0e16661ce0fc9b0b2b",
-      "zipEntry": "out/guest-bridges/payload/corresponding-source/original-archives/SOURCE-MANIFEST.json"
+      "zipEntry": "bridge/corresponding-source/original-archives/SOURCE-MANIFEST.json"
     },
     "share/esteria-bridges/corresponding-source/original-archives/libxtst_1.2.3-1.1.diff.gz": {
       "bytes": 9598,
       "payloadPath": "corresponding-source/original-archives/libxtst_1.2.3-1.1.diff.gz",
       "sha256": "4f7eef30f2a860bc649e470d844d0b90bcc7cf7c5bf98fb02f29163b692a5948",
-      "zipEntry": "out/guest-bridges/payload/corresponding-source/original-archives/libxtst_1.2.3-1.1.diff.gz"
+      "zipEntry": "bridge/corresponding-source/original-archives/libxtst_1.2.3-1.1.diff.gz"
     },
     "share/esteria-bridges/corresponding-source/original-archives/libxtst_1.2.3-1.1.dsc": {
       "bytes": 2248,
       "payloadPath": "corresponding-source/original-archives/libxtst_1.2.3-1.1.dsc",
       "sha256": "ca51260a4a4fc34b244819065ab03d7a722678e9dd9dbd1ea8d86f74aaacc00c",
-      "zipEntry": "out/guest-bridges/payload/corresponding-source/original-archives/libxtst_1.2.3-1.1.dsc"
+      "zipEntry": "bridge/corresponding-source/original-archives/libxtst_1.2.3-1.1.dsc"
     },
     "share/esteria-bridges/corresponding-source/original-archives/libxtst_1.2.3.orig.tar.gz": {
       "bytes": 400197,
       "payloadPath": "corresponding-source/original-archives/libxtst_1.2.3.orig.tar.gz",
       "sha256": "a0c83acce02d4923018c744662cb28eb0dbbc33b4adc027726879ccf68fbc2c2",
-      "zipEntry": "out/guest-bridges/payload/corresponding-source/original-archives/libxtst_1.2.3.orig.tar.gz"
+      "zipEntry": "bridge/corresponding-source/original-archives/libxtst_1.2.3.orig.tar.gz"
     },
     "share/esteria-bridges/corresponding-source/presentation/frame_protocol.h": {
       "bytes": 1388,
       "payloadPath": "corresponding-source/presentation/frame_protocol.h",
       "sha256": "e8a2a9dec44254049520ae5f21141d355a054e1afc9b4b83d87ce25c815881df",
-      "zipEntry": "out/guest-bridges/payload/corresponding-source/presentation/frame_protocol.h"
+      "zipEntry": "bridge/corresponding-source/presentation/frame_protocol.h"
     },
     "share/esteria-bridges/corresponding-source/presentation/frame_transport.h": {
       "bytes": 869,
       "payloadPath": "corresponding-source/presentation/frame_transport.h",
       "sha256": "53979f5450ca55c33899cc844403650296aacba8449bf2a313fefd87ff1325fd",
-      "zipEntry": "out/guest-bridges/payload/corresponding-source/presentation/frame_transport.h"
+      "zipEntry": "bridge/corresponding-source/presentation/frame_transport.h"
     },
     "share/esteria-bridges/notices/AUDIO-LICENSE": {
       "bytes": 1075,
       "payloadPath": "notices/AUDIO-LICENSE",
       "sha256": "dc18de7cb5064083e6cbe8fc6891de96b3700ed17891d03d1baa5e0097bd479e",
-      "zipEntry": "out/guest-bridges/payload/notices/AUDIO-LICENSE"
+      "zipEntry": "bridge/notices/AUDIO-LICENSE"
     },
     "share/esteria-bridges/notices/ESTERIA-GPL-3.0": {
       "bytes": 35149,
       "payloadPath": "notices/ESTERIA-GPL-3.0",
       "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
-      "zipEntry": "out/guest-bridges/payload/notices/ESTERIA-GPL-3.0"
+      "zipEntry": "bridge/notices/ESTERIA-GPL-3.0"
     },
     "share/esteria-bridges/notices/libxtst-copyright": {
       "bytes": 5914,
       "payloadPath": "notices/libxtst-copyright",
       "sha256": "304f78731e1e0e78132fbba4e1909c8642878a3b8c4837b36cb2d38891bf2204",
-      "zipEntry": "out/guest-bridges/payload/notices/libxtst-copyright"
+      "zipEntry": "bridge/notices/libxtst-copyright"
     }
   },
   "formatVersion": 1,
-  "integrationRevision": "61bf8a134845276cb78430884d557e477ff286aa",
+  "integrationRevision": "75f50445112818c97f8d8e575d2b1c21e59af6e5",
   "repositoryInputs": {
     "LICENSE": {
       "bytes": 35149,
@@ -232,9 +234,9 @@
     "runtime/bridges/sources.lock.json": {
       "bytes": 23129,
       "installedPath": "share/esteria-bridges/corresponding-source/build-recipe/sources.lock.json",
-      "sha256": "be07f59cff79a6c0e746d4d9c2adbd816568903e312317ff58091f9747779af0"
+      "sha256": "241729a2da2c6e88df431c9d68f00e37873c0616d81981a354e12b58046384e9"
     }
   },
   "scope": "measured-guest-bridge-provider-inputs",
-  "workflowRun": 40995565147
+  "workflowRun": 41073499555
 }

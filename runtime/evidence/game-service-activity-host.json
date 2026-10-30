@@ -1,0 +1,41 @@
+{
+  "applicationApk": {
+    "bytes": 704363,
+    "sha256": "bbb5667568815e801b8a28351e13daf1a8fc45f8ac7527d736b700b737098188"
+  },
+  "buildScope": "Default internal debug APK from parallel working tree after actual seven-pin adoption; all optional payload flags false, not a user-test candidate",
+  "dateUtc": "2026-10-30",
+  "execution": {
+    "androidActivity": false,
+    "androidService": false,
+    "audio": false,
+    "authWorld": false,
+    "botAi": false,
+    "characterSaving": false,
+    "controllerInGame": false,
+    "gpu": false,
+    "mysql": false,
+    "nativeClient": false,
+    "offlineGameplay": false
+  },
+  "formatVersion": 1,
+  "implementation": {
+    "childPssIncludedInPerformanceSnapshot": false,
+    "explicitForceAfterGracefulFailureOnly": true,
+    "foregroundCompletionWaitsForSupportExport": true,
+    "foregroundUntilKnownReap": true,
+    "gameplayQualificationInferred": false,
+    "lowerServerStopAfterClientReap": true,
+    "supportExportSeparateSingleFlightWorker": true,
+    "viewsDetachedOnActivityStopOnly": true
+  },
+  "independentReview": {
+    "finalServiceActivityReview": "clear; no repeated builds by reviewer",
+    "gameStartupCancellation": "clear after startup-only lifetime detachment fix",
+    "launcherForceStop": "independent of presentation/recreation state",
+    "quietSetupWakeRenewal": "service-owned60second heartbeat and bounded10minute lease"
+  },
+  "latestBuild": "BUILD SUCCESSFUL in25s;54tasks;28executed/26up-to-date; assembleDebug/lintDebug",
+  "previousFullBuild": "Game owner evidence records56s85tasks Game8+World2+Presentation3+APK/AndroidTest/lint before final launcher force/wake heartbeat delta",
+  "scope": "retained-game-service-and-replaceable-activity-build-review-only"
+}

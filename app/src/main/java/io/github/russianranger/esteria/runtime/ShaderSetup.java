@@ -181,6 +181,23 @@ public final class ShaderSetup {
             }
         }
     }
+    /** Recheck current provider/import/output metadata while the caller owns
+     * import and client-view leases. This remains format-only shader evidence. */
+    static Result requireCurrent(Context context,Path root,RuntimeSetup wine,ShaderToolsSetup tools,Result expected)throws IOException {
+        background();
+        if(expected==null||!root.equals(context.getFilesDir().getCanonicalFile().toPath()))throw new IOException("Private prepared shaders required");
+        tools.requireWineArchive(wine.archiveSha256());
+        if(wine.current()==null||tools.current()==null)throw new IOException("Prepared shader providers required");
+        ShaderRunPlan plan=new ShaderRunPlan(root.resolve("game"),tools.current(),root.resolve("state/shader-work"),tools.revision(),expected.locale);
+        Result current=validatePrepared(plan,tools.toolManifestSha256(),expected.processLogs,false);
+        requireSameSelection(current,expected);return current;
+    }
+    static void requireSameSelection(Result current,Result expected)throws IOException {
+        if(!current.generation.equals(expected.generation)||!current.shaders.equals(expected.shaders)||
+                !current.importGeneration.equals(expected.importGeneration)||!current.clientRevision.equals(expected.clientRevision)||
+                !current.locale.equals(expected.locale)||current.outputFiles!=expected.outputFiles||current.outputBytes!=expected.outputBytes)
+            throw new IOException("Prepared shader selection changed; run local setup again");
+    }
     /** Validate the owned helper's completed receipt and metadata, without a full
      * rescan of imported MPQs. The helper itself hashes every generated output.
      * This host readback checks those output paths/sizes, not GPU correctness.

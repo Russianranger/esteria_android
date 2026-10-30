@@ -1,16 +1,18 @@
 {
   "androidQualified": false,
   "artifact": {
-    "bytes": 267867656,
-    "id": 12956644900,
-    "repository": "Russianranger/esteria_android",
-    "runId": 41008439895,
-    "sha256": "43867f8121d34a8140e9b30757d667bf58ef58e8b8e2b613092786c28f637271"
+    "bytes": 269250352,
+    "id": 12989171109,
+    "originalBuildRunId": 41073499555,
+    "runId": 41079114080,
+    "sha256": "02d8f9384d3d884e25184137e4c6b97ee482b61a3f3f9719f925e084bae69182",
+    "sourceRecoveryRevision": "bed4c62e52655519a402712b34fb5340db92bb99",
+    "sourceRecoveryRunId": 41079114080
   },
-  "bundleReceiptSha256": "6106d53fd5a63438606743f1b9dff142e9dbb19131b10b65b75adf79c5bab48e",
-  "clientRevision": "926a6f73253720283ead9d7621ffd6d7d9c040cd",
-  "compilerBuildSha256": "52f4214ce6af27985fe80a9e0aec55e6bd2c5f0c867b6ded0987bf9aa4ea9ef0",
-  "compilerIntegrationRevision": "8a42261db0413ce10ce9a01cd669264a5d5b90fc",
+  "bundleReceiptSha256": "99dca7fe4217264272e4630dd9499a3dc0a722d01f62f33a553dee768a32cf6d",
+  "clientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "compilerBuildSha256": "bf283d2674459fb0dbd2d5feb8452c86a3f2284f7234a78fd2b864818a788220",
+  "compilerIntegrationRevision": "75f50445112818c97f8d8e575d2b1c21e59af6e5",
   "files": {
     "NOTICE.txt": {
       "bytes": 392,
@@ -176,17 +178,29 @@
       "bytes": 2927,
       "sha256": "9e5b96d63773a5d177ba264254390f792be07e41748ebd94730981c6cac31cc6"
     },
+    "provenance/build-recipe-reference/sources.lock.json": {
+      "bytes": 43088,
+      "sha256": "9bc783e6240d3314a8245f88a3ce8eb5a8d583e360f330f780cd71080bf2d8d1"
+    },
     "provenance/build-recipe/.dockerignore": {
       "bytes": 18,
       "sha256": "05cc6ae53cfd6129f1d7010aa874c6cf0a6019b1adfeff3f4fab27f2d04f43ca"
+    },
+    "provenance/build-recipe/ANDROID-PACKAGING.md": {
+      "bytes": 5162,
+      "sha256": "82b9a64f548bfcc52c8c9f6d10b2b90a79f3734eee3fc003f4e1044791fcc248"
     },
     "provenance/build-recipe/Dockerfile": {
       "bytes": 1086,
       "sha256": "a89cfdfd358fc718218b6b12a7feb64fdd7f45c58593ea01585425b7ef928f09"
     },
     "provenance/build-recipe/README.md": {
-      "bytes": 5834,
-      "sha256": "346bd76585ce9d66b599277447d571ad2504c122e592ddf6380f99b97d37ceeb"
+      "bytes": 7288,
+      "sha256": "47f0e2b9dddd692e39c3f99d5ed114b1dcf016b8f2ad8f751da0749931274b36"
+    },
+    "provenance/build-recipe/android-provider.lock.json": {
+      "bytes": 16051,
+      "sha256": "a2999f5172d139ea37cec712662ffc17303cb2d78d8356095c11c8f671f887d4"
     },
     "provenance/build-recipe/build.sh": {
       "bytes": 2320,
@@ -209,8 +223,8 @@
       "sha256": "89d0bec77bab06399ee57be1603d082521eebb903ad40fcf7b95e7c76e1a1f03"
     },
     "provenance/build-recipe/probe.c": {
-      "bytes": 16132,
-      "sha256": "b23e379e041a48d32833aca30dba277d088ce873e06eac27a6adaeca9b974a2d"
+      "bytes": 17766,
+      "sha256": "2f071971b16f6eaacba9a9d95358ea28c782536a584f83147a8cff923fba9cbf"
     },
     "provenance/build-recipe/probe.frag": {
       "bytes": 102,
@@ -225,20 +239,20 @@
       "sha256": "fd39918a5223dd81519041323c0f06382947f39722d5a3db3917baeb6e16e41e"
     },
     "provenance/build-recipe/record_build.py": {
-      "bytes": 8779,
-      "sha256": "0e78bfd9df5e3847a0c85abb461f97d6dada90f4ef2289bf25a5f9925c0f07d7"
+      "bytes": 8959,
+      "sha256": "82b94f7ab1344e6026ee1524668b4abe1b8ea3e4212189952783bf13bc052e6d"
     },
     "provenance/build-recipe/run_probe.py": {
-      "bytes": 6919,
-      "sha256": "9f709ec2b94cfa0502a059b8f0414efe4c9b0908495673d596a0d168f31195bc"
+      "bytes": 7186,
+      "sha256": "671d44f9aec71f13f303d745cf145fa8ac4deaccbefe8911ad2b610be90f35c6"
     },
     "provenance/build-recipe/sources.lock.json": {
       "bytes": 43088,
-      "sha256": "9bc783e6240d3314a8245f88a3ce8eb5a8d583e360f330f780cd71080bf2d8d1"
+      "sha256": "f92f119d657feaa7548e84196d20c59a9050b91a62f171de8249b75e23a8645f"
     },
     "provenance/bundle.json": {
-      "bytes": 4011,
-      "sha256": "6106d53fd5a63438606743f1b9dff142e9dbb19131b10b65b75adf79c5bab48e"
+      "bytes": 4498,
+      "sha256": "99dca7fe4217264272e4630dd9499a3dc0a722d01f62f33a553dee768a32cf6d"
     },
     "provenance/client-shader-README.md": {
       "bytes": 8033,
@@ -249,8 +263,8 @@
       "sha256": "95a25f419d3f73bb1ba6b6ce31551eaa8524939de25d8d5a69106fe3a463d213"
     },
     "provenance/turnip-build.json": {
-      "bytes": 20615,
-      "sha256": "52f4214ce6af27985fe80a9e0aec55e6bd2c5f0c867b6ded0987bf9aa4ea9ef0"
+      "bytes": 20904,
+      "sha256": "bf283d2674459fb0dbd2d5feb8452c86a3f2284f7234a78fd2b864818a788220"
     },
     "tools/bin/glslangValidator": {
       "bytes": 8234112,
@@ -282,7 +296,7 @@
     },
     "tools/shader-tools.json": {
       "bytes": 1210,
-      "sha256": "45ca24037e24fcd7eddf2cc70c5dffaa57de7386ef96f24801d6eb91e7086767"
+      "sha256": "36e3032524c2136c4273908f887a1ca59ebb414e806f52d47e778332ed4acda6"
     },
     "tools/translate_shaders.py": {
       "bytes": 5871,
@@ -297,12 +311,12 @@
     "gitBlob": "9f2eab5b4126c51239896da184e4aadd4803ba7f",
     "gitMode": "100644",
     "installedPath": "helpers/shader_generation.py",
-    "revision": "8a42261db0413ce10ce9a01cd669264a5d5b90fc",
+    "revision": "bed4c62e52655519a402712b34fb5340db92bb99",
     "sha256": "8bb48952c36bdc4c69516c2ffa6f5c2d2eb59e84019e6420948d94bc81683ac5",
     "source": "runtime/shader_generation.py"
   },
   "nativeCompilerFixtureQualified": true,
-  "requiredWineArchiveSha256": "f036c00a290abb953bec26be80c4d8fe492fd986e7a589c51008124432c8641e",
+  "requiredWineArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
   "scope": "measured-offline-shader-provider-inputs",
-  "toolManifestSha256": "45ca24037e24fcd7eddf2cc70c5dffaa57de7386ef96f24801d6eb91e7086767"
+  "toolManifestSha256": "36e3032524c2136c4273908f887a1ca59ebb414e806f52d47e778332ed4acda6"
 }

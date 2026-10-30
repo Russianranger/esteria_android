@@ -276,3 +276,10 @@ profile fails before SQL allocation. Prepare client/server runtimes first, then
 select the imported client language for Prepare local world. Data/setup children
 remain owned through cancellation and cleanup; the4GiB fresh SQL reserve is a
 conservative policy separate from imported/extracted assets.
+
+The actual public Wine cohort passes anonymous/full-source consumption and all
+seven consumer pins are adopted together. The standalone android-wine-cohort
+workflow builds/checks that selected profile, separate from the old combined
+release schema. `app/game-session.gradle` supplies gameSessionOwnerTest; regular
+Android CI runs it with data/world/presentation owners. Complete gameplay still
+requires the composed data tools and helper-augmented programs profiles.

@@ -152,3 +152,10 @@ graph/importer/prelaunch fixtures at32MiB. The delayed shader owner keeps the
 data/import and outer locks until known reap; a forced-cleanup diagnostic remains
 a failure even after leases release. Regular Android CI also runs the four
 serverDataSetupOwnerTest groups. No Android/SQL/gameplay execution is implied.
+
+GameSession passes eight actual Java owner/lease/close/cancellation fixtures at
+32MiB; world2 and presentation3 also pass. Full APK/AndroidTest/lint passes56s;
+final launcher force/recreation control and quiet-phase wake heartbeat changes
+pass APK/lint25s. Independent review found/fixed lifetime cancellation of lower
+servers before client reap. No native client, Android service/activity, world,
+character save, real audio/controller or bot AI is inferred.

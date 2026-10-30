@@ -21,6 +21,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.FrameLayout;
+import io.github.russianranger.esteria.runtime.GameSession;
+import io.github.russianranger.esteria.presentation.GamePresentationPanel;
 import io.github.russianranger.esteria.runtime.ClientLaunchSetup;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,12 +39,24 @@ public final class MainActivity extends Activity {
     private String displayedUiDigest;
     private boolean bound;
     private Spinner clientLanguage;
+    private FrameLayout rootView;
+    private ScrollView launcher;
+    private LinearLayout gameRoot;
+    private GamePresentationPanel gamePanel;
+    private GameSession.Handle boundGame;
+    private TextView gameStatus;
+    private Button startGame,exportSupport,forceStop,launcherForceStop;
+    private boolean resumed;
     private static final String[] CLIENT_LOCALES={"enUS","enGB","ruRU","deDE","esES","esMX","frFR","koKR","zhCN","zhTW","enCN","enTW"};
     private final Runnable refresh = new Runnable() {
         public void run() {
             if (service != null) {
                 status.setText(service.status());
                 for (Button action : actions) action.setEnabled(!service.busy());
+                startGame.setEnabled(!service.busy()&&completeProfile());
+                exportSupport.setEnabled(!service.busy()||service.game()!=null);
+                launcherForceStop.setVisibility(service.forceStopAvailable()?View.VISIBLE:View.GONE);
+                launcherForceStop.setEnabled(service.forceStopAvailable());
                 if(clientLanguage!=null)clientLanguage.setEnabled(!service.busy());
                 cancel.setEnabled(service.busy());
                 ClientLaunchSetup.UiReview review=service.uiReview();
@@ -54,6 +69,7 @@ public final class MainActivity extends Activity {
                     displayedUiDigest=review.digest; uiReview.setVisibility(View.VISIBLE);
                     useImportedUi.setVisibility(View.VISIBLE); keepCurrentUi.setVisibility(View.VISIBLE);
                 }
+                syncGameView();
             }
             ui.postDelayed(this, 250);
         }
@@ -62,16 +78,16 @@ public final class MainActivity extends Activity {
         @Override public void onServiceConnected(ComponentName name, IBinder binder) {
             service = ((SessionService.LocalBinder) binder).service();
         }
-        @Override public void onServiceDisconnected(ComponentName name) { service = null; }
+        @Override public void onServiceDisconnected(ComponentName name) { detachGameView();service = null; }
     };
     @Override public void onCreate(Bundle savedState) {
         super.onCreate(savedState);
-        ScrollView scroll = new ScrollView(this); scroll.setFillViewport(true);
+        ScrollView scroll = new ScrollView(this); scroll.setFillViewport(true);launcher=scroll;
         LinearLayout layout = new LinearLayout(this); layout.setOrientation(LinearLayout.VERTICAL);
         int padding = dp(24); layout.setPadding(padding, padding, padding, padding); scroll.addView(layout);
         TextView title = text("ESTERIA", 34, Color.rgb(220, 186, 113)); layout.addView(title);
         TextView subtitle = text("Your local world", 18, Color.rgb(184, 199, 211)); layout.addView(subtitle);
-        TextView explanation = text("Import your World of Warcraft 3.3.5a build 12340 client folder directly, or choose a ZIP. Custom content can be added later. Imported data stays in the app between updates.\n\nFolder imports avoid an extra archive copy. Keep the source folder unchanged until import finishes. ZIP imports need space for an archive copy and expanded files. Updates retain previous data versions; automatic cleanup is not available yet.\n\nGameplay is unavailable in this development build.", 15, Color.rgb(184, 199, 211));
+        TextView explanation = text("Import your World of Warcraft 3.3.5a build 12340 client folder directly, or choose a ZIP. Custom content can be added later. Imported data stays in the app between updates.\n\nFolder imports avoid an extra archive copy. Keep the source folder unchanged until import finishes. ZIP imports need space for an archive copy and expanded files. Updates retain previous data versions; automatic cleanup is not available yet.\n\n"+(completeProfile()?"This build includes the local client/server session. Hardware rendering, world entry and gameplay validation are pending.":"This build has an incomplete runtime profile; gameplay is unavailable."), 15, Color.rgb(184, 199, 211));
         explanation.setPadding(0, dp(20), 0, dp(12)); layout.addView(explanation);
         button(layout, "Import client folder", () -> chooseFolder(BASE_FOLDER));
         button(layout, "Import client ZIP", () -> chooseArchive(BASE));
@@ -104,14 +120,21 @@ public final class MainActivity extends Activity {
         useImportedUi=button(layout,"Use imported UI version",()->reviewDecision(SessionService.ACCEPT_UI));
         keepCurrentUi=button(layout,"Keep current UI",()->reviewDecision(SessionService.KEEP_UI));
         useImportedUi.setVisibility(View.GONE); keepCurrentUi.setVisibility(View.GONE);
-        button(layout, "Start local game", () -> operation(new Intent(this, SessionService.class).setAction(SessionService.START)));
-        button(layout, "Export support bundle", this::chooseExport);
+        startGame=button(layout, "Start local game", () -> {
+            Intent intent=new Intent(this,SessionService.class).setAction(SessionService.START);
+            if(clientLanguage!=null)intent.putExtra(SessionService.WORLD_LOCALE,(String)clientLanguage.getSelectedItem());
+            operation(intent);
+        });startGame.setEnabled(completeProfile());
+        exportSupport=button(layout, "Export support bundle", this::chooseExport);
         cancel = new Button(this); cancel.setText(R.string.stop_session); cancel.setEnabled(false);
         cancel.setOnClickListener(v -> startService(new Intent(this, SessionService.class).setAction(SessionService.CANCEL))); layout.addView(cancel);
+        launcherForceStop=button(layout,"Force stop client · unsaved state may be lost",()->
+            startService(new Intent(this,SessionService.class).setAction(SessionService.FORCE_STOP)));
+        launcherForceStop.setVisibility(View.GONE);
         status = text("Connecting to local storage…", 16, Color.WHITE); status.setTextIsSelectable(true);
         status.setPadding(0, dp(20), 0, dp(12)); layout.addView(status);
         TextView controls = text("D-pad: navigate · A: choose · B: minimize\nLB / RB: previous / next control", 13, Color.rgb(145, 163, 177)); layout.addView(controls);
-        setContentView(scroll);
+        rootView=new FrameLayout(this);rootView.addView(scroll,new FrameLayout.LayoutParams(-1,-1));setContentView(rootView);
         if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
             requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 20);
     }
@@ -123,6 +146,41 @@ public final class MainActivity extends Activity {
         TextView view = new TextView(this); view.setText(text); view.setTextSize(size); view.setTextColor(color); return view;
     }
     private int dp(int value) { return Math.round(value * getResources().getDisplayMetrics().density); }
+    private static boolean completeProfile(){return BuildConfig.PROOT_PACKAGED&&BuildConfig.CLIENT_RUNTIME_PACKAGED&&BuildConfig.GUEST_BRIDGES_PACKAGED&&
+        BuildConfig.TURNIP_PACKAGED&&BuildConfig.SERVER_RUNTIME_PACKAGED&&BuildConfig.SERVER_PROGRAMS_PACKAGED&&BuildConfig.SERVER_CONTENT_PACKAGED&&
+        BuildConfig.SERVER_DATA_TOOLS_PACKAGED&&BuildConfig.SHADER_TOOLS_PACKAGED;}
+    /** Activities own views only. Rebinding never starts/stops a native process. */
+    private void syncGameView() {
+        GameSession.Handle owner=service==null?null:service.game();
+        if(owner==null){detachGameView();return;}
+        if(boundGame!=owner) {
+            if(owner.state()!=GameSession.State.CLIENT_STARTED||owner.presentation()==null||!owner.presentation().isReady()||service.presentationEvents()==null)return;
+            detachGameView();
+            gameRoot=new LinearLayout(this);gameRoot.setOrientation(LinearLayout.VERTICAL);gameRoot.setBackgroundColor(Color.BLACK);
+            gamePanel=new GamePresentationPanel(this,service.presentationEvents(),()->startService(new Intent(this,SessionService.class).setAction(SessionService.CANCEL)));
+            try{gamePanel.bind(owner.presentation());}catch(java.io.IOException error){gamePanel=null;gameRoot=null;return;}
+            gameRoot.addView(gamePanel,new LinearLayout.LayoutParams(-1,0,1));
+            gameStatus=text("",13,Color.WHITE);gameStatus.setPadding(dp(12),dp(4),dp(12),dp(4));gameRoot.addView(gameStatus);
+            LinearLayout tools=new LinearLayout(this);
+            Button support=new Button(this);support.setText("Support bundle");support.setOnClickListener(v->chooseExport());tools.addView(support,new LinearLayout.LayoutParams(0,-2,1));
+            forceStop=new Button(this);forceStop.setText("Force stop");forceStop.setVisibility(View.GONE);
+            forceStop.setOnClickListener(v->startService(new Intent(this,SessionService.class).setAction(SessionService.FORCE_STOP)));
+            tools.addView(forceStop,new LinearLayout.LayoutParams(0,-2,1));gameRoot.addView(tools);
+            rootView.addView(gameRoot,new FrameLayout.LayoutParams(-1,-1));launcher.setVisibility(View.GONE);boundGame=owner;
+            getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            if(resumed)gamePanel.resume();
+        }
+        if(gameStatus!=null)gameStatus.setText(service.status());
+        if(forceStop!=null){forceStop.setVisibility(owner.needsForceStop()?View.VISIBLE:View.GONE);forceStop.setEnabled(owner.needsForceStop());}
+        if(owner.state()!=GameSession.State.CLIENT_STARTED&&gamePanel!=null)gamePanel.pause();
+    }
+    private void detachGameView() {
+        if(gamePanel!=null){gamePanel.pause();gamePanel.unbind();}
+        if(gameRoot!=null)rootView.removeView(gameRoot);
+        gamePanel=null;gameRoot=null;gameStatus=null;forceStop=null;boundGame=null;
+        if(launcher!=null)launcher.setVisibility(View.VISIBLE);
+        getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
     private void chooseArchive(int request) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT).setType("*/*").addCategory(Intent.CATEGORY_OPENABLE);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
@@ -162,9 +220,12 @@ public final class MainActivity extends Activity {
         super.onStart(); bound = bindService(new Intent(this, SessionService.class), connection, BIND_AUTO_CREATE); ui.post(refresh);
     }
     @Override protected void onStop() {
-        ui.removeCallbacks(refresh); if (bound) { unbindService(connection); bound = false; } service = null; super.onStop();
+        ui.removeCallbacks(refresh);detachGameView();if (bound) { unbindService(connection); bound = false; } service = null; super.onStop();
     }
+    @Override protected void onResume(){super.onResume();resumed=true;if(gamePanel!=null)gamePanel.resume();}
+    @Override protected void onPause(){resumed=false;if(gamePanel!=null)gamePanel.pause();super.onPause();}
     @Override public boolean onKeyDown(int code, KeyEvent event) {
+        if(gamePanel!=null&&code!=KeyEvent.KEYCODE_BUTTON_B)return super.onKeyDown(code,event);
         if (code == KeyEvent.KEYCODE_BUTTON_B) { if (event.getRepeatCount() == 0) moveTaskToBack(true); return true; }
         if (code == KeyEvent.KEYCODE_BUTTON_A) {
             View focus = getCurrentFocus(); if (event.getRepeatCount() == 0 && focus != null) focus.performClick(); return true;

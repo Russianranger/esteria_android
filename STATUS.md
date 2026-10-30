@@ -26,7 +26,7 @@ Wine/glibc2.36. APK identity remains `io.github.russianranger.esteria`.
 | Reconstructed client471 | All five jobs pass in41061576677, including native Windows handoff-reader tests, full client builds and ARM64 Wine controlled-peer/graphics/audio regressions. | Current471/c0e/seven-patch pairing passes41088546780; normal CommonMain/world remain untested. |
 | Protocol | All215 player descriptors match; containers254/574DWORDs, quests25, player1326DWORDs/42mask words. Client class capacity32, serverMAX_CLASSES12. | Inventory/appearance/custom races need real matched gameplay. |
 | Android Wine | Android13 x64 run41046942035 passes reconstructed entry, offline diagnostics and actual loopback transport with source-owned PE mapping adaptation. | Emulator component evidence; production ARM64, graphics/audio and full game remain open. |
-| Production ARM64 Wine | Actual frozen-source Wine/FEX build, complete source closure and native client0f codec/entry/offline/transport/Grunt/software Vulkan/frame/texture/captured WinMM+DirectSound pass41057900330. Independent runtime readback covers14,180entries/1,325,744,204filebytes. | Selected471 component pairing passes41069065089. Android ARM64/Adreno and complete game remain open. Production still uses oldf036 until matched providers are adopted. |
+| Production ARM64 Wine | Actual frozen-source Wine/FEX build, complete source closure and native client0f codec/entry/offline/transport/Grunt/software Vulkan/frame/texture/captured WinMM+DirectSound pass41057900330. Independent runtime readback covers14,180entries/1,325,744,204filebytes. | Selected471 component pairing passes41069065089. Android ARM64/Adreno and complete game remain open. The exact c0e public cohort is now atomically adopted after complete public source readback. |
 | Server build | Seven-patch server links/installs all programs/tools; actual full50 ConfigMgr parse/reload passes41041859706. | Full isolated compile/verification pass41051669638; exact source recovery/retention passes41078079045, including all266 members. Paired source/debug/provider APK checks pass41081388547; Android/world remain open. |
 | Retained server SQL/auth | Native ARM64 run41050050193 passes compiled first/repeat SQL, exact ledgers/restart, real SRP/M2, persisted40-byte session key, owned loopback realm/listener, credentials/trackers and clean shutdown. | This measured input is six-patch build41005048019.1; no reconstructed client/world/Android execution. |
 | Appearance storage | Exact source-derived49/132-byte binary tables pass NUL/high-byte roundtrip, REPLACE/read/delete and restart with fixture rows removed. | No canonical original creator was found; provenance remains explicit. Actual game saves/transport unqualified. |
@@ -52,8 +52,9 @@ up and recorded in `app/development-signing.lock.json`. No delivered update
 baseline exists. Keep signing keys, credentials, MPQs and databases outside Git.
 Client471 and production Wine's separate durable releases pass actual public
 download/source readback; GitHub reports immutability=false. The new measured
-Wine client/bridge/Turnip/shader cohort still awaits coherent APK verification and
-durable cohort publication; historical global provider pins remain unchanged.
+Wine client/bridge/Turnip/shader cohort is public and passes anonymous19-asset
+and entire Wine-source consumption41098490533. All seven exact consumer pins
+are adopted together; the actual coherent APK is the next packaging gate.
 
 ## Blockers and next implementation
 
@@ -174,3 +175,20 @@ The19-asset source-preserving Wine cohort is now public at exact recipe4d27ba8;
 public anonymous full-source consumption and atomic seven-pin adoption remain
 separate gates. Full source packaging for ordered tools/helper is in progress
 after both actual native dependency observation jobs succeeded.
+
+## Integrated session and matched public cohort
+
+GameSession now composes typed DB/auth/world/presentation/client ownership,
+private one-use login and current import/shader/provider bindings. Running lower
+servers detach from startup cancellation before client launch. Graceful timeout
+keeps dependencies; explicit force records recovery. Activity recreation retains
+the service and exposes force controls independently of presentation. The service
+keeps foreground/wake through cleanup and permits separate bounded support
+export. Game8/World2/Presentation3, APK/AndroidTest/lint and final force/wake
+APK/lint checks pass. Normal client/world, Android ARM64 and gameplay remain open.
+
+The Wine cohort public/full-source gate41098490533 passes and exact seven global
+pins now select c0e with the opt-in private PE mapping profile. Ordered complete
+sources41097592284 pass full5675member readback; its immutable input lock stays
+b82. Derived four-tool native CLI and helper-augmented provider construction
+remain pending; no source/runtime identity was guessed.

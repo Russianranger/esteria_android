@@ -1,0 +1,104 @@
+{
+  "artifacts": {
+    "application.apk": {
+      "bytes": 835714,
+      "sha256": "9b75abebd2b1e86c52cb2bd67d9cb842c146f114b180f2b82c773d7c73747348"
+    },
+    "tests.apk": {
+      "bytes": 1751581,
+      "sha256": "dc3ca40b4d6b770aa3b0dac6391a2cfe4399149fe4f28be3f9061735d6f4b225"
+    }
+  },
+  "buildResult": "BUILD SUCCESSFUL in56s;85tasks;31executed/54up-to-date",
+  "buildScope": "Internal default debug APK from parallel development working tree with root Service/Main integration; all runtime payload flags false; not a user-test candidate",
+  "command": "./gradlew --offline --no-daemon --init-script <temporary isolated-output init> :app:gameSessionOwnerTest :app:localWorldSetupOwnerTest :app:presentationOwnerTest :app:assembleDebug :app:assembleDebugAndroidTest :app:lintDebug",
+  "dateUtc": "2026-10-30",
+  "execution": {
+    "actualNativeProcessBackend": false,
+    "android": false,
+    "audio": false,
+    "authWorld": false,
+    "botAi": false,
+    "characterPersistence": false,
+    "gameInput": false,
+    "gameplay": false,
+    "gpu": false,
+    "mysql": false,
+    "reconstructedClient": false,
+    "wine": false,
+    "world": false
+  },
+  "formatVersion": 1,
+  "hostChecks": {
+    "actualImporterAndViewFileLocks": true,
+    "actualJavaOwnedProcess": true,
+    "changedHandoffPreservedWithReleasedStoppedSessionLeases": true,
+    "controlledBackendOnly": true,
+    "existingPresentationShaderOwnerFixtureGroups": 3,
+    "explicitForceTimeoutRetainsBindingsAndLeases": true,
+    "gameOwnerFixtureGroups": 8,
+    "gracefulFailureNeverAutomaticallyForcesClient": true,
+    "insufficientBudgetNeverStartsPersistentStop": true,
+    "maxHeapMiB": 32,
+    "naturalExitNotifiesCentralOwnerWithoutConcurrentClose": true,
+    "prelaunchGuardRetainsLeases": true,
+    "runningServerCancellationDetachedBeforeClientLaunch": true,
+    "sameViewForeignHandoffReuseRefused": true,
+    "shaderStaleSelectionRejected": true,
+    "shutdownBudgetDatabaseMinimumSeconds": 5,
+    "shutdownBudgetWorldMinimumSeconds": 10,
+    "sourceAltF4AtomicSequenceVerified": true,
+    "startupCancellationDrainsInFlightAndLatchesTransientSignal": true,
+    "typedViewLeaseRejectsWrongRootClosedAndCompetingPrepare": true,
+    "worldSetupOwnerFixtureGroups": 2
+  },
+  "implementation": {
+    "clientMode": "rebuilt-Windows-ARM64-under-ARM64-Wine",
+    "extraHelperFiles": 0,
+    "foreignHandoffAutomaticallyRemovedOrQuarantined": false,
+    "liveOwnerAndProviderRetentionOnTimeout": true,
+    "localLoginRequiresRealServicesAndPromotedExactPrivateJournal": true,
+    "monitorOwnsCleanup": false,
+    "noPrivateCredentialsInArgvEnvironmentUiOrNewPublicReceipts": true,
+    "rootParallelServiceMainCompiled": true,
+    "shutdownOrder": [
+      "normal-client-zero-or-explicit-force-and-confirmed-reap",
+      "handoff-and-presentation",
+      "world-auth",
+      "database",
+      "view-and-import-leases"
+    ],
+    "startupOrder": [
+      "owned-promoted-database",
+      "verified-auth-world",
+      "presentation",
+      "private-one-use-handoff",
+      "reconstructed-client"
+    ],
+    "uiActivationInOwnedBatch": false
+  },
+  "independentReview": "Final CLEAR from full50_review on six-path ownership/source/account review and synchronized startup cancellation delta; no edits or repeated builds",
+  "scope": "host-retained-game-session-owner-and-packaging-only",
+  "source": {
+    "client": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+    "server": "f35f04d01689f034778e3474b3c820092f51e461",
+    "serverBuildSourceLockSha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+  },
+  "validation": {
+    "allExistingHelperBytesAndManifestsReadBack": true,
+    "androidApplicationBuild": true,
+    "androidTestCompilation": true,
+    "embeddedRuntimeArchives": 0,
+    "gameOwnerDexClassDefined": true,
+    "helperGroups": {
+      "database-service": 2,
+      "database-setup": 2,
+      "server-data": 5,
+      "server-installation": 18,
+      "server-schema": 9,
+      "server-session": 23
+    },
+    "hostLooperAndOwnerFixtureDefinitionsExcluded": true,
+    "lint": true
+  }
+}

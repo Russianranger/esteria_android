@@ -13,6 +13,10 @@ import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
 import io.github.russianranger.esteria.core.runtime.process.ProotLaunch;
 import io.github.russianranger.esteria.runtime.GuestBridgeSetup;
+import io.github.russianranger.esteria.runtime.ClientLaunchSetup;
+import io.github.russianranger.esteria.runtime.ClientRuntimeSetup;
+import io.github.russianranger.esteria.runtime.ShaderSetup;
+import io.github.russianranger.esteria.runtime.TurnipSetup;
 import io.github.russianranger.esteria.runtime.ProotProcess;
 import io.github.russianranger.esteria.runtime.RuntimeSetup;
 import java.io.IOException;
@@ -78,6 +82,8 @@ public final class ClientPresentationSession implements AutoCloseable {
     private final List<OwnedProcess> children=new ArrayList<>();
     private final AtomicBoolean closing=new AtomicBoolean();
     private final AtomicReference<String> failure=new AtomicReference<>();
+    private volatile OwnedProcess client;
+    private boolean clientStartAttempted;
     private AudioBridge audio;
     private InputBridge input;
     private SurfaceBridge surface;
@@ -182,6 +188,47 @@ public final class ClientPresentationSession implements AutoCloseable {
                 List.of(new ProotLaunch.Mount(prepared.bridgeRoot,GuestBridgeSetup.guestMount())),bindings);
         children.add(child);return child;
     }
+    /** Fixed reconstructed-client launch only. This owner retains the client
+     * before returning; no failed caller may discard its presentation bindings.
+     * The higher session owner establishes local services/account first. */
+    public OwnedProcess startClient(ClientRuntimeSetup provider,ClientLaunchSetup.Prepared view,ShaderSetup.Result shaders,
+            TurnipSetup turnip)throws IOException {
+        background();return operations.run(()->{
+            check();if(!ready||clientStartAttempted)throw new IOException("Client presentation launch is unavailable or already attempted");
+            clientStartAttempted=true;providersUnchanged(prepared);
+            provider.requireWineArchive(prepared.runtime.archiveSha256());
+            if(view==null||shaders==null||provider.current()==null||!prepared.work.equals(view.work)||
+                    !provider.generation().equals(view.plan.clientGeneration)||!view.plan.generation.equals(view.view.generation)||
+                    !view.plan.importedGeneration.equals(shaders.importGeneration)||!provider.sourceRevision().equals(shaders.clientRevision))
+                throw new IOException("Current matched reconstructed client, view and shaders required");
+            List<String> command=new ArrayList<>();command.add("/opt/wine/bin/wine");command.add(view.plan.windowsExecutable());
+            command.addAll(view.plan.arguments());command.addAll(provider.localLoginArguments());
+            Map<String,String> environment=new java.util.TreeMap<>(wineEnvironment());environment.putAll(view.plan.environment());
+            List<ProotLaunch.Mount> mounts=new ArrayList<>();
+            mounts.add(new ProotLaunch.Mount(view.importedData,"/esteria-data"));
+            mounts.add(new ProotLaunch.Mount(shaders.shaders,"/esteria-shaders"));
+            if(turnip!=null) {
+                turnip.requireWineArchive(prepared.runtime.archiveSha256());Path driver=turnip.current();
+                if(driver==null)throw new IOException("Selected Turnip generation is not prepared");
+                mounts.add(new ProotLaunch.Mount(driver,TurnipSetup.guestMount()));
+                environment.putAll(turnip.selectedEnvironment(prepared.runtime.archiveSha256()));
+            }
+            Path process=directory(session.resolve("client"));
+            client=ProotProcess.startPresentation(context,prepared.runtime.installer(),prepared.runtime.packagePlan(),
+                prepared.work,process,command,prepared.runtime.wineEnvironment(environment),mounts,bindings);
+            return client;
+        });
+    }
+    /** Source471 maps Alt+F4 through WM_CLOSE to normal engine shutdown. Queue
+     * acceptance alone is not a close/save acknowledgment; the caller awaits
+     * the exact owned client process. Keep input/display/audio alive meanwhile. */
+    public void requestClientClose()throws IOException {
+        background();if(closed||input==null)throw new IOException("Client close input is unavailable; live dependencies retained");
+        sendClientClose(input);
+    }
+    private static void sendClientClose(InputSink sink)throws IOException {
+        sink.releaseAll();sink.keySequence(new int[]{0xffe9,0xffc1,0xffc1,0xffe9},new boolean[]{true,true,false,false});
+    }
     @FunctionalInterface private interface Readiness { boolean check()throws IOException; }
     private void await(OwnedProcess child,Readiness readiness,Path log,String marker)throws IOException {
         long deadline=System.nanoTime()+java.util.concurrent.TimeUnit.SECONDS.toNanos(20);
@@ -252,6 +299,7 @@ public final class ClientPresentationSession implements AutoCloseable {
         boolean firstClose=!closing.getAndSet(true);ready=false;
         try(ServiceOperationGuard.StopPermit ignored=operations.stopWithin(timeout)) {
             if(closed){if(closeFailure!=null)throw closeFailure;return;}
+            if(client!=null&&client.isAlive())throw new IOException("Client still owns presentation bindings; stop and reap it before presentation cleanup");
             IOException error=null;boolean stopped=true;
             if(monitor!=null&&monitor!=Thread.currentThread()) {
                 monitor.interrupt();try{monitor.join(2000);if(monitor.isAlive()){stopped=false;error=add(error,new IOException("Presentation monitor remains alive"));}}

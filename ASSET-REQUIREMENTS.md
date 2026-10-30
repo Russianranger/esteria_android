@@ -166,3 +166,7 @@ validation gates after the ongoing independent integration work.
 The launcher setup pipeline can now compose data, shader and SQL adapters under
 one retained import lease. This adds no game inputs or prepared content: real
 12340/custom MPQs, matching overlays and actual conversion/coverage remain open.
+
+The integrated service/client/control code and complete public runtime source
+cohort add no game assets. Normal client initialization/world, actual generated
+shaders/maps and Esteria content validation still require real imported inputs.
