@@ -7,6 +7,8 @@ on:
       - .github/workflows/playerbots-helper-sources.yml
       - tools/qualify_playerbots_helper_sources.py
       - tests/test_playerbots_helper_sources.py
+      - tests/test_ordered_extractor_dependencies.py
+      - tests/test_target_dependency_observation.py
       - tools/capture_ordered_extractor_dependencies.py
       - tools/verify_target_dependency_observation.py
 permissions:

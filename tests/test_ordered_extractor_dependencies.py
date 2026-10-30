@@ -79,6 +79,8 @@ class ActualHostDependencies(unittest.TestCase):
                 arguments=[str(self.gcc),'-I'+str(self.build),'-c',str(source),'-o',obj]))
         (self.build/'build.ninja').write_text('\n'.join(ninja)+'\n')
         subprocess.run([str(self.ninja),'-C',str(self.build),*capture.TARGETS],check=True,capture_output=True,timeout=30)
+        with (self.build/(capture.TARGETS[0]+'.o')).open('rb') as stream:header=stream.read(20)
+        self.machine=int.from_bytes(header[18:20],'little')
         self.commands=self.build/'compile_commands.json';self.commands.write_text(json.dumps(self.rows))
         self.logs=self.root/'logs';self.logs.mkdir();self.calls=[]
 
@@ -204,7 +206,7 @@ class ActualHostLinkDependencies(unittest.TestCase):
         raw=capture.parse_dependencies((output/'ninja-deps.txt').read_text())
         self.assertEqual(proof['observedObjects'],3);self.assertEqual(proof['observedLinks'],2)
         self.assertEqual(set(raw),set(data['objects'])|set(data['links']))
-        self.assertEqual(set(data['links']),set(capture.TARGETS));self.assertEqual(proof['linkElfMachines'],[62])
+        self.assertEqual(set(data['links']),set(capture.TARGETS));self.assertEqual(proof['linkElfMachines'],[self.fixture.machine])
         self.assertTrue(proof['linkDependenciesNotNewerThanOutput'])
         self.assertFalse(proof['linkInputsCopied']);self.assertFalse(proof['systemLinkSourcesCopied'])
         self.assertEqual(data['linkInputs']['libfixture.a']['kind'],'archive')

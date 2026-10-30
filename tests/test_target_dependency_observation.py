@@ -26,7 +26,10 @@ class TargetObservation(unittest.TestCase):
                          for p in self.host.prepared.rglob('*') if p.is_file()}
         self.observation_root = root / 'dependency-observation'
         self.observed = json.loads((self.observation_root / 'observation.json').read_text())
-        self.kwargs = dict(targets=verify.dependencies.TARGETS, machines=(62,), expected_objects=2,
+        with (self.host.build / (verify.dependencies.TARGETS[0] + '.o')).open('rb') as stream:
+            header = stream.read(20)
+        self.host_machine = int.from_bytes(header[18:20], 'little')
+        self.kwargs = dict(targets=verify.dependencies.TARGETS, machines=(self.host_machine,), expected_objects=2,
             observation_identity=self.receipt['outputFiles']['observation.json'],
             required_sources=('source/map_extractor.c', 'source/vmap4_extractor.c'))
 
@@ -75,7 +78,7 @@ class TargetObservation(unittest.TestCase):
 
     def test_command_object_machine_scope_and_exact_observation_are_not_inferred(self):
         original = copy.deepcopy(self.kwargs)
-        self.kwargs['machines'] = (183,)
+        self.kwargs['machines'] = (62 if self.host_machine != 62 else 183,)
         with self.assertRaisesRegex(ValueError, 'native-scope-or-gates'): self.check()
         self.kwargs = original
         self.kwargs['observation_identity'] = dict(bytes=0, sha256='0' * 64)
