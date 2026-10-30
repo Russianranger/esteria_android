@@ -19,9 +19,21 @@ jobs:
         with:
           distribution: temurin
           java-version: '17.0.13+11'
+      - name: Install Android command-line tools explicitly
+        run: |
+          export ANDROID_HOME="$RUNNER_TEMP/esteria-android-sdk"
+          mkdir -p "$ANDROID_HOME/cmdline-tools"
+          curl --fail --location --retry 3 https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -o "$RUNNER_TEMP/android-commandline.zip"
+          echo '2d2d50857e4eb553af5a6dc3ad507a17adf43d115264b1afc116f95c92e5e258  '"$RUNNER_TEMP/android-commandline.zip" | sha256sum --check
+          unzip -q "$RUNNER_TEMP/android-commandline.zip" -d "$ANDROID_HOME/cmdline-tools"
+          mv "$ANDROID_HOME/cmdline-tools/cmdline-tools" "$ANDROID_HOME/cmdline-tools/12.0"
+          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "$ANDROID_HOME/cmdline-tools/12.0/bin" >> "$GITHUB_PATH"
       - name: Install pinned Android platform and build tools
         run: |
-          sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'cmdline-tools;12.0'
+          (set +o pipefail; yes | sdkmanager --sdk_root="$ANDROID_HOME" --licenses >/dev/null)
+          sdkmanager --sdk_root="$ANDROID_HOME" 'platforms;android-35' 'build-tools;35.0.0'
       - name: Verify wrapper and source behavior, compile launcher, run Android lint
         run: |
           sha256sum --check gradle/wrapper/SHA256SUMS
