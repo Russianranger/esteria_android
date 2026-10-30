@@ -162,5 +162,24 @@ class ServerSetupX64Sql(unittest.TestCase):
             sql.x64_playerbots_plan(None, admitted, {}, self.root / 'mysql')
         selected.assert_not_called()
 
+    def test_public_failure_frames_exclude_private_paths_arguments_and_locals(self):
+        private = 'private-account-secret-not-for-artifacts'
+        try:
+            sql.template(self.root / private, self.root / 'unused')
+        except FileNotFoundError as error:
+            value = sql.failure_diagnostic(error)
+        else: self.fail('Missing original source input must refuse')
+        self.assertTrue(value['privateDetailsExcluded']); self.assertTrue(value['sourceFrames'])
+        self.assertLessEqual(len(value['sourceFrames']), 12)
+        self.assertTrue(any(row['source'] == 'tools/qualify_server_setup_x64_sql.py' and
+            row['function'] == 'template' for row in value['sourceFrames']))
+        encoded = sql.encode(value).decode()
+        for forbidden in (private, str(self.root), str(sql.ROOT), 'source-inputs-receipt.json', 'args', 'locals'):
+            self.assertNotIn(forbidden, encoded)
+        for row in value['sourceFrames']:
+            self.assertEqual(set(row), {'source', 'function', 'line'}); self.assertIs(type(row['line']), int)
+        self.assertEqual(sql.failure_diagnostic(ValueError(private)),
+            dict(sourceFrames=[], privateDetailsExcluded=True))
+
 
 if __name__ == '__main__': unittest.main()

@@ -1,0 +1,476 @@
+{
+  "actualInputAcquisitionAndExactRootfsImageStepsSucceeded": true,
+  "actualQualification": {
+    "actualX64BuildReceipt": {
+      "bytes": 32433,
+      "sha256": "5e6646ae314bfefbac00a7cae1eb892b76a29e06feffc9ba88a2a55b2f4d5522"
+    },
+    "actualX64LibrarySourceReadback": {
+      "bytes": 700,
+      "sha256": "0bfd6d7b3cc43de79c4a821367ad1ca73680fb2fe353b15f8f78e22d88cd469b"
+    },
+    "androidRuntimeQualified": false,
+    "buildProducer": {
+      "integrationRevision": "817cbc229f4dcc24beb169ecc72838fab4d1df32",
+      "job": 124281186151,
+      "workflowRun": 41119182502
+    },
+    "checkedInvocations": {
+      "dbimport": {
+        "actualExecutable": {
+          "bytes": 1862240,
+          "sha256": "d7ca8295d99f90a1c8ec26dffcd39d36037e2fe9231f97578fd30992c6430948"
+        },
+        "invocation": {
+          "bytes": 5152,
+          "sha256": "728df8ca84d03ba1aaa9488a188eaf991a7557d0e63aa50191d3448161e00075"
+        },
+        "invocationIsOriginalElf": false,
+        "loader": {
+          "bytes": 236616,
+          "sha256": "c20a2dc8917c755f02b94049356320fe1f62ac7d9f8994731f807d9df39302da"
+        },
+        "originalElfBytesChanged": false,
+        "path": "/sql-work/fixture/invocations/dbimport"
+      },
+      "playerbots-schema": {
+        "actualExecutable": {
+          "bytes": 1755704,
+          "sha256": "57c90150262ab7b79e17ab5f780ce058b3b29d12ca00d7ce3f59eec0e0fd102c"
+        },
+        "invocation": {
+          "bytes": 5179,
+          "sha256": "31428f0ecee0c4d103e2fe3863dc055e8fb68f3d05f008767d8eaca61d72c0df"
+        },
+        "invocationIsOriginalElf": false,
+        "loader": {
+          "bytes": 236616,
+          "sha256": "c20a2dc8917c755f02b94049356320fe1f62ac7d9f8994731f807d9df39302da"
+        },
+        "originalElfBytesChanged": false,
+        "path": "/sql-work/fixture/invocations/playerbots-schema"
+      }
+    },
+    "contentOriginIsOriginalArm64Packaging": true,
+    "currentNativeCaller": {
+      "historicalRuntimeQualificationTransferred": false,
+      "integrationRevision": "6e7ef3d539fc19727a62de4cc3d1efbf43767d46",
+      "scope": "current-native-x64-sql-caller-source-only",
+      "sourceInputs": {
+        "config/local-server.json": {
+          "bytes": 858,
+          "sha256": "6750fa3e1a7c0101b5922f4163c6dfa87d90faba25ce011d5a36de8a578e2d4d"
+        },
+        "runtime/android_database_setup.py": {
+          "bytes": 5488,
+          "sha256": "a2bdc53753d8c301e6e8fa633a8e12026f7285881f08c22e2aedf6819d31a813"
+        },
+        "runtime/android_server_installation_setup.py": {
+          "bytes": 41474,
+          "sha256": "fe45968a0c3a32d559de27f591b5e968139e2f4ab5f04b4fc57e4bc98a330df6"
+        },
+        "runtime/android_server_schema_setup.py": {
+          "bytes": 11875,
+          "sha256": "9526275258a6b98930e3253c0011627844ed10e1816658b3d5d07e23cd3dfd02"
+        },
+        "runtime/bridges/capture_sources.py": {
+          "bytes": 2158,
+          "sha256": "96e24b2480b97897d919794e5088de12921fbbc605cfc6ce4725df1a6b0cf498"
+        },
+        "runtime/bridges/record_build.py": {
+          "bytes": 4522,
+          "sha256": "c2efaafe2235480de55fe08b641c56afa1b74a6c40c07d9e34c50ab375cf9842"
+        },
+        "runtime/bridges/record_x11_fixture.py": {
+          "bytes": 1124,
+          "sha256": "d070683c2392b1704a2a503af63340fea26fcf60c09b92e7b1d02e82a062d2aa"
+        },
+        "runtime/extractor_order.py": {
+          "bytes": 9884,
+          "sha256": "5c6d30d23c2a8ebb13d037907cbcc6e7b67ea31f4b99798d925c5e3da756128c"
+        },
+        "runtime/mysql-probe/guest_check.py": {
+          "bytes": 8978,
+          "sha256": "36fd8cd42851df051df421eec1df01fab9b711092ba21cc728daea8d5050fee9"
+        },
+        "runtime/mysql-probe/record_runtime.py": {
+          "bytes": 4590,
+          "sha256": "02dc95b182414d78e890eb89ff6121d94d3a45ac268efa896fbba95ce6577cea"
+        },
+        "runtime/mysql_bootstrap.py": {
+          "bytes": 32698,
+          "sha256": "e69d5b64c4a5f5ace86fa521589d5a64613f601c59aedb011b42a1e5b743b47d"
+        },
+        "runtime/mysql_service.py": {
+          "bytes": 18078,
+          "sha256": "8b30e9598f20ee715685a51aba59cefcafc6213d9d5d5cb6c6f3a73efa6b71c2"
+        },
+        "runtime/owned_process_group.py": {
+          "bytes": 2795,
+          "sha256": "c19ed5c05e94d7b537df1055983fca75e20447f594419084f2207d60f99f138e"
+        },
+        "runtime/prepared_data_cache.py": {
+          "bytes": 15184,
+          "sha256": "302606e980bef1b066e98e6ed1c1e58fcf0bc76f6f0d5dc08c265e3f930d25bd"
+        },
+        "runtime/provision_local_account.py": {
+          "bytes": 19542,
+          "sha256": "e5d2c7d35e83176841107da200ff737bdb8e3671e1a5db91f9438c4228f6701d"
+        },
+        "runtime/provision_local_realm.py": {
+          "bytes": 25452,
+          "sha256": "703ed8a0f1f011191fdf4374aa7e999ca5cff5a87cd4e6e7b3907d7d1c53c994"
+        },
+        "runtime/server/capture_sources.py": {
+          "bytes": 3191,
+          "sha256": "5568e32bf0d912e45e65ffdfa02404d604138e86a8534d8c097b111b0445010b"
+        },
+        "runtime/server/record_runtime.py": {
+          "bytes": 4582,
+          "sha256": "7b1989e8a3d540f15e264e2d175872ee922a4f4c4112db8422efeea43c307495"
+        },
+        "runtime/server_config.py": {
+          "bytes": 21005,
+          "sha256": "8c22c17f6fc7b28f842c49793f9d89b84cbea3f6ce5a1d638b503c97d932f472"
+        },
+        "runtime/server_content.py": {
+          "bytes": 20541,
+          "sha256": "e32102ba850f4df7201c39c53e6c5530e59992cef1d3587ac809aca2ad681f8c"
+        },
+        "runtime/server_data_generation.py": {
+          "bytes": 29380,
+          "sha256": "72513fb5e0c1264f996fed74a96178a9789e14e97863d268da1170fa64f74cc6"
+        },
+        "runtime/server_data_preflight.py": {
+          "bytes": 27886,
+          "sha256": "8b9a1d44b70a8c1fce7a54e0ee39bba68621026f34270982cb68cb8d326374e0"
+        },
+        "runtime/server_playerbots_setup.py": {
+          "bytes": 22756,
+          "sha256": "c928a5ab26fae98f6458807231450d1bdcd1cc670e21844aa6b4e7b909a32451"
+        },
+        "runtime/server_schema_adaptations.py": {
+          "bytes": 6316,
+          "sha256": "a49e1f8477d8b840964ce47783ed5af6873dc0dcde5b4a52280b696159082b44"
+        },
+        "runtime/server_schema_baseline.py": {
+          "bytes": 8606,
+          "sha256": "21d0bd526145f6699db90e9f90bb3ec01cf15316b59e27f8db6649f03480df20"
+        },
+        "runtime/server_schema_setup.py": {
+          "bytes": 11262,
+          "sha256": "6ed4f83f882101a8af0f06212c870cf71b2cee81a654b2ad4c14d9f83ef08026"
+        },
+        "runtime/server_session.py": {
+          "bytes": 25194,
+          "sha256": "7d159953d2a9c2027bd75aaf59f6a541ef3cbc51b16c7756ca2a71253551f0ee"
+        },
+        "runtime/server_session_process.py": {
+          "bytes": 12854,
+          "sha256": "2ee8ac79a1e045f503616715b2eeb9f34ae10d509391190ca3be09e30e242ec2"
+        },
+        "runtime/server_update_setup.py": {
+          "bytes": 25241,
+          "sha256": "7ff3b5272f9ec3fe38a42413f8d2d6a45f72d206f794c26869d7422439be2310"
+        },
+        "runtime/server_updater.py": {
+          "bytes": 7538,
+          "sha256": "8efabb037c012a89848d854fea8a12eff8c3bab7a9d1e9a3f3ea36369c4a6007"
+        },
+        "runtime/shader_generation.py": {
+          "bytes": 19353,
+          "sha256": "8bb48952c36bdc4c69516c2ffa6f5c2d2eb59e84019e6420948d94bc81683ac5"
+        },
+        "runtime/turnip/fetch_sources.py": {
+          "bytes": 5418,
+          "sha256": "90f7b5a750391599911d8b69cb0681c346e549f2013cf799641949c757acd3f9"
+        },
+        "runtime/turnip/qualify_shaders.py": {
+          "bytes": 2878,
+          "sha256": "fd39918a5223dd81519041323c0f06382947f39722d5a3db3917baeb6e16e41e"
+        },
+        "runtime/turnip/record_build.py": {
+          "bytes": 8959,
+          "sha256": "82b94f7ab1344e6026ee1524668b4abe1b8ea3e4212189952783bf13bc052e6d"
+        },
+        "runtime/turnip/run_probe.py": {
+          "bytes": 7186,
+          "sha256": "671d44f9aec71f13f303d745cf145fa8ac4deaccbefe8911ad2b610be90f35c6"
+        },
+        "runtime/wine-arm64/capture_toolchain_sources.py": {
+          "bytes": 30645,
+          "sha256": "16b729041d06223d0bbdf8a4081cc1dcc97a1b1399232685b63de1894dab71af"
+        },
+        "runtime/wine-arm64/fetch_inputs.py": {
+          "bytes": 3976,
+          "sha256": "7c54e1a2ba841465f788a61f16d7c82100c534ec6c740b7a8e866cb6b9db0025"
+        },
+        "runtime/wine-arm64/private_pe_check.py": {
+          "bytes": 10028,
+          "sha256": "493b8dfdc42decfd72b91084be424041b7bdc6d5cf81c5adb623e7b65485b700"
+        },
+        "runtime/wine-arm64/record_runtime.py": {
+          "bytes": 6600,
+          "sha256": "e0863092ec74f59d330ddd2a9fc4bc018ff813fa91afccd759943d23f68b392c"
+        },
+        "runtime/wine-probe/apply_adaptations.py": {
+          "bytes": 3535,
+          "sha256": "e10f8f4aac362554d0270b33e60e7464e3828ffb21d10cf6db1501f4ded93ef0"
+        },
+        "runtime/wine-probe/capture_sources.py": {
+          "bytes": 2676,
+          "sha256": "718c966a54b76196979d2cfb8d68cd37f284d2707584cd0b5188f35a359fa221"
+        },
+        "runtime/wine-probe/guest_check.py": {
+          "bytes": 8045,
+          "sha256": "7e9ab911487fc1debd200c227ee88fd6088d76aae8bd299dbae3431db447c2d4"
+        },
+        "runtime/wine-probe/private_pe_check.py": {
+          "bytes": 10004,
+          "sha256": "83bbb8b38b0a752b853d630f7507d29ab240c4104f1959011bb2158199885c87"
+        },
+        "runtime/wine-probe/record_runtime.py": {
+          "bytes": 4815,
+          "sha256": "093775c42a71d0139152c4322e30c4b0e149d6d52a2bc6e4010d0b50ee427220"
+        },
+        "tools/fetch_android_mysql_fixture_frozen.py": {
+          "bytes": 16538,
+          "sha256": "ff76580150c93b3131851518e743bc0b1e5f720c3e9b54e2df0bec4159d0d506"
+        },
+        "tools/qualify_base_sql.py": {
+          "bytes": 20438,
+          "sha256": "47c38418695664597b4310e193007daf8de1c2e5dd6b3302fe8d96b7e0b2b677"
+        },
+        "tools/qualify_dbimport.py": {
+          "bytes": 27741,
+          "sha256": "06dc3ee4d639b2ba818377140e114e441c9aaa07ecae2b8c70ec57b6cd04c158"
+        },
+        "tools/qualify_playerbots_component.py": {
+          "bytes": 16298,
+          "sha256": "7216080fd7aa1216d835c8342e33efdbd384072b0667d37e6cec79fd5406f632"
+        },
+        "tools/qualify_server_setup_x64_sql.py": {
+          "bytes": 28513,
+          "sha256": "018b56d9709ca78ff66b40ad2bfd52a15c67937c744c488ae4211da6e3f2809b"
+        },
+        "tools/server_setup_x64_sql_inputs.py": {
+          "bytes": 24177,
+          "sha256": "b338374ec14d09427b7158a1f1502811ed6a161bd84f914a854a8c49632d3841"
+        }
+      },
+      "sourceSnapshotExact": true
+    },
+    "failureClass": "FileNotFoundError",
+    "failurePhase": "verify-inputs",
+    "formatVersion": 1,
+    "fourSchemaCoordinatorQualified": false,
+    "gameplayQualified": false,
+    "inputSelection": {
+      "bytes": 3333,
+      "sha256": "b4761fa5f6b1de914637c17f4248872b8749565738efb4e0098c8e13d4c4540a"
+    },
+    "mysqlVersion": "8.0.46-0ubuntu0.24.04.4",
+    "originalArm64ReceiptReusedForX64Qualification": false,
+    "originalMysqlArchive": {
+      "bytes": 112330756,
+      "sha256": "159c75f03fd851796f261688fec7a02f8fe1fec8cebb5701c2504bdb2304413f"
+    },
+    "phase": "failed",
+    "playerbotsAiQualified": false,
+    "productionArm64ProviderQualified": false,
+    "qualificationSucceeded": false,
+    "scope": "disposable-native-x64-measured-setup-four-schema-sql",
+    "selectedX64ToolsSqlQualified": false,
+    "serverDataQualified": false,
+    "slotPromoted": false,
+    "sqlExecuted": false,
+    "worldserverQualified": false
+  },
+  "allCurrentNativeCallerSourceInputsMatchExactGitBlobs": true,
+  "androidRuntimeQualified": false,
+  "artifact": {
+    "bytes": 4531,
+    "id": 13017785792,
+    "sha256": "0b3553efbd73d2785a13df97540fea6a82808bcc1f86b2e21c79039c8ec495ab"
+  },
+  "artifactMembers": {
+    "image-context.json": {
+      "bytes": 714,
+      "sha256": "8cfe6d3eb476586d032ed914ba291818a3faa987ecd1234f4147929ca714ee56"
+    },
+    "qualification.json": {
+      "bytes": 11009,
+      "sha256": "362a563a97fe332a18b1ac220aa26441c48cd25894d31091b5eb0cba5a007564"
+    }
+  },
+  "checkedInvocationsCreatedForBothOriginalElf62Tools": true,
+  "currentNativeCallerSourceInputCount": 50,
+  "everyArtifactMemberCrcAndSha256Verified": true,
+  "everyArtifactZipByteReadBack": true,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "jobs": [
+    {
+      "conclusion": "success",
+      "id": 124345965560,
+      "name": "selection",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-30T22:27:37Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "startedAt": "2026-10-30T22:27:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T22:27:39Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "startedAt": "2026-10-30T22:27:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T22:27:42Z",
+          "conclusion": "success",
+          "name": "Check real ELF loader source and measured-selection refusal boundaries",
+          "startedAt": "2026-10-30T22:27:39Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T22:27:42Z",
+          "conclusion": "success",
+          "name": "Require actual measured build outputs before enabling native SQL",
+          "startedAt": "2026-10-30T22:27:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T22:27:43Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "startedAt": "2026-10-30T22:27:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T22:27:43Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "startedAt": "2026-10-30T22:27:43Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T22:27:43Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "startedAt": "2026-10-30T22:27:43Z",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "conclusion": "failure",
+      "id": 124346032639,
+      "name": "qualify",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-30T22:27:49Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "startedAt": "2026-10-30T22:27:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T22:27:50Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "startedAt": "2026-10-30T22:27:49Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T22:27:51Z",
+          "conclusion": "success",
+          "name": "Check out only the exact original x64 MySQL consumer recipe",
+          "startedAt": "2026-10-30T22:27:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T22:28:47Z",
+          "conclusion": "success",
+          "name": "Read every pinned x64 runtime tool source debug and public SQL input",
+          "startedAt": "2026-10-30T22:27:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T22:28:51Z",
+          "conclusion": "success",
+          "name": "Build the original exact compiler-free MySQL rootfs without APT",
+          "startedAt": "2026-10-30T22:28:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T22:28:59Z",
+          "conclusion": "failure",
+          "name": "Execute real core updater helper reentry and persistent four-schema restart offline",
+          "startedAt": "2026-10-30T22:28:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T22:29:00Z",
+          "conclusion": "success",
+          "name": "Export only bounded public receipts without database account or private engine files",
+          "startedAt": "2026-10-30T22:28:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T22:29:01Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "startedAt": "2026-10-30T22:29:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T22:29:01Z",
+          "conclusion": "success",
+          "name": "Post Check out only the exact original x64 MySQL consumer recipe",
+          "startedAt": "2026-10-30T22:29:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T22:29:01Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "startedAt": "2026-10-30T22:29:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T22:29:01Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "startedAt": "2026-10-30T22:29:01Z",
+          "status": "completed"
+        }
+      ]
+    }
+  ],
+  "missingPathNotIdentifiedByOriginalPublicReceipt": true,
+  "nextDiagnostic": "Bounded source-relative Python code frames and narrower pre-SQL phases; no exception arguments, locals, private paths or log bytes.",
+  "originalToolsRebuilt": false,
+  "playerbotsAiQualified": false,
+  "privateExecutionLogRetained": false,
+  "productionArm64ProviderQualified": false,
+  "qualificationIdentity": {
+    "bytes": 11009,
+    "sha256": "362a563a97fe332a18b1ac220aa26441c48cd25894d31091b5eb0cba5a007564"
+  },
+  "scope": "actual-native-x64-sql-preinitialization-failure-readback",
+  "sqlExecuted": false,
+  "workflow": {
+    "conclusion": "failure",
+    "headSha": "6e7ef3d539fc19727a62de4cc3d1efbf43767d46",
+    "htmlUrl": "https://github.com/Russianranger/esteria_android/actions/runs/41138255737",
+    "id": 41138255737,
+    "status": "completed"
+  },
+  "worldserverQualified": false
+}

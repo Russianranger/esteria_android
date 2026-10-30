@@ -45,6 +45,22 @@ def encode(value):
     return (json.dumps(value, sort_keys=True, indent=2) + '\n').encode()
 
 
+def failure_diagnostic(error):
+    """Expose bounded source locations, never exception arguments or locals."""
+    frames = []; traceback = error.__traceback__; examined = 0
+    while traceback is not None and examined < 64:
+        examined += 1; code = traceback.tb_frame.f_code
+        path = Path(code.co_filename)
+        try: relative = path.relative_to(ROOT).as_posix() if path.is_absolute() else ''
+        except ValueError: relative = ''
+        if (re.fullmatch(r'(?:tools|runtime)/(?:[A-Za-z0-9_-]+/)*[A-Za-z0-9_-]+\.py', relative) and
+                re.fullmatch('[A-Za-z_][A-Za-z0-9_]{0,127}', code.co_name) and
+                type(traceback.tb_lineno) is int and 0 < traceback.tb_lineno <= 1000000):
+            frames.append(dict(source=relative, function=code.co_name, line=traceback.tb_lineno))
+        traceback = traceback.tb_next
+    return dict(sourceFrames=frames[-12:], privateDetailsExcluded=True)
+
+
 def fresh(path):
     path = Path(os.path.abspath(path)); selection.archives.directory(path.parent, create=True)
     require(not os.path.lexists(path), 'x64-sql-existing-output-preserved')
@@ -303,7 +319,9 @@ def run(inputs, output, mysql, mysqld, version):
     try:
         payload = Path(admitted['payloadPath']); invocations = launchers(payload, admitted, output / 'invocations')
         evidence['checkedInvocations'] = invocations
+        evidence['phase'] = 'extract-original-source-template'
         original_template = output / 'dbimport.conf.dist'; template_id = template(payload, original_template)
+        evidence['phase'] = 'stage-original-content-package'
         assets = inputs / 'content-provider/assets/server-content'
         source = output / 'source-content-input'; source.mkdir(mode=0o700)
         for name, original in (('package-receipt.json', assets / 'package-receipt.json'),
@@ -311,18 +329,23 @@ def run(inputs, output, mysql, mysqld, version):
             release.engine.copy_verified(original, source / name, selection.files.identity(original), 0o400)
         receipt_sha = selection.files.identity(source / 'package-receipt.json')['sha256']
         lock = ROOT / 'runtime/server/server-build-sources.lock.json'
+        evidence['phase'] = 'extract-original-content-package'
         receipt, manifest, compiled = importer.unpack_content(source, receipt_sha, lock, output / 'content')
+        evidence['phase'] = 'verify-product-source-content'
         verified = importer.verify_runtime_content(output / 'content', source, receipt_sha, lock, manifest, compiled)
         require(admitted['build']['originalArm64Build'] == verified.compiled['serverBuild'] and
             admitted['build']['originalArm64Modules'] == verified.receipt['compiledModules'] and
             admitted['build']['serverSource'] == verified.manifest['source'], 'x64-sql-content-origin-source-binding')
+        evidence['phase'] = 'prepare-source-playerbots-plan'
         plan = x64_playerbots_plan(verified, admitted, invocations['playerbots-schema'], mysql)
         evidence.update(contentReceipt=verified.identities['receipt'], contentOriginBuild=verified.compiled['serverBuild'],
             compiledModules=receipt['compiledModules'], source=receipt['source'], sourceLockSha256=receipt['sourceLockSha256'],
             selectedSourceBaseFiles=playerbots.BASE_COUNT, selectedSourceUpdates=playerbots.UPDATE_COUNT,
             preparedStatementCount=playerbots.STATEMENTS, sourceSelectedContentFiles=len(verified.identities['files']))
         profile = json.loads((ROOT / 'config/local-server.json').read_bytes()); data = output / 'unavailable-game-data'
+        evidence['phase'] = 'prepare-owned-credentials'
         password = db.read_secret(state / 'accounts/database-secret', create=True)
+        evidence['phase'] = 'acquire-owned-state-lease'
         with db.state_lock(state) as lease:
             evidence['phase'] = 'initialize-owned-mysql'; db.initialize(mysqld, mysql, state, version)
             evidence['initializedNewInstance'] = True; evidence['sqlExecuted'] = True
@@ -393,7 +416,8 @@ def run(inputs, output, mysql, mysqld, version):
                 capturedLoaderAndLibraryCompatibilityQualified=True, qualificationSucceeded=True, phase='complete')
         return checks.public_record(evidence)
     except BaseException as error:
-        evidence.update(qualificationSucceeded=False, failurePhase=evidence['phase'], failureClass=type(error).__name__, phase='failed')
+        evidence.update(qualificationSucceeded=False, failurePhase=evidence['phase'], failureClass=type(error).__name__,
+            failureDiagnostic=failure_diagnostic(error), phase='failed')
         raise
     finally:
         try:
