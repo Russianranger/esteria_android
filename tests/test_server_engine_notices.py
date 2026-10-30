@@ -253,7 +253,35 @@ class ExactRetainedInputs(unittest.TestCase):
             self.assertEqual(len(receipt['archiveFiles']), 126)
             self.assertTrue(receipt['originalRuntimeFilesUnchanged'])
             self.assertFalse(receipt['sourceCompanionComplete']); self.assertFalse(receipt['androidProviderCreated'])
+            pin=json.loads(notices.PROVIDER_LOCK.read_text())
+            self.assertEqual(receipt['archive'],pin['archive'])
+            self.assertEqual(notices.files.identity(output/'package-receipt.json'),notices.engine.identity(pin['packageReceipt']))
             notices.engine.verify_archive(output / notices.ARCHIVE, receipt['archiveFiles'])
+
+
+class NoticeSourceBinding(unittest.TestCase):
+    def test_reviewed_client_only_change_reuses_archived_source_and_rejects_server_profile_drift(self):
+        provider=json.loads(notices.PROVIDER_LOCK.read_text())
+        derivative=dict(serverSource=provider['serverSource'],sourcesLock=provider['serverBuildSourceLock'])
+        notices.validate_source_selection(derivative)
+        with tempfile.TemporaryDirectory(prefix='notice-source-binding-') as temporary:
+            root=Path(temporary);current=json.loads(notices.SOURCE_LOCK.read_text())
+            current['sources']['client']['commit']='a'*40
+            path=root/'current.lock.json';pin=root/'provider.lock.json'
+            def select(document):
+                raw=notices.engine.canonical(document);path.write_bytes(raw)
+                provider['appSourceLock']=identity(raw);pin.write_bytes(notices.engine.canonical(provider))
+            select(current)
+            with patch.object(notices,'SOURCE_LOCK',path),patch.object(notices,'PROVIDER_LOCK',pin):
+                notices.validate_source_selection(derivative)
+                for kind in ('patch','submodule','profile'):
+                    changed=copy.deepcopy(current)
+                    if kind=='patch':changed['sources']['server']['patches'][0]['sha256']='0'*64
+                    elif kind=='submodule':changed['sources']['server']['submodules']['src/server/game/LuaEngine']='b'*40
+                    else:changed['compatibility']['extended_limits']=1
+                    select(changed)
+                    with self.subTest(kind=kind),self.assertRaisesRegex(ValueError,'not-current|compatibility-profile-differs'):
+                        notices.validate_source_selection(derivative)
 
 
 if __name__ == '__main__': unittest.main()

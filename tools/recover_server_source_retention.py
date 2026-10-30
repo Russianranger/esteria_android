@@ -134,6 +134,15 @@ def rebuild_plan():
         originalBinaryBitIdentityRequired=False)
 
 
+def revision_metadata_arguments(cmake,prepared,output):
+    # Replay the original revision.h custom target's CMake script, without
+    # building any C/C++ target. Script mode has a different variable context
+    # from CMakeLists.txt configuration and overwrites the configure-time header.
+    return [cmake,'-DBUILDDIR='+str(output/'build'),
+        '-DESTERIA_ARCHIVAL_REVISION_FILE='+str(prepared/'provenance/archival-revision.txt'),
+        '-P',str(prepared/'source/src/cmake/genrev.cmake'),str(output/'build')]
+
+
 def selected_files(sealed,*,integration,acquired,prepared,protocol,evidence,output,plan):
     selected={}
     for name,row in sealed['archiveFiles'].items():
@@ -205,6 +214,14 @@ def recover(workspace,integration,evidence_root,destination):
     arguments=isolated.configure_arguments(cmake,prepared,output)+['-DCMAKE_C_COMPILER='+compilers['gcc'],
         '-DCMAKE_CXX_COMPILER='+compilers['g++']]
     configure=isolated.run_owned(arguments,output/'diagnostics/recovery-configure.log',environment,cwd=workspace,timeout=900)
+    revision=isolated.run_owned(revision_metadata_arguments(cmake,prepared,output),
+        output/'diagnostics/recovery-revision.log',environment,cwd=prepared/'source',timeout=30)
+    generated={name:dict(expected=engine.identity(row),observed=files.identity(output/'build'/name[len('new-build/generated/'):]))
+        for name,row in sealed['archiveFiles'].items() if name.startswith('new-build/generated/')}
+    engine.put_metadata(output/'diagnostics/recovery-generated.json',generated)
+    revision_header=output/'build/revision.h'
+    require(revision_header.stat().st_size<=65536,'source-recovery-revision-header-byte-bound')
+    engine.copy_verified(revision_header,output/'diagnostics/recovery-revision.h',files.identity(revision_header),0o444)
     engine.put_metadata(output/'rebuild-plan.json',rebuild_plan())
     selected=selected_files(sealed,integration=integration,acquired=acquired,prepared=prepared,
         protocol=protocol,evidence=evidence,output=output,plan=output/'rebuild-plan.json')
@@ -215,9 +232,9 @@ def recover(workspace,integration,evidence_root,destination):
         originalEvidenceArtifact=pin['evidenceArtifact'],originalQualification=pin['qualification'],
         originalSealedSourceReceipt=pin['sealedReceipt'],archive=archive_identity,
         exactOriginalMemberIdentitiesMatched=len(selected),exactOriginalCompressedArchiveMatched=True,
-        originalReceiptsPreserved=True,configureOnly=True,compilerFeatureProbesMayRun=True,
+        originalReceiptsPreserved=True,configureAndRevisionMetadataOnly=True,compilerFeatureProbesMayRun=True,
         fullServerCompilationPerformed=False,newNativeQualificationClaimed=False,
-        currentRelevantEnvironment=current_environment,configure=configure,network=network,
+        currentRelevantEnvironment=current_environment,configure=configure,revisionMetadata=revision,network=network,
         androidRuntimeQualified=False,gameplayQualified=False)
     engine.put_metadata(destination/'retention-recovery-receipt.json',receipt)
     return receipt

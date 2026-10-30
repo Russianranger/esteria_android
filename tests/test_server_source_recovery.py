@@ -2,6 +2,7 @@
 import copy
 import hashlib
 import json
+import os
 from pathlib import Path
 import tempfile
 import unittest
@@ -103,6 +104,30 @@ class SourceRecoveryGuards(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'changed|identity|differ|mismatch'):
             recovery.publish_exact(selected,sealed,evidence,changed_receipt,receipt_identities)
         self.assertFalse((changed_receipt/'qualification.json').exists())
+
+
+@unittest.skipUnless(os.environ.get('ESTERIA_SOURCE_RECOVERY_PREPARED') and os.environ.get('ESTERIA_SOURCE_RECOVERY_CMAKE'),
+                     'actual prepared revision recipe and host CMake not supplied')
+class ActualArchivalRevisionRecipe(unittest.TestCase):
+    def test_original_metadata_script_replaces_configure_time_header_without_compiling(self):
+        import shutil
+        original=Path(os.environ['ESTERIA_SOURCE_RECOVERY_PREPARED']).resolve(strict=True)
+        cmake=Path(os.environ['ESTERIA_SOURCE_RECOVERY_CMAKE']).resolve(strict=True)
+        with tempfile.TemporaryDirectory(prefix='actual-revision-script-') as name:
+            root=Path(name);prepared=root/'prepared';output=root/'output'
+            for relative in ('source/src/cmake/genrev.cmake','source/src/cmake/revision.h.in.cmake','provenance/archival-revision.txt'):
+                target=prepared/relative;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(original/relative,target)
+            (output/'build').mkdir(parents=True);(output/'tmp').mkdir()
+            header=output/'build/revision.h';header.write_bytes(b'configure-time placeholder must be overwritten')
+            recovery.isolated.run_owned(recovery.revision_metadata_arguments(cmake,prepared,output),
+                output/'revision.log',recovery.isolated.build_environment(output),cwd=prepared/'source',timeout=30)
+            text=header.read_text()
+            self.assertIn('#define _HASH                      "f35f04d01689+"',text)
+            self.assertIn('#define _DATE                      "2026-10-28 12:35:08 -0500"',text)
+            self.assertIn('#define _BRANCH                    "Archived source package"',text)
+            self.assertIn('R"('+str(output/'build')+')"',text)
+            self.assertNotIn('configure-time placeholder',text)
+            self.assertEqual({p.name for p in (output/'build').iterdir()},{'revision.h'})
 
 
 if __name__=='__main__':unittest.main()

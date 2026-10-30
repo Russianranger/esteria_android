@@ -3,7 +3,14 @@ on:
   push:
     branches: [android/client-server]
     paths:
-      - runtime/server/**
+      - runtime/server/Dockerfile
+      - runtime/server/.dockerignore
+      - runtime/server/ubuntu.sources
+      - runtime/server/sources.lock.json
+      - runtime/server/inrelease.SHA256SUMS
+      - runtime/server/mysql-binaries.SHA256SUMS
+      - runtime/server/record_runtime.py
+      - runtime/server/capture_sources.py
       - runtime/mysql_bootstrap.py
       - tests/test_mysql_bootstrap.py
       - tests/test_server_runtime_inputs.py
@@ -11,16 +18,22 @@ on:
       - tools/package_server_runtime.py
       - tools/prepare_runtime.py
       - tools/package_server_content.py
-      - .github/workflows/server-runtime.yml
   pull_request:
     paths:
-      - runtime/server/**
+      - runtime/server/Dockerfile
+      - runtime/server/.dockerignore
+      - runtime/server/ubuntu.sources
+      - runtime/server/sources.lock.json
+      - runtime/server/inrelease.SHA256SUMS
+      - runtime/server/mysql-binaries.SHA256SUMS
+      - runtime/server/record_runtime.py
+      - runtime/server/capture_sources.py
       - tests/test_server_runtime_inputs.py
       - tests/test_server_runtime_package.py
       - tools/package_server_runtime.py
       - tools/prepare_runtime.py
       - tools/package_server_content.py
-      - .github/workflows/server-runtime.yml
+  # Workflow-only policy edits use manual dispatch; recipe/input changes above rebuild automatically.
   workflow_dispatch:
     inputs:
       capture_sources:

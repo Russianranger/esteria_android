@@ -23,9 +23,11 @@ from tools import manifest_server_modules as modules, package_server_content as 
 from tools import package_server_engine as engine, package_server_engine_source_inputs as sources
 from tools import prepare_runtime as archives, verify_server_build as files
 from tools import verify_server_engine_runtime as runtime
+from tools import fetch_sources, server_provider_sources as source_binding
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_LOCK = ROOT / 'sources.lock.json'
+PROVIDER_LOCK = ROOT / 'runtime/server/programs-provider.lock.json'
 AUDIT = ROOT / 'runtime/server/engine-source-audit.json'
 ARCHIVE = 'server-programs-runtime-arm64.tar.gz'
 SOURCE_ARCHIVE = 'server-engine-source-inputs.tar.gz'
@@ -37,6 +39,17 @@ MAX_SOURCE_FILES = 20000
 MAX_SOURCE_BYTES = 4 * 1024**3
 MAX_CAPTURE = 16 * 1024**2
 require = files.require
+
+
+def validate_source_selection(derivative):
+    current=fetch_sources.load_lock(SOURCE_LOCK)
+    require(source_binding.same(derivative['serverSource'],current['sources']['server']),
+            'notice-engine-server-source-is-not-current')
+    if derivative['sourcesLock']==files.identity(SOURCE_LOCK):return
+    provider,_=modules.read_json(PROVIDER_LOCK)
+    source_binding.validate_current(provider,SOURCE_LOCK)
+    require(derivative['sourcesLock']==provider['serverBuildSourceLock'],
+            'notice-engine-source-lock-is-not-reviewed-archived-build')
 
 
 def parsed(raw):
@@ -211,7 +224,7 @@ def build(engine_package, source_inputs, output):
             for value in inputs), 'notice-output-exists-or-overlaps-input')
     original, original_identity, _ = runtime.load_receipt(engine_package / 'package-receipt.json')
     derivative = original['derivative']
-    require(derivative['sourcesLock'] == files.identity(SOURCE_LOCK), 'notice-engine-source-lock-is-not-current')
+    validate_source_selection(derivative)
     audit, audit_identity = load_audit()
     require(audit.get('serverRevision') == derivative['serverSource']['commit'], 'notice-audit-server-revision-mismatch')
     source_receipt, source_identity, manifest, captured = read_sources(source_inputs, derivative, audit, audit_identity)

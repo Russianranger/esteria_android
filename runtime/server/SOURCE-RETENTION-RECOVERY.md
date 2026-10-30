@@ -21,7 +21,10 @@ preparation and runs CMake configuration at the original absolute workspace
 paths with the same relevant compiler/development inputs. CMake may run compiler
 feature probes; no full server or reference target is compiled. Four missing
 generated metadata files must match their original identities, including the
-53 MB compile command list and CMake cache. Every other member must also match.
+53 MB compile command list and CMake cache. The original `revision.h` custom
+target's CMake script is replayed separately in its original script-mode context;
+the full build overwrites the configure-time header through that command. Every
+other member must also match.
 
 Only an exact match of all members **and the final compressed archive** permits
 publication. Original qualification/sealing receipts remain byte-identical; a

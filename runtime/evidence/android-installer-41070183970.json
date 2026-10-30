@@ -1,0 +1,68 @@
+{
+  "formatVersion": 1,
+  "scope": "android-13-x86_64-installer-and-apk-update",
+  "applicationRevision": "5cee3cd94392113af03677f43736d856df14f3e0",
+  "workflowRun": 41070183970,
+  "artifact": {
+    "id": 12983199521,
+    "bytes": 8153,
+    "sha256": "02dad4ac0772d3c6a5313ece2c70f41dce8e5bfaf63e55bba6c9eedd2b6363c1"
+  },
+  "qualificationJson": {
+    "bytes": 1528,
+    "sha256": "c10cab3e932c19dd136e7cde6c11be9c47330523986331472381367342fc993c"
+  },
+  "originalQualification": {
+    "formatVersion": 1,
+    "scope": "android-13-x86_64-installer-and-apk-update",
+    "emulatorProperties": {
+      "ro.kernel.qemu": "1",
+      "ro.build.version.sdk": "33",
+      "ro.product.cpu.abi": "x86_64",
+      "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys"
+    },
+    "artifacts": {
+      "initialApk": {
+        "bytes": 468051,
+        "sha256": "72c8dcdb15495ba260afa5fb79e849979fc976a95cc93f1cd17a1a64849faca3"
+      },
+      "updateApk": {
+        "bytes": 468047,
+        "sha256": "4b9455254b17fe4c7339e8ebd799c9ac7eb90af7642a7a83c47ac3e8af8e55dd"
+      },
+      "testApk": {
+        "bytes": 1746805,
+        "sha256": "037920fdab425508109befdcbe318e9c383ef22721a08fb6fc552be4f5cfbc39"
+      }
+    },
+    "runtimeContractGroups": 18,
+    "databaseHelperAssetContractGroups": 6,
+    "databaseHelperAssetsQualified": true,
+    "schemaHelperAssetContractGroups": 3,
+    "schemaHelperAssetsQualified": true,
+    "schemaSqlExecuted": false,
+    "installationHelperAssetFiles": 17,
+    "installationHelperAssetsQualified": true,
+    "installationSetupExecuted": false,
+    "databaseServiceExecuted": false,
+    "runtimeFilesystemQualified": true,
+    "sameJobDebugKeyUpdatePreservedRuntimeAndSentinel": true,
+    "privateLocalLoginHandoffFilesystemQualified": true,
+    "clientLoginExecuted": false,
+    "handoffHardLinkCreationPermitted": false,
+    "handoffMultiLinkNegativeExecuted": false,
+    "userSigningIdentityQualified": false,
+    "arm64GuestExecuted": false,
+    "gameplayQualified": false,
+    "completedAtUnix": 1793369917
+  },
+  "independentReadback": {
+    "zipMemberCount": 24,
+    "selectedMethodLogsPassed": true
+  },
+  "limitations": [
+    "Historical runtimeContractGroups=18 was a fixed value; source fixture contained19 groups. Later receipts observe the completed instrumentation count.",
+    "Android policy denied creating a hard link; multi-link negative was not executed on this emulator.",
+    "Seventeen helper assets were tested in this historical build; current eighteen-file inventory awaits its own Android run."
+  ]
+}
