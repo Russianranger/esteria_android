@@ -24,7 +24,7 @@ class AndroidInstallationX64Inputs(unittest.TestCase):
         self.root = Path(temporary.name)
         self.lock = self.root / 'selection.json'
         self.pending = dict(formatVersion=1, scope=inputs.SCOPE, repository='Russianranger/esteria_android',
-            enabled=False, state=inputs.PENDING, nativeSql=None, provider=None,
+            enabled=False, state=inputs.PENDING, nativeSql=None, provider=None, providerReadback=None,
             **{name: False for name in inputs.FALSE_FLAGS})
 
     def load(self, value, *, required=False):
@@ -197,7 +197,40 @@ class AndroidInstallationX64Inputs(unittest.TestCase):
         native_row['readback'] = save('runtime/evidence/synthetic-native-readback.json', observed)
         selected = dict(self.pending, enabled=True, state=inputs.MEASURED, nativeSql=native_row,
             provider=pin(b'independently measured synthetic descriptor metadata'))
+        selected['providerReadback']=save('runtime/evidence/synthetic-provider-readback.json',dict(
+            formatVersion=1,scope='independent-android-x64-installation-provider-readback',providerDescriptor=selected['provider'],
+            nativeSqlReceipt={key:native_row['qualification'][key] for key in ('bytes','sha256')},nativeInputSelection=pin(path.read_bytes()),
+            allPackagedProviderFilesReadBack=True,allProgramElfAndCapturedLibraryBytesReadBack=True,
+            fullOriginalSourcesAndPairedDebugReadBack=True,originalElfBytesUnchanged=True,invocationScriptsHaveSeparateIdentities=True,
+            **{name:False for name in inputs.FALSE_FLAGS}))
         return path, native, context, report, observed, selected
+
+    def test_native_qualified_provider_pending_allows_measurement_only(self):
+        path,native,context,report,observed,selected=self.measured()
+        selected.update(enabled=False,state=inputs.PROVIDER_PENDING,provider=None,providerReadback=None)
+        with patch.object(inputs,'ROOT',self.root),patch.object(inputs.native,'LOCK',path),\
+                patch.object(inputs.native,'load_pin',return_value=native),patch.object(inputs,'_context',return_value=context):
+            self.lock.write_text(json.dumps(selected))
+            with patch.object(inputs,'LOCK',self.lock):
+                self.assertEqual(inputs.load_pin(require_native=True),selected)
+                with self.assertRaisesRegex(ValueError,'measured-native-sql-and-provider-required'):
+                    inputs.load_pin(require_enabled=True)
+        with patch.object(inputs,'LOCK',self.lock),patch.object(inputs.native,'load_pin') as admission:
+            self.lock.write_text(json.dumps(self.pending))
+            with self.assertRaisesRegex(ValueError,'native-sql-measurement-required'):inputs.load_pin(require_native=True)
+            admission.assert_not_called()
+
+    def test_provider_self_hash_without_independent_readback_cannot_enable_execution(self):
+        path,native,context,report,observed,selected=self.measured()
+        value=self.root/selected['providerReadback']['path'];record=json.loads(value.read_bytes())
+        for key in ('providerDescriptor','fullOriginalSourcesAndPairedDebugReadBack','originalElfBytesUnchanged','gameplayQualified'):
+            changed=copy.deepcopy(record)
+            changed[key]={'bytes':1,'sha256':'0'*64} if key=='providerDescriptor' else not changed[key]
+            raw=json.dumps(changed).encode();value.write_bytes(raw);candidate=copy.deepcopy(selected);candidate['providerReadback'].update(pin(raw))
+            with self.subTest(key=key),patch.object(inputs,'ROOT',self.root),patch.object(inputs.native,'LOCK',path),\
+                    patch.object(inputs.native,'load_pin',return_value=native),patch.object(inputs,'_context',return_value=context),\
+                    self.assertRaisesRegex(ValueError,'independent-provider-readback-required'):
+                self.load(candidate,required=True)
 
     def test_future_measured_schema_requires_underlying_enabled_admission_and_exact_readback(self):
         path, native, context, report, observed, selected = self.measured()

@@ -56,8 +56,37 @@ if (installationProbeProvider) {
         }
     }
     if (actual != wanted) throw new GradleException('Installation probe provider file closure differs')
+    // The original standalone verifier deliberately compares its runtime receipt
+    // with current Java sources. This new profile reuses only the exact frozen
+    // runtime recipe, while its own current app/provider/SQL gate stays separate.
+    def frozenSource = providers.gradleProperty('serverInstallationProbeFrozenSourceDir').orNull
+    if (!frozenSource) throw new GradleException('Installation probe requires the exact frozen MySQL consumer source checkout')
+    tasks.named('verifyMysqlProbeProvider', Exec).configure {
+        commandLine 'python3','tools/provider_android_installation_x64.py','verify-external',
+            '--provider',provider.absolutePath,'--frozen-source',file(frozenSource).canonicalPath,
+            '--mysql-provider',file(providers.gradleProperty('mysqlProbeProviderDir').get()).canonicalPath,
+            '--proot-provider',file(providers.gradleProperty('prootProbeProviderDir').get()).canonicalPath
+    }
     androidComponents.beforeVariants(androidComponents.selector().withBuildType('release')) { variant -> variant.enable = false }
     android.sourceSets.main.assets.srcDir(new File(provider,'assets'))
 }
 android.defaultConfig.buildConfigField 'boolean','SERVER_INSTALLATION_PROBE_PACKAGED',installationProbeProvider ? 'true' : 'false'
 android.defaultConfig.buildConfigField 'String','SERVER_INSTALLATION_PROBE_PIN','"' + installationProbePin + '"'
+
+// Host-only real lifetime/lease fixture. It compiles the same test-only owner,
+// and never includes that owner in the production APK.
+def installationLifetimeClasspath=files(project(':core').layout.buildDirectory.dir('classes/java/main'))
+def compileInstallationLifetime=tasks.register('compileInstallationX64LifetimeFixture',JavaCompile) {
+    dependsOn ':core:classes'
+    source file('src/androidTest/java/io/github/russianranger/esteria/runtime/InstallationX64Lifetime.java')
+    source file('src/test/java/io/github/russianranger/esteria/runtime/InstallationX64LifetimeTests.java')
+    classpath=installationLifetimeClasspath
+    destinationDirectory=layout.buildDirectory.dir('installationX64LifetimeFixture')
+    sourceCompatibility='17';targetCompatibility='17'
+}
+tasks.register('installationX64LifetimeTest',JavaExec) {
+    dependsOn compileInstallationLifetime
+    classpath=files(compileInstallationLifetime.flatMap{it.destinationDirectory})+installationLifetimeClasspath
+    mainClass='io.github.russianranger.esteria.runtime.InstallationX64LifetimeTests'
+    maxHeapSize='32m'
+}

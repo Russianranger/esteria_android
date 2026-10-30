@@ -1,0 +1,158 @@
+{
+  "actualHostLifetimeGroups": 2,
+  "boundaries": {
+    "androidExecuted": false,
+    "androidMeasuredSelectionsAllNull": true,
+    "arm64Qualified": false,
+    "botAiExecuted": false,
+    "currentAndroidExecutionReceiptSeparatelyRequired": true,
+    "currentSelectedCodeBytesMustEqualRecipeP": true,
+    "defaultGateDisabled": true,
+    "exactOriginalCompleteSourceZipReadbackImplemented": true,
+    "frozen817VerifierOnly": true,
+    "gameplayQualified": false,
+    "historicalJavaProofAppliedToCurrentCaller": false,
+    "liveCleanupKeepsFixtureOwnerAndLease": true,
+    "nativeSqlExecuted": false,
+    "observerReapRequiredBeforeDatabaseAndCoordinatorCleanup": true,
+    "positiveProviderConstructed": false,
+    "productionArmAdmissionChanged": false,
+    "productionMainSourcesChanged": false,
+    "providerRecipePAndActivationQMayDifferInMetadataOnly": true,
+    "retainsObserverBeforeWait": true,
+    "standaloneMysqlCurrentSourceGuardChanged": false,
+    "thorQualified": false,
+    "worldserverExecuted": false
+  },
+  "formatVersion": 1,
+  "hostLifetimeBackend": "delayed opaque OwnedProcess.Backend; no SQL or JNI execution",
+  "hostLifetimeHeapMiB": 32,
+  "integrationRevisionBeforeUncommittedImplementation": "02f65872b5205b638e9dcb2f0e7ed3edc3b9715e",
+  "python": {
+    "output": {
+      "bytes": 187,
+      "sha256": "ef60f70e9834269a15f5e0cc59f31712debd5d86376fa08f2ad3bbbc968769ba"
+    },
+    "passed": 88,
+    "seconds": 7.857,
+    "sharedExistingInstallationAndPlayerbotsFixturesRetained": true,
+    "suites": [
+      "tests.test_android_installation_x64_provider",
+      "tests.test_android_installation_x64_inputs",
+      "tests.test_android_installation_x64_entry",
+      "tests.test_android_server_installation_setup",
+      "tests.test_runtime_playerbots_setup",
+      "tests.test_server_setup_x64_sql_inputs",
+      "tests.test_server_setup_x64_sql"
+    ],
+    "syntheticReceiptAndElfFixturesOnly": true,
+    "tests": 88
+  },
+  "remaining": [
+    "No actual native x64 four-schema SQL receipt is selected.",
+    "No positive provider archive/descriptor or independent provider readback has been measured.",
+    "Android fixture execution workflow and measured provider acquisition remain to implement after actual inputs.",
+    "No client/game content/world/controller/bot gameplay qualification is established by this fixture."
+  ],
+  "scope": "android-x64-installation-disabled-fixture-implementation-host-only",
+  "sdk": {
+    "earlierAndroidTestCompilePrivacyFix": {
+      "actualSdkCommand": true,
+      "executed": 9,
+      "log": {
+        "bytes": 2233,
+        "sha256": "9d960de753e2a4c1e1d5b87bc8274373c43082175a18124040b399eec460c810"
+      },
+      "seconds": 11,
+      "success": true,
+      "tasks": 37
+    },
+    "earlierLint": {
+      "actualSdkCommand": true,
+      "executed": 8,
+      "log": {
+        "bytes": 2300,
+        "sha256": "76d1cfbe2addb4ba59ccab74e914d6461c4f91dd148072a4fe7e0c608e7b6288"
+      },
+      "seconds": 21,
+      "success": true,
+      "tasks": 37
+    },
+    "finalLifetimeAndAndroidTestCompileAndLint": {
+      "actualSdkCommand": true,
+      "executed": 3,
+      "log": {
+        "bytes": 3116,
+        "sha256": "c65ef081e9b9e7f80fa3612ab0787c862b3a580bdfcce0db3bba8bbe7cfc936b"
+      },
+      "seconds": 17,
+      "success": true,
+      "tasks": 48
+    },
+    "pendingProfileRefusal": {
+      "actualSdkCommand": true,
+      "executed": null,
+      "log": {
+        "bytes": 1804,
+        "sha256": "16ba38e020c4df373b146e1141867ef576df93853e4aaecea57723c0b11c67a5"
+      },
+      "seconds": 6,
+      "success": false,
+      "tasks": null
+    }
+  },
+  "sourceFiles": {
+    "app/server-installation-probe.gradle": {
+      "bytes": 6673,
+      "sha256": "97a5c21574c8aea9a188b69fcb1e192f8e836c1c642d36401cfb7d98abec990e"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/runtime/InstallationX64Inputs.java": {
+      "bytes": 19116,
+      "sha256": "5880374edfaa33e5536c89d5389992ecc09d339f2cfec79ba353b86d0eb9fd40"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/runtime/InstallationX64Lifetime.java": {
+      "bytes": 3468,
+      "sha256": "fe1ddbaf940aa3df58a4dd3c5fe38ca6460fe9237f2867337365d126a2eb918d"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/runtime/ServerInstallationX64Test.java": {
+      "bytes": 14184,
+      "sha256": "b7137496949ede0e3beb5786b8747eb03d64e3d49a8f19e3de414106af1e3ab8"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/runtime/InstallationX64LifetimeTests.java": {
+      "bytes": 5179,
+      "sha256": "e56e4f45e9b027dbd3e26f1e9c1bf1994650fb9b00fa551408860277157e4b48"
+    },
+    "runtime/mysql-probe/ANDROID-INSTALLATION-X64-PLAN.md": {
+      "bytes": 11995,
+      "sha256": "0ff469c77ab54675bc008198c337bc59727021aaadbe662491f60dcb43bbb4f4"
+    },
+    "runtime/mysql-probe/android-installation-x64-inputs.lock.json": {
+      "bytes": 594,
+      "sha256": "ebd60c3e6952df36de945d9b999aa36363158df74bd3de1d46bf12d09449ab2e"
+    },
+    "tests/android-installation-x64/installation_x64_entry.py": {
+      "bytes": 25931,
+      "sha256": "f0af3e47709300b31e4ac94c943a3129bf8b4e9853b9065f1d7de12f72fd7ae7"
+    },
+    "tests/test_android_installation_x64_entry.py": {
+      "bytes": 19992,
+      "sha256": "84696f5dcc65b9e6386fabaf0a560075adf1a0227b09dd375527f65d5c43b964"
+    },
+    "tests/test_android_installation_x64_inputs.py": {
+      "bytes": 21213,
+      "sha256": "e95048b213037e48fa0c596ef057d564583e11725741312a30bc7b5a557ad005"
+    },
+    "tests/test_android_installation_x64_provider.py": {
+      "bytes": 18438,
+      "sha256": "967683c1445db0613b36ed2957f3fc8eb4e8d29e832e2b723d6db56780b0fc9a"
+    },
+    "tools/android_installation_x64_inputs.py": {
+      "bytes": 17117,
+      "sha256": "1bca504ba1740cbda7ff86b5d5b6bacdf7eb64d1012d02409c7e1a71676837f9"
+    },
+    "tools/provider_android_installation_x64.py": {
+      "bytes": 38848,
+      "sha256": "77c59fd5f085f39dc5b23c944329b9b90fd09ed22ec7e4d5a60ba8ecb46d7c57"
+    }
+  }
+}

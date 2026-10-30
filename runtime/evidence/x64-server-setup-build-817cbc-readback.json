@@ -1,0 +1,865 @@
+{
+  "actualBuildReceipt": {
+    "actualCompileSucceeded": true,
+    "actualPlayerbotsCompileInputs": {
+      "bytes": 39177988,
+      "sha256": "1d5b31f9b4551d451f9b9fd6ea80fda853fdf39c46c946ae1d3c684cac744e0c"
+    },
+    "androidRuntimeQualified": false,
+    "buildNetwork": {
+      "externalNetworkingAvailable": false,
+      "interfaces": [
+        "lo"
+      ]
+    },
+    "compileCommands": {
+      "bytes": 39177988,
+      "sha256": "1d5b31f9b4551d451f9b9fd6ea80fda853fdf39c46c946ae1d3c684cac744e0c"
+    },
+    "compiler": {
+      "identity": {
+        "bytes": 1027128,
+        "sha256": "1353e9bdd29a7295c7226bf6c63abccce056d8cac31f112e5cdbecc3f28c2769"
+      },
+      "version": "x86_64-linux-gnu-g++-13 (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n"
+    },
+    "compilerLaunchers": {
+      "CMAKE_CXX_COMPILER_LAUNCHER": "",
+      "CMAKE_C_COMPILER_LAUNCHER": ""
+    },
+    "correspondingSourcesCaptured": false,
+    "dbimportSqlQualified": false,
+    "executables": {
+      "dbimport": {
+        "bytes": 1862240,
+        "debugFile": "debug/dbimport.debug",
+        "elf": {
+          "elfClass": 2,
+          "interpreter": "/lib64/ld-linux-x86-64.so.2",
+          "loadSegments": 4,
+          "machine": 62
+        },
+        "original": {
+          "bytes": 27024728,
+          "sha256": "1ae159d4f42ce6df6a7af4efaeeb8588641af75e475de0c9dcecf474248f0913"
+        },
+        "originalFile": "originals/dbimport",
+        "pairedDebug": {
+          "bytes": 25562104,
+          "sha256": "0ceea8acfda67f61ce29fe6d192ac23da814b2a276ebdda54c9dcdc6084f3098"
+        },
+        "sha256": "d7ca8295d99f90a1c8ec26dffcd39d36037e2fe9231f97578fd30992c6430948"
+      },
+      "playerbots-schema": {
+        "bytes": 1755704,
+        "debugFile": "debug/playerbots-schema.debug",
+        "elf": {
+          "elfClass": 2,
+          "interpreter": "/lib64/ld-linux-x86-64.so.2",
+          "loadSegments": 4,
+          "machine": 62
+        },
+        "original": {
+          "bytes": 25515104,
+          "sha256": "406cded3b0fae689914a4abd882a6ddfbbd7367d26d5e4dcbac2d1f6d671e6fc"
+        },
+        "originalFile": "originals/playerbots-schema",
+        "pairedDebug": {
+          "bytes": 24134456,
+          "sha256": "3605bd21a0349eb8cb45eaec85dd73382b6ec6a28cf7ce9b5a7eb425331502ac"
+        },
+        "sha256": "57c90150262ab7b79e17ab5f780ce058b3b29d12ca00d7ce3f59eec0e0fd102c"
+      }
+    },
+    "formatVersion": 1,
+    "fourSchemaCoordinatorQualified": false,
+    "gameplayQualified": false,
+    "hostPackages": "adduser\t3.137ubuntu1\napt\t2.8.3\nautoconf\t2.71-3\nautomake\t1:1.16.5-1.3ubuntu1\nautotools-dev\t20220109.1\nbase-files\t13ubuntu10.5\nbase-passwd\t3.6.3build1\nbash\t5.2.21-2ubuntu4\nbinutils\t2.42-4ubuntu2.10\nbinutils-common:amd64\t2.42-4ubuntu2.10\nbinutils-x86-64-linux-gnu\t2.42-4ubuntu2.10\nbsdutils\t1:2.39.3-9ubuntu6.6\nca-certificates\t20260816ubuntu0.24.04.1\ncmake\t3.28.3-1build7\ncmake-data\t3.28.3-1build7\ncoreutils\t9.4-3ubuntu6.3\ncpp\t4:13.2.0-7ubuntu1\ncpp-13\t13.3.0-6ubuntu2~24.04.1\ncpp-13-x86-64-linux-gnu\t13.3.0-6ubuntu2~24.04.1\ncpp-x86-64-linux-gnu\t4:13.2.0-7ubuntu1\ndash\t0.5.12-6ubuntu5\ndebconf\t1.5.86ubuntu1\ndebianutils\t5.17build1\ndiffutils\t1:3.10-1ubuntu0.1\ndpkg\t1.22.6ubuntu6.6\ne2fsprogs\t1.47.0-2.4~exp1ubuntu4.1\nfindutils\t4.9.0-5build1\ng++\t4:13.2.0-7ubuntu1\ng++-13\t13.3.0-6ubuntu2~24.04.1\ng++-13-x86-64-linux-gnu\t13.3.0-6ubuntu2~24.04.1\ng++-x86-64-linux-gnu\t4:13.2.0-7ubuntu1\ngcc\t4:13.2.0-7ubuntu1\ngcc-13\t13.3.0-6ubuntu2~24.04.1\ngcc-13-base:amd64\t13.3.0-6ubuntu2~24.04.1\ngcc-13-x86-64-linux-gnu\t13.3.0-6ubuntu2~24.04.1\ngcc-14-base:amd64\t14.2.0-4ubuntu2~24.04.1\ngcc-x86-64-linux-gnu\t4:13.2.0-7ubuntu1\ngfortran-13\t13.3.0-6ubuntu2~24.04.1\ngfortran-13-x86-64-linux-gnu\t13.3.0-6ubuntu2~24.04.1\ngit\t1:2.43.0-1ubuntu7.4\ngit-man\t1:2.43.0-1ubuntu7.4\ngpgv\t2.4.4-2ubuntu17.6\ngrep\t3.11-4build1\ngzip\t1.12-1ubuntu3.2\nhostname\t3.23+nmu2ubuntu2\nibverbs-providers:amd64\t50.0-2ubuntu0.2\nicu-devtools\t74.2-1ubuntu3.1\ninit-system-helpers\t1.66ubuntu1\nlibacl1:amd64\t2.3.2-1build1.1\nlibamd-comgr2:amd64\t6.0+git20231212.4510c28+dfsg-3build2\nlibamdhip64-5\t5.7.1-3\nlibapt-pkg6.0t64:amd64\t2.8.3\nlibarchive13t64:amd64\t3.7.2-2ubuntu0.9\nlibasan8:amd64\t14.2.0-4ubuntu2~24.04.1\nlibassuan0:amd64\t2.5.6-1build1\nlibatomic1:amd64\t14.2.0-4ubuntu2~24.04.1\nlibattr1:amd64\t1:2.5.2-1ubuntu0.1\nlibaudit-common\t1:3.1.2-2.1ubuntu0.1\nlibaudit1:amd64\t1:3.1.2-2.1ubuntu0.1\nlibbinutils:amd64\t2.42-4ubuntu2.10\nlibblkid1:amd64\t2.39.3-9ubuntu6.6\nlibboost-all-dev\t1.83.0.1ubuntu2\nlibboost-atomic-dev:amd64\t1.83.0.1ubuntu2\nlibboost-atomic1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-atomic1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-chrono-dev:amd64\t1.83.0.1ubuntu2\nlibboost-chrono1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-chrono1.83.0t64:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-container-dev:amd64\t1.83.0.1ubuntu2\nlibboost-container1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-container1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-context-dev:amd64\t1.83.0.1ubuntu2\nlibboost-context1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-context1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-coroutine-dev:amd64\t1.83.0.1ubuntu2\nlibboost-coroutine1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-coroutine1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-date-time-dev:amd64\t1.83.0.1ubuntu2\nlibboost-date-time1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-date-time1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-dev:amd64\t1.83.0.1ubuntu2\nlibboost-exception-dev:amd64\t1.83.0.1ubuntu2\nlibboost-exception1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-fiber-dev:amd64\t1.83.0.1ubuntu2\nlibboost-fiber1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-fiber1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-filesystem-dev:amd64\t1.83.0.1ubuntu2\nlibboost-filesystem1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-filesystem1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-graph-dev:amd64\t1.83.0.1ubuntu2\nlibboost-graph-parallel-dev\t1.83.0.1ubuntu2\nlibboost-graph-parallel1.83-dev\t1.83.0-2.1ubuntu3.2\nlibboost-graph-parallel1.83.0\t1.83.0-2.1ubuntu3.2\nlibboost-graph1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-graph1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-iostreams-dev:amd64\t1.83.0.1ubuntu2\nlibboost-iostreams1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-iostreams1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-json-dev:amd64\t1.83.0.1ubuntu2\nlibboost-json1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-json1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-locale-dev:amd64\t1.83.0.1ubuntu2\nlibboost-locale1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-locale1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-log-dev\t1.83.0.1ubuntu2\nlibboost-log1.83-dev\t1.83.0-2.1ubuntu3.2\nlibboost-log1.83.0\t1.83.0-2.1ubuntu3.2\nlibboost-math-dev:amd64\t1.83.0.1ubuntu2\nlibboost-math1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-math1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-mpi-dev\t1.83.0.1ubuntu2\nlibboost-mpi-python-dev\t1.83.0.1ubuntu2\nlibboost-mpi-python1.83-dev\t1.83.0-2.1ubuntu3.2\nlibboost-mpi-python1.83.0\t1.83.0-2.1ubuntu3.2\nlibboost-mpi1.83-dev\t1.83.0-2.1ubuntu3.2\nlibboost-mpi1.83.0\t1.83.0-2.1ubuntu3.2\nlibboost-nowide-dev\t1.83.0.1ubuntu2\nlibboost-nowide1.83-dev\t1.83.0-2.1ubuntu3.2\nlibboost-nowide1.83.0\t1.83.0-2.1ubuntu3.2\nlibboost-numpy-dev\t1.83.0.1ubuntu2\nlibboost-numpy1.83-dev\t1.83.0-2.1ubuntu3.2\nlibboost-numpy1.83.0\t1.83.0-2.1ubuntu3.2\nlibboost-program-options-dev:amd64\t1.83.0.1ubuntu2\nlibboost-program-options1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-program-options1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-python-dev\t1.83.0.1ubuntu2\nlibboost-python1.83-dev\t1.83.0-2.1ubuntu3.2\nlibboost-python1.83.0\t1.83.0-2.1ubuntu3.2\nlibboost-random-dev:amd64\t1.83.0.1ubuntu2\nlibboost-random1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-random1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-regex-dev:amd64\t1.83.0.1ubuntu2\nlibboost-regex1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-regex1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-serialization-dev:amd64\t1.83.0.1ubuntu2\nlibboost-serialization1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-serialization1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-stacktrace-dev:amd64\t1.83.0.1ubuntu2\nlibboost-stacktrace1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-stacktrace1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-system-dev:amd64\t1.83.0.1ubuntu2\nlibboost-system1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-system1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-test-dev:amd64\t1.83.0.1ubuntu2\nlibboost-test1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-test1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-thread-dev:amd64\t1.83.0.1ubuntu2\nlibboost-thread1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-thread1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-timer-dev:amd64\t1.83.0.1ubuntu2\nlibboost-timer1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-timer1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-tools-dev\t1.83.0.1ubuntu2\nlibboost-type-erasure-dev:amd64\t1.83.0.1ubuntu2\nlibboost-type-erasure1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-type-erasure1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-url-dev:amd64\t1.83.0.1ubuntu2\nlibboost-url1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-url1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-wave-dev:amd64\t1.83.0.1ubuntu2\nlibboost-wave1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost-wave1.83.0:amd64\t1.83.0-2.1ubuntu3.2\nlibboost1.83-dev:amd64\t1.83.0-2.1ubuntu3.2\nlibboost1.83-tools-dev\t1.83.0-2.1ubuntu3.2\nlibbrotli1:amd64\t1.1.0-2ubuntu0.1\nlibbsd0:amd64\t0.12.1-1build1.1\nlibbz2-1.0:amd64\t1.0.8-5.1ubuntu0.1\nlibbz2-dev:amd64\t1.0.8-5.1ubuntu0.1\nlibc-bin\t2.39-0ubuntu8.9\nlibc-dev-bin\t2.39-0ubuntu8.9\nlibc6:amd64\t2.39-0ubuntu8.9\nlibc6-dev:amd64\t2.39-0ubuntu8.9\nlibcap-ng0:amd64\t0.8.4-2build2\nlibcap2:amd64\t1:2.66-5ubuntu2.4\nlibcbor0.10:amd64\t0.10.2-1.2ubuntu2\nlibcc1-0:amd64\t14.2.0-4ubuntu2~24.04.1\nlibcom-err2:amd64\t1.47.0-2.4~exp1ubuntu4.1\nlibcrypt-dev:amd64\t1:4.4.36-4build1\nlibcrypt1:amd64\t1:4.4.36-4build1\nlibctf-nobfd0:amd64\t2.42-4ubuntu2.10\nlibctf0:amd64\t2.42-4ubuntu2.10\nlibcurl3t64-gnutls:amd64\t8.5.0-2ubuntu10.16\nlibcurl4t64:amd64\t8.5.0-2ubuntu10.16\nlibdb5.3t64:amd64\t5.3.28+dfsg2-7\nlibdebconfclient0:amd64\t0.271ubuntu3\nlibdrm-amdgpu1:amd64\t2.4.125-1ubuntu0.1~24.04.2\nlibdrm-common\t2.4.125-1ubuntu0.1~24.04.2\nlibdrm2:amd64\t2.4.125-1ubuntu0.1~24.04.2\nlibedit2:amd64\t3.1-20230828-1build1\nlibelf1t64:amd64\t0.190-1.1ubuntu0.1\nliberror-perl\t0.17029-2\nlibevent-2.1-7t64:amd64\t2.1.12-stable-9ubuntu2.2\nlibevent-core-2.1-7t64:amd64\t2.1.12-stable-9ubuntu2.2\nlibevent-dev\t2.1.12-stable-9ubuntu2.2\nlibevent-extra-2.1-7t64:amd64\t2.1.12-stable-9ubuntu2.2\nlibevent-openssl-2.1-7t64:amd64\t2.1.12-stable-9ubuntu2.2\nlibevent-pthreads-2.1-7t64:amd64\t2.1.12-stable-9ubuntu2.2\nlibexpat1:amd64\t2.6.1-2ubuntu0.6\nlibexpat1-dev:amd64\t2.6.1-2ubuntu0.6\nlibext2fs2t64:amd64\t1.47.0-2.4~exp1ubuntu4.1\nlibfabric1:amd64\t1.17.0-3build2\nlibffi8:amd64\t3.4.6-1build1\nlibfido2-1:amd64\t1.14.0-1build3\nlibgcc-13-dev:amd64\t13.3.0-6ubuntu2~24.04.1\nlibgcc-s1:amd64\t14.2.0-4ubuntu2~24.04.1\nlibgcrypt20:amd64\t1.10.3-2ubuntu0.2\nlibgdbm-compat4t64:amd64\t1.23-5.1build1\nlibgdbm6t64:amd64\t1.23-5.1build1\nlibgfortran-13-dev:amd64\t13.3.0-6ubuntu2~24.04.1\nlibgfortran5:amd64\t14.2.0-4ubuntu2~24.04.1\nlibgmp10:amd64\t2:6.3.0+dfsg-2ubuntu6.1\nlibgnutls30t64:amd64\t3.8.3-1.1ubuntu3.6\nlibgomp1:amd64\t14.2.0-4ubuntu2~24.04.1\nlibgpg-error0:amd64\t1.47-3build2.1\nlibgprofng0:amd64\t2.42-4ubuntu2.10\nlibgssapi-krb5-2:amd64\t1.20.1-6ubuntu2.10\nlibhogweed6t64:amd64\t3.9.1-2.2build1.1\nlibhsa-runtime64-1\t5.7.1-2build1\nlibhsakmt1:amd64\t5.7.0-1build1\nlibhwasan0:amd64\t14.2.0-4ubuntu2~24.04.1\nlibhwloc-dev:amd64\t2.10.0-1build1\nlibhwloc-plugins:amd64\t2.10.0-1build1\nlibhwloc15:amd64\t2.10.0-1build1\nlibibverbs-dev:amd64\t50.0-2ubuntu0.2\nlibibverbs1:amd64\t50.0-2ubuntu0.2\nlibicu-dev:amd64\t74.2-1ubuntu3.1\nlibicu74:amd64\t74.2-1ubuntu3.1\nlibidn2-0:amd64\t2.3.7-2build1.1\nlibisl23:amd64\t0.26-3build1.1\nlibitm1:amd64\t14.2.0-4ubuntu2~24.04.1\nlibjansson4:amd64\t2.14-2build2\nlibjs-jquery\t3.6.1+dfsg+~3.5.14-1\nlibjs-jquery-ui\t1.13.2+dfsg-1\nlibjs-sphinxdoc\t7.2.6-6\nlibjs-underscore\t1.13.4~dfsg+~1.11.4-3\nlibjsoncpp25:amd64\t1.9.5-6build1\nlibk5crypto3:amd64\t1.20.1-6ubuntu2.10\nlibkeyutils1:amd64\t1.6.3-3build1\nlibkrb5-3:amd64\t1.20.1-6ubuntu2.10\nlibkrb5support0:amd64\t1.20.1-6ubuntu2.10\nlibldap2:amd64\t2.6.10+dfsg-0ubuntu0.24.04.1\nlibllvm17t64:amd64\t1:17.0.6-9ubuntu1\nliblsan0:amd64\t14.2.0-4ubuntu2~24.04.1\nlibltdl-dev:amd64\t2.4.7-7build1\nlibltdl7:amd64\t2.4.7-7build1\nliblz4-1:amd64\t1.9.4-1build1.1\nliblzma5:amd64\t5.6.1+really5.4.5-1ubuntu0.4\nlibmd0:amd64\t1.1.0-2build1.1\nlibmount1:amd64\t2.39.3-9ubuntu6.6\nlibmpc3:amd64\t1.3.1-1build1.1\nlibmpfr6:amd64\t4.2.1-1build1.1\nlibmunge2:amd64\t0.5.15-4ubuntu0.1\nlibmysqlclient-dev\t8.0.46-0ubuntu0.24.04.4\nlibmysqlclient21:amd64\t8.0.46-0ubuntu0.24.04.4\nlibncurses-dev:amd64\t6.4+20240113-1ubuntu2.2\nlibncurses6:amd64\t6.4+20240113-1ubuntu2.2\nlibncursesw6:amd64\t6.4+20240113-1ubuntu2.2\nlibnettle8t64:amd64\t3.9.1-2.2build1.1\nlibnghttp2-14:amd64\t1.59.0-1ubuntu0.4\nlibnl-3-200:amd64\t3.7.0-0.3build1.1\nlibnl-3-dev:amd64\t3.7.0-0.3build1.1\nlibnl-route-3-200:amd64\t3.7.0-0.3build1.1\nlibnl-route-3-dev:amd64\t3.7.0-0.3build1.1\nlibnpth0t64:amd64\t1.6-3.1build1\nlibnuma-dev:amd64\t2.0.18-1ubuntu0.24.04.1\nlibnuma1:amd64\t2.0.18-1ubuntu0.24.04.1\nlibopenmpi-dev:amd64\t4.1.6-7ubuntu2\nlibopenmpi3t64:amd64\t4.1.6-7ubuntu2\nlibp11-kit0:amd64\t0.25.3-4ubuntu2.2\nlibpam-modules:amd64\t1.5.3-5ubuntu5.7\nlibpam-modules-bin\t1.5.3-5ubuntu5.7\nlibpam-runtime\t1.5.3-5ubuntu5.7\nlibpam0g:amd64\t1.5.3-5ubuntu5.7\nlibpciaccess0:amd64\t0.17-3ubuntu0.24.04.3\nlibpcre2-8-0:amd64\t10.42-4ubuntu2.1\nlibperl5.38t64:amd64\t5.38.2-3.2ubuntu0.6\nlibpmix-dev:amd64\t5.0.1-4.1build1\nlibpmix2t64:amd64\t5.0.1-4.1build1\nlibproc2-0:amd64\t2:4.0.4-4ubuntu3.3\nlibpsl5t64:amd64\t0.21.2-1.1build1\nlibpsm-infinipath1\t3.3+20.604758e7-6.3build1\nlibpsm2-2\t11.2.185-2build1\nlibpython3-dev:amd64\t3.12.3-0ubuntu2.1\nlibpython3-stdlib:amd64\t3.12.3-0ubuntu2.1\nlibpython3.12-dev:amd64\t3.12.3-1ubuntu0.17\nlibpython3.12-minimal:amd64\t3.12.3-1ubuntu0.17\nlibpython3.12-stdlib:amd64\t3.12.3-1ubuntu0.17\nlibpython3.12t64:amd64\t3.12.3-1ubuntu0.17\nlibquadmath0:amd64\t14.2.0-4ubuntu2~24.04.1\nlibrdmacm1t64:amd64\t50.0-2ubuntu0.2\nlibreadline-dev:amd64\t8.2-4build1\nlibreadline8t64:amd64\t8.2-4build1\nlibrhash0:amd64\t1.4.3-3build1\nlibrtmp1:amd64\t2.4+20151223.gitfa8646d.1-2build7\nlibsasl2-2:amd64\t2.1.28+dfsg1-5ubuntu3.1\nlibsasl2-modules-db:amd64\t2.1.28+dfsg1-5ubuntu3.1\nlibseccomp2:amd64\t2.5.5-1ubuntu3.1\nlibselinux1:amd64\t3.5-2ubuntu2.1\nlibsemanage-common\t3.5-1build5\nlibsemanage2:amd64\t3.5-1build5\nlibsepol2:amd64\t3.5-2build1\nlibsframe1:amd64\t2.42-4ubuntu2.10\nlibsmartcols1:amd64\t2.39.3-9ubuntu6.6\nlibsqlite3-0:amd64\t3.45.1-1ubuntu2.8\nlibss2:amd64\t1.47.0-2.4~exp1ubuntu4.1\nlibssh-4:amd64\t0.10.6-2ubuntu0.5\nlibssl-dev:amd64\t3.0.13-0ubuntu3.16\nlibssl3t64:amd64\t3.0.13-0ubuntu3.16\nlibstdc++-13-dev:amd64\t13.3.0-6ubuntu2~24.04.1\nlibstdc++6:amd64\t14.2.0-4ubuntu2~24.04.1\nlibsystemd0:amd64\t255.4-1ubuntu8.18\nlibtasn1-6:amd64\t4.19.0-3ubuntu0.24.04.2\nlibtinfo6:amd64\t6.4+20240113-1ubuntu2.2\nlibtsan2:amd64\t14.2.0-4ubuntu2~24.04.1\nlibubsan1:amd64\t14.2.0-4ubuntu2~24.04.1\nlibucx0:amd64\t1.16.0+ds-5ubuntu1\nlibudev1:amd64\t255.4-1ubuntu8.18\nlibunistring5:amd64\t1.1-2build1.1\nlibuuid1:amd64\t2.39.3-9ubuntu6.6\nlibuv1t64:amd64\t1.48.0-1.1build1\nlibx11-6:amd64\t2:1.8.7-1ubuntu0.1\nlibx11-data\t2:1.8.7-1ubuntu0.1\nlibxau6:amd64\t1:1.0.9-1build6\nlibxcb1:amd64\t1.15-1ubuntu2\nlibxdmcp6:amd64\t1:1.1.3-0ubuntu6\nlibxext6:amd64\t2:1.3.4-1build2\nlibxml2:amd64\t2.9.14+dfsg-1.3ubuntu3.10\nlibxnvctrl0:amd64\t510.47.03-0ubuntu4.24.04.1\nlibxxhash0:amd64\t0.8.2-2build1\nlibzstd-dev:amd64\t1.5.5+dfsg2-2build1.1\nlibzstd1:amd64\t1.5.5+dfsg2-2build1.1\nlinux-libc-dev:amd64\t6.8.0-147.147\nlogin\t1:4.13+dfsg1-4ubuntu3.2\nlogsave\t1.47.0-2.4~exp1ubuntu4.1\nm4\t1.4.19-4build1\nmawk\t1.3.4.20240123-1build1\nmedia-types\t10.1.0\nmount\t2.39.3-9ubuntu6.6\nmpi-default-bin\t1.15build1\nmpi-default-dev\t1.15build1\nmysql-common\t5.8+1.1.0build1\nncurses-base\t6.4+20240113-1ubuntu2.2\nncurses-bin\t6.4+20240113-1ubuntu2.2\nnetbase\t6.4\nninja-build\t1.11.1-2\nocl-icd-libopencl1:amd64\t2.3.2-1build1\nopenmpi-bin\t4.1.6-7ubuntu2\nopenmpi-common\t4.1.6-7ubuntu2\nopenssh-client\t1:9.6p1-3ubuntu13.20\nopenssl\t3.0.13-0ubuntu3.16\npasswd\t1:4.13+dfsg1-4ubuntu3.2\nperl\t5.38.2-3.2ubuntu0.6\nperl-base\t5.38.2-3.2ubuntu0.6\nperl-modules-5.38\t5.38.2-3.2ubuntu0.6\nprocps\t2:4.0.4-4ubuntu3.3\npython3\t3.12.3-0ubuntu2.1\npython3-dev\t3.12.3-0ubuntu2.1\npython3-minimal\t3.12.3-0ubuntu2.1\npython3.12\t3.12.3-1ubuntu0.17\npython3.12-dev\t3.12.3-1ubuntu0.17\npython3.12-minimal\t3.12.3-1ubuntu0.17\nreadline-common\t8.2-4build1\nrpcsvc-proto\t1.4.2-0ubuntu7\nsed\t4.9-2ubuntu0.24.04.1\nsensible-utils\t0.0.22\nsysvinit-utils\t3.08-6ubuntu3\ntar\t1.35+dfsg-3ubuntu0.4\ntzdata\t2026e-0ubuntu0.24.04.1\nubuntu-keyring\t2023.11.28.1\nunminimize\t0.2.1\nutil-linux\t2.39.3-9ubuntu6.6\nzlib1g:amd64\t1:1.3.dfsg-3.1ubuntu2.3\nzlib1g-dev:amd64\t1:1.3.dfsg-3.1ubuntu2.3\n",
+    "integrationRevision": "817cbc229f4dcc24beb169ecc72838fab4d1df32",
+    "libraries": {
+      "lib64/ld-linux-x86-64.so.2": {
+        "bytes": 236616,
+        "elf": {
+          "elfClass": 2,
+          "interpreter": null,
+          "loadSegments": 4,
+          "machine": 62
+        },
+        "package": {
+          "binaryPackage": "libc6:amd64",
+          "binaryVersion": "2.39-0ubuntu8.9",
+          "package": "glibc",
+          "version": "2.39-0ubuntu8.9"
+        },
+        "sha256": "c20a2dc8917c755f02b94049356320fe1f62ac7d9f8994731f807d9df39302da"
+      },
+      "usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2": {
+        "bytes": 236616,
+        "elf": {
+          "elfClass": 2,
+          "interpreter": null,
+          "loadSegments": 4,
+          "machine": 62
+        },
+        "package": {
+          "binaryPackage": "libc6:amd64",
+          "binaryVersion": "2.39-0ubuntu8.9",
+          "package": "glibc",
+          "version": "2.39-0ubuntu8.9"
+        },
+        "sha256": "c20a2dc8917c755f02b94049356320fe1f62ac7d9f8994731f807d9df39302da"
+      },
+      "usr/lib/x86_64-linux-gnu/libboost_filesystem.so.1.83.0": {
+        "bytes": 137640,
+        "elf": {
+          "elfClass": 2,
+          "interpreter": null,
+          "loadSegments": 4,
+          "machine": 62
+        },
+        "package": {
+          "binaryPackage": "libboost-filesystem1.83.0:amd64",
+          "binaryVersion": "1.83.0-2.1ubuntu3.2",
+          "package": "boost1.83",
+          "version": "1.83.0-2.1ubuntu3.2"
+        },
+        "sha256": "2c137b29a3740fb6d12a4c18823bc2b15215646c3ba3bb208b89782df28559f0"
+      },
+      "usr/lib/x86_64-linux-gnu/libboost_program_options.so.1.83.0": {
+        "bytes": 264376,
+        "elf": {
+          "elfClass": 2,
+          "interpreter": null,
+          "loadSegments": 4,
+          "machine": 62
+        },
+        "package": {
+          "binaryPackage": "libboost-program-options1.83.0:amd64",
+          "binaryVersion": "1.83.0-2.1ubuntu3.2",
+          "package": "boost1.83",
+          "version": "1.83.0-2.1ubuntu3.2"
+        },
+        "sha256": "15f34bcb75dfb0fa30af13cf2b82fb7a9a8e0fbbadf7cabcd397dd65bde552f3"
+      },
+      "usr/lib/x86_64-linux-gnu/libc.so.6": {
+        "bytes": 2129424,
+        "elf": {
+          "elfClass": 2,
+          "interpreter": "/lib64/ld-linux-x86-64.so.2",
+          "loadSegments": 4,
+          "machine": 62
+        },
+        "package": {
+          "binaryPackage": "libc6:amd64",
+          "binaryVersion": "2.39-0ubuntu8.9",
+          "package": "glibc",
+          "version": "2.39-0ubuntu8.9"
+        },
+        "sha256": "3a15d66867d83762c7f2f1e37359cb8f6c5743edb369c65285cb0b1c4f7498bf"
+      },
+      "usr/lib/x86_64-linux-gnu/libcrypto.so.3": {
+        "bytes": 5309400,
+        "elf": {
+          "elfClass": 2,
+          "interpreter": null,
+          "loadSegments": 4,
+          "machine": 62
+        },
+        "package": {
+          "binaryPackage": "libssl3t64:amd64",
+          "binaryVersion": "3.0.13-0ubuntu3.16",
+          "package": "openssl",
+          "version": "3.0.13-0ubuntu3.16"
+        },
+        "sha256": "6866ed711dab8927e1bf82bf1cd30e828bdfc34f3cc1e83b1c9eb01ce6c37d9a"
+      },
+      "usr/lib/x86_64-linux-gnu/libgcc_s.so.1": {
+        "bytes": 183024,
+        "elf": {
+          "elfClass": 2,
+          "interpreter": null,
+          "loadSegments": 4,
+          "machine": 62
+        },
+        "package": {
+          "binaryPackage": "libgcc-s1:amd64",
+          "binaryVersion": "14.2.0-4ubuntu2~24.04.1",
+          "package": "gcc-14",
+          "version": "14.2.0-4ubuntu2~24.04.1"
+        },
+        "sha256": "d93224d2b0dab4247598be683adca02f5cf00586f99c187579cd7e92058fb7cb"
+      },
+      "usr/lib/x86_64-linux-gnu/libm.so.6": {
+        "bytes": 952616,
+        "elf": {
+          "elfClass": 2,
+          "interpreter": null,
+          "loadSegments": 4,
+          "machine": 62
+        },
+        "package": {
+          "binaryPackage": "libc6:amd64",
+          "binaryVersion": "2.39-0ubuntu8.9",
+          "package": "glibc",
+          "version": "2.39-0ubuntu8.9"
+        },
+        "sha256": "fce00b6f25f459cf4ae0b7fae4257909a1a8a86f9149e7c029a5d617baf1ccd0"
+      },
+      "usr/lib/x86_64-linux-gnu/libmysqlclient.so.21": {
+        "bytes": 6793144,
+        "elf": {
+          "elfClass": 2,
+          "interpreter": null,
+          "loadSegments": 4,
+          "machine": 62
+        },
+        "package": {
+          "binaryPackage": "libmysqlclient21:amd64",
+          "binaryVersion": "8.0.46-0ubuntu0.24.04.4",
+          "package": "mysql-8.0",
+          "version": "8.0.46-0ubuntu0.24.04.4"
+        },
+        "sha256": "4707393164b8a29b11a35a87ad213612a936df43360c491555b1a0e528967080"
+      },
+      "usr/lib/x86_64-linux-gnu/libresolv.so.2": {
+        "bytes": 64008,
+        "elf": {
+          "elfClass": 2,
+          "interpreter": null,
+          "loadSegments": 4,
+          "machine": 62
+        },
+        "package": {
+          "binaryPackage": "libc6:amd64",
+          "binaryVersion": "2.39-0ubuntu8.9",
+          "package": "glibc",
+          "version": "2.39-0ubuntu8.9"
+        },
+        "sha256": "1d730ea434da5a5595bc6a961d7a9ace83e03703205df9644044b3dca79c362f"
+      },
+      "usr/lib/x86_64-linux-gnu/libssl.so.3": {
+        "bytes": 696512,
+        "elf": {
+          "elfClass": 2,
+          "interpreter": null,
+          "loadSegments": 4,
+          "machine": 62
+        },
+        "package": {
+          "binaryPackage": "libssl3t64:amd64",
+          "binaryVersion": "3.0.13-0ubuntu3.16",
+          "package": "openssl",
+          "version": "3.0.13-0ubuntu3.16"
+        },
+        "sha256": "a40e7b67489bbd257e432c700ff8f6a1ad796425b5eccecdc2930127fdd86624"
+      },
+      "usr/lib/x86_64-linux-gnu/libstdc++.so.6": {
+        "bytes": 2592224,
+        "elf": {
+          "elfClass": 2,
+          "interpreter": null,
+          "loadSegments": 4,
+          "machine": 62
+        },
+        "package": {
+          "binaryPackage": "libstdc++6:amd64",
+          "binaryVersion": "14.2.0-4ubuntu2~24.04.1",
+          "package": "gcc-14",
+          "version": "14.2.0-4ubuntu2~24.04.1"
+        },
+        "sha256": "1fd75fe70354a416d75aef22bcae68c47bd25d20e2d0568c30b1a9838cf62f11"
+      },
+      "usr/lib/x86_64-linux-gnu/libz.so.1": {
+        "bytes": 113000,
+        "elf": {
+          "elfClass": 2,
+          "interpreter": null,
+          "loadSegments": 4,
+          "machine": 62
+        },
+        "package": {
+          "binaryPackage": "zlib1g:amd64",
+          "binaryVersion": "1:1.3.dfsg-3.1ubuntu2.3",
+          "package": "zlib",
+          "version": "1:1.3.dfsg-3.1ubuntu2.3"
+        },
+        "sha256": "f61677c7bdb7c2aa2a243ea781bfd16afcb361cede7b4ef76127a9d8eb9a5242"
+      },
+      "usr/lib/x86_64-linux-gnu/libzstd.so.1": {
+        "bytes": 755864,
+        "elf": {
+          "elfClass": 2,
+          "interpreter": null,
+          "loadSegments": 4,
+          "machine": 62
+        },
+        "package": {
+          "binaryPackage": "libzstd1:amd64",
+          "binaryVersion": "1.5.5+dfsg2-2build1.1",
+          "package": "libzstd",
+          "version": "1.5.5+dfsg2-2build1.1"
+        },
+        "sha256": "0a2128bc10841fb29e76d08d945864dfb0b6a66da5df6df5d8299197439e54bb"
+      }
+    },
+    "libraryNotices": {
+      "libboost-filesystem1.83.0": {
+        "bytes": 2175464,
+        "sha256": "87ff229c71d391f951383b2246ba630c849e2024ea42a2ac9113dc9646f1e667"
+      },
+      "libboost-program-options1.83.0": {
+        "bytes": 2175464,
+        "sha256": "87ff229c71d391f951383b2246ba630c849e2024ea42a2ac9113dc9646f1e667"
+      },
+      "libc6": {
+        "bytes": 26462,
+        "sha256": "d3c95b56fa33e28b57860580f0baf4e4f4de2a268a2b80f1d031a5191bade265"
+      },
+      "libgcc-s1": {
+        "bytes": 69004,
+        "sha256": "20390f8a6f3b1e4d7cb45dd8652dabb259bbef688cbad839bcdb0b9ba7252f79"
+      },
+      "libmysqlclient21": {
+        "bytes": 28966,
+        "sha256": "d6b8a9a033b07c56afb1b448098760891d0cc872eaf0013c830f439864203094"
+      },
+      "libssl3t64": {
+        "bytes": 2543,
+        "sha256": "6a7da622fe0637a334d2a8fc470852d2ffb77d9a2b2f930f854e32a41ad6ef35"
+      },
+      "libstdc++6": {
+        "bytes": 69004,
+        "sha256": "20390f8a6f3b1e4d7cb45dd8652dabb259bbef688cbad839bcdb0b9ba7252f79"
+      },
+      "libzstd1": {
+        "bytes": 5389,
+        "sha256": "35e85e8e9bbb71492c5f5dddf39ed65b68775a02ad8d710c25d097b497f06c49"
+      },
+      "zlib1g": {
+        "bytes": 2927,
+        "sha256": "9e5b96d63773a5d177ba264254390f792be07e41748ebd94730981c6cac31cc6"
+      }
+    },
+    "libraryPackages": {
+      "libboost-filesystem1.83.0:amd64": {
+        "binaryPackage": "libboost-filesystem1.83.0:amd64",
+        "binaryVersion": "1.83.0-2.1ubuntu3.2",
+        "package": "boost1.83",
+        "version": "1.83.0-2.1ubuntu3.2"
+      },
+      "libboost-program-options1.83.0:amd64": {
+        "binaryPackage": "libboost-program-options1.83.0:amd64",
+        "binaryVersion": "1.83.0-2.1ubuntu3.2",
+        "package": "boost1.83",
+        "version": "1.83.0-2.1ubuntu3.2"
+      },
+      "libc6:amd64": {
+        "binaryPackage": "libc6:amd64",
+        "binaryVersion": "2.39-0ubuntu8.9",
+        "package": "glibc",
+        "version": "2.39-0ubuntu8.9"
+      },
+      "libgcc-s1:amd64": {
+        "binaryPackage": "libgcc-s1:amd64",
+        "binaryVersion": "14.2.0-4ubuntu2~24.04.1",
+        "package": "gcc-14",
+        "version": "14.2.0-4ubuntu2~24.04.1"
+      },
+      "libmysqlclient21:amd64": {
+        "binaryPackage": "libmysqlclient21:amd64",
+        "binaryVersion": "8.0.46-0ubuntu0.24.04.4",
+        "package": "mysql-8.0",
+        "version": "8.0.46-0ubuntu0.24.04.4"
+      },
+      "libssl3t64:amd64": {
+        "binaryPackage": "libssl3t64:amd64",
+        "binaryVersion": "3.0.13-0ubuntu3.16",
+        "package": "openssl",
+        "version": "3.0.13-0ubuntu3.16"
+      },
+      "libstdc++6:amd64": {
+        "binaryPackage": "libstdc++6:amd64",
+        "binaryVersion": "14.2.0-4ubuntu2~24.04.1",
+        "package": "gcc-14",
+        "version": "14.2.0-4ubuntu2~24.04.1"
+      },
+      "libzstd1:amd64": {
+        "binaryPackage": "libzstd1:amd64",
+        "binaryVersion": "1.5.5+dfsg2-2build1.1",
+        "package": "libzstd",
+        "version": "1.5.5+dfsg2-2build1.1"
+      },
+      "zlib1g:amd64": {
+        "binaryPackage": "zlib1g:amd64",
+        "binaryVersion": "1:1.3.dfsg-3.1ubuntu2.3",
+        "package": "zlib",
+        "version": "1:1.3.dfsg-3.1ubuntu2.3"
+      }
+    },
+    "librarySourceCaptureRequired": true,
+    "originalArm64Build": {
+      "bytes": 32521,
+      "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+    },
+    "originalArm64Modules": {
+      "bytes": 5348,
+      "sha256": "6459b6a1acab2c62c474e4c6ab3eb651daa21f697ccd628e93a38bad298bbdd1"
+    },
+    "originalArm64ReceiptReusedForX64Qualification": false,
+    "originalDbimportExecutableBuilt": true,
+    "originalDbimportTargetAndFullStaticModuleScriptLinkGraphBuilt": true,
+    "phase": "built-unqualified-inputs",
+    "playerbotsAiQualified": false,
+    "productionArm64ProviderQualified": false,
+    "runtimeOverlayCompatibilityQualified": false,
+    "scope": "source-built-x86-64-server-setup-tools-only",
+    "serverSource": {
+      "branch": "main",
+      "commit": "f35f04d01689f034778e3474b3c820092f51e461",
+      "patches": [
+        {
+          "path": "patches/server/0001-eluna-declare-area-trigger.patch",
+          "sha256": "c26b145188c5f97bf30d032e1fe3bd7fe17aa1f8f0daa6793e51f5d830fe7aa6",
+          "submodule": "src/server/game/LuaEngine"
+        },
+        {
+          "path": "patches/server/0002-eluna-include-map-manager.patch",
+          "sha256": "4e277dbe56c31ae30640c8e9ad4dee12e944e0f051d9bdc8d62aaa239c50433f",
+          "submodule": "src/server/game/LuaEngine"
+        },
+        {
+          "path": "patches/server/0003-eluna-hooks-include-types.patch",
+          "sha256": "5999402d985fcc709abdc90bb4272072d1d5e3e261b2cc7ec19460320c14295f",
+          "submodule": "src/server/game/LuaEngine"
+        },
+        {
+          "path": "patches/server/0004-attunement-stat-api.patch",
+          "sha256": "d9ef6ca8f96ab186c37c072b22143cdded9976aa3a62d083f893c502a5745cb8"
+        },
+        {
+          "path": "patches/server/0005-script-grid-templates.patch",
+          "sha256": "6b459c90839e7831df8533966442fabd476ae1773f0302c50ccc8a997f157369"
+        },
+        {
+          "path": "patches/server/0006-empty-script-modules.patch",
+          "sha256": "ea0beb357c71d8b8c187af9d4afede520e7ac9877e40fbdc5fab99d54fc21f97"
+        },
+        {
+          "path": "patches/server/0007-runtime-module-config-directory.patch",
+          "sha256": "5e41d474179ef553ec9c2544de947a3724885fd7f3ac233af3d89797acd032ff"
+        }
+      ],
+      "submodules": {
+        "src/server/game/LuaEngine": "58d7652138887783228b9727bd1fa4e08f00342b"
+      },
+      "url": "https://github.com/Russianranger/EsteriaWoW.git"
+    },
+    "sourceInputs": {
+      "integration-recipe.tar": {
+        "bytes": 10352640,
+        "sha256": "1579ea5a54116a642321e29af164c5017e8e46c76546fb5c7f9ae27982d45d90"
+      },
+      "integration/LICENSE": {
+        "bytes": 35149,
+        "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+      },
+      "integration/runtime/server/server-build-sources.lock.json": {
+        "bytes": 2170,
+        "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+      },
+      "integration/sources.lock.json": {
+        "bytes": 2170,
+        "sha256": "dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90"
+      },
+      "integration/tests/auth_srp_reference.cpp": {
+        "bytes": 1525,
+        "sha256": "ab7287d08fdb674f4779ca28227076dbab97a6475136f46486c37ea14944436b"
+      },
+      "integration/tests/config_path_reference.cmake": {
+        "bytes": 1071,
+        "sha256": "7edb126ada44a9a452f490919db7ad5dbee42ab6eeeb8e9831d5a884cdad83fc"
+      },
+      "integration/tests/config_path_reference.cpp": {
+        "bytes": 3734,
+        "sha256": "6e40a099fbce0911fed327efff402e2397d198bafdcc2e58f29cd6c883fbd352"
+      },
+      "integration/tests/playerbots_database_reference.cmake": {
+        "bytes": 1075,
+        "sha256": "254a8946088c364bff34a901acc546b747e2cf5fe1cda4a61e5b11d3d26fc61a"
+      },
+      "integration/tests/playerbots_database_reference.cpp": {
+        "bytes": 2552,
+        "sha256": "75c54da4fcae709d23723a0c8dfa7c0affc7d97ecf310a47f293e0071dae7da0"
+      },
+      "integration/tests/srp6_reference.cmake": {
+        "bytes": 1415,
+        "sha256": "ef9813ea2fdcf40ee470fc4f354467bc5130f369d9f9e8479e9b6a45fe40a152"
+      },
+      "integration/tests/srp6_reference.cpp": {
+        "bytes": 1455,
+        "sha256": "bb182c943040fe108d8a1952dd4b70dff9a6f2b4ef89bb3234efb3eddbb7baf7"
+      },
+      "integration/tools/build_server_setup_x64_probe.py": {
+        "bytes": 18734,
+        "sha256": "6487f55b06eba372ad360dd7584f0dd70e8bdb5d5f609a7a23f1068c469f2141"
+      },
+      "source-inputs/server-engine-source-inputs.tar.gz": {
+        "bytes": 18216368,
+        "sha256": "8c820a962947d2b8e2028c434ccedc969127716390f557626444d23ff8e15b99"
+      },
+      "source-inputs/source-inputs-receipt.json": {
+        "bytes": 1746751,
+        "sha256": "46a4ef82021d49699694bccab545591f3debbd6f4ab9e208c54e4796326bc03e"
+      },
+      "supplements/modules/ModulesScriptLoader.h": {
+        "bytes": 850,
+        "sha256": "cee2616d8f99a84111b5c2380946c316623b418fa615836b5afac8c235a4efb3"
+      }
+    },
+    "sourceLock": {
+      "bytes": 2170,
+      "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+    },
+    "sourcePreparation": {
+      "bytes": 5930,
+      "sha256": "6ff44e6198a2c54660c4c85388f6511d5adcb54b3e0ae8d2933871bb61fe0e4f"
+    },
+    "sqlExecuted": false,
+    "statementsDeclared": 52,
+    "targets": [
+      "dbimport",
+      "esteria_playerbots_database_reference"
+    ],
+    "worldserverQualified": false
+  },
+  "actualCompiledElfMachine": 62,
+  "actualCompilerContext": {
+    "androidRuntimeQualified": false,
+    "baseImage": "docker.io/library/ubuntu@sha256:78d4744ead1f5b19b04d0df558ab182a5300903900755e515b2ca4d10eb2044d",
+    "dockerfile": {
+      "bytes": 1132,
+      "sha256": "a9c912f2dde1227c1854bdea87706cee06b7156d8452a6f7c60aebfc98a7c9d5"
+    },
+    "files": {
+      "runtime/server/inrelease.SHA256SUMS": {
+        "bytes": 413,
+        "sha256": "16405ad6b24709c3cc1ca2f249cf72590a8893a3e5b1263f299465915eabc39d"
+      },
+      "runtime/server/ubuntu.sources": {
+        "bytes": 204,
+        "sha256": "3bca581187f9aa8d51605ee49a8493619779338f630de58553ae7888aa82fd16"
+      }
+    },
+    "formatVersion": 1,
+    "fourSchemaCoordinatorQualified": false,
+    "gameplayQualified": false,
+    "playerbotsAiQualified": false,
+    "productionArm64ProviderQualified": false,
+    "scope": "x64-server-setup-compiler-context-only",
+    "sqlExecuted": false,
+    "worldserverQualified": false
+  },
+  "actualDeclaredPlayerbotsPreparedStatements": 52,
+  "actualFinalBuildSteps": [
+    "[1843/1850] Building CXX object modules/CMakeFiles/modules.dir/mod-world-chat/src/WorldChat_loader.cpp.o",
+    "[1844/1850] Building CXX object modules/CMakeFiles/modules.dir/mod-wxl-dbc/src/WxlDbcLoader.cpp.o",
+    "[1845/1850] Building CXX object modules/CMakeFiles/modules.dir/mod-world-chat/src/WorldChat.cpp.o",
+    "[1846/1850] Building CXX object modules/CMakeFiles/modules.dir/mod-wxl-dbc/src/WxlDbcScan.cpp.o",
+    "[1847/1850] Building CXX object modules/CMakeFiles/modules.dir/mod-wxl-dbc/src/WxlDbcRegistry.cpp.o",
+    "[1848/1850] Building CXX object modules/CMakeFiles/modules.dir/mod-wxl-dbc/src/mod_wxl_dbc.cpp.o",
+    "[1849/1850] Linking CXX static library modules/libmodules.a",
+    "[1850/1850] Linking CXX executable src/tools/dbimport"
+  ],
+  "actualHostRefusalTests": [
+    "test_actual_host_elf_and_arm64_header_mutation (tests.test_server_setup_x64_probe.ServerSetupX64Probe.test_actual_host_elf_and_arm64_header_mutation) ... ok",
+    "test_actual_system_library_closure_has_package_source_binding_and_complete_copies (tests.test_server_setup_x64_probe.ServerSetupX64Probe.test_actual_system_library_closure_has_package_source_binding_and_complete_copies) ... ok",
+    "test_context_pins_architecture_snapshot_hash_gate_and_mysql_without_database (tests.test_server_setup_x64_probe.ServerSetupX64Probe.test_context_pins_architecture_snapshot_hash_gate_and_mysql_without_database) ... ok",
+    "test_needed_refuses_paths_duplicates_and_unbounded_names (tests.test_server_setup_x64_probe.ServerSetupX64Probe.test_needed_refuses_paths_duplicates_and_unbounded_names) ... ok",
+    "test_source_capture_refuses_nonbuild_before_network (tests.test_server_setup_x64_probe.ServerSetupX64Probe.test_source_capture_refuses_nonbuild_before_network) ... ok",
+    "test_wrong_architecture_stops_before_source_reads_or_output (tests.test_server_setup_x64_probe.ServerSetupX64Probe.test_wrong_architecture_stops_before_source_reads_or_output) ... ok"
+  ],
+  "actualHostRefusalTestsPassed": 6,
+  "actualJobLog": {
+    "bytes": 29232,
+    "sha256": "f0a4ac0c82cecc5809bb14f7e83272a60feb6f95bd221758167e2d6f686650f1"
+  },
+  "actualLibrarySourceReadback": {
+    "androidRuntimeQualified": false,
+    "buildReceipt": {
+      "bytes": 32433,
+      "sha256": "5e6646ae314bfefbac00a7cae1eb892b76a29e06feffc9ba88a2a55b2f4d5522"
+    },
+    "everyCopiedLibrarySourceCaptured": true,
+    "formatVersion": 1,
+    "fourSchemaCoordinatorQualified": false,
+    "gameplayQualified": false,
+    "playerbotsAiQualified": false,
+    "productionArm64ProviderQualified": false,
+    "scope": "x64-server-setup-tools-library-source-preservation-only",
+    "sourceArchiveBytes": 707201884,
+    "sourceArchiveFiles": 22,
+    "sourceManifest": {
+      "bytes": 4760,
+      "sha256": "81938c9d1001139e7b8e81cbd0be0480aed38df1f215157f8de329cad7da5f13"
+    },
+    "sqlExecuted": false,
+    "worldserverQualified": false
+  },
+  "actualOriginalCompileStepSeconds": 8355,
+  "actualOriginalDbimportFullStaticModuleScriptLinkGraphBuilt": true,
+  "allBuildRecipeSourceInputsReadFromExactGitRevision": true,
+  "androidRuntimeQualified": false,
+  "artifactMetadataOnly": {
+    "complete": {
+      "bytes": 868530955,
+      "id": 13016403682,
+      "sha256": "a74b2a60c64e32183b91c2669ae2c2cc170e483b001bb15a0345831cbb0a5480"
+    },
+    "evidence": {
+      "bytes": 51701,
+      "id": 13017243314,
+      "sha256": "132cb7a5ca5cb56a2f22da89e7a170b6f28218323b6ddd1fa45409d970967e86"
+    }
+  },
+  "buildReceiptIdentity": {
+    "bytes": 32433,
+    "sha256": "5e6646ae314bfefbac00a7cae1eb892b76a29e06feffc9ba88a2a55b2f4d5522"
+  },
+  "canonicalRecipeTarMatchesActualRetainedRecipeIdentity": true,
+  "compileCommandsBytesReadLocally": false,
+  "compilerContextIdentity": {
+    "bytes": 882,
+    "sha256": "b23f6444c35ae790aba6b8e3967c9cec4f3f8a05116e44b44a9c852d26931cba"
+  },
+  "completeArtifactFullReadbackRequiredBeforeNativeSql": true,
+  "completeArtifactMetadataMeasured": true,
+  "completeArtifactReadLocally": false,
+  "correspondingLibrarySourceArchivesReadLocally": false,
+  "everySmallArtifactMemberCrcAndSha256Verified": true,
+  "everySmallArtifactZipByteReadBack": true,
+  "exactBuildRecipeSourceInputs": {
+    ".github/workflows/server-setup-x64-probe.yml": {
+      "bytes": 5476,
+      "sha256": "12fb5f93a740a6db2443735fc69ce76eea38197374f466f54d2af0dd117d5d1b"
+    },
+    "runtime/mysql-probe/sources.lock.json": {
+      "bytes": 6499,
+      "sha256": "012af95659e8ee2e98907d185ccdb5abc64e87614a9a4ee43b5b8679ff92b512"
+    },
+    "tests/playerbots_database_reference.cmake": {
+      "bytes": 1075,
+      "sha256": "254a8946088c364bff34a901acc546b747e2cf5fe1cda4a61e5b11d3d26fc61a"
+    },
+    "tests/playerbots_database_reference.cpp": {
+      "bytes": 2552,
+      "sha256": "75c54da4fcae709d23723a0c8dfa7c0affc7d97ecf310a47f293e0071dae7da0"
+    },
+    "tests/test_server_setup_x64_probe.py": {
+      "bytes": 4503,
+      "sha256": "1a043b03158c19142167f28753d3c28d2830df957c0cb1224131b4dd8a7676c9"
+    },
+    "tools/build_playerbots_component.py": {
+      "bytes": 16495,
+      "sha256": "7e2182e308cd34fd6a10010f797f9ed352d0726963566e28a5d240d6f4a156e8"
+    },
+    "tools/build_server_setup_x64_probe.py": {
+      "bytes": 18734,
+      "sha256": "6487f55b06eba372ad360dd7584f0dd70e8bdb5d5f609a7a23f1068c469f2141"
+    },
+    "tools/qualify_server_isolated_build.py": {
+      "bytes": 30967,
+      "sha256": "9ec15b40b97d5c42b73bd29d956ab412ad2147f10a580fc977649deb83242ba2"
+    }
+  },
+  "formatVersion": 1,
+  "fourSchemaCoordinatorQualified": false,
+  "gameplayQualified": false,
+  "jobs": [
+    {
+      "completedAt": "2026-10-30T22:19:16Z",
+      "conclusion": "success",
+      "htmlUrl": "https://github.com/Russianranger/esteria_android/actions/runs/41119182502/job/124281186151",
+      "id": 124281186151,
+      "startedAt": "2026-10-30T19:55:35Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-30T19:55:37Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-30T19:55:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T19:55:38Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 2,
+          "startedAt": "2026-10-30T19:55:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T19:55:41Z",
+          "conclusion": "success",
+          "name": "Check actual ELF package-source and architecture refusal behavior",
+          "number": 3,
+          "startedAt": "2026-10-30T19:55:38Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T19:56:09Z",
+          "conclusion": "success",
+          "name": "Acquire and verify unchanged complete source inputs without asset trees",
+          "number": 4,
+          "startedAt": "2026-10-30T19:55:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T19:58:42Z",
+          "conclusion": "success",
+          "name": "Build the pinned snapshot x64 compiler image with hash-checked indexes",
+          "number": 5,
+          "startedAt": "2026-10-30T19:56:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T22:17:57Z",
+          "conclusion": "success",
+          "name": "Compile original dbimport with full static module closure and real Playerbots helper offline",
+          "number": 6,
+          "startedAt": "2026-10-30T19:58:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T22:19:02Z",
+          "conclusion": "success",
+          "name": "Preserve authenticated corresponding sources for every copied shared library",
+          "number": 7,
+          "startedAt": "2026-10-30T22:17:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T22:19:02Z",
+          "conclusion": "success",
+          "name": "Collect bounded build receipts without claiming SQL or Android execution",
+          "number": 8,
+          "startedAt": "2026-10-30T22:19:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T22:19:03Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 9,
+          "startedAt": "2026-10-30T22:19:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T22:19:14Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 10,
+          "startedAt": "2026-10-30T22:19:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T22:19:14Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 20,
+          "startedAt": "2026-10-30T22:19:14Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T22:19:14Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 21,
+          "startedAt": "2026-10-30T22:19:14Z",
+          "status": "completed"
+        }
+      ]
+    }
+  ],
+  "librarySourceReadbackIdentity": {
+    "bytes": 700,
+    "sha256": "0bfd6d7b3cc43de79c4a821367ad1ca73680fb2fe353b15f8f78e22d88cd469b"
+  },
+  "localCanonicalIntegrationRecipeStream": {
+    "bytes": 10352640,
+    "sha256": "1579ea5a54116a642321e29af164c5017e8e46c76546fb5c7f9ae27982d45d90"
+  },
+  "originalArm64BuildReceiptReusedForX64Qualification": false,
+  "originalExeAndPairedDebugBytesReadLocally": false,
+  "originalTargetsBuilt": [
+    "dbimport",
+    "esteria_playerbots_database_reference"
+  ],
+  "playerbotsAiQualified": false,
+  "productionArm64ProviderQualified": false,
+  "scope": "independent-x64-server-setup-build-and-source-readback",
+  "selectedProductionClientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "selectedX64ToolsSqlQualified": false,
+  "smallArtifact": {
+    "bytes": 51701,
+    "id": 13017243314,
+    "sha256": "132cb7a5ca5cb56a2f22da89e7a170b6f28218323b6ddd1fa45409d970967e86"
+  },
+  "smallArtifactFile": {
+    "bytes": 51701,
+    "sha256": "132cb7a5ca5cb56a2f22da89e7a170b6f28218323b6ddd1fa45409d970967e86"
+  },
+  "smallArtifactMembers": {
+    "acquisition.log": {
+      "bytes": 1442,
+      "sha256": "ea78661bcd4dbb3a19bcdf377aeb728f52adaf9f0de9533666eb37c200a63fac"
+    },
+    "build-private.log": {
+      "bytes": 32433,
+      "sha256": "5e6646ae314bfefbac00a7cae1eb892b76a29e06feffc9ba88a2a55b2f4d5522"
+    },
+    "build.log.tail": {
+      "bytes": 65536,
+      "sha256": "4038ffffc3fc9674d037d340a906a550071157fc64caef0097ac9079ce7ee88d"
+    },
+    "configure.log.tail": {
+      "bytes": 10139,
+      "sha256": "e7d12ca5e38577d43844a4d77d4043c438cebbc3740b18df5d761b7ce0703150"
+    },
+    "context.json": {
+      "bytes": 882,
+      "sha256": "b23f6444c35ae790aba6b8e3967c9cec4f3f8a05116e44b44a9c852d26931cba"
+    },
+    "image-build.log": {
+      "bytes": 146329,
+      "sha256": "fd070b4b35998cb10c43a3ea414281807f9d96819ebef8d71c5947b542c55884"
+    },
+    "library-source-readback.json": {
+      "bytes": 700,
+      "sha256": "0bfd6d7b3cc43de79c4a821367ad1ca73680fb2fe353b15f8f78e22d88cd469b"
+    },
+    "library-sources.log": {
+      "bytes": 7243,
+      "sha256": "3f45efd1b35f49e6e905d70aaa79c7357d1196fad3a4012f99c244465a2c9a36"
+    },
+    "preparation.json": {
+      "bytes": 5930,
+      "sha256": "2e93430367fb2218f3e444745e42070d0aa1fe260ac92d10149dd3dd0166604a"
+    },
+    "qualification.json": {
+      "bytes": 32433,
+      "sha256": "5e6646ae314bfefbac00a7cae1eb892b76a29e06feffc9ba88a2a55b2f4d5522"
+    }
+  },
+  "sqlExecuted": false,
+  "workflow": {
+    "conclusion": "success",
+    "headSha": "817cbc229f4dcc24beb169ecc72838fab4d1df32",
+    "htmlUrl": "https://github.com/Russianranger/esteria_android/actions/runs/41119182502",
+    "id": 41119182502,
+    "runAttempt": 1,
+    "status": "completed"
+  },
+  "worldserverQualified": false
+}

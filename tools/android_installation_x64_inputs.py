@@ -27,6 +27,7 @@ NATIVE_SELECTION = 'runtime/mysql-probe/server-setup-x64-sql-inputs.lock.json'
 CONTENT_SELECTION = 'runtime/server/content-provider.lock.json'
 SCOPE = 'android-x64-installation-coordinator-input-selection'
 PENDING = 'pending-native-x64-sql-and-provider-measurement'
+PROVIDER_PENDING = 'native-x64-sql-qualified-provider-pending'
 MEASURED = 'native-x64-sql-and-provider-measured'
 FALSE_FLAGS = ('sqlExecuted', 'androidRuntimeQualified', 'productionArm64ProviderQualified',
     'fourSchemaCoordinatorQualified', 'worldserverQualified', 'playerbotsAiQualified', 'gameplayQualified',
@@ -194,19 +195,37 @@ def _readback(value, selected, qualification):
         'android-installation-x64-independent-native-readback-required')
 
 
-def load_pin(*, require_enabled=False):
+def _provider_readback(value,pin):
+    require(type(value) is dict and type(value.get('formatVersion')) is int and value['formatVersion']==1 and
+        value.get('scope')=='independent-android-x64-installation-provider-readback' and
+        value.get('providerDescriptor')==pin['provider'] and
+        value.get('nativeSqlReceipt')=={key:pin['nativeSql']['qualification'][key] for key in ('bytes','sha256')} and
+        value.get('nativeInputSelection')=={key:pin['nativeSql']['inputSelection'][key] for key in ('bytes','sha256')} and
+        all(value.get(name) is True for name in ('allPackagedProviderFilesReadBack','allProgramElfAndCapturedLibraryBytesReadBack',
+            'fullOriginalSourcesAndPairedDebugReadBack','originalElfBytesUnchanged','invocationScriptsHaveSeparateIdentities')) and
+        all(value.get(name) is False for name in FALSE_FLAGS),
+        'android-installation-x64-independent-provider-readback-required')
+
+
+def load_pin(*, require_enabled=False, require_native=False):
     pin = small(LOCK, 128 << 10)
     require(type(pin) is dict and set(pin) == {'formatVersion', 'scope', 'repository', 'enabled', 'state',
-        'nativeSql', 'provider', *FALSE_FLAGS} and type(pin['formatVersion']) is int and pin['formatVersion'] == 1 and
+        'nativeSql', 'provider', 'providerReadback', *FALSE_FLAGS} and type(pin['formatVersion']) is int and pin['formatVersion'] == 1 and
         pin['scope'] == SCOPE and pin['repository'] == 'Russianranger/esteria_android' and type(pin['enabled']) is bool and
         all(pin[name] is False for name in FALSE_FLAGS), 'android-installation-x64-selection-schema')
-    if not pin['enabled']:
-        require(pin['state'] == PENDING and pin['nativeSql'] is None and pin['provider'] is None,
+    if pin['state']==PENDING:
+        require(pin['enabled'] is False and pin['nativeSql'] is None and pin['provider'] is None and pin['providerReadback'] is None,
             'android-installation-x64-pending-measurements-required')
         require(not require_enabled, 'android-installation-x64-measured-native-sql-and-provider-required')
+        require(not require_native,'android-installation-x64-native-sql-measurement-required')
         return pin
-    require(pin['state'] == MEASURED, 'android-installation-x64-measured-state-required')
-    identity(pin['provider'], 128 << 10)
+    if pin['state']==PROVIDER_PENDING:
+        require(pin['enabled'] is False and pin['provider'] is None and pin['providerReadback'] is None,
+            'android-installation-x64-provider-measurement-state-required')
+        require(not require_enabled,'android-installation-x64-measured-native-sql-and-provider-required')
+    else:
+        require(pin['state']==MEASURED and pin['enabled'] is True,'android-installation-x64-measured-state-required')
+        identity(pin['provider'],128<<10)
     selected = pin['nativeSql']
     require(type(selected) is dict and set(selected) == {'inputSelection', 'producer', 'evidenceArtifact',
         'qualification', 'readback'}, 'android-installation-x64-native-selection-schema')
@@ -224,14 +243,16 @@ def load_pin(*, require_enabled=False):
     qualification = record(selected['qualification'])
     validate_native_sql(qualification, native_pin)
     _readback(record(selected['readback']), selected, qualification)
+    if pin['state']==MEASURED:_provider_readback(record(pin['providerReadback']),pin)
     return pin
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--require-enabled', action='store_true')
+    parser.add_argument('--require-native', action='store_true')
     arguments = parser.parse_args()
-    pin = load_pin(require_enabled=arguments.require_enabled)
+    pin = load_pin(require_enabled=arguments.require_enabled,require_native=arguments.require_native)
     print(json.dumps(dict(formatVersion=1, scope='android-x64-installation-selection-check-only',
         enabled=pin['enabled'], state=pin['state'], provider=pin['provider'],
         inputSelection=native.files.identity(LOCK), **{name: False for name in FALSE_FLAGS}), sort_keys=True))

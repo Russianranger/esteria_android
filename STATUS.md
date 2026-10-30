@@ -82,14 +82,17 @@ qualify exclusive cache publication or ARM64 semantics.
 
 ## Active work and remaining gates
 
-1. Original full x64 dbimport/helper build41119182502/job124281186151 is still
-   compiling (started19:58:42UTC, internal bound22:58:42). Do not duplicate it.
-   Measure actual source/debug outputs, enable the native SQL lock only from
-   those outputs, then execute four-schema/reentry/ledger/restart offline.
-2. Finish the disabled Android x64 provider/fixture source and observer-cleanup
-   review; bind only genuine SQL/provider measurements, then run Android SQL.
-   Historical817 consumers require a fully verified frozen checkout. Production
-   ARM64 admission and five save-selection fields remain unchanged.
+1. Original full x64 build41119182502/job124281186151 succeeded:1850/1850
+   objects, original dbimport and52-statement helper, ELF62/source/debug/22library
+   source archives measured. Small evidence fully read;868MB component remains
+   local-unread and must pass full CI admission. Native SQL input selector is
+   enabled from these actual pins; execute four-schema/reentry/ledger/restart.
+2. Disabled Android x64 provider/fixture implementation and observer-before-DB
+   cleanup pass88focused tests, actual delayed-owner groups, default compilation/
+   lint and independent review. Its measurements remain null/OFF. Implement
+   measurement/acquisition/emulator workflows, bind only actual SQL/provider
+   receipts, then run Android SQL. Frozen817 source and unchanged five production
+   save-selection fields remain mandatory.
 3. Finish actual Android input-widget qualification; keep registered-axis tests
    conditional on a real emulator InputDevice with proper MotionRanges.
 4. Import real12340 MPQs and matched Esteria catalogs/textures/DBC/maps; generate

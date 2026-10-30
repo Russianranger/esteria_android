@@ -6,6 +6,7 @@
   "state": "pending-native-x64-sql-and-provider-measurement",
   "nativeSql": null,
   "provider": null,
+  "providerReadback": null,
   "sqlExecuted": false,
   "androidRuntimeQualified": false,
   "productionArm64ProviderQualified": false,

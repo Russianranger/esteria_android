@@ -4,15 +4,29 @@ This gate is a prerequisite for a future Android13 x64 installation-coordinator
 fixture. It does not replace the production ARM64 providers or qualify Thor.
 The original complete `dbimport` target and the real52-statement Playerbots
 database helper are built separately by `server-setup-x64-probe.yml`. Its first
-actual source build is41119182502 at817cbc229f4dcc24beb169ecc72838fab4d1df32;
-the result is still pending when this implementation is recorded.
+actual source build41119182502/job124281186151 at
+817cbc229f4dcc24beb169ecc72838fab4d1df32 completed successfully. The original
+full static module/script build took8,355 seconds and reached1850/1850 linking
+`dbimport`; both actual output executables are ELF62. The separate52-statement
+helper, original unstripped executables, paired debug files, captured DSO closure
+and22 corresponding library-source archives are retained in the original
+868,530,955-byte complete artifact.
 
 ## Explicit measurement gate
 
-`server-setup-x64-sql-inputs.lock.json` starts disabled. Its three unmeasured
-selections are null, and both acquisition and execution refuse before creating
-output or initializing SQL. Host tests and the workflow selection job can run
-in this state. A skipped native SQL job is not successful SQL qualification.
+`server-setup-x64-sql-inputs.lock.json` now selects the actual measured source
+build and enables the separate native SQL workflow. The bounded51,701-byte
+evidence ZIP was read completely with every member CRC/hash verified. The
+canonical817cbc Git archive was streamed locally and matches the actual retained
+recipe identity. The complete868MB artifact was not downloaded locally; native
+acquisition must read every original byte/member and full source closure before
+executing its programs. Exact measurements are recorded in
+`runtime/evidence/x64-server-setup-build-817cbc-readback.json`.
+
+The original disabled/null state remains a tested refusal boundary. A skipped
+or merely enabled native SQL job is not successful SQL qualification. No native
+SQL, Android coordinator, world or gameplay success follows from the compiler
+result or this input selection.
 
 Enable only after the actual x64 source build and library-source capture pass.
 Record the actual run/job/revision, original complete/evidence artifact IDs and
@@ -94,7 +108,7 @@ world/gameplay, character persistence and bot AI unqualified.
 python3 -m unittest tests.test_server_setup_x64_sql_inputs tests.test_server_setup_x64_sql -v
 ```
 
-Seventeen host groups pass. They include actual ELF/debug splitting and CRCs,
+Nineteen host groups pass. They include actual ELF/debug splitting and CRCs,
 real captured-loader execution of a harmless host utility, ELF/library mutation
 refusal, original source-template extraction, source archive mutation refusal,
 private-configuration checks, restored MySQL descriptor/archive identity checks

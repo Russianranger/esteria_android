@@ -30,19 +30,21 @@ Large source/build artifacts are fully verified in CI; label local-read boundari
 
 ## Immediate execution
 
-1. Inspect original x64 setup-tool build41119182502/job124281186151. Full original
-   dbimport/script-module closure and actual Playerbots helper have compiled since
-   19:58:42UTC; internal3h bound22:58:42, job bound23:55. It was genuinely running
-   at22:08. Do not launch a duplicate or substitute a reduced/no-op loader.
-2. On success read bounded build/source/debug/DSO receipts; bind native SQL input
-   lock only to actual measured build/MySQL/content outputs. Its committed default
-   remains disabled/null. Run actual four-schema SQL/reentry/ledger/clean restart.
-3. Complete the currently uncommitted Android x64 provider/fixture group. Review
-   exact full905MB original MySQL sourceZIP preservation/readback, fixed source-
-   owned helper closure, frozen817 verifier, P→Q measurement/activation distinction
-   and retained observer cleanup BEFORE DB/coordinator cleanup. Do not stage it
-   until its owner supplies a reviewed exact freeze. No positive measurements or
-   Android four-schema qualification exist yet.
+1. Original full x64 build41119182502/job124281186151 succeeded22:19:16UTC.
+  1850/1850 original dbimport objects and real52-statement helper link; actual
+  ELF62/debug/22library-source metadata is in x64-server-setup-build-817cbc proof.
+  Small51,701B evidence read locally;868,530,955B complete artifact remains
+  local-unread and requires full CI source/byte admission before execution.
+2. Measured native SQL input lock is now enabled from those actual build/MySQL/
+  public-content pins. Run existing native four-schema/reentry/ledger/restart
+  workflow and inspect actual completed receipts. No SQL proof exists yet for
+  these x64 tools; never transfer ARM64 or historical Java proof.
+3. Android x64 provider/fixture14-path implementation is reviewed/frozen:88focused
+  Python checks, actual delayed observer-owner groups, default AndroidTest compile/
+  lint and negative pending-profile admission pass. Default Android gate stays
+  OFF/null. Preserve exact905MB sourceZIP readback and P→Q unchanged-code binding.
+  Finish measurement/acquisition and actual emulator workflows, then bind real
+  native SQL/provider receipts. Observer must reap before DB/coordinator cleanup.
 4. Complete the new Android input-widget instrumentation group. It uses real
    SurfaceView/InputConnection/KeyEvent/touch and a bounded recording sink; no Wine
    or game claim. Register a real emulator uinput InputDevice only if supported;

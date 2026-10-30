@@ -1,18 +1,92 @@
 {
-  "formatVersion": 1,
-  "scope": "x64-server-setup-sql-input-selection",
-  "repository": "Russianranger/esteria_android",
-  "enabled": false,
-  "state": "pending-x64-compile-source-measurement",
-  "minimumFreeBytes": 17179869184,
-  "build": null,
-  "mysql": null,
-  "serverContent": null,
-  "sqlExecuted": false,
   "androidRuntimeQualified": false,
-  "productionArm64ProviderQualified": false,
+  "build": {
+    "actualEvidence": {
+      "bytes": 46789,
+      "path": "runtime/evidence/x64-server-setup-build-817cbc-readback.json",
+      "sha256": "5a55f290566566e1027a50aa915a715cfbef29574c86ca2435cd89e9c805852b"
+    },
+    "artifacts": {
+      "complete": {
+        "bytes": 868530955,
+        "id": 13016403682,
+        "sha256": "a74b2a60c64e32183b91c2669ae2c2cc170e483b001bb15a0345831cbb0a5480"
+      },
+      "evidence": {
+        "bytes": 51701,
+        "id": 13017243314,
+        "sha256": "132cb7a5ca5cb56a2f22da89e7a170b6f28218323b6ddd1fa45409d970967e86"
+      }
+    },
+    "buildReceipt": {
+      "bytes": 32433,
+      "sha256": "5e6646ae314bfefbac00a7cae1eb892b76a29e06feffc9ba88a2a55b2f4d5522"
+    },
+    "componentPrefix": "x64-setup-build/component",
+    "contextPrefix": "x64-setup-context",
+    "contextReceipt": {
+      "bytes": 882,
+      "sha256": "b23f6444c35ae790aba6b8e3967c9cec4f3f8a05116e44b44a9c852d26931cba"
+    },
+    "librarySourceManifest": {
+      "bytes": 4760,
+      "sha256": "81938c9d1001139e7b8e81cbd0be0480aed38df1f215157f8de329cad7da5f13"
+    },
+    "librarySourceReadback": {
+      "bytes": 700,
+      "sha256": "0bfd6d7b3cc43de79c4a821367ad1ca73680fb2fe353b15f8f78e22d88cd469b"
+    },
+    "producer": {
+      "integrationRevision": "817cbc229f4dcc24beb169ecc72838fab4d1df32",
+      "job": 124281186151,
+      "workflowRun": 41119182502
+    }
+  },
+  "enabled": true,
+  "formatVersion": 1,
   "fourSchemaCoordinatorQualified": false,
-  "worldserverQualified": false,
+  "gameplayQualified": false,
+  "minimumFreeBytes": 17179869184,
+  "mysql": {
+    "fullReadbackEvidence": {
+      "bytes": 4376,
+      "path": "runtime/evidence/android-mysql-input-readback-41119182469.json",
+      "sha256": "4144fe9cf576f2139817b2682052f795e8c20bb354b0df52e9d2d58acaed78ca"
+    },
+    "selection": {
+      "bytes": 6228,
+      "path": "runtime/mysql-probe/qualified-inputs.lock.json",
+      "sha256": "5268fa26eb1e2165f0cf5ff9f90686792abb4af6b9af48288d75932009bf853d"
+    }
+  },
   "playerbotsAiQualified": false,
-  "gameplayQualified": false
+  "productionArm64ProviderQualified": false,
+  "repository": "Russianranger/esteria_android",
+  "scope": "x64-server-setup-sql-input-selection",
+  "serverContent": {
+    "asset": {
+      "bytes": 168956728,
+      "sha256": "0fe3d5ec91f25295fcfff1acca898cfb36136ecbe40f1d65653f98817d58803e",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-local-server-f35f04d-21ce4e1b-b7d9b72c/server-content-provider.tar.gz"
+    },
+    "publicSourceReadback": {
+      "bytes": 2388,
+      "path": "runtime/server-components-publication/public-source-readback.json",
+      "sha256": "684f1770e9ca5061feca037038f3f5f4fb79dd57740f96b33358eafa1142a651"
+    },
+    "publicationReceipt": {
+      "bytes": 4102,
+      "path": "runtime/server-components-publication/published-release.json",
+      "sha256": "e6b46909d12e8eac2e3d94dade1e07089b3fd962c86302f4f9fb1bcc65fe6925"
+    },
+    "recipeRevision": "7e498c50cdf55027e679d63e31f0a5e4b117f934",
+    "releaseSelection": {
+      "bytes": 178915,
+      "path": "runtime/server-components-publication/dependency-release.lock.json",
+      "sha256": "b8e36e40c522c6191a50e5e56dcc93ac2fb3c1401afa81962c81e715f4a05264"
+    }
+  },
+  "sqlExecuted": false,
+  "state": "measured-component-inputs",
+  "worldserverQualified": false
 }

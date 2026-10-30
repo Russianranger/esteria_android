@@ -79,13 +79,87 @@ production guard that accepts machine183 or machine62 interchangeably.
   gate, then prepares assets and executes the actual Android13 x64 fixture.
   Pending selection is reported as unexecuted, not successful installation.
 
-This checkpoint implements the typed Java seam, private Python kernels,
-default-disabled fixed-payload inspector and measured input-selection gate. The
-provider builder, Android inputs adapter, actual instrumentation and Android
-workflow listed above are follow-through work. No positive x64 provider exists.
+The published typed Java seam, private Python kernels, default-disabled
+fixed-payload inspector and measured input-selection gate retain the production
+ARM64 policy. The follow-through implementation now also contains the provider
+builder/readback, fixed x64 guest wrapper and two AndroidTest-only Java classes.
+No positive x64 provider exists. The Android execution workflow and measured
+provider acquisition remain follow-through work after actual native SQL results.
 After native SQL qualification, a separate measured-native/provider-pending
 state may permit provider measurement only; actual descriptor SHA and independent
 readback must be committed before APK execution can be enabled.
+
+`provider_android_installation_x64.py build --inputs <admitted-native-inputs>
+--output <new-product>` refuses the initial pending selection before creating
+output. Once native SQL has independently passed, it re-reads the full original
+ELF/debug/source/library component, original MySQL metadata and original public
+SQL content. It preserves all reviewed source/library/Lua notices and produces a
+streamed normalized programs archive. The helper and captured loader keep their
+executable modes. Original ELF bytes, ARM content packaging origin, native SQL
+receipts and newly generated Android invocation identities remain distinct.
+
+The resulting `provider/` contains only APK assets. `corresponding-source/`
+beside it retains the unchanged original x64 component, paired debug, library
+sources, exact original MySQL/PRoot complete-source ZIP and the exact clean Git
+packaging recipe. The independent reader restores that ZIP into an owned
+temporary directory and repeats every original member/CRC/hash and source-package
+check against its original external pin. Neither location contains a database,
+credentials or saves.
+`provider_android_installation_x64.py readback --product <product>` independently
+re-reads the closed file trees, original Git blobs, native component admission,
+MySQL source packages and extracted original ELF/library/loader bytes. It checks
+the exact source-owned Android invocation renderer and emits a small receipt for
+review and a separate committed pin. It does not enable an APK or execute SQL.
+
+The test-only `InstallationX64Inputs` has a private constructor and fixed APK
+asset paths. It verifies the compiled descriptor pin, exact helper set and
+original native SQL proof, installs the three generic immutable packages, then
+uses the actual typed coordinator and `ProotProcess` capability. The test refuses
+prior active/legacy fixture data. Its successful path requires real four-schema
+SQL, live observations, clean promotion, active reseeding refusal, same UUID
+restart and a second clean stop. Private SQL/journal/credential comparisons stay
+in memory. A compiled fixture is not evidence that any of those steps ran.
+The test-only lifetime owner retains each SQL observation before waiting. A
+timed-out child keeps the observer, database, coordinator and file lease strongly
+reachable. Cleanup must confirm observation reap before database/coordinator
+shutdown; a pending cleanup cannot release the fixture lease or qualify success.
+Two actual host ownership/lease groups cover this order using a delayed opaque
+backend, without executing SQL, JNI or Android.
+
+The standalone `mysql-probe.gradle` keeps its strict current-source verifier.
+Only the separately measured installation profile overrides that task with
+`provider_android_installation_x64.py verify-external`. It requires
+`serverInstallationProbeFrozenSourceDir` to name the exact whole-checkout
+817cbc229f4dcc24beb169ecc72838fab4d1df32 recipe admitted by the existing frozen
+consumer. The fixed original verifier executes with Python environment isolation
+and a before/after checkout check. It re-reads the original runtime bytes; its
+historical Java proof never applies to the current app. Current compiled
+provider/native-SQL pins and the new Android result stay separate. A Gradle
+property, alternate checkout or caller command cannot replace that admission.
+
+Measurement commit P is allowed to retain the provider-pending selection.
+Activation commit Q subsequently commits actual descriptor/readback pins; those
+changing lock bytes are deliberately outside the provider recipe source set.
+The original P source files remain pinned to P Git blobs. Before packaging Q,
+the fixed external verifier separately requires byte-identical selected Core,
+Java coordinator/test, native owner and guest/renderer sources. P and Q need not
+have the same whole Git revision. The eventual Android result records Q and its
+own actual execution; neither P's measurement nor old native/Java proof becomes
+an Android result. A real two-commit host fixture verifies this distinction.
+
+Host validation at this checkpoint: 14 input-gate, 17 provider and nine guest
+fixtures pass; default-profile AndroidTest Java compilation and Android lint
+pass. Those tests use explicitly synthetic ELF/receipt/content fixtures and
+never claim native SQL or Android execution. The exact current native ARM Java
+regression after the typed refactor passed at7c303665, recorded separately in
+`runtime/evidence/native-java-installation-7c303665-readback.json`; the
+later lease changes have their own separate validation. Actual x64 source-build
+artifacts and native SQL results have separate measured admission; this
+checkpoint supplies neither and keeps the selection disabled.
+The final focused run also includes existing shared installation, Playerbots and
+native x64 input/SQL fixtures: 88 tests passed. The earlier repository-wide run
+covered an intermediate provider version; it does not replace these final
+source-binding regressions or claim that a positive provider was constructed.
 
 Native qualification invocation scripts contain native fixture paths. Android's
 new source-owned invocation scripts therefore receive separate identities. Their
