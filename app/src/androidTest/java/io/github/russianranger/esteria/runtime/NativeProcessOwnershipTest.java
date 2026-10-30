@@ -6,6 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import io.github.russianranger.esteria.BuildConfig;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
+import io.github.russianranger.esteria.core.runtime.process.WorldConsoleShutdown;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -37,6 +38,10 @@ public final class NativeProcessOwnershipTest {
         long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(15);
         while (child.isAlive() && System.nanoTime()<deadline) Thread.sleep(10);
         if (child.isAlive()) { try { child.stop(Duration.ZERO); } finally { fail("Owned process did not exit"); } }
+    }
+    private static OwnedProcess.Specification interactive(Path path,String script) throws IOException {
+        OwnedProcess.Specification base=spec(path,script);
+        return new OwnedProcess.Specification(base.executable,base.arguments,base.environment,base.cwd,base.stdout,base.stderr,true);
     }
     private static String read(Path path) throws IOException { return new String(Files.readAllBytes(path),StandardCharsets.UTF_8); }
     private static void write(Path path,String value) throws IOException { Files.write(path,value.getBytes(StandardCharsets.UTF_8),StandardOpenOption.CREATE_NEW); }
@@ -88,12 +93,55 @@ public final class NativeProcessOwnershipTest {
                     root,root.resolve("missing-out"),root.resolve("missing-err")),null);
                 fail("Missing executable must fail before handle publication");
             } catch (IOException expected) { }
+
+            Path echoPath=root.resolve("interactive-echo");
+            OwnedProcess echo=OwnedProcess.startInteractive(backend,interactive(echoPath,"cat"),null);owned.add(echo);
+            byte[] binary=new byte[257];for(int i=0;i<binary.length;i++)binary[i]=(byte)i;
+            assertTrue(echo.writeInput(binary,Duration.ofMillis(200)));echo.closeInput();complete(echo);
+            assertEquals(0,echo.exitCode());assertNull(echo.failure());
+            assertArrayEquals(binary,Files.readAllBytes(echoPath.resolve("stdout.log")));
+            try {echo.writeInput(binary,Duration.ZERO);fail("Exited console input must be closed");}catch(IOException expected) { }
+
+            Path pressurePath=root.resolve("interactive-pressure");
+            OwnedProcess pressure=OwnedProcess.startInteractive(backend,interactive(pressurePath,"while [ ! -f drain ]; do sleep .01; done; cat"),null);owned.add(pressure);
+            byte[] block=new byte[4096];Arrays.fill(block,(byte)'b');int accepted=0;
+            while(accepted<1024*1024&&pressure.writeInput(block,Duration.ZERO))accepted+=block.length;
+            assertTrue("Expected real pipe backpressure",accepted>0&&accepted<1024*1024);
+            byte[] rejected=new byte[4096];Arrays.fill(rejected,(byte)'r');long began=System.nanoTime();
+            assertFalse(pressure.writeInput(rejected,Duration.ofMillis(80)));
+            assertTrue("Pipe timeout must be bounded",System.nanoTime()-began<TimeUnit.SECONDS.toNanos(2));
+            AtomicReference<Throwable> writerResult=new AtomicReference<>();
+            Thread writer=new Thread(()->{try {pressure.writeInput(rejected,Duration.ofSeconds(1));writerResult.set(new AssertionError("Closed writer returned normally"));}catch(Throwable error){writerResult.set(error);}});
+            writer.start();Thread.sleep(50);pressure.closeInput();writer.join(2000);
+            assertFalse("Closing input must cancel pending write",writer.isAlive());assertTrue(writerResult.get() instanceof IOException);
+            write(pressurePath.resolve("drain"),"go");complete(pressure);assertEquals(0,pressure.exitCode());assertNull(pressure.failure());
+            byte[] expectedBytes=new byte[accepted];Arrays.fill(expectedBytes,(byte)'b');
+            assertArrayEquals("Timed out commands must queue no partial bytes",expectedBytes,Files.readAllBytes(pressurePath.resolve("stdout.log")));
+            Path brokenPath=root.resolve("interactive-broken");
+            OwnedProcess broken=OwnedProcess.startInteractive(backend,interactive(brokenPath,"exec 0<&-; printf ready; exec sleep 30"),null);owned.add(broken);
+            long ready=System.nanoTime()+TimeUnit.SECONDS.toNanos(5);
+            while(Files.size(brokenPath.resolve("stdout.log"))<5&&System.nanoTime()<ready)Thread.sleep(10);
+            assertEquals("ready",read(brokenPath.resolve("stdout.log")));
+            try {broken.writeInput(binary,Duration.ofMillis(100));fail("Closed reader must refuse input without fatal SIGPIPE");}catch(IOException expected) { }
+            try {broken.stop(Duration.ZERO);}catch(IOException expected) { }
+            assertFalse(broken.isAlive());
+
+            Path commandPath=root.resolve("interactive-command");
+            OwnedProcess command=OwnedProcess.startInteractive(backend,interactive(commandPath,
+                "IFS= read -r command; [ \"$command\" = 'server shutdown 1' ] || exit 9; printf command-received > receipt"),new WorldConsoleShutdown());owned.add(command);
+            command.stop(Duration.ofSeconds(3));assertFalse(command.wasForced());assertEquals(0,command.exitCode());assertNull(command.failure());
+            assertEquals("command-received",read(commandPath.resolve("receipt")));
+            assertEquals(0,Files.size(commandPath.resolve("stdout.log")));assertEquals(0,Files.size(commandPath.resolve("stderr.log")));
+
             JSONObject receipt=new JSONObject().put("formatVersion",1).put("scope","android-13-x86_64-native-owner-system-shell")
                 .put("sourceRevision",BuildConfig.SOURCE_REVISION).put("api",Build.VERSION.SDK_INT).put("targetSdk",context.getApplicationInfo().targetSdkVersion)
-                .put("fingerprint",Build.FINGERPRINT).put("abi","x86_64").put("groupsPassed",6).put("nativeOwnerExecuted",true)
+                .put("fingerprint",Build.FINGERPRINT).put("abi","x86_64").put("groupsPassed",9).put("nativeOwnerExecuted",true)
                 .put("unicodeAndExitVerified",true).put("creatorThreadLifetimeVerified",true).put("gracefulFixtureVerified",true)
                 .put("forcedAndFailedRequestVisible",true).put("bothPipeBoundsVerified",true).put("failedExecRejected",true)
+                .put("interactiveBinaryEofVerified",true).put("interactiveBackpressureAndCloseVerified",true)
+                .put("interactiveEpipeVerified",true).put("consoleCommandFixtureVerified",true)
                 .put("logReadBytesPerPipe",9000000).put("logStoredBytesPerPipe",8388608)
+                .put("worldShutdownQualified",false).put("characterPersistenceQualified",false)
                 .put("appDeathQualified",false).put("arm64GuestExecuted",false).put("androidProotExecuted",false).put("gameplayQualified",false);
             write(context.getFilesDir().toPath().resolve("native-owner-qualification.json"),receipt.toString(2));
         } finally {

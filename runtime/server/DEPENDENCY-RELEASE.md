@@ -37,22 +37,36 @@ runtime state are never selected as release files. The release contains the
 112,374,096-byte runtime archive, its three metadata files, original source ZIP,
 source manifest, notices, a release manifest and `SHA256SUMS`.
 
-Only the publication job has `contents: write`; it has no administration permission.
-It creates or verifies the exact original-commit tag, creates an owned draft,
-uploads all missing assets and reads back their actual bytes, then publishes the
-prerelease. The publisher never moves a tag, deletes anything, overwrites assets,
-repairs incomplete published releases, or edits another repository. An interrupted
-owned draft can resume; every existing asset must already match exactly. Rerunning
-against a complete matching release performs verification without mutation.
+Only the `upload-draft` job has `contents: write`; it has no administration
+permission. An authorized GitHub UI publisher first creates a prerelease draft
+with this exact tag, full original commit SHA as `target_commitish`, and the exact
+body returned by `release_body(lock)` in the preservation tool. The workflow
+discovers that existing draft, verifies its identity and any existing tag/assets,
+uploads missing assets and reads back their actual bytes. It never creates a
+tag/release or finalizes the draft. It emits `draft-assets-verified.json` only
+after all dependency/source assets are verified, without claiming publication.
+
+After that receipt is available, the authorized UI publisher publishes the same
+draft. A separate `verify-publication` job has read-only permissions and waits up
+to 20 minutes for publication, then verifies the actual original-commit tag, exact
+release identity and every asset's stored bytes before producing the durable URL
+receipt. A delayed publication simply fails this bounded read-only wait; rerunning
+the workflow can verify a completed release without changing it.
+
+The workflow never moves a tag, deletes anything, overwrites assets, repairs
+incomplete published releases, or edits another repository. An interrupted owned
+draft can resume; every existing asset must already match exactly. Rerunning
+against a complete matching release performs verification without mutation. The
+older combined `publish` CLI remains available only where its normal API token
+is authorized; the Actions workflow no longer invokes it.
 
 GitHub-enforced release immutability depends on repository settings. This workflow
 does not change those settings. The publication receipt records GitHub's actual
 `immutable` value as `githubImmutable`, separately from its own write-once policy.
-If token permissions deny the exact tag/release operation, the job fails without
-substituting a misleading default-branch tag or broadening permissions. Current
-GitHub documentation describes additional workflow permission requirements for
-some release targets containing workflow changes; the normal authorized API path
-is attempted and any denial remains a concrete access blocker.
+Current GitHub documentation describes additional workflow permission requirements
+for some release targets containing workflow changes. The split UI/asset workflow
+uses each supported authorization path for its permitted operation, without
+substituting a default-branch tag or broadening token permissions.
 
 ## Record successful publication without changing provider identities
 
@@ -94,6 +108,31 @@ measured runtime and its installed-package notice graph can be verified locally.
 Full original source ZIP validation and actual publication require the workflow;
 the connector's 512 MiB download cap prevented local recovery of that ZIP.
 No release or clean-build URL is claimed until the successful receipt is recorded.
+
+On 2026-10-30, [run 41002275307](https://github.com/Russianranger/esteria_android/actions/runs/41002275307)
+at integration `ce45a79fb3786ab0e16ea8055a2c2bd0fbb7d444` completed the read-only
+validation job successfully. This included downloading the complete 954,236,077-byte
+source ZIP, checking all 278 original files and 89 source-package descriptors, and
+checking notices for 133 installed binary packages (128 resolved copyright files).
+The validated candidate was retained as a short-lived workflow artifact. This is
+actual full-source validation evidence; the source ZIP still was not downloaded
+through the connector's 512 MiB-limited endpoint.
+
+The isolated publication job 123889454241 then failed at `POST /git/refs` with
+HTTP 403 while requesting the exact original `b06de55...` target. Its recorded
+token permissions included `Contents: write` and `Actions: read`. No release or
+asset publication was reached, and `published` remains null. The response body
+was not exported, so the specific backend denial reason is not asserted.
+
+GitHub's current release API documentation separately states that release targets
+whose workflows differ from the default branch need `Workflows: write`, which
+Actions' `GITHUB_TOKEN` cannot receive. This documented restriction also applies
+to a current packaging commit containing those workflow changes; changing the tag
+target is not a documented solution. The exact original target and measured
+provider/source lock bytes remain unchanged. The split authenticated UI and
+asset-upload workflow above is the subsequent implementation; its success is
+not inferred from these earlier validation results. Repository permissions/settings
+are not changed by this workflow.
 
 References: [GitHub release API](https://docs.github.com/en/rest/releases/releases),
 [release immutability](https://docs.github.com/en/code-security/concepts/supply-chain-security/immutable-releases).

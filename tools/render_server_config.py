@@ -87,6 +87,7 @@ def render(server: Path, state: Path, data: Path, sql_source: Path, mysql_client
                           'WorldDatabase.WorkerThreads': 1, 'WorldDatabase.SynchThreads': 1,
                           'CharacterDatabase.WorkerThreads': 1, 'CharacterDatabase.SynchThreads': 1,
                           'Console.Enable': 1, 'Ra.Enable': 0, 'SOAP.Enabled': 0,
+                          'Wintergrasp.DeferShutdownTimer': 0,
                           'Network.Threads': 1, 'MapUpdate.Threads': 1}
         bots = profile['playerbots'] | {'PlayerbotsDatabaseInfo': database_info('acore_playerbots')}
         files = {

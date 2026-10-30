@@ -7,9 +7,12 @@ on:
       - patches/server/**
       - tools/qualify_base_sql.py
       - tools/qualify_local_account.py
+      - tools/qualify_mysql_backup.py
       - tools/manifest_server_content.py
       - tools/package_server_content.py
       - runtime/mysql_bootstrap.py
+      - runtime/android_database_setup.py
+      - runtime/mysql-backup-tools.lock.json
       - runtime/provision_local_account.py
       - runtime/provision_local_realm.py
       - tools/render_server_config.py
@@ -18,6 +21,8 @@ on:
       - tests/test_base_sql.py
       - tests/test_local_account.py
       - tests/test_local_account_qualification.py
+      - tests/test_mysql_backup.py
+      - tests/test_android_database_setup.py
       - tests/fixtures/*-f35f04d.sql
       - .github/workflows/base-sql.yml
   pull_request:
@@ -26,9 +31,12 @@ on:
       - patches/server/**
       - tools/qualify_base_sql.py
       - tools/qualify_local_account.py
+      - tools/qualify_mysql_backup.py
       - tools/manifest_server_content.py
       - tools/package_server_content.py
       - runtime/mysql_bootstrap.py
+      - runtime/android_database_setup.py
+      - runtime/mysql-backup-tools.lock.json
       - runtime/provision_local_account.py
       - runtime/provision_local_realm.py
       - runtime/server/**
@@ -37,6 +45,8 @@ on:
       - tests/test_base_sql.py
       - tests/test_local_account.py
       - tests/test_local_account_qualification.py
+      - tests/test_mysql_backup.py
+      - tests/test_android_database_setup.py
       - tests/fixtures/*-f35f04d.sql
       - .github/workflows/base-sql.yml
   workflow_dispatch:
@@ -54,8 +64,8 @@ jobs:
       - name: Check source and fresh-fixture safety contracts
         run: |
           test "$(uname -m)" = aarch64
-          python3 -m unittest tests.test_base_sql tests.test_server_runtime_inputs tests.test_local_account tests.test_local_account_qualification -v
-          mkdir -p out/base-sql-evidence out/base-sql-private out/local-account-evidence out/local-account-private
+          python3 -m unittest tests.test_base_sql tests.test_server_runtime_inputs tests.test_local_account tests.test_local_account_qualification tests.test_mysql_backup tests.test_android_database_setup -v
+          mkdir -p out/base-sql-evidence out/base-sql-private out/local-account-evidence out/local-account-private out/mysql-backup-evidence out/mysql-backup-private
       - name: Fetch the exact server Git tree and stage only authenticated base SQL
         run: |
           python3 - <<'PY'
@@ -120,6 +130,18 @@ jobs:
             --mysql /usr/bin/mysql --mysqld /usr/sbin/mysqld \
             --expected-version "$ESTERIA_MYSQL_SQL_VERSION" --output /state/run \
             > out/local-account-evidence/qualification.log 2>&1
+      - name: Qualify private four-database backup and fresh restore without external network
+        run: |
+          docker run --rm --init --network none \
+            --env PYTHONDONTWRITEBYTECODE=1 \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/base-sql-fixture,dst=/fixture,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/mysql-backup-private,dst=/state" \
+            --workdir /qualification esteria-base-sql:qualification \
+            python3 tools/qualify_mysql_backup.py --fixture /fixture \
+            --fixture-sha256 "$ESTERIA_BASE_FIXTURE_SHA256" \
+            --expected-version "$ESTERIA_MYSQL_SQL_VERSION" --output /state/run \
+            > out/mysql-backup-evidence/qualification.log 2>&1
       - name: Collect receipts and bounded redacted diagnostics only
         if: always()
         run: |
@@ -169,6 +191,28 @@ jobs:
               (target / 'environment-receipt.json').write_text(json.dumps(metadata, indent=2) + '\n')
           PY
           sudo chown -R "$(id -u):$(id -g)" out/local-account-evidence
+      - name: Collect backup qualification receipts only, never SQL or credentials
+        if: always()
+        run: |
+          sudo python3 - <<'PY'
+          import hashlib, json, pathlib, shutil
+          source = pathlib.Path('out/mysql-backup-private/run')
+          target = pathlib.Path('out/mysql-backup-evidence')
+          target.mkdir(parents=True, exist_ok=True)
+          receipt = source / 'qualification.json'
+          runtime = pathlib.Path('out/base-sql-evidence/server-runtime.json')
+          if receipt.is_file():
+              shutil.copyfile(receipt, target / receipt.name)
+          if receipt.is_file() and runtime.is_file():
+              shutil.copyfile(runtime, target / runtime.name)
+              metadata = dict(formatVersion=1, scope='native-arm64-disposable-MySQL-backup',
+                  qualificationSha256=hashlib.sha256(receipt.read_bytes()).hexdigest(),
+                  runtimeManifestSha256=hashlib.sha256(runtime.read_bytes()).hexdigest(),
+                  externalNetworkDisabled=True, existingSaveRestoreQualified=False,
+                  schemaUpgradeQualified=False, androidRuntimeQualified=False, gameplayQualified=False)
+              (target / 'environment-receipt.json').write_text(json.dumps(metadata, indent=2) + '\n')
+          PY
+          sudo chown -R "$(id -u):$(id -g)" out/mysql-backup-evidence
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
@@ -181,5 +225,12 @@ jobs:
         with:
           name: local-account-qualification-${{ github.sha }}
           path: out/local-account-evidence
+          retention-days: 14
+          if-no-files-found: error
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: mysql-backup-qualification-${{ github.sha }}
+          path: out/mysql-backup-evidence
           retention-days: 14
           if-no-files-found: error

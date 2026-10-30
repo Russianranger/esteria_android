@@ -12,7 +12,7 @@ WORLD = '''BindIP LogsDir SourceDirectory MySQLExecutable TempDir LoginDatabaseI
 LoginDatabase.WorkerThreads LoginDatabase.SynchThreads WorldServerPort DataDir
 WorldDatabaseInfo CharacterDatabaseInfo WorldDatabase.WorkerThreads WorldDatabase.SynchThreads
 CharacterDatabase.WorkerThreads CharacterDatabase.SynchThreads Console.Enable Ra.Enable SOAP.Enabled
-Network.Threads MapUpdate.Threads'''.split()
+Network.Threads MapUpdate.Threads Wintergrasp.DeferShutdownTimer'''.split()
 
 
 def fixture(root):
@@ -55,6 +55,8 @@ class ServerConfigTests(unittest.TestCase):
             world = (current / 'worldserver.conf').read_text()
             self.assertIn('BindIP = "127.0.0.1"', world)
             self.assertIn('Ra.Enable = 0', world)
+            self.assertIn('Console.Enable = 1', world)
+            self.assertIn('Wintergrasp.DeferShutdownTimer = 0', world)
             self.assertNotIn('500', (current / 'modules/playerbots.conf').read_text())
             self.assertFalse(first['database_initialized'])
             (server / 'src/server/apps/worldserver/worldserver.conf.dist').write_text('broken')
@@ -62,6 +64,16 @@ class ServerConfigTests(unittest.TestCase):
                 render(*args)
             self.assertEqual(current, (state / 'config/current').resolve())
             self.assertEqual(secret, (state / 'accounts/database-secret').read_bytes())
+
+    def test_console_shutdown_cannot_inherit_battle_deferral(self):
+        with tempfile.TemporaryDirectory() as name:
+            root=Path(name); server=fixture(root)
+            source=server/'src/server/apps/worldserver/worldserver.conf.dist'
+            source.write_text(source.read_text().replace('Wintergrasp.DeferShutdownTimer = 0','Wintergrasp.DeferShutdownTimer = 1'))
+            render(server,root/'state',root/'data',root/'sql',Path('/usr/bin/mysql'))
+            world=(root/'state/config/current/worldserver.conf').read_text()
+            self.assertIn('Wintergrasp.DeferShutdownTimer = 0',world)
+            self.assertNotIn('Wintergrasp.DeferShutdownTimer = 1',world)
 
     def test_does_not_replace_corrupt_existing_credentials(self):
         with tempfile.TemporaryDirectory() as name:

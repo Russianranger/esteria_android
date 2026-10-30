@@ -30,8 +30,12 @@ The class reports directory-fsync support instead of assuming durability support
 
 `Plan.arguments()` produces `-datadir`, the Windows form of its private view
 path, and `-vulkan`. This method **refuses gameplay arguments when loose Interface
-content is present**. `deferredLooseTrees` exposes that pending content requirement.
-A preparation result alone is not permission to skip this gate. Client revisions
+content is present without an active reviewed writable UI selection**.
+`deferredLooseTrees` exposes that pending requirement. The five-argument Plan
+constructor accepts only a typed `ClientUiStore.Selection`; it binds the exact
+import/root/work store and is revalidated before preparation and argument use.
+See [WRITABLE-UI.md](WRITABLE-UI.md). A preparation result alone is not permission
+to skip this gate. Client revisions
 that implement a separately reviewed local-offline policy will need their own
 qualified launch-argument addition; the current pinned 69cc client has no such
 mode and the view does not invent an unsupported flag.
@@ -115,9 +119,10 @@ No credential is read into receipts or progress messages.
 Loose `Interface` is an explicit deferred feature, not silently omitted gameplay
 content. `WoW/Source/UIUtil/AddOns.cpp` writes `.pub` and `.url` files and can
 rename/delete `GlueXML`, `FrameXML` and Blizzard addon directories. A simple
-link into immutable imported content is therefore inappropriate. A subsequent
-copy-on-update policy must preserve imported originals, prior generations and
-user changes before this gate can be removed. Packed MPQ UI content continues
+link into immutable imported content is therefore inappropriate. The separately implemented
+`ClientUiStore` policy preserves imported originals, prior generations and user
+changes, and supplies a typed selection after assessment and activation. Until
+that selection is supplied, the gate remains closed. Packed MPQ UI content continues
 to be reachable through the Data overlay. Fonts are exposed through individual
 validated guest file links; the audited font consumers request those asset paths
 for reading, with no font-file writer introduced here.

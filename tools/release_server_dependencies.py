@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Validate/preserve exact server dependency artifacts as a write-once prerelease.
 
-Only the explicit publish operation writes to GitHub. It never overwrites an
+Only explicit publish/upload-draft operations write to GitHub. Neither overwrites an
 asset, moves a tag, deletes a release, changes repository settings, or ships APKs,
 game files, SQL content or private state. Large files are streamed with bounds.
 """
@@ -17,6 +17,7 @@ import re
 import shutil
 import stat
 import tempfile
+import time
 from urllib.error import HTTPError
 from urllib.parse import quote, urlsplit
 from urllib.request import Request, build_opener, HTTPRedirectHandler
@@ -359,6 +360,110 @@ def release_body(lock):
             'GitHub-enforced immutability is recorded separately; this workflow does not change repository settings.\n')
 
 
+def release_identity(release, lock):
+    # The authorized GitHub web editor stores CRLF. Normalize only that exact
+    # newline encoding; do not trim, collapse whitespace, or accept bare CR.
+    body = release.get('body')
+    require(release['tag_name'] == lock['tag'] and release['prerelease'] is True and
+            isinstance(body, str) and body.replace('\r\n', '\n') == release_body(lock),
+            'existing-release-identity-mismatch; release-preserved')
+
+
+def find_owned_draft(api, lock):
+    # GitHub's by-tag endpoint may omit drafts. List with the publication job's
+    # authorized contents permission; never infer ownership from the name alone.
+    matches = []
+    for page in range(1, 11):
+        rows = api.json('/releases?per_page=100&page=' + str(page))
+        matches.extend(row for row in rows if row['tag_name'] == lock['tag'])
+        if len(rows) < 100:
+            break
+    else:
+        raise ValueError('release-list-bound; no-mutation')
+    require(len(matches) == 1, 'exact-owned-UI-draft-required; no-release-created')
+    release = matches[0]
+    release_identity(release, lock)
+    return release
+
+
+def stored_assets(api, release_id, identities):
+    rows = api.json('/releases/' + str(release_id) + '/assets?per_page=100')
+    assets = {item['name']: item for item in rows}
+    require(len(assets) == len(rows) and set(assets).issubset(RELEASE_FILES), 'unexpected-existing-release-assets')
+    for name, row in assets.items():
+        check_stored_asset(api, row, identities[name])
+    return assets
+
+
+def check_stored_asset(api, row, expected):
+    require(row['state'] == 'uploaded' and row['size'] == expected['bytes'] and
+            row.get('digest') == 'sha256:' + expected['sha256'], 'existing-asset-differs; no-overwrite')
+    with tempfile.TemporaryDirectory(prefix='esteria-release-verify-') as directory:
+        api.download(API + '/releases/assets/' + str(row['id']), Path(directory) / 'stored-asset', expected)
+
+
+def publication_receipt(release, assets, identities, lock):
+    return dict(formatVersion=1, repository=REPOSITORY, tag=lock['tag'], targetCommit=lock['targetCommit'],
+                releaseId=release['id'], url=release['html_url'], githubImmutable=release.get('immutable'),
+                publisherNeverOverwrites=True, assets={name: dict(identities[name], url=assets[name]['browser_download_url']) for name in sorted(identities)})
+
+
+def verify_published(api, candidate, lock, pin, wait_seconds=0):
+    """Read-only verification after an authorized publisher finalizes the draft."""
+    require(type(wait_seconds) is int and 0 <= wait_seconds <= 1200, 'publication-wait-bound')
+    identities = verify_candidate(candidate, lock, pin)
+    deadline = time.monotonic() + wait_seconds
+    while True:
+        release = api.json('/releases/tags/' + quote(lock['tag'], safe=''), missing=True)
+        if release is not None and release['draft'] is False:
+            break
+        require(time.monotonic() < deadline, 'published-release-not-yet-available; no-mutation')
+        time.sleep(min(15, max(0, deadline - time.monotonic())))
+    release_identity(release, lock)
+    ref = api.json('/git/ref/tags/' + quote(lock['tag'], safe=''))
+    require(ref['object']['type'] == 'commit' and ref['object']['sha'] == lock['targetCommit'], 'existing-tag-target-mismatch; tag-preserved')
+    assets = stored_assets(api, release['id'], identities)
+    require(set(assets) == RELEASE_FILES, 'published-release-missing-assets; no-repair-or-overwrite')
+    return publication_receipt(release, assets, identities, lock)
+
+
+def upload_draft(api, candidate, lock, pin):
+    """Only upload missing assets to the exact existing UI-created draft.
+
+    No tag/ref creation, release creation, metadata mutation, or finalization.
+    The UI draft must bind the full original SHA even before its tag exists.
+    """
+    identities = verify_candidate(candidate, lock, pin)
+    release = find_owned_draft(api, lock)
+    if release['draft'] is False:
+        # A repeated invocation may verify a complete published release, but
+        # cannot add even one missing asset or alter its metadata.
+        return dict(draft=False, completeAssetSetVerified=True,
+                    published=verify_published(api, candidate, lock, pin))
+    require(release['draft'] is True and release['target_commitish'] == lock['targetCommit'],
+            'UI-draft-must-bind-exact-original-commit')
+    ref = api.json('/git/ref/tags/' + quote(lock['tag'], safe=''), missing=True)
+    require(ref is None or (ref['object']['type'] == 'commit' and ref['object']['sha'] == lock['targetCommit']),
+            'existing-tag-target-mismatch; tag-preserved')
+    release_id = release['id']
+    assets = stored_assets(api, release_id, identities)
+    for name, expected in identities.items():
+        if name not in assets:
+            current = api.json('/releases/' + str(release_id))
+            release_identity(current, lock)
+            require(current['draft'] is True and current['target_commitish'] == lock['targetCommit'],
+                    'UI-draft-changed-before-upload; no-metadata-mutation')
+            assets[name] = api.upload(release_id, name, candidate / name, expected)
+            check_stored_asset(api, assets[name], expected)
+    current = api.json('/releases/' + str(release_id))
+    release_identity(current, lock)
+    require(current['draft'] is True and current['target_commitish'] == lock['targetCommit'],
+            'UI-draft-changed-before-receipt')
+    return dict(formatVersion=1, repository=REPOSITORY, tag=lock['tag'], targetCommit=lock['targetCommit'],
+                releaseId=release_id, draft=True, completeAssetSetVerified=True, publicationQualified=False,
+                assets={name: dict(identities[name]) for name in sorted(identities)})
+
+
 def publish(api, candidate, lock, pin):
     identities = verify_candidate(candidate, lock, pin)
     ref_path = '/git/ref/tags/' + quote(lock['tag'], safe='')
@@ -372,8 +477,7 @@ def publish(api, candidate, lock, pin):
         release = api.json('/releases', method='POST', value=dict(tag_name=lock['tag'], target_commitish=lock['targetCommit'],
                            name='Esteria server dependencies ' + lock['tag'], body=release_body(lock),
                            draft=True, prerelease=True, make_latest='false'))
-    require(release['tag_name'] == lock['tag'] and release['prerelease'] is True and release['body'] == release_body(lock),
-            'existing-release-identity-mismatch; release-preserved')
+    release_identity(release, lock)
     release_id = release['id']
     rows = api.json('/releases/' + str(release_id) + '/assets?per_page=100')
     assets = {item['name']: item for item in rows}
@@ -428,10 +532,11 @@ def fetch_published(api, output, lock, pin, include_sources=False, candidate=Fal
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('operation', choices=('prepare', 'download-inputs', 'stage', 'verify', 'publish', 'fetch'))
+    parser.add_argument('operation', choices=('prepare', 'download-inputs', 'stage', 'verify', 'publish', 'upload-draft', 'verify-published', 'fetch'))
     parser.add_argument('--inputs', type=Path)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--include-sources', action='store_true')
+    parser.add_argument('--wait-seconds', type=int, default=0)
     args = parser.parse_args()
     lock, pin = load_lock()
     api = Github(os.environ.get('GITHUB_TOKEN'))
@@ -448,12 +553,18 @@ def main():
         require(args.inputs is not None, 'stage-requires-inputs'); result = stage(args.inputs, args.output, lock, pin)
     elif args.operation == 'verify':
         result = verify_candidate(args.output, lock, pin)
-    elif args.operation == 'publish':
+    elif args.operation in ('publish', 'upload-draft'):
         require(os.environ.get('GITHUB_REPOSITORY') == REPOSITORY and
                 os.environ.get('GITHUB_REF') == 'refs/heads/android/client-server' and api.token,
                 'publication-requires-owned-development-branch-GitHub-Actions-context')
         require(args.inputs is not None and not args.output.exists(), 'publish-requires-candidate-and-new-receipt')
-        result = publish(api, args.inputs, lock, pin)
+        result = (upload_draft if args.operation == 'upload-draft' else publish)(api, args.inputs, lock, pin)
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_bytes(encoded(result))
+    elif args.operation == 'verify-published':
+        require(args.inputs is not None and not args.output.exists(), 'verify-published-requires-candidate-and-new-receipt')
+        result = verify_published(api, args.inputs, lock, pin, args.wait_seconds)
+        args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_bytes(encoded(result))
     else:
         result = fetch_published(api, args.output, lock, pin, args.include_sources)

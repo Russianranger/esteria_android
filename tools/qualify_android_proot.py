@@ -16,7 +16,7 @@ PACKAGE='io.github.russianranger.esteria'
 SCOPE='android-13-x86_64-proot-glibc-execution'
 FLAGS=('androidProotExecuted','privateElfLoaderExecuted','directPrivateBionicExecRejected',
        'dynamicLibraryAndTlsVerified','forkExecLoopbackVerified','relaunchPersistenceVerified',
-       'androidTracerDeathQualified','pidfdIdentityVerified','gracefulGuestStopVerified')
+       'androidTracerDeathQualified','pidfdIdentityVerified','gracefulGuestStopVerified','userSpaceWaitArmed')
 
 
 def validate_receipt(value,revision,fingerprint,build):

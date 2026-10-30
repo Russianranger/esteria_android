@@ -13,7 +13,6 @@ import json
 import os
 from pathlib import Path
 import re
-import resource
 import stat
 import subprocess
 import sys
@@ -180,8 +179,17 @@ def copy_fixture(fixture, expected_hash, lock_path, destination):
     return manifest
 
 
-def bounded_output():
-    resource.setrlimit(resource.RLIMIT_FSIZE, (MAX_SQL_LOG, MAX_SQL_LOG))
+def bounded_file_command(command, maximum):
+    # EngineCapture has a live reader thread. Python preexec_fn is unsafe in a
+    # threaded parent and can block before Popen returns (outside its timeout).
+    # Start an isolated interpreter instead, then exec the exact target in the
+    # same process with the size cap applied. This contains no interpolated code.
+    limiter = ('import os,resource,signal,sys; n=int(sys.argv[1]); '
+               'resource.setrlimit(resource.RLIMIT_FSIZE,(n,n)); '
+               'signal.signal(signal.SIGPIPE,signal.SIG_DFL); '
+               'signal.signal(signal.SIGXFSZ,signal.SIG_DFL); '
+               'os.execv(sys.argv[2],sys.argv[2:])')
+    return [sys.executable, '-I', '-c', limiter, str(maximum), *command]
 
 
 def apply_base(mysql, options, database, sql, log):
@@ -191,8 +199,8 @@ def apply_base(mysql, options, database, sql, log):
     environment = {'PATH': '/usr/bin:/bin', 'LANG': 'C.UTF-8', 'MYSQL_TEST_LOGIN_FILE': os.devnull}
     with sql.open('rb') as source, log.open('wb') as diagnostic:
         os.chmod(log, 0o600)
-        result = subprocess.run(command, stdin=source, stdout=diagnostic, stderr=subprocess.STDOUT,
-                                env=environment, timeout=300, preexec_fn=bounded_output)
+        result = subprocess.run(bounded_file_command(command, MAX_SQL_LOG), stdin=source,
+                                stdout=diagnostic, stderr=subprocess.STDOUT, env=environment, timeout=300)
     content.require(result.returncode == 0, 'base SQL client failed for ' + sql.name +
                     ' (exit ' + str(result.returncode) + '); private bounded SQL log retained')
 

@@ -37,6 +37,65 @@ int main() {
     { std::ifstream file(root+"/out"); file >> value; assert(value=="ok"); }
     { std::ifstream file(root+"/err"); file >> value; assert(value=="err"); }
     struct stat info{}; assert(stat((root+"/out").c_str(),&info)==0); assert((info.st_mode & 0777)==0600);
+    // Opt-in stdin is a real binary stream. EOF is explicit and idempotent.
+    options.arguments={"-c","cat"}; options.interactive_input=true;
+    const auto echo=esteria::start(options);
+    const unsigned char binary[]={0,255,1,'\n','x',0,'y'};
+    assert(esteria::write_input(echo,binary,sizeof(binary),100));
+    esteria::close_input(echo); esteria::close_input(echo);
+    assert(esteria::wait_for(echo,5000)==0);
+    { std::ifstream file(root+"/out",std::ios::binary); std::string bytes((std::istreambuf_iterator<char>(file)),{});
+      assert(bytes==std::string(reinterpret_cast<const char*>(binary),sizeof(binary))); }
+    bool closed_input=false;
+    try { esteria::write_input(echo,binary,sizeof(binary),0); } catch (...) { closed_input=true; }
+    assert(closed_input);
+    // Fill a reader-paused pipe, verify bounded backpressure and zero partial
+    // messages on timeout, then drain exactly the messages reported accepted.
+    options.arguments={"-c","while [ ! -f drain ]; do sleep .01; done; cat"};
+    const auto pressure_input=esteria::start(options);
+    const std::string block(4096,'b'); std::size_t accepted=0;
+    while (accepted<1024*1024 && esteria::write_input(pressure_input,block.data(),block.size(),0)) accepted+=block.size();
+    assert(accepted>0 && accepted<1024*1024);
+    const auto input_began=std::chrono::steady_clock::now();
+    const std::string refused_block(4096,'r');
+    assert(!esteria::write_input(pressure_input,refused_block.data(),refused_block.size(),80));
+    assert(std::chrono::steady_clock::now()-input_began<std::chrono::milliseconds(500));
+    { std::ofstream marker(root+"/drain"); marker << "go"; }
+    esteria::close_input(pressure_input);
+    assert(esteria::wait_for(pressure_input,5000)==0);
+    { std::ifstream file(root+"/out",std::ios::binary); std::string bytes((std::istreambuf_iterator<char>(file)),{});
+      assert(bytes==std::string(accepted,'b')); }
+    unlink((root+"/drain").c_str());
+    // Closing while a writer waits must cancel it; it cannot target a reused fd.
+    options.arguments={"-c","exec sleep 30"};
+    const auto closing_input=esteria::start(options);
+    accepted=0;
+    while (accepted<1024*1024 && esteria::write_input(closing_input,block.data(),block.size(),0)) accepted+=block.size();
+    assert(accepted<1024*1024);
+    bool write_closed=false;
+    std::thread input_writer([&] { try { esteria::write_input(closing_input,block.data(),block.size(),1000); } catch (...) { write_closed=true; } });
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    const auto close_began=std::chrono::steady_clock::now();
+    esteria::close_input(closing_input); input_writer.join();
+    assert(write_closed && std::chrono::steady_clock::now()-close_began<std::chrono::milliseconds(500));
+    assert(esteria::stop(closing_input,0)!=esteria::running);
+    // EPIPE must not deliver a fatal SIGPIPE to the native host/JVM.
+    options.arguments={"-c","exec 0<&-; printf ready; exec sleep 30"};
+    const auto broken_input=esteria::start(options);
+    bool reader_closed=false;
+    for (int i=0;i<100 && !reader_closed;++i) {
+        std::ifstream file(root+"/out"); std::string line; file >> line; reader_closed=line=="ready";
+        if (!reader_closed) std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    assert(reader_closed); bool broken_rejected=false;
+    try { esteria::write_input(broken_input,binary,sizeof(binary),100); } catch (...) { broken_rejected=true; }
+    assert(broken_rejected && esteria::stop(broken_input,0)!=esteria::running);
+    options.interactive_input=false; options.arguments={"-c","cat; printf eof"};
+    const auto default_input=esteria::start(options); assert(esteria::wait_for(default_input,5000)==0);
+    { std::ifstream file(root+"/out"); file >> value; assert(value=="eof"); }
+    bool default_rejected=false;
+    try { esteria::write_input(default_input,binary,sizeof(binary),0); } catch (...) { default_rejected=true; }
+    assert(default_rejected);
     options.executable="/bin/sleep"; options.arguments={"30"};
     const auto live=esteria::start(options);
     const auto live_pid=esteria::process_id(live);
@@ -100,6 +159,7 @@ int main() {
         close(report[0]);
         options.output=root+"/orphan-out"; options.error=root+"/orphan-err";
         options.arguments={"-c","trap '' TERM; echo $$; exec /bin/sleep 30"};
+        options.interactive_input=true;
         esteria::start(options);
         pid_t native_child=0;
         for (int i=0;i<100 && native_child<=0;++i) {
@@ -138,5 +198,5 @@ int main() {
     refused=false; try { esteria::start(options); } catch (...) { refused=true; } assert(refused);
     { std::ifstream keep(root+"/preserve"); keep >> value; assert(value=="preserve"); }
     std::filesystem::remove_all(root);
-    std::cout << "Native owner tests: PASS (exit, idempotence, TERM/KILL, concurrent stop/wait, unrelated child isolation, owner SIGKILL, group cleanup, 80-command churn, log bound, IO modes, rejected exec/handles/symlinks)\n";
+    std::cout << "Native owner tests: PASS (exit, idempotence, TERM/KILL, concurrent stop/wait, unrelated child isolation, owner SIGKILL, group cleanup, 80-command churn, log bound, IO modes, rejected exec/handles/symlinks, binary stdin, EOF, atomic backpressure, close/write race, EPIPE, default stdin)\n";
 }

@@ -1,0 +1,21 @@
+// Package these exact reusable helpers; do not keep divergent Android copies.
+def databaseHelpers = ['mysql_bootstrap.py', 'android_database_setup.py']
+def helperOutput = layout.buildDirectory.dir('generated/databaseSetup')
+def packageDatabaseSetup = tasks.register('packageDatabaseSetup') {
+    inputs.files(databaseHelpers.collect { rootProject.file('runtime/' + it) })
+    outputs.dir(helperOutput)
+    doLast {
+        def destination = new File(helperOutput.get().asFile, 'database-setup')
+        destination.mkdirs()
+        def records = new TreeMap()
+        databaseHelpers.each { name ->
+            byte[] bytes = rootProject.file('runtime/' + name).bytes
+            if (bytes.length == 0 || bytes.length > 131072) throw new GradleException('Unexpected database helper size')
+            new File(destination, name).bytes = bytes
+            records[name] = [bytes: bytes.length, sha256: java.security.MessageDigest.getInstance('SHA-256').digest(bytes).encodeHex().toString()]
+        }
+        new File(destination, 'manifest.json').text = groovy.json.JsonOutput.toJson([formatVersion: 1, files: records]) + '\n'
+    }
+}
+android.sourceSets.main.assets.srcDir(helperOutput)
+tasks.named('preBuild').configure { dependsOn packageDatabaseSetup }

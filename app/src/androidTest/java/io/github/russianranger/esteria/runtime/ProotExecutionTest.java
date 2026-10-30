@@ -99,6 +99,14 @@ public final class ProotExecutionTest {
                 pids.add(pid);watched.add(ProbeProcessHandles.watch(pid,ticks,tracerPid,loader.toString(),rootfs.resolve("probe-owner").toString()));
             }
             assertEquals(3,watched.size());assertEquals(3,new HashSet<>(pids).size());
+            if(!graceful){
+                Path armed=work.resolve("armed");String expected="\u0001\u0001\u0001";
+                while(System.nanoTime()<deadline){
+                    if(Files.exists(armed)&&expected.equals(read(armed)))break;
+                    assertTrue("Ownership guest ended before CPU-only wait",child.isAlive());Thread.sleep(10);
+                }
+                assertEquals("All tracees passed their final syscall before intervention",expected,read(armed));
+            }
             for(long handle:watched)assertFalse("Tracee must be alive before the intervention",ProbeProcessHandles.exited(handle,0));
             if(graceful){
                 child.stop(Duration.ofSeconds(5));assertFalse(child.wasForced());assertEquals(0,child.exitCode());assertNull(child.failure());
@@ -199,6 +207,7 @@ public final class ProotExecutionTest {
             .put("androidProotExecuted",true).put("privateElfLoaderExecuted",true).put("directPrivateBionicExecRejected",true)
             .put("dynamicLibraryAndTlsVerified",true).put("forkExecLoopbackVerified",true).put("relaunchPersistenceVerified",true)
             .put("androidTracerDeathQualified",true).put("pidfdIdentityVerified",true).put("controlSurvivors",3).put("patchedSurvivors",0)
+            .put("userSpaceWaitArmed",true)
             .put("detachedTraceesPerCase",3).put("gracefulGuestStopVerified",true).put("gracefulSavedFilesRestored",3)
             .put("controlObservationMillis",controlMillis).put("patchedObservationMillis",patchedMillis)
             .put("arm64GuestExecuted",false).put("appDeathQualified",false).put("wineQualified",false).put("gameplayQualified",false);

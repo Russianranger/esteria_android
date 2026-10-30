@@ -41,7 +41,7 @@ jobs:
           compression-level: 0
           if-no-files-found: error
           retention-days: 3
-  publish:
+  upload-draft:
     needs: validate
     if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
     runs-on: ubuntu-24.04
@@ -57,12 +57,41 @@ jobs:
         with:
           name: validated-server-dependency-release
           path: out/release-candidate
-      - name: Verify stored bytes, preserve exact tag/assets, publish dependency-only prerelease
+      - name: Upload only to the exact existing UI-created draft and verify stored bytes
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          python3 tools/release_server_dependencies.py publish \
-            --inputs out/release-candidate --output out/published-release.json
+          python3 tools/release_server_dependencies.py upload-draft \
+            --inputs out/release-candidate --output out/draft-assets-verified.json
+      - name: Retain draft asset readiness without claiming publication
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: server-dependency-draft-upload-receipt
+          path: out/draft-assets-verified.json
+          if-no-files-found: error
+          retention-days: 14
+  verify-publication:
+    needs: [validate, upload-draft]
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: validated-server-dependency-release
+          path: out/release-candidate
+      - name: Wait for authorized UI publication, then verify actual tag and every asset read-only
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/release_server_dependencies.py verify-published \
+            --inputs out/release-candidate --output out/published-release.json --wait-seconds 1200
       - name: Retain actual durable URLs and server-reported immutability
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:

@@ -111,7 +111,8 @@ class FakeGithub:
         self.mutations, self.downloads = [], []
         self.ref = {'object': {'type': 'commit', 'sha': lock['targetCommit']}} if existing else None
         self.release = dict(id=1, tag_name=lock['tag'], draft=draft, prerelease=True,
-                            body=release.release_body(lock), html_url='https://github.com/example', immutable=False) if existing else None
+                            target_commitish=lock['targetCommit'], body=release.release_body(lock),
+                            html_url='https://github.com/example', immutable=False) if existing else None
         self.assets = {name: self.asset(name, values, index + 1) for index, (name, values) in enumerate(identities.items())} if existing else {}
 
     def asset(self, name, values, id_):
@@ -130,6 +131,10 @@ class FakeGithub:
             raise AssertionError(path)
         if path.startswith('/git/ref/'):
             return self.ref
+        if path.startswith('/releases?per_page=100&page='):
+            return [self.release] if self.release else []
+        if path == '/releases/1':
+            return self.release
         if path.startswith('/releases/tags/'):
             return self.release
         if path == '/releases/1/assets?per_page=100':
@@ -191,6 +196,62 @@ class PublicationGuards(unittest.TestCase):
         name = api.assets.pop(next(iter(api.assets)))['name']
         release.publish(api, Path('/fixture'), self.lock, {})
         self.assertEqual(api.mutations, [('UPLOAD', name), ('PATCH', '/releases/1')])
+
+    def test_ui_draft_upload_never_creates_tag_or_release_or_finalizes(self):
+        api = FakeGithub(self.lock, self.identities, draft=True)
+        api.ref = None
+        api.assets = {}
+        result = release.upload_draft(api, Path('/fixture'), self.lock, {})
+        self.assertTrue(result['draft'])
+        self.assertTrue(result['completeAssetSetVerified'])
+        self.assertFalse(result['publicationQualified'])
+        self.assertEqual(len(api.mutations), len(self.identities))
+        self.assertTrue(all(method == 'UPLOAD' for method, _ in api.mutations))
+        self.assertIsNone(api.ref)
+        self.assertTrue(api.release['draft'])
+
+    def test_ui_draft_requires_exact_sha_and_body_and_preserves_existing_conflicts(self):
+        for change in ('missing', 'target', 'body', 'tag', 'asset'):
+            api = FakeGithub(self.lock, self.identities, draft=True)
+            if change == 'missing': api.release = None
+            elif change == 'target': api.release['target_commitish'] = 'android/client-server'
+            elif change == 'body': api.release['body'] = 'unrelated draft'
+            elif change == 'tag': api.ref['object']['sha'] = 'b' * 40
+            else: next(iter(api.assets.values()))['digest'] = 'sha256:' + '0' * 64
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                release.upload_draft(api, Path('/fixture'), self.lock, {})
+            self.assertEqual(api.mutations, [])
+
+    def test_exact_ui_crlf_encoding_is_accepted_without_other_body_normalization(self):
+        api = FakeGithub(self.lock, self.identities, draft=True)
+        api.release['body'] = api.release['body'].replace('\n', '\r\n')
+        release.upload_draft(api, Path('/fixture'), self.lock, {})
+        self.assertEqual(api.mutations, [])
+        for changed in (release.release_body(self.lock).rstrip(), release.release_body(self.lock).replace('\n', '\r')):
+            api.release['body'] = changed
+            with self.assertRaises(ValueError):
+                release.upload_draft(api, Path('/fixture'), self.lock, {})
+
+    def test_final_readonly_verification_requires_real_published_tag_and_all_assets(self):
+        api = FakeGithub(self.lock, self.identities)
+        result = release.verify_published(api, Path('/fixture'), self.lock, {})
+        self.assertEqual(result['targetCommit'], self.lock['targetCommit'])
+        self.assertEqual(api.mutations, [])
+        for change in ('draft', 'tag', 'missing'):
+            api = FakeGithub(self.lock, self.identities)
+            if change == 'draft': api.release['draft'] = True
+            elif change == 'tag': api.ref['object']['sha'] = 'b' * 40
+            else: api.assets.pop(next(iter(api.assets)))
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                release.verify_published(api, Path('/fixture'), self.lock, {})
+            self.assertEqual(api.mutations, [])
+
+    def test_draft_upload_invocation_cannot_repair_published_release(self):
+        api = FakeGithub(self.lock, self.identities)
+        api.assets.pop(next(iter(api.assets)))
+        with self.assertRaisesRegex(ValueError, 'no-repair'):
+            release.upload_draft(api, Path('/fixture'), self.lock, {})
+        self.assertEqual(api.mutations, [])
 
 
 class NetworkBoundary(unittest.TestCase):

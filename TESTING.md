@@ -140,3 +140,11 @@ Native ARM64 Wine FMOD run `40998295147` also passes both actual backend/signal
 checks; receipt SHA256 is
 `663bdfd114d8440098556f5e475a4024224b28b8c5700a903d58308762131ffd`.
 These remain separate host/emulator component results, not an end-to-end game pass.
+
+
+The latest host checkpoints add six Android database-adapter preservation tests,
+32MiB writable UI generation/selection tests, twelve real native JNI groups with
+bounded stdin, and eleven backup guard tests including the actual kernel output
+size limit. Full MySQL dump/restore, expanded Android process tests and corrected
+tracer-death control still require their CI results. See the scoped qualification
+documents; none of these host checks establishes login, world saving or Thor use.

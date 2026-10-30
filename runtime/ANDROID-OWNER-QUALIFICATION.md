@@ -13,12 +13,19 @@ owner source. The test asserts that its library exists, loads it through the
 real app class, and executes `/system/bin/sh` through the native fork/exec path.
 A missing library or skipped/zero-test result is a failure.
 
-Six groups establish Unicode paths/arguments and nonzero exit, creator-thread
+The original six groups establish Unicode paths/arguments and nonzero exit, creator-thread
 lifetime with a file-mediated graceful-save fixture, forced-stop failure,
 failed-shutdown-request cleanup, continuously drained independent stdout/stderr
 (9,000,000 bytes each, capped at 8 MiB stored), and missing-executable rejection.
 The shell snippets are test fixtures; production PRoot commands remain explicit
 argv without a shell wrapper. This does not initialize or save a real database.
+
+The expanded nine-group fixture also requires binary stdin/EOF, a real full-pipe
+timeout with no partial command, close/write cancellation, closed-reader EPIPE
+without host termination, and exact `server shutdown 1` delivery to a normal-exit
+shell fixture. These new checks are pending actual emulator execution; the earlier
+six-group pass below does not qualify them. Receipts must explicitly retain false
+world-shutdown and character-persistence fields. See [WORLD-SHUTDOWN.md](WORLD-SHUTDOWN.md).
 
 The harness requires one completed successful JUnit result, then retrieves the
 app-generated receipt via `run-as`, verifies its exact source revision,

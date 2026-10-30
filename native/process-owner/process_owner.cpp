@@ -11,6 +11,7 @@
 #include <memory>
 #include <mutex>
 #include <poll.h>
+#include <pthread.h>
 #include <signal.h>
 #include <stdexcept>
 #include <sys/prctl.h>
@@ -28,6 +29,10 @@ struct Owned {
     pid_t pid;
     std::atomic<int> status{running};
     std::mutex mutex;
+    std::timed_mutex input_mutex;
+    std::atomic<bool> input_closing{false};
+    int input_fd = -1;
+    bool interactive_input = false;
     std::atomic<bool> finish_logs{false};
     std::atomic<bool> diagnostics_consumed{false};
     std::atomic<bool> logs_joined{false};
@@ -35,6 +40,7 @@ struct Owned {
     std::thread output_thread, error_thread;
     explicit Owned(pid_t p) : pid(p) {}
     ~Owned() {
+        if (input_fd >= 0) close(input_fd);
         finish_logs = true;
         if (output_thread.joinable()) output_thread.join();
         if (error_thread.joinable()) error_thread.join();
@@ -46,6 +52,32 @@ std::map<std::int64_t, std::shared_ptr<Owned>> registry;
 std::int64_t next_handle = 1;
 [[noreturn]] void fail(const char* message) { throw std::runtime_error(message); }
 void close_fd(int& fd) { if (fd >= 0) { close(fd); fd = -1; } }
+void close_owned_input(Owned& owned) {
+    owned.input_closing = true;
+    std::lock_guard<std::timed_mutex> guard(owned.input_mutex);
+    close_fd(owned.input_fd);
+}
+// Never change the JVM's process-wide SIGPIPE disposition. Block only this
+// writing thread and consume only a new EPIPE signal produced by our own write.
+class PipeSignal {
+    sigset_t previous{}, blocked{};
+    bool pending = false;
+public:
+    PipeSignal() {
+        sigemptyset(&blocked); sigaddset(&blocked,SIGPIPE);
+        if (pthread_sigmask(SIG_BLOCK,&blocked,&previous)) fail("Cannot protect process input write");
+        sigset_t signals{};
+        if (sigpending(&signals)) { pthread_sigmask(SIG_SETMASK,&previous,nullptr); fail("Cannot inspect process input signal state"); }
+        pending = sigismember(&signals,SIGPIPE) == 1;
+    }
+    void broken() {
+        if (!pending) {
+            timespec zero{};
+            while (sigtimedwait(&blocked,nullptr,&zero)<0 && errno==EINTR) {}
+        }
+    }
+    ~PipeSignal() { pthread_sigmask(SIG_SETMASK,&previous,nullptr); }
+};
 int regular_file(const std::string& path, bool write) {
     int fd = open(path.c_str(), (write ? O_WRONLY | O_CREAT : O_RDONLY) | O_CLOEXEC | O_NOFOLLOW | O_NONBLOCK, 0600);
     if (fd < 0) fail("Cannot open private process IO");
@@ -104,6 +136,7 @@ int poll_owned(Owned& owned) {
         fail("Owned process could not be observed");
     }
     if (!info.si_pid) return running;
+    close_owned_input(owned);
     if (kill(-owned.pid, SIGKILL) && errno != ESRCH) fail("Owned process group could not be completed");
     int value = 0;
     pid_t result;
@@ -124,6 +157,7 @@ std::int64_t start(const StartOptions& options) {
     bounded_strings({options.executable, options.cwd, options.input, options.output, options.error}, 5);
     if (options.executable.empty() || options.executable[0] != '/' || options.cwd.empty() || options.cwd[0] != '/') fail("Process paths must be absolute");
     if (options.output == options.error) fail("Process log paths must differ");
+    if (options.interactive_input && !options.input.empty()) fail("Interactive process input cannot use a file");
     std::vector<std::string> values{options.executable};
     values.insert(values.end(), options.arguments.begin(), options.arguments.end());
     std::vector<char*> argv, env;
@@ -132,10 +166,14 @@ std::int64_t start(const StartOptions& options) {
     for (const auto& value : options.environment) env.push_back(const_cast<char*>(value.c_str()));
     env.push_back(nullptr);
     int input = -1, output = -1, error = -1;
-    int out_pipe[2]{-1,-1}, err_pipe[2]{-1,-1}, exec_pipe[2]{-1,-1};
+    int in_pipe[2]{-1,-1}, out_pipe[2]{-1,-1}, err_pipe[2]{-1,-1}, exec_pipe[2]{-1,-1};
     pid_t child = -1;
     try {
-        input = options.input.empty() ? open("/dev/null", O_RDONLY | O_CLOEXEC) : regular_file(options.input, false);
+        if (options.interactive_input) {
+            if (pipe2(in_pipe,O_CLOEXEC) || fcntl(in_pipe[1],F_SETFL,O_NONBLOCK) ||
+                    fpathconf(in_pipe[1],_PC_PIPE_BUF)<4096) fail("Cannot create bounded process input pipe");
+            input=in_pipe[0]; in_pipe[0]=-1;
+        } else input = options.input.empty() ? open("/dev/null", O_RDONLY | O_CLOEXEC) : regular_file(options.input, false);
         if (input < 0) fail("Cannot open process input");
         output = regular_file(options.output, true); error = regular_file(options.error, true);
         if (pipe2(out_pipe, O_CLOEXEC) || pipe2(err_pipe, O_CLOEXEC) || pipe2(exec_pipe, O_CLOEXEC)) fail("Cannot create process pipes");
@@ -190,6 +228,8 @@ std::int64_t start(const StartOptions& options) {
         close_fd(exec_pipe[0]);
         if (got != 0) { waitpid(child, nullptr, 0); child = -1; fail("Native executable did not start"); }
         auto owned = std::make_shared<Owned>(child);
+        owned->interactive_input=options.interactive_input;
+        owned->input_fd=in_pipe[1]; in_pipe[1]=-1;
         owned->output_thread = std::thread(drain, out_pipe[0], output, owned.get(), 0); out_pipe[0] = output = -1;
         owned->error_thread = std::thread(drain, err_pipe[0], error, owned.get(), 1); err_pipe[0] = error = -1;
         const auto handle = next_handle++;
@@ -199,9 +239,43 @@ std::int64_t start(const StartOptions& options) {
     } catch (...) {
         if (child > 0) { kill(-child, SIGKILL); kill(child, SIGKILL); waitpid(child, nullptr, 0); }
         close_fd(input); close_fd(output); close_fd(error);
-        for (int* pair : {out_pipe,err_pipe,exec_pipe}) { close_fd(pair[0]); close_fd(pair[1]); }
+        for (int* pair : {in_pipe,out_pipe,err_pipe,exec_pipe}) { close_fd(pair[0]); close_fd(pair[1]); }
         throw;
     }
+}
+
+bool write_input(std::int64_t handle, const void* bytes, std::size_t size, std::int64_t timeout_ms) {
+    if (!bytes || !size || size>4096 || timeout_ms<0 || timeout_ms>1000) fail("Invalid bounded process input request");
+    auto owned=lookup(handle);
+    if (!owned->interactive_input) fail("Owned process input is not interactive");
+    const auto end=std::chrono::steady_clock::now()+std::chrono::milliseconds(timeout_ms);
+    std::unique_lock<std::timed_mutex> guard(owned->input_mutex,std::defer_lock);
+    if (!guard.try_lock_until(end)) return false;
+    PipeSignal signal;
+    while (true) {
+        if (owned->input_closing || owned->status!=running || owned->input_fd<0) fail("Owned process input is closed");
+        // Nonblocking writes <=PIPE_BUF are all-or-nothing, including a timeout.
+        const ssize_t count=write(owned->input_fd,bytes,size);
+        if (count==static_cast<ssize_t>(size)) return true;
+        const int problem=errno;
+        if (count<0 && problem==EPIPE) {
+            signal.broken(); owned->input_closing=true; close_fd(owned->input_fd);
+            fail("Owned process input is closed");
+        }
+        if (count>=0 || (problem!=EAGAIN && problem!=EWOULDBLOCK && problem!=EINTR)) fail("Owned process input write failed");
+        const auto now=std::chrono::steady_clock::now();
+        if (now>=end) return false;
+        const auto remaining=std::chrono::duration_cast<std::chrono::milliseconds>(end-now).count();
+        pollfd watched{owned->input_fd,POLLOUT,0};
+        const int ready=poll(&watched,1,static_cast<int>(std::clamp<std::int64_t>(remaining,1,20)));
+        if (ready<0 && errno!=EINTR) fail("Owned process input wait failed");
+    }
+}
+
+void close_input(std::int64_t handle) {
+    auto owned=lookup(handle);
+    if (!owned->interactive_input) fail("Owned process input is not interactive");
+    close_owned_input(*owned);
 }
 
 int process_id(std::int64_t handle) {
@@ -247,6 +321,7 @@ int wait_for(std::int64_t handle, std::int64_t timeout_ms) {
 
 int stop(std::int64_t handle, std::int64_t grace_ms) {
     auto owned = lookup(handle);
+    close_owned_input(*owned);
     int completed;
     {
         std::lock_guard<std::mutex> guard(owned->mutex);

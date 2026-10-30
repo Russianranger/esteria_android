@@ -104,6 +104,8 @@ public final class ServerRuntimeSetup {
     public String generation() { return plan.generation; }
     public String archiveSha256() { return plan.archiveSha256; }
     public String expectedMysqlVersion() { return mysqlVersion; }
+    public RuntimePackagePlan packagePlan() { return plan; }
+    public RuntimeInstaller installer() throws IOException { return new RuntimeInstaller(store); }
     public long freshSetupFreeBytes() { return freshFreeBytes; }
 
     private InputStream openArchive(long offset) throws IOException {

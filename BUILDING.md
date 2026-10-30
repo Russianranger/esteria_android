@@ -154,3 +154,17 @@ into APK assets, covering the linked static C++/compiler runtime notices. Missin
 notice inputs fail the build. The mutable client view is exercised by
 `:core:clientLaunchViewTest`; see `runtime/client/LAUNCH-VIEW.md` for its stopped
 client requirement, loopback configuration and explicit loose-Interface gate.
+
+
+`app/database-setup.gradle` packages the original Python bootstrap and its fixed
+Android entry point, with a generated file-size/SHA-256 inventory. No separate
+source copy or Python dependency download is needed. The optional server runtime
+already contains the measured Python/MySQL binaries. This adapter is compiled but
+not invoked by launcher setup until actual Android MySQL qualification succeeds;
+see `runtime/ANDROID-DATABASE-SETUP.md` for the persistent guest-path contract.
+
+The dependency-preservation workflow supports an already-owned exact-commit UI
+draft. Its upload job only attaches verified missing assets, then a separate
+read-only job verifies actual publication. It does not expand Actions permissions,
+change default branches or substitute another tag target. See
+`runtime/server/DEPENDENCY-RELEASE.md` for the concrete authentication boundary.

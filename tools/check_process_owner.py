@@ -31,11 +31,12 @@ def main() -> None:
             "-I"+str(java/"include"),"-I"+str(java/"include/linux"),str(source/"process_owner.cpp"),str(source/"jni_bridge.cpp"),"-o",str(build/"libesteria_process.so")])
         classes=build/"classes"; classes.mkdir()
         core=ROOT/"core/src/main/java/io/github/russianranger/esteria/core/runtime"
-        run([str(java/"bin/javac"),"-d",str(classes),str(core/"SessionSupervisor.java"),str(core/"process/OwnedProcess.java"),str(core/"process/ProotLaunch.java"),
-            str(ROOT/"app/src/main/java/io/github/russianranger/esteria/runtime/NativeProcessBridge.java"),str(source/"NativeOwnerIntegrationTest.java")])
+        run([str(java/"bin/javac"),"-d",str(classes),str(core/"SessionSupervisor.java"),str(core/"process/OwnedProcess.java"),str(core/"process/ProotLaunch.java"),str(core/"process/WorldConsoleShutdown.java"),
+            str(ROOT/"app/src/main/java/io/github/russianranger/esteria/runtime/NativeProcessBridge.java"),str(source/"NativeOwnerIntegrationTest.java"),str(source/"NativeOwnerInputTests.java")])
         run([str(java/"bin/java"),"-Xmx64m","-Djava.library.path="+str(build),"-cp",str(classes),"io.github.russianranger.esteria.runtime.NativeOwnerIntegrationTest"],timeout=60)
     receipt={"formatVersion":1,"scope":"linux-native-owner-and-jni","hostArchitecture":platform.machine(),
-        "nativeOwnerPassed":True,"jvmIntegrationGroups":8,"androidCrossBuilt":False,"androidExecuted":False,"guestExecuted":False,"gameplayQualified":False}
+        "nativeOwnerPassed":True,"jvmIntegrationGroups":12,"interactiveInputQualified":True,
+        "worldShutdownQualified":False,"characterPersistenceQualified":False,"androidCrossBuilt":False,"androidExecuted":False,"guestExecuted":False,"gameplayQualified":False}
     if args.ndk:
         if "Pkg.Revision = 28.2.13676358" not in (args.ndk/"source.properties").read_text():
             raise ValueError("NDK 28.2.13676358 required")

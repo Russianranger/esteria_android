@@ -13,6 +13,23 @@ verified import, launcher UI and diagnostics, with gameplay deliberately gated.
 Read [STATUS.md](STATUS.md) and current Actions results before resuming; pending
 server/Wine jobs must not be converted into successful evidence without logs.
 
+## Current queued checkpoints
+
+- Client offline/timer tip: `e2718f647a7f1efb9219106c7501f88a0bf06e4f`; inspect its
+  full Windows/Wine run before regenerating the intentionally older69cc provider.
+- Server40994809596 remains active; auth and backup harnesses are ready for actual
+  binary/engine runs. Do not infer success from its long compile duration.
+- Android tracer control correction uses three armed CPU-only waits after all
+  syscalls. Prior41002275287 failed SIGSYS in the unpatched control; rerun required.
+- Bounded stdin/world shutdown adapter and writable UI store pass host tests;
+  actual Android/world-save and app review integration are next.
+- Android database setup source/asset adapter compiles. Read
+  `runtime/ANDROID-DATABASE-SETUP.md`; fixed `/work/state`, existing secrets and
+  interrupted state must be preserved. No live-service readiness claim.
+- Exactb06 dependency UI draft exists; automated upload only and post-publication
+  read-only verification avoid Actions release-create permissions. Verify assets
+  before browser publication; do not change the target/default branch.
+
 ## Next concrete work
 
 1. Fetch both development tips and inspect current Actions. Application client pin
@@ -29,7 +46,7 @@ server/Wine jobs must not be converted into successful evidence without logs.
    workflow also binds enabled modules to actual binaries and emits a verified
    GNU SQL/config/notice package. Source-profile package alone is unqualified.
 4. Android PRoot CI `40986376389` passed Bionic build/APK byte verification and
-   Linux x64/ARM64 descendant ownership. Actual Android PRoot execution remains open.
+   Linux x64/ARM64 descendant ownership. Minimal Android x64 PRoot/glibc execution passes below; production ARM64 remains open.
    The Java runtime installer has passed the full pinned archive on Linux with
    64 MiB heap, including forced hardlink copies. Android13 x86_64 installer/update
    run `40995925492` passes all18 contracts and version-2 preservation. Android

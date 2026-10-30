@@ -104,7 +104,8 @@ public final class NativeOwnerIntegrationTest {
             try { ProotLaunch.create(executable,executable,fs,linked,tmp,logs,List.of("/bin/true"),Map.of()); throw new AssertionError("symlink process directory accepted"); }
             catch (IOException expected) { }
             System.out.println("PASS PRoot argv, explicit environment and persistent/runtime separation");
-            System.out.println("Native JVM integration: 8 groups passed; Linux host only, not Android or guest execution");
+            check(NativeOwnerInputTests.run(backend,root)==4,"Input groups incomplete");
+            System.out.println("Native JVM integration: 12 groups passed; Linux host only, not Android or guest execution");
         } finally {
             try (var paths=Files.walk(root)) { for (Path path:paths.sorted(java.util.Comparator.reverseOrder()).toList()) Files.delete(path); }
         }

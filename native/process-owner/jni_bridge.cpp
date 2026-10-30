@@ -49,9 +49,26 @@ void error(JNIEnv* env,const std::exception& problem) {
 }
 }
 extern "C" JNIEXPORT jlong JNICALL
-Java_io_github_russianranger_esteria_runtime_NativeProcessBridge_startNative(JNIEnv* env,jclass,jstring executable,jobjectArray args,jobjectArray environment,jstring cwd,jstring output,jstring errors) {
-    try { return esteria::start({string(env,executable),strings(env,args),strings(env,environment),string(env,cwd),"",string(env,output),string(env,errors)}); }
+Java_io_github_russianranger_esteria_runtime_NativeProcessBridge_startNative(JNIEnv* env,jclass,jstring executable,jobjectArray args,jobjectArray environment,jstring cwd,jstring output,jstring errors,jboolean interactive) {
+    try { return esteria::start({string(env,executable),strings(env,args),strings(env,environment),string(env,cwd),"",string(env,output),string(env,errors),interactive==JNI_TRUE}); }
     catch (const std::exception& problem) { error(env,problem); return 0; }
+}
+extern "C" JNIEXPORT jboolean JNICALL
+Java_io_github_russianranger_esteria_runtime_NativeProcessBridge_writeInput(JNIEnv* env,jobject,jlong handle,jbyteArray data,jlong timeout) {
+    try {
+        if (!data) throw std::runtime_error("Missing process input");
+        const jsize size=env->GetArrayLength(data);
+        if (size<1 || size>4096) throw std::runtime_error("Invalid process input size");
+        std::array<jbyte,4096> bytes{};
+        env->GetByteArrayRegion(data,0,size,bytes.data());
+        if (env->ExceptionCheck()) return JNI_FALSE;
+        return esteria::write_input(handle,bytes.data(),static_cast<std::size_t>(size),timeout)?JNI_TRUE:JNI_FALSE;
+    } catch (const std::exception& problem) { error(env,problem); return JNI_FALSE; }
+}
+extern "C" JNIEXPORT void JNICALL
+Java_io_github_russianranger_esteria_runtime_NativeProcessBridge_closeInput(JNIEnv* env,jobject,jlong handle) {
+    try { esteria::close_input(handle); }
+    catch (const std::exception& problem) { error(env,problem); }
 }
 extern "C" JNIEXPORT jint JNICALL
 Java_io_github_russianranger_esteria_runtime_NativeProcessBridge_waitFor(JNIEnv* env,jobject,jlong handle,jlong timeout) {

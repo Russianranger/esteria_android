@@ -69,6 +69,16 @@ private guest's executable mapping before retaining opaque handles. Signals
 target only these descriptors; process names or recycled numeric PIDs are never
 signal targets.
 
+Forced-mode guests publish three separate shared-memory readiness bytes after
+their final setup syscall, then wait in a bounded user-space CPU loop. The test
+requires all three bytes before killing the tracer. This avoids an unrelated
+Android syscall-policy failure after removing PRoot: the first actual extension
+run [41002275287](https://github.com/Russianranger/esteria_android/actions/runs/41002275287),
+at `ce45a79fb3786ab0e16ea8055a2c2bd0fbb7d444`, failed its unpatched control while
+the guests called Linux `pause()`. Android logcat records SIGSYS (31) for all
+three identities; the test correctly refused to count their deaths as EXITKILL.
+No Android policy or production-runtime setting is changed by the correction.
+
 The test kills only the verified tracer. The unpatched control must leave all
 three detached tracees alive, whereas EXITKILL must terminate all three. Native
 process-group cleanup cannot create this result because every observed tracee
@@ -89,8 +99,8 @@ remains a separate unqualified gate.
 termination and stale-handle tests in the normal CI VM. The managed development
 host has different syscall/procfs PID namespaces (`getpid=5`, `/proc/self=133684`
 was observed), so it cannot supply this execution evidence; the helper fails
-closed there. The extension has passed native/Java compilation, APK verification
-and harness tests; its new Android runtime result remains pending.
+closed there. The normal CI VM passed this host pidfd gate in run41002275287.
+The corrected Android ownership result remains pending.
 
 To reproduce with Python3.12+, dpkg-deb, JDK17 and the documented Android SDK:
 

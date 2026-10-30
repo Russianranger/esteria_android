@@ -1,0 +1,12 @@
+{
+  "formatVersion": 1,
+  "scope": "disposable-native-arm64-MySQL-backup-tools",
+  "runtimeSourceLockSha256": "2efac3a6a310c4add3a0407f0044ac608706aa748730351d45ea4c67bdfd0a47",
+  "mysqlVersion": "8.0.46-0ubuntu0.24.04.4",
+  "clientPackageSha256": "641eb958b07497de25a9e7a14fa3fbbdb193a3445d2fcd36686f5788e16639b3",
+  "images": {
+    "mysql": {"path": "/usr/bin/mysql", "bytes": 6912024, "sha256": "f0acfeacf8fc03a4e0b4a8af00dac7422e3f01deeeb4b6d7ffca10662fc4e39e"},
+    "mysqld": {"path": "/usr/sbin/mysqld", "bytes": 54196328, "sha256": "3bc577a5948c24ee6bf5341575ec365e12b80530ffc665e6f3300ce9b4938d75"},
+    "mysqldump": {"path": "/usr/bin/mysqldump", "bytes": 6817992, "sha256": "5af8762a118d391e0710b68b149e10c9139b33d7848e725cfc5f24c8ac06eb52"}
+  }
+}

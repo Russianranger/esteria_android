@@ -16,7 +16,8 @@ except ImportError:
 PACKAGE='io.github.russianranger.esteria'
 TEST=PACKAGE+'.runtime.NativeProcessOwnershipTest#nativeOwnerContracts'
 FLAGS=('nativeOwnerExecuted','unicodeAndExitVerified','creatorThreadLifetimeVerified','gracefulFixtureVerified',
-       'forcedAndFailedRequestVisible','bothPipeBoundsVerified','failedExecRejected')
+       'forcedAndFailedRequestVisible','bothPipeBoundsVerified','failedExecRejected','interactiveBinaryEofVerified',
+       'interactiveBackpressureAndCloseVerified','interactiveEpipeVerified','consoleCommandFixtureVerified')
 
 def require(condition,reason):
     if not condition: raise ValueError(reason)
@@ -35,10 +36,11 @@ def apk_identity(path):
 def validate_receipt(value,revision,fingerprint):
     require(type(value.get('formatVersion')) is int and value.get('formatVersion')==1 and value.get('scope')=='android-13-x86_64-native-owner-system-shell' and
         value.get('sourceRevision')==revision and value.get('fingerprint')==fingerprint and value.get('abi')=='x86_64','owner-receipt-identity')
-    for key,expected in (('api',33),('targetSdk',35),('groupsPassed',6),('logReadBytesPerPipe',9000000),('logStoredBytesPerPipe',8388608)):
+    for key,expected in (('api',33),('targetSdk',35),('groupsPassed',9),('logReadBytesPerPipe',9000000),('logStoredBytesPerPipe',8388608)):
         require(type(value.get(key)) is int and value[key]==expected,'owner-receipt-count-'+key)
     require(all(value.get(flag) is True for flag in FLAGS),'owner-receipt-missing-check')
-    require(all(value.get(flag) is False for flag in ('appDeathQualified','arm64GuestExecuted','androidProotExecuted','gameplayQualified')),'owner-receipt-overclaims-scope')
+    require(all(value.get(flag) is False for flag in ('appDeathQualified','arm64GuestExecuted','androidProotExecuted','gameplayQualified',
+        'worldShutdownQualified','characterPersistenceQualified')),'owner-receipt-overclaims-scope')
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
@@ -51,7 +53,8 @@ def main():
     args.output.mkdir(parents=True,exist_ok=False)
     report=dict(formatVersion=1,scope='android-13-x86_64-native-owner-system-shell',sourceRevision=args.source_revision,
         apk=identity,testApk=dict(bytes=args.test_apk.stat().st_size,sha256=digest(args.test_apk)),androidNativeOwnerQualified=False,
-        appDeathQualified=False,androidProotExecuted=False,arm64GuestExecuted=False,gameplayQualified=False)
+        appDeathQualified=False,androidProotExecuted=False,arm64GuestExecuted=False,gameplayQualified=False,
+        worldShutdownQualified=False,characterPersistenceQualified=False)
     installed=False; failure=None
     def command(label,words,timeout=180,allow_failure=False):
         code,text=run_bounded([args.adb,*words],args.output/(label+'.log'),timeout)

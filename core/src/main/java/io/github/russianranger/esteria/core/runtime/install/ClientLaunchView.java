@@ -27,10 +27,15 @@ public final class ClientLaunchView {
         public final String clientGeneration, importedGeneration, generation;
         public final List<String> deferredLooseTrees;
         private final Path clientRoot, importedRoot;
+        private final ClientUiStore.Selection ui;
         private final Map<String,RuntimePackagePlan.RequiredFile> binaries=new TreeMap<>();
         private final SortedMap<String,String> links=new TreeMap<>();
         private final SortedSet<String> directories=new TreeSet<>(), configuration=new TreeSet<>();
         public Plan(Path clientRoot, RuntimePackagePlan client, Path importedRoot, String importedGeneration) throws IOException {
+            this(clientRoot,client,importedRoot,importedGeneration,null);
+        }
+        public Plan(Path clientRoot, RuntimePackagePlan client, Path importedRoot, String importedGeneration,ClientUiStore.Selection ui) throws IOException {
+            this.ui=ui;
             this.clientRoot=existingDirectory(clientRoot);this.importedRoot=existingDirectory(importedRoot);
             RuntimeFiles.require(client.packageId.equals("client-arm64"),"Expected reconstructed ARM64 client provider");
             RuntimeFiles.hashPin(importedGeneration);this.importedGeneration=importedGeneration;clientGeneration=client.generation;
@@ -52,7 +57,7 @@ public final class ClientLaunchView {
             }
             List<String> deferred=new ArrayList<>();
             if(rootEntries.containsKey("interface")) {
-                existingDirectory(rootEntries.get("interface"));deferred.add("Interface");
+                existingDirectory(rootEntries.get("interface"));if(ui==null)deferred.add("Interface");
             }
             deferredLooseTrees=Collections.unmodifiableList(new ArrayList<>(deferred));
             Set<String> folded=new HashSet<>();final int[] count={0};
@@ -97,6 +102,10 @@ public final class ClientLaunchView {
                 }
             }
             for(String name:STATE)links.put(name,"/work/client-state/"+name);
+            if(ui!=null) {
+                ui.verifySource(this.importedRoot,importedGeneration,RuntimeWork.NEVER_CANCELLED);
+                links.put("Interface",ui.guestPath());
+            }
             // The reconstructed desktop I/O still uses MAX_PATH buffers. Include
             // the full fixed guest/Windows executable directory in this bound.
             for(Collection<String> paths:Arrays.asList(directories,links.keySet(),configuration))
@@ -113,6 +122,7 @@ public final class ClientLaunchView {
         }
         public List<String> arguments()throws IOException {
             requireSupportedLooseContent();
+            if(ui!=null)ui.verifySource(importedRoot,importedGeneration,RuntimeWork.NEVER_CANCELLED);
             return Collections.unmodifiableList(Arrays.asList("-datadir","Z:"+guestDirectory().replace('/','\\'),"-vulkan"));
         }
         public Map<String,String> environment(){return Collections.singletonMap("GX_VULKAN_SHADERS","Z:\\esteria-shaders");}
@@ -132,6 +142,7 @@ public final class ClientLaunchView {
         RuntimeFiles.require(!overlap(work,plan.clientRoot)&&!overlap(work,plan.importedRoot)&&!overlap(plan.clientRoot,plan.importedRoot),"Client providers/imported data must be separate from mutable work");
         try(RuntimeFiles.Lock ignored=RuntimeFiles.lock(launches)) {
             RuntimeWork.check(cancellation);validateState();
+            if(plan.ui!=null)plan.ui.verify(work,plan.importedRoot,plan.importedGeneration,cancellation);
             Path target=launches.resolve(plan.generation),stage=stages.resolve(plan.generation);
             if(Files.exists(target,LinkOption.NOFOLLOW_LINKS)) {validateView(target,plan,cancellation);return new Result(target,plan.generation,2,true,sync);}
             stage=ownedDirectory(stage,OWNER+plan.generation+"\n");

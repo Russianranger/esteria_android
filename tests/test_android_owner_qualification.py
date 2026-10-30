@@ -9,10 +9,11 @@ from tools import qualify_android_owner as owner
 class OwnerQualification(unittest.TestCase):
     def test_scope_requires_every_actual_check_and_exact_identity(self):
         receipt=dict(formatVersion=1,scope='android-13-x86_64-native-owner-system-shell',sourceRevision='a'*40,
-            fingerprint='test',abi='x86_64',api=33,targetSdk=35,groupsPassed=6,logReadBytesPerPipe=9000000,logStoredBytesPerPipe=8388608,
-            appDeathQualified=False,arm64GuestExecuted=False,androidProotExecuted=False,gameplayQualified=False)
+            fingerprint='test',abi='x86_64',api=33,targetSdk=35,groupsPassed=9,logReadBytesPerPipe=9000000,logStoredBytesPerPipe=8388608,
+            appDeathQualified=False,arm64GuestExecuted=False,androidProotExecuted=False,gameplayQualified=False,
+            worldShutdownQualified=False,characterPersistenceQualified=False)
         receipt.update({key:True for key in owner.FLAGS}); owner.validate_receipt(receipt,'a'*40,'test')
-        for key,value in [(key,False) for key in owner.FLAGS]+[('sourceRevision','b'*40),('fingerprint','other'),('api',True),('targetSdk',28),('groupsPassed',0),('gameplayQualified',True),('appDeathQualified',True)]:
+        for key,value in [(key,False) for key in owner.FLAGS]+[('sourceRevision','b'*40),('fingerprint','other'),('api',True),('targetSdk',28),('groupsPassed',0),('gameplayQualified',True),('appDeathQualified',True),('worldShutdownQualified',True),('characterPersistenceQualified',True)]:
             changed=copy.deepcopy(receipt); changed[key]=value
             with self.subTest(key=key),self.assertRaises(ValueError):owner.validate_receipt(changed,'a'*40,'test')
     def test_apk_must_have_only_x64_owner_and_real_elf_header(self):

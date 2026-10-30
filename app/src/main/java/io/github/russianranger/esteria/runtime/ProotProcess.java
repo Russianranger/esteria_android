@@ -26,6 +26,21 @@ public final class ProotProcess {
     public static OwnedProcess start(Context context,RuntimeInstaller installer,RuntimePackagePlan plan,
             Path work,Path session,List<String> guestCommand,Map<String,String> guestEnvironment,
             List<ProotLaunch.Mount> mounts,OwnedProcess.GracefulStop gracefulStop) throws IOException {
+        return OwnedProcess.start(new NativeProcessBridge(),specification(context,installer,plan,work,session,
+            guestCommand,guestEnvironment,mounts),gracefulStop);
+    }
+    /** Explicit console pipe; the callback must send a source-supported command and check delivery. */
+    public static OwnedProcess startInteractive(Context context,RuntimeInstaller installer,RuntimePackagePlan plan,
+            Path work,Path session,List<String> guestCommand,Map<String,String> guestEnvironment,
+            List<ProotLaunch.Mount> mounts,OwnedProcess.GracefulInputStop gracefulStop) throws IOException {
+        OwnedProcess.Specification base=specification(context,installer,plan,work,session,guestCommand,guestEnvironment,mounts);
+        OwnedProcess.Specification interactive=new OwnedProcess.Specification(base.executable,base.arguments,base.environment,
+            base.cwd,base.stdout,base.stderr,true);
+        return OwnedProcess.startInteractive(new NativeProcessBridge(),interactive,gracefulStop);
+    }
+    private static OwnedProcess.Specification specification(Context context,RuntimeInstaller installer,RuntimePackagePlan plan,
+            Path work,Path session,List<String> guestCommand,Map<String,String> guestEnvironment,
+            List<ProotLaunch.Mount> mounts) throws IOException {
         InstalledProot payload=InstalledProot.inspect(context);
         Path rootfs=installer.resolveCurrent(plan);
         if (rootfs==null) throw new IOException("The pinned runtime generation is not prepared");
@@ -46,9 +61,8 @@ public final class ProotProcess {
         Path home=work.resolve("home");
         if (!Files.exists(home)) Files.createDirectory(home,PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------")));
         privatePath(privateRoot,home);
-        OwnedProcess.Specification spec=ProotLaunch.create(payload.tracer.toPath(),payload.loader.toPath(),rootfs,
+        return ProotLaunch.create(payload.tracer.toPath(),payload.loader.toPath(),rootfs,
             work,temporary,logs,guestCommand,guestEnvironment,mounts);
-        return OwnedProcess.start(new NativeProcessBridge(),spec,gracefulStop);
     }
     private static Path privatePath(Path privateRoot,Path path) throws IOException {
         Path canonical=path.toRealPath();

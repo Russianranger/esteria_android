@@ -32,6 +32,24 @@ acknowledged shutdown and zero exit, signal termination is reported as failure.
 Callback failures/timeouts trigger owned termination and remain visible.
 Foreground lifecycle wiring and each server's save acknowledgement are pending.
 
+Stdin defaults to `/dev/null`. Explicit `Specification.interactiveInput=true`
+and `OwnedProcess.startInteractive` provide a private CLOEXEC pipe whose writer
+remains attached to the opaque owned handle. `writeInput(bytes, timeout)` accepts
+1–4,096 bytes and a timeout of zero to one second. The pipe's atomic-write bound
+is checked; a timeout returns false with **zero bytes queued**, rather than
+sending a partial console command. Concurrent callers serialize within that same
+deadline. Reader closure raises an I/O error without changing the JVM's global
+SIGPIPE handler. `closeInput()` sends EOF; normal completion, forced cleanup and
+owner death also close the descriptor. Cleanup interrupts a blocked writer within
+one 20-ms poll slice plus scheduling time. Input bytes are never included in owner
+diagnostics or exceptions; child programs may still produce their own output.
+
+`ProotProcess.startInteractive` exposes the same explicit opt-in for verified
+guest launches. `WorldConsoleShutdown` queues the pinned server's
+`server shutdown 1\n` command and keeps stdin open through process completion.
+See [the source-backed shutdown contract](../../runtime/WORLD-SHUTDOWN.md).
+Pipe acceptance is not command acknowledgment or character-save evidence.
+
 Each pipe is continuously drained, storing at most 8 MiB in a private mode-0600
 regular file. Excess output is counted/discarded, avoiding pipe deadlock without
 unbounded disk growth. I/O failures are reported separately. Final drain is
@@ -72,10 +90,13 @@ the ARM64 guest. See [execution policy](../../runtime/ANDROID-EXECUTION.md).
 The native suite executes success/nonzero exits, idempotence, TERM/KILL, blocked
 signals, concurrent wait/stop, unrelated-child isolation, process-group cleanup,
 abrupt parent death, 80-command churn, log bounds and rejected executable,
-handle/symlink/hardlink inputs. Eight JVM/JNI groups additionally exercise Unicode
+handle/symlink/hardlink inputs. Twelve JVM/JNI groups additionally exercise Unicode
 paths/arguments, lifetime after the launching caller thread exits, a real
 file-mediated graceful-save fixture, observable forced/request-failure cleanup,
-both bounded pipe drains, interrupted-launch cleanup, exec failure and PRoot argv/state separation.
+both bounded pipe drains, interrupted-launch cleanup, exec failure and PRoot argv/state separation,
+binary stdin/EOF, real full-pipe backpressure without partial messages, concurrent
+input close, closed-reader EPIPE and exact console-command delivery to a normal-exit
+fixture. The native owner-death fixture also enables the input pipe.
 These are Linux host fixtures; neither Android execution nor guest/gameplay is
 established by their success.
 
