@@ -1,7 +1,8 @@
 # Android presentation, audio and input bridges
 
-These are implemented component adapters, not an enabled game launch or an
-Android qualification. The launcher continues to gate gameplay. The guest
+These are implemented component adapters, not an enabled game launch.
+Android emulator evidence below covers specific synthetic protocol fixtures.
+The launcher continues to gate gameplay. The guest
 helpers must be built, verified and added to a replaceable runtime generation;
 the Android process owner must supervise the X server and both helpers.
 
@@ -169,11 +170,17 @@ images, source revision and emulator fingerprint. The first emulator run
 listener-shutdown failure: closing a listening fd did not wake its blocked
 accept worker. Listener and idle audio cancellation now explicitly shut down
 their owned sockets before close; the same bounded worker joins remain required.
-An added fixture stops audio with an established peer still connected. The
-corrected gate is not yet reported as passed. It does not exercise the guest X11 producers, Wine,
+An added fixture stops audio with an established peer still connected. Corrected
+Android13 x86_64 run
+[40999380046](https://github.com/Russianranger/esteria_android/actions/runs/40999380046)
+passes all five groups and ten required checks at integration
+`2dd8d9fd06c7f998206f441605e0d0189d9df673`: actual accepted and played PCM frames
+both equal 4,992. Artifact `12952971767` has SHA256
+`590f6c7373728be0e13e0907d8a3d0d037cf5ab469e4050c7a99c5e92e2a75e7`.
+This does not exercise the guest X11 producers, Wine,
 ARM64 execution, on-screen presentation, audible hardware output, or Adreno.
 
 Docker and filesystem Unix socket creation are unavailable in the current host;
-native ARM64 guest execution, actual Android Surface/AudioTrack/lifecycle,
+native ARM64 guest execution, integrated on-screen Surface/audio lifecycle,
 controller game behavior, sound, and Thor performance remain unpassed gates.
 No preliminary device installation or gameplay success is requested or claimed.

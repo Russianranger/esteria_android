@@ -41,6 +41,7 @@ import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import io.github.russianranger.esteria.runtime.RuntimeSetup;
 import io.github.russianranger.esteria.runtime.ServerRuntimeSetup;
 import io.github.russianranger.esteria.runtime.GuestBridgeSetup;
+import io.github.russianranger.esteria.runtime.ClientRuntimeSetup;
 
 /** Foreground owner of large import jobs. Runtime launch remains gated until qualified binaries exist. */
 public final class SessionService extends Service {
@@ -174,6 +175,8 @@ public final class SessionService extends Service {
         RuntimeSetup setup = new RuntimeSetup(this, root);
         GuestBridgeSetup bridges = BuildConfig.GUEST_BRIDGES_PACKAGED ? new GuestBridgeSetup(this, root) : null;
         if (bridges != null) bridges.requireWineArchive(setup.archiveSha256());
+        ClientRuntimeSetup client = BuildConfig.CLIENT_RUNTIME_PACKAGED ? new ClientRuntimeSetup(this, root) : null;
+        if (client != null) client.requireWineArchive(setup.archiveSha256());
         final long[] lastUpdate = {0};
         RuntimeInstaller.Result result = setup.prepare((phase, path, completed, total) -> {
             long now = android.os.SystemClock.elapsedRealtime();
@@ -202,6 +205,20 @@ public final class SessionService extends Service {
             log("Guest bridges prepared generation=" + support.generation + " reusedFiles=" + support.reusedFiles
                     + " copiedBytes=" + support.copiedBytes + " archiveSha256=" + bridges.archiveSha256()
                     + " gameRuntimeQualified=false");
+        }
+        if (client != null) {
+            status = "Preparing reconstructed client files…";
+            RuntimeInstaller.Result installed = client.prepare((phase, path, completed, total) -> {
+                long now = android.os.SystemClock.elapsedRealtime();
+                if (now - lastUpdate[0] >= 250 || completed == total) {
+                    lastUpdate[0] = now;
+                    status = "Preparing reconstructed client files…\n" + mib(completed)
+                            + (total >= 0 ? " / " + mib(total) : "") + " MiB";
+                }
+            }, cancelled::get);
+            log("Reconstructed client prepared generation=" + installed.generation + " revision=" + client.sourceRevision()
+                    + " build=" + client.buildId() + " reusedFiles=" + installed.reusedFiles
+                    + " copiedBytes=" + installed.copiedBytes + " gameRuntimeQualified=false");
         }
         status = "Client runtime files are prepared. Local services and gameplay are still under development.";
     }
@@ -275,6 +292,21 @@ public final class SessionService extends Service {
                 facts.put("runtime.guestBridges.prepared", String.valueOf(bridges.current() != null));
             } catch (IOException error) {
                 facts.put("runtime.guestBridges.installationError", error.getMessage());
+            }
+        }
+        facts.put("runtime.reconstructedClient.packaged", String.valueOf(BuildConfig.CLIENT_RUNTIME_PACKAGED));
+        facts.put("runtime.reconstructedClient.prepared", "false");
+        if (BuildConfig.CLIENT_RUNTIME_PACKAGED) {
+            try {
+                ClientRuntimeSetup client = new ClientRuntimeSetup(this, root);
+                client.requireWineArchive(new RuntimeSetup(this, root).archiveSha256());
+                facts.put("runtime.reconstructedClient.archiveSha256", client.archiveSha256());
+                facts.put("runtime.reconstructedClient.sourceRevision", client.sourceRevision());
+                facts.put("runtime.reconstructedClient.buildId", client.buildId());
+                facts.put("runtime.reconstructedClient.expectedGeneration", client.generation());
+                facts.put("runtime.reconstructedClient.prepared", String.valueOf(client.current() != null));
+            } catch (IOException error) {
+                facts.put("runtime.reconstructedClient.installationError", error.getMessage());
             }
         }
         facts.put("proot.packaged", String.valueOf(BuildConfig.PROOT_PACKAGED));

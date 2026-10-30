@@ -132,3 +132,19 @@ existing client setup action installs these into a separate generation after
 checking the exact Wine archive identity. Repeating setup of a verified Wine
 generation does not reopen or download its archive. Final APK validation must
 check each selected provider, not only successful assembly.
+
+To include the reconstructed Windows ARM64 client, build its measured provider
+with `tools/provider_client_runtime.py` and pass all three properties:
+`-PclientRuntimeProviderDir=<provider>`, `-PclientRuntimeArtifact=<original-zip>`
+and `-PclientRuntimeSource=<exact-client-checkout>`. Pre-build verification checks
+the original artifact and exact source; APK verification additionally uses
+`verify --apk <apk>`. Client setup checks the embedded source-lock digest,
+12340/254/25/32 protocol and pinned Wine identity before installing separate
+immutable client files. See `runtime/client/ANDROID-PACKAGING.md` and retain its
+corresponding-source companion beside any distributed APK.
+
+`runtime/server/DEPENDENCY-RELEASE.md` describes the dependency-only preservation
+workflow. It validates original runtime and complete corresponding sources before
+publishing a write-once, hash-pinned prerelease. Until the workflow succeeds and
+its actual publication receipt is committed, durable release availability is
+not established. It publishes no application APK or game data.

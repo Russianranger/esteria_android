@@ -50,7 +50,10 @@ server/Wine jobs must not be converted into successful evidence without logs.
    on x64. Implement real auth challenge/proof/realm-list qualification when
    authserver is available. Repair advertised realm only after all module updates.
 7. Native process/Surface/audio/input bridge implementations and internal controller/IME
-   view are now present; guest ARM64 build `40995565147` and Android-owner CI pass. Integrate
+   view are now present; guest ARM64 build `40995565147`, Android-owner and actual
+   Surface/AudioTrack run `40999380046` pass. Both native ARM64 Wine FMOD backends
+   pass client run `40998295147`. Reconstructed client/provider installation and
+   all four combined APK provider checks pass. Integrate
    their qualified session lifecycle and
    graceful server-save shutdown. Inspect read-only reference launcher code where
    useful. Keep startup gated until component readiness is actually established.

@@ -178,3 +178,13 @@ python3 -m unittest tests.test_wine_qualification -v
 
 Host unit tests do not execute ARM64 Wine. The first real CI result remains a
 separate required evidence item; an authored harness alone is not a pass.
+
+
+Both reconstructed FMOD output backends now have actual captured PCM evidence in
+client run [40998295147](https://github.com/Russianranger/wowdecomp_esteria/actions/runs/40998295147),
+client `243b6c4dd141976f043d1b1a0d465631c40890ec` and harness
+`682f8c309365e7c8f4cd1a3503cc794275c73c8e`. The combined codec, entry, software
+presentation/frame readback, texture lifecycle and FMOD transport gates all passed.
+Exact capture counts, hashes and remaining audio scope limits are in
+[PCM-CAPTURE.md](PCM-CAPTURE.md). Android audio and complete game startup remain
+separate qualification work.

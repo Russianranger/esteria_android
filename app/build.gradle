@@ -4,6 +4,11 @@ def clientRevision = sourceLock.sources.client.commit
 def serverRevision = sourceLock.sources.server.commit
 def prootProvider = providers.gradleProperty('prootProviderDir').orNull
 def serverProvider = providers.gradleProperty('serverRuntimeProviderDir').orNull
+def clientProvider = providers.gradleProperty('clientRuntimeProviderDir').orNull
+def clientArtifact = providers.gradleProperty('clientRuntimeArtifact').orNull
+def clientSource = providers.gradleProperty('clientRuntimeSource').orNull
+if ((clientProvider || clientArtifact || clientSource) && !(clientProvider && clientArtifact && clientSource))
+    throw new GradleException('Client provider requires clientRuntimeProviderDir, clientRuntimeArtifact and clientRuntimeSource for exact source/artifact verification')
 def guestBridgeProvider = providers.gradleProperty('guestBridgeProviderDir').orNull
 def nativeBridge = providers.gradleProperty('nativeRuntimeBridge').getOrElse('false').toBoolean()
 def nativeAbi = providers.gradleProperty('nativeBridgeAbi').getOrElse('arm64-v8a')
@@ -31,6 +36,7 @@ android {
         buildConfigField 'String', 'SERVER_REVISION', '"' + serverRevision + '"'
         buildConfigField 'boolean', 'PROOT_PACKAGED', prootProvider ? 'true' : 'false'
         buildConfigField 'boolean', 'SERVER_RUNTIME_PACKAGED', serverProvider ? 'true' : 'false'
+        buildConfigField 'boolean', 'CLIENT_RUNTIME_PACKAGED', clientProvider ? 'true' : 'false'
         buildConfigField 'boolean', 'GUEST_BRIDGES_PACKAGED', guestBridgeProvider ? 'true' : 'false'
         buildConfigField 'boolean', 'PRESENTATION_EMULATOR_TEST', presentationEmulator ? 'true' : 'false'
         ndk { abiFilters nativeBridge ? nativeAbi : 'arm64-v8a' }
@@ -125,6 +131,20 @@ if (serverProvider) {
         commandLine 'python3', 'tools/provider_server_runtime.py', 'verify', '--provider', provider.absolutePath
     }
     tasks.named('preBuild').configure { dependsOn verifyServerRuntime }
+}
+
+// Reconstructed PE files retain their measured source/artifact identity. A
+// provider's own descriptor is insufficient authority for accepting new bytes.
+if (clientProvider) {
+    def provider = file(clientProvider)
+    android.sourceSets.main.assets.srcDir(new File(provider, 'assets'))
+    def verifyClientRuntime = tasks.register('verifyClientRuntimeProvider', Exec) {
+        workingDir rootProject.projectDir
+        commandLine 'python3', 'tools/provider_client_runtime.py', 'verify',
+            '--provider', provider.absolutePath, '--artifact', file(clientArtifact).absolutePath,
+            '--client-source', file(clientSource).absolutePath
+    }
+    tasks.named('preBuild').configure { dependsOn verifyClientRuntime }
 }
 
 apply from: 'proot-probe.gradle'

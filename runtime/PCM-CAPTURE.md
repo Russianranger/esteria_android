@@ -63,7 +63,7 @@ The fixture failed because polling a naturally finished FMOD channel returned
 `FMOD_ERR_INVALID_HANDLE`. DirectSound was not reached, and the audio gate did
 not pass. The correction registers the real END callback while paused and
 requires exactly one callback plus prior observed playback/sample progress.
-The independent PCM signal remains mandatory. This correction awaits execution.
+The independent PCM signal remains mandatory.
 
 Each backend already stops and waits for the owned Wine server before inspecting
 capture EOF. Final cleanup now reuses only the latest backend's observed successful
@@ -72,3 +72,24 @@ normal stop followed by wait. This avoids interpreting a redundant stop of an
 already absent server as a runtime failure. A failed or unobserved stop is never
 accepted merely because its exit is 1; final wait failure prevents every scope
 from qualifying.
+
+
+The corrected run [40998295147](https://github.com/Russianranger/wowdecomp_esteria/actions/runs/40998295147)
+passed all five jobs at client `243b6c4dd141976f043d1b1a0d465631c40890ec`, paired
+with integration `682f8c309365e7c8f4cd1a3503cc794275c73c8e`. The native Linux
+ARM64 Wine job123879322876 executed both real backends with zero exits, exact
+lifecycle markers, clean PCM EOF and successful stop/final wait. WinMM captured
+122,414 frames (489,656 bytes); DirectSound captured 123,344 frames (493,376 bytes).
+Each contained 91,999 strong left samples and 87,999 strong right samples with
+the required channel frequencies and rejection. Captures include the drain period.
+`linuxArm64FmodPcmTransportQualified=true`; all earlier codec/entry/software
+Vulkan scopes also passed. Generic audio, Android and game-login flags stay false.
+
+[Evidence artifact12952801053](https://github.com/Russianranger/wowdecomp_esteria/actions/runs/40998295147/artifacts/12952801053)
+has ZIP SHA-256 `b979a81a3fda1c0ece69c4f7492989495643215474f7076533b31d3a1a0e1b52`
+and qualification receipt SHA-256
+`663bdfd114d8440098556f5e475a4024224b28b8c5700a903d58308762131ffd`.
+WinMM raw PCM SHA-256 is
+`457f0eeccd12df48ee83915afb73bf63375b5f84dd62d4d9a8f2a2b797bf104d`;
+DirectSound raw PCM SHA-256 is
+`0348c923eebd4773a1c7027ad35a6f868f8ef1c063967c7445bb529e89de30be`.

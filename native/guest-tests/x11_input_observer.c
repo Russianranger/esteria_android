@@ -20,7 +20,7 @@
 
 static Display *display;
 static Window window;
-static unsigned events, acknowledgments;
+static unsigned events, acknowledgments, mapping_notifications;
 static int failed(const char *reason) { fprintf(stderr, "X11_INPUT_FAILURE %s\n", reason); return 0; }
 #define CHECK(test, reason) do { if (!(test)) return failed(reason); } while (0)
 static int64_t millis(void) {
@@ -60,20 +60,36 @@ static int command(int fd, unsigned type, int x, int y, unsigned mask, unsigned 
  * connection until we read. Poll the actual X fd with a bounded deadline. */
 static int next_event(XEvent *event, int timeout) {
     int64_t deadline = millis() + timeout;
-    while (!XPending(display)) {
-        int remaining = (int)(deadline - millis());
-        if (remaining <= 0) return 0;
-        struct pollfd fd = {.fd = ConnectionNumber(display), .events = POLLIN};
-        int count = poll(&fd, 1, remaining);
-        if (count < 0 && errno == EINTR) continue;
-        if (count <= 0 || !(fd.revents & POLLIN)) return 0;
+    for (;;) {
+        while (!XPending(display)) {
+            int remaining = (int)(deadline - millis());
+            if (remaining <= 0) return 0;
+            struct pollfd fd = {.fd = ConnectionNumber(display), .events = POLLIN};
+            int count = poll(&fd, 1, remaining);
+            if (count < 0 && errno == EINTR) continue;
+            if (count <= 0 || !(fd.revents & POLLIN)) return 0;
+        }
+        XNextEvent(display, event);
+        // X11 sends MappingNotify to clients independently of input selection.
+        // Refresh Xlib's keyboard cache; it is not an injected window event.
+        if (event->type == MappingNotify) {
+            if (++mapping_notifications > 64) return 0;
+            fprintf(stderr, "X11_OBSERVER_ADMIN MappingNotify request=%d first=%d count=%d\n",
+                    event->xmapping.request, event->xmapping.first_keycode, event->xmapping.count);
+            XRefreshKeyboardMapping(&event->xmapping);
+            continue;
+        }
+        return 1;
     }
-    XNextEvent(display, event); return 1;
 }
 static int observe(int type, unsigned detail, int root_x, int root_y, char text) {
     XEvent event;
     CHECK(next_event(&event, 3000), "missing-window-event");
-    CHECK(event.type == type && event.xany.window == window && !event.xany.send_event, "wrong-window-event");
+    if (event.type != type || event.xany.window != window || event.xany.send_event) {
+        fprintf(stderr, "X11_OBSERVER_EVENT expected=%d actual=%d window=%lu expectedWindow=%lu sendEvent=%d\n",
+                type, event.type, event.xany.window, window, event.xany.send_event);
+        return failed("wrong-window-event");
+    }
     if (type == KeyPress || type == KeyRelease) {
         CHECK(event.xkey.keycode == detail, "wrong-keycode");
         if (text) {

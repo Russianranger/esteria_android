@@ -46,6 +46,10 @@ sudo python3 tools/qualify_x11_input.py --runtime /private/new-runtime \
 Current evidence: the observer compiles with `-Wall -Wextra -Werror` on host x64;
 six focused receipt/build-input guards pass. All 49 runtime ELF images, aliases
 and loader metadata were independently read and verified against the previously
-qualified archive. Actual native ARM64 observer execution awaits the new CI gate.
+qualified archive. Native ARM64 run `40999380088` built and executed the fixture:
+motion/buttons passed, then an unexpected event preceded the first key check.
+The observer now handles X11 administrative `MappingNotify` events separately,
+refreshes the keyboard map, and logs unexpected event types. All 16 input-event
+assertions remain mandatory; the corrected execution gate is still pending.
 Filesystem Unix listener creation and Docker are unavailable on this local host;
 host compilation and source review do not substitute for that execution.

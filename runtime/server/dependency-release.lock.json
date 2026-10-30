@@ -1,0 +1,76 @@
+{
+  "formatVersion": 1,
+  "repository": "Russianranger/esteria_android",
+  "scope": "dependency-only-write-once-prerelease",
+  "tag": "deps-server-arm64-b06de55-21a9e8020aac",
+  "targetCommit": "b06de55f5b17f27ae9659abcfdaf93a61b749a9e",
+  "workflowRun": 40993458111,
+  "providerLockSha256": "9773bb1c9a45a82cc5146812aa3c3c0d6c14cfbbdbabfaa66121fc72c341dfad",
+  "artifactInputs": {
+    "runtime": {
+      "id": 12949858359,
+      "name": "unqualified-server-runtime-arm64-b06de55f5b17f27ae9659abcfdaf93a61b749a9e",
+      "bytes": 112417444,
+      "sha256": "eb5c9c1f975b3a24ea49af8d03cbd3b79d1f82972c1b2a32813cdbe7683aa631"
+    },
+    "evidence": {
+      "id": 12949992985,
+      "name": "server-dependency-evidence-b06de55f5b17f27ae9659abcfdaf93a61b749a9e",
+      "bytes": 73647,
+      "sha256": "cfc7cd4f78c9d0c659cdd7edbfbd2564f0e09382e1e90b495794649e8e101a16"
+    },
+    "sources": {
+      "id": 12950466782,
+      "name": "server-runtime-corresponding-sources-b06de55f5b17f27ae9659abcfdaf93a61b749a9e",
+      "bytes": 954236077,
+      "sha256": "b09599218a1a62a8e131eeedc47f6c8c19e2d39936d4e0aed7261e365f409bc1"
+    }
+  },
+  "sourceCompanionWrappers": {
+    "runtime/server/Dockerfile": {
+      "bytes": 2993,
+      "sha256": "a81bf21a119024f873365711e3de12eee11c46909badfe70f9e1dca97314ffbf"
+    },
+    "runtime/server/README.md": {
+      "bytes": 7535,
+      "sha256": "3fbb4c0f2fe221421a5f1e01916d5fa7311575587a7295d989de2086b5d6ecd2"
+    },
+    "runtime/server/__pycache__/capture_sources.cpython-312.pyc": {
+      "bytes": 5617,
+      "sha256": "9c8838fe9f951bf4f1c80743265058e85cc4a61ea94b5f52a16e312a485cc3f4"
+    },
+    "runtime/server/__pycache__/record_runtime.cpython-312.pyc": {
+      "bytes": 8073,
+      "sha256": "d3d84be49cad54209b19d21e6b26aa0bf845a60cf8a8af538c3240c522e8ea86"
+    },
+    "runtime/server/capture_sources.py": {
+      "bytes": 3191,
+      "sha256": "5568e32bf0d912e45e65ffdfa02404d604138e86a8534d8c097b111b0445010b"
+    },
+    "runtime/server/inrelease.SHA256SUMS": {
+      "bytes": 413,
+      "sha256": "16405ad6b24709c3cc1ca2f249cf72590a8893a3e5b1263f299465915eabc39d"
+    },
+    "runtime/server/mysql-binaries.SHA256SUMS": {
+      "bytes": 361,
+      "sha256": "736ebf000e64f632fabe592e0d7b962e4243980852c5813471fbd8b8807deb51"
+    },
+    "runtime/server/record_runtime.py": {
+      "bytes": 4582,
+      "sha256": "7b1989e8a3d540f15e264e2d175872ee922a4f4c4112db8422efeea43c307495"
+    },
+    "runtime/server/sources.lock.json": {
+      "bytes": 6578,
+      "sha256": "2efac3a6a310c4add3a0407f0044ac608706aa748730351d45ea4c67bdfd0a47"
+    },
+    "runtime/server/ubuntu.sources": {
+      "bytes": 204,
+      "sha256": "3bca581187f9aa8d51605ee49a8493619779338f630de58553ae7888aa82fd16"
+    },
+    "LICENSE": {
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    }
+  },
+  "published": null
+}

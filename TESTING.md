@@ -131,3 +131,12 @@ The real ARM64 owned-account qualification passes run `40998008509`, receipt
 SHA256 `6c67ff662a12c1165bdad9b6b3330feeb5452af0f99c9365776d52e25c9bc0fa`.
 It uses a separate fresh exact-MySQL8.0.46 fixture, not a replay over saved game
 state. `runtime/LOCAL-ACCOUNT.md` records source-matched SRP and recovery scope.
+
+Android Surface/AudioTrack run `40999380046` passes all ten required assertions,
+including real RGBA readback, recreation,4,992 accepted/played frames and shutdown
+with an idle connected audio peer. Artifact SHA256 is
+`590f6c7373728be0e13e0907d8a3d0d037cf5ab469e4050c7a99c5e92e2a75e7`.
+Native ARM64 Wine FMOD run `40998295147` also passes both actual backend/signal
+checks; receipt SHA256 is
+`663bdfd114d8440098556f5e475a4024224b28b8c5700a903d58308762131ffd`.
+These remain separate host/emulator component results, not an end-to-end game pass.
