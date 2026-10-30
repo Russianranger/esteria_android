@@ -1,0 +1,143 @@
+name: Reconstructed client and compiled local authserver
+on:
+  push:
+    branches: [android/client-server]
+    paths:
+      - .github/workflows/client-auth.yml
+      - runtime/client/auth-reference.lock.json
+      - runtime/client-auth/**
+      - runtime/server/compiled-reference.lock.json
+      - tools/prepare_client_auth_inputs.py
+      - tools/qualify_client_auth.py
+      - tools/client_auth_contract.py
+      - tools/prepare_server_requalification.py
+      - tools/qualify_dbimport.py
+      - tools/qualify_authserver.py
+      - tools/owned_process_group.py
+      - tests/test_client_auth_inputs.py
+      - tests/test_client_auth_qualification.py
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: reconstructed-compiled-auth-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  authentication:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Checkout the measured reconstructed client source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: Russianranger/wowdecomp_esteria
+          ref: 0f931bbade36a4b197725d691b8eff7caea7b3be
+          path: client-auth-source
+          persist-credentials: false
+      - name: Verify host and private authentication contracts
+        run: |
+          test "$(uname -m)" = aarch64
+          python3 -m unittest tests.test_client_auth_inputs tests.test_client_auth_qualification tests.test_server_requalification tests.test_owned_process_group -v
+          mkdir -p out/client-auth-evidence out/client-auth-private
+      - name: Fetch exact previously linked client and server inputs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/prepare_client_auth_inputs.py --output "$GITHUB_WORKSPACE/out/client-auth-inputs" \
+            > out/client-auth-evidence/client-preparation.log 2>&1
+          python3 tools/prepare_server_requalification.py --output "$GITHUB_WORKSPACE/out/server-reference" \
+            > out/client-auth-evidence/server-preparation.log 2>&1
+          cp out/client-auth-inputs/preparation.json out/client-auth-evidence/client-inputs.json
+          cp out/client-auth-inputs/wine-component-qualification.json out/client-auth-evidence/
+          cp out/server-reference/preparation.json out/client-auth-evidence/server-inputs.json
+          cp out/server-reference/install/server-build.json out/client-auth-evidence/
+          cp out/server-reference/locked/sources.lock.json out/client-auth-evidence/original-server-sources.lock.json
+      - name: Prepare the exact fresh Wine filesystem
+        run: |
+          python3 tools/prepare_runtime.py --download --cache "$RUNNER_TEMP/client-auth-wine-cache" \
+            --stage "$GITHUB_WORKSPACE/out/client-auth-private/wine" \
+            > out/client-auth-evidence/wine-preparation.log 2>&1
+      - name: Build the pinned native MySQL environment and namespace tools
+        run: |
+          docker build --platform linux/arm64 --target runtime \
+            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
+            -t esteria-server-reference:qualification runtime/server \
+            > out/client-auth-evidence/server-image-build.log 2>&1
+          docker build --platform linux/arm64 --file runtime/client-auth/Dockerfile \
+            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
+            -t esteria-client-auth:qualification . \
+            > out/client-auth-evidence/auth-image-build.log 2>&1
+          container=$(docker create esteria-client-auth:qualification)
+          trap 'docker rm -f "$container" >/dev/null' EXIT
+          docker cp "$container:/etc/esteria-server-runtime.json" out/client-auth-evidence/server-runtime.json
+          docker cp "$container:/etc/esteria-client-auth-tool-packages.txt" out/client-auth-evidence/tool-packages.txt
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib
+          client = json.loads(pathlib.Path('runtime/client/auth-reference.lock.json').read_text())
+          runtime = json.loads(pathlib.Path('out/client-auth-evidence/server-runtime.json').read_text())
+          content = pathlib.Path('out/server-reference/content/package-receipt.json').read_bytes()
+          with open(os.environ['GITHUB_ENV'], 'a') as output:
+              for name, value in {'ESTERIA_AUTH_MYSQL_VERSION': runtime['expectedMysqlSqlVersion'],
+                                  'ESTERIA_AUTH_CONTENT_SHA256': hashlib.sha256(content).hexdigest(),
+                                  'ESTERIA_AUTH_CLIENT_REVISION': client['sourceRevision'],
+                                  'ESTERIA_AUTH_CLIENT_SHA256': client['clientArtifact']['sha256'],
+                                  'ESTERIA_AUTH_CLIENT_BYTES': str(client['clientArtifact']['bytes'])}.items():
+                  output.write(name + '=' + value + '\n')
+          PY
+      - name: Run actual reconstructed Grunt against the compiled server and database
+        run: |
+          # Namespace privileges are confined to this disposable network-none CI
+          # container. The worker creates another owned PID/mount/network namespace.
+          docker run --rm --init --privileged --network none --read-only \
+            --tmpfs /tmp:rw,nosuid,nodev,mode=1777 \
+            --env PYTHONDONTWRITEBYTECODE=1 \
+            --env GIT_CONFIG_COUNT=1 --env GIT_CONFIG_KEY_0=safe.directory \
+            --env GIT_CONFIG_VALUE_0=/qualification/client-auth-source \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/client-auth-private,dst=/state" \
+            --workdir /qualification esteria-client-auth:qualification \
+            python3 tools/qualify_client_auth.py \
+            --runtime /state/wine --install /qualification/out/server-reference/install \
+            --content /qualification/out/server-reference/content \
+            --content-receipt-sha256 "$ESTERIA_AUTH_CONTENT_SHA256" \
+            --lock /qualification/out/server-reference/locked/sources.lock.json \
+            --mysql /usr/bin/mysql --mysqld /usr/sbin/mysqld \
+            --expected-version "$ESTERIA_AUTH_MYSQL_VERSION" \
+            --client-artifact /qualification/out/client-auth-inputs/client-arm64.zip \
+            --client-artifact-sha256 "$ESTERIA_AUTH_CLIENT_SHA256" \
+            --client-artifact-bytes "$ESTERIA_AUTH_CLIENT_BYTES" \
+            --client-source /qualification/client-auth-source --client-revision "$ESTERIA_AUTH_CLIENT_REVISION" \
+            --output /state/run > out/client-auth-evidence/qualification-status.log 2>&1
+      - name: Preserve bounded public receipts only after success or failure
+        if: always()
+        run: |
+          trap 'sudo chown -R "$(id -u):$(id -g)" out/client-auth-evidence' EXIT
+          sudo env ESTERIA_QUALIFICATION_REVISION="${GITHUB_SHA}" python3 - <<'PY'
+          import hashlib, json, os, pathlib, shutil
+          target = pathlib.Path('out/client-auth-evidence'); target.mkdir(parents=True, exist_ok=True)
+          source = pathlib.Path('out/client-auth-private/run/evidence')
+          if source.exists():
+              for path in source.iterdir():
+                  if path.is_symlink() or not path.is_file() or path.stat().st_size > 1048576:
+                      raise ValueError('public authentication evidence bounds')
+                  if path.name not in {'qualification.json', 'worker.json', 'client-auth.json', 'client-status.log'}:
+                      raise ValueError('unexpected public authentication evidence')
+                  shutil.copyfile(path, target/path.name)
+          receipt = dict(formatVersion=1, scope='reconstructed-client-compiled-authserver-environment',
+              integrationRevision=os.environ['ESTERIA_QUALIFICATION_REVISION'], externalNetworkDisabled=True,
+              existingStateModified=False, androidRuntimeQualified=False, worldEntryQualified=False, gameplayQualified=False,
+              files={path.name: {'bytes': path.stat().st_size, 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
+                     for path in target.iterdir() if path.is_file() and path.stat().st_size <= 16777216})
+          (target/'environment-receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: reconstructed-compiled-auth-evidence-${{ github.sha }}
+          path: out/client-auth-evidence
+          retention-days: 14
+          if-no-files-found: error

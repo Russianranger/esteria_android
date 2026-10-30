@@ -3,8 +3,8 @@
 `tools/qualify_client_auth.py` pairs the actual source-built Windows ARM64 client
 with the exact compiled Esteria authserver and local MySQL. It reuses the existing
 updater, configuration, account, realm and owned-process helpers without changing
-`qualify_authserver.py` or adopting its previous state. The source implementation
-and five host contract guards exist; actual paired execution is pending. No
+`qualify_authserver.py` or adopting its previous state. The source implementation,
+input staging and nine host contract guards exist; actual paired execution is pending. No
 compiled-server client compatibility, Android or gameplay pass is claimed.
 
 The client `--auth-check --local-offline` path uses its real Grunt timer, SRP
@@ -50,10 +50,35 @@ python3 tools/qualify_client_auth.py \
   --output /private/new-client-auth-run
 ```
 
-These placeholders must be replaced by the actual measured artifacts; the tool
-does not download or select a latest client/server. A separate execution workflow
-will be pinned after both required builds pass. This command is not a device
-installation procedure.
+These placeholders must be replaced by the actual measured artifacts; the
+composer does not download or select a latest client/server. This command is
+not a device installation procedure.
+
+`.github/workflows/client-auth.yml` now prepares the exact six-patch server
+reference through `prepare_server_requalification.py`. Its original build
+`41005048019.1` linked and passed loader/module/artifact checks, but its first
+runtime gate stopped at a content-consumer comparison before MySQL initialization.
+The separate server reference retains that failed-run scope and its original
+source lock. The new gate reruns the actual updater on fresh private state.
+
+`runtime/client/auth-reference.lock.json` independently pins client
+`0f931bbade36a4b197725d691b8eff7caea7b3be`, build `41012726334.1`, original ARM64
+artifact `12958691770` and Wine evidence `12958019059`. The original ZIP hashes,
+full passing workflow, matching manifest and exact combined receipt are checked
+before use. That measured receipt passed nine Linux ARM64 component scopes,
+including real Grunt against the controlled peer; it did not qualify a compiled
+server. The application production source lock is not substituted for either
+reference.
+
+The qualification-only Docker extension installs Git, ELF/namespace tools and
+iproute2 from the same hash-checked Ubuntu snapshot as the server dependency
+image. It does not change the Android runtime recipe. During execution the
+disposable container is read-only and has no network interface beyond loopback;
+namespace privileges allow the composer to create its own owned PID, mount and
+network namespaces. Only the newly created `/state` and temporary filesystem are
+writable. Credentials are generated inside this fresh state and never become
+Docker arguments, environment variables, or artifacts. Both source checkouts
+avoid persisted GitHub credentials, and the execution step receives no token.
 
 ## Ownership, private state and evidence
 

@@ -1,13 +1,19 @@
 # Durable reconstructed client inputs
 
-The next selected provider is client `0f931bbade36a4b197725d691b8eff7caea7b3be`,
-build `41012726334.1`, paired with the seven-patch server source lock. Its exact
-original ZIP and newly retained complete source companion have been checked
-locally. Publication of its separate durable prerelease is pending the exact
-integration packaging checkpoint; no new download URL is claimed yet. The old
-69cc release remains intact. Until the new release is published and its receipt
-recorded, the default release validator deliberately refuses the old release
-metadata against the newly selected provider pin.
+The selected provider is client `0f931bbade36a4b197725d691b8eff7caea7b3be`,
+build `41012726334.1`, paired with the seven-patch server source lock. The new
+release metadata selects tag `deps-client-arm64-27446b5-0f931bba` at integration
+packaging commit `27446b57e33e04d6fb11b0594d54d96b8bbd8ca6`. Its original
+45,848,368-byte ZIP and 23,440,715-byte complete source companion passed actual
+package reproduction, source readback, preservation and tamper checks. The
+source archive SHA-256 is
+`14b61f4fd5cdc6e7375297ae4a48d65240382ef2c18eed484808898373694821`.
+
+Publication of this separate prerelease is pending; no new download URL is
+claimed yet. `prepare` recovers and validates the exact original artifact and
+regenerates sources from the fixed packaging checkout. Anonymous `fetch` refuses
+until a verified publication receipt is recorded. The existing 69cc release and
+its seven stored assets remain intact.
 
 ## Preserved initial release
 
@@ -22,8 +28,8 @@ imported game data or private runtime state is added. Existing component
 licenses are preserved; the integration GPL license does not relicense client
 code, which has no top-level license at the selected pin.
 
-Its original input-lock bytes remain in the release and Git history. Historical
-release metadata in `dependency-release.lock.json` identifies integration provider
+Its original input-lock bytes and historical release metadata remain in the
+release, Git history and publication evidence. They identify integration provider
 packaging revision `ae5534d0a9d7fb72c8e5a03dcfc65420c354e7bb`, and client source
 revision `69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa` remains separately explicit.
 The initial corresponding-source receipt binds the six-patch integration source lock.

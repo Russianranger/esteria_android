@@ -1,0 +1,24 @@
+{
+  "formatVersion": 1,
+  "scope": "measured-client-for-compiled-authserver-qualification",
+  "repository": "Russianranger/wowdecomp_esteria",
+  "sourceRevision": "0f931bbade36a4b197725d691b8eff7caea7b3be",
+  "workflowRun": 41012726334,
+  "buildId": "41012726334.1",
+  "clientManifestSha256": "bccde6ee90f688b27ac9790e2aa29d70d270dad2b324a54e92a1bdf72bd58b40",
+  "clientArtifact": {
+    "id": 12958691770,
+    "bytes": 45848368,
+    "sha256": "1fd6176727065f50a926b45a3d81df1bfd0ea33c330e9fb9131ff30ad170b94e"
+  },
+  "wineEvidence": {
+    "id": 12958019059,
+    "bytes": 142376297,
+    "sha256": "8138278ea05ab9a4638e940d41179c16b1b7732270978904a6a532b80bdca5d6",
+    "receiptPath": "wine-codec-evidence/qualification.json",
+    "receiptSha256": "841d1d989c4e1402a9bf13a5150d1101259b332ed41b2b14a0f371dc0a60b33d"
+  },
+  "compiledAuthserverQualified": false,
+  "androidRuntimeQualified": false,
+  "gameplayQualified": false
+}

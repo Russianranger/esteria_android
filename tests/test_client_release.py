@@ -11,9 +11,9 @@ from tools import release_client_inputs as client
 class ClientReleaseGuards(unittest.TestCase):
     def test_current_release_retains_proven_client_and_complete_measured_source(self):
         lock, pin = client.load_lock()
-        self.assertEqual(lock['sourceRevision'], '69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa')
+        self.assertEqual(lock['sourceRevision'], '0f931bbade36a4b197725d691b8eff7caea7b3be')
         self.assertEqual(lock['artifact']['sha256'], pin['artifact']['sha256'])
-        self.assertEqual(lock['sourceArchive']['bytes'], 23401759)
+        self.assertEqual(lock['sourceArchive']['bytes'], 23440715)
         self.assertIn('tools/package_client_sources.py', lock['generationInputs'])
 
     def test_existing_output_is_preserved_before_reading_any_inputs(self):

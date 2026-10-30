@@ -30,7 +30,7 @@ jobs:
         run: python3 tools/fetch_sources.py client --output sources
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: ae5534d0a9d7fb72c8e5a03dcfc65420c354e7bb
+          ref: 27446b57e33e04d6fb11b0594d54d96b8bbd8ca6
           path: source-packaging
           persist-credentials: false
       - name: Test validation and write-once behavior
