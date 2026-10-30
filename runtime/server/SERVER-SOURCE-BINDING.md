@@ -45,3 +45,11 @@ providers, reject server/patch/submodule/profile/type drift, preserve archived
 receipts, and run the actual Java installer at 32 MiB to show cached generation
 reuse without an archive input. No client pin changes or new server qualification
 claims are made by this migration.
+
+`prepare_server_engine_inputs.py` applies the same binding before acquiring or
+repacking original installed build inputs. It requires the exact archived build
+lock in the original diagnostics/install, checks the current reviewed provider
+binding and both full server/profile objects, and fetches the unchanged server
+with that archived lock. A client-only current APK change does not require a
+server rebuild or rewrite any original receipt. A new preparation receipt records
+the current APK identity separately from its original `sourceLock` identity.

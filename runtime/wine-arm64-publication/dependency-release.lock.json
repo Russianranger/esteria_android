@@ -1,0 +1,246 @@
+{
+  "formatVersion": 1,
+  "recipeInputs": {
+    "runtime/wine-arm64-publication/README.md": {
+      "bytes": 3139,
+      "sha256": "d71a6afc30c39d6ae332259425a7705340924954013d293eceaebb696236694d"
+    },
+    "runtime/wine-arm64/capture_toolchain_sources.py": {
+      "bytes": 30645,
+      "sha256": "16b729041d06223d0bbdf8a4081cc1dcc97a1b1399232685b63de1894dab71af"
+    },
+    "runtime/wine-arm64/record_runtime.py": {
+      "bytes": 6600,
+      "sha256": "e0863092ec74f59d330ddd2a9fc4bc018ff813fa91afccd759943d23f68b392c"
+    },
+    "runtime/wine-arm64/sources.lock.json": {
+      "bytes": 18146,
+      "sha256": "077fb2b0883986338b6755e53f5cede08bd63ed1834783e7e6cd079e0ec0c16d"
+    },
+    "runtime/wine-probe/android-private-pe-copy.patch": {
+      "bytes": 9732,
+      "sha256": "0f4d5b1feb2c14ae98acac215d1cf06732f9a46f325292ebd00a536ade7b5e0e"
+    },
+    "runtime/wine-probe/apply_adaptations.py": {
+      "bytes": 3535,
+      "sha256": "e10f8f4aac362554d0270b33e60e7464e3828ffb21d10cf6db1501f4ded93ef0"
+    },
+    "tests/test_wine_release.py": {
+      "bytes": 12579,
+      "sha256": "7678ea5653529f6db01c6ed0e38f48244c90f65d33c8adf3f2055703c9ab76a7"
+    },
+    "tools/android_elf.py": {
+      "bytes": 3738,
+      "sha256": "3d85699c1e66cfbd4c012045848dcf925a73656fe356dee43fb2de4cccdac136"
+    },
+    "tools/android_jni_elf.py": {
+      "bytes": 2887,
+      "sha256": "8ca8e69f7f141cb40b018c7cf4ed1cd29768d9396a536977f811e1cfa65edfe9"
+    },
+    "tools/build_android_proot.py": {
+      "bytes": 12917,
+      "sha256": "80d460817977a7df0f11cc188c568633fa03a0cd6e7948e395e02995bee9832a"
+    },
+    "tools/build_android_proot_probe.py": {
+      "bytes": 13880,
+      "sha256": "de7b6d905b334d00cf40fbb71df54944032b48c29f51e56dbfca47d29f1ccf57"
+    },
+    "tools/build_android_wine_probe.py": {
+      "bytes": 10573,
+      "sha256": "c219a48df3426a59993effde51e7b6bc30daba7c0ccc665642acb998613ea7e0"
+    },
+    "tools/client_auth_contract.py": {
+      "bytes": 3920,
+      "sha256": "a08237be2369d61a5dc504ae69c9d2f5154eb5f3d05db62f1b2a7a6b468fd3e1"
+    },
+    "tools/dependency_publication.py": {
+      "bytes": 4961,
+      "sha256": "74c050586df3ba3c689d2b0ac936031388d878527c21cfdb4682b5c835a740ba"
+    },
+    "tools/fetch_android_wine_probe.py": {
+      "bytes": 5060,
+      "sha256": "1ad7cbe7f030eecffe49aa778a1507db701f90a373094dd13f65048b210ea3bd"
+    },
+    "tools/fetch_sources.py": {
+      "bytes": 7393,
+      "sha256": "19ac32b6bcc9c869e7785f19e7bb1f8492f7b94bd839aa9c30a02eae476c598c"
+    },
+    "tools/manifest_server_content.py": {
+      "bytes": 23861,
+      "sha256": "12529786b59baee29e5f778cb8c0a557f005baa4a7b875d80f67e5d1e9458289"
+    },
+    "tools/manifest_server_modules.py": {
+      "bytes": 9119,
+      "sha256": "4e614b8c860ba2d9ef69d595f6fbbd51df440993f8c7a9a8e85d5d99533b9166"
+    },
+    "tools/owned_process_group.py": {
+      "bytes": 2795,
+      "sha256": "c19ed5c05e94d7b537df1055983fca75e20447f594419084f2207d60f99f138e"
+    },
+    "tools/package_android_wine_runtime.py": {
+      "bytes": 9545,
+      "sha256": "78c845f1078392ccbab73fc002610b027672c7a89b2bf75b45dd033efe32a071"
+    },
+    "tools/package_android_wine_sources.py": {
+      "bytes": 18254,
+      "sha256": "ce522f5ed3f7d45f2ffae4617f25a756b8d10a2af9d834402b0cabebd4e82d5e"
+    },
+    "tools/package_combined_android.py": {
+      "bytes": 19962,
+      "sha256": "d78d86d33ac4a13e023e448f2d11e5bd370ab227494fc04c230396d6e9db644c"
+    },
+    "tools/package_server_content.py": {
+      "bytes": 19732,
+      "sha256": "7a23e7e2b40c55a5a581be825d91d95411ed70be6444d1a838ed468edc4069e6"
+    },
+    "tools/package_server_runtime.py": {
+      "bytes": 13619,
+      "sha256": "e3fca010d44223bab12f34fe5f8bc984e21e518419f60edf72acdd6299fb93f7"
+    },
+    "tools/package_wine_arm64_candidate.py": {
+      "bytes": 16986,
+      "sha256": "72206aa78302bc1bd707d8a8cd02bdd042d57c02b93873cb463564f01d10e04b"
+    },
+    "tools/pcm_capture.py": {
+      "bytes": 12116,
+      "sha256": "6db7a0d089ad769be0de6a44678d628efb1498536be2fb4dd305db20bea8a307"
+    },
+    "tools/prepare_runtime.py": {
+      "bytes": 22126,
+      "sha256": "113ae7612cba7f557fab79550448578a9a6b8ceb674cff80b38fcf40e8257078"
+    },
+    "tools/prepare_wine_arm64_candidate.py": {
+      "bytes": 5372,
+      "sha256": "57ef82fc3c54caf39aace2c08fcdc3b986a4efc128d6dc9dc3f8b13bc1bc5f2a"
+    },
+    "tools/provider_client_runtime.py": {
+      "bytes": 19310,
+      "sha256": "e0e50df80a77c6673019710b741e4ca8f6715f71f0b745bcdcf9bddcf22d3988"
+    },
+    "tools/provider_guest_bridges.py": {
+      "bytes": 15554,
+      "sha256": "088aebe6c5caeba7c8dd97f7733e5bffe8547794832ea6e99f109714b08b1573"
+    },
+    "tools/provider_server_runtime.py": {
+      "bytes": 10458,
+      "sha256": "64d52409befc871d90591753a522b8f7627787757869c2b219c2c6510ed7a0cb"
+    },
+    "tools/qualify_wine_arm64.py": {
+      "bytes": 48065,
+      "sha256": "c1082c70f5ff700cd7b4f36e80aab672592def93731647066dc45f24806acc6c"
+    },
+    "tools/release_client_inputs.py": {
+      "bytes": 20299,
+      "sha256": "35838d0787d1b07b2ac2b89892444b92feb1ec47930c447d0b3abc9534cf44cb"
+    },
+    "tools/release_guest_bridges.py": {
+      "bytes": 12919,
+      "sha256": "9cc3051904d37197cf099224541486e0db808175dd95e70894ab72e7e6f40363"
+    },
+    "tools/release_server_dependencies.py": {
+      "bytes": 34132,
+      "sha256": "d71bb10576bfbae8a2eba23b34eeb982eb26326f69cf91c142fdfa146f9dde0a"
+    },
+    "tools/release_wine_arm64.py": {
+      "bytes": 16963,
+      "sha256": "3903fffff17dccad2400bb2be3329064d44be626eb04dde640019dd6183f2e98"
+    },
+    "tools/verify_android_proot.py": {
+      "bytes": 5769,
+      "sha256": "92163f63c5c0350c23f5c0893d7a293a4c4e24fe1ad925a021e309efa22613eb"
+    },
+    "tools/verify_android_proot_probe.py": {
+      "bytes": 13031,
+      "sha256": "abd499af52fdb23746483f1b90afa32b6541304f1116bcea4c2491af912d2f50"
+    },
+    "tools/verify_server_build.py": {
+      "bytes": 15540,
+      "sha256": "9d3096e8cc1d2a650353886800e8192dfe78f0b352fede322a39002e545b4152"
+    },
+    "tools/verify_wine_arm64_sources.py": {
+      "bytes": 8852,
+      "sha256": "abeb2cc7f1a04feac3c3910aa9159c05450c3cae4aada0bc80d8e1d05cc464b5"
+    },
+    "tools/wine_arm64_requalification.py": {
+      "bytes": 12150,
+      "sha256": "12b84a1301046cc11a703e892f6bc3c1c96aa061bd97737414db57f9542a8505"
+    },
+    "tools/wine_audio.py": {
+      "bytes": 7781,
+      "sha256": "43df0641a4d810b6eaabb9da77ea0d4d957358fa19d585589088d913ccc7939f"
+    },
+    "tools/wine_auth.py": {
+      "bytes": 6138,
+      "sha256": "8986b3a75a4e6c33ded38dcb6935b465bc9c6d045746cf8d398ba03b23646988"
+    }
+  },
+  "repository": "Russianranger/esteria_android",
+  "runtimeInput": {
+    "androidQualified": false,
+    "artifact": {
+      "bytes": 282903224,
+      "sha256": "2c1b248bdc3605505bf6248066ccd6ed323242bbf2f04e08cab772aff11c87df"
+    },
+    "artifactId": 12982441891,
+    "evidenceArtifact": {
+      "bytes": 181600,
+      "sha256": "b9bb18a04d3c529b4153eb3077438159c10fcdcf35f75718f340e6d2f7790e7a"
+    },
+    "evidenceArtifactId": 12981467294,
+    "files": {
+      "candidate-runtime.lock.json": {
+        "bytes": 102647,
+        "sha256": "5816a07061c308a6a515d3747da2b7e3adfb8b22b6e6827819f590b1214fe04b"
+      },
+      "package-build-receipt.json": {
+        "bytes": 19890,
+        "sha256": "db0f3431aa47c20e41219201246c3f406f46598235e35c31d1f4b45577523f37"
+      },
+      "runtime.json": {
+        "bytes": 66640,
+        "sha256": "4b731a5f450a556632c598ddebda2ec3f814c8d7ea2c9e1529d6c80c8773e0a5"
+      },
+      "sources.lock.json": {
+        "bytes": 18146,
+        "sha256": "077fb2b0883986338b6755e53f5cede08bd63ed1834783e7e6cd079e0ec0c16d"
+      },
+      "wine-arm64.manifest.json": {
+        "bytes": 66773,
+        "sha256": "d6c98cca860d324113c434cd0ccd1709e19e2dfac1a03b1f248b479f50303267"
+      },
+      "wine-arm64.tar.gz": {
+        "bytes": 282628308,
+        "sha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46"
+      }
+    },
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "hostQualificationReceipt": {
+      "bytes": 20396,
+      "sha256": "fdefa5c028aa21a5bb4b94b408725d7062d7b5f7eba8b6704224dd70c8d2dfd4"
+    },
+    "originalNativeClientComponentGatesPassed": true,
+    "originalNativeClientRevision": "0f931bbade36a4b197725d691b8eff7caea7b3be",
+    "scope": "measured-native-arm64-wine-host-candidate-inputs",
+    "sourceBuildPassed": true,
+    "sourceReadbackReceipt": {
+      "bytes": 1530,
+      "sha256": "da37376ccb72d18b2b50f327ed12a65ceccce665f2ef399be8e571b0b6f95b1c"
+    },
+    "sourceRevision": "681b2e9f30b19e94bf8e8de44f67fedba5033c8a",
+    "sourcesArtifact": {
+      "bytes": 1681474721,
+      "sha256": "38e16617545abb16f995ba75a8b52b8ca2bacad5d2688adf3646911f16c8fb06"
+    },
+    "sourcesArtifactId": 12982282257,
+    "sourcesPrefix": "wine-arm64-sources/",
+    "workflowRun": 41057900330
+  },
+  "runtimeInputFile": {
+    "bytes": 2084,
+    "sha256": "e5fd2de4935cbf10372cc18c23dec387478867a624d984b568e09a4a0b0515c0"
+  },
+  "scope": "source-owned-arm64-wine-inputs-write-once-prerelease",
+  "tag": "deps-wine-arm64-681b2e9-c0e13ed15a69",
+  "targetCommit": "75f50445112818c97f8d8e575d2b1c21e59af6e5"
+}

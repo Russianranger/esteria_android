@@ -21,13 +21,22 @@ if not __package__:
 from tools import fetch_sources, manifest_server_content as content
 from tools import manifest_server_modules as modules, package_server_content as package
 from tools import prepare_server_requalification as reference
-from tools import qualify_dbimport as importer, verify_server_build as files
+from tools import qualify_dbimport as importer, verify_server_build as files, server_provider_sources as sources
 
 ROOT = Path(__file__).resolve().parents[1]
 LOCK = ROOT / 'runtime/server/engine-reference.lock.json'
 SOURCE_LOCK = ROOT / 'sources.lock.json'
+PROVIDER_LOCK = ROOT / 'runtime/server/programs-provider.lock.json'
 MINIMUM_FREE_BYTES = 12 * 1024**3
 require = content.require
+
+
+def source_selection(pin):
+    provider, _ = modules.read_json(PROVIDER_LOCK)
+    current = sources.validate_current(provider, SOURCE_LOCK)
+    require(provider['serverBuildSourceLock']['sha256'] == pin['sourceLockSha256'],
+            'engine-reference-archived-server-source-lock-differs')
+    return current, provider['serverBuildSourceLockText'].encode('utf-8')
 
 
 def load_pin():
@@ -49,11 +58,9 @@ def load_pin():
                 'invalid-engine-artifact-pin')
     for flag in ('sourceCompanionComplete', 'androidRuntimeQualified', 'gameplayQualified'):
         require(pin.get(flag) is False, 'invalid-engine-reference-qualification')
-    require(files.identity(SOURCE_LOCK)['sha256'] == pin['sourceLockSha256'],
-            'current-application-source-lock-differs-from-engine-reference')
+    source_selection(pin)
     require(files.identity(ROOT / 'runtime/server/sources.lock.json')['sha256'] == pin['runtimeSourceLockSha256'],
             'current-server-dependency-source-lock-differs-from-engine-reference')
-    fetch_sources.load_lock(SOURCE_LOCK)
     return pin, identity
 
 
@@ -83,8 +90,9 @@ def download_inputs(output, api, pin):
 
 def repack_content(output, pin, build, compiled, original):
     lock_path = output / 'locked/sources.lock.json'
-    require(files.identity(lock_path) == files.identity(SOURCE_LOCK) and
-            build['serverSource'] == fetch_sources.load_lock(SOURCE_LOCK)['sources']['server'],
+    current, archived = source_selection(pin)
+    require(lock_path.read_bytes() == archived and
+            sources.same(build['serverSource'], current['sources']['server']),
             'engine-source-selection-is-not-current')
     source = build['serverSource']
     fetch_sources.fetch('server', source, output / 'sources', lock_path.parent, False)
@@ -116,8 +124,9 @@ def prepare(output, api=None):
     install = output / 'install'
     build = reference.extract_install(downloads / 'install.zip', install, pin)
     lock_path = reference.stage_diagnostics(downloads / 'diagnostics.zip', output, install / 'sources.lock.json', pin)
-    require(files.identity(lock_path) == files.identity(SOURCE_LOCK),
-            'engine-diagnostics-lock-is-not-current-application-lock')
+    _, archived = source_selection(pin)
+    require(lock_path.read_bytes() == archived,
+            'engine-diagnostics-lock-is-not-archived-server-build-lock')
     original = reference.original_metadata(downloads / 'content.zip', output / 'original-content')
     compiled_path = output / 'original-content/server-modules.json'
     compiled, compiled_identity = modules.read_json(compiled_path)
@@ -145,6 +154,7 @@ def prepare(output, api=None):
         initialFreeBytes=disk['observedFreeBytes'], serverBuild=files.identity(install / 'server-build.json'),
         compiledModules=compiled_identity, compileCommands=files.identity(output / 'compile_commands.json'),
         sourceLock=files.identity(lock_path), originalContentReceipt=files.identity(output / 'original-content/package-receipt.json'),
+        currentAppSourceLock=files.identity(SOURCE_LOCK), currentServerAndCompatibilityMatchArchivedBuild=True,
         repackedContentReceipt=files.identity(output / 'content/package-receipt.json'),
         currentSourceCheckoutVerified=True, sourceContentRepacked=True,
         preparationSucceeded=True, binariesChanged=False, recompiled=False,

@@ -1,0 +1,269 @@
+{
+  "adaptedFiles": {
+    "src/tools/map_extractor/System.cpp": {
+      "bytes": 39735,
+      "sha256": "547c38dabe77883059859210273850e36b6d9c8bd7079e571b2a8bc46d856852"
+    },
+    "src/tools/map_extractor/mpq_libmpq.cpp": {
+      "bytes": 4250,
+      "sha256": "04de674c068ae0c5e55c8077a97f2b0db06a96537c8ea287fe696e9177afd81d"
+    },
+    "src/tools/vmap4_extractor/mpq_libmpq.cpp": {
+      "bytes": 4399,
+      "sha256": "17d1dbac11b027ff64f2709f1746ba9d4a22ec70445a6751a5ecf0891dcc4cb9"
+    },
+    "src/tools/vmap4_extractor/vmapexport.cpp": {
+      "bytes": 15857,
+      "sha256": "263a5b82e14864b1e8efe6327deb34fc681cbe62c1cbf9a81aa65b48b2bda42b"
+    }
+  },
+  "androidRuntimeQualified": false,
+  "baseFiles": {
+    "src/tools/map_extractor/System.cpp": {
+      "bytes": 37480,
+      "sha256": "07e1d9425b9e1b210cc6c015b67dff45ee605cf35eee687dab7b3bd709434c16"
+    },
+    "src/tools/map_extractor/mpq_libmpq.cpp": {
+      "bytes": 3817,
+      "sha256": "87d5af850300a5105abe09b89d45ff48f6963f5f8b12705189836e1b242ce8ba"
+    },
+    "src/tools/vmap4_extractor/mpq_libmpq.cpp": {
+      "bytes": 3966,
+      "sha256": "2b2c1b652e59fc559e9fa6971a7b5602136bcef421d94245b0d77c9d52d60dd2"
+    },
+    "src/tools/vmap4_extractor/vmapexport.cpp": {
+      "bytes": 14784,
+      "sha256": "56999622c36deea1ad8768e8f9357d37e8a44c0e0ecb34e47e09932ae88834eb"
+    }
+  },
+  "baseServerSource": {
+    "branch": "main",
+    "commit": "f35f04d01689f034778e3474b3c820092f51e461",
+    "patches": [
+      {
+        "path": "patches/server/0001-eluna-declare-area-trigger.patch",
+        "sha256": "c26b145188c5f97bf30d032e1fe3bd7fe17aa1f8f0daa6793e51f5d830fe7aa6",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0002-eluna-include-map-manager.patch",
+        "sha256": "4e277dbe56c31ae30640c8e9ad4dee12e944e0f051d9bdc8d62aaa239c50433f",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0003-eluna-hooks-include-types.patch",
+        "sha256": "5999402d985fcc709abdc90bb4272072d1d5e3e261b2cc7ec19460320c14295f",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0004-attunement-stat-api.patch",
+        "sha256": "d9ef6ca8f96ab186c37c072b22143cdded9976aa3a62d083f893c502a5745cb8"
+      },
+      {
+        "path": "patches/server/0005-script-grid-templates.patch",
+        "sha256": "6b459c90839e7831df8533966442fabd476ae1773f0302c50ccc8a997f157369"
+      },
+      {
+        "path": "patches/server/0006-empty-script-modules.patch",
+        "sha256": "ea0beb357c71d8b8c187af9d4afede520e7ac9877e40fbdc5fab99d54fc21f97"
+      },
+      {
+        "path": "patches/server/0007-runtime-module-config-directory.patch",
+        "sha256": "5e41d474179ef553ec9c2544de947a3724885fd7f3ac233af3d89797acd032ff"
+      }
+    ],
+    "submodules": {
+      "src/server/game/LuaEngine": "58d7652138887783228b9727bd1fa4e08f00342b"
+    },
+    "url": "https://github.com/Russianranger/EsteriaWoW.git"
+  },
+  "clientMpqConversionQualified": false,
+  "clientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "clientSources": {
+    "Engine/Source/Base/Sort.cpp": {
+      "bytes": 2617,
+      "gitBlob": "63d7bf8adbf00a5e917f082908872c3e272a8575",
+      "sha256": "c1ccecc5fc8eb005f6933c1a241ded282449178e0c98f38efe695a2df28fb15b"
+    },
+    "Engine/Source/BlizzardCore/SFile2-Core.cpp": {
+      "bytes": 47192,
+      "gitBlob": "590973d64a2465353aa40fa8fdae1f59d499935e",
+      "sha256": "f2347f44e9f851280d1983d8d9dcdf1df0b225d9d4759dbc22fbe3575ad0bbde"
+    },
+    "Engine/Source/BlizzardCore/Source/Packages/Mopaq/MPQGlobals.cpp": {
+      "bytes": 5441,
+      "gitBlob": "e532dee268443a49266b58ac6ad387061736bd00",
+      "sha256": "617c0b7f3e890f909a7835c925f5f763493571221d3c36fbf05be12a3743ac99"
+    },
+    "Engine/Source/BlizzardCore/Source/Packages/Mopaq/SFileArchives.cpp": {
+      "bytes": 99981,
+      "gitBlob": "9b356f21cdb43d503ec6a4a29fde94b578ae1829",
+      "sha256": "ad028f50ac9e92f41a0d6dd484067b0af642e2ad93b7e4a57e27822f480c07db"
+    },
+    "Engine/Source/BlizzardCore/Source/System/File/File.cpp": {
+      "bytes": 34087,
+      "gitBlob": "1616082bf3779517c2d7c563536dde66b9d921ad",
+      "sha256": "c8137e50ad606129ca67cb9e79b7504ff263744057a1c858e2f0bc76fc6958e3"
+    },
+    "Engine/Source/BlizzardCore/Source/System/File/Win64/Filestack.cpp": {
+      "bytes": 32341,
+      "gitBlob": "f7b478d4bcbc3a083070ccecdbac67aa81a8f300",
+      "sha256": "563d0cb9204a7d8d52c3d18838b7b30f2580d1811ad06727dce120e4164e59a1"
+    },
+    "Engine/Source/Os/Win64/OsFile.cpp": {
+      "bytes": 8097,
+      "gitBlob": "48259199a47139adae94eb91bcdc2a75f4288ce3",
+      "sha256": "4b69f9e644df845514a0eec2aaf5ddfc26c7cd6bbd5147ca12a57a65cf0aafe5"
+    },
+    "Engine/Source/Storm/Source/SStr.cpp": {
+      "bytes": 26686,
+      "gitBlob": "61011a1d69ccad4c5248d4db233bd0d87e5f6bb5",
+      "sha256": "eff4d50bbdb245c50a901f7bc729f4f6f3e7999215606441b3dc3efe4286f29e"
+    },
+    "WoW/Source/Client.cpp": {
+      "bytes": 73746,
+      "gitBlob": "32309c11806d55753584d20a1885f315d0e3690d",
+      "sha256": "1c656a2432cfb6aa485c8d56a973d604147b37ead064b19e2a5322b71fa91787"
+    },
+    "WoW/Source/WowServices/PatchFiles.cpp": {
+      "bytes": 3013,
+      "gitBlob": "87a4c1b7c1b7fddede093dc7cd7df7d965092dff",
+      "sha256": "17934d9b0078f2ef99ffd5d649417c182c21994f9f06ce22f557319a7035eccd"
+    }
+  },
+  "contract": "esteria-classical-ordered-providers-v1",
+  "customEsteriaDataLoadOrderQualified": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "globalServerPatchListChanged": false,
+  "header": {
+    "bytes": 19299,
+    "file": "runtime/server/extractor-order/EsteriaArchiveOrder.h",
+    "installedPath": "src/tools/EsteriaArchiveOrder.h",
+    "sha256": "da78de99a6850b7fcbb7f15e72985c89414bbf372c008a17d620e18e6c634d29"
+  },
+  "libraryFiles": {
+    "deps/bzip2/bzlib.h": {
+      "bytes": 6245,
+      "sha256": "b360bfe8e0769adaa8ee6ae26324e26c40ccbdb557677a6b8ad506214984d2e8"
+    },
+    "deps/libmpq/config.h": {
+      "bytes": 2166,
+      "sha256": "e503f087265d72b3842ca3534544396cd67c1ac8db07d9e9948dc117d830afcd"
+    },
+    "deps/libmpq/libmpq/common.c": {
+      "bytes": 6413,
+      "sha256": "2d788af8463f2e4f9073b9f912b5ab8f39271fe0baebac676d7c326da375bc25"
+    },
+    "deps/libmpq/libmpq/common.h": {
+      "bytes": 1649,
+      "sha256": "cace119e6e1d08e27ff14027d706d5d7f574f96fe53c84231fff510b938a4090"
+    },
+    "deps/libmpq/libmpq/crypt_buf.h": {
+      "bytes": 15687,
+      "sha256": "9384b91f161a8a25ba5e7a1f7e551ee5781cabfb649b3136d4515720d4775100"
+    },
+    "deps/libmpq/libmpq/explode.c": {
+      "bytes": 19861,
+      "sha256": "9483bf3fa21c7e77fab95dcf5e4cd938a1b52b1c325c688aac27a56760b912a5"
+    },
+    "deps/libmpq/libmpq/explode.h": {
+      "bytes": 3915,
+      "sha256": "52e37e967c4b21763744bcfc50c9c004bd9b9c89e57187818f4bbd219919afb3"
+    },
+    "deps/libmpq/libmpq/extract.c": {
+      "bytes": 10080,
+      "sha256": "817fa027239e234447b8c5d4caf38a6e107538a690d02cf51b138fc9cbfce3b9"
+    },
+    "deps/libmpq/libmpq/extract.h": {
+      "bytes": 3323,
+      "sha256": "648dbed231bc7cd7ae4a41b9f05ad702e0c66c0113f71ca081fc8fbad8975f92"
+    },
+    "deps/libmpq/libmpq/huffman.c": {
+      "bytes": 37167,
+      "sha256": "74e1ca260e10e6408ada7e4ed0856277e409235eba25a913023de0bdb140ddc7"
+    },
+    "deps/libmpq/libmpq/huffman.h": {
+      "bytes": 5427,
+      "sha256": "a226cc9af1d26c9a90d0ac654a48d74dcf72774e90ccbb95a1bbef2c7d2e4ef7"
+    },
+    "deps/libmpq/libmpq/mpq-internal.h": {
+      "bytes": 6563,
+      "sha256": "37da349bf25fe0c4654caccf72a561fd2274951ef400608a7ac3e57de70d39fa"
+    },
+    "deps/libmpq/libmpq/mpq.c": {
+      "bytes": 34028,
+      "sha256": "b330ef1bc72c1081c26b0a6adae5608d08c7a1da347178870750b227bd52bd05"
+    },
+    "deps/libmpq/libmpq/mpq.h": {
+      "bytes": 5185,
+      "sha256": "3668e51530695927016687404baae7439cb35326903d04e114e4321238caeb49"
+    },
+    "deps/libmpq/libmpq/pack_begin.h": {
+      "bytes": 1109,
+      "sha256": "d5001f9e495845f2d0f42815bf288be3acb62c523130328928a6948b480a66d1"
+    },
+    "deps/libmpq/libmpq/pack_end.h": {
+      "bytes": 1029,
+      "sha256": "cdf8fc7feb3c247b21f161ebffcac1055eeeb4ac884dab7a11e5939700247b5f"
+    },
+    "deps/libmpq/libmpq/platform.h": {
+      "bytes": 974,
+      "sha256": "4f587e7299ceb88389008b20acc6158de14e4fabedc9beb23ad4e03300b75aee"
+    },
+    "deps/libmpq/libmpq/wave.c": {
+      "bytes": 6707,
+      "sha256": "0bb86a71f425e5e5a6e1f75f88377e238b97d128eaa677b3fc678846e4055414"
+    },
+    "deps/libmpq/libmpq/wave.h": {
+      "bytes": 1445,
+      "sha256": "3c187e5959bc01142d007ff99b8681f111914ea68184a6da48439f066a4f81d5"
+    },
+    "src/common/CompilerDefs.h": {
+      "bytes": 1871,
+      "sha256": "d15fc32a75011ef0c77395f5f7296528121ce7416a676e3620f0f0ce02846960"
+    },
+    "src/common/Define.h": {
+      "bytes": 2992,
+      "sha256": "b7b3efb5fd8fd9061cf27435112ca3b149bafbfedbe96f0ddd96d82fe57ed9a6"
+    },
+    "src/tools/map_extractor/loadlib/loadlib.h": {
+      "bytes": 1487,
+      "sha256": "868066212473add89fbe09b8593a8d6eef2cea7a0d9ff1bba868d157152d9956"
+    },
+    "src/tools/map_extractor/mpq_libmpq04.h": {
+      "bytes": 2919,
+      "sha256": "e634d7167c79ed85df8d94baad045056dbedc0c89317eeafe413598295596fb8"
+    },
+    "src/tools/vmap4_extractor/loadlib/loadlib.h": {
+      "bytes": 2014,
+      "sha256": "fa7a2b7bbb30d70691a8d0c0ed31e8a68f62d703a33aa674a16bc072af4eec06"
+    },
+    "src/tools/vmap4_extractor/mpq_libmpq04.h": {
+      "bytes": 2814,
+      "sha256": "7c440ae635873f4338427e6f185a824ad3066296b0e9b457bd15623da50a8efc"
+    }
+  },
+  "nativeAdaptedToolsQualified": false,
+  "patch": {
+    "bytes": 7088,
+    "file": "runtime/server/extractor-order/0001-explicit-ordered-providers.patch",
+    "sha256": "8645bb3643ada0db7bdc7122e87a2a941f8f511d7666ef0360c18621f5a78e24"
+  },
+  "recipes": {
+    "runtime/extractor_order.py": {
+      "bytes": 9884,
+      "sha256": "5c6d30d23c2a8ebb13d037907cbcc6e7b67ea31f4b99798d925c5e3da756128c"
+    },
+    "tools/prepare_ordered_extractors.py": {
+      "bytes": 5921,
+      "sha256": "2368ae56924c68f9ea5d91cf2fd5a79e6059f0198643923b204be9e7f3252444"
+    }
+  },
+  "scope": "separate-extractor-only-order-adaptation-inputs",
+  "serverBuildSourceLock": {
+    "bytes": 2170,
+    "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+  },
+  "sourceCompanionComplete": false
+}

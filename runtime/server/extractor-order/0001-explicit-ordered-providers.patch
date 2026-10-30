@@ -1,0 +1,233 @@
+--- a/src/tools/map_extractor/System.cpp
++++ b/src/tools/map_extractor/System.cpp
+@@ -34,6 +34,7 @@
+ 
+ #include "dbcfile.h"
+ #include "mpq_libmpq04.h"
++#include "../EsteriaArchiveOrder.h"
+ #include "StringFormat.h"
+ 
+ #include "adt.h"
+@@ -1028,6 +1029,11 @@
+         return false;
+     }
+     MPQFile m(mpq_name);
++    if (EsteriaOrder::Active() && m.isEof())
++    {
++        fclose(output);
++        throw std::runtime_error("required ordered extraction member is absent or deleted");
++    }
+     if (!m.isEof())
+         fwrite(m.getPointer(), 1, m.getSize(), output);
+ 
+@@ -1041,8 +1047,18 @@
+ 
+     std::set<std::string> dbcfiles;
+ 
+-    // get DBC file list
+-    for (auto & gOpenArchive : gOpenArchives)
++    // Explicit ordered mode lists the same effective provider stack used by reads.
++    if (EsteriaOrder::Active())
++    {
++        for (auto const& file : EsteriaOrder::FileList())
++        {
++            auto lower = EsteriaOrder::Lower(file);
++            if (lower.rfind("dbfilesclient/", 0) == 0 && lower.size() > 4 && lower.substr(lower.size() - 4) == ".dbc")
++                dbcfiles.insert(file);
++        }
++    }
++    // get DBC file list (original desktop mode)
++    else for (auto & gOpenArchive : gOpenArchives)
+     {
+         vector<string> files;
+         gOpenArchive->GetFileListTo(files);
+@@ -1178,12 +1194,25 @@
+     gOpenArchives.clear();
+ }
+ 
+-int main(int argc, char* arg[])
++int EsteriaExtractorMain(int argc, char* arg[])
+ {
+     printf("Map & DBC Extractor\n");
+     printf("===================\n\n");
+ 
+     HandleArgs(argc, arg);
++
++    if (EsteriaOrder::Active())
++    {
++        int locale = -1;
++        for (int i = 0; i < LANG_COUNT; i++) if (EsteriaOrder::Locale() == langs[i]) locale = i;
++        EsteriaOrder::Need(locale >= 0, "effective ordered locale is unsupported");
++        uint32 build = ReadBuild(locale);
++        EsteriaOrder::Need(build == 12340, "ordered extraction requires client build12340");
++        if (CONF_extract & EXTRACT_DBC) ExtractDBCFiles(locale, true);
++        if (CONF_extract & EXTRACT_CAMERA) ExtractCameraFiles(locale, true);
++        if (CONF_extract & EXTRACT_MAP) ExtractMapsFromMpq(build);
++        return 0;
++    }
+ 
+     int FirstLocale = -1;
+     uint32 build = 0;
+@@ -1259,3 +1288,32 @@
+ 
+     return 0;
+ }
++
++// Only explicit ordered mode uses the adaptation; desktop behavior is retained.
++int main(int argc, char** argv)
++{
++    int status;
++    try { status = EsteriaOrder::Bootstrap(argc, argv); }
++    catch (std::exception const& error)
++    {
++        std::fprintf(stderr, "Esteria ordered input refused: %s\n", error.what());
++        return 2;
++    }
++    if (status >= 0) return status;
++    if (!EsteriaOrder::Active()) return EsteriaExtractorMain(argc, argv);
++    try
++    {
++        if (!EsteriaOrder::MemberProbe().empty())
++        {
++            MPQFile file(EsteriaOrder::MemberProbe().c_str());
++            bool found = !file.isEof();
++            return EsteriaOrder::EmitProbe(found ? file.getBuffer() : nullptr, found ? file.getSize() : 0, found);
++        }
++        return EsteriaExtractorMain(argc, argv);
++    }
++    catch (std::exception const& error)
++    {
++        std::fprintf(stderr, "Esteria ordered input refused: %s\n", error.what());
++        return 2;
++    }
++}
+--- a/src/tools/map_extractor/mpq_libmpq.cpp
++++ b/src/tools/map_extractor/mpq_libmpq.cpp
+@@ -16,6 +16,7 @@
+  */
+ 
+ #include "mpq_libmpq04.h"
++#include "../EsteriaArchiveOrder.h"
+ #include <cstdio>
+ #include <deque>
+ 
+@@ -65,6 +66,19 @@
+     pointer(0),
+     size(0)
+ {
++    if (EsteriaOrder::Active())
++    {
++        std::vector<char> bytes;
++        if (EsteriaOrder::Read(filename, bytes))
++        {
++            size = bytes.size();
++            buffer = new char[std::max<std::size_t>(bytes.size(), 1)];
++            if (!bytes.empty()) std::memcpy(buffer, bytes.data(), bytes.size());
++            eof = false;
++        }
++        else eof = true;
++        return;
++    }
+     for (auto & gOpenArchive : gOpenArchives)
+     {
+         mpq_archive* mpq_a = gOpenArchive->mpq_a;
+--- a/src/tools/vmap4_extractor/mpq_libmpq.cpp
++++ b/src/tools/vmap4_extractor/mpq_libmpq.cpp
+@@ -16,6 +16,7 @@
+  */
+ 
+ #include "mpq_libmpq04.h"
++#include "../EsteriaArchiveOrder.h"
+ #include <algorithm>
+ #include <cstdio>
+ #include <deque>
+@@ -71,6 +72,19 @@
+     pointer(0),
+     size(0)
+ {
++    if (EsteriaOrder::Active())
++    {
++        std::vector<char> bytes;
++        if (EsteriaOrder::Read(filename, bytes))
++        {
++            size = bytes.size();
++            buffer = new char[std::max<std::size_t>(bytes.size(), 1)];
++            if (!bytes.empty()) std::memcpy(buffer, bytes.data(), bytes.size());
++            eof = false;
++        }
++        else eof = true;
++        return;
++    }
+     for (auto & gOpenArchive : gOpenArchives)
+     {
+         mpq_archive* mpq_a = gOpenArchive->mpq_a;
+--- a/src/tools/vmap4_extractor/vmapexport.cpp
++++ b/src/tools/vmap4_extractor/vmapexport.cpp
+@@ -37,6 +37,7 @@
+ #include "adtfile.h"
+ #include "dbcfile.h"
+ #include "mpq_libmpq04.h"
++#include "../EsteriaArchiveOrder.h"
+ #include "wdtfile.h"
+ #include "wmo.h"
+ 
+@@ -424,7 +425,7 @@
+ // Arg2 - Listfile name
+ //
+ 
+-int main(int argc, char** argv)
++int EsteriaExtractorMain(int argc, char** argv)
+ {
+     bool success = true;
+     char const* versionString = "V4.00 2012_02";
+@@ -460,7 +461,7 @@
+ 
+     // prepare archive name list
+     std::vector<std::string> archiveNames;
+-    fillArchiveNameVector(archiveNames);
++    if (!EsteriaOrder::Active()) fillArchiveNameVector(archiveNames);
+     for (auto & archiveName : archiveNames)
+     {
+         MPQArchive* archive = new MPQArchive(archiveName.c_str());
+@@ -468,7 +469,7 @@
+             delete archive;
+     }
+ 
+-    if (gOpenArchives.empty())
++    if (!EsteriaOrder::Active() && gOpenArchives.empty())
+     {
+         printf("FATAL ERROR: None MPQ archive found by path '%s'. Use -d option with proper path.\n", input_path);
+         return 1;
+@@ -522,3 +523,32 @@
+     printf("Extract %s. Work complete. No errors.\n", versionString);
+     return 0;
+ }
++
++// Only explicit ordered mode uses the adaptation; desktop behavior is retained.
++int main(int argc, char** argv)
++{
++    int status;
++    try { status = EsteriaOrder::Bootstrap(argc, argv); }
++    catch (std::exception const& error)
++    {
++        std::fprintf(stderr, "Esteria ordered input refused: %s\n", error.what());
++        return 2;
++    }
++    if (status >= 0) return status;
++    if (!EsteriaOrder::Active()) return EsteriaExtractorMain(argc, argv);
++    try
++    {
++        if (!EsteriaOrder::MemberProbe().empty())
++        {
++            MPQFile file(EsteriaOrder::MemberProbe().c_str());
++            bool found = !file.isEof();
++            return EsteriaOrder::EmitProbe(found ? file.getBuffer() : nullptr, found ? file.getSize() : 0, found);
++        }
++        return EsteriaExtractorMain(argc, argv);
++    }
++    catch (std::exception const& error)
++    {
++        std::fprintf(stderr, "Esteria ordered input refused: %s\n", error.what());
++        return 2;
++    }
++}

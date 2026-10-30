@@ -50,7 +50,7 @@ class EngineInputGuards(unittest.TestCase):
         return shutil._ntuple_diskusage(32 * 1024**3, 32 * 1024**3 - free, free)
 
     def inputs(self):
-        lock = stage.SOURCE_LOCK.read_bytes()
+        _, lock = stage.source_selection(self.pin)
         binary = b'synthetic binary; never executable or qualified\0'
         source = stage.fetch_sources.load_lock(stage.SOURCE_LOCK)['sources']['server']
         installed = {'sources.lock.json': lock, 'bin/authserver': binary, 'bin/worldserver': binary,
@@ -89,20 +89,44 @@ class EngineInputGuards(unittest.TestCase):
     def test_reference_is_current_seven_patch_build_and_not_six_patch_alias(self):
         self.assertEqual(self.pin['workflowRun'], 41019374697)
         self.assertEqual(self.pin['artifacts']['install']['id'], 12966255548)
-        self.assertEqual(self.pin['sourceLockSha256'], stage.files.identity(stage.SOURCE_LOCK)['sha256'])
+        current, archived = stage.source_selection(self.pin)
+        self.assertEqual(self.pin['sourceLockSha256'], identity(archived)['sha256'])
+        self.assertTrue(stage.sources.same(current['sources']['server'], json.loads(archived)['sources']['server']))
         self.assertEqual(len(stage.fetch_sources.load_lock(stage.SOURCE_LOCK)['sources']['server']['patches']), 7)
         old, _ = stage.reference.load_pin()
         self.assertNotEqual(self.pin['integrationRevision'], old['integrationRevision'])
         self.assertNotEqual(self.pin['sourceLockSha256'], old['sourceLockSha256'])
 
     def test_changed_current_source_lock_or_reduced_disk_floor_refused(self):
-        source = self.root / 'changed-source-lock.json'; source.write_bytes(b'changed')
-        with patch.object(stage, 'SOURCE_LOCK', source), self.assertRaisesRegex(ValueError, 'application-source-lock'):
+        source = self.root / 'changed-source-lock.json'; source.write_text(stage.SOURCE_LOCK.read_text()+'\n')
+        with patch.object(stage, 'SOURCE_LOCK', source), self.assertRaisesRegex(ValueError, 'current-app-source-lock'):
             stage.load_pin()
         pin = copy.deepcopy(self.pin); pin['minimumFreeBytes'] = 1
         with patch.object(stage.modules, 'read_json', return_value=(pin, self.pin_identity)), \
                 self.assertRaisesRegex(ValueError, 'reference-identity'):
             stage.load_pin()
+
+    def test_client_only_app_advance_preserves_archived_server_identity_but_server_or_profile_drift_refuses(self):
+        current=json.loads(stage.SOURCE_LOCK.read_text())
+        provider=json.loads(stage.PROVIDER_LOCK.read_text())
+        source=self.root/'current.lock.json';provider_path=self.root/'provider.lock.json'
+        def select(document):
+            raw=stage.reference.encoded(document);source.write_bytes(raw)
+            provider['appSourceLock']=identity(raw);provider_path.write_bytes(stage.reference.encoded(provider))
+        current['sources']['client']['commit']='a'*40;select(current)
+        with patch.object(stage,'SOURCE_LOCK',source),patch.object(stage,'PROVIDER_LOCK',provider_path):
+            selected,archived=stage.source_selection(self.pin)
+            self.assertEqual(selected['sources']['client']['commit'],'a'*40)
+            self.assertEqual(identity(archived)['sha256'],self.pin['sourceLockSha256'])
+            self.assertEqual(stage.load_pin(),(self.pin,self.pin_identity))
+            mutations=(lambda row:row['sources']['server']['patches'][0].update(sha256='0'*64),
+                       lambda row:row['sources']['server']['submodules'].update({'src/server/game/LuaEngine':'b'*40}),
+                       lambda row:row['compatibility'].update(base_client_build=12341),
+                       lambda row:row['compatibility'].update(extended_limits=1))
+            for mutate in mutations:
+                changed=copy.deepcopy(current);mutate(changed);select(changed)
+                with self.assertRaisesRegex(ValueError,'selection-differs|compatibility-profile-differs'):
+                    stage.load_pin()
 
     def test_disk_preflight_writes_typed_failure_before_any_network(self):
         output = self.root / 'insufficient'; api = Mock()
@@ -177,7 +201,9 @@ class EngineInputGuards(unittest.TestCase):
             receipt = stage.prepare(output, api)
         self.assertEqual(api.download.call_count, 3)
         self.assertEqual((output / 'server-modules.json').read_bytes(), compiled_raw)
-        self.assertEqual((output / 'locked/sources.lock.json').read_bytes(), stage.SOURCE_LOCK.read_bytes())
+        self.assertEqual((output / 'locked/sources.lock.json').read_bytes(), stage.source_selection(pin)[1])
+        self.assertEqual(receipt['currentAppSourceLock'],stage.files.identity(stage.SOURCE_LOCK))
+        self.assertTrue(receipt['currentServerAndCompatibilityMatchArchivedBuild'])
         self.assertEqual(list((output / 'downloads').iterdir()), [])
         self.assertEqual(json.loads((output / 'preparation.json').read_bytes()), receipt)
         for flag in ('sourceCompanionComplete', 'strippedDerivativeCreated', 'sqlExecuted',
