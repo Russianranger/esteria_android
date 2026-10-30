@@ -86,6 +86,48 @@ class CombinedPackageGuards(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'combined-apk-asset-inventory-mismatch'):
             bundle.apk_inventory(path, {})
 
+    def test_complete_asset_inventory_binds_x11_lock_and_rejects_missing_or_changed_bytes(self):
+        # ZIP inventory/source-byte fixture only; the separate provider/ELF
+        # verifiers handle executable content before any actual publication.
+        payload = {name: b'unexecuted fixture' for name in bundle.NATIVE_FILES}
+        for prefix, names in [('assets/proot/', bundle.proot.NOTICES | {'build-evidence.json'}),
+                              ('assets/' + bundle.server.ASSET_DIR + '/', bundle.server.NAMES),
+                              ('assets/' + bundle.guest.ASSET_DIR + '/', bundle.guest.NAMES),
+                              (bundle.client.ASSETS + '/', {bundle.client.ARCHIVE, 'provider.json', 'NOTICE.txt'})]:
+            payload.update({prefix + name: b'provider fixture' for name in names})
+        for directory, names in bundle.HELPER_SETS.items():
+            records = {}
+            for name in names:
+                source = bundle.ROOT / 'runtime' / name
+                payload['assets/' + directory + '/' + name] = source.read_bytes()
+                records[name] = bundle.identity(source)
+            payload['assets/' + directory + '/manifest.json'] = json.dumps(dict(formatVersion=1, files=records)).encode()
+        for name, source in [('sources.lock.json', 'sources.lock.json'),
+                             ('runtime-sources.lock.json', 'runtime/runtime-sources.lock.json'),
+                             ('x11-runtime.lock.json', 'runtime/bridges/x11-runtime.lock.json'),
+                             ('runtime.properties', 'app/src/main/assets/runtime.properties')]:
+            payload['assets/' + name] = (bundle.ROOT / source).read_bytes()
+        notices = {}
+        for name in bundle.NDK_NOTICES:
+            data = b'fixed test toolchain notice'; payload['assets/notices/' + name] = data
+            notices[name] = dict(bytes=len(data), sha256=hashlib.sha256(data).hexdigest())
+        for name in ('ESTERIA-GPL-3.0.txt', 'FTA-MIT-LICENSE.txt'):
+            payload['assets/notices/' + name] = b'fixture notice'
+        for mutation, reason in [('none', None), ('missing', 'asset-inventory'),
+                                 ('changed', 'embedded-source-lock'), ('extra', 'asset-inventory')]:
+            contents = dict(payload)
+            if mutation == 'missing': del contents['assets/x11-runtime.lock.json']
+            if mutation == 'changed': contents['assets/x11-runtime.lock.json'] = b'X' * len(contents['assets/x11-runtime.lock.json'])
+            if mutation == 'extra': contents['assets/foreign-private-file'] = b'never permitted'
+            path = self.root / (mutation + '.zip')
+            with zipfile.ZipFile(path, 'w') as archive:
+                for name, data in contents.items(): archive.writestr(name, data)
+            with self.subTest(mutation=mutation):
+                if reason:
+                    with self.assertRaisesRegex(ValueError, reason): bundle.apk_inventory(path, notices)
+                else:
+                    self.assertEqual(bundle.apk_inventory(path, notices), sorted(bundle.NATIVE_FILES))
+
     def test_verified_copy_never_replaces_existing_output_or_accepts_wrong_bytes(self):
         source = self.root / 'source'; source.write_bytes(b'actual original')
         target = self.root / 'target'; target.write_bytes(b'preserve')

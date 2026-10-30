@@ -82,6 +82,19 @@ public final class ProotMountTests {
             Path colon=Files.createDirectory(fixture.base.resolve("colon:source"));
             rejects(()->fixture.create(List.of(new ProotLaunch.Mount(colon,"/esteria-data"))));
             rejects(()->fixture.create(List.of(new ProotLaunch.Mount(Path.of("relative"),"/esteria-data"))));
+            Path endpoints=Files.createDirectory(fixture.base.resolve("ipc")),x11=Files.createDirectory(fixture.base.resolve("x11"));
+            ProotLaunch.PresentationBindings shared=new ProotLaunch.PresentationBindings(endpoints,x11);
+            OwnedProcess.Specification presentation=ProotLaunch.create(fixture.tracer,fixture.loader,fixture.runtime,fixture.work,
+                    fixture.temp,fixture.logs,List.of("/usr/bin/Xtigervnc"),Map.of(),List.of(),shared);
+            check(presentation.arguments.contains(endpoints+":/session!")&&presentation.arguments.contains(x11+":/tmp/.X11-unix!"),"Explicit fixed shared IPC bindings");
+            check(presentation.arguments.contains(fixture.temp+":/tmp")&&presentation.environment.get("PROOT_TMP_DIR").equals(fixture.temp.toString()),"Per-process temp remains isolated");
+            for(Path invalid:List.of(fixture.work,fixture.temp,fixture.logs,fixture.runtime,fixture.base,x11))
+                rejects(()->ProotLaunch.create(fixture.tracer,fixture.loader,fixture.runtime,fixture.work,fixture.temp,fixture.logs,
+                        List.of("/bin/true"),Map.of(),List.of(),new ProotLaunch.PresentationBindings(invalid,x11)));
+            rejects(()->ProotLaunch.create(fixture.tracer,fixture.loader,fixture.runtime,fixture.work,fixture.temp,fixture.logs,
+                    List.of("/bin/true"),Map.of(),List.of(new ProotLaunch.Mount(endpoints,"/esteria-bridges")),shared));
+            check(fixture.create(List.of(new ProotLaunch.Mount(fixture.binary,"/esteria-turnip"))).arguments
+                    .contains(fixture.binary+":/esteria-turnip!"),"Optional Turnip mount only by explicit request");
             rejects(()->fixture.create(null));
         }
         System.out.println("PRoot provider mount isolation and argv checks passed; no guest execution claimed");

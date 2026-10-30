@@ -92,13 +92,14 @@ def apk_inventory(apk, notices):
         expected_assets |= {client.ASSETS + '/' + name for name in (client.ARCHIVE, 'provider.json', 'NOTICE.txt')}
         expected_assets |= {'assets/' + directory + '/' + name for directory, names in HELPER_SETS.items()
                             for name in (*names, 'manifest.json')}
-        expected_assets |= {'assets/' + name for name in ('sources.lock.json', 'runtime-sources.lock.json', 'runtime.properties',
+        expected_assets |= {'assets/' + name for name in ('sources.lock.json', 'runtime-sources.lock.json', 'x11-runtime.lock.json', 'runtime.properties',
             'notices/ESTERIA-GPL-3.0.txt', 'notices/FTA-MIT-LICENSE.txt', 'notices/LLVM-RUNTIME-NOTICE.txt',
             'notices/NDK-28.2.13676358-NOTICE.txt', 'notices/NDK-SYSROOT-NOTICE.txt')}
         require({name for name in names if name.startswith('assets/') and not name.endswith('/')} == expected_assets,
                 'combined-apk-asset-inventory-mismatch')
         for target, source in [('assets/sources.lock.json', ROOT / 'sources.lock.json'),
                                ('assets/runtime-sources.lock.json', ROOT / 'runtime/runtime-sources.lock.json'),
+                               ('assets/x11-runtime.lock.json', ROOT / 'runtime/bridges/x11-runtime.lock.json'),
                                ('assets/runtime.properties', ROOT / 'app/src/main/assets/runtime.properties')]:
             expected = client.small(source)
             info = archive.getinfo(target)

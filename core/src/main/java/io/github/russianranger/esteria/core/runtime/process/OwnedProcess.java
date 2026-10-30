@@ -70,7 +70,7 @@ public final class OwnedProcess implements SessionSupervisor.Child {
     private volatile IOException failure;
     private volatile int status=RUNNING;
     private volatile long stopDeadline;
-    private volatile boolean stopRequested, forced;
+    private volatile boolean stopRequested, forced, auxiliaryStop;
     private volatile long inputHandle;
     private volatile long[] metrics=new long[5];
 
@@ -123,7 +123,7 @@ public final class OwnedProcess implements SessionSupervisor.Child {
                     forced=true;
                     status=backend.terminate(handle);
                     if (status==RUNNING) throw new IOException("Native process did not terminate");
-                    remember(new IOException("Graceful shutdown did not complete; owned process was terminated"));
+                    if (!auxiliaryStop) remember(new IOException("Graceful shutdown did not complete; owned process was terminated"));
                 }
             }
             if (stopRequested && shutdown!=null) {
@@ -153,8 +153,12 @@ public final class OwnedProcess implements SessionSupervisor.Child {
         }
     }
     private void remember(IOException error) { if (failure==null) failure=error; else failure.addSuppressed(error); }
-    private synchronized void requestStop(Duration timeout) {
-        if (!stopRequested) { stopDeadline=System.nanoTime()+timeout.toNanos(); stopRequested=true; }
+    private void requestStop(Duration timeout) { requestStop(timeout,false); }
+    private synchronized void requestStop(Duration timeout, boolean auxiliary) {
+        if (auxiliary && graceful!=null) throw new IllegalStateException("A persistent component must use its graceful shutdown protocol");
+        // The first caller owns shutdown semantics; an auxiliary request must
+        // never erase a prior normal stop's failure or save acknowledgment.
+        if (!stopRequested) { stopDeadline=System.nanoTime()+timeout.toNanos(); auxiliaryStop=auxiliary; stopRequested=true; }
     }
     @Override public boolean isAlive() { return finished.getCount()!=0; }
     @Override public int exitCode() { if (isAlive()) throw new IllegalThreadStateException("Process still owned"); return status; }
@@ -182,6 +186,18 @@ public final class OwnedProcess implements SessionSupervisor.Child {
         if (timeout.isNegative() || timeout.compareTo(Duration.ofSeconds(30))>0)
             throw new IllegalArgumentException("Shutdown timeout must be between zero and 30 seconds");
         requestStop(timeout);
+        awaitStop(timeout);
+    }
+    /** Terminate a stateless auxiliary process through the same owned native
+     * TERM/KILL/reap path. This never reports a save or graceful acknowledgment;
+     * wasForced and the actual exit status remain available. Existing failures
+     * and cleanup/log errors are still thrown. Not valid for graceful callbacks.
+     */
+    public void terminateAuxiliary() throws IOException {
+        requestStop(Duration.ZERO,true);
+        awaitStop(Duration.ZERO);
+    }
+    private void awaitStop(Duration timeout) throws IOException {
         try {
             if (!finished.await(timeout.toMillis()+7000,TimeUnit.MILLISECONDS)) throw new IOException("Native cleanup is still running");
         } catch (InterruptedException e) { Thread.currentThread().interrupt(); throw new IOException("Interrupted while waiting for native cleanup",e); }

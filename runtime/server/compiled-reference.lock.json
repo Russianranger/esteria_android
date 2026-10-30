@@ -1,0 +1,19 @@
+{
+  "formatVersion": 1,
+  "scope": "exact-linked-server-build-requalification",
+  "repository": "Russianranger/esteria_android",
+  "integrationRevision": "ae5534d0a9d7fb72c8e5a03dcfc65420c354e7bb",
+  "workflowRun": 41005048019,
+  "job": 123898253406,
+  "buildId": "41005048019.1",
+  "sourceLockSha256": "dbbf8983cfa2b429f7dd0c3308a2795ffbecd29e8019adf35348447e1eab41b0",
+  "runtimeSourceLockSha256": "2efac3a6a310c4add3a0407f0044ac608706aa748730351d45ea4c67bdfd0a47",
+  "artifacts": {
+    "install": {"id": 12959116561, "bytes": 1168311183, "sha256": "ed3c0cf61752c95d21036cbec59b6fe35a3b85836a8d14cee0276c7f584ea7e2"},
+    "content": {"id": 12958981685, "bytes": 171423607, "sha256": "212e44186e3a26de64cd989b3bf1e04a177d5fa60cca2444de602844c6350825"},
+    "diagnostics": {"id": 12958224918, "bytes": 2958877, "sha256": "3419fc9a42102aeadb3510ba880af9d4a3cc67e3fa28a1d419fe5df77291894a"}
+  },
+  "originalQualification": {"scope": "pre-engine-content-consumer-rejection", "mysqlInitialized": false, "compiledUpdaterExecuted": false},
+  "applicationRuntimeQualified": false,
+  "gameplayQualified": false
+}

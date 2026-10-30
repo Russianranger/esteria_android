@@ -41,6 +41,7 @@ public final class AudioBridge implements AutoCloseable {
     private Thread acceptor;
     private volatile boolean closed;
     private volatile float volume = 1;
+    private volatile boolean suspended;
     private long device, inode;
     private boolean ownsPath, focusRequested;
 
@@ -65,9 +66,17 @@ public final class AudioBridge implements AutoCloseable {
                             change == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK ? .2f : 0;
                     List<Playback> active;
                     synchronized (connections) { active = new ArrayList<>(connections); }
-                    for (Playback playback : active) playback.volume(volume);
+                    for (Playback playback : active) playback.refreshVolume();
                     event(volume == 1 ? "audio-focus-gained" : "audio-focus-reduced");
                 }, new Handler(Looper.getMainLooper())).build();
+    }
+    /** Lifecycle mute preserves the producer clock; focus changes cannot unmute
+     * a suspended activity. Resume retains the latest actual focus grant. */
+    public void setSuspended(boolean value) {
+        suspended=value;
+        List<Playback> active;
+        synchronized(connections) { active=new ArrayList<>(connections); }
+        for(Playback playback:active)playback.refreshVolume();
     }
     private void event(String code) { if (events != null) events.event(code); }
     private void listen() throws IOException {
@@ -145,7 +154,7 @@ public final class AudioBridge implements AutoCloseable {
                             .setEncoding(AudioFormat.ENCODING_PCM_16BIT).setChannelMask(AudioFormat.CHANNEL_OUT_STEREO).build())
                     .setTransferMode(AudioTrack.MODE_STREAM).setBufferSizeInBytes(Math.max(minimum, capacity * 4)).build();
             if (track.getState() != AudioTrack.STATE_INITIALIZED) throw new IOException("Android audio initialization failed");
-            buffer(); track.setVolume(volume);
+            buffer(); track.setVolume(suspended ? 0 : volume);
         }
         @Override public synchronized void start() throws IOException { check(); buffer(); track.play(); }
         @Override public synchronized void stop() throws IOException { check(); track.pause(); track.flush(); }
@@ -158,7 +167,7 @@ public final class AudioBridge implements AutoCloseable {
         @Override public synchronized int write(byte[] bytes, int length) throws IOException {
             check(); return track.write(bytes, 0, length, AudioTrack.WRITE_NON_BLOCKING);
         }
-        synchronized void volume(float value) { if (track != null) track.setVolume(value); }
+        synchronized void refreshVolume() { if (track != null) track.setVolume(suspended ? 0 : volume); }
         @Override public synchronized void close() {
             ended = true;
             if (track != null) { track.release(); track = null; }

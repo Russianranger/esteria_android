@@ -1,0 +1,147 @@
+name: Exact compiled server runtime qualification
+on:
+  push:
+    branches: [android/client-server]
+    paths:
+      - tools/prepare_server_requalification.py
+      - tests/test_server_requalification.py
+      - runtime/server/compiled-reference.lock.json
+      - tools/qualify_dbimport.py
+      - tools/qualify_authserver.py
+      - tools/auth_protocol.py
+      - tools/owned_process_group.py
+      - tools/package_server_content.py
+      - tools/manifest_server_content.py
+      - tools/manifest_server_modules.py
+      - tools/verify_server_build.py
+      - tools/fetch_sources.py
+      - tools/prepare_runtime.py
+      - tools/provider_client_runtime.py
+      - tools/release_server_dependencies.py
+      - tools/render_server_config.py
+      - runtime/server/Dockerfile
+      - runtime/server/sources.lock.json
+      - runtime/server-lua-map.json
+      - config/local-server.json
+      - runtime/mysql_bootstrap.py
+      - runtime/provision_local_account.py
+      - runtime/provision_local_realm.py
+      - .github/workflows/server-requalification.yml
+  pull_request:
+    paths:
+      - tools/prepare_server_requalification.py
+      - tests/test_server_requalification.py
+      - runtime/server/compiled-reference.lock.json
+      - tools/qualify_dbimport.py
+      - tools/qualify_authserver.py
+      - tools/auth_protocol.py
+      - tools/owned_process_group.py
+      - tools/package_server_content.py
+      - tools/manifest_server_content.py
+      - tools/manifest_server_modules.py
+      - tools/verify_server_build.py
+      - tools/fetch_sources.py
+      - tools/prepare_runtime.py
+      - tools/provider_client_runtime.py
+      - tools/release_server_dependencies.py
+      - tools/render_server_config.py
+      - runtime/server/Dockerfile
+      - runtime/server/sources.lock.json
+      - runtime/server-lua-map.json
+      - config/local-server.json
+      - runtime/mysql_bootstrap.py
+      - runtime/provision_local_account.py
+      - runtime/provision_local_realm.py
+      - .github/workflows/server-requalification.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: exact-server-runtime-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  runtime:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Verify staging, source packaging and process ownership guards
+        run: |
+          test "$(uname -m)" = aarch64
+          python3 -m unittest tests.test_server_requalification tests.test_server_package tests.test_dbimport_qualification tests.test_owned_process_group -v
+          mkdir -p out/server-requalification-evidence out/server-requalification-private
+      - name: Fetch exact linked artifacts and repack their original source content
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/prepare_server_requalification.py --output "$GITHUB_WORKSPACE/out/server-reference" \
+            > out/server-requalification-evidence/preparation.log 2>&1
+          cp out/server-reference/preparation.json out/server-requalification-evidence/
+          cp out/server-reference/install/server-build.json out/server-requalification-evidence/
+          cp out/server-reference/original-content/server-modules.json out/server-requalification-evidence/
+          cp out/server-reference/locked/sources.lock.json out/server-requalification-evidence/original-sources.lock.json
+          cp out/server-reference/content/package-receipt.json out/server-requalification-evidence/repacked-content-receipt.json
+          cp out/server-reference/original-content/package-receipt.json out/server-requalification-evidence/original-content-receipt.json
+      - name: Build exact pinned MySQL dependency environment
+        run: |
+          docker build --platform linux/arm64 --target runtime \
+            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
+            -t esteria-server-reference:qualification runtime/server \
+            > out/server-requalification-evidence/image-build.log 2>&1
+          container=$(docker create esteria-server-reference:qualification)
+          trap 'docker rm -f "$container" >/dev/null' EXIT
+          docker cp "$container:/etc/esteria-server-runtime.json" out/server-requalification-evidence/server-runtime.json
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib
+          root = pathlib.Path('out/server-reference')
+          runtime = json.loads(pathlib.Path('out/server-requalification-evidence/server-runtime.json').read_text())
+          with open(os.environ['GITHUB_ENV'], 'a') as output:
+              output.write('ESTERIA_SERVER_REFERENCE_VERSION=' + runtime['expectedMysqlSqlVersion'] + '\n')
+              output.write('ESTERIA_SERVER_REFERENCE_CONTENT=' + hashlib.sha256((root/'content/package-receipt.json').read_bytes()).hexdigest() + '\n')
+          PY
+      - name: Run real compiled updater and authentication against fresh owned state
+        run: |
+          docker run --rm --init --network none \
+            --env PYTHONDONTWRITEBYTECODE=1 \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/server-requalification-private,dst=/state" \
+            --workdir /qualification esteria-server-reference:qualification \
+            python3 tools/qualify_authserver.py \
+            --install /qualification/out/server-reference/install \
+            --content /qualification/out/server-reference/content \
+            --content-receipt-sha256 "$ESTERIA_SERVER_REFERENCE_CONTENT" \
+            --lock /qualification/out/server-reference/locked/sources.lock.json \
+            --mysql /usr/bin/mysql --mysqld /usr/sbin/mysqld \
+            --expected-version "$ESTERIA_SERVER_REFERENCE_VERSION" --output /state/run \
+            > out/server-requalification-evidence/qualification.log 2>&1
+      - name: Collect public receipts and bounded redacted component diagnostics
+        if: always()
+        run: |
+          trap 'sudo chown -R "$(id -u):$(id -g)" out/server-requalification-evidence' EXIT
+          sudo env ESTERIA_QUALIFICATION_REVISION="${GITHUB_SHA}" python3 - <<'PY'
+          import hashlib, json, os, pathlib, shutil
+          source = pathlib.Path('out/server-requalification-private/run')
+          target = pathlib.Path('out/server-requalification-evidence'); target.mkdir(parents=True, exist_ok=True)
+          for name in ['qualification.json', 'auth-qualification.json', 'dbimport-first.log', 'dbimport-second.log',
+                       'authserver-redacted.log', 'mysql-initialize-engine.log', 'mysql-bootstrap-engine.log',
+                       'mysql-base-engine.log', 'mysql-base-restart-engine.log']:
+              path = source/name
+              if path.is_file():
+                  if path.stat().st_size > 1048576: raise ValueError('public diagnostic size bound')
+                  shutil.copyfile(path, target/name)
+          receipt = dict(formatVersion=1, scope='exact-linked-server-runtime-requalification-environment',
+              integrationRevision=os.environ['ESTERIA_QUALIFICATION_REVISION'], externalNetworkDisabled=True,
+              originalBuildId='41005048019.1', recompiled=False, existingStateModified=False,
+              androidRuntimeQualified=False, gameplayQualified=False,
+              files={path.name: {'bytes': path.stat().st_size, 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
+                     for path in target.iterdir() if path.is_file()})
+          (target/'environment-receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: exact-server-runtime-evidence-${{ github.sha }}
+          path: out/server-requalification-evidence
+          retention-days: 14
+          if-no-files-found: error

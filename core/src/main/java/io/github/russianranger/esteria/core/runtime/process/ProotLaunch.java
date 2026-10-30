@@ -26,9 +26,17 @@ public final class ProotLaunch {
         public final String destination;
         public Mount(Path source, String destination) {
             if (source == null || destination == null || !Arrays.asList("/esteria-client", "/esteria-data",
-                    "/esteria-content", "/esteria-server", "/esteria-bridges", "/esteria-shaders", "/esteria-shader-tools").contains(destination))
+                    "/esteria-content", "/esteria-server", "/esteria-bridges", "/esteria-shaders", "/esteria-shader-tools", "/esteria-turnip").contains(destination))
                 throw new IllegalArgumentException("Unsupported runtime provider mount");
             this.source = source; this.destination = destination;
+        }
+    }
+    /** Mutable private IPC only; each process still has separate /tmp and logs. */
+    public static final class PresentationBindings {
+        public final Path endpoints, x11;
+        public PresentationBindings(Path endpoints, Path x11) {
+            if (endpoints == null || x11 == null) throw new IllegalArgumentException("Presentation IPC directories required");
+            this.endpoints=endpoints; this.x11=x11;
         }
     }
     public static OwnedProcess.Specification create(Path tracer,Path loader,Path rootfs,Path work,
@@ -37,6 +45,11 @@ public final class ProotLaunch {
     }
     public static OwnedProcess.Specification create(Path tracer,Path loader,Path rootfs,Path work,
             Path temporary,Path logs,List<String> guestCommand,Map<String,String> guestEnvironment,List<Mount> mounts) throws IOException {
+        return create(tracer,loader,rootfs,work,temporary,logs,guestCommand,guestEnvironment,mounts,null);
+    }
+    public static OwnedProcess.Specification create(Path tracer,Path loader,Path rootfs,Path work,
+            Path temporary,Path logs,List<String> guestCommand,Map<String,String> guestEnvironment,List<Mount> mounts,
+            PresentationBindings presentation) throws IOException {
         for (Path path : Arrays.asList(rootfs,work,temporary,logs)) directory(path);
         for (Path path : Arrays.asList(tracer,loader)) {
             if (!path.isAbsolute() || Files.isSymbolicLink(path) || !Files.isRegularFile(path,LinkOption.NOFOLLOW_LINKS) || !Files.isExecutable(path))
@@ -49,7 +62,7 @@ public final class ProotLaunch {
                 throw new IOException("Runtime, persistent work, temporary files and logs must be separate");
         List<String> args=new ArrayList<>(Arrays.asList("--kill-on-exit","--sysvipc","-0","-r",rootfs.toString(),
             "-b","/dev","-b","/proc","-b",work+":/work","-b",temporary+":/tmp"));
-        if (mounts == null || mounts.size() > 7) throw new IOException("Too many runtime provider mounts");
+        if (mounts == null || mounts.size() > 8) throw new IOException("Too many runtime provider mounts");
         Set<String> destinations=new HashSet<>();
         List<Path> sources=new ArrayList<>();
         for (Mount mount : mounts) {
@@ -63,6 +76,19 @@ public final class ProotLaunch {
             // Pinned PRoot binding.c interprets terminal ! as no dereference of
             // the guest destination. Never redirect a provider via a guest link.
             args.add("-b"); args.add(mount.source+":"+mount.destination+"!");
+        }
+        if (presentation != null) {
+            List<Path> ipc=Arrays.asList(presentation.endpoints,presentation.x11);
+            for (Path path : ipc) {
+                directory(path);
+                for (Path other : baseDirectories) if (overlap(path,other))
+                    throw new IOException("Presentation IPC overlaps runtime or process state");
+                for (Path other : sources) if (overlap(path,other))
+                    throw new IOException("Presentation IPC overlaps immutable providers");
+            }
+            if (overlap(ipc.get(0),ipc.get(1))) throw new IOException("Presentation IPC directories overlap");
+            args.add("-b"); args.add(presentation.endpoints+":/session!");
+            args.add("-b"); args.add(presentation.x11+":/tmp/.X11-unix!");
         }
         args.addAll(Arrays.asList("-w","/work","/usr/bin/env","-i"));
         Map<String,String> guest=new TreeMap<>();

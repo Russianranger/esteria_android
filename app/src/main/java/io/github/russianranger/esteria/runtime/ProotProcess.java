@@ -27,20 +27,27 @@ public final class ProotProcess {
             Path work,Path session,List<String> guestCommand,Map<String,String> guestEnvironment,
             List<ProotLaunch.Mount> mounts,OwnedProcess.GracefulStop gracefulStop) throws IOException {
         return OwnedProcess.start(new NativeProcessBridge(),specification(context,installer,plan,work,session,
-            guestCommand,guestEnvironment,mounts),gracefulStop);
+            guestCommand,guestEnvironment,mounts,null),gracefulStop);
+    }
+    public static OwnedProcess startPresentation(Context context,RuntimeInstaller installer,RuntimePackagePlan plan,
+            Path work,Path session,List<String> guestCommand,Map<String,String> guestEnvironment,
+            List<ProotLaunch.Mount> mounts,ProotLaunch.PresentationBindings presentation) throws IOException {
+        if (presentation==null) throw new IOException("Explicit presentation IPC bindings required");
+        return OwnedProcess.start(new NativeProcessBridge(),specification(context,installer,plan,work,session,
+            guestCommand,guestEnvironment,mounts,presentation),null);
     }
     /** Explicit console pipe; the callback must send a source-supported command and check delivery. */
     public static OwnedProcess startInteractive(Context context,RuntimeInstaller installer,RuntimePackagePlan plan,
             Path work,Path session,List<String> guestCommand,Map<String,String> guestEnvironment,
             List<ProotLaunch.Mount> mounts,OwnedProcess.GracefulInputStop gracefulStop) throws IOException {
-        OwnedProcess.Specification base=specification(context,installer,plan,work,session,guestCommand,guestEnvironment,mounts);
+        OwnedProcess.Specification base=specification(context,installer,plan,work,session,guestCommand,guestEnvironment,mounts,null);
         OwnedProcess.Specification interactive=new OwnedProcess.Specification(base.executable,base.arguments,base.environment,
             base.cwd,base.stdout,base.stderr,true);
         return OwnedProcess.startInteractive(new NativeProcessBridge(),interactive,gracefulStop);
     }
     private static OwnedProcess.Specification specification(Context context,RuntimeInstaller installer,RuntimePackagePlan plan,
             Path work,Path session,List<String> guestCommand,Map<String,String> guestEnvironment,
-            List<ProotLaunch.Mount> mounts) throws IOException {
+            List<ProotLaunch.Mount> mounts,ProotLaunch.PresentationBindings presentation) throws IOException {
         InstalledProot payload=InstalledProot.inspect(context);
         Path rootfs=installer.resolveCurrent(plan);
         if (rootfs==null) throw new IOException("The pinned runtime generation is not prepared");
@@ -50,6 +57,9 @@ public final class ProotProcess {
         for (ProotLaunch.Mount mount : mounts) {
             if (mount == null) throw new IOException("Runtime provider mount is missing");
             privatePath(privateRoot,mount.source);
+        }
+        if (presentation!=null) {
+            privatePath(privateRoot,presentation.endpoints); privatePath(privateRoot,presentation.x11);
         }
         if (session.startsWith(rootfs) || rootfs.startsWith(session) || session.startsWith(work) || work.startsWith(session))
             throw new IOException("Process session must be separate from runtime and persistent state");
@@ -62,7 +72,7 @@ public final class ProotProcess {
         if (!Files.exists(home)) Files.createDirectory(home,PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------")));
         privatePath(privateRoot,home);
         return ProotLaunch.create(payload.tracer.toPath(),payload.loader.toPath(),rootfs,
-            work,temporary,logs,guestCommand,guestEnvironment,mounts);
+            work,temporary,logs,guestCommand,guestEnvironment,mounts,presentation);
     }
     private static Path privatePath(Path privateRoot,Path path) throws IOException {
         Path canonical=path.toRealPath();
