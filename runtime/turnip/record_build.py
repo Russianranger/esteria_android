@@ -67,10 +67,12 @@ def elf(path, shared):
 
 
 def validate_no_gpu(value):
-    expected = dict(formatVersion=1, scope='linux-arm64-turnip-kgsl-component-probe', icdLoaded=True,
+    expected = dict(formatVersion=2, scope='linux-arm64-turnip-kgsl-component-probe', icdLoaded=True,
+        directIcdNoDevicesVerified=True,
         noKgslHostVerified=True, turnip740ShaderReadbackQualified=False, pixelsVerified=0,
         vendorId=0, deviceId=0, deviceName='', x11PresentationQualified=False, androidQualified=False, gameplayQualified=False)
-    require(type(value) is dict and set(value) == set(expected) and
+    require(type(value) is dict and set(value) == set(expected) | {'loaderEnumerationResult'} and
+            type(value['loaderEnumerationResult']) is int and value['loaderEnumerationResult'] in (0,-3) and
             all(type(value[k]) is type(v) and value[k] == v for k,v in expected.items()), 'no-gpu-receipt-overclaims-or-incomplete')
 
 

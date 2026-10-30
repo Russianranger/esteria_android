@@ -70,5 +70,23 @@ class AuthserverGuards(unittest.TestCase):
             with self.assertRaises(ValueError):
                 auth.run(Path('/install'),Path('/content'),'a'*64,Path('/lock'),Path('/mysql'),Path('/mysqld'),'8.0.46',self.root/'new')
 
+    def test_natural_readiness_failure_retains_leader_until_owned_cleanup(self):
+        executable=self.root/'authserver'; configuration=self.root/'authserver.conf'
+        configuration.write_text('fixture')
+        executable.write_text('#!/usr/bin/python3\nprint("failed",flush=True)\nraise SystemExit(9)\n')
+        executable.chmod(0o700)
+        capture=auth.OwnedAuthserver(executable,configuration,self.root/'private.log')
+        try:
+            self.assertEqual(capture.group.wait(5),9)
+            with self.assertRaisesRegex(ValueError,'exited before readiness'):
+                auth.wait_authserver(capture)
+            self.assertIsNone(capture.process.returncode)
+        finally:
+            with self.assertRaisesRegex(ValueError,'failed startup/shutdown'):capture.stop()
+        self.assertEqual(capture.process.returncode,9)
+        with patch('tools.owned_process_group.os.killpg') as kill:
+            with self.assertRaisesRegex(ValueError,'failed startup/shutdown'):capture.stop()
+            kill.assert_not_called()
+
 
 if __name__=='__main__':unittest.main()

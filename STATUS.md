@@ -17,11 +17,14 @@ no default merge, history rewrite or server push has occurred.
 The full reconstructed EXE's offline diagnostics pass Windows x64/ARM64 and
 native Linux ARM64 Wine in run41003225299, client
 `e2718f647a7f1efb9219106c7501f88a0bf06e4f`. New client tip
-`97b347ee034551ea78dc905c3e209667534e6283` corrects the final retention-test fixture.
+`97b347ee034551ea78dc905c3e209667534e6283` passes all five actual transport jobs
+in41007244092, including Windows x64/ARM64 and native ARM64 Wine.
+New development tip926a6f73253720283ead9d7621ffd6d7d9c040cd adds strict bounded
+shader translation, with25 actual host compiler tests passing.
 The preceding3e9 run41006100154 passed real x64 short/extended packet reads,
 queued sends, stream I/O and both connect/disconnect pairs after repairing lost
 network timer wakes; it then exposed the fixture's missing WDataStore Finalize().
-A complete transport receipt and Wine transport qualification remain pending.
+The complete transport receipt and Wine transport gate now pass.
 The application intentionally keeps the measured69cc provider.
 
 Server40994809596 compiled all2,257 objects and linked authserver/dbimport, then
@@ -61,8 +64,13 @@ The latest combined ARM64 APK passes clean core checks, application/instrumentat
 compilation, lint and all four final provider byte checks with six-patch source
 lock SHA256 `dbbf8983cfa2b429f7dd0c3308a2795ffbecd29e8019adf35348447e1eab41b0`.
 It remains an internal build, not an ARM64 execution or user device-test result.
-Android MySQL fixture41006572364 has built the exact x64 runtime image; actual
-emulator SQL results are pending. Turnip ARM64 build41006180058 is pending.
+Android MySQL has built and installed its exact x64 runtime and executed Python
+and mysqld version inspection. Atomic journal rename returns ENOSYS in the guest;
+the PRoot compatibility path is under investigation before database initialization.
+Turnip ARM64 compiles and its real shader tools pass. The pinned loader returns
+initialization failure when the ICD successfully enumerates zero devices; the
+revised no-GPU check independently requires that exact ICD result before accepting
+the loader result. Its ARM64 rerun remains pending; no GPU execution is claimed.
 Transactional shader-generation staging passes eight host groups, with actual
 subprocess bounds and explicitly synthetic storage fixtures. Real game MPQs,
 shader generation, Adreno rendering and launcher activation are still absent.

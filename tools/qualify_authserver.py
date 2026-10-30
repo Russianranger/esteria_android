@@ -14,7 +14,6 @@ import json
 import os
 from pathlib import Path
 import re
-import signal
 import socket
 import subprocess
 import sys
@@ -30,6 +29,7 @@ from tools import qualify_base_sql as base
 from tools import render_server_config as config
 from tools import verify_server_build as files
 from tools import manifest_server_modules as modules
+from tools.owned_process_group import OwnedGroup
 from runtime import mysql_bootstrap as db
 from runtime import provision_local_account as account
 from runtime import provision_local_realm as realm
@@ -50,6 +50,7 @@ class OwnedAuthserver:
             self.process = subprocess.Popen([str(executable), '--config', str(configuration)],
                 cwd=configuration.parent, env=environment, umask=0o077, stdin=subprocess.DEVNULL,
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT, start_new_session=True, bufsize=0)
+            self.group = OwnedGroup(self.process)
         except BaseException:
             self.output.close()
             raise
@@ -82,20 +83,10 @@ class OwnedAuthserver:
 
     def stop(self):
         try:
-            if self.process.poll() is None:
-                os.killpg(self.process.pid, signal.SIGTERM)
-            try:
-                status = self.process.wait(timeout=30)
-            except subprocess.TimeoutExpired:
-                os.killpg(self.process.pid, signal.SIGKILL)
-                self.process.wait(timeout=5)
-                raise ValueError('owned authserver did not stop cleanly')
+            status, forced = self.group.stop(graceful_timeout=30)
+            require(not forced, 'owned authserver did not stop cleanly')
             require(status == 0, 'owned authserver failed startup/shutdown')
         finally:
-            try:
-                os.killpg(self.process.pid, signal.SIGKILL)
-            except ProcessLookupError:
-                pass
             self.reader.join(timeout=5)
             require(not self.reader.is_alive() and self.error is None, 'owned authserver diagnostic drain failed')
 
@@ -133,7 +124,7 @@ def owns_listener(pid, *, proc=Path('/proc')):
 def wait_authserver(capture):
     deadline = time.monotonic() + 120
     while True:
-        require(capture.process.poll() is None, 'owned authserver exited before readiness')
+        require(capture.group.observe() is None, 'owned authserver exited before readiness')
         if owns_listener(capture.process.pid):
             return
         require(time.monotonic() < deadline, 'owned authserver listener readiness timed out')

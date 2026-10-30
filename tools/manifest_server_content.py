@@ -50,7 +50,11 @@ DATABASES = {
     'world': ('', 'data/sql/base/db_world', 'world'),
     'playerbots': ('modules/mod-playerbots', 'modules/mod-playerbots/data/sql/playerbots/base', 'db_playerbot'),
 }
-EVIDENCE = (
+MAIN_CONFIG_TEMPLATES = (
+    'src/server/apps/authserver/authserver.conf.dist',
+    'src/server/apps/worldserver/worldserver.conf.dist',
+)
+EVIDENCE = MAIN_CONFIG_TEMPLATES + (
     'src/server/database/Database/DatabaseLoader.cpp',
     'src/server/database/Updater/DBUpdater.cpp',
     'src/server/database/Updater/UpdateFetcher.cpp',

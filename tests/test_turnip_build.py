@@ -59,23 +59,32 @@ class TurnipBuild(unittest.TestCase):
         self.assertFalse(any(key.startswith('LD_') for key in env))
 
     def test_hardware_result_requires_all_pixels_and_narrow_scope(self):
-        value=dict(formatVersion=1,scope='linux-arm64-turnip-kgsl-component-probe',icdLoaded=True,
+        value=dict(formatVersion=2,scope='linux-arm64-turnip-kgsl-component-probe',icdLoaded=True,
+            directIcdNoDevicesVerified=False,loaderEnumerationResult=0,
             noKgslHostVerified=False,turnip740ShaderReadbackQualified=True,pixelsVerified=4096,
             vendorId=0x5143,deviceId=740,deviceName='FD740',x11PresentationQualified=False,
             androidQualified=False,gameplayQualified=False)
         probe.validate(value,False)
-        for key,bad in (('pixelsVerified',0),('deviceName','llvmpipe'),('vendorId',1),('androidQualified',True),('icdLoaded',False)):
+        for key,bad in (('pixelsVerified',0),('deviceName','llvmpipe'),('vendorId',1),('androidQualified',True),('icdLoaded',False),
+                        ('loaderEnumerationResult',-3),('directIcdNoDevicesVerified',True)):
             with self.subTest(key=key),self.assertRaises(ValueError):probe.validate(dict(value,**{key:bad}),False)
 
     def test_absent_gpu_receipt_cannot_claim_hardware_or_android(self):
-        value = dict(formatVersion=1, scope='linux-arm64-turnip-kgsl-component-probe', icdLoaded=True,
+        value = dict(formatVersion=2, scope='linux-arm64-turnip-kgsl-component-probe', icdLoaded=True,
+            directIcdNoDevicesVerified=True,loaderEnumerationResult=-3,
             noKgslHostVerified=True, turnip740ShaderReadbackQualified=False, pixelsVerified=0,
             vendorId=0, deviceId=0, deviceName='', x11PresentationQualified=False, androidQualified=False, gameplayQualified=False)
         record.validate_no_gpu(value)
+        probe.validate(value,True)
+        for result in (0,-3):
+            record.validate_no_gpu(dict(value,loaderEnumerationResult=result))
+            probe.validate(dict(value,loaderEnumerationResult=result),True)
         for key in ('turnip740ShaderReadbackQualified','androidQualified','x11PresentationQualified','gameplayQualified'):
             with self.subTest(key=key), self.assertRaises(ValueError): record.validate_no_gpu(dict(value, **{key:True}))
-        for key, bad in (('icdLoaded',False),('noKgslHostVerified',False),('pixelsVerified',4096),('vendorId',False)):
+        for key, bad in (('icdLoaded',False),('noKgslHostVerified',False),('pixelsVerified',4096),('vendorId',False),
+                         ('directIcdNoDevicesVerified',False),('loaderEnumerationResult',-9),('loaderEnumerationResult',False)):
             with self.subTest(key=key), self.assertRaises(ValueError): record.validate_no_gpu(dict(value, **{key:bad}))
+            with self.subTest(key=key), self.assertRaises(ValueError): probe.validate(dict(value, **{key:bad}),True)
 
     def archive(self, root, members):
         archive = root / 'input.tar'

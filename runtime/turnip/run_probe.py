@@ -68,18 +68,21 @@ def execute(command, env, output):
 
 def validate(value, no_gpu):
     expected={'formatVersion','scope','icdLoaded','noKgslHostVerified','turnip740ShaderReadbackQualified',
+        'directIcdNoDevicesVerified','loaderEnumerationResult',
         'pixelsVerified','vendorId','deviceId','deviceName','x11PresentationQualified','androidQualified','gameplayQualified'}
     require(type(value) is dict and set(value)==expected,'probe-receipt-schema')
-    require(type(value['formatVersion']) is int and value['formatVersion']==1 and
+    require(type(value['formatVersion']) is int and value['formatVersion']==2 and
         value['scope']=='linux-arm64-turnip-kgsl-component-probe' and value['icdLoaded'] is True and
         value['noKgslHostVerified'] is no_gpu and value['turnip740ShaderReadbackQualified'] is (not no_gpu) and
+        value['directIcdNoDevicesVerified'] is no_gpu and
         all(value[x] is False for x in ('x11PresentationQualified','androidQualified','gameplayQualified')),'probe-receipt-scope')
-    require(all(type(value[x]) is int for x in ('pixelsVerified','vendorId','deviceId')) and
+    require(all(type(value[x]) is int for x in ('pixelsVerified','vendorId','deviceId','loaderEnumerationResult')) and
         type(value['deviceName']) is str and len(value['deviceName'])<=255,'probe-receipt-types')
     if no_gpu:
-        require(value['pixelsVerified']==value['vendorId']==value['deviceId']==0 and value['deviceName']=='','unexpected-device')
+        require(value['pixelsVerified']==value['vendorId']==value['deviceId']==0 and value['deviceName']=='' and
+                value['loaderEnumerationResult'] in (0,-3),'unexpected-device-or-loader-error')
     else:
-        require(value['pixelsVerified']==4096 and value['vendorId']==0x5143 and value['deviceId']>0 and
+        require(value['loaderEnumerationResult']==0 and value['pixelsVerified']==4096 and value['vendorId']==0x5143 and value['deviceId']>0 and
                 '740' in value['deviceName'],'actual-turnip740-readback-required')
 
 

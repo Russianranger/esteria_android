@@ -15,7 +15,6 @@ from pathlib import Path
 import platform
 import re
 import selectors
-import signal
 import subprocess
 import sys
 import time
@@ -30,6 +29,7 @@ try:
     from . import manifest_server_modules as modules
     from . import render_server_config as config
     from . import verify_server_build as files
+    from .owned_process_group import OwnedGroup
 except ImportError:
     import prepare_runtime as archives
     import qualify_base_sql as base
@@ -37,6 +37,7 @@ except ImportError:
     import manifest_server_modules as modules
     import render_server_config as config
     import verify_server_build as files
+    from owned_process_group import OwnedGroup
 from runtime import mysql_bootstrap as db
 from runtime import provision_local_realm as realm
 
@@ -174,9 +175,11 @@ def run_importer(executable, configuration, log, *, timeout=1800):
     descriptor = os.open(log, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
     tail = bytearray()
     child = None
+    group = None
     try:
         child = subprocess.Popen(command, cwd=configuration.parent, env=environment, umask=0o077,
             stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, start_new_session=True)
+        group = OwnedGroup(child)
         deadline = time.monotonic() + timeout
         with selectors.DefaultSelector() as selector:
             selector.register(child.stdout, selectors.EVENT_READ)
@@ -190,32 +193,21 @@ def run_importer(executable, configuration, log, *, timeout=1800):
                     tail.extend(block)
                     if len(tail) > LOG_LIMIT:
                         del tail[:-LOG_LIMIT]
-            exit_code = child.wait(timeout=max(.01, deadline - time.monotonic()))
+            exit_code = group.wait(timeout=max(.01, deadline - time.monotonic()))
         require(exit_code == 0, 'compiled dbimport failed (exit ' + str(exit_code) + '); partial fixture preserved')
         return {'exitCode': exit_code, 'diagnosticBytes': len(tail),
                 'diagnosticSha256': hashlib.sha256(tail).hexdigest()}
     finally:
-        if child is not None:
-            try:
-                os.killpg(child.pid, signal.SIGTERM)
-            except ProcessLookupError:
-                pass
-            try:
-                child.wait(timeout=10)
-            except subprocess.TimeoutExpired:
-                os.killpg(child.pid, signal.SIGKILL)
-                child.wait(timeout=5)
-            # Also stop any owned descendant whose parent exited first.
-            try:
-                os.killpg(child.pid, signal.SIGKILL)
-            except ProcessLookupError:
-                pass
-            if child.stdout:
+        try:
+            if group is not None:
+                group.stop()
+        finally:
+            if child is not None and child.stdout:
                 child.stdout.close()
-        with os.fdopen(descriptor, 'wb') as output:
-            output.write(tail)
-            output.flush()
-            os.fsync(output.fileno())
+            with os.fdopen(descriptor, 'wb') as output:
+                output.write(tail)
+                output.flush()
+                os.fsync(output.fileno())
 
 
 def expected_updates(source, manifest, database):

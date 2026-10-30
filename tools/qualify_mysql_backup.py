@@ -218,6 +218,69 @@ def probe_snapshot(connection, intent):
     return dict(probes=probes, trackers=trackers, tables=tables)
 
 
+def dump_difference(expected, actual):
+    """Locate the first mismatch with bounded memory, exporting no SQL values.
+
+    Prefixes and line digests are private. Only fixed SQL syntax classifications,
+    schema identifiers, line lengths and position may leave this function.
+    """
+    def record(stream):
+        prefix, digest, size = b'', hashlib.sha256(), 0
+        while True:
+            block = stream.readline(4096)
+            if not block:
+                return None if not size else (prefix, digest.digest(), size)
+            if not prefix:
+                prefix = block
+            size += len(block); digest.update(block)
+            content.require(size <= MAX_DUMP, 'private dump record exceeds bound')
+            if block.endswith(b'\n'):
+                return prefix, digest.digest(), size
+
+    def syntax(prefix, context):
+        line = prefix.lstrip()
+        use = re.match(rb'USE `([A-Za-z0-9_]{1,64})`;', line)
+        if use:
+            context['database'] = use[1].decode('ascii'); context.pop('table', None)
+        table = re.match(rb'(?:CREATE TABLE|INSERT INTO|ALTER TABLE|DROP TABLE IF EXISTS) `([A-Za-z0-9_]{1,64})`', line)
+        if table:
+            context['table'] = table[1].decode('ascii')
+        kind = next((name for token, name in ((b'INSERT INTO ', 'insert'), (b'CREATE TABLE ', 'create-table'),
+            (b'ALTER TABLE ', 'alter-table'), (b'DROP TABLE ', 'drop-table'), (b'USE ', 'use-database'),
+            (b') ENGINE=', 'table-options'), (b'/*!', 'versioned-directive')) if line.startswith(token)), 'other')
+        result = dict(context, statementKind=kind)
+        column = re.match(rb'`([A-Za-z0-9_]{1,64})`\s', line)
+        if column:
+            result.update(statementKind='column-definition', column=column[1].decode('ascii'))
+        return result
+
+    contexts = [{}, {}]
+    with expected.open('rb') as left, actual.open('rb') as right:
+        number = 0
+        while True:
+            rows = [record(left), record(right)]
+            if rows == [None, None]:
+                return {'kind': 'no-line-difference'}
+            number += 1
+            classified = [syntax(row[0], context) if row is not None else {'statementKind': 'end-of-file'}
+                          for row, context in zip(rows, contexts)]
+            if rows[0] is None or rows[1] is None or rows[0][1:] != rows[1][1:]:
+                result = dict(kind='canonical-line-mismatch', line=number,
+                    expected=classified[0] | {'lineBytes': rows[0][2] if rows[0] else 0},
+                    actual=classified[1] | {'lineBytes': rows[1][2] if rows[1] else 0})
+                if all(row is not None and row[2] <= 4096 for row in rows) and \
+                        all(item['statementKind'] == 'table-options' for item in classified):
+                    normalize = lambda raw: re.sub(rb' AUTO_INCREMENT=[0-9]+', b'', raw)
+                    result['onlyAutoIncrementCounterDiffers'] = normalize(rows[0][0]) == normalize(rows[1][0])
+                return result
+
+
+def require_same_dump(evidence, original, compared, expected_identity, actual_identity):
+    if actual_identity != expected_identity:
+        evidence['canonicalDifference'] = dump_difference(original, compared)
+        raise ValueError('full logical SQL differs; only safe structural diagnostic exported')
+
+
 def run(mysql, mysqld, mysqldump, fixture, expected, source_lock, output, version, *,
         account_fixture, account_fixture_sha256):
     db.exact_version(version)
@@ -312,8 +375,9 @@ def run(mysql, mysqld, mysqldump, fixture, expected, source_lock, output, versio
             content.require(probe_snapshot(connection, intent) == expected_rows, 'restored account/tracker/probe/table mismatch')
         evidence['ownedCredentialRowsRestored'] = True
         evidence['phase'] = 'compare-complete-canonical-sql'
-        content.require(dump(mysql, mysqldump, destination, version, output / 'private-restored.sql') == backup_identity,
-                        'full logical SQL changed after restoration')
+        restored_dump = output / 'private-restored.sql'
+        require_same_dump(evidence, backup, restored_dump, backup_identity,
+                          dump(mysql, mysqldump, destination, version, restored_dump))
         evidence['canonicalDumpMatched'] = True
         evidence['phase'] = 'restart-restored-instance'
         base.stop_owned(capture); capture = None
@@ -321,8 +385,9 @@ def run(mysql, mysqld, mysqldump, fixture, expected, source_lock, output, versio
         base.wait_owned(mysql, destination, version, capture)
         with owned_admin(mysql, destination, version) as (connection, _):
             content.require(probe_snapshot(connection, intent) == expected_rows, 'restored restart changed data')
-        content.require(dump(mysql, mysqldump, destination, version, output / 'private-restarted.sql') == backup_identity,
-                        'full logical SQL changed after restart')
+        restarted_dump = output / 'private-restarted.sql'
+        require_same_dump(evidence, backup, restarted_dump, backup_identity,
+                          dump(mysql, mysqldump, destination, version, restarted_dump))
         base.stop_owned(capture); capture = None
         evidence['phase'] = 'recheck-original-state-preservation'
         capture = db.EngineCapture(base.engine_command(mysqld, source), source / 'logs/mysql-backup-restart-engine.log')

@@ -18,6 +18,7 @@
     "AiPlayerbot.RandomBotGuildCount": 0,
     "AiPlayerbot.RandomBotArenaTeam2v2Count": 0,
     "AiPlayerbot.RandomBotArenaTeam3v3Count": 0,
-    "AiPlayerbot.RandomBotArenaTeam5v5Count": 0
+    "AiPlayerbot.RandomBotArenaTeam5v5Count": 0,
+    "AiPlayerbot.CommandServerPort": 0
   }
 }

@@ -3,6 +3,7 @@ import io
 import json
 import os
 from pathlib import Path
+import select
 import subprocess
 import tarfile
 import tempfile
@@ -56,6 +57,32 @@ class QualificationGuards(unittest.TestCase):
                 qualify.run_importer(executable, root / 'config.cnf', root / 'run.log')
             self.assertEqual((root / 'run.log').stat().st_size, qualify.LOG_LIMIT)
 
+    @unittest.skipUnless(hasattr(os, 'pidfd_open'), 'Linux descendant observation')
+    def test_timeout_cleans_descendant_that_retains_output_after_leader_exit(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary); executable = root / 'updater'
+            executable.write_text('#!/usr/bin/python3\nimport os,time,pathlib\n'
+                'if os.fork()==0:\n'
+                ' pathlib.Path("descendant").write_text(str(os.getpid()))\n'
+                ' print("retained",flush=True)\n'
+                ' while True:time.sleep(.05)\n')
+            executable.chmod(0o700)
+            watched = []
+            original = qualify.OwnedGroup.stop
+            def stop(group, *args, **kwargs):
+                descriptor = os.pidfd_open(int((root / 'descendant').read_text()))
+                watched.append(descriptor)
+                self.assertIsNone(group.process.returncode)
+                return original(group, *args, **kwargs)
+            try:
+                with patch.object(qualify.OwnedGroup, 'stop', stop), self.assertRaisesRegex(ValueError, 'timed out'):
+                    qualify.run_importer(executable, root / 'config.cnf', root / 'run.log', timeout=.2)
+                self.assertEqual(len(watched), 1)
+                self.assertEqual(select.select(watched, [], [], 5)[0], watched)
+                self.assertIn(b'retained', (root / 'run.log').read_bytes())
+            finally:
+                for descriptor in watched: os.close(descriptor)
+
     def test_update_ledgers_require_every_selected_nonarchived_hash(self):
         expected = {name: {'source.sql': ('a' * 40, 'MODULE')} for name in qualify.DATABASES}
         connection = Mock()
@@ -105,6 +132,10 @@ class ContentExtraction(unittest.TestCase):
             path = qualify.base.content.DATABASES[database][1] + '/updates.sql'
             data = b'CREATE TABLE updates (name VARCHAR(255));\n'
             self.manifest['databases'][database] = dict(base=[path], updateOrder=[], executionOrderQualified=True)
+            self.manifest['files'][path] = identity(data)
+            self.payload['source/' + path] = data
+        for path in qualify.base.content.MAIN_CONFIG_TEMPLATES:
+            data = b'# Synthetic source configuration template\n'
             self.manifest['files'][path] = identity(data)
             self.payload['source/' + path] = data
         self.compiled = dict(formatVersion=1, scope='compiled-server-module-selection',

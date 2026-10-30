@@ -427,3 +427,10 @@ execution remains pending the real server build and qualification run.
 ```sh
 python3 -m unittest tests.test_dbimport_qualification -v
 ```
+
+
+Complete module configuration now includes the original main auth/world templates
+and every selected module template. The renderer can bind their hashes and exact
+compiled config list before atomic activation; see
+`runtime/server/MODULE-CONFIGURATION.md`. Ordinary bootstrap fixture rendering
+explicitly remains incomplete. Lua stays disabled until its script map is qualified.

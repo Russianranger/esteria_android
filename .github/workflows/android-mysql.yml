@@ -8,6 +8,11 @@ on:
       - runtime/android_database_setup.py
       - runtime/server/ubuntu.sources
       - runtime/server/inrelease.SHA256SUMS
+      - runtime/proot/**
+      - native/proot-probe/**
+      - tools/build_android_proot.py
+      - tools/build_android_proot_probe.py
+      - tools/verify_android_proot_probe.py
       - app/mysql-probe.gradle
       - app/database-setup.gradle
       - app/src/androidTest/**/MySqlExecutionTest.java
@@ -107,6 +112,14 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
           disable-animations: true
           script: python3 tools/qualify_android_mysql.py --apk out/android-mysql/probe.apk --test-apk out/android-mysql/tests.apk --provider out/mysql-provider --proot-provider "$RUNNER_TEMP/proot-probe/provider" --source-revision "$GITHUB_SHA" --output out/android-mysql/evidence
+      - name: Publish bounded emulator diagnostics before source export
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: android-13-x64-mysql-early-evidence-${{ github.sha }}
+          path: out/android-mysql/evidence
+          if-no-files-found: warn
+          retention-days: 14
       - name: Retain complete installed-package corresponding sources even after a test failure
         if: always() && steps.runtime.outcome == 'success'
         run: |

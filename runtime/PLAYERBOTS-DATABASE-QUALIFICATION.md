@@ -1,0 +1,60 @@
+# Playerbots database loader qualification
+
+The server's standalone `dbimport` registers auth, characters and world only.
+Playerbots is a fourth pool registered by
+`modules/mod-playerbots/src/Script/Playerbots.cpp::OnDatabasesLoading`. A passed
+core updater therefore does not establish playerbots database readiness.
+
+The isolated `esteria_playerbots_database_reference` calls that exact loader
+sequence against the pinned server's real `database` and `common` targets. It
+does not copy or replace the loader, connection, updater or prepared statements.
+The database target must already have the selected module's `-DMOD_PLAYERBOTS`
+definition; the reference refuses configuration otherwise. It loads its main
+configuration and sibling `modules/playerbots.conf` through actual `ConfigMgr`,
+requiring reviewed source adaptation 0007. No game scripts or bot AI are linked
+into this reference. It closes the pool before ending the MySQL client library.
+
+At server `f35f04d01689f034778e3474b3c820092f51e461`, the playerbots database plan
+contains 29 base files and 31 released updates (73,695,906 source bytes). Its
+loader has an empty extra-module list and `DBUpdater` selects the module's own
+`data/sql/playerbots/base` and `updates_include` paths. The registered database
+uses update bit 8; `SetUpdateFlags` adds that bit to the configured mask. Its
+source declares 52 prepared statements. These are source facts, not execution
+results. No external SQL or arbitrary glob order is substituted.
+
+`verify_playerbots_reference.py` binds the helper ELF/hash to the source-verified
+server build, exact compiled-module receipt and same compile-command inventory.
+It checks the real loader/updater/playerbots-connection translation units and
+reference command all carry the module definition, checks reference source
+bytes against the integration revision, and records ELF dependencies without
+executing it. The helper remains a CI qualification artifact and is not added
+to the application runtime.
+
+`qualify_playerbots_database.py` first verifies that receipt's independently
+provided SHA-256. The existing compiled importer/auth harness is the sole
+creator of a new disposable instance; a previous output or game save is never
+adopted. After successful real auth qualification, it requires the fourth schema
+to be empty and executes the real loader. It checks every released SQL filename,
+SHA-1 and state against the content manifest, rejects extra ledger entries, and
+requires the source-controlled completion after statement preparation and pool
+shutdown. A second load must retain the same tables, ledger and a disposable
+InnoDB marker. A clean MySQL restart must retain them again. Core table sets,
+update ledgers, importer markers, all account columns including the authenticated
+session key, realm trackers and private account journal are compared without
+publishing their contents. Account columns use `HEX` in the private line-based
+comparison, preserving arbitrary binary salt/verifier/session bytes.
+
+The local realm is reasserted after this last database loader. This is not the
+final application world-startup gate: other module hooks and actual world entry
+still require qualification. Source upgrade behavior, playerbot character
+creation, AI, saved-world persistence, Android execution and gameplay remain
+explicitly false. The helper emits only a database qualification receipt;
+private SQL diagnostics stay in the disposable fixture.
+
+Eleven focused host guards pass, including exact compile-source selection,
+module definitions, receipt rejection before database creation, real pinned
+configuration-key rendering, exact ledger checks, binary-safe private account
+comparison, existing-state preservation and completion-marker checks. Actual
+ARM64 linking and MySQL execution remain pending the full server build and
+activation of adaptation 0007. The main server workflow has not yet been wired
+to execute this reference.

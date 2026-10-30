@@ -69,7 +69,7 @@ no unpinned runtime package or replacement binary.
 
 ## Validation boundary
 
-Sixteen focused host guard tests pass, including real bounded subprocess output
+Nineteen focused host guard tests pass, including real bounded subprocess output
 draining/deadline cleanup, digest rejection before SQL, all-four-empty gating,
 partial-file preservation, no-replace publication and regular-file/link checks.
 The file-size limiter starts an isolated Python interpreter that applies the
@@ -99,7 +99,17 @@ Failures now export controlled classification and numeric process/MySQL error
 codes, never raw SQL diagnostics. Artifact `12955522230` from that run was
 downloaded and verified (6,241-byte ZIP SHA-256
 `84ad9fc9f886c76ad5c5ce3e6b91dfa9889e52145de5a84bdd10548ccdfc4e8d`).
-Full backup/restore execution is pending rerun; no dump, restore or setup-wrapper
-success is inferred from the preceding stages.
+Actual native ARM64 run `41007529313` at `db385698` passed the dump option
+preflight, full four-schema dump and restore, owned account/tracker/probe checks,
+and exact setup-wrapper fresh initialization plus repeated initialization. It
+stopped at the strict canonical dump comparison, before restart qualification.
+The verified 6,302-byte artifact `12956860052` has ZIP SHA-256
+`17e51e989d41c81f72541e045a939ccbb758f3cb64330733c725223a8ae1b2a6`.
+The next run adds a bounded first-difference diagnostic containing only SQL
+statement kind, schema/table/column identifiers, line lengths and position. No
+row values or per-line hashes leave the private fixture. This does not relax
+the byte-for-byte gate; even a difference limited to an auto-increment counter
+still fails. Full preservation qualification awaits that investigation and the
+subsequent clean restart comparisons.
 No current result qualifies live saved-game restoration, upgrades across revisions,
 character saving/relogging, bot persistence, the Android helper, or gameplay.

@@ -71,6 +71,20 @@ receipt even on error. The failed first run does not qualify ICD loading or
 provide a usable retained binary artifact. A successful no-GPU load is never
 Adreno qualification.
 
+The diagnostic rerun `41007887730` at `7200e221cb3b087e6797cc9efc683146e1f68da1`
+retained the complete build/source artifact and isolated the probe failure:
+`vkEnumeratePhysicalDevices` returned `VK_ERROR_INITIALIZATION_FAILED` (-3).
+The pinned Vulkan-Loader 1.3.239 `loader/loader.c`,
+`setup_loader_term_phys_devs`, explicitly returns this result when every ICD
+successfully reports zero devices. Mesa's `vk_instance.c` converts the missing
+KGSL device into that successful empty enumeration. The version2 component probe
+therefore first creates an instance and requires successful zero-device
+enumeration **directly from the exact measured ICD**. Only after that independent
+check does the no-GPU path permit loader result0 or-3. It records the actual
+result; arbitrary ICD errors and physical devices still fail. The hardware path
+requires normal successful enumeration and all pixel checks. The corrected
+probe still awaits native ARM64 execution; no hardware gate has passed.
+
 The separate `--gpu-readback` probe requires observed Mesa Turnip driver identity,
 an integrated Qualcomm740 GPU and a KGSL character device. It compiles/runs the
 provided vertex and fragment shaders, draws a full image through a real graphics

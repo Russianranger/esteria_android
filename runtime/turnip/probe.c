@@ -33,13 +33,30 @@ static VkDeviceMemory allocate(VkPhysicalDevice gpu, VkDevice device, VkMemoryRe
         .allocationSize=requirements.size, .memoryTypeIndex=memory_type(gpu, requirements.memoryTypeBits, flags)};
     VkDeviceMemory memory; checked(vkAllocateMemory(device, &info, NULL, &memory), "allocate actual GPU memory");return memory;
 }
-static void receipt(const char *path, int hardware, const VkPhysicalDeviceProperties *properties) {
+static void no_icd_devices(void *icd, const VkInstanceCreateInfo *info) {
+    PFN_vkGetInstanceProcAddr address = (PFN_vkGetInstanceProcAddr)dlsym(icd, "vk_icdGetInstanceProcAddr");
+    require(address != NULL, "exact ICD dispatch entrypoint");
+    PFN_vkCreateInstance create = (PFN_vkCreateInstance)address(VK_NULL_HANDLE, "vkCreateInstance");
+    require(create != NULL, "exact ICD instance entrypoint");
+    VkInstance instance = VK_NULL_HANDLE;
+    checked(create(info, NULL, &instance), "direct ICD instance creation");
+    PFN_vkEnumeratePhysicalDevices enumerate = (PFN_vkEnumeratePhysicalDevices)address(instance, "vkEnumeratePhysicalDevices");
+    PFN_vkDestroyInstance destroy = (PFN_vkDestroyInstance)address(instance, "vkDestroyInstance");
+    require(enumerate != NULL && destroy != NULL, "exact ICD instance dispatch");
+    uint32_t count = 0;
+    checked(enumerate(instance, &count, NULL), "direct ICD enumeration");
+    require(count == 0, "exact ICD must independently report no devices without KGSL");
+    destroy(instance, NULL);
+}
+static void receipt(const char *path, int hardware, const VkPhysicalDeviceProperties *properties, VkResult enumeration) {
     int fd = open(path, O_WRONLY|O_CREAT|O_EXCL|O_CLOEXEC|O_NOFOLLOW, 0600);
     require(fd >= 0, "exclusive receipt creation"); FILE *file = fdopen(fd, "w"); require(file != NULL, "receipt stream");
-    fprintf(file, "{\"formatVersion\":1,\"scope\":\"linux-arm64-turnip-kgsl-component-probe\","
+    fprintf(file, "{\"formatVersion\":2,\"scope\":\"linux-arm64-turnip-kgsl-component-probe\","
         "\"icdLoaded\":true,\"noKgslHostVerified\":%s,\"turnip740ShaderReadbackQualified\":%s,"
+        "\"directIcdNoDevicesVerified\":%s,\"loaderEnumerationResult\":%d,"
         "\"pixelsVerified\":%u,\"vendorId\":%u,\"deviceId\":%u,\"deviceName\":\"",
-        hardware ? "false" : "true", hardware ? "true" : "false", hardware ? 4096u : 0,
+        hardware ? "false" : "true", hardware ? "true" : "false", hardware ? "false" : "true", enumeration,
+        hardware ? 4096u : 0,
         hardware ? properties->vendorID : 0, hardware ? properties->deviceID : 0);
     if (hardware) for (const unsigned char *p=(const unsigned char *)properties->deviceName; *p; ++p) {
         if (*p < 32 || *p == '\\' || *p == '"' || *p >= 127) fprintf(file, "\\u%04x", *p);
@@ -65,16 +82,21 @@ int main(int argc, char **argv) {
     VkApplicationInfo application = {.sType=VK_STRUCTURE_TYPE_APPLICATION_INFO,
         .pApplicationName="Esteria Turnip component probe", .apiVersion=VK_API_VERSION_1_2};
     VkInstanceCreateInfo instance_info = {.sType=VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO, .pApplicationInfo=&application};
+    if (no_gpu) no_icd_devices(icd, &instance_info);
     VkInstance instance = VK_NULL_HANDLE; VkResult created = vkCreateInstance(&instance_info, NULL, &instance);
-    if (no_gpu && created == VK_ERROR_INCOMPATIBLE_DRIVER) {
-        require(dlclose(icd) == 0, "ICD unload"); receipt(argv[2], 0, NULL); return 0;
-    }
     checked(created, "loader creates real ICD instance");
-    uint32_t count = 0; checked(vkEnumeratePhysicalDevices(instance, &count, NULL), "enumerate actual devices");
+    uint32_t count = 0; VkResult enumeration = vkEnumeratePhysicalDevices(instance, &count, NULL);
     if (no_gpu) {
+        /* Pinned Vulkan-Loader 1.3.239 loader.c setup_loader_term_phys_devs
+         * returns INITIALIZATION_FAILED when the exact ICD succeeds with zero
+         * devices. Prove that direct result above, rather than treating an
+         * arbitrary initialization failure as evidence of a functioning ICD. */
+        require(enumeration == VK_SUCCESS || enumeration == VK_ERROR_INITIALIZATION_FAILED,
+                "expected no-device loader enumeration result");
         require(count == 0, "software or unexpected physical device must not qualify no-KGSL check");
-        vkDestroyInstance(instance, NULL); require(dlclose(icd) == 0, "ICD unload"); receipt(argv[2], 0, NULL); return 0;
+        vkDestroyInstance(instance, NULL); require(dlclose(icd) == 0, "ICD unload"); receipt(argv[2], 0, NULL, enumeration); return 0;
     }
+    checked(enumeration, "enumerate actual devices");
     require(count == 1, "exactly one selected Turnip hardware device required");
     VkPhysicalDevice gpu; checked(vkEnumeratePhysicalDevices(instance, &count, &gpu), "obtain GPU");
     VkPhysicalDeviceDriverProperties driver = {.sType=VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES};
@@ -179,5 +201,5 @@ int main(int argc, char **argv) {
     vkDestroyPipelineLayout(device,layout,NULL);for(unsigned i=0;i<2;++i)vkDestroyShaderModule(device,modules[i],NULL);
     vkDestroyFramebuffer(device,framebuffer,NULL);vkDestroyRenderPass(device,pass,NULL);vkDestroyImageView(device,view,NULL);
     vkDestroyImage(device,image,NULL);vkFreeMemory(device,image_memory,NULL);vkDestroyDevice(device,NULL);vkDestroyInstance(instance,NULL);
-    require(dlclose(icd)==0,"ICD unload after clean completion");receipt(argv[2],1,&properties.properties);return 0;
+    require(dlclose(icd)==0,"ICD unload after clean completion");receipt(argv[2],1,&properties.properties,enumeration);return 0;
 }

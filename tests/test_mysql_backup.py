@@ -202,6 +202,40 @@ class BackupGuards(unittest.TestCase):
         self.assertEqual(error.exception.public, dict(kind='sql-process-exit', exitCode=2, mysqlErrorCode=1045))
         self.assertNotIn('private-SQL-secret', str(error.exception))
 
+    def test_canonical_diagnostic_reveals_structure_but_never_private_row_data(self):
+        left, right = self.root / 'left.sql', self.root / 'right.sql'
+        header = b'USE `acore_auth`;\nCREATE TABLE `account` (\n  `id` int\n) ENGINE=InnoDB;\n'
+        left.write_bytes(header + b"INSERT INTO `account` VALUES (1,'private-salt-secret');\n")
+        right.write_bytes(header + b"INSERT INTO `account` VALUES (1,'changed-private-session');\n")
+        result = backup.dump_difference(left, right)
+        self.assertEqual(result['line'], 5)
+        self.assertEqual(result['expected']['statementKind'], 'insert')
+        self.assertEqual(result['expected']['table'], 'account')
+        self.assertNotIn('private', json.dumps(result)); self.assertNotIn('session', json.dumps(result))
+        evidence = {}
+        with self.assertRaisesRegex(ValueError, 'full logical SQL differs'):
+            backup.require_same_dump(evidence, left, right, backup.identity_file(left), backup.identity_file(right))
+        self.assertEqual(evidence['canonicalDifference'], result)
+
+    def test_canonical_diagnostic_handles_large_lines_without_exporting_bytes_or_hashes(self):
+        left, right = self.root / 'left.sql', self.root / 'right.sql'
+        left.write_bytes(b"INSERT INTO `fixture` VALUES ('" + b'x'*100000 + b"');\n")
+        right.write_bytes(b"INSERT INTO `fixture` VALUES ('" + b'y'*100000 + b"');\n")
+        result = backup.dump_difference(left, right)
+        self.assertEqual(result['expected']['table'], 'fixture')
+        self.assertEqual(result['expected']['lineBytes'], left.stat().st_size)
+        self.assertLess(len(json.dumps(result)), 512)
+        self.assertNotIn('sha', json.dumps(result))
+
+    def test_auto_increment_only_diagnostic_does_not_relax_canonical_gate(self):
+        left, right = self.root / 'left.sql', self.root / 'right.sql'
+        left.write_bytes(b') ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;\n')
+        right.write_bytes(b') ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;\n')
+        evidence = {}
+        with self.assertRaises(ValueError):
+            backup.require_same_dump(evidence, left, right, backup.identity_file(left), backup.identity_file(right))
+        self.assertTrue(evidence['canonicalDifference']['onlyAutoIncrementCounterDiffers'])
+
     def test_actual_child_stderr_is_drained_and_bounded_privately(self):
         log = self.root / 'private.log'
         command = [sys.executable, '-c', "import os; os.write(2,b'private-SQL-'*20000)"]

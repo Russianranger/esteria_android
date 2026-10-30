@@ -18,6 +18,8 @@ class Packaging(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.data = {
+            'src/server/apps/authserver/authserver.conf.dist': b'# source auth template\n',
+            'src/server/apps/worldserver/worldserver.conf.dist': b'# source world template\n',
             'LICENSE': b'server license',
             'data/sql/base/db_auth/base.sql': b'CREATE TABLE fixture(id INT);\n',
             'modules/mod-one/data/sql/db-auth/update.sql': b'UPDATE fixture SET id=1;\n',
@@ -76,6 +78,8 @@ class Packaging(unittest.TestCase):
             self.assertIn('source/data/sql/base/db_auth/base.sql', names)
             self.assertIn('source/modules/mod-one/data/sql/db-auth/update.sql', names)
             self.assertIn('source/modules/mod-one/LICENSE', names)
+            for name in content.MAIN_CONFIG_TEMPLATES:
+                self.assertEqual(archive.extractfile('source/' + name).read(), self.data[name])
             self.assertIn('source/src/server/game/LuaEngine/docs/LICENSE.md', names)
             self.assertNotIn('source/modules/mod-one/data/sql/manual/uninstall.sql', names)
             self.assertNotIn('source/src/evidence.cpp', names)

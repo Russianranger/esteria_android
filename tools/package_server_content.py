@@ -127,7 +127,9 @@ def validate_lua(mapping, manifest):
 
 
 def select_payload(manifest, lua):
-    selected = set()
+    content.require(all(path in manifest['files'] for path in content.MAIN_CONFIG_TEMPLATES),
+                    'main server configuration templates missing from source inventory')
+    selected = set(content.MAIN_CONFIG_TEMPLATES)
     for plan in manifest['databases'].values():
         selected.update(plan['base'])
         selected.update(row['path'] for row in plan['updateOrder'])
