@@ -76,6 +76,9 @@ jobs:
           ref: ${{ needs.selection.outputs.recipe }}
           path: source-packaging
           persist-credentials: false
+      - name: Recover original producer source history in the separate frozen recipe checkout
+        working-directory: source-packaging
+        run: git fetch --no-tags --depth 1 origin 75f50445112818c97f8d8e575d2b1c21e59af6e5
       - name: Validate strict cohort and stock provider contracts
         run: |
           mkdir -p out/coherent-evidence out/coherent-logs

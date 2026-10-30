@@ -15,13 +15,16 @@ class SourceInputs(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory(prefix='helper-source-transfer-')
         self.addCleanup(temporary.cleanup); self.root = Path(temporary.name)
 
-    def fixture(self, *, extra=False):
+    def fixture(self, *, extra=False, program=False):
         empty = dict(bytes=0, sha256=inputs.hashlib.sha256(b'').hexdigest())
-        raw = (json.dumps(dict(scope='TEST_ONLY_NO_NATIVE_CLAIM', payloadFiles={'source/README.md': empty})) + '\n').encode()
+        rows = {'source/README.md': empty}; body = b'TEST_ONLY_MODE_FIXTURE_NEVER_EXECUTED'
+        if program: rows['bin/playerbots-schema'] = dict(bytes=len(body), sha256=inputs.hashlib.sha256(body).hexdigest())
+        raw = (json.dumps(dict(scope='TEST_ONLY_NO_NATIVE_CLAIM', payloadFiles=rows)) + '\n').encode()
         qid = dict(bytes=len(raw), sha256=inputs.hashlib.sha256(raw).hexdigest())
         archive = self.root / ('extra.zip' if extra else 'native.zip')
         with zipfile.ZipFile(archive, 'w') as z:
             z.writestr('source-build.json', raw); z.writestr('source/README.md', b'')
+            if program: z.writestr('bin/playerbots-schema', body)
             if extra: z.writestr('unrecorded', b'unrecorded')
         pin = dict(nativeCapture=dict(workflowRun=1, job=2, integrationRevision='a' * 40,
                    receipt=qid, artifact=dict(id=3, **inputs.files.identity(archive))))
@@ -54,6 +57,16 @@ class SourceInputs(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'exact-members-required'):
             inputs.extract_native(archive, self.root / 'extra', pin)
         self.assertFalse((self.root / 'wrong').exists()); self.assertFalse((self.root / 'extra').exists())
+
+    def test_fixed_helper_role_keeps_executable_mode_for_strict_elf_readback(self):
+        archive, pin = self.fixture(program=True)
+        def verify(root, actual):
+            self.assertEqual((root / 'bin/playerbots-schema').stat().st_mode & 0o777, 0o555)
+            self.assertEqual((root / 'source/README.md').stat().st_mode & 0o777, 0o444)
+            self.assertEqual(actual, pin)
+        with patch.object(inputs.source, 'verify_native', side_effect=verify) as called:
+            inputs.extract_native(archive, self.root / 'roles', pin)
+        called.assert_called_once()
 
     def test_exact_successful_native_run_and_job_are_required(self):
         _, pin = self.fixture()

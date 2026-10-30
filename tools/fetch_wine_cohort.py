@@ -33,6 +33,10 @@ def selection(lock_path,source):
     git=['git','-c','safe.directory='+str(source),'-C',str(source)]
     def query(*args):return subprocess.check_output(git+list(args),env=environment,stderr=subprocess.DEVNULL,timeout=30)
     require(query('rev-parse','HEAD').decode().strip()==lock['targetCommit'],'public-cohort-exact-recipe-checkout')
+    try:producer=query('cat-file','-t',release.measured.PRODUCER)
+    except subprocess.CalledProcessError:
+        raise ValueError('public-cohort-original-producer-history-missing-in-frozen-checkout') from None
+    require(producer==b'commit\n','public-cohort-original-producer-object-type')
     flags=query('ls-files','-v','-z')
     require(len(flags)<=32<<20 and all(not row or row.startswith(b'H ') for row in flags.split(b'\0')),
         'public-cohort-recipe-hidden-index-flags')

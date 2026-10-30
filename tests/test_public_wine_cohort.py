@@ -1,6 +1,7 @@
 import copy
 from pathlib import Path
 import tempfile
+import subprocess
 import unittest
 from unittest import mock
 from tools import fetch_wine_cohort as consumer
@@ -64,6 +65,19 @@ class PublicCohort(unittest.TestCase):
             self.assertNotIn('GITHUB_TOKEN',args.kwargs['env']);self.assertNotIn('PYTHONPATH',args.kwargs['env'])
             self.assertEqual(args.kwargs['env']['GIT_NO_LAZY_FETCH'],'1')
             self.assertIn('-B',args.args[0]);self.assertTrue(any(x.startswith('pycache_prefix=') for x in args.args[0]))
+
+    def test_original_producer_history_is_required_in_its_own_recipe_checkout_before_network(self):
+        lock,_,_,_,_=self.fixture()
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);path=root/'lock.json';path.write_bytes(consumer.encoded(lock))
+            for producer in (subprocess.CalledProcessError(128,['git','cat-file'],stderr=b'private detail'),b'blob\n'):
+                def query(command,**kwargs):
+                    if 'rev-parse' in command:return (lock['targetCommit']+'\n').encode()
+                    if isinstance(producer,Exception):raise producer
+                    return producer
+                with mock.patch.object(consumer.subprocess,'check_output',side_effect=query),self.assertRaisesRegex(ValueError,'producer') as caught:
+                    consumer.selection(path,root)
+                self.assertNotIn('private detail',str(caught.exception))
 
 
 if __name__=='__main__':unittest.main()

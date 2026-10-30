@@ -97,14 +97,25 @@ jobs:
                   kind,message=rows[-1];kind=kind.rsplit('.',1)[-1]
                   if kind in allowed:
                       record={'exceptionClass':kind}
-                      if re.fullmatch(r'(?:helper-source|target-observation)-[A-Za-z0-9:-]{1,160}',message):
+                      if re.fullmatch(r'(?:helper-source|target-observation|server-programs|playerbots-candidate|installation-candidate)-[A-Za-z0-9:-]{1,160}',message) or message=='server-executable-missing-interpreter-or-mode':
                           record['reasonCode']=message
+                      http=re.fullmatch(r'download /repos/Russianranger/esteria_android/actions/artifacts/([0-9]{1,20})/zip failed with HTTP ([1-5][0-9]{2}); no token/redirect/response exported',message)
+                      if http:record.update(artifactId=int(http[1]),httpStatus=int(http[2]))
                       failures[label]=record
               path.unlink()
+          acquisition_phase=None
+          progress=Path('out/playerbots-source-seal-inputs/progress.json')
+          if progress.is_file() and progress.stat().st_size<=4096:
+              value=json.loads(progress.read_text())
+              if value.get('scope')=='helper-source-input-acquisition-progress' and value.get('phase') in {
+                  'download-native-artifact','native-payload-readback','download-registered-candidate',
+                  'registered-candidate-readback','download-original-source-triple','original-source-triple-readback','complete'}:
+                  acquisition_phase=value['phase']
           receipt=dict(formatVersion=1,scope='playerbots-helper-source-only-composition-environment',
               integrationRevision=os.environ['ESTERIA_HELPER_SEAL_REVISION'],
               files={p.name:files.identity(p) for p in target.iterdir() if p.is_file()},sourcePackageFiles=identities,
               failures=failures,
+              acquisitionPhase=acquisition_phase,
               compilerExecuted=False,helperExecuted=False,sqlExecuted=False,originalThreeProgramsRebuilt=False,
               providerActivated=False,androidRuntimeQualified=False,gameplayQualified=False)
           (target/'environment-receipt.json').write_text(json.dumps(receipt,sort_keys=True,indent=2)+'\n')

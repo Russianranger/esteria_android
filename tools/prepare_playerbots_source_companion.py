@@ -70,8 +70,9 @@ def extract_native(archive_path, output, pin):
                 require(archives.hash_stream(incoming, row['bytes'], outgoing) == row['sha256'],
                         'helper-source-native-member-hash-differs')
                 outgoing.flush(); os.fsync(outgoing.fileno())
-            # Input programs are inspected as bytes; this acquisition executes none.
-            path.chmod(0o444)
+            # Preserve the closed executable role required by the existing
+            # ELF verifier; this acquisition never executes the program.
+            path.chmod(0o555 if name == 'bin/playerbots-schema' else 0o444)
     source.verify_native(output, pin)
     return q
 
@@ -86,16 +87,25 @@ def prepare(output, api=None):
     registration, _, _ = candidate.load_pin(); candidate.verify_remote(api, registration)
     original = stock.load_pin()['artifacts']['completeSources']; stock.verify_remote(api, original)
     output.mkdir(mode=0o700)
+    def phase(name):
+        source.isolated.write_json(output / 'progress.json', dict(formatVersion=1,
+            scope='helper-source-input-acquisition-progress', inputLock=pid, phase=name))
     native_zip = output / 'native.zip'
+    phase('download-native-artifact')
     api.download(API + '/actions/artifacts/' + str(native['id']) + '/zip', native_zip, source.identity(native))
+    phase('native-payload-readback')
     extract_native(native_zip, output / 'native', pin); native_zip.unlink()
     candidate_zip = output / 'registered-candidate.zip'
+    phase('download-registered-candidate')
     api.download(API + '/actions/artifacts/' + str(registration['artifact']['id']) + '/zip', candidate_zip,
                  source.identity(registration['artifact']))
+    phase('registered-candidate-readback')
     candidate.extract_registration(candidate_zip, output / 'registration', registration)
     candidate.extract_candidate(output / 'registration', output / 'candidate', registration); candidate_zip.unlink()
     source_zip = output / 'original-source.zip'
+    phase('download-original-source-triple')
     api.download(API + '/actions/artifacts/' + str(original['id']) + '/zip', source_zip, source.identity(original))
+    phase('original-source-triple-readback')
     stock.extract_selected(source_zip, output / 'original', original); source_zip.unlink()
     source.verify_original(output / 'original/sealed', pin)
     require(source.load_pin()[1] == pid, 'helper-source-input-lock-changed-during-acquisition')
@@ -107,6 +117,7 @@ def prepare(output, api=None):
         pairedDebugArchiveAcquired=False, serverRuntimeImageAcquired=False, sourceCompanionComplete=False,
         androidProviderCreated=False, productionActivated=False, androidRuntimeQualified=False, gameplayQualified=False)
     transfer.write_new(output / 'preparation.json', encoded(proof))
+    phase('complete')
     return proof
 
 
