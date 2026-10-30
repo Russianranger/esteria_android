@@ -122,3 +122,11 @@ both arguments retains the default behavior and receipt shape. Existing release
 locks without `selectedInputs` continue using every original frozen generation
 input, including their original source/client locks. No historical receipt,
 published asset or server build source identity is relabeled.
+
+The selected471 release is now public at
+[deps-client-arm64-33cf433-471ee42f](https://github.com/Russianranger/esteria_android/releases/tag/deps-client-arm64-33cf433-471ee42f).
+Workflow41066742791 validated, uploaded and verified all seven files; a separate
+readback without an application token verified all downloaded bytes and source
+provenance again. The public API reports immutable=false. Exact observed IDs,
+URLs and hashes are retained in dependency-release.lock.json and
+../evidence/client-471-publication.json. This is a dependency release, not an APK.

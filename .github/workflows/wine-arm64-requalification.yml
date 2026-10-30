@@ -1,0 +1,119 @@
+name: Retained source-owned ARM64 Wine with selected client
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - runtime/wine-arm64-qualification/**
+      - tools/wine_arm64_requalification.py
+      - tests/test_wine_arm64_requalification.py
+      - .github/workflows/wine-arm64-requalification.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: wine-arm64-requalification-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify separate measured runtime and selected-client inputs
+        id: inputs
+        run: |
+          test "$(uname -m)" = aarch64
+          python3 -m unittest tests.test_wine_arm64_requalification tests.test_wine_qualification tests.test_wine_audio -v
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          from tools.wine_arm64_requalification import pins
+          runtime,client=pins()
+          print('runtime_revision='+runtime['sourceRevision'])
+          print('client_revision='+client['sourceRevision'])
+          PY
+          mkdir -p out/wine-arm64-requalification
+      - name: Checkout this exact selected client's complete sources
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: Russianranger/wowdecomp_esteria
+          ref: ${{ steps.inputs.outputs.client_revision }}
+          path: out/wine-requalification-client-source
+          persist-credentials: false
+      - name: Recover exact selected-client original and complete source companion
+        run: |
+          python3 tools/release_client_inputs.py fetch --client-source out/wine-requalification-client-source \
+            --output out/wine-requalification-client-inputs > out/wine-arm64-requalification/client-source-readback.json
+      - name: Recover and independently validate the entire retained runtime and source companion
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          RUNTIME_REVISION: ${{ steps.inputs.outputs.runtime_revision }}
+        run: |
+          git fetch --no-tags --depth 1 origin "$RUNTIME_REVISION"
+          python3 tools/wine_arm64_requalification.py fetch --output "$RUNNER_TEMP/wine-requalification-inputs" \
+            > out/wine-arm64-requalification/runtime-source-readback.json
+      - name: Prepare actual runtime and independently selected client without recompiling Wine
+        run: |
+          python3 tools/wine_arm64_requalification.py prepare --runtime-inputs "$RUNNER_TEMP/wine-requalification-inputs" \
+            --client-artifact out/wine-requalification-client-inputs/reconstructed-client-arm64-original.zip \
+            --output "$RUNNER_TEMP/wine-requalification" > out/wine-arm64-requalification/preparation.json
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y iproute2 util-linux binutils
+      - name: Rebuild a source-verified guest bridge bound to the retained runtime
+        run: |
+          docker build --platform linux/arm64 --target guest-export --build-context bridge-src=./native \
+            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt --build-arg INTEGRATION_REVISION="$GITHUB_SHA" \
+            --output type=local,dest=out/wine-requalification-bridge "$RUNNER_TEMP/wine-requalification/bridge-context" \
+            > out/wine-arm64-requalification/bridge-build.log 2>&1
+          sudo chown -R "$(id -u):$(id -g)" out/wine-requalification-bridge
+          cp LICENSE out/wine-requalification-bridge/notices/ESTERIA-GPL-3.0
+          cp runtime/bridge-reference.json out/wine-requalification-bridge/corresponding-source/
+      - name: Seal actual qualification sources and exact selection before execution
+        id: sources
+        run: |
+          mkdir -p out/wine-requalification-source-selection
+          cp "$RUNNER_TEMP/wine-requalification-inputs/input-evidence.json" out/wine-requalification-source-selection/
+          cp "$RUNNER_TEMP/wine-requalification/preparation.json" out/wine-requalification-source-selection/
+          cp runtime/wine-arm64-qualification/*lock.json out/wine-requalification-source-selection/
+          git archive --format=tar "$GITHUB_SHA" > out/wine-requalification-source-selection/integration-source.tar
+          printf '%s\n' "$GITHUB_SHA" > out/wine-requalification-source-selection/integration-revision.txt
+      - name: Execute selected client's actual entry offline transport Grunt codec Vulkan and PCM gates
+        run: |
+          fixtures="$RUNNER_TEMP/wine-requalification/client-fixtures"
+          sudo -n env GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=safe.directory \
+            GIT_CONFIG_VALUE_0="$GITHUB_WORKSPACE/out/wine-requalification-client-source" \
+            python3 tools/qualify_wine_arm64.py --runtime "$RUNNER_TEMP/wine-requalification/runtime" \
+            --runtime-lock "$RUNNER_TEMP/wine-requalification-inputs/runtime-package/candidate-runtime.lock.json" \
+            --bridge-input-lock "$RUNNER_TEMP/wine-requalification/bridge-context/sources.lock.json" --private-pe-copy \
+            --client-dir "$fixtures/bin/Win/ARM64" --driver "$fixtures/build/platform/Release/test_xvid_adapter.exe" \
+            --presentation-driver "$fixtures/build/vulkan/Release/presentation_device.exe" \
+            --texture-driver "$fixtures/build/vulkan/Release/texture_device.exe" \
+            --audio-driver "$fixtures/build/audio/Release/fmod_output_device.exe" \
+            --client-entry-check --client-offline-check --client-loopback-check --require-engine-frame-readback \
+            --client-auth-source "$GITHUB_WORKSPACE/out/wine-requalification-client-source" \
+            --bridge-dir "$GITHUB_WORKSPACE/out/wine-requalification-bridge" --bridge-revision "$GITHUB_SHA" \
+            --output "$GITHUB_WORKSPACE/out/wine-arm64-requalification/client-evidence"
+      - name: Preserve bounded disposable execution evidence
+        if: always()
+        run: sudo chown -R "$(id -u):$(id -g)" out
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: native-arm64-wine-selected-client-evidence-${{ github.sha }}
+          path: out/wine-arm64-requalification
+          retention-days: 14
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always() && steps.sources.outcome == 'success'
+        with:
+          name: native-arm64-wine-selected-client-sources-${{ github.sha }}
+          path: |
+            out/wine-requalification-source-selection
+            out/wine-requalification-client-inputs
+            out/wine-requalification-bridge/corresponding-source
+            out/wine-requalification-bridge/notices
+            ${{ runner.temp }}/wine-requalification-inputs/sources.zip
+          retention-days: 14
+          compression-level: 0
+          if-no-files-found: error

@@ -54,8 +54,9 @@ baseline exists. Never commit signing keys, credentials, user MPQs or databases.
 Durable server dependencies, guest helpers, reconstructed client0f and shader
 tools have independently verified public release locks. Optional Turnip loading
 without a GPU is separate from Adreno qualification.
-Client471's measured provider and complete source/release inputs are prepared;
-its separate durable publication remains pending verification.
+Client471's separate durable release is published and all seven public downloads
+pass actual byte/source readback. Publication workflow41066742791 passes; its
+GitHub immutability flag remains false, independently of publisher no-overwrite checks.
 
 ## Blockers and next implementation
 
