@@ -200,3 +200,25 @@ Both spellings plus all namespace, shutdown and log gates are required for
 `linuxArm64ClientOfflineBoundariesQualified`. A prior entry/codec result cannot
 substitute for this scope. Actual successful local login and full offline gameplay
 are separate gates. The new diagnostic/harness is awaiting its paired execution.
+
+The optional `--client-loopback-check` requires the entry and offline checks and
+runs the same hash-verified full client executable with
+`--loopback-check --local-offline` inside the owned, externally disconnected
+namespace. Its separate `linuxArm64ClientLoopbackTransportQualified` flag requires
+zero exit, an exclusive bounded receipt with every exact check/count, and the
+existing complete namespace, Wine shutdown, log-drain and log-size gates.
+
+This fixture starts the actual network manager and two workers, connects twice to
+an ephemeral `127.0.0.1` peer, observes partial two/three-byte frame headers in the
+actual parser, compares 17/32,768-byte frame payloads and queued `SendPacket`
+output, and compares raw stream receive/send bytes. It verifies normal disconnect
+callbacks, released connection references and actual joined worker handles. A
+separate real blocked worker forces a ten-second stop timeout: its network,
+event and pooled buffers must remain alive until explicit release and a second
+successful shutdown. A 25-second causal bound excludes the fixture's 30-second
+barrier timeout from establishing that result. The owned process has a
+90-second watchdog and the harness a 120-second deadline.
+
+Compilation and actual Windows/Linux ARM64 execution of this new loopback scope
+are pending. No authentication, real server protocol, world entry, Android or
+Thor qualification follows from this transport fixture.

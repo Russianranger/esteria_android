@@ -102,6 +102,28 @@ def read_offline_receipt(path):
     return result, hashlib.sha256(data).hexdigest()
 
 
+LOOPBACK_RECEIPT = 'Esteria-loopback-check.json'
+LOOPBACK_CHECKS = {'actualCommandParser', 'localOfflineEnabled', 'twoWorkerThreads', 'loopbackConnectCallbacks',
+                   'partialFrameHeaders', 'shortAndExtendedFrameBytes', 'queuedPacketSendBytes', 'streamReadAndSendBytes',
+                   'controlledDisconnectCallbacks', 'connectionRefsReleased', 'networkThreadsJoined', 'stopTimeoutRetainsNetwork'}
+
+
+def read_loopback_receipt(path):
+    with packages.plain_file(path) as stream:data = stream.read(4097)
+    packages.require(len(data) <= 4096, 'client-loopback-receipt-size-limit')
+    result = json.loads(data)
+    expected = dict(schemaVersion=1, scope='executable-loopback-transport-only', architecture='ARM64',
+                    protocolBuild=12340, connections=2, receivedFrames=2, sentFrames=2,
+                    receivedStreamBytes=1027, sentStreamBytes=1031, commonMainStarted=False,
+                    assetsLoaded=False, authenticationQualified=False, gameplayQualified=False)
+    packages.require(type(result) is dict and set(result) == set(expected) | {'checks'} and
+                     all(type(result[key]) is type(value) and result[key] == value for key, value in expected.items()),
+                     'client-loopback-receipt-scope-mismatch')
+    packages.require(type(result['checks']) is dict and set(result['checks']) == LOOPBACK_CHECKS and
+                     all(value is True for value in result['checks'].values()), 'client-loopback-checks-incomplete')
+    return result, hashlib.sha256(data).hexdigest()
+
+
 def client_inputs(client_dir, driver):
     client_dir = packages.directory(client_dir)
     manifest, digest = read_json(client_dir / 'client-build.json')
@@ -333,6 +355,18 @@ def worker(runtime, output):
                 observed.update(receipt=value, receiptSha256=digest, receiptValidated=True)
                 packages.write_json(output / ('client-offline-' + label + '.json'), value)
                 if label == 'short':receipt_path.unlink() # Only this validated, private fixture receipt.
+        if plan.get('clientLoopbackRequested'):
+            receipt_path = fixture / LOOPBACK_RECEIPT
+            packages.require(not os.path.lexists(receipt_path), 'client-loopback-receipt-already-exists')
+            observed = dict(exitCode=None, receiptValidated=False)
+            result['clientLoopback'] = observed
+            capture = run_logged(guest_command(root, '/opt/wine/bin/wine', GUEST + '/WowClient64.exe',
+                                 '--loopback-check', '--local-offline'), output / 'client-loopback.log', 120, captures)
+            observed['exitCode'] = capture.exit_code
+            packages.require(capture.exit_code == 0, 'client-loopback-process-failed')
+            value, digest = read_loopback_receipt(receipt_path)
+            observed.update(receipt=value, receiptSha256=digest, receiptValidated=True)
+            packages.write_json(output / 'client-loopback.json', value)
         result['graphics'] = {}
         for name in plan['graphicsRequested']:
             filename, message = VULKAN_FIXTURES[name]
@@ -426,7 +460,7 @@ def graphics_identity(root, lock):
     return candidate
 
 
-def qualification_flags(result, requested, namespace_exit=0, client_entry=False, audio=False, client_offline=False):
+def qualification_flags(result, requested, namespace_exit=0, client_entry=False, audio=False, client_offline=False, client_loopback=False):
     # A deliberate handled fixture failure may preserve earlier passing scopes.
     # An abnormal namespace exit may not qualify anything, even if a receipt was
     # flushed just before the worker was killed.
@@ -441,7 +475,12 @@ def qualification_flags(result, requested, namespace_exit=0, client_entry=False,
                                               result.get('codecMessageMatched') is True),
              'linuxArm64VulkanPresentationQualified': False, 'linuxArm64VulkanTextureLifecycleQualified': False,
              'linuxArm64ClientEntryQualified': False, 'linuxArm64VulkanEngineFrameReadbackQualified': False,
-             'linuxArm64FmodPcmTransportQualified': False, 'linuxArm64ClientOfflineBoundariesQualified': False}
+             'linuxArm64FmodPcmTransportQualified': False, 'linuxArm64ClientOfflineBoundariesQualified': False,
+             'linuxArm64ClientLoopbackTransportQualified': False}
+    if client_loopback:
+        observed = result.get('clientLoopback', {})
+        flags['linuxArm64ClientLoopbackTransportQualified'] = bool(common and observed.get('exitCode') == 0 and
+            observed.get('receiptValidated') is True)
     if client_offline:
         observed = result.get('clientOffline', {})
         flags['linuxArm64ClientOfflineBoundariesQualified'] = bool(common and
@@ -467,7 +506,8 @@ def qualification_flags(result, requested, namespace_exit=0, client_entry=False,
 
 
 def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=False, require_engine_frame=False,
-            audio_driver=None, bridge_dir=None, bridge_revision=None, client_offline=False):
+            audio_driver=None, bridge_dir=None, bridge_revision=None, client_offline=False, client_loopback=False):
+    packages.require(not client_loopback or (client_entry and client_offline), 'loopback-check-requires-entry-and-offline-checks')
     packages.require(not client_offline or client_entry, 'offline-check-requires-client-entry-check')
     packages.require(not require_engine_frame or 'presentation' in (graphics or {}),
                      'engine-frame-readback-requires-presentation-driver')
@@ -524,7 +564,7 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
     packages.write_json(fixture / 'qualification-plan.json',
                         dict(graphicsRequested=list(graphics), softwareGraphics=software_graphics,
                              clientEntryRequested=client_entry, engineFrameReadbackRequired=require_engine_frame,
-                             clientOfflineRequested=client_offline,
+                             clientOfflineRequested=client_offline, clientLoopbackRequested=client_loopback,
                              audioRequested=bool(audio_driver)))
     report = dict(formatVersion=1, scope='native-linux-arm64-wine-component-fixtures',
                   runtimeArchiveSha256=package['archive']['sha256'], runtimeReceiptSha256=prepared_sha,
@@ -536,6 +576,7 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
                   linuxArm64VulkanPresentationQualified=False, linuxArm64VulkanTextureLifecycleQualified=False,
                   linuxArm64ClientEntryQualified=False, clientEntryRequested=client_entry,
                   linuxArm64ClientOfflineBoundariesQualified=False, clientOfflineRequested=client_offline,
+                  linuxArm64ClientLoopbackTransportQualified=False, clientLoopbackRequested=client_loopback,
                   linuxArm64VulkanEngineFrameReadbackQualified=False, engineFrameReadbackRequired=require_engine_frame,
                   linuxArm64FmodPcmTransportQualified=False, audioRequested=bool(audio_driver), audioBridge=audio_identity,
                   softwareGraphics=software_graphics, graphicsRequested=list(graphics))
@@ -548,7 +589,8 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
                      'ESTERIA_NAMESPACE_CHILD': '1'})
             try:
                 report['namespaceExit'] = child.wait(timeout=420 + 185 * len(graphics) + (125 if client_entry else 0) +
-                                                    (620 if audio_driver else 0) + (250 if client_offline else 0))
+                                                    (620 if audio_driver else 0) + (250 if client_offline else 0) +
+                                                    (125 if client_loopback else 0))
             except subprocess.TimeoutExpired:
                 os.killpg(child.pid, signal.SIGKILL)
                 child.wait(timeout=15)
@@ -556,7 +598,7 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
         report['processNamespaceExited'] = True
         result, _ = read_json(output / 'worker-result.json')
         report['worker'] = result
-        report.update(qualification_flags(result, graphics, report['namespaceExit'], client_entry, bool(audio_driver), client_offline))
+        report.update(qualification_flags(result, graphics, report['namespaceExit'], client_entry, bool(audio_driver), client_offline, client_loopback))
         report['clientExecutableLaunchAttempted'] = result.get('clientEntry', {}).get('launchAttempted') is True
         report['clientExecutableEntryReached'] = report['linuxArm64ClientEntryQualified']
         packages.require(report['linuxArm64CodecQualified'], 'wine-codec-qualification-failed')
@@ -564,6 +606,8 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
             packages.require(report['linuxArm64ClientEntryQualified'], 'client-entry-not-qualified')
         if client_offline:
             packages.require(report['linuxArm64ClientOfflineBoundariesQualified'], 'client-offline-boundaries-not-qualified')
+        if client_loopback:
+            packages.require(report['linuxArm64ClientLoopbackTransportQualified'], 'client-loopback-transport-not-qualified')
         for name in graphics:
             key = ('linuxArm64VulkanPresentationQualified' if name == 'presentation' else
                    'linuxArm64VulkanTextureLifecycleQualified')
@@ -606,6 +650,7 @@ def main():
     parser.add_argument('--bridge-revision', help='Exact integration revision used to build the guest bridge')
     parser.add_argument('--client-entry-check', action='store_true', help='Launch the verified full PE in its explicit entry-only mode')
     parser.add_argument('--client-offline-check', action='store_true', help='Exercise both real offline command spellings and refused remote paths')
+    parser.add_argument('--client-loopback-check', action='store_true', help='Exercise actual client network workers and loopback frame/stream transport')
     parser.add_argument('--require-engine-frame-readback', action='store_true',
                         help='Require the presentation driver to pass real engine scene readback and embedded shaders')
     parser.add_argument('--output', type=Path, required=True, help='New evidence directory')
@@ -621,12 +666,13 @@ def main():
     result = qualify(args.runtime, args.client_dir.absolute(), args.driver.absolute(), args.output, graphics,
                      args.client_entry_check, args.require_engine_frame_readback,
                      args.audio_driver.absolute() if args.audio_driver else None,
-                     args.bridge_dir.absolute() if args.bridge_dir else None, args.bridge_revision, args.client_offline_check)
+                     args.bridge_dir.absolute() if args.bridge_dir else None, args.bridge_revision, args.client_offline_check, args.client_loopback_check)
     print(json.dumps({key: result[key] for key in ('linuxArm64CodecQualified', 'linuxArm64VulkanPresentationQualified',
                                                  'linuxArm64VulkanTextureLifecycleQualified', 'linuxArm64ClientEntryQualified',
                                                  'linuxArm64VulkanEngineFrameReadbackQualified',
                                                  'linuxArm64FmodPcmTransportQualified',
                                                  'linuxArm64ClientOfflineBoundariesQualified',
+                                                 'linuxArm64ClientLoopbackTransportQualified',
                                                  'androidRuntimeQualified')}))
     return 0
 

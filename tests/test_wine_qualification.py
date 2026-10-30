@@ -44,6 +44,49 @@ class WineQualification(unittest.TestCase):
         driver.write_bytes(image())
         return manifest, driver
 
+    def test_loopback_receipt_requires_actual_counts_checks_and_transport_only_scope(self):
+        import copy
+        valid = dict(schemaVersion=1, scope='executable-loopback-transport-only', architecture='ARM64',
+                     protocolBuild=12340, checks={name: True for name in qualification.LOOPBACK_CHECKS},
+                     connections=2, receivedFrames=2, sentFrames=2, receivedStreamBytes=1027, sentStreamBytes=1031,
+                     commonMainStarted=False, assetsLoaded=False, authenticationQualified=False, gameplayQualified=False)
+        path = self.root / 'loopback.json';path.write_text(json.dumps(valid))
+        self.assertEqual(qualification.read_loopback_receipt(path)[0], valid)
+        wrong = []
+        for key in ('connections', 'receivedFrames', 'sentFrames', 'receivedStreamBytes', 'sentStreamBytes'):
+            bad = copy.deepcopy(valid);bad[key] = 0;wrong.append(bad)
+        for key in ('commonMainStarted', 'assetsLoaded', 'authenticationQualified', 'gameplayQualified'):
+            bad = copy.deepcopy(valid);bad[key] = True;wrong.append(bad)
+        for key in qualification.LOOPBACK_CHECKS:
+            bad = copy.deepcopy(valid);bad['checks'][key] = False;wrong.append(bad)
+        bad = copy.deepcopy(valid);bad['architecture'] = 'x64';wrong.append(bad)
+        bad = copy.deepcopy(valid);bad['connections'] = 2.0;wrong.append(bad)
+        for value in wrong:
+            path.write_text(json.dumps(value))
+            with self.assertRaises(ValueError):qualification.read_loopback_receipt(path)
+        path.write_bytes(b' ' * 4097)
+        with self.assertRaises(ValueError):qualification.read_loopback_receipt(path)
+
+    def test_loopback_requires_opt_in_exact_receipt_zero_exit_and_owned_cleanup(self):
+        observed = dict(exitCode=0, receiptValidated=True)
+        result = dict(displayReady=True, networkIsolated=True, prefixExit=0, fixtureExit=0, codecMessageMatched=True,
+                      wineStopExit=0, wineWaitExit=0, logStreamsDrained=True, logsWithinLimit=True, logWritesSucceeded=True,
+                      workerCompleted=True, expectedExit=0, clientLoopback=observed)
+        key = 'linuxArm64ClientLoopbackTransportQualified'
+        self.assertTrue(qualification.qualification_flags(result, [], client_loopback=True)[key])
+        self.assertFalse(qualification.qualification_flags(result, [])[key])
+        for name, value in (('exitCode', 1), ('receiptValidated', False)):
+            previous = observed[name];observed[name] = value
+            self.assertFalse(qualification.qualification_flags(result, [], client_loopback=True)[key])
+            observed[name] = previous
+        for name in ('logStreamsDrained', 'logsWithinLimit', 'networkIsolated', 'workerCompleted'):
+            result[name] = False
+            self.assertFalse(qualification.qualification_flags(result, [], client_loopback=True)[key])
+            result[name] = True
+        self.assertFalse(qualification.qualification_flags(result, [], namespace_exit=137, client_loopback=True)[key])
+        with self.assertRaisesRegex(ValueError, 'loopback-check-requires-entry-and-offline-checks'):
+            qualification.qualify(self.root, self.root, self.root, self.root, client_loopback=True)
+
     def test_exact_arm64_images_and_actual_build_hashes(self):
         manifest, driver = self.inputs()
         actual, evidence = qualification.client_inputs(self.root, driver)
