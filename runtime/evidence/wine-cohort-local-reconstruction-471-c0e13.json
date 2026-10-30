@@ -1,0 +1,75 @@
+{
+  "actualBinaryCompilersExecuted": false,
+  "allFourProviderArchivesReproducedByteForByte": true,
+  "allSourceCompanionsReproducedByteForByte": true,
+  "androidQualified": false,
+  "files": {
+    "bridge-provider/assets/guest-bridges/guest-bridges-arm64.archive": {
+      "bytes": 469117,
+      "sha256": "7e0356f14bf3654a0e1ecc903726bd479fea0c761c8a4e8a4356e2e476726a55"
+    },
+    "bridge.zip": {
+      "bytes": 143760843,
+      "sha256": "2b326ecee4a3d90996818857f2847b21477f11492f53f5b372de5260588e5590"
+    },
+    "client-original-source-receipt.json": {
+      "bytes": 3838,
+      "sha256": "e768b9dfec4cae999d6c4ca2b8d85a6ed998264b6f4779a57670e91f8533d615"
+    },
+    "client-provider/assets/client-runtime/client-arm64.archive": {
+      "bytes": 7313293,
+      "sha256": "5997af5a94a1151e708cf80fa9931e4055a887598e01c9cf21e6b3af0d438759"
+    },
+    "client-sources-selected3/client-corresponding-source.tar.gz": {
+      "bytes": 23460042,
+      "sha256": "32e241b061f9b9d40fd1ce38be9e491e0749f8656d574c4b38fe0cc112eecba8"
+    },
+    "client-sources-selected3/source-receipt.json": {
+      "bytes": 3995,
+      "sha256": "7d0e1d188672ef0b83f3e1e9e0d45c036072b3c7cd6812fbdfe8c2799f0d3fe1"
+    },
+    "shader-corresponding-source.tar.gz": {
+      "bytes": 10647552,
+      "sha256": "887ae09458b3f4185d4ed9c78e67b647184907cd98bf375d7b9782783bd0c143"
+    },
+    "shader-provider-verified/assets/shader-tools/shader-tools-arm64.archive": {
+      "bytes": 10652649,
+      "sha256": "c48c4d78952d4a2c02c26b7a6da0087d29b21eb19a81b643cb5a9a97cf7389af"
+    },
+    "shader-source-receipt.json": {
+      "bytes": 11693,
+      "sha256": "081ceb2eb09795a07f7e47e5d41ae630cf904f5c00f98de8c6ffc079d3d69c7e"
+    },
+    "turnip-provider/assets/turnip/turnip-arm64.archive": {
+      "bytes": 3283344,
+      "sha256": "445c38ddf7e66f65ee90aa7fd2006db88d6fecd72c8567d801f2ee4c4000a772"
+    },
+    "turnip-provider/sources/source-receipt.json": {
+      "bytes": 1311,
+      "sha256": "0c3296d747b514043899746270a6445301980aebe585e6f5c219ec9605a06d1b"
+    },
+    "turnip-source-complete.zip": {
+      "bytes": 269250352,
+      "sha256": "02d8f9384d3d884e25184137e4c6b97ee482b61a3f3f9719f925e084bae69182"
+    },
+    "turnip.zip": {
+      "bytes": 269241367,
+      "sha256": "cd80feb7bece90f3c16a4a68365c63711eeec2ad10bfb487e78147090084776c"
+    }
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "hardwareQualified": false,
+  "historicalClientSourceSchemaUnchanged": true,
+  "originalNetworkInputs": "previously-read-back-supported-Actions-and-public-release-inputs",
+  "productionPinsChanged": false,
+  "recipePublicationAndCICohortReproductionPending": true,
+  "reconstructionNetworkAccessed": false,
+  "retainedArtifactWholeHashesRechecked": true,
+  "scope": "local-retained-input-reconstruction-of-selected471-wine-provider-cohort",
+  "selectedClientSourceSchemaKeys": [
+    "runtime/client/android-provider.lock.json",
+    "runtime/runtime-sources.lock.json",
+    "sources.lock.json"
+  ]
+}

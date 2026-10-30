@@ -1,0 +1,44 @@
+{
+  "formatVersion": 1,
+  "scope": "measured-native-server-installation-finish-inputs",
+  "producer": {
+    "workflowRun": 41081216973,
+    "integrationRevision": "eb11d0719032bd9dc40498bfdb4888fd3162bc35"
+  },
+  "artifact": {
+    "id": 12990195617,
+    "bytes": 40130109,
+    "sha256": "73952c331659db612669b16c6221ac58195da35bd802b69fdaffa312eca6b7b5"
+  },
+  "members": {
+    "candidate.tar.gz": {
+      "bytes": 40112280,
+      "sha256": "70dfcdda9ff389d0467aceed5b5951f4261f0ad210e8bc3356d9dacc2bd8792d"
+    },
+    "candidate/candidate-pin.json": {
+      "bytes": 13654,
+      "sha256": "602e7d0da21baf6549272c7aab8c9d8d2ad87c83f601ce487d16d02b4ac6b757"
+    },
+    "acquisition.json": {
+      "bytes": 2095,
+      "sha256": "024c0566515dd6950ed7b09c5511ed9832e358982655922eb9585fe390481438"
+    },
+    "preparation.json": {
+      "bytes": 1538,
+      "sha256": "f91f74d9d026aa5fed978a79afd73142aec007b71aa7b17b7bc64616a8a05460"
+    }
+  },
+  "helperInputLock": {
+    "bytes": 10344,
+    "sha256": "58b0e480e577bd3e8605865d65f2ec5bb090cd1477ef92acd40f463f77ad33a6"
+  },
+  "candidateFiles": 45,
+  "candidateExpandedBytes": 175514426,
+  "originalHelperArtifactComplete": false,
+  "compilerExecuted": false,
+  "helperExecuted": false,
+  "sqlExecuted": false,
+  "productionActivated": false,
+  "androidRuntimeQualified": false,
+  "gameplayQualified": false
+}

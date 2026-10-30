@@ -1,0 +1,143 @@
+name: Native owned installation finish and clean-stop receipts
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - .github/workflows/server-installation-native.yml
+      - tools/prepare_server_installation_inputs.py
+      - tools/qualify_server_installation.py
+      - tests/test_server_installation_inputs.py
+      - tests/test_server_installation_qualification.py
+      - tests/test_android_server_installation_setup.py
+      - runtime/server/installation-native-inputs.lock.json
+      - runtime/android_server_installation_setup.py
+      - runtime/android_server_schema_setup.py
+      - runtime/mysql_service.py
+      - runtime/mysql_bootstrap.py
+      - runtime/server_playerbots_setup.py
+      - runtime/server_update_setup.py
+      - runtime/server_updater.py
+      - runtime/server_content.py
+      - runtime/server_config.py
+      - runtime/server_schema_setup.py
+      - runtime/server_schema_baseline.py
+      - runtime/server_schema_adaptations.py
+      - runtime/provision_local_realm.py
+      - runtime/provision_local_account.py
+      - runtime/owned_process_group.py
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: server-installation-native-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  owned-installation:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Check bounded input, owned child, completion and portable journal guards
+        run: |
+          test "$(uname -m)" = aarch64
+          python3 -m unittest tests.test_server_installation_inputs tests.test_server_installation_qualification \
+            tests.test_android_server_installation_setup tests.test_runtime_playerbots_setup \
+            tests.test_runtime_server_update_setup tests.test_mysql_service -v
+          mkdir -p out/installation-evidence
+      - name: Acquire measured registered helper candidate and retained seven-patch runtime without compiling
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/prepare_server_installation_inputs.py --output out/installation-inputs \
+            > out/installation-evidence/input-acquisition.log 2>&1
+          cp out/installation-inputs/preparation.json out/installation-evidence/input-preparation.json
+          cp out/installation-inputs/runtime-inputs/preparation.json out/installation-evidence/runtime-preparation.json
+      - name: Prepare and read back the exact compiler-free dependency image without APT
+        run: |
+          env -u GITHUB_TOKEN python3 tools/release_server_dependencies.py prepare --output out/installation-dependency-release \
+            > out/installation-evidence/dependency-download.log 2>&1
+          python3 tools/prepare_server_dependency_image.py --inputs out/installation-dependency-release \
+            --output out/installation-dependency-image > out/installation-evidence/dependency-context.log 2>&1
+          cp out/installation-dependency-image/context-receipt.json out/installation-evidence/dependency-context.json
+          rm -rf out/installation-dependency-release
+          docker build --network none --platform linux/arm64 -t esteria-installation-native:verified \
+            out/installation-dependency-image/context > out/installation-evidence/image-build.log 2>&1
+          docker run --rm --network none --read-only \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/tools/verify_server_dependency_image.py,dst=/verify-image.py,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/installation-dependency-image/context-receipt.json,dst=/context-receipt.json,readonly" \
+            esteria-installation-native:verified /usr/bin/python3 /verify-image.py --context-receipt /context-receipt.json \
+            > out/installation-evidence/dependency-image-check.json
+      - name: Verify the unused intended MySQL state mount destination
+        run: |
+          docker run --rm --network none --read-only -i esteria-installation-native:verified \
+            /usr/bin/python3 - > out/installation-evidence/mysql-state-mount-preflight.json <<'PY'
+          import json, pathlib, stat
+          target=pathlib.Path('/var/lib/mysql/esteria-installation-native')
+          current=pathlib.Path('/')
+          for part in target.parts[1:-1]:
+              current/=part
+              try: info=current.lstat()
+              except FileNotFoundError: continue
+              if not stat.S_ISDIR(info.st_mode): raise ValueError('mysql-state-parent-is-not-plain-directory')
+          try: target.lstat()
+          except FileNotFoundError: pass
+          else: raise ValueError('mysql-state-destination-must-be-absent')
+          print(json.dumps(dict(formatVersion=1,scope='installation-mysql-state-mount-preflight',
+              presentParentsArePlainDirectories=True,destinationAbsent=True,databaseExecuted=False),sort_keys=True))
+          PY
+      - name: Run actual portable finish, nested DataDir, reentry, service restart and bound clean-stop receipt
+        run: |
+          umask 077
+          mkdir -p out/installation-native-private
+          version=$(python3 -c 'import json; print(json.load(open("out/installation-evidence/dependency-image-check.json"))["expectedMysqlSqlVersion"])')
+          docker run --rm --init --network none --read-only --tmpfs /tmp:rw,nosuid,nodev,size=16m \
+            --env PYTHONDONTWRITEBYTECODE=1 \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/installation-native-private,dst=/var/lib/mysql/esteria-installation-native" \
+            --workdir /qualification esteria-installation-native:verified \
+            python3 tools/qualify_server_installation.py \
+            --prepared /qualification/out/installation-inputs --mysql /usr/bin/mysql --mysqld /usr/sbin/mysqld \
+            --expected-version "$version" --output /var/lib/mysql/esteria-installation-native/run \
+            > out/installation-native-private/qualification-status-private.log 2>&1
+      - name: Collect bounded typed evidence and separate executed scopes
+        if: always()
+        run: |
+          sudo env ESTERIA_INSTALLATION_REVISION="$GITHUB_SHA" python3 - <<'PY'
+          from pathlib import Path
+          import json, os
+          from tools import verify_server_build as files, manifest_server_modules as modules
+          from tools.qualify_server_installation import public_record, SCOPE
+          target=Path('out/installation-evidence');target.mkdir(parents=True,exist_ok=True)
+          source=Path('out/installation-native-private/run/qualification.json')
+          if source.is_file():
+              proof,_=modules.read_json(source,limit=512*1024)
+              if proof.get('scope')!=SCOPE:raise ValueError('unexpected-native-installation-proof-scope')
+              (target/'native-installation-qualification.json').write_text(json.dumps(public_record(proof),sort_keys=True,indent=2)+'\n')
+          # Only source transfer/image diagnostics are public. Never copy the
+          # private service/SQL/helper logs, credentials or setup marker.
+          for path in target.iterdir():
+              if path.is_file() and path.suffix=='.log':
+                  with path.open('rb') as stream:
+                      stream.seek(max(0,path.stat().st_size-64*1024));raw=stream.read(64*1024)
+                  path.write_bytes(raw)
+          inventory={path.name:files.identity(path) for path in target.iterdir() if path.is_file()}
+          environment=dict(formatVersion=1,scope='native-installation-finish-and-clean-stop-environment',
+              integrationRevision=os.environ['ESTERIA_INSTALLATION_REVISION'],files=inventory,
+              compilerExecuted=False,javaCoordinatorExecuted=False,worldserverExecuted=False,
+              nativeCommandsRequireExternalNetworkDisabled=True,privateSqlLogsExported=False,
+              providerActivated=False,slotPromoted=False,androidRuntimeQualified=False,gameplayQualified=False)
+          (target/'environment-receipt.json').write_text(json.dumps(environment,sort_keys=True,indent=2)+'\n')
+          PY
+          sudo chown -R "$(id -u):$(id -g)" out/installation-evidence
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: server-installation-native-evidence-${{ github.sha }}
+          path: out/installation-evidence/
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error
