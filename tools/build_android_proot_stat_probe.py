@@ -34,7 +34,7 @@ ASSETS={'probe-stat','build-evidence.json','ESTERIA-GPL-3.0.txt'}
 # Measured with the pinned NDK28.2 compiler and the original Debian2.36 sysroot.
 # CI must reproduce these bytes; a caller-authored source flag cannot substitute
 # a different executable which merely prints the expected observations.
-FIXTURE_PIN=dict(bytes=17408,sha256='a86939bfbf91df756a96658f4d21253814e0437d71a01d6701ddec81509a5dfe')
+FIXTURE_PIN=dict(bytes=18536,sha256='a0e6aeec97fb7e218d98820c333b97d3c11f681ab79660ebc191dffc9fc762c2')
 require=old.require
 
 def identity(path):

@@ -22,7 +22,7 @@ PACKAGE='io.github.russianranger.esteria'
 SCOPE='android-13-x86_64-proot-stat-metadata-visible-mutations'
 FIELDS=('dev','ino','mode','uid','gid','nlink','size','mtimeNs','ctimeNs')
 VIEWS={'work','data','rawWork','rawData'}
-OBSERVATIONS={'regularInitial','hardlinkAdded','hardlinkRemoved','modeChanged','modeRestored','mtimeFixed','rewritten','replaced',
+OBSERVATIONS={'regularInitial','hardlinkAfterCreateAttempt','hardlinkAfterRemoveAttempt','modeChanged','modeRestored','mtimeFixed','rewritten','replaced',
     'directoryInitial','directoryAdded','directoryRemoved','symlink','symlinkTarget','ancestor','ancestorLeaf'}
 FINAL={'generation','dataRoot','receipt','regular','directory','symlink','ancestor','ancestorLeaf'}
 require=fixture.require
@@ -45,7 +45,7 @@ def observation(value):
 
 def validate_guests(mutation,relaunch):
     for value,mode in ((mutation,'mutate'),(relaunch,'verify')):
-        require(type(value) is dict and set(value)=={'formatVersion','scope','mode','observations','finalSnapshot',
+        require(type(value) is dict and set(value)=={'formatVersion','scope','mode','observations','finalSnapshot','hardlinkOperation','hardlinkErrno',
             'metadataVisibleMutationsOnly','unchangedMetadataCorruptionDetectionClaimed'} and type(value.get('formatVersion')) is int and value.get('formatVersion')==1 and
             value.get('scope')=='linux-glibc-stat-alias-mutation-fixture' and value.get('mode')==mode and
             value.get('metadataVisibleMutationsOnly') is True and value.get('unchangedMetadataCorruptionDetectionClaimed') is False,
@@ -53,13 +53,22 @@ def validate_guests(mutation,relaunch):
         require(set(value['finalSnapshot'])==FINAL,'stat-final-node-set')
         for row in value['finalSnapshot'].values():observation(row)
     require(set(mutation['observations'])==OBSERVATIONS and relaunch['observations']=={},'stat-mutation-case-set')
+    hardlinks=mutation['hardlinkOperation']
+    require(hardlinks in ('created-and-removed','blocked-eacces','blocked-eperm') and
+        relaunch['hardlinkOperation']=='not-requested' and
+        type(mutation['hardlinkErrno']) is int and mutation['hardlinkErrno']==
+            {'created-and-removed':0,'blocked-eacces':13,'blocked-eperm':1}[hardlinks] and
+        type(relaunch['hardlinkErrno']) is int and relaunch['hardlinkErrno']==0,'stat-hardlink-operation-scope')
     seen={name:observation(row) for name,row in mutation['observations'].items()}
     require(mutation['finalSnapshot']==relaunch['finalSnapshot'],'stat-tuples-changed-across-reaped-relaunch')
     before,mode,restored=(seen[name] for name in ('regularInitial','modeChanged','modeRestored'))
-    linked,unlinked=(seen[name] for name in ('hardlinkAdded','hardlinkRemoved'))
-    require((before['nlink'],linked['nlink'],unlinked['nlink'])==('1','2','1') and
-        all(before[name]==linked[name]==unlinked[name] for name in FIELDS if name not in ('nlink','ctimeNs')) and
-        before['ctimeNs']!=linked['ctimeNs']!=unlinked['ctimeNs'],'stat-hardlink-count-change-not-visible')
+    linked,unlinked=(seen[name] for name in ('hardlinkAfterCreateAttempt','hardlinkAfterRemoveAttempt'))
+    if hardlinks=='created-and-removed':
+        require((before['nlink'],linked['nlink'],unlinked['nlink'])==('1','2','1') and
+            all(before[name]==linked[name]==unlinked[name] for name in FIELDS if name not in ('nlink','ctimeNs')) and
+            before['ctimeNs']!=linked['ctimeNs']!=unlinked['ctimeNs'],'stat-hardlink-count-change-not-visible')
+    else:
+        require(before==linked==unlinked and before['nlink']=='1','stat-denied-hardlink-changed-metadata')
     require(stat.S_IMODE(int(before['mode']))==0o600 and stat.S_IMODE(int(mode['mode']))==0o400 and
         stat.S_IMODE(int(restored['mode']))==0o600 and before['ino']==mode['ino']==restored['ino'] and
         before['ctimeNs']!=mode['ctimeNs'],'stat-mode-change-not-visible')
@@ -81,7 +90,13 @@ def validate_guests(mutation,relaunch):
         'stat-generation-final-snapshot')
     return dict(aliasAndRawSyscallTuplesMatched=True,nanosecondMtimePreserved=True,
         sameLengthWriteRestoredMtimeChangedCtime=True,sameContentsReplacementChangedInode=True,
-        modeChangesVisible=True,hardlinkAddDeleteChangedLinkCountAndCtime=True,directoryAddDeleteWithRestoredMtimeChangedCtime=True,
+        modeChangesVisible=True,hardlinkOperation=hardlinks,
+        linkAttemptOutcome='created-and-removed' if hardlinks=='created-and-removed' else 'denied',
+        linkAttemptErrno=mutation['hardlinkErrno'],linkMutationQualified=hardlinks=='created-and-removed',
+        linkDenialObserved=hardlinks in ('blocked-eacces','blocked-eperm'),
+        hardlinkAddDeleteChangedLinkCountAndCtime=hardlinks=='created-and-removed',
+        hardlinkMutationDeniedAndUnchanged=hardlinks in ('blocked-eacces','blocked-eperm'),
+        directoryAddDeleteWithRestoredMtimeChangedCtime=True,
         terminalSymlinkVisible=True,symlinkAncestorVisible=True,leafOnlySymlinkProtectionClaimed=False,
         reapedGuestRelaunchTuplesStable=True,observations=15,finalNodes=8,
         productionCacheEnabled=False,arm64Qualified=False,gameplayQualified=False,
@@ -118,7 +133,8 @@ def main():
     report=dict(formatVersion=1,scope=SCOPE,sourceRevision=args.source_revision,
         apk=dict(bytes=args.apk.stat().st_size,sha256=digest(args.apk)),
         testApk=dict(bytes=args.test_apk.stat().st_size,sha256=digest(args.test_apk)),
-        androidX64StatQualified=False,productionCacheEnabled=False,arm64Qualified=False,hardwareQualified=False,
+        androidX64StatQualified=False,androidX64StatObservationsCompleted=False,
+        productionCacheEnabled=False,arm64Qualified=False,hardwareQualified=False,
         unchangedMetadataCorruptionDetectionClaimed=False,gameplayQualified=False)
     installed=False;failure=None
     def command(label,words,timeout=180,allow_failure=False):
@@ -142,7 +158,11 @@ def main():
         require(len(raw.encode())<=256<<10,'android-stat-app-receipt-bound')
         evidence=json.loads(raw)
         report['checks']=validate_receipt(evidence,args.source_revision,properties['ro.build.fingerprint'],build,stat_build)
-        report['appEvidence']=evidence;report['androidX64StatQualified']=True
+        report['appEvidence']=evidence;report['androidX64StatObservationsCompleted']=True
+        # An explicit platform denial is useful evidence, never a successful
+        # hardlink mutation. Keep the overall qualification flag false until
+        # every requested mutation has actually been exercised and reviewed.
+        report['androidX64StatQualified']=report['checks']['linkMutationQualified']
     except Exception as error:failure=error;report['error']=str(error)
     finally:
         if installed:
@@ -152,10 +172,12 @@ def main():
             for label,words in diagnostics:
                 try:command(label,words,allow_failure=label!='stop')
                 except Exception as error:
-                    report['androidX64StatQualified']=False;report.setdefault('cleanupErrors',[]).append(str(error));failure=failure or error
+                    report['androidX64StatQualified']=False;report['androidX64StatObservationsCompleted']=False
+                    report.setdefault('cleanupErrors',[]).append(str(error));failure=failure or error
         report['completedAtUnix']=int(time.time())
         (args.output/'qualification.json').write_text(json.dumps(report,sort_keys=True,indent=2)+'\n')
-    print(json.dumps({key:report[key] for key in ('scope','androidX64StatQualified','productionCacheEnabled','arm64Qualified')},indent=2))
+    print(json.dumps({key:report[key] for key in ('scope','androidX64StatQualified','androidX64StatObservationsCompleted',
+        'productionCacheEnabled','arm64Qualified')},indent=2))
     if failure is not None:raise failure
 
 if __name__=='__main__':main()

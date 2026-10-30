@@ -25,6 +25,23 @@ preservation. A symlink ancestor shows why checking only a leaf tuple is
 insufficient; no-follow directory opening must reject that ancestor. A second
 actually reaped guest must observe the same final tuples through both aliases.
 
+Android can deny app-private hardlink creation. A real `EACCES` or `EPERM` is
+recorded separately and requires unchanged metadata and no created link. It does
+not claim a successful hardlink mutation test. Other link failures stop the
+fixture. Both the mutation-success and explicit-denial admission rules have host
+tests; actual platform results retain which branch executed.
+Completed observations with a denied hardlink keep `androidX64StatQualified`
+false while recording `androidX64StatObservationsCompleted=true`. A green job
+can therefore mean the narrowed observation procedure completed; it never
+implies that the denied mutation or the production cache is qualified.
+
+Cache publication is a separate gate: the proposed Python sealer currently uses
+`os.link` for exclusive candidate publication. The observed Android guest link
+denial can block that operation even if every other stat check passes. The real
+cache publication operation must be qualified or deliberately adapted before
+activation. This fixture does not qualify Python publication, change its code or
+enable the cache.
+
 This qualifies only metadata-visible changes in privately owned immutable data.
 It does not detect byte corruption which preserves every observed metadata
 field. Filesystem timestamp granularity or PRoot translation which hides a

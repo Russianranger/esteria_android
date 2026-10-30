@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.DocumentsContract;
 import android.provider.OpenableColumns;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
@@ -21,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.concurrent.atomic.AtomicBoolean;
 import io.github.russianranger.esteria.core.importer.GameDataImporter;
+import io.github.russianranger.esteria.core.importer.SourceStreamPositioner;
 
 /** Turns a SAF document into a seekable ZIP without ever buffering the archive in RAM. */
 final class UriStager {
@@ -60,7 +60,7 @@ final class UriStager {
         try (InputStream input = resolver.openInputStream(uri); RandomAccessFile output = new RandomAccessFile(partial.toFile(), "rw")) {
             if (input == null) throw new IOException("The selected document could not be opened");
             output.setLength(offset);
-            seek(input, offset, cancelled);
+            SourceStreamPositioner.advance(input, offset, cancelled::get);
             output.seek(offset);
             byte[] buffer = new byte[128 * 1024];
             long copied = offset, reportAt = 0;
@@ -83,20 +83,6 @@ final class UriStager {
         // copy time would make the importer treat an unchanged ZIP as a different generation.
         if (info.reliable()) Files.setLastModifiedTime(archive, FileTime.fromMillis(info.modified));
         return archive;
-    }
-    private static void seek(InputStream input, long offset, AtomicBoolean cancelled) throws IOException {
-        if (offset == 0) return;
-        if (input instanceof FileInputStream) {
-            try { ((FileInputStream) input).getChannel().position(offset); return; }
-            catch (IOException unsupported) { /* SAF pipes must be advanced sequentially. */ }
-        }
-        byte[] discard = new byte[128 * 1024];
-        while (offset > 0) {
-            if (cancelled.get()) throw new GameDataImporter.ImportCancelledException();
-            int read = input.read(discard, 0, (int) Math.min(discard.length, offset));
-            if (read < 0) throw new IOException("Source ended before the saved resume position");
-            offset -= read;
-        }
     }
     private static Info info(ContentResolver resolver, Uri uri) {
         Info result = new Info();

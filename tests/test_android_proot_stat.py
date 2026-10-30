@@ -70,10 +70,43 @@ class StatQualification(unittest.TestCase):
     def test_hidden_hardlink_count_or_ctime_change_refuses(self):
         for field in ('nlink','ctimeNs'):
             mutation=copy.deepcopy(self.mutation)
-            for row in mutation['observations']['hardlinkAdded'].values():
+            for row in mutation['observations']['hardlinkAfterCreateAttempt'].values():
                 row[field]=mutation['observations']['regularInitial']['work'][field]
             with self.subTest(field=field),self.assertRaisesRegex(ValueError,'hardlink-count-change-not-visible'):
                 stat_probe.validate_guests(mutation,self.relaunch)
+
+    def test_platform_denied_hardlink_requires_exact_unchanged_metadata(self):
+        for outcome in ('blocked-eacces','blocked-eperm'):
+            mutation=copy.deepcopy(self.mutation);mutation['hardlinkOperation']=outcome
+            mutation['hardlinkErrno']=13 if outcome=='blocked-eacces' else 1
+            for name in ('hardlinkAfterCreateAttempt','hardlinkAfterRemoveAttempt'):
+                mutation['observations'][name]=copy.deepcopy(mutation['observations']['regularInitial'])
+            checked=stat_probe.validate_guests(mutation,self.relaunch)
+            self.assertTrue(checked['hardlinkMutationDeniedAndUnchanged'])
+            self.assertFalse(checked['hardlinkAddDeleteChangedLinkCountAndCtime'])
+            self.assertFalse(checked['linkMutationQualified']);self.assertTrue(checked['linkDenialObserved'])
+            self.assertEqual(checked['linkAttemptOutcome'],'denied')
+            mutation['observations']['hardlinkAfterCreateAttempt']['work']['nlink']='2'
+            with self.assertRaises(ValueError):stat_probe.validate_guests(mutation,self.relaunch)
+
+    def test_explicit_injected_link_denial_runs_real_c_refusal_branch(self):
+        # This is a named negative control, not evidence that the host platform
+        # denies links. The actual Android result must retain its own errno.
+        for error in (13,1):
+            with self.subTest(errno=error),tempfile.TemporaryDirectory(prefix='stat-link-denial-control-') as temporary:
+                root=Path(temporary);source=root/'deny.c';library=root/'deny.so'
+                source.write_text('#include <errno.h>\nint link(const char *a,const char *b){(void)a;(void)b;errno='+str(error)+';return -1;}\n')
+                subprocess.run([shutil.which('cc'),'-shared','-fPIC','-Wall','-Wextra','-Werror',str(source),'-o',str(library)],
+                    stdout=subprocess.PIPE,stderr=subprocess.PIPE,check=True,timeout=10)
+                generation=root/'generation';(generation/'data').mkdir(parents=True);values=[]
+                for mode in ('mutate','verify'):
+                    child=subprocess.run([str(self.executable),mode,str(generation),str(generation)],
+                        env=dict(os.environ,LD_PRELOAD=str(library)),stdout=subprocess.PIPE,stderr=subprocess.PIPE,check=True,timeout=5)
+                    values.append(json.loads(child.stdout))
+                checked=stat_probe.validate_guests(*values)
+                self.assertTrue(checked['linkDenialObserved']);self.assertFalse(checked['linkMutationQualified'])
+                self.assertEqual(checked['linkAttemptErrno'],error)
+                self.assertFalse((generation/'data/hardlink').exists())
 
     def test_second_precision_or_invisible_directory_change_refuses(self):
         for changed in ('precision','directory'):

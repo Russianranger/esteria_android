@@ -140,3 +140,14 @@ Owned draft429422570 now binds the measured7e498c recipe and all twelve identiti
 Creation41117178780 passed; actual Actions creation and separate UI inspection
 receipts are retained. The frozen uploader remains unchanged. Full stored-byte
 upload and public anonymous verification are still pending.
+
+Actual Android13 x64 stat run41117041928 reached the guest and refused hard-link
+creation with EACCES before later observations. That original failure is retained.
+The follow-up records denial/unchanged tuples separately from successful mutation
+and keeps overall qualification false on denial. Production cache remains OFF;
+its exclusive os.link publication operation is also an explicit platform gate.
+
+SAF archive resumption now advances relative to the provider stream, preserving
+file-slice origin and length accounting.32 importer groups at32MiB, real file
+descriptor/slice and5GiB offset regressions, app compilation and lint pass.
+Actual Android document-provider execution remains separate.

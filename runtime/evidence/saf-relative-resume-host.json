@@ -1,0 +1,80 @@
+{
+  "bounds": {
+    "ambiguousSkipIOException": "propagated without retry or read fallback",
+    "existingPartialCopyAndActiveGenerationPolicy": "unchanged",
+    "maximumFallbackReadBufferBytes": 32768,
+    "maximumSkipRequestBytes": 1048576,
+    "zeroProgressOrInvalidReadOrSkipLength": "refused"
+  },
+  "change": "UriStager advances the provider InputStream through its relative skip/read contract. It does not reposition an inherited channel.",
+  "confirmedAndroid13Contract": {
+    "assetDescriptor": "A bounded AssetFileDescriptor stream starts at its descriptor origin. Its skip override advances relatively and decrements separate remaining-length accounting. Direct inherited FileChannel positioning bypasses both.",
+    "fileInputStream": "Android13 FileInputStream.skip uses native skipping for seekable descriptors and manual skipping for pipes."
+  },
+  "formatVersion": 1,
+  "gitHead": "0a6bc08417ee037286669784c97a54974bbe2817",
+  "observedAtUtc": "2026-10-30",
+  "primarySourceObservations": {
+    "AssetFileDescriptor.java": {
+      "bytes": 12843,
+      "sha256": "02ad073b6cb4010e2a93061476088604c5269f3ce7c6001034506eff4eb91e5e",
+      "url": "https://android.googlesource.com/platform/frameworks/base/+/android-13.0.0_r1/core/java/android/content/res/AssetFileDescriptor.java?format=TEXT"
+    },
+    "FileInputStream.java": {
+      "bytes": 19689,
+      "sha256": "a37a80411e9192a30915a46580bcba768ddb0df37aadf444a0b1555a81d0648c",
+      "url": "https://android.googlesource.com/platform/libcore/+/android-13.0.0_r1/ojluni/src/main/java/java/io/FileInputStream.java?format=TEXT"
+    }
+  },
+  "qualification": {
+    "actualSdkJavaBuild": true,
+    "actualTwentyGiBClientImported": false,
+    "androidArm64Executed": false,
+    "androidLint": true,
+    "androidProviderExecuted": false,
+    "apkProducedByThisCheck": false,
+    "gameplayQualified": false,
+    "hostFileDescriptorsAndStreamFixtures": true,
+    "sourceAssetsOrProtocolCompatibilityQualified": false
+  },
+  "scope": "host-saf-provider-relative-archive-resume",
+  "sourceIdentity": "Modified worktree source hashes below; gitHead alone does not identify tested source. Other concurrent modified sources may be compiled but are not independently qualified by this receipt.",
+  "sources": {
+    "app/src/main/java/io/github/russianranger/esteria/UriStager.java": {
+      "bytes": 6561,
+      "sha256": "f2500a80fc24fbecce7510377ce293958c24059d9427a1e55e840e190d666861"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/SourceStreamPositioner.java": {
+      "bytes": 2004,
+      "sha256": "aacdff1bcd579c6cc2fc75e8c940e9029f6cd204efadd02414c90f761f6e1c0f"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/importer/ImporterTests.java": {
+      "bytes": 55353,
+      "sha256": "c3e21e1807d9ea4ff16d250c62ec1986e05537098a4d1d175501103fec511d83"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/importer/SourceStreamPositionerTests.java": {
+      "bytes": 7845,
+      "sha256": "e8d956341d013d5f2e879d39525321d9d3bfe46863b398db6776e0aa33630c25"
+    }
+  },
+  "verification": {
+    "actionableTasks": 39,
+    "command": "./gradlew --offline --no-daemon --init-script <workspace-output-redirect> :core:importerTest :app:compileDebugJavaWithJavac :app:lintDebug",
+    "diffCheck": "passed",
+    "elapsedSeconds": 22,
+    "executedTasks": 11,
+    "focusedActualBehavior": [
+      "Actual host FileInputStream slice begins at nonzero origin; original absolute channel positioning is demonstrated to produce the wrong suffix.",
+      "Correct relative resume reads only the selected document suffix and stops at its bound, without backing-file prefix or suffix leakage.",
+      "Exact slice end succeeds; a longer requested offset fails.",
+      "A sparse host file advances by5368709137 bytes using bounded native skip calls and zero payload reads during advance; the expected final marker is read.",
+      "A zero-skip nonseekable fixture advances using32KiB bulk reads and cancels before a second read.",
+      "Ambiguous skip IOException propagates without any fallback read; EOF, zero progress and excessive skip results fail.",
+      "Existing64MiB asset-streaming, ZIP/ZIP64, CRC, import-resume, overlay rollback/old-generation and metadata-budget groups pass in the32MiB heap."
+    ],
+    "importerGroupsPassed": 32,
+    "javaHeapMiBForImporterTests": 32,
+    "result": "BUILD SUCCESSFUL",
+    "upToDateTasks": 28
+  }
+}

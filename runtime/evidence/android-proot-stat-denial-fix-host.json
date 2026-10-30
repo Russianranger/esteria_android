@@ -1,0 +1,126 @@
+{
+  "boundaries": {
+    "androidArm64Qualified": false,
+    "gameplayQualified": false,
+    "newAndroidRunExecuted": false,
+    "productionCacheEnabled": false,
+    "pythonCacheExclusiveLinkPublicationQualified": false,
+    "thorQualified": false,
+    "worldQualified": false
+  },
+  "changedSemantics": {
+    "completedObservationFlagSeparate": true,
+    "deniedLinkDenialObserved": true,
+    "deniedLinkErrnoMustBeOneOf": [
+      13,
+      1
+    ],
+    "deniedLinkMutationQualified": false,
+    "deniedLinkRequiresUnchangedTuples": true,
+    "deniedOutcomeKeepsOverallAndroidX64StatQualifiedFalse": true
+  },
+  "compilerSha256": "6156dd4e5e466333197a00b8d20bca72c292186643b749dcaaa3aa9164afb1de",
+  "exactNdkFixtureActuallyExecutedOnLinuxHost": {
+    "checks": {
+      "aliasAndRawSyscallTuplesMatched": true,
+      "arm64Qualified": false,
+      "directoryAddDeleteWithRestoredMtimeChangedCtime": true,
+      "finalNodes": 8,
+      "gameplayQualified": false,
+      "hardlinkAddDeleteChangedLinkCountAndCtime": true,
+      "hardlinkMutationDeniedAndUnchanged": false,
+      "hardlinkOperation": "created-and-removed",
+      "leafOnlySymlinkProtectionClaimed": false,
+      "linkAttemptErrno": 0,
+      "linkAttemptOutcome": "created-and-removed",
+      "linkDenialObserved": false,
+      "linkMutationQualified": true,
+      "modeChangesVisible": true,
+      "nanosecondMtimePreserved": true,
+      "observations": 15,
+      "productionCacheEnabled": false,
+      "reapedGuestRelaunchTuplesStable": true,
+      "sameContentsReplacementChangedInode": true,
+      "sameLengthWriteRestoredMtimeChangedCtime": true,
+      "symlinkAncestorVisible": true,
+      "terminalSymlinkVisible": true,
+      "unchangedMetadataCorruptionDetectionClaimed": false
+    },
+    "exitCodes": [
+      0,
+      0
+    ],
+    "processes": 2
+  },
+  "fixture": {
+    "bytes": 18536,
+    "sha256": "a0e6aeec97fb7e218d98820c333b97d3c11f681ab79660ebc191dffc9fc762c2"
+  },
+  "formatVersion": 1,
+  "gitHeadAtObservation": "0a6bc08417ee037286669784c97a54974bbe2817",
+  "glibcVersion": "2.36",
+  "host": {
+    "machine": "x86_64",
+    "system": "Linux"
+  },
+  "ndkVersion": "28.2.13676358",
+  "observedAtUtc": "2026-10-30T19:49:04.238190+00:00",
+  "originalFailureEvidence": "runtime/evidence/android-proot-stat-41117041928-failure.json",
+  "providerVerified": true,
+  "remainingGate": "Actual cache publication currently uses Python os.link; Android guest hardlink denial can block it even when remaining stat observations complete. Qualify or deliberately adapt the real publication operation before any cache activation.",
+  "scope": "explicit-hardlink-denial-fixture-fix-host-only",
+  "sourceInputs": {
+    ".github/workflows/android-proot-stat.yml": {
+      "bytes": 7502,
+      "sha256": "8d46cff6c36e99282a68f4e00e4809fcfc3ce43848ae59706ac2a2614ceb007a"
+    },
+    "LICENSE": {
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    "app/src/androidTest/assets/proot-stat-probe/.gitignore": {
+      "bytes": 129,
+      "sha256": "e8f2fe0b8f5bdc802946ca98d86e07ceb2a4021a9c8a93af4fb55c839e08ac74"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/runtime/ProotStatMetadataTest.java": {
+      "bytes": 12300,
+      "sha256": "e97df7e0d63aaf1c8c501e5b378cb3101556f998dd0ca2b216bbfe30a4d0c57d"
+    },
+    "native/proot-stat-probe/README.md": {
+      "bytes": 4354,
+      "sha256": "20e6b5b20a4827e95acca122b454689e575ce79d92102706ff2f68db756c07b8"
+    },
+    "native/proot-stat-probe/stat_probe.c": {
+      "bytes": 10997,
+      "sha256": "9c87ed1e5a0b0ffa1ffd1d7a052c01be341ddcb0bf9ad6a578b859b796fe332f"
+    },
+    "tests/test_android_proot_stat.py": {
+      "bytes": 9029,
+      "sha256": "3ba5db9e995cee35f50d696e7bb1e7743d3803129af7160dbef22a0ba1f62eb1"
+    },
+    "tools/build_android_proot_stat_probe.py": {
+      "bytes": 9992,
+      "sha256": "ebbd6f56f0d8b652345e91ca4608555e8a06d32a29f8136b07e6f9d7c354fbab"
+    },
+    "tools/qualify_android_proot_stat.py": {
+      "bytes": 13610,
+      "sha256": "f18c2545872fac389b1ecccb8c83ecbabb2cdd7121d778da72ccd9ca35359fe4"
+    }
+  },
+  "sourceSnapshotExact": false,
+  "sourceState": "modified-worktree-exact-source-file-identities",
+  "tests": {
+    "actualHostMutationCase": true,
+    "command": "python3 -m unittest tests.test_android_proot_stat -q",
+    "errors": 0,
+    "exitCode": 0,
+    "explicitInjectedLinkDenialControls": [
+      13,
+      1
+    ],
+    "failures": 0,
+    "injectedDenialControlsArePlatformQualification": false,
+    "skipped": 0,
+    "testsRun": 9
+  }
+}

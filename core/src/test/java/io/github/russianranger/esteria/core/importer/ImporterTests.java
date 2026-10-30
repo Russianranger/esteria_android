@@ -41,6 +41,7 @@ public final class ImporterTests {
         run("continuation manifest ordering rejects unsafe absent and ambiguous inputs before activation", ImporterTests::serverContinuationManifest);
         run("ZIP wrapper extraction and resume", ImporterTests::zipWrapper);
         run("ZIP64 directory accepted without loading asset into memory", ImporterTests::zip64);
+        run("archive resume respects provider origin length long offsets and cancellation", SourceStreamPositionerTests::run);
         run("ZIP traversal and case collisions rejected", ImporterTests::zipPaths);
         run("ZIP CRC corruption and truncation rejected", ImporterTests::zipCorruption);
         run("ZIP Unix symlink rejected", ImporterTests::zipSymlink);

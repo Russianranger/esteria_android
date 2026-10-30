@@ -14,6 +14,8 @@
 #include <unistd.h>
 
 static const char *primary, *alias;
+static const char *hardlink_outcome = "not-requested";
+static int hardlink_error;
 static int first_observation;
 static void need(int ok, const char *what) {
     if (!ok) { fprintf(stderr, "stat fixture: %s: %s\n", what, strerror(errno)); exit(70); }
@@ -80,14 +82,22 @@ static void mutation(void) {
     struct stat initial = observe("regularInitial", "data/regular.bin", 0);
     need(S_ISREG(initial.st_mode) && initial.st_size == 8 && initial.st_nlink == 1, "regular fixture");
     path(file, primary, "data/regular.bin"); path(other, primary, "data/hardlink");
-    pause_clock(); need(link(file, other) == 0, "hardlink mutation");
-    struct stat linked = observe("hardlinkAdded", "data/regular.bin", 0);
-    need(linked.st_ino == initial.st_ino && linked.st_nlink == 2 &&
-         nanoseconds(linked.st_ctim) != nanoseconds(initial.st_ctim), "hardlink count observed");
-    pause_clock(); need(unlink(other) == 0, "hardlink removal");
-    struct stat unlinked = observe("hardlinkRemoved", "data/regular.bin", 0);
-    need(unlinked.st_ino == initial.st_ino && unlinked.st_nlink == 1 &&
-         nanoseconds(unlinked.st_ctim) != nanoseconds(linked.st_ctim), "hardlink removal observed");
+    pause_clock(); int linked_result = link(file, other), linked_error = errno;
+    need(linked_result == 0 || linked_error == EACCES || linked_error == EPERM, "hardlink mutation or explicit platform denial");
+    hardlink_outcome = linked_result == 0 ? "created-and-removed" : linked_error == EACCES ? "blocked-eacces" : "blocked-eperm";
+    hardlink_error = linked_result == 0 ? 0 : linked_error;
+    struct stat linked = observe("hardlinkAfterCreateAttempt", "data/regular.bin", 0);
+    if (linked_result == 0) {
+        need(linked.st_ino == initial.st_ino && linked.st_nlink == 2 &&
+             nanoseconds(linked.st_ctim) != nanoseconds(initial.st_ctim), "hardlink count observed");
+        pause_clock(); need(unlink(other) == 0, "hardlink removal");
+    } else {
+        struct stat absent;
+        need(lstat(other, &absent) == -1 && errno == ENOENT && equal(&initial, &linked), "denied hardlink leaves file unchanged");
+    }
+    struct stat unlinked = observe("hardlinkAfterRemoveAttempt", "data/regular.bin", 0);
+    need(linked_result == 0 ? unlinked.st_ino == initial.st_ino && unlinked.st_nlink == 1 &&
+         nanoseconds(unlinked.st_ctim) != nanoseconds(linked.st_ctim) : equal(&linked, &unlinked), "hardlink removal or denied-link stability observed");
     pause_clock(); need(chmod(file, 0400) == 0, "chmod mutation");
     struct stat changed = observe("modeChanged", "data/regular.bin", 0);
     need((changed.st_mode & 0777) == 0400 && changed.st_mode != initial.st_mode, "mode observed");
@@ -139,6 +149,6 @@ int main(int argc, char **argv) {
     primary = argv[2]; alias = argv[3]; need(primary[0] == '/' && alias[0] == '/' && strlen(primary) < 2048 && strlen(alias) < 2048, "absolute bounded aliases");
     printf("{\"formatVersion\":1,\"scope\":\"linux-glibc-stat-alias-mutation-fixture\",\"mode\":\"%s\",\"observations\":{", argv[1]);
     first_observation = 1; if (!strcmp(argv[1], "mutate")) mutation(); printf("}");
-    final_snapshot(); printf(",\"metadataVisibleMutationsOnly\":true,\"unchangedMetadataCorruptionDetectionClaimed\":false}\n");
+    final_snapshot(); printf(",\"hardlinkOperation\":\"%s\",\"hardlinkErrno\":%d,\"metadataVisibleMutationsOnly\":true,\"unchangedMetadataCorruptionDetectionClaimed\":false}\n", hardlink_outcome, hardlink_error);
     need(fflush(stdout) == 0, "stat report flush"); return 0;
 }
