@@ -18,7 +18,7 @@ python3 tools/seal_ordered_extractor_sources.py \
   --original-sealed out/ordered-inputs/original-sealed \
   --integration-git-root . \
   --client-readme out/ordered-inputs/client-reference/README.md \
-  --output out/ordered-complete-sources
+  --output "$RUNNER_TEMP/ordered-complete-sources"
 ```
 
 The parent acquisition step verifies the whole published payload ZIP against its

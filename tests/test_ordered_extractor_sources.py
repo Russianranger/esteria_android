@@ -39,6 +39,20 @@ class SourceGuards(unittest.TestCase):
                              self.root/'absent.md', self.root/'new'/'output')
         self.assertFalse((self.root/'new').exists())
 
+    def test_source_output_must_be_outside_the_integration_git_input(self):
+        integration=self.root/'integration';payload=integration/'inputs/payload';original=integration/'inputs/original'
+        payload.mkdir(parents=True);original.mkdir()
+        with patch.object(sources,'load_pin',return_value=dict(clientPolicyReadme={})):
+            with self.assertRaisesRegex(ValueError,'output-exists-or-overlaps'):
+                sources.seal(payload,original,integration,self.root/'README.md',integration/'out')
+            self.assertFalse((integration/'out').exists())
+            # A separate runner-temporary parent passes the overlap guard and
+            # reaches README verification; this fixture intentionally has none.
+            outside=self.root/'runner-temp'/'published';outside.parent.mkdir()
+            with self.assertRaises(FileNotFoundError):
+                sources.seal(payload,original,integration,self.root/'README.md',outside)
+            self.assertFalse(outside.exists())
+
     def test_inventory_requires_every_member_and_refuses_links_and_changes(self):
         directory = self.root/'inputs'; row = write(directory/'source.txt', b'exact source\n')
         sources.check_inventory(directory, {'source.txt': row})
