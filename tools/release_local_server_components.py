@@ -175,13 +175,15 @@ def recipe_inputs(revision):
                 'local-server-release-recipe-plain-git-files-required')
         name = name.decode('utf-8'); engine.content.safe_path(name)
         require(name not in rows and len(name.encode()) <= 4096, 'local-server-release-recipe-path')
+        require(0 <= int(size) <= MAX_RECIPE - total and len(rows) < MAX_ROWS,
+                'local-server-release-recipe-git-byte-bound')
         body = subprocess.check_output(['git', 'cat-file', 'blob', blob.decode()], cwd=ROOT, timeout=30)
         total += len(body)
         require(len(body) == int(size) and total <= MAX_RECIPE and len(rows) < MAX_ROWS and
             hashlib.sha1(b'blob ' + str(len(body)).encode() + b'\0' + body).hexdigest() == blob.decode(),
             'local-server-release-recipe-git-byte-bound')
         row = dict(bytes=len(body), sha256=hashlib.sha256(body).hexdigest(), mode=0o555 if mode == b'100755' else 0o444)
-        require(identity(ROOT / name) == {k: row[k] for k in ('bytes', 'sha256')},
+        require(checkout_matches(name, body, row),
                 'local-server-release-executing-recipe-changed:' + name)
         rows[name] = row
     validate_inventory(rows, MAX_RECIPE)
@@ -189,6 +191,34 @@ def recipe_inputs(revision):
         '.github/workflows/preserve-local-server-components.yml' in rows,
         'local-server-release-recipe-not-yet-published')
     return dict(sorted(rows.items()))
+
+
+def checkout_matches(name, body, row):
+    if identity(ROOT / name) == {k: row[k] for k in ('bytes', 'sha256')}: return True
+    # Git's committed .gitattributes deliberately checks the Windows wrapper
+    # out with CRLF, while the canonical blob uses LF. This sole known checkout
+    # conversion is not a source edit; arbitrary files or line changes still fail.
+    if name != 'gradlew.bat' or b'\r' in body or len(body) > 64 << 10: return False
+    with files.plain_file(ROOT / '.gitattributes') as source: attributes = source.read((64 << 10) + 1)
+    if len(attributes) > 64 << 10 or b'*.bat text eol=crlf' not in attributes.splitlines(): return False
+    expected = body.replace(b'\n', b'\r\n')
+    with files.plain_file(ROOT / name) as source: actual = source.read(len(expected) + 1)
+    return actual == expected
+
+
+def write_recipe(revision, rows, target):
+    """Archive canonical Git blob bytes, independently of checkout EOL filters."""
+    validate_inventory(rows, MAX_RECIPE)
+    with tempfile.TemporaryDirectory(prefix='esteria-local-server-recipe-', dir=target.parent) as tmp:
+        tree = Path(tmp)
+        for name, row in rows.items():
+            raw = subprocess.check_output(['git', 'cat-file', 'blob', revision + ':' + name], cwd=ROOT, timeout=30)
+            require(dict(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest()) ==
+                {k: row[k] for k in ('bytes', 'sha256')}, 'local-server-release-canonical-recipe-blob-differs')
+            path = tree / name; path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+            with path.open('xb') as output: output.write(raw)
+            path.chmod(row['mode'])
+        write_bundle(tree, target, rows)
 
 
 def prepare(output, api=None):
@@ -290,7 +320,7 @@ def stage(inputs, target, output, lock_output=None, existing_lock=None):
     engine.put_metadata(output / 'providers-receipt.json', dict(formatVersion=1,
         scope='complete-local-server-provider-bundles', selectedInputs=selected, providers=providers,
         **{k: False for k in FALSE_FLAGS}))
-    write_bundle(ROOT, output / 'integration-recipe.tar.gz', recipe)
+    write_recipe(target, recipe, output / 'integration-recipe.tar.gz')
     engine.put_metadata(output / 'integration-recipe-receipt.json', dict(formatVersion=1,
         scope='exact-local-server-integration-recipe', targetCommit=target,
         archive=identity(output / 'integration-recipe.tar.gz'), members=recipe))

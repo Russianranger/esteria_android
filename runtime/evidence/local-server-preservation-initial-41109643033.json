@@ -1,0 +1,68 @@
+{
+  "androidGuestExecuted": false,
+  "androidRuntimeQualified": false,
+  "compilerExecuted": false,
+  "fix": {
+    "actualTemporaryGitCheckoutAndArchiveRegressionPassed": true,
+    "canonicalGitBlobArchive": true,
+    "focusedReleaseTestsPassed": 11,
+    "focusedReleaseTestsRun": 11,
+    "focusedReleaseTestsSkipped": 0,
+    "gitBlobSizeBoundCheckedBeforeRead": true,
+    "onlyExactDeclaredGradlewBatCheckoutConversionAccepted": true,
+    "otherSourceChangesStillRefused": true,
+    "productionProviderFactoryExecuted": false,
+    "productionReleaseAssetsMeasured": false
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "helperExecuted": false,
+  "initialWorkflow": {
+    "causedByRecipeEolDefect": false,
+    "conclusion": "failure",
+    "infrastructureFailureBeforeJobSteps": true,
+    "integrationRevision": "4fd32df287961b9cc5175213a6fe85eac1c6d868",
+    "job": 124248431398,
+    "jobApiStatusConflict": true,
+    "jobApiStillQueued": true,
+    "retainedArtifacts": 0,
+    "rootBrowserJobObservation": {
+      "annotation": "Internal server error. Correlation ID: 0672761d-58ab-43c6-a2f7-a9d6ed6caf43",
+      "executedSteps": 0,
+      "jobLog": "Starting job"
+    },
+    "run": 41109643033,
+    "runUrl": "https://github.com/Russianranger/esteria_android/actions/runs/41109643033",
+    "status": "completed",
+    "updatedAt": "2026-10-30T18:46:41Z"
+  },
+  "localFrozenCheckoutReproduction": {
+    "checkout": {
+      "bytes": 295,
+      "sha256": "21186e8f097fcc9e5f62ee0abf2d95b92f973b347d0c27f0205a336af8aa021d"
+    },
+    "declaredAttribute": "*.bat text eol=crlf",
+    "exactDeclaredCheckoutConversion": true,
+    "gitAttributes": {
+      "bytes": 1178,
+      "sha256": "7b6b7e34fb82eef62f667ad30b73dec6403ed1fc475bf6de29b1516af08e66fa"
+    },
+    "gitBlob": {
+      "bytes": 289,
+      "sha256": "119ce8a4bfdf3024ba03cf9b6b810afd47b49e17999a0053bfe719effbad36ea"
+    },
+    "integrationRevision": "4fd32df287961b9cc5175213a6fe85eac1c6d868",
+    "isolatedDetachedCheckout": true,
+    "originalRecipeRejected": true,
+    "path": "gradlew.bat",
+    "reason": "local-server-release-executing-recipe-changed:gradlew.bat"
+  },
+  "observedAt": "2026-10-30T18:51:38.116701+00:00",
+  "ownedDraftCreated": false,
+  "playerbotsAiQualified": false,
+  "releasePublished": false,
+  "releaseTargetCommitSelected": null,
+  "scope": "local-server-preservation-infrastructure-failure-and-independent-recipe-eol-regression",
+  "sqlExecuted": false,
+  "worldserverQualified": false
+}

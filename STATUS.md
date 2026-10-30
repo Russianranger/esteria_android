@@ -95,10 +95,16 @@ publication and anonymous readback finish.
    offline gameplay and produce one persistent-key signed Thor candidate.
 
 Two old native MySQL checks stopped before engine startup on HTTP502 snapshot
-inputs. Their replacement consumes exact published21a dependencies, verifies
-complete sources/native bytes and builds offline; actual reruns are pending.
+inputs. Their replacements now pass actual native runs41107921377/41107921450:
+published21a dependencies, complete source/native readback, clean service cycles,
+base/account SQL and logical restore/restart checks.
 The separate x64 emulator fixture encountered HTTP503 before execution; its
 future successful binary/source inputs are now retained without fabricating a
 consumer pin or substituting the ARM64 runtime.
 
 See BUILDING.md, TESTING.md and HANDOFF.md for commands and scoped evidence.
+
+The first server-component measurement stopped on a GitHub internal error
+before job steps. An independently reproduced Windows-wrapper checkout EOL
+defect is fixed by archiving canonical Git blobs while strictly validating the
+sole declared CRLF conversion. A fresh exact-recipe measurement follows.

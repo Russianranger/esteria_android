@@ -5,6 +5,9 @@ on:
     branches: [android/client-server]
     paths:
       - runtime/server-components-publication/dependency-release.lock.json
+      - tools/release_local_server_components.py
+      - tests/test_local_server_components_release.py
+      - runtime/server-components-publication/README.md
 permissions:
   contents: read
 concurrency:

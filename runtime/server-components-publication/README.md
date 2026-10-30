@@ -23,6 +23,10 @@ The fixed release has12 assets:
 
 Bundle files use GNU tar in stored gzip with normalized ownership/time/modes.
 Every original nested runtime, debug and source archive stays byte-identical.
+The integration recipe uses canonical Git blobs. Its Windows Gradle wrapper may
+have the exact CRLF checkout required by committed `.gitattributes`; this one
+known conversion is verified explicitly, while the retained wrapper stays LF
+like its Git blob. Arbitrary source changes and other conversions are refused.
 Each bundle's expanded payload is capped at1900MiB; every individual release
 asset must remain below2GiB. Sources/debug remain outside APK assets. Full
 original provider verification runs before staging, after archive extraction,

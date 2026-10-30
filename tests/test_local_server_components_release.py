@@ -5,6 +5,7 @@ import hashlib
 import io
 import json
 from pathlib import Path
+import subprocess
 import tarfile
 import tempfile
 import unittest
@@ -77,6 +78,38 @@ class LocalServerRelease(unittest.TestCase):
         output = self.root / 'readback'; release.read_bundle(first, rows, output)
         self.assertEqual((output / 'original.tar.gz').read_bytes(), original)
         self.assertEqual((output / 'helper').stat().st_mode & 0o777, 0o555)
+
+    def test_canonical_git_recipe_accepts_only_exact_declared_wrapper_checkout_conversion(self):
+        repository=self.root/'git-fixture';repository.mkdir()
+        def git(*arguments):
+            return subprocess.check_output(['git','-c','user.name=Archive Fixture',
+                '-c','user.email=fixture@example.invalid','-c','commit.gpgsign=false',*arguments],
+                cwd=repository,stderr=subprocess.DEVNULL)
+        git('init')
+        contents={'.gitattributes':b'* text=auto eol=lf\n*.bat text eol=crlf\n',
+            'gradlew.bat':b'@echo off\r\necho fixture\r\n',
+            'tools/release_local_server_components.py':b'# TEST_ONLY recipe fixture; never executed\n',
+            '.github/workflows/preserve-local-server-components.yml':b'# TEST_ONLY recipe fixture\n'}
+        for name,raw in contents.items():
+            path=repository/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(raw)
+        git('add','.');git('commit','-m','Fixture canonical source bytes')
+        git('checkout-index','--force','--all')
+        revision=git('rev-parse','HEAD').decode().strip()
+        with mock.patch.object(release,'ROOT',repository):
+            rows=release.recipe_inputs(revision)
+            canonical=git('show',revision+':gradlew.bat')
+            self.assertNotIn(b'\r',canonical);self.assertIn(b'\r\n',(repository/'gradlew.bat').read_bytes())
+            self.assertEqual(rows['gradlew.bat']['sha256'],hashlib.sha256(canonical).hexdigest())
+            archive=self.root/'canonical-recipe.tar.gz';release.write_recipe(revision,rows,archive)
+            extracted=self.root/'canonical';release.read_bundle(archive,rows,extracted)
+            self.assertEqual((extracted/'gradlew.bat').read_bytes(),canonical)
+            (repository/'gradlew.bat').write_bytes(contents['gradlew.bat']+b'echo changed\r\n')
+            with self.assertRaisesRegex(ValueError,'executing-recipe-changed:gradlew.bat'):
+                release.recipe_inputs(revision)
+            (repository/'gradlew.bat').write_bytes(contents['gradlew.bat'])
+            (repository/'tools/release_local_server_components.py').write_bytes(b'# changed\r\n')
+            with self.assertRaisesRegex(ValueError,'executing-recipe-changed:tools/'):
+                release.recipe_inputs(revision)
 
     def test_inventory_and_archive_reject_changed_links_traversal_duplicates_missing_and_trailer(self):
         pin = dict(bytes=3, sha256=hashlib.sha256(b'abc').hexdigest(), mode=0o444)
