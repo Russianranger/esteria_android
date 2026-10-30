@@ -1,0 +1,88 @@
+name: Optional playerbots helper candidate from measured artifacts
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - .github/workflows/playerbots-helper-candidate.yml
+      - runtime/server/playerbots-helper-candidate.lock.json
+      - tools/prepare_playerbots_helper.py
+      - tools/package_playerbots_helper.py
+      - tests/test_playerbots_helper_acquisition.py
+      - tests/test_playerbots_helper_candidate.py
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: playerbots-helper-candidate-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  source-only-candidate:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Check source-only acquisition and candidate guards
+        run: |
+          python3 -m unittest tests.test_playerbots_helper_acquisition tests.test_playerbots_helper_candidate -v
+          mkdir -p out/playerbots-helper-candidate-evidence
+      - name: Acquire exact artifacts, recover one pinned source recipe, package and read back candidate
+        id: prepare
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/prepare_playerbots_helper.py --output out/playerbots-helper-prepared \
+            > out/playerbots-helper-candidate-evidence/preparation.log 2>&1
+      - name: Collect bounded public source-only acquisition receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os, shutil
+          from pathlib import Path
+          from tools import verify_server_build as files
+          source=Path('out/playerbots-helper-prepared')
+          target=Path('out/playerbots-helper-candidate-evidence')
+          target.mkdir(parents=True,exist_ok=True)
+          for name in ('acquisition.json','preparation.json'):
+              path=source/name
+              if path.is_file():
+                  if path.stat().st_size>128*1024:raise ValueError('candidate-public-receipt-bound')
+                  shutil.copyfile(path,target/name)
+          log=target/'preparation.log'
+          if log.is_file():
+              with log.open('rb') as stream:
+                  stream.seek(max(0,log.stat().st_size-64*1024));tail=stream.read(64*1024)
+              log.write_bytes(tail)
+          proof=dict(formatVersion=1,scope='source-only-playerbots-helper-candidate-registration',
+              integrationRevision=os.environ['GITHUB_SHA'],
+              files={p.name:files.identity(p) for p in target.iterdir() if p.is_file()},
+              compilerExecuted=False,helperOrServerExecuted=False,sqlExecuted=False,
+              originalHelperArtifactDeclaredIncomplete=True,sourceCompanionComplete=False,
+              androidProviderCreated=False,productionActivated=False,androidRuntimeQualified=False,gameplayQualified=False)
+          (target/'environment-receipt.json').write_text(json.dumps(proof,sort_keys=True,indent=2)+'\n')
+          PY
+      - name: Register complete optional candidate and explicit acquisition provenance
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: success() && steps.prepare.outcome == 'success'
+        with:
+          name: playerbots-helper-candidate-${{ github.sha }}
+          compression-level: 0
+          include-hidden-files: true
+          path: |
+            out/playerbots-helper-prepared/candidate.tar.gz
+            out/playerbots-helper-prepared/candidate/candidate-pin.json
+            out/playerbots-helper-prepared/acquisition.json
+            out/playerbots-helper-prepared/preparation.json
+          retention-days: 30
+          if-no-files-found: error
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: playerbots-helper-candidate-evidence-${{ github.sha }}
+          include-hidden-files: true
+          path: out/playerbots-helper-candidate-evidence/
+          retention-days: 30
+          if-no-files-found: error

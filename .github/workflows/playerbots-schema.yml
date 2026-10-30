@@ -1,10 +1,10 @@
 name: Playerbots database component and fresh schema
 on:
+  # Workflow-only retention/policy changes use manual dispatch; helper/runtime inputs below run automatically.
   workflow_dispatch:
   push:
     branches: [android/client-server]
     paths:
-      - .github/workflows/playerbots-schema.yml
       - tools/build_playerbots_component.py
       - tools/prepare_server_isolated_build.py
       - tools/prepare_server_isolated_sources.py
@@ -225,6 +225,7 @@ jobs:
         if: always() && steps.component.outcome == 'success'
         with:
           name: playerbots-schema-helper-${{ github.sha }}
+          include-hidden-files: true
           compression-level: 0
           path: out/playerbots-component/payload/
           retention-days: 30

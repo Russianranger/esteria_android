@@ -56,7 +56,22 @@ before final live product verification against the original completed journal.
 Only typed receipts are exported; SQL logs and account/credential contents remain
 private. Host journal/process fixtures are not native SQL qualification.
 
-Actual native execution of this new phase is pending. The phone coordinator
-remains staged pending playerbots; this code does not create a complete setup
-marker, promote a slot or open normal START. Playerbot AI, bot characters, world
-startup, existing-save upgrades, Android runtime and gameplay remain unqualified.
+[Actual native run `41076505231`](../evidence/server-playerbots-schema-41076505231.json)
+passed on Linux ARM64 at integration revision `6ce7a9f154b11f5e24ce2d228e613f06001b979f`.
+The 25,188,512-byte helper compiled from the archived seven-patch inputs and ran
+against MySQL `8.0.46-0ubuntu0.24.04.4`. First initialization, completed repeat
+without execution, real loader reentry with 52 prepared statements, clean restart,
+probe removal and final four-schema product checks passed on one UUID. The final
+source schema contains 30 tables and 31 update-ledger rows. Original three-program
+receipts and selected executable identities remain unchanged.
+
+The original helper upload omitted one hidden workflow recipe. Its exact actual
+producer Git blob was recovered and checked against the build receipt; the
+original ZIP remains unchanged and is explicitly recorded as incomplete. See
+[the separately staged helper candidate](PLAYERBOTS-HELPER-CANDIDATE.md).
+
+The phone coordinator remains staged pending playerbots. This phase does not
+create a complete setup marker, promote a slot or open normal START. A complete
+candidate CI artifact, sealed source/provider integration and phone composition
+remain separate gates. Playerbot AI, bot characters, world startup, existing-save
+upgrades, Android runtime and gameplay remain unqualified.

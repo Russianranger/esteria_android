@@ -44,12 +44,13 @@ No security mechanism was established. The successful retry mounted the same
 private fixture under MySQL's intended data directory and retained the binary,
 read-only root, external-network isolation and owned namespaces.
 
-## Next: actual playerbots fourth schema
+## Actual playerbots fourth schema and remaining phone gate
 
 Standalone `dbimport` registers auth, characters and world only. Its default
 compiled-updater snapshot deliberately requires playerbots to remain empty.
-Fresh installation therefore remains staged pending playerbots; no complete
-installation marker or promotion is authorized by the proofs above.
+The phone coordinator remains staged pending a measured, packaged playerbots
+helper/provider and composition; no complete installation marker or promotion
+is authorized by the component proofs above.
 
 At the pinned server source, playerbots owns 29 base SQL files, 31 released
 updates and 52 prepared statements. Its real `DatabaseLoader` adds update bit 8,
@@ -59,12 +60,13 @@ controls creating a missing database, not populating an existing empty one.
 
 The exact real database/common reference was built and provenance-bound in run
 `41041859706`, but its executable was not retained in the uploaded artifacts.
-Its build-only receipt is not database execution evidence. The new target-only workflow
-builds only that database/common helper from the archived seven-patch source
-and explicit original lock, retain a separately measured binary/source receipt,
-and is wired to qualify real population, statements, repeat and restart without
-rebuilding or repinning the original server programs. Actual execution remains
-pending; see [the production phase contract](PLAYERBOTS-SCHEMA.md).
+Its build-only receipt is not database execution evidence. The target-only
+workflow now built that database/common helper from the archived seven-patch source and explicit original lock. [Run `41076505231`](../evidence/server-playerbots-schema-41076505231.json)
+passed actual production core/PB journals, 52 prepared statements, completed
+repeat without execution, real loader reentry, restart persistence, probe removal
+and final four-schema checks without rebuilding or repinning the original three
+server programs. It retained the separate helper/build/native proofs; see
+[the production phase contract](PLAYERBOTS-SCHEMA.md).
 
 The implemented production phase uses a private same-UUID/source/content/module/credential-bound
 playerbots intent before the compiled helper can run, refusal of uncertain
