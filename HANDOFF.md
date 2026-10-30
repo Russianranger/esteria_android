@@ -157,3 +157,16 @@ source-selection identity. `verify_completed` also binds retained order.json/tsv
 The world session mounts a completed generation at /esteria-data and must verify
 DataDir=/esteria-data/data. Main START remains closed. Finish the measured
 composed ordered-tool provider and Android operation owner before UI activation.
+
+Current runtime auth471/c0e/seven-patch passes41088546780; native owned four-schema
+finish/reentry/restart/clean-stop passes41088296041. Preserve these scoped proofs.
+New Android LocalServerSession has retained database/native ownership, real
+readiness/shutdown mechanisms and23 source helpers, but no Main START activation
+or actual world/Android qualification. Public data creation must pass through the
+source-qualified composed-tool owner; metadata self-hashes alone are insufficient.
+
+Before selecting the Wine cohort publication target, include the final
+package_combined_android.py bytes and conditional explicit adapted-runtime client
+verification arguments. Keep the old two-key client-release schema distinct from
+the cohort's three-key companion. Publish all sources/digests before atomic seven
+global-pin adoption and coherent APK validation.

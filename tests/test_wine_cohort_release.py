@@ -7,6 +7,7 @@ import tarfile
 import tempfile
 import unittest
 from unittest import mock
+import zipfile
 from tools import release_wine_cohort as release
 
 
@@ -30,6 +31,24 @@ class CohortRelease(unittest.TestCase):
         self.assertEqual(len(names),3)
         self.assertTrue(all(name.startswith('corresponding-source/original-archives/') for name in names))
         self.assertFalse(any('mesa' in name.lower() for name in names))
+
+    def test_original_guest_build_source_hashes_are_checked_beyond_whole_zip_identity(self):
+        raw=b'original direct build source';pin=dict(bytes=len(raw),sha256=hashlib.sha256(raw).hexdigest())
+        lock=dict(runtimeArchiveSha256=release.measured.RUNTIME,sources=[dict(package='example',version='1',
+            archives=[dict(file='example.tar.gz',**pin)])])
+        manifest=dict(formatVersion=1,completeGuestRootfsSourceClosure=False,
+            files=[dict(package='example',version='1',file='example.tar.gz',**pin)])
+        with tempfile.TemporaryDirectory() as tmp:
+            for changed in (False,True):
+                path=Path(tmp)/str(changed)
+                with zipfile.ZipFile(path,'w') as archive:
+                    for name,data in [('bridge/corresponding-source/build-recipe/sources.lock.json',release.encoded(lock)),
+                        ('bridge/corresponding-source/original-archives/SOURCE-MANIFEST.json',release.encoded(manifest)),
+                        ('bridge/corresponding-source/original-archives/example.tar.gz',b'changed' if changed else raw)]:
+                        item=zipfile.ZipInfo(name);item.create_system=3;item.external_attr=0o100444<<16;archive.writestr(item,data)
+                if changed:
+                    with self.assertRaises(ValueError):release.bridge_sources(path)
+                else:self.assertEqual(release.bridge_sources(path)['originalArchives'],1)
 
     def test_old_two_key_source_receipt_is_not_relabelled_as_new_three_key(self):
         with tempfile.TemporaryDirectory() as tmp:

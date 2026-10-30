@@ -156,3 +156,9 @@ Completed generated data now retains its exact effective-provider manifest and
 wire projection, with source/import/tool-selection identities. The APK includes
 the preparation/preflight helper closure; this is code availability, not generated
 world data. Real base/custom inputs and matching DBC overlays remain unavailable.
+
+Current matched authentication and native database setup succeed without game
+assets; their receipts explicitly exclude CommonMain/world. No available-code or
+source-provider result supplies absent base/custom MPQs, appearance banks, DBC
+overlays, geographical coverage or generated shaders. These remain actual data
+validation gates after the ongoing independent integration work.

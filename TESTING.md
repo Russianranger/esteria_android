@@ -139,3 +139,10 @@ bootstrap test executes no extractor main and converts no game assets. Completed
 data binding tests also enforce fixed-mount alias generation identity and typed
 preflight booleans. The server install-profile APK verifier now invokes the
 shared exact helper-closure check, including server-data5.
+
+Current matched authentication41088546780 and native installation finish41088296041
+pass with exact new inputs. The Android server-session slice ran39 Python
+groups:38 passed and one managed-proc check skipped, three real Java owner/lease fixtures and
+APK/AndroidTest/lint/source-helper readback. These are not actual server world or
+Android execution gates. ServerDataToolSelection also matches the Python canonical
+fixture exactly; the composed provider's source/native positive gate is pending.

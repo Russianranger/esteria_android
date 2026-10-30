@@ -88,7 +88,7 @@ def recipe_inputs(revision):
     pending.update({'runtime/shader_generation.py','runtime/turnip/sources.lock.json',
         'runtime/turnip/android-provider.lock.json','runtime/turnip/.dockerignore',
         'runtime/bridges/android-provider.lock.json','runtime/bridge-reference.json',
-        'runtime/client/dependency-release.lock.json'})
+        'runtime/client/dependency-release.lock.json','runtime/wine-arm64-adoption/x11-runtime.lock.json'})
     pending.update({'runtime/evidence/wine-arm64-selected471-41069065089.json',
         'runtime/evidence/wine-arm64-providers-41073499555.json',
         'runtime/evidence/wine-arm64-public-consumer-41079114080.json',
@@ -188,6 +188,29 @@ def source_receipt(directory,archive_name,receipt_name,selected=None):
     return receipt
 
 
+def bridge_sources(path):
+    # The installable helper archive retains its source recipe. The adjacent
+    # unchanged original ZIP additionally retains all direct Debian build sources.
+    inventory=recovery.members(path)
+    prefix='bridge/corresponding-source/original-archives/'
+    with client.archives.plain_file(path) as raw,client.checked_zip(raw,(),maximum_entries=4096) as archive:
+        lock=json.loads(measured.member(archive,'bridge/corresponding-source/build-recipe/sources.lock.json',2<<20))
+        manifest=json.loads(measured.member(archive,prefix+'SOURCE-MANIFEST.json',2<<20))
+    require(lock['runtimeArchiveSha256']==measured.RUNTIME,'cohort-guest-original-runtime-selection')
+    expected=[];names=set()
+    for source in lock['sources']:
+        for row in source['archives']:
+            name=row['file'];require(client.archives.member_path(name)==name and '/' not in name and name not in names,
+                'cohort-guest-original-source-name')
+            names.add(name);pin={key:row[key] for key in ('bytes','sha256')}
+            require(inventory.get(prefix+name)==pin,'cohort-guest-original-source-hash:'+name)
+            expected.append(dict(package=source['package'],version=source['version'],file=name,**pin))
+    require(1<=len(names)<=256 and {n.removeprefix(prefix) for n in inventory if n.startswith(prefix)}==names|{'SOURCE-MANIFEST.json'} and
+        type(manifest.get('formatVersion')) is int and manifest['formatVersion']==1 and manifest.get('files')==expected and
+        manifest.get('completeGuestRootfsSourceClosure') is False,'cohort-guest-original-source-closure')
+    return dict(originalArchives=len(names),allOriginalMembersReadBack=True,allLockedSourceArchivesVerified=True)
+
+
 def validate_payload(directory,selected):
     # Whole payload identities are checked by the caller before any parsing.
     assets=json.loads(client.small(directory/'provider-assets-receipt.json'))
@@ -204,6 +227,7 @@ def validate_payload(directory,selected):
     for name,pin in [('guest-bridges-original.zip',guest_pin),
             ('turnip-source-complete.zip',json.loads(client.small(MEASURED/'turnip-input.lock.json'))['artifact'])]:
         client.verify_identity(directory/name,pin)
+    bridge_sources(directory/'guest-bridges-original.zip')
     original_artifact=json.loads(client.small(MEASURED/'turnip-input.lock.json'))['artifact']['originalNativeBuildArtifact']
     client.verify_identity(directory/'turnip-original-native.zip',original_artifact)
     recovery.verify(directory/'turnip-original-native.zip',directory/'turnip-source-complete.zip',original_artifact)

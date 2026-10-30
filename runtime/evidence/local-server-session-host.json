@@ -1,0 +1,87 @@
+{
+  "artifacts": {
+    "application.apk": {
+      "bytes": 782985,
+      "sha256": "5238504ace2ee4c99f9739af5ecda2feb027287ec659e5ef2994976d6a89188f"
+    },
+    "tests.apk": {
+      "bytes": 1751489,
+      "sha256": "376616fa75756992d2a933171f8c1bec904e523d08b3a3b54e63f4524dc5c37f"
+    }
+  },
+  "buildResult": "BUILD SUCCESSFUL in23s;81tasks;22executed/59up-to-date",
+  "buildScope": "Internal default debug APK from a parallel development working tree; no runtime archives, not a user candidate",
+  "checks": {
+    "androidApplicationBuilt": true,
+    "androidTestCompiled": true,
+    "apkSourceHelperFiles": 23,
+    "authUnexpectedZeroExitNeverAcknowledged": true,
+    "authUnknownAccountCallbackWithoutCredentials": true,
+    "hostFixtureDefinitionsExcludedFromApplication": true,
+    "javaOwnerFixtures": 3,
+    "javaOwnerMaxHeapMiB": 32,
+    "lintPassed": true,
+    "localPythonImportClosureComplete": true,
+    "pythonPassed": 38,
+    "pythonSkipped": 1,
+    "pythonTests": 39,
+    "sourceHelperClosureVerified": true,
+    "strictNestedHelperManifestTamperRefused": true
+  },
+  "command": "./gradlew --offline --no-daemon --init-script <temporary isolated-output init> :app:localServerSessionOwnerTest :app:assembleDebug :app:assembleDebugAndroidTest :app:lintDebug",
+  "dateUtc": "2026-10-30",
+  "emulator": {
+    "authWorldSessionExecuted": false,
+    "executed": false,
+    "metadataFixturesOnly": true,
+    "sessionHelperAssetContractMethods": 2
+  },
+  "formatVersion": 1,
+  "hostExecution": {
+    "actualAuthserverBinary": false,
+    "actualConsolePipeFixtures": true,
+    "actualFilesystemLocks": true,
+    "actualLinuxChildFixtures": true,
+    "actualOwnedListenerInodeVerified": false,
+    "actualSocketProtocolFixtures": true,
+    "actualSql": false,
+    "actualWorldserverBinary": false,
+    "ownedListenerInodeSkipReason": "Managed host denies own-child proc/fd or projects no matching socket; production remains fail-closed",
+    "sourceSchemaPhases": "explicitly mocked orchestration only",
+    "syntheticProcParserTested": true
+  },
+  "implementation": {
+    "dataBindingFactory": "package-private-future-source-qualified-provider-only",
+    "databaseStoppedByAdapter": false,
+    "launcherStartEnabled": false,
+    "publicSelfHashedDataQualification": false,
+    "runtimeDataDir": "/esteria-data/data",
+    "sessionServiceChanged": false,
+    "sourceInitializationOrMigration": false
+  },
+  "independentReview": "Clear after auth unexpected-zero-exit acknowledgment fix and credential-free auth callback probe",
+  "qualifications": {
+    "androidRuntime": false,
+    "botAi": false,
+    "characterPersistence": false,
+    "fourSchemaNativeComposition": false,
+    "offlineGameplay": false,
+    "thorHardware": false,
+    "worldEntry": false
+  },
+  "scope": "host-owned-auth-world-adapter-and-source-packaging-only",
+  "sourceDependencies": {
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerInstallationSetup.java": {
+      "bytes": 40836,
+      "sha256": "2d767b99c38b27551d1b12f931582ea1c2830253476715bfa241dc8754cf0f68"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/FreshServerInstallations.java": {
+      "bytes": 20551,
+      "sha256": "1feda7897b56b5793ad995c0075013d375c132946f668fa91acdd92a77884ff7"
+    },
+    "runtime/server_data_generation.py": {
+      "bytes": 22202,
+      "sha256": "995c98bf718b4b6d54cb630e1e9123f8330a7da20c942325fbb09a53c2cf61bd"
+    }
+  }
+}

@@ -79,3 +79,8 @@ The data generation's source/input/manifest verifier and five-file APK helper
 closure now pass local contract/build/readback gates. Connect them to the retained
 setup and auth/world session owners only after the actual ordered tool provider
 is complete; keep format readiness separate from world coverage and gameplay.
+
+The current matched client/Wine/seven-patch authentication and native four-schema
+installation finish now pass. Complete the source-qualified composed data-tools
+and playerbots-helper providers, retained data operation and client/server
+coordinator, then use actual imported assets for world/controller/save/bot gates.

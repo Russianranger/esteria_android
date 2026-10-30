@@ -1,0 +1,132 @@
+name: Playerbots helper target-only source observation
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - .github/workflows/playerbots-helper-sources.yml
+      - tools/qualify_playerbots_helper_sources.py
+      - tests/test_playerbots_helper_sources.py
+      - tools/capture_ordered_extractor_dependencies.py
+      - tools/verify_target_dependency_observation.py
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: playerbots-helper-sources-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  helper-source-observation:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Check helper-only orchestration and dependency graph guards
+        run: |
+          test "$(uname -m)" = aarch64
+          python3 -m unittest tests.test_playerbots_helper_sources tests.test_playerbots_component_build \
+            tests.test_ordered_extractor_dependencies tests.test_target_dependency_observation -v
+          mkdir -p out/playerbots-source-evidence
+      - name: Acquire exact archived source, original environment and supplemental header
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/prepare_server_isolated_build.py acquire --output out/playerbots-source-inputs \
+            --original-lock runtime/server/server-build-sources.lock.json \
+            > out/playerbots-source-evidence/acquisition.log 2>&1
+          cp out/playerbots-source-inputs/acquisition.json out/playerbots-source-evidence/acquisition.json
+      - name: Install the exact relevant original native build packages
+        run: |
+          mapfile -t packages < <(python3 tools/prepare_server_isolated_build.py packages \
+            --original-lock runtime/server/server-build-sources.lock.json)
+          test "${#packages[@]}" = 10
+          sudo apt-get -o Acquire::Retries=3 update
+          sudo apt-get -o Acquire::Retries=3 install -y "${packages[@]}"
+          python3 tools/prepare_server_isolated_build.py environment --inputs out/playerbots-source-inputs \
+            --original-lock runtime/server/server-build-sources.lock.json \
+            --output out/playerbots-source-evidence/environment.json
+      - name: Prepare the unchanged seven-patch asset-free source export
+        run: |
+          python3 tools/prepare_server_isolated_sources.py \
+            --source-inputs out/playerbots-source-inputs/source-inputs \
+            --supplements out/playerbots-source-inputs/supplements \
+            --original-lock runtime/server/server-build-sources.lock.json \
+            --output out/playerbots-source-prepared > out/playerbots-source-evidence/preparation.json
+          test ! -e out/playerbots-source-prepared/source/.git
+          test ! -e out/playerbots-source-prepared/source/Harvested
+          test ! -e out/playerbots-source-prepared/source/Data
+      - name: Build only the database helper twice and capture actual dependencies offline
+        id: observation
+        run: |
+          sudo env PATH="$PATH" PYTHONDONTWRITEBYTECODE=1 CCACHE_DISABLE=1 \
+            unshare --net -- sh -c 'ip link set lo up; exec "$@"' sh \
+            python3 tools/qualify_playerbots_helper_sources.py build \
+            --prepared "$GITHUB_WORKSPACE/out/playerbots-source-prepared" \
+            --inputs "$GITHUB_WORKSPACE/out/playerbots-source-inputs" \
+            --original-lock "$GITHUB_WORKSPACE/runtime/server/server-build-sources.lock.json" \
+            --environment "$GITHUB_WORKSPACE/out/playerbots-source-evidence/environment.json" \
+            --output "$GITHUB_WORKSPACE/out/playerbots-helper-source-observation" \
+            --integration-revision "$GITHUB_SHA" \
+            > out/playerbots-source-evidence/source-observation-status.log 2>&1
+      - name: Collect bounded build evidence without source-complete or SQL claims
+        if: always()
+        run: |
+          sudo env ESTERIA_HELPER_SOURCE_REVISION="$GITHUB_SHA" python3 - <<'PY'
+          from pathlib import Path
+          import json, os
+          from tools import verify_server_build as files, manifest_server_modules as modules
+          target=Path('out/playerbots-source-evidence');target.mkdir(parents=True,exist_ok=True)
+          root=Path('out/playerbots-helper-source-observation')
+          for name,source in (('source-build.json',root/'qualification.json'),
+                  ('helper-source-build.json',root/'component/qualification.json')):
+              if source.is_file():
+                  value,_=modules.read_json(source,limit=8*1024**2)
+                  (target/name).write_text(json.dumps(value,sort_keys=True,indent=2)+'\n')
+          for directory,prefix in ((root/'diagnostics','observation'),(root/'component/diagnostics','initial-build')):
+              if directory.is_dir():
+                  for path in directory.iterdir():
+                      if path.is_file() and path.suffix=='.log':
+                          with path.open('rb') as stream:
+                              stream.seek(max(0,path.stat().st_size-64*1024));raw=stream.read(64*1024)
+                          (target/(prefix+'-'+path.name)).write_bytes(raw)
+          for path in target.iterdir():
+              if path.is_file() and path.suffix=='.log':
+                  with path.open('rb') as stream:
+                      stream.seek(max(0,path.stat().st_size-64*1024));raw=stream.read(64*1024)
+                  path.write_bytes(raw)
+          rows={path.name:files.identity(path) for path in target.iterdir() if path.is_file()}
+          receipt=dict(formatVersion=1,scope='native-playerbots-helper-source-observation-environment',
+              integrationRevision=os.environ['ESTERIA_HELPER_SOURCE_REVISION'],files=rows,
+              targetBuildCommandsRequireExternalNetworkDisabled=True,originalServerProgramsRebuilt=False,
+              helperExecuted=False,sqlExecuted=False,originalHelperNativeSqlQualificationTransferred=False,
+              sourceCompanionComplete=False,providerActivated=False,androidRuntimeQualified=False,gameplayQualified=False)
+          (target/'environment-receipt.json').write_text(json.dumps(receipt,sort_keys=True,indent=2)+'\n')
+          PY
+          sudo chown -R "$(id -u):$(id -g)" out/playerbots-source-evidence
+          if sudo test -d out/playerbots-helper-source-observation; then
+            sudo chown "$(id -u):$(id -g)" out/playerbots-helper-source-observation
+          fi
+          if sudo test -d out/playerbots-helper-source-observation/payload; then
+            sudo chown -R "$(id -u):$(id -g)" out/playerbots-helper-source-observation/payload
+          fi
+      - name: Retain new helper, exact inputs and the complete observed source dependency graph
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always() && steps.observation.outcome == 'success'
+        with:
+          name: playerbots-helper-source-observation-${{ github.sha }}
+          path: out/playerbots-helper-source-observation/payload/
+          include-hidden-files: true
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: playerbots-helper-source-evidence-${{ github.sha }}
+          path: out/playerbots-source-evidence/
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error

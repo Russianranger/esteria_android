@@ -18,6 +18,22 @@ class CombinedPackageGuards(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory(); self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
 
+    def test_only_the_pinned_adapted_wine_profile_passes_explicit_client_runtime_selection(self):
+        path=self.root/'runtime/runtime-sources.lock.json';path.parent.mkdir()
+        def write(environment,include=True):
+            selected={'wineEnvironment':environment} if include else {}
+            path.write_text(json.dumps({'packages':{'wine-arm64':selected}}))
+        with patch.object(bundle,'ROOT',self.root):
+            write(None,include=False);self.assertEqual(bundle.selected_client_runtime_options(),{})
+            write({});self.assertEqual(bundle.selected_client_runtime_options(),{})
+            write({'WINE_ANDROID_PRIVATE_PE_COPY':'1'})
+            self.assertEqual(bundle.selected_client_runtime_options(),{'runtime_lock':path})
+            for invalid in (None,True,{'WINE_ANDROID_PRIVATE_PE_COPY':1},{'WINE_ANDROID_PRIVATE_PE_COPY':'0'},
+                    {'WINE_ANDROID_PRIVATE_PE_COPY':'1','UNSELECTED':'1'}):
+                write(invalid)
+                with self.assertRaisesRegex(ValueError,'unsupported-wine-environment'):
+                    bundle.selected_client_runtime_options()
+
     def test_existing_output_preserves_everything_before_validation(self):
         output = self.root / 'existing'; output.mkdir(); marker = output / 'save'; marker.write_bytes(b'keep')
         with self.assertRaisesRegex(ValueError, 'existing-artifacts-preserved'):
@@ -66,10 +82,38 @@ class CombinedPackageGuards(unittest.TestCase):
                 'server_update_setup.py', 'server_updater.py', 'server_playerbots_setup.py', 'owned_process_group.py', 'server_config.py', 'provision_local_realm.py',
                 'provision_local_account.py', 'server/appearance-schema-v1.sql', 'server/appearance-schema.lock.json', 'local-server.json'),
             'server-data': ('server_data_generation.py', 'server_data_preflight.py', 'shader_generation.py',
-                'extractor_order.py', 'owned_process_group.py')})
+                'extractor_order.py', 'owned_process_group.py'),
+            'server-session': ('server_session.py', 'server_session_process.py', 'android_server_schema_setup.py',
+                'mysql_bootstrap.py', 'mysql_service.py', 'server_content.py', 'server_schema_setup.py',
+                'server_schema_baseline.py', 'server_schema_adaptations.py', 'server_update_setup.py', 'server_updater.py',
+                'server_playerbots_setup.py', 'owned_process_group.py', 'server_config.py', 'provision_local_realm.py',
+                'provision_local_account.py', 'server_data_generation.py', 'server_data_preflight.py', 'shader_generation.py',
+                'extractor_order.py', 'server/appearance-schema-v1.sql', 'server/appearance-schema.lock.json', 'local-server.json')})
         repository, path = self.helper_fixture()
         with patch.object(bundle, 'ROOT', repository), zipfile.ZipFile(path) as archive:
             bundle.verify_helpers(archive)
+
+    def test_session_exact23_source_closure_and_nested_manifest_tamper_refused(self):
+        repository, path = self.helper_fixture()
+        self.assertEqual(len(bundle.HELPER_SETS['server-session']), 23)
+        with zipfile.ZipFile(path) as archive:
+            original = {name:archive.read(name) for name in archive.namelist()}
+        prefix = 'assets/server-session/'
+        for mutation, reason in [('extra','helper-inventory'),('missing','helper-inventory'),
+                                 ('nested','helper-source'),('profile','helper-source'),('manifest','helper-manifest')]:
+            changed = dict(original)
+            if mutation == 'extra': changed[prefix+'unexpected.py']=b'unapproved'
+            if mutation == 'missing': del changed[prefix+'server_session_process.py']
+            if mutation in ('nested','profile'):
+                name=prefix+('server/appearance-schema-v1.sql' if mutation=='nested' else 'local-server.json')
+                changed[name]=b'X'*len(changed[name])
+            if mutation=='manifest':
+                name=prefix+'manifest.json'; changed[name]=changed[name].replace(b'{',b'{"formatVersion":1,',1)
+            output=self.root/('session-'+mutation+'.zip')
+            with zipfile.ZipFile(output,'w') as archive:
+                for name,raw in changed.items():archive.writestr(name,raw)
+            with patch.object(bundle,'ROOT',repository),zipfile.ZipFile(output) as archive:
+                with self.assertRaisesRegex(ValueError,reason):bundle.verify_helpers(archive)
 
     def test_same_size_modified_database_service_helper_is_rejected(self):
         repository, path = self.helper_fixture(changed_service=True)

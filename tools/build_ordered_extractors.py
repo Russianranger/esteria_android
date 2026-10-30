@@ -92,6 +92,24 @@ def verify_overlay(original,adapted,before,pin,adaptation_identity):
     require(tree(adapted)==expected and tree(original)==before,'ordered-adaptation-changed-unapproved-source-inputs')
 
 
+def verify_native_observation(receipt,observation,programs,compile_commands):
+    """Require the observed native compiler graph and both final linker outputs."""
+    require(receipt.get('objectElfMachines')==[183] and receipt.get('observedObjects')==210 and
+            receipt.get('dependenciesNotNewerThanObject') is True and
+            receipt.get('compileCommands')==compile_commands,
+            'ordered-actual-native-object-observation-required')
+    require(receipt.get('observedLinks')==len(TARGETS) and receipt.get('linkElfMachines')==[183] and
+            receipt.get('linkDependenciesNotNewerThanOutput') is True and
+            receipt.get('linkInputsCopied') is False and receipt.get('systemLinkSourcesCopied') is False and
+            type(observation.get('links')) is dict and
+            set(observation['links'])=={'bin/'+name for name in TARGETS},
+            'ordered-actual-native-link-observation-required')
+    require(all(row.get('identity')==engine.identity(programs[name]) and row.get('elfMachine')==183 and
+                row.get('elfType') in ('EXEC','DYN')
+                for name in TARGETS for row in (observation['links']['bin/'+name],)),
+            'ordered-final-link-output-differs-from-measured-program')
+
+
 def build(prepared,acquired,original_lock,environment,policy_sources,output,*,integration_revision):
     require(platform.system()=='Linux' and platform.machine()=='aarch64','native-arm64-ordered-target-build-required')
     require(re.fullmatch('[0-9a-f]{40}',integration_revision or ''),'ordered-build-integration-revision-required')
@@ -173,10 +191,8 @@ def build(prepared,acquired,original_lock,environment,policy_sources,output,*,in
             return output/('diagnostics/'+label+'.log')
         observed=dependencies.capture(output/'build',adapted,output/'build/compile_commands.json',
             Path(ninja).resolve(strict=True),capture_run,capture_output)
-        require(observed['objectElfMachines']==[183] and observed['observedObjects']==210 and
-                observed['dependenciesNotNewerThanObject'] is True and
-                observed['compileCommands']==proof['compileCommands'],'ordered-actual-native-object-observation-required')
         observation,_=engine.modules.read_json(capture_output/'observation.json',limit=16*1024**2)
+        verify_native_observation(observed,observation,programs,proof['compileCommands'])
         expected_project=dict(before)
         for name,row in pin['adaptedFiles'].items():expected_project['source/'+name]=row
         expected_project['source/'+pin['header']['installedPath']]=engine.identity(pin['header'])

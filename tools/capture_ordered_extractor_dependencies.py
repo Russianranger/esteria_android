@@ -27,6 +27,7 @@ MAX_EDGES = 1000000
 MAX_GENERATED = 128 << 20
 TARGETS = ('map_extractor', 'vmap4_extractor')
 SYSTEM_ROOTS = (Path('/usr/include'), Path('/usr/lib/gcc'))
+SYSTEM_LINK_ROOTS = (Path('/usr/lib'), Path('/lib'), Path('/usr/lib64'), Path('/lib64'))
 HEADER_SUFFIXES = {'.h', '.hh', '.hpp', '.hxx', '.inc', '.inl', '.tcc'}
 SOURCE_SUFFIXES = {'.c', '.cc', '.cpp', '.cxx', '.C'}
 
@@ -195,6 +196,43 @@ def target_commands(text, build):
     return result
 
 
+def link_commands(text, build, targets=TARGETS):
+    """Parse explicit GCC/Clang LD-depfile commands without executing a shell.
+
+    CMake wraps a link in ``: && driver ... && :``. Only that exact wrapper
+    and an optional leading ``cd directory &&`` are accepted. Link commands
+    without an LD depfile remain outside this observation (legacy fixtures).
+    A raw linker dependency record without its explicit command is refused.
+    """
+    result = {}
+    driver = re.compile(r'(?:(?:[A-Za-z0-9_+.]+)-)*(?:gcc|g\+\+|cc|c\+\+|clang|clang\+\+)(?:-[0-9]+(?:\.[0-9]+)*)?')
+    for line in text.splitlines():
+        if not line: continue
+        require(len(line.encode()) <= 1 << 20, 'Ninja link command line bound')
+        argv = shlex.split(line); directory = build
+        if len(argv) >= 3 and argv[0] == 'cd' and argv[2] == '&&':
+            directory = absolute(argv[1], build); argv = argv[3:]
+        flags = [token for token in argv if token.startswith('-Wl,--dependency-file')]
+        if not flags: continue
+        if argv[:2] == [':', '&&']:
+            require(argv[-2:] == ['&&', ':'], 'unsupported Ninja link shell wrapper')
+            argv = argv[2:-2]
+        arguments(argv)
+        require(len(flags) == 1 and flags[0].startswith('-Wl,--dependency-file=') and
+                flags[0] != '-Wl,--dependency-file=' and '-c' not in argv and argv.count('-o') == 1 and
+                Path(argv[0]).is_absolute() and driver.fullmatch(Path(argv[0]).name),
+                'explicit compiler driver link command required')
+        position = argv.index('-o'); require(position+1 < len(argv), 'link output argument missing')
+        output = absolute(argv[position+1], directory)
+        depfile = absolute(flags[0].split('=', 1)[1], directory)
+        require(inside(directory, build) and inside(output, build) and output.name in targets and
+                inside(depfile, build) and output != depfile and output not in result,
+                'owned unique selected linked target and depfile required')
+        result[output] = dict(directory=directory, argv=argv, dependencyFile=depfile)
+        require(len(result) <= len(targets), 'Ninja selected link command count bound')
+    return result
+
+
 def write_new(path, raw):
     require(len(raw) <= MAX_TEXT, 'dependency observation metadata byte bound')
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -233,7 +271,9 @@ def capture(build: Path, prepared: Path, commands: Path, ninja: Path, run, outpu
     write_new(output / 'ninja-deps.txt', deps_raw); write_new(output / 'ninja-target-commands.txt', command_raw)
     records = parse_dependencies(deps_raw.decode('utf-8'))
     target = target_commands(command_raw.decode('utf-8'), build)
+    linked_targets = link_commands(command_raw.decode('utf-8'), build, targets)
     observed = {}; objects = {}; project = {}; generated = {}; system = {}; machines = set()
+    links = {}; link_inputs = {}; system_links = {}; link_machines = set(); observed_links = {}; link_mtime_bounds = {}
     dependency_mtime_bounds = {}
     roots = {name: canonical_directory(prepared / name) for name in ('source', 'external', 'integration')}
 
@@ -265,6 +305,8 @@ def capture(build: Path, prepared: Path, commands: Path, ninja: Path, run, outpu
 
     for name, record in records.items():
         path = absolute(name, build); unlinked(path)
+        if path in linked_targets:
+            continue
         require(inside(path, build) and path not in objects and path in database and path in target,
                 'Ninja built object has no unique owned compile command')
         declared, actual = database[path], target[path]
@@ -291,6 +333,66 @@ def capture(build: Path, prepared: Path, commands: Path, ninja: Path, run, outpu
             dependencyCount=record['count'], ninjaDependenciesMtime=record['mtime'], objectMtimeNs=object_mtime,
             dependencies=references)
     require(set(objects) == set(target), 'Ninja target graph and built dependency objects differ')
+
+    def link_dependency(value):
+        lexical = absolute(value, build); resolved = lexical.resolve(strict=True)
+        if inside(lexical, build):
+            unlinked(lexical)
+            require(resolved == lexical and lexical.suffix in ('.o', '.a'), 'unsupported owned linker input')
+            kind = 'object' if lexical.suffix == '.o' else 'archive'
+            row = observed_links.get(resolved)
+            if row is None: row = identity(resolved); observed_links[resolved] = row
+            if kind == 'object':
+                require(resolved in objects and objects[resolved]['identity'] == row,
+                        'linked object was not observed in actual compiler graph')
+            else:
+                with resolved.open('rb') as stream:
+                    require(stream.read(8) == b'!<arch>\n', 'linked local archive is not a regular ar archive')
+            key = lexical.relative_to(build).as_posix(); link_inputs[key] = dict(identity=row, kind=kind)
+            reference = 'build:'+key
+        else:
+            require(any(inside(lexical, root) for root in SYSTEM_LINK_ROOTS) and
+                    any(inside(resolved, root) for root in SYSTEM_LINK_ROOTS), 'unknown system linker input root')
+            unlinked(resolved)
+            row = observed_links.get(resolved)
+            if row is None: row = identity(resolved); observed_links[resolved] = row
+            key = str(resolved); system_links[key] = row; reference = 'system:'+key
+        require(len(observed_links) <= MAX_FILES, 'observed linker input count bound')
+        return reference, resolved
+
+    for name, record in records.items():
+        path = absolute(name, build)
+        if path not in linked_targets: continue
+        require(path not in links, 'duplicate normalized linked output')
+        declared = linked_targets[path]; output_mtime = path.stat().st_mtime_ns
+        references = []; paths = set()
+        for value in record['dependencies']:
+            reference, resolved = link_dependency(value)
+            require(resolved.stat().st_mtime_ns <= output_mtime,
+                    'link dependency newer than linked output; replay target build')
+            link_mtime_bounds[resolved] = min(link_mtime_bounds.get(resolved, output_mtime), output_mtime)
+            references.append(reference); paths.add(resolved)
+        # Inputs spelled explicitly in the command must also occur in the LD
+        # record; driver-selected runtime libraries remain additional evidence.
+        skip = False
+        for token in declared['argv'][1:]:
+            if skip: skip = False; continue
+            if token == '-o': skip = True; continue
+            if not token.startswith('-') and (Path(token).suffix in ('.o', '.a') or '.so' in Path(token).name):
+                require(absolute(token, declared['directory']).resolve(strict=True) in paths,
+                        'explicit linker command input absent from dependency record')
+        row = identity(path)
+        with path.open('rb') as stream: header = stream.read(20)
+        require(len(header) == 20 and header[:6] == b'\x7fELF\x02\x01' and header[16:18] in (b'\x02\x00', b'\x03\x00'),
+                'observed linked output is not an ELF64 executable or dynamic executable')
+        machine = int.from_bytes(header[18:20], 'little'); link_machines.add(machine)
+        require(machine in machines, 'linked output machine differs from compiled objects')
+        links[path] = dict(identity=row, elfMachine=machine, elfType='EXEC' if header[16:18] == b'\x02\x00' else 'DYN',
+            linkCommandSha256=hashlib.sha256(encoded(declared['argv'])).hexdigest(),
+            dependencyCount=record['count'], ninjaDependenciesMtime=record['mtime'], outputMtimeNs=output_mtime,
+            dependencies=references)
+    require(set(links) == set(linked_targets) and len(records) == len(objects)+len(links),
+            'Ninja link target graph and dependency records differ')
     generated_bytes = 0
     for name, row in generated.items():
         path = build / name; generated_bytes += row['bytes']
@@ -306,12 +408,22 @@ def capture(build: Path, prepared: Path, commands: Path, ninja: Path, run, outpu
     for path, row in objects.items():
         require(identity(path) == row['identity'] and path.stat().st_mtime_ns == row['objectMtimeNs'],
                 'observed object changed before completion')
+    for path, row in observed_links.items():
+        require(identity(path) == row, 'observed linker input changed before completion')
+        require(path.stat().st_mtime_ns <= link_mtime_bounds[path],
+                'link dependency newer than linked output; replay target build')
+    for path, row in links.items():
+        require(identity(path) == row['identity'] and path.stat().st_mtime_ns == row['outputMtimeNs'],
+                'observed linked output changed before completion')
     require(text_file(commands)[1] == database_identity and text_file(deps_path)[1] == deps_identity and
             text_file(command_path)[1] == command_identity and identity(ninja) == ninja_identity,
             'observation command inputs changed before completion')
     object_rows = {path.relative_to(build).as_posix(): value for path, value in objects.items()}
+    link_rows = {path.relative_to(build).as_posix(): value for path, value in links.items()}
     observation = dict(formatVersion=1, scope=scope,
         targets=list(targets), objects=object_rows, projectFiles=project, generatedFiles=generated, systemHeaders=system,
+        links=link_rows, linkInputs=link_inputs, systemLinkInputs=system_links,
+        linkDependenciesNotNewerThanOutput=True, linkInputsCopied=False, systemLinkSourcesCopied=False,
         actualTargetSourceDependencyObservation=True, dependencyIdentitiesObservedAfterBuild=True,
         dependenciesNotNewerThanObject=True, systemHeaderSourcesCopied=False,
         unknownOriginalSystemHashesCompared=False, sourceCompanionComplete=False,
@@ -321,6 +433,9 @@ def capture(build: Path, prepared: Path, commands: Path, ninja: Path, run, outpu
     return dict(formatVersion=1, scope=observation['scope'], targets=list(targets), compileCommands=database_identity,
         ninja=dict(path=str(ninja), **ninja_identity), observedObjects=len(objects), observedProjectFiles=len(project),
         observedGeneratedFiles=len(generated), observedSystemHeaders=len(system), objectElfMachines=sorted(machines),
+        observedLinks=len(links), observedLinkInputs=len(link_inputs), observedSystemLinkInputs=len(system_links),
+        linkElfMachines=sorted(link_machines), linkMetadataSha256=hashlib.sha256(encoded(link_rows)).hexdigest(),
+        linkDependenciesNotNewerThanOutput=True, linkInputsCopied=False, systemLinkSourcesCopied=False,
         objectMetadataSha256=hashlib.sha256(encoded(object_rows)).hexdigest(), outputFiles=inventory,
         actualTargetSourceDependencyObservation=True, dependencyIdentitiesObservedAfterBuild=True,
         dependenciesNotNewerThanObject=True, systemHeaderSourcesCopied=False,

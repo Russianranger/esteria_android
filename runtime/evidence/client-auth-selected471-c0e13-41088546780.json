@@ -1,0 +1,378 @@
+{
+  "androidQualified": false,
+  "assetsQualified": false,
+  "boundedEnvironmentInventoryIndependentlyReadBack": true,
+  "clientWineServerRecompiledForThisGate": false,
+  "commonMainQualified": false,
+  "compiledUpdaterAndActualReconstructedGruntPassed": true,
+  "completePublicWineSourceZipReadBackBeforeExecution": true,
+  "engineOriginalSourceCompanionComplete": false,
+  "evidenceArtifact": {
+    "bytes": 60027,
+    "id": 12992907098,
+    "sha256": "0b158af0442c4c09a5daa477ba617c8502d0d060252d9b6536876f9c46b3ed44"
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "hardwareQualified": false,
+  "historicalAuthenticationEvidenceUnchanged": true,
+  "inputLockSha256": "2ddf6461224c5122283d7133da3b082b85ad567fbfdd939478c286c7984e3ab0",
+  "integrationRevision": "15c6bb5e229df142213b039d6782e7c5a6bc4cd2",
+  "normalUntracedFreshMySqlInitializationPassed": true,
+  "ownedProcessesAndPrivateKeyCleanupVerified": true,
+  "persistedSessionKeyAndRealmCallbacksVerified": true,
+  "privatePeCopyMarkerReadBack": true,
+  "qualification": {
+    "androidRuntimeQualified": false,
+    "client": {
+      "artifact": {
+        "bytes": 45848847,
+        "sha256": "befac98c5c3434ea94dcb878f5da37f915946221fb17f1a7888c65f74bb846ad"
+      },
+      "authDiagnosticSourceSha256": "8658af61c27efe59ba270836bac6f8b5ae85fe9b31d348a7ab05533bc9b8489d",
+      "buildId": "41061576677.1",
+      "files": [
+        {
+          "imports": [
+            "ADVAPI32.dll",
+            "api-ms-win-crt-convert-l1-1-0.dll",
+            "api-ms-win-crt-environment-l1-1-0.dll",
+            "api-ms-win-crt-filesystem-l1-1-0.dll",
+            "api-ms-win-crt-heap-l1-1-0.dll",
+            "api-ms-win-crt-locale-l1-1-0.dll",
+            "api-ms-win-crt-math-l1-1-0.dll",
+            "api-ms-win-crt-multibyte-l1-1-0.dll",
+            "api-ms-win-crt-runtime-l1-1-0.dll",
+            "api-ms-win-crt-stdio-l1-1-0.dll",
+            "api-ms-win-crt-string-l1-1-0.dll",
+            "api-ms-win-crt-time-l1-1-0.dll",
+            "api-ms-win-crt-utility-l1-1-0.dll",
+            "d3d11.dll",
+            "D3DCOMPILER_47.dll",
+            "dbghelp.dll",
+            "DINPUT8.dll",
+            "dxgi.dll",
+            "GDI32.dll",
+            "HID.DLL",
+            "IMM32.dll",
+            "KERNEL32.dll",
+            "MSACM32.dll",
+            "MSVCP140.dll",
+            "ole32.dll",
+            "OPENGL32.dll",
+            "SETUPAPI.dll",
+            "SHELL32.dll",
+            "USER32.dll",
+            "VCRUNTIME140.dll",
+            "VERSION.dll",
+            "WININET.dll",
+            "WINMM.dll",
+            "WS2_32.dll",
+            "XvidDecoder.dll"
+          ],
+          "name": "WowClient64.exe",
+          "pe": {
+            "dll": false,
+            "executable": true,
+            "format": "PE32+",
+            "machine": "0xaa64"
+          },
+          "sha256": "06557024cfaa974d02482eb98fedc186bc6b323ca730178347e153105343e12a",
+          "size": 20785152
+        },
+        {
+          "imports": [
+            "api-ms-win-crt-heap-l1-1-0.dll",
+            "api-ms-win-crt-math-l1-1-0.dll",
+            "api-ms-win-crt-runtime-l1-1-0.dll",
+            "api-ms-win-crt-stdio-l1-1-0.dll",
+            "api-ms-win-crt-string-l1-1-0.dll",
+            "api-ms-win-crt-utility-l1-1-0.dll",
+            "KERNEL32.dll",
+            "VCRUNTIME140.dll"
+          ],
+          "name": "XvidDecoder.dll",
+          "pe": {
+            "dll": true,
+            "executable": true,
+            "format": "PE32+",
+            "machine": "0xaa64"
+          },
+          "sha256": "b4c774430942d709ca7e3f03a1890d6aec7aaa2e432bee0e698e57027a70d006",
+          "size": 566272
+        }
+      ],
+      "manifestSha256": "ed34b6f648026073ba43203bee7e3dd1ca1d2413017fb99d8da54dab57808559",
+      "sourceRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5"
+    },
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "namespaceExit": 0,
+    "phase": "complete",
+    "qualificationSucceeded": true,
+    "scope": "disposable-linux-arm64-reconstructed-client-compiled-authserver",
+    "versionChecksumQualified": false,
+    "wineRuntime": {
+      "archiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+      "preparedReceiptSha256": "f850e9a83b7d4cf243c2fb39da575385cbeadc5e759289d17912f612c2ed596a",
+      "runtimeLockSha256": "5816a07061c308a6a515d3747da2b7e3adfb8b22b6e6827819f590b1214fe04b",
+      "wineEnvironment": {
+        "WINE_ANDROID_PRIVATE_PE_COPY": "1"
+      }
+    },
+    "worker": {
+      "androidRuntimeQualified": false,
+      "authserver": {
+        "bytes": 1709864,
+        "sha256": "04cbda982ca1385903929eb46ca52b7cb41ca222e8a48f9898af716d2b878531"
+      },
+      "cleanShutdownVerified": true,
+      "cleanupFailures": [],
+      "clientReceipt": {
+        "architecture": "ARM64",
+        "assetsLoaded": false,
+        "authentications": 1,
+        "checks": {
+          "actualCommandParser": true,
+          "connectedCallback": true,
+          "connectionRefsReleased": true,
+          "controlledDisconnect": true,
+          "gruntTimerJoined": true,
+          "gruntTimerThread": true,
+          "localOfflineEnabled": true,
+          "networkThreadsJoined": true,
+          "newSessionRequest": true,
+          "realmListCallback": true,
+          "serverProofVerified": true,
+          "twoWorkerThreads": true,
+          "versionChallengeObserved": true
+        },
+        "commonMainStarted": false,
+        "compiledServerQualified": false,
+        "fixtureId": "3f5a2cb779a3840a8d2ea562c324870b",
+        "gameplayQualified": false,
+        "privateSessionKeyBytes": 40,
+        "protocolBuild": 12340,
+        "realmBuildPresent": false,
+        "realmFlags": 2,
+        "realmId": 1,
+        "realms": 1,
+        "schemaVersion": 1,
+        "scope": "executable-grunt-authentication-only",
+        "versionChecksumQualified": false,
+        "worldEndpoint": "127.0.0.1:8085",
+        "worldEntryQualified": false
+      },
+      "clientReceiptSha256": "da07c08c2a07763e4432c179ce459ddb623adf70d99fade7c389e4ce89ff54f2",
+      "compiledUpdaterReceiptSha256": "a1bb8f79c14f9856b9285cc36f0f87c2169ab36475be20739a3122a49616a44a",
+      "credentialsAndTrackersPreserved": true,
+      "engineDerivative": {
+        "androidRuntimeQualified": false,
+        "debugArchiveIdentified": {
+          "bytes": 1082880246,
+          "sha256": "facc75680f3fb1b205a98960d6ea5a0d565cb2a2b4bd56303dd6625fd4854a24"
+        },
+        "debugArchiveReadBackHere": false,
+        "formatVersion": 1,
+        "gameplayQualified": false,
+        "originalBuild": {
+          "bytes": 32521,
+          "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+        },
+        "originalModules": {
+          "bytes": 5348,
+          "sha256": "6459b6a1acab2c62c474e4c6ab3eb651daa21f697ccd628e93a38bad298bbdd1"
+        },
+        "originalReceiptsUnchanged": true,
+        "packageReceipt": {
+          "bytes": 34652,
+          "sha256": "bb62ad200ac9be9b756616e351bf591508eedb7420f9fd39d5ea0544ae1cc548"
+        },
+        "programs": {
+          "authserver": {
+            "bytes": 1709864,
+            "sha256": "04cbda982ca1385903929eb46ca52b7cb41ca222e8a48f9898af716d2b878531"
+          },
+          "dbimport": {
+            "bytes": 1379920,
+            "sha256": "f452ef5c7ab90451e9060bdace1ba866a93da768145428b15ddc25a7e73b6c24"
+          },
+          "worldserver": {
+            "bytes": 59025784,
+            "sha256": "9757f0bbb2ee159d18070d8f5fe7ecdf5b4b8b7171116198039f418d5ec13aa1"
+          }
+        },
+        "runtimeArchive": {
+          "bytes": 21352885,
+          "sha256": "00bd0a5829caec2a2b11d4e85bd261b67461c04e6755bb332d37d393311c6ccb"
+        },
+        "scope": "verified-engine-derivative-program-selection",
+        "serverExecuted": false,
+        "sourceCompanionComplete": false
+      },
+      "expectedExit": 0,
+      "formatVersion": 1,
+      "gameplayQualified": false,
+      "logsComplete": true,
+      "networkIsolated": true,
+      "ownedLoopbackListenerVerified": true,
+      "persistedSessionKeyVerified": true,
+      "phase": "complete",
+      "privateKeyRemoved": true,
+      "privatePeCopyMarkerObserved": true,
+      "reconstructedClientAuthenticated": true,
+      "schemaLedgerPreserved": true,
+      "scope": "disposable-linux-arm64-reconstructed-client-compiled-authserver",
+      "serverBuildId": "41019374697.1",
+      "serverSource": {
+        "branch": "main",
+        "commit": "f35f04d01689f034778e3474b3c820092f51e461",
+        "patches": [
+          {
+            "path": "patches/server/0001-eluna-declare-area-trigger.patch",
+            "sha256": "c26b145188c5f97bf30d032e1fe3bd7fe17aa1f8f0daa6793e51f5d830fe7aa6",
+            "submodule": "src/server/game/LuaEngine"
+          },
+          {
+            "path": "patches/server/0002-eluna-include-map-manager.patch",
+            "sha256": "4e277dbe56c31ae30640c8e9ad4dee12e944e0f051d9bdc8d62aaa239c50433f",
+            "submodule": "src/server/game/LuaEngine"
+          },
+          {
+            "path": "patches/server/0003-eluna-hooks-include-types.patch",
+            "sha256": "5999402d985fcc709abdc90bb4272072d1d5e3e261b2cc7ec19460320c14295f",
+            "submodule": "src/server/game/LuaEngine"
+          },
+          {
+            "path": "patches/server/0004-attunement-stat-api.patch",
+            "sha256": "d9ef6ca8f96ab186c37c072b22143cdded9976aa3a62d083f893c502a5745cb8"
+          },
+          {
+            "path": "patches/server/0005-script-grid-templates.patch",
+            "sha256": "6b459c90839e7831df8533966442fabd476ae1773f0302c50ccc8a997f157369"
+          },
+          {
+            "path": "patches/server/0006-empty-script-modules.patch",
+            "sha256": "ea0beb357c71d8b8c187af9d4afede520e7ac9877e40fbdc5fab99d54fc21f97"
+          },
+          {
+            "path": "patches/server/0007-runtime-module-config-directory.patch",
+            "sha256": "5e41d474179ef553ec9c2544de947a3724885fd7f3ac233af3d89797acd032ff"
+          }
+        ],
+        "submodules": {
+          "src/server/game/LuaEngine": "58d7652138887783228b9727bd1fa4e08f00342b"
+        },
+        "url": "https://github.com/Russianranger/EsteriaWoW.git"
+      },
+      "sourceLockSha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1",
+      "workerCompleted": true,
+      "worldEntryQualified": false
+    },
+    "worldEntryQualified": false
+  },
+  "receiptIdentities": {
+    "client-source-readback.json": {
+      "bytes": 955,
+      "sha256": "413a178d089c861073409a4247b0daee9f307578216e1d90c2ac94401e53e199"
+    },
+    "environment-receipt.json": {
+      "bytes": 4062,
+      "sha256": "5be96acf9509f16de1ea114d63dd660e03e2daa6d0722e677c7258bfc4f41986"
+    },
+    "mysql-state-mount-preflight.json": {
+      "bytes": 178,
+      "sha256": "75557c27fa99475f6f9014cca2988a8bfba75658956edae37fcf9624ab8736e7"
+    },
+    "qualification.json": {
+      "bytes": 8884,
+      "sha256": "0399d828f0b3ada189c11b2fe51fe357dd56b4db86a32003f88987d11d00c04e"
+    },
+    "selected-inputs.lock.json": {
+      "bytes": 2238,
+      "sha256": "2ddf6461224c5122283d7133da3b082b85ad567fbfdd939478c286c7984e3ab0"
+    },
+    "server-inputs.json": {
+      "bytes": 3734,
+      "sha256": "468c1de20bb2652ea8ac6acd348bf8435b17ca1a7e875a4cd77beccf89e88114"
+    },
+    "wine-source-readback.json": {
+      "bytes": 8163,
+      "sha256": "3568818f2e79d53dd47a4dec5d433b333b34cd0ddb949ba662929f309bd066aa"
+    },
+    "worker.json": {
+      "bytes": 5289,
+      "sha256": "52c6cb687a13c5bfd84b3a415b5965dd864bac948289e73d6dd5685dbd544236"
+    }
+  },
+  "scope": "actual-selected471-source-owned-wine-seven-patch-compiled-authentication",
+  "selectedInputs": {
+    "androidQualified": false,
+    "clientComponentProof": {
+      "bytes": 30846,
+      "path": "runtime/evidence/wine-arm64-selected471-41069065089.json",
+      "sha256": "db1671f91bb4fce833de9c00e7f49c5fbae1a64c76ea01d5366a82428bac798b"
+    },
+    "clientInput": {
+      "androidRuntimeQualified": false,
+      "artifact": {
+        "bytes": 45848847,
+        "sha256": "befac98c5c3434ea94dcb878f5da37f915946221fb17f1a7888c65f74bb846ad"
+      },
+      "artifactId": 12979433537,
+      "buildId": "41061576677.1",
+      "buildManifestSha256": "ed34b6f648026073ba43203bee7e3dd1ca1d2413017fb99d8da54dab57808559",
+      "formatVersion": 1,
+      "scope": "measured-reconstructed-client-provider-inputs",
+      "sourceRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "workflowRun": 41061576677
+    },
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "privatePeCopy": true,
+    "runtimeArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+    "scope": "separate-measured471-new-wine-seven-patch-auth-inputs",
+    "server": {
+      "artifact": {
+        "bytes": 190334300,
+        "id": 12975000396,
+        "sha256": "02dcbfd557d0ffed86f1f5284089345b3ecf679f1475bb2782aa8fe2721c00cd"
+      },
+      "integrationRevision": "870034ae997bbdba778770f0b1072821678cbf43",
+      "originalBuildId": "41019374697.1",
+      "packageReceipt": {
+        "bytes": 34652,
+        "sha256": "bb62ad200ac9be9b756616e351bf591508eedb7420f9fd39d5ea0544ae1cc548"
+      },
+      "programs": {
+        "authserver": {
+          "bytes": 1709864,
+          "sha256": "04cbda982ca1385903929eb46ca52b7cb41ca222e8a48f9898af716d2b878531"
+        },
+        "dbimport": {
+          "bytes": 1379920,
+          "sha256": "f452ef5c7ab90451e9060bdace1ba866a93da768145428b15ddc25a7e73b6c24"
+        },
+        "worldserver": {
+          "bytes": 59025784,
+          "sha256": "9757f0bbb2ee159d18070d8f5fe7ecdf5b4b8b7171116198039f418d5ec13aa1"
+        }
+      },
+      "runtimeArchive": {
+        "bytes": 21352885,
+        "sha256": "00bd0a5829caec2a2b11d4e85bd261b67461c04e6755bb332d37d393311c6ccb"
+      },
+      "serverSourceLock": {
+        "bytes": 2170,
+        "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+      },
+      "workflowRun": 41050050294
+    },
+    "thisTupleCompiledAuthQualified": false
+  },
+  "versionChecksumQualified": false,
+  "workflowJob": 124176021102,
+  "workflowPath": ".github/workflows/client-auth-candidate.yml",
+  "workflowRun": 41088546780,
+  "worldEntryQualified": false
+}

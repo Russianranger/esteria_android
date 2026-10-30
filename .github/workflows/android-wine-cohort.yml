@@ -1,0 +1,273 @@
+name: Coherent selected Wine cohort and qualified stock server ARM64 package
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - 'app/**'
+      - 'core/**'
+      - 'native/**'
+      - 'runtime/runtime-sources.lock.json'
+      - 'runtime/bridges/android-provider.lock.json'
+      - 'runtime/bridges/sources.lock.json'
+      - 'runtime/bridges/x11-runtime.lock.json'
+      - 'runtime/turnip/android-provider.lock.json'
+      - 'runtime/turnip/sources.lock.json'
+      - 'runtime/shaders/android-provider.lock.json'
+      - 'runtime/wine-cohort-publication/published-release.json'
+      - 'tools/verify_wine_cohort_apk.py'
+      - 'tools/plan_wine_cohort_adoption.py'
+      - 'tests/test_wine_cohort_apk.py'
+      - '.github/workflows/android-wine-cohort.yml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: coherent-selected-wine-stock-server-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  selection:
+    runs-on: ubuntu-24.04
+    outputs:
+      selected: ${{ steps.profile.outputs.selected }}
+      recipe: ${{ steps.profile.outputs.recipe }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - id: profile
+        name: Require atomic adopted profile and actual public cohort source readback
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json,re
+          from pathlib import Path
+          wine=json.loads(Path('runtime/runtime-sources.lock.json').read_bytes())['packages']['wine-arm64']
+          environment=wine.get('wineEnvironment',{})
+          assert type(environment) is dict and environment in ({},{'WINE_ANDROID_PRIVATE_PE_COPY':'1'})
+          selected=bool(environment)
+          print('selected='+str(selected).lower())
+          if selected:
+            from tools.plan_wine_cohort_adoption import plan
+            from tools.release_wine_cohort import ROOT,identity
+            value=plan()
+            assert all(row['identity']==identity(ROOT/name) for name,row in value['files'].items())
+            lock=json.loads(Path('runtime/wine-cohort-publication/dependency-release.lock.json').read_bytes())
+            proof=json.loads(Path('runtime/wine-cohort-publication/public-source-readback.json').read_bytes())
+            assert proof['actualPublicCohortAndEntireWineSourcesReadBack'] is True
+            assert proof['releaseSelection']==identity(Path('runtime/wine-cohort-publication/dependency-release.lock.json'))
+            assert re.fullmatch('[0-9a-f]{40}',lock['targetCommit'])
+            print('recipe='+lock['targetCommit'])
+          PY
+  package:
+    needs: selection
+    if: needs.selection.outputs.selected == 'true' && github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '17.0.13+11'
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ needs.selection.outputs.recipe }}
+          path: source-packaging
+          persist-credentials: false
+      - name: Validate strict cohort and stock provider contracts
+        run: |
+          mkdir -p out/coherent-evidence out/coherent-logs
+          python3 -m unittest tests.test_wine_cohort_apk tests.test_public_wine_cohort \
+            tests.test_server_provider_qualification tests.test_combined_android -v
+          python3 tools/fetch_sources.py client --output sources
+          git fetch --no-tags --depth 1 origin 75f50445112818c97f8d8e575d2b1c21e59af6e5
+          git fetch --no-tags --depth 1 origin 681b2e9f30b19e94bf8e8de44f67fedba5033c8a
+      - name: Acquire qualified complete stock server sources and debug pairs before other large inputs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/qualify_server_providers.py acquire --output "$RUNNER_TEMP/stock-inputs" \
+            > out/coherent-logs/stock-acquisition.log 2>&1
+          cp "$RUNNER_TEMP/stock-inputs/acquisition.json" out/coherent-evidence/stock-acquisition.json
+          python3 tools/qualify_server_providers.py build --inputs "$RUNNER_TEMP/stock-inputs" --output "$RUNNER_TEMP/stock-providers" \
+            > out/coherent-logs/stock-providers.log 2>&1
+          cp "$RUNNER_TEMP/stock-providers/provider-build.json" out/coherent-evidence/stock-provider-build.json
+          # Build verified all complete source/debug copies retained under providers.
+          rm -rf "$RUNNER_TEMP/stock-inputs"
+      - name: Read back the exact public cohort once and restore all four providers
+        run: |
+          python3 tools/fetch_wine_cohort.py \
+            --release-lock runtime/wine-cohort-publication/dependency-release.lock.json \
+            --publication-receipt runtime/wine-cohort-publication/published-release.json \
+            --packaging-source "$GITHUB_WORKSPACE/source-packaging" \
+            --output "$RUNNER_TEMP/cohort-inputs" --providers "$RUNNER_TEMP/cohort-providers" \
+            > out/coherent-evidence/public-cohort-consumer.json
+      - name: Read back the complete Wine source companion before subsequent packaging
+        run: |
+          python3 tools/fetch_wine_arm64_release.py \
+            --release-lock runtime/wine-arm64-publication/dependency-release.lock.json \
+            --publication-receipt runtime/wine-arm64-publication/published-release.json \
+            --output "$RUNNER_TEMP/coherent-wine-inputs" > out/coherent-evidence/public-wine-consumer.json
+          # Keep the unchanged complete original ZIP for the companion artifact.
+          # Only this already verified reproducible expanded input tree is removed.
+          rm -rf "$RUNNER_TEMP/coherent-wine-inputs/sources-export"
+      - name: Acquire the pinned public database dependency runtime once with its entire sources
+        run: |
+          env -u GITHUB_TOKEN python3 tools/release_server_dependencies.py prepare --output "$RUNNER_TEMP/server-release" \
+            > out/coherent-logs/server-dependencies.log 2>&1
+          python3 tools/provider_server_runtime.py build --package "$RUNNER_TEMP/server-release" --output "$RUNNER_TEMP/server-provider"
+      - name: Build pinned Bionic ARM64 PRoot and matching complete source companion
+        run: |
+          curl --fail --location --retry 2 --max-time 600 https://github.com/Russianranger/uo-android-launcher/releases/download/v0.2.0/runtime-corresponding-sources.tar.gz -o "$RUNNER_TEMP/proot-original-sources.tar.gz"
+          curl --fail --location --retry 2 --max-time 900 https://dl.google.com/android/repository/android-ndk-r28c-linux.zip -o "$RUNNER_TEMP/android-ndk-r28c-linux.zip"
+          python3 tools/build_android_proot.py --sources "$RUNNER_TEMP/proot-original-sources.tar.gz" --ndk-zip "$RUNNER_TEMP/android-ndk-r28c-linux.zip" --work "$RUNNER_TEMP/proot-build"
+          python3 tools/verify_android_proot.py --provider "$RUNNER_TEMP/proot-build/provider"
+      - name: Install pinned Android command-line tools and complete the already verified NDK
+        run: |
+          export ANDROID_HOME="$RUNNER_TEMP/esteria-combined-sdk"
+          mkdir -p "$ANDROID_HOME/cmdline-tools" "$ANDROID_HOME/ndk"
+          curl --fail --location --retry 3 --max-time 600 https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -o "$RUNNER_TEMP/android-commandline.zip"
+          echo '2d2d50857e4eb553af5a6dc3ad507a17adf43d115264b1afc116f95c92e5e258  '"$RUNNER_TEMP/android-commandline.zip" | sha256sum --check
+          unzip -q "$RUNNER_TEMP/android-commandline.zip" -d "$ANDROID_HOME/cmdline-tools"
+          mv "$ANDROID_HOME/cmdline-tools/cmdline-tools" "$ANDROID_HOME/cmdline-tools/12.0"
+          # The PRoot builder already verified the complete NDK ZIP hash. Fill
+          # missing CMake/build files without overwriting its compiler/runtime.
+          unzip -q -n "$RUNNER_TEMP/android-ndk-r28c-linux.zip" -d "$RUNNER_TEMP/proot-build/toolchain"
+          ln -s "$RUNNER_TEMP/proot-build/toolchain/android-ndk-r28c" "$ANDROID_HOME/ndk/28.2.13676358"
+          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "$ANDROID_HOME/cmdline-tools/12.0/bin" >> "$GITHUB_PATH"
+      - name: Install Android platform, build tools and CMake
+        run: |
+          (set +o pipefail; yes | sdkmanager --sdk_root="$ANDROID_HOME" --licenses >/dev/null)
+          sdkmanager --sdk_root="$ANDROID_HOME" 'platforms;android-35' 'build-tools;35.0.0' 'cmake;3.22.1'
+      - name: Clean profile, test core behavior, compile native ARM64 and lint combined app
+        run: |
+          set -o pipefail
+          sha256sum --check gradle/wrapper/SHA256SUMS
+          ./gradlew --no-daemon :app:clean :core:check :app:assembleDebug :app:assembleDebugAndroidTest :app:lintDebug \
+            -PsourceRevision="${GITHUB_SHA}" -PnativeRuntimeBridge=true -PnativeBridgeAbi=arm64-v8a \
+            -PprootProviderDir="$RUNNER_TEMP/proot-build/provider" \
+            -PserverRuntimeProviderDir="$RUNNER_TEMP/server-provider" \
+            -PguestBridgeProviderDir="$RUNNER_TEMP/cohort-providers/bridge-provider" \
+            -PclientRuntimeProviderDir="$RUNNER_TEMP/cohort-providers/client-provider" \
+            -PshaderToolsProviderDir="$RUNNER_TEMP/cohort-providers/shader-provider-verified" \
+            -PturnipProviderDir="$RUNNER_TEMP/cohort-providers/turnip-provider" \
+            -PserverProgramsProviderDir="$RUNNER_TEMP/stock-providers/programs" \
+            -PserverExtractorsProviderDir="$RUNNER_TEMP/stock-providers/extractors" \
+            -PserverContentProviderDir="$RUNNER_TEMP/stock-providers/content" \
+            -PclientRuntimeArtifact="$RUNNER_TEMP/cohort-inputs/release/client-original.zip" \
+            -PclientRuntimeSource="$GITHUB_WORKSPACE/sources/client" 2>&1 | tee out/coherent-logs/gradle.log
+      - name: Verify every provider helper native ABI and selected source profile in the actual APK
+        id: verified
+        run: |
+          python3 tools/verify_wine_cohort_apk.py \
+            --apk app/build/outputs/apk/debug/app-debug.apk \
+            --cohort-release "$RUNNER_TEMP/cohort-inputs/release" \
+            --release-lock runtime/wine-cohort-publication/dependency-release.lock.json \
+            --packaging-source "$GITHUB_WORKSPACE/source-packaging" \
+            --proot-provider "$RUNNER_TEMP/proot-build/provider" \
+            --proot-sources "$RUNNER_TEMP/proot-build/proot-corresponding-source.tar.gz" \
+            --ndk-archive "$RUNNER_TEMP/android-ndk-r28c-linux.zip" \
+            --server-providers "$RUNNER_TEMP/stock-providers" --dependency-provider "$RUNNER_TEMP/server-provider" \
+            --output out/coherent-evidence/coherent-apk.json
+          git archive --format=tar.gz --output="$RUNNER_TEMP/coherent-integration-source.tar.gz" "$GITHUB_SHA"
+      - name: Retain the exact internally coherent APK and complete source selection proof
+        if: steps.verified.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: unqualified-coherent-wine-stock-arm64-${{ github.sha }}
+          path: |
+            app/build/outputs/apk/debug/app-debug.apk
+            app/build/outputs/apk/androidTest/debug/*.apk
+            out/coherent-evidence/
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+      - name: Retain complete provider cohort source companions and original inputs unchanged
+        if: steps.verified.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: coherent-wine-cohort-originals-${{ github.sha }}
+          path: ${{ runner.temp }}/cohort-inputs/
+          include-hidden-files: true
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+      - name: Retain entire original Wine corresponding-source ZIP separately
+        if: steps.verified.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: coherent-wine-full-original-sources-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/coherent-wine-inputs/sources.zip
+            ${{ runner.temp }}/coherent-wine-inputs/input-evidence.json
+            ${{ runner.temp }}/coherent-wine-inputs/publication/
+          include-hidden-files: true
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+      - name: Retain complete database dependency source companion
+        if: steps.verified.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: coherent-server-dependency-sources-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/server-release/server-runtime-corresponding-sources.zip
+            ${{ runner.temp }}/server-release/server-runtime-source-manifest.json
+            ${{ runner.temp }}/server-release/release-manifest.json
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+      - name: Retain complete server program sources and paired debug outside APK assets
+        if: steps.verified.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: coherent-stock-program-source-debug-${{ github.sha }}
+          path: ${{ runner.temp }}/stock-providers/programs/sources/
+          include-hidden-files: true
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+      - name: Retain complete stock extractor sources and paired debug outside APK assets
+        if: steps.verified.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: coherent-stock-extractors-source-debug-${{ github.sha }}
+          path: ${{ runner.temp }}/stock-providers/extractors/sources/
+          include-hidden-files: true
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+      - name: Retain original PRoot source and exact current integration source
+        if: steps.verified.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: coherent-integration-proot-sources-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/proot-build/proot-corresponding-source.tar.gz
+            ${{ runner.temp }}/coherent-integration-source.tar.gz
+            ${{ runner.temp }}/proot-build/build-evidence.json
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+      - name: Preserve bounded diagnostics after success or failure
+        if: always()
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          target=Path('out/coherent-evidence');target.mkdir(parents=True,exist_ok=True)
+          for path in Path('out/coherent-logs').glob('*.log'):
+            with path.open('rb') as stream:
+              stream.seek(max(0,path.stat().st_size-256*1024))
+              (target/(path.stem+'-tail.log')).write_bytes(stream.read(256*1024))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: coherent-wine-stock-evidence-${{ github.sha }}
+          path: out/coherent-evidence/
+          retention-days: 30
+          if-no-files-found: warn

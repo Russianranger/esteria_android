@@ -48,7 +48,23 @@ HELPER_SETS = {'database-setup': ('mysql_bootstrap.py', 'android_database_setup.
                     'provision_local_account.py', 'server/appearance-schema-v1.sql', 'server/appearance-schema.lock.json',
                     'local-server.json'),
                'server-data': ('server_data_generation.py', 'server_data_preflight.py', 'shader_generation.py',
-                    'extractor_order.py', 'owned_process_group.py')}
+                    'extractor_order.py', 'owned_process_group.py'),
+               'server-session': ('server_session.py', 'server_session_process.py', 'android_server_schema_setup.py',
+                    'mysql_bootstrap.py', 'mysql_service.py', 'server_content.py', 'server_schema_setup.py',
+                    'server_schema_baseline.py', 'server_schema_adaptations.py', 'server_update_setup.py', 'server_updater.py',
+                    'server_playerbots_setup.py', 'owned_process_group.py', 'server_config.py', 'provision_local_realm.py',
+                    'provision_local_account.py', 'server_data_generation.py', 'server_data_preflight.py', 'shader_generation.py',
+                    'extractor_order.py', 'server/appearance-schema-v1.sql', 'server/appearance-schema.lock.json', 'local-server.json')}
+
+
+def selected_client_runtime_options():
+    """Preserve historical default receipts; select the adapted runtime explicitly."""
+    path = ROOT / 'runtime/runtime-sources.lock.json'
+    selected = json.loads(client.small(path))['packages']['wine-arm64']
+    environment = selected.get('wineEnvironment', {})
+    require(type(environment) is dict and environment in ({}, {'WINE_ANDROID_PRIVATE_PE_COPY': '1'}),
+            'combined-unsupported-wine-environment-profile')
+    return {'runtime_lock': path} if environment else {}
 
 
 def ndk_notices(path):
@@ -75,7 +91,7 @@ def verify_ndk_notices(archive, expected):
 
 def helper_source_path(directory, name):
     require(directory in HELPER_SETS and name in HELPER_SETS[directory], 'combined-unknown-helper-source')
-    return 'config/local-server.json' if (directory, name) == ('server-installation', 'local-server.json') else 'runtime/' + name
+    return 'config/local-server.json' if directory in ('server-installation', 'server-session') and name == 'local-server.json' else 'runtime/' + name
 
 
 def verify_helpers(archive):
@@ -258,7 +274,8 @@ def seal(args):
     source_proof = proot_sources(args.proot_sources, args.proot_provider)
     checks = dict(proot=proot.verify(args.proot_provider, args.apk), server=server.verify(args.server_provider, args.apk),
                   guest=guest.verify(args.guest_provider, args.apk),
-                  client=client.run(args.client_release / client_release.ARTIFACT, args.client_source, args.client_provider, True, args.apk))
+                  client=client.run(args.client_release / client_release.ARTIFACT, args.client_source, args.client_provider, True, args.apk,
+                                    **selected_client_runtime_options()))
     notices = ndk_notices(args.ndk_archive)
     native = apk_inventory(args.apk, notices)
     client.archives.directory(args.output.parent, create=True)

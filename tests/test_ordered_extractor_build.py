@@ -88,5 +88,27 @@ class OrderedBuildGuards(unittest.TestCase):
             with self.subTest(cache=changed),self.assertRaisesRegex(ValueError,'launcher-enabled-or-absent'):
                 build.compiler_launchers(cache)
 
+    def test_native_observation_requires_two_links_bound_to_measured_programs(self):
+        programs={name:dict(identity(name.encode()),elf={'machine':183}) for name in build.TARGETS}
+        commands=identity(b'compile commands')
+        receipt=dict(objectElfMachines=[183],observedObjects=210,dependenciesNotNewerThanObject=True,
+                     compileCommands=commands,observedLinks=2,linkElfMachines=[183],
+                     linkDependenciesNotNewerThanOutput=True,linkInputsCopied=False,systemLinkSourcesCopied=False)
+        observation=dict(links={'bin/'+name:dict(identity=identity(name.encode()),elfMachine=183,elfType='DYN')
+                                for name in build.TARGETS})
+        build.verify_native_observation(receipt,observation,programs,commands)
+        for key,value in (('observedLinks',1),('linkElfMachines',[62]),
+                          ('linkDependenciesNotNewerThanOutput',False),('linkInputsCopied',True),
+                          ('systemLinkSourcesCopied',True)):
+            changed=dict(receipt,**{key:value})
+            with self.subTest(field=key),self.assertRaisesRegex(ValueError,'native-link-observation'):
+                build.verify_native_observation(changed,observation,programs,commands)
+        changed=copy.deepcopy(observation);changed['links']['bin/map_extractor']['identity']=identity(b'other program')
+        with self.assertRaisesRegex(ValueError,'final-link-output-differs'):
+            build.verify_native_observation(receipt,changed,programs,commands)
+        changed=copy.deepcopy(observation);changed['links']['bin/unknown']=changed['links'].pop('bin/map_extractor')
+        with self.assertRaisesRegex(ValueError,'native-link-observation'):
+            build.verify_native_observation(receipt,changed,programs,commands)
+
 
 if __name__=='__main__':unittest.main()

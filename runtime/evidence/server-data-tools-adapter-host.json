@@ -1,0 +1,16 @@
+{
+  "formatVersion": 1,
+  "scope": "host-gated-data-tools-adapter-and-canonical-selection",
+  "canonicalPythonFixture": {
+    "bytes": 949,
+    "sha256": "f12f3d0027e0cd5b6974a92e4be92be16b3216501b8fbeb925736f950263ffaf"
+  },
+  "javaCanonicalSelectionAndRejectionChecksPassed": true,
+  "defaultAndroidJavacAndLintPassed": true,
+  "sourceQualifiedProviderCreated": false,
+  "positiveArchiveOrNativeCliQualified": false,
+  "androidGuestExecuted": false,
+  "dataConversionExecuted": false,
+  "worldQualified": false,
+  "gameplayQualified": false
+}

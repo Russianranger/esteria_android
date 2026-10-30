@@ -1,0 +1,820 @@
+{
+  "actualQualification": {
+    "androidRuntimeQualified": false,
+    "authserverExecuted": false,
+    "botCharactersCreated": false,
+    "cleanShutdownVerified": true,
+    "compiledModules": {
+      "bytes": 5348,
+      "sha256": "6459b6a1acab2c62c474e4c6ab3eb651daa21f697ccd628e93a38bad298bbdd1"
+    },
+    "compilerExecuted": false,
+    "completeSetupQualified": false,
+    "completedFinishReentry": {
+      "androidRuntimeQualified": false,
+      "authserverExecuted": false,
+      "baselineComplete": true,
+      "botCharactersCreated": false,
+      "compiledPlayerbotsLoaderExecuted": false,
+      "compiledUpdaterCompleted": true,
+      "compiledUpdaterExecuted": false,
+      "compiledUpdaterJournal": {
+        "bytes": 5770,
+        "sha256": "2f5e5c6199475953dd756d82b898b2396db91b96c28a2da6467f84db0c1db60c"
+      },
+      "completeSetupQualified": false,
+      "databaseServiceStarted": false,
+      "databaseServiceStopped": false,
+      "engineStopped": false,
+      "formatVersion": 1,
+      "fourSchemasVerified": true,
+      "gameplayQualified": false,
+      "localAccountVerified": true,
+      "localRealmVerified": true,
+      "mysqlUuid": "570af1ac-d47d-11f1-b4fd-73af135058cb",
+      "mysqlVersion": "8.0.46-0ubuntu0.24.04.4",
+      "ownedServiceIdentityVerified": true,
+      "pendingComponents": [
+        "owned-clean-engine-stop"
+      ],
+      "playerbotsAiQualified": false,
+      "playerbotsFinishJournal": {
+        "bytes": 4211,
+        "sha256": "08964a260dbe288714cb4714a78721b88ad12e5c3c7c642efe0b093db1f00d71"
+      },
+      "playerbotsSchemaJournal": {
+        "bytes": 5463,
+        "sha256": "4789b8b042d9562ae32594d2dc17226cf4a0cdde5c0d974f66b95c999b10042a"
+      },
+      "playerbotsSchemaVerified": true,
+      "sameRevisionReentryVerified": true,
+      "scope": "owned-server-installation-four-schemas-verified",
+      "serverDataQualified": false,
+      "slotPromoted": false,
+      "sourceBaselineJournal": {
+        "bytes": 55822,
+        "sha256": "cf62bb0d52b21d01a9da665eb6a6773f37f615f3cfef6394ace17c2562fd190f"
+      },
+      "sourceLedgersVerified": true,
+      "stagedInstallationReceipt": {
+        "bytes": 2071,
+        "sha256": "3932f8e95222d70011e9c8f13cc14a342e3e4fa7e479cd8a3bb126208d5aea39"
+      },
+      "worldserverExecuted": false
+    },
+    "completedFinishReentryWithoutExecution": true,
+    "contentReceipt": {
+      "bytes": 1343739,
+      "sha256": "1c00990e090e85af0232fe633b64e2718071a5f8e81f3b0ca1c8f2b214ffb3af"
+    },
+    "engineDerivative": {
+      "androidRuntimeQualified": false,
+      "debugArchiveIdentified": {
+        "bytes": 1082880246,
+        "sha256": "facc75680f3fb1b205a98960d6ea5a0d565cb2a2b4bd56303dd6625fd4854a24"
+      },
+      "debugArchiveReadBackHere": false,
+      "formatVersion": 1,
+      "gameplayQualified": false,
+      "originalBuild": {
+        "bytes": 32521,
+        "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+      },
+      "originalModules": {
+        "bytes": 5348,
+        "sha256": "6459b6a1acab2c62c474e4c6ab3eb651daa21f697ccd628e93a38bad298bbdd1"
+      },
+      "originalReceiptsUnchanged": true,
+      "packageReceipt": {
+        "bytes": 34652,
+        "sha256": "bb62ad200ac9be9b756616e351bf591508eedb7420f9fd39d5ea0544ae1cc548"
+      },
+      "programs": {
+        "authserver": {
+          "bytes": 1709864,
+          "sha256": "04cbda982ca1385903929eb46ca52b7cb41ca222e8a48f9898af716d2b878531"
+        },
+        "dbimport": {
+          "bytes": 1379920,
+          "sha256": "f452ef5c7ab90451e9060bdace1ba866a93da768145428b15ddc25a7e73b6c24"
+        },
+        "worldserver": {
+          "bytes": 59025784,
+          "sha256": "9757f0bbb2ee159d18070d8f5fe7ecdf5b4b8b7171116198039f418d5ec13aa1"
+        }
+      },
+      "runtimeArchive": {
+        "bytes": 21352885,
+        "sha256": "00bd0a5829caec2a2b11d4e85bd261b67461c04e6755bb332d37d393311c6ccb"
+      },
+      "scope": "verified-engine-derivative-program-selection",
+      "serverExecuted": false,
+      "sourceCompanionComplete": false
+    },
+    "existingStateModified": false,
+    "finalStoppedReceipt": {
+      "characterPersistenceQualified": false,
+      "cleanEngineExit": true,
+      "dataRemoved": false,
+      "engineStarted": true,
+      "formatVersion": 1,
+      "gameplayQualified": false,
+      "operationId": "649d3e635e8a776fca3a31a02ee69889",
+      "readyBeforeStop": true,
+      "receiptIdentity": {
+        "bytes": 410,
+        "sha256": "963bd3f15613e88f490ebf075857cce13301799e6e0e7606ea97c20f8bdbc576"
+      },
+      "scope": "owned-local-mysql-stopped",
+      "stopReason": "command",
+      "uuid": "570af1ac-d47d-11f1-b4fd-73af135058cb",
+      "version": "8.0.46-0ubuntu0.24.04.4"
+    },
+    "firstReadyReceipt": {
+      "applicationSchemaUpdatesQualified": false,
+      "bindAddress": "127.0.0.1",
+      "formatVersion": 1,
+      "gameplayQualified": false,
+      "liveSqlAuthenticated": true,
+      "operationId": "172c2aab006fef3ded264e80646375d0",
+      "ownedEngineIdentityVerified": true,
+      "port": 13306,
+      "receiptIdentity": {
+        "bytes": 591,
+        "sha256": "020ec638ecbdf9c0d5a32b732d6d676c92b6b7b97b40794598fc8dc2789f6981"
+      },
+      "scope": "owned-local-mysql-live-service",
+      "uuid": "570af1ac-d47d-11f1-b4fd-73af135058cb",
+      "version": "8.0.46-0ubuntu0.24.04.4"
+    },
+    "firstStoppedReceipt": {
+      "characterPersistenceQualified": false,
+      "cleanEngineExit": true,
+      "dataRemoved": false,
+      "engineStarted": true,
+      "formatVersion": 1,
+      "gameplayQualified": false,
+      "operationId": "172c2aab006fef3ded264e80646375d0",
+      "readyBeforeStop": true,
+      "receiptIdentity": {
+        "bytes": 410,
+        "sha256": "b5106552ef04ee4a2bece65271db45e8e14ed96e80e3039600a25b3ad2f53873"
+      },
+      "scope": "owned-local-mysql-stopped",
+      "stopReason": "command",
+      "uuid": "570af1ac-d47d-11f1-b4fd-73af135058cb",
+      "version": "8.0.46-0ubuntu0.24.04.4"
+    },
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "helperBuildReceipt": {
+      "bytes": 32008,
+      "sha256": "82b9c7c852164f303500214e044f07bf5eb389fa2f3f03b9f6cdc962a5bba602"
+    },
+    "helperExecutable": {
+      "bytes": 25188512,
+      "sha256": "b7d9b72c17f32294915f0a474283c543057ffb7de7b3f93015c2e7e179bfcf25"
+    },
+    "helperNativeReceipt": {
+      "bytes": 37703,
+      "sha256": "56288b2ea7046fa256bdd53113701bd59236d5d8403a3a16f32b5fcf0ab53c42"
+    },
+    "initializedNewInstance": true,
+    "inputLock": {
+      "bytes": 1357,
+      "sha256": "97a954c672194afd83f6aa4d4dd352ec454a19f43e552b98c6c0b86c49a101a0"
+    },
+    "javaCoordinatorExecuted": false,
+    "mysqlUuid": "570af1ac-d47d-11f1-b4fd-73af135058cb",
+    "mysqlVersion": "8.0.46-0ubuntu0.24.04.4",
+    "nativeSqlSetupReceipt": {
+      "androidRuntimeQualified": false,
+      "authserverExecuted": false,
+      "baselineComplete": true,
+      "botCharactersCreated": false,
+      "cleanEngineStopped": true,
+      "compiledPlayerbotsLoaderExecuted": false,
+      "compiledUpdaterCompleted": true,
+      "compiledUpdaterExecuted": false,
+      "compiledUpdaterJournal": {
+        "bytes": 5770,
+        "sha256": "2f5e5c6199475953dd756d82b898b2396db91b96c28a2da6467f84db0c1db60c"
+      },
+      "completeSetupQualified": true,
+      "databaseServiceStarted": false,
+      "databaseServiceStopped": true,
+      "databaseSnapshots": {
+        "auth": {
+          "ledgerRows": 25,
+          "ledgerSha256": "3af02abd4a9dc23a1338585d17b4b5dd56e230d27940f15bbafbb98edb8a223f",
+          "sourceUpdateNamesVerified": 25,
+          "tableCount": 23,
+          "tablesSha256": "fa7f8d310a546dc1178ab89cb683cd015a946e19bab238412d13bb3ab4d98672"
+        },
+        "characters": {
+          "ledgerRows": 105,
+          "ledgerSha256": "e3dbbeeec065f81e95ad61abd6ed875abba89582fe4f9906c78ad7268a9541ba",
+          "sourceUpdateNamesVerified": 105,
+          "tableCount": 176,
+          "tablesSha256": "72880eba1be47d33f088f36b0e6526bbe04d321f1b24c4a03e50fea21aa4d1da"
+        },
+        "world": {
+          "ledgerRows": 3340,
+          "ledgerSha256": "86cbb8ed2462d9da9bc7f0737c2e56ece4ac27c771c533ded0c1fe4ce12ee9a7",
+          "sourceUpdateNamesVerified": 3340,
+          "tableCount": 372,
+          "tablesSha256": "ac80a18647a08114bc05f034633269b055916c2fb34e5c825c954e47b428d91c"
+        }
+      },
+      "engineStopped": true,
+      "formatVersion": 1,
+      "fourSchemaReceipt": {
+        "bytes": 6167,
+        "sha256": "de5a99a6b5c49443bad49b080044da05702893b37a7dc4160761e973a28bb04a"
+      },
+      "fourSchemasVerified": true,
+      "gameplayQualified": false,
+      "localAccountReceipt": {
+        "bytes": 1205,
+        "sha256": "8b2470939f2cc8ae4e575453f966459cbfa5a26cca04e18e7b07a80e280192f0"
+      },
+      "localAccountVerified": true,
+      "localRealmReceipt": {
+        "bytes": 1193,
+        "sha256": "0e8c00e1b27e710caabcec78a7f4d23174f0478d1066551cb7884250972e1ce4"
+      },
+      "localRealmVerified": true,
+      "mysqlUuid": "570af1ac-d47d-11f1-b4fd-73af135058cb",
+      "mysqlVersion": "8.0.46-0ubuntu0.24.04.4",
+      "ownedServiceIdentityVerified": true,
+      "pendingComponents": [],
+      "playerbotsAiQualified": false,
+      "playerbotsDatabaseSnapshot": {
+        "columnsSha256": "e914cef750e150f575e6c683b0dd3a0f91869341e38c889e26f7c7a0c4342e00",
+        "indexesSha256": "9e39bbd79a2e4a5bb05b52ab6b4761c0f44984bbb4c07bb0d98d2276a34218e0",
+        "ledgerSha256": "fe400294ff9831a0203e17d8d4673bf37cf0f9de8c2aa87ce758ce66b4a10149",
+        "tableCount": 30,
+        "tablesSha256": "4547f71f47e5b41415e3ce9fcfe1c9508f2aea1adebb80aca0382e200644fafa",
+        "updateCount": 31
+      },
+      "playerbotsFinishJournal": {
+        "bytes": 4211,
+        "sha256": "08964a260dbe288714cb4714a78721b88ad12e5c3c7c642efe0b093db1f00d71"
+      },
+      "playerbotsSchemaJournal": {
+        "bytes": 5463,
+        "sha256": "4789b8b042d9562ae32594d2dc17226cf4a0cdde5c0d974f66b95c999b10042a"
+      },
+      "playerbotsSchemaVerified": true,
+      "sameRevisionReentryVerified": true,
+      "scope": "owned-server-installation-four-schemas-cleanly-stopped",
+      "serverDataQualified": false,
+      "serviceOperationId": "649d3e635e8a776fca3a31a02ee69889",
+      "slotPromoted": false,
+      "sourceBaselineJournal": {
+        "bytes": 55822,
+        "sha256": "cf62bb0d52b21d01a9da665eb6a6773f37f615f3cfef6394ace17c2562fd190f"
+      },
+      "sourceLedgersVerified": true,
+      "stagedInstallationReceipt": {
+        "bytes": 2071,
+        "sha256": "3932f8e95222d70011e9c8f13cc14a342e3e4fa7e479cd8a3bb126208d5aea39"
+      },
+      "stoppedReceipt": {
+        "bytes": 410,
+        "sha256": "963bd3f15613e88f490ebf075857cce13301799e6e0e7606ea97c20f8bdbc576"
+      },
+      "worldserverExecuted": false
+    },
+    "nativeSqlSetupReceiptIdentity": {
+      "bytes": 6484,
+      "sha256": "fcb9a9c11106b9d69b85af2ee07b7efd271c511939c11202c81ed57eec08417a"
+    },
+    "nativeSqlSetupReceiptVerified": true,
+    "nestedDataDirectoryConfigurationVerified": true,
+    "originalBuild": {
+      "bytes": 32521,
+      "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+    },
+    "phase": "complete",
+    "playerbotsAiQualified": false,
+    "playerbotsFirstFinish": {
+      "androidRuntimeQualified": false,
+      "authserverExecuted": false,
+      "baselineComplete": true,
+      "botCharactersCreated": false,
+      "compiledPlayerbotsLoaderExecuted": true,
+      "compiledUpdaterCompleted": true,
+      "compiledUpdaterExecuted": false,
+      "compiledUpdaterJournal": {
+        "bytes": 5770,
+        "sha256": "2f5e5c6199475953dd756d82b898b2396db91b96c28a2da6467f84db0c1db60c"
+      },
+      "completeSetupQualified": false,
+      "databaseServiceStarted": false,
+      "databaseServiceStopped": false,
+      "databaseSnapshots": {
+        "auth": {
+          "ledgerRows": 25,
+          "ledgerSha256": "3af02abd4a9dc23a1338585d17b4b5dd56e230d27940f15bbafbb98edb8a223f",
+          "sourceUpdateNamesVerified": 25,
+          "tableCount": 23,
+          "tablesSha256": "fa7f8d310a546dc1178ab89cb683cd015a946e19bab238412d13bb3ab4d98672"
+        },
+        "characters": {
+          "ledgerRows": 105,
+          "ledgerSha256": "e3dbbeeec065f81e95ad61abd6ed875abba89582fe4f9906c78ad7268a9541ba",
+          "sourceUpdateNamesVerified": 105,
+          "tableCount": 176,
+          "tablesSha256": "72880eba1be47d33f088f36b0e6526bbe04d321f1b24c4a03e50fea21aa4d1da"
+        },
+        "world": {
+          "ledgerRows": 3340,
+          "ledgerSha256": "86cbb8ed2462d9da9bc7f0737c2e56ece4ac27c771c533ded0c1fe4ce12ee9a7",
+          "sourceUpdateNamesVerified": 3340,
+          "tableCount": 372,
+          "tablesSha256": "ac80a18647a08114bc05f034633269b055916c2fb34e5c825c954e47b428d91c"
+        }
+      },
+      "engineStopped": false,
+      "formatVersion": 1,
+      "fourSchemasVerified": true,
+      "gameplayQualified": false,
+      "localAccountReceipt": {
+        "bytes": 1205,
+        "sha256": "8b2470939f2cc8ae4e575453f966459cbfa5a26cca04e18e7b07a80e280192f0"
+      },
+      "localAccountVerified": true,
+      "localRealmReceipt": {
+        "bytes": 1193,
+        "sha256": "0e8c00e1b27e710caabcec78a7f4d23174f0478d1066551cb7884250972e1ce4"
+      },
+      "localRealmVerified": true,
+      "mysqlUuid": "570af1ac-d47d-11f1-b4fd-73af135058cb",
+      "mysqlVersion": "8.0.46-0ubuntu0.24.04.4",
+      "ownedServiceIdentityVerified": true,
+      "pendingComponents": [
+        "owned-clean-engine-stop"
+      ],
+      "playerbotsAiQualified": false,
+      "playerbotsDatabaseSnapshot": {
+        "columnsSha256": "e914cef750e150f575e6c683b0dd3a0f91869341e38c889e26f7c7a0c4342e00",
+        "indexesSha256": "9e39bbd79a2e4a5bb05b52ab6b4761c0f44984bbb4c07bb0d98d2276a34218e0",
+        "ledgerSha256": "fe400294ff9831a0203e17d8d4673bf37cf0f9de8c2aa87ce758ce66b4a10149",
+        "tableCount": 30,
+        "tablesSha256": "4547f71f47e5b41415e3ce9fcfe1c9508f2aea1adebb80aca0382e200644fafa",
+        "updateCount": 31
+      },
+      "playerbotsFinishJournal": {
+        "bytes": 4211,
+        "sha256": "08964a260dbe288714cb4714a78721b88ad12e5c3c7c642efe0b093db1f00d71"
+      },
+      "playerbotsSchemaJournal": {
+        "bytes": 5463,
+        "sha256": "4789b8b042d9562ae32594d2dc17226cf4a0cdde5c0d974f66b95c999b10042a"
+      },
+      "playerbotsSchemaVerified": true,
+      "sameRevisionReentryVerified": true,
+      "scope": "owned-server-installation-four-schemas-verified",
+      "serverDataQualified": false,
+      "slotPromoted": false,
+      "sourceBaselineJournal": {
+        "bytes": 55822,
+        "sha256": "cf62bb0d52b21d01a9da665eb6a6773f37f615f3cfef6394ace17c2562fd190f"
+      },
+      "sourceLedgersVerified": true,
+      "stagedInstallationReceipt": {
+        "bytes": 2071,
+        "sha256": "3932f8e95222d70011e9c8f13cc14a342e3e4fa7e479cd8a3bb126208d5aea39"
+      },
+      "worldserverExecuted": false
+    },
+    "productionCoreComposition": {
+      "androidRuntimeQualified": false,
+      "authserverExecuted": false,
+      "baselineComplete": true,
+      "compiledUpdaterCompleted": true,
+      "compiledUpdaterJournal": {
+        "bytes": 5770,
+        "sha256": "2f5e5c6199475953dd756d82b898b2396db91b96c28a2da6467f84db0c1db60c"
+      },
+      "completeSetupQualified": false,
+      "contentFilesVerified": 4063,
+      "databaseServiceStarted": false,
+      "databaseServiceStopped": false,
+      "formatVersion": 1,
+      "gameplayQualified": false,
+      "localAccountReceipt": {
+        "bytes": 1205,
+        "sha256": "0abf351772f2cdd07618f9d777a2dee9e29b3ae77b9d34b9b4dee48630311a15"
+      },
+      "localAccountVerified": true,
+      "localRealmReceipt": {
+        "bytes": 1193,
+        "sha256": "bee4e8aa29ff4ddddbf051d47b15135b0dc6ee6339b5e6669af8623fb9130bb0"
+      },
+      "localRealmVerified": true,
+      "mysqlUuid": "570af1ac-d47d-11f1-b4fd-73af135058cb",
+      "mysqlVersion": "8.0.46-0ubuntu0.24.04.4",
+      "ownedServiceIdentityVerified": true,
+      "pendingComponents": [
+        "playerbots-schema"
+      ],
+      "playerbotsSchemaVerified": false,
+      "sameRevisionReentryVerified": true,
+      "scope": "owned-server-installation-staged-pending-playerbots",
+      "serverDataQualified": false,
+      "slotPromoted": false,
+      "sourceBaselineJournal": {
+        "bytes": 55822,
+        "sha256": "cf62bb0d52b21d01a9da665eb6a6773f37f615f3cfef6394ace17c2562fd190f"
+      },
+      "sourceLedgersVerified": true,
+      "worldserverExecuted": false
+    },
+    "productionCoreCompositionCompleted": true,
+    "productionFinishPlayerbotsExecuted": true,
+    "productionReadyAndStoppedAcknowledgmentsVerified": true,
+    "qualificationSucceeded": true,
+    "registeredCandidate": {
+      "artifact": {
+        "bytes": 40130109,
+        "id": 12990195617,
+        "sha256": "73952c331659db612669b16c6221ac58195da35bd802b69fdaffa312eca6b7b5"
+      },
+      "candidatePin": {
+        "bytes": 13654,
+        "sha256": "602e7d0da21baf6549272c7aab8c9d8d2ad87c83f601ce487d16d02b4ac6b757"
+      },
+      "producer": {
+        "integrationRevision": "eb11d0719032bd9dc40498bfdb4888fd3162bc35",
+        "workflowRun": 41081216973
+      }
+    },
+    "restartPersistenceVerified": true,
+    "restartedFinishReentry": {
+      "androidRuntimeQualified": false,
+      "authserverExecuted": false,
+      "baselineComplete": true,
+      "botCharactersCreated": false,
+      "compiledPlayerbotsLoaderExecuted": false,
+      "compiledUpdaterCompleted": true,
+      "compiledUpdaterExecuted": false,
+      "compiledUpdaterJournal": {
+        "bytes": 5770,
+        "sha256": "2f5e5c6199475953dd756d82b898b2396db91b96c28a2da6467f84db0c1db60c"
+      },
+      "completeSetupQualified": false,
+      "databaseServiceStarted": false,
+      "databaseServiceStopped": false,
+      "engineStopped": false,
+      "formatVersion": 1,
+      "fourSchemasVerified": true,
+      "gameplayQualified": false,
+      "localAccountVerified": true,
+      "localRealmVerified": true,
+      "mysqlUuid": "570af1ac-d47d-11f1-b4fd-73af135058cb",
+      "mysqlVersion": "8.0.46-0ubuntu0.24.04.4",
+      "ownedServiceIdentityVerified": true,
+      "pendingComponents": [
+        "owned-clean-engine-stop"
+      ],
+      "playerbotsAiQualified": false,
+      "playerbotsFinishJournal": {
+        "bytes": 4211,
+        "sha256": "08964a260dbe288714cb4714a78721b88ad12e5c3c7c642efe0b093db1f00d71"
+      },
+      "playerbotsSchemaJournal": {
+        "bytes": 5463,
+        "sha256": "4789b8b042d9562ae32594d2dc17226cf4a0cdde5c0d974f66b95c999b10042a"
+      },
+      "playerbotsSchemaVerified": true,
+      "sameRevisionReentryVerified": true,
+      "scope": "owned-server-installation-four-schemas-verified",
+      "serverDataQualified": false,
+      "slotPromoted": false,
+      "sourceBaselineJournal": {
+        "bytes": 55822,
+        "sha256": "cf62bb0d52b21d01a9da665eb6a6773f37f615f3cfef6394ace17c2562fd190f"
+      },
+      "sourceLedgersVerified": true,
+      "stagedInstallationReceipt": {
+        "bytes": 2071,
+        "sha256": "3932f8e95222d70011e9c8f13cc14a342e3e4fa7e479cd8a3bb126208d5aea39"
+      },
+      "worldserverExecuted": false
+    },
+    "restartedFinishReentryWithoutExecution": true,
+    "restartedReadyReceipt": {
+      "applicationSchemaUpdatesQualified": false,
+      "bindAddress": "127.0.0.1",
+      "formatVersion": 1,
+      "gameplayQualified": false,
+      "liveSqlAuthenticated": true,
+      "operationId": "649d3e635e8a776fca3a31a02ee69889",
+      "ownedEngineIdentityVerified": true,
+      "port": 13306,
+      "receiptIdentity": {
+        "bytes": 591,
+        "sha256": "0dca895ec3e467ebebd402dcf94a6f3b823371bab1e691ff5f4c28c6ab1ec336"
+      },
+      "scope": "owned-local-mysql-live-service",
+      "uuid": "570af1ac-d47d-11f1-b4fd-73af135058cb",
+      "version": "8.0.46-0ubuntu0.24.04.4"
+    },
+    "scope": "disposable-native-arm64-owned-installation-finish-and-stop",
+    "serverDataQualified": false,
+    "slotPromoted": false,
+    "source": {
+      "branch": "main",
+      "commit": "f35f04d01689f034778e3474b3c820092f51e461",
+      "patches": [
+        {
+          "path": "patches/server/0001-eluna-declare-area-trigger.patch",
+          "sha256": "c26b145188c5f97bf30d032e1fe3bd7fe17aa1f8f0daa6793e51f5d830fe7aa6",
+          "submodule": "src/server/game/LuaEngine"
+        },
+        {
+          "path": "patches/server/0002-eluna-include-map-manager.patch",
+          "sha256": "4e277dbe56c31ae30640c8e9ad4dee12e944e0f051d9bdc8d62aaa239c50433f",
+          "submodule": "src/server/game/LuaEngine"
+        },
+        {
+          "path": "patches/server/0003-eluna-hooks-include-types.patch",
+          "sha256": "5999402d985fcc709abdc90bb4272072d1d5e3e261b2cc7ec19460320c14295f",
+          "submodule": "src/server/game/LuaEngine"
+        },
+        {
+          "path": "patches/server/0004-attunement-stat-api.patch",
+          "sha256": "d9ef6ca8f96ab186c37c072b22143cdded9976aa3a62d083f893c502a5745cb8"
+        },
+        {
+          "path": "patches/server/0005-script-grid-templates.patch",
+          "sha256": "6b459c90839e7831df8533966442fabd476ae1773f0302c50ccc8a997f157369"
+        },
+        {
+          "path": "patches/server/0006-empty-script-modules.patch",
+          "sha256": "ea0beb357c71d8b8c187af9d4afede520e7ac9877e40fbdc5fab99d54fc21f97"
+        },
+        {
+          "path": "patches/server/0007-runtime-module-config-directory.patch",
+          "sha256": "5e41d474179ef553ec9c2544de947a3724885fd7f3ac233af3d89797acd032ff"
+        }
+      ],
+      "submodules": {
+        "src/server/game/LuaEngine": "58d7652138887783228b9727bd1fa4e08f00342b"
+      },
+      "url": "https://github.com/Russianranger/EsteriaWoW.git"
+    },
+    "sourceLockSha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1",
+    "sourcePrivateJournalsAccountCredentialsPreserved": true,
+    "worldserverExecuted": false
+  },
+  "androidRuntimeQualified": false,
+  "archivedServerBuildSourceLock": {
+    "bytes": 2170,
+    "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+  },
+  "artifact": {
+    "bytes": 12414,
+    "id": 12993061348,
+    "name": "server-installation-native-evidence-1d35f1bd3faaf39d78cef28de4e905d2c0034059",
+    "sha256": "9586c70c0f7136ae8007239b641116f5ce19fae62805e3bf1be6a8dc170b0817"
+  },
+  "authserverExecuted": false,
+  "botCharactersCreated": false,
+  "compilerExecuted": false,
+  "completeSetupQualified": false,
+  "dependencyImageReadback": {
+    "actualImageMetadataAndElfHashesVerified": true,
+    "androidRuntimeQualified": false,
+    "components": {
+      "mysql": {
+        "bytes": 6912024,
+        "elfMachine": 183,
+        "sha256": "f0acfeacf8fc03a4e0b4a8af00dac7422e3f01deeeb4b6d7ffca10662fc4e39e"
+      },
+      "mysqld": {
+        "bytes": 54196328,
+        "elfMachine": 183,
+        "sha256": "3bc577a5948c24ee6bf5341575ec365e12b80530ffc665e6f3300ce9b4938d75"
+      },
+      "python3": {
+        "bytes": 7845048,
+        "elfMachine": 183,
+        "sha256": "c86f21d0da9290ece2d7d49a3f7ed52aed59cb029abdf0ea25c79634f6cbe960"
+      }
+    },
+    "contextReceipt": {
+      "bytes": 2187,
+      "sha256": "2d46f7fc1f0a406527aae025cd20d8991767e1367aab122acbe1f4bf6adc604d"
+    },
+    "databaseInitialized": false,
+    "esteriaServerExecuted": false,
+    "expectedMysqlSqlVersion": "8.0.46-0ubuntu0.24.04.4",
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "mysqlServerExecuted": false,
+    "nativePythonExecuted": true,
+    "runtimeArchive": {
+      "bytes": 112374096,
+      "file": "server-runtime-arm64.tar.gz",
+      "sha256": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5"
+    },
+    "runtimeMetadata": {
+      "bytes": 34299,
+      "sha256": "3aa480f48fd36cea1253557976163dc2da0707eef72dbef18d028196888b05b1"
+    },
+    "scope": "native-arm64-dependency-image-readback",
+    "sourceCompanion": {
+      "bytes": 954236077,
+      "sha256": "b09599218a1a62a8e131eeedc47f6c8c19e2d39936d4e0aed7261e365f409bc1"
+    }
+  },
+  "disclosure": {
+    "configurationGenerationValuesWithheld": true,
+    "credentialAndPrivateAccountDataWithheld": true,
+    "enginePidsAndPrivateAbsolutePathsWithheld": true,
+    "nativeQualificationSectionsAreExactPublicSubsets": true,
+    "privateAccountJournalIdentitiesWithheld": true,
+    "privateMarkerIdentityIsProducerVerifiedNotPublicProjectionHash": true,
+    "privateSetupMarkerIncluded": false,
+    "privateSqlAndServiceLogsWithheld": true,
+    "privateStateFilesIncluded": false
+  },
+  "environmentReceipt": {
+    "bytes": 1943,
+    "sha256": "1c0b7df8e9dc22ea73a9ede53c934eb65071f89d584721a1f6ee57d93522a967"
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "independentReadback": {
+    "allPublicFileIdentitiesVerified": true,
+    "coreAndPlayerbotsSnapshotsEqualAcrossAllFinishes": true,
+    "distinctServiceOperationsAcrossRestartVerified": true,
+    "fullUbuntuVersionMatchedImage": true,
+    "localNativeExecutionPerformed": false,
+    "outerArtifactSha256AndZipCrcVerified": true,
+    "privateJournalPinsEqualAcrossAllFinishes": true,
+    "privateMarkerStopIdentityMatchesFinalAcknowledgment": true,
+    "publicFilesVerified": 10,
+    "scope": "read-only-comparison-of-producer-typed-receipts",
+    "sourceOriginalBuildModulesAndHelperPinsCrossBound": true,
+    "twoReadyStopOperationPairsMatchedSameUuid": true
+  },
+  "inputPreparation": {
+    "androidRuntimeQualified": false,
+    "artifact": {
+      "bytes": 40130109,
+      "id": 12990195617,
+      "sha256": "73952c331659db612669b16c6221ac58195da35bd802b69fdaffa312eca6b7b5"
+    },
+    "candidateAllBytesAndModesVerified": true,
+    "candidateArchive": {
+      "bytes": 40112280,
+      "sha256": "70dfcdda9ff389d0467aceed5b5951f4261f0ad210e8bc3356d9dacc2bd8792d"
+    },
+    "candidateFiles": 45,
+    "candidatePin": {
+      "bytes": 13654,
+      "sha256": "602e7d0da21baf6549272c7aab8c9d8d2ad87c83f601ce487d16d02b4ac6b757"
+    },
+    "compilerExecuted": false,
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "helperBuildReceipt": {
+      "bytes": 32008,
+      "sha256": "82b9c7c852164f303500214e044f07bf5eb389fa2f3f03b9f6cdc962a5bba602"
+    },
+    "helperExecutable": {
+      "bytes": 25188512,
+      "sha256": "b7d9b72c17f32294915f0a474283c543057ffb7de7b3f93015c2e7e179bfcf25"
+    },
+    "helperExecuted": false,
+    "helperNativeReceipt": {
+      "bytes": 37703,
+      "sha256": "56288b2ea7046fa256bdd53113701bd59236d5d8403a3a16f32b5fcf0ab53c42"
+    },
+    "inputLock": {
+      "bytes": 1357,
+      "sha256": "97a954c672194afd83f6aa4d4dd352ec454a19f43e552b98c6c0b86c49a101a0"
+    },
+    "originalRegistrationReceiptsUnchanged": true,
+    "producer": {
+      "integrationRevision": "eb11d0719032bd9dc40498bfdb4888fd3162bc35",
+      "workflowRun": 41081216973
+    },
+    "productionActivated": false,
+    "runtimePreparation": {
+      "bytes": 1362,
+      "sha256": "da9ef8189231352878b4ed4b95846088ea32a720c51821b7c7e1d1c3b586226d"
+    },
+    "scope": "prepared-native-server-installation-finish-inputs",
+    "sqlExecuted": false
+  },
+  "javaCoordinatorExecuted": false,
+  "nativeQualification": {
+    "bytes": 35876,
+    "sha256": "4d7bf28e85dc6658d48ca7ea77550216deac60e47959ca35a9b4263c9d96d8a3"
+  },
+  "playerbotsAiQualified": false,
+  "producer": {
+    "integrationRevision": "1d35f1bd3faaf39d78cef28de4e905d2c0034059",
+    "job": 124175165237,
+    "jobConclusion": "success",
+    "repository": "Russianranger/esteria_android",
+    "workflow": "Native owned installation finish and clean-stop receipts",
+    "workflowConclusion": "success",
+    "workflowRun": 41088296041
+  },
+  "publicFileIdentities": {
+    "dependency-context.json": {
+      "bytes": 2187,
+      "sha256": "2d46f7fc1f0a406527aae025cd20d8991767e1367aab122acbe1f4bf6adc604d"
+    },
+    "dependency-context.log": {
+      "bytes": 2187,
+      "sha256": "d31bdb7b2d7e906e3e8bc5fe722afd251bf1163f4ff84f222d29d2f65c00a8a9"
+    },
+    "dependency-download.log": {
+      "bytes": 110,
+      "sha256": "5d3e81dea3a4bdbc90c02cd799cdc3669f9f787ac129cd08efcd740453575ff9"
+    },
+    "dependency-image-check.json": {
+      "bytes": 1433,
+      "sha256": "ded60395aa7547a75286b373acbc9e674e63cac21333f4cf735a7bb78242fa63"
+    },
+    "image-build.log": {
+      "bytes": 646,
+      "sha256": "3b7ca8f11fe1e6a5bb05b2a2b7610415866181e0b179e2eec4df600b504e0e3e"
+    },
+    "input-acquisition.log": {
+      "bytes": 1566,
+      "sha256": "04e2a3faada331d2a87d7f13e55e26e61f1f0881e45192327f1f3da157cecaf5"
+    },
+    "input-preparation.json": {
+      "bytes": 1566,
+      "sha256": "04e2a3faada331d2a87d7f13e55e26e61f1f0881e45192327f1f3da157cecaf5"
+    },
+    "mysql-state-mount-preflight.json": {
+      "bytes": 171,
+      "sha256": "c0525585aedb47e63737e4f736e97640d59ae56f501a47e0958046f78d4bb58f"
+    },
+    "native-installation-qualification.json": {
+      "bytes": 35876,
+      "sha256": "4d7bf28e85dc6658d48ca7ea77550216deac60e47959ca35a9b4263c9d96d8a3"
+    },
+    "runtime-preparation.json": {
+      "bytes": 1362,
+      "sha256": "da9ef8189231352878b4ed4b95846088ea32a720c51821b7c7e1d1c3b586226d"
+    }
+  },
+  "runtimePreparation": {
+    "androidRuntimeQualified": false,
+    "contentReceipt": {
+      "bytes": 1343739,
+      "sha256": "1c00990e090e85af0232fe633b64e2718071a5f8e81f3b0ca1c8f2b214ffb3af"
+    },
+    "engineExtraction": {
+      "androidRuntimeQualified": false,
+      "archive": {
+        "bytes": 21352885,
+        "sha256": "00bd0a5829caec2a2b11d4e85bd261b67461c04e6755bb332d37d393311c6ccb"
+      },
+      "extractedFiles": 60,
+      "formatVersion": 1,
+      "gameplayQualified": false,
+      "packageReceipt": {
+        "bytes": 34652,
+        "sha256": "bb62ad200ac9be9b756616e351bf591508eedb7420f9fd39d5ea0544ae1cc548"
+      },
+      "scope": "engine-derivative-runtime-extraction",
+      "serverExecuted": false
+    },
+    "engineReceipt": {
+      "bytes": 34652,
+      "sha256": "bb62ad200ac9be9b756616e351bf591508eedb7420f9fd39d5ea0544ae1cc548"
+    },
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "helperExecuted": false,
+    "originalProducer": {
+      "artifact": {
+        "bytes": 192900091,
+        "id": 12976974609,
+        "sha256": "67cc07940819d89524760c965a6144ec91ac4d73dc90c98a930b087538be50d4"
+      },
+      "integrationRevision": "b258529f695be0de810040eacb0ee07e483b11d4",
+      "workflowRun": 41058676543
+    },
+    "originalReceiptsPreserved": true,
+    "originalServerProgramsRebuilt": false,
+    "scope": "exact-seven-patch-runtime-for-playerbots-component",
+    "selectedTransferFiles": 12,
+    "sqlExecuted": false
+  },
+  "scope": "retained-native-arm64-installation-finish-evidence",
+  "serverDataQualified": false,
+  "slotPromoted": false,
+  "worldserverExecuted": false
+}

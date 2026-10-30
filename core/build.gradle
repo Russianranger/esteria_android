@@ -121,3 +121,12 @@ tasks.register('serverDataRunPlanTest', JavaExec) {
     maxHeapSize = '32m'
 }
 check.dependsOn serverDataRunPlanTest
+
+tasks.register('serverDataToolSelectionTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.runtime.install.ServerDataToolSelectionTests'
+    args rootProject.file('tests/fixtures/server-data-tool-selection.canonical.json').absolutePath
+    maxHeapSize = '32m'
+}
+check.dependsOn serverDataToolSelectionTest

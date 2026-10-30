@@ -41,8 +41,28 @@ concurrency:
   group: combined-arm64-package-${{ github.ref }}
   cancel-in-progress: false
 jobs:
+  selection:
+    runs-on: ubuntu-24.04
+    outputs:
+      legacy: ${{ steps.profile.outputs.legacy }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - id: profile
+        name: Route the selected source-owned Wine cohort to its separate coherent workflow
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+          selected=json.loads(Path('runtime/runtime-sources.lock.json').read_bytes())['packages']['wine-arm64']
+          profile=selected.get('wineEnvironment',{})
+          assert type(profile) is dict and profile in ({},{'WINE_ANDROID_PRIVATE_PE_COPY':'1'})
+          print('legacy='+str(not profile).lower())
+          PY
   package:
-    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    needs: selection
+    if: needs.selection.outputs.legacy == 'true' && github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
     runs-on: ubuntu-24.04
     timeout-minutes: 55
     steps:

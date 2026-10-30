@@ -121,3 +121,26 @@ Forty-four focused Python checks, Java fixed-command guards, APK/AndroidTest
 and lint pass. Actual extraction and the new helper's Android installation remain
 separate gates. Auth/world session implementation is in progress with retained
 children, authenticated readiness and source-supported graceful shutdown.
+
+## Matched runtime and Android owner checkpoint
+
+Current tuple471/c0e/seven-patch compiled authentication passes41088546780:
+real13 Grunt checks, persisted session key, loopback realm and clean shutdown.
+Normal CommonMain/assets/world/checksum/Android remain false. Native owned
+installation finish41088296041 passes first/repeat/restart, nested DataDir
+configuration, production MySQL service ready/clean-stop receipts and a bound
+SQL-only completion marker. This does not establish Java slot promotion or world.
+
+The Android auth/world owner now retains its database operation lease and native
+child ownership through startup/shutdown errors, uses source-supported readiness
+probes and world-then-auth shutdown, and packages23 exact source helpers. Host
+checks ran39 Python groups:38 passed and one managed-proc observation skipped.
+Three Java owner fixtures, APK/AndroidTest/lint and helper byte readback also pass.
+It is not wired to
+Main START; actual server execution/Android/world/persistence remain open.
+
+The composed data-tools Android installer and cross-language canonical selection
+build/lint and metadata guards pass. Its actual ordered source/derived native
+provider remains gated/pending; no archive identity was invented. Strong ordered
+source capture now models actual compiler and linker dependency records
+separately; fresh native observation remains required after this correction. The already sealed stock provider remains unchanged.

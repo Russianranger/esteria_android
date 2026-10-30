@@ -262,3 +262,9 @@ and the stock four-tool provider does not imply ordered-reader support.
 `app/server-data.gradle` packages exactly five helpers. The combined APK sealer
 checks that same closure. `:core:serverDataRunPlanTest` verifies fixed commands,
 private separate paths and source/import changes without running an extractor.
+
+`app/server-session.gradle` packages23 exact server-session helper/profile files.
+The composed data-tools profile uses `app/server-data-tools.gradle`, remains
+default false while its source/native pin is pending, and is mutually exclusive
+with the stock extractors property. The standalone new-cohort packaging workflow
+is separate from the historical two-key client release/combined sealer.

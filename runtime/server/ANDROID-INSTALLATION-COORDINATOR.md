@@ -100,7 +100,11 @@ focused owner/storage tasks pass.
 The prior actual seven-patch PB loader/core composition is recorded separately in
 [run 41076505231](../evidence/server-playerbots-schema-41076505231.json). It does
 not exercise this new finish/config-transition/clean-stop coordinator path.
-A reuse-only ARM64 qualification of that path is pending; it will consume the
-registered helper candidate and retained runtime without recompiling C++.
+The [reuse-only ARM64 gate 41088296041](NATIVE-INSTALLATION-FINISH.md) subsequently
+passed the actual portable finish, nested DataDir transition, completed reentry,
+production service restart and bound SQL-only clean-stop receipt on one UUID.
+It reused the registered helper and retained runtime without compiling C++.
+That gate exercised Python production helpers on native Linux, with Java and
+slot promotion explicitly false in its outer qualification.
 Android execution, sealed helper-provider activation, world and gameplay remain
 unqualified. No Main START action or device-test package is delivered here.

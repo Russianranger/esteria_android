@@ -1,0 +1,59 @@
+name: Public selected471 Wine cohort and full original sources
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - runtime/wine-cohort-publication/published-release.json
+permissions:
+  contents: read
+concurrency:
+  group: public-selected471-source-owned-wine-cohort
+  cancel-in-progress: false
+jobs:
+  readback:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Select the exact retained producer recipe
+        id: recipe
+        run: |
+          python3 -m unittest tests.test_public_wine_cohort tests.test_public_wine_inputs -v
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json,re
+          lock=json.load(open('runtime/wine-cohort-publication/dependency-release.lock.json'))
+          assert re.fullmatch('[0-9a-f]{40}',lock['targetCommit'])
+          print('revision='+lock['targetCommit'])
+          PY
+          git fetch --no-tags --depth 1 origin 75f50445112818c97f8d8e575d2b1c21e59af6e5
+          git fetch --no-tags --depth 1 origin 681b2e9f30b19e94bf8e8de44f67fedba5033c8a
+          mkdir -p out/public-cohort-evidence
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ steps.recipe.outputs.revision }}
+          path: source-packaging
+          persist-credentials: false
+      - name: Download and read back every public cohort asset and complete provider source member
+        run: |
+          python3 tools/fetch_wine_cohort.py \
+            --release-lock runtime/wine-cohort-publication/dependency-release.lock.json \
+            --publication-receipt runtime/wine-cohort-publication/published-release.json \
+            --packaging-source "$GITHUB_WORKSPACE/source-packaging" \
+            --output "$RUNNER_TEMP/public-cohort-inputs" --providers "$RUNNER_TEMP/public-cohort-providers" \
+            > out/public-cohort-evidence/cohort-consumer.json
+      - name: Read back the separately retained entire original Wine source companion before any later execution
+        run: |
+          python3 tools/fetch_wine_arm64_release.py \
+            --release-lock runtime/wine-arm64-publication/dependency-release.lock.json \
+            --publication-receipt runtime/wine-arm64-publication/published-release.json \
+            --output "$RUNNER_TEMP/public-cohort-wine" > out/public-cohort-evidence/wine-consumer.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: public-selected471-wine-cohort-source-readback-${{ github.sha }}
+          path: out/public-cohort-evidence
+          retention-days: 14
+          if-no-files-found: warn

@@ -1,0 +1,45 @@
+// Full fixed guest import closure. This packages source only; no launch action.
+def sessionHelpers = ['server_session.py', 'server_session_process.py', 'android_server_schema_setup.py',
+    'mysql_bootstrap.py', 'mysql_service.py', 'server_content.py', 'server_schema_setup.py',
+    'server_schema_baseline.py', 'server_schema_adaptations.py', 'server_update_setup.py', 'server_updater.py',
+    'server_playerbots_setup.py', 'owned_process_group.py', 'server_config.py', 'provision_local_realm.py',
+    'provision_local_account.py', 'server_data_generation.py', 'server_data_preflight.py', 'shader_generation.py',
+    'extractor_order.py', 'server/appearance-schema-v1.sql', 'server/appearance-schema.lock.json']
+def sessionInputs = sessionHelpers.collectEntries { name -> [(name): rootProject.file('runtime/' + name)] }
+sessionInputs['local-server.json'] = rootProject.file('config/local-server.json')
+def sessionAssets = layout.buildDirectory.dir('generated/serverSession')
+def packageServerSession = tasks.register('packageServerSession') {
+    inputs.files(sessionInputs.values()); outputs.dir(sessionAssets)
+    doLast {
+        def directory = new File(sessionAssets.get().asFile, 'server-session'); delete directory; directory.mkdirs()
+        def records = new TreeMap()
+        sessionInputs.each { name, source ->
+            byte[] bytes = source.bytes
+            if (bytes.length == 0 || bytes.length > 131072) throw new GradleException('Unexpected session helper size')
+            def destination = new File(directory, name); destination.parentFile.mkdirs(); destination.bytes = bytes
+            records[name] = [bytes: bytes.length, sha256: java.security.MessageDigest.getInstance('SHA-256').digest(bytes).encodeHex().toString()]
+        }
+        new File(directory, 'manifest.json').text = groovy.json.JsonOutput.toJson([formatVersion: 1, files: records]) + '\n'
+    }
+}
+android.sourceSets.main.assets.srcDir(sessionAssets)
+tasks.named('preBuild').configure { dependsOn packageServerSession }
+
+// Real Java owner/guard/file-lock fixtures, never an Android/native proof.
+def sessionOwnerClasspath = files(providers.provider { android.bootClasspath },
+    providers.provider { tasks.named('compileDebugJavaWithJavac').get().destinationDirectory.get().asFile },
+    project(':core').layout.buildDirectory.dir('classes/java/main'))
+def compileSessionOwner = tasks.register('compileLocalServerSessionOwnerFixture', JavaCompile) {
+    dependsOn 'compileDebugJavaWithJavac', ':core:classes'
+    source file('src/test/java/io/github/russianranger/esteria/runtime/LocalServerSessionOwnerTests.java')
+    source file('src/test/java/android/os/Looper.java')
+    classpath = sessionOwnerClasspath
+    destinationDirectory = layout.buildDirectory.dir('localServerSessionOwnerFixture')
+    sourceCompatibility = '17'; targetCompatibility = '17'
+}
+tasks.register('localServerSessionOwnerTest', JavaExec) {
+    dependsOn compileSessionOwner
+    classpath = files(compileSessionOwner.flatMap { it.destinationDirectory }) + sessionOwnerClasspath
+    mainClass = 'io.github.russianranger.esteria.runtime.LocalServerSessionOwnerTests'
+    maxHeapSize = '32m'
+}

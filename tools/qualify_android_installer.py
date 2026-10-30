@@ -16,6 +16,7 @@ HELPER_TEST = PACKAGE + '.runtime.DatabaseServiceAssetsTest'
 SCHEMA_HELPER_TEST = PACKAGE + '.runtime.ServerSchemaAssetsTest'
 INSTALLATION_HELPER_TEST = PACKAGE + '.runtime.ServerInstallationAssetsTest'
 DATA_HELPER_TEST = PACKAGE + '.runtime.ServerDataAssetsTest'
+SESSION_HELPER_TEST = PACKAGE + '.runtime.ServerSessionAssetsTest'
 SCHEMA_HELPER_METHODS = ('nestedOriginalSourcesInstallAndResumeWithoutRewriting',
     'unexpectedNestedModuleIsPreservedAndRefused',
     'linkedResourceDirectoryIsPreservedAndRefused')
@@ -122,6 +123,8 @@ def main():
         test(method, SCHEMA_HELPER_TEST)
     test('completeInstallationHelperClosureInstallsAndReusesExactBytes', INSTALLATION_HELPER_TEST)
     test('completeDataHelperClosureInstallsAndReusesExactBytes', DATA_HELPER_TEST)
+    test('completeSessionHelperClosureInstallsAndReusesExactBytes', SESSION_HELPER_TEST)
+    test('privateDataMetadataBindingRejectsChangedAncestryAndQualificationClaims', SESSION_HELPER_TEST)
     runtime_contracts = test('runtimeContracts')
     groups = re.findall(r'^INSTRUMENTATION_STATUS: esteriaRuntimeContractGroups=([1-9][0-9]?)\s*$', runtime_contracts, re.M)
     if len(groups) != 1:raise RuntimeError('Missing completed runtime filesystem group count')
@@ -137,6 +140,8 @@ def main():
         schemaHelperAssetContractGroups=len(SCHEMA_HELPER_METHODS), schemaHelperAssetsQualified=True, schemaSqlExecuted=False,
         installationHelperAssetFiles=18, installationHelperAssetsQualified=True, installationSetupExecuted=False,
         dataHelperAssetFiles=5, dataHelperAssetsQualified=True, dataPreparationExecuted=False,
+        sessionHelperAssetFiles=23, sessionHelperAssetsQualified=True, privateDataMetadataBindingQualified=True,
+        authWorldSessionExecuted=False,
         databaseServiceExecuted=False,
         runtimeFilesystemQualified=True, sameJobDebugKeyUpdatePreservedRuntimeAndSentinel=True,
         privateLocalLoginHandoffFilesystemQualified=True, clientLoginExecuted=False,

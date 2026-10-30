@@ -153,11 +153,19 @@ if (serverProvider) {
 if (clientProvider) {
     def provider = file(clientProvider)
     android.sourceSets.main.assets.srcDir(new File(provider, 'assets'))
+    def selectedRuntimeFile = rootProject.file('runtime/runtime-sources.lock.json')
+    def selectedWine = new groovy.json.JsonSlurper().parse(selectedRuntimeFile).packages['wine-arm64']
+    def wineEnvironment = selectedWine.containsKey('wineEnvironment') ? selectedWine.wineEnvironment : [:]
+    if (!(wineEnvironment instanceof Map) ||
+            !(wineEnvironment.isEmpty() || wineEnvironment == [WINE_ANDROID_PRIVATE_PE_COPY: '1']))
+        throw new GradleException('Unsupported selected Wine environment profile')
     def verifyClientRuntime = tasks.register('verifyClientRuntimeProvider', Exec) {
         workingDir rootProject.projectDir
-        commandLine 'python3', 'tools/provider_client_runtime.py', 'verify',
+        def arguments = ['python3', 'tools/provider_client_runtime.py', 'verify',
             '--provider', provider.absolutePath, '--artifact', file(clientArtifact).absolutePath,
-            '--client-source', file(clientSource).absolutePath
+            '--client-source', file(clientSource).absolutePath]
+        if (!wineEnvironment.isEmpty()) arguments += ['--runtime-lock', selectedRuntimeFile.absolutePath]
+        commandLine arguments
     }
     tasks.named('preBuild').configure { dependsOn verifyClientRuntime }
 }
@@ -187,3 +195,6 @@ if (guestBridgeProvider) {
 }
 
 apply from: 'server-data.gradle'
+apply from: 'server-session.gradle'
+
+apply from: 'server-data-tools.gradle'
