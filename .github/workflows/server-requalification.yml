@@ -7,6 +7,8 @@ on:
       - tests/test_server_requalification.py
       - runtime/server/compiled-reference.lock.json
       - tools/qualify_dbimport.py
+      - tools/initialize_server_schema.py
+      - tests/test_server_schema_baseline.py
       - tools/qualify_authserver.py
       - tools/auth_protocol.py
       - tools/owned_process_group.py
@@ -33,6 +35,8 @@ on:
       - tests/test_server_requalification.py
       - runtime/server/compiled-reference.lock.json
       - tools/qualify_dbimport.py
+      - tools/initialize_server_schema.py
+      - tests/test_server_schema_baseline.py
       - tools/qualify_authserver.py
       - tools/auth_protocol.py
       - tools/owned_process_group.py
@@ -69,7 +73,7 @@ jobs:
       - name: Verify staging, source packaging and process ownership guards
         run: |
           test "$(uname -m)" = aarch64
-          python3 -m unittest tests.test_server_requalification tests.test_server_package tests.test_dbimport_qualification tests.test_owned_process_group -v
+          python3 -m unittest tests.test_server_requalification tests.test_server_package tests.test_dbimport_qualification tests.test_server_schema_baseline tests.test_owned_process_group -v
           mkdir -p out/server-requalification-evidence out/server-requalification-private
       - name: Fetch exact linked artifacts and repack their original source content
         env:

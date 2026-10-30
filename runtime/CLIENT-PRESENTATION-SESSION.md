@@ -73,3 +73,20 @@ ARM64 guest-helper receipts cover individual components. This new combined
 Android session, authenticated X11 connection, GPU hardware, game pixels/audio
 and gameplay still require their own execution evidence. No Thor test is requested
 at this stage.
+
+
+## Replaceable Android view
+
+`GamePresentationPanel` consumes an already started session. A session-owned
+`SessionEvents` relay forwards frame geometry and failures to the currently
+attached view without retaining a detached Activity. The owner handles Stop and
+retains database/client processes independently of Activity or Surface recreation.
+The panel exposes the software keyboard and the existing controller/touch router.
+
+`GameInputView` separates Surface availability from an attached writer. Pause
+neutralizes held input and detaches rendering; a Surface created while paused
+cannot restart it. Resume attaches the current valid Surface once and waits for
+new frame geometry. The panel also mutes presentation audio through the session.
+No launcher action creates this panel yet; it does not admit an unqualified game
+or establish Android X11/guest/client execution. The expanded synthetic Android
+Surface fixture separately checks the view lifecycle.

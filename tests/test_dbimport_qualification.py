@@ -22,6 +22,19 @@ def source_identity(data):
 
 
 class QualificationGuards(unittest.TestCase):
+    def test_execution_evidence_requires_real_process_creation_and_records_nonzero_child(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary); started = Mock()
+            with self.assertRaises(OSError):
+                qualify.run_importer(root / 'missing', root / 'config', root / 'failed-open.log', on_started=started)
+            started.assert_not_called()
+            executable = root / 'updater'
+            executable.write_text('#!/usr/bin/python3\nraise SystemExit(7)\n')
+            executable.chmod(0o700)
+            with self.assertRaisesRegex(ValueError, 'exit 7'):
+                qualify.run_importer(executable, root / 'config', root / 'failed-exit.log', on_started=started)
+            started.assert_called_once_with()
+
     def test_existing_state_never_calls_engine(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

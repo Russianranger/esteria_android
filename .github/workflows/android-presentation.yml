@@ -6,7 +6,9 @@ on:
       - native/presentation/**
       - native/CMakeLists.txt
       - core/src/main/java/**/presentation/**
+      - core/src/main/java/**/input/**
       - app/src/main/java/**/presentation/**
+      - app/src/main/java/**/input/**
       - app/src/androidTest/**/PresentationAudioTest.java
       - app/build.gradle
       - tools/qualify_android_presentation.py
@@ -59,7 +61,7 @@ jobs:
             -PnativeRuntimeBridge=true -PnativeBridgeAbi=x86_64 -PpresentationEmulatorTest=true -PsourceRevision="$GITHUB_SHA"
           cp app/build/outputs/apk/debug/app-debug.apk out/android-presentation/app.apk
           cp app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk out/android-presentation/tests.apk
-      - name: Execute actual Android Surface pixel readback and AudioTrack clock
+      - name: Execute Android Surface pixels, paused lifecycle and AudioTrack clock
         uses: ReactiveCircus/android-emulator-runner@324029e2f414c084d8b15ba075288885e74aef9c # v2.34.0
         with:
           api-level: 33

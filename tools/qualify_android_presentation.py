@@ -19,7 +19,9 @@ TEST = PACKAGE + '.presentation.PresentationAudioTest#actualSurfaceAndAudioTrack
 SCOPE = 'android-13-x86_64-surface-audiotrack-protocol-fixtures'
 FLAGS = ('nativeSurfaceExecuted', 'rgbaReadbackVerified', 'surfaceRecreationVerified', 'invalidFrameRejected',
          'audioResetVerified', 'audioInvalidHandshakeRecovered', 'privateSocketCleanupVerified',
-         'privateRootAliasVerified', 'privateChildSymlinkRejected', 'audioActivePeerShutdownVerified')
+         'privateRootAliasVerified', 'privateChildSymlinkRejected', 'audioActivePeerShutdownVerified',
+         'pausedSurfaceCreationBlocked', 'surfaceResumeFrameVerified', 'surfacePausePeerEofVerified',
+         'pausedSurfaceRecreationBlocked', 'surfaceResumeIdempotentVerified', 'surfaceLifecycleCleanupVerified')
 UNQUALIFIED = ('arm64GuestExecuted', 'androidWineExecuted', 'x11GuestExecuted', 'audibleOutputQualified',
                'adrenoQualified', 'gameplayQualified')
 
@@ -55,7 +57,8 @@ def validate_receipt(value, revision, fingerprint):
     require(type(value.get('formatVersion')) is int and value['formatVersion'] == 1 and value.get('scope') == SCOPE and
             value.get('sourceRevision') == revision and value.get('fingerprint') == fingerprint and value.get('abi') == 'x86_64',
             'presentation-receipt-identity')
-    for key, expected in (('api', 33), ('targetSdk', 35), ('groupsPassed', 5)):
+    for key, expected in (('api', 33), ('targetSdk', 35), ('groupsPassed', 6),
+                          ('surfaceLifecycleConnections', 2), ('surfaceLifecyclePeerEofs', 2)):
         require(type(value.get(key)) is int and value[key] == expected, 'presentation-receipt-count-' + key)
     accepted, played = value.get('audioTrackAcceptedFrames'), value.get('audioTrackPlayedFrames')
     require(type(accepted) is int and type(played) is int and 4800 <= accepted <= played <= 96000,

@@ -29,6 +29,7 @@ try:
     from . import manifest_server_modules as modules
     from . import render_server_config as config
     from . import verify_server_build as files
+    from . import initialize_server_schema as baseline
     from .owned_process_group import OwnedGroup
 except ImportError:
     import prepare_runtime as archives
@@ -37,6 +38,7 @@ except ImportError:
     import manifest_server_modules as modules
     import render_server_config as config
     import verify_server_build as files
+    import initialize_server_schema as baseline
     from owned_process_group import OwnedGroup
 from runtime import mysql_bootstrap as db
 from runtime import provision_local_realm as realm
@@ -169,7 +171,7 @@ def render_importer(template, source, state, mysql, password):
     return path
 
 
-def run_importer(executable, configuration, log, *, timeout=1800):
+def run_importer(executable, configuration, log, *, timeout=1800, on_started=None):
     """Own the whole updater/mysql child process group; retain a bounded private tail."""
     command = [str(executable), '--config', str(configuration)]
     environment = {'PATH': '/usr/bin:/bin', 'LANG': 'C.UTF-8', 'LC_ALL': 'C.UTF-8',
@@ -182,6 +184,8 @@ def run_importer(executable, configuration, log, *, timeout=1800):
         child = subprocess.Popen(command, cwd=configuration.parent, env=environment, umask=0o077,
             stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, start_new_session=True)
         group = OwnedGroup(child)
+        if on_started is not None:
+            on_started()
         deadline = time.monotonic() + timeout
         with selectors.DefaultSelector() as selector:
             selector.register(child.stdout, selectors.EVENT_READ)
@@ -289,7 +293,9 @@ def run(install, content_directory, receipt_sha256, lock_path, mysql, mysqld, ve
     state.mkdir(mode=0o700)
     evidence = dict(formatVersion=1, scope='disposable-native-ARM64-compiled-dbimport', mysqlVersion=version,
         contentReceiptSha256=receipt_sha256, qualificationSucceeded=False, initializedNewInstance=False,
-        compiledUpdaterExecuted=False, coreModuleUpdatesQualified=False, sameRevisionReentryVerified=False,
+        compiledUpdaterAttempted=False, compiledUpdaterExecuted=False, compiledUpdaterCompleted=False,
+        compiledAutoPopulationQualified=False,
+        coreModuleUpdatesQualified=False, sameRevisionReentryVerified=False,
         restartPersistenceVerified=False, playerbotsDatabaseUntouched=False, playerbotsRuntimeQualified=False,
         postAllServicesRealmGateQualified=False, existingStateModified=False, databaseUpgradeQualified=False,
         gameSchemasQualified=False, androidRuntimeQualified=False, gameplayQualified=False)
@@ -312,8 +318,14 @@ def run(install, content_directory, receipt_sha256, lock_path, mysql, mysqld, ve
                 require(connection.query("SELECT GET_LOCK('esteria-local-bootstrap',0)") == ['1'],
                         'another operation owns fixture instance')
                 base.empty_databases(connection)
-                evidence['firstUpdater'] = run_importer(install / 'bin/dbimport', configuration, state / 'logs/dbimport-first.log')
-                evidence['compiledUpdaterExecuted'] = True
+                evidence['sourceBaseline'] = baseline.initialize(connection, source, manifest,
+                    lambda database, sql: base.apply_base(mysql, options, 'acore_' + database,
+                                                          sql, state / 'logs/sql-client.log'))
+                evidence['compiledUpdaterAttempted'] = True
+                evidence['firstUpdater'] = run_importer(install / 'bin/dbimport', configuration,
+                    state / 'logs/dbimport-first.log',
+                    on_started=lambda: evidence.update(compiledUpdaterExecuted=True))
+                evidence['compiledUpdaterCompleted'] = True
                 schema_snapshot(connection, expected)
                 evidence['coreModuleUpdatesQualified'] = True
                 token = hashlib.sha256(base.canonical_identity(receipt['archive'])).hexdigest()

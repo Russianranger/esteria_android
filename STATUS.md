@@ -31,10 +31,11 @@ queued sends, stream I/O and both connect/disconnect pairs after repairing lost
 network timer wakes; it then exposed the fixture's missing WDataStore Finalize().
 The complete transport receipt and Wine transport gate now pass.
 The application now selects the measured0f provider and seven-patch server source.
-The exact new provider/source companion pass eight host groups. This is a
-dependency-preparation checkpoint: the existing69 dependency release remains
-unchanged, and combined fetching will refuse it until the new exact release is
-published and verified. Source-lock SHA256 is
+The exact new provider/source companion pass eight host groups. Its new seven-file
+dependency release at packaging27446b5 is published and independently fetched
+without credentials, with full source/PE/descriptor checks. The historical69
+release remains unchanged. The current combined APK must pass its own new build;
+dependency publication alone is not an application build result. Source-lock SHA256 is
 `5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1`.
 
 Server40994809596 compiled all2,257 objects and linked authserver/dbimport, then
@@ -52,8 +53,10 @@ including account journal and repeated setup preservation. Harness-only charset
 normalization was corrected without changing server tables or comparison gates.
 Native ARM64 persistent-service41013380186 passes three live SQL cycles,
 UUID/credentials/four-schema persistence, duplicate-owner rejection and clean
-command/EOF/signal shutdown. Android application-service execution remains open;
-its emulator fixture is being implemented, including short translated socket paths.
+command/EOF/signal shutdown. Android13 x64 run41016293760 now passes the actual Java application-service
+wrapper: two live SQL cycles, duplicate-start refusal, typed readiness/clean-stop
+receipts and unchanged UUID/credentials/markers. This uses the explicitly verified
+x64 test seam; production ARM64, real schema upgrades and game saving remain open.
 
 Writable UI selection/review is integrated into the app with explicit divergence
 decisions and retained prior versions. Actual adapter32MiB tests, independent
@@ -79,7 +82,7 @@ Guest and client input releases also pass actual public verification in
 Exact source companions and original license notices are retained. No default
 branch, credential scope or repository security setting was changed.
 
-The latest combined ARM64 APK passes clean core checks, application/instrumentation
+The prior six-patch combined ARM64 APK passed clean core checks, application/instrumentation
 compilation, lint and all four final provider byte checks with six-patch source
 lock SHA256 `dbbf8983cfa2b429f7dd0c3308a2795ffbecd29e8019adf35348447e1eab41b0`.
 Hosted all-provider builds41009954235 and41010011668 also pass complete source
@@ -104,9 +107,11 @@ remains unqualified.
 
 Android x64 Wine run41015479987 passed complete original-source sealing and APK
 validation, then failed prefix initialization while making ntdll executable.
-No reconstructed-client execution occurred. A five-case mmap/mprotect diagnostic
-now measures actual return/errno values without executing mapped bytes; the
-Android cause remains unproven. The owned display/input/audio coordinator now
+No reconstructed-client execution occurred. The five-case diagnostic in41017052972
+now establishes errno13 for adding execute permission after modifying a private
+file mapping; clean/direct file mappings and anonymous RW→RX pass. It executes no
+mapped bytes. A source-owned Wine private-image mapping adaptation is in progress;
+Android policy and target SDK stay unchanged. The owned display/input/audio coordinator now
 builds with authenticated shared X11 endpoints, lifecycle mute and reverse cleanup.
 It has not executed as a complete Android presentation session.
 

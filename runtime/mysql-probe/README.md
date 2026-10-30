@@ -130,8 +130,32 @@ The new receipt has scope `android-13-x86_64-java-mysql-service-lifecycle`.
 `androidJavaDatabaseServiceLifecycleQualified` requires both actual instrumentation
 success and exact receipt/input validation. ARM64, full production runtime,
 application schema updates, worldserver and gameplay remain explicitly unqualified.
-The Java/test source compiles and lint passes; actual execution of this new gate
-is pending. The measured bootstrap result below predates this additional gate.
+The Java/test source compiles and lint passes. Actual execution of both gates
+passed in run `41016293760`, as recorded below.
+
+## Measured Java service lifecycle
+
+[Run41016293760](https://github.com/Russianranger/esteria_android/actions/runs/41016293760)
+at `0e13dd2c89afebecedf40e13674b219cfdcac5c0` completed every phase, including
+the source export. Android13 x86_64 ran the new Java service method successfully
+in 57.669 seconds: two authenticated live service cycles, two duplicate-start
+rejections, explicit clean shutdown, released Java leases, unchanged instance and
+credential identities, and four separate initialization/seed/readback guest
+invocations. The original four-launch bootstrap/restart method also passed.
+
+Both downloaded evidence ZIPs were hash-verified. The final 105,168-byte ZIP is
+SHA-256 `fc98112f2e24560ded50450c31a3a9e2f0face0c91bb389932361b65dfdf6c52`.
+The provider's 21 source inputs were independently compared against the exact
+historical Git revision, and both app receipts passed the strict host validator
+against its canonical provider hash. Exact receipts, input identities, original
+instrumentation-log hash and source-export artifact metadata are retained in
+`runtime/evidence/android-mysql-service-0e13dd2.json`. The 905,074,129-byte complete
+source artifact was exported by CI and not downloaded locally.
+
+This qualifies the real Java database lifecycle with the separate x64 probe
+runtime. The production ARM64 provider/tracer, application schemas, worldserver,
+character persistence and gameplay remain separate gates. Normal START remains
+unavailable; the instrumentation fixture is not a user test package.
 
 ## Current evidence
 

@@ -1,0 +1,397 @@
+{
+  "actualInstrumentation": {
+    "log": {
+      "bytes": 851,
+      "sha256": "30a07d1e5ffa8a0a61435a685f3ffe13cf29ad8d5d9b467f8d26c740c3d9f521"
+    },
+    "method": "actualJavaServiceAdapterOwnsReadinessShutdownAndRestart",
+    "passed": true,
+    "seconds": 57.669,
+    "tests": 1
+  },
+  "androidArm64Qualified": false,
+  "apkVerification": {
+    "androidMysqlQualified": false,
+    "apkVerified": true,
+    "archive": {
+      "assetPath": "mysql-probe/mysql-x86-64.archive",
+      "bytes": 112330761,
+      "file": "mysql-x86-64.tar.gz",
+      "sha256": "9fdd00181897ed7b7797c103787f19787e5075dec5b5bfe01c082bf2275b89e8"
+    },
+    "arm64Qualified": false,
+    "expectedMysqlSqlVersion": "8.0.46-0ubuntu0.24.04.4",
+    "productionAdapterQualified": false,
+    "providerVerified": true,
+    "scope": "android-13-x86-64-mysql-probe-build-only"
+  },
+  "earlyArtifact": {
+    "bytes": 44288,
+    "downloadVerified": true,
+    "id": 12960062838,
+    "sha256": "561aedf463f69b4780f958fd62e25fa860795b5947d8cac8af9f5c6f00d5e12b"
+  },
+  "finalEvidenceArtifact": {
+    "bytes": 105168,
+    "downloadVerified": true,
+    "id": 12960795635,
+    "sha256": "fc98112f2e24560ded50450c31a3a9e2f0face0c91bb389932361b65dfdf6c52"
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "jobId": 123934445262,
+  "providerIdentityFromCanonicalBuildReceipt": {
+    "bytes": 5405,
+    "sha256": "687833b08ee875c50f19dfab5ef51ac32ff2a3c1c42d32487e122141c4183d4f"
+  },
+  "providerSourceInputsComparedToExactCommit": true,
+  "qualification": {
+    "bytes": 14184,
+    "receipt": {
+      "androidJavaDatabaseServiceLifecycleQualified": true,
+      "androidMysqlBootstrapQualified": true,
+      "apk": {
+        "bytes": 114655405,
+        "sha256": "3293b5ec44769721fd87ab361dfe729ef24b15ba29becc3ddee893c8317ad991"
+      },
+      "appEvidence": {
+        "abi": "x86_64",
+        "api": 33,
+        "applicationSqlAuthenticated": true,
+        "arm64Qualified": false,
+        "cleanShutdown": true,
+        "credentialsPreserved": true,
+        "databaseInitialized": true,
+        "exactBootstrapHelpersVerified": true,
+        "fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+        "formatVersion": 1,
+        "gameplayQualified": false,
+        "guestLaunches": 4,
+        "instanceIdentityVerified": true,
+        "mysqlVersion": "8.0.46-0ubuntu0.24.04.4",
+        "persistentMarkerRestored": true,
+        "productionAdapterQualified": false,
+        "prootBuildEvidence": {
+          "androidProotExecuted": false,
+          "arm64GuestExecuted": false,
+          "builderSha256": "de7b6d905b334d00cf40fbb71df54944032b48c29f51e56dbfca47d29f1ccf57",
+          "compilerSha256": "6156dd4e5e466333197a00b8d20bca72c292186643b749dcaaa3aa9164afb1de",
+          "formatVersion": 1,
+          "gameplayQualified": false,
+          "glibcLockSha256": "8c72a53ec20d430c9a728ec2047be038dc7de62ae1cfd7a929412f567d0c08c0",
+          "glibcVersion": "2.36",
+          "guestSourceSha256": "5e98de4b1439f2c2f35a5a7a8108e86f54070e5a8c70b234daf15e775fd1a10f",
+          "nativeFiles": {
+            "libproot_probe.so": {
+              "bytes": 277720,
+              "sha256": "8901163fb083b63e741b7c6bc7958cf82c646bb1d897052c39c3dc8e427526c5"
+            },
+            "libproot_probe_control.so": {
+              "bytes": 277720,
+              "sha256": "29dbcbbab429fc77bbf45580a35b6d2c659f19162b9bf764b43ebb2da625f970"
+            },
+            "libproot_probe_loader.so": {
+              "bytes": 18344,
+              "sha256": "4a324117c6a16fe996af18ea388191379f5517309e963c80186fd3563a78410a"
+            }
+          },
+          "ndkVersion": "28.2.13676358",
+          "ownerDeathTestSourceSha256": "3519aac5705f1283079789ff99c228236bca817f720d7a51dea8e43622772ece",
+          "ownerServiceManifestSha256": "4f88a42892470ae50ae03286e666bbb869889b31fd8b2f61663a216052e3d66c",
+          "ownerServiceSourceSha256": "987abdb65d3a43a59c332102f103af340a2793f306071ed4082867a10ce39bf2",
+          "ownershipGuestSourceSha256": "99868eb91f6925d9fc20607c44103afc27fcfbef8146a9e0d1e7a59393b97b2e",
+          "ownershipPatchSha256": "509160bd6ec3663d525fa0e795a7bb45b8ccc283a6de8e1398e8cd6624fe86de",
+          "pluginSourceSha256": "5e78917619d3568470b2ed7471d3901591980ba1acdecaa088ff3e98db9f3556",
+          "prootSourceLockSha256": "d4383760217a5b71a4a28cd02d6fc354b5876ca9e21e1db0fe1c733564a58bf2",
+          "renameCompatibilityPatchSha256": "8ea4340df89b694e881e4804c312d71268071736a1883b4ffbc42015e9081152",
+          "rootfsFiles": {
+            "lib/x86_64-linux-gnu/libc.so.6": {
+              "bytes": 1926232,
+              "sha256": "6b4a45352fd0c540a9c7c718f35ce8c8e46a4e482f9d3885a910c32d1a0e1421"
+            },
+            "lib64/ld-linux-x86-64.so.2": {
+              "bytes": 215000,
+              "sha256": "02bcda52c1a5dfc236f94d9e5255b4a0e26347d8a372a5223b650e31f291ce3c"
+            },
+            "probe": {
+              "bytes": 16160,
+              "sha256": "b1dd5b28c57718e907f452629002e385be4677bd98f6595d9847a7d695c9d495"
+            },
+            "probe-owner": {
+              "bytes": 13312,
+              "sha256": "485785fd1949b29554f65d63edddf93ad151f23b305e6cfd9cf91a5daa53fd92"
+            },
+            "probe-plugin.so": {
+              "bytes": 3328,
+              "sha256": "5ed97ba5e696301162e9f5fa1e3e88a04b304f38f8d3c1fd2e9f0914ff9d5d6b"
+            }
+          },
+          "scope": "android-13-x86_64-proot-glibc-probe-build-only",
+          "tallocRelinkableObjects": {
+            "lib/replace/closefrom.c.1.o": {
+              "bytes": 2552,
+              "sha256": "8122c2b401a38a1ee1c443a6cfe77e35db6afadb7376e926db56173392d42b69"
+            },
+            "lib/replace/closefrom.c.2.o": {
+              "bytes": 2552,
+              "sha256": "c8b2c9490e2eb978f120d1ba6f4ed921ae11efed789214ace525bac46139457b"
+            },
+            "lib/replace/replace.c.1.o": {
+              "bytes": 4240,
+              "sha256": "bfe75df26e73ea9ac54d8058045845c2a4139fc6276944e554ecdc7c0f1a5c91"
+            },
+            "lib/replace/replace.c.2.o": {
+              "bytes": 4240,
+              "sha256": "22dcae9721b53f88f9012bb0ffacc97b932091ae498a511e69db1d5fcfec279e"
+            },
+            "lib/replace/replace.empty.c.4.o": {
+              "bytes": 752,
+              "sha256": "bc85561adcc6faa8c5b518b997b64bd63e949eff53ca593eabe461bb8e15dcd0"
+            },
+            "lib/replace/tests/getifaddrs.c.5.o": {
+              "bytes": 2776,
+              "sha256": "f496ccf3f552fbacc2eecab6e80d12e76d7d1027f3d015c1e191c859cec7d578"
+            },
+            "lib/replace/tests/main.c.6.o": {
+              "bytes": 1176,
+              "sha256": "e3effd1efeb627f1bb3843f32bf14c29bd2a431968e4e4cbde2b037b0a9fabaf"
+            },
+            "lib/replace/tests/os2_delete.c.5.o": {
+              "bytes": 6640,
+              "sha256": "8a5258c0a12704135201e456f0dee161d4002cdc07e00a294d9a5447999fae68"
+            },
+            "lib/replace/tests/strptime.c.5.o": {
+              "bytes": 4592,
+              "sha256": "7f9c83032ef6a878a42a08c7acbe4c0be55afce5f20464e170b65f972c2ff71a"
+            },
+            "lib/replace/tests/testsuite.c.5.o": {
+              "bytes": 152416,
+              "sha256": "17f83683d202e1d31549413d700fe64a36aa11a2ee57f3e08e1d9d1c656bdc2c"
+            },
+            "talloc.c.5.o": {
+              "bytes": 50152,
+              "sha256": "c64ec8122208efc66c6dc202d02e8e156920122b096ec7fd690ab9115e7adcf6"
+            },
+            "talloc.c.6.o": {
+              "bytes": 50152,
+              "sha256": "2cf0ba5bee3daa69ca5e71441889ee6492e16c4bdb03c476ad3abc4204d8a208"
+            },
+            "test_magic_differs_helper.c.3.o": {
+              "bytes": 1400,
+              "sha256": "0194aa52959af680cbcef51d7b5bffd98179ae778b339c25429860032f146ccd"
+            },
+            "testsuite.c.1.o": {
+              "bytes": 153112,
+              "sha256": "600e36e0b879dcd3b6ac865078c814d77792a968513c0ced6cebfb0218dba7c3"
+            },
+            "testsuite_main.c.1.o": {
+              "bytes": 1184,
+              "sha256": "53f634093ee45aca945f758762e51358b8f2fed36aab9b96941eb3971efe7e80"
+            }
+          },
+          "unpatchedControlIncluded": true
+        },
+        "repeatBootstrapPreserved": true,
+        "rootSqlAuthenticated": true,
+        "runtimeArchiveSha256": "9fdd00181897ed7b7797c103787f19787e5075dec5b5bfe01c082bf2275b89e8",
+        "runtimeGeneration": "06eef5d4379eae3339bfb77536302878bedfa6b495514c52f04262a6742b60f7",
+        "runtimeInstalledByProductionInstaller": true,
+        "runtimeProviderSha256": "687833b08ee875c50f19dfab5ef51ac32ff2a3c1c42d32487e122141c4183d4f",
+        "scope": "android-13-x86_64-mysql-bootstrap-and-restart",
+        "serverSchemasQualified": false,
+        "socketOnly": true,
+        "sourceRevision": "0e13dd2c89afebecedf40e13674b219cfdcac5c0",
+        "targetSdk": 35,
+        "worldserverQualified": false
+      },
+      "arm64Qualified": false,
+      "completedAtUnix": 1793343696,
+      "emulatorProperties": {
+        "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+        "ro.build.version.sdk": "33",
+        "ro.kernel.qemu": "1",
+        "ro.product.cpu.abi": "x86_64"
+      },
+      "formatVersion": 1,
+      "gameplayQualified": false,
+      "productionAdapterQualified": false,
+      "scope": "android-13-x86_64-mysql-bootstrap-and-restart",
+      "serverSchemasQualified": false,
+      "serviceAppEvidence": {
+        "abi": "x86_64",
+        "api": 33,
+        "arm64Qualified": false,
+        "credentialsPreserved": true,
+        "duplicateLeaseRejected": true,
+        "duplicateStartAttempts": 2,
+        "exactServiceHelpersVerified": true,
+        "explicitShutdownAcknowledged": true,
+        "fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+        "formatVersion": 1,
+        "gameplayQualified": false,
+        "leaseReleasedAfterStop": true,
+        "markerRestoredAfterEachStop": true,
+        "mysqlVersion": "8.0.46-0ubuntu0.24.04.4",
+        "ownedLoopbackSqlReady": true,
+        "productionAdapterQualified": false,
+        "prootBuildEvidence": {
+          "androidProotExecuted": false,
+          "arm64GuestExecuted": false,
+          "builderSha256": "de7b6d905b334d00cf40fbb71df54944032b48c29f51e56dbfca47d29f1ccf57",
+          "compilerSha256": "6156dd4e5e466333197a00b8d20bca72c292186643b749dcaaa3aa9164afb1de",
+          "formatVersion": 1,
+          "gameplayQualified": false,
+          "glibcLockSha256": "8c72a53ec20d430c9a728ec2047be038dc7de62ae1cfd7a929412f567d0c08c0",
+          "glibcVersion": "2.36",
+          "guestSourceSha256": "5e98de4b1439f2c2f35a5a7a8108e86f54070e5a8c70b234daf15e775fd1a10f",
+          "nativeFiles": {
+            "libproot_probe.so": {
+              "bytes": 277720,
+              "sha256": "8901163fb083b63e741b7c6bc7958cf82c646bb1d897052c39c3dc8e427526c5"
+            },
+            "libproot_probe_control.so": {
+              "bytes": 277720,
+              "sha256": "29dbcbbab429fc77bbf45580a35b6d2c659f19162b9bf764b43ebb2da625f970"
+            },
+            "libproot_probe_loader.so": {
+              "bytes": 18344,
+              "sha256": "4a324117c6a16fe996af18ea388191379f5517309e963c80186fd3563a78410a"
+            }
+          },
+          "ndkVersion": "28.2.13676358",
+          "ownerDeathTestSourceSha256": "3519aac5705f1283079789ff99c228236bca817f720d7a51dea8e43622772ece",
+          "ownerServiceManifestSha256": "4f88a42892470ae50ae03286e666bbb869889b31fd8b2f61663a216052e3d66c",
+          "ownerServiceSourceSha256": "987abdb65d3a43a59c332102f103af340a2793f306071ed4082867a10ce39bf2",
+          "ownershipGuestSourceSha256": "99868eb91f6925d9fc20607c44103afc27fcfbef8146a9e0d1e7a59393b97b2e",
+          "ownershipPatchSha256": "509160bd6ec3663d525fa0e795a7bb45b8ccc283a6de8e1398e8cd6624fe86de",
+          "pluginSourceSha256": "5e78917619d3568470b2ed7471d3901591980ba1acdecaa088ff3e98db9f3556",
+          "prootSourceLockSha256": "d4383760217a5b71a4a28cd02d6fc354b5876ca9e21e1db0fe1c733564a58bf2",
+          "renameCompatibilityPatchSha256": "8ea4340df89b694e881e4804c312d71268071736a1883b4ffbc42015e9081152",
+          "rootfsFiles": {
+            "lib/x86_64-linux-gnu/libc.so.6": {
+              "bytes": 1926232,
+              "sha256": "6b4a45352fd0c540a9c7c718f35ce8c8e46a4e482f9d3885a910c32d1a0e1421"
+            },
+            "lib64/ld-linux-x86-64.so.2": {
+              "bytes": 215000,
+              "sha256": "02bcda52c1a5dfc236f94d9e5255b4a0e26347d8a372a5223b650e31f291ce3c"
+            },
+            "probe": {
+              "bytes": 16160,
+              "sha256": "b1dd5b28c57718e907f452629002e385be4677bd98f6595d9847a7d695c9d495"
+            },
+            "probe-owner": {
+              "bytes": 13312,
+              "sha256": "485785fd1949b29554f65d63edddf93ad151f23b305e6cfd9cf91a5daa53fd92"
+            },
+            "probe-plugin.so": {
+              "bytes": 3328,
+              "sha256": "5ed97ba5e696301162e9f5fa1e3e88a04b304f38f8d3c1fd2e9f0914ff9d5d6b"
+            }
+          },
+          "scope": "android-13-x86_64-proot-glibc-probe-build-only",
+          "tallocRelinkableObjects": {
+            "lib/replace/closefrom.c.1.o": {
+              "bytes": 2552,
+              "sha256": "8122c2b401a38a1ee1c443a6cfe77e35db6afadb7376e926db56173392d42b69"
+            },
+            "lib/replace/closefrom.c.2.o": {
+              "bytes": 2552,
+              "sha256": "c8b2c9490e2eb978f120d1ba6f4ed921ae11efed789214ace525bac46139457b"
+            },
+            "lib/replace/replace.c.1.o": {
+              "bytes": 4240,
+              "sha256": "bfe75df26e73ea9ac54d8058045845c2a4139fc6276944e554ecdc7c0f1a5c91"
+            },
+            "lib/replace/replace.c.2.o": {
+              "bytes": 4240,
+              "sha256": "22dcae9721b53f88f9012bb0ffacc97b932091ae498a511e69db1d5fcfec279e"
+            },
+            "lib/replace/replace.empty.c.4.o": {
+              "bytes": 752,
+              "sha256": "bc85561adcc6faa8c5b518b997b64bd63e949eff53ca593eabe461bb8e15dcd0"
+            },
+            "lib/replace/tests/getifaddrs.c.5.o": {
+              "bytes": 2776,
+              "sha256": "f496ccf3f552fbacc2eecab6e80d12e76d7d1027f3d015c1e191c859cec7d578"
+            },
+            "lib/replace/tests/main.c.6.o": {
+              "bytes": 1176,
+              "sha256": "e3effd1efeb627f1bb3843f32bf14c29bd2a431968e4e4cbde2b037b0a9fabaf"
+            },
+            "lib/replace/tests/os2_delete.c.5.o": {
+              "bytes": 6640,
+              "sha256": "8a5258c0a12704135201e456f0dee161d4002cdc07e00a294d9a5447999fae68"
+            },
+            "lib/replace/tests/strptime.c.5.o": {
+              "bytes": 4592,
+              "sha256": "7f9c83032ef6a878a42a08c7acbe4c0be55afce5f20464e170b65f972c2ff71a"
+            },
+            "lib/replace/tests/testsuite.c.5.o": {
+              "bytes": 152416,
+              "sha256": "17f83683d202e1d31549413d700fe64a36aa11a2ee57f3e08e1d9d1c656bdc2c"
+            },
+            "talloc.c.5.o": {
+              "bytes": 50152,
+              "sha256": "c64ec8122208efc66c6dc202d02e8e156920122b096ec7fd690ab9115e7adcf6"
+            },
+            "talloc.c.6.o": {
+              "bytes": 50152,
+              "sha256": "2cf0ba5bee3daa69ca5e71441889ee6492e16c4bdb03c476ad3abc4204d8a208"
+            },
+            "test_magic_differs_helper.c.3.o": {
+              "bytes": 1400,
+              "sha256": "0194aa52959af680cbcef51d7b5bffd98179ae778b339c25429860032f146ccd"
+            },
+            "testsuite.c.1.o": {
+              "bytes": 153112,
+              "sha256": "600e36e0b879dcd3b6ac865078c814d77792a968513c0ced6cebfb0218dba7c3"
+            },
+            "testsuite_main.c.1.o": {
+              "bytes": 1184,
+              "sha256": "53f634093ee45aca945f758762e51358b8f2fed36aab9b96941eb3971efe7e80"
+            }
+          },
+          "unpatchedControlIncluded": true
+        },
+        "realJavaAdapterExecuted": true,
+        "runtimeArchiveSha256": "9fdd00181897ed7b7797c103787f19787e5075dec5b5bfe01c082bf2275b89e8",
+        "runtimeGeneration": "06eef5d4379eae3339bfb77536302878bedfa6b495514c52f04262a6742b60f7",
+        "runtimeProviderSha256": "687833b08ee875c50f19dfab5ef51ac32ff2a3c1c42d32487e122141c4183d4f",
+        "sameInstanceRestarted": true,
+        "scope": "android-13-x86_64-java-mysql-service-lifecycle",
+        "serverSchemasQualified": false,
+        "serviceLaunches": 2,
+        "sourceRevision": "0e13dd2c89afebecedf40e13674b219cfdcac5c0",
+        "targetSdk": 35,
+        "verificationGuestLaunches": 4,
+        "verifiedX64RuntimeOnly": true,
+        "worldserverQualified": false
+      },
+      "sourceRevision": "0e13dd2c89afebecedf40e13674b219cfdcac5c0",
+      "testApk": {
+        "bytes": 1733369,
+        "sha256": "54dab765d4c40c7c5f150b5729c048f71dfafbdf20d61c7e46b333bc9ec54522"
+      },
+      "worldserverQualified": false
+    },
+    "sha256": "4d20416eecb375da996e7f160d5c8ead071fb4d0607e33eeb18ef1af74969519"
+  },
+  "runConclusion": "success",
+  "runId": 41016293760,
+  "runUrl": "https://github.com/Russianranger/esteria_android/actions/runs/41016293760",
+  "scope": "observed-android-13-x86_64-java-mysql-service-lifecycle",
+  "serverSchemasQualified": false,
+  "sourceArtifact": {
+    "bytes": 905074129,
+    "downloadedLocally": false,
+    "id": 12960407279,
+    "sha256": "4c708691b2759a6bb9923e61bcdfb005925c5108a71800f7a2abe6925521d710",
+    "workflowExportPassed": true
+  },
+  "sourceManifest": {
+    "bytes": 53070,
+    "sha256": "ca5c6d1ee9559430b62590d242788ff756393cc4d7de2248b943633b3221c04f"
+  },
+  "sourceRevision": "0e13dd2c89afebecedf40e13674b219cfdcac5c0"
+}

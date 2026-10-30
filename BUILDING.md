@@ -170,9 +170,28 @@ change default branches or substitute another tag target. See
 `runtime/server/DEPENDENCY-RELEASE.md` for the concrete authentication boundary.
 
 
-The server, guest-helper and reconstructed-client dependency releases now have
-actual publication and independent public-fetch receipts. Their scoped
-`dependency-release.lock.json` files retain exact URLs/hashes without repinning the
-measured providers. See the three `DEPENDENCY-RELEASE.md` files. Shader setup's
-source-matched tool bundle and transactional helper are documented in
-`runtime/SHADER-GENERATION.md`; this is not yet enabled in normal launcher setup.
+The server and guest-helper dependency releases have actual publication and
+independent public-fetch receipts. The current client0f/seven-patch packaging
+checkpoint replaces the application pin; its new dependency release is published
+and independently fetched/verified without credentials. The historical69 release
+remains available and unchanged. Scoped `dependency-release.lock.json`
+files retain exact URLs/hashes and refuse stale mismatched provider inputs.
+
+The optional `-PshaderToolsProviderDir=<verified-provider>` packages the exact
+source-backed ARM64 compiler/translator. Client runtime preparation installs its
+immutable files after verifying Wine compatibility. Generate the provider using
+the durable, anonymously verified archive described in `runtime/shaders/RELEASE.md`.
+This source bundle is 10,635,594 bytes; it contains no game data or generated game
+shaders. Actual game shader generation remains a separate gated operation in
+`runtime/SHADER-GENERATION.md` and is not run by ordinary launcher setup.
+
+The optional `-PturnipProviderDir=<verified-provider>` installs the measured ARM64
+glibc driver separately. Its original build ZIP/source companion must remain beside
+the provider and accompany distribution, outside APK assets. See
+`runtime/turnip/ANDROID-PACKAGING.md`; no driver is selected by the launcher and
+Android/Adreno execution remains unqualified.
+
+`server-requalification.yml` and `client-auth.yml` reuse the exact measured linked
+six-patch binaries and artifact-contained lock, independent of the newer application
+lock. Docker is only their native reference environment. Android execution uses
+PRoot and the application-owned process bridge, never device Docker.

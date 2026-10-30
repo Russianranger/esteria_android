@@ -119,3 +119,12 @@ missing game assets. Their new CI build/execution gates remain separate from cli
 data, DBC, shaders, full-game audio and Adreno qualification. The Ubuntu ARM64
 MySQL dependency archive has passed native image, archive readback, source capture
 and host staging; `runtime/server/README.md` records its exact identities.
+
+
+The exact source-backed shader tool provider is now generated and durably
+published (`runtime/shaders/RELEASE.md`), including compiler originals/notices and
+the pinned translator. Its APK installer is wired into client-runtime preparation.
+This resolves tool availability only: no user MPQ shaders have been generated or
+rendered. The optional Turnip driver also packages from verified source/build
+receipts; native no-GPU loading is separate from actual Adreno execution. Neither
+component supplies missing maps, DBC overlays, appearance banks or game data.

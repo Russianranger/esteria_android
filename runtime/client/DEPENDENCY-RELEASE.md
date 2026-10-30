@@ -9,11 +9,16 @@ package reproduction, source readback, preservation and tamper checks. The
 source archive SHA-256 is
 `14b61f4fd5cdc6e7375297ae4a48d65240382ef2c18eed484808898373694821`.
 
-Publication of this separate prerelease is pending; no new download URL is
-claimed yet. `prepare` recovers and validates the exact original artifact and
-regenerates sources from the fixed packaging checkout. Anonymous `fetch` refuses
-until a verified publication receipt is recorded. The existing 69cc release and
-its seven stored assets remain intact.
+The [separate prerelease](https://github.com/Russianranger/esteria_android/releases/tag/deps-client-arm64-27446b5-0f931bba)
+is published. [Run41018243725](https://github.com/Russianranger/esteria_android/actions/runs/41018243725)
+passed exact original-artifact recovery, source generation from the fixed packaging
+checkout, draft upload and final read-only verification of the actual tag and all
+seven complete asset bytes. Its downloaded publication receipt was hash-verified;
+an independent anonymous fetch then repeated every asset, source, PE, descriptor
+and notice check. Durable URLs are recorded in `dependency-release.lock.json`,
+with publication/public-fetch evidence under `runtime/evidence/`. GitHub reports
+`immutable=false`; publisher overwrite protection remains explicit. The existing
+69cc release and its seven stored assets remain intact.
 
 ## Preserved initial release
 

@@ -1,0 +1,46 @@
+{
+  "allAssetHashesVerified": true,
+  "androidRuntimeQualified": false,
+  "assets": {
+    "NOTICE.txt": {
+      "bytes": 1340,
+      "sha256": "07268b21f9f08843bbbb42aa1fdfcd3c8ed8e052ab470eb42a1e0458dd898b42"
+    },
+    "SHA256SUMS": {
+      "bytes": 547,
+      "sha256": "20ca16777cea97f8cea11fe4d0b89e23ba595085dbb1798d7239ef30603a54ba"
+    },
+    "client-corresponding-source.tar.gz": {
+      "bytes": 23440715,
+      "sha256": "14b61f4fd5cdc6e7375297ae4a48d65240382ef2c18eed484808898373694821"
+    },
+    "client-input-lock.json": {
+      "bytes": 492,
+      "sha256": "ab3d912ad54fa2bc7ed8be05deaa58874b2f9f747caae954f7181daeafe665b6"
+    },
+    "reconstructed-client-arm64-original.zip": {
+      "bytes": 45848368,
+      "sha256": "1fd6176727065f50a926b45a3d81df1bfd0ea33c330e9fb9131ff30ad170b94e"
+    },
+    "release-manifest.json": {
+      "bytes": 1507,
+      "sha256": "a9ff5a5b14f0468cd9fff335786aa167bcc8211446c22b7f597aac1c6bcc58a0"
+    },
+    "source-receipt.json": {
+      "bytes": 3513,
+      "sha256": "a4e7d0ff1770b76141e3321dfe8cfcfefaa19881cc6016db15a5b6e91b38e532"
+    }
+  },
+  "exactClientCheckoutVerified": true,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "githubTokenUsed": false,
+  "packagingRevision": "27446b57e33e04d6fb11b0594d54d96b8bbd8ca6",
+  "peDescriptorAndNoticeChecksPassed": true,
+  "publicationRunId": 41018243725,
+  "releaseId": 428738643,
+  "scope": "anonymous-durable-client-input-recovery",
+  "sourceCompanionReadBack": true,
+  "sourceRevision": "0f931bbade36a4b197725d691b8eff7caea7b3be",
+  "url": "https://github.com/Russianranger/esteria_android/releases/tag/deps-client-arm64-27446b5-0f931bba"
+}

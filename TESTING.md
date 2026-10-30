@@ -156,12 +156,30 @@ latest combined ARM64 all-provider APK passes clean core/build/instrumentation/l
 and final provider hashes, without claiming ARM64 execution. Eight shader setup
 host groups validate transactions, exact tool closure and actual subprocess bounds;
 synthetic SPIR-V fixtures deliberately claim no semantic/rendering qualification.
-Backup dump/restore and account/setup checks now pass; complete canonical equality
-exposed a disposable harness-column charset normalization, corrected without
-relaxing the comparison. Run41011458127 must establish the complete result.
+Native ARM64 backup41013086447 passes complete367,899,260-byte canonical equality
+following fresh restore and restart, account/setup preservation and the explicit
+harness-column charset correction. No server tables or strict comparisons changed.
+The persistent native service also passes41013380186 and the short-socket regression
+41015153591. These do not establish live game-character restoration or upgrades.
 Android13 x64 MySQL41010011663 passes actual initialize/authenticate/repeat/restart
 and same-instance credentials/marker preservation after the rename adaptation;
 this is not production ARM64 or game-save qualification. The stable development
 certificate has signed an internal nondebug43cc release with exact provider
 readback, but installation/update preservation and a delivered baseline remain
 open. See the scoped qualification documents and public evidence receipts.
+
+
+Client0f run41012726334 passes all five Windows/native-Linux jobs, including real
+Grunt callbacks and SRP-proof validation under ARM64 Wine against a controlled
+peer. The compiled Esteria pairing is a separate `client-auth.yml` gate. The
+actual six-patch server linked and passed loader/module checks in41005048019;
+its first exact-binary runtime rerun reached MySQL/dbimport but failed a documented
+Nemesis base-before-update ordering requirement. This is an active setup fix,
+not a successful compiled authentication result.
+
+Android x64 Wine41015479987 failed ntdll page protection during prefix creation,
+before client execution. The next run41017052972 measured errno13 only when a
+modified private file mapping was changed from RW to RX; anonymous RW→RX and
+clean/direct file executable mappings passed. No mapped diagnostic bytes execute.
+The runtime adaptation is being built from source; Android policy and target SDK
+remain unchanged.

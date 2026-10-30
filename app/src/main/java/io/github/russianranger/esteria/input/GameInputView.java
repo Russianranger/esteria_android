@@ -30,7 +30,7 @@ public final class GameInputView extends SurfaceView implements SurfaceHolder.Ca
     private final Events events;
     private final InputManager inputs;
     private int frameWidth, frameHeight, controller = -1, touch = -1;
-    private boolean attached, ticking, failed, keyboard, surfaceReady, sessionPaused;
+    private boolean attached, ticking, failed, keyboard, surfaceReady, writerAttached, sessionPaused;
     private long keyboardGeneration;
     private long previousFrame;
     public GameInputView(Context context, InputSink sink, SurfaceBridge presentation, Events events) {
@@ -62,8 +62,14 @@ public final class GameInputView extends SurfaceView implements SurfaceHolder.Ca
         if (events != null) events.failed(reason == null ? "Game input failed" : reason);
     }
     /** Session pause/focus loss must neutralize injected keys even while no frame is drawn. */
-    public void pauseInput() { sessionPaused = true; neutralize(true); }
-    public void resumeInput() { sessionPaused = false; startTick(); }
+    public void pauseInput() { sessionPaused = true; neutralize(true); detachPresentation(); }
+    public void resumeInput() { sessionPaused = false; attachPresentation(); startTick(); }
+    private void attachPresentation() {
+        if (writerAttached || !attached || !surfaceReady || sessionPaused || failed || !getHolder().getSurface().isValid()) return;
+        frameWidth = frameHeight = 0;
+        writerAttached = act(() -> presentation.attach(getHolder().getSurface()));
+    }
+    private void detachPresentation() { writerAttached = false; presentation.detach(); }
     private void neutralize(boolean cancelKeyboard) {
         stopTick(); touch = -1;
         if (cancelKeyboard) { keyboard = false; keyboardGeneration++; }
@@ -90,27 +96,27 @@ public final class GameInputView extends SurfaceView implements SurfaceHolder.Ca
     }
     @Override public void surfaceCreated(SurfaceHolder holder) {
         frameWidth = frameHeight = 0;
-        surfaceReady = act(() -> presentation.attach(holder.getSurface())); startTick();
+        surfaceReady = true; attachPresentation(); startTick();
     }
     @Override public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) { }
     @Override public void surfaceDestroyed(SurfaceHolder holder) {
-        surfaceReady = false; frameWidth = frameHeight = 0; neutralize(true); presentation.detach();
+        surfaceReady = false; frameWidth = frameHeight = 0; neutralize(true); detachPresentation();
     }
     @Override protected void onAttachedToWindow() {
         super.onAttachedToWindow(); attached = true;
-        if (inputs != null) inputs.registerInputDeviceListener(this, null); startTick();
+        if (inputs != null) inputs.registerInputDeviceListener(this, null); attachPresentation(); startTick();
     }
     @Override protected void onDetachedFromWindow() {
         neutralize(true); attached = surfaceReady = false;
         if (inputs != null) inputs.unregisterInputDeviceListener(this);
-        presentation.detach(); super.onDetachedFromWindow();
+        detachPresentation(); super.onDetachedFromWindow();
     }
     @Override public void onWindowFocusChanged(boolean focus) {
         super.onWindowFocusChanged(focus);
         if (focus) startTick(); else neutralize(true);
     }
     private boolean controlsReady() {
-        return attached && surfaceReady && frameWidth > 0 && !failed && !keyboard && !sessionPaused && hasWindowFocus();
+        return attached && surfaceReady && writerAttached && frameWidth > 0 && !failed && !keyboard && !sessionPaused && hasWindowFocus();
     }
     private void startTick() {
         if (!controlsReady() || ticking) return;

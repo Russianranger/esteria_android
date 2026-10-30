@@ -12,9 +12,10 @@ The application lock pins client0f931bbade36a4b197725d691b8eff7caea7b3be,
 serverf35f04d01689f034778e3474b3c820092f51e461 and
 Eluna58d7652138887783228b9727bd1fa4e08f00342b, with seven hashed server patches. Source-lock SHA256 is
 5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1.
-The new client provider/source companion are measured and verified; publish their
-new exact durable release next. The old69 release remains intact and is rejected
-by current-pin fetch checks during this explicit dependency-preparation interval.
+The new client provider/source companion and seven-file durable release are now
+published and anonymously fetched/verified at packaging27446b5. The old69 release
+remains intact. Rerun/inspect the current combined APK gate after the new public
+release receipt, without treating publication as a successful application build.
 The newer client development tip is0f931bbade36a4b197725d691b8eff7caea7b3be;
 its workflow pins integration0146ca89307eb3c00c09b7fbecdf3e301bd9bd53 for Wine Grunt.
 Fetch both branches and inspect Actions before interpreting pending results.
@@ -92,13 +93,16 @@ ARM64 execution, client/server login or world entry is qualified.
     exclusive setup/session lease and requires live and clean-stop receipts.
     Native ARM64 mysql-service.yml run41013380186 passes three SQL cycles and
     command/EOF/helper-signal shutdown with unchanged UUID/credentials/markers.
-    The real Android adapter lifecycle fixture is in progress; PRoot expands socket
-    paths, so its exclusive socket directory must remain short. Keep gameplay gated.
+    Actual Android13 x64 adapter41016293760 now passes two service starts/stops,
+    duplicate-owner refusal and SQL/UUID/credential/marker preservation. It uses an
+    exact verified x64 seam; production ARM64/game schemas/saves remain unqualified.
+    PRoot expands socket paths, so exclusive socket directories must stay short.
 
 11. Android x64 Wine41015479987 passed full source/APK gates, then failed ntdll
-    executable-page protection before client execution. Exact numeric memory-map
-    diagnostics are running next; do not treat an inferred execmod restriction as
-    established. No Android policy or target SDK is weakened. Owned authenticated
+    executable-page protection before client execution. Run41017052972 establishes
+    errno13 only for dirty private-file RW→RX; anonymous/clean/direct cases pass.
+    The source-owned Wine private-PE mapping adaptation is in progress. No Android
+    policy or target SDK is weakened. Owned authenticated
     X11/input/audio composition now builds; complete Android execution is separate.
 
 ## Missing content and acceptance

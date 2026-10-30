@@ -14,10 +14,16 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.system.Os;
 import android.system.StructStat;
+import android.view.SurfaceHolder;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import io.github.russianranger.esteria.BuildConfig;
 import io.github.russianranger.esteria.MainActivity;
+import io.github.russianranger.esteria.core.presentation.InputSink;
+import io.github.russianranger.esteria.input.GameInputView;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -31,6 +37,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -63,11 +70,16 @@ public final class PresentationAudioTest {
         final String path;
         final long device, inode;
         final AtomicReference<Throwable> failure = new AtomicReference<>();
-        final boolean malformed;
+        final AtomicInteger connections = new AtomicInteger(), peerEofs = new AtomicInteger();
+        final boolean malformed, holdAfterFirstFrame;
         volatile LocalSocket current;
         volatile boolean closed;
         Frames(Path directory, boolean malformed) throws Exception {
-            this.malformed = malformed; path = directory.resolve("frame.sock").toString();
+            this(directory, malformed, false);
+        }
+        Frames(Path directory, boolean malformed, boolean holdAfterFirstFrame) throws Exception {
+            this.malformed = malformed; this.holdAfterFirstFrame = holdAfterFirstFrame;
+            path = directory.resolve("frame.sock").toString();
             assertFalse(Files.exists(directory.resolve("frame.sock")));
             bound.bind(new LocalSocketAddress(path, LocalSocketAddress.Namespace.FILESYSTEM)); Os.chmod(path, 0600);
             StructStat stat = Os.lstat(path); device = stat.st_dev; inode = stat.st_ino;
@@ -76,16 +88,22 @@ public final class PresentationAudioTest {
         }
         private void serve() {
             try {
-                int connection = 0;
                 while (!closed) {
                     try (LocalSocket socket = server.accept()) {
-                        current = socket; socket.setSoTimeout(3000); connection++;
+                        if (closed) break; // The owned accept-wakeup is not a presentation connection.
+                        current = socket; socket.setSoTimeout(3000);
+                        int connection = connections.incrementAndGet();
                         DataInputStream input = new DataInputStream(socket.getInputStream());
                         DataOutputStream output = new DataOutputStream(socket.getOutputStream());
                         int sequence = 0, width = connection == 1 ? 2 : 3, height = connection == 1 ? 2 : 1;
                         while (!closed) {
-                            int request = input.read(); if (request == -1) break;
+                            int request = input.read();
+                            if (request == -1) { peerEofs.incrementAndGet(); break; }
                             assertEquals(1, request); sequence++;
+                            // Keep the native receiver blocked after one posted frame. A
+                            // pause must shut down its socket; no racing reply is needed
+                            // to prove the producer actually receives peer EOF.
+                            if (holdAfterFirstFrame && sequence > 1) continue;
                             boolean unchanged = malformed || sequence > 1;
                             int[] header = {FRAME_MAGIC, width, height, width * 4, 17, sequence,
                                     unchanged ? 0 : width * height * 4, unchanged ? 2 : 0};
@@ -110,6 +128,91 @@ public final class PresentationAudioTest {
             BridgePaths.deleteOwnedSocket(path, device, inode);
             if (failure.get() != null) throw new AssertionError("Synthetic frame producer failed", failure.get());
         }
+    }
+
+    /** Records Java input calls only; this fixture does not inject X11 events. */
+    private static final class RecordingInput implements InputSink {
+        final AtomicInteger calls = new AtomicInteger(), releases = new AtomicInteger();
+        public void key(int keysym, boolean down) { calls.incrementAndGet(); }
+        public void keySequence(int[] keys, boolean[] down) { calls.incrementAndGet(); }
+        public void pointer(int x, int y, int mask) { calls.incrementAndGet(); }
+        public void relativeMotion(int dx, int dy) { calls.incrementAndGet(); }
+        public void buttons(int mask) { calls.incrementAndGet(); }
+        public void releaseAll() { releases.incrementAndGet(); }
+    }
+
+    private static void pausedSurfaceLifecycle(android.app.Instrumentation instrumentation,
+                                               Activity activity, Context context, Path root) throws Exception {
+        AtomicReference<GameInputView> view = new AtomicReference<>();
+        AtomicReference<String> failure = new AtomicReference<>();
+        AtomicInteger created = new AtomicInteger(), destroyed = new AtomicInteger();
+        RecordingInput input = new RecordingInput();
+        try (Frames producer = new Frames(root, false, true);
+             SurfaceBridge bridge = new SurfaceBridge(context, root.toFile(), new SurfaceBridge.Events() {
+                 public void frameSize(int width, int height) { view.get().frameSize(width, height); }
+                 public void failed(String reason) { failure.set(reason); }
+             })) {
+            try {
+                instrumentation.runOnMainSync(() -> {
+                    GameInputView display = new GameInputView(activity, input, bridge, new GameInputView.Events() {
+                        public void failed(String reason) { failure.set(reason); }
+                        public void cursorModeChanged(boolean enabled) { }
+                        public void rejected(String reason) { failure.set(reason); }
+                    });
+                    view.set(display);
+                    display.getHolder().addCallback(new SurfaceHolder.Callback() {
+                        public void surfaceCreated(SurfaceHolder holder) { created.incrementAndGet(); }
+                        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) { }
+                        public void surfaceDestroyed(SurfaceHolder holder) { destroyed.incrementAndGet(); }
+                    });
+                    display.pauseInput();
+                    ViewGroup content = activity.findViewById(android.R.id.content);
+                    content.addView(display, new FrameLayout.LayoutParams(320, 180));
+                });
+                waitFor(() -> created.get() == 1, 8000, "Paused view must receive a real surface-created callback");
+                Thread.sleep(200);
+                assertEquals("Paused surface creation must not connect", 0, producer.connections.get());
+                assertEquals("Paused surface creation must not post native frames", 0, bridge.counters()[0]);
+                assertNull(failure.get());
+
+                instrumentation.runOnMainSync(() -> view.get().resumeInput());
+                waitFor(() -> bridge.counters()[0] == 1, 4000, "Resume must post a real native SurfaceView frame");
+                assertEquals(1, producer.connections.get());
+                instrumentation.runOnMainSync(() -> view.get().pauseInput());
+                waitFor(() -> producer.peerEofs.get() == 1, 4000, "Pause must reach the producer as peer EOF");
+
+                instrumentation.runOnMainSync(() -> view.get().setVisibility(View.GONE));
+                waitFor(() -> destroyed.get() == 1, 8000, "GONE must destroy the actual SurfaceView surface");
+                instrumentation.runOnMainSync(() -> view.get().setVisibility(View.VISIBLE));
+                waitFor(() -> created.get() == 2, 8000, "VISIBLE must recreate the actual SurfaceView surface");
+                Thread.sleep(200);
+                assertEquals("Paused recreation must not reconnect", 1, producer.connections.get());
+                assertEquals("Paused recreation must not post another frame", 1, bridge.counters()[0]);
+                assertNull(failure.get());
+
+                instrumentation.runOnMainSync(() -> view.get().resumeInput());
+                waitFor(() -> bridge.counters()[0] == 2, 4000, "Resume after recreation must post a second native frame");
+                instrumentation.runOnMainSync(() -> { view.get().resumeInput(); view.get().resumeInput(); });
+                Thread.sleep(200);
+                assertEquals("Repeated resume must retain one writer", 2, producer.connections.get());
+                assertEquals(2, bridge.counters()[0]);
+                assertNull(failure.get());
+            } finally {
+                instrumentation.runOnMainSync(() -> {
+                    GameInputView display = view.get();
+                    if (display != null) {
+                        display.pauseInput();
+                        if (display.getParent() instanceof ViewGroup) ((ViewGroup)display.getParent()).removeView(display);
+                    }
+                });
+            }
+            waitFor(() -> producer.peerEofs.get() == 2, 4000, "Removal must retire the second native writer");
+            waitFor(() -> destroyed.get() == 2, 4000, "Removal must destroy the recreated surface");
+            assertEquals(2, producer.connections.get());
+            assertTrue("Pauses must neutralize the recording input sink", input.releases.get() >= 3);
+            assertNull(failure.get());
+        }
+        assertFalse("Lifecycle fixture must remove its owned frame socket", Files.exists(root.resolve("frame.sock")));
     }
     private static final class Readback implements AutoCloseable {
         final ImageReader reader;
@@ -191,6 +294,8 @@ public final class PresentationAudioTest {
                 assertEquals(0, bridge.counters()[0]); assertEquals(1, readback.received.getCount());
             }
 
+            pausedSurfaceLifecycle(instrumentation, activity, context, root);
+
             List<String> audioEvents = Collections.synchronizedList(new java.util.ArrayList<>());
             try (AudioBridge audio = AudioBridge.start(context, root.toFile(), audioEvents::add);
                  LocalSocket socket = connect(root, "audio.sock")) {
@@ -237,12 +342,16 @@ public final class PresentationAudioTest {
                     .put("scope","android-13-x86_64-surface-audiotrack-protocol-fixtures")
                     .put("sourceRevision",BuildConfig.SOURCE_REVISION).put("api",Build.VERSION.SDK_INT)
                     .put("targetSdk",context.getApplicationInfo().targetSdkVersion).put("fingerprint",Build.FINGERPRINT)
-                    .put("abi","x86_64").put("groupsPassed",5).put("nativeSurfaceExecuted",true)
+                    .put("abi","x86_64").put("groupsPassed",6).put("nativeSurfaceExecuted",true)
                     .put("rgbaReadbackVerified",true).put("surfaceRecreationVerified",true)
                     .put("invalidFrameRejected",true).put("audioTrackAcceptedFrames",acceptedFrames)
                     .put("audioTrackPlayedFrames",playedFrames).put("audioResetVerified",true)
                     .put("audioInvalidHandshakeRecovered",true).put("privateSocketCleanupVerified",true)
                     .put("audioActivePeerShutdownVerified",true)
+                    .put("pausedSurfaceCreationBlocked",true).put("surfaceResumeFrameVerified",true)
+                    .put("surfacePausePeerEofVerified",true).put("pausedSurfaceRecreationBlocked",true)
+                    .put("surfaceResumeIdempotentVerified",true).put("surfaceLifecycleCleanupVerified",true)
+                    .put("surfaceLifecycleConnections",2).put("surfaceLifecyclePeerEofs",2)
                     .put("privateRootAliasVerified",true).put("privateChildSymlinkRejected",true)
                     .put("arm64GuestExecuted",false).put("androidWineExecuted",false).put("x11GuestExecuted",false)
                     .put("audibleOutputQualified",false).put("adrenoQualified",false).put("gameplayQualified",false);

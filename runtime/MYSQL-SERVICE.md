@@ -69,8 +69,17 @@ at `2df6c813f60d1ab50874b092226ce0baac792ba9`. Its artifact `12958689902`
 is 11,366 bytes, SHA-256
 `c6c67df48907ef4609300a5de46c2cbdb1459f354938dadb76eb84eb2b5d0a66`;
 downloaded source/runtime envelope and qualification hashes were verified.
-This proves native service behavior after the path change. Android's translated
-socket address still requires the separate emulator execution gate.
+This proves native service behavior after the path change.
 
-Android adapter execution is a separate follow-on gate. This result does not
-qualify game schema/module updates, character saves, bots or world gameplay.
+The real Java adapter subsequently passed the separate Android13 x86_64 probe
+gate in [run41016293760](https://github.com/Russianranger/esteria_android/actions/runs/41016293760)
+at `0e13dd2c89afebecedf40e13674b219cfdcac5c0`. Both owned service cycles reached
+authenticated readiness, rejected duplicate starts, acknowledged clean command
+shutdown and released the Java lease; independent guest restarts preserved the
+same private SQL marker and credential identities. This also exercises Android's
+translated short socket paths. Exact downloaded receipts and source-input checks
+are recorded in `runtime/evidence/android-mysql-service-0e13dd2.json`.
+
+That fixture uses a separately verified x64 runtime through the internal test seam.
+Production ARM64 runtime execution, game schema/module updates, character saves,
+bots and world gameplay remain unqualified; normal launcher START stays gated.

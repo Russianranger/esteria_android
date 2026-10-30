@@ -11,17 +11,26 @@ from tools import qualify_android_presentation as presentation
 class AndroidPresentationQualification(unittest.TestCase):
     def test_every_real_check_and_exact_emulator_scope_are_required(self):
         receipt = dict(formatVersion=1, scope=presentation.SCOPE, sourceRevision='a' * 40, fingerprint='fixture',
-                       abi='x86_64', api=33, targetSdk=35, groupsPassed=5, audioTrackAcceptedFrames=4800,
+                       abi='x86_64', api=33, targetSdk=35, groupsPassed=6,
+                       surfaceLifecycleConnections=2, surfaceLifecyclePeerEofs=2, audioTrackAcceptedFrames=4800,
                        audioTrackPlayedFrames=4800, **{flag: True for flag in presentation.FLAGS},
                        **{flag: False for flag in presentation.UNQUALIFIED})
         presentation.validate_receipt(receipt, 'a' * 40, 'fixture')
         failures = [(flag, False) for flag in presentation.FLAGS] + [(flag, True) for flag in presentation.UNQUALIFIED]
         failures += [('abi', 'arm64-v8a'), ('sourceRevision', 'b' * 40), ('fingerprint', 'different'),
-                     ('api', True), ('targetSdk', 28), ('groupsPassed', 4), ('audioTrackAcceptedFrames', True),
+                     ('api', True), ('targetSdk', 28), ('groupsPassed', 5), ('audioTrackAcceptedFrames', True),
+                     ('surfaceLifecycleConnections', True), ('surfaceLifecycleConnections', 1),
+                     ('surfaceLifecycleConnections', 3), ('surfaceLifecyclePeerEofs', True),
+                     ('surfaceLifecyclePeerEofs', 1), ('surfaceLifecyclePeerEofs', 3),
                      ('audioTrackPlayedFrames', 4799), ('audioTrackPlayedFrames', 999999)]
         for key, value in failures:
             changed = copy.deepcopy(receipt); changed[key] = value
             with self.subTest(key=key), self.assertRaises(ValueError):
+                presentation.validate_receipt(changed, 'a' * 40, 'fixture')
+
+        for key in (*presentation.FLAGS, 'surfaceLifecycleConnections', 'surfaceLifecyclePeerEofs'):
+            changed = copy.deepcopy(receipt); del changed[key]
+            with self.subTest(missing=key), self.assertRaises(ValueError):
                 presentation.validate_receipt(changed, 'a' * 40, 'fixture')
 
     def test_both_real_x64_native_images_required_and_arm64_is_not_inferred(self):

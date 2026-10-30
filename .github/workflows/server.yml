@@ -10,6 +10,8 @@ on:
       - tools/manifest_server_modules.py
       - tools/package_server_content.py
       - tools/qualify_dbimport.py
+      - tools/initialize_server_schema.py
+      - tests/test_server_schema_baseline.py
       - tools/owned_process_group.py
       - tests/test_owned_process_group.py
       - tools/qualify_authserver.py
@@ -44,6 +46,8 @@ on:
       - tools/manifest_server_modules.py
       - tools/package_server_content.py
       - tools/qualify_dbimport.py
+      - tools/initialize_server_schema.py
+      - tests/test_server_schema_baseline.py
       - tools/owned_process_group.py
       - tests/test_owned_process_group.py
       - tools/qualify_authserver.py
@@ -142,7 +146,7 @@ jobs:
           -Isources/server/src/common -Isources/server/src/common/Platform
           -Isources/server/src/server/game/LuaEngine/hooks tests/native/eluna_hooks.cpp
       - name: Verify server artifact checker behavior
-        run: python3 -m unittest tests.test_owned_process_group tests.test_server_build tests.test_dbimport_qualification tests.test_server_adaptations tests.test_empty_script_modules tests.test_local_account tests.test_auth_protocol tests.test_authserver_qualification -v
+        run: python3 -m unittest tests.test_owned_process_group tests.test_server_build tests.test_dbimport_qualification tests.test_server_schema_baseline tests.test_server_adaptations tests.test_empty_script_modules tests.test_local_account tests.test_auth_protocol tests.test_authserver_qualification -v
       - name: Configure ARM64 server
         run: |
           set -o pipefail
