@@ -2,6 +2,7 @@ package io.github.russianranger.esteria.runtime;
 
 import android.content.Context;
 import io.github.russianranger.esteria.core.runtime.SessionSupervisor;
+import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
@@ -40,12 +41,13 @@ public final class ServerDatabaseService {
         private final OwnedProcess process;
         private final FileChannel leaseChannel;
         private final FileLock lease;
-        private final Path guestSession;
+        private final Path guestSession,runtimeGeneration;
         private final String operation,version;
         private String instanceUuid;
         private boolean released;
-        private Handle(OwnedProcess process,FileChannel channel,FileLock lease,Path session,String operation,String version) {
-            this.process=process;leaseChannel=channel;this.lease=lease;guestSession=session;this.operation=operation;this.version=version;
+        private final ServiceOperationGuard operations=new ServiceOperationGuard();
+        private Handle(OwnedProcess process,FileChannel channel,FileLock lease,Path session,String operation,String version,Path runtimeGeneration) {
+            this.process=process;leaseChannel=channel;this.lease=lease;guestSession=session;this.operation=operation;this.version=version;this.runtimeGeneration=runtimeGeneration;
         }
         @Override public boolean isAlive(){return process.isAlive();}
         @Override public int exitCode(){return process.exitCode();}
@@ -53,6 +55,11 @@ public final class ServerDatabaseService {
         public String instanceUuid(){return instanceUuid;}
         public Path privateSessionDirectory(){return guestSession;}
         @Override public void stop(Duration timeout) throws IOException {
+            try(ServiceOperationGuard.StopPermit permit=operations.stopWithin(timeout)) {
+                stopOwned(permit.remaining());
+            }
+        }
+        private void stopOwned(Duration timeout) throws IOException {
             try {
                 process.stop(timeout);
                 if(process.isAlive() || process.exitCode()!=0 || process.wasForced() || process.failure()!=null)
@@ -70,6 +77,21 @@ public final class ServerDatabaseService {
                 // service lock also remains held until its real engine stops.
                 if(!process.isAlive())release();
             }
+        }
+        interface ReadyOperation<T> { T run(String operation,String version,String uuid) throws IOException; }
+        /** Setup observes this request and cancels only at a SQL file boundary. */
+        boolean schemaCancellationRequested(){return operations.isStopRequested();}
+        /** Keep the same live engine and exclusive Android service lease for an
+         * off-main-thread operation. Shutdown waits only its caller's deadline. */
+        <T> T withReadyLease(Path expectedRuntime,ReadyOperation<T> action) throws IOException {
+            return operations.run(()->{
+                if(released || !lease.isValid() || instanceUuid==null || !runtimeGeneration.equals(expectedRuntime) || !process.isAlive())
+                    throw new IOException("A live owned database service from this runtime is required");
+                T result=action.run(operation,version,instanceUuid);
+                if(released || !lease.isValid() || !process.isAlive())
+                    throw new IOException("Database service exited during schema setup; state retained");
+                return result;
+            });
         }
         private synchronized void release() throws IOException {
             if(!released){released=true;try{lease.release();}finally{leaseChannel.close();}}
@@ -96,7 +118,8 @@ public final class ServerDatabaseService {
         });
     }
     static Handle startInstalled(Context context,Path root,InstalledRuntime runtime) throws IOException {
-        if(!root.equals(context.getFilesDir().getCanonicalFile().toPath()) || runtime.current()==null)
+        Path installed=runtime.current();
+        if(!root.equals(context.getFilesDir().getCanonicalFile().toPath()) || installed==null)
             throw new IOException("Prepared runtime and canonical private storage required");
         Path work=GuestHelperAssets.directory(root,"state/server-work");
         // PRoot expands guest UNIX sockets to these physical Android filenames.
@@ -127,7 +150,7 @@ public final class ServerDatabaseService {
                         if(!child.writeInput("shutdown\n".getBytes(StandardCharsets.US_ASCII),Duration.ofSeconds(1)))
                             throw new IOException("Database shutdown request was not delivered");
                     });
-            return new Handle(process,channel,lock,guestSessions.resolve(operation),operation,runtime.expectedMysqlVersion());
+            return new Handle(process,channel,lock,guestSessions.resolve(operation),operation,runtime.expectedMysqlVersion(),installed);
         } catch(IOException|RuntimeException error) {
             try{if(lock!=null)lock.release();}finally{channel.close();}
             throw error;

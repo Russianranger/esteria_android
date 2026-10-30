@@ -34,6 +34,23 @@ class ClientAuthQualification(unittest.TestCase):
         self.assertTrue(all(location.startswith('client-auth/') for location in locations))
         self.assertNotIn('private-secret',json.dumps(locations));self.assertNotIn('test_',json.dumps(locations))
 
+    def test_untagged_mysqld_startup_errno_is_kept_without_private_text(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            path=Path(temporary)/'initialize-private.log'
+            path.write_bytes(b'mysqld: private/path/password (OS errno 30 - private detail)\n'
+                b'/usr/sbin/mysqld: private SQL Errcode: 13\n'
+                b'mysqld-debug: private detail errno=2\n'
+                b'[Note] [MY-010116] private startup errno=77\n'
+                b'unrelated: private text Errcode: 99\n'
+                b'[ERROR] [MY-010119] private summary\n')
+            path.chmod(0o600)
+            result=qualifier.initialization_failure_codes(path)
+            self.assertEqual(result['osErrorNumbers'],[2,13,30])
+            self.assertEqual(result['mysqlErrorCodes'],['MY-010119'])
+            self.assertEqual(set(result),{'scope','mysqlErrorCodes','osErrorNumbers','privateLogTextExported'})
+            self.assertFalse(result['privateLogTextExported'])
+            self.assertNotIn('private',json.dumps(result).replace('privateLogTextExported',''))
+
     def test_readonly_source_verification_uses_exact_trust_and_no_index_writes(self):
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary); revision='a'*40

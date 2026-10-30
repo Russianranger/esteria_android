@@ -195,3 +195,44 @@ Android/Adreno execution remains unqualified.
 six-patch binaries and artifact-contained lock, independent of the newer application
 lock. Docker is only their native reference environment. Android execution uses
 PRoot and the application-owned process bridge, never device Docker.
+
+
+## Server programs, SQL sources and Android setup
+
+`-PserverProgramsProviderDir=<verified-provider>` selects the optional stripped
+ARM64 programs installer. `runtime/server/PROGRAMS-ANDROID-PACKAGING.md` records
+its original binaries, paired debug archive and source gate. The current lock
+remains pending: an actual complete isolated source rebuild receipt is required
+before Gradle/provider tools permit packaging. Never flip only its boolean.
+
+The original seven-patch SQL/configuration package can be prepared without Git:
+
+```sh
+python3 tools/provider_server_content.py build --artifact <exact-12965377058.zip> --output <new-provider>
+python3 tools/provider_server_content.py verify --provider <new-provider>
+```
+
+Pass `-PserverContentProviderDir=<new-provider>` together with the separately
+verified `-PserverRuntimeProviderDir=<dependencies>`. The source archive remains
+unaltered and is stored uncompressed in APK assets as `.archive`; the external
+receipt and four metadata markers bind its4,063-file source-selected inventory.
+`verify --apk <apk>` must pass for every selected provider after assembly. See
+`runtime/server/content-provider.lock.json` for exact input bytes/hashes. This
+bundles source SQL/configuration and notices, not initialized saves or server data.
+
+`app/server-schema.gradle` packages the original standard-library helper sources
+and nested appearance adaptation inputs. `ServerSchemaSetup` requires a retained
+live owned MySQL handle, verified programs/content generations and matching UUID.
+It does not enable Main START. `runtime/server/ANDROID-SCHEMA-SETUP.md` documents
+the current baseline-only and partial-journal boundaries.
+
+`.github/workflows/server-isolated-build.yml` replays all seven server patches
+against exported inputs with no source Git repository, compiler cache or external
+network. It captures relevant original compiler/ABI inputs and seals corresponding
+sources only after the complete native ARM64 rebuild passes. The one original
+module-loader header supplement is separately hash-pinned and retained.
+
+`.github/workflows/wine-arm64-candidate.yml` builds the source-owned private-PE
+adaptation for the production architecture. Its generated candidate locks remain
+separate from the old production runtime and archive-bound client/bridge/graphics
+providers until the actual new runtime is measured and requalified.

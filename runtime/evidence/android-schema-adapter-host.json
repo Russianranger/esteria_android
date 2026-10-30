@@ -1,0 +1,88 @@
+{
+  "actualMysqlSqlExecuted": false,
+  "androidBuild": {
+    "androidTestCompilationPassed": true,
+    "apkAssemblyPassed": true,
+    "apkHelperBytesEqualSources": true,
+    "javaCompilationPassed": true,
+    "lintPassed": true,
+    "mandatorySchemaHelperDeviceTests": 3,
+    "nestedHelperFiles": 2
+  },
+  "androidDeviceExecuted": false,
+  "androidRuntimeQualified": false,
+  "apk": {
+    "bytes": 412929,
+    "sha256": "7f6475ee8c9ad9a10d998a69cc28dd9c860207e4c49a7f1806ed3c9ee671e72a"
+  },
+  "authserverExecuted": false,
+  "compiledUpdaterExecuted": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "helperManifest": {
+    "bytes": 1101,
+    "sha256": "da0d57c3f215628aa2a0f9ceed32bd8a089d1a576c3696481ba97f9409df1e63"
+  },
+  "helpers": {
+    "android_server_schema_setup.py": {
+      "bytes": 11875,
+      "sha256": "9526275258a6b98930e3253c0011627844ed10e1816658b3d5d07e23cd3dfd02"
+    },
+    "mysql_bootstrap.py": {
+      "bytes": 29877,
+      "sha256": "c8bfe432c5651b6908882342515f14bde33b1564098dde9d865ec38c4b47bca6"
+    },
+    "mysql_service.py": {
+      "bytes": 18078,
+      "sha256": "8b30e9598f20ee715685a51aba59cefcafc6213d9d5d5cb6c6f3a73efa6b71c2"
+    },
+    "server/appearance-schema-v1.sql": {
+      "bytes": 790,
+      "sha256": "8e35e8e41d74979eaa98f6f2d824d831b73f63a4a6b2f573b869484b2ff15d46"
+    },
+    "server/appearance-schema.lock.json": {
+      "bytes": 7783,
+      "sha256": "6ccf5e363ec3daa5c37cbbe753d29a7e6b5d10f18eef407b700fc0d67985428d"
+    },
+    "server_content.py": {
+      "bytes": 20541,
+      "sha256": "e32102ba850f4df7201c39c53e6c5530e59992cef1d3587ac809aca2ad681f8c"
+    },
+    "server_schema_adaptations.py": {
+      "bytes": 6316,
+      "sha256": "a49e1f8477d8b840964ce47783ed5af6873dc0dcde5b4a52280b696159082b44"
+    },
+    "server_schema_baseline.py": {
+      "bytes": 8606,
+      "sha256": "21d0bd526145f6699db90e9f90bb3ec01cf15316b59e27f8db6649f03480df20"
+    },
+    "server_schema_setup.py": {
+      "bytes": 10862,
+      "sha256": "64681a3d44cfcee8049fea4874627e1343c4fd8c204f23edd8f2c0b45b8e6c8a"
+    }
+  },
+  "host": {
+    "actualAtomicJournalCancellationRacePassed": true,
+    "actualSqlClientFixtureSubprocess": true,
+    "androidInstallerHarnessTests": 3,
+    "concurrentServiceStopDeadlineAndRetryPassed": true,
+    "coreMountChecksPassed": true,
+    "credentialsExcludedFromArgumentsAndEnvironment": true,
+    "existingSchemaJournalTests": 14,
+    "guestEntrypointTests": 8,
+    "privateLogLimitBytes": 1048576,
+    "streamedSqlBytes": 3014656
+  },
+  "limitations": [
+    "Default APK contains source helpers; server programs and content require separately pinned providers.",
+    "Nested APK helper filesystem tests compile but require Android execution.",
+    "The baseline adapter retains the live service lease; compiled updater, account and realm provisioning remain subsequent gates.",
+    "Clean cancellation between completed SQL files preserves the partial fresh baseline and currently refuses automatic reentry/recovery."
+  ],
+  "scope": "android-schema-adapter-host-and-packaged-source-only",
+  "sourceLock": {
+    "bytes": 2170,
+    "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+  },
+  "worldserverExecuted": false
+}

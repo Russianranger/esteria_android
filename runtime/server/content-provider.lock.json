@@ -1,0 +1,106 @@
+{
+  "androidRuntimeQualified": false,
+  "appSourceLock": {
+    "bytes": 2170,
+    "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+  },
+  "archive": {
+    "bytes": 167585802,
+    "file": "server-content.tar.gz",
+    "sha256": "0f41b2deea5344fcea4cbc70bbddf0bab1dfda1cd0346e23e92592aac63056e6"
+  },
+  "archiveEntries": 4063,
+  "archiveFileBytes": 654243888,
+  "artifact": {
+    "bytes": 171464693,
+    "id": 12965377058,
+    "sha256": "a66b586f4517ce56d529378e72e125287c1122f84f35339102f8b8def78b9d07"
+  },
+  "compiledModules": {
+    "bytes": 5348,
+    "sha256": "6459b6a1acab2c62c474e4c6ab3eb651daa21f697ccd628e93a38bad298bbdd1"
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "integrationRevision": "e9dcb61d8d8c40fc683ac2a67bbf15a8eb538300",
+  "limits": {
+    "entries": 8192,
+    "fileBytes": 654243888,
+    "memberBytes": 76428259,
+    "metadataBytes": 16777216,
+    "pathBytes": 4096
+  },
+  "luaDisabled": true,
+  "originalBuild": {
+    "bytes": 32521,
+    "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+  },
+  "originalNoticesPreserved": true,
+  "receipt": {
+    "bytes": 1343739,
+    "sha256": "1c00990e090e85af0232fe633b64e2718071a5f8e81f3b0ca1c8f2b214ffb3af"
+  },
+  "requiredFiles": {
+    "metadata/compiled-modules.json": {
+      "bytes": 5348,
+      "sha256": "6459b6a1acab2c62c474e4c6ab3eb651daa21f697ccd628e93a38bad298bbdd1"
+    },
+    "metadata/content-manifest.json": {
+      "bytes": 2529178,
+      "sha256": "c6d88cac5939b6412eafbe29d7bd92fa582e8de3a2fde7acee4bad79ce928d94"
+    },
+    "metadata/lua-map.json": {
+      "bytes": 8685,
+      "sha256": "9b0f866d6827978eb15de95223177a4797adfaf692b52446309759d093380646"
+    },
+    "metadata/package-plan.json": {
+      "bytes": 3433,
+      "sha256": "69beef2a5252314840ac16ab5a1da043ecd30857652111177c9073967b5a37b9"
+    }
+  },
+  "requiredServerRuntimeArchiveSha256": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5",
+  "scope": "measured-server-content-provider-inputs",
+  "serverSource": {
+    "branch": "main",
+    "commit": "f35f04d01689f034778e3474b3c820092f51e461",
+    "patches": [
+      {
+        "path": "patches/server/0001-eluna-declare-area-trigger.patch",
+        "sha256": "c26b145188c5f97bf30d032e1fe3bd7fe17aa1f8f0daa6793e51f5d830fe7aa6",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0002-eluna-include-map-manager.patch",
+        "sha256": "4e277dbe56c31ae30640c8e9ad4dee12e944e0f051d9bdc8d62aaa239c50433f",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0003-eluna-hooks-include-types.patch",
+        "sha256": "5999402d985fcc709abdc90bb4272072d1d5e3e261b2cc7ec19460320c14295f",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0004-attunement-stat-api.patch",
+        "sha256": "d9ef6ca8f96ab186c37c072b22143cdded9976aa3a62d083f893c502a5745cb8"
+      },
+      {
+        "path": "patches/server/0005-script-grid-templates.patch",
+        "sha256": "6b459c90839e7831df8533966442fabd476ae1773f0302c50ccc8a997f157369"
+      },
+      {
+        "path": "patches/server/0006-empty-script-modules.patch",
+        "sha256": "ea0beb357c71d8b8c187af9d4afede520e7ac9877e40fbdc5fab99d54fc21f97"
+      },
+      {
+        "path": "patches/server/0007-runtime-module-config-directory.patch",
+        "sha256": "5e41d474179ef553ec9c2544de947a3724885fd7f3ac233af3d89797acd032ff"
+      }
+    ],
+    "submodules": {
+      "src/server/game/LuaEngine": "58d7652138887783228b9727bd1fa4e08f00342b"
+    },
+    "url": "https://github.com/Russianranger/EsteriaWoW.git"
+  },
+  "sqlExecuted": false,
+  "workflowRun": 41019374697
+}

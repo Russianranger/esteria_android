@@ -13,6 +13,10 @@ import threading
 PACKAGE = 'io.github.russianranger.esteria'
 TEST = PACKAGE + '.core.runtime.install.RuntimeInstallationInstrumentedTest'
 HELPER_TEST = PACKAGE + '.runtime.DatabaseServiceAssetsTest'
+SCHEMA_HELPER_TEST = PACKAGE + '.runtime.ServerSchemaAssetsTest'
+SCHEMA_HELPER_METHODS = ('nestedOriginalSourcesInstallAndResumeWithoutRewriting',
+    'unexpectedNestedModuleIsPreservedAndRefused',
+    'linkedResourceDirectoryIsPreservedAndRefused')
 HELPER_METHODS = ('actualBundledHelpersInstallAndRepeatWithoutRewriting',
     'changedExistingHelperIsPreservedAndRefused',
     'partialGenerationResumesAndRetainsHarmlessInterruptedWrite',
@@ -111,6 +115,8 @@ def main():
             raise RuntimeError(method + ' did not report one successful test')
     for method in HELPER_METHODS:
         test(method, HELPER_TEST)
+    for method in SCHEMA_HELPER_METHODS:
+        test(method, SCHEMA_HELPER_TEST)
     test('runtimeContracts')
     test('seedBeforeUpdate')
     command('install-update-preserving-data', ['install', '-r', str(args.update_apk)])
@@ -118,6 +124,7 @@ def main():
     receipt = dict(formatVersion=1, scope='android-13-x86_64-installer-and-apk-update',
         emulatorProperties=properties, artifacts=artifacts, runtimeContractGroups=18,
         databaseHelperAssetContractGroups=len(HELPER_METHODS), databaseHelperAssetsQualified=True,
+        schemaHelperAssetContractGroups=len(SCHEMA_HELPER_METHODS), schemaHelperAssetsQualified=True, schemaSqlExecuted=False,
         databaseServiceExecuted=False,
         runtimeFilesystemQualified=True, sameJobDebugKeyUpdatePreservedRuntimeAndSentinel=True,
         userSigningIdentityQualified=False, arm64GuestExecuted=False, gameplayQualified=False,

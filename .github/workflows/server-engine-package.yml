@@ -22,6 +22,10 @@ on:
       - runtime/server/appearance-schema-v1.sql
       - runtime/server/appearance-schema.lock.json
       - tests/test_server_engine_*.py
+      - tools/render_server_config.py
+      - runtime/server_config.py
+      - runtime/server_updater.py
+      - runtime/owned_process_group.py
 permissions:
   contents: read
   actions: read

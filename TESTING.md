@@ -1,185 +1,74 @@
 # Validation gates
 
-## Host tooling
-```
+## Focused local checks
+
+```sh
 python3 -m unittest discover -s tests -v
 python3 tools/verify_protocol.py --client ../client-src --server ../server-src
+./gradlew :core:check :app:assembleDebug :app:assembleDebugAndroidTest :app:lintDebug
 ```
-The actual-source protocol verifier generates the selected 25/254/32 descriptors and compares every player field to pinned server offsets and sizes. It also checks mask counts, container slots and server size-comment consistency. This verifies layout, not login, appearance transport or world behavior.
 
-Java core tests use synthetic files and child processes, with no game data or
-database required. Run `./gradlew :core:check :app:assembleDebug :app:lintDebug`.
-The importer runs with a 32 MiB heap and a larger streaming input. Tests cover
-interruption/reuse, immutable overlays, malformed archive/provider metadata,
-bounded inventories, cancellation and prior-generation preservation. SAF Android
-provider behavior remains a separate emulator/device check.
+Use documented SDK/JDK/NDK dependencies and exact source locks from BUILDING.md.
+Run focused affected groups first. Real-MySQL and native/emulator fixtures require
+explicit disposable environments; skipped tests are not execution evidence.
+Changing an optional provider/ABI profile requires a clean app build. After
+assembly, verify every selected provider against the final APK, including stored
+archive bytes, original metadata/notices and exact source companions.
 
-Runtime installer checks run with `:core:runtimeInstallerTest` (64 MiB heap).
-Seventeen groups cover traversal, malformed GNU metadata, cancellation/resume,
-closed staging inventories, required-file tampering, download caching and activation.
-The actual pinned archive passed on Linux with 64 MiB heap: 14,092 entries, all
-11,844 regular source files reused on retry, zero copied payload on retry. This is
-not Android filesystem or execution evidence.
+## Actual evidence boundaries
 
-The client CI matrix separately builds full Windows x64 and ARM64 binaries,
-validates PE provenance, and invokes the actual movie DLL through a synthetic
-compressed-frame driver. Linux x64 and native ARM64 component tests cover portable
-algorithms. None of these tests start the full game.
+| Gate | Actual result | Does not establish |
+| --- | --- | --- |
+| Source/layout/client builds | Client0f all five jobs41012726334; all215 descriptors match254containers/25quests/32client class capacity. | Matched gameplay, appearance/inventory semantics. |
+| Compiled six-patch server |41050050193: first/repeat SQL, original ledgers, restart, real SRP/M2 and40-byte persisted session key, loopback realm, credentials/trackers and clean shutdown. | Reconstructed client, world, bots or Android. |
+| Current seven-patch derivatives |41050050294: actual stripped program hashes agree across native loader, first/repeat dbimport, ledgers/restart and compiled-auth receipts. | Complete source seal, playerbots/world or Android execution. |
+| Appearance binary storage |49/132byte NUL/high-byte REPLACE/read/delete/restart; fixtures removed. Explicit source-derived schema provenance. | Actual game appearance transport, characters or original canonical schema. |
+| Native full50 configurations |41041859706: real ConfigMgr parse/reload and preserved source templates; shared renderer produces byte-identical54files/proof/hash. | World/module initialization. |
+| Android Wine x64 |41046942035: source-adapted reconstructed EXE entry/offline checks and real loopback transport. | ARM64, CommonMain, GPU/audio or full game. |
+| ARM64 Wine host | Current0f controlled-peer Grunt plus source-specific codec/entry/software Vulkan/frame/texture/audio scopes pass historical pinned runtime. | Android/Adreno; the new source-built adaptation has its own pending gates. |
+| MySQL service/backup | Native ARM64 persistent service and367,899,260byte restore/restart equality; Android13 x64 Java service41016293760 actual two live cycles. | Production ARM64 Android, existing game-save upgrades/restores. |
+| Content install/package | Actual seven-patch4,063files/654,243,888bytes install on Java32MiB, zero-copy cached retry, complete product no-Git verification; local APK/AndroidTest/lint and final dependency/content APK bytes pass. | SQL or Android runtime execution through the new adapter. |
+| Schema helper | Real subprocess SQL streaming/private bounded diagnostics, same-service identity rejection, journal cancellation boundaries and concurrent bounded service guard pass host tests. Nine exact helper APK files match source. | Android schema execution, compiled updater composition or gameplay. |
+| Android filesystem/update |40995925492:18installer groups, same-CI-key install-r update preserving runtime/persistent marker. | Stable-key user update baseline or game saves. |
+| Input/display/audio/ownership | Actual Android x64 Surface/AudioTrack lifecycle, native ARM64 authenticated X11/XTest, Wine FMOD PCM capture and Android owned-process cleanup pass separately. | Complete guest/client presentation, actual Thor controls/audio or Adreno. |
 
-## Real database evidence
+Public JSON under runtime/evidence and scoped qualification documents retain exact
+run/artifact/source hashes and narrowly typed claims. Preserve original failure
+receipts; later component success does not rewrite historical observations.
 
-Database run [40983978344](https://github.com/Russianranger/esteria_android/actions/runs/40983978344)
-passed both real-engine fixtures. The dedicated MySQL 8.0.44 service verifies
-authentication/provisioning/locks/ownership/preservation. Host MySQL 8.0.46 verifies
-fresh initialization, secure setup, datadir promotion/recovery, restart and SQL
-persistence. The logs record exact engine versions. The bootstrap only creates
-empty application databases. Game-schema load, migrations, character saves and
-Android MySQL remain unqualified. Ordinary discovery reports these fixtures as
-skipped unless their explicit environment and disposable engine are provided.
+## New schema and recovery checks
 
-Realm repair run [40987376123](https://github.com/Russianranger/esteria_android/actions/runs/40987376123)
-passes all eight dedicated MySQL 8.0.44 tests, including owned-instance checks and
-preservation of unrelated rows/settings. Only realm network/build provisioning is qualified.
+`tests.test_android_server_schema_setup` runs actual subprocess fixtures that
+stream SQL without exposing credentials in argv/environment and bound private
+failure logs. `tests.test_runtime_server_schema_setup` tests exclusive source/UUID
+journal ownership, no unsafe SQL replay, and durable intent as the commit-to-file
+cancellation boundary. `:core:serviceOperationGuardTest` executes real concurrent
+stop/operation races; a timeout retains the owned live engine/lease for retry.
 
-## Wine and Android evidence boundaries
+`tools/qualify_android_installer.py` now requires three ServerSchemaAssetsTest
+methods in addition to the existing database helper contracts. Their actual
+emulator results are pending publication/CI; local compilation and APK closure
+alone do not qualify Android behavior.
 
-The candidate Wine archive is measured and staged with checked file hashes and
-architecture. Its actual client execution requires the separate native Linux ARM64
-fixture in [runtime/WINE-QUALIFICATION.md](runtime/WINE-QUALIFICATION.md). Keep
-its resulting qualification JSON and logs; authored tests or absent physical DLL
-files for API-set names do not establish loader success or failure.
+Initial partial baseline journals still refuse replay. Fresh-installation slot
+and promotion recovery work is ongoing; never erase/reinitialize an active or
+legacy database to make a test pass. Never claim clean saving after forced stop.
 
-Native Linux ARM64 Wine codec run `40985737329` and software Vulkan run
-`40986534025` pass. The latter presents/resizes 16 frames and exercises 30,000
-texture lifetime operations using the pinned Lavapipe stack. Its receipt SHA-256 is
-`26e27a5437dd2785ed6b8db05b7281b7a45306696c1f58360709052f515cefc0`.
-Validation layers were unavailable; this is not hardware Vulkan or world rendering.
-The actual-client entry fixture passes on Windows x64/ARM64 and native Linux
-ARM64 Wine in run `40989834370`, with seven receipt checks and clean namespace exit.
-Qualification SHA-256: `a7686069cd8e62eb8cb2075380e5cbb7390b2e42718c318413261cffc54141a6`.
-It returns before CommonMain/assets; Wine DbgHelp unwinds only one frame.
+## Remaining acceptance
 
-Android APK compilation/lint and launcher host tests are passing checks. No Android
-emulator or physical Thor gameplay result has been recorded. Display/audio/input,
-PRoot execution, full local client/server startup and offline play need actual
-runtime validation. Keep launcher memory/thermal diagnostics labeled as launcher
-observations until the combined runtime can be measured.
+Matched reconstructed client/server authentication, actual server DBC/map loading,
+character creation/selection, world entry, gameplay rendering/input/audio,
+combat/loot/inventory/quest interaction, save/relog, small supported bots, offline
+play, combined memory/CPU/thermal behavior, Android ARM64 lifecycle and stable-key
+user updates remain end-to-end gates. Missing MPQs/custom data block their affected
+checks; continue independent implementation.
 
-## Not yet qualified
-Game-schema initialization/migration, server data loading, full Wine client launch,
-Vulkan world rendering, audio/input, character login/create/world entry,
-combat/loot/quests, save/relog, bots, offline play, update-signature continuity and
-Android low-memory recovery have not passed end-to-end validation.
+## Consolidated Thor test
 
-Do not ask the owner to install a foundation APK. The main Thor test comes after one coherent candidate is expected to cover all requested gameplay. A narrow device-only diagnostic is allowed only when evidence shows useful independent work cannot continue.
-
-## Future consolidated Thor test
-Install/update with the stable signing identity; import verified data; start local play; create/select a character; move/look with controller; fight/loot/equip/quest; summon a small supported bot group; verify audio; exit/relaunch and confirm saves; repeat with networking disabled. Export one support bundle. Exact instructions and artifact identification must accompany the qualified candidate, not this preliminary gate description.
-
-## Android filesystem and APK-update instrumentation
-
-`.github/workflows/android-instrumentation.yml` builds an AndroidX instrumentation
-APK and two application versions, then runs only on a fresh Android 13 x86_64
-emulator. It reuses the same 18 installer contracts in app-private storage, stages
-a runtime and separate persistent-state marker, installs version 2 with `adb
-install -r`, and verifies both survive with zero runtime recopy. The harness
-refuses a physical device or preexisting app and requires an explicit completed
-JUnit result for each phase. It records APK hashes and emulator properties.
-
-Local instrumentation compile and Android lint pass. First emulator run
-`40990723608` failed because Android rejects `Files.getFileStore`; runtime download,
-runtime extraction, game import, ZIP staging and storage diagnostics now use
-`File` storage queries. Free-space reserves remain enforced. The second emulator run `40991448984` then exposed app-private hardlink denial.
-The explicit verified-copy fallback adds an 18th contract. Run
-`40995925492` at `e22b8d30a053a4afbcd6d78ca28e80f8dc0c697a` passes all contracts,
-seed, update and retained-pointer/copied-hardlink/sentinel assertions. Evidence
-artifact SHA256 is `03eadc7a72f54f9a861ee5d11b0eb3f17d780cbc7508c7970ff7042de4a167d1`.
-This qualifies Android filesystem/update behavior, not ARM64 PRoot/Wine,
-audio/display, gameplay, or the user's persistent signing key.
-Both test versions use one isolated CI debug key.
-
-## Native presentation, input and process gates
-
-`tools/check_process_owner.py` builds and executes the native C++ owner and real
-JVM/JNI adapter fixtures. The separate Android owner workflow requires x86_64 JNI
-on an Android13 emulator and executes `/system/bin/sh`; it does not skip a missing
-bridge or claim ARM64 guest execution. Host owner, JNI, NDK ARM64 build, native
-APK validation and Android compile/lint pass. Actual emulator execution passes
-all six owner groups in run `40994809786`; see `runtime/ANDROID-OWNER-QUALIFICATION.md`.
-
-Six bounded JVM PCM/input protocol groups and the production native Surface decoder
-with host socketpairs/test-only ANativeWindow stubs pass. Guest helper ARM64 builds
-use pinned Debian12 inputs and source companions and pass native ARM64 CI
-`40995565147`. Actual Android Surface/AudioTrack
-playback and Wine guest input/audio remain separate gates. `runtime/CONTROLS.md`
-describes the initial internal controller/IME router and remaining device checks.
-
-The actual engine frame readback passed in Wine run `40992315512`: receipt SHA256
-`69bfe354c777abf78e54ed033849235928edf742efdfce3371bca4c1e01379c4`.
-This includes exact BGRA/partial-clear pixels and embedded engine presentation,
-using llvmpipe LLVM15.0.6 with validation layers unavailable. It is not world rendering.
-
-Actual Android PRoot/glibc run `40998008458` at integration `69b6b9e` passes the
-two-launch native x64 fixture at API33/target35. It verifies private ELF loading,
-glibc2.36 dlopen/TLS/pthreads, fork/exec, loopback and persisted bytes, with empty
-guest stderr. Artifact SHA256 is
-`9f08e7cc1461f04467730d7b25e1513b1284d91a9041c3bae187b7a1e176f2a9`.
-See `runtime/ANDROID-PROOT-QUALIFICATION.md`; production ARM64, Wine and
-tracer/app-death behavior are explicitly outside this result.
-
-The real ARM64 owned-account qualification passes run `40998008509`, receipt
-SHA256 `6c67ff662a12c1165bdad9b6b3330feeb5452af0f99c9365776d52e25c9bc0fa`.
-It uses a separate fresh exact-MySQL8.0.46 fixture, not a replay over saved game
-state. `runtime/LOCAL-ACCOUNT.md` records source-matched SRP and recovery scope.
-
-Android Surface/AudioTrack run `40999380046` passes all ten required assertions,
-including real RGBA readback, recreation,4,992 accepted/played frames and shutdown
-with an idle connected audio peer. Artifact SHA256 is
-`590f6c7373728be0e13e0907d8a3d0d037cf5ab469e4050c7a99c5e92e2a75e7`.
-Native ARM64 Wine FMOD run `40998295147` also passes both actual backend/signal
-checks; receipt SHA256 is
-`663bdfd114d8440098556f5e475a4024224b28b8c5700a903d58308762131ffd`.
-These remain separate host/emulator component results, not an end-to-end game pass.
-
-
-The latest host checkpoints add six Android database-adapter preservation tests,
-32MiB writable UI generation/selection tests, twelve real native JNI groups with
-bounded stdin, and eleven backup guard tests including the actual kernel output
-size limit. Full MySQL dump/restore, expanded Android process tests and corrected
-tracer-death control still require their CI results. See the scoped qualification
-documents; none of these host checks establishes login, world saving or Thor use.
-
-
-Current lifecycle evidence supersedes the pending qualifications above: stdin
-41003838802 and remote-owner41006180061 pass real Android13 x64 execution. The
-latest combined ARM64 all-provider APK passes clean core/build/instrumentation/lint
-and final provider hashes, without claiming ARM64 execution. Eight shader setup
-host groups validate transactions, exact tool closure and actual subprocess bounds;
-synthetic SPIR-V fixtures deliberately claim no semantic/rendering qualification.
-Native ARM64 backup41013086447 passes complete367,899,260-byte canonical equality
-following fresh restore and restart, account/setup preservation and the explicit
-harness-column charset correction. No server tables or strict comparisons changed.
-The persistent native service also passes41013380186 and the short-socket regression
-41015153591. These do not establish live game-character restoration or upgrades.
-Android13 x64 MySQL41010011663 passes actual initialize/authenticate/repeat/restart
-and same-instance credentials/marker preservation after the rename adaptation;
-this is not production ARM64 or game-save qualification. The stable development
-certificate has signed an internal nondebug43cc release with exact provider
-readback, but installation/update preservation and a delivered baseline remain
-open. See the scoped qualification documents and public evidence receipts.
-
-
-Client0f run41012726334 passes all five Windows/native-Linux jobs, including real
-Grunt callbacks and SRP-proof validation under ARM64 Wine against a controlled
-peer. The compiled Esteria pairing is a separate `client-auth.yml` gate. The
-actual six-patch server linked and passed loader/module checks in41005048019;
-its first exact-binary runtime rerun reached MySQL/dbimport but failed a documented
-Nemesis base-before-update ordering requirement. This is an active setup fix,
-not a successful compiled authentication result.
-
-Android x64 Wine41015479987 failed ntdll page protection during prefix creation,
-before client execution. The next run41017052972 measured errno13 only when a
-modified private file mapping was changed from RW to RX; anonymous RW→RX and
-clean/direct file executable mappings passed. No mapped diagnostic bytes execute.
-The runtime adaptation is being built from source; Android policy and target SDK
-remain unchanged.
+Do not ask the owner to install foundation probes. The normal test comes with one
+nearly complete signed APK, working download, exact revisions/build identifier,
+update-safe instructions and one support-export action. Procedure: import verified
+content; start local play; create/select a character; move/look with controller;
+fight/loot/equip/quest; use a small bot group; verify audio; exit/relaunch/relog and
+confirm saves; repeat with networking disabled; export one support bundle.
+A device-only diagnostic exception requires evidence that independent work is blocked.

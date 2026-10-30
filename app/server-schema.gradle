@@ -1,0 +1,25 @@
+// Source-only helpers; this task neither packages server data nor enables START.
+def schemaHelpers = ['android_server_schema_setup.py', 'mysql_bootstrap.py', 'mysql_service.py',
+    'server_content.py', 'server_schema_setup.py', 'server_schema_baseline.py', 'server_schema_adaptations.py',
+    'server/appearance-schema-v1.sql', 'server/appearance-schema.lock.json']
+def schemaAssets = layout.buildDirectory.dir('generated/serverSchema')
+def packageServerSchema = tasks.register('packageServerSchema') {
+    inputs.files(schemaHelpers.collect { rootProject.file('runtime/' + it) })
+    outputs.dir(schemaAssets)
+    doLast {
+        def directory = new File(schemaAssets.get().asFile, 'server-schema')
+        directory.mkdirs()
+        def records = new TreeMap()
+        schemaHelpers.each { name ->
+            byte[] bytes = rootProject.file('runtime/' + name).bytes
+            if (bytes.length == 0 || bytes.length > 131072) throw new GradleException('Unexpected server schema helper size')
+            def destination = new File(directory, name)
+            destination.parentFile.mkdirs()
+            destination.bytes = bytes
+            records[name] = [bytes: bytes.length, sha256: java.security.MessageDigest.getInstance('SHA-256').digest(bytes).encodeHex().toString()]
+        }
+        new File(directory, 'manifest.json').text = groovy.json.JsonOutput.toJson([formatVersion: 1, files: records]) + '\n'
+    }
+}
+android.sourceSets.main.assets.srcDir(schemaAssets)
+tasks.named('preBuild').configure { dependsOn packageServerSchema }

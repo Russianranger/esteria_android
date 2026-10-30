@@ -1,0 +1,161 @@
+{
+  "androidRuntimeQualified": false,
+  "appearanceSchemaAdaptation": {
+    "adaptationId": "character-appearance-empty-v1",
+    "canonicalOriginal": false,
+    "exactEmptyTableAdditionVerified": true,
+    "existingSaveUpgradesQualified": false,
+    "freshEmptyInstanceOnly": true,
+    "metadataIdentity": {
+      "bytes": 7783,
+      "sha256": "6ccf5e363ec3daa5c37cbbe753d29a7e6b5d10f18eef407b700fc0d67985428d"
+    },
+    "originalSourceFilesUnchanged": true,
+    "rowsSeeded": false,
+    "scope": "source-derived-empty-character-appearance-schema",
+    "sourceDerived": true,
+    "sqlIdentity": {
+      "bytes": 790,
+      "sha256": "8e35e8e41d74979eaa98f6f2d824d831b73f63a4a6b2f573b869484b2ff15d46"
+    },
+    "tables": {
+      "character_body_shape": {
+        "data": "BINARY(49) NOT NULL",
+        "guid": "INT UNSIGNED NOT NULL",
+        "primaryKey": [
+          "guid"
+        ]
+      },
+      "character_retail_look": {
+        "data": "BINARY(132) NOT NULL",
+        "guid": "INT UNSIGNED NOT NULL",
+        "primaryKey": [
+          "guid"
+        ]
+      }
+    },
+    "updaterLedgerRowsWritten": false
+  },
+  "authentication": {
+    "advertisedLoopbackRealmVerified": true,
+    "androidRuntimeQualified": false,
+    "cleanShutdownVerified": true,
+    "credentialsAndTrackersPreserved": true,
+    "gameplayQualified": false,
+    "moduleConfigurationsPrepared": true,
+    "ownedLoopbackListenerVerified": true,
+    "persistedSessionKeyVerified": true,
+    "playerbotsRuntimeQualified": false,
+    "qualificationSucceeded": true,
+    "reconstructedClientExecuted": false,
+    "schemaLedgerPreserved": true,
+    "srpProofVerified": true,
+    "worldEntryQualified": false,
+    "worldModuleConfigsLoadedByAuthserver": false
+  },
+  "evidenceArtifact": {
+    "bytes": 72409,
+    "id": 12974766962,
+    "sha256": "5221e741a0e9113ed220164cc6dabc96bf193c2dccac5850b64c0f557fd20bc9"
+  },
+  "existingStateModified": false,
+  "expectedMysqlSqlVersion": "8.0.46-0ubuntu0.24.04.4",
+  "externalNetworkDisabled": true,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "integrationRevision": "870034ae997bbdba778770f0b1072821678cbf43",
+  "isolatedSourceRebuildQualified": false,
+  "jobs": {
+    "nativeReference": {
+      "conclusion": "success",
+      "id": 124045679938
+    },
+    "package": {
+      "conclusion": "success",
+      "id": 124043577798
+    }
+  },
+  "nativeAuthWorldVersionOutputs": {
+    "authserver": "AzerothCore rev. f35f04d01689+ 2026-10-28 12:35:08 -0500 (HEAD branch) (Unix, RelWithDebInfo, Static)",
+    "worldserver": "AzerothCore rev. f35f04d01689+ 2026-10-28 12:35:08 -0500 (HEAD branch) (Unix, RelWithDebInfo, Static)"
+  },
+  "originalBuild": {
+    "bytes": 32521,
+    "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+  },
+  "originalBuildId": "41019374697.1",
+  "originalIntegrationRevision": "e9dcb61d8d8c40fc683ac2a67bbf15a8eb538300",
+  "originalModules": {
+    "bytes": 5348,
+    "sha256": "6459b6a1acab2c62c474e4c6ab3eb651daa21f697ccd628e93a38bad298bbdd1"
+  },
+  "originalPackageReceipt": {
+    "bytes": 34652,
+    "sha256": "bb62ad200ac9be9b756616e351bf591508eedb7420f9fd39d5ea0544ae1cc548"
+  },
+  "originalReceiptsUnchanged": true,
+  "programs": {
+    "authserver": {
+      "bytes": 1709864,
+      "sha256": "04cbda982ca1385903929eb46ca52b7cb41ca222e8a48f9898af716d2b878531"
+    },
+    "dbimport": {
+      "bytes": 1379920,
+      "sha256": "f452ef5c7ab90451e9060bdace1ba866a93da768145428b15ddc25a7e73b6c24"
+    },
+    "worldserver": {
+      "bytes": 59025784,
+      "sha256": "9757f0bbb2ee159d18070d8f5fe7ecdf5b4b8b7171116198039f418d5ec13aa1"
+    }
+  },
+  "qualification": {
+    "androidRuntimeQualified": false,
+    "compiledAutoPopulationQualified": false,
+    "compiledUpdaterAttempted": true,
+    "compiledUpdaterCompleted": true,
+    "compiledUpdaterExecuted": true,
+    "coreModuleUpdatesQualified": true,
+    "databaseUpgradeQualified": false,
+    "existingStateModified": false,
+    "gameSchemasQualified": false,
+    "gameplayQualified": false,
+    "initializedNewInstance": true,
+    "loopbackRealmVerifiedAfterDbimport": true,
+    "playerbotsDatabaseUntouched": true,
+    "playerbotsRuntimeQualified": false,
+    "postAllServicesRealmGateQualified": false,
+    "qualificationSucceeded": true,
+    "restartPersistenceVerified": true,
+    "sameRevisionReentryVerified": true
+  },
+  "receipts": {
+    "auth-qualification.json": {
+      "bytes": 4443,
+      "sha256": "22924528c96cc4c62967f582d42d63b2be2975c0452a508745d84c2afa13ea13"
+    },
+    "dependency-image-check.json": {
+      "bytes": 1433,
+      "sha256": "ded60395aa7547a75286b373acbc9e674e63cac21333f4cf735a7bb78242fa63"
+    },
+    "environment-receipt.json": {
+      "bytes": 3049,
+      "sha256": "70e3f701af3e79483b1ddc0bd506fdc16f5c27fda8c0fa4bd160c09befc7e73b"
+    },
+    "loader-smoke.json": {
+      "bytes": 2427,
+      "sha256": "33fee9aefde98026139c3ba059f296b958cf813d13eb1f48d7bf74c749b74a09"
+    },
+    "qualification.json": {
+      "bytes": 170126,
+      "sha256": "f4bd787404787142ed96dac329b6419bcc12340bde8cbcfca457740c5caf3445"
+    }
+  },
+  "runtimeArchive": {
+    "bytes": 21352885,
+    "sha256": "00bd0a5829caec2a2b11d4e85bd261b67461c04e6755bb332d37d393311c6ccb"
+  },
+  "scope": "actual-seven-patch-stripped-server-native-SQL-and-auth",
+  "sourceCompanionComplete": false,
+  "sourceLockSha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1",
+  "workflowRun": 41050050294
+}

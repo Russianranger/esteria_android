@@ -1,6 +1,6 @@
 # Esteria asset requirements
 
-Audit date: 2026-10-29 (America/Chicago). Client baseline
+Audit updated: 2026-10-30 UTC; source availability remains distinct from runtime qualification. Client baseline
 `800cdd272269570a9776d0c170e4828605fc1218`; server baseline
 `f35f04d01689f034778e3474b3c820092f51e461`.
 This inventory distinguishes source availability from usable, matched content. No complete imported
@@ -128,3 +128,12 @@ This resolves tool availability only: no user MPQ shaders have been generated or
 rendered. The optional Turnip driver also packages from verified source/build
 receipts; native no-GPU loading is separate from actual Adreno execution. Neither
 component supplies missing maps, DBC overlays, appearance banks or game data.
+
+
+The seven-patch server content provider now preserves the exact source-selected
+SQL/configuration/notices package (4,063files/654,243,888bytes), independently of
+user client assets and mutable saves. Its original archive/receipt/module build
+bindings and actual Java/APK readback are recorded in
+`runtime/evidence/server-content-android-packaging-host.json`. This resolves
+available source SQL packaging; it supplies no missing MPQs, DBC overlays, maps,
+appearance banks or generated shaders. The Lua-disabled policy remains explicit.

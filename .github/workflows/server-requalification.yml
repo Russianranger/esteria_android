@@ -36,6 +36,9 @@ on:
       - runtime/server/dependency-release.lock.json
       - runtime/server/android-provider.lock.json
       - tools/render_server_config.py
+      - runtime/server_config.py
+      - runtime/server_updater.py
+      - runtime/owned_process_group.py
       - runtime/server/Dockerfile
       - runtime/server/sources.lock.json
       - runtime/server-lua-map.json
@@ -79,6 +82,9 @@ on:
       - runtime/server/dependency-release.lock.json
       - runtime/server/android-provider.lock.json
       - tools/render_server_config.py
+      - runtime/server_config.py
+      - runtime/server_updater.py
+      - runtime/owned_process_group.py
       - runtime/server/Dockerfile
       - runtime/server/sources.lock.json
       - runtime/server-lua-map.json

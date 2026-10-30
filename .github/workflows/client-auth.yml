@@ -30,6 +30,10 @@ on:
       - tools/owned_process_group.py
       - tests/test_client_auth_inputs.py
       - tests/test_client_auth_qualification.py
+      - tools/render_server_config.py
+      - runtime/server_config.py
+      - runtime/server_updater.py
+      - runtime/owned_process_group.py
   workflow_dispatch:
 permissions:
   contents: read

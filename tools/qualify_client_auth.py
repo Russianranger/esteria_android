@@ -147,10 +147,15 @@ def initialization_failure_codes(path):
                 not info.st_mode&0o077,'private-mysql-initialization-diagnostic-contract')
         raw=stream.read(db.ENGINE_LOG_LIMIT+1)
     require(len(raw)<=db.ENGINE_LOG_LIMIT,'mysql-initialization-diagnostic-bound')
-    errors=b'\n'.join(line for line in raw.splitlines() if b'[ERROR]' in line)
+    lines=raw.splitlines()
+    errors=b'\n'.join(line for line in lines if b'[ERROR]' in line)
+    # Early mysys failures use an untagged `mysqld: ... (OS errno N)`
+    # diagnostic. Keep their numeric errno without publishing the path/text.
+    startup=b'\n'.join(line for line in lines if re.match(
+        rb'(?:/[^\x00\r\n]*/)?mysqld(?:-debug)?:\s',line))
     engine=sorted({value.decode('ascii') for value in re.findall(rb'\bMY-[0-9]{6}\b',errors)})
     system=sorted({int(value) for value in re.findall(rb'\b(?:OS errno\s*|errno[ =:]+|Errcode:\s*)([0-9]{1,4})\b',
-                                                    errors,re.I) if int(value)<=4095})
+                                                    errors+b'\n'+startup,re.I) if int(value)<=4095})
     return dict(scope='mysql-initialization-failure-numeric-codes-only',mysqlErrorCodes=engine,
                 osErrorNumbers=system,privateLogTextExported=False)
 

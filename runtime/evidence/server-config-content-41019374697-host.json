@@ -1,0 +1,289 @@
+{
+  "activeConfigConsumerAccepted": true,
+  "actualNoGitContentConsumerSucceeded": true,
+  "actualRuntimeRendererSucceeded": true,
+  "androidRuntimeQualified": false,
+  "compiledModules": {
+    "bytes": 5348,
+    "sha256": "6459b6a1acab2c62c474e4c6ab3eb651daa21f697ccd628e93a38bad298bbdd1"
+  },
+  "compiledProgramsExecuted": false,
+  "completeCompiledModuleConfigurationsPrepared": true,
+  "configurationTextOrCredentialsExported": false,
+  "contentProviderIntegrationRevision": "e9dcb61d8d8c40fc683ac2a67bbf15a8eb538300",
+  "contentWorkflowRun": 41019374697,
+  "executionEnvironment": "host-linux-stdlib-no-sql",
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "moduleProof": {
+    "bytes": 11088,
+    "sha256": "7d729d423e6986345027c843b9f4324f25d0d7e70d4a63207c65c8990ee1310d"
+  },
+  "moduleStartupQualified": false,
+  "originalBuild": {
+    "bytes": 32521,
+    "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+  },
+  "originalContentReceipt": {
+    "bytes": 1343739,
+    "sha256": "1c00990e090e85af0232fe633b64e2718071a5f8e81f3b0ca1c8f2b214ffb3af"
+  },
+  "packagedBytesReadBack": 654243888,
+  "packagedFilesReadBack": 4063,
+  "preparedGenerationFiles": 54,
+  "preparedModuleConfigurations": 50,
+  "scope": "actual-java-installed-seven-patch-no-git-runtime-config-renderer-host-check",
+  "source": {
+    "branch": "main",
+    "commit": "f35f04d01689f034778e3474b3c820092f51e461",
+    "patches": [
+      {
+        "path": "patches/server/0001-eluna-declare-area-trigger.patch",
+        "sha256": "c26b145188c5f97bf30d032e1fe3bd7fe17aa1f8f0daa6793e51f5d830fe7aa6",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0002-eluna-include-map-manager.patch",
+        "sha256": "4e277dbe56c31ae30640c8e9ad4dee12e944e0f051d9bdc8d62aaa239c50433f",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0003-eluna-hooks-include-types.patch",
+        "sha256": "5999402d985fcc709abdc90bb4272072d1d5e3e261b2cc7ec19460320c14295f",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0004-attunement-stat-api.patch",
+        "sha256": "d9ef6ca8f96ab186c37c072b22143cdded9976aa3a62d083f893c502a5745cb8"
+      },
+      {
+        "path": "patches/server/0005-script-grid-templates.patch",
+        "sha256": "6b459c90839e7831df8533966442fabd476ae1773f0302c50ccc8a997f157369"
+      },
+      {
+        "path": "patches/server/0006-empty-script-modules.patch",
+        "sha256": "ea0beb357c71d8b8c187af9d4afede520e7ac9877e40fbdc5fab99d54fc21f97"
+      },
+      {
+        "path": "patches/server/0007-runtime-module-config-directory.patch",
+        "sha256": "5e41d474179ef553ec9c2544de947a3724885fd7f3ac233af3d89797acd032ff"
+      }
+    ],
+    "submodules": {
+      "src/server/game/LuaEngine": "58d7652138887783228b9727bd1fa4e08f00342b"
+    },
+    "url": "https://github.com/Russianranger/EsteriaWoW.git"
+  },
+  "sourceLockSha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1",
+  "sqlExecuted": false,
+  "upstreamTemplateIdentities": {
+    "modules/mod-account-achievements/conf/mod_achievements.conf.dist": {
+      "bytes": 495,
+      "sha256": "7182247e0375f9380feb89a801b9de841c5b6a65d6a6588f44da80d667b85acb"
+    },
+    "modules/mod-account-mounts/conf/mod_account_mount.conf.dist": {
+      "bytes": 738,
+      "sha256": "9687c2e2b45aecba35ded11eed63c10abd90fdbb35d0a833f3b2f6a0daf2641f"
+    },
+    "modules/mod-adaptive-autoattack/conf/adaptive_autoattack.conf.dist": {
+      "bytes": 127,
+      "sha256": "958a898cb052b3f1066855bd55e692ee7df08eee46864cb62b34f22e0ef98896"
+    },
+    "modules/mod-ah-bot/conf/mod_ahbot.conf.dist": {
+      "bytes": 71937,
+      "sha256": "9b091efd8f2f4f0488b191df88375b785ebcf7ea1158a5c57eae0b6cc145a236"
+    },
+    "modules/mod-aoe-loot/conf/mod_aoe_loot.conf.dist": {
+      "bytes": 1461,
+      "sha256": "5ccf5a1d26961f9668434fda8e6b9a23e71cda72447bd9d67c5393f25569a194"
+    },
+    "modules/mod-autobalance/conf/AutoBalance.conf.dist": {
+      "bytes": 39563,
+      "sha256": "0188714241f2f160c84b6896cd3a8119832870ba92c17914d86f04cfe5c1705c"
+    },
+    "modules/mod-azeroth-plex/conf/mod_azeroth_plex.conf.dist": {
+      "bytes": 4060,
+      "sha256": "03a969b322d10d9bb58a5838b8d19f84914ece44745e615b83ddabd9addfb023"
+    },
+    "modules/mod-battlemon/conf/mod_battlemon.conf.dist": {
+      "bytes": 3141,
+      "sha256": "d22f8c6e2a925d4f8a882fb17b43d99e18a8565c26a820eddb4425c0ee2bc0dc"
+    },
+    "modules/mod-battlemon/conf/mod_battlemon_battles.conf.dist": {
+      "bytes": 1286,
+      "sha256": "386cb618ca43c1333cf2b0b1844a518bac765d58171fef8b0191b89b6443c856"
+    },
+    "modules/mod-battlemon/conf/mod_battlemon_overworld.conf.dist": {
+      "bytes": 2026,
+      "sha256": "a365b1d17727aaceeebbc656c72081fa0849959c549dec542f2b50681ee10828"
+    },
+    "modules/mod-challenge-modes/conf/challenge_modes.conf.dist": {
+      "bytes": 5656,
+      "sha256": "b1a8c80d2a916bac4a3066fff366820432afaadb6682c77624d9eb0a5406fb66"
+    },
+    "modules/mod-chat-transmitter/conf/ChatTransmitter.conf.dist": {
+      "bytes": 1854,
+      "sha256": "e18a4522716cba5d451eb42656b35048ab8e84b3961fa91e6473cdd5e874f2f2"
+    },
+    "modules/mod-classless-wildcard/conf/classless_wildcard.conf.dist": {
+      "bytes": 40424,
+      "sha256": "dce0770e45a1118eeee8ce260d8e0c82d6436e91a619ddc0d3d5c1eaf98369f2"
+    },
+    "modules/mod-congrats-on-level/conf/mod_congratsonlevel.conf.dist": {
+      "bytes": 399,
+      "sha256": "3790d953497cfcebcc60f888a9e4549345986948140de560033d95561c5b17b1"
+    },
+    "modules/mod-corpse-respawn/conf/mod-corpse-respawn.conf.dist": {
+      "bytes": 821,
+      "sha256": "6eed3a753524166204ded3eab527bcb60c32f8b5a2044529abcece1700e59b85"
+    },
+    "modules/mod-dungeon-clear/conf/mod_dungeon_clear.conf.dist": {
+      "bytes": 70313,
+      "sha256": "e3f0c4ad06baecb9eec154cb2e158baed045a14791b947cb3c07a7148023a650"
+    },
+    "modules/mod-dungeon-master/conf/mod_dungeon_master.conf.dist": {
+      "bytes": 13417,
+      "sha256": "71e781c935ec25f6a358101e324586bde93bfb6da81962713bb83fa81c6ae504"
+    },
+    "modules/mod-esteria-chat/conf/mod_esteria_chat.conf.dist": {
+      "bytes": 318,
+      "sha256": "a11d6191652aa556cfbf2ac5cfda068511173d75d995acdf1d2f8e2af2de942c"
+    },
+    "modules/mod-fly-anywhere/conf/fly-anywhere.conf.dist": {
+      "bytes": 372,
+      "sha256": "4c8e2679416c9a8699746ee678c2f5585089e1dbd9505024e10ab0d0013615ab"
+    },
+    "modules/mod-guildhouse/conf/mod_guildhouse.conf.dist": {
+      "bytes": 2058,
+      "sha256": "05d1eb9bd84934185a8cfcf012032f8fc579ab287bfbc781473965ffe07bed32"
+    },
+    "modules/mod-improved-bank/conf/mod_improved_bank.conf.dist": {
+      "bytes": 2182,
+      "sha256": "abd4034ece92cefd0b4c5fcc337ccb036d760e5cabdb5da8e8ef4aa0144c1bc3"
+    },
+    "modules/mod-individual-progression/conf/individualProgression.conf.dist": {
+      "bytes": 24182,
+      "sha256": "bb3126c0905ae96fca1b21c8faed0c72d37b3dae4f93fff90a634163848eb977"
+    },
+    "modules/mod-individual-xp/conf/individual_xp.conf.dist": {
+      "bytes": 1409,
+      "sha256": "813e41db8577c5764d9af0ef24bb0f625e69891dbb990595afa2068be381b4c2"
+    },
+    "modules/mod-instance-reset/conf/instance-reset.conf.dist": {
+      "bytes": 1754,
+      "sha256": "ee05462e3ed88d68ab2620338e388bd1ac7f1561775818a842a1836fa021a541"
+    },
+    "modules/mod-item-upgrade/conf/mod_item_upgrade.conf.dist": {
+      "bytes": 13202,
+      "sha256": "be8b084dacad0f5953ccce9304a7c844f7cb81337dc4761b9027e18a98ebee7c"
+    },
+    "modules/mod-launcher-api/conf/mod_launcher_api.conf.dist": {
+      "bytes": 1928,
+      "sha256": "fc0b56a34fea8fb204840fda59384a4df2dab075ff054c7ed85a304042e32c14"
+    },
+    "modules/mod-loot-beam/conf/mod_loot_beam.conf.dist": {
+      "bytes": 941,
+      "sha256": "eadc52c98943e74bd80d6088dfddde9015bcc9d584ef8ee6d942aeb4c72f4d89"
+    },
+    "modules/mod-loyal-steed/conf/mod_loyal_steed.conf.dist": {
+      "bytes": 2450,
+      "sha256": "b3b901114703143644212bfa8de4f471da0190fde4372e5cae59ff6c23967ed5"
+    },
+    "modules/mod-mana-loot-pet/conf/mod-mana-loot-pet.conf.dist": {
+      "bytes": 6285,
+      "sha256": "500352f7bf24e0a31e372085703b9112f3fbad4382521668ee6f73c7e0976be9"
+    },
+    "modules/mod-mana-speedflying/conf/mod-mana-speedflying.conf.dist": {
+      "bytes": 15808,
+      "sha256": "b7f06a39680f35a08836f45285d7ce2ae69fbbbb27de649606464c3f6e142c58"
+    },
+    "modules/mod-mythic-plus/conf/mod_mythic_plus.conf.dist": {
+      "bytes": 1367,
+      "sha256": "855e979039eb87f0d8022cd96dfaa1a1a000a4a2699db7e28d8172640500a3df"
+    },
+    "modules/mod-nemesis-system/conf/mod_nemesis_system.conf.dist": {
+      "bytes": 11023,
+      "sha256": "6eccd85b48793b7a5dda97011690cb0d82734645c231b3c293ac5f1ab137a846"
+    },
+    "modules/mod-no-hearthstone-cooldown/conf/mod_no_hearthstone_cooldown.conf.dist": {
+      "bytes": 766,
+      "sha256": "e7a333b6109f3bf1ffcc74de61b95a3483b0decd84d4ea2e49c1cc19ceefd3c0"
+    },
+    "modules/mod-no-profession-limit/conf/NoProfessionLimit.conf.dist": {
+      "bytes": 5783,
+      "sha256": "ec2e9c6e580804f1e81eb60ebc71ab4cab35da0d1792509fcfe0515e65907cae"
+    },
+    "modules/mod-npc-beastmaster/conf/mod_npc_beastmaster.conf.dist": {
+      "bytes": 2685,
+      "sha256": "89802e533faab12e7f4b43661b541cd7d86db0b6d69417cfd58c05bd774a81e0"
+    },
+    "modules/mod-playerbots/conf/playerbots.conf.dist": {
+      "bytes": 119723,
+      "sha256": "8fa5376d8f9153929490785b5fe26b6aff3d6118483743aba5ddf97bfe0ab67d"
+    },
+    "modules/mod-premium/conf/premium.conf.dist": {
+      "bytes": 1974,
+      "sha256": "203db42d7e580a885e672c9bdc7a190b62d3121e05530c5ae6386c5329e65503"
+    },
+    "modules/mod-profession-experience/conf/profession_experience.conf.dist": {
+      "bytes": 5529,
+      "sha256": "35c25feb97d50d4633991b9cef616bca76ce6c0bbbd7dc19eec5711c6cb13d38"
+    },
+    "modules/mod-random-enchants/conf/random_enchants.conf.dist": {
+      "bytes": 2015,
+      "sha256": "21a0e095e9d920b7b10e4e0ae7d1b9e5f81d60be4d48be69c0e924434b4c5cf7"
+    },
+    "modules/mod-reward-played-time/conf/reward_system.conf.dist": {
+      "bytes": 624,
+      "sha256": "f2617313e0c2c7eb4fd7fae1297490dd5ce6640fc6d60c154c4ebcfdb9826430"
+    },
+    "modules/mod-reward-shop/conf/reward_shop.conf.dist": {
+      "bytes": 744,
+      "sha256": "81feee09216615f56add98f895f107942e0910f887b95b0e778acbdce5a31dd1"
+    },
+    "modules/mod-seasonpass/conf/seasonpass.conf.dist": {
+      "bytes": 5048,
+      "sha256": "cd6bf2613b39758cf44dd2ec6c51f7599e902f5a4034098773f714a333ea878e"
+    },
+    "modules/mod-solo-lfg/conf/SoloLfg.conf.dist": {
+      "bytes": 1011,
+      "sha256": "f127a31cdb9b7afc7acaa130b8ebe1c5a17811c2d1a237c9f6c1dcc86adcfdb2"
+    },
+    "modules/mod-starter-guild/conf/mod_starterguild.conf.dist": {
+      "bytes": 1763,
+      "sha256": "e8045324699ff1bdeec70671e9b3c842c5bc72dd6ff4dd867b1d74ffb352db55"
+    },
+    "modules/mod-starting-pet/conf/mod_startingpet.conf.dist": {
+      "bytes": 2738,
+      "sha256": "08c8542f7daecccf6aa646d3c100aea844021823b75fb36e86c7678ef3b61308"
+    },
+    "modules/mod-transmog/conf/transmog.conf.dist": {
+      "bytes": 14597,
+      "sha256": "891598cc88a99ef99e139ab4a9686e168f22f9c9816dd24fd5194cc0180022d1"
+    },
+    "modules/mod-two-names/conf/mod_two_names.conf.dist": {
+      "bytes": 2186,
+      "sha256": "52df1948b22456964a67eb0e8729503a25e1fbbceeb8cdd6b359d682809fe0f0"
+    },
+    "modules/mod-worgoblin-high-elf/conf/mod_worgoblin.conf.dist": {
+      "bytes": 1180,
+      "sha256": "0e531847bc4129edcb924fca07f4d90aeacf01f145cac8f1c066bcecb88c43c2"
+    },
+    "modules/mod-world-chat/conf/WorldChat.conf.dist": {
+      "bytes": 1365,
+      "sha256": "187f3f23c51fc7abeb8b57cb9d42d2753ab9597584a0caae7498dbaa82ee8f20"
+    },
+    "modules/mod-wxl-dbc/conf/mod_wxl_dbc.conf.dist": {
+      "bytes": 480,
+      "sha256": "9b8d818e99c1f1ffce9c411e03dd524eaf7a70f861747e02a342892ed1196f4c"
+    },
+    "src/server/apps/authserver/authserver.conf.dist": {
+      "bytes": 15690,
+      "sha256": "88604496cdd1165d2fae0480ef32fd05f6b1422847619adaf777e80a2ce6265e"
+    },
+    "src/server/apps/worldserver/worldserver.conf.dist": {
+      "bytes": 171008,
+      "sha256": "d3e4667280cf6cafb9a3de73431b1c486612304ccd5dcebfc463a112d29da382"
+    }
+  }
+}

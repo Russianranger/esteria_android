@@ -163,7 +163,9 @@ def initialize(content, connection, state, version, apply, *, progress=None, can
                 if progress is not None:
                     progress(dict(phase='schema-file-started', path=relative,
                                   files=len(journal['completed']), totalFiles=len(paths)))
-                checkpoint(cancelled)
+                # Durable intent commits us to finish this file. A cancellation
+                # arriving now is observed before the next file, never between
+                # intent and SQL (which would strand an untouched database).
                 apply(database, path)
                 require(credential_identity(state) == credentials and account_identity(state) == account,
                         'Credential or account journal changed during schema initialization')

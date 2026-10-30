@@ -1,0 +1,23 @@
+// Original source-owned SQL/configuration payload, separate from mutable saves.
+def serverContentProvider = providers.gradleProperty('serverContentProviderDir').orNull
+def serverContentPinFile = rootProject.file('runtime/server/content-provider.lock.json')
+def serverContentPinHash = serverContentPinFile.exists() ? java.security.MessageDigest.getInstance('SHA-256').digest(serverContentPinFile.bytes).encodeHex().toString() : ''
+android.defaultConfig.buildConfigField 'boolean', 'SERVER_CONTENT_PACKAGED', serverContentProvider ? 'true' : 'false'
+android.defaultConfig.buildConfigField 'String', 'SERVER_CONTENT_PIN', '"' + serverContentPinHash + '"'
+if (serverContentProvider) {
+    if (!serverContentPinFile.exists()) throw new GradleException('Server content requires its reviewed exact source pin')
+    if (providers.gradleProperty('nativeBridgeAbi').getOrElse('arm64-v8a') != 'arm64-v8a' ||
+        providers.gradleProperty('presentationEmulatorTest').getOrElse('false') == 'true' ||
+        ['prootProbeProviderDir', 'mysqlProbeProviderDir', 'wineProbeProviderDir'].any { providers.gradleProperty(it).isPresent() })
+        throw new GradleException('Server content requires the production ARM64 profile, separately from emulator fixtures')
+    if (!providers.gradleProperty('serverRuntimeProviderDir').isPresent())
+        throw new GradleException('Server content requires its separately verified Ubuntu server dependency provider')
+    def provider = file(serverContentProvider)
+    android.sourceSets.main.assets.srcDir(new File(provider, 'assets'))
+    android.androidResources.noCompress += ['archive']
+    def verifyServerContent = tasks.register('verifyServerContentProvider', Exec) {
+        workingDir rootProject.projectDir
+        commandLine 'python3', 'tools/provider_server_content.py', 'verify', '--provider', provider.absolutePath
+    }
+    tasks.named('preBuild').configure { dependsOn verifyServerContent }
+}

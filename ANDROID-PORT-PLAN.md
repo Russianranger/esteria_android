@@ -24,14 +24,14 @@ combined memory and Thor thermals remain measurements to make, not assumed gains
 
 ## Milestone state
 
-| Milestone | State | Next evidence |
+| Milestone | Current state | Next evidence |
 | --- | --- | --- |
-| 1. Pinned reference builds | Branches, locks, protocol checks, full ARM64/x64 client builds complete; server build in progress. | Native Linux ARM64 server link/install and artifact provenance. |
-| 2. Executable client platform | Full Windows builds and Linux ARM64 Wine entry/codec/Vulkan/PCM pass. Android13 x64 private-ELF, Surface/AudioTrack and ARM64 host XTest component gates pass. | Qualify implemented offline-client startup, combined Android ARM64 execution and full game initialization. |
-| 3. Local server/database | Native ARM64 MySQL rootfs/source closure, fresh base SQL and restart persistence pass. Optional verified APK dependency provider and resumable setup implemented. | Complete server linking, compiled module/schema updates, owned local account and Android server execution. |
-| 4. Matched gameplay | Not qualified. | Login, character creation, world entry, Esteria extensions and persistent saves with real content. |
-| 5. Android integration | Four verified providers, resumable setup, diagnostics and persistent mutable client view are integrated. Android13 installer/update, native owner, PRoot/glibc and Surface/AudioTrack pass. | Corrected tracer-death/graceful ownership, app UI update review, matched application session and controller/lifecycle gameplay. |
-| 6. Thor candidate | Not ready. | One signed update-compatible package with all required host/emulator/gameplay gates, then consolidated Thor test. |
+| 1. Reproducible references | Exact pins, full Windows ARM64/x64 client and linked ARM64 server/tools complete; protocol layouts match. | Isolated exported-source server rebuild/source seal. |
+| 2. Client platform | Native ARM64 Wine entry/codec/software Vulkan/PCM and Android x64 entry/offline/loopback pass. | New source-owned production ARM64 Wine build, Android presentation and full initialization. |
+| 3. Local services | Native compiled SQL/auth/SRP/ledger/restart passes for retained six-patch reference; Android x64 persistent MySQL service passes. | Phone updater/account/realm composition, fresh staging/recovery and production ARM64 execution. |
+| 4. Matched gameplay | Client controlled-peer authentication passes; real compiled-server pairing remains blocked before SQL. | Matched login, character/world/gameplay and actual persistence/bots. |
+| 5. Android application | Verified runtime/source import, UI review, controls/bridges, source-gated programs installer and content/schema adapters build. | Complete owned session, readiness, lifecycle and graceful saves. |
+| 6. Thor candidate | Not ready; stable signing identity provisioned. | One coherent offline playable, update-compatible APK with available data and consolidated test. |
 
 ## Execution order
 1. Pin sources and Eluna, create repeatable source preparation and field-layout tests. Build x64 + ARM64 client and Linux ARM64 server continuously.
@@ -51,12 +51,8 @@ Application: `io.github.russianranger.esteria`. Immutable imported generations a
 A passed component test, compiled EXE, built APK or listening TCP port does not prove world playability. Keep compilation, host component tests, emulator tests and physical Thor tests separate in STATUS.md and TESTING.md. Missing content blocks only affected runtime qualification while independent work proceeds.
 
 
-Latest integration priorities: complete source-backed server linking and compiled
-SQL/auth gates; qualify the new Android persistent-service adapter after the
-native MySQL service passed; qualify the packaged shader setup on actual Android
-and compose Wine client execution with native presentation. Android x64 bootstrap/restart, native ARM64 KGSL-library
-loading without hardware, and real shader compiler gates now pass. Native Windows
-Grunt/SRP passes; ARM64 Wine Grunt and actual compiled-server pairing remain next.
-Durable dependency archives reproduce combined builds, and the persistent signing
-identity has signed an internal nondebug APK. These component results remain
-separate from complete ARM64 local gameplay and data-preserving update acceptance.
+Latest integration priorities: follow actual production ARM64 Wine and isolated
+server source builds; pass matched compiled authentication; compose portable
+updater/config/account/realm setup on the owned MySQL service; finish fresh-slot
+promotion/recovery and server data extraction; then complete client presentation
+and matched world/gameplay gates. Exact current evidence is in STATUS.md.

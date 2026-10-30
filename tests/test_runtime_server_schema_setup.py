@@ -121,16 +121,17 @@ class PackagedSchemaGuards(unittest.TestCase):
         self.assertEqual((self.state / setup.JOURNAL).read_bytes(), before)
         self.assertEqual(len(self.connection.applied), 1)
 
-    def test_cancellation_from_started_progress_never_executes_sql(self):
+    def test_cancellation_from_started_progress_finishes_committed_sql_file(self):
         cancelled = False
         def progress(update):
             nonlocal cancelled
             if update['phase'] == 'schema-file-started': cancelled = True
         with self.assertRaises(setup.SchemaCancelled):
             self.run_setup(progress=progress, cancelled=lambda: cancelled)
-        self.assertEqual(self.connection.applied, [])
+        self.assertEqual(len(self.connection.applied), 1)
         journal = json.loads((self.state / setup.JOURNAL).read_text())
-        self.assertEqual(journal['phase'], 'importing'); self.assertIsNotNone(journal['pending'])
+        self.assertEqual(journal['phase'], 'importing'); self.assertIsNone(journal['pending'])
+        self.assertEqual(len(journal['completed']), 1)
         with self.assertRaisesRegex(db.BootstrapError, 'Partial schema setup'): self.run_setup()
 
     def test_prepared_retry_refuses_account_journal_appearing_after_safe_cancellation(self):
@@ -143,20 +144,36 @@ class PackagedSchemaGuards(unittest.TestCase):
         self.assertEqual(self.connection.applied, []); self.assertEqual(journal.read_bytes(), before)
         self.assertEqual(path.read_bytes(), b'new private account intent')
 
-    def test_cancellation_before_separate_appearance_sql_preserves_original_baseline_without_replay(self):
+    def test_cancellation_after_final_appearance_intent_finishes_setup_without_replay(self):
         cancelled = False
         def progress(update):
             nonlocal cancelled
             if update['phase'] == 'schema-file-started' and update['path'] == setup.APPEARANCE_PATH:
                 cancelled = True
-        with self.assertRaises(setup.SchemaCancelled):
-            self.run_setup(progress=progress, cancelled=lambda: cancelled)
-        self.assertEqual(len(self.connection.applied), 8)
-        self.assertFalse(set(setup.adaptations.TABLES).intersection(self.connection.tables['characters']))
+        result = self.run_setup(progress=progress, cancelled=lambda: cancelled)
+        self.assertEqual(len(self.connection.applied), 9)
+        self.assertTrue(set(setup.adaptations.TABLES).issubset(self.connection.tables['characters']))
+        self.assertEqual(result['operation'], 'initialized-source-baseline')
         journal = json.loads((self.state / setup.JOURNAL).read_text())
-        self.assertEqual(journal['pending']['path'], setup.APPEARANCE_PATH)
+        self.assertIsNone(journal['pending']); self.assertEqual(journal['phase'], 'baseline-complete')
+        self.assertEqual(self.run_setup()['operation'], 'already-prepared')
+        self.assertEqual(len(self.connection.applied), 9)
+
+    def test_cancel_during_durable_intent_write_finishes_that_file_before_next_boundary(self):
+        cancelled = False
+        original = db.atomic_json
+        def write(path, value):
+            nonlocal cancelled
+            original(path, value)
+            if path.name == setup.JOURNAL and value.get('pending') is not None:
+                cancelled = True
+        with patch.object(db, 'atomic_json', side_effect=write):
+            with self.assertRaises(setup.SchemaCancelled): self.run_setup(cancelled=lambda: cancelled)
+        self.assertEqual(len(self.connection.applied), 1)
+        journal = json.loads((self.state / setup.JOURNAL).read_text())
+        self.assertIsNone(journal['pending']); self.assertEqual(len(journal['completed']), 1)
         with self.assertRaisesRegex(db.BootstrapError, 'Partial schema setup'): self.run_setup()
-        self.assertEqual(len(self.connection.applied), 8)
+        self.assertEqual(len(self.connection.applied), 1)
 
     def test_changed_adaptation_metadata_is_not_adopted_on_completed_reentry(self):
         self.run_setup(); before = (self.state / setup.JOURNAL).read_bytes()

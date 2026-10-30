@@ -52,13 +52,15 @@ final class GuestHelperAssets {
             if(descriptor.getInt("formatVersion")!=1 || !names.equals(expected))
                 throw new IOException("Unexpected helper manifest");
             for(String name:expected) {
-                if(!name.matches("[a-z_]+\\.py"))throw new IOException("Invalid helper filename");
+                validateName(name);
                 JSONObject pin=files.getJSONObject(name);
                 byte[] bytes=asset(context,assetPrefix+"/"+name,131072);
                 String digest=sha256(bytes);
                 if(pin.getInt("bytes")!=bytes.length || !digest.equals(pin.getString("sha256")))
                     throw new IOException("Bundled helper identity differs");
                 Path destination=directory.resolve(name);
+                if(destination.getParent()!=null && !destination.getParent().equals(directory))
+                    directory(directory,directory.relativize(destination.getParent()).toString());
                 if(Files.exists(destination,LinkOption.NOFOLLOW_LINKS)) {
                     if(!Files.isRegularFile(destination,LinkOption.NOFOLLOW_LINKS) || Files.size(destination)!=bytes.length ||
                             !digest.equals(sha256(Files.readAllBytes(destination))))
@@ -71,6 +73,7 @@ final class GuestHelperAssets {
                     Files.write(pending,bytes);
                     try(FileChannel file=FileChannel.open(pending,StandardOpenOption.WRITE)){file.force(true);}
                     Files.move(pending,destination,StandardCopyOption.ATOMIC_MOVE);
+                    try(FileChannel parent=FileChannel.open(destination.getParent(),StandardOpenOption.READ)){parent.force(true);}
                 } finally {Files.deleteIfExists(pending);}
             }
             try(FileChannel folder=FileChannel.open(directory,StandardOpenOption.READ)){folder.force(true);}
@@ -78,14 +81,33 @@ final class GuestHelperAssets {
             return generation;
         } catch(JSONException error){throw new IOException("Invalid bundled helper metadata",error);}
     }
+    private static void validateName(String name) throws IOException {
+        if(name==null || name.length()>256 || name.startsWith("/") || name.indexOf('\\')>=0)
+            throw new IOException("Invalid helper filename");
+        for(String part:name.split("/",-1))
+            if(!part.matches("[A-Za-z0-9_.-]+") || part.equals(".") || part.equals(".."))
+                throw new IOException("Invalid helper filename component");
+    }
     private static void exactClosure(Path directory,Set<String> expected) throws IOException {
-        // Python's script directory is importable. Reject extra modules/native
-        // extensions and caches even when every expected helper still matches.
-        // Interrupted writes can leave only these nonimportable private temp files.
+        Set<String> folders=new HashSet<>();
+        for(String name:expected) {
+            validateName(name);
+            Path parent=java.nio.file.Paths.get(name).getParent();
+            while(parent!=null){folders.add(parent.toString());parent=parent.getParent();}
+        }
+        inspectClosure(directory,directory,expected,folders);
+    }
+    private static void inspectClosure(Path root,Path directory,Set<String> expected,Set<String> folders) throws IOException {
+        // Python's script directory is importable. Accept only declared nested
+        // helper resources and nonimportable remnants of our interrupted writes.
         try(var files=Files.newDirectoryStream(directory)) {
             for(Path path:files) {
-                String name=path.getFileName().toString();
-                if((!expected.contains(name) && !name.matches("\\.helper-[0-9]+\\.tmp")) ||
+                String name=root.relativize(path).toString();
+                if(Files.isDirectory(path,LinkOption.NOFOLLOW_LINKS)) {
+                    if(!folders.contains(name) || !path.toRealPath().equals(path))
+                        throw new IOException("Unexpected directory in helper generation; original retained");
+                    inspectClosure(root,path,expected,folders);
+                } else if((!expected.contains(name) && !path.getFileName().toString().matches("\\.helper-[0-9]+\\.tmp")) ||
                         !Files.isRegularFile(path,LinkOption.NOFOLLOW_LINKS))
                     throw new IOException("Unexpected importable file in helper generation; original retained");
             }

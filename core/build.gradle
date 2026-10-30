@@ -81,3 +81,11 @@ tasks.register('presentationProcessTest', JavaExec) {
     maxHeapSize = '32m'
 }
 check.dependsOn presentationProcessTest
+
+tasks.register('serviceOperationGuardTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.runtime.ServiceOperationGuardTests'
+    maxHeapSize = '32m'
+}
+check.dependsOn serviceOperationGuardTest

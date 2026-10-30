@@ -1,169 +1,99 @@
-# Next-session handoff
+# Autonomous development handoff
 
-Continue toward a nearly complete local client/server APK for AYN Thor. User
-explicitly authorizes implementation, commits, branch pushes and CI. Push only
-client `android/arm64-port` and integration `android/client-server`; preserve
-both defaults and shared history. Server is read-only. No preliminary APK or
-Thor startup-test request. Do not imply execution continues without a real job.
+Continue to a nearly complete local client/server package for AYN Thor, or the
+user's reported50% weekly usage threshold. No available quota endpoint exposes a
+successful weekly reading here; do not invent one or claim automatic enforcement.
+User authorizes development branch commits/pushes, CI, dependencies, signing and
+parallel work. No default merges/force pushes/server-repository writes. No
+preliminary hardware APKs; a PR or green component check is not a stopping point.
 
-## Current inputs and outcome
+## Source and runtime identity
 
-The application lock pins client0f931bbade36a4b197725d691b8eff7caea7b3be,
-serverf35f04d01689f034778e3474b3c820092f51e461 and
-Eluna58d7652138887783228b9727bd1fa4e08f00342b, with seven hashed server patches. Source-lock SHA256 is
-5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1.
-The new client provider/source companion and seven-file durable release are now
-published and anonymously fetched/verified at packaging27446b5. The old69 release
-remains intact. Current-pin combined run41019374657 now passes APK/lint/sealed-source/readback;
-its exact public evidence is in runtime/COMBINED-ANDROID-BUILD.md. This remains an
-internal package without the compiled server programs or qualified game session.
-The client development tip is4b16bece2b8396fb434b5289a40d8ae418c48e28 (docs only
-above the measured0f executable);
-its workflow pins integration0146ca89307eb3c00c09b7fbecdf3e301bd9bd53 for Wine Grunt.
-Fetch both branches and inspect Actions before interpreting pending results.
+- Client binary pin: `0f931bbade36a4b197725d691b8eff7caea7b3be`.
+- Client development branch tip: `4b16bece2b8396fb434b5289a40d8ae418c48e28`
+  (documentation above the measured executable).
+- Server: `f35f04d01689f034778e3474b3c820092f51e461`; Eluna:
+  `58d7652138887783228b9727bd1fa4e08f00342b`; seven exact adaptations.
+- App lock SHA256: `5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1`.
+- Reconstructed Windows ARM64/Wine on Debian12 and Linux ARM64 MySQL/server on
+  Ubuntu24 are separate guests. Never substitute x64 emulator evidence for ARM64.
+- Package `io.github.russianranger.esteria`; stable private signing key is backed
+  up outside Git. Public certificate fingerprint is in its signing lock.
 
-The chosen path is reconstructed Windows ARM64 under local ARM64 Wine, plus a
-separate Ubuntu24 ARM64 MySQL/server guest. It is not native Android. Do not mix
-Ubuntu glibc2.39 server binaries into Debian12 Wine's glibc2.36 rootfs. The x64
-Android fixtures are component qualifications, not production ARM64 evidence.
+Fetch both requested branches and inspect Actions before retrying an old failure.
+Git CLI fetch works; publication has used GitHub Git-object APIs with expected-head
+leases when CLI push is unavailable. Preserve unrelated work and publish only
+exact reviewed files. Source revisions embedded in APKs are authoritative.
 
-The app has resumable immutable imports, verified optional runtime providers,
-writable client/UI generations, review/activation, native presentation/input/audio
-bridges, process ownership, persistent bootstrap source packaging and diagnostics.
-Gameplay START remains gated. Latest all-four-provider ARM64 build passes core,
-APK/AndroidTest/lint and exact final-byte inventory checks. Stable development
-signing identity is provisioned and privately backed up; the public fingerprint
-is in app/development-signing.lock.json. No delivered update baseline, Android
-ARM64 execution, client/server login or world entry is qualified.
+## Actual latest results
 
-## Actual latest evidence and next work
+- Android x64 Wine41046942035 passes reconstructed entry/offline/loopback after
+  source-owned private-PE anonymous-copy adaptation. No CommonMain, graphics,
+  audio, ARM64 or world claim. Original Android policy/targetSDK35 are unchanged.
+- Production ARM64 adaptation recipe/workflow is published atb1d96ed. It keeps
+  the old production runtime/provider hashes untouched. Follow its actual build,
+  complete original/source capture and native current0f component gates next.
+- Seven-patch linked server/full50 ConfigMgr pass; exact source-isolated rebuild
+  fixes published ata3f0a49 (compiler invocation alias) and23f727a (the original
+  850-byte modules/ModulesScriptLoader.h supplement). Follow current configure/
+  compilation/source seal rather than recompiling for Python harness changes.
+- Native retained-six-patch runtime41050050193 passes SQL/updater ledgers,
+  reentry/restart, appearance storage, real compiled-auth SRP/M2/session key,
+  owned loopback listener/realm and clean shutdown. Evidence:
+  runtime/evidence/server-auth-41050050193.json. Reconstructed client not executed.
+- Matched client-auth41050050351 failed mysqld fresh initialization before SQL.
+  MY-013236/MY-010119 are cleanup summaries; cause remains unknown. The numeric
+  reader now also recognizes raw mysqld OS errno lines without publishing any
+  private log text. Run the next actual gate before choosing a fix.
+- Current seven-patch stripped engine41050050294 passes native loader, first/repeat SQL, exact ledgers/restart and real compiled-auth/session persistence. Evidence: runtime/evidence/server-engine-sql-auth-41050050294.json. The21,996,594-byte runtime retains
+  all original notices. Programs installer is source-gated, not enabled by a
+  fabricated sourceCompanionComplete flag.
+- New content provider binds the original seven-patch tar/receipt and compiled
+  module object:4,063files/654,243,888bytes. Actual Java32MiB install/reuse,
+  no-Git verifier, clean APK/AndroidTest/lint and complete provider APK readback
+  pass. No SQL or Android execution is inferred from that package check.
+- New source-baseline adapter keeps the caller's owned MySQL UUID/service lease,
+  streams SQL, retains private diagnostics and journals durable intent. Shutdown
+  requests safe-point cancellation with a bounded deadline, preserving a live
+  lease on timeout; durable intent commits to finishing that SQL file.
+- Shared stdlib runtime/server_config.py now exposes render_verified over real
+  VerifiedContent; the host wrapper preserves Git/source validation and CLI.
+  All54 actual output files, full50 configs, proof and generation hash remain
+  byte-identical. It is not yet composed with the phone updater.
 
-1. Full EXE offline checks passed all5 jobs41003225299 (cliente2718f6).
-   Positive transport run41006100154 passed actual x64 packet/stream I/O after
-   the timer-wake fix, then exposed a diagnostic-only missing Finalize() call.
-   Client97b347 fixes that and all five jobs41007244092 pass. Strict shader source
-   926a also passes all five jobs41007556042. Client3f9389 adds actual Grunt/SRP
-   callbacks against a controlled local peer; Windows ARM64/x64 in41010223296 pass.
-   Client0f all five jobs41012726334 pass including native ARM64 Wine Grunt.
-   Real compiled-server pairing is separate; application pins now select0f.
-2. Server41005048019 linked the complete six-patch source and passed loader,
-   generated-module selection and source packaging. Its first runtime gate stopped
-   before SQL because the consumer omitted three producer provenance fields.
-   That strict consumer is fixed and regression-tested. server-requalification.yml
-   now tests the retained exact linked artifact without another full compile.
-   Seven-patch run41019374697 also links/installs and passes loader/module checks.
-   Its real baseline+Nemesis import succeeds, then dbimport stops at an epoch-named
-   race update before the calendar-named four-table creator. The exact fresh-only
-   creator prerequisite is now implemented; corrected native execution is pending.
-   No completed compiled SQL/auth success is claimed yet.
-3. Proposed patch7 derives module configs from the selected main config's parent,
-   preserving defaults. Actual source-linked host ConfigMgr reference passes and
-   original-source negative control fails. It is now in sources.lock with client0f.
-   Complete source-bound module rendering is
-   implemented. Qualifiers must pass both verified source inventory and actual
-   compiled selection. ConfigMgr success alone does not prove modules loaded.
-4. Native ARM64 backup41013086447 passes complete367,899,260-byte dump equality
-   after fresh restore and restart, account journal preservation and repeated setup.
-   The exact harness charset correction leaves server tables/strict gates intact.
-   See runtime/MYSQL-BACKUP-QUALIFICATION.md for receipt/artifact identities.
-   Existing-save restore/upgrades remain unqualified. Playerbots fourth-schema
-   source reference is implemented but not yet executed.
-5. Android stdin41003838802 passes9 groups; native stdin41003838751 passes12.
-   Tracer41003838793 passes3survivors versus0 protected plus saved-file relaunch.
-   Remote-owner41006180061 passes owner/tracer/guest exit and independent control
-   survival in4,115ms with nine pidfds. Whole-app death/ARM64/Wine remain open.
-6. Android MySQL41007887632 fails first atomic journal rename with errno38 before
-   database initialization. The x64-only PRoot rename adaptation passes actual
-   Android13 atomic replacement/persistence in41010011745. MySQL41010011663 now
-   passes initialize→seed→repeat→verify and live SQL/UUID/credential preservation.
-   Production ARM64 execution remains open. Preserve /work/state across updates.
-7. Turnip compiles all681objects; actual glslang/SPIRV compile/validate/disassembly
-   and invalid-input checks pass. The pinned loader returns -3 when its ICD has no
-   devices. Corrected41009954190 passes direct exact-ICD zero-device success
-   before accepting that loader result. GPU/Android gates remain false.
-8. Shader staging helper uses strict pinned client translation, bounded processes,
-   exact input/tool provenance and atomic output promotion. Eight host groups pass;
-   synthetic structural SPIR-V tests are not real shaders. Exact926a translator
-   plus actual8a ARM64 compiler/source bundle packages and verifies successfully.
-   Optional APK provider and Android transactional setup now build/lint and pass
-   all five final-provider checks. Durable dependency publication is in progress;
-   actual Android compiler execution/data-based generation remains unqualified.
-9. Durable server41003838795, guest41006572380 and client41006572426 dependency
-   releases are published and read-only/public-fetch verified. Scoped release locks
-   contain exact URLs/hashes; GitHub immutable=false is explicit. Unified clean
-   all-provider APK automation passes41009954235 and41010011668, with full paired
-   source closure and independent APK readback. These remain internal builds.
-10. New persistent MySQL service helper is source-reviewed: exact engine-version
-    preflight, upgrade refusal, owned PID/UUID/loopback authentication, bounded
-    logs, explicit shutdown and joined engine. Its new Android adapter has an
-    exclusive setup/session lease and requires live and clean-stop receipts.
-    Native ARM64 mysql-service.yml run41013380186 passes three SQL cycles and
-    command/EOF/helper-signal shutdown with unchanged UUID/credentials/markers.
-    Actual Android13 x64 adapter41016293760 now passes two service starts/stops,
-    duplicate-owner refusal and SQL/UUID/credential/marker preservation. It uses an
-    exact verified x64 seam; production ARM64/game schemas/saves remain unqualified.
-    PRoot expands socket paths, so exclusive socket directories must stay short.
+## Concrete continuation
 
-11. Android x64 Wine41015479987 passed full source/APK gates, then failed ntdll
-    executable-page protection before client execution. Run41017052972 establishes
-    errno13 only for dirty private-file RW→RX; anonymous/clean/direct cases pass.
-    Source-owned Wine private-PE copy adaptation is published at824ca6d; source
-    build/host original-versus-opt-in execution run41040860418 now passes with
-    full source export. Its exact test-runtime pin is updated; the next Android
-    workflow must fully validate the877MB source ZIP before APK construction and
-    execution. Local full-source download exceeded the connector size cap; no
-    local full-source validation is claimed. No Android policy or target SDK is weakened. Owned authenticated
-    X11/input/audio composition now builds; complete Android execution is separate.
+1. Finish actual isolated source rebuild and ARM64 Wine build. Preserve exact
+   successful artifacts, source receipts and complete original notices. Repack
+   providers against a new Wine hash only after measurement; bindings are exact.
+2. Pass the matched current0f/compiled-server auth gate; keep initialization
+   failures distinct from protocol failures. Run actual playerbots schema gate.
+3. Complete reusable updater/ledger/account/realm APIs on the same live engine.
+   Compose them after the explicit original baseline + separate source-derived
+   appearance adaptation; never rewrite original SQL/updater ledger history.
+4. Finish fresh-installation slot/workspace ownership and atomic pointer
+   promotion. Cancelled/failed fresh stages must not overwrite active/legacy
+   saves. Baseline-only proof cannot promote a gameplay database. Current partial
+   schema journals conservatively refuse replay; preserve them for diagnosis.
+5. Wire app-owned local services/client session, authenticated X11, lifecycle,
+   controller/keyboard/audio, readiness and graceful save/stop. Keep Main START
+   closed until coherent prerequisites and actual gates are satisfied.
+6. Package/run pinned extractors and shader tools against imported12340 data;
+   validate matched DBC/map closure and actual offline assets. Then world entry,
+   save/relog, gameplay interactions, small bots and combined resources.
 
-## Missing content and acceptance
+## Evidence and assets
 
-Only the supplied Wow.exe established3.3.5.12340. Full base MPQs, current custom
-provider stack/catalogs, matched DBC overlays/maps/vmaps/mmaps/Cameras and generated
-shaders are absent. See ASSET-REQUIREMENTS.md. Continue independent platform work;
-request precise files only when unavailable inputs prevent all remaining progress.
-Keep Retail/Forever disabled until complete local closure is prepared. Start bot
-qualification at a small measured population; current random population is zero.
+STATUS.md is the concise current view. Scoped runtime documents and JSON receipts
+retain hashes and exact observations. Native service/backup, Android x64
+MySQL/Surface/AudioTrack/ownership and authenticated native X11 pass separately.
+They do not prove live game saves, a complete presentation session or Adreno use.
 
-Read the scoped runtime qualification documents for exact hashes and limits. Do
-not infer world saves from a file fixture, game input from XTest, or Adreno rendering
-from Lavapipe. Main device testing requires one coherent expected-playable package.
+Only the supplied Wow.exe established build12340. Full base MPQs/current custom
+MPQs/catalogs/texture banks/matched server data/generated shaders are absent.
+ASSET-REQUIREMENTS.md inventories precise missing inputs. Continue independent
+work until those inputs block all useful progress, then request the smallest
+working content set. Do not fabricate assets or enable online CDN gameplay.
 
-## Resume priorities
-
-Latest published implementation includes the full50-module configuration reader,
-owned MySQL initialize TMP directory, source-gated Android program installer and
-native isolated server source rebuild workflow. Inspect their actual new Actions
-before retrying. Android x64 Wine41046942035 passes reconstructed entry/offline/
-loopback component checks; adapt the same source patch in production ARM64 next.
-Server41045808679 passes compiled first/repeat/restart SQL and appearance storage;
-41046942015 also passes the actual4,063-file no-Git consumer. Those runs reached
-auth preparation but failed the now-fixed legacy configuration reader, so login
-remains unqualified. The app-owned content/schema entrypoint is being integrated.
-
-The user requests continued work until a nearly complete import-and-test package
-or 50% weekly usage. No current tool/account endpoint successfully exposes that
-weekly meter here; do not invent a reading or claim automatic quota enforcement.
-If the user reports the threshold, finish a concrete checkpoint and stop.
-
-- Use the durable Ubuntu dependency-image helper for runtime-only SQL/auth gates;
-  snapshot50x failures previously prevented execution. It verifies all preserved
-  input/source bytes and image readback before running a guest, without device Docker.
-- Complete real native source-baseline/updater/auth/playerbots qualifications. The
-  full50 ConfigMgr native workflow remains distinct from passed x64 source tests.
-- Server derivative41043905821 now has actual21,352,885-byte runtime archive and
-  paired1,082,880,246-byte debug archive; worldserver strips to59,025,784bytes.
-  NativeARM64 program loader/version checks pass; fullSQL/auth still hits the
-  appearance-store prerequisite now implemented. Sourceinputs/notices export is
-  verified, but isolated source rebuild/source closure/Android provider remain work.
-- Pass the adapted Wine host fixture, repin exact successful runtime/source
-  artifacts, rerun actual Android x64 reconstructed-client diagnostics, then
-  port/qualify the same adaptation in the production ARM64 runtime.
-- Actual Android Surface lifecycle41019374598 passes six groups, exactly two
-  connections/two peer EOFs, paused creation/recreation and real AudioTrack clock.
-  Complete guest X11/Wine/Adreno presentation remains unqualified.
-
-The reusable phone-side content verifier and fresh-schema journal now consume
-immutable packaged source/module metadata without Git or Docker. Original SQL
-and explicit source-derived appearance adaptation remain separate in receipts.
-Caller still owns the MySQL connection/process and helper generation; app
-activation and compiled updater composition remain to be wired/qualified.
+Keep six project records current and push meaningful checkpoints. State clearly
+which real CI mechanisms remain running; do not imply invisible background work.

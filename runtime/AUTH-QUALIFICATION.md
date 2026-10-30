@@ -57,8 +57,23 @@ Twelve focused codec/ownership/diagnostic tests passed, including those two real
 C++ exchanges. The server workflow also builds the reference through the actual
 ARM64 `common` target and requires those exchanges before its full build.
 
-Actual ARM64 authserver network execution remains pending the full server binary
-build. `auth-qualification.json` and `auth-environment-receipt.json` will capture
-that separate result next to the compiled-updater receipts. A passed synthetic
-protocol probe will not qualify execution of the reconstructed client, world
-entry, character creation, bots, existing-save upgrades or Android gameplay.
+Actual native ARM64 execution passed in runtime-only run
+[`41050050193`](https://github.com/Russianranger/esteria_android/actions/runs/41050050193)
+at integration revision `870034ae997bbdba778770f0b1072821678cbf43`.
+[The compact evidence](evidence/server-auth-41050050193.json) binds the retained
+709,363-byte artifact ZIP, its public receipts, and the original six-patch server
+build `41005048019.1` under source lock `dbbf8983…41b0`. This reuses the exact
+linked binary; it does not qualify the current seven-patch binary.
+
+The actual compiled updater passed its first run, same-revision repeat, ledger
+checks and restart before the authserver passed the owned listener, SRP6 proof,
+persisted session key, local realm, credential/tracker preservation and clean
+shutdown checks. The same invocation also passed the no-Git packaged-content
+consumer and the separately identified source-derived appearance storage gate.
+The original source SQL and the fresh appearance adaptation remain distinct;
+the latter is not recovered original DDL.
+
+The client side of this exchange is the bounded Python protocol probe described
+above. Execution of the reconstructed client remains a separate failing gate.
+World entry, character creation, bots, existing-save upgrades and Android
+gameplay remain unqualified. The reported realm retains its world-offline flag.

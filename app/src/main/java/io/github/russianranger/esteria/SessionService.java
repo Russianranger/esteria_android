@@ -41,6 +41,7 @@ import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import io.github.russianranger.esteria.runtime.RuntimeSetup;
 import io.github.russianranger.esteria.runtime.ServerRuntimeSetup;
 import io.github.russianranger.esteria.runtime.ServerProgramsSetup;
+import io.github.russianranger.esteria.runtime.ServerContentSetup;
 import io.github.russianranger.esteria.runtime.GuestBridgeSetup;
 import io.github.russianranger.esteria.runtime.ClientRuntimeSetup;
 import io.github.russianranger.esteria.runtime.ClientLaunchSetup;
@@ -300,8 +301,10 @@ public final class SessionService extends Service {
         status = "Preparing bundled database and server dependencies…";
         ServerRuntimeSetup setup = new ServerRuntimeSetup(this, root);
         ServerProgramsSetup programs = BuildConfig.SERVER_PROGRAMS_PACKAGED ? new ServerProgramsSetup(this, root) : null;
+        ServerContentSetup content = BuildConfig.SERVER_CONTENT_PACKAGED ? new ServerContentSetup(this, root) : null;
         // Validate the complete selected pair before either installation can change its pointer.
         if (programs != null) programs.requireServerRuntimeArchive(setup.archiveSha256());
+        if (content != null) content.requireServerRuntimeArchive(setup.archiveSha256());
         final long[] lastUpdate = {0};
         // prepare() reuses a verified dependency generation without opening its archive.
         // Continue after reuse so an app update can add a new programs generation.
@@ -333,6 +336,21 @@ public final class SessionService extends Service {
                     + " archiveSha256=" + programs.archiveSha256() + " sourcePinSha256=" + BuildConfig.SERVER_PROGRAMS_PIN
                     + " reusedFiles=" + installed.reusedFiles + " copiedBytes=" + installed.copiedBytes
                     + " androidRuntimeQualified=false gameRuntimeQualified=false");
+        }
+        if (content != null) {
+            status = "Preparing bundled server data…";
+            RuntimeInstaller.Result installed = content.prepare(setup.archiveSha256(), (phase, path, completed, total) -> {
+                long now = android.os.SystemClock.elapsedRealtime();
+                if (now - lastUpdate[0] >= 250 || completed == total) {
+                    lastUpdate[0] = now;
+                    status = "Preparing bundled server data…\n" + mib(completed)
+                            + (total >= 0 ? " / " + mib(total) : "") + " MiB";
+                }
+            }, cancelled::get);
+            log("Server source content prepared generation=" + installed.generation
+                    + " archiveSha256=" + content.archiveSha256() + " receiptSha256=" + content.receiptSha256()
+                    + " reusedFiles=" + installed.reusedFiles + " copiedBytes=" + installed.copiedBytes
+                    + " schemaInitialized=false gameRuntimeQualified=false");
         }
         status = programs == null
                 ? "Database and server dependencies are prepared. Local server startup is still under development."
@@ -389,6 +407,18 @@ public final class SessionService extends Service {
             } catch (IOException error) {
                 facts.put("runtime.serverPrograms.installationError", error.getMessage());
             }
+        }
+        facts.put("runtime.serverContent.packaged", String.valueOf(BuildConfig.SERVER_CONTENT_PACKAGED));
+        facts.put("runtime.serverContent.prepared", "false");
+        if (BuildConfig.SERVER_CONTENT_PACKAGED) {
+            try {
+                ServerContentSetup content = new ServerContentSetup(this, root);
+                content.requireServerRuntimeArchive(new ServerRuntimeSetup(this, root).archiveSha256());
+                facts.put("runtime.serverContent.archiveSha256", content.archiveSha256());
+                facts.put("runtime.serverContent.receiptSha256", content.receiptSha256());
+                facts.put("runtime.serverContent.expectedGeneration", content.generation());
+                facts.put("runtime.serverContent.prepared", String.valueOf(content.current() != null));
+            } catch (IOException error) { facts.put("runtime.serverContent.installationError", error.getMessage()); }
         }
         facts.put("runtime.guestBridges.packaged", String.valueOf(BuildConfig.GUEST_BRIDGES_PACKAGED));
         facts.put("runtime.guestBridges.prepared", "false");

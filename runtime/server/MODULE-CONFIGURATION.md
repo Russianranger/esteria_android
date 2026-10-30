@@ -22,6 +22,23 @@ config filenames, with startup/gameplay qualification false. The ordinary
 bootstrap/account-fixture call without both manifests still prepares playerbots
 only and explicitly reports `module_configurations_complete=false`.
 
+The same generation implementation is available without Git or host tools through
+`runtime.server_config.render_verified(content, state, data, mysql, profile=profile)`.
+It requires the actual `VerifiedContent` result, rechecks archived metadata and
+every main/module template, and always renders the complete compiled selection.
+The caller supplies the explicit local endpoint and controlled-bot profile;
+the runtime entrypoint rejects changed policy. The host command retains its
+source/module validator and delegates rendering to this shared implementation.
+
+[Actual packaged-content host evidence](../evidence/server-config-content-41019374697-host.json)
+records that API consuming the Java-installed seven-patch content retained from
+run `41019374697`: 4,063 files and 654,243,888 bytes passed the no-Git consumer,
+then all 50 module configs and 54 generation files were prepared and accepted
+by the full-generation consumer. Original receipt, source-lock, compiled-selection
+and template identities are recorded. Temporary configurations and credentials
+were removed. This executes no SQL or server program and qualifies no Android
+runtime, module startup or gameplay.
+
 ## Local profile
 
 - Playerbots command-server port is 0 (source-supported disabled value). The

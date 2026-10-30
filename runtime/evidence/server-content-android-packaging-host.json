@@ -1,0 +1,162 @@
+{
+  "androidRuntimeQualified": false,
+  "archive": {
+    "bytes": 167585802,
+    "file": "server-content.tar.gz",
+    "sha256": "0f41b2deea5344fcea4cbc70bbddf0bab1dfda1cd0346e23e92592aac63056e6"
+  },
+  "compiledModules": {
+    "bytes": 5348,
+    "sha256": "6459b6a1acab2c62c474e4c6ab3eb651daa21f697ccd628e93a38bad298bbdd1"
+  },
+  "deviceTestCandidate": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "hostJava": {
+    "cachedArchivePathDidNotExist": true,
+    "cachedCopiedBytes": 0,
+    "cachedReuseFiles": 4063,
+    "completedInventory": {
+      "bytes": 363,
+      "sha256": "10ae3dc52eccfd3941c1587061b3bd161372cd6758cc6514f1b761700744c4c3"
+    },
+    "fullProductNoGitVerifierPassed": true,
+    "generation": "09bcff112f7c03c64c7a0b76de9e73a7d7fb6589244107ed54c3dc9d5b48e433",
+    "installedFileBytes": 654243888,
+    "installedFiles": 4063,
+    "maximumHeapBytes": 33554432,
+    "metadataRequiredPins": 4,
+    "originalArchiveInstalled": true
+  },
+  "localApk": {
+    "archiveStoredUncompressed": true,
+    "assembleDebugAndroidTestPassed": true,
+    "assembleDebugPassed": true,
+    "buildHeadBeforeWorkingTreeChanges": "23f727a46de8c95ebca7fc698f6c82028c0ce033",
+    "bytes": 280688121,
+    "contentFinalApkBytesVerified": true,
+    "helperSourceFilesVerified": 9,
+    "lintDebugPassed": true,
+    "prootPackaged": false,
+    "reviewedWorkingTreeInputs": {
+      "app/build.gradle": {
+        "bytes": 10363,
+        "sha256": "17741956238f439f5f8d2709cf811304035b19ddc407a917ca8e34a222c97ce5"
+      },
+      "app/server-content.gradle": {
+        "bytes": 1936,
+        "sha256": "16de8288831ac18899b1ae7540718715e7c96fc9aa4d111f47f1d96044e74575"
+      },
+      "app/server-schema.gradle": {
+        "bytes": 1546,
+        "sha256": "6acdabb6ccb822e1405b6437fd6fb8dba4ea3ea4b36d425fd3270663078f9922"
+      },
+      "app/src/androidTest/java/io/github/russianranger/esteria/runtime/ServerSchemaAssetsTest.java": {
+        "bytes": 3505,
+        "sha256": "ea9286174075970dfa869f0b98e73b1094ebe65cdd74de3398040811407e6b23"
+      },
+      "app/src/main/java/io/github/russianranger/esteria/SessionService.java": {
+        "bytes": 42888,
+        "sha256": "202f03cd41eeb1cbd1afdfb333f8b42852e15d647fc885d3421767a1bc43a267"
+      },
+      "app/src/main/java/io/github/russianranger/esteria/runtime/GuestHelperAssets.java": {
+        "bytes": 7797,
+        "sha256": "5bd0aedf8f2e160c57c01beb97d4f8a14989cae53fe1962e7d898d67a1433349"
+      },
+      "app/src/main/java/io/github/russianranger/esteria/runtime/ServerContentSetup.java": {
+        "bytes": 13047,
+        "sha256": "7f3d0ef73f7756700868d15d39171ac76eea6052a372dbc8838bcf728f1344fc"
+      },
+      "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseService.java": {
+        "bytes": 13202,
+        "sha256": "f743fad94aa1af1e3ac693f5be2fdcef2723a34029ce41762a741ec1e25c739d"
+      },
+      "app/src/main/java/io/github/russianranger/esteria/runtime/ServerSchemaSetup.java": {
+        "bytes": 13850,
+        "sha256": "d2e0b7c1ce44a601de29c6818330d237530c8a25d8fa54e6ba0a7439733b0877"
+      },
+      "core/build.gradle": {
+        "bytes": 3294,
+        "sha256": "e32b9a4c68c23911be4a94b6e04bae30ad38fd142bcf3276345d784a64d33c50"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/ServiceOperationGuard.java": {
+        "bytes": 2419,
+        "sha256": "f7f3f81ebc41396cae10d0a9ad4dc53b1e385fcd6ada44985490c2227f47e42e"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/ProotLaunch.java": {
+        "bytes": 7474,
+        "sha256": "032a54698e355f9735f0f947d833bc789e77f826df85d41c6f4bc533f67a7134"
+      },
+      "core/src/test/java/io/github/russianranger/esteria/core/runtime/ProotMountTests.java": {
+        "bytes": 8977,
+        "sha256": "887dfb734575d4a7b12a1f09ef0d3c5a988b6aab2e752350b9fa6920f9acc725"
+      },
+      "core/src/test/java/io/github/russianranger/esteria/core/runtime/ServiceOperationGuardTests.java": {
+        "bytes": 3392,
+        "sha256": "1c73e3d88d81c289a345f8be6cfe1e35e3c99e3eea2608d34191c5ad38fc6f8e"
+      },
+      "runtime/android_server_schema_setup.py": {
+        "bytes": 11875,
+        "sha256": "9526275258a6b98930e3253c0011627844ed10e1816658b3d5d07e23cd3dfd02"
+      },
+      "runtime/evidence/android-schema-adapter-host.json": {
+        "bytes": 3229,
+        "sha256": "eb50d94712a0fb6892a3f32c50f37c2b17374ae50b2ad6c69ef3cf720fc70611"
+      },
+      "runtime/server/ANDROID-SCHEMA-SETUP.md": {
+        "bytes": 4358,
+        "sha256": "d289bb49f8bb3499c1198330967ddd62e86353b8a078543b380bd1238fe9a085"
+      },
+      "runtime/server/content-provider.lock.json": {
+        "bytes": 3725,
+        "sha256": "bd439f8fa93d0a52c7077844450d7472f5c1748d06b3662921cd26a92c3978dc"
+      },
+      "runtime/server_schema_setup.py": {
+        "bytes": 10862,
+        "sha256": "64681a3d44cfcee8049fea4874627e1343c4fd8c204f23edd8f2c0b45b8e6c8a"
+      },
+      "tests/test_android_server_schema_setup.py": {
+        "bytes": 7423,
+        "sha256": "2a283c6504a5631c30efabc91052829c11b112a2d9a2b60988c714573a84ae83"
+      },
+      "tests/test_runtime_server_schema_setup.py": {
+        "bytes": 14336,
+        "sha256": "3801f6eb0999f5990193c60b95bed71bd5747a851c527a53d8d3ccf5c1aa6887"
+      },
+      "tests/test_server_content_provider.py": {
+        "bytes": 6956,
+        "sha256": "b8c11b1533ae54d57fa31de2657f391fb823ebc66d2b72e9140b864053d17295"
+      },
+      "tools/provider_server_content.py": {
+        "bytes": 13636,
+        "sha256": "8e75a2b72f6b8e05a9b852676bd3a6d24b0fcbc2e275107687b61a2e8ffa86f9"
+      },
+      "tools/qualify_android_installer.py": {
+        "bytes": 6772,
+        "sha256": "a94028acff9f4d93e9fb52dd15239a7a23a42a84f9e0b61f10e7b30914e643c4"
+      }
+    },
+    "serverDependencyFinalApkBytesVerified": true,
+    "serverProgramsPackaged": false,
+    "sha256": "1ab14bee98289a4d0d13cabd08c55069b9c3650292fe3edfa98109d39d60afa2"
+  },
+  "originalContentArtifact": {
+    "bytes": 171464693,
+    "id": 12965377058,
+    "sha256": "a66b586f4517ce56d529378e72e125287c1122f84f35339102f8b8def78b9d07"
+  },
+  "providerPin": {
+    "bytes": 3725,
+    "sha256": "bd439f8fa93d0a52c7077844450d7472f5c1748d06b3662921cd26a92c3978dc"
+  },
+  "receipt": {
+    "bytes": 1343739,
+    "sha256": "1c00990e090e85af0232fe633b64e2718071a5f8e81f3b0ca1c8f2b214ffb3af"
+  },
+  "scope": "actual-server-content-java-install-and-local-apk-package",
+  "sourceLock": {
+    "bytes": 2170,
+    "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+  },
+  "sqlExecuted": false
+}
