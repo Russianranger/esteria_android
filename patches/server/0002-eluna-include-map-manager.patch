@@ -1,0 +1,12 @@
+diff --git a/ElunaLoader.cpp b/ElunaLoader.cpp
+--- a/ElunaLoader.cpp
++++ b/ElunaLoader.cpp
+@@ -31,6 +31,8 @@ namespace fs = std::filesystem;
+ #include "MapManager.h"
+ #elif defined ELUNA_CMANGOS
+ #include "Maps/MapManager.h"
++#elif defined ELUNA_AZEROTHCORE
++#include "MapMgr.h"
+ #endif
+ 
+ extern "C" {

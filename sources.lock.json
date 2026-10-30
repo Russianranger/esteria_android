@@ -20,6 +20,11 @@
           "path": "patches/server/0001-eluna-declare-area-trigger.patch",
           "sha256": "c26b145188c5f97bf30d032e1fe3bd7fe17aa1f8f0daa6793e51f5d830fe7aa6",
           "submodule": "src/server/game/LuaEngine"
+        },
+        {
+          "path": "patches/server/0002-eluna-include-map-manager.patch",
+          "sha256": "4e277dbe56c31ae30640c8e9ad4dee12e944e0f051d9bdc8d62aaa239c50433f",
+          "submodule": "src/server/game/LuaEngine"
         }
       ]
     }

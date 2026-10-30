@@ -22,8 +22,9 @@ server/Wine jobs must not be converted into successful evidence without logs.
 2. Complete native ARM64 Wine codec execution and asset-free Vulkan fixture.
    Use the pinned preparer and `runtime/WINE-QUALIFICATION.md`; keep external
    networking isolated and distinguish native Linux ARM64 from Android.
-3. Inspect server run `40983190300` and fix any remaining compile/link error via
-   ordered digest-checked patches here. Package the installed binaries plus SQL,
+3. Inspect the latest server run after `40983190300`, which exposed the missing
+   `MapMgr.h` include now fixed by patch 0002. Fix any further compile/link error
+   via ordered digest-checked patches here. Package the installed binaries plus SQL,
    modules/Lua, extractors, configs and notices; install target alone is incomplete.
 4. Build Bionic ARM64 PRoot/loader from pinned source. Package executables through
    Android nativeLibraryDir. Reuse read-only FTA approaches where compatible,

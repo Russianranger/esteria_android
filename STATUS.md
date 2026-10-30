@@ -7,8 +7,8 @@ Updated 2026-10-30 UTC. This is an implementation checkpoint, **not a device-tes
 `sources.lock.json` is authoritative for application inputs. It pins client
 `a3683cc3644d965bf0ed8d91946cd5d6b3f928e1`, server
 `f35f04d01689f034778e3474b3c820092f51e461`, and Eluna
-`58d7652138887783228b9727bd1fa4e08f00342b`. The digest-checked Eluna forward-declaration
-patch is maintained here. Starting tips were client `800cdd2`, integration `6309c8f`,
+`58d7652138887783228b9727bd1fa4e08f00342b`. Digest-checked Eluna forward-declaration and map-manager include
+patches are maintained here. Starting tips were client `800cdd2`, integration `6309c8f`,
 and the same server revision. Work is on the two requested development branches;
 no default merge, history rewrite or server push has occurred.
 
@@ -33,7 +33,7 @@ It is kept outside Git. The complete client data has not been imported or qualif
 
 ## Active work and remaining gates
 
-- Native Linux ARM64 server [CI 40983190300](https://github.com/Russianranger/esteria_android/actions/runs/40983190300) is compiling with the Eluna fix and bounded compiler cache. The earlier build failed on an undeclared `AreaTrigger`; do not cite it as a successful server build.
+- Native Linux ARM64 server [CI 40983190300](https://github.com/Russianranger/esteria_android/actions/runs/40983190300) progressed past the `AreaTrigger` fix, then failed because ElunaLoader omitted the AzerothCore `MapMgr.h` include. A second digest-checked patch supplies that real declaration; source-preparation tests and patch application pass. The next build can reuse the saved bounded compiler cache. Full server linking is not yet proven.
 - Execute the actual packaged ARM64 movie DLL under pinned Wine on a native ARM64 Linux host, then qualify asset-free Vulkan presentation. A harness or a staged runtime alone is not a pass.
 - Build/package the Android Bionic PRoot launcher and loader; qualify Android execution policy, display, audio, input, keyboard, lifecycle and process ownership.
 - Package a matching server rootfs and MySQL. The Wine candidate has Debian 12/glibc 2.36; the server build uses Ubuntu 24.04/glibc 2.39, so those binaries cannot simply be combined.
