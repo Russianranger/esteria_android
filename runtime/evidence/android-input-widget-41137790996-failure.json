@@ -1,0 +1,281 @@
+{
+  "actualInstrumentedCase": {
+    "actorPid": 3806,
+    "error": "Targeted input event injection was not directed at a window owned by the application uid.",
+    "failedBeforeFinalInputReceipt": true,
+    "failures": 1,
+    "stackOrigin": "GameInputAndroidTest.tap:103 / open:108 / actualImeTouchAndControllerCallbacks:222",
+    "targetUid": 10174,
+    "testsRun": 1
+  },
+  "artifact": {
+    "all20MembersReadAndCrcVerified": true,
+    "bytes": 48867,
+    "id": 13016949546,
+    "members": {
+      "app-receipt.log": {
+        "bytes": 1268,
+        "sha256": "5235d50053cb10cec4bd3cf1374447939b44f9f1b7deee80c2e022c6c71412bc"
+      },
+      "available-input-methods.log": {
+        "bytes": 190,
+        "sha256": "f68b7b98a60fa225d044badecf43a8965815043206e5afe57c50d92d2c831724"
+      },
+      "bounded-logcat.log": {
+        "bytes": 252255,
+        "sha256": "d110555221dafedf4bb5993c1abba540ea2443cf9697245d7ec521f7100b699f"
+      },
+      "default-input-method.log": {
+        "bytes": 76,
+        "sha256": "2a774a2e41afc19b41619afbe7add50c5a04408e0d69b5adf64b38a00faf06c5"
+      },
+      "enable-emulator-software-keyboard.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "grant-fixture-notification-permission.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "hardware-ime-setting-before.log": {
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      },
+      "install-app.log": {
+        "bytes": 36,
+        "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+      },
+      "install-tests.log": {
+        "bytes": 36,
+        "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+      },
+      "preexisting.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "presentation-audio-contracts.log": {
+        "bytes": 834,
+        "sha256": "f1c9e23a6c2790dbee24209b91dbdbf03920db941e96c32e103718eb3326d777"
+      },
+      "qualification.json": {
+        "bytes": 2716,
+        "sha256": "42cb46d728360660a06ce3e5ec215dc9f4f8c1b1bca23549b05359ec27606f80"
+      },
+      "restore-emulator-software-keyboard-setting.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ro.build.fingerprint.log": {
+        "bytes": 81,
+        "sha256": "74f45a5b5c9c2e0e9fe31b30e7fecac3d7eed0ec13131a36513c9da0e27ee79d"
+      },
+      "ro.build.version.sdk.log": {
+        "bytes": 3,
+        "sha256": "19b8d5c59e421f037fe563007c7254eb8d98bc221b278c3db3e5fdbbfd52e273"
+      },
+      "ro.kernel.qemu.log": {
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      },
+      "ro.product.cpu.abi.log": {
+        "bytes": 7,
+        "sha256": "aaf631698ae5160ceb04a97681a14887fdcab47cd6e0f163c87485b3b1340b62"
+      },
+      "serial.log": {
+        "bytes": 14,
+        "sha256": "0115c661660f4cd9f62719a1c0f968c833c3295da9713cc8b6d915f739be272e"
+      },
+      "stop-owned-test-app.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "widget-ime-input-contracts.log": {
+        "bytes": 5456,
+        "sha256": "ee95422c6f1d401495facf877ed9c1ad562511e6d82d805077a4191206040707"
+      }
+    },
+    "sha256": "adefa3fabafc062cf7384f7511b0be464601bb9fb60fdaae9b2f4d2aa9a170e3"
+  },
+  "diagnosis": {
+    "actualInputDispatcherTargetMismatchObserved": true,
+    "category": "test-fixture-bottom-toolbar-touch-during-IME-window-resize",
+    "observedForeignWindowUid": 10133,
+    "observedTargetWindow": "InputMethod",
+    "optionalRegisteredUinputReached": false,
+    "preserveTargetUidInjectionGuard": true,
+    "productionInputFailureEstablished": false,
+    "status": "evidence-supported-inference"
+  },
+  "formatVersion": 1,
+  "jobId": 124344420278,
+  "observedAtUtc": "2026-10-30T22:29:58.453618+00:00",
+  "preparedNarrowFix": {
+    "androidRerunQualified": false,
+    "focusedAndroidTestJavaCompilePassed": true,
+    "focusedGradleActionableTasks": 37,
+    "focusedGradleBuildLine": "BUILD SUCCESSFUL in 9s",
+    "focusedGradleCommand": "env JAVA_HOME=/workspace/scratch/6ba4742880b1/toolchain/jdk/usr/lib/jvm/java-17-openjdk-amd64 ANDROID_HOME=/workspace/scratch/6ba4742880b1/toolchain/android-sdk GRADLE_OPTS= ./gradlew --offline --no-daemon --init-script /tmp/esteria-wine-profile-xdyphqjf/outputs.gradle :app:compileDebugAndroidTestJavaWithJavac",
+    "focusedGradleCompletionLog": {
+      "bytes": 2320,
+      "sha256": "196546f1cc7c07de36efb2c31b19a1249134408122f37d55eddae6c0aad461c3"
+    },
+    "focusedGradleExecutedTasks": 1,
+    "focusedGradleUpToDateTasks": 36,
+    "globalInputInjectionUsed": false,
+    "independentReadOnlyDiagnosisAndScopeReview": "CLEAR",
+    "productionBehaviorChanged": false,
+    "sourceSnapshotExact": false,
+    "testToolbarPlacedAboveSurface": true,
+    "waitForMainIdleBeforeReadingTapCoordinates": true,
+    "worktreeSourceInput": {
+      "bytes": 23589,
+      "path": "app/src/androidTest/java/io/github/russianranger/esteria/presentation/GameInputAndroidTest.java",
+      "sha256": "220af6bc0977d844d161a97a00fbc05b161e9c67084962dccdd53715749feb91"
+    }
+  },
+  "producerGitInputs": {
+    ".github/workflows/android-presentation.yml": {
+      "bytes": 4409,
+      "sha256": "75585daecae66450767b2c1da7bf8f6876e82b5d5025962a0c7d9844498382c5"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/presentation/GameInputAndroidTest.java": {
+      "bytes": 23387,
+      "sha256": "8aff3f1d46d3d5fe68bb48e332beb71badcbc0da0971a179bacca64ef70d3944"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/presentation/PresentationAudioTest.java": {
+      "bytes": 24024,
+      "sha256": "556a4b967f590fd9fb173f4569a2da381c5a1e9a5985fe9faee808bf7f59f4c0"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/presentation/RegisteredInputFixture.java": {
+      "bytes": 16532,
+      "sha256": "d73132d230691d86ffb723a2c91818615bc7e1664d6851084b0f024b91b49a36"
+    },
+    "runtime/ANDROID-INPUT-QUALIFICATION.md": {
+      "bytes": 3836,
+      "sha256": "8e88d5117f0235368c1905fad2720fd1571545fba059ef1ba1c9c652e1654f27"
+    },
+    "runtime/CONTROLS.md": {
+      "bytes": 5667,
+      "sha256": "e90a6460747454fb5c0ca176c9033bbd9a3f34653eb836291251ad8fdd97dd03"
+    },
+    "runtime/evidence/android-input-widget-host.json": {
+      "bytes": 5836,
+      "sha256": "1938dcdcfebf34881355de0342d4e9556d125db6e5f4e648a076b22ac6ae6be8"
+    },
+    "tests/test_android_presentation_qualification.py": {
+      "bytes": 7088,
+      "sha256": "162eb3b9fa78102aae3a40d76990499d1dba7a6848a47fd5612d94af72cc84c3"
+    },
+    "tools/qualify_android_presentation.py": {
+      "bytes": 12864,
+      "sha256": "a33f8b40af2b72559b51dfabc25e41d230e0970ede48f73b883d29d0f04cf2c6"
+    }
+  },
+  "qualificationBoundary": {
+    "androidWidgetImeWholeCaseQualified": false,
+    "androidWineExecuted": false,
+    "arm64Qualified": false,
+    "deviceTestCandidate": false,
+    "gameplayQualified": false,
+    "hardwareQualified": false,
+    "inputBridgeSocketExecuted": false,
+    "physicalControllerQualified": false,
+    "registeredUinputAvailabilityObserved": false,
+    "x11GuestExecuted": false
+  },
+  "rawQualification": {
+    "adrenoQualified": false,
+    "androidEmulatorSurfaceAudioQualified": true,
+    "androidEmulatorWidgetImeInputQualified": false,
+    "androidWineExecuted": false,
+    "apk": {
+      "bytes": 1131816,
+      "native": {
+        "lib/x86_64/libesteria-presentation.so": {
+          "bytes": 8056,
+          "sha256": "254ec807ca6c93a4eceaf4ce74f2d831aae120a24b2d0a903997149c62d8fd2c"
+        },
+        "lib/x86_64/libesteria_process.so": {
+          "bytes": 517632,
+          "sha256": "28174b3c8677d644c37535304885de7737c6b96c5435dd0f987ada026dae7364"
+        }
+      },
+      "sha256": "9c51ad7bac7c5a6fd7aa5f912ca0bddd694b0626481a575ffd084e0a2716c4bd"
+    },
+    "appEvidence": {
+      "abi": "x86_64",
+      "adrenoQualified": false,
+      "androidWineExecuted": false,
+      "api": 33,
+      "arm64GuestExecuted": false,
+      "audibleOutputQualified": false,
+      "audioActivePeerShutdownVerified": true,
+      "audioInvalidHandshakeRecovered": true,
+      "audioResetVerified": true,
+      "audioTrackAcceptedFrames": 4992,
+      "audioTrackPlayedFrames": 4992,
+      "fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+      "formatVersion": 1,
+      "gameplayQualified": false,
+      "groupsPassed": 6,
+      "invalidFrameRejected": true,
+      "nativeSurfaceExecuted": true,
+      "pausedSurfaceCreationBlocked": true,
+      "pausedSurfaceRecreationBlocked": true,
+      "privateChildSymlinkRejected": true,
+      "privateRootAliasVerified": true,
+      "privateSocketCleanupVerified": true,
+      "rgbaReadbackVerified": true,
+      "scope": "android-13-x86_64-surface-audiotrack-protocol-fixtures",
+      "sourceRevision": "1180deff97f37afa58de439ad07441ab7941f886",
+      "surfaceLifecycleCleanupVerified": true,
+      "surfaceLifecycleConnections": 2,
+      "surfaceLifecyclePeerEofs": 2,
+      "surfacePausePeerEofVerified": true,
+      "surfaceRecreationVerified": true,
+      "surfaceResumeFrameVerified": true,
+      "surfaceResumeIdempotentVerified": true,
+      "targetSdk": 35,
+      "x11GuestExecuted": false
+    },
+    "arm64GuestExecuted": false,
+    "audibleOutputQualified": false,
+    "completedAtUnix": 1793399261,
+    "emulatorProperties": {
+      "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+      "ro.build.version.sdk": "33",
+      "ro.kernel.qemu": "1",
+      "ro.product.cpu.abi": "x86_64"
+    },
+    "error": "android-widget-ime-input-test-did-not-pass",
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "scope": "android-13-x86_64-surface-audiotrack-protocol-fixtures",
+    "sourceRevision": "1180deff97f37afa58de439ad07441ab7941f886",
+    "testApk": {
+      "bytes": 1786517,
+      "sha256": "185ab4a516b253f5fd9e94abb4664889a2fdbab62ce7611d90f11dc9323f331f"
+    },
+    "x11GuestExecuted": false
+  },
+  "runAttempt": 1,
+  "scope": "actual-android-13-x64-input-widget-targeted-touch-fixture-failure",
+  "sourceAndBuild": {
+    "actualApkDownloadedLocally": false,
+    "decodedJobLog": {
+      "bytes": 84454,
+      "sha256": "68dc15495bdff3886a8da6dcf3f2f447be68293a6fe2af4775011e0759288094"
+    },
+    "exactX64JavaNativeBuildPassed": true
+  },
+  "sourceControlFlowInference": {
+    "basis": "The exact producer test reached its fifth open at line222; preceding synchronous assertions returned. This is partial source-control-flow evidence, not a completed input qualification.",
+    "previousDoneRetryReplacedClosedAndSoftEnterAssertionsCompleted": true
+  },
+  "sourceRevision": "1180deff97f37afa58de439ad07441ab7941f886",
+  "sourceSnapshotExact": true,
+  "workflowCompletionConfirmed": true,
+  "workflowConclusion": "failure",
+  "workflowRun": 41137790996,
+  "workflowStatus": "completed"
+}

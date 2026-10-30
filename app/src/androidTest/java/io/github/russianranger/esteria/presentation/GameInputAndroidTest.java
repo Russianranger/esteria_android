@@ -95,6 +95,7 @@ public final class GameInputAndroidTest {
         WindowInsets insets=view.getRootWindowInsets();return insets!=null&&insets.isVisible(WindowInsets.Type.ime());
     }
     private void tap(Button button)throws Exception {
+        instrumentation.waitForIdleSync();
         int[] point=ui(()->{int[] p=new int[2];button.getLocationOnScreen(p);p[0]+=button.getWidth()/2;p[1]+=button.getHeight()/2;return p;});
         long now=SystemClock.uptimeMillis();
         for(int action:new int[]{MotionEvent.ACTION_DOWN,MotionEvent.ACTION_UP}) {
@@ -166,9 +167,11 @@ public final class GameInputAndroidTest {
                         public void rejected(String reason){rejections.incrementAndGet();}
                         public void cursorModeChanged(boolean enabled){modeChanges.incrementAndGet();}
                     });view.set(display);
-                    box.addView(display,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,0,1));
                     Button button=new Button(activity);button.setText("Keyboard");button.setOnClickListener(v->display.showKeyboard());keyboard.set(button);
+                    // Keep the fixture's injected touch outside the IME window
+                    // while hide/show resizes the Surface below this toolbar.
                     box.addView(button,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT));
+                    box.addView(display,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,0,1));
                     ((ViewGroup)activity.findViewById(android.R.id.content)).addView(box,new FrameLayout.LayoutParams(-1,-1));
                     display.requestFocus();return null;
                 });
