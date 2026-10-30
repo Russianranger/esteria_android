@@ -28,9 +28,9 @@ combined memory and Thor thermals remain measurements to make, not assumed gains
 | --- | --- | --- |
 | 1. Pinned reference builds | Branches, locks, protocol checks, full ARM64/x64 client builds complete; server build in progress. | Native Linux ARM64 server link/install and artifact provenance. |
 | 2. Executable client platform | ARM64 algorithms/crash/codec implemented; full Windows builds and Linux ARM64 Wine codec/software Vulkan pass. | Actual EXE entry and engine-frame readback now pass; next Android display/input/audio and full game startup. |
-| 3. Local server/database | Real host MySQL bootstrap/recovery/persistence passed. | Packaged ARM64 MySQL/server rootfs, source-backed game schemas and data loading. |
+| 3. Local server/database | Native ARM64 MySQL rootfs/source closure, fresh base SQL and restart persistence pass. Optional verified APK dependency provider and resumable setup implemented. | Complete server linking, compiled module/schema updates, owned local account and Android server execution. |
 | 4. Matched gameplay | Not qualified. | Login, character creation, world entry, Esteria extensions and persistent saves with real content. |
-| 5. Android integration | Import/recovery, bounded runtime setup, diagnostics, native process/Surface/audio bridges and internal controller/IME view implemented. | Android runtime execution, process adapter, in-game controls, keyboard, shutdown and lifecycle. |
+| 5. Android integration | Import/recovery, bounded runtime setup, diagnostics, native process/Surface/audio bridges and internal controller/IME view implemented. Android13 installer/update and native owner pass. | Actual PRoot guest execution and Surface/AudioTrack emulator gates, then matched application session, game controls and lifecycle. |
 | 6. Thor candidate | Not ready. | One signed update-compatible package with all required host/emulator/gameplay gates, then consolidated Thor test. |
 
 ## Execution order

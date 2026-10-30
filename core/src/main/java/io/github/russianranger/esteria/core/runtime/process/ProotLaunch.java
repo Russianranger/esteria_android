@@ -9,25 +9,62 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /** Explicit PRoot argv; callers provide verified payloads and private directories.
  * PRoot is a compatibility layer, not a security or network sandbox.
  */
 public final class ProotLaunch {
     private ProotLaunch() { }
+    /** Immutable provider/data location by convention, not an enforced read-only mount.
+     * PRoot cannot make same-UID application files into a security boundary.
+     */
+    public static final class Mount {
+        public final Path source;
+        public final String destination;
+        public Mount(Path source, String destination) {
+            if (source == null || destination == null || !Arrays.asList("/esteria-client", "/esteria-data",
+                    "/esteria-content", "/esteria-server", "/esteria-bridges", "/esteria-shaders").contains(destination))
+                throw new IllegalArgumentException("Unsupported runtime provider mount");
+            this.source = source; this.destination = destination;
+        }
+    }
     public static OwnedProcess.Specification create(Path tracer,Path loader,Path rootfs,Path work,
             Path temporary,Path logs,List<String> guestCommand,Map<String,String> guestEnvironment) throws IOException {
+        return create(tracer,loader,rootfs,work,temporary,logs,guestCommand,guestEnvironment,Collections.emptyList());
+    }
+    public static OwnedProcess.Specification create(Path tracer,Path loader,Path rootfs,Path work,
+            Path temporary,Path logs,List<String> guestCommand,Map<String,String> guestEnvironment,List<Mount> mounts) throws IOException {
         for (Path path : Arrays.asList(rootfs,work,temporary,logs)) directory(path);
         for (Path path : Arrays.asList(tracer,loader)) {
             if (!path.isAbsolute() || Files.isSymbolicLink(path) || !Files.isRegularFile(path,LinkOption.NOFOLLOW_LINKS) || !Files.isExecutable(path))
                 throw new IOException("Missing installed PRoot executable");
         }
         if (guestCommand.isEmpty() || !guestCommand.get(0).startsWith("/")) throw new IOException("Absolute guest executable required");
-        if (rootfs.startsWith(work) || work.startsWith(rootfs) || temporary.startsWith(rootfs) || rootfs.startsWith(temporary) ||
-                logs.startsWith(rootfs) || rootfs.startsWith(logs))
-            throw new IOException("Mutable process state must be outside the runtime generation");
+        List<Path> baseDirectories=Arrays.asList(rootfs,work,temporary,logs);
+        for (int i=0;i<baseDirectories.size();i++) for (int j=i+1;j<baseDirectories.size();j++)
+            if (overlap(baseDirectories.get(i),baseDirectories.get(j)))
+                throw new IOException("Runtime, persistent work, temporary files and logs must be separate");
         List<String> args=new ArrayList<>(Arrays.asList("--kill-on-exit","--sysvipc","-0","-r",rootfs.toString(),
-            "-b","/dev","-b","/proc","-b",work+":/work","-b",temporary+":/tmp","-w","/work","/usr/bin/env","-i"));
+            "-b","/dev","-b","/proc","-b",work+":/work","-b",temporary+":/tmp"));
+        if (mounts == null || mounts.size() > 6) throw new IOException("Too many runtime provider mounts");
+        Set<String> destinations=new HashSet<>();
+        List<Path> sources=new ArrayList<>();
+        for (Mount mount : mounts) {
+            if (mount == null || !destinations.add(mount.destination)) throw new IOException("Duplicate runtime provider mount");
+            directory(mount.source);
+            for (Path other : Arrays.asList(rootfs,work,temporary,logs))
+                if (overlap(mount.source,other)) throw new IOException("Provider mount overlaps runtime or mutable process state");
+            for (Path other : sources)
+                if (overlap(mount.source,other)) throw new IOException("Provider mounts overlap");
+            sources.add(mount.source);
+            // Pinned PRoot binding.c interprets terminal ! as no dereference of
+            // the guest destination. Never redirect a provider via a guest link.
+            args.add("-b"); args.add(mount.source+":"+mount.destination+"!");
+        }
+        args.addAll(Arrays.asList("-w","/work","/usr/bin/env","-i"));
         Map<String,String> guest=new TreeMap<>();
         guest.put("PATH","/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin");
         guest.put("HOME","/work/home"); guest.put("USER","root"); guest.put("LANG","C.UTF-8"); guest.put("TMPDIR","/tmp");
@@ -44,6 +81,7 @@ public final class ProotLaunch {
         return new OwnedProcess.Specification(tracer,args,host,
             work,logs.resolve("stdout.log"),logs.resolve("stderr.log"));
     }
+    private static boolean overlap(Path first,Path second) { return first.startsWith(second) || second.startsWith(first); }
     private static void directory(Path path) throws IOException {
         if (!path.isAbsolute() || !path.normalize().equals(path) || path.toString().indexOf(':')>=0 ||
                 Files.isSymbolicLink(path) || !Files.isDirectory(path,LinkOption.NOFOLLOW_LINKS) || !path.toRealPath().equals(path))

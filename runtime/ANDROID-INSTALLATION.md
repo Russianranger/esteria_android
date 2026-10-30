@@ -38,7 +38,7 @@ the current pointer changes last. Failure preserves the previous active runtime.
 
 ## Actual evidence and limits
 
-Seventeen focused Java test groups pass with a 64 MiB heap, and independently
+Eighteen focused Java test groups pass with a 64 MiB heap, and independently
 with 32 MiB. They cover traversal/link safety, malformed tar metadata, bounded
 payloads, cancellation, torn journals, stale files, download/cache behavior,
 required-file tampering and activation preservation.
@@ -51,10 +51,12 @@ Recorded evidence SHA-256:
 `e27689b59820054ac9c20670d68edd7d785e3182d0cb9e611977d40a5cdfddda`.
 
 The Android adapter compiles, clean assemble/lint pass, and the APK's bundled
-PRoot/loader bytes match the verified provider. Android filesystem execution,
+PRoot/loader bytes match the verified provider. Android13 x86_64 filesystem and
+APK-update qualification passes in run `40995925492`: all18 contracts plus a
+version-2 update preserving runtime pointer, copied hardlink and state marker.
 PRoot guest launch, display/audio/input and gameplay remain separate unpassed
-gates. This installer currently covers the client Wine candidate; a compatible
-server rootfs/content installation adapter is still required. Retention/cleanup
+gates. The optional server dependency provider uses this same installer; actual
+server binaries/content and session startup remain separate work. Retention/cleanup
 of superseded generations must be implemented before storage-managed releases.
 
 Run the bounded behavior checks with:
@@ -78,7 +80,7 @@ support log. Extra physical space and the expanded-byte ceiling remain enforced.
 The initial archive's 45 hardlinks refer to immutable regular-file payloads; mutable
 database state is never imported through this mechanism. A forced-denial and
 interrupted-copy regression brings the host installer suite to 18 groups. The
-updated Android emulator qualification remains pending.
+updated Android emulator qualification passes in run `40995925492`.
 
 The exact 45-copy overhead is 1,008,166,513 bytes. Combined archive and file payload
 need 4,258,882,859 bytes before reserve. Copied aliases have a bounded private
@@ -92,4 +94,6 @@ Linux host under 64 MiB heap: all 45 copies passed and total copied bytes were
 3,645,965,754. A cached repeat copied zero and read about 94 MB (the required
 pins twice plus metadata), rather than rescanning the extra 1 GB. Evidence SHA256:
 `9f13d0ecbfe65b4b502693892c84651b8c2587f4151a4323ffb1e1afad77182c`.
-This full-input host proof does not replace the pending Android emulator rerun.
+This full-input host proof complements the Android fixture run; neither establishes
+Android execution of the installed ARM64 binaries. The emulator update uses one
+isolated debug key, not the future persistent user-signing identity.

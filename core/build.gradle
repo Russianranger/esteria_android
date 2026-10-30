@@ -41,3 +41,11 @@ tasks.register('presentationProtocolTest', JavaExec) {
     maxHeapSize = '32m'
 }
 check.dependsOn presentationProtocolTest
+
+tasks.register('prootMountTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.runtime.ProotMountTests'
+    maxHeapSize = '32m'
+}
+check.dependsOn prootMountTest

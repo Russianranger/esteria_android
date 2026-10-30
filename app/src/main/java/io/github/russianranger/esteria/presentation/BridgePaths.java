@@ -17,9 +17,17 @@ import java.nio.file.Paths;
 final class BridgePaths {
     private BridgePaths() {}
     static Path directory(Context context, File directory) throws IOException {
-        Path root = context.getFilesDir().toPath().toRealPath();
-        Path path = directory.toPath().toAbsolutePath().normalize();
-        if (!path.startsWith(root)) throw new IOException("Bridge directory is outside private application files");
+        Path advertisedRoot = context.getFilesDir().toPath().toAbsolutePath().normalize();
+        Path root = advertisedRoot.toRealPath();
+        Path requested = directory.toPath().toAbsolutePath().normalize();
+        // Android can advertise /data/user/0 while the trusted root resolves to
+        // /data/data. Resolve only that framework-owned root, then inspect each
+        // caller-supplied child without following links.
+        Path relative;
+        if (requested.startsWith(advertisedRoot)) relative = advertisedRoot.relativize(requested);
+        else if (requested.startsWith(root)) relative = root.relativize(requested);
+        else throw new IOException("Bridge directory is outside private application files");
+        Path path = root.resolve(relative);
         Path current = root;
         for (Path part : root.relativize(path)) {
             current = current.resolve(part);

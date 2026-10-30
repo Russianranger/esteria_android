@@ -80,7 +80,7 @@ Install/update with the stable signing identity; import verified data; start loc
 
 `.github/workflows/android-instrumentation.yml` builds an AndroidX instrumentation
 APK and two application versions, then runs only on a fresh Android 13 x86_64
-emulator. It reuses the same 17 installer contracts in app-private storage, stages
+emulator. It reuses the same 18 installer contracts in app-private storage, stages
 a runtime and separate persistent-state marker, installs version 2 with `adb
 install -r`, and verifies both survive with zero runtime recopy. The harness
 refuses a physical device or preexisting app and requires an explicit completed
@@ -90,8 +90,12 @@ Local instrumentation compile and Android lint pass. First emulator run
 `40990723608` failed because Android rejects `Files.getFileStore`; runtime download,
 runtime extraction, game import, ZIP staging and storage diagnostics now use
 `File` storage queries. Free-space reserves remain enforced. The second emulator run `40991448984` then exposed app-private hardlink denial.
-The explicit verified-copy fallback adds an 18th contract; the next rerun is pending. A successful run would qualify these Android filesystem/update behaviors, not
-ARM64 PRoot/Wine, audio/display, gameplay, or the user's persistent signing key.
+The explicit verified-copy fallback adds an 18th contract. Run
+`40995925492` at `e22b8d30a053a4afbcd6d78ca28e80f8dc0c697a` passes all contracts,
+seed, update and retained-pointer/copied-hardlink/sentinel assertions. Evidence
+artifact SHA256 is `03eadc7a72f54f9a861ee5d11b0eb3f17d780cbc7508c7970ff7042de4a167d1`.
+This qualifies Android filesystem/update behavior, not ARM64 PRoot/Wine,
+audio/display, gameplay, or the user's persistent signing key.
 Both test versions use one isolated CI debug key.
 
 ## Native presentation, input and process gates
@@ -100,11 +104,13 @@ Both test versions use one isolated CI debug key.
 JVM/JNI adapter fixtures. The separate Android owner workflow requires x86_64 JNI
 on an Android13 emulator and executes `/system/bin/sh`; it does not skip a missing
 bridge or claim ARM64 guest execution. Host owner, JNI, NDK ARM64 build, native
-APK validation and Android compile/lint pass; emulator owner execution is pending.
+APK validation and Android compile/lint pass. Actual emulator execution passes
+all six owner groups in run `40994809786`; see `runtime/ANDROID-OWNER-QUALIFICATION.md`.
 
 Six bounded JVM PCM/input protocol groups and the production native Surface decoder
 with host socketpairs/test-only ANativeWindow stubs pass. Guest helper ARM64 builds
-use pinned Debian12 inputs and source companions. Actual Android Surface/AudioTrack
+use pinned Debian12 inputs and source companions and pass native ARM64 CI
+`40995565147`. Actual Android Surface/AudioTrack
 playback and Wine guest input/audio remain separate gates. `runtime/CONTROLS.md`
 describes the initial internal controller/IME router and remaining device checks.
 

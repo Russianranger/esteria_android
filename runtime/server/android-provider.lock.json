@@ -1,0 +1,35 @@
+{
+  "formatVersion": 1,
+  "scope": "measured-server-runtime-provider-inputs",
+  "integrationRevision": "b06de55f5b17f27ae9659abcfdaf93a61b749a9e",
+  "workflowRun": 40993458111,
+  "archive": {
+    "file": "server-runtime-arm64.tar.gz",
+    "bytes": 112374096,
+    "sha256": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5"
+  },
+  "packageReceipt": {
+    "bytes": 1915,
+    "sha256": "05153c6c03856071f0c0452f6075ae4b9ea2e1f1d0fbcc32f33319a9599adb9f"
+  },
+  "runtimeMetadata": {
+    "bytes": 34299,
+    "sha256": "3aa480f48fd36cea1253557976163dc2da0707eef72dbef18d028196888b05b1"
+  },
+  "sourceLock": {
+    "bytes": 6578,
+    "sha256": "2efac3a6a310c4add3a0407f0044ac608706aa748730351d45ea4c67bdfd0a47"
+  },
+  "archiveEntries": 6263,
+  "archiveFileBytes": 385051708,
+  "sourceCompanion": {
+    "artifactId": 12950466782,
+    "zipBytes": 954236077,
+    "zipSha256": "b09599218a1a62a8e131eeedc47f6c8c19e2d39936d4e0aed7261e365f409bc1",
+    "manifestSha256": "635b966d617ffd2763d51412c67fa52c90dc1d9311ca2e489408c09362024688",
+    "sourcePackages": 89,
+    "files": 278,
+    "fileBytes": 954006914
+  },
+  "androidRuntimeQualified": false
+}

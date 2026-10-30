@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.22)
 project(esteria_presentation C)
-if(NOT ANDROID OR NOT ANDROID_ABI STREQUAL "arm64-v8a")
-  message(FATAL_ERROR "Presentation is an Android ARM64 JNI library; guest helpers build separately")
+if(NOT ANDROID OR NOT (ANDROID_ABI STREQUAL "arm64-v8a" OR
+    (ANDROID_ABI STREQUAL "x86_64" AND ESTERIA_PRESENTATION_EMULATOR_TEST)))
+  message(FATAL_ERROR "Presentation requires ARM64 or the explicit x86_64 emulator-test option")
 endif()
 add_library(esteria-presentation SHARED surface.c)
 target_compile_features(esteria-presentation PRIVATE c_std_11)

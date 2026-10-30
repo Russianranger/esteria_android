@@ -77,3 +77,20 @@ failure and choose a supported packaging/backend adaptation. Do not infer a
 device-only failure from the current host's separate ptrace restriction, weaken
 SELinux, silently lower targetSdk, or request a preliminary Thor installation
 while independent implementation and emulator work remain useful.
+## Provider mounts and persistent state
+
+`ProotLaunch` accepts explicit canonical provider directories at six fixed guest
+paths: `/esteria-client`, `/esteria-data`, `/esteria-content`, `/esteria-server`,
+`/esteria-bridges` and `/esteria-shaders`. Each is passed as one argv element;
+PRoot's source-confirmed terminal `!` avoids following a guest destination link.
+The Android adapter first requires every source inside canonical private app
+storage. Provider sources cannot overlap each other, the rootfs, persistent
+`/work`, temporary files or logs. Runtime, work, temporary and log directories
+are also pairwise disjoint; session directories cannot be nested inside work.
+The default overload adds no provider mounts.
+
+These are layout and invocation guards, covered by `:core:prootMountTest`, not
+enforced read-only mounts or a security sandbox. PRoot runs under the application's
+UID. Providers remain immutable by application contract; mutable client launch
+views, databases and saves must be placed in separate persistent work directories.
+Actual provider bindings still require guest execution qualification.

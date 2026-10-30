@@ -29,14 +29,16 @@ server/Wine jobs must not be converted into successful evidence without logs.
    workflow also binds enabled modules to actual binaries and emits a verified
    GNU SQL/config/notice package. Source-profile package alone is unqualified.
 4. Android PRoot CI `40986376389` passed Bionic build/APK byte verification and
-   Linux x64/ARM64 descendant ownership. Actual Android execution remains open.
+   Linux x64/ARM64 descendant ownership. Actual Android PRoot execution remains open.
    The Java runtime installer has passed the full pinned archive on Linux with
-   64 MiB heap. Continue process-owner adapter and Android filesystem/execution
-   qualification; the new Android13 x86_64 installer/APK-update workflow is compiled
-   but its first emulator run found Android getFileStore unsupported. The File-based
-   fix passed its prior point; hardlink denial is now handled by verified immutable copies. Inspect the next emulator run. See `runtime/ANDROID-INSTALLATION.md` and `runtime/proot/README.md`.
-5. Dependency image/MySQL/source-capture CI `40989666380` passed; continue verified
-   GNU rootfs packaging and actual server library closure.
+   64 MiB heap, including forced hardlink copies. Android13 x86_64 installer/update
+   run `40995925492` passes all18 contracts and version-2 preservation. Android
+   native owner run `40994809786` passes six real shell-process groups. Continue
+   actual emulator PRoot/glibc execution and ARM64 integration. See
+   `runtime/ANDROID-INSTALLATION.md` and `runtime/proot/README.md`.
+5. Dependency image/MySQL/source-capture CI `40989666380` and normalized rootfs
+   package/readback run `40993458111` passed. Integrate the verified optional APK
+   provider and setup action, then establish actual server library closure.
    Do not combine its glibc 2.39 binaries with Debian 12 Wine's glibc 2.36.
    Keep all mutable databases outside replaceable runtime generations.
 6. Base SQL load/restart CI `40991449039` passed all 468 files; qualify the compiled dbimport and the separate playerbots
@@ -44,7 +46,7 @@ server/Wine jobs must not be converted into successful evidence without logs.
    bootstrap and loopback realm repair pass; `40987376123` runs all eight realm
    tests on MySQL 8.0.44. Repair advertised realm only after all module updates.
 7. Native process/Surface/audio/input bridge implementations and internal controller/IME
-   view are now present; inspect new guest ARM64 and Android-owner CI. Integrate
+   view are now present; guest ARM64 build `40995565147` and Android-owner CI pass. Integrate
    their qualified session lifecycle and
    graceful server-save shutdown. Inspect read-only reference launcher code where
    useful. Keep startup gated until component readiness is actually established.

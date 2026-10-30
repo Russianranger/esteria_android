@@ -1,0 +1,16 @@
+# Loaded by CMAKE_PROJECT_INCLUDE in the pinned server build, without editing it.
+# Defer until common and its real dependency/include graph have been declared.
+if(PROJECT_NAME STREQUAL "AzerothCore" AND CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    if(CMAKE_VERSION VERSION_LESS 3.19)
+        message(FATAL_ERROR "The isolated Esteria SRP6 reference requires CMake 3.19 or newer")
+    endif()
+    function(esteria_add_srp_reference)
+        if(NOT TARGET common)
+            message(FATAL_ERROR "Pinned server common target was not configured")
+        endif()
+        add_executable(esteria_srp_reference EXCLUDE_FROM_ALL "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/srp6_reference.cpp")
+        target_compile_features(esteria_srp_reference PRIVATE cxx_std_20)
+        target_link_libraries(esteria_srp_reference PRIVATE common)
+    endfunction()
+    cmake_language(DEFER CALL esteria_add_srp_reference)
+endif()

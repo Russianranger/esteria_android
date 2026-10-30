@@ -6,16 +6,38 @@ on:
       - sources.lock.json
       - patches/server/**
       - tools/qualify_base_sql.py
+      - tools/qualify_local_account.py
       - tools/manifest_server_content.py
       - tools/package_server_content.py
       - runtime/mysql_bootstrap.py
+      - runtime/provision_local_account.py
+      - runtime/provision_local_realm.py
+      - tools/render_server_config.py
+      - config/local-server.json
       - runtime/server/**
       - tests/test_base_sql.py
+      - tests/test_local_account.py
+      - tests/test_local_account_qualification.py
+      - tests/fixtures/*-f35f04d.sql
       - .github/workflows/base-sql.yml
   pull_request:
     paths:
+      - sources.lock.json
+      - patches/server/**
       - tools/qualify_base_sql.py
+      - tools/qualify_local_account.py
+      - tools/manifest_server_content.py
+      - tools/package_server_content.py
+      - runtime/mysql_bootstrap.py
+      - runtime/provision_local_account.py
+      - runtime/provision_local_realm.py
+      - runtime/server/**
+      - tools/render_server_config.py
+      - config/local-server.json
       - tests/test_base_sql.py
+      - tests/test_local_account.py
+      - tests/test_local_account_qualification.py
+      - tests/fixtures/*-f35f04d.sql
       - .github/workflows/base-sql.yml
   workflow_dispatch:
 permissions:
@@ -32,8 +54,8 @@ jobs:
       - name: Check source and fresh-fixture safety contracts
         run: |
           test "$(uname -m)" = aarch64
-          python3 -m unittest tests.test_base_sql tests.test_server_runtime_inputs -v
-          mkdir -p out/base-sql-evidence out/base-sql-private
+          python3 -m unittest tests.test_base_sql tests.test_server_runtime_inputs tests.test_local_account tests.test_local_account_qualification -v
+          mkdir -p out/base-sql-evidence out/base-sql-private out/local-account-evidence out/local-account-private
       - name: Fetch the exact server Git tree and stage only authenticated base SQL
         run: |
           python3 - <<'PY'
@@ -47,11 +69,14 @@ jobs:
           PY
           python3 tools/qualify_base_sql.py prepare --server out/base-sql-source \
             --output out/base-sql-fixture --allow-source-fetch
+          python3 tools/qualify_local_account.py prepare --server out/base-sql-source \
+            --output out/local-account-fixture --allow-source-fetch
           python3 - <<'PY'
           import hashlib, os, pathlib
           digest = hashlib.sha256(pathlib.Path('out/base-sql-fixture/base-fixture.json').read_bytes()).hexdigest()
           with open(os.environ['GITHUB_ENV'], 'a') as output:
               output.write('ESTERIA_BASE_FIXTURE_SHA256=' + digest + '\n')
+              output.write('ESTERIA_ACCOUNT_FIXTURE_SHA256=' + hashlib.sha256(pathlib.Path('out/local-account-fixture/account-fixture.json').read_bytes()).hexdigest() + '\n')
           PY
       - name: Build the pinned native ARM64 MySQL dependency image
         run: |
@@ -82,6 +107,19 @@ jobs:
             --mysql /usr/bin/mysql --mysqld /usr/sbin/mysqld \
             --expected-version "$ESTERIA_MYSQL_SQL_VERSION" --output /state/run \
             > out/base-sql-evidence/qualification.log 2>&1
+      - name: Qualify one owned account in a separate new MySQL instance without external network
+        run: |
+          docker run --rm --init --network none \
+            --env PYTHONDONTWRITEBYTECODE=1 \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/local-account-fixture,dst=/fixture,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/local-account-private,dst=/state" \
+            --workdir /qualification esteria-base-sql:qualification \
+            python3 tools/qualify_local_account.py qualify --fixture /fixture \
+            --fixture-sha256 "$ESTERIA_ACCOUNT_FIXTURE_SHA256" \
+            --mysql /usr/bin/mysql --mysqld /usr/sbin/mysqld \
+            --expected-version "$ESTERIA_MYSQL_SQL_VERSION" --output /state/run \
+            > out/local-account-evidence/qualification.log 2>&1
       - name: Collect receipts and bounded redacted diagnostics only
         if: always()
         run: |
@@ -106,10 +144,42 @@ jobs:
               (target / 'environment-receipt.json').write_text(json.dumps(metadata, indent=2) + '\n')
           PY
           sudo chown -R "$(id -u):$(id -g)" out/base-sql-evidence
+      - name: Collect account receipts and bounded engine diagnostics only
+        if: always()
+        run: |
+          sudo python3 - <<'PY'
+          import hashlib, json, pathlib, shutil
+          source = pathlib.Path('out/local-account-private/run')
+          target = pathlib.Path('out/local-account-evidence')
+          target.mkdir(parents=True, exist_ok=True)
+          for name in ['qualification.json', 'mysql-initialize-engine.log', 'mysql-bootstrap-engine.log',
+                       'mysql-base-engine.log', 'mysql-base-restart-engine.log']:
+              path = source / name
+              if path.is_file():
+                  shutil.copyfile(path, target / name)
+          runtime = pathlib.Path('out/base-sql-evidence/server-runtime.json')
+          receipt = target / 'qualification.json'
+          if receipt.is_file() and runtime.is_file():
+              shutil.copyfile(runtime, target / runtime.name)
+              metadata = dict(formatVersion=1, scope='native-arm64-disposable-owned-local-account',
+                  qualificationSha256=hashlib.sha256(receipt.read_bytes()).hexdigest(),
+                  runtimeManifestSha256=hashlib.sha256(runtime.read_bytes()).hexdigest(),
+                  externalNetworkDisabled=True, compiledAuthserverExecuted=False,
+                  authProtocolQualified=False, androidRuntimeQualified=False, gameplayQualified=False)
+              (target / 'environment-receipt.json').write_text(json.dumps(metadata, indent=2) + '\n')
+          PY
+          sudo chown -R "$(id -u):$(id -g)" out/local-account-evidence
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: base-sql-qualification-${{ github.sha }}
           path: out/base-sql-evidence
+          retention-days: 14
+          if-no-files-found: error
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: local-account-qualification-${{ github.sha }}
+          path: out/local-account-evidence
           retention-days: 14
           if-no-files-found: error

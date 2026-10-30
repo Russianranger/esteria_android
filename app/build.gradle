@@ -3,10 +3,15 @@ def sourceLock = new groovy.json.JsonSlurper().parse(rootProject.file('sources.l
 def clientRevision = sourceLock.sources.client.commit
 def serverRevision = sourceLock.sources.server.commit
 def prootProvider = providers.gradleProperty('prootProviderDir').orNull
+def serverProvider = providers.gradleProperty('serverRuntimeProviderDir').orNull
 def nativeBridge = providers.gradleProperty('nativeRuntimeBridge').getOrElse('false').toBoolean()
 def nativeAbi = providers.gradleProperty('nativeBridgeAbi').getOrElse('arm64-v8a')
+def presentationEmulator = providers.gradleProperty('presentationEmulatorTest').getOrElse('false').toBoolean()
 if (!(nativeAbi in ['arm64-v8a', 'x86_64']) || (prootProvider && nativeAbi != 'arm64-v8a'))
     throw new GradleException('Native bridge ABI must be arm64-v8a, or x86_64 without the ARM64 PRoot provider')
+if (presentationEmulator && (!nativeBridge || nativeAbi != 'x86_64' || prootProvider ||
+        gradle.startParameter.taskNames.any { it.toLowerCase().contains('release') }))
+    throw new GradleException('presentationEmulatorTest is an explicit x86_64 debug/test-only native build')
 if (!(clientRevision ==~ /[0-9a-f]{40}/) || !(serverRevision ==~ /[0-9a-f]{40}/))
     throw new GradleException('sources.lock.json requires full client and server commit SHAs')
 android {
@@ -24,8 +29,12 @@ android {
         buildConfigField 'String', 'CLIENT_REVISION', '"' + clientRevision + '"'
         buildConfigField 'String', 'SERVER_REVISION', '"' + serverRevision + '"'
         buildConfigField 'boolean', 'PROOT_PACKAGED', prootProvider ? 'true' : 'false'
+        buildConfigField 'boolean', 'SERVER_RUNTIME_PACKAGED', serverProvider ? 'true' : 'false'
+        buildConfigField 'boolean', 'PRESENTATION_EMULATOR_TEST', presentationEmulator ? 'true' : 'false'
         ndk { abiFilters nativeBridge ? nativeAbi : 'arm64-v8a' }
-        if (nativeBridge) externalNativeBuild { cmake { arguments '-DANDROID_STL=c++_static' } }
+        if (nativeBridge) externalNativeBuild { cmake {
+            arguments '-DANDROID_STL=c++_static', '-DESTERIA_PRESENTATION_EMULATOR_TEST=' + (presentationEmulator ? 'ON' : 'OFF')
+        } }
     }
     compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
     buildFeatures { buildConfig true }
@@ -37,6 +46,7 @@ android {
         useLegacyPackaging true // Android installs process payloads in nativeLibraryDir.
         keepDebugSymbols += ['**/libproot.so', '**/libproot-loader.so'] // Preserve verified ELF hashes.
     } }
+    androidResources { noCompress += ['archive'] }
     lint { disable 'ChromeOsAbiSupport' } // This project deliberately targets ARM64 handhelds.
     signingConfigs {
         development {
@@ -103,3 +113,16 @@ if (prootProvider) {
     }
     tasks.named('preBuild').configure { dependsOn verifyProot }
 }
+
+// Optional verified server rootfs asset. Default APKs do not contain a server payload.
+if (serverProvider) {
+    def provider = file(serverProvider)
+    android.sourceSets.main.assets.srcDir(new File(provider, 'assets'))
+    def verifyServerRuntime = tasks.register('verifyServerRuntimeProvider', Exec) {
+        workingDir rootProject.projectDir
+        commandLine 'python3', 'tools/provider_server_runtime.py', 'verify', '--provider', provider.absolutePath
+    }
+    tasks.named('preBuild').configure { dependsOn verifyServerRuntime }
+}
+
+apply from: 'proot-probe.gradle'

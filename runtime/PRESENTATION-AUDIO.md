@@ -141,16 +141,34 @@ Evidence at this checkpoint:
 - All new Android Java compiles with JDK17 `-Xlint:all -Werror`; the actual
   ARM64 Android26 JNI library compiles with NDK r28c `-Wall -Wextra -Werror`.
 - The three guest C targets compile on host x64 against checksum-verified Ubuntu
-  development packages. Native ARM64 CI `40994809770` also compiled all three
-  using the selected Debian12 snapshot. Its first verifier run rejected the
-  AArch64 glibc loader's direct dependency; the allowlist now includes that exact
-  loader, which exports `__stack_chk_guard`. ELF verification and source export
-  still require the corrected CI run. Compilation does not qualify execution.
+  development packages. Native ARM64 CI
+  [40995565147](https://github.com/Russianranger/esteria_android/actions/runs/40995565147)
+  passed compilation, actual ELF verification and source export at integration
+  `61bf8a134845276cb78430884d557e477ff286aa`. Artifact `12951430269` has SHA256
+  `f3365863da63074fb18bf9809cb7df38c161d47e5efe40f2f32c1fe5f6847e3b`.
+  The PCM plugin is 71,088 bytes, SHA256
+  `bb2f32c2def9e712630ea282aca06fe38bf563b03b07d0672ddf273a18ebb16c`,
+  with maximum GLIBC 2.17 and only `libasound.so.2`, `libc.so.6` and the exact
+  AArch64 loader as shared dependencies. The two X11 helpers require at most
+  GLIBC 2.34. Compilation does not qualify execution.
 - A real reconstructed FMOD/Wine/ALSA transport
   fixture with a bounded simulated PCM receiver. That does not qualify audible
   Android output.
 
+The `android-presentation.yml` workflow builds an explicit debug/test-only x64
+JNI profile using `-PnativeRuntimeBridge=true -PnativeBridgeAbi=x86_64
+-PpresentationEmulatorTest=true`. Production remains ARM64. Its disposable
+Android 13 emulator fixture drives the real native decoder from private Unix
+sockets into an offscreen `ImageReader` Surface, verifies actual RGBA pixels and
+surface recreation, and streams PCM through real `AudioTrack` while checking
+accepted frames, playback-head progress and reset. Malformed frames/handshakes,
+socket cleanup, and Android's trusted app-directory alias are also checked.
+`tools/qualify_android_presentation.py` binds the receipt to the measured APK/JNI
+images, source revision and emulator fingerprint. This newly authored gate is
+not yet reported as passed. It does not exercise the guest X11 producers, Wine,
+ARM64 execution, on-screen presentation, audible hardware output, or Adreno.
+
 Docker and filesystem Unix socket creation are unavailable in the current host;
-native ARM64 guest builds/execution, actual Android Surface/AudioTrack/lifecycle,
+native ARM64 guest execution, actual Android Surface/AudioTrack/lifecycle,
 controller game behavior, sound, and Thor performance remain unpassed gates.
 No preliminary device installation or gameplay success is requested or claimed.

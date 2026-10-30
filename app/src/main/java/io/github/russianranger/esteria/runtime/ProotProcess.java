@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
 
 /** Component adapter for internal qualification. No launcher action uses this yet.
  * Starting a process does not establish display/audio/service or gameplay readiness.
@@ -20,12 +21,22 @@ public final class ProotProcess {
     public static OwnedProcess start(Context context,RuntimeInstaller installer,RuntimePackagePlan plan,
             Path work,Path session,List<String> guestCommand,Map<String,String> guestEnvironment,
             OwnedProcess.GracefulStop gracefulStop) throws IOException {
+        return start(context,installer,plan,work,session,guestCommand,guestEnvironment,Collections.emptyList(),gracefulStop);
+    }
+    public static OwnedProcess start(Context context,RuntimeInstaller installer,RuntimePackagePlan plan,
+            Path work,Path session,List<String> guestCommand,Map<String,String> guestEnvironment,
+            List<ProotLaunch.Mount> mounts,OwnedProcess.GracefulStop gracefulStop) throws IOException {
         InstalledProot payload=InstalledProot.inspect(context);
         Path rootfs=installer.resolveCurrent(plan);
         if (rootfs==null) throw new IOException("The pinned runtime generation is not prepared");
         Path privateRoot=context.getFilesDir().getCanonicalFile().toPath();
         rootfs=privatePath(privateRoot,rootfs); work=privatePath(privateRoot,work); session=privatePath(privateRoot,session);
-        if (session.startsWith(rootfs) || rootfs.startsWith(session) || session.equals(work) || work.startsWith(session))
+        if (mounts == null) throw new IOException("Runtime provider mounts are missing");
+        for (ProotLaunch.Mount mount : mounts) {
+            if (mount == null) throw new IOException("Runtime provider mount is missing");
+            privatePath(privateRoot,mount.source);
+        }
+        if (session.startsWith(rootfs) || rootfs.startsWith(session) || session.startsWith(work) || work.startsWith(session))
             throw new IOException("Process session must be separate from runtime and persistent state");
         Path temporary=session.resolve("tmp"),logs=session.resolve("logs");
         // Session must be freshly created by the caller, avoiding stale sockets/logs.
@@ -36,7 +47,7 @@ public final class ProotProcess {
         if (!Files.exists(home)) Files.createDirectory(home,PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------")));
         privatePath(privateRoot,home);
         OwnedProcess.Specification spec=ProotLaunch.create(payload.tracer.toPath(),payload.loader.toPath(),rootfs,
-            work,temporary,logs,guestCommand,guestEnvironment);
+            work,temporary,logs,guestCommand,guestEnvironment,mounts);
         return OwnedProcess.start(new NativeProcessBridge(),spec,gracefulStop);
     }
     private static Path privatePath(Path privateRoot,Path path) throws IOException {

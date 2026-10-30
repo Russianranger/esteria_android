@@ -1,0 +1,18 @@
+// Explicit emulator-only probe; ordinary and production ARM64 APKs are unchanged.
+def probeProvider = providers.gradleProperty('prootProbeProviderDir').orNull
+if (probeProvider) {
+    if (providers.gradleProperty('nativeRuntimeBridge').getOrElse('false') != 'true' ||
+        providers.gradleProperty('nativeBridgeAbi').getOrElse('arm64-v8a') != 'x86_64' ||
+        providers.gradleProperty('prootProviderDir').isPresent() ||
+        providers.gradleProperty('presentationEmulatorTest').getOrElse('false') == 'true')
+        throw new GradleException('PRoot probe requires the separate x86_64 owner-only test configuration')
+    def provider = file(probeProvider)
+    android.sourceSets.main.jniLibs.srcDir(new File(provider, 'jniLibs'))
+    android.sourceSets.main.assets.srcDir(new File(provider, 'assets'))
+    android.packaging.jniLibs.keepDebugSymbols += ['**/libproot_probe.so', '**/libproot_probe_loader.so']
+    def verifyProbe = tasks.register('verifyProotProbeProvider', Exec) {
+        workingDir rootProject.projectDir
+        commandLine 'python3', 'tools/verify_android_proot_probe.py', '--provider', provider.absolutePath
+    }
+    tasks.named('preBuild').configure { dependsOn verifyProbe }
+}

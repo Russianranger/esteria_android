@@ -39,6 +39,7 @@ import io.github.russianranger.esteria.core.importer.GameDataImporter;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeInstaller;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import io.github.russianranger.esteria.runtime.RuntimeSetup;
+import io.github.russianranger.esteria.runtime.ServerRuntimeSetup;
 
 /** Foreground owner of large import jobs. Runtime launch remains gated until qualified binaries exist. */
 public final class SessionService extends Service {
@@ -47,6 +48,7 @@ public final class SessionService extends Service {
     static final String EXPORT = "io.github.russianranger.esteria.EXPORT";
     static final String START = "io.github.russianranger.esteria.START";
     static final String PREPARE_RUNTIME = "io.github.russianranger.esteria.PREPARE_RUNTIME";
+    static final String PREPARE_SERVER_RUNTIME = "io.github.russianranger.esteria.PREPARE_SERVER_RUNTIME";
     private static final String CHANNEL = "esteria-session";
     private static final int NOTIFICATION = 1001;
     final class LocalBinder extends Binder { SessionService service() { return SessionService.this; } }
@@ -68,10 +70,11 @@ public final class SessionService extends Service {
         try {
             root = getFilesDir().getCanonicalFile().toPath();
             Files.createDirectories(root.resolve("state/logs"));
-            if (getSharedPreferences("session", MODE_PRIVATE).getBoolean("interrupted", false))
-                status = PREPARE_RUNTIME.equals(getSharedPreferences("session", MODE_PRIVATE).getString("operationAction", ""))
-                        ? "Runtime setup was interrupted. Choose Prepare client runtime to resume; current data and saves are preserved."
+            if (getSharedPreferences("session", MODE_PRIVATE).getBoolean("interrupted", false)) {
+                String action = getSharedPreferences("session", MODE_PRIVATE).getString("operationAction", "");
+                status = isRuntimeSetup(action) ? setupPaused(action, true)
                         : "Previous operation was interrupted. Select the same folder or archive to resume where source metadata permits. Existing game data remains active.";
+            }
             else if (new GameDataImporter(root.resolve("game")).resolveCurrent() != null)
                 status = "Client data is imported. Local runtime qualification is still pending.";
         } catch (IOException e) { status = "Storage unavailable: " + e.getMessage(); }
@@ -101,9 +104,10 @@ public final class SessionService extends Service {
                 else if (EXPORT.equals(intent.getAction())) exportBundle(intent.getData());
                 else if (START.equals(intent.getAction())) checkLaunch();
                 else if (PREPARE_RUNTIME.equals(intent.getAction())) prepareRuntime();
+                else if (PREPARE_SERVER_RUNTIME.equals(intent.getAction())) prepareServerRuntime();
                 else throw new IOException("Unknown operation");
             } catch (RuntimeWork.CancelledException e) {
-                status = "Runtime setup paused. Choose Prepare client runtime to resume; current data and saves are preserved.";
+                status = setupPaused(intent.getAction(), false);
                 log("Runtime setup paused");
             } catch (GameDataImporter.ImportCancelledException e) {
                 status = "Import paused. Select the same folder or archive to resume where source metadata permits; existing game data is unchanged.";
@@ -187,6 +191,29 @@ public final class SessionService extends Service {
                 + " hardLinkCopyBytes=" + result.hardLinkCopyBytes + " directorySyncSupported=" + result.directorySyncSupported
                 + " gameRuntimeQualified=false");
     }
+    private void prepareServerRuntime() throws IOException {
+        status = "Preparing bundled database and server dependencies…";
+        ServerRuntimeSetup setup = new ServerRuntimeSetup(this, root);
+        if (setup.current() != null) {
+            status = "Database and server dependencies are already prepared. Local server startup is still under development.";
+            return;
+        }
+        final long[] lastUpdate = {0};
+        RuntimeInstaller.Result result = setup.prepare((phase, path, completed, total) -> {
+            long now = android.os.SystemClock.elapsedRealtime();
+            if (now - lastUpdate[0] >= 250 || completed == total) {
+                lastUpdate[0] = now;
+                status = "Preparing database and server dependencies…\n" + mib(completed)
+                        + (total >= 0 ? " / " + mib(total) : "") + " MiB"
+                        + (path == null || path.isEmpty() ? "" : "\n" + path);
+            }
+        }, cancelled::get);
+        status = "Database and server dependencies are prepared. Local server startup is still under development.";
+        log("Server dependencies prepared generation=" + result.generation + " reusedFiles=" + result.reusedFiles
+                + " copiedBytes=" + result.copiedBytes + " hardLinkCopies=" + result.hardLinkCopies
+                + " hardLinkCopyBytes=" + result.hardLinkCopyBytes + " directorySyncSupported=" + result.directorySyncSupported
+                + " mysqlVersion=" + setup.expectedMysqlVersion() + " gameRuntimeQualified=false");
+    }
     private void exportBundle(Uri destination) throws Exception {
         if (destination == null || !"content".equals(destination.getScheme())) throw new IOException("No export destination selected");
         String previousStatus = status; status = "Writing support bundle…";
@@ -208,6 +235,19 @@ public final class SessionService extends Service {
         } catch (IOException error) {
             facts.put("runtime.client.prepared", "false");
             facts.put("runtime.client.installationError", error.getMessage());
+        }
+        facts.put("runtime.server.packaged", String.valueOf(BuildConfig.SERVER_RUNTIME_PACKAGED));
+        facts.put("runtime.server.prepared", "false");
+        if (BuildConfig.SERVER_RUNTIME_PACKAGED) {
+            try {
+                ServerRuntimeSetup setup = new ServerRuntimeSetup(this, root);
+                facts.put("runtime.server.archiveSha256", setup.archiveSha256());
+                facts.put("runtime.server.expectedGeneration", setup.generation());
+                facts.put("runtime.server.expectedMysqlVersion", setup.expectedMysqlVersion());
+                facts.put("runtime.server.prepared", String.valueOf(setup.current() != null));
+            } catch (IOException error) {
+                facts.put("runtime.server.installationError", error.getMessage());
+            }
         }
         facts.put("proot.packaged", String.valueOf(BuildConfig.PROOT_PACKAGED));
         facts.put("proot.androidExecutionQualified", "false");
@@ -336,6 +376,14 @@ public final class SessionService extends Service {
         } catch (IOException ignored) { }
     }
     private static long mib(long value) { return value / (1024 * 1024); }
+    private static boolean isRuntimeSetup(String action) {
+        return PREPARE_RUNTIME.equals(action) || PREPARE_SERVER_RUNTIME.equals(action);
+    }
+    private static String setupPaused(String action, boolean interrupted) {
+        String label = PREPARE_SERVER_RUNTIME.equals(action) ? "Prepare server dependencies" : "Prepare client runtime";
+        return "Runtime setup " + (interrupted ? "was interrupted" : "paused") + ". Choose " + label
+                + " to resume; current data and saves are preserved.";
+    }
     private static String runtimePhase(String phase) {
         switch (phase) {
             case "download": return "Downloading client runtime…";

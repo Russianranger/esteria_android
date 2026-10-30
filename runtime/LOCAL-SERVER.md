@@ -4,6 +4,9 @@ This is a source-verified setup contract, host-tested configuration renderer and
 database bootstrap implementation. It is not an installed or qualified Android
 runtime. Real MySQL behavior has a dedicated CI test; check that run before claiming
 engine qualification. No game schemas or player accounts are populated by bootstrap.
+The separate [owned local account helper](LOCAL-ACCOUNT.md) verifies exact server
+SRP6/schema semantics and preserves existing credentials; its real engine and
+compiled crypto qualification remain pending. It is not wired into Android launch.
 
 ## Pinned foundation
 

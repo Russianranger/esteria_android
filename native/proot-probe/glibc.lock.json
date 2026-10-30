@@ -1,0 +1,70 @@
+{
+  "index": {
+    "bytes": 8790396,
+    "sha256": "9e0b5aabb2465b3d2e7a7fe27f9913846277833f7a2826e7767acccff5b588c5",
+    "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/dists/bookworm/main/binary-amd64/Packages.xz"
+  },
+  "packages": [
+    {
+      "package": "libc6",
+      "version": "2.36-9+deb12u14",
+      "architecture": "amd64",
+      "source": "glibc",
+      "bytes": 2759320,
+      "sha256": "ba4f88f73dbc3ae9055f3c20f4523bfdbaf1ad13ff95e258924f77d20b4fbedf",
+      "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/g/glibc/libc6_2.36-9+deb12u14_amd64.deb"
+    },
+    {
+      "package": "libc6-dev",
+      "version": "2.36-9+deb12u14",
+      "architecture": "amd64",
+      "source": "glibc",
+      "bytes": 1903668,
+      "sha256": "0218fc2befcd784c1b0c6292c0a137ce89fad054efaa579ad083bee0f2c01aae",
+      "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/g/glibc/libc6-dev_2.36-9+deb12u14_amd64.deb"
+    },
+    {
+      "package": "linux-libc-dev",
+      "version": "6.1.176-1",
+      "architecture": "amd64",
+      "source": "linux",
+      "bytes": 2303828,
+      "sha256": "8bb258735b9dffbb111da778ebdd024750878e435ffd9dfcadcb6762ede6b4cf",
+      "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/l/linux/linux-libc-dev_6.1.176-1_amd64.deb"
+    }
+  ],
+  "formatVersion": 1,
+  "scope": "android-13-x86_64-proot-glibc-probe-only",
+  "snapshot": "20261029T000000Z",
+  "keyring": {
+    "path": "usr/share/keyrings/debian-archive-keyring.gpg",
+    "bytes": 55918,
+    "sha256": "506b815cbb32d9b6066b4a2aa524071e071761e7e7f68c3ac74f3061ba852017"
+  },
+  "inRelease": {
+    "suite": "bookworm",
+    "bytes": 151075,
+    "sha256": "77737fa4b34f2693e982cc9ee35736816c35a7778fc2d326cc1bbf5b301fe1aa"
+  },
+  "sources": [
+    {
+      "file": "glibc_2.36-9+deb12u14.dsc",
+      "bytes": 9765,
+      "sha256": "cfe1f0b8dc1fa211ce5a45b3725cc38b29f88667f1140ebdca6de35cf9c6f1fd",
+      "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/g/glibc/glibc_2.36-9+deb12u14.dsc"
+    },
+    {
+      "file": "glibc_2.36.orig.tar.xz",
+      "bytes": 19363988,
+      "sha256": "a543c02070d46ccaf866957efd13f10c924daa74c86a90a0254db09a92a708ee",
+      "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/g/glibc/glibc_2.36.orig.tar.xz"
+    },
+    {
+      "file": "glibc_2.36-9+deb12u14.debian.tar.xz",
+      "bytes": 918488,
+      "sha256": "cf4ac9cd98185452cae3ef34e2e4ee12753e3d93fd0c62c61396d4a47eec902f",
+      "url": "https://snapshot.debian.org/archive/debian/20261029T000000Z/pool/main/g/glibc/glibc_2.36-9+deb12u14.debian.tar.xz"
+    }
+  ],
+  "androidQualified": false
+}

@@ -62,6 +62,10 @@ public final class MainActivity extends Activity {
         button(layout, "Prepare client runtime · 585 MiB download", () -> operation(new Intent(this, SessionService.class).setAction(SessionService.PREPARE_RUNTIME)));
         TextView runtimeNote = text("Runtime setup uses about 4.2 GiB plus space retained by earlier versions. Interrupted setup can resume. Local services and gameplay are still under development.", 13, Color.rgb(145, 163, 177));
         layout.addView(runtimeNote);
+        if (BuildConfig.SERVER_RUNTIME_PACKAGED) {
+            button(layout, "Prepare server dependencies · bundled", () -> operation(new Intent(this, SessionService.class).setAction(SessionService.PREPARE_SERVER_RUNTIME)));
+            layout.addView(text("Database and server dependencies are included in this build. Setup needs about 560 MiB of free space and can resume after interruption. Database initialization and local server startup are still under development.", 13, Color.rgb(145, 163, 177)));
+        }
         button(layout, "Start local game", () -> operation(new Intent(this, SessionService.class).setAction(SessionService.START)));
         button(layout, "Export support bundle", this::chooseExport);
         cancel = new Button(this); cancel.setText(R.string.stop_session); cancel.setEnabled(false);

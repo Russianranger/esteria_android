@@ -109,3 +109,18 @@ Combine it with the verified PRoot provider for internal ARM64 build checks.
 and rejects the ARM64 PRoot provider. Neither build property enables gameplay.
 See `runtime/ANDROID-EXECUTION.md`, `runtime/ANDROID-OWNER-QUALIFICATION.md` and
 `runtime/PRESENTATION-AUDIO.md` for exact scope and source provenance.
+
+The reviewed server dependency provider is optional:
+`-PserverRuntimeProviderDir=<verified-provider>` bundles the exact normalized
+Ubuntu/MySQL archive as an uncompressed `.archive` APK asset and enables its
+resumable setup action. The suffix matters: AAPT transforms `.gz` assets even
+when compression is disabled. `tools/provider_server_runtime.py` verifies both
+provider and final APK bytes; use `runtime/server/ANDROID-PACKAGING.md` to build
+it from pinned inputs. This packages database/server dependencies, not the
+authserver/worldserver binaries or a gameplay-ready database.
+
+For actual Android execution qualification use the dedicated workflows and their
+documented explicit emulator-only properties. The production ABI stays ARM64.
+`presentationEmulatorTest=true` requires an x86_64 debug/test native build;
+`prootProbeProviderDir` selects a separate source-verified emulator fixture.
+Neither may substitute emulator binaries for the ARM64 production provider.

@@ -16,6 +16,10 @@ on:
       - tools/render_server_config.py
       - runtime/mysql_bootstrap.py
       - runtime/provision_local_realm.py
+      - runtime/provision_local_account.py
+      - tests/test_local_account.py
+      - tests/srp6_reference.cpp
+      - tests/srp6_reference.cmake
       - runtime/server/**
       - runtime/server-lua-map.json
       - tests/native/**
@@ -38,6 +42,10 @@ on:
       - tools/render_server_config.py
       - runtime/mysql_bootstrap.py
       - runtime/provision_local_realm.py
+      - runtime/provision_local_account.py
+      - tests/test_local_account.py
+      - tests/srp6_reference.cpp
+      - tests/srp6_reference.cmake
       - runtime/server/**
       - runtime/server-lua-map.json
       - tests/native/**
@@ -118,13 +126,14 @@ jobs:
           -Isources/server/src/common -Isources/server/src/common/Platform
           -Isources/server/src/server/game/LuaEngine/hooks tests/native/eluna_hooks.cpp
       - name: Verify server artifact checker behavior
-        run: python3 -m unittest tests.test_server_build tests.test_dbimport_qualification tests.test_server_adaptations -v
+        run: python3 -m unittest tests.test_server_build tests.test_dbimport_qualification tests.test_server_adaptations tests.test_local_account -v
       - name: Configure ARM64 server
         run: |
           set -o pipefail
           cmake -S sources/server -B out/server -G Ninja \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/out/server-install \
             -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+            -DCMAKE_PROJECT_INCLUDE=${{ github.workspace }}/tests/srp6_reference.cmake \
             -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DSCRIPTS=static -DMODULES=static -DAPPS_BUILD=all -DTOOLS_BUILD=all \
             -DELUNA=ON -DLUA_VERSION=lua52 -DLUA_STATIC=ON -DNOPCH=1 \
@@ -133,6 +142,9 @@ jobs:
         id: compile
         run: |
           set -o pipefail
+          cmake --build out/server --parallel 2 --target esteria_srp_reference \
+            2>&1 | tee out/diagnostics/srp-reference-compile.log
+          out/server/esteria_srp_reference > out/diagnostics/srp-reference.json
           cmake --build out/server --parallel 1 \
             --target modules/CMakeFiles/modules.dir/mod-attunement-plus/src/mod_attunement_plus.cpp.o \
             2>&1 | tee out/diagnostics/attunement-compile.log
