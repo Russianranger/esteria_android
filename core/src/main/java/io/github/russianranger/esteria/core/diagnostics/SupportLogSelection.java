@@ -27,7 +27,7 @@ public final class SupportLogSelection {
     private static final Pattern SERVER_HELPER=Pattern.compile("game\\.server\\.helper\\.(stdout|stderr)\\.log");
     private static final Pattern SERVER=Pattern.compile("game\\.server\\.(authserver|worldserver)\\.log");
     private static final Pattern PRESENTATION=Pattern.compile("game\\.presentation\\.(xserver|frame|input|client)\\.(stdout|stderr)\\.log");
-    private static final Pattern SETUP=Pattern.compile("setup\\.(data|shader|installation)\\.(stdout|stderr)\\.log");
+    private static final Pattern SETUP=Pattern.compile("setup\\.(data|shader|installation|turnip)\\.(stdout|stderr)\\.log");
     private SupportLogSelection(){ }
 
     /** Stable ASCII metadata only. Missing logs are retained for later startup
@@ -90,7 +90,8 @@ public final class SupportLogSelection {
         if(expected==null&&(match=SERVER.matcher(name)).matches())expected="db/"+SLOT+"/server-sessions/"+OP+"/"+match.group(1)+"\\.log";
         if(expected==null&&(match=PRESENTATION.matcher(name)).matches())expected="s/"+SLOT+"/"+match.group(1)+"/logs/"+match.group(2)+"\\.log";
         if(expected==null&&(match=SETUP.matcher(name)).matches()) {
-            String directory=match.group(1).equals("data")?"server-data-operations":match.group(1).equals("shader")?"shader-operations":"server-installation-processes";
+            String directory=match.group(1).equals("data")?"server-data-operations":match.group(1).equals("shader")?"shader-operations":
+                match.group(1).equals("turnip")?"turnip-probe-operations":"server-installation-processes";
             expected="state/"+directory+"/"+OP+"/logs/"+match.group(2)+"\\.log";
         }
         if(expected==null||!relative.matches(expected))throw new IOException("Unsupported owned diagnostic role or path");

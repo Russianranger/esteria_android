@@ -1,0 +1,211 @@
+{
+  "behavior": {
+    "activeOwnerRecoveryRefused": true,
+    "allSupportedLogRoles": 22,
+    "arbitraryCallerCommandsPathsOrPids": false,
+    "assetDatabasePrefixAndX11MountsAbsent": true,
+    "childDeadlineMillis": 5000,
+    "delayedCleanupRetainsOwnerAndExclusiveLease": true,
+    "exclusiveIcdAndEmptyXdgDirectories": true,
+    "leaseAdmissionPrecedesOpeningLockFd": true,
+    "leaseCloseFailureRetainsOwnerForRetry": true,
+    "maximumReceiptBytes": 4096,
+    "noGpuModeOrBroadQualificationFlagsRefused": true,
+    "noPersistedPositiveReadinessCache": true,
+    "preloadRefused": true,
+    "priorKnownFailedOrStopRequestedOwnerRecovery": true,
+    "receiptAndPrivateWorkExcludedFromLogSelection": true,
+    "sameApplicationContextRequiredForPublicRecovery": true,
+    "sourceOwnedNativeAuxiliaryCleanup": true,
+    "supportFixedRoles": [
+      "setup.turnip.stdout.log",
+      "setup.turnip.stderr.log"
+    ]
+  },
+  "boundaries": {
+    "actualCProbeExecuted": false,
+    "actualProotGuestExecuted": false,
+    "adreno740Qualified": false,
+    "androidApiExecutionQualified": false,
+    "audibleAudioQualified": false,
+    "coordinatorIntegrationQualified": false,
+    "gameplayQualified": false,
+    "gpuReadbackQualified": false,
+    "kgslAccessQualified": false,
+    "thorQualified": false,
+    "userDeviceProbeRequested": false,
+    "wineClientQualified": false,
+    "x11PresentationQualified": false
+  },
+  "branch": "android/client-server",
+  "contractAndSupportSdkChecks": {
+    "command": "./gradlew --offline --no-daemon :core:turnipProbeContractTest :core:supportLogSelectionTest",
+    "exitCode": 0,
+    "fixedRoles": 22,
+    "gpuOrAndroidExecuted": false,
+    "probeContractActualProotArgvChecked": true,
+    "sourceChangedAfterPassedChecks": false,
+    "supportMetadataActualFilesystemGroups": 3
+  },
+  "directJdkHostChecks": {
+    "contractAndSupportMetadataTestsPassed": true,
+    "exitCode": 0,
+    "jdk": 17,
+    "maximumHeapBytes": 33554432
+  },
+  "files": {
+    "app/src/main/java/io/github/russianranger/esteria/runtime/TurnipReadinessProbe.java": {
+      "bytes": 17220,
+      "sha256": "0954de818dc1fb64c817a934d27ff9c7c6acfc27e325b794657312f286fac83b"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/TurnipSetup.java": {
+      "bytes": 9707,
+      "sha256": "0c3c4c0468747774669c792fcbc891a6c2e46b85ee0fdef391ce4241c4cb14e3"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/runtime/TurnipReadinessOwnerTests.java": {
+      "bytes": 7546,
+      "sha256": "c65088ac48bb888f40cd1d60fd9a0796670e9fc026511942d20dc4ba6bbe5c51"
+    },
+    "app/turnip-provider.gradle": {
+      "bytes": 2793,
+      "sha256": "1ae0c56fc5551eff6d81f41974a31379d9bf8a02b139de81472dd6ccb3a063bb"
+    },
+    "core/build.gradle": {
+      "bytes": 6720,
+      "sha256": "94ced6eef9fe449dab6a8a8884a769290a21c699f6acd09270efa676994fc975"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/diagnostics/SupportLogSelection.java": {
+      "bytes": 8022,
+      "sha256": "d806eaa14d7ee1b5ba5639669076aee9a5d636d7d1ad6da50ae3432386a5d202"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/TurnipProbeContract.java": {
+      "bytes": 4181,
+      "sha256": "777a2290d3a3b8176a394ad0f37d7e20e651d6a87ee6c1438b71e32f1861be8d"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/diagnostics/SupportLogSelectionTests.java": {
+      "bytes": 9272,
+      "sha256": "4dc8adfb604068637c873058a7a4726e28e69a2583afae350919f6db178286dc"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/TurnipProbeContractTests.java": {
+      "bytes": 5913,
+      "sha256": "ddfafcffe970bc81503e3bbf269d8aea8705db5ceeebcb34d0af6e932577263c"
+    },
+    "runtime/turnip/ANDROID-PACKAGING.md": {
+      "bytes": 5815,
+      "sha256": "c0a146ae72da195e325cbc05abff80452fb8eef7be1f802002905eeecae08b07"
+    },
+    "runtime/turnip/ANDROID-READINESS-PROBE.md": {
+      "bytes": 5821,
+      "sha256": "a19d6b8407b30c2148a32c6435df1f057bb7afad87db6c23a1c31b9512c2762c"
+    }
+  },
+  "fixedCommand": [
+    "/esteria-turnip/bin/esteria-turnip-probe",
+    "/esteria-turnip/lib/libvulkan_freedreno.so",
+    "/work/probe.json",
+    "--gpu-readback"
+  ],
+  "formatVersion": 1,
+  "gitHeadAtObservation": "7c303665e8028aba86a7b87d543b2528d968b1ab",
+  "host": {
+    "machine": "x86_64",
+    "system": "Linux"
+  },
+  "nextGate": "Source-reviewed owner can be wired into retained explicit Setup before extraction/shaders; real target execution must produce its own C component receipt. Host/SDK evidence never qualifies GPU, Android ARM64 or world gameplay.",
+  "observedAtUtc": "2026-10-30T21:32:11.479442+00:00",
+  "repository": "Russianranger/esteria_android",
+  "scope": "turnip-readiness-owner-contract-and-host-lifecycle-only",
+  "sdkAndHostOwnerChecks": {
+    "actionableTasks": 61,
+    "actualJavaProbeOwnerFilesystemGroups": 2,
+    "androidTestJavaCompilationPassed": true,
+    "apkDuplicated": false,
+    "buildSuccessful": true,
+    "command": "./gradlew --offline --no-daemon :app:gameSessionOwnerTest :app:localWorldSetupOwnerTest :app:serverDataSetupOwnerTest :app:localServerSessionOwnerTest :app:serverInstallationOwnerTest :app:presentationOwnerTest :app:turnipProbeOwnerTest :app:compileDebugJavaWithJavac :app:compileDebugAndroidTestJavaWithJavac :app:lintDebug",
+    "durationSeconds": 87,
+    "environment": "JDK17/SDK35/Gradle8.9; preexisting local output-directory init script only; no APK build",
+    "executedTasks": 26,
+    "exitCode": 0,
+    "lintPassed": true,
+    "mainJavaCompilationPassed": true,
+    "maximumFixtureHeapBytes": 33554432,
+    "nativeBackend": "deliberately delayed opaque host fixture, not NativeProcessBridge",
+    "observedProbeOutput": "Turnip owner passed2 actual filesystem/ownership groups: fixed support roles, single-use close, active-owner recovery refusal, exact failed/stop-requested recovery, retained opaque child/lock after timeout and confirmed-reap retry; no GPU/Android execution",
+    "retainedCompletionStdout": {
+      "bytes": 4486,
+      "completeBuildLog": false,
+      "description": "Three actual completion stdout chunks; excludes initial generic daemon boilerplate",
+      "sha256": "7296c07c6fb7a7588120d1cd0fda626e4d8690ee5ecdbbb98e0d1661ef43a8a9"
+    },
+    "sourceMatchedPendingCleanupApi": true,
+    "upToDateTasks": 35
+  },
+  "selectedExistingComponents": {
+    "buildReceiptSha256": "bf283d2674459fb0dbd2d5feb8452c86a3f2284f7234a78fd2b864818a788220",
+    "driver": {
+      "bytes": 15957640,
+      "sha256": "a373ecc89b6c5bcb53f117c52328389891902fe56b71c3195af888717a003b58"
+    },
+    "driverOrProbeRebuilt": false,
+    "driverSourceRevision": "75f50445112818c97f8d8e575d2b1c21e59af6e5",
+    "packagedCRecipeMatchesCurrentSource": true,
+    "packagedPythonWrapperMatchesCurrentSource": true,
+    "probe": {
+      "bytes": 74368,
+      "sha256": "f8786b9906a2e9753eaa73d75de849d2fc31872d5781ee73821c3cd9f2476f92"
+    },
+    "providerOrCohortRepins": false,
+    "pythonWrapperUsedByNewOwner": false,
+    "wineArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+    "winePythonAvailable": {
+      "bytes": 6616880,
+      "elfClass": 2,
+      "elfMachine": 183,
+      "sha256": "2ceb9199570aaf34a254b9ea88b1d77f38530833e2a12688d002a59c905b51b2"
+    }
+  },
+  "sourceDependenciesAtObservation": {
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ProotProcess.java": {
+      "bytes": 17351,
+      "sha256": "02141e0e5e56c2edfc99709b76dd9668e426106167a47f5c6f87f7b038850512"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/RuntimeSetup.java": {
+      "bytes": 9061,
+      "sha256": "310ee3cefde43985dcbf9627ec59f395073a074792b53b135aa6cd335b892da2"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/ExclusiveFileLease.java": {
+      "bytes": 4211,
+      "sha256": "b550d39bc159a58cc15bd76700650315641bffd34b3810b59154a5b9a04f120b"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/ServiceOperationGuard.java": {
+      "bytes": 2419,
+      "sha256": "f7f3f81ebc41396cae10d0a9ad4dc53b1e385fcd6ada44985490c2227f47e42e"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/OwnedProcess.java": {
+      "bytes": 15680,
+      "sha256": "626f874bb89bef35a418a1106576e63716edf63c453da9abad5be47a58df67db"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/ProotLaunch.java": {
+      "bytes": 7504,
+      "sha256": "ff482a9a1680cfebf965fb664c4476d3b804d917c3178e125cf8251a2ee17d5e"
+    },
+    "runtime/runtime-sources.lock.json": {
+      "bytes": 105545,
+      "sha256": "562bf73630b7217c2c3ae0adf85b7a16d6979d3c257227e287757c9cbc3154c7"
+    },
+    "runtime/turnip/android-provider.lock.json": {
+      "bytes": 16435,
+      "sha256": "879c79db15622cfa155aad0b1d901fc322559e7fbc7245c5d73b234ed499df91"
+    },
+    "runtime/turnip/probe.c": {
+      "bytes": 17766,
+      "sha256": "2f071971b16f6eaacba9a9d95358ea28c782536a584f83147a8cff923fba9cbf"
+    },
+    "runtime/turnip/run_probe.py": {
+      "bytes": 7186,
+      "sha256": "671d44f9aec71f13f303d745cf145fa8ac4deaccbefe8911ad2b610be90f35c6"
+    }
+  },
+  "sourceSnapshotExact": false,
+  "sourceState": "modified-worktree-exact-file-identities"
+}

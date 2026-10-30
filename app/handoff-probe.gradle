@@ -20,7 +20,8 @@ if (handoffProbe) {
         'core/src/main/java/io/github/russianranger/esteria/core/runtime/install/LocalHandoffRecovery.java',
         'core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ClientLaunchView.java',
         'core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeFiles.java',
-        'core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeWork.java', 'sources.lock.json',
+        'core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeWork.java',
+        'core/src/main/java/io/github/russianranger/esteria/core/runtime/ExclusiveFileLease.java', 'sources.lock.json',
         'tools/qualify_android_handoff.py', 'tests/test_android_handoff.py', '.github/workflows/android-handoff-recovery.yml']
     def revision = providers.gradleProperty('sourceRevision').getOrElse('local-uncommitted')
     def generated = layout.buildDirectory.dir('generated/handoffProbeEvidence')

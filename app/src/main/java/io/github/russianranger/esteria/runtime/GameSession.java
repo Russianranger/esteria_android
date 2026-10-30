@@ -6,6 +6,7 @@ import android.system.ErrnoException;
 import android.system.Os;
 import android.system.OsConstants;
 import android.system.StructStat;
+import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
 import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
 import io.github.russianranger.esteria.core.runtime.install.LocalAccountHandoff;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
@@ -13,13 +14,10 @@ import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
 import io.github.russianranger.esteria.presentation.ClientPresentationSession;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -90,12 +88,11 @@ public final class GameSession {
     }
     static final class Leases implements AutoCloseable {
         final ClientLaunchSetup.Lease client;
-        private final FileChannel importChannel;
-        private final FileLock imported;
+        private final ExclusiveFileLease imported;
         private boolean closed;
-        private Leases(ClientLaunchSetup.Lease client,FileChannel channel,FileLock imported){this.client=client;importChannel=channel;this.imported=imported;}
+        private Leases(ClientLaunchSetup.Lease client,ExclusiveFileLease imported){this.client=client;this.imported=imported;}
         @Override public void close()throws IOException {
-            if(closed)return;client.close();try{imported.release();}finally{importChannel.close();closed=true;}
+            if(closed)return;client.close();imported.close();closed=true;
         }
     }
     static Leases claim(Path root)throws IOException {
@@ -103,15 +100,13 @@ public final class GameSession {
         if(!Files.isDirectory(game,LinkOption.NOFOLLOW_LINKS)||!game.equals(game.toRealPath()))throw new IOException("Canonical imported game store required");
         Path path=game.resolve("import.lock");
         if(Files.exists(path,LinkOption.NOFOLLOW_LINKS)&&!Files.isRegularFile(path,LinkOption.NOFOLLOW_LINKS))throw new IOException("Invalid import ownership file");
-        FileChannel channel=FileChannel.open(path,StandardOpenOption.CREATE,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS);
-        FileLock lock=null;
+        ExclusiveFileLease imported=ExclusiveFileLease.acquire(path,"Import or local setup already owns game data");
         try {
             Files.setPosixFilePermissions(path,PosixFilePermissions.fromString("rw-------"));
-            try{lock=channel.tryLock();}catch(java.nio.channels.OverlappingFileLockException busy){throw new IOException("Import or local setup already owns game data",busy);}
-            if(lock==null)throw new IOException("Import or local setup already owns game data");
-            return new Leases(ClientLaunchSetup.claim(root),channel,lock);
-        }catch(IOException|RuntimeException error){try{if(lock!=null)lock.release();}finally{channel.close();}throw error;}
+            return new Leases(ClientLaunchSetup.claim(root),imported);
+        }catch(IOException|RuntimeException|Error error){try{imported.close();}catch(IOException close){error.addSuppressed(close);}throw error;}
     }
+
     public static final class Handle implements AutoCloseable {
         private final Context context;
         private final Path root;

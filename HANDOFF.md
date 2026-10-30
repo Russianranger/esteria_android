@@ -10,7 +10,7 @@ merges, force pushes, server-repository writes or preliminary Thor APK requests.
 
 - App: Russianranger/esteria_android, android/client-server.
 - Selected client binary:471ee42faadf4a97a1d0a86989cf1452621f2dc5.
-- Client development: Russianranger/wowdecomp_esteria, android/arm64-port atcebfd5c560d8f7224e4798fa57a319f3ff18a31c. The671db06 offline fix has all-five-job41114326028 evidence. Separate full Retail-ON Windows builds41127220146 pass on both architectures after canonical archive/checkout fixes; all-five ordinary jobs41127220503 also pass. App pin stays471 until deliberate matched runtime/cohort requalification.
+- Client development: Russianranger/wowdecomp_esteria, android/arm64-port atc8b0ab201f52e18ffaba1e6c55aad6e26c740251. The671db06 offline fix has all-five-job41114326028 evidence. Separate full Retail-ON Windows builds41127220146 pass on both architectures after canonical archive/checkout fixes; all-five ordinary jobs41127220503 also pass. App pin stays471 until deliberate matched runtime/cohort requalification.
 - Server:f35f04d01689f034778e3474b3c820092f51e461; Eluna:58d7652138887783228b9727bd1fa4e08f00342b; seven hashed adaptations.
 - App source lock:dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90. Archived server-build lock remains5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1.
 - Package io.github.russianranger.esteria. Persistent signing key is private and backed up; public certificate is in app/development-signing.lock.json. No delivered update baseline.
@@ -75,8 +75,8 @@ filename. Unknown custom tables/actual SQL rows/coverage remain unqualified.
 Valid v1 preflight reports remain unchanged; helper generation changes naturally.
 See runtime/server/DBC-PREFLIGHT.md and regenerate only from exact source pins.
 
-Last broad modified-worktree pass:1344 Python checks,1289 passed,55 explicit skips,
-zero failures/errors. See runtime/evidence/typed-installation-host-regression.json;
+Last broad modified-worktree pass:1364 Python checks,1309 passed,55 explicit skips,
+zero failures/errors. See runtime/evidence/lease-locale-host-regression.json;
 source identities distinguish modified worktree from Git head.
 
 ## Runtime invariants
@@ -140,8 +140,31 @@ Android component workflow after this Core change; no new client/binary pin.
 The typed installation inputs/private Python kernel are implemented with ARM64
 admission, five save-selection fields and existing receipts preserved. The
 Android x64 adapter/provider remains disabled pending real native SQL and measured
-provider proof. Rerun actual native ARM64 Java SQL/promotion/restart now. The old
+provider proof. Actual typed-coordinator ARM64 SQL41129893302 passes at7c303665; rerun after the subsequent lease changes. The old
 MySQL runtime must use tools/fetch_android_mysql_fixture_frozen.py with the exact
 fully verified817 checkout; never transfer its old Java qualification to current
-sources. Run the newly committed Android handoff fixture workflow for actual
-five-phase remote-process death/recovery; ordinary APKs exclude the fixture.
+sources. Actual Android handoff41129893390 passes five-phase remote-process death/recovery; qualify the subsequent generic lease extension; ordinary APKs exclude the fixture.
+
+Actual Android handoff41129893390@7c303665 now passes five remote-process Binder
+deaths/recreation, all active-owner guards and cleanup. See
+runtime/evidence/android-handoff-recovery-7c303665-readback.json for complete
+small APK/source readback and precise x64 boundary. Full Retail-enabled client
+41127220146 and ordinary41127220503 also pass atceb; additive source/descriptor
+readback is runtime/evidence/client-retail-full-cebfd5c-readback.json. App471 stays
+selected. Android update41129893361 passes. Native ARM64 Java SQL41129893302 passes; original x64 setup-tool41119182502 remains running. Full APK41129893343 attempt1
+failed public NDK HTTP/2 transport before compile; only failed jobs were retried.
+
+Core ExclusiveFileLease is the new shared admission rule: reserve canonical lock
+name BEFORE opening any descriptor; close the FD before removing reservation.
+Never unlink a live lease file. A real Linux negative control reproduces the old
+lock loss, and positive cross-JVM tests retain exclusion after duplicate refusals.
+Importer/runtime/app owner migration and source-owned graphics readiness are
+being qualified. Existing handoff custom lease uses its already-tested equivalent
+rule. Preserve actual source-bound component receipts; none establishes gameplay.
+
+Typed Java coordinator41129893302 at7c303665 passes actual native ARM64 four-
+schema SQL, clean promotion, active reseeding refusal, two clean stops and same-
+UUID persistence/restart (30 bot tables/31 updates). The small artifact is fully
+read and all60 compiled project inputs match producer Git. This proof excludes
+the subsequent lease migration, Android, bot AI and gameplay. Reusable client
+shader locale fallback is published separately atc8b0ab2; selected app471 stays.

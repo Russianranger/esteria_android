@@ -221,3 +221,46 @@ input/source archives in `android-mysql-inputs.yml`. Its host guards run with
 (19 tests). `tests.test_server_setup_x64_probe` adds six build/ELF/source guards.
 `server-setup-x64-probe.yml` compiles the original dbimport target and real helper
 from exact source; compilation alone does not qualify SQL or Android coordination.
+
+## Effective locale, provider order and signed UI
+
+The first asset-backed run should import build 12340 MPQs and the matched client
+patches, add a small `mode=overlay` DBC/continuation package, then generate world
+data and shaders. This exercises the normal bounded import route. Large loose
+precomputed world imports remain limited by the 16 MiB estimated metadata
+budget; successful small fixtures do not qualify that alternative route.
+
+The app's shader command now uses the effective locale selected by client471's
+availability rotation, while retaining the user's request separately. Host
+fixtures cover requested deDE with only enUS data, available enUS/ruRU, Windows
+case matching, missing/non-file locale archives, alias refusal, changed imports
+and changed effective selection. A names-only reproduction also compares the
+pinned shader provider files to exact client471 Git blobs and demonstrates the
+previous omission of four enUS providers for an unavailable deDE request.
+These are source/path checks, not MPQ decoding or actual shader execution.
+
+```sh
+./gradlew :core:shaderRunPlanTest :app:gameSessionOwnerTest :app:localWorldSetupOwnerTest
+python3 -m unittest tests.test_extractor_order.Planner tests.test_server_data_packages -v
+```
+
+Before calling a build a device candidate, verify with actual imported data:
+
+1. The recorded requested/effective locale and effective root/locale MPQ
+   winners agree for the client, server extraction and shader preparation.
+   Named patch suffixes follow full case-insensitive Windows path ordering;
+   `patch-10` is not assumed newer than `patch-2`, and `common-3` remains the
+   lowest-priority base entry in this reconstructed source.
+2. Normal startup authenticates the effective `signaturefile` and signed
+   GlueXML/FrameXML TOCs and content with client471's enabled checks. A custom
+   UI import or explicit loose-UI acceptance is not signature qualification.
+   Record actual signature/loading errors if present; do not infer failure
+   merely because a custom MPQ exists.
+3. Glue frames load and proceed through real login/character selection, then
+   world UI, rendering, audio and persistence. Component/SRP/title-screen
+   checks alone do not establish these steps.
+
+A winning `enCN`/`enTW` locale remains unsupported by the pinned shader tool;
+setup must report that limit rather than generate from another locale or only
+root providers. No real user MPQs, signed custom UI closure or world session
+has been qualified by the host locale fixtures.

@@ -31,7 +31,7 @@ jobs:
       - name: Download exact source and NDK archives
         run: |
           curl --fail --location --retry 2 --max-time 600 https://github.com/Russianranger/uo-android-launcher/releases/download/v0.2.0/runtime-corresponding-sources.tar.gz -o "$RUNNER_TEMP/proot-sources.tar.gz"
-          curl --fail --location --retry 2 --max-time 900 https://dl.google.com/android/repository/android-ndk-r28c-linux.zip -o "$RUNNER_TEMP/android-ndk-r28c-linux.zip"
+          curl --fail --location --retry 2 --retry-all-errors --retry-delay 2 --max-time 900 https://dl.google.com/android/repository/android-ndk-r28c-linux.zip -o "$RUNNER_TEMP/android-ndk-r28c-linux.zip"
       - name: Build real Bionic ARM64 process bridge and source companion
         run: |
           python3 -m unittest tests.test_android_proot -v

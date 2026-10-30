@@ -8,13 +8,11 @@ import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
 import io.github.russianranger.esteria.core.runtime.process.ProotLaunch;
 import io.github.russianranger.esteria.presentation.ClientPresentationSession;
 import java.io.IOException;
+import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.channels.OverlappingFileLockException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -104,33 +102,30 @@ public final class PresentationShaderOwnerTests {
             remove(root);
         }
     }
-    private static ShaderSetup.Handle shader(Path root,FileChannel channel,FileLock lock)throws Exception {
+    private static ShaderSetup.Handle shader(Path root,ExclusiveFileLease lock)throws Exception {
         Constructor<ShaderSetup.Handle> constructor=ShaderSetup.Handle.class.getDeclaredConstructor(Context.class,Path.class,Path.class,
-            RuntimeSetup.class,ShaderToolsSetup.class,String.class,Path.class,Path.class,FileChannel.class,FileLock.class);
-        constructor.setAccessible(true);return constructor.newInstance(null,root,root.resolve("work"),null,null,"enUS",root.resolve("wine"),root.resolve("tools"),channel,lock);
+            RuntimeSetup.class,ShaderToolsSetup.class,String.class,Path.class,Path.class,ExclusiveFileLease.class);
+        constructor.setAccessible(true);return constructor.newInstance(null,root,root.resolve("work"),null,null,"enUS",root.resolve("wine"),root.resolve("tools"),lock);
     }
     private static void shaderTimeout()throws Exception {
         Path root=Files.createTempDirectory("esteria-shader-owner-").toRealPath();Backend backend=new Backend();OwnedProcess child=null;ShaderSetup.Handle owner=null;
         try {
             Files.createDirectory(root.resolve("work"));Path output=root.resolve("work/retained-partial-output");Files.writeString(output,"TEST_ONLY_PARTIAL_OUTPUT");
-            Path lockPath=root.resolve("work/.android-shader-setup.lock");FileChannel channel=FileChannel.open(lockPath,StandardOpenOption.CREATE,StandardOpenOption.WRITE);FileLock lock=channel.tryLock();
-            owner=shader(root,channel,lock);retain(owner);
+            Path lockPath=root.resolve("work/.android-shader-setup.lock");ExclusiveFileLease lock=ExclusiveFileLease.acquire(lockPath,"TEST_ONLY_BUSY");
+            owner=shader(root,lock);retain(owner);
             // Model the public compatibility entrypoint after its native work
             // has failed: the handle was retained before this process existed.
             child=start(backend,root);set(owner,"process",child);set(owner,"state",ShaderSetup.State.FAILED);
             try{owner.close(Duration.ZERO);throw new AssertionError("Live shader cleanup cannot close its lease");}
             catch(IOException expected){check(child.isAlive(),"Shader backend must still be cleaning up");}
             check(lock.isValid()&&retained(owner,root.resolve("work"))&&owner.state()!=ShaderSetup.State.CLOSED,"Shader process and actual file lease remain retained");
-            try(FileChannel competing=FileChannel.open(lockPath,StandardOpenOption.WRITE)) {
-                try{FileLock unexpected=competing.tryLock();if(unexpected!=null)unexpected.close();throw new AssertionError("Another shader/import stage must not acquire the active shader lease");}
-                catch(OverlappingFileLockException expected){ }
-            }
+            try{ExclusiveFileLease unexpected=ExclusiveFileLease.acquire(lockPath,"TEST_ONLY_BUSY");unexpected.close();throw new AssertionError("Another shader/import stage must not acquire the active shader lease");}catch(IOException expected){check("TEST_ONLY_BUSY".equals(expected.getMessage()),"Retained lease refuses before a competing descriptor opens");}
             try{owner.prepare(null,null);throw new AssertionError("Failed helper must never be replayed on its retained owner");}catch(IOException expected){ }
             check(Files.readString(output).equals("TEST_ONLY_PARTIAL_OUTPUT"),"Staged outputs survive failure without fabrication or deletion");
             settle(child,backend);
             try{ShaderSetup.retryPendingCleanup(root.resolve("work"));}catch(IOException expected){ /* Actual forced status is never hidden. */ }
             check(owner.state()==ShaderSetup.State.CLOSED&&!lock.isValid()&&!retained(owner,root.resolve("work")),"Compatibility retry releases ownership only after known-child completion");
-            try(FileChannel next=FileChannel.open(lockPath,StandardOpenOption.WRITE);FileLock admitted=next.tryLock()){check(admitted!=null,"New work is admitted after completed cleanup");}
+            try(ExclusiveFileLease admitted=ExclusiveFileLease.acquire(lockPath,"TEST_ONLY_BUSY")){check(admitted!=null,"New work is admitted after completed cleanup");}
         } finally {
             backend.release.countDown();if(child!=null&&child.isAlive())try{child.stop(Duration.ZERO);}catch(IOException ignored){ }
             if(owner!=null&&owner.state()!=ShaderSetup.State.CLOSED)try{owner.close(Duration.ofSeconds(1));}catch(IOException ignored){ }
@@ -143,8 +138,8 @@ public final class PresentationShaderOwnerTests {
         AtomicReference<Throwable> error=new AtomicReference<>();
         try {
             Files.createDirectory(root.resolve("work"));Path lockPath=root.resolve("work/.android-shader-setup.lock");
-            FileChannel channel=FileChannel.open(lockPath,StandardOpenOption.CREATE,StandardOpenOption.WRITE);FileLock lock=channel.tryLock();
-            owner=shader(root,channel,lock);retain(owner);ServiceOperationGuard guard=(ServiceOperationGuard)field(owner,"operations");
+            ExclusiveFileLease lock=ExclusiveFileLease.acquire(lockPath,"TEST_ONLY_BUSY");
+            owner=shader(root,lock);retain(owner);ServiceOperationGuard guard=(ServiceOperationGuard)field(owner,"operations");
             operation=new Thread(()->{try{guard.run(()->{entered.countDown();try{release.await();}catch(InterruptedException interrupted){throw new IOException(interrupted);}return null;});}
                 catch(Throwable failure){error.set(failure);}});operation.start();check(entered.await(2,TimeUnit.SECONDS),"Actual operation guard entered");
             try{owner.close(Duration.ZERO);throw new AssertionError("An in-flight allocation/launch must retain its owner");}catch(IOException expected){ }

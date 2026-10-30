@@ -2,16 +2,14 @@ package io.github.russianranger.esteria.runtime;
 
 import android.content.Context;
 import android.os.Looper;
+import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
 import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
 import io.github.russianranger.esteria.core.runtime.install.FreshServerInstallations;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.time.Duration;
 import java.util.Map;
@@ -65,17 +63,14 @@ public final class LocalWorldSetup {
         Path state=GuestHelperAssets.directory(root,"state");Path lockPath=state.resolve(".local-world-setup.lock");
         if(Files.exists(lockPath,LinkOption.NOFOLLOW_LINKS)&&(!Files.isRegularFile(lockPath,LinkOption.NOFOLLOW_LINKS)||
                 !lockPath.equals(lockPath.toRealPath())))throw new IOException("Invalid local setup ownership file");
-        FileChannel channel=FileChannel.open(lockPath,StandardOpenOption.CREATE,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS);
-        FileLock lock=null;
+        ExclusiveFileLease lease=ExclusiveFileLease.acquire(lockPath,"Local world setup is already owned");
         try {
             Files.setPosixFilePermissions(lockPath,PosixFilePermissions.fromString("rw-------"));
-            try{lock=channel.tryLock();}catch(java.nio.channels.OverlappingFileLockException busy){throw new IOException("Local world setup is already owned",busy);}
-            if(lock==null)throw new IOException("Local world setup is already owned");
             Handle owner=new Handle(context.getApplicationContext(),root,server,programs,content,dataTools,wine,shaderTools,
-                locale,threads,freshDatabaseReserve,previous,channel,lock);
+                locale,threads,freshDatabaseReserve,previous,lease);
             if(OWNERS.putIfAbsent(root,owner)!=null)throw new IOException("Previous local setup cleanup remains retained");
             return owner;
-        }catch(IOException|RuntimeException error){try{if(lock!=null)lock.release();}finally{channel.close();}throw error;}
+        }catch(IOException|RuntimeException|Error error){try{lease.close();}catch(IOException close){error.addSuppressed(close);}throw error;}
     }
     public static final class Handle implements AutoCloseable {
         private final Context context;
@@ -90,8 +85,7 @@ public final class LocalWorldSetup {
         private final int threads;
         private final long reserve;
         private final FreshServerInstallations.Active previous;
-        private final FileChannel channel;
-        private final FileLock lock;
+        private final ExclusiveFileLease lease;
         private final ServiceOperationGuard operations=new ServiceOperationGuard();
         private volatile State state=State.ALLOCATED;
         private volatile IOException failure;
@@ -100,10 +94,10 @@ public final class LocalWorldSetup {
         private volatile ServerInstallationSetup.Handle installation;
         private Handle(Context context,Path root,ServerRuntimeSetup server,ServerProgramsSetup programs,ServerContentSetup content,
                 ServerDataToolsSetup tools,RuntimeSetup wine,ShaderToolsSetup shaderTools,String locale,int threads,long reserve,
-                FreshServerInstallations.Active previous,FileChannel channel,FileLock lock) {
+                FreshServerInstallations.Active previous,ExclusiveFileLease lease) {
             this.context=context;this.root=root;this.server=server;this.programs=programs;this.content=content;this.tools=tools;
             this.wine=wine;this.shaderTools=shaderTools;this.locale=locale;this.threads=threads;this.reserve=reserve;
-            this.previous=previous;this.channel=channel;this.lock=lock;
+            this.previous=previous;this.lease=lease;
         }
         public State state(){return state;}
         /** Known operation streams; no directory discovery or credential files. */
@@ -131,6 +125,8 @@ public final class LocalWorldSetup {
                     ServerDataBinding binding=data.prepare(updates,stop);
                     check(stop);shaders=ShaderSetup.begin(context,root,wine,shaderTools,locale);
                     ShaderSetup.Result generated=shaders.prepare(updates,stop);
+                    if(!generated.locale.equals(binding.effectiveLocale))
+                        throw new IOException("Shader and server data effective client locales differ; prepared outputs are retained");
                     binding.requireUnchanged();check(stop);
                     FreshServerInstallations.Active active=previous;
                     if(active==null) {
@@ -166,7 +162,7 @@ public final class LocalWorldSetup {
                 if(shaders!=null&&shaders.state()!=ShaderSetup.State.CLOSED)throw retained(error);
                 if(data!=null)try{data.close(permit.remaining());}catch(IOException issue){error=add(error,issue);}
                 if(data!=null&&data.state()!=ServerDataSetup.State.CLOSED)throw retained(error);
-                try{lock.release();}finally{try{channel.close();}finally{state=State.CLOSED;OWNERS.remove(root,this);}}
+                lease.close();state=State.CLOSED;OWNERS.remove(root,this);
                 if(error!=null)throw error;
             }
         }

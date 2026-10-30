@@ -15,6 +15,7 @@ import android.os.Process;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import io.github.russianranger.esteria.BuildConfig;
+import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -104,6 +105,40 @@ public final class LocalHandoffRecoveryInstrumentedTest {
         assertEquals("PRESERVED_TEST_ACCOUNT_SAVE",RuntimeFiles.smallText(directory.resolve("account-save-sibling"),128));
         assertEquals("UNRECOGNIZED_STAGE_PRESERVED",RuntimeFiles.smallText(directory.resolve(UNKNOWN),128));
     }
+    private static void genericBusy(Path path)throws Exception {
+        boolean refused=false;
+        try(ExclusiveFileLease unexpected=ExclusiveFileLease.acquire(path,"handoff-probe-generic-busy")){}
+        catch(java.io.IOException busy){assertEquals("handoff-probe-generic-busy",busy.getMessage());refused=true;}
+        assertTrue("Actual exclusive lease is refused",refused);
+    }
+    private static JSONObject genericLease(Context context,Path root)throws Exception {
+        Path directory=directory(root.resolve("exclusive-lease-case")),lock=directory.resolve("owner.lock");
+        write(directory.resolve("preserved-sibling"),"PRESERVED_GENERIC_LEASE_SIBLING");String previous;
+        try(Link old=new Link(context)) {
+            Messenger remote=old.bind();previous=instance(old.call(remote,1,0));
+            assertTrue(old.call(remote,6,0).getBoolean("sameJvmDuplicateRefused"));
+            genericBusy(lock);assertTrue(Files.isRegularFile(lock,java.nio.file.LinkOption.NOFOLLOW_LINKS));assertEquals(0,Files.size(lock));
+            CountDownLatch dead=new CountDownLatch(1);old.binder.linkToDeath(dead::countDown,0);old.send(remote,7,0);
+            assertTrue("Actual generic lease owner process death observed",dead.await(8,TimeUnit.SECONDS));
+        }
+        JSONObject marker=new JSONObject(RuntimeFiles.smallText(directory.resolve("reached.json"),1024));
+        assertEquals("exclusive-file-lease",marker.getString("phase"));assertEquals(previous,marker.getString("instance"));
+        assertEquals(BuildConfig.SOURCE_REVISION,marker.getString("sourceRevision"));
+        try(Link next=new Link(context)) {
+            Messenger remote=next.bind();assertNotEquals(previous,instance(next.call(remote,1,0)));
+            try(ExclusiveFileLease owner=ExclusiveFileLease.acquire(lock,"handoff-probe-generic-busy")) {
+                for(int index=0;index<32;index++)genericBusy(lock);
+                assertTrue(owner.isValid());assertFalse("New remote process still sees the main process kernel lock after duplicates",next.call(remote,8,0).getBoolean("acquired"));
+            }
+            assertTrue("Descriptor close admits independent new owner",next.call(remote,8,0).getBoolean("acquired"));
+        }
+        assertEquals("PRESERVED_GENERIC_LEASE_SIBLING",RuntimeFiles.smallText(directory.resolve("preserved-sibling"),128));
+        assertEquals(0,Files.size(lock));
+        return new JSONObject().put("sameJvmDuplicateRefused",true).put("crossProcessRefusedAfterDuplicates",true)
+            .put("binderDeathObserved",true).put("ownerInstanceChanged",true).put("leaseReacquiredAfterDeath",true)
+            .put("sameJvmDuplicateRefusedAfterReacquire",true).put("crossProcessRefusedAfterReacquire",true)
+            .put("releasedAfterClose",true).put("siblingPreserved",true);
+    }
     @Test public void remoteOwnerDeathRecoversOnlyKnownHandoffs()throws Exception {
         Assume.assumeTrue(BuildConfig.HANDOFF_EMULATOR_TEST);
         assertTrue(BuildConfig.DEBUG);assertEquals(33,Build.VERSION.SDK_INT);assertTrue(Arrays.asList(Build.SUPPORTED_ABIS).contains("x86_64"));
@@ -150,10 +185,11 @@ public final class LocalHandoffRecoveryInstrumentedTest {
             siblings(first);active.put("sameJvmDuplicateRefused",true).put("crossProcessRefused",true).put("recordUnchanged",true)
                     .put("released",true).put("relaunchAfterRelease",true).put("siblingsPreserved",true);
         }
+        JSONObject exclusive=genericLease(context,root);
         JSONObject receipt=new JSONObject().put("formatVersion",1).put("scope","android-13-x86_64-local-handoff-remote-owner-process-death")
                 .put("sourceRevision",BuildConfig.SOURCE_REVISION).put("fingerprint",Build.FINGERPRINT).put("api",Build.VERSION.SDK_INT)
                 .put("targetSdk",context.getApplicationInfo().targetSdkVersion).put("abi","x86_64").put("buildEvidence",evidence)
-                .put("cases",cases).put("activeOwner",active).put("remoteOwnerProcessesKilled",5).put("remoteOwnerProcessesRecreated",5)
+                .put("cases",cases).put("activeOwner",active).put("exclusiveFileLease",exclusive).put("remoteOwnerProcessesKilled",6).put("remoteOwnerProcessesRecreated",6)
                 .put("syntheticClientExecutableNotRun",true).put("productionAppProcessRestartQualified",false).put("physicalDeviceQualified",false)
                 .put("clientExecuted",false).put("sqlExecuted",false).put("arm64Qualified",false).put("gameplayQualified",false);
         write(context.getFilesDir().getCanonicalFile().toPath().resolve("handoff-recovery-qualification.json"),receipt.toString().getBytes(StandardCharsets.UTF_8));

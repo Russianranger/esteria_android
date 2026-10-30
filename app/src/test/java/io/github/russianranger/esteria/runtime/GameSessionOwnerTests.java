@@ -13,12 +13,11 @@ import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
 import io.github.russianranger.esteria.core.runtime.process.ShaderRunPlan;
 import io.github.russianranger.esteria.presentation.ClientPresentationSession;
 import java.io.IOException;
+import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -172,13 +171,13 @@ public final class GameSessionOwnerTests {
         GameSession.Handle owner=null;OwnedProcess engine=null;Backend backend=new Backend();ServerDatabaseService.Handle database=null;LocalServerSession.Handle servers=null;
         try {
             owner=owner(root,GameSession.claim(root));Path work=Files.createDirectory(root.resolve("dbwork"));
-            FileChannel dbChannel=FileChannel.open(work.resolve("database.lock"),StandardOpenOption.CREATE,StandardOpenOption.WRITE);FileLock dbLock=dbChannel.tryLock();
+            ExclusiveFileLease dbLock=ExclusiveFileLease.acquire(work.resolve("database.lock"),"TEST_ONLY_BUSY");
             engine=start(backend,root);
-            Constructor<ServerDatabaseService.Handle> dbConstructor=ServerDatabaseService.Handle.class.getDeclaredConstructor(OwnedProcess.class,FileChannel.class,FileLock.class,Path.class,String.class,String.class,Path.class,Path.class,FreshServerInstallations.Workspace.class);dbConstructor.setAccessible(true);
-            database=dbConstructor.newInstance(engine,dbChannel,dbLock,root.resolve("fixture-db-session"),"a".repeat(32),"8.0.46",root,work,null);set(owner,"database",database);
-            FileChannel serverChannel=FileChannel.open(work.resolve("server.lock"),StandardOpenOption.CREATE,StandardOpenOption.WRITE);FileLock serverLock=serverChannel.tryLock();
-            Constructor<LocalServerSession.Handle> serverConstructor=LocalServerSession.Handle.class.getDeclaredConstructor(Context.class,Path.class,Path.class,ServerRuntimeSetup.class,ServerProgramsSetup.class,ServerContentSetup.class,FreshServerInstallations.Active.class,ServerDatabaseService.Handle.class,ServerDataBinding.class,LocalServerSession.Events.class,FileChannel.class,FileLock.class);serverConstructor.setAccessible(true);
-            servers=serverConstructor.newInstance(null,root,work,null,null,null,null,database,null,null,serverChannel,serverLock);set(owner,"servers",servers);
+            Constructor<ServerDatabaseService.Handle> dbConstructor=ServerDatabaseService.Handle.class.getDeclaredConstructor(OwnedProcess.class,ExclusiveFileLease.class,Path.class,String.class,String.class,Path.class,Path.class,FreshServerInstallations.Workspace.class);dbConstructor.setAccessible(true);
+            database=dbConstructor.newInstance(engine,dbLock,root.resolve("fixture-db-session"),"a".repeat(32),"8.0.46",root,work,null);set(owner,"database",database);
+            ExclusiveFileLease serverLock=ExclusiveFileLease.acquire(work.resolve("server.lock"),"TEST_ONLY_BUSY");
+            Constructor<LocalServerSession.Handle> serverConstructor=LocalServerSession.Handle.class.getDeclaredConstructor(Context.class,Path.class,Path.class,ServerRuntimeSetup.class,ServerProgramsSetup.class,ServerContentSetup.class,FreshServerInstallations.Active.class,ServerDatabaseService.Handle.class,ServerDataBinding.class,LocalServerSession.Events.class,ExclusiveFileLease.class);serverConstructor.setAccessible(true);
+            servers=serverConstructor.newInstance(null,root,work,null,null,null,null,database,null,null,serverLock);set(owner,"servers",servers);
             try{owner.close(Duration.ofSeconds(9));throw new AssertionError("Insufficient world stop budget should preserve original services");}catch(IOException expected){ }
             check(servers.state()==LocalServerSession.State.ALLOCATED&&serverLock.isValid()&&dbLock.isValid()&&backend.stops.get()==0,"World shutdown is not initiated with less than10seconds; live database remains untouched");blocked(root);
             servers.close(Duration.ofSeconds(30));
@@ -214,7 +213,8 @@ public final class GameSessionOwnerTests {
         Path root=Files.createTempDirectory("esteria-shader-selection-").toRealPath();
         try {
             Path game=Files.createDirectory(root.resolve("game")),tools=Files.createDirectory(root.resolve("tools")),work=Files.createDirectory(root.resolve("work"));
-            Files.writeString(game.resolve("current"),"a".repeat(64)+"\n");Path generations=Files.createDirectory(game.resolve("generations"));Files.createDirectory(Files.createDirectory(generations.resolve("a".repeat(64))).resolve("data"));
+            Files.writeString(game.resolve("current"),"a".repeat(64)+"\n");Path generations=Files.createDirectory(game.resolve("generations"));Path imported=Files.createDirectory(Files.createDirectory(generations.resolve("a".repeat(64))).resolve("data"));Path data=Files.createDirectory(imported.resolve("Data"));
+            Files.write(data.resolve("common.MPQ"),new byte[]{0});Path enUS=Files.createDirectory(data.resolve("enUS"));Files.write(enUS.resolve("locale-enUS.MPQ"),new byte[]{0});
             ShaderRunPlan plan=new ShaderRunPlan(game,tools,work,"b".repeat(40),"enUS");
             Constructor<ShaderSetup.Result> constructor=ShaderSetup.Result.class.getDeclaredConstructor(ShaderRunPlan.class,String.class,Path.class,Path.class,int.class,long.class,boolean.class);constructor.setAccessible(true);
             ShaderSetup.Result original=constructor.newInstance(plan,"c".repeat(64),root.resolve("shaders"),root.resolve("logs"),4,123L,false);
@@ -224,10 +224,54 @@ public final class GameSessionOwnerTests {
                 try{ShaderSetup.requireSameSelection(changed,original);throw new AssertionError("Stale shader selection was accepted");}catch(IOException expected){ }
         }finally{remove(root);}
     }
+    /** A Java FileLock can remain valid after an unrelated close has released
+     * the kernel POSIX lock. Only a separate JVM establishes real exclusion. */
+    private static void externalLease(Path path,boolean busy)throws Exception {
+        Process child=new ProcessBuilder(Path.of(System.getProperty("java.home"),"bin","java").toString(),
+            "-Xmx32m","-cp",System.getProperty("java.class.path"),GameSessionOwnerTests.class.getName(),
+            "--probe-lease",path.toString()).redirectOutput(ProcessBuilder.Redirect.DISCARD)
+            .redirectError(ProcessBuilder.Redirect.DISCARD).start();
+        try {
+            check(child.waitFor(8,TimeUnit.SECONDS),"Independent lock claimant must finish within eight seconds");
+            check(child.exitValue()==(busy?73:0),"Cross-JVM kernel exclusion must survive duplicate refusals and release after close (expected "+(busy?73:0)+", observed "+child.exitValue()+")");
+        } finally {
+            if(child.isAlive())child.destroyForcibly();
+            check(child.waitFor(3,TimeUnit.SECONDS),"Independent lock claimant must be reaped");
+        }
+    }
+    private static void crossProcessDuplicateRefusal()throws Exception {
+        Path root=Files.createTempDirectory("esteria-app-posix-lease-").toRealPath();Files.createDirectory(root.resolve("game"));
+        Path work=Files.createDirectory(root.resolve("data-work")),other=Files.createDirectory(root.resolve("other-work"));
+        Path imported=root.resolve("game/import.lock"),view=root.resolve("state/client-work/.client-launch-setup.lock"),setup=work.resolve(".android-server-data-setup.lock");
+        try {
+            try(GameSession.Leases owner=GameSession.claim(root)) {
+                for(int index=0;index<16;index++) {
+                    blocked(root);
+                    try{GameSession.claim(root);throw new AssertionError("Duplicate game owner was admitted");}catch(IOException expected){ }
+                    try{ServerDataSetup.claim(other,root.resolve("game"));throw new AssertionError("Data setup acquired playing import");}catch(IOException expected){ }
+                }
+                externalLease(imported,true);externalLease(view,true);
+                externalLease(other.resolve(".android-server-data-setup.lock"),false);
+            }
+            externalLease(imported,false);externalLease(view,false);
+            try(ServerDataSetup.Leases owner=ServerDataSetup.claim(work,root.resolve("game"))) {
+                for(int index=0;index<16;index++) {
+                    try{ServerDataSetup.claim(work,root.resolve("game"));throw new AssertionError("Duplicate data owner was admitted");}catch(IOException expected){ }
+                    try{GameSession.claim(root);throw new AssertionError("Game owner acquired setup import");}catch(IOException expected){ }
+                }
+                externalLease(imported,true);externalLease(setup,true);
+            }
+            externalLease(imported,false);externalLease(setup,false);
+        } finally {remove(root);}
+    }
     private static void settle(OwnedProcess child)throws Exception {long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(3);while(child.isAlive()&&System.nanoTime()<deadline)Thread.sleep(2);check(!child.isAlive(),"Known creating process owner completed actual cleanup");}
     private static void remove(Path root)throws IOException {try(var paths=Files.walk(root)){for(Path path:paths.sorted(Comparator.reverseOrder()).toArray(Path[]::new))Files.delete(path);}}
     public static void main(String[] arguments)throws Exception {
-        gracefulFailureThenExplicitForce();naturalExit();prelaunch();typedViewLease();preservedForeignHandoff();persistentShutdownBudgets();startupCancellationHandoff();sourceCloseSequenceAndShaderSelection();
-        System.out.println("Game owner passed8 host groups: real owners/import+view locks, explicit-force/reap/bindings, source close sequence and shader stale guards; no native/SQL/Android/gameplay run");
+        if(arguments.length==2&&arguments[0].equals("--probe-lease")) {
+            try(ExclusiveFileLease lease=ExclusiveFileLease.acquire(Path.of(arguments[1]),"TEST_ONLY_BUSY")){System.exit(0);}
+            catch(IOException busy){if("TEST_ONLY_BUSY".equals(busy.getMessage()))System.exit(73);throw busy;}
+        }
+        crossProcessDuplicateRefusal();gracefulFailureThenExplicitForce();naturalExit();prelaunch();typedViewLease();preservedForeignHandoff();persistentShutdownBudgets();startupCancellationHandoff();sourceCloseSequenceAndShaderSelection();
+        System.out.println("Game owner passed9 host groups: cross-JVM duplicate/refusal/release, real owners/import+view locks, explicit-force/reap/bindings, source close sequence and shader stale guards; no native/SQL/Android/gameplay run");
     }
 }

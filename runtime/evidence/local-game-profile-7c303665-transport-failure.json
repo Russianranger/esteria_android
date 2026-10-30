@@ -1,0 +1,20 @@
+{
+  "allFourPublicServerProvidersRestoredBeforeFailure": true,
+  "androidRuntimeQualified": false,
+  "applicationCompileReached": false,
+  "attempt": 1,
+  "boundedDiagnostic": "curl: (92) HTTP/2 stream 1 was not closed cleanly: INTERNAL_ERROR (err 2)",
+  "exitCode": 92,
+  "failedStep": "Build pinned Bionic ARM64 PRoot and matching complete source companion",
+  "failedTransfer": "public original Android NDK r28c ZIP, interrupted at49percent",
+  "followup": "retry all curl transport errors twice with bounded900second attempts; retain existing exact NDK and source verification",
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "jobId": 124317894304,
+  "observedAtUtc": "2026-10-30T21:24:06.278052+00:00",
+  "rerunOutcome": "pending",
+  "rootRequestedFailedJobsOnlyRerun": true,
+  "runId": 41129893343,
+  "scope": "complete-profile attempt1 bounded Android NDK transport failure before PRoot/app compilation",
+  "sourceRevision": "7c303665e8028aba86a7b87d543b2528d968b1ab"
+}

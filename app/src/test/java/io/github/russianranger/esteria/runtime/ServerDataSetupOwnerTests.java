@@ -7,11 +7,10 @@ import io.github.russianranger.esteria.core.runtime.install.RuntimePackagePlan;
 import io.github.russianranger.esteria.core.runtime.install.ServerDataToolSelection;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
 import java.io.IOException;
+import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -101,10 +100,10 @@ public final class ServerDataSetupOwnerTests {
     }
     private static void busyImportDoesNotLeakSetupLease()throws Exception {
         Path root=Files.createTempDirectory("esteria-data-lock-unwind-").toRealPath(),game=Files.createDirectory(root.resolve("game")),work=Files.createDirectory(root.resolve("work"));
-        try(FileChannel existing=FileChannel.open(game.resolve("import.lock"),StandardOpenOption.CREATE,StandardOpenOption.WRITE);FileLock held=existing.tryLock()) {
+        try(ExclusiveFileLease held=ExclusiveFileLease.acquire(game.resolve("import.lock"),"TEST_ONLY_BUSY")) {
             try{ServerDataSetup.claim(work,game);throw new AssertionError("A live importer must exclude data setup");}catch(IOException expected){ }
             check(held.isValid(),"The original importer lease remains owned");
-            try(FileChannel channel=FileChannel.open(work.resolve(".android-server-data-setup.lock"),StandardOpenOption.WRITE);FileLock setup=channel.tryLock()) {
+            try(ExclusiveFileLease setup=ExclusiveFileLease.acquire(work.resolve(".android-server-data-setup.lock"),"TEST_ONLY_BUSY")) {
                 check(setup!=null,"Secondary-lock failure cannot leak the first setup lease");
             }
         }finally{remove(root);}

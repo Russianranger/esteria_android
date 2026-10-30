@@ -5,8 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.channels.OverlappingFileLockException;
+import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -458,15 +457,12 @@ public final class GameDataImporter {
     }
     private ImportLock lock() throws IOException {
         Path lockPath = root.resolve("import.lock"); if (Files.isSymbolicLink(lockPath)) throw new IOException("Symlink lock path");
-        FileChannel channel = FileChannel.open(lockPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-        try {
-            FileLock held = channel.tryLock(); if (held == null) throw new IOException("Another import is active"); return new ImportLock(channel, held);
-        } catch (OverlappingFileLockException | IOException e) { channel.close(); throw new IOException("Another import is active or lock unavailable", e); }
+        return new ImportLock(ExclusiveFileLease.acquire(lockPath,"Another import is active or lock unavailable"));
     }
     private static MessageDigest sha256() { try { return MessageDigest.getInstance("SHA-256"); } catch (NoSuchAlgorithmException e) { throw new AssertionError(e); } }
     private static String hex(byte[] value) { StringBuilder out = new StringBuilder(value.length * 2); for (byte b : value) out.append(String.format(Locale.ROOT, "%02x", b & 255)); return out.toString(); }
     private static final class Saved { final long size, modified; Saved(long s, long m) { size = s; modified = m; } }
-    private static final class ImportLock implements AutoCloseable { final FileChannel channel; final FileLock lock; ImportLock(FileChannel c, FileLock l) { channel = c; lock = l; } public void close() throws IOException { try { lock.release(); } finally { channel.close(); } } }
+    private static final class ImportLock implements AutoCloseable { final ExclusiveFileLease lease; ImportLock(ExclusiveFileLease lease) { this.lease=lease; } public void close() throws IOException { lease.close(); } }
     private static final class Entry { String path; final String original; final long size, modified, crc; Entry(String path, long size, long modified, long crc) { this.path = path; this.original = path; this.size = size; this.modified = modified; this.crc = crc; } }
     private interface Source { List<Entry> entries(Cancellation cancellation) throws IOException; String identity(); InputStream open(Entry entry) throws IOException; void verifyUnchanged(Entry entry) throws IOException; }
     private final class ExternalSource implements Source {

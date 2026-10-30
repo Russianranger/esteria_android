@@ -1,0 +1,612 @@
+{
+  "actualAndroidInstrumentedExecutionObserved": true,
+  "actualAppReceipt": {
+    "abi": "x86_64",
+    "activeOwner": {
+      "crossProcessRefused": true,
+      "recordUnchanged": true,
+      "relaunchAfterRelease": true,
+      "released": true,
+      "sameJvmDuplicateRefused": true,
+      "siblingsPreserved": true
+    },
+    "api": 33,
+    "arm64Qualified": false,
+    "cases": [
+      {
+        "binderDeathObserved": true,
+        "clientRecordBefore": false,
+        "knownStateMatched": true,
+        "ownerInstanceChanged": true,
+        "ownerReceiptBefore": false,
+        "phase": "created",
+        "receiptAbsentAfterClose": true,
+        "recordAbsentAfterClose": true,
+        "recovered": true,
+        "siblingsPreserved": true,
+        "unknownStagesPreserved": true
+      },
+      {
+        "binderDeathObserved": true,
+        "clientRecordBefore": false,
+        "knownStateMatched": true,
+        "ownerInstanceChanged": true,
+        "ownerReceiptBefore": false,
+        "phase": "written",
+        "receiptAbsentAfterClose": true,
+        "recordAbsentAfterClose": true,
+        "recovered": true,
+        "siblingsPreserved": true,
+        "unknownStagesPreserved": true
+      },
+      {
+        "binderDeathObserved": true,
+        "clientRecordBefore": false,
+        "knownStateMatched": true,
+        "ownerInstanceChanged": true,
+        "ownerReceiptBefore": true,
+        "phase": "proof-synced",
+        "receiptAbsentAfterClose": true,
+        "recordAbsentAfterClose": true,
+        "recovered": true,
+        "siblingsPreserved": true,
+        "unknownStagesPreserved": true
+      },
+      {
+        "binderDeathObserved": true,
+        "clientRecordBefore": true,
+        "knownStateMatched": true,
+        "ownerInstanceChanged": true,
+        "ownerReceiptBefore": true,
+        "phase": "synced",
+        "receiptAbsentAfterClose": true,
+        "recordAbsentAfterClose": true,
+        "recovered": true,
+        "siblingsPreserved": true,
+        "unknownStagesPreserved": true
+      },
+      {
+        "binderDeathObserved": true,
+        "clientRecordBefore": false,
+        "knownStateMatched": true,
+        "ownerInstanceChanged": true,
+        "ownerReceiptBefore": true,
+        "phase": "consumed",
+        "receiptAbsentAfterClose": true,
+        "recordAbsentAfterClose": true,
+        "recovered": true,
+        "siblingsPreserved": true,
+        "unknownStagesPreserved": true
+      }
+    ],
+    "clientExecuted": false,
+    "fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "physicalDeviceQualified": false,
+    "productionAppProcessRestartQualified": false,
+    "remoteOwnerProcessesKilled": 5,
+    "remoteOwnerProcessesRecreated": 5,
+    "scope": "android-13-x86_64-local-handoff-remote-owner-process-death",
+    "sourceRevision": "7c303665e8028aba86a7b87d543b2528d968b1ab",
+    "sqlExecuted": false,
+    "syntheticClientExecutableNotRun": true,
+    "targetSdk": 35
+  },
+  "actualCompiledPrivateService": {
+    "class": "io.github.russianranger.esteria.core.runtime.install.HandoffProbeService",
+    "exported": false,
+    "process": ":handoffProbe"
+  },
+  "actualQualificationChecks": {
+    "binderDeathsObserved": true,
+    "leasesReleasedAndRelaunchPreserved": true,
+    "ownerInstancesChanged": true,
+    "recognizedRecordsRecovered": true,
+    "remoteDeathPhasesVerified": 5,
+    "sameJvmAndCrossProcessDuplicatesRefused": true,
+    "unknownStagesAndSiblingsPreserved": true
+  },
+  "all24OuterArtifactMembersCrcAndSha256Read": true,
+  "allBuildAndRuntimeSourceEvidenceIdentical": true,
+  "allJobStepsCompletedSuccessfully": true,
+  "androidArm64Executed": false,
+  "androidRuntimeQualified": false,
+  "androidX64HandoffRecoveryQualified": true,
+  "applicationPinAdvanced": false,
+  "applicationRuntimeProviderAdopted": false,
+  "applicationSelectedClientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "arm64Qualified": false,
+  "artifactArchivesReadBack": {
+    "evidence": {
+      "artifactId": 13013096762,
+      "bytes": 12326,
+      "sha256": "571c7387286ba9b91351b65347bb974a41dc07bd4b73d79efbb8b51b41022db7"
+    },
+    "inputs": {
+      "artifactId": 13011984695,
+      "bytes": 5778548,
+      "sha256": "1db4902b52d4d9fae4c972bc8555db1f6da82d3196f1d3d88b837f837e0ad55e"
+    }
+  },
+  "artifactMetadata": [
+    {
+      "bytes": 12326,
+      "createdAt": "2026-10-30T21:21:24Z",
+      "digest": "sha256:571c7387286ba9b91351b65347bb974a41dc07bd4b73d79efbb8b51b41022db7",
+      "expired": false,
+      "expiresAt": "2026-11-29T21:21:24Z",
+      "id": 13013096762,
+      "name": "android-x64-handoff-recovery-evidence-7c303665e8028aba86a7b87d543b2528d968b1ab"
+    },
+    {
+      "bytes": 5778548,
+      "createdAt": "2026-10-30T21:21:26Z",
+      "digest": "sha256:1db4902b52d4d9fae4c972bc8555db1f6da82d3196f1d3d88b837f837e0ad55e",
+      "expired": false,
+      "expiresAt": "2026-11-29T21:21:25Z",
+      "id": 13011984695,
+      "name": "unqualified-android-x64-handoff-apks-and-source-7c303665e8028aba86a7b87d543b2528d968b1ab"
+    }
+  ],
+  "botAiQualified": false,
+  "buildEvidence": {
+    "androidExecutionQualified": false,
+    "arm64Qualified": false,
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "productionRuntimeQualified": false,
+    "scope": "android-x64-handoff-fixture-build-only",
+    "sourceRevision": "7c303665e8028aba86a7b87d543b2528d968b1ab",
+    "sourceSnapshotExact": true
+  },
+  "canonicalSourceArchive": {
+    "all1040FilesMatchCanonicalGitArchiveExport": true,
+    "archiveSourceFileBytesVerified": 10146280,
+    "attributeControlledExportConversions": {
+      "gradlew.bat": {
+        "archive": {
+          "bytes": 295,
+          "sha256": "21186e8f097fcc9e5f62ee0abf2d95b92f973b347d0c27f0205a336af8aa021d"
+        },
+        "canonicalGitBlob": {
+          "bytes": 289,
+          "sha256": "119ce8a4bfdf3024ba03cf9b6b810afd47b49e17999a0053bfe719effbad36ea"
+        },
+        "canonicalGitBlobObject": "ea3b545d27e06d9bc27ceda9b7ef08a66b9d93c9",
+        "conversion": "committed *.bat text eol=crlf; six LF separators exported as CRLF"
+      }
+    },
+    "byteIdenticalCanonicalGitBlobFiles": 1039,
+    "canonicalGitBlobBytes": 10146274,
+    "gitSourceFilesVerified": 1040,
+    "identity": {
+      "bytes": 2526908,
+      "sha256": "ba50a85910439494a6cb844431c6db0c4e258620ebe60d96edbda165c410041d"
+    },
+    "isolatedCanonicalGitSourceGuardPassedWithoutRelaxation": true,
+    "productionSharedRepositoryModified": false,
+    "wholeArchiveByteIdenticalToLocallyRegeneratedGitArchive": true
+  },
+  "characterPersistenceQualified": false,
+  "clientExecuted": false,
+  "compiledServerQualified": false,
+  "emulatorProperties": {
+    "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+    "ro.build.version.sdk": "33",
+    "ro.kernel.qemu": "1",
+    "ro.product.cpu.abi": "x86_64"
+  },
+  "evidenceArtifactMembers": {
+    "evidence/app-receipt.json": {
+      "bytes": 5848,
+      "sha256": "38b13e6ea9445d04d2452935dcb6a20e08dc7ec829dd3afba64549c0170d3829"
+    },
+    "evidence/filtered-logcat.log": {
+      "bytes": 304,
+      "sha256": "c8aae85048af95c3b714b61e3e718769f2c334f0b79fb75fec56d343626513f1"
+    },
+    "evidence/install-app.log": {
+      "bytes": 36,
+      "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+    },
+    "evidence/install-tests.log": {
+      "bytes": 36,
+      "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+    },
+    "evidence/instrument.log": {
+      "bytes": 915,
+      "sha256": "dafdb5b11c572b5b5680b2c321f8bb9eb3fdc5c3e51cc3eaabb30e2fa09a830a"
+    },
+    "evidence/preexisting-app.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "evidence/preexisting-tests.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "evidence/qualification.json": {
+      "bytes": 10785,
+      "sha256": "0522a7c7bec26b6bfd46f16466c67afaca310575865d801e10c83210fd413b9b"
+    },
+    "evidence/ro.build.fingerprint.log": {
+      "bytes": 81,
+      "sha256": "74f45a5b5c9c2e0e9fe31b30e7fecac3d7eed0ec13131a36513c9da0e27ee79d"
+    },
+    "evidence/ro.build.version.sdk.log": {
+      "bytes": 3,
+      "sha256": "19b8d5c59e421f037fe563007c7254eb8d98bc221b278c3db3e5fdbbfd52e273"
+    },
+    "evidence/ro.kernel.qemu.log": {
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    "evidence/ro.product.cpu.abi.log": {
+      "bytes": 7,
+      "sha256": "aaf631698ae5160ceb04a97681a14887fdcab47cd6e0f163c87485b3b1340b62"
+    },
+    "evidence/serial.log": {
+      "bytes": 14,
+      "sha256": "0115c661660f4cd9f62719a1c0f968c833c3295da9713cc8b6d915f739be272e"
+    },
+    "evidence/stop-owned-test-app.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "fixture-apk-verification.json": {
+      "bytes": 3294,
+      "sha256": "84a4d630e5b5292a681f1b0af142eab96c1162562ddf01ecf9671076e09bfe28"
+    },
+    "fixture-gradle-tail.log": {
+      "bytes": 4631,
+      "sha256": "8194041bef36245ffc124963f67fe5d6f646086b13f9f4b79da72b9e5b71b386"
+    },
+    "ordinary-exclusion.json": {
+      "bytes": 201,
+      "sha256": "e254b0fa528f0fb0ea07b879fed599e2ab4931057b5bffdf41ee953fc320bc66"
+    },
+    "ordinary-gradle-tail.log": {
+      "bytes": 3215,
+      "sha256": "2aac850bcfd63d494d47f0e8d0f7e18abb88fcc07efd47f1dbddbc7d5f4cc4eb"
+    },
+    "source-companion.json": {
+      "bytes": 3780,
+      "sha256": "5b365df3ff879a7463ea15cbdf3b5545e96b11d22b20bf47992a77089d8105d8"
+    }
+  },
+  "formatVersion": 1,
+  "freshAppAndTestPackageAbsenceObserved": true,
+  "gameLoginQualified": false,
+  "gameplayQualified": false,
+  "hostGuardTestsFromExactSource": {
+    "command": "python3 -m unittest tests.test_android_handoff -v",
+    "passed": true,
+    "scope": "host admission and receipt guard tests; actual Android execution is independently evidenced by the CI instrumentation receipt",
+    "tests": 10
+  },
+  "inputArtifactMembers": {
+    "handoff-source.tar.gz": {
+      "bytes": 2526908,
+      "sha256": "ba50a85910439494a6cb844431c6db0c4e258620ebe60d96edbda165c410041d"
+    },
+    "ordinary.apk": {
+      "bytes": 765167,
+      "sha256": "c113652fd2134f0164d80fe6b8c9e1998a84ae3579384575c00e0384a914e577"
+    },
+    "probe.apk": {
+      "bytes": 775684,
+      "sha256": "8c30bfa1da89bd71bf2164d5bc2bbfc582ee5f82001e636753b1e244567037c0"
+    },
+    "source-companion.json": {
+      "bytes": 3780,
+      "sha256": "5b365df3ff879a7463ea15cbdf3b5545e96b11d22b20bf47992a77089d8105d8"
+    },
+    "tests.apk": {
+      "bytes": 1764993,
+      "sha256": "1535a47fff2a898f50b95244d7565682bb781e318d6ec9d3047c1f5a012a6ef7"
+    }
+  },
+  "instrumentationMethod": "io.github.russianranger.esteria.core.runtime.install.LocalHandoffRecoveryInstrumentedTest#remoteOwnerDeathRecoversOnlyKnownHandoffs",
+  "instrumentationPassed": true,
+  "instrumentationTestsExecuted": 1,
+  "jobResults": [
+    {
+      "conclusion": "success",
+      "id": 124317830032,
+      "logs_url": null,
+      "name": "handoff",
+      "run_id": 41129893390,
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 2,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+          "number": 3,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Check bounded APK manifest source receipt and fresh-emulator admission",
+          "number": 4,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Enable KVM for the disposable x64 emulator",
+          "number": 5,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Install pinned Android SDK platform and build tools without an NDK",
+          "number": 6,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Build ordinary APK and prove all remote-death fixture surfaces are absent",
+          "number": 7,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Build only the explicit debug remote-process fixture and Android tests",
+          "number": 8,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Preserve the exact complete source snapshot and fixture selection",
+          "number": 9,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Execute five real Binder-death recovery phases and active-owner exclusion",
+          "number": 10,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Retain bounded build diagnostics without private app state",
+          "number": 11,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 12,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 13,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+          "number": 25,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 26,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 27,
+          "status": "completed"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "One explicit debug-only fixture runs on a disposable Android13/API33 x86_64 emulator with targetSdk35, not on Thor or ARM64. Its ordinary sibling APK is independently verified to exclude the service, fixture DEX marker and source asset.",
+    "The real owner process in the private :handoffProbe service self-terminates in five phases. Instrumentation observes each Binder death and a changed owner instance, then production LocalAccountHandoff/LocalHandoffRecovery recognize and recover known states while preserving unknown stages and settings/account siblings.",
+    "Same-JVM and cross-process active-owner duplication are refused; original bytes remain unchanged, release succeeds and subsequent creation/close is preserved. These are actual instrumented assertions, not host-mocked process-death results.",
+    "The main application process is not restarted. A two-byte nonexecuted MZ file only supplies the handoff fixture owned launch-view filename; no WoW executable, Wine, PRoot, local services, account SQL, imported game assets or gameplay runs.",
+    "Build-only evidence keeps androidExecutionQualified false; this additive source-bound runtime receipt alone qualifies the narrower Android x64 handoff recovery path. It does not qualify the production runtime or a playable APK.",
+    "The original source companion, ordinary/probe/test APKs and all bounded evidence members were read in full. The complete archive is byte-identical to locally regenerated canonical Git archive 7c303665:1039 files match exact blobs; gradlew.bat has only the committed six-separator LF-to-CRLF export conversion. All14 source-bound build input identities and the strict committed-source admission guard pass in a separate canonical extraction.",
+    "Only source evidence, fixed scope flags, validated receipt fields and bounded diagnostic identities are exported. No private credentials, handoff record/proof bytes, owner UUIDs or supplied process identifiers are added to this proof."
+  ],
+  "normalClientInitialized": false,
+  "observedAtUtc": "2026-10-30T21:24:59.123307Z",
+  "ordinaryApkExclusion": {
+    "bytes": 765167,
+    "fixtureEnabled": false,
+    "fixtureExcluded": true,
+    "noNativeOrRuntimeProviderPackaged": true,
+    "sha256": "c113652fd2134f0164d80fe6b8c9e1998a84ae3579384575c00e0384a914e577"
+  },
+  "ownedFixtureStopAcknowledged": true,
+  "physicalDeviceQualified": false,
+  "probeApk": {
+    "bytes": 775684,
+    "explicitPrivateRemoteServiceVerified": true,
+    "fixtureEnabled": true,
+    "noNativeOrRuntimeProviderPackaged": true,
+    "sha256": "8c30bfa1da89bd71bf2164d5bc2bbfc582ee5f82001e636753b1e244567037c0"
+  },
+  "productionAppProcessRestartQualified": false,
+  "scope": "independent-android13-x64-handoff-recovery-artifacts-and-complete-source-readback-only",
+  "sourceCompanionIdentity": {
+    "bytes": 3780,
+    "sha256": "5b365df3ff879a7463ea15cbdf3b5545e96b11d22b20bf47992a77089d8105d8"
+  },
+  "sourceFiles": {
+    ".github/workflows/android-handoff-recovery.yml": {
+      "bytes": 8312,
+      "gitBlob": "2e12326b1a551da0b916f374112fc22e6f24713c",
+      "sha256": "659d6f27c62db864598ff1a1fadb42825e828ec0d44c9273a418aab9cc350a70"
+    },
+    "app/build.gradle": {
+      "bytes": 11469,
+      "gitBlob": "2f4efc2bfd3a0a49b9c06f41998a60d94e407e4c",
+      "sha256": "9838cf277575dcc4c06843155b74a0f872c199d1edfe6347b1ac66089aa86360"
+    },
+    "app/handoff-probe.gradle": {
+      "bytes": 5208,
+      "gitBlob": "d0ed5a9ffa99b54f4086e01233ae7e0adf65d2fd",
+      "sha256": "0888888c09c6eb7b5d302e81edaee3e4ceba00909a0b1cb2f0efdb1142ba3115"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/core/runtime/install/LocalHandoffRecoveryInstrumentedTest.java": {
+      "bytes": 11635,
+      "gitBlob": "ac9399a243f437f0dad29c6671d62e41f7070814",
+      "sha256": "e507497b4d463105a48ec9f3e2ec5c1804c6250fa837990dc35df1ebb750fceb"
+    },
+    "app/src/handoffProbe/AndroidManifest.xml": {
+      "bytes": 435,
+      "gitBlob": "0353d98f7e5879395197e8599ef21a5506192d5f",
+      "sha256": "b70ce2b14bbd291040945162d6532170269407efbe4933ad9246589f46324859"
+    },
+    "app/src/handoffProbe/java/io/github/russianranger/esteria/core/runtime/install/HandoffProbeService.java": {
+      "bytes": 11294,
+      "gitBlob": "4098a8f366a4984a22f32fd8e6586fe5e614f122",
+      "sha256": "0d5017a41e10bb930b1d2ec9f9cb303a01eb0e106e478e458f116652948991bd"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ClientLaunchView.java": {
+      "bytes": 22304,
+      "gitBlob": "77eedc1e5cea70f7714a24fc3ecb3c0a9ec02d47",
+      "sha256": "e6e1537377e8b468b096422d40e3ff6c7eb9df9e833d0c9cc876e10ef2eee2b7"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/LocalAccountHandoff.java": {
+      "bytes": 9226,
+      "gitBlob": "1dd37f00980daddccd7e381887d48b3064e118ee",
+      "sha256": "10a367e13e2a2f21c23d7d3d59149382d4b5bbc8f09bc3cfebcdc42c5a03a96f"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/LocalHandoffRecovery.java": {
+      "bytes": 13954,
+      "gitBlob": "d71fea3d3122141abe637871ef2c4d2d95928fcf",
+      "sha256": "b5170bfda38a2dc6cfd7016bd531c1d3d597262141fa63c1f9582c907679e60f"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeFiles.java": {
+      "bytes": 7427,
+      "gitBlob": "b1b6978e9243a4667e43f5cec8365cbe98a920ee",
+      "sha256": "a61d4c4518e63825dcb3013e7af199edddbf92cd8f06eb93547391737635eb64"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeWork.java": {
+      "bytes": 992,
+      "gitBlob": "03261544d87c54886928e285fc8ffcad0cbdae10",
+      "sha256": "36ee9284e1a0bfa4734f979506db964c4d23d3c1699ce94b496906dff0f1b5c0"
+    },
+    "sources.lock.json": {
+      "bytes": 2170,
+      "gitBlob": "1be944f22c6229f31d46767ec9aad4b62052bb9a",
+      "sha256": "dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90"
+    },
+    "tests/test_android_handoff.py": {
+      "bytes": 14712,
+      "gitBlob": "f14a20cdb6089ce850606a96db02051dbfab4536",
+      "sha256": "742306c8cbe80e7a7d3039d56169ee824aff124ec3293cb6b5ab823ccba07eef"
+    },
+    "tools/qualify_android_handoff.py": {
+      "bytes": 24941,
+      "gitBlob": "653471d54320d58fca86bcb9ec0224a361a272c8",
+      "sha256": "9f90c3297691396176b2a32bcb5ffa6912e0682de51cbd6d3224b7249d4d5084"
+    }
+  },
+  "sourceInputs": {
+    ".github/workflows/android-handoff-recovery.yml": {
+      "bytes": 8312,
+      "sha256": "659d6f27c62db864598ff1a1fadb42825e828ec0d44c9273a418aab9cc350a70"
+    },
+    "app/build.gradle": {
+      "bytes": 11469,
+      "sha256": "9838cf277575dcc4c06843155b74a0f872c199d1edfe6347b1ac66089aa86360"
+    },
+    "app/handoff-probe.gradle": {
+      "bytes": 5208,
+      "sha256": "0888888c09c6eb7b5d302e81edaee3e4ceba00909a0b1cb2f0efdb1142ba3115"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/core/runtime/install/LocalHandoffRecoveryInstrumentedTest.java": {
+      "bytes": 11635,
+      "sha256": "e507497b4d463105a48ec9f3e2ec5c1804c6250fa837990dc35df1ebb750fceb"
+    },
+    "app/src/handoffProbe/AndroidManifest.xml": {
+      "bytes": 435,
+      "sha256": "b70ce2b14bbd291040945162d6532170269407efbe4933ad9246589f46324859"
+    },
+    "app/src/handoffProbe/java/io/github/russianranger/esteria/core/runtime/install/HandoffProbeService.java": {
+      "bytes": 11294,
+      "sha256": "0d5017a41e10bb930b1d2ec9f9cb303a01eb0e106e478e458f116652948991bd"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ClientLaunchView.java": {
+      "bytes": 22304,
+      "sha256": "e6e1537377e8b468b096422d40e3ff6c7eb9df9e833d0c9cc876e10ef2eee2b7"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/LocalAccountHandoff.java": {
+      "bytes": 9226,
+      "sha256": "10a367e13e2a2f21c23d7d3d59149382d4b5bbc8f09bc3cfebcdc42c5a03a96f"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/LocalHandoffRecovery.java": {
+      "bytes": 13954,
+      "sha256": "b5170bfda38a2dc6cfd7016bd531c1d3d597262141fa63c1f9582c907679e60f"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeFiles.java": {
+      "bytes": 7427,
+      "sha256": "a61d4c4518e63825dcb3013e7af199edddbf92cd8f06eb93547391737635eb64"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeWork.java": {
+      "bytes": 992,
+      "sha256": "36ee9284e1a0bfa4734f979506db964c4d23d3c1699ce94b496906dff0f1b5c0"
+    },
+    "sources.lock.json": {
+      "bytes": 2170,
+      "sha256": "dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90"
+    },
+    "tests/test_android_handoff.py": {
+      "bytes": 14712,
+      "sha256": "742306c8cbe80e7a7d3039d56169ee824aff124ec3293cb6b5ab823ccba07eef"
+    },
+    "tools/qualify_android_handoff.py": {
+      "bytes": 24941,
+      "sha256": "9f90c3297691396176b2a32bcb5ffa6912e0682de51cbd6d3224b7249d4d5084"
+    }
+  },
+  "sourceRevision": "7c303665e8028aba86a7b87d543b2528d968b1ab",
+  "sqlExecuted": false,
+  "testApk": {
+    "bytes": 1764993,
+    "manifest": {
+      "noNativeOrRuntimeProviderPackaged": true,
+      "package": "io.github.russianranger.esteria.test",
+      "runner": "androidx.test.runner.AndroidJUnitRunner",
+      "targetPackage": "io.github.russianranger.esteria"
+    },
+    "sha256": "1535a47fff2a898f50b95244d7565682bb781e318d6ec9d3047c1f5a012a6ef7"
+  },
+  "thorExecuted": false,
+  "workflow": {
+    "conclusion": "success",
+    "createdAt": "2026-10-30T21:17:18Z",
+    "headBranch": "android/client-server",
+    "headSha": "7c303665e8028aba86a7b87d543b2528d968b1ab",
+    "id": 41129893390,
+    "name": "Android 13 x64 private handoff remote-process recovery",
+    "path": ".github/workflows/android-handoff-recovery.yml",
+    "runAttempt": 1,
+    "runNumber": 1,
+    "status": "completed",
+    "updatedAt": "2026-10-30T21:21:31Z",
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/41129893390"
+  },
+  "worldQualified": false
+}

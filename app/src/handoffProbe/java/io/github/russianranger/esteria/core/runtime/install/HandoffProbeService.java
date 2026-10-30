@@ -12,6 +12,7 @@ import android.os.Messenger;
 import android.os.Process;
 import android.os.RemoteException;
 import io.github.russianranger.esteria.BuildConfig;
+import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -39,7 +40,8 @@ public final class HandoffProbeService extends Service {
     private HandlerThread worker;
     private Messenger messenger;
     private LocalAccountHandoff held;
-    private boolean used;
+    private boolean used,genericUsed;
+    private ExclusiveFileLease genericHeld;
     private JSONObject build;
     @Override public void onCreate() {
         super.onCreate();
@@ -84,19 +86,53 @@ public final class HandoffProbeService extends Service {
                 held.close();held=null;Path directory=caseDirectory(0);
                 response.putBoolean("released",!Files.exists(directory.resolve(LocalAccountHandoff.FILENAME),LinkOption.NOFOLLOW_LINKS)&&
                         !Files.exists(directory.resolve(LocalHandoffRecovery.OWNER),LinkOption.NOFOLLOW_LINKS));
+            }else if(request.what==6) {
+                if(genericUsed||request.arg1!=0||held!=null)throw new IOException("handoff-probe-generic-hold-refused");genericUsed=true;
+                genericHeld=ExclusiveFileLease.acquire(genericDirectory().resolve("owner.lock"),"handoff-probe-generic-busy");
+                Files.setPosixFilePermissions(genericDirectory().resolve("owner.lock"),PosixFilePermissions.fromString("rw-------"));
+                refuseGenericDuplicates(genericDirectory().resolve("owner.lock"));
+                response.putBoolean("sameJvmDuplicateRefused",true);
+            }else if(request.what==7) {
+                if(request.arg1!=0||genericHeld==null||!genericHeld.isValid())throw new IOException("handoff-probe-generic-crash-refused");
+                crash(genericDirectory(),"exclusive-file-lease");
+            }else if(request.what==8) {
+                if(request.arg1!=0||genericHeld!=null)throw new IOException("handoff-probe-generic-check-refused");
+                Path directory=genericDirectory();JSONObject marker=new JSONObject(RuntimeFiles.smallText(directory.resolve("reached.json"),1024));
+                if(!marker.getString("phase").equals("exclusive-file-lease")||marker.getString("instance").equals(instance)||
+                        !marker.getString("sourceRevision").equals(BuildConfig.SOURCE_REVISION))throw new IOException("handoff-probe-generic-marker-refused");
+                boolean acquired=false;
+                try(ExclusiveFileLease lease=ExclusiveFileLease.acquire(directory.resolve("owner.lock"),"handoff-probe-generic-busy")){acquired=true;}
+                catch(IOException busy){if(!"handoff-probe-generic-busy".equals(busy.getMessage()))throw busy;}
+                response.putBoolean("acquired",acquired);
             }else throw new IOException("handoff-probe-command-refused");
         }catch(Exception failure){response.putString("error","handoff-probe-"+failure.getClass().getSimpleName());}
         Message answer=Message.obtain(null,request.what);answer.setData(response);
         try{request.replyTo.send(answer);}catch(RemoteException disconnected){closeHeld();}
         return true;
     }
-    private Path caseDirectory(int index)throws Exception {
-        if(index<0||index>=5)throw new IOException("handoff-probe-case-refused");
+    private Path probeRoot()throws Exception {
         Path root=getFilesDir().getCanonicalFile().toPath().resolve("handoff-recovery-probe");
         if(!root.equals(root.toRealPath())||!RuntimeFiles.smallText(root.resolve(".scope"),256).equals("esteria-handoff-probe-v1\n"+BuildConfig.SOURCE_REVISION+"\n"))
             throw new IOException("handoff-probe-root-refused");
-        Path directory=root.resolve("case-"+index);
+        return root;
+    }
+    private Path caseDirectory(int index)throws Exception {
+        if(index<0||index>=5)throw new IOException("handoff-probe-case-refused");
+        Path directory=probeRoot().resolve("case-"+index);
         if(!directory.equals(directory.toRealPath()))throw new IOException("handoff-probe-case-refused");return directory;
+    }
+    private Path genericDirectory()throws Exception {
+        Path directory=probeRoot().resolve("exclusive-lease-case");
+        if(!directory.equals(directory.toRealPath())||!RuntimeFiles.smallText(directory.resolve("preserved-sibling"),128).equals("PRESERVED_GENERIC_LEASE_SIBLING"))
+            throw new IOException("handoff-probe-generic-directory-refused");return directory;
+    }
+    private static void refuseGenericDuplicates(Path path)throws IOException {
+        for(int index=0;index<32;index++) {
+            boolean refused=false;
+            try(ExclusiveFileLease unexpected=ExclusiveFileLease.acquire(path,"handoff-probe-generic-busy")){}
+            catch(IOException busy){if(!"handoff-probe-generic-busy".equals(busy.getMessage()))throw busy;refused=true;}
+            if(!refused)throw new IOException("handoff-probe-generic-reentry-admitted");
+        }
     }
     private static LocalAccountHandoff create(Path directory,LocalAccountHandoff.CreationCheck check)throws IOException {
         char[] user="EST0123456789ABCD".toCharArray(),password="ABCDEFGHJKLMNPQR".toCharArray();
@@ -145,6 +181,9 @@ public final class HandoffProbeService extends Service {
                 .put("recordAbsentAfterClose",!Files.exists(directory.resolve(LocalAccountHandoff.FILENAME),LinkOption.NOFOLLOW_LINKS))
                 .put("receiptAbsentAfterClose",!Files.exists(directory.resolve(LocalHandoffRecovery.OWNER),LinkOption.NOFOLLOW_LINKS));
     }
-    private void closeHeld(){if(held!=null)try{held.close();held=null;}catch(IOException preserved){/* Fixed private fixture only; qualifier retains failure then force-stops its fresh package. */}}
+    private void closeHeld(){
+        if(held!=null)try{held.close();held=null;}catch(IOException preserved){/* Private fixture cleanup remains owned. */}
+        if(genericHeld!=null)try{genericHeld.close();genericHeld=null;}catch(IOException preserved){/* Private fixture cleanup remains owned. */}
+    }
     @Override public void onDestroy(){if(worker!=null){new Handler(worker.getLooper()).post(this::closeHeld);worker.quitSafely();}super.onDestroy();}
 }

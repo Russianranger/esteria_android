@@ -51,6 +51,7 @@ import io.github.russianranger.esteria.runtime.ClientRuntimeSetup;
 import io.github.russianranger.esteria.runtime.ClientLaunchSetup;
 import io.github.russianranger.esteria.runtime.ShaderToolsSetup;
 import io.github.russianranger.esteria.runtime.TurnipSetup;
+import io.github.russianranger.esteria.runtime.TurnipReadinessProbe;
 import io.github.russianranger.esteria.runtime.ServerDataToolsSetup;
 import io.github.russianranger.esteria.runtime.LocalWorldSetup;
 import io.github.russianranger.esteria.runtime.GameSession;
@@ -92,6 +93,8 @@ public final class SessionService extends Service {
     // children and their data/import leases have confirmed cleanup.
     private volatile LocalWorldSetup.Handle worldSetup;
     private volatile LocalWorldSetup.Result preparedWorld;
+    private volatile TurnipReadinessProbe.Handle graphicsProbe;
+    private volatile Map<String,String> graphicsProbeFacts=Map.of("turnip.probe.result","not-attempted");
     private volatile String activeAction;
     private volatile GameSession.Handle game;
     private volatile GamePresentationPanel.SessionEvents gameEvents;
@@ -531,6 +534,7 @@ public final class SessionService extends Service {
         ServerContentSetup content=new ServerContentSetup(this,root);
         ServerDataToolsSetup tools=new ServerDataToolsSetup(this,root);
         RuntimeSetup wine=new RuntimeSetup(this,root);ShaderToolsSetup shaders=new ShaderToolsSetup(this,root);
+        if(BuildConfig.TURNIP_PACKAGED)verifyGraphics(wine,new TurnipSetup(this,root));
         status="Preparing the local world. Completed data is reused when its inputs match…";
         // Four GiB is a conservative free-space policy for fresh database work,
         // separate from imported/extracted assets; no device footprint claim.
@@ -556,6 +560,56 @@ public final class SessionService extends Service {
         preparedWorld=result;
         getSharedPreferences("world",MODE_PRIVATE).edit().putString("locale",locale).apply();
         status="World data, shaders and the local database are prepared. World entry has not yet been validated.";
+    }
+    /** Explicit setup checks the installed driver before lengthy extraction or
+     * SQL. The Service keeps cleanup ownership and logs through cancellation. */
+    private void verifyGraphics(RuntimeSetup wine,TurnipSetup graphics)throws IOException {
+        graphicsProbeFacts=Map.of("turnip.probe.result","pending","turnip.probe.gameplayQualified","false");
+        TurnipReadinessProbe.Handle owner;
+        try {
+            TurnipReadinessProbe.Handle prior=TurnipReadinessProbe.pendingCleanup(this);
+            if(prior!=null) {
+                graphicsProbe=prior;
+                IOException cleanup=closeGraphicsProbe(prior);
+                if(cleanup!=null)throw cleanup;
+            }
+            owner=TurnipReadinessProbe.begin(this,wine,graphics);
+        }catch(IOException|RuntimeException error){
+            graphicsProbeFacts=Map.of("turnip.probe.result","not-started","turnip.probe.failureStage","admission-or-prior-cleanup",
+                "turnip.probe.gameplayQualified","false");
+            throw error;
+        }
+        graphicsProbe=owner;Throwable operationFailure=null;
+        try {
+            status="Checking graphics support…";
+            rememberLogs(owner.diagnosticLogs());
+            TurnipReadinessProbe.Result result=owner.run((phase,path,completed,total)->keepAwake(),cancelled::get);
+            graphicsProbeFacts=result.diagnosticFacts();
+            log("Graphics component readback passed deviceId="+result.deviceId+" elapsedMillis="+result.elapsedMillis
+                +" driverGeneration="+result.driverGeneration+" wineGeneration="+result.wineGeneration+" gameplayQualified=false");
+        }catch(IOException|RuntimeException error){
+            graphicsProbeFacts=Map.of("turnip.probe.result","failed","turnip.probe.gameplayQualified","false");
+            operationFailure=error;throw error;
+        }finally {
+            IOException cleanup=closeGraphicsProbe(owner);
+            if(cleanup!=null){if(operationFailure!=null)operationFailure.addSuppressed(cleanup);else throw cleanup;}
+        }
+    }
+    private IOException closeGraphicsProbe(TurnipReadinessProbe.Handle owner) {
+        IOException failure=null;boolean interrupted=Thread.interrupted();
+        while(owner.state()!=TurnipReadinessProbe.State.CLOSED) {
+            keepAwake();rememberLogs(owner.diagnosticLogs());
+            try{owner.close(Duration.ofSeconds(2));}
+            catch(IOException error){if(failure==null)failure=error;else if(failure!=error&&failure.getSuppressed().length<15)failure.addSuppressed(error);}
+            catch(RuntimeException error){IOException wrapped=new IOException("Graphics cleanup failed; ownership retained",error);
+                if(failure==null)failure=wrapped;else if(failure.getSuppressed().length<15)failure.addSuppressed(wrapped);}
+            if(owner.state()!=TurnipReadinessProbe.State.CLOSED) {
+                status="Stopping the graphics check safely…";
+                try{Thread.sleep(100);}catch(InterruptedException ignored){interrupted=true;}
+            }
+        }
+        rememberLogs(owner.diagnosticLogs());graphicsProbe=null;
+        if(interrupted)Thread.currentThread().interrupt();return failure;
     }
     /** Keep the foreground operation busy while actual cleanup is outstanding.
      * This worker is the explicit retry mechanism; no new setup/import can run. */
@@ -629,6 +683,10 @@ public final class SessionService extends Service {
         }
         LocalWorldSetup.Handle setupOwner=worldSetup;
         facts.put("worldSetup.retained",Boolean.toString(setupOwner!=null));
+        facts.putAll(graphicsProbeFacts);
+        TurnipReadinessProbe.Handle probeOwner=graphicsProbe;
+        facts.put("turnip.probe.retained",Boolean.toString(probeOwner!=null));
+        if(probeOwner!=null){facts.put("turnip.probe.state",probeOwner.state().name());rememberLogs(probeOwner.diagnosticLogs());}
         if(setupOwner!=null){facts.put("worldSetup.state",setupOwner.state().name());rememberLogs(setupOwner.diagnosticLogs());}
         LocalWorldSetup.Result world=preparedWorld;
         if(world!=null) {

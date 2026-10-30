@@ -1,0 +1,1151 @@
+{
+  "actualGeneratedDescriptorsComparedToPinnedServer": {
+    "architectures": {
+      "ARM64": {
+        "active_player_dwords": 1326,
+        "build": 12340,
+        "class_mask_words": 1,
+        "container_dwords": 574,
+        "container_slots": 254,
+        "player_fields_checked": 215,
+        "quest_slots": 25,
+        "required_mask_dwords": 42,
+        "scope": "update-field layout, not runtime protocol qualification",
+        "status": "passed"
+      },
+      "x64": {
+        "active_player_dwords": 1326,
+        "build": 12340,
+        "class_mask_words": 1,
+        "container_dwords": 574,
+        "container_slots": 254,
+        "player_fields_checked": 215,
+        "quest_slots": 25,
+        "required_mask_dwords": 42,
+        "scope": "update-field layout, not runtime protocol qualification",
+        "status": "passed"
+      }
+    },
+    "protocolVerifier": {
+      "bytes": 6908,
+      "sha256": "2e477e4c03d0a8eb1fe114a366a059ae517bed81b4fb707ace773b89f8f1dcc4"
+    },
+    "serverHeader": {
+      "bytes": 41897,
+      "sha256": "9fbd4a15b47e964294b3f3990d0b1c702cb1dcde05c36d42351eb3669540c50e"
+    },
+    "serverHeaderPath": "src/server/game/Entities/Object/Updates/UpdateFields.h",
+    "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461"
+  },
+  "adrenoQualified": false,
+  "allClientEngineAndRetailSourcesUnchangedSince671": true,
+  "allTwoJobsAndAllStepsCompletedSuccessfully": true,
+  "androidArm64Executed": false,
+  "androidRuntimeQualified": false,
+  "applicationPinAdvanced": false,
+  "applicationRuntimeProviderAdopted": false,
+  "applicationSelectedClientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "applicationSourceLock": {
+    "bytes": 2170,
+    "sha256": "dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90"
+  },
+  "artifactMetadata": [
+    {
+      "bytes": 31785,
+      "createdAt": "2026-10-30T21:06:27Z",
+      "digest": "sha256:97b1b43b59e0a75bb777a2f9d7c1eec27d56a72abd12349824f0b2f1c5d4a215",
+      "expired": false,
+      "expiresAt": "2026-11-29T21:06:26Z",
+      "id": 13012490417,
+      "name": "retail-enabled-x64-evidence-cebfd5c560d8f7224e4798fa57a319f3ff18a31c"
+    },
+    {
+      "bytes": 47269097,
+      "createdAt": "2026-10-30T21:06:15Z",
+      "digest": "sha256:d3a91eae9a6d626e2f4e3a859b12e064e1a280a08976744a0919b85e11dfb20a",
+      "expired": false,
+      "expiresAt": "2026-11-13T22:06:10Z",
+      "id": 13012186547,
+      "name": "retail-enabled-client-ARM64-cebfd5c560d8f7224e4798fa57a319f3ff18a31c"
+    },
+    {
+      "bytes": 70459934,
+      "createdAt": "2026-10-30T21:06:10Z",
+      "digest": "sha256:98d19144430618cb54b26a90602e4f60d857228dd35dbddfd0da73466af94129",
+      "expired": false,
+      "expiresAt": "2026-11-29T22:06:04Z",
+      "id": 13011647546,
+      "name": "retail-enabled-ARM64-complete-sources-cebfd5c560d8f7224e4798fa57a319f3ff18a31c"
+    },
+    {
+      "bytes": 41437600,
+      "createdAt": "2026-10-30T21:06:39Z",
+      "digest": "sha256:509344d47b0299c5a06bdd6b09c83bc13fdbc5c936a6fdc0b0dfa498ab6a8c29",
+      "expired": false,
+      "expiresAt": "2026-11-13T21:06:34Z",
+      "id": 13011632354,
+      "name": "retail-enabled-client-x64-cebfd5c560d8f7224e4798fa57a319f3ff18a31c"
+    },
+    {
+      "bytes": 41902,
+      "createdAt": "2026-10-30T21:06:03Z",
+      "digest": "sha256:b345604e13468d6106cc482ff194970acbf448292343614b622ed00b056724fe",
+      "expired": false,
+      "expiresAt": "2026-11-29T22:06:02Z",
+      "id": 13011138850,
+      "name": "retail-enabled-ARM64-evidence-cebfd5c560d8f7224e4798fa57a319f3ff18a31c"
+    },
+    {
+      "bytes": 70459934,
+      "createdAt": "2026-10-30T21:06:33Z",
+      "digest": "sha256:5a74220059aaac4d80b7b0e4eaee33b83d3416d5d5b6da3dc77c4a5dc756f916",
+      "expired": false,
+      "expiresAt": "2026-11-29T21:06:27Z",
+      "id": 13010968996,
+      "name": "retail-enabled-x64-complete-sources-cebfd5c560d8f7224e4798fa57a319f3ff18a31c"
+    }
+  ],
+  "botAiQualified": false,
+  "changesSincePriorOfflineCascRevision": [
+    ".github/workflows/retail-client.yml",
+    "docs/android-arm64-platform.md"
+  ],
+  "characterPersistenceQualified": false,
+  "clientDevelopmentRevision": "cebfd5c560d8f7224e4798fa57a319f3ff18a31c",
+  "compiledServerQualified": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "independentCompleteX64SourceArchiveReadback": {
+    "all129OuterMembersCrcAndContentRead": true,
+    "allClientArchiveFilesMatchExactGit": true,
+    "allExtractedCascFilesMatchPinnedOriginalArchive": true,
+    "cascRevision": "38a34665624b8775bb875274b36191b21c38d97b",
+    "cascSourceFileBytesVerified": 97054521,
+    "cascSourceFilesVerified": 125,
+    "clientGitBlobBytesVerified": 117480020,
+    "clientGitBlobFilesVerified": 4768,
+    "clientSourceArchive": {
+      "bytes": 121374720,
+      "sha256": "0d7145f708ca4a0bce4ac94c2f87c7eea61a306468dad1335a5a92a0fefddb54"
+    },
+    "formatVersion": 1,
+    "originalCascSourceZip": {
+      "bytes": 23532702,
+      "sha256": "1b59deebc82a4eb75c6e9ef463a7644b22231a4b3b0657ad9afe0dd5205fee3f"
+    },
+    "originalXvid137SourceArchive": {
+      "bytes": 820854,
+      "sha256": "abbdcbd39555691dd1c9b4d08f0a031376a3b211652c0d8b3b8aa9be1303ce2d"
+    },
+    "scope": "independent-complete-source-archive-byte-and-git-readback-only",
+    "sourceArtifactArchive": {
+      "bytes": 70459934,
+      "sha256": "5a74220059aaac4d80b7b0e4eaee33b83d3416d5d5b6da3dc77c4a5dc756f916"
+    },
+    "sourceCompanion": {
+      "bytes": 1134410,
+      "sha256": "36a8408e661f4f94e50ec956d8f99e0c2e5fb937917de0188dad1fa15acdc832"
+    },
+    "sourceRevision": "cebfd5c560d8f7224e4798fa57a319f3ff18a31c",
+    "xvidLicenseFilesRead": [
+      "xvidcore/LICENSE",
+      "xvidcore/vfw/LICENSE"
+    ],
+    "xvidSourceArchiveBytesRead": 3706503,
+    "xvidSourceArchiveFilesRead": 226
+  },
+  "jobResults": [
+    {
+      "conclusion": "success",
+      "id": 124308748038,
+      "logs_url": null,
+      "name": "Retail-enabled full client (x64)",
+      "run_id": 41127220146,
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 2,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Prepare immutable client CascLib and codec source companions before compilation",
+          "number": 3,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Configure full matched client with optional Engine and WoW paths enabled",
+          "number": 4,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Compile complete Retail-enabled client",
+          "number": 5,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Compile and execute real Retail CascLib source tests from the same full configuration",
+          "number": 6,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Validate PE architecture exact source revision and matched protocol limits",
+          "number": 7,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Exercise actual optional-enabled executable entry offline transport and synthetic Grunt",
+          "number": 8,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Recheck every original source byte and record the explicit optional profile",
+          "number": 9,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Preserve bounded optional-build diagnostics",
+          "number": 10,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Preserve complete canonical client CascLib codec sources and original notices",
+          "number": 11,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Preserve separately identified optional binaries and PDBs",
+          "number": 12,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 24,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 25,
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "conclusion": "success",
+      "id": 124308748424,
+      "logs_url": null,
+      "name": "Retail-enabled full client (ARM64)",
+      "run_id": 41127220146,
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 2,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Prepare immutable client CascLib and codec source companions before compilation",
+          "number": 3,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Configure full matched client with optional Engine and WoW paths enabled",
+          "number": 4,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Compile complete Retail-enabled client",
+          "number": 5,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Compile and execute real Retail CascLib source tests from the same full configuration",
+          "number": 6,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Validate PE architecture exact source revision and matched protocol limits",
+          "number": 7,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Exercise actual optional-enabled executable entry offline transport and synthetic Grunt",
+          "number": 8,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Recheck every original source byte and record the explicit optional profile",
+          "number": 9,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Preserve bounded optional-build diagnostics",
+          "number": 10,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Preserve complete canonical client CascLib codec sources and original notices",
+          "number": 11,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Preserve separately identified optional binaries and PDBs",
+          "number": 12,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 24,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 25,
+          "status": "completed"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "This is a separate optional Retail-ON full reconstructed WowClient profile. The existing primary desktop matrix remains Retail-OFF and the application selected client remains 471ee42.",
+    "Both native Windows jobs compile the actual optional Engine and WoW feature branches and execute one real linked RetailAssetTests CTest, plus actual executable entry, offline boundary, loopback transport and synthetic Grunt peer fixtures. They do not run normal game initialization.",
+    "The successful synthetic Grunt authentication is not a compiled Esteria server, real account, version checksum, character selection, world entry or gameplay qualification.",
+    "The two small diagnostic ZIPs and one original x64 complete-source ZIP were fully downloaded and independently read. ARM64 complete-source and both executable/PDB artifacts are API metadata only; their binary bytes were not downloaded or independently PE-parsed locally.",
+    "The full original x64 source artifact was read with bounded streams, verified against exact Git blobs and original pinned CascLib/Xvid archive identities, then its reproducible 70 MB transport ZIP was removed. No source claim depends on a partial archive download.",
+    "Both diagnostic profiles bind the identical source-inputs companion SHA256; the independently validated complete source transport was the x64 artifact only.",
+    "Generated client descriptors from both actual builds independently match 215 player update fields and approved 254/25/32 limits against the pinned server header. This validates layout rather than the remaining runtime protocol.",
+    "Local Retail storage tests use synthetic metadata fixtures, not actual Retail/Forever game assets. No unavailable client data, appearance catalog, map, shader or gameplay content is fabricated.",
+    "The Windows x64 existing prebuilt codec is not claimed rebuild-equivalent to the preserved original upstream Xvid source. Complete original archives, source-owned adaptations and existing notices are retained separately from binaries."
+  ],
+  "normalClientInitialized": false,
+  "observedAtUtc": "2026-10-30T21:20:53.928657Z",
+  "optionalProfileBasedOnClientRevision": "671db06afd85fe2f6116b9fd59f5abf3170e2ef2",
+  "realRetailContentQualified": false,
+  "repository": "Russianranger/wowdecomp_esteria",
+  "scope": "retail-enabled-complete-client-native-windows-build-and-bounded-independent-readback-only",
+  "sourceFiles": {
+    ".github/workflows/retail-client.yml": {
+      "bytes": 16106,
+      "gitBlob": "357174b0da5e1f4cbefbf85156c60a54f115ce13",
+      "sha256": "9ee9e51788bb7126f7e380b6c41770851377b991809ec96a9b408330f3cccdc6"
+    },
+    "CMakeLists.txt": {
+      "bytes": 5927,
+      "gitBlob": "95dee8a89c6f2c2c000a0251dc475b2f50ad1fc1",
+      "sha256": "8d687001cbeee369b97c9270a26855d20b772dffd64d1bbe13604c921001de95"
+    },
+    "Engine/Source/Retail/CascSource.cpp": {
+      "bytes": 42248,
+      "gitBlob": "0056ef977ea06aab44550de6514c228ae2a70856",
+      "sha256": "c915dd4970c35692cc6c25bc8c8fed3500e9bec7cb541a0169270668ef7cc44c"
+    },
+    "Tools/RetailAssets/tests.cpp": {
+      "bytes": 130503,
+      "gitBlob": "bdb82abe89f54dca4d2c679e67c24abf336c9de8",
+      "sha256": "68a613c525a5369324c547a1397a2035be814df3cce07b6a58e60d635e98e608"
+    },
+    "cmake/RetailAssets.cmake": {
+      "bytes": 5705,
+      "gitBlob": "25e500227a0ba7d14ce553ff0e0f02926c5283cd",
+      "sha256": "ad932c56fa02a13ce806d355a1258a7e897087ef37520977dd4599f84f3b96e6"
+    },
+    "docs/android-arm64-platform.md": {
+      "bytes": 39139,
+      "gitBlob": "3b86da371063ec7e1a0e279aea6cbed958aa9846",
+      "sha256": "3bcbf05369baf1aad694c2c51f7d2bf02c2cb72748e8697b220476cd6883cf2c"
+    }
+  },
+  "thorExecuted": false,
+  "windows": {
+    "ARM64": {
+      "actualExecutableFixtures": {
+        "auth-qualification.json": {
+          "cases": [
+            {
+              "exitCode": 0,
+              "mode": "valid",
+              "peerObservedClose": true,
+              "peerVerifiedClientProof": true
+            },
+            {
+              "exitCode": 65,
+              "mode": "bad-server-proof",
+              "peerObservedClose": true,
+              "peerVerifiedClientProof": true
+            },
+            {
+              "exitCode": 65,
+              "mode": "remote-realm",
+              "peerObservedClose": true,
+              "peerVerifiedClientProof": true
+            }
+          ],
+          "compiledServerQualified": false,
+          "gameInitializationStarted": false,
+          "gameplayQualified": false,
+          "privateSessionKeyMatched": true,
+          "qualified": true,
+          "receiptIdentity": {
+            "bytes": 2148,
+            "sha256": "d27efbac27f499c249bc68a4a63e06e86a70dfb2edb29c16404717ed59711ef4"
+          },
+          "scope": "native-windows-reconstructed-grunt-synthetic-peer-only",
+          "versionChecksumQualified": false,
+          "worldEntryQualified": false
+        },
+        "loopback-qualification.json": {
+          "authenticationQualified": false,
+          "checks": {
+            "actualCommandParser": true,
+            "connectionRefsReleased": true,
+            "controlledDisconnectCallbacks": true,
+            "localOfflineEnabled": true,
+            "loopbackConnectCallbacks": true,
+            "networkThreadsJoined": true,
+            "partialFrameHeaders": true,
+            "queuedPacketSendBytes": true,
+            "shortAndExtendedFrameBytes": true,
+            "stopTimeoutRetainsNetwork": true,
+            "streamReadAndSendBytes": true,
+            "twoWorkerThreads": true
+          },
+          "connections": 2,
+          "gameInitializationStarted": false,
+          "qualified": true,
+          "receiptIdentity": {
+            "bytes": 1387,
+            "sha256": "b4b651b367dea583638b556326ef4d91a62ff40919a55c8c41a7ca3a01c73403"
+          },
+          "receivedFrames": 2,
+          "scope": "native-windows-client-loopback-transport-only",
+          "sentFrames": 2
+        },
+        "offline-qualification.json": {
+          "bothLocalOfflineSpellingsPassed": true,
+          "existingReceiptPreserved": true,
+          "gameInitializationStarted": false,
+          "qualified": true,
+          "receiptIdentity": {
+            "bytes": 2337,
+            "sha256": "539d300860f86bd8603e5467dd48ce0d8c255ebe24ef667eba9f675b089163ca"
+          },
+          "remoteAttemptsRejectedPerSpelling": 3,
+          "scope": "native-windows-client-offline-boundaries-only"
+        },
+        "qualification.json": {
+          "actualEntrypointChecks": {
+            "cppUnwind": true,
+            "crtInitialized": true,
+            "fiberReturn": true,
+            "fpControlRead": true,
+            "imageEntryReached": true,
+            "mainFiber": true,
+            "stormAllocator": true
+          },
+          "binaryBytesDownloadedLocally": false,
+          "gameInitializationStarted": false,
+          "imagesRecordedByCI": [
+            {
+              "imports": [
+                "ADVAPI32.dll",
+                "api-ms-win-crt-convert-l1-1-0.dll",
+                "api-ms-win-crt-environment-l1-1-0.dll",
+                "api-ms-win-crt-filesystem-l1-1-0.dll",
+                "api-ms-win-crt-heap-l1-1-0.dll",
+                "api-ms-win-crt-locale-l1-1-0.dll",
+                "api-ms-win-crt-math-l1-1-0.dll",
+                "api-ms-win-crt-multibyte-l1-1-0.dll",
+                "api-ms-win-crt-runtime-l1-1-0.dll",
+                "api-ms-win-crt-stdio-l1-1-0.dll",
+                "api-ms-win-crt-string-l1-1-0.dll",
+                "api-ms-win-crt-time-l1-1-0.dll",
+                "api-ms-win-crt-utility-l1-1-0.dll",
+                "d3d11.dll",
+                "D3DCOMPILER_47.dll",
+                "dbghelp.dll",
+                "DINPUT8.dll",
+                "dxgi.dll",
+                "GDI32.dll",
+                "HID.DLL",
+                "IMM32.dll",
+                "KERNEL32.dll",
+                "MSACM32.dll",
+                "MSVCP140.dll",
+                "ole32.dll",
+                "OPENGL32.dll",
+                "SETUPAPI.dll",
+                "SHELL32.dll",
+                "USER32.dll",
+                "VCRUNTIME140.dll",
+                "VERSION.dll",
+                "WININET.dll",
+                "WINMM.dll",
+                "WS2_32.dll",
+                "XvidDecoder.dll"
+              ],
+              "name": "WowClient64.exe",
+              "pe": {
+                "dll": false,
+                "executable": true,
+                "format": "PE32+",
+                "machine": "0xaa64"
+              },
+              "sha256": "50d742a03ffaa20626bc913a77922516dc11fd9cde3c853c8d8b96732ecfeee5",
+              "size": 22178816
+            },
+            {
+              "imports": [
+                "api-ms-win-crt-heap-l1-1-0.dll",
+                "api-ms-win-crt-math-l1-1-0.dll",
+                "api-ms-win-crt-runtime-l1-1-0.dll",
+                "api-ms-win-crt-stdio-l1-1-0.dll",
+                "api-ms-win-crt-string-l1-1-0.dll",
+                "api-ms-win-crt-utility-l1-1-0.dll",
+                "KERNEL32.dll",
+                "VCRUNTIME140.dll"
+              ],
+              "name": "XvidDecoder.dll",
+              "pe": {
+                "dll": true,
+                "executable": true,
+                "format": "PE32+",
+                "machine": "0xaa64"
+              },
+              "sha256": "c679d81b25351ab2271279b57443ea12bb4569aff8162d151ed31f1f1b6428f0",
+              "size": 566272
+            }
+          ],
+          "qualified": true,
+          "receiptIdentity": {
+            "bytes": 3460,
+            "sha256": "8d2daec220b45e215620443dee0f05b8969e89c751449dd52f1fad5444723d80"
+          },
+          "scope": "native-windows-executable-entry-only",
+          "threeMalformedEntryArgumentsRejected": true
+        }
+      },
+      "actualPinnedCascLibLinked": true,
+      "all36MembersCrcAndSha256ReadBack": true,
+      "allFiveActualFixtureReceiptByteHashesMatchQualificationDocuments": true,
+      "completeSourceCompanionMatchesIndependentlyReadX64Archive": true,
+      "configurationFlagsReadBack": {
+        "WOWCLIENT_CRASH_LOG": "ON",
+        "WOWDECOMP_CONTAINER_SLOTS": "254",
+        "WOWDECOMP_EXTENDED_LIMITS": "ON",
+        "WOWDECOMP_MAX_CLASSES": "32",
+        "WOWDECOMP_QUEST_LOG_SLOTS": "25",
+        "WOWDECOMP_RETAIL_ASSETS": "ON"
+      },
+      "diagnosticArchive": {
+        "bytes": 41902,
+        "sha256": "b345604e13468d6106cc482ff194970acbf448292343614b622ed00b056724fe"
+      },
+      "diagnosticArtifactId": 13011138850,
+      "diagnosticMembers": {
+        "build/retail-client/CMakeCache.txt": {
+          "bytes": 21821,
+          "sha256": "9c390dd5bffc969ce76f6630b26be4dbe5ad5279de7859ef619599ddb52d4479"
+        },
+        "build/retail-client/CMakeFiles/CMakeConfigureLog.yaml": {
+          "bytes": 292353,
+          "sha256": "c9b77b9df1d3b82db31ee8157f487b7dfad4d4c08e9d68528149095c9555ce89"
+        },
+        "build/retail-client/Testing/Temporary/LastTest.log": {
+          "bytes": 1229,
+          "sha256": "fbe931dac0864eb708a81ff2482cb1559360333842acbe0309c60f2cf57beae2"
+        },
+        "build/retail-client/generated/limits/limits.json": {
+          "bytes": 30394,
+          "sha256": "16e5024377ebb4cd59b3fd0acb4029b35ae481f16c7bec39a5a6a9490867c188"
+        },
+        "build/retail-entry/evidence/Esteria-entry-check.json": {
+          "bytes": 319,
+          "sha256": "0ed74a49d5f65c792391394fda20187fe07e9d99d3f6de582db17a07e25d356b"
+        },
+        "build/retail-entry/evidence/auth-0.log": {
+          "bytes": 182,
+          "sha256": "d26d64eb1dd562d0de3396faeb5119954299ae8d3121409837f967a095cf00fe"
+        },
+        "build/retail-entry/evidence/auth-1.log": {
+          "bytes": 162,
+          "sha256": "e50f58880980c8e171b5d7228341f2e92a287bd77f3ddde538e6584d1c7f11b7"
+        },
+        "build/retail-entry/evidence/auth-2.log": {
+          "bytes": 149,
+          "sha256": "e71be4e39895b07653ed18f42905d26710ae91cc883cc3b6c0f00d8f88fd5b8a"
+        },
+        "build/retail-entry/evidence/auth-qualification.json": {
+          "bytes": 2148,
+          "sha256": "d27efbac27f499c249bc68a4a63e06e86a70dfb2edb29c16404717ed59711ef4"
+        },
+        "build/retail-entry/evidence/auth.json": {
+          "bytes": 826,
+          "sha256": "c5ab1d7fa0817702303e101278c9f9eb5af873eaef35394a4b61cbbf3f6ba30d"
+        },
+        "build/retail-entry/evidence/entry.log": {
+          "bytes": 407,
+          "sha256": "b96b6fa855f2203637e447f363cc5a79f36befc94d0a0db2e895ae4f14834deb"
+        },
+        "build/retail-entry/evidence/existing-receipt.log": {
+          "bytes": 414,
+          "sha256": "3262c90dbb9416f55badcbc5170f84e85fb00359f23567c1683b15d475f48859"
+        },
+        "build/retail-entry/evidence/invalid-0.log": {
+          "bytes": 316,
+          "sha256": "3898698dbff0af894341b348b226e11dc5676ebc735ba68cb44a98ad9457cc21"
+        },
+        "build/retail-entry/evidence/invalid-1.log": {
+          "bytes": 316,
+          "sha256": "873b3b89fc406a2e47a0bc5a097f850bcd6392726e0e0689675d907d50733eb0"
+        },
+        "build/retail-entry/evidence/invalid-2.log": {
+          "bytes": 316,
+          "sha256": "232078bbf3951c1850ecc912c90bb22a466738fd167ca94783da51355a07e966"
+        },
+        "build/retail-entry/evidence/last-entry-crash.log": {
+          "bytes": 310,
+          "sha256": "1cb7d6b5d227d5a83f5f9a77a413cb20cbf5f2902a209e7d2778179c1fb6b759"
+        },
+        "build/retail-entry/evidence/loopback-existing.log": {
+          "bytes": 848,
+          "sha256": "63b714841e1988828e4ca39ac800da25508fcf93e6d5856dd60fc072a2c5473d"
+        },
+        "build/retail-entry/evidence/loopback-invalid-0.log": {
+          "bytes": 316,
+          "sha256": "e9794147480a617005f1a6476919c6e9d6931f252717028d9bd43362c23b7838"
+        },
+        "build/retail-entry/evidence/loopback-invalid-1.log": {
+          "bytes": 316,
+          "sha256": "f490123eca5b3fcfde3633c93505b9d028f872b938cd4d45181aaae01951159e"
+        },
+        "build/retail-entry/evidence/loopback-invalid-2.log": {
+          "bytes": 316,
+          "sha256": "94024604a850518d6cf5641e016c1526f241612e80d4048573527ce46595b4f2"
+        },
+        "build/retail-entry/evidence/loopback-invalid-3.log": {
+          "bytes": 316,
+          "sha256": "930c7d1367d530f17b478e49a1b5c1ea71b361a7bce59777c4b5b3802499e4fb"
+        },
+        "build/retail-entry/evidence/loopback-qualification.json": {
+          "bytes": 1387,
+          "sha256": "b4b651b367dea583638b556326ef4d91a62ff40919a55c8c41a7ca3a01c73403"
+        },
+        "build/retail-entry/evidence/loopback.json": {
+          "bytes": 684,
+          "sha256": "bb8f70ff9fda6fb9939fa4046ff613249220e29d3e6bf30bfc6365300197aaee"
+        },
+        "build/retail-entry/evidence/loopback.log": {
+          "bytes": 973,
+          "sha256": "b05f055c4e9cdfa5fb7908d6886289d9cdad36217037818f9ec897d8adf25cd1"
+        },
+        "build/retail-entry/evidence/offline-existing.log": {
+          "bytes": 771,
+          "sha256": "597524f73c07963804f6128b20008b5a2208dc16bdbc0288431ae5afd5dfb210"
+        },
+        "build/retail-entry/evidence/offline-invalid-0.log": {
+          "bytes": 316,
+          "sha256": "66f45417b9b176c775ba3c218fdde6b681286cc2913349ef5aef133a0fb8fc0c"
+        },
+        "build/retail-entry/evidence/offline-invalid-1.log": {
+          "bytes": 316,
+          "sha256": "2325353dfaf7a37c1645801a60dec7b70adad175bc99e7bc374a06c21c83de8e"
+        },
+        "build/retail-entry/evidence/offline-invalid-2.log": {
+          "bytes": 316,
+          "sha256": "d91a820b79afe15095f230018c227015137624fae87f449af3fb5c12986955b8"
+        },
+        "build/retail-entry/evidence/offline-invalid-3.log": {
+          "bytes": 316,
+          "sha256": "5ef3586f342d3434fb81ffce37255231c6e93cfe770e4aed9b1c71756f8e64d9"
+        },
+        "build/retail-entry/evidence/offline-long.json": {
+          "bytes": 548,
+          "sha256": "a0a8ea79b80b80bf73766539cc4d6f64c38c4f599e760b7cf267a7f0f1a027c2"
+        },
+        "build/retail-entry/evidence/offline-long.log": {
+          "bytes": 870,
+          "sha256": "69e3a48e008fe105425d96e7265086ab5a135b3ab3dbdbd5f44485e7d643b2e2"
+        },
+        "build/retail-entry/evidence/offline-qualification.json": {
+          "bytes": 2337,
+          "sha256": "539d300860f86bd8603e5467dd48ce0d8c255ebe24ef667eba9f675b089163ca"
+        },
+        "build/retail-entry/evidence/offline-short.json": {
+          "bytes": 548,
+          "sha256": "a0a8ea79b80b80bf73766539cc4d6f64c38c4f599e760b7cf267a7f0f1a027c2"
+        },
+        "build/retail-entry/evidence/offline-short.log": {
+          "bytes": 870,
+          "sha256": "c9d4c43d9a13d7b0c29d1d674cc6d293449faf32ac1984f348c2f36daf47de9c"
+        },
+        "build/retail-entry/evidence/qualification.json": {
+          "bytes": 3460,
+          "sha256": "8d2daec220b45e215620443dee0f05b8969e89c751449dd52f1fad5444723d80"
+        },
+        "out/retail-evidence/retail-profile.json": {
+          "bytes": 1155,
+          "sha256": "d46547ba8d69367bd6a6cc1cec5452e0a8f43efbd9901fbfb2d071011c0f76df"
+        }
+      },
+      "fullClientRetailOnCompileAndLinkPassed": true,
+      "jobId": 124308748424,
+      "linuxPreloadTripwireUsed": false,
+      "offlineBackendRefusalLogEvents": 3,
+      "retailCtestPassed": 1,
+      "sourceAndFeatureProfile": {
+        "allClientAndCascSourceBytesUnchanged": true,
+        "allCorrespondingSourceCompanionsRetained": true,
+        "androidRuntimeQualified": false,
+        "architecture": "ARM64",
+        "assetFreeEntryAndSyntheticGruntPassed": true,
+        "compiledServerQualified": false,
+        "configurationFlags": {
+          "WOWCLIENT_CRASH_LOG": "ON",
+          "WOWDECOMP_CONTAINER_SLOTS": "254",
+          "WOWDECOMP_EXTENDED_LIMITS": "ON",
+          "WOWDECOMP_MAX_CLASSES": "32",
+          "WOWDECOMP_QUEST_LOG_SLOTS": "25",
+          "WOWDECOMP_RETAIL_ASSETS": "ON"
+        },
+        "formatVersion": 1,
+        "fullClientCompiled": true,
+        "gameplayQualified": false,
+        "normalClientInitialized": false,
+        "peAndProtocolManifestPassed": true,
+        "realRetailContentQualified": false,
+        "realRetailSourceTestsPassed": true,
+        "retailAssetsEnabled": true,
+        "scope": "retail-enabled-full-client-reference-build-and-source-readback",
+        "sourceCompanion": {
+          "bytes": 1134410,
+          "sha256": "36a8408e661f4f94e50ec956d8f99e0c2e5fb937917de0188dad1fa15acdc832"
+        },
+        "sourceRevision": "cebfd5c560d8f7224e4798fa57a319f3ff18a31c",
+        "worldQualified": false,
+        "x64ExistingPrebuiltCodecRebuildEquivalent": false
+      }
+    },
+    "x64": {
+      "actualExecutableFixtures": {
+        "auth-qualification.json": {
+          "cases": [
+            {
+              "exitCode": 0,
+              "mode": "valid",
+              "peerObservedClose": true,
+              "peerVerifiedClientProof": true
+            },
+            {
+              "exitCode": 65,
+              "mode": "bad-server-proof",
+              "peerObservedClose": true,
+              "peerVerifiedClientProof": true
+            },
+            {
+              "exitCode": 65,
+              "mode": "remote-realm",
+              "peerObservedClose": true,
+              "peerVerifiedClientProof": true
+            }
+          ],
+          "compiledServerQualified": false,
+          "gameInitializationStarted": false,
+          "gameplayQualified": false,
+          "privateSessionKeyMatched": true,
+          "qualified": true,
+          "receiptIdentity": {
+            "bytes": 2144,
+            "sha256": "77d30b0fcc000d9a9165e81273a1b43250d93b92e0e7fdfdc10bc5b9bc1395d2"
+          },
+          "scope": "native-windows-reconstructed-grunt-synthetic-peer-only",
+          "versionChecksumQualified": false,
+          "worldEntryQualified": false
+        },
+        "loopback-qualification.json": {
+          "authenticationQualified": false,
+          "checks": {
+            "actualCommandParser": true,
+            "connectionRefsReleased": true,
+            "controlledDisconnectCallbacks": true,
+            "localOfflineEnabled": true,
+            "loopbackConnectCallbacks": true,
+            "networkThreadsJoined": true,
+            "partialFrameHeaders": true,
+            "queuedPacketSendBytes": true,
+            "shortAndExtendedFrameBytes": true,
+            "stopTimeoutRetainsNetwork": true,
+            "streamReadAndSendBytes": true,
+            "twoWorkerThreads": true
+          },
+          "connections": 2,
+          "gameInitializationStarted": false,
+          "qualified": true,
+          "receiptIdentity": {
+            "bytes": 1383,
+            "sha256": "4fe46d6e6aeaa19021c855d1dc1e218d1298be645dfd8b442bdc2f12895f70a4"
+          },
+          "receivedFrames": 2,
+          "scope": "native-windows-client-loopback-transport-only",
+          "sentFrames": 2
+        },
+        "offline-qualification.json": {
+          "bothLocalOfflineSpellingsPassed": true,
+          "existingReceiptPreserved": true,
+          "gameInitializationStarted": false,
+          "qualified": true,
+          "receiptIdentity": {
+            "bytes": 2331,
+            "sha256": "73398f198c61868da73af6c67775a75869ec01e7a2e04a002d252deacef8af61"
+          },
+          "remoteAttemptsRejectedPerSpelling": 3,
+          "scope": "native-windows-client-offline-boundaries-only"
+        },
+        "qualification.json": {
+          "actualEntrypointChecks": {
+            "cppUnwind": true,
+            "crtInitialized": true,
+            "fiberReturn": true,
+            "fpControlRead": true,
+            "imageEntryReached": true,
+            "mainFiber": true,
+            "stormAllocator": true
+          },
+          "binaryBytesDownloadedLocally": false,
+          "gameInitializationStarted": false,
+          "imagesRecordedByCI": [
+            {
+              "imports": [
+                "ADVAPI32.dll",
+                "api-ms-win-crt-convert-l1-1-0.dll",
+                "api-ms-win-crt-environment-l1-1-0.dll",
+                "api-ms-win-crt-filesystem-l1-1-0.dll",
+                "api-ms-win-crt-heap-l1-1-0.dll",
+                "api-ms-win-crt-locale-l1-1-0.dll",
+                "api-ms-win-crt-math-l1-1-0.dll",
+                "api-ms-win-crt-multibyte-l1-1-0.dll",
+                "api-ms-win-crt-runtime-l1-1-0.dll",
+                "api-ms-win-crt-stdio-l1-1-0.dll",
+                "api-ms-win-crt-string-l1-1-0.dll",
+                "api-ms-win-crt-time-l1-1-0.dll",
+                "api-ms-win-crt-utility-l1-1-0.dll",
+                "d3d11.dll",
+                "D3DCOMPILER_47.dll",
+                "dbghelp.dll",
+                "DINPUT8.dll",
+                "dxgi.dll",
+                "GDI32.dll",
+                "HID.DLL",
+                "IMM32.dll",
+                "KERNEL32.dll",
+                "MSACM32.dll",
+                "MSVCP140.dll",
+                "ole32.dll",
+                "OPENGL32.dll",
+                "SETUPAPI.dll",
+                "SHELL32.dll",
+                "USER32.dll",
+                "VCRUNTIME140.dll",
+                "VCRUNTIME140_1.dll",
+                "VERSION.dll",
+                "WININET.dll",
+                "WINMM.dll",
+                "WS2_32.dll",
+                "XvidDecoder.dll"
+              ],
+              "name": "WowClient64.exe",
+              "pe": {
+                "dll": false,
+                "executable": true,
+                "format": "PE32+",
+                "machine": "0x8664"
+              },
+              "sha256": "fde081919d84c8b6d68a090c27ab0d32fb90b82eda9b748e151a4cade6a1fd63",
+              "size": 18782720
+            },
+            {
+              "imports": [
+                "api-ms-win-crt-heap-l1-1-0.dll",
+                "api-ms-win-crt-math-l1-1-0.dll",
+                "api-ms-win-crt-runtime-l1-1-0.dll",
+                "api-ms-win-crt-stdio-l1-1-0.dll",
+                "api-ms-win-crt-string-l1-1-0.dll",
+                "api-ms-win-crt-utility-l1-1-0.dll",
+                "KERNEL32.dll",
+                "VCRUNTIME140.dll"
+              ],
+              "name": "XvidDecoder.dll",
+              "pe": {
+                "dll": true,
+                "executable": true,
+                "format": "PE32+",
+                "machine": "0x8664"
+              },
+              "sha256": "8d44bd8766e21c6474a983504e406b2db61ecdcc8ae6eb6ae4b347f87551ebc7",
+              "size": 769024
+            }
+          ],
+          "qualified": true,
+          "receiptIdentity": {
+            "bytes": 3487,
+            "sha256": "fcacabf3964c13bc38f482709dee299beadac5688ee37db91cdba8089644217e"
+          },
+          "scope": "native-windows-executable-entry-only",
+          "threeMalformedEntryArgumentsRejected": true
+        }
+      },
+      "actualPinnedCascLibLinked": true,
+      "all36MembersCrcAndSha256ReadBack": true,
+      "allFiveActualFixtureReceiptByteHashesMatchQualificationDocuments": true,
+      "completeSourceCompanionMatchesIndependentlyReadX64Archive": true,
+      "configurationFlagsReadBack": {
+        "WOWCLIENT_CRASH_LOG": "ON",
+        "WOWDECOMP_CONTAINER_SLOTS": "254",
+        "WOWDECOMP_EXTENDED_LIMITS": "ON",
+        "WOWDECOMP_MAX_CLASSES": "32",
+        "WOWDECOMP_QUEST_LOG_SLOTS": "25",
+        "WOWDECOMP_RETAIL_ASSETS": "ON"
+      },
+      "diagnosticArchive": {
+        "bytes": 31785,
+        "sha256": "97b1b43b59e0a75bb777a2f9d7c1eec27d56a72abd12349824f0b2f1c5d4a215"
+      },
+      "diagnosticArtifactId": 13012490417,
+      "diagnosticMembers": {
+        "build/retail-client/CMakeCache.txt": {
+          "bytes": 20353,
+          "sha256": "50cea80028154545ff62dd1b2495e1c8f95e9a6412e0ec1559a5f266463c8d91"
+        },
+        "build/retail-client/CMakeFiles/CMakeConfigureLog.yaml": {
+          "bytes": 20999,
+          "sha256": "b3deec5a028df5d04b64af9574e6cdd27969ce1e0594597e7b5578cc2838c82b"
+        },
+        "build/retail-client/Testing/Temporary/LastTest.log": {
+          "bytes": 1249,
+          "sha256": "82b0247ccf9faa7ea39d0b363f9b7cdfc2811a291bea645f84cff3dda778d3d0"
+        },
+        "build/retail-client/generated/limits/limits.json": {
+          "bytes": 30394,
+          "sha256": "16e5024377ebb4cd59b3fd0acb4029b35ae481f16c7bec39a5a6a9490867c188"
+        },
+        "build/retail-entry/evidence/Esteria-entry-check.json": {
+          "bytes": 317,
+          "sha256": "0633e334cbc07d68f6189f8df38ba282530b0f2842201fbdac1e8387400a50ac"
+        },
+        "build/retail-entry/evidence/auth-0.log": {
+          "bytes": 182,
+          "sha256": "d26d64eb1dd562d0de3396faeb5119954299ae8d3121409837f967a095cf00fe"
+        },
+        "build/retail-entry/evidence/auth-1.log": {
+          "bytes": 162,
+          "sha256": "e50f58880980c8e171b5d7228341f2e92a287bd77f3ddde538e6584d1c7f11b7"
+        },
+        "build/retail-entry/evidence/auth-2.log": {
+          "bytes": 149,
+          "sha256": "e71be4e39895b07653ed18f42905d26710ae91cc883cc3b6c0f00d8f88fd5b8a"
+        },
+        "build/retail-entry/evidence/auth-qualification.json": {
+          "bytes": 2144,
+          "sha256": "77d30b0fcc000d9a9165e81273a1b43250d93b92e0e7fdfdc10bc5b9bc1395d2"
+        },
+        "build/retail-entry/evidence/auth.json": {
+          "bytes": 824,
+          "sha256": "e8fe2ba8e5b6bcec7d176cf382aa0b502871f81bd3df17a384d770bf607d1a1c"
+        },
+        "build/retail-entry/evidence/entry.log": {
+          "bytes": 1278,
+          "sha256": "789b89464ef68c5c1359e0518dab19cbcbf9c5384e92b12e6d9df46e0b023ddb"
+        },
+        "build/retail-entry/evidence/existing-receipt.log": {
+          "bytes": 1286,
+          "sha256": "2c5b690021e69f6e03d17a7b906590b28d26b3a5736e072d1786b03bf6163e50"
+        },
+        "build/retail-entry/evidence/invalid-0.log": {
+          "bytes": 1188,
+          "sha256": "57992ca24e36a41c4120bff8e99b776a047df91cc25a73e66abb78461936d724"
+        },
+        "build/retail-entry/evidence/invalid-1.log": {
+          "bytes": 1188,
+          "sha256": "57992ca24e36a41c4120bff8e99b776a047df91cc25a73e66abb78461936d724"
+        },
+        "build/retail-entry/evidence/invalid-2.log": {
+          "bytes": 1188,
+          "sha256": "57992ca24e36a41c4120bff8e99b776a047df91cc25a73e66abb78461936d724"
+        },
+        "build/retail-entry/evidence/last-entry-crash.log": {
+          "bytes": 1168,
+          "sha256": "23e19922aaad079d20fa65d0c0e3f9febeb8abaedd36f4e40f92aecb136e28bc"
+        },
+        "build/retail-entry/evidence/loopback-existing.log": {
+          "bytes": 1720,
+          "sha256": "e447be3e6caca4edb7859476f2f173a3c6d8073ca715d6f0011de83628d87db2"
+        },
+        "build/retail-entry/evidence/loopback-invalid-0.log": {
+          "bytes": 1188,
+          "sha256": "57992ca24e36a41c4120bff8e99b776a047df91cc25a73e66abb78461936d724"
+        },
+        "build/retail-entry/evidence/loopback-invalid-1.log": {
+          "bytes": 1188,
+          "sha256": "57992ca24e36a41c4120bff8e99b776a047df91cc25a73e66abb78461936d724"
+        },
+        "build/retail-entry/evidence/loopback-invalid-2.log": {
+          "bytes": 1188,
+          "sha256": "57992ca24e36a41c4120bff8e99b776a047df91cc25a73e66abb78461936d724"
+        },
+        "build/retail-entry/evidence/loopback-invalid-3.log": {
+          "bytes": 1188,
+          "sha256": "57992ca24e36a41c4120bff8e99b776a047df91cc25a73e66abb78461936d724"
+        },
+        "build/retail-entry/evidence/loopback-qualification.json": {
+          "bytes": 1383,
+          "sha256": "4fe46d6e6aeaa19021c855d1dc1e218d1298be645dfd8b442bdc2f12895f70a4"
+        },
+        "build/retail-entry/evidence/loopback.json": {
+          "bytes": 682,
+          "sha256": "4600a6b4a0b163c2719e0051e202d00d5174b5537b8029d8982887931cfc21e5"
+        },
+        "build/retail-entry/evidence/loopback.log": {
+          "bytes": 1844,
+          "sha256": "fdaca7c48624a59e802e16428a3f3ea318562c63ac12a442ca66cac690d9f126"
+        },
+        "build/retail-entry/evidence/offline-existing.log": {
+          "bytes": 1643,
+          "sha256": "9a678afe8d2dcfd1d089a294eead995c0d9a801cd8450f624a9f5a6328fee902"
+        },
+        "build/retail-entry/evidence/offline-invalid-0.log": {
+          "bytes": 1188,
+          "sha256": "57992ca24e36a41c4120bff8e99b776a047df91cc25a73e66abb78461936d724"
+        },
+        "build/retail-entry/evidence/offline-invalid-1.log": {
+          "bytes": 1188,
+          "sha256": "57992ca24e36a41c4120bff8e99b776a047df91cc25a73e66abb78461936d724"
+        },
+        "build/retail-entry/evidence/offline-invalid-2.log": {
+          "bytes": 1188,
+          "sha256": "57992ca24e36a41c4120bff8e99b776a047df91cc25a73e66abb78461936d724"
+        },
+        "build/retail-entry/evidence/offline-invalid-3.log": {
+          "bytes": 1188,
+          "sha256": "57992ca24e36a41c4120bff8e99b776a047df91cc25a73e66abb78461936d724"
+        },
+        "build/retail-entry/evidence/offline-long.json": {
+          "bytes": 546,
+          "sha256": "3b0900bf889c887c48d712aad66846813e4beebb6071a3eeba3a0e22e04b71de"
+        },
+        "build/retail-entry/evidence/offline-long.log": {
+          "bytes": 1741,
+          "sha256": "e7ff7a1b877b913ad12f42bc2f957e4ac2da50804914407deb5def9d8095b271"
+        },
+        "build/retail-entry/evidence/offline-qualification.json": {
+          "bytes": 2331,
+          "sha256": "73398f198c61868da73af6c67775a75869ec01e7a2e04a002d252deacef8af61"
+        },
+        "build/retail-entry/evidence/offline-short.json": {
+          "bytes": 546,
+          "sha256": "3b0900bf889c887c48d712aad66846813e4beebb6071a3eeba3a0e22e04b71de"
+        },
+        "build/retail-entry/evidence/offline-short.log": {
+          "bytes": 1741,
+          "sha256": "e7ff7a1b877b913ad12f42bc2f957e4ac2da50804914407deb5def9d8095b271"
+        },
+        "build/retail-entry/evidence/qualification.json": {
+          "bytes": 3487,
+          "sha256": "fcacabf3964c13bc38f482709dee299beadac5688ee37db91cdba8089644217e"
+        },
+        "out/retail-evidence/retail-profile.json": {
+          "bytes": 1153,
+          "sha256": "b5cdf0d2d6bfa046d631482b815ceb7bab2fc4a461654a11132b8a8311fcae09"
+        }
+      },
+      "fullClientRetailOnCompileAndLinkPassed": true,
+      "jobId": 124308748038,
+      "linuxPreloadTripwireUsed": false,
+      "offlineBackendRefusalLogEvents": 3,
+      "retailCtestPassed": 1,
+      "sourceAndFeatureProfile": {
+        "allClientAndCascSourceBytesUnchanged": true,
+        "allCorrespondingSourceCompanionsRetained": true,
+        "androidRuntimeQualified": false,
+        "architecture": "x64",
+        "assetFreeEntryAndSyntheticGruntPassed": true,
+        "compiledServerQualified": false,
+        "configurationFlags": {
+          "WOWCLIENT_CRASH_LOG": "ON",
+          "WOWDECOMP_CONTAINER_SLOTS": "254",
+          "WOWDECOMP_EXTENDED_LIMITS": "ON",
+          "WOWDECOMP_MAX_CLASSES": "32",
+          "WOWDECOMP_QUEST_LOG_SLOTS": "25",
+          "WOWDECOMP_RETAIL_ASSETS": "ON"
+        },
+        "formatVersion": 1,
+        "fullClientCompiled": true,
+        "gameplayQualified": false,
+        "normalClientInitialized": false,
+        "peAndProtocolManifestPassed": true,
+        "realRetailContentQualified": false,
+        "realRetailSourceTestsPassed": true,
+        "retailAssetsEnabled": true,
+        "scope": "retail-enabled-full-client-reference-build-and-source-readback",
+        "sourceCompanion": {
+          "bytes": 1134410,
+          "sha256": "36a8408e661f4f94e50ec956d8f99e0c2e5fb937917de0188dad1fa15acdc832"
+        },
+        "sourceRevision": "cebfd5c560d8f7224e4798fa57a319f3ff18a31c",
+        "worldQualified": false,
+        "x64ExistingPrebuiltCodecRebuildEquivalent": false
+      }
+    }
+  },
+  "workflow": {
+    "conclusion": "success",
+    "createdAt": "2026-10-30T20:56:58Z",
+    "headBranch": "android/arm64-port",
+    "headSha": "cebfd5c560d8f7224e4798fa57a319f3ff18a31c",
+    "id": 41127220146,
+    "name": "Retail-enabled complete reconstructed client",
+    "path": ".github/workflows/retail-client.yml",
+    "runAttempt": 1,
+    "runNumber": 3,
+    "status": "completed",
+    "updatedAt": "2026-10-30T21:06:44Z",
+    "url": "https://github.com/Russianranger/wowdecomp_esteria/actions/runs/41127220146"
+  },
+  "worldQualified": false
+}

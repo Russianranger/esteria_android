@@ -1,0 +1,198 @@
+{
+  "actualNamesOnlyReproduction": {
+    "actualGameAssetsRead": false,
+    "clientAndServerEffectiveLocale": "enUS",
+    "correctAvailableEnUsProviderOrdersMatch": true,
+    "mpqDecoded": false,
+    "originalPinnedShaderExplicitLocale": "deDE",
+    "originalPinnedShaderOmittedWinningProviders": [
+      "Data/enUS/patch-enUS-z.MPQ",
+      "Data/enUS/patch-enUS.MPQ",
+      "Data/enUS/locale-enUS.MPQ",
+      "Data/enUS/speech-enUS.MPQ"
+    ],
+    "requestedUnavailableLocale": "deDE",
+    "shaderGenerated": false
+  },
+  "actualWorldDataPrepared": false,
+  "androidGuestExecuted": false,
+  "appBehavior": {
+    "caseInsensitiveRegularArchiveAvailability": true,
+    "effectiveLocalePassedToOlderPinnedShaderHelper": true,
+    "missingLocaleRefusesRootOnlySetup": true,
+    "requestedAndEffectiveLocaleRetainedSeparately": true,
+    "sameImportGenerationStillRequired": true,
+    "serverAndShaderEffectiveLocaleCheckedBeforeSql": true,
+    "sourceReceiptFormatsAndApplicationClient471PinUnchanged": true,
+    "sourceTwelveLocaleAvailabilityRotation": true,
+    "winningUnsupportedEnCnEnTwRefused": true
+  },
+  "dateUtc": "2026-10-30",
+  "deviceTestCandidate": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "hostCoreFixture": {
+    "availableEnUsAndRuRuUnavailableDeDeFallbackCovered": true,
+    "changedImportAndEffectiveSelectionRefused": true,
+    "commandLog": {
+      "bytes": 797,
+      "sha256": "09f47070c98501ccc50ed527b795ac27bd5f0d08c097aee5e9a1ef68ee445826"
+    },
+    "gameAssetsDecoded": false,
+    "maximumHeapMiB": 32,
+    "passed": true,
+    "task": ":core:shaderRunPlanTest",
+    "unsupportedAliasAndSymlinkAndCaseCollisionRefusalsCovered": true
+  },
+  "importRoute": {
+    "estimatedJavaMetadataMaximumBytes": 16777216,
+    "heapLimitRaised": false,
+    "largeLooseWorldStreamingInventoryImplemented": false,
+    "newPackedServerDataFormatIntroduced": false,
+    "recommended": "MPQ base and client patches plus small matched DBC/continuation overlay; generate world data later",
+    "strictSevenManifestKeysUnchanged": true,
+    "wholeServerNamespaceReplacementUnchanged": true
+  },
+  "integrationHead": "7c303665e8028aba86a7b87d543b2528d968b1ab",
+  "jointSdkAndOwnerQualification": {
+    "actionableTasks": 61,
+    "apkAssembled": false,
+    "lintPassed": true,
+    "mainAndAndroidTestJavaCompiled": true,
+    "receipt": {
+      "bytes": 7604,
+      "sha256": "56720d6b7b0c1b91e61f27fb98da408c9a4cc526810bc454b3435f215af6218a"
+    },
+    "seconds": 87,
+    "sourceSnapshotExact": false
+  },
+  "normalClientCommonMainExecuted": false,
+  "physicalThorTestRequested": false,
+  "proposedReusableClientImplementation": {
+    "applicationProviderRepinned": false,
+    "clientBranchHead": "cebfd5c560d8f7224e4798fa57a319f3ff18a31c",
+    "errors": 0,
+    "failures": 0,
+    "log": {
+      "bytes": 4865,
+      "sha256": "bcf728a066f3f5a2e1ea4a8775bb4c313fc0eff9602069f5a546f68b1849454f"
+    },
+    "optionalActualGlslangAbsent": true,
+    "passed": 30,
+    "selectedClientRebuiltHere": false,
+    "skipped": 1,
+    "sourceFiles": {
+      "Tools/VulkanShaders/README.md": {
+        "bytes": 9044,
+        "sha256": "04371020d56c05260d2f4859c0b36b92ad77d3979be2855684529628065ed907"
+      },
+      "Tools/VulkanShaders/bls/archive.py": {
+        "bytes": 15843,
+        "sha256": "0d82ac31199b5e392b42c84e8fd7e01e7538daa3569ff17c96c9e8df3deb591f"
+      },
+      "Tools/VulkanShaders/tests/test_archive.py": {
+        "bytes": 11650,
+        "sha256": "a30265c484144d263f42d01ee1f0c00cc8dd65c3e56df178de0476acd1d81b43"
+      }
+    },
+    "sourceRotationIncludesEnCnEnTw": true,
+    "syntheticMpqWinnerAndGermanLocaleHashReadsExecuted": true,
+    "testsCommand": "python3 -m unittest discover -s Tools/VulkanShaders/tests -v",
+    "testsRun": 31,
+    "winningAliasHashLocaleRemainsUnsupported": true,
+    "workingTreeImplementation": true
+  },
+  "scope": "host-source-and-provider-locale-correction-without-game-assets",
+  "selectedClientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "selectedClientSourceGitBlobs": {
+    "CMakeLists.txt": {
+      "bytes": 5927,
+      "sha256": "8d687001cbeee369b97c9270a26855d20b772dffd64d1bbe13604c921001de95"
+    },
+    "Engine/Source/FrameXML/LoadXML.cpp": {
+      "bytes": 30754,
+      "sha256": "419c97c6c81dce4e1a6f8d3f6c8a449d09fedee201098481a139899cdc082f29"
+    },
+    "Engine/Source/Os/Win64/OsFile.cpp": {
+      "bytes": 8097,
+      "sha256": "4b69f9e644df845514a0eec2aaf5ddfc26c7cd6bbd5147ca12a57a65cf0aafe5"
+    },
+    "WoW/Source/Client.cpp": {
+      "bytes": 73746,
+      "sha256": "1c656a2432cfb6aa485c8d56a973d604147b37ead064b19e2a5322b71fa91787"
+    },
+    "WoW/Source/Glue/CGlueMgr.cpp": {
+      "bytes": 85290,
+      "sha256": "4fa2e6f819cc727e0a113a3d69b48389e562842b14394427054766fba1da1b34"
+    },
+    "WoW/Source/WowServices/PatchFiles.cpp": {
+      "bytes": 3013,
+      "sha256": "17934d9b0078f2ef99ffd5d649417c182c21994f9f06ce22f557319a7035eccd"
+    }
+  },
+  "selectedShaderProviderFilesMatchExact471GitBlobs": {
+    "__init__.py": {
+      "bytes": 113,
+      "sha256": "123dfa2801174ab77864b01a0b19fc7bf5918c5754ce00415808813440071ce2"
+    },
+    "archive.py": {
+      "bytes": 14233,
+      "sha256": "9494b952ad1431bd58dd2a30ecaac853b08e3dc59aa35490f66074d6a5ef6604"
+    },
+    "dx9ir.py": {
+      "bytes": 14911,
+      "sha256": "fbcd88b95182335dc9d420030f8b216e65597553d990d5bed8d4771c1ea372b1"
+    },
+    "mpq_extract.py": {
+      "bytes": 12465,
+      "sha256": "b0db43564227c85e4aa13cadfcc379b4b0695ee19b6054746d7c9e2657a7b524"
+    }
+  },
+  "shaderCompilerExecutedHere": false,
+  "signatureQualification": {
+    "actualCustomUiSignaturesQualified": false,
+    "actualUserContentSignatureFailureObserved": false,
+    "normalSignaturefileAndGlueFrameTocChecksRemain": true,
+    "signaturePolicyChanged": false,
+    "sourceDefaultDisableSignatureChecks": false
+  },
+  "sourceFiles": {
+    "ASSET-REQUIREMENTS.md": {
+      "bytes": 21761,
+      "sha256": "bf360ef6a533fb1262769391aa01f7dd819fb0bedffaba690f2bd3e9c3def5d2"
+    },
+    "BUILDING.md": {
+      "bytes": 25598,
+      "sha256": "bab82e4950c7f1ecd322aaccbc9b6c86a10433f44b03d1f02e165bfc89974c3e"
+    },
+    "TESTING.md": {
+      "bytes": 18217,
+      "sha256": "8d0a5657d8c433cc83b5f25a574da5894b4a72f38d237823118985d8c7810590"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/LocalWorldSetup.java": {
+      "bytes": 12827,
+      "sha256": "883ac7dfa08f9b7b1ee9db84f37318c51286cfe9c645a74852f508ee6c1cba3c"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDataBinding.java": {
+      "bytes": 19212,
+      "sha256": "ac8ca73e371e5c4790aa907cd7f8dd06bbe84bf94248e64ac07672b1a71b5dba"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ShaderSetup.java": {
+      "bytes": 23336,
+      "sha256": "6263e52f2c4ad4c253dfd2c8a898d2add4acebbc3751b577157b94152d72a88f"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/runtime/GameSessionOwnerTests.java": {
+      "bytes": 31082,
+      "sha256": "ff84202bded32a9993d864e67697db555ccdc43c45ba61a54c2bcc72dac88514"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/ShaderRunPlan.java": {
+      "bytes": 6966,
+      "sha256": "dbd033e5429358266744ae14a285965de5374f793839159e9474c53372ac11be"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/ShaderRunPlanTests.java": {
+      "bytes": 6124,
+      "sha256": "bd327f28fbde403013b94d2ba151a620be68145da6f171a9a8bf00800366d2d9"
+    }
+  },
+  "workingTreeHadUncommittedImplementation": true
+}

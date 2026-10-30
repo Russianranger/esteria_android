@@ -1,0 +1,251 @@
+{
+  "actualApkReadback": {
+    "actualGenericLeaseAndFixtureDexMarkersPresent": true,
+    "privateServiceCompiledAxmlVerified": true,
+    "source15WorkingFileHashesExact": true,
+    "testGenericLeaseCaseDexMarkersPresent": true
+  },
+  "androidExecuted": false,
+  "arm64Qualified": false,
+  "fixtureDesign": {
+    "callerPathPidOrExecutableAuthority": false,
+    "fixedGenericDirectory": "exclusive-lease-case",
+    "genericCaseCommands": [
+      6,
+      7,
+      8
+    ],
+    "genericLeaseFileBytes": 0,
+    "genericUsesActualProductionExclusiveFileLease": true,
+    "ordinaryProductionApkContainsFixture": false,
+    "originalFiveHandoffPhaseBodiesPreserved": true,
+    "sameJvmDuplicateRefusalsPerHeldProcess": 32
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "genericLeaseAndroidRecoveryQualified": false,
+  "gitHead": "7c303665e8028aba86a7b87d543b2528d968b1ab",
+  "historicalFivePhaseAndroidReadbackPreserved": "runtime/evidence/android-handoff-recovery-7c303665-readback.json",
+  "hostGuards": {
+    "exactBooleanAndMissingExtraFieldRefusal": true,
+    "exactBuildInputs": 15,
+    "groupsPassed": 11,
+    "newExclusiveFileLeaseReceiptResults": [
+      "binderDeathObserved",
+      "crossProcessRefusedAfterDuplicates",
+      "crossProcessRefusedAfterReacquire",
+      "leaseReacquiredAfterDeath",
+      "ownerInstanceChanged",
+      "releasedAfterClose",
+      "sameJvmDuplicateRefused",
+      "sameJvmDuplicateRefusedAfterReacquire",
+      "siblingPreserved"
+    ],
+    "ordinaryApkFixtureExcluded": true,
+    "originalHandoffPhaseCasesRequired": 5,
+    "refusalReason": "handoff-build-scope-or-snapshot",
+    "strictUncommittedExecutionAdmissionRefused": true,
+    "totalRemoteOwnerDeathsRequired": 6,
+    "unitTestModule": "tests.test_android_handoff"
+  },
+  "independentSourceReviews": {
+    "debugFixtureServiceAndInstrumentation": "CLEAR: prepared_cache; fixed commands/private paths, source guards, self-kill only retained owner, marker and exclusion checks",
+    "qualifierTestsWorkflowDocumentation": "CLEAR: integration_review; independently reran all eleven host groups"
+  },
+  "localBuildEvidence": {
+    "androidExecutionQualified": false,
+    "arm64Qualified": false,
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "productionRuntimeQualified": false,
+    "scope": "android-x64-handoff-fixture-build-only",
+    "sourceInputs": {
+      ".github/workflows/android-handoff-recovery.yml": {
+        "bytes": 8371,
+        "sha256": "2b78109129bb994a981c3f7ad0db22e3a92b84e1350fd0cd1233fddd6a463948"
+      },
+      "app/build.gradle": {
+        "bytes": 11469,
+        "sha256": "9838cf277575dcc4c06843155b74a0f872c199d1edfe6347b1ac66089aa86360"
+      },
+      "app/handoff-probe.gradle": {
+        "bytes": 5307,
+        "sha256": "50f210b561f12474b03229afe9cb67bf7e1a5a70ac0d4f756a8b81bd2ccb9c60"
+      },
+      "app/src/androidTest/java/io/github/russianranger/esteria/core/runtime/install/LocalHandoffRecoveryInstrumentedTest.java": {
+        "bytes": 14619,
+        "sha256": "bb37092101217822e972db9ca3917c84cdc84bd1c976ec728668c6c4feef93fa"
+      },
+      "app/src/handoffProbe/AndroidManifest.xml": {
+        "bytes": 435,
+        "sha256": "b70ce2b14bbd291040945162d6532170269407efbe4933ad9246589f46324859"
+      },
+      "app/src/handoffProbe/java/io/github/russianranger/esteria/core/runtime/install/HandoffProbeService.java": {
+        "bytes": 14282,
+        "sha256": "f9d59ca2be255dae84c936489f2e6117198d79d20daeb6b17a7cdd4e95a4ab3a"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/ExclusiveFileLease.java": {
+        "bytes": 4211,
+        "sha256": "b550d39bc159a58cc15bd76700650315641bffd34b3810b59154a5b9a04f120b"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ClientLaunchView.java": {
+        "bytes": 22304,
+        "sha256": "e6e1537377e8b468b096422d40e3ff6c7eb9df9e833d0c9cc876e10ef2eee2b7"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/LocalAccountHandoff.java": {
+        "bytes": 9226,
+        "sha256": "10a367e13e2a2f21c23d7d3d59149382d4b5bbc8f09bc3cfebcdc42c5a03a96f"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/LocalHandoffRecovery.java": {
+        "bytes": 13954,
+        "sha256": "b5170bfda38a2dc6cfd7016bd531c1d3d597262141fa63c1f9582c907679e60f"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeFiles.java": {
+        "bytes": 7009,
+        "sha256": "8d9d321cb78c71d5c4e25c34fa4755b1343ab1dd7c32e62bb1c34ae6c606cc5d"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeWork.java": {
+        "bytes": 992,
+        "sha256": "36ee9284e1a0bfa4734f979506db964c4d23d3c1699ce94b496906dff0f1b5c0"
+      },
+      "sources.lock.json": {
+        "bytes": 2170,
+        "sha256": "dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90"
+      },
+      "tests/test_android_handoff.py": {
+        "bytes": 16155,
+        "sha256": "1f545d45cbfab6e8bb37ea9c4a92d478b0e119f3620e3bcd07c62a43262b1545"
+      },
+      "tools/qualify_android_handoff.py": {
+        "bytes": 25676,
+        "sha256": "92ba9a86bb9c1071221dd9c555bf9ebf2f5e3fd13e623e50124abc27172497f0"
+      }
+    },
+    "sourceRevision": "local-uncommitted",
+    "sourceSnapshotExact": false
+  },
+  "nativeClientExecuted": false,
+  "observedAtUtc": "2026-10-30T21:38:32.352635+00:00",
+  "physicalDeviceQualified": false,
+  "productionAppProcessRestartQualified": false,
+  "scope": "host-android-generic-exclusive-file-lease-fixture-build-and-guard-only",
+  "sdkBuilds": {
+    "compileSdk": 35,
+    "default": {
+      "actionableTasks": 43,
+      "apk": {
+        "bytes": 939509,
+        "fixtureEnabled": false,
+        "fixtureExcluded": true,
+        "noNativeOrRuntimeProviderPackaged": true,
+        "sha256": "0ca899bd5c4b2f33075576ca68e105a7f3fa08feff258c81ad268258e22d1b82"
+      },
+      "executedTasks": 7,
+      "gradleLog": {
+        "bytes": 2653,
+        "sha256": "78cd087cdaed8391577089d6d0602382ccc8b3185d5a284024d7a6eb360bcb68"
+      },
+      "result": "BUILD SUCCESSFUL in 11s",
+      "tasks": [
+        ":app:assembleDebug"
+      ]
+    },
+    "defaultAndroidTestJavaAndLintAlsoPassed": "prepared_cache:18s46tasks4executed before explicit profile",
+    "explicitFixture": {
+      "actionableTasks": 80,
+      "androidTestApk": {
+        "bytes": 1826143,
+        "sha256": "fec3cec96a0318a2da21c5b82c3c0496e926ee4c8b04aed2e3e5c34a212713db"
+      },
+      "apk": {
+        "bytes": 939654,
+        "sha256": "2b4f846b0534b3e46eb3099ef815aec934f43bb720a2711e63bca28d77c6b4ae"
+      },
+      "executedTasks": 26,
+      "gradleLog": {
+        "bytes": 4899,
+        "sha256": "cbc4a2bc3b49f394b5be42721501f9ff69c4797e3eb75ec4124171162e059086"
+      },
+      "properties": {
+        "handoffEmulatorTest": true,
+        "nativeBridgeAbi": "x86_64",
+        "nativeRuntimeBridge": false
+      },
+      "result": "BUILD SUCCESSFUL in 26s",
+      "tasks": [
+        ":app:assembleDebug",
+        ":app:assembleDebugAndroidTest",
+        ":app:lintDebug"
+      ]
+    },
+    "targetSdk": 35
+  },
+  "sourceFiles": {
+    ".github/workflows/android-handoff-recovery.yml": {
+      "bytes": 8371,
+      "sha256": "2b78109129bb994a981c3f7ad0db22e3a92b84e1350fd0cd1233fddd6a463948"
+    },
+    "app/build.gradle": {
+      "bytes": 11469,
+      "sha256": "9838cf277575dcc4c06843155b74a0f872c199d1edfe6347b1ac66089aa86360"
+    },
+    "app/handoff-probe.gradle": {
+      "bytes": 5307,
+      "sha256": "50f210b561f12474b03229afe9cb67bf7e1a5a70ac0d4f756a8b81bd2ccb9c60"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/core/runtime/install/LocalHandoffRecoveryInstrumentedTest.java": {
+      "bytes": 14619,
+      "sha256": "bb37092101217822e972db9ca3917c84cdc84bd1c976ec728668c6c4feef93fa"
+    },
+    "app/src/handoffProbe/AndroidManifest.xml": {
+      "bytes": 435,
+      "sha256": "b70ce2b14bbd291040945162d6532170269407efbe4933ad9246589f46324859"
+    },
+    "app/src/handoffProbe/java/io/github/russianranger/esteria/core/runtime/install/HandoffProbeService.java": {
+      "bytes": 14282,
+      "sha256": "f9d59ca2be255dae84c936489f2e6117198d79d20daeb6b17a7cdd4e95a4ab3a"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/ExclusiveFileLease.java": {
+      "bytes": 4211,
+      "sha256": "b550d39bc159a58cc15bd76700650315641bffd34b3810b59154a5b9a04f120b"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ClientLaunchView.java": {
+      "bytes": 22304,
+      "sha256": "e6e1537377e8b468b096422d40e3ff6c7eb9df9e833d0c9cc876e10ef2eee2b7"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/LocalAccountHandoff.java": {
+      "bytes": 9226,
+      "sha256": "10a367e13e2a2f21c23d7d3d59149382d4b5bbc8f09bc3cfebcdc42c5a03a96f"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/LocalHandoffRecovery.java": {
+      "bytes": 13954,
+      "sha256": "b5170bfda38a2dc6cfd7016bd531c1d3d597262141fa63c1f9582c907679e60f"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeFiles.java": {
+      "bytes": 7009,
+      "sha256": "8d9d321cb78c71d5c4e25c34fa4755b1343ab1dd7c32e62bb1c34ae6c606cc5d"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeWork.java": {
+      "bytes": 992,
+      "sha256": "36ee9284e1a0bfa4734f979506db964c4d23d3c1699ce94b496906dff0f1b5c0"
+    },
+    "runtime/client/ANDROID-HANDOFF-QUALIFICATION.md": {
+      "bytes": 4821,
+      "sha256": "87919021457fe52524fa526b9dc5ade7f3f4cabfd667490af756a37ed7e83925"
+    },
+    "sources.lock.json": {
+      "bytes": 2170,
+      "sha256": "dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90"
+    },
+    "tests/test_android_handoff.py": {
+      "bytes": 16155,
+      "sha256": "1f545d45cbfab6e8bb37ea9c4a92d478b0e119f3620e3bcd07c62a43262b1545"
+    },
+    "tools/qualify_android_handoff.py": {
+      "bytes": 25676,
+      "sha256": "92ba9a86bb9c1071221dd9c555bf9ebf2f5e3fd13e623e50124abc27172497f0"
+    }
+  },
+  "sourceSnapshotExact": false,
+  "sqlExecuted": false
+}

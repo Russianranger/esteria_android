@@ -208,3 +208,42 @@ All stores have SQL fallback, so absence is not converted into an invented
 mandatory-file list. Unknown custom tables retain structural-only checks. These
 checks reject incompatible layouts early; they do not qualify rows, SQL overlays,
 world coverage or matched client/custom content. See runtime/server/DBC-PREFLIGHT.md.
+
+## Recommended first input set
+
+Use the complete build 12340 client with its original MPQs and the matching
+Esteria client MPQ stack. Import the folder containing `Wow.exe` and `Data/`.
+Add only the small matched server DBC/continuation overlay through
+`EsteriaServerData/` in `mode=overlay`. Then let **Prepare local world** generate
+maps, vmaps, mmaps, Cameras and Vulkan shaders from that effective client stack.
+This route keeps the many generated world files outside the Java import
+inventory and does not require the user to initialize or administer MySQL.
+
+The 16 MiB limit is an estimated budget for concurrently retained import
+metadata, not a game-data byte limit or a fixed supported file count. Path
+length, provider document IDs, directories, validation maps and resume journals
+all contribute. A few large MPQs can be streamed; tens of thousands of loose
+precomputed world files or folder-MPQ members can exceed the budget before
+copying. The existing `mode=complete` route remains available only within that
+budget. A large loose-world importer with a disk-backed inventory is not
+implemented; splitting a replacement server namespace into sequential packages
+would remove earlier namespace files and is not a workaround.
+
+Select the language actually installed in the client. The app now resolves the
+client reader's twelve-locale availability rotation before invoking its older
+pinned shader tool, retains the requested and effective locales separately and
+requires server data and shaders to use the same effective locale/import.
+The pinned shader tool supports ten locale encodings: a winning `enCN` or
+`enTW` locale is explicitly unsupported, rather than silently selecting a
+different provider stack. This source-level correction is not actual shader
+or world qualification on supplied game data.
+
+The selected client471 build keeps `WOWDECOMP_DISABLE_SIGNATURE_CHECKS=OFF`.
+Its normal startup authenticates `signaturefile`, signed GlueXML/FrameXML TOCs
+and their loaded content. Import/header success does not establish that a
+modified or unsigned winning UI will load. Qualify the actual effective
+`Interface/GlueXML` and `Interface/FrameXML` closure with this exact binary;
+retain original signed UI when no custom UI is required. Missing, corrupt or
+modified signatures can prevent Glue/world UI initialization. No failure on
+the user's unavailable files has been observed, and no signature policy was
+changed by the import or locale work.

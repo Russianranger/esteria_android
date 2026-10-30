@@ -6,10 +6,9 @@ import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
 import io.github.russianranger.esteria.core.runtime.install.FreshServerInstallations;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
 import java.io.IOException;
+import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -40,14 +39,13 @@ public final class LocalWorldSetupOwnerTests {
         final Path root=Files.createTempDirectory("esteria-world-setup-owner-").toRealPath();
         final Path game=Files.createDirectory(root.resolve("game")),work=Files.createDirectory(root.resolve("server-data-work"));
         final Path shaders=Files.createDirectory(root.resolve("shader-work")),state=Files.createDirectory(root.resolve("state"));
-        final FileChannel channel=FileChannel.open(state.resolve(".local-world-setup.lock"),StandardOpenOption.CREATE,StandardOpenOption.WRITE);
-        final FileLock lock=channel.tryLock();
+        ExclusiveFileLease lock=ExclusiveFileLease.acquire(state.resolve(".local-world-setup.lock"),"TEST_ONLY_BUSY");
         final LocalWorldSetup.Handle owner;
         Fixture()throws Exception {
             Constructor<LocalWorldSetup.Handle> constructor=LocalWorldSetup.Handle.class.getDeclaredConstructor(Context.class,Path.class,
                 ServerRuntimeSetup.class,ServerProgramsSetup.class,ServerContentSetup.class,ServerDataToolsSetup.class,RuntimeSetup.class,
-                ShaderToolsSetup.class,String.class,int.class,long.class,FreshServerInstallations.Active.class,FileChannel.class,FileLock.class);
-            constructor.setAccessible(true);owner=constructor.newInstance(null,root,null,null,null,null,null,null,"enUS",1,1L<<30,null,channel,lock);
+                ShaderToolsSetup.class,String.class,int.class,long.class,FreshServerInstallations.Active.class,ExclusiveFileLease.class);
+            constructor.setAccessible(true);owner=constructor.newInstance(null,root,null,null,null,null,null,null,"enUS",1,1L<<30,null,lock);
             check(registry(LocalWorldSetup.class).putIfAbsent(root,owner)==null,"Outer owner registered before children");
         }
         void data()throws Exception {
@@ -58,15 +56,15 @@ public final class LocalWorldSetupOwnerTests {
             registry(ServerDataSetup.class).put(work,data);set(owner,"data",data);
         }
         ShaderSetup.Handle shader(OwnedProcess process)throws Exception {
-            FileChannel channel=FileChannel.open(shaders.resolve(".android-shader-setup.lock"),StandardOpenOption.CREATE,StandardOpenOption.WRITE);FileLock lock=channel.tryLock();
+            ExclusiveFileLease lock=ExclusiveFileLease.acquire(shaders.resolve(".android-shader-setup.lock"),"TEST_ONLY_BUSY");
             Constructor<ShaderSetup.Handle> c=ShaderSetup.Handle.class.getDeclaredConstructor(Context.class,Path.class,Path.class,RuntimeSetup.class,ShaderToolsSetup.class,
-                String.class,Path.class,Path.class,FileChannel.class,FileLock.class);c.setAccessible(true);
-            ShaderSetup.Handle shader=c.newInstance(null,root,shaders,null,null,"enUS",root.resolve("wine"),root.resolve("tools"),channel,lock);
+                String.class,Path.class,Path.class,ExclusiveFileLease.class);c.setAccessible(true);
+            ShaderSetup.Handle shader=c.newInstance(null,root,shaders,null,null,"enUS",root.resolve("wine"),root.resolve("tools"),lock);
             set(shader,"process",process);set(shader,"state",ShaderSetup.State.FAILED);registry(ShaderSetup.class).put(shaders,shader);set(owner,"shaders",shader);return shader;
         }
         @Override public void close()throws Exception {
             if(owner.state()!=LocalWorldSetup.State.CLOSED)try{owner.close(Duration.ofSeconds(1));}catch(IOException ignored){ }
-            channel.close();try(var all=Files.walk(root)){for(Path path:all.sorted(Comparator.reverseOrder()).toArray(Path[]::new))Files.delete(path);}
+            lock.close();try(var all=Files.walk(root)){for(Path path:all.sorted(Comparator.reverseOrder()).toArray(Path[]::new))Files.delete(path);}
         }
     }
     private static void importer(Path game,AtomicInteger scans,boolean admitted)throws IOException {

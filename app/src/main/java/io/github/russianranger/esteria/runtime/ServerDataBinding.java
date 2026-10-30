@@ -28,12 +28,12 @@ import org.json.JSONObject;
  * guest must independently verify every prepared data byte before server launch.
  */
 public final class ServerDataBinding {
-    public final String generation;
+    public final String generation,effectiveLocale;
     public final Path directory;
     private final ServerDataRunPlan plan;
     private final String inputsJson,receiptJson;
-    private ServerDataBinding(ServerDataRunPlan plan,Path directory,String generation,JSONObject inputs,JSONObject receipt)throws IOException {
-        this.plan=plan;this.directory=directory;this.generation=generation;
+    private ServerDataBinding(ServerDataRunPlan plan,Path directory,String generation,JSONObject inputs,JSONObject receipt,String effectiveLocale)throws IOException {
+        this.plan=plan;this.directory=directory;this.generation=generation;this.effectiveLocale=effectiveLocale;
         inputsJson=inputs.toString();receiptJson=receipt.toString();
     }
     /** Deliberately package-private. Only a future source-qualified composed
@@ -82,12 +82,15 @@ public final class ServerDataBinding {
             if(!canonical(importMetadata(plan.game,plan.importGeneration)).equals(canonical(inputs.getJSONObject("importMetadata"))))
                 throw new IOException("Prepared data import ancestry changed");
             JSONObject provider=value.getJSONObject("providerOrder");keys(provider,"effectiveLocale","manifest","wire");
+            Object effective=provider.get("effectiveLocale");
+            if(!(effective instanceof String)||!Set.of("deDE","enGB","enUS","esES","frFR","koKR","zhCN","zhTW","enCN","enTW","esMX","ruRU").contains(effective))
+                throw new IOException("Prepared server provider order has an unsupported effective locale");
             pin(provider.getJSONObject("manifest"),16L<<20);pin(provider.getJSONObject("wire"),16L<<20);
             if(!canonical(identity(selected.resolve("order.json"),16L<<20)).equals(canonical(provider.getJSONObject("manifest")))||
                     !canonical(identity(selected.resolve("order.tsv"),16L<<20)).equals(canonical(provider.getJSONObject("wire"))))
                 throw new IOException("Prepared provider order metadata changed");
             plan.requireInputsUnchanged();
-            return new ServerDataBinding(plan,selected,generation,inputs,receipt.identity);
+            return new ServerDataBinding(plan,selected,generation,inputs,receipt.identity,(String)effective);
         }catch(JSONException error){throw new IOException("Invalid completed server data metadata",error);}
     }
     public void requireUnchanged()throws IOException {

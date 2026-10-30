@@ -7,7 +7,7 @@ candidate has been delivered or requested.
 
 - Application branch: android/client-server; package: io.github.russianranger.esteria.
 - Selected client binary:471ee42faadf4a97a1d0a86989cf1452621f2dc5.
-- Client development branch android/arm64-port:cebfd5c560d8f7224e4798fa57a319f3ff18a31c. The offline fix is671db06; separate full Retail-ON Windows builds41127220146 now pass on ARM64/x64. The application pin remains471.
+- Client development branch android/arm64-port:c8b0ab201f52e18ffaba1e6c55aad6e26c740251. The offline fix is671db06; separate full Retail-ON Windows builds41127220146 and all-five ordinary jobs41127220503 pass. The application pin remains471.
 - Server:f35f04d01689f034778e3474b3c820092f51e461; Eluna:58d7652138887783228b9727bd1fa4e08f00342b; seven exact adaptation patches.
 - App source-lock SHA256:dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90. Archived server-build lock stays5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1.
 - Protocol:254 container slots,25 quests,32 client class capacity; all215 player descriptors match the server. This is layout evidence, not gameplay qualification.
@@ -23,7 +23,7 @@ not qualify Android ARM64, Adreno or Thor.
 | --- | --- | --- |
 | Selected client471 | All five41061576677 jobs pass. | Normal asset-backed CommonMain/world remains untested. |
 | Current matched authentication |41088546780:471/c0e/seven-patch Grunt/SRP,13 checks, persisted session key, loopback realm and clean shutdown. | Stops before normal asset-backed initialization. |
-| Development client671 |41114326028: all five jobs pass, complete Windows ARM64/x64, Linux platform/Retail-CascLib no-network tests, ARM64 Wine entry/codec/Vulkan/FMOD/transport. | Primary Retail OFF; historical synthetic Wine auth harness. App pin unchanged. |
+| Development client671/ceb |41114326028: all five jobs pass, complete Windows ARM64/x64, Linux platform/Retail-CascLib no-network tests, ARM64 Wine entry/codec/Vulkan/FMOD/transport. | Original671 primary Retail OFF. Separate ceb41127220146 completes Retail ON ARM64/x64 with independent source/descriptor readback. App pin unchanged. |
 | Wine public cohort |19 assets and complete original Wine source pass anonymous41098490533; seven consumer pins adopted atomically. | No full Android ARM64 game/Adreno qualification. |
 | Original server/source closure |41051669638 full compile,41078079045 source recovery, all266 source members verified. | Original runtime/source/debug pairs preserved. |
 | Playerbots schema |41076505231: originalb7 helper,52 statements, four-schema reentry/restart; complete source seal41099467799. | Distinct f327 source observation transfers no SQL/AI proof. |
@@ -89,16 +89,16 @@ field-count/packed-stride checks for112 active stores. All have SQL fallback;
 missing/unknown custom rows remain unqualified.55 focused tests and actual pinned
 source regeneration pass; valid v1 preflight reports remain unchanged.
 
-The last broad modified-worktree Python pass ran1344 checks in40.188s:1289 passed,
+The last broad modified-worktree Python pass ran1364 checks in38.597s:1309 passed,
 55 explicit skips, zero failures/errors. Exact tested source identities are
 retained. Host tests/compilation do not establish Android gameplay.
 
 ## Remaining gates
 
-1. Preserve the successful public-input APK evidence; rerun native ARM64 Java SQL/promotion/restart after the typed installation seam.
+1. Native ARM64 typed-coordinator41129893302 passes. Rerun after the new shared lease migration.
 2. Finish actual x64 original dbimport/helper build41119182502, new SQL receipts,
    then finish the disabled private Android four-schema coordinator adapter/provider.
-3. Run Android handoff recovery on the five real remote-process death phases. Keep production cache OFF; hardlink publication remains unqualified.
+3. Preserve actual Android handoff41129893390 success and qualify the new generic lease across Android processes. Keep production cache OFF; hardlink publication remains unqualified.
 4. Import real12340 MPQs and matched Esteria content; generate server data/shaders,
    validate normal login/characters/world/gameplay, persistence and audio. No complete
    base/custom client data is available here. See ASSET-REQUIREMENTS.md.
@@ -123,8 +123,7 @@ receipt and exclusive lease, preserving unknown/changed/linked files. Five actua
 SIGKILL/relaunch phases, cross-JVM exclusion after same-JVM duplicate refusal,
 original57-byte wire/privacy and owner fixtures pass. SDK69 tasks/34s includes
 Core recovery, eight GameSession owner groups, app/AndroidTest compilation and
-lint. Client471 is unchanged; actual Android death/restart and normal login remain
-separate gates. Accounts, passwords and databases are not changed by recovery.
+lint. Client471 is unchanged; Android component death/restart passes separately at7c303665, while normal login remains unqualified. Accounts, passwords and databases are not changed by recovery.
 
 The typed installed-input seam now reuses the production Java/Python setup kernel
 without changing ARM64 admission, helper receipts or the five save-selection
@@ -133,4 +132,30 @@ measurements exist. The exact historical817 MySQL consumer runs only from a full
 verified frozen checkout; current Java changes inherit no historical SQL proof.
 Focused Python/SDK/native-Java compilation checks pass. A debug-only Android
 handoff fixture is excluded from ordinary APKs; actual emulator execution and
-the new native ARM64 regression remain pending after publication.
+native ARM64 regression pass at7c303665. Later shared-lease changes require new runs.
+
+Actual Android13 x64 handoff41129893390 at7c303665 passes five real Binder
+deaths/recreated owners, all active-owner guards and cleanup. Both APK families
+and complete source were independently read and source admission rechecked.
+Android installer/update41129893361 also passes. This establishes component
+recovery/update behavior, not full production/client/database restart or gameplay.
+
+Current complete-profile41129893343 attempt1 stopped on an interrupted public
+NDK HTTP/2 download before compilation; failed-job-only retry is running. The
+source change adds bounded retries for that transport failure; original exact
+NDK/source verification remains mandatory.
+
+A real JVM negative control reproduced a POSIX ownership bug: closing a refused
+duplicate descriptor releases the original process lock while Java reports it
+valid. Core now reserves canonical names before opening lease files; installer,
+importer and app owner migrations pass actual cross-JVM and SDK checks. The new
+explicit-setup graphics component check uses the existing pinned offscreen C
+probe with retained cleanup/logs, and has no GPU/hardware result here. A separate
+locale fix makes shader and data preparation select the same available locale.
+
+Typed Java coordinator41129893302 at7c303665 passes actual native ARM64 four-
+schema SQL, clean promotion, active reseeding refusal, two clean stops and same-
+UUID persistence/restart (30 bot tables/31 updates). The small artifact is fully
+read and all60 compiled project inputs match producer Git. This proof excludes
+the subsequent lease migration, Android, bot AI and gameplay. Reusable client
+shader locale fallback is published separately atc8b0ab2; selected app471 stays.

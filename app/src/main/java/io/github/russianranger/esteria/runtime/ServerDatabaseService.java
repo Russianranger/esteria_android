@@ -1,6 +1,7 @@
 package io.github.russianranger.esteria.runtime;
 
 import android.content.Context;
+import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
 import io.github.russianranger.esteria.core.runtime.SessionSupervisor;
 import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
 import io.github.russianranger.esteria.core.runtime.install.FreshServerInstallations;
@@ -8,13 +9,10 @@ import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
 import io.github.russianranger.esteria.core.runtime.process.ProotLaunch;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.time.Duration;
 import java.util.Arrays;
@@ -49,16 +47,15 @@ public final class ServerDatabaseService {
     }
     public static final class Handle implements SessionSupervisor.Child {
         private final OwnedProcess process;
-        private final FileChannel leaseChannel;
-        private final FileLock lease;
+        private final ExclusiveFileLease lease;
         private final Path guestSession,runtimeGeneration,workDirectory;
         private final FreshServerInstallations.Workspace freshWorkspace;
         private final String operation,version;
         private String instanceUuid;
         private boolean released;
         private final ServiceOperationGuard operations=new ServiceOperationGuard();
-        private Handle(OwnedProcess process,FileChannel channel,FileLock lease,Path session,String operation,String version,Path runtimeGeneration,Path workDirectory,FreshServerInstallations.Workspace workspace) {
-            this.process=process;leaseChannel=channel;this.lease=lease;guestSession=session;this.operation=operation;this.version=version;this.runtimeGeneration=runtimeGeneration;this.workDirectory=workDirectory;freshWorkspace=workspace;
+        private Handle(OwnedProcess process,ExclusiveFileLease lease,Path session,String operation,String version,Path runtimeGeneration,Path workDirectory,FreshServerInstallations.Workspace workspace) {
+            this.process=process;this.lease=lease;guestSession=session;this.operation=operation;this.version=version;this.runtimeGeneration=runtimeGeneration;this.workDirectory=workDirectory;freshWorkspace=workspace;
         }
         @Override public boolean isAlive(){return process.isAlive();}
         @Override public int exitCode(){return process.exitCode();}
@@ -112,7 +109,7 @@ public final class ServerDatabaseService {
             });
         }
         private synchronized void release() throws IOException {
-            if(!released){released=true;try{lease.release();}finally{try{leaseChannel.close();}finally{if(freshWorkspace!=null)freshWorkspace.close();}}}
+            if(!released){lease.close();if(freshWorkspace!=null)freshWorkspace.close();released=true;}
         }
         private void identity(JSONObject receipt,String scope) throws IOException,JSONException {
             String uuid=receipt.getString("uuid");
@@ -179,12 +176,9 @@ public final class ServerDatabaseService {
         Path lockPath=work.resolve(".android-database-setup.lock");
         if(Files.exists(lockPath,LinkOption.NOFOLLOW_LINKS) && !Files.isRegularFile(lockPath,LinkOption.NOFOLLOW_LINKS))
             throw new IOException("Invalid database ownership lock");
-        FileChannel channel=FileChannel.open(lockPath,StandardOpenOption.CREATE,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS);
-        FileLock lock=null;
+        ExclusiveFileLease lease=ExclusiveFileLease.acquire(lockPath,"Database is already in use");
         try {
             Files.setPosixFilePermissions(lockPath,PosixFilePermissions.fromString("rw-------"));
-            try{lock=channel.tryLock();}catch(java.nio.channels.OverlappingFileLockException busy){throw new IOException("Database is already in use",busy);}
-            if(lock==null)throw new IOException("Database is already in use");
             String generation=GuestHelperAssets.install(context,"database-service",
                     GuestHelperAssets.directory(work,"service-helpers"),
                     new HashSet<>(Arrays.asList("mysql_bootstrap.py","mysql_service.py")));
@@ -200,9 +194,9 @@ public final class ServerDatabaseService {
                         if(!child.writeInput("shutdown\n".getBytes(StandardCharsets.US_ASCII),Duration.ofSeconds(1)))
                             throw new IOException("Database shutdown request was not delivered");
                     });
-            return new Handle(process,channel,lock,guestSessions.resolve(operation),operation,runtime.expectedMysqlVersion(),installed,work,workspace);
-        } catch(IOException|RuntimeException error) {
-            try{if(lock!=null)lock.release();}finally{channel.close();}
+            return new Handle(process,lease,guestSessions.resolve(operation),operation,runtime.expectedMysqlVersion(),installed,work,workspace);
+        } catch(IOException|RuntimeException|Error error) {
+            try{lease.close();}catch(IOException close){error.addSuppressed(close);}
             throw error;
         }
     }

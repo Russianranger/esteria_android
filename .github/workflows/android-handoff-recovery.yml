@@ -13,6 +13,7 @@ on:
       - core/src/main/java/**/ClientLaunchView.java
       - core/src/main/java/**/RuntimeFiles.java
       - core/src/main/java/**/RuntimeWork.java
+      - core/src/main/java/**/ExclusiveFileLease.java
       - tools/qualify_android_handoff.py
       - tests/test_android_handoff.py
       - .github/workflows/android-handoff-recovery.yml
@@ -100,7 +101,7 @@ jobs:
               androidExecutionQualified=False,arm64Qualified=False,gameplayQualified=False)
           (root/'source-companion.json').write_text(json.dumps(receipt,sort_keys=True,indent=2)+'\n')
           PY
-      - name: Execute five real Binder-death recovery phases and active-owner exclusion
+      - name: Execute five handoff Binder-death phases and generic file-lease death recovery
         uses: ReactiveCircus/android-emulator-runner@324029e2f414c084d8b15ba075288885e74aef9c # v2.34.0
         with:
           api-level: 33

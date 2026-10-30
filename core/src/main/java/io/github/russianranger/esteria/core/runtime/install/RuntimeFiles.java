@@ -4,8 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.channels.OverlappingFileLockException;
+import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -103,13 +102,11 @@ final class RuntimeFiles {
     }
     static Lock lock(Path root) throws IOException {
         Path file=root.resolve(".lock"); if(Files.exists(file,LinkOption.NOFOLLOW_LINKS)) plain(file);
-        FileChannel channel=FileChannel.open(file,StandardOpenOption.CREATE,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS);
-        try { FileLock lock=channel.tryLock(); require(lock!=null,"Runtime setup is already active"); return new Lock(channel,lock); }
-        catch(IOException | OverlappingFileLockException error) { channel.close(); throw new IOException("Runtime setup is already active",error); }
+        return new Lock(ExclusiveFileLease.acquire(file,"Runtime setup is already active"));
     }
     static final class Lock implements AutoCloseable {
-        final FileChannel channel; final FileLock lock;
-        Lock(FileChannel channel,FileLock lock){this.channel=channel;this.lock=lock;}
-        public void close() throws IOException {try{lock.release();}finally{channel.close();}}
+        final ExclusiveFileLease lock;
+        Lock(ExclusiveFileLease lock){this.lock=lock;}
+        public void close() throws IOException {lock.close();}
     }
 }

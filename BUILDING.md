@@ -359,3 +359,59 @@ and paired debug companions outside the APK and retain them with distribution.
 Only programs/data-tools/content are selected for the complete application; the
 original extractors remain preserved comparison inputs. This gate qualifies
 source/package reproduction, not world entry or a Thor test candidate.
+
+## Preparing the first game-content import
+
+Use MPQs plus a small matched DBC overlay for the initial package. The app's
+**Import client folder/ZIP** checks the complete build 12340 base. **Add custom
+content folder/ZIP** installs client patches at their effective `Data/` or
+`Data/<locale>/` locations and an optional whole replacement server namespace.
+After runtime/dependency setup, **Prepare local world** performs extraction,
+shader preparation and local database setup. Choose the imported client language.
+A missing requested locale uses the client reader's effective fallback; both
+choices remain visible during shader preparation and must match server data.
+
+To prepare only the reserved overlay from authentic matching server files on a
+build host, this example refuses an existing output and leaves source files
+unchanged. It creates no maps, rows or replacement assets:
+
+```sh
+ESTERIA_MATCHED_DATA=/path/to/matched/server-data python3 - <<'PY'
+from pathlib import Path
+import os, shutil
+from runtime.server_data_preflight import parse_server_manifest, check_server_package
+source = Path(os.environ['ESTERIA_MATCHED_DATA'])
+package = Path('out/matched-server-overlay')
+package.mkdir(parents=True, exist_ok=False)
+namespace = package / 'EsteriaServerData'
+payload = namespace / 'data'
+payload.mkdir(parents=True)
+shutil.copy2('config/server-data-inputs.example.properties', namespace / 'manifest.properties')
+for name in ('dbc', 'dbc-continuations'):
+    if (source / name).is_dir():
+        shutil.copytree(source / name, payload / name, symlinks=True)
+selected = parse_server_manifest((namespace / 'manifest.properties').read_bytes())
+print(check_server_package(payload, selected))
+print('Import the folder:', package)
+PY
+```
+
+The example preserves exactly seven manifest fields and `mode=overlay`.
+`clientProviderOrderSha256=none` leaves client matching unverified; only a hash
+of the actual canonical `order.json` for that same effective import can supply
+an exact provider-order binding. Include every continuation that should remain:
+a subsequent server namespace replaces the previous namespace atomically.
+Client MPQs can be added separately through the same custom-content import route.
+
+Do not unpack a complete precomputed world set into this overlay. The existing
+16 MiB metadata budget applies to source enumeration, path validation and
+resume bookkeeping, even when individual files are small. Generated MPQ-based
+world preparation avoids that loose-file import ceiling. Large `mode=complete`
+packages and large folder MPQs remain bounded and may be refused. No Android
+heap limit was raised and no new packed server-data format was introduced.
+
+Client471 uses its original enabled signature checks. A custom package which
+changes protected GlueXML/FrameXML content still needs actual signed-content
+and normal UI initialization qualification with that selected binary. Import
+verification, SRP authentication and successful shader compilation do not
+establish that gate or authorize a silent signature-policy change.

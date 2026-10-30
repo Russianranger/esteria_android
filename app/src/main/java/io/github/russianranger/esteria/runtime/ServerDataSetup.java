@@ -2,6 +2,7 @@ package io.github.russianranger.esteria.runtime;
 
 import android.content.Context;
 import android.os.Looper;
+import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
 import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import io.github.russianranger.esteria.core.runtime.install.ServerDataToolSelection;
@@ -12,7 +13,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -72,45 +72,30 @@ public final class ServerDataSetup {
     /** Real import/setup leases, shared with GameDataImporter and the future
      * playing-session owner. No lease is released while its native child lives. */
     static final class Leases implements AutoCloseable {
-        private final FileChannel setupChannel,importChannel;
-        private final FileLock setup,imported;
+        private final ExclusiveFileLease setup,imported;
         private boolean closed;
-        private Leases(FileChannel setupChannel,FileLock setup,FileChannel importChannel,FileLock imported) {
-            this.setupChannel=setupChannel;this.setup=setup;this.importChannel=importChannel;this.imported=imported;
+        private Leases(ExclusiveFileLease setup,ExclusiveFileLease imported) {
+            this.setup=setup;this.imported=imported;
         }
         @Override public void close()throws IOException {
             if(closed)return;IOException failure=null;
-            try{imported.release();}catch(IOException error){failure=error;}
-            try{importChannel.close();}catch(IOException error){if(failure==null)failure=error;else failure.addSuppressed(error);}
-            try{setup.release();}catch(IOException error){if(failure==null)failure=error;else failure.addSuppressed(error);}
-            try{setupChannel.close();}catch(IOException error){if(failure==null)failure=error;else failure.addSuppressed(error);}
-            closed=true;if(failure!=null)throw failure;
+            try{imported.close();}catch(IOException error){failure=error;}
+            try{setup.close();}catch(IOException error){if(failure==null)failure=error;else failure.addSuppressed(error);}
+            if(failure!=null)throw failure;closed=true;
         }
     }
     static Leases claim(Path work,Path game)throws IOException {
-        FileChannel setupChannel=lockChannel(work.resolve(SETUP_LOCK));FileLock setup=null;
-        FileChannel importChannel=null;FileLock imported=null;
+        ExclusiveFileLease setup=exclusive(work.resolve(SETUP_LOCK),"Another data setup is active");
         try {
-            setup=exclusive(setupChannel,"Another data setup is active");
-            importChannel=lockChannel(game.resolve("import.lock"));
-            imported=exclusive(importChannel,"Import/client data is already in use");
-            return new Leases(setupChannel,setup,importChannel,imported);
-        }catch(IOException|RuntimeException error) {
-            try{if(imported!=null)imported.release();}finally{try{if(importChannel!=null)importChannel.close();}finally{
-                try{if(setup!=null)setup.release();}finally{setupChannel.close();}}}
-            throw error;
+            return new Leases(setup,exclusive(game.resolve("import.lock"),"Import/client data is already in use"));
+        }catch(IOException|RuntimeException|Error error) {
+            try{setup.close();}catch(IOException close){error.addSuppressed(close);}throw error;
         }
     }
-    private static FileChannel lockChannel(Path path)throws IOException {
-        if(Files.exists(path,LinkOption.NOFOLLOW_LINKS)&&(!Files.isRegularFile(path,LinkOption.NOFOLLOW_LINKS)||!path.toRealPath().equals(path)))
-            throw new IOException("Invalid data operation/import lock");
-        FileChannel channel=FileChannel.open(path,StandardOpenOption.CREATE,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS);
-        try{Files.setPosixFilePermissions(path,PosixFilePermissions.fromString("rw-------"));return channel;}
-        catch(IOException|RuntimeException error){channel.close();throw error;}
-    }
-    private static FileLock exclusive(FileChannel channel,String message)throws IOException {
-        try{FileLock lock=channel.tryLock();if(lock==null)throw new IOException(message);return lock;}
-        catch(java.nio.channels.OverlappingFileLockException busy){throw new IOException(message,busy);}
+    private static ExclusiveFileLease exclusive(Path path,String message)throws IOException {
+        ExclusiveFileLease lease=ExclusiveFileLease.acquire(path,message);
+        try{Files.setPosixFilePermissions(path,PosixFilePermissions.fromString("rw-------"));return lease;}
+        catch(IOException|RuntimeException|Error error){try{lease.close();}catch(IOException close){error.addSuppressed(close);}throw error;}
     }
     public static final class Handle implements AutoCloseable {
         private final Context context;
@@ -212,7 +197,7 @@ public final class ServerDataSetup {
                     try{process.stop(permit.remaining());}catch(IOException error){cleanupFailure=error;}
                     if(process.isAlive())throw new IOException("Data native cleanup remains active; setup and import leases retained",cleanupFailure);
                 }
-                try{leases.close();}finally{state=State.CLOSED;OWNERS.remove(work,this);}
+                leases.close();state=State.CLOSED;OWNERS.remove(work,this);
                 throwCleanup();
             }
         }

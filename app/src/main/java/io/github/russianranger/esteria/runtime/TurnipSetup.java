@@ -89,6 +89,7 @@ public final class TurnipSetup {
     public Path current()throws IOException{return new RuntimeInstaller(store).resolveCurrent(plan);}
     public String generation(){return plan.generation;}
     public String archiveSha256(){return plan.archiveSha256;}
+    public RuntimePackagePlan packagePlan(){return plan;}
     public static String guestMount(){return "/esteria-turnip";}
     public static String icdPath(){return "/esteria-turnip/etc/turnip-icd.json";}
     public void requireWineArchive(String actual)throws IOException {

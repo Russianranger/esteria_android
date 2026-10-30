@@ -1,6 +1,7 @@
 package io.github.russianranger.esteria.runtime;
 
 import android.content.Context;
+import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import io.github.russianranger.esteria.core.runtime.install.FreshServerInstallations;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
@@ -8,7 +9,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -76,17 +76,16 @@ public final class ServerDatabaseSetup {
         return prepareWork(context,privateRoot,workspace.directoryFor(privateRoot),runtime,progress,cancelled,processOwner);
     }
     static final class BootstrapLease implements AutoCloseable {
-        private final FileChannel channel;
-        private final FileLock lock;
+        private final ExclusiveFileLease lease;
         private OwnedProcess process;
         private boolean closed;
         private boolean operationActive=true;
-        BootstrapLease(FileChannel channel,FileLock lock){this.channel=channel;this.lock=lock;}
+        BootstrapLease(ExclusiveFileLease lease){this.lease=lease;}
         OwnedProcess process(){return process;}
         @Override public synchronized void close() throws IOException {
             if(closed)return;
             if(process!=null && process.isAlive())throw new IOException("Bootstrap process is still owned; database lease retained");
-            try{lock.release();}finally{try{channel.close();}finally{closed=true;}}
+            lease.close();closed=true;
         }
     }
     // Legacy callers do not return a retained Handle. Keep their process and
@@ -136,19 +135,16 @@ public final class ServerDatabaseSetup {
             RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled,java.util.function.Consumer<BootstrapLease> processOwner) throws IOException {
         Path lockPath=work.resolve(".android-database-setup.lock");
         if(Files.exists(lockPath,LinkOption.NOFOLLOW_LINKS) && !regular(lockPath))throw new IOException("Invalid database operation lock");
-        FileChannel channel=FileChannel.open(lockPath,StandardOpenOption.CREATE,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS);
+        ExclusiveFileLease lease=ExclusiveFileLease.acquire(lockPath,"Database setup is already running");
         BootstrapLease ownership=null;boolean transferred=false,legacyRegistered=false;
         try {
             Files.setPosixFilePermissions(lockPath,PosixFilePermissions.fromString("rw-------"));
-            FileLock lock;
-            try{lock=channel.tryLock();}catch(java.nio.channels.OverlappingFileLockException busy){throw new IOException("Database setup is already running",busy);}
-            if(lock==null)throw new IOException("Database setup is already running");
-            ownership=new BootstrapLease(channel,lock);
+            ownership=new BootstrapLease(lease);
             if(processOwner!=null){processOwner.accept(ownership);transferred=true;}
             else {retainLegacy(work,ownership);legacyRegistered=true;}
             return run(context,privateRoot,work,runtime,progress,cancelled,ownership);
         } finally {
-            if(ownership==null)channel.close();
+            if(ownership==null)lease.close();
             else if(legacyRegistered)finishLegacy(work,ownership);
             else if(!transferred)ownership.close();
         }

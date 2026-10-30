@@ -20,3 +20,23 @@ if (turnipProvider) {
     }
     tasks.named('preBuild').configure { dependsOn verifyTurnip }
 }
+
+// Actual Java owner/lock fault injection only; host stubs never enter an APK.
+def turnipProbeOwnerClasspath = files(providers.provider { android.bootClasspath },
+    providers.provider { tasks.named('compileDebugJavaWithJavac').get().destinationDirectory.get().asFile },
+    project(':core').layout.buildDirectory.dir('classes/java/main'))
+def compileTurnipProbeOwner = tasks.register('compileTurnipProbeOwnerFixture', JavaCompile) {
+    dependsOn 'compileDebugJavaWithJavac', ':core:classes'
+    source file('src/test/java/io/github/russianranger/esteria/runtime/TurnipReadinessOwnerTests.java')
+    source file('src/test/java/android/os/Looper.java')
+    classpath = turnipProbeOwnerClasspath
+    destinationDirectory = layout.buildDirectory.dir('turnipProbeOwnerFixture')
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
+}
+tasks.register('turnipProbeOwnerTest', JavaExec) {
+    dependsOn compileTurnipProbeOwner
+    classpath = files(compileTurnipProbeOwner.flatMap { it.destinationDirectory }) + turnipProbeOwnerClasspath
+    mainClass = 'io.github.russianranger.esteria.runtime.TurnipReadinessOwnerTests'
+    maxHeapSize = '32m'
+}

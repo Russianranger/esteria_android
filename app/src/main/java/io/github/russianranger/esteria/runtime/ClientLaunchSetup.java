@@ -1,6 +1,7 @@
 package io.github.russianranger.esteria.runtime;
 
 import android.content.Context;
+import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
 import io.github.russianranger.esteria.core.importer.GameDataImporter;
 import io.github.russianranger.esteria.core.runtime.install.ClientLaunchView;
 import io.github.russianranger.esteria.core.runtime.install.ClientUiStore;
@@ -8,9 +9,6 @@ import io.github.russianranger.esteria.core.runtime.install.ImportedUiSource;
 import io.github.russianranger.esteria.core.runtime.install.RuntimePackagePlan;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.file.StandardOpenOption;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -100,17 +98,16 @@ public final class ClientLaunchSetup {
      * the playing owner holds it until every client/presentation child is reaped. */
     static final class Lease implements AutoCloseable {
         final Path root,work;
-        private final FileChannel channel;
-        private final FileLock lock;
+        private final ExclusiveFileLease lease;
         private boolean closed;
-        private Lease(Path root,Path work,FileChannel channel,FileLock lock) {
-            this.root=root;this.work=work;this.channel=channel;this.lock=lock;
+        private Lease(Path root,Path work,ExclusiveFileLease lease) {
+            this.root=root;this.work=work;this.lease=lease;
         }
         void require(Path expected)throws IOException {
-            if(closed||!lock.isValid()||!root.equals(expected))throw new IOException("Owned client view lease is unavailable");
+            if(closed||!lease.isValid()||!root.equals(expected))throw new IOException("Owned client view lease is unavailable");
         }
         @Override public void close()throws IOException {
-            if(closed)return;try{lock.release();}finally{channel.close();closed=true;}
+            if(closed)return;lease.close();closed=true;
         }
     }
     static Lease claim(Path root)throws IOException {
@@ -127,15 +124,13 @@ public final class ClientLaunchSetup {
         Path lockPath=work.resolve(".client-launch-setup.lock");
         if(Files.exists(lockPath,LinkOption.NOFOLLOW_LINKS)&&!Files.isRegularFile(lockPath,LinkOption.NOFOLLOW_LINKS))
             throw new IOException("Invalid client setup operation lock");
-        FileChannel channel=FileChannel.open(lockPath,StandardOpenOption.CREATE,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS);
-        FileLock lock=null;
+        ExclusiveFileLease lease=ExclusiveFileLease.acquire(lockPath,"Client view is already owned");
         try {
             Files.setPosixFilePermissions(lockPath,PosixFilePermissions.fromString("rw-------"));
-            try{lock=channel.tryLock();}catch(java.nio.channels.OverlappingFileLockException busy){throw new IOException("Client view is already owned",busy);}
-            if(lock==null)throw new IOException("Client view is already owned");
-            return new Lease(root,work,channel,lock);
-        }catch(IOException|RuntimeException error){try{if(lock!=null)lock.release();}finally{channel.close();}throw error;}
+            return new Lease(root,work,lease);
+        }catch(IOException|RuntimeException|Error error){try{lease.close();}catch(IOException close){error.addSuppressed(close);}throw error;}
     }
+
     static Prepared prepareUnderOwnedLease(Context context,Path root,ClientRuntimeSetup client,Lease lease,
             RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled)throws IOException {
         if(!root.equals(context.getFilesDir().getCanonicalFile().toPath()))throw new IOException("Private canonical client storage required");

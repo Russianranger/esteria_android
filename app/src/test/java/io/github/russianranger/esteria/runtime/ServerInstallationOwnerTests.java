@@ -6,10 +6,9 @@ import io.github.russianranger.esteria.core.runtime.install.RuntimePackagePlan;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
 import io.github.russianranger.esteria.core.runtime.process.ProotLaunch;
 import java.io.IOException;
+import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -69,16 +68,16 @@ public final class ServerInstallationOwnerTests {
             owner=owner(root,attempt,ownerWorkspace);set(owner,"state",ServerInstallationSetup.State.FAILED);
             set(owner,"setupProcessWorkspace",attempt.retainWorkspace());helper=start(helperBackend,root);
             Path lockPath=work.resolve(".android-database-setup.lock");
-            FileChannel channel=FileChannel.open(lockPath,StandardOpenOption.CREATE,StandardOpenOption.WRITE);FileLock lock=channel.tryLock();
+            ExclusiveFileLease lock=ExclusiveFileLease.acquire(lockPath,"TEST_ONLY_BUSY");
             if(phase.equals("bootstrap")) {
-                ServerDatabaseSetup.BootstrapLease bootstrap=new ServerDatabaseSetup.BootstrapLease(channel,lock);
+                ServerDatabaseSetup.BootstrapLease bootstrap=new ServerDatabaseSetup.BootstrapLease(lock);
                 set(bootstrap,"process",helper);set(owner,"bootstrapLease",bootstrap);
             } else {
                 set(owner,"setupProcess",helper);
                 Constructor<ServerDatabaseService.Handle> constructor=ServerDatabaseService.Handle.class.getDeclaredConstructor(OwnedProcess.class,
-                    FileChannel.class,FileLock.class,Path.class,String.class,String.class,Path.class,Path.class,FreshServerInstallations.Workspace.class);
+                    ExclusiveFileLease.class,Path.class,String.class,String.class,Path.class,Path.class,FreshServerInstallations.Workspace.class);
                 constructor.setAccessible(true);
-                Object database=constructor.newInstance(start(databaseBackend,root),channel,lock,root.resolve("fixture-service"),"f".repeat(32),
+                Object database=constructor.newInstance(start(databaseBackend,root),lock,root.resolve("fixture-service"),"f".repeat(32),
                     "8.0.46",root,work,attempt.retainWorkspace());set(owner,"database",database);
             }
             if(phase.equals("installation")) {
@@ -122,8 +121,8 @@ public final class ServerInstallationOwnerTests {
         Backend backend=new Backend(true);OwnedProcess helper=null;
         try {
             Path lockPath=root.resolve(".android-database-setup.lock");
-            FileChannel channel=FileChannel.open(lockPath,StandardOpenOption.CREATE,StandardOpenOption.WRITE);FileLock lock=channel.tryLock();
-            ServerDatabaseSetup.BootstrapLease ownership=new ServerDatabaseSetup.BootstrapLease(channel,lock);
+            ExclusiveFileLease lock=ExclusiveFileLease.acquire(lockPath,"TEST_ONLY_BUSY");
+            ServerDatabaseSetup.BootstrapLease ownership=new ServerDatabaseSetup.BootstrapLease(lock);
             ServerDatabaseSetup.retainLegacy(root,ownership);
             // A concurrent legacy prepare/retry cannot close a lease before its
             // helper is even attached. It must refuse the active operation.
@@ -135,16 +134,13 @@ public final class ServerInstallationOwnerTests {
             try{ServerDatabaseSetup.retryLegacyCleanup(root,Duration.ZERO);throw new AssertionError("Live legacy cleanup must remain pending");}
             catch(IOException expected){check(helper.isAlive(),"Fault fixture must still be cleaning up");}
             check(ServerDatabaseSetup.legacyCleanupPending(root) && lock.isValid(),"Legacy timeout cannot release its registry/file lease");
-            try(FileChannel competing=FileChannel.open(lockPath,StandardOpenOption.WRITE)) {
-                try{FileLock unexpected=competing.tryLock();if(unexpected!=null)unexpected.close();throw new AssertionError("Reseeding/startup must remain excluded");}
-                catch(java.nio.channels.OverlappingFileLockException expected){ }
-            }
+            try{ExclusiveFileLease unexpected=ExclusiveFileLease.acquire(lockPath,"TEST_ONLY_BUSY");unexpected.close();throw new AssertionError("Reseeding/startup must remain excluded");}catch(IOException expected){check("TEST_ONLY_BUSY".equals(expected.getMessage()),"Retained lease refuses before a competing descriptor opens");}
             backend.release.countDown();long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(3);
             while(helper.isAlive() && System.nanoTime()<deadline)Thread.sleep(1);
             check(!helper.isAlive(),"Legacy retained process must settle before retry");
             ServerDatabaseSetup.retryLegacyCleanup(root,Duration.ofSeconds(1));
             check(!ServerDatabaseSetup.legacyCleanupPending(root) && !lock.isValid(),"Known-stopped retry releases only the prior legacy owner");
-            try(FileChannel next=FileChannel.open(lockPath,StandardOpenOption.WRITE);FileLock admitted=next.tryLock()) {
+            try(ExclusiveFileLease admitted=ExclusiveFileLease.acquire(lockPath,"TEST_ONLY_BUSY")) {
                 check(admitted!=null,"A later bootstrap may acquire ownership only after cleanup");
             }
         } finally {

@@ -1,0 +1,36 @@
+{
+  "androidGuestExecuted": false,
+  "canonicalAliasRefusedBeforeOpen": true,
+  "closeReacquireAndInvalidPathPreservationPassed": true,
+  "fixedLeaseCrossJvmExclusionAfter32SameJvmDuplicateRefusals": true,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "gitHead": "7c303665e8028aba86a7b87d543b2528d968b1ab",
+  "hostArchitecture": "x86_64",
+  "javaControlFileLockStillReportedValid": true,
+  "maximumHeapMiB": 32,
+  "negativeControlKernelExclusionLostAfterDuplicateDescriptorClose": true,
+  "observedAtUtc": "2026-10-30T21:21:13.583707+00:00",
+  "scope": "actual Linux JVM POSIX descriptor-close regression and Core runtime exclusive lease",
+  "seconds": 1.1434306979936082,
+  "sourceFiles": {
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/ExclusiveFileLease.java": {
+      "bytes": 4211,
+      "sha256": "b550d39bc159a58cc15bd76700650315641bffd34b3810b59154a5b9a04f120b"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeFiles.java": {
+      "bytes": 7009,
+      "sha256": "8d9d321cb78c71d5c4e25c34fa4755b1343ab1dd7c32e62bb1c34ae6c606cc5d"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeWork.java": {
+      "bytes": 992,
+      "sha256": "36ee9284e1a0bfa4734f979506db964c4d23d3c1699ce94b496906dff0f1b5c0"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/install/RuntimeLeaseTests.java": {
+      "bytes": 5640,
+      "sha256": "fd67cc75953e0657fc44ff1bfdf1a0d2253b028bfc70eeb1c68258c7ea574474"
+    }
+  },
+  "sourceSnapshotExact": false,
+  "stdout": "Runtime lease PASS: actual POSIX negative control, cross-JVM exclusion after32 duplicate refusals, canonical aliases, close/reacquire, foreign/link preservation; host only\n"
+}

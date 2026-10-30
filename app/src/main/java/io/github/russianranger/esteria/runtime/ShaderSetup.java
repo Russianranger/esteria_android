@@ -8,8 +8,7 @@ import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
 import io.github.russianranger.esteria.core.runtime.process.ShaderRunPlan;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
+import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -38,13 +37,13 @@ import org.json.JSONObject;
 public final class ShaderSetup {
     private ShaderSetup() { }
     public static final class Result {
-        public final String generation,importGeneration,clientRevision,locale;
+        public final String generation,importGeneration,clientRevision,requestedLocale,locale;
         public final Path shaders,processLogs;
         public final int outputFiles;
         public final long outputBytes;
         public final boolean cancellationRequested;
         private Result(ShaderRunPlan plan,String generation,Path shaders,Path logs,int files,long bytes,boolean cancelled) {
-            this.generation=generation;importGeneration=plan.importGeneration;clientRevision=plan.clientRevision;locale=plan.locale;
+            this.generation=generation;importGeneration=plan.importGeneration;clientRevision=plan.clientRevision;requestedLocale=plan.requestedLocale;locale=plan.locale;
             this.shaders=shaders;processLogs=logs;outputFiles=files;outputBytes=bytes;cancellationRequested=cancelled;
         }
     }
@@ -67,15 +66,12 @@ public final class ShaderSetup {
         Path lockPath=work.resolve(".android-shader-setup.lock");
         if(Files.exists(lockPath,LinkOption.NOFOLLOW_LINKS)&&!Files.isRegularFile(lockPath,LinkOption.NOFOLLOW_LINKS))
             throw new IOException("Invalid shader setup operation lock");
-        FileChannel channel=FileChannel.open(lockPath,StandardOpenOption.CREATE,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS);
-        FileLock lock=null;
+        ExclusiveFileLease lease=ExclusiveFileLease.acquire(lockPath,"Shader setup is already running");
         try {
             Files.setPosixFilePermissions(lockPath,PosixFilePermissions.fromString("rw-------"));
-            try{lock=channel.tryLock();}catch(java.nio.channels.OverlappingFileLockException busy){throw new IOException("Shader setup is already running",busy);}
-            if(lock==null)throw new IOException("Shader setup is already running");
-            Handle owner=new Handle(context.getApplicationContext(),privateRoot,work,wine,tools,locale,wineRoot,toolsRoot,channel,lock);
+            Handle owner=new Handle(context.getApplicationContext(),privateRoot,work,wine,tools,locale,wineRoot,toolsRoot,lease);
             retain(owner);return owner;
-        } catch(IOException|RuntimeException error){try{if(lock!=null)lock.release();}finally{channel.close();}throw error;}
+        } catch(IOException|RuntimeException|Error error){try{lease.close();}catch(IOException close){error.addSuppressed(close);}throw error;}
     }
     private static void retain(Handle owner)throws IOException {
         if(OWNERS.putIfAbsent(owner.work,owner)!=null)throw new IOException("Shader ownership is already retained");
@@ -106,17 +102,16 @@ public final class ShaderSetup {
         private final RuntimeSetup wine;
         private final ShaderToolsSetup tools;
         private final String locale;
-        private final FileChannel channel;
-        private final FileLock lock;
+        private final ExclusiveFileLease lease;
         private final ServiceOperationGuard operations=new ServiceOperationGuard();
         private volatile State state=State.ALLOCATED;
         private OwnedProcess process;
         private volatile Map<String,Path> diagnosticLogs=Map.of();
         private IOException cleanupFailure;
         private Handle(Context context,Path root,Path work,RuntimeSetup wine,ShaderToolsSetup tools,String locale,
-                Path wineRoot,Path toolsRoot,FileChannel channel,FileLock lock) {
+                Path wineRoot,Path toolsRoot,ExclusiveFileLease lease) {
             this.context=context;this.root=root;this.work=work;this.wine=wine;this.tools=tools;this.locale=locale;
-            this.wineRoot=wineRoot;this.toolsRoot=toolsRoot;this.channel=channel;this.lock=lock;
+            this.wineRoot=wineRoot;this.toolsRoot=toolsRoot;this.lease=lease;
         }
         public State state(){return state;}
         /** Fixed wrapper streams only; retained after failed startup and close. */
@@ -146,6 +141,7 @@ public final class ShaderSetup {
             checkCancelled(cancelled);
             if(!wineRoot.equals(wine.current())||!toolsRoot.equals(tools.current()))throw new IOException("Shader providers changed after allocation");
             ShaderRunPlan plan=new ShaderRunPlan(root.resolve("game"),toolsRoot,work,tools.revision(),locale);
+            if(progress!=null)progress.update("shaders-locale-selected","requested "+plan.requestedLocale+"; effective "+plan.locale,0,-1);
             Path sessions=directories(root,"state/shader-operations");
             Path session=sessions.resolve(UUID.randomUUID().toString().replace("-",""));
             Files.createDirectory(session,PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------")));
@@ -181,7 +177,7 @@ public final class ShaderSetup {
                     try{process.stop(permit.remaining());}catch(IOException failure){error=failure;cleanupFailure=failure;}
                     if(process.isAlive())throw error!=null?error:new IOException("Shader helper remains alive; file lease retained");
                 }
-                try{lock.release();}finally{try{channel.close();}finally{state=State.CLOSED;OWNERS.remove(work,this);}}
+                lease.close();state=State.CLOSED;OWNERS.remove(work,this);
                 if(error!=null)throw error;
             }
         }
@@ -193,14 +189,14 @@ public final class ShaderSetup {
         if(expected==null||!root.equals(context.getFilesDir().getCanonicalFile().toPath()))throw new IOException("Private prepared shaders required");
         tools.requireWineArchive(wine.archiveSha256());
         if(wine.current()==null||tools.current()==null)throw new IOException("Prepared shader providers required");
-        ShaderRunPlan plan=new ShaderRunPlan(root.resolve("game"),tools.current(),root.resolve("state/shader-work"),tools.revision(),expected.locale);
+        ShaderRunPlan plan=new ShaderRunPlan(root.resolve("game"),tools.current(),root.resolve("state/shader-work"),tools.revision(),expected.requestedLocale);
         Result current=validatePrepared(plan,tools.toolManifestSha256(),expected.processLogs,false);
         requireSameSelection(current,expected);return current;
     }
     static void requireSameSelection(Result current,Result expected)throws IOException {
         if(!current.generation.equals(expected.generation)||!current.shaders.equals(expected.shaders)||
                 !current.importGeneration.equals(expected.importGeneration)||!current.clientRevision.equals(expected.clientRevision)||
-                !current.locale.equals(expected.locale)||current.outputFiles!=expected.outputFiles||current.outputBytes!=expected.outputBytes)
+                !current.requestedLocale.equals(expected.requestedLocale)||!current.locale.equals(expected.locale)||current.outputFiles!=expected.outputFiles||current.outputBytes!=expected.outputBytes)
             throw new IOException("Prepared shader selection changed; run local setup again");
     }
     /** Validate the owned helper's completed receipt and metadata, without a full

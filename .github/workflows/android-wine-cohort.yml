@@ -124,7 +124,7 @@ jobs:
       - name: Build pinned Bionic ARM64 PRoot and matching complete source companion
         run: |
           curl --fail --location --retry 2 --max-time 600 https://github.com/Russianranger/uo-android-launcher/releases/download/v0.2.0/runtime-corresponding-sources.tar.gz -o "$RUNNER_TEMP/proot-original-sources.tar.gz"
-          curl --fail --location --retry 2 --max-time 900 https://dl.google.com/android/repository/android-ndk-r28c-linux.zip -o "$RUNNER_TEMP/android-ndk-r28c-linux.zip"
+          curl --fail --location --retry 2 --retry-all-errors --retry-delay 2 --max-time 900 https://dl.google.com/android/repository/android-ndk-r28c-linux.zip -o "$RUNNER_TEMP/android-ndk-r28c-linux.zip"
           python3 tools/build_android_proot.py --sources "$RUNNER_TEMP/proot-original-sources.tar.gz" --ndk-zip "$RUNNER_TEMP/android-ndk-r28c-linux.zip" --work "$RUNNER_TEMP/proot-build"
           python3 tools/verify_android_proot.py --provider "$RUNNER_TEMP/proot-build/provider"
       - name: Install pinned Android command-line tools and complete the already verified NDK

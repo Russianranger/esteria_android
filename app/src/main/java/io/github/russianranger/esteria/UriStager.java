@@ -11,10 +11,7 @@ import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.channels.OverlappingFileLockException;
+import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
 import java.nio.file.attribute.FileTime;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -35,11 +32,8 @@ final class UriStager {
     static Path stage(ContentResolver resolver, Uri uri, Path directory, AtomicBoolean cancelled, Progress progress) throws Exception {
         if (!"content".equals(uri.getScheme())) throw new IOException("Choose an archive through Android's file picker");
         Files.createDirectories(directory);
-        try (FileChannel channel = FileChannel.open(directory.resolve("stage.lock"), StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
-            try (FileLock lock = channel.tryLock()) {
-                if (lock == null) throw new IOException("A previous archive copy is still stopping; retry in a moment");
-                return stageLocked(resolver, uri, directory, cancelled, progress);
-            } catch (OverlappingFileLockException busy) { throw new IOException("A previous archive copy is still stopping; retry in a moment", busy); }
+        try (ExclusiveFileLease lease = ExclusiveFileLease.acquire(directory.resolve("stage.lock"),"A previous archive copy is still stopping; retry in a moment")) {
+            return stageLocked(resolver, uri, directory, cancelled, progress);
         }
     }
     private static Path stageLocked(ContentResolver resolver, Uri uri, Path directory, AtomicBoolean cancelled, Progress progress) throws Exception {

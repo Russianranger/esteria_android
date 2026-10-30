@@ -158,3 +158,21 @@ tasks.register('preparedDataCachePinTest', JavaExec) {
     maxHeapSize = '32m'
 }
 check.dependsOn preparedDataCachePinTest
+
+tasks.register('turnipProbeContractTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.runtime.TurnipProbeContractTests'
+    maxHeapSize = '32m'
+}
+check.dependsOn turnipProbeContractTest
+
+// Actual POSIX descriptor-close regression and competing JVM acquisition.
+tasks.register('runtimeLeaseTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.runtime.install.RuntimeLeaseTests'
+    maxHeapSize = '32m'
+    onlyIf { System.getProperty('os.name') == 'Linux' }
+}
+check.dependsOn runtimeLeaseTest

@@ -63,8 +63,9 @@ def receipt():
         api=33, targetSdk=35, abi='x86_64', buildEvidence=build(),
         cases=[dict(phase=phase, clientRecordBefore=before[0], ownerReceiptBefore=before[1],
             **{flag: True for flag in handoff.CASE_FLAGS}) for phase, before in zip(handoff.PHASES, handoff.BEFORE)],
-        activeOwner={flag: True for flag in handoff.ACTIVE_FLAGS}, remoteOwnerProcessesKilled=5,
-        remoteOwnerProcessesRecreated=5, syntheticClientExecutableNotRun=True,
+        activeOwner={flag: True for flag in handoff.ACTIVE_FLAGS},
+        exclusiveFileLease={flag: True for flag in handoff.EXCLUSIVE_FLAGS}, remoteOwnerProcessesKilled=6,
+        remoteOwnerProcessesRecreated=6, syntheticClientExecutableNotRun=True,
         **{name: False for name in handoff.FALSE_FLAGS})
 
 
@@ -130,6 +131,8 @@ class AndroidHandoff(unittest.TestCase):
     def test_all_five_real_death_phases_active_owner_and_false_scope_are_required(self):
         value = receipt(); result = handoff.validate_receipt(value, 'a'*40, 'emulator-fixture', build())
         self.assertEqual(result['remoteDeathPhasesVerified'], 5)
+        self.assertEqual(result['remoteOwnerProcessDeathsVerified'], 6)
+        self.assertTrue(result['exclusiveFileLeaseDeathRecoveryVerified'])
         for i in range(5):
             for key in ('binderDeathObserved', 'ownerInstanceChanged', 'recovered', 'unknownStagesPreserved', 'siblingsPreserved'):
                 bad = copy.deepcopy(value); bad['cases'][i][key] = False
@@ -146,8 +149,25 @@ class AndroidHandoff(unittest.TestCase):
             with self.subTest(key=key), self.assertRaisesRegex(ValueError, 'overclaim'):
                 handoff.validate_receipt(bad, 'a'*40, 'emulator-fixture', build())
 
+    def test_generic_exclusive_lease_requires_every_exact_true_result(self):
+        value = receipt()
+        for key in handoff.EXCLUSIVE_FLAGS:
+            for operation in ('false', 'number', 'missing'):
+                bad = copy.deepcopy(value)
+                if operation == 'missing': del bad['exclusiveFileLease'][key]
+                else: bad['exclusiveFileLease'][key] = False if operation == 'false' else 1
+                with self.subTest(key=key, operation=operation), self.assertRaisesRegex(ValueError, 'exclusive-file-lease'):
+                    handoff.validate_receipt(bad, 'a'*40, 'emulator-fixture', build())
+        bad = copy.deepcopy(value); bad['exclusiveFileLease']['unexpected'] = True
+        with self.assertRaisesRegex(ValueError, 'exclusive-file-lease'):
+            handoff.validate_receipt(bad, 'a'*40, 'emulator-fixture', build())
+        bad = copy.deepcopy(value); del bad['exclusiveFileLease']
+        with self.assertRaisesRegex(ValueError, 'receipt-identity'):
+            handoff.validate_receipt(bad, 'a'*40, 'emulator-fixture', build())
+
     def test_receipt_rejects_missing_extra_fields_boolean_counts_and_foreign_source(self):
-        for changed in (dict(api=True), dict(remoteOwnerProcessesKilled=4), dict(sourceRevision='b'*40),
+        for changed in (dict(api=True), dict(remoteOwnerProcessesKilled=5), dict(remoteOwnerProcessesRecreated=5),
+                dict(remoteOwnerProcessesKilled=True), dict(remoteOwnerProcessesRecreated=True), dict(sourceRevision='b'*40),
                 dict(fingerprint='foreign'), dict(buildEvidence={}), dict(pid=1234)):
             with self.subTest(changed=changed), self.assertRaises(ValueError):
                 handoff.validate_receipt(dict(receipt(), **changed), 'a'*40, 'emulator-fixture', build())

@@ -2,6 +2,7 @@ package io.github.russianranger.esteria.runtime;
 
 import android.content.Context;
 import android.os.Looper;
+import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
 import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
 import io.github.russianranger.esteria.core.runtime.install.FreshServerInstallations;
 import io.github.russianranger.esteria.core.runtime.install.RuntimePackagePlan;
@@ -11,8 +12,6 @@ import io.github.russianranger.esteria.core.runtime.process.ProotLaunch;
 import io.github.russianranger.esteria.core.runtime.process.WorldConsoleShutdown;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -77,16 +76,13 @@ public final class LocalServerSession {
         Path lockPath=work.resolve(".android-local-server-session.lock");
         if(Files.exists(lockPath,LinkOption.NOFOLLOW_LINKS)&&!Files.isRegularFile(lockPath,LinkOption.NOFOLLOW_LINKS))
             throw new IOException("Invalid server session lock");
-        FileChannel channel=FileChannel.open(lockPath,StandardOpenOption.CREATE,StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS);
-        FileLock lock=null;
+        ExclusiveFileLease lease=ExclusiveFileLease.acquire(lockPath,"Local server session is already owned");
         try {
             Files.setPosixFilePermissions(lockPath,PosixFilePermissions.fromString("rw-------"));
-            try{lock=channel.tryLock();}catch(java.nio.channels.OverlappingFileLockException busy){throw new IOException("Local server session is already owned",busy);}
-            if(lock==null)throw new IOException("Local server session is already owned");
-            Handle owner=new Handle(context.getApplicationContext(),root,work,runtime,programs,content,active,database,data,events,channel,lock);
+            Handle owner=new Handle(context.getApplicationContext(),root,work,runtime,programs,content,active,database,data,events,lease);
             if(OWNERS.putIfAbsent(work,owner)!=null)throw new IOException("Previous local server ownership remains retained");
             return owner;
-        }catch(IOException|RuntimeException error){try{if(lock!=null)lock.release();}finally{channel.close();}throw error;}
+        }catch(IOException|RuntimeException|Error error){try{lease.close();}catch(IOException close){error.addSuppressed(close);}throw error;}
     }
     public static final class Handle implements AutoCloseable {
         private final Context context;
@@ -98,8 +94,7 @@ public final class LocalServerSession {
         private final ServerDatabaseService.Handle database;
         private final ServerDataBinding data;
         private final Events events;
-        private final FileChannel channel;
-        private final FileLock lock;
+        private final ExclusiveFileLease lease;
         private final ServiceOperationGuard operations=new ServiceOperationGuard();
         private final AtomicBoolean stopping=new AtomicBoolean();
         private final CountDownLatch startup=new CountDownLatch(1),finished=new CountDownLatch(1);
@@ -111,9 +106,9 @@ public final class LocalServerSession {
         private volatile Path guestSession,logs;
         private Handle(Context context,Path root,Path work,ServerRuntimeSetup runtime,ServerProgramsSetup programs,
                 ServerContentSetup content,FreshServerInstallations.Active active,ServerDatabaseService.Handle database,
-                ServerDataBinding data,Events events,FileChannel channel,FileLock lock) {
+                ServerDataBinding data,Events events,ExclusiveFileLease lease) {
             this.context=context;this.root=root;this.work=work;this.runtime=runtime;this.programs=programs;this.content=content;
-            this.active=active;this.database=database;this.data=data;this.events=events;this.channel=channel;this.lock=lock;
+            this.active=active;this.database=database;this.data=data;this.events=events;this.lease=lease;
         }
         public State state(){return state;}
         public IOException failure(){return failure;}
@@ -238,7 +233,7 @@ public final class LocalServerSession {
                 if(worker!=null)try{if(!finished.await(permit.remaining().toNanos(),TimeUnit.NANOSECONDS))throw new IOException("Local server cleanup remains active; database and session leases retained");}
                     catch(InterruptedException error){Thread.currentThread().interrupt();throw new IOException("Local server close interrupted; owner retained",error);}
                 if(process!=null&&process.isAlive())throw new IOException("Local server native owner remains active; leases retained");
-                try{lock.release();}finally{try{channel.close();}finally{state=State.CLOSED;OWNERS.remove(work,this);}}
+                lease.close();state=State.CLOSED;OWNERS.remove(work,this);
                 if(failure!=null)throw failure;
             }
         }

@@ -1,9 +1,16 @@
 # Optional Turnip driver package
 
 This provider installs the source-built ARM64 glibc Mesa 26.1.4 KGSL driver in a
-separate immutable generation. It starts no process and is not selected by the
-launcher. Native Linux loading on a host without KGSL passed; Adreno740 execution,
+separate immutable generation. Installation starts no process. The integrated
+client session can explicitly select it. Native Linux loading on a host without KGSL passed; Adreno 740 execution,
 Android execution, X11 presentation and gameplay remain unqualified.
+
+The current selected source is 75f50445112818c97f8d8e575d2b1c21e59af6e5,
+matched to Wine archive c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46.
+Its original sources/runtime are also preserved by the public Wine cohort release.
+The 46a reference packaging evidence below is historical and is not transferred to
+different bytes. See [ANDROID-READINESS-PROBE.md](ANDROID-READINESS-PROBE.md) for
+the new short source-owned component check; its host tests do not qualify hardware.
 
 `android-provider.lock.json` pins successful build/probe run
 [41009954190](https://github.com/Russianranger/esteria_android/actions/runs/41009954190)
@@ -44,9 +51,9 @@ Wine rootfs. The companion is mandatory during provider verification and must
 accompany any distribution of this optional runtime. It must not be omitted from
 the final application source bundle merely because it is outside the APK.
 
-The original Actions artifact currently has finite retention. A durable measured
-release remains a distribution prerequisite; it has not been published by this
-provider tool. `Dockerfile` and the pinned sources remain the rebuild path, but an
+The original Actions artifact has finite retention. The current selected cohort
+has a separately verified durable release; this provider tool never publishes it.
+`Dockerfile` and the pinned sources remain the rebuild path, but an
 unmeasured rebuild is never silently substituted for this recorded binary.
 
 All files have exact size/hash pins; the verifier rereads ELF architecture,
@@ -60,8 +67,10 @@ automatic `.gz` transformation. Every installed file is a required hash pin.
 `TurnipSetup.prepare` uses the shared bounded/resumable installer and cached
 completed-generation checks. It installs only into `runtimes/turnip-arm64` and
 keeps its asset cache separate. Before explicit selection,
-`requireWineArchive(actualArchiveSha256)` must match Wine archive
-`f036c00a290abb953bec26be80c4d8fe492fd986e7a589c51008124432c8641e`.
+`requireWineArchive(actualArchiveSha256)` must match the current provider lock's
+Wine archive. The historical 46a provider required
+`f036c00a290abb953bec26be80c4d8fe492fd986e7a589c51008124432c8641e`;
+the current selected provider requires the c0e archive identified above.
 
 Bind the resulting verified generation at `/esteria-turnip`. In the sanitized
 guest environment, `selectedEnvironment` supplies both `VK_DRIVER_FILES` and

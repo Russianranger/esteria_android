@@ -46,6 +46,7 @@ INPUTS = (
     'core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ClientLaunchView.java',
     'core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeFiles.java',
     'core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeWork.java',
+    'core/src/main/java/io/github/russianranger/esteria/core/runtime/ExclusiveFileLease.java',
     'sources.lock.json', 'tools/qualify_android_handoff.py', 'tests/test_android_handoff.py',
     '.github/workflows/android-handoff-recovery.yml')
 BUILD_KEYS = {'formatVersion', 'scope', 'sourceRevision', 'sourceSnapshotExact', 'sourceInputs',
@@ -60,6 +61,9 @@ PHASES = ('created', 'written', 'proof-synced', 'synced', 'consumed')
 BEFORE = ((False, False), (False, False), (False, True), (True, True), (False, True))
 ACTIVE_FLAGS = {'sameJvmDuplicateRefused', 'crossProcessRefused', 'recordUnchanged', 'released',
     'relaunchAfterRelease', 'siblingsPreserved'}
+EXCLUSIVE_FLAGS = {'sameJvmDuplicateRefused', 'crossProcessRefusedAfterDuplicates', 'binderDeathObserved',
+    'ownerInstanceChanged', 'leaseReacquiredAfterDeath', 'sameJvmDuplicateRefusedAfterReacquire',
+    'crossProcessRefusedAfterReacquire', 'releasedAfterClose', 'siblingPreserved'}
 
 
 def require(value, reason):
@@ -270,11 +274,12 @@ def verify_apk(path, enabled=True, revision=None):
 
 def validate_receipt(value, revision, fingerprint, build):
     keys = {'formatVersion', 'scope', 'sourceRevision', 'fingerprint', 'api', 'targetSdk', 'abi', 'buildEvidence',
-        'cases', 'activeOwner', 'remoteOwnerProcessesKilled', 'remoteOwnerProcessesRecreated', 'syntheticClientExecutableNotRun', *FALSE_FLAGS}
+        'cases', 'activeOwner', 'exclusiveFileLease', 'remoteOwnerProcessesKilled', 'remoteOwnerProcessesRecreated',
+        'syntheticClientExecutableNotRun', *FALSE_FLAGS}
     require(type(value) is dict and set(value) == keys and type(value.get('formatVersion')) is int and value['formatVersion'] == 1 and
         value.get('scope') == SCOPE and value.get('sourceRevision') == revision and value.get('fingerprint') == fingerprint and
         value.get('abi') == 'x86_64' and value.get('buildEvidence') == build, 'handoff-receipt-identity')
-    for name, expected in (('api', 33), ('targetSdk', 35), ('remoteOwnerProcessesKilled', 5), ('remoteOwnerProcessesRecreated', 5)):
+    for name, expected in (('api', 33), ('targetSdk', 35), ('remoteOwnerProcessesKilled', 6), ('remoteOwnerProcessesRecreated', 6)):
         require(type(value.get(name)) is int and value[name] == expected, 'handoff-receipt-count')
     require(value.get('syntheticClientExecutableNotRun') is True and all(value.get(name) is False for name in FALSE_FLAGS),
         'handoff-receipt-overclaim')
@@ -286,9 +291,13 @@ def validate_receipt(value, revision, fingerprint, build):
     active = value.get('activeOwner')
     require(type(active) is dict and set(active) == ACTIVE_FLAGS and all(active[name] is True for name in ACTIVE_FLAGS),
         'handoff-receipt-active-owner-and-release')
+    exclusive = value.get('exclusiveFileLease')
+    require(type(exclusive) is dict and set(exclusive) == EXCLUSIVE_FLAGS and
+        all(exclusive[name] is True for name in EXCLUSIVE_FLAGS), 'handoff-receipt-exclusive-file-lease')
     return dict(remoteDeathPhasesVerified=5, binderDeathsObserved=True, ownerInstancesChanged=True,
         recognizedRecordsRecovered=True, unknownStagesAndSiblingsPreserved=True,
-        sameJvmAndCrossProcessDuplicatesRefused=True, leasesReleasedAndRelaunchPreserved=True)
+        sameJvmAndCrossProcessDuplicatesRefused=True, leasesReleasedAndRelaunchPreserved=True,
+        exclusiveFileLeaseDeathRecoveryVerified=True, remoteOwnerProcessDeathsVerified=6)
 
 
 def qualify(apk, test_apk, revision, output, adb='adb'):

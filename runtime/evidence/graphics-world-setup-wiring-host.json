@@ -1,0 +1,78 @@
+{
+  "androidArm64Qualified": false,
+  "androidGuestExecuted": false,
+  "apkAssembled": false,
+  "behavior": {
+    "admissionFailureDistinguishedFromGpuFailure": true,
+    "componentFactsAndFixedLogsExportable": true,
+    "existingPinnedCProbeAndProviderUsed": true,
+    "freshGraphicsOwnerRetainedThroughCancelAndReap": true,
+    "gameDataRuntimeAndSaveSelectionPinsUnchanged": true,
+    "graphicsPrecedesExpensiveExtractionAndSql": true,
+    "graphicsRunsOnlyDuringExplicitSetup": true,
+    "noCallerPathPidOrCommand": true,
+    "priorFailedGraphicsOwnerRetainedByServiceThroughCleanup": true
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "gpuProbeExecutedHere": false,
+  "integrationHeadAtCheck": "7c303665e8028aba86a7b87d543b2528d968b1ab",
+  "observedAtUtc": "2026-10-30T21:34:41.384231+00:00",
+  "reviews": {
+    "graphicsComponent": "independent prepared-cache review CLEAR",
+    "serviceWiring": "independent integration and component-owner reviews CLEAR",
+    "sharedLeasePrimitive": "independent integration review CLEAR"
+  },
+  "scope": "explicit world setup graphics wiring and root lease/import migration source-bound host verification",
+  "sharedSdk": {
+    "androidLintPassed": true,
+    "androidTestJavaCompiled": true,
+    "executedTasks": 26,
+    "mainJavaCompiled": true,
+    "migrationReceipt": {
+      "bytes": 7604,
+      "path": "runtime/evidence/app-exclusive-lease-host.json",
+      "sha256": "56720d6b7b0c1b91e61f27fb98da408c9a4cc526810bc454b3435f215af6218a"
+    },
+    "seconds": 87,
+    "tasks": 61,
+    "turnipReceipt": {
+      "bytes": 9312,
+      "path": "runtime/evidence/turnip-readiness-owner-host.json",
+      "sha256": "8d2f8e25e40313df538a17ec22cbb0aa33cd656a653ee9d5f74f39e4ef8aa00c"
+    },
+    "upToDateTasks": 35
+  },
+  "sourceFiles": {
+    "app/src/main/java/io/github/russianranger/esteria/SessionService.java": {
+      "bytes": 71557,
+      "sha256": "bc71bb95dad6a0fd31ad79d44dd5a29b7df57496e3dee82c4991ed456d813014"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/UriStager.java": {
+      "bytes": 6157,
+      "sha256": "4efc853b2667fd89ce818c5714cd88e02b607d286e9068831a5cc7c79392d756"
+    },
+    "core/build.gradle": {
+      "bytes": 6720,
+      "sha256": "94ced6eef9fe449dab6a8a8884a769290a21c699f6acd09270efa676994fc975"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/GameDataImporter.java": {
+      "bytes": 42143,
+      "sha256": "22549bdbdf724368a079af6b49ce848d89e3033b7e251f832f23bf4f6354f1ee"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/ExclusiveFileLease.java": {
+      "bytes": 4211,
+      "sha256": "b550d39bc159a58cc15bd76700650315641bffd34b3810b59154a5b9a04f120b"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeFiles.java": {
+      "bytes": 7009,
+      "sha256": "8d9d321cb78c71d5c4e25c34fa4755b1343ab1dd7c32e62bb1c34ae6c606cc5d"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/install/RuntimeLeaseTests.java": {
+      "bytes": 5640,
+      "sha256": "fd67cc75953e0657fc44ff1bfdf1a0d2253b028bfc70eeb1c68258c7ea574474"
+    }
+  },
+  "sourceSnapshotExact": false,
+  "worldQualified": false
+}
