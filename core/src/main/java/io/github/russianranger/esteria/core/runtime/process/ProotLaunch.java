@@ -26,7 +26,7 @@ public final class ProotLaunch {
         public final String destination;
         public Mount(Path source, String destination) {
             if (source == null || destination == null || !Arrays.asList("/esteria-client", "/esteria-data",
-                    "/esteria-content", "/esteria-server", "/esteria-bridges", "/esteria-shaders").contains(destination))
+                    "/esteria-content", "/esteria-server", "/esteria-bridges", "/esteria-shaders", "/esteria-shader-tools").contains(destination))
                 throw new IllegalArgumentException("Unsupported runtime provider mount");
             this.source = source; this.destination = destination;
         }
@@ -49,7 +49,7 @@ public final class ProotLaunch {
                 throw new IOException("Runtime, persistent work, temporary files and logs must be separate");
         List<String> args=new ArrayList<>(Arrays.asList("--kill-on-exit","--sysvipc","-0","-r",rootfs.toString(),
             "-b","/dev","-b","/proc","-b",work+":/work","-b",temporary+":/tmp"));
-        if (mounts == null || mounts.size() > 6) throw new IOException("Too many runtime provider mounts");
+        if (mounts == null || mounts.size() > 7) throw new IOException("Too many runtime provider mounts");
         Set<String> destinations=new HashSet<>();
         List<Path> sources=new ArrayList<>();
         for (Mount mount : mounts) {

@@ -1,0 +1,22 @@
+// Optional exact-source shader tools. This flag never enables gameplay.
+def shaderProvider = providers.gradleProperty('shaderToolsProviderDir').orNull
+def shaderPinFile = rootProject.file('runtime/shaders/android-provider.lock.json')
+def shaderPin = new groovy.json.JsonSlurper().parse(shaderPinFile)
+def shaderPinHash = java.security.MessageDigest.getInstance('SHA-256').digest(shaderPinFile.bytes).encodeHex().toString()
+android.defaultConfig.buildConfigField 'boolean', 'SHADER_TOOLS_PACKAGED', shaderProvider ? 'true' : 'false'
+android.defaultConfig.buildConfigField 'String', 'SHADER_TOOLS_REVISION', '"' + shaderPin.clientRevision + '"'
+android.defaultConfig.buildConfigField 'String', 'SHADER_TOOLS_PIN', '"' + shaderPinHash + '"'
+if (shaderProvider) {
+    if (providers.gradleProperty('nativeBridgeAbi').getOrElse('arm64-v8a') != 'arm64-v8a' ||
+        providers.gradleProperty('presentationEmulatorTest').getOrElse('false') == 'true' ||
+        ['prootProbeProviderDir', 'mysqlProbeProviderDir', 'wineProbeProviderDir'].any { providers.gradleProperty(it).isPresent() })
+        throw new GradleException('Shader tools use the ARM64 runtime profile, separately from emulator fixtures')
+    def provider = file(shaderProvider)
+    android.sourceSets.main.assets.srcDir(new File(provider, 'assets'))
+    android.androidResources.noCompress += ['archive']
+    def verifyShaderTools = tasks.register('verifyShaderToolsProvider', Exec) {
+        workingDir rootProject.projectDir
+        commandLine 'python3', 'tools/provider_shader_tools.py', 'verify', '--provider', provider.absolutePath
+    }
+    tasks.named('preBuild').configure { dependsOn verifyShaderTools }
+}

@@ -50,6 +50,18 @@ failures. The dedicated `mysql-service.yml` runs the exact CLI on native ARM64,
 inside the pinned Ubuntu dependency image without external networking, against
 fresh disposable state. It requires three live SQL/restart cycles, preserved
 four-schema marker data and private identity, second-owner rejection, and command,
-EOF and helper-only signal shutdown. Actual execution is pending the first run;
-Android adapter execution is a separate follow-on gate. Neither result qualifies
-game schema/module updates, character saves, bots or world gameplay.
+EOF and helper-only signal shutdown.
+
+Native ARM64 execution passed in [run 41013380186](https://github.com/Russianranger/esteria_android/actions/runs/41013380186)
+at integration `14b71f3357f31af5ef091003d50e90ef7b7ead61`, using MySQL
+`8.0.46-0ubuntu0.24.04.4`. All 18 host guards and the three-cycle real-engine
+fixture passed. The downloaded artifact `12958164479` contains only six evidence
+files, with ZIP size 11,341 bytes and SHA-256
+`f8f13f82b44c04df5a1463a0c871606ceca0261ee895173a45fe2e1d4f5b8cf9`.
+Its source/runtime envelope and qualification receipt were independently read
+back and their hashes matched. The earlier run also passed the engine fixture,
+but failed evidence export because `sudo` removed the source revision variable;
+the corrected workflow restores file ownership before binding that envelope.
+
+Android adapter execution is a separate follow-on gate. This result does not
+qualify game schema/module updates, character saves, bots or world gameplay.

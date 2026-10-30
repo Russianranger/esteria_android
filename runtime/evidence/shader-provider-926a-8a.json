@@ -1,0 +1,24 @@
+{
+  "formatVersion": 1,
+  "scope": "measured-source-pinned-shader-provider-host-installation",
+  "archive": {
+    "assetPath": "shader-tools/shader-tools-arm64.archive",
+    "bytes": 10635594,
+    "file": "shader-tools-arm64.tar.gz",
+    "sha256": "7937274c8379882a045fb93c50ea9bb8575e25d5f769f7d8a3077d1518522c57"
+  },
+  "files": 70,
+  "uncompressedBytes": 16621607,
+  "stdout": "PASS shader provider: 70 exact files; 16621607 bytes; ARM64 ELF checked; cached reuse without archive; no compiler execution",
+  "androidQualified": false,
+  "compilerExecuted": false,
+  "gameplayQualified": false,
+  "providerInputLock": "runtime/shaders/android-provider.lock.json",
+  "toolManifestSha256": "45ca24037e24fcd7eddf2cc70c5dffaa57de7386ef96f24801d6eb91e7086767",
+  "compilerBuildSha256": "52f4214ce6af27985fe80a9e0aec55e6bd2c5f0c867b6ded0987bf9aa4ea9ef0",
+  "clientRevision": "926a6f73253720283ead9d7621ffd6d7d9c040cd",
+  "compilerIntegrationRevision": "8a42261db0413ce10ce9a01cd669264a5d5b90fc",
+  "cachedReuseWithoutArchive": true,
+  "nativeCompilerQualifiedInSeparateFixture": true,
+  "gameAssetShadersQualified": false
+}

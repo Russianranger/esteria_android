@@ -65,3 +65,11 @@ tasks.register('clientUiStoreTest', JavaExec) {
     maxHeapSize = '32m'
 }
 check.dependsOn clientUiStoreTest
+
+tasks.register('shaderRunPlanTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.runtime.ShaderRunPlanTests'
+    maxHeapSize = '32m'
+}
+check.dependsOn shaderRunPlanTest

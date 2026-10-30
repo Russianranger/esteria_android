@@ -75,6 +75,8 @@ public final class RuntimeSetup {
     }
 
     public Path current() throws IOException { return new RuntimeInstaller(store).resolveCurrent(plan); }
+    public RuntimeInstaller installer() throws IOException { return new RuntimeInstaller(store); }
+    public RuntimePackagePlan packagePlan() { return plan; }
     public String generation() { return plan.generation; }
     public String archiveSha256() { return plan.archiveSha256; }
     public String sourcePinSha256() { return plan.sourcePinSha256; }

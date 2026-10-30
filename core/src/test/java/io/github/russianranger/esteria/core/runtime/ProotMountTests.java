@@ -50,6 +50,10 @@ public final class ProotMountTests {
             check(spec.environment.get("PROOT_LOADER").equals(fixture.loader.toString()),"Installed native loader retained");
             check(spec.arguments.contains("WINEPREFIX=/work/wine"),"Explicit guest environment retained");
             check(!fixture.create(List.of()).arguments.contains(fixture.data+":/esteria-data!"),"No implicit data exposure");
+            check(fixture.create(List.of(new ProotLaunch.Mount(fixture.binary,"/esteria-shader-tools")))
+                    .arguments.contains(fixture.binary+":/esteria-shader-tools!"),"Fixed shader tools binding is explicit and does not follow guest links");
+            rejects(()->new ProotLaunch.Mount(fixture.binary,"/esteria-shader-tools/tools"));
+            rejects(()->fixture.create(List.of(new ProotLaunch.Mount(fixture.work,"/esteria-shader-tools"))));
 
             for (String target:List.of("/", "/work", "/tmp", "/proc", "/dev", "/usr", "/esteria-data/child", "/esteria-data!"))
                 rejects(()->new ProotLaunch.Mount(fixture.data,target));
