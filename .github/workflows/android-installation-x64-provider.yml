@@ -38,7 +38,7 @@ jobs:
           python3 - <<'PY' >> "$GITHUB_OUTPUT"
           from tools import android_installation_x64_inputs as gate
           value=gate.load_pin()
-          ready=value['state'] in (gate.PROVIDER_PENDING,gate.MEASURED)
+          ready=value['state']==gate.PROVIDER_PENDING
           if ready:gate.load_pin(require_native=True)
           print('nativeReady='+str(ready).lower())
           PY
