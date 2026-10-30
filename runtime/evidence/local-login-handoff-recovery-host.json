@@ -1,0 +1,112 @@
+{
+  "actualHostChecks": {
+    "actualLinuxExitCode": 137,
+    "crossJvmActiveOwnerRefusedAfterSameJvmDuplicateClaim": true,
+    "existingPublicationTargetNotOverwritten": true,
+    "foreignLegacyRecordPreserved": true,
+    "gameSessionOwnerGroupsPassed": 8,
+    "independentReview": "clear; separate JDK17 compile and both 32MiB host fixture invocations passed",
+    "malformedOrEscapingOrMissingProofRefused": true,
+    "originalClientLaunchViewSuitePassed": true,
+    "originalHandoffWireNoncePrivacyAndOwnedRetrySuitePassed": true,
+    "recordAndReceiptAndLockLinkGuardsPassed": true,
+    "restoredMtimeMutationAndInodeReplacementRefused": true,
+    "sameJvmDuplicateClaimDoesNotDropOriginalPosixKernelLease": true,
+    "settingsAndAccountSaveSiblingsPreserved": true,
+    "sigkillBoundaries": [
+      "record-created",
+      "record-written",
+      "ownership-proof-synced",
+      "fixed-client-filename-synced",
+      "client-record-consumed"
+    ],
+    "sigkillChildrenReaped": 5
+  },
+  "clientContract": {
+    "bytes": 57,
+    "clientPinChanged": false,
+    "clientRecompiledHere": false,
+    "developmentRevisionCompared": "671db06afd85fe2f6116b9fd59f5abf3170e2ef2",
+    "filename": "Esteria-local-login.bin",
+    "files": {
+      "Engine/Source/Platform/LocalAccountHandoff.h": {
+        "bytes": 3545,
+        "sha256": "61649fa017321fc0d8249f6e7812de0f17bc762ae34711409804cb47a5349461"
+      },
+      "Engine/Source/Platform/PrivateLocalAccountFile.h": {
+        "bytes": 2527,
+        "sha256": "143e034e5b9b7dbbdab0f3ae21c611cf12837d1514199068c7a8852c2f3bddab"
+      },
+      "WoW/Source/Glue/LocalAccountLogin.cpp": {
+        "bytes": 2411,
+        "sha256": "d1a32bf68586fee94bb72e1eb76ffe4ae7882307245795e0bd16ec649010e055"
+      }
+    },
+    "magic": "ESTLOGN1",
+    "selectedRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+    "threeContractFilesUnchangedBetweenRevisions": true
+  },
+  "formatVersion": 1,
+  "gitHead": "984c84e1e9b69da67fed5f3106de9d17089e3130",
+  "observedAtUtc": "2026-10-30",
+  "qualification": {
+    "androidAppDeathAndRestartExecutedHere": false,
+    "androidArm64Executed": false,
+    "androidGuestExecuted": false,
+    "androidSdkCompilationAndLint": true,
+    "clientLoginQualifiedHere": false,
+    "gameplayQualified": false,
+    "hostProcessesAndPrivateFilesystemExecuted": true,
+    "mysqlExecutedHere": false,
+    "worldEntryQualified": false
+  },
+  "recoveryPolicy": {
+    "accountOrDatabaseChanged": false,
+    "activeOwnerReservationBeforeLockFdOpen": true,
+    "arbitraryCallerPathOrPidAccepted": false,
+    "knownRecordIdentityAndHashCheckedTwiceBeforeDeletion": true,
+    "legacyOrChangedFileAdoption": false,
+    "metadataMaximumBytes": 1024,
+    "opaqueOldRecordDecoded": false,
+    "receiptDurableBeforeClientFilenamePublication": true,
+    "recordHashBytes": 57,
+    "reservationReleasedOnlyByOwnTokenAfterFdClose": true,
+    "supportExcludesSecretRecords": true,
+    "unknownUnpublishedStages": "preserved and ignored; private bounded files"
+  },
+  "scope": "host-owned-local-login-handoff-process-death-recovery",
+  "sdkCheck": {
+    "actionableTasks": 69,
+    "androidTestApkCompiled": true,
+    "command": "./gradlew --offline --no-daemon --init-script <workspace-output-redirect> :core:localAccountHandoffTest :core:localAccountHandoffRecoveryTest :core:clientLaunchViewTest :app:gameSessionOwnerTest :app:compileDebugJavaWithJavac :app:assembleDebugAndroidTest :app:lintDebug",
+    "elapsedSeconds": 34,
+    "executedTasks": 23,
+    "fullProductionApkDuplicated": false,
+    "hostFixtureHeapMiB": 32,
+    "result": "BUILD SUCCESSFUL",
+    "upToDateTasks": 46
+  },
+  "sourceIdentity": "Modified source hashes below; Git head alone does not identify tested source. Other modified helper files may be packaged by the SDK check without becoming qualified here.",
+  "sources": {
+    "core/build.gradle": {
+      "bytes": 6034,
+      "sha256": "a7b0c1fcc1c923566839c13748762938de8fafb6339473036ce75ffaceba8edc"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/LocalAccountHandoff.java": {
+      "bytes": 9226,
+      "sha256": "10a367e13e2a2f21c23d7d3d59149382d4b5bbc8f09bc3cfebcdc42c5a03a96f"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/LocalHandoffRecovery.java": {
+      "bytes": 13954,
+      "sha256": "b5170bfda38a2dc6cfd7016bd531c1d3d597262141fa63c1f9582c907679e60f"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/install/LocalAccountHandoffRecoveryTests.java": {
+      "bytes": 11855,
+      "sha256": "c430926b0c24d787553df04f1fb719ba540276a7c7be9c35bd21404b17d131d0"
+    },
+    "runtime/client/LOCAL-LOGIN-RECOVERY.md": {
+      "bytes": 4116,
+      "sha256": "7b57f244bd19fc4bff7fa595cd810e18cd24296117803c43fdd8f676bec76888"
+    }
+  }
+}

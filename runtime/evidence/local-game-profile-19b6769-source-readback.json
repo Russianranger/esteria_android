@@ -1,0 +1,89 @@
+{
+  "actualClientAssetsUsed": false,
+  "androidGuestExecuted": false,
+  "androidRuntimeQualified": false,
+  "apkDownloadedLocally": false,
+  "dateUtc": "2026-10-30",
+  "deviceTestCandidate": false,
+  "entireSourceArtifactBytesAndAllZipMemberCrcsVerified": true,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "integrationRevision": "19b67695208d25cbc59b543ebf1110bb6ca5ef94",
+  "integrationSource": {
+    "allRegularFilesMatchExactGitBlobsOrSoleDeclaredWrapperConversion": true,
+    "archiveRegularFileBytes": 9648291,
+    "canonicalGitBlobBytes": 9648285,
+    "declaredCheckoutConversions": {
+      "gradlew.bat": {
+        "archiveBytes": 295,
+        "archiveSha256": "21186e8f097fcc9e5f62ee0abf2d95b92f973b347d0c27f0205a336af8aa021d",
+        "canonicalBytes": 289,
+        "canonicalSha256": "119ce8a4bfdf3024ba03cf9b6b810afd47b49e17999a0053bfe719effbad36ea",
+        "exactDeclaredCrLfConversionVerified": true
+      }
+    },
+    "entireGzipAndZipCrcReadBack": true,
+    "trackedRegularFiles": 999
+  },
+  "playerbotsAiQualified": false,
+  "prootSource": {
+    "allMemberSizesAndSha256MatchActualCiInventory": true,
+    "entireGzipAndZipCrcReadBack": true,
+    "regularFileBytes": 1613364,
+    "regularFiles": 30,
+    "relinkableArm64Objects": 15
+  },
+  "scope": "independent-local-full-integration-and-PRoot-source-artifact-readback-only",
+  "sourceArtifact": {
+    "bytes": 3556154,
+    "id": 13007594796,
+    "name": "local-game-integration-proot-sources-19b67695208d25cbc59b543ebf1110bb6ca5ef94",
+    "sha256": "b257942a64fceaca8ce03574904a937ff911e70d9d977b07b9b1fd2358a60c14"
+  },
+  "sourceArtifactMembers": {
+    "coherent-integration-source.tar.gz": {
+      "bytes": 2405731,
+      "sha256": "02925a6a1bf8c36b097319669f5991f36f94b3200927814ac32c62719a470f03"
+    },
+    "proot-build/build-evidence.json": {
+      "bytes": 2099,
+      "sha256": "14d09032d6b44bbd4f58956861375c35721b46e286dfde1b0c2c3803842507f8"
+    },
+    "proot-build/proot-corresponding-source.tar.gz": {
+      "bytes": 1147806,
+      "sha256": "579b9f6f19631b6a7d0ad6fd2a124d4ff739425cabd769ca8812dafa6a620d08"
+    }
+  },
+  "sourceDerivedServerDataManifest": {
+    "bytes": 612,
+    "directlyReadFromApk": false,
+    "exactHelperClosureWasVerifiedInsideActualCiApk": true,
+    "files": {
+      "extractor_order.py": {
+        "bytes": 9884,
+        "sha256": "5c6d30d23c2a8ebb13d037907cbcc6e7b67ea31f4b99798d925c5e3da756128c"
+      },
+      "owned_process_group.py": {
+        "bytes": 2795,
+        "sha256": "c19ed5c05e94d7b537df1055983fca75e20447f594419084f2207d60f99f138e"
+      },
+      "server_data_generation.py": {
+        "bytes": 29380,
+        "sha256": "72513fb5e0c1264f996fed74a96178a9789e14e97863d268da1170fa64f74cc6"
+      },
+      "server_data_preflight.py": {
+        "bytes": 27886,
+        "sha256": "8b9a1d44b70a8c1fce7a54e0ee39bba68621026f34270982cb68cb8d326374e0"
+      },
+      "shader_generation.py": {
+        "bytes": 19353,
+        "sha256": "8bb48952c36bdc4c69516c2ffa6f5c2d2eb59e84019e6420948d94bc81683ac5"
+      }
+    },
+    "sha256": "8a463f722113934a64a042aa5975a9f24f5a1308c186a70ed41fe73d9cac6a5d"
+  },
+  "wholeApkPayloadReadBackLocally": false,
+  "workflowJob": 124286022672,
+  "workflowRun": 41120449825,
+  "worldserverQualified": false
+}

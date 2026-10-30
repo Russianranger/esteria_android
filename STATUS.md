@@ -31,7 +31,7 @@ not qualify Android ARM64, Adreno or Thor.
 | Android13 x64 MySQL |41109642918 at4fd32df: bootstrap66.491s and actual Java service lifecycle51.72s. | No four-schema Android coordinator or ARM64 claim. |
 | Retained x64 SQL inputs |41119182469: full229MB input/905MB source readback,275 source archives/876,239,964 bytes and original APK/PRoot verified. | Qualification-only inputs; no new SQL/Android execution. |
 | Composed data4/helper providers |41103915829 native CLI/reader checks;41106873028 full source/debug/APK and Java32MiB fresh/cache checks. | Actual MPQ conversion, world coverage and bot AI untested. |
-| Complete local-game profile |41107245856 at7a7166: ARM64 APK336,971,486 bytes; independent local readback of all127 APK entries/eight archives; four-component Java32MiB install/cache. | Packaging/component installation, no complete runtime session. |
+| Complete local-game profile |41120449825 at19b6769: public-input ARM64 APK337,008,310 bytes; full CI APK/source/helper/native verification; four-component Java32MiB installation/cache. Independent source readback checks999 integration/30 PRoot files. Earlier7a7166 APK also has full local byte readback. | Current full APK payload read in CI, not locally; no complete runtime session. |
 | Server public preservation |41117618335:12 assets/1,783,413,529 bytes; complete source/debug, stored-byte readback and anonymous public verification. | Source/package preservation, no game data or APK. |
 | Android presentation/owners |7619 component runs and05925 native visible-group usage sampling pass. | x64 component evidence, no audible game, whole-guest memory or bot budget. |
 
@@ -39,8 +39,8 @@ Public server release429422570 targets exact recipe7e498c50cdf55027e679d63e31f0a
 Actions creation and separate UI inspection precede the bound upload. All twelve
 identities, nested originals and paired debug remain unchanged. GitHub reports
 githubImmutable=false; cryptographic pins and no-replacement policy remain enforced. The complete-profile
-consumer now admits this durable public selection; its next actual build qualifies
-adoption. Separate public Ubuntu/MySQL dependencies remain pinned.
+consumer now admits this durable public selection; actual41120449825 now qualifies
+adoption and complete-source/provider packaging. Separate public Ubuntu/MySQL dependencies remain pinned.
 
 ## Application behavior and recent fixes
 
@@ -118,3 +118,11 @@ build/source outputs are available. Production ARM64 admission is unchanged.
 The earlier4a506 complete-APK job failed on HTTP503 during legacy helper Actions
 acquisition before the input-code build;19b's public acquisition bypasses that
 failed route and passes the actual restore/admission step.
+
+An orphaned one-use login record now recovers through a private durable ownership
+receipt and exclusive lease, preserving unknown/changed/linked files. Five actual
+SIGKILL/relaunch phases, cross-JVM exclusion after same-JVM duplicate refusal,
+original57-byte wire/privacy and owner fixtures pass. SDK69 tasks/34s includes
+Core recovery, eight GameSession owner groups, app/AndroidTest compilation and
+lint. Client471 is unchanged; actual Android death/restart and normal login remain
+separate gates. Accounts, passwords and databases are not changed by recovery.

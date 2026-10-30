@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -18,19 +17,21 @@ import java.util.EnumSet;
 /** One-use ESTLOGN1 file for a stopped, owned launch view. The caller must first
  * verify the selected client capability and the live local account/services.
  * Close only after the client has stopped; a changed or foreign file is preserved.
+ * A kernel lease and durable private receipt recover only a known unconsumed
+ * handoff after process death, without changing the selected client wire format.
  * PRoot and same-UID paths do not constitute a security boundary.
  */
 public final class LocalAccountHandoff implements AutoCloseable {
     public static final String FILENAME = "Esteria-local-login.bin";
     public static final int BYTES = 57;
     private static final String ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    private final Path path;
-    private final Object fileKey;
     private final byte[] digest;
+    private final LocalHandoffRecovery owner;
     private boolean closed;
+    private IOException closeFailure;
 
-    private LocalAccountHandoff(Path path, Object fileKey, byte[] digest) {
-        this.path = path; this.fileKey = fileKey; this.digest = digest;
+    private LocalAccountHandoff(byte[] digest, LocalHandoffRecovery owner) {
+        this.digest = digest; this.owner = owner;
     }
 
     /** Copies credentials without retaining their arrays. Caller owns and clears its inputs. */
@@ -52,15 +53,16 @@ public final class LocalAccountHandoff implements AutoCloseable {
         for (int i = 3; i < username.length; i++)
             RuntimeFiles.require("0123456789ABCDEF".indexOf(username[i]) >= 0, "Invalid owned local account name");
         for (char value : password) RuntimeFiles.require(ALPHABET.indexOf(value) >= 0, "Invalid owned local account password");
+        LocalHandoffRecovery owner = LocalHandoffRecovery.begin(directory, view.generation);
         byte[] record = new byte[BYTES], nonce = new byte[16];
-        Path target = directory.resolve(FILENAME);
+        Path target = owner.stage;
         Object createdKey = null;
         try {
             System.arraycopy("ESTLOGN1".getBytes(StandardCharsets.US_ASCII), 0, record, 0, 8);
             new SecureRandom().nextBytes(nonce); System.arraycopy(nonce, 0, record, 8, nonce.length);
             for (int i = 0; i < username.length; i++) record[24 + i] = (byte) username[i];
             for (int i = 0; i < password.length; i++) record[41 + i] = (byte) password[i];
-            // CREATE_NEW rejects an interrupted handoff, foreign file, or link. Never replace it.
+            // Unique staging never replaces an unrecognized crash leftover.
             try (FileChannel output = FileChannel.open(target,
                     EnumSet.of(StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE),
                     PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-------")))) {
@@ -78,23 +80,23 @@ public final class LocalAccountHandoff implements AutoCloseable {
             RuntimeFiles.require(RuntimeFiles.hashFile(target, BYTES, RuntimeWork.NEVER_CANCELLED).equals(RuntimeFiles.hex(expectedDigest)),
                     "Local account handoff readback differs; preserved");
             RuntimeFiles.require(RuntimeFiles.sync(directory), "Local account handoff directory sync failed");
+            owner.publish(createdKey, expectedDigest, check);
             check.reached("synced");
-            return new LocalAccountHandoff(target, createdKey, expectedDigest);
+            return new LocalAccountHandoff(expectedDigest, owner);
         } catch (IOException | RuntimeException failure) {
-            if (createdKey != null) {
-                try { removeFailedCreation(target, createdKey, record); }
-                catch (IOException | RuntimeException cleanup) { failure.addSuppressed(cleanup); }
-            }
-            throw failure;
+            try { owner.abort(createdKey, record); }
+            catch (IOException | RuntimeException cleanup) { failure.addSuppressed(cleanup); }
+            try { owner.close(); } catch (IOException cleanup) { failure.addSuppressed(cleanup); }
+            throw new IOException("local-login-handoff-prepare-failed; preserved files require support export", failure);
         } finally { Arrays.fill(record, (byte) 0); Arrays.fill(nonce, (byte) 0); }
     }
 
-    private static void removeFailedCreation(Path path, Object key, byte[] expected) throws IOException {
-        byte[] bytes = new byte[BYTES + 1];
+    static void removeFailedCreation(Path path, Object key, byte[] expected) throws IOException {
+        byte[] bytes = new byte[expected.length + 1];
         try {
             BasicFileAttributes before;
             try { before = attributes(path); } catch (java.nio.file.NoSuchFileException absent) { return; }
-            RuntimeFiles.require(key.equals(before.fileKey()) && before.size() <= BYTES,
+            RuntimeFiles.require(key.equals(before.fileKey()) && before.size() <= expected.length,
                     "Failed local account handoff changed; preserved");
             try (FileChannel input = FileChannel.open(path, StandardOpenOption.READ, LinkOption.NOFOLLOW_LINKS)) {
                 ByteBuffer data = ByteBuffer.wrap(bytes);
@@ -111,7 +113,7 @@ public final class LocalAccountHandoff implements AutoCloseable {
         } finally { Arrays.fill(bytes, (byte) 0); }
     }
 
-    private static BasicFileAttributes attributes(Path file) throws IOException {
+    static BasicFileAttributes attributes(Path file) throws IOException {
         BasicFileAttributes value = Files.readAttributes(file, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
         RuntimeFiles.plain(file);
         RuntimeFiles.require(value.isRegularFile() && !value.isSymbolicLink(), "Local account handoff type changed; preserved");
@@ -123,29 +125,20 @@ public final class LocalAccountHandoff implements AutoCloseable {
         return value;
     }
 
-    /** The reader deletes its file before login. Remove only our unchanged, unconsumed file. */
+    /** The reader deletes its file before login. Remove only our unchanged,
+     * recorded file. A failed cleanup releases the kernel lease, preserving the
+     * invalid record/proof so another process cannot silently adopt it. */
     @Override public synchronized void close() throws IOException {
-        if (closed) return;
-        byte[] bytes = new byte[BYTES + 1];
-        try {
-            BasicFileAttributes before;
-            try { before = attributes(path); }
-            catch (java.nio.file.NoSuchFileException consumed) { closed = true; return; }
-            RuntimeFiles.require(fileKey.equals(before.fileKey()) && before.size() == BYTES,
-                    "Local account handoff identity changed; preserved");
-            try (FileChannel input = FileChannel.open(path, StandardOpenOption.READ, LinkOption.NOFOLLOW_LINKS)) {
-                ByteBuffer data = ByteBuffer.wrap(bytes);
-                while (data.hasRemaining() && input.read(data) != -1) { /* At most 58 bytes. */ }
-                MessageDigest actual = RuntimeFiles.digest(); actual.update(bytes, 0, BYTES);
-                RuntimeFiles.require(data.position() == BYTES && MessageDigest.isEqual(digest,
-                        actual.digest()), "Local account handoff changed; preserved");
-            }
-            BasicFileAttributes after = attributes(path);
-            RuntimeFiles.require(fileKey.equals(after.fileKey()) && after.size() == BYTES &&
-                    before.lastModifiedTime().equals(after.lastModifiedTime()), "Local account handoff changed during cleanup; preserved");
-            Files.delete(path);
-            RuntimeFiles.require(RuntimeFiles.sync(path.getParent()), "Local account handoff cleanup sync failed");
-            closed = true;
-        } finally { Arrays.fill(bytes, (byte) 0); if (closed) Arrays.fill(digest, (byte) 0); }
+        if (closed) {
+            if (closeFailure != null) { owner.close(); owner.retryFinish(); closeFailure = null; }
+            return;
+        }
+        try { owner.finish(); }
+        catch (IOException | RuntimeException failure) { closeFailure = new IOException("local-login-handoff-recovery-preserved; export support", failure); }
+        finally {
+            try { owner.close(); } catch (IOException failure) { if (closeFailure == null) closeFailure = failure; else closeFailure.addSuppressed(failure); }
+            closed = true; Arrays.fill(digest, (byte) 0);
+        }
+        if (closeFailure != null) throw closeFailure;
     }
 }

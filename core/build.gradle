@@ -18,6 +18,16 @@ tasks.register('importerTest', JavaExec) {
 }
 check.dependsOn hostTest, diagnosticsTest, importerTest
 
+// Actual Linux JVM parent-death fixture; never copied into Android test APKs.
+tasks.register('localAccountHandoffRecoveryTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.runtime.install.LocalAccountHandoffRecoveryTests'
+    maxHeapSize = '32m'
+    onlyIf { System.getProperty('os.name') == 'Linux' }
+}
+check.dependsOn localAccountHandoffRecoveryTest
+
 tasks.register('runtimeInstallerTest', JavaExec) {
     dependsOn testClasses
     classpath = sourceSets.test.runtimeClasspath

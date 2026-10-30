@@ -1,0 +1,519 @@
+{
+  "actualApkVerification": {
+    "androidMysqlQualified": false,
+    "apkVerified": true,
+    "archive": {
+      "assetPath": "mysql-probe/mysql-x86-64.archive",
+      "bytes": 112330775,
+      "file": "mysql-x86-64.tar.gz",
+      "sha256": "ef3162053fe10e9ff2a0a99c1760b40c8b7a0afb4d57a43bfd812886b085919c"
+    },
+    "arm64Qualified": false,
+    "expectedMysqlSqlVersion": "8.0.46-0ubuntu0.24.04.4",
+    "productionAdapterQualified": false,
+    "providerVerified": true,
+    "scope": "android-13-x86-64-mysql-probe-build-only"
+  },
+  "actualProviderBuild": {
+    "androidMysqlQualified": false,
+    "architecture": "x86_64",
+    "archive": {
+      "assetPath": "mysql-probe/mysql-x86-64.archive",
+      "bytes": 112330775,
+      "file": "mysql-x86-64.tar.gz",
+      "sha256": "ef3162053fe10e9ff2a0a99c1760b40c8b7a0afb4d57a43bfd812886b085919c"
+    },
+    "archiveEntries": 6218,
+    "archiveFileBytes": 348288619,
+    "archiveReadBack": true,
+    "arm64Qualified": false,
+    "expectedMysqlSqlVersion": "8.0.46-0ubuntu0.24.04.4",
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "limits": {
+      "entries": 6218,
+      "fileBytes": 352314373,
+      "memberBytes": 55467944,
+      "metadataBytes": 16777216,
+      "pathBytes": 4096
+    },
+    "maximumHardLinkCopies": 2,
+    "maximumHardLinkCopyBytes": 4025754,
+    "maximumPhysicalFileBytes": 352314373,
+    "packageKey": "mysql-probe-x86-64",
+    "productionAdapterQualified": false,
+    "requiredFiles": {
+      "etc/esteria-mysql-probe.json": {
+        "bytes": 33125,
+        "sha256": "109ac9bc069911045ba9055c35b1822ec2c543b469aa66faf0acee905b92b024"
+      },
+      "usr/bin/mysql": {
+        "bytes": 6912408,
+        "elfClass": 2,
+        "elfMachine": 62,
+        "sha256": "27d7039f47cbf6079dd70d6bd12dce937136e69b78cea995f8d2f82c191f9d6a"
+      },
+      "usr/bin/python3.12": {
+        "bytes": 8020928,
+        "elfClass": 2,
+        "elfMachine": 62,
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "usr/lib/os-release": {
+        "bytes": 400,
+        "sha256": "87458b3b1f1ca0e5c693ade771de7007c3783bdc692fa6b39eb6414bf2af2763"
+      },
+      "usr/sbin/mysqld": {
+        "bytes": 55467944,
+        "elfClass": 2,
+        "elfMachine": 62,
+        "sha256": "77b0fe21f3e93533beee25ee911c32db7a5f0a4f6dae95923d17c13f62bb9663"
+      }
+    },
+    "runtimeMetadataSha256": "109ac9bc069911045ba9055c35b1822ec2c543b469aa66faf0acee905b92b024",
+    "scope": "android-13-x86-64-mysql-probe-build-only",
+    "serverSchemasQualified": false,
+    "sourceCompanionRequired": true,
+    "sourceInputs": {
+      "app/database-service.gradle": {
+        "bytes": 1254,
+        "sha256": "bc6fcc3044d2ce4902c89dd84e84f1ef8c56a5441ec055604ec1673be8434149"
+      },
+      "app/mysql-probe.gradle": {
+        "bytes": 1624,
+        "sha256": "3ac7f3a969e1af31a2123fbfd9d3677b69e54ec78a06d8cbe4a64a342eaecb6e"
+      },
+      "app/src/androidTest/java/io/github/russianranger/esteria/runtime/MySqlExecutionTest.java": {
+        "bytes": 28348,
+        "sha256": "55a62b7cfad371948b87d84465dee8df827f37577148cbbe12c0103e10b55d59"
+      },
+      "app/src/main/java/io/github/russianranger/esteria/runtime/GuestHelperAssets.java": {
+        "bytes": 7797,
+        "sha256": "b27921fc56209fbbfb97a62249a2e731f9edcc9cc4106861e1f74f4b55ae16cf"
+      },
+      "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseService.java": {
+        "bytes": 16233,
+        "sha256": "de6d8820d5e21ae6a6c4c0b53a2030ecb806d71682ebd2cbd0fe865ada184526"
+      },
+      "runtime/android_database_setup.py": {
+        "bytes": 5488,
+        "sha256": "a2bdc53753d8c301e6e8fa633a8e12026f7285881f08c22e2aedf6819d31a813"
+      },
+      "runtime/mysql-probe/Dockerfile": {
+        "bytes": 2912,
+        "sha256": "d516ea4ce52f6a71c71b1c9f3bd169729e5e288313b11b70644d516291c63ebf"
+      },
+      "runtime/mysql-probe/Dockerfile.dockerignore": {
+        "bytes": 179,
+        "sha256": "ff3705d5422ab933518a1e9a1898063dbfcf104abb472ca455f6dc73d87d9130"
+      },
+      "runtime/mysql-probe/guest_check.py": {
+        "bytes": 8978,
+        "sha256": "36fd8cd42851df051df421eec1df01fab9b711092ba21cc728daea8d5050fee9"
+      },
+      "runtime/mysql-probe/mysql-binaries.SHA256SUMS": {
+        "bytes": 361,
+        "sha256": "d1f390b4d9f9f63d62a069a202b824f9c273d6e3695b4a1f4a40357184184303"
+      },
+      "runtime/mysql-probe/record_runtime.py": {
+        "bytes": 4590,
+        "sha256": "02dc95b182414d78e890eb89ff6121d94d3a45ac268efa896fbba95ce6577cea"
+      },
+      "runtime/mysql_bootstrap.py": {
+        "bytes": 32698,
+        "sha256": "e69d5b64c4a5f5ace86fa521589d5a64613f601c59aedb011b42a1e5b743b47d"
+      },
+      "runtime/mysql_service.py": {
+        "bytes": 18078,
+        "sha256": "8b30e9598f20ee715685a51aba59cefcafc6213d9d5d5cb6c6f3a73efa6b71c2"
+      },
+      "runtime/server/capture_sources.py": {
+        "bytes": 3191,
+        "sha256": "5568e32bf0d912e45e65ffdfa02404d604138e86a8534d8c097b111b0445010b"
+      },
+      "runtime/server/inrelease.SHA256SUMS": {
+        "bytes": 413,
+        "sha256": "16405ad6b24709c3cc1ca2f249cf72590a8893a3e5b1263f299465915eabc39d"
+      },
+      "runtime/server/ubuntu.sources": {
+        "bytes": 204,
+        "sha256": "3bca581187f9aa8d51605ee49a8493619779338f630de58553ae7888aa82fd16"
+      },
+      "tools/build_android_mysql_probe.py": {
+        "bytes": 9284,
+        "sha256": "ece850eb73804ac85e5ce511c5d7085e35420ea2b1f628222daf813a149d84ed"
+      },
+      "tools/package_server_runtime.py": {
+        "bytes": 13619,
+        "sha256": "e3fca010d44223bab12f34fe5f8bc984e21e518419f60edf72acdd6299fb93f7"
+      },
+      "tools/prepare_runtime.py": {
+        "bytes": 22126,
+        "sha256": "113ae7612cba7f557fab79550448578a9a6b8ceb674cff80b38fcf40e8257078"
+      },
+      "tools/qualify_android_mysql.py": {
+        "bytes": 11098,
+        "sha256": "19d0c7ce57b2982c98c8a0857eb5c99ea76794d9c7ff957b892885bec6c94d49"
+      },
+      "tools/verify_android_mysql_probe.py": {
+        "bytes": 8006,
+        "sha256": "acb0b354745b48146060b1c105ca76dbea2b1fd8a0cdc9e8c0c38590b7078867"
+      }
+    },
+    "sourceLockSha256": "012af95659e8ee2e98907d185ccdb5abc64e87614a9a4ee43b5b8679ff92b512"
+  },
+  "actualStepCompletion": {
+    "all21StepsCompletedSuccessfully": true,
+    "completeSourceCaptureCompletedAt": "2026-10-30T20:19:44Z",
+    "emulatorStepCompletedAt": "2026-10-30T20:06:45Z",
+    "freshInputRetentionCompletedAt": "2026-10-30T20:19:57Z",
+    "lastCleanupAndCompleteJobAt": "2026-10-30T20:20:00Z"
+  },
+  "all21ProviderSourceInputsMatchExactGitBlobs": true,
+  "all66FinalSmallArtifactMembersReadAndCrcVerified": true,
+  "artifactMembers": {
+    "app/build/reports/lint-results-debug.html": {
+      "bytes": 89372,
+      "sha256": "848662ddc4c22101dc9be4a0acaba877d68869ba428adcd7627265e724913854"
+    },
+    "app/build/reports/lint-results-debug.txt": {
+      "bytes": 11730,
+      "sha256": "3ff15a410809a6bfab855385a62930e50fe8ee1860fc700c5a037d67b79e6e91"
+    },
+    "app/build/reports/lint-results-debug.xml": {
+      "bytes": 33356,
+      "sha256": "a3d8ed5890b75b618c34e7209f69d09660412a1db2a36c69e454fe54307d4ead"
+    },
+    "out/android-mysql/apk-verification.json": {
+      "bytes": 478,
+      "sha256": "ae4585ced6fe5d3f04c5030646e1f522cb9c956566d824a632b59ee36748ccb9"
+    },
+    "out/android-mysql/evidence/app-receipt.log": {
+      "bytes": 6319,
+      "sha256": "797aa85d9817240d983728f25661bbbb21fa06e2bd5121ad1adaaf247b7a4c25"
+    },
+    "out/android-mysql/evidence/bounded-logcat.log": {
+      "bytes": 219557,
+      "sha256": "814e7bf9eb6254ee9c1ec90c6dd8696f8913145d3a83158cfd38759c771bca78"
+    },
+    "out/android-mysql/evidence/initialize-engine-files.log": {
+      "bytes": 91,
+      "sha256": "96a575bedd6a91551a24169463ae73f09d2211ff0f3dbb0ffd14e556f1081c67"
+    },
+    "out/android-mysql/evidence/initialize-engine-mysql-bootstrap-engine.log.log": {
+      "bytes": 1088,
+      "sha256": "c799b4881755aed0f54e563683a0560abc09923d27ba4b1274cd3f2caca3f50a"
+    },
+    "out/android-mysql/evidence/initialize-engine-mysql-initialize-engine.log.log": {
+      "bytes": 525,
+      "sha256": "a252b1a3755392b14febdfc95346f7e078e144c9370f156d4476a1d406d5cadc"
+    },
+    "out/android-mysql/evidence/initialize-stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "out/android-mysql/evidence/initialize-stdout.log": {
+      "bytes": 69,
+      "sha256": "0364cbf611787f6b6d2c57698989632412e5f55d9359ecbc805cc018333c725d"
+    },
+    "out/android-mysql/evidence/install-app.log": {
+      "bytes": 36,
+      "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+    },
+    "out/android-mysql/evidence/install-tests.log": {
+      "bytes": 36,
+      "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+    },
+    "out/android-mysql/evidence/mysql-service-test.log": {
+      "bytes": 851,
+      "sha256": "724c9f060e2961d7464c4da9517d255408a373ffda687f8e04411dc4c7c61bbc"
+    },
+    "out/android-mysql/evidence/mysql-test.log": {
+      "bytes": 833,
+      "sha256": "fe21ba2b04bd914281a95de7685d5df6f36f5304458c056fd790750a56248a94"
+    },
+    "out/android-mysql/evidence/preexisting.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "out/android-mysql/evidence/qualification.json": {
+      "bytes": 14184,
+      "sha256": "7d1a9fa5dac3171f9a82a8619c0c60b9455e857c796456ea548d7446f1c83508"
+    },
+    "out/android-mysql/evidence/repeat-engine-files.log": {
+      "bytes": 141,
+      "sha256": "41483b0af1d2d01e67b89458534261adf1cb61cf43ab79ff008489a894a84f4d"
+    },
+    "out/android-mysql/evidence/repeat-engine-mysql-bootstrap-engine.log.log": {
+      "bytes": 1088,
+      "sha256": "c799b4881755aed0f54e563683a0560abc09923d27ba4b1274cd3f2caca3f50a"
+    },
+    "out/android-mysql/evidence/repeat-engine-mysql-initialize-engine.log.log": {
+      "bytes": 525,
+      "sha256": "a252b1a3755392b14febdfc95346f7e078e144c9370f156d4476a1d406d5cadc"
+    },
+    "out/android-mysql/evidence/repeat-engine-probe-249a966f565e4ddfb4710e14eff7bee8.log.log": {
+      "bytes": 1084,
+      "sha256": "a70496bd1ec151623b322bec5e8cfd3dd9a14557255ad1a1dd31cb9450e5df52"
+    },
+    "out/android-mysql/evidence/repeat-stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "out/android-mysql/evidence/repeat-stdout.log": {
+      "bytes": 69,
+      "sha256": "0364cbf611787f6b6d2c57698989632412e5f55d9359ecbc805cc018333c725d"
+    },
+    "out/android-mysql/evidence/ro.build.fingerprint.log": {
+      "bytes": 81,
+      "sha256": "74f45a5b5c9c2e0e9fe31b30e7fecac3d7eed0ec13131a36513c9da0e27ee79d"
+    },
+    "out/android-mysql/evidence/ro.build.version.sdk.log": {
+      "bytes": 3,
+      "sha256": "19b8d5c59e421f037fe563007c7254eb8d98bc221b278c3db3e5fdbbfd52e273"
+    },
+    "out/android-mysql/evidence/ro.kernel.qemu.log": {
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    "out/android-mysql/evidence/ro.product.cpu.abi.log": {
+      "bytes": 7,
+      "sha256": "aaf631698ae5160ceb04a97681a14887fdcab47cd6e0f163c87485b3b1340b62"
+    },
+    "out/android-mysql/evidence/seed-engine-files.log": {
+      "bytes": 141,
+      "sha256": "41483b0af1d2d01e67b89458534261adf1cb61cf43ab79ff008489a894a84f4d"
+    },
+    "out/android-mysql/evidence/seed-engine-mysql-bootstrap-engine.log.log": {
+      "bytes": 1088,
+      "sha256": "c799b4881755aed0f54e563683a0560abc09923d27ba4b1274cd3f2caca3f50a"
+    },
+    "out/android-mysql/evidence/seed-engine-mysql-initialize-engine.log.log": {
+      "bytes": 525,
+      "sha256": "a252b1a3755392b14febdfc95346f7e078e144c9370f156d4476a1d406d5cadc"
+    },
+    "out/android-mysql/evidence/seed-engine-probe-249a966f565e4ddfb4710e14eff7bee8.log.log": {
+      "bytes": 1084,
+      "sha256": "a70496bd1ec151623b322bec5e8cfd3dd9a14557255ad1a1dd31cb9450e5df52"
+    },
+    "out/android-mysql/evidence/seed-stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "out/android-mysql/evidence/seed-stdout.log": {
+      "bytes": 70,
+      "sha256": "86058f30580501c8de63c21d0215ad8bc3fd03b4a966b713f08525d674809452"
+    },
+    "out/android-mysql/evidence/serial.log": {
+      "bytes": 14,
+      "sha256": "0115c661660f4cd9f62719a1c0f968c833c3295da9713cc8b6d915f739be272e"
+    },
+    "out/android-mysql/evidence/service-app-receipt.log": {
+      "bytes": 6361,
+      "sha256": "982b3fc35118c5c8a21869d9414aaa344381b15d7ffbe0e8e4bf87034d7bca6c"
+    },
+    "out/android-mysql/evidence/service-initialize-engine-private.log.log": {
+      "bytes": 110,
+      "sha256": "e4197991ea3dc5d9d4ad4ab66739f04d84bde204fa6ecfe3a02eb3fe0f26545d"
+    },
+    "out/android-mysql/evidence/service-initialize-stderr.log.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "out/android-mysql/evidence/service-initialize-stdout.log.log": {
+      "bytes": 69,
+      "sha256": "0364cbf611787f6b6d2c57698989632412e5f55d9359ecbc805cc018333c725d"
+    },
+    "out/android-mysql/evidence/service-seed-engine-private.log.log": {
+      "bytes": 104,
+      "sha256": "477bc16842dc3f647785b8dbd933945cdb8e91f0c5dfad7dd3f78c2b6740fd7e"
+    },
+    "out/android-mysql/evidence/service-seed-stderr.log.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "out/android-mysql/evidence/service-seed-stdout.log.log": {
+      "bytes": 70,
+      "sha256": "86058f30580501c8de63c21d0215ad8bc3fd03b4a966b713f08525d674809452"
+    },
+    "out/android-mysql/evidence/service-service-0-engine-private.log.log": {
+      "bytes": 1085,
+      "sha256": "b5fb8e55202fb128514f5cd55ee9a9441c8a12e5451290254c09db2ae7699767"
+    },
+    "out/android-mysql/evidence/service-service-0-stderr.log.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "out/android-mysql/evidence/service-service-0-stdout.log.log": {
+      "bytes": 98,
+      "sha256": "4ec5647f38ac5934dfa01c1847038589c2c61d310f75910fe1837fff04e2a2a3"
+    },
+    "out/android-mysql/evidence/service-service-1-engine-private.log.log": {
+      "bytes": 1085,
+      "sha256": "ea6b4762e7d83f96c06861f5b12142a5c61cc81f12bc218d16eb963b66180af0"
+    },
+    "out/android-mysql/evidence/service-service-1-stderr.log.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "out/android-mysql/evidence/service-service-1-stdout.log.log": {
+      "bytes": 98,
+      "sha256": "4ec5647f38ac5934dfa01c1847038589c2c61d310f75910fe1837fff04e2a2a3"
+    },
+    "out/android-mysql/evidence/service-verify-0-engine-private.log.log": {
+      "bytes": 108,
+      "sha256": "bc9edc86120611bd13f79a8c8e4ebc36b2ed1d3e84c7d5e5f1f09886d8138f20"
+    },
+    "out/android-mysql/evidence/service-verify-0-stderr.log.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "out/android-mysql/evidence/service-verify-0-stdout.log.log": {
+      "bytes": 72,
+      "sha256": "0a45b57732c1dc36801fc24fcaf2697c13658b9b1673cc49e4acbb077442d5fc"
+    },
+    "out/android-mysql/evidence/service-verify-1-engine-private.log.log": {
+      "bytes": 108,
+      "sha256": "8ec28080468011b8a0f7c09fad57c32998f2a38d58c1b646be0efa7acd4f9912"
+    },
+    "out/android-mysql/evidence/service-verify-1-stderr.log.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "out/android-mysql/evidence/service-verify-1-stdout.log.log": {
+      "bytes": 72,
+      "sha256": "0a45b57732c1dc36801fc24fcaf2697c13658b9b1673cc49e4acbb077442d5fc"
+    },
+    "out/android-mysql/evidence/stop-owned-test-app.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "out/android-mysql/evidence/verify-engine-files.log": {
+      "bytes": 191,
+      "sha256": "8eaf0f0069f6dd5c284cc13dfa753377e3501406a0432b88256211d6ef02f248"
+    },
+    "out/android-mysql/evidence/verify-engine-mysql-bootstrap-engine.log.log": {
+      "bytes": 1088,
+      "sha256": "c799b4881755aed0f54e563683a0560abc09923d27ba4b1274cd3f2caca3f50a"
+    },
+    "out/android-mysql/evidence/verify-engine-mysql-initialize-engine.log.log": {
+      "bytes": 525,
+      "sha256": "a252b1a3755392b14febdfc95346f7e078e144c9370f156d4476a1d406d5cadc"
+    },
+    "out/android-mysql/evidence/verify-engine-probe-249a966f565e4ddfb4710e14eff7bee8.log.log": {
+      "bytes": 1084,
+      "sha256": "a70496bd1ec151623b322bec5e8cfd3dd9a14557255ad1a1dd31cb9450e5df52"
+    },
+    "out/android-mysql/evidence/verify-engine-probe-761341f6fb064d6ca1515eeef52a7428.log.log": {
+      "bytes": 1084,
+      "sha256": "7ada90a7ac3662c67143bdb8bd4518a01de2951ac5a6d56dd01af09553cc1ff8"
+    },
+    "out/android-mysql/evidence/verify-stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "out/android-mysql/evidence/verify-stdout.log": {
+      "bytes": 72,
+      "sha256": "0a45b57732c1dc36801fc24fcaf2697c13658b9b1673cc49e4acbb077442d5fc"
+    },
+    "out/android-mysql/image-build.log": {
+      "bytes": 28534,
+      "sha256": "379fe65c28a87456ef06c33563b10f386145307a10ab3d18e22b55d31586dd90"
+    },
+    "out/android-mysql/provider-build.json": {
+      "bytes": 5405,
+      "sha256": "7ce83fb7ee0af5d9957f57eedef08b049d3adcc1040c6d4dcefbc9ba1d089ae8"
+    },
+    "out/android-mysql/runtime.json": {
+      "bytes": 33125,
+      "sha256": "109ac9bc069911045ba9055c35b1822ec2c543b469aa66faf0acee905b92b024"
+    },
+    "out/android-mysql/source-build.log": {
+      "bytes": 95658,
+      "sha256": "c1951c5a795ec139f5f157df3a3b70be048d697715499b912ed5e1a8ae2dce4a"
+    },
+    "out/android-mysql/source-manifest.json": {
+      "bytes": 53070,
+      "sha256": "ca5c6d1ee9559430b62590d242788ff756393cc4d7de2248b943633b3221c04f"
+    }
+  },
+  "bothBootstrapAndServiceAdmissionValidatorsRerunLocally": true,
+  "canonicalProvider": {
+    "bytes": 5405,
+    "sha256": "272551e46524ce2f61b479b7d05a93c11acb8c6536e3dd2a76b205d7509cc87c"
+  },
+  "canonicalProviderReconstructedAndReceiptHashMatched": true,
+  "ciCompleteInstalledSourcesReadBackBeforeFreshInputRetention": true,
+  "completeSourceManifest": {
+    "allPinnedMysqlSourceArchiveIdentitiesMatched": true,
+    "archiveBytes": 876239964,
+    "archiveFiles": 275,
+    "identity": {
+      "bytes": 53070,
+      "sha256": "ca5c6d1ee9559430b62590d242788ff756393cc4d7de2248b943633b3221c04f"
+    },
+    "matchesPreviouslyFullyReadBackSourceManifest": true,
+    "runtimeMetadata": {
+      "bytes": 33125,
+      "sha256": "109ac9bc069911045ba9055c35b1822ec2c543b469aa66faf0acee905b92b024"
+    },
+    "sourcePackages": 88
+  },
+  "currentRuntimeArchive": {
+    "assetPath": "mysql-probe/mysql-x86-64.archive",
+    "bytes": 112330775,
+    "file": "mysql-x86-64.tar.gz",
+    "sha256": "ef3162053fe10e9ff2a0a99c1760b40c8b7a0afb4d57a43bfd812886b085919c"
+  },
+  "currentVariantSelectedForProduction": false,
+  "decodedActualWholeJobLog": {
+    "bytes": 133145,
+    "sha256": "2865a81fb5a2eb66127571d67563cde21939668d62e45f792b9580cf8f3cb7d0"
+  },
+  "finalSmallArtifact": {
+    "bytes": 110749,
+    "id": 13008264081,
+    "sha256": "5ff01d7239ebd4032fcca7b459d137e96917470c6f04e34779387ac729183959"
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "historical159c75VariantProofTransferred": false,
+  "historicalEarlyObservation": {
+    "finalQualificationMatchesEarlyExactly": true,
+    "identity": {
+      "bytes": 25623,
+      "sha256": "c6f7eda088bb475732e32cef5436013d6f929277269dfd032b231548aaa2e8e0"
+    },
+    "path": "runtime/evidence/android-mysql-service-817cbc-early-readback.json",
+    "priorInProgressObservationPreserved": true,
+    "unchanged": true
+  },
+  "localApkOrRuntimeArchiveReadBack": false,
+  "localCompleteSourceOrFreshInputArtifactsDownloaded": false,
+  "observedAtUtc": "2026-10-30T20:24:34.506281+00:00",
+  "producer": {
+    "apiUpdatedAt": "2026-10-30T20:21:09Z",
+    "conclusion": "success",
+    "integrationRevision": "817cbc229f4dcc24beb169ecc72838fab4d1df32",
+    "job": 124281184854,
+    "repository": "Russianranger/esteria_android",
+    "status": "completed",
+    "workflowRun": 41119182193
+  },
+  "productionArm64Qualified": false,
+  "retainedArtifacts": {
+    "completeSources": {
+      "bytes": 905119581,
+      "id": 13009620479,
+      "sha256": "f9b27ac13d3856233d1f1aebaa60b89b479171dc3dae37b186b083866d9ac355"
+    },
+    "freshInputs": {
+      "bytes": 229346153,
+      "id": 13008209084,
+      "sha256": "fe778d380356fac7ff30267ee84ea2db895a64dbc17c3b31f841f66d23077864"
+    }
+  },
+  "scope": "actual-current-source-android13-x64-mysql-completion-and-source-retention-readback",
+  "serverSchemasQualified": false,
+  "worldserverQualified": false
+}

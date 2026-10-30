@@ -33,9 +33,13 @@ immutable=false. Never replace assets, move the tag or transfer proof to other
 bytes. The complete-profile consumer checks the exact frozen recipe before
 executing it and current provider guards afterward; run its actual new APK job.
 
-The original complete-profile APK41107245856 at7a7166 passed all127 APK entries,
-eight runtime archives and four-component Java32MiB installation/cache checks.
-That historical proof is packaging only. New sources include real client ALSA
+The current public-input APK41120449825 at19b6769 passes full CI APK/source/
+helper/native verification and four-component Java32MiB installation/cache. Raw
+APK337,008,310 bytes SHAee468b1e961cf728b7cb16da8299e8e99ef83e577e9dfd5479e453b9145fffe4.
+Independent local source readback validates999 integration/30 PRoot files; the
+sole wrapper CRLF export is explicit. Current full APK bytes were read in CI,
+not downloaded locally. The earlier7a7166 APK has independent full local readback.
+Both are packaging only, not a Thor candidate. New sources include real client ALSA
 mount, SAF relative stream resume and IME submission/backpressure/stale-connection
 fixes. Host/Core/SDK checks pass; normal asset-backed execution remains open.
 
@@ -122,3 +126,13 @@ selections and run the real four-schema/reentry/ledger/clean-restart job. Captur
 loader/library wrappers are distinct from unchanged ELF/debug identities; the
 original selected MySQL descriptor/archive is checked before any execution.
 Do not bypass the disabled gate or change production ARM64 admission.
+
+Local-account handoff crash recovery is now implemented without changing the
+selected471 wire contract. Read runtime/client/LOCAL-LOGIN-RECOVERY.md before
+changing it. A canonical in-process reservation precedes opening the kernel lock
+FD (closing a duplicate FD can release POSIX locks); release reservation only after
+FD close. A private durable inode/opaque57-byte-hash receipt precedes publication.
+Recover only recognized unchanged records; preserve unknown pre-proof stages,
+legacy/tampered/linked files and save/config siblings. Five actual host SIGKILL
+phases and cross-JVM guards pass; SDK compilation/lint passes. Inspect the actual
+Android component workflow after this Core change; no new client/binary pin.
