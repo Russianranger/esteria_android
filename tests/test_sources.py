@@ -46,6 +46,13 @@ class SourceLockTests(unittest.TestCase):
             source = {"commit": git("rev-parse", "HEAD"), "submodules": {}}
             module.verify_checkout(repo, source, [])
             path.write_text("user work")
+            for flag, inverse in [("--assume-unchanged", "--no-assume-unchanged"),
+                                  ("--skip-worktree", "--no-skip-worktree")]:
+                git("update-index", flag, "source.txt")
+                with self.assertRaises(ValueError):
+                    module.verify_checkout(repo, source, [])
+                self.assertEqual(path.read_text(), "user work")
+                git("update-index", inverse, "source.txt")
             with self.assertRaises(ValueError):
                 module.verify_checkout(repo, source, [])
             self.assertEqual(path.read_text(), "user work")

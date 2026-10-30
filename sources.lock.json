@@ -3,7 +3,7 @@
   "sources": {
     "client": {
       "url": "https://github.com/Russianranger/wowdecomp_esteria.git",
-      "commit": "800cdd272269570a9776d0c170e4828605fc1218",
+      "commit": "71b9b564c30b14365172e3bc38a13aa69d21f4b8",
       "branch": "android/arm64-port",
       "submodules": {},
       "patches": []

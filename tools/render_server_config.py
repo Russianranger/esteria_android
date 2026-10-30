@@ -61,7 +61,7 @@ def render(server: Path, state: Path, data: Path, sql_source: Path, mysql_client
         quoted(path)
     profile = json.loads(PROFILE.read_text())
     state.mkdir(parents=True, exist_ok=True)
-    for name in ('config', 'accounts', 'database', 'logs', 'run'):
+    for name in ('config', 'accounts', 'database', 'logs', 'run', 'run/authserver', 'run/worldserver'):
         (state / name).mkdir(mode=0o700, exist_ok=True)
     with (state / 'config/.render.lock').open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
@@ -79,8 +79,9 @@ def render(server: Path, state: Path, data: Path, sql_source: Path, mysql_client
                   'SourceDirectory': quoted(sql_source), 'MySQLExecutable': quoted(mysql_client),
                   'LoginDatabaseInfo': database_info('acore_auth'),
                   'LoginDatabase.WorkerThreads': 1, 'LoginDatabase.SynchThreads': 1}
-        auth = common | {'RealmServerPort': profile['auth_port']}
+        auth = common | {'RealmServerPort': profile['auth_port'], 'TempDir': quoted(state / 'run/authserver')}
         world = common | {'WorldServerPort': profile['world_port'], 'DataDir': quoted(data),
+                          'TempDir': quoted(state / 'run/worldserver'),
                           'WorldDatabaseInfo': database_info('acore_world'),
                           'CharacterDatabaseInfo': database_info('acore_characters'),
                           'WorldDatabase.WorkerThreads': 1, 'WorldDatabase.SynchThreads': 1,

@@ -1,0 +1,19 @@
+plugins { id 'java-library' }
+java { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
+tasks.register('hostTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.runtime.SessionSupervisorTest'
+}
+tasks.register('diagnosticsTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.diagnostics.SupportBundleTest'
+}
+tasks.register('importerTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.importer.ImporterTests'
+    maxHeapSize = '32m'
+}
+check.dependsOn hostTest, diagnosticsTest, importerTest

@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 180
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Install build dependencies
         run: |
           sudo apt-get update
@@ -47,7 +47,7 @@ jobs:
           uname -a > out/server-install/build-host.txt
           dpkg-query -W > out/server-install/build-packages.txt
           find out/server-install -type f -print0 | sort -z | xargs -0 sha256sum > out/server-install.sha256
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: esteria-linux-arm64-server-${{ github.sha }}
           path: |

@@ -1,0 +1,41 @@
+# Source text keeps stable line endings; binary detection remains enabled.
+* text=auto eol=lf
+gradlew text eol=lf
+*.sh text eol=lf
+*.bat text eol=crlf
+
+# Explicit case-insensitive extension patterns protect imported/runtime artifacts if
+# they are intentionally tracked later. Proprietary game data is not committed.
+*.[mM][pP][qQ] binary
+*.[bB][iI][nN] binary
+*.[dD][bB][cC] binary
+*.[dD][bB][cC][1-9]-* binary
+*.[mM]2 binary
+*.[sS][kK][iI][nN] binary
+*.[bB][lL][pP] binary
+*.[wW][mM][oO] binary
+*.[vV][mM][oO] binary
+*.[mM][aA][pP] binary
+*.[mM][mM][aA][pP] binary
+*.[mM][mM][tT][iI][lL][eE] binary
+*.[vV][mM][tT][rR][eE][eE] binary
+*.[vV][mM][tT][iI][lL][eE] binary
+*.[sS][pP][vV] binary
+*.[pP][nN][gG] binary
+*.[jJ][pP][gG] binary
+*.[jJ][pP][eE][gG] binary
+*.[gG][iI][fF] binary
+*.[wW][eE][bB][pP] binary
+*.[zZ][iI][pP] binary
+*.[gG][zZ] binary
+*.[xX][zZ] binary
+*.[7][zZ] binary
+*.[eE][xX][eE] binary
+*.[dD][lL][lL] binary
+*.[sS][oO] binary
+*.[lL][iI][bB] binary
+*.[oO][bB][jJ] binary
+*.[jJ][aA][rR] binary
+*.[aA][pP][kK] binary
+*.[aA][aA][bB] binary
+*.[pP][dD][fF] binary

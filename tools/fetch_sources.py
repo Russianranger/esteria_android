@@ -60,9 +60,18 @@ def patch_inputs(source: dict, root: Path) -> list[Path]:
     return result
 
 
+def reject_hidden_changes(path: Path) -> None:
+    # Git diff trusts these index flags. A build must not silently consume bytes
+    # that git intentionally omitted from its normal working-tree comparisons.
+    entries = run("git", "ls-files", "-v", "-z", cwd=path).split("\0")
+    if any(entry and (entry[0].islower() or entry[0] == "S") for entry in entries):
+        raise ValueError(f"{path}: assume-unchanged/skip-worktree flags hide source changes; use a fresh checkout")
+
+
 def verify_checkout(path: Path, source: dict, patches: list[Path]) -> None:
     if run("git", "rev-parse", "HEAD", cwd=path) != source["commit"]:
         raise ValueError(f"{path}: HEAD differs from lock; preserve this checkout and use a new output directory")
+    reject_hidden_changes(path)
     # Expected modifications are exactly the indexed, pinned patches. Never reset.
     if run("git", "diff", "--name-only", cwd=path):
         raise ValueError(f"{path}: uncommitted source changes")
@@ -70,6 +79,7 @@ def verify_checkout(path: Path, source: dict, patches: list[Path]) -> None:
         raise ValueError(f"{path}: untracked source files")
     for subpath, commit in source["submodules"].items():
         module = path / subpath
+        reject_hidden_changes(module)
         if run("git", "rev-parse", "HEAD", cwd=module) != commit:
             raise ValueError(f"{subpath}: incorrect pinned submodule")
         if run("git", "status", "--porcelain", cwd=module):

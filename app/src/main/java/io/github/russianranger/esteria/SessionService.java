@@ -1,0 +1,269 @@
+package io.github.russianranger.esteria;
+
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.app.ActivityManager;
+import android.content.Intent;
+import android.content.pm.ServiceInfo;
+import android.net.Uri;
+import android.os.Binder;
+import android.os.Build;
+import android.os.IBinder;
+import android.os.Debug;
+import android.os.PowerManager;
+import android.os.Handler;
+import android.os.Looper;
+import android.annotation.SuppressLint;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
+import java.util.Iterator;
+import org.json.JSONObject;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+import io.github.russianranger.esteria.core.diagnostics.SupportBundle;
+import io.github.russianranger.esteria.core.importer.GameDataImporter;
+
+/** Foreground owner of large import jobs. Runtime launch remains gated until qualified binaries exist. */
+public final class SessionService extends Service {
+    static final String IMPORT = "io.github.russianranger.esteria.IMPORT";
+    static final String CANCEL = "io.github.russianranger.esteria.CANCEL";
+    static final String EXPORT = "io.github.russianranger.esteria.EXPORT";
+    static final String START = "io.github.russianranger.esteria.START";
+    private static final String CHANNEL = "esteria-session";
+    private static final int NOTIFICATION = 1001;
+    final class LocalBinder extends Binder { SessionService service() { return SessionService.this; } }
+    private final IBinder binder = new LocalBinder();
+    private final ExecutorService worker = Executors.newSingleThreadExecutor();
+    private final AtomicBoolean cancelled = new AtomicBoolean();
+    private final AtomicBoolean busy = new AtomicBoolean();
+    private final Handler main = new Handler(Looper.getMainLooper());
+    private boolean destroyed;
+    private int latestStartId;
+    private volatile String status = "Ready to import your 3.3.5a build 12340 client ZIP.";
+    private Path root;
+    String status() { return status; }
+    boolean busy() { return busy.get(); }
+    @Override public IBinder onBind(Intent intent) { return binder; }
+    @Override public void onCreate() {
+        super.onCreate();
+        try {
+            root = getFilesDir().getCanonicalFile().toPath();
+            Files.createDirectories(root.resolve("state/logs"));
+            if (getSharedPreferences("session", MODE_PRIVATE).getBoolean("interrupted", false))
+                status = "Previous operation was interrupted. Select the same archive to resume. Existing game data remains active.";
+            else if (new GameDataImporter(root.resolve("game")).resolveCurrent() != null)
+                status = "Client data is imported. Local runtime qualification is still pending.";
+        } catch (IOException e) { status = "Storage unavailable: " + e.getMessage(); }
+        NotificationManager manager = getSystemService(NotificationManager.class);
+        manager.createNotificationChannel(new NotificationChannel(CHANNEL, "Local game and imports", NotificationManager.IMPORTANCE_LOW));
+    }
+    @SuppressLint("ApplySharedPref") // The recovery marker must be durable before touching imported data.
+    @Override public int onStartCommand(Intent intent, int flags, int startId) {
+        latestStartId = startId;
+        if (intent == null) { stopSelf(startId); return START_NOT_STICKY; }
+        if (CANCEL.equals(intent.getAction())) {
+            if (busy.get()) { cancelled.set(true); status = "Stopping at a safe point…"; }
+            else stopSelf(startId);
+            return START_NOT_STICKY;
+        }
+        // A repeated startForegroundService call still requires a foreground response.
+        foreground("Preparing Esteria");
+        if (!busy.compareAndSet(false, true)) return START_NOT_STICKY;
+        cancelled.set(false);
+        String operationId = UUID.randomUUID().toString();
+        getSharedPreferences("session", MODE_PRIVATE).edit().putString("operation", operationId).putBoolean("interrupted", true).commit();
+        worker.execute(() -> {
+            try {
+                if (root == null) throw new IOException("App storage is unavailable");
+                if (IMPORT.equals(intent.getAction())) importArchive(intent);
+                else if (EXPORT.equals(intent.getAction())) exportBundle(intent.getData());
+                else if (START.equals(intent.getAction())) checkLaunch();
+                else throw new IOException("Unknown operation");
+            } catch (GameDataImporter.ImportCancelledException e) {
+                status = "Import paused. Select the same archive to resume; existing game data is unchanged.";
+                log("Import paused");
+            } catch (Exception e) {
+                status = e.getClass().getSimpleName() + ": " + e.getMessage();
+                log(status);
+            } finally {
+                // Serialize completion with onStartCommand. Publishing idle before stopSelf
+                // could otherwise cancel a newly queued import. A replaced service instance
+                // may own a newer recovery marker; never clear that instance's operation.
+                main.post(() -> {
+                    if (operationId.equals(getSharedPreferences("session", MODE_PRIVATE).getString("operation", "")))
+                        getSharedPreferences("session", MODE_PRIVATE).edit().putBoolean("interrupted", false).commit();
+                    if (!destroyed) { stopForeground(STOP_FOREGROUND_REMOVE); stopSelf(latestStartId); }
+                    busy.set(false);
+                });
+            }
+        });
+        return START_NOT_STICKY;
+    }
+    private void importArchive(Intent intent) throws Exception {
+        Uri uri = intent.getData();
+        if (uri == null) throw new IOException("No archive selected");
+        GameDataImporter.ImportKind kind = intent.getBooleanExtra("overlay", false)
+                ? GameDataImporter.ImportKind.CONTENT_OVERLAY : GameDataImporter.ImportKind.BASE_CLIENT;
+        Path archive = UriStager.stage(getContentResolver(), uri, root.resolve("imports"), cancelled,
+                (copied, total) -> status = "Copying archive: " + mib(copied) + (total >= 0 ? " / " + mib(total) : "") + " MiB");
+        GameDataImporter importer = new GameDataImporter(root.resolve("game"));
+        GameDataImporter.Result result = importer.importZip(archive, kind, (path, bytes, total, count, files) ->
+                status = "Importing " + count + " / " + files + " files · " + mib(bytes) + " / " + mib(total) + " MiB\n" + path,
+                cancelled::get);
+        // Delete only the temporary ZIP after the importer has published a complete generation.
+        Files.deleteIfExists(archive);
+        status = "Import complete: " + result.copiedFiles + " copied, " + result.reusedFiles + " resumed.\nBuild 12340 base checks passed; full Esteria content and runtime are not yet qualified.";
+        log("Import complete generation=" + result.generation + " copied=" + result.copiedFiles + " reused=" + result.reusedFiles);
+    }
+    private void checkLaunch() throws Exception {
+        if (new GameDataImporter(root.resolve("game")).resolveCurrent() == null) throw new IOException("Import a build 12340 client first");
+        Properties runtime = new Properties();
+        try (InputStream input = getAssets().open("runtime.properties")) { runtime.load(input); }
+        if (!"true".equals(runtime.getProperty("qualified")))
+            throw new IOException(runtime.getProperty("reason", "No qualified local runtime is installed"));
+        // A true manifest alone cannot establish a working runtime. Implement and qualify the
+        // platform session adapter before admitting any runtime to this build.
+        throw new IOException("This build has no qualified client/server session adapter");
+    }
+    private void exportBundle(Uri destination) throws Exception {
+        if (destination == null || !"content".equals(destination.getScheme())) throw new IOException("No export destination selected");
+        String previousStatus = status; status = "Writing support bundle…";
+        Map<String, String> facts = new LinkedHashMap<>();
+        facts.put("app.id", BuildConfig.APPLICATION_ID); facts.put("app.version", BuildConfig.VERSION_NAME);
+        facts.put("app.sourceRevision", BuildConfig.SOURCE_REVISION);
+        facts.put("buildPin.client", BuildConfig.CLIENT_REVISION); facts.put("buildPin.server", BuildConfig.SERVER_REVISION);
+        facts.put("app.versionCode", String.valueOf(BuildConfig.VERSION_CODE));
+        facts.put("android.api", String.valueOf(Build.VERSION.SDK_INT)); facts.put("android.release", Build.VERSION.RELEASE);
+        facts.put("device.model", Build.MODEL); facts.put("device.manufacturer", Build.MANUFACTURER);
+        facts.put("device.abis", android.text.TextUtils.join(",", Build.SUPPORTED_ABIS));
+        facts.put("status", previousStatus); facts.put("runtime.qualified", "false");
+        addPerformanceSnapshot(facts);
+        Properties runtime = new Properties();
+        try (InputStream input = getAssets().open("runtime.properties")) { runtime.load(input); }
+        for (String key : runtime.stringPropertyNames()) facts.put("runtime.manifest." + key, runtime.getProperty(key));
+        JSONObject pins = new JSONObject(readAsset("sources.lock.json")).getJSONObject("sources");
+        for (String source : new String[]{"client", "server"}) {
+            JSONObject pin = pins.getJSONObject(source);
+            facts.put("sourcePin." + source + ".commit", pin.getString("commit"));
+            facts.put("sourcePin." + source + ".url", pin.getString("url"));
+            JSONObject submodules = pin.optJSONObject("submodules");
+            if (submodules != null) {
+                int index = 0;
+                for (Iterator<String> keys = submodules.keys(); keys.hasNext();) {
+                    String path = keys.next(), prefix = "sourcePin." + source + ".submodule" + index++;
+                    facts.put(prefix + ".path", path); facts.put(prefix + ".commit", submodules.getString(path));
+                }
+            }
+        }
+        Map<String, Path> logs = new LinkedHashMap<>();
+        for (String name : new String[]{"launcher", "database", "authserver", "worldserver", "client"})
+            logs.put(name + ".log", root.resolve("state/logs/" + name + ".log"));
+        try (OutputStream output = getContentResolver().openOutputStream(destination, "w")) {
+            if (output == null) throw new IOException("Export destination could not be opened");
+            SupportBundle.write(output, facts, logs);
+        }
+        status = "Support bundle saved. It contains status and bounded, redacted logs; no game assets or databases.";
+    }
+    private void foreground(String text) {
+        Intent open = new Intent(this, MainActivity.class);
+        Intent cancel = new Intent(this, SessionService.class).setAction(CANCEL);
+        Notification notification = new Notification.Builder(this, CHANNEL)
+                .setContentTitle("Esteria").setContentText(text).setSmallIcon(android.R.drawable.ic_media_play)
+                .setContentIntent(PendingIntent.getActivity(this, 0, open, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT))
+                .addAction(new Notification.Action.Builder(null, "Stop", PendingIntent.getService(this, 1, cancel, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT)).build())
+                .setOngoing(true).build();
+        if (Build.VERSION.SDK_INT >= 29) startForeground(NOTIFICATION, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+        else startForeground(NOTIFICATION, notification);
+    }
+    private String readAsset(String name) throws IOException {
+        try (InputStream input = getAssets().open(name); ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
+            byte[] chunk = new byte[4096];
+            for (int count; (count = input.read(chunk)) != -1;) {
+                if (bytes.size() + count > 64 * 1024) throw new IOException("Build metadata exceeds its size limit");
+                bytes.write(chunk, 0, count);
+            }
+            return new String(bytes.toByteArray(), StandardCharsets.UTF_8);
+        }
+    }
+    /** Cheap observations captured only on explicit export; these are not gameplay measurements. */
+    private void addPerformanceSnapshot(Map<String, String> facts) {
+        facts.put("snapshot.scope", "launcher-process observation; not a gameplay benchmark");
+        facts.put("snapshot.capturedAtEpochMs", String.valueOf(System.currentTimeMillis()));
+        try {
+            ActivityManager manager = getSystemService(ActivityManager.class);
+            if (manager == null) facts.put("snapshot.memory.status", "unavailable");
+            else {
+                ActivityManager.MemoryInfo memory = new ActivityManager.MemoryInfo();
+                manager.getMemoryInfo(memory);
+                facts.put("snapshot.memory.totalBytes", String.valueOf(memory.totalMem));
+                facts.put("snapshot.memory.availableBytes", String.valueOf(memory.availMem));
+                facts.put("snapshot.memory.lowMemory", String.valueOf(memory.lowMemory));
+                facts.put("snapshot.memory.lowMemoryThresholdBytes", String.valueOf(memory.threshold));
+            }
+        } catch (RuntimeException unavailable) {
+            facts.put("snapshot.memory.status", "unavailable: " + unavailable.getClass().getSimpleName());
+        }
+        try {
+            Debug.MemoryInfo processMemory = new Debug.MemoryInfo();
+            Debug.getMemoryInfo(processMemory);
+            facts.put("snapshot.launcherProcess.pssKiB", String.valueOf(processMemory.getTotalPss()));
+            facts.put("snapshot.launcherProcess.privateDirtyKiB", String.valueOf(processMemory.getTotalPrivateDirty()));
+            facts.put("snapshot.launcherProcess.sharedDirtyKiB", String.valueOf(processMemory.getTotalSharedDirty()));
+            Runtime vm = Runtime.getRuntime();
+            facts.put("snapshot.launcherProcess.javaHeapUsedBytes", String.valueOf(vm.totalMemory() - vm.freeMemory()));
+            facts.put("snapshot.launcherProcess.javaHeapLimitBytes", String.valueOf(vm.maxMemory()));
+        } catch (RuntimeException unavailable) {
+            facts.put("snapshot.launcherProcess.status", "unavailable: " + unavailable.getClass().getSimpleName());
+        }
+        try {
+            if (Build.VERSION.SDK_INT < 29) facts.put("snapshot.thermal.status", "unsupported before Android API 29");
+            else {
+                PowerManager power = getSystemService(PowerManager.class);
+                if (power == null) facts.put("snapshot.thermal.status", "unavailable");
+                else {
+                    int thermal = power.getCurrentThermalStatus();
+                    facts.put("snapshot.thermal.androidStatusCode", String.valueOf(thermal));
+                    String[] labels = {"none", "light", "moderate", "severe", "critical", "emergency", "shutdown"};
+                    facts.put("snapshot.thermal.status", thermal >= 0 && thermal < labels.length ? labels[thermal] : "unknown");
+                }
+            }
+        } catch (RuntimeException unavailable) {
+            facts.put("snapshot.thermal.status", "unavailable: " + unavailable.getClass().getSimpleName());
+        }
+        try {
+            java.nio.file.FileStore storage = Files.getFileStore(root);
+            facts.put("snapshot.storage.freeBytes", String.valueOf(storage.getUsableSpace()));
+            facts.put("snapshot.storage.totalBytes", String.valueOf(storage.getTotalSpace()));
+        } catch (IOException | RuntimeException unavailable) {
+            facts.put("snapshot.storage.status", "unavailable: " + unavailable.getClass().getSimpleName());
+        }
+    }
+    private void log(String line) {
+        if (root == null) return;
+        try {
+            Path path = root.resolve("state/logs/launcher.log");
+            if (Files.exists(path) && Files.size(path) > 256 * 1024) Files.delete(path);
+            Files.write(path, (System.currentTimeMillis() + " " + SupportBundle.redact(line) + "\n").getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        } catch (IOException ignored) { }
+    }
+    private static long mib(long value) { return value / (1024 * 1024); }
+    @Override public void onDestroy() { destroyed = true; cancelled.set(true); worker.shutdown(); super.onDestroy(); }
+    @Override public void onTimeout(int startId, int foregroundServiceType) {
+        cancelled.set(true); status = "Android stopped the long import. Select the same archive to resume.";
+        stopForeground(STOP_FOREGROUND_REMOVE); stopSelf(startId);
+    }
+}

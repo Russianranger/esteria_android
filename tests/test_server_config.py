@@ -6,9 +6,9 @@ import unittest
 from tools.render_server_config import overlay, quoted, render
 
 
-AUTH = '''BindIP LogsDir SourceDirectory MySQLExecutable LoginDatabaseInfo
+AUTH = '''BindIP LogsDir SourceDirectory MySQLExecutable TempDir LoginDatabaseInfo
 LoginDatabase.WorkerThreads LoginDatabase.SynchThreads RealmServerPort'''.split()
-WORLD = '''BindIP LogsDir SourceDirectory MySQLExecutable LoginDatabaseInfo
+WORLD = '''BindIP LogsDir SourceDirectory MySQLExecutable TempDir LoginDatabaseInfo
 LoginDatabase.WorkerThreads LoginDatabase.SynchThreads WorldServerPort DataDir
 WorldDatabaseInfo CharacterDatabaseInfo WorldDatabase.WorkerThreads WorldDatabase.SynchThreads
 CharacterDatabase.WorkerThreads CharacterDatabase.SynchThreads Console.Enable Ra.Enable SOAP.Enabled
