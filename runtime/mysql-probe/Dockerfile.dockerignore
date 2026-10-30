@@ -1,0 +1,8 @@
+**
+!runtime/
+!runtime/mysql-probe/
+!runtime/mysql-probe/**
+!runtime/server/
+!runtime/server/ubuntu.sources
+!runtime/server/inrelease.SHA256SUMS
+!runtime/server/capture_sources.py

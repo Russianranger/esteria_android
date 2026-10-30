@@ -1,0 +1,21 @@
+// Separate x86_64 database qualification; never a production runtime provider.
+def mysqlProbeProvider = providers.gradleProperty('mysqlProbeProviderDir').orNull
+android.defaultConfig.buildConfigField 'boolean', 'MYSQL_PROBE_PACKAGED', mysqlProbeProvider ? 'true' : 'false'
+if (mysqlProbeProvider) {
+    def prootProbeProvider = providers.gradleProperty('prootProbeProviderDir').orNull
+    if (providers.gradleProperty('nativeRuntimeBridge').getOrElse('false') != 'true' ||
+        providers.gradleProperty('nativeBridgeAbi').getOrElse('arm64-v8a') != 'x86_64' || !prootProbeProvider ||
+        ['prootProviderDir', 'serverRuntimeProviderDir', 'clientRuntimeProviderDir', 'guestBridgeProviderDir'].any {
+            providers.gradleProperty(it).isPresent()
+        } || providers.gradleProperty('presentationEmulatorTest').getOrElse('false') == 'true')
+        throw new GradleException('MySQL probe requires the isolated x86_64 PRoot debug profile without production providers')
+    androidComponents.beforeVariants(androidComponents.selector().withBuildType('release')) { variant -> variant.enable = false }
+    def provider = file(mysqlProbeProvider)
+    android.sourceSets.main.assets.srcDir(new File(provider, 'assets'))
+    def verifyMysqlProbe = tasks.register('verifyMysqlProbeProvider', Exec) {
+        workingDir rootProject.projectDir
+        commandLine 'python3', 'tools/verify_android_mysql_probe.py', '--provider', provider.absolutePath,
+            '--proot-provider', file(prootProbeProvider).absolutePath
+    }
+    tasks.named('preBuild').configure { dependsOn verifyMysqlProbe }
+}

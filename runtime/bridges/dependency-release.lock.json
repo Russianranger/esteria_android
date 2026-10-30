@@ -1,0 +1,21 @@
+{
+  "formatVersion": 1,
+  "repository": "Russianranger/esteria_android",
+  "scope": "guest-helper-inputs-write-once-prerelease",
+  "tag": "deps-guest-bridges-ae5534d-a91e2e7cf749",
+  "targetCommit": "ae5534d0a9d7fb72c8e5a03dcfc65420c354e7bb",
+  "originalIntegrationRevision": "61bf8a134845276cb78430884d557e477ff286aa",
+  "workflowRun": 40995565147,
+  "providerLockSha256": "e983198e229ffad73d8fdc14cd6059029a5b6ba20d6e9509633db45df3e03ea4",
+  "artifact": {
+    "id": 12951430269,
+    "name": "unqualified-linux-arm64-guest-bridges-61bf8a134845276cb78430884d557e477ff286aa",
+    "bytes": 142339282,
+    "sha256": "f3365863da63074fb18bf9809cb7df38c161d47e5efe40f2f32c1fe5f6847e3b"
+  },
+  "archive": {
+    "bytes": 469031,
+    "sha256": "a91e2e7cf74957c7caf2c7e85de2a6ee8952d273b3f5e3f18cecb06127791c39"
+  },
+  "published": null
+}

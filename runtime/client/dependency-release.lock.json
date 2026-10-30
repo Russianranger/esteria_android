@@ -1,0 +1,81 @@
+{
+  "formatVersion": 1,
+  "repository": "Russianranger/esteria_android",
+  "scope": "reconstructed-client-inputs-write-once-prerelease",
+  "tag": "deps-client-arm64-ae5534d-69ccfaa6",
+  "targetCommit": "ae5534d0a9d7fb72c8e5a03dcfc65420c354e7bb",
+  "sourceRevision": "69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa",
+  "workflowRun": 40992315512,
+  "buildId": "40992315512.1",
+  "providerLockSha256": "644849e771f7f2668553111db935fe2fff20b2a574187b340e070a7e1a2b7600",
+  "artifact": {
+    "id": 12949534555,
+    "name": "client-ARM64-69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa",
+    "bytes": 45120553,
+    "sha256": "4298480be53ddc2e614a06e8acd130139015ad52994e766eecee5f5d374327e4"
+  },
+  "sourceArchive": {
+    "bytes": 23401759,
+    "sha256": "0ea2fa4f4997cee49cea73a06bf19977d2981285db6179a35f16921546a7bc48"
+  },
+  "sourceReceipt": {
+    "bytes": 3513,
+    "sha256": "0bea5cdcadbff68c7ad6eda98ce298ef92f7b1939b86da9812295ec863a884ff"
+  },
+  "xvid": {
+    "bytes": 820854,
+    "sha256": "abbdcbd39555691dd1c9b4d08f0a031376a3b211652c0d8b3b8aa9be1303ce2d",
+    "url": "https://downloads.xvid.com/downloads/xvidcore-1.3.7.tar.gz"
+  },
+  "generationInputs": {
+    "LICENSE": {
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    "runtime/client/android-provider.lock.json": {
+      "bytes": 492,
+      "sha256": "644849e771f7f2668553111db935fe2fff20b2a574187b340e070a7e1a2b7600"
+    },
+    "runtime/runtime-sources.lock.json": {
+      "bytes": 14211,
+      "sha256": "cd2f3d2d47e2ac0de845acc914e94013906836de9710dc290a6fa51c89bbf07d"
+    },
+    "sources.lock.json": {
+      "bytes": 1983,
+      "sha256": "dbbf8983cfa2b429f7dd0c3308a2795ffbecd29e8019adf35348447e1eab41b0"
+    },
+    "tools/fetch_sources.py": {
+      "bytes": 7393,
+      "sha256": "19ac32b6bcc9c869e7785f19e7bb1f8492f7b94bd839aa9c30a02eae476c598c"
+    },
+    "tools/manifest_server_content.py": {
+      "bytes": 23330,
+      "sha256": "4c13be83597903737a40260f685e63b1908fd6c2655f590fc5228fee957fd985"
+    },
+    "tools/manifest_server_modules.py": {
+      "bytes": 9119,
+      "sha256": "4e614b8c860ba2d9ef69d595f6fbbd51df440993f8c7a9a8e85d5d99533b9166"
+    },
+    "tools/package_client_sources.py": {
+      "bytes": 5926,
+      "sha256": "4950cfd3e6b322d497d8d15cb08d8f167e5834c787ebdf11731c0339d3baeb99"
+    },
+    "tools/package_server_content.py": {
+      "bytes": 19520,
+      "sha256": "7ebc123d1492421438a76200f2dafa92e5d022b20bed0267d9fa505460c88598"
+    },
+    "tools/prepare_runtime.py": {
+      "bytes": 22126,
+      "sha256": "113ae7612cba7f557fab79550448578a9a6b8ceb674cff80b38fcf40e8257078"
+    },
+    "tools/provider_client_runtime.py": {
+      "bytes": 18403,
+      "sha256": "0709050784db7ef855033d6f49df973831ec8813b74fc57ce8f175a3d9bbc580"
+    },
+    "tools/verify_server_build.py": {
+      "bytes": 15540,
+      "sha256": "9d3096e8cc1d2a650353886800e8192dfe78f0b352fede322a39002e545b4152"
+    }
+  },
+  "published": null
+}

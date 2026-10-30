@@ -1,0 +1,113 @@
+name: Preserve measured reconstructed client inputs
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - runtime/client/dependency-release.lock.json
+      - tools/release_client_inputs.py
+      - tools/dependency_publication.py
+      - tests/test_client_release.py
+      - .github/workflows/preserve-client-inputs.yml
+permissions:
+  contents: read
+concurrency:
+  group: preserve-measured-client-inputs
+  cancel-in-progress: false
+jobs:
+  validate:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Fetch exact reconstructed client revision for source and PE checks
+        run: python3 tools/fetch_sources.py client --output sources
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ae5534d0a9d7fb72c8e5a03dcfc65420c354e7bb
+          path: source-packaging
+          persist-credentials: false
+      - name: Test validation and write-once behavior
+        run: python3 -m unittest tests.test_provider_publication tests.test_client_release -v
+      - name: Recover exact originals and validate exact reconstructed binary/full-source inputs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/release_client_inputs.py prepare \
+            --inputs out/original-client-inputs --output out/release-candidate --client-source sources/client --packaging-source source-packaging
+      - name: Transfer only validated reconstructed client/source release files
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: validated-client-input-release
+          path: out/release-candidate/
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 3
+  upload-draft:
+    needs: validate
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Fetch exact reconstructed client revision for source and PE checks
+        run: python3 tools/fetch_sources.py client --output sources
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: validated-client-input-release
+          path: out/release-candidate
+      - name: Upload only to the exact existing UI-created draft and verify stored bytes
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/release_client_inputs.py upload-draft \
+            --inputs out/release-candidate --output out/draft-assets-verified.json --client-source sources/client
+      - name: Retain draft asset readiness without claiming publication
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: client-input-draft-upload-receipt
+          path: out/draft-assets-verified.json
+          if-no-files-found: error
+          retention-days: 14
+  verify-publication:
+    needs: [validate, upload-draft]
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Fetch exact reconstructed client revision for source and PE checks
+        run: python3 tools/fetch_sources.py client --output sources
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: validated-client-input-release
+          path: out/release-candidate
+      - name: Wait for authorized UI publication, then verify actual tag and every asset read-only
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/release_client_inputs.py verify-published \
+            --inputs out/release-candidate --output out/published-release.json --wait-seconds 1200 --client-source sources/client
+      - name: Retain actual durable URLs and GitHub-reported immutability
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: client-input-publication-receipt
+          path: out/published-release.json
+          if-no-files-found: error
+          retention-days: 14
