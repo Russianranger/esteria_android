@@ -1,0 +1,18 @@
+{
+  "formatVersion": 1,
+  "scope": "x64-server-setup-sql-input-selection",
+  "repository": "Russianranger/esteria_android",
+  "enabled": false,
+  "state": "pending-x64-compile-source-measurement",
+  "minimumFreeBytes": 17179869184,
+  "build": null,
+  "mysql": null,
+  "serverContent": null,
+  "sqlExecuted": false,
+  "androidRuntimeQualified": false,
+  "productionArm64ProviderQualified": false,
+  "fourSchemaCoordinatorQualified": false,
+  "worldserverQualified": false,
+  "playerbotsAiQualified": false,
+  "gameplayQualified": false
+}

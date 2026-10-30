@@ -1,0 +1,64 @@
+{
+  "androidRuntimeQualified": false,
+  "apkPackagingReached": false,
+  "appCompilationReached": false,
+  "artifact": {
+    "allMemberBytesReadBackAndZipCrcVerified": true,
+    "bytes": 5907,
+    "id": 13007912542,
+    "members": {
+      "helper-acquisition-tail.log": {
+        "bytes": 1099,
+        "sha256": "2e332b5f72824576489460d98301abb2a1bc1c82d9abc6fcd57456a0ac0ca489"
+      },
+      "stock-acquisition-tail.log": {
+        "bytes": 5281,
+        "sha256": "08ec7bfa309bd06d3b441cbcbcf1ba6787bc9523ec2b28f1ea7d39318bacb895"
+      },
+      "stock-acquisition.json": {
+        "bytes": 5281,
+        "sha256": "017fed7673e99950cdbe628115b1a04d1a350ec0ef5bc62f793781ff2cd411f7"
+      },
+      "stock-provider-build.json": {
+        "bytes": 1988,
+        "sha256": "f797ed772883a6ad6e7b7c6e1cbfba9a1dfad04cb17f4e99e5d093a230666dcc"
+      },
+      "stock-providers-tail.log": {
+        "bytes": 1988,
+        "sha256": "ce854d19d880063e40c106994d79f587bc88881cb7ed85320b9e6f9b41857701"
+      }
+    },
+    "sha256": "582844a9ee4346cdecff17ea28cbfbf8f9b275d016b02756f5ee7297075632ed"
+  },
+  "dateUtc": "2026-10-30",
+  "failedJob": 124285153153,
+  "failedStep": "Acquire the registered SQL-qualified helper and complete corresponding sources",
+  "failure": {
+    "downloadArtifactId": 12997208259,
+    "exceptionType": "ValueError",
+    "httpStatus": 503,
+    "phase": "legacy-actions-helper-acquisition"
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "imeCompilationReached": false,
+  "integrationRevision": "4a506e1532652b8cf6fec73eeb327734e151fee6",
+  "legacyRerunRequested": false,
+  "newPublicSelection": {
+    "integrationRevision": "19b67695208d25cbc59b543ebf1110bb6ca5ef94",
+    "legacyHelperActionsDownloadSkippedBySelection": true,
+    "newWorkflowResultQualifiedByThisReceipt": false,
+    "source": "public-release",
+    "workflowRun": 41120449825
+  },
+  "playerbotsAiQualified": false,
+  "privateRawLogsExported": false,
+  "scope": "historical-local-game-profile-retained-helper-download-failure-only",
+  "sourceDefectEstablished": false,
+  "stockProviderBuildAndFullSourceGuardsPassed": true,
+  "workflowCompleted": true,
+  "workflowConclusion": "failure",
+  "workflowPath": ".github/workflows/android-local-game-profile.yml",
+  "workflowRun": 41119692617,
+  "worldserverQualified": false
+}

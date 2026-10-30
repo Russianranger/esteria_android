@@ -1,0 +1,107 @@
+name: Measured x64 setup tools native four-schema SQL qualification
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - runtime/mysql-probe/server-setup-x64-sql-inputs.lock.json
+      - tools/server_setup_x64_sql_inputs.py
+      - tools/qualify_server_setup_x64_sql.py
+      - tests/test_server_setup_x64_sql_inputs.py
+      - tests/test_server_setup_x64_sql.py
+      - .github/workflows/server-setup-x64-sql.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: measured-x64-server-setup-sql-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  selection:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04
+    outputs:
+      enabled: ${{ steps.selection.outputs.enabled }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Check real ELF loader source and measured-selection refusal boundaries
+        run: python3 -m unittest tests.test_server_setup_x64_sql_inputs tests.test_server_setup_x64_sql -v
+      - name: Require actual measured build outputs before enabling native SQL
+        id: selection
+        run: |
+          mkdir -p out/x64-sql-selection
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          from pathlib import Path
+          from tools import server_setup_x64_sql_inputs as selection
+          from tools import qualify_server_setup_x64_sql as qualifier
+          value=selection.load_pin()
+          print('enabled='+str(value['enabled']).lower())
+          (Path('out/x64-sql-selection')/'selection.json').write_bytes(qualifier.encode(dict(
+              formatVersion=1,scope='x64-native-setup-sql-selection-only',state=value['state'],
+              executionEnabled=value['enabled'],inputSelection=selection.files.identity(selection.LOCK),
+              buildMeasured=value['build'] is not None,sqlExecuted=False,
+              **{name:False for name in qualifier.FALSE_FLAGS})))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: x64-native-setup-sql-selection-${{ github.sha }}
+          path: out/x64-sql-selection/selection.json
+          retention-days: 30
+          if-no-files-found: error
+  qualify:
+    needs: selection
+    if: needs.selection.outputs.enabled == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Read every pinned x64 runtime tool source debug and public SQL input
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          test "$(uname -m)" = x86_64
+          mkdir -p out/x64-native-sql-evidence out/x64-native-sql-work
+          python3 tools/qualify_server_setup_x64_sql.py acquire --output out/x64-native-sql-inputs \
+            > out/x64-native-sql-acquisition-private.log 2>&1
+          python3 tools/qualify_server_setup_x64_sql.py image-context \
+            --inputs out/x64-native-sql-inputs --output out/x64-native-sql-image \
+            > out/x64-native-sql-evidence/image-context.json
+      - name: Build the original exact compiler-free MySQL rootfs without APT
+        run: |
+          docker build --platform linux/amd64 --network none -t esteria-x64-native-sql:qualification \
+            out/x64-native-sql-image > out/x64-native-sql-image-private.log 2>&1
+      - name: Execute real core updater helper reentry and persistent four-schema restart offline
+        run: |
+          docker run --rm --platform linux/amd64 --network none --read-only \
+            --tmpfs /tmp:rw,nosuid,nodev,size=128m \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/x64-native-sql-inputs,dst=/inputs,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/x64-native-sql-work,dst=/sql-work" \
+            --workdir /qualification esteria-x64-native-sql:qualification \
+            /usr/bin/python3 -B -s -E tools/qualify_server_setup_x64_sql.py run \
+            --inputs /inputs --output /sql-work/fixture --mysql /usr/bin/mysql --mysqld /usr/sbin/mysqld \
+            --expected-version 8.0.46-0ubuntu0.24.04.4 > out/x64-native-sql-execution-private.log 2>&1
+      - name: Export only bounded public receipts without database account or private engine files
+        if: always()
+        run: |
+          sudo chown -R "$(id -u):$(id -g)" out/x64-native-sql-work
+          python3 - <<'PY'
+          from pathlib import Path
+          import shutil
+          source=Path('out/x64-native-sql-work/fixture/qualification.json')
+          target=Path('out/x64-native-sql-evidence')
+          target.mkdir(parents=True,exist_ok=True)
+          if source.is_file() and source.stat().st_size<=256<<10:
+              shutil.copyfile(source,target/'qualification.json')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: x64-native-setup-four-schema-sql-evidence-${{ github.sha }}
+          path: out/x64-native-sql-evidence/*.json
+          retention-days: 30
+          if-no-files-found: error

@@ -54,7 +54,11 @@ The fix records explicit denial, unchanged tuples and false link qualification,
 then observes remaining cases. Second run41118768616 failed emulator system-
 image provisioning on disk space before guest execution. The scoped cleanup
 removes only completed job NDK/download after verified source/APK retention.
-Inspect its next actual result; production cache remains OFF with no app calls.
+41120449890 now completes actual two-guest observations after scoped cleanup;
+all15 mutation observations/eight final-node tuples compare across aliases and
+relaunch. Link creation remains denied(errno13), so overall stat qualification
+remains false. Separate retained receipts preserve delayed workflow metadata.
+Production cache remains OFF with no app calls.
 Python cache os.link publication itself is an unqualified platform gate. Any
 future fast path needs full stable-file sealing, trusted private SHA authority,
 fresh complete stat comparison after each data/import lease boundary and actual
@@ -109,3 +113,12 @@ Then validate real extraction/shaders, matched DBC/maps, normal login, character
 creation/selection, world, controller camera/movement, combat/loot/inventory/quest,
 audio, saves/relog, small bots and offline lifecycle. Only after these gates deliver
 one coherent stable-key signed APK with a single consolidated Thor procedure.
+
+The separate native x64 SQL implementation is under
+runtime/mysql-probe/X64-SQL-QUALIFICATION.md. Its selection lock is intentionally
+enabled=false/build=mysql=serverContent=null. After actual full original-target
+compile and source capture, measure/admit those exact outputs, bind all three
+selections and run the real four-schema/reentry/ledger/clean-restart job. Captured
+loader/library wrappers are distinct from unchanged ELF/debug identities; the
+original selected MySQL descriptor/archive is checked before any execution.
+Do not bypass the disabled gate or change production ARM64 admission.

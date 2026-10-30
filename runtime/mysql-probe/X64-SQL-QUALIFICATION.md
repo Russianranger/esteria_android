@@ -1,0 +1,94 @@
+# Separate x64 setup SQL qualification
+
+This gate is a prerequisite for a future Android13 x64 installation-coordinator
+fixture. It does not replace the production ARM64 providers or qualify Thor.
+The original complete `dbimport` target and the real52-statement Playerbots
+database helper are built separately by `server-setup-x64-probe.yml`. Its first
+actual source build is41119182502 at817cbc229f4dcc24beb169ecc72838fab4d1df32;
+the result is still pending when this implementation is recorded.
+
+## Explicit measurement gate
+
+`server-setup-x64-sql-inputs.lock.json` starts disabled. Its three unmeasured
+selections are null, and both acquisition and execution refuse before creating
+output or initializing SQL. Host tests and the workflow selection job can run
+in this state. A skipped native SQL job is not successful SQL qualification.
+
+Enable only after the actual x64 source build and library-source capture pass.
+Record the actual run/job/revision, original complete/evidence artifact IDs and
+byte hashes, build/source/context receipt identities and an independently read
+positive build receipt. Bind the already successful full x64 MySQL input/source
+consumer and the exact public server-content release/receipt. No placeholder
+hash, successful compiler Boolean or old ARM64 attestation can enable this gate.
+
+`server_setup_x64_sql_inputs.py` reads every original component ZIP member,
+hashes the closed runtime/original/debug/library/notice/source tree, checks actual
+ELF62 headers and GNU debuglink CRCs, and reads every original source-tar member
+and library source archive. The new compile-command bytes are not present in the
+original complete artifact; their retained identity is explicitly metadata only.
+Production ARM64 helper admission remains unchanged.
+
+## Loader and data boundaries
+
+The compiler's captured loader/libc/Boost closure may have different patch-level
+libraries from the original MySQL rootfs. The qualifier preserves both sets. It
+creates a private executable copy of the exact captured loader and two checked,
+source-owned invocation scripts. Each script verifies the unchanged target ELF,
+captured loader and all library hashes before invoking that ELF with the exact
+captured library path. The invocation-script identity is recorded separately
+from the actual compiled ELF, original binary and paired debug identities.
+
+MySQL/Python and any MySQL client process spawned by the updater retain the
+original MySQL rootfs loader and libraries. No rootfs DSO is overwritten and no
+global `LD_LIBRARY_PATH` is introduced. Actual SQL success is required before
+reporting this composition compatible. Source-content packaging originated with
+the ARM64 build and remains byte-identical; its origin is distinct from the
+new x64 tool build and execution evidence.
+
+The source-backed public content provider supplies the real base/update SQL,
+module templates and notices. The original `dbimport.conf.dist` is extracted
+from the pinned server source archive by exact member identity. Missing game
+data is a separately named unavailable path; this gate starts no world server.
+
+## Native execution contract
+
+The native gate uses an original, compiler-free x64 MySQL8.0.46 rootfs and a
+fresh private datadir inside a disposable network-isolated container. It runs
+the unchanged product `installation.compose`, source baseline, compiled updater,
+realm and local-account operations. A fixture-only x64 adapter binds the fully
+admitted helper to the unchanged `playerbots.apply`, real loader and verification
+functions; it does not fabricate an ARM64 helper receipt or alter its guards.
+
+Execution must demonstrate all of the following before issuing a positive x64
+SQL receipt:
+
+- Actual core updater and52-statement Playerbots helper execution.
+- Exact source update ledgers and completed reentry without loader replay.
+- Four-schema verification with core account/realm rows and credentials intact.
+- A separate real helper reentry with a disposable persistence marker.
+- Clean MySQL stop, same-instance restart and preserved private journals/rows.
+- Removal of the disposable marker and a final four-schema verification.
+
+Existing output is never adopted, cleared or reseeded. Failure preserves its
+fresh private state and reports a typed phase/class. Only bounded public JSON
+receipts are exported; database files, account/credential contents, option files,
+SQL dumps and raw private engine logs remain outside artifacts.
+
+The separate `server-setup-x64-sql.yml` workflow enables its native job only for
+an explicitly measured selection. It makes no source build, APT or SDK download
+part of normal gameplay. A positive native x64 receipt would still leave the
+Android installation coordinator, fresh-slot promotion, ARM64 execution,
+world/gameplay, character persistence and bot AI unqualified.
+
+## Host implementation checks
+
+```sh
+python3 -m unittest tests.test_server_setup_x64_sql_inputs tests.test_server_setup_x64_sql -v
+```
+
+Seventeen host groups pass. They include actual ELF/debug splitting and CRCs,
+real captured-loader execution of a harmless host utility, ELF/library mutation
+refusal, original source-template extraction, source archive mutation refusal,
+private-configuration checks, restored MySQL descriptor/archive identity checks
+and strict pending-selection boundaries. They do
+not execute MySQL, populate schemas or qualify the actual new x64 component.

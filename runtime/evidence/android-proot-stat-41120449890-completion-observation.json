@@ -1,0 +1,130 @@
+{
+  "allReportedStepsCompletedSuccessfully": true,
+  "boundary": "Actual retained instrumentation/guest observations are separate from still-unconfirmed workflow/job completion. This metadata observation does not change the original proof or qualify hardlink mutation, ARM64, production cache or gameplay.",
+  "formatVersion": 1,
+  "jobCompletionConfirmed": false,
+  "jobId": 124285536756,
+  "jobMetadata": {
+    "conclusion": null,
+    "status": "in_progress",
+    "steps": [
+      {
+        "conclusion": "success",
+        "name": "Set up job",
+        "number": 1,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "number": 2,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+        "number": 3,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "name": "Exercise actual host mutations and strict Android admission guards",
+        "number": 4,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "name": "Enable KVM for the disposable emulator",
+        "number": 5,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install exact Android tools and the pinned NDK",
+        "number": 6,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "name": "Build the unchanged exact PRoot probe and separate stat fixture",
+        "number": 7,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "name": "Compile and verify the source-bound instrumentation fixture",
+        "number": 8,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "name": "Release only this job's completed build inputs before emulator provisioning",
+        "number": 9,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "name": "Observe actual Android guest tuples through both bound aliases",
+        "number": 10,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "name": "Retain exact probe APKs separately from any device candidate",
+        "number": 11,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "name": "Bound retained Gradle diagnostics",
+        "number": 12,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "name": "Retain complete fixture and original probe corresponding sources",
+        "number": 13,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "name": "Retain bounded actual observations and build receipts",
+        "number": 14,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+        "number": 27,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "number": 28,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "name": "Complete job",
+        "number": 29,
+        "status": "completed"
+      }
+    ]
+  },
+  "observedAtUtc": "2026-10-30T20:13:58.287Z",
+  "originalObservationProof": "runtime/evidence/android-proot-stat-41120449890.json",
+  "repository": "Russianranger/esteria_android",
+  "runAttempt": 1,
+  "runId": 41120449890,
+  "scope": "github-workflow-completion-metadata-observation-only",
+  "sourceRevision": "19b67695208d25cbc59b543ebf1110bb6ca5ef94",
+  "stepRerunsRequested": false,
+  "workflowAttemptMetadata": {
+    "conclusion": null,
+    "status": "in_progress",
+    "updatedAt": "2026-10-30T20:06:07Z",
+    "url": "https://api.github.com/repos/Russianranger/esteria_android/actions/runs/41120449890/attempts/1"
+  },
+  "workflowCompletionConfirmed": false
+}

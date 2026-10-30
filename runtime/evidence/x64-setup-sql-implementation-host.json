@@ -1,0 +1,71 @@
+{
+  "actualMeasuredX64ComponentAdmitted": false,
+  "actualSourceBuildOutcome": "in_progress_at_recording",
+  "actualSourceBuildRun": 41119182502,
+  "androidRuntimeQualified": false,
+  "checks": {
+    "actualElfLibraryMutationAndNonPrivateConfigurationRefused": true,
+    "actualHostHarmlessElfInvokedViaCapturedLoader": true,
+    "actualSplitElfDebugCrcChecks": true,
+    "arm64AdmissionUnchanged": true,
+    "groupsPassed": 17,
+    "originalMysqlDescriptorAndArchiveSelectionReboundBeforeExecution": true,
+    "originalSourceArchiveAndTemplateReadbackChecks": true,
+    "pendingGateRefusesBeforeAcquisitionOrSql": true,
+    "workflowExecutionConditionalOnMeasuredEnabledSelection": true,
+    "workflowParsed": true
+  },
+  "exactUnittestCommand": "python3 -m unittest tests.test_server_setup_x64_sql_inputs tests.test_server_setup_x64_sql -v",
+  "formatVersion": 1,
+  "fourSchemaCoordinatorQualified": false,
+  "gameplayQualified": false,
+  "playerbotsAiQualified": false,
+  "productionArm64ProviderQualified": false,
+  "repositoryHeadAtCheck": "19b67695208d25cbc59b543ebf1110bb6ca5ef94",
+  "scope": "host-separate-measured-x64-sql-qualification-implementation-only",
+  "selectionEnabled": false,
+  "slotPromoted": false,
+  "sourceFiles": {
+    ".github/workflows/server-setup-x64-sql.yml": {
+      "bytes": 5361,
+      "sha256": "4a207f520d2c5628085ea4cce162ef6c8d43716658107bf3e4963c28941f964e"
+    },
+    "runtime/mysql-probe/X64-SQL-QUALIFICATION.md": {
+      "bytes": 5402,
+      "sha256": "148e84ebee994f6640e395c3cac9f1454d98575ca3b901c33a2fd86d5fea8143"
+    },
+    "runtime/mysql-probe/server-setup-x64-sql-inputs.lock.json": {
+      "bytes": 537,
+      "sha256": "aa20f7c7c351094c7fac3dc37bde962743255725605ac894b932d44edb32e229"
+    },
+    "tests/test_server_setup_x64_sql.py": {
+      "bytes": 9895,
+      "sha256": "928937ea8f497e6a65acc14cc341fafd0411c22147ea3e865cb4984eeb6b064c"
+    },
+    "tests/test_server_setup_x64_sql_inputs.py": {
+      "bytes": 9392,
+      "sha256": "058130423430f9ae0c058c7d5a3e9189c6d9d3d8146bb45bfd6c485b21c29887"
+    },
+    "tools/qualify_server_setup_x64_sql.py": {
+      "bytes": 26052,
+      "sha256": "7ffbc5f9d13edd6dbae6fca06faed2b7a2ac0a12011188850bcf7d953cbca9e8"
+    },
+    "tools/server_setup_x64_sql_inputs.py": {
+      "bytes": 23937,
+      "sha256": "22708025d3f0a1b770b2df50e330e42dafc48759136d4e8af768a5e8b0f4f3bd"
+    }
+  },
+  "sourceSnapshotExact": false,
+  "sqlExecuted": false,
+  "unittestModules": [
+    {
+      "module": "tests.test_server_setup_x64_sql_inputs",
+      "tests": 9
+    },
+    {
+      "module": "tests.test_server_setup_x64_sql",
+      "tests": 8
+    }
+  ],
+  "worldserverQualified": false
+}

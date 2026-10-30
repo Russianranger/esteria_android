@@ -77,8 +77,12 @@ Production fast path remains OFF with no app call sites. Actual Android stat run
 41117041928 found hardlink EACCES; its failure is retained. The follow-up records
 denial separately and leaves overall qualification false.41118768616 reached
 exact-source build/APK verification but failed system-image provisioning on disk
-space before guest execution. Narrow disposable-CI cleanup is prepared. Real
-cache os.link publication and Android ARM64 semantics remain explicit gates.
+space before guest execution. Scoped cleanup then passed in41120449890, followed
+by two actual reaped Android guests: all15 observations/eight final-node alias/raw
+stat comparisons and metadata-visible mutations completed. Hardlinks remain denied
+(errno13), so overall stat qualification and production cache remain false. Workflow
+completion metadata lag is retained separately. Real cache os.link publication and
+Android ARM64 semantics remain explicit gates.
 
 Known supplied DBC base/locale/continuation files now receive source-derived
 field-count/packed-stride checks for112 active stores. All have SQL fallback;
@@ -106,3 +110,11 @@ Persistent RSA4096 development signing is provisioned/private; its public
 certificate is in app/development-signing.lock.json. No delivered update baseline
 exists. Defaults/server repository remain unchanged. Game assets, credentials,
 initialized databases/prefixes, saves and private signing keys stay outside Git.
+
+A separate native x64 four-schema SQL harness now has17 passing admission/loader/
+composition guards and independent review. Its committed input selection remains
+disabled with all three measured selections null until the actual original-tool
+build/source outputs are available. Production ARM64 admission is unchanged.
+The earlier4a506 complete-APK job failed on HTTP503 during legacy helper Actions
+acquisition before the input-code build;19b's public acquisition bypasses that
+failed route and passes the actual restore/admission step.
