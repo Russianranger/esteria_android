@@ -30,7 +30,7 @@ RUN --mount=type=secret,id=build_ca,required=true,mode=0444 \
 RUN cd /wine-build \
     && /src/wine/configure --prefix=/opt/wine --enable-win64 --with-mingw=yes --disable-tests \
        --without-wayland --without-gstreamer --without-cups --without-sane --without-gphoto \
-    && make -j2 && make install-strip DESTDIR=/out \
+    && make -s -j2 && make -s install INSTALL_PROGRAM_FLAGS=-s DESTDIR=/out \
     && cp config.log /sources/wine-build-config.log \
     && dpkg-query -W -f='${binary:Package}\t${Version}\t${Architecture}\t${source:Package}\t${source:Version}\n' > /sources/build-packages.tsv \
     && cp /src/wine/COPYING.LIB /sources/Wine-COPYING.LIB

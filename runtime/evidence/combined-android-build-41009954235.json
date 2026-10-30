@@ -1,0 +1,487 @@
+{
+  "apkArtifact": {
+    "bytes": 120899353,
+    "downloadedAndHashVerified": true,
+    "id": 12957132900,
+    "sha256": "e1e719fe0a227393c546e584f1973d012506c58945fa9cfba79ec6ef63882c87"
+  },
+  "buildReceipt": {
+    "androidExecutionQualified": false,
+    "apk": {
+      "bytes": 120881379,
+      "sha256": "29502f16e300a5072a32420cd4e03855670068eab821d4b1199ba8074edb0da2"
+    },
+    "apkNativeFiles": [
+      "lib/arm64-v8a/libesteria-presentation.so",
+      "lib/arm64-v8a/libesteria_process.so",
+      "lib/arm64-v8a/libproot-loader.so",
+      "lib/arm64-v8a/libproot.so"
+    ],
+    "authWorldExecutablesIncluded": false,
+    "buildVariant": "debug",
+    "clientRevision": "69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa",
+    "correspondingSources": {
+      "client-corresponding-source.tar.gz": {
+        "bytes": 23401759,
+        "sha256": "0ea2fa4f4997cee49cea73a06bf19977d2981285db6179a35f16921546a7bc48"
+      },
+      "client-release-receipt.json": {
+        "bytes": 2396,
+        "sha256": "30344744351422fe7055173409552f12e310b5e29ec01bc26c958f0741a0d153"
+      },
+      "client-source-receipt.json": {
+        "bytes": 3513,
+        "sha256": "0bea5cdcadbff68c7ad6eda98ce298ef92f7b1939b86da9812295ec863a884ff"
+      },
+      "guest-bridges-arm64.tar.gz": {
+        "bytes": 469031,
+        "sha256": "a91e2e7cf74957c7caf2c7e85de2a6ee8952d273b3f5e3f18cecb06127791c39"
+      },
+      "guest-release-receipt.json": {
+        "bytes": 2123,
+        "sha256": "ade19a8b12258390617335991706a133f9a3247dd88bc4e88d1b6adf734d1855"
+      },
+      "integration-source.tar.gz": {
+        "bytes": 761033,
+        "sha256": "dbac8cce6338e8ebe0da90692dd9b948ff37f101fbe46d6c7be63bdbcc3b2b1d"
+      },
+      "proot-corresponding-source.tar.gz": {
+        "bytes": 1147811,
+        "sha256": "ec8a6f775ea73149fb9314c282b07708e565f2b0aa96ea8964656abf1f0cff92"
+      },
+      "server-release-receipt.json": {
+        "bytes": 3012,
+        "sha256": "cdd9ba6779e95e8f5e12c4e76cebc7796229c4e4906afcec6d14849d89ee67e1"
+      },
+      "server-runtime-corresponding-sources.zip": {
+        "bytes": 954236077,
+        "sha256": "b09599218a1a62a8e131eeedc47f6c8c19e2d39936d4e0aed7261e365f409bc1"
+      },
+      "server-runtime-source-manifest.json": {
+        "bytes": 53668,
+        "sha256": "635b966d617ffd2763d51412c67fa52c90dc1d9311ca2e489408c09362024688"
+      }
+    },
+    "deviceTestCandidate": false,
+    "formatVersion": 1,
+    "gameDataIncluded": false,
+    "gameLoginQualified": false,
+    "gameplayQualified": false,
+    "integrationRevision": "46a54a223720cdc230074aa6a43f10370718af71",
+    "ndkNotices": {
+      "LLVM-RUNTIME-NOTICE.txt": {
+        "bytes": 130424,
+        "sha256": "f96f763beb66a7ba7a667647fc64c0226ace875e590c831fdd9579ec1c1d91e1"
+      },
+      "NDK-28.2.13676358-NOTICE.txt": {
+        "bytes": 516438,
+        "sha256": "faf0dc52cf6ce9ab09a04b0c074a378dd2565ee1ed9bc1179d83793bcdba012e"
+      },
+      "NDK-SYSROOT-NOTICE.txt": {
+        "bytes": 494921,
+        "sha256": "2905ac5c59628352af990c748a8f4c3675a04f36eca7914612e3068661d2c6a6"
+      }
+    },
+    "persistentSigningQualified": false,
+    "prootCorrespondingSource": {
+      "archive": {
+        "bytes": 1147811,
+        "sha256": "ec8a6f775ea73149fb9314c282b07708e565f2b0aa96ea8964656abf1f0cff92"
+      },
+      "files": {
+        "build-evidence.json": {
+          "bytes": 2099,
+          "sha256": "14d09032d6b44bbd4f58956861375c35721b46e286dfde1b0c2c3803842507f8"
+        },
+        "esteria/LICENSE": {
+          "bytes": 35149,
+          "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+        },
+        "esteria/runtime/proot/FTA-MIT-LICENSE.txt": {
+          "bytes": 1070,
+          "sha256": "f9c4b27004805765d801d72b2d97dcfea8c05b4d5675d65545164090914ae354"
+        },
+        "esteria/runtime/proot/README.md": {
+          "bytes": 5186,
+          "sha256": "b5ca3648b71b08f26cf2d92d592c9ce54aeec06552536bf40b378b32dd491e1f"
+        },
+        "esteria/runtime/proot/ownership_fixture.c": {
+          "bytes": 1026,
+          "sha256": "040b6d5f288e55666a3bd155fecbb17061132e6227160870ee0c4cd497b7c0ea"
+        },
+        "esteria/runtime/proot/proot-exitkill.patch": {
+          "bytes": 515,
+          "sha256": "509160bd6ec3663d525fa0e795a7bb45b8ccc283a6de8e1398e8cd6624fe86de"
+        },
+        "esteria/runtime/proot/sources.lock.json": {
+          "bytes": 1970,
+          "sha256": "d4383760217a5b71a4a28cd02d6fc354b5876ca9e21e1db0fe1c733564a58bf2"
+        },
+        "esteria/tools/android_elf.py": {
+          "bytes": 3738,
+          "sha256": "3d85699c1e66cfbd4c012045848dcf925a73656fe356dee43fb2de4cccdac136"
+        },
+        "esteria/tools/build_android_proot.py": {
+          "bytes": 12917,
+          "sha256": "80d460817977a7df0f11cc188c568633fa03a0cd6e7948e395e02995bee9832a"
+        },
+        "esteria/tools/prepare_runtime.py": {
+          "bytes": 22126,
+          "sha256": "113ae7612cba7f557fab79550448578a9a6b8ceb674cff80b38fcf40e8257078"
+        },
+        "original/build-proot.sh": {
+          "bytes": 4647,
+          "sha256": "7ddcee055714f27c2a53fea816c8d43171efc54b655771e979735a30ba343319"
+        },
+        "original/native/proot-acceleration.patch": {
+          "bytes": 825,
+          "sha256": "46ab8e6f80260044bccbd831e22a7fc3a376e45ef945772cac790485ab70306f"
+        },
+        "original/native/proot-sysvipc.patch": {
+          "bytes": 1158,
+          "sha256": "e8e3cb956bdb8b1bcbdf72a23b67ad86fc33fa51430f3a1ee37e1a053f5f0330"
+        },
+        "original/proot-source.tar.gz": {
+          "bytes": 322118,
+          "sha256": "d43ad342bb2e8f4d2afe6119b5ec3a1d8bb912d5897e2db7d2ddf928548c1c84"
+        },
+        "original/talloc-2.4.3.tar.gz": {
+          "bytes": 684092,
+          "sha256": "dc46c40b9f46bb34dd97fe41f548b0e8b247b77a918576733c528e83abd854dd"
+        },
+        "talloc-build-objects/lib/replace/closefrom.c.1.o": {
+          "bytes": 2680,
+          "sha256": "971ba46eb29664f8d4019e59f6279a86121ebde01870878f54d8fee660e1c4a5"
+        },
+        "talloc-build-objects/lib/replace/closefrom.c.2.o": {
+          "bytes": 2680,
+          "sha256": "f1e8489603f41d8206d53f5ae2e84ea23be9873079270057cd192823d74028a1"
+        },
+        "talloc-build-objects/lib/replace/replace.c.1.o": {
+          "bytes": 4472,
+          "sha256": "16ecfb8cabee44f367bbf0ab025cae6b5f9e72b3697729b2d719e2aa3ef54c10"
+        },
+        "talloc-build-objects/lib/replace/replace.c.2.o": {
+          "bytes": 4472,
+          "sha256": "f77d97ada0efcedb4fe298ed4ee2caafa12d23bffa6c78d6f1db7dad8477ca4b"
+        },
+        "talloc-build-objects/lib/replace/replace.empty.c.4.o": {
+          "bytes": 784,
+          "sha256": "635675b728144ce0b0f11cc3d6f4f05f23d817978a500c5b056540facd8481bf"
+        },
+        "talloc-build-objects/lib/replace/tests/getifaddrs.c.5.o": {
+          "bytes": 2872,
+          "sha256": "76e2dbccd8858a5d927ae30beb4bfb16ff815d64c517de50496236e2032b9261"
+        },
+        "talloc-build-objects/lib/replace/tests/main.c.6.o": {
+          "bytes": 1288,
+          "sha256": "4279bca7a086e9caa9861bf5c383d1c4d50cadec5d6094942d3ddf927a7a2f94"
+        },
+        "talloc-build-objects/lib/replace/tests/os2_delete.c.5.o": {
+          "bytes": 7944,
+          "sha256": "412466400a10e9d3f11cc459513f18d9af451daab047dcbeb0895b947d50a06b"
+        },
+        "talloc-build-objects/lib/replace/tests/strptime.c.5.o": {
+          "bytes": 4984,
+          "sha256": "25c3ccbbf1b832973577665c39ae481428bdcda8fdcac9bd590ba0236371aed1"
+        },
+        "talloc-build-objects/lib/replace/tests/testsuite.c.5.o": {
+          "bytes": 201416,
+          "sha256": "3ba4bdcbfd110fe08f632d3c8b7eb9bd9e6502abbe4ee63fa42fdf0301c7c396"
+        },
+        "talloc-build-objects/talloc.c.5.o": {
+          "bytes": 59856,
+          "sha256": "7f9b8abb86b7700511b4d1c64a5ec2d6ed728c2763aa90096013fdc0bcee8d6a"
+        },
+        "talloc-build-objects/talloc.c.6.o": {
+          "bytes": 59856,
+          "sha256": "ab3af6d4d3dbc8bf91676a96e3b81ae0f8ef9565d1f10b932470a92eb04d5a63"
+        },
+        "talloc-build-objects/test_magic_differs_helper.c.3.o": {
+          "bytes": 1552,
+          "sha256": "0307d45031a0cf40c2e07c9b51c4e317e97f43aaaead2ea978db4b104fe84927"
+        },
+        "talloc-build-objects/testsuite.c.1.o": {
+          "bytes": 158576,
+          "sha256": "f022c2476b2078d1863155228f9f75b8afd2e02ae7a881ce422a59a7cdba19ee"
+        },
+        "talloc-build-objects/testsuite_main.c.1.o": {
+          "bytes": 1296,
+          "sha256": "ef93c57454b579144af122f5eeb9aeb474e8c1d67b67e550db472e655f2d488c"
+        }
+      },
+      "relinkableArm64Objects": 15
+    },
+    "providerChecks": {
+      "client": {
+        "androidRuntimeQualified": false,
+        "archive": {
+          "assetPath": "client-runtime/client-arm64.archive",
+          "bytes": 7290181,
+          "sha256": "ef35a3d7a10e137e3e375f371ed4496d6f65f806e390c68fe0e55b222333c467"
+        },
+        "archiveEntries": 30,
+        "archiveFileBytes": 21445937,
+        "archiveVerified": true,
+        "buildId": "40992315512.1",
+        "completeDynamicImportClosureQualified": false,
+        "formatVersion": 1,
+        "freshSetupFreeBytes": 112622198,
+        "gameInitializationQualified": false,
+        "gameLoginQualified": false,
+        "inputLockSha256": "644849e771f7f2668553111db935fe2fff20b2a574187b340e070a7e1a2b7600",
+        "limits": {
+          "entries": 30,
+          "fileBytes": 21445937,
+          "memberBytes": 20716544,
+          "metadataBytes": 16777216,
+          "pathBytes": 4096
+        },
+        "maximumHardLinkCopies": 0,
+        "maximumHardLinkCopyBytes": 0,
+        "maximumPhysicalFileBytes": 21445937,
+        "packageKey": "client-arm64",
+        "peHeadersAndDirectImportsVerified": true,
+        "protocol": {
+          "build": 12340,
+          "container_slots": 254,
+          "max_class_id": 32,
+          "quest_slots": 25
+        },
+        "requiredFiles": {
+          "NOTICE.txt": {
+            "bytes": 855,
+            "sha256": "65ca56b47adee786ec28d368c9dfb25d1181581337e5c3154a56bd0d1522399e"
+          },
+          "bin/WowClient64.exe": {
+            "bytes": 20716544,
+            "peMachine": "0xaa64",
+            "sha256": "0e62ca5bf5626dad3992295d89d7125bb1a3caa60010a4b219a4a4c6132d1035"
+          },
+          "bin/XvidDecoder.dll": {
+            "bytes": 566272,
+            "peMachine": "0xaa64",
+            "sha256": "286e1b0e337a62c383685ef8c33d8d6f45d41eb4f40bf1fc5e62126e26b34ed2"
+          },
+          "client-runtime.json": {
+            "bytes": 2844,
+            "sha256": "df09e2f26492e07bf4e86f5be10ff4587938889d1125df93429c578baaa5cb15"
+          },
+          "metadata/client-build.json": {
+            "bytes": 2508,
+            "sha256": "1c153e0d2c2f5a8ce29db975431fdc8cefe0827ce12e77f33a0fe0ede0d4c841"
+          },
+          "metadata/limits.json": {
+            "bytes": 30394,
+            "sha256": "16e5024377ebb4cd59b3fd0acb4029b35ae481f16c7bec39a5a6a9490867c188"
+          },
+          "metadata/sources.lock.json": {
+            "bytes": 1983,
+            "sha256": "dbbf8983cfa2b429f7dd0c3308a2795ffbecd29e8019adf35348447e1eab41b0"
+          },
+          "notices/Engine/Source/Lumenveil/Core/LICENSE": {
+            "bytes": 18093,
+            "sha256": "640d90f6ee401241ff62834d0d1b33f83049e99b8bfdfa04ed1b0a1635dde3e7"
+          },
+          "notices/Engine/Source/SoundEngine/fmodex/LICENSE.TXT": {
+            "bytes": 2755,
+            "sha256": "66340c3978f10e2db01481213b6b2855a05ed40b693720964e6f9a7c265af581"
+          },
+          "notices/Engine/Source/lua-5.1/COPYRIGHT": {
+            "bytes": 1528,
+            "sha256": "edce81d96d79c0d3e3ca80c22216c96d6ffa9627d502ac7f0322d8c4b9f4754b"
+          },
+          "notices/Extensions/ASECM3/NOTICE.md": {
+            "bytes": 1111,
+            "sha256": "036c771a2b1fd08c3e0ace7cec3dbc083e9c721a008306022c1d73870fe3d65e"
+          },
+          "notices/Extensions/ASECM3/third_party/bullet/LICENSE.txt": {
+            "bytes": 1022,
+            "sha256": "885cd516a8420acb7c3e0b1a7119913b686495001ae564e3229740460e8cff59"
+          },
+          "notices/ThirdParty/bzip2/LICENSE": {
+            "bytes": 1740,
+            "sha256": "802f577465df855ca207973e0f63521535ba646537ce4ab5cb584e83210f62e1"
+          },
+          "notices/ThirdParty/expat/COPYING": {
+            "bytes": 1184,
+            "sha256": "3373b5c2ed10ae60e0b2f19e4248537bf07fa922b7cbd4aa8ed818563b946864"
+          },
+          "notices/ThirdParty/freetype/LICENSE.TXT": {
+            "bytes": 208,
+            "sha256": "7c049fd103f21e79bf1e120c806300ab2612ce99e6de30b48dc7f86f4300b002"
+          },
+          "notices/ThirdParty/freetype/docs/FTL.txt": {
+            "bytes": 6668,
+            "sha256": "6e04c8845e4009f4814ee871aa9f19c585d21ab13c7b54febe68ee1a7b1bbd84"
+          },
+          "notices/ThirdParty/freetype/docs/GPL.txt": {
+            "bytes": 17986,
+            "sha256": "6f828f136ee75a5620a333ad1623f552822f3065ded254c1b783ca6f3cb7dcaf"
+          },
+          "notices/ThirdParty/freetype/src/autohint/CatharonLicense.txt": {
+            "bytes": 5206,
+            "sha256": "276e65899f23a0063f149bbcd42cb7fb8577a21ea610196e6402399e3725baf6"
+          },
+          "notices/ThirdParty/nvapi/License.txt": {
+            "bytes": 1248,
+            "sha256": "84726b60c17fe0f71f92a6c074c3d4087370886eba5d21ccc4ec55db37d6c8ba"
+          },
+          "notices/ThirdParty/pcre/COPYING": {
+            "bytes": 2067,
+            "sha256": "e15ef5a4328693716e4bd9689b31886af5981f61d5e010035472d007c2372403"
+          },
+          "notices/ThirdParty/vulkan-headers/LICENSE.md": {
+            "bytes": 495,
+            "sha256": "95ad366d23fadf701d355bc45fb8b82ae2d700239471d35d41286ac3b08ff903"
+          },
+          "notices/ThirdParty/xvidcore/licenses/xvid.txt": {
+            "bytes": 18327,
+            "sha256": "40a8c1ea469c6813413443df59115ecc781421cc7d184839ccc7c9f54057a283"
+          },
+          "notices/ThirdParty/zlib/README": {
+            "bytes": 5710,
+            "sha256": "9cfd596761bf5c925a5b17ddb82afd404f326af2bd0755f58ab110fef7d045d7"
+          },
+          "notices/ThirdParty/zlib/contrib/dotzlib/LICENSE_1_0.txt": {
+            "bytes": 1337,
+            "sha256": "8d8291caf1cee26d23acf3eb67c9f9a2d58f1c681b16a4fbe8cbfb9e3c0b5a9b"
+          },
+          "notices/Xvid-1.3.7-LICENSE.txt": {
+            "bytes": 17987,
+            "sha256": "2ab06d2335f9781f1a485c78a557e6c61b6c24e118caad4d4210c46426bbce95"
+          },
+          "source-recipes/Tools/RuntimeManifest/generate.py": {
+            "bytes": 10763,
+            "sha256": "5cc4e588caee98acf43f834e5e562e01c41e74284b7abbd5de970aea50811afc"
+          },
+          "source-recipes/Tools/XvidDecoder/CMakeLists.txt": {
+            "bytes": 1267,
+            "sha256": "41a983765e351f0ac85d0ab28bb9e76b6c15ed961fe351b1b8ecaf29a69b3764"
+          },
+          "source-recipes/Tools/XvidDecoder/XvidDecoder.cpp": {
+            "bytes": 2853,
+            "sha256": "60aa0e6553c02b47a49c779f7e4923c5a89d03673daad4810429e8e3f4c56a6c"
+          },
+          "source-recipes/Tools/XvidDecoder/XvidDecoder.def": {
+            "bytes": 117,
+            "sha256": "a8d48502128284dca39ff3d2c747096e39342d0e0265d8bec6e2ae578d9f6df6"
+          },
+          "source-recipes/cmake/XvidPortable.cmake": {
+            "bytes": 4865,
+            "sha256": "c5ae76e3b7342692410797936bb1777e1745b4cd6f63ece2a61d4b09385583a4"
+          }
+        },
+        "requiredWineArchiveSha256": "f036c00a290abb953bec26be80c4d8fe492fd986e7a589c51008124432c8641e",
+        "requiredWineRuntime": {
+          "archiveSha256": "f036c00a290abb953bec26be80c4d8fe492fd986e7a589c51008124432c8641e",
+          "manifestSha256": "d375adf23b621f83ef7b5fff95365312377399704abb486fd8d4164a1fe29a13"
+        },
+        "scope": "android-reconstructed-client-install-only",
+        "sourceLockSha256": "dbbf8983cfa2b429f7dd0c3308a2795ffbecd29e8019adf35348447e1eab41b0",
+        "sourceRevision": "69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa"
+      },
+      "guest": {
+        "androidRuntimeQualified": false,
+        "apkBytesVerified": true,
+        "archive": {
+          "assetPath": "guest-bridges/guest-bridges-arm64.archive",
+          "bytes": 469031,
+          "file": "guest-bridges-arm64.tar.gz",
+          "sha256": "a91e2e7cf74957c7caf2c7e85de2a6ee8952d273b3f5e3f18cecb06127791c39"
+        },
+        "archiveFileBytes": 745949,
+        "providerVerified": true
+      },
+      "proot": {
+        "androidBridgeBuilt": true,
+        "androidBridgeExecuted": false,
+        "androidRuntimeQualified": false,
+        "apkBytesVerified": true,
+        "payloads": {
+          "libproot-loader.so": "614591192bb34c98cc6cef528fb74ecfc1c97d0fabf4e352df1f16873c71d447",
+          "libproot.so": "46dcafabc77b386a7127f6cb7c71bdac03c372ff6bb4db0e1e9493ee29332adb"
+        },
+        "sourceBuiltJniBridges": {
+          "libesteria-presentation.so": {
+            "bytes": 8056,
+            "elf": {
+              "executableStack": false,
+              "machine": "AArch64",
+              "minimumLoadAlignment": 16384,
+              "needed": [
+                "libandroid.so",
+                "libc.so",
+                "libdl.so",
+                "libm.so"
+              ],
+              "soname": "libesteria-presentation.so",
+              "type": "DYN"
+            },
+            "sha256": "cf0e1b1d8e5dcb8e47d2985d82a2c6cc1c38421ef59289eb3c428e95df2c3486"
+          },
+          "libesteria_process.so": {
+            "bytes": 487280,
+            "elf": {
+              "executableStack": false,
+              "machine": "AArch64",
+              "minimumLoadAlignment": 16384,
+              "needed": [
+                "libc.so",
+                "libdl.so",
+                "libm.so"
+              ],
+              "soname": "libesteria_process.so",
+              "type": "DYN"
+            },
+            "sha256": "a63705a795618f4ae28e6161b36779dc3e1430203aa150582bc461a160163335"
+          }
+        }
+      },
+      "server": {
+        "androidRuntimeQualified": false,
+        "apkBytesVerified": true,
+        "archive": {
+          "assetPath": "server-runtime/server-runtime-arm64.archive",
+          "bytes": 112374096,
+          "file": "server-runtime-arm64.tar.gz",
+          "sha256": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5"
+        },
+        "maximumPhysicalFileBytes": 388996294,
+        "providerVerified": true
+      }
+    },
+    "scope": "source-verified-four-provider-arm64-apk-packaging-only",
+    "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
+    "sourceLockSha256": "dbbf8983cfa2b429f7dd0c3308a2795ffbecd29e8019adf35348447e1eab41b0",
+    "wineIncluded": false
+  },
+  "conclusion": "success",
+  "diagnosticsArtifact": {
+    "bytes": 33073,
+    "id": 12956954060,
+    "sha256": "e554311030478e210e179c60f8eb07fc4d621733a11a8847f279a718cdb924c4"
+  },
+  "formatVersion": 1,
+  "independentApkReadback": {
+    "assets/client-runtime/client-arm64.archive": "ef35a3d7a10e137e3e375f371ed4496d6f65f806e390c68fe0e55b222333c467",
+    "assets/guest-bridges/guest-bridges-arm64.archive": "a91e2e7cf74957c7caf2c7e85de2a6ee8952d273b3f5e3f18cecb06127791c39",
+    "assets/server-runtime/server-runtime-arm64.archive": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5",
+    "lib/arm64-v8a/libesteria-presentation.so": "cf0e1b1d8e5dcb8e47d2985d82a2c6cc1c38421ef59289eb3c428e95df2c3486",
+    "lib/arm64-v8a/libesteria_process.so": "a63705a795618f4ae28e6161b36779dc3e1430203aa150582bc461a160163335",
+    "lib/arm64-v8a/libproot-loader.so": "614591192bb34c98cc6cef528fb74ecfc1c97d0fabf4e352df1f16873c71d447",
+    "lib/arm64-v8a/libproot.so": "46dcafabc77b386a7127f6cb7c71bdac03c372ff6bb4db0e1e9493ee29332adb"
+  },
+  "integrationRevision": "46a54a223720cdc230074aa6a43f10370718af71",
+  "jobId": 123913360687,
+  "repository": "Russianranger/esteria_android",
+  "runId": 41009954235,
+  "scope": "host-ci-four-provider-apk-packaging-readback",
+  "sourceArtifact": {
+    "bytes": 980099765,
+    "id": 12956734903,
+    "outerArtifactDownloadedLocally": false,
+    "sha256": "696e0599791fb0619f8693e3eb86be66b7d8427563d23e5814c3192b480fef76",
+    "sourceSealerPassedInCi": true
+  }
+}

@@ -210,6 +210,11 @@ def restore(mysql, state, version, backup, expected):
 
 
 def probe_snapshot(connection, intent):
+    for name in db.DATABASES:
+        content.require(connection.query("SELECT DATA_TYPE,CHARACTER_MAXIMUM_LENGTH,CHARACTER_SET_NAME,"
+            "COLLATION_NAME,IS_NULLABLE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA='" + name +
+            "' AND TABLE_NAME='esteria_backup_probe' AND COLUMN_NAME='note'") ==
+            ['varchar\t50\tutf8mb4\tutf8mb4_unicode_ci\tYES'], 'disposable probe text semantics changed')
     account.match_account(account.selected_account(connection, intent['username']), intent)
     probes = {name: connection.query('SELECT id,HEX(payload),HEX(note),nullable_value FROM `' + name +
                                     '`.`esteria_backup_probe` ORDER BY id') for name in db.DATABASES}
@@ -340,9 +345,14 @@ def run(mysql, mysqld, mysqldump, fixture, expected, source_lock, output, versio
         original = db.read_receipt(source / 'database-bootstrap.json', version)
         intent = account.read_intent(source / account.JOURNAL, original)
         with owned_admin(mysql, source, version) as (connection, _):
+            # Explicit column charset/collation keeps this fixture's DDL stable
+            # through MySQL SHOW CREATE replay (Oracle bug 110825). Do not relax
+            # full-dump equality or rewrite the imported server schemas.
             for name in db.DATABASES:
                 connection.query('CREATE TABLE `' + name + '`.`esteria_backup_probe` '
-                                 '(id INT PRIMARY KEY,payload VARBINARY(512),note VARCHAR(50),nullable_value INT NULL) '
+                                 '(id INT PRIMARY KEY,payload VARBINARY(512),'
+                                 'note VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,'
+                                 'nullable_value INT NULL) '
                                  'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci')
                 connection.query('INSERT INTO `' + name + '`.`esteria_backup_probe` VALUES '
                                  "(1,UNHEX('000aff275c00ff'),CONVERT(UNHEX('d0add181d182d0b5d180d0b8d18ff09f8fa0') USING utf8mb4),NULL),"

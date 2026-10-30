@@ -40,8 +40,22 @@ Build diagnostics are retained separately if any step fails. Actions artifacts
 are outputs only; clean builds use durable release inputs rather than expiring
 historical artifacts.
 
-The individual providers and previous local combined build passed their existing
-checks. The new workflow and final source sealer still need their first actual CI
-run; focused tests exercise preservation, inventory and source-object guards with
-explicitly synthetic, unexecuted objects. They do not establish Android execution,
-login, world entry, gameplay, audio, character persistence or bot behavior.
+The first actual hosted run [41009954235](https://github.com/Russianranger/esteria_android/actions/runs/41009954235)
+at `46a54a223720cdc230074aa6a43f10370718af71` passed all phases, including anonymous
+durable-input acquisition, PRoot source rebuild, core tests, native ARM64 app and
+instrumentation compilation, lint, and final source/byte sealing. The generated
+APK is 120,881,379 bytes, SHA-256
+`29502f16e300a5072a32420cd4e03855670068eab821d4b1199ba8074edb0da2`.
+Its matched source artifact is 980,099,765 bytes. The small binary artifact was
+downloaded, checked against the service digest, and the APK/native/provider bytes
+independently read back. The full source artifact was validated by the CI sealer;
+its outer ZIP was not downloaded locally because it exceeds the connector limit.
+Exact artifact IDs, hashes and the source-bound receipt are retained in
+`runtime/evidence/combined-android-build-41009954235.json`.
+
+This run uses client `69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa`, pinned server
+`f35f04d01689f034778e3474b3c820092f51e461` and six reviewed server patches.
+It compiles the combined app but does not run it on Android. Focused guards also
+exercise preservation and source-object validation using explicitly synthetic,
+unexecuted objects. Neither result establishes login, world entry, gameplay,
+audio, character persistence, bot behavior, or persistent-key installation.

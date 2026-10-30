@@ -1,0 +1,99 @@
+# Reconstructed client and compiled authserver gate
+
+`tools/qualify_client_auth.py` pairs the actual source-built Windows ARM64 client
+with the exact compiled Esteria authserver and local MySQL. It reuses the existing
+updater, configuration, account, realm and owned-process helpers without changing
+`qualify_authserver.py` or adopting its previous state. The source implementation
+and five host contract guards exist; actual paired execution is pending. No
+compiled-server client compatibility, Android or gameplay pass is claimed.
+
+The client `--auth-check --local-offline` path uses its real Grunt timer, SRP
+exchange, stream parser, realm callback and network workers before `CommonMain`.
+The initial Windows CI check uses an owned synthetic peer, including bad-proof
+and nonlocal-realm negative cases. This separate integration gate replaces that
+peer with the compiled server; it contains no alternative SRP client/server.
+
+## Development prerequisites
+
+Run on native Linux ARM64, as root, inside the pinned Ubuntu ARM64 server
+dependency environment or an equivalent explicitly verified native reference
+environment. The host needs Python3, `unshare`, `mount`, `ip`, and `chroot`.
+A container must permit a new mount/PID/network namespace; Docker is a CI tool,
+not an Android runtime requirement. The prepared Debian Wine filesystem is a
+separate dependency closure. It is never overlaid onto the Ubuntu server files.
+
+Inputs are the exact installed server tree plus matching immutable content
+package/receipt, current source lock, native MySQL programs/version, a fresh
+`prepare_runtime.py` Wine result, and the original ARM64 client Actions ZIP with
+its measured SHA256/size and clean matching source checkout. The committed
+client parser verifies both PE images and generated build12340/254/25/32
+descriptors. The source must contain the real opt-in Grunt diagnostic. The tool
+retains the original artifact/build/source identities and rechecks copied images
+immediately before supplying credentials.
+
+The invocation shape is:
+
+```sh
+python3 tools/qualify_client_auth.py \
+  --runtime /private/fresh-prepared-wine \
+  --install /qualification/out/server-install \
+  --content /qualification/out/server-content \
+  --content-receipt-sha256 EXACT_CONTENT_RECEIPT_SHA256 \
+  --lock /qualification/sources.lock.json \
+  --mysql /usr/bin/mysql --mysqld /usr/sbin/mysqld \
+  --expected-version EXACT_PINNED_MYSQL_VERSION \
+  --client-artifact /private/exact-client-arm64.zip \
+  --client-artifact-sha256 EXACT_CLIENT_ZIP_SHA256 \
+  --client-artifact-bytes EXACT_CLIENT_ZIP_BYTES \
+  --client-source /private/clean-pinned-client \
+  --client-revision EXACT_CLIENT_COMMIT \
+  --output /private/new-client-auth-run
+```
+
+These placeholders must be replaced by the actual measured artifacts; the tool
+does not download or select a latest client/server. A separate execution workflow
+will be pinned after both required builds pass. This command is not a device
+installation procedure.
+
+## Ownership, private state and evidence
+
+The outer owner creates a new output directory and refuses an already-used Wine
+fixture. Its child is PID1 of new private mount/PID/network namespaces. It raises
+only loopback and verifies that no other interface exists. MySQL and authserver
+remain direct owned native processes; readiness checks require the authserver's
+own listener inode at `127.0.0.1:3724`, including immediately before credentials
+are supplied. No existing port, account directory or database may be adopted.
+
+The compiled updater is the sole creator of a fresh nested server fixture.
+Normal configuration rendering and account/realm provisioning follow. The gate
+requires the source-default `StrictVersionCheck=0` instead of changing it; game
+asset version-checksum validation remains false. Realm1 must advertise
+`127.0.0.1:8085` for build12340. Its offline flag is allowed because the world
+server is not part of this gate.
+
+The generated private account is serialized to the client's exclusive 57-byte
+`Esteria-auth-input.bin`; no credentials are passed through arguments. The
+exclusive public client receipt must contain every actual callback, SRP-proof
+and joined-thread check with this run's nonce. The raw 40-byte private session
+key must equal the actual account's database `session_key`, with platform/locale
+`Win`/`enUS`. The gate also compares unchanged schema/update-ledger, character
+trackers, account salt/verifier, private journal and realm configuration.
+
+Qualification requires normal client exit, Wine stop/wait, authserver/MySQL
+shutdown, complete bounded log draining and final namespace exit0. Private input
+and key files are removed during cleanup. A killed namespace, incomplete worker
+receipt or failed shutdown cannot qualify an earlier successful authentication.
+
+Only `OUTPUT/evidence/` is suitable for a public CI artifact. It contains typed
+phase/error-class and qualification receipts plus fixed client diagnostic status
+lines. Never publish `OUTPUT/private/`, the prepared Wine filesystem, raw Wine or
+server crash logs, generated credential files, session keys or initialized MySQL
+files. Server logs remain private even if ordinary account redaction would be
+possible, because a crash may expose session material before it is returned to
+the harness.
+
+The executable receipt deliberately describes only its own authentication
+checks and keeps `compiledServerQualified=false`; the outer gate establishes the
+additional compiled-server relationship after the owned listener, matching key,
+persistence and cleanup checks all pass. Neither receipt qualifies world entry,
+characters, gameplay, bots, imported assets or Android execution.

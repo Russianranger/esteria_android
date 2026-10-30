@@ -69,7 +69,7 @@ no unpinned runtime package or replacement binary.
 
 ## Validation boundary
 
-Nineteen focused host guard tests pass, including real bounded subprocess output
+Twenty focused host guard tests pass, including real bounded subprocess output
 draining/deadline cleanup, digest rejection before SQL, all-four-empty gating,
 partial-file preservation, no-replace publication and regular-file/link checks.
 The file-size limiter starts an isolated Python interpreter that applies the
@@ -111,5 +111,20 @@ row values or per-line hashes leave the private fixture. This does not relax
 the byte-for-byte gate; even a difference limited to an auto-increment counter
 still fails. Full preservation qualification awaits that investigation and the
 subsequent clean restart comparisons.
+
+Run `41009954140` at `46a54a22` located that mismatch precisely: the harness-only
+`acore_auth.esteria_backup_probe.note` column definition changed from 62 to 84
+bytes. [Oracle's verified bug 110825](https://bugs.mysql.com/bug.php?id=110825)
+documents this exact `SHOW CREATE TABLE` behavior: an inherited column charset
+and emitted collation can acquire an explicit charset clause on replay. The
+fixture now declares `CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci` directly
+on that text column. This changes no server table or data input. Source and
+restored snapshots additionally check the column's type, length, charset,
+collation and nullability. Every full-dump comparison remains unchanged.
+The next exact ARM64 run must establish the result. A small local x86_64 MySQL
+8.0.46 instance initialized, but this host denied Unix-socket binding before
+SQL readiness; no local SQL round-trip is claimed. The diagnostic run's verified
+6,422-byte artifact `12957775001` has ZIP SHA-256
+`19763d0e3026848bb82d7fc885f8ce90f54a801d0a32a435db90ef6c14bfe432`.
 No current result qualifies live saved-game restoration, upgrades across revisions,
 character saving/relogging, bot persistence, the Android helper, or gameplay.

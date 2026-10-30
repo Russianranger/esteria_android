@@ -176,7 +176,7 @@ python3 tools/qualify_android_proot.py --provider /tmp/new-proot-probe/provider 
 The probe provider is mutually exclusive with the production ARM64 provider and
 the separate presentation emulator profile. Do not distribute its APK as a Thor
 candidate or a normal application update. It uses only a disposable CI debug key.
-## Android x64 legacy rename compatibility (pending runtime gate)
+## Android x64 legacy rename compatibility
 
 The real Android MySQL fixture in run `41007887632` started guest Python and
 executed `mysqld --version`, then failed its first atomic journal replacement:
@@ -202,11 +202,27 @@ directory with correct guest `getcwd`. It flushes state and verifies exact bytes
 link contents and the renamed directory on the second process launch. The
 instrumentation and host receipt require both new markers; previous successful
 receipts do not qualify this added behavior. Native compilation and source review
-are separate from the new Android execution and MySQL rerun, which are pending.
+are separate from Android execution and the MySQL service qualification.
 Two clean native builds reproduced the new protected and control tracer bytes;
 the loader bytes remain identical. All five provider/receipt guards pass with the
 actual rebuilt provider. The x64 native APK, instrumentation and lint also pass,
 and the final local APK matches the pinned provider bytes. These are build checks.
+
+Actual Android13 x86_64 execution passed in
+[run41010011745](https://github.com/Russianranger/esteria_android/actions/runs/41010011745)
+at `43ccce4fe5ef8f5df79397e849c1aabf498f7cd5`. The receipt requires and records
+`legacyRenameReplacementVerified` and `renamePersistenceVerified`, and matches
+the independently rebuilt provider's complete build evidence. All eight guest
+launches and previous ownership controls also pass: three control survivors,
+zero protected survivors, three restored graceful save records, and remote-owner
+cleanup within 2,878 ms. The separate ordinary APK exclusion check passes.
+Evidence ZIP12956929592 is 67,722 bytes, SHA-256
+`4ffeed0dad06064bb85748f3797baa5d66bfdce6d573be89ee66edb271c50f27`.
+The checked APK is 2,274,034 bytes, SHA-256
+`d7054f489ed612c07d6563baaa70440a2262f8ff28fe470c8068d89d142b0763`.
+This establishes the specified legacy rename semantics through the Android x64
+loader; the MySQL service rerun is a separate gate. ARM64, Wine and gameplay
+execution remain unqualified by this test.
 
 Primary Android13 source:
 `platform/bionic`, tag `android-13.0.0_r37`, `libc/SYSCALLS.TXT` and

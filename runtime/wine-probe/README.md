@@ -29,3 +29,10 @@ complete source companion. `.github/workflows/android-wine-runtime.yml` is the
 reproducible invocation. `tests.test_android_wine_runtime` checks bounded staging,
 actual ELF/PE architecture rejection, exact scope/source pins, hardlink budget,
 escaping links and no-overwrite behavior with synthetic archives.
+
+The initial source build in run41008440024 compiled Wine successfully but failed
+at installation because this pinned Wine revision has no `install-strip` target.
+The recipe uses its actual `install` target with `INSTALL_PROGRAM_FLAGS=-s`;
+the pinned `tools/makedep.c` supplies the correct native/PE `STRIPPROG` for each
+installed program. Silent make mode avoids clipping compiler diagnostics behind
+BuildKit's command-output limit. The corrected runtime build remains pending.

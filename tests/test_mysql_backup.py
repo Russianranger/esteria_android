@@ -236,6 +236,13 @@ class BackupGuards(unittest.TestCase):
             backup.require_same_dump(evidence, left, right, backup.identity_file(left), backup.identity_file(right))
         self.assertTrue(evidence['canonicalDifference']['onlyAutoIncrementCounterDiffers'])
 
+    def test_probe_snapshot_rejects_changed_column_semantics_before_account_comparison(self):
+        connection = Mock(); connection.query.return_value = ['varchar\t50\tlatin1\tlatin1_swedish_ci\tYES']
+        with patch.object(backup.account, 'selected_account') as account:
+            with self.assertRaisesRegex(ValueError, 'probe text semantics changed'):
+                backup.probe_snapshot(connection, {'username': 'unused'})
+        account.assert_not_called()
+
     def test_actual_child_stderr_is_drained_and_bounded_privately(self):
         log = self.root / 'private.log'
         command = [sys.executable, '-c', "import os; os.write(2,b'private-SQL-'*20000)"]
