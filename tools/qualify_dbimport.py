@@ -253,7 +253,8 @@ def markers(connection, token, *, create=False):
     for name in DATABASES:
         table = '`acore_' + name + '`.`esteria_dbimport_probe`'
         if create:
-            connection.query('CREATE TABLE ' + table + ' (id INT PRIMARY KEY, token CHAR(64) NOT NULL) ENGINE=InnoDB')
+            connection.query('CREATE TABLE ' + table + ' (id INT PRIMARY KEY, '
+                             'token CHAR(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL) ENGINE=InnoDB')
             connection.query("INSERT INTO " + table + " VALUES (1,'" + token + "')")
         require(connection.query('SELECT token FROM ' + table + ' WHERE id=1') == [token],
                 'disposable state marker changed during same-revision updater/restart')

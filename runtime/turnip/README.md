@@ -82,8 +82,16 @@ therefore first creates an instance and requires successful zero-device
 enumeration **directly from the exact measured ICD**. Only after that independent
 check does the no-GPU path permit loader result0 or-3. It records the actual
 result; arbitrary ICD errors and physical devices still fail. The hardware path
-requires normal successful enumeration and all pixel checks. The corrected
-probe still awaits native ARM64 execution; no hardware gate has passed.
+requires normal successful enumeration and all pixel checks.
+
+The corrected native ARM64 run
+[41009954190](https://github.com/Russianranger/esteria_android/actions/runs/41009954190)
+at `46a54a223720cdc230074aa6a43f10370718af71` passed the full source build, real
+shader compiler checks and exact-ICD no-GPU probe. The latter required direct
+successful zero-device enumeration, real loader instance creation and its
+separately recorded enumeration result, followed by normal cleanup. This
+qualifies Linux ARM64 ICD loading without a GPU only. Adreno rendering, X11
+presentation, Android and gameplay remain unqualified.
 
 The separate `--gpu-readback` probe requires observed Mesa Turnip driver identity,
 an integrated Qualcomm740 GPU and a KGSL character device. It compiles/runs the

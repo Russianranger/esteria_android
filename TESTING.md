@@ -156,5 +156,12 @@ latest combined ARM64 all-provider APK passes clean core/build/instrumentation/l
 and final provider hashes, without claiming ARM64 execution. Eight shader setup
 host groups validate transactions, exact tool closure and actual subprocess bounds;
 synthetic SPIR-V fixtures deliberately claim no semantic/rendering qualification.
-Backup41006179962 failed before dump on an unsupported dumper option; its correction
-requires actual rerun. See scoped qualification documents for full evidence.
+Backup dump/restore and account/setup checks now pass; complete canonical equality
+exposed a disposable harness-column charset normalization, corrected without
+relaxing the comparison. Run41011458127 must establish the complete result.
+Android13 x64 MySQL41010011663 passes actual initialize/authenticate/repeat/restart
+and same-instance credentials/marker preservation after the rename adaptation;
+this is not production ARM64 or game-save qualification. The stable development
+certificate has signed an internal nondebug43cc release with exact provider
+readback, but installation/update preservation and a delivered baseline remain
+open. See the scoped qualification documents and public evidence receipts.

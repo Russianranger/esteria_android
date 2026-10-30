@@ -19,3 +19,5 @@ def packageDatabaseSetup = tasks.register('packageDatabaseSetup') {
 }
 android.sourceSets.main.assets.srcDir(helperOutput)
 tasks.named('preBuild').configure { dependsOn packageDatabaseSetup }
+
+apply from: 'database-service.gradle'

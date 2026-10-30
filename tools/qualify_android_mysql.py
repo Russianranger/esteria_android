@@ -91,7 +91,7 @@ def main():
                         report.setdefault('diagnosticErrors', []).append(str(error))
                 # Only Java-sanitized engine diagnostics are read; never state/config/SQL.
                 try:
-                    _, listing = command(phase + '-engine-files', ['exec-out', 'run-as', PACKAGE, 'ls',
+                    _, listing = command(phase + '-engine-files', ['exec-out', 'run-as', PACKAGE, 'ls', '-1',
                         'files/mysql-probe-session/sessions/' + phase + '/logs'], allow_failure=True)
                     files = [name for name in listing.splitlines() if name.startswith('engine-')]
                     require(len(files) <= 16 and all(re.fullmatch('engine-[a-z0-9.-]{1,80}', name) for name in files), 'engine-log-inventory')

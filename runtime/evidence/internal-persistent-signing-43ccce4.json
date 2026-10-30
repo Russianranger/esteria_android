@@ -1,0 +1,45 @@
+{
+  "androidExecutionQualified": false,
+  "buildChecks": [
+    "core:check",
+    "app:assembleRelease",
+    "app:lintRelease"
+  ],
+  "deliveredBaselineEstablished": false,
+  "finalProviderBytesVerified": [
+    "proot",
+    "server",
+    "guest",
+    "client"
+  ],
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "integrationRevision": "43ccce4fe5ef8f5df79397e849c1aabf498f7cd5",
+  "scope": "internal-persistent-signature-and-provider-bytes-only",
+  "signing": {
+    "actualInstallOverQualified": false,
+    "deviceCandidateQualified": false,
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "inputApkSha256": "d4fe2b30db4d756ed1da9e67c4052130650627c0f31213653de7f413345c95cb",
+    "payloadPreserved": true,
+    "persistentSigningIdentityVerified": true,
+    "previousPublished": null,
+    "publicSigningLockSha256": "71fb3b7defb7a607df544b424dd7452d8d5722bdd7fbf5a63a873da704dc5c7a",
+    "qualificationOnly": false,
+    "scope": "apk-signature-and-update-identity",
+    "sdkBuildToolsVersion": "35.0.0",
+    "signedApk": {
+      "apkBytes": 120704190,
+      "apkSha256": "3e3af9904bfa403cc0a74a9ce9df5803af5e5e2aacb8a1facafecebeb2a77e60",
+      "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+      "debuggable": false,
+      "minSdk": 26,
+      "packageId": "io.github.russianranger.esteria",
+      "targetSdk": 35,
+      "versionCode": 1,
+      "versionName": "0.1.0-dev"
+    }
+  },
+  "signingToolRevision": "f963225d900961c3696880bc6c0c537aa741577f"
+}

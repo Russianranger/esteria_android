@@ -12,6 +12,7 @@ from pathlib import Path
 import re
 import shlex
 import shutil
+import struct
 import subprocess
 import tarfile
 from urllib.parse import urlsplit
@@ -33,6 +34,21 @@ NATIVE_PINS = {
 
 def identity(path):
     return dict(bytes=path.stat().st_size, sha256=proot.digest(path))
+
+
+def relinkable_objects(directory):
+    result = {}; total = 0
+    for path in sorted(directory.rglob('*.o')):
+        packages.require(path.is_file() and not path.is_symlink(), 'probe-relink-object-type')
+        size = path.stat().st_size; total += size
+        packages.require(20 <= size <= 16 * 1024**2 and total <= 32 * 1024**2 and len(result) < 128,
+                         'probe-relink-object-limit')
+        with path.open('rb') as stream: header = stream.read(20)
+        packages.require(header[:6] == b'\x7fELF\x02\x01' and struct.unpack_from('<HH', header, 16) == (1, 62),
+                         'probe-relink-object-not-x64')
+        result[path.relative_to(directory).as_posix()] = identity(path)
+    packages.require('talloc.c.5.o' in result, 'probe-talloc-relink-object-missing')
+    return result
 
 
 def build(args):
@@ -170,6 +186,7 @@ def build(args):
         ownerDeathTestSourceSha256=proot.digest(ROOT / 'app/src/androidTest/java/io/github/russianranger/esteria/runtime/RemoteOwnerDeathProbe.java'),
         renameCompatibilityPatchSha256=proot.digest(rename_patch),
         nativeFiles=NATIVE_PINS, rootfsFiles=root_files, glibcVersion='2.36',
+        tallocRelinkableObjects=relinkable_objects(source / 'talloc-2.4.3/bin/default'),
         androidProotExecuted=False, arm64GuestExecuted=False, gameplayQualified=False)
     packages.write_json(assets / 'build-evidence.json', evidence)
     packages.write_json(work / 'build-evidence.json', evidence)

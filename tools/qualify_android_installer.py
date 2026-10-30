@@ -12,6 +12,13 @@ import threading
 
 PACKAGE = 'io.github.russianranger.esteria'
 TEST = PACKAGE + '.core.runtime.install.RuntimeInstallationInstrumentedTest'
+HELPER_TEST = PACKAGE + '.runtime.DatabaseServiceAssetsTest'
+HELPER_METHODS = ('actualBundledHelpersInstallAndRepeatWithoutRewriting',
+    'changedExistingHelperIsPreservedAndRefused',
+    'partialGenerationResumesAndRetainsHarmlessInterruptedWrite',
+    'extraModulesNativeExtensionsAndCachesCannotEnterImportPath',
+    'expectedHelperSymlinkNeverReplacesOrWritesItsTarget',
+    'temporarySymlinkDoesNotBypassClosure')
 
 def digest(path):
     value = hashlib.sha256()
@@ -97,17 +104,21 @@ def main():
         ('initialApk', args.initial_apk), ('updateApk', args.update_apk), ('testApk', args.test_apk))}
     command('install-initial', ['install', str(args.initial_apk)])
     command('install-tests', ['install', str(args.test_apk)])
-    def test(method):
+    def test(method, test_class=TEST):
         _, output = command(method, ['shell', 'am', 'instrument', '-w', '-r', '-e', 'class',
-            TEST + '#' + method, PACKAGE + '.test/androidx.test.runner.AndroidJUnitRunner'], timeout=600)
+            test_class + '#' + method, PACKAGE + '.test/androidx.test.runner.AndroidJUnitRunner'], timeout=600)
         if not instrument_passed(output):
             raise RuntimeError(method + ' did not report one successful test')
+    for method in HELPER_METHODS:
+        test(method, HELPER_TEST)
     test('runtimeContracts')
     test('seedBeforeUpdate')
     command('install-update-preserving-data', ['install', '-r', str(args.update_apk)])
     test('verifyAfterUpdate')
     receipt = dict(formatVersion=1, scope='android-13-x86_64-installer-and-apk-update',
         emulatorProperties=properties, artifacts=artifacts, runtimeContractGroups=18,
+        databaseHelperAssetContractGroups=len(HELPER_METHODS), databaseHelperAssetsQualified=True,
+        databaseServiceExecuted=False,
         runtimeFilesystemQualified=True, sameJobDebugKeyUpdatePreservedRuntimeAndSentinel=True,
         userSigningIdentityQualified=False, arm64GuestExecuted=False, gameplayQualified=False,
         completedAtUnix=int(time.time()))

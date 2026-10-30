@@ -52,8 +52,11 @@ A passed component test, compiled EXE, built APK or listening TCP port does not 
 
 
 Latest integration priorities: complete source-backed server linking and compiled
-SQL/auth gates; qualify the real bootstrap under Android x64; finish strict local
-shader preparation and the pinned KGSL graphics build; then compose actual Wine
-client execution with native presentation. Durable dependency archives now allow
-clean build automation to avoid expiring CI inputs. Staging checks and emulator
-fixtures remain separate from complete ARM64 local gameplay acceptance.
+SQL/auth gates; qualify the persistent MySQL service and new Android adapter;
+finish the local shader setup adapter and compose actual Wine client execution
+with native presentation. Android x64 bootstrap/restart, native ARM64 KGSL-library
+loading without hardware, and real shader compiler gates now pass. Native Windows
+Grunt/SRP passes; ARM64 Wine Grunt and actual compiled-server pairing remain next.
+Durable dependency archives reproduce combined builds, and the persistent signing
+identity has signed an internal nondebug APK. These component results remain
+separate from complete ARM64 local gameplay and data-preserving update acceptance.

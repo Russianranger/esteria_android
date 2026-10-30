@@ -11,7 +11,8 @@ Thor startup-test request. Do not imply execution continues without a real job.
 The application lock pins client69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa,
 serverf35f04d01689f034778e3474b3c820092f51e461 and
 Eluna58d7652138887783228b9727bd1fa4e08f00342b, with six hashed server patches.
-The newer client development tip is97b347ee034551ea78dc905c3e209667534e6283.
+The newer client development tip is0f931bbade36a4b197725d691b8eff7caea7b3be;
+its workflow pins integration0146ca89307eb3c00c09b7fbecdf3e301bd9bd53 for Wine Grunt.
 Fetch both branches and inspect Actions before interpreting pending results.
 
 The chosen path is reconstructed Windows ARM64 under local ARM64 Wine, plus a
@@ -23,15 +24,20 @@ The app has resumable immutable imports, verified optional runtime providers,
 writable client/UI generations, review/activation, native presentation/input/audio
 bridges, process ownership, persistent bootstrap source packaging and diagnostics.
 Gameplay START remains gated. Latest all-four-provider ARM64 build passes core,
-APK/AndroidTest/lint and exact final-byte inventory checks. No user signing/update
-baseline, Android ARM64 execution, client/server login or world entry is qualified.
+APK/AndroidTest/lint and exact final-byte inventory checks. Stable development
+signing identity is provisioned and privately backed up; the public fingerprint
+is in app/development-signing.lock.json. No delivered update baseline, Android
+ARM64 execution, client/server login or world entry is qualified.
 
 ## Actual latest evidence and next work
 
 1. Full EXE offline checks passed all5 jobs41003225299 (cliente2718f6).
    Positive transport run41006100154 passed actual x64 packet/stream I/O after
    the timer-wake fix, then exposed a diagnostic-only missing Finalize() call.
-   Client97b347 fixes that; wait for complete Windows/Wine receipts before repinning.
+   Client97b347 fixes that and all five jobs41007244092 pass. Strict shader source
+   926a also passes all five jobs41007556042. Client3f9389 adds actual Grunt/SRP
+   callbacks against a controlled local peer; Windows ARM64/x64 in41010223296 pass.
+   Real compiled-server pairing is separate; the application still pins69cc.
 2. Server41005048019 compiles six-patch source using saved cache. Prior run linked
    authserver/dbimport but failed final worldserver link after2,257objects. Patches5/6
    repair real template visibility and README-only Custom registration. Complete
@@ -39,30 +45,43 @@ baseline, Android ARM64 execution, client/server login or world entry is qualifi
 3. Proposed patch7 derives module configs from the selected main config's parent,
    preserving defaults. Actual source-linked host ConfigMgr reference passes and
    original-source negative control fails. It is not in sources.lock yet. Activate
-   after current link evidence; then materialize/check every enabled module config,
-   not just playerbots.conf. ConfigMgr success alone does not prove modules loaded.
-4. Base/account SQL runs pass. Backup41006179962 fails before dumping on a mysqldump
-   option accepted only by mysql. The corrected command and real host preflight
-   are implemented; actual ARM64 dump/restore/restart and repeat-wrapper must rerun.
-   Playerbots fourth-schema readiness reference is under development; no AI claim.
+   after current link evidence; complete source-bound module rendering is now
+   implemented. Qualifiers must pass both verified source inventory and actual
+   compiled selection. ConfigMgr success alone does not prove modules loaded.
+4. Base/account SQL and actual backup dump/restore/setup repetition pass. Strict
+   complete dump equality in41009954140 identifies a harness-only text-column
+   charset normalization. The fixture now declares that existing charset explicitly;
+   the full-byte equality gate remains unchanged and requires a new ARM64 run.
+   Playerbots fourth-schema source reference is implemented but not yet executed.
 5. Android stdin41003838802 passes9 groups; native stdin41003838751 passes12.
    Tracer41003838793 passes3survivors versus0 protected plus saved-file relaunch.
    Remote-owner41006180061 passes owner/tracer/guest exit and independent control
    survival in4,115ms with nine pidfds. Whole-app death/ARM64/Wine remain open.
-6. Android MySQL41006572364 builds a separate exact x64 debug fixture. Require real
-   initialize→seed→repeat→verify SQL/UUID/credential evidence before enabling the
-   normal bootstrap adapter. Preserve /work/state and private secrets across updates.
-7. Turnip41006180058 builds Linux ARM64 Mesa KGSL plus X11 software WSI and real
-   glslang/SPIRV tools. A source build is not GPU/Android qualification. Existing
-   Debian22 Mesa DRM driver does not establish Adreno KGSL support.
+6. Android MySQL41007887632 fails first atomic journal rename with errno38 before
+   database initialization. The x64-only PRoot rename adaptation passes actual
+   Android13 atomic replacement/persistence in41010011745. MySQL41010011663 now
+   passes initialize→seed→repeat→verify and live SQL/UUID/credential preservation.
+   Production ARM64 execution remains open. Preserve /work/state across updates.
+7. Turnip compiles all681objects; actual glslang/SPIRV compile/validate/disassembly
+   and invalid-input checks pass. The pinned loader returns -3 when its ICD has no
+   devices. Corrected41009954190 passes direct exact-ICD zero-device success
+   before accepting that loader result. GPU/Android gates remain false.
 8. Shader staging helper uses strict pinned client translation, bounded processes,
    exact input/tool provenance and atomic output promotion. Eight host groups pass;
-   synthetic structural SPIR-V tests are not real shaders. Complete tool packaging,
-   app setup adapter and actual data-based generation remain work.
+   synthetic structural SPIR-V tests are not real shaders. Exact926a translator
+   plus actual8a ARM64 compiler/source bundle packages and verifies successfully;
+   optional APK provider/app setup adapter and actual data-based generation remain work.
 9. Durable server41003838795, guest41006572380 and client41006572426 dependency
    releases are published and read-only/public-fetch verified. Scoped release locks
    contain exact URLs/hashes; GitHub immutable=false is explicit. Unified clean
-   all-provider APK automation is next; never depend on expiring Actions artifacts.
+   all-provider APK automation passes41009954235 and41010011668, with full paired
+   source closure and independent APK readback. These remain internal builds.
+10. New persistent MySQL service helper is source-reviewed: exact engine-version
+    preflight, upgrade refusal, owned PID/UUID/loopback authentication, bounded
+    logs, explicit shutdown and joined engine. Its new Android adapter has an
+    exclusive setup/session lease and requires live and clean-stop receipts.
+    The separate mysql-service.yml actual runtime gate remains pending; do not
+    infer a live service from a setup receipt or enable gameplay prematurely.
 
 ## Missing content and acceptance
 

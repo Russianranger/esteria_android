@@ -1,0 +1,92 @@
+name: Pinned persistent MySQL service qualification
+on:
+  push:
+    branches: [android/client-server]
+    paths:
+      - runtime/mysql_service.py
+      - runtime/mysql_bootstrap.py
+      - runtime/server/**
+      - tools/owned_process_group.py
+      - tests/test_mysql_service.py
+      - .github/workflows/mysql-service.yml
+  pull_request:
+    paths:
+      - runtime/mysql_service.py
+      - runtime/mysql_bootstrap.py
+      - runtime/server/**
+      - tools/owned_process_group.py
+      - tests/test_mysql_service.py
+      - .github/workflows/mysql-service.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: mysql-service-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  persistent-service:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Check service ownership and startup guards
+        run: |
+          test "$(uname -m)" = aarch64
+          python3 -m unittest tests.test_mysql_service.ServiceGuards tests.test_owned_process_group -v
+          mkdir -p out/mysql-service-evidence out/mysql-service-private
+      - name: Build exact pinned native ARM64 dependency image
+        run: |
+          docker build --platform linux/arm64 --target runtime \
+            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
+            -t esteria-mysql-service:qualification runtime/server \
+            > out/mysql-service-evidence/image-build.log 2>&1
+          container=$(docker create esteria-mysql-service:qualification)
+          trap 'docker rm -f "$container" >/dev/null' EXIT
+          docker cp "$container:/etc/esteria-server-runtime.json" out/mysql-service-evidence/server-runtime.json
+          docker image inspect esteria-mysql-service:qualification --format '{{.Id}}' > out/mysql-service-evidence/image-id.txt
+          python3 - <<'PY'
+          import json, os, pathlib
+          runtime = json.loads(pathlib.Path('out/mysql-service-evidence/server-runtime.json').read_text())
+          with open(os.environ['GITHUB_ENV'], 'a') as output:
+              output.write('ESTERIA_MYSQL_SERVICE_VERSION=' + runtime['expectedMysqlSqlVersion'] + '\n')
+          PY
+      - name: Exercise exact service CLI and restart persistence without external network
+        run: |
+          docker run --rm --init --network none \
+            --env PYTHONDONTWRITEBYTECODE=1 \
+            --env ESTERIA_MYSQL_SERVICE_INTEGRATION=1 \
+            --env "ESTERIA_MYSQL_SERVICE_VERSION=$ESTERIA_MYSQL_SERVICE_VERSION" \
+            --env ESTERIA_MYSQL_SERVICE_EVIDENCE=/evidence \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/mysql-service-private,dst=/work" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/mysql-service-evidence,dst=/evidence" \
+            --workdir /qualification esteria-mysql-service:qualification \
+            python3 -m unittest tests.test_mysql_service.RealMysqlService -v \
+            > out/mysql-service-evidence/qualification.log 2>&1
+      - name: Bind successful fixture evidence to exact source and runtime
+        if: always()
+        run: |
+          sudo python3 - <<'PY'
+          import hashlib, json, os, pathlib
+          root = pathlib.Path('out/mysql-service-evidence')
+          root.mkdir(parents=True, exist_ok=True)
+          evidence = root / 'qualification.json'
+          runtime = root / 'server-runtime.json'
+          if evidence.is_file() and runtime.is_file():
+              report = dict(formatVersion=1, scope='native-arm64-persistent-mysql-service-environment',
+                  integrationRevision=os.environ['GITHUB_SHA'],
+                  qualificationSha256=hashlib.sha256(evidence.read_bytes()).hexdigest(),
+                  runtimeManifestSha256=hashlib.sha256(runtime.read_bytes()).hexdigest(),
+                  externalNetworkDisabled=True, freshDisposableStateOnly=True,
+                  applicationSchemaUpdatesQualified=False, characterPersistenceQualified=False,
+                  androidQualified=False, gameplayQualified=False)
+              (root / 'environment-receipt.json').write_text(json.dumps(report, indent=2) + '\n')
+          PY
+          sudo chown -R "$(id -u):$(id -g)" out/mysql-service-evidence
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: mysql-service-qualification-${{ github.sha }}
+          path: out/mysql-service-evidence
+          retention-days: 14
+          if-no-files-found: error

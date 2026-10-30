@@ -1,0 +1,152 @@
+{
+  "formatVersion": 1,
+  "scope": "observed-android-13-x86_64-mysql-bootstrap-and-restart",
+  "runId": 41010011663,
+  "sourceRevision": "43ccce4fe5ef8f5df79397e849c1aabf498f7cd5",
+  "runConclusion": "success",
+  "earlyArtifact": {
+    "id": 12956809312,
+    "bytes": 46799,
+    "sha256": "5d6c206cc145aa30203bdeec2cfd236016597378097926c71882e1a6e7552772",
+    "downloadVerified": true
+  },
+  "qualification": {
+    "bytes": 5097,
+    "sha256": "c105a95c93966e393a7a94601b4f90134adbd994c28ec46f178e2c807b55f471",
+    "receipt": {
+      "formatVersion": 1,
+      "scope": "android-13-x86_64-mysql-bootstrap-and-restart",
+      "sourceRevision": "43ccce4fe5ef8f5df79397e849c1aabf498f7cd5",
+      "apk": {
+        "bytes": 114618218,
+        "sha256": "e6c8eafe9973cd5bc0fea4a464ac572f6cceb8243c4c2ec510b72bbfc21084c4"
+      },
+      "testApk": {
+        "bytes": 1720977,
+        "sha256": "574f19ef1e427b51e012a9f000187c23b7849258fd1c6c39fb806a26a74bf6dc"
+      },
+      "androidMysqlBootstrapQualified": true,
+      "productionAdapterQualified": false,
+      "arm64Qualified": false,
+      "serverSchemasQualified": false,
+      "worldserverQualified": false,
+      "gameplayQualified": false,
+      "emulatorProperties": {
+        "ro.kernel.qemu": "1",
+        "ro.build.version.sdk": "33",
+        "ro.product.cpu.abi": "x86_64",
+        "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys"
+      },
+      "appEvidence": {
+        "formatVersion": 1,
+        "scope": "android-13-x86_64-mysql-bootstrap-and-restart",
+        "sourceRevision": "43ccce4fe5ef8f5df79397e849c1aabf498f7cd5",
+        "fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+        "api": 33,
+        "targetSdk": 35,
+        "abi": "x86_64",
+        "mysqlVersion": "8.0.46-0ubuntu0.24.04.4",
+        "runtimeProviderSha256": "ff8a5e0fb610cdf081933c355db62b90bfc051334a1c8721957953c014069264",
+        "runtimeArchiveSha256": "a6d77731cf194319392bb51f4334352657ae3d1ef8ebe913c9307f7d70f9fc38",
+        "runtimeGeneration": "648a08607216c10cbc276b08873d4a1f42eb3ed8cb87816410ff3cdb372977da",
+        "prootBuildEvidence": {
+          "formatVersion": 1,
+          "scope": "android-13-x86_64-proot-glibc-probe-build-only",
+          "ndkVersion": "28.2.13676358",
+          "compilerSha256": "6156dd4e5e466333197a00b8d20bca72c292186643b749dcaaa3aa9164afb1de",
+          "prootSourceLockSha256": "d4383760217a5b71a4a28cd02d6fc354b5876ca9e21e1db0fe1c733564a58bf2",
+          "glibcLockSha256": "8c72a53ec20d430c9a728ec2047be038dc7de62ae1cfd7a929412f567d0c08c0",
+          "builderSha256": "5556113f1dcc7b3b42087ed600bde50db9a71912c1fb19691d164898a5267be0",
+          "guestSourceSha256": "5e98de4b1439f2c2f35a5a7a8108e86f54070e5a8c70b234daf15e775fd1a10f",
+          "pluginSourceSha256": "5e78917619d3568470b2ed7471d3901591980ba1acdecaa088ff3e98db9f3556",
+          "ownershipPatchSha256": "509160bd6ec3663d525fa0e795a7bb45b8ccc283a6de8e1398e8cd6624fe86de",
+          "ownershipGuestSourceSha256": "99868eb91f6925d9fc20607c44103afc27fcfbef8146a9e0d1e7a59393b97b2e",
+          "unpatchedControlIncluded": true,
+          "ownerServiceSourceSha256": "987abdb65d3a43a59c332102f103af340a2793f306071ed4082867a10ce39bf2",
+          "ownerServiceManifestSha256": "4f88a42892470ae50ae03286e666bbb869889b31fd8b2f61663a216052e3d66c",
+          "ownerDeathTestSourceSha256": "3519aac5705f1283079789ff99c228236bca817f720d7a51dea8e43622772ece",
+          "renameCompatibilityPatchSha256": "8ea4340df89b694e881e4804c312d71268071736a1883b4ffbc42015e9081152",
+          "nativeFiles": {
+            "libproot_probe.so": {
+              "bytes": 277720,
+              "sha256": "8901163fb083b63e741b7c6bc7958cf82c646bb1d897052c39c3dc8e427526c5"
+            },
+            "libproot_probe_loader.so": {
+              "bytes": 18344,
+              "sha256": "4a324117c6a16fe996af18ea388191379f5517309e963c80186fd3563a78410a"
+            },
+            "libproot_probe_control.so": {
+              "bytes": 277720,
+              "sha256": "29dbcbbab429fc77bbf45580a35b6d2c659f19162b9bf764b43ebb2da625f970"
+            }
+          },
+          "rootfsFiles": {
+            "probe": {
+              "bytes": 16160,
+              "sha256": "b1dd5b28c57718e907f452629002e385be4677bd98f6595d9847a7d695c9d495"
+            },
+            "probe-plugin.so": {
+              "bytes": 3328,
+              "sha256": "5ed97ba5e696301162e9f5fa1e3e88a04b304f38f8d3c1fd2e9f0914ff9d5d6b"
+            },
+            "probe-owner": {
+              "bytes": 13312,
+              "sha256": "485785fd1949b29554f65d63edddf93ad151f23b305e6cfd9cf91a5daa53fd92"
+            },
+            "lib/x86_64-linux-gnu/libc.so.6": {
+              "bytes": 1926232,
+              "sha256": "6b4a45352fd0c540a9c7c718f35ce8c8e46a4e482f9d3885a910c32d1a0e1421"
+            },
+            "lib64/ld-linux-x86-64.so.2": {
+              "bytes": 215000,
+              "sha256": "02bcda52c1a5dfc236f94d9e5255b4a0e26347d8a372a5223b650e31f291ce3c"
+            }
+          },
+          "glibcVersion": "2.36",
+          "androidProotExecuted": false,
+          "arm64GuestExecuted": false,
+          "gameplayQualified": false
+        },
+        "guestLaunches": 4,
+        "exactBootstrapHelpersVerified": true,
+        "runtimeInstalledByProductionInstaller": true,
+        "databaseInitialized": true,
+        "rootSqlAuthenticated": true,
+        "applicationSqlAuthenticated": true,
+        "socketOnly": true,
+        "instanceIdentityVerified": true,
+        "persistentMarkerRestored": true,
+        "credentialsPreserved": true,
+        "cleanShutdown": true,
+        "repeatBootstrapPreserved": true,
+        "productionAdapterQualified": false,
+        "arm64Qualified": false,
+        "serverSchemasQualified": false,
+        "worldserverQualified": false,
+        "gameplayQualified": false
+      },
+      "diagnosticErrors": [
+        "engine-log-inventory",
+        "engine-log-inventory",
+        "engine-log-inventory"
+      ],
+      "completedAtUnix": 1793339836
+    }
+  },
+  "finalEvidenceArtifact": {
+    "id": 12958021626,
+    "bytes": 105598,
+    "sha256": "2117fdccf9f4633b94a746a63a05a3091a3b7feeefde18cec6267df7e8a22a3b",
+    "downloadVerified": false
+  },
+  "sourceCompanionArtifact": {
+    "id": 12958270737,
+    "bytes": 905014233,
+    "sha256": "bd9a0a5de871bd7c15b268c93ede152c5631022c97812e9f557885c4c58427f8",
+    "downloadVerified": false
+  },
+  "limitations": [
+    "Three engine-log inventories failed because Toybox ls emitted columns; this did not alter the execution receipt. Qualifier now requests ls -1.",
+    "Actions source/evidence artifacts expire; this debug fixture is not a production APK distribution."
+  ]
+}

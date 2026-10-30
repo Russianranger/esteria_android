@@ -96,9 +96,30 @@ or the production `ServerDatabaseSetup`/`ProotProcess` adapter execute correctly
 
 ## Current evidence
 
-Host tests cover real archive normalization/readback, state/credential/link
-refusal, copied-hardlink reserve, source/architecture separation and mutation of
-all required execution receipt flags. Compilation and synthetic host contracts
-are not MySQL execution evidence. Actual dependency-image/profile build and
-Android MySQL initialization/restart remain pending the new
-`.github/workflows/android-mysql.yml` run.
+Native CI run [41010011663](https://github.com/Russianranger/esteria_android/actions/runs/41010011663)
+completed successfully at `43ccce4fe5ef8f5df79397e849c1aabf498f7cd5`.
+Android13/API33 x86_64 executed all four launches with MySQL
+`8.0.46-0ubuntu0.24.04.4`: fresh initialization, root/application SQL
+authentication, socket-only service, exact instance identity, marker/credential
+preservation after repeated bootstrap and restart, and clean owned shutdown.
+The production installer installed the exact fixture runtime and all bootstrap
+helper hashes matched. This qualifies the stated x64 emulator bootstrap scope;
+production adapter, ARM64, game schemas, worldserver and gameplay remain false.
+
+The independently downloaded early evidence ZIP is46,799 bytes, SHA-256
+`5d6c206cc145aa30203bdeec2cfd236016597378097926c71882e1a6e7552772`.
+Its qualification receipt SHA-256 is
+`c105a95c93966e393a7a94601b4f90134adbd994c28ec46f178e2c807b55f471`.
+[The recorded evidence](../evidence/android-mysql-43ccce4.json) retains the exact
+receipt, APK/provider/native hashes and separately identified final/source
+artifact transport metadata. The latter two artifacts have not been downloaded
+for independent readback. Three engine-log inventories were omitted because
+Toybox `ls` emitted multiple columns; the qualifier now requests `ls -1`.
+The actual execution receipt is complete; diagnostic log coverage is limited.
+
+The preceding real Android failure was `errno=38` in Python `os.replace` while
+writing the initial initialization journal. The reviewed, separately pinned x64
+PRoot legacy-rename-to-renameat adaptation resolved it without changing the
+bootstrap helper or adding a destructive recovery path. Native ARM64 PRoot and
+the production provider were unchanged. Host archive/provenance guard tests
+remain useful but are separate from this measured emulator result.

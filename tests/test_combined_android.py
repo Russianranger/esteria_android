@@ -31,6 +31,61 @@ class CombinedPackageGuards(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'native-inventory'):
             bundle.apk_inventory(path, {})
 
+    def helper_fixture(self, changed_service=False, changed_manifest=False, manifest_version=1):
+        # Source-byte packaging fixtures only; these Python snippets are never executed.
+        repository = self.root / 'helper-repository'; (repository / 'runtime').mkdir(parents=True)
+        for name in {name for names in bundle.HELPER_SETS.values() for name in names}:
+            (repository / 'runtime' / name).write_bytes(('fixture source: ' + name + '\n').encode())
+        path = self.root / 'helpers.zip'
+        with zipfile.ZipFile(path, 'w') as archive:
+            for directory, names in bundle.HELPER_SETS.items():
+                records = {}
+                for name in names:
+                    source = repository / 'runtime' / name
+                    records[name] = bundle.identity(source)
+                    data = source.read_bytes()
+                    if changed_service and directory == 'database-service' and name == 'mysql_service.py':
+                        data = b'X' * len(data)
+                    archive.writestr('assets/' + directory + '/' + name, data)
+                if changed_manifest and directory == 'database-service':
+                    records['mysql_service.py']['sha256'] = '0' * 64
+                archive.writestr('assets/' + directory + '/manifest.json', json.dumps(dict(formatVersion=manifest_version, files=records)))
+        return repository, path
+
+    def test_setup_and_service_helpers_are_both_exact_source_bound(self):
+        self.assertEqual(bundle.HELPER_SETS, {'database-setup': ('mysql_bootstrap.py', 'android_database_setup.py'),
+                                            'database-service': ('mysql_bootstrap.py', 'mysql_service.py')})
+        repository, path = self.helper_fixture()
+        with patch.object(bundle, 'ROOT', repository), zipfile.ZipFile(path) as archive:
+            bundle.verify_helpers(archive)
+
+    def test_same_size_modified_database_service_helper_is_rejected(self):
+        repository, path = self.helper_fixture(changed_service=True)
+        with patch.object(bundle, 'ROOT', repository), zipfile.ZipFile(path) as archive:
+            with self.assertRaisesRegex(ValueError, 'helper-source-mismatch'):
+                bundle.verify_helpers(archive)
+
+    def test_service_manifest_cannot_claim_different_helper_bytes(self):
+        repository, path = self.helper_fixture(changed_manifest=True)
+        with patch.object(bundle, 'ROOT', repository), zipfile.ZipFile(path) as archive:
+            with self.assertRaisesRegex(ValueError, 'helper-manifest-mismatch'):
+                bundle.verify_helpers(archive)
+
+    def test_helper_manifest_boolean_format_is_not_integer_one(self):
+        repository, path = self.helper_fixture(manifest_version=True)
+        with patch.object(bundle, 'ROOT', repository), zipfile.ZipFile(path) as archive:
+            with self.assertRaisesRegex(ValueError, 'helper-manifest-mismatch'):
+                bundle.verify_helpers(archive)
+
+    def test_unknown_assets_still_fail_the_exact_inventory_gate(self):
+        path = self.root / 'foreign-assets.zip'
+        with zipfile.ZipFile(path, 'w') as archive:
+            for name in bundle.NATIVE_FILES:
+                archive.writestr(name, b'unexecuted header-free fixture')
+            archive.writestr('assets/database-service/unapproved.py', b'unapproved private fixture')
+        with self.assertRaisesRegex(ValueError, 'combined-apk-asset-inventory-mismatch'):
+            bundle.apk_inventory(path, {})
+
     def test_verified_copy_never_replaces_existing_output_or_accepts_wrong_bytes(self):
         source = self.root / 'source'; source.write_bytes(b'actual original')
         target = self.root / 'target'; target.write_bytes(b'preserve')

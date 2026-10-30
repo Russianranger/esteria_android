@@ -1,0 +1,21 @@
+// The persistent service uses the same source as the host qualification.
+def serviceHelpers = ['mysql_bootstrap.py', 'mysql_service.py']
+def serviceAssets = layout.buildDirectory.dir('generated/databaseService')
+def packageDatabaseService = tasks.register('packageDatabaseService') {
+    inputs.files(serviceHelpers.collect { rootProject.file('runtime/' + it) })
+    outputs.dir(serviceAssets)
+    doLast {
+        def directory = new File(serviceAssets.get().asFile, 'database-service')
+        directory.mkdirs()
+        def records = new TreeMap()
+        serviceHelpers.each { name ->
+            byte[] bytes = rootProject.file('runtime/' + name).bytes
+            if (bytes.length == 0 || bytes.length > 131072) throw new GradleException('Unexpected database service helper size')
+            new File(directory, name).bytes = bytes
+            records[name] = [bytes: bytes.length, sha256: java.security.MessageDigest.getInstance('SHA-256').digest(bytes).encodeHex().toString()]
+        }
+        new File(directory, 'manifest.json').text = groovy.json.JsonOutput.toJson([formatVersion: 1, files: records]) + '\n'
+    }
+}
+android.sourceSets.main.assets.srcDir(serviceAssets)
+tasks.named('preBuild').configure { dependsOn packageDatabaseService }

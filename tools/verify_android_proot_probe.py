@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import re
 import struct
 import zipfile
 try:
@@ -106,6 +107,14 @@ def verify(provider, apk=None):
     for field, path in sources.items(): require(receipt[field] == identity((ROOT / path).read_bytes())['sha256'], 'stale-probe-source-receipt')
     require(receipt['nativeFiles'] == builder.NATIVE_PINS and set(receipt['rootfsFiles']) == ROOTFS, 'probe-file-inventory')
     require(receipt.get('unpatchedControlIncluded') is True, 'probe-needs-explicit-negative-control')
+    objects = receipt.get('tallocRelinkableObjects', {})
+    require(type(objects) is dict and 0 < len(objects) <= 128 and 'talloc.c.5.o' in objects, 'probe-relink-object-inventory')
+    for name, pin in objects.items():
+        require(isinstance(name, str) and re.fullmatch(r'[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*\.o', name) and
+                not any(part in ('.', '..') for part in name.split('/')) and isinstance(pin, dict) and
+                set(pin) == {'bytes', 'sha256'} and type(pin['bytes']) is int and 20 <= pin['bytes'] <= 16*1024**2 and
+                isinstance(pin['sha256'], str) and re.fullmatch('[a-f0-9]{64}', pin['sha256']), 'probe-relink-object-record')
+    require(sum(pin['bytes'] for pin in objects.values()) <= 32*1024**2, 'probe-relink-object-total')
     for name, pin in builder.NATIVE_PINS.items():
         path = provider / 'jniLibs/x86_64' / name
         require(path.stat().st_size == pin['bytes'], 'probe-native-size')

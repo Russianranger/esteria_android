@@ -35,6 +35,8 @@ NATIVE_FILES = {'lib/arm64-v8a/' + name for name in
 NDK_NOTICES = {'NDK-28.2.13676358-NOTICE.txt': 'android-ndk-r28c/NOTICE',
                'LLVM-RUNTIME-NOTICE.txt': 'android-ndk-r28c/toolchains/llvm/prebuilt/linux-x86_64/NOTICE',
                'NDK-SYSROOT-NOTICE.txt': 'android-ndk-r28c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/NOTICE'}
+HELPER_SETS = {'database-setup': ('mysql_bootstrap.py', 'android_database_setup.py'),
+               'database-service': ('mysql_bootstrap.py', 'mysql_service.py')}
 
 
 def ndk_notices(path):
@@ -59,6 +61,25 @@ def verify_ndk_notices(archive, expected):
             require(client.archives.hash_stream(stream, item.file_size) == proof['sha256'], 'combined-apk-toolchain-notice-hash-mismatch')
 
 
+def verify_helpers(archive):
+    for directory, names in HELPER_SETS.items():
+        records = {}
+        for name in names:
+            source = ROOT / 'runtime' / name
+            expected = client.small(source)
+            info = archive.getinfo('assets/' + directory + '/' + name)
+            require(info.file_size == len(expected) and archive.read(info) == expected,
+                    'combined-apk-helper-source-mismatch')
+            records[name] = dict(bytes=len(expected), sha256=hashlib.sha256(expected).hexdigest())
+        manifest = archive.getinfo('assets/' + directory + '/manifest.json')
+        require(manifest.file_size <= 4096, 'combined-apk-helper-manifest-mismatch')
+        parsed = json.loads(archive.read(manifest))
+        require(type(parsed) is dict and type(parsed.get('formatVersion')) is int and
+                type(parsed.get('files')) is dict and
+                all(type(pin) is dict and type(pin.get('bytes')) is int for pin in parsed['files'].values()) and
+                parsed == dict(formatVersion=1, files=records), 'combined-apk-helper-manifest-mismatch')
+
+
 def apk_inventory(apk, notices):
     with client.archives.plain_file(apk) as incoming, zipfile.ZipFile(incoming) as archive:
         names = archive.namelist()
@@ -69,26 +90,21 @@ def apk_inventory(apk, notices):
         expected_assets |= {'assets/' + server.ASSET_DIR + '/' + name for name in server.NAMES}
         expected_assets |= {'assets/' + guest.ASSET_DIR + '/' + name for name in guest.NAMES}
         expected_assets |= {client.ASSETS + '/' + name for name in (client.ARCHIVE, 'provider.json', 'NOTICE.txt')}
+        expected_assets |= {'assets/' + directory + '/' + name for directory, names in HELPER_SETS.items()
+                            for name in (*names, 'manifest.json')}
         expected_assets |= {'assets/' + name for name in ('sources.lock.json', 'runtime-sources.lock.json', 'runtime.properties',
-            'database-setup/mysql_bootstrap.py', 'database-setup/android_database_setup.py', 'database-setup/manifest.json',
             'notices/ESTERIA-GPL-3.0.txt', 'notices/FTA-MIT-LICENSE.txt', 'notices/LLVM-RUNTIME-NOTICE.txt',
             'notices/NDK-28.2.13676358-NOTICE.txt', 'notices/NDK-SYSROOT-NOTICE.txt')}
         require({name for name in names if name.startswith('assets/') and not name.endswith('/')} == expected_assets,
                 'combined-apk-asset-inventory-mismatch')
         for target, source in [('assets/sources.lock.json', ROOT / 'sources.lock.json'),
                                ('assets/runtime-sources.lock.json', ROOT / 'runtime/runtime-sources.lock.json'),
-                               ('assets/runtime.properties', ROOT / 'app/src/main/assets/runtime.properties'),
-                               ('assets/database-setup/mysql_bootstrap.py', ROOT / 'runtime/mysql_bootstrap.py'),
-                               ('assets/database-setup/android_database_setup.py', ROOT / 'runtime/android_database_setup.py')]:
+                               ('assets/runtime.properties', ROOT / 'app/src/main/assets/runtime.properties')]:
             expected = client.small(source)
             info = archive.getinfo(target)
             require(info.file_size == len(expected) and archive.read(info) == expected,
                     'combined-apk-embedded-source-lock-mismatch')
-        helper_records = {name: identity(ROOT / 'runtime' / name) for name in
-                          ('mysql_bootstrap.py', 'android_database_setup.py')}
-        helper_manifest = archive.getinfo('assets/database-setup/manifest.json')
-        require(helper_manifest.file_size <= 4096 and json.loads(archive.read(helper_manifest)) ==
-                dict(formatVersion=1, files=helper_records), 'combined-apk-helper-manifest-mismatch')
+        verify_helpers(archive)
         verify_ndk_notices(archive, notices)
     return sorted(native)
 

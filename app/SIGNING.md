@@ -106,9 +106,14 @@ receipt nonpersistent; the production lock cannot enter this mode. Without
 `ESTERIA_SIGNING_TEST_BUILD_TOOLS` and `ESTERIA_SIGNING_TEST_DEBUG_KEY`, the two
 actual-SDK groups are explicitly skipped and eight guard groups still run.
 
-These are host signing/identity tests. The public identity is provisioned, but no
-stable-key APK, install-over test, save-preserving device update, or Thor gameplay
-candidate is established by these tests. The
+An internal nondebug ARM64 release at integration
+`43ccce4fe5ef8f5df79397e849c1aabf498f7cd5` now passes clean core checks, release
+assembly/lint, real signing with the persistent certificate, v2/v3 verification,
+and independent final APK readback of all four providers. Its 120,704,190-byte APK
+has SHA-256 `3e3af9904bfa403cc0a74a9ce9df5803af5e5e2aacb8a1facafecebeb2a77e60`;
+public evidence is `runtime/evidence/internal-persistent-signing-43ccce4.json`.
+It remains internal, with `lastPublished=null`. No install-over test,
+save-preserving device update, or Thor gameplay candidate is established. The
 main candidate still needs actual installation/update and saved-data preservation
 qualification with its final stable certificate before delivery.
 

@@ -325,8 +325,11 @@ def run(mysql, mysqld, fixture, fixture_hash, lock_path, output, version):
                 evidence['baseSqlLoaded'] = True
                 token = hashlib.sha256(canonical_identity(identities)).hexdigest()
                 for name in DB_ORDER:
+                    # Match the bootstrap schema default explicitly: inherited
+                    # charset clauses drift on dump/restore (MySQL bug 110825).
                     connection.query('CREATE TABLE `acore_' + name + '`.`esteria_base_probe` '
-                                     '(id INT PRIMARY KEY, token CHAR(64) NOT NULL) ENGINE=InnoDB')
+                                     '(id INT PRIMARY KEY, token CHAR(64) CHARACTER SET utf8mb4 '
+                                     'COLLATE utf8mb4_general_ci NOT NULL) ENGINE=InnoDB')
                     connection.query("INSERT INTO `acore_" + name + "`.`esteria_base_probe` VALUES (1,'" + token + "')")
             stop_owned(capture)
             capture = None

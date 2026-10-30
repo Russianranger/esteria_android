@@ -121,7 +121,19 @@ fixture now declares `CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci` directly
 on that text column. This changes no server table or data input. Source and
 restored snapshots additionally check the column's type, length, charset,
 collation and nullability. Every full-dump comparison remains unchanged.
-The next exact ARM64 run must establish the result. A small local x86_64 MySQL
+Actual native ARM64 run `41011458127` at `f963225d` progressed past that column,
+then found the same 22-byte expansion in the harness-created
+`acore_auth.esteria_base_probe.token` definition (56 to 78 bytes, line 151).
+Full restore, owned account/tracker/probe checks and setup-wrapper fresh/repeated
+initialization again passed; canonical equality and subsequent restart gates
+did not. Its verified 6,424-byte artifact `12958405095` has ZIP SHA-256
+`f5e2e7036c4ffb577aef4fdc09579530b8f4c6d1f6fe4c52b411675489e3676b`.
+The base-loader, compiled-updater and playerbots-reference fixture token columns
+now declare `CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci` explicitly. That
+preserves their inherited bootstrap database collation, which differs from the
+backup probe's intentionally chosen Unicode collation. No imported server table
+is changed, and all complete-dump identity checks remain strict. The next exact
+ARM64 run must establish the result. A small local x86_64 MySQL
 8.0.46 instance initialized, but this host denied Unix-socket binding before
 SQL readiness; no local SQL round-trip is claimed. The diagnostic run's verified
 6,422-byte artifact `12957775001` has ZIP SHA-256

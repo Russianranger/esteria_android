@@ -19,8 +19,12 @@ native Linux ARM64 Wine in run41003225299, client
 `e2718f647a7f1efb9219106c7501f88a0bf06e4f`. New client tip
 `97b347ee034551ea78dc905c3e209667534e6283` passes all five actual transport jobs
 in41007244092, including Windows x64/ARM64 and native ARM64 Wine.
-New development tip926a6f73253720283ead9d7621ffd6d7d9c040cd adds strict bounded
-shader translation, with25 actual host compiler tests passing.
+Strict shader source926a6f73253720283ead9d7621ffd6d7d9c040cd also passes all five
+jobs41007556042 and25 actual host compiler tests. Development tip
+3f9389ccfdb0431d281e281c49193c8064c70b62 passes real Grunt/SRP positive and
+negative controlled-peer tests on Windows ARM64/x64 in41010223296. The compiled
+server pairing is implemented separately and awaits its actual runtime gate.
+New tip0f931bbade36a4b197725d691b8eff7caea7b3be adds the exact-source Wine Grunt gate.
 The preceding3e9 run41006100154 passed real x64 short/extended packet reads,
 queued sends, stream I/O and both connect/disconnect pairs after repairing lost
 network timer wakes; it then exposed the fixture's missing WDataStore Finalize().
@@ -32,9 +36,10 @@ failed final worldserver linking on three missing grid-template instantiations
 and the README-only Custom directory's nonexistent loader. Minimal source-backed
 patches5/6 supply real template definitions and omit only source-empty directories.
 Corrected run41005048019 is compiling with the saved cache; no complete server
-package or auth/world success is claimed. Backup run41006179962 passed source
-SQL, rendering and account setup, then rejected an unsupported mysqldump option.
-The correction has a real host option preflight; actual dump/restore remains open.
+package or auth/world success is claimed. Actual backup dump, restore, account
+and repeated setup checks pass; full canonical equality identifies a harness-only
+charset normalization. The narrow explicit-charset correction preserves all strict
+comparison gates; native run41011458127 is pending.
 
 Writable UI selection/review is integrated into the app with explicit divergence
 decisions and retained prior versions. Actual adapter32MiB tests, independent
@@ -63,14 +68,17 @@ branch, credential scope or repository security setting was changed.
 The latest combined ARM64 APK passes clean core checks, application/instrumentation
 compilation, lint and all four final provider byte checks with six-patch source
 lock SHA256 `dbbf8983cfa2b429f7dd0c3308a2795ffbecd29e8019adf35348447e1eab41b0`.
-It remains an internal build, not an ARM64 execution or user device-test result.
-Android MySQL has built and installed its exact x64 runtime and executed Python
-and mysqld version inspection. Atomic journal rename returns ENOSYS in the guest;
-the PRoot compatibility path is under investigation before database initialization.
-Turnip ARM64 compiles and its real shader tools pass. The pinned loader returns
-initialization failure when the ICD successfully enumerates zero devices; the
-revised no-GPU check independently requires that exact ICD result before accepting
-the loader result. Its ARM64 rerun remains pending; no GPU execution is claimed.
+Hosted all-provider builds41009954235 and41010011668 also pass complete source
+sealing and APK readback. A nondebug43cc release is signed with the persistent
+RSA4096 certificate and passes v2/v3 plus all provider-byte checks. Its private
+recovery backup is retained outside Git; no delivered baseline exists.
+Android MySQL41010011663 now passes actual initialization, authenticated SQL,
+repeat setup and restart with the same UUID, credentials and four-schema marker
+data. The x64 PRoot rename adaptation separately passes41010011745. These are
+Android13 x64 component results, not production ARM64/gameplay qualification.
+Turnip ARM6441009954190 passes direct exact-ICD zero-device loading and the pinned
+loader's corresponding result. Its real shader tools pass compilation/validation.
+No Adreno execution, Android GPU compatibility or hardware rendering is claimed.
 Transactional shader-generation staging passes eight host groups, with actual
 subprocess bounds and explicitly synthetic storage fixtures. Real game MPQs,
 shader generation, Adreno rendering and launcher activation are still absent.

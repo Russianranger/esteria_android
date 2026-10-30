@@ -116,7 +116,8 @@ def marker(connection, token, *, create=False):
     require(re.fullmatch('[a-f0-9]{64}', token), 'invalid disposable persistence marker')
     if create:
         connection.query('CREATE TABLE acore_playerbots.esteria_reference_probe '
-                         '(id INT PRIMARY KEY, token CHAR(64) NOT NULL) ENGINE=InnoDB')
+                         '(id INT PRIMARY KEY, token CHAR(64) CHARACTER SET utf8mb4 '
+                         'COLLATE utf8mb4_general_ci NOT NULL) ENGINE=InnoDB')
         connection.query("INSERT INTO acore_playerbots.esteria_reference_probe VALUES (1,'" + token + "')")
     require(connection.query('SELECT token FROM acore_playerbots.esteria_reference_probe WHERE id=1') == [token],
             'playerbots disposable persistence marker changed')
