@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Build the separately gated composed four-tool server data provider.
 
-The pending pin contains no guessed archive or source-seal identities. Provider
-creation requires the actual ordered source/strip/native receipts and both debug
+Provider creation requires the actual ordered source/strip/native receipts and both debug
 companions; existing stock extractor and server program providers stay separate.
 """
 from __future__ import annotations
@@ -54,8 +53,8 @@ def source_inputs(pin):
     return measured
 
 
-def load_pin(sealed=False):
-    pin,_=shared.read_json(LOCK,128<<10)
+def load_pin(sealed=False, *, path=None):
+    pin,_=shared.read_json(LOCK if path is None else path,128<<10)
     require(type(pin.get('formatVersion')) is int and pin['formatVersion']==1 and
             pin.get('scope')=='measured-server-data-tools-provider-inputs' and
             pin.get('packageKey')=='server-data-tools-arm64' and pin.get('guestMount')==MOUNT and
@@ -186,6 +185,48 @@ def verify_reference_image(cli,pin):
             'server-data-tools-native-reference-image-selection-or-gates')
 
 
+def validate_native_cli(cli,pin):
+    """Retained native evidence must bind every shipped role and exact package."""
+    from tools import package_server_extractors as original_cli, build_ordered_extractors as ordered
+    require(type(cli.get('formatVersion')) is int and cli['formatVersion']==1 and
+            cli.get('scope')=='native-arm64-composed-server-data-tools-cli-only' and
+            all(cli.get(k) is True for k in ('qualificationSucceeded','nativeOrderedLookupsQualified',
+                'originalStockConfigParsed','shippedRuntimeFilesUnchanged')) and
+            cli.get('packageReceipt')==identity(pin['packageReceipt']) and
+            cli.get('runtimeArchive')==identity(pin['archive']) and
+            cli.get('orderedSourceReceipt')==identity(pin['actualOrderedSourceQualification']['receipt']) and
+            cli.get('programs')=={name:pair['stripped'] for name,pair in pin['programPairs'].items()} and
+            cli.get('configuration')==identity(pin['configuration']) and
+            all(cli.get(k) is False for k in FALSE_FLAGS) and cli.get('sourceCompanionComplete') is False,
+            'server-data-tools-real-derived-native-cli-required')
+    verify_reference_image(cli,pin)
+    original,_=original_cli.load_pin()
+    cases=cli.get('cliCases',{})
+    require(type(cases) is dict and set(cases)=={row['name'] for row in original['cliCases']},
+            'server-data-tools-complete-native-cli-cases-required')
+    for case in original['cliCases']:
+        actual=cases[case['name']]
+        require(type(actual) is dict and type(actual.get('exitCode')) is int and actual['exitCode']==case['exitCode'] and
+                type(actual.get('output')) is str and len(actual['output'].encode())<=65536 and
+                all(token in actual['output'] for token in case['contains']),
+                'server-data-tools-native-cli-result-differs')
+    capability=ordered.adaptation.load_pin()['contract']+ordered.CAPABILITY_SUFFIX+'\n'
+    require(type(cli.get('capabilities')) is dict and set(cli['capabilities'])==set(ORDERED) and
+            all(row==dict(exitCode=0,output=capability) for row in cli['capabilities'].values()),
+            'server-data-tools-complete-native-capabilities-required')
+    names=cli.get('lookupTestNames')
+    require(type(names) is list and len(names)>=22 and
+            all(type(name) is str and name.startswith('tests.test_extractor_order.RealArchiveReader.test_') for name in names) and
+            len(names)==len(set(names)) and
+            type(cli.get('lookupTestsRun')) is int and cli['lookupTestsRun']==len(names) and
+            type(cli.get('lookupTestsSkipped')) is int and cli['lookupTestsSkipped']==0 and
+            type(cli.get('syntheticLookupTests')) is dict and
+            type(cli['syntheticLookupTests'].get('exitCode')) is int and cli['syntheticLookupTests']['exitCode']==0,
+            'server-data-tools-all-native-lookups-without-skips-required')
+    for key in ('cliPhase','lookupResult','fixturePreparation'):
+        identity(cli[key])
+
+
 def verify_sources(directory,pin):
     qualified=pin['actualOrderedSourceQualification'];original=stock.load_pin()
     expected={'package-receipt.json':pin['packageReceipt'],SOURCE_RECEIPT:qualified['receipt'],
@@ -237,13 +278,7 @@ def verify_sources(directory,pin):
     stock.validate_package(stock_receipt,original)
     engine.verify_archive(directory/'stock-extractors-debug-arm64.tar.gz',stock_receipt['packages']['debug']['inventory'])
     cli,_=shared.read_json(directory/'native-cli.json')
-    require(cli.get('scope')=='native-arm64-composed-server-data-tools-cli-only' and
-            all(cli.get(k) is True for k in ('qualificationSucceeded','nativeOrderedLookupsQualified','originalStockConfigParsed')) and
-            cli.get('runtimeArchive')==identity(pin['archive']) and cli.get('orderedSourceReceipt')==identity(qualified['receipt']) and
-            cli.get('programs')=={name:pair['stripped'] for name,pair in pin['programPairs'].items()} and
-            cli.get('configuration')==identity(pin['configuration']) and all(cli.get(k) is False for k in FALSE_FLAGS),
-            'server-data-tools-real-derived-native-cli-required')
-    verify_reference_image(cli,pin)
+    validate_native_cli(cli,pin)
     receipt,_=shared.read_json(directory/'package-receipt.json',16<<20)
     require(receipt.get('scope')=='composed-linux-arm64-server-data-tools-runtime' and
             receipt.get('archive')==pin['archive'] and receipt.get('archiveFiles')==pin['files'] and

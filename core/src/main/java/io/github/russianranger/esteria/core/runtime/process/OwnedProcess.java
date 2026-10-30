@@ -26,6 +26,8 @@ public final class OwnedProcess implements SessionSupervisor.Child {
          * RUNNING/an exception leaves ownership with the creating thread. */
         int terminate(long handle) throws IOException;
         long[] diagnostics(long handle) throws IOException;
+        /** Optional observation only; an unsupported backend is explicit. */
+        default ProcessUsageSnapshot usage(long handle)throws IOException {return ProcessUsageSnapshot.unavailable(ProcessUsageSnapshot.UNSUPPORTED_BACKEND);}
         default boolean writeInput(long handle,byte[] bytes,long timeoutMillis) throws IOException {
             throw new IOException("Backend has no interactive process input");
         }
@@ -68,17 +70,19 @@ public final class OwnedProcess implements SessionSupervisor.Child {
     private final Backend backend;
     private final GracefulInputStop graceful;
     private final boolean interactiveInput;
+    private final Map<String,Path> logPaths;
     private final CountDownLatch started=new CountDownLatch(1), finished=new CountDownLatch(1);
     private volatile IOException failure;
     private volatile int status=RUNNING;
     private volatile long stopDeadline;
     private volatile boolean stopRequested, forced, auxiliaryStop;
-    private volatile long inputHandle;
+    private volatile long inputHandle,usageHandle;
     private volatile long[] metrics=new long[5];
     private int rememberedFailures;
 
     private OwnedProcess(Backend backend, Specification spec, GracefulInputStop graceful) {
         this.backend=backend; this.graceful=graceful; this.interactiveInput=spec.interactiveInput;
+        Map<String,Path> paths=new TreeMap<>();paths.put("stdout",spec.stdout);paths.put("stderr",spec.stderr);logPaths=Collections.unmodifiableMap(paths);
     }
     public static OwnedProcess start(Backend backend, Specification spec, GracefulStop graceful) throws IOException {
         return launch(backend,spec,graceful==null?null:child->graceful.request());
@@ -118,7 +122,7 @@ public final class OwnedProcess implements SessionSupervisor.Child {
         try {
             handle=backend.start(spec);
             if (handle<=0) throw new IOException("Native owner returned an invalid handle");
-            inputHandle=handle;
+            inputHandle=handle;usageHandle=handle;
             started.countDown();
             while (status==RUNNING) {
                 status=backend.waitFor(handle,40);
@@ -179,7 +183,7 @@ public final class OwnedProcess implements SessionSupervisor.Child {
                 } catch (IOException e) { remember(e); }
             }
             if(handle<=0 && status==RUNNING)status=127; // No published native handle was created.
-            started.countDown(); finished.countDown();
+            usageHandle=0;started.countDown(); finished.countDown();
         }
     }
     private void remember(IOException error) {
@@ -212,6 +216,18 @@ public final class OwnedProcess implements SessionSupervisor.Child {
         long handle=inputHandle;
         if (!interactiveInput || handle==0 || !isAlive()) throw new IOException("Owned process input is unavailable");
         backend.closeInput(handle);
+    }
+    /** Fixed read-only paths from the validated launch specification. This
+     * neither reads/exports raw logs nor exposes commands, input or environment. */
+    public Map<String,Path> logPaths(){return logPaths;}
+    /** Best-effort observation only. Errors/denials never change process stop,
+     * failure or diagnostics state, and no caller-selected PID is accepted. */
+    public ProcessUsageSnapshot usage() {
+        long handle=usageHandle;
+        if(handle==0||!isAlive())return ProcessUsageSnapshot.unavailable(ProcessUsageSnapshot.NOT_RUNNING);
+        try{return backend.usage(handle);}
+        catch(IOException error){return ProcessUsageSnapshot.unavailable(isAlive()?ProcessUsageSnapshot.NATIVE_ERROR:ProcessUsageSnapshot.NOT_RUNNING);}
+        catch(LinkageError error){return ProcessUsageSnapshot.unavailable(ProcessUsageSnapshot.UNSUPPORTED_BACKEND);}
     }
     /** Captured stdout read/stored, stderr read/stored, log errors; available after completion. */
     public long[] diagnostics() { return metrics.clone(); }

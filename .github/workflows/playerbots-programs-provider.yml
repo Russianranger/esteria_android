@@ -1,0 +1,177 @@
+name: Optional schema helper programs source debug and install qualification
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - .github/workflows/playerbots-programs-provider.yml
+      - tools/measure_playerbots_programs.py
+      - tools/provider_playerbots_programs.py
+      - tools/qualify_playerbots_programs.py
+      - tests/test_playerbots_programs_measurement.py
+      - tests/test_playerbots_programs_provider.py
+      - tests/test_playerbots_programs_qualification.py
+      - runtime/server/programs-playerbots-provider.lock.json
+      - runtime/server/PLAYERBOTS-PROGRAMS.md
+      - app/server-programs.gradle
+      - app/src/main/java/io/github/russianranger/esteria/runtime/ServerProgramsSetup.java
+      - app/src/test/java/io/github/russianranger/esteria/runtime/ServerProgramsProfileTests.java
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: optional-playerbots-programs-provider-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  install-profile:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '17.0.13+11'
+      - name: Check original source and optional profile refusal boundaries
+        run: |
+          test "$(uname -m)" = x86_64
+          mkdir -p out/helper-programs-evidence out/helper-programs-logs
+          python3 -m unittest tests.test_playerbots_programs_measurement \
+            tests.test_playerbots_programs_provider tests.test_playerbots_programs_qualification \
+            tests.test_server_programs_provider tests.test_server_provider_sources -v
+      - name: Acquire original complete sources and all paired debug inputs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/qualify_server_providers.py acquire --output out/stock-inputs \
+            > out/helper-programs-logs/stock-acquisition.log 2>&1
+          python3 tools/qualify_playerbots_programs.py acquire --output out/helper-inputs \
+            > out/helper-programs-logs/helper-acquisition.log 2>&1
+      - name: Reproduce original providers and measure the closed helper delta
+        id: providers
+        run: |
+          python3 tools/qualify_server_providers.py build --inputs out/stock-inputs --output out/stock-providers \
+            > out/helper-programs-logs/stock-build.log 2>&1
+          python3 tools/qualify_playerbots_programs.py build --stock-providers out/stock-providers \
+            --inputs out/helper-inputs --output out/helper-providers \
+            > out/helper-programs-logs/helper-build.log 2>&1
+      - name: Build the exact separately pinned database dependency provider
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/release_server_dependencies.py prepare --output "$RUNNER_TEMP/server-release" \
+            > out/helper-programs-logs/dependency-acquisition.log 2>&1
+          python3 tools/provider_server_runtime.py build --package "$RUNNER_TEMP/server-release" \
+            --output out/dependency-provider > out/helper-programs-logs/dependency-provider.log 2>&1
+      - name: Install the exact Android command line tools
+        run: |
+          export ANDROID_HOME="$RUNNER_TEMP/esteria-android-sdk"
+          mkdir -p "$ANDROID_HOME/cmdline-tools"
+          curl --fail --location --retry 3 https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -o "$RUNNER_TEMP/android-commandline.zip"
+          echo '2d2d50857e4eb553af5a6dc3ad507a17adf43d115264b1afc116f95c92e5e258  '"$RUNNER_TEMP/android-commandline.zip" | sha256sum --check
+          unzip -q "$RUNNER_TEMP/android-commandline.zip" -d "$ANDROID_HOME/cmdline-tools"
+          mv "$ANDROID_HOME/cmdline-tools/cmdline-tools" "$ANDROID_HOME/cmdline-tools/12.0"
+          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "$ANDROID_HOME/cmdline-tools/12.0/bin" >> "$GITHUB_PATH"
+      - name: Install Android platform 35 and build tools 35
+        run: |
+          (set +o pipefail; yes | sdkmanager --sdk_root="$ANDROID_HOME" --licenses >/dev/null)
+          sdkmanager --sdk_root="$ANDROID_HOME" 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Build and lint the explicitly selected optional helper installation profile
+        run: |
+          sha256sum --check gradle/wrapper/SHA256SUMS
+          ./gradlew --no-daemon :core:check :app:clean :app:assembleDebug \
+            :app:assembleDebugAndroidTest :app:lintDebug :app:serverProgramsProfileTest \
+            -PsourceRevision="$GITHUB_SHA" -PserverProgramsProfile=playerbots-schema-helper \
+            -PserverRuntimeProviderDir="$GITHUB_WORKSPACE/out/dependency-provider" \
+            -PserverProgramsProviderDir="$GITHUB_WORKSPACE/out/helper-providers/programs" \
+            > out/helper-programs-logs/gradle.log 2>&1
+      - name: Actually install every selected helper archive byte with a 32 MiB Java heap
+        run: |
+          mkdir -p out/java-reference
+          javac -cp core/build/classes/java/main -d out/java-reference tests/ServerArchiveInstallReference.java
+          python3 tools/qualify_server_providers.py java-manifest --provider out/helper-providers/programs \
+            --output out/helper-programs-evidence/java-programs.tsv > out/helper-programs-evidence/java-programs-input.json
+          archive=$(python3 -c 'import json;print(json.load(open("out/helper-programs-evidence/java-programs-input.json"))["archive"])')
+          java -Xmx32m -cp core/build/classes/java/main:out/java-reference ServerArchiveInstallReference \
+            out/helper-programs-evidence/java-programs.tsv "$archive" "$RUNNER_TEMP/helper-programs-java-store" \
+            > out/helper-programs-evidence/java-programs.json
+      - name: Recheck complete sources original debug pairs and actual selected APK bytes
+        id: verified
+        run: |
+          python3 - <<'PY'
+          import json,os,zipfile
+          from pathlib import Path
+          from tools import provider_playerbots_programs as provider,verify_server_build as files
+          apk=Path('app/build/outputs/apk/debug/app-debug.apk')
+          checked=provider.verify(Path('out/helper-providers/programs'),apk=apk)
+          installed=json.loads(Path('out/helper-programs-evidence/java-programs.json').read_text())
+          pin=provider.load_pin()[0]
+          assert installed['scope']=='host-java-exact-server-archive-install-and-cached-reuse'
+          assert installed['entries']==131 and installed['fileBytes']==pin['archiveFileBytes']
+          assert installed['firstCopiedBytes']==pin['archiveFileBytes'] and installed['cachedCopiedBytes']==0
+          assert installed['cachedArchiveRequired'] is False and installed['androidRuntimeQualified'] is False
+          with zipfile.ZipFile(apk) as archive:
+              assert not any('playerbots-helper-complete-sources' in name or 'server-engine-debug' in name for name in archive.namelist())
+          result=dict(formatVersion=1,scope='host-java-and-apk-byte-only-optional-playerbots-programs-qualification',
+              integrationRevision=os.environ['GITHUB_SHA'],apk=files.identity(apk),providerVerification=checked,
+              javaMaximumHeapBytes=32*1024**2,actualArchiveInstallAndCachedReuse=installed,
+              originalThreeProgramsAndReceiptsUnchanged=True,originalHelperSqlProofPreserved=True,
+              compilerExecuted=False,helperExecuted=False,sqlExecuted=False,androidInstrumentationExecuted=False,
+              androidGuestExecuted=False,worldserverQualified=False,playerbotsAiQualified=False,
+              androidRuntimeQualified=False,gameplayQualified=False)
+          provider.engine.put_metadata(Path('out/helper-programs-evidence/qualification.json'),result)
+          PY
+      - name: Collect bounded proof and diagnostics
+        if: always()
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import shutil
+          target=Path('out/helper-programs-evidence');target.mkdir(parents=True,exist_ok=True)
+          for source,label in (('out/stock-inputs/acquisition.json','stock-acquisition.json'),
+              ('out/helper-inputs/acquisition.json','helper-acquisition.json'),
+              ('out/stock-providers/provider-build.json','stock-provider-build.json'),
+              ('out/helper-providers/provider-build.json','helper-provider-build.json'),
+              ('out/helper-providers/runtime-candidate/measurement.json','runtime-measurement.json')):
+              path=Path(source)
+              if path.is_file() and path.stat().st_size<=16*1024**2:shutil.copyfile(path,target/label)
+          for path in Path('out/helper-programs-logs').glob('*.log'):
+              with path.open('rb') as stream:
+                  stream.seek(max(0,path.stat().st_size-128*1024))
+                  (target/(path.stem+'-tail.log')).write_bytes(stream.read(128*1024))
+          PY
+      - name: Retain full corresponding sources and original paired debug outside APK assets
+        if: always() && steps.providers.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: optional-playerbots-programs-source-debug-${{ github.sha }}
+          path: out/helper-providers/programs/sources/
+          include-hidden-files: true
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+      - name: Retain unqualified install profile APK and selected runtime assets
+        if: always() && steps.verified.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: unqualified-playerbots-programs-install-profile-${{ github.sha }}
+          path: |
+            app/build/outputs/apk/debug/app-debug.apk
+            app/build/outputs/apk/androidTest/debug/*.apk
+            out/helper-providers/programs/assets/
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+      - name: Retain bounded optional profile proof
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: optional-playerbots-programs-qualification-evidence-${{ github.sha }}
+          path: out/helper-programs-evidence/
+          retention-days: 30
+          if-no-files-found: error

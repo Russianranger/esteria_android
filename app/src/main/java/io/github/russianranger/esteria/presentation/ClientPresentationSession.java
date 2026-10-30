@@ -289,6 +289,14 @@ public final class ClientPresentationSession implements AutoCloseable {
     /** Component-only metrics; does not imply pixels/audio/gameplay were observed. */
     public long[] diagnostics(){return new long[]{ready?1:0,closed?1:0,children.size(),failure.get()==null?0:1};}
     public IOException cleanupFailure(){return closeFailure;}
+    /** Fixed component output paths only. Xauthority, IPC, account handoff,
+     * prefix and game data never enter support-log selection. */
+    public Map<String,Path> diagnosticLogs() {
+        Map<String,Path> result=new java.util.TreeMap<>();
+        for(String component:List.of("xserver","frame","input","client"))
+            for(String stream:List.of("stdout","stderr"))result.put(component+"."+stream+".log",session.resolve(component+"/logs/"+stream+".log"));
+        return java.util.Collections.unmodifiableMap(result);
+    }
     public boolean isClosed(){return closed;}
     @Override public void close()throws IOException {close(Duration.ofSeconds(20));}
     /** Bounded safe-boundary wait; each owned native cleanup has its existing

@@ -117,6 +117,20 @@ public final class LocalServerSession {
         }
         public State state(){return state;}
         public IOException failure(){return failure;}
+        /** Fixed owned component logs; never private options/account/config. */
+        public java.util.Map<String,Path> diagnosticLogs() {
+            java.util.Map<String,Path> result=new java.util.TreeMap<>();Path wrapperLogs=logs;
+            if(wrapperLogs!=null){result.put("helper.stdout.log",wrapperLogs.resolve("stdout.log"));
+                result.put("helper.stderr.log",wrapperLogs.resolve("stderr.log"));}
+            Path operation=guestSession;
+            if(operation!=null){result.put("authserver.log",operation.resolve("authserver.log"));result.put("worldserver.log",operation.resolve("worldserver.log"));}
+            return java.util.Collections.unmodifiableMap(result);
+        }
+        /** Null means the wrapper has not been allocated yet. */
+        public io.github.russianranger.esteria.core.runtime.process.ProcessUsageSnapshot usage() {
+            OwnedProcess child=process;
+            return child==null?null:child.usage();
+        }
         public boolean isReady(){return state==State.READY&&!stopping.get()&&process!=null&&process.isAlive()&&database.isAlive();}
         /** Keep this owner after every exception. The worker retains the same
          * database operation lease for the entire running auth/world session. */

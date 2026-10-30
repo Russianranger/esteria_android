@@ -1,0 +1,378 @@
+{
+  "actualAllArchiveMembersReadBackLocally": true,
+  "androidRuntimeQualified": false,
+  "artifacts": {
+    "native": {
+      "bytes": 19822,
+      "id": 13000058168,
+      "sha256": "3607411cb00c93e574ebe429fc840cfb113ca99be9431dc6b9b71b2626fbd147"
+    },
+    "package": {
+      "bytes": 131080114,
+      "id": 13000131588,
+      "sha256": "26a0e897720e3700eea7bbda211c77b15a2072e8decae5a784510fae77dd6fa2"
+    },
+    "packaging": {
+      "bytes": 21351,
+      "id": 13000131594,
+      "sha256": "3df94c7063d99e32b069fee0263358572048a4288e5ec4ed02e51708d9de3509"
+    }
+  },
+  "clientMpqConversionQualified": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "independentReadback": {
+    "allPackageAndSourceAndDebugReadback": true,
+    "artifact": {
+      "bytes": 131080114,
+      "id": 13000131588,
+      "sha256": "26a0e897720e3700eea7bbda211c77b15a2072e8decae5a784510fae77dd6fa2"
+    },
+    "nativeCLIQualifiedFromRetainedActualReceipt": true,
+    "nativeLookupTests": 22,
+    "nativeProgramsExecutedLocally": false,
+    "nativeReceipt": {
+      "bytes": 9904,
+      "sha256": "cf339ae140e65702b2e9d977c668db2f432a6ad1904d3d16a4697a7755de47ae"
+    },
+    "nativeSkippedTests": 0,
+    "packageReceipt": {
+      "bytes": 60159,
+      "sha256": "25d87f1f20f74f6bed041a6a06de235fe0f5e50f56bcdbe11bf2e56ab9fd44c0"
+    },
+    "reusedIdenticalInputBytes": 119422846,
+    "runtimeArchive": {
+      "bytes": 2902474,
+      "file": "server-data-tools-runtime-arm64.tar.gz",
+      "sha256": "21ce4e1b9a4ff054df4a781cf6b83f37149ab941014d2759f33d93bbfebf231b"
+    },
+    "runtimeEntries": 81,
+    "runtimeFileBytes": 8945245,
+    "transportZipRemovedAfterVerifiedExtraction": true
+  },
+  "integrationRevision": "64dd9bcba52c448f07dcbe2ff0e407d41484ad4f",
+  "localHostQualification": {
+    "androidTestApk": {
+      "bytes": 1753201,
+      "sha256": "c75d01b72c516cf8acf9dec60f231d1d7a4ed1727a65e62c73862d3a66ed14f0"
+    },
+    "apk": {
+      "bytes": 116015722,
+      "sha256": "5993b271424a04326e4018494a7251f8232cbcf93fc3c602437adbf33237642d"
+    },
+    "apkProviderReadback": {
+      "androidRuntimeQualified": false,
+      "apkBytesVerified": true,
+      "clientMpqConversionQualified": false,
+      "customEsteriaDataLoadOrderQualified": false,
+      "gameLoginQualified": false,
+      "gameplayQualified": false,
+      "nativeArgumentConfigQualified": true,
+      "pairedDebugVerified": true,
+      "providerVerified": true,
+      "sourceCompanionVerified": true
+    },
+    "focusedPythonTests": {
+      "exactNdkFixtureUsed": true,
+      "passed": 34,
+      "run": 34,
+      "skipped": 0
+    },
+    "javaInstall": {
+      "androidRuntimeQualified": false,
+      "cachedArchiveRequired": false,
+      "cachedCopiedBytes": 0,
+      "entries": 81,
+      "fileBytes": 8945245,
+      "firstCopiedBytes": 8945245,
+      "gameplayQualified": false,
+      "generation": "64aaaa42a915efd6c109c8dacbd87e60fad71e8628f1b613a4381c00f3d60ac2",
+      "packageKey": "server-data-tools-arm64",
+      "scope": "host-java-exact-server-archive-install-and-cached-reuse"
+    },
+    "sdk": {
+      "actionableTasks": 82,
+      "additionalWorkingTreeImplementationPresent": true,
+      "androidExecuted": false,
+      "androidTestApkAssembled": true,
+      "apkAssembled": true,
+      "appClean": true,
+      "buildSucceeded": true,
+      "executedTasks": 80,
+      "lintDebugPassed": true,
+      "seconds": 39,
+      "sourceRevisionArgument": "64dd9bcba52c448f07dcbe2ff0e407d41484ad4f",
+      "upToDateTasks": 2
+    }
+  },
+  "measuredProvider": {
+    "androidProviderCreated": false,
+    "androidRuntimeQualified": false,
+    "archive": {
+      "bytes": 2902474,
+      "file": "server-data-tools-runtime-arm64.tar.gz",
+      "sha256": "21ce4e1b9a4ff054df4a781cf6b83f37149ab941014d2759f33d93bbfebf231b"
+    },
+    "archiveEntries": 81,
+    "archiveFileBytes": 8945245,
+    "candidatePin": {
+      "bytes": 26660,
+      "sha256": "bd3e7039b75eed0c4d09e578f6b9bb5f625543529b1181e3383d5cef6f3a2970"
+    },
+    "clientMpqConversionQualified": false,
+    "committedPinChangedHere": false,
+    "customEsteriaDataLoadOrderQualified": false,
+    "formatVersion": 1,
+    "gameLoginQualified": false,
+    "gameplayQualified": false,
+    "inputLock": {
+      "bytes": 7618,
+      "sha256": "fc8bd088dd7ff59c3035f84e7fdd9fc07074833d85af4a520177d8fefc06a823"
+    },
+    "nativeCapabilities": 2,
+    "nativeCliCases": 5,
+    "nativeCliReceipt": {
+      "bytes": 9904,
+      "sha256": "cf339ae140e65702b2e9d977c668db2f432a6ad1904d3d16a4697a7755de47ae"
+    },
+    "nativeLookupTestsRun": 22,
+    "nativeLookupTestsSkipped": 0,
+    "nativeProgramsExecutedHere": false,
+    "originalNoticesPreserved": true,
+    "originalStockProgramsAndConfigUnchanged": true,
+    "pairedDebugVerified": true,
+    "retainedNativeOutputsVerified": true,
+    "scope": "measured-complete-server-data-tools-provider-admission",
+    "sourceCompanionVerified": true
+  },
+  "nativeCliReceipt": {
+    "identity": {
+      "bytes": 9904,
+      "sha256": "cf339ae140e65702b2e9d977c668db2f432a6ad1904d3d16a4697a7755de47ae"
+    },
+    "receipt": {
+      "androidRuntimeQualified": false,
+      "capabilities": {
+        "map_extractor": {
+          "exitCode": 0,
+          "output": "esteria-classical-ordered-providers-v1; archive/folder/prefix; no conversion qualification\n"
+        },
+        "vmap4_extractor": {
+          "exitCode": 0,
+          "output": "esteria-classical-ordered-providers-v1; archive/folder/prefix; no conversion qualification\n"
+        }
+      },
+      "cliCases": {
+        "map-usage": {
+          "exitCode": 1,
+          "output": "Map & DBC Extractor\n===================\n\nUsage:\n/state/cli/install/bin/map_extractor -[var] [value]\n-i set input path\n-o set output path\n-e extract only MAP(1)/DBC(2)/Camera(4) - standard: all(7)\n-f height stored as int (less map size but lost some accuracy) 1 by default\nExample: /state/cli/install/bin/map_extractor -f 0 -i \"c:\\games\\game\""
+        },
+        "mmaps-argument-validation": {
+          "exitCode": 255,
+          "output": "invalid map id\n"
+        },
+        "mmaps-default-configuration-validation": {
+          "exitCode": 253,
+          "output": "'maps' directory is empty or does not exist\n"
+        },
+        "vmap-assembler-usage": {
+          "exitCode": 1,
+          "output": "usage: /state/cli/install/bin/vmap4_assembler <raw data dir> <vmap dest dir>\n"
+        },
+        "vmap-extractor-usage": {
+          "exitCode": 1,
+          "output": "Extract V4.00 2012_02.\n/state/cli/install/bin/vmap4_extractor [-?][-s][-l][-d <path>]\n   -s : (default) small size (data size optimization), ~500MB less vmap data.\n   -l : large size, ~500MB more vmap data. (might contain more details)\n   -d <path>: Path to the vector data source folder.\n   -? : This message.\n"
+        }
+      },
+      "cliPhase": {
+        "bytes": 5270,
+        "sha256": "8f1bc2fdf7cb22985ae260ab2f87cd77c0e75f6b738607c6187c0c61f71753ce"
+      },
+      "clientMpqConversionQualified": false,
+      "configuration": {
+        "bytes": 7888,
+        "sha256": "324479ef3821a0f9ef0c3f2d6b42c011eba1c31148eeaccd6bed3250c3d9c306"
+      },
+      "customEsteriaDataLoadOrderQualified": false,
+      "fixturePreparation": {
+        "bytes": 5930,
+        "sha256": "6ff44e6198a2c54660c4c85388f6511d5adcb54b3e0ae8d2933871bb61fe0e4f"
+      },
+      "fixtureRecipes": {
+        "runtime/extractor_order.py": {
+          "bytes": 9884,
+          "sha256": "5c6d30d23c2a8ebb13d037907cbcc6e7b67ea31f4b99798d925c5e3da756128c"
+        },
+        "runtime/server/extractor-order.lock.json": {
+          "bytes": 10416,
+          "sha256": "6963915b2b2923940a91ebbe5f01113e4e3b1f172f9fbffc9b9db8ce87923cc0"
+        },
+        "runtime/server/extractor-order/0001-explicit-ordered-providers.patch": {
+          "bytes": 7088,
+          "sha256": "8645bb3643ada0db7bdc7122e87a2a941f8f511d7666ef0360c18621f5a78e24"
+        },
+        "runtime/server/extractor-order/EsteriaArchiveOrder.h": {
+          "bytes": 19299,
+          "sha256": "da78de99a6850b7fcbb7f15e72985c89414bbf372c008a17d620e18e6c634d29"
+        },
+        "tests/extractor_mpqfile_reference.cpp": {
+          "bytes": 697,
+          "sha256": "48ad6280e7d77cff6bb9b09901f75706e777ad96cd9bea22182568d3a4a11e86"
+        },
+        "tests/extractor_order_reference.cpp": {
+          "bytes": 4964,
+          "sha256": "fec8561ee848972035f097a88147b18dff8001d3352b5b45767a235607fd2336"
+        },
+        "tests/test_extractor_order.py": {
+          "bytes": 18167,
+          "sha256": "102a5660ff7d15db18762946f7cb910c0c9ea447a72edce4bf368757692f22b7"
+        },
+        "tools/build_ordered_extractors.py": {
+          "bytes": 19603,
+          "sha256": "229578c92137db8ea7e121b5e68cd5c95500a661dc875bd4cc0b86626d102a57"
+        },
+        "tools/prepare_ordered_extractors.py": {
+          "bytes": 5921,
+          "sha256": "2368ae56924c68f9ea5d91cf2fd5a79e6059f0198643923b204be9e7f3252444"
+        }
+      },
+      "formatVersion": 1,
+      "gameLoginQualified": false,
+      "gameplayQualified": false,
+      "lookupResult": {
+        "bytes": 3001,
+        "sha256": "77a154490cd9278a2146f763485243259bda75fc1ab28300894c8701777d8b08"
+      },
+      "lookupTestNames": [
+        "tests.test_extractor_order.RealArchiveReader.test_actual_bootstrap_accepts_data_conversion_argv_without_legacy_input_selectors",
+        "tests.test_extractor_order.RealArchiveReader.test_actual_encrypted_table_mpqs_follow_lexical_order_not_numeric",
+        "tests.test_extractor_order.RealArchiveReader.test_actual_reader_full_capability_c_string_matches_native_packager",
+        "tests.test_extractor_order.RealArchiveReader.test_alternate_prefix_views_outrank_direct_patch_and_alternate_base",
+        "tests.test_extractor_order.RealArchiveReader.test_arbitrary_suffixes_use_full_case_insensitive_lexical_paths_not_numbers",
+        "tests.test_extractor_order.RealArchiveReader.test_changed_archive_or_loose_member_and_manifest_sha_never_fall_back",
+        "tests.test_extractor_order.RealArchiveReader.test_chinese_prefix_views_exist_without_alternate_base_but_other_locales_do_not",
+        "tests.test_extractor_order.RealArchiveReader.test_decode_failure_and_delta_patch_refuse_instead_of_reading_lower",
+        "tests.test_extractor_order.RealArchiveReader.test_encrypted_member_is_refused_without_falling_back_or_emitting_garbage",
+        "tests.test_extractor_order.RealArchiveReader.test_folder_patches_and_alternate_views_have_exact_effective_priority",
+        "tests.test_extractor_order.RealArchiveReader.test_listfile_union_is_case_insensitive_and_excludes_deleted_members",
+        "tests.test_extractor_order.RealArchiveReader.test_locale_root_relative_lexical_precedence_and_selected_locale_only",
+        "tests.test_extractor_order.RealArchiveReader.test_locale_rotation_matches_source_and_common3_is_below_common2_and_common",
+        "tests.test_extractor_order.RealArchiveReader.test_loose_folder_wins_in_same_order_and_its_case_insensitive_member_is_read",
+        "tests.test_extractor_order.RealArchiveReader.test_new_unlisted_loose_file_is_refused_instead_of_reading_lower_archive",
+        "tests.test_extractor_order.RealArchiveReader.test_patch_replay_does_not_discover_the_parent_integration_checkout",
+        "tests.test_extractor_order.RealArchiveReader.test_separate_patch_replays_only_four_tools_and_retains_default_path",
+        "tests.test_extractor_order.RealArchiveReader.test_tombstone_stops_lower_provider_and_non_neutral_hash_record_is_ignored",
+        "tests.test_extractor_order.RealArchiveReader.test_unrelated_names_outside_Data_do_not_invalidate_the_archive_order",
+        "tests.test_extractor_order.RealArchiveReader.test_unsupported_profiles_path_aliases_symlinks_and_missing_required_inputs_refuse",
+        "tests.test_extractor_order.RealArchiveReader.test_wire_order_and_original_not_conversion_qualification_are_explicit",
+        "tests.test_extractor_order.RealArchiveReader.test_zero_and_one_byte_files_do_not_turn_into_fallback_or_tombstones"
+      ],
+      "lookupTestsRun": 22,
+      "lookupTestsSkipped": 0,
+      "nativeOrderedLookupsQualified": true,
+      "orderedSourceReceipt": {
+        "bytes": 1180783,
+        "sha256": "1cbf3a0d25980a3a4785ce7ee50a6de061b6d20875d364a4ae3c8d3c43656149"
+      },
+      "originalStockConfigParsed": true,
+      "originalUnstrippedELFReadbackPerformed": false,
+      "packageReceipt": {
+        "bytes": 60159,
+        "sha256": "25d87f1f20f74f6bed041a6a06de235fe0f5e50f56bcdbe11bf2e56ab9fd44c0"
+      },
+      "programs": {
+        "map_extractor": {
+          "bytes": 527808,
+          "sha256": "a650b7e3befe131b9f349c6596263e85623ba324863c3894a2ebd8cd8ac8b42b"
+        },
+        "mmaps_generator": {
+          "bytes": 1839280,
+          "sha256": "3c9c3ff993300a5fff9ec0e65ec717faeb5894e15b0f481cd72be138b0765c34"
+        },
+        "vmap4_assembler": {
+          "bytes": 1051576,
+          "sha256": "b5ec1b64ff59a98bfd2de159bf6f6bbec4ed69363d53910d7321f357d59440f6"
+        },
+        "vmap4_extractor": {
+          "bytes": 921896,
+          "sha256": "87bc89f367ee60dff292270f421a6dfe1ad84c6a6d150ba5f1ccf1d0950635c1"
+        }
+      },
+      "qualificationSucceeded": true,
+      "referenceImageIdentityVerifiedByQualifier": false,
+      "referenceImageReadback": {
+        "identity": {
+          "bytes": 1433,
+          "sha256": "ded60395aa7547a75286b373acbc9e674e63cac21333f4cf735a7bb78242fa63"
+        },
+        "receipt": {
+          "actualImageMetadataAndElfHashesVerified": true,
+          "androidRuntimeQualified": false,
+          "components": {
+            "mysql": {
+              "bytes": 6912024,
+              "elfMachine": 183,
+              "sha256": "f0acfeacf8fc03a4e0b4a8af00dac7422e3f01deeeb4b6d7ffca10662fc4e39e"
+            },
+            "mysqld": {
+              "bytes": 54196328,
+              "elfMachine": 183,
+              "sha256": "3bc577a5948c24ee6bf5341575ec365e12b80530ffc665e6f3300ce9b4938d75"
+            },
+            "python3": {
+              "bytes": 7845048,
+              "elfMachine": 183,
+              "sha256": "c86f21d0da9290ece2d7d49a3f7ed52aed59cb029abdf0ea25c79634f6cbe960"
+            }
+          },
+          "contextReceipt": {
+            "bytes": 2187,
+            "sha256": "2d46f7fc1f0a406527aae025cd20d8991767e1367aab122acbe1f4bf6adc604d"
+          },
+          "databaseInitialized": false,
+          "esteriaServerExecuted": false,
+          "expectedMysqlSqlVersion": "8.0.46-0ubuntu0.24.04.4",
+          "formatVersion": 1,
+          "gameplayQualified": false,
+          "mysqlServerExecuted": false,
+          "nativePythonExecuted": true,
+          "runtimeArchive": {
+            "bytes": 112374096,
+            "file": "server-runtime-arm64.tar.gz",
+            "sha256": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5"
+          },
+          "runtimeMetadata": {
+            "bytes": 34299,
+            "sha256": "3aa480f48fd36cea1253557976163dc2da0707eef72dbef18d028196888b05b1"
+          },
+          "scope": "native-arm64-dependency-image-readback",
+          "sourceCompanion": {
+            "bytes": 954236077,
+            "sha256": "b09599218a1a62a8e131eeedc47f6c8c19e2d39936d4e0aed7261e365f409bc1"
+          }
+        }
+      },
+      "runtimeArchive": {
+        "bytes": 2902474,
+        "sha256": "21ce4e1b9a4ff054df4a781cf6b83f37149ab941014d2759f33d93bbfebf231b"
+      },
+      "scope": "native-arm64-composed-server-data-tools-cli-only",
+      "shippedRuntimeFilesUnchanged": true,
+      "sourceCompanionComplete": false,
+      "syntheticLookupTests": {
+        "exitCode": 0,
+        "observedSeconds": 8.445,
+        "output": {
+          "bytes": 7472,
+          "sha256": "f37eb2412ff04469a346e6a9b501e91240a88b26c0e2341673627169fa42028b"
+        }
+      }
+    }
+  },
+  "nativeProgramsExecutedLocally": false,
+  "scope": "actual-native-composed-server-data-tools-provider-readback",
+  "statusConflictUnresolved": true,
+  "workflowCompletionConfirmed": false,
+  "workflowRun": 41103915829,
+  "worldQualified": false
+}

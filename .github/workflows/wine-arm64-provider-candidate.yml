@@ -34,7 +34,32 @@ concurrency:
   group: wine-arm64-provider-candidate-${{ github.ref }}
   cancel-in-progress: false
 jobs:
+  selection:
+    runs-on: ubuntu-24.04
+    outputs:
+      pre_adoption: ${{ steps.profile.outputs.pre_adoption }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - id: profile
+        name: Keep the pre-adoption producer on its original reference profile
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+          package=json.loads(Path('runtime/runtime-sources.lock.json').read_bytes())['packages']['wine-arm64']
+          environment=package.get('wineEnvironment',{})
+          assert type(environment) is dict and environment in ({},{'WINE_ANDROID_PRIVATE_PE_COPY':'1'})
+          old=json.loads(Path('runtime/wine-arm64/sources.lock.json').read_bytes())['oldProviderArchiveSha256']
+          candidate=json.loads(Path('runtime/wine-arm64-qualification/runtime-input.lock.json').read_bytes())['files']['wine-arm64.tar.gz']['sha256']
+          expected=candidate if environment else old
+          assert package['archive']['sha256']==expected
+          print('pre_adoption='+str(not environment).lower())
+          PY
   rebuild:
+    needs: selection
+    if: needs.selection.outputs.pre_adoption == 'true'
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 90
     steps:

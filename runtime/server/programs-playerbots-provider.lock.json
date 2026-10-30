@@ -1,0 +1,977 @@
+{
+  "androidRuntimeQualified": false,
+  "appSourceLock": {
+    "bytes": 2170,
+    "sha256": "dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90"
+  },
+  "archive": {
+    "bytes": 30730491,
+    "file": "server-programs-runtime-arm64.tar.gz",
+    "sha256": "963a23c1390440260b85ffe164b2d7508c56b005b315dce8a919ae443a46d1bf"
+  },
+  "archiveEntries": 131,
+  "archiveFileBytes": 92638681,
+  "buildId": "41019374697.1",
+  "debugArchive": {
+    "bytes": 1082880246,
+    "file": "server-engine-debug-arm64.tar.gz",
+    "sha256": "facc75680f3fb1b205a98960d6ea5a0d565cb2a2b4bd56303dd6625fd4854a24"
+  },
+  "files": {
+    "bin/authserver": {
+      "bytes": 1709864,
+      "mode": 365,
+      "sha256": "04cbda982ca1385903929eb46ca52b7cb41ca222e8a48f9898af716d2b878531"
+    },
+    "bin/dbimport": {
+      "bytes": 1379920,
+      "mode": 365,
+      "sha256": "f452ef5c7ab90451e9060bdace1ba866a93da768145428b15ddc25a7e73b6c24"
+    },
+    "bin/worldserver": {
+      "bytes": 59025784,
+      "mode": 365,
+      "sha256": "9757f0bbb2ee159d18070d8f5fe7ecdf5b4b8b7171116198039f418d5ec13aa1"
+    },
+    "etc/authserver.conf.dist": {
+      "bytes": 15690,
+      "mode": 292,
+      "sha256": "88604496cdd1165d2fae0480ef32fd05f6b1422847619adaf777e80a2ce6265e"
+    },
+    "etc/dbimport.conf.dist": {
+      "bytes": 12250,
+      "mode": 292,
+      "sha256": "8ce8122b1b6ba9e3ca7109d80ece04bf5670e5a04dcb44aff6454e85817dd61a"
+    },
+    "etc/modules/AutoBalance.conf.dist": {
+      "bytes": 39563,
+      "mode": 292,
+      "sha256": "0188714241f2f160c84b6896cd3a8119832870ba92c17914d86f04cfe5c1705c"
+    },
+    "etc/modules/ChatTransmitter.conf.dist": {
+      "bytes": 1854,
+      "mode": 292,
+      "sha256": "e18a4522716cba5d451eb42656b35048ab8e84b3961fa91e6473cdd5e874f2f2"
+    },
+    "etc/modules/NoProfessionLimit.conf.dist": {
+      "bytes": 5783,
+      "mode": 292,
+      "sha256": "ec2e9c6e580804f1e81eb60ebc71ab4cab35da0d1792509fcfe0515e65907cae"
+    },
+    "etc/modules/SoloLfg.conf.dist": {
+      "bytes": 1011,
+      "mode": 292,
+      "sha256": "f127a31cdb9b7afc7acaa130b8ebe1c5a17811c2d1a237c9f6c1dcc86adcfdb2"
+    },
+    "etc/modules/WorldChat.conf.dist": {
+      "bytes": 1365,
+      "mode": 292,
+      "sha256": "187f3f23c51fc7abeb8b57cb9d42d2753ab9597584a0caae7498dbaa82ee8f20"
+    },
+    "etc/modules/adaptive_autoattack.conf.dist": {
+      "bytes": 127,
+      "mode": 292,
+      "sha256": "958a898cb052b3f1066855bd55e692ee7df08eee46864cb62b34f22e0ef98896"
+    },
+    "etc/modules/challenge_modes.conf.dist": {
+      "bytes": 5656,
+      "mode": 292,
+      "sha256": "b1a8c80d2a916bac4a3066fff366820432afaadb6682c77624d9eb0a5406fb66"
+    },
+    "etc/modules/classless_wildcard.conf.dist": {
+      "bytes": 40424,
+      "mode": 292,
+      "sha256": "dce0770e45a1118eeee8ce260d8e0c82d6436e91a619ddc0d3d5c1eaf98369f2"
+    },
+    "etc/modules/fly-anywhere.conf.dist": {
+      "bytes": 372,
+      "mode": 292,
+      "sha256": "4c8e2679416c9a8699746ee678c2f5585089e1dbd9505024e10ab0d0013615ab"
+    },
+    "etc/modules/individualProgression.conf.dist": {
+      "bytes": 24182,
+      "mode": 292,
+      "sha256": "bb3126c0905ae96fca1b21c8faed0c72d37b3dae4f93fff90a634163848eb977"
+    },
+    "etc/modules/individual_xp.conf.dist": {
+      "bytes": 1409,
+      "mode": 292,
+      "sha256": "813e41db8577c5764d9af0ef24bb0f625e69891dbb990595afa2068be381b4c2"
+    },
+    "etc/modules/instance-reset.conf.dist": {
+      "bytes": 1754,
+      "mode": 292,
+      "sha256": "ee05462e3ed88d68ab2620338e388bd1ac7f1561775818a842a1836fa021a541"
+    },
+    "etc/modules/mod-corpse-respawn.conf.dist": {
+      "bytes": 821,
+      "mode": 292,
+      "sha256": "6eed3a753524166204ded3eab527bcb60c32f8b5a2044529abcece1700e59b85"
+    },
+    "etc/modules/mod-mana-loot-pet.conf.dist": {
+      "bytes": 6285,
+      "mode": 292,
+      "sha256": "500352f7bf24e0a31e372085703b9112f3fbad4382521668ee6f73c7e0976be9"
+    },
+    "etc/modules/mod-mana-speedflying.conf.dist": {
+      "bytes": 15808,
+      "mode": 292,
+      "sha256": "b7f06a39680f35a08836f45285d7ce2ae69fbbbb27de649606464c3f6e142c58"
+    },
+    "etc/modules/mod_account_mount.conf.dist": {
+      "bytes": 738,
+      "mode": 292,
+      "sha256": "9687c2e2b45aecba35ded11eed63c10abd90fdbb35d0a833f3b2f6a0daf2641f"
+    },
+    "etc/modules/mod_achievements.conf.dist": {
+      "bytes": 495,
+      "mode": 292,
+      "sha256": "7182247e0375f9380feb89a801b9de841c5b6a65d6a6588f44da80d667b85acb"
+    },
+    "etc/modules/mod_ahbot.conf.dist": {
+      "bytes": 71937,
+      "mode": 292,
+      "sha256": "9b091efd8f2f4f0488b191df88375b785ebcf7ea1158a5c57eae0b6cc145a236"
+    },
+    "etc/modules/mod_aoe_loot.conf.dist": {
+      "bytes": 1461,
+      "mode": 292,
+      "sha256": "5ccf5a1d26961f9668434fda8e6b9a23e71cda72447bd9d67c5393f25569a194"
+    },
+    "etc/modules/mod_azeroth_plex.conf.dist": {
+      "bytes": 4060,
+      "mode": 292,
+      "sha256": "03a969b322d10d9bb58a5838b8d19f84914ece44745e615b83ddabd9addfb023"
+    },
+    "etc/modules/mod_battlemon.conf.dist": {
+      "bytes": 3141,
+      "mode": 292,
+      "sha256": "d22f8c6e2a925d4f8a882fb17b43d99e18a8565c26a820eddb4425c0ee2bc0dc"
+    },
+    "etc/modules/mod_battlemon_battles.conf.dist": {
+      "bytes": 1286,
+      "mode": 292,
+      "sha256": "386cb618ca43c1333cf2b0b1844a518bac765d58171fef8b0191b89b6443c856"
+    },
+    "etc/modules/mod_battlemon_overworld.conf.dist": {
+      "bytes": 2026,
+      "mode": 292,
+      "sha256": "a365b1d17727aaceeebbc656c72081fa0849959c549dec542f2b50681ee10828"
+    },
+    "etc/modules/mod_congratsonlevel.conf.dist": {
+      "bytes": 399,
+      "mode": 292,
+      "sha256": "3790d953497cfcebcc60f888a9e4549345986948140de560033d95561c5b17b1"
+    },
+    "etc/modules/mod_dungeon_clear.conf.dist": {
+      "bytes": 70313,
+      "mode": 292,
+      "sha256": "e3f0c4ad06baecb9eec154cb2e158baed045a14791b947cb3c07a7148023a650"
+    },
+    "etc/modules/mod_dungeon_master.conf.dist": {
+      "bytes": 13417,
+      "mode": 292,
+      "sha256": "71e781c935ec25f6a358101e324586bde93bfb6da81962713bb83fa81c6ae504"
+    },
+    "etc/modules/mod_esteria_chat.conf.dist": {
+      "bytes": 318,
+      "mode": 292,
+      "sha256": "a11d6191652aa556cfbf2ac5cfda068511173d75d995acdf1d2f8e2af2de942c"
+    },
+    "etc/modules/mod_guildhouse.conf.dist": {
+      "bytes": 2058,
+      "mode": 292,
+      "sha256": "05d1eb9bd84934185a8cfcf012032f8fc579ab287bfbc781473965ffe07bed32"
+    },
+    "etc/modules/mod_improved_bank.conf.dist": {
+      "bytes": 2182,
+      "mode": 292,
+      "sha256": "abd4034ece92cefd0b4c5fcc337ccb036d760e5cabdb5da8e8ef4aa0144c1bc3"
+    },
+    "etc/modules/mod_item_upgrade.conf.dist": {
+      "bytes": 13202,
+      "mode": 292,
+      "sha256": "be8b084dacad0f5953ccce9304a7c844f7cb81337dc4761b9027e18a98ebee7c"
+    },
+    "etc/modules/mod_launcher_api.conf.dist": {
+      "bytes": 1928,
+      "mode": 292,
+      "sha256": "fc0b56a34fea8fb204840fda59384a4df2dab075ff054c7ed85a304042e32c14"
+    },
+    "etc/modules/mod_loot_beam.conf.dist": {
+      "bytes": 941,
+      "mode": 292,
+      "sha256": "eadc52c98943e74bd80d6088dfddde9015bcc9d584ef8ee6d942aeb4c72f4d89"
+    },
+    "etc/modules/mod_loyal_steed.conf.dist": {
+      "bytes": 2450,
+      "mode": 292,
+      "sha256": "b3b901114703143644212bfa8de4f471da0190fde4372e5cae59ff6c23967ed5"
+    },
+    "etc/modules/mod_mythic_plus.conf.dist": {
+      "bytes": 1367,
+      "mode": 292,
+      "sha256": "855e979039eb87f0d8022cd96dfaa1a1a000a4a2699db7e28d8172640500a3df"
+    },
+    "etc/modules/mod_nemesis_system.conf.dist": {
+      "bytes": 11023,
+      "mode": 292,
+      "sha256": "6eccd85b48793b7a5dda97011690cb0d82734645c231b3c293ac5f1ab137a846"
+    },
+    "etc/modules/mod_no_hearthstone_cooldown.conf.dist": {
+      "bytes": 766,
+      "mode": 292,
+      "sha256": "e7a333b6109f3bf1ffcc74de61b95a3483b0decd84d4ea2e49c1cc19ceefd3c0"
+    },
+    "etc/modules/mod_npc_beastmaster.conf.dist": {
+      "bytes": 2685,
+      "mode": 292,
+      "sha256": "89802e533faab12e7f4b43661b541cd7d86db0b6d69417cfd58c05bd774a81e0"
+    },
+    "etc/modules/mod_starterguild.conf.dist": {
+      "bytes": 1763,
+      "mode": 292,
+      "sha256": "e8045324699ff1bdeec70671e9b3c842c5bc72dd6ff4dd867b1d74ffb352db55"
+    },
+    "etc/modules/mod_startingpet.conf.dist": {
+      "bytes": 2738,
+      "mode": 292,
+      "sha256": "08c8542f7daecccf6aa646d3c100aea844021823b75fb36e86c7678ef3b61308"
+    },
+    "etc/modules/mod_two_names.conf.dist": {
+      "bytes": 2186,
+      "mode": 292,
+      "sha256": "52df1948b22456964a67eb0e8729503a25e1fbbceeb8cdd6b359d682809fe0f0"
+    },
+    "etc/modules/mod_worgoblin.conf.dist": {
+      "bytes": 1180,
+      "mode": 292,
+      "sha256": "0e531847bc4129edcb924fca07f4d90aeacf01f145cac8f1c066bcecb88c43c2"
+    },
+    "etc/modules/mod_wxl_dbc.conf.dist": {
+      "bytes": 480,
+      "mode": 292,
+      "sha256": "9b8d818e99c1f1ffce9c411e03dd524eaf7a70f861747e02a342892ed1196f4c"
+    },
+    "etc/modules/playerbots.conf.dist": {
+      "bytes": 119723,
+      "mode": 292,
+      "sha256": "8fa5376d8f9153929490785b5fe26b6aff3d6118483743aba5ddf97bfe0ab67d"
+    },
+    "etc/modules/premium.conf.dist": {
+      "bytes": 1974,
+      "mode": 292,
+      "sha256": "203db42d7e580a885e672c9bdc7a190b62d3121e05530c5ae6386c5329e65503"
+    },
+    "etc/modules/profession_experience.conf.dist": {
+      "bytes": 5529,
+      "mode": 292,
+      "sha256": "35c25feb97d50d4633991b9cef616bca76ce6c0bbbd7dc19eec5711c6cb13d38"
+    },
+    "etc/modules/random_enchants.conf.dist": {
+      "bytes": 2015,
+      "mode": 292,
+      "sha256": "21a0e095e9d920b7b10e4e0ae7d1b9e5f81d60be4d48be69c0e924434b4c5cf7"
+    },
+    "etc/modules/reward_shop.conf.dist": {
+      "bytes": 744,
+      "mode": 292,
+      "sha256": "81feee09216615f56add98f895f107942e0910f887b95b0e778acbdce5a31dd1"
+    },
+    "etc/modules/reward_system.conf.dist": {
+      "bytes": 624,
+      "mode": 292,
+      "sha256": "f2617313e0c2c7eb4fd7fae1297490dd5ce6640fc6d60c154c4ebcfdb9826430"
+    },
+    "etc/modules/seasonpass.conf.dist": {
+      "bytes": 5048,
+      "mode": 292,
+      "sha256": "cd6bf2613b39758cf44dd2ec6c51f7599e902f5a4034098773f714a333ea878e"
+    },
+    "etc/modules/transmog.conf.dist": {
+      "bytes": 14597,
+      "mode": 292,
+      "sha256": "891598cc88a99ef99e139ab4a9686e168f22f9c9816dd24fd5194cc0180022d1"
+    },
+    "etc/worldserver.conf.dist": {
+      "bytes": 171008,
+      "mode": 292,
+      "sha256": "d3e4667280cf6cafb9a3de73431b1c486612304ccd5dcebfc463a112d29da382"
+    },
+    "helper-notices/esteria-integration-LICENSE.txt": {
+      "bytes": 35149,
+      "mode": 292,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    "helpers/playerbots-schema": {
+      "bytes": 25188512,
+      "mode": 365,
+      "sha256": "b7d9b72c17f32294915f0a474283c543057ffb7de7b3f93015c2e7e179bfcf25"
+    },
+    "notices/external/lua-5.2.4/doc/readme.html": {
+      "bytes": 13160,
+      "mode": 292,
+      "sha256": "a686d9158c8878ee4c6e1c90d719949c2b70031b74d6e945e6e218a063ebcb20"
+    },
+    "notices/source/AUTHORS": {
+      "bytes": 2897,
+      "mode": 292,
+      "sha256": "76047a285432615359bba4f1e2e3cb02b9cc30617688b2a3341b1f963d2b683d"
+    },
+    "notices/source/LICENSE": {
+      "bytes": 18091,
+      "mode": 292,
+      "sha256": "f9c375a1be4a41f7b70301dd83c91cb89e41567478859b77eef375a52d782505"
+    },
+    "notices/source/deps/SFMT/LICENSE.txt": {
+      "bytes": 1706,
+      "mode": 292,
+      "sha256": "9d6db9b6702bf80c926b36d61f6282bf48d0a9a8044db2bd31e524aa08ccac0f"
+    },
+    "notices/source/deps/acore/joiner/LICENSE": {
+      "bytes": 34519,
+      "mode": 292,
+      "sha256": "d8de517917a591daa447d6be28ffb2fac866703e4feb65e86221be9a22d3033a"
+    },
+    "notices/source/deps/argon2/LICENSE": {
+      "bytes": 17879,
+      "mode": 292,
+      "sha256": "220f8736a89ff51c92ef3d497f413b48e6cf1df3d6278bc909c6308c78e1718e"
+    },
+    "notices/source/deps/bzip2/LICENSE": {
+      "bytes": 1901,
+      "mode": 292,
+      "sha256": "4919cfb14a73cd64fcef67b107613970cf1659a09aa675dba31314f373bc7204"
+    },
+    "notices/source/deps/fkYAML/fkYAML/node.hpp": {
+      "bytes": 600305,
+      "mode": 292,
+      "sha256": "1ecac743ede9b7955ce21886f63075cc0f2298f228c6f50cd9c090c8d2882421"
+    },
+    "notices/source/deps/fmt/LICENSE": {
+      "bytes": 1431,
+      "mode": 292,
+      "sha256": "07580f2a3b35709ce703d523f447b242f6dfec7582a8c0df102c7fa2849375f8"
+    },
+    "notices/source/deps/g3dlite/source/license.cpp": {
+      "bytes": 3212,
+      "mode": 292,
+      "sha256": "2080b875973930021fc646446552fa188c1c0908e249dd9ce1737de193d06781"
+    },
+    "notices/source/deps/gsoap/stdsoap2.cpp": {
+      "bytes": 636890,
+      "mode": 292,
+      "sha256": "dd05286b57c59835cfd2240f002937f631c7ac8ade251de472f112811839ccc2"
+    },
+    "notices/source/deps/jemalloc/COPYING": {
+      "bytes": 1709,
+      "mode": 292,
+      "sha256": "94aa2caa98c25d942f58b956c71dba6a99ff98fc3a31cbc669fe2a4cd0268b53"
+    },
+    "notices/source/deps/jsonpath/LICENSE.APACHE2": {
+      "bytes": 586,
+      "mode": 292,
+      "sha256": "e8734448285a2dd773d40136ed5d5e8163a70701dd540cdc796cfca232f67d55"
+    },
+    "notices/source/deps/jsonpath/LICENSE.MIT": {
+      "bytes": 1088,
+      "mode": 292,
+      "sha256": "d72dea1a8cdf3f4dfa2f594253d0c5b37baefc76e806f5ecb0e426393edcd505"
+    },
+    "notices/source/deps/libmpq/AUTHORS": {
+      "bytes": 245,
+      "mode": 292,
+      "sha256": "dbe938e5a2ca995278a86060b33dac337c2674de1e70c7d36218786c8cbb884a"
+    },
+    "notices/source/deps/libmpq/COPYING": {
+      "bytes": 17997,
+      "mode": 292,
+      "sha256": "58530d09b6fcb91ae27071be0081af90e6c2d7fdf991d34a29e234a2a5e75455"
+    },
+    "notices/source/deps/libmpq/debian/copyright": {
+      "bytes": 653,
+      "mode": 292,
+      "sha256": "bd3113f547db3c0c90cf9aa6ed28ff3e7dbe8d027f1f0c7d32248cef7d0ab897"
+    },
+    "notices/source/deps/lualib/lua/CMakeLists.txt": {
+      "bytes": 5993,
+      "mode": 292,
+      "sha256": "0602804cc973338ccb959c56a8bc77b8c1f9dc39d72934bcf1d17c3d0cc84b3e"
+    },
+    "notices/source/deps/recastnavigation/License.txt": {
+      "bytes": 859,
+      "mode": 292,
+      "sha256": "5881db2682bc4871837e36b5af4460f59905a7944848221406f841eaa3fda8c4"
+    },
+    "notices/source/deps/semver_bash/LICENSE": {
+      "bytes": 1515,
+      "mode": 292,
+      "sha256": "5dfbc658d4eda74c18acd89ea205c7c23d2d6b47ff455dc5167371ee86257a39"
+    },
+    "notices/source/deps/utf8cpp/utf8.h": {
+      "bytes": 1521,
+      "mode": 292,
+      "sha256": "90643c1044a58020af389dc8eb73099fc8327a12d0731a1101acb277e03e6a3b"
+    },
+    "notices/source/deps/zlib/zlib.h": {
+      "bytes": 96829,
+      "mode": 292,
+      "sha256": "8a5579af72ea4f427ff00a4150f0ccb3fc5c1e4379f726e101133b1ab9fc600c"
+    },
+    "notices/source/modules/mod-account-achievements/LICENSE.md": {
+      "bytes": 34329,
+      "mode": 292,
+      "sha256": "43288b9b855db42b80dc976ef5c27820bf52b755fc2404c3c57962fdd8f0b41a"
+    },
+    "notices/source/modules/mod-account-mounts/LICENSE": {
+      "bytes": 34503,
+      "mode": 292,
+      "sha256": "7f8f48e4266aa8fd3033dfaa4bb7f6e83a60c6e099f82d4959b81de90e67cd8f"
+    },
+    "notices/source/modules/mod-account-mounts/LICENSE.md": {
+      "bytes": 34329,
+      "mode": 292,
+      "sha256": "43288b9b855db42b80dc976ef5c27820bf52b755fc2404c3c57962fdd8f0b41a"
+    },
+    "notices/source/modules/mod-adaptive-autoattack/LICENSE": {
+      "bytes": 18091,
+      "mode": 292,
+      "sha256": "f9c375a1be4a41f7b70301dd83c91cb89e41567478859b77eef375a52d782505"
+    },
+    "notices/source/modules/mod-aoe-loot/LICENSE": {
+      "bytes": 34520,
+      "mode": 292,
+      "sha256": "76a97c878c9c7a8321bb395c2b44d3fe2f8d81314d219b20138ed0e2dddd5182"
+    },
+    "notices/source/modules/mod-better-item-reloading/LICENSE": {
+      "bytes": 1061,
+      "mode": 292,
+      "sha256": "973d195b6aef73b35de298a0732a2a092bcb5cd0d0de8247d24d0f7be2f68ef4"
+    },
+    "notices/source/modules/mod-challenge-modes/LICENSE": {
+      "bytes": 1068,
+      "mode": 292,
+      "sha256": "4a59014059435fd1f99b1e2d2a7e45f032701c1584483f3d32b6102bc2736cb5"
+    },
+    "notices/source/modules/mod-chat-transmitter/libs/nlohmann/json.hpp": {
+      "bytes": 926233,
+      "mode": 292,
+      "sha256": "7804b38146921d03374549c9e2a5e3acda097814c43caf2b96a0278e58df26e0"
+    },
+    "notices/source/modules/mod-classless-wildcard/LICENSE": {
+      "bytes": 18091,
+      "mode": 292,
+      "sha256": "f9c375a1be4a41f7b70301dd83c91cb89e41567478859b77eef375a52d782505"
+    },
+    "notices/source/modules/mod-congrats-on-level/LICENSE.md": {
+      "bytes": 34329,
+      "mode": 292,
+      "sha256": "43288b9b855db42b80dc976ef5c27820bf52b755fc2404c3c57962fdd8f0b41a"
+    },
+    "notices/source/modules/mod-custom-server/LICENSE": {
+      "bytes": 1068,
+      "mode": 292,
+      "sha256": "203a620948410283b0ca6c696133983ebd4050f1f258c5a66bfcb7f943190d5b"
+    },
+    "notices/source/modules/mod-dungeon-clear/LICENSE": {
+      "bytes": 991,
+      "mode": 292,
+      "sha256": "6dfac49a0d8d7619bdaf0ab4fb42dfaeba6c20be1cd449abcdbd5e45a9591318"
+    },
+    "notices/source/modules/mod-dungeon-master/LICENSE": {
+      "bytes": 34503,
+      "mode": 292,
+      "sha256": "7f8f48e4266aa8fd3033dfaa4bb7f6e83a60c6e099f82d4959b81de90e67cd8f"
+    },
+    "notices/source/modules/mod-fly-anywhere/LICENSE": {
+      "bytes": 1068,
+      "mode": 292,
+      "sha256": "203a620948410283b0ca6c696133983ebd4050f1f258c5a66bfcb7f943190d5b"
+    },
+    "notices/source/modules/mod-improved-bank/LICENSE": {
+      "bytes": 1068,
+      "mode": 292,
+      "sha256": "203a620948410283b0ca6c696133983ebd4050f1f258c5a66bfcb7f943190d5b"
+    },
+    "notices/source/modules/mod-individual-progression/LICENSE": {
+      "bytes": 1068,
+      "mode": 292,
+      "sha256": "4a59014059435fd1f99b1e2d2a7e45f032701c1584483f3d32b6102bc2736cb5"
+    },
+    "notices/source/modules/mod-individual-xp/LICENSE": {
+      "bytes": 34520,
+      "mode": 292,
+      "sha256": "76a97c878c9c7a8321bb395c2b44d3fe2f8d81314d219b20138ed0e2dddd5182"
+    },
+    "notices/source/modules/mod-item-upgrade/LICENSE": {
+      "bytes": 1068,
+      "mode": 292,
+      "sha256": "203a620948410283b0ca6c696133983ebd4050f1f258c5a66bfcb7f943190d5b"
+    },
+    "notices/source/modules/mod-loyal-steed/LICENSE": {
+      "bytes": 712,
+      "mode": 292,
+      "sha256": "f9fd8fd01011bdeebfe771b533b69bccf5ae58f18ebbf5a6c5049a3fe14872a7"
+    },
+    "notices/source/modules/mod-mythic-plus/LICENSE": {
+      "bytes": 1068,
+      "mode": 292,
+      "sha256": "203a620948410283b0ca6c696133983ebd4050f1f258c5a66bfcb7f943190d5b"
+    },
+    "notices/source/modules/mod-nemesis-system/ClientAddon/Ace3/LICENSE.txt": {
+      "bytes": 1697,
+      "mode": 292,
+      "sha256": "afe050a430bafdbca7da69d95897751239f4fab415784a419a3cdc2519eee9b2"
+    },
+    "notices/source/modules/mod-no-hearthstone-cooldown/LICENSE": {
+      "bytes": 34523,
+      "mode": 292,
+      "sha256": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef"
+    },
+    "notices/source/modules/mod-no-profession-limit/LICENSE": {
+      "bytes": 18091,
+      "mode": 292,
+      "sha256": "f9c375a1be4a41f7b70301dd83c91cb89e41567478859b77eef375a52d782505"
+    },
+    "notices/source/modules/mod-npc-beastmaster/LICENSE.md": {
+      "bytes": 34329,
+      "mode": 292,
+      "sha256": "43288b9b855db42b80dc976ef5c27820bf52b755fc2404c3c57962fdd8f0b41a"
+    },
+    "notices/source/modules/mod-playerbots/AUTHORS.md": {
+      "bytes": 2084,
+      "mode": 292,
+      "sha256": "4b9537cb4eeca7061b3489f5886995ac939f284f87bbf2de93cb3624195cf7a4"
+    },
+    "notices/source/modules/mod-playerbots/LICENSE": {
+      "bytes": 18092,
+      "mode": 292,
+      "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643"
+    },
+    "notices/source/modules/mod-premium/LICENSE": {
+      "bytes": 34520,
+      "mode": 292,
+      "sha256": "76a97c878c9c7a8321bb395c2b44d3fe2f8d81314d219b20138ed0e2dddd5182"
+    },
+    "notices/source/modules/mod-profession-experience/LICENSE": {
+      "bytes": 947,
+      "mode": 292,
+      "sha256": "abfa6c9413e31f9caef102e8dd2a7b43ae2a78b3d3ef7d4c1407ebdb8ef8d79f"
+    },
+    "notices/source/modules/mod-reward-played-time/LICENSE": {
+      "bytes": 34520,
+      "mode": 292,
+      "sha256": "76a97c878c9c7a8321bb395c2b44d3fe2f8d81314d219b20138ed0e2dddd5182"
+    },
+    "notices/source/modules/mod-reward-shop/LICENSE": {
+      "bytes": 34520,
+      "mode": 292,
+      "sha256": "76a97c878c9c7a8321bb395c2b44d3fe2f8d81314d219b20138ed0e2dddd5182"
+    },
+    "notices/source/modules/mod-seasonpass/LICENSE": {
+      "bytes": 34526,
+      "mode": 292,
+      "sha256": "7d47378ed949810b4af8e95c0e21070a9f5fcff8e031130ad9b1a123566d9151"
+    },
+    "notices/source/modules/mod-solo-lfg/LICENSE": {
+      "bytes": 1063,
+      "mode": 292,
+      "sha256": "5b13ccff3f2d082ac5c9c45dc28f94ddeec0e27ca6e1feecd4d6a9192b14eb02"
+    },
+    "notices/source/modules/mod-starter-guild/LICENSE.md": {
+      "bytes": 34329,
+      "mode": 292,
+      "sha256": "43288b9b855db42b80dc976ef5c27820bf52b755fc2404c3c57962fdd8f0b41a"
+    },
+    "notices/source/modules/mod-starting-pet/LICENSE": {
+      "bytes": 34523,
+      "mode": 292,
+      "sha256": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef"
+    },
+    "notices/source/modules/mod-transmog/LICENSE": {
+      "bytes": 34520,
+      "mode": 292,
+      "sha256": "76a97c878c9c7a8321bb395c2b44d3fe2f8d81314d219b20138ed0e2dddd5182"
+    },
+    "notices/source/modules/mod-worgoblin-high-elf/LICENSE": {
+      "bytes": 34523,
+      "mode": 292,
+      "sha256": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef"
+    },
+    "notices/source/modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/Dep_LuaSrcDiet/COPYRIGHT": {
+      "bytes": 1733,
+      "mode": 292,
+      "sha256": "f69411826c78ab1e794cef44c70198a20dfc707794f83e4cf9a39b002b51b586"
+    },
+    "notices/source/modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/Dep_LuaSrcDiet/COPYRIGHT_Lua51": {
+      "bytes": 1528,
+      "mode": 292,
+      "sha256": "15c7579ae46d908816dd0ce6f41256a84c2e1862489eb731421626d7335f0db3"
+    },
+    "notices/source/modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/Dep_Smallfolk/LICENSE.md": {
+      "bytes": 1058,
+      "mode": 292,
+      "sha256": "276685cf85c778c10855808c05d0e667cba75b516e11bc7a77722e3da11cce98"
+    },
+    "notices/source/modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/Dep_crc32lua/COPYRIGHT": {
+      "bytes": 1250,
+      "mode": 292,
+      "sha256": "4e85596caaf9cf930f4c9f6f9217cdd7e0b0d10e53177dffe98d80889129feaf"
+    },
+    "notices/source/modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/lualzw-zeros/LICENSE": {
+      "bytes": 1057,
+      "mode": 292,
+      "sha256": "a446f219aabe3667850444bbd5f11b7e931889b4d5dbf3bc074fe00f25f1124c"
+    },
+    "notices/source/modules/mod-world-chat/LICENSE": {
+      "bytes": 34520,
+      "mode": 292,
+      "sha256": "76a97c878c9c7a8321bb395c2b44d3fe2f8d81314d219b20138ed0e2dddd5182"
+    },
+    "notices/source/src/server/game/LuaEngine/LICENSE": {
+      "bytes": 35141,
+      "mode": 292,
+      "sha256": "589ed823e9a84c56feb95ac58e7cf384626b9cbf4fda2a907bc36e103de1bad2"
+    },
+    "notices/source/src/server/game/LuaEngine/extensions/StackTracePlus/LICENSE": {
+      "bytes": 1077,
+      "mode": 292,
+      "sha256": "5288be437f496001ee58dc5c8a5e926af8286adf2db003cdc72087e7bb576512"
+    },
+    "provenance/playerbots-helper-build.json": {
+      "bytes": 32008,
+      "mode": 292,
+      "sha256": "82b9c7c852164f303500214e044f07bf5eb389fa2f3f03b9f6cdc962a5bba602"
+    },
+    "provenance/playerbots-native-sql.json": {
+      "bytes": 37703,
+      "mode": 292,
+      "sha256": "56288b2ea7046fa256bdd53113701bd59236d5d8403a3a16f32b5fcf0ab53c42"
+    },
+    "provenance/playerbots-source-receipt.json": {
+      "bytes": 1320302,
+      "mode": 292,
+      "sha256": "633cfa8f18bb887249d643b7eaf249e1bfe7bd30daf572e18084574ca8ec046d"
+    },
+    "provenance/server-build.json": {
+      "bytes": 32521,
+      "mode": 292,
+      "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+    },
+    "provenance/server-engine-derivative.json": {
+      "bytes": 18399,
+      "mode": 292,
+      "sha256": "50ce08f2e3e19c8ddf7869387a692ba7dc2a18be7a12ab1d2b8beb590ec08ce8"
+    },
+    "provenance/server-modules.json": {
+      "bytes": 5348,
+      "mode": 292,
+      "sha256": "6459b6a1acab2c62c474e4c6ab3eb651daa21f697ccd628e93a38bad298bbdd1"
+    },
+    "provenance/sources.lock.json": {
+      "bytes": 2170,
+      "mode": 292,
+      "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+    }
+  },
+  "formatVersion": 1,
+  "gameLoginQualified": false,
+  "gameplayQualified": false,
+  "helper": {
+    "buildReceipt": {
+      "bytes": 32008,
+      "sha256": "82b9c7c852164f303500214e044f07bf5eb389fa2f3f03b9f6cdc962a5bba602"
+    },
+    "executable": {
+      "bytes": 25188512,
+      "sha256": "b7d9b72c17f32294915f0a474283c543057ffb7de7b3f93015c2e7e179bfcf25"
+    },
+    "guestPath": "/esteria-server-programs/helpers/playerbots-schema",
+    "name": "playerbots-schema",
+    "nativeSqlReceipt": {
+      "bytes": 37703,
+      "sha256": "56288b2ea7046fa256bdd53113701bd59236d5d8403a3a16f32b5fcf0ab53c42"
+    }
+  },
+  "helperNames": [
+    "playerbots-schema"
+  ],
+  "helperNoticeFiles": {
+    "helper-notices/esteria-integration-LICENSE.txt": {
+      "bytes": 35149,
+      "mode": 292,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    }
+  },
+  "helperSourceAnchor": {
+    "bytes": 5835,
+    "sha256": "ff2d3186f242977df700a4fa399a001f9ff881f0da27d85652cdf9c116654eb8"
+  },
+  "helperSourceCompanionComplete": true,
+  "helperSourceQualification": {
+    "archive": {
+      "bytes": 108559554,
+      "file": "playerbots-helper-complete-sources.tar.gz",
+      "sha256": "eb7d1a77484943ad2e16d022877671426c28e4e3d7e3d8a1b166073950fc5c0f"
+    },
+    "nativeObservationReceipt": {
+      "bytes": 42641,
+      "sha256": "fdd3d688f44f7b07f0ce26094ee47c7386ef54a2b456508b1279d58176c57bd7"
+    },
+    "receipt": {
+      "bytes": 1320302,
+      "file": "playerbots-source-receipt.json",
+      "sha256": "633cfa8f18bb887249d643b7eaf249e1bfe7bd30daf572e18084574ca8ec046d"
+    }
+  },
+  "integrationRevision": "e9dcb61d8d8c40fc683ac2a67bbf15a8eb538300",
+  "nativeAuthWorldVersionQualified": true,
+  "nativeLoaderReceipt": {
+    "bytes": 2427,
+    "file": "native-loader.json",
+    "sha256": "33fee9aefde98026139c3ba059f296b958cf813d13eb1f48d7bf74c749b74a09"
+  },
+  "nativeSqlQualified": true,
+  "noticeFiles": [
+    "notices/external/lua-5.2.4/doc/readme.html",
+    "notices/source/AUTHORS",
+    "notices/source/LICENSE",
+    "notices/source/deps/SFMT/LICENSE.txt",
+    "notices/source/deps/acore/joiner/LICENSE",
+    "notices/source/deps/argon2/LICENSE",
+    "notices/source/deps/bzip2/LICENSE",
+    "notices/source/deps/fkYAML/fkYAML/node.hpp",
+    "notices/source/deps/fmt/LICENSE",
+    "notices/source/deps/g3dlite/source/license.cpp",
+    "notices/source/deps/gsoap/stdsoap2.cpp",
+    "notices/source/deps/jemalloc/COPYING",
+    "notices/source/deps/jsonpath/LICENSE.APACHE2",
+    "notices/source/deps/jsonpath/LICENSE.MIT",
+    "notices/source/deps/libmpq/AUTHORS",
+    "notices/source/deps/libmpq/COPYING",
+    "notices/source/deps/libmpq/debian/copyright",
+    "notices/source/deps/lualib/lua/CMakeLists.txt",
+    "notices/source/deps/recastnavigation/License.txt",
+    "notices/source/deps/semver_bash/LICENSE",
+    "notices/source/deps/utf8cpp/utf8.h",
+    "notices/source/deps/zlib/zlib.h",
+    "notices/source/modules/mod-account-achievements/LICENSE.md",
+    "notices/source/modules/mod-account-mounts/LICENSE",
+    "notices/source/modules/mod-account-mounts/LICENSE.md",
+    "notices/source/modules/mod-adaptive-autoattack/LICENSE",
+    "notices/source/modules/mod-aoe-loot/LICENSE",
+    "notices/source/modules/mod-better-item-reloading/LICENSE",
+    "notices/source/modules/mod-challenge-modes/LICENSE",
+    "notices/source/modules/mod-chat-transmitter/libs/nlohmann/json.hpp",
+    "notices/source/modules/mod-classless-wildcard/LICENSE",
+    "notices/source/modules/mod-congrats-on-level/LICENSE.md",
+    "notices/source/modules/mod-custom-server/LICENSE",
+    "notices/source/modules/mod-dungeon-clear/LICENSE",
+    "notices/source/modules/mod-dungeon-master/LICENSE",
+    "notices/source/modules/mod-fly-anywhere/LICENSE",
+    "notices/source/modules/mod-improved-bank/LICENSE",
+    "notices/source/modules/mod-individual-progression/LICENSE",
+    "notices/source/modules/mod-individual-xp/LICENSE",
+    "notices/source/modules/mod-item-upgrade/LICENSE",
+    "notices/source/modules/mod-loyal-steed/LICENSE",
+    "notices/source/modules/mod-mythic-plus/LICENSE",
+    "notices/source/modules/mod-nemesis-system/ClientAddon/Ace3/LICENSE.txt",
+    "notices/source/modules/mod-no-hearthstone-cooldown/LICENSE",
+    "notices/source/modules/mod-no-profession-limit/LICENSE",
+    "notices/source/modules/mod-npc-beastmaster/LICENSE.md",
+    "notices/source/modules/mod-playerbots/AUTHORS.md",
+    "notices/source/modules/mod-playerbots/LICENSE",
+    "notices/source/modules/mod-premium/LICENSE",
+    "notices/source/modules/mod-profession-experience/LICENSE",
+    "notices/source/modules/mod-reward-played-time/LICENSE",
+    "notices/source/modules/mod-reward-shop/LICENSE",
+    "notices/source/modules/mod-seasonpass/LICENSE",
+    "notices/source/modules/mod-solo-lfg/LICENSE",
+    "notices/source/modules/mod-starter-guild/LICENSE.md",
+    "notices/source/modules/mod-starting-pet/LICENSE",
+    "notices/source/modules/mod-transmog/LICENSE",
+    "notices/source/modules/mod-worgoblin-high-elf/LICENSE",
+    "notices/source/modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/Dep_LuaSrcDiet/COPYRIGHT",
+    "notices/source/modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/Dep_LuaSrcDiet/COPYRIGHT_Lua51",
+    "notices/source/modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/Dep_Smallfolk/LICENSE.md",
+    "notices/source/modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/Dep_crc32lua/COPYRIGHT",
+    "notices/source/modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/lualzw-zeros/LICENSE",
+    "notices/source/modules/mod-world-chat/LICENSE",
+    "notices/source/src/server/game/LuaEngine/LICENSE",
+    "notices/source/src/server/game/LuaEngine/extensions/StackTracePlus/LICENSE"
+  ],
+  "originalBuild": {
+    "bytes": 32521,
+    "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+  },
+  "originalModules": {
+    "bytes": 5348,
+    "sha256": "6459b6a1acab2c62c474e4c6ab3eb651daa21f697ccd628e93a38bad298bbdd1"
+  },
+  "originalNoticePackageReceipt": {
+    "bytes": 70817,
+    "file": "package-receipt.json",
+    "sha256": "6385c162579f0e04c8dcc47595bc108a1baf91ca773c9c11aa93005511914d36"
+  },
+  "originalPackageReceipt": {
+    "bytes": 34652,
+    "file": "package-receipt.json",
+    "sha256": "bb62ad200ac9be9b756616e351bf591508eedb7420f9fd39d5ea0544ae1cc548"
+  },
+  "originalProgramsArchive": {
+    "bytes": 21996594,
+    "file": "server-programs-runtime-arm64.tar.gz",
+    "sha256": "df7e0b33e4048daf780ebf31c0a7f9a10b1f74ea42f4de100ca18ed1a65b673e"
+  },
+  "originalRuntimeArchive": {
+    "bytes": 21352885,
+    "sha256": "00bd0a5829caec2a2b11d4e85bd261b67461c04e6755bb332d37d393311c6ccb"
+  },
+  "originalSourceInputs": {
+    "archive": {
+      "bytes": 18216368,
+      "file": "server-engine-source-inputs.tar.gz",
+      "sha256": "8c820a962947d2b8e2028c434ccedc969127716390f557626444d23ff8e15b99"
+    },
+    "manifest": {
+      "bytes": 1581647,
+      "sha256": "c19dda3ad0732d9b4b852cb0207432a32f877917fb2f0e9cf9075634f82678ef"
+    },
+    "receipt": {
+      "bytes": 1746751,
+      "sha256": "46a4ef82021d49699694bccab545591f3debbd6f4ab9e208c54e4796326bc03e"
+    }
+  },
+  "originalStockInputLock": {
+    "bytes": 35697,
+    "sha256": "96bd84c0d01538bb3a49f60e15a17f1f0a601833a8e7d8b21549b82075dd4cc0"
+  },
+  "playerbotsAiQualified": false,
+  "productionActivated": false,
+  "programNames": [
+    "authserver",
+    "worldserver",
+    "dbimport"
+  ],
+  "programPairs": {
+    "authserver": {
+      "debug": {
+        "bytes": 33394888,
+        "sha256": "71052571b414372ee2aacc88bb4e65d0d97f0c2eacfb617cd4b74b5bc7edc7b0"
+      },
+      "original": {
+        "bytes": 35077368,
+        "sha256": "e477158fd3b6d9301101fc6dd149280d51bb16b73250f03d9036fa6b670ac6ca"
+      },
+      "stripped": {
+        "bytes": 1709864,
+        "sha256": "04cbda982ca1385903929eb46ca52b7cb41ca222e8a48f9898af716d2b878531"
+      }
+    },
+    "dbimport": {
+      "debug": {
+        "bytes": 25310768,
+        "sha256": "06622d868130849a8b9da0f2a62fe3eeb03f8ba776c667cd14e2663a4b9ee60d"
+      },
+      "original": {
+        "bytes": 26656208,
+        "sha256": "5816e3fe9c8bdb185db037389b059299ca3a1fb3fc305c071bea4b2159c95439"
+      },
+      "stripped": {
+        "bytes": 1379920,
+        "sha256": "f452ef5c7ab90451e9060bdace1ba866a93da768145428b15ddc25a7e73b6c24"
+      }
+    },
+    "worldserver": {
+      "debug": {
+        "bytes": 2587747032,
+        "sha256": "8b408f8170bd43566db3b58b1acc8f65756283034ba1f9891c7a0cc80b68b0c2"
+      },
+      "original": {
+        "bytes": 2646753984,
+        "sha256": "664890944222b4cf4cb368a4613ceba0951efc0035570ee099afc9d47d6d3128"
+      },
+      "stripped": {
+        "bytes": 59025784,
+        "sha256": "9757f0bbb2ee159d18070d8f5fe7ecdf5b4b8b7171116198039f418d5ec13aa1"
+      }
+    }
+  },
+  "requiredServerRuntimeArchive": {
+    "bytes": 112374096,
+    "file": "server-runtime-arm64.tar.gz",
+    "sha256": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5"
+  },
+  "scope": "measured-optional-playerbots-programs-provider-inputs",
+  "serverBuildCompatibility": {
+    "base_client_build": 12340,
+    "client_class_capacity": 32,
+    "container_slots": 254,
+    "extended_limits": true,
+    "quest_log_slots": 25
+  },
+  "serverBuildSourceLock": {
+    "bytes": 2170,
+    "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+  },
+  "serverBuildSourceLockText": "{\n  \"schema\": 1,\n  \"sources\": {\n    \"client\": {\n      \"url\": \"https://github.com/Russianranger/wowdecomp_esteria.git\",\n      \"commit\": \"0f931bbade36a4b197725d691b8eff7caea7b3be\",\n      \"branch\": \"android/arm64-port\",\n      \"submodules\": {},\n      \"patches\": []\n    },\n    \"server\": {\n      \"url\": \"https://github.com/Russianranger/EsteriaWoW.git\",\n      \"commit\": \"f35f04d01689f034778e3474b3c820092f51e461\",\n      \"branch\": \"main\",\n      \"submodules\": {\n        \"src/server/game/LuaEngine\": \"58d7652138887783228b9727bd1fa4e08f00342b\"\n      },\n      \"patches\": [\n        {\n          \"path\": \"patches/server/0001-eluna-declare-area-trigger.patch\",\n          \"sha256\": \"c26b145188c5f97bf30d032e1fe3bd7fe17aa1f8f0daa6793e51f5d830fe7aa6\",\n          \"submodule\": \"src/server/game/LuaEngine\"\n        },\n        {\n          \"path\": \"patches/server/0002-eluna-include-map-manager.patch\",\n          \"sha256\": \"4e277dbe56c31ae30640c8e9ad4dee12e944e0f051d9bdc8d62aaa239c50433f\",\n          \"submodule\": \"src/server/game/LuaEngine\"\n        },\n        {\n          \"path\": \"patches/server/0003-eluna-hooks-include-types.patch\",\n          \"sha256\": \"5999402d985fcc709abdc90bb4272072d1d5e3e261b2cc7ec19460320c14295f\",\n          \"submodule\": \"src/server/game/LuaEngine\"\n        },\n        {\n          \"path\": \"patches/server/0004-attunement-stat-api.patch\",\n          \"sha256\": \"d9ef6ca8f96ab186c37c072b22143cdded9976aa3a62d083f893c502a5745cb8\"\n        },\n        {\n          \"path\": \"patches/server/0005-script-grid-templates.patch\",\n          \"sha256\": \"6b459c90839e7831df8533966442fabd476ae1773f0302c50ccc8a997f157369\"\n        },\n        {\n          \"path\": \"patches/server/0006-empty-script-modules.patch\",\n          \"sha256\": \"ea0beb357c71d8b8c187af9d4afede520e7ac9877e40fbdc5fab99d54fc21f97\"\n        },\n        {\n          \"path\": \"patches/server/0007-runtime-module-config-directory.patch\",\n          \"sha256\": \"5e41d474179ef553ec9c2544de947a3724885fd7f3ac233af3d89797acd032ff\"\n        }\n      ]\n    }\n  },\n  \"compatibility\": {\n    \"base_client_build\": 12340,\n    \"extended_limits\": true,\n    \"container_slots\": 254,\n    \"quest_log_slots\": 25,\n    \"client_class_capacity\": 32\n  }\n}\n",
+  "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
+  "serverSource": {
+    "branch": "main",
+    "commit": "f35f04d01689f034778e3474b3c820092f51e461",
+    "patches": [
+      {
+        "path": "patches/server/0001-eluna-declare-area-trigger.patch",
+        "sha256": "c26b145188c5f97bf30d032e1fe3bd7fe17aa1f8f0daa6793e51f5d830fe7aa6",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0002-eluna-include-map-manager.patch",
+        "sha256": "4e277dbe56c31ae30640c8e9ad4dee12e944e0f051d9bdc8d62aaa239c50433f",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0003-eluna-hooks-include-types.patch",
+        "sha256": "5999402d985fcc709abdc90bb4272072d1d5e3e261b2cc7ec19460320c14295f",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0004-attunement-stat-api.patch",
+        "sha256": "d9ef6ca8f96ab186c37c072b22143cdded9976aa3a62d083f893c502a5745cb8"
+      },
+      {
+        "path": "patches/server/0005-script-grid-templates.patch",
+        "sha256": "6b459c90839e7831df8533966442fabd476ae1773f0302c50ccc8a997f157369"
+      },
+      {
+        "path": "patches/server/0006-empty-script-modules.patch",
+        "sha256": "ea0beb357c71d8b8c187af9d4afede520e7ac9877e40fbdc5fab99d54fc21f97"
+      },
+      {
+        "path": "patches/server/0007-runtime-module-config-directory.patch",
+        "sha256": "5e41d474179ef553ec9c2544de947a3724885fd7f3ac233af3d89797acd032ff"
+      }
+    ],
+    "submodules": {
+      "src/server/game/LuaEngine": "58d7652138887783228b9727bd1fa4e08f00342b"
+    },
+    "url": "https://github.com/Russianranger/EsteriaWoW.git"
+  },
+  "sourceCompanionComplete": true,
+  "sourceQualification": {
+    "archive": {
+      "bytes": 24619647,
+      "sha256": "9f76881f06a7c998e0dba9d4a226c623021ed6ad8b87074aa7a861eafbb96d80"
+    },
+    "qualification": {
+      "bytes": 23757,
+      "sha256": "bcb421500351886cd9daa280e6ba75c57b6e64b689a3a7410fa7104640a58de9"
+    },
+    "receipt": {
+      "bytes": 49875,
+      "sha256": "fae08a831fb0a55d22c3ea330677671cf72045e2abe8fc229ba90494794aa4f4"
+    }
+  },
+  "state": "sealed-helper-source-and-native-sql",
+  "worldserverQualified": false
+}

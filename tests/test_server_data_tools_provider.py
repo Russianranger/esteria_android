@@ -107,4 +107,37 @@ class PendingDataToolsProvider(unittest.TestCase):
             provider.verify_reference_image({},self.pin)
 
 
+class ActualNativeReceiptAdmission(unittest.TestCase):
+    def setUp(self):
+        self.pin=provider.load_pin(sealed=True)
+        path=provider.ROOT/'runtime/evidence/server-data-tools-provider-41103915829.json'
+        retained=json.loads(path.read_text())['nativeCliReceipt']
+        self.cli=retained['receipt']
+        self.assertEqual(retained['identity'],self.pin['nativeCliReceipt'])
+
+    def test_actual_retained_native_tuple_has_five_cli_two_capabilities_and_22_no_skip_lookups(self):
+        provider.validate_native_cli(self.cli,self.pin)
+        self.assertEqual(len(self.cli['cliCases']),5)
+        self.assertEqual(len(self.cli['capabilities']),2)
+        self.assertEqual(self.cli['lookupTestsRun'],22)
+        self.assertEqual(self.cli['lookupTestsSkipped'],0)
+        self.assertFalse(self.pin['androidRuntimeQualified'])
+        self.assertFalse(self.pin['clientMpqConversionQualified'])
+
+    def test_foreign_package_modified_runtime_missing_roles_and_partial_native_results_refuse(self):
+        for kind in ('package','runtime','case','case-output','capability','lookup-count','lookup-skip','lookup-duplicate','lookup-type','gameplay'):
+            cli=copy.deepcopy(self.cli)
+            if kind=='package':cli['packageReceipt']['sha256']='0'*64
+            elif kind=='runtime':cli['shippedRuntimeFilesUnchanged']=False
+            elif kind=='case':cli['cliCases'].pop(next(iter(cli['cliCases'])))
+            elif kind=='case-output':cli['cliCases']['map-usage']['output']='unrelated program'
+            elif kind=='capability':cli['capabilities'].pop('map_extractor')
+            elif kind=='lookup-count':cli['lookupTestsRun']=0
+            elif kind=='lookup-skip':cli['lookupTestsSkipped']=1
+            elif kind=='lookup-duplicate':cli['lookupTestNames'][-1]=cli['lookupTestNames'][0]
+            elif kind=='lookup-type':cli['lookupTestsRun']=True
+            else:cli['gameplayQualified']=True
+            with self.subTest(kind=kind),self.assertRaises(ValueError):provider.validate_native_cli(cli,self.pin)
+
+
 if __name__=='__main__':unittest.main()

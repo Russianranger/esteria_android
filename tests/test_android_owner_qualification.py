@@ -16,6 +16,18 @@ class OwnerQualification(unittest.TestCase):
         for key,value in [(key,False) for key in owner.FLAGS]+[('sourceRevision','b'*40),('fingerprint','other'),('api',True),('targetSdk',28),('groupsPassed',0),('gameplayQualified',True),('appDeathQualified',True),('worldShutdownQualified',True),('characterPersistenceQualified',True)]:
             changed=copy.deepcopy(receipt); changed[key]=value
             with self.subTest(key=key),self.assertRaises(ValueError):owner.validate_receipt(changed,'a'*40,'test')
+    def test_usage_scope_and_denial_never_make_partial_totals(self):
+        receipt=dict(formatVersion=1,scope='visible-owned-native-group-members-only',sourceRevision='a'*40,fingerprint='test',abi='x86_64',api=33,targetSdk=35,diagnosticsAbiLength=5,
+            nativeOwnerUsageExecuted=True,knownReapVerified=True,unknownHandleRefused=True,immutableLogPathsVerified=True,
+            flags=4129,visibleSetStable=True,wholeGroupMembershipVerified=False,visibleMembers=3,rssMeasuredMembers=3,pssMeasuredMembers=2,cpuMeasuredMembers=3,rssBytes=300,pssBytes=None,cpuNanos=1,
+            startedMonotonicNanos=1,durationNanos=2,wholeGuestUsageQualified=False,combinedMemoryQualified=False,botPopulationQualified=False,gameplayQualified=False)
+        owner.validate_usage_receipt(receipt,'a'*40,'test')
+        for key,value in [('scope','combined-memory'),('flags',True),('visibleSetStable',False),('pssBytes',200),('rssMeasuredMembers',4),('botPopulationQualified',True),('knownReapVerified',False),('sourceRevision','b'*40)]:
+            changed=copy.deepcopy(receipt);changed[key]=value
+            with self.subTest(key=key),self.assertRaises(ValueError):owner.validate_usage_receipt(changed,'a'*40,'test')
+        receipt.update(flags=4131,visibleSetStable=False,rssBytes=None,cpuNanos=None);owner.validate_usage_receipt(receipt,'a'*40,'test')
+        receipt['rssBytes']=300
+        with self.assertRaises(ValueError):owner.validate_usage_receipt(receipt,'a'*40,'test')
     def test_apk_must_have_only_x64_owner_and_real_elf_header(self):
         with tempfile.TemporaryDirectory() as temporary:
             path=Path(temporary)/'fixture.apk'; header=bytearray(64); header[:7]=b'\x7fELF\x02\x01\x01'; struct.pack_into('<HH',header,16,3,62)

@@ -159,3 +159,30 @@ final launcher force/recreation control and quiet-phase wake heartbeat changes
 pass APK/lint25s. Independent review found/fixed lifetime cancellation of lower
 servers before client reap. No native client, Android service/activity, world,
 character save, real audio/controller or bot AI is inferred.
+
+## 2026-10-30 retained evidence and diagnostic integration
+
+`runtime/evidence/android13-components-7619-readback.json` records independently
+read evidence ZIPs for actual Android13 x64 installer/update, Surface/AudioTrack
+and native owner runs. All three now report completed/success at7619f125.
+Same-job debug signing qualifies update-safe storage, not the persistent
+production signing identity. Component fixtures do not establish game execution.
+
+`runtime/evidence/wine-adoption-python-64dd.json` records the broad modified
+worktree Python pass:1,168 checks,1,113 passed,55 explicitly skipped. The Git head
+is recorded separately from the modified sources; it is not a clean-checkout CI
+claim. Historical fixture bytes were matched to their original Git snapshot.
+
+The support integration passed `:core:check :app:assembleDebug
+:app:assembleDebugAndroidTest :app:lintDebug` with JDK17/SDK35 in41seconds,
+99 tasks. Actual filesystem selectors cover20 fixed roles, private/traversal/
+symlink rejection and interrupted/rotated logs. Bundle checks include bounded
+live log tails, no-follow final opens and SRP session key/salt/verifier redaction.
+No Android Service runtime or native ARM64 gameplay was executed by this pass.
+
+The final derived-profile/support worktree regression pass ran1,190 Python checks:
+1,135 passed,55 explicitly skipped, zero failures/errors. Source-format redaction,
+APK compilation and lint passed the focused follow-up in25seconds/56tasks.
+Exact local source/log hashes and scope are in
+`runtime/evidence/support-session-integration-host.json`; Android service/world
+execution remains unqualified.

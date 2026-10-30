@@ -1,14 +1,29 @@
 // Optional immutable server programs. Installation never launches local services.
 def serverProgramsProvider = providers.gradleProperty('serverProgramsProviderDir').orNull
-def serverProgramsPinFile = rootProject.file('runtime/server/programs-provider.lock.json')
+def serverProgramsProfile = providers.gradleProperty('serverProgramsProfile').orNull
+if (serverProgramsProfile != null && serverProgramsProfile != 'playerbots-schema-helper')
+    throw new GradleException('Unknown optional server programs profile')
+if (serverProgramsProfile != null && !serverProgramsProvider)
+    throw new GradleException('The optional helper profile requires an explicitly supplied programs provider')
+def stockProgramsPinFile = rootProject.file('runtime/server/programs-provider.lock.json')
+def stockProgramsPin = new groovy.json.JsonSlurper().parse(stockProgramsPinFile)
+def stockProgramsPinHash = java.security.MessageDigest.getInstance('SHA-256').digest(stockProgramsPinFile.bytes).encodeHex().toString()
+def serverProgramsPinFile = serverProgramsProfile ? rootProject.file('runtime/server/programs-playerbots-provider.lock.json') : stockProgramsPinFile
 def serverProgramsPin = new groovy.json.JsonSlurper().parse(serverProgramsPinFile)
 def serverProgramsPinHash = java.security.MessageDigest.getInstance('SHA-256').digest(serverProgramsPinFile.bytes).encodeHex().toString()
 android.defaultConfig.buildConfigField 'boolean', 'SERVER_PROGRAMS_PACKAGED', serverProgramsProvider ? 'true' : 'false'
 android.defaultConfig.buildConfigField 'String', 'SERVER_PROGRAMS_REVISION', '"' + serverProgramsPin.serverRevision + '"'
 android.defaultConfig.buildConfigField 'String', 'SERVER_PROGRAMS_PIN', '"' + serverProgramsPinHash + '"'
+android.defaultConfig.buildConfigField 'String', 'SERVER_PROGRAMS_STOCK_PIN', '"' + stockProgramsPinHash + '"'
+android.defaultConfig.buildConfigField 'long', 'SERVER_PROGRAMS_STOCK_ARCHIVE_BYTES', stockProgramsPin.archive.bytes.toString() + 'L'
+android.defaultConfig.buildConfigField 'String', 'SERVER_PROGRAMS_STOCK_ARCHIVE_SHA256', '"' + stockProgramsPin.archive.sha256 + '"'
 if (serverProgramsProvider) {
-    if (serverProgramsPin.state != 'sealed-source-and-native-loader' || serverProgramsPin.sourceCompanionComplete != true ||
-        serverProgramsPin.sourceQualification == null)
+    if ((!serverProgramsProfile && serverProgramsPin.state != 'sealed-source-and-native-loader') ||
+        (serverProgramsProfile && (serverProgramsPin.state != 'sealed-helper-source-and-native-sql' ||
+            serverProgramsPin.scope != 'measured-optional-playerbots-programs-provider-inputs' ||
+            serverProgramsPin.helperSourceCompanionComplete != true || serverProgramsPin.nativeSqlQualified != true ||
+            serverProgramsPin.originalStockInputLock.sha256 != stockProgramsPinHash || serverProgramsPin.originalProgramsArchive != stockProgramsPin.archive)) ||
+        serverProgramsPin.sourceCompanionComplete != true || serverProgramsPin.sourceQualification == null)
         throw new GradleException('Server programs require the actual pinned complete-source rebuild receipt; current provider is unsealed')
     if (providers.gradleProperty('nativeBridgeAbi').getOrElse('arm64-v8a') != 'arm64-v8a' ||
         providers.gradleProperty('presentationEmulatorTest').getOrElse('false') == 'true' ||
@@ -21,7 +36,27 @@ if (serverProgramsProvider) {
     android.androidResources.noCompress += ['archive']
     def verifyServerPrograms = tasks.register('verifyServerProgramsProvider', Exec) {
         workingDir rootProject.projectDir
-        commandLine 'python3', 'tools/provider_server_programs.py', 'verify', '--provider', provider.absolutePath
+        commandLine 'python3', serverProgramsProfile ? 'tools/provider_playerbots_programs.py' : 'tools/provider_server_programs.py',
+            'verify', '--provider', provider.absolutePath
     }
     tasks.named('preBuild').configure { dependsOn verifyServerPrograms }
+}
+
+// Decoded descriptor guards run against production validation on a bounded host
+// heap. These fixtures neither replace Android JSON nor execute packaged files.
+def programsProfileClasspath = files(providers.provider { android.bootClasspath },
+    providers.provider { tasks.named('compileDebugJavaWithJavac').get().destinationDirectory.get().asFile },
+    project(':core').layout.buildDirectory.dir('classes/java/main'))
+def compileProgramsProfile = tasks.register('compileServerProgramsProfileFixture', JavaCompile) {
+    dependsOn 'compileDebugJavaWithJavac', ':core:classes'
+    source file('src/test/java/io/github/russianranger/esteria/runtime/ServerProgramsProfileTests.java')
+    classpath = programsProfileClasspath
+    destinationDirectory = layout.buildDirectory.dir('serverProgramsProfileFixture')
+    sourceCompatibility = '17'; targetCompatibility = '17'
+}
+tasks.register('serverProgramsProfileTest', JavaExec) {
+    dependsOn compileProgramsProfile
+    classpath = files(compileProgramsProfile.flatMap { it.destinationDirectory }) + programsProfileClasspath
+    mainClass = 'io.github.russianranger.esteria.runtime.ServerProgramsProfileTests'
+    maxHeapSize = '32m'
 }

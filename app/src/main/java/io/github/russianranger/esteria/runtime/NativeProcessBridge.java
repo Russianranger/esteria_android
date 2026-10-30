@@ -1,6 +1,7 @@
 package io.github.russianranger.esteria.runtime;
 
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
+import io.github.russianranger.esteria.core.runtime.process.ProcessUsageSnapshot;
 import java.io.IOException;
 
 /** JNI process ownership only. Runtime selection belongs to ProotProcess. */
@@ -18,6 +19,8 @@ final class NativeProcessBridge implements OwnedProcess.Backend {
     @Override public native int waitFor(long handle,long timeoutMillis) throws IOException;
     @Override public native int terminate(long handle) throws IOException;
     @Override public native long[] diagnostics(long handle) throws IOException;
+    @Override public ProcessUsageSnapshot usage(long handle)throws IOException {return ProcessUsageSnapshot.fromNative(usageNative(handle));}
+    private native long[] usageNative(long handle)throws IOException;
     @Override public native boolean writeInput(long handle,byte[] bytes,long timeoutMillis) throws IOException;
     @Override public native void closeInput(long handle) throws IOException;
 }

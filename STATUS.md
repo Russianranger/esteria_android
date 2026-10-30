@@ -2,6 +2,39 @@
 
 Updated 2026-10-30 UTC. Development continues; no Thor test candidate is ready.
 
+## Latest integration results
+
+The selected Wine cohort and original stock server profile pass the actual
+coherent ARM64 APK workflow41100858610 at7619f125. GitHub now confirms completed/
+success after initially delayed status metadata. Independent local readback
+checks the entire327,793,102-byte APK, all127 APK entries and all eight runtime
+archives; this remains an internal installation profile without composed data
+tools or the bot helper, and is not a Thor candidate.
+
+Android13 x64 runs41100859160/41100863613/41100855901 pass actual update-safe
+installer, Surface/AudioTrack and native process-owner component checks. The
+retained small evidence ZIPs were independently verified. No complete Android
+client/server session, ARM64 device, Adreno or gameplay result is claimed.
+
+The ordered four-tool provider now has actual native CLI/capability and22 reader
+checks in41103915829, plus complete source/debug/runtime readback and real32MiB
+Java fresh/cache installation. Its measured provider is being integrated into
+the complete game profile alongside the separately source-sealed, SQL-qualified
+playerbots schema helper. The original three server programs remain unchanged.
+
+Owned process usage sampling and fixed support-log selection are implemented.
+Usage covers only visible members of one owned native process group; detached
+PRoot tracees and combined client/server bot budgets remain unqualified. Support
+export now retains fixed setup/game stream paths across service recreation,
+excludes configuration/private engine captures and redacts SRP secrets. Core,
+APK, AndroidTest compilation and lint pass locally (99 tasks,41seconds).
+
+The next gate is one coherent APK with composed data4 and helper-augmented
+programs, actual provider/Java installation checks, followed by imported-data
+preparation and full session qualification. Base12340 MPQs and current matched
+custom data remain unavailable here. Development continues; no preliminary Thor
+APK is being requested.
+
 ## Exact inputs and architecture
 
 Application `sources.lock.json` pins reconstructed client
@@ -192,3 +225,10 @@ pins now select c0e with the opt-in private PE mapping profile. Ordered complete
 sources41097592284 pass full5675member readback; its immutable input lock stays
 b82. Derived four-tool native CLI and helper-augmented provider construction
 remain pending; no source/runtime identity was guessed.
+
+The final derived-profile/support worktree regression pass ran1,190 Python checks:
+1,135 passed,55 explicitly skipped, zero failures/errors. Source-format redaction,
+APK compilation and lint passed the focused follow-up in25seconds/56tasks.
+Exact local source/log hashes and scope are in
+`runtime/evidence/support-session-integration-host.json`; Android service/world
+execution remains unqualified.

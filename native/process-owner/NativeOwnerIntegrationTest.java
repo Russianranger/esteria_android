@@ -105,7 +105,8 @@ public final class NativeOwnerIntegrationTest {
             catch (IOException expected) { }
             System.out.println("PASS PRoot argv, explicit environment and persistent/runtime separation");
             check(NativeOwnerInputTests.run(backend,root)==4,"Input groups incomplete");
-            System.out.println("Native JVM integration: 12 groups passed; Linux host only, not Android or guest execution");
+            check(NativeOwnerUsageTests.run(backend,root)==3,"Usage groups incomplete");
+            System.out.println("Native JVM integration: 15 groups passed; Linux host only, not Android or guest execution");
         } finally {
             try (var paths=Files.walk(root)) { for (Path path:paths.sorted(java.util.Comparator.reverseOrder()).toList()) Files.delete(path); }
         }

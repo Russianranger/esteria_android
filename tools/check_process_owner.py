@@ -25,17 +25,19 @@ def main() -> None:
     source=ROOT/"native/process-owner"
     with tempfile.TemporaryDirectory(prefix="esteria-owner-check-") as directory:
         build=Path(directory)
-        run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pthread",str(source/"process_owner.cpp"),str(source/"process_owner_test.cpp"),"-o",str(build/"owner-test")])
+        run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pthread",str(source/"process_owner.cpp"),str(source/"process_usage.cpp"),str(source/"process_owner_test.cpp"),"-o",str(build/"owner-test")])
         run([str(build/"owner-test")],timeout=60)
+        run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pthread","-DESTERIA_USAGE_TESTING",str(source/"process_owner.cpp"),str(source/"process_usage.cpp"),str(source/"process_usage_test.cpp"),"-o",str(build/"usage-test")])
+        run([str(build/"usage-test")],timeout=30)
         run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-fPIC","-shared","-pthread","-fvisibility=hidden",
-            "-I"+str(java/"include"),"-I"+str(java/"include/linux"),str(source/"process_owner.cpp"),str(source/"jni_bridge.cpp"),"-o",str(build/"libesteria_process.so")])
+            "-I"+str(java/"include"),"-I"+str(java/"include/linux"),str(source/"process_owner.cpp"),str(source/"process_usage.cpp"),str(source/"jni_bridge.cpp"),"-o",str(build/"libesteria_process.so")])
         classes=build/"classes"; classes.mkdir()
         core=ROOT/"core/src/main/java/io/github/russianranger/esteria/core/runtime"
-        run([str(java/"bin/javac"),"-d",str(classes),str(core/"SessionSupervisor.java"),str(core/"process/OwnedProcess.java"),str(core/"process/ProotLaunch.java"),str(core/"process/WorldConsoleShutdown.java"),
-            str(ROOT/"app/src/main/java/io/github/russianranger/esteria/runtime/NativeProcessBridge.java"),str(source/"NativeOwnerIntegrationTest.java"),str(source/"NativeOwnerInputTests.java")])
+        run([str(java/"bin/javac"),"-d",str(classes),str(core/"SessionSupervisor.java"),str(core/"process/OwnedProcess.java"),str(core/"process/ProcessUsageSnapshot.java"),str(core/"process/ProotLaunch.java"),str(core/"process/WorldConsoleShutdown.java"),
+            str(ROOT/"app/src/main/java/io/github/russianranger/esteria/runtime/NativeProcessBridge.java"),str(source/"NativeOwnerIntegrationTest.java"),str(source/"NativeOwnerInputTests.java"),str(source/"NativeOwnerUsageTests.java")])
         run([str(java/"bin/java"),"-Xmx64m","-Djava.library.path="+str(build),"-cp",str(classes),"io.github.russianranger.esteria.runtime.NativeOwnerIntegrationTest"],timeout=60)
     receipt={"formatVersion":1,"scope":"linux-native-owner-and-jni","hostArchitecture":platform.machine(),
-        "nativeOwnerPassed":True,"jvmIntegrationGroups":12,"interactiveInputQualified":True,
+        "nativeOwnerPassed":True,"jvmIntegrationGroups":15,"interactiveInputQualified":True,"groupUsageApiExecuted":True,"wholeGuestUsageQualified":False,
         "worldShutdownQualified":False,"characterPersistenceQualified":False,"androidCrossBuilt":False,"androidExecuted":False,"guestExecuted":False,"gameplayQualified":False}
     if args.ndk:
         if "Pkg.Revision = 28.2.13676358" not in (args.ndk/"source.properties").read_text():
@@ -44,7 +46,7 @@ def main() -> None:
         compiler=args.ndk/"toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android26-clang++"
         library=output/"libesteria_process.so"
         run([str(compiler),"-std=c++17","-Wall","-Wextra","-Werror","-fPIC","-shared","-static-libstdc++","-fvisibility=hidden",
-            "-Wl,-z,max-page-size=16384","-Wl,-z,noexecstack",str(source/"process_owner.cpp"),str(source/"jni_bridge.cpp"),"-o",str(library)])
+            "-Wl,-z,max-page-size=16384","-Wl,-z,noexecstack",str(source/"process_owner.cpp"),str(source/"process_usage.cpp"),str(source/"jni_bridge.cpp"),"-o",str(library)])
         receipt.update(androidCrossBuilt=True,androidLibrarySha256=hashlib.sha256(library.read_bytes()).hexdigest(),androidLibraryBytes=library.stat().st_size)
     inputs=list(source.iterdir())+list((core/"process").glob("*.java"))+[core/"SessionSupervisor.java",
         ROOT/"app/src/main/java/io/github/russianranger/esteria/runtime/NativeProcessBridge.java",Path(__file__).resolve()]

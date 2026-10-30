@@ -130,3 +130,12 @@ tasks.register('serverDataToolSelectionTest', JavaExec) {
     maxHeapSize = '32m'
 }
 check.dependsOn serverDataToolSelectionTest
+
+// Metadata-only persistence for the fixed owned support-log roles.
+tasks.register('supportLogSelectionTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.diagnostics.SupportLogSelectionTests'
+    maxHeapSize = '32m'
+}
+check.dependsOn supportLogSelectionTest

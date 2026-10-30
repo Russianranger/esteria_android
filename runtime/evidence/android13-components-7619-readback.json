@@ -1,0 +1,466 @@
+{
+  "arm64AndroidExecuted": false,
+  "formatVersion": 1,
+  "gameSessionExecuted": false,
+  "gameplayQualified": false,
+  "notes": [
+    "Workflow API previously lagged retained completed-job artifacts; all three now report completed/success at the exact source revision.",
+    "Only small evidence ZIPs were independently read here. APK identities are retained qualification receipts, not independent local APK-byte checks.",
+    "Installer checks same-job debug-key update preservation; persistent user signing identity remains a separate gate."
+  ],
+  "observedDateUtc": "2026-10-30",
+  "results": {
+    "installer": {
+      "allZipMembersReadBackLocally": true,
+      "apkBytesReadBackLocally": false,
+      "artifactId": 12999491738,
+      "artifactZip": {
+        "bytes": 9609,
+        "sha256": "53708b06e3698ebfb5a6de66532842685cbcd59a27f65e47133be30cfd822df9"
+      },
+      "members": {
+        "actualBundledHelpersInstallAndRepeatWithoutRewriting.log": {
+          "bytes": 865,
+          "sha256": "253cbed8bb755395306bb44ae85a2d74055ee1ad012916a000a0f894f7087e0b"
+        },
+        "changedExistingHelperIsPreservedAndRefused.log": {
+          "bytes": 845,
+          "sha256": "6d6a179373a2aea3c1ac37773e49b8a4d601d18ffa596e1b822424c5495ee658"
+        },
+        "completeDataHelperClosureInstallsAndReusesExactBytes.log": {
+          "bytes": 850,
+          "sha256": "5a9841d971a2f7bb0052fbeb086429508a64fe3ad591a1d21d3508dfe0d872c7"
+        },
+        "completeInstallationHelperClosureInstallsAndReusesExactBytes.log": {
+          "bytes": 890,
+          "sha256": "6378a1e334c68a46057ec938347b9a6a6044f2d5c664452ff8da11143167c7e5"
+        },
+        "completeSessionHelperClosureInstallsAndReusesExactBytes.log": {
+          "bytes": 865,
+          "sha256": "816eae6377fb2379b934737b6f9b18d10d7494e98da27792e4cacd4070da0bb9"
+        },
+        "expectedHelperSymlinkNeverReplacesOrWritesItsTarget.log": {
+          "bytes": 863,
+          "sha256": "add51e6dfb44af670408afba7d713314e672e1cd78b1ceefa5dca0eca8ed8c8f"
+        },
+        "extraModulesNativeExtensionsAndCachesCannotEnterImportPath.log": {
+          "bytes": 877,
+          "sha256": "9e8b6961912847cf4b322a6155611301e352c1e28bcc5e55d859faa9552cc46a"
+        },
+        "install-initial.log": {
+          "bytes": 36,
+          "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+        },
+        "install-tests.log": {
+          "bytes": 36,
+          "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+        },
+        "install-update-preserving-data.log": {
+          "bytes": 36,
+          "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+        },
+        "linkedResourceDirectoryIsPreservedAndRefused.log": {
+          "bytes": 840,
+          "sha256": "1af55b0f03ccc06d8cb1b66a64e3bec1b1e390bab96739b1c4a59e12bad13ba6"
+        },
+        "nestedOriginalSourcesInstallAndResumeWithoutRewriting.log": {
+          "bytes": 858,
+          "sha256": "612ff0d2f5e8d3d21f54d59b5a899669b2b7a504a909ea671aa8fbd36b3350b0"
+        },
+        "partialGenerationResumesAndRetainsHarmlessInterruptedWrite.log": {
+          "bytes": 877,
+          "sha256": "e3a6414cd5ef6f1d8dc072e8598871e0b7f8340bed331d79b633493e5c21483b"
+        },
+        "preexisting-package.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "privateDataMetadataBindingRejectsChangedAncestryAndQualificationClaims.log": {
+          "bytes": 894,
+          "sha256": "0c6e303aaa98a97844be27aa7c5f989e6b8e1409bf485ce800beed1fef91be82"
+        },
+        "privateLocalLoginHandoffContracts.log": {
+          "bytes": 988,
+          "sha256": "07609712331640cb7a5f06a7faa460df43b48df14c675868946a5c3c977df9b2"
+        },
+        "qualification.json": {
+          "bytes": 1787,
+          "sha256": "51fc0d6c444dab97c99dc28c5a076e722e0aefcae3135408bca6968af4e6794d"
+        },
+        "ro.build.fingerprint.log": {
+          "bytes": 81,
+          "sha256": "74f45a5b5c9c2e0e9fe31b30e7fecac3d7eed0ec13131a36513c9da0e27ee79d"
+        },
+        "ro.build.version.sdk.log": {
+          "bytes": 3,
+          "sha256": "19b8d5c59e421f037fe563007c7254eb8d98bc221b278c3db3e5fdbbfd52e273"
+        },
+        "ro.kernel.qemu.log": {
+          "bytes": 2,
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+        },
+        "ro.product.cpu.abi.log": {
+          "bytes": 7,
+          "sha256": "aaf631698ae5160ceb04a97681a14887fdcab47cd6e0f163c87485b3b1340b62"
+        },
+        "runtimeContracts.log": {
+          "bytes": 949,
+          "sha256": "f92fa6a0535e1259f84987b29bcb5cf27f786ea3880e37b2bc583c8712900746"
+        },
+        "seedBeforeUpdate.log": {
+          "bytes": 862,
+          "sha256": "64d9268a1a284db92d2dd79bf5b64c47da488dcc775f28be44af43d872091856"
+        },
+        "serial.log": {
+          "bytes": 14,
+          "sha256": "0115c661660f4cd9f62719a1c0f968c833c3295da9713cc8b6d915f739be272e"
+        },
+        "temporarySymlinkDoesNotBypassClosure.log": {
+          "bytes": 833,
+          "sha256": "b4e63a7802250fde8539a44ad4d6b88d3a7f814c3ba40362a1ae8cdddaf93eea"
+        },
+        "unexpectedNestedModuleIsPreservedAndRefused.log": {
+          "bytes": 838,
+          "sha256": "cad61f7620d4073281050c7ccd8377b5659b40ea624d127909ca620bc3a19ae3"
+        },
+        "verifyAfterUpdate.log": {
+          "bytes": 863,
+          "sha256": "6df20d26afadfe8b93fd3111cbf09b366d803979a0cfc79afa3e8298c5598b6b"
+        }
+      },
+      "qualification": {
+        "arm64GuestExecuted": false,
+        "artifacts": {
+          "initialApk": {
+            "bytes": 704359,
+            "sha256": "8b7f5e58359d87b4845fae16b0de40188ae611910d109e802e4827af720504ad"
+          },
+          "testApk": {
+            "bytes": 1751549,
+            "sha256": "a34d9f0fe02a056ae364bb824c37866b2bf89cb70652cd4c479f8e14d6551047"
+          },
+          "updateApk": {
+            "bytes": 704379,
+            "sha256": "053a43d3523a61182ea6c0f97b78e9b5ad611a49167d8240415cac7c143121ef"
+          }
+        },
+        "authWorldSessionExecuted": false,
+        "clientLoginExecuted": false,
+        "completedAtUnix": 1793382372,
+        "dataHelperAssetFiles": 5,
+        "dataHelperAssetsQualified": true,
+        "dataPreparationExecuted": false,
+        "databaseHelperAssetContractGroups": 6,
+        "databaseHelperAssetsQualified": true,
+        "databaseServiceExecuted": false,
+        "emulatorProperties": {
+          "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+          "ro.build.version.sdk": "33",
+          "ro.kernel.qemu": "1",
+          "ro.product.cpu.abi": "x86_64"
+        },
+        "formatVersion": 1,
+        "gameplayQualified": false,
+        "handoffHardLinkCreationPermitted": false,
+        "handoffMultiLinkNegativeExecuted": false,
+        "installationHelperAssetFiles": 18,
+        "installationHelperAssetsQualified": true,
+        "installationSetupExecuted": false,
+        "privateDataMetadataBindingQualified": true,
+        "privateLocalLoginHandoffFilesystemQualified": true,
+        "runtimeContractGroups": 19,
+        "runtimeFilesystemQualified": true,
+        "sameJobDebugKeyUpdatePreservedRuntimeAndSentinel": true,
+        "schemaHelperAssetContractGroups": 3,
+        "schemaHelperAssetsQualified": true,
+        "schemaSqlExecuted": false,
+        "scope": "android-13-x86_64-installer-and-apk-update",
+        "sessionHelperAssetFiles": 23,
+        "sessionHelperAssetsQualified": true,
+        "userSigningIdentityQualified": false
+      },
+      "runId": 41100859160,
+      "runUrl": "https://github.com/Russianranger/esteria_android/actions/runs/41100859160",
+      "sourceRevision": "7619f1253afb69c30caab86201aa0751b72f11ba",
+      "statusConflictPreviouslyObserved": true,
+      "workflowCompletionConfirmed": true,
+      "workflowConclusionObserved": "success",
+      "workflowStatusObserved": "completed"
+    },
+    "native-owner": {
+      "allZipMembersReadBackLocally": true,
+      "apkBytesReadBackLocally": false,
+      "artifactId": 12997907693,
+      "artifactZip": {
+        "bytes": 44556,
+        "sha256": "7e7ea43e7d5d928d52e97d31e2ade340a3ea6e6c9e9ee9d9ed518d8b897f9828"
+      },
+      "members": {
+        "app-receipt.log": {
+          "bytes": 1009,
+          "sha256": "27bb816aa3fc643126c19ec0bb8287fa03d0e60ffb9b26bdfe8f9b8c251c594c"
+        },
+        "bounded-logcat.log": {
+          "bytes": 232512,
+          "sha256": "0570fbac0cdf94318e528b078c2b4cf5256f2c3028b476be7a7d596a92840425"
+        },
+        "install-app.log": {
+          "bytes": 36,
+          "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+        },
+        "install-tests.log": {
+          "bytes": 36,
+          "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+        },
+        "native-owner-contracts.log": {
+          "bytes": 804,
+          "sha256": "f560143ab5dd89b3554ec2b6bb8efc53ceb396e7e90b8663bbcf15c04b899270"
+        },
+        "preexisting.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "qualification.json": {
+          "bytes": 1980,
+          "sha256": "2e482ac903345cb96f277247f8ee3811cd278e3bdf49dc8c9b701c551a190a4c"
+        },
+        "ro.build.fingerprint.log": {
+          "bytes": 81,
+          "sha256": "74f45a5b5c9c2e0e9fe31b30e7fecac3d7eed0ec13131a36513c9da0e27ee79d"
+        },
+        "ro.build.version.sdk.log": {
+          "bytes": 3,
+          "sha256": "19b8d5c59e421f037fe563007c7254eb8d98bc221b278c3db3e5fdbbfd52e273"
+        },
+        "ro.kernel.qemu.log": {
+          "bytes": 2,
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+        },
+        "ro.product.cpu.abi.log": {
+          "bytes": 7,
+          "sha256": "aaf631698ae5160ceb04a97681a14887fdcab47cd6e0f163c87485b3b1340b62"
+        },
+        "serial.log": {
+          "bytes": 14,
+          "sha256": "0115c661660f4cd9f62719a1c0f968c833c3295da9713cc8b6d915f739be272e"
+        },
+        "stop-owned-test-app.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "qualification": {
+        "androidNativeOwnerQualified": true,
+        "androidProotExecuted": false,
+        "apk": {
+          "bytes": 1036801,
+          "sha256": "646d9c2cab452203fa131d1c77b6fd9814e56ff98d44c89ccfb461f9d02d4f56"
+        },
+        "appDeathQualified": false,
+        "appEvidence": {
+          "abi": "x86_64",
+          "androidProotExecuted": false,
+          "api": 33,
+          "appDeathQualified": false,
+          "arm64GuestExecuted": false,
+          "bothPipeBoundsVerified": true,
+          "characterPersistenceQualified": false,
+          "consoleCommandFixtureVerified": true,
+          "creatorThreadLifetimeVerified": true,
+          "failedExecRejected": true,
+          "fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+          "forcedAndFailedRequestVisible": true,
+          "formatVersion": 1,
+          "gameplayQualified": false,
+          "gracefulFixtureVerified": true,
+          "groupsPassed": 9,
+          "interactiveBackpressureAndCloseVerified": true,
+          "interactiveBinaryEofVerified": true,
+          "interactiveEpipeVerified": true,
+          "logReadBytesPerPipe": 9000000,
+          "logStoredBytesPerPipe": 8388608,
+          "nativeOwnerExecuted": true,
+          "scope": "android-13-x86_64-native-owner-system-shell",
+          "sourceRevision": "7619f1253afb69c30caab86201aa0751b72f11ba",
+          "targetSdk": 35,
+          "unicodeAndExitVerified": true,
+          "worldShutdownQualified": false
+        },
+        "arm64GuestExecuted": false,
+        "characterPersistenceQualified": false,
+        "completedAtUnix": 1793382366,
+        "emulatorProperties": {
+          "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+          "ro.build.version.sdk": "33",
+          "ro.kernel.qemu": "1",
+          "ro.product.cpu.abi": "x86_64"
+        },
+        "formatVersion": 1,
+        "gameplayQualified": false,
+        "scope": "android-13-x86_64-native-owner-system-shell",
+        "sourceRevision": "7619f1253afb69c30caab86201aa0751b72f11ba",
+        "testApk": {
+          "bytes": 1751549,
+          "sha256": "6f0d5526f802ecc25a7177c3057bbbae30f5a5c6feed93945e8ac5cd6dd1377b"
+        },
+        "worldShutdownQualified": false
+      },
+      "runId": 41100855901,
+      "runUrl": "https://github.com/Russianranger/esteria_android/actions/runs/41100855901",
+      "sourceRevision": "7619f1253afb69c30caab86201aa0751b72f11ba",
+      "statusConflictPreviouslyObserved": true,
+      "workflowCompletionConfirmed": true,
+      "workflowConclusionObserved": "success",
+      "workflowStatusObserved": "completed"
+    },
+    "presentation": {
+      "allZipMembersReadBackLocally": true,
+      "apkBytesReadBackLocally": false,
+      "artifactId": 12998248051,
+      "artifactZip": {
+        "bytes": 47756,
+        "sha256": "89fbfdcb4fe9d62a4560a42a53a8c70859e5546a12bb5776fcd60f247336370f"
+      },
+      "members": {
+        "app-receipt.log": {
+          "bytes": 1268,
+          "sha256": "f48bb83b1ac4808a91c32615b9e45e6f803ad3424b090c6676c76837343e2a18"
+        },
+        "bounded-logcat.log": {
+          "bytes": 251212,
+          "sha256": "02235d6e543d4cd5bc723f06edc0f248390f76332de5ebafe7bb0b7361c7abef"
+        },
+        "grant-fixture-notification-permission.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "install-app.log": {
+          "bytes": 36,
+          "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+        },
+        "install-tests.log": {
+          "bytes": 36,
+          "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+        },
+        "preexisting.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "presentation-audio-contracts.log": {
+          "bytes": 834,
+          "sha256": "d1271046e25d9698bc87e16bd5ef8abbe919534f2c70d0058bb691ddeb9f1099"
+        },
+        "qualification.json": {
+          "bytes": 2608,
+          "sha256": "d224121b77155de73110fc99b93128debb0075b307790c4fd33b07eef4958439"
+        },
+        "ro.build.fingerprint.log": {
+          "bytes": 81,
+          "sha256": "74f45a5b5c9c2e0e9fe31b30e7fecac3d7eed0ec13131a36513c9da0e27ee79d"
+        },
+        "ro.build.version.sdk.log": {
+          "bytes": 3,
+          "sha256": "19b8d5c59e421f037fe563007c7254eb8d98bc221b278c3db3e5fdbbfd52e273"
+        },
+        "ro.kernel.qemu.log": {
+          "bytes": 2,
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+        },
+        "ro.product.cpu.abi.log": {
+          "bytes": 7,
+          "sha256": "aaf631698ae5160ceb04a97681a14887fdcab47cd6e0f163c87485b3b1340b62"
+        },
+        "serial.log": {
+          "bytes": 14,
+          "sha256": "0115c661660f4cd9f62719a1c0f968c833c3295da9713cc8b6d915f739be272e"
+        },
+        "stop-owned-test-app.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "qualification": {
+        "adrenoQualified": false,
+        "androidEmulatorSurfaceAudioQualified": true,
+        "androidWineExecuted": false,
+        "apk": {
+          "bytes": 1040372,
+          "native": {
+            "lib/x86_64/libesteria-presentation.so": {
+              "bytes": 8056,
+              "sha256": "254ec807ca6c93a4eceaf4ce74f2d831aae120a24b2d0a903997149c62d8fd2c"
+            },
+            "lib/x86_64/libesteria_process.so": {
+              "bytes": 472720,
+              "sha256": "e657f195b052b9fda5adb7415e0a2752dd901ef6e9bbc4963d93c36be54f4920"
+            }
+          },
+          "sha256": "2757edd2ef914e11981b303b121a86a0425d59ebcf6bf7e3d828de781537dc4b"
+        },
+        "appEvidence": {
+          "abi": "x86_64",
+          "adrenoQualified": false,
+          "androidWineExecuted": false,
+          "api": 33,
+          "arm64GuestExecuted": false,
+          "audibleOutputQualified": false,
+          "audioActivePeerShutdownVerified": true,
+          "audioInvalidHandshakeRecovered": true,
+          "audioResetVerified": true,
+          "audioTrackAcceptedFrames": 4992,
+          "audioTrackPlayedFrames": 4992,
+          "fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+          "formatVersion": 1,
+          "gameplayQualified": false,
+          "groupsPassed": 6,
+          "invalidFrameRejected": true,
+          "nativeSurfaceExecuted": true,
+          "pausedSurfaceCreationBlocked": true,
+          "pausedSurfaceRecreationBlocked": true,
+          "privateChildSymlinkRejected": true,
+          "privateRootAliasVerified": true,
+          "privateSocketCleanupVerified": true,
+          "rgbaReadbackVerified": true,
+          "scope": "android-13-x86_64-surface-audiotrack-protocol-fixtures",
+          "sourceRevision": "7619f1253afb69c30caab86201aa0751b72f11ba",
+          "surfaceLifecycleCleanupVerified": true,
+          "surfaceLifecycleConnections": 2,
+          "surfaceLifecyclePeerEofs": 2,
+          "surfacePausePeerEofVerified": true,
+          "surfaceRecreationVerified": true,
+          "surfaceResumeFrameVerified": true,
+          "surfaceResumeIdempotentVerified": true,
+          "targetSdk": 35,
+          "x11GuestExecuted": false
+        },
+        "arm64GuestExecuted": false,
+        "audibleOutputQualified": false,
+        "completedAtUnix": 1793382333,
+        "emulatorProperties": {
+          "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+          "ro.build.version.sdk": "33",
+          "ro.kernel.qemu": "1",
+          "ro.product.cpu.abi": "x86_64"
+        },
+        "formatVersion": 1,
+        "gameplayQualified": false,
+        "scope": "android-13-x86_64-surface-audiotrack-protocol-fixtures",
+        "sourceRevision": "7619f1253afb69c30caab86201aa0751b72f11ba",
+        "testApk": {
+          "bytes": 1751857,
+          "sha256": "d8947544d893481c3d203f1611accc0b1e618935e816ae09e6211395c2c5903c"
+        },
+        "x11GuestExecuted": false
+      },
+      "runId": 41100863613,
+      "runUrl": "https://github.com/Russianranger/esteria_android/actions/runs/41100863613",
+      "sourceRevision": "7619f1253afb69c30caab86201aa0751b72f11ba",
+      "statusConflictPreviouslyObserved": true,
+      "workflowCompletionConfirmed": true,
+      "workflowConclusionObserved": "success",
+      "workflowStatusObserved": "completed"
+    }
+  },
+  "scope": "retained-android13-x86_64-component-evidence-readback",
+  "thorExecuted": false
+}

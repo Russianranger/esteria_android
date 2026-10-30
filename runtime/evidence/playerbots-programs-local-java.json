@@ -1,0 +1,61 @@
+{
+  "actualArchiveInstallAndCachedReuse": {
+    "androidRuntimeQualified": false,
+    "cachedArchiveRequired": false,
+    "cachedCopiedBytes": 0,
+    "entries": 131,
+    "fileBytes": 92638681,
+    "firstCopiedBytes": 92638681,
+    "gameplayQualified": false,
+    "generation": "d7a76adec6bf2c04fbfc954901cf8d647c822d37f8665d3ed33c1bdd47686810",
+    "packageKey": "server-programs-arm64",
+    "scope": "host-java-exact-server-archive-install-and-cached-reuse"
+  },
+  "androidGuestExecuted": false,
+  "androidInstrumentationExecuted": false,
+  "androidRuntimeQualified": false,
+  "apkBuiltHere": false,
+  "archive": {
+    "bytes": 30730491,
+    "file": "server-programs-runtime-arm64.tar.gz",
+    "sha256": "963a23c1390440260b85ffe164b2d7508c56b005b315dce8a919ae443a46d1bf"
+  },
+  "compilerExecuted": false,
+  "descriptor": {
+    "bytes": 32063,
+    "sha256": "54c661716ee316755806d235b5042cc071e5618e6cd0dc23243ff80351429de2"
+  },
+  "exactRuntimeCandidateReadback": true,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "helperExecuted": false,
+  "helperSourceAnchor": {
+    "bytes": 5835,
+    "sha256": "ff2d3186f242977df700a4fa399a001f9ff881f0da27d85652cdf9c116654eb8"
+  },
+  "hostArchitecture": "x86_64",
+  "inputLock": {
+    "bytes": 38585,
+    "sha256": "71dd8aff3b51348aec0439c4621cd7f153c5d9a1046b65d219b0310edca4254d"
+  },
+  "installerSource": {
+    "bytes": 38016,
+    "sha256": "843968c15b088b501df93db1a395c6e392175f9589ad9250364583ef31b05723"
+  },
+  "javaManifest": {
+    "bytes": 15952,
+    "sha256": "81e3539e66d486d5f89ff1aa82810b832c330b6d94ed8eae8446b34f26c4de90"
+  },
+  "javaReferenceSource": {
+    "bytes": 3166,
+    "sha256": "e8e17307fcda60b1513537e5edac0af34e053604e01806cca7439b5bb98d09c9"
+  },
+  "maximumJavaHeapBytes": 33554432,
+  "optionalProviderFactoryExecuted": false,
+  "originalProviderAdmissionGuardPreserved": true,
+  "originalStockSourceAndPairedDebugReverifiedHere": false,
+  "playerbotsAiQualified": false,
+  "scope": "local-host-java-only-measured-playerbots-programs-archive-install",
+  "sqlExecuted": false,
+  "worldserverQualified": false
+}

@@ -6,6 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import io.github.russianranger.esteria.BuildConfig;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
+import io.github.russianranger.esteria.core.runtime.process.ProcessUsageSnapshot;
 import io.github.russianranger.esteria.core.runtime.process.WorldConsoleShutdown;
 import java.io.File;
 import java.io.IOException;
@@ -151,4 +152,43 @@ public final class NativeProcessOwnershipTest {
             }
         }
     }
+    /** System processes only. Denials/null metrics remain visible observations,
+     * not whole-guest/combined-resource or bot-population qualification. */
+    @Test public void ownedGroupUsageObservation()throws Exception {
+        Context context=InstrumentationRegistry.getInstrumentation().getTargetContext();
+        assertEquals(33,Build.VERSION.SDK_INT);assertEquals(35,context.getApplicationInfo().targetSdkVersion);
+        assertTrue(Arrays.asList(Build.SUPPORTED_ABIS).contains("x86_64"));assertFalse(BuildConfig.PROOT_PACKAGED);
+        Path root=Files.createTempDirectory(context.getFilesDir().toPath(),"native-usage-");NativeProcessBridge backend=new NativeProcessBridge();
+        OwnedProcess child=null;
+        try {
+            Path work=root.resolve("group");child=OwnedProcess.start(backend,spec(work,"sleep 30 & sleep 30 & printf ready; wait"),null);
+            long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(5);
+            while(Files.size(work.resolve("stdout.log"))<5&&System.nanoTime()<deadline)Thread.sleep(10);
+            assertEquals("ready",read(work.resolve("stdout.log")));assertTrue(child.isAlive());
+            ProcessUsageSnapshot usage=child.usage();
+            assertEquals(ProcessUsageSnapshot.SCOPE,usage.scope());
+            if(usage.visibleSetStable()){assertFalse(usage.wholeGroupMembershipVerified());assertNotEquals(0,usage.flags&ProcessUsageSnapshot.VISIBILITY_UNVERIFIED);}
+            else {assertNotEquals(0,usage.flags);assertFalse(usage.visibleMembersRssBytes().isPresent());assertFalse(usage.visibleMembersPssBytes().isPresent());}
+            assertEquals(work.resolve("stdout.log"),child.logPaths().get("stdout"));assertEquals(work.resolve("stderr.log"),child.logPaths().get("stderr"));
+            try{child.logPaths().clear();fail("Log path metadata must be immutable");}catch(UnsupportedOperationException expected){ }
+            try{backend.usage(999999999L);fail("Unknown opaque handle must be refused");}catch(IOException expected){ }
+            assertTrue("Observation never stops its owner",child.isAlive());assertNull(child.failure());
+            child.terminateAuxiliary();assertFalse(child.isAlive());assertEquals(5,child.diagnostics().length);
+            assertNotEquals(0,child.usage().flags&ProcessUsageSnapshot.NOT_RUNNING);
+            JSONObject receipt=new JSONObject().put("formatVersion",1).put("scope",usage.scope()).put("sourceRevision",BuildConfig.SOURCE_REVISION)
+                .put("fingerprint",Build.FINGERPRINT).put("api",Build.VERSION.SDK_INT).put("targetSdk",context.getApplicationInfo().targetSdkVersion).put("abi","x86_64")
+                .put("nativeOwnerUsageExecuted",true).put("knownReapVerified",true).put("unknownHandleRefused",true).put("immutableLogPathsVerified",true).put("diagnosticsAbiLength",5)
+                .put("flags",usage.flags).put("startedMonotonicNanos",usage.startedMonotonicNanos).put("durationNanos",usage.durationNanos).put("visibleSetStable",usage.visibleSetStable()).put("wholeGroupMembershipVerified",false)
+                .put("visibleMembers",usage.visibleMembers).put("rssMeasuredMembers",usage.rssMeasuredMembers).put("pssMeasuredMembers",usage.pssMeasuredMembers).put("cpuMeasuredMembers",usage.cpuMeasuredMembers)
+                .put("rssBytes",usage.visibleMembersRssBytes().isPresent()?usage.visibleMembersRssBytes().getAsLong():JSONObject.NULL)
+                .put("pssBytes",usage.visibleMembersPssBytes().isPresent()?usage.visibleMembersPssBytes().getAsLong():JSONObject.NULL)
+                .put("cpuNanos",usage.visibleMembersCpuNanos().isPresent()?usage.visibleMembersCpuNanos().getAsLong():JSONObject.NULL)
+                .put("wholeGuestUsageQualified",false).put("combinedMemoryQualified",false).put("botPopulationQualified",false).put("gameplayQualified",false);
+            write(context.getFilesDir().toPath().resolve("native-group-usage.json"),receipt.toString(2));
+        }finally {
+            if(child!=null&&child.isAlive())child.terminateAuxiliary();
+            try(java.util.stream.Stream<Path> paths=Files.walk(root)){for(Path path:(Iterable<Path>)paths.sorted(java.util.Comparator.reverseOrder())::iterator)Files.delete(path);}
+        }
+    }
+
 }

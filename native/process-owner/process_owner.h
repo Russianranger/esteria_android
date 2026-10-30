@@ -7,6 +7,7 @@
 #include <limits>
 #include <string>
 #include <vector>
+#include "process_usage.h"
 
 namespace esteria {
 constexpr int running = std::numeric_limits<int>::min();
@@ -30,4 +31,7 @@ int process_id(std::int64_t handle);
 // stdout read/stored, stderr read/stored, IO failures; no log content or secrets.
 // Read once after wait_for completes to permit bounded completed-handle eviction.
 std::array<std::int64_t,5> diagnostics(std::int64_t handle);
+// Observation only, from a known opaque owner. Native PGID only: no claim of
+// detached PRoot tracees, whole guest, combined memory or bot qualification.
+GroupUsage usage(std::int64_t handle);
 }

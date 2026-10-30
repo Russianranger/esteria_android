@@ -19,6 +19,7 @@ public final class SupportBundleTest {
         lines.append("password=hidden-secret\nAuthorization: Bearer abc123\naccount=PLAYER\n");
         lines.append("LoginDatabaseInfo = \"127.0.0.1;13306;esteria;db-hidden;acore_auth\"\n");
         lines.append("{\"password\":\"json-hidden\"}\nmysql://user:uri-hidden@127.0.0.1/example\nBearer auth-hidden\n");
+        lines.append("session_key=srp-key-hidden\n{\"sessionKey\":\"camel-key-hidden\"}\nsaltHex=salt-hidden\nverifierHex=verifier-hidden\n");
         Files.write(log, lines.toString().getBytes(StandardCharsets.UTF_8));
         Map<String, String> facts = new LinkedHashMap<>(); facts.put("version", "test-1"); facts.put("state", "FAILED");
         ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -30,11 +31,25 @@ public final class SupportBundleTest {
                 for (int n; (n = zip.read(buffer)) != -1;) bytes.write(buffer, 0, n);
                 String value = new String(bytes.toByteArray(), StandardCharsets.UTF_8);
                 if (value.contains("hidden-secret") || value.contains("abc123") || value.contains("PLAYER") || value.contains("db-hidden") || value.contains("json-hidden") || value.contains("uri-hidden") || value.contains("auth-hidden")) throw new AssertionError("secret leaked");
+                for(String secret:new String[]{"srp-key-hidden","camel-key-hidden","salt-hidden","verifier-hidden"})
+                    if(value.contains(secret))throw new AssertionError("SRP credential leaked");
                 if (entry.getName().equals("logs/world.log") && bytes.size() > SupportBundle.MAX_LOG_BYTES + 200) throw new AssertionError("log bound exceeded");
                 count++;
             }
         }
         if (count != 2) throw new AssertionError("missing diagnostics");
+        String[] accountMessages={"Account 'PRIVATE_ACCOUNT' has invalid credentials", "Banned account PRIVATE_ACCOUNT tried to login!",
+            "account PRIVATE_ACCOUNT is using 'enUS' locale", "User 'PRIVATE_ACCOUNT' successfully authenticated",
+            "account PRIVATE_ACCOUNT tried to login with invalid password!", "account PRIVATE_ACCOUNT got banned after failed logins",
+            "because account PRIVATE_ACCOUNT failed to authenticate", "[ERROR] user PRIVATE_ACCOUNT tried to login, but session is invalid.",
+            "Client 'PRIVATE_ACCOUNT' authenticated successfully from 127.0.0.1", "Authentication failed for account: 1 ('PRIVATE_ACCOUNT') address: 127.0.0.1",
+            "SQL(p): INSERT INTO account(username, salt, verifier, email) VALUES(PRIVATE_ACCOUNT, BINARY, BINARY, PRIVATE_EMAIL)",
+            "SQL(p): UPDATE account SET session_key=BINARY WHERE username='PRIVATE_ACCOUNT'"};
+        for(String message:accountMessages){String redacted=SupportBundle.redact(message+"\n[ERROR] Reason retained\n");
+            if(redacted.contains("PRIVATE_ACCOUNT")||redacted.contains("PRIVATE_EMAIL")||!redacted.endsWith("[ERROR] Reason retained\n"))
+                throw new AssertionError("source-format account/SQL redaction failed");}
+        if(!SupportBundle.redact("Local server startup failed: missing maps\nSQL(p): SELECT id FROM version\n").equals(
+            "Local server startup failed: missing maps\nSQL(p): SELECT id FROM version\n"))throw new AssertionError("unrelated failure detail removed");
         try {
             SupportBundle.write(new ByteArrayOutputStream(), facts, Collections.singletonMap("../secrets.log", log));
             throw new AssertionError("unsafe entry accepted");

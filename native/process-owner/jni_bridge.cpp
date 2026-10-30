@@ -88,3 +88,14 @@ Java_io_github_russianranger_esteria_runtime_NativeProcessBridge_diagnostics(JNI
         auto result=env->NewLongArray(5); if (result) env->SetLongArrayRegion(result,0,5,copy); return result;
     } catch (const std::exception& problem) { error(env,problem); return nullptr; }
 }
+
+extern "C" JNIEXPORT jlongArray JNICALL
+Java_io_github_russianranger_esteria_runtime_NativeProcessBridge_usageNative(JNIEnv* env,jobject,jlong handle) {
+    try {
+        const auto value=esteria::usage(handle);
+        const jlong wire[16]={1,value.flags,value.start_nanos,value.duration_nanos,value.scanned_processes,value.members,
+            value.rss_members,value.pss_members,value.cpu_members,value.rss_bytes,value.pss_bytes,value.cpu_ticks,value.ticks_per_second,
+            value.changed_members,value.denied_entries,0};
+        auto result=env->NewLongArray(16);if(result)env->SetLongArrayRegion(result,0,16,wire);return result;
+    }catch(const std::exception& problem){error(env,problem);return nullptr;}
+}

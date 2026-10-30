@@ -142,6 +142,7 @@ public final class ServerInstallationSetup {
         private volatile State state=State.ALLOCATED;
         private ServerDatabaseService.Handle database;
         private OwnedProcess setupProcess;
+        private volatile Map<String,Path> diagnosticLogs=Map.of();
         private ServerDatabaseSetup.BootstrapLease bootstrapLease;
         private FreshServerInstallations.Workspace setupProcessWorkspace;
         private Result result;
@@ -152,6 +153,8 @@ public final class ServerInstallationSetup {
             this.data=data;this.attempt=attempt;this.workspace=workspace;
         }
         public State state(){return state;}
+        /** Wrapper streams only. Engine-private capture and account/config files are excluded. */
+        public Map<String,Path> diagnosticLogs(){return diagnosticLogs;}
         public String slotId(){return attempt.slotId;}
         /** Off main thread. Keep this owner on every failure, then close/retry
          * shutdown; a timeout keeps the live engine and workspace leases held. */
@@ -297,6 +300,8 @@ public final class ServerInstallationSetup {
         String operation=UUID.randomUUID().toString().replace("-","");
         Path operationFiles=GuestHelperAssets.directory(work,"installation-operations").resolve(operation);createPrivate(operationFiles);
         Path processSession=GuestHelperAssets.directory(root,"state/server-installation-processes").resolve(operation);createPrivate(processSession);
+        owner.diagnosticLogs=Map.of("setup.installation.stdout.log",processSession.resolve("logs/stdout.log"),
+            "setup.installation.stderr.log",processSession.resolve("logs/stderr.log"));
         try {
             byte[] receipt=read(content.receiptPath(),16<<20);
             if(!hash(receipt).equals(content.receiptSha256()))throw new IOException("Server content receipt changed");

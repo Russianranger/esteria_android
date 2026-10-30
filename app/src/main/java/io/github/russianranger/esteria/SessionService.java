@@ -35,6 +35,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import io.github.russianranger.esteria.core.diagnostics.SupportBundle;
+import io.github.russianranger.esteria.core.diagnostics.SupportLogSelection;
+import io.github.russianranger.esteria.core.runtime.process.ProcessUsageSnapshot;
 import io.github.russianranger.esteria.core.importer.GameDataImporter;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeInstaller;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
@@ -92,6 +94,10 @@ public final class SessionService extends Service {
     private volatile GameSession.Handle game;
     private volatile GamePresentationPanel.SessionEvents gameEvents;
     private volatile boolean lastRecoveryRequired,lastClientExitAcknowledged;
+    // Bounded fixed-path metadata survives service recreation and APK updates.
+    // No log content, account, configuration or environment is persisted here.
+    private final Map<String,Path> selectedLogs=new LinkedHashMap<>();
+    private String selectedLogsEncoded="";
     private PowerManager.WakeLock operationWake;
     private long wakeRenewAfter;
     private final Runnable wakeHeartbeat=new Runnable(){public void run(){
@@ -110,6 +116,10 @@ public final class SessionService extends Service {
         try {
             root = getFilesDir().getCanonicalFile().toPath();
             Files.createDirectories(root.resolve("state/logs"));
+            try {
+                String saved=getSharedPreferences("session",MODE_PRIVATE).getString("ownedSupportLogs","");
+                selectedLogs.putAll(SupportLogSelection.decode(root,saved));selectedLogsEncoded=saved;
+            }catch(IOException|RuntimeException invalid){log("Retained support-log selection is invalid; private files were excluded");}
             if (getSharedPreferences("session", MODE_PRIVATE).getBoolean("interrupted", false)) {
                 String action = getSharedPreferences("session", MODE_PRIVATE).getString("operationAction", "");
                 status = START.equals(action)?"The previous local session was interrupted. Startup will check the retained database and files; export a support bundle if it fails."
@@ -233,6 +243,7 @@ public final class SessionService extends Service {
         log("Import complete generation=" + result.generation + " copied=" + result.copiedFiles + " reused=" + result.reusedFiles);
     }
     private void startLocalGame(String locale) throws IOException {
+        clearSelectedLogs("game.");
         if (new GameDataImporter(root.resolve("game")).resolveCurrent() == null) throw new IOException("Import a build 12340 client first");
         if(!BuildConfig.PROOT_PACKAGED||!BuildConfig.CLIENT_RUNTIME_PACKAGED||!BuildConfig.GUEST_BRIDGES_PACKAGED||
                 !BuildConfig.TURNIP_PACKAGED||!BuildConfig.SERVER_RUNTIME_PACKAGED||!BuildConfig.SERVER_PROGRAMS_PACKAGED||
@@ -257,13 +268,15 @@ public final class SessionService extends Service {
         game=owner;lastRecoveryRequired=false;lastClientExitAcknowledged=false;
         Throwable operationFailure=null;
         try {
-            owner.start((phase,path,completed,total)->{keepAwake();status=phase.contains("database")?"Starting the local database…":phase.startsWith("server")?"Starting local services…":"Starting the reconstructed client…";},cancelled::get);
+            owner.start((phase,path,completed,total)->{keepAwake();rememberLogs(owner.diagnosticLogs());status=phase.contains("database")?"Starting the local database…":phase.startsWith("server")?"Starting local services…":"Starting the reconstructed client…";},cancelled::get);
+            rememberLogs(owner.diagnosticLogs());
             status="Local client started. Displayed login and world state have not been automatically verified.";
             while(!cancelled.get()&&owner.state()==GameSession.State.CLIENT_STARTED&&owner.isClientAlive()) {
                 keepAwake();try{Thread.sleep(100);}catch(InterruptedException error){Thread.currentThread().interrupt();throw new IOException("Session worker interrupted",error);}
             }
         }catch(IOException|RuntimeException error){operationFailure=error;throw error;}
         finally {
+            rememberLogs(owner.diagnosticLogs());
             IOException cleanup=closeGame(owner);lastRecoveryRequired=owner.recoveryRequired();lastClientExitAcknowledged=owner.clientExitAcknowledged();
             if(cleanup!=null){if(operationFailure!=null)operationFailure.addSuppressed(cleanup);else throw cleanup;}
         }
@@ -273,6 +286,7 @@ public final class SessionService extends Service {
         IOException failure=null;boolean interrupted=Thread.interrupted();
         while(owner.state()!=GameSession.State.CLOSED) {
             keepAwake();
+            rememberLogs(owner.diagnosticLogs());
             try{owner.close(Duration.ofSeconds(30));}
             catch(IOException error){if(failure==null)failure=error;else if(error!=failure&&failure.getSuppressed().length<15)failure.addSuppressed(error);}
             catch(RuntimeException error){IOException wrapped=new IOException("Game cleanup failed; ownership retained",error);if(failure==null)failure=wrapped;else if(failure.getSuppressed().length<15)failure.addSuppressed(wrapped);}
@@ -282,6 +296,7 @@ public final class SessionService extends Service {
                 try{Thread.sleep(250);}catch(InterruptedException ignored){interrupted=true;}
             }
         }
+        rememberLogs(owner.diagnosticLogs());
         log("Game owner closed clientExitAcknowledged="+owner.clientExitAcknowledged()+" recoveryRequired="+owner.recoveryRequired()
             +" forced="+owner.wasForced()+" handoffRecoveryRequired="+owner.handoffRecoveryRequired()+" saveQualified=false");
         getSharedPreferences("session",MODE_PRIVATE).edit().putBoolean("lastRecoveryRequired",owner.recoveryRequired())
@@ -499,6 +514,7 @@ public final class SessionService extends Service {
                 : "Database dependencies and server programs are prepared. Local server startup is still under development.";
     }
     private void prepareWorld(String locale)throws IOException {
+        clearSelectedLogs("setup.");
         if(locale==null||!java.util.Set.of("deDE","enGB","enUS","esES","frFR","koKR","zhCN","zhTW","enCN","enTW","esMX","ruRU").contains(locale))
             throw new IOException("Select the language of the imported client before preparing the world");
         if(!BuildConfig.SERVER_RUNTIME_PACKAGED||!BuildConfig.SERVER_PROGRAMS_PACKAGED||!BuildConfig.SERVER_CONTENT_PACKAGED||
@@ -519,6 +535,7 @@ public final class SessionService extends Service {
         try {
             result=owner.prepare((phase,path,completed,total)->{
                 keepAwake();
+                rememberLogs(owner.diagnosticLogs());
                 String label=phase.startsWith("server-data")?"Preparing world data":phase.startsWith("shader")?"Preparing graphics data":"Preparing the local database";
                 status=label+"…"+(path==null||path.isEmpty()?"":"\n"+path);
             },cancelled::get);
@@ -527,6 +544,7 @@ public final class SessionService extends Service {
                 +" worldQualified=false gameplayQualified=false");
         }catch(IOException|RuntimeException error){operationFailure=error;throw error;}
         finally {
+            rememberLogs(owner.diagnosticLogs());
             IOException cleanup=closeWorldSetup(owner);
             if(cleanup!=null){if(operationFailure!=null)operationFailure.addSuppressed(cleanup);else throw cleanup;}
         }
@@ -540,6 +558,7 @@ public final class SessionService extends Service {
         IOException failure=null;boolean interrupted=Thread.interrupted();
         while(owner.state()!=LocalWorldSetup.State.CLOSED) {
             keepAwake();
+            rememberLogs(owner.diagnosticLogs());
             try{owner.close(Duration.ofSeconds(20));}
             catch(IOException error){if(failure==null)failure=error;else if(failure!=error&&failure.getSuppressed().length<15)failure.addSuppressed(error);}
             catch(RuntimeException error){IOException wrapped=new IOException("Local setup cleanup failed; ownership retained",error);
@@ -549,6 +568,7 @@ public final class SessionService extends Service {
                 try{Thread.sleep(250);}catch(InterruptedException ignored){interrupted=true;}
             }
         }
+        rememberLogs(owner.diagnosticLogs());
         worldSetup=null;if(interrupted)Thread.currentThread().interrupt();return failure;
     }
     private void exportBundle(Uri destination) throws Exception {
@@ -569,6 +589,18 @@ public final class SessionService extends Service {
         facts.put("game.lastClientExitAcknowledged",Boolean.toString(lastClientExitAcknowledged));
         facts.put("game.characterSaveQualified","false");
         if(gameOwner!=null) {
+            rememberLogs(gameOwner.diagnosticLogs());
+            for(Map.Entry<String,ProcessUsageSnapshot> sample:gameOwner.usage().entrySet()) {
+                ProcessUsageSnapshot usage=sample.getValue();
+                facts.put("game.usage."+sample.getKey(),"scope="+usage.scope()+"; flags="+usage.flags
+                    +"; visibleMembers="+usage.visibleMembers+"; scanned="+usage.scannedProcesses
+                    +"; rssCoverage="+usage.rssMeasuredMembers+"; pssCoverage="+usage.pssMeasuredMembers
+                    +"; cpuCoverage="+usage.cpuMeasuredMembers+"; windowNanos="+usage.durationNanos
+                    +"; visibleRssBytes="+optionalMetric(usage.visibleMembersRssBytes())
+                    +"; visiblePssBytes="+optionalMetric(usage.visibleMembersPssBytes())
+                    +"; visibleCpuNanos="+optionalMetric(usage.visibleMembersCpuNanos())
+                    +"; wholeGroupMembershipVerified=false; combinedBudgetQualified=false");
+            }
             facts.put("game.state",gameOwner.state().name());
             facts.put("game.clientAlive",Boolean.toString(gameOwner.isClientAlive()));
             facts.put("game.needsExplicitForceStop",Boolean.toString(gameOwner.needsForceStop()));
@@ -583,7 +615,7 @@ public final class SessionService extends Service {
         }
         LocalWorldSetup.Handle setupOwner=worldSetup;
         facts.put("worldSetup.retained",Boolean.toString(setupOwner!=null));
-        if(setupOwner!=null)facts.put("worldSetup.state",setupOwner.state().name());
+        if(setupOwner!=null){facts.put("worldSetup.state",setupOwner.state().name());rememberLogs(setupOwner.diagnosticLogs());}
         LocalWorldSetup.Result world=preparedWorld;
         if(world!=null) {
             facts.put("worldSetup.dataGeneration",world.data.generation);
@@ -746,11 +778,39 @@ public final class SessionService extends Service {
         Map<String, Path> logs = new LinkedHashMap<>();
         for (String name : new String[]{"launcher", "database", "authserver", "worldserver", "client"})
             logs.put(name + ".log", root.resolve("state/logs/" + name + ".log"));
+        // Revalidate every selected path against current filesystem metadata at
+        // export, including ancestor links. Persisted metadata grants no open lease.
+        synchronized(selectedLogs) {
+            try{logs.putAll(SupportLogSelection.decode(root,selectedLogsEncoded));}
+            catch(IOException invalid){facts.put("support.ownedLogs","selection-invalid-private-files-excluded");}
+        }
         try (OutputStream output = getContentResolver().openOutputStream(destination, "w")) {
             if (output == null) throw new IOException("Export destination could not be opened");
             SupportBundle.write(output, facts, logs);
         }
         status = "Support bundle saved. It contains status and bounded, redacted logs; no game assets or databases.";
+    }
+    private static String optionalMetric(java.util.OptionalLong value){return value.isPresent()?Long.toString(value.getAsLong()):"unavailable";}
+    @SuppressLint("ApplySharedPref") // Keep fixed log selection with the retained operation's recovery state.
+    private void rememberLogs(Map<String,Path> fixed) {
+        synchronized(selectedLogs) {
+            Map<String,Path> candidate=new LinkedHashMap<>(selectedLogs);candidate.putAll(fixed);
+            if(!selectedLogsEncoded.isEmpty()&&candidate.equals(selectedLogs))return;
+            try {
+                String encoded=SupportLogSelection.encode(root,candidate);
+                if(encoded.equals(selectedLogsEncoded))return;
+                selectedLogs.clear();selectedLogs.putAll(candidate);selectedLogsEncoded=encoded;
+                if(!getSharedPreferences("session",MODE_PRIVATE).edit().putString("ownedSupportLogs",encoded).commit())
+                    log("Support-log metadata could not be retained across service recreation");
+            }catch(IOException|RuntimeException invalid){log("Invalid owned support-log paths excluded");}
+        }
+    }
+    private void clearSelectedLogs(String prefix) {
+        synchronized(selectedLogs) {
+            selectedLogs.keySet().removeIf(name->name.startsWith(prefix));
+            // Force persistence even if a malformed older selection was discarded.
+            selectedLogsEncoded="";rememberLogs(Map.of());
+        }
     }
     private void foreground(String text,String action) {
         Intent open = new Intent(this, MainActivity.class);

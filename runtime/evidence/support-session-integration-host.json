@@ -1,0 +1,99 @@
+{
+  "actualChecks": {
+    "coreCheckAndApkAndroidTestLint": true,
+    "finalRedactionApkLintSeconds": 25,
+    "finalRedactionApkLintTasks": 56,
+    "initialBuildSeconds": 41,
+    "initialBuildTasks": 99,
+    "pythonErrors": 0,
+    "pythonFailures": 0,
+    "pythonPassed": 1135,
+    "pythonSkipped": 55,
+    "pythonTestsRun": 1190,
+    "sourceFormatAccountSqlCases": 12
+  },
+  "androidGuestExecuted": false,
+  "androidServiceExecuted": false,
+  "dateUtc": "2026-10-30",
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "headRevision": "64dd9bcba52c448f07dcbe2ff0e407d41484ad4f",
+  "logs": {
+    "allPython": {
+      "bytes": 223290,
+      "sha256": "9f66907e9075662d59f83fb7704ae018a9f405d6bb4864c632e1167afbf2b353"
+    },
+    "coreApkTestsLint": {
+      "bytes": 11183,
+      "sha256": "8790f5d493f93c68a96db0c489d577b37ef7d3e2e1566cfda9b51360c2ff3f72"
+    },
+    "sourceFormatRedactionApkLint": {
+      "bytes": 3443,
+      "sha256": "acbe4cceae60dbba8b2c80375cb7bf91e96c54779d364266dbb67cd58c0010ca"
+    }
+  },
+  "privacy": {
+    "accountsConfigEnginePrivateExcluded": true,
+    "decodeAgainBeforeExport": true,
+    "fixedRolePathsOnly": true,
+    "maximumLogTailBytes": 65536,
+    "noFollowFinalOpen": true,
+    "persistedMetadataNotLogContents": true,
+    "sourceFormatAccountAndSensitiveSqlRedacted": true,
+    "srpKeySaltVerifierRedacted": true
+  },
+  "review": "Independent review clear after fixing allocated failed-launch log paths and source-format account/SQL redaction",
+  "scope": "host-compiled-retained-support-log-and-visible-usage-integration",
+  "sourceFiles": {
+    "app/src/main/java/io/github/russianranger/esteria/SessionService.java": {
+      "bytes": 66427,
+      "sha256": "6414b43c73e3bcde503c9c07eaabdf68f2ccd2817ddf0fc826e706a45cf47113"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/presentation/ClientPresentationSession.java": {
+      "bytes": 24313,
+      "sha256": "4afa5aa2472f86e50deeb007acb98e7972532707aa14d122d56850d694f3ba67"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/GameSession.java": {
+      "bytes": 27598,
+      "sha256": "c1d06b89ef0dbccf56f6a688d9412d5fd3efce5a7709387bbc514d05d3ddcd09"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/LocalServerSession.java": {
+      "bytes": 24955,
+      "sha256": "f3f6d3cec204ce22f134fffbf7efdbbca55588f950edc62237a271836f5a8772"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/LocalWorldSetup.java": {
+      "bytes": 13058,
+      "sha256": "9c39bb3b569855e22133ff50205d08b314e3aab249769bfa8b5afa61ec13e578"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseService.java": {
+      "bytes": 16233,
+      "sha256": "de6d8820d5e21ae6a6c4c0b53a2030ecb806d71682ebd2cbd0fe865ada184526"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerInstallationSetup.java": {
+      "bytes": 42139,
+      "sha256": "425b19abd5475be4c4aa7adabdf3bf4fa0c9eb2ce64238ab7e1eecefb2717ad7"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ShaderSetup.java": {
+      "bytes": 23472,
+      "sha256": "ec9c7f811a0b4b08f735c09be26627e2d827b47cdb5a2aa303ad473d56158c09"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/diagnostics/SupportBundle.java": {
+      "bytes": 5524,
+      "sha256": "a5881221c30ad91ad4dbfb636bd18ca7b7000b4e57d000c424f7bdf3d4155cc5"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/diagnostics/SupportBundleTest.java": {
+      "bytes": 8406,
+      "sha256": "61a858ef7ae9e45d8097bacb8154cb13da8936517cba4fd921952664f239d803"
+    }
+  },
+  "thorExecuted": false,
+  "usage": {
+    "botPopulationQualified": false,
+    "combinedMemoryQualified": false,
+    "sampleOnlyOnExplicitExport": true,
+    "scope": "visible-owned-native-group-members-only",
+    "wholeGroupMembershipVerified": false
+  },
+  "workingTreeHadUncommittedImplementation": true,
+  "worldserverExecuted": false
+}

@@ -42,6 +42,25 @@ def validate_receipt(value,revision,fingerprint):
     require(all(value.get(flag) is False for flag in ('appDeathQualified','arm64GuestExecuted','androidProotExecuted','gameplayQualified',
         'worldShutdownQualified','characterPersistenceQualified')),'owner-receipt-overclaims-scope')
 
+def validate_usage_receipt(value,revision,fingerprint):
+    require(type(value) is dict and value.get('formatVersion')==1 and type(value['formatVersion']) is int and
+        value.get('scope')=='visible-owned-native-group-members-only' and value.get('sourceRevision')==revision and
+        value.get('fingerprint')==fingerprint and value.get('abi')=='x86_64','usage-receipt-identity')
+    require(all(value.get(key) is True for key in ('nativeOwnerUsageExecuted','knownReapVerified','unknownHandleRefused','immutableLogPathsVerified')),'usage-receipt-checks')
+    require(all(value.get(key) is False for key in ('wholeGuestUsageQualified','combinedMemoryQualified','botPopulationQualified','gameplayQualified')),'usage-receipt-overclaim')
+    for key,expected in (('api',33),('targetSdk',35),('diagnosticsAbiLength',5)):
+        require(type(value.get(key)) is int and value[key]==expected,'usage-receipt-policy')
+    for key,maximum in (('flags',8191),('visibleMembers',128),('rssMeasuredMembers',128),('pssMeasuredMembers',128),('cpuMeasuredMembers',128),('startedMonotonicNanos',2**63-1),('durationNanos',2**63-1)):
+        require(type(value.get(key)) is int and 0<=value[key]<=maximum,'usage-receipt-counter')
+    complete=value['visibleMembers']>0 and not value['flags']&(2|4|8|128|256|1024|2048)
+    require(type(value.get('visibleSetStable')) is bool and value['visibleSetStable']==complete,'usage-receipt-membership')
+    require(value.get('wholeGroupMembershipVerified') is False and value['flags']&4096,'usage-receipt-visibility-overclaim')
+    require(value['visibleMembers']>0 or value['flags']!=0,'usage-receipt-empty-without-reason')
+    for measured,total,unavailable in (('rssMeasuredMembers','rssBytes',16),('pssMeasuredMembers','pssBytes',32),('cpuMeasuredMembers','cpuNanos',64)):
+        require(value[measured]<=value['visibleMembers'],'usage-receipt-coverage')
+        expected=complete and value[measured]==value['visibleMembers'] and not value['flags']&unavailable
+        require(total in value and ((type(value[total]) is int and 0<=value[total]<2**63) if expected else value[total] is None),'usage-receipt-partial-total')
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--adb',default='adb'); parser.add_argument('--apk',type=Path,required=True)
@@ -75,6 +94,13 @@ def main():
         _,raw=command('app-receipt',['exec-out','run-as',PACKAGE,'cat','files/native-owner-qualification.json'])
         require(len(raw.encode())<=65536,'oversized-app-receipt')
         evidence=json.loads(raw); validate_receipt(evidence,args.source_revision,properties['ro.build.fingerprint']); report['appEvidence']=evidence
+        _,usage_result=command('native-owner-usage',['shell','am','instrument','-w','-r','-e','class',PACKAGE+'.runtime.NativeProcessOwnershipTest#ownedGroupUsageObservation',
+            PACKAGE+'.test/androidx.test.runner.AndroidJUnitRunner'],timeout=180)
+        require(instrument_passed(usage_result),'native-usage-test-did-not-pass')
+        _,usage_raw=command('usage-receipt',['exec-out','run-as',PACKAGE,'cat','files/native-group-usage.json'])
+        require(len(usage_raw.encode())<=65536,'oversized-usage-receipt')
+        usage=json.loads(usage_raw);validate_usage_receipt(usage,args.source_revision,properties['ro.build.fingerprint']);report['groupUsageObservation']=usage
+        report['wholeGuestUsageQualified']=False;report['combinedMemoryQualified']=False;report['botPopulationQualified']=False
         report['androidNativeOwnerQualified']=True
     except Exception as error:
         failure=error; report['error']=str(error)

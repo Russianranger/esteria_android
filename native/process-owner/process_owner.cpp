@@ -292,6 +292,40 @@ int process_id(std::int64_t handle) {
     return owned->pid;
 }
 
+GroupUsage usage(std::int64_t handle) {
+    auto owned=lookup(handle);
+    const auto unavailable=[](std::int64_t reason) {GroupUsage result;result.flags=reason|GroupUsage::membership_incomplete|GroupUsage::visibility_unverified;return result;};
+    int directory=-1;
+    {
+        std::unique_lock<std::mutex> guard(owned->mutex,std::try_to_lock);
+        if(!guard.owns_lock())return unavailable(GroupUsage::owner_busy);
+        if(owned->status!=running)return unavailable(GroupUsage::not_running);
+        siginfo_t info{};int result;
+        do {result=waitid(P_PID,static_cast<id_t>(owned->pid),&info,WEXITED|WNOHANG|WNOWAIT);}while(result&&errno==EINTR);
+        if(result)return unavailable(GroupUsage::io_error);
+        if(info.si_pid)return unavailable(GroupUsage::not_running);
+        // Bind the proc inode while the leader PID is still reserved by this
+        // owner. Subsequent openat operations cannot follow a recycled PID.
+        const std::string path="/proc/"+std::to_string(owned->pid);
+        directory=open(path.c_str(),O_RDONLY|O_DIRECTORY|O_CLOEXEC|O_NOFOLLOW);
+        if(directory<0)return unavailable((errno==EACCES||errno==EPERM)?GroupUsage::proc_denied:GroupUsage::io_error);
+    }
+    GroupUsage sample;
+    try {sample=detail::sample_group(directory,owned->pid);}catch(...){close(directory);throw;}
+    close(directory);
+    // Never keep the reaping mutex during a potentially slow kernel proc read.
+    // If cleanup won that race, discard every metric rather than grant this
+    // completed handle observational authority over a reused numeric PGID.
+    std::unique_lock<std::mutex> guard(owned->mutex,std::try_to_lock);
+    if(!guard.owns_lock())return unavailable(GroupUsage::owner_busy);
+    if(owned->status!=running)return unavailable(GroupUsage::not_running);
+    siginfo_t info{};int result;
+    do {result=waitid(P_PID,static_cast<id_t>(owned->pid),&info,WEXITED|WNOHANG|WNOWAIT);}while(result&&errno==EINTR);
+    if(result)return unavailable(GroupUsage::io_error);
+    if(info.si_pid)return unavailable(GroupUsage::not_running);
+    return sample;
+}
+
 std::array<std::int64_t,5> diagnostics(std::int64_t handle) {
     auto owned = lookup(handle);
     const bool final = owned->logs_joined.load();

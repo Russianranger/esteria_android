@@ -24,6 +24,8 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
+          # This published legacy release retains its original provider defaults.
+          ref: 4d27ba80aed0669bdbe15871ad5ddb59c14b3a39
           persist-credentials: false
       - name: Test exact closure, publication refusal and immutable recovery
         run: python3 -m unittest tests.test_shader_release tests.test_shader_provider tests.test_shader_tools_package tests.test_provider_publication -v
@@ -84,6 +86,8 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
+          # This published legacy release retains its original provider defaults.
+          ref: 4d27ba80aed0669bdbe15871ad5ddb59c14b3a39
           persist-credentials: false
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
@@ -112,6 +116,8 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
+          # This published legacy release retains its original provider defaults.
+          ref: 4d27ba80aed0669bdbe15871ad5ddb59c14b3a39
           persist-credentials: false
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:

@@ -34,6 +34,22 @@ original receipts, source locks, paired debug, notices and historical proofs.
 | Wine publication |Separate c0e runtime/full source release and selected471 client release pass public readback. New cohort429283373 targets exact4d27ba80aed0669bdbe15871ad5ddb59c14b3a39 and contains19 verified assets; public anonymous consumer41098490533 and atomic seven-pin adoption now pass; actual coherent APK remains. |
 | Android owners |Presentation, shaders, native known-reap, database/schema, auth/world, data setup and local-world pipeline build/lint and focused Java/Python ownership fixtures pass. Actual Android full execution remains open. |
 
+## Current follow-through
+
+Coherent stock/Wine run41100858610 and the three7619 emulator component runs now
+report completed/success. Preserve their additive independent readback receipts;
+do not rewrite the older record of delayed workflow metadata. Data4 native run
+41103915829 passes5CLI/config,2capabilities and22 actual reader checks. Use its
+measured21ce4e1b runtime, complete source/debug pairs and the optional old-b7
+helper program profile in a new explicit complete-game packaging profile. Keep
+stock provider/release histories unchanged.
+
+The Service retains only fixed bounded support-log path metadata, including
+failed setup and stopped game streams. Validate it again before export. Native
+usage is visible-owned-group only; never sum it as complete guest memory or
+claim a bot population budget. Pending concrete work: publish qualified derived
+providers and complete-profile CI, then actual imported-data/world integration.
+
 ## Next concrete work
 
 1. Ordered complete-source seal41097592284 passes full5675member readback;

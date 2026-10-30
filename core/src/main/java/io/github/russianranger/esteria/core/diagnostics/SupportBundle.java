@@ -2,11 +2,14 @@ package io.github.russianranger.esteria.core.diagnostics;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.Set;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -19,8 +22,12 @@ public final class SupportBundle {
     public static final int MAX_FACTS = 256;
     public static final int MAX_METADATA_BYTES = 256 * 1024;
     public static String redact(String value) {
-        return value.replaceAll("(?im)([A-Za-z]*DatabaseInfo)([\"']?\\s*[=:]\\s*)([^\\r\\n]+)", "$1$2[redacted]")
-                .replaceAll("(?im)(password|passwd|pwd|token|secret|authorization|cookie|account(?:name)?|username)([\"']?\\s*[=:]\\s*)([^\\r\\n]+)", "$1$2[redacted]")
+        return value.replaceAll("(?im)(\\bSQL(?:\\(p\\))?:[ \\t]*)[^\\r\\n]*\\b(?:account|password|session_?key|salt|verifier)\\b[^\\r\\n]*", "$1[redacted]")
+                .replaceAll("(?im)(\\b(?:account|user)[ \\t]+)'[^'\\r\\n]*'", "$1'[redacted]'")
+                .replaceAll("(?im)(\\b(?:account|user)[ \\t]+)[^ \\t\\r\\n]+(?=[ \\t]+(?:is using|tried to login|got banned|failed to authenticate))", "$1[redacted]")
+                .replaceAll("(?im)(\\bClient[ \\t]+)'[^'\\r\\n]*'(?=[ \\t]+authenticated successfully)", "$1'[redacted]'")
+                .replaceAll("(?im)([A-Za-z]*DatabaseInfo)([\"']?\\s*[=:]\\s*)([^\\r\\n]+)", "$1$2[redacted]")
+                .replaceAll("(?im)(password|passwd|pwd|token|secret|authorization|cookie|account(?:name)?|username|session_?key|salt(?:hex)?|verifier(?:hex)?)([\"']?\\s*[=:]\\s*)([^\\r\\n]+)", "$1$2[redacted]")
                 .replaceAll("(?i)(mysql|mariadb)://[^\\s@]+@", "$1://[redacted]@")
                 .replaceAll("(?i)Bearer\\s+[A-Za-z0-9._~+/-]+=*", "Bearer [redacted]");
     }
@@ -46,12 +53,17 @@ public final class SupportBundle {
                 if (!Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS)) continue;
                 byte[] tail;
                 boolean partialLine = false;
-                try (RandomAccessFile input = new RandomAccessFile(path.toFile(), "r")) {
-                    long size = input.length();
+                // Reject a last-component link at open time as well as during
+                // selection. Never follow a replaced log to another file.
+                try (SeekableByteChannel input = Files.newByteChannel(path,Set.of(StandardOpenOption.READ,LinkOption.NOFOLLOW_LINKS))) {
+                    long size = input.size();
                     int count = (int) Math.min(size, MAX_LOG_BYTES);
                     long start = size - count;
-                    if (start > 0) { input.seek(start - 1); partialLine = input.read() != '\n'; }
-                    tail = new byte[count]; input.seek(start); input.readFully(tail);
+                    if (start > 0) {ByteBuffer previous=ByteBuffer.allocate(1);input.position(start-1);
+                        partialLine=input.read(previous)!=1||previous.array()[0]!='\n';}
+                    ByteBuffer buffer=ByteBuffer.allocate(count);input.position(start);
+                    while(buffer.hasRemaining()){int read=input.read(buffer);if(read<0)break;if(read==0)throw new IOException("Log read made no progress");}
+                    tail=java.util.Arrays.copyOf(buffer.array(),buffer.position());
                 }
                 int begin = 0;
                 // The missing beginning may contain the credential key. Never export an

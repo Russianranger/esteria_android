@@ -128,9 +128,9 @@ public final class GameSession {
         private volatile IOException failure;
         private volatile boolean needsForce,recovery,clientExitAcknowledged,handoffRecovery;
         private volatile OwnedProcess process;
-        private ServerDatabaseService.Handle database;
-        private LocalServerSession.Handle servers;
-        private ClientPresentationSession presentation;
+        private volatile ServerDatabaseService.Handle database;
+        private volatile LocalServerSession.Handle servers;
+        private volatile ClientPresentationSession presentation;
         private LocalAccountHandoff handoff;
         private Thread monitor;
         private Handle(Context context,Path root,LocalWorldSetup.Result setup,ClientRuntimeSetup client,
@@ -149,6 +149,26 @@ public final class GameSession {
         /** Process exit acknowledgment alone does not establish character saving. */
         public boolean clientExitAcknowledged(){return clientExitAcknowledged;}
         public ClientPresentationSession presentation(){return presentation;}
+        /** Read-only fixed log selection survives known cleanup; no credential
+         * record, database engine-private output or configuration is selected. */
+        public java.util.Map<String,Path> diagnosticLogs() {
+            java.util.Map<String,Path> result=new java.util.TreeMap<>();
+            ServerDatabaseService.Handle db=database;LocalServerSession.Handle server=servers;ClientPresentationSession display=presentation;
+            if(db!=null)db.diagnosticLogs().forEach((name,path)->result.put("game.database."+name+".log",path));
+            if(server!=null)server.diagnosticLogs().forEach((name,path)->result.put("game.server."+name,path));
+            if(display!=null)display.diagnosticLogs().forEach((name,path)->result.put("game.presentation."+name,path));
+            return java.util.Collections.unmodifiableMap(result);
+        }
+        /** Observed native wrapper groups only. PRoot guest tracees can detach;
+         * these observations never establish combined game/server/bot memory. */
+        public java.util.Map<String,io.github.russianranger.esteria.core.runtime.process.ProcessUsageSnapshot> usage() {
+            java.util.Map<String,io.github.russianranger.esteria.core.runtime.process.ProcessUsageSnapshot> result=new java.util.TreeMap<>();
+            OwnedProcess child=process;if(child!=null)result.put("client-wrapper",child.usage());
+            ServerDatabaseService.Handle db=database;if(db!=null)result.put("database-wrapper",db.usage());
+            LocalServerSession.Handle server=servers;
+            if(server!=null){var observed=server.usage();if(observed!=null)result.put("auth-world-wrapper",observed);}
+            return java.util.Collections.unmodifiableMap(result);
+        }
         /** Explicit user policy only, admitted after a graceful timeout/failure.
          * close() performs the actual bounded force/reap; this flag never saves. */
         public void requestForceStop()throws IOException {

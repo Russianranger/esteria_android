@@ -14,6 +14,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.time.Duration;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 
 /** Retained setup pipeline. Data preparation holds the import lease throughout
@@ -92,9 +95,9 @@ public final class LocalWorldSetup {
         private final ServiceOperationGuard operations=new ServiceOperationGuard();
         private volatile State state=State.ALLOCATED;
         private volatile IOException failure;
-        private ServerDataSetup.Handle data;
-        private ShaderSetup.Handle shaders;
-        private ServerInstallationSetup.Handle installation;
+        private volatile ServerDataSetup.Handle data;
+        private volatile ShaderSetup.Handle shaders;
+        private volatile ServerInstallationSetup.Handle installation;
         private Handle(Context context,Path root,ServerRuntimeSetup server,ServerProgramsSetup programs,ServerContentSetup content,
                 ServerDataToolsSetup tools,RuntimeSetup wine,ShaderToolsSetup shaderTools,String locale,int threads,long reserve,
                 FreshServerInstallations.Active previous,FileChannel channel,FileLock lock) {
@@ -103,6 +106,19 @@ public final class LocalWorldSetup {
             this.previous=previous;this.channel=channel;this.lock=lock;
         }
         public State state(){return state;}
+        /** Known operation streams; no directory discovery or credential files. */
+        public Map<String,Path> diagnosticLogs(){
+            Map<String,Path> logs=new LinkedHashMap<>();
+            ServerDataSetup.Handle currentData=data;
+            if(currentData!=null&&currentData.privateLogs()!=null){Path directory=currentData.privateLogs();
+                logs.put("setup.data.stdout.log",directory.resolve("stdout.log"));
+                logs.put("setup.data.stderr.log",directory.resolve("stderr.log"));}
+            ShaderSetup.Handle currentShaders=shaders;
+            if(currentShaders!=null)logs.putAll(currentShaders.diagnosticLogs());
+            ServerInstallationSetup.Handle currentInstallation=installation;
+            if(currentInstallation!=null)logs.putAll(currentInstallation.diagnosticLogs());
+            return Collections.unmodifiableMap(logs);
+        }
         public IOException failure(){return failure;}
         public Result prepare(RuntimeWork.Progress progress,RuntimeWork.Cancellation cancellation)throws IOException {
             background();return operations.run(()->{

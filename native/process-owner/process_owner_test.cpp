@@ -101,7 +101,12 @@ int main() {
     const auto live_pid=esteria::process_id(live);
     assert(live_pid>0 && live_pid!=getpid() && kill(live_pid,0)==0);
     assert(esteria::wait_for(live,10)==esteria::running);
+    const auto visible_usage=esteria::usage(live);
+    assert(visible_usage.flags&esteria::GroupUsage::visibility_unverified);
+    assert(esteria::wait_for(live,0)==esteria::running); // Sampling cannot reap or signal.
     assert(esteria::stop(live,2000)==143);
+    const auto ended_usage=esteria::usage(live);
+    assert((ended_usage.flags&esteria::GroupUsage::not_running)&&ended_usage.members==0&&ended_usage.rss_bytes==0&&ended_usage.pss_bytes==0&&ended_usage.cpu_ticks==0);
     assert(esteria::wait_for(live,0)==143);
     bool dead_identity_refused=false;
     try { esteria::process_id(live); } catch (...) { dead_identity_refused=true; }

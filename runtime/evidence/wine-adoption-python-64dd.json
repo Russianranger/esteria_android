@@ -1,0 +1,26 @@
+{
+  "androidExecuted": false,
+  "command": "python3 -m unittest discover -s tests -v",
+  "errors": 0,
+  "failures": 0,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "headRevision": "64dd9bcba52c448f07dcbe2ff0e407d41484ad4f",
+  "hostOnly": true,
+  "log": {
+    "bytes": 2695,
+    "sha256": "6c90170c9be5edaef530d4ea17f9e7956a2274cd825def43f952c37ea290755a"
+  },
+  "nativeNdkToolchainBinConfigured": true,
+  "notes": [
+    "Historical provider fixtures were independently byte-matched to their original Git4d27 snapshot.",
+    "The full NDK LLVM bin directory was supplied; absent toolchain dependencies retain explicit skips.",
+    "This evidence predates the optional helper/data4 and support-log additions; their focused checks are recorded separately.",
+    "Head identity is recorded separately from the modified worktree; this is a local test result, not a clean-checkout CI qualification."
+  ],
+  "passed": 1113,
+  "scope": "local-python-current-wine-adoption-regressions",
+  "skipped": 55,
+  "testsRun": 1168,
+  "workingTreeHadUncommittedImplementation": true
+}

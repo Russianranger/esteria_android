@@ -111,6 +111,7 @@ public final class ShaderSetup {
         private final ServiceOperationGuard operations=new ServiceOperationGuard();
         private volatile State state=State.ALLOCATED;
         private OwnedProcess process;
+        private volatile Map<String,Path> diagnosticLogs=Map.of();
         private IOException cleanupFailure;
         private Handle(Context context,Path root,Path work,RuntimeSetup wine,ShaderToolsSetup tools,String locale,
                 Path wineRoot,Path toolsRoot,FileChannel channel,FileLock lock) {
@@ -118,6 +119,8 @@ public final class ShaderSetup {
             this.wineRoot=wineRoot;this.toolsRoot=toolsRoot;this.channel=channel;this.lock=lock;
         }
         public State state(){return state;}
+        /** Fixed wrapper streams only; retained after failed startup and close. */
+        public Map<String,Path> diagnosticLogs(){return diagnosticLogs;}
         public IOException cleanupFailure(){return cleanupFailure;}
         /** Single use. Keep this owner on failure; cancellation stops the
          * complete owned guest. Atomic shader promotion may win that race. */
@@ -146,6 +149,8 @@ public final class ShaderSetup {
             Path sessions=directories(root,"state/shader-operations");
             Path session=sessions.resolve(UUID.randomUUID().toString().replace("-",""));
             Files.createDirectory(session,PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------")));
+            diagnosticLogs=Map.of("setup.shader.stdout.log",session.resolve("logs/stdout.log"),
+                "setup.shader.stderr.log",session.resolve("logs/stderr.log"));
             checkCancelled(cancelled);
             if(progress!=null)progress.update("shaders-generating","",0,-1);
             process=ProotProcess.start(context,wine.installer(),wine.packagePlan(),work,session,

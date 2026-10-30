@@ -57,6 +57,10 @@ public final class ServerDatabaseService {
         /** This identity is available only after live SQL readiness, not merely setup. */
         public String instanceUuid(){return instanceUuid;}
         public Path privateSessionDirectory(){return guestSession;}
+        /** Only the owned wrapper's bounded stdout/stderr. Engine-private.log,
+         * option files, accounts and configuration remain excluded. */
+        public java.util.Map<String,Path> diagnosticLogs(){return process.logPaths();}
+        public io.github.russianranger.esteria.core.runtime.process.ProcessUsageSnapshot usage(){return process.usage();}
         Path privateWorkDirectory(){return workDirectory;}
         @Override public void stop(Duration timeout) throws IOException {
             if(timeout==null || timeout.isNegative() || timeout.compareTo(Duration.ofSeconds(30))>0)
