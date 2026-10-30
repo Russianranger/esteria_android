@@ -88,3 +88,21 @@ python3 tools/provider_client_runtime.py build \
 Keep the source companion and source receipt with any redistributed binary
 package. Windows ARM64 execution needs the separately qualified local Wine
 runtime; this release does not establish native Android execution or gameplay.
+
+## Selecting new measured inputs with a frozen recipe
+
+A new release can pin a committed packaging recipe before adopting a new client.
+Its optional `selectedInputs` contains exactly the raw `sources.lock.json` and
+`runtime/client/android-provider.lock.json` identities. Its `generationInputs`
+then pins the ten unchanged helper/runtime/license recipe inputs at
+`targetCommit`. The selected source and measured client locks must travel
+together, match the exact revision/build/protocol contract, and be retained under
+their normal `integration-recipe/` names in the source companion. The receipt
+binds both raw input hashes; subsequent release checks revalidate those bytes.
+
+`package_client_sources.py --source-lock <exact-app-lock> --client-input-lock
+<exact-measured-client-lock>` selects those paired inputs explicitly. Omitting
+both arguments retains the default behavior and receipt shape. Existing release
+locks without `selectedInputs` continue using every original frozen generation
+input, including their original source/client locks. No historical receipt,
+published asset or server build source identity is relabeled.

@@ -35,6 +35,11 @@ SOURCE_RECEIPT = 'source-receipt.json'
 INPUT_LOCK = 'client-input-lock.json'
 PAYLOAD_FILES = {ARTIFACT, SOURCE_ARCHIVE, SOURCE_RECEIPT, INPUT_LOCK, 'NOTICE.txt'}
 RELEASE_FILES = PAYLOAD_FILES | {'release-manifest.json', 'SHA256SUMS'}
+SELECTED_INPUT_PATHS = {'sources.lock.json', 'runtime/client/android-provider.lock.json'}
+RECIPE_INPUT_PATHS = {'LICENSE', 'runtime/runtime-sources.lock.json', 'tools/fetch_sources.py',
+    'tools/manifest_server_content.py', 'tools/manifest_server_modules.py', 'tools/package_client_sources.py',
+    'tools/package_server_content.py', 'tools/prepare_runtime.py', 'tools/provider_client_runtime.py',
+    'tools/verify_server_build.py'}
 NOTICE = provider.NOTICE + b'''This archival release retains the original CI ZIP without repacking it, including
 compiler logs and symbols. It pairs it with the complete pinned client Git tree,
 original Xvid source, integration recipes and existing component license notices.
@@ -94,7 +99,22 @@ def load_lock():
             pin['sourceRevision'] == lock['sourceRevision'] and pin['buildId'] == lock['buildId'] and
             pin['workflowRun'] == lock['workflowRun'] and pin['artifactId'] == lock['artifact']['id'] and
             pin['artifact'] == {key: lock['artifact'][key] for key in ('bytes', 'sha256')}, 'measured-client-release-pin-mismatch')
+    selected_inputs(lock)
     return lock, pin
+
+
+def selected_inputs(lock):
+    if 'selectedInputs' not in lock:return None
+    selected = lock['selectedInputs']
+    require(type(selected) is dict and set(selected) == SELECTED_INPUT_PATHS and
+            type(lock.get('generationInputs')) is dict and set(lock['generationInputs']) == RECIPE_INPUT_PATHS,
+            'client-selected-input-set-mismatch')
+    for name, expected in selected.items():
+        require(type(expected) is dict and set(expected) == {'bytes', 'sha256'} and
+                type(expected.get('bytes')) is int and 0 < expected['bytes'] <= provider.META_LIMIT and
+                type(expected.get('sha256')) is str and re.fullmatch('[0-9a-f]{64}', expected['sha256']) and
+                shared.identity(ROOT / name) == expected, 'client-selected-input-identity-mismatch:' + name)
+    return selected
 
 
 def release_body(lock):
@@ -118,6 +138,11 @@ def receipt_check(companion, lock, pin):
             receipt['archive'] == lock['sourceArchive'] and receipt['archiveReadBack'] is True and
             receipt['androidRuntimeQualified'] is False and receipt['gameplayQualified'] is False,
             'client-source-receipt-provenance-mismatch')
+    selected = selected_inputs(lock)
+    if selected is not None:
+        require(provider.encoded(receipt.get('selectedInputs')) == provider.encoded(selected) and
+                all(receipt['members'].get('integration-recipe/' + name) == expected
+                    for name, expected in selected.items()), 'client-selected-source-receipt-mismatch')
     require(shared.identity(companion / SOURCE_ARCHIVE) == lock['sourceArchive'], 'client-source-archive-identity-mismatch')
     provider.audit(companion / SOURCE_ARCHIVE, receipt['members'])
     return receipt
@@ -229,9 +254,13 @@ def prepare(api, artifact_api, inputs, output, lock, pin, client_source, packagi
     for name, expected in lock['generationInputs'].items():
         require(shared.identity(packaging_source / name) == expected, 'source-generation-input-changed:' + name)
     api.download(lock['xvid']['url'], inputs / 'xvidcore-1.3.7.tar.gz', lock['xvid'])
-    subprocess.run([sys.executable, str((packaging_source / 'tools/package_client_sources.py').resolve()),
+    command = [sys.executable, str((packaging_source / 'tools/package_client_sources.py').resolve()),
         '--client-source', str(client_source.resolve()), '--xvid-source', str((inputs / 'xvidcore-1.3.7.tar.gz').resolve()),
-        '--output', str((inputs / 'companion').resolve())], check=True, timeout=180, stdout=subprocess.DEVNULL)
+        '--output', str((inputs / 'companion').resolve())]
+    if selected_inputs(lock) is not None:
+        command += ['--source-lock', str((ROOT / 'sources.lock.json').resolve()),
+                    '--client-input-lock', str((ROOT / 'runtime/client/android-provider.lock.json').resolve())]
+    subprocess.run(command, check=True, timeout=180, stdout=subprocess.DEVNULL)
     return stage(inputs / ARTIFACT, inputs / 'companion', output, lock, pin, client_source)
 
 

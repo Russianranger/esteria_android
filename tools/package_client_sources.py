@@ -34,9 +34,45 @@ It establishes retained source inputs, not Android or gameplay qualification.
 '''
 
 
-def build(source, xvid, output):
-    source_bytes = client.small(client.SOURCE_LOCK);lock = client.fetch_sources.load_lock(client.SOURCE_LOCK)
-    pin_bytes = client.small(client.PIN);pin = json.loads(pin_bytes);source_pin = lock['sources']['client']
+def input_selection(source_lock=None, client_input_lock=None):
+    client.require((source_lock is None) == (client_input_lock is None), 'paired-client-source-inputs-required')
+    source_path = Path(source_lock) if source_lock is not None else client.SOURCE_LOCK
+    pin_path = Path(client_input_lock) if client_input_lock is not None else client.PIN
+    source_bytes = client.small(source_path);lock = client.fetch_sources.load_lock(source_path)
+    client.require(client.encoded(json.loads(source_bytes)) == client.encoded(lock), 'client-source-input-changed')
+    pin_bytes = client.small(pin_path);pin = json.loads(pin_bytes)
+    selected = None
+    if source_lock is not None:
+        # Override both raw inputs together. A fixed committed recipe can then
+        # retain newly measured inputs without a self-referential commit pin.
+        source_pin = lock['sources']['client']
+        client.require(type(lock.get('schema')) is int and lock['schema'] == 1 and
+            client.encoded(lock['compatibility']) == client.encoded(dict(base_client_build=12340, extended_limits=True,
+                container_slots=254, quest_log_slots=25, client_class_capacity=32)), 'client-selected-protocol-mismatch')
+        client.require(set(pin) == {'formatVersion', 'scope', 'sourceRevision', 'workflowRun', 'buildId',
+            'artifactId', 'artifact', 'buildManifestSha256', 'androidRuntimeQualified'} and
+            type(pin.get('formatVersion')) is int and pin['formatVersion'] == 1 and
+            pin.get('scope') == 'measured-reconstructed-client-provider-inputs' and pin.get('androidRuntimeQualified') is False and
+            type(pin.get('sourceRevision')) is str and re.fullmatch('[0-9a-f]{40}', pin['sourceRevision']) and
+            type(pin.get('workflowRun')) is int and pin['workflowRun'] > 0 and type(pin.get('artifactId')) is int and pin['artifactId'] > 0 and
+            type(pin.get('buildId')) is str and re.fullmatch(str(pin['workflowRun']) + r'\.[1-9][0-9]*', pin['buildId']) and
+            type(pin.get('artifact')) is dict and set(pin['artifact']) == {'bytes', 'sha256'} and
+            type(pin['artifact'].get('bytes')) is int and
+            22 <= pin['artifact']['bytes'] <= 512 * 1024**2 and
+            type(pin['artifact'].get('sha256')) is str and re.fullmatch('[0-9a-f]{64}', pin['artifact']['sha256']) and
+            type(pin.get('buildManifestSha256')) is str and re.fullmatch('[0-9a-f]{64}', pin['buildManifestSha256']),
+            'client-selected-measured-input-mismatch')
+        client.require(source_pin == dict(url='https://github.com/Russianranger/wowdecomp_esteria.git',
+            commit=pin['sourceRevision'], branch='android/arm64-port', submodules={}, patches=[]),
+            'client-selected-source-revision-mismatch')
+        selected = {name: dict(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest()) for name, raw in (
+            ('sources.lock.json', source_bytes), ('runtime/client/android-provider.lock.json', pin_bytes))}
+    return source_bytes, lock, pin_bytes, pin, selected
+
+
+def build(source, xvid, output, source_lock=None, client_input_lock=None):
+    source_bytes, lock, pin_bytes, pin, selected = input_selection(source_lock, client_input_lock)
+    source_pin = lock['sources']['client']
     client.require(source_pin['commit'] == pin['sourceRevision'] and not source_pin['patches'] and
                    not source_pin['submodules'], 'client-source-companion-pin-mismatch')
     client.fetch_sources.verify_checkout(source, source_pin, [])
@@ -63,7 +99,8 @@ def build(source, xvid, output):
         for path in (client.PIN, client.SOURCE_LOCK, client.archives.DEFAULT_LOCK,
                      *(client.ROOT / 'tools' / name for name in helpers), Path(__file__).resolve(), client.ROOT / 'LICENSE'):
             relative = path.relative_to(client.ROOT);target = recipes / relative
-            target.parent.mkdir(parents=True, exist_ok=True);target.write_bytes(client.small(path))
+            data = source_bytes if path == client.SOURCE_LOCK else pin_bytes if path == client.PIN else client.small(path)
+            target.parent.mkdir(parents=True, exist_ok=True);target.write_bytes(data)
         (tree / 'README.txt').write_bytes(README)
         inventory = {str(path.relative_to(tree)): client.identity(path) for path in sorted(tree.rglob('*')) if path.is_file()}
         archive = package / 'client-corresponding-source.tar.gz'
@@ -74,6 +111,7 @@ def build(source, xvid, output):
                        xvid=dict(url=url.group(1), sha256=actual, bytes=before.st_size),
                        archive=client.identity(archive), members=inventory, archiveReadBack=True,
                        androidRuntimeQualified=False, gameplayQualified=False)
+        if selected is not None:receipt['selectedInputs'] = selected
         (package / 'source-receipt.json').write_bytes(client.encoded(receipt))
         client.publish_directory(package, output);client.archives.sync_directory(output.parent)
         return receipt
@@ -86,7 +124,10 @@ def main():
     parser.add_argument('--client-source', type=Path, required=True)
     parser.add_argument('--xvid-source', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
-    args = parser.parse_args();print(json.dumps(build(args.client_source, args.xvid_source, args.output), indent=2))
+    parser.add_argument('--source-lock', type=Path, help='explicit source-lock input; requires --client-input-lock')
+    parser.add_argument('--client-input-lock', type=Path, help='explicit measured client input; requires --source-lock')
+    args = parser.parse_args();print(json.dumps(build(args.client_source, args.xvid_source, args.output,
+        args.source_lock, args.client_input_lock), indent=2))
 
 
 if __name__ == '__main__':main()
