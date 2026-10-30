@@ -5,6 +5,7 @@ import io.github.russianranger.esteria.core.runtime.install.DownloadCache;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeInstaller;
 import io.github.russianranger.esteria.core.runtime.install.RuntimePackagePlan;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
+import io.github.russianranger.esteria.core.runtime.WineRuntimeProfile;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,6 +29,7 @@ public final class RuntimeSetup {
     private final URI download;
     private final Path store;
     private final Path cache;
+    private final WineRuntimeProfile wineProfile;
 
     public RuntimeSetup(Context context, Path privateRoot) throws IOException {
         try {
@@ -38,6 +40,14 @@ public final class RuntimeSetup {
             if (!"wine-arm64".equals(key) || profile.getInt("formatVersion") != 1)
                 throw new IOException("Unsupported client runtime installation profile");
             JSONObject selected = lock.getJSONObject("packages").getJSONObject(key);
+            Map<String,Object> environment = new TreeMap<>();
+            if (selected.has("wineEnvironment")) {
+                JSONObject configured = selected.getJSONObject("wineEnvironment");
+                for (Iterator<String> keys = configured.keys(); keys.hasNext();) {
+                    String name = keys.next(); environment.put(name, configured.get(name));
+                }
+            }
+            wineProfile = new WineRuntimeProfile(environment);
             JSONObject archive = selected.getJSONObject("archive");
             JSONObject bounds = selected.getJSONObject("limits");
             Map<String, RuntimePackagePlan.RequiredFile> required = new TreeMap<>();
@@ -80,6 +90,8 @@ public final class RuntimeSetup {
     public String generation() { return plan.generation; }
     public String archiveSha256() { return plan.archiveSha256; }
     public String sourcePinSha256() { return plan.sourcePinSha256; }
+    public Map<String,String> wineEnvironment() { return wineProfile.environment(); }
+    public Map<String,String> wineEnvironment(Map<String,String> session) throws IOException { return wineProfile.merge(session); }
 
     private static void addFiles(Map<String, RuntimePackagePlan.RequiredFile> files, JSONObject source)
             throws JSONException, IOException {

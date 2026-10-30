@@ -118,3 +118,22 @@ The combined APK source sealer now declares/hashes all nine schema helpers,
 including nested SQL inputs; an old exact-inventory failure must be rerun rather
 than bypassed. Extractors have native CLI and actual Java archive install/reuse
 proofs, but optional APK packaging remains blocked by the real source seal.
+
+## Latest continuation
+
+- Preserve public Wine release `deps-wine-arm64-681b2e9-c0e13ed15a69` and its
+  separate publication receipt.41074190885 all three jobs pass; GitHub reports
+  immutability=false. Do not extend the strict explicit release selection schema.
+- Newbound provider run41073499555 passes all native helper/X11/compiler/ICD gates.
+  Measure original outputs, adopt exact consumer locks only after source/readback
+  verification, and retain historical releases unchanged.
+- Isolated server41051669638 actually completed full compilation/verification;
+  upload failed at a root-owned0700 parent. Recover the exact9f76881f source
+  archive from all266 retained member hashes with configure-only reconstruction.
+  Keep backup compile41071369172 until that complete archive is retained/read back.
+- Bot setup/helper packaging is now18 files. Follow the actual narrow C++/SQL
+  workflow; only after native schema/reentry/restart qualification integrate it
+  into phone complete-slot promotion. Never replay uncertain partial DDL.
+- WineRuntimeProfile is wired through shader and presentation guest launches;
+  add retained owner/retry semantics for presentation/shader startup failures
+  before composing the final client/server session.

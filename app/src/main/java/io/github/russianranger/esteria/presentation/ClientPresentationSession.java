@@ -134,7 +134,7 @@ public final class ClientPresentationSession implements AutoCloseable {
     private OwnedProcess launch(String name,List<String> command)throws IOException {
         check();Path process=directory(session.resolve(name));
         OwnedProcess child=ProotProcess.startPresentation(context,prepared.runtime.installer(),prepared.runtime.packagePlan(),
-                prepared.work,process,command,X11SessionPlan.environment(display),
+                prepared.work,process,command,prepared.runtime.wineEnvironment(X11SessionPlan.environment(display)),
                 List.of(new ProotLaunch.Mount(prepared.bridgeRoot,GuestBridgeSetup.guestMount())),bindings);
         children.add(child);return child;
     }
@@ -182,6 +182,11 @@ public final class ClientPresentationSession implements AutoCloseable {
         cleanup.setDaemon(true);cleanup.start();
     }
     public InputSink input()throws IOException {check();if(!ready)throw new IOException("Input is not ready");return input;}
+    /** Fixed display/audio settings plus this runtime's required Wine adaptation. */
+    public Map<String,String> wineEnvironment()throws IOException {
+        check();if(!ready)throw new IOException("Presentation session is not ready");
+        return prepared.runtime.wineEnvironment(X11SessionPlan.environment(display));
+    }
     public SurfaceBridge surface()throws IOException {check();if(!ready)throw new IOException("Display is not ready");return surface;}
     /** GameInputView also clears its own controller state on lifecycle pause. */
     public void pauseInput()throws IOException {

@@ -390,6 +390,7 @@ public final class SessionService extends Service {
             facts.put("runtime.client.archiveSha256", setup.archiveSha256());
             facts.put("runtime.client.sourcePinSha256", setup.sourcePinSha256());
             facts.put("runtime.client.expectedGeneration", setup.generation());
+            facts.put("runtime.client.privatePeCopyRequested", String.valueOf(setup.wineEnvironment().containsKey("WINE_ANDROID_PRIVATE_PE_COPY")));
             facts.put("runtime.client.prepared", String.valueOf(setup.current() != null));
         } catch (IOException error) {
             facts.put("runtime.client.prepared", "false");

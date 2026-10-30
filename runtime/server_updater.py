@@ -131,7 +131,8 @@ def expected_updates(source, manifest, database):
     return result
 
 
-def schema_snapshot(connection, expected):
+def core_schema_snapshot(connection, expected):
+    """Read the three registered core pools without adopting a fourth schema."""
     result = {}
     for name in DATABASES:
         tables = connection.query('SHOW TABLES FROM `acore_' + name + '`')
@@ -151,6 +152,12 @@ def schema_snapshot(connection, expected):
         result[name] = {'tableCount': len(tables), 'tablesSha256': hashlib.sha256(canonical_identity(tables)).hexdigest(),
                         'ledgerRows': len(rows), 'ledgerSha256': hashlib.sha256(canonical_identity(rows)).hexdigest(),
                         'sourceUpdateNamesVerified': len(expected[name])}
+    return result
+
+
+def schema_snapshot(connection, expected):
+    """Default dbimport gate retains the empty, unregistered fourth-pool guard."""
+    result = core_schema_snapshot(connection, expected)
     require(not connection.query('SHOW TABLES FROM `acore_playerbots`'),
             'dbimport unexpectedly modified the unregistered playerbots database')
     return result

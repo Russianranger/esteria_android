@@ -49,6 +49,21 @@ public final class ProotMountTests {
             check(spec.arguments.get(spec.arguments.size()-1).equals("one argument"),"Guest argument preserved verbatim");
             check(spec.environment.get("PROOT_LOADER").equals(fixture.loader.toString()),"Installed native loader retained");
             check(spec.arguments.contains("WINEPREFIX=/work/wine"),"Explicit guest environment retained");
+            WineRuntimeProfile legacy = new WineRuntimeProfile(Map.of());
+            WineRuntimeProfile selected = new WineRuntimeProfile(Map.of(WineRuntimeProfile.PRIVATE_PE_COPY,"1"));
+            check(legacy.environment().isEmpty() && !legacy.requiresPrivatePeCopy(),"Old runtime gains no adaptation");
+            OwnedProcess.Specification adapted=ProotLaunch.create(fixture.tracer,fixture.loader,fixture.runtime,fixture.work,fixture.temp,fixture.logs,
+                List.of("/opt/wine/bin/wine","owned-client.exe"),selected.merge(Map.of("WINEPREFIX","/work/wine")));
+            check(adapted.arguments.contains("WINE_ANDROID_PRIVATE_PE_COPY=1") && adapted.arguments.contains("WINEPREFIX=/work/wine"),
+                "Selected adaptation must reach the clean guest environment");
+            check(!adapted.environment.containsKey(WineRuntimeProfile.PRIVATE_PE_COPY),"Adaptation must not enter the Android owner environment");
+            rejects(()->legacy.merge(Map.of(WineRuntimeProfile.PRIVATE_PE_COPY,"1")));
+            rejects(()->legacy.merge(Map.of(WineRuntimeProfile.PRIVATE_PE_COPY,"")));
+            rejects(()->selected.merge(Map.of(WineRuntimeProfile.PRIVATE_PE_COPY,"0")));
+            rejects(()->new WineRuntimeProfile(Map.of(WineRuntimeProfile.PRIVATE_PE_COPY,1)));
+            rejects(()->new WineRuntimeProfile(Map.of(WineRuntimeProfile.PRIVATE_PE_COPY,true)));
+            rejects(()->new WineRuntimeProfile(Map.of("LD_PRELOAD","/unselected/library")));
+            rejects(()->new WineRuntimeProfile(Map.of(WineRuntimeProfile.PRIVATE_PE_COPY,"1","OTHER","value")));
             check(!fixture.create(List.of()).arguments.contains(fixture.data+":/esteria-data!"),"No implicit data exposure");
             check(fixture.create(List.of(new ProotLaunch.Mount(fixture.binary,"/esteria-shader-tools")))
                     .arguments.contains(fixture.binary+":/esteria-shader-tools!"),"Fixed shader tools binding is explicit and does not follow guest links");

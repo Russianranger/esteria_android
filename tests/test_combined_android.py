@@ -63,7 +63,7 @@ class CombinedPackageGuards(unittest.TestCase):
                                                               'server/appearance-schema.lock.json'),
             'server-installation': ('android_server_installation_setup.py', 'android_server_schema_setup.py', 'mysql_bootstrap.py',
                 'mysql_service.py', 'server_content.py', 'server_schema_setup.py', 'server_schema_baseline.py', 'server_schema_adaptations.py',
-                'server_update_setup.py', 'server_updater.py', 'owned_process_group.py', 'server_config.py', 'provision_local_realm.py',
+                'server_update_setup.py', 'server_updater.py', 'server_playerbots_setup.py', 'owned_process_group.py', 'server_config.py', 'provision_local_realm.py',
                 'provision_local_account.py', 'server/appearance-schema-v1.sql', 'server/appearance-schema.lock.json', 'local-server.json')})
         repository, path = self.helper_fixture()
         with patch.object(bundle, 'ROOT', repository), zipfile.ZipFile(path) as archive:
@@ -89,7 +89,7 @@ class CombinedPackageGuards(unittest.TestCase):
 
     def test_installation_helper_manifest_inventory_and_profile_are_strict(self):
         repository, path = self.helper_fixture()
-        self.assertEqual(len(bundle.HELPER_SETS['server-installation']), 17)
+        self.assertEqual(len(bundle.HELPER_SETS['server-installation']), 18)
         self.assertTrue((repository / 'config/local-server.json').is_file())
         with zipfile.ZipFile(path) as archive:
             original = {name: archive.read(name) for name in archive.namelist()}

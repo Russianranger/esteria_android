@@ -65,6 +65,21 @@ def declared_statement_count(header):
     return len(values) - 1
 
 
+def verify_cache_launchers(path):
+    # cmake_options intentionally returns only the original eight build options.
+    # Inspect the actual cache rows; absent, duplicated or nonempty is a failure.
+    with files.plain_file(path) as stream:
+        raw = stream.read(files.MAX_METADATA + 1)
+    require(len(raw) <= files.MAX_METADATA, 'playerbots-cmake-cache-byte-bound')
+    text = raw.decode('utf-8')
+    result = {}
+    for name in ('CMAKE_C_COMPILER_LAUNCHER', 'CMAKE_CXX_COMPILER_LAUNCHER'):
+        require(re.findall(r'^' + name + r':[^=]+=(.*)$', text, re.MULTILINE) == [''],
+                'playerbots-compiler-cache-launcher-enabled-or-absent')
+        result[name] = ''
+    return result
+
+
 def copy_exact(source, target, expected=None, *, executable=False):
     identity = files.identity(source)
     require(expected is None or identity == expected, 'playerbots-payload-input-changed')
@@ -181,8 +196,7 @@ def build(prepared, acquired, original_lock, environment, output, *, integration
             '-DCMAKE_C_COMPILER=' + str(compilers['gcc']), '-DCMAKE_CXX_COMPILER=' + str(compilers['g++'])]
         proof['configure'] = run(arguments, 'configure', 900)
         proof['cmakeOptions'] = files.cmake_options(output / 'build/CMakeCache.txt')
-        require(all(proof['cmakeOptions'].get(name) == '' for name in
-            ('CMAKE_C_COMPILER_LAUNCHER', 'CMAKE_CXX_COMPILER_LAUNCHER')), 'playerbots-compiler-cache-launcher-enabled')
+        proof['compilerLaunchers'] = verify_cache_launchers(output / 'build/CMakeCache.txt')
         command_identity = reference.commands(output / 'build/compile_commands.json', prepared / 'source', prepared / 'integration')
         proof['newCompileCommands'] = command_identity
         proof['phase'] = 'build-component'; isolated.write_json(output / 'qualification.json', proof)

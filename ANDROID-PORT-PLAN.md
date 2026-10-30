@@ -63,3 +63,9 @@ server source builds; pass matched compiled authentication; compose portable
 updater/config/account/realm setup on the owned MySQL service; finish fresh-slot
 promotion/recovery and server data extraction; then complete client presentation
 and matched world/gameplay gates. Exact current evidence is in STATUS.md.
+
+The full exported-source server compile has passed; exact sealed-source retention
+is the current provider gate. Production Wine source/publication and selected471
+component qualification pass, with consumer providers now measured against the
+new runtime. Bot schema integration and retained presentation/session ownership
+are the next implementation work before asset-backed world qualification.

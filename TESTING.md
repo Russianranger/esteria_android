@@ -95,3 +95,18 @@ content; start local play; create/select a character; move/look with controller;
 fight/loot/equip/quest; use a small bot group; verify audio; exit/relaunch/relog and
 confirm saves; repeat with networking disabled; export one support bundle.
 A device-only diagnostic exception requires evidence that independent work is blocked.
+
+## New integration checks
+
+The18-file installation helper inventory now includes `server_playerbots_setup.py`.
+45 focused combined-package and playerbots helper/build/qualification tests pass
+locally. They establish contracts and rejection behavior, not native SQL or AI.
+The previous17-file Android run41070183970 passed actual private installation,
+local-login handoff and install-r preservation; its historical receipt is retained.
+Future receipts observe the completed runtime filesystem group count from the
+instrumentation result rather than assuming18.
+
+`:core:prootMountTest` checks the exact selected Wine adaptation after guest
+`env -i`, absence from the Android-owner environment, and type/override rejection.
+New runtime/provider native gates pass41069065089 and41073499555; no full
+CommonMain/world, Android ARM64/Adreno or audible-device claim follows.

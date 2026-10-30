@@ -120,7 +120,9 @@ def main():
     for method in SCHEMA_HELPER_METHODS:
         test(method, SCHEMA_HELPER_TEST)
     test('completeInstallationHelperClosureInstallsAndReusesExactBytes', INSTALLATION_HELPER_TEST)
-    test('runtimeContracts')
+    runtime_contracts = test('runtimeContracts')
+    groups = re.findall(r'^INSTRUMENTATION_STATUS: esteriaRuntimeContractGroups=([1-9][0-9]?)\s*$', runtime_contracts, re.M)
+    if len(groups) != 1:raise RuntimeError('Missing completed runtime filesystem group count')
     handoff = test('privateLocalLoginHandoffContracts')
     link_policy = re.findall(r'^INSTRUMENTATION_STATUS: esteriaHandoffHardLinksCreated=(true|false)\s*$', handoff, re.M)
     if len(link_policy) != 1:raise RuntimeError('Missing handoff filesystem link-policy observation')
@@ -128,10 +130,10 @@ def main():
     command('install-update-preserving-data', ['install', '-r', str(args.update_apk)])
     test('verifyAfterUpdate')
     receipt = dict(formatVersion=1, scope='android-13-x86_64-installer-and-apk-update',
-        emulatorProperties=properties, artifacts=artifacts, runtimeContractGroups=18,
+        emulatorProperties=properties, artifacts=artifacts, runtimeContractGroups=int(groups[0]),
         databaseHelperAssetContractGroups=len(HELPER_METHODS), databaseHelperAssetsQualified=True,
         schemaHelperAssetContractGroups=len(SCHEMA_HELPER_METHODS), schemaHelperAssetsQualified=True, schemaSqlExecuted=False,
-        installationHelperAssetFiles=17, installationHelperAssetsQualified=True, installationSetupExecuted=False,
+        installationHelperAssetFiles=18, installationHelperAssetsQualified=True, installationSetupExecuted=False,
         databaseServiceExecuted=False,
         runtimeFilesystemQualified=True, sameJobDebugKeyUpdatePreservedRuntimeAndSentinel=True,
         privateLocalLoginHandoffFilesystemQualified=True, clientLoginExecuted=False,

@@ -242,15 +242,30 @@ def _verify_completed(content, connection, state, version, expected_uuid, verify
                 contentReceipt=content_binding['contentReceipt'], sourceLockSha256=content_binding['sourceLockSha256'],
                 compiledModules=content.receipt['compiledModules']).items()), 'Completed source baseline binding changed')
     checkpoint(cancelled)
-    snapshot = updater.schema_snapshot(connection, expected)
+    snapshot = updater.core_schema_snapshot(connection, expected)
     require(snapshot == journal.get('snapshot'), 'Completed updater live ledger or table set changed')
+    playerbots = None
+    if connection.query('SHOW TABLES FROM `acore_playerbots`') or os.path.lexists(state / '.server-playerbots-schema.json'):
+        # A source-owned fourth pool has its own durable execution journal. The
+        # default dbimport primitive still requires it empty; only a completed
+        # private playerbots journal can authorize later core read-only checks.
+        try:
+            from . import server_playerbots_setup
+        except ImportError:
+            import server_playerbots_setup
+        playerbots = server_playerbots_setup._verify_completed(content, connection, state, version,
+            expected_uuid=expected_uuid, verify_service=verify_service,
+            core_journal_identity=journal_identity, core_snapshot=snapshot, cancelled=cancelled)
     checkpoint(cancelled); _service(verify_service)
     require(_instance(connection, state, version)['uuid'] == expected_uuid and
             _credentials(state) == credentials and schema.account_identity(state) == account and
             baseline.file_identity(path) == journal_identity and baseline.file_identity(baseline_path) == baseline_identity,
             'Completed updater private context changed during verification')
-    return dict(_receipt(binding, bootstrap, 'verified-completed-updater', False, snapshot),
-                journalIdentity=journal_identity, baselineJournalIdentity=baseline_identity)
+    result = dict(_receipt(binding, bootstrap, 'verified-completed-updater', False, snapshot),
+                  journalIdentity=journal_identity, baselineJournalIdentity=baseline_identity)
+    if playerbots is not None:
+        result['playerbots'] = playerbots
+    return result
 
 
 def verify_completed_update(content, connection, state, version, *, expected_uuid, verify_service,

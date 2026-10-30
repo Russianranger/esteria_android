@@ -77,7 +77,7 @@ public final class ShaderSetup {
         checkCancelled(cancelled);
         if(progress!=null)progress.update("shaders-generating","",0,-1);
         OwnedProcess process=ProotProcess.start(context,wine.installer(),wine.packagePlan(),work,session,
-            plan.arguments,Collections.emptyMap(),plan.mounts,null);
+            plan.arguments,wine.wineEnvironment(),plan.mounts,null);
         long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(125);
         try {
             while(process.isAlive()) {

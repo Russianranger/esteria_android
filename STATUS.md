@@ -26,8 +26,8 @@ Wine/glibc2.36. APK identity remains `io.github.russianranger.esteria`.
 | Reconstructed client471 | All five jobs pass in41061576677, including native Windows handoff-reader tests, full client builds and ARM64 Wine controlled-peer/graphics/audio regressions. | Earlier0f compiled-server SRP pairing passes41060555263 with retained six-patch server; new471 pairing and normal CommonMain/world remain untested. |
 | Protocol | All215 player descriptors match; containers254/574DWORDs, quests25, player1326DWORDs/42mask words. Client class capacity32, serverMAX_CLASSES12. | Inventory/appearance/custom races need real matched gameplay. |
 | Android Wine | Android13 x64 run41046942035 passes reconstructed entry, offline diagnostics and actual loopback transport with source-owned PE mapping adaptation. | Emulator component evidence; production ARM64, graphics/audio and full game remain open. |
-| Production ARM64 Wine | Actual frozen-source Wine/FEX build, complete source closure and native client0f codec/entry/offline/transport/Grunt/software Vulkan/frame/texture/captured WinMM+DirectSound pass41057900330. Independent runtime readback covers14,180entries/1,325,744,204filebytes. | Selected471 pairing, Android ARM64/Adreno and complete game remain open. Production still uses oldf036; no provider relabel. |
-| Server build | Seven-patch server links/installs all programs/tools; actual full50 ConfigMgr parse/reload passes41041859706. | A clean isolated exported-source rebuild is running after two exact input corrections. |
+| Production ARM64 Wine | Actual frozen-source Wine/FEX build, complete source closure and native client0f codec/entry/offline/transport/Grunt/software Vulkan/frame/texture/captured WinMM+DirectSound pass41057900330. Independent runtime readback covers14,180entries/1,325,744,204filebytes. | Selected471 component pairing passes41069065089. Android ARM64/Adreno and complete game remain open. Production still uses oldf036 until matched providers are adopted. |
+| Server build | Seven-patch server links/installs all programs/tools; actual full50 ConfigMgr parse/reload passes41041859706. | Complete isolated compile and typed verification pass41051669638; source upload failed on parent ownership. Exact source-package recovery and retention remain open. |
 | Retained server SQL/auth | Native ARM64 run41050050193 passes compiled first/repeat SQL, exact ledgers/restart, real SRP/M2, persisted40-byte session key, owned loopback realm/listener, credentials/trackers and clean shutdown. | This measured input is six-patch build41005048019.1; no reconstructed client/world/Android execution. |
 | Appearance storage | Exact source-derived49/132-byte binary tables pass NUL/high-byte roundtrip, REPLACE/read/delete and restart with fixture rows removed. | No canonical original creator was found; provenance remains explicit. Actual game saves/transport unqualified. |
 | Server runtime packaging | Current seven-patch stripped SQL/auth/restart gates pass41050050294; native ARM64 loading of actual stripped auth/world programs passes; worldserver shrinks2.65GB→59MB, paired debug data retained outside APK. Runtime plus original notices is21,996,594bytes. | Programs provider stays disabled until complete corresponding-source rebuild proof. |
@@ -80,3 +80,24 @@ GitHub immutability flag remains false, independently of publisher no-overwrite 
 
 No preliminary APK is being requested on the Thor. See scoped runtime receipts
 for host/emulator/hardware boundaries and HANDOFF.md for concrete continuation.
+
+## Current integration checkpoint
+
+Production Wine has a separate public dependency release at
+`deps-wine-arm64-681b2e9-c0e13ed15a69`; all three preservation jobs41074190885
+pass actual stored-byte readback. The original runtime and complete1.68GB source
+companion remain byte-identical. New runtime-bound X11/PCM helpers, authenticated
+X11, Turnip/compiler rebuild and compiler/exclusive-ICD checks pass41073499555.
+These are native ARM64 host checks without a GPU, not Android/Adreno gameplay.
+
+The APK now packages18 exact installation helper/profile files, including the
+source-backed playerbots setup. It still stages before playerbots completion;
+Main START and complete-slot promotion remain closed. The real compiled bot
+database component and schema/reentry/restart workflow is being rerun after the
+CMake launcher-cache guard and artifact parent ownership corrections. No actual
+bot schema or in-world AI success is claimed yet.
+
+The Android Wine launch environment now accepts only an absent adaptation or the
+pinned string `WINE_ANDROID_PRIVATE_PE_COPY=1`, passes it through the isolated
+guest environment and rejects session overrides. Host argv checks, Android test
+compilation and lint pass; the current production lock remains unchanged.

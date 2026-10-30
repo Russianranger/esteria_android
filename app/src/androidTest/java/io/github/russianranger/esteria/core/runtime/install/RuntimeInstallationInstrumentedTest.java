@@ -27,6 +27,9 @@ public final class RuntimeInstallationInstrumentedTest {
         Path root = Files.createTempDirectory(context().getCacheDir().toPath(), "runtime-contracts-");
         try {
             RuntimeInstallerTests.main(new String[]{root.toString()});
+            android.os.Bundle observations = new android.os.Bundle();
+            observations.putString("esteriaRuntimeContractGroups", Integer.toString(RuntimeInstallerTests.passedCount()));
+            InstrumentationRegistry.getInstrumentation().sendStatus(0, observations);
         } finally {
             try (java.util.stream.Stream<Path> paths = Files.walk(root)) {
                 for (Path path : (Iterable<Path>) paths.sorted(Comparator.reverseOrder())::iterator)

@@ -23,6 +23,7 @@ import java.util.zip.GZIPOutputStream;
 public final class RuntimeInstallerTests {
     interface Test {void run()throws Exception;}
     private static int passed;
+    public static int passedCount() { return passed; }
     private static Path temporaryRoot;
     private static final RuntimePackagePlan.Limits LIMITS=new RuntimePackagePlan.Limits(50000,128L<<20,256L<<20,4096,32L<<20);
     private static final URI URI_PIN=URI.create("https://example.invalid/runtime.tar.gz");

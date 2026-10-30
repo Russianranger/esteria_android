@@ -20,6 +20,24 @@ class PlayerbotsComponentBuild(unittest.TestCase):
         self.original_lock = self.root / 'original-sources.lock.json'
         self.original_lock.write_text(self.provider['serverBuildSourceLockText'])
 
+    def test_actual_cache_rows_prove_both_launchers_empty_independently_of_option_projection(self):
+        path = self.root / 'CMakeCache.txt'
+        selected = dict(APPS_BUILD='all', TOOLS_BUILD='all', SCRIPTS='static', MODULES='static',
+                        LUA_VERSION='lua52', CMAKE_BUILD_TYPE='RelWithDebInfo', ELUNA='ON', LUA_STATIC='ON')
+        prefix = ''.join(name + ':STRING=' + value + '\n' for name, value in selected.items())
+        launchers = ('CMAKE_C_COMPILER_LAUNCHER', 'CMAKE_CXX_COMPILER_LAUNCHER')
+        empty = ''.join(name + ':STRING=\n' for name in launchers)
+        path.write_text(prefix + empty)
+        self.assertEqual(component.files.cmake_options(path), dict(sorted(selected.items())))
+        self.assertEqual(component.verify_cache_launchers(path), {name: '' for name in launchers})
+        for name in launchers:
+            for suffix in (empty.replace(name + ':STRING=\n', ''),
+                           empty.replace(name + ':STRING=\n', name + ':STRING=ccache\n'),
+                           empty + name + ':STRING=\n'):
+                path.write_text(prefix + suffix)
+                with self.subTest(name=name), self.assertRaisesRegex(ValueError, 'launcher-enabled-or-absent'):
+                    component.verify_cache_launchers(path)
+
     def test_explicit_original_lock_keeps_archived_hash_and_current_server_profile(self):
         pin = inputs.load_pin(self.original_lock)
         self.assertEqual(pin['sourceLockSha256'], self.provider['serverBuildSourceLock']['sha256'])
@@ -179,6 +197,8 @@ class PlayerbotsComponentBuild(unittest.TestCase):
             executed.append([str(row) for row in arguments]); log.write_bytes(b'fixture compiler output\n')
             if '--build' not in arguments:
                 (output / 'build').mkdir()
+                (output / 'build/CMakeCache.txt').write_text(
+                    'CMAKE_C_COMPILER_LAUNCHER:STRING=\nCMAKE_CXX_COMPILER_LAUNCHER:STRING=\n')
             else:
                 (output / 'build' / component.TARGET).write_bytes(
                     b'fixture binary\x00ESTERIA_PLAYERBOTS_DATABASE_REFERENCE_COMPLETE statements=\x00')
@@ -194,7 +214,7 @@ class PlayerbotsComponentBuild(unittest.TestCase):
                 patch.object(component.inputs, 'verify_environment', side_effect=compare), \
                 patch.object(component.shutil, 'which', return_value=sys.executable), \
                 patch.object(component.isolated, 'run_owned', side_effect=run), \
-                patch.object(component.files, 'cmake_options', return_value=dict(CMAKE_C_COMPILER_LAUNCHER='', CMAKE_CXX_COMPILER_LAUNCHER='')), \
+                patch.object(component.files, 'cmake_options', return_value=dict(APPS_BUILD='all', TOOLS_BUILD='all')), \
                 patch.object(component.reference, 'commands', return_value=new_commands), \
                 patch.object(component.files, 'elf_header', return_value=dict(machine='AArch64')), \
                 patch.object(component.files, 'bounded_command', return_value=''), \

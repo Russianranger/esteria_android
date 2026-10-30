@@ -11,6 +11,24 @@ on:
       - tools/qualify_server_isolated_build.py
       - tools/verify_playerbots_reference.py
       - tests/test_playerbots_component_build.py
+      - tools/prepare_playerbots_runtime.py
+      - tools/qualify_playerbots_component.py
+      - tests/test_playerbots_component_qualification.py
+      - tests/test_runtime_playerbots_setup.py
+      - runtime/server_playerbots_setup.py
+      - runtime/server_update_setup.py
+      - runtime/server_updater.py
+      - runtime/server_content.py
+      - runtime/server_config.py
+      - runtime/server_schema_setup.py
+      - runtime/server_schema_baseline.py
+      - runtime/server_schema_adaptations.py
+      - runtime/mysql_bootstrap.py
+      - runtime/owned_process_group.py
+      - runtime/android_server_installation_setup.py
+      - runtime/provision_local_realm.py
+      - runtime/provision_local_account.py
+      - runtime/server/server-build-sources.lock.json
 permissions:
   contents: read
   actions: read
@@ -21,7 +39,7 @@ jobs:
   playerbots-schema:
     if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
     runs-on: ubuntu-24.04-arm
-    timeout-minutes: 90
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -30,7 +48,9 @@ jobs:
         run: |
           test "$(uname -m)" = aarch64
           python3 -m unittest tests.test_playerbots_component_build tests.test_server_isolated_environment \
-            tests.test_server_isolated_sources tests.test_server_isolated_build -v
+            tests.test_server_isolated_sources tests.test_server_isolated_build \
+            tests.test_playerbots_component_qualification tests.test_runtime_playerbots_setup \
+            tests.test_runtime_server_update_setup tests.test_android_server_installation_setup -v
           mkdir -p out/playerbots-evidence
       - name: Select the unchanged archived server lock after validating current app binding
         run: |
@@ -86,15 +106,90 @@ jobs:
             --integration-revision "$GITHUB_SHA" \
             --output "$GITHUB_WORKSPACE/out/playerbots-component" \
             > out/playerbots-evidence/build.log 2>&1
-      # The separate native SQL step consumes payload/bin/playerbots-schema and
-      # payload/helper-build.json inside the verified compiler-free engine image.
-      # Its fresh-instance, reentry and restart receipt is separate from this build.
-      - name: Collect build-only receipts and bounded compiler diagnostics
+      - name: Acquire only measured seven-patch runtime derivatives and exact source content
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/prepare_playerbots_runtime.py --output out/playerbots-runtime-inputs \
+            > out/playerbots-evidence/runtime-inputs.log 2>&1
+          cp out/playerbots-runtime-inputs/preparation.json out/playerbots-evidence/runtime-preparation.json
+      - name: Build and read back the exact compiler-free dependency image without APT
+        run: |
+          env -u GITHUB_TOKEN python3 tools/release_server_dependencies.py prepare --output out/playerbots-dependency-release \
+            > out/playerbots-evidence/dependency-download.log 2>&1
+          python3 tools/prepare_server_dependency_image.py --inputs out/playerbots-dependency-release \
+            --output out/playerbots-dependency-image > out/playerbots-evidence/dependency-context.log 2>&1
+          cp out/playerbots-dependency-image/context-receipt.json out/playerbots-evidence/dependency-context.json
+          rm -rf out/playerbots-dependency-release
+          docker build --network none --platform linux/arm64 -t esteria-playerbots-schema:verified \
+            out/playerbots-dependency-image/context > out/playerbots-evidence/image-build.log 2>&1
+          docker run --rm --network none --read-only \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/tools/verify_server_dependency_image.py,dst=/verify-image.py,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/playerbots-dependency-image/context-receipt.json,dst=/context-receipt.json,readonly" \
+            esteria-playerbots-schema:verified /usr/bin/python3 /verify-image.py --context-receipt /context-receipt.json \
+            > out/playerbots-evidence/dependency-image-check.json
+      - name: Verify the unused intended MySQL state mount destination
+        run: |
+          docker run --rm --network none --read-only -i esteria-playerbots-schema:verified \
+            /usr/bin/python3 - > out/playerbots-evidence/mysql-state-mount-preflight.json <<'PY'
+          import json, pathlib, stat
+          target = pathlib.Path('/var/lib/mysql/esteria-playerbots-schema')
+          current = pathlib.Path('/')
+          for part in target.parts[1:-1]:
+              current /= part
+              try: info = current.lstat()
+              except FileNotFoundError: continue
+              if not stat.S_ISDIR(info.st_mode): raise ValueError('mysql-state-parent-is-not-plain-directory')
+          try: target.lstat()
+          except FileNotFoundError: pass
+          else: raise ValueError('mysql-state-destination-must-be-absent')
+          print(json.dumps(dict(formatVersion=1, scope='playerbots-mysql-state-mount-preflight',
+              presentParentsArePlainDirectories=True, destinationAbsent=True, databaseExecuted=False), sort_keys=True))
+          PY
+      - name: Run real product core and fourth-schema setup, reentry and restart on native ARM64
+        run: |
+          umask 077
+          mkdir -p out/playerbots-native-private
+          version=$(python3 -c 'import json; print(json.load(open("out/playerbots-evidence/dependency-image-check.json"))["expectedMysqlSqlVersion"])')
+          helper=$(sudo sha256sum out/playerbots-component/payload/helper-build.json | cut -d' ' -f1)
+          docker run --rm --init --network none --read-only --tmpfs /tmp:rw,nosuid,nodev,size=16m \
+            --env PYTHONDONTWRITEBYTECODE=1 \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/playerbots-native-private,dst=/var/lib/mysql/esteria-playerbots-schema" \
+            --workdir /qualification esteria-playerbots-schema:verified \
+            python3 tools/qualify_playerbots_component.py \
+            --install /qualification/out/playerbots-runtime-inputs/install \
+            --engine-derivative-receipt /qualification/out/playerbots-runtime-inputs/transfer/server-engine-package/package-receipt.json \
+            --content /qualification/out/playerbots-runtime-inputs/transfer/engine-inputs/content \
+            --content-receipt-sha256 1c00990e090e85af0232fe633b64e2718071a5f8e81f3b0ca1c8f2b214ffb3af \
+            --lock /qualification/out/playerbots-runtime-inputs/transfer/engine-inputs/locked/sources.lock.json \
+            --helper /qualification/out/playerbots-component/payload/bin/playerbots-schema \
+            --helper-receipt /qualification/out/playerbots-component/payload/helper-build.json \
+            --helper-receipt-sha256 "$helper" --mysql /usr/bin/mysql --mysqld /usr/sbin/mysqld \
+            --expected-version "$version" --output /var/lib/mysql/esteria-playerbots-schema/run \
+            > out/playerbots-native-private/qualification-status-private.log 2>&1
+      - name: Collect only typed native SQL qualification
         if: always()
         run: |
           sudo python3 - <<'PY'
+          import json, os
           from pathlib import Path
-          import shutil
+          from tools import verify_server_build as files, manifest_server_modules as modules
+          from tools.qualify_playerbots_component import public_record
+          target=Path('out/playerbots-evidence');target.mkdir(parents=True,exist_ok=True)
+          source=Path('out/playerbots-native-private/run/qualification.json')
+          if source.is_file():
+              proof,identity=modules.read_json(source,limit=4*1024**2)
+              if proof.get('scope')!='disposable-native-arm64-product-playerbots-schema':raise ValueError('unexpected-native-proof-scope')
+              (target/'native-sql-qualification.json').write_text(json.dumps(public_record(proof),sort_keys=True,indent=2)+'\n')
+          PY
+      - name: Collect build-only receipts, bounded compiler diagnostics and final public identities
+        if: always()
+        run: |
+          sudo env ESTERIA_PLAYERBOTS_REVISION="$GITHUB_SHA" python3 - <<'PY'
+          from pathlib import Path
+          import json, os, shutil
+          from tools import verify_server_build as files
           source=Path('out/playerbots-component');target=Path('out/playerbots-evidence')
           target.mkdir(parents=True,exist_ok=True)
           receipt=source/'qualification.json'
@@ -109,8 +204,19 @@ jobs:
                       with path.open('rb') as stream:
                           stream.seek(max(0,path.stat().st_size-256*1024))
                           (target/(path.stem+'-tail.log')).write_bytes(stream.read(256*1024))
+          rows={path.name:files.identity(path) for path in target.iterdir() if path.is_file()}
+          receipt=dict(formatVersion=1,scope='native-playerbots-build-and-schema-environment',
+              integrationRevision=os.environ['ESTERIA_PLAYERBOTS_REVISION'],files=rows,buildAndSqlCommandsRequireExternalNetworkDisabled=True,
+              originalServerProgramsRebuilt=False,originalReceiptsPreserved=True,
+              privateSqlLogsExported=False,androidRuntimeQualified=False,gameplayQualified=False)
+          (target/'environment-receipt.json').write_text(json.dumps(receipt,sort_keys=True,indent=2)+'\n')
           PY
           sudo chown -R "$(id -u):$(id -g)" out/playerbots-evidence
+          # The root-owned 0700 parent must be traversable by the artifact
+          # action after handoff; changing only its payload child is insufficient.
+          if sudo test -d out/playerbots-component; then
+            sudo chown "$(id -u):$(id -g)" out/playerbots-component
+          fi
           if test -d out/playerbots-component/payload; then
             sudo chown -R "$(id -u):$(id -g)" out/playerbots-component/payload
           fi
