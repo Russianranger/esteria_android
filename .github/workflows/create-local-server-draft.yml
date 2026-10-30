@@ -5,6 +5,9 @@ on:
     branches: [android/client-server]
     paths:
       - runtime/server-components-publication/draft-creation.lock.json
+      - tools/create_local_server_draft.py
+      - tests/test_local_server_draft_creation.py
+      - .github/workflows/create-local-server-draft.yml
 permissions:
   contents: read
 concurrency:
@@ -15,15 +18,25 @@ jobs:
     if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    outputs:
+      create_requested: ${{ steps.request.outputs.create_requested }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
       - name: Test refusal of existing releases tags changed measurements and metadata mutation
         run: python3 -m unittest tests.test_local_server_draft_creation -v
+      - name: Admit metadata creation only while the explicit source publication lock remains unbound
+        id: request
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          from tools.create_local_server_draft import ROOT,load_pin,creation_requested,transport
+          lock=transport.small_json(ROOT/'runtime/server-components-publication/dependency-release.lock.json')
+          print('create_requested='+str(creation_requested(lock,load_pin())).lower())
+          PY
   create-metadata:
     needs: validate
-    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server' && needs.validate.outputs.create_requested == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:

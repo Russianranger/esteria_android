@@ -67,6 +67,30 @@ def load_pin():
     return pin
 
 
+def creation_requested(lock, pin):
+    """Only an explicit unbound source lock admits the write job, never a remote match."""
+    require(type(lock) is dict and set(lock) == {'formatVersion', 'scope', 'repository', 'tag',
+        'state', 'targetCommit', 'ownedDraftReleaseId', 'selectedInputs', 'recipeInputs', 'files'} and
+        type(lock['formatVersion']) is int and lock['formatVersion'] == 1 and
+        lock['scope'] == 'local-server-source-debug-provider-write-once-prerelease' and
+        lock['repository'] == REPOSITORY and lock['tag'] == TAG,
+        'draft-creation-publication-lock-schema-required')
+    if lock['state'] == 'pending-measurement':
+        require(all(lock[name] is None for name in ('targetCommit', 'ownedDraftReleaseId',
+            'selectedInputs', 'recipeInputs', 'files')), 'draft-creation-pending-lock-must-be-unbound')
+        return True
+    require(lock['state'] in ('measured-unbound', 'owned-draft-bound') and
+        digest(engine.canonical(dict(lock, state='measured-unbound', ownedDraftReleaseId=None))) ==
+            pin['measurementFiles']['measured-release.lock.json'],
+        'draft-creation-publication-measurement-differs')
+    if lock['state'] == 'owned-draft-bound':
+        require(type(lock['ownedDraftReleaseId']) is int and lock['ownedDraftReleaseId'] > 0,
+            'draft-creation-bound-lock-id-required')
+        return False
+    require(lock['ownedDraftReleaseId'] is None, 'draft-creation-measured-lock-must-be-unbound')
+    return True
+
+
 def frozen_selection(recipe, measured_lock, pin):
     """Let the exact archived recipe validate its own locks and canonical Git blobs."""
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=recipe, timeout=30).decode().strip()
@@ -239,6 +263,10 @@ def main():
             candidateAssetBytesReverifiedHere=False)
     else:
         require(args.measurement_directory is None, 'draft-creation-must-acquire-exact-retained-measurement')
+        if args.operation == 'create':
+            require(creation_requested(transport.small_json(ROOT /
+                'runtime/server-components-publication/dependency-release.lock.json'), pin),
+                'draft-creation-already-bound-use-read-only-verification')
         api = transport.Github(os.environ.get('GITHUB_TOKEN'))
         with tempfile.TemporaryDirectory(prefix='esteria-draft-metadata-') as temporary:
             directory = acquire_measurement(api, Path(temporary), pin)

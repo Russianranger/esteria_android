@@ -203,10 +203,28 @@ class LocalServerDraftCreation(unittest.TestCase):
         self.assertIn('contents: write', raw)
         self.assertIn('actions: read', raw)
         self.assertIn('runtime/server-components-publication/draft-creation.lock.json', raw)
+        self.assertIn('tools/create_local_server_draft.py', raw)
+        self.assertIn('tests/test_local_server_draft_creation.py', raw)
+        self.assertIn("needs.validate.outputs.create_requested == 'true'", raw)
         self.assertEqual(raw.count('persist-credentials: false'), 3)
         self.assertNotIn('pull_request_target', raw)
         self.assertNotIn('git push', raw)
         self.assertNotIn('gh release', raw)
+        pending = dict(formatVersion=1, scope='local-server-source-debug-provider-write-once-prerelease',
+            repository=draft.REPOSITORY, tag=draft.TAG, state='pending-measurement', targetCommit=None,
+            ownedDraftReleaseId=None, selectedInputs=None, recipeInputs=None, files=None)
+        self.assertTrue(draft.creation_requested(pending, self.pin))
+        with self.assertRaisesRegex(ValueError, 'pending-lock-must-be-unbound'):
+            draft.creation_requested(dict(pending, ownedDraftReleaseId=123), self.pin)
+        pin, directory, selection = self.measurement_fixture()
+        measured = selection['lock']
+        self.assertTrue(draft.creation_requested(measured, pin))
+        self.assertFalse(draft.creation_requested(dict(measured, state='owned-draft-bound', ownedDraftReleaseId=123), pin))
+        with self.assertRaisesRegex(ValueError, 'bound-lock-id-required'):
+            draft.creation_requested(dict(measured, state='owned-draft-bound'), pin)
+        with self.assertRaisesRegex(ValueError, 'publication-measurement-differs'):
+            draft.creation_requested(dict(measured, state='owned-draft-bound', ownedDraftReleaseId=123,
+                targetCommit='f' * 40), pin)
 
 
 if __name__ == '__main__': unittest.main()
