@@ -1,0 +1,57 @@
+name: Pinned local-server build
+on:
+  push:
+    branches: [android/client-server]
+    paths:
+      - sources.lock.json
+      - runtime/**
+      - config/**
+      - tools/**
+      - tests/**
+      - .github/workflows/server.yml
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: server-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  server:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build g++ libboost-all-dev libssl-dev libmysqlclient-dev mysql-client libreadline-dev libbz2-dev zlib1g-dev
+      - name: Test integration tooling
+        run: python3 -m unittest discover -s tests -v
+      - name: Prepare pinned sources
+        run: python3 tools/fetch_sources.py all
+      - name: Verify client and server field layouts
+        run: python3 tools/verify_protocol.py --client sources/client --server sources/server
+      - name: Configure ARM64 server
+        run: >-
+          cmake -S sources/server -B out/server -G Ninja
+          -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/out/server-install
+          -DSCRIPTS=static -DMODULES=static -DAPPS_BUILD=all -DTOOLS_BUILD=all
+          -DELUNA=ON -DLUA_VERSION=lua52 -DLUA_STATIC=ON -DNOPCH=1
+      - name: Build with bounded concurrency
+        run: cmake --build out/server --parallel 2
+      - name: Install and record provenance
+        run: |
+          cmake --install out/server
+          cp sources.lock.json out/server-install/
+          uname -a > out/server-install/build-host.txt
+          dpkg-query -W > out/server-install/build-packages.txt
+          find out/server-install -type f -print0 | sort -z | xargs -0 sha256sum > out/server-install.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: esteria-linux-arm64-server-${{ github.sha }}
+          path: |
+            out/server-install/
+            out/server-install.sha256
+          if-no-files-found: error
+          retention-days: 14

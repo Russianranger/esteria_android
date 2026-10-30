@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "sources": {
+    "client": {
+      "url": "https://github.com/Russianranger/wowdecomp_esteria.git",
+      "commit": "800cdd272269570a9776d0c170e4828605fc1218",
+      "branch": "android/arm64-port",
+      "submodules": {},
+      "patches": []
+    },
+    "server": {
+      "url": "https://github.com/Russianranger/EsteriaWoW.git",
+      "commit": "f35f04d01689f034778e3474b3c820092f51e461",
+      "branch": "main",
+      "submodules": {
+        "src/server/game/LuaEngine": "58d7652138887783228b9727bd1fa4e08f00342b"
+      },
+      "patches": []
+    }
+  },
+  "compatibility": {
+    "base_client_build": 12340,
+    "extended_limits": true,
+    "container_slots": 254,
+    "quest_log_slots": 25,
+    "client_class_capacity": 32
+  }
+}

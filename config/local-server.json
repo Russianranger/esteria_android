@@ -1,0 +1,23 @@
+{
+  "database_engine": "MySQL >= 8.0; MariaDB is not qualified",
+  "database_port": 13306,
+  "auth_port": 3724,
+  "world_port": 8085,
+  "client_build": 12340,
+  "qualification": "Initial four controlled account-bot ceiling; device memory and thermals unmeasured",
+  "playerbots": {
+    "AiPlayerbot.Enabled": 1,
+    "AiPlayerbot.RandomBotAutologin": 0,
+    "AiPlayerbot.MinRandomBots": 0,
+    "AiPlayerbot.MaxRandomBots": 0,
+    "AiPlayerbot.RandomBotAccountCount": 0,
+    "AiPlayerbot.AddClassAccountPoolSize": 0,
+    "AiPlayerbot.MaxAddedBots": 4,
+    "AiPlayerbot.BotAutologin": 0,
+    "AiPlayerbot.AllowAccountBots": 1,
+    "AiPlayerbot.RandomBotGuildCount": 0,
+    "AiPlayerbot.RandomBotArenaTeam2v2Count": 0,
+    "AiPlayerbot.RandomBotArenaTeam3v3Count": 0,
+    "AiPlayerbot.RandomBotArenaTeam5v5Count": 0
+  }
+}
