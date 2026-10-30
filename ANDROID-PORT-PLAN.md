@@ -16,7 +16,7 @@ Native Android is a later platform path: current root CMake deliberately rejects
 
 The complete reconstructed Windows ARM64 and x64 builds now pass, including the
 source-built movie DLL's actual load/decode test. This supports the selected bring-up
-path but does not qualify Wine, Android, graphics or game protocol behavior. The
+path. Actual Linux ARM64 Wine codec and software Vulkan fixtures now pass; Android, hardware graphics, full game startup and game protocol behavior remain unqualified. The
 pinned Debian 12 Wine candidate is staged and measured; the Ubuntu 24.04 server
 needs a separate compatible dependency environment. No CPU translation should be
 needed for the selected AA64 client/server code, but Wine/PRoot/display overhead,
@@ -27,10 +27,10 @@ combined memory and Thor thermals remain measurements to make, not assumed gains
 | Milestone | State | Next evidence |
 | --- | --- | --- |
 | 1. Pinned reference builds | Branches, locks, protocol checks, full ARM64/x64 client builds complete; server build in progress. | Native Linux ARM64 server link/install and artifact provenance. |
-| 2. Executable client platform | ARM64 algorithms, crash path and real codec implemented; Windows client compiles. | Linux ARM64 Wine execution, Vulkan presentation, then Android display/input/audio. |
+| 2. Executable client platform | ARM64 algorithms/crash/codec implemented; full Windows builds and Linux ARM64 Wine codec/software Vulkan pass. | Actual EXE entry check, then Android display/input/audio and full game startup. |
 | 3. Local server/database | Real host MySQL bootstrap/recovery/persistence passed. | Packaged ARM64 MySQL/server rootfs, source-backed game schemas and data loading. |
 | 4. Matched gameplay | Not qualified. | Login, character creation, world entry, Esteria extensions and persistent saves with real content. |
-| 5. Android integration | Import/recovery, launcher controls, diagnostics and generic supervisor implemented. | Runtime installation, process adapter, in-game controls, keyboard, shutdown and lifecycle. |
+| 5. Android integration | Import/recovery, bounded runtime setup, launcher controls, diagnostics and generic supervisor implemented. | Android runtime execution, process adapter, in-game controls, keyboard, shutdown and lifecycle. |
 | 6. Thor candidate | Not ready. | One signed update-compatible package with all required host/emulator/gameplay gates, then consolidated Thor test. |
 
 ## Execution order

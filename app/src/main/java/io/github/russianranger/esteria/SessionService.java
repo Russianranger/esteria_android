@@ -36,6 +36,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import io.github.russianranger.esteria.core.diagnostics.SupportBundle;
 import io.github.russianranger.esteria.core.importer.GameDataImporter;
+import io.github.russianranger.esteria.core.runtime.install.RuntimeInstaller;
+import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
+import io.github.russianranger.esteria.runtime.RuntimeSetup;
 
 /** Foreground owner of large import jobs. Runtime launch remains gated until qualified binaries exist. */
 public final class SessionService extends Service {
@@ -43,6 +46,7 @@ public final class SessionService extends Service {
     static final String CANCEL = "io.github.russianranger.esteria.CANCEL";
     static final String EXPORT = "io.github.russianranger.esteria.EXPORT";
     static final String START = "io.github.russianranger.esteria.START";
+    static final String PREPARE_RUNTIME = "io.github.russianranger.esteria.PREPARE_RUNTIME";
     private static final String CHANNEL = "esteria-session";
     private static final int NOTIFICATION = 1001;
     final class LocalBinder extends Binder { SessionService service() { return SessionService.this; } }
@@ -65,7 +69,9 @@ public final class SessionService extends Service {
             root = getFilesDir().getCanonicalFile().toPath();
             Files.createDirectories(root.resolve("state/logs"));
             if (getSharedPreferences("session", MODE_PRIVATE).getBoolean("interrupted", false))
-                status = "Previous operation was interrupted. Select the same folder or archive to resume where source metadata permits. Existing game data remains active.";
+                status = PREPARE_RUNTIME.equals(getSharedPreferences("session", MODE_PRIVATE).getString("operationAction", ""))
+                        ? "Runtime setup was interrupted. Choose Prepare client runtime to resume; current data and saves are preserved."
+                        : "Previous operation was interrupted. Select the same folder or archive to resume where source metadata permits. Existing game data remains active.";
             else if (new GameDataImporter(root.resolve("game")).resolveCurrent() != null)
                 status = "Client data is imported. Local runtime qualification is still pending.";
         } catch (IOException e) { status = "Storage unavailable: " + e.getMessage(); }
@@ -86,14 +92,19 @@ public final class SessionService extends Service {
         if (!busy.compareAndSet(false, true)) return START_NOT_STICKY;
         cancelled.set(false);
         String operationId = UUID.randomUUID().toString();
-        getSharedPreferences("session", MODE_PRIVATE).edit().putString("operation", operationId).putBoolean("interrupted", true).commit();
+        getSharedPreferences("session", MODE_PRIVATE).edit().putString("operation", operationId)
+                .putString("operationAction", intent.getAction()).putBoolean("interrupted", true).commit();
         worker.execute(() -> {
             try {
                 if (root == null) throw new IOException("App storage is unavailable");
                 if (IMPORT.equals(intent.getAction())) importData(intent);
                 else if (EXPORT.equals(intent.getAction())) exportBundle(intent.getData());
                 else if (START.equals(intent.getAction())) checkLaunch();
+                else if (PREPARE_RUNTIME.equals(intent.getAction())) prepareRuntime();
                 else throw new IOException("Unknown operation");
+            } catch (RuntimeWork.CancelledException e) {
+                status = "Runtime setup paused. Choose Prepare client runtime to resume; current data and saves are preserved.";
+                log("Runtime setup paused");
             } catch (GameDataImporter.ImportCancelledException e) {
                 status = "Import paused. Select the same folder or archive to resume where source metadata permits; existing game data is unchanged.";
                 log("Import paused");
@@ -153,6 +164,28 @@ public final class SessionService extends Service {
         // platform session adapter before admitting any runtime to this build.
         throw new IOException("This build has no qualified client/server session adapter");
     }
+    private void prepareRuntime() throws IOException {
+        status = "Preparing client runtime…";
+        RuntimeSetup setup = new RuntimeSetup(this, root);
+        if (setup.current() != null) {
+            status = "The current client runtime files are already prepared. Local services and gameplay are still under development.";
+            return;
+        }
+        final long[] lastUpdate = {0};
+        RuntimeInstaller.Result result = setup.prepare((phase, path, completed, total) -> {
+            long now = android.os.SystemClock.elapsedRealtime();
+            if (now - lastUpdate[0] >= 250 || completed == total) {
+                lastUpdate[0] = now;
+                status = runtimePhase(phase) + "\n" + mib(completed)
+                        + (total >= 0 ? " / " + mib(total) : "") + " MiB"
+                        + (path == null || path.isEmpty() ? "" : "\n" + path);
+            }
+        }, cancelled::get);
+        status = "Client runtime files are prepared. Local services and gameplay are still under development.";
+        log("Runtime prepared generation=" + result.generation + " reusedFiles=" + result.reusedFiles
+                + " copiedBytes=" + result.copiedBytes + " directorySyncSupported=" + result.directorySyncSupported
+                + " gameRuntimeQualified=false");
+    }
     private void exportBundle(Uri destination) throws Exception {
         if (destination == null || !"content".equals(destination.getScheme())) throw new IOException("No export destination selected");
         String previousStatus = status; status = "Writing support bundle…";
@@ -165,6 +198,16 @@ public final class SessionService extends Service {
         facts.put("device.model", Build.MODEL); facts.put("device.manufacturer", Build.MANUFACTURER);
         facts.put("device.abis", android.text.TextUtils.join(",", Build.SUPPORTED_ABIS));
         facts.put("status", previousStatus); facts.put("runtime.qualified", "false");
+        try {
+            RuntimeSetup setup = new RuntimeSetup(this, root);
+            facts.put("runtime.client.archiveSha256", setup.archiveSha256());
+            facts.put("runtime.client.sourcePinSha256", setup.sourcePinSha256());
+            facts.put("runtime.client.expectedGeneration", setup.generation());
+            facts.put("runtime.client.prepared", String.valueOf(setup.current() != null));
+        } catch (IOException error) {
+            facts.put("runtime.client.prepared", "false");
+            facts.put("runtime.client.installationError", error.getMessage());
+        }
         facts.put("proot.packaged", String.valueOf(BuildConfig.PROOT_PACKAGED));
         facts.put("proot.androidExecutionQualified", "false");
         if (BuildConfig.PROOT_PACKAGED) {
@@ -291,6 +334,17 @@ public final class SessionService extends Service {
         } catch (IOException ignored) { }
     }
     private static long mib(long value) { return value / (1024 * 1024); }
+    private static String runtimePhase(String phase) {
+        switch (phase) {
+            case "download": return "Downloading client runtime…";
+            case "verify-download": case "verify-resume": return "Checking runtime download…";
+            case "resume-runtime": return "Resuming prepared runtime files…";
+            case "verify-runtime": return "Checking prepared runtime files…";
+            case "cached": case "download-verified": return "Runtime download is ready";
+            case "runtime-prepared": case "runtime-cached": return "Client runtime files are ready";
+            default: return "Preparing local runtime files…";
+        }
+    }
     private static String importProgress(String path, long bytes, long total, int count, int files) {
         return "Importing " + count + " / " + files + " files · " + mib(bytes) + " / " + mib(total) + " MiB\n" + path;
     }
@@ -301,7 +355,7 @@ public final class SessionService extends Service {
     }
     @Override public void onDestroy() { destroyed = true; requestCancellation(); worker.shutdown(); super.onDestroy(); }
     @Override public void onTimeout(int startId, int foregroundServiceType) {
-        requestCancellation(); status = "Android stopped the long import. Select the same source to resume where metadata permits.";
+        requestCancellation(); status = "Android stopped this setup operation. Start it again to resume completed work where supported.";
         stopForeground(STOP_FOREGROUND_REMOVE); stopSelf(startId);
     }
 }

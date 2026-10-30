@@ -17,3 +17,11 @@ tasks.register('importerTest', JavaExec) {
     maxHeapSize = '32m'
 }
 check.dependsOn hostTest, diagnosticsTest, importerTest
+
+tasks.register('runtimeInstallerTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.runtime.install.RuntimeInstallerTests'
+    maxHeapSize = '64m'
+}
+check.dependsOn runtimeInstallerTest

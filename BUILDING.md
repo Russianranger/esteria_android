@@ -40,11 +40,15 @@ First build environment: Ubuntu 24.04 ARM64 with GCC, CMake, Ninja, Boost develo
 
 MySQL 8 is required by the selected source. MariaDB is not a drop-in qualified substitution: both compile-time and runtime version checks reject it. Server artifacts do not include a seeded database, extracted game data or an Android runtime.
 
-The locked Eluna patch fixes a missing `AreaTrigger` forward declaration exposed
-by the clean build; `fetch_sources.py` verifies and applies it inside the exact
+The three locked Eluna patches supply the missing `AreaTrigger` declaration,
+`MapMgr.h` include and standalone integer/size type includes exposed by clean builds; `fetch_sources.py` verifies and applies it inside the exact
 submodule. Compiler caches include actual compiler/package and source/patch
 fingerprints and use two jobs/2 GiB. The cache can accelerate a failed build but
 does not replace the source checks.
+
+The separate dependency-image recipe in [runtime/server/README.md](runtime/server/README.md)
+pins Ubuntu snapshot packages, MySQL and corresponding sources. Docker is used for
+development builds and offline native ARM64 database qualification, not on-device execution.
 
 ## Android toolchain
 JDK 17, Android SDK platform 35 / build-tools 35.0.0, Gradle 8.9 / AGP 8.7.3. The app and core are Java; host core tests require no game data. The Gradle wrapper pins its distribution hash. APK compilation initially validates the launcher and core only. The runtime and gameplay gates must pass before calling it a device candidate.
@@ -64,7 +68,8 @@ for recorded build provenance. Gradle embeds the complete source lock as well.
 [runtime/proot/README.md](runtime/proot/README.md) provides the exact source/NDK
 inputs, one-job Bionic ARM64 build, corresponding-source companion, provider
 validation and APK byte check. Pass `-PprootProviderDir=<verified-provider>` to
-include the real PRoot/loader executables. Plain launcher builds remain valid
+include the real PRoot/loader executables. Run `:app:clean` when changing provider
+inputs to discard previously merged native/compressed assets. Plain launcher builds remain valid
 without that provider. Build success does not qualify Android guest execution.
 
 ## Runtime staging and database qualification
@@ -75,10 +80,14 @@ artifact, not an Android runtime installation. Do not execute Ubuntu 24.04 serve
 binaries in that Debian 12 rootfs without a compatible dependency environment.
 
 [runtime/WINE-QUALIFICATION.md](runtime/WINE-QUALIFICATION.md) describes the isolated
-native ARM64 Linux codec fixture. It needs a real Windows ARM64 build artifact and
+native ARM64 Linux codec, Vulkan and optional actual-EXE entry fixtures. It needs a real Windows ARM64 build artifact and
 does not require proprietary game data. [runtime/LOCAL-SERVER.md](runtime/LOCAL-SERVER.md)
 documents guarded MySQL initialization and authenticated readiness. Dedicated
 database CI tests real engines; ordinary Python discovery skips those fixtures.
+
+[runtime/ANDROID-INSTALLATION.md](runtime/ANDROID-INSTALLATION.md) documents the
+app setup adapter and bounded Java installer. [runtime/SQL-PACKAGING.md](runtime/SQL-PACKAGING.md)
+documents the source-backed module selection and reproducible GNU content archive.
 
 ## Signing and reproducibility
 Keep `*.jks`, `*.keystore`, private runtime configurations and game assets out of Git. A user-deliverable development APK must use one persistent privately stored key and carry the application/client/server source revisions and runtime hashes. This is not yet a bit-identical reproducible APK promise: SDK/compiler/runtime package locks and release signing qualification remain to be completed.

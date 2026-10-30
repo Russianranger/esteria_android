@@ -1,0 +1,160 @@
+{
+  "formatVersion": 1,
+  "scope": "server-runtime-source-inputs-only",
+  "runtimeQualified": false,
+  "architecture": "arm64",
+  "baseImage": {
+    "reference": "docker.io/library/ubuntu@sha256:19cad59657037cffa0ac9a48107019b768900ff1071140965827513ac866bd5e",
+    "manifest": {
+      "annotations": {
+        "com.docker.official-images.bashbrew.arch": "arm64v8",
+        "org.opencontainers.image.base.name": "scratch",
+        "org.opencontainers.image.created": "2026-10-24T00:00:00Z",
+        "org.opencontainers.image.revision": "16ea15480c0ade845a0b2384e31b932db235dcf5",
+        "org.opencontainers.image.source": "https://git.launchpad.net/cloud-images/+oci/ubuntu-base",
+        "org.opencontainers.image.url": "https://hub.docker.com/_/ubuntu",
+        "org.opencontainers.image.version": "24.04"
+      },
+      "digest": "sha256:19cad59657037cffa0ac9a48107019b768900ff1071140965827513ac866bd5e",
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "platform": {
+        "architecture": "arm64",
+        "os": "linux",
+        "variant": "v8"
+      },
+      "size": 424
+    },
+    "config": {
+      "mediaType": "application/vnd.oci.image.config.v1+json",
+      "size": 2069,
+      "digest": "sha256:1f1aeedbd16d617d1e09524c511cbbfb3b9748526f73ef36325366eee8347f8c"
+    },
+    "layers": [
+      {
+        "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+        "size": 28940126,
+        "digest": "sha256:e2d2bb84d02254f4be480ca3c62f94fc12ac959c11b3ce5bd7da3f411b2b9607"
+      }
+    ],
+    "source": "https://git.launchpad.net/cloud-images/+oci/ubuntu-base",
+    "sourceRevision": "16ea15480c0ade845a0b2384e31b932db235dcf5"
+  },
+  "snapshot": {
+    "id": "20261029T000000Z",
+    "uri": "https://snapshot.ubuntu.com/ubuntu/20261029T000000Z",
+    "suites": [
+      "noble",
+      "noble-updates",
+      "noble-security"
+    ],
+    "components": [
+      "main",
+      "universe"
+    ],
+    "inRelease": [
+      {
+        "suite": "noble",
+        "bytes": 255850,
+        "sha256": "cdb2f31d809f589719a53c6ad15f255b27569c4059542ada282aaa21b8e164b0",
+        "url": "https://snapshot.ubuntu.com/ubuntu/20261029T000000Z/dists/noble/InRelease"
+      },
+      {
+        "suite": "noble-updates",
+        "bytes": 126125,
+        "sha256": "e1c5857e7e172d38526c644d0a9726de89464923655593fcf0530eb49287a981",
+        "url": "https://snapshot.ubuntu.com/ubuntu/20261029T000000Z/dists/noble-updates/InRelease"
+      },
+      {
+        "suite": "noble-security",
+        "bytes": 126127,
+        "sha256": "38f7d01ad74eaeefd526677cdfaee36a81a2370dfa9a7936ab0f8fe5accc34a4",
+        "url": "https://snapshot.ubuntu.com/ubuntu/20261029T000000Z/dists/noble-security/InRelease"
+      }
+    ],
+    "keyring": {
+      "path": "usr/share/keyrings/ubuntu-archive-keyring.gpg",
+      "bytes": 3607,
+      "sha256": "80a36b0a6de2f69f49d2df75ef473ccde121e9e190b9ea01d20a4f63778d5c31"
+    },
+    "observedSigningFingerprint": "F6ECB3762474EDA9D21B7022871920D1991BC93C"
+  },
+  "mysql": {
+    "packageVersion": "8.0.46-0ubuntu0.24.04.4",
+    "expectedRuntimeVersion": "8.0.46-0ubuntu0.24.04.4",
+    "runtimeVersionVerified": false,
+    "sourcePackage": "mysql-8.0",
+    "license": "GPL-2.0; retain package copyright notices and bundled dependency notices",
+    "binaryPackages": [
+      {
+        "package": "mysql-server-core-8.0",
+        "architecture": "arm64",
+        "version": "8.0.46-0ubuntu0.24.04.4",
+        "file": "mysql-server-core-8.0_8.0.46-0ubuntu0.24.04.4_arm64.deb",
+        "bytes": 17312550,
+        "sha256": "802a8c487520066e2fe960f8691ecbdaaf98dce03494795e55dde8db4689ea8e",
+        "url": "https://snapshot.ubuntu.com/ubuntu/20261029T000000Z/pool/main/m/mysql-8.0/mysql-server-core-8.0_8.0.46-0ubuntu0.24.04.4_arm64.deb"
+      },
+      {
+        "package": "mysql-client-core-8.0",
+        "architecture": "arm64",
+        "version": "8.0.46-0ubuntu0.24.04.4",
+        "file": "mysql-client-core-8.0_8.0.46-0ubuntu0.24.04.4_arm64.deb",
+        "bytes": 2727944,
+        "sha256": "641eb958b07497de25a9e7a14fa3fbbdb193a3445d2fcd36686f5788e16639b3",
+        "url": "https://snapshot.ubuntu.com/ubuntu/20261029T000000Z/pool/main/m/mysql-8.0/mysql-client-core-8.0_8.0.46-0ubuntu0.24.04.4_arm64.deb"
+      },
+      {
+        "package": "libmysqlclient21",
+        "architecture": "arm64",
+        "version": "8.0.46-0ubuntu0.24.04.4",
+        "file": "libmysqlclient21_8.0.46-0ubuntu0.24.04.4_arm64.deb",
+        "bytes": 1245514,
+        "sha256": "3044e9126fed3377d0e5a306c4b89ca781903df711c5af4cc2fe72dd1eddbf13",
+        "url": "https://snapshot.ubuntu.com/ubuntu/20261029T000000Z/pool/main/m/mysql-8.0/libmysqlclient21_8.0.46-0ubuntu0.24.04.4_arm64.deb"
+      }
+    ],
+    "sourceArchives": [
+      {
+        "file": "mysql-8.0_8.0.46.orig.tar.gz",
+        "bytes": 492495969,
+        "sha256": "dff4332ee7f8f37fc0516c66763600a22a81c8192c743c477b6484206e314f2f",
+        "url": "https://snapshot.ubuntu.com/ubuntu/20261029T000000Z/pool/main/m/mysql-8.0/mysql-8.0_8.0.46.orig.tar.gz"
+      },
+      {
+        "file": "mysql-8.0_8.0.46-0ubuntu0.24.04.4.debian.tar.xz",
+        "bytes": 235036,
+        "sha256": "f922343a3252ad355579d1ec5dcc6707e2b97e1d717d498572f945713e4e713d",
+        "url": "https://snapshot.ubuntu.com/ubuntu/20261029T000000Z/pool/main/m/mysql-8.0/mysql-8.0_8.0.46-0ubuntu0.24.04.4.debian.tar.xz"
+      },
+      {
+        "file": "mysql-8.0_8.0.46-0ubuntu0.24.04.4.dsc",
+        "bytes": 3613,
+        "sha256": "5b95ccbed23c569db1cb3b144b6e002ee9bec8a94bfd54c5fe1aefb6286c6d87",
+        "url": "https://snapshot.ubuntu.com/ubuntu/20261029T000000Z/pool/main/m/mysql-8.0/mysql-8.0_8.0.46-0ubuntu0.24.04.4.dsc"
+      }
+    ]
+  },
+  "runtimePackages": [
+    "ca-certificates",
+    "python3",
+    "mysql-server-core-8.0",
+    "mysql-client-core-8.0",
+    "libmysqlclient21",
+    "libboost-filesystem1.83.0",
+    "libboost-program-options1.83.0",
+    "libboost-iostreams1.83.0",
+    "libboost-regex1.83.0",
+    "libboost-thread1.83.0",
+    "libreadline8t64",
+    "libbz2-1.0",
+    "zlib1g",
+    "libssl3t64"
+  ],
+  "notes": [
+    "Base OCI manifest and layer identities fetched and verified independently.",
+    "All three snapshot InRelease signatures verified with the pinned OCI base keyring.",
+    "MySQL binary/source hashes originate in indexes covered by the verified noble-updates InRelease.",
+    "No rootfs build, MySQL execution, server ELF closure or Android execution established by this source lock.",
+    "Current package recipe is for a separate Linux ARM64 guest, never the Debian12 Wine rootfs."
+  ]
+}

@@ -6,6 +6,10 @@ on:
       - sources.lock.json
       - tools/fetch_sources.py
       - tools/verify_protocol.py
+      - tools/manifest_server_content.py
+      - tools/manifest_server_modules.py
+      - tools/package_server_content.py
+      - runtime/server-lua-map.json
       - tests/native/**
       - tools/verify_server_build.py
       - tests/test_server_build.py
@@ -16,6 +20,10 @@ on:
       - sources.lock.json
       - tools/fetch_sources.py
       - tools/verify_protocol.py
+      - tools/manifest_server_content.py
+      - tools/manifest_server_modules.py
+      - tools/package_server_content.py
+      - runtime/server-lua-map.json
       - tests/native/**
       - tools/verify_server_build.py
       - tests/test_server_build.py
@@ -100,6 +108,7 @@ jobs:
           set -o pipefail
           cmake -S sources/server -B out/server -G Ninja \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/out/server-install \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
             -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DSCRIPTS=static -DMODULES=static -DAPPS_BUILD=all -DTOOLS_BUILD=all \
             -DELUNA=ON -DLUA_VERSION=lua52 -DLUA_STATIC=ON -DNOPCH=1 \
@@ -138,6 +147,34 @@ jobs:
             --host out/server-install/build-host.txt \
             --revision "${GITHUB_SHA}" --build-id "${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}" \
             --loader-smoke 2>&1 | tee out/diagnostics/artifact-verification.log
+      - name: Bind generated module lists to the verified binaries
+        run: |
+          python3 tools/manifest_server_modules.py \
+            --compile-commands out/server/compile_commands.json --install out/server-install \
+            --server-build out/server-install/server-build.json --output out/server-modules.json
+          python3 - <<'PY'
+          import json, pathlib
+          manifest = json.loads(pathlib.Path('out/server-modules.json').read_text())
+          pathlib.Path('out/server-enabled-modules.json').write_text(json.dumps(manifest['enabledModules']))
+          PY
+      - name: Package verified SQL and notices with explicit Lua policy
+        run: |
+          python3 tools/manifest_server_content.py --server sources/server \
+            --modules-json out/server-enabled-modules.json --output out/server-content-manifest.json
+          python3 tools/package_server_content.py --server sources/server \
+            --manifest out/server-content-manifest.json --module-receipt out/server-modules.json \
+            --lua-map runtime/server-lua-map.json --output out/server-content
+      - name: Retain unqualified content package and exact module evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: unqualified-esteria-server-content-${{ github.sha }}
+          compression-level: 0
+          path: |
+            out/server-content/
+            out/server-modules.json
+            out/server-content-manifest.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Retain installed unqualified binaries even when verification fails
         if: always() && steps.install.outcome == 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -155,6 +192,7 @@ jobs:
           path: |
             out/diagnostics/
             out/server/CMakeCache.txt
+            out/server/compile_commands.json
             out/server/CMakeFiles/CMakeConfigureLog.yaml
             out/server/.ninja_log
             sources.lock.json

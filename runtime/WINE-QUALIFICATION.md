@@ -50,9 +50,31 @@ the real Vulkan image tracking implementation for 20,000 simultaneous images
 and 30,000 total create/destroy operations. Each needs zero exit and its exact
 success marker. Presentation and texture flags are separate from codec; a
 later graphics failure does not erase an earlier qualified codec result when
-owned cleanup and logs remain valid. The command still exits nonzero if any
+owned cleanup and logs remain valid. The worker records its intended zero or
+handled-failure exit; the observed namespace exit must match that completed
+receipt before any component can qualify. Abnormal death cannot retain a pass.
+The command still exits nonzero if any
 requested check fails. Validation callback availability is recorded separately;
 an unavailable layer never becomes a validation-layer pass.
+
+## Full executable entry check
+
+Add `--client-entry-check` to copy the already-hashed `WowClient64.exe` into the
+private fixture and launch it with its single exact `--esteria-entry-check`
+argument. This executes the real Windows image entry, CRT/Storm initialization,
+allocator, C++ exception/destructor unwind, FP-control read and main-fiber return
+path. Its special mode returns before `CommonMain`; it does not load game data.
+Normal client behavior when that argument is absent remains unchanged.
+
+Pass requires exit zero and a new, regular, bounded `Esteria-entry-check.json`
+with the exact ARM64/build12340/extension4 entry-only schema, all seven checks
+true, and both `commonMainStarted` and `assetsLoaded` false. The client creates
+that file exclusively; an existing receipt is refused. The harness exports its
+verified contents and original SHA256. The stdout success marker is recorded
+only as observed because the real crash logger's `AllocConsole` may redirect it.
+`linuxArm64ClientEntryQualified`, `clientExecutableLaunchAttempted` and
+`clientExecutableEntryReached` describe this explicit scope;
+`gameInitializationStarted` and Android/gameplay qualifications remain false.
 
 The output directory must be new. Logs, identities, per-import file/machine
 diagnostics, worker exit status and `qualification.json` are retained on success
@@ -78,7 +100,8 @@ support failures are reported; there is no weaker silent fallback.
 Codec pass requires display readiness, successful Wine initialization, the driver's
 zero exit and exact success message, successful Wine stop and observed namespace
 exit. It establishes **Linux ARM64 Wine + real Xvid DLL** execution only. The
-client executable is hashed for matched-build provenance but is not started.
+client executable is hashed for matched-build provenance and is started only
+when the explicit entry-check option above is selected.
 The codec fixture does not validate other client imports, Vulkan rendering, Android
 process policy, presentation, input, audio, server startup, login or gameplay.
 Reports explicitly keep those qualifications false.
@@ -93,7 +116,7 @@ Android presentation, game-shader correctness, or scene rendering. The generic
 Android/game/rendering qualification fields remain false; Linux software
 presentation and texture lifecycle have explicit separate fields.
 
-Run the twelve host guard/manifest/capture/graphics-scope tests with:
+Run the fourteen host guard/manifest/capture/scope tests with:
 
 ```sh
 python3 -m unittest tests.test_wine_qualification -v

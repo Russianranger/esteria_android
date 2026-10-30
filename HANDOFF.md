@@ -15,36 +15,36 @@ server/Wine jobs must not be converted into successful evidence without logs.
 
 ## Next concrete work
 
-1. Fetch both development tips and read their instructions. Confirm the current
-   source/runtime locks and exact CI/artifact identities. Client full-build/DLL
-   smoke pass is `b335a3111cd64e69d5ceaebc73fb4daa57eed560`, run `40983191169`.
-   Application source lock currently uses full-build-proven `a3683cc`.
-2. Native ARM64 Wine codec execution passed at client `61ad13e`, run `40985737329`.
-   Complete the asset-free Vulkan fixtures at client `08e6d45`, run `40986534025`.
-   Use the pinned preparer and `runtime/WINE-QUALIFICATION.md`; keep external
-   networking isolated and distinguish native Linux ARM64 from Android.
-3. Inspect the latest server run after `40983190300`, which exposed the missing
-   `MapMgr.h` include fixed by patch 0002. Follow-up `c2408d5` failed missing
-   integer/size types in Hooks.h, now fixed by patch 0003 with standalone-header
-   compilation. Fix any further compile/link error
-   via ordered digest-checked patches here. Package the installed binaries plus SQL,
-   modules/Lua, extractors, configs and notices; install target alone is incomplete.
-4. Inspect the new Android PRoot CI and Linux ownership matrix. Two local clean
-   Bionic builds and APK payload checks already pass. Continue actual Android
-   execution, runtime installation and process-owner integration; see
-   `runtime/proot/README.md`. Preserve nativeLibraryDir packaging and source notices.
-5. Pin a matching server rootfs/MySQL package. Ubuntu 24.04 server binaries cannot
-   be assumed to run in the Debian 12 Wine rootfs. Keep mutable databases outside
-   replaceable runtime trees. MySQL 8 is required; MariaDB is not qualified.
-6. Extend the tested empty-database bootstrap with source-backed game schema and
-   module initialization/version checks, then guarded upgrades and server readiness.
-   Never reseed live character/account/bot data. Real bootstrap CI `40983978344`
-   passed on 8.0.46 and 8.0.44; this does not prove game schemas or Android MySQL.
-7. Integrate display/audio/input and real client/server launch. Continue host and
-   available emulator qualification before requesting hardware work.
+1. Fetch both development tips and inspect current Actions. Application client pin
+   is `08e6d453733cff08f47eeb76dec5211749594753`; full ARM64/x64 builds and
+   native ARM64 Wine software Vulkan passed in `40986534025`. Codec also passed
+   `40985737329`. Neither starts the full game.
+2. Publish/run the pending actual-EXE entry check from the client branch using
+   the newly pinned integration Wine harness. Verify Windows ARM64/x64 and native
+   Linux ARM64 receipts, namespace completion and actual process exit. Entry check
+   deliberately does not call CommonMain or consume game assets.
+3. Inspect server run `40987376145` after the third Eluna include patch. Continue
+   real compile/link fixes as digest-checked patches in this repository. The next
+   workflow also binds enabled modules to actual binaries and emits a verified
+   GNU SQL/config/notice package. Source-profile package alone is unqualified.
+4. Android PRoot CI `40986376389` passed Bionic build/APK byte verification and
+   Linux x64/ARM64 descendant ownership. Actual Android execution remains open.
+   The Java runtime installer has passed the full pinned archive on Linux with
+   64 MiB heap. Continue process-owner adapter and Android filesystem/execution
+   qualification; see `runtime/ANDROID-INSTALLATION.md` and `runtime/proot/README.md`.
+5. Inspect the new CI build of the reviewed, separately pinned Ubuntu 24.04 server/MySQL rootfs.
+   Do not combine its glibc 2.39 binaries with Debian 12 Wine's glibc 2.36.
+   Keep all mutable databases outside replaceable runtime generations.
+6. Qualify actual fresh game schemas with dbimport and the separate playerbots
+   loader, then versioned upgrades with validated backup/restore. Real empty-DB
+   bootstrap and loopback realm repair pass; `40987376123` runs all eight realm
+   tests on MySQL 8.0.44. Repair advertised realm only after all module updates.
+7. Integrate actual display/audio/input, controller and keyboard, lifecycle and
+   graceful server-save shutdown. Inspect read-only reference launcher code where
+   useful. Keep startup gated until component readiness is actually established.
 8. Import authentic complete build 12340/custom data; generate shaders with the
    corrected provider precedence, extract matched server assets, validate local
-   login/world/save/relog/bots/offline. Missing content scope is in the asset inventory.
+   login/world/save/relog/bots/offline before any main Thor test.
 
 ## Invariants
 

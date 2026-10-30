@@ -14,6 +14,13 @@ interruption/reuse, immutable overlays, malformed archive/provider metadata,
 bounded inventories, cancellation and prior-generation preservation. SAF Android
 provider behavior remains a separate emulator/device check.
 
+Runtime installer checks run with `:core:runtimeInstallerTest` (64 MiB heap).
+Seventeen groups cover traversal, malformed GNU metadata, cancellation/resume,
+closed staging inventories, required-file tampering, download caching and activation.
+The actual pinned archive passed on Linux with 64 MiB heap: 14,092 entries, all
+11,844 regular source files reused on retry, zero copied payload on retry. This is
+not Android filesystem or execution evidence.
+
 The client CI matrix separately builds full Windows x64 and ARM64 binaries,
 validates PE provenance, and invokes the actual movie DLL through a synthetic
 compressed-frame driver. Linux x64 and native ARM64 component tests cover portable
@@ -30,6 +37,10 @@ empty application databases. Game-schema load, migrations, character saves and
 Android MySQL remain unqualified. Ordinary discovery reports these fixtures as
 skipped unless their explicit environment and disposable engine are provided.
 
+Realm repair run [40987376123](https://github.com/Russianranger/esteria_android/actions/runs/40987376123)
+passes all eight dedicated MySQL 8.0.44 tests, including owned-instance checks and
+preservation of unrelated rows/settings. Only realm network/build provisioning is qualified.
+
 ## Wine and Android evidence boundaries
 
 The candidate Wine archive is measured and staged with checked file hashes and
@@ -37,6 +48,13 @@ architecture. Its actual client execution requires the separate native Linux ARM
 fixture in [runtime/WINE-QUALIFICATION.md](runtime/WINE-QUALIFICATION.md). Keep
 its resulting qualification JSON and logs; authored tests or absent physical DLL
 files for API-set names do not establish loader success or failure.
+
+Native Linux ARM64 Wine codec run `40985737329` and software Vulkan run
+`40986534025` pass. The latter presents/resizes 16 frames and exercises 30,000
+texture lifetime operations using the pinned Lavapipe stack. Its receipt SHA-256 is
+`26e27a5437dd2785ed6b8db05b7281b7a45306696c1f58360709052f515cefc0`.
+Validation layers were unavailable; this is not hardware Vulkan or world rendering.
+The optional actual-client entry fixture still needs execution results.
 
 Android APK compilation/lint and launcher host tests are passing checks. No Android
 emulator or physical Thor gameplay result has been recorded. Display/audio/input,

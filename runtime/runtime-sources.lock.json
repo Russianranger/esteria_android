@@ -275,5 +275,24 @@
       }
     },
     "note": "Software reference only; no Android display, Adreno driver, or game-frame validation."
+  },
+  "androidInstallation": {
+    "formatVersion": 1,
+    "packageKey": "wine-arm64",
+    "metadataBytes": 33554432,
+    "requiredMetadata": {
+      "etc/memento-client-runtime.json": {
+        "bytes": 215,
+        "sha256": "db1d304311c46e645d3907ac6abc866895ca4b2f04302b96f94c497d1e3a72c5"
+      },
+      "etc/memento-client-packages.txt": {
+        "bytes": 5804,
+        "sha256": "d352e210a76cba919e036d4faa48a997054ee0c8ac598e2be98efe9f19a31fc9"
+      },
+      "usr/lib/os-release": {
+        "bytes": 267,
+        "sha256": "59a77b5f2666d9c85c489bd1911a6eebbd91ef22fe48b90a3b75f1b21f3844d4"
+      }
+    }
   }
 }

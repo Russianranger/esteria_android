@@ -59,6 +59,9 @@ public final class MainActivity extends Activity {
         button(layout, "Import client ZIP", () -> chooseArchive(BASE));
         button(layout, "Add custom content folder", () -> chooseFolder(OVERLAY_FOLDER));
         button(layout, "Add custom content ZIP", () -> chooseArchive(OVERLAY));
+        button(layout, "Prepare client runtime · 585 MiB download", () -> operation(new Intent(this, SessionService.class).setAction(SessionService.PREPARE_RUNTIME)));
+        TextView runtimeNote = text("Runtime setup uses about 3.2 GiB plus space retained by earlier versions. Interrupted setup can resume. Local services and gameplay are still under development.", 13, Color.rgb(145, 163, 177));
+        layout.addView(runtimeNote);
         button(layout, "Start local game", () -> operation(new Intent(this, SessionService.class).setAction(SessionService.START)));
         button(layout, "Export support bundle", this::chooseExport);
         cancel = new Button(this); cancel.setText(R.string.stop_session); cancel.setEnabled(false);

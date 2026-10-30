@@ -97,3 +97,14 @@ shader rendering, SQL overlay parity, offline cache completeness or in-world beh
 Missing inputs block only their affected runtime qualification. Continue client platform work,
 reproducible builds, import/recovery, process supervision, protocol checks and UI without fabricated
 assets. Request the precise missing custom set only after independent implementation is exhausted.
+
+## Source-backed server content checkpoint
+
+`runtime/SQL-PACKAGING.md` records the exact source inventory, compiled-module
+binding check and GNU archive packager. The source-profile archive readback
+passed for 4,060 entries / 654,046,522 bytes. It contains available updater SQL,
+config templates and notices, not an initialized database or complete deployed
+content. All 20 discovered server-Lua candidates have explicit dependency decisions
+in `runtime/server-lua-map.json`; the intermediate profile disables Lua until
+matching AIO, schemas, custom races/maps and appearances can be qualified.
+The full Esteria script and custom-content requirements remain open.

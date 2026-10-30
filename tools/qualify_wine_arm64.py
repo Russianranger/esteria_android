@@ -27,6 +27,8 @@ except ImportError:
 
 GUEST = '/esteria-qualification'
 SUCCESS = 'Movie adapter (DLL): BGRA/VFLIP, output bounds, skipped frames and slot lifecycle passed'
+ENTRY_SUCCESS = 'PASS: Esteria executable entry/CRT/allocator/exception/fiber roundtrip (entry-check only)'
+ENTRY_RECEIPT = 'Esteria-entry-check.json'
 LOG_LIMIT = 16 * 1024 * 1024
 VULKAN_FIXTURES = {
     'presentation': ('presentation_device.exe',
@@ -41,6 +43,23 @@ def read_json(path):
         data = stream.read(packages.MAX_METADATA + 1)
     packages.require(len(data) <= packages.MAX_METADATA, 'qualification-json-limit')
     return json.loads(data), hashlib.sha256(data).hexdigest()
+
+
+def read_entry_receipt(path):
+    with packages.plain_file(path) as stream:
+        data = stream.read(4097)
+    packages.require(len(data) <= 4096, 'client-entry-receipt-size-limit')
+    result = json.loads(data)
+    expected = dict(schemaVersion=1, scope='executable-entry-only', architecture='ARM64',
+                    protocolBuild=12340, extensionVersion=4, commonMainStarted=False, assetsLoaded=False)
+    checks = {'imageEntryReached', 'crtInitialized', 'stormAllocator', 'cppUnwind', 'mainFiber', 'fiberReturn',
+              'fpControlRead'}
+    packages.require(type(result) is dict and set(result) == set(expected) | {'checks'}, 'client-entry-receipt-fields')
+    packages.require(all(type(result[key]) is type(value) and result[key] == value for key, value in expected.items()),
+                     'client-entry-receipt-scope-mismatch')
+    packages.require(type(result['checks']) is dict and set(result['checks']) == checks and
+                     all(value is True for value in result['checks'].values()), 'client-entry-checks-incomplete')
+    return result, hashlib.sha256(data).hexdigest()
 
 
 def pe_identity(path, dll):
@@ -216,7 +235,8 @@ def worker(runtime, output):
     fixture = root / GUEST.lstrip('/')
     plan, _ = read_json(fixture / 'qualification-plan.json')
     result = {'displayReady': False, 'prefixExit': None, 'fixtureExit': None,
-              'codecMessageMatched': False, 'networkIsolated': False}
+              'codecMessageMatched': False, 'networkIsolated': False,
+              'expectedExit': None, 'workerCompleted': False}
     display = None
     captures = []
     try:
@@ -255,6 +275,22 @@ def worker(runtime, output):
         result['fixtureExit'] = codec.exit_code
         result['codecMessageMatched'] = codec.matched.wait(timeout=5)
         packages.require(result['fixtureExit'] == 0 and result['codecMessageMatched'], 'codec-fixture-failed')
+        if plan['clientEntryRequested']:
+            receipt_path = fixture / ENTRY_RECEIPT
+            packages.require(not os.path.lexists(receipt_path), 'client-entry-receipt-already-exists')
+            entry = dict(launchAttempted=True, exitCode=None, messageObserved=False, receiptValidated=False)
+            result['clientEntry'] = entry
+            capture = run_logged(guest_command(root, '/opt/wine/bin/wine', GUEST + '/WowClient64.exe',
+                                               '--esteria-entry-check'),
+                                 output / 'client-entry.log', 120, captures, needle=ENTRY_SUCCESS.encode())
+            entry['exitCode'] = capture.exit_code
+            # AllocConsole may move stdout to Wine's console; the exclusive
+            # receipt and process exit are authoritative for this narrow gate.
+            entry['messageObserved'] = capture.matched.is_set()
+            packages.require(capture.exit_code == 0, 'client-entry-process-failed')
+            value, digest = read_entry_receipt(receipt_path)
+            entry.update(receipt=value, receiptSha256=digest, receiptValidated=True)
+            packages.write_json(output / 'client-entry-check.json', value)
         result['graphics'] = {}
         for name in plan['graphicsRequested']:
             filename, message = VULKAN_FIXTURES[name]
@@ -271,9 +307,11 @@ def worker(runtime, output):
             result['graphics'][name] = observed
             packages.require(capture.exit_code == 0 and matched and observed['softwareAdapterMatched'],
                              name + '-vulkan-fixture-failed')
+        result['expectedExit'] = 0
         return 0
     except Exception as error:
         result['failure'] = str(error)
+        result['expectedExit'] = 1
         return 1
     finally:
         try:
@@ -292,6 +330,7 @@ def worker(runtime, output):
         result['logStreamsDrained'] = all([capture.finish(drain_deadline - time.monotonic()) for capture in captures])
         result['logsWithinLimit'] = all(not capture.truncated for capture in captures)
         result['logWritesSucceeded'] = all(capture.error is None for capture in captures)
+        result['workerCompleted'] = True
         packages.write_json(output / 'worker-result.json', result)
         # Exiting PID 1 tears down every descendant, including detached Wine
         # services. The outer owner observes namespace process exit before pass.
@@ -313,14 +352,25 @@ def graphics_identity(root, lock):
     return candidate
 
 
-def qualification_flags(result, requested):
-    common = (result.get('displayReady') is True and result.get('networkIsolated') is True and
+def qualification_flags(result, requested, namespace_exit=0, client_entry=False):
+    # A deliberate handled fixture failure may preserve earlier passing scopes.
+    # An abnormal namespace exit may not qualify anything, even if a receipt was
+    # flushed just before the worker was killed.
+    completed = (result.get('workerCompleted') is True and type(result.get('expectedExit')) is int and
+                 result['expectedExit'] in (0, 1) and type(namespace_exit) is int and
+                 namespace_exit == result['expectedExit'])
+    common = (completed and result.get('displayReady') is True and result.get('networkIsolated') is True and
               result.get('prefixExit') == 0 and result.get('wineStopExit') == 0 and
               result.get('logStreamsDrained') is True and result.get('logsWithinLimit') is True and
               result.get('logWritesSucceeded') is True)
     flags = {'linuxArm64CodecQualified': bool(common and result.get('fixtureExit') == 0 and
                                               result.get('codecMessageMatched') is True),
-             'linuxArm64VulkanPresentationQualified': False, 'linuxArm64VulkanTextureLifecycleQualified': False}
+             'linuxArm64VulkanPresentationQualified': False, 'linuxArm64VulkanTextureLifecycleQualified': False,
+             'linuxArm64ClientEntryQualified': False}
+    if client_entry:
+        entry = result.get('clientEntry', {})
+        flags['linuxArm64ClientEntryQualified'] = bool(common and entry.get('launchAttempted') is True and
+            entry.get('exitCode') == 0 and entry.get('receiptValidated') is True)
     for name in requested:
         observed = result.get('graphics', {}).get(name, {})
         passed = bool(common and observed.get('exitCode') == 0 and observed.get('messageMatched') is True and
@@ -330,7 +380,7 @@ def qualification_flags(result, requested):
     return flags
 
 
-def qualify(runtime, client_dir, driver, output, graphics=None):
+def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=False):
     packages.require(platform.machine().lower() in ('aarch64', 'arm64'), 'native-arm64-host-required')
     packages.require(os.geteuid() == 0, 'invoke-qualification-with-sudo')
     runtime = packages.directory(runtime)
@@ -360,6 +410,8 @@ def qualify(runtime, client_dir, driver, output, graphics=None):
     packages.require(not os.path.lexists(fixture), 'runtime-already-used-for-qualification')
     fixture.mkdir(mode=0o700)
     inputs = [(driver, 'test_xvid_adapter.exe'), (client_dir / 'XvidDecoder.dll', 'XvidDecoder.dll')]
+    if client_entry:
+        inputs.append((client_dir / 'WowClient64.exe', 'WowClient64.exe'))
     inputs += [(path, VULKAN_FIXTURES[name][0]) for name, path in graphics.items()]
     for source, name in inputs:
         with packages.plain_file(source) as src, (fixture / name).open('xb') as dst:
@@ -368,14 +420,17 @@ def qualify(runtime, client_dir, driver, output, graphics=None):
             dst.flush()
             os.fsync(dst.fileno())
     packages.write_json(fixture / 'qualification-plan.json',
-                        dict(graphicsRequested=list(graphics), softwareGraphics=software_graphics))
+                        dict(graphicsRequested=list(graphics), softwareGraphics=software_graphics,
+                             clientEntryRequested=client_entry))
     report = dict(formatVersion=1, scope='native-linux-arm64-wine-component-fixtures',
                   runtimeArchiveSha256=package['archive']['sha256'], runtimeReceiptSha256=prepared_sha,
                   client=client, directImports=imports_report(manifest, prepared),
-                  androidRuntimeQualified=False, gameClientStarted=False, renderingQualified=False,
+                  androidRuntimeQualified=False, clientExecutableLaunchAttempted=False,
+                  clientExecutableEntryReached=False, gameInitializationStarted=False, renderingQualified=False,
                   audioQualified=False, gameLoginQualified=False, serverRuntimeIncluded=False,
                   linuxArm64CodecQualified=False, processNamespaceExited=False,
                   linuxArm64VulkanPresentationQualified=False, linuxArm64VulkanTextureLifecycleQualified=False,
+                  linuxArm64ClientEntryQualified=False, clientEntryRequested=client_entry,
                   softwareGraphics=software_graphics, graphicsRequested=list(graphics))
     command = namespace_command(Path(__file__).resolve(), runtime, output, os.geteuid() == 0)
     child = None
@@ -385,7 +440,7 @@ def qualify(runtime, client_dir, driver, output, graphics=None):
                 env={'PATH': '/usr/sbin:/usr/bin:/sbin:/bin', 'LANG': 'C.UTF-8',
                      'ESTERIA_NAMESPACE_CHILD': '1'})
             try:
-                report['namespaceExit'] = child.wait(timeout=420 + 185 * len(graphics))
+                report['namespaceExit'] = child.wait(timeout=420 + 185 * len(graphics) + (125 if client_entry else 0))
             except subprocess.TimeoutExpired:
                 os.killpg(child.pid, signal.SIGKILL)
                 child.wait(timeout=15)
@@ -393,8 +448,12 @@ def qualify(runtime, client_dir, driver, output, graphics=None):
         report['processNamespaceExited'] = True
         result, _ = read_json(output / 'worker-result.json')
         report['worker'] = result
-        report.update(qualification_flags(result, graphics))
+        report.update(qualification_flags(result, graphics, report['namespaceExit'], client_entry))
+        report['clientExecutableLaunchAttempted'] = result.get('clientEntry', {}).get('launchAttempted') is True
+        report['clientExecutableEntryReached'] = report['linuxArm64ClientEntryQualified']
         packages.require(report['linuxArm64CodecQualified'], 'wine-codec-qualification-failed')
+        if client_entry:
+            packages.require(report['linuxArm64ClientEntryQualified'], 'client-entry-not-qualified')
         for name in graphics:
             key = ('linuxArm64VulkanPresentationQualified' if name == 'presentation' else
                    'linuxArm64VulkanTextureLifecycleQualified')
@@ -428,6 +487,7 @@ def main():
     parser.add_argument('--driver', type=Path)
     parser.add_argument('--presentation-driver', type=Path)
     parser.add_argument('--texture-driver', type=Path)
+    parser.add_argument('--client-entry-check', action='store_true', help='Launch the verified full PE in its explicit entry-only mode')
     parser.add_argument('--output', type=Path, required=True, help='New evidence directory')
     parser.add_argument('--namespace-worker', action='store_true', help=argparse.SUPPRESS)
     args = parser.parse_args()
@@ -438,9 +498,11 @@ def main():
     packages.require(args.client_dir is not None and args.driver is not None, 'client-dir-and-driver-required')
     graphics = {name: path.absolute() for name, path in
                 (('presentation', args.presentation_driver), ('texture', args.texture_driver)) if path is not None}
-    result = qualify(args.runtime, args.client_dir.absolute(), args.driver.absolute(), args.output, graphics)
+    result = qualify(args.runtime, args.client_dir.absolute(), args.driver.absolute(), args.output, graphics,
+                     args.client_entry_check)
     print(json.dumps({key: result[key] for key in ('linuxArm64CodecQualified', 'linuxArm64VulkanPresentationQualified',
-                                                 'linuxArm64VulkanTextureLifecycleQualified', 'androidRuntimeQualified')}))
+                                                 'linuxArm64VulkanTextureLifecycleQualified', 'linuxArm64ClientEntryQualified',
+                                                 'androidRuntimeQualified')}))
     return 0
 
 

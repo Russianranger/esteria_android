@@ -136,3 +136,118 @@ run real MySQL schema loading using the compiled updater. Capture schema version
 prepared-statement validation, authenticated loopback realm state and the distinct
 playerbots readiness result. Existing-save upgrades additionally require validated
 backup/restore and an explicit version transition; never reseed live saves.
+
+## Bind module selection to the built artifacts
+
+```sh
+python3 tools/manifest_server_modules.py \
+  --compile-commands out/server/compile_commands.json \
+  --install out/server-install --server-build out/server-install/server-build.json \
+  --output out/server-modules.json
+```
+
+The extractor streams the CMake compile database with bounded entries and never
+executes compiler commands. It requires matching `AC_MODULES_LIST` and
+`CONFIG_FILE_LIST` definitions for the actual worldserver/dbimport `Main.cpp`
+translation units. It then hashes the installed executables against the existing
+ARM64 build receipt and finds the exact terminated module string in **both**
+binaries. Worldserver also must contain the config-list literal it consumes;
+dbimport does not consume that macro, so an optimized-away config string is not
+required there. Duplicate, mismatched or missing definitions fail explicitly.
+
+Only the C string's trailing NUL is required. A compiler may pool suffixes or
+place nonzero read-only data immediately before it. Binary string presence is a
+consistency check alongside generated compile options and the source-verified,
+hash-matched build receipt; it is not standalone reverse-engineering evidence.
+
+The resulting receipt identifies the compile database, server build receipt,
+source lock and exact binary bytes. It establishes the built module selection,
+not successful module startup. The server CI workflow records the compile database,
+runs this check after binary verification, and uses the resulting module names
+for the content inventory and package. A source-profile package without this
+receipt remains marked `moduleSelectionVerified=false`.
+
+## Reproducible content archive
+
+```sh
+python3 tools/package_server_content.py --server sources/server \
+  --manifest out/server-content-manifest.json --module-receipt out/server-modules.json \
+  --lua-map runtime/server-lua-map.json --output out/server-content
+```
+
+The input must be a full SHA-256 inventory matching the current source lock. The
+packager reconstructs discovery from exact Git objects and rejects altered file
+sets, identities, update order or duplicate/depth-limited SQL. It fetches nothing.
+Selected payload bytes stream from Git and must match the inventory before they
+can enter the archive. A second pass reads every archive member and verifies its
+hash, regular-file type, length and fixed metadata. Failed attempts leave existing
+packages untouched. On Linux, `renameat2(RENAME_NOREPLACE)` publishes a complete
+new output directory atomically; there is no weaker overwrite fallback.
+
+The directory contains `server-content.tar.gz` and `package-receipt.json`:
+
+- `source/` preserves exact base/update/config/notice source paths for the updater.
+  Config files remain `.conf.dist` templates; no private settings are packaged.
+- Excluded/manual SQL is retained only as identities and review decisions inside
+  `metadata/content-manifest.json`. It is absent from executable SQL payload paths.
+- `lua_scripts/` contains only explicitly mapped, dependency-cleared script files.
+  An unmapped source candidate is never activated by a broad directory copy.
+- `metadata/` retains the content/module/Lua receipts and package plan, including
+  the post-update local-realm verification gate and unresolved gameplay gates.
+
+The archive uses GNU tar format, including GNU long-name records when required;
+it does not emit PAX extended headers. This matches the bounded importer format,
+but actual installation of this content package on Android remains untested.
+Archive entries are sorted; owner/group, timestamps, modes and gzip timestamp are
+fixed. Tests produce identical archive bytes from repeated inputs. The receipt
+records Python/zlib versions and packaging-tool hashes, so reproducibility is
+scoped to the recorded producer inputs. The package contains **no initialized
+database**, binaries, account credentials, game maps or client assets. Every
+schema/gameplay/Android qualification flag remains false until real qualification.
+
+## Explicit initial Lua policy and source findings
+
+`runtime/server-lua-map.json` records an identity-bound decision for all 20 source
+candidates (17 module scripts and three Eluna extensions). The initial SQL/runtime
+bring-up policy is explicitly **disabled**, and its package requires
+`Eluna.Enabled=false`. This is an intermediate setup profile; the full Esteria Lua
+objective remains active. It must not be presented as a complete feature package.
+
+A mapped policy must account for every candidate, preserve file hashes, reject
+unsafe paths and case-insensitive destination collisions, and have no outstanding
+dependencies on any activated file. Mapped files are not themselves runtime
+qualification; the package continues to report `luaRuntimeQualified=false`.
+
+| Source group | Actual dependency or behavior |
+| --- | --- |
+| `AIO_Server/AIO.lua` and its nine dependency scripts | The source declares AIO **1.75** and explicitly requires the same client version/file. No matching client AIO package is established by the selected module tree. Preserve the relative library paths when eventually mapping them. |
+| `transmog.lua` | Registers AIO `Transmog` handlers and uses account/character persistence tables (`account_transmog`, removed appearances, `character_transmog`, weapon enchants), plus world appearance/item queries. Matching AIO client UI, schema readiness and custom appearance closure are required. It is not a cosmetic optional example to omit silently. |
+| `racials.lua`, `teach_riding_worgen.lua` | Register Worgen race 12 riding/spell/login/level handlers. They need matching race/spell DBC behavior and tests; both scripts are intentional source inputs, not interchangeable duplicates. |
+| `FactionFreeTeleports_Gnome.lua`, `FactionFreeTeleports_Goblin.lua` | Bind NPC IDs **600001/600000**, respectively. Matching NPC/gossip data and valid map destinations must be verified. Do not install a second copy from the legacy Faction Free module. |
+| `open-azeroth/continent_bridge.lua` | Source assumptions explicitly require extended ocean terrain and flight on maps **0, 1 and 571**. Its 500 ms scan teleports across custom coordinate thresholds; stock-map presence alone does not satisfy this requirement. |
+| `chat_probe.lua` | Comment-only unused placeholder. Do not count it as functioning diagnostics or gameplay. |
+| Eluna `.ext` files | Framework extensions are available but held with the disabled policy. When enabled, retain the engine's extensions-before-scripts ordering and actual relative paths. |
+
+The module README is historical installation guidance, not proof that the current
+client archive stack or deployed Lua set is complete. The packager does not fetch
+CDN content, fabricate missing client code, patch signatures, or activate scripts
+with unmet data dependencies.
+
+Additional focused checks:
+
+```sh
+python3 -m unittest tests.test_server_modules tests.test_server_package -v
+```
+
+They cover command parsing/stream bounds, actual binary hash/literal checks,
+selection mismatches, deterministic archives, notice preservation, exclusion of
+manual SQL, explicit Lua decisions, failed-hash rollback and atomic no-replace
+publication. Actual compiled-module evidence still awaits a completed server build.
+
+The GNU-format source-profile package was generated entirely offline with the
+three reviewed Eluna patches: **4,060 archive entries / 654,046,522 uncompressed
+bytes**, compressed to **167,542,391 bytes**, SHA-256
+`4df26d28f4c367a3d17706006e37e9d780133c986760c58f0958afbebd16276d`.
+Every archived payload was read back and checked. Its receipt explicitly leaves
+compiled-module selection unverified and Lua disabled; it is a packaging result,
+not a successfully initialized server or Android candidate.

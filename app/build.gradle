@@ -53,6 +53,7 @@ dependencies { implementation project(':core') }
 // pins from qualified runtime binaries; these pins alone never enable gameplay.
 def sourcePins = tasks.register('generateSourcePins', Copy) {
     from rootProject.file('sources.lock.json')
+    from rootProject.file('runtime/runtime-sources.lock.json')
     into layout.buildDirectory.dir('generated/sourcePins')
 }
 android.sourceSets.main.assets.srcDir(layout.buildDirectory.dir('generated/sourcePins'))

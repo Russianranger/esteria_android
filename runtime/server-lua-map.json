@@ -1,0 +1,203 @@
+{
+  "formatVersion": 1,
+  "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
+  "elunaRevision": "58d7652138887783228b9727bd1fa4e08f00342b",
+  "mode": "disabled",
+  "reason": "SQL/runtime bring-up profile only. Full Esteria Lua remains an active qualification goal.",
+  "files": [
+    {
+      "origin": "eluna",
+      "source": "extensions/ObjectVariables.ext",
+      "sha256": "7014bd5e5289c2074afb41b9a5fd1ba01e5b5f2323e9f0015fc2f0920107772f",
+      "destination": null,
+      "reason": "Eluna support extension held with the explicitly disabled Lua setup profile.",
+      "requirements": []
+    },
+    {
+      "origin": "eluna",
+      "source": "extensions/StackTracePlus/StackTracePlus.ext",
+      "sha256": "4b6ff214aabcbf0ffe85fbbf0b7d3c4a752445f8384b85a75b00fd028018a88e",
+      "destination": null,
+      "reason": "Eluna support extension held with the explicitly disabled Lua setup profile.",
+      "requirements": []
+    },
+    {
+      "origin": "eluna",
+      "source": "extensions/_Misc.ext",
+      "sha256": "5c62df9926ca212673cbc02f2054922da236370d3ced541ad8ab8457fb3e9529",
+      "destination": null,
+      "reason": "Eluna support extension held with the explicitly disabled Lua setup profile.",
+      "requirements": []
+    },
+    {
+      "origin": "server",
+      "source": "modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/AIO.lua",
+      "sha256": "5eec2163e77621df711c744d1bc8b469121da1b8e64cc716906f0abbcc400dea",
+      "destination": null,
+      "reason": "AIO 1.75 transport/library; matching client AIO source and message integration are not qualified.",
+      "requirements": [
+        "matching-client-AIO-1.75"
+      ]
+    },
+    {
+      "origin": "server",
+      "source": "modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/Dep_LuaSrcDiet/LuaSrcDiet.lua",
+      "sha256": "a6133aa30117ad41d10c619f942036a3e449bea1050aeeec5746334cea067d15",
+      "destination": null,
+      "reason": "AIO 1.75 transport/library; matching client AIO source and message integration are not qualified.",
+      "requirements": [
+        "matching-client-AIO-1.75"
+      ]
+    },
+    {
+      "origin": "server",
+      "source": "modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/Dep_LuaSrcDiet/llex.lua",
+      "sha256": "28e490e82298e1f2167e887d4cb4fff15df7f3145a033e3ee305e0d839852d23",
+      "destination": null,
+      "reason": "AIO 1.75 transport/library; matching client AIO source and message integration are not qualified.",
+      "requirements": [
+        "matching-client-AIO-1.75"
+      ]
+    },
+    {
+      "origin": "server",
+      "source": "modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/Dep_LuaSrcDiet/lparser.lua",
+      "sha256": "0d633b5b7d01025bcd4ac7e20a8c6a2011ce67fa633829ecedf98ac7f3fbc594",
+      "destination": null,
+      "reason": "AIO 1.75 transport/library; matching client AIO source and message integration are not qualified.",
+      "requirements": [
+        "matching-client-AIO-1.75"
+      ]
+    },
+    {
+      "origin": "server",
+      "source": "modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/Dep_LuaSrcDiet/optlex.lua",
+      "sha256": "b1815598d11b12a37d7e9585a8f3419c758fa1d74d3b68013cb6a2124628ce72",
+      "destination": null,
+      "reason": "AIO 1.75 transport/library; matching client AIO source and message integration are not qualified.",
+      "requirements": [
+        "matching-client-AIO-1.75"
+      ]
+    },
+    {
+      "origin": "server",
+      "source": "modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/Dep_LuaSrcDiet/optparser.lua",
+      "sha256": "890eebdc7f8131eabb9673c3ff91ca25f01a9e6250794f4a6d5d90387c849902",
+      "destination": null,
+      "reason": "AIO 1.75 transport/library; matching client AIO source and message integration are not qualified.",
+      "requirements": [
+        "matching-client-AIO-1.75"
+      ]
+    },
+    {
+      "origin": "server",
+      "source": "modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/Dep_Smallfolk/smallfolk.lua",
+      "sha256": "80657a22b846391949fc7c1a7d42a69cc48a24d59f81c64120fa9b9d727d6955",
+      "destination": null,
+      "reason": "AIO 1.75 transport/library; matching client AIO source and message integration are not qualified.",
+      "requirements": [
+        "matching-client-AIO-1.75"
+      ]
+    },
+    {
+      "origin": "server",
+      "source": "modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/Dep_crc32lua/crc32lua.lua",
+      "sha256": "8ec020a5403d91b50e137d8d809a001337453b3d887b9e5a93e177ee9eb64be5",
+      "destination": null,
+      "reason": "AIO 1.75 transport/library; matching client AIO source and message integration are not qualified.",
+      "requirements": [
+        "matching-client-AIO-1.75"
+      ]
+    },
+    {
+      "origin": "server",
+      "source": "modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/lualzw-zeros/lualzw.lua",
+      "sha256": "ffa21617c170bcb89324a5eec41351429b493387deb37147057e723d1bf8911d",
+      "destination": null,
+      "reason": "AIO 1.75 transport/library; matching client AIO source and message integration are not qualified.",
+      "requirements": [
+        "matching-client-AIO-1.75"
+      ]
+    },
+    {
+      "origin": "server",
+      "source": "modules/mod-worgoblin-high-elf/lua_scripts/AIO_Server/queue.lua",
+      "sha256": "20942254652f8f576e774621379db17c4f831d45c6ae140939093b65b12efff1",
+      "destination": null,
+      "reason": "AIO 1.75 transport/library; matching client AIO source and message integration are not qualified.",
+      "requirements": [
+        "matching-client-AIO-1.75"
+      ]
+    },
+    {
+      "origin": "server",
+      "source": "modules/mod-worgoblin-high-elf/lua_scripts/FactionFreeTeleports_Gnome.lua",
+      "sha256": "8694b598be756deb5159785d3a176b9fb9732433e150887891da420e7c7577e8",
+      "destination": null,
+      "reason": "Teleport gossip handlers need matching NPC 600000/600001 and destinations; avoid duplicating legacy module handlers.",
+      "requirements": [
+        "matching-faction-free-NPCs-and-map-destinations"
+      ]
+    },
+    {
+      "origin": "server",
+      "source": "modules/mod-worgoblin-high-elf/lua_scripts/FactionFreeTeleports_Goblin.lua",
+      "sha256": "4e7381d0c5c4952a07f3e7ab6a91dd865599966a8f328e8623427e2f4a0204c5",
+      "destination": null,
+      "reason": "Teleport gossip handlers need matching NPC 600000/600001 and destinations; avoid duplicating legacy module handlers.",
+      "requirements": [
+        "matching-faction-free-NPCs-and-map-destinations"
+      ]
+    },
+    {
+      "origin": "server",
+      "source": "modules/mod-worgoblin-high-elf/lua_scripts/chat_probe.lua",
+      "sha256": "6379eaad9df7509cc4b7cd4f591bcff2a1a0c900c4f595333701889305b75165",
+      "destination": null,
+      "reason": "Source chat_probe.lua is an unused comment-only placeholder; do not activate as functionality.",
+      "requirements": []
+    },
+    {
+      "origin": "server",
+      "source": "modules/mod-worgoblin-high-elf/lua_scripts/open-azeroth/continent_bridge.lua",
+      "sha256": "6c46c18e88e5a74a3a38420986ec2d9f7a7e8013c4aafcbbf0c08afd0097bec9",
+      "destination": null,
+      "reason": "Source assumes extended ocean terrain and flight on maps 0, 1 and 571; exact map coverage is unqualified.",
+      "requirements": [
+        "extended-continent-terrain-and-server-map-coverage"
+      ]
+    },
+    {
+      "origin": "server",
+      "source": "modules/mod-worgoblin-high-elf/lua_scripts/racials.lua",
+      "sha256": "c404cf669b0c5fb19864ed7d570751392cc29a03825ed663539f5ea2f515c288",
+      "destination": null,
+      "reason": "Race 12 Worgen riding handlers need matching custom race/spell DBC and behavior qualification.",
+      "requirements": [
+        "matching-Worgen-race-and-riding-spells"
+      ]
+    },
+    {
+      "origin": "server",
+      "source": "modules/mod-worgoblin-high-elf/lua_scripts/teach_riding_worgen.lua",
+      "sha256": "53539f451eed7b8e6fcc83a87b55f55c0704a38ce7f86e5956044087ae87f3b1",
+      "destination": null,
+      "reason": "Race 12 Worgen riding handlers need matching custom race/spell DBC and behavior qualification.",
+      "requirements": [
+        "matching-Worgen-race-and-riding-spells"
+      ]
+    },
+    {
+      "origin": "server",
+      "source": "modules/mod-worgoblin-high-elf/lua_scripts/transmog.lua",
+      "sha256": "ba1d35eea6a720182eb0aac41fdc83b53f4756ba666795c2f6ef0710f92f6851",
+      "destination": null,
+      "reason": "Appearance transport/persistence needs matching AIO client, account/character schema and custom appearance content.",
+      "requirements": [
+        "matching-client-AIO-1.75",
+        "appearance-schema-readiness",
+        "appearance-content-closure"
+      ]
+    }
+  ]
+}

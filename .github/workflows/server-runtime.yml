@@ -1,0 +1,99 @@
+name: Pinned ARM64 server dependencies
+on:
+  push:
+    branches: [android/client-server]
+    paths:
+      - runtime/server/**
+      - runtime/mysql_bootstrap.py
+      - tests/test_mysql_bootstrap.py
+      - tests/test_server_runtime_inputs.py
+      - .github/workflows/server-runtime.yml
+  pull_request:
+    paths:
+      - runtime/server/**
+      - tests/test_server_runtime_inputs.py
+      - .github/workflows/server-runtime.yml
+  workflow_dispatch:
+    inputs:
+      capture_sources:
+        description: Download the complete installed-package source closure
+        type: boolean
+        default: true
+permissions:
+  contents: read
+concurrency:
+  group: server-runtime-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  dependencies:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Check source pin contracts on native ARM64
+        run: |
+          test "$(uname -m)" = aarch64
+          python3 -m unittest tests.test_server_runtime_inputs -v
+          mkdir -p out/server-runtime
+      - name: Build exact Ubuntu snapshot dependency image
+        run: |
+          docker build --platform linux/arm64 --target runtime \
+            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
+            -t esteria-server-runtime:qualification runtime/server \
+            > out/server-runtime/build.log 2>&1
+      - name: Recover measured image metadata
+        run: |
+          container=$(docker create esteria-server-runtime:qualification)
+          trap 'docker rm -f "$container" >/dev/null' EXIT
+          docker cp "$container:/etc/esteria-server-runtime.json" out/server-runtime/server-runtime.json
+          docker image inspect esteria-server-runtime:qualification --format '{{.Id}}' > out/server-runtime/image-id.txt
+          python3 - <<'PY'
+          import json, os, pathlib
+          runtime = json.loads(pathlib.Path('out/server-runtime/server-runtime.json').read_text())
+          with open(os.environ['GITHUB_ENV'], 'a') as output:
+              output.write('ESTERIA_MYSQL_INITIALIZE_VERSION=' + runtime['expectedMysqlSqlVersion'] + '\n')
+          PY
+      - name: Qualify real ARM64 database initialization and persistence without external network
+        run: |
+          docker run --rm --init --network none \
+            --env PYTHONDONTWRITEBYTECODE=1 \
+            --env ESTERIA_MYSQL_INITIALIZE=1 \
+            --env ESTERIA_MYSQLD_PATH=/usr/sbin/mysqld \
+            --env ESTERIA_MYSQL_INITIALIZE_VERSION \
+            --env ESTERIA_MYSQL_DIAGNOSTICS_DIR=/evidence/mysql \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/server-runtime,dst=/evidence" \
+            --workdir /qualification esteria-server-runtime:qualification \
+            python3 -m unittest tests.test_mysql_bootstrap.RealMysqlInitialization.test_initialize_promote_restart_and_persist -v \
+            > out/server-runtime/mysql-initialize.log 2>&1
+          python3 - <<'PY'
+          import hashlib, json, pathlib
+          root = pathlib.Path('out/server-runtime')
+          raw = (root / 'server-runtime.json').read_bytes()
+          runtime = json.loads(raw)
+          receipt = dict(formatVersion=1, scope='native-arm64-container-mysql-initialization',
+              runtimeManifestSha256=hashlib.sha256(raw).hexdigest(), sourceLockSha256=runtime['sourceLockSha256'],
+              mysqlVersion=runtime['expectedMysqlSqlVersion'], mysqlSqlVersionVerified=True,
+              initializedPromotedRestartedAndPersisted=True, externalNetworkDisabled=True,
+              serverIncluded=False, androidRuntimeQualified=False, gameLoginQualified=False)
+          (root / 'mysql-qualification.json').write_text(json.dumps(receipt, indent=2) + '\n')
+          PY
+      - name: Download authenticated corresponding sources for installed packages
+        if: github.event_name != 'workflow_dispatch' || inputs.capture_sources
+        run: |
+          docker build --platform linux/arm64 --target source-export \
+            --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
+            --output type=local,dest=out/server-runtime/sources runtime/server \
+            > out/server-runtime/source-build.log 2>&1
+      - name: Make owned diagnostic/source artifacts readable
+        if: always()
+        run: sudo chown -R "$(id -u):$(id -g)" out/server-runtime
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: unqualified-server-dependencies-${{ github.sha }}
+          path: |
+            out/server-runtime
+            runtime/server
+            LICENSE
+          retention-days: 14

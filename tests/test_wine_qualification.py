@@ -104,15 +104,18 @@ class WineQualification(unittest.TestCase):
     def test_graphics_receipt_keeps_codec_and_presentation_scope_separate(self):
         result = dict(displayReady=True, networkIsolated=True, prefixExit=0, fixtureExit=0, codecMessageMatched=True,
                       wineStopExit=0, logStreamsDrained=True, logsWithinLimit=True, logWritesSucceeded=True,
+                      workerCompleted=True, expectedExit=1,
                       graphics={'presentation': dict(exitCode=0, messageMatched=True, softwareAdapterMatched=True,
                                                       validationCallbackActive=False),
                                 'texture': dict(exitCode=1, messageMatched=False, softwareAdapterMatched=False)})
-        flags = qualification.qualification_flags(result, ['presentation', 'texture'])
+        flags = qualification.qualification_flags(result, ['presentation', 'texture'], namespace_exit=1)
         self.assertTrue(flags['linuxArm64CodecQualified'])
         self.assertTrue(flags['linuxArm64VulkanPresentationQualified'])
         self.assertFalse(flags['linuxArm64VulkanTextureLifecycleQualified'])
+        for abnormal in (0, 137, -9):
+            self.assertFalse(any(qualification.qualification_flags(result, ['presentation', 'texture'], abnormal).values()))
         result['logStreamsDrained'] = False
-        self.assertFalse(any(qualification.qualification_flags(result, ['presentation', 'texture']).values()))
+        self.assertFalse(any(qualification.qualification_flags(result, ['presentation', 'texture'], 1).values()))
 
     def test_checked_in_graphics_pin_matches_runtime_and_requires_real_identities(self):
         lock = json.loads(qualification.packages.DEFAULT_LOCK.read_text())
@@ -123,6 +126,42 @@ class WineQualification(unittest.TestCase):
             qualification.packages.pin_identity(dict(file=Path(name).name, **expected))
         with self.assertRaises(FileNotFoundError):
             qualification.graphics_identity(self.root, lock)
+
+    def test_entry_receipt_requires_exact_scope_and_all_real_checks(self):
+        receipt = dict(schemaVersion=1, scope='executable-entry-only', architecture='ARM64', protocolBuild=12340,
+                       extensionVersion=4, commonMainStarted=False, assetsLoaded=False,
+                       checks=dict.fromkeys(('imageEntryReached', 'crtInitialized', 'stormAllocator', 'cppUnwind',
+                                             'mainFiber', 'fiberReturn', 'fpControlRead'), True))
+        path = self.root / qualification.ENTRY_RECEIPT
+        path.write_text(json.dumps(receipt))
+        actual, digest = qualification.read_entry_receipt(path)
+        self.assertEqual(actual, receipt)
+        self.assertEqual(digest, hashlib.sha256(path.read_bytes()).hexdigest())
+        for key, wrong in (('commonMainStarted', True), ('assetsLoaded', True), ('architecture', 'x64'),
+                           ('schemaVersion', True), ('extensionVersion', 3)):
+            invalid = dict(receipt, **{key: wrong})
+            path.write_text(json.dumps(invalid))
+            with self.assertRaises(ValueError):
+                qualification.read_entry_receipt(path)
+        receipt['checks']['fiberReturn'] = 1
+        path.write_text(json.dumps(receipt))
+        with self.assertRaises(ValueError):
+            qualification.read_entry_receipt(path)
+        path.write_text(' ' * 4097)
+        with self.assertRaisesRegex(ValueError, 'size-limit'):
+            qualification.read_entry_receipt(path)
+
+    def test_entry_gate_does_not_require_redirected_console_marker_or_imply_gameplay(self):
+        result = dict(displayReady=True, networkIsolated=True, prefixExit=0, fixtureExit=0, codecMessageMatched=True,
+                      wineStopExit=0, logStreamsDrained=True, logsWithinLimit=True, logWritesSucceeded=True,
+                      workerCompleted=True, expectedExit=0,
+                      clientEntry=dict(launchAttempted=True, exitCode=0, receiptValidated=True, messageObserved=False))
+        flags = qualification.qualification_flags(result, [], client_entry=True)
+        self.assertTrue(flags['linuxArm64ClientEntryQualified'])
+        self.assertFalse(flags['linuxArm64VulkanPresentationQualified'])
+        self.assertFalse(qualification.qualification_flags(result, [], client_entry=False)['linuxArm64ClientEntryQualified'])
+        result['clientEntry']['exitCode'] = 66
+        self.assertFalse(qualification.qualification_flags(result, [], client_entry=True)['linuxArm64ClientEntryQualified'])
 
     def test_unqualified_host_or_direct_worker_invocation_never_starts_processes(self):
         with patch.object(qualification.platform, 'machine', return_value='x86_64'), \
