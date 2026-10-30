@@ -1,6 +1,5 @@
 """Concrete metadata policy: one empty draft, no adoption or upload authority."""
 import copy
-import hashlib
 import shutil
 from pathlib import Path
 import tempfile
@@ -171,6 +170,14 @@ class LocalServerDraftCreation(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'successful-exact-producer-required'):
             draft.acquire_measurement(api, self.root, self.pin)
         api.download.assert_not_called()
+        run = dict(api.json.return_value, conclusion='success')
+        expected = self.pin['measurementArtifact']
+        artifact = dict(id=expected['id'], name=expected['name'], expired=False, size_in_bytes=expected['bytes'],
+            digest='sha256:' + expected['sha256'], workflow_run=dict(id=self.pin['workflowRun'], head_sha=self.pin['targetCommit']))
+        api = mock.Mock(); api.json.side_effect = [run, artifact, dict(artifact, id=self.pin['candidateArtifact']['id'])]
+        with self.assertRaisesRegex(ValueError, 'exact-retained-artifacts-required'):
+            draft.acquire_measurement(api, self.root, self.pin)
+        api.download.assert_not_called()
 
     def test_only_small_measurement_zip_is_downloaded_and_every_member_crc_and_identity_is_read(self):
         pin, directory, _ = self.measurement_fixture()
@@ -190,14 +197,6 @@ class LocalServerDraftCreation(unittest.TestCase):
         self.assertEqual({p.name: draft.digest(p.read_bytes()) for p in output.iterdir()}, pin['measurementFiles'])
         api.download.assert_called_once_with(draft.transport.API + '/actions/artifacts/' +
             str(pin['measurementArtifact']['id']) + '/zip', destination / 'measurement.zip', pin['measurementArtifact'])
-        run = dict(api.json.return_value, conclusion='success')
-        expected = self.pin['measurementArtifact']
-        artifact = dict(id=expected['id'], name=expected['name'], expired=False, size_in_bytes=expected['bytes'],
-            digest='sha256:' + expected['sha256'], workflow_run=dict(id=self.pin['workflowRun'], head_sha=self.pin['targetCommit']))
-        api = mock.Mock(); api.json.side_effect = [run, artifact, dict(artifact, id=self.pin['candidateArtifact']['id'])]
-        with self.assertRaisesRegex(ValueError, 'exact-retained-artifacts-required'):
-            draft.acquire_measurement(api, self.root, self.pin)
-        api.download.assert_not_called()
 
     def test_workflow_write_scope_is_separate_and_push_only_explicit_request(self):
         raw = (draft.ROOT / draft.WORKFLOW).read_text()
