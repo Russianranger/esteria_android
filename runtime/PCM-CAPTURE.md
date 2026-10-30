@@ -37,8 +37,7 @@ at `b06de55f5b17f27ae9659abcfdaf93a61b749a9e`, including real AF_UNIX partial-wr
 retry, exact captured signal, malformed input, storage caps and endpoint ownership.
 This workspace denies AF_UNIX socket creation, so those three tests explicitly
 skip locally; CI requires their execution. The tests exercise a synthetic sender,
-not FMOD or Wine. The real guest plugin build and paired FMOD/Wine run remain
-pending; this is receiver behavior evidence only.
+not FMOD or Wine; those tests are receiver behavior evidence only.
 
 The optional Wine harness accepts `--audio-driver`, `--bridge-dir` and
 `--bridge-revision` together. The bridge payload must match that exact integration
@@ -53,5 +52,23 @@ It runs WinMM and DirectSound separately, observes Wine shutdown, lets capture
 workers drain EOF, then exports prefix-separated PCM files. Both backend markers,
 zero process exits, successful owned cleanup and matching captured stereo signals
 are required for `linuxArm64FmodPcmTransportQualified`. Generic `audioQualified`
-and Android qualifications remain false. The new harness path has not yet run;
-its guard tests do not establish actual FMOD, plugin or Wine execution.
+and Android qualifications remain false.
+
+The first real paired run [40995927216](https://github.com/Russianranger/wowdecomp_esteria/actions/runs/40995927216)
+used client `7a226415d0ca34ac90f931b51890f7bfc6dad5be` and integration
+`61bf8a134845276cb78430884d557e477ff286aa`. Both Windows builds passed. WinMM
+actually delivered 98,422 stereo frames through the source-built ALSA plugin;
+the capture matched the left/right signal and drained EOF after Wine stop/wait.
+The fixture failed because polling a naturally finished FMOD channel returned
+`FMOD_ERR_INVALID_HANDLE`. DirectSound was not reached, and the audio gate did
+not pass. The correction registers the real END callback while paused and
+requires exactly one callback plus prior observed playback/sample progress.
+The independent PCM signal remains mandatory. This correction awaits execution.
+
+Each backend already stops and waits for the owned Wine server before inspecting
+capture EOF. Final cleanup now reuses only the latest backend's observed successful
+stop and wait, and performs another bounded wait. Otherwise it still issues the
+normal stop followed by wait. This avoids interpreting a redundant stop of an
+already absent server as a runtime failure. A failed or unobserved stop is never
+accepted merely because its exit is 1; final wait failure prevents every scope
+from qualifying.

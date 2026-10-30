@@ -152,8 +152,8 @@ namespace exits. The host's mounts and network remain unchanged. Namespace
 support failures are reported; there is no weaker silent fallback.
 
 Codec pass requires display readiness, successful Wine initialization, the driver's
-zero exit and exact success message, successful Wine stop and observed namespace
-exit. It establishes **Linux ARM64 Wine + real Xvid DLL** execution only. The
+zero exit and exact success message, successful Wine stop and final wait, and
+observed namespace exit. It establishes **Linux ARM64 Wine + real Xvid DLL** execution only. The
 client executable is hashed for matched-build provenance and is started only
 when the explicit entry-check option above is selected.
 The codec fixture does not validate other client imports, Vulkan rendering, Android

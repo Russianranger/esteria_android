@@ -332,11 +332,7 @@ def worker(runtime, output):
         result['expectedExit'] = 1
         return 1
     finally:
-        try:
-            result['wineStopExit'] = run_logged(guest_command(root, '/opt/wine/bin/wineserver', '-k'),
-                                               output / 'wine-stop.log', 15, captures).exit_code
-        except Exception as error:
-            result['wineStopFailure'] = str(error)
+        finish_wine(root, output, result, captures)
         if display is not None:
             display.terminate()
             try:
@@ -352,6 +348,31 @@ def worker(runtime, output):
         packages.write_json(output / 'worker-result.json', result)
         # Exiting PID 1 tears down every descendant, including detached Wine
         # services. The outer owner observes namespace process exit before pass.
+
+
+def finish_wine(root, output, result, captures):
+    # Each audio case stops and waits for this same private prefix before PCM
+    # EOF is inspected. A second -k returns 1 when that server is already gone.
+    # Reuse only the latest case's observed successful stop+wait, then require a
+    # fresh final wait. An earlier case cannot excuse incomplete later cleanup.
+    audio = result.get('audio', {})
+    latest = next((name for name in reversed(tuple(wine_audio.BACKENDS)) if name in audio), None)
+    previous = audio.get(latest, {})
+    if previous.get('wineStopExit') == 0 and previous.get('wineWaitExit') == 0:
+        result['wineStopExit'] = previous['wineStopExit']
+        result['wineStopSource'] = 'audio-' + latest
+    else:
+        try:
+            result['wineStopExit'] = run_logged(guest_command(root, '/opt/wine/bin/wineserver', '-k'),
+                                               output / 'wine-stop.log', 15, captures).exit_code
+            result['wineStopSource'] = 'final-cleanup'
+        except Exception as error:
+            result['wineStopFailure'] = str(error)
+    try:
+        result['wineWaitExit'] = run_logged(guest_command(root, '/opt/wine/bin/wineserver', '-w'),
+                                           output / 'wine-wait.log', 15, captures).exit_code
+    except Exception as error:
+        result['wineWaitFailure'] = str(error)
 
 
 def graphics_identity(root, lock):
@@ -378,7 +399,7 @@ def qualification_flags(result, requested, namespace_exit=0, client_entry=False,
                  result['expectedExit'] in (0, 1) and type(namespace_exit) is int and
                  namespace_exit == result['expectedExit'])
     common = (completed and result.get('displayReady') is True and result.get('networkIsolated') is True and
-              result.get('prefixExit') == 0 and result.get('wineStopExit') == 0 and
+              result.get('prefixExit') == 0 and result.get('wineStopExit') == 0 and result.get('wineWaitExit') == 0 and
               result.get('logStreamsDrained') is True and result.get('logsWithinLimit') is True and
               result.get('logWritesSucceeded') is True)
     flags = {'linuxArm64CodecQualified': bool(common and result.get('fixtureExit') == 0 and

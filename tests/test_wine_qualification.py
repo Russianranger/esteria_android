@@ -5,6 +5,7 @@ from pathlib import Path
 import struct
 import sys
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -99,7 +100,7 @@ class WineQualification(unittest.TestCase):
         passed = dict(driverSelectionExit=0, fixtureExit=0, messageMatched=True, wineStopExit=0, wineWaitExit=0,
                       pcmEofDrained=True, pcm={'pcmSignalQualified': True})
         result = dict(displayReady=True, networkIsolated=True, prefixExit=0, fixtureExit=0, codecMessageMatched=True,
-                      wineStopExit=0, logStreamsDrained=True, logsWithinLimit=True, logWritesSucceeded=True,
+                      wineStopExit=0, wineWaitExit=0, logStreamsDrained=True, logsWithinLimit=True, logWritesSucceeded=True,
                       workerCompleted=True, expectedExit=0, audio={'winmm': dict(passed), 'dsound': dict(passed)})
         key = 'linuxArm64FmodPcmTransportQualified'
         self.assertTrue(qualification.qualification_flags(result, [], audio=True)[key])
@@ -119,6 +120,35 @@ class WineQualification(unittest.TestCase):
                 qualification.qualify(self.root, self.root, self.root / 'driver', self.root / 'output',
                                       audio_driver=self.root / 'audio')
 
+    def test_final_cleanup_reuses_only_latest_observed_audio_stop_and_still_waits(self):
+        cases = [({}, ['-k', '-w']),
+                 ({'winmm': dict(wineStopExit=0, wineWaitExit=0)}, ['-w']),
+                 ({'winmm': dict(wineStopExit=0, wineWaitExit=0), 'dsound': {}}, ['-k', '-w']),
+                 ({'winmm': dict(wineStopExit=0, wineWaitExit=0),
+                   'dsound': dict(wineStopExit=1, wineWaitExit=0)}, ['-k', '-w'])]
+        for audio, arguments in cases:
+            with self.subTest(audio=audio), patch.object(qualification, 'run_logged',
+                    return_value=SimpleNamespace(exit_code=0)) as run:
+                result = {'audio': audio}
+                qualification.finish_wine(self.root, self.root, result, [])
+                self.assertEqual([call.args[0][-1] for call in run.call_args_list], arguments)
+                self.assertEqual(result['wineStopExit'], 0)
+                self.assertEqual(result['wineWaitExit'], 0)
+                self.assertEqual(result['wineStopSource'], 'audio-winmm' if arguments == ['-w'] else 'final-cleanup')
+
+    def test_final_wait_failure_or_unproven_stop_cannot_qualify_prior_success(self):
+        base = dict(displayReady=True, networkIsolated=True, prefixExit=0, fixtureExit=0, codecMessageMatched=True,
+                    workerCompleted=True, expectedExit=0, logStreamsDrained=True, logsWithinLimit=True,
+                    logWritesSucceeded=True, audio={'winmm': dict(wineStopExit=0, wineWaitExit=0)})
+        for outcome in (SimpleNamespace(exit_code=1), TimeoutError('final wait timed out')):
+            with self.subTest(outcome=outcome):
+                result = dict(base)
+                with patch.object(qualification, 'run_logged', side_effect=[outcome]):
+                    qualification.finish_wine(self.root, self.root, result, [])
+                self.assertFalse(any(qualification.qualification_flags(result, []).values()))
+        result = dict(base, wineStopExit=1, wineWaitExit=0)
+        self.assertFalse(any(qualification.qualification_flags(result, []).values()))
+
     def test_forced_vulkan_driver_and_observed_device_identity(self):
         command = qualification.guest_command(Path('/r'), 'fixture', graphics={'icdPath': 'usr/share/vulkan/icd.d/lvp.json'})
         self.assertIn('VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/lvp.json', command)
@@ -134,7 +164,7 @@ class WineQualification(unittest.TestCase):
 
     def test_graphics_receipt_keeps_codec_and_presentation_scope_separate(self):
         result = dict(displayReady=True, networkIsolated=True, prefixExit=0, fixtureExit=0, codecMessageMatched=True,
-                      wineStopExit=0, logStreamsDrained=True, logsWithinLimit=True, logWritesSucceeded=True,
+                      wineStopExit=0, wineWaitExit=0, logStreamsDrained=True, logsWithinLimit=True, logWritesSucceeded=True,
                       workerCompleted=True, expectedExit=1,
                       graphics={'presentation': dict(exitCode=0, messageMatched=True, softwareAdapterMatched=True,
                                                       validationCallbackActive=False),
@@ -153,7 +183,7 @@ class WineQualification(unittest.TestCase):
         presentation = dict(exitCode=0, messageMatched=True, softwareAdapterMatched=True,
                             engineFrameMessageMatched=True, validationCallbackActive=False)
         result = dict(displayReady=True, networkIsolated=True, prefixExit=0, fixtureExit=0, codecMessageMatched=True,
-                      wineStopExit=0, logStreamsDrained=True, logsWithinLimit=True, logWritesSucceeded=True,
+                      wineStopExit=0, wineWaitExit=0, logStreamsDrained=True, logsWithinLimit=True, logWritesSucceeded=True,
                       workerCompleted=True, expectedExit=0, graphics={'presentation': presentation})
         key = 'linuxArm64VulkanEngineFrameReadbackQualified'
         self.assertTrue(qualification.qualification_flags(result, ['presentation'])[key])
@@ -221,7 +251,7 @@ class WineQualification(unittest.TestCase):
 
     def test_entry_gate_does_not_require_redirected_console_marker_or_imply_gameplay(self):
         result = dict(displayReady=True, networkIsolated=True, prefixExit=0, fixtureExit=0, codecMessageMatched=True,
-                      wineStopExit=0, logStreamsDrained=True, logsWithinLimit=True, logWritesSucceeded=True,
+                      wineStopExit=0, wineWaitExit=0, logStreamsDrained=True, logsWithinLimit=True, logWritesSucceeded=True,
                       workerCompleted=True, expectedExit=0,
                       clientEntry=dict(launchAttempted=True, exitCode=0, receiptValidated=True, messageObserved=False))
         flags = qualification.qualification_flags(result, [], client_entry=True)
