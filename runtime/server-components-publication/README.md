@@ -53,6 +53,18 @@ explicit lock. The workflow reproduces the candidate in a separate checkout of
 the original packaging recipe and uploads only missing exact assets to that
 specific draft ID. A matching tag/body with another release ID is refused.
 
+When GitHub's release form cannot bind an arbitrary full commit, the separate
+`create-local-server-draft.yml` creator validates the successful measurement,
+exact recipe/body/twelve identities and absence of the tag/release, then creates
+one empty draft with Actions authentication. It uploads no assets and never
+publishes or mutates refs. Its retained receipt records Actions origin and
+`draftUiInspected=false`. Inspect that actual draft in the UI, retain a separate
+inspection receipt, and bind only its verified numeric ID. The frozen body's
+“owned UI draft” describes this reviewable destination; it does not attest to
+UI creation. The unchanged uploader checks ID, target and body. Never adopt a
+matching existing release to retry creation; explicit prior-receipt verification
+is read-only. Once the exact measured lock is bound, creator jobs skip writes.
+
 The uploader never creates or finalizes a release, moves a tag, replaces an
 asset, changes release metadata or changes repository settings. It fully reads
 back every stored asset before issuing draft readiness. After the authorized

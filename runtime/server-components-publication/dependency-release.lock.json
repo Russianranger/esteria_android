@@ -1,12 +1,4823 @@
 {
-  "files": null,
+  "files": {
+    "NOTICE.txt": {
+      "bytes": 1071,
+      "sha256": "de1a80680d8ec657763f0bcc9db04d4c3e1616ce1aa2f6fa3b2a3ca49ed8cbb9"
+    },
+    "integration-recipe-receipt.json": {
+      "bytes": 175261,
+      "sha256": "3456ed08ecf2f88d8fd2f21d2535591009e6d9c250df1cfdc17eeea04b871eb1"
+    },
+    "integration-recipe.tar.gz": {
+      "bytes": 9708528,
+      "sha256": "2f9e32abaa89e7fb401107f6071150b75f350a182fcf7e5a73aa005c8f802345"
+    },
+    "providers-receipt.json": {
+      "bytes": 22318,
+      "sha256": "395b159771455015a1dc1b8ca7630be4f10987fb488e5220b19ddbf4bee229e1"
+    },
+    "server-content-provider.tar.gz": {
+      "bytes": 168956728,
+      "sha256": "0fe3d5ec91f25295fcfff1acca898cfb36136ecbe40f1d65653f98817d58803e"
+    },
+    "server-data-tools-provider.tar.gz": {
+      "bytes": 105749018,
+      "sha256": "f1b480bf9adc5876c5410f8355be7988ce9757a15feb779b3d513f0464703d6d"
+    },
+    "server-dependency-publication.json": {
+      "bytes": 3012,
+      "sha256": "cdd9ba6779e95e8f5e12c4e76cebc7796229c4e4906afcec6d14849d89ee67e1"
+    },
+    "server-dependency-release.lock.json": {
+      "bytes": 6005,
+      "sha256": "a95a9a5557f3417ff84a1311d1747a0e98db39305505c741b642e2ecef9746d9"
+    },
+    "server-extractors-original-provider.tar.gz": {
+      "bytes": 52679938,
+      "sha256": "6dc20fea542fcd07a7ed45328cfe0c67efd86130492d4be827bcbf7f10eff610"
+    },
+    "server-programs-playerbots-provider.tar.gz": {
+      "bytes": 1446106793,
+      "sha256": "39004f06f823b8416422894329555e4ce0187b2a88e1cb81655afb8033888cc4"
+    }
+  },
   "formatVersion": 1,
-  "ownedDraftReleaseId": null,
-  "recipeInputs": null,
+  "ownedDraftReleaseId": 429422570,
+  "recipeInputs": {
+    ".gitattributes": {
+      "bytes": 1178,
+      "mode": 292,
+      "sha256": "7b6b7e34fb82eef62f667ad30b73dec6403ed1fc475bf6de29b1516af08e66fa"
+    },
+    ".github/workflows/android-combined.yml": {
+      "bytes": 9734,
+      "mode": 292,
+      "sha256": "d18bd5ad31e2ccba693d8823abb871178bcc3108a98fca84ee9e8f1e6130f04f"
+    },
+    ".github/workflows/android-instrumentation.yml": {
+      "bytes": 4287,
+      "mode": 292,
+      "sha256": "c326e17516086ff5e61f695564ddebeedae0479d3563f89025787134119d12d1"
+    },
+    ".github/workflows/android-local-game-profile.yml": {
+      "bytes": 22786,
+      "mode": 292,
+      "sha256": "365f499404e48d771d18fc50b0e71e29e1b903c9f4aeee0800565a4e1488f24e"
+    },
+    ".github/workflows/android-mysql.yml": {
+      "bytes": 10953,
+      "mode": 292,
+      "sha256": "b5fd73590015c7e29d315b8b80ca2927d20bcb6888cfb4c21a209cb9f8882499"
+    },
+    ".github/workflows/android-presentation.yml": {
+      "bytes": 4281,
+      "mode": 292,
+      "sha256": "dbf80edf2742d7b0d8b84ade4c47a0b3d0e0d5c27d4436a8832671a3b85d4376"
+    },
+    ".github/workflows/android-process-owner.yml": {
+      "bytes": 4117,
+      "mode": 292,
+      "sha256": "a4f8a85f32519070136ec5c53a0a182c11b849677c083f0b9c04d98acd3fbe57"
+    },
+    ".github/workflows/android-proot-execution.yml": {
+      "bytes": 6465,
+      "mode": 292,
+      "sha256": "cf384cd75c8d76b7e9d4a462f7361db88b9f6bece4a940ed6c1c35084646cb26"
+    },
+    ".github/workflows/android-proot.yml": {
+      "bytes": 5837,
+      "mode": 292,
+      "sha256": "e9489abda1afa72f5dbe101fb49a8b9ec58e250cf3083aa3007630f306e0d6a2"
+    },
+    ".github/workflows/android-wine-cohort.yml": {
+      "bytes": 16183,
+      "mode": 292,
+      "sha256": "60eb2dd79552fa4ea8f4a23c8ff073706fd5fbda732e7cb5e176e419c240405a"
+    },
+    ".github/workflows/android-wine-execution.yml": {
+      "bytes": 8658,
+      "mode": 292,
+      "sha256": "bb4c15204679de09317e11459314137321a33a8ea95b9263370ad522a813d33a"
+    },
+    ".github/workflows/android-wine-runtime.yml": {
+      "bytes": 4583,
+      "mode": 292,
+      "sha256": "510e201c12a0cec7714206dc3b2019d5b74fb640ba2ec940d3bbc78ac6bd70b7"
+    },
+    ".github/workflows/android.yml": {
+      "bytes": 3796,
+      "mode": 292,
+      "sha256": "aab7884d50c6d9821018c63845a74619775a69f7140463fb2f800bee67a34ec2"
+    },
+    ".github/workflows/base-sql.yml": {
+      "bytes": 14448,
+      "mode": 292,
+      "sha256": "31c6d69ede9a28910282da3748ffdcaee93755b36f79329f76cb9652fcedbf3a"
+    },
+    ".github/workflows/client-auth-candidate.yml": {
+      "bytes": 13938,
+      "mode": 292,
+      "sha256": "822e193d15b0321a5bd67576f8fa5d35a604139f7f4c450f91474dda25ee1f0d"
+    },
+    ".github/workflows/client-auth.yml": {
+      "bytes": 13863,
+      "mode": 292,
+      "sha256": "50236a4e392ae37fc2286d0cc8f2393d5c92f3c136d2e679157f7ad693d41ff1"
+    },
+    ".github/workflows/database.yml": {
+      "bytes": 8611,
+      "mode": 292,
+      "sha256": "d592d49782794f6838fe6a3ec20c200440faa8e3760b19abb6b0a086ba84e5c5"
+    },
+    ".github/workflows/guest-bridges.yml": {
+      "bytes": 3765,
+      "mode": 292,
+      "sha256": "6945e0b1d314ab90d45a6635dbcb8470b5076b9e2fda21fad3f22cd9d174979e"
+    },
+    ".github/workflows/java-server-installation-native.yml": {
+      "bytes": 11139,
+      "mode": 292,
+      "sha256": "e1072c2873efa7928791afd50b56eb1da37cd7177034be21e4bfbf19a5cc61e9"
+    },
+    ".github/workflows/mysql-service.yml": {
+      "bytes": 6025,
+      "mode": 292,
+      "sha256": "c8a60b94486e3ccf49d99b0d112e6db6d63e54aa5340a5bb8d75a48f7ab3392b"
+    },
+    ".github/workflows/playerbots-helper-candidate.yml": {
+      "bytes": 4227,
+      "mode": 292,
+      "sha256": "f2c41b8a1f6049e603b0ec46ca94fd467993b1ad078ec97a9bb4ff0a56d6f4f0"
+    },
+    ".github/workflows/playerbots-helper-source-seal.yml": {
+      "bytes": 8778,
+      "mode": 292,
+      "sha256": "3cff651ebf5b874f5f47ce0ed2578a9911c33dd0109208a539e34255116e6f11"
+    },
+    ".github/workflows/playerbots-helper-sources.yml": {
+      "bytes": 7831,
+      "mode": 292,
+      "sha256": "0887f1dfac783724e9941723e76e2aa29405b7e4196f4ac7fd5ed793aa6ba05e"
+    },
+    ".github/workflows/playerbots-programs-provider.yml": {
+      "bytes": 10796,
+      "mode": 292,
+      "sha256": "6bed74fa922379dca996918db744fdf28a92189eecf9e32cf5ab83eb6e33dc9d"
+    },
+    ".github/workflows/playerbots-schema.yml": {
+      "bytes": 14415,
+      "mode": 292,
+      "sha256": "dc37db9ab12230b7f5da41a315df5f9aba0e07f6fcf5499d3a1f4f019a453235"
+    },
+    ".github/workflows/preserve-client-inputs.yml": {
+      "bytes": 4949,
+      "mode": 292,
+      "sha256": "61300ca9c6c8fe3c0378980fce2a670741de5cf56bdf50a22b89122a33fd7863"
+    },
+    ".github/workflows/preserve-guest-bridges.yml": {
+      "bytes": 4545,
+      "mode": 292,
+      "sha256": "dc8ad86214bceb681884d4b6b47254b75bfc27d504ed8c089c4d02b0003d5710"
+    },
+    ".github/workflows/preserve-local-server-components.yml": {
+      "bytes": 10148,
+      "mode": 292,
+      "sha256": "8ecc73c7300789757aa9e282c40137ec32e43c61544a7ef22149a5fbdedfea4a"
+    },
+    ".github/workflows/preserve-server-dependencies.yml": {
+      "bytes": 4122,
+      "mode": 292,
+      "sha256": "254b64c7c4ecd385ced36cf1a6acc0f61c31d520706a749c29e778013c7761a8"
+    },
+    ".github/workflows/preserve-shader-tools.yml": {
+      "bytes": 6933,
+      "mode": 292,
+      "sha256": "27aec133fba07b5f29353338f44671628cfc525eb080f27b41f8e931c583bb14"
+    },
+    ".github/workflows/preserve-wine-arm64.yml": {
+      "bytes": 6232,
+      "mode": 292,
+      "sha256": "6b31138ac3fbcac3a1a680f0d41b324365378e2bd929b74deb58ff2206ccfda5"
+    },
+    ".github/workflows/preserve-wine-cohort.yml": {
+      "bytes": 7170,
+      "mode": 292,
+      "sha256": "fb66931bd03c63dc7fe93837536d8af44a039ceeee721bb0c2f84ee20dbb8db4"
+    },
+    ".github/workflows/process-owner.yml": {
+      "bytes": 1203,
+      "mode": 292,
+      "sha256": "dcd6372d42698e08235deb4b0d0e7341edfdacea3a3bd5a74aa1d6948fcdd49c"
+    },
+    ".github/workflows/server-data-tools.yml": {
+      "bytes": 12658,
+      "mode": 292,
+      "sha256": "7c2e9b83ecf73f46eda239f10463bc2de6aeb35549ae5e0e3fbd1bb9d7cbcea0"
+    },
+    ".github/workflows/server-engine-package.yml": {
+      "bytes": 21807,
+      "mode": 292,
+      "sha256": "9619ff1222aa46a4093217671940b47985d3114d81af7d7d77e194038c8d5dbf"
+    },
+    ".github/workflows/server-extractor-order.yml": {
+      "bytes": 7819,
+      "mode": 292,
+      "sha256": "846cc05fee9ded30c902b16c1a33626f4df74df6426baccc5e092290e322c3b7"
+    },
+    ".github/workflows/server-installation-native.yml": {
+      "bytes": 8771,
+      "mode": 292,
+      "sha256": "fd0f707373b5208aadfcd5ec4d007ed61aae14a6cdc4eb8f93fd7af4b3e87312"
+    },
+    ".github/workflows/server-isolated-build.yml": {
+      "bytes": 6916,
+      "mode": 292,
+      "sha256": "88cd1287aba66c3f755c95728d3dc9060812d02b582f515e4235cea36ff3258a"
+    },
+    ".github/workflows/server-ordered-sources.yml": {
+      "bytes": 3431,
+      "mode": 292,
+      "sha256": "4beacaaac033c889ba876fc48d6914fbd8dcc8359744c1b9888964ab09dfc5bb"
+    },
+    ".github/workflows/server-provider-qualification.yml": {
+      "bytes": 10644,
+      "mode": 292,
+      "sha256": "b2a6ca321cae44ef7da6fec39fd55c7941d872c545ed373d775ca6987e1ea5c9"
+    },
+    ".github/workflows/server-requalification.yml": {
+      "bytes": 13069,
+      "mode": 292,
+      "sha256": "09be581abf0cbcfc2eeca694be499807c35f56e350e500d012ef44319f23b463"
+    },
+    ".github/workflows/server-runtime.yml": {
+      "bytes": 7590,
+      "mode": 292,
+      "sha256": "59b00a2528582063f862a190d0c722ff83991f8068072ff0cd223f0148f62dd0"
+    },
+    ".github/workflows/server-source-recovery.yml": {
+      "bytes": 5062,
+      "mode": 292,
+      "sha256": "916d50e0f687c48c6964b5df10ff10d50b8af96cbb7cfb923fb5189983aacfc0"
+    },
+    ".github/workflows/server.yml": {
+      "bytes": 23810,
+      "mode": 292,
+      "sha256": "fc39a3e10c011e551d8a2b989f30b39e5c5cd125f0e7a992d0cd372e36015b97"
+    },
+    ".github/workflows/tooling.yml": {
+      "bytes": 1303,
+      "mode": 292,
+      "sha256": "1acacfef093685dd545b87464b8d5b1a479f8b5e472714c0a3dd2f916d0451ca"
+    },
+    ".github/workflows/turnip.yml": {
+      "bytes": 3288,
+      "mode": 292,
+      "sha256": "52304d9b5001ebab3b4d4a0c46d1497b10f4ba0d01638739f39942e18045d340"
+    },
+    ".github/workflows/wine-arm64-candidate.yml": {
+      "bytes": 11469,
+      "mode": 292,
+      "sha256": "f8508fd1f63b504c8d815158a1f85951ecb5cde027c44ece0c1495145276e869"
+    },
+    ".github/workflows/wine-arm64-provider-candidate.yml": {
+      "bytes": 12671,
+      "mode": 292,
+      "sha256": "b494856ada06fd9c953ab8ba5f43551fa4e63948f9ee3ea43c9faeea3662671f"
+    },
+    ".github/workflows/wine-arm64-provider-source-recovery.yml": {
+      "bytes": 4819,
+      "mode": 292,
+      "sha256": "5181b7ad78834b0cf1c1918c6c2da625950bc1d65e1937ee8854f13f76033acb"
+    },
+    ".github/workflows/wine-arm64-requalification.yml": {
+      "bytes": 7085,
+      "mode": 292,
+      "sha256": "7506116f33747d5b53bc159080fcc06d8a6a1a4aeea5f75c67258b1a0e19866f"
+    },
+    ".github/workflows/wine-cohort-public-inputs.yml": {
+      "bytes": 3154,
+      "mode": 292,
+      "sha256": "5baa3a789fd74da129e3db6d53b6d2c8c8a28175ef13fb3e8c72b3766a314ac3"
+    },
+    ".gitignore": {
+      "bytes": 107,
+      "mode": 292,
+      "sha256": "3dac22872094b3d9135c1a23008beac00d8470595b63465e29243113a9fa1069"
+    },
+    "AGENTS.md": {
+      "bytes": 2172,
+      "mode": 292,
+      "sha256": "39edf04a8b27cec445edc835c3bb33eb5b5a83e767d2ae19ebe77d9960a86a7e"
+    },
+    "ANDROID-PORT-PLAN.md": {
+      "bytes": 7312,
+      "mode": 292,
+      "sha256": "90c975aacb3c10046038cf4ce71ff3c0ae410750c04c664e3a982c1f90c98e4d"
+    },
+    "ASSET-REQUIREMENTS.md": {
+      "bytes": 18813,
+      "mode": 292,
+      "sha256": "a2af54ebbd363eceede397c7fbce839761104a1093562e5356dec7817446b1e2"
+    },
+    "BUILDING.md": {
+      "bytes": 21270,
+      "mode": 292,
+      "sha256": "527bd7f54b3dfd2f232989376bf60158520bc1c8578267b5c77831c39f141042"
+    },
+    "HANDOFF.md": {
+      "bytes": 9489,
+      "mode": 292,
+      "sha256": "6c1f8693b8df3c1111e8f1dfeff62ed8769f68a03a6d1709f7c711c8e0b6471a"
+    },
+    "LICENSE": {
+      "bytes": 35149,
+      "mode": 292,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    "README.md": {
+      "bytes": 1334,
+      "mode": 292,
+      "sha256": "d1535b1bcf2383c4f01db8421158d3b7323f17b73c10b68396a7e0035477787d"
+    },
+    "STATUS.md": {
+      "bytes": 9361,
+      "mode": 292,
+      "sha256": "dfafcdf64a878a5462a2285116719e43f8410b0ee4a1087e5c256c08eb7fb237"
+    },
+    "TESTING.md": {
+      "bytes": 14200,
+      "mode": 292,
+      "sha256": "f8c3eb92492b3b90a7d970e7ad83cac7ed23f401f19c69cf8716e1ca1abdff55"
+    },
+    "app/IMPORTING.md": {
+      "bytes": 2425,
+      "mode": 292,
+      "sha256": "7735e086b9abc8f704192e1dac48b92a92c321a15e8f2e6f27608cc33c03f020"
+    },
+    "app/SIGNING.md": {
+      "bytes": 7571,
+      "mode": 292,
+      "sha256": "5bd8536a08b777385d5dccd5bef822eefb15be6b4da0e28efc6ca264e893a941"
+    },
+    "app/build.gradle": {
+      "bytes": 11387,
+      "mode": 292,
+      "sha256": "73caee573c1f11bc93ff8149b0ddcb085622cce079d6ec0995dae6e9154d48c2"
+    },
+    "app/database-service.gradle": {
+      "bytes": 1254,
+      "mode": 292,
+      "sha256": "bc6fcc3044d2ce4902c89dd84e84f1ef8c56a5441ec055604ec1673be8434149"
+    },
+    "app/database-setup.gradle": {
+      "bytes": 1296,
+      "mode": 292,
+      "sha256": "454d0292fac9ca6ff705aa03f087440c31f8228f2d34740d9064f670dbe2e023"
+    },
+    "app/development-signing.lock.json": {
+      "bytes": 230,
+      "mode": 292,
+      "sha256": "71fb3b7defb7a607df544b424dd7452d8d5722bdd7fbf5a63a873da704dc5c7a"
+    },
+    "app/game-session.gradle": {
+      "bytes": 1099,
+      "mode": 292,
+      "sha256": "7a90d651c39bc5a32104a62e04cdb0377e383b7b1fcb4a6c19322096615a4277"
+    },
+    "app/mysql-probe.gradle": {
+      "bytes": 1624,
+      "mode": 292,
+      "sha256": "3ac7f3a969e1af31a2123fbfd9d3677b69e54ec78a06d8cbe4a64a342eaecb6e"
+    },
+    "app/presentation-owner.gradle": {
+      "bytes": 1248,
+      "mode": 292,
+      "sha256": "897615934e8064c204230452fa043f72a015ab363069c9d2ff86cfb2ac1cf72c"
+    },
+    "app/proot-probe.gradle": {
+      "bytes": 1729,
+      "mode": 292,
+      "sha256": "de8ccc42cd282d3299b2538556cb9e9645e2f07c7ee3c9a5c8e8ca17ae24bb4d"
+    },
+    "app/server-content.gradle": {
+      "bytes": 1936,
+      "mode": 292,
+      "sha256": "16de8288831ac18899b1ae7540718715e7c96fc9aa4d111f47f1d96044e74575"
+    },
+    "app/server-data-tools.gradle": {
+      "bytes": 2287,
+      "mode": 292,
+      "sha256": "52cba046993a46c148fab4b937f1dead99c295238af75e76eb93b2fd0ccff1b8"
+    },
+    "app/server-data.gradle": {
+      "bytes": 2567,
+      "mode": 292,
+      "sha256": "dfd391403782fba5abdfe92e7587e9476a9c4bd004ab35cff01b2d3bf5fdb633"
+    },
+    "app/server-extractors.gradle": {
+      "bytes": 2380,
+      "mode": 292,
+      "sha256": "e179c352889d043e798a83b1e66468d9a7aa6ecf31950f65a4e1356762ae0416"
+    },
+    "app/server-installation.gradle": {
+      "bytes": 3215,
+      "mode": 292,
+      "sha256": "7ad08c3982ed961e51ab0d1221e5810ad4ea68121765b5abbbadb874cbb172c7"
+    },
+    "app/server-programs.gradle": {
+      "bytes": 5268,
+      "mode": 292,
+      "sha256": "3db10386936a13d9c3766ffe1d58ad8ba8467f2cddeec0563229a50bec1a8411"
+    },
+    "app/server-schema.gradle": {
+      "bytes": 1546,
+      "mode": 292,
+      "sha256": "6acdabb6ccb822e1405b6437fd6fb8dba4ea3ea4b36d425fd3270663078f9922"
+    },
+    "app/server-session.gradle": {
+      "bytes": 3161,
+      "mode": 292,
+      "sha256": "3ba2e99c58f26c540b7322c1e466a8d1a9f6f9e3bca1a6754e6733990d045d87"
+    },
+    "app/shader-provider.gradle": {
+      "bytes": 1673,
+      "mode": 292,
+      "sha256": "d10206a7ac9f1cdd6e84534a3e2f7425b788e8a9f1cc10334a95e044c8105250"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/core/runtime/install/RuntimeInstallationInstrumentedTest.java": {
+      "bytes": 5012,
+      "mode": 292,
+      "sha256": "bbcb7a7ef1a335e8c7addc4fae2ba0c3c1b587b846825f47de8786e23c3264f3"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/presentation/PresentationAudioTest.java": {
+      "bytes": 24032,
+      "mode": 292,
+      "sha256": "cd24cf2b315a4ef3285aaef3a1c9491d16d92f2b4045164810c020731e106906"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/runtime/DatabaseServiceAssetsTest.java": {
+      "bytes": 6606,
+      "mode": 292,
+      "sha256": "65a386205c8f6a3a98db474cfea347a9a389cce4bc0b3d488027cfd31444804f"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/runtime/MySqlExecutionTest.java": {
+      "bytes": 28348,
+      "mode": 292,
+      "sha256": "55a62b7cfad371948b87d84465dee8df827f37577148cbbe12c0103e10b55d59"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/runtime/NativeProcessOwnershipTest.java": {
+      "bytes": 16611,
+      "mode": 292,
+      "sha256": "635d415b6d8ab5af0fcec877e9c0948b42cebb43c7bd95de297c207796a06bd4"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/runtime/ProbeProcessHandles.java": {
+      "bytes": 628,
+      "mode": 292,
+      "sha256": "637dd7bcc7f53cf896d87575337e61e48d7e4f1d4e020425168625471d55419e"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/runtime/ProotExecutionTest.java": {
+      "bytes": 18074,
+      "mode": 292,
+      "sha256": "4e5320c7ddb4251aa61d6e593f5fa19436c3881cdf138986c797d560e723f17a"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/runtime/RemoteOwnerDeathProbe.java": {
+      "bytes": 11193,
+      "mode": 292,
+      "sha256": "3519aac5705f1283079789ff99c228236bca817f720d7a51dea8e43622772ece"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/runtime/ServerDataAssetsTest.java": {
+      "bytes": 1898,
+      "mode": 292,
+      "sha256": "03da6339e566c847d37a65736607f5e4c756a6598c313a4508e24c3e59d5497f"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/runtime/ServerInstallationAssetsTest.java": {
+      "bytes": 2550,
+      "mode": 292,
+      "sha256": "d6b6e6fab5d313bcf026296a7bd6c4901b09fbeadcad81bfd31ee4f77087d105"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/runtime/ServerSchemaAssetsTest.java": {
+      "bytes": 3505,
+      "mode": 292,
+      "sha256": "ea9286174075970dfa869f0b98e73b1094ebe65cdd74de3398040811407e6b23"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/runtime/ServerSessionAssetsTest.java": {
+      "bytes": 7946,
+      "mode": 292,
+      "sha256": "c55aff6935dde0e7dc7c0816310f9e70d8016a63aaf57f829cc7387003701866"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/runtime/ShaderSetupReceiptTest.java": {
+      "bytes": 6021,
+      "mode": 292,
+      "sha256": "c06199e41de5d77e2a11fc8d4ce8efcc3d214ed274287fab2a46e0705c444aff"
+    },
+    "app/src/main/AndroidManifest.xml": {
+      "bytes": 1615,
+      "mode": 292,
+      "sha256": "e68c591d8870637b26515bfcd0c5391ff39e4f374f782f2f11dd10001bd10b45"
+    },
+    "app/src/main/assets/runtime.properties": {
+      "bytes": 439,
+      "mode": 292,
+      "sha256": "792a63db869cf8593bcfe60597b20f87a5f50ed8245eba32a363ee9cdcb76648"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/MainActivity.java": {
+      "bytes": 17884,
+      "mode": 292,
+      "sha256": "8e7350f91311602ffda1707ebf1a1c61ea729688938823c4a9b5b849400d0878"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/SafTreeSource.java": {
+      "bytes": 15254,
+      "mode": 292,
+      "sha256": "b69c1eb180bb9f63fe24bbbab21f9fff0b9a0ab94b029b2b09ff36555475ba6c"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/SessionService.java": {
+      "bytes": 67706,
+      "mode": 292,
+      "sha256": "2444fe332116deb57da4974c7de2d0502b0052c97fa89f40b34d43644b26f842"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/UriStager.java": {
+      "bytes": 7256,
+      "mode": 292,
+      "sha256": "672f2a0719ad81562563187db7230c494f59281963595f42469d1772958a0c84"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/input/GameInputView.java": {
+      "bytes": 15304,
+      "mode": 292,
+      "sha256": "5b54789cbbee4e5f8c324c5bf6907f1a4562e17899001f3447cbc07a927538da"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/presentation/AudioBridge.java": {
+      "bytes": 11747,
+      "mode": 292,
+      "sha256": "86446ecf4cc5205ea28b86e23f46611e144633f1f6ac705cf956b9ac711d7d7c"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/presentation/BridgePaths.java": {
+      "bytes": 4397,
+      "mode": 292,
+      "sha256": "7158916be8baaa0557fc1ec0dcc352d2822019070f6624c4ddc96b4822677be7"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/presentation/ClientPresentationSession.java": {
+      "bytes": 24313,
+      "mode": 292,
+      "sha256": "4afa5aa2472f86e50deeb007acb98e7972532707aa14d122d56850d694f3ba67"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/presentation/GamePresentationPanel.java": {
+      "bytes": 9668,
+      "mode": 292,
+      "sha256": "f0b4e59b2140bfc7606eea2a21c5fad69a3408f7efbe15ce23c8f274ef6668e9"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/presentation/InputBridge.java": {
+      "bytes": 7471,
+      "mode": 292,
+      "sha256": "c3529d16eab36283f6d519d4572916347cb19151401d86e4ab8c95e31dfc417c"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/presentation/PresentationRuntimeChecks.java": {
+      "bytes": 4952,
+      "mode": 292,
+      "sha256": "23cd7d5a5f5f525bd1049630ff72617111bdab1a9f87667007fa2695e917f3d8"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/presentation/SurfaceBridge.java": {
+      "bytes": 7465,
+      "mode": 292,
+      "sha256": "25f5182439537a418f1271e2d7bbf0de05d04270bee5985b5c433b6ab4f9437c"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ClientLaunchSetup.java": {
+      "bytes": 12347,
+      "mode": 292,
+      "sha256": "1933db95a81da16f11fa861785b45c4b072889a8f9bd79a094f6a9c42904444f"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ClientRuntimeSetup.java": {
+      "bytes": 13765,
+      "mode": 292,
+      "sha256": "0d6bf9f3e95d519e8e1f2b1ee256b909ef002954c1d5ebb84a00e6f0bbf0a318"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/GameSession.java": {
+      "bytes": 27598,
+      "mode": 292,
+      "sha256": "c1d06b89ef0dbccf56f6a688d9412d5fd3efce5a7709387bbc514d05d3ddcd09"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/GuestBridgeSetup.java": {
+      "bytes": 10588,
+      "mode": 292,
+      "sha256": "d16718a24416e0aab66db97d8cab90e262d0b346dd901d399702a943233753ea"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/GuestHelperAssets.java": {
+      "bytes": 7797,
+      "mode": 292,
+      "sha256": "b27921fc56209fbbfb97a62249a2e731f9edcc9cc4106861e1f74f4b55ae16cf"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/InstalledProot.java": {
+      "bytes": 4195,
+      "mode": 292,
+      "sha256": "a1f29572a072c5c5ecd41e43e6e388e5658ea2198ea784ec82ccd64bbb592620"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/LocalServerSession.java": {
+      "bytes": 24955,
+      "mode": 292,
+      "sha256": "f3f6d3cec204ce22f134fffbf7efdbbca55588f950edc62237a271836f5a8772"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/LocalWorldSetup.java": {
+      "bytes": 13058,
+      "mode": 292,
+      "sha256": "9c39bb3b569855e22133ff50205d08b314e3aab249769bfa8b5afa61ec13e578"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/NativeProcessBridge.java": {
+      "bytes": 1873,
+      "mode": 292,
+      "sha256": "53ab4c623af8c2ccbb5b178c1f8dcc205fc3371b95ab3ae7f88d0ed00adc9a9c"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ProotProcess.java": {
+      "bytes": 6007,
+      "mode": 292,
+      "sha256": "b26b16e87f185d8f2d74f58e1ede26b603d872ad82ea945f3539b531d0770f23"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/RuntimeSetup.java": {
+      "bytes": 9061,
+      "mode": 292,
+      "sha256": "310ee3cefde43985dcbf9627ec59f395073a074792b53b135aa6cd335b892da2"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerContentSetup.java": {
+      "bytes": 12242,
+      "mode": 292,
+      "sha256": "0a109409665327778922f352a83011bb947bd02789a83e714436c2cab43e168f"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDataAssets.java": {
+      "bytes": 966,
+      "mode": 292,
+      "sha256": "52b15db91e9a3487e7476b029672b98ee7f48202f387a7c5933a4a44fb6aba1f"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDataBinding.java": {
+      "bytes": 18786,
+      "mode": 292,
+      "sha256": "3f8b3934b72f01b016a1a51f0d752e0198e8e4c814e3e1611afa8374a0fff893"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDataSetup.java": {
+      "bytes": 20767,
+      "mode": 292,
+      "sha256": "413d5feb8c704b5236832b67d32511e75f887a88448c5f0fcc2c48713136e35e"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDataToolsSetup.java": {
+      "bytes": 12626,
+      "mode": 292,
+      "sha256": "7c5faf80e33880509b5a75ab544e0183a3c8d3a044dcd0f5b657ace07c181c13"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseService.java": {
+      "bytes": 16233,
+      "mode": 292,
+      "sha256": "de6d8820d5e21ae6a6c4c0b53a2030ecb806d71682ebd2cbd0fe865ada184526"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseSetup.java": {
+      "bytes": 18174,
+      "mode": 292,
+      "sha256": "5d9adf505f476bcf5809050f1b2fdc03de4c57d54791e2dd1cda2788ea0eb3ec"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerExtractorsSetup.java": {
+      "bytes": 14383,
+      "mode": 292,
+      "sha256": "2ca393f13feff1b6af6df475a8b533bc2a37222c979d89c52dd088b188d077b1"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerInstallationSetup.java": {
+      "bytes": 42139,
+      "mode": 292,
+      "sha256": "425b19abd5475be4c4aa7adabdf3bf4fa0c9eb2ce64238ab7e1eecefb2717ad7"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerProgramsSetup.java": {
+      "bytes": 22261,
+      "mode": 292,
+      "sha256": "00476380157f485e291ace044100da368adbefb088acf9e8128be5dddecc7b33"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerRuntimeSetup.java": {
+      "bytes": 9898,
+      "mode": 292,
+      "sha256": "dc82e8f2d175b6a8ad92a48a37d1b10226a77c11c41eb7132dcf87437393a57d"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerSchemaSetup.java": {
+      "bytes": 14144,
+      "mode": 292,
+      "sha256": "08d773cef9c842aca0e47efa6c95b089c1c4bf9c5619f2969aa2c8c065cb7c6e"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerSourceSelection.java": {
+      "bytes": 3808,
+      "mode": 292,
+      "sha256": "0f420407e9fca2c5c575f355eb5ff5cdeb476ae7599b582c7fb8593ae51d7be1"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ShaderSetup.java": {
+      "bytes": 23472,
+      "mode": 292,
+      "sha256": "ec9c7f811a0b4b08f735c09be26627e2d827b47cdb5a2aa303ad473d56158c09"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ShaderToolsSetup.java": {
+      "bytes": 9451,
+      "mode": 292,
+      "sha256": "13c59c7966c679a21e1b9aa04a6d9745462ee3d164ff4ffce426d1ec93959c17"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/TurnipSetup.java": {
+      "bytes": 9649,
+      "mode": 292,
+      "sha256": "6b3d60acd78e19c57e50ae40d3992a65d0d37eb3d7111cf90eadb99e362e8a71"
+    },
+    "app/src/main/res/drawable/ic_esteria.xml": {
+      "bytes": 495,
+      "mode": 292,
+      "sha256": "0af46d16875d11f091faa2a5ee9efa8864366a58b5e10d4249f5e991ee1f7221"
+    },
+    "app/src/main/res/values/strings.xml": {
+      "bytes": 127,
+      "mode": 292,
+      "sha256": "5480c6140f08659acbef789ba59c2a5777d38f02c87ebd0737c4937fe7f19820"
+    },
+    "app/src/main/res/values/styles.xml": {
+      "bytes": 509,
+      "mode": 292,
+      "sha256": "37c4fdc988bbf599d374b574ebcf823fde7292740e9e29ebbad24acd476286f0"
+    },
+    "app/src/main/res/xml/data_extraction_rules.xml": {
+      "bytes": 671,
+      "mode": 292,
+      "sha256": "8b55ff5489071bb19a4e89967b604a16c0e4d1e87a2df3c73c64417314a59f22"
+    },
+    "app/src/prootProbe/AndroidManifest.xml": {
+      "bytes": 673,
+      "mode": 292,
+      "sha256": "4f88a42892470ae50ae03286e666bbb869889b31fd8b2f61663a216052e3d66c"
+    },
+    "app/src/prootProbe/java/io/github/russianranger/esteria/runtime/ProbeOwnerService.java": {
+      "bytes": 5366,
+      "mode": 292,
+      "sha256": "987abdb65d3a43a59c332102f103af340a2793f306071ed4082867a10ce39bf2"
+    },
+    "app/src/test/java/android/os/Looper.java": {
+      "bytes": 312,
+      "mode": 292,
+      "sha256": "a213b8ac5bd644bbe71b0fe7864e30524dec09f9fca60600c2ec5a600022354d"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/runtime/GameSessionOwnerTests.java": {
+      "bytes": 27565,
+      "mode": 292,
+      "sha256": "c27518957c418fedd3cb808cf608c1457f43bc91d6e239fe8ef9f4c6b887bd6e"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/runtime/LocalServerSessionOwnerTests.java": {
+      "bytes": 11892,
+      "mode": 292,
+      "sha256": "f44a0df1aa5ef5619ec31269742e2b8e1eb796625c7ab0b0141def82854fe8e9"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/runtime/LocalWorldSetupOwnerTests.java": {
+      "bytes": 11394,
+      "mode": 292,
+      "sha256": "a8e6a34d5dff906b9ffb6e81983d081ded19eb1d3e0c14db4c9ff1d142168262"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/runtime/PresentationShaderOwnerTests.java": {
+      "bytes": 13745,
+      "mode": 292,
+      "sha256": "91bb33c5dfe08616e147526d99c4bf873118ef6980750d8f6c609c49fd796087"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/runtime/ServerDataSetupOwnerTests.java": {
+      "bytes": 14485,
+      "mode": 292,
+      "sha256": "339a6b0212e0c846d11f13682b700a0858d884d3fc339265364ecc5e0e08decc"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/runtime/ServerInstallationOwnerTests.java": {
+      "bytes": 12689,
+      "mode": 292,
+      "sha256": "78ebcf4e22331d72c815a9a936484c4d5725934eabc93a322e32688995631250"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/runtime/ServerProgramsProfileTests.java": {
+      "bytes": 9506,
+      "mode": 292,
+      "sha256": "5baf3cd46c60cb54b3426cb77c010070af334a2185c5f1cb6bbc6d9a44b00e59"
+    },
+    "app/src/wineProbeAndroidTest/java/io/github/russianranger/esteria/runtime/WineExecutionTest.java": {
+      "bytes": 14826,
+      "mode": 292,
+      "sha256": "1c7f9b61fc366f3c0909587cc537a16800c8b9cbc335eea736313015372edb09"
+    },
+    "app/turnip-provider.gradle": {
+      "bytes": 1642,
+      "mode": 292,
+      "sha256": "2c90664019b518100ec8a2604d152a584ab5593190bd89d52dd5f03c6c73429f"
+    },
+    "app/wine-probe.gradle": {
+      "bytes": 2195,
+      "mode": 292,
+      "sha256": "ccf5b0bea0dafb6d6e62c71e02ab5fc72b1121fb162370874c90fc3ef45fec71"
+    },
+    "app/world-setup.gradle": {
+      "bytes": 1100,
+      "mode": 292,
+      "sha256": "edd6f29c1076b5cacaf2aae9014ee72076f063b125f9acb31573ec4f81606352"
+    },
+    "build.gradle": {
+      "bytes": 73,
+      "mode": 292,
+      "sha256": "c3c0cf04da0fc239f391c774554d97d890018ab6e37e87cc62f6070d0c8c9909"
+    },
+    "config/local-server.json": {
+      "bytes": 858,
+      "mode": 292,
+      "sha256": "6750fa3e1a7c0101b5922f4163c6dfa87d90faba25ce011d5a36de8a578e2d4d"
+    },
+    "config/server-data-inputs.example.properties": {
+      "bytes": 207,
+      "mode": 292,
+      "sha256": "6294ee77f1c6133a03ac7aa54874db80ca4a80a0d94db269708b0e8b2a994c9b"
+    },
+    "core/README.md": {
+      "bytes": 1673,
+      "mode": 292,
+      "sha256": "f082d07e6515339c2585403b200d25bbc20186f31779258e9242b8cbc8aaf3be"
+    },
+    "core/build.gradle": {
+      "bytes": 5211,
+      "mode": 292,
+      "sha256": "f5fed6e998e9c69193a657b3b3e7a8e93c1982a0577a7efe456147c190b726f0"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/diagnostics/SupportBundle.java": {
+      "bytes": 5524,
+      "mode": 292,
+      "sha256": "a5881221c30ad91ad4dbfb636bd18ca7b7000b4e57d000c424f7bdf3d4155cc5"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/diagnostics/SupportLogSelection.java": {
+      "bytes": 7940,
+      "mode": 292,
+      "sha256": "21d086c87fe7bea2359881e377e676d512298431e3883ea522c473c21d817b7e"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/ContentPackageLayout.java": {
+      "bytes": 25813,
+      "mode": 292,
+      "sha256": "6f5a6dbbf9823f9bc10f2bb9cfe55009ad9dcf0ed68edfcb30ceb43f8794d8e8"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/EsteriaCatalogVerifier.java": {
+      "bytes": 3383,
+      "mode": 292,
+      "sha256": "1d4453913747ed2c608d9a46e6106dd514215aac5e9fe6100f36cd2f0688c2ad"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/GameDataImporter.java": {
+      "bytes": 42542,
+      "mode": 292,
+      "sha256": "53b1c8aeac4c9881bac1665abca95b4bce1bbc5dbfc2d94b51b3bcfb4cfcc757"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/GameDataVerifier.java": {
+      "bytes": 14575,
+      "mode": 292,
+      "sha256": "33f1c8397f21d9a22e9ca7be3243ada2366a5d304304f01b3ac5f46c841ec21c"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/ZipSafety.java": {
+      "bytes": 5240,
+      "mode": 292,
+      "sha256": "8a9f03db1f7b1899b0819352feefa452ab33bf9d9b70a63b20199795103fd241"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/input/GameInputRouter.java": {
+      "bytes": 6893,
+      "mode": 292,
+      "sha256": "f3508f2ea63a3ef3bcc4d11ed4ffa0b7d05b2829c839a2e736d1df87b0982f84"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/input/KeyboardText.java": {
+      "bytes": 4047,
+      "mode": 292,
+      "sha256": "f4e5fd8661b53bf2f4b80686546011f04721e5a93749d6155f6638d7b9995df4"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/presentation/InputProtocol.java": {
+      "bytes": 1058,
+      "mode": 292,
+      "sha256": "20e2fac7231e1ae272cad0ed4184501822d0aec12033400ea1784e8b278249f0"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/presentation/InputSink.java": {
+      "bytes": 814,
+      "mode": 292,
+      "sha256": "5ff13dd5e988965fba2aa977df2de9803cfb43599846a2c02af3c8cefd544de4"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/presentation/PcmProtocol.java": {
+      "bytes": 3629,
+      "mode": 292,
+      "sha256": "92937ce8e1fb8d6afd358576f66119c9274fe98c9b1fe836ae0c9f225c9db360"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/presentation/X11SessionPlan.java": {
+      "bytes": 2458,
+      "mode": 292,
+      "sha256": "6f5a912fd4a067f3d8820c4818502a3b3d7d12f2ab62b991a7023bfaa9d990a0"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/LoggedProcess.java": {
+      "bytes": 3836,
+      "mode": 292,
+      "sha256": "afaa73bc65421997bc28c14ebc5bd704aeb358cab28de1efafbac78a62bb7872"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/ServiceOperationGuard.java": {
+      "bytes": 2419,
+      "mode": 292,
+      "sha256": "f7f3f81ebc41396cae10d0a9ad4dc53b1e385fcd6ada44985490c2227f47e42e"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/SessionSupervisor.java": {
+      "bytes": 11187,
+      "mode": 292,
+      "sha256": "ed8df92912d21f6d0879c8fcf2db4b450aa32fd97b98b8a6956ab009d8fff221"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/WineRuntimeProfile.java": {
+      "bytes": 1892,
+      "mode": 292,
+      "sha256": "7f342780a9fdc62a33950ed5f0aa6ca7a6e43e694c8ef7d7ceaadc1a2954f3c5"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ClientLaunchView.java": {
+      "bytes": 22304,
+      "mode": 292,
+      "sha256": "e6e1537377e8b468b096422d40e3ff6c7eb9df9e833d0c9cc876e10ef2eee2b7"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ClientUiStore.java": {
+      "bytes": 17477,
+      "mode": 292,
+      "sha256": "506c34861b643f4442142bdfa14af32cde8fce21ed31d6a0d06fd98c1c1b712e"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/DownloadCache.java": {
+      "bytes": 10149,
+      "mode": 292,
+      "sha256": "2a4493d41860c98b2ea9639b66c52499868d22332b81f273b1d5819807286461"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/EmbeddedArchiveCache.java": {
+      "bytes": 6363,
+      "mode": 292,
+      "sha256": "224a86ac24ab3c5080869de48efd2783bdbbfb0107a6fc1514ede8cab8be38eb"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/FreshServerInstallations.java": {
+      "bytes": 20551,
+      "mode": 292,
+      "sha256": "1feda7897b56b5793ad995c0075013d375c132946f668fa91acdd92a77884ff7"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ImportedUiSource.java": {
+      "bytes": 8841,
+      "mode": 292,
+      "sha256": "4543f39127bc8dfba6ca7aa6362ecc765a108676d82b472607640a88cd2fdc2d"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/LocalAccountHandoff.java": {
+      "bytes": 9652,
+      "mode": 292,
+      "sha256": "114207db197b385f06647265ecc4bdec29062a0afc1b5efac516d84c7d43f7f2"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeFiles.java": {
+      "bytes": 7427,
+      "mode": 292,
+      "sha256": "a61d4c4518e63825dcb3013e7af199edddbf92cd8f06eb93547391737635eb64"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeInstaller.java": {
+      "bytes": 38016,
+      "mode": 292,
+      "sha256": "843968c15b088b501df93db1a395c6e392175f9589ad9250364583ef31b05723"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimePackagePlan.java": {
+      "bytes": 4262,
+      "mode": 292,
+      "sha256": "e035eb2981be83545b9cd03957cbf64e4eb81aaecc3181bb08e7cf4868dd036f"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeWork.java": {
+      "bytes": 992,
+      "mode": 292,
+      "sha256": "36ee9284e1a0bfa4734f979506db964c4d23d3c1699ce94b496906dff0f1b5c0"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ServerDataToolSelection.java": {
+      "bytes": 3725,
+      "mode": 292,
+      "sha256": "80c5923dce5f719d869e9fc2e20ce5248db75ceab7d4152a0a1cd6e049b1f9ae"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/UiFiles.java": {
+      "bytes": 8096,
+      "mode": 292,
+      "sha256": "431243f76e2aee6bc72de80487a9d5021b5fd931ee574a2d76a7de35b8d79826"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/OwnedProcess.java": {
+      "bytes": 15680,
+      "mode": 292,
+      "sha256": "626f874bb89bef35a418a1106576e63716edf63c453da9abad5be47a58df67db"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/ProcessUsageSnapshot.java": {
+      "bytes": 4766,
+      "mode": 292,
+      "sha256": "262de0d0d0fdfee9f3e9c6e69dfb3a86e639ee2178d0cc008125ed1df71df83d"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/ProotLaunch.java": {
+      "bytes": 7504,
+      "mode": 292,
+      "sha256": "ff482a9a1680cfebf965fb664c4476d3b804d917c3178e125cf8251a2ee17d5e"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/ServerDataRunPlan.java": {
+      "bytes": 5903,
+      "mode": 292,
+      "sha256": "b891ec7987ee4b408173d291cd9c8e490249ba40cad61530235a4dc1affc1279"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/ShaderRunPlan.java": {
+      "bytes": 3620,
+      "mode": 292,
+      "sha256": "fa3073a66bb7ae6cda442a748af74521c29f3b252927a0aae2231b37324a9aa7"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/WorldConsoleShutdown.java": {
+      "bytes": 916,
+      "mode": 292,
+      "sha256": "b3f5208d9ae9c7471dae8ec9904a929ae2fe71d0580c3167d0eacef3610f522c"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/diagnostics/SupportBundleTest.java": {
+      "bytes": 8406,
+      "mode": 292,
+      "sha256": "61a858ef7ae9e45d8097bacb8154cb13da8936517cba4fd921952664f239d803"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/diagnostics/SupportLogSelectionTests.java": {
+      "bytes": 8934,
+      "mode": 292,
+      "sha256": "f58164a0f2ab61427065c653a81cf9ef0703cdbfea63ae619bd6a2b208e6f7cf"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/importer/ImporterTests.java": {
+      "bytes": 55226,
+      "mode": 292,
+      "sha256": "91a55639c1ae8ef8d9e2d0152f5a58c7c56a353a31548966ee845e8e6a481f66"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/input/GameInputRouterTest.java": {
+      "bytes": 4798,
+      "mode": 292,
+      "sha256": "d526edb9ac2316fc21937356ca14bd9aa58d277fbe7f81483a902201b900d896"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/presentation/PcmProtocolTests.java": {
+      "bytes": 5684,
+      "mode": 292,
+      "sha256": "2d544af8b29402c3863d2ab504766dce0239d764c167deec0c3107f9e2ccf2bc"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/OwnedLaunchFailureTests.java": {
+      "bytes": 7142,
+      "mode": 292,
+      "sha256": "d8384380a41c305200a014950fa5971a76de61b1c93ee3045c7e99550c0f3daa"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/PresentationProcessTests.java": {
+      "bytes": 4581,
+      "mode": 292,
+      "sha256": "fd5a155d571c6a4fa8b585d387219b8ca379ed040ee81a496856d337122703db"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/ProotMountTests.java": {
+      "bytes": 10605,
+      "mode": 292,
+      "sha256": "cf5aa9031d2cfa5834a572c6f98e1579c5c3b1ab39516cbd64c26cd5c5fbe35b"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/ServerDataRunPlanTests.java": {
+      "bytes": 5135,
+      "mode": 292,
+      "sha256": "56e42aad3643431f84067f5a3acf475853967690a32ccd283d257287f58e5708"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/ServiceOperationGuardTests.java": {
+      "bytes": 3392,
+      "mode": 292,
+      "sha256": "1c73e3d88d81c289a345f8be6cfe1e35e3c99e3eea2608d34191c5ad38fc6f8e"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/SessionSupervisorTest.java": {
+      "bytes": 13570,
+      "mode": 292,
+      "sha256": "8f14fc2640be06487310ad6c890e5f992d8a45ef6013af83db019508d29bab3d"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/ShaderRunPlanTests.java": {
+      "bytes": 2931,
+      "mode": 292,
+      "sha256": "b79cd176eb56df805916276feb33ae6a8c77f8493e98d9d636bcb3181592a4ed"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/install/ClientLaunchViewTests.java": {
+      "bytes": 10437,
+      "mode": 292,
+      "sha256": "4b4b9141262ce39ad772eeb7fb3bb40bdce0d6a55efb76f60d71ce7f20710245"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/install/ClientUiStoreTests.java": {
+      "bytes": 13132,
+      "mode": 292,
+      "sha256": "74829f3d7de0981669b6b0c0113abd13f5429a9e9e72dff21bebbf017ae1af12"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/install/EmbeddedArchiveCacheTests.java": {
+      "bytes": 3903,
+      "mode": 292,
+      "sha256": "8ba56ad204ccd3c64c50f9da6478761b82f40362d89201163abcbe624513aac6"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/install/FreshServerInstallationsTests.java": {
+      "bytes": 13212,
+      "mode": 292,
+      "sha256": "5f5346aa5c1714ac665dd98aa5c2ef7abad70897c2da7b57af9dece9181a7e5d"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/install/LocalAccountHandoffTests.java": {
+      "bytes": 6430,
+      "mode": 292,
+      "sha256": "7bebdefcbd75dfff9ff306c1b1ac601ee2d28d3d7f5eba8f91ae4e8823ded6b8"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/install/RuntimeInstallerTests.java": {
+      "bytes": 30439,
+      "mode": 292,
+      "sha256": "a118694d414f32cd7ac639219c6ef6f6dbdbfa05fe7015e4d3e73f0937a7c2d1"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/install/ServerDataToolSelectionTests.java": {
+      "bytes": 2996,
+      "mode": 292,
+      "sha256": "e89fee08e2f6219a7180b6dcb357a66f83a998752273498cda038e6448ead862"
+    },
+    "gradle.properties": {
+      "bytes": 135,
+      "mode": 292,
+      "sha256": "2348f7d4dd608dfee1a292b307f826e49ece96ff58eb824a4aecaca644d5d167"
+    },
+    "gradle/wrapper/LICENSE": {
+      "bytes": 23622,
+      "mode": 292,
+      "sha256": "9536d88ea948603d18e232a13f5958d67807cd80828036b082bff171d2cf0703"
+    },
+    "gradle/wrapper/NOTICE": {
+      "bytes": 339,
+      "mode": 292,
+      "sha256": "62a53de32e88d365945030123af76d43012d894a1e9675f660e254dc52c7d239"
+    },
+    "gradle/wrapper/SHA256SUMS": {
+      "bytes": 100,
+      "mode": 292,
+      "sha256": "a1f685c35af32c8a28da2d4b932fd042409ed7d5cf715a8aeb3989b4d1ec01b2"
+    },
+    "gradle/wrapper/gradle-wrapper.jar": {
+      "bytes": 43504,
+      "mode": 292,
+      "sha256": "498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17"
+    },
+    "gradle/wrapper/gradle-wrapper.properties": {
+      "bytes": 337,
+      "mode": 292,
+      "sha256": "30ab49760f7cea3476ead771720cd59ab1dd98f5525b9d682f7ede458c90a788"
+    },
+    "gradlew": {
+      "bytes": 489,
+      "mode": 365,
+      "sha256": "7c58f7a5fed1624d881035bf5cdc6ffb9e542ab94b68847763fb0c2f4877a43c"
+    },
+    "gradlew.bat": {
+      "bytes": 289,
+      "mode": 292,
+      "sha256": "119ce8a4bfdf3024ba03cf9b6b810afd47b49e17999a0053bfe719effbad36ea"
+    },
+    "native/CMakeLists.txt": {
+      "bytes": 570,
+      "mode": 292,
+      "sha256": "fb50c23dd3bd6e8d4b029eed7f88a8cb9bfe3631e17d2347fe0a57302050b214"
+    },
+    "native/guest-bridges/AUDIO-LICENSE": {
+      "bytes": 1075,
+      "mode": 292,
+      "sha256": "dc18de7cb5064083e6cbe8fc6891de96b3700ed17891d03d1baa5e0097bd479e"
+    },
+    "native/guest-bridges/Makefile": {
+      "bytes": 926,
+      "mode": 292,
+      "sha256": "cb83e03fbf1b29192039580cc8f60ac68a7f6571c6d73b2c34b9a97fd5a6f95a"
+    },
+    "native/guest-bridges/pcm_esteria.c": {
+      "bytes": 7449,
+      "mode": 292,
+      "sha256": "b520bd47cd2dd7e542ee88c6c518532ec9cd84b006bf7b8f912438a479897dc8"
+    },
+    "native/guest-bridges/private_socket.h": {
+      "bytes": 1888,
+      "mode": 292,
+      "sha256": "06d4335d1bc348e8630969b5940d9c7a0cf8658552ffdf005d581426f0af84a6"
+    },
+    "native/guest-bridges/x11_frame.c": {
+      "bytes": 6355,
+      "mode": 292,
+      "sha256": "58ac751cba2add9f48911bb78eaab1432b269adba7abc44f20635836ef1684cb"
+    },
+    "native/guest-bridges/x11_input.c": {
+      "bytes": 4627,
+      "mode": 292,
+      "sha256": "ea42849c6cf80132da04b43d9fd771ed1f71dba5081607c586069ac257f59e52"
+    },
+    "native/guest-tests/x11_input_observer.c": {
+      "bytes": 9555,
+      "mode": 292,
+      "sha256": "b89a3a26bd03a7813aae822dd06970a5b5c12e306a9a7406de103fba1fc50a92"
+    },
+    "native/presentation/CMakeLists.txt": {
+      "bytes": 675,
+      "mode": 292,
+      "sha256": "70ed7b542d64cbb2231f8c7509716afedea3e61fc92d3ee2008c90071704ad09"
+    },
+    "native/presentation/frame_protocol.h": {
+      "bytes": 1388,
+      "mode": 292,
+      "sha256": "e8a2a9dec44254049520ae5f21141d355a054e1afc9b4b83d87ce25c815881df"
+    },
+    "native/presentation/frame_transport.h": {
+      "bytes": 869,
+      "mode": 292,
+      "sha256": "53979f5450ca55c33899cc844403650296aacba8449bf2a313fefd87ff1325fd"
+    },
+    "native/presentation/surface.c": {
+      "bytes": 3348,
+      "mode": 292,
+      "sha256": "adbf2ec1d0c65e186cc63d5e4b47946473befe07807421a6e8ecb2dae4413216"
+    },
+    "native/process-owner/CMakeLists.txt": {
+      "bytes": 1562,
+      "mode": 292,
+      "sha256": "706ab1f5e532c24fb1b55ecd3c553b0b8f2d5a20197c4705aad91c91ccd92f18"
+    },
+    "native/process-owner/FTA-MIT-LICENSE.txt": {
+      "bytes": 1070,
+      "mode": 292,
+      "sha256": "f9c4b27004805765d801d72b2d97dcfea8c05b4d5675d65545164090914ae354"
+    },
+    "native/process-owner/NativeOwnerInputTests.java": {
+      "bytes": 6805,
+      "mode": 292,
+      "sha256": "57267d7633789dd15af159f95fe4c5682791afacd07e867a09636dd0918cc10f"
+    },
+    "native/process-owner/NativeOwnerIntegrationTest.java": {
+      "bytes": 8759,
+      "mode": 292,
+      "sha256": "14af0d9cc7244bddcce82e83bf2214487323d76e4dbcb3a1c20cf121203f189d"
+    },
+    "native/process-owner/NativeOwnerUsageTests.java": {
+      "bytes": 6151,
+      "mode": 292,
+      "sha256": "f3e0cfe9f0dc5f722249fc2f222b714c9c8b84d95a37d3fe098b9ba5db73e9f0"
+    },
+    "native/process-owner/README.md": {
+      "bytes": 6465,
+      "mode": 292,
+      "sha256": "5a6b57057c89accaa0bd9a1e0dd060ab3259b1d6fc6d7110a2124f921c053458"
+    },
+    "native/process-owner/jni_bridge.cpp": {
+      "bytes": 5850,
+      "mode": 292,
+      "sha256": "361d5ac9299d8dee3d985027e2a41d50beeeb983e839cf072e29a5cfa1f2218e"
+    },
+    "native/process-owner/process_owner.cpp": {
+      "bytes": 18774,
+      "mode": 292,
+      "sha256": "6047296536321ddb04da2447253fbbb42debdc3e346b50aa435cbc0bc6be30d8"
+    },
+    "native/process-owner/process_owner.h": {
+      "bytes": 1702,
+      "mode": 292,
+      "sha256": "53d6813f2b07ab1a5afca7cc76a9fd1b33218767ce04cdc0559c8c9871e65d35"
+    },
+    "native/process-owner/process_owner_test.cpp": {
+      "bytes": 12747,
+      "mode": 292,
+      "sha256": "2832c62ca3ea0cd13d87e8849e01cb8feb23b15062bc44345ae639814f98aff2"
+    },
+    "native/process-owner/process_usage.cpp": {
+      "bytes": 11676,
+      "mode": 292,
+      "sha256": "80989ccf8d2c024643d0476d7a67724aeebdeb0c00b075548bbfab09a69f1ed9"
+    },
+    "native/process-owner/process_usage.h": {
+      "bytes": 1989,
+      "mode": 292,
+      "sha256": "6f7ef7f8ef6c41804eefc2c7ddecc8bf0ca5ebc221b8356c8c13a82ff2f58f8a"
+    },
+    "native/process-owner/process_usage_test.cpp": {
+      "bytes": 14499,
+      "mode": 292,
+      "sha256": "00c1933edc3d6a334ea6b8666a55b9e743ee6da4ee47728d02692c1fb0e01a76"
+    },
+    "native/proot-probe/CMakeLists.txt": {
+      "bytes": 468,
+      "mode": 292,
+      "sha256": "202a84cb0ecb1b50a92668bf92c45b06524fae70c4b2f1d802d7828113f24a57"
+    },
+    "native/proot-probe/PidfdHostTest.java": {
+      "bytes": 2891,
+      "mode": 292,
+      "sha256": "d10abe08c73be61984bc7a825f03f3c4de1fe3db97ad13aa93e737d04486ae96"
+    },
+    "native/proot-probe/glibc.lock.json": {
+      "bytes": 2719,
+      "mode": 292,
+      "sha256": "8c72a53ec20d430c9a728ec2047be038dc7de62ae1cfd7a929412f567d0c08c0"
+    },
+    "native/proot-probe/guest.c": {
+      "bytes": 9570,
+      "mode": 292,
+      "sha256": "5e98de4b1439f2c2f35a5a7a8108e86f54070e5a8c70b234daf15e775fd1a10f"
+    },
+    "native/proot-probe/ownership_guest.c": {
+      "bytes": 5339,
+      "mode": 292,
+      "sha256": "99868eb91f6925d9fc20607c44103afc27fcfbef8146a9e0d1e7a59393b97b2e"
+    },
+    "native/proot-probe/pidfd_jni.cpp": {
+      "bytes": 7477,
+      "mode": 292,
+      "sha256": "1ea6f43193adad4e01821f02ac102c2e69530d7b3c64df40b3e64175062e2b20"
+    },
+    "native/proot-probe/plugin.c": {
+      "bytes": 198,
+      "mode": 292,
+      "sha256": "5e78917619d3568470b2ed7471d3901591980ba1acdecaa088ff3e98db9f3556"
+    },
+    "native/proot-probe/proot-x64-renameat.patch": {
+      "bytes": 1532,
+      "mode": 292,
+      "sha256": "8ea4340df89b694e881e4804c312d71268071736a1883b4ffbc42015e9081152"
+    },
+    "patches/server/0001-eluna-declare-area-trigger.patch": {
+      "bytes": 285,
+      "mode": 292,
+      "sha256": "c26b145188c5f97bf30d032e1fe3bd7fe17aa1f8f0daa6793e51f5d830fe7aa6"
+    },
+    "patches/server/0002-eluna-include-map-manager.patch": {
+      "bytes": 303,
+      "mode": 292,
+      "sha256": "4e277dbe56c31ae30640c8e9ad4dee12e944e0f051d9bdc8d62aaa239c50433f"
+    },
+    "patches/server/0003-eluna-hooks-include-types.patch": {
+      "bytes": 283,
+      "mode": 292,
+      "sha256": "5999402d985fcc709abdc90bb4272072d1d5e3e261b2cc7ec19460320c14295f"
+    },
+    "patches/server/0004-attunement-stat-api.patch": {
+      "bytes": 4137,
+      "mode": 292,
+      "sha256": "d9ef6ca8f96ab186c37c072b22143cdded9976aa3a62d083f893c502a5745cb8"
+    },
+    "patches/server/0005-script-grid-templates.patch": {
+      "bytes": 1541,
+      "mode": 292,
+      "sha256": "6b459c90839e7831df8533966442fabd476ae1773f0302c50ccc8a997f157369"
+    },
+    "patches/server/0006-empty-script-modules.patch": {
+      "bytes": 1809,
+      "mode": 292,
+      "sha256": "ea0beb357c71d8b8c187af9d4afede520e7ac9877e40fbdc5fab99d54fc21f97"
+    },
+    "patches/server/0007-runtime-module-config-directory.patch": {
+      "bytes": 1145,
+      "mode": 292,
+      "sha256": "5e41d474179ef553ec9c2544de947a3724885fd7f3ac233af3d89797acd032ff"
+    },
+    "patches/server/ATTUNEMENT-API-AUDIT.md": {
+      "bytes": 5747,
+      "mode": 292,
+      "sha256": "28508e005e576ad9b095f0a98a8d6c6745cd83242527c214e4a6d73e2be91410"
+    },
+    "patches/server/LINKAGE-AUDIT.md": {
+      "bytes": 3437,
+      "mode": 292,
+      "sha256": "739ae8923de567a98cd425d3c6c89042aeb3fd73cb8016a76836f568856f4211"
+    },
+    "patches/server/MODULE-CONFIG-PATH-AUDIT.md": {
+      "bytes": 3277,
+      "mode": 292,
+      "sha256": "ef7e799f5d6d0fe3293e91fc3ef729ebb32d2b9cdd6236d40283a25c4b34f2cd"
+    },
+    "patches/server/README.md": {
+      "bytes": 2594,
+      "mode": 292,
+      "sha256": "58bd0eeb76a0cdc7d7cf84bc7d003267d381eeda5f36381976844cc3d891e858"
+    },
+    "runtime/ANDROID-DATABASE-SETUP.md": {
+      "bytes": 2960,
+      "mode": 292,
+      "sha256": "0a92bec0902b4528e173cf86ec50bb1123ad52ef4b6d30af4420b9dc534fc474"
+    },
+    "runtime/ANDROID-EXECUTION.md": {
+      "bytes": 6088,
+      "mode": 292,
+      "sha256": "fd6075ff2075e77fd48f5beaa8f3c20f938f811705cf6f83769d16fbc8b521c6"
+    },
+    "runtime/ANDROID-INSTALLATION.md": {
+      "bytes": 6789,
+      "mode": 292,
+      "sha256": "fcd512aa0a763893744e7e714dc84e886a5b9ed8ce7bfdfb7911067d075a3f16"
+    },
+    "runtime/ANDROID-OWNER-QUALIFICATION.md": {
+      "bytes": 4446,
+      "mode": 292,
+      "sha256": "513f1430baad0508acd540ccfc440bce75f6505e02d421fc87cb277c18e8aaac"
+    },
+    "runtime/ANDROID-PROOT-QUALIFICATION.md": {
+      "bytes": 15742,
+      "mode": 292,
+      "sha256": "6fbb1b98a917694da27feb4745ff2ff03476b3acb9d7a3d0cb270c859b15a6c6"
+    },
+    "runtime/ANDROID-WINE-QUALIFICATION.md": {
+      "bytes": 11106,
+      "mode": 292,
+      "sha256": "ab3643139f5c2937093ccc35177fa6bfe7b7dcfcaeb3d748cef1b47388c5c1aa"
+    },
+    "runtime/AUTH-QUALIFICATION.md": {
+      "bytes": 5009,
+      "mode": 292,
+      "sha256": "395c6da54a1a606435e3b467434e43b654b3cc1908a8393b0212fe6251add871"
+    },
+    "runtime/CLIENT-AUTH-QUALIFICATION.md": {
+      "bytes": 10630,
+      "mode": 292,
+      "sha256": "5d24af0137deb1e582e7b3c42615db2372bd24fed9d033395c1a64833d460347"
+    },
+    "runtime/CLIENT-PRESENTATION-SESSION.md": {
+      "bytes": 7892,
+      "mode": 292,
+      "sha256": "90c6990af1fe871a25e35b4c08501df2ed6bff78966dfd5e62c442755fb933d3"
+    },
+    "runtime/COMBINED-ANDROID-BUILD.md": {
+      "bytes": 6069,
+      "mode": 292,
+      "sha256": "1288972ad8e01a1e54802d255f3808de70dee2a7c888e8bec801a6b75e9623e1"
+    },
+    "runtime/CONTROLS.md": {
+      "bytes": 3757,
+      "mode": 292,
+      "sha256": "b669b58e76d5459539375d4a404b555b11687aa9f0fefc8e3cb7c31772a5498d"
+    },
+    "runtime/GAME-SERVICE-UI.md": {
+      "bytes": 2527,
+      "mode": 292,
+      "sha256": "e009378879743369af650ace204eceda5ed160fef67f541d3d9fe26a766bb39a"
+    },
+    "runtime/GAME-SESSION.md": {
+      "bytes": 5400,
+      "mode": 292,
+      "sha256": "8934dd9649358e429f93625551d00fd4fece7d866b7c36e6b2e27e9bb8850939"
+    },
+    "runtime/LOCAL-ACCOUNT.md": {
+      "bytes": 7506,
+      "mode": 292,
+      "sha256": "e5decf27ee933ab0f00ee71a59e7992ad68b5d5a6cf3ae0f652d10ab5ddb6928"
+    },
+    "runtime/LOCAL-SERVER.md": {
+      "bytes": 12522,
+      "mode": 292,
+      "sha256": "173e672a811dc7b6f0c9bd733efda7e1142bf2789fabdfce757a9cb572eea0ae"
+    },
+    "runtime/MYSQL-BACKUP-QUALIFICATION.md": {
+      "bytes": 10884,
+      "mode": 292,
+      "sha256": "bbf7163c260890320b8c0e33971cbfdab16fc7b909da662cfdd243b7be0c66f4"
+    },
+    "runtime/MYSQL-SERVICE.md": {
+      "bytes": 5581,
+      "mode": 292,
+      "sha256": "26c0a23560916ab70dafb2f26e469bdaf41405b7538083a311fd10383ff23a09"
+    },
+    "runtime/PACKAGING.md": {
+      "bytes": 10202,
+      "mode": 292,
+      "sha256": "7984637598c36a01632775ce427274e5a95c5e36b778a01d3ecd1dd656385883"
+    },
+    "runtime/PCM-CAPTURE.md": {
+      "bytes": 6147,
+      "mode": 292,
+      "sha256": "89fd1a40fa38729636c447b4c16b826ebb24f07b96fdf23af5731f82b1ae63dd"
+    },
+    "runtime/PLAYERBOTS-DATABASE-QUALIFICATION.md": {
+      "bytes": 5014,
+      "mode": 292,
+      "sha256": "426a2e2c08d9aa2d264fdd6511bdf703edea7612dc8baa3c9747cb2b33a4d1e6"
+    },
+    "runtime/PRESENTATION-AUDIO.md": {
+      "bytes": 13376,
+      "mode": 292,
+      "sha256": "de91bdd5180fcba12bde234ab45139a58c67a94bd580b0a0a4dff7241e04c04a"
+    },
+    "runtime/PROCESS-USAGE.md": {
+      "bytes": 5622,
+      "mode": 292,
+      "sha256": "487dc7c682c30583ca0eee9f23cc88e7fd714936bfee439fc6ed4bc491acdcc2"
+    },
+    "runtime/REALM-PROVISIONING.md": {
+      "bytes": 5735,
+      "mode": 292,
+      "sha256": "04e74eb1efcbe6e6638776b275fd75342fbb3a29b3893fa8bb2b5dae2076bd96"
+    },
+    "runtime/SERVER-CONTENT-SETUP.md": {
+      "bytes": 6686,
+      "mode": 292,
+      "sha256": "a09a1d61abe48c5bfac20fba5f195c7f6d54a9302c7fe64c23ff64dc802baf94"
+    },
+    "runtime/SHADER-GENERATION.md": {
+      "bytes": 6270,
+      "mode": 292,
+      "sha256": "65aca30c0cb2cbd3aec0f016dc5eabad1eb314c11082fd25980a6fd59817428a"
+    },
+    "runtime/SHADER-TOOLS.md": {
+      "bytes": 8815,
+      "mode": 292,
+      "sha256": "3412ed9d5b8f9f853d2993407ce3eeb0a2a975fb5f31b023dd50ecab6b86a4cb"
+    },
+    "runtime/SOURCE-SCHEMA-BASELINE.md": {
+      "bytes": 5830,
+      "mode": 292,
+      "sha256": "4150dc84e64236c5e263673f0705f5ec2022cbef6ab89cec9efe26068bfc2b31"
+    },
+    "runtime/SQL-PACKAGING.md": {
+      "bytes": 27718,
+      "mode": 292,
+      "sha256": "e0ad57248e5989c7362c0b1e4dbd0906dd571a08c776391ae4ddc3b15cd8eac8"
+    },
+    "runtime/SUPPORT-LOG-SELECTION.md": {
+      "bytes": 2085,
+      "mode": 292,
+      "sha256": "96a7286cd79e4afc99050779665e9ecb9db3e0d5ba0908737e07abe8cc5212fa"
+    },
+    "runtime/WINE-QUALIFICATION.md": {
+      "bytes": 16467,
+      "mode": 292,
+      "sha256": "ef3b030dc3e46d7ba83e66fb17274aabf03e3b9965b3349c0097cf4957d6ea64"
+    },
+    "runtime/WORLD-SHUTDOWN.md": {
+      "bytes": 3509,
+      "mode": 292,
+      "sha256": "c61f8a262000c0d3c968d579dd62d1d8f4ee7ef4df8e8346452b521e678e8d52"
+    },
+    "runtime/android_database_setup.py": {
+      "bytes": 5488,
+      "mode": 292,
+      "sha256": "a2bdc53753d8c301e6e8fa633a8e12026f7285881f08c22e2aedf6819d31a813"
+    },
+    "runtime/android_server_installation_setup.py": {
+      "bytes": 39179,
+      "mode": 292,
+      "sha256": "3148188d213352a02671c09ca85d0476361686b2180c660ad1492bf2a169fefb"
+    },
+    "runtime/android_server_schema_setup.py": {
+      "bytes": 11875,
+      "mode": 292,
+      "sha256": "9526275258a6b98930e3253c0011627844ed10e1816658b3d5d07e23cd3dfd02"
+    },
+    "runtime/bridge-reference.json": {
+      "bytes": 664,
+      "mode": 292,
+      "sha256": "6762304137005c31d1b7eeb847de6ffad0eaed4ba96d1771f48399babce3490f"
+    },
+    "runtime/bridges/ANDROID-PACKAGING.md": {
+      "bytes": 7405,
+      "mode": 292,
+      "sha256": "1c7a51c25d812f680a044a83d270f96c179bc20b5015df325d2697fe07e29f09"
+    },
+    "runtime/bridges/DEPENDENCY-RELEASE.md": {
+      "bytes": 3574,
+      "mode": 292,
+      "sha256": "4c2e37a9773b579570843707e630c1c84b0fb98a6ccd81f601ff7d4e556e88d3"
+    },
+    "runtime/bridges/Dockerfile": {
+      "bytes": 2716,
+      "mode": 292,
+      "sha256": "79f87a6485e6fac56a2b6810c822467d2c3a5ae06c62f7472b4b0814706a700f"
+    },
+    "runtime/bridges/X11-AUTH-QUALIFICATION.md": {
+      "bytes": 4711,
+      "mode": 292,
+      "sha256": "161888b2257cc4c3e49f05bddede062a2044ab3600b93ed5d2f645393536543a"
+    },
+    "runtime/bridges/X11-QUALIFICATION.md": {
+      "bytes": 4690,
+      "mode": 292,
+      "sha256": "a49d9af6448297ea03a952c065c02b6cda6782c756b865c647ac472ac2a4e668"
+    },
+    "runtime/bridges/android-provider.lock.json": {
+      "bytes": 12376,
+      "mode": 292,
+      "sha256": "2829cef5a81fbdcceeaa47b7cec9fe00274e4d0308c5d8242c722e0667e5616b"
+    },
+    "runtime/bridges/capture_sources.py": {
+      "bytes": 2158,
+      "mode": 292,
+      "sha256": "96e24b2480b97897d919794e5088de12921fbbc605cfc6ce4725df1a6b0cf498"
+    },
+    "runtime/bridges/debian.sources": {
+      "bytes": 434,
+      "mode": 292,
+      "sha256": "8e8f7c4f33e39696a188e01bb6e385daf17a006eb573bc84af073ebcc4fc9f65"
+    },
+    "runtime/bridges/dependency-release.lock.json": {
+      "bytes": 3029,
+      "mode": 292,
+      "sha256": "98d269c76a2f3e2dddc013b4a17ddb93e8ba893abe58d27997bac7e789da5d42"
+    },
+    "runtime/bridges/inrelease.SHA256SUMS": {
+      "bytes": 455,
+      "mode": 292,
+      "sha256": "2acec858821beef422f424794c5577adf01ef084787ca42616c5cb78a72b1413"
+    },
+    "runtime/bridges/packages.txt": {
+      "bytes": 266,
+      "mode": 292,
+      "sha256": "0668e11127bc1c74f139b96e9d57953ff4cb02fa77e88e7a7bda97af23069959"
+    },
+    "runtime/bridges/record_build.py": {
+      "bytes": 4522,
+      "mode": 292,
+      "sha256": "c2efaafe2235480de55fe08b641c56afa1b74a6c40c07d9e34c50ab375cf9842"
+    },
+    "runtime/bridges/record_x11_fixture.py": {
+      "bytes": 1124,
+      "mode": 292,
+      "sha256": "d070683c2392b1704a2a503af63340fea26fcf60c09b92e7b1d02e82a062d2aa"
+    },
+    "runtime/bridges/sources.lock.json": {
+      "bytes": 23129,
+      "mode": 292,
+      "sha256": "241729a2da2c6e88df431c9d68f00e37873c0616d81981a354e12b58046384e9"
+    },
+    "runtime/bridges/x11-runtime.lock.json": {
+      "bytes": 14313,
+      "mode": 292,
+      "sha256": "828f3a7843f7073648e95fe52edfd69834ccb480073a42f52bf68b0b8f3d12e5"
+    },
+    "runtime/client-auth-candidate/QUALIFICATION.md": {
+      "bytes": 2384,
+      "mode": 292,
+      "sha256": "b457f75503c65a281705c626c1dcd427a0f5a6357c89c2497210be966cde0847"
+    },
+    "runtime/client-auth-candidate/README.md": {
+      "bytes": 1749,
+      "mode": 292,
+      "sha256": "fed4d6ebe3bf69df7b1b1e11748414b5ef23b30ee3ce8e0a854be14a13f1af11"
+    },
+    "runtime/client-auth-candidate/inputs.lock.json": {
+      "bytes": 2238,
+      "mode": 292,
+      "sha256": "2ddf6461224c5122283d7133da3b082b85ad567fbfdd939478c286c7984e3ab0"
+    },
+    "runtime/client-auth/Dockerfile": {
+      "bytes": 833,
+      "mode": 292,
+      "sha256": "50ff3be6cedf1df78238674b130e8010a3a9815fb0834e7b6f4d2b74cd6e75b2"
+    },
+    "runtime/client-auth/Dockerfile.dockerignore": {
+      "bytes": 166,
+      "mode": 292,
+      "sha256": "163e630f5826f58b6afb5fedf3c2dc20195c3c36b4a9dac3abc4cc167ae7c8c1"
+    },
+    "runtime/client-auth/INITIALIZATION-DIAGNOSTICS.md": {
+      "bytes": 1848,
+      "mode": 292,
+      "sha256": "4142d391dc09f6f0dc0b17bcd843c3e82f5ec987741b58aa95ac7e25c71b4230"
+    },
+    "runtime/client-auth/tool-inputs.lock.json": {
+      "bytes": 49389,
+      "mode": 292,
+      "sha256": "73d26f4ed16665399fe81b5826627008c552c6d53ab8805d130c09a5be2e9470"
+    },
+    "runtime/client/ANDROID-PACKAGING.md": {
+      "bytes": 9440,
+      "mode": 292,
+      "sha256": "9eaeeecbf6d614f54cc33e7e9a2a7f61ca8472d92c1b4d31062034c698f0d072"
+    },
+    "runtime/client/APP-UI-REVIEW.md": {
+      "bytes": 3617,
+      "mode": 292,
+      "sha256": "64d0538c1b5f70ef9fbcb1b746698854a4090c0c299b39448992e9fd5641abce"
+    },
+    "runtime/client/CATALOG-IMPORT.md": {
+      "bytes": 1710,
+      "mode": 292,
+      "sha256": "d479eef6dcf87e0c480d8bdbf0fb4a7bd95431d73d6e0d69f0258c0e144fe505"
+    },
+    "runtime/client/DEPENDENCY-RELEASE.md": {
+      "bytes": 8167,
+      "mode": 292,
+      "sha256": "9aae8d593f0aeda7fd24c6ba103ec5c3cd9b605aa08444c9d773c3e3968a1304"
+    },
+    "runtime/client/LAUNCH-VIEW.md": {
+      "bytes": 10228,
+      "mode": 292,
+      "sha256": "3246cbf736dfbbf6b03ec75ef610ddb767c7bd09d78186be842413504cc25763"
+    },
+    "runtime/client/LOCAL-ACCOUNT-HANDOFF.md": {
+      "bytes": 2258,
+      "mode": 292,
+      "sha256": "175f75c57d4928fdf0b919989ef4b108f790f70282b3461fc01e610eed0b2946"
+    },
+    "runtime/client/WRITABLE-UI.md": {
+      "bytes": 6864,
+      "mode": 292,
+      "sha256": "f9ec79d3ff53262ccaff7d058be4b509dc29c6865feb6e4dab4192d0690b363e"
+    },
+    "runtime/client/android-provider.lock.json": {
+      "bytes": 492,
+      "mode": 292,
+      "sha256": "7ecb7dfd4e9917e742fb467d81a72af9273394c8488e5a6cb3e25fa70c29ed5b"
+    },
+    "runtime/client/auth-reference.lock.json": {
+      "bytes": 925,
+      "mode": 292,
+      "sha256": "605e1f42617cc222819f7d412b719757b9d1360b92d9d9445306c04624c8c6cd"
+    },
+    "runtime/client/dependency-release.lock.json": {
+      "bytes": 5474,
+      "mode": 292,
+      "sha256": "3dcafa462901a6af8f216c00fd96ff318caeff14540107e822f5b8b65c7c0f9a"
+    },
+    "runtime/evidence/android-handoff-initial-41064257662.json": {
+      "bytes": 729,
+      "mode": 292,
+      "sha256": "0a42b185d7ba8812c86304b9b2b6bf64945384596f4461a636501b34b5ed838e"
+    },
+    "runtime/evidence/android-helper-installer-41013086426.json": {
+      "bytes": 2950,
+      "mode": 292,
+      "sha256": "82575aaba212816429e4af1b60f89ffb5493be3a3772b7bdf0f49a99624ff508"
+    },
+    "runtime/evidence/android-installer-41070183970.json": {
+      "bytes": 2607,
+      "mode": 292,
+      "sha256": "b867a55f4252497c338c4ce7734e60b9ddbf7ffa12674119852e51626339b32a"
+    },
+    "runtime/evidence/android-mysql-43ccce4.json": {
+      "bytes": 6767,
+      "mode": 292,
+      "sha256": "bbe6713d176f12ece6c3eb1f39247c01e6beda2a6c9d4c292b6f654ec230b79b"
+    },
+    "runtime/evidence/android-mysql-probe-dependency-05925.json": {
+      "bytes": 1755,
+      "mode": 292,
+      "sha256": "20771e0f91e9013f6613250245dbcd07b360150ef087ef10fa7304f6b510fad4"
+    },
+    "runtime/evidence/android-mysql-service-0e13dd2.json": {
+      "bytes": 17802,
+      "mode": 292,
+      "sha256": "1aa28d7db3416f7c11f4130862f08d6a51de2926c934febed205e093eae2a44d"
+    },
+    "runtime/evidence/android-presentation-e9dcb61.json": {
+      "bytes": 3693,
+      "mode": 292,
+      "sha256": "547359395511e94c20f4b440799f65ff426ace9468629be98ea5fe1bb2ec0c51"
+    },
+    "runtime/evidence/android-schema-adapter-host.json": {
+      "bytes": 3229,
+      "mode": 292,
+      "sha256": "eb50d94712a0fb6892a3f32c50f37c2b17374ae50b2ad6c69ef3cf720fc70611"
+    },
+    "runtime/evidence/android-wine-client-41046942035.json": {
+      "bytes": 35826,
+      "mode": 292,
+      "sha256": "daaca6f85e9b2b6c0b06366d26f5e655a09a34fd9c2e6b2adae1e156c194e303"
+    },
+    "runtime/evidence/android-wine-mappings-41017052972.json": {
+      "bytes": 2144,
+      "mode": 292,
+      "sha256": "5ecdfafb5321d04481feb71c826bbcacb7dadc8a08cce5ada0d05df39b0018ae"
+    },
+    "runtime/evidence/android13-components-7619-readback.json": {
+      "bytes": 19142,
+      "mode": 292,
+      "sha256": "cf8fb130fd195906987099055199f3572f6d372a7d1522a04d3075e642d45701"
+    },
+    "runtime/evidence/client-471-publication.json": {
+      "bytes": 4176,
+      "mode": 292,
+      "sha256": "e58f7ca7633311acfaf9d716308e168b898994230837642f40a10eefd5f0ca95"
+    },
+    "runtime/evidence/client-auth-41060555263.json": {
+      "bytes": 6680,
+      "mode": 292,
+      "sha256": "4e356e74ce51f865ebeae1790d7168c09175147580cd280392769cb0a41f2b40"
+    },
+    "runtime/evidence/client-auth-initialization-41058676745.json": {
+      "bytes": 3977,
+      "mode": 292,
+      "sha256": "e2173dd62f26cf078d3526e270be4adba1f6a6825f7848607947121da2213ede"
+    },
+    "runtime/evidence/client-auth-selected471-c0e13-41088546780.json": {
+      "bytes": 14267,
+      "mode": 292,
+      "sha256": "3ff74b73c5918d87194816f972a39448846936be81f93df25350b1166bde7578"
+    },
+    "runtime/evidence/client-dependency-public-fetch-41006572426.json": {
+      "bytes": 1825,
+      "mode": 292,
+      "sha256": "bca41a574b0a8b53ae522931ec6ff80142704bfeb55839db6eb0f85b2fc74ad0"
+    },
+    "runtime/evidence/client-dependency-public-fetch-41018243725.json": {
+      "bytes": 1653,
+      "mode": 292,
+      "sha256": "99ca429e0f46f3f519361eeb84771ca1bd6e187f78fe11b857eceabd9637a492"
+    },
+    "runtime/evidence/client-dependency-publication-41006572426.json": {
+      "bytes": 2396,
+      "mode": 292,
+      "sha256": "30344744351422fe7055173409552f12e310b5e29ec01bc26c958f0741a0d153"
+    },
+    "runtime/evidence/client-dependency-publication-41018243725.json": {
+      "bytes": 2891,
+      "mode": 292,
+      "sha256": "769dfb7e5f50f77cc405e65cf7cb6a65e08c1a8bf96893748635cd42cc294e23"
+    },
+    "runtime/evidence/client-provider-0f-patch7.json": {
+      "bytes": 12108,
+      "mode": 292,
+      "sha256": "4d07957b0698480d243fb0eb14b16e2d133eb46b454163e488e741a2ecc0d67f"
+    },
+    "runtime/evidence/client-provider-471.json": {
+      "bytes": 8956,
+      "mode": 292,
+      "sha256": "b7a7df95301e7d12d4b6721129b97988e5557827e2ab45e4c78c69b15c87a197"
+    },
+    "runtime/evidence/coherent-wine-stock-41100858610.json": {
+      "bytes": 17322,
+      "mode": 292,
+      "sha256": "0a3d86515b112400d1c8e94579799a73b5a8f96b7beabe3e77e278287da11822"
+    },
+    "runtime/evidence/coherent-wine-stock-apk-local-41100858610.json": {
+      "bytes": 32670,
+      "mode": 292,
+      "sha256": "274cc3b6cf50165061c5b226959a29f99a1a3b39d8d4bc3a834d7d1b2cf7feec"
+    },
+    "runtime/evidence/combined-android-build-41009954235.json": {
+      "bytes": 20290,
+      "mode": 292,
+      "sha256": "7ddd6d866e41636299733e385127fe5092e97c2e85019c20950f749ee4272e9e"
+    },
+    "runtime/evidence/combined-android-build-41013086386.json": {
+      "bytes": 19430,
+      "mode": 292,
+      "sha256": "a01cb613940872d23941f13877a42b78509baaa487bf5dfe369a1b8c3516e1f1"
+    },
+    "runtime/evidence/combined-android-build-41019374657.json": {
+      "bytes": 19531,
+      "mode": 292,
+      "sha256": "9e6f44eeb10020058aa5c661bb9036754aff465204efe6cc4c9ec0380ee943c1"
+    },
+    "runtime/evidence/fresh-server-installations-host.json": {
+      "bytes": 3372,
+      "mode": 292,
+      "sha256": "4e35ea8adbf32602c54c9ca7af382b1f5124337b172f0620c9b87aff6838a013"
+    },
+    "runtime/evidence/game-service-activity-host.json": {
+      "bytes": 1745,
+      "mode": 292,
+      "sha256": "4cd2358347d47eb9c84803ac683ea8dc2e1c64cfdecae7d0f3266321dff28f47"
+    },
+    "runtime/evidence/game-session-owner-host.json": {
+      "bytes": 4088,
+      "mode": 292,
+      "sha256": "bcb71cf6875c29bba29d51dc11e834c238c8eae9717263a190a96d4ffb56e87b"
+    },
+    "runtime/evidence/guest-dependency-public-fetch-41006572380.json": {
+      "bytes": 1675,
+      "mode": 292,
+      "sha256": "4d85cff2824fed0f6bfbacd8afdc0f3b98076fa1432a7124390aa2bc615e486e"
+    },
+    "runtime/evidence/guest-dependency-publication-41006572380.json": {
+      "bytes": 2123,
+      "mode": 292,
+      "sha256": "ade19a8b12258390617335991706a133f9a3247dd88bc4e88d1b6adf734d1855"
+    },
+    "runtime/evidence/helper-and-owner-05925-readback.json": {
+      "bytes": 13378,
+      "mode": 292,
+      "sha256": "ce8b65b553a93d9c57a9465904483f6b840633a6c5cede3d287cd76022bb1050"
+    },
+    "runtime/evidence/internal-persistent-signing-43ccce4.json": {
+      "bytes": 1513,
+      "mode": 292,
+      "sha256": "3f7156d94ad9dd2de7364b73c2e2e97ebe631c5054a26a57fd454a3331d57835"
+    },
+    "runtime/evidence/live-support-export-host.json": {
+      "bytes": 1031,
+      "mode": 292,
+      "sha256": "51b4c5c0fb74de9d92dc6d56373c1f610fa6ba834d7700456bd6232d0cf0e836"
+    },
+    "runtime/evidence/local-game-profile-7a7166-readback.json": {
+      "bytes": 27170,
+      "mode": 292,
+      "sha256": "e79eec72caef5431a4862f43e1be8bd96ac3bbc5beefd5d343e56895ba0074bb"
+    },
+    "runtime/evidence/local-game-profile-apk-local-41107245856.json": {
+      "bytes": 35508,
+      "mode": 292,
+      "sha256": "393b46ebb5626bcb8b3fe20692d32c61c302c729b1b8878710808c1feba47295"
+    },
+    "runtime/evidence/local-server-preservation-diagnostics-41110997462.json": {
+      "bytes": 2236,
+      "mode": 292,
+      "sha256": "485f3ebeab9efafe60f6c82bf81ce3655cf20323f2e74c62bf16b96cc3372d79"
+    },
+    "runtime/evidence/local-server-preservation-initial-41109643033.json": {
+      "bytes": 2485,
+      "mode": 292,
+      "sha256": "f579eb00f905ef939194499c7ea0cdda1018f81db43d8281e416da0fc561ac41"
+    },
+    "runtime/evidence/local-server-session-host.json": {
+      "bytes": 3455,
+      "mode": 292,
+      "sha256": "87801cc784ba2272b410c70ce402291d7b1074f2d62a122a3b36c992ded5ba5a"
+    },
+    "runtime/evidence/local-world-setup-host.json": {
+      "bytes": 1568,
+      "mode": 292,
+      "sha256": "7e0d41d36067a1d69ad2fac8adecb85ae1eaf332a38bd8b87c20753a4110d5b5"
+    },
+    "runtime/evidence/mysql-offline-qualification-0f74-readback.json": {
+      "bytes": 25467,
+      "mode": 292,
+      "sha256": "d6d8c03604cc14024ec486ac0ecfad6744b6d9386fbd8c98831839574674a952"
+    },
+    "runtime/evidence/mysql-qualification-dependency-download-05925.json": {
+      "bytes": 2425,
+      "mode": 292,
+      "sha256": "f74e0247071afb68d795536eb0c88cb3ddbfc661cffc3aeb39af2804907570eb"
+    },
+    "runtime/evidence/native-java-installation-41109643068.json": {
+      "bytes": 10050,
+      "mode": 292,
+      "sha256": "37c5c79fc70b9f22449abe6b8e8a3712e3de779ce2731fb0a25a223d5dd6352a"
+    },
+    "runtime/evidence/native-owner-confirmed-reap-host.json": {
+      "bytes": 2541,
+      "mode": 292,
+      "sha256": "3989e269bb03579bd2df3eeb563ed735efd4ee851cef7909330da02e3df54070"
+    },
+    "runtime/evidence/playerbots-programs-local-java.json": {
+      "bytes": 2086,
+      "mode": 292,
+      "sha256": "68d7e2786204e591ecaebf83ae2c85491cb47d2650f27f698bd80fbc53ccf709"
+    },
+    "runtime/evidence/portable-local-provisioning-host.json": {
+      "bytes": 2169,
+      "mode": 292,
+      "sha256": "6b7f7057effd48765231bb9b8176d0ef810116cf189068d2cd62d95068a9faa1"
+    },
+    "runtime/evidence/portable-provisioning-renderer-parity-host.json": {
+      "bytes": 757,
+      "mode": 292,
+      "sha256": "0a531dff3a67373bde0e21f87317ce0b5f4fc2d26572906de443252f14469733"
+    },
+    "runtime/evidence/presentation-shader-owner-host.json": {
+      "bytes": 2290,
+      "mode": 292,
+      "sha256": "c07e8b465a7ad0cced4223a59409e6d06a44b748d74943dc789c37279f531471"
+    },
+    "runtime/evidence/process-usage-owner-host.json": {
+      "bytes": 7470,
+      "mode": 292,
+      "sha256": "f952eaa742ee73649d2bf54025ba6f757e20958dab5840698c363df475ba01d3"
+    },
+    "runtime/evidence/server-auth-41050050193.json": {
+      "bytes": 11303,
+      "mode": 292,
+      "sha256": "6e755f2177763518dd6d814afcefe986f7fc66916fb02fc24954a0dd17b96b67"
+    },
+    "runtime/evidence/server-config-content-41019374697-host.json": {
+      "bytes": 12316,
+      "mode": 292,
+      "sha256": "0ed5bbcfb57e56a97f900915ff547021c31d03efbcc2719f40b12711d5b362b8"
+    },
+    "runtime/evidence/server-content-android-packaging-host.json": {
+      "bytes": 6600,
+      "mode": 292,
+      "sha256": "fbcabb3d65656de9c08631e42e8ed3dd88c5d40a6dd2e43405f9c12fc79d0d96"
+    },
+    "runtime/evidence/server-content-readback-41046942015.json": {
+      "bytes": 1814,
+      "mode": 292,
+      "sha256": "21687856d12688fb51f89646058c2158ef003c924cff1d6bffcc1175e6be8b00"
+    },
+    "runtime/evidence/server-content-ui-host.json": {
+      "bytes": 1220,
+      "mode": 292,
+      "sha256": "8deedb250a3b9d3aea0357f4f2486c10522270b3ce8ecc9b4721470891ebd8d2"
+    },
+    "runtime/evidence/server-data-binding-host.json": {
+      "bytes": 737,
+      "mode": 292,
+      "sha256": "85064e7d317cc1fa2f6b60f5cbcdedc6212dedc20df5e931b461a02f4cfa5eea"
+    },
+    "runtime/evidence/server-data-generation-host.json": {
+      "bytes": 1096,
+      "mode": 292,
+      "sha256": "b63241f7549da6c691eb5afc3f6c3611698160055cefe44406a2b4e8287633b2"
+    },
+    "runtime/evidence/server-data-helper-apk-host.json": {
+      "bytes": 1247,
+      "mode": 292,
+      "sha256": "e10039fedbc37b6ead82a89c17f48fd7a6ea9c86520b407b02be0bc79d12ac81"
+    },
+    "runtime/evidence/server-data-input-import-host.json": {
+      "bytes": 6817,
+      "mode": 292,
+      "sha256": "ccd59b4a787ce299ce8349f32164a5c5cc7db645af70efb9404661e95621a4bd"
+    },
+    "runtime/evidence/server-data-setup-owner-host.json": {
+      "bytes": 2440,
+      "mode": 292,
+      "sha256": "97797496a086de27cb8cbda0e2b7b27fb80800153a1b5b41292c4111b9c76956"
+    },
+    "runtime/evidence/server-data-tools-adapter-host.json": {
+      "bytes": 545,
+      "mode": 292,
+      "sha256": "8af743d7bab8d8e9d48d32a2a4fe12072d11d1caa410ce3126668233d441480d"
+    },
+    "runtime/evidence/server-data-tools-provider-41103915829.json": {
+      "bytes": 16113,
+      "mode": 292,
+      "sha256": "c033f2ccc67f3a4cd357730ac728af6152b4b6b099c3bd0ea6d80c762093b429"
+    },
+    "runtime/evidence/server-dependency-public-fetch-41003838795.json": {
+      "bytes": 1160,
+      "mode": 292,
+      "sha256": "b8d4c34c1b25127a770d4f528f371cdccbeeecc675a9478c9684d3ebfb855d1f"
+    },
+    "runtime/evidence/server-dependency-publication-41003838795.json": {
+      "bytes": 3012,
+      "mode": 292,
+      "sha256": "cdd9ba6779e95e8f5e12c4e76cebc7796229c4e4906afcec6d14849d89ee67e1"
+    },
+    "runtime/evidence/server-engine-packaging-41043905821.json": {
+      "bytes": 7368,
+      "mode": 292,
+      "sha256": "b185c315d3700eb57ff270cfa79bc2af6a9ecf799b2f4c0f5ac3ea1e83522338"
+    },
+    "runtime/evidence/server-engine-product-composition-41058676543.json": {
+      "bytes": 17707,
+      "mode": 292,
+      "sha256": "2e7b0cb9fd56e247a3dbb50753eee6723c2cfdb9966bb3f388b357b5f6bf4b33"
+    },
+    "runtime/evidence/server-engine-sql-auth-41050050294.json": {
+      "bytes": 5443,
+      "mode": 292,
+      "sha256": "2757083b8be00e2107445f9b089fb5f177fac91cd62f733e9a9145637bfdebe2"
+    },
+    "runtime/evidence/server-extractors-cli-41054451870.json": {
+      "bytes": 8052,
+      "mode": 292,
+      "sha256": "b611e37e803ad7a8c550297d9226da5004313d362a5548907df1dbd633235171"
+    },
+    "runtime/evidence/server-extractors-java-install-host.json": {
+      "bytes": 1240,
+      "mode": 292,
+      "sha256": "8d4054053834c0a19a5157227e0d77a2f1ac169b3a7426f1391359fdd8fe7e74"
+    },
+    "runtime/evidence/server-installation-coordinator-host.json": {
+      "bytes": 7788,
+      "mode": 292,
+      "sha256": "62a656efb6d46081104684cd37b58a657a1cf69748696f0153385c090e3bbbe5"
+    },
+    "runtime/evidence/server-installation-finish-41088296041.json": {
+      "bytes": 30694,
+      "mode": 292,
+      "sha256": "e46aa8cc210de6a974abc8a1ff40570a0f7dd6925b05c0d72e6ca4976fb19eb8"
+    },
+    "runtime/evidence/server-module-configurations-41041859706.json": {
+      "bytes": 5865,
+      "mode": 292,
+      "sha256": "6d00d72a12eb1530249fcc6bc34624d48f9019dc4095722d80775c74f17c0ef0"
+    },
+    "runtime/evidence/server-ordered-extractors-41076785723.json": {
+      "bytes": 6064,
+      "mode": 292,
+      "sha256": "8863e46356cc9b2aa3d321fc3857be849f438ec72ab0b06e678dd02c65755e80"
+    },
+    "runtime/evidence/server-ordered-source-observation-41095126683.json": {
+      "bytes": 5215,
+      "mode": 292,
+      "sha256": "98c36f396854850b02f1aaf710d195b7fef3c00570314eece4d12ab347dcd75e"
+    },
+    "runtime/evidence/server-ordered-sources-retained-41097592284.json": {
+      "bytes": 5345,
+      "mode": 292,
+      "sha256": "7ade9ab1f2eb52e846e02985c9f779bd8a3480610aa772157706b1f8b2adbbff"
+    },
+    "runtime/evidence/server-playerbots-helper-candidate-41081216973.json": {
+      "bytes": 6649,
+      "mode": 292,
+      "sha256": "b0502fa7f9c7f3ef90078f852bd2d7e349bd7a946590a7e988da4b18f90c52d4"
+    },
+    "runtime/evidence/server-playerbots-helper-source-observation-41095126547.json": {
+      "bytes": 30707,
+      "mode": 292,
+      "sha256": "41cafbc0ec15776362c702d519cabeb75d51912906f5a6a87a6c615a53147f6a"
+    },
+    "runtime/evidence/server-playerbots-helper-source-sealed-41099467799.json": {
+      "bytes": 15053,
+      "mode": 292,
+      "sha256": "72b5b09dd1ca6a433e9a6b96e2e9eed340d13b333a62b80046ea766dd1efd8db"
+    },
+    "runtime/evidence/server-playerbots-schema-41076505231.json": {
+      "bytes": 21549,
+      "mode": 292,
+      "sha256": "8e76b9fcca0d9864eb3331012d58fcfecae8bbf8bc36fe02fe57e40400937a70"
+    },
+    "runtime/evidence/server-product-composition-41058676309.json": {
+      "bytes": 14221,
+      "mode": 292,
+      "sha256": "3519072846d2177b9410ee88438c4469d55db14341cee447d78c37c3ba1a3655"
+    },
+    "runtime/evidence/server-programs-java-install-41043905821.json": {
+      "bytes": 2763,
+      "mode": 292,
+      "sha256": "3aedc1c444388824dff681a887e2ee9d97f8d030b8a47ff4591e849205ebfb23"
+    },
+    "runtime/evidence/server-programs-provider-host.json": {
+      "bytes": 2925,
+      "mode": 292,
+      "sha256": "832c22589786145b6dda3021668d5b45974190f441268925b4edaa9e9b2549d7"
+    },
+    "runtime/evidence/server-programs-service-host.json": {
+      "bytes": 1573,
+      "mode": 292,
+      "sha256": "eb1cb6ad2ea994a077b7cd9b5641646c4f59b33abc13c3cdb72edc64fff71318"
+    },
+    "runtime/evidence/server-schema-components-41045808679.json": {
+      "bytes": 4449,
+      "mode": 292,
+      "sha256": "c5c815b15a4aa9fcd815c139c677b3ea87d8900cb9e2ecf17988d6b7cb2221a0"
+    },
+    "runtime/evidence/server-source-rebuild-retained-41078079045.json": {
+      "bytes": 6210,
+      "mode": 292,
+      "sha256": "52d9665adb0a2edee2ad64a41797d140465f07192823cee9065ce31a16f488ff"
+    },
+    "runtime/evidence/server-stock-provider-profile-41081388547.json": {
+      "bytes": 11466,
+      "mode": 292,
+      "sha256": "5f17b798545081e4dacf3a7d3e52430e1ac0b6fa2020b530fa920c93f7bbecb6"
+    },
+    "runtime/evidence/shader-dependency-publication-41014702663.json": {
+      "bytes": 4412,
+      "mode": 292,
+      "sha256": "b4fb1773d3fac5372ce35d676481512ed0ec8dc9bad2a14eeb7d2345cae811a8"
+    },
+    "runtime/evidence/shader-provider-926a-8a.json": {
+      "bytes": 1119,
+      "mode": 292,
+      "sha256": "a6c00bfb98d1f5166d6c57f845adb6cdfe6fbfa79e6842d6126b89b1e7b06a0e"
+    },
+    "runtime/evidence/support-session-integration-host.json": {
+      "bytes": 3963,
+      "mode": 292,
+      "sha256": "fbb0995f0a7e4a833394c429364b8596f34f8edc35e3df4a515742027ff5fdd1"
+    },
+    "runtime/evidence/turnip-provider-46a.json": {
+      "bytes": 1738,
+      "mode": 292,
+      "sha256": "803f640fb093498729664ebe618aeb630ab9e07910b6248f60ce8cdf8d05c78a"
+    },
+    "runtime/evidence/wine-adoption-python-64dd.json": {
+      "bytes": 1076,
+      "mode": 292,
+      "sha256": "5a120e4bc1da2b82cc633d176497c937e35a2baabeae715dd00a4b21ca631a35"
+    },
+    "runtime/evidence/wine-arm64-candidate-41051386531.json": {
+      "bytes": 28615,
+      "mode": 292,
+      "sha256": "62ee2237f3a932c6a75a112d09ab6e961b3d06aafe8185b953c23ce5efa712bf"
+    },
+    "runtime/evidence/wine-arm64-cohort-packaging-471-c0e13.json": {
+      "bytes": 3780,
+      "mode": 292,
+      "sha256": "74df1772db4aa0894de9915617b8a4ab9058aaf351699074fad869d6b967ac9f"
+    },
+    "runtime/evidence/wine-arm64-provider-measurement-41079114080.json": {
+      "bytes": 44474,
+      "mode": 292,
+      "sha256": "c41e88659374e0012222d652a18c9fdcf97240aa86dde491eb1ee3f4090d6616"
+    },
+    "runtime/evidence/wine-arm64-providers-41073499555.json": {
+      "bytes": 34153,
+      "mode": 292,
+      "sha256": "609c41a0a921d755843e2044cff1be0f649c033d5fe12eb899468f12aee048c9"
+    },
+    "runtime/evidence/wine-arm64-public-consumer-41079114080.json": {
+      "bytes": 8163,
+      "mode": 292,
+      "sha256": "3568818f2e79d53dd47a4dec5d433b333b34cd0ddb949ba662929f309bd066aa"
+    },
+    "runtime/evidence/wine-arm64-publication-41074190885.json": {
+      "bytes": 5273,
+      "mode": 292,
+      "sha256": "28b3bafc5b540e6ac874e5728dc1aac3089699c07a13f4c26ad43c334f77d1e1"
+    },
+    "runtime/evidence/wine-arm64-qualified-41057900330.json": {
+      "bytes": 56373,
+      "mode": 292,
+      "sha256": "2853638f903bc5305373e32b3c7e87659c192425b64938000a27e62114b18415"
+    },
+    "runtime/evidence/wine-arm64-selected471-41069065089.json": {
+      "bytes": 30846,
+      "mode": 292,
+      "sha256": "db1671f91bb4fce833de9c00e7f49c5fbae1a64c76ea01d5366a82428bac798b"
+    },
+    "runtime/evidence/wine-arm64-source-preflight-41057900330.json": {
+      "bytes": 2147,
+      "mode": 292,
+      "sha256": "09f1d22282391776b699ab1a76e22a188cf0a53a70ee8e8868a7a5f46240c773"
+    },
+    "runtime/evidence/wine-arm64-source-recovery-41079114080.json": {
+      "bytes": 30578,
+      "mode": 292,
+      "sha256": "8698a02c6491630eed0a1f752c6545f86fe7f4c939cfc85b7a4a83f26e57c311"
+    },
+    "runtime/evidence/wine-arm64-x11-closure-c0e13.json": {
+      "bytes": 24404,
+      "mode": 292,
+      "sha256": "012a61fc2a25c51ed995512cbe0e96b364fc98feefeec6cfe6f9af47ed716030"
+    },
+    "runtime/evidence/wine-cohort-atomic-adoption.json": {
+      "bytes": 6597,
+      "mode": 292,
+      "sha256": "58896dd38ad6d7e115a884cf3ea6c32ed9607eaf6385f9446f7d9d0d31edb72e"
+    },
+    "runtime/evidence/wine-cohort-draft-41095126575.json": {
+      "bytes": 4459,
+      "mode": 292,
+      "sha256": "a477abaf0a117bc5cad4ac138ed1a1dc59157ff27e8a1824539e06f04f56978e"
+    },
+    "runtime/evidence/wine-cohort-local-reconstruction-471-c0e13.json": {
+      "bytes": 2990,
+      "mode": 292,
+      "sha256": "2556619e6a65f2751b8feff4e263cb8a628049d7f1863b3742ba093d15cfad0f"
+    },
+    "runtime/evidence/wine-cohort-public-source-41098490533.json": {
+      "bytes": 1196,
+      "mode": 292,
+      "sha256": "ceca0e780fb6b3cb38db2222e8d8a8c42f6d4e2d287475545615a4b2bd51067b"
+    },
+    "runtime/evidence/wine-cohort-publication-41095126575.json": {
+      "bytes": 7578,
+      "mode": 292,
+      "sha256": "dd9389cd6c72be75375e700d85ff22da97f6119f6f7df7057df54379098730b7"
+    },
+    "runtime/evidence/wine-private-pe-host-41040860418.json": {
+      "bytes": 10764,
+      "mode": 292,
+      "sha256": "51803206de922bd257ef0f7b73cceae1fed3f68c9c8ecd147a1c8348aaa4b451"
+    },
+    "runtime/evidence/x11-auth-arm64-41041859781.json": {
+      "bytes": 6926,
+      "mode": 292,
+      "sha256": "be20063527ec368f505b227fe94d465df573607bce16de102a8f2e3e4414df64"
+    },
+    "runtime/extractor_order.py": {
+      "bytes": 9884,
+      "mode": 292,
+      "sha256": "5c6d30d23c2a8ebb13d037907cbcc6e7b67ea31f4b99798d925c5e3da756128c"
+    },
+    "runtime/mysql-backup-tools.lock.json": {
+      "bytes": 758,
+      "mode": 292,
+      "sha256": "589af5e86a4fa2ba4d9acc31ebd47c87e858a2328dd2474ce13e2fbf6ac03059"
+    },
+    "runtime/mysql-probe/Dockerfile": {
+      "bytes": 2912,
+      "mode": 292,
+      "sha256": "d516ea4ce52f6a71c71b1c9f3bd169729e5e288313b11b70644d516291c63ebf"
+    },
+    "runtime/mysql-probe/Dockerfile.dockerignore": {
+      "bytes": 179,
+      "mode": 292,
+      "sha256": "ff3705d5422ab933518a1e9a1898063dbfcf104abb472ca455f6dc73d87d9130"
+    },
+    "runtime/mysql-probe/README.md": {
+      "bytes": 13105,
+      "mode": 292,
+      "sha256": "37df2f89ad9b437accfc59a4421cb750e41a4e58c937f673771b559adec18dff"
+    },
+    "runtime/mysql-probe/guest_check.py": {
+      "bytes": 8978,
+      "mode": 292,
+      "sha256": "36fd8cd42851df051df421eec1df01fab9b711092ba21cc728daea8d5050fee9"
+    },
+    "runtime/mysql-probe/mysql-binaries.SHA256SUMS": {
+      "bytes": 361,
+      "mode": 292,
+      "sha256": "d1f390b4d9f9f63d62a069a202b824f9c273d6e3695b4a1f4a40357184184303"
+    },
+    "runtime/mysql-probe/record_runtime.py": {
+      "bytes": 4590,
+      "mode": 292,
+      "sha256": "02dc95b182414d78e890eb89ff6121d94d3a45ac268efa896fbba95ce6577cea"
+    },
+    "runtime/mysql-probe/sources.lock.json": {
+      "bytes": 6499,
+      "mode": 292,
+      "sha256": "012af95659e8ee2e98907d185ccdb5abc64e87614a9a4ee43b5b8679ff92b512"
+    },
+    "runtime/mysql_bootstrap.py": {
+      "bytes": 32698,
+      "mode": 292,
+      "sha256": "e69d5b64c4a5f5ace86fa521589d5a64613f601c59aedb011b42a1e5b743b47d"
+    },
+    "runtime/mysql_service.py": {
+      "bytes": 18078,
+      "mode": 292,
+      "sha256": "8b30e9598f20ee715685a51aba59cefcafc6213d9d5d5cb6c6f3a73efa6b71c2"
+    },
+    "runtime/owned_process_group.py": {
+      "bytes": 2795,
+      "mode": 292,
+      "sha256": "c19ed5c05e94d7b537df1055983fca75e20447f594419084f2207d60f99f138e"
+    },
+    "runtime/proot/FTA-MIT-LICENSE.txt": {
+      "bytes": 1070,
+      "mode": 292,
+      "sha256": "f9c4b27004805765d801d72b2d97dcfea8c05b4d5675d65545164090914ae354"
+    },
+    "runtime/proot/README.md": {
+      "bytes": 5186,
+      "mode": 292,
+      "sha256": "b5ca3648b71b08f26cf2d92d592c9ce54aeec06552536bf40b378b32dd491e1f"
+    },
+    "runtime/proot/ownership_fixture.c": {
+      "bytes": 1026,
+      "mode": 292,
+      "sha256": "040b6d5f288e55666a3bd155fecbb17061132e6227160870ee0c4cd497b7c0ea"
+    },
+    "runtime/proot/proot-exitkill.patch": {
+      "bytes": 515,
+      "mode": 292,
+      "sha256": "509160bd6ec3663d525fa0e795a7bb45b8ccc283a6de8e1398e8cd6624fe86de"
+    },
+    "runtime/proot/sources.lock.json": {
+      "bytes": 1970,
+      "mode": 292,
+      "sha256": "d4383760217a5b71a4a28cd02d6fc354b5876ca9e21e1db0fe1c733564a58bf2"
+    },
+    "runtime/provision_local_account.py": {
+      "bytes": 19542,
+      "mode": 292,
+      "sha256": "e5d2c7d35e83176841107da200ff737bdb8e3671e1a5db91f9438c4228f6701d"
+    },
+    "runtime/provision_local_realm.py": {
+      "bytes": 25452,
+      "mode": 292,
+      "sha256": "703ed8a0f1f011191fdf4374aa7e999ca5cff5a87cd4e6e7b3907d7d1c53c994"
+    },
+    "runtime/runtime-sources.lock.json": {
+      "bytes": 105545,
+      "mode": 292,
+      "sha256": "562bf73630b7217c2c3ae0adf85b7a16d6979d3c257227e287757c9cbc3154c7"
+    },
+    "runtime/server-components-publication/README.md": {
+      "bytes": 6522,
+      "mode": 292,
+      "sha256": "6ff9c999b580a5c5c638563b036e3958129bc9595304d07639fd741eeac7dab3"
+    },
+    "runtime/server-components-publication/dependency-release.lock.json": {
+      "bytes": 357,
+      "mode": 292,
+      "sha256": "bfb68782475277d2db2b3ff50cdf1b48fae93872520d22eac6979a31fb7bdff3"
+    },
+    "runtime/server-lua-map.json": {
+      "bytes": 8685,
+      "mode": 292,
+      "sha256": "1549b1d41260584a7921c4d6f0b511e34460c44b1fbb20c80f4c95b9744a84d3"
+    },
+    "runtime/server/ANDROID-DATA-SETUP.md": {
+      "bytes": 3842,
+      "mode": 292,
+      "sha256": "d4ba1fd576046a8b9406d7e1ddfe56e74c58f9c6ece4ebd1332015d367626b31"
+    },
+    "runtime/server/ANDROID-INSTALLATION-COORDINATOR.md": {
+      "bytes": 7315,
+      "mode": 292,
+      "sha256": "e810c9427aded327d1a1b2f3ce288ecc08ff2e11b971a09dbc73ffc5b9269fea"
+    },
+    "runtime/server/ANDROID-PACKAGING.md": {
+      "bytes": 5887,
+      "mode": 292,
+      "sha256": "a8300ca9efcdd5b1236279767de8954cd92d64afa9a2d8585842abd16db34759"
+    },
+    "runtime/server/ANDROID-SCHEMA-SETUP.md": {
+      "bytes": 4358,
+      "mode": 292,
+      "sha256": "d289bb49f8bb3499c1198330967ddd62e86353b8a078543b380bd1238fe9a085"
+    },
+    "runtime/server/APPEARANCE-SCHEMA.md": {
+      "bytes": 5457,
+      "mode": 292,
+      "sha256": "a63a7c13b1c65ea63561d4cd30dc6141a5ffe85ead3dd1335ed37ad588abbd5a"
+    },
+    "runtime/server/COMPILED-REFERENCE.md": {
+      "bytes": 3964,
+      "mode": 292,
+      "sha256": "73ed7f8e74fb8eeaed0f412dc5385f58c7201428fbea7f8b7f05e67b49293de4"
+    },
+    "runtime/server/DATA-PREPARATION.md": {
+      "bytes": 5067,
+      "mode": 292,
+      "sha256": "e2427f6725f5fb7d230902c14d39e2fed644e3502a1baaab33fd3bbc0e27cf50"
+    },
+    "runtime/server/DATA-TOOLS-ANDROID.md": {
+      "bytes": 1819,
+      "mode": 292,
+      "sha256": "cbca62cbc81bfc11bb46aa0f06bd435d9c662350d92c4eea271bb038e05770e2"
+    },
+    "runtime/server/DATA-TOOLS-PROVIDER.md": {
+      "bytes": 3416,
+      "mode": 292,
+      "sha256": "48a9e0f562c4e89cf0b2e05d4e1532a198488a2300ec1e61e8904228bac278cf"
+    },
+    "runtime/server/DEPENDENCY-RELEASE.md": {
+      "bytes": 10074,
+      "mode": 292,
+      "sha256": "7aa59d714f990a12349602883acd1abd5b09e8adbe7d2127ad59bea7792022e9"
+    },
+    "runtime/server/DURABLE-IMAGE.md": {
+      "bytes": 4089,
+      "mode": 292,
+      "sha256": "8def5950b85e2c0248e0c9b771caccca68e047b51705ecf0eabd41fb2349b986"
+    },
+    "runtime/server/Dockerfile": {
+      "bytes": 3103,
+      "mode": 292,
+      "sha256": "20d18e6720fdd2bfae0735f091eddff35453a9009d0dfab92a4a2f4c49efcdac"
+    },
+    "runtime/server/ENGINE-CI.md": {
+      "bytes": 3356,
+      "mode": 292,
+      "sha256": "6df12ce08a32eee9667bec0186b125f465d831f61837fbb36293717f5d3b1d56"
+    },
+    "runtime/server/ENGINE-PACKAGING.md": {
+      "bytes": 6384,
+      "mode": 292,
+      "sha256": "eea3c6a1b978eaa3a442eedf53be47c5adcd7ba10424198c43519fb7a6f89a8e"
+    },
+    "runtime/server/ENGINE-SOURCE-AUDIT.md": {
+      "bytes": 6068,
+      "mode": 292,
+      "sha256": "b4457bf0434bb9c8d0be64eaa51efd7ca93ccbd261d156f5b8b4bd0ad0a71261"
+    },
+    "runtime/server/EXTRACTOR-ORDER.md": {
+      "bytes": 7677,
+      "mode": 292,
+      "sha256": "f49fa6fb33e2eec66b903d1357c9840e9045d6c69dea67f61c066711fb0cb54e"
+    },
+    "runtime/server/EXTRACTOR-PACKAGING.md": {
+      "bytes": 4086,
+      "mode": 292,
+      "sha256": "8ac7cdaf22a49712b5c40f95baa4f9380ea0d2477bc8baba51e303fefb43d3be"
+    },
+    "runtime/server/EXTRACTOR-PROVIDER.md": {
+      "bytes": 3632,
+      "mode": 292,
+      "sha256": "d0d0af93effeab1b6d3fde3e4dafa0aa985af4e4b9ef4981e549edcd761c32a6"
+    },
+    "runtime/server/FRESH-SETUP-SLOTS.md": {
+      "bytes": 4789,
+      "mode": 292,
+      "sha256": "6caffcd981c2d4e562c2184f13f3a97d69f177d94fe9fc8b16c9578e0b2bbc30"
+    },
+    "runtime/server/IMPORTED-SERVER-DATA.md": {
+      "bytes": 3905,
+      "mode": 292,
+      "sha256": "2648cf1428d33d6514427a61e7c32fc3a0651010371d9e8f7958433f4b37b92a"
+    },
+    "runtime/server/JAVA-INSTALLATION-QUALIFICATION.md": {
+      "bytes": 5666,
+      "mode": 292,
+      "sha256": "c962b6c1531aad21dbfc2bcfee5c137f99c917217fb20c7b61aa820b32f882bb"
+    },
+    "runtime/server/LOCAL-SERVER-SESSION.md": {
+      "bytes": 8154,
+      "mode": 292,
+      "sha256": "b9a2b003366bb0ca23e9aba9e3b9cd4bdad2ec87276a5d1897a09893df927ec5"
+    },
+    "runtime/server/LOCAL-WORLD-SETUP.md": {
+      "bytes": 2753,
+      "mode": 292,
+      "sha256": "871f1b0c033d48a87b3274236d61befd88eb498a2ee4ba2835ccf6c7eeff921a"
+    },
+    "runtime/server/MODULE-CONFIGURATION.md": {
+      "bytes": 7594,
+      "mode": 292,
+      "sha256": "1f2701971965c628cccccc62cc7fd8b528f86d9db0aaa99aac771b387ef51c50"
+    },
+    "runtime/server/NATIVE-INSTALLATION-FINISH.md": {
+      "bytes": 8494,
+      "mode": 292,
+      "sha256": "02ff379d7f912a82e9af3e9238ab5d8ec9bbeda5b5de743d97a894933371d58e"
+    },
+    "runtime/server/ORDERED-SOURCE-SEAL.md": {
+      "bytes": 10431,
+      "mode": 292,
+      "sha256": "6bb6b806b163b9ce220a50e150178a1a52c0c6d346d64810bd77f01f437dea26"
+    },
+    "runtime/server/PLAYERBOTS-HELPER-CANDIDATE.md": {
+      "bytes": 3943,
+      "mode": 292,
+      "sha256": "a31970bfddd910bbd7aa4851296d70c6858a40cf53d26a119f6de87d0a1baff9"
+    },
+    "runtime/server/PLAYERBOTS-PROGRAMS.md": {
+      "bytes": 4028,
+      "mode": 292,
+      "sha256": "488775436ee8c95f9fda88cd25e6b8903dc23c4d7ea6b200babb80c156f17564"
+    },
+    "runtime/server/PLAYERBOTS-SCHEMA.md": {
+      "bytes": 5337,
+      "mode": 292,
+      "sha256": "c74c834b8ecfad7052a923bf56f05afe74e394037e54fb07991873cef2eaa3e2"
+    },
+    "runtime/server/PLAYERBOTS-SOURCE-COMPANION.md": {
+      "bytes": 7764,
+      "mode": 292,
+      "sha256": "b2484601c81cc8536f286ab262a8a65365dfa2e784dd674f7ea8a228f3734860"
+    },
+    "runtime/server/PLAYERBOTS-SOURCE-OBSERVATION.md": {
+      "bytes": 6396,
+      "mode": 292,
+      "sha256": "0c568fc34da5f381eb13612bf05a6d304404c65047ffa13a2b7bec504edff085"
+    },
+    "runtime/server/PLAYERBOTS-WORLD-SCENARIO.md": {
+      "bytes": 10073,
+      "mode": 292,
+      "sha256": "955223d1516b092104f835821e7da7605c5c0cf2aa97f39cd4e973503ca84851"
+    },
+    "runtime/server/PORTABLE-LOCAL-PROVISIONING.md": {
+      "bytes": 4267,
+      "mode": 292,
+      "sha256": "40aadf177f22233c74ba4e183154913e6183fb973589145720da7009ea1766ac"
+    },
+    "runtime/server/PROGRAMS-ANDROID-PACKAGING.md": {
+      "bytes": 6776,
+      "mode": 292,
+      "sha256": "1df57d5b5454eb4844781363cf892acbcdba532cc5d60dd673630ddcb8f7e595"
+    },
+    "runtime/server/PROVIDER-QUALIFICATION.md": {
+      "bytes": 4857,
+      "mode": 292,
+      "sha256": "626b20993cff060d46f511672188833e71cab40cb175e4047b08c1e9c113dd6f"
+    },
+    "runtime/server/README.md": {
+      "bytes": 9374,
+      "mode": 292,
+      "sha256": "9f33599e37c61e59f78b3a9becace43df5087a342cecf83d44abefd0f64eef93"
+    },
+    "runtime/server/SERVER-SOURCE-BINDING.md": {
+      "bytes": 3593,
+      "mode": 292,
+      "sha256": "fa7643dab9f037305fa08dc69c9cfaa8132ab4003e1dd9ea638ac66782985e34"
+    },
+    "runtime/server/SOURCE-RETENTION-RECOVERY.md": {
+      "bytes": 3148,
+      "mode": 292,
+      "sha256": "23b70a99b725784265cf80eb05914d4f7f498fa19079f3a618b7dbfe8002cf82"
+    },
+    "runtime/server/SQL-QUALIFICATION-HANDOFF.md": {
+      "bytes": 5184,
+      "mode": 292,
+      "sha256": "af6fd24400b2ca914c7726b7f2a209106c8d033b651a6aa58b2b1ee6f10ddbb9"
+    },
+    "runtime/server/UPDATER-SETUP.md": {
+      "bytes": 4214,
+      "mode": 292,
+      "sha256": "8cff98369698d19496ae742746d3c266b7e4aa1b37a6c1555e82d5b9436cec7f"
+    },
+    "runtime/server/android-provider.lock.json": {
+      "bytes": 1152,
+      "mode": 292,
+      "sha256": "9773bb1c9a45a82cc5146812aa3c3c0d6c14cfbbdbabfaa66121fc72c341dfad"
+    },
+    "runtime/server/appearance-schema-v1.sql": {
+      "bytes": 790,
+      "mode": 292,
+      "sha256": "8e35e8e41d74979eaa98f6f2d824d831b73f63a4a6b2f573b869484b2ff15d46"
+    },
+    "runtime/server/appearance-schema.lock.json": {
+      "bytes": 7783,
+      "mode": 292,
+      "sha256": "6ccf5e363ec3daa5c37cbbe753d29a7e6b5d10f18eef407b700fc0d67985428d"
+    },
+    "runtime/server/capture_sources.py": {
+      "bytes": 3191,
+      "mode": 292,
+      "sha256": "5568e32bf0d912e45e65ffdfa02404d604138e86a8534d8c097b111b0445010b"
+    },
+    "runtime/server/compiled-reference.lock.json": {
+      "bytes": 1105,
+      "mode": 292,
+      "sha256": "db0aa8dd46da7ff62b531a4106745288d33601ad0be405858a1a38a0f60b3db7"
+    },
+    "runtime/server/content-provider.lock.json": {
+      "bytes": 6433,
+      "mode": 292,
+      "sha256": "b658e00e2dc602135ede02bd12c7d130dfb0aa00df4b8772c7e8c170d1628a65"
+    },
+    "runtime/server/data-tools-provider.lock.json": {
+      "bytes": 26660,
+      "mode": 292,
+      "sha256": "bd3e7039b75eed0c4d09e578f6b9bb5f625543529b1181e3383d5cef6f3a2970"
+    },
+    "runtime/server/data-tools-qualified-artifacts.lock.json": {
+      "bytes": 4061,
+      "mode": 292,
+      "sha256": "49eac3b56d8986772fdf6f29221f5fa3935fc3a08c0a04d27a38f55dfcccc616"
+    },
+    "runtime/server/dependency-release.lock.json": {
+      "bytes": 6005,
+      "mode": 292,
+      "sha256": "a95a9a5557f3417ff84a1311d1747a0e98db39305505c741b642e2ecef9746d9"
+    },
+    "runtime/server/engine-reference.lock.json": {
+      "bytes": 1170,
+      "mode": 292,
+      "sha256": "8f9a9b1f3ece57ed0a2df34ce6f58c23968b12d2f6274739443a7e3514e4795d"
+    },
+    "runtime/server/engine-source-audit.json": {
+      "bytes": 22127,
+      "mode": 292,
+      "sha256": "2cb7da90509b91b1b51a7e4f7a7329efbc9603244bcb04b4964167a4933b397e"
+    },
+    "runtime/server/engine-strip.lock.json": {
+      "bytes": 1037,
+      "mode": 292,
+      "sha256": "1983d20564bdb6bfafd75b61de04caa8cf2d6957a5ad2a88f4fd89fdabf090d2"
+    },
+    "runtime/server/extractor-order.lock.json": {
+      "bytes": 10416,
+      "mode": 292,
+      "sha256": "6963915b2b2923940a91ebbe5f01113e4e3b1f172f9fbffc9b9db8ce87923cc0"
+    },
+    "runtime/server/extractor-order/0001-explicit-ordered-providers.patch": {
+      "bytes": 7088,
+      "mode": 292,
+      "sha256": "8645bb3643ada0db7bdc7122e87a2a941f8f511d7666ef0360c18621f5a78e24"
+    },
+    "runtime/server/extractor-order/EsteriaArchiveOrder.h": {
+      "bytes": 19299,
+      "mode": 292,
+      "sha256": "da78de99a6850b7fcbb7f15e72985c89414bbf372c008a17d620e18e6c634d29"
+    },
+    "runtime/server/extractors-packaging.lock.json": {
+      "bytes": 3953,
+      "mode": 292,
+      "sha256": "9bc560fe67edc2e6de7bce445c9a7cd47f0ce20fb39b529679eacc98ac898a4d"
+    },
+    "runtime/server/extractors-provider.lock.json": {
+      "bytes": 27240,
+      "mode": 292,
+      "sha256": "4e1cbb5ae03cae59b5732a3ff9a70cd5b1bf46374617bb3c42cbbd55a4c384b7"
+    },
+    "runtime/server/inrelease.SHA256SUMS": {
+      "bytes": 413,
+      "mode": 292,
+      "sha256": "16405ad6b24709c3cc1ca2f249cf72590a8893a3e5b1263f299465915eabc39d"
+    },
+    "runtime/server/installation-native-inputs.lock.json": {
+      "bytes": 1357,
+      "mode": 292,
+      "sha256": "97a954c672194afd83f6aa4d4dd352ec454a19f43e552b98c6c0b86c49a101a0"
+    },
+    "runtime/server/isolated-build.lock.json": {
+      "bytes": 8195,
+      "mode": 292,
+      "sha256": "46a85068ee9a93cfca8ecd7db9f13f935f87a668db1a18f059abb5764c846752"
+    },
+    "runtime/server/isolated-source-recovery.lock.json": {
+      "bytes": 1350,
+      "mode": 292,
+      "sha256": "1846e9ee76629f354689fc4baab9db7c9a5d19eaf9d6c2649e587fa31ea9c6f0"
+    },
+    "runtime/server/mysql-binaries.SHA256SUMS": {
+      "bytes": 361,
+      "mode": 292,
+      "sha256": "736ebf000e64f632fabe592e0d7b962e4243980852c5813471fbd8b8807deb51"
+    },
+    "runtime/server/ordered-tools-inputs.lock.json": {
+      "bytes": 3391,
+      "mode": 292,
+      "sha256": "b82abde4df6fa5b630d91973ae500f33266433ef80ad6f92e2f562d877f417ad"
+    },
+    "runtime/server/playerbots-helper-candidate.lock.json": {
+      "bytes": 10344,
+      "mode": 292,
+      "sha256": "58b0e480e577bd3e8605865d65f2ec5bb090cd1477ef92acd40f463f77ad33a6"
+    },
+    "runtime/server/playerbots-helper-source-qualified.lock.json": {
+      "bytes": 5835,
+      "mode": 292,
+      "sha256": "ff2d3186f242977df700a4fa399a001f9ff881f0da27d85652cdf9c116654eb8"
+    },
+    "runtime/server/playerbots-sources-inputs.lock.json": {
+      "bytes": 4330,
+      "mode": 292,
+      "sha256": "240843bb757645c5c05d889c065fc21fda095755f586bfc489ed6296ce2c0010"
+    },
+    "runtime/server/programs-playerbots-provider.lock.json": {
+      "bytes": 38585,
+      "mode": 292,
+      "sha256": "71dd8aff3b51348aec0439c4621cd7f153c5d9a1046b65d219b0310edca4254d"
+    },
+    "runtime/server/programs-provider.lock.json": {
+      "bytes": 35697,
+      "mode": 292,
+      "sha256": "96bd84c0d01538bb3a49f60e15a17f1f0a601833a8e7d8b21549b82075dd4cc0"
+    },
+    "runtime/server/provider-qualification.lock.json": {
+      "bytes": 5005,
+      "mode": 292,
+      "sha256": "6ece52db92c86e7d3b94aef62d2477c43ca674225fe8e3f39b69688b1a464ed0"
+    },
+    "runtime/server/record_runtime.py": {
+      "bytes": 4582,
+      "mode": 292,
+      "sha256": "7b1989e8a3d540f15e264e2d175872ee922a4f4c4112db8422efeea43c307495"
+    },
+    "runtime/server/server-build-sources.lock.json": {
+      "bytes": 2170,
+      "mode": 292,
+      "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+    },
+    "runtime/server/sources.lock.json": {
+      "bytes": 6578,
+      "mode": 292,
+      "sha256": "2efac3a6a310c4add3a0407f0044ac608706aa748730351d45ea4c67bdfd0a47"
+    },
+    "runtime/server/ubuntu.sources": {
+      "bytes": 204,
+      "mode": 292,
+      "sha256": "3bca581187f9aa8d51605ee49a8493619779338f630de58553ae7888aa82fd16"
+    },
+    "runtime/server_config.py": {
+      "bytes": 21005,
+      "mode": 292,
+      "sha256": "8c22c17f6fc7b28f842c49793f9d89b84cbea3f6ce5a1d638b503c97d932f472"
+    },
+    "runtime/server_content.py": {
+      "bytes": 20541,
+      "mode": 292,
+      "sha256": "e32102ba850f4df7201c39c53e6c5530e59992cef1d3587ac809aca2ad681f8c"
+    },
+    "runtime/server_data_generation.py": {
+      "bytes": 28172,
+      "mode": 292,
+      "sha256": "d425c9a4aa9913d2ce320b9a549e708671494be8323a2ad490beb60b90c22d46"
+    },
+    "runtime/server_data_preflight.py": {
+      "bytes": 15268,
+      "mode": 292,
+      "sha256": "f69f84fad386f1d705a0268d95339d5a3ed070ac8694a8a29832f6ac01edf864"
+    },
+    "runtime/server_playerbots_setup.py": {
+      "bytes": 22756,
+      "mode": 292,
+      "sha256": "c928a5ab26fae98f6458807231450d1bdcd1cc670e21844aa6b4e7b909a32451"
+    },
+    "runtime/server_schema_adaptations.py": {
+      "bytes": 6316,
+      "mode": 292,
+      "sha256": "a49e1f8477d8b840964ce47783ed5af6873dc0dcde5b4a52280b696159082b44"
+    },
+    "runtime/server_schema_baseline.py": {
+      "bytes": 8606,
+      "mode": 292,
+      "sha256": "21d0bd526145f6699db90e9f90bb3ec01cf15316b59e27f8db6649f03480df20"
+    },
+    "runtime/server_schema_setup.py": {
+      "bytes": 11262,
+      "mode": 292,
+      "sha256": "6ed4f83f882101a8af0f06212c870cf71b2cee81a654b2ad4c14d9f83ef08026"
+    },
+    "runtime/server_session.py": {
+      "bytes": 25194,
+      "mode": 292,
+      "sha256": "7d159953d2a9c2027bd75aaf59f6a541ef3cbc51b16c7756ca2a71253551f0ee"
+    },
+    "runtime/server_session_process.py": {
+      "bytes": 12854,
+      "mode": 292,
+      "sha256": "2ee8ac79a1e045f503616715b2eeb9f34ae10d509391190ca3be09e30e242ec2"
+    },
+    "runtime/server_update_setup.py": {
+      "bytes": 25241,
+      "mode": 292,
+      "sha256": "7ff3b5272f9ec3fe38a42413f8d2d6a45f72d206f794c26869d7422439be2310"
+    },
+    "runtime/server_updater.py": {
+      "bytes": 7538,
+      "mode": 292,
+      "sha256": "8efabb037c012a89848d854fea8a12eff8c3bab7a9d1e9a3f3ea36369c4a6007"
+    },
+    "runtime/shader_generation.py": {
+      "bytes": 19353,
+      "mode": 292,
+      "sha256": "8bb48952c36bdc4c69516c2ffa6f5c2d2eb59e84019e6420948d94bc81683ac5"
+    },
+    "runtime/shaders/RELEASE.md": {
+      "bytes": 6238,
+      "mode": 292,
+      "sha256": "1f41ffe12042d8bca7681cb055ecb34e93b30f2e8e51f210c16368a5f4fc0282"
+    },
+    "runtime/shaders/android-provider.lock.json": {
+      "bytes": 12463,
+      "mode": 292,
+      "sha256": "738784d15c24788c478b2fb61a2947588c142a7d8c752d753c92c74cde920f48"
+    },
+    "runtime/shaders/dependency-release.lock.json": {
+      "bytes": 3582,
+      "mode": 292,
+      "sha256": "d47efd9f922aeafd0221bb3cda27015f1ba85bff2963b93e7cdd174ae6d9c15d"
+    },
+    "runtime/turnip/.dockerignore": {
+      "bytes": 18,
+      "mode": 292,
+      "sha256": "05cc6ae53cfd6129f1d7010aa874c6cf0a6019b1adfeff3f4fab27f2d04f43ca"
+    },
+    "runtime/turnip/ANDROID-PACKAGING.md": {
+      "bytes": 5162,
+      "mode": 292,
+      "sha256": "82b9a64f548bfcc52c8c9f6d10b2b90a79f3734eee3fc003f4e1044791fcc248"
+    },
+    "runtime/turnip/Dockerfile": {
+      "bytes": 1086,
+      "mode": 292,
+      "sha256": "a89cfdfd358fc718218b6b12a7feb64fdd7f45c58593ea01585425b7ef928f09"
+    },
+    "runtime/turnip/README.md": {
+      "bytes": 7288,
+      "mode": 292,
+      "sha256": "47f0e2b9dddd692e39c3f99d5ed114b1dcf016b8f2ad8f751da0749931274b36"
+    },
+    "runtime/turnip/android-provider.lock.json": {
+      "bytes": 16435,
+      "mode": 292,
+      "sha256": "879c79db15622cfa155aad0b1d901fc322559e7fbc7245c5d73b234ed499df91"
+    },
+    "runtime/turnip/build.sh": {
+      "bytes": 2320,
+      "mode": 292,
+      "sha256": "9866ef7e9fd8dae6a5079b37e8232c864114f4b88542754e48fafa6c4d5e444a"
+    },
+    "runtime/turnip/debian.sources": {
+      "bytes": 434,
+      "mode": 292,
+      "sha256": "8e8f7c4f33e39696a188e01bb6e385daf17a006eb573bc84af073ebcc4fc9f65"
+    },
+    "runtime/turnip/fetch_sources.py": {
+      "bytes": 5418,
+      "mode": 292,
+      "sha256": "90f7b5a750391599911d8b69cb0681c346e549f2013cf799641949c757acd3f9"
+    },
+    "runtime/turnip/inrelease.SHA256SUMS": {
+      "bytes": 455,
+      "mode": 292,
+      "sha256": "2acec858821beef422f424794c5577adf01ef084787ca42616c5cb78a72b1413"
+    },
+    "runtime/turnip/packages.txt": {
+      "bytes": 767,
+      "mode": 292,
+      "sha256": "89d0bec77bab06399ee57be1603d082521eebb903ad40fcf7b95e7c76e1a1f03"
+    },
+    "runtime/turnip/probe.c": {
+      "bytes": 17766,
+      "mode": 292,
+      "sha256": "2f071971b16f6eaacba9a9d95358ea28c782536a584f83147a8cff923fba9cbf"
+    },
+    "runtime/turnip/probe.frag": {
+      "bytes": 102,
+      "mode": 292,
+      "sha256": "ae5d45bff00d2287752eec77c055d454c5b8588e8720885a8bd1ff7f791830e1"
+    },
+    "runtime/turnip/probe.vert": {
+      "bytes": 155,
+      "mode": 292,
+      "sha256": "dd3b4afa79ffe81c1f6c1df03f671398c97b2bc9a7ea90dad2648769067067d3"
+    },
+    "runtime/turnip/qualify_shaders.py": {
+      "bytes": 2878,
+      "mode": 292,
+      "sha256": "fd39918a5223dd81519041323c0f06382947f39722d5a3db3917baeb6e16e41e"
+    },
+    "runtime/turnip/record_build.py": {
+      "bytes": 8959,
+      "mode": 292,
+      "sha256": "82b94f7ab1344e6026ee1524668b4abe1b8ea3e4212189952783bf13bc052e6d"
+    },
+    "runtime/turnip/run_probe.py": {
+      "bytes": 7186,
+      "mode": 292,
+      "sha256": "671d44f9aec71f13f303d745cf145fa8ac4deaccbefe8911ad2b610be90f35c6"
+    },
+    "runtime/turnip/sources.lock.json": {
+      "bytes": 43088,
+      "mode": 292,
+      "sha256": "f92f119d657feaa7548e84196d20c59a9050b91a62f171de8249b75e23a8645f"
+    },
+    "runtime/wine-arm64-adoption/README.md": {
+      "bytes": 3956,
+      "mode": 292,
+      "sha256": "837f2165ecab5aea7bcbfbf9e9f4384cc388ae9567e449df72b5e5d267bd62e2"
+    },
+    "runtime/wine-arm64-adoption/measured/bridge-sources.lock.json": {
+      "bytes": 23129,
+      "mode": 292,
+      "sha256": "241729a2da2c6e88df431c9d68f00e37873c0616d81981a354e12b58046384e9"
+    },
+    "runtime/wine-arm64-adoption/measured/guest-bridges-input.lock.json": {
+      "bytes": 12376,
+      "mode": 292,
+      "sha256": "2829cef5a81fbdcceeaa47b7cec9fe00274e4d0308c5d8242c722e0667e5616b"
+    },
+    "runtime/wine-arm64-adoption/measured/runtime-sources.proposed.lock.json": {
+      "bytes": 105545,
+      "mode": 292,
+      "sha256": "562bf73630b7217c2c3ae0adf85b7a16d6979d3c257227e287757c9cbc3154c7"
+    },
+    "runtime/wine-arm64-adoption/measured/shader-tools-input.lock.json": {
+      "bytes": 12463,
+      "mode": 292,
+      "sha256": "738784d15c24788c478b2fb61a2947588c142a7d8c752d753c92c74cde920f48"
+    },
+    "runtime/wine-arm64-adoption/measured/turnip-input.lock.json": {
+      "bytes": 16435,
+      "mode": 292,
+      "sha256": "879c79db15622cfa155aad0b1d901fc322559e7fbc7245c5d73b234ed499df91"
+    },
+    "runtime/wine-arm64-adoption/measured/turnip-sources.lock.json": {
+      "bytes": 43088,
+      "mode": 292,
+      "sha256": "f92f119d657feaa7548e84196d20c59a9050b91a62f171de8249b75e23a8645f"
+    },
+    "runtime/wine-arm64-adoption/x11-runtime.lock.json": {
+      "bytes": 14313,
+      "mode": 292,
+      "sha256": "828f3a7843f7073648e95fe52edfd69834ccb480073a42f52bf68b0b8f3d12e5"
+    },
+    "runtime/wine-arm64-publication/README.md": {
+      "bytes": 4211,
+      "mode": 292,
+      "sha256": "91abc71dfb6f1bca0ec77dbf7562708a6297e5d6d791b6cca56c856bf0229cbc"
+    },
+    "runtime/wine-arm64-publication/dependency-release.lock.json": {
+      "bytes": 9204,
+      "mode": 292,
+      "sha256": "cf2f7ac0dd633cde9b273fa6b3886ef370ba3ac65bbdccb0884095b99df4b958"
+    },
+    "runtime/wine-arm64-publication/published-release.json": {
+      "bytes": 3527,
+      "mode": 292,
+      "sha256": "0cf34337c9f003ba92c6f5d81a9970feff4a8e2ea986605030ed6c49850f131f"
+    },
+    "runtime/wine-arm64-qualification/README.md": {
+      "bytes": 2967,
+      "mode": 292,
+      "sha256": "e510948b8e2bfd4b60be8e92ceeb707c10e9c9c0cde35c295ca683861bedfabb"
+    },
+    "runtime/wine-arm64-qualification/client-input.lock.json": {
+      "bytes": 492,
+      "mode": 292,
+      "sha256": "7ecb7dfd4e9917e742fb467d81a72af9273394c8488e5a6cb3e25fa70c29ed5b"
+    },
+    "runtime/wine-arm64-qualification/runtime-input.lock.json": {
+      "bytes": 2084,
+      "mode": 292,
+      "sha256": "e5fd2de4935cbf10372cc18c23dec387478867a624d984b568e09a4a0b0515c0"
+    },
+    "runtime/wine-arm64/Dockerfile": {
+      "bytes": 7504,
+      "mode": 292,
+      "sha256": "a313c84e979dae58f04eab3864d123229330455ec92a64fc0bfc7764ec5301c5"
+    },
+    "runtime/wine-arm64/Dockerfile.dockerignore": {
+      "bytes": 379,
+      "mode": 292,
+      "sha256": "94409ccfbb556bfaff2d011d11c3689b34d9ccdad3402a9e7b8504e5e8a4c1b5"
+    },
+    "runtime/wine-arm64/README.md": {
+      "bytes": 6814,
+      "mode": 292,
+      "sha256": "43b740192ca4bd2408069b4e4788b21f9a3cae4e8906053c5d969313ffc40ca5"
+    },
+    "runtime/wine-arm64/capture_toolchain_sources.py": {
+      "bytes": 30645,
+      "mode": 292,
+      "sha256": "16b729041d06223d0bbdf8a4081cc1dcc97a1b1399232685b63de1894dab71af"
+    },
+    "runtime/wine-arm64/fetch_inputs.py": {
+      "bytes": 3976,
+      "mode": 292,
+      "sha256": "7c54e1a2ba841465f788a61f16d7c82100c534ec6c740b7a8e866cb6b9db0025"
+    },
+    "runtime/wine-arm64/private_pe_check.c": {
+      "bytes": 9950,
+      "mode": 292,
+      "sha256": "9f5243e12dfb4d6ad1c1ea416530f5c5ce3f924a865944b5fbf9a61f42b05458"
+    },
+    "runtime/wine-arm64/private_pe_check.py": {
+      "bytes": 10028,
+      "mode": 292,
+      "sha256": "493b8dfdc42decfd72b91084be424041b7bdc6d5cf81c5adb623e7b65485b700"
+    },
+    "runtime/wine-arm64/private_pe_fixture.c": {
+      "bytes": 767,
+      "mode": 292,
+      "sha256": "64dd325dd5c2926e9561dd43e47ea979bc14fd26d3dd4b17f120881e4b98de76"
+    },
+    "runtime/wine-arm64/record_runtime.py": {
+      "bytes": 6600,
+      "mode": 292,
+      "sha256": "e0863092ec74f59d330ddd2a9fc4bc018ff813fa91afccd759943d23f68b392c"
+    },
+    "runtime/wine-arm64/sources.lock.json": {
+      "bytes": 18146,
+      "mode": 292,
+      "sha256": "077fb2b0883986338b6755e53f5cede08bd63ed1834783e7e6cd079e0ec0c16d"
+    },
+    "runtime/wine-cohort-publication/COHERENT-APK.md": {
+      "bytes": 3231,
+      "mode": 292,
+      "sha256": "af369f9cc82d803e13607fcc6ea2e32580ec8ce6e1906dadb9d5847e889e2391"
+    },
+    "runtime/wine-cohort-publication/README.md": {
+      "bytes": 2685,
+      "mode": 292,
+      "sha256": "18f7ad4c37fa5c5a97be0359e5551960d5d13af0c5756df01e76120928df21b2"
+    },
+    "runtime/wine-cohort-publication/adoption-proposal.json": {
+      "bytes": 4048,
+      "mode": 292,
+      "sha256": "da7453ae3a558d3ca82cec080e8ff5b16c15671e6742fde047c744f94ad26aaa"
+    },
+    "runtime/wine-cohort-publication/adoption-ready.json": {
+      "bytes": 3865,
+      "mode": 292,
+      "sha256": "580133588d1ca0c3614ce70d0522ff1d4bd22b72e76009f96222b2594f579520"
+    },
+    "runtime/wine-cohort-publication/dependency-release.lock.json": {
+      "bytes": 15764,
+      "mode": 292,
+      "sha256": "a15491aa8a2f075794e3379813e1e4700753699f16ebedb2c68c4c9735c9cbdd"
+    },
+    "runtime/wine-cohort-publication/public-source-readback.json": {
+      "bytes": 17826,
+      "mode": 292,
+      "sha256": "9c0c4c76672d8bc2c3675b4818eeb0791315fb0468ca3467a88ff7272169602c"
+    },
+    "runtime/wine-cohort-publication/published-release.json": {
+      "bytes": 6045,
+      "mode": 292,
+      "sha256": "8e6a885a12b6a16d77f34f684c014b25078dd8b7ea4dd7370060498ab9441df1"
+    },
+    "runtime/wine-probe/Dockerfile": {
+      "bytes": 6077,
+      "mode": 292,
+      "sha256": "2cfbaceb4edfa34f2d09d9e754cb8cb9f4d711654de9461ddfbd18bb2d57e70b"
+    },
+    "runtime/wine-probe/Dockerfile.dockerignore": {
+      "bytes": 179,
+      "mode": 292,
+      "sha256": "1cc685b0c3641d7a69617a565104cb4d8d9d530afe6740a4378da7f0cd11133e"
+    },
+    "runtime/wine-probe/PRIVATE-PE-COPY.md": {
+      "bytes": 6225,
+      "mode": 292,
+      "sha256": "185c7d234c4d9306a2b20b256b0406122fff230f115e661270aec6374621ceb5"
+    },
+    "runtime/wine-probe/README.md": {
+      "bytes": 6577,
+      "mode": 292,
+      "sha256": "5fdbd5073e2ff222865930f2f70bfc79027591c641c32acc92ceb83421240be8"
+    },
+    "runtime/wine-probe/android-private-pe-copy.patch": {
+      "bytes": 9732,
+      "mode": 292,
+      "sha256": "0f4d5b1feb2c14ae98acac215d1cf06732f9a46f325292ebd00a536ade7b5e0e"
+    },
+    "runtime/wine-probe/apply_adaptations.py": {
+      "bytes": 3535,
+      "mode": 292,
+      "sha256": "e10f8f4aac362554d0270b33e60e7464e3828ffb21d10cf6db1501f4ded93ef0"
+    },
+    "runtime/wine-probe/capture_sources.py": {
+      "bytes": 2676,
+      "mode": 292,
+      "sha256": "718c966a54b76196979d2cfb8d68cd37f284d2707584cd0b5188f35a359fa221"
+    },
+    "runtime/wine-probe/client-input.lock.json": {
+      "bytes": 695,
+      "mode": 292,
+      "sha256": "a750f8445d0790d2a1ca6a37d03b3cf3281738e766c8c7e375ef25166fa49458"
+    },
+    "runtime/wine-probe/guest_check.py": {
+      "bytes": 8045,
+      "mode": 292,
+      "sha256": "7e9ab911487fc1debd200c227ee88fd6088d76aae8bd299dbae3431db447c2d4"
+    },
+    "runtime/wine-probe/private_pe_check.c": {
+      "bytes": 9950,
+      "mode": 292,
+      "sha256": "ccf282af51b6cb4be7cacba10f58085d37a313758edce132e3859a0689782424"
+    },
+    "runtime/wine-probe/private_pe_check.py": {
+      "bytes": 10004,
+      "mode": 292,
+      "sha256": "83bbb8b38b0a752b853d630f7507d29ab240c4104f1959011bb2158199885c87"
+    },
+    "runtime/wine-probe/private_pe_fixture.c": {
+      "bytes": 767,
+      "mode": 292,
+      "sha256": "64dd325dd5c2926e9561dd43e47ea979bc14fd26d3dd4b17f120881e4b98de76"
+    },
+    "runtime/wine-probe/record_runtime.py": {
+      "bytes": 4815,
+      "mode": 292,
+      "sha256": "093775c42a71d0139152c4322e30c4b0e149d6d52a2bc6e4010d0b50ee427220"
+    },
+    "runtime/wine-probe/runtime-input.lock.json": {
+      "bytes": 1317,
+      "mode": 292,
+      "sha256": "2b53c91bf890b370623efecccbbc009c1fa85dc0dbf4213fb1be430731c257b7"
+    },
+    "runtime/wine-probe/sources.lock.json": {
+      "bytes": 5246,
+      "mode": 292,
+      "sha256": "76113e65b9f63ae1d4d84eb2bbab615e3b0337b5924fdae7a4286f37a06dcc00"
+    },
+    "settings.gradle": {
+      "bytes": 291,
+      "mode": 292,
+      "sha256": "ad38e21a6d25f83e74b517462b7e7486f80fee93b441dda4bc822bb377a73724"
+    },
+    "sources.lock.json": {
+      "bytes": 2170,
+      "mode": 292,
+      "sha256": "dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90"
+    },
+    "tests/ServerArchiveInstallReference.java": {
+      "bytes": 3166,
+      "mode": 292,
+      "sha256": "e8e17307fcda60b1513537e5edac0af34e053604e01806cca7439b5bb98d09c9"
+    },
+    "tests/auth_srp_reference.cpp": {
+      "bytes": 1525,
+      "mode": 292,
+      "sha256": "ab7287d08fdb674f4779ca28227076dbab97a6475136f46486c37ea14944436b"
+    },
+    "tests/bridge-stubs/android/native_window_jni.h": {
+      "bytes": 785,
+      "mode": 292,
+      "sha256": "483f71c0d2cd7c8c4ebfde1b09cee01facb8993ea16d3a9f25ffea9ca4fe6bd1"
+    },
+    "tests/config_path_reference.cmake": {
+      "bytes": 1071,
+      "mode": 292,
+      "sha256": "7edb126ada44a9a452f490919db7ad5dbee42ab6eeeb8e9831d5a884cdad83fc"
+    },
+    "tests/config_path_reference.cpp": {
+      "bytes": 3734,
+      "mode": 292,
+      "sha256": "6e40a099fbce0911fed327efff402e2397d198bafdcc2e58f29cd6c883fbd352"
+    },
+    "tests/extractor_mpqfile_reference.cpp": {
+      "bytes": 697,
+      "mode": 292,
+      "sha256": "48ad6280e7d77cff6bb9b09901f75706e777ad96cd9bea22182568d3a4a11e86"
+    },
+    "tests/extractor_order_reference.cpp": {
+      "bytes": 4964,
+      "mode": 292,
+      "sha256": "fec8561ee848972035f097a88147b18dff8001d3352b5b45767a235607fd2336"
+    },
+    "tests/fixtures/X11AuthorityFixture.java": {
+      "bytes": 2225,
+      "mode": 292,
+      "sha256": "ee6f94afc0d77854bdcfb0cb112fa6c77b999ae5ad94d725f116dee3975e0d08"
+    },
+    "tests/fixtures/account-f35f04d.sql": {
+      "bytes": 2043,
+      "mode": 292,
+      "sha256": "98fa6cbbc1dca7ab12e583b3c6d9d7e3c735a20f144bfd44c69d734ae6480a64"
+    },
+    "tests/fixtures/realmcharacters-f35f04d.sql": {
+      "bytes": 567,
+      "mode": 292,
+      "sha256": "15b3db391a9c3a572d475981427bb925590384ccccd94242132f1981fca0c49e"
+    },
+    "tests/fixtures/realmlist-f35f04d.sql": {
+      "bytes": 1375,
+      "mode": 292,
+      "sha256": "e3743af73bd7cf4b75f2cd49a0269a31a5fc842cd78682f58ea0c4021d2d191f"
+    },
+    "tests/fixtures/server-data-tool-selection.canonical.json": {
+      "bytes": 949,
+      "mode": 292,
+      "sha256": "f12f3d0027e0cd5b6974a92e4be92be16b3216501b8fbeb925736f950263ffaf"
+    },
+    "tests/fixtures/wine-pre-adoption-4d27/LICENSE": {
+      "bytes": 35149,
+      "mode": 292,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    "tests/fixtures/wine-pre-adoption-4d27/manifest.json": {
+      "bytes": 4963,
+      "mode": 292,
+      "sha256": "5c81ae895f55cfef6519e626216e8d832de3665392c63774326da552a0338ed7"
+    },
+    "tests/fixtures/wine-pre-adoption-4d27/native/guest-bridges/AUDIO-LICENSE": {
+      "bytes": 1075,
+      "mode": 292,
+      "sha256": "dc18de7cb5064083e6cbe8fc6891de96b3700ed17891d03d1baa5e0097bd479e"
+    },
+    "tests/fixtures/wine-pre-adoption-4d27/native/guest-bridges/Makefile": {
+      "bytes": 926,
+      "mode": 292,
+      "sha256": "cb83e03fbf1b29192039580cc8f60ac68a7f6571c6d73b2c34b9a97fd5a6f95a"
+    },
+    "tests/fixtures/wine-pre-adoption-4d27/native/guest-bridges/pcm_esteria.c": {
+      "bytes": 7449,
+      "mode": 292,
+      "sha256": "b520bd47cd2dd7e542ee88c6c518532ec9cd84b006bf7b8f912438a479897dc8"
+    },
+    "tests/fixtures/wine-pre-adoption-4d27/native/guest-bridges/private_socket.h": {
+      "bytes": 1888,
+      "mode": 292,
+      "sha256": "06d4335d1bc348e8630969b5940d9c7a0cf8658552ffdf005d581426f0af84a6"
+    },
+    "tests/fixtures/wine-pre-adoption-4d27/native/guest-bridges/x11_frame.c": {
+      "bytes": 6355,
+      "mode": 292,
+      "sha256": "58ac751cba2add9f48911bb78eaab1432b269adba7abc44f20635836ef1684cb"
+    },
+    "tests/fixtures/wine-pre-adoption-4d27/native/guest-bridges/x11_input.c": {
+      "bytes": 4627,
+      "mode": 292,
+      "sha256": "ea42849c6cf80132da04b43d9fd771ed1f71dba5081607c586069ac257f59e52"
+    },
+    "tests/fixtures/wine-pre-adoption-4d27/native/presentation/frame_protocol.h": {
+      "bytes": 1388,
+      "mode": 292,
+      "sha256": "e8a2a9dec44254049520ae5f21141d355a054e1afc9b4b83d87ce25c815881df"
+    },
+    "tests/fixtures/wine-pre-adoption-4d27/native/presentation/frame_transport.h": {
+      "bytes": 869,
+      "mode": 292,
+      "sha256": "53979f5450ca55c33899cc844403650296aacba8449bf2a313fefd87ff1325fd"
+    },
+    "tests/fixtures/wine-pre-adoption-4d27/runtime/bridge-reference.json": {
+      "bytes": 664,
+      "mode": 292,
+      "sha256": "6762304137005c31d1b7eeb847de6ffad0eaed4ba96d1771f48399babce3490f"
+    },
+    "tests/fixtures/wine-pre-adoption-4d27/runtime/bridges/android-provider.lock.json": {
+      "bytes": 12807,
+      "mode": 292,
+      "sha256": "e983198e229ffad73d8fdc14cd6059029a5b6ba20d6e9509633db45df3e03ea4"
+    },
+    "tests/fixtures/wine-pre-adoption-4d27/runtime/bridges/dependency-release.lock.json": {
+      "bytes": 3029,
+      "mode": 292,
+      "sha256": "98d269c76a2f3e2dddc013b4a17ddb93e8ba893abe58d27997bac7e789da5d42"
+    },
+    "tests/fixtures/wine-pre-adoption-4d27/runtime/bridges/sources.lock.json": {
+      "bytes": 23129,
+      "mode": 292,
+      "sha256": "be07f59cff79a6c0e746d4d9c2adbd816568903e312317ff58091f9747779af0"
+    },
+    "tests/fixtures/wine-pre-adoption-4d27/runtime/bridges/x11-runtime.lock.json": {
+      "bytes": 14313,
+      "mode": 292,
+      "sha256": "f6a7cebc7d78933a05a074a7a152adc7a19b547e00192de6489d6b1bd7e15ccf"
+    },
+    "tests/fixtures/wine-pre-adoption-4d27/runtime/client/android-provider.lock.json": {
+      "bytes": 492,
+      "mode": 292,
+      "sha256": "7ecb7dfd4e9917e742fb467d81a72af9273394c8488e5a6cb3e25fa70c29ed5b"
+    },
+    "tests/fixtures/wine-pre-adoption-4d27/runtime/client/dependency-release.lock.json": {
+      "bytes": 5474,
+      "mode": 292,
+      "sha256": "3dcafa462901a6af8f216c00fd96ff318caeff14540107e822f5b8b65c7c0f9a"
+    },
+    "tests/fixtures/wine-pre-adoption-4d27/runtime/runtime-sources.lock.json": {
+      "bytes": 14211,
+      "mode": 292,
+      "sha256": "cd2f3d2d47e2ac0de845acc914e94013906836de9710dc290a6fa51c89bbf07d"
+    },
+    "tests/fixtures/wine-pre-adoption-4d27/runtime/shader_generation.py": {
+      "bytes": 19353,
+      "mode": 292,
+      "sha256": "8bb48952c36bdc4c69516c2ffa6f5c2d2eb59e84019e6420948d94bc81683ac5"
+    },
+    "tests/fixtures/wine-pre-adoption-4d27/runtime/shaders/android-provider.lock.json": {
+      "bytes": 11851,
+      "mode": 292,
+      "sha256": "a7a2ceb0d04367817c0a80c58c5fc9120d7e4c623ca3286dcc2ea07b82b697b1"
+    },
+    "tests/fixtures/wine-pre-adoption-4d27/runtime/shaders/dependency-release.lock.json": {
+      "bytes": 3582,
+      "mode": 292,
+      "sha256": "d47efd9f922aeafd0221bb3cda27015f1ba85bff2963b93e7cdd174ae6d9c15d"
+    },
+    "tests/fixtures/wine-pre-adoption-4d27/runtime/turnip/android-provider.lock.json": {
+      "bytes": 16051,
+      "mode": 292,
+      "sha256": "a2999f5172d139ea37cec712662ffc17303cb2d78d8356095c11c8f671f887d4"
+    },
+    "tests/fixtures/wine-pre-adoption-4d27/runtime/turnip/sources.lock.json": {
+      "bytes": 43088,
+      "mode": 292,
+      "sha256": "9bc783e6240d3314a8245f88a3ce8eb5a8d583e360f330f780cd71080bf2d8d1"
+    },
+    "tests/historical_wine_inputs.py": {
+      "bytes": 1362,
+      "mode": 292,
+      "sha256": "10ec09dde64c93b774fa0a126b7680f0616fd8c873e6b83f22f67586b4f75180"
+    },
+    "tests/java/io/github/russianranger/esteria/runtime/ClientLaunchSetupTest.java": {
+      "bytes": 9626,
+      "mode": 292,
+      "sha256": "ee207e35779270f6dd05ff79b3a85296ffebc710198d589ec6271bcfce1a8234"
+    },
+    "tests/module_configs_reference.cpp": {
+      "bytes": 4891,
+      "mode": 292,
+      "sha256": "d558f2d2b68ce7ad5ec101071cde26ca30d810be4a497142b231813b7ba87aee"
+    },
+    "tests/native-java-installation/restart_probe.py": {
+      "bytes": 3698,
+      "mode": 292,
+      "sha256": "bffa2578a01e89789e56d3fdc1fdb85ff6fe97e6e2cc789de6cfb58556053196"
+    },
+    "tests/native-java-installation/src/android/content/Context.java": {
+      "bytes": 510,
+      "mode": 292,
+      "sha256": "9aef34621da5caffe40311220ee0cf7056d351c64d2934ea7e8c25941197dd17"
+    },
+    "tests/native-java-installation/src/android/content/res/AssetFileDescriptor.java": {
+      "bytes": 683,
+      "mode": 292,
+      "sha256": "95420d6f3829f5dfef3befdb8fca6544472f204e34be4620ce240d7256f82781"
+    },
+    "tests/native-java-installation/src/android/content/res/AssetManager.java": {
+      "bytes": 1513,
+      "mode": 292,
+      "sha256": "e559e132f30145a6a68500d86bb08c0ad3f51735904cfabe7c8392b72752fdb5"
+    },
+    "tests/native-java-installation/src/io/github/russianranger/esteria/runtime/InstalledProot.java": {
+      "bytes": 8455,
+      "mode": 292,
+      "sha256": "980b06f686787f646c3c2b67b4c712de672c13ca6fd9bfbb56c02f0d97cc97b4"
+    },
+    "tests/native-java-installation/src/io/github/russianranger/esteria/runtime/NativeJavaInstallation.java": {
+      "bytes": 16368,
+      "mode": 292,
+      "sha256": "04236a9aea010a6de3c785f236ae0e4f4d1b28d1066cfcc8da0413d812961945"
+    },
+    "tests/native/eluna_hooks.cpp": {
+      "bytes": 259,
+      "mode": 292,
+      "sha256": "e2f795729d51750627404cfa2baf8c5928d9eb4d0bc1266f1c3d4fbd4305dc18"
+    },
+    "tests/playerbots_database_reference.cmake": {
+      "bytes": 1075,
+      "mode": 292,
+      "sha256": "254a8946088c364bff34a901acc546b747e2cf5fe1cda4a61e5b11d3d26fc61a"
+    },
+    "tests/playerbots_database_reference.cpp": {
+      "bytes": 2552,
+      "mode": 292,
+      "sha256": "75c54da4fcae709d23723a0c8dfa7c0affc7d97ecf310a47f293e0071dae7da0"
+    },
+    "tests/presentation_surface_probe.c": {
+      "bytes": 4474,
+      "mode": 292,
+      "sha256": "3cf8275b3d722437fde88d3366ef15c838e8f0b60eaa8cbc1dac8f17e16c4b8b"
+    },
+    "tests/srp6_reference.cmake": {
+      "bytes": 1415,
+      "mode": 292,
+      "sha256": "ef9813ea2fdcf40ee470fc4f354467bc5130f369d9f9e8479e9b6a45fe40a152"
+    },
+    "tests/srp6_reference.cpp": {
+      "bytes": 1455,
+      "mode": 292,
+      "sha256": "bb182c943040fe108d8a1952dd4b70dff9a6f2b4ef89bb3234efb3eddbb7baf7"
+    },
+    "tests/test_android_database_setup.py": {
+      "bytes": 4945,
+      "mode": 292,
+      "sha256": "2420a42043049e56a9297afccf07fae53e2ff51612faf84766d8f03d92f68f4f"
+    },
+    "tests/test_android_installer_qualification.py": {
+      "bytes": 1441,
+      "mode": 292,
+      "sha256": "2c4358b713efa366840366194a6a64dc11fb0ac4cbffac5e93c84e35b574a65f"
+    },
+    "tests/test_android_jni_elf.py": {
+      "bytes": 2113,
+      "mode": 292,
+      "sha256": "17113389168ad09e8dc864d2f2766f4074c9c25820c3289c09bbf2f26c9a29bc"
+    },
+    "tests/test_android_mysql_probe.py": {
+      "bytes": 8945,
+      "mode": 292,
+      "sha256": "1abe3b8124c7c2df3a5d1cebd2ba45fe80cce2e3b8b4689b52361779275460ad"
+    },
+    "tests/test_android_mysql_retention.py": {
+      "bytes": 7109,
+      "mode": 292,
+      "sha256": "1c5e5e003237ef2eab5ab7ceb0b454faeff731479261de4328603e8601218aa9"
+    },
+    "tests/test_android_owner_qualification.py": {
+      "bytes": 3682,
+      "mode": 292,
+      "sha256": "06525851c686a0c63b55a44392724c87e747621ad057bff30b76c88b314f6115"
+    },
+    "tests/test_android_presentation_qualification.py": {
+      "bytes": 3239,
+      "mode": 292,
+      "sha256": "03c8f74a59c777cbe64cdb3ab7181b780cb13cdaf5ec00027293fed00e8d5a90"
+    },
+    "tests/test_android_proot.py": {
+      "bytes": 8775,
+      "mode": 292,
+      "sha256": "bd73d510131aa2766282695dc6bf16205c32a29f26e10898bd404fabd51bb17f"
+    },
+    "tests/test_android_proot_probe.py": {
+      "bytes": 5823,
+      "mode": 292,
+      "sha256": "a2d93881d8378eeb067c5763924f702dce7f0403ea712f0188847973a88f7636"
+    },
+    "tests/test_android_server_installation_setup.py": {
+      "bytes": 30560,
+      "mode": 292,
+      "sha256": "c12c8f5c93c6af29e212b7354e79a9a74202bc304122071cb9633d07e55c2839"
+    },
+    "tests/test_android_server_schema_setup.py": {
+      "bytes": 7423,
+      "mode": 292,
+      "sha256": "2a283c6504a5631c30efabc91052829c11b112a2d9a2b60988c714573a84ae83"
+    },
+    "tests/test_android_signing.py": {
+      "bytes": 10408,
+      "mode": 292,
+      "sha256": "4e617e2d6d352745b416060f8821cd4b6d1f5ca5415ab891246250be00639210"
+    },
+    "tests/test_android_wine_probe.py": {
+      "bytes": 6596,
+      "mode": 292,
+      "sha256": "b68c85f95635c0b7563c5b8832ac61212aa11d7ef37160bcc866c195b99b19b9"
+    },
+    "tests/test_android_wine_runtime.py": {
+      "bytes": 5941,
+      "mode": 292,
+      "sha256": "5a2eeae32dc46b9d1cdd0f11c67c1e317a31a5618ca4037259afb462b6e82ceb"
+    },
+    "tests/test_android_wine_sources.py": {
+      "bytes": 10009,
+      "mode": 292,
+      "sha256": "8e535527d381f3e0e94e559dd0ba2ce618974f13db9d112f6212604d25d1702a"
+    },
+    "tests/test_appearance_schema_qualification.py": {
+      "bytes": 4539,
+      "mode": 292,
+      "sha256": "163a9f8487732f086682aeecaabc62c623f9c82b5537fa5a99df469b4ef8ee59"
+    },
+    "tests/test_assets.py": {
+      "bytes": 3432,
+      "mode": 292,
+      "sha256": "286ed729604714822494dc3949b4292ca087aabdc75b318d70a8620a296c5fe7"
+    },
+    "tests/test_auth_protocol.py": {
+      "bytes": 5274,
+      "mode": 292,
+      "sha256": "00f88b8aedb7dc4c47c817b09acde8cbf44c881ca8c6dc36ef66bc9adf785b8a"
+    },
+    "tests/test_authserver_qualification.py": {
+      "bytes": 7304,
+      "mode": 292,
+      "sha256": "a66e5d48683cae28843d0585b93e3ddc34596c0c6f2bc130cb7ef2406392d8f9"
+    },
+    "tests/test_base_sql.py": {
+      "bytes": 9411,
+      "mode": 292,
+      "sha256": "7ee1d43a0782914c0e540e10116f9cce24427d3489c133874ba124f6b50ea9a4"
+    },
+    "tests/test_client_auth_inputs.py": {
+      "bytes": 4257,
+      "mode": 292,
+      "sha256": "23fc862e1939dabdf957ae4a33854982d0a4797e1def4e3193d2ec7801a0ea53"
+    },
+    "tests/test_client_auth_qualification.py": {
+      "bytes": 15963,
+      "mode": 292,
+      "sha256": "202c656f3655872d63b5420cb3dff13e29f9e9c60c519018cf91752082e57892"
+    },
+    "tests/test_client_auth_tools.py": {
+      "bytes": 5001,
+      "mode": 292,
+      "sha256": "89d632927a21aa121e22047f9c9cda1c34bebfcb3bb2259503adeb64ce99f1fb"
+    },
+    "tests/test_client_launch_setup.py": {
+      "bytes": 2494,
+      "mode": 292,
+      "sha256": "ecaca61b0747241bdfa21bea1286ac9bc4811e1a340bbb24ecc34d99462e9c7e"
+    },
+    "tests/test_client_release.py": {
+      "bytes": 4806,
+      "mode": 292,
+      "sha256": "2590c856f34b11b6ce091b10998b1dc5ab6dec68bb0c08a9533c277d7883ede2"
+    },
+    "tests/test_client_runtime_provider.py": {
+      "bytes": 12867,
+      "mode": 292,
+      "sha256": "89f181889a19c8a423d2ecc4642b538a2a29f9cdd8fe1a01379683c6122b8929"
+    },
+    "tests/test_client_source_inputs.py": {
+      "bytes": 9886,
+      "mode": 292,
+      "sha256": "e825adebd4ec13e78a89ecf3fa99eddc82a999c52f42a2b92ae05f007c0c3f9b"
+    },
+    "tests/test_combined_android.py": {
+      "bytes": 21020,
+      "mode": 292,
+      "sha256": "04c746ea4252f97ac8dca7c3300f8501f891ea9fb93a20f29d5d3977759dc683"
+    },
+    "tests/test_config_path_reference.py": {
+      "bytes": 1733,
+      "mode": 292,
+      "sha256": "a6a412d5aed34483e2706c8bd5f44aad678c614838bbbc22772cc43bb9679129"
+    },
+    "tests/test_data_tools_inputs.py": {
+      "bytes": 3562,
+      "mode": 292,
+      "sha256": "b562a9c76bc6a33edc8b25abf95ddb20e6a15008b19291f1569541b68fd19f79"
+    },
+    "tests/test_data_tools_qualification.py": {
+      "bytes": 10613,
+      "mode": 292,
+      "sha256": "c84a95dfe6d4d5197b6ac3d74bc431eeb237060acb9d9b638349c500ac28e5d0"
+    },
+    "tests/test_dbimport_qualification.py": {
+      "bytes": 18716,
+      "mode": 292,
+      "sha256": "1a6036473005fde716f5df4fbdf55bbbf124c2cac50031e8a58f6c0761a2953f"
+    },
+    "tests/test_dependency_release.py": {
+      "bytes": 17854,
+      "mode": 292,
+      "sha256": "f642c2b1ad353d9c8a96fb71e53c550f7f30342055488d666e648a72d9781d4f"
+    },
+    "tests/test_embedded_archive_cache.py": {
+      "bytes": 1126,
+      "mode": 292,
+      "sha256": "213f0b48ced7446e9e8c3e2f2350507a3d1fc2bd2f0f1b84201ab457d2c714f9"
+    },
+    "tests/test_empty_script_modules.py": {
+      "bytes": 4283,
+      "mode": 292,
+      "sha256": "f24ea16de6e2588d354f7d000af0d45d3be7a65bef0b61b0ad1b1bf070a4c63e"
+    },
+    "tests/test_extractor_order.py": {
+      "bytes": 18167,
+      "mode": 292,
+      "sha256": "102a5660ff7d15db18762946f7cb910c0c9ea447a72edce4bf368757692f22b7"
+    },
+    "tests/test_guest_bridge_inputs.py": {
+      "bytes": 4457,
+      "mode": 292,
+      "sha256": "055855b33662002a32df3db1aa91b998a41d4d779441ea1ed212c96599e1b95e"
+    },
+    "tests/test_guest_bridge_provider.py": {
+      "bytes": 7351,
+      "mode": 292,
+      "sha256": "05f5577f1efcdc47bd5094b08c33ee8b8cf4bc27b4dc8599ec170c6e0a12281c"
+    },
+    "tests/test_java_server_installation_qualification.py": {
+      "bytes": 3788,
+      "mode": 292,
+      "sha256": "7dd63069c9eb9d13466eafd1f065b40d5d35a920a07d0dd0cae8008963c92e29"
+    },
+    "tests/test_local_account.py": {
+      "bytes": 11775,
+      "mode": 292,
+      "sha256": "31c66ffd60a2e318d55d676d1713a7e14cfc26baa38737e401eda486b6f82cba"
+    },
+    "tests/test_local_account_qualification.py": {
+      "bytes": 4441,
+      "mode": 292,
+      "sha256": "9ba3e877326d60e9b168102ab794087a9cad014b25bd059c55c23170594534d6"
+    },
+    "tests/test_local_realm.py": {
+      "bytes": 19195,
+      "mode": 292,
+      "sha256": "02c422c4ca6834ace31497853a144ddfe8c9e1e56b0686c3aca963dc0a4a131f"
+    },
+    "tests/test_local_server_components_release.py": {
+      "bytes": 15293,
+      "mode": 292,
+      "sha256": "5867cd350b25e8d1679f84cf035ec9aac6f8590d4beda647c212b32de3353473"
+    },
+    "tests/test_matched_client_auth.py": {
+      "bytes": 7267,
+      "mode": 292,
+      "sha256": "217583fb9c879d0693e76f9289d0f185828f2dbbfae995c59a674e2e861e9a24"
+    },
+    "tests/test_module_configurations.py": {
+      "bytes": 3439,
+      "mode": 292,
+      "sha256": "6c73c59acaae02642f3a80aebf6766d33c106ae5b770807c6ee7135adc90051e"
+    },
+    "tests/test_mysql_backup.py": {
+      "bytes": 17034,
+      "mode": 292,
+      "sha256": "b86ef6ccab8a5a1d6a4d31d1ee9f8b1301209db652caf301bcfd6c4de35a6214"
+    },
+    "tests/test_mysql_bootstrap.py": {
+      "bytes": 23035,
+      "mode": 292,
+      "sha256": "207e750e6e35532a409a8d3313bc08cca7e64f3a9680518fafd659a290fb3f35"
+    },
+    "tests/test_mysql_init_trace.py": {
+      "bytes": 17344,
+      "mode": 292,
+      "sha256": "0c08f8e1d809f30efbcf5838aa6f91edd540eeab3bd13368298e99f85fd6377b"
+    },
+    "tests/test_mysql_service.py": {
+      "bytes": 21942,
+      "mode": 292,
+      "sha256": "b52dc3d8938adf9e04775c0eae49c2a2507d49ae294793216de4586c94dd1ba9"
+    },
+    "tests/test_mysql_state_lease.py": {
+      "bytes": 3930,
+      "mode": 292,
+      "sha256": "07117747980eddbc9c1551e6b707955a8b3ca7e5e44f0f55f8cdf9a66e2d2e1e"
+    },
+    "tests/test_ordered_extractor_build.py": {
+      "bytes": 8052,
+      "mode": 292,
+      "sha256": "059d255c5df0a1703481839e55b36866d78b866e3fe0c998b75882fcb2047bf8"
+    },
+    "tests/test_ordered_extractor_dependencies.py": {
+      "bytes": 20006,
+      "mode": 292,
+      "sha256": "6591fae1db09ab22852a0b9c24c334c6c759ddac2e1ad2aed04d59365a2b5695"
+    },
+    "tests/test_ordered_extractor_sources.py": {
+      "bytes": 24452,
+      "mode": 292,
+      "sha256": "5544f07d0e463e6462cf0e0297ce9d9c29b0509767837e6589f45b316f60ad39"
+    },
+    "tests/test_ordered_source_inputs.py": {
+      "bytes": 4979,
+      "mode": 292,
+      "sha256": "ef391e786291c4cbcb6a525bfe9d551e932c24c7acc5cc35a7404708a4599a3a"
+    },
+    "tests/test_owned_process_group.py": {
+      "bytes": 4960,
+      "mode": 292,
+      "sha256": "899c093b337b3086fa03b9d2b5a61c91cdf46b8341116dbd1cbdf0079ffd54f7"
+    },
+    "tests/test_package_server_data_tools.py": {
+      "bytes": 13374,
+      "mode": 292,
+      "sha256": "83337096997259f428241eb8e33abe448d341dc6bdf00c7ab3d27e3a97d004d4"
+    },
+    "tests/test_pcm_capture.py": {
+      "bytes": 6301,
+      "mode": 292,
+      "sha256": "d9c10b532ddd7696d9feb93144b50b0a23fe0104ec041bd1ab29ce56b72f3dfb"
+    },
+    "tests/test_playerbots_component_build.py": {
+      "bytes": 20389,
+      "mode": 292,
+      "sha256": "327e10389cdc9b88f3fe7c4e2384c92191c158e9f8927646f83de64cc025c7ff"
+    },
+    "tests/test_playerbots_component_qualification.py": {
+      "bytes": 8014,
+      "mode": 292,
+      "sha256": "e91b83b9c3b2837a24c9a45722b05dda7c92ae2b3aacc3d2763ccb2c1c398d93"
+    },
+    "tests/test_playerbots_helper_acquisition.py": {
+      "bytes": 13798,
+      "mode": 292,
+      "sha256": "faf04e191b649eb642ce993802bc7ae29934d3ea0024769e6723e948c867bd0d"
+    },
+    "tests/test_playerbots_helper_candidate.py": {
+      "bytes": 12721,
+      "mode": 292,
+      "sha256": "5b49e3a4df5d036b656531b1c1f06a4a99db489b5ea4145883dd7a78a2a308e4"
+    },
+    "tests/test_playerbots_helper_sources.py": {
+      "bytes": 19493,
+      "mode": 292,
+      "sha256": "889c8477f7d269ac6b5533f218d849d2568bb6447a61d22f6960ce75aa2158b0"
+    },
+    "tests/test_playerbots_programs_measurement.py": {
+      "bytes": 5626,
+      "mode": 292,
+      "sha256": "7cd2f817da2f1b67e67b76f9ca2df3325434441f55d2aa12e302a7c91763433e"
+    },
+    "tests/test_playerbots_programs_provider.py": {
+      "bytes": 8611,
+      "mode": 292,
+      "sha256": "9907e12429cadca7eb2544d2de833f3124ec6fc59084f75510d816f0c13e0d0a"
+    },
+    "tests/test_playerbots_programs_qualification.py": {
+      "bytes": 4826,
+      "mode": 292,
+      "sha256": "08feed4b2ae1166b24ad192631c87d61f36b342ea836d2eec97577d239d4722c"
+    },
+    "tests/test_playerbots_qualification.py": {
+      "bytes": 6654,
+      "mode": 292,
+      "sha256": "13401745b80c50bfafa3a4bc9e25f76c295fb0aa5bccddcab2fba9a2bb4bb99e"
+    },
+    "tests/test_playerbots_reference.py": {
+      "bytes": 2785,
+      "mode": 292,
+      "sha256": "e65758cd29701e08e855a6433c9ae18faf8a6be7b5472d42901ee13c37be4580"
+    },
+    "tests/test_playerbots_source_companion.py": {
+      "bytes": 10156,
+      "mode": 292,
+      "sha256": "13589bf0b019999efd5f1c1f37429ffeed8c694cd74b21d02705253c49067a9c"
+    },
+    "tests/test_playerbots_source_inputs.py": {
+      "bytes": 4779,
+      "mode": 292,
+      "sha256": "60b684f6f9ff93fd8371b982676c30c997c6b6fbd240502a6287a34fc9610ee6"
+    },
+    "tests/test_presentation_native.py": {
+      "bytes": 1531,
+      "mode": 292,
+      "sha256": "bfb86cb52380a7f6eecccee25b611b16a58af209e9d8150fd516561dd04dee61"
+    },
+    "tests/test_protocol.py": {
+      "bytes": 2940,
+      "mode": 292,
+      "sha256": "52280ae0defbaa733abba172c5d177d3dc358ed21053d4e2434bf7a0010a2aae"
+    },
+    "tests/test_provider_candidate_locks.py": {
+      "bytes": 5316,
+      "mode": 292,
+      "sha256": "abd7d8bf41324a3e31febe2403ae7ce90373ec1b172c9e2dded148d22923d6f1"
+    },
+    "tests/test_provider_publication.py": {
+      "bytes": 7403,
+      "mode": 292,
+      "sha256": "7892613b5ce9227e7c7f09286e17d335cadaf65b09260869fa1f2f7176ab2de4"
+    },
+    "tests/test_public_wine_cohort.py": {
+      "bytes": 5465,
+      "mode": 292,
+      "sha256": "b98cae60a2d7ca494726efae757f5651595a1f3bdc750c8c4cf094458d3c8e56"
+    },
+    "tests/test_public_wine_inputs.py": {
+      "bytes": 6809,
+      "mode": 292,
+      "sha256": "91b81e590fd2acad178bb3a7fc442db740a202f0f56c294e0e7120bb3e8745e7"
+    },
+    "tests/test_qualified_data_tools_inputs.py": {
+      "bytes": 2928,
+      "mode": 292,
+      "sha256": "3ce2160b9370bac5cd85cb0ad68a7f86006e415b6e8bb3fd84a2b536ce88360d"
+    },
+    "tests/test_runtime_local_provisioning.py": {
+      "bytes": 17156,
+      "mode": 292,
+      "sha256": "cd0a6b7d832b4b99dc184c9bf9037134f6ed65f82d7f8a5fbdffd54f45a7b510"
+    },
+    "tests/test_runtime_packages.py": {
+      "bytes": 12601,
+      "mode": 292,
+      "sha256": "bf4034834b6670a6cb0020b48e0e8e36d95e010b3b2341300d7431aeaebd96a0"
+    },
+    "tests/test_runtime_playerbots_setup.py": {
+      "bytes": 19795,
+      "mode": 292,
+      "sha256": "14dd5fa2f1db457816393e085c791fc803b869ac107cde18d41c16aa62087c62"
+    },
+    "tests/test_runtime_server_config.py": {
+      "bytes": 11236,
+      "mode": 292,
+      "sha256": "0c165c46a21a1b12021f3b9e0cce932c33c3ae4838c41e7c9f58cff7df3fe715"
+    },
+    "tests/test_runtime_server_content.py": {
+      "bytes": 14777,
+      "mode": 292,
+      "sha256": "f46ec53806d2b6a9378e87d1c585af6f6e3c06260b0d8604952f7b9c3567c3fe"
+    },
+    "tests/test_runtime_server_schema_setup.py": {
+      "bytes": 16334,
+      "mode": 292,
+      "sha256": "8cb87a64dc5c41bf58130fa6a9c747b852cc106bc092e48abd9bd7e8d84b8618"
+    },
+    "tests/test_runtime_server_update_setup.py": {
+      "bytes": 21036,
+      "mode": 292,
+      "sha256": "13f8c28754a7a32170e7b26e3dd2fe09860a084beb5641a32c171dc5c17c86d2"
+    },
+    "tests/test_runtime_server_updater.py": {
+      "bytes": 5294,
+      "mode": 292,
+      "sha256": "e14862c369bf89dec13e2a646845da90fea405a6e4c4379a6bbd8cf50d21037e"
+    },
+    "tests/test_server_adaptations.py": {
+      "bytes": 3096,
+      "mode": 292,
+      "sha256": "6a8befb31bc8b7f85a99d6a79bbfccc91b138cd6ec5573235a1db542ee0aebff"
+    },
+    "tests/test_server_build.py": {
+      "bytes": 9346,
+      "mode": 292,
+      "sha256": "3872baacd45fa690110a1e5eb07474782caaf2c39b02f2331944fc04899c1909"
+    },
+    "tests/test_server_config.py": {
+      "bytes": 10673,
+      "mode": 292,
+      "sha256": "e35696a00945cf48ad4f1ef9c9f49b66ff973b027c3a51324964744fd6bab65e"
+    },
+    "tests/test_server_content.py": {
+      "bytes": 10491,
+      "mode": 292,
+      "sha256": "3fd06043a0b5467c892a1ac1c58c93bdd8bf100a7ac2713b8ecda5c81dc6afad"
+    },
+    "tests/test_server_content_provider.py": {
+      "bytes": 7166,
+      "mode": 292,
+      "sha256": "bac556341fce62e72a1ea045e6d57d7fda1126d72d0d658dfc5216042fbf4f84"
+    },
+    "tests/test_server_data_generation.py": {
+      "bytes": 15337,
+      "mode": 292,
+      "sha256": "6dbd4cbd29c12cb82fd85b46bddc90dde3dcd27993e0f211e229873666467e71"
+    },
+    "tests/test_server_data_packages.py": {
+      "bytes": 10215,
+      "mode": 292,
+      "sha256": "937456c05bdae90cbe7877416bea1ddf89c503ba02116935015edc3fc0731aab"
+    },
+    "tests/test_server_data_tools_provider.py": {
+      "bytes": 9608,
+      "mode": 292,
+      "sha256": "4d37037b50f8c554d369a446f1f92894c677b17a5eb41b51e7f7af56c54d1e97"
+    },
+    "tests/test_server_dependency_image.py": {
+      "bytes": 5659,
+      "mode": 292,
+      "sha256": "a4d1911564a8d498a82ecf4d81b0bdbe10e1ef69f7ef7128ca9dd2cb861ac278"
+    },
+    "tests/test_server_dependency_image_readback.py": {
+      "bytes": 5855,
+      "mode": 292,
+      "sha256": "acff331288faf81d8364aaa0f164b06b0edd7a9dc4af45b514ad3868c9b3fb25"
+    },
+    "tests/test_server_engine_elf.py": {
+      "bytes": 7236,
+      "mode": 292,
+      "sha256": "9d697e237aadcb8e326995b71a108cb7fb23c1c64a8e0a7e77605bd309ee66b3"
+    },
+    "tests/test_server_engine_inputs.py": {
+      "bytes": 13762,
+      "mode": 292,
+      "sha256": "64f7b0c27e9b7f012c51d27c90e8830676bd31852f1daf930c2be4f43e6cbdf1"
+    },
+    "tests/test_server_engine_notices.py": {
+      "bytes": 18517,
+      "mode": 292,
+      "sha256": "09833eb5196680e88bfa50d8038d4ce618464b4839334334c0164e68506473c6"
+    },
+    "tests/test_server_engine_package.py": {
+      "bytes": 13564,
+      "mode": 292,
+      "sha256": "7679945d534a3c85c611f580d2fea8663bffac172c365dbe063b1b31128a718b"
+    },
+    "tests/test_server_engine_runtime.py": {
+      "bytes": 6370,
+      "mode": 292,
+      "sha256": "133ada7a88545bdca9c710908eb51129024499e87c05771139968736456d5de5"
+    },
+    "tests/test_server_engine_source_inputs.py": {
+      "bytes": 15070,
+      "mode": 292,
+      "sha256": "0875b8b17c773837b6e0f4ba2e9c439ebf6b8a9bfeeffeff9e760d2042feb6f6"
+    },
+    "tests/test_server_extractors.py": {
+      "bytes": 10953,
+      "mode": 292,
+      "sha256": "d99ed44c7357a9484eca51bd708003df2a6cb79640736431224ecaf0bfa974bd"
+    },
+    "tests/test_server_extractors_provider.py": {
+      "bytes": 10724,
+      "mode": 292,
+      "sha256": "347026235dac02308bd1b8a5fb075ef2fe82e9d6798c227dd8b61e859c483d0e"
+    },
+    "tests/test_server_installation_inputs.py": {
+      "bytes": 8881,
+      "mode": 292,
+      "sha256": "02ad8df47a11ccbb3f73f742c790097c6d361c046a920f77d0c8aa3b8a384706"
+    },
+    "tests/test_server_installation_qualification.py": {
+      "bytes": 13502,
+      "mode": 292,
+      "sha256": "72794aa7c3cc4e66abe893c650b44e3b69a2c18d29ac901867809cc57c1283e1"
+    },
+    "tests/test_server_isolated_build.py": {
+      "bytes": 10071,
+      "mode": 292,
+      "sha256": "c6a11a9ac90ed5b461b7dbaadd9f74f486c1b89025e7eda32a52de5667353991"
+    },
+    "tests/test_server_isolated_environment.py": {
+      "bytes": 8531,
+      "mode": 292,
+      "sha256": "9e7e712defe3e6e7b3b1f66a579807f342909a1f00a8d41313ec0317d41c59b4"
+    },
+    "tests/test_server_isolated_sources.py": {
+      "bytes": 11584,
+      "mode": 292,
+      "sha256": "30e82093ffc3ff8a5feb736d6ccda66bf3920b63076c34d91d8e53a47abd5d6c"
+    },
+    "tests/test_server_modules.py": {
+      "bytes": 5149,
+      "mode": 292,
+      "sha256": "e01147e707ba43e4c50b1808e1fecbfb34bfa95ede80f1177bd1fa170e6f90e3"
+    },
+    "tests/test_server_package.py": {
+      "bytes": 11796,
+      "mode": 292,
+      "sha256": "42b5bfa503458381a48d0ddf05ab4e8337a982770f5d7439c8064edcf25e2b76"
+    },
+    "tests/test_server_programs_provider.py": {
+      "bytes": 8273,
+      "mode": 292,
+      "sha256": "a8af2b69c1cc3c58af6cda07f6c585afbb26b9b291e1310068f6db28e459c94b"
+    },
+    "tests/test_server_provider_qualification.py": {
+      "bytes": 6375,
+      "mode": 292,
+      "sha256": "2b8b4fb87a0a788f8f8c5d28a0b6c9f5f21d2e3ac033b0b419345d482ef96258"
+    },
+    "tests/test_server_provider_sources.py": {
+      "bytes": 7566,
+      "mode": 292,
+      "sha256": "8e5ec1eaf92fbb07dec3a254e3dde28897c31e4beddb3a0ccd04ca40e466a776"
+    },
+    "tests/test_server_requalification.py": {
+      "bytes": 6364,
+      "mode": 292,
+      "sha256": "5439a5062d87f6ef627988b063871906cab256f0ad760e23039706fef40da221"
+    },
+    "tests/test_server_runtime_inputs.py": {
+      "bytes": 4012,
+      "mode": 292,
+      "sha256": "931c9b2ee7b20cc1304640d3af20de10b4494cd60d72ecb9b1ed95b568af8034"
+    },
+    "tests/test_server_runtime_package.py": {
+      "bytes": 7883,
+      "mode": 292,
+      "sha256": "f12e7cb6921ede500d2dc0d3e6a285d393d06f41f163309966e1527c448fa1e6"
+    },
+    "tests/test_server_runtime_provider.py": {
+      "bytes": 3965,
+      "mode": 292,
+      "sha256": "6af2e710e3c9427d1c72dcf2aa04a704de47cf2e50e7cf561d61fc68e6ba9ff5"
+    },
+    "tests/test_server_schema_adaptations.py": {
+      "bytes": 10147,
+      "mode": 292,
+      "sha256": "3236a5a3e5a4f95f28ae4a084e8dabca815c9480c7b8b6af3263f20ff8dc8ae4"
+    },
+    "tests/test_server_schema_baseline.py": {
+      "bytes": 11972,
+      "mode": 292,
+      "sha256": "448f7c7b9a17ca76c2f4cc99a3450266dc137b46b12064a131f6a5b043b307bf"
+    },
+    "tests/test_server_session.py": {
+      "bytes": 11721,
+      "mode": 292,
+      "sha256": "b2ad265a7008392a6128508bf0d3c3cc58ab400d32f0ef75a977ba6b761b8588"
+    },
+    "tests/test_server_session_process.py": {
+      "bytes": 10210,
+      "mode": 292,
+      "sha256": "b9d12e66c7f9b4c739322b4348028954f980b8622fdb96ee3d5c82f135c037db"
+    },
+    "tests/test_server_source_recovery.py": {
+      "bytes": 9231,
+      "mode": 292,
+      "sha256": "96cfe757712032b3de73f7af9f5639053c80040fca290632fdfbc366a428d703"
+    },
+    "tests/test_shader_generation.py": {
+      "bytes": 9447,
+      "mode": 292,
+      "sha256": "4bc7bb04e85c0ed707f92c170b422f59367f0e3140c0359ec4e353c14a90c0c2"
+    },
+    "tests/test_shader_provider.py": {
+      "bytes": 6753,
+      "mode": 292,
+      "sha256": "9317a8e4c09339c97c7e71069b89d126d4e8b21452dbab09bef6bc5ba90eb7a8"
+    },
+    "tests/test_shader_release.py": {
+      "bytes": 8457,
+      "mode": 292,
+      "sha256": "10a2e8dcbfc2d8be0cee453d42601756f41be63485e100866f4b47f387e77281"
+    },
+    "tests/test_shader_tools_package.py": {
+      "bytes": 11724,
+      "mode": 292,
+      "sha256": "b6a8de6e907541afb0df7c8c6d62ef04b38a88e17abe74c00e461fdd838b2cec"
+    },
+    "tests/test_sources.py": {
+      "bytes": 6083,
+      "mode": 292,
+      "sha256": "39b5c1f5408addf4f5a47d6ef122c6be11fab47b453d20c064946ea2ecc74eec"
+    },
+    "tests/test_target_dependency_observation.py": {
+      "bytes": 13092,
+      "mode": 292,
+      "sha256": "38aba69120c4f02ee2fa91146217725af85801d86f3c518d073e6051d292120a"
+    },
+    "tests/test_turnip_build.py": {
+      "bytes": 7249,
+      "mode": 292,
+      "sha256": "86df3a19dc59a12d3a1f1e89863b6ac4f551478b68399730ab906ab7d954741f"
+    },
+    "tests/test_turnip_provider.py": {
+      "bytes": 9085,
+      "mode": 292,
+      "sha256": "7ba69f8d892bfec533d9bca81c23336e3835a2c6df5a0e0ddc6b206866c6e2e0"
+    },
+    "tests/test_wine_adaptations.py": {
+      "bytes": 2795,
+      "mode": 292,
+      "sha256": "ec9f2a6bae9940fae8fbcb11a8b749945e95e2e374cba4762800e34972b08898"
+    },
+    "tests/test_wine_adoption.py": {
+      "bytes": 7390,
+      "mode": 292,
+      "sha256": "2fc9536041eb42f900c6a620e38c4b5a0791189a0cd01f04c793b329434e301a"
+    },
+    "tests/test_wine_arm64_candidate.py": {
+      "bytes": 13381,
+      "mode": 292,
+      "sha256": "227bd697bf86c1e28069e0e087f68a6d57ba467fc7e3fb848d4c806945145581"
+    },
+    "tests/test_wine_arm64_preparation.py": {
+      "bytes": 3512,
+      "mode": 292,
+      "sha256": "839cfe59ef7785c2136d6400bfa2ea9d32fb84ae85f9db49915c3542d97525e4"
+    },
+    "tests/test_wine_arm64_requalification.py": {
+      "bytes": 5564,
+      "mode": 292,
+      "sha256": "ea06ef1c72d7de71f49d4c852b1610ac412e6a8c01f67bbb1d4ea08116427be6"
+    },
+    "tests/test_wine_arm64_sources.py": {
+      "bytes": 14513,
+      "mode": 292,
+      "sha256": "01ae410d228541388b6f43e429598278e43b0843aba1b1011b4d97e7ff031399"
+    },
+    "tests/test_wine_audio.py": {
+      "bytes": 6864,
+      "mode": 292,
+      "sha256": "1110e3c2bb9a40b54786a49a577aa6a9dec0df677369d6e690aa44bf5559b0be"
+    },
+    "tests/test_wine_auth.py": {
+      "bytes": 5043,
+      "mode": 292,
+      "sha256": "e4ef30e9c2081d84a602c17e6f3c37af7fe2eee8af8a8d071743c7393b688b46"
+    },
+    "tests/test_wine_cohort_apk.py": {
+      "bytes": 11218,
+      "mode": 292,
+      "sha256": "ce95c3001bad8faea2e1b3992a9d0599ba1dbb4c8a3e15a66fb8ccea35d29a6b"
+    },
+    "tests/test_wine_cohort_release.py": {
+      "bytes": 6346,
+      "mode": 292,
+      "sha256": "1c88964ac86aba41597a46fc89bf7219236dc9a42a3421bbe9663e34d2374379"
+    },
+    "tests/test_wine_private_pe_copy.py": {
+      "bytes": 8846,
+      "mode": 292,
+      "sha256": "5d306507a502c591a7d7e7c4ba125dcfcafa582e3d35b2667b76250eec4206fe"
+    },
+    "tests/test_wine_private_pe_fixture.py": {
+      "bytes": 2790,
+      "mode": 292,
+      "sha256": "886fe2334501a18a6c8edf10cad8008446ac50671a58da1df0d59c73cb7c33ea"
+    },
+    "tests/test_wine_provider_measurement.py": {
+      "bytes": 18755,
+      "mode": 292,
+      "sha256": "836713cf926b0ada7190067460ac186db1a4da554fc71d37c6c13a0da536d164"
+    },
+    "tests/test_wine_qualification.py": {
+      "bytes": 29712,
+      "mode": 292,
+      "sha256": "52465bf0a23bec43d89ee9c94b79ae6592547dc3149bbdbbf8734c5ab4f3d565"
+    },
+    "tests/test_wine_release.py": {
+      "bytes": 12579,
+      "mode": 292,
+      "sha256": "7678ea5653529f6db01c6ed0e38f48244c90f65d33c8adf3f2055703c9ab76a7"
+    },
+    "tests/test_wine_source_recovery.py": {
+      "bytes": 6420,
+      "mode": 292,
+      "sha256": "d6c0414da7eb433e0433d0246bb171000f05388fdf5682fa48b27e8961dd4e22"
+    },
+    "tests/test_wine_x11_closure.py": {
+      "bytes": 4240,
+      "mode": 292,
+      "sha256": "35a705538180af4d77be9191e260599d105b321fe7fb9ad2c9772e11792c8777"
+    },
+    "tests/test_x11_input_qualification.py": {
+      "bytes": 18626,
+      "mode": 292,
+      "sha256": "48fb9e9ae1e503f57bf04f548d6192b640cfae29ab27f90bde088a7e9e4dbda9"
+    },
+    "tools/android_elf.py": {
+      "bytes": 3738,
+      "mode": 292,
+      "sha256": "3d85699c1e66cfbd4c012045848dcf925a73656fe356dee43fb2de4cccdac136"
+    },
+    "tools/android_jni_elf.py": {
+      "bytes": 2887,
+      "mode": 292,
+      "sha256": "8ca8e69f7f141cb40b018c7cf4ed1cd29768d9396a536977f811e1cfa65edfe9"
+    },
+    "tools/auth_protocol.py": {
+      "bytes": 7780,
+      "mode": 292,
+      "sha256": "1b2c98d097e276cf46a4703ea84fbbff4cf1fe86052555639264dc96ad9d6b54"
+    },
+    "tools/build_android_mysql_probe.py": {
+      "bytes": 9284,
+      "mode": 292,
+      "sha256": "ece850eb73804ac85e5ce511c5d7085e35420ea2b1f628222daf813a149d84ed"
+    },
+    "tools/build_android_proot.py": {
+      "bytes": 12917,
+      "mode": 292,
+      "sha256": "80d460817977a7df0f11cc188c568633fa03a0cd6e7948e395e02995bee9832a"
+    },
+    "tools/build_android_proot_probe.py": {
+      "bytes": 13880,
+      "mode": 292,
+      "sha256": "de7b6d905b334d00cf40fbb71df54944032b48c29f51e56dbfca47d29f1ccf57"
+    },
+    "tools/build_android_wine_probe.py": {
+      "bytes": 10573,
+      "mode": 292,
+      "sha256": "c219a48df3426a59993effde51e7b6bc30daba7c0ccc665642acb998613ea7e0"
+    },
+    "tools/build_ordered_extractors.py": {
+      "bytes": 19603,
+      "mode": 292,
+      "sha256": "229578c92137db8ea7e121b5e68cd5c95500a661dc875bd4cc0b86626d102a57"
+    },
+    "tools/build_playerbots_component.py": {
+      "bytes": 16495,
+      "mode": 292,
+      "sha256": "7e2182e308cd34fd6a10010f797f9ed352d0726963566e28a5d240d6f4a156e8"
+    },
+    "tools/capture_ordered_extractor_dependencies.py": {
+      "bytes": 25153,
+      "mode": 292,
+      "sha256": "8e8aac7b0c96bb8e7bc42d9cd0d4506298fc2015f61ad58fbb66b1670fe07bec"
+    },
+    "tools/check_assets.py": {
+      "bytes": 305,
+      "mode": 292,
+      "sha256": "fb10e8dc419cdca77d3379dac9f2cc11d91ac263fa3dec58963442a6ce0f65af"
+    },
+    "tools/check_process_owner.py": {
+      "bytes": 4356,
+      "mode": 292,
+      "sha256": "23ce067415c0a764d6d318964251edb0864999aaca8d05b3d398647a1a3446ca"
+    },
+    "tools/check_proot_probe_pidfd.py": {
+      "bytes": 1565,
+      "mode": 292,
+      "sha256": "3d75dbe99089a7463d34bc8e7860a4cc91deb2a0b0338f0afe4d2f58072b3af0"
+    },
+    "tools/client_auth_contract.py": {
+      "bytes": 3920,
+      "mode": 292,
+      "sha256": "a08237be2369d61a5dc504ae69c9d2f5154eb5f3d05db62f1b2a7a6b468fd3e1"
+    },
+    "tools/dependency_publication.py": {
+      "bytes": 4961,
+      "mode": 292,
+      "sha256": "74c050586df3ba3c689d2b0ac936031388d878527c21cfdb4682b5c835a740ba"
+    },
+    "tools/fetch_android_wine_probe.py": {
+      "bytes": 5060,
+      "mode": 292,
+      "sha256": "1ad7cbe7f030eecffe49aa778a1507db701f90a373094dd13f65048b210ea3bd"
+    },
+    "tools/fetch_sources.py": {
+      "bytes": 7393,
+      "mode": 292,
+      "sha256": "19ac32b6bcc9c869e7785f19e7bb1f8492f7b94bd839aa9c30a02eae476c598c"
+    },
+    "tools/fetch_wine_arm64_release.py": {
+      "bytes": 8229,
+      "mode": 292,
+      "sha256": "b19359fbb7c79b2931f6dcef9a47f8d1fd131f4dbbfee2d2da55cb5b089ac745"
+    },
+    "tools/fetch_wine_cohort.py": {
+      "bytes": 9906,
+      "mode": 292,
+      "sha256": "5ea874b046713d5038302dbba5cbb3f12f3319f64b6b5a8782095bedc5fdfc16"
+    },
+    "tools/initialize_server_schema.py": {
+      "bytes": 1159,
+      "mode": 292,
+      "sha256": "fe61c55e83838b41177d6c6d042c300f3a19c7fac26a4a0645ca4d34d8dae1db"
+    },
+    "tools/manifest_server_content.py": {
+      "bytes": 23861,
+      "mode": 292,
+      "sha256": "12529786b59baee29e5f778cb8c0a557f005baa4a7b875d80f67e5d1e9458289"
+    },
+    "tools/manifest_server_modules.py": {
+      "bytes": 9119,
+      "mode": 292,
+      "sha256": "4e614b8c860ba2d9ef69d595f6fbbd51df440993f8c7a9a8e85d5d99533b9166"
+    },
+    "tools/measure_playerbots_programs.py": {
+      "bytes": 16660,
+      "mode": 292,
+      "sha256": "b395183aa96ebaca13a6ce2ff03209bcdd19c08b4187294f31c058f06f8a5c53"
+    },
+    "tools/measure_server_data_tools.py": {
+      "bytes": 5860,
+      "mode": 292,
+      "sha256": "15a031626cb7a030cc9c17c218b11ef20709577368e1ecf79bf2987c494bd6e7"
+    },
+    "tools/measure_wine_provider_candidates.py": {
+      "bytes": 18354,
+      "mode": 292,
+      "sha256": "fd2f479a51dff701e6224551905b4f0ceb6f0dc881465bc16fbae77325fda8ce"
+    },
+    "tools/measure_wine_x11_closure.py": {
+      "bytes": 9859,
+      "mode": 292,
+      "sha256": "1620db2b642c7d1fb4f8832feb9f7016b5054a8579ae46755c2370fb6d7eb0cc"
+    },
+    "tools/mysql_init_trace.py": {
+      "bytes": 14249,
+      "mode": 292,
+      "sha256": "d8044d2d67e86bb59f7e025b30028ef73232f611af881900d27a251fe0690d70"
+    },
+    "tools/owned_process_group.py": {
+      "bytes": 2795,
+      "mode": 292,
+      "sha256": "c19ed5c05e94d7b537df1055983fca75e20447f594419084f2207d60f99f138e"
+    },
+    "tools/package_android_wine_runtime.py": {
+      "bytes": 9545,
+      "mode": 292,
+      "sha256": "78c845f1078392ccbab73fc002610b027672c7a89b2bf75b45dd033efe32a071"
+    },
+    "tools/package_android_wine_sources.py": {
+      "bytes": 18254,
+      "mode": 292,
+      "sha256": "ce522f5ed3f7d45f2ffae4617f25a756b8d10a2af9d834402b0cabebd4e82d5e"
+    },
+    "tools/package_client_sources.py": {
+      "bytes": 9914,
+      "mode": 292,
+      "sha256": "2edfdbfed21f26b5dc15f72df241444864764af792b80a373d46fcf794976109"
+    },
+    "tools/package_combined_android.py": {
+      "bytes": 21542,
+      "mode": 292,
+      "sha256": "cd14804142943f6dec3cd2e2488f04ac32f36fb458dae2efed97009771b604ef"
+    },
+    "tools/package_playerbots_helper.py": {
+      "bytes": 21891,
+      "mode": 292,
+      "sha256": "937e10e094eeb3b0ca9b533ebd974dfd00115de9b38dbb50f6e1ff8dab626a50"
+    },
+    "tools/package_server_content.py": {
+      "bytes": 19732,
+      "mode": 292,
+      "sha256": "7a23e7e2b40c55a5a581be825d91d95411ed70be6444d1a838ed468edc4069e6"
+    },
+    "tools/package_server_data_tools.py": {
+      "bytes": 21744,
+      "mode": 292,
+      "sha256": "7f8ae510a61bca01f94422c797bd7ce7810bacebf60a8a74185b51dc2f2124bb"
+    },
+    "tools/package_server_engine.py": {
+      "bytes": 14277,
+      "mode": 292,
+      "sha256": "865d853048a868b0c9c4f7985ed63b408ff09168cbf4ea61f09402bc4eb6dd3c"
+    },
+    "tools/package_server_engine_notices.py": {
+      "bytes": 17743,
+      "mode": 292,
+      "sha256": "c82c88241b3c519b578685e1e3161ba5c6a3b5c4b08087fa0254434af3ebd561"
+    },
+    "tools/package_server_engine_source_inputs.py": {
+      "bytes": 23166,
+      "mode": 292,
+      "sha256": "4dd6a9be5bfda869a9cff48c93f6190753f04ad39339908a852c55f9e6298934"
+    },
+    "tools/package_server_extractors.py": {
+      "bytes": 21336,
+      "mode": 292,
+      "sha256": "6cb02243bb03f6ca6631db8a83c4481f635e5d446fda257b8092ad6573f18eae"
+    },
+    "tools/package_server_runtime.py": {
+      "bytes": 13619,
+      "mode": 292,
+      "sha256": "e3fca010d44223bab12f34fe5f8bc984e21e518419f60edf72acdd6299fb93f7"
+    },
+    "tools/package_shader_tools.py": {
+      "bytes": 15382,
+      "mode": 292,
+      "sha256": "eaafa175309888868493b4c384d87b369d5c1867fd3a55b41fd128e62c978cc4"
+    },
+    "tools/package_wine_arm64_candidate.py": {
+      "bytes": 16986,
+      "mode": 292,
+      "sha256": "72206aa78302bc1bd707d8a8cd02bdd042d57c02b93873cb463564f01d10e04b"
+    },
+    "tools/pcm_capture.py": {
+      "bytes": 12116,
+      "mode": 292,
+      "sha256": "6db7a0d089ad769be0de6a44678d628efb1498536be2fb4dd305db20bea8a307"
+    },
+    "tools/plan_wine_cohort_adoption.py": {
+      "bytes": 4635,
+      "mode": 292,
+      "sha256": "2ed81a60eed573c73f3c5a204301f5d84918e414202bb7a3020d99a3837984c8"
+    },
+    "tools/prepare_client_auth_inputs.py": {
+      "bytes": 6248,
+      "mode": 292,
+      "sha256": "f8b22946780825e87a461ec2d3b591d8ae515598efcb953e11390e31a3a5250f"
+    },
+    "tools/prepare_client_auth_tools.py": {
+      "bytes": 9940,
+      "mode": 292,
+      "sha256": "370442a8d5bf89a5f0fb2b0acbaadf49777d092931210607b4ce67d014d3408a"
+    },
+    "tools/prepare_data_tools_provider.py": {
+      "bytes": 7232,
+      "mode": 292,
+      "sha256": "fec52a65c83b2bdc3ee8eeaa1765b10a1e0cf6286a1b015c00e9bd7a9e71ace4"
+    },
+    "tools/prepare_matched_client_auth.py": {
+      "bytes": 7782,
+      "mode": 292,
+      "sha256": "e9afb1bc2956e1bfa73f2939abcd8ae8b00e0d8962a5d76fc54c411df0d707f2"
+    },
+    "tools/prepare_ordered_extractor_sources.py": {
+      "bytes": 7561,
+      "mode": 292,
+      "sha256": "56ab6c42171f1896e887cf27094d4703cdd0278630835930c68e5cb8d72c1b4d"
+    },
+    "tools/prepare_ordered_extractors.py": {
+      "bytes": 5921,
+      "mode": 292,
+      "sha256": "2368ae56924c68f9ea5d91cf2fd5a79e6059f0198643923b204be9e7f3252444"
+    },
+    "tools/prepare_playerbots_helper.py": {
+      "bytes": 17849,
+      "mode": 292,
+      "sha256": "525647f8104ac780ca3f0d8380290520bc18d4d61a371c8290819512f9152ffc"
+    },
+    "tools/prepare_playerbots_runtime.py": {
+      "bytes": 5304,
+      "mode": 292,
+      "sha256": "8c38c168e0a382776d35fd99dbac97d6eb1c0d494b473d3ad9c7e3dbbc18e931"
+    },
+    "tools/prepare_playerbots_source_companion.py": {
+      "bytes": 7566,
+      "mode": 292,
+      "sha256": "f7b074026466ee5926b6a2b64a5d260a1b87d3e3d3cfe1d9c69798dcacf561ed"
+    },
+    "tools/prepare_runtime.py": {
+      "bytes": 22126,
+      "mode": 292,
+      "sha256": "113ae7612cba7f557fab79550448578a9a6b8ceb674cff80b38fcf40e8257078"
+    },
+    "tools/prepare_server_data_tools.py": {
+      "bytes": 7934,
+      "mode": 292,
+      "sha256": "fbc99e67e402831bc31439fd1f2150367997315ec6a35ba01dfee50ab06e833b"
+    },
+    "tools/prepare_server_dependency_image.py": {
+      "bytes": 5897,
+      "mode": 292,
+      "sha256": "f025bd7ee5d3c40ea8eefe173f53b1a81e933b26ef57a34674ccab251e4a929e"
+    },
+    "tools/prepare_server_engine_inputs.py": {
+      "bytes": 10113,
+      "mode": 292,
+      "sha256": "89d8ff18aa1a3f5c22c9584a1c3529f85e0240d37d4a54e8bae900fa00c0e3c6"
+    },
+    "tools/prepare_server_installation_inputs.py": {
+      "bytes": 10930,
+      "mode": 292,
+      "sha256": "2626d10fd325a218b49da00dea95f9cd3dee30b333704ddc654e912660859330"
+    },
+    "tools/prepare_server_isolated_build.py": {
+      "bytes": 16718,
+      "mode": 292,
+      "sha256": "1415d59a493ee30aec53aa1653e2ec0f13b8ec0aeff6bfa39a74f9415a8c3b36"
+    },
+    "tools/prepare_server_isolated_sources.py": {
+      "bytes": 22156,
+      "mode": 292,
+      "sha256": "9db59d2ecb3e9de9ad9bdb6e1e6696e9b6f9ce28b212862b4388f6f24d46da0d"
+    },
+    "tools/prepare_server_requalification.py": {
+      "bytes": 14320,
+      "mode": 292,
+      "sha256": "43318c00c97e60a08735fbe422aa599f38c698c980484b93b6f48a16892da097"
+    },
+    "tools/prepare_wine_arm64_adoption.py": {
+      "bytes": 11543,
+      "mode": 292,
+      "sha256": "7fd36fae7be5986e637bf8aaf6d54f6d134ea160e11f143cb2ed366f003de59d"
+    },
+    "tools/prepare_wine_arm64_candidate.py": {
+      "bytes": 5372,
+      "mode": 292,
+      "sha256": "57ef82fc3c54caf39aace2c08fcdc3b986a4efc128d6dc9dc3f8b13bc1bc5f2a"
+    },
+    "tools/preserve_android_mysql_probe.py": {
+      "bytes": 6607,
+      "mode": 292,
+      "sha256": "15d81568176f58bc7bb2fbc4340bab9dba7d481f6bcf68f41563a210a4f1f21a"
+    },
+    "tools/provider_client_runtime.py": {
+      "bytes": 22111,
+      "mode": 292,
+      "sha256": "8d9d6939ce79b533ad184d8118a4e87cda3aa8bcf72d2bcd19740186a3f68586"
+    },
+    "tools/provider_guest_bridges.py": {
+      "bytes": 16549,
+      "mode": 292,
+      "sha256": "e5e765245080541c6e61d9db9eeb5bc530bf373f5e770d0eadc9717a6ab41d03"
+    },
+    "tools/provider_playerbots_programs.py": {
+      "bytes": 14941,
+      "mode": 292,
+      "sha256": "f185d46d922e5c57e31d5212e6069ed637d1df64152422853fb8e37d42a74822"
+    },
+    "tools/provider_server_content.py": {
+      "bytes": 13474,
+      "mode": 292,
+      "sha256": "51b956abd0e3f5bbaf68dbf822b931d906009e9955ae1e7177f7c3112dbdd34f"
+    },
+    "tools/provider_server_data_tools.py": {
+      "bytes": 23987,
+      "mode": 292,
+      "sha256": "bb980407a91cefc6f9b2ddceedf648d944c5904fa4287f8227ca3ecdedc1507d"
+    },
+    "tools/provider_server_extractors.py": {
+      "bytes": 24407,
+      "mode": 292,
+      "sha256": "8eff2fa7c852ff701822599f5c998ac2f6cefad265ab721802d2b1fc7fe39926"
+    },
+    "tools/provider_server_programs.py": {
+      "bytes": 26581,
+      "mode": 292,
+      "sha256": "0ea0cccb0e532efd4d9a3ab2285f9f370f220b9c702185fc1e6d0c5ff2ed80af"
+    },
+    "tools/provider_server_runtime.py": {
+      "bytes": 10458,
+      "mode": 292,
+      "sha256": "64d52409befc871d90591753a522b8f7627787757869c2b219c2c6510ed7a0cb"
+    },
+    "tools/provider_shader_tools.py": {
+      "bytes": 13986,
+      "mode": 292,
+      "sha256": "be58214ab4bae55eaff7654edceace6b032de49a6b1bcb12be5995a967eaaff9"
+    },
+    "tools/provider_turnip.py": {
+      "bytes": 19300,
+      "mode": 292,
+      "sha256": "8bcc15483ba2f710bda99836788abfbd3b28311cbfb0717eb2a78dc86f970048"
+    },
+    "tools/qualify_android_installer.py": {
+      "bytes": 8486,
+      "mode": 292,
+      "sha256": "a1ff3463c0911613087e2af12f51c3afeae8f911530c090df043b73c6545f6e9"
+    },
+    "tools/qualify_android_mysql.py": {
+      "bytes": 11098,
+      "mode": 292,
+      "sha256": "19d0c7ce57b2982c98c8a0857eb5c99ea76794d9c7ff957b892885bec6c94d49"
+    },
+    "tools/qualify_android_owner.py": {
+      "bytes": 9385,
+      "mode": 292,
+      "sha256": "2d949829d32d550d5ee8b3210cb7d2cea31d45aa96d8f32a9bdcf5745da787c7"
+    },
+    "tools/qualify_android_presentation.py": {
+      "bytes": 7766,
+      "mode": 292,
+      "sha256": "8df19a03523705010cb405a0944f61c38252cd47fd299371a62d01dc20dd77b7"
+    },
+    "tools/qualify_android_proot.py": {
+      "bytes": 7776,
+      "mode": 292,
+      "sha256": "3b4d82b2873f584789425e798a1c74fb77a429c5868091a7d3ad52857e207de8"
+    },
+    "tools/qualify_android_wine.py": {
+      "bytes": 8517,
+      "mode": 292,
+      "sha256": "de0939af30d564338368f0b6117fa6a18f293c3c8f7b13e05adc265982570ed7"
+    },
+    "tools/qualify_appearance_schema.py": {
+      "bytes": 10488,
+      "mode": 292,
+      "sha256": "39dc6e90b21fa65f60a6193060b02c44e343921796436b6c8c0b8c1c95fb50a7"
+    },
+    "tools/qualify_authserver.py": {
+      "bytes": 16044,
+      "mode": 292,
+      "sha256": "67431c9efee7cba7b6817aeda631063888d1442d1f778041fd000b9170252d58"
+    },
+    "tools/qualify_base_sql.py": {
+      "bytes": 20438,
+      "mode": 292,
+      "sha256": "47c38418695664597b4310e193007daf8de1c2e5dd6b3302fe8d96b7e0b2b677"
+    },
+    "tools/qualify_client_auth.py": {
+      "bytes": 29905,
+      "mode": 292,
+      "sha256": "e6c6e18308fdb637411859ca13e99932b283327005ef7d3e08b6c4acb60bbd83"
+    },
+    "tools/qualify_dbimport.py": {
+      "bytes": 27741,
+      "mode": 292,
+      "sha256": "06dc3ee4d639b2ba818377140e114e441c9aaa07ecae2b8c70ec57b6cd04c158"
+    },
+    "tools/qualify_java_server_installation.py": {
+      "bytes": 14807,
+      "mode": 292,
+      "sha256": "67f1b7d5b37a9d9eab2f00b86a163826cb964af663f548ce8a495499ccbed895"
+    },
+    "tools/qualify_local_account.py": {
+      "bytes": 18272,
+      "mode": 292,
+      "sha256": "e621252c642d339329cdf482bcfb0735108f520522275d3e4bb482be65c16c4b"
+    },
+    "tools/qualify_module_configurations.py": {
+      "bytes": 7339,
+      "mode": 292,
+      "sha256": "c48df506696eb04a5f6d6456a150a6b71a67c4577a8cd9640c225c3f41664847"
+    },
+    "tools/qualify_mysql_backup.py": {
+      "bytes": 25774,
+      "mode": 292,
+      "sha256": "676835ce1cdb0f1e7f76561b5a920c402ec934b7480c10d995b5a8bd288a7cfe"
+    },
+    "tools/qualify_playerbots_component.py": {
+      "bytes": 16298,
+      "mode": 292,
+      "sha256": "7216080fd7aa1216d835c8342e33efdbd384072b0667d37e6cec79fd5406f632"
+    },
+    "tools/qualify_playerbots_database.py": {
+      "bytes": 14000,
+      "mode": 292,
+      "sha256": "993311727784f7c8906b272c798be1fef4dc12eb5112782ba3578eeed41dafb5"
+    },
+    "tools/qualify_playerbots_helper_sources.py": {
+      "bytes": 20996,
+      "mode": 292,
+      "sha256": "34aa505bb6cd902e912f5f8e72c6dcd6f14a3def62f20ab5428e105c0b0ac162"
+    },
+    "tools/qualify_playerbots_programs.py": {
+      "bytes": 7486,
+      "mode": 292,
+      "sha256": "ebe8e7efc27c9edb361df5cc46cb71612abfb5f3598a02327885f38add556f16"
+    },
+    "tools/qualify_proot_ownership.py": {
+      "bytes": 11483,
+      "mode": 292,
+      "sha256": "cb701341ed863efdee672245a03f3b1d39a77d25da384ffd45b45181f291ab4b"
+    },
+    "tools/qualify_server_data_tools.py": {
+      "bytes": 27260,
+      "mode": 292,
+      "sha256": "ed22b55b6b0afa16a906d3fb4fbdd3e15fceffafe47d926f7ae8a03e3db047fe"
+    },
+    "tools/qualify_server_installation.py": {
+      "bytes": 26801,
+      "mode": 292,
+      "sha256": "e37b9c724f91b81d98859aff4b1cde431c185e4d45f096be347c705273ec6d9a"
+    },
+    "tools/qualify_server_isolated_build.py": {
+      "bytes": 30967,
+      "mode": 292,
+      "sha256": "9ec15b40b97d5c42b73bd29d956ab412ad2147f10a580fc977649deb83242ba2"
+    },
+    "tools/qualify_server_providers.py": {
+      "bytes": 12068,
+      "mode": 292,
+      "sha256": "d12009a946ed84360cf124b8b7dff42d69d3159ae3008bfd6b78959c98d04176"
+    },
+    "tools/qualify_wine_arm64.py": {
+      "bytes": 48065,
+      "mode": 292,
+      "sha256": "c1082c70f5ff700cd7b4f36e80aab672592def93731647066dc45f24806acc6c"
+    },
+    "tools/qualify_x11_input.py": {
+      "bytes": 26064,
+      "mode": 292,
+      "sha256": "9aa51922fe176edb8069c13c283fc649079f1fe2c57af2157966c0b0485f5a1c"
+    },
+    "tools/recover_server_source_retention.py": {
+      "bytes": 17493,
+      "mode": 292,
+      "sha256": "cb61c9805d5b2c0051e09466ba0c02abfb6eb60cfa41fce52780028b8e9adb9e"
+    },
+    "tools/recover_wine_provider_sources.py": {
+      "bytes": 6557,
+      "mode": 292,
+      "sha256": "adb93f786286c0685c2cd7e11c2c46e85f9dc4d0d0b6ae8b2d9a828087a62ff0"
+    },
+    "tools/release_client_inputs.py": {
+      "bytes": 20299,
+      "mode": 292,
+      "sha256": "35838d0787d1b07b2ac2b89892444b92feb1ec47930c447d0b3abc9534cf44cb"
+    },
+    "tools/release_guest_bridges.py": {
+      "bytes": 12919,
+      "mode": 292,
+      "sha256": "9cc3051904d37197cf099224541486e0db808175dd95e70894ab72e7e6f40363"
+    },
+    "tools/release_local_server_components.py": {
+      "bytes": 35256,
+      "mode": 292,
+      "sha256": "43ffa231c94898b76bd38653e45d672250d28c183eecf9ab65f901e811403736"
+    },
+    "tools/release_server_dependencies.py": {
+      "bytes": 34132,
+      "mode": 292,
+      "sha256": "d71bb10576bfbae8a2eba23b34eeb982eb26326f69cf91c142fdfa146f9dde0a"
+    },
+    "tools/release_shader_tools.py": {
+      "bytes": 18098,
+      "mode": 292,
+      "sha256": "00f0761351bbef8a54b491a6e4fe1913e5e5c5f48975ee52e00d3e3852e2cb8c"
+    },
+    "tools/release_wine_arm64.py": {
+      "bytes": 16963,
+      "mode": 292,
+      "sha256": "3903fffff17dccad2400bb2be3329064d44be626eb04dde640019dd6183f2e98"
+    },
+    "tools/release_wine_cohort.py": {
+      "bytes": 32825,
+      "mode": 292,
+      "sha256": "9c6c1c23ca89022baeca9ebe3e32c744311c406ab442f911e2252e00302d703e"
+    },
+    "tools/render_server_config.py": {
+      "bytes": 3649,
+      "mode": 292,
+      "sha256": "8abc28eb08184cf18b0dc057e48a43a279468211461c2a738155a07d85658a2c"
+    },
+    "tools/seal_ordered_extractor_sources.py": {
+      "bytes": 40835,
+      "mode": 292,
+      "sha256": "6015f4733ef053d331271b481678a0aaeee5c659c603b447afd6b47bdcdea516"
+    },
+    "tools/seal_playerbots_helper_sources.py": {
+      "bytes": 26488,
+      "mode": 292,
+      "sha256": "3dd835975da1265748baf709c95e80c0eb2478dd9f36f6e4999654e2ccc243f6"
+    },
+    "tools/server_engine_elf.py": {
+      "bytes": 14103,
+      "mode": 292,
+      "sha256": "fa98429cc59e18c16f81f9ba2be99ab204b9cb8e2e1d3d1a4ce4d62aec7dd989"
+    },
+    "tools/server_provider_sources.py": {
+      "bytes": 3103,
+      "mode": 292,
+      "sha256": "b2b65c40cfdb26b6d7471d5070cb61f521fc82515a22fd497c07e97c444adc64"
+    },
+    "tools/sign_android_apk.py": {
+      "bytes": 15054,
+      "mode": 292,
+      "sha256": "f12b21970611c46fcc56dea36e46ddc9cfa2e55353a7e507e403da9e9932acc3"
+    },
+    "tools/verify_android_mysql_probe.py": {
+      "bytes": 8006,
+      "mode": 292,
+      "sha256": "acb0b354745b48146060b1c105ca76dbea2b1fd8a0cdc9e8c0c38590b7078867"
+    },
+    "tools/verify_android_proot.py": {
+      "bytes": 5769,
+      "mode": 292,
+      "sha256": "92163f63c5c0350c23f5c0893d7a293a4c4e24fe1ad925a021e309efa22613eb"
+    },
+    "tools/verify_android_proot_probe.py": {
+      "bytes": 13031,
+      "mode": 292,
+      "sha256": "abd499af52fdb23746483f1b90afa32b6541304f1116bcea4c2491af912d2f50"
+    },
+    "tools/verify_android_wine_probe.py": {
+      "bytes": 4596,
+      "mode": 292,
+      "sha256": "a00d28e87b2b139cc6858a1273990113012a397a261364813a6ebcffa22b3770"
+    },
+    "tools/verify_client_auth_tools.py": {
+      "bytes": 6448,
+      "mode": 292,
+      "sha256": "c1251ea127e2cc973178c8027deee933de5c9abf49949883df3d2c05fd3d9c0c"
+    },
+    "tools/verify_playerbots_reference.py": {
+      "bytes": 6537,
+      "mode": 292,
+      "sha256": "29e18c1367d905443664437a24cbddfa5bc701f26fad81fa9fe93ced369c8c8f"
+    },
+    "tools/verify_protocol.py": {
+      "bytes": 6908,
+      "mode": 292,
+      "sha256": "2e477e4c03d0a8eb1fe114a366a059ae517bed81b4fb707ace773b89f8f1dcc4"
+    },
+    "tools/verify_server_build.py": {
+      "bytes": 15540,
+      "mode": 292,
+      "sha256": "9d3096e8cc1d2a650353886800e8192dfe78f0b352fede322a39002e545b4152"
+    },
+    "tools/verify_server_dependency_image.py": {
+      "bytes": 6097,
+      "mode": 292,
+      "sha256": "62e700db6c333c14b220aad126603ce1a314f62f1d17836b04e2f43358dd2d14"
+    },
+    "tools/verify_server_engine_runtime.py": {
+      "bytes": 11753,
+      "mode": 292,
+      "sha256": "ca765bc0776bfea84fc23b9ce037949fd8191fcf22ef678e79dfd729a4d47cf0"
+    },
+    "tools/verify_target_dependency_observation.py": {
+      "bytes": 17378,
+      "mode": 292,
+      "sha256": "77d0f6a00c9a6ef49a128a4445f51967718922bfa9c1ca476debd451d87462b3"
+    },
+    "tools/verify_wine_arm64_sources.py": {
+      "bytes": 8852,
+      "mode": 292,
+      "sha256": "abeb2cc7f1a04feac3c3910aa9159c05450c3cae4aada0bc80d8e1d05cc464b5"
+    },
+    "tools/verify_wine_cohort_apk.py": {
+      "bytes": 9988,
+      "mode": 292,
+      "sha256": "36d9b934eab34ca7c944a41fe5f2cba020b6ef21324f640ace855e4bb207689f"
+    },
+    "tools/wine_arm64_requalification.py": {
+      "bytes": 12150,
+      "mode": 292,
+      "sha256": "12b84a1301046cc11a703e892f6bc3c1c96aa061bd97737414db57f9542a8505"
+    },
+    "tools/wine_audio.py": {
+      "bytes": 7781,
+      "mode": 292,
+      "sha256": "43df0641a4d810b6eaabb9da77ea0d4d957358fa19d585589088d913ccc7939f"
+    },
+    "tools/wine_auth.py": {
+      "bytes": 6138,
+      "mode": 292,
+      "sha256": "8986b3a75a4e6c33ded38dcb6935b465bc9c6d045746cf8d398ba03b23646988"
+    }
+  },
   "repository": "Russianranger/esteria_android",
   "scope": "local-server-source-debug-provider-write-once-prerelease",
-  "selectedInputs": null,
-  "state": "pending-measurement",
+  "selectedInputs": {
+    "runtime/server/content-provider.lock.json": {
+      "bytes": 6433,
+      "sha256": "b658e00e2dc602135ede02bd12c7d130dfb0aa00df4b8772c7e8c170d1628a65"
+    },
+    "runtime/server/data-tools-provider.lock.json": {
+      "bytes": 26660,
+      "sha256": "bd3e7039b75eed0c4d09e578f6b9bb5f625543529b1181e3383d5cef6f3a2970"
+    },
+    "runtime/server/data-tools-qualified-artifacts.lock.json": {
+      "bytes": 4061,
+      "sha256": "49eac3b56d8986772fdf6f29221f5fa3935fc3a08c0a04d27a38f55dfcccc616"
+    },
+    "runtime/server/dependency-release.lock.json": {
+      "bytes": 6005,
+      "sha256": "a95a9a5557f3417ff84a1311d1747a0e98db39305505c741b642e2ecef9746d9"
+    },
+    "runtime/server/extractors-provider.lock.json": {
+      "bytes": 27240,
+      "sha256": "4e1cbb5ae03cae59b5732a3ff9a70cd5b1bf46374617bb3c42cbbd55a4c384b7"
+    },
+    "runtime/server/installation-native-inputs.lock.json": {
+      "bytes": 1357,
+      "sha256": "97a954c672194afd83f6aa4d4dd352ec454a19f43e552b98c6c0b86c49a101a0"
+    },
+    "runtime/server/playerbots-helper-source-qualified.lock.json": {
+      "bytes": 5835,
+      "sha256": "ff2d3186f242977df700a4fa399a001f9ff881f0da27d85652cdf9c116654eb8"
+    },
+    "runtime/server/programs-playerbots-provider.lock.json": {
+      "bytes": 38585,
+      "sha256": "71dd8aff3b51348aec0439c4621cd7f153c5d9a1046b65d219b0310edca4254d"
+    },
+    "runtime/server/programs-provider.lock.json": {
+      "bytes": 35697,
+      "sha256": "96bd84c0d01538bb3a49f60e15a17f1f0a601833a8e7d8b21549b82075dd4cc0"
+    },
+    "runtime/server/provider-qualification.lock.json": {
+      "bytes": 5005,
+      "sha256": "6ece52db92c86e7d3b94aef62d2477c43ca674225fe8e3f39b69688b1a464ed0"
+    },
+    "runtime/server/server-build-sources.lock.json": {
+      "bytes": 2170,
+      "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+    },
+    "sources.lock.json": {
+      "bytes": 2170,
+      "sha256": "dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90"
+    }
+  },
+  "state": "owned-draft-bound",
   "tag": "deps-local-server-f35f04d-21ce4e1b-b7d9b72c",
-  "targetCommit": null
+  "targetCommit": "7e498c50cdf55027e679d63e31f0a5e4b117f934"
 }

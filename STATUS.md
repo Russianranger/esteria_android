@@ -135,3 +135,8 @@ Production remains OFF with no app call sites.42 focused Python checks and seven
 Core filesystem groups pass; small metadata allocation no longer reserves the
 64MiB ceiling. A separate source-built Android13 x64 PRoot stat qualification
 workflow is ready; its host fixture/APK checks are not Android execution evidence.
+
+Owned draft429422570 now binds the measured7e498c recipe and all twelve identities.
+Creation41117178780 passed; actual Actions creation and separate UI inspection
+receipts are retained. The frozen uploader remains unchanged. Full stored-byte
+upload and public anonymous verification are still pending.

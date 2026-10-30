@@ -1,0 +1,35 @@
+{
+  "formatVersion": 1,
+  "scope": "independent-actions-draft-ui-inspection",
+  "repository": "Russianranger/esteria_android",
+  "releaseId": 429422570,
+  "targetCommit": "7e498c50cdf55027e679d63e31f0a5e4b117f934",
+  "tag": "deps-local-server-f35f04d-21ce4e1b-b7d9b72c",
+  "metadataOrigin": "actions-created-then-ui-inspected",
+  "draftUiInspected": true,
+  "exactTargetReadBackThroughApi": true,
+  "draftLabelVisible": true,
+  "prereleaseSelected": true,
+  "bodyMatchedMeasurement": true,
+  "initialStoredAssets": 0,
+  "creationWorkflowRun": 41117178780,
+  "creatorRevision": "c1a7740a4bb9e32d57f851ee540807108bfba882",
+  "creationArtifact": {
+    "id": 13004919278,
+    "bytes": 1550,
+    "sha256": "67296ed2dcb1f3e0369f8fa049b3fe75dc8c9f67d46a1e46979b193dadcfe4fa"
+  },
+  "creationReceipt": {
+    "bytes": 3149,
+    "sha256": "eecf6623e561254bddbbd7a169dee2b602aa35297d0ecf768dd42260d221232b"
+  },
+  "body": {
+    "bytes": 901,
+    "sha256": "42d5ed649ee3ff62fba05f4d7e2f27edec42b41a8c56d21a5815e4cd12af8c90"
+  },
+  "releaseUploaded": false,
+  "releasePublished": false,
+  "androidRuntimeQualified": false,
+  "worldQualified": false,
+  "gameplayQualified": false
+}
