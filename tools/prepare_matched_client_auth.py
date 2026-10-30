@@ -55,11 +55,12 @@ def extract(path,output,pin):
     require(not os.path.lexists(output),'matched-auth-server-output-exists')
     client.verify_identity(path,pin['artifact'])
     output.mkdir(mode=0o700)
-    prefixes={'server-engine-package/':'package/', 'engine-inputs/content/':'content/'}
-    wanted='engine-inputs/locked/sources.lock.json';seen=set();total=0
+    prefixes={'server-engine-package/':'package/', 'engine-inputs/content/':'content/',
+              'engine-inputs/locked/':'locked/'}
+    seen=set();total=0
     with client.archives.plain_file(path) as stream,client.checked_zip(stream,(),maximum_entries=4096) as archive:
         for item in archive.infolist():
-            target='locked/sources.lock.json' if item.filename==wanted else None
+            target=None
             for prefix,destination in prefixes.items():
                 if item.filename.startswith(prefix):target=destination+item.filename.removeprefix(prefix)
             if target is None:continue
@@ -71,10 +72,14 @@ def extract(path,output,pin):
             seen.add(target)
     receipt=output/'package/package-receipt.json';lock=output/'locked/sources.lock.json'
     client.verify_identity(receipt,pin['packageReceipt']);client.verify_identity(lock,pin['serverSourceLock'])
+    # Exercise the same pinned patch contract as SQL initialization before any
+    # database/image/guest execution. The unchanged lock alone is insufficient.
+    source,lock_sha=importer.base.locked_source(lock)
+    require(lock_sha==pin['serverSourceLock']['sha256'],'matched-auth-retained-patch-source-lock')
     extraction=engine.extract(receipt,output/'install')
     compiled=json.loads(client.small(output/'install/provenance/server-modules.json'))
     build,_,programs,derivative=importer.select_install(output/'install',compiled,lock,receipt)
-    require(programs==pin['programs'] and build['buildId']==pin['originalBuildId'] and
+    require(programs==pin['programs'] and build['serverSource']==source and build['buildId']==pin['originalBuildId'] and
         derivative['runtimeArchive']==pin['runtimeArchive'],'matched-auth-seven-patch-program-identity')
     content=json.loads(client.small(output/'content/package-receipt.json'))
     require(content.get('sourceLockSha256')==pin['serverSourceLock']['sha256'] and content.get('moduleSelectionVerified') is True and

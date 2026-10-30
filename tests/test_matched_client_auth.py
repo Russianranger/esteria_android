@@ -63,6 +63,34 @@ class MatchedInputs(unittest.TestCase):
                     self.assertRaisesRegex(ValueError,'profile-must-be-selected'):
                 auth.prepared_wine(Path(tmp),Path('/selected'),False)
 
+    def test_retained_seven_patch_contract_is_required_before_engine_extraction(self):
+        lock=selected.ROOT/'runtime/server/server-build-sources.lock.json'
+        source=json.loads(lock.read_bytes())['sources']['server'];patches=source['patches']
+        self.assertEqual(len(patches),7)
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            for index in range(-1,len(patches)):
+                path=root/('input'+str(index)+'.zip')
+                with zipfile.ZipFile(path,'w') as archive:
+                    files={'server-engine-package/package-receipt.json':b'{}',
+                        'engine-inputs/locked/sources.lock.json':lock.read_bytes()}
+                    files.update({'engine-inputs/locked/'+p['path']:(selected.ROOT/p['path']).read_bytes()
+                                  for n,p in enumerate(patches) if n!=index})
+                    for name,raw in files.items():
+                        item=zipfile.ZipInfo(name);item.create_system=3;item.external_attr=(stat.S_IFREG|0o444)<<16
+                        archive.writestr(item,raw)
+                pin=dict(artifact=selected.client.identity(path),serverSourceLock=selected.client.identity(lock),
+                         packageReceipt=dict(bytes=2,sha256=hashlib.sha256(b'{}').hexdigest()))
+                with mock.patch.object(selected.engine,'extract',side_effect=RuntimeError('verified-patches-reached-engine')) as engine:
+                    if index==-1:
+                        with self.assertRaisesRegex(RuntimeError,'verified-patches-reached-engine'):
+                            selected.extract(path,root/('out'+str(index)),pin)
+                        engine.assert_called_once()
+                    else:
+                        with self.assertRaises((ValueError,FileNotFoundError)):
+                            selected.extract(path,root/('out'+str(index)),pin)
+                        engine.assert_not_called()
+
     def test_prepared_candidate_profile_keeps_bound_components_and_preparer_readback(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);(root/'rootfs').mkdir();(root/'rootfs/component').write_bytes(b'actual')
