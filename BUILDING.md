@@ -326,3 +326,13 @@ Omit `serverExtractorsProviderDir` for this profile. Explicit
 `--playerbots-programs-provider` and `--data-tools-provider`; it rechecks every
 selected source/debug companion and the complete actual APK inventory. The
 historical stock profile keeps its original default checker and workflow.
+
+## Supplied server-data preparation
+
+Client generation imports can include the reserved matched server-data namespace
+described in `runtime/server/IMPORTED-SERVER-DATA.md`. Generation input format2
+binds that manifest and exact APK helper generation; ordinary generated data
+keeps format1. Do not alter the helper byte manifest independently of
+ServerDataRunPlan: the actual five-file manifest hash is checked against the
+preparer and APK. Source-side tests use explicitly synthetic tiny headers and
+do not qualify actual maps, DBC rows or world entry.

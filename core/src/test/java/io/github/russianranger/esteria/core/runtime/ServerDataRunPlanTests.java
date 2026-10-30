@@ -30,6 +30,17 @@ public final class ServerDataRunPlanTests {
             plan.requireInputsUnchanged();Files.writeString(work.resolve("data-tools-selection.json"),"[]\n");rejects(plan::requireInputsUnchanged);
             Files.write(work.resolve("data-tools-selection.json"),selection);Files.writeString(game.resolve("current"),"3".repeat(64)+"\n");rejects(plan::requireInputsUnchanged);
             Files.writeString(game.resolve("current"),generation+"\n");
+            Path namespace=Files.createDirectory(game.resolve("generations/"+generation+"/data/EsteriaServerData"));
+            String manifest="format=1\nscope=esteria-user-supplied-server-data\nserverRevision=f35f04d01689f034778e3474b3c820092f51e461\nclientBuild=12340\nmode=overlay\nprovenance=user-supplied-format-checked\nclientProviderOrderSha256=none\n";
+            Files.writeString(namespace.resolve("manifest.properties"),manifest);
+            rejects(plan::requireInputsUnchanged);
+            ServerDataRunPlan supplied=new ServerDataRunPlan(game,tools,work,helpers,pin.toString(),"enUS",1);
+            if(supplied.serverDataPackage==null||!supplied.serverDataPackage.mode.equals("overlay")||
+                    supplied.serverDataPackage.manifestBytes!=manifest.length())throw new AssertionError("Typed supplied package binding missing");
+            supplied.requireInputsUnchanged();
+            Files.writeString(namespace.resolve("manifest.properties"),manifest.replace("mode=overlay","mode=complete"));
+            rejects(supplied::requireInputsUnchanged);
+            Files.delete(namespace.resolve("manifest.properties"));Files.delete(namespace);
             rejects(()->new ServerDataRunPlan(game,tools,work,helpers,pin.toString(),"../enUS",1));
             rejects(()->new ServerDataRunPlan(game,tools,work,helpers,pin.toString(),"enUS",3));
             rejects(()->new ServerDataRunPlan(game,work,work,helpers,pin.toString(),"enUS",1));

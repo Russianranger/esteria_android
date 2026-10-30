@@ -1,5 +1,6 @@
 package io.github.russianranger.esteria.core.runtime.process;
 
+import io.github.russianranger.esteria.core.importer.ContentPackageLayout;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -19,6 +20,7 @@ public final class ServerDataRunPlan {
     public final Path game,tools,work;
     public final String importGeneration,helperGeneration,toolSelectionSha256,locale;
     public final int threads;
+    public final ContentPackageLayout.ServerManifest serverDataPackage;
     public final List<String> arguments;
     public final List<ProotLaunch.Mount> mounts;
     public ServerDataRunPlan(Path game,Path tools,Path work,String helperGeneration,String toolSelectionSha256,
@@ -35,6 +37,7 @@ public final class ServerDataRunPlan {
         importGeneration=ShaderRunPlan.current(game);
         directory(game.resolve("generations"));directory(game.resolve("generations").resolve(importGeneration));
         directory(game.resolve("generations").resolve(importGeneration).resolve("data"));
+        serverDataPackage=ContentPackageLayout.inspectServerManifest(game.resolve("generations").resolve(importGeneration).resolve("data"));
         Path helpers=directory(directory(work.resolve("data-helpers")).resolve(helperGeneration));
         for(String name:Arrays.asList("server_data_generation.py","server_data_preflight.py","shader_generation.py",
                 "extractor_order.py","owned_process_group.py")) {
@@ -52,6 +55,9 @@ public final class ServerDataRunPlan {
     }
     public void requireInputsUnchanged()throws IOException {
         if(!importGeneration.equals(ShaderRunPlan.current(game)))throw new IOException("Import changed during data preparation; outputs retained");
+        if(!java.util.Objects.equals(serverDataPackage,ContentPackageLayout.inspectServerManifest(
+                game.resolve("generations").resolve(importGeneration).resolve("data"))))
+            throw new IOException("Matched server package selection changed during preparation");
         directory(tools);requireSelection();
     }
     private void requireSelection()throws IOException {

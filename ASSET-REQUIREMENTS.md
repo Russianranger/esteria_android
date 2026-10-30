@@ -1,7 +1,7 @@
 # Esteria asset requirements
 
 Audit updated: 2026-10-30 UTC; source availability remains distinct from runtime qualification. Client baseline
-`800cdd272269570a9776d0c170e4828605fc1218`; server baseline
+`471ee42faadf4a97a1d0a86989cf1452621f2dc5`; server baseline
 `f35f04d01689f034778e3474b3c820092f51e461`.
 This inventory distinguishes source availability from usable, matched content. No complete imported
 client/server data set has been qualified in this project. The user's existing 3.3.5a client has not
@@ -62,7 +62,7 @@ It never silently ignores a failed winning provider and emits shaders from older
 The setup integration must stage shader outputs before activating a content generation and retain
 provenance (client revision, translator/tool version, locale and provider fingerprints). It must run
 after custom package changes, not every launch. No shader generation has been performed on the
-user's data yet. Its Android setup adapter and actual full-data qualification remain outstanding.
+user's data yet. Its retained Android setup adapter compiles and passes owner/helper checks; actual full-data generation and rendering remain unqualified.
 
 ## Historical archive integrity evidence
 
@@ -170,3 +170,34 @@ one retained import lease. This adds no game inputs or prepared content: real
 The integrated service/client/control code and complete public runtime source
 cohort add no game assets. Normal client initialization/world, actual generated
 shaders/maps and Esteria content validation still require real imported inputs.
+
+## Matched server-data injection
+
+The Add custom content folder/ZIP route now accepts a strict reserved
+`EsteriaServerData/manifest.properties` plus `EsteriaServerData/data/` namespace.
+See `runtime/server/IMPORTED-SERVER-DATA.md` and the exact manifest example in
+`config/server-data-inputs.example.properties`. This is a user-supplied data
+declaration with format checks, not independent source or gameplay qualification.
+
+Small DBC/continuation overlays are applied to generated data before atomic
+promotion; complete supplied data can bypass conversion when all required
+format families are present. Existing import metadata limits still apply, so
+large precomputed full-world sets can be refused. Generating from imported MPQs
+plus a small matched continuation package remains the bounded supported route.
+A replacement namespace removes stale previous continuations; unrelated client
+overlays retain the current server-data selection. Runtime inputs bind imported
+ancestry, the exact manifest, optional client provider order and preparation
+helper identity. No unavailable bytes are synthesized.
+
+The actual server continuation path is `data/dbc-continuations/`, including its
+optional `wxl-dbc.manifest`. Tier/manifest/project/table order and matching base
+WDBC layouts are validated. This supplies the server module only. Current client
+DBC loading consumes full effective DBC files from the client provider stack;
+server continuation fragments alone do not qualify matching client rows. A
+working custom package must supply those full client tables where required.
+
+Misplaced root MPQs, wrapped custom MPQs and archives outside the actual engine
+provider locations are rejected with corrective instructions. Loose catalogs
+remain client-root Esteria*.bin or virtual Esteria paths inside effective MPQs.
+All content compatibility, coverage and Esteria-specific behavior still require
+the matched user assets and actual game execution.

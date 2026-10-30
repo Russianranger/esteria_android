@@ -99,3 +99,17 @@ The legacy stock workflow remains separate. The new checker requires explicit
 helper+data4 together, rejects stock extractor assets, and performs full optional
 provider source/debug/APK verification. Durable server-component preservation
 is being implemented separately; do not replace exact inputs with floating URLs.
+
+Current source checkpoint adds typed EsteriaServerData input through the existing
+custom-content import route. Read runtime/server/IMPORTED-SERVER-DATA.md before
+changing layouts or input schemas. Preserve v1 generated inputs, strict v2
+manifest/helper/ancestry binding, atomic whole-namespace replacement, actual
+dbc-continuations layout/order and accurate user-supplied provenance. The large
+full-world import metadata ceiling remains explicit. Android/core owners and
+actual APK helper readback pass; actual assets/world remain unavailable.
+
+A source audit found an optional Retail-enabled CascLib path where cached
+versions metadata can re-enable downloads behind mode=local. Current471 runtime
+was built with Retail assets disabled. A client-source fix is being implemented
+and must be qualified before any new binary/cohort or enabled optional asset
+feature is selected. Keep the current matched471 app pin until then.

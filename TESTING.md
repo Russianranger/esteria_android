@@ -186,3 +186,14 @@ APK compilation and lint passed the focused follow-up in25seconds/56tasks.
 Exact local source/log hashes and scope are in
 `runtime/evidence/support-session-integration-host.json`; Android service/world
 execution remains unqualified.
+
+## Matched server-content import checkpoint
+
+The reserved import namespace passes31 real Java importer groups with32MiB,
+including replacement, cancellation/resume, source-format validation, effective
+client MPQ locations and preactivation continuation-manifest checks. Runtime
+preparation, readonly binding, owner fixtures and actual helper/APK readback pass
+67 focused Python checks and106 SDK tasks in66seconds. See
+`runtime/evidence/server-data-input-import-host.json` for exact modified-worktree
+source identities, APK identities and helper hashes. Android, SQL, actual game
+assets/conversion and gameplay are explicitly unqualified by these fixtures.

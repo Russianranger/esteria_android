@@ -32,6 +32,13 @@ public final class ImporterTests {
         run("partial journal record and changed staged file recover", ImporterTests::journalRecovery);
         run("failed overlay preserves current generation", ImporterTests::overlayRollback);
         run("successful overlay preserves base and old bytes", ImporterTests::overlaySuccess);
+        run("misplaced custom packages fail before copying or activation", ImporterTests::overlayLayout);
+        run("custom archive folder locale catalog and UI routes are preserved", ImporterTests::overlayRoutes);
+        run("server package replacement resumes without inheriting obsolete files", ImporterTests::serverReplacement);
+        run("server package manifest and structural failures preserve active data", ImporterTests::serverRollback);
+        run("complete server package requires all recognized groups and matched DBC layouts", ImporterTests::serverComplete);
+        run("server manifest binding is bounded immutable and rejects linked namespaces", ImporterTests::serverManifestBinding);
+        run("continuation manifest ordering rejects unsafe absent and ambiguous inputs before activation", ImporterTests::serverContinuationManifest);
         run("ZIP wrapper extraction and resume", ImporterTests::zipWrapper);
         run("ZIP64 directory accepted without loading asset into memory", ImporterTests::zip64);
         run("ZIP traversal and case collisions rejected", ImporterTests::zipPaths);
@@ -214,6 +221,188 @@ public final class ImporterTests {
         check(new String(Files.readAllBytes(next.resolve("Interface/AddOns/MyAddon/config.txt")), StandardCharsets.UTF_8).equals("new config"), "case-matched overlay replaced file");
         GameDataImporter.Result repeat = folder(im, overlay, GameDataImporter.ImportKind.CONTENT_OVERLAY);
         check(repeat.gameDirectory.equals(next) && repeat.copiedBytes == 0, "repeated same overlay avoids another generation");
+    }
+    private static void overlayLayout() throws Exception {
+        Path root = temp(), source = client(root); GameDataImporter im = importer(root);
+        Path before = folder(im, source, GameDataImporter.ImportKind.BASE_CLIENT).gameDirectory;
+        String[] paths = {"patch-Z.MPQ", "patch-Z.MPQ/Esteria/EsteriaNaga.bin", "Wrapped/Data/patch-Z.MPQ", "Esteria/EsteriaNaga.bin"};
+        for (int i = 0; i < paths.length; i++) {
+            Path overlay = root.resolve("bad-" + i); write(overlay.resolve(paths[i]), paths[i].endsWith(".MPQ") ? mpq() : selectionCatalog());
+            try {
+                im.importFolder(overlay, GameDataImporter.ImportKind.CONTENT_OVERLAY, (p,b,t,n,f) -> { throw new AssertionError("misplaced content copied"); }, GameDataImporter.NEVER_CANCELLED);
+                throw new AssertionError("misplaced content accepted: " + paths[i]);
+            } catch (IOException expected) {
+                check(expected.getMessage().contains(i == 3 ? "Loose Esteria" : i == 2 ? "wrapper" : "under Data/"), "precise layout correction");
+            }
+            check(im.resolveCurrent().equals(before), "misplaced overlay changed active import");
+        }
+        write(source.resolve("patch-Z.MPQ"), mpq());
+        fails(() -> folder(im, source, GameDataImporter.ImportKind.BASE_CLIENT), "base client with unused root MPQ");
+        check(im.resolveCurrent().equals(before), "misplaced root archive in a base client changed active import");
+        for (String path : new String[]{"Wrapped/Data/patch-Z.MPQ", "Data/MyPack.MPQ", "Data/enUS/MyPack.MPQ", "Data/Retail/patch-Z.MPQ", "Wrapped/EsteriaServerData/manifest.properties"}) {
+            Path mixed = root.resolve("mixed-" + Math.abs(path.hashCode()));
+            write(mixed.resolve("Interface/AddOns/Useful/a.lua"), new byte[]{1});
+            write(mixed.resolve(path), path.endsWith(".MPQ") ? mpq() : serverManifest("overlay"));
+            fails(() -> im.importFolder(mixed, GameDataImporter.ImportKind.CONTENT_OVERLAY,
+                    (p,b,t,n,f) -> { throw new AssertionError("provably misplaced mixed content copied"); }, GameDataImporter.NEVER_CANCELLED), "mixed supported and misplaced content");
+            check(im.resolveCurrent().equals(before), "legitimate UI file masked an unused archive or wrapped server package");
+        }
+    }
+    private static void overlayRoutes() throws Exception {
+        Path root = temp(), source = client(root), overlay = root.resolve("routes"); GameDataImporter im = importer(root);
+        folder(im, source, GameDataImporter.ImportKind.BASE_CLIENT);
+        write(overlay.resolve("Data/patch-MyPack.MPQ"), mpq());
+        write(overlay.resolve("Data/enUS/patch-enUS-Zcustom.MPQ"), mpq());
+        write(overlay.resolve("Data/patch-Z.MPQ/Esteria/EsteriaNaga.bin"), selectionCatalog());
+        write(overlay.resolve("Data/patch-Z.MPQ/Character/Custom.blp"), new byte[]{1,2,3});
+        write(overlay.resolve("Data/patch-Z.MPQ/World/Data/nested.blp"), new byte[]{5});
+        write(overlay.resolve("Data/patch-Z.MPQ/EsteriaServerData/virtual.bin"), new byte[]{6});
+        write(overlay.resolve("Data/enUS/patch-enUS-Folder.MPQ/World/Data/nested.blp"), new byte[]{7});
+        write(overlay.resolve("Data/Retail/models/local.bin"), new byte[]{8});
+        write(overlay.resolve("EsteriaNagaTextures.bin"), new byte[]{7,8});
+        write(overlay.resolve("Fonts/FRIZQT__.TTF"), new byte[]{3});
+        write(overlay.resolve("Interface/AddOns/MyAddon/config.txt"), new byte[]{4});
+        GameDataImporter.Result result = folder(im, overlay, GameDataImporter.ImportKind.CONTENT_OVERLAY);
+        try (java.util.stream.Stream<Path> files = Files.walk(overlay)) {
+            for (Path file : (Iterable<Path>)files.filter(Files::isRegularFile)::iterator)
+                check(Arrays.equals(Files.readAllBytes(file), Files.readAllBytes(result.gameDirectory.resolve(overlay.relativize(file)))), "custom route lost bytes");
+        }
+    }
+    private static byte[] serverManifest(String mode) {
+        return ("format=1\nscope=esteria-user-supplied-server-data\nserverRevision=f35f04d01689f034778e3474b3c820092f51e461\nclientBuild=12340\nmode=" + mode +
+                "\nprovenance=user-supplied-format-checked\nclientProviderOrderSha256=none\n").getBytes(StandardCharsets.US_ASCII);
+    }
+    private static byte[] dbc(int fields, int stride) {
+        return ByteBuffer.allocate(20 + stride + 1).order(ByteOrder.LITTLE_ENDIAN).putInt(0x43424457).putInt(1).putInt(fields).putInt(stride).putInt(1).array();
+    }
+    private static Path serverOverlay(Path root, String table) throws Exception {
+        Path namespace = root.resolve("EsteriaServerData");
+        write(namespace.resolve("manifest.properties"), serverManifest("overlay"));
+        write(namespace.resolve("data/dbc/" + table + ".dbc"), dbc(1,4));
+        write(namespace.resolve("data/dbc-continuations/" + table + ".dbc1-custom"), dbc(1,4));
+        return root;
+    }
+    private static void serverReplacement() throws Exception {
+        Path root = temp(), source = client(root); GameDataImporter im = importer(root);
+        folder(im, source, GameDataImporter.ImportKind.BASE_CLIENT);
+        Path old = folder(im, serverOverlay(root.resolve("old-package"), "Old"), GameDataImporter.ImportKind.CONTENT_OVERLAY).gameDirectory;
+        Path update = serverOverlay(root.resolve("new-package"), "New"); AtomicBoolean cancelled = new AtomicBoolean();
+        fails(() -> im.importFolder(update, GameDataImporter.ImportKind.CONTENT_OVERLAY,
+                (p,b,t,n,f) -> { if (n == 1) cancelled.set(true); }, cancelled::get), "interrupted namespace replacement");
+        check(im.resolveCurrent().equals(old) && Files.exists(old.resolve("EsteriaServerData/data/dbc/Old.dbc")), "interrupted update mutated old namespace");
+        GameDataImporter.Result next = folder(im, update, GameDataImporter.ImportKind.CONTENT_OVERLAY);
+        check(next.reusedFiles == 1 && next.copiedFiles == 2, "reserved namespace copy did not resume journaled file");
+        check(Files.exists(next.gameDirectory.resolve("EsteriaServerData/data/dbc/New.dbc")) &&
+                !Files.exists(next.gameDirectory.resolve("EsteriaServerData/data/dbc/Old.dbc")) &&
+                !Files.exists(next.gameDirectory.resolve("EsteriaServerData/data/dbc-continuations/Old.dbc1-custom")), "obsolete namespace leaked into replacement");
+        check(Files.exists(old.resolve("EsteriaServerData/data/dbc/Old.dbc")), "old generation was changed");
+        Path ordinary = root.resolve("ordinary"); write(ordinary.resolve("Fonts/font.ttf"), new byte[]{1});
+        Path inherited = folder(im, ordinary, GameDataImporter.ImportKind.CONTENT_OVERLAY).gameDirectory;
+        check(Files.exists(inherited.resolve("EsteriaServerData/data/dbc/New.dbc")), "unrelated content update lost reserved data");
+    }
+    private static void serverRollback() throws Exception {
+        Path root = temp(), source = client(root); GameDataImporter im = importer(root);
+        Path active = folder(im, source, GameDataImporter.ImportKind.BASE_CLIENT).gameDirectory;
+        for (String problem : new String[]{"missing-manifest", "wrong-server", "duplicate-key", "extra-blank", "bom", "bad-dbc", "mismatched-continuation", "unknown-group", "unknown-file", "wrong-case", "overlay-map", "unicode-file", "unicode-directory", "deep-directory"}) {
+            Path update = serverOverlay(root.resolve(problem), "Test"), namespace = update.resolve("EsteriaServerData");
+            Path manifest = namespace.resolve("manifest.properties");
+            if (problem.equals("missing-manifest")) Files.delete(manifest);
+            if (problem.equals("wrong-server")) Files.writeString(manifest, new String(serverManifest("overlay"), StandardCharsets.US_ASCII).replace("f35f04d01689f034778e3474b3c820092f51e461", "0".repeat(40)));
+            if (problem.equals("duplicate-key")) Files.writeString(manifest, new String(serverManifest("overlay"), StandardCharsets.US_ASCII).replace("clientBuild=12340", "format=1"));
+            if (problem.equals("extra-blank")) Files.writeString(manifest, new String(serverManifest("overlay"), StandardCharsets.US_ASCII) + "\n");
+            if (problem.equals("bom")) Files.writeString(manifest, "\ufeff" + new String(serverManifest("overlay"), StandardCharsets.US_ASCII));
+            if (problem.equals("bad-dbc")) Files.write(namespace.resolve("data/dbc/Test.dbc"), new byte[]{1,2});
+            if (problem.equals("mismatched-continuation")) Files.write(namespace.resolve("data/dbc-continuations/Test.dbc1-custom"), dbc(2,8));
+            if (problem.equals("unknown-group")) write(namespace.resolve("data/private/token.txt"), new byte[]{1});
+            if (problem.equals("unknown-file")) write(namespace.resolve("data/dbc/account.txt"), new byte[]{1});
+            if (problem.equals("wrong-case")) Files.move(namespace, update.resolve("esteriaserverdata"));
+            if (problem.equals("overlay-map")) write(namespace.resolve("data/maps/0000000.map"), ByteBuffer.allocate(44).order(ByteOrder.LITTLE_ENDIAN).putInt(0x5350414d).putInt(9).putInt(12340).array());
+            if (problem.equals("unicode-file")) write(namespace.resolve("data/dbc/Tést.dbc"), dbc(1,4));
+            if (problem.equals("unicode-directory")) write(namespace.resolve("data/dbc/é/Test.dbc"), dbc(1,4));
+            if (problem.equals("deep-directory")) write(namespace.resolve("data/dbc/" + "nested/".repeat(16) + "Test.dbc"), dbc(1,4));
+            fails(() -> folder(im, update, GameDataImporter.ImportKind.CONTENT_OVERLAY), problem);
+            check(im.resolveCurrent().equals(active), "invalid server package changed active pointer: " + problem);
+        }
+    }
+    private static Path completeServerPackage(Path root) throws Exception {
+        Path namespace = serverOverlay(root, "Test").resolve("EsteriaServerData");
+        write(namespace.resolve("manifest.properties"), serverManifest("complete"));
+        write(namespace.resolve("data/maps/0000000.map"), ByteBuffer.allocate(44).order(ByteOrder.LITTLE_ENDIAN).putInt(0x5350414d).putInt(9).putInt(12340).array());
+        write(namespace.resolve("data/vmaps/000.vmtree"), "VMAP_4.8".getBytes(StandardCharsets.US_ASCII));
+        write(namespace.resolve("data/mmaps/000.mmap"), new byte[28]);
+        write(namespace.resolve("data/mmaps/0000000.mmtile"), ByteBuffer.allocate(60).order(ByteOrder.LITTLE_ENDIAN).putInt(0x4d4d4150).putInt(7).putInt(20).putInt(4).array());
+        write(namespace.resolve("data/Cameras/test.m2"), ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putInt(0x3032444d).putInt(264).array());
+        return root;
+    }
+    private static void serverComplete() throws Exception {
+        Path root = temp(), source = client(root); GameDataImporter im = importer(root);
+        Path active = folder(im, source, GameDataImporter.ImportKind.BASE_CLIENT).gameDirectory;
+        for (String problem : new String[]{"missing-camera", "wrong-map-build", "overlapping-map", "wrong-vmap", "wrong-mmap-size", "wrong-mmtile-payload", "wrong-camera"}) {
+            Path update = completeServerPackage(root.resolve(problem)), namespace = update.resolve("EsteriaServerData");
+            if (problem.equals("missing-camera")) Files.delete(namespace.resolve("data/Cameras/test.m2"));
+            if (problem.equals("wrong-map-build")) Files.write(namespace.resolve("data/maps/0000000.map"), ByteBuffer.allocate(44).order(ByteOrder.LITTLE_ENDIAN).putInt(0x5350414d).putInt(9).putInt(12341).array());
+            if (problem.equals("overlapping-map")) Files.write(namespace.resolve("data/maps/0000000.map"), ByteBuffer.allocate(52).order(ByteOrder.LITTLE_ENDIAN).putInt(0x5350414d).putInt(9).putInt(12340).putInt(44).putInt(8).putInt(48).putInt(4).array());
+            if (problem.equals("wrong-vmap")) Files.write(namespace.resolve("data/vmaps/000.vmtree"), "VMAP_4.7".getBytes(StandardCharsets.US_ASCII));
+            if (problem.equals("wrong-mmap-size")) Files.write(namespace.resolve("data/mmaps/000.mmap"), new byte[29]);
+            if (problem.equals("wrong-mmtile-payload")) Files.write(namespace.resolve("data/mmaps/0000000.mmtile"), ByteBuffer.allocate(60).order(ByteOrder.LITTLE_ENDIAN).putInt(0x4d4d4150).putInt(7).putInt(20).putInt(5).array());
+            if (problem.equals("wrong-camera")) Files.write(namespace.resolve("data/Cameras/test.m2"), new byte[8]);
+            fails(() -> folder(im, update, GameDataImporter.ImportKind.CONTENT_OVERLAY), problem);
+            check(im.resolveCurrent().equals(active), "incomplete or corrupt complete package changed active pointer");
+        }
+        Path valid = completeServerPackage(root.resolve("valid"));
+        String crlf = new String(serverManifest("complete"), StandardCharsets.US_ASCII).replace("\n", "\r\n");
+        Files.writeString(valid.resolve("EsteriaServerData/manifest.properties"), crlf, StandardCharsets.US_ASCII);
+        GameDataImporter.Result installed = folder(im, valid, GameDataImporter.ImportKind.CONTENT_OVERLAY);
+        check(ContentPackageLayout.inspectServerManifest(installed.gameDirectory).mode.equals("complete"), "complete package did not activate");
+        check(folder(im, valid, GameDataImporter.ImportKind.CONTENT_OVERLAY).copiedBytes == 0, "identical reserved import copied again");
+    }
+    private static void serverManifestBinding() throws Exception {
+        Path root = temp(); check(ContentPackageLayout.inspectServerManifest(root) == null, "absent namespace should be absent");
+        serverOverlay(root, "Test");
+        ContentPackageLayout.ServerManifest first = ContentPackageLayout.inspectServerManifest(root);
+        check(first.equals(ContentPackageLayout.inspectServerManifest(root)) && first.manifestBytes == serverManifest("overlay").length && first.manifestSha256.matches("[0-9a-f]{64}"), "manifest binding is unstable");
+        Path manifest = root.resolve("EsteriaServerData/manifest.properties");
+        Files.writeString(manifest, new String(serverManifest("overlay"), StandardCharsets.US_ASCII).replace("clientProviderOrderSha256=none", "clientProviderOrderSha256=" + "1".repeat(64)));
+        check(!first.equals(ContentPackageLayout.inspectServerManifest(root)), "manifest change was not bound");
+        Files.write(manifest, new byte[2049]); fails(() -> ContentPackageLayout.inspectServerManifest(root), "oversized manifest");
+        Files.write(manifest, serverManifest("overlay"));
+        Path other = temp(), alias = other.resolve("alias"); Files.createSymbolicLink(alias, root);
+        fails(() -> ContentPackageLayout.inspectServerManifest(alias), "linked imported root");
+        Path namespace = root.resolve("EsteriaServerData"), moved = root.resolve("preserved-server-data"); Files.move(namespace, moved); Files.createSymbolicLink(namespace, moved);
+        fails(() -> ContentPackageLayout.inspectServerManifest(root), "linked namespace");
+    }
+    private static void serverContinuationManifest() throws Exception {
+        Path root = temp(), source = client(root); GameDataImporter im = importer(root);
+        Path active = folder(im, source, GameDataImporter.ImportKind.BASE_CLIENT).gameDirectory;
+        String[] invalid = {"../Test.dbc1-custom", "/Test.dbc1-custom", "Test.dbc1-missing", "nested/../Test.dbc1-custom",
+                "nested//Test.dbc1-custom", "./Test.dbc1-custom", "C:Test.dbc1-custom", "nested\\Test.dbc1-custom",
+                "Test.dbc1-custom\u000bTest.dbc1-custom", "Test.dbc1-custom\rTest.dbc1-custom", "Tést.dbc1-custom"};
+        for (int i = 0; i < invalid.length; i++) {
+            Path update = serverOverlay(root.resolve("unsafe-order-" + i), "Test");
+            write(update.resolve("EsteriaServerData/data/dbc-continuations/wxl-dbc.manifest"), (invalid[i] + "\n").getBytes(StandardCharsets.UTF_8));
+            fails(() -> folder(im, update, GameDataImporter.ImportKind.CONTENT_OVERLAY), "unsafe or absent continuation manifest file");
+            check(im.resolveCurrent().equals(active), "invalid continuation manifest changed active import");
+        }
+        Path nested = serverOverlay(root.resolve("nested-manifest"), "Test");
+        write(nested.resolve("EsteriaServerData/data/dbc-continuations/nested/wxl-dbc.manifest"), "Test.dbc1-custom\n".getBytes(StandardCharsets.US_ASCII));
+        fails(() -> folder(im, nested, GameDataImporter.ImportKind.CONTENT_OVERLAY), "nested continuation manifest");
+        check(im.resolveCurrent().equals(active), "nested continuation manifest changed active import");
+        Path ambiguous = serverOverlay(root.resolve("ambiguous-order"), "Test");
+        write(ambiguous.resolve("EsteriaServerData/data/dbc-continuations/nested/Test.dbc1-custom"), dbc(1,4));
+        fails(() -> folder(im, ambiguous, GameDataImporter.ImportKind.CONTENT_OVERLAY), "unordered-map continuation tie");
+        check(im.resolveCurrent().equals(active), "ambiguous continuation order changed active import");
+        Path continuationRoot = ambiguous.resolve("EsteriaServerData/data/dbc-continuations");
+        write(continuationRoot.resolve("Test.dbc2-a"), dbc(1,4));
+        write(continuationRoot.resolve("Test.dbc1-a"), dbc(1,4));
+        write(continuationRoot.resolve("wxl-dbc.manifest"), ("# source tier precedes explicit positions\r\n\tTest.dbc2-a \r\nTest.dbc1-custom\n" +
+                "nested/Test.dbc1-custom\nTest.dbc1-custom\nTest.dbc1-a\n").getBytes(StandardCharsets.US_ASCII));
+        GameDataImporter.Result ordered = folder(im, ambiguous, GameDataImporter.ImportKind.CONTENT_OVERLAY);
+        check(!ordered.gameDirectory.equals(active) && Files.exists(ordered.gameDirectory.resolve("EsteriaServerData/data/dbc-continuations/nested/Test.dbc1-custom")), "explicit continuation positions did not resolve the tie");
+        Path bounded = serverOverlay(root.resolve("bounded-order"), "Test");
+        byte[] lines = new byte[1 << 20]; Arrays.fill(lines, (byte)'\n');
+        write(bounded.resolve("EsteriaServerData/data/dbc-continuations/wxl-dbc.manifest"), lines);
+        GameDataImporter.Result manyLines = folder(im, bounded, GameDataImporter.ImportKind.CONTENT_OVERLAY);
+        check(Files.size(manyLines.gameDirectory.resolve("EsteriaServerData/data/dbc-continuations/wxl-dbc.manifest")) == 1L << 20, "bounded manifest with many empty lines was not streamed safely");
     }
     private static void zipWrapper() throws Exception {
         Path root = temp(), source = client(root), archive = root.resolve("client.zip");

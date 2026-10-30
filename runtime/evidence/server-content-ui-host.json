@@ -1,0 +1,43 @@
+{
+  "actualGameDataConverted": false,
+  "androidExecuted": false,
+  "dateUtc": "2026-10-30",
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "headRevision": "5c560335d6e6b6cd9a9492cda2ed4602effab543",
+  "logs": {
+    "fullPython": {
+      "bytes": 229649,
+      "sha256": "5f3cdbddfeaad453cc5e2388695ef4306be847ca5ebe8aed62a297044a9a6df5"
+    },
+    "uiApkLint": {
+      "bytes": 3308,
+      "sha256": "10905acaaf9f217f8e5d8c7eeed39c82e7d23f414252920a09e6e5ffdeea79bd"
+    }
+  },
+  "python": {
+    "errors": 0,
+    "failures": 0,
+    "passed": 1165,
+    "run": 1220,
+    "skipped": 55
+  },
+  "scope": "host-server-content-import-ui-and-regressions",
+  "sourceFiles": {
+    "app/src/main/java/io/github/russianranger/esteria/MainActivity.java": {
+      "bytes": 17884,
+      "sha256": "8e7350f91311602ffda1707ebf1a1c61ea729688938823c4a9b5b849400d0878"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/SessionService.java": {
+      "bytes": 67706,
+      "sha256": "2444fe332116deb57da4974c7de2d0502b0052c97fa89f40b34d43644b26f842"
+    }
+  },
+  "uiApkLint": {
+    "passed": true,
+    "seconds": 26,
+    "tasks": 54
+  },
+  "workingTreeHadUncommittedImplementation": true,
+  "worldserverExecuted": false
+}

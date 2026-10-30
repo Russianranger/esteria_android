@@ -16,6 +16,131 @@ from typing import Callable
 
 SERVER_REVISION = 'f35f04d01689f034778e3474b3c820092f51e461'
 BUILD = 12340
+SERVER_NAMESPACE = 'EsteriaServerData'
+SERVER_MANIFEST = 'manifest.properties'
+SERVER_PACKAGE_SCOPE = 'esteria-user-supplied-server-data'
+SERVER_DATA_GROUPS = ('dbc', 'dbc-continuations', 'maps', 'vmaps', 'mmaps', 'Cameras')
+CONTINUATION = re.compile(r'([A-Za-z][A-Za-z0-9_]*)\.dbc([1-9])-([A-Za-z0-9_-]+)\Z')
+
+
+def parse_server_manifest(raw: bytes) -> dict:
+    """A package's declared source is not proof of its producer or coverage."""
+    if not 0 < len(raw) <= 2048 or not raw.endswith(b'\n'):
+        raise ValueError('bounded newline-terminated matched server manifest required')
+    text = raw.decode('ascii')
+    if '\r' in text.replace('\r\n', '\n') or any(ord(c) < 32 and c not in '\r\n' for c in text):
+        raise ValueError('control character in matched server manifest')
+    result = {}
+    for line in text.splitlines():
+        key, separator, value = line.partition('=')
+        if not separator or not key or not value or key in result or any(ord(c) < 32 or ord(c) > 126 or c == '\\' for c in line):
+            raise ValueError('invalid or duplicate matched server manifest field')
+        result[key] = value
+    if set(result) != {'format', 'scope', 'serverRevision', 'clientBuild', 'mode', 'provenance', 'clientProviderOrderSha256'} or \
+            result['format'] != '1' or result['scope'] != SERVER_PACKAGE_SCOPE or \
+            result['serverRevision'] != SERVER_REVISION or result['clientBuild'] != str(BUILD) or \
+            result['mode'] not in ('complete', 'overlay') or result['provenance'] != 'user-supplied-format-checked' or \
+            (result['clientProviderOrderSha256'] != 'none' and not re.fullmatch('[0-9a-f]{64}', result['clientProviderOrderSha256'])):
+        raise ValueError('matched server manifest source, mode or provenance differs')
+    return result
+
+
+def data_file_checker(group: str, path: Path):
+    suffix, name = path.suffix.lower(), path.name.lower()
+    if group == 'dbc':
+        if name.endswith('.dbc'): return check_dbc
+        if re.fullmatch(r'component\.wow-[A-Za-z]{4}\.txt', path.name): return None
+    elif group == 'dbc-continuations':
+        if CONTINUATION.fullmatch(path.name): return check_dbc
+        if path.name == 'wxl-dbc.manifest': return None
+    elif group == 'maps' and suffix == '.map': return check_map
+    elif group == 'vmaps' and (suffix in ('.vmtree', '.vmtile', '.vmo') or name == 'gameobjectmodels.dtree'): return check_vmap
+    elif group == 'mmaps':
+        if suffix == '.mmtile': return check_mmtile
+        if suffix == '.mmap': return check_mmap
+    elif group == 'Cameras' and suffix == '.m2': return check_camera
+    raise ValueError('unrecognized matched server data file: ' + str(path))
+
+
+def continuation_order(root: Path, base: Path) -> dict:
+    """Mirror pinned WxlDbcScan ordering; refuse ambiguous or escaping input.
+
+    Source sorts tier, explicit manifest position, project and base-table name.
+    Unordered-map ties have no stable source order and need explicit manifest
+    positions. No rows are merged or fabricated by this preflight.
+    """
+    entries = {}; manifest_positions = {}; base_headers = {}
+    if base.is_dir():
+        for path in files_bounded(base):
+            if path.name.lower().endswith('.dbc'):
+                check_dbc(path); header, _ = read_header(path, 20)
+                signature = struct.unpack('<4s4I', header)[2:4]
+                key = path.name.lower()
+                if key in base_headers and base_headers[key] != signature:
+                    raise ValueError('locale/base DBC field layout disagrees: ' + path.name)
+                base_headers[key] = signature
+    for path in files_bounded(root):
+        relative = path.relative_to(root).as_posix()
+        if path.name == 'wxl-dbc.manifest':
+            if relative != 'wxl-dbc.manifest': raise ValueError('continuation manifest must be at the continuation root')
+            continue
+        matched = CONTINUATION.fullmatch(path.name)
+        if not matched: raise ValueError('unrecognized continuation filename: ' + relative)
+        check_dbc(path); header, _ = read_header(path, 20)
+        signature = struct.unpack('<4s4I', header)[2:4]
+        table, tier, project = matched.groups(); base_name = table + '.dbc'
+        if base_name.lower() in base_headers and base_headers[base_name.lower()] != signature:
+            raise ValueError('continuation field count or record size differs from base: ' + relative)
+        entries[relative] = (int(tier), project.lower(), base_name.lower())
+    manifest = root / 'wxl-dbc.manifest'
+    if manifest.exists() or manifest.is_symlink():
+        if manifest.is_symlink() or not manifest.is_file() or manifest.stat().st_size > 1024*1024:
+            raise ValueError('bounded regular continuation manifest required')
+        with manifest.open('r', encoding='ascii', newline='') as stream:
+            manifest_text = stream.read(1024*1024+1)
+        if len(manifest_text) > 1024*1024: raise ValueError('continuation manifest grew beyond bound')
+        if any(ord(c) > 126 or ord(c) < 32 and c not in '\n\r\t' for c in manifest_text):
+            raise ValueError('continuation manifest requires ASCII without other control characters')
+        position = 0
+        for line in manifest_text.split('\n'):
+            line = line.rstrip(' \t\r').lstrip(' \t')
+            if not line or line.startswith('#'): continue
+            if line.startswith('/') or '\\' in line or ':' in line or any(p in ('', '.', '..') for p in line.split('/')) or \
+                    any(ord(c) < 32 or ord(c) > 126 for c in line) or line not in entries:
+                raise ValueError('continuation manifest references an unsafe or absent file')
+            if line not in manifest_positions: manifest_positions[line] = position
+            position += 1
+    keys = {}
+    for name, (tier, project, table) in entries.items():
+        key = (tier, manifest_positions.get(name, 0x7fffffff), project, table)
+        if key in keys: raise ValueError('ambiguous continuation order; list both files in wxl-dbc.manifest')
+        keys[key] = name
+    return {'files_checked': len(entries), 'order': [keys[key] for key in sorted(keys)],
+            'ordering': 'tier-then-manifest-position-then-project-then-base-table',
+            'base_field_layouts_checked': len(base_headers), 'rows_merged': False}
+
+
+def check_server_package(root: Path, selected: dict) -> dict:
+    """Validate all supplied files, including the server's separate DBC folder."""
+    if root.is_symlink() or not root.is_dir(): raise ValueError('matched server data root required')
+    allowed = SERVER_DATA_GROUPS if selected['mode'] == 'complete' else ('dbc', 'dbc-continuations')
+    groups = {}; recognized = 0
+    for child in root.iterdir():
+        if child.name not in allowed or child.is_symlink() or not child.is_dir():
+            raise ValueError('unsupported matched server data group: ' + child.name)
+        checked = 0
+        for path in files_bounded(child):
+            if not path.is_file(): raise ValueError('regular matched server file required')
+            checker = data_file_checker(child.name, path)
+            if checker: checker(path); checked += 1
+            elif path.stat().st_size > (1024*1024 if path.name == 'wxl-dbc.manifest' else 65536):
+                raise ValueError('matched server ancillary file exceeds bound')
+        groups[child.name] = checked; recognized += checked
+    if not recognized: raise ValueError('matched server package contains no recognized data')
+    if selected['mode'] == 'complete' and not all(groups.get(name, 0) > 0 for name in ('dbc', 'maps', 'vmaps', 'mmaps', 'Cameras')):
+        raise ValueError('complete matched server package requires all five data groups')
+    if 'dbc-continuations' in groups: continuation_order(root / 'dbc-continuations', root / 'dbc')
+    return {'groups': groups, 'provenance': 'user-supplied-format-checked', 'worldQualified': False}
 
 
 def read_header(path: Path, size: int) -> tuple[bytes, int]:
@@ -143,6 +268,11 @@ def check_server_data(root: Path) -> dict:
         except (ValueError, OSError) as failure:
             error(name, failure)
         report['groups'][name] = {'files_checked': checked}
+    if (root / 'dbc-continuations').exists() or (root / 'dbc-continuations').is_symlink():
+        try:
+            report['continuations'] = continuation_order(root / 'dbc-continuations', root / 'dbc')
+        except (ValueError, OSError) as failure:
+            error('dbc-continuations', failure)
     report['checks_passed'] = report['error_count'] == 0
     report['gameplay_qualified'] = False
     report['limitations'] = ['Does not establish map coverage, DBC schema/row compatibility or custom asset closure.',

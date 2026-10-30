@@ -60,7 +60,7 @@ group only, with unavailable/coverage flags; it cannot qualify whole guest or
 combined client/server budgets. Core/APK/AndroidTest/lint and independent reviews
 pass; actual Service integration remains an execution gate.
 
-The last broad modified-worktree pass ran1190 Python checks:1135 passed,55
+The last broad modified-worktree pass ran1220 Python checks:1165 passed,55
 explicitly skipped, zero failures/errors. Retained evidence distinguishes Git
 head from modified source identities. Focused native/Java/provider checks add
 actual file/process behavior; compilation is never labeled gameplay success.
@@ -85,9 +85,9 @@ publication and anonymous readback finish.
    four-schema completion, clean promotion, active-save reseeding refusal and
    persistent restart. The Linux payload locator is a qualification seam; Android
    APK/Bionic locator execution remains separate.
-3. Finish custom-server-data import and actual DBC continuation handling. The
-   existing client import route did not apply server continuation files. Reject
-   misplaced client packages rather than reporting unused files as effective.
+3. Custom server-data import and actual continuation layout/order now pass
+   host/Core/SDK checks. Qualify the new route on real matched assets; large
+   precomputed world sets still face the conservative import metadata limit.
 4. Import real build12340 MPQs and matched Esteria assets; prepare actual server
    data/shaders, validate normal login/character/world and gameplay/persistence.
    No complete client/custom data is available here. See ASSET-REQUIREMENTS.md.
@@ -108,3 +108,12 @@ The first server-component measurement stopped on a GitHub internal error
 before job steps. An independently reproduced Windows-wrapper checkout EOL
 defect is fixed by archiving canonical Git blobs while strictly validating the
 sole declared CRLF conversion. A fresh exact-recipe measurement follows.
+
+The server-content checkpoint passes31 Java importer groups at32MiB,67 focused
+Python checks and106 SDK tasks. The actual APK helper byte manifest matches its
+runtime binding. Server-only continuation fragments still require matching full
+client DBC tables; no new client continuation feature is claimed.
+
+The final content-route UI/APK/lint follow-up passes26seconds/54tasks. The broad
+modified-worktree regression pass is1220 checks:1165 passed,55 explicitly
+skipped, zero failures/errors. No runtime/gameplay claim follows from that pass.

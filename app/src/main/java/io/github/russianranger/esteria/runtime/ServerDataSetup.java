@@ -253,6 +253,7 @@ public final class ServerDataSetup {
                 case "extraction-vmap4_extractor":return "raw-collision";
                 case "extraction-vmap4_assembler":return "assembled-collision";
                 case "extraction-mmaps_generator":return "navigation";
+                case "extraction-supplied-server-data":return "matched-server-data";
                 case "extraction-format-checked":return "format-checked";
                 default:return null;
             }

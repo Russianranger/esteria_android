@@ -38,6 +38,8 @@ PROFILE = dict(classical=True, trial=False, streaming=False, directAccess=False,
                retailVirtualProviders=False, parentDataVisible=False, installDataVisible=False)
 MAX_FILES, MAX_FILE, MAX_TOTAL, MAX_METADATA = 300000, 16 << 30, 96 << 30, 64 << 20
 CAPABILITY = b'esteria-classical-ordered-providers-v1; archive/folder/prefix; no conversion qualification'
+PREPARATION_HELPERS = ('server_data_generation.py', 'server_data_preflight.py', 'shader_generation.py',
+                       'extractor_order.py', 'owned_process_group.py')
 
 
 def require(condition, reason):
@@ -64,6 +66,73 @@ def pin(value):
             type(value['bytes']) is int and 0 < value['bytes'] <= MAX_FILE and
             type(value['sha256']) is str and storage.HASH.fullmatch(value['sha256']), 'invalid data tool pin')
     return value
+
+
+def preparation_helper_generation():
+    """Match the APK's exact compact, ordered helper manifest generation."""
+    files = {name: storage.identity(Path(__file__).resolve().parent / name, 131072)
+             for name in sorted(PREPARATION_HELPERS)}
+    raw = (json.dumps({'formatVersion': 1, 'files': files}, separators=(',', ':')) + '\n').encode()
+    return hashlib.sha256(raw).hexdigest()
+
+
+def package_selection(source, *, validate=False):
+    namespace = source / formats.SERVER_NAMESPACE
+    for name in source.iterdir():
+        require(name.name.lower() != formats.SERVER_NAMESPACE.lower() or name.name == formats.SERVER_NAMESPACE,
+                'matched server namespace capitalization differs')
+    if not namespace.exists() and not namespace.is_symlink(): return None
+    storage.canonical(namespace)
+    require({path.name for path in namespace.iterdir()} == {formats.SERVER_MANIFEST, 'data'},
+            'matched server package requires only its manifest and data directory')
+    raw = storage.read(namespace / formats.SERVER_MANIFEST, 2048)
+    selected = formats.parse_server_manifest(raw)
+    data = storage.canonical(namespace / 'data')
+    if validate: formats.check_server_package(data, selected)
+    return dict(formatVersion=1, scope='user-supplied-format-checked', namespace=formats.SERVER_NAMESPACE,
+        mode=selected['mode'], clientProviderOrderSha256=selected['clientProviderOrderSha256'],
+        manifest=dict(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest()))
+
+
+def validate_package_selection(value):
+    require(type(value) is dict and set(value) == {'formatVersion', 'scope', 'namespace', 'mode',
+            'clientProviderOrderSha256', 'manifest'} and type(value['formatVersion']) is int and
+            value['formatVersion'] == 1 and value['scope'] == 'user-supplied-format-checked' and
+            value['namespace'] == formats.SERVER_NAMESPACE and value['mode'] in ('complete', 'overlay') and
+            (value['clientProviderOrderSha256'] == 'none' or
+             type(value['clientProviderOrderSha256']) is str and storage.HASH.fullmatch(value['clientProviderOrderSha256'])),
+            'invalid supplied server package selection')
+    pin(value['manifest'])
+    require(value['manifest']['bytes'] <= 2048, 'supplied server manifest size differs')
+    return value
+
+
+def merge_supplied(source, destination, *, cancelled=lambda: False):
+    """Replace each supplied file by rename, never mutate a phase's hard link."""
+    for parent, dirs, files in os.walk(source, followlinks=False, onerror=walk_error):
+        require(not cancelled(), 'supplied server copy cancelled; active data preserved')
+        at = Path(parent); target = destination / at.relative_to(source)
+        storage.canonical(target, create=True)
+        for name in dirs: storage.canonical(at / name)
+        for name in files:
+            require(not cancelled(), 'supplied server copy cancelled; active data preserved')
+            original = storage.canonical(at / name, False)
+            output = target / name; temporary = target / ('.server-input-' + uuid.uuid4().hex)
+            try:
+                try: os.link(original, temporary, follow_symlinks=False)
+                except OSError as error:
+                    if error.errno not in (errno.EPERM, errno.EXDEV, errno.EOPNOTSUPP, errno.ENOSYS): raise
+                    with original.open('rb') as incoming, temporary.open('xb') as outgoing:
+                        while block := incoming.read(128 << 10):
+                            require(not cancelled(), 'supplied server copy cancelled; active data preserved')
+                            outgoing.write(block)
+                        outgoing.flush(); os.fsync(outgoing.fileno())
+                    os.chmod(temporary, 0o600)
+                require(not output.is_symlink() and (not output.exists() or output.is_file()),
+                        'supplied server file conflicts with a non-regular destination')
+                os.replace(temporary, output)
+            finally:
+                if temporary.exists(): temporary.unlink()
 
 
 def tools_verified(root, selection):
@@ -242,15 +311,21 @@ def verify_completed(destination, expected_inputs=None, *, expected_generation=N
             all(receipt[name] is False for name in ('worldQualified', 'androidQualified', 'gameplayQualified')),
             'invalid prepared server data receipt')
     inputs = receipt['inputs']
-    require(type(inputs) is dict and set(inputs) == {'formatVersion', 'importGeneration', 'clientRevision',
-            'serverRevision', 'locale', 'threads', 'importMetadata', 'toolSelectionSha256'} and
-            type(inputs['formatVersion']) is int and inputs['formatVersion'] == 1 and
+    base_fields = {'formatVersion', 'importGeneration', 'clientRevision', 'serverRevision', 'locale',
+                   'threads', 'importMetadata', 'toolSelectionSha256'}
+    version = inputs.get('formatVersion') if type(inputs) is dict else None
+    fields = base_fields if version == 1 else base_fields | {'serverDataPackage', 'preparationHelperGeneration'}
+    require(type(inputs) is dict and set(inputs) == fields and type(version) is int and version in (1, 2) and
             inputs['clientRevision'] == CLIENT_REVISION and inputs['serverRevision'] == formats.SERVER_REVISION and
             inputs['locale'] in order.LOCALES and type(inputs['threads']) is int and inputs['threads'] in (1, 2) and
             type(inputs['importGeneration']) is str and storage.HASH.fullmatch(inputs['importGeneration']) and
             type(inputs['toolSelectionSha256']) is str and storage.HASH.fullmatch(inputs['toolSelectionSha256']) and
             type(inputs['importMetadata']) is dict and 0 < len(inputs['importMetadata']) <= 96,
             'prepared data input selection differs')
+    if version == 2:
+        validate_package_selection(inputs['serverDataPackage'])
+        require(inputs['preparationHelperGeneration'] == preparation_helper_generation(),
+                'prepared server package helper source changed; prepare a new generation')
     for name, identity in inputs['importMetadata'].items():
         order.safe(name, 1024); pin(identity)
     key = hashlib.sha256(storage.encoded(inputs)).hexdigest()
@@ -290,6 +365,11 @@ def generate(store, game, generation, tools, selection, locale, *, threads=1, ti
                   'clientRevision': CLIENT_REVISION, 'serverRevision': formats.SERVER_REVISION,
                   'importMetadata': storage.imported(game, generation),
                   'toolSelectionSha256': tools_verified(tools, selection)}
+        source = game / 'generations' / generation / 'data'
+        external = package_selection(source)
+        if external is not None:
+            inputs.update(formatVersion=2, serverDataPackage=external,
+                          preparationHelperGeneration=preparation_helper_generation())
         key = hashlib.sha256(storage.encoded(inputs)).hexdigest()
         staging = storage.canonical(store / 'staging', create=True)
         generations = storage.canonical(store / 'generations', create=True)
@@ -298,7 +378,6 @@ def generate(store, game, generation, tools, selection, locale, *, threads=1, ti
             receipt = verify_completed(destination, inputs)
         else:
             work = storage.canonical(staging / key, create=True)
-            source = game / 'generations' / generation / 'data'
             plan_path = work / 'order.json'
             if plan_path.exists() or plan_path.is_symlink():
                 plan = document(plan_path)
@@ -312,6 +391,11 @@ def generate(store, game, generation, tools, selection, locale, *, threads=1, ti
                 storage.atomic(work / 'order.tsv', wire)
                 storage.atomic(plan_path, order.canonical(plan))
             require(plan['configuredLocale'] == locale and plan['profile'] == PROFILE, 'extraction provider profile changed')
+            if external is not None:
+                require(package_selection(source, validate=True) == external, 'matched server package selection changed')
+                selected_order = external['clientProviderOrderSha256']
+                require(selected_order == 'none' or selected_order == hashlib.sha256(order.canonical(plan)).hexdigest(),
+                        'supplied server package is bound to a different effective client provider order')
             ordered = ['--esteria-order', str(work / 'order.tsv'), '--esteria-order-sha256', hashlib.sha256(wire).hexdigest(),
                        '--esteria-input-root', str(source)]
             deadline = time.monotonic() + timeout
@@ -320,34 +404,41 @@ def generate(store, game, generation, tools, selection, locale, *, threads=1, ti
                 remaining = int(deadline - time.monotonic())
                 require(remaining > 0, 'data preparation deadline exceeded')
                 return execute([str(tools / 'bin' / name), *args], cwd, log, remaining, cancelled=cancelled)
-            for name in PROGRAMS[:2]:
-                capability_log = work / ('capability-' + name + '-' + uuid.uuid4().hex + '.log')
-                run(name, ['--esteria-order-capabilities'], work, capability_log)
-                require(storage.read(capability_log, 4096).rstrip(b'\n') == CAPABILITY,
-                        'ordered extractor capability differs; no stock fallback')
-            maps = phase(work, 'maps-dbc-cameras', lambda data, at:
-                run('map_extractor', [*ordered, '-o', str(data), '-e', '7'], data, at / 'extract.log'))
-            raw = phase(work, 'raw-vmaps', lambda data, at:
-                run('vmap4_extractor', ordered, data, at / 'extract.log'))
-            def assemble(data, at):
-                (data / 'vmaps').mkdir(mode=0o700)
-                run('vmap4_assembler', [str(raw / 'Buildings'), str(data / 'vmaps')], data, at / 'extract.log')
-            vmaps = phase(work, 'assembled-vmaps', assemble)
-            def navigation(data, at):
-                clone(maps / 'maps', data / 'maps')
-                clone(vmaps / 'vmaps', data / 'vmaps')
-                run('mmaps_generator', ['--config', str(tools / 'etc/mmaps-config.yaml'), '--threads', str(threads), '--silent'],
-                    data, at / 'extract.log')
-            nav = phase(work, 'navigation', navigation)
+            complete_external = external is not None and external['mode'] == 'complete'
+            if not complete_external:
+                for name in PROGRAMS[:2]:
+                    capability_log = work / ('capability-' + name + '-' + uuid.uuid4().hex + '.log')
+                    run(name, ['--esteria-order-capabilities'], work, capability_log)
+                    require(storage.read(capability_log, 4096).rstrip(b'\n') == CAPABILITY,
+                            'ordered extractor capability differs; no stock fallback')
+                maps = phase(work, 'maps-dbc-cameras', lambda data, at:
+                    run('map_extractor', [*ordered, '-o', str(data), '-e', '7'], data, at / 'extract.log'))
+                raw = phase(work, 'raw-vmaps', lambda data, at:
+                    run('vmap4_extractor', ordered, data, at / 'extract.log'))
+                def assemble(data, at):
+                    (data / 'vmaps').mkdir(mode=0o700)
+                    run('vmap4_assembler', [str(raw / 'Buildings'), str(data / 'vmaps')], data, at / 'extract.log')
+                vmaps = phase(work, 'assembled-vmaps', assemble)
+                def navigation(data, at):
+                    clone(maps / 'maps', data / 'maps')
+                    clone(vmaps / 'vmaps', data / 'vmaps')
+                    run('mmaps_generator', ['--config', str(tools / 'etc/mmaps-config.yaml'), '--threads', str(threads), '--silent'],
+                        data, at / 'extract.log')
+                nav = phase(work, 'navigation', navigation)
             final = work / ('final-' + uuid.uuid4().hex); final.mkdir(mode=0o700)
             data = final / 'data'; data.mkdir(mode=0o700)
-            for base, names in ((maps, ('maps', 'dbc', 'Cameras')), (vmaps, ('vmaps',)), (nav, ('mmaps',))):
-                for name in names:
-                    clone(base / name, data / name)
+            if not complete_external:
+                for base, names in ((maps, ('maps', 'dbc', 'Cameras')), (vmaps, ('vmaps',)), (nav, ('mmaps',))):
+                    for name in names:
+                        clone(base / name, data / name)
+            if external is not None:
+                progress('extraction-supplied-server-data')
+                merge_supplied(source / formats.SERVER_NAMESPACE / 'data', data, cancelled=cancelled)
             preflight = formats.check_server_data(data)
             require(preflight['checks_passed'], 'generated server data failed format preflight')
             require(not cancelled() and storage.imported(game, generation) == inputs['importMetadata'] and
-                    tools_verified(tools, selection) == inputs['toolSelectionSha256'], 'extraction inputs changed before completion')
+                    tools_verified(tools, selection) == inputs['toolSelectionSha256'] and package_selection(source) == external,
+                    'extraction inputs changed before completion')
             receipt = {'formatVersion': 1, 'scope': SCOPE, 'generation': key, 'inputs': inputs,
                        'files': inventory(data), 'preflight': preflight,
                        'providerOrder': {'effectiveLocale': plan['effectiveLocale'],
@@ -363,7 +454,8 @@ def generate(store, game, generation, tools, selection, locale, *, threads=1, ti
             storage.atomic(final / 'order.tsv', wire)
             storage.atomic(final / 'receipt.json', storage.encoded(receipt))
             os.rename(final, destination); storage.sync(generations)
-        require(not cancelled() and storage.imported(game, generation) == inputs['importMetadata'],
+        require(not cancelled() and storage.imported(game, generation) == inputs['importMetadata'] and
+                package_selection(source) == external,
                 'import changed before server data activation')
         storage.atomic(store / 'current', (key + '\n').encode())
         progress('extraction-format-checked')

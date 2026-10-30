@@ -183,13 +183,16 @@ public final class GameDataImporter {
         if (entries.isEmpty()) throw new IOException("No files to import");
         if (kind == ImportKind.BASE_CLIENT) stripClientWrapper(entries);
         validateEntries(entries);
+        boolean replaceServerData = ContentPackageLayout.inspect(() -> entries.stream().map(entry -> entry.path).iterator(), kind == ImportKind.CONTENT_OVERLAY);
         if (kind == ImportKind.BASE_CLIENT) GameDataVerifier.verifyBaseLayout(() -> entries.stream().map(entry -> entry.path).iterator());
         entries.sort(Comparator.comparing(e -> e.path));
         Path current = resolveCurrent();
         String base = kind == ImportKind.CONTENT_OVERLAY ? currentId() : "base";
         if (kind == ImportKind.CONTENT_OVERLAY && current == null) throw new IOException("Import a base client before custom content");
         MessageDigest identity = sha256();
-        identity.update(("esteria-import-v1\n" + kind + "\n" + source.identity() + "\n").getBytes(StandardCharsets.UTF_8));
+        // Reserved server packages replace their entire namespace. A distinct
+        // identity cannot resume legacy staging which inherited an older one.
+        identity.update(((replaceServerData ? "esteria-import-v2-server-data-replacement\n" : "esteria-import-v1\n") + kind + "\n" + source.identity() + "\n").getBytes(StandardCharsets.UTF_8));
         for (Entry entry : entries) identity.update((entry.path + "\0" + entry.size + "\0" + entry.modified + "\0" + entry.crc + "\n").getBytes(StandardCharsets.UTF_8));
         String sourceId = hex(identity.digest());
         if (current != null && matchesCompletedSource(current.getParent().resolve("complete"), sourceId)) return new Result(current, currentId(), 0, entries.size(), 0);
@@ -203,7 +206,7 @@ public final class GameDataImporter {
         Path journal = generation.resolve("journal.tsv");
         Map<String, Saved> saved = readJournal(journal);
         if (kind == ImportKind.CONTENT_OVERLAY && !Files.exists(generation.resolve("base-ready"))) {
-            seedBase(current, data, cancellation);
+            seedBase(current, data, cancellation, replaceServerData);
             atomicWrite(generation.resolve("base-ready"), base + "\n");
         }
         if (kind == ImportKind.CONTENT_OVERLAY) canonicalizeOverlayPaths(data, entries);
@@ -253,20 +256,23 @@ public final class GameDataImporter {
         checkCancelled(cancellation);
         source.verifyUnchanged(null);
         GameDataVerifier.verifyBaseClient(data);
+        ContentPackageLayout.validateFinal(data);
         // No active pointer is changed until every file and the whole client satisfy the checks.
         atomicWrite(generation.resolve("complete"), "format=1\nclientBuild=12340\nrequest=" + id + "\nsource=" + sourceId + "\ndirectorySync=" + directorySyncSupported + "\ncontentCompatibility=unqualified\n");
         atomicWrite(root.resolve("current"), id + "\n");
         return new Result(data, id, copied, reused, copiedBytes);
     }
 
-    private void seedBase(Path source, Path destination, Cancellation cancellation) throws IOException {
+    private void seedBase(Path source, Path destination, Cancellation cancellation, boolean replaceServerData) throws IOException {
         Files.walkFileTree(source, new SimpleFileVisitor<Path>() {
             @Override public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attributes) throws IOException {
                 checkCancelled(cancellation); if (attributes.isSymbolicLink()) throw new IOException("Symlink in active data");
+                if (replaceServerData && !dir.equals(source) && ContentPackageLayout.reserved(source.relativize(dir).toString().replace('\\', '/'))) return FileVisitResult.SKIP_SUBTREE;
                 Path target = destination.resolve(source.relativize(dir)); createDirectoriesDurably(target); rejectSymlinkAncestors(target); return FileVisitResult.CONTINUE;
             }
             @Override public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
                 checkCancelled(cancellation); if (!attributes.isRegularFile() || attributes.isSymbolicLink()) throw new IOException("Nonregular active data");
+                if (replaceServerData && ContentPackageLayout.reserved(source.relativize(file).toString().replace('\\', '/'))) return FileVisitResult.CONTINUE;
                 Path target = destination.resolve(source.relativize(file));
                 if (Files.exists(target, LinkOption.NOFOLLOW_LINKS)) {
                     if (!Files.isRegularFile(target, LinkOption.NOFOLLOW_LINKS) || Files.size(target) != attributes.size()) throw new IOException("Invalid resumed base file");

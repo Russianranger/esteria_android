@@ -38,6 +38,7 @@ import io.github.russianranger.esteria.core.diagnostics.SupportBundle;
 import io.github.russianranger.esteria.core.diagnostics.SupportLogSelection;
 import io.github.russianranger.esteria.core.runtime.process.ProcessUsageSnapshot;
 import io.github.russianranger.esteria.core.importer.GameDataImporter;
+import io.github.russianranger.esteria.core.importer.ContentPackageLayout;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeInstaller;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import io.github.russianranger.esteria.runtime.RuntimeSetup;
@@ -592,6 +593,15 @@ public final class SessionService extends Service {
         facts.put("game.lastRecoveryRequired",Boolean.toString(lastRecoveryRequired));
         facts.put("game.lastClientExitAcknowledged",Boolean.toString(lastClientExitAcknowledged));
         facts.put("game.characterSaveQualified","false");
+        try {
+            Path imported=new GameDataImporter(root.resolve("game")).resolveCurrent();
+            ContentPackageLayout.ServerManifest supplied=imported==null?null:ContentPackageLayout.inspectServerManifest(imported);
+            facts.put("import.serverData.supplied",Boolean.toString(supplied!=null));
+            if(supplied!=null){facts.put("import.serverData.mode",supplied.mode);
+                facts.put("import.serverData.manifestSha256",supplied.manifestSha256);
+                facts.put("import.serverData.clientProviderOrderSha256",supplied.clientProviderOrderSha256);
+                facts.put("import.serverData.provenance","user-supplied-format-checked-not-world-qualified");}
+        }catch(IOException invalid){facts.put("import.serverData.selection","unavailable-or-invalid");}
         if(gameOwner!=null) {
             rememberLogs(gameOwner.diagnosticLogs());
             for(Map.Entry<String,ProcessUsageSnapshot> sample:gameOwner.usage().entrySet()) {

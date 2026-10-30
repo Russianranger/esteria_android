@@ -56,8 +56,21 @@ public final class ServerDataBinding {
                     !Boolean.TRUE.equals(value.getJSONObject("preflight").get("checks_passed")))
                 throw new IOException("Prepared server data scope differs");
             JSONObject inputs=value.getJSONObject("inputs");
-            keys(inputs,"formatVersion","importGeneration","clientRevision","serverRevision","locale","threads","importMetadata","toolSelectionSha256");
-            if(integer(inputs,"formatVersion")!=1||!BuildConfig.CLIENT_REVISION.equals(inputs.get("clientRevision"))||
+            if(plan.serverDataPackage==null) {
+                keys(inputs,"formatVersion","importGeneration","clientRevision","serverRevision","locale","threads","importMetadata","toolSelectionSha256");
+                if(integer(inputs,"formatVersion")!=1)throw new IOException("Generated data input format differs");
+            } else {
+                keys(inputs,"formatVersion","importGeneration","clientRevision","serverRevision","locale","threads","importMetadata","toolSelectionSha256","serverDataPackage","preparationHelperGeneration");
+                var supplied=plan.serverDataPackage;
+                JSONObject manifest=new JSONObject().put("bytes",supplied.manifestBytes).put("sha256",supplied.manifestSha256);
+                JSONObject expected=new JSONObject().put("formatVersion",1).put("scope","user-supplied-format-checked")
+                    .put("namespace","EsteriaServerData").put("mode",supplied.mode)
+                    .put("clientProviderOrderSha256",supplied.clientProviderOrderSha256).put("manifest",manifest);
+                if(integer(inputs,"formatVersion")!=2||!plan.helperGeneration.equals(inputs.get("preparationHelperGeneration"))||
+                        !canonical(expected).equals(canonical(inputs.getJSONObject("serverDataPackage"))))
+                    throw new IOException("User-supplied server data manifest, provenance or helper selection differs");
+            }
+            if(!BuildConfig.CLIENT_REVISION.equals(inputs.get("clientRevision"))||
                     !verifiedServerRevision.equals(inputs.get("serverRevision"))||!plan.importGeneration.equals(inputs.get("importGeneration"))||
                     !plan.locale.equals(inputs.get("locale"))||integer(inputs,"threads")!=plan.threads||
                     !hash((canonical(inputs)+"\n").getBytes(StandardCharsets.UTF_8)).equals(generation))

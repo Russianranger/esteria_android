@@ -1,0 +1,170 @@
+{
+  "actualGameAssetsImported": false,
+  "actualMpqConversionExecuted": false,
+  "androidGuestExecuted": false,
+  "androidInstrumentationExecuted": false,
+  "androidRuntimeQualified": false,
+  "androidSdk": {
+    "agp": "8.7.3",
+    "allSixHelperSubtreesAndManifestsMatchCurrentSourceBytes": true,
+    "androidTestApk": {
+      "bytes": 1753085,
+      "sha256": "5c82a0775c64863e6450e024b3c6cf6e6f44600e4bc025456acb8462bdc666d6"
+    },
+    "apk": {
+      "bytes": 738443,
+      "sha256": "cfd5f2e83c8e0ddf241925c938f908503b8df26b62befe9aaf52a3d644d76e21"
+    },
+    "bothApkZipCrcsReadBack": true,
+    "dataPreparationHelperManifestBytes": 612,
+    "dataPreparationHelperManifestSha256": "a8ac1ae59355d39523552cf6292daa2fed6c49ac9ff17764bdbcad051d3c7273",
+    "durationSeconds": 66,
+    "executedTasks": 106,
+    "gradle": "8.9",
+    "helperManifests": {
+      "database-service": {
+        "bytes": 254,
+        "sha256": "f7f05083969ce1e557fb1387c8a354a6aa2b80100729ca73cb6b4635a7ce475e"
+      },
+      "database-setup": {
+        "bytes": 262,
+        "sha256": "72afe9c5a043b1f20ef5484ae6a9a10626587d0e87caeb764a0701d6e91684b0"
+      },
+      "server-data": {
+        "bytes": 612,
+        "sha256": "a8ac1ae59355d39523552cf6292daa2fed6c49ac9ff17764bdbcad051d3c7273"
+      },
+      "server-installation": {
+        "bytes": 2158,
+        "sha256": "2fd8cc083d87184c63f96b643d9432017c82f272f4bd07fed951e8a7f0325eb7"
+      },
+      "server-schema": {
+        "bytes": 1101,
+        "sha256": "978b0a784003474a31d05bcb07f423c47d0ec201613f96d227a59ad678b99972"
+      },
+      "server-session": {
+        "bytes": 2725,
+        "sha256": "e39b12c0fbec9e3cf223c08175c663723e64d006931229abab74112c6c9ebb69"
+      }
+    },
+    "jdkMajor": 17,
+    "offlineBuild": true,
+    "pythonPreparationHelperGenerationMatchesActualApkManifest": true,
+    "sdkPlatform": 35,
+    "taskLog": {
+      "bytes": 11860,
+      "sha256": "ce54998c8276b8f6c90c0c4c3eb9629864ff79db7b26b31965140a77c8762059"
+    },
+    "tasks": [
+      ":app:clean",
+      ":core:check",
+      ":app:serverDataSetupOwnerTest",
+      ":app:localWorldSetupOwnerTest",
+      ":app:gameSessionOwnerTest",
+      ":app:assembleDebug",
+      ":app:assembleDebugAndroidTest",
+      ":app:lintDebug"
+    ]
+  },
+  "behavior": {
+    "actualSourceContinuationOrderValidated": true,
+    "clientMatchingIsUnverifiedWhenOrderPinIsNone": true,
+    "completeUserSuppliedModeSkipsAllConversion": true,
+    "copyFallbackCancellationPreservesExistingTargets": true,
+    "entireNamespaceReplacedWithoutOldContinuationLeak": true,
+    "invalidManifestAndHeadersPreserveActiveImport": true,
+    "knownBaseContinuationFieldLayoutsCompared": true,
+    "matchedServerNamespaceUsesExistingResumableImporter": true,
+    "misplacedProviderPathsRefuseBeforeCopy": true,
+    "oldPreparedGenerationsPreserved": true,
+    "overlayPreservesImmutableGeneratedPhaseBytes": true,
+    "v1GeneratedReceiptShapePreserved": true,
+    "v2SuppliedInputsBindImportSourceToolsManifestAndActualHelpers": true
+  },
+  "clientLaunched": false,
+  "deviceTestCandidate": false,
+  "formatVersion": 1,
+  "frozenChangedSourceFiles": {
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDataBinding.java": {
+      "bytes": 18786,
+      "sha256": "3f8b3934b72f01b016a1a51f0d752e0198e8e4c814e3e1611afa8374a0fff893"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDataSetup.java": {
+      "bytes": 20767,
+      "sha256": "413d5feb8c704b5236832b67d32511e75f887a88448c5f0fcc2c48713136e35e"
+    },
+    "config/server-data-inputs.example.properties": {
+      "bytes": 207,
+      "sha256": "6294ee77f1c6133a03ac7aa54874db80ca4a80a0d94db269708b0e8b2a994c9b"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/ContentPackageLayout.java": {
+      "bytes": 25813,
+      "sha256": "6f5a6dbbf9823f9bc10f2bb9cfe55009ad9dcf0ed68edfcb30ceb43f8794d8e8"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/GameDataImporter.java": {
+      "bytes": 42542,
+      "sha256": "53b1c8aeac4c9881bac1665abca95b4bce1bbc5dbfc2d94b51b3bcfb4cfcc757"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/ServerDataRunPlan.java": {
+      "bytes": 5903,
+      "sha256": "b891ec7987ee4b408173d291cd9c8e490249ba40cad61530235a4dc1affc1279"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/importer/ImporterTests.java": {
+      "bytes": 55226,
+      "sha256": "91a55639c1ae8ef8d9e2d0152f5a58c7c56a353a31548966ee845e8e6a481f66"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/ServerDataRunPlanTests.java": {
+      "bytes": 5135,
+      "sha256": "56e42aad3643431f84067f5a3acf475853967690a32ccd283d257287f58e5708"
+    },
+    "runtime/server/IMPORTED-SERVER-DATA.md": {
+      "bytes": 3905,
+      "sha256": "2648cf1428d33d6514427a61e7c32fc3a0651010371d9e8f7958433f4b37b92a"
+    },
+    "runtime/server_data_generation.py": {
+      "bytes": 28172,
+      "sha256": "d425c9a4aa9913d2ce320b9a549e708671494be8323a2ad490beb60b90c22d46"
+    },
+    "runtime/server_data_preflight.py": {
+      "bytes": 15268,
+      "sha256": "f69f84fad386f1d705a0268d95339d5a3ed070ac8694a8a29832f6ac01edf864"
+    },
+    "tests/test_server_data_packages.py": {
+      "bytes": 10215,
+      "sha256": "937456c05bdae90cbe7877416bea1ddf89c503ba02116935015edc3fc0731aab"
+    }
+  },
+  "gameplayQualified": false,
+  "hardwareQualified": false,
+  "limitations": [
+    "Existing 16 MiB import metadata budget can reject large full-world packages before copying.",
+    "Header/storage fixtures do not establish geographical coverage, DBC row compatibility or actual client continuation support.",
+    "Complete supplied data is user-declared format checked; no extractor producer or world qualification is inferred."
+  ],
+  "nativeServerProgramsExecuted": false,
+  "observedAtUtc": "2026-10-30T18:56:38.963951+00:00",
+  "persistentSigningQualified": false,
+  "playerbotsAiQualified": false,
+  "qualificationUsesUncommittedFrozenSources": true,
+  "scope": "host-core-and-android-sdk-server-content-import-adapter-validation",
+  "sourceProducerOfSuppliedDataIndependentlyVerified": false,
+  "sqlExecuted": false,
+  "tests": {
+    "actualCoreRunPlanGuardsPassed": true,
+    "actualDataOwnerGroups": 4,
+    "actualGameOwnerGroups": 8,
+    "actualJavaImporterGroups": 31,
+    "actualLocalWorldOwnerGroups": 2,
+    "fixturesUseSyntheticHeadersNotGameAssets": true,
+    "focusedPythonFailures": 0,
+    "focusedPythonSkips": 0,
+    "focusedPythonTests": 67,
+    "javaMaximumHeapBytes": 33554432,
+    "pythonLog": {
+      "bytes": 98,
+      "sha256": "506b631d630a035da9971bf06170f793cc8d30811c55cc26135fd59a2103e8c8"
+    }
+  },
+  "workingTreeBaseRevision": "5c560335d6e6b6cd9a9492cda2ed4602effab543",
+  "worldQualified": false
+}

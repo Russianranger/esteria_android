@@ -93,6 +93,7 @@ public final class MainActivity extends Activity {
         button(layout, "Import client ZIP", () -> chooseArchive(BASE));
         button(layout, "Add custom content folder", () -> chooseFolder(OVERLAY_FOLDER));
         button(layout, "Add custom content ZIP", () -> chooseArchive(OVERLAY));
+        layout.addView(text("Custom packages should have Data/ at their top level. Choose its parent folder, rather than Data/ itself. Matched server packages can also include EsteriaServerData/ at that level.",13,Color.rgb(145,163,177)));
         button(layout, "Prepare client runtime", () -> operation(new Intent(this, SessionService.class).setAction(SessionService.PREPARE_RUNTIME)));
         TextView runtimeNote = text("Initial runtime setup may download files. Progress shows the copied size; interrupted setup can resume. Previous versions and imported game data are retained.", 13, Color.rgb(145, 163, 177));
         layout.addView(runtimeNote);
