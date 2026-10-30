@@ -294,5 +294,33 @@
         "sha256": "59a77b5f2666d9c85c489bd1911a6eebbd91ef22fe48b90a3b75f1b21f3844d4"
       }
     }
+  },
+  "softwareAudio": {
+    "formatVersion": 1,
+    "runtimeArchiveSha256": "f036c00a290abb953bec26be80c4d8fe492fd986e7a589c51008124432c8641e",
+    "components": {
+      "usr/lib/aarch64-linux-gnu/libasound.so.2.0.0": {
+        "bytes": 1116648,
+        "sha256": "9fade6b3aedf1ba944e6795b52b74378f2f89166b92ee542582171416a76572d",
+        "elfMachine": 183,
+        "elfClass": 2
+      },
+      "usr/share/alsa/alsa.conf": {
+        "bytes": 10117,
+        "sha256": "ea7c6cedb7da16ba51a0fea3e960416a2240e29c1f5d42e475c1dfcd19eb74ee"
+      },
+      "opt/wine/lib/wine/aarch64-unix/winealsa.so": {
+        "bytes": 462776,
+        "sha256": "aea857b5d08efb62046efa939b0df2f6be42ea4031debe4ff083e055b9599cc9",
+        "elfMachine": 183,
+        "elfClass": 2
+      },
+      "opt/wine/lib/wine/aarch64-windows/winealsa.drv": {
+        "bytes": 983040,
+        "sha256": "84d5571b6a065fa76fa436404acc7a99e8cfa930cd8d29509aa0246dcf09915a",
+        "peMachine": "0xaa64"
+      }
+    },
+    "note": "Source-built Esteria ALSA plugin and a captured known stereo signal are separately required. Simulated Linux playback clock; not Android or audible-output qualification."
   }
 }

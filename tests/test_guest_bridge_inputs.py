@@ -45,13 +45,14 @@ class GuestBridgeInputs(unittest.TestCase):
             head = bytearray(64); head[:6] = b'\x7fELF\x02\x01'; struct.pack_into('<H', head, 18, 183)
             executable.write_bytes(head)
             with patch('runtime.bridges.record_build.subprocess.check_output', side_effect=[
-                    '(NEEDED) Shared library: [libX11.so.6]\n(NEEDED) Shared library: [libc.so.6]',
+                    '(NEEDED) Shared library: [libX11.so.6]\n(NEEDED) Shared library: [libc.so.6]\n'
+                    '(NEEDED) Shared library: [ld-linux-aarch64.so.1]',
                     '[Requesting program interpreter: /lib/ld-linux-aarch64.so.1]',
                     'Name: GLIBC_2.17\nName: GLIBC_2.34']):
                 result = elf(executable)
             self.assertEqual(result['maxGlibc'], '2.34')
             self.assertEqual(result['architecture'], 'arm64')
-            self.assertEqual(result['needed'], ['libX11.so.6', 'libc.so.6'])
+            self.assertEqual(result['needed'], ['ld-linux-aarch64.so.1', 'libX11.so.6', 'libc.so.6'])
 
     def test_elf_receipt_rejects_wrong_architecture_loader_libraries_and_newer_abi(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -32,8 +32,26 @@ as false. Game assets, music decoding and game audio integration remain separate
 ESTERIA_REQUIRE_SOCKET_TESTS=1 python3 -m unittest tests.test_pcm_capture -v
 ```
 
-Two host clock/spectral tests pass locally. This workspace denies AF_UNIX socket
-creation, so three real socket tests explicitly skip here; CI makes those tests
-mandatory and must establish their result. The real guest plugin build and
-paired FMOD/Wine run are pending. No runtime audio pass is claimed by these
-source-level checks.
+All five capture tests passed in [integration tooling CI 40993458123](https://github.com/Russianranger/esteria_android/actions/runs/40993458123)
+at `b06de55f5b17f27ae9659abcfdaf93a61b749a9e`, including real AF_UNIX partial-write
+retry, exact captured signal, malformed input, storage caps and endpoint ownership.
+This workspace denies AF_UNIX socket creation, so those three tests explicitly
+skip locally; CI requires their execution. The tests exercise a synthetic sender,
+not FMOD or Wine. The real guest plugin build and paired FMOD/Wine run remain
+pending; this is receiver behavior evidence only.
+
+The optional Wine harness accepts `--audio-driver`, `--bridge-dir` and
+`--bridge-revision` together. The bridge payload must match that exact integration
+commit, every current guest source hash, the pinned build-input lock, the Wine
+runtime archive and the actual plugin's ARM64 ELF/hash/dependency report. Native
+Wine ALSA libraries and system ALSA configuration are separately byte-pinned in
+`runtime/runtime-sources.lock.json`; the existing base runtime identity is intact.
+
+The harness selects the private plugin in a fresh configuration, explicitly
+selects Wine's ALSA driver and disables PulseAudio for these fixture processes.
+It runs WinMM and DirectSound separately, observes Wine shutdown, lets capture
+workers drain EOF, then exports prefix-separated PCM files. Both backend markers,
+zero process exits, successful owned cleanup and matching captured stereo signals
+are required for `linuxArm64FmodPcmTransportQualified`. Generic `audioQualified`
+and Android qualifications remain false. The new harness path has not yet run;
+its guard tests do not establish actual FMOD, plugin or Wine execution.

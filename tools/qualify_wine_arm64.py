@@ -21,8 +21,10 @@ import time
 
 try:
     from . import prepare_runtime as packages
+    from . import wine_audio
 except ImportError:
     import prepare_runtime as packages
+    import wine_audio
 
 
 GUEST = '/esteria-qualification'
@@ -126,14 +128,18 @@ def namespace_command(script, runtime, output, privileged):
         '--namespace-worker', '--runtime', str(runtime), '--output', str(output)]
 
 
-def guest_command(root, *command, graphics=None):
+def guest_command(root, *command, graphics=None, audio=False):
     environment = []
     if graphics:
         environment = ['VK_ICD_FILENAMES=/' + graphics['icdPath'], 'LIBGL_ALWAYS_SOFTWARE=1']
+    overrides = 'winemenubuilder,mshtml,mscoree='
+    if audio:
+        environment += [f'ALSA_CONFIG_PATH={GUEST}/alsa-qualification.conf', f'ESTERIA_AUDIO_SOCKET={GUEST}/audio.sock']
+        overrides += ';winepulse.drv='
     return ['chroot', str(root), '/usr/bin/env', '-i',
             'PATH=/opt/wine/bin:/usr/bin:/bin', 'LANG=C.UTF-8', f'HOME={GUEST}/home',
             f'WINEPREFIX={GUEST}/prefix', 'WINEARCH=win64', 'DISPLAY=:8',
-            'WINEDEBUG=-all,err+all', 'WINEDLLOVERRIDES=winemenubuilder,mshtml,mscoree=',
+            'WINEDEBUG=-all,err+all', 'WINEDLLOVERRIDES=' + overrides,
             'WINEESYNC=0', 'WINEFSYNC=0', 'FEX_DISABLETELEMETRY=1', *environment, *command]
 
 
@@ -312,6 +318,13 @@ def worker(runtime, output):
                              name + '-vulkan-fixture-failed')
             if name == 'presentation' and plan.get('engineFrameReadbackRequired'):
                 packages.require(observed['engineFrameMessageMatched'], 'engine-frame-readback-marker-missing')
+        if plan.get('audioRequested'):
+            wine_audio.configure(fixture, GUEST)
+            result['audio'] = {}
+            for backend in wine_audio.BACKENDS:
+                observed = {}
+                result['audio'][backend] = observed
+                wine_audio.execute(root, fixture, output, GUEST, backend, observed, run_logged, guest_command, captures)
         result['expectedExit'] = 0
         return 0
     except Exception as error:
@@ -357,7 +370,7 @@ def graphics_identity(root, lock):
     return candidate
 
 
-def qualification_flags(result, requested, namespace_exit=0, client_entry=False):
+def qualification_flags(result, requested, namespace_exit=0, client_entry=False, audio=False):
     # A deliberate handled fixture failure may preserve earlier passing scopes.
     # An abnormal namespace exit may not qualify anything, even if a receipt was
     # flushed just before the worker was killed.
@@ -371,7 +384,11 @@ def qualification_flags(result, requested, namespace_exit=0, client_entry=False)
     flags = {'linuxArm64CodecQualified': bool(common and result.get('fixtureExit') == 0 and
                                               result.get('codecMessageMatched') is True),
              'linuxArm64VulkanPresentationQualified': False, 'linuxArm64VulkanTextureLifecycleQualified': False,
-             'linuxArm64ClientEntryQualified': False, 'linuxArm64VulkanEngineFrameReadbackQualified': False}
+             'linuxArm64ClientEntryQualified': False, 'linuxArm64VulkanEngineFrameReadbackQualified': False,
+             'linuxArm64FmodPcmTransportQualified': False}
+    if audio:
+        flags['linuxArm64FmodPcmTransportQualified'] = bool(common and
+            all(wine_audio.passed(result.get('audio', {}).get(name, {})) for name in wine_audio.BACKENDS))
     if client_entry:
         entry = result.get('clientEntry', {})
         flags['linuxArm64ClientEntryQualified'] = bool(common and entry.get('launchAttempted') is True and
@@ -388,9 +405,11 @@ def qualification_flags(result, requested, namespace_exit=0, client_entry=False)
     return flags
 
 
-def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=False, require_engine_frame=False):
+def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=False, require_engine_frame=False,
+            audio_driver=None, bridge_dir=None, bridge_revision=None):
     packages.require(not require_engine_frame or 'presentation' in (graphics or {}),
                      'engine-frame-readback-requires-presentation-driver')
+    packages.require(bool(audio_driver) == bool(bridge_dir) == bool(bridge_revision), 'audio-driver-and-pinned-bridge-required-together')
     packages.require(platform.machine().lower() in ('aarch64', 'arm64'), 'native-arm64-host-required')
     packages.require(os.geteuid() == 0, 'invoke-qualification-with-sudo')
     runtime = packages.directory(runtime)
@@ -411,6 +430,9 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
     packages.directory(output.parent, create=True)
     output.mkdir(mode=0o700)
     root = runtime / 'rootfs'
+    audio_identity = wine_audio.bridge_identity(root, bridge_dir, bridge_revision, lock) if audio_driver else None
+    if audio_driver:
+        client['files']['fmod_output_device.exe'] = pe_identity(audio_driver, False)
     graphics = graphics or {}
     packages.require(set(graphics) <= set(VULKAN_FIXTURES), 'unknown-graphics-fixture')
     software_graphics = graphics_identity(root, lock) if graphics else None
@@ -423,15 +445,24 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
     if client_entry:
         inputs.append((client_dir / 'WowClient64.exe', 'WowClient64.exe'))
     inputs += [(path, VULKAN_FIXTURES[name][0]) for name, path in graphics.items()]
+    if audio_driver:
+        inputs.append((audio_driver, 'fmod_output_device.exe'))
     for source, name in inputs:
         with packages.plain_file(source) as src, (fixture / name).open('xb') as dst:
             digest = packages.hash_stream(src, client['files'][name]['bytes'], dst)
             packages.require(digest == client['files'][name]['sha256'], 'fixture-changed-during-copy')
             dst.flush()
             os.fsync(dst.fileno())
+    if audio_driver:
+        with packages.plain_file(bridge_dir / 'bin' / wine_audio.PLUGIN) as src, (fixture / wine_audio.PLUGIN).open('xb') as dst:
+            expected = audio_identity['plugin']
+            packages.require(packages.hash_stream(src, expected['bytes'], dst) == expected['sha256'], 'audio-plugin-changed-during-copy')
+            dst.flush()
+            os.fsync(dst.fileno())
     packages.write_json(fixture / 'qualification-plan.json',
                         dict(graphicsRequested=list(graphics), softwareGraphics=software_graphics,
-                             clientEntryRequested=client_entry, engineFrameReadbackRequired=require_engine_frame))
+                             clientEntryRequested=client_entry, engineFrameReadbackRequired=require_engine_frame,
+                             audioRequested=bool(audio_driver)))
     report = dict(formatVersion=1, scope='native-linux-arm64-wine-component-fixtures',
                   runtimeArchiveSha256=package['archive']['sha256'], runtimeReceiptSha256=prepared_sha,
                   client=client, directImports=imports_report(manifest, prepared),
@@ -442,6 +473,7 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
                   linuxArm64VulkanPresentationQualified=False, linuxArm64VulkanTextureLifecycleQualified=False,
                   linuxArm64ClientEntryQualified=False, clientEntryRequested=client_entry,
                   linuxArm64VulkanEngineFrameReadbackQualified=False, engineFrameReadbackRequired=require_engine_frame,
+                  linuxArm64FmodPcmTransportQualified=False, audioRequested=bool(audio_driver), audioBridge=audio_identity,
                   softwareGraphics=software_graphics, graphicsRequested=list(graphics))
     command = namespace_command(Path(__file__).resolve(), runtime, output, os.geteuid() == 0)
     child = None
@@ -451,7 +483,8 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
                 env={'PATH': '/usr/sbin:/usr/bin:/sbin:/bin', 'LANG': 'C.UTF-8',
                      'ESTERIA_NAMESPACE_CHILD': '1'})
             try:
-                report['namespaceExit'] = child.wait(timeout=420 + 185 * len(graphics) + (125 if client_entry else 0))
+                report['namespaceExit'] = child.wait(timeout=420 + 185 * len(graphics) + (125 if client_entry else 0) +
+                                                    (620 if audio_driver else 0))
             except subprocess.TimeoutExpired:
                 os.killpg(child.pid, signal.SIGKILL)
                 child.wait(timeout=15)
@@ -459,7 +492,7 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
         report['processNamespaceExited'] = True
         result, _ = read_json(output / 'worker-result.json')
         report['worker'] = result
-        report.update(qualification_flags(result, graphics, report['namespaceExit'], client_entry))
+        report.update(qualification_flags(result, graphics, report['namespaceExit'], client_entry, bool(audio_driver)))
         report['clientExecutableLaunchAttempted'] = result.get('clientEntry', {}).get('launchAttempted') is True
         report['clientExecutableEntryReached'] = report['linuxArm64ClientEntryQualified']
         packages.require(report['linuxArm64CodecQualified'], 'wine-codec-qualification-failed')
@@ -471,6 +504,8 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
             packages.require(report[key], name + '-vulkan-not-qualified')
         if require_engine_frame:
             packages.require(report['linuxArm64VulkanEngineFrameReadbackQualified'], 'engine-frame-readback-not-qualified')
+        if audio_driver:
+            packages.require(report['linuxArm64FmodPcmTransportQualified'], 'fmod-pcm-transport-not-qualified')
         packages.require(report['namespaceExit'] == 0, 'wine-worker-exit-failed')
         return report
     except Exception as error:
@@ -500,6 +535,9 @@ def main():
     parser.add_argument('--driver', type=Path)
     parser.add_argument('--presentation-driver', type=Path)
     parser.add_argument('--texture-driver', type=Path)
+    parser.add_argument('--audio-driver', type=Path, help='Actual source-built ARM64 FMOD Windows output fixture')
+    parser.add_argument('--bridge-dir', type=Path, help='Matching source-built native guest bridge payload')
+    parser.add_argument('--bridge-revision', help='Exact integration revision used to build the guest bridge')
     parser.add_argument('--client-entry-check', action='store_true', help='Launch the verified full PE in its explicit entry-only mode')
     parser.add_argument('--require-engine-frame-readback', action='store_true',
                         help='Require the presentation driver to pass real engine scene readback and embedded shaders')
@@ -514,10 +552,13 @@ def main():
     graphics = {name: path.absolute() for name, path in
                 (('presentation', args.presentation_driver), ('texture', args.texture_driver)) if path is not None}
     result = qualify(args.runtime, args.client_dir.absolute(), args.driver.absolute(), args.output, graphics,
-                     args.client_entry_check, args.require_engine_frame_readback)
+                     args.client_entry_check, args.require_engine_frame_readback,
+                     args.audio_driver.absolute() if args.audio_driver else None,
+                     args.bridge_dir.absolute() if args.bridge_dir else None, args.bridge_revision)
     print(json.dumps({key: result[key] for key in ('linuxArm64CodecQualified', 'linuxArm64VulkanPresentationQualified',
                                                  'linuxArm64VulkanTextureLifecycleQualified', 'linuxArm64ClientEntryQualified',
                                                  'linuxArm64VulkanEngineFrameReadbackQualified',
+                                                 'linuxArm64FmodPcmTransportQualified',
                                                  'androidRuntimeQualified')}))
     return 0
 

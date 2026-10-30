@@ -88,6 +88,37 @@ class WineQualification(unittest.TestCase):
         self.assertNotIn('HOME=/root', command)
         self.assertTrue(all('TOKEN' not in part for part in command))
 
+    def test_audio_environment_explicitly_selects_private_source_plugin_and_disables_pulse(self):
+        command = qualification.guest_command(Path('/rootfs'), 'fixture.exe', audio=True)
+        self.assertIn('ALSA_CONFIG_PATH=/esteria-qualification/alsa-qualification.conf', command)
+        self.assertIn('ESTERIA_AUDIO_SOCKET=/esteria-qualification/audio.sock', command)
+        self.assertIn('WINEDLLOVERRIDES=winemenubuilder,mshtml,mscoree=;winepulse.drv=', command)
+        self.assertNotIn('PULSE_SERVER', ' '.join(command))
+
+    def test_audio_scope_requires_both_actual_backends_pcm_signal_and_complete_cleanup(self):
+        passed = dict(driverSelectionExit=0, fixtureExit=0, messageMatched=True, wineStopExit=0, wineWaitExit=0,
+                      pcmEofDrained=True, pcm={'pcmSignalQualified': True})
+        result = dict(displayReady=True, networkIsolated=True, prefixExit=0, fixtureExit=0, codecMessageMatched=True,
+                      wineStopExit=0, logStreamsDrained=True, logsWithinLimit=True, logWritesSucceeded=True,
+                      workerCompleted=True, expectedExit=0, audio={'winmm': dict(passed), 'dsound': dict(passed)})
+        key = 'linuxArm64FmodPcmTransportQualified'
+        self.assertTrue(qualification.qualification_flags(result, [], audio=True)[key])
+        self.assertFalse(qualification.qualification_flags(result, [], audio=False)[key])
+        for backend in ('winmm', 'dsound'):
+            for field, wrong in (('fixtureExit', 1), ('messageMatched', False), ('wineWaitExit', 1),
+                                 ('pcmEofDrained', False), ('pcm', {'pcmSignalQualified': False})):
+                saved = result['audio'][backend][field]
+                result['audio'][backend][field] = wrong
+                self.assertFalse(qualification.qualification_flags(result, [], audio=True)[key])
+                result['audio'][backend][field] = saved
+        self.assertFalse(qualification.qualification_flags(result, [], namespace_exit=-9, audio=True)[key])
+
+    def test_audio_requires_explicit_paired_bridge_inputs_before_execution(self):
+        with patch.object(qualification.subprocess, 'Popen', side_effect=AssertionError('must not execute')):
+            with self.assertRaisesRegex(ValueError, 'pinned-bridge-required-together'):
+                qualification.qualify(self.root, self.root, self.root / 'driver', self.root / 'output',
+                                      audio_driver=self.root / 'audio')
+
     def test_forced_vulkan_driver_and_observed_device_identity(self):
         command = qualification.guest_command(Path('/r'), 'fixture', graphics={'icdPath': 'usr/share/vulkan/icd.d/lvp.json'})
         self.assertIn('VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/lvp.json', command)

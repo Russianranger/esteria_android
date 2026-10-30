@@ -141,8 +141,11 @@ Evidence at this checkpoint:
 - All new Android Java compiles with JDK17 `-Xlint:all -Werror`; the actual
   ARM64 Android26 JNI library compiles with NDK r28c `-Wall -Wextra -Werror`.
 - The three guest C targets compile on host x64 against checksum-verified Ubuntu
-  development packages. This is compilation evidence only, not the selected
-  Debian ARM64 runtime build.
+  development packages. Native ARM64 CI `40994809770` also compiled all three
+  using the selected Debian12 snapshot. Its first verifier run rejected the
+  AArch64 glibc loader's direct dependency; the allowlist now includes that exact
+  loader, which exports `__stack_chk_guard`. ELF verification and source export
+  still require the corrected CI run. Compilation does not qualify execution.
 - A real reconstructed FMOD/Wine/ALSA transport
   fixture with a bounded simulated PCM receiver. That does not qualify audible
   Android output.

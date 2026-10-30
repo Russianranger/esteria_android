@@ -234,6 +234,15 @@ class PcmCapture:
             with self.lock:
                 self.connections.discard(connection)
 
+    def wait_eof(self, timeout):
+        """Allow already-connected producers to reach EOF before forced local cleanup."""
+        deadline = time.monotonic() + timeout
+        with self.lock:
+            workers = list(self.workers)
+        for worker in workers:
+            worker.join(max(0, deadline - time.monotonic()))
+        return all(not worker.is_alive() for worker in workers)
+
     def close(self):
         self.closed = True
         self.listener.close()
@@ -253,13 +262,15 @@ class PcmCapture:
             raise ValueError('pcm-workers-did-not-stop')
         self._unlink()
 
-    def report(self, output):
+    def report(self, output, prefix='captured'):
         if not self.closed or any(worker.is_alive() for worker in self.workers):
             raise ValueError('pcm-capture-must-be-stopped-before-report')
+        if not prefix or any(character not in 'abcdefghijklmnopqrstuvwxyz0123456789-' for character in prefix):
+            raise ValueError('pcm-capture-prefix-invalid')
         output = Path(output)
         reports = []
         for index, stream in enumerate(self.streams):
-            name = f'captured-{index:02d}.s16le'
+            name = f'{prefix}-{index:02d}.s16le'
             with (output / name).open('xb') as capture:
                 capture.write(stream['pcm'])
             value = {key: value for key, value in stream.items() if key != 'pcm'}

@@ -1,4 +1,4 @@
-# Linux ARM64 Wine codec qualification
+# Linux ARM64 Wine component qualification
 
 `tools/qualify_wine_arm64.py` runs the real reconstructed-client
 `XvidDecoder.dll` through the native ARM64 `test_xvid_adapter.exe` driver. It
@@ -72,7 +72,16 @@ This checks pixels before the embedded presentation shader, not pixels displayed
 by the compositor. It establishes neither data-derived game shader correctness
 nor world rendering. The exact new marker is
 `PASS: Engine Vulkan frame BGRA readback, partial clears and embedded-shader presentation`.
-This new scope is implemented but awaits the paired client CI execution.
+This scope passed in [client CI 40992315512](https://github.com/Russianranger/wowdecomp_esteria/actions/runs/40992315512)
+at client `69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa`, harness
+`32329e64f05d9c9734b7c55c3270fb1800c7aff6`. Both native Windows builds passed;
+the actual native Linux ARM64 Wine run reported the exact additional marker,
+zero exit, normal cleanup and bounded drained logs on llvmpipe LLVM 15.0.6.
+[Evidence artifact 12949797521](https://github.com/Russianranger/wowdecomp_esteria/actions/runs/40992315512/artifacts/12949797521)
+contains receipt SHA256
+`69bfe354c777abf78e54ed033849235928edf742efdfce3371bca4c1e01379c4`.
+The validation layer was unavailable; Android/Adreno and full game rendering
+remain unqualified.
 
 ## Full executable entry check
 
@@ -92,6 +101,34 @@ only as observed because the real crash logger's `AllocConsole` may redirect it.
 `linuxArm64ClientEntryQualified`, `clientExecutableLaunchAttempted` and
 `clientExecutableEntryReached` describe this explicit scope;
 `gameInitializationStarted` and Android/gameplay qualifications remain false.
+
+## Captured FMOD audio transport
+
+The optional audio gate takes all three arguments together:
+
+```sh
+  --audio-driver /path/to/client-artifact/build/audio/Release/fmod_output_device.exe \
+  --bridge-dir /path/to/guest-payload \
+  --bridge-revision EXACT_INTEGRATION_COMMIT
+```
+
+Build that payload with the pinned `runtime/bridges/Dockerfile` from the same
+exact integration checkout. The harness verifies current guest source hashes,
+build-input lock, runtime archive, actual plugin ELF requirements and native
+Wine/ALSA component hashes. `readelf` from binutils is required for this optional
+path. It then selects the private ALSA endpoint and runs the real reconstructed
+FMOD fixture with WinMM and DirectSound separately. Both process markers and
+zero exits, actual captured 1 kHz-left/2 kHz-right PCM, clean receiver EOF and
+owned Wine/namespace cleanup must pass. Raw bounded captures and hashes are
+included in the evidence directory.
+
+`linuxArm64FmodPcmTransportQualified` describes this separate Linux transport
+scope. The receiver supplies a simulated monotonic playback clock: generic
+`audioQualified`, Android audio, audible output and physical latency remain
+unqualified. See [PCM-CAPTURE.md](PCM-CAPTURE.md) for the tested receiver behavior
+and current execution status. The new FMOD/Wine path has not yet executed.
+
+## Ownership and evidence
 
 The output directory must be new. Logs, identities, per-import file/machine
 diagnostics, worker exit status and `qualification.json` are retained on success

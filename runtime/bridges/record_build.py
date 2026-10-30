@@ -9,7 +9,10 @@ import re
 import struct
 import subprocess
 
-ALLOWED_NEEDED = {'libX11.so.6', 'libXfixes.so.3', 'libXext.so.6', 'libasound.so.2', 'libc.so.6'}
+# AArch64 glibc exports __stack_chk_guard from its loader. Stack-protected
+# executables/plugins can therefore directly NEEDED this same required loader.
+ALLOWED_NEEDED = {'libX11.so.6', 'libXfixes.so.3', 'libXext.so.6', 'libasound.so.2', 'libc.so.6',
+                  'ld-linux-aarch64.so.1'}
 BINARIES = ('esteria-x11-frame', 'esteria-x11-input', 'libasound_module_pcm_esteria.so')
 
 
@@ -32,7 +35,8 @@ def elf(path):
             struct.unpack_from('<H', head, 18)[0] == 183, 'not-elf64-arm64')
     dynamic = subprocess.check_output(['readelf', '--dynamic', '--wide', str(path)], text=True)
     needed = re.findall(r'\(NEEDED\).*?\[([^\]]+)\]', dynamic)
-    require(needed and set(needed) <= ALLOWED_NEEDED, 'unexpected-guest-library')
+    require(needed and set(needed) <= ALLOWED_NEEDED,
+            'unexpected-guest-library:' + path.name + ':' + ','.join(needed))
     require(not re.search(r'\((?:RPATH|RUNPATH)\)', dynamic), 'unexpected-library-search-path')
     program = subprocess.check_output(['readelf', '--program-headers', '--wide', str(path)], text=True)
     interpreters = re.findall(r'Requesting program interpreter: ([^\]]+)', program)
