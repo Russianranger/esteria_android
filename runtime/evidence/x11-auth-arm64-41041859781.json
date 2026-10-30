@@ -1,0 +1,196 @@
+{
+  "formatVersion": 1,
+  "scope": "observed-native-linux-arm64-authenticated-x11-input",
+  "runId": 41041859781,
+  "sourceRevision": "e1341cf658d972d66bd05c90150eb7bf3c3db0df",
+  "runConclusion": "success",
+  "artifact": {
+    "id": 12971070587,
+    "bytes": 142444010,
+    "sha256": "c6fc79a3437e01518184c4b3182f36858e33d14456b2f9ad7d17e10198a10ae7",
+    "downloadVerified": true
+  },
+  "qualification": {
+    "bytes": 3948,
+    "sha256": "3d46c1f194003be72d6f6a70186c38d00601ba5dfd5e84855a861b9c1d00e738",
+    "receipt": {
+      "formatVersion": 1,
+      "scope": "native-linux-arm64-x11-input-fixture",
+      "runtimeArchiveSha256": "f036c00a290abb953bec26be80c4d8fe492fd986e7a589c51008124432c8641e",
+      "runtimeReceiptSha256": "67ce1aa0d90c1199bd4fc5be4538f36c247f1905d761285efbda90c2e7b5664a",
+      "x11RuntimeLockSha256": "f6a7cebc7d78933a05a074a7a152adc7a19b547e00192de6489d6b1bd7e15ccf",
+      "x11ElfImagesVerified": 49,
+      "binaries": {
+        "integrationRevision": "e1341cf658d972d66bd05c90150eb7bf3c3db0df",
+        "bridgeReceiptSha256": "b2f39a81854ef3bf848113b047692fa1e93004979242964d46a93c9281614c91",
+        "observerReceiptSha256": "655970d32027e702e9bf432063c00a44170a60aabe2c874eb878eaa4e71d185b",
+        "inputLockSha256": "be07f59cff79a6c0e746d4d9c2adbd816568903e312317ff58091f9747779af0",
+        "helper": {
+          "bytes": 73392,
+          "sha256": "1402acc34f52e33177d9bef1b57b46532d192a5ac3b2eb0675973c80e6b0a014",
+          "architecture": "arm64",
+          "needed": [
+            "ld-linux-aarch64.so.1",
+            "libX11.so.6",
+            "libXext.so.6",
+            "libc.so.6"
+          ],
+          "maxGlibc": "2.34",
+          "interpreter": "/lib/ld-linux-aarch64.so.1"
+        },
+        "observer": {
+          "bytes": 72416,
+          "sha256": "2f77b245183e2be268160588d11c98c62141207c9325feab1fc9b23d2ab0b691",
+          "architecture": "arm64",
+          "needed": [
+            "libX11.so.6",
+            "libc.so.6"
+          ],
+          "maxGlibc": "2.34",
+          "interpreter": "/lib/ld-linux-aarch64.so.1"
+        }
+      },
+      "linuxArm64X11InputQualified": true,
+      "processNamespaceExited": true,
+      "wineClientExecuted": false,
+      "linuxArm64AuthenticatedX11InputQualified": true,
+      "androidQualified": false,
+      "controllerQualified": false,
+      "gameplayQualified": false,
+      "authentication": {
+        "actualApplicationFormatterExecuted": true,
+        "sources": {
+          "core/src/main/java/io/github/russianranger/esteria/core/presentation/X11SessionPlan.java": {
+            "bytes": 2458,
+            "sha256": "6f5a912fd4a067f3d8820c4818502a3b3d7d12f2ab62b991a7023bfaa9d990a0"
+          },
+          "tests/fixtures/X11AuthorityFixture.java": {
+            "bytes": 2225,
+            "sha256": "ee6f94afc0d77854bdcfb0cb112fa6c77b999ae5ad94d725f116dee3975e0d08"
+          }
+        },
+        "hostJavaExecutables": {
+          "javac": {
+            "bytes": 70736,
+            "sha256": "3d0a318a9c874cacbd69a6ac51c3c6fe95eee6e6558c8a3f3ef1711746b6ef00"
+          },
+          "java": {
+            "bytes": 70704,
+            "sha256": "185fdd3e40d7736c600cb948403f77fd3421e8877e2ff13271673f28a501531f"
+          }
+        },
+        "display": 64,
+        "privateCookiesExported": false
+      },
+      "namespaceExit": 0,
+      "worker": {
+        "workerCompleted": true,
+        "expectedExit": 0,
+        "networkIsolated": true,
+        "displayReady": true,
+        "helperReady": true,
+        "observerExit": 0,
+        "receiptValidated": true,
+        "authenticatedServerCommand": true,
+        "missingCookie": {
+          "exitCode": 3,
+          "listenerCreated": false,
+          "readyMarker": false,
+          "logDrained": true
+        },
+        "wrongCookie": {
+          "exitCode": 3,
+          "listenerCreated": false,
+          "readyMarker": false,
+          "logDrained": true
+        },
+        "positiveHelperReadyMarker": true,
+        "observerReceipt": {
+          "formatVersion": 1,
+          "scope": "native-linux-arm64-x11-input-fixture",
+          "groupsPassed": 7,
+          "observedEvents": 16,
+          "acknowledgments": 15,
+          "absoluteMotion": true,
+          "relativeMotion": true,
+          "buttons": true,
+          "keyboardAndShift": true,
+          "releaseOnEof": true,
+          "unsupportedKeyRejected": true,
+          "reconnectNeutral": true,
+          "androidQualified": false,
+          "controllerQualified": false,
+          "gameplayQualified": false
+        },
+        "observerReceiptSha256": "6978f8b7264c314ab077a1f92034cd114f7ce15303b309fb00d5b4bfa82e94a0",
+        "helperExit": 0,
+        "helperForced": false,
+        "displayExit": 0,
+        "displayForced": false,
+        "displayStopped": true,
+        "socketRemoved": true,
+        "logStreamsDrained": true,
+        "logsWithinLimit": true,
+        "logWritesSucceeded": true
+      }
+    }
+  },
+  "publicEvidenceFiles": {
+    "display.log": {
+      "bytes": 619,
+      "sha256": "7e496d941d5855e2a051af8f30836ea409fff4b54c413631fd73f37c67b02057"
+    },
+    "formatter-compile.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "formatter-run.log": {
+      "bytes": 32,
+      "sha256": "2ae7d3f591fb8e54f93d5eb7e2f515d698f5d91fd29a4599791712cc5462949e"
+    },
+    "input-helper.log": {
+      "bytes": 35,
+      "sha256": "3f8aa8af4790a129d0c2373b5f78a60ff4535405dafe5bcbf5a2363ba2b677d9"
+    },
+    "missingCookie.log": {
+      "bytes": 65,
+      "sha256": "3c649a53cd037292977d3a8e8bc3d981384d2f09bca4ac792ad22418b8954b63"
+    },
+    "namespace.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "observer-receipt.json": {
+      "bytes": 422,
+      "sha256": "7130e1341e72ad5e317c80234a0890b1266a43c766f0079daa8bedc5935d5e89"
+    },
+    "observer.log": {
+      "bytes": 93,
+      "sha256": "f36f2900a1663edfca24530b689f790f1f81f403afc5992ad88ba89799ce086a"
+    },
+    "qualification.json": {
+      "bytes": 3948,
+      "sha256": "3d46c1f194003be72d6f6a70186c38d00601ba5dfd5e84855a861b9c1d00e738"
+    },
+    "worker-result.json": {
+      "bytes": 1293,
+      "sha256": "e82522b1e8407280213829928e78bcc65b60a2e8d0d8058655df848accf4abb9"
+    },
+    "wrongCookie.log": {
+      "bytes": 31,
+      "sha256": "ee63b70834b1e470e473d29814cd7e2a8b5bc28d749f256b0c00d561401c2dce"
+    }
+  },
+  "verification": {
+    "actualFormatterSourcesMatchArchiveAndCheckout": true,
+    "helperAndObserverBuildIdentityVerified": true,
+    "strictObserverAndWorkerReceiptsValidated": true,
+    "sourceFormatObserverReceiptHashVerified": true,
+    "privateAuthorityFilesAbsentFromArtifact": true
+  },
+  "prootQualified": false,
+  "androidQualified": false,
+  "wineClientQualified": false,
+  "controllerQualified": false,
+  "gameplayQualified": false
+}

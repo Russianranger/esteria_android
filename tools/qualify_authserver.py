@@ -183,11 +183,14 @@ def export_auth_log(state, output, extra_secrets=()):
     config.write_private(output / 'authserver-redacted.log', text)
 
 
-def run(install, content_directory, receipt_sha256, lock_path, mysql, mysqld, version, output):
+def run(install, content_directory, receipt_sha256, lock_path, mysql, mysqld, version, output,
+        *, engine_derivative_receipt=None):
     # This call is the sole creator of output and its MySQL state. There is no
     # mode that adopts a previous updater fixture or a user-owned save path.
     output = db.private_path(output)
-    updated = importer.run(install, content_directory, receipt_sha256, lock_path, mysql, mysqld, version, output)
+    selection_args = {} if engine_derivative_receipt is None else {'engine_derivative_receipt': engine_derivative_receipt}
+    updated = importer.run(install, content_directory, receipt_sha256, lock_path, mysql, mysqld, version, output,
+                           **selection_args)
     require(updated['qualificationSucceeded'], 'compiled updater did not qualify')
     state = output / 'private-state'
     evidence = dict(formatVersion=1, scope='disposable-native-ARM64-authserver-protocol-probe', mysqlVersion=version,
@@ -200,12 +203,14 @@ def run(install, content_directory, receipt_sha256, lock_path, mysql, mysqld, ve
     try:
         manifest, _ = modules.read_json(output / 'content/metadata/content-manifest.json')
         compiled, _ = modules.read_json(output / 'content/metadata/compiled-modules.json')
-        build, _ = importer.verify_install(install, compiled, lock_path)
+        build, _, programs, derivative = importer.select_install(install, compiled, lock_path, engine_derivative_receipt)
+        if derivative is not None:
+            evidence['engineDerivative'] = derivative
         auth = [row for row in build['files'] if row['path'] == 'bin/authserver']
         require(len(auth) == 1 and auth[0].get('elf', {}).get('machine') == 'AArch64', 'verified ARM64 authserver missing')
-        require(files.identity(install / 'bin/authserver') == {key: auth[0][key] for key in ('bytes', 'sha256')},
+        require(files.identity(install / 'bin/authserver') == programs['authserver'],
                 'authserver identity changed before execution')
-        evidence.update(serverBuildId=build['buildId'], authserver={key:auth[0][key] for key in ('bytes','sha256')},
+        evidence.update(serverBuildId=build['buildId'], authserver=programs['authserver'],
                         source=updated['source'], sourceLockSha256=updated['sourceLockSha256'])
         source = output / 'content/source'
         rendered = render_runtime_config(install, output, source, build, state, mysql)
@@ -229,6 +234,8 @@ def run(install, content_directory, receipt_sha256, lock_path, mysql, mysqld, ve
             before = importer.schema_snapshot(connection, expected)
             trackers = connection.query('SELECT * FROM acore_auth.realmcharacters ORDER BY realmid,acctid')
         evidence['phase'] = 'start-owned-authserver'
+        require(files.identity(install / 'bin/authserver') == programs['authserver'],
+                'selected authserver identity changed before owned startup')
         auth_capture = OwnedAuthserver(install / 'bin/authserver', configuration, state / 'logs/authserver-private.log')
         wait_authserver(auth_capture)
         evidence['ownedLoopbackListenerVerified'] = True
@@ -276,10 +283,12 @@ def main():
     parser.add_argument('--lock', type=Path, default=base.content.ROOT / 'sources.lock.json')
     parser.add_argument('--content-receipt-sha256', required=True)
     parser.add_argument('--expected-version', required=True)
+    parser.add_argument('--engine-derivative-receipt', type=Path)
     args = parser.parse_args()
     try:
         result = run(args.install, args.content, args.content_receipt_sha256, args.lock,
-                     args.mysql, args.mysqld, args.expected_version, args.output)
+                     args.mysql, args.mysqld, args.expected_version, args.output,
+                     engine_derivative_receipt=args.engine_derivative_receipt)
         print(json.dumps(result, indent=2)); return 0
     except BaseException:
         print('Owned authserver qualification failed; private fixture retained and credentials withheld', file=sys.stderr)

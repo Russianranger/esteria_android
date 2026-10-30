@@ -152,6 +152,17 @@ def verify_install(install, compiled, lock_path):
     return build, install / template
 
 
+def select_install(install, compiled, lock_path, engine_derivative_receipt=None):
+    """Keep original provenance and select derived program identities explicitly."""
+    if engine_derivative_receipt is not None:
+        from tools import verify_server_engine_runtime as derivative
+        return derivative.verify_install(install, compiled, lock_path, engine_derivative_receipt)
+    build, template = verify_install(install, compiled, lock_path)
+    programs = {Path(row['path']).name: {key: row[key] for key in ('bytes', 'sha256')}
+                for row in build['files'] if row['path'] in ('bin/authserver', 'bin/worldserver', 'bin/dbimport')}
+    return build, template, programs, None
+
+
 def render_importer(template, source, state, mysql, password):
     run = state / 'run/dbimport'
     run.mkdir(mode=0o700)
@@ -279,7 +290,8 @@ def redact_importer_logs(state, output):
             config.write_private(output / name, text)
 
 
-def run(install, content_directory, receipt_sha256, lock_path, mysql, mysqld, version, output):
+def run(install, content_directory, receipt_sha256, lock_path, mysql, mysqld, version, output,
+        *, engine_derivative_receipt=None):
     db.exact_version(version)
     require(platform.system() == 'Linux' and platform.machine().lower() in ('aarch64', 'arm64'),
             'compiled updater qualification requires native Linux ARM64')
@@ -302,7 +314,9 @@ def run(install, content_directory, receipt_sha256, lock_path, mysql, mysqld, ve
     capture = None
     try:
         receipt, manifest, compiled = unpack_content(content_directory, receipt_sha256, lock_path, output / 'content')
-        build, template = verify_install(install, compiled, lock_path)
+        build, template, programs, derivative = select_install(install, compiled, lock_path, engine_derivative_receipt)
+        if derivative is not None:
+            evidence['engineDerivative'] = derivative
         evidence.update(source=receipt['source'], sourceLockSha256=receipt['sourceLockSha256'],
                         serverBuildId=build['buildId'], compiledModules=compiled['enabledModules'])
         source = output / 'content/source'
@@ -322,6 +336,8 @@ def run(install, content_directory, receipt_sha256, lock_path, mysql, mysqld, ve
                     lambda database, sql: base.apply_base(mysql, options, 'acore_' + database,
                                                           sql, state / 'logs/sql-client.log'))
                 evidence['compiledUpdaterAttempted'] = True
+                require(files.identity(install / 'bin/dbimport') == programs['dbimport'],
+                        'selected dbimport identity changed before execution')
                 evidence['firstUpdater'] = run_importer(install / 'bin/dbimport', configuration,
                     state / 'logs/dbimport-first.log',
                     on_started=lambda: evidence.update(compiledUpdaterExecuted=True))
@@ -331,6 +347,8 @@ def run(install, content_directory, receipt_sha256, lock_path, mysql, mysqld, ve
                 token = hashlib.sha256(base.canonical_identity(receipt['archive'])).hexdigest()
                 markers(connection, token, create=True)
                 before = schema_snapshot(connection, expected)
+                require(files.identity(install / 'bin/dbimport') == programs['dbimport'],
+                        'selected dbimport identity changed before reentry')
                 evidence['secondUpdater'] = run_importer(install / 'bin/dbimport', configuration, state / 'logs/dbimport-second.log')
                 markers(connection, token)
                 require(schema_snapshot(connection, expected) == before, 'same-revision updater changed table/ledger set')
@@ -383,9 +401,11 @@ def main():
     parser.add_argument('--mysqld', type=Path, required=True)
     parser.add_argument('--expected-version', required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--engine-derivative-receipt', type=Path)
     args = parser.parse_args()
     evidence = run(args.install, args.content, args.content_receipt_sha256, args.lock, args.mysql,
-                   args.mysqld, args.expected_version, args.output)
+                   args.mysqld, args.expected_version, args.output,
+                   engine_derivative_receipt=args.engine_derivative_receipt)
     print(json.dumps(evidence, sort_keys=True))
 
 

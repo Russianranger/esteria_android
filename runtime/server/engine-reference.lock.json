@@ -1,0 +1,24 @@
+{
+  "formatVersion": 1,
+  "scope": "exact-current-server-engine-inputs",
+  "repository": "Russianranger/esteria_android",
+  "integrationRevision": "e9dcb61d8d8c40fc683ac2a67bbf15a8eb538300",
+  "workflowRun": 41019374697,
+  "job": 123943855596,
+  "buildId": "41019374697.1",
+  "sourceLockSha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1",
+  "runtimeSourceLockSha256": "2efac3a6a310c4add3a0407f0044ac608706aa748730351d45ea4c67bdfd0a47",
+  "minimumFreeBytes": 12884901888,
+  "artifacts": {
+    "install": {"id": 12966255548, "bytes": 1168482464, "sha256": "69cc0381cd16f5a3c57c7b24128e90b601e157808336bbdd9ad3a59f403d3ac8"},
+    "content": {"id": 12965377058, "bytes": 171464693, "sha256": "a66b586f4517ce56d529378e72e125287c1122f84f35339102f8b8def78b9d07"},
+    "diagnostics": {"id": 12966265599, "bytes": 2961517, "sha256": "07b6c9210ab164d312f7e717b2dcf7c9b08de8d86abeb51b5c39db8e34f22c6b"}
+  },
+  "originalQualification": {
+    "scope": "link-install-loader-module-content-pass-runtime-step-failure",
+    "runtimeStepQualified": false
+  },
+  "sourceCompanionComplete": false,
+  "androidRuntimeQualified": false,
+  "gameplayQualified": false
+}

@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 import tempfile
+import subprocess
 import unittest
 from unittest import mock
 from tools import client_auth_contract as contract
@@ -10,6 +11,49 @@ from tools import qualify_client_auth as qualifier
 
 
 class ClientAuthQualification(unittest.TestCase):
+    def test_readonly_source_verification_uses_exact_trust_and_no_index_writes(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary); revision='a'*40
+            outputs=[(revision+'\n').encode(),b'H clean.cpp\0',b'',b'',b'']
+            with mock.patch.object(qualifier.subprocess,'run',side_effect=[
+                    subprocess.CompletedProcess([],0,stdout=raw,stderr=b'') for raw in outputs]) as run:
+                qualifier.verify_readonly_client_source(root,revision)
+            commands=[call.args[0] for call in run.call_args_list]
+            self.assertEqual(len(commands),5)
+            for call in run.call_args_list:
+                self.assertIn('safe.directory='+str(root),call.args[0])
+                self.assertEqual(call.kwargs['env']['GIT_OPTIONAL_LOCKS'],'0')
+                self.assertEqual(call.kwargs['env']['GIT_NO_LAZY_FETCH'],'1')
+                self.assertNotIn('write-tree',call.args[0]);self.assertNotIn('read-tree',call.args[0])
+            self.assertIn('diff-index',commands[2]);self.assertIn('--cached',commands[2])
+            self.assertIn('diff-files',commands[3])
+
+    def test_readonly_source_rejects_hidden_changes_before_binary_or_namespace_work(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary);revision='b'*40
+            for hidden in (b'S hidden.cpp\0',b'h hidden.cpp\0'):
+                with mock.patch.object(qualifier.subprocess,'run',side_effect=[
+                        subprocess.CompletedProcess([],0,stdout=(revision+'\n').encode(),stderr=b''),
+                        subprocess.CompletedProcess([],0,stdout=hidden,stderr=b'')]), \
+                        self.assertRaisesRegex(ValueError,'hidden-index-flags'):
+                    qualifier.verify_readonly_client_source(root,revision)
+
+    def test_readonly_source_rejects_changed_index_worktree_and_untracked_files(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary);revision='c'*40
+            for failure in (2,3,4):
+                results=[subprocess.CompletedProcess([],0,stdout=(revision+'\n').encode(),stderr=b''),
+                    subprocess.CompletedProcess([],0,stdout=b'H source.cpp\0',stderr=b''),
+                    subprocess.CompletedProcess([],0,stdout=b'',stderr=b''),
+                    subprocess.CompletedProcess([],0,stdout=b'',stderr=b''),
+                    subprocess.CompletedProcess([],0,stdout=b'',stderr=b'')]
+                results[failure]=subprocess.CompletedProcess([],1 if failure<4 else 0,
+                    stdout=b'extra.cpp\0' if failure==4 else b'',stderr=b'private error withheld')
+                with self.subTest(failure=failure),mock.patch.object(qualifier.subprocess,'run',side_effect=results), \
+                        self.assertRaises(ValueError) as caught:
+                    qualifier.verify_readonly_client_source(root,revision)
+                self.assertNotIn('private',str(caught.exception))
+
     def test_private_credentials_are_exact_bounded_exclusive_and_not_link_following(self):
         intent=dict(username='EST0123456789ABCD',password='ABCDEFGHJKLMNPQR')
         nonce=bytes(range(16))

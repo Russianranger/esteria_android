@@ -44,10 +44,31 @@ SELECTED.update({'bin/Win/ARM64/client-build.json':'client-build.json',
                  'build/client/generated/limits/limits.json':'limits.json'})
 
 
+def verify_readonly_client_source(source, revision):
+    """Verify this unpatched input without updating a mounted checkout's index."""
+    source=client.archives.directory(source)
+    environment=dict(os.environ,GIT_OPTIONAL_LOCKS='0',GIT_NO_LAZY_FETCH='1')
+    command=['git','-c','safe.directory='+str(source),'-c','core.fsmonitor=false',
+             '-c','core.untrackedCache=false','-C',str(source)]
+    def query(*arguments):
+        result=subprocess.run(command+list(arguments),env=environment,stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=30)
+        require(result.returncode==0,'read-only-client-source-check-failed:'+arguments[0])
+        require(len(result.stdout)<=32*1024**2,'client-source-check-output-bound')
+        return result.stdout
+    require(query('rev-parse','HEAD').strip().decode('ascii')==revision,'client-source-revision-mismatch')
+    entries=query('ls-files','-v','-z').split(b'\0')
+    require(not any(row and (row[:1].islower() or row[:1]==b'S') for row in entries),
+            'client-source-hidden-index-flags')
+    query('diff-index','--cached','--quiet','--no-ext-diff','--no-textconv','--ignore-submodules=none','HEAD','--')
+    query('diff-files','--quiet','--no-ext-diff','--no-textconv','--ignore-submodules=none','--')
+    require(not query('ls-files','--others','--exclude-standard','-z'),'client-source-untracked-files')
+
+
 def prepare_client(artifact, source, revision, expected_sha, expected_bytes, fixture):
     require(re.fullmatch('[a-f0-9]{40}',revision) and re.fullmatch('[a-f0-9]{64}',expected_sha) and
             22<=expected_bytes<=512*1024**2,'explicit-client-artifact-identity-required')
-    client.fetch_sources.verify_checkout(source,dict(commit=revision,submodules={}),[])
+    verify_readonly_client_source(source,revision)
     # The exact trusted source must contain the opt-in diagnostic; an older
     # qualified entry-only client cannot satisfy this gate through stale output.
     diagnostic=client.source_blob(source,revision,'WoW/Source/Win64/AuthCheck.cpp')
@@ -241,10 +262,12 @@ def qualify(args):
     require(not os.path.lexists(fixture),'wine-runtime-already-used-for-qualification')
     output.mkdir(mode=0o700);(output/'private').mkdir(mode=0o700);(output/'evidence').mkdir(mode=0o700);fixture.mkdir(mode=0o700)
     report=dict(formatVersion=1,scope=SCOPE,qualificationSucceeded=False,wineRuntime=runtime_proof,
+        phase='verify-client-input',
         androidRuntimeQualified=False,worldEntryQualified=False,gameplayQualified=False,versionChecksumQualified=False)
     try:
         report['client']=prepare_client(args.client_artifact,args.client_source,args.client_revision,
             args.client_artifact_sha256,args.client_artifact_bytes,fixture)
+        report['phase']='prepare-worker-plan'
         plan={name:str(getattr(args,name).resolve(strict=True)) for name in ('runtime','install','content','lock','mysql','mysqld')}
         plan.update(output=str(output),version=args.expected_version,contentReceiptSha256=args.content_receipt_sha256,
                     client=report['client'])
@@ -254,13 +277,26 @@ def qualify(args):
         # Capture owns the unshare leader. Killing that still-owned process on a
         # timeout kills namespace PID1; the kernel then kills every descendant.
         command=['env','ESTERIA_AUTH_NAMESPACE=1',*command]
+        report['phase']='run-namespace-worker'
         capture=wine.Capture(command,output/'private/namespace.log')
         try:report['namespaceExit']=capture.wait(7200).exit_code
         finally:require(capture.finish(10) and not capture.truncated and capture.error is None,'namespace-log-drain-failed')
         result,_=wine.read_json(output/'evidence/worker.json');report['worker']=result
         report['qualificationSucceeded']=typed_success(result,report['namespaceExit'])
         require(report['qualificationSucceeded'],'compiled-server-client-authentication-did-not-qualify')
+        report['phase']='complete'
         return report
+    except BaseException as error:
+        # Fixed module locations and a type name reveal no exception text, SQL,
+        # account material or private process output.
+        report['failureClass']=type(error).__name__
+        frames=[]; current=error.__traceback__
+        while current is not None:
+            if current.tb_frame.f_code.co_filename==__file__:
+                frames.append(current.tb_frame.f_code.co_name+':'+str(current.tb_lineno))
+            current=current.tb_next
+        report['failureLocations']=frames[-6:]
+        raise
     finally:db.atomic_json(output/'evidence/qualification.json',report)
 
 

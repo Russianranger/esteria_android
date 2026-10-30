@@ -1,0 +1,269 @@
+name: Exact server engine derivatives and native reference gates
+on:
+  workflow_dispatch:
+  push:
+    branches: [android/client-server]
+    paths:
+      - .github/workflows/server-engine-package.yml
+      - runtime/server/engine-reference.lock.json
+      - runtime/server/engine-strip.lock.json
+      - tools/prepare_server_engine_inputs.py
+      - tools/package_server_engine.py
+      - tools/package_server_engine_source_inputs.py
+      - tools/server_engine_elf.py
+      - tools/verify_server_engine_runtime.py
+      - tools/qualify_dbimport.py
+      - tools/qualify_authserver.py
+      - tools/initialize_server_schema.py
+      - tests/test_server_engine_*.py
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: exact-server-engine-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  package:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    outputs:
+      receipt_sha256: ${{ steps.identities.outputs.receipt_sha256 }}
+      content_receipt_sha256: ${{ steps.identities.outputs.content_receipt_sha256 }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Verify host packaging guards without executing AArch64 inputs
+        run: |
+          test "$(uname -m)" = x86_64
+          python3 -m unittest tests.test_server_engine_inputs tests.test_server_engine_elf \
+            tests.test_server_engine_package tests.test_server_engine_runtime \
+            tests.test_server_engine_source_inputs tests.test_server_requalification \
+            tests.test_dbimport_qualification tests.test_authserver_qualification -v
+          mkdir -p out/engine-evidence
+      - name: Stream and verify exact seven-patch original inputs after disk preflight
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/prepare_server_engine_inputs.py --output out/engine-inputs \
+            > out/engine-evidence/input-preparation.log 2>&1
+          cp out/engine-inputs/preparation.json out/engine-evidence/
+          cp out/engine-inputs/disk-preflight.json out/engine-evidence/
+      - name: Acquire exact host objcopy and original Lua archive
+        run: |
+          python3 - <<'PY'
+          import json, os, pathlib, stat, zipfile
+          from tools import prepare_runtime as archives
+          from tools import server_engine_elf as elf
+          lock = json.loads(elf.TOOL_LOCK.read_bytes())
+          ndk = archives.fetch(lock['ndkArchive'], pathlib.Path('out/engine-tool-inputs'))
+          tool = pathlib.Path('out/engine-tool/llvm-objcopy'); tool.parent.mkdir(mode=0o700)
+          with zipfile.ZipFile(ndk) as archive:
+              info = archive.getinfo(elf.NDK_TOOL)
+              if stat.S_IFMT(info.external_attr >> 16) != stat.S_IFREG: raise ValueError('objcopy must be original regular entry')
+              if info.file_size != lock['executable']['bytes']: raise ValueError('objcopy size differs')
+              with archive.open(info) as source, tool.open('xb') as target:
+                  if archives.hash_stream(source, info.file_size, target) != lock['executable']['sha256']:
+                      raise ValueError('objcopy differs')
+              notices = pathlib.Path('out/engine-tool-notices'); notices.mkdir(mode=0o700)
+              names = [i for i in archive.infolist() if i.filename.startswith('android-ndk-r28c/') and
+                       (i.filename == 'android-ndk-r28c/NOTICE' or
+                        i.filename.startswith('android-ndk-r28c/toolchains/llvm/prebuilt/linux-x86_64/NOTICE'))]
+              if not names: raise ValueError('original NDK notices missing')
+              for number, entry in enumerate(names):
+                  if entry.file_size > 16 * 1024**2: raise ValueError('notice size bound')
+                  (notices/(str(number)+'-'+pathlib.Path(entry.filename).name)).write_bytes(archive.read(entry))
+          tool.chmod(0o555)
+          proof = elf.verify_tool(ndk, tool.absolute(), lock['ndkArchive'])
+          pathlib.Path('out/engine-evidence/strip-tool.json').write_text(json.dumps(proof, indent=2)+'\n')
+          PY
+          curl --fail --location --retry 2 --max-time 180 \
+            https://www.lua.org/ftp/lua-5.2.4.tar.gz -o out/engine-tool-inputs/lua-5.2.4.tar.gz
+          printf '%s\n' 'b9e2e4aad6789b3b63a056d442f7b39f0ecfca3ae0f1fc0ae4e9614401b69f4b  out/engine-tool-inputs/lua-5.2.4.tar.gz' | sha256sum --check
+      - name: Create and completely read back actual engine and debug derivatives
+        run: |
+          python3 tools/package_server_engine.py \
+            --install out/engine-inputs/install --compiled-modules out/engine-inputs/server-modules.json \
+            --compile-commands out/engine-inputs/compile_commands.json \
+            --lock out/engine-inputs/locked/sources.lock.json --server out/engine-inputs/sources/server \
+            --ndk-archive out/engine-tool-inputs/android-ndk-r28c-linux.zip \
+            --objcopy "$GITHUB_WORKSPACE/out/engine-tool/llvm-objcopy" \
+            --output out/server-engine-package > out/engine-evidence/engine-packaging.log 2>&1
+      - name: Retain selected pristine sources, adaptations and original notices separately
+        run: |
+          python3 tools/package_server_engine_source_inputs.py \
+            --server out/engine-inputs/sources/server --lock out/engine-inputs/locked/sources.lock.json \
+            --server-build out/engine-inputs/install/server-build.json \
+            --compiled-modules out/engine-inputs/server-modules.json \
+            --compile-commands out/engine-inputs/compile_commands.json \
+            --lua-archive out/engine-tool-inputs/lua-5.2.4.tar.gz \
+            --output out/server-engine-source-inputs \
+            > out/engine-evidence/source-input-packaging.log 2>&1
+      - name: Bind exact transfer receipt and source-content identities
+        id: identities
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib
+          from tools import verify_server_build as files
+          package = pathlib.Path('out/server-engine-package')
+          proof = files.identity(package/'package-receipt.json')
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output:
+              output.write('receipt_sha256='+proof['sha256']+'\n')
+              output.write('content_receipt_sha256='+files.identity(pathlib.Path('out/engine-inputs/content/package-receipt.json'))['sha256']+'\n')
+          target = pathlib.Path('out/engine-evidence')
+          receipt = json.loads((package/'package-receipt.json').read_text())
+          evidence = dict(formatVersion=1, scope='actual-source-built-engine-derivatives-host-packaged',
+              integrationRevision=os.environ['GITHUB_SHA'], originalBuildId='41019374697.1',
+              packageReceipt=proof, packages={k:v['archive'] for k,v in receipt['packages'].items()},
+              originalReceiptsPreserved=True, aarch64InputsExecuted=False,
+              sourceCompanionComplete=False, androidProviderCreated=False,
+              androidRuntimeQualified=False, gameplayQualified=False)
+          (target/'packaging-environment.json').write_text(json.dumps(evidence,indent=2)+'\n')
+          PY
+      - name: Retain paired debug symbols and original host-tool notices outside runtime
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: unsealed-server-engine-debug-${{ github.sha }}
+          compression-level: 0
+          path: |
+            out/server-engine-package/server-engine-debug-arm64.tar.gz
+            out/server-engine-package/package-receipt.json
+            out/engine-tool-notices/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Retain selected source inputs and notices with truthful incomplete closure
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: unsealed-server-engine-source-inputs-${{ github.sha }}
+          compression-level: 0
+          path: out/server-engine-source-inputs/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Transfer verified runtime and exact source content to native ARM64 job
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: unsealed-server-engine-runtime-${{ github.sha }}
+          compression-level: 0
+          path: |
+            out/server-engine-package/package-receipt.json
+            out/server-engine-package/server-engine-runtime-arm64.tar.gz
+            out/engine-inputs/content/
+            out/engine-inputs/locked/
+            out/engine-inputs/preparation.json
+          retention-days: 30
+          if-no-files-found: error
+      - name: Retain bounded host preparation and derivative receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: server-engine-packaging-evidence-${{ github.sha }}
+          path: out/engine-evidence/
+          retention-days: 30
+          if-no-files-found: warn
+  native-reference:
+    needs: package
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: unsealed-server-engine-runtime-${{ github.sha }}
+          path: out/transfer
+      - name: Verify cross-job receipt identity and extract only runtime programs
+        env:
+          EXPECTED_ENGINE_RECEIPT: ${{ needs.package.outputs.receipt_sha256 }}
+          EXPECTED_CONTENT_RECEIPT: ${{ needs.package.outputs.content_receipt_sha256 }}
+        run: |
+          test "$(uname -m)" = aarch64
+          mkdir -p out/engine-native-evidence out/engine-native-private
+          python3 - <<'PY'
+          import os, pathlib, re
+          from tools import verify_server_build as files
+          expected=os.environ['EXPECTED_ENGINE_RECEIPT']
+          if not re.fullmatch('[0-9a-f]{64}',expected): raise ValueError('exact producer receipt required')
+          if files.identity(pathlib.Path('out/transfer/server-engine-package/package-receipt.json'))['sha256'] != expected:
+              raise ValueError('cross-job derivative receipt changed')
+          content=os.environ['EXPECTED_CONTENT_RECEIPT']
+          if not re.fullmatch('[0-9a-f]{64}',content): raise ValueError('exact producer content receipt required')
+          if files.identity(pathlib.Path('out/transfer/engine-inputs/content/package-receipt.json'))['sha256'] != content:
+              raise ValueError('cross-job source-content receipt changed')
+          PY
+          python3 tools/verify_server_engine_runtime.py extract \
+            --package-receipt out/transfer/server-engine-package/package-receipt.json \
+            --output out/engine-native-install > out/engine-native-evidence/extraction.json
+      - name: Build and read back exact published Ubuntu MySQL image without APT
+        run: |
+          env -u GITHUB_TOKEN python3 tools/release_server_dependencies.py prepare --output out/server-dependency-release \
+            > out/engine-native-evidence/dependency-download.log 2>&1
+          python3 tools/prepare_server_dependency_image.py --inputs out/server-dependency-release \
+            --output out/server-dependency-image > out/engine-native-evidence/dependency-context.log 2>&1
+          cp out/server-dependency-image/context-receipt.json out/engine-native-evidence/dependency-context.json
+          rm -rf out/server-dependency-release
+          docker build --network none --platform linux/arm64 -t esteria-engine-reference:verified \
+            out/server-dependency-image/context > out/engine-native-evidence/image-build.log 2>&1
+          docker image inspect esteria-engine-reference:verified --format '{{.Id}}' > out/engine-native-evidence/image-id.txt
+          docker run --rm --network none --read-only \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/tools/verify_server_dependency_image.py,dst=/verify-image.py,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/server-dependency-image/context-receipt.json,dst=/context-receipt.json,readonly" \
+            esteria-engine-reference:verified /usr/bin/python3 /verify-image.py --context-receipt /context-receipt.json \
+            > out/engine-native-evidence/dependency-image-check.json
+      - name: Execute actual derived auth and world version entry on native ARM64
+        run: |
+          docker run --rm --init --network none --env PYTHONDONTWRITEBYTECODE=1 \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/engine-native-private,dst=/state" \
+            --workdir /qualification esteria-engine-reference:verified \
+            python3 tools/verify_server_engine_runtime.py smoke \
+            --install /qualification/out/engine-native-install \
+            --lock /qualification/out/transfer/engine-inputs/locked/sources.lock.json \
+            --package-receipt /qualification/out/transfer/server-engine-package/package-receipt.json \
+            --output /state/loader-smoke.json > out/engine-native-evidence/loader-smoke.log 2>&1
+      - name: Exercise actual derived updater and owned authentication against fresh SQL
+        run: |
+          version=$(python3 -c 'import json; print(json.load(open("out/engine-native-evidence/dependency-image-check.json"))["expectedMysqlSqlVersion"])')
+          content=$(sha256sum out/transfer/engine-inputs/content/package-receipt.json | cut -d' ' -f1)
+          docker run --rm --init --network none --env PYTHONDONTWRITEBYTECODE=1 \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/engine-native-private,dst=/state" \
+            --workdir /qualification esteria-engine-reference:verified \
+            python3 tools/qualify_authserver.py --install /qualification/out/engine-native-install \
+            --content /qualification/out/transfer/engine-inputs/content --content-receipt-sha256 "$content" \
+            --lock /qualification/out/transfer/engine-inputs/locked/sources.lock.json \
+            --engine-derivative-receipt /qualification/out/transfer/server-engine-package/package-receipt.json \
+            --mysql /usr/bin/mysql --mysqld /usr/sbin/mysqld --expected-version "$version" --output /state/run \
+            > out/engine-native-evidence/qualification.log 2>&1
+      - name: Collect typed public receipts and bounded redacted diagnostics
+        if: always()
+        run: |
+          sudo python3 - <<'PY'
+          import json, pathlib, shutil
+          from tools import verify_server_build as files
+          source=pathlib.Path('out/engine-native-private'); target=pathlib.Path('out/engine-native-evidence')
+          target.mkdir(parents=True,exist_ok=True)
+          for relative in ('loader-smoke.json','run/qualification.json','run/auth-qualification.json',
+                           'run/dbimport-first.log','run/dbimport-second.log','run/authserver-redacted.log',
+                           'run/mysql-initialize-engine.log','run/mysql-bootstrap-engine.log',
+                           'run/mysql-base-engine.log','run/mysql-base-restart-engine.log'):
+              path=source/relative
+              if path.is_file():
+                  if path.stat().st_size>1024**2: raise ValueError('public diagnostic bound')
+                  shutil.copyfile(path,target/path.name)
+          evidence=dict(formatVersion=1,scope='native-arm64-actual-engine-derivative-reference-environment',
+              originalBuildId='41019374697.1', externalNetworkDisabled=True,
+              originalReceiptsPreserved=True, existingStateModified=False,
+              sourceCompanionComplete=False, androidRuntimeQualified=False, gameplayQualified=False,
+              files={p.name:files.identity(p) for p in target.iterdir() if p.is_file()})
+          (target/'environment-receipt.json').write_text(json.dumps(evidence,indent=2)+'\n')
+          PY
+          sudo chown -R "$(id -u):$(id -g)" out/engine-native-evidence
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: native-server-engine-reference-evidence-${{ github.sha }}
+          path: out/engine-native-evidence/
+          retention-days: 30
+          if-no-files-found: error
