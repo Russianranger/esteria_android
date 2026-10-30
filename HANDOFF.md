@@ -9,12 +9,13 @@ preliminary hardware APKs; a PR or green component check is not a stopping point
 
 ## Source and runtime identity
 
-- Client binary pin: `0f931bbade36a4b197725d691b8eff7caea7b3be`.
-- Client development branch tip: `4b16bece2b8396fb434b5289a40d8ae418c48e28`
-  (documentation above the measured executable).
+- Client binary pin and development branch tip:
+  `471ee42faadf4a97a1d0a86989cf1452621f2dc5`.
 - Server: `f35f04d01689f034778e3474b3c820092f51e461`; Eluna:
   `58d7652138887783228b9727bd1fa4e08f00342b`; seven exact adaptations.
-- App lock SHA256: `5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1`.
+- App lock SHA256: `dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90`.
+  Server build/content/SQL receipts retain archived lock
+  `5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1`.
 - Reconstructed Windows ARM64/Wine on Debian12 and Linux ARM64 MySQL/server on
   Ubuntu24 are separate guests. Never substitute x64 emulator evidence for ARM64.
 - Package `io.github.russianranger.esteria`; stable private signing key is backed
@@ -41,10 +42,12 @@ exact reviewed files. Source revisions embedded in APKs are authoritative.
   reentry/restart, appearance storage, real compiled-auth SRP/M2/session key,
   owned loopback listener/realm and clean shutdown. Evidence:
   runtime/evidence/server-auth-41050050193.json. Reconstructed client not executed.
-- Matched client-auth41050050351 failed mysqld fresh initialization before SQL.
-  MY-013236/MY-010119 are cleanup summaries; cause remains unknown. The numeric
-  reader now also recognizes raw mysqld OS errno lines without publishing any
-  private log text. Run the next actual gate before choosing a fix.
+- Matched reconstructed client0f/authserver run41060555263 passes real Grunt/SRP,
+  exact persisted40-byte session key, loopback realm, unchanged credentials and
+  ledgers, and clean joined shutdown. It uses retained six-patch server41005048019.1.
+  Private trace41058676745 exposed EACCES during staging-directory read; the
+  compatible intended MySQL state layout resolves the normal gate. Do not claim
+  a proven underlying security-policy cause. CommonMain/assets/world remain false.
 - Current seven-patch stripped engine41050050294 passes native loader, first/repeat SQL, exact ledgers/restart and real compiled-auth/session persistence. Evidence: runtime/evidence/server-engine-sql-auth-41050050294.json. The21,996,594-byte runtime retains
   all original notices. Programs installer is source-gated, not enabled by a
   fabricated sourceCompanionComplete flag.
@@ -66,10 +69,10 @@ exact reviewed files. Source revisions embedded in APKs are authoritative.
 1. Finish actual isolated source rebuild and ARM64 Wine build. Preserve exact
    successful artifacts, source receipts and complete original notices. Repack
    providers against a new Wine hash only after measurement; bindings are exact.
-2. Pass the matched current0f/compiled-server auth gate; keep initialization
-   failures distinct from protocol failures. Run actual playerbots schema gate.
+2. Keep the passed matched0f/six-patch auth proof distinct from normal game login;
+   run the selected new-client/seven-patch pairing and actual playerbots schema gate.
 3. Portable updater/ledger/account/realm APIs are implemented and independently
-   reviewed; follow their new actual native composition gate on the same engine.
+   reviewed; actual native composition passes41058676309 and41058676543 on one UUID.
    Compose them after the explicit original baseline + separate source-derived
    appearance adaptation; never rewrite original SQL/updater ledger history.
 4. Fresh-slot/workspace ownership and atomic promotion/recovery storage now pass

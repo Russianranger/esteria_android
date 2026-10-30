@@ -2,25 +2,25 @@
   "formatVersion": 1,
   "repository": "Russianranger/esteria_android",
   "scope": "reconstructed-client-inputs-write-once-prerelease",
-  "tag": "deps-client-arm64-27446b5-0f931bba",
-  "targetCommit": "27446b57e33e04d6fb11b0594d54d96b8bbd8ca6",
-  "sourceRevision": "0f931bbade36a4b197725d691b8eff7caea7b3be",
-  "workflowRun": 41012726334,
-  "buildId": "41012726334.1",
-  "providerLockSha256": "ab3d912ad54fa2bc7ed8be05deaa58874b2f9f747caae954f7181daeafe665b6",
+  "tag": "deps-client-arm64-33cf433-471ee42f",
+  "targetCommit": "33cf433a907a9181d27a6962b1f07516afc0773d",
+  "sourceRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "workflowRun": 41061576677,
+  "buildId": "41061576677.1",
+  "providerLockSha256": "7ecb7dfd4e9917e742fb467d81a72af9273394c8488e5a6cb3e25fa70c29ed5b",
   "artifact": {
-    "id": 12958691770,
-    "name": "client-ARM64-0f931bbade36a4b197725d691b8eff7caea7b3be",
-    "bytes": 45848368,
-    "sha256": "1fd6176727065f50a926b45a3d81df1bfd0ea33c330e9fb9131ff30ad170b94e"
+    "id": 12979433537,
+    "name": "client-ARM64-471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+    "bytes": 45848847,
+    "sha256": "befac98c5c3434ea94dcb878f5da37f915946221fb17f1a7888c65f74bb846ad"
   },
   "sourceArchive": {
-    "bytes": 23440715,
-    "sha256": "14b61f4fd5cdc6e7375297ae4a48d65240382ef2c18eed484808898373694821"
+    "bytes": 23449963,
+    "sha256": "71f7bc4c3b1574de365418bffa2a8c74b299cf0635f45e292b30df20005259cd"
   },
   "sourceReceipt": {
-    "bytes": 3513,
-    "sha256": "a4e7d0ff1770b76141e3321dfe8cfcfefaa19881cc6016db15a5b6e91b38e532"
+    "bytes": 3838,
+    "sha256": "e768b9dfec4cae999d6c4ca2b8d85a6ed998264b6f4779a57670e91f8533d615"
   },
   "xvid": {
     "bytes": 820854,
@@ -32,17 +32,9 @@
       "bytes": 35149,
       "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
     },
-    "runtime/client/android-provider.lock.json": {
-      "bytes": 492,
-      "sha256": "ab3d912ad54fa2bc7ed8be05deaa58874b2f9f747caae954f7181daeafe665b6"
-    },
     "runtime/runtime-sources.lock.json": {
       "bytes": 14211,
       "sha256": "cd2f3d2d47e2ac0de845acc914e94013906836de9710dc290a6fa51c89bbf07d"
-    },
-    "sources.lock.json": {
-      "bytes": 2170,
-      "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
     },
     "tools/fetch_sources.py": {
       "bytes": 7393,
@@ -57,8 +49,8 @@
       "sha256": "4e614b8c860ba2d9ef69d595f6fbbd51df440993f8c7a9a8e85d5d99533b9166"
     },
     "tools/package_client_sources.py": {
-      "bytes": 5926,
-      "sha256": "4950cfd3e6b322d497d8d15cb08d8f167e5834c787ebdf11731c0339d3baeb99"
+      "bytes": 9406,
+      "sha256": "0c685e1e1659a7c3146854bba2182c09b641b7d43e8bd593494c93bc1cdc47d4"
     },
     "tools/package_server_content.py": {
       "bytes": 19732,
@@ -69,59 +61,22 @@
       "sha256": "113ae7612cba7f557fab79550448578a9a6b8ceb674cff80b38fcf40e8257078"
     },
     "tools/provider_client_runtime.py": {
-      "bytes": 18403,
-      "sha256": "0709050784db7ef855033d6f49df973831ec8813b74fc57ce8f175a3d9bbc580"
+      "bytes": 19310,
+      "sha256": "e0e50df80a77c6673019710b741e4ca8f6715f71f0b745bcdcf9bddcf22d3988"
     },
     "tools/verify_server_build.py": {
       "bytes": 15540,
       "sha256": "9d3096e8cc1d2a650353886800e8192dfe78f0b352fede322a39002e545b4152"
     }
   },
-  "published": {
-    "assets": {
-      "NOTICE.txt": {
-        "bytes": 1340,
-        "sha256": "07268b21f9f08843bbbb42aa1fdfcd3c8ed8e052ab470eb42a1e0458dd898b42",
-        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-client-arm64-27446b5-0f931bba/NOTICE.txt"
-      },
-      "SHA256SUMS": {
-        "bytes": 547,
-        "sha256": "20ca16777cea97f8cea11fe4d0b89e23ba595085dbb1798d7239ef30603a54ba",
-        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-client-arm64-27446b5-0f931bba/SHA256SUMS"
-      },
-      "client-corresponding-source.tar.gz": {
-        "bytes": 23440715,
-        "sha256": "14b61f4fd5cdc6e7375297ae4a48d65240382ef2c18eed484808898373694821",
-        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-client-arm64-27446b5-0f931bba/client-corresponding-source.tar.gz"
-      },
-      "client-input-lock.json": {
-        "bytes": 492,
-        "sha256": "ab3d912ad54fa2bc7ed8be05deaa58874b2f9f747caae954f7181daeafe665b6",
-        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-client-arm64-27446b5-0f931bba/client-input-lock.json"
-      },
-      "reconstructed-client-arm64-original.zip": {
-        "bytes": 45848368,
-        "sha256": "1fd6176727065f50a926b45a3d81df1bfd0ea33c330e9fb9131ff30ad170b94e",
-        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-client-arm64-27446b5-0f931bba/reconstructed-client-arm64-original.zip"
-      },
-      "release-manifest.json": {
-        "bytes": 1507,
-        "sha256": "a9ff5a5b14f0468cd9fff335786aa167bcc8211446c22b7f597aac1c6bcc58a0",
-        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-client-arm64-27446b5-0f931bba/release-manifest.json"
-      },
-      "source-receipt.json": {
-        "bytes": 3513,
-        "sha256": "a4e7d0ff1770b76141e3321dfe8cfcfefaa19881cc6016db15a5b6e91b38e532",
-        "url": "https://github.com/Russianranger/esteria_android/releases/download/deps-client-arm64-27446b5-0f931bba/source-receipt.json"
-      }
+  "selectedInputs": {
+    "runtime/client/android-provider.lock.json": {
+      "bytes": 492,
+      "sha256": "7ecb7dfd4e9917e742fb467d81a72af9273394c8488e5a6cb3e25fa70c29ed5b"
     },
-    "formatVersion": 1,
-    "githubImmutable": false,
-    "publisherNeverOverwrites": true,
-    "releaseId": 428738643,
-    "repository": "Russianranger/esteria_android",
-    "tag": "deps-client-arm64-27446b5-0f931bba",
-    "targetCommit": "27446b57e33e04d6fb11b0594d54d96b8bbd8ca6",
-    "url": "https://github.com/Russianranger/esteria_android/releases/tag/deps-client-arm64-27446b5-0f931bba"
+    "sources.lock.json": {
+      "bytes": 2170,
+      "sha256": "dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90"
+    }
   }
 }

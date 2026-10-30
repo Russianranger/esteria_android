@@ -2,10 +2,10 @@
 
 `tools/provider_client_runtime.py` builds a host-verified APK asset provider from
 the actual reconstructed Windows ARM64 client artifact. The selected input is
-client `0f931bbade36a4b197725d691b8eff7caea7b3be`, build `41012726334.1`,
-[artifact 12958691770](https://github.com/Russianranger/wowdecomp_esteria/actions/runs/41012726334/artifacts/12958691770).
-`android-provider.lock.json` pins its 45,848,368-byte ZIP and SHA-256
-`1fd6176727065f50a926b45a3d81df1bfd0ea33c330e9fb9131ff30ad170b94e`, measured
+client `471ee42faadf4a97a1d0a86989cf1452621f2dc5`, build `41061576677.1`,
+[artifact 12979433537](https://github.com/Russianranger/wowdecomp_esteria/actions/runs/41061576677/artifacts/12979433537).
+`android-provider.lock.json` pins its 45,848,847-byte ZIP and SHA-256
+`befac98c5c3434ea94dcb878f5da37f915946221fb17f1a7888c65f74bb846ad`, measured
 against GitHub's artifact digest. The tool requires the same clean source revision
 as application `sources.lock.json`; a changed source pin requires a newly measured
 artifact pin. It never chooses a floating branch or accepts a stock `Wow.exe`.
@@ -15,8 +15,17 @@ and native Linux ARM64 Wine execution. The latter exercised real executable entr
 offline network policy, loopback transport and synthetic Grunt authentication,
 codec, software Vulkan graphics and captured FMOD output. These asset-free fixture
 results are separate from Android execution or matched world gameplay. The new
-provider binds the exact seven-patch server source lock; the earlier 69cc provider
-and its already-published source release remain preserved as historical inputs.
+provider binds the current app source lock. The archived seven-patch server build
+lock, payloads, SQL and receipts retain their original identities. Earlier 0f/69cc
+providers and their published source releases remain historical inputs.
+
+Native Windows x64/ARM64 tests additionally exercised the actual bounded private
+handoff reader. The exact source/build manifest advertises
+`capabilities.local_account_handoff` version1: `--local-login` requires
+`--local-offline` and a private 57-byte `ESTLOGN1` handoff beside the executable.
+The provider accepts that capability only when it exactly matches the committed
+client parser. Normal asset-backed CommonMain/Glue login and Android/Wine handoff
+consumption remain unqualified; packaging never sets game-login flags true.
 
 Only `WowClient64.exe` and matching `XvidDecoder.dll` enter the binary directory.
 The tool reuses the exact committed client's PE parser, validates actual AA64
@@ -67,13 +76,13 @@ client repository; generated binaries are never committed to either repository.
 
 ```sh
 python3 tools/fetch_sources.py client --output sources
-python3 tools/provider_client_runtime.py build --artifact /cache/arm64-auth-0f.zip \
+python3 tools/provider_client_runtime.py build --artifact /cache/arm64-local-login-471.zip \
   --client-source sources/client --provider /tmp/new-client-provider
-python3 tools/provider_client_runtime.py verify --artifact /cache/arm64-auth-0f.zip \
+python3 tools/provider_client_runtime.py verify --artifact /cache/arm64-local-login-471.zip \
   --client-source sources/client --provider /tmp/new-client-provider
 python3 tools/package_client_sources.py --client-source sources/client \
   --xvid-source /cache/xvidcore-1.3.7.tar.gz --output /tmp/new-client-sources
-ESTERIA_CLIENT_ARTIFACT=/cache/arm64-auth-0f.zip ESTERIA_CLIENT_SOURCE="$PWD/sources/client" \
+ESTERIA_CLIENT_ARTIFACT=/cache/arm64-local-login-471.zip ESTERIA_CLIENT_SOURCE="$PWD/sources/client" \
   python3 -m unittest tests.test_client_runtime_provider -v
 ```
 

@@ -1,5 +1,6 @@
 """Current client changes never relabel archived server receipts or payloads."""
 import copy
+import hashlib
 import json
 from pathlib import Path
 import tempfile
@@ -17,8 +18,10 @@ class ServerSourceBinding(unittest.TestCase):
     def setUp(self):
         temporary = tempfile.TemporaryDirectory(prefix='server-source-binding-')
         self.addCleanup(temporary.cleanup); self.root = Path(temporary.name)
-        self.original = (ROOT / 'sources.lock.json').read_bytes()
-        self.current = json.loads(self.original)
+        # The selected application can already be newer than the archived
+        # server build; derive that historical baseline from its retained text.
+        self.original = json.loads(programs.LOCK.read_bytes())['serverBuildSourceLockText'].encode('utf-8')
+        self.current = json.loads((ROOT / 'sources.lock.json').read_bytes())
         self.current['sources']['client']['commit'] = '1'*40
         deps = self.root / 'runtime/server/android-provider.lock.json'
         deps.parent.mkdir(parents=True); deps.write_bytes((ROOT / 'runtime/server/android-provider.lock.json').read_bytes())
@@ -40,11 +43,19 @@ class ServerSourceBinding(unittest.TestCase):
             with self.subTest(provider=provider.__name__), patch.object(provider, 'ROOT', self.root), patch.object(provider, 'LOCK', path):
                 actual = provider.load_pin()
                 self.assertNotEqual(actual['appSourceLock'], actual['serverBuildSourceLock'])
-                self.assertEqual(actual['serverBuildSourceLock'], programs.files.identity(ROOT / 'sources.lock.json'))
+                self.assertEqual(actual['serverBuildSourceLock'], dict(bytes=len(self.original),
+                    sha256=hashlib.sha256(self.original).hexdigest()))
                 sources.validate_archived(self.original, actual)
                 fields = sources.descriptor_fields(actual)
                 self.assertEqual(fields['appSourceLockSha256'], pin['appSourceLock']['sha256'])
                 self.assertEqual(fields['serverBuildSourceLockSha256'], actual['serverBuildSourceLock']['sha256'])
+
+    def test_selected_current_application_preserves_the_original_archived_server_binding(self):
+        for provider in PROVIDERS:
+            with self.subTest(provider=provider.__name__):
+                actual = provider.load_pin()
+                self.assertEqual(actual['appSourceLock'], programs.files.identity(ROOT / 'sources.lock.json'))
+                sources.validate_archived(self.original, actual)
 
     def test_client_change_without_reviewed_current_app_pin_is_refused(self):
         for provider in PROVIDERS:

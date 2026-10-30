@@ -1,6 +1,22 @@
 # Durable reconstructed client inputs
 
-The selected provider is client `0f931bbade36a4b197725d691b8eff7caea7b3be`,
+The selected provider is now client
+`471ee42faadf4a97a1d0a86989cf1452621f2dc5`, build `41061576677.1`.
+Its new release input lock selects `deps-client-arm64-33cf433-471ee42f` with
+frozen recipe `33cf433a907a9181d27a6962b1f07516afc0773d` and two explicitly
+hash-bound current input locks. The unchanged original 45,848,847-byte CI ZIP is
+paired with a 23,449,963-byte complete source archive, SHA-256
+`71f7bc4c3b1574de365418bffa2a8c74b299cf0635f45e292b30df20005259cd`.
+The source receipt is 3,838 bytes, SHA-256
+`e768b9dfec4cae999d6c4ca2b8d85a6ed998264b6f4779a57670e91f8533d615`.
+All seven release files are prepared and read back locally; public publication
+has not been verified. This is input preservation, not Android or gameplay
+qualification. The app source lock advances the client only; archived server
+build, SQL and source receipts retain their original identities.
+
+## Preserved 0f release
+
+The prior provider is client `0f931bbade36a4b197725d691b8eff7caea7b3be`,
 build `41012726334.1`, paired with the seven-patch server source lock. The new
 release metadata selects tag `deps-client-arm64-27446b5-0f931bba` at integration
 packaging commit `27446b57e33e04d6fb11b0594d54d96b8bbd8ca6`. Its original

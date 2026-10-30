@@ -11,10 +11,12 @@ from tools import release_client_inputs as client
 class ClientReleaseGuards(unittest.TestCase):
     def test_current_release_retains_proven_client_and_complete_measured_source(self):
         lock, pin = client.load_lock()
-        self.assertEqual(lock['sourceRevision'], '0f931bbade36a4b197725d691b8eff7caea7b3be')
+        self.assertEqual(lock['sourceRevision'], '471ee42faadf4a97a1d0a86989cf1452621f2dc5')
         self.assertEqual(lock['artifact']['sha256'], pin['artifact']['sha256'])
-        self.assertEqual(lock['sourceArchive']['bytes'], 23440715)
+        self.assertEqual(lock['sourceArchive']['bytes'], 23449963)
         self.assertIn('tools/package_client_sources.py', lock['generationInputs'])
+        self.assertEqual(set(lock['selectedInputs']), client.SELECTED_INPUT_PATHS)
+        self.assertEqual(lock['targetCommit'], '33cf433a907a9181d27a6962b1f07516afc0773d')
 
     def test_existing_output_is_preserved_before_reading_any_inputs(self):
         with tempfile.TemporaryDirectory() as name:
