@@ -87,6 +87,21 @@ class AndroidDatabaseSetupTests(unittest.TestCase):
         (self.state / 'database/auto.cnf').write_text('server-uuid=22345678-1234-4234-8234-123456789abc\n')
         with self.assertRaises(bootstrap.BootstrapError): self.call()
 
+    def test_failure_diagnostics_preserve_errno_without_exception_contents(self):
+        private = 'private-credential-and-query-text'
+        error = OSError(38, private, '/private/path/' + private)
+        with mock.patch.object(bootstrap, 'private_path', side_effect=error):
+            try:
+                self.call()
+            except OSError as caught:
+                message = adapter.failure_diagnostic(caught)
+        self.assertIn('OSError; errno=38', message)
+        self.assertIn('setup:', message)
+        self.assertNotIn(private, message)
+        self.assertNotIn('/private/path', message)
+        self.assertNotIn('test_failure_', message)
+        self.assertEqual(adapter.failure_diagnostic(bootstrap.BootstrapError(private)), 'BootstrapError')
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -16,6 +16,35 @@ else:
     import mysql_bootstrap as bootstrap
 
 
+def failure_diagnostic(error: Exception) -> str:
+    """Emit code locations and numeric errno only, never exception text/locals.
+
+    Filesystem and process errors on Android need an actionable failure site.
+    SQL failures can embed credentials, so standard tracebacks are unsuitable.
+    """
+    kind = type(error).__name__
+    if not re.fullmatch('[A-Za-z_][A-Za-z0-9_]{0,63}', kind):
+        kind = 'Exception'
+    fields = [kind]
+    if isinstance(error, OSError) and type(error.errno) is int and 0 <= error.errno <= 4095:
+        fields.append('errno=' + str(error.errno))
+    frames = []; current = error.__traceback__; visited = 0
+    while current is not None and visited < 64:
+        visited += 1
+        code = current.tb_frame.f_code
+        module = current.tb_frame.f_globals.get('__name__')
+        # Only these two shipped modules; a basename from an arbitrary path is
+        # insufficient to authorize logging that frame's function name.
+        if module in ('__main__', __name__, bootstrap.__name__) and code.co_filename in (__file__, bootstrap.__file__):
+            function = code.co_name
+            if re.fullmatch('[A-Za-z_][A-Za-z0-9_]{0,63}', function):
+                frames.append(function + ':' + str(current.tb_lineno))
+        current = current.tb_next
+    if frames:
+        fields.append('helperFrames=' + ','.join(frames[-8:]))
+    return '; '.join(fields)
+
+
 def setup(state: Path, mysql: Path, mysqld: Path, version: str) -> dict:
     bootstrap.exact_version(version)
     state = bootstrap.private_path(state)
@@ -70,7 +99,7 @@ def main() -> int:
     except Exception as error:
         # SQL errors can contain credentials or query fragments. Keep the
         # exception text out of process logs; owned engine logs remain private.
-        print('Database setup failed (' + type(error).__name__ +
+        print('Database setup failed (' + failure_diagnostic(error) +
               '); persistent state was preserved for recovery', file=sys.stderr)
         return 1
 

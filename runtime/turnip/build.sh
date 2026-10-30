@@ -35,7 +35,3 @@ cp /src/spirv-tools/LICENSE /out/notices/SPIRV-TOOLS-LICENSE
 cp /src/spirv-headers/LICENSE /out/notices/SPIRV-HEADERS-LICENSE
 python3 /inputs/qualify_shaders.py --directory /out/bin --output /out/shader-tool-check
 python3 /inputs/record_build.py --revision "$INTEGRATION_REVISION"
-python3 /inputs/run_probe.py --payload /out --output /out/no-gpu-check \
-    --build-sha256 "$(sha256sum /out/turnip-build.json | cut -d ' ' -f 1)" \
-    --source-revision "$INTEGRATION_REVISION" --expect-no-kgsl
-python3 /inputs/record_build.py --check-no-gpu

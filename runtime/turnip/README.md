@@ -61,8 +61,15 @@ CI checks ELF64/AArch64, required libraries, loader, GLIBC/GLIBCXX ceilings,
 actual Meson options and source identities. It loads the exact ICD and asks the
 Vulkan loader to enumerate in an environment where `/dev/kgsl-3d0` must be absent.
 That receipt must keep hardware, X11 presentation, Android and gameplay false.
-Actual build/execution results are pending; a successful host load is not Adreno
-qualification.
+The first native ARM64 run `41006180058` at integration `73f694c35ffaa6f0f7f8e9bab9eb30b79c84b5d4`
+compiled and linked Mesa's KGSL driver, built the two shader tools, passed their
+valid/invalid compiler tests and emitted the build-only receipt. The subsequent
+no-GPU loader probe failed; its component log was lost with the failed Docker
+layer. CI now exports the completed build first and runs the probe in a separate
+network-disabled container, retaining its exact bounded log and false/failure
+receipt even on error. The failed first run does not qualify ICD loading or
+provide a usable retained binary artifact. A successful no-GPU load is never
+Adreno qualification.
 
 The separate `--gpu-readback` probe requires observed Mesa Turnip driver identity,
 an integrated Qualcomm740 GPU and a KGSL character device. It compiles/runs the

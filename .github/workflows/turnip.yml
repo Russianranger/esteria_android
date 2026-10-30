@@ -19,17 +19,40 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Check pinned inputs source extraction and qualification boundaries
         run: python3 -m unittest tests.test_turnip_build -v
-      - name: Source-build glibc ARM64 KGSL driver and actual shader probe
+      - name: Source-build glibc ARM64 KGSL driver and qualify shader tools
         run: |
           test "$(uname -m)" = aarch64
-          mkdir -p out/turnip
-          docker build --platform linux/arm64 --target turnip-export \
+          mkdir -p out/turnip/payload
+          docker build --platform linux/arm64 --target build --tag "esteria-turnip:$GITHUB_SHA" \
             --secret id=build_ca,src=/etc/ssl/certs/ca-certificates.crt \
             --build-arg INTEGRATION_REVISION="$GITHUB_SHA" \
-            --output type=local,dest=out/turnip/payload runtime/turnip \
+            runtime/turnip \
             > out/turnip/build.log 2>&1
+          container=$(docker create "esteria-turnip:$GITHUB_SHA" /bin/true)
+          trap 'docker rm -f "$container" >/dev/null 2>&1 || true' EXIT
+          docker cp "$container:/out/." out/turnip/payload/
           sudo chown -R "$(id -u):$(id -g)" out/turnip
           cp LICENSE out/turnip/payload/notices/ESTERIA-GPL-3.0
+      - name: Qualify exact ICD loading without a GPU and retain failure diagnostics
+        run: |
+          receipt_sha=$(sha256sum out/turnip/payload/turnip-build.json | cut -d ' ' -f 1)
+          container=$(docker create --network none "esteria-turnip:$GITHUB_SHA" /bin/sh -c \
+            'python3 /inputs/run_probe.py --payload /out --output /out/no-gpu-check --build-sha256 "$1" --source-revision "$2" --expect-no-kgsl && python3 /inputs/record_build.py --check-no-gpu' \
+            -- "$receipt_sha" "$GITHUB_SHA")
+          trap 'docker rm -f "$container" >/dev/null 2>&1 || true' EXIT
+          set +e
+          docker start --attach "$container" > out/turnip/probe-supervisor.log 2>&1
+          probe_status=$?
+          set -e
+          container_exit=$(docker inspect --format '{{.State.ExitCode}}' "$container")
+          docker cp "$container:/out/no-gpu-check" out/turnip/payload/
+          sudo chown -R "$(id -u):$(id -g)" out/turnip
+          cat out/turnip/probe-supervisor.log
+          if test -f out/turnip/payload/no-gpu-check/probe.log; then
+            tail -c 1048576 out/turnip/payload/no-gpu-check/probe.log
+          fi
+          test "$probe_status" -eq 0
+          test "$container_exit" -eq 0
       - name: Preserve build-only evidence
         if: always()
         run: sudo chown -R "$(id -u):$(id -g)" out/turnip
