@@ -113,3 +113,10 @@ versions metadata can re-enable downloads behind mode=local. Current471 runtime
 was built with Retail assets disabled. A client-source fix is being implemented
 and must be qualified before any new binary/cohort or enabled optional asset
 feature is selected. Keep the current matched471 app pin until then.
+
+Actual native Java SQL/promotion/restart now passes41109643068 at4fd32df.
+Preserve runtime/evidence/native-java-installation-41109643068.json; the Linux
+locator seam and unqualified Android/world scope remain explicit. Next inspect
+the fresh server-component measurement after the typed failure diagnostics fix:
+prior preparation/staging exited1 with unavailable inner logs. Exact twelve
+measured assets and an owned draft ID are still required before publication.

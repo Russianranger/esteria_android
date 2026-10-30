@@ -25,7 +25,7 @@ separate. Android13 x64 emulator checks do not qualify Android ARM64 or Thor.
 | Wine public cohort |19 exact assets plus entire original Wine corresponding source pass anonymous consumption41098490533; seven consumer pins adopted atomically. | Android ARM64/Adreno/full game untested. |
 | Full server sources |41051669638 original full compile and41078079045 exact source recovery; all266 source members verified. | Preserve original source/debug pairs; no rebuild needed for packaging. |
 | Playerbots SQL |41076505231: actual originalb7 helper,52 statements/four-schema reentry/restart; complete source seal41099467799 read back all6372 members. | Schema qualification is not bot AI or world qualification. |
-| Owned installation finish |41088296041: production MySQL, first/repeat/restart, nested DataDir, four-schema SQL-only completion and clean-stop receipts. | Actual Java slot promotion test is newly implemented, execution pending. |
+| Owned installation finish |41088296041: production MySQL, first/repeat/restart, nested DataDir, four-schema SQL-only completion and clean-stop receipts. | Native Java promotion/restart passes41109643068; Android execution remains separate. |
 | Composed data4 |41103915829:5 CLI/config cases,2 capabilities,22 reader tests; runtime21ce4e1b, complete source and both debug pairs verified. | Actual client MPQ conversion and full coverage untested. |
 | Optional helper programs |41106873028: full original source/debug guards, actual APK bytes and Java32MiB fresh/cache installation of131 files/92,638,681 bytes. | Three original programs remain unchanged; no new SQL/Android/world execution. |
 | Complete local-game profile |41107245856 at7a7166e: actual ARM64 APK336,971,486 bytes; full sources/debug/providers/helpers/native inventory; Java32MiB four-component shared-store fresh/cache checks. | APK packaging/install evidence, no complete runtime session. Independent local APK readback passes all127 entries and eight runtime archives. |
@@ -81,10 +81,10 @@ publication and anonymous readback finish.
 
 1. Finish independent complete-profile APK readback and durable server-component
    publication. Produce subsequent APKs from the same exact public inputs.
-2. Execute the new native ARM64 Java coordinator test: real PRoot/JNI/SQL,
+2. Native ARM64 Java coordination passes41109643068: real PRoot/JNI/SQL,
    four-schema completion, clean promotion, active-save reseeding refusal and
-   persistent restart. The Linux payload locator is a qualification seam; Android
-   APK/Bionic locator execution remains separate.
+   persistent restart. Qualify the Android composition next. The Linux payload
+   locator is a qualification seam; Android APK/Bionic execution stays separate.
 3. Custom server-data import and actual continuation layout/order now pass
    host/Core/SDK checks. Qualify the new route on real matched assets; large
    precomputed world sets still face the conservative import metadata limit.
@@ -117,3 +117,10 @@ client DBC tables; no new client continuation feature is claimed.
 The final content-route UI/APK/lint follow-up passes26seconds/54tasks. The broad
 modified-worktree regression pass is1220 checks:1165 passed,55 explicitly
 skipped, zero failures/errors. No runtime/gameplay claim follows from that pass.
+
+Native Java evidence41109643068 independently verifies19 artifact members and
+all55 source inputs against exact4fd32df. The actual SQL/restart step passes;
+workflow metadata still lags completed logs/retained results. No Android/world
+result is inferred. The next server-publication producer exports typed failure
+phase/reason tokens after its prior preparation/staging failure; exact inner
+cause was unavailable, so no source or network diagnosis was invented.

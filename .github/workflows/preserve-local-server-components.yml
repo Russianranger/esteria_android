@@ -93,6 +93,15 @@ jobs:
           compression-level: 0
           retention-days: 14
           if-no-files-found: error
+      - name: Collect bounded typed phase and failure tokens without exporting private log bodies
+        if: always()
+        run: |
+          if test -f source-packaging/tools/release_local_server_components.py; then
+            python3 source-packaging/tools/release_local_server_components.py failure-context \
+              --inputs "$RUNNER_TEMP/local-server-components-inputs" \
+              --logs source-packaging/out/publication-evidence \
+              --output source-packaging/out/publication-evidence/failure-context.json
+          fi
       - name: Retain bounded measurement and exact UI draft body
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -102,6 +111,7 @@ jobs:
             source-packaging/out/publication-evidence/measurement.json
             source-packaging/out/publication-evidence/measured-release.lock.json
             source-packaging/out/publication-evidence/release-body.txt
+            source-packaging/out/publication-evidence/failure-context.json
           retention-days: 30
           if-no-files-found: warn
   upload-draft:

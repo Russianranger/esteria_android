@@ -171,5 +171,42 @@ class LocalServerRelease(unittest.TestCase):
                 release.fetch_published(self.root/'refused',lock,api)
         self.assertFalse((self.root/'refused').exists());api.download.assert_not_called()
 
+    def test_failure_receipt_keeps_typed_phase_and_source_literal_guard_without_private_bodies(self):
+        inputs,logs=self.root/'inputs',self.root/'logs';inputs.mkdir();logs.mkdir()
+        (inputs/'progress-stock-acquisition.json').write_bytes(release.encoded(dict(formatVersion=1,
+            scope='local-server-publication-input-preparation-progress',phase='stock-acquisition')))
+        (inputs/'progress-stock-providers.json').write_bytes(release.encoded(dict(formatVersion=1,
+            scope='local-server-publication-input-preparation-progress',phase='stock-providers')))
+        (inputs/'progress-helper-provider.json').write_bytes(b'{"private":"DO_NOT_EXPORT_THIS"}')
+        (logs/'preparation-private.log').write_text('private signed URL https://private.invalid/?token=DO_NOT_EXPORT_THIS\n'
+            'ValueError: local-server-release-reproduction-differs: /private/DO_NOT_EXPORT_THIS\n')
+        (logs/'staging-private.log').write_text('PermissionError: [Errno 13] /private/DO_NOT_EXPORT_THIS\n')
+        result=release.failure_context(inputs,logs,self.root/'failure.json')
+        self.assertEqual(result['preparationPhasesReached'],['stock-acquisition','stock-providers'])
+        self.assertEqual(result['lastPreparationPhase'],'stock-providers')
+        self.assertEqual(result['failures']['preparation'],dict(exceptionType='ValueError',reasonToken='local-server-release-reproduction-differs'))
+        self.assertEqual(result['failures']['staging'],dict(exceptionType='PermissionError',errno=13))
+        text=json.dumps(result);self.assertNotIn('DO_NOT_EXPORT_THIS',text);self.assertNotIn('https:',text);self.assertNotIn('/private',text)
+
+    def test_arbitrary_kebab_exception_body_is_not_mislabelled_as_a_known_guard(self):
+        inputs,logs=self.root/'inputs',self.root/'logs';inputs.mkdir();logs.mkdir()
+        (logs/'preparation-private.log').write_text('ValueError: arbitrary-secret-marker-that-is-not-a-source-guard\n')
+        result=release.failure_context(inputs,logs,self.root/'failure.json')
+        self.assertEqual(result['failures']['preparation'],dict(exceptionType='ValueError'))
+        self.assertNotIn('arbitrary-secret-marker',json.dumps(result))
+
+    def test_standard_qualified_traceback_types_and_http_status_do_not_export_urls_or_arguments(self):
+        inputs,logs=self.root/'inputs',self.root/'logs';inputs.mkdir();logs.mkdir()
+        cases=[('urllib.error.HTTPError: HTTP Error 503: https://private.invalid/?token=PRIVATE_MARKER',dict(exceptionType='HTTPError',httpStatus=503)),
+            ('subprocess.CalledProcessError: Command [PRIVATE_MARKER] returned non-zero exit status 1.',dict(exceptionType='CalledProcessError')),
+            ('json.decoder.JSONDecodeError: PRIVATE_MARKER: line 1 column 1 (char 0)',dict(exceptionType='JSONDecodeError')),
+            ('tarfile.ReadError: PRIVATE_MARKER',dict(exceptionType='ReadError'))]
+        for number,(line,expected) in enumerate(cases):
+            with self.subTest(line=line.split(':')[0]):
+                (logs/'preparation-private.log').write_text('Traceback (most recent call last):\n'+line+'\n')
+                result=release.failure_context(inputs,logs,self.root/('failure-'+str(number)+'.json'))
+                self.assertEqual(result['failures']['preparation'],expected)
+                self.assertNotIn('PRIVATE_MARKER',json.dumps(result));self.assertNotIn('https:',json.dumps(result))
+
 
 if __name__ == '__main__': unittest.main()

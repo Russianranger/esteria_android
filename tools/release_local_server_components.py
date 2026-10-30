@@ -9,6 +9,7 @@ release, overwrites assets, moves tags or changes repository settings.
 from __future__ import annotations
 
 import argparse
+import ast
 import gzip
 import hashlib
 import json
@@ -62,6 +63,16 @@ CONSUMER_DIRECTORIES = {'server-programs-playerbots-provider.tar.gz': 'programs'
     'server-content-provider.tar.gz': 'content'}
 FALSE_FLAGS = ('compilerExecuted', 'helperExecuted', 'sqlExecuted', 'androidGuestExecuted',
     'androidRuntimeQualified', 'worldserverQualified', 'playerbotsAiQualified', 'gameplayQualified')
+PREPARATION_PHASES = ('stock-acquisition', 'stock-providers', 'helper-inputs', 'helper-provider',
+    'data-inputs', 'data-provider', 'complete-provider-verification', 'complete')
+ERROR_TYPES = ('ValueError', 'RuntimeError', 'FileNotFoundError', 'PermissionError', 'OSError',
+    'CalledProcessError', 'HTTPError', 'URLError', 'EOFError', 'KeyError', 'TypeError', 'JSONDecodeError',
+    'BadZipFile', 'ReadError', 'BadGzipFile', 'UnicodeDecodeError')
+ERROR_NAMES = dict({name: name for name in ERROR_TYPES}, **{
+    'urllib.error.HTTPError': 'HTTPError', 'urllib.error.URLError': 'URLError',
+    'subprocess.CalledProcessError': 'CalledProcessError', 'json.decoder.JSONDecodeError': 'JSONDecodeError',
+    'zipfile.BadZipFile': 'BadZipFile', 'tarfile.ReadError': 'ReadError', 'gzip.BadGzipFile': 'BadGzipFile'})
+GUARD_TOKEN = r'([a-z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)+)(?=[:;\s]|$)'
 NOTICE = b'''Local Esteria ARM64 server programs, schema helper, data tools and content providers.
 The helper programs bundle contains its original stock provider, complete original
 corresponding sources and paired debug. The composed data-tool and original stock
@@ -228,17 +239,97 @@ def prepare(output, api=None):
     require(shutil.disk_usage(output.parent).free >= 20 << 30, 'local-server-release-preparation-requires-twenty-GiB-free')
     output.mkdir(mode=0o700)
     api = api or publication.Github(os.environ.get('GITHUB_TOKEN'))
+    def phase(name):
+        engine.put_metadata(output / ('progress-' + name + '.json'), dict(formatVersion=1,
+            scope='local-server-publication-input-preparation-progress', phase=name))
+    phase('stock-acquisition')
     stock.acquire(output / 'stock-inputs', api)
+    phase('stock-providers')
     stock.build(output / 'stock-inputs', output / 'stock-providers')
+    phase('helper-inputs')
     helper.acquire(output / 'helper-inputs', api)
+    phase('helper-provider')
     helper.build(output / 'stock-providers', output / 'helper-inputs', output / 'helper-providers')
+    phase('data-inputs')
     data.acquire(output / 'data-inputs', api)
+    phase('data-provider')
     data.build(output / 'data-inputs', output / 'data-providers')
+    phase('complete-provider-verification')
     proof = dict(formatVersion=1, scope='source-and-debug-verified-local-server-publication-inputs',
         selectedInputs=selected_inputs(), providers={name: verify(output / relative)
             for name, (relative, verify) in BUNDLES.items()}, **{k: False for k in FALSE_FLAGS})
     engine.put_metadata(output / 'preparation.json', proof)
+    phase('complete')
     return proof
+
+
+def failure_context(inputs, logs, output):
+    """Export bounded typed failure context, never raw messages/URLs/log bodies."""
+    phases = []
+    for name in PREPARATION_PHASES:
+        path = inputs / ('progress-' + name + '.json')
+        if not path.exists(): continue
+        try:
+            with files.plain_file(path) as source: raw = source.read(4097)
+            require(len(raw) <= 4096, 'progress-bound')
+            value = json.loads(raw)
+            if value == dict(formatVersion=1, scope='local-server-publication-input-preparation-progress', phase=name):
+                phases.append(name)
+        except (OSError, ValueError, TypeError): pass
+    failures = {}; allowed_tokens = guard_reason_tokens()
+    for name, label in (('preparation-private.log', 'preparation'), ('staging-private.log', 'staging')):
+        path = logs / name
+        if not path.exists(): continue
+        try:
+            with files.plain_file(path) as source:
+                source.seek(max(0, os.fstat(source.fileno()).st_size - 65536))
+                text = source.read(65536).decode('utf-8', 'replace')
+            matches = re.findall(r'(?:^|\n)(' + '|'.join(re.escape(name) for name in ERROR_NAMES) + r'):([^\n]*)', text)
+            if matches:
+                display_name, message = matches[-1]; row = dict(exceptionType=ERROR_NAMES[display_name])
+                # Only existing kebab-case guard tokens survive. Arbitrary
+                # messages, paths, command arguments and signed URLs do not.
+                token = re.match(r'\s*' + GUARD_TOKEN, message)
+                if token and token.group(1) in allowed_tokens: row['reasonToken'] = token.group(1)
+                errno = re.search(r'\[Errno ([0-9]{1,4})\]', message)
+                if errno: row['errno'] = int(errno.group(1))
+                http = re.search(r'\bHTTP(?: Error)? ([0-9]{3})\b', message)
+                if http: row['httpStatus'] = int(http.group(1))
+                failures[label] = row
+        except (OSError, ValueError, TypeError) as error:
+            failures[label] = dict(diagnosticReadError=type(error).__name__ if type(error).__name__ in ERROR_TYPES else 'OSError')
+    result = dict(formatVersion=1, scope='bounded-local-server-publication-failure-context',
+        preparationPhasesReached=phases, lastPreparationPhase=phases[-1] if phases else None,
+        failures=failures, rawLogBodiesExported=False, arbitraryExceptionMessagesExported=False,
+        candidateMeasurementPerformedHere=False, releaseUploadPerformedHere=False, releasePublicationPerformedHere=False,
+        **{name: False for name in FALSE_FLAGS})
+    engine.put_metadata(output, result)
+    return result
+
+
+def guard_reason_tokens():
+    """Only literal guard prefixes in this source recipe can reach diagnostics."""
+    result = set(); total = 0
+    for root in (ROOT / 'tools', ROOT / 'runtime'):
+        for path in sorted(root.rglob('*.py')):
+            if '__pycache__' in path.parts: continue
+            try:
+                with files.plain_file(path) as source: raw = source.read((256 << 10) + 1)
+                total += len(raw)
+                if len(raw) > 256 << 10 or total > 16 << 20: continue
+                tree = ast.parse(raw)
+            except (OSError, ValueError, SyntaxError): continue
+            for node in ast.walk(tree):
+                if not isinstance(node, ast.Call): continue
+                name = node.func.id if isinstance(node.func, ast.Name) else node.func.attr if isinstance(node.func, ast.Attribute) else ''
+                index = 1 if name == 'require' else 0 if name in ERROR_TYPES else -1
+                if index < 0 or len(node.args) <= index: continue
+                value = node.args[index]
+                if isinstance(value, ast.JoinedStr) and value.values: value = value.values[0]
+                if not isinstance(value, ast.Constant) or not isinstance(value.value, str): continue
+                token = re.match(GUARD_TOKEN, value.value)
+                if token and len(token.group(1)) <= 160: result.add(token.group(1))
+    return result
 
 
 def dependency_binding(directory):
@@ -447,10 +538,15 @@ def consume(directory, output, lock):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('operation', choices=('prepare', 'stage', 'verify', 'body', 'upload-draft', 'verify-published',
-        'fetch-published', 'consume'))
+        'fetch-published', 'consume', 'failure-context'))
     parser.add_argument('--release-lock', type=Path, default=LOCK); parser.add_argument('--inputs', type=Path)
-    parser.add_argument('--output', type=Path); parser.add_argument('--target'); parser.add_argument('--wait-seconds', type=int, default=0)
+    parser.add_argument('--output', type=Path); parser.add_argument('--logs', type=Path)
+    parser.add_argument('--target'); parser.add_argument('--wait-seconds', type=int, default=0)
     args = parser.parse_args()
+    if args.operation == 'failure-context':
+        require(args.inputs and args.logs and args.output, 'local-server-failure-context-inputs-required')
+        result = failure_context(args.inputs, args.logs, args.output)
+        print(json.dumps(result, sort_keys=True, indent=2)); return
     if args.operation == 'prepare': result = prepare(args.output)
     elif args.operation == 'stage':
         require(args.target and args.inputs and args.output, 'local-server-release-stage-inputs-required')

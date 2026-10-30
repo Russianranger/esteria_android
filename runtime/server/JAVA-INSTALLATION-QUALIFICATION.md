@@ -67,7 +67,25 @@ The `prepare` subcommand requires verified dependency, helper-augmented programs
 and content providers. The `run` subcommand refuses non-ARM64 execution and
 requires an actual native PRoot ownership build, fresh private paths and the
 recorded class/JNI closure. The workflow contains the complete mount and run
-commands. On2026-10-30 the harness compiled with actual JDK17 and glibc JNI on the
-available x64 host, and the three bounded input/receipt groups passed. Native
-ARM64 SQL execution, promotion and restart await the workflow; do not infer them
-from that host compile result.
+commands. The three bounded host input/receipt groups and actual JDK17/glibc JNI
+compilation pass; the x64 JVM refuses native qualification before creating
+private storage.
+
+Actual native ARM64 run41109643068 at application
+`4fd32df287961b9cc5175213a6fe85eac1c6d868` passes the full Java SQL/promotion/
+restart gate: real core and fourth-schema initialization, completed proof
+readback, refusal to reinitialize the active save, the same live SQL UUID after
+restart, unchanged actual account/realm/core/playerbots rows and private
+journals/credentials, and two clean database stops. The original bot schema has
+30tables and31updates. Its19-member evidence artifact is45,297bytes, SHA256
+`134efe85d03727937da320b8a43fcac529f2854bc49321f3a9068e0ab3f3453c`.
+Independent readback verifies every member and all55 recorded project source
+inputs, including both native headers, against that exact Git revision. The
+native runner also verifies all170 compiled classes before execution. See
+`runtime/evidence/native-java-installation-41109643068.json`.
+
+The actual job log completes evidence upload and cleanup, while Actions run/job
+metadata still reports `in_progress` with an older update time. The proof records
+this discrepancy and leaves workflow completion unconfirmed. The positive
+retained execution result does not qualify the Android/Bionic locator, Android
+SQL, authserver/worldserver, game data, character saving, bot AI or gameplay.

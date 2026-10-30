@@ -1,0 +1,62 @@
+{
+  "androidGuestExecuted": false,
+  "androidRuntimeQualified": false,
+  "compilerExecuted": false,
+  "diagnosticChange": {
+    "arbitraryExceptionMessagesExported": false,
+    "fixedPreparationPhases": 8,
+    "hostTestsPassed": 14,
+    "hostTestsRun": 14,
+    "hostTestsSkipped": 0,
+    "knownQualifiedExceptionTypesNormalizeToShortType": true,
+    "numericOsAndHttpCodesOnly": true,
+    "providerAdmissionGuardsRelaxed": false,
+    "rawLogBodiesExported": false,
+    "sourceLiteralGuardTokensOnly": true
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "helperExecuted": false,
+  "independentActualFrozenRecipe": {
+    "allRecipeMembersReadBack": true,
+    "archive": {
+      "bytes": 9585638,
+      "sha256": "13a5528fbba44e94da1ad0b52d2b929ec905128c32c1fade51625af3a885cb59"
+    },
+    "canonicalGitFileBytes": 8854668,
+    "fullTwelveAssetCandidateMeasured": false,
+    "integrationRevision": "5c560335d6e6b6cd9a9492cda2ed4602effab543",
+    "isolatedDetachedCheckout": true,
+    "productionProviderFactoryExecuted": false,
+    "trackedRegularFiles": 936
+  },
+  "observedAt": "2026-10-30T19:07:36.410263+00:00",
+  "ownedDraftCreated": false,
+  "playerbotsAiQualified": false,
+  "releasePublished": false,
+  "releaseTargetCommitSelected": null,
+  "scope": "local-server-preservation-executed-failure-and-bounded-diagnostics",
+  "sqlExecuted": false,
+  "workflow": {
+    "actualCandidateAvailable": false,
+    "actualDecodedJobLogRead": true,
+    "combinedPreparationAndStagingStepFailedAt": "2026-10-30T18:57:59.3170317Z",
+    "combinedPreparationAndStagingStepStartedAt": "2026-10-30T18:55:38.2916197Z",
+    "conclusion": "failure",
+    "exactInnerFailureReasonKnown": false,
+    "exitCode": 1,
+    "hostTestsPassed": 23,
+    "hostTestsRun": 23,
+    "hostTestsSkipped": 0,
+    "infrastructureFailureBeforeSteps": false,
+    "integrationRevision": "5c560335d6e6b6cd9a9492cda2ed4602effab543",
+    "job": 124253080033,
+    "noMeasuredOutputFilesRetained": true,
+    "privateInnerLogAvailable": false,
+    "run": 41110997462,
+    "runUpdatedAt": "2026-10-30T19:01:44Z",
+    "runUrl": "https://github.com/Russianranger/esteria_android/actions/runs/41110997462",
+    "status": "completed"
+  },
+  "worldserverQualified": false
+}

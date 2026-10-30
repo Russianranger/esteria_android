@@ -41,6 +41,9 @@ source/debug admission guards and creates one completely read-back candidate.
 Its bounded measurement artifact contains `measured-release.lock.json`, all12
 asset identities and the exact `release-body.txt`; no UI draft is needed for
 this first phase. A failed measurement cannot enable upload.
+Failure collection retains only fixed preparation phases, exception types,
+bounded guard reason tokens and numeric OS/HTTP error codes. Raw private logs,
+arbitrary exception messages, command arguments and signed URLs are excluded.
 
 Create an owned UI draft only after that concrete candidate passes. Use the
 measured tag, exact target commit, prerelease setting and body. Record its
