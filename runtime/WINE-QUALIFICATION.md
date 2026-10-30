@@ -1,5 +1,39 @@
 # Linux ARM64 Wine component qualification
 
+## Optional actual Grunt/SRP path
+
+`--client-auth-source /path/to/exact-clean-client-checkout` additionally runs the
+full verified PE's `--auth-check --local-offline` path. Entry, offline and
+loopback checks must also be enabled. The clean source revision must equal the
+binary manifest revision; the harness stages only that commit's
+`Tools/PlatformTests/auth_peer.py`, records its hash and rechecks it before
+execution. The peer stays in the client repository, with no second SRP
+implementation maintained here. A root invocation reading a runner-owned Git
+checkout must scope Git's `safe.directory` configuration to that exact trusted
+checkout; CI supplies it only in the qualification command environment.
+
+Inside the existing owned network/PID namespace, the peer owns literal
+`127.0.0.1:3724` and supplies fragmented protocol replies. The actual reconstructed
+Grunt/SRP code must authenticate, return one local realm and a matching private
+40-byte session key, then reject a bad server proof and a nonlocal advertised
+realm. Existing private/public outputs must be refused without alteration.
+Credentials enter through a fresh private 57-byte file and are never command
+arguments. Input/key files are removed after each case. Raw client/Wine logs
+remain in the disposable private runtime fixture, outside the artifact directory;
+only canonical status lines and the bounded typed receipt are exported after
+log draining. Public failure lines omit their original suffix entirely.
+
+The separate `linuxArm64ClientGruntSyntheticPeerQualified` flag requires all
+three cases, private-key equality, output preservation/removal and the existing
+Wine stop/wait, bounded logs and normal completed namespace gates. It cannot
+imply compiled-server compatibility, game initialization, assets, world entry,
+Android or gameplay. Those scope flags remain false. The new optional Wine path
+awaits actual execution. Its matching native Windows x64/ARM64 synthetic-peer
+checks passed at client `3f9389ccfdb0431d281e281c49193c8064c70b62`, run
+`41010223296`; this does not establish the Wine result. The separate
+`CLIENT-AUTH-QUALIFICATION.md` composer requires the real compiled server and
+database instead of this synthetic peer.
+
 `tools/qualify_wine_arm64.py` runs the real reconstructed-client
 `XvidDecoder.dll` through the native ARM64 `test_xvid_adapter.exe` driver. It
 verifies the same build's `client-build.json`, hashes and AA64 PE headers before

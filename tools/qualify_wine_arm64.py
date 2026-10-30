@@ -22,9 +22,11 @@ import time
 try:
     from . import prepare_runtime as packages
     from . import wine_audio
+    from . import wine_auth
 except ImportError:
     import prepare_runtime as packages
     import wine_audio
+    import wine_auth
 
 
 GUEST = '/esteria-qualification'
@@ -367,6 +369,10 @@ def worker(runtime, output):
             value, digest = read_loopback_receipt(receipt_path)
             observed.update(receipt=value, receiptSha256=digest, receiptValidated=True)
             packages.write_json(output / 'client-loopback.json', value)
+        if plan.get('clientAuthPeer'):
+            result['clientAuth'] = {}
+            wine_auth.execute(root, fixture, GUEST, plan['clientAuthPeer'], result['clientAuth'],
+                              run_logged, guest_command, captures)
         result['graphics'] = {}
         for name in plan['graphicsRequested']:
             filename, message = VULKAN_FIXTURES[name]
@@ -413,6 +419,11 @@ def worker(runtime, output):
         result['logStreamsDrained'] = all([capture.finish(drain_deadline - time.monotonic()) for capture in captures])
         result['logsWithinLimit'] = all(not capture.truncated for capture in captures)
         result['logWritesSucceeded'] = all(capture.error is None for capture in captures)
+        if plan.get('clientAuthPeer'):
+            try:
+                wine_auth.export_logs(fixture, output)
+            except Exception:
+                result['logWritesSucceeded'] = False
         result['workerCompleted'] = True
         packages.write_json(output / 'worker-result.json', result)
         # Exiting PID 1 tears down every descendant, including detached Wine
@@ -460,7 +471,8 @@ def graphics_identity(root, lock):
     return candidate
 
 
-def qualification_flags(result, requested, namespace_exit=0, client_entry=False, audio=False, client_offline=False, client_loopback=False):
+def qualification_flags(result, requested, namespace_exit=0, client_entry=False, audio=False, client_offline=False, client_loopback=False,
+                        client_auth=False):
     # A deliberate handled fixture failure may preserve earlier passing scopes.
     # An abnormal namespace exit may not qualify anything, even if a receipt was
     # flushed just before the worker was killed.
@@ -476,7 +488,9 @@ def qualification_flags(result, requested, namespace_exit=0, client_entry=False,
              'linuxArm64VulkanPresentationQualified': False, 'linuxArm64VulkanTextureLifecycleQualified': False,
              'linuxArm64ClientEntryQualified': False, 'linuxArm64VulkanEngineFrameReadbackQualified': False,
              'linuxArm64FmodPcmTransportQualified': False, 'linuxArm64ClientOfflineBoundariesQualified': False,
-             'linuxArm64ClientLoopbackTransportQualified': False}
+             'linuxArm64ClientLoopbackTransportQualified': False, 'linuxArm64ClientGruntSyntheticPeerQualified': False}
+    if client_auth:
+        flags['linuxArm64ClientGruntSyntheticPeerQualified'] = bool(common and wine_auth.passed(result.get('clientAuth', {})))
     if client_loopback:
         observed = result.get('clientLoopback', {})
         flags['linuxArm64ClientLoopbackTransportQualified'] = bool(common and observed.get('exitCode') == 0 and
@@ -506,7 +520,9 @@ def qualification_flags(result, requested, namespace_exit=0, client_entry=False,
 
 
 def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=False, require_engine_frame=False,
-            audio_driver=None, bridge_dir=None, bridge_revision=None, client_offline=False, client_loopback=False):
+            audio_driver=None, bridge_dir=None, bridge_revision=None, client_offline=False, client_loopback=False, client_auth_source=None):
+    packages.require(not client_auth_source or (client_entry and client_offline and client_loopback),
+                     'auth-check-requires-entry-offline-and-loopback-checks')
     packages.require(not client_loopback or (client_entry and client_offline), 'loopback-check-requires-entry-and-offline-checks')
     packages.require(not client_offline or client_entry, 'offline-check-requires-client-entry-check')
     packages.require(not require_engine_frame or 'presentation' in (graphics or {}),
@@ -543,6 +559,7 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
     fixture = root / GUEST.lstrip('/')
     packages.require(not os.path.lexists(fixture), 'runtime-already-used-for-qualification')
     fixture.mkdir(mode=0o700)
+    auth_peer = wine_auth.prepare(client_auth_source, client['sourceRevision'], fixture) if client_auth_source else None
     inputs = [(driver, 'test_xvid_adapter.exe'), (client_dir / 'XvidDecoder.dll', 'XvidDecoder.dll')]
     if client_entry:
         inputs.append((client_dir / 'WowClient64.exe', 'WowClient64.exe'))
@@ -565,6 +582,7 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
                         dict(graphicsRequested=list(graphics), softwareGraphics=software_graphics,
                              clientEntryRequested=client_entry, engineFrameReadbackRequired=require_engine_frame,
                              clientOfflineRequested=client_offline, clientLoopbackRequested=client_loopback,
+                             clientAuthPeer=auth_peer,
                              audioRequested=bool(audio_driver)))
     report = dict(formatVersion=1, scope='native-linux-arm64-wine-component-fixtures',
                   runtimeArchiveSha256=package['archive']['sha256'], runtimeReceiptSha256=prepared_sha,
@@ -577,6 +595,7 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
                   linuxArm64ClientEntryQualified=False, clientEntryRequested=client_entry,
                   linuxArm64ClientOfflineBoundariesQualified=False, clientOfflineRequested=client_offline,
                   linuxArm64ClientLoopbackTransportQualified=False, clientLoopbackRequested=client_loopback,
+                  linuxArm64ClientGruntSyntheticPeerQualified=False, clientAuthPeer=auth_peer,
                   linuxArm64VulkanEngineFrameReadbackQualified=False, engineFrameReadbackRequired=require_engine_frame,
                   linuxArm64FmodPcmTransportQualified=False, audioRequested=bool(audio_driver), audioBridge=audio_identity,
                   softwareGraphics=software_graphics, graphicsRequested=list(graphics))
@@ -590,7 +609,7 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
             try:
                 report['namespaceExit'] = child.wait(timeout=420 + 185 * len(graphics) + (125 if client_entry else 0) +
                                                     (620 if audio_driver else 0) + (250 if client_offline else 0) +
-                                                    (125 if client_loopback else 0))
+                                                    (125 if client_loopback else 0) + (500 if auth_peer else 0))
             except subprocess.TimeoutExpired:
                 os.killpg(child.pid, signal.SIGKILL)
                 child.wait(timeout=15)
@@ -598,7 +617,8 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
         report['processNamespaceExited'] = True
         result, _ = read_json(output / 'worker-result.json')
         report['worker'] = result
-        report.update(qualification_flags(result, graphics, report['namespaceExit'], client_entry, bool(audio_driver), client_offline, client_loopback))
+        report.update(qualification_flags(result, graphics, report['namespaceExit'], client_entry, bool(audio_driver), client_offline,
+                                          client_loopback, bool(auth_peer)))
         report['clientExecutableLaunchAttempted'] = result.get('clientEntry', {}).get('launchAttempted') is True
         report['clientExecutableEntryReached'] = report['linuxArm64ClientEntryQualified']
         packages.require(report['linuxArm64CodecQualified'], 'wine-codec-qualification-failed')
@@ -608,6 +628,8 @@ def qualify(runtime, client_dir, driver, output, graphics=None, client_entry=Fal
             packages.require(report['linuxArm64ClientOfflineBoundariesQualified'], 'client-offline-boundaries-not-qualified')
         if client_loopback:
             packages.require(report['linuxArm64ClientLoopbackTransportQualified'], 'client-loopback-transport-not-qualified')
+        if auth_peer:
+            packages.require(report['linuxArm64ClientGruntSyntheticPeerQualified'], 'client-grunt-synthetic-peer-not-qualified')
         for name in graphics:
             key = ('linuxArm64VulkanPresentationQualified' if name == 'presentation' else
                    'linuxArm64VulkanTextureLifecycleQualified')
@@ -651,6 +673,7 @@ def main():
     parser.add_argument('--client-entry-check', action='store_true', help='Launch the verified full PE in its explicit entry-only mode')
     parser.add_argument('--client-offline-check', action='store_true', help='Exercise both real offline command spellings and refused remote paths')
     parser.add_argument('--client-loopback-check', action='store_true', help='Exercise actual client network workers and loopback frame/stream transport')
+    parser.add_argument('--client-auth-source', type=Path, help='Exact clean matching client checkout; opt in to real Grunt/SRP against its synthetic peer')
     parser.add_argument('--require-engine-frame-readback', action='store_true',
                         help='Require the presentation driver to pass real engine scene readback and embedded shaders')
     parser.add_argument('--output', type=Path, required=True, help='New evidence directory')
@@ -666,13 +689,15 @@ def main():
     result = qualify(args.runtime, args.client_dir.absolute(), args.driver.absolute(), args.output, graphics,
                      args.client_entry_check, args.require_engine_frame_readback,
                      args.audio_driver.absolute() if args.audio_driver else None,
-                     args.bridge_dir.absolute() if args.bridge_dir else None, args.bridge_revision, args.client_offline_check, args.client_loopback_check)
+                     args.bridge_dir.absolute() if args.bridge_dir else None, args.bridge_revision, args.client_offline_check, args.client_loopback_check,
+                     args.client_auth_source.absolute() if args.client_auth_source else None)
     print(json.dumps({key: result[key] for key in ('linuxArm64CodecQualified', 'linuxArm64VulkanPresentationQualified',
                                                  'linuxArm64VulkanTextureLifecycleQualified', 'linuxArm64ClientEntryQualified',
                                                  'linuxArm64VulkanEngineFrameReadbackQualified',
                                                  'linuxArm64FmodPcmTransportQualified',
                                                  'linuxArm64ClientOfflineBoundariesQualified',
                                                  'linuxArm64ClientLoopbackTransportQualified',
+                                                 'linuxArm64ClientGruntSyntheticPeerQualified',
                                                  'androidRuntimeQualified')}))
     return 0
 

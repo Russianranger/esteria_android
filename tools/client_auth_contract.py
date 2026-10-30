@@ -8,7 +8,10 @@ import json
 import os
 import re
 
-from . import prepare_runtime as files
+try:
+    from . import prepare_runtime as files
+except ImportError:
+    import prepare_runtime as files
 
 INPUT = 'Esteria-auth-input.bin'
 RECEIPT = 'Esteria-auth-check.json'
