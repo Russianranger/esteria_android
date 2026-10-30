@@ -66,6 +66,18 @@ def initialization_state():
 
 
 class FilesystemGuards(unittest.TestCase):
+    def test_legacy_hidden_staging_is_preserved_not_reinitialized(self):
+        with tempfile.TemporaryDirectory() as name:
+            state = Path(name)
+            legacy = state / '.database-initializing'
+            legacy.mkdir()
+            sentinel = legacy / 'undo_001'
+            sentinel.write_bytes(b'preserve failed initialization')
+            with self.assertRaisesRegex(BootstrapError, 'Legacy hidden staging datadir is preserved'):
+                initialize(Path('/missing/mysqld'), Path('/missing/mysql'), state, '8.0.44')
+            self.assertEqual(sentinel.read_bytes(), b'preserve failed initialization')
+            self.assertFalse((state / 'database-initializing').exists())
+
     def test_engine_diagnostics_are_bounded_private_and_redacted_for_export(self):
         with tempfile.TemporaryDirectory() as name:
             root = Path(name)
@@ -118,7 +130,7 @@ class FilesystemGuards(unittest.TestCase):
             with self.assertRaisesRegex(BootstrapError, 'Nonempty datadir'):
                 initialize(Path('/missing/mysqld'), Path('/missing/mysql'), root, '8.0.44')
             self.assertEqual(marker.read_bytes(), b'preserve me')
-            self.assertFalse((root / '.database-initializing').exists())
+            self.assertFalse((root / 'database-initializing').exists())
 
     def test_symlinked_datadir_and_credentials_fail_closed(self):
         with tempfile.TemporaryDirectory() as name:
@@ -163,7 +175,7 @@ class FilesystemGuards(unittest.TestCase):
             marker.write_bytes(b'preserved after rename')
             receipt = {'format': FORMAT, 'engine': 'mysql', 'version': '8.0.44',
                        'uuid': 'f28dc207-e269-11ed-bc2a-0242ac120002',
-                       'datadir': str(state / '.database-initializing'),
+                       'datadir': str(state / 'database-initializing'),
                        'databases': list(DATABASES), 'application_schemas_populated': False}
             atomic_json(state / '.database-staged-bootstrap.json', receipt)
             atomic_json(state / '.database-initialization.json',
@@ -306,7 +318,7 @@ class RealMysqlInitialization(unittest.TestCase):
             # staged receipt and journal durable, final receipt not yet written.
             receipt = state / 'database-bootstrap.json'
             staged = json.loads(receipt.read_text())
-            staged['datadir'] = str(state / '.database-initializing')
+            staged['datadir'] = str(state / 'database-initializing')
             atomic_json(state / '.database-staged-bootstrap.json', staged)
             atomic_json(state / '.database-initialization.json',
                         {'format': FORMAT, 'version': version, 'phase': 'ready-to-promote', 'uuid': staged['uuid']})

@@ -17,7 +17,7 @@ jobs:
     env:
       ESTERIA_MYSQL_INITIALIZE: '1'
       ESTERIA_MYSQLD_PATH: /usr/sbin/mysqld
-      ESTERIA_MYSQL_DIAGNOSTICS_DIR: ${{ runner.temp }}/esteria-mysql-initialize-diagnostics
+      ESTERIA_MYSQL_DIAGNOSTICS_DIR: /tmp/esteria-mysql-initialize-diagnostics
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Install real host MySQL for initialization qualification
@@ -29,7 +29,7 @@ jobs:
             sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld || true
           fi
           dpkg-query -W 'mysql*' > mysql-host-packages.txt
-          mysql --no-defaults --no-login-paths --batch --raw --skip-column-names --unbuffered --skip-reconnect --connect-timeout=3 --version > mysql-client-version.txt
+          mysql --no-defaults --batch --raw --skip-column-names --unbuffered --skip-reconnect --connect-timeout=3 --version > mysql-client-version.txt
       - name: Record exact diagnostic engine version
         shell: python
         run: |
@@ -53,7 +53,7 @@ jobs:
             mysql-host-version.txt
             mysql-host-packages.txt
             mysql-client-version.txt
-            ${{ runner.temp }}/esteria-mysql-initialize-diagnostics/*.log
+            /tmp/esteria-mysql-initialize-diagnostics/*.log
           retention-days: 14
   mysql:
     runs-on: ubuntu-24.04
@@ -62,14 +62,14 @@ jobs:
       ESTERIA_MYSQL_VERSION: 8.0.44
       ESTERIA_MYSQL_INTEGRATION: '1'
       ESTERIA_MYSQL_ADMIN_OPTIONS: /tmp/esteria-mysql-admin.cnf
-      ESTERIA_MYSQL_DIAGNOSTICS_DIR: ${{ runner.temp }}/esteria-mysql-container-diagnostics
+      ESTERIA_MYSQL_DIAGNOSTICS_DIR: /tmp/esteria-mysql-container-diagnostics
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Install SQL client
         run: |
           sudo apt-get update
           sudo apt-get install -y mysql-client
-          mysql --no-defaults --no-login-paths --batch --raw --skip-column-names --unbuffered --skip-reconnect --connect-timeout=3 --version > mysql-client-version.txt
+          mysql --no-defaults --batch --raw --skip-column-names --unbuffered --skip-reconnect --connect-timeout=3 --version > mysql-client-version.txt
       - name: Start dedicated loopback MySQL 8 fixture
         shell: python
         run: |
@@ -107,7 +107,7 @@ jobs:
           name: mysql-container-diagnostics-${{ github.sha }}
           path: |
             mysql-client-version.txt
-            ${{ runner.temp }}/esteria-mysql-container-diagnostics/*.log
+            /tmp/esteria-mysql-container-diagnostics/*.log
           retention-days: 14
       - name: Remove fixture and credential
         if: always()

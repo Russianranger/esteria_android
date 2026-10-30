@@ -191,14 +191,17 @@ class Mysql:
         private_path(options)
         if not options.is_file() or options.stat().st_mode & 0o077:
             raise BootstrapError('MySQL option file must exist and be private (mode 0600)')
-        command = [str(executable), f'--defaults-file={options}', '--no-login-paths', '--batch', '--raw',
+        command = [str(executable), f'--defaults-file={options}', '--batch', '--raw',
                    '--skip-column-names', '--unbuffered', '--skip-reconnect', '--connect-timeout=3']
         command += ['--protocol=SOCKET', f'--socket={socket}'] if socket else [
             '--protocol=TCP', '--host=127.0.0.1', f'--port={PORT}']
         # mysql can include SQL fragments in errors. Keep stderr out of logs.
         environment = dict(os.environ)
-        for key in ('MYSQL_PWD', 'MYSQL_TEST_LOGIN_FILE'):
-            environment.pop(key, None)
+        environment.pop('MYSQL_PWD', None)
+        # MySQL 8.0 does not support the newer --no-login-paths option. Its own
+        # my_default_get_login_file() honors this override, so do not inherit a
+        # user's encrypted .mylogin.cnf alongside our explicit private options.
+        environment['MYSQL_TEST_LOGIN_FILE'] = os.devnull
         self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                         stderr=subprocess.DEVNULL, bufsize=0, env=environment)
         self.selector = selectors.DefaultSelector()
@@ -391,7 +394,11 @@ def initialize(mysqld: Path, mysql: Path, state: Path, expected_version: str) ->
     """Stage a brand-new instance. Never call --initialize over existing storage."""
     exact_version(expected_version)
     target = private_path(state / 'database')
-    stage = private_path(state / '.database-initializing')
+    # MySQL 8.0 InnoDB discovery skips dot-prefixed datadirs: a newly initialized
+    # hidden directory fails restart with MY-013039 (undo_001 already exists).
+    # Keep the private staging directory visible; privacy comes from mode 0700.
+    stage = private_path(state / 'database-initializing')
+    legacy_stage = private_path(state / '.database-initializing')
     journal = private_path(state / '.database-initialization.json')
     receipt_path = private_path(state / 'database-bootstrap.json')
     if receipt_path.exists():
@@ -400,6 +407,8 @@ def initialize(mysqld: Path, mysql: Path, state: Path, expected_version: str) ->
             raise BootstrapError('Existing datadir UUID disagrees with its receipt')
         return receipt | {'operation': 'already-initialized', 'sql_authenticated': False,
                           'next': 'Start the owned instance, then run verify'}
+    if legacy_stage.exists():
+        raise BootstrapError('Legacy hidden staging datadir is preserved; inspect recovery before starting a new initialization')
     if target.exists() and (not target.is_dir() or any(target.iterdir())):
         # The data rename is durable before the receipt rename. A crash between
         # them may finish only this already-provisioned, exactly identified move.
