@@ -139,6 +139,27 @@ jobs:
                                   'ESTERIA_AUTH_CLIENT_BYTES': str(client['clientArtifact']['bytes'])}.items():
                   output.write(name + '=' + value + '\n')
           PY
+      - name: Verify the unused intended MySQL state mount destination
+        run: |
+          docker run --rm --network none --read-only -i esteria-client-auth:qualification \
+            /usr/bin/python3 - > out/client-auth-evidence/mysql-state-mount-preflight.json <<'PY'
+          import json, os, pathlib, stat
+          target = pathlib.Path('/var/lib/mysql/esteria-client-auth')
+          current = pathlib.Path('/')
+          for part in target.parts[1:-1]:
+              current /= part
+              try:
+                  info = current.lstat()
+              except FileNotFoundError:
+                  continue
+              if not stat.S_ISDIR(info.st_mode):
+                  raise ValueError('mysql-state-mount-parent-is-not-a-plain-directory')
+          if os.path.lexists(target):
+              raise ValueError('mysql-state-mount-destination-must-be-absent')
+          print(json.dumps(dict(formatVersion=1, scope='client-auth-mysql-state-mount-preflight',
+              presentParentsArePlainDirectories=True, destinationAbsent=True,
+              databaseOrClientExecuted=False), sort_keys=True))
+          PY
       - name: Run actual reconstructed Grunt against the compiled server and database
         run: |
           # Namespace privileges are confined to this disposable network-none CI
@@ -150,6 +171,7 @@ jobs:
             --env GIT_CONFIG_VALUE_0=/qualification/client-auth-source \
             --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
             --mount "type=bind,src=$GITHUB_WORKSPACE/out/client-auth-private,dst=/state" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/client-auth-private,dst=/var/lib/mysql/esteria-client-auth" \
             --workdir /qualification esteria-client-auth:qualification \
             python3 tools/qualify_client_auth.py \
             --runtime /state/wine --install /qualification/out/server-reference/install \
@@ -162,7 +184,7 @@ jobs:
             --client-artifact-sha256 "$ESTERIA_AUTH_CLIENT_SHA256" \
             --client-artifact-bytes "$ESTERIA_AUTH_CLIENT_BYTES" \
             --client-source /qualification/client-auth-source --client-revision "$ESTERIA_AUTH_CLIENT_REVISION" \
-            --output /state/run > out/client-auth-evidence/qualification-status.log 2>&1
+            --output /var/lib/mysql/esteria-client-auth/run > out/client-auth-evidence/qualification-status.log 2>&1
       - name: Preserve bounded public receipts only after success or failure
         if: always()
         run: |

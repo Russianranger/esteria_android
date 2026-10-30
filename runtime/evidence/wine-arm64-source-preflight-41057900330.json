@@ -1,0 +1,64 @@
+{
+  "formatVersion": 1,
+  "scope": "actual-toolchain-git-source-preflight-only-before-native-runtime-rebuild",
+  "workflowRun": 41057900330,
+  "sourceRevision": "681b2e9f30b19e94bf8e8de44f67fedba5033c8a",
+  "jobId": 124069961741,
+  "jobConclusion": "success",
+  "artifact": {
+    "id": 12977492746,
+    "bytes": 361,
+    "sha256": "9702f81ad9444d4e9729c0feadd177d5f97aade09dcbcc5ddec420239564244e",
+    "downloadVerified": true
+  },
+  "captureReceipt": {
+    "bytes": 310,
+    "sha256": "1f8b13a0bdff2273a2f7dfa38200108ff49a5bbb71b8ec8bbf576b305130c3f9",
+    "receipt": {
+      "sourceTrees": 4,
+      "originalNotices": 47,
+      "archiveBytes": 252021269,
+      "manifest": {
+        "bytes": 13790,
+        "sha256": "fc41f799c6122fb880e8809df75d9fd993b831d78d4d688be8ef56523a698f83"
+      },
+      "allSelectedGitBlobsReadBack": true,
+      "binaryRebuildEquivalent": false,
+      "androidRuntimeQualified": false
+    }
+  },
+  "retainedSourceArtifact": {
+    "id": 12977467828,
+    "bytes": 252596388,
+    "sha256": "376c9327d0a68ecdd03bd7c7445f41b3b940e6368d7a2c9fa9376e5830196f59",
+    "localFullArtifactReadback": false,
+    "completeCiCaptureAndTransferReadbackPassed": true
+  },
+  "sourceLockSha256": "077fb2b0883986338b6755e53f5cede08bd63ed1834783e7e6cd079e0ec0c16d",
+  "selectedGitSources": [
+    {
+      "repository": "https://github.com/bylaws/llvm-mingw",
+      "revision": "b21616256053c65c95e44c9a4477727e32351460",
+      "tag": "20250920"
+    },
+    {
+      "repository": "https://github.com/bylaws/llvm-project",
+      "revision": "c5668510b7c8a1881d5764d6a67ff253523d21e9",
+      "selection": "build-llvm.sh:19"
+    },
+    {
+      "repository": "https://github.com/mingw-w64/mingw-w64",
+      "revision": "311590a177efe7e5ec61bc3f265e4c810328f25e",
+      "selection": "build-mingw-w64.sh:21"
+    },
+    {
+      "repository": "https://github.com/lldb-tools/lldb-mi",
+      "revision": "f1fea743bf06a99b6e7f74085bd8c8db47999df5",
+      "selection": "build-lldb-mi.sh:19"
+    }
+  ],
+  "nativeCandidateBuildOrClientQualified": false,
+  "androidQualified": false,
+  "gameplayQualified": false,
+  "productionProviderChanged": false
+}
