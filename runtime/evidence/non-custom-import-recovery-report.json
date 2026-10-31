@@ -1,0 +1,55 @@
+{
+  "actualFolderOrZipExecutionOnOwnerData": false,
+  "actualOwnerClientBytesInspected": false,
+  "actualThorExecution": false,
+  "app": {
+    "contentProfile": "stock-3.3.5a",
+    "packageId": "io.github.russianranger.esteria.stock",
+    "sourceRevision": "8d31e4fa832cd8ef0f738d36088fb9e64ae3aa41",
+    "versionCode": 1,
+    "versionName": "0.1.0-non-custom.1"
+  },
+  "downstreamErrors": {
+    "interpretation": "Consistent with preparation after failed import, not demonstrated runtime failure",
+    "missingCompleteClientCount": 2
+  },
+  "evidenceLimits": [
+    "Only two attached text reports supplied; no screenshot, source inventory or complete client data.",
+    "Old logger omits route, selected/detected root, filename and detailed exception chain.",
+    "Representative regression filenames must not be represented as the exact owner failure.",
+    "Runtime preparation and gameplay were not reached in the supplied report."
+  ],
+  "firstRecordedError": {
+    "epochMs": 1793471398867,
+    "exception": "IOException",
+    "failingStage": "shared import provider-location validation (matched source message)",
+    "folderVersusZip": null,
+    "nestedExceptionChain": null,
+    "normalizedRelativePath": null,
+    "observedRelativePath": null,
+    "occurrences": 3,
+    "offendingFilename": null,
+    "reason": "MPQ content is not at an effective client provider location",
+    "selectedRoot": null
+  },
+  "formatVersion": 1,
+  "otherReportFailures": [],
+  "reportFiles": {
+    "launcher.log": {
+      "bytes": 1628,
+      "sha256": "c6180fff3aef812f058b5c9e4818483c0b9859200d300492a5f2454a535661c6"
+    },
+    "status.txt": {
+      "bytes": 5970,
+      "sha256": "aeca63a046ee0749f1ed1f4e0bc385f4740d4d5a6ca3a7468182f69598ebe817"
+    }
+  },
+  "scope": "owner-support-report-and-source-diagnosis",
+  "snapshot": {
+    "lowMemory": false,
+    "memoryAvailableBytes": 11530194944,
+    "storageFreeBytes": 104327319552,
+    "thermal": "none"
+  },
+  "sourceFinding": "BASE_CLIENT called the overlay provider-location validator for every .mpq; harmless nonprovider names can reject an otherwise valid complete client before base verification. Exact triggering owner filename is absent from supplied diagnostics."
+}

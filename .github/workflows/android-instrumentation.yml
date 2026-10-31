@@ -114,6 +114,41 @@ jobs:
                   receipt['stdout'] = dict(bytes=log.stat().st_size, sha256=digest(log))
               (destination / 'stock-shader-component.json').write_text(json.dumps(receipt, sort_keys=True, indent=2) + '\n')
           print(json.dumps(receipt, sort_keys=True, indent=2))
+          # Real Android URI/document/stream API with an in-process provider and tiny synthetic headers.
+          selected = 'io.github.russianranger.esteria.SafImportTest'
+          files = ['app/src/androidTest/java/io/github/russianranger/esteria/SafImportTest.java',
+                   'app/src/main/java/io/github/russianranger/esteria/SafTreeSource.java',
+                   'app/src/main/java/io/github/russianranger/esteria/UriStager.java',
+                   'app/src/main/java/io/github/russianranger/esteria/ImportDiagnostics.java',
+                   'app/src/main/java/io/github/russianranger/esteria/SessionService.java',
+                   'core/src/main/java/io/github/russianranger/esteria/core/importer/GameDataImporter.java',
+                   'core/src/main/java/io/github/russianranger/esteria/core/importer/ContentPackageLayout.java']
+          receipt = dict(formatVersion=1, scope='android13-x64-document-resolver-synthetic-client-import-components',
+              appSourceRevision=os.environ['GITHUB_SHA'], contentProfile='stock-3.3.5a',
+              testClass=selected, expectedTests=3, emulatorProperties=properties,
+              sources={name: dict(bytes=(root / name).stat().st_size, sha256=digest(root / name)) for name in files},
+              componentTestsExecuted=False, componentTestsPassed=False,
+              ownerDocumentProviderTested=False, ownerGameDataImported=False,
+              androidArm64Qualified=False, thorQualified=False, gameplayQualified=False)
+          log = destination / 'saf-import-component.log'
+          try:
+              code, output = run_bounded(['adb', 'shell', 'am', 'instrument', '-w', '-r', '-e', 'class',
+                  selected, PACKAGE + '.test/androidx.test.runner.AndroidJUnitRunner'], log, 600, 256 * 1024)
+              receipt.update(componentTestsExecuted=True, processExitCode=code)
+              passed = code == 0 and bool(re.search(r'^OK \(3 tests\)\s*$', output, re.M)) and bool(
+                  re.search(r'^INSTRUMENTATION_CODE: -1\s*$', output, re.M)) and not re.search(
+                  r'FAILURES!!!|INSTRUMENTATION_FAILED|Process crashed|INSTRUMENTATION_STATUS_CODE: -[12]', output)
+              receipt['componentTestsPassed'] = passed
+              if not passed:
+                  raise RuntimeError('SAF import component class did not report exactly three successful tests')
+          except Exception as error:
+              receipt['failure'] = type(error).__name__ + ': ' + str(error)[:1024]
+              raise
+          finally:
+              if log.exists():
+                  receipt['stdout'] = dict(bytes=log.stat().st_size, sha256=digest(log))
+              (destination / 'saf-import-component.json').write_text(json.dumps(receipt, sort_keys=True, indent=2) + '\n')
+          print(json.dumps(receipt, sort_keys=True, indent=2))
           PY
       - name: Run real app-private filesystem and package-update contracts
         uses: ReactiveCircus/android-emulator-runner@324029e2f414c084d8b15ba075288885e74aef9c # v2.34.0

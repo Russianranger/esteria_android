@@ -13,6 +13,7 @@ import hashlib
 import importlib
 import importlib.util
 import json
+import os
 from pathlib import Path
 import posixpath
 import re
@@ -59,6 +60,76 @@ def virtual_name(value):
     return value
 
 
+def imported_name(value):
+    """A journal path is an imported filename, not an MPQ virtual member.
+
+    Non-provider installer/readme names can be Unicode and longer than the
+    engine's virtual path bound. Keep the importer's containment rules here.
+    """
+    require(isinstance(value, str) and 0 < len(value.encode('utf-8')) <= 1024 and
+            not value.startswith('/') and not any(c in value for c in ('\\', ':')) and
+            all(ord(c) >= 32 and ord(c) != 127 for c in value), 'unsafe imported journal path')
+    parts = value.split('/')
+    require(len(parts) <= 32 and all(part not in ('', '.', '..') and
+            not part.endswith(('.', ' ')) for part in parts), 'unsafe imported journal path')
+    return value
+
+
+def effective_provider_path(relative):
+    """Any supported classical locale, including an effective folder boundary.
+
+    This is the mask-2/mask-3 OpenArchives table plus PatchFiles enumeration,
+    matching ContentPackageLayout. In particular, an inactive installed locale
+    or unsupported alternate view must never be discarded as ancillary.
+    """
+    parts = relative.lower().split('/')
+    if len(parts) < 2 or parts[0] != 'data':
+        return False
+    name = parts[1]
+    if name.endswith('.mpq') and (name in {'alternate.mpq', 'expansion.mpq', 'lichking.mpq',
+            'common.mpq', 'common-2.mpq', 'common-3.mpq', 'patch.mpq'} or name.startswith('patch-')):
+        return True
+    if len(parts) < 3 or parts[1] not in {name.lower() for name in order.LOCALES}:
+        return False
+    locale, name = parts[1:3]
+    return name.endswith('.mpq') and (name == 'patch-' + locale + '.mpq' or
+            name.startswith('patch-' + locale + '-') or name in {prefix + locale + '.mpq'
+            for prefix in ('locale-', 'speech-', 'expansion-locale-', 'lichking-locale-',
+                           'expansion-speech-', 'lichking-speech-')})
+
+
+def ancillary_archives(source, pins):
+    """Record ignored physical archives without opening or rehashing them.
+
+    Only files or folder-MPQ members outside every effective provider boundary
+    qualify. The original
+    completed import remains intact; the Java stock projection independently
+    checks these paths and import hashes before omitting them from its own view.
+    """
+    exclusions, seen, count = [], set(), 0
+    for parent, directories, files in os.walk(source, followlinks=False):
+        for name in sorted(directories + files):
+            path = Path(parent) / name
+            relative = imported_name(path.relative_to(source).as_posix())
+            count += 1
+            require(count <= MAX_MEMBERS, 'stock physical inventory member bound')
+            folded = relative.casefold()
+            require(folded not in seen, 'case-colliding stock imported path: ' + relative)
+            seen.add(folded)
+            info = path.lstat()
+            require(stat.S_ISDIR(info.st_mode) or stat.S_ISREG(info.st_mode),
+                    'linked or special stock imported path: ' + relative)
+            if not stat.S_ISREG(info.st_mode) or not any(part.endswith('.mpq') for part in folded.split('/')) or effective_provider_path(relative):
+                continue
+            pin = pins.get(folded)
+            require(pin is not None and info.st_size == pin['bytes'],
+                    'ancillary archive differs from its completed streaming import: ' + relative)
+            exclusions.append({'path': relative, **pin,
+                'reason': 'Ancillary archive or folder member: no effective provider location in the selected classical client profile; excluded from the app-owned stock view, original import preserved'})
+            require(len(exclusions) <= 4096, 'stock ancillary archive exclusion bound')
+    return exclusions
+
+
 def importer_pins(source, generation):
     """Trust the owned streaming import journals; do not hash 16+ GiB again."""
     require(storage.HASH.fullmatch(generation) is not None and source.name == 'data', 'full import generation required')
@@ -84,7 +155,7 @@ def importer_pins(source, generation):
                     name = base64.b64decode(parts[0], validate=True).decode('utf-8')
                     size = int(parts[1]); digest = parts[3].decode('ascii')
                     require(size >= 0 and storage.HASH.fullmatch(digest) is not None, 'invalid imported file pin')
-                    name = virtual_name(name)
+                    name = imported_name(name)
                     local[name.casefold()] = {'bytes': size, 'sha256': digest}
                     require(len(local) <= MAX_MEMBERS, 'stock import journal member bound')
                 except (UnicodeError, ValueError):
@@ -285,9 +356,11 @@ def inspect(source, tools, revision, locale, generation, *, reader_loader=load_r
             'toolManifestSha256': tool_hash, 'providers': [], 'exclusions': [], 'unknownOverlays': [],
             'checks': {}, 'errors': [], 'passed': False, 'runtimeSignatureValidation': False,
             'runtimeExecution': False, 'worldEntry': False}
+    ancillary = ancillary_archives(source, pins)
     stack = Stack(source, effective, reader, pins)
     try:
-        report.update(providers=list(reversed(stack.providers)), exclusions=stack.exclusions, unknownOverlays=stack.unknown)
+        report.update(providers=list(reversed(stack.providers)), exclusions=stack.exclusions + ancillary, unknownOverlays=stack.unknown)
+        require(len(report['exclusions']) <= 4096, 'combined stock archive exclusion bound')
         if stack.unknown:
             report['errors'].extend('unclassified optional overlay: ' + row['path'] for row in stack.unknown)
         checks = report['checks']
@@ -341,10 +414,10 @@ def main():
         print('Stock profile: ' + report['contentProfile'] + '; import: ' + report['importGeneration'] +
               '; requested locale: ' + report['requestedLocale'] + '; effective locale: ' + report['effectiveLocale'])
         print('Inspected providers: ' + str(len(report['providers'])) + '; DBC layouts: ' +
-              str(len(report['checks'].get('clientDbcs', {}))) + '; confirmed optional archives: ' +
+              str(len(report['checks'].get('clientDbcs', {}))) + '; excluded optional/ancillary files: ' +
               str(len(report['exclusions'])) + '; unknown overlays: ' + str(len(report['unknownOverlays'])))
         for row in report['exclusions'][:32]:
-            print('Excluded optional archive: ' + row['path'] + '; ' + row['reason'])
+            print('Excluded file: ' + row['path'] + '; ' + row['reason'])
         if len(report['exclusions']) > 32:
             print('Additional exclusions retained in compatibility report: ' + str(len(report['exclusions']) - 32))
         if not report['passed']:

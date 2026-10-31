@@ -58,7 +58,7 @@ public final class GameDataVerifier {
 
     public static void verifyKnownFile(Path file, String relativePath) throws IOException {
         String lower = relativePath.toLowerCase(Locale.ROOT);
-        if (lower.endsWith(".mpq")) verifyMpq(file);
+        if (ContentPackageLayout.isEffectiveClientProvider(relativePath)) verifyMpq(file);
         if (lower.equals("wow.exe")) verifyWowVersion(file);
         EsteriaCatalogVerifier.verifyKnown(file, relativePath);
     }

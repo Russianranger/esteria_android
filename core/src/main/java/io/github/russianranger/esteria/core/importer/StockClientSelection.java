@@ -24,7 +24,8 @@ public final class StockClientSelection {
         SortedMap<String,String> exclusions=new TreeMap<>();
         for(Map.Entry<String,String> entry:confirmedExclusions.entrySet()) {
             String name=entry.getKey();String folded=name.toLowerCase(Locale.ROOT);
-            if(!safe(name)||!folded.startsWith("data/")||!folded.endsWith(".mpq")||
+            if(!safe(name)||(!ContentPackageLayout.isAncillaryClientPath(name)&&
+                    (!folded.startsWith("data/")||!folded.endsWith(".mpq")))||
                     entry.getValue()==null||!entry.getValue().matches("[0-9a-f]{64}")||
                     ordinaryArchivePath(name)||exclusions.put(name,entry.getValue())!=null)
                 throw new IOException("Stock selection cannot exclude an essential or unaudited archive: "+name);

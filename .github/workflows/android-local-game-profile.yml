@@ -5,7 +5,7 @@ on:
       build_version_code:
         description: Positive release versionCode, increased before a signed update
         required: false
-        default: '1'
+        default: '2'
         type: string
       publish_non_custom:
         description: Sign and publish an additive non-custom prerelease using the configured persistent key
@@ -112,7 +112,7 @@ jobs:
       contents: write
       actions: read
     env:
-      RELEASE_VERSION_CODE: ${{ inputs.build_version_code || '1' }}
+      RELEASE_VERSION_CODE: ${{ inputs.build_version_code || '2' }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -147,6 +147,20 @@ jobs:
           python3 tools/fetch_sources.py client --output sources
           git fetch --no-tags --depth 1 origin 75f50445112818c97f8d8e575d2b1c21e59af6e5
           git fetch --no-tags --depth 1 origin 681b2e9f30b19e94bf8e8de44f67fedba5033c8a
+      - name: Exercise both public import routes through actual pinned-reader stock preparation
+        run: |
+          ESTERIA_CLIENT_SOURCE="$PWD/sources/client" \
+          ESTERIA_STOCK_PIPELINE_EVIDENCE="$PWD/out/coherent-evidence/stock-import-preparation.json" \
+            python3 -m unittest tests.test_stock_content_inspection -v
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          proof=json.loads(Path('out/coherent-evidence/stock-import-preparation.json').read_bytes())
+          assert len(proof['routes'])==6 and proof['unknownOverlayRoutesRejected']==2
+          assert {row['route'] for row in proof['routes']}=={'folder','zip'}
+          assert all(row['clientDbcs']==238 and row['providers']==11 and row['exclusions']==3 for row in proof['routes'])
+          assert proof['ownerClientData'] is False and proof['androidExecution'] is False and proof['worldEntry'] is False
+          PY
       - name: Select provider paths without changing either exact input profile
         env:
           SERVER_INPUT_SOURCE: ${{ needs.selection.outputs.server_source }}

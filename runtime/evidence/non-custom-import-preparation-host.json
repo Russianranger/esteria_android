@@ -1,0 +1,76 @@
+{
+  "androidExecution": false,
+  "clientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "javaHeapLimitMiB": 32,
+  "ownerClientData": false,
+  "routes": [
+    {
+      "clientDbcs": 238,
+      "exclusions": 3,
+      "importedFiles": 15,
+      "layout": "direct",
+      "providers": 11,
+      "route": "folder",
+      "selectedFiles": 12
+    },
+    {
+      "clientDbcs": 238,
+      "exclusions": 3,
+      "importedFiles": 15,
+      "layout": "direct",
+      "providers": 11,
+      "route": "zip",
+      "selectedFiles": 12
+    },
+    {
+      "clientDbcs": 238,
+      "exclusions": 3,
+      "importedFiles": 15,
+      "layout": "wrapped-with-metadata",
+      "providers": 11,
+      "route": "folder",
+      "selectedFiles": 12
+    },
+    {
+      "clientDbcs": 238,
+      "exclusions": 3,
+      "importedFiles": 15,
+      "layout": "wrapped-with-metadata",
+      "providers": 11,
+      "route": "zip",
+      "selectedFiles": 12
+    },
+    {
+      "clientDbcs": 238,
+      "exclusions": 3,
+      "importedFiles": 15,
+      "layout": "mixed-case",
+      "providers": 11,
+      "route": "folder",
+      "selectedFiles": 12
+    },
+    {
+      "clientDbcs": 238,
+      "exclusions": 3,
+      "importedFiles": 15,
+      "layout": "mixed-case",
+      "providers": 11,
+      "route": "zip",
+      "selectedFiles": 12
+    }
+  ],
+  "scope": "host Java public importer to exact client reader over encrypted synthetic MPQs",
+  "sourceHashes": {
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/ContentPackageLayout.java": "481713ee0676203d3e8d894670ea6f18bbb7187bfb9995a2dacd0ec33f3e6c82",
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/GameDataImporter.java": "8b303d1f2bc6cc4e7758d18ce62d0ea930c220143f3a8bb1ecdc00ba0143eabc",
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/GameDataVerifier.java": "0025451e3e248f1c8429855f021f11a5abd5eb10a6cceae87d1d6b9a0e7df5d8",
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/StockClientSelection.java": "750f02c0ca4e48b5cbf89295f5735520134f3adbfda04a30dc3530f0a8c8594c",
+    "runtime/stock_content_inspection.py": "d855304663f1ddf89065ae6eb32d6abcd48ba350549a338a8c149b204d1128f3",
+    "tests/StockImportReference.java": "d0d551c1ce207fe7ad41e3e3a83d33b7bbc67eace3de95658d232cf0a0a26257",
+    "tests/test_stock_content_inspection.py": "306fc21c104944e2e453c138613b0c77437dd91d81dda26547e7cc3a14c5ec7b"
+  },
+  "test": "tests.test_stock_content_inspection.RealPinnedMpqInspection.test_public_folder_zip_imports_reach_real_reader_inspection_and_stock_selection",
+  "testedAtDate": "2026-10-31",
+  "unknownOverlayRoutesRejected": 2,
+  "worldEntry": false
+}

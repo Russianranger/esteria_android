@@ -92,7 +92,8 @@ public final class StockClientCompatibility {
                 for (Map.Entry<String, Path> item : members.entrySet()) {
                     if (!item.getKey().endsWith(".mpq")) continue;
                     String path = "Data/" + folder.getFileName() + "/" + item.getValue().getFileName();
-                    if (!stockLocaleArchive(item.getKey(), locale)) overlays.add(path);
+                    if (!ContentPackageLayout.isEffectiveClientProvider(path)) warnings.add("Ancillary archive " + path + "; not loaded by any supported client locale; preserved for audited stock selection");
+                    else if (!stockLocaleArchive(item.getKey(), locale)) overlays.add(path);
                 }
             }
         }
@@ -122,7 +123,9 @@ public final class StockClientCompatibility {
         for (Map.Entry<String, Path> item : dataEntries.entrySet()) {
             String name = item.getKey();
             if (!name.endsWith(".mpq")) continue;
-            if (!ROOT_ARCHIVES.stream().anyMatch(stock -> stock.equalsIgnoreCase(name))) overlays.add("Data/" + item.getValue().getFileName());
+            String path = "Data/" + item.getValue().getFileName();
+            if (!ContentPackageLayout.isEffectiveClientProvider(path)) warnings.add("Ancillary archive " + path + "; not loaded by any supported client locale; preserved for audited stock selection");
+            else if (!ROOT_ARCHIVES.stream().anyMatch(stock -> stock.equalsIgnoreCase(name)) && !name.equals("common-3.mpq")) overlays.add(path);
         }
         if (rootEntries.containsKey("interface")) warnings.add("Loose Interface/AddOns content is outside the stock selection; stock signed UI must come from the selected archives");
         if (rootEntries.containsKey("esteriaserverdata")) warnings.add("Custom EsteriaServerData namespace is outside the stock profile; generated stock data is required");

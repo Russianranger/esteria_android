@@ -10,6 +10,8 @@ on:
       - tests/test_server_installation_inputs.py
       - tests/test_server_installation_qualification.py
       - tests/test_android_server_installation_setup.py
+      - core/src/main/java/io/github/russianranger/esteria/core/importer/**
+      - runtime/stock_content_inspection.py
       - runtime/server/installation-native-inputs.lock.json
       - runtime/android_server_installation_setup.py
       - runtime/android_server_schema_setup.py

@@ -40,7 +40,11 @@ import java.util.zip.ZipFile;
  */
 public final class GameDataImporter {
     public enum ImportKind { BASE_CLIENT, CONTENT_OVERLAY }
-    public interface ProgressListener { void onProgress(String path, long completedBytes, long totalBytes, int completedFiles, int totalFiles); }
+    public interface ProgressListener {
+        void onProgress(String path, long completedBytes, long totalBytes, int completedFiles, int totalFiles);
+        /** Relative detected root only; provider document identifiers remain opaque. */
+        default void onDiagnostic(String phase, String detectedRoot, String path) { }
+    }
     public interface Cancellation { boolean isCancelled(); }
     /** An observed source document. IDs are opaque tokens, never destination paths. */
     public static final class InputEntry {
@@ -177,12 +181,34 @@ public final class GameDataImporter {
 
     private Result importSource(Source source, ImportKind kind, ProgressListener listener, Cancellation cancellation) throws IOException {
         if (kind == null || listener == null || cancellation == null) throw new IllegalArgumentException("Import arguments must not be null");
+        ImportContext context = new ImportContext(listener);
+        try { return performImport(source, kind, listener, cancellation, context); }
+        catch (ImportCancelledException cancelled) { throw cancelled; }
+        catch (IOException failure) {
+            throw new IOException("Import " + source.route() + " " + kind + " failed; phase=" + context.phase +
+                    "; detectedRoot=" + context.detectedRoot + "; observedPath=" + (context.entry == null ? "unavailable" : context.entry.original) +
+                    "; normalizedPath=" + (context.entry == null ? "unavailable" : context.entry.path) + ": " + failure.getMessage(), failure);
+        }
+    }
+
+    private Result performImport(Source source, ImportKind kind, ProgressListener listener, Cancellation cancellation, ImportContext context) throws IOException {
         checkCancelled(cancellation);
+        context.phase("inventory", null);
         List<Entry> entries = source.entries(cancellation);
         if (entries.isEmpty()) throw new IOException("No files to import");
-        if (kind == ImportKind.BASE_CLIENT) stripClientWrapper(entries);
+        // Validate the complete bounded source before discarding harmless ZIP
+        // metadata. Malicious aliases/collisions cannot hide outside the client.
+        context.phase("source-path-validation", null);
         validateEntries(entries);
-        boolean replaceServerData = ContentPackageLayout.inspect(() -> entries.stream().map(entry -> entry.path).iterator(), kind == ImportKind.CONTENT_OVERLAY);
+        if (kind == ImportKind.BASE_CLIENT) {
+            context.phase("root-discovery", null);
+            context.detectedRoot = stripClientWrapper(entries);
+        } else context.detectedRoot = ".";
+        context.phase("layout-validation", null);
+        boolean replaceServerData = ContentPackageLayout.inspect(() -> entries.stream().map(entry -> {
+            context.entry = entry; listener.onDiagnostic(context.phase, context.detectedRoot, entry.path); return entry.path;
+        }).iterator(), kind == ImportKind.CONTENT_OVERLAY);
+        context.phase("base-layout-validation", null);
         if (kind == ImportKind.BASE_CLIENT) GameDataVerifier.verifyBaseLayout(() -> entries.stream().map(entry -> entry.path).iterator());
         entries.sort(Comparator.comparing(e -> e.path));
         Path current = resolveCurrent();
@@ -192,7 +218,14 @@ public final class GameDataImporter {
         // Reserved server packages replace their entire namespace. A distinct
         // identity cannot resume legacy staging which inherited an older one.
         identity.update(((replaceServerData ? "esteria-import-v2-server-data-replacement\n" : "esteria-import-v1\n") + kind + "\n" + source.identity() + "\n").getBytes(StandardCharsets.UTF_8));
+        boolean mappedSource = entries.stream().anyMatch(entry -> !entry.path.equals(entry.original));
+        // A wrapper change can preserve logical names, size and mtime while
+        // selecting different physical documents. Bind the original relative
+        // mapping without interpreting document IDs or exposing them in logs.
+        // Direct-path imports retain their existing resume fingerprint.
+        if (mappedSource) identity.update("relative-source-mapping-v1\n".getBytes(StandardCharsets.UTF_8));
         for (Entry entry : entries) identity.update((entry.path + "\0" + entry.size + "\0" + entry.modified + "\0" + entry.crc + "\n").getBytes(StandardCharsets.UTF_8));
+        if (mappedSource) for (Entry entry : entries) identity.update((entry.path + "\0" + entry.original + "\n").getBytes(StandardCharsets.UTF_8));
         String sourceId = hex(identity.digest());
         if (current != null && matchesCompletedSource(current.getParent().resolve("complete"), sourceId)) return new Result(current, currentId(), 0, entries.size(), 0);
         identity.update((sourceId + "\n" + base).getBytes(StandardCharsets.UTF_8));
@@ -217,6 +250,7 @@ public final class GameDataImporter {
         int copied = 0, reused = 0, finished = 0;
         byte[] buffer = new byte[128 * 1024];
         for (Entry entry : entries) {
+            context.phase("staging", entry);
             checkCancelled(cancellation);
             Path target = safeTarget(data, entry.path);
             if (reusable(data, entry, saved.get(entry.path))) {
@@ -243,6 +277,7 @@ public final class GameDataImporter {
                 if (bytes != entry.size || (entry.crc >= 0 && crc.getValue() != entry.crc)) throw new IOException("Truncated or corrupt source: " + entry.path);
                 output.force(true);
             } catch (IOException | RuntimeException failure) { Files.deleteIfExists(partial); throw failure; }
+            context.phase("file-verification", entry);
             source.verifyUnchanged(entry);
             GameDataVerifier.verifyKnownFile(partial, entry.path);
             Files.move(partial, target, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
@@ -252,6 +287,7 @@ public final class GameDataImporter {
             copied++; copiedBytes += bytes; completed += bytes; finished++;
             listener.onProgress(entry.path, completed, total, finished, entries.size());
         }
+        context.phase("final-validation", null);
         checkCancelled(cancellation);
         source.verifyUnchanged(null);
         GameDataVerifier.verifyBaseClient(data);
@@ -262,6 +298,7 @@ public final class GameDataImporter {
         atomicWrite(generation.resolve(StockClientCompatibility.REPORT_NAME),
             StockClientCompatibility.inspect(data, "enUS").toText());
         // No active pointer is changed until every file and the whole client satisfy the checks.
+        context.phase("promotion", null);
         atomicWrite(generation.resolve("complete"), "format=1\nclientBuild=12340\nrequest=" + id + "\nsource=" + sourceId + "\ndirectorySync=" + directorySyncSupported + "\ncontentCompatibility=unqualified\n");
         atomicWrite(root.resolve("current"), id + "\n");
         return new Result(data, id, copied, reused, copiedBytes);
@@ -355,14 +392,69 @@ public final class GameDataImporter {
         }
     }
 
-    private static void stripClientWrapper(List<Entry> entries) {
-        if (entries.stream().anyMatch(e -> e.path.equalsIgnoreCase("Wow.exe"))) return;
-        String prefix = null;
-        for (Entry entry : entries) if (entry.path.toLowerCase(Locale.ROOT).endsWith("/wow.exe")) {
-            String candidate = entry.path.substring(0, entry.path.length() - 7);
-            if (entries.stream().allMatch(e -> e.path.startsWith(candidate))) { prefix = candidate; break; }
+    private static String stripClientWrapper(List<Entry> entries) throws IOException {
+        // Search only already-enumerated descendants of the granted source.
+        // No filesystem parent lookup or document-ID path interpretation occurs.
+        Set<String> paths = new HashSet<>();
+        List<String> candidates = new ArrayList<>(), complete = new ArrayList<>();
+        for (Entry entry : entries) paths.add(entry.path.toLowerCase(Locale.ROOT));
+        for (Entry entry : entries) {
+            String lower = entry.path.toLowerCase(Locale.ROOT);
+            if (metadataPath(entry.path) || !(lower.equals("wow.exe") || lower.endsWith("/wow.exe"))) continue;
+            String prefix = entry.path.substring(0, entry.path.length() - "Wow.exe".length());
+            if (prefix.chars().filter(character -> character == '/').count() > 8)
+                throw new IOException("Client root discovery exceeds eight enclosing folders: " + entry.path);
+            if (candidates.size() >= 128) throw new IOException("Too many possible client roots in selected source");
+            candidates.add(prefix);
+            String folded = prefix.toLowerCase(Locale.ROOT);
+            boolean hasData = paths.stream().anyMatch(path -> path.startsWith(folded + "data/"));
+            if (hasData) {
+                List<String> relative = new ArrayList<>();
+                for (Entry item : entries) if (item.path.startsWith(prefix)) relative.add(item.path.substring(prefix.length()));
+                try { GameDataVerifier.verifyBaseLayout(relative); complete.add(prefix); }
+                catch (IOException incomplete) { /* Use exact missing-data reason after unique root selection. */ }
+            }
         }
-        if (prefix != null) for (Entry entry : entries) entry.path = entry.path.substring(prefix.length());
+        if (complete.size() > 1) throw new IOException("Ambiguous selected source contains multiple complete clients: " + roots(complete) + "; select exactly one client root containing Wow.exe and Data");
+        String prefix;
+        if (complete.size() == 1) prefix = complete.get(0);
+        else if (candidates.size() == 1) prefix = candidates.get(0);
+        else if (candidates.size() > 1) throw new IOException("Ambiguous selected source contains multiple possible clients: " + roots(candidates) + "; select exactly one client root containing Wow.exe and Data");
+        else {
+            if (paths.contains("common.mpq") || paths.stream().anyMatch(path -> path.matches("[a-z]{4}/locale-[a-z]{4}\\.mpq")))
+                throw new IOException("Selected source appears to be Data itself. Select its parent client folder containing Wow.exe and Data; ordinary MPQs remain inside Data");
+            throw new IOException("No client root found in selected source; choose the folder containing Wow.exe and Data (or its complete ZIP)");
+        }
+        for (Entry entry : entries) if (!entry.path.startsWith(prefix) && !metadataPath(entry.path) && !wrapperDocument(entry.path))
+            throw new IOException("Observed path '" + entry.path + "' is outside detected client root '" + (prefix.isEmpty() ? "." : prefix) + "'; select the exact client parent containing Wow.exe and Data");
+        String selected = prefix;
+        entries.removeIf(entry -> !entry.path.startsWith(selected) || metadataPath(entry.path));
+        for (Entry entry : entries) entry.path = entry.path.substring(prefix.length());
+        return prefix.isEmpty() ? "." : prefix.substring(0, prefix.length() - 1);
+    }
+    private static void observeSourceSpelling(Map<String, String> spelling, String path) throws IOException {
+        String current = path;
+        while (!current.isEmpty()) {
+            String previous = spelling.putIfAbsent(current.toLowerCase(Locale.ROOT), current);
+            if (previous != null && !previous.equals(current)) throw new IOException("Conflicting source capitalization: " + path + " (" + previous + ")");
+            int slash = current.lastIndexOf('/');
+            if (slash < 0) break;
+            current = current.substring(0, slash);
+        }
+    }
+    private static String roots(List<String> roots) {
+        List<String> labels = new ArrayList<>();
+        for (String root : roots) labels.add(root.isEmpty() ? "." : root.substring(0, root.length() - 1));
+        return String.join(", ", labels);
+    }
+    private static boolean metadataPath(String path) {
+        for (String component : path.split("/"))
+            if (component.equalsIgnoreCase("__MACOSX") || component.equalsIgnoreCase(".DS_Store") || component.startsWith("._")) return true;
+        return false;
+    }
+    private static boolean wrapperDocument(String path) {
+        String name = path.substring(path.lastIndexOf('/') + 1).toLowerCase(Locale.ROOT);
+        return name.matches("(?:readme|license|licence|copying)(?:[._-][a-z0-9._-]+)?");
     }
 
     static String validatePath(String path) throws IOException {
@@ -469,7 +561,18 @@ public final class GameDataImporter {
     private static final class Saved { final long size, modified; Saved(long s, long m) { size = s; modified = m; } }
     private static final class ImportLock implements AutoCloseable { final ExclusiveFileLease lease; ImportLock(ExclusiveFileLease lease) { this.lease=lease; } public void close() throws IOException { lease.close(); } }
     private static final class Entry { String path; final String original; final long size, modified, crc; Entry(String path, long size, long modified, long crc) { this.path = path; this.original = path; this.size = size; this.modified = modified; this.crc = crc; } }
-    private interface Source { List<Entry> entries(Cancellation cancellation) throws IOException; String identity(); InputStream open(Entry entry) throws IOException; void verifyUnchanged(Entry entry) throws IOException; }
+    private static final class ImportContext {
+        final ProgressListener listener; String phase = "initialization", detectedRoot = "undetected"; Entry entry;
+        ImportContext(ProgressListener listener) { this.listener = listener; }
+        void phase(String phase, Entry entry) { this.phase = phase; this.entry = entry; listener.onDiagnostic(phase, detectedRoot, entry == null ? "" : entry.path); }
+    }
+    private interface Source {
+        List<Entry> entries(Cancellation cancellation) throws IOException;
+        String identity();
+        default String route() { return "document"; }
+        InputStream open(Entry entry) throws IOException;
+        void verifyUnchanged(Entry entry) throws IOException;
+    }
     private final class ExternalSource implements Source {
         private final InputSource input;
         private final Map<String, InputEntry> byPath = new HashMap<>();
@@ -535,17 +638,19 @@ public final class GameDataImporter {
         Cancellation cancellation;
         FolderSource(Path source) { this.source = source; }
         public String identity() { return source.toString(); }
+        public String route() { return "folder"; }
         public List<Entry> entries(Cancellation cancellation) throws IOException {
             this.cancellation = cancellation;
             List<Entry> entries = new ArrayList<>();
             MetadataBudget budget = new MetadataBudget(limits.maxMetadataBytes);
+            Map<String, String> spelling = new HashMap<>();
             if (!Files.isDirectory(source, LinkOption.NOFOLLOW_LINKS)) throw new IOException("Client source is not a folder");
             Files.walkFileTree(source, new SimpleFileVisitor<Path>() {
                 @Override public FileVisitResult preVisitDirectory(Path directory, BasicFileAttributes attributes) throws IOException {
                     checkCancelled(cancellation);
                     if (directoryTimes.size() >= limits.maxFiles) throw new IOException("Too many source directories");
                     String relative = source.relativize(directory).toString().replace('\\', '/');
-                    if (!relative.isEmpty()) validatePath(relative);
+                    if (!relative.isEmpty()) { validatePath(relative); observeSourceSpelling(spelling, relative); }
                     budget.add(relative, "", true);
                     directoryTimes.put(directory, attributes.lastModifiedTime().toMillis());
                     return FileVisitResult.CONTINUE;
@@ -556,12 +661,13 @@ public final class GameDataImporter {
                     if (entries.size() >= limits.maxFiles) throw new IOException("Too many source files");
                     String relative = source.relativize(file).toString().replace('\\', '/');
                     validatePath(relative);
+                    observeSourceSpelling(spelling, relative);
                     budget.add(relative, "", false);
                     entries.add(new Entry(relative, attributes.size(), attributes.lastModifiedTime().toMillis(), -1));
                     return FileVisitResult.CONTINUE;
                 }
             });
-            snapshot = entries;
+            snapshot = new ArrayList<>(entries);
             return entries;
         }
         public InputStream open(Entry entry) throws IOException { verifyUnchanged(entry); return Files.newInputStream(source.resolve(entry.original), LinkOption.NOFOLLOW_LINKS); }
@@ -584,8 +690,10 @@ public final class GameDataImporter {
         final Path source; final ZipFile zip; final long length, modified;
         ZipSource(Path source) throws IOException { this.source = source; length = Files.size(source); modified = Files.getLastModifiedTime(source).toMillis(); zip = new ZipFile(source.toFile()); }
         public String identity() { return source + "\n" + length + "\n" + modified; }
+        public String route() { return "ZIP"; }
         public List<Entry> entries(Cancellation cancellation) throws IOException {
             List<Entry> entries = new ArrayList<>(); Set<String> allNames = new HashSet<>();
+            Map<String, String> spelling = new HashMap<>();
             MetadataBudget budget = new MetadataBudget(limits.maxMetadataBytes);
             Enumeration<? extends ZipEntry> iterator = zip.entries();
             while (iterator.hasMoreElements()) {
@@ -594,6 +702,7 @@ public final class GameDataImporter {
                 String name = file.getName(); String checked = file.isDirectory() ? name.substring(0, name.length() - 1) : name;
                 budget.add(checked, "", file.isDirectory());
                 validatePath(checked);
+                observeSourceSpelling(spelling, checked);
                 if (!allNames.add(checked.toLowerCase(Locale.ROOT))) throw new IOException("Duplicate ZIP entry: " + name);
                 if (allNames.size() > limits.maxFiles) throw new IOException("Too many ZIP entries");
                 if (!file.isDirectory()) entries.add(new Entry(name, file.getSize(), file.getTime(), file.getCrc()));

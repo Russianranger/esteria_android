@@ -1,3 +1,27 @@
+# Non-custom stock import recovery — version 2
+
+Updated 2026-10-31 America/Chicago. Work only on `non-custom`. Package `io.github.russianranger.esteria.stock`, profile `stock-3.3.5a`; candidate `0.1.0-non-custom.2`, versionCode 2. The existing persistent certificate and version-1 update baseline remain required. Publication is pending the full-provider build and signature readback; version 1 below is historical, not the revised APK.
+
+## Report and implementation
+
+Both supplied files (`launcher.log`, `status.txt`) were inspected completely. Three generic MPQ provider-location errors are interleaved with two missing-import messages. The old logger omits the filename, normalized path, selected root, folder/ZIP route and cause chain. Those exact facts cannot be recovered from this report and no owner client assets were supplied. No additional permission, storage, OOM, process or runtime failure is demonstrated; preparation was not reached. See `runtime/evidence/non-custom-import-recovery-report.json` for exact report identities and evidence limits.
+
+The shared validator incorrectly applied explicit-overlay provider naming rules to a complete base client. The pinned classical engine does not load every file ending `.MPQ`. Base import now preserves inactive ancillary files; content inspection records journal-bound exclusions in a separate app-owned stock selection. Standard base/locale MPQs and Blizzard patches retain validation; unknown active providers and unsupported alternate/folder views still require inspection. Neither source files nor previous active imports/saves are edited.
+
+Folder/ZIP/opaque document sources share bounded unique-root discovery. A normal wrapper can coexist with README/LICENSE and Apple ZIP metadata. Multiple complete clients, file/directory conflicts and case collisions remain rejected. Data-only selection identifies the parent containing Wow.exe and Data without escaping the granted source. The generation's internal `data` directory remains distinct from the client `Data`. Original source-entry mappings and source-change checks survive normalization.
+
+Support export now retains import route/kind, provider/fingerprint, selected-root display label, detected root/phase/path and bounded full exception causes in `status.txt` (`import.last.*`) and `launcher.log`. Composed server-data-tool status is separate from the historical stock extractor flag.
+
+## Verification and next handoff
+
+The original rejection was reproduced in both public folder and ZIP routes using representative inactive MPQs. The old report does not reveal its exact archive. The revised core suite passes 42 groups with a 32 MiB Java heap, including standard archives, locale and extension case, wrappers/metadata, Data-only guidance, opaque source IDs, source changes, cancellation/resume and corrupt-input rollback. Pinned-client MPQ-reader tests use encrypted-table synthetic archives, not owner data. Six cross-layer folder/ZIP pipelines (direct, wrapped/metadata and mixed-case) passed actual Java import, pinned-reader inspection, journal-bound selection and a second inspection; both active unknown-patch cases were rejected. See `runtime/evidence/non-custom-import-preparation-host.json`. Full-provider packaging, Android13 SAF component execution and public signed readback are recorded when completed.
+
+Install the final signed update over stock version 1; do not uninstall or clear data. One normal device import is sufficient. Follow `NON-CUSTOM-TESTING.md`: update → retry folder or ZIP import → Prepare local runtime / world → Start local game → Human Warrior/world entry → clean stop/relaunch → offline repeat. Export the whole support bundle at the exact failed stage if blocked.
+
+Client remains `471ee42faadf4a97a1d0a86989cf1452621f2dc5`; server remains `f35f04d01689f034778e3474b3c820092f51e461` with seven unchanged adaptations and existing local Wine/PRoot/MySQL architecture. No original x86 Wow.exe substitution or custom/HD dependency. Actual owner MPQ extraction, Thor rendering/login/world entry/controller/audio/persistence remain unqualified until device evidence.
+
+## Historical version-1 baseline
+
 # Non-custom stock package handoff
 
 Updated 2026-10-31 America/Chicago. Continue only on `non-custom`; routine implementation, pushes, builds and additive labelled releases are authorized. Preserve every other branch/release and all existing saves. The complete custom integration remains at `android/client-server`; this branch's stock milestone supersedes custom-asset acceptance gates.

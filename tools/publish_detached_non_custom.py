@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Publish the exact first stock APK with a public, detached APK signature.
+"""Publish an exact stock APK update with a public, detached APK signature.
 
 The private key never enters this workflow. The selected successful package and
 native SQL runs, their immutable artifact digests, the source pins, the original
@@ -36,14 +36,13 @@ except ImportError:
 ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY = 'Russianranger/esteria_android'
 BRANCH = 'non-custom'
-VERSION_CODE = 1
-VERSION_NAME = '0.1.0-non-custom.1'
 FAILED_SQL_RUN = 41211067232  # Retained failure; never reused as success.
 PACKAGE_WORKFLOW = '.github/workflows/android-local-game-profile.yml'
 SQL_WORKFLOW = '.github/workflows/server-installation-native.yml'
-SELECTION = ROOT / 'runtime/releases/non-custom/publication-inputs.json'
-RECIPE = 'runtime/releases/non-custom/signature-recipe.json'
-RECEIPT = 'runtime/releases/non-custom/signing-receipt.json'
+PUBLICATION_DIRECTORY = 'runtime/releases/non-custom/update-2'
+SELECTION = ROOT / PUBLICATION_DIRECTORY / 'publication-inputs.json'
+RECIPE = PUBLICATION_DIRECTORY + '/signature-recipe.json'
+RECEIPT = PUBLICATION_DIRECTORY + '/signing-receipt.json'
 SCOPE = 'exact-non-custom-detached-signature-publication'
 MAX_JSON = 4 << 20
 MAX_ARTIFACT = 500_000_000
@@ -110,7 +109,10 @@ def schema():
         signatureRecipe=copy_json(file_pin), signingReceipt=copy_json(file_pin),
         sourceLock=copy_json(file_pin), stockSigningLock=copy_json(file_pin))
     return dict(type='object', additionalProperties=False, required=list(properties), properties=properties,
-        fixedApplication=dict(packageId=signing.STOCK_PACKAGE, versionCode=VERSION_CODE, versionName=VERSION_NAME),
+        applicationPolicy=dict(packageId=signing.STOCK_PACKAGE,
+            versionCode='strictly greater than the pinned lastPublished versionCode',
+            versionName='0.1.0-non-custom.<versionCode>',
+            previousPublished='exact pinned stock signing baseline'),
         localInputPaths=dict(signatureRecipe=RECIPE, signingReceipt=RECEIPT,
             sourceLock='sources.lock.json', stockSigningLock='app/stock-signing.lock.json'))
 
@@ -180,9 +182,34 @@ def selection(path=SELECTION):
             ('sources.lock.json', 'sourceLock', 2 << 20), ('app/stock-signing.lock.json', 'stockSigningLock', 16384)):
         checked_local(name, value[key], maximum)
     lock = signing.load_lock(ROOT / 'app/stock-signing.lock.json')
-    require(lock['packageId'] == signing.STOCK_PACKAGE and lock['lastPublished'] is None,
-        'publication-first-stock-identity-required')
+    application_identity(read_json(ROOT / RECEIPT), lock)
     return value
+
+
+def application_identity(receipt, lock):
+    """Bind an increasing stock update to the exact previous signing baseline.
+
+    The signer already verified the previous APK with the SDK. Its receipt pins
+    that result to this unchanged public lock; final SDK verification below
+    independently verifies the new certificate, package, version and payload.
+    """
+    require(type(receipt) is dict and lock['packageId'] == signing.STOCK_PACKAGE,
+        'publication-stock-identity-required')
+    signed = receipt.get('signedApk', {})
+    require(type(signed) is dict and signed.get('packageId') == signing.STOCK_PACKAGE and
+        signed.get('certificateSha256') == lock['certificateSha256'] and
+        type(signed.get('versionCode')) is int and
+        0 < signed['versionCode'] <= 2_100_000_000 and signed.get('debuggable') is False and
+        signed.get('versionName') == '0.1.0-non-custom.' + str(signed['versionCode']),
+        'publication-stock-update-identity')
+    baseline = lock['lastPublished']
+    previous = receipt.get('previousPublished')
+    require((previous is None if baseline is None else type(previous) is dict and
+        set(previous) == {'versionCode', 'apkSha256'} and type(previous.get('versionCode')) is int) and
+        previous == baseline and
+        (signed['versionCode'] == 1 if baseline is None else signed['versionCode'] > baseline['versionCode']),
+        'publication-stock-update-baseline')
+    return dict(packageId=signing.STOCK_PACKAGE, versionCode=signed['versionCode'], versionName=signed['versionName'])
 
 
 SQL_DIAGNOSTIC_ONLY_PATHS = frozenset((
@@ -299,7 +326,7 @@ def extract_package(path, output):
     return output
 
 
-def verify_unsigned(directory, selected, tools):
+def verify_unsigned(directory, selected, tools, application):
     apk = directory / 'app-release-unsigned.apk'
     package = read_json(directory / 'unsigned-release-package.json')
     cohort = read_json(directory / 'coherent-release-apk.json')
@@ -320,8 +347,9 @@ def verify_unsigned(directory, selected, tools):
         cohort.get('completeAssetInventoryVerified') is True and cohort.get('exactCurrentHelperClosureVerified') is True and
         cohort.get('deviceTestCandidate') is False and cohort.get('selectedInputs', {}).get('sources.lock.json') == selected['sourceLock'],
         'publication-complete-cohort-proof')
-    require(manifest == signing.manifest(apk, tools, VERSION_CODE, signing.STOCK_PACKAGE) and manifest['debuggable'] is False and
-        manifest['versionName'] == VERSION_NAME, 'publication-stock-apk-manifest')
+    require(manifest == signing.manifest(apk, tools, application['versionCode'], signing.STOCK_PACKAGE) and manifest['debuggable'] is False and
+        manifest['versionCode'] == application['versionCode'] and type(manifest['versionCode']) is int and
+        manifest['versionName'] == application['versionName'], 'publication-stock-apk-manifest')
     with zipfile.ZipFile(apk) as archive:
         item = archive.getinfo('assets/sources.lock.json')
         require(item.file_size == selected['sourceLock']['bytes'] and item.file_size <= 2 << 20 and
@@ -372,7 +400,7 @@ def verify_native_sql(path, revision):
         sourceRevision=revision, sqlSelectionPolicy=STOCK_SQL_POLICY, worldserverExecuted=False, gameplayQualified=False)
 
 
-def verify_signing_receipt(receipt, selected, unsigned):
+def verify_signing_receipt(receipt, selected, unsigned, lock):
     require(type(receipt) is dict and set(receipt) == {'formatVersion', 'scope', 'qualificationOnly',
         'persistentSigningIdentityVerified', 'inputApkSha256', 'publicSigningLockSha256', 'previousPublished',
         'signedApk', 'payloadPreserved', 'sdkBuildToolsVersion', 'actualInstallOverQualified', 'gameplayQualified',
@@ -381,9 +409,10 @@ def verify_signing_receipt(receipt, selected, unsigned):
         receipt['persistentSigningIdentityVerified'] is True and receipt['payloadPreserved'] is True and
         receipt['actualInstallOverQualified'] is False and receipt['gameplayQualified'] is False and
         receipt['deviceCandidateQualified'] is False and receipt['sdkBuildToolsVersion'] == '35.0.0' and
-        receipt['previousPublished'] is None and receipt['inputApkSha256'] == unsigned['sha256'] and
+        receipt['inputApkSha256'] == unsigned['sha256'] and
         receipt['publicSigningLockSha256'] == selected['stockSigningLock']['sha256'],
         'publication-original-signing-receipt')
+    application_identity(receipt, lock)
     return receipt
 
 
@@ -402,8 +431,11 @@ def stage(api, output, tools):
     native = verify_native_sql(output / 'native-sql-artifact.zip', selected['nativeSqlRevision'])
     directory = extract_package(output / 'unsigned-artifact.zip', output / 'unsigned')
     unsigned_apk = directory / 'app-release-unsigned.apk'
-    unsigned = verify_unsigned(directory, selected, tools)
-    receipt = verify_signing_receipt(read_json(ROOT / RECEIPT), selected, unsigned)
+    lock = signing.load_lock(ROOT / 'app/stock-signing.lock.json')
+    original_receipt = read_json(ROOT / RECEIPT)
+    application = application_identity(original_receipt, lock)
+    unsigned = verify_unsigned(directory, selected, tools, application)
+    receipt = verify_signing_receipt(original_receipt, selected, unsigned, lock)
     # The generic reconstructor accepts no private material and admits only the
     # original prefix, an inserted signature block, unchanged CD and offset patch.
     try:
@@ -413,8 +445,7 @@ def stage(api, output, tools):
     signed_directory = output / 'signed'; signed_directory.mkdir()
     signed_apk = signed_directory / 'esteria-development.apk'
     detached.apply(unsigned_apk, ROOT / RECIPE, signed_apk)
-    lock = signing.load_lock(ROOT / 'app/stock-signing.lock.json')
-    checked = signing.verify(signed_apk, tools, lock, VERSION_CODE)
+    checked = signing.verify(signed_apk, tools, lock, application['versionCode'])
     require(checked == receipt['signedApk'] and signing.payload(unsigned_apk) == signing.payload(signed_apk),
         'publication-sdk-signature-or-payload-mismatch')
     shutil.copyfile(ROOT / RECEIPT, signed_directory / 'signing-receipt.json')
@@ -425,6 +456,7 @@ def stage(api, output, tools):
         packageRun=package_run, nativeSqlRun=sql_run, nativeSql=native, nativeSqlSourceEquivalence=equivalent, selectedInputs=selected,
         publicSignatureReconstructed=True, sdkSignatureAndManifestVerified=True,
         completeApkPayloadPreserved=True, persistentCertificateSha256=checked['certificateSha256'],
+        previousPublished=lock['lastPublished'], application=application,
         signedApk=dict(bytes=checked['apkBytes'], sha256=checked['apkSha256']),
         privateKeyPresentInWorkflow=False, androidExecutionQualified=False, thorQualified=False, gameplayQualified=False)
     (output / 'publication-evidence.json').write_text(json.dumps(evidence, sort_keys=True, indent=2) + '\n')

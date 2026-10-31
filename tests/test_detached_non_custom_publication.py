@@ -37,10 +37,10 @@ class PublicationGuards(unittest.TestCase):
         return path
 
     def selected(self):
-        for name in (publication.RECIPE, publication.RECEIPT, 'sources.lock.json'):
+        for name in (publication.RECIPE, 'sources.lock.json'):
             self.write(name, {'synthetic': True})
-        self.write('app/stock-signing.lock.json', dict(formatVersion=1, purpose='persistent-development',
-            packageId=publication.signing.STOCK_PACKAGE, certificateSha256='1' * 64, lastPublished=None))
+        self.write(publication.RECEIPT, self.signing_receipt())
+        self.write('app/stock-signing.lock.json', self.signing_lock())
         value = dict(formatVersion=1, scope=publication.SCOPE, repository=publication.REPOSITORY,
             branch='non-custom', appRevision=TEST_APP,
             packageRunId=TEST_RUN, packageJobId=TEST_JOB,
@@ -54,6 +54,20 @@ class PublicationGuards(unittest.TestCase):
             sourceLock=publication.identity(self.root / 'sources.lock.json'),
             stockSigningLock=publication.identity(self.root / 'app/stock-signing.lock.json'))
         return value
+
+    def signing_lock(self):
+        return dict(formatVersion=1, purpose='persistent-development',
+            packageId=publication.signing.STOCK_PACKAGE, certificateSha256='1' * 64,
+            lastPublished=dict(versionCode=1, apkSha256='f' * 64))
+
+    def signing_receipt(self):
+        return dict(formatVersion=1, scope='apk-signature-and-update-identity', qualificationOnly=False,
+            persistentSigningIdentityVerified=True, inputApkSha256='b' * 64, publicSigningLockSha256='a' * 64,
+            previousPublished=self.signing_lock()['lastPublished'],
+            signedApk=dict(packageId=publication.signing.STOCK_PACKAGE, certificateSha256='1' * 64,
+                versionCode=2, versionName='0.1.0-non-custom.2', debuggable=False),
+            payloadPreserved=True, sdkBuildToolsVersion='35.0.0', actualInstallOverQualified=False,
+            gameplayQualified=False, deviceCandidateQualified=False)
 
     def test_selection_cannot_choose_another_repository_workflow_app_or_failed_native_run(self):
         value = self.selected()
@@ -72,27 +86,55 @@ class PublicationGuards(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'local-file-identity'):
                 publication.selection(path)
 
-    def test_recorded_release_baseline_retires_initial_publisher_and_preserves_frozen_metadata(self):
+    def test_recorded_release_baseline_retires_old_publisher_and_preserves_frozen_metadata(self):
         value = self.selected()
         path = self.write('selection.json', value)
         recipe = (self.root / publication.RECIPE).read_bytes()
         receipt = (self.root / publication.RECEIPT).read_bytes()
         lock_path = self.root / 'app/stock-signing.lock.json'
         lock = json.loads(lock_path.read_text())
-        lock['lastPublished'] = dict(versionCode=1, apkSha256='f' * 64)
+        lock['lastPublished'] = dict(versionCode=2, apkSha256='e' * 64)
         self.write('app/stock-signing.lock.json', lock)
         with patch.object(publication, 'ROOT', self.root):
-            # The historical first-release selection retains its original lock
+            # The historical selection retains its original lock
             # hash. Updating the official ledger intentionally retires its replay.
             with self.assertRaisesRegex(ValueError, 'local-file-identity'):
                 publication.selection(path)
-            # Rebinding the ledger hash cannot bypass the first-release guard.
+            # Rebinding the ledger hash cannot replay the retired update.
             value['stockSigningLock'] = publication.identity(lock_path)
             self.write('selection.json', value)
-            with self.assertRaisesRegex(ValueError, 'first-stock-identity-required'):
+            with self.assertRaisesRegex(ValueError, 'stock-update-baseline'):
                 publication.selection(path)
         self.assertEqual((self.root / publication.RECIPE).read_bytes(), recipe)
         self.assertEqual((self.root / publication.RECEIPT).read_bytes(), receipt)
+
+    def test_update_identity_requires_same_certificate_package_exact_prior_and_increasing_integer_version(self):
+        lock = self.signing_lock()
+        receipt = self.signing_receipt()
+        application = publication.application_identity(receipt, lock)
+        self.assertEqual(application, dict(packageId=publication.signing.STOCK_PACKAGE,
+            versionCode=2, versionName='0.1.0-non-custom.2'))
+        mutations = [
+            lambda v: v['signedApk'].update(certificateSha256='2' * 64),
+            lambda v: v['signedApk'].update(packageId='io.github.russianranger.esteria'),
+            lambda v: v['signedApk'].update(versionCode=True),
+            lambda v: v['signedApk'].update(versionCode=1, versionName='0.1.0-non-custom.1'),
+            lambda v: v['signedApk'].update(versionCode=0, versionName='0.1.0-non-custom.0'),
+            lambda v: v['signedApk'].update(versionName='other-version'),
+            lambda v: v.update(previousPublished=None),
+            lambda v: v['previousPublished'].update(apkSha256='e' * 64),
+            lambda v: v['previousPublished'].update(versionCode=True),
+        ]
+        for index, mutate in enumerate(mutations):
+            altered = copy.deepcopy(receipt); mutate(altered)
+            with self.subTest(index=index), self.assertRaisesRegex(ValueError, 'stock-update-'):
+                publication.application_identity(altered, lock)
+        first = copy.deepcopy(receipt)
+        first['previousPublished'] = None
+        first['signedApk'].update(versionCode=1, versionName='0.1.0-non-custom.1')
+        self.assertEqual(publication.application_identity(first, dict(lock, lastPublished=None))['versionCode'], 1)
+        with self.assertRaisesRegex(ValueError, 'stock-update-baseline'):
+            publication.application_identity(first, lock)
 
     def run_rows(self):
         run = dict(id=TEST_RUN, repository=dict(full_name=publication.REPOSITORY),
@@ -164,7 +206,7 @@ class PublicationGuards(unittest.TestCase):
             self.assertEqual(result['missingLocalInputs'], [])
             self.assertEqual(result['selection']['sourceLock'], publication.identity(self.root / 'sources.lock.json'))
         schema = publication.schema()
-        self.assertEqual(schema['fixedApplication']['packageId'], publication.signing.STOCK_PACKAGE)
+        self.assertEqual(schema['applicationPolicy']['packageId'], publication.signing.STOCK_PACKAGE)
         self.assertEqual(schema['properties']['packageRunId'], dict(type='integer', minimum=1))
 
     def test_artifact_traversal_extra_files_and_existing_outputs_are_preserved(self):
@@ -231,8 +273,9 @@ class PublicationGuards(unittest.TestCase):
             archive.writestr('assets/sources.lock.json', source.read_bytes())
             archive.writestr('classes.dex', b'synthetic-not-an-Android-client')
         observed = publication.identity(apk)
-        manifest = dict(packageId=publication.signing.STOCK_PACKAGE, versionCode=1,
-            versionName='0.1.0-non-custom.1', debuggable=False, minSdk=26, targetSdk=35)
+        manifest = dict(packageId=publication.signing.STOCK_PACKAGE, versionCode=2,
+            versionName='0.1.0-non-custom.2', debuggable=False, minSdk=26, targetSdk=35)
+        application = dict(packageId=manifest['packageId'], versionCode=2, versionName=manifest['versionName'])
         package = dict(formatVersion=1, scope='unsigned-nondebug-local-game-profile-release-packaging-only',
             integrationRevision=TEST_APP, apk=observed, manifest=manifest)
         package.update({name: True for name in ('completeProviderAndSourceBytesVerified', 'unsignedSignatureStructureVerified',
@@ -251,26 +294,23 @@ class PublicationGuards(unittest.TestCase):
                 (directory / name).write_text(json.dumps(value))
         write()
         with patch.object(publication, 'ROOT', self.root), patch.object(publication.signing, 'manifest', return_value=manifest):
-            self.assertEqual(publication.verify_unsigned(directory, selected, {}), observed)
+            self.assertEqual(publication.verify_unsigned(directory, selected, {}, application), observed)
             package['formatVersion'] = True; write()
             with self.assertRaisesRegex(ValueError, 'unsigned-package-proof'):
-                publication.verify_unsigned(directory, selected, {})
+                publication.verify_unsigned(directory, selected, {}, application)
             package['formatVersion'] = 1; cohort['exactCurrentHelperClosureVerified'] = False; write()
             with self.assertRaisesRegex(ValueError, 'complete-cohort-proof'):
-                publication.verify_unsigned(directory, selected, {})
+                publication.verify_unsigned(directory, selected, {}, application)
 
     def test_original_signing_receipt_must_bind_exact_unsigned_and_pinned_public_lock(self):
         selected = dict(stockSigningLock=dict(bytes=1, sha256='a' * 64))
         unsigned = dict(bytes=1, sha256='b' * 64)
-        receipt = dict(formatVersion=1, scope='apk-signature-and-update-identity', qualificationOnly=False,
-            persistentSigningIdentityVerified=True, inputApkSha256='b' * 64, publicSigningLockSha256='a' * 64,
-            previousPublished=None, signedApk=dict(synthetic=True), payloadPreserved=True, sdkBuildToolsVersion='35.0.0',
-            actualInstallOverQualified=False, gameplayQualified=False, deviceCandidateQualified=False)
-        publication.verify_signing_receipt(receipt, selected, unsigned)
+        receipt = self.signing_receipt()
+        publication.verify_signing_receipt(receipt, selected, unsigned, self.signing_lock())
         for key, value in (('qualificationOnly', True), ('inputApkSha256', 'c' * 64), ('publicSigningLockSha256', 'd' * 64),
                 ('persistentSigningIdentityVerified', False), ('formatVersion', True)):
             with self.subTest(key=key), self.assertRaisesRegex(ValueError, 'original-signing-receipt'):
-                publication.verify_signing_receipt(dict(receipt, **{key: value}), selected, unsigned)
+                publication.verify_signing_receipt(dict(receipt, **{key: value}), selected, unsigned, self.signing_lock())
 
     def test_existing_tag_is_never_replaced_or_used_for_another_release(self):
         tag = 'non-custom-v0.1.0-non-custom.1'

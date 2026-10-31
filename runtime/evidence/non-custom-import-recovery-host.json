@@ -1,0 +1,64 @@
+{
+  "actualAndroidSafExecuted": false,
+  "actualOwnerClientBytesInspected": false,
+  "actualThorExecuted": false,
+  "checks": {
+    "actualSdkSigning": {
+      "bytes": 1596,
+      "sha256": "d8a1a4804f59c413ccaaaf79cd63cf709401e19f295b5cb3f12079b612d819e8",
+      "tail": [
+        "",
+        "----------------------------------------------------------------------",
+        "Ran 8 tests in 13.103s",
+        "",
+        "OK"
+      ]
+    },
+    "baselineFolderReproduction": {
+      "bytes": 1255,
+      "sha256": "319738aa0cb6dd77376c1ef8bf22ebff883ddeb2aad26a58533f19366d888960",
+      "tail": [
+        "\tat io.github.russianranger.esteria.core.importer.GameDataImporter.importFolder(GameDataImporter.java:159)",
+        "\tat io.github.russianranger.esteria.core.importer.ImporterTests.folder(ImporterTests.java:77)",
+        "\tat io.github.russianranger.esteria.core.importer.ImporterTests.stockAncillaryImports(ImporterTests.java:121)",
+        "\tat io.github.russianranger.esteria.core.importer.ImporterTests.run(ImporterTests.java:70)",
+        "\tat io.github.russianranger.esteria.core.importer.ImporterTests.main(ImporterTests.java:29)"
+      ]
+    },
+    "baselineZipReproduction": {
+      "bytes": 1249,
+      "sha256": "f43e80fe252a45554ab67667ed4990bce076e98ca48cb789ba130893e8f38217",
+      "tail": [
+        "\tat io.github.russianranger.esteria.core.importer.GameDataImporter.importZip(GameDataImporter.java:168)",
+        "\tat io.github.russianranger.esteria.core.importer.ImporterTests.zip(ImporterTests.java:80)",
+        "\tat io.github.russianranger.esteria.core.importer.ImporterTests.stockAncillaryImports(ImporterTests.java:121)",
+        "\tat io.github.russianranger.esteria.core.importer.ImporterTests.run(ImporterTests.java:70)",
+        "\tat io.github.russianranger.esteria.core.importer.ImporterTests.main(ImporterTests.java:29)"
+      ]
+    },
+    "coreImporter": {
+      "bytes": 2603,
+      "sha256": "cc78fd66438412cb7e10aad209e299382ceb0fa3fcd5acb5e12600e81f2a1c69",
+      "tail": [
+        "PASS document metadata changes reject publication",
+        "PASS document paths IDs sizes and unknown times are bounded",
+        "PASS incomplete client inventory fails before any asset is copied",
+        "PASS metadata budget stops long-name inventories before heap pressure",
+        "Importer tests passed: 42"
+      ]
+    },
+    "python": {
+      "bytes": 282647,
+      "sha256": "adf15f979356b512790e4aa65d0eff1cc441146c9f058d9b2f5fabe506c82cf6",
+      "tail": [
+        "",
+        "----------------------------------------------------------------------",
+        "Ran 1461 tests in 83.193s",
+        "",
+        "OK (skipped=112)"
+      ]
+    }
+  },
+  "formatVersion": 1,
+  "scope": "host-and-actual-sdk-representative-fixtures"
+}

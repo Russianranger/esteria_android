@@ -7,9 +7,11 @@ from pathlib import Path
 import runpy
 import shutil
 import struct
+import subprocess
 import sys
 import tempfile
 import unittest
+import zipfile
 from unittest.mock import patch
 
 from runtime import stock_content_inspection as stock
@@ -60,6 +62,19 @@ class StockContentChecks(unittest.TestCase):
                     struct.pack('<4s4I', b'WDBC', 1, 1, 4, 1) + b'\1\0\0\0\0'):
             with self.assertRaisesRegex(ValueError, 'layout|sentinel'):
                 stock.inspect_dbc(bad, 'DBFilesClient\\ChrRaces.dbc', layout)
+
+    def test_ancillary_classification_matches_complete_client_provider_boundaries(self):
+        for name in ('Data/common.MPQ', 'DATA/common-3.MpQ', 'data/expansion.mpq', 'Data/alternate.MPQ',
+                     'Data/patch-HD.MPQ', 'Data/enUS/locale-enUS.MPQ', 'data/frFR/speech-frFR.MPQ',
+                     'DATA/ruRU/patch-ruRU-X.MpQ', 'Data/patch-folder.MPQ/inner.MPQ'):
+            self.assertTrue(stock.effective_provider_path(name), name)
+        for name in ('uninstall.MPQ', 'Data/sound.MPQ', 'Data/development.MPQ',
+                     'Data/wow-update-base-12340.MPQ', 'Data/enUS/backup/locale-enUS.MPQ',
+                     'Data/enUS/wow-update-enUS-12340.MPQ', 'Data/not-a-locale/patch-not-a-locale-Z.MPQ'):
+            self.assertFalse(stock.effective_provider_path(name), name)
+        self.assertEqual(stock.imported_name('Installer/Información.MPQ'), 'Installer/Información.MPQ')
+        for name in ('../bad.MPQ', 'Data/../bad.MPQ', '/bad.MPQ', 'Data\\bad.MPQ', 'Data/C:bad.MPQ'):
+            with self.assertRaises(ValueError): stock.imported_name(name)
 
     def test_source_derived_stores_and_standard_patches_remain_explicit(self):
         self.assertEqual(stock.CLIENT_DBC_LAYOUT_SOURCE['storeCount'], 238)
@@ -119,6 +134,13 @@ class RealPinnedMpqInspection(unittest.TestCase):
             journal.write(base64.b64encode(name.encode()).decode() + '\t' + str(path.stat().st_size) + '\t0\t' +
                           hashlib.sha256(path.read_bytes()).hexdigest() + '\n')
 
+    def ancillary(self, name, raw=b'not an archive; the classical engine never opens this path'):
+        path = self.source / name; path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(raw)
+        with (self.at / 'journal.tsv').open('a') as journal:
+            journal.write(base64.b64encode(name.encode()).decode() + '\t' + str(len(raw)) + '\t0\t' +
+                          hashlib.sha256(raw).hexdigest() + '\n')
+        return path
+
     def inspect(self):
         return stock.inspect(self.source, self.tools, stock.CLIENT_REVISION, 'enUS', self.generation)
 
@@ -127,6 +149,170 @@ class RealPinnedMpqInspection(unittest.TestCase):
         self.assertTrue(report['passed'], report['errors'])
         self.assertEqual(len(report['checks']['clientDbcs']), 238)
         self.assertFalse(report['runtimeSignatureValidation']); self.assertFalse(report['runtimeExecution'])
+
+    def test_nonprovider_mpqs_are_recorded_without_opening_and_sources_are_preserved(self):
+        names = ('Data/wow-update-base-12340.MPQ', 'Data/sound.MpQ', 'uninstall.MPQ',
+                 'Data/enUS/backup/locale-enUS.MPQ', 'Installer/Información.MPQ',
+                 'Data/installer.MPQ/help.txt', 'Data/installer.MPQ/assets/inner.MPQ')
+        paths = [self.ancillary(name) for name in names]
+        # An archive for another supported locale remains outside the current
+        # stack, but is not classified as harmless to every supported locale.
+        self.archive('Data/frFR/patch-frFR-X.MPQ', {'Interface\\Icons\\Generic.blp': b'unclassified'})
+        report = self.inspect()
+        self.assertTrue(report['passed'], report['errors'])
+        self.assertEqual({row['path'] for row in report['exclusions']}, set(names))
+        self.assertTrue(all('Ancillary archive or folder member' in row['reason'] for row in report['exclusions']))
+        self.assertEqual(len(report['providers']), 3)
+        self.assertEqual(report['unknownOverlays'], [])
+        self.assertTrue(all(path.exists() for path in paths))
+        # The later extractor planner also ignores these names and retains the
+        # same effective stack; it never interprets the generation's data/
+        # storage prefix as the client's Data/ provider directory.
+        manifest = stock.order.plan(self.source, 'enUS', profile=dict(classical=True, trial=False,
+            streaming=False, directAccess=False, retailVirtualProviders=False,
+            parentDataVisible=False, installDataVisible=False))
+        self.assertEqual({row['path'] for row in manifest['providers']},
+            {row['path'] for row in report['providers']})
+
+    def test_ancillary_source_changes_and_active_alternate_views_are_not_ignored(self):
+        path = self.ancillary('Data/wow-update-base-12340.MPQ')
+        path.write_bytes(b'changed size')
+        with self.assertRaisesRegex(ValueError, 'ancillary archive differs.*Data/wow-update-base-12340.MPQ'):
+            self.inspect()
+        path.unlink()
+        self.archive('Data/alternate.MPQ', {})
+        with self.assertRaisesRegex(ValueError, 'alternate.MPQ archive views are unsupported'):
+            self.inspect()
+
+    @unittest.skipUnless(shutil.which('javac') and shutil.which('java'), 'JDK17 host tools unavailable')
+    def test_public_folder_zip_imports_reach_real_reader_inspection_and_stock_selection(self):
+        """Encrypted synthetic archives cross both real Java import routes.
+
+        Imported journals are created by production GameDataImporter, then read
+        by the exact client reader. No handcrafted journal is used for this
+        pipeline; the source fixture's earlier journal stays outside its root.
+        """
+        repository = Path(__file__).resolve().parents[1]
+        classes = self.root / 'java-classes'; classes.mkdir()
+        sources = sorted((repository / 'core/src/main/java').rglob('*.java'))
+        command = ['javac', '-encoding', 'UTF-8', '-d', str(classes),
+                   *(str(path) for path in sources), str(repository / 'tests/StockImportReference.java')]
+        compiled = subprocess.run(command, capture_output=True, text=True, timeout=60)
+        self.assertEqual(compiled.returncode, 0, compiled.stdout + compiled.stderr)
+
+        def java(route, store, source, *extra):
+            process = subprocess.run(['java', '-Xmx32m', '-cp', str(classes), 'StockImportReference',
+                route, str(store), str(source), *(str(value) for value in extra)],
+                capture_output=True, text=True, timeout=60)
+            self.assertEqual(process.returncode, 0, process.stdout + process.stderr)
+            return Path(process.stdout.strip())
+
+        def pe_fixture():
+            raw = bytearray(1024)
+            def u16(at, value): struct.pack_into('<H', raw, at, value)
+            def u32(at, value): struct.pack_into('<I', raw, at, value)
+            u16(0, 0x5a4d); u32(0x3c, 0x80); u32(0x80, 0x4550)
+            u16(0x84, 0x14c); u16(0x86, 1); u16(0x94, 224)
+            optional = 0x98; u16(optional, 0x10b); u32(optional + 92, 16)
+            u32(optional + 112, 0x1000); u32(optional + 116, 512)
+            section = optional + 224
+            for at, value in ((8, 512), (12, 0x1000), (16, 512), (20, 512)):
+                u32(section + at, value)
+            res = 512
+            for at, identity, child in ((0, 16, 0x80000020), (32, 1, 0x80000040), (64, 1033, 96)):
+                u16(res + at + 14, 1); u32(res + at + 16, identity); u32(res + at + 20, child)
+            u32(res + 96, 0x1080); u32(res + 100, 92)
+            data = res + 128; u16(data, 92); u16(data + 2, 52)
+            key = 'VS_VERSION_INFO'.encode('utf-16-le'); raw[data + 6:data + 6 + len(key)] = key
+            for at, value in ((40, 0xfeef04bd), (44, 0x10000), (48, 0x30003), (52, 0x53034)):
+                u32(data + at, value)
+            return raw
+
+        def archive_source(root, destination):
+            with zipfile.ZipFile(destination, 'w', compression=zipfile.ZIP_STORED) as outgoing:
+                for path in sorted(root.rglob('*')):
+                    if path.is_file(): outgoing.write(path, path.relative_to(root).as_posix())
+            return destination
+
+        def inventory(root):
+            return {path.relative_to(root).as_posix().casefold(): hashlib.sha256(path.read_bytes()).hexdigest()
+                    for path in root.rglob('*') if path.is_file()}
+
+        (self.source / 'Wow.exe').write_bytes(pe_fixture())
+        for name in ('common-2', 'common-3', 'expansion', 'lichking', 'patch', 'patch-2', 'patch-3'):
+            self.archive('Data/' + name + '.MPQ', {})
+        self.archive('Data/enUS/patch-enUS-3.MPQ', {})
+        ancillary = ('Data/wow-update-base-12340.MPQ', 'Installer.MPQ', 'Data/installer.MPQ/help.txt')
+        for name in ancillary: self.ancillary(name)
+        wrapped_root = self.root / 'wrapped'; wrapped_root.mkdir()
+        shutil.copytree(self.source, wrapped_root / 'ChromieCraft')
+        (wrapped_root / 'README.txt').write_text('Client is inside ChromieCraft')
+        metadata = wrapped_root / '__MACOSX/ChromieCraft/Data/._common.MPQ'
+        metadata.parent.mkdir(parents=True); metadata.write_bytes(b'ignored ZIP metadata')
+        mixed = self.root / 'mixed'; shutil.copytree(self.source, mixed)
+        (mixed / 'Wow.exe').rename(mixed / 'wOw.ExE'); (mixed / 'Data').rename(mixed / 'dAtA')
+        (mixed / 'dAtA/enUS').rename(mixed / 'dAtA/eNuS')
+        (mixed / 'dAtA/common.MPQ').rename(mixed / 'dAtA/CoMmOn.mPq')
+        (mixed / 'dAtA/eNuS/locale-enUS.MPQ').rename(mixed / 'dAtA/eNuS/LoCaLe-EnUs.mPq')
+        reference, runs = None, []
+        for label, original in (('direct', self.source), ('wrapped-with-metadata', wrapped_root), ('mixed-case', mixed)):
+            zip_path = archive_source(original, self.root / (label + '.zip'))
+            for route, input_path in (('folder', original), ('zip', zip_path)):
+                with self.subTest(layout=label, route=route):
+                    store = self.root / (label + '-' + route + '-store')
+                    imported = java(route, store, input_path)
+                    imported_before = inventory(imported)
+                    generation = imported.parent.name
+                    report = stock.inspect(imported, self.tools, stock.CLIENT_REVISION, 'enUS', generation)
+                    self.assertTrue(report['passed'], report['errors'])
+                    self.assertEqual({row['path'].casefold() for row in report['exclusions']},
+                                     {name.casefold() for name in ancillary})
+                    self.assertNotIn('__macosx/chromiecraft/data/._common.mpq', imported_before)
+                    decisions = self.root / (label + '-' + route + '-exclusions.tsv')
+                    decisions.write_text(''.join(base64.b64encode(row['path'].encode()).decode() + '\t' +
+                        row['sha256'] + '\n' for row in report['exclusions']))
+                    selected = java('select', store, imported, decisions,
+                        hashlib.sha256(stock.storage.encoded(report)).hexdigest())
+                    self.assertNotEqual(selected, imported)
+                    self.assertEqual(inventory(imported), imported_before, 'original imported generation retained')
+                    self.assertTrue(all(name.casefold() not in inventory(selected) for name in ancillary))
+                    selected_report = stock.inspect(selected, self.tools, stock.CLIENT_REVISION, 'enUS', selected.parent.name)
+                    self.assertTrue(selected_report['passed'], selected_report['errors'])
+                    self.assertEqual(selected_report['exclusions'], [])
+                    projected = inventory(selected)
+                    if reference is None: reference = projected
+                    else: self.assertEqual(projected, reference, 'folder/ZIP/wrapper/case projection equivalence')
+                    manifest = stock.order.plan(selected, 'enUS', profile=dict(classical=True, trial=False,
+                        streaming=False, directAccess=False, retailVirtualProviders=False,
+                        parentDataVisible=False, installDataVisible=False))
+                    self.assertEqual({row['path'].casefold() for row in manifest['providers']},
+                                     {row['path'].casefold() for row in selected_report['providers']})
+                    runs.append({'layout': label, 'route': route, 'importedFiles': len(imported_before),
+                        'selectedFiles': len(projected), 'providers': len(report['providers']),
+                        'clientDbcs': len(report['checks']['clientDbcs']), 'exclusions': len(report['exclusions'])})
+        self.assertEqual(len(runs), 6)
+        # A real active overlay is imported and reaches inspection, where it is
+        # refused; it is not silently treated like the ancillary update archive.
+        self.archive('Data/patch-Unknown.MPQ', {'Interface\\Icons\\Generic.blp': b'unclassified'})
+        unknown_zip = archive_source(self.source, self.root / 'unknown.zip')
+        for route, input_path in (('folder', self.source), ('zip', unknown_zip)):
+            imported = java(route, self.root / ('unknown-' + route + '-store'), input_path)
+            report = stock.inspect(imported, self.tools, stock.CLIENT_REVISION, 'enUS', imported.parent.name)
+            self.assertFalse(report['passed'])
+            self.assertEqual(report['unknownOverlays'][0]['path'], 'Data/patch-Unknown.MPQ')
+            self.assertTrue((imported / 'Data/patch-Unknown.MPQ').exists())
+        if os.environ.get('ESTERIA_STOCK_PIPELINE_EVIDENCE'):
+            Path(os.environ['ESTERIA_STOCK_PIPELINE_EVIDENCE']).write_bytes(stock.storage.encoded({
+                'scope': 'host Java public importer to exact client reader over encrypted synthetic MPQs',
+                'clientRevision': stock.CLIENT_REVISION, 'routes': runs, 'unknownOverlayRoutesRejected': 2,
+                'ownerClientData': False, 'androidExecution': False, 'worldEntry': False}))
+
+    def test_active_folder_provider_members_are_not_mistaken_for_ancillary(self):
+        self.ancillary('Data/patch-folder.MPQ/inner.MPQ')
+        pins = stock.importer_pins(self.source, self.generation)
+        self.assertEqual(stock.ancillary_archives(self.source, pins), [])
+        with self.assertRaisesRegex(ValueError, 'requires regular archive providers.*Data/patch-folder.MPQ'):
+            self.inspect()
 
     def test_unknown_patch_is_not_removed_or_labelled_optional_by_filename(self):
         self.archive('Data/patch-Z.MPQ', {'Interface\\Icons\\Generic.blp': b'unclassified'})

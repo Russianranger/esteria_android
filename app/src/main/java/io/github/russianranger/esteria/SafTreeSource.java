@@ -58,6 +58,7 @@ final class SafTreeSource implements GameDataImporter.InputSource, AutoCloseable
     private InputStream activeStream;
     private GameDataImporter.Cancellation importerCancellation;
     private boolean inventoried, reliableFileTimes = true;
+    private String selectedRootName;
 
     SafTreeSource(ContentResolver resolver, Uri tree, AtomicBoolean cancelled, Progress progress) throws IOException {
         if (tree == null || !"content".equals(tree.getScheme()) || !DocumentsContract.isTreeUri(tree))
@@ -66,12 +67,15 @@ final class SafTreeSource implements GameDataImporter.InputSource, AutoCloseable
     }
     @Override public String identity() { return "android-saf-tree-v1\n" + tree; }
     boolean hasReliableFileTimes() { return reliableFileTimes; }
+    String selectedRootName() { return selectedRootName; }
 
     @Override public List<GameDataImporter.InputEntry> snapshot(GameDataImporter.Cancellation cancellation) throws IOException {
         if (inventoried) throw new IOException("A folder source can be inventoried only once");
         inventoried = true; importerCancellation = cancellation; checkCancelled();
         Document root = readDocument(DocumentsContract.getTreeDocumentId(tree));
         if (!root.directory()) throw new IOException("The selected document is not a folder");
+        selectedRootName = root.name;
+        progress.update(0, 1, reliableFileTimes);
         metadataBudget.add("", root.id, true);
         observe(root); directories.add(root);
         ArrayDeque<Directory> pending = new ArrayDeque<>(); pending.add(new Directory(root, "", 0));
@@ -105,7 +109,11 @@ final class SafTreeSource implements GameDataImporter.InputSource, AutoCloseable
                     if (now - reportedAt >= 200_000_000L) { progress.update(files.size(), directories.size(), reliableFileTimes); reportedAt = now; }
                 }
             } catch (OperationCanceledException e) { throw new GameDataImporter.ImportCancelledException(); }
-            catch (RuntimeException e) { throw providerFailure("The file provider could not list a source folder", e); }
+            catch (GameDataImporter.ImportCancelledException e) { throw e; }
+            catch (IOException e) { throw new IOException("Could not enumerate selected folder '" + selectedRootName
+                    + "', relative directory '" + (directory.path.isEmpty() ? "." : directory.path) + "': " + e.getMessage(), e); }
+            catch (RuntimeException e) { throw providerFailure("The file provider could not list relative directory '"
+                    + (directory.path.isEmpty() ? "." : directory.path) + "' in selected folder '" + selectedRootName + "'", e); }
         }
         checkCancelled(); progress.update(files.size(), directories.size(), reliableFileTimes);
         return files;
@@ -116,6 +124,8 @@ final class SafTreeSource implements GameDataImporter.InputSource, AutoCloseable
         AssetFileDescriptor descriptor;
         try { descriptor = resolver.openAssetFileDescriptor(documentUri(document.id), "r", queryCancellation); }
         catch (OperationCanceledException e) { throw new GameDataImporter.ImportCancelledException(); }
+        catch (IOException e) { throw new IOException("The file provider could not open relative path '" + entry.relativePath
+                + "' in selected folder '" + selectedRootName + "': " + e.getMessage(), e); }
         catch (RuntimeException e) { throw providerFailure("The file provider could not open " + entry.relativePath, e); }
         if (descriptor == null) throw new IOException("The file provider could not open " + entry.relativePath);
         final InputStream input;
@@ -139,7 +149,11 @@ final class SafTreeSource implements GameDataImporter.InputSource, AutoCloseable
     }
 
     @Override public void verifyUnchanged(GameDataImporter.InputEntry entry) throws IOException {
-        checkCancelled(); verify(known(entry));
+        checkCancelled();
+        try { verify(known(entry)); }
+        catch (GameDataImporter.ImportCancelledException cancelled) { throw cancelled; }
+        catch (IOException changed) { throw new IOException("Source verification failed at relative path '" + entry.relativePath
+                + "' in selected folder '" + selectedRootName + "': " + changed.getMessage(), changed); }
     }
     @Override public void verifySnapshot(List<GameDataImporter.InputEntry> snapshot) throws IOException {
         // No second tree enumeration or rehashing: check the inventoried directory metadata.

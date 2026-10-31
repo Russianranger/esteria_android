@@ -26,6 +26,14 @@ public final class ImporterTests {
         run("PE version resource validates exact build", ImporterTests::versionResources);
         run("stock report verifies actual version headers locale speech and preserves standard patches", ImporterTests::stockCompatibility);
         run("MPQ signature and table bounds", ImporterTests::mpqBounds);
+        run("folder and ZIP preserve harmless ancillary archives", ImporterTests::stockAncillaryImports);
+        run("folder and ZIP wrappers tolerate README and metadata", ImporterTests::wrapperMetadataImports);
+        run("renamed client wrapper changes mapped source identity", ImporterTests::renamedWrapperIdentity);
+        run("folder and ZIP preserve mixed-case client paths", ImporterTests::mixedCaseImports);
+        run("wrapped document imports keep opaque source identifiers", ImporterTests::opaqueDocumentImport);
+        run("Data-only roots identify the parent client root", ImporterTests::dataOnlyImports);
+        run("multiple complete client roots reject before staging", ImporterTests::ambiguousClientRoots);
+        run("malformed essential archives preserve active data in both routes", ImporterTests::essentialArchiveRollback);
         run("stock selection preserves source and essential patches, excludes only confirmed overlays and loose UI", ImporterTests::stockSelection);
         run("Esteria selection catalogs validate complete bounded records", ImporterTests::selectionCatalogs);
         run("invalid catalog update preserves active assets and permits corrected retry", ImporterTests::catalogUpdate);
@@ -100,6 +108,101 @@ public final class ImporterTests {
         for(String patch:List.of("patch.MPQ","patch-2.MPQ","patch-3.MPQ"))check(Files.exists(selected.resolve("Data/"+patch)),"stock Blizzard patch retained");
         check(Files.exists(imported.gameDirectory.resolve("Interface/AddOns/MyAddon/config.txt"))&&Files.exists(source.resolve("Data/patch-extra.MPQ"))&&digest(imported.gameDirectory.resolve("Data/patch-extra.MPQ")).equals(overlayDigest),"original source and imported generation unchanged");
         check(StockClientSelection.apply(importer,selected,selected.getParent().getFileName().toString(),Map.of(),"b".repeat(64),GameDataImporter.NO_PROGRESS,GameDataImporter.NEVER_CANCELLED).equals(selected),"unchanged stock selection avoids another copy");
+    }
+    // Representative ancillary names: the old user log omitted its rejected filename.
+    private static void stockAncillaryImports() throws Exception {
+        Path root=temp(), source=client(root);
+        write(source.resolve("Data/enUS/speech-enUS.MPQ"),mpq());
+        for(String name:List.of("Data/common-3.MPQ","Data/enUS/patch-enUS.MPQ","Data/enUS/patch-enUS-2.MPQ","Data/enUS/patch-enUS-3.MPQ"))write(source.resolve(name),mpq());
+        List<String> ancillary=List.of("Data/Interface.MPQ","Data/wow-update-old.MpQ","Data/enUS/backup-locale-enUS.MPQ","Installer.MPQ","Data/installer.MPQ/help.txt");
+        // These are deliberately invalid as MPQs; the engine never opens their names.
+        for(String name:ancillary)write(source.resolve(name),("ignored fixture "+name).getBytes(StandardCharsets.UTF_8));
+        write(source.resolve("Data/patch-unclassified.MPQ"),mpq());
+        Path archive=zipTree(root,source);
+        GameDataImporter fi=new GameDataImporter(root.resolve("folder-store")), zi=new GameDataImporter(root.resolve("zip-store"));
+        GameDataImporter.Result a=folder(fi,source,GameDataImporter.ImportKind.BASE_CLIENT), b=zip(zi,archive);
+        sameTree(source,a.gameDirectory);sameTree(a.gameDirectory,b.gameDirectory);
+        StockClientCompatibility.Report report=StockClientCompatibility.inspect(a.gameDirectory,"enUS");report.requirePreparationInputs();
+        check(report.candidateOverlays.equals(List.of("Data/patch-unclassified.MPQ")),"only the active unknown patch requires content inspection; inactive names/common-3/standard locale patches do not: "+report.candidateOverlays);
+        Map<String,String> exclusions=new LinkedHashMap<>();for(String name:ancillary)exclusions.put(name,digest(a.gameDirectory.resolve(name)));
+        Path selected=StockClientSelection.apply(fi,a.gameDirectory,a.generation,exclusions,"c".repeat(64),GameDataImporter.NO_PROGRESS,GameDataImporter.NEVER_CANCELLED);
+        for(String name:ancillary)check(!Files.exists(selected.resolve(name))&&Files.exists(a.gameDirectory.resolve(name))&&Files.exists(source.resolve(name)),"ancillary excluded only from app-owned stock view: "+name);
+        for(String name:List.of("Data/common-3.MPQ","Data/patch.MPQ","Data/patch-2.MPQ","Data/patch-3.MPQ","Data/enUS/patch-enUS-3.MPQ","Data/patch-unclassified.MPQ"))check(Files.exists(selected.resolve(name)),"active provider is retained unless content audit explicitly excludes it: "+name);
+    }
+    private static Path zipTree(Path root,Path source)throws Exception {
+        List<String> names=new ArrayList<>();List<byte[]> data=new ArrayList<>();
+        try(java.util.stream.Stream<Path> files=Files.walk(source)) {
+            for(Path file:(Iterable<Path>)files.filter(Files::isRegularFile).sorted()::iterator){names.add(source.relativize(file).toString().replace('\\','/'));data.add(Files.readAllBytes(file));}
+        }
+        return zipEntries(root,names.toArray(new String[0]),data.toArray(new byte[0][]));
+    }
+    private static void sameTree(Path expected,Path actual)throws Exception {
+        List<String> names=new ArrayList<>(),observed=new ArrayList<>();
+        try(java.util.stream.Stream<Path> files=Files.walk(expected)){for(Path file:(Iterable<Path>)files.filter(Files::isRegularFile)::iterator)names.add(expected.relativize(file).toString());}
+        try(java.util.stream.Stream<Path> files=Files.walk(actual)){for(Path file:(Iterable<Path>)files.filter(Files::isRegularFile)::iterator)observed.add(actual.relativize(file).toString());}
+        java.util.Collections.sort(names);java.util.Collections.sort(observed);check(names.equals(observed),"equivalent logical inventory: "+names+" vs "+observed);
+        for(String name:names)check(Arrays.equals(Files.readAllBytes(expected.resolve(name)),Files.readAllBytes(actual.resolve(name))),"equivalent bytes: "+name);
+    }
+    private static void wrapperMetadataImports()throws Exception {
+        Path root=temp(),source=client(root),selected=root.resolve("selected"),wrapped=selected.resolve("ChromieCraft");Files.createDirectories(selected);Files.move(source,wrapped);
+        write(selected.resolve("README.txt"),"client in ChromieCraft".getBytes(StandardCharsets.UTF_8));
+        write(selected.resolve("__MACOSX/._ChromieCraft"),new byte[]{1,2});write(selected.resolve("__MACOSX/ChromieCraft/Data/._common.MPQ"),new byte[]{3,4});
+        Path archive=zipTree(root,selected);
+        Path a=folder(new GameDataImporter(root.resolve("folder-store")),selected,GameDataImporter.ImportKind.BASE_CLIENT).gameDirectory,b=zip(new GameDataImporter(root.resolve("zip-store")),archive).gameDirectory;
+        check(Files.exists(a.resolve("Wow.exe"))&&Files.exists(a.resolve("Data/common.MPQ")),"bounded folder root found despite sibling metadata");
+        check(!Files.exists(a.resolve("ChromieCraft"))&&!Files.exists(b.resolve("__MACOSX")),"wrapper removed once and external metadata omitted");sameTree(wrapped,a);sameTree(a,b);
+    }
+    private static void renamedWrapperIdentity()throws Exception {
+        Path root=temp(),selected=root.resolve("selected"),wrapped=selected.resolve("Wrapped");Files.createDirectories(selected);Files.move(client(root),wrapped);
+        GameDataImporter im=importer(root);GameDataImporter.Result before=folder(im,selected,GameDataImporter.ImportKind.BASE_CLIENT);
+        long originalMtime=Files.getLastModifiedTime(wrapped.resolve("Wow.exe")).toMillis();
+        Path renamed=selected.resolve("Renamed");Files.move(wrapped,renamed);
+        check(Files.getLastModifiedTime(renamed.resolve("Wow.exe")).toMillis()==originalMtime,"wrapper rename leaves file metadata unchanged");
+        GameDataImporter.Result after=folder(im,selected,GameDataImporter.ImportKind.BASE_CLIENT);
+        check(!after.generation.equals(before.generation)&&after.copiedFiles>0,"same selected container with changed original mapping cannot reuse completed identity");
+        check(im.resolveCurrent().equals(after.gameDirectory)&&Files.exists(before.gameDirectory.resolve("Wow.exe"))&&Files.exists(renamed.resolve("Wow.exe")),"new mapping retains source and old generation");
+        sameTree(renamed,after.gameDirectory);sameTree(before.gameDirectory,after.gameDirectory);
+    }
+    private static void mixedCaseImports()throws Exception {
+        Path root=temp(),source=client(root);Files.move(source.resolve("Wow.exe"),source.resolve("wOw.ExE"));Files.move(source.resolve("Data"),source.resolve("dAtA"));
+        Files.move(source.resolve("dAtA/enUS"),source.resolve("dAtA/eNuS"));Files.move(source.resolve("dAtA/common.MPQ"),source.resolve("dAtA/CoMmOn.mPq"));Files.move(source.resolve("dAtA/eNuS/locale-enUS.MPQ"),source.resolve("dAtA/eNuS/LoCaLe-EnUs.mPq"));
+        write(source.resolve("dAtA/eNuS/SpEeCh-EnUs.MpQ"),mpq());Path archive=zipTree(root,source);
+        Path a=folder(new GameDataImporter(root.resolve("folder-store")),source,GameDataImporter.ImportKind.BASE_CLIENT).gameDirectory,b=zip(new GameDataImporter(root.resolve("zip-store")),archive).gameDirectory;
+        sameTree(source,a);sameTree(a,b);StockClientCompatibility.inspect(a,"enUS").requirePreparationInputs();check(!Files.exists(a.resolve("data/dAtA")),"storage data prefix is separate from client Data");
+    }
+    private static void opaqueDocumentImport()throws Exception {
+        Path root=temp(),source=client(root);Documents docs=new Documents();int next=0;
+        try(java.util.stream.Stream<Path> files=Files.walk(source)){
+            for(Path file:(Iterable<Path>)files.filter(Files::isRegularFile).sorted()::iterator){String relative=source.relativize(file).toString().replace('\\','/');docs.put("provider:opaque/../../token?doc="+(next++),"Client/"+relative,Files.readAllBytes(file),1234);}
+        }
+        docs.put("provider:README-token","README.txt",new byte[]{1},1234);docs.put("provider:metadata-token","__MACOSX/._Client",new byte[]{2},1234);
+        Path imported=documentImport(importer(root),docs).gameDirectory;sameTree(source,imported);check(docs.opened==10&&docs.closed==10&&docs.finalChecks==1,"normalization preserves original opaque ID mappings and bounded source verification");
+    }
+    private static void dataOnlyImports()throws Exception {
+        Path root=temp(),source=client(root).resolve("Data"),archive=zipTree(root,source);
+        for(boolean useZip:List.of(false,true)) {
+            GameDataImporter im=new GameDataImporter(root.resolve(useZip?"zip-store":"folder-store"));
+            try{if(useZip)zip(im,archive);else folder(im,source,GameDataImporter.ImportKind.BASE_CLIENT);throw new AssertionError("Data-only selection accepted");}
+            catch(IOException failure){String text=failure.getMessage().toLowerCase(java.util.Locale.ROOT);check(text.contains("parent")&&text.contains("wow.exe")&&text.contains("data"),"parent-selection guidance: "+failure.getMessage());check(!text.contains("custom archives"),"Data-only standard archives are not misplaced custom content");}
+            check(im.resolveCurrent()==null,"Data-only selection cannot publish");
+        }
+    }
+    private static void ambiguousClientRoots()throws Exception {
+        Path root=temp(),selected=root.resolve("selected");Files.createDirectories(selected);Files.move(client(root),selected.resolve("ClientA"));Path other=temp();Files.move(client(other),selected.resolve("ClientB"));Path archive=zipTree(root,selected);
+        for(boolean useZip:List.of(false,true)){
+            Path store=root.resolve(useZip?"zip-store":"folder-store");GameDataImporter im=new GameDataImporter(store);
+            try{if(useZip)zip(im,archive);else folder(im,selected,GameDataImporter.ImportKind.BASE_CLIENT);throw new AssertionError("two complete roots accepted");}
+            catch(IOException failure){String text=failure.getMessage().toLowerCase(java.util.Locale.ROOT);check(text.contains("ambiguous")||text.contains("multiple"),"precise ambiguity error: "+failure.getMessage());}
+            check(im.resolveCurrent()==null,"ambiguous source cannot publish");try(java.util.stream.Stream<Path> generations=Files.list(store.resolve("generations"))){check(generations.findAny().isEmpty(),"ambiguity rejected before staging");}
+        }
+    }
+    private static void essentialArchiveRollback()throws Exception {
+        for(boolean useZip:List.of(false,true)){
+            Path root=temp(),source=client(root);GameDataImporter im=importer(root);Path before=folder(im,source,GameDataImporter.ImportKind.BASE_CLIENT).gameDirectory;write(source.resolve("Data/common.MPQ"),new byte[]{1,2,3});Path archive=zipTree(root,source);
+            try{if(useZip)zip(im,archive);else folder(im,source,GameDataImporter.ImportKind.BASE_CLIENT);throw new AssertionError("malformed essential common.MPQ accepted");}
+            catch(IOException failure){String text=failure.getMessage();check(text.contains("phase=file-verification")&&text.contains("detectedRoot=.")&&text.contains("observedPath=Data/common.MPQ")&&text.contains("normalizedPath=Data/common.MPQ")&&failure.getCause()!=null,"import failure retains phase/root/path/cause: "+text);}
+            check(im.resolveCurrent().equals(before)&&Arrays.equals(Files.readAllBytes(before.resolve("Data/common.MPQ")),mpq()),"malformed essential import preserves active bytes");
+        }
     }
     private static byte[] selectionCatalog() {
         ByteBuffer bytes = ByteBuffer.allocate(12 + 6 * 156).order(ByteOrder.LITTLE_ENDIAN);
@@ -292,15 +395,16 @@ public final class ImporterTests {
             check(im.resolveCurrent().equals(before), "misplaced overlay changed active import");
         }
         write(source.resolve("patch-Z.MPQ"), mpq());
-        fails(() -> folder(im, source, GameDataImporter.ImportKind.BASE_CLIENT), "base client with unused root MPQ");
-        check(im.resolveCurrent().equals(before), "misplaced root archive in a base client changed active import");
+        Path active = folder(im, source, GameDataImporter.ImportKind.BASE_CLIENT).gameDirectory;
+        check(Files.exists(active.resolve("patch-Z.MPQ")) && Files.exists(source.resolve("patch-Z.MPQ")), "inert root archive is retained by base import and original source is preserved");
+        check(!StockClientCompatibility.inspect(active, "enUS").candidateOverlays.contains("patch-Z.MPQ"), "unused root archive is not an active patch provider");
         for (String path : new String[]{"Wrapped/Data/patch-Z.MPQ", "Data/MyPack.MPQ", "Data/enUS/MyPack.MPQ", "Data/Retail/patch-Z.MPQ", "Wrapped/EsteriaServerData/manifest.properties"}) {
             Path mixed = root.resolve("mixed-" + Math.abs(path.hashCode()));
             write(mixed.resolve("Interface/AddOns/Useful/a.lua"), new byte[]{1});
             write(mixed.resolve(path), path.endsWith(".MPQ") ? mpq() : serverManifest("overlay"));
             fails(() -> im.importFolder(mixed, GameDataImporter.ImportKind.CONTENT_OVERLAY,
                     (p,b,t,n,f) -> { throw new AssertionError("provably misplaced mixed content copied"); }, GameDataImporter.NEVER_CANCELLED), "mixed supported and misplaced content");
-            check(im.resolveCurrent().equals(before), "legitimate UI file masked an unused archive or wrapped server package");
+            check(im.resolveCurrent().equals(active), "legitimate UI file masked an unused archive or wrapped server package");
         }
     }
     private static void overlayRoutes() throws Exception {
@@ -508,6 +612,19 @@ public final class ImporterTests {
         fails(() -> zip(importer(root), dirs), "case directory ambiguity");
         Path collision = zipEntries(root, new String[]{"Data", "Data/x"}, new byte[][]{new byte[0], new byte[0]});
         fails(() -> zip(importer(root), collision), "file parent collision");
+        // Explicit directory spelling must participate even when all file paths
+        // consistently use a different case; their names alone are unambiguous.
+        Path source = client(root); List<String> names = new ArrayList<>(); List<byte[]> data = new ArrayList<>();
+        names.add("Data/"); data.add(new byte[0]);
+        try (java.util.stream.Stream<Path> files = Files.walk(source)) {
+            for (Path file : (Iterable<Path>) files.filter(Files::isRegularFile)::iterator) {
+                String name = source.relativize(file).toString().replace('\\', '/');
+                names.add(name.startsWith("Data/") ? "data/" + name.substring(5) : name); data.add(Files.readAllBytes(file));
+            }
+        }
+        Path explicitCase = zipEntries(root, names.toArray(new String[0]), data.toArray(new byte[0][]));
+        try { zip(importer(root), explicitCase); throw new AssertionError("explicit Data/ versus data/file ambiguity accepted"); }
+        catch (IOException failure) { check(failure.getMessage().toLowerCase(java.util.Locale.ROOT).contains("capital"), "explicit ZIP directory collision gives its true reason: " + failure.getMessage()); }
     }
     private static void zipCorruption() throws Exception {
         Path root = temp(), source = client(root);

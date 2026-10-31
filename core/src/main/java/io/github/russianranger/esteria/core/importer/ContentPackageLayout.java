@@ -87,7 +87,7 @@ public final class ContentPackageLayout {
         for (String path : paths) {
             String[] parts = path.split("/");
             String first = parts[0].toLowerCase(Locale.ROOT);
-            validateClientProviderLocation(parts);
+            validateClientProviderLocation(parts, overlay);
             if (first.equals(SERVER_DIRECTORY.toLowerCase(Locale.ROOT))) {
                 server = true; supportedRoot = true;
                 if (!parts[0].equals(SERVER_DIRECTORY)) throw new IOException("Server data must use the exact EsteriaServerData/ directory name");
@@ -97,7 +97,7 @@ public final class ContentPackageLayout {
             }
             if (first.equals("data") || first.equals("interface") || first.equals("fonts") ||
                     (parts.length == 1 && first.matches("esteria[a-z0-9_.-]*\\.bin"))) supportedRoot = true;
-            if (first.endsWith(".mpq")) throw new IOException("Place custom archives and folder MPQs under Data/ (for example Data/patch-Z.MPQ); select the package parent, not Data itself");
+            if (overlay && first.endsWith(".mpq")) throw new IOException("Place custom archives and folder MPQs under Data/ (for example Data/patch-Z.MPQ); select the package parent, not Data itself");
             if (first.equals("esteria") && parts[parts.length - 1].toLowerCase(Locale.ROOT).endsWith(".bin"))
                 throw new IOException("Loose Esteria*.bin catalogs belong beside Wow.exe at the package root, or inside Data/patch-*.MPQ/Esteria/; a root Esteria/ directory is not loaded");
             if (overlay) {
@@ -122,7 +122,34 @@ public final class ContentPackageLayout {
         return false;
     }
 
-    private static void validateClientProviderLocation(String[] parts) throws IOException {
+    /** True only for a physical file at a provider path consumed by OpenArchives.
+     * The client generation directory named data is outside this relative path.
+     */
+    public static boolean isEffectiveClientProvider(String relative) {
+        if (relative == null) return false;
+        String[] parts = relative.split("/");
+        return (parts.length == 2 && effectiveProvider(parts, 1)) ||
+                (parts.length == 3 && effectiveProvider(parts, 2));
+    }
+
+    /** An archive-shaped file which cannot become active in any supported locale.
+     * Nested virtual members of active folder MPQs are deliberately not ancillary.
+     */
+    public static boolean isAncillaryClientArchive(String relative) {
+        if (relative == null || !relative.toLowerCase(Locale.ROOT).endsWith(".mpq")) return false;
+        return isAncillaryClientPath(relative);
+    }
+
+    /** File or folder-MPQ member outside every effective provider boundary. */
+    public static boolean isAncillaryClientPath(String relative) {
+        if (relative == null) return false;
+        String[] parts = relative.split("/");
+        boolean archive = java.util.Arrays.stream(parts).anyMatch(part -> part.toLowerCase(Locale.ROOT).endsWith(".mpq"));
+        return archive && !((parts.length > 1 && effectiveProvider(parts, 1)) ||
+                (parts.length > 2 && effectiveProvider(parts, 2)));
+    }
+
+    private static void validateClientProviderLocation(String[] parts, boolean overlay) throws IOException {
         // Once an effective folder-MPQ boundary is reached, everything below it
         // is a virtual asset path, including folders named Data or the reserved
         // server namespace. Those names must not be reinterpreted as packages.
@@ -132,8 +159,14 @@ public final class ContentPackageLayout {
         for (int i = 1; i < parts.length; i++) if (parts[i].equalsIgnoreCase(SERVER_DIRECTORY))
             throw new IOException("EsteriaServerData/ is a reserved server package and must be at the client/package root, not inside another folder");
         if (first.equals("interface") || first.equals("fonts")) return;
-        for (String component : parts) if (component.toLowerCase(Locale.ROOT).endsWith(".mpq"))
-            throw new IOException("MPQ content is not at an effective client provider location; place custom archives and folder MPQs under Data/patch-*.MPQ or Data/<locale>/patch-<locale>-*.MPQ, without a wrapper folder");
+        // A base import can contain installer, backup and ancillary MPQs.
+        // Preserve those bytes for audited stock projection; names alone do
+        // not make them engine providers. Explicit overlays remain strict.
+        if (overlay) for (String component : parts) if (component.toLowerCase(Locale.ROOT).endsWith(".mpq"))
+            throw new IOException("Unsupported overlay provider path '" + String.join("/", parts) +
+                    "'; this path is not loaded by the selected client" +
+                    (java.util.Arrays.stream(parts).skip(1).anyMatch(part -> part.equalsIgnoreCase("Data")) ? "; a wrapper folder puts Data outside the client root" : "") +
+                    ". Explicit active custom overlays belong under Data/patch-*.MPQ or Data/<locale>/patch-<locale>-*.MPQ and require content inspection");
     }
 
     static boolean reserved(String relative) {

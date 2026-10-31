@@ -1,4 +1,6 @@
 import base64
+import hashlib
+import io
 import json
 import os
 from pathlib import Path
@@ -36,15 +38,81 @@ class StockSigningBoundary(unittest.TestCase):
             self.assertEqual(args.lock, signing.ROOT / 'app/stock-signing.lock.json')
             self.assertFalse(args.qualification_only)
             raise ValueError('apk-signing-failed')
-        with patch.dict(os.environ, secrets, clear=True), patch.object(signing, 'sign', side_effect=fail):
+        with patch.dict(os.environ, secrets, clear=True), patch.object(signing, 'sign', side_effect=fail), \
+                patch.object(ci, 'fetch_previous_apk', return_value=self.root / 'previous.apk') as previous:
             with self.assertRaisesRegex(ValueError, '^apk-signing-failed$'):
                 ci.execute(self.args)
+            previous.assert_called_once()
         self.assertFalse(self.args.private_directory.exists())
         self.args.private_directory.mkdir(); marker = self.args.private_directory / 'keep'; marker.write_text('keep')
         with patch.dict(os.environ, secrets, clear=True):
             with self.assertRaisesRegex(ValueError, 'exclusive-private-directory-required'):
                 ci.execute(self.args)
         self.assertEqual(marker.read_text(), 'keep')
+
+    def test_previous_official_apk_fetch_is_hash_and_length_bound_and_never_overwrites(self):
+        data = b'synthetic previous APK, not installation evidence'
+        lock = dict(packageId=signing.STOCK_PACKAGE,
+            lastPublished=dict(versionCode=1, apkSha256=hashlib.sha256(data).hexdigest()))
+        class Response(io.BytesIO):
+            def __init__(self, value, length=None, code=200):
+                super().__init__(value)
+                self.headers = {'Content-Length': str(len(value)) if length is None else length}
+                self.code = code
+            def getcode(self):
+                return self.code
+        target = self.root / 'previous.apk'
+        with patch.object(ci, 'urlopen', return_value=Response(data)) as opened:
+            self.assertEqual(ci.fetch_previous_apk(lock, target), target)
+            request = opened.call_args.args[0]
+            self.assertEqual(request.full_url, 'https://github.com/Russianranger/esteria_android/releases/download/'
+                'non-custom-v0.1.0-non-custom.1/Esteria-Stock-3.3.5a-arm64.apk')
+            self.assertFalse(request.has_header('Authorization'))
+            self.assertEqual(target.read_bytes(), data)
+            with self.assertRaisesRegex(ValueError, 'previous-apk-output-exists'):
+                ci.fetch_previous_apk(lock, target)
+            self.assertEqual(opened.call_count, 1)
+        target.unlink()
+        for response in (Response(data + b'changed'), Response(data, str(len(data) + 1)),
+                Response(data, str(len(data) - 1)), Response(data, ''),
+                Response(data, str(ci.MAX_PREVIOUS_APK_BYTES + 1)), Response(data, code=206)):
+            with patch.object(ci, 'urlopen', return_value=response), self.assertRaisesRegex(ValueError, 'previous-apk-download-'):
+                ci.fetch_previous_apk(lock, target)
+            self.assertFalse(target.exists())
+        with patch.object(ci, 'urlopen') as opened:
+            self.assertIsNone(ci.fetch_previous_apk(dict(lock, lastPublished=None), target))
+            opened.assert_not_called()
+        def raced(request, timeout):
+            target.write_bytes(b'other writer owns this output')
+            return Response(data)
+        with patch.object(ci, 'urlopen', side_effect=raced), self.assertRaises(FileExistsError):
+            ci.fetch_previous_apk(lock, target)
+        self.assertEqual(target.read_bytes(), b'other writer owns this output')
+
+    def test_downloaded_previous_apk_is_passed_to_sdk_and_removed_with_private_inputs(self):
+        secrets = dict(ESTERIA_KEYSTORE_BASE64=base64.b64encode(b'synthetic-key').decode(),
+                       ESTERIA_KEYSTORE_PASSWORD='synthetic-store', ESTERIA_KEY_PASSWORD='synthetic-key-pass')
+        previous = self.args.private_directory / 'previous-stock.apk'
+        def fetch(lock, path):
+            self.assertEqual(path, previous)
+            self.assertFalse((path.parent / 'key.jks').exists())
+            path.write_bytes(b'synthetic previous APK')
+            return path
+        def verify(args):
+            self.assertEqual(args.previous_apk, previous)
+            self.assertEqual(args.previous_apk.read_bytes(), b'synthetic previous APK')
+            self.assertFalse(args.initial_baseline)
+            return dict(synthetic=True)
+        with patch.dict(os.environ, secrets, clear=True), patch.object(ci, 'fetch_previous_apk', side_effect=fetch), \
+                patch.object(signing, 'sign', side_effect=verify):
+            self.assertEqual(ci.execute(self.args), dict(synthetic=True))
+        self.assertFalse(self.args.private_directory.exists())
+        self.args.previous_apk = self.root / 'explicit-previous.apk'
+        with patch.dict(os.environ, secrets, clear=True), patch.object(ci, 'fetch_previous_apk') as fetched, \
+                patch.object(signing, 'sign', return_value=dict(synthetic=True)) as signed:
+            ci.execute(self.args)
+            fetched.assert_not_called()
+            self.assertEqual(signed.call_args.args[0].previous_apk, self.args.previous_apk)
 
 
 class StockReleaseBoundary(unittest.TestCase):

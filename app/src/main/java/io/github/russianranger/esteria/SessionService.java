@@ -90,6 +90,7 @@ public final class SessionService extends Service {
     private volatile String status = "Ready to import your 3.3.5a build 12340 client folder or ZIP.";
     private volatile String supportStatus="";
     private volatile SafTreeSource activeFolderSource;
+    private volatile ImportDiagnostics lastImport;
     // Ephemeral decisions are never restored as approval after service/process recreation.
     private volatile ClientLaunchSetup.UiReview pendingUiReview;
     // The worker retains this handle across every failure until all setup
@@ -126,6 +127,7 @@ public final class SessionService extends Service {
         try {
             root = getFilesDir().getCanonicalFile().toPath();
             Files.createDirectories(root.resolve("state/logs"));
+            lastImport = new ImportDiagnostics(root.resolve("state/import-last.properties"));
             try {
                 String saved=getSharedPreferences("session",MODE_PRIVATE).getString("ownedSupportLogs","");
                 selectedLogs.putAll(SupportLogSelection.decode(root,saved));selectedLogsEncoded=saved;
@@ -212,7 +214,7 @@ public final class SessionService extends Service {
                         :"Local startup or shutdown did not complete normally: "+e.getMessage()+". Export the support bundle for details.")
                         :cancelled.get() ? "Operation cancelled. Existing game data remains active."
                         : e.getClass().getSimpleName() + ": " + e.getMessage();
-                log(status+" failure="+e.getClass().getSimpleName()+": "+e.getMessage());
+                log(status + ImportDiagnostics.failure(e));
             } finally {
                 // Serialize completion with onStartCommand. Publishing idle before stopSelf
                 // could otherwise cancel a newly queued import. A replaced service instance
@@ -234,30 +236,57 @@ public final class SessionService extends Service {
         if (uri == null) throw new IOException("No source selected");
         GameDataImporter.ImportKind kind = intent.getBooleanExtra("overlay", false)
                 ? GameDataImporter.ImportKind.CONTENT_OVERLAY : GameDataImporter.ImportKind.BASE_CLIENT;
+        boolean folder = intent.getBooleanExtra("folder", false);
+        ImportDiagnostics diagnostics = new ImportDiagnostics(root.resolve("state/import-last.properties"));
+        lastImport = diagnostics;
+        diagnostics.begin(folder ? "folder" : "zip", kind.name(), uri.getAuthority(), uri.toString(),
+                folder ? "folder display name pending cancellable inventory" : "ZIP document; client root pending inspection");
+        log("Import started " + diagnostics.context());
         pendingUiReview=null;
         GameDataImporter importer = new GameDataImporter(root.resolve("game"));
         GameDataImporter.Result result;
-        if (intent.getBooleanExtra("folder", false)) {
+        try {
+        if (folder) {
             status = "Reading selected folder…";
-            try (SafTreeSource source = new SafTreeSource(getContentResolver(), uri, cancelled, (files, directories, reliableTimes) ->
+            diagnostics.phase("folder-enumeration", "not-yet-detected", "");
+            try (SafTreeSource source = new SafTreeSource(getContentResolver(), uri, cancelled, (files, directories, reliableTimes) -> {
+                    SafTreeSource current = activeFolderSource;
+                    if (current != null && current.selectedRootName() != null) diagnostics.selectedRoot(current.selectedRootName());
                     status = "Reading folder: " + files + " files, " + directories + " folders"
-                            + (reliableTimes ? "" : "\nThis provider omits modification times; interrupted imports must start a new copy."))) {
+                            + (reliableTimes ? "" : "\nThis provider omits modification times; interrupted imports must start a new copy."); })) {
                 activeFolderSource = source;
-                result = importer.importSource(source, kind, (path, bytes, total, count, files) ->
-                        status = importProgress(path, bytes, total, count, files)
-                                + (source.hasReliableFileTimes() ? "" : "\nResume is unavailable for this source because some files have no modification time."), cancelled::get);
+                result = importer.importSource(source, kind, importListener(diagnostics, source), cancelled::get);
             } finally { activeFolderSource = null; }
         } else {
+            diagnostics.phase("zip-document-copy", "not-yet-detected", "");
             Path archive = UriStager.stage(getContentResolver(), uri, root.resolve("imports"), cancelled,
                     (copied, total) -> status = "Copying archive: " + mib(copied) + (total >= 0 ? " / " + mib(total) : "") + " MiB");
-            result = importer.importZip(archive, kind, (path, bytes, total, count, files) ->
-                    status = importProgress(path, bytes, total, count, files), cancelled::get);
+            result = importer.importZip(archive, kind, importListener(diagnostics, null), cancelled::get);
             // Delete only the temporary ZIP after the importer has published a complete generation.
             Files.deleteIfExists(archive);
         }
+        diagnostics.phase("stock-compatibility");
         status = "Import complete: " + result.copiedFiles + " copied, " + result.reusedFiles + " resumed.\n"
             +inspectStockClient(getSharedPreferences("world",MODE_PRIVATE).getString("locale","enUS"),false).toText();
+        diagnostics.finish("complete", null);
         log("Import complete generation=" + result.generation + " copied=" + result.copiedFiles + " reused=" + result.reusedFiles);
+        } catch (GameDataImporter.ImportCancelledException paused) {
+            diagnostics.finish("paused", paused); log("Import paused " + diagnostics.context()); throw paused;
+        } catch (Exception failure) {
+            diagnostics.finish("failed", failure); log("Import failed " + diagnostics.context()); throw failure;
+        }
+    }
+    private GameDataImporter.ProgressListener importListener(ImportDiagnostics diagnostics, SafTreeSource source) {
+        return new GameDataImporter.ProgressListener() {
+            @Override public void onProgress(String path, long bytes, long total, int count, int files) {
+                status = importProgress(path, bytes, total, count, files)
+                    + (source == null || source.hasReliableFileTimes() ? "" : "\nResume is unavailable for this source because some files have no modification time.");
+            }
+            @Override public void onDiagnostic(String phase, String detectedRoot, String path) {
+                if (source != null && source.selectedRootName() != null) diagnostics.selectedRoot(source.selectedRootName());
+                diagnostics.phase(phase, detectedRoot, path);
+            }
+        };
     }
     private void startLocalGame(String locale) throws IOException {
         clearSelectedLogs("game.");
@@ -695,6 +724,8 @@ public final class SessionService extends Service {
         facts.put("device.model", Build.MODEL); facts.put("device.manufacturer", Build.MANUFACTURER);
         facts.put("device.abis", android.text.TextUtils.join(",", Build.SUPPORTED_ABIS));
         facts.put("status", previousStatus); facts.put("runtime.qualified", "false");
+        ImportDiagnostics importDiagnostic = lastImport;
+        if (importDiagnostic != null) facts.putAll(importDiagnostic.facts());
         GameSession.Handle gameOwner=game;
         facts.put("game.retained",Boolean.toString(gameOwner!=null));
         facts.put("game.lastRecoveryRequired",Boolean.toString(lastRecoveryRequired));
@@ -816,6 +847,19 @@ public final class SessionService extends Service {
                 facts.put("runtime.serverExtractors.expectedGeneration", tools.generation());
                 facts.put("runtime.serverExtractors.prepared", String.valueOf(tools.current() != null));
             } catch (IOException error) { facts.put("runtime.serverExtractors.installationError", error.getMessage()); }
+        }
+        // The stock complete profile uses this composed provider independently of the historical optional extractor provider.
+        facts.put("runtime.serverDataTools.packaged", String.valueOf(BuildConfig.SERVER_DATA_TOOLS_PACKAGED));
+        facts.put("runtime.serverDataTools.prepared", "false");
+        if (BuildConfig.SERVER_DATA_TOOLS_PACKAGED) {
+            try {
+                ServerDataToolsSetup tools = new ServerDataToolsSetup(this, root);
+                tools.requireServerRuntimeArchive(new ServerRuntimeSetup(this, root).archiveSha256());
+                facts.put("runtime.serverDataTools.archiveSha256", tools.archiveSha256());
+                facts.put("runtime.serverDataTools.sourcePinSha256", BuildConfig.SERVER_DATA_TOOLS_PIN);
+                facts.put("runtime.serverDataTools.expectedGeneration", tools.packagePlan().generation);
+                facts.put("runtime.serverDataTools.prepared", String.valueOf(tools.current() != null));
+            } catch (IOException error) { facts.put("runtime.serverDataTools.installationError", error.getMessage()); }
         }
         facts.put("runtime.guestBridges.packaged", String.valueOf(BuildConfig.GUEST_BRIDGES_PACKAGED));
         facts.put("runtime.guestBridges.prepared", "false");
