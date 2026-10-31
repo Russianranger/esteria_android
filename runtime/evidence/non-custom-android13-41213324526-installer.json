@@ -1,0 +1,51 @@
+{
+  "formatVersion": 1,
+  "scope": "android-13-x86_64-installer-and-apk-update",
+  "emulatorProperties": {
+    "ro.kernel.qemu": "1",
+    "ro.build.version.sdk": "33",
+    "ro.product.cpu.abi": "x86_64",
+    "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys"
+  },
+  "artifacts": {
+    "initialApk": {
+      "bytes": 839386,
+      "sha256": "03e072ba2646ee612e567a1573a185f42e309533f23984a8292cabe4ffdd06f2"
+    },
+    "updateApk": {
+      "bytes": 839394,
+      "sha256": "3931ee9bfba16f996d6c58e890281058c97e6b6cc0b0af33312fc50f0e6b355d"
+    },
+    "testApk": {
+      "bytes": 1804597,
+      "sha256": "d900a5ec7c101f980fe6a5591787c4f09b06a518527c758df766a07cfebc066f"
+    }
+  },
+  "runtimeContractGroups": 19,
+  "databaseHelperAssetContractGroups": 6,
+  "databaseHelperAssetsQualified": true,
+  "schemaHelperAssetContractGroups": 3,
+  "schemaHelperAssetsQualified": true,
+  "schemaSqlExecuted": false,
+  "installationHelperAssetFiles": 18,
+  "installationHelperAssetsQualified": true,
+  "installationSetupExecuted": false,
+  "dataHelperAssetFiles": 5,
+  "dataHelperAssetsQualified": true,
+  "dataPreparationExecuted": false,
+  "sessionHelperAssetFiles": 23,
+  "sessionHelperAssetsQualified": true,
+  "privateDataMetadataBindingQualified": true,
+  "authWorldSessionExecuted": false,
+  "databaseServiceExecuted": false,
+  "runtimeFilesystemQualified": true,
+  "sameJobDebugKeyUpdatePreservedRuntimeAndSentinel": true,
+  "privateLocalLoginHandoffFilesystemQualified": true,
+  "clientLoginExecuted": false,
+  "handoffHardLinkCreationPermitted": false,
+  "handoffMultiLinkNegativeExecuted": false,
+  "userSigningIdentityQualified": false,
+  "arm64GuestExecuted": false,
+  "gameplayQualified": false,
+  "completedAtUnix": 1793459485
+}

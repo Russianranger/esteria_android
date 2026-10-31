@@ -16,10 +16,10 @@ python3 tools/export_apk_signature.py export \
 cp /absolute/path/signed/signing-receipt.json runtime/releases/non-custom/signing-receipt.json
 ```
 
-The exporter permits only the original file prefix, at most 4095 all-zero
-alignment bytes emitted by `apksigner`, the bounded public v2/v3 signing block,
-the unchanged central directory, and the canonical EOCD central-directory offset
-patch. Both complete APK byte lengths and SHA-256 hashes are pinned. Reapplying
+The exporter preserves the original file prefix and central directory except
+canonical SDK ZIP alignment fields and their derived header offsets (format2,
+explained below). It also permits at most4095 all-zero page-alignment bytes,
+the bounded public v2/v3 signing block and the canonical EOCD offset patch. Both complete APK byte lengths and SHA-256 hashes are pinned. Reapplying
 the recipe must reconstruct the exact already-signed bytes; arbitrary replacement
 bytes, changed payloads, nonzero padding and existing output files are refused.
 
@@ -101,3 +101,13 @@ Later signed updates must increase versionCode (at least 2 after this release)
 and supply the exact previous published stock APK to the signer. Do not use
 `--initial-baseline` again. The persistent certificate and package stay the same;
 the update ledger does not rewrite historical signing or build evidence.
+
+The actual Gradle-built APK needs transport format2: apksigner adds canonical
+Android ZIP alignment fields (`0xd935`, alignment4) to stored entries and adjusts
+the central-directory local-header offsets. The recipe lists affected source
+entry names only. The tool derives the field bytes and offsets from the exact
+unsigned APK, preserves every other prefix/CD byte and all compressed payload
+bytes, and then inserts the public signing block and zero page alignment. The
+reconstructed complete signed SHA-256, original payload comparison and actual
+SDK signature/certificate verification remain mandatory. No arbitrary ZIP
+replacement bytes or private material are included in the recipe.

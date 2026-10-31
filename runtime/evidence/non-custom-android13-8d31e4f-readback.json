@@ -1,0 +1,242 @@
+{
+  "actualAndroid13X64ComponentsExecuted": true,
+  "actualClientExecution": false,
+  "actualShaderCompilation": false,
+  "actualShaderRendering": false,
+  "actualSqlExecuted": false,
+  "actualWorldEntry": false,
+  "androidArm64Qualified": false,
+  "apkHashEvidence": "Computed by CI before actual installation. APK payload bytes not present in this bounded evidence artifact and not read back locally.",
+  "apkIdentities": {
+    "initialApk": {
+      "bytes": 839386,
+      "sha256": "03e072ba2646ee612e567a1573a185f42e309533f23984a8292cabe4ffdd06f2"
+    },
+    "testApk": {
+      "bytes": 1804597,
+      "sha256": "d900a5ec7c101f980fe6a5591787c4f09b06a518527c758df766a07cfebc066f"
+    },
+    "updateApk": {
+      "bytes": 839394,
+      "sha256": "3931ee9bfba16f996d6c58e890281058c97e6b6cc0b0af33312fc50f0e6b355d"
+    }
+  },
+  "appSourceRevision": "8d31e4fa832cd8ef0f738d36088fb9e64ae3aa41",
+  "archiveFiles": {
+    "actualBundledHelpersInstallAndRepeatWithoutRewriting.log": {
+      "bytes": 865,
+      "sha256": "733222956320ec2c54cb3cd484e0c7d4ee7b044a3ab7f41f9c67b5137569c973"
+    },
+    "changedExistingHelperIsPreservedAndRefused.log": {
+      "bytes": 845,
+      "sha256": "408569af59f569e2039dbb637051a1ec9b8550264c263476591ebe8b68160ff5"
+    },
+    "completeDataHelperClosureInstallsAndReusesExactBytes.log": {
+      "bytes": 849,
+      "sha256": "1eb05e554784d1b28ad44702f678725c998437b75fbce6cb533c21d9eb408126"
+    },
+    "completeInstallationHelperClosureInstallsAndReusesExactBytes.log": {
+      "bytes": 890,
+      "sha256": "7d708900877a10e52114345b52f9bcd06be172c8024fa1a499d89adb1cd7f6b6"
+    },
+    "completeSessionHelperClosureInstallsAndReusesExactBytes.log": {
+      "bytes": 865,
+      "sha256": "ddc4fe0a52ed3d5f1ebafb2caae573eb45f937ee24399b21d8fbc07366750372"
+    },
+    "expectedHelperSymlinkNeverReplacesOrWritesItsTarget.log": {
+      "bytes": 862,
+      "sha256": "fbe5da41ebd42c693750f52ad62f2386018d1c1441883e98c5c8b0612467aee2"
+    },
+    "extraModulesNativeExtensionsAndCachesCannotEnterImportPath.log": {
+      "bytes": 877,
+      "sha256": "41af71560f6d98e13e7ac237511066f3e4f1a9ef7dc3e1475049bd65689aebeb"
+    },
+    "install-initial.log": {
+      "bytes": 36,
+      "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+    },
+    "install-tests.log": {
+      "bytes": 36,
+      "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+    },
+    "install-update-preserving-data.log": {
+      "bytes": 36,
+      "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+    },
+    "linkedResourceDirectoryIsPreservedAndRefused.log": {
+      "bytes": 840,
+      "sha256": "81957d6134a4ab0bd8af9f6d212c42a70faec8ed84fa3a1f8f7e10f5f3e8fea3"
+    },
+    "nestedOriginalSourcesInstallAndResumeWithoutRewriting.log": {
+      "bytes": 856,
+      "sha256": "b0401a0fc5d883502f00edfe0c7115299692085a1bb9e24d6b3e1e1daa896b87"
+    },
+    "partialGenerationResumesAndRetainsHarmlessInterruptedWrite.log": {
+      "bytes": 876,
+      "sha256": "c52b7b8125b253cccedf84eaded5966886c5527327e60c66b3906de1077d1a17"
+    },
+    "preexisting-package.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "privateDataMetadataBindingRejectsChangedAncestryAndQualificationClaims.log": {
+      "bytes": 894,
+      "sha256": "1fd8e048871ac495a21dd7155c5db473529ed2f8261cfb5cc4b49eb0ddde2e2d"
+    },
+    "privateLocalLoginHandoffContracts.log": {
+      "bytes": 988,
+      "sha256": "78bfcae9b7609adcc043d2ff46e505776674a686c9407d41f062d2265070f23b"
+    },
+    "qualification.json": {
+      "bytes": 1787,
+      "sha256": "5f3070aa13acb5a455083f5c93d2399030b8b84daac3e496c11eb7c44f54b37d"
+    },
+    "ro.build.fingerprint.log": {
+      "bytes": 81,
+      "sha256": "74f45a5b5c9c2e0e9fe31b30e7fecac3d7eed0ec13131a36513c9da0e27ee79d"
+    },
+    "ro.build.version.sdk.log": {
+      "bytes": 3,
+      "sha256": "19b8d5c59e421f037fe563007c7254eb8d98bc221b278c3db3e5fdbbfd52e273"
+    },
+    "ro.kernel.qemu.log": {
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    "ro.product.cpu.abi.log": {
+      "bytes": 7,
+      "sha256": "aaf631698ae5160ceb04a97681a14887fdcab47cd6e0f163c87485b3b1340b62"
+    },
+    "runtimeContracts.log": {
+      "bytes": 949,
+      "sha256": "65898d397d85a0acb600cb6ce510454a227be437aaf380878082cf70d5de0fee"
+    },
+    "seedBeforeUpdate.log": {
+      "bytes": 862,
+      "sha256": "91a698200887f400c1e4b077ee1b2322e428275006c0eab54857b83b6235667d"
+    },
+    "serial.log": {
+      "bytes": 14,
+      "sha256": "0115c661660f4cd9f62719a1c0f968c833c3295da9713cc8b6d915f739be272e"
+    },
+    "stock-shader-component.json": {
+      "bytes": 2870,
+      "sha256": "1d2ee67356400614e6a29bc7316a499d7e1ec9d6dc8a1a3ed2b5e4b6d327de92"
+    },
+    "stock-shader-component.log": {
+      "bytes": 1522,
+      "sha256": "c3ae8485a94a86fa2981aa2a0af78388f2c7bd9d14e1594c39123f463817e0cd"
+    },
+    "temporarySymlinkDoesNotBypassClosure.log": {
+      "bytes": 833,
+      "sha256": "29ce85b370b25c3c3762748d809372203a0e9d6fefe4f81f76123d2c4807d488"
+    },
+    "unexpectedNestedModuleIsPreservedAndRefused.log": {
+      "bytes": 838,
+      "sha256": "0f3f53cda08288597325f7f2595fc7f7860723ad6e57b3b52b69bec8ff50a466"
+    },
+    "verifyAfterUpdate.log": {
+      "bytes": 863,
+      "sha256": "92b1b252f9b15c0ffa451a0c78f019cf0f45201af30846649cfbc2262b836c36"
+    }
+  },
+  "archiveFullyReadLocally": true,
+  "archiveGitHubDigestMatched": true,
+  "artifact": {
+    "bytes": 11415,
+    "id": 13047332325,
+    "name": "android-13-installer-evidence-8d31e4fa832cd8ef0f738d36088fb9e64ae3aa41",
+    "sha256": "1ad258a897a8e3b8165ad9245bf74900a74a7dd2a14b87b8efe56e2b90e1d073"
+  },
+  "componentLogResult": "OK (2 tests); INSTRUMENTATION_CODE: -1",
+  "componentSourceReadback": {
+    "app/src/androidTest/java/io/github/russianranger/esteria/runtime/ServerSessionAssetsTest.java": {
+      "expected": {
+        "bytes": 8709,
+        "sha256": "72730433a734811c8e6b9c1f43bc0f25ec29aafffbf669c688ca7483f3331581"
+      },
+      "matches": true,
+      "observed": {
+        "bytes": 8709,
+        "sha256": "72730433a734811c8e6b9c1f43bc0f25ec29aafffbf669c688ca7483f3331581"
+      }
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/runtime/ShaderSetupReceiptTest.java": {
+      "expected": {
+        "bytes": 8021,
+        "sha256": "d52f3fa01e48ae9a7b2061c32352d82c6b0812973d07c7c4973465b27e545282"
+      },
+      "matches": true,
+      "observed": {
+        "bytes": 8021,
+        "sha256": "d52f3fa01e48ae9a7b2061c32352d82c6b0812973d07c7c4973465b27e545282"
+      }
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ShaderSetup.java": {
+      "expected": {
+        "bytes": 23942,
+        "sha256": "e86d74401585bb866c6d54c6c97923c484457353080274fff2323721a0c4cefc"
+      },
+      "matches": true,
+      "observed": {
+        "bytes": 23942,
+        "sha256": "e86d74401585bb866c6d54c6c97923c484457353080274fff2323721a0c4cefc"
+      }
+    },
+    "app/src/main/java/io/github/russianranger/esteria/runtime/StockClientSetup.java": {
+      "expected": {
+        "bytes": 17265,
+        "sha256": "b499e7713f22e5b947eed5091a71ed1927c8faed2c0cb2c959f8cab245dd4227"
+      },
+      "matches": true,
+      "observed": {
+        "bytes": 17265,
+        "sha256": "b499e7713f22e5b947eed5091a71ed1927c8faed2c0cb2c959f8cab245dd4227"
+      }
+    },
+    "app/stock-client.gradle": {
+      "expected": {
+        "bytes": 1391,
+        "sha256": "b99204c97d6491a1bf1c80147a1fcf1e21cf762a9272fc02fe95ad054cdb286d"
+      },
+      "matches": true,
+      "observed": {
+        "bytes": 1391,
+        "sha256": "b99204c97d6491a1bf1c80147a1fcf1e21cf762a9272fc02fe95ad054cdb286d"
+      }
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/ShaderRunPlan.java": {
+      "expected": {
+        "bytes": 7297,
+        "sha256": "a5fab51efce27298157d0e411076d77bac37fcc4e1f462798fda254234c2bff0"
+      },
+      "matches": true,
+      "observed": {
+        "bytes": 7297,
+        "sha256": "a5fab51efce27298157d0e411076d77bac37fcc4e1f462798fda254234c2bff0"
+      }
+    },
+    "runtime/stock_shader_generation.py": {
+      "expected": {
+        "bytes": 5738,
+        "sha256": "c97814479a0f13274af9924d309ddc4b5d3c94ec4f8873bc0e92f828e2a7eef4"
+      },
+      "matches": true,
+      "observed": {
+        "bytes": 5738,
+        "sha256": "c97814479a0f13274af9924d309ddc4b5d3c94ec4f8873bc0e92f828e2a7eef4"
+      }
+    }
+  },
+  "componentTestsPassed": 2,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "installerRuntimeContractGroups": 19,
+  "job": 124572645724,
+  "run": 41213324526,
+  "runConclusion": "success",
+  "scope": "bounded-android13-x64-component-artifact-and-source-readback",
+  "stockHelperAssetsQualified": true,
+  "syntheticShaderReceiptGuardsQualified": true,
+  "thorQualified": false
+}

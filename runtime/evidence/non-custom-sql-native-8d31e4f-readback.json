@@ -1,0 +1,94 @@
+{
+  "formatVersion": 1,
+  "scope": "complete-bounded-artifact-readback-final-native-arm64-stock-sql",
+  "integrationRevision": "8d31e4fa832cd8ef0f738d36088fb9e64ae3aa41",
+  "applicationIdFromSource": "io.github.russianranger.esteria.stock",
+  "applicationIdRuntimeExecuted": false,
+  "workflowRun": 41213324577,
+  "job": 124572646075,
+  "artifact": {
+    "id": 13047427052,
+    "name": "server-installation-native-evidence-8d31e4fa832cd8ef0f738d36088fb9e64ae3aa41",
+    "bytes": 12654,
+    "sha256": "f3072b9ea090b0d25507f440ef166ce6424fac3d81c666beb433e5031177e30d",
+    "workflowRun": 41213324577,
+    "integrationRevision": "8d31e4fa832cd8ef0f738d36088fb9e64ae3aa41"
+  },
+  "allArtifactBytesAndMembersRead": true,
+  "allEnvironmentFileIdentitiesVerified": true,
+  "proofIdentity": {
+    "bytes": 36481,
+    "sha256": "cde09cc3210fee4f401ef04a98a2d873b2690901b294a834882e40a55aabe9b9"
+  },
+  "environmentIdentity": {
+    "bytes": 1943,
+    "sha256": "f84f57b15c60ae8e031f355f37dc42c0bc321adf99d2837ff249da509f600890"
+  },
+  "stockWorldSql": {
+    "actualFileDbcRowsLoaded": false,
+    "contentProfile": "stock-3.3.5a",
+    "gameplayQualified": false,
+    "humanWarriorNorthshireStartVerified": true,
+    "stockRaceClassMapOutfitSqlOverlaysEmpty": true,
+    "worldStartupExecuted": false
+  },
+  "verifiedTrueFlags": [
+    "qualificationSucceeded",
+    "initializedNewInstance",
+    "productionCoreCompositionCompleted",
+    "productionFinishPlayerbotsExecuted",
+    "nestedDataDirectoryConfigurationVerified",
+    "completedFinishReentryWithoutExecution",
+    "restartPersistenceVerified",
+    "restartedFinishReentryWithoutExecution",
+    "productionReadyAndStoppedAcknowledgmentsVerified",
+    "sourcePrivateJournalsAccountCredentialsPreserved",
+    "nativeSqlSetupReceiptVerified",
+    "cleanShutdownVerified"
+  ],
+  "unqualifiedFlags": [
+    "androidRuntimeQualified",
+    "authserverExecuted",
+    "worldserverExecuted",
+    "gameplayQualified",
+    "serverDataQualified",
+    "slotPromoted",
+    "playerbotsAiQualified",
+    "botCharactersCreated",
+    "javaCoordinatorExecuted"
+  ],
+  "selectedWorldUpdateCount": 3070,
+  "excludedWorldUpdateCount": 270,
+  "sourceLockSha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1",
+  "selectedSourcePathsSha256": "9a0fae2c2da7cf5695ad1a6bd0d62088c1d19fae30089d9b3450d7896c10919b",
+  "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
+  "clientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "serverAdaptations": 7,
+  "schemas": {
+    "auth": {
+      "tableCount": 23,
+      "sourceUpdateNamesVerified": 25
+    },
+    "characters": {
+      "tableCount": 176,
+      "sourceUpdateNamesVerified": 105
+    },
+    "world": {
+      "tableCount": 360,
+      "sourceUpdateNamesVerified": 3070
+    }
+  },
+  "playerbots": {
+    "tableCount": 30,
+    "updateCount": 31
+  },
+  "sameMysqlUuidAcrossRestart": true,
+  "cleanCommandStopsVerified": 2,
+  "productionSelectionMatches7001Proof": true,
+  "liveSqlSnapshotsMatch7001Proof": true,
+  "actualClientDataAvailable": false,
+  "actualFileDbcRowsLoaded": false,
+  "actualWorldStartupExecuted": false,
+  "actualGameSessionExecuted": false,
+  "previousFailureAndSuccessReceiptsRetained": true
+}
