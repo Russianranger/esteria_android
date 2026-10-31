@@ -24,10 +24,10 @@ qualify Android ARM64, Adreno or Thor. Docker is for development only.
 | --- | --- | --- |
 | Client development | c8 ordinary41131932778 allfive jobs pass. ceb complete Retail-ON41127220146 ARM64/x64 pass; exact source/descriptor readback retained. | App stays471; normal asset-backed initialization untested. |
 | Matched authentication |41088546780:471/c0e/seven-patch Grunt/SRP,13 checks, persisted session key, loopback realm, clean shutdown. | Synthetic entry/transport, no normal Glue/world. |
-| Qualified runtime APK |41132701776@84fa:337,031,390B SHA578546cdef502c8397255072e9f90f4cc73713977930a7149d32cb90278da1a2.122tasks/138s; full CI payload validation. Independent1058 integration/30PRoot files and15ARM64 relink objects checked. | Current APK payload read in CI; no full session/signing claim. |
+| Qualified runtime APK |41148040843@651:337,032,998B SHA187e07c2bd654005de47775adc01b7c91f42e300b87601b4dec5c26b5b5f2b22.122tasks/140s; full CI provider/helper/native validation. Independent1114 integration/30PRoot source files and15ARM64 relink objects checked. | Debug build; whole current APK read in CI, no signing/full-session claim. |
 | Independent full APK bytes |41129893343@7c attempt2:337,019,318B SHA68c55d9ef700e73c39ba62caac818a7072be70bc86846b3e3de05735aaf843b0. All127APK entries/eight provider archives/10,743 entries/1,196,665,936 regular bytes read. | Same provider/helper cohort as84fa; current whole APK identity differs. |
 | Public server preservation |41117618335:12assets/1,783,413,529B, complete source/debug and anonymous readback. Release429422570 at recipe7e498c50cdf55027e679d63e31f0a5e4b117f934. | GitHub immutable=false; pins/no replacement enforced. |
-| Native ARM64 Java coordinator |41132702177@84fa: actual four schemas, promotion, active reseed refusal, two clean stops, same UUID/restart;30bot tables/31updates.62exact Git inputs/191classes checked. | Linux payload-locator seam; no Android/world/character-save/bot-AI claim. |
+| Native ARM64 Java coordinator |41148040872@651: actual four schemas, promotion, active reseed refusal, two clean stops, same UUID/restart;30bot tables/31updates.63exact Git inputs/192classes checked; real parser regression runs before SQL. | Linux payload-locator seam; no Android/world/character-save/bot-AI claim. |
 | Native x64 SQL |41139757153@7d4: actual original dbimport/52-statement helper,29base files/31updates,30bot tables, reentry, four-schema preservation, restart and clean stop pass in245s.58caller Git inputs/eight source-profile pins checked. | Native Linux x64; Android/world/AI remain false. |
 | Android13x64 MySQL |41109642918@4fd bootstrap/service lifecycle; fresh817 run41119182193 also passes. | Distinct runtime bytes; current code inherits no historical Java proof. |
 | Android recovery |41129893390@7c five handoff deaths;41132701736@84fa adds actual generic lease death/reacquisition. | Component-only; source/APK readbacks separate from full app restart. |
@@ -95,7 +95,10 @@ qualify exclusive cache publication or ARM64 semantics.
    for a fresh Android SQL/promotion/restart run. Original native SQL/ELF/runtime
    bytes are unchanged. Preserve995/c441 failures and historicalfff proof; no
    Android four-schema success is established yet. Native ARM64 Java651 is also
-   rerunning actual SQL and restart; complete ARM64 APK651 is building.
+   passes actual SQL and restart, including the new parser regression. Complete
+   ARM64 debug APK651 also passes. The workflow now builds/verifies a separate
+   non-debuggable release with the same providers for later stable-key signing;
+   its complete release CI result remains pending.
 3. Preserve actual Android input-widget41138732113 success and its prior test-
    toolbar failure. Physical controller/kernel input, Wine and gameplay remain
    separate gates.

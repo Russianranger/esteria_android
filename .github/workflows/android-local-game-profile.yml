@@ -1,6 +1,12 @@
 name: Complete local-game provider profile ARM64 packaging qualification
 on:
   workflow_dispatch:
+    inputs:
+      build_version_code:
+        description: Positive release versionCode, increased before a signed update
+        required: false
+        default: '1'
+        type: string
   push:
     branches: [android/client-server]
     paths:
@@ -16,6 +22,7 @@ on:
       - 'runtime/shaders/android-provider.lock.json'
       - 'runtime/wine-cohort-publication/published-release.json'
       - 'tools/verify_wine_cohort_apk.py'
+      - 'tools/sign_android_apk.py'
       - 'tools/plan_wine_cohort_adoption.py'
       - 'tests/test_wine_cohort_apk.py'
       - 'runtime/server/programs-playerbots-provider.lock.json'
@@ -89,6 +96,8 @@ jobs:
     if: needs.selection.outputs.selected == 'true' && github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
     runs-on: ubuntu-24.04
     timeout-minutes: 90
+    env:
+      RELEASE_VERSION_CODE: ${{ inputs.build_version_code || '1' }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -392,6 +401,96 @@ jobs:
             ${{ runner.temp }}/proot-build/proot-corresponding-source.tar.gz
             ${{ runner.temp }}/coherent-integration-source.tar.gz
             ${{ runner.temp }}/proot-build/build-evidence.json
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+      - name: Build and lint an unsigned release from the same complete provider profile
+        run: |
+          set -o pipefail
+          python3 - <<'PY'
+          import os,re
+          from tools import sign_android_apk as signing
+          value=os.environ['RELEASE_VERSION_CODE']
+          assert re.fullmatch('[1-9][0-9]{0,9}',value), 'release-version-code-format'
+          signing.version(int(value))
+          PY
+          env -u ESTERIA_KEYSTORE_PATH -u ESTERIA_KEYSTORE_PASSWORD -u ESTERIA_KEY_ALIAS -u ESTERIA_KEY_PASSWORD \
+            ./gradlew --no-daemon :app:assembleRelease :app:lintRelease \
+            -PbuildVersionCode="$RELEASE_VERSION_CODE" \
+            -PsourceRevision="${GITHUB_SHA}" -PnativeRuntimeBridge=true -PnativeBridgeAbi=arm64-v8a \
+            -PprootProviderDir="$RUNNER_TEMP/proot-build/provider" \
+            -PserverRuntimeProviderDir="$RUNNER_TEMP/server-provider" \
+            -PguestBridgeProviderDir="$RUNNER_TEMP/cohort-providers/bridge-provider" \
+            -PclientRuntimeProviderDir="$RUNNER_TEMP/cohort-providers/client-provider" \
+            -PshaderToolsProviderDir="$RUNNER_TEMP/cohort-providers/shader-provider-verified" \
+            -PturnipProviderDir="$RUNNER_TEMP/cohort-providers/turnip-provider" \
+            -PserverProgramsProfile=playerbots-schema-helper \
+            -PserverProgramsProviderDir="$SERVER_HELPER_PROGRAMS_PROVIDER" \
+            -PserverDataToolsProviderDir="$SERVER_DATA_TOOLS_PROVIDER" \
+            -PserverContentProviderDir="$SERVER_STOCK_PROVIDERS/content" \
+            -PclientRuntimeArtifact="$RUNNER_TEMP/cohort-inputs/release/client-original.zip" \
+            -PclientRuntimeSource="$GITHUB_WORKSPACE/sources/client" 2>&1 | tee out/coherent-logs/gradle-release.log
+      - name: Verify release provider bytes and nondebug unsigned APK identity without a key
+        id: release_verified
+        run: |
+          mkdir -p out/coherent-release-evidence
+          python3 tools/verify_wine_cohort_apk.py \
+            --apk app/build/outputs/apk/release/app-release-unsigned.apk \
+            --cohort-release "$RUNNER_TEMP/cohort-inputs/release" \
+            --release-lock runtime/wine-cohort-publication/dependency-release.lock.json \
+            --packaging-source "$GITHUB_WORKSPACE/source-packaging" \
+            --proot-provider "$RUNNER_TEMP/proot-build/provider" \
+            --proot-sources "$RUNNER_TEMP/proot-build/proot-corresponding-source.tar.gz" \
+            --ndk-archive "$RUNNER_TEMP/android-ndk-r28c-linux.zip" \
+            --server-providers "$SERVER_STOCK_PROVIDERS" --dependency-provider "$RUNNER_TEMP/server-provider" \
+            --server-profile local-game \
+            --playerbots-programs-provider "$SERVER_HELPER_PROGRAMS_PROVIDER" \
+            --data-tools-provider "$SERVER_DATA_TOOLS_PROVIDER" \
+            --output out/coherent-release-evidence/coherent-release-apk.json
+          python3 - <<'PY'
+          import json,os,re,zipfile
+          from pathlib import Path
+          from tools import sign_android_apk as signing
+          apk=Path('app/build/outputs/apk/release/app-release-unsigned.apk')
+          tools=signing.sdk_tools(Path(os.environ['ANDROID_HOME'])/'build-tools/35.0.0')
+          manifest=signing.manifest(apk,tools,signing.version(int(os.environ['RELEASE_VERSION_CODE'])))
+          assert manifest['debuggable'] is False, 'release-apk-must-not-be-debuggable'
+          with zipfile.ZipFile(apk) as archive:
+              assert not any(re.fullmatch(r'META-INF/[^/]+\.(SF|RSA|DSA|EC)',name,re.I)
+                  for name in archive.namelist()), 'release-apk-has-v1-signature'
+              central=archive.start_dir
+          with apk.open('rb') as stream:
+              stream.seek(max(0,central-16))
+              assert stream.read(16)!=b'APK Sig Block 42', 'release-apk-has-signing-block'
+          target=Path('out/coherent-release-evidence')
+          (target/'release-manifest.json').write_text(json.dumps(manifest,sort_keys=True,indent=2)+'\n')
+          cohort=json.loads((target/'coherent-release-apk.json').read_bytes())
+          assert cohort['completeAssetInventoryVerified'] is True and cohort['exactCurrentHelperClosureVerified'] is True
+          assert cohort['serverProfile']=='local-game' and cohort['deviceTestCandidate'] is False
+          identity=dict(bytes=apk.stat().st_size,sha256=signing.digest(apk))
+          assert identity==cohort['apk'], 'release-apk-byte-verifier-identity-differs'
+          proof=dict(formatVersion=1,scope='unsigned-nondebug-local-game-profile-release-packaging-only',
+              integrationRevision=os.environ['GITHUB_SHA'],apk=identity,manifest=manifest,
+              completeProviderAndSourceBytesVerified=True,unsignedSignatureStructureVerified=True,
+              debugReferenceArtifactRetainedSeparately=True,sourceAndPairedDebugCompanionsRetainedSeparately=True,
+              privateSigningPerformed=False,persistentSigningQualified=False,releaseInstallationQualified=False,
+              androidExecutionQualified=False,hardwareQualified=False,commonMainQualified=False,
+              gameLoginQualified=False,localWorldReadinessQualified=False,playerbotsAiQualified=False,
+              gameplayQualified=False,deviceTestCandidate=False)
+          (target/'unsigned-release-package.json').write_text(json.dumps(proof,sort_keys=True,indent=2)+'\n')
+          assert {path.name for path in target.iterdir()}=={
+              'coherent-release-apk.json','release-manifest.json','unsigned-release-package.json'}
+          assert all(path.is_file() and path.stat().st_size<=2<<20 for path in target.iterdir())
+          assert apk.stat().st_size+sum(path.stat().st_size for path in target.iterdir())<500_000_000, 'release-apk-and-evidence-must-fit-bounded-artifact'
+          PY
+      - name: Retain the separately verified unsigned release APK and bounded release proof
+        if: steps.release_verified.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: unsigned-local-game-profile-release-arm64-${{ github.sha }}
+          path: |
+            app/build/outputs/apk/release/app-release-unsigned.apk
+            out/coherent-release-evidence/
           compression-level: 0
           retention-days: 30
           if-no-files-found: error

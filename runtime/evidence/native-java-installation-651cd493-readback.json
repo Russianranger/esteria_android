@@ -1,0 +1,281 @@
+{
+  "actualQualification": {
+    "activeFreshInitializationRefused": true,
+    "activeSlotId": "f73a6de07bb84aee",
+    "actualCoreAccountRealmAndBotSqlPreserved": true,
+    "actualSqlExecuted": true,
+    "androidApiExecuted": false,
+    "androidBionicProotLocatorExecuted": false,
+    "androidRuntimeQualified": false,
+    "authserverExecuted": false,
+    "characterPersistenceQualified": false,
+    "completeReceiptSha256": "9897b105110e182b7dbbbec5f69d59a7949ebd5db1e85532c6b280414d6744ea",
+    "completedSelectionReadBack": true,
+    "contentReceiptSha256": "1c00990e090e85af0232fe633b64e2718071a5f8e81f3b0ca1c8f2b214ffb3af",
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "integrationRevision": "651cd493c1dee9436c6fc98da0d6b4485ff19900",
+    "javaCoordinatorExecuted": true,
+    "mysqlUuid": "38c9836d-d4bf-11f1-a5fa-a988acc5d6e3",
+    "mysqlVersion": "8.0.46-0ubuntu0.24.04.4",
+    "phase": "complete",
+    "playerbotsAiQualified": false,
+    "playerbotsTableCount": 30,
+    "playerbotsUpdateCount": 31,
+    "privateJournalsAndCredentialsPreserved": true,
+    "productionProotProcessExecuted": true,
+    "programsArchiveSha256": "963a23c1390440260b85ffe164b2d7508c56b005b315dce8a919ae443a46d1bf",
+    "promotionProofSha256": "d56942b4c3f50b5c7f46fb6ee971ccc209e0f15ae6c62142c2935e98e4bbd233",
+    "qualificationSucceeded": true,
+    "restartedSameLiveSqlUuid": true,
+    "runtimeArchiveSha256": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5",
+    "scope": "native-arm64-java-owned-installation-promotion-and-restart",
+    "serverDataQualified": false,
+    "slotPromoted": true,
+    "sourceLockSha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1",
+    "sqlExecutionAttempted": true,
+    "twoCleanDatabaseStopsVerified": true,
+    "worldserverExecuted": false
+  },
+  "allArtifactMembersReadWithCrcAndSha256": true,
+  "androidApiExecuted": false,
+  "androidRuntimeQualified": false,
+  "artifact": {
+    "bytes": 48639,
+    "id": 13021838491,
+    "name": "native-java-installation-evidence-651cd493c1dee9436c6fc98da0d6b4485ff19900",
+    "sha256": "8952e213afdb3d71602b3d5829ed802dfc4a83e66f95a6a3cabc182442f676b9"
+  },
+  "changedOrAddedCompiledInputsFrom84fa": {
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerSourceSelection.java": {
+      "bytes": 4167,
+      "sha256": "a657e6318574b030619005e384ef5b79f5c9df640a9f153f42f13b7709f194ea"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ClientLaunchView.java": {
+      "bytes": 26210,
+      "sha256": "a7aea548e92bb85c48e59b4d440cf4db6d48bf29b7e3f0ad27d5664f21cb6ccf"
+    },
+    "tests/native-java-installation/src/io/github/russianranger/esteria/runtime/NativeJavaInstallation.java": {
+      "bytes": 16415,
+      "sha256": "8a7bd277b14c1cf889fd155986288dc6996561365a356c1af35d7dc9c94b616a"
+    },
+    "tests/native-java-installation/src/io/github/russianranger/esteria/runtime/ServerSourceSelectionNumbers.java": {
+      "bytes": 2643,
+      "sha256": "2eaddb6350b031e130b774590173de2b03e1e964d3f1f09cdb69ab2fcde3d774"
+    }
+  },
+  "characterPersistenceQualified": false,
+  "classBytesIncludedInThisArtifact": false,
+  "clientLocaleConsumptionQualified": false,
+  "compiledClassClosureCount": 192,
+  "compiledClassMetadataMapSha256": "0147d0550b127fe776ed44ab6ba8c5c9fa6d2fe121163a6000130730288aab79",
+  "compiledClosureReadBackBeforeExecutionInCi": true,
+  "compiledInputMapSha256": "011aa9ee9e32abeed6cd25a213b7fcf3823e07138333af087468f551ba08a157",
+  "compiledProjectInputCount": 63,
+  "dependencyImageCheck": {
+    "actualImageMetadataAndElfHashesVerified": true,
+    "androidRuntimeQualified": false,
+    "components": {
+      "mysql": {
+        "bytes": 6912024,
+        "elfMachine": 183,
+        "sha256": "f0acfeacf8fc03a4e0b4a8af00dac7422e3f01deeeb4b6d7ffca10662fc4e39e"
+      },
+      "mysqld": {
+        "bytes": 54196328,
+        "elfMachine": 183,
+        "sha256": "3bc577a5948c24ee6bf5341575ec365e12b80530ffc665e6f3300ce9b4938d75"
+      },
+      "python3": {
+        "bytes": 7845048,
+        "elfMachine": 183,
+        "sha256": "c86f21d0da9290ece2d7d49a3f7ed52aed59cb029abdf0ea25c79634f6cbe960"
+      }
+    },
+    "contextReceipt": {
+      "bytes": 2187,
+      "sha256": "2d46f7fc1f0a406527aae025cd20d8991767e1367aab122acbe1f4bf6adc604d"
+    },
+    "databaseInitialized": false,
+    "esteriaServerExecuted": false,
+    "expectedMysqlSqlVersion": "8.0.46-0ubuntu0.24.04.4",
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "mysqlServerExecuted": false,
+    "nativePythonExecuted": true,
+    "runtimeArchive": {
+      "bytes": 112374096,
+      "file": "server-runtime-arm64.tar.gz",
+      "sha256": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5"
+    },
+    "runtimeMetadata": {
+      "bytes": 34299,
+      "sha256": "3aa480f48fd36cea1253557976163dc2da0707eef72dbef18d028196888b05b1"
+    },
+    "scope": "native-arm64-dependency-image-readback",
+    "sourceCompanion": {
+      "bytes": 954236077,
+      "sha256": "b09599218a1a62a8e131eeedc47f6c8c19e2d39936d4e0aed7261e365f409bc1"
+    }
+  },
+  "environmentInventoryMatchesAllOtherMembers": true,
+  "environmentScope": "native-java-installation-qualification-environment",
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "linuxPayloadLocatorReplacesAndroidApkLocator": true,
+  "linuxProotOwnershipSummary": {
+    "androidBridgeExecuted": false,
+    "androidRuntimeQualified": false,
+    "baseline": {
+      "detachedSessionLeaders": 2,
+      "terminatedAfterTracerKill": 0,
+      "tracees": 3
+    },
+    "baselineProotSha256": "15a4877538d8024741a3a9b4205f559138d6085040540556ddab268b4c6e9dc3",
+    "fixed": {
+      "detachedSessionLeaders": 2,
+      "terminatedAfterTracerKill": 3,
+      "tracees": 3
+    },
+    "linuxTracerDeathOwnershipQualified": true,
+    "loaderSha256": "ac2009081fc0ccc6b3629e38738a562257335f7be560fd49f4388f43febe5615",
+    "machine": "aarch64",
+    "normalTreeExit": 0,
+    "ownedProotSha256": "cb539415b7740a44ce44f96505caa5fee19a9fc19762152fa9ee3c71136ab7fe",
+    "ownershipPatchSha256": "509160bd6ec3663d525fa0e795a7bb45b8ccc283a6de8e1398e8cd6624fe86de",
+    "scope": "native-linux-proot-ownership",
+    "sourceArchiveSha256": "492043660b1370e1910c8b8ca2b93be1f637f4929034f575591f14e67e015243"
+  },
+  "members": {
+    "asset-preparation-tail.log": {
+      "bytes": 6439,
+      "sha256": "1142f1f336d05e2cdb5c86bfa06ccf99071322ad91bd5bef380fa193a61dc141"
+    },
+    "asset-preparation.json": {
+      "bytes": 6439,
+      "sha256": "1142f1f336d05e2cdb5c86bfa06ccf99071322ad91bd5bef380fa193a61dc141"
+    },
+    "dependency-context-tail.log": {
+      "bytes": 2187,
+      "sha256": "d31bdb7b2d7e906e3e8bc5fe722afd251bf1163f4ff84f222d29d2f65c00a8a9"
+    },
+    "dependency-download-tail.log": {
+      "bytes": 110,
+      "sha256": "5d3e81dea3a4bdbc90c02cd799cdc3669f9f787ac129cd08efcd740453575ff9"
+    },
+    "dependency-image-check.json": {
+      "bytes": 1433,
+      "sha256": "ded60395aa7547a75286b373acbc9e674e63cac21333f4cf735a7bb78242fa63"
+    },
+    "dependency-provider-tail.log": {
+      "bytes": 2465,
+      "sha256": "91bc33041ef1b2e8d473c062fb812ca3a3fa4ea5c256349afa36cd0e7061ec09"
+    },
+    "environment-receipt.json": {
+      "bytes": 3151,
+      "sha256": "805ff09a5921aa46552cd8e98c779fe0f840d5158cf63ef62614632d372ba307"
+    },
+    "helper-acquisition-tail.log": {
+      "bytes": 1231,
+      "sha256": "ea91f9938fd873625a3b16573c340340270fe786b86c4a49d3a00c78873cf894"
+    },
+    "helper-build-tail.log": {
+      "bytes": 2148,
+      "sha256": "e8e42ce2959315ea1375b3a031ac74d2495ba379a462199cbfc2649ca7f67adf"
+    },
+    "image-build-tail.log": {
+      "bytes": 639,
+      "sha256": "fd7f964b8e116cabee114f897aea724add23a354afbe0b3bd62bb41314cd51ea"
+    },
+    "java-build-receipt.json": {
+      "bytes": 55289,
+      "sha256": "acbb1f5db956d1f195c7d8e84a2d33f14031c79d3ba7f1371f93036c96c87a75"
+    },
+    "java-build-tail.log": {
+      "bytes": 55289,
+      "sha256": "acbb1f5db956d1f195c7d8e84a2d33f14031c79d3ba7f1371f93036c96c87a75"
+    },
+    "java-installation-result.json": {
+      "bytes": 1723,
+      "sha256": "0a694db074288f1c23e0e0c8ed30cd350075a5cf9151a66bd11c0fcdb78a2c56"
+    },
+    "linux-proot-ownership.json": {
+      "bytes": 1593,
+      "sha256": "e06703c09cc87ebdf5ca09821679fe5870b934d1f50d009522c76fbf22087b1d"
+    },
+    "programs-provider-build.json": {
+      "bytes": 2148,
+      "sha256": "e8e42ce2959315ea1375b3a031ac74d2495ba379a462199cbfc2649ca7f67adf"
+    },
+    "proot-build-tail.log": {
+      "bytes": 63,
+      "sha256": "0be18a3abd181cf29842182a56861b4527334d78a1267cb3aded10afb12ae030"
+    },
+    "state-mount-preflight.json": {
+      "bytes": 99,
+      "sha256": "6f0f97fd066f19ccdf0afa3ded42b73760670a920fbf4ab39322fe1868404f60"
+    },
+    "stock-acquisition-tail.log": {
+      "bytes": 5281,
+      "sha256": "08ec7bfa309bd06d3b441cbcbcf1ba6787bc9523ec2b28f1ea7d39318bacb895"
+    },
+    "stock-build-tail.log": {
+      "bytes": 1988,
+      "sha256": "ce854d19d880063e40c106994d79f587bc88881cb7ed85320b9e6f9b41857701"
+    }
+  },
+  "nativeExecutionContainerNetwork": "none",
+  "nativeJniLibrary": {
+    "bytes": 390136,
+    "sha256": "81e89ec8e9d66b289553bf05c3ddd571b261ec8585d88fc83d531c2933653ccc"
+  },
+  "playerbotsAiQualified": false,
+  "privateSqlLogsExported": false,
+  "producer": {
+    "completedAt": "2026-10-31T00:17:33Z",
+    "jobConclusion": "success",
+    "jobId": 124377645428,
+    "jobStatus": "completed",
+    "repository": "Russianranger/esteria_android",
+    "revision": "651cd493c1dee9436c6fc98da0d6b4485ff19900",
+    "runAttempt": 1,
+    "runId": 41148040872,
+    "startedAt": "2026-10-31T00:03:39Z"
+  },
+  "productionInputsMatchProducerGitBlobs": true,
+  "rawTailLogContentsReexported": false,
+  "readOnlyContainerRoot": true,
+  "realParserRegression": {
+    "androidParserExecuted": false,
+    "compiledClass": {
+      "bytes": 3615,
+      "sha256": "55184d739403d0e29b081d2cc72157e6f8f34784e4529b1ebb7900c850c920ce"
+    },
+    "invokedBeforeRuntimeAndSqlSetup": true,
+    "jsonRepository": "https://github.com/stleary/JSON-java.git",
+    "jsonRevision": "f9b5587c87aaf02e4a5ed1991d48d6c05993624a",
+    "source": {
+      "bytes": 2643,
+      "sha256": "2eaddb6350b031e130b774590173de2b03e1e964d3f1f09cdb69ab2fcde3d774"
+    },
+    "sourceFileCount": 25,
+    "symmetricComparisonGroups": 16
+  },
+  "scope": "independent-native-arm64-java-sql-current-source-readback",
+  "thorQualified": false,
+  "unchangedFrom84fa": {
+    "assetPreparationAndEveryHelper": true,
+    "contentReceiptAndSourceLock": true,
+    "dependencyImageMetadataAndElfIdentities": true,
+    "jsonJavaSourceAndLicense": true,
+    "linuxProotOwnershipReceiptAndBinaries": true,
+    "nativeJniLibrary": true,
+    "priorProof": {
+      "bytes": 29942,
+      "path": "runtime/evidence/native-java-installation-84fa6378-readback.json",
+      "sha256": "10e4ce01b9c7d5233a941b0ddfdd96447978be389035d9e01491e28e7f45c4ec"
+    },
+    "runtimeAndProgramArchiveIdentities": true
+  },
+  "worldserverExecuted": false
+}

@@ -61,7 +61,15 @@ Large source/build artifacts are fully verified in CI; label local-read boundari
    the actual parser check before setup and all failure diagnostics. Original
    native SQL/runtime/ELF bytes are unchanged; do not transfer oldfff caller
    proof or rebuild original1850-object tools. Native Java41148040872 and full
-   APK41148040843@651 are also running; inspect real completion/artifacts.
+   APK41148040843@651 were also launched. The full debug APK now passes: raw
+   337,032,998B SHA187e07c2bd654005de47775adc01b7c91f42e300b87601b4dec5c26b5b5f2b22;
+   all1114Git/30PRoot/15ARM64objects independently checked, wholeAPK CI-only.
+   Native Java also succeeds:63exact inputs/192classes, actual SQL/promotion/
+   restart and the real parser regression before setup. The updated full-profile
+   workflow now builds and separately verifies an unsigned non-debuggable
+   release APK after preserving debug/source artifacts. Inspect its actual CI
+   release result before persistent signing; the signer refuses debuggable
+   distribution and no key operation runs in CI.
 4. Android input-widget41138732113@50123a9 passes eight required groups and
    optional real registered-device ranges/camera/EOF cleanup. Preserve its actual
    proof and earlier1180 toolbar/IME-window failure. Kernel/physical delivery,

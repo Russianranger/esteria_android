@@ -327,6 +327,25 @@ Omit `serverExtractorsProviderDir` for this profile. Explicit
 selected source/debug companion and the complete actual APK inventory. The
 historical stock profile keeps its original default checker and workflow.
 
+The complete-profile workflow also runs `assembleRelease` and `lintRelease` with
+the same verified providers after retaining the debug APK, AndroidTest, reference
+receipts and complete source/debug companions. It rechecks the unsigned release
+with the unchanged full cohort verifier and signing tool's manifest reader,
+including package/version, minSdk26, targetSdk35 and `debuggable=false`. Its
+separate `unsigned-local-game-profile-release-arm64-<revision>` artifact contains
+one unsigned APK and three bounded JSON proofs, with combined input bytes below
+500,000,000. This workflow implementation is not an actual release-build or
+installation result until its CI job succeeds; gameplay qualification remains
+separate.
+
+`workflow_dispatch` accepts `build_version_code` (default1; positive and at most
+2,100,000,000); increase it before publishing a signed update. Push builds use1.
+The release build explicitly clears signing environment variables and performs
+no private-key operation. Sign the reviewed `app-release-unsigned.apk` separately
+with `tools/sign_android_apk.py` and the owner-provisioned persistent development
+key. The signer continues to reject debuggable APKs; this path uses no
+`--qualification-only` exception and does not establish an update baseline.
+
 ## Supplied server-data preparation
 
 Client generation imports can include the reserved matched server-data namespace

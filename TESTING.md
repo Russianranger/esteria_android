@@ -96,6 +96,32 @@ fight/loot/equip/quest; use a small bot group; verify audio; exit/relaunch/relog
 confirm saves; repeat with networking disabled; export one support bundle.
 A device-only diagnostic exception requires evidence that independent work is blocked.
 
+### One controlled account bot
+
+The sealed profile enables at most four account bots and no random population.
+For the first content-backed test, create two ordinary Human Warriors on the
+managed local account, enter the alt once, and log it out normally. Enter the
+main character at the same starting area; bots are not teleported to the main.
+
+1. Enter `.playerbots bot list`, then `.playerbots bot add Altname` in chat.
+2. Wait for the visible bot, party membership and `+Altname` in the roster.
+   An immediate `ok` is not evidence that asynchronous login completed.
+3. Use `/p follow`; select a nearby weak enemy and use `/p attack`.
+4. After kills, `/p add all loot` requests nearby eligible loot, subject to
+   normal rights and range. Check the main character's ordinary looting too.
+5. Enter `.playerbots bot remove Altname`; wait for `-Altname`. Relog the alt
+   to inspect its XP, items and position, then return to the main character.
+
+Re-add the alt explicitly after relogging: `BotAutologin=0`. These commands are
+available to normal players and authorize the same-account character; no server
+console or GM account is needed. At pinned serverf35f, see
+`PlayerbotCommandScript.cpp:35`, `PlayerbotMgr.cpp:83,345,545`,
+`ChatCommandHandlerStrategy.cpp:35` and `PlayerbotSecurity.cpp:162` in the
+playerbots module. Removal/master logout saves and removes the bot; app shutdown
+retains world/database dependencies through cleanup. Forced termination is not a
+save result. This procedure is source-derived; actual bot AI and persistence
+remain content-backed gameplay gates.
+
 ## New integration checks
 
 The18-file installation helper inventory now includes `server_playerbots_setup.py`.

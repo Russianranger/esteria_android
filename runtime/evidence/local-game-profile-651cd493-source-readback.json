@@ -1,0 +1,305 @@
+{
+  "allSourceZipMembersReadAndCrcVerified": true,
+  "androidGuestExecuted": false,
+  "apkPayloadReadBackHere": false,
+  "completeEmbeddedHelperSourceClosure": {
+    "allSourceFilesMatchedActualCompleteSourceArchive": true,
+    "distinctSourceFiles": 25,
+    "embeddedHelperCopies": 59,
+    "groups": {
+      "database-service": {
+        "mysql_bootstrap.py": "runtime/mysql_bootstrap.py",
+        "mysql_service.py": "runtime/mysql_service.py"
+      },
+      "database-setup": {
+        "android_database_setup.py": "runtime/android_database_setup.py",
+        "mysql_bootstrap.py": "runtime/mysql_bootstrap.py"
+      },
+      "server-data": {
+        "extractor_order.py": "runtime/extractor_order.py",
+        "owned_process_group.py": "runtime/owned_process_group.py",
+        "server_data_generation.py": "runtime/server_data_generation.py",
+        "server_data_preflight.py": "runtime/server_data_preflight.py",
+        "shader_generation.py": "runtime/shader_generation.py"
+      },
+      "server-installation": {
+        "android_server_installation_setup.py": "runtime/android_server_installation_setup.py",
+        "android_server_schema_setup.py": "runtime/android_server_schema_setup.py",
+        "local-server.json": "config/local-server.json",
+        "mysql_bootstrap.py": "runtime/mysql_bootstrap.py",
+        "mysql_service.py": "runtime/mysql_service.py",
+        "owned_process_group.py": "runtime/owned_process_group.py",
+        "provision_local_account.py": "runtime/provision_local_account.py",
+        "provision_local_realm.py": "runtime/provision_local_realm.py",
+        "server/appearance-schema-v1.sql": "runtime/server/appearance-schema-v1.sql",
+        "server/appearance-schema.lock.json": "runtime/server/appearance-schema.lock.json",
+        "server_config.py": "runtime/server_config.py",
+        "server_content.py": "runtime/server_content.py",
+        "server_playerbots_setup.py": "runtime/server_playerbots_setup.py",
+        "server_schema_adaptations.py": "runtime/server_schema_adaptations.py",
+        "server_schema_baseline.py": "runtime/server_schema_baseline.py",
+        "server_schema_setup.py": "runtime/server_schema_setup.py",
+        "server_update_setup.py": "runtime/server_update_setup.py",
+        "server_updater.py": "runtime/server_updater.py"
+      },
+      "server-schema": {
+        "android_server_schema_setup.py": "runtime/android_server_schema_setup.py",
+        "mysql_bootstrap.py": "runtime/mysql_bootstrap.py",
+        "mysql_service.py": "runtime/mysql_service.py",
+        "server/appearance-schema-v1.sql": "runtime/server/appearance-schema-v1.sql",
+        "server/appearance-schema.lock.json": "runtime/server/appearance-schema.lock.json",
+        "server_content.py": "runtime/server_content.py",
+        "server_schema_adaptations.py": "runtime/server_schema_adaptations.py",
+        "server_schema_baseline.py": "runtime/server_schema_baseline.py",
+        "server_schema_setup.py": "runtime/server_schema_setup.py"
+      },
+      "server-session": {
+        "android_server_schema_setup.py": "runtime/android_server_schema_setup.py",
+        "extractor_order.py": "runtime/extractor_order.py",
+        "local-server.json": "config/local-server.json",
+        "mysql_bootstrap.py": "runtime/mysql_bootstrap.py",
+        "mysql_service.py": "runtime/mysql_service.py",
+        "owned_process_group.py": "runtime/owned_process_group.py",
+        "provision_local_account.py": "runtime/provision_local_account.py",
+        "provision_local_realm.py": "runtime/provision_local_realm.py",
+        "server/appearance-schema-v1.sql": "runtime/server/appearance-schema-v1.sql",
+        "server/appearance-schema.lock.json": "runtime/server/appearance-schema.lock.json",
+        "server_config.py": "runtime/server_config.py",
+        "server_content.py": "runtime/server_content.py",
+        "server_data_generation.py": "runtime/server_data_generation.py",
+        "server_data_preflight.py": "runtime/server_data_preflight.py",
+        "server_playerbots_setup.py": "runtime/server_playerbots_setup.py",
+        "server_schema_adaptations.py": "runtime/server_schema_adaptations.py",
+        "server_schema_baseline.py": "runtime/server_schema_baseline.py",
+        "server_schema_setup.py": "runtime/server_schema_setup.py",
+        "server_session.py": "runtime/server_session.py",
+        "server_session_process.py": "runtime/server_session_process.py",
+        "server_update_setup.py": "runtime/server_update_setup.py",
+        "server_updater.py": "runtime/server_updater.py",
+        "shader_generation.py": "runtime/shader_generation.py"
+      }
+    },
+    "sourceFiles": {
+      "config/local-server.json": {
+        "bytes": 858,
+        "sha256": "6750fa3e1a7c0101b5922f4163c6dfa87d90faba25ce011d5a36de8a578e2d4d"
+      },
+      "runtime/android_database_setup.py": {
+        "bytes": 5488,
+        "sha256": "a2bdc53753d8c301e6e8fa633a8e12026f7285881f08c22e2aedf6819d31a813"
+      },
+      "runtime/android_server_installation_setup.py": {
+        "bytes": 41474,
+        "sha256": "fe45968a0c3a32d559de27f591b5e968139e2f4ab5f04b4fc57e4bc98a330df6"
+      },
+      "runtime/android_server_schema_setup.py": {
+        "bytes": 11875,
+        "sha256": "9526275258a6b98930e3253c0011627844ed10e1816658b3d5d07e23cd3dfd02"
+      },
+      "runtime/extractor_order.py": {
+        "bytes": 9884,
+        "sha256": "5c6d30d23c2a8ebb13d037907cbcc6e7b67ea31f4b99798d925c5e3da756128c"
+      },
+      "runtime/mysql_bootstrap.py": {
+        "bytes": 32698,
+        "sha256": "e69d5b64c4a5f5ace86fa521589d5a64613f601c59aedb011b42a1e5b743b47d"
+      },
+      "runtime/mysql_service.py": {
+        "bytes": 18078,
+        "sha256": "8b30e9598f20ee715685a51aba59cefcafc6213d9d5d5cb6c6f3a73efa6b71c2"
+      },
+      "runtime/owned_process_group.py": {
+        "bytes": 2795,
+        "sha256": "c19ed5c05e94d7b537df1055983fca75e20447f594419084f2207d60f99f138e"
+      },
+      "runtime/provision_local_account.py": {
+        "bytes": 19542,
+        "sha256": "e5d2c7d35e83176841107da200ff737bdb8e3671e1a5db91f9438c4228f6701d"
+      },
+      "runtime/provision_local_realm.py": {
+        "bytes": 25452,
+        "sha256": "703ed8a0f1f011191fdf4374aa7e999ca5cff5a87cd4e6e7b3907d7d1c53c994"
+      },
+      "runtime/server/appearance-schema-v1.sql": {
+        "bytes": 790,
+        "sha256": "8e35e8e41d74979eaa98f6f2d824d831b73f63a4a6b2f573b869484b2ff15d46"
+      },
+      "runtime/server/appearance-schema.lock.json": {
+        "bytes": 7783,
+        "sha256": "6ccf5e363ec3daa5c37cbbe753d29a7e6b5d10f18eef407b700fc0d67985428d"
+      },
+      "runtime/server_config.py": {
+        "bytes": 21005,
+        "sha256": "8c22c17f6fc7b28f842c49793f9d89b84cbea3f6ce5a1d638b503c97d932f472"
+      },
+      "runtime/server_content.py": {
+        "bytes": 20541,
+        "sha256": "e32102ba850f4df7201c39c53e6c5530e59992cef1d3587ac809aca2ad681f8c"
+      },
+      "runtime/server_data_generation.py": {
+        "bytes": 29380,
+        "sha256": "72513fb5e0c1264f996fed74a96178a9789e14e97863d268da1170fa64f74cc6"
+      },
+      "runtime/server_data_preflight.py": {
+        "bytes": 27886,
+        "sha256": "8b9a1d44b70a8c1fce7a54e0ee39bba68621026f34270982cb68cb8d326374e0"
+      },
+      "runtime/server_playerbots_setup.py": {
+        "bytes": 22756,
+        "sha256": "c928a5ab26fae98f6458807231450d1bdcd1cc670e21844aa6b4e7b909a32451"
+      },
+      "runtime/server_schema_adaptations.py": {
+        "bytes": 6316,
+        "sha256": "a49e1f8477d8b840964ce47783ed5af6873dc0dcde5b4a52280b696159082b44"
+      },
+      "runtime/server_schema_baseline.py": {
+        "bytes": 8606,
+        "sha256": "21d0bd526145f6699db90e9f90bb3ec01cf15316b59e27f8db6649f03480df20"
+      },
+      "runtime/server_schema_setup.py": {
+        "bytes": 11262,
+        "sha256": "6ed4f83f882101a8af0f06212c870cf71b2cee81a654b2ad4c14d9f83ef08026"
+      },
+      "runtime/server_session.py": {
+        "bytes": 25194,
+        "sha256": "7d159953d2a9c2027bd75aaf59f6a541ef3cbc51b16c7756ca2a71253551f0ee"
+      },
+      "runtime/server_session_process.py": {
+        "bytes": 12854,
+        "sha256": "2ee8ac79a1e045f503616715b2eeb9f34ae10d509391190ca3be09e30e242ec2"
+      },
+      "runtime/server_update_setup.py": {
+        "bytes": 25241,
+        "sha256": "7ff3b5272f9ec3fe38a42413f8d2d6a45f72d206f794c26869d7422439be2310"
+      },
+      "runtime/server_updater.py": {
+        "bytes": 7538,
+        "sha256": "8efabb037c012a89848d854fea8a12eff8c3bab7a9d1e9a3f3ea36369c4a6007"
+      },
+      "runtime/shader_generation.py": {
+        "bytes": 19353,
+        "sha256": "8bb48952c36bdc4c69516c2ffa6f5c2d2eb59e84019e6420948d94bc81683ac5"
+      }
+    }
+  },
+  "deviceTestCandidate": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "integrationRevision": "651cd493c1dee9436c6fc98da0d6b4485ff19900",
+  "integrationSource": {
+    "allRegularFilesMatchExactGitBlobsOrDeclaredWrapperConversion": true,
+    "archiveRegularFileBytes": 11347717,
+    "canonicalGitBlobBytes": 11347711,
+    "declaredCheckoutConversions": {
+      "gradlew.bat": {
+        "archive": {
+          "bytes": 295,
+          "sha256": "21186e8f097fcc9e5f62ee0abf2d95b92f973b347d0c27f0205a336af8aa021d"
+        },
+        "canonical": {
+          "bytes": 289,
+          "sha256": "119ce8a4bfdf3024ba03cf9b6b810afd47b49e17999a0053bfe719effbad36ea"
+        },
+        "exactCrLfConversionVerified": true
+      }
+    },
+    "entireGzipCrcAndTrailerReadBack": true,
+    "executableModesMatchGit": true,
+    "trackedRegularFiles": 1114
+  },
+  "prootSource": {
+    "allMemberSizesAndSha256MatchActualCiInventory": true,
+    "allRelinkableObjectsHaveActualArm64RelocatableElfHeaders": true,
+    "entireGzipCrcAndTrailerReadBack": true,
+    "regularFileBytes": 1613364,
+    "regularFiles": 30,
+    "relinkableArm64Objects": 15
+  },
+  "runAttempt": 1,
+  "runtimeJsonIdentityComparison": {
+    "changedAuxiliaryMeasurementFiles": [
+      {
+        "latest": {
+          "bytes": 1542,
+          "sha256": "ed049b2055e340f7a73ee9f191279bbb6696603890d369d2a41eb3bdacd03b4e"
+        },
+        "path": "runtime/mysql-probe/android-installation-x64-inputs.lock.json",
+        "prior": {
+          "bytes": 566,
+          "sha256": "585b76019f3db1fc6e3472abecdaae3bc3d2fee11966afab4ce26a7cea509994"
+        }
+      },
+      {
+        "latest": {
+          "bytes": 685,
+          "sha256": "55fe3f02487ef3e9fdc00ea431e352fee98d4f52b3002a3c6f2e50d740176cd1"
+        },
+        "path": "runtime/mysql-probe/android-installation-x64-provider-artifacts.lock.json",
+        "prior": null
+      },
+      {
+        "latest": {
+          "bytes": 3333,
+          "sha256": "b4761fa5f6b1de914637c17f4248872b8749565738efb4e0098c8e13d4c4540a"
+        },
+        "path": "runtime/mysql-probe/server-setup-x64-sql-inputs.lock.json",
+        "prior": {
+          "bytes": 537,
+          "sha256": "aa20f7c7c351094c7fac3dc37bde962743255725605ac894b932d44edb32e229"
+        }
+      }
+    ],
+    "comparedRevision": "84fa637867ad6c2c916a455c703e577cd60a298c",
+    "productionProviderAndCohortSelectionUnchanged": true,
+    "serialization": "Git-sorted {path,bytes,sha256} array, json.dumps(sort_keys=True,separators=(comma,colon)), UTF-8",
+    "unchangedCanonicalManifest": {
+      "bytes": 10702,
+      "sha256": "95ceaf8348e7bb82d2f19ad50b098537fafd4368a0bc91e74ba4197de8ed1d0f"
+    },
+    "unchangedFiles": 72
+  },
+  "scope": "independent-local-exact-integration-and-PRoot-source-readback",
+  "sourceArtifact": {
+    "bytes": 3943252,
+    "id": 13021942370,
+    "sha256": "b5434e3ad63e3a2471ed6bed561e9fd8ac7b92ae67babb8a4da0e980a6f3bc63"
+  },
+  "sourceArtifactMembers": {
+    "coherent-integration-source.tar.gz": {
+      "bytes": 2792818,
+      "sha256": "8117b1dcbe50c3471609643c3bdc8c21272018daccdfbbfd41d8ffc817f48530"
+    },
+    "proot-build/build-evidence.json": {
+      "bytes": 2099,
+      "sha256": "14d09032d6b44bbd4f58956861375c35721b46e286dfde1b0c2c3803842507f8"
+    },
+    "proot-build/proot-corresponding-source.tar.gz": {
+      "bytes": 1147817,
+      "sha256": "3755cd2cba8877c795b096674376ba7914ffb408fd5fb1b0d99be00c3ea50786"
+    }
+  },
+  "sourceDerivedDataHelperFiles": {
+    "extractor_order.py": {
+      "bytes": 9884,
+      "sha256": "5c6d30d23c2a8ebb13d037907cbcc6e7b67ea31f4b99798d925c5e3da756128c"
+    },
+    "owned_process_group.py": {
+      "bytes": 2795,
+      "sha256": "c19ed5c05e94d7b537df1055983fca75e20447f594419084f2207d60f99f138e"
+    },
+    "server_data_generation.py": {
+      "bytes": 29380,
+      "sha256": "72513fb5e0c1264f996fed74a96178a9789e14e97863d268da1170fa64f74cc6"
+    },
+    "server_data_preflight.py": {
+      "bytes": 27886,
+      "sha256": "8b9a1d44b70a8c1fce7a54e0ee39bba68621026f34270982cb68cb8d326374e0"
+    },
+    "shader_generation.py": {
+      "bytes": 19353,
+      "sha256": "8bb48952c36bdc4c69516c2ffa6f5c2d2eb59e84019e6420948d94bc81683ac5"
+    }
+  },
+  "sourceSnapshotExact": true,
+  "workflowRun": 41148040843
+}

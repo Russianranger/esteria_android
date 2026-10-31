@@ -1,0 +1,561 @@
+{
+  "actualCiBuild": {
+    "actionableTasks": 122,
+    "androidInstrumentedTestsExecuted": false,
+    "appOwnerHostFixtureTasksExecutedByThisCiRun": false,
+    "buildSuccessful": true,
+    "coreChecksExecuted": true,
+    "decodedLog": {
+      "bytes": 233991,
+      "sha256": "e1f7ceebdae24be883f5c5e7161f8a9318ee420956f163bc24c3e38f2b48083f"
+    },
+    "exactCurrentArm64NativeCompiled": true,
+    "exactCurrentMainAndAndroidTestJavaCompiled": true,
+    "executedTasks": 121,
+    "lintPassed": true,
+    "observedBuildLine": "BUILD SUCCESSFUL in 2m 20s",
+    "requiredTasksObserved": [
+      ":core:clientLaunchViewTest",
+      ":core:runtimeLeaseTest",
+      ":core:turnipProbeContractTest",
+      ":core:shaderRunPlanTest",
+      ":core:check",
+      ":app:compileDebugJavaWithJavac",
+      ":app:compileDebugAndroidTestJavaWithJavac",
+      ":app:buildCMakeDebug[arm64-v8a]",
+      ":app:assembleDebug",
+      ":app:assembleDebugAndroidTest",
+      ":app:lintDebug",
+      ":app:serverProgramsProfileTest"
+    ],
+    "selectedEffectiveLocaleLaunchViewHostRegressionExecuted": true,
+    "upToDateTasks": 1
+  },
+  "actualHostJavaFourComponentInstall": {
+    "actualCopiedFileBytes": 1140879522,
+    "androidRuntimeQualified": false,
+    "components": {
+      "content": {
+        "androidRuntimeQualified": false,
+        "cachedArchiveRequired": false,
+        "cachedCopiedBytes": 0,
+        "entries": 4063,
+        "fileBytes": 654243888,
+        "firstCopiedBytes": 654243888,
+        "gameplayQualified": false,
+        "generation": "ebdf3e2b2ec3766d18af0442cf01a228a6d9adba00e41a996af3089251d78edf",
+        "packageKey": "server-content-arm64",
+        "scope": "host-java-exact-server-archive-install-and-cached-reuse"
+      },
+      "data-tools": {
+        "androidRuntimeQualified": false,
+        "cachedArchiveRequired": false,
+        "cachedCopiedBytes": 0,
+        "entries": 81,
+        "fileBytes": 8945245,
+        "firstCopiedBytes": 8945245,
+        "gameplayQualified": false,
+        "generation": "64aaaa42a915efd6c109c8dacbd87e60fad71e8628f1b613a4381c00f3d60ac2",
+        "packageKey": "server-data-tools-arm64",
+        "scope": "host-java-exact-server-archive-install-and-cached-reuse"
+      },
+      "dependencies": {
+        "androidRuntimeQualified": false,
+        "cachedArchiveRequired": false,
+        "cachedCopiedBytes": 0,
+        "entries": 6263,
+        "fileBytes": 385051708,
+        "firstCopiedBytes": 385051708,
+        "gameplayQualified": false,
+        "generation": "a216314af433bdf81250be1168e719148f46143a8c78b78e0c06e894acfdaaf0",
+        "packageKey": "server-arm64",
+        "scope": "host-java-exact-server-archive-install-and-cached-reuse"
+      },
+      "programs": {
+        "androidRuntimeQualified": false,
+        "cachedArchiveRequired": false,
+        "cachedCopiedBytes": 0,
+        "entries": 131,
+        "fileBytes": 92638681,
+        "firstCopiedBytes": 92638681,
+        "gameplayQualified": false,
+        "generation": "d7a76adec6bf2c04fbfc954901cf8d647c822d37f8665d3ed33c1bdd47686810",
+        "packageKey": "server-programs-arm64",
+        "scope": "host-java-exact-server-archive-install-and-cached-reuse"
+      }
+    },
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "integrationRevision": "651cd493c1dee9436c6fc98da0d6b4485ff19900",
+    "javaMaximumHeapBytes": 33554432,
+    "localWorldReadinessQualified": false,
+    "originalArchiveRequiredForCachedReuse": false,
+    "scope": "host-java-four-component-local-game-profile-install-cache-only",
+    "serverProgramsExecuted": false,
+    "sharedPrivateStore": true,
+    "sqlExecuted": false
+  },
+  "actualJobs": [
+    {
+      "conclusion": "success",
+      "id": 124377645205,
+      "name": "selection",
+      "skippedSteps": [],
+      "status": "completed",
+      "successfulSteps": [
+        "Set up job",
+        "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "Require adopted Wine and exact qualified helper/data-tool provider inputs",
+        "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "Complete job"
+      ]
+    },
+    {
+      "conclusion": "success",
+      "id": 124377682450,
+      "name": "package",
+      "skippedSteps": [
+        "Acquire qualified complete stock server sources and debug pairs before other large inputs",
+        "Acquire the registered SQL-qualified helper and complete corresponding sources",
+        "Acquire and reproduce qualified composed data tools without a server rebuild"
+      ],
+      "status": "completed",
+      "successfulSteps": [
+        "Set up job",
+        "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+        "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "Recover original producer source history in the separate frozen recipe checkout",
+        "Validate strict cohort and both explicit server provider profiles",
+        "Select provider paths without changing either exact input profile",
+        "Restore all four exact public server providers through their frozen source recipe",
+        "Read back the exact public cohort once and restore all four providers",
+        "Read back the complete Wine source companion before subsequent packaging",
+        "Acquire the pinned public database dependency runtime once with its entire sources",
+        "Build pinned Bionic ARM64 PRoot and matching complete source companion",
+        "Install pinned Android command-line tools and complete the already verified NDK",
+        "Install Android platform, build tools and CMake",
+        "Clean profile, test core behavior, compile native ARM64 and lint combined app",
+        "Install the complete selected server provider profile on a bounded Java heap",
+        "Verify every provider helper native ABI and selected source profile in the actual APK",
+        "Retain the unqualified complete-provider APK and exact source-selection proof",
+        "Retain complete provider cohort source companions and original inputs unchanged",
+        "Retain entire original Wine corresponding-source ZIP separately",
+        "Retain complete database dependency source companion",
+        "Retain complete helper and original program sources and paired debug outside APK assets",
+        "Retain complete stock extractor sources and paired debug outside APK assets",
+        "Retain complete composed reader sources and paired debug outside APK assets",
+        "Retain original PRoot source and exact current integration source",
+        "Preserve bounded diagnostics after success or failure",
+        "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+        "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+        "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "Complete job"
+      ]
+    }
+  ],
+  "actualWorkflow": {
+    "conclusion": "success",
+    "created_at": "2026-10-31T00:03:33Z",
+    "head_branch": "android/client-server",
+    "head_sha": "651cd493c1dee9436c6fc98da0d6b4485ff19900",
+    "html_url": "https://github.com/Russianranger/esteria_android/actions/runs/41148040843",
+    "id": 41148040843,
+    "run_attempt": 1,
+    "status": "completed",
+    "updated_at": "2026-10-31T00:13:32Z"
+  },
+  "currentCiApkPayloadVerification": {
+    "actualCurrentApkBytesDownloadedOrReadLocally": false,
+    "currentApkAllExpectedAssetBytesVerifiedOnCi": true,
+    "currentApkCompleteAssetInventoryVerifiedOnCi": true,
+    "currentApkExactCurrentHelperClosureVerifiedOnCi": true,
+    "currentProviderAndCorrespondingSourceBytesReadBackOnCi": true,
+    "ndkNoticeIdentitiesUnchanged": true,
+    "prootPayloadsAndJniIdentitiesUnchanged": true,
+    "qualificationSemanticallyEqualsPrior7cExceptApkIdentitiesAndProotSourceGzipIdentity": true,
+    "rawApk": {
+      "bytes": 337032998,
+      "sha256": "187e07c2bd654005de47775adc01b7c91f42e300b87601b4dec5c26b5b5f2b22"
+    },
+    "rawQualificationMember": {
+      "bytes": 12928,
+      "sha256": "d2684f5c4d6861257f9b945072fa6b06c3f992e6e5b4096c1336e9982b7df200"
+    }
+  },
+  "currentPublicSourceConsumerProofs": {
+    "allThreeRawReceiptsByteIdenticalToPrior7c": true,
+    "completeOriginalServerSourceAndPairedDebugReadBackOnCi": true,
+    "completeOriginalWineSourceZipReadBackOnCi": true,
+    "entireProviderAndSourceCohortAssetsReadBackOnCi": true,
+    "oversizedSourceAssetsDownloadedOrReadLocally": false
+  },
+  "formatVersion": 1,
+  "independentCurrentIntegrationAndProotSourceReadback": {
+    "bytes": 12956,
+    "path": "runtime/evidence/local-game-profile-651cd493-source-readback.json",
+    "sha256": "4d6208bae22a3fa0b528b70e7b8b9495941248dc50ea022e766799ebfb4b4502"
+  },
+  "integrationRevision": "651cd493c1dee9436c6fc98da0d6b4485ff19900",
+  "localDownloadBoundary": {
+    "currentApkDownloaded": false,
+    "currentLargeSourceDebugArtifactsDownloaded": false,
+    "downloadedArtifacts": [
+      13021977275,
+      13021942370
+    ],
+    "downloadedTotalBytes": 3978765,
+    "noSdkOrRuntimeExecutedHere": true
+  },
+  "observedAtUtc": "2026-10-31T00:15:07.126748+00:00",
+  "qualificationBoundary": {
+    "androidGuestExecuted": false,
+    "androidRuntimeQualified": false,
+    "deviceTestCandidate": false,
+    "gameLoginQualified": false,
+    "gameplayQualified": false,
+    "hardwareQualified": false,
+    "persistentSigningQualified": false,
+    "playerbotsAiQualified": false,
+    "serverProgramsExecuted": false,
+    "sqlExecuted": false,
+    "turnipGpuExecuted": false,
+    "worldEntryQualified": false
+  },
+  "retainedArtifactMetadata": [
+    {
+      "digest": "sha256:750c8e37cb0dee4b6bc835fe0750a272726603ca02e5da23f43f3e1bcee4b3e6",
+      "expired": false,
+      "id": 13022106865,
+      "name": "local-game-data-tools-source-debug-651cd493c1dee9436c6fc98da0d6b4485ff19900",
+      "size_in_bytes": 102799105
+    },
+    {
+      "digest": "sha256:f675051988fa37cf077f65845250946fa3ccb7bd97f6d4af7f2bd846099b9b6f",
+      "expired": false,
+      "id": 13022091820,
+      "name": "local-game-wine-cohort-originals-651cd493c1dee9436c6fc98da0d6b4485ff19900",
+      "size_in_bytes": 784194922
+    },
+    {
+      "digest": "sha256:744eec9eacb54a90e81a937033cce8d5e6c25bcbc694e3ccf2359d617335081b",
+      "expired": false,
+      "id": 13021977275,
+      "name": "local-game-provider-evidence-651cd493c1dee9436c6fc98da0d6b4485ff19900",
+      "size_in_bytes": 35513
+    },
+    {
+      "digest": "sha256:b5434e3ad63e3a2471ed6bed561e9fd8ac7b92ae67babb8a4da0e980a6f3bc63",
+      "expired": false,
+      "id": 13021942370,
+      "name": "local-game-integration-proot-sources-651cd493c1dee9436c6fc98da0d6b4485ff19900",
+      "size_in_bytes": 3943252
+    },
+    {
+      "digest": "sha256:5519e19a9c971b42b91cda7b7941a0d70adfbac2b66d2ec76c02c36ad235d9bf",
+      "expired": false,
+      "id": 13021887572,
+      "name": "local-game-original-stock-extractors-source-debug-651cd493c1dee9436c6fc98da0d6b4485ff19900",
+      "size_in_bytes": 50142591
+    },
+    {
+      "digest": "sha256:5a582c701cf5ef7f8e1481bf28d7a6ecaa33dfb901c8b266f054422c96ec2d86",
+      "expired": false,
+      "id": 13021887561,
+      "name": "local-game-helper-program-source-debug-651cd493c1dee9436c6fc98da0d6b4485ff19900",
+      "size_in_bytes": 1415151986
+    },
+    {
+      "digest": "sha256:2beed94f71831de0ec111874b10fa990f14182a852d6d4d6d38a498036044a3e",
+      "expired": false,
+      "id": 13021877407,
+      "name": "unqualified-local-game-profile-arm64-651cd493c1dee9436c6fc98da0d6b4485ff19900",
+      "size_in_bytes": 338914869
+    },
+    {
+      "digest": "sha256:451a8debbd4174df41767ceca8f441088c13781ca82aaacb5b5c1d3b2f14d9da",
+      "expired": false,
+      "id": 13021852562,
+      "name": "local-game-wine-full-original-sources-651cd493c1dee9436c6fc98da0d6b4485ff19900",
+      "size_in_bytes": 1681509673
+    },
+    {
+      "digest": "sha256:46e4cfb0380fd22586cb25f7f25371cbc7f488f30479a61d451fcdadac26650d",
+      "expired": false,
+      "id": 13021837715,
+      "name": "local-game-server-dependency-sources-651cd493c1dee9436c6fc98da0d6b4485ff19900",
+      "size_in_bytes": 954291968
+    }
+  ],
+  "scope": "independent-current-complete-profile-small-proof-and-exact-source-readback",
+  "smallEvidenceArtifact": {
+    "all19MembersReadAndCrcVerified": true,
+    "bytes": 35513,
+    "id": 13021977275,
+    "members": {
+      "coherent-apk.json": {
+        "bytes": 12928,
+        "sha256": "d2684f5c4d6861257f9b945072fa6b06c3f992e6e5b4096c1336e9982b7df200"
+      },
+      "gradle-tail.log": {
+        "bytes": 24991,
+        "sha256": "9c84a422939c1a15adf3a5196b2f76a4f3c9cf9438577b5f25ff33e8c0aeea5a"
+      },
+      "java-content-input.json": {
+        "bytes": 240,
+        "sha256": "57585b49b5f1c356d68361b8d2494724f6dde18c26d970cb3739377b3891ed36"
+      },
+      "java-content.json": {
+        "bytes": 360,
+        "sha256": "82863c99faa3a048418f4c3bded079cd2311c886ed324b3468dbacdfedf47f1f"
+      },
+      "java-content.tsv": {
+        "bytes": 656,
+        "sha256": "afc47ef486e3eb3107a89751cbea405e323f1897c29ccbe98ea2cd1e5b792f95"
+      },
+      "java-data-tools-input.json": {
+        "bytes": 251,
+        "sha256": "385843c44044dcecd4537a814d2691cfa62dfcee4bc6d996a4386cefe7c4c838"
+      },
+      "java-data-tools.json": {
+        "bytes": 357,
+        "sha256": "c1b8157bf1ec63821cce12bd9617123d8cfec93bfdc85283c56eb60bb33050a6"
+      },
+      "java-data-tools.tsv": {
+        "bytes": 10284,
+        "sha256": "42651855960b05e26f4ed01aa346151066cd9de6b577ac53dcf8119760841d24"
+      },
+      "java-dependencies-input.json": {
+        "bytes": 230,
+        "sha256": "1537c4a46bbdbe44a1f06cb08e4f4557175d9a10b6a3a8fd2481757ff39f1e48"
+      },
+      "java-dependencies.json": {
+        "bytes": 352,
+        "sha256": "85dc6368e5ddfb7865ed9d2d5b0ebfa24e09826fc410ac5bd6147a4dd3ee2277"
+      },
+      "java-dependencies.tsv": {
+        "bytes": 732,
+        "sha256": "f4b1dfaa09fa7acccf1968b30eeb12210b42246e715ffd6b0248073a8505ea25"
+      },
+      "java-programs-input.json": {
+        "bytes": 245,
+        "sha256": "011b62b8d2470a5cd0cef491f3c7febf688d42271984aa1b9abe664e2dc52ef4"
+      },
+      "java-programs.json": {
+        "bytes": 358,
+        "sha256": "d665fa63b8aabb879e81c28627bc6e015028da4c367800c99ef00c4a2b3ecb4e"
+      },
+      "java-programs.tsv": {
+        "bytes": 15952,
+        "sha256": "81e3539e66d486d5f89ff1aa82810b832c330b6d94ed8eae8446b34f26c4de90"
+      },
+      "java-server-profile.json": {
+        "bytes": 2354,
+        "sha256": "b752a6ae37a20b6a021f35fb4201bcc41219450fff31a60f027a68bb6f7678f0"
+      },
+      "public-cohort-consumer.json": {
+        "bytes": 7449,
+        "sha256": "8a0bc92bc4331805e75f26a4a2292ddb5fd2da4d6b3fc1b2b06baa902cd51ff6"
+      },
+      "public-server-acquisition.json": {
+        "bytes": 14161,
+        "sha256": "73b1273386ea2bbf485818aaa423f608d627e322d5ed4ec03b61c12934a3ac92"
+      },
+      "public-wine-consumer.json": {
+        "bytes": 8163,
+        "sha256": "3568818f2e79d53dd47a4dec5d433b333b34cd0ddb949ba662929f309bd066aa"
+      },
+      "server-dependencies-tail.log": {
+        "bytes": 110,
+        "sha256": "5d3e81dea3a4bdbc90c02cd799cdc3669f9f787ac129cd08efcd740453575ff9"
+      }
+    },
+    "sha256": "744eec9eacb54a90e81a937033cce8d5e6c25bcbc694e3ccf2359d617335081b"
+  },
+  "sourceSnapshotExact": true,
+  "unchangedProviderIdentitiesComparedToPriorLocalReadback": {
+    "all14CohortMemberIdentitiesMatchPriorWholeApk": true,
+    "comparedRevision": "7c303665e8028aba86a7b87d543b2528d968b1ab",
+    "currentRawApkIsDifferent": true,
+    "exactPublicCohortManifest": {
+      "bytes": 2976,
+      "sha256": "5bac6bc6668b817128043d1d915ff7ac900d10db232e18fd79255ab76e92040f"
+    },
+    "priorRawApk": {
+      "bytes": 337019318,
+      "sha256": "68c55d9ef700e73c39ba62caac818a7072be70bc86846b3e3de05735aaf843b0"
+    },
+    "priorReadback": {
+      "bytes": 35734,
+      "path": "runtime/evidence/local-game-profile-apk-local-41129893343.json",
+      "sha256": "c014b3319e5ea2ca5d50761805b8d7807833ed1beebff6d9ddb6568bca99c93a"
+    },
+    "priorWholeApkReadbackDoesNotQualifyCurrentDexOrUi": true,
+    "providerArchives": {
+      "client-runtime": {
+        "archive": {
+          "bytes": 7313293,
+          "sha256": "5997af5a94a1151e708cf80fa9931e4055a887598e01c9cf21e6b3af0d438759"
+        },
+        "currentArchiveBytesLocallyRead": false,
+        "currentCiDescriptorIdentityExplicitlyReported": true,
+        "currentPublicCohortManifestIncludesExactArchive": true,
+        "descriptor": {
+          "bytes": 6867,
+          "sha256": "cc619845e8feffb3d77892c94b5825a86bacd5d575471ef6ebe9953578872b65"
+        },
+        "exactSourceInput": {
+          "bytes": 492,
+          "path": "runtime/client/android-provider.lock.json",
+          "sha256": "7ecb7dfd4e9917e742fb467d81a72af9273394c8488e5a6cb3e25fa70c29ed5b"
+        },
+        "priorLocalArchiveEntries": 30,
+        "priorLocalRegularFileBytes": 21515784
+      },
+      "guest-bridges": {
+        "archive": {
+          "bytes": 469117,
+          "sha256": "7e0356f14bf3654a0e1ecc903726bd479fea0c761c8a4e8a4356e2e476726a55"
+        },
+        "currentArchiveBytesLocallyRead": false,
+        "currentCiDescriptorIdentityExplicitlyReported": true,
+        "currentPublicCohortManifestIncludesExactArchive": true,
+        "descriptor": {
+          "bytes": 7367,
+          "sha256": "dc941ac94d697549844eb61022c0587c7af8d71b8029a592db791b36ac0638b4"
+        },
+        "exactSourceInput": {
+          "bytes": 12376,
+          "path": "runtime/bridges/android-provider.lock.json",
+          "sha256": "2829cef5a81fbdcceeaa47b7cec9fe00274e4d0308c5d8242c722e0667e5616b"
+        },
+        "priorLocalArchiveEntries": 30,
+        "priorLocalRegularFileBytes": 746776
+      },
+      "server-content": {
+        "archive": {
+          "bytes": 167585802,
+          "sha256": "0f41b2deea5344fcea4cbc70bbddf0bab1dfda1cd0346e23e92592aac63056e6"
+        },
+        "currentArchiveBytesLocallyRead": false,
+        "currentCiEmbeddedArchiveIdentityExplicitlyReported": true,
+        "currentExactProviderLockIncludesExactArchive": true,
+        "descriptor": {
+          "bytes": 6443,
+          "sha256": "9e5977e78ddc45deeba9863be5f1127c521d4675dbf8fc490743f49322640970"
+        },
+        "exactSourceInput": {
+          "bytes": 6433,
+          "path": "runtime/server/content-provider.lock.json",
+          "sha256": "b658e00e2dc602135ede02bd12c7d130dfb0aa00df4b8772c7e8c170d1628a65"
+        },
+        "priorLocalArchiveEntries": 4063,
+        "priorLocalRegularFileBytes": 654243888
+      },
+      "server-data-tools": {
+        "archive": {
+          "bytes": 2902474,
+          "sha256": "21ce4e1b9a4ff054df4a781cf6b83f37149ab941014d2759f33d93bbfebf231b"
+        },
+        "currentArchiveBytesLocallyRead": false,
+        "currentExactProviderLockIncludesExactArchive": true,
+        "descriptor": {
+          "bytes": 24670,
+          "sha256": "d7d5f589d8ec2215946f947f359e4d0168ace0ae3b561ab725bb81886c85d969"
+        },
+        "exactSourceInput": {
+          "bytes": 26660,
+          "path": "runtime/server/data-tools-provider.lock.json",
+          "sha256": "bd3e7039b75eed0c4d09e578f6b9bb5f625543529b1181e3383d5cef6f3a2970"
+        },
+        "priorLocalArchiveEntries": 81,
+        "priorLocalRegularFileBytes": 8945245
+      },
+      "server-programs": {
+        "archive": {
+          "bytes": 30730491,
+          "sha256": "963a23c1390440260b85ffe164b2d7508c56b005b315dce8a919ae443a46d1bf"
+        },
+        "currentArchiveBytesLocallyRead": false,
+        "currentCiEmbeddedArchiveIdentityExplicitlyReported": true,
+        "currentExactProviderLockIncludesExactArchive": true,
+        "descriptor": {
+          "bytes": 32063,
+          "sha256": "54c661716ee316755806d235b5042cc071e5618e6cd0dc23243ff80351429de2"
+        },
+        "exactSourceInput": {
+          "bytes": 38585,
+          "path": "runtime/server/programs-playerbots-provider.lock.json",
+          "sha256": "71dd8aff3b51348aec0439c4621cd7f153c5d9a1046b65d219b0310edca4254d"
+        },
+        "priorLocalArchiveEntries": 131,
+        "priorLocalRegularFileBytes": 92638681
+      },
+      "server-runtime": {
+        "archive": {
+          "bytes": 112374096,
+          "sha256": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5"
+        },
+        "currentArchiveBytesLocallyRead": false,
+        "currentCiEmbeddedArchiveIdentityExplicitlyReported": true,
+        "currentExactProviderLockIncludesExactArchive": true,
+        "descriptor": {
+          "bytes": 2465,
+          "sha256": "5e130999e2b4974dcb329552d3ef559b8f4555099589e976bac4a16f93b004cb"
+        },
+        "exactSourceInput": {
+          "bytes": 1152,
+          "path": "runtime/server/android-provider.lock.json",
+          "sha256": "9773bb1c9a45a82cc5146812aa3c3c0d6c14cfbbdbabfaa66121fc72c341dfad"
+        },
+        "priorLocalArchiveEntries": 6263,
+        "priorLocalRegularFileBytes": 385051708
+      },
+      "shader-tools": {
+        "archive": {
+          "bytes": 10652649,
+          "sha256": "c48c4d78952d4a2c02c26b7a6da0087d29b21eb19a81b643cb5a9a97cf7389af"
+        },
+        "currentArchiveBytesLocallyRead": false,
+        "currentCiDescriptorIdentityExplicitlyReported": true,
+        "currentPublicCohortManifestIncludesExactArchive": true,
+        "descriptor": {
+          "bytes": 12709,
+          "sha256": "cdffebe458994cd6fa8d87a2cd42cdce30234125af8bded2c6bb44552ff84b7c"
+        },
+        "exactSourceInput": {
+          "bytes": 12463,
+          "path": "runtime/shaders/android-provider.lock.json",
+          "sha256": "738784d15c24788c478b2fb61a2947588c142a7d8c752d753c92c74cde920f48"
+        },
+        "priorLocalArchiveEntries": 73,
+        "priorLocalRegularFileBytes": 16690219
+      },
+      "turnip": {
+        "archive": {
+          "bytes": 3283344,
+          "sha256": "445c38ddf7e66f65ee90aa7fd2006db88d6fecd72c8567d801f2ee4c4000a772"
+        },
+        "currentArchiveBytesLocallyRead": false,
+        "currentCiDescriptorIdentityExplicitlyReported": true,
+        "currentPublicCohortManifestIncludesExactArchive": true,
+        "descriptor": {
+          "bytes": 13101,
+          "sha256": "290d0b020715382beaa6eb49781ca9e97aba8260e5a8e9d8680db3cb1b02572c"
+        },
+        "exactSourceInput": {
+          "bytes": 16435,
+          "path": "runtime/turnip/android-provider.lock.json",
+          "sha256": "879c79db15622cfa155aad0b1d901fc322559e7fbc7245c5d73b234ed499df91"
+        },
+        "priorLocalArchiveEntries": 72,
+        "priorLocalRegularFileBytes": 16833635
+      }
+    },
+    "totalPriorArchiveEntries": 10743,
+    "totalPriorRegularFileBytes": 1196665936
+  }
+}
