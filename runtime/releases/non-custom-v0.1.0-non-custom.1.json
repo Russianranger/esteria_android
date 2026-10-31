@@ -1,0 +1,68 @@
+{
+  "formatVersion": 1,
+  "scope": "published-non-custom-signed-arm64-candidate",
+  "releaseId": 430019568,
+  "tag": "non-custom-v0.1.0-non-custom.1",
+  "url": "https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.1",
+  "branch": "non-custom",
+  "appRevision": "8d31e4fa832cd8ef0f738d36088fb9e64ae3aa41",
+  "publicationRevision": "35310cd093aae28239ac6b35d5f69c854865341e",
+  "publicationRun": 41215249412,
+  "fullPackageRun": 41213324528,
+  "nativeSqlRun": 41213324577,
+  "android13ComponentRun": 41213324526,
+  "clientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
+  "prerelease": true,
+  "draft": false,
+  "assets": [
+    {
+      "id": 695745590,
+      "name": "Esteria-Stock-3.3.5a-arm64.apk",
+      "bytes": 336746941,
+      "digest": "sha256:802cb3f8575f4413e19ddef937e75394370ec9682c3f71631fff3579976df718",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.1/Esteria-Stock-3.3.5a-arm64.apk"
+    },
+    {
+      "id": 695746894,
+      "name": "NON-CUSTOM-TESTING.md",
+      "bytes": 3749,
+      "digest": "sha256:953ede231e5029f4c2e0b5ee6644da257a31cb5d944be897bea767c39c5d1424",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.1/NON-CUSTOM-TESTING.md"
+    },
+    {
+      "id": 695746718,
+      "name": "publication-evidence.json",
+      "bytes": 3479,
+      "digest": "sha256:75d4873d83f30a60e161e805377b5009a2bb25e604d1f0581d71a5c903f5dcf3",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.1/publication-evidence.json"
+    },
+    {
+      "id": 695746546,
+      "name": "release.json",
+      "bytes": 2532,
+      "digest": "sha256:f0b00e45b0df1074c27f96e07644b9c1b6fd01e1c5867dc5d68a72329d428854",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.1/release.json"
+    },
+    {
+      "id": 695746513,
+      "name": "SHA256SUMS",
+      "bytes": 97,
+      "digest": "sha256:db95f426de4b9ce10b2c2618faa303cd7d0f8a93c362f8025e1b6d1f8cc518ff",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.1/SHA256SUMS"
+    },
+    {
+      "id": 695746578,
+      "name": "signing-receipt.json",
+      "bytes": 943,
+      "digest": "sha256:e2c6ad518e7ce9894e45cdd81adeb4ee5da4d5fbbdd87564aeca433e7db6039b",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.1/signing-receipt.json"
+    }
+  ],
+  "signatureVerified": true,
+  "payloadPreserved": true,
+  "actualUserClientValidated": false,
+  "graphicalStartupQualified": false,
+  "worldEntryQualified": false,
+  "thorQualified": false
+}

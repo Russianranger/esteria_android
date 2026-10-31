@@ -6,7 +6,7 @@ Updated 2026-10-31 America/Chicago. Profile `stock-3.3.5a`; branch `non-custom`;
 
 Version `0.1.0-non-custom.1`, versionCode `1`; 336,746,941 bytes.
 APK SHA-256: `802cb3f8575f4413e19ddef937e75394370ec9682c3f71631fff3579976df718`.
-Certificate: `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`; actual SDK v2/v3 signature, nondebuggable manifest and complete payload preservation verified. A backup download is saved. Additive GitHub publication is being finalized; see the final publication receipt before calling it published.
+Certificate: `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`; actual SDK v2/v3 signature, nondebuggable manifest and complete payload preservation verified. Published additive prerelease: https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.1. Public anonymous HTTP200, filename,336,746,941B and the complete SHA-256 readback match the SDK-verified signed APK. All six release assets have recorded digests. Backup download saved. Official stock signing baseline is versionCode1; future updates require>=2.
 
 - Exact app producer: `8d31e4fa832cd8ef0f738d36088fb9e64ae3aa41`; full ARM64 build `41213324528`, job `124572722479`.
 - Reconstructed ARM64 client: `471ee42faadf4a97a1d0a86989cf1452621f2dc5`.
@@ -40,3 +40,5 @@ Both failed native SQL runs `41211067232` and `41211577406`, the exact guard rea
 No complete owner ChromieCraft client folder/archive or Thor was accessible here. No actual stock MPQ extraction/game shader generation, normal graphical startup/login, character creation/world entry, character saves, real controller/audio or offline gameplay was executed. Run the one `NON-CUSTOM-TESTING.md` procedure with the existing complete12340 client. This needs no custom MPQ bundle, pre-extracted world download, ChromieCraft credentials or manual MySQL administration.
 
 Full Esteria MPQs/catalogues/races/appearance, HD art, custom maps, Retail/Forever, Lua/AIO/custom gameplay and bot AI qualification are deferred and never stock acceptance gates. All custom sources remain recoverable.
+
+Publication run `41215249412` at metadata commit `35310cd093aae28239ac6b35d5f69c854865341e` independently reverified source-run/artifact/nativeSQL provenance, reconstructed the exact signed APK, verified SDK certificate/manifest/payload, then published. See runtime/releases/non-custom-v0.1.0-non-custom.1.json and runtime/evidence/non-custom-public-apk-readback.json. The APK producer remains8d31; later commits only retain evidence/publication/signing-ledger metadata.

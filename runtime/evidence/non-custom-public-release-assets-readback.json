@@ -1,0 +1,45 @@
+{
+  "allFiveTextAssetsReadBack": true,
+  "apkReadback": "non-custom-public-apk-readback.json",
+  "assets": [
+    {
+      "bytes": 3749,
+      "exactPublicBytesVerified": true,
+      "httpStatus": 200,
+      "name": "NON-CUSTOM-TESTING.md",
+      "sha256": "953ede231e5029f4c2e0b5ee6644da257a31cb5d944be897bea767c39c5d1424"
+    },
+    {
+      "bytes": 3479,
+      "exactPublicBytesVerified": true,
+      "httpStatus": 200,
+      "name": "publication-evidence.json",
+      "sha256": "75d4873d83f30a60e161e805377b5009a2bb25e604d1f0581d71a5c903f5dcf3"
+    },
+    {
+      "bytes": 2532,
+      "exactPublicBytesVerified": true,
+      "httpStatus": 200,
+      "name": "release.json",
+      "sha256": "f0b00e45b0df1074c27f96e07644b9c1b6fd01e1c5867dc5d68a72329d428854"
+    },
+    {
+      "bytes": 97,
+      "exactPublicBytesVerified": true,
+      "httpStatus": 200,
+      "name": "SHA256SUMS",
+      "sha256": "db95f426de4b9ce10b2c2618faa303cd7d0f8a93c362f8025e1b6d1f8cc518ff"
+    },
+    {
+      "bytes": 943,
+      "exactPublicBytesVerified": true,
+      "httpStatus": 200,
+      "name": "signing-receipt.json",
+      "sha256": "e2c6ad518e7ce9894e45cdd81adeb4ee5da4d5fbbdd87564aeca433e7db6039b"
+    }
+  ],
+  "formatVersion": 1,
+  "privateKeyMaterialIncluded": false,
+  "releaseId": 430019568,
+  "scope": "anonymous-public-release-text-assets-byte-readback"
+}

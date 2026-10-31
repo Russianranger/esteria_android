@@ -3,5 +3,8 @@
   "purpose": "persistent-development",
   "packageId": "io.github.russianranger.esteria.stock",
   "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
-  "lastPublished": null
+  "lastPublished": {
+    "versionCode": 1,
+    "apkSha256": "802cb3f8575f4413e19ddef937e75394370ec9682c3f71631fff3579976df718"
+  }
 }

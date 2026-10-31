@@ -1,0 +1,14 @@
+{
+  "bytes": 336746941,
+  "contentDisposition": "attachment; filename=Esteria-Stock-3.3.5a-arm64.apk",
+  "contentLength": "336746941",
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "httpStatus": 200,
+  "matchesLocallySdkVerifiedSignedApk": true,
+  "scope": "anonymous-public-signed-apk-byte-readback",
+  "sha256": "802cb3f8575f4413e19ddef937e75394370ec9682c3f71631fff3579976df718",
+  "sourceRevision": "8d31e4fa832cd8ef0f738d36088fb9e64ae3aa41",
+  "thorQualified": false,
+  "url": "https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.1/Esteria-Stock-3.3.5a-arm64.apk"
+}

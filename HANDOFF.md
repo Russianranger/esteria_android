@@ -8,7 +8,7 @@ Updated 2026-10-31 America/Chicago. Continue only on `non-custom`; routine imple
 - Exact APK producer/app source: `8d31e4fa832cd8ef0f738d36088fb9e64ae3aa41`.
 - Client `471ee42faadf4a97a1d0a86989cf1452621f2dc5`; server `f35f04d01689f034778e3474b3c820092f51e461` plus unchanged seven pinned adaptations; Eluna `58d7652138887783228b9727bd1fa4e08f00342b`.
 - Signed APK336,746,941B; SHA-256 `802cb3f8575f4413e19ddef937e75394370ec9682c3f71631fff3579976df718`.
-- Existing persistent certificate `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`; actual SDK35 v2/v3/nondebug manifest and complete payload preservation pass. A backup APK is saved privately. Additive GitHub publication is the final current operation; check the publication receipt before claiming it completed.
+- Existing persistent certificate `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`; actual SDK35 v2/v3/nondebug manifest and complete payload preservation pass. Published additive prerelease: https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.1. All six public asset identities are recorded; the public APK was anonymously downloaded in full and exactly matches this hash/length. Publication run41215249412 succeeded at35310cd093aae28239ac6b35d5f69c854865341e. A backup APK is saved.
 
 The imported original Wow.exe supplies version evidence only. Run the reconstructed Windows ARM64 client in the selected Wine/Debian12 PRoot and Linux ARM64 server/MySQL in the separate Ubuntu24 PRoot. No x86 substitution, streaming or device Docker. Protocol remains254 containers/25quests/32client-class capacity. Source locks, original provider archives/notices/sources/debug companions remain unchanged.
 
@@ -46,6 +46,6 @@ Do not return to custom completion as a prerequisite. Deferred: full Esteria MPQ
 
 ## Signing and future updates
 
-After the first release is published and its public APK/certificate/hash read back, update official app/stock-signing.lock.json lastPublished to versionCode1 and this APK hash in a separate metadata commit. Preserve the original null-lock selection/recipe/receipt at the publication/producer commits. The initial publisher then intentionally refuses replay. Future updates must use versionCode>=2, the same persistent certificate and the exact prior published APK for continuity; never reuse --initial-baseline. The private backup remains outside Git.
+The release/public byte readback is complete. Official app/stock-signing.lock.json now records lastPublished versionCode1 and this APK hash in this separate final metadata checkpoint. Preserve the original null-lock selection/recipe/receipt at the publication/producer commits. The initial publisher then intentionally refuses replay. Future updates must use versionCode>=2, the same persistent certificate and the exact prior published APK for continuity; never reuse --initial-baseline. The private backup remains outside Git.
 
 No autonomous work is implied after a final response. State any actually running CI separately; otherwise resume only when new owner content/device evidence is supplied.
