@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 from tools.render_server_config import overlay, quoted, render, MODULE_OVERRIDES
 
 
@@ -47,7 +48,9 @@ class ServerConfigTests(unittest.TestCase):
             server = fixture(root)
             state = root / 'state'
             args = (server, state, root / 'data', root / 'sql', Path('/usr/bin/mysql'))
-            first = render(*args)
+            # Numeric-looking text in a generated credential is not a bot limit.
+            with patch('runtime.server_config.secrets.token_hex', return_value='500' + 'a' * 61):
+                first = render(*args)
             secret = (state / 'accounts/database-secret').read_bytes()
             self.assertEqual(os.stat(state / 'accounts/database-secret').st_mode & 0o777, 0o600)
             second = render(*args)
@@ -60,8 +63,9 @@ class ServerConfigTests(unittest.TestCase):
             self.assertIn('Console.Enable = 1', world)
             self.assertIn('Wintergrasp.DeferShutdownTimer = 0', world)
             self.assertIn('Eluna.Enabled = 0', world)
-            self.assertNotIn('500', (current / 'modules/playerbots.conf').read_text())
-            self.assertIn('AiPlayerbot.CommandServerPort = 0', (current / 'modules/playerbots.conf').read_text())
+            bot_lines = (current / 'modules/playerbots.conf').read_text().splitlines()
+            self.assertIn('AiPlayerbot.MaxRandomBots = 0', bot_lines)
+            self.assertIn('AiPlayerbot.CommandServerPort = 0', bot_lines)
             self.assertFalse(first['database_initialized'])
             self.assertFalse(first['module_configurations_complete'])
             self.assertFalse(first['lua_scripts_enabled'])
