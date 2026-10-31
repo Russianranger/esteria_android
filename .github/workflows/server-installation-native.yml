@@ -35,7 +35,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   owned-installation:
-    if: github.repository == 'Russianranger/esteria_android' && (github.ref == 'refs/heads/android/client-server' || github.ref == 'refs/heads/non-custom')
+    if: github.repository == 'Russianranger/esteria_android' && (github.ref == 'refs/heads/android/client-server' || github.ref == 'refs/heads/non-custom') && !(github.event_name == 'push' && contains(github.event.head_commit.message, '[publish detached non-custom]'))
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 60
     steps:

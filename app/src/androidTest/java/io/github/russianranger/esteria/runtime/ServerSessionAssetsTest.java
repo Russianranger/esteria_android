@@ -60,7 +60,9 @@ public final class ServerSessionAssetsTest {
             JSONObject metadata=new JSONObject().put(importId+"/complete",pin(imported.resolve("complete"))).put(importId+"/journal.tsv",pin(imported.resolve("journal.tsv")));
             JSONObject inputs=new JSONObject().put("formatVersion",1).put("importGeneration",importId).put("clientRevision",BuildConfig.CLIENT_REVISION)
                 .put("serverRevision",server).put("locale","enUS").put("threads",1).put("importMetadata",metadata)
-                .put("toolSelectionSha256",hash(toolJson.getBytes(StandardCharsets.UTF_8)));
+                .put("toolSelectionSha256",hash(toolJson.getBytes(StandardCharsets.UTF_8)))
+                .put("contentProfile",io.github.russianranger.esteria.core.content.ContentProfile.ID)
+                .put("preparationHelperGeneration",helpers);
             String generation=hash((ServerDataBinding.canonical(inputs)+"\n").getBytes(StandardCharsets.UTF_8));
             Path store=Files.createDirectory(work.resolve("server-data")),selected=Files.createDirectories(store.resolve("generations").resolve(generation));
             Files.createDirectory(selected.resolve("data"));write(store.resolve("current"),generation+"\n");
@@ -72,6 +74,11 @@ public final class ServerSessionAssetsTest {
                 .put("worldQualified",false).put("androidQualified",false).put("gameplayQualified",false);
             Path receiptFile=selected.resolve("receipt.json");write(receiptFile,receipt.toString()+"\n");
             ServerDataBinding binding=ServerDataBinding.inspect(plan,server);assertEquals(generation,binding.generation);binding.requireUnchanged();
+            inputs.put("contentProfile","esteria-custom");write(receiptFile,receipt.toString()+"\n");refuses(()->ServerDataBinding.inspect(plan,server));
+            inputs.put("contentProfile",io.github.russianranger.esteria.core.content.ContentProfile.ID);
+            inputs.put("preparationHelperGeneration","e".repeat(64));write(receiptFile,receipt.toString()+"\n");refuses(()->ServerDataBinding.inspect(plan,server));
+            inputs.put("preparationHelperGeneration",helpers);write(receiptFile,receipt.toString()+"\n");
+            ServerDataBinding.inspect(plan,server).requireUnchanged();
             // This intentionally tests metadata binding only: the production
             // guest refuses this fixture's nonexistent formats/source provider.
             receipt.put("worldQualified",true);write(receiptFile,receipt.toString()+"\n");refuses(()->ServerDataBinding.inspect(plan,server));
