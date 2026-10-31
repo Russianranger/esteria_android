@@ -53,6 +53,26 @@ class InstallationQualification(unittest.TestCase):
         self.assertEqual(setup.public_record(original),dict(nested=[dict(gameplayQualified=False)]))
         self.assertIn('configGeneration',original)
 
+    def test_failure_context_excludes_exception_messages_locals_and_journal_private_fields(self):
+        secret = 'fixture-private-password-DO-NOT-EXPORT'
+        setup.db.atomic_json(self.state / setup.updater.JOURNAL, dict(phase='failed',
+            compiledUpdaterExecuted=True, credentials=secret, invocation='/private/' + secret))
+        try:
+            raise setup.db.BootstrapError(secret)
+        except setup.db.BootstrapError as error:
+            value = setup.safe_failure_context(error, self.state)
+        encoded = json.dumps(value)
+        self.assertNotIn(secret, encoded); self.assertNotIn('/private/', encoded)
+        self.assertEqual(value['failureReasonCode'], 'unclassified-static-boundary')
+        self.assertEqual(value['ownedOperationStages'], dict(updater=dict(phase='failed', compiledUpdaterExecuted=True)))
+        try:
+            setup.updater.stock_world_sql_snapshot(Mock(query=lambda _: ['1\t0\t0\t0']))
+        except setup.db.BootstrapError as error:
+            value = setup.safe_failure_context(error, self.state)
+        self.assertEqual(value['failureReasonCode'], 'stock-race-class-map-outfit-overlay-nonempty')
+        self.assertTrue(any(row['source'] == 'runtime/server_update_setup.py' and
+                            row['function'] == 'stock_world_sql_snapshot' for row in value['failureSourceFrames']))
+
     def test_stop_ack_requires_actual_same_operation_version_uuid_and_clean_flags(self):
         row=self.stopped();setup.stopped_document(row,self.operation,self.version,self.uuid)
         changes=(('operationId','2'*32),('version','8.0.46'),('uuid','11234567-89ab-4cde-8fab-0123456789ab'),

@@ -52,6 +52,44 @@ def public_record(value):
     return value
 
 
+def safe_failure_context(error, state):
+    """Bounded source locations and typed stages, never messages or locals.
+
+    Raw exception text, SQL logs, connection strings and private paths can
+    contain credentials. Only exact known static failures get reason codes.
+    """
+    frames, current = [], error.__traceback__
+    while current is not None:
+        code = current.tb_frame.f_code
+        try: relative = Path(code.co_filename).resolve().relative_to(ROOT).as_posix()
+        except (OSError, ValueError): relative = ''
+        if relative.startswith(('runtime/', 'tools/')) and relative.endswith('.py'):
+            frames.append(dict(source=relative, line=current.tb_lineno, function=code.co_name))
+        current = current.tb_next
+    reasons = {
+        'Stock SQL closure changed: ChrRaces/ChrClasses/Map/CharStartOutfit overlays must be empty; '
+        'preserving this installation for diagnosis': 'stock-race-class-map-outfit-overlay-nonempty',
+        'Stock Human Warrior start missing or changed: expected map 0, zone 12, Northshire; '
+        'preserving this installation for diagnosis': 'stock-human-warrior-start-missing',
+        'MySQL query failed; no credentials or SQL text were logged': 'mysql-query-failed',
+        'compiled dbimport failed (exit 1); partial fixture preserved': 'compiled-updater-exit-1',
+    }
+    stages = {}
+    allowed = {'prepared', 'importing', 'baseline-complete', 'in-flight', 'failed', 'complete'}
+    for label, name in (('baseline', schema.JOURNAL), ('updater', updater.JOURNAL), ('playerbots', playerbots.JOURNAL)):
+        try:
+            if not os.path.lexists(state / name): continue
+            document = schema.private_journal(state / name)
+            phase = document.get('phase')
+            stages[label] = dict(phase=phase if phase in allowed else 'unrecognized')
+            for field in ('compiledUpdaterExecuted', 'compiledPlayerbotsLoaderExecuted'):
+                if type(document.get(field)) is bool: stages[label][field] = document[field]
+        except (OSError, ValueError, db.BootstrapError):
+            stages[label] = dict(phase='unreadable')
+    return dict(failureSourceFrames=frames[-16:], failureReasonCode=reasons.get(str(error), 'unclassified-static-boundary'),
+                ownedOperationStages=stages)
+
+
 def worker_command(state, session, mysql, mysqld, version, operation):
     return [sys.executable, '-B', '-s', '-E', str(Path(__file__).resolve()), '--service-worker',
         '--state', str(state), '--session', str(session), '--mysql', str(mysql), '--mysqld', str(mysqld),
@@ -280,12 +318,16 @@ def run(prepared, mysql, mysqld, version, output):
         with db.option_file(state, 'esteria', password) as options, db.Mysql(mysql, options) as connection, db.state_lock(state) as lease:
             live = lambda: owned.verify(connection, uuid)
             evidence['phase'] = 'production-core-composition'
+            def composition_progress(value):
+                phase = value.get('phase') if isinstance(value, dict) else None
+                if isinstance(phase, str) and re.fullmatch(r'installation-[a-z0-9-]{1,64}', phase):
+                    evidence['compositionPhase'] = phase
             staged = installation.compose(verified, connection, state, version, program=install / 'bin/dbimport',
                 program_identity=programs['dbimport'], template=template,
                 template_identity={key: rows[0][key] for key in ('bytes', 'sha256')},
                 original_build_identity=verified.compiled['serverBuild'], mysql=mysql, data=data, profile=arguments['profile'],
                 apply_sql=lambda name, sql: base.apply_base(mysql, options, 'acore_' + name, sql, state / 'logs/sql-private.log'),
-                verify_service=live, expected_uuid=uuid, state_lease=lease)
+                verify_service=live, expected_uuid=uuid, state_lease=lease, progress=composition_progress)
             require(staged['scope'] == installation.SCOPE and staged['playerbotsSchemaVerified'] is False,
                     'Initial composition must remain pending playerbots')
             stock_sql = updater.stock_world_sql_snapshot(connection)
@@ -362,6 +404,7 @@ def run(prepared, mysql, mysqld, version, output):
         return public_record(evidence)
     except BaseException as error:
         evidence.update(qualificationSucceeded=False, failurePhase=evidence['phase'], failureClass=type(error).__name__, phase='failed')
+        evidence.update(safe_failure_context(error, state))
         raise
     finally:
         try:

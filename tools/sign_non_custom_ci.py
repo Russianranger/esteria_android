@@ -31,7 +31,10 @@ def execute(args):
     encoded = os.environ['ESTERIA_KEYSTORE_BASE64']
     signing.require(len(encoded) <= 24 * 1024 * 1024, 'private-input-size')
     try:
-        key = base64.b64decode(encoded, validate=True)
+        # Existing GitHub key secrets may use the original decoder's line wrapping.
+        # Only ASCII base64 whitespace is ignored; all other invalid bytes fail.
+        normalized = encoded.translate(str.maketrans('', '', ' \t\r\n'))
+        key = base64.b64decode(normalized, validate=True)
     except (ValueError, binascii.Error):
         raise ValueError('invalid-keystore-encoding') from None
     signing.require(0 < len(key) <= 16 * 1024 * 1024, 'private-input-size')

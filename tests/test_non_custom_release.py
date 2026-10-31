@@ -27,9 +27,10 @@ class StockSigningBoundary(unittest.TestCase):
         self.assertFalse(self.args.output.exists())
 
     def test_private_inputs_are_external_exclusive_and_removed_on_sdk_failure(self):
-        secrets = dict(ESTERIA_KEYSTORE_BASE64=base64.b64encode(b'synthetic-key').decode(),
+        secrets = dict(ESTERIA_KEYSTORE_BASE64=' \n' + base64.b64encode(b'synthetic-key').decode() + '\r\n',
                        ESTERIA_KEYSTORE_PASSWORD='synthetic-store', ESTERIA_KEY_PASSWORD='synthetic-key-pass')
         def fail(args):
+            self.assertEqual(args.keystore.read_bytes(), b'synthetic-key')
             self.assertEqual(args.keystore.stat().st_mode & 0o777, 0o600)
             self.assertEqual(args.keystore.parent.stat().st_mode & 0o777, 0o700)
             self.assertEqual(args.lock, signing.ROOT / 'app/stock-signing.lock.json')
