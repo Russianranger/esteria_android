@@ -275,11 +275,19 @@ jobs:
             -PserverContentProviderDir="$SERVER_STOCK_PROVIDERS/content" \
             -PclientRuntimeArtifact="$RUNNER_TEMP/cohort-inputs/release/client-original.zip" \
             -PclientRuntimeSource="$GITHUB_WORKSPACE/sources/client" 2>&1 | tee out/coherent-logs/gradle.log
-      - name: Exercise actual SDK signing and isolated package identities with the pre-existing debug fixture key
+      - name: Exercise actual SDK signing and isolated package identities with an explicit disposable fixture key
         run: |
-          test -f "$HOME/.android/debug.keystore"
+          umask 077
+          SDK_SIGNING_FIXTURE_KEY="$RUNNER_TEMP/esteria-sdk-signing-fixture.jks"
+          test ! -e "$SDK_SIGNING_FIXTURE_KEY"
+          trap 'rm -f "$SDK_SIGNING_FIXTURE_KEY"' EXIT
+          # This disposable identity signs only tiny qualification fixtures.
+          # The owner-provisioned persistent project key is never used here.
+          keytool -genkeypair -noprompt -keystore "$SDK_SIGNING_FIXTURE_KEY" \
+            -storetype JKS -alias androiddebugkey -storepass android -keypass android \
+            -dname 'CN=Android Debug,O=Android,C=US' -keyalg RSA -keysize 2048 -validity 1
           ESTERIA_SIGNING_TEST_BUILD_TOOLS="$ANDROID_HOME/build-tools/35.0.0" \
-          ESTERIA_SIGNING_TEST_DEBUG_KEY="$HOME/.android/debug.keystore" \
+          ESTERIA_SIGNING_TEST_DEBUG_KEY="$SDK_SIGNING_FIXTURE_KEY" \
             python3 -m unittest tests.test_android_signing.ActualSdkSigning -v
       - name: Install the complete selected server provider profile on a bounded Java heap
         run: |

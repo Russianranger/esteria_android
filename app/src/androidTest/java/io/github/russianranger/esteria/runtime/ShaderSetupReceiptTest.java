@@ -22,6 +22,25 @@ public final class ShaderSetupReceiptTest {
     static String hash(byte[] bytes)throws Exception {StringBuilder out=new StringBuilder();for(byte b:MessageDigest.getInstance("SHA-256").digest(bytes))out.append(String.format(java.util.Locale.ROOT,"%02x",b&255));return out.toString();}
     static void write(Path file,String value)throws IOException {Files.write(file,value.getBytes(StandardCharsets.UTF_8));}
     static JSONObject pin(byte[] bytes)throws Exception{return new JSONObject().put("bytes",bytes.length).put("sha256",hash(bytes));}
+    @Test public void packagedStockHelpersReuseAndPreserveChangedBytes()throws Exception {
+        android.content.Context context=InstrumentationRegistry.getInstrumentation().getTargetContext();
+        Path root=context.getFilesDir().getCanonicalFile().toPath();
+        Path helpers=StockClientSetup.installHelpers(context,root);
+        java.util.Set<String> expected=java.util.Set.of("stock_content_inspection.py","stock_shader_generation.py",
+            "shader_generation.py","extractor_order.py","server_data_preflight.py");
+        try(var files=Files.list(helpers)) {
+            assertEquals(expected,files.map(path->path.getFileName().toString()).collect(java.util.stream.Collectors.toSet()));
+        }
+        assertEquals(helpers,StockClientSetup.installHelpers(context,root));
+        Path coordinator=helpers.resolve("stock_shader_generation.py");
+        byte[] original=Files.readAllBytes(coordinator),changed="changed-helper-preserved".getBytes(StandardCharsets.US_ASCII);
+        try {
+            Files.write(coordinator,changed);
+            refuses(()->StockClientSetup.installHelpers(context,root));
+            assertArrayEquals(changed,Files.readAllBytes(coordinator));
+        }finally {Files.write(coordinator,original);}
+        assertEquals(helpers,StockClientSetup.installHelpers(context,root));
+    }
     static String canonical(JSONObject value)throws Exception {
         TreeMap<String,Object> sorted=new TreeMap<>();value.keys().forEachRemaining(k->{try{sorted.put(k,value.get(k));}catch(Exception e){throw new AssertionError(e);}});
         StringBuilder out=new StringBuilder("{");for(var item:sorted.entrySet()) {
@@ -35,6 +54,11 @@ public final class ShaderSetupReceiptTest {
             Path game=Files.createDirectory(base.resolve("game")),tools=Files.createDirectory(base.resolve("tools")),work=Files.createDirectory(base.resolve("work")),helpers=Files.createDirectory(base.resolve("helpers"));
             String imported="1".repeat(64),revision="2".repeat(40),manifest="3".repeat(64);
             Path data=Files.createDirectories(game.resolve("generations/"+imported+"/data"));
+            // Name-only locale selection fixture; these are deliberately not
+            // real MPQs and do not exercise decoding or shader generation.
+            Files.createDirectories(data.resolve("Data/enUS"));
+            Files.write(data.resolve("Data/common.MPQ"),new byte[]{0});
+            Files.write(data.resolve("Data/enUS/locale-enUS.MPQ"),new byte[]{0});
             write(game.resolve("current"),imported+"\n");
             byte[] complete="explicit synthetic metadata".getBytes(StandardCharsets.UTF_8),journal="synthetic journal".getBytes(StandardCharsets.UTF_8);
             Files.write(data.getParent().resolve("complete"),complete);Files.write(data.getParent().resolve("journal.tsv"),journal);

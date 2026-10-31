@@ -86,13 +86,20 @@ class ActualSdkDetachedSignature(unittest.TestCase):
             bad = fixture.root / (label + '.apk'); content = bytearray(signed.read_bytes()); content[offset] ^= 1; bad.write_bytes(content)
             with self.subTest(mutation=label), self.assertRaisesRegex(ValueError, message):
                 detached.export(unsigned, bad, fixture.root / (label + '.json'))
+        if recipe['alignmentPaddingBytes']:
+            bad = fixture.root / 'nonzero-padding.apk'; content = bytearray(signed.read_bytes())
+            content[recipe['unsignedCentralDirectoryOffset']] = 1; bad.write_bytes(content)
+            with self.assertRaisesRegex(ValueError, 'alignment-padding-not-zero'):
+                detached.export(unsigned, bad, fixture.root / 'nonzero-padding.json')
         with self.assertRaisesRegex(ValueError, 'must-be-unsigned'):
             detached.export(signed, signed, fixture.root / 'already-signed.json')
 
-        for label in ('unsigned', 'signed', 'block'):
+        for label in ('unsigned', 'signed', 'block', 'padding-type'):
             changed = json.loads(recipe_file.read_text())
             if label in ('unsigned', 'signed'):
                 changed[label]['sha256'] = 'f' * 64
+            elif label == 'padding-type':
+                changed['alignmentPaddingBytes'] = True
             else:
                 block = bytearray(base64.b64decode(changed['signingBlockBase64'])); block[30] ^= 1
                 changed['signingBlockBase64'] = base64.b64encode(block).decode()

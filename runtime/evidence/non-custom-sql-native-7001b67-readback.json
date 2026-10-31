@@ -1,0 +1,100 @@
+{
+  "formatVersion": 1,
+  "scope": "complete-bounded-artifact-readback-native-arm64-stock-sql",
+  "integrationRevision": "7001b67fc16da9f967ee0810a5c0e675d00c5776",
+  "workflowRun": 41212052721,
+  "job": 124568903691,
+  "artifacts": {
+    "success": {
+      "id": 13046736514,
+      "name": "server-installation-native-evidence-7001b67fc16da9f967ee0810a5c0e675d00c5776",
+      "bytes": 12657,
+      "sha256": "74dce9b9f2e77eca89e499a9a73b9515a4ed7c6a9ddda55d084a2aeddc9fa459",
+      "workflowRun": 41212052721,
+      "integrationRevision": "7001b67fc16da9f967ee0810a5c0e675d00c5776"
+    },
+    "failure0": {
+      "id": 13045914042,
+      "name": "server-installation-native-evidence-b00f13a8a2bf50d14110d363812ed7599010ec9f",
+      "bytes": 10302,
+      "sha256": "0be6758c5dd6812f609dd64eba989ff95f51571a1b4fc5f569de976d86005722",
+      "workflowRun": 41211067232,
+      "integrationRevision": "b00f13a8a2bf50d14110d363812ed7599010ec9f"
+    },
+    "failure1": {
+      "id": 13046800751,
+      "name": "server-installation-native-evidence-c321951effd724ce7cde0714cfb8ac5264b1d941",
+      "bytes": 10554,
+      "sha256": "73e2066ce053035510c48879dd570fdacb9160040be69a7ceaaa527537ee46e2",
+      "workflowRun": 41211577406,
+      "integrationRevision": "c321951effd724ce7cde0714cfb8ac5264b1d941"
+    }
+  },
+  "allArtifactBytesAndMembersRead": true,
+  "allEnvironmentFileIdentitiesVerified": true,
+  "stockWorldSql": {
+    "actualFileDbcRowsLoaded": false,
+    "contentProfile": "stock-3.3.5a",
+    "gameplayQualified": false,
+    "humanWarriorNorthshireStartVerified": true,
+    "stockRaceClassMapOutfitSqlOverlaysEmpty": true,
+    "worldStartupExecuted": false
+  },
+  "verifiedTrueFlags": [
+    "qualificationSucceeded",
+    "initializedNewInstance",
+    "productionCoreCompositionCompleted",
+    "productionFinishPlayerbotsExecuted",
+    "nestedDataDirectoryConfigurationVerified",
+    "completedFinishReentryWithoutExecution",
+    "restartPersistenceVerified",
+    "restartedFinishReentryWithoutExecution",
+    "productionReadyAndStoppedAcknowledgmentsVerified",
+    "sourcePrivateJournalsAccountCredentialsPreserved",
+    "nativeSqlSetupReceiptVerified",
+    "cleanShutdownVerified"
+  ],
+  "unqualifiedFlags": [
+    "androidRuntimeQualified",
+    "authserverExecuted",
+    "worldserverExecuted",
+    "gameplayQualified",
+    "serverDataQualified",
+    "slotPromoted",
+    "playerbotsAiQualified",
+    "botCharactersCreated",
+    "javaCoordinatorExecuted"
+  ],
+  "selectedWorldUpdateCount": 3070,
+  "excludedWorldUpdateCount": 270,
+  "sourceLockSha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1",
+  "selectedSourcePathsSha256": "9a0fae2c2da7cf5695ad1a6bd0d62088c1d19fae30089d9b3450d7896c10919b",
+  "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
+  "serverAdaptations": 7,
+  "schemas": {
+    "auth": {
+      "tableCount": 23,
+      "sourceUpdateNamesVerified": 25
+    },
+    "characters": {
+      "tableCount": 176,
+      "sourceUpdateNamesVerified": 105
+    },
+    "world": {
+      "tableCount": 360,
+      "sourceUpdateNamesVerified": 3070
+    }
+  },
+  "playerbots": {
+    "tableCount": 30,
+    "updateCount": 31
+  },
+  "sameMysqlUuidAcrossRestart": true,
+  "cleanCommandStopsVerified": 2,
+  "actualClientDataAvailable": false,
+  "actualFileDbcRowsLoaded": false,
+  "actualWorldStartupExecuted": false,
+  "actualGameSessionExecuted": false,
+  "previousFailuresRetained": true,
+  "previousFailureReasonCode": "stock-race-class-map-outfit-overlay-nonempty"
+}

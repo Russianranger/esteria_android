@@ -1,0 +1,56 @@
+{
+  "androidRuntimeQualified": false,
+  "compilerExecuted": false,
+  "files": {
+    "dependency-context.json": {
+      "bytes": 2187,
+      "sha256": "2d46f7fc1f0a406527aae025cd20d8991767e1367aab122acbe1f4bf6adc604d"
+    },
+    "dependency-context.log": {
+      "bytes": 2187,
+      "sha256": "d31bdb7b2d7e906e3e8bc5fe722afd251bf1163f4ff84f222d29d2f65c00a8a9"
+    },
+    "dependency-download.log": {
+      "bytes": 110,
+      "sha256": "5d3e81dea3a4bdbc90c02cd799cdc3669f9f787ac129cd08efcd740453575ff9"
+    },
+    "dependency-image-check.json": {
+      "bytes": 1433,
+      "sha256": "ded60395aa7547a75286b373acbc9e674e63cac21333f4cf735a7bb78242fa63"
+    },
+    "image-build.log": {
+      "bytes": 641,
+      "sha256": "431e2974aef5f5dcbd02c3e2baa07eaa96dec6f9f83c5217a3aae7661111442b"
+    },
+    "input-acquisition.log": {
+      "bytes": 1566,
+      "sha256": "04e2a3faada331d2a87d7f13e55e26e61f1f0881e45192327f1f3da157cecaf5"
+    },
+    "input-preparation.json": {
+      "bytes": 1566,
+      "sha256": "04e2a3faada331d2a87d7f13e55e26e61f1f0881e45192327f1f3da157cecaf5"
+    },
+    "mysql-state-mount-preflight.json": {
+      "bytes": 171,
+      "sha256": "c0525585aedb47e63737e4f736e97640d59ae56f501a47e0958046f78d4bb58f"
+    },
+    "native-installation-qualification.json": {
+      "bytes": 36481,
+      "sha256": "d19777230898e2ed5c8e0baebca6ef85a0b99d35f0d7c1cac79425562340158d"
+    },
+    "runtime-preparation.json": {
+      "bytes": 1362,
+      "sha256": "da9ef8189231352878b4ed4b95846088ea32a720c51821b7c7e1d1c3b586226d"
+    }
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "integrationRevision": "7001b67fc16da9f967ee0810a5c0e675d00c5776",
+  "javaCoordinatorExecuted": false,
+  "nativeCommandsRequireExternalNetworkDisabled": true,
+  "privateSqlLogsExported": false,
+  "providerActivated": false,
+  "scope": "native-installation-finish-and-clean-stop-environment",
+  "slotPromoted": false,
+  "worldserverExecuted": false
+}

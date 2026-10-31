@@ -1,0 +1,66 @@
+name: Publish exact stock APK with detached public signature
+on:
+  workflow_dispatch:
+  push:
+    branches: [non-custom]
+    paths:
+      - runtime/releases/non-custom/**
+      - tools/publish_detached_non_custom.py
+      - tools/export_apk_signature.py
+      - .github/workflows/publish-non-custom-detached.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: publish-detached-non-custom
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/non-custom' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[publish detached non-custom]'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with:
+          distribution: temurin
+          java-version: '17.0.13+11'
+      - name: Install exact Android SDK tools for independent signature and manifest readback
+        run: |
+          export ANDROID_HOME="$RUNNER_TEMP/detached-publication-sdk"
+          mkdir -p "$ANDROID_HOME/cmdline-tools"
+          curl --fail --location --retry 3 --max-time 600 https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -o "$RUNNER_TEMP/detached-android-commandline.zip"
+          echo '2d2d50857e4eb553af5a6dc3ad507a17adf43d115264b1afc116f95c92e5e258  '"$RUNNER_TEMP/detached-android-commandline.zip" | sha256sum --check
+          unzip -q "$RUNNER_TEMP/detached-android-commandline.zip" -d "$ANDROID_HOME/cmdline-tools"
+          mv "$ANDROID_HOME/cmdline-tools/cmdline-tools" "$ANDROID_HOME/cmdline-tools/12.0"
+          (set +o pipefail; yes | "$ANDROID_HOME/cmdline-tools/12.0/bin/sdkmanager" --sdk_root="$ANDROID_HOME" --licenses >/dev/null)
+          "$ANDROID_HOME/cmdline-tools/12.0/bin/sdkmanager" --sdk_root="$ANDROID_HOME" 'build-tools;35.0.0'
+          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
+      - name: Check detached signature and fixed producer provenance guards
+        run: |
+          python3 -m py_compile tools/export_apk_signature.py tools/publish_detached_non_custom.py
+          python3 -m unittest tests.test_detached_non_custom_publication -v
+      - name: Verify exact package and native SQL evidence, reconstruct and independently verify, publish additively
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/publish_detached_non_custom.py --build-tools "$ANDROID_HOME/build-tools/35.0.0" \
+            --output out/detached-publication --publish
+      - name: Retain public provenance and signing evidence without private key material
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: detached-stock-publication-${{ github.sha }}
+          path: |
+            out/detached-publication/publication-evidence.json
+            out/detached-publication/publication-draft.json
+            out/detached-publication/published-release.json
+            out/detached-publication/release/release.json
+            out/detached-publication/signed/signing-receipt.json
+          if-no-files-found: warn
+          retention-days: 30

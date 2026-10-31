@@ -1,0 +1,179 @@
+{
+  "androidRuntimeQualified": false,
+  "authserverExecuted": false,
+  "botCharactersCreated": false,
+  "cleanShutdownVerified": false,
+  "compiledModules": {
+    "bytes": 5348,
+    "sha256": "6459b6a1acab2c62c474e4c6ab3eb651daa21f697ccd628e93a38bad298bbdd1"
+  },
+  "compilerExecuted": false,
+  "completeSetupQualified": false,
+  "completedFinishReentryWithoutExecution": false,
+  "contentReceipt": {
+    "bytes": 1343739,
+    "sha256": "1c00990e090e85af0232fe633b64e2718071a5f8e81f3b0ca1c8f2b214ffb3af"
+  },
+  "engineDerivative": {
+    "androidRuntimeQualified": false,
+    "debugArchiveIdentified": {
+      "bytes": 1082880246,
+      "sha256": "facc75680f3fb1b205a98960d6ea5a0d565cb2a2b4bd56303dd6625fd4854a24"
+    },
+    "debugArchiveReadBackHere": false,
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "originalBuild": {
+      "bytes": 32521,
+      "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+    },
+    "originalModules": {
+      "bytes": 5348,
+      "sha256": "6459b6a1acab2c62c474e4c6ab3eb651daa21f697ccd628e93a38bad298bbdd1"
+    },
+    "originalReceiptsUnchanged": true,
+    "packageReceipt": {
+      "bytes": 34652,
+      "sha256": "bb62ad200ac9be9b756616e351bf591508eedb7420f9fd39d5ea0544ae1cc548"
+    },
+    "programs": {
+      "authserver": {
+        "bytes": 1709864,
+        "sha256": "04cbda982ca1385903929eb46ca52b7cb41ca222e8a48f9898af716d2b878531"
+      },
+      "dbimport": {
+        "bytes": 1379920,
+        "sha256": "f452ef5c7ab90451e9060bdace1ba866a93da768145428b15ddc25a7e73b6c24"
+      },
+      "worldserver": {
+        "bytes": 59025784,
+        "sha256": "9757f0bbb2ee159d18070d8f5fe7ecdf5b4b8b7171116198039f418d5ec13aa1"
+      }
+    },
+    "runtimeArchive": {
+      "bytes": 21352885,
+      "sha256": "00bd0a5829caec2a2b11d4e85bd261b67461c04e6755bb332d37d393311c6ccb"
+    },
+    "scope": "verified-engine-derivative-program-selection",
+    "serverExecuted": false,
+    "sourceCompanionComplete": false
+  },
+  "existingStateModified": false,
+  "failureClass": "BootstrapError",
+  "failurePhase": "production-core-composition",
+  "firstReadyReceipt": {
+    "applicationSchemaUpdatesQualified": false,
+    "bindAddress": "127.0.0.1",
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "liveSqlAuthenticated": true,
+    "operationId": "d06b72d283c94549e6e9fc4e80c8c72a",
+    "ownedEngineIdentityVerified": true,
+    "port": 13306,
+    "receiptIdentity": {
+      "bytes": 591,
+      "sha256": "36f0b29e9b3d34ed727b246b6593302cc848e8291e5346295adb415813dfb9ef"
+    },
+    "scope": "owned-local-mysql-live-service",
+    "uuid": "e3a4eb87-d538-11f1-8336-1534c9534252",
+    "version": "8.0.46-0ubuntu0.24.04.4"
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "helperBuildReceipt": {
+    "bytes": 32008,
+    "sha256": "82b9c7c852164f303500214e044f07bf5eb389fa2f3f03b9f6cdc962a5bba602"
+  },
+  "helperExecutable": {
+    "bytes": 25188512,
+    "sha256": "b7d9b72c17f32294915f0a474283c543057ffb7de7b3f93015c2e7e179bfcf25"
+  },
+  "helperNativeReceipt": {
+    "bytes": 37703,
+    "sha256": "56288b2ea7046fa256bdd53113701bd59236d5d8403a3a16f32b5fcf0ab53c42"
+  },
+  "initializedNewInstance": true,
+  "inputLock": {
+    "bytes": 1357,
+    "sha256": "97a954c672194afd83f6aa4d4dd352ec454a19f43e552b98c6c0b86c49a101a0"
+  },
+  "javaCoordinatorExecuted": false,
+  "mysqlUuid": "e3a4eb87-d538-11f1-8336-1534c9534252",
+  "mysqlVersion": "8.0.46-0ubuntu0.24.04.4",
+  "nativeSqlSetupReceiptVerified": false,
+  "nestedDataDirectoryConfigurationVerified": false,
+  "originalBuild": {
+    "bytes": 32521,
+    "sha256": "cdfd2ea0361f7dbb54b6f820a4cb295eb6b87fdcda32fe5cf4206ac3fe919d31"
+  },
+  "phase": "failed",
+  "playerbotsAiQualified": false,
+  "productionCoreCompositionCompleted": false,
+  "productionFinishPlayerbotsExecuted": false,
+  "productionReadyAndStoppedAcknowledgmentsVerified": false,
+  "qualificationSucceeded": false,
+  "registeredCandidate": {
+    "artifact": {
+      "bytes": 40130109,
+      "id": 12990195617,
+      "sha256": "73952c331659db612669b16c6221ac58195da35bd802b69fdaffa312eca6b7b5"
+    },
+    "candidatePin": {
+      "bytes": 13654,
+      "sha256": "602e7d0da21baf6549272c7aab8c9d8d2ad87c83f601ce487d16d02b4ac6b757"
+    },
+    "producer": {
+      "integrationRevision": "eb11d0719032bd9dc40498bfdb4888fd3162bc35",
+      "workflowRun": 41081216973
+    }
+  },
+  "restartPersistenceVerified": false,
+  "restartedFinishReentryWithoutExecution": false,
+  "scope": "disposable-native-arm64-owned-installation-finish-and-stop",
+  "serverDataQualified": false,
+  "slotPromoted": false,
+  "source": {
+    "branch": "main",
+    "commit": "f35f04d01689f034778e3474b3c820092f51e461",
+    "patches": [
+      {
+        "path": "patches/server/0001-eluna-declare-area-trigger.patch",
+        "sha256": "c26b145188c5f97bf30d032e1fe3bd7fe17aa1f8f0daa6793e51f5d830fe7aa6",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0002-eluna-include-map-manager.patch",
+        "sha256": "4e277dbe56c31ae30640c8e9ad4dee12e944e0f051d9bdc8d62aaa239c50433f",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0003-eluna-hooks-include-types.patch",
+        "sha256": "5999402d985fcc709abdc90bb4272072d1d5e3e261b2cc7ec19460320c14295f",
+        "submodule": "src/server/game/LuaEngine"
+      },
+      {
+        "path": "patches/server/0004-attunement-stat-api.patch",
+        "sha256": "d9ef6ca8f96ab186c37c072b22143cdded9976aa3a62d083f893c502a5745cb8"
+      },
+      {
+        "path": "patches/server/0005-script-grid-templates.patch",
+        "sha256": "6b459c90839e7831df8533966442fabd476ae1773f0302c50ccc8a997f157369"
+      },
+      {
+        "path": "patches/server/0006-empty-script-modules.patch",
+        "sha256": "ea0beb357c71d8b8c187af9d4afede520e7ac9877e40fbdc5fab99d54fc21f97"
+      },
+      {
+        "path": "patches/server/0007-runtime-module-config-directory.patch",
+        "sha256": "5e41d474179ef553ec9c2544de947a3724885fd7f3ac233af3d89797acd032ff"
+      }
+    ],
+    "submodules": {
+      "src/server/game/LuaEngine": "58d7652138887783228b9727bd1fa4e08f00342b"
+    },
+    "url": "https://github.com/Russianranger/EsteriaWoW.git"
+  },
+  "sourceLockSha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1",
+  "sourcePrivateJournalsAccountCredentialsPreserved": false,
+  "worldserverExecuted": false
+}

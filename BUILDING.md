@@ -470,3 +470,11 @@ changes protected GlueXML/FrameXML content still needs actual signed-content
 and normal UI initialization qualification with that selected binary. Import
 verification, SRP authentication and successful shader compilation do not
 establish that gate or authorize a silent signature-policy change.
+
+
+The original persistent key may also remain entirely local. The
+[detached public signing transport](runtime/releases/non-custom/README.md)
+reconstructs the exact previously signed APK in a separate publication workflow
+from its bounded public v2/v3 signature recipe. It requires exact successful
+full-provider build and actual native stock SQL evidence before additive release
+publication; it does not reuse failed runs or claim world/Thor execution.
