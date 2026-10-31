@@ -61,7 +61,7 @@ jobs:
           python3 - "$RUNNER_TEMP/proot-build/apk-manifest.txt" <<'PYCODE'
           import pathlib, sys
           manifest = pathlib.Path(sys.argv[1]).read_text()
-          assert 'package="io.github.russianranger.esteria"' in manifest
+          assert 'package="io.github.russianranger.esteria.stock"' in manifest
           assert 'android:extractNativeLibs(0x010104ea)=(type 0x12)0xffffffff' in manifest
           PYCODE
       - name: Retain build evidence and corresponding sources

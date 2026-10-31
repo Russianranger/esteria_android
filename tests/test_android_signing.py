@@ -27,6 +27,29 @@ class SigningGuards(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'certificate-not-pinned'):
             signing.load_lock(self.lock(certificateSha256=None), True)
 
+    def test_stock_package_has_separate_pinned_identity(self):
+        lock = signing.load_lock(self.lock(packageId=signing.STOCK_PACKAGE), True)
+        self.assertEqual(lock['packageId'], signing.STOCK_PACKAGE)
+        for package in ('org.example.other', [], None):
+            with self.assertRaisesRegex(ValueError, 'signing-lock-identity'):
+                signing.load_lock(self.lock(packageId=package), True)
+        stock = json.loads((signing.ROOT / 'app/stock-signing.lock.json').read_text())
+        custom = json.loads((signing.ROOT / 'app/development-signing.lock.json').read_text())
+        self.assertEqual(stock['packageId'], signing.STOCK_PACKAGE)
+        self.assertNotEqual(stock['packageId'], custom['packageId'])
+        self.assertEqual(signing.load_lock(signing.ROOT / 'app/stock-signing.lock.json')['packageId'], signing.STOCK_PACKAGE)
+
+    def test_manifest_does_not_accept_a_different_profile_package(self):
+        apk = self.root / 'manifest.apk'; apk.write_bytes(b'fixture')
+        stock_badging = ("package: name='" + signing.STOCK_PACKAGE + "' versionCode='1' versionName='fixture'\n"
+                         "sdkVersion:'26'\ntargetSdkVersion:'35'\n")
+        with patch.object(signing, 'command', return_value=stock_badging):
+            self.assertEqual(signing.manifest(apk, {'aapt': Path('aapt')}, 1, signing.STOCK_PACKAGE)['packageId'], signing.STOCK_PACKAGE)
+            with self.assertRaisesRegex(ValueError, 'package-or-version-mismatch'):
+                signing.manifest(apk, {'aapt': Path('aapt')}, 1)
+        with self.assertRaisesRegex(ValueError, 'unsupported-package-identity'):
+            signing.manifest(apk, {}, 1, 'org.example.other')
+
     def test_test_identity_cannot_be_used_for_development(self):
         with self.assertRaisesRegex(ValueError, 'signing-lock-purpose'):
             signing.load_lock(self.lock(), False)
@@ -150,6 +173,15 @@ class ActualSdkSigning(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'certificate-mismatch'):
             signing.sign(self.args(self.first, 1, 'wrong-cert'))
         self.assertFalse((self.root / 'wrong-cert').exists())
+
+    def test_actual_stock_identity_is_separate_from_custom_package(self):
+        self.lock_value['packageId'] = signing.STOCK_PACKAGE; self.write_lock()
+        stock = signing.sign(self.args(self.apk(1, signing.STOCK_PACKAGE), 1, 'stock'))
+        self.assertEqual(stock['signedApk']['packageId'], signing.STOCK_PACKAGE)
+        self.assertTrue(stock['payloadPreserved'])
+        with self.assertRaisesRegex(ValueError, 'package-or-version'):
+            signing.sign(self.args(self.first, 1, 'custom-as-stock'))
+        self.assertFalse((self.root / 'custom-as-stock').exists())
 
     def test_actual_wrong_package_debug_and_private_credentials_fail_closed(self):
         with self.assertRaisesRegex(ValueError, 'package-or-version'):

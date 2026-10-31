@@ -88,6 +88,30 @@ class ServerDataGenerationTests(unittest.TestCase):
         self.assertEqual(len(first['files']), 5)
         self.assertEqual((self.store / 'current').read_text(), first['generation'] + '\n')
 
+    def test_profiles_separate_data_reuse_and_stock_rejects_custom_overlay(self):
+        with patch.object(data, 'execute', side_effect=self.fake_execute):
+            stock = self.generate()
+            custom = self.generate(content_profile='esteria-custom')
+            self.assertNotEqual(stock['generation'], custom['generation'])
+            self.assertEqual(stock['inputs']['contentProfile'], 'stock-3.3.5a')
+            self.assertEqual(custom['inputs']['contentProfile'], 'esteria-custom')
+        prior = (self.store / 'current').read_text()
+        namespace = self.import_root / 'data/EsteriaServerData'; namespace.mkdir()
+        (namespace / 'data').mkdir()
+        (namespace / 'manifest.properties').write_text('format=1\nscope=esteria-user-supplied-server-data\nserverRevision=' +
+            data.formats.SERVER_REVISION + '\nclientBuild=12340\nmode=overlay\nprovenance=user-supplied-format-checked\nclientProviderOrderSha256=none\n')
+        with self.assertRaisesRegex(ValueError, 'custom server-data overlays require the Esteria profile'):
+            self.generate()
+        self.assertEqual((self.store / 'current').read_text(), prior)
+
+    def test_helper_generation_changes_separate_stock_data_reuse(self):
+        with patch.object(data, 'execute', side_effect=self.fake_execute):
+            first = self.generate()
+            with patch.object(data, 'preparation_helper_generation', return_value='9' * 64):
+                second = self.generate()
+            self.assertNotEqual(first['generation'], second['generation'])
+            self.assertEqual(second['inputs']['preparationHelperGeneration'], '9' * 64)
+
     def test_interrupted_vmap_phase_reuses_only_completed_map_phase(self):
         prior = 'f' * 64 + '\n'
         self.store.mkdir(); (self.store / 'current').write_text(prior)

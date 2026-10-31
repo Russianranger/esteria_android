@@ -9,7 +9,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from runtime import shader_generation as shaders
+from runtime import stock_shader_generation as shaders
 
 
 def output(root):
@@ -73,6 +73,28 @@ class ShaderGenerationTest(unittest.TestCase):
         self.assertFalse(receipt['graphicsQualified'])
         self.assertFalse(receipt['gameplayQualified'])
         self.assertEqual((self.store / 'current').read_text(), receipt['generation'] + '\n')
+
+    def test_content_profile_separates_reuse_identity_and_rejects_unknown_profiles(self):
+        with patch.object(shaders, 'execute', side_effect=self.fake_execute) as run:
+            stock = self.run_generation()
+            custom = shaders.generate(self.store, self.game, self.generation, self.tools, self.revision, 'enUS', content_profile='esteria-custom')
+            self.assertNotEqual(stock['generation'], custom['generation'])
+            self.assertEqual(stock['inputs']['contentProfile'], 'stock-3.3.5a')
+            self.assertEqual(custom['inputs']['contentProfile'], 'esteria-custom')
+            self.assertEqual(self.run_generation(), stock)
+            self.assertEqual(run.call_count, 2)
+        with self.assertRaisesRegex(shaders.ShaderError, 'unsupported content profile'):
+            shaders.generate(self.store, self.game, self.generation, self.tools, self.revision, 'enUS', content_profile='stock-unknown')
+
+    def test_wrapper_source_changes_prevent_reusing_a_prior_shader_generation(self):
+        with patch.object(shaders, 'execute', side_effect=self.fake_execute) as run:
+            first = self.run_generation()
+            changed = self.root / 'changed-wrapper.py'; changed.write_text('# changed owned coordinator fixture\n')
+            with patch.object(shaders, '__file__', str(changed)):
+                second = self.run_generation()
+            self.assertNotEqual(first['generation'], second['generation'])
+            self.assertNotEqual(first['inputs']['preparationHelperSha256'], second['inputs']['preparationHelperSha256'])
+            self.assertEqual(run.call_count, 2)
 
     def test_failed_or_changed_inputs_keep_previous_generation(self):
         with patch.object(shaders, 'execute', side_effect=self.fake_execute):

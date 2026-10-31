@@ -256,6 +256,11 @@ public final class GameDataImporter {
         source.verifyUnchanged(null);
         GameDataVerifier.verifyBaseClient(data);
         ContentPackageLayout.validateFinal(data);
+        // This records exact structural evidence while the source/import lease is
+        // retained. It deliberately does not call header checks content proof;
+        // selected-locale preparation and runtime authentication remain gates.
+        atomicWrite(generation.resolve(StockClientCompatibility.REPORT_NAME),
+            StockClientCompatibility.inspect(data, "enUS").toText());
         // No active pointer is changed until every file and the whole client satisfy the checks.
         atomicWrite(generation.resolve("complete"), "format=1\nclientBuild=12340\nrequest=" + id + "\nsource=" + sourceId + "\ndirectorySync=" + directorySyncSupported + "\ncontentCompatibility=unqualified\n");
         atomicWrite(root.resolve("current"), id + "\n");

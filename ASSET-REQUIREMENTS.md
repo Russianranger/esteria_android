@@ -1,3 +1,9 @@
+# Non-custom stock asset scope
+
+The default branch profile is `stock-3.3.5a`. Supply complete original build12340 `Wow.exe` and `Data` with one complete locale/speech set, preserving Blizzard root and locale patch archives. Generate matching DBC/maps/vmaps/mmaps/Cameras and Vulkan shaders in-app. Extra Esteria/HD/challenge MPQs, custom catalogues/races/maps and Retail/Forever assets are deferred; none is a stock startup prerequisite.
+
+Actual owner bytes have not been supplied here. Import structural reporting, decoded MPQ/DBC/UI/shader inspection and actual client/server/world execution are separate evidence levels. The retained custom inventory below applies only when those deferred features are deliberately restored. Keep original source files/realmlist/accounts unchanged and genuine UI signatures enabled.
+
 # Esteria asset requirements
 
 Audit updated: 2026-10-30 UTC; source availability remains distinct from runtime qualification. Client baseline

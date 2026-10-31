@@ -1,7 +1,7 @@
 name: Android launcher and host behavior checks
 on:
   push:
-    branches: [android/client-server]
+    branches: [non-custom]
   pull_request:
   workflow_dispatch:
 permissions:

@@ -140,7 +140,7 @@ public final class ShaderSetup {
         private Result run(RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled)throws IOException {
             checkCancelled(cancelled);
             if(!wineRoot.equals(wine.current())||!toolsRoot.equals(tools.current()))throw new IOException("Shader providers changed after allocation");
-            ShaderRunPlan plan=new ShaderRunPlan(root.resolve("game"),toolsRoot,work,tools.revision(),locale);
+            ShaderRunPlan plan=new ShaderRunPlan(root.resolve("game"),toolsRoot,work,StockClientSetup.installHelpers(context,root),tools.revision(),locale);
             if(progress!=null)progress.update("shaders-locale-selected","requested "+plan.requestedLocale+"; effective "+plan.locale,0,-1);
             Path sessions=directories(root,"state/shader-operations");
             Path session=sessions.resolve(UUID.randomUUID().toString().replace("-",""));
@@ -189,7 +189,7 @@ public final class ShaderSetup {
         if(expected==null||!root.equals(context.getFilesDir().getCanonicalFile().toPath()))throw new IOException("Private prepared shaders required");
         tools.requireWineArchive(wine.archiveSha256());
         if(wine.current()==null||tools.current()==null)throw new IOException("Prepared shader providers required");
-        ShaderRunPlan plan=new ShaderRunPlan(root.resolve("game"),tools.current(),root.resolve("state/shader-work"),tools.revision(),expected.requestedLocale);
+        ShaderRunPlan plan=new ShaderRunPlan(root.resolve("game"),tools.current(),root.resolve("state/shader-work"),StockClientSetup.installHelpers(context,root),tools.revision(),expected.requestedLocale);
         Result current=validatePrepared(plan,tools.toolManifestSha256(),expected.processLogs,false);
         requireSameSelection(current,expected);return current;
     }
@@ -219,8 +219,13 @@ public final class ShaderSetup {
                 !Boolean.FALSE.equals(receipt.get("androidQualified"))||!Boolean.FALSE.equals(receipt.get("gameplayQualified")))
                 throw new IOException("Shader result scope differs");
             JSONObject inputs=receipt.getJSONObject("inputs");
-            requireKeys(inputs,"formatVersion","importGeneration","clientRevision","locale","importMetadata","toolManifestSha256");
-            if(integer(inputs,"formatVersion")!=1||!plan.importGeneration.equals(inputs.get("importGeneration"))||
+            requireKeys(inputs,"formatVersion","contentProfile","importGeneration","clientRevision","locale","importMetadata","toolManifestSha256","preparationHelperSha256");
+            Path helper=plan.helpers.resolve("stock_shader_generation.py");canonicalFile(helper);
+            long helperBytes=Files.size(helper);
+            if(helperBytes<=0||helperBytes>131072)throw new IOException("Bounded app shader helper required");
+            if(!hashFile(helper,helperBytes).equals(inputs.get("preparationHelperSha256"))||
+                !io.github.russianranger.esteria.core.content.ContentProfile.ID.equals(inputs.get("contentProfile"))||
+                integer(inputs,"formatVersion")!=1||!plan.importGeneration.equals(inputs.get("importGeneration"))||
                 !plan.clientRevision.equals(inputs.get("clientRevision"))||!plan.locale.equals(inputs.get("locale"))||
                 !manifest.equals(inputs.get("toolManifestSha256"))||!sha256((canonical(inputs)+"\n").getBytes(StandardCharsets.UTF_8)).equals(generation))
                 throw new IOException("Shader result input identity differs");

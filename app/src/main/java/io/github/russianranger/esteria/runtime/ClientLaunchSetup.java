@@ -92,7 +92,9 @@ public final class ClientLaunchSetup {
             throw new IOException("Client view root differs from private application storage");
         Path binaries=client.current();
         if (binaries==null) throw new IOException("Prepare the reconstructed client before its launch view");
-        return prepareStored(root,binaries,client.packagePlan(),acceptedAssessment,progress,cancelled);
+        try(Lease lease=claim(root)) {
+            return prepareStockStoredUnderOwnedLease(root,binaries,client.packagePlan(),lease,progress,cancelled);
+        }
     }
     /** Exclusive writable-view lease. Only the runtime package can create it;
      * the playing owner holds it until every client/presentation child is reaped. */
@@ -135,7 +137,23 @@ public final class ClientLaunchSetup {
             RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled)throws IOException {
         if(!root.equals(context.getFilesDir().getCanonicalFile().toPath()))throw new IOException("Private canonical client storage required");
         Path binaries=client.current();if(binaries==null)throw new IOException("Prepare the reconstructed client first");
-        return prepareStoredUnderOwnedLease(root,binaries,client.packagePlan(),null,lease,progress,cancelled);
+        return prepareStockStoredUnderOwnedLease(root,binaries,client.packagePlan(),lease,progress,cancelled);
+    }
+    /** Stock always loads the signed UI from selected MPQs. Retained writable
+     * addon/UI trees are never attached to this content profile. */
+    static Prepared prepareStockStoredUnderOwnedLease(Path root,Path binaries,RuntimePackagePlan client,Lease lease,
+            RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled)throws IOException {
+        lease.require(root);
+        RuntimeWork.Cancellation stop=cancelled==null?RuntimeWork.NEVER_CANCELLED:cancelled;
+        if(stop.isCancelled()||Thread.currentThread().isInterrupted())throw new RuntimeWork.CancelledException();
+        GameDataImporter importer=new GameDataImporter(root.resolve("game"));Path data=importer.resolveCurrent();
+        if(data==null)return null;
+        String generation=data.getParent().getFileName().toString();
+        ClientLaunchView.Plan plan=new ClientLaunchView.Plan(binaries,client,data,generation,null);
+        plan.requireSupportedLooseContent();
+        ClientLaunchView.Result view=new ClientLaunchView(lease.work).prepare(plan,progress,stop);
+        if(!data.equals(importer.resolveCurrent()))throw new IOException("Stock import changed while preparing the client view");
+        return new Prepared(lease.work,data,plan,view);
     }
     // Kept independent of Android services so real persistence/review behavior can be host-tested.
     static Prepared prepareStored(Path root,Path binaries,RuntimePackagePlan client,String acceptedAssessment,

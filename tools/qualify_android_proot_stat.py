@@ -18,7 +18,8 @@ except ImportError:
     import build_android_proot_stat_probe as fixture, verify_android_proot_probe as proot
     from qualify_android_installer import digest,instrument_passed,run_bounded
 
-PACKAGE='io.github.russianranger.esteria'
+NAMESPACE='io.github.russianranger.esteria'
+PACKAGE=NAMESPACE+'.stock'
 SCOPE='android-13-x86_64-proot-stat-metadata-visible-mutations'
 FIELDS=('dev','ino','mode','uid','gid','nlink','size','mtimeNs','ctimeNs')
 VIEWS={'work','data','rawWork','rawData'}
@@ -151,7 +152,7 @@ def main():
         command('install',['install',str(args.apk)]);installed=True
         command('install-tests',['install',str(args.test_apk)])
         result=command('instrument',['shell','am','instrument','-w','-r','-e','class',
-            PACKAGE+'.runtime.ProotStatMetadataTest#statTuplesSurviveAliasesAndExposeMutations',
+            NAMESPACE+'.runtime.ProotStatMetadataTest#statTuplesSurviveAliasesAndExposeMutations',
             PACKAGE+'.test/androidx.test.runner.AndroidJUnitRunner'],timeout=120)
         require(instrument_passed(result),'android-stat-instrumentation-failed')
         raw=command('receipt',['exec-out','run-as',PACKAGE,'cat','files/proot-stat-qualification.json'])

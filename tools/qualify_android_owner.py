@@ -13,8 +13,9 @@ try:
 except ImportError:
     from qualify_android_installer import digest, instrument_passed, run_bounded
 
-PACKAGE='io.github.russianranger.esteria'
-TEST=PACKAGE+'.runtime.NativeProcessOwnershipTest#nativeOwnerContracts'
+NAMESPACE='io.github.russianranger.esteria'
+PACKAGE=NAMESPACE+'.stock'
+TEST=NAMESPACE+'.runtime.NativeProcessOwnershipTest#nativeOwnerContracts'
 FLAGS=('nativeOwnerExecuted','unicodeAndExitVerified','creatorThreadLifetimeVerified','gracefulFixtureVerified',
        'forcedAndFailedRequestVisible','bothPipeBoundsVerified','failedExecRejected','interactiveBinaryEofVerified',
        'interactiveBackpressureAndCloseVerified','interactiveEpipeVerified','consoleCommandFixtureVerified')
@@ -94,7 +95,7 @@ def main():
         _,raw=command('app-receipt',['exec-out','run-as',PACKAGE,'cat','files/native-owner-qualification.json'])
         require(len(raw.encode())<=65536,'oversized-app-receipt')
         evidence=json.loads(raw); validate_receipt(evidence,args.source_revision,properties['ro.build.fingerprint']); report['appEvidence']=evidence
-        _,usage_result=command('native-owner-usage',['shell','am','instrument','-w','-r','-e','class',PACKAGE+'.runtime.NativeProcessOwnershipTest#ownedGroupUsageObservation',
+        _,usage_result=command('native-owner-usage',['shell','am','instrument','-w','-r','-e','class',NAMESPACE+'.runtime.NativeProcessOwnershipTest#ownedGroupUsageObservation',
             PACKAGE+'.test/androidx.test.runner.AndroidJUnitRunner'],timeout=180)
         require(instrument_passed(usage_result),'native-usage-test-did-not-pass')
         _,usage_raw=command('usage-receipt',['exec-out','run-as',PACKAGE,'cat','files/native-group-usage.json'])

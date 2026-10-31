@@ -15,7 +15,8 @@ def dbc(fields=66, stride=264, value=0):
 
 class SuppliedDataTests(unittest.TestCase):
     setUp = fixtures.ServerDataGenerationTests.setUp
-    generate = fixtures.ServerDataGenerationTests.generate
+    def generate(self, **kwargs):
+        return fixtures.ServerDataGenerationTests.generate(self, content_profile='esteria-custom', **kwargs)
     fake_execute = fixtures.ServerDataGenerationTests.fake_execute
 
     def package(self, mode='overlay', files=None, order='none'):

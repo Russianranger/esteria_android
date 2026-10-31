@@ -1,7 +1,7 @@
 name: Integration tooling behavior
 on:
   push:
-    branches: [android/client-server]
+    branches: [non-custom]
     paths:
       - sources.lock.json
       - config/**

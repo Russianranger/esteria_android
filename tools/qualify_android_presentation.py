@@ -14,9 +14,10 @@ try:
 except ImportError:
     from qualify_android_installer import digest, instrument_passed, run_bounded
 
-PACKAGE = 'io.github.russianranger.esteria'
-TEST = PACKAGE + '.presentation.PresentationAudioTest#actualSurfaceAndAudioTrackContracts'
-INPUT_TEST = PACKAGE + '.presentation.GameInputAndroidTest#actualImeTouchAndControllerCallbacks'
+NAMESPACE = 'io.github.russianranger.esteria'
+PACKAGE = NAMESPACE + '.stock'
+TEST = NAMESPACE + '.presentation.PresentationAudioTest#actualSurfaceAndAudioTrackContracts'
+INPUT_TEST = NAMESPACE + '.presentation.GameInputAndroidTest#actualImeTouchAndControllerCallbacks'
 SCOPE = 'android-13-x86_64-surface-audiotrack-protocol-fixtures'
 INPUT_SCOPE = 'android-13-x86_64-widget-ime-input-recording-component'
 FLAGS = ('nativeSurfaceExecuted', 'rgbaReadbackVerified', 'surfaceRecreationVerified', 'invalidFrameRejected',

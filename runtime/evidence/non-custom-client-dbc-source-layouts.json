@@ -1,0 +1,1923 @@
+{
+  "clientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "fileCount": 479,
+  "files": {
+    "WoW/Source/Client.cpp": {
+      "bytes": 73746,
+      "sha256": "1c656a2432cfb6aa485c8d56a973d604147b37ead064b19e2a5322b71fa91787"
+    },
+    "WoW/Source/DB/DBClient/DBClient.cpp": {
+      "bytes": 39325,
+      "sha256": "a08a4d5e1f2323f5c98fce0d8e48a9f637e22f367be0b331589277ac96c2ccef"
+    },
+    "WoW/Source/DB/Rec/AchievementRec.cpp": {
+      "bytes": 9733,
+      "sha256": "931bd07d43e7eb2bc9cd309757bfd2c40762525fd933be75645e40718c34a6a8"
+    },
+    "WoW/Source/DB/Rec/AchievementRec.h": {
+      "bytes": 966,
+      "sha256": "946947e65e8a6c66805e0ff76997b52c7ae2090ff580e55a0f217af40a6fd099"
+    },
+    "WoW/Source/DB/Rec/Achievement_CategoryRec.cpp": {
+      "bytes": 3315,
+      "sha256": "46bdca3ea092a27c5b6e41789d3122e667011788c95d2b331a1445f5fb7b11bb"
+    },
+    "WoW/Source/DB/Rec/Achievement_CategoryRec.h": {
+      "bytes": 639,
+      "sha256": "37ebb35d88f5671089bf0d537add282197ab92855ebf745f6114a2b7917bd292"
+    },
+    "WoW/Source/DB/Rec/Achievement_CriteriaRec.cpp": {
+      "bytes": 5412,
+      "sha256": "16e740c76817804336dc0447e9f2515536109b36b1bad8b778984875bf5dd51b"
+    },
+    "WoW/Source/DB/Rec/Achievement_CriteriaRec.h": {
+      "bytes": 1049,
+      "sha256": "3ebe73918c1475c0695e033fc85f9c341f8afc51c36276645c07cb25c5418780"
+    },
+    "WoW/Source/DB/Rec/AnimationDataRec.cpp": {
+      "bytes": 1736,
+      "sha256": "ba5119fbd88aa3be1f2c9b933767923d92892ad20fe1daa4cec032f3eabf4415"
+    },
+    "WoW/Source/DB/Rec/AnimationDataRec.h": {
+      "bytes": 753,
+      "sha256": "ac82b7af49e82a7b467723af92407630f1e254cd6347e4dc7aaa584ee152a616"
+    },
+    "WoW/Source/DB/Rec/AreaGroupRec.cpp": {
+      "bytes": 858,
+      "sha256": "53e766bd0e58c05931fd92f3f602a0190e2e8a3265b81198ee4404fad4557bd2"
+    },
+    "WoW/Source/DB/Rec/AreaGroupRec.h": {
+      "bytes": 555,
+      "sha256": "88b7c4780b077c950ee0a7cba33958bca37a778331fd59f6d2f31e4409c42021"
+    },
+    "WoW/Source/DB/Rec/AreaPOIRec.cpp": {
+      "bytes": 7265,
+      "sha256": "0ec9b1b7b3e59b68039bb3e0fe52934180c26bbc520668a2bb05f3fcea193d85"
+    },
+    "WoW/Source/DB/Rec/AreaPOIRec.h": {
+      "bytes": 871,
+      "sha256": "748fcc41bfd0ad8b4e1c801e84288be6fcb34583458b540876ce03c25dd0db7c"
+    },
+    "WoW/Source/DB/Rec/AreaTableRec.cpp": {
+      "bytes": 5596,
+      "sha256": "1e5febd04b3b97b6dc07bbbb716e1ccbb3bdec4b8fd3b931a0a9d36563336fa6"
+    },
+    "WoW/Source/DB/Rec/AreaTableRec.h": {
+      "bytes": 1115,
+      "sha256": "2a8bf47f42a1b473dab9ebb9226cace737c38bfbebdb443b121a876e8703708e"
+    },
+    "WoW/Source/DB/Rec/AreaTriggerRec.cpp": {
+      "bytes": 1807,
+      "sha256": "1d164b336fd2a38266cfe1647084cbc0e2afc8df8e2e7c7a0441b2cb77e0cb07"
+    },
+    "WoW/Source/DB/Rec/AreaTriggerRec.h": {
+      "bytes": 725,
+      "sha256": "364090ddbdc29a616088faabb5a3d7297b7f46169abe558b5b532590d4f85231"
+    },
+    "WoW/Source/DB/Rec/AttackAnimKitsRec.cpp": {
+      "bytes": 1231,
+      "sha256": "7648f09d94deb852ed950ae23f6c3e5cedbf2bacf806931308c1f786040de70c"
+    },
+    "WoW/Source/DB/Rec/AttackAnimKitsRec.h": {
+      "bytes": 660,
+      "sha256": "185b91e34f9ff5a078d4a79ef0a1b5c5c4e25856583b25ee08dafca614800449"
+    },
+    "WoW/Source/DB/Rec/AttackAnimTypesRec.cpp": {
+      "bytes": 926,
+      "sha256": "9970a7e1f7c41e0e6c566fcfd7834d3848d75cabfc1a2c6b7684d61b7317732e"
+    },
+    "WoW/Source/DB/Rec/AttackAnimTypesRec.h": {
+      "bytes": 549,
+      "sha256": "556ce8501a1817c6a927faf93a00a48dee741c7a6c18ded4a30598c686c1b4a5"
+    },
+    "WoW/Source/DB/Rec/AuctionHouseRec.cpp": {
+      "bytes": 3445,
+      "sha256": "4b2809c50b1bf308fd1798beb39154f9954f81d49d3a757badb460538bc3be1c"
+    },
+    "WoW/Source/DB/Rec/AuctionHouseRec.h": {
+      "bytes": 648,
+      "sha256": "4128c72603fc024931f8195842cdadfca4fbd62f50869e2740d6bfe96fdb1b39"
+    },
+    "WoW/Source/DB/Rec/BankBagSlotPricesRec.cpp": {
+      "bytes": 767,
+      "sha256": "bb2e0ccdad9e17f3fcf8bf0f73dec92aa40bf3a22decf47f43f8ff4a5c26a3a9"
+    },
+    "WoW/Source/DB/Rec/BankBagSlotPricesRec.h": {
+      "bytes": 551,
+      "sha256": "1c17d4bd5cb2d4522e729f8b39968fe2b51098202b71e358f76e669eb86cbf43"
+    },
+    "WoW/Source/DB/Rec/BannedAddOnsRec.cpp": {
+      "bytes": 1165,
+      "sha256": "03e24ed8ac11bc4d1aa069b268f62569cb8707e5050aea7cedbd8f7da2e86d4c"
+    },
+    "WoW/Source/DB/Rec/BannedAddOnsRec.h": {
+      "bytes": 647,
+      "sha256": "8c086909dd13342be8467942a28152ad44a9db2bc12e213e1634c3fb62b91998"
+    },
+    "WoW/Source/DB/Rec/BarberShopStyleRec.cpp": {
+      "bytes": 6977,
+      "sha256": "02b8f8f3e6e37de9a073f1d7e583173b41f868a6b112f3b2b5acb024ecc668ab"
+    },
+    "WoW/Source/DB/Rec/BarberShopStyleRec.h": {
+      "bytes": 757,
+      "sha256": "f3027b9d2f28c6c5e1f8582829e51082ac87ced64212b3b016590563a84f7784"
+    },
+    "WoW/Source/DB/Rec/BattlemasterListRec.cpp": {
+      "bytes": 4060,
+      "sha256": "ce92cc7806bf3cac46607ef39847c5eda60a195d398e13ae0c1912d9102f019a"
+    },
+    "WoW/Source/DB/Rec/BattlemasterListRec.h": {
+      "bytes": 821,
+      "sha256": "c838b56ba82d3f794971eb56163e81677a965d4ec773896a455f1102dafd4ac6"
+    },
+    "WoW/Source/DB/Rec/CameraShakesRec.cpp": {
+      "bytes": 1589,
+      "sha256": "a631bb3a58c40fad7d000834839c3793a2ae691221c2cfd72796263cde674590"
+    },
+    "WoW/Source/DB/Rec/CameraShakesRec.h": {
+      "bytes": 735,
+      "sha256": "7fb1aa6de920982395ce3443384bd0d4f0a7d413c20a8d0fab57cdd9bb53a0a9"
+    },
+    "WoW/Source/DB/Rec/Cfg_CategoriesRec.cpp": {
+      "bytes": 3402,
+      "sha256": "056de9fa9eef776a44e26a850ef86191890121ed4e52598bffea8e1f5e6810db"
+    },
+    "WoW/Source/DB/Rec/Cfg_CategoriesRec.h": {
+      "bytes": 655,
+      "sha256": "7a615eda1c21f599af5c5324676fb3009f9a5647611af78c539d56c954547c21"
+    },
+    "WoW/Source/DB/Rec/Cfg_ConfigsRec.cpp": {
+      "bytes": 1077,
+      "sha256": "80b014680f00aef384c538dd2cc1ee71aed53c89ad587348182830f8382b2024"
+    },
+    "WoW/Source/DB/Rec/Cfg_ConfigsRec.h": {
+      "bytes": 649,
+      "sha256": "3621bc06bd88c4d2dcb2e3b438b56fca7525796c5421816db7f961f367d419b4"
+    },
+    "WoW/Source/DB/Rec/CharBaseInfoRec.cpp": {
+      "bytes": 755,
+      "sha256": "296936edec2292cd68e928bf99c1b5e793243e74156f34bbd53a4c460db30f93"
+    },
+    "WoW/Source/DB/Rec/CharBaseInfoRec.h": {
+      "bytes": 568,
+      "sha256": "6c713f14c8c07fa86e36b29fdd757db7a0316bbfff9a657bac2f9350e3ee0fc2"
+    },
+    "WoW/Source/DB/Rec/CharHairGeosetsRec.cpp": {
+      "bytes": 1317,
+      "sha256": "1dbbb9c1d6dfa94dcaa8cef4e4951381b024a60b3f613f2386db3fc0c717160c"
+    },
+    "WoW/Source/DB/Rec/CharHairGeosetsRec.h": {
+      "bytes": 685,
+      "sha256": "8cb8252037b3c595686d7a4f6f077fa43a1bf8ba9767c5eea9464876b47840b5"
+    },
+    "WoW/Source/DB/Rec/CharSectionsRec.cpp": {
+      "bytes": 2310,
+      "sha256": "c151708fb7d553dd807babd7614195bfda5a34f8238c5d0a41e04415852e5d0c"
+    },
+    "WoW/Source/DB/Rec/CharSectionsRec.h": {
+      "bytes": 756,
+      "sha256": "cf1f96db535aeb7d2321d08e15f97439c3d2799872a97d3a8c0aaceff5ebb82e"
+    },
+    "WoW/Source/DB/Rec/CharStartOutfitRec.cpp": {
+      "bytes": 1602,
+      "sha256": "875710a0341430559e4c0515954e0fa9ecb1a300aa923ef74b46bb5db9c78616"
+    },
+    "WoW/Source/DB/Rec/CharStartOutfitRec.h": {
+      "bytes": 771,
+      "sha256": "ef349797960f0aed75840dbefa1f2d535156eccaa39e0e8f54828d2c935b1582"
+    },
+    "WoW/Source/DB/Rec/CharTitlesRec.cpp": {
+      "bytes": 5630,
+      "sha256": "8dc1833ebd1490e0f14be4a6a9c724c2aa2019bbae999720fb757ee0e13eb712"
+    },
+    "WoW/Source/DB/Rec/CharTitlesRec.h": {
+      "bytes": 630,
+      "sha256": "71451fc4308b1d9ca218d9b4b846960d2301d0ebd4187817b65bba2b80bf7cbd"
+    },
+    "WoW/Source/DB/Rec/CharacterFacialHairStylesRec.cpp": {
+      "bytes": 1132,
+      "sha256": "02453dde1cdd974a5d92009a5da2bbfa84de848acae46b978167b08e06685c03"
+    },
+    "WoW/Source/DB/Rec/CharacterFacialHairStylesRec.h": {
+      "bytes": 709,
+      "sha256": "1dc25f5c6f8baa08970cca09fc68a139d34a33442e4b73632bbb7c85694e8691"
+    },
+    "WoW/Source/DB/Rec/ChatChannelsRec.cpp": {
+      "bytes": 5865,
+      "sha256": "71399dfce2a827247ed75981ff0c19efbca80123aaad2dd6fa4652682d1432d4"
+    },
+    "WoW/Source/DB/Rec/ChatChannelsRec.h": {
+      "bytes": 643,
+      "sha256": "ffd5ca85a54f13e883056850dfe92467a3b80085d32c903d948689455ed16308"
+    },
+    "WoW/Source/DB/Rec/ChatProfanityRec.cpp": {
+      "bytes": 1016,
+      "sha256": "675a8533728bfc78474791f5ddbae0bb7901eef6997db80acaae331ca17c21ed"
+    },
+    "WoW/Source/DB/Rec/ChatProfanityRec.h": {
+      "bytes": 571,
+      "sha256": "9e3c1fa03c2ec895bee3228e52d1af37e1d3413d4e2521109e8f72be15afcf74"
+    },
+    "WoW/Source/DB/Rec/ChrClassesRec.cpp": {
+      "bytes": 9809,
+      "sha256": "e5edfa2c157390635feae40a2d9ecd47f8718b0ae8a79a0310d38f6a1922a7dc"
+    },
+    "WoW/Source/DB/Rec/ChrClassesRec.h": {
+      "bytes": 928,
+      "sha256": "39ade78032825a53fd0fc363f990c4f3ebc1427e4b49e8e937a0fb044fac6db2"
+    },
+    "WoW/Source/DB/Rec/ChrRacesRec.cpp": {
+      "bytes": 11866,
+      "sha256": "851af5c3dd2b08fe07e003ff2f76443853244aeff67e72fd2ba293ee660ac59a"
+    },
+    "WoW/Source/DB/Rec/ChrRacesRec.h": {
+      "bytes": 1272,
+      "sha256": "82b7cf4dd834559de444a815226d744e25c27d943d5fed29b51f3eea54359be0"
+    },
+    "WoW/Source/DB/Rec/CinematicCameraRec.cpp": {
+      "bytes": 1606,
+      "sha256": "43a22068051df063d4f3d6d3489b0e9e27e2f8f703d0cb140a06206439316c0b"
+    },
+    "WoW/Source/DB/Rec/CinematicCameraRec.h": {
+      "bytes": 653,
+      "sha256": "e4cf2f0ca0e3723e67cc61b1e7bae915c8374c21d064057418ac7a37a9e5bacb"
+    },
+    "WoW/Source/DB/Rec/CinematicSequencesRec.cpp": {
+      "bytes": 918,
+      "sha256": "96ba4bb9e181eaea63d2f415bc32ad8d455f37e1c5e98a3b5a718eaa5c7ee981"
+    },
+    "WoW/Source/DB/Rec/CinematicSequencesRec.h": {
+      "bytes": 598,
+      "sha256": "a08b042f7982212a702a0371bfb3bf9ccf1feb5bc3d57a48d51f0b651893da3f"
+    },
+    "WoW/Source/DB/Rec/CreatureDisplayInfoExtraRec.cpp": {
+      "bytes": 2311,
+      "sha256": "1941216e6a5c5d975d5119cfcc03c49da4a3a5455d52b9905e524a8a3883a65a"
+    },
+    "WoW/Source/DB/Rec/CreatureDisplayInfoExtraRec.h": {
+      "bytes": 934,
+      "sha256": "1dad1358b2f75366bc68b707ba7f5766bded1e7eefaca7b822bd1d4429b824cf"
+    },
+    "WoW/Source/DB/Rec/CreatureDisplayInfoRec.cpp": {
+      "bytes": 3744,
+      "sha256": "87b4eb84769c07ec4c0dbaa0dd331cd8da16b9f69cfdb1f4fea2c44d0e64da63"
+    },
+    "WoW/Source/DB/Rec/CreatureDisplayInfoRec.h": {
+      "bytes": 1079,
+      "sha256": "ca0918db37311e352e4cf00d7ad9472618d3c269ec012712d43433a9bec11b1e"
+    },
+    "WoW/Source/DB/Rec/CreatureFamilyRec.cpp": {
+      "bytes": 4458,
+      "sha256": "7be242cb7fdc5c37682e83430ee579d1f517717f098942464332fad9fe696dbe"
+    },
+    "WoW/Source/DB/Rec/CreatureFamilyRec.h": {
+      "bytes": 887,
+      "sha256": "5ad1372d1c6a8d8b4966d43117a3359a2357aff7be923936fddbbaa4b93028f0"
+    },
+    "WoW/Source/DB/Rec/CreatureModelDataRec.cpp": {
+      "bytes": 5182,
+      "sha256": "283e0ad9087be106a8d3db260ba24ac07f61e223a44fe441b5d2f4d924df2cd6"
+    },
+    "WoW/Source/DB/Rec/CreatureModelDataRec.h": {
+      "bytes": 1598,
+      "sha256": "db6bc4087cc774df98ff5dd7e7f1de08d14b9cf7b324ad2db3003f1be52cae43"
+    },
+    "WoW/Source/DB/Rec/CreatureMovementInfoRec.cpp": {
+      "bytes": 812,
+      "sha256": "f03368f7199369fd3606033ae9b00e6766c14e5129895c1b4af8697be1b6596f"
+    },
+    "WoW/Source/DB/Rec/CreatureMovementInfoRec.h": {
+      "bytes": 581,
+      "sha256": "ba652a11dab4603c335e756c0846c40c6ef12537a3024c84970aa56f239d7d00"
+    },
+    "WoW/Source/DB/Rec/CreatureSoundDataRec.cpp": {
+      "bytes": 5715,
+      "sha256": "6b4489adf3dae5732d288dc05b0e96d930dfa27c5da27e7dee9352382322073f"
+    },
+    "WoW/Source/DB/Rec/CreatureSoundDataRec.h": {
+      "bytes": 1810,
+      "sha256": "d6fc1ab946428d4bba6e654f91f932946595ad20203cafface3e8c4fb938d67b"
+    },
+    "WoW/Source/DB/Rec/CreatureSpellDataRec.cpp": {
+      "bytes": 929,
+      "sha256": "b833b128e941c43a91b02bed82e0bb1da573360228d3bfec29ac472b44a6524e"
+    },
+    "WoW/Source/DB/Rec/CreatureSpellDataRec.h": {
+      "bytes": 601,
+      "sha256": "a0fe3dca19342654e192809be1ad87da3d072346e5d73014a132b026c7ab9556"
+    },
+    "WoW/Source/DB/Rec/CreatureTypeRec.cpp": {
+      "bytes": 3113,
+      "sha256": "fbba6786e9b015effa9d4bcecde708400658772903a1081fd39241d7644caf7d"
+    },
+    "WoW/Source/DB/Rec/CreatureTypeRec.h": {
+      "bytes": 564,
+      "sha256": "fa25011c5f321cf84ac9b1853b3aa10028c904508bc869c17b5f24d14add70cc"
+    },
+    "WoW/Source/DB/Rec/CurrencyCategoryRec.cpp": {
+      "bytes": 3145,
+      "sha256": "791cef2bc47340a35304fe3f373a64870a2ed6d0d7112cdc4f4b7d0a2c6415f8"
+    },
+    "WoW/Source/DB/Rec/CurrencyCategoryRec.h": {
+      "bytes": 584,
+      "sha256": "bb80e2f7dd732275553ecabf26771a9a59b69510d344986e84d1536734537885"
+    },
+    "WoW/Source/DB/Rec/CurrencyTypesRec.cpp": {
+      "bytes": 980,
+      "sha256": "a24610d1bdf55786aca328cc2ce9cfeef85eec780d2f9401f42020b22b397139"
+    },
+    "WoW/Source/DB/Rec/CurrencyTypesRec.h": {
+      "bytes": 606,
+      "sha256": "41168e8782ea93923821d3db71d65597752fc1a9c17cead75a1b449228fb7223"
+    },
+    "WoW/Source/DB/Rec/DanceMovesRec.cpp": {
+      "bytes": 3909,
+      "sha256": "671614b815cef4ef2fe839e1def45ac116b0f1e9de9c3ca5cd0a295b6fe54f12"
+    },
+    "WoW/Source/DB/Rec/DanceMovesRec.h": {
+      "bytes": 731,
+      "sha256": "122668b65848b37d2140adda1dabfed0853c1cac2936c65b86f5a1f19ea1dc33"
+    },
+    "WoW/Source/DB/Rec/DeathThudLookupsRec.cpp": {
+      "bytes": 1238,
+      "sha256": "168c43d6c568d2a61e801ed517ff669480dc7957993339013f3c88e581a4e8ae"
+    },
+    "WoW/Source/DB/Rec/DeathThudLookupsRec.h": {
+      "bytes": 680,
+      "sha256": "2c7edecc64f39a4f1b673f05315cdc1e43fde01c9e9b65868e37a320366b5599"
+    },
+    "WoW/Source/DB/Rec/DestructibleModelDataRec.cpp": {
+      "bytes": 3921,
+      "sha256": "7f384243a5f51eb8705c7e1b15dcc1ebcdd7807c06717ca059edcc0b326da0da"
+    },
+    "WoW/Source/DB/Rec/DestructibleModelDataRec.h": {
+      "bytes": 1362,
+      "sha256": "9739ae9f9a24af329732f2b2be6f6f8ab80ebad9b9bf3cab1d020c56606e6e5b"
+    },
+    "WoW/Source/DB/Rec/DungeonEncounterRec.cpp": {
+      "bytes": 3705,
+      "sha256": "ba97d89d7fa257ba8eab45f221e9f4e48f4f2d1c04a90af9c30a882c3d522384"
+    },
+    "WoW/Source/DB/Rec/DungeonEncounterRec.h": {
+      "bytes": 726,
+      "sha256": "183fa746b6be324683cbf4acac5f062ddbb6b6caceba2a5bf51e04c8650976e2"
+    },
+    "WoW/Source/DB/Rec/DungeonMapChunkRec.cpp": {
+      "bytes": 1130,
+      "sha256": "2e2e9fc665965325140cb70781fc150a242840772fb991faf5701dd61153bcdf"
+    },
+    "WoW/Source/DB/Rec/DungeonMapChunkRec.h": {
+      "bytes": 648,
+      "sha256": "2909ef7cef04ca7517be4fb5166331090bda01afcde04aca0b51bc4e647d83ef"
+    },
+    "WoW/Source/DB/Rec/DungeonMapRec.cpp": {
+      "bytes": 1472,
+      "sha256": "88f7f291654538c1163ed8033b6fc80b3b4167f229d5fa098c183f3c131cf274"
+    },
+    "WoW/Source/DB/Rec/DungeonMapRec.h": {
+      "bytes": 714,
+      "sha256": "25b807c673a3f17d3cae9e149f4bacde3340293eb5a2ac52d779ea9aaec53422"
+    },
+    "WoW/Source/DB/Rec/DurabilityCostsRec.cpp": {
+      "bytes": 981,
+      "sha256": "3567f6aec9bab28b15e7fcf6536cbf2336a5a6ae0c063336bbd15697282751a3"
+    },
+    "WoW/Source/DB/Rec/DurabilityCostsRec.h": {
+      "bytes": 611,
+      "sha256": "57a2abce62cb43f5b0141882d0f972ff8c44909e96c4ccebc94b6a45531bccd7"
+    },
+    "WoW/Source/DB/Rec/DurabilityQualityRec.cpp": {
+      "bytes": 720,
+      "sha256": "15ad4a5097f4b08e742313999450fa698fe2cdaaa353cb9b66ec9b256c58ef78"
+    },
+    "WoW/Source/DB/Rec/DurabilityQualityRec.h": {
+      "bytes": 549,
+      "sha256": "cd74b791a38662fd1814bdb3e800151162140c7b92de2351c966e090793a75cb"
+    },
+    "WoW/Source/DB/Rec/EmotesRec.cpp": {
+      "bytes": 1645,
+      "sha256": "f59f624611175bb65687f16c0e3d72273a2040df612325e38f651ad442582e79"
+    },
+    "WoW/Source/DB/Rec/EmotesRec.h": {
+      "bytes": 708,
+      "sha256": "230d371593943f7af968b3e9c8d71846f9307effbf41f8420760726e7c1cce39"
+    },
+    "WoW/Source/DB/Rec/EmotesTextDataRec.cpp": {
+      "bytes": 3003,
+      "sha256": "a54bb4db0cec0ab2b1166642667343ddaac6880c76df8600846578880b494465"
+    },
+    "WoW/Source/DB/Rec/EmotesTextDataRec.h": {
+      "bytes": 542,
+      "sha256": "e707bdcbd213e682961ff58a1a7f09636a3ebe71ea2dabb85c3fcfee7187e204"
+    },
+    "WoW/Source/DB/Rec/EmotesTextRec.cpp": {
+      "bytes": 1131,
+      "sha256": "f481a573d8ae0f368166df03fb9f3f21a4d7905becb7a2f681ba506f24ef2f2b"
+    },
+    "WoW/Source/DB/Rec/EmotesTextRec.h": {
+      "bytes": 597,
+      "sha256": "605c6498fc53279ab7e0ccc3551d640776a656f41a94435eb46e46c4e7ffe7e3"
+    },
+    "WoW/Source/DB/Rec/EmotesTextSoundRec.cpp": {
+      "bytes": 1126,
+      "sha256": "ff9dabda56c48f43ace15d8421a808dc0ba618a2dc0bc1e87a3c0652e5a2e91f"
+    },
+    "WoW/Source/DB/Rec/EmotesTextSoundRec.h": {
+      "bytes": 649,
+      "sha256": "7ada091f0d3d9c4d0ba734aa696d0035bae560414e63ca57b5aef1ef1cbc8299"
+    },
+    "WoW/Source/DB/Rec/EnvironmentalDamageRec.cpp": {
+      "bytes": 943,
+      "sha256": "49b1faaca44b8b9896a1cd85349e2f52352592c1b3acc7a5601235b2d263d3e4"
+    },
+    "WoW/Source/DB/Rec/EnvironmentalDamageRec.h": {
+      "bytes": 602,
+      "sha256": "9fae2fa4ce264fd1fad395cfb625e3d74f9759f259b4316e6493cc1555898157"
+    },
+    "WoW/Source/DB/Rec/ExhaustionRec.cpp": {
+      "bytes": 3602,
+      "sha256": "8904edbea9b838c853cd48d9f4f9cfec009990308a89afae0096cd1fe3bce7c0"
+    },
+    "WoW/Source/DB/Rec/ExhaustionRec.h": {
+      "bytes": 686,
+      "sha256": "51221083a3f2b6b12dc68358318c9afa57bf0f83424c7f8e668791742f04b3ce"
+    },
+    "WoW/Source/DB/Rec/FactionGroupRec.cpp": {
+      "bytes": 3401,
+      "sha256": "d693b1312d9e8db7263e151be041f0d334f9df527a876d0b8f86268c4f0f965f"
+    },
+    "WoW/Source/DB/Rec/FactionGroupRec.h": {
+      "bytes": 608,
+      "sha256": "5b0ef524d1ecaa2be914a6c64382d3ef953ac177078630c5d3df6bf5a0ada08b"
+    },
+    "WoW/Source/DB/Rec/FactionRec.cpp": {
+      "bytes": 7118,
+      "sha256": "34696b950abaa49a4e52fd1fe133777c297a45954dcfed0d3ccac6b323898255"
+    },
+    "WoW/Source/DB/Rec/FactionRec.h": {
+      "bytes": 1015,
+      "sha256": "71d37b14618cbceeef3a537230c3254ce0568ff699b9fc3b645443b95d37e13c"
+    },
+    "WoW/Source/DB/Rec/FactionTemplateRec.cpp": {
+      "bytes": 1603,
+      "sha256": "93e1b7279ac69255a42cdd619b08178c874cbc666fcc639f6a7e529ca5d2b582"
+    },
+    "WoW/Source/DB/Rec/FactionTemplateRec.h": {
+      "bytes": 767,
+      "sha256": "238c15d1848b9943a04da8e733b729663e54c5686a1fe44b34c268f6df151015"
+    },
+    "WoW/Source/DB/Rec/FileDataRec.cpp": {
+      "bytes": 1122,
+      "sha256": "0a102966522053229f64ba84fb7102d610b237fecaa85655b601a5f639ea5128"
+    },
+    "WoW/Source/DB/Rec/FileDataRec.h": {
+      "bytes": 554,
+      "sha256": "7fd2d7e3046f6d6dff04d84d054f9244e8d53c89f180336517ca5dad3ee1c3c4"
+    },
+    "WoW/Source/DB/Rec/FootprintTexturesRec.cpp": {
+      "bytes": 959,
+      "sha256": "8b9ad33f92ee582caf25b0f034f34f9ec9abe0f95b0b962154e38d5b5c920a0a"
+    },
+    "WoW/Source/DB/Rec/FootprintTexturesRec.h": {
+      "bytes": 567,
+      "sha256": "9bf9e9cad805c1c0d0907399bd06ed9574ac4cbcbdac7d927ea6b7a23161cdfe"
+    },
+    "WoW/Source/DB/Rec/FootstepTerrainLookupRec.cpp": {
+      "bytes": 1262,
+      "sha256": "ebc4fc71d48d6846ed41a156925fff0c1ed91459a8f378b592d0e9e0b4c50848"
+    },
+    "WoW/Source/DB/Rec/FootstepTerrainLookupRec.h": {
+      "bytes": 701,
+      "sha256": "240b8d4d37db2b63b82349ad913356d8703ba8f19520737070a6b2db705fcaf1"
+    },
+    "WoW/Source/DB/Rec/GMSurveyAnswersRec.cpp": {
+      "bytes": 3477,
+      "sha256": "65c76d3d09e8dd3f97d7bda0fecd9649bf02a17186a271d893ff587b73ef7c92"
+    },
+    "WoW/Source/DB/Rec/GMSurveyAnswersRec.h": {
+      "bytes": 630,
+      "sha256": "ac7f6a29de3466d1c2304382b44ed6890b98f4aab8d4796b605985c0249234c4"
+    },
+    "WoW/Source/DB/Rec/GMSurveyCurrentSurveyRec.cpp": {
+      "bytes": 776,
+      "sha256": "5d617c487f3802ea05754d0a6733fb057bc166c8a9937160be343224dd1d9399"
+    },
+    "WoW/Source/DB/Rec/GMSurveyCurrentSurveyRec.h": {
+      "bytes": 577,
+      "sha256": "68217344098abb248e259d18811d13df5c83ba2a3f0c35fd1ec1bf9baa0c6948"
+    },
+    "WoW/Source/DB/Rec/GMSurveyQuestionsRec.cpp": {
+      "bytes": 3272,
+      "sha256": "9e6dfe4611450f758cb89ef298644f860c0bc2ee8e54568b53d0c3d5b43f3b36"
+    },
+    "WoW/Source/DB/Rec/GMSurveyQuestionsRec.h": {
+      "bytes": 561,
+      "sha256": "efa22a75ea74aac1cfab9900b803d48f9b851568e6d443090f31eb89bf98952c"
+    },
+    "WoW/Source/DB/Rec/GMSurveySurveysRec.cpp": {
+      "bytes": 778,
+      "sha256": "72d345e8f3de1fe7ef57edc7e75837b8bf7dc3cbc089162f3f9308fbfb1579a8"
+    },
+    "WoW/Source/DB/Rec/GMSurveySurveysRec.h": {
+      "bytes": 555,
+      "sha256": "c8b2a138022ab938c4bed58d67e19153386ff49195db958892c381f0f50c4957"
+    },
+    "WoW/Source/DB/Rec/GMTicketCategoryRec.cpp": {
+      "bytes": 3264,
+      "sha256": "242779bf5f9eb61d087afba329d4690c882d8281cb71c73d726e247f94c5aa2d"
+    },
+    "WoW/Source/DB/Rec/GMTicketCategoryRec.h": {
+      "bytes": 556,
+      "sha256": "5d36bb882931d717062916e839a39ebc45bcf05a03eb8cb05e99857c35d0b665"
+    },
+    "WoW/Source/DB/Rec/GameObjectArtKitRec.cpp": {
+      "bytes": 2691,
+      "sha256": "6aa10fb6ef5fed3cdb9823f349ae18081ef6cace4e87c1d44fd909f4d366d0e0"
+    },
+    "WoW/Source/DB/Rec/GameObjectArtKitRec.h": {
+      "bytes": 613,
+      "sha256": "34a8e05e850a37dd21165fbc10427c7fb0c5945c1446d50069e31b485e048445"
+    },
+    "WoW/Source/DB/Rec/GameObjectDisplayInfoRec.cpp": {
+      "bytes": 2197,
+      "sha256": "2c756321de8e51bac6cee710bdec91b0157f14f69a155b51e720000fa7c7fdbf"
+    },
+    "WoW/Source/DB/Rec/GameObjectDisplayInfoRec.h": {
+      "bytes": 743,
+      "sha256": "9e10923fd1c679ecbdd1d0867f8d567da2532186d00f2d6946f073fc6da51469"
+    },
+    "WoW/Source/DB/Rec/GameTablesRec.cpp": {
+      "bytes": 1020,
+      "sha256": "d90b84b38d80103908603d8780bee17f7b02121744d1de454609a72af7c3aa9d"
+    },
+    "WoW/Source/DB/Rec/GameTablesRec.h": {
+      "bytes": 600,
+      "sha256": "76d51be1a860430922c8dc917d6264477653b30c105cedc351977378780b84f0"
+    },
+    "WoW/Source/DB/Rec/GameTipsRec.cpp": {
+      "bytes": 2908,
+      "sha256": "6e01d66771977a9129149753290f987587618db8058de8d58c808408eec60ffc"
+    },
+    "WoW/Source/DB/Rec/GameTipsRec.h": {
+      "bytes": 512,
+      "sha256": "5e0a99c6f185d5f4b498ced6023cf837fc4efa23cfef6dca56ed651fc15d7e85"
+    },
+    "WoW/Source/DB/Rec/GemPropertiesRec.cpp": {
+      "bytes": 1134,
+      "sha256": "ae884695d62b65617db4c4f900c8a7575f3cbd01c3244f86375cf2026a198bdd"
+    },
+    "WoW/Source/DB/Rec/GemPropertiesRec.h": {
+      "bytes": 645,
+      "sha256": "0e8c5cbae90a6494f491c5202ae2b5db6aa9ea62a590d1edcfbdbe9b9e0983da"
+    },
+    "WoW/Source/DB/Rec/GlyphPropertiesRec.cpp": {
+      "bytes": 1028,
+      "sha256": "761d124c298130983da242d76737507886a3a951a6d1dee3b82b64cdfddd9a92"
+    },
+    "WoW/Source/DB/Rec/GlyphPropertiesRec.h": {
+      "bytes": 624,
+      "sha256": "2fd1b62c0f6411839754301a58957f721ff820f986be20df6bd00495578e9362"
+    },
+    "WoW/Source/DB/Rec/GlyphSlotRec.cpp": {
+      "bytes": 790,
+      "sha256": "42017454132026a09f7e2a7fa850893bdb4417eb60dddfe378de32be0a54f69a"
+    },
+    "WoW/Source/DB/Rec/GlyphSlotRec.h": {
+      "bytes": 546,
+      "sha256": "83c72d4e2a248d8b3bb1b560cf7086cd3fe62992a71054e9b8b35e7a6fef307c"
+    },
+    "WoW/Source/DB/Rec/GroundEffectDoodadRec.cpp": {
+      "bytes": 1045,
+      "sha256": "3b5d6b9552fa5e26caea5af2c20de20039615db124997f071f2e45de6b512028"
+    },
+    "WoW/Source/DB/Rec/GroundEffectDoodadRec.h": {
+      "bytes": 599,
+      "sha256": "9b929cd6eb9e5bb8a8e339c08f17d4b047f78c1526f10e40741def952f6632c7"
+    },
+    "WoW/Source/DB/Rec/GroundEffectTextureRec.cpp": {
+      "bytes": 1164,
+      "sha256": "8f2a2d9e29a351e81019e8051fb0488b259836dc77b491cf1c678065ff484a3f"
+    },
+    "WoW/Source/DB/Rec/GroundEffectTextureRec.h": {
+      "bytes": 680,
+      "sha256": "9e07d490f8c0c82aea1ce888d57e6552433019ce64aad817aa96aaecdd57ef28"
+    },
+    "WoW/Source/DB/Rec/HelmetGeosetVisDataRec.cpp": {
+      "bytes": 806,
+      "sha256": "a7b08272eb06797e15729df0b913772ceed03f00de399c770c6f37c2deae0cc0"
+    },
+    "WoW/Source/DB/Rec/HelmetGeosetVisDataRec.h": {
+      "bytes": 572,
+      "sha256": "ad4853487450c141c78594c4e1e33294102bd4cbaf4947449c03530a71affc5f"
+    },
+    "WoW/Source/DB/Rec/HolidayDescriptionsRec.cpp": {
+      "bytes": 3507,
+      "sha256": "75692a5e0931e1971941db99c3c9e9fd29bce966ca129dedd898bafa3d8fb523"
+    },
+    "WoW/Source/DB/Rec/HolidayDescriptionsRec.h": {
+      "bytes": 574,
+      "sha256": "3c75ac6e1021a92bb6fcfd453f96ebcc2d3c8abb69b7c1f50fedf2887a75003c"
+    },
+    "WoW/Source/DB/Rec/HolidayNamesRec.cpp": {
+      "bytes": 2940,
+      "sha256": "c3e0809afccf11d850cf315a29d125bf9a7e7da4fcf7120c8ea6866e70c9906e"
+    },
+    "WoW/Source/DB/Rec/HolidayNamesRec.h": {
+      "bytes": 532,
+      "sha256": "77e8678a36dc8a18d29cf5fc2cdc9f684b9f89c18ba2a0425001cebc4b2cf455"
+    },
+    "WoW/Source/DB/Rec/HolidaysRec.cpp": {
+      "bytes": 2391,
+      "sha256": "39ef48575a19cfc9958a2351d9c6403b094ac139baf2851753a9fe195bc1c572"
+    },
+    "WoW/Source/DB/Rec/HolidaysRec.h": {
+      "bytes": 911,
+      "sha256": "910ad559853f9783db33d7369beecc7a5f34af87cbad6c0075877d66f0c6d258"
+    },
+    "WoW/Source/DB/Rec/ItemBagFamilyRec.cpp": {
+      "bytes": 2948,
+      "sha256": "3ef34bc9ec1d978133bf400d3eda377cebfba837ac82e21e295395b77456231b"
+    },
+    "WoW/Source/DB/Rec/ItemBagFamilyRec.h": {
+      "bytes": 537,
+      "sha256": "9a3e0f417d8b294fa7495a1c1547a78b183e9023a6a6a16f458b93824e797179"
+    },
+    "WoW/Source/DB/Rec/ItemClassRec.cpp": {
+      "bytes": 3585,
+      "sha256": "9645501be7c0ca78aa2f2a6408b87078125e4a152c2c005348025c1b8160502b"
+    },
+    "WoW/Source/DB/Rec/ItemClassRec.h": {
+      "bytes": 636,
+      "sha256": "a135e94d71faf472d72d03d327a3d13f96f7163ce9f7aca3a45085151b65719a"
+    },
+    "WoW/Source/DB/Rec/ItemCondExtCostsRec.cpp": {
+      "bytes": 1100,
+      "sha256": "af5502a9ab56c6aa4dd44860e60204a575b895cb24e4ee8e1ee6c23257869fcc"
+    },
+    "WoW/Source/DB/Rec/ItemCondExtCostsRec.h": {
+      "bytes": 645,
+      "sha256": "a79d4c8523b45940343d67ae21508d37a67016b3dc7190238c22f5cda1e88444"
+    },
+    "WoW/Source/DB/Rec/ItemDisplayInfoRec.cpp": {
+      "bytes": 5388,
+      "sha256": "0cf876167cf36ef4c6147b133557e724975dd7068a6fcb780de946046647ba38"
+    },
+    "WoW/Source/DB/Rec/ItemDisplayInfoRec.h": {
+      "bytes": 977,
+      "sha256": "abe44c323d2f4ab3b10f833faf25da80ca2b246638c9cf9008f9b7413ee7bfcf"
+    },
+    "WoW/Source/DB/Rec/ItemExtendedCostRec.cpp": {
+      "bytes": 1719,
+      "sha256": "0e4d11026be3423ee1512d5462ac09c0919ba667d00850416e9c6ee660560ad2"
+    },
+    "WoW/Source/DB/Rec/ItemExtendedCostRec.h": {
+      "bytes": 799,
+      "sha256": "51ef43e3941d8dfeb33976df9d81de8c73fa30d570dafee9af21e38b52e49179"
+    },
+    "WoW/Source/DB/Rec/ItemGroupSoundsRec.cpp": {
+      "bytes": 754,
+      "sha256": "6b873caf0e8049d2e20d2317ec6ba52fec8110134886915d73345ac775a49d97"
+    },
+    "WoW/Source/DB/Rec/ItemGroupSoundsRec.h": {
+      "bytes": 547,
+      "sha256": "3abec80a5230539b9a742d05cf300362e4cd5c4b396872c227a3cb35bf486460"
+    },
+    "WoW/Source/DB/Rec/ItemLimitCategoryRec.cpp": {
+      "bytes": 3291,
+      "sha256": "b4bb326352d7c33d13bb8bb661efd1c0c88a211f86b286df303059ea9dffac4e"
+    },
+    "WoW/Source/DB/Rec/ItemLimitCategoryRec.h": {
+      "bytes": 624,
+      "sha256": "fc8b8e210a6b867710a9d04103f3295282887cdffce213d63260d8f870546b1c"
+    },
+    "WoW/Source/DB/Rec/ItemPetFoodRec.cpp": {
+      "bytes": 2932,
+      "sha256": "cc482052e2591c01b760e2da14573e45faf1a59aa0ebfb3a8b7511fd4781f588"
+    },
+    "WoW/Source/DB/Rec/ItemPetFoodRec.h": {
+      "bytes": 527,
+      "sha256": "385037b5c21392f8874affd0ed75d5612e8f3d9df22efaa9306bbe27d41e0fa0"
+    },
+    "WoW/Source/DB/Rec/ItemPurchaseGroupRec.cpp": {
+      "bytes": 3156,
+      "sha256": "9fc61d99701dc0613c9c5fb3eed3ffe53c60843a20cdc95c085fffb338d3896d"
+    },
+    "WoW/Source/DB/Rec/ItemPurchaseGroupRec.h": {
+      "bytes": 595,
+      "sha256": "fbd22cca3667ddefafb7eb8dee8c605376e5f6824cee3f109ec885a51c71d18d"
+    },
+    "WoW/Source/DB/Rec/ItemRandomPropertiesRec.cpp": {
+      "bytes": 3712,
+      "sha256": "e05101cd0757ccac50d32d793ea3861b6de05321ee5791581dd15e43bfd3d267"
+    },
+    "WoW/Source/DB/Rec/ItemRandomPropertiesRec.h": {
+      "bytes": 653,
+      "sha256": "abb03b76287ed24d3e36f6a95762fd91486bd677652339aa048a5c64e4ec0cdf"
+    },
+    "WoW/Source/DB/Rec/ItemRandomSuffixRec.cpp": {
+      "bytes": 3609,
+      "sha256": "ac257e24d05cd17765fe15e6a7fb68b41ebe8783cf3ac6f0bbc689d56e77cc3a"
+    },
+    "WoW/Source/DB/Rec/ItemRandomSuffixRec.h": {
+      "bytes": 682,
+      "sha256": "7a5afa204847f49c71b3277bf7c6c1d4b43a6bbdeda7d3e0f9a6514ab3c11c4e"
+    },
+    "WoW/Source/DB/Rec/ItemRec.cpp": {
+      "bytes": 1576,
+      "sha256": "85e8a15bf63cd5b935b8c2df31159f39d61012a4e84880d4ae3fee0ac198f989"
+    },
+    "WoW/Source/DB/Rec/ItemRec.h": {
+      "bytes": 730,
+      "sha256": "569e57c634a7b5fc9e96287de41edade28be1d2d736d23f615993b501e5c0e39"
+    },
+    "WoW/Source/DB/Rec/ItemSetRec.cpp": {
+      "bytes": 3706,
+      "sha256": "942bce75f65753cf4dfca89a6542166b789aae14fe6143172e7b313f78103ebc"
+    },
+    "WoW/Source/DB/Rec/ItemSetRec.h": {
+      "bytes": 714,
+      "sha256": "dcccf5572053bc4c5f4d507c2c5667fd190f9ee0c502dcc37238f1558c3f6c31"
+    },
+    "WoW/Source/DB/Rec/ItemSubClassMaskRec.cpp": {
+      "bytes": 3114,
+      "sha256": "b3432fcc98b7da43a75fb5265238f9f53ab2b9087c7626af364b5bb4d5db53f1"
+    },
+    "WoW/Source/DB/Rec/ItemSubClassMaskRec.h": {
+      "bytes": 625,
+      "sha256": "3f03c925f87a1111373cd223ffe23b2dc4e154d5f2c11e04a36e72f7a9b4474f"
+    },
+    "WoW/Source/DB/Rec/ItemSubClassRec.cpp": {
+      "bytes": 7817,
+      "sha256": "a9ee3db7a5041007c06e29eaa14ed025b11c627fe01515ed056947a2fca572aa"
+    },
+    "WoW/Source/DB/Rec/ItemSubClassRec.h": {
+      "bytes": 999,
+      "sha256": "212bcf701dddd9b48395fabb959cdcdec575f9c8a373c79ed37471f5d77a9e93"
+    },
+    "WoW/Source/DB/Rec/ItemVisualEffectsRec.cpp": {
+      "bytes": 871,
+      "sha256": "5b74b7092c8d57a45817c271ce9b66a825870faedf6f57f5cc536b8d3b02b3f5"
+    },
+    "WoW/Source/DB/Rec/ItemVisualEffectsRec.h": {
+      "bytes": 556,
+      "sha256": "0be39f200e1fdb66e3c05f3835458196b5fd4ea80484400510b5e52a6c931e69"
+    },
+    "WoW/Source/DB/Rec/ItemVisualsRec.cpp": {
+      "bytes": 718,
+      "sha256": "e1bf58e026f556f8e189708ad9af868d9115b1e3333802aed5734b0f5fbaa6cf"
+    },
+    "WoW/Source/DB/Rec/ItemVisualsRec.h": {
+      "bytes": 526,
+      "sha256": "4e60dd480c750e1a68651cac5ad3750883682c62224c3b0da1e110dad4bde491"
+    },
+    "WoW/Source/DB/Rec/LanguageWordsRec.cpp": {
+      "bytes": 1024,
+      "sha256": "76a914f0dae1daf3875441fd3a834a6236dbab727ddb6dc6b3b935c8ae9c673d"
+    },
+    "WoW/Source/DB/Rec/LanguageWordsRec.h": {
+      "bytes": 573,
+      "sha256": "5cddc5991b05ff3fa0a52969f70d38c6ac1babc2a653164c506c72cbf1699e62"
+    },
+    "WoW/Source/DB/Rec/LanguagesRec.cpp": {
+      "bytes": 2916,
+      "sha256": "d7226d909e0a00b44c018220583a42035ab9def7718e4e4658b6473edecf53dc"
+    },
+    "WoW/Source/DB/Rec/LanguagesRec.h": {
+      "bytes": 517,
+      "sha256": "dac96155097062d67891b239b50f3379e6089673aa739786c87ff32fa99d8940"
+    },
+    "WoW/Source/DB/Rec/LfgDungeonExpansionRec.cpp": {
+      "bytes": 1672,
+      "sha256": "fb659986aff108bcc3abf4943ac371ae56b449a79204b57ade97ef9c8e728d32"
+    },
+    "WoW/Source/DB/Rec/LfgDungeonExpansionRec.h": {
+      "bytes": 799,
+      "sha256": "06265c4f7a3cf1dbdc34c36156e3fcd041f44a4cb51d541dee4f423be0f1019b"
+    },
+    "WoW/Source/DB/Rec/LfgDungeonGroupRec.cpp": {
+      "bytes": 3445,
+      "sha256": "4544360436f6126667b1375b702cfb8253f000cd70141c2787816f7835ea45ab"
+    },
+    "WoW/Source/DB/Rec/LfgDungeonGroupRec.h": {
+      "bytes": 657,
+      "sha256": "d4746c6be869bdf7b8e8fa78119bbc130d6699a02c10ad1f3d5ff3d561f4fc2b"
+    },
+    "WoW/Source/DB/Rec/LfgDungeonsRec.cpp": {
+      "bytes": 7958,
+      "sha256": "26b23cb294aaa6db04c8aa7da0d2d6dc6996d1e64415d1adf08deaaf371ccc28"
+    },
+    "WoW/Source/DB/Rec/LfgDungeonsRec.h": {
+      "bytes": 1086,
+      "sha256": "134bedd71d2dedd2b981ec06e8bc13578e1e8e9a0b63a6879ca65c8b19022301"
+    },
+    "WoW/Source/DB/Rec/LightFloatBandRec.cpp": {
+      "bytes": 983,
+      "sha256": "bfeaa8f1d4d64a0b6b7d3538799028ada2509a9daa1d6fce166123879e4bb5e0"
+    },
+    "WoW/Source/DB/Rec/LightFloatBandRec.h": {
+      "bytes": 608,
+      "sha256": "acc8a98098ccdcd4ec550fd60db666ffb77b9ed2b6ffda483cd9f69f8c063520"
+    },
+    "WoW/Source/DB/Rec/LightIntBandRec.cpp": {
+      "bytes": 918,
+      "sha256": "62949edbfd02b8e3d3fc45391b9fe5a8468cf767c430e517d7c9b83493ac01bd"
+    },
+    "WoW/Source/DB/Rec/LightIntBandRec.h": {
+      "bytes": 600,
+      "sha256": "9c7c62d56cec5eb6091bb47e886b3b265ecad101fcf88fcba1e569089e6dd3f0"
+    },
+    "WoW/Source/DB/Rec/LightParamsRec.cpp": {
+      "bytes": 1855,
+      "sha256": "cfaf807e4087a4e9b1abe5215b2ce235d7903e5d78d7220a59bab92d7322bdf8"
+    },
+    "WoW/Source/DB/Rec/LightParamsRec.h": {
+      "bytes": 799,
+      "sha256": "2375d0f7b20bc773f5e43cd110d03c74b2698cae7025d84783ce88a0ba7a7dda"
+    },
+    "WoW/Source/DB/Rec/LightRec.cpp": {
+      "bytes": 1652,
+      "sha256": "4c4c7e33bad34d175cd5d196aa3dfb574dce349414daa6ef45eec0c2e6444d75"
+    },
+    "WoW/Source/DB/Rec/LightRec.h": {
+      "bytes": 663,
+      "sha256": "8ff4ad1e2e323b6bc208a0f0c250e018f42a32a4d849d2122e90f3aa634bc3cf"
+    },
+    "WoW/Source/DB/Rec/LightSkyboxRec.cpp": {
+      "bytes": 941,
+      "sha256": "6a57872f410a9e8550986f07e6fe463aef4f8de4ddd6e3eee0512d40f7a0892c"
+    },
+    "WoW/Source/DB/Rec/LightSkyboxRec.h": {
+      "bytes": 558,
+      "sha256": "8ad2b9a03fd1a539cd7202cf452ce1748dcb2b19751331992a13ca6736a4c76e"
+    },
+    "WoW/Source/DB/Rec/LiquidMaterialRec.cpp": {
+      "bytes": 818,
+      "sha256": "39f29fa86da6f349524187c7f4b956a1562f31f5385838cfaaa0612ea5df545e"
+    },
+    "WoW/Source/DB/Rec/LiquidMaterialRec.h": {
+      "bytes": 568,
+      "sha256": "416bf7c7ed60c7d7710cbc29615b71e6497f3918131b0a3dd5aef62c07774ef0"
+    },
+    "WoW/Source/DB/Rec/LiquidTypeRec.cpp": {
+      "bytes": 4660,
+      "sha256": "94caec79dbe93366366ecce1cfb43e364b229ba472d1b292a39f8c0a30d2e978"
+    },
+    "WoW/Source/DB/Rec/LiquidTypeRec.h": {
+      "bytes": 1169,
+      "sha256": "e3dc2470af5b8b139ec7d44752b854458c03ca61835edcf944c5f75fa45612a8"
+    },
+    "WoW/Source/DB/Rec/LoadingScreenTaxiSplinesRec.cpp": {
+      "bytes": 1213,
+      "sha256": "4964751558032a12994b9656e63bddf4b1c2799146ac23f57aa6258e5885ccd7"
+    },
+    "WoW/Source/DB/Rec/LoadingScreenTaxiSplinesRec.h": {
+      "bytes": 691,
+      "sha256": "80e918f4eacd0f5fe0ed73256584df5004287db1e3ff4105b5e61a836e8d7485"
+    },
+    "WoW/Source/DB/Rec/LoadingScreensRec.cpp": {
+      "bytes": 1298,
+      "sha256": "4305fba5221d2ce8103a427ec7c91701d004feb9258ef9a9849d0c32e07cb3f7"
+    },
+    "WoW/Source/DB/Rec/LoadingScreensRec.h": {
+      "bytes": 620,
+      "sha256": "6bb5abaccd9d0ee289726b01193d8c85a4abbf65410074fcfa44e1347980c4fc"
+    },
+    "WoW/Source/DB/Rec/LockRec.cpp": {
+      "bytes": 1043,
+      "sha256": "d41955fe0a0ad3eed356710feec6a23538c1912207270f93d5811c298554c124"
+    },
+    "WoW/Source/DB/Rec/LockRec.h": {
+      "bytes": 602,
+      "sha256": "7999ff972b53204042be703c8e0f78d18fb11409c8fb2968c132896d4a424cbb"
+    },
+    "WoW/Source/DB/Rec/LockTypeRec.cpp": {
+      "bytes": 8419,
+      "sha256": "d0698e04141ee45c52bca1c4c0174e238b05722498f8f821c02413f4f8e236e5"
+    },
+    "WoW/Source/DB/Rec/LockTypeRec.h": {
+      "bytes": 632,
+      "sha256": "1de1b5b603b7557067203bd2bd8a990a388fa77dae04ce93dd719a384abe3e40"
+    },
+    "WoW/Source/DB/Rec/MailTemplateRec.cpp": {
+      "bytes": 5512,
+      "sha256": "7ccfa5f6358197f20cc9f6af9da66686f0dfeefc52cf743d115c13d46ce1d1de"
+    },
+    "WoW/Source/DB/Rec/MailTemplateRec.h": {
+      "bytes": 571,
+      "sha256": "8f066215b56ca7427785611b9e4f09c7fdcc7061c8c67cf03e0beb635388add0"
+    },
+    "WoW/Source/DB/Rec/MapDifficultyRec.cpp": {
+      "bytes": 4102,
+      "sha256": "8100e8adef4a973697823b7ec05a3f7bb7d95baeeac5bb9bd87317c5f2cf4bd4"
+    },
+    "WoW/Source/DB/Rec/MapDifficultyRec.h": {
+      "bytes": 732,
+      "sha256": "1914cbffc52738ede42b6de7879081bbc3236a12a0209ce9a26f582593a21873"
+    },
+    "WoW/Source/DB/Rec/MapRec.cpp": {
+      "bytes": 11526,
+      "sha256": "6edd40f2d9d5b927172d5bc956e4cbf949124f2b5ec0dede843bb50830d3d679"
+    },
+    "WoW/Source/DB/Rec/MapRec.h": {
+      "bytes": 1074,
+      "sha256": "e588ed7747617513bd01eca13b2c538c53ae67f92e8f1a73bfed943efd56b39d"
+    },
+    "WoW/Source/DB/Rec/MaterialRec.cpp": {
+      "bytes": 1138,
+      "sha256": "c847c3efc92127522b8e14123766a337ed9cd2e9236f9426c4914880eb73832d"
+    },
+    "WoW/Source/DB/Rec/MaterialRec.h": {
+      "bytes": 631,
+      "sha256": "018fe1bc74f81e333926ea472c6eae3a1a3b4abfe1e2e66ec94692321d7f8e2f"
+    },
+    "WoW/Source/DB/Rec/MovieFileDataRec.cpp": {
+      "bytes": 712,
+      "sha256": "4d5535eea510c98b84970649b4980e415ff1e792fa69b240a8a96c0552c77a14"
+    },
+    "WoW/Source/DB/Rec/MovieFileDataRec.h": {
+      "bytes": 537,
+      "sha256": "c2ddd875baddacfd84ee34599f354a52d794489569a1a14e17a52cf2c57adb2d"
+    },
+    "WoW/Source/DB/Rec/MovieRec.cpp": {
+      "bytes": 929,
+      "sha256": "fc0c74b42fa1123a982938dae35613704f3ec129638c442868e04afcb0d73629"
+    },
+    "WoW/Source/DB/Rec/MovieRec.h": {
+      "bytes": 533,
+      "sha256": "89b7415b4e41af92d21536027d00dae2b6b06b080303670615b04e1d2dc05062"
+    },
+    "WoW/Source/DB/Rec/MovieVariationRec.cpp": {
+      "bytes": 854,
+      "sha256": "4ca844c5d3fb4d0739801f9ee4a5faa44977d91166e01cdbf86b798c95076c97"
+    },
+    "WoW/Source/DB/Rec/MovieVariationRec.h": {
+      "bytes": 577,
+      "sha256": "53fb7304f90277c190d66225da243494f244a471e70da3a2e06c38f72ebe4d17"
+    },
+    "WoW/Source/DB/Rec/NPCSoundsRec.cpp": {
+      "bytes": 667,
+      "sha256": "2e9aefb240e0830b249b572f8edc09dca2051e36758700eabaae1f81a0b1dcfd"
+    },
+    "WoW/Source/DB/Rec/NPCSoundsRec.h": {
+      "bytes": 519,
+      "sha256": "769a5fe19b82df7785223c6b34726d39167f31873ef09b95d6919e142e9580a4"
+    },
+    "WoW/Source/DB/Rec/NameGenRec.cpp": {
+      "bytes": 1080,
+      "sha256": "e6306cf7e64f46f57287ea123e62365651c9924a9c14f8769cf338ebd5fa9bbf"
+    },
+    "WoW/Source/DB/Rec/NameGenRec.h": {
+      "bytes": 569,
+      "sha256": "81c56ffcbf5ebde4e17e34a839408bfed86b38e9760dcbad4218c13af6735241"
+    },
+    "WoW/Source/DB/Rec/NamesProfanityRec.cpp": {
+      "bytes": 977,
+      "sha256": "2fa59584bc5e43af7b849011ed8641027d468473cc1f57de7d5dca8c90084fdc"
+    },
+    "WoW/Source/DB/Rec/NamesProfanityRec.h": {
+      "bytes": 576,
+      "sha256": "f5c8c7ca7d1c33bc4614eb49f366e5eb866ebcbf65738abedb07a44b929d11b6"
+    },
+    "WoW/Source/DB/Rec/NamesReservedRec.cpp": {
+      "bytes": 969,
+      "sha256": "8ab02fde4540e9a709dd9731e20cd7e43986eec6fa210f7b261b942d630e1133"
+    },
+    "WoW/Source/DB/Rec/NamesReservedRec.h": {
+      "bytes": 571,
+      "sha256": "52c4ede77d354dea7ba2e74e72ceb06c760e5c9eef2a553cd27b741a2c839a13"
+    },
+    "WoW/Source/DB/Rec/ObjectEffectGroupRec.cpp": {
+      "bytes": 863,
+      "sha256": "b271e3153b009d9fa0a02f2dd264ec8396e7096f62dc3ae7672d5f7cf8bde3bd"
+    },
+    "WoW/Source/DB/Rec/ObjectEffectGroupRec.h": {
+      "bytes": 555,
+      "sha256": "d6fd536340380c1ce6e3fbf0b730850f25e86b5426377f5d7620279bb409b83d"
+    },
+    "WoW/Source/DB/Rec/ObjectEffectModifierRec.cpp": {
+      "bytes": 1218,
+      "sha256": "8288726785f8be88fe6ad11ae5348fa84376bab62b3f34bc548778eeab325ccf"
+    },
+    "WoW/Source/DB/Rec/ObjectEffectModifierRec.h": {
+      "bytes": 677,
+      "sha256": "497aa7197d9cc3f90f935c135f9d736382c17e2d946b906003ae08eefab854e8"
+    },
+    "WoW/Source/DB/Rec/ObjectEffectPackageElemRec.cpp": {
+      "bytes": 1160,
+      "sha256": "946efa74129f59826a22f8cef3b525ff5779c4f5000413a4438e7dbdb4f1f95f"
+    },
+    "WoW/Source/DB/Rec/ObjectEffectPackageElemRec.h": {
+      "bytes": 681,
+      "sha256": "4ea63e00288ca826716f5c0199a2e129c68c1f667a3e46c58c37eb070b70da0b"
+    },
+    "WoW/Source/DB/Rec/ObjectEffectPackageRec.cpp": {
+      "bytes": 879,
+      "sha256": "da13e008e8aa901ae54a0907dd359ce8c1baed9939cd6d8226ba6e12d3d3bc8f"
+    },
+    "WoW/Source/DB/Rec/ObjectEffectPackageRec.h": {
+      "bytes": 565,
+      "sha256": "a711470e997d8237d8057d84b60d83fdd3e5b5b7e8215e5b86566c9b4b43c64b"
+    },
+    "WoW/Source/DB/Rec/ObjectEffectRec.cpp": {
+      "bytes": 2406,
+      "sha256": "e90fe4eef0a03acaea7637a8e4a13ea3318c1e28cb6f22a4e4cc392bf4c10a6f"
+    },
+    "WoW/Source/DB/Rec/ObjectEffectRec.h": {
+      "bytes": 851,
+      "sha256": "ff9f875d81d57495454fdd6c0106e7d8aecff1e6e42e52845da4a2a0f87ab73a"
+    },
+    "WoW/Source/DB/Rec/OverrideSpellDataRec.cpp": {
+      "bytes": 902,
+      "sha256": "21f6937b5257c28856c3c591ccd1ec291937c8b0636e638211e35ac5df0571c9"
+    },
+    "WoW/Source/DB/Rec/OverrideSpellDataRec.h": {
+      "bytes": 592,
+      "sha256": "bb2b5c61dd3bd3355fda9322bf697aba5f7d1bdff75695513734dd4dcfa5011b"
+    },
+    "WoW/Source/DB/Rec/PackageRec.cpp": {
+      "bytes": 3289,
+      "sha256": "f1251e648de5eb1ac6bca23dbd72c80623c3bf98b3495b1ff580ff045b6bcad0"
+    },
+    "WoW/Source/DB/Rec/PackageRec.h": {
+      "bytes": 573,
+      "sha256": "16f331d0279c038892a9f6c04ffe520538f8efb9346de53ebb691e612617f688"
+    },
+    "WoW/Source/DB/Rec/PageTextMaterialRec.cpp": {
+      "bytes": 855,
+      "sha256": "304dd8225e92aa4bbcd374ed7d724e1bdaaa5664382b7739b02857a4cd75af0b"
+    },
+    "WoW/Source/DB/Rec/PageTextMaterialRec.h": {
+      "bytes": 550,
+      "sha256": "862856f6bc724e4077b8a124ba5b79881f17fb23b1859ffb307d32b1569c3bcd"
+    },
+    "WoW/Source/DB/Rec/PaperDollItemFrameRec.cpp": {
+      "bytes": 1282,
+      "sha256": "f5b86c9c5b1910598957a84710c075e10afef93e16d375b781ad54a7a416516d"
+    },
+    "WoW/Source/DB/Rec/PaperDollItemFrameRec.h": {
+      "bytes": 655,
+      "sha256": "8dfd27f670f946e578ad9e8ada06ef2627511c75434d49dbddbba5cbdae7c40e"
+    },
+    "WoW/Source/DB/Rec/ParticleColorRec.cpp": {
+      "bytes": 974,
+      "sha256": "ea5fcb458a052c6313f6bd5dcdda1c021b5cbda6462807db6a6f5f6fbc5e734b"
+    },
+    "WoW/Source/DB/Rec/ParticleColorRec.h": {
+      "bytes": 606,
+      "sha256": "07565a6b4fcfce510979db7e4953812355c55bb2d38660bf192895b33a2b8871"
+    },
+    "WoW/Source/DB/Rec/PetPersonalityRec.cpp": {
+      "bytes": 3345,
+      "sha256": "08bc31ceea1b39751be3c87622698e8a5d24832ff59cfd50983b68c12e281500"
+    },
+    "WoW/Source/DB/Rec/PetPersonalityRec.h": {
+      "bytes": 635,
+      "sha256": "1626c4ec3ed70d8ed6e848a20de81d0a4745bf12a836e4428bd565a608ab6222"
+    },
+    "WoW/Source/DB/Rec/PowerDisplayRec.cpp": {
+      "bytes": 1504,
+      "sha256": "e175fd7208d7e974122238dcc7a20817fac1894a800b84b66c909e640cadf1fa"
+    },
+    "WoW/Source/DB/Rec/PowerDisplayRec.h": {
+      "bytes": 673,
+      "sha256": "1c50785fd686fc23cea4907017a3f980563aa58951f92ec40e9d3a75176673bb"
+    },
+    "WoW/Source/DB/Rec/PvpDifficultyRec.cpp": {
+      "bytes": 1260,
+      "sha256": "282671f583565b7d8a1d9a9e0c4127348a0ff77e1942ce71f0848cab4de3be0d"
+    },
+    "WoW/Source/DB/Rec/PvpDifficultyRec.h": {
+      "bytes": 677,
+      "sha256": "491e450108036117e454503266f21848b912e32207fd8df57158c312107da079"
+    },
+    "WoW/Source/DB/Rec/QuestFactionRewardRec.cpp": {
+      "bytes": 751,
+      "sha256": "59729416a70985dd440664cfb92db75c9f7ce8af6b0e44a30247f2530b6a60ef"
+    },
+    "WoW/Source/DB/Rec/QuestFactionRewardRec.h": {
+      "bytes": 569,
+      "sha256": "b89960cf7548d4464eaf845f871c7eb0b2ae937820816e8e517fb253384132ed"
+    },
+    "WoW/Source/DB/Rec/QuestInfoRec.cpp": {
+      "bytes": 3208,
+      "sha256": "cf546bea3826363ef72672cfcdf51d54b00e27e117183396492bed605dafeed1"
+    },
+    "WoW/Source/DB/Rec/QuestInfoRec.h": {
+      "bytes": 521,
+      "sha256": "33d85d403cffada50746710236c94435eb1b9ac66976e1fcf3556039040e05eb"
+    },
+    "WoW/Source/DB/Rec/QuestSortRec.cpp": {
+      "bytes": 3208,
+      "sha256": "d2dd5a98cec6dca725678b31a60bc2d53f6fae97af9d06feb2178a88a881b131"
+    },
+    "WoW/Source/DB/Rec/QuestSortRec.h": {
+      "bytes": 521,
+      "sha256": "aac4f5d735cd6e2cd052f2933f41eaee6f4ea2e9d4ff5442b56d8ec9b3588f5a"
+    },
+    "WoW/Source/DB/Rec/QuestXPRec.cpp": {
+      "bytes": 663,
+      "sha256": "9bf891b2c50856e609a01cb75346ba5ee850de514ecb81289e6a234c498c3c95"
+    },
+    "WoW/Source/DB/Rec/QuestXPRec.h": {
+      "bytes": 514,
+      "sha256": "3f35ba290473a657857a68d357aa7b0163701408fb649a5d70663d1d07b796ae"
+    },
+    "WoW/Source/DB/Rec/RandPropPointsRec.cpp": {
+      "bytes": 1002,
+      "sha256": "7d61e78fd0f1c59bad4474244edc91a9bc0fefafcbb95e8cc0a729a1fc93aa15"
+    },
+    "WoW/Source/DB/Rec/RandPropPointsRec.h": {
+      "bytes": 616,
+      "sha256": "95184ac9195fa965e4b1a542146156274781b9035b75ddd8a20931c6d44b31c7"
+    },
+    "WoW/Source/DB/Rec/ResistancesRec.cpp": {
+      "bytes": 3216,
+      "sha256": "7da1de6bdf90a4a4bef1c1349286f24c839cb720e0e10972e54aadd0cfc203cc"
+    },
+    "WoW/Source/DB/Rec/ResistancesRec.h": {
+      "bytes": 599,
+      "sha256": "4af1ab1a8461dfc51b64212c0f558c82ee974e0c62133621d1c7cfc44e18b103"
+    },
+    "WoW/Source/DB/Rec/ScalingStatDistributionRec.cpp": {
+      "bytes": 1087,
+      "sha256": "a213722734b1e6f692da028ed13611f5426ca09f80129c59f589f53f4a42e4f6"
+    },
+    "WoW/Source/DB/Rec/ScalingStatDistributionRec.h": {
+      "bytes": 662,
+      "sha256": "9b3b0b5b69bed306e399f2d5cca3640c0fc3e735ce9dcc0fb1738e274a269baa"
+    },
+    "WoW/Source/DB/Rec/ScalingStatValuesRec.cpp": {
+      "bytes": 4355,
+      "sha256": "0d92a64feaf70e9e54bae622b9c9f8b8a7bc8abda66673b9e83ce26a7bbf9f3d"
+    },
+    "WoW/Source/DB/Rec/ScalingStatValuesRec.h": {
+      "bytes": 1461,
+      "sha256": "4d40a5960a84ea2423913fbeb5d3d27c4f7a29839f77c27328bca146ae7dd0af"
+    },
+    "WoW/Source/DB/Rec/ScreenEffectRec.cpp": {
+      "bytes": 1601,
+      "sha256": "8e711971f1b3cac6be1ac713ec43ba9b764548c5468ba4d15c95f4f7468599c4"
+    },
+    "WoW/Source/DB/Rec/ScreenEffectRec.h": {
+      "bytes": 721,
+      "sha256": "24a0c168aff60d7a81227ba34784d7d1a8ae92a64f4b9c90be152934f855ee81"
+    },
+    "WoW/Source/DB/Rec/ServerMessagesRec.cpp": {
+      "bytes": 2956,
+      "sha256": "fc94f96f5895d95d5c308e125a3dc3b3d8efac9758c6a2eff40b83ddc11cdf40"
+    },
+    "WoW/Source/DB/Rec/ServerMessagesRec.h": {
+      "bytes": 542,
+      "sha256": "e25e6352898697f9eda866aac1b8be81e56d1e021b6bd6e91645c5324b263f5c"
+    },
+    "WoW/Source/DB/Rec/SheatheSoundLookupsRec.cpp": {
+      "bytes": 1555,
+      "sha256": "4338eeb754ab1fb6e357ef21c76c029f071700448779b0e919b50c7d568c2ee7"
+    },
+    "WoW/Source/DB/Rec/SheatheSoundLookupsRec.h": {
+      "bytes": 757,
+      "sha256": "0a8bd88735c7e1cdf20980a66324f3ddfc0bd1900ceb2e61676f131b165932b4"
+    },
+    "WoW/Source/DB/Rec/SkillCostsDataRec.cpp": {
+      "bytes": 898,
+      "sha256": "1b9488a57d0a3846e9554ea6406afac8ac3be270f397ae506f025a5ce11b3992"
+    },
+    "WoW/Source/DB/Rec/SkillCostsDataRec.h": {
+      "bytes": 580,
+      "sha256": "e9605ad91b5d19894f8ad27a07b4f5eb8ede2a19685c80052ed8ed4cb8078ea5"
+    },
+    "WoW/Source/DB/Rec/SkillLineAbilityRec.cpp": {
+      "bytes": 2556,
+      "sha256": "0c1d8b26f49169fd2fd1f901bf9426762613320172481975d860fa56264b1c59"
+    },
+    "WoW/Source/DB/Rec/SkillLineAbilityRec.h": {
+      "bytes": 1107,
+      "sha256": "f175c66262a1db5f0468ba9bcd00c386cf78170f565f7004e2e9d65ace708da8"
+    },
+    "WoW/Source/DB/Rec/SkillLineCategoryRec.cpp": {
+      "bytes": 3122,
+      "sha256": "65124cc9f1a0d8a68047e8fa7159f93dd748ef43321f704593c00eb9cc1b363c"
+    },
+    "WoW/Source/DB/Rec/SkillLineCategoryRec.h": {
+      "bytes": 593,
+      "sha256": "bcb5a57610fea6a71db0cb682c570f23bbb713e8bd1c447b3e671a6972358e7f"
+    },
+    "WoW/Source/DB/Rec/SkillLineRec.cpp": {
+      "bytes": 9838,
+      "sha256": "454d10667ebdfeeaa979fb76fb6a21e737df1fd397e9129b45717cd83e4eed9b"
+    },
+    "WoW/Source/DB/Rec/SkillLineRec.h": {
+      "bytes": 759,
+      "sha256": "fb2eb898bf51d2a5313599f72238b5f0de7b23e6e38e0ff6c2e1d5434a06808f"
+    },
+    "WoW/Source/DB/Rec/SkillRaceClassInfoRec.cpp": {
+      "bytes": 1596,
+      "sha256": "194ab7dd1a2e3c04f3f7fc43c434e83b201834fdf508e991c7ba78b3975675b2"
+    },
+    "WoW/Source/DB/Rec/SkillRaceClassInfoRec.h": {
+      "bytes": 871,
+      "sha256": "f91f7874cf6162c8588b2f9487ac1e1ee83d9cc31abf3c74dd9753815cee0a2a"
+    },
+    "WoW/Source/DB/Rec/SkillTiersRec.cpp": {
+      "bytes": 837,
+      "sha256": "e9dcced32ea97c44fbf16276330bf560f62c2ae9bdb301f60f8285f2d6c6519b"
+    },
+    "WoW/Source/DB/Rec/SkillTiersRec.h": {
+      "bytes": 561,
+      "sha256": "57bd3dc2d86c2c5b3fe4f8c3122a9e917ed053449df8f943ab73a13db313b5d6"
+    },
+    "WoW/Source/DB/Rec/SoundAmbienceRec.cpp": {
+      "bytes": 758,
+      "sha256": "bcc7d15549b2504575cc86ea9de5777e8a0b37ee9b3d544c7e5905bad3460cda"
+    },
+    "WoW/Source/DB/Rec/SoundAmbienceRec.h": {
+      "bytes": 542,
+      "sha256": "1bfb9921d70405091c51e445168b24dcb82ec9869f8fc970c8f89f1d98daeed2"
+    },
+    "WoW/Source/DB/Rec/SoundEmittersRec.cpp": {
+      "bytes": 2078,
+      "sha256": "9cb9007ed198669347b49536e7db8ad2835364e961a9298425daccddf9bf6cc7"
+    },
+    "WoW/Source/DB/Rec/SoundEmittersRec.h": {
+      "bytes": 691,
+      "sha256": "cffc002cae7390e90ad88a375bd9eadfc956ef46383b39afb36b38ca25e150ae"
+    },
+    "WoW/Source/DB/Rec/SoundEntriesAdvancedRec.cpp": {
+      "bytes": 4330,
+      "sha256": "3156181be4206816d69a8cc719f4fb2aa69dddb9fac2bd2b2902d76039af18b2"
+    },
+    "WoW/Source/DB/Rec/SoundEntriesAdvancedRec.h": {
+      "bytes": 1412,
+      "sha256": "b020f33c3e0fa9a3c23eebbe0eff1697c60de5cab5a83d6c29b08dc282742d3f"
+    },
+    "WoW/Source/DB/Rec/SoundEntriesRec.cpp": {
+      "bytes": 4486,
+      "sha256": "e8e583e5a2d1b1fac2c9aae57f6a0443015c4b89471e10884775e03890c9566b"
+    },
+    "WoW/Source/DB/Rec/SoundEntriesRec.h": {
+      "bytes": 914,
+      "sha256": "07953db2d0dd6e3013e86e64e1e0309007f0cb4fb7efd52698ec1a832d38c0f9"
+    },
+    "WoW/Source/DB/Rec/SoundFilterElemRec.cpp": {
+      "bytes": 1210,
+      "sha256": "ab25e1944895833c4f13f887c12eb91cbb1ce3d837fa786c08d9cc1ec8b03961"
+    },
+    "WoW/Source/DB/Rec/SoundFilterElemRec.h": {
+      "bytes": 661,
+      "sha256": "46ae11ddaa41aa5ffbbf62d8f419ac6fa75ffe42bb45a835a1cad423356cd239"
+    },
+    "WoW/Source/DB/Rec/SoundFilterRec.cpp": {
+      "bytes": 815,
+      "sha256": "911d3d9654a9632d3d2a6f9d06ffc1f20acb6edac4d50293ec3cee6761af6a0b"
+    },
+    "WoW/Source/DB/Rec/SoundFilterRec.h": {
+      "bytes": 525,
+      "sha256": "0c94ea398cd9579082cef69f741ee9a2e39cc5e5d826180a71c577c8fa5756ec"
+    },
+    "WoW/Source/DB/Rec/SoundProviderPreferencesRec.cpp": {
+      "bytes": 4662,
+      "sha256": "c9e9c4bf64306b037ff41ae033f4cb9a799f55c448d317a87a63d94d58dd9feb"
+    },
+    "WoW/Source/DB/Rec/SoundProviderPreferencesRec.h": {
+      "bytes": 1490,
+      "sha256": "13715c5102f046629e45a47c38b130c5b2ba908f64243d30267a68f177193c2f"
+    },
+    "WoW/Source/DB/Rec/SoundSamplePreferencesRec.cpp": {
+      "bytes": 3449,
+      "sha256": "f79e827178f619a2cbc736079c96f8722e93220cb7e1d7bca98421975a452275"
+    },
+    "WoW/Source/DB/Rec/SoundSamplePreferencesRec.h": {
+      "bytes": 1232,
+      "sha256": "f622e4975793a2a70964b9df540ae72113efe5ea97a4c86ce7a8f0320e8e2c0c"
+    },
+    "WoW/Source/DB/Rec/SoundWaterTypeRec.cpp": {
+      "bytes": 1004,
+      "sha256": "276575d1984f2c010d82a3397e64cf65aac71c082e156c05f9c6d1bb00869c5e"
+    },
+    "WoW/Source/DB/Rec/SoundWaterTypeRec.h": {
+      "bytes": 615,
+      "sha256": "40558054f987f3ebe60cec84c7af180b6c6a4eb471289b2105c033c8aacc8c0b"
+    },
+    "WoW/Source/DB/Rec/SpamMessagesRec.cpp": {
+      "bytes": 823,
+      "sha256": "16faafc6e73e0c90ac1e637a76e5cbbd70928951ddcaafdc71f858176ea72ecf"
+    },
+    "WoW/Source/DB/Rec/SpamMessagesRec.h": {
+      "bytes": 530,
+      "sha256": "4e5730e343482f2e08fb6df0df649dacd015c14b13939370718a59993ced76aa"
+    },
+    "WoW/Source/DB/Rec/SpellCastTimesRec.cpp": {
+      "bytes": 968,
+      "sha256": "93bdef4ec6626c5705d3a160e01412ddfb61a4c8c735193315e8e5dfdbb85dc9"
+    },
+    "WoW/Source/DB/Rec/SpellCastTimesRec.h": {
+      "bytes": 606,
+      "sha256": "cf6c3a2f8a6a8fcf3925443f439c4b3498a88f772f60d75c76c7bf7b85c765d8"
+    },
+    "WoW/Source/DB/Rec/SpellCategoryRec.cpp": {
+      "bytes": 692,
+      "sha256": "4d3a87339e38979c30ed1cdf59ffe8be7d4b1b5159e68850f1695b893d994c1b"
+    },
+    "WoW/Source/DB/Rec/SpellCategoryRec.h": {
+      "bytes": 532,
+      "sha256": "604fcc351ce54fc2162d2b729ae2d92ac4af6056d9c46ba8babaae312d75f9f8"
+    },
+    "WoW/Source/DB/Rec/SpellChainEffectsRec.cpp": {
+      "bytes": 8204,
+      "sha256": "ab2eef0d3795e2740cd22e92479b7486243d0951468b617d32a9c539dfb0d0a9"
+    },
+    "WoW/Source/DB/Rec/SpellChainEffectsRec.h": {
+      "bytes": 2309,
+      "sha256": "d0779c93bbbcf68bb2b1e1509b3553e594a99168423214a541b1a63dcaf1960b"
+    },
+    "WoW/Source/DB/Rec/SpellDescriptionVariablesRec.cpp": {
+      "bytes": 967,
+      "sha256": "5c8842b1396b960c2d34ec2104f719ec72bf141278c0de0fed42e70b1ee185ec"
+    },
+    "WoW/Source/DB/Rec/SpellDescriptionVariablesRec.h": {
+      "bytes": 600,
+      "sha256": "cbd5f4bd39676a3f689de181845441bf151e9239560ccc28d4a75ecc6ac42562"
+    },
+    "WoW/Source/DB/Rec/SpellDifficultyRec.cpp": {
+      "bytes": 755,
+      "sha256": "7163bbecfd2f98f0285f5b67f3fbfcd2248456d356791fbd189904704893997f"
+    },
+    "WoW/Source/DB/Rec/SpellDifficultyRec.h": {
+      "bytes": 559,
+      "sha256": "0bd161581aa4e5684214706199fc684d08019b2305142c8ba6fc510b8e9635a6"
+    },
+    "WoW/Source/DB/Rec/SpellDispelTypeRec.cpp": {
+      "bytes": 3587,
+      "sha256": "893a241c440e8738ca8ecaf0e52e026ca213db4835f6987c2f65f8b7eaf16bb7"
+    },
+    "WoW/Source/DB/Rec/SpellDispelTypeRec.h": {
+      "bytes": 664,
+      "sha256": "71d504318820eb65aefac2596eb9f153d287ef0f15422f204dad67359fc5ae73"
+    },
+    "WoW/Source/DB/Rec/SpellDurationRec.cpp": {
+      "bytes": 1024,
+      "sha256": "b93a070aa710d6fcc9eba9e47dab17ba26bad2371737ba93fca9b21b04b05cb6"
+    },
+    "WoW/Source/DB/Rec/SpellDurationRec.h": {
+      "bytes": 617,
+      "sha256": "9a3aefd04ce16559fadfa86325924af2258ae2f9db3d4c5f5138bfd3f23e0272"
+    },
+    "WoW/Source/DB/Rec/SpellEffectCameraShakesRec.cpp": {
+      "bytes": 842,
+      "sha256": "01e8a726671ea1c483be5914f3cf8d585785f26bac995022786c0762e57102b5"
+    },
+    "WoW/Source/DB/Rec/SpellEffectCameraShakesRec.h": {
+      "bytes": 593,
+      "sha256": "23730551d069628a59d53455679f37cf05c30dfbfeb16d570961df7ddf0757bc"
+    },
+    "WoW/Source/DB/Rec/SpellFocusObjectRec.cpp": {
+      "bytes": 2972,
+      "sha256": "f6261fe04be66cd9cc111ba9ef267c548a6c03e511ef66a16d0d39e707037f5f"
+    },
+    "WoW/Source/DB/Rec/SpellFocusObjectRec.h": {
+      "bytes": 552,
+      "sha256": "367bab98199bbba3ce40bd4e14a74898cc71a24a6d4dfba2b9aeef4837f09902"
+    },
+    "WoW/Source/DB/Rec/SpellIconRec.cpp": {
+      "bytes": 887,
+      "sha256": "77dbff1f20fce9de0ef6171cbaf205c6f4514bfd8cccf092295c05a1c456faea"
+    },
+    "WoW/Source/DB/Rec/SpellIconRec.h": {
+      "bytes": 526,
+      "sha256": "8e3bc65d05c97e40a2d3406890db7357045036044857f58f01b70615f33211c3"
+    },
+    "WoW/Source/DB/Rec/SpellItemEnchantmentConditionRec.cpp": {
+      "bytes": 1601,
+      "sha256": "015115f1e55f7c196a5691c3051a6b96a5de78230b73a29884a51de1048de530"
+    },
+    "WoW/Source/DB/Rec/SpellItemEnchantmentConditionRec.h": {
+      "bytes": 821,
+      "sha256": "6c663ac4f9245c3ef05834e5165f70082b9e0b3843676edbc9bf7ce01e78a533"
+    },
+    "WoW/Source/DB/Rec/SpellItemEnchantmentRec.cpp": {
+      "bytes": 4827,
+      "sha256": "1ca570717d6e287e50878f0037a10c5cc24b18996d70147edf7ac65b5693181b"
+    },
+    "WoW/Source/DB/Rec/SpellItemEnchantmentRec.h": {
+      "bytes": 1040,
+      "sha256": "d2dd0c60b78ed770d6ff72838899e13584599cc8de42931a98732338e07421d0"
+    },
+    "WoW/Source/DB/Rec/SpellMechanicRec.cpp": {
+      "bytes": 3313,
+      "sha256": "d65faa159bb715e601ab7e48ca2ac3607f7ff804755253b45da204c8618b12fc"
+    },
+    "WoW/Source/DB/Rec/SpellMechanicRec.h": {
+      "bytes": 542,
+      "sha256": "0736db287bcdb558623748ffd2561eee46fada40949415b795ad7cd4d88fee70"
+    },
+    "WoW/Source/DB/Rec/SpellMissileMotionRec.cpp": {
+      "bytes": 1466,
+      "sha256": "9ec47d48a8c55ab9d6f70e98adbd029563c92b766f1ae1e5c901a39028fa8587"
+    },
+    "WoW/Source/DB/Rec/SpellMissileMotionRec.h": {
+      "bytes": 673,
+      "sha256": "d6297db0a272ae390b2ac076849595921663b62f3859041d229d8fbea08428f9"
+    },
+    "WoW/Source/DB/Rec/SpellMissileRec.cpp": {
+      "bytes": 2897,
+      "sha256": "8ee095732e04ae30685a21b2d051fde59ddcdddb3274b5a204a973bc1e66210e"
+    },
+    "WoW/Source/DB/Rec/SpellMissileRec.h": {
+      "bytes": 1051,
+      "sha256": "42925266b7893502eb22ff5bebeb6257b3e1118951b33830ef6f27e5a52af6c9"
+    },
+    "WoW/Source/DB/Rec/SpellRadiusRec.cpp": {
+      "bytes": 984,
+      "sha256": "9b047ba1d2aeadfc559e7bb3216dbaabd092cb9ebd9c9eb1231afc49cd0fb80c"
+    },
+    "WoW/Source/DB/Rec/SpellRadiusRec.h": {
+      "bytes": 595,
+      "sha256": "82b3313312b8a15205a18ed9813c3e27b31652bc1d766e5d0150ae9e4745dbd0"
+    },
+    "WoW/Source/DB/Rec/SpellRangeRec.cpp": {
+      "bytes": 7064,
+      "sha256": "ddf58a796b48ad6be873d07ef73a69707a7179ad298de63c8bb1e753cd51e29a"
+    },
+    "WoW/Source/DB/Rec/SpellRangeRec.h": {
+      "bytes": 683,
+      "sha256": "779e63d719941b42f20d70775704f831e2930d5b89c2b45b8df48e301d6cc0e9"
+    },
+    "WoW/Source/DB/Rec/SpellRec.cpp": {
+      "bytes": 28032,
+      "sha256": "10850c7e51b392c303b4c0d8f49078cb6d164dc496b032b1e636a89c85e128b9"
+    },
+    "WoW/Source/DB/Rec/SpellRec.h": {
+      "bytes": 5746,
+      "sha256": "51ca686cf461b537b387924d065d2b173ca9d7f7e3b5197f427c68212647b6bb"
+    },
+    "WoW/Source/DB/Rec/SpellRuneCostRec.cpp": {
+      "bytes": 1094,
+      "sha256": "3e41162c64ce881fc9f95df53d718420f14aab3eae838b4e3e149f97f6a03028"
+    },
+    "WoW/Source/DB/Rec/SpellRuneCostRec.h": {
+      "bytes": 635,
+      "sha256": "89b1e5a34c639a7279f40db3515def28c144088fac32a2ac4c901336a16759c4"
+    },
+    "WoW/Source/DB/Rec/SpellShapeshiftFormRec.cpp": {
+      "bytes": 4135,
+      "sha256": "5c6dd635fcf1f6e3e60233495055e6aab81c8d44b69e89802338a3a13d9fddaa"
+    },
+    "WoW/Source/DB/Rec/SpellShapeshiftFormRec.h": {
+      "bytes": 853,
+      "sha256": "8eba6f2837df22e4c9ae3d271d1932d32087aeb4b7198eebf47e2b44e50dcf8a"
+    },
+    "WoW/Source/DB/Rec/SpellVisualEffectNameRec.cpp": {
+      "bytes": 1816,
+      "sha256": "59b5eaf3f3f3c7901d4ca6054cb1b86cc40df5b138a0256ffa92776f7a81d1c0"
+    },
+    "WoW/Source/DB/Rec/SpellVisualEffectNameRec.h": {
+      "bytes": 764,
+      "sha256": "49b93b90ead3b51475c5e8a9248cae0600fd5545dce4b1a7bea95aa44b6c4246"
+    },
+    "WoW/Source/DB/Rec/SpellVisualKitAreaModelRec.cpp": {
+      "bytes": 1041,
+      "sha256": "eda75cd1fa9dc0a04aa2521fcd749545b67038f653e960cb80bc2f982db6ed85"
+    },
+    "WoW/Source/DB/Rec/SpellVisualKitAreaModelRec.h": {
+      "bytes": 619,
+      "sha256": "d725400671b4d6b19bb35d33bb96a2270171c601e98828c2bade58d4d9b73dc4"
+    },
+    "WoW/Source/DB/Rec/SpellVisualKitModelAttachRec.cpp": {
+      "bytes": 1988,
+      "sha256": "c90ae51b66afdc7a33e3474d65665aa1b02af4ead1881959a6eec161e84cb89d"
+    },
+    "WoW/Source/DB/Rec/SpellVisualKitModelAttachRec.h": {
+      "bytes": 822,
+      "sha256": "d26aeb265d88c41b3f9b2c10322010726cc4beec152f95ef92a6db947c73fd68"
+    },
+    "WoW/Source/DB/Rec/SpellVisualKitRec.cpp": {
+      "bytes": 3631,
+      "sha256": "4d8a4cd4622a3276f119d5fd32721c70edb93db48287a5bad2850e6c5e54b346"
+    },
+    "WoW/Source/DB/Rec/SpellVisualKitRec.h": {
+      "bytes": 1288,
+      "sha256": "461327e1c4c7e6b18676f92e65bd94d11eacaa4b56d66260d42ce6d6d1ae55cd"
+    },
+    "WoW/Source/DB/Rec/SpellVisualRec.cpp": {
+      "bytes": 5815,
+      "sha256": "d84f8d225ecd7bc14ce8d32cd6a87748a884a8945101a2a34a6b86736eff3a18"
+    },
+    "WoW/Source/DB/Rec/SpellVisualRec.h": {
+      "bytes": 1643,
+      "sha256": "ed3b1b7a6361e509620eb6b0798de53b171260e77295e976016491de212d1db3"
+    },
+    "WoW/Source/DB/Rec/StableSlotPricesRec.cpp": {
+      "bytes": 712,
+      "sha256": "fefea8b8b6244bd5b91fbb35f5d4c528ff58b75676ed0f29f769dcd1ae3bece4"
+    },
+    "WoW/Source/DB/Rec/StableSlotPricesRec.h": {
+      "bytes": 546,
+      "sha256": "b973f0aa30f809dd3afbba579d4a61a7a268e9969eb7eabb21b1dd8c80273b9b"
+    },
+    "WoW/Source/DB/Rec/Startup_StringsRec.cpp": {
+      "bytes": 3450,
+      "sha256": "2335bbf6b1455a8610b57a12cc5cd8ad7fad84b8ea7cb0e796c3065b670c8b28"
+    },
+    "WoW/Source/DB/Rec/Startup_StringsRec.h": {
+      "bytes": 585,
+      "sha256": "d97a04b0f8ebffd315d95d1c6370ca8523d0601f959e2c8defb2382b20d43a07"
+    },
+    "WoW/Source/DB/Rec/StationeryRec.cpp": {
+      "bytes": 1136,
+      "sha256": "4d6769bf8519540e333d212c91af0c4a4d4125fe42d73256568dda9fc1208e34"
+    },
+    "WoW/Source/DB/Rec/StationeryRec.h": {
+      "bytes": 589,
+      "sha256": "c65ddfd958cc859215f72bb9ca6ea98aca656ca898ec9cf35e58dfe9e5613466"
+    },
+    "WoW/Source/DB/Rec/StringLookupsRec.cpp": {
+      "bytes": 847,
+      "sha256": "31884e84bc4ffab14914f87734796ae10e7a05446c53d04438ff21169dafe5c4"
+    },
+    "WoW/Source/DB/Rec/StringLookupsRec.h": {
+      "bytes": 537,
+      "sha256": "70af22e700f406cc9ead2117d965cfe1c6f5272d7d7ccd12e8b4791cbb4b2cf8"
+    },
+    "WoW/Source/DB/Rec/SummonPropertiesRec.cpp": {
+      "bytes": 1232,
+      "sha256": "f848ca08ee4ff9df9a39c092033cd9a4bf077515323693a33a510c54f5fd0308"
+    },
+    "WoW/Source/DB/Rec/SummonPropertiesRec.h": {
+      "bytes": 679,
+      "sha256": "14d12a13fdcec8dce5fbc35fd74d41c1fee5abc621816f4d8b866bb8122fb4b1"
+    },
+    "WoW/Source/DB/Rec/TalentRec.cpp": {
+      "bytes": 1847,
+      "sha256": "00896b37655a8cf99bfb2e8a842dfc4981afb7e7389a37f65499efad3cb584c4"
+    },
+    "WoW/Source/DB/Rec/TalentRec.h": {
+      "bytes": 811,
+      "sha256": "2ea8cafffcc2993b18478aef91644ddc55d9e7d755e18716d6b4486708ae12ae"
+    },
+    "WoW/Source/DB/Rec/TalentTabRec.cpp": {
+      "bytes": 4001,
+      "sha256": "5df8c1170522bed123a912060bede025cd5dc439a578f4d3da470fbe9733e227"
+    },
+    "WoW/Source/DB/Rec/TalentTabRec.h": {
+      "bytes": 843,
+      "sha256": "bdb34bfe9d6db7973a2a88f04cea1a4090476b6df906ed33c1c5114cbede9f5d"
+    },
+    "WoW/Source/DB/Rec/TaxiNodesRec.cpp": {
+      "bytes": 3656,
+      "sha256": "0377ac8c608845e49a37aeac1d2158a8874d3639ee9d8b420e2e61466dedb784"
+    },
+    "WoW/Source/DB/Rec/TaxiNodesRec.h": {
+      "bytes": 633,
+      "sha256": "24d0283eff2f295edd6053a4df06cbbca5fe051cfca9f096bb644980685fa829"
+    },
+    "WoW/Source/DB/Rec/TaxiPathNodeRec.cpp": {
+      "bytes": 1989,
+      "sha256": "c6746a8425f4d7b4f61c8c279ab7b65fe58c14f00c28a099ad375f959c8148a5"
+    },
+    "WoW/Source/DB/Rec/TaxiPathNodeRec.h": {
+      "bytes": 784,
+      "sha256": "6b654afe9dc8ce36568b1e0e7970b7cdc67c3cf17f80fd93874269f14eabe3e2"
+    },
+    "WoW/Source/DB/Rec/TaxiPathRec.cpp": {
+      "bytes": 948,
+      "sha256": "084d5d2a5acb6a7ecbdff124389412c78799a4ece1ec907d99817d1653c9d153"
+    },
+    "WoW/Source/DB/Rec/TaxiPathRec.h": {
+      "bytes": 583,
+      "sha256": "64ba7850a03faf83e0d7c69a89d1104972070ab0a0bdcf457b1e25b8315e8230"
+    },
+    "WoW/Source/DB/Rec/TeamContributionPointsRec.cpp": {
+      "bytes": 760,
+      "sha256": "4fd89e93fa7bddaaa8e96a691eedc1516980938ad78184fd10290d3fb1d23146"
+    },
+    "WoW/Source/DB/Rec/TeamContributionPointsRec.h": {
+      "bytes": 574,
+      "sha256": "045999e786541f987f0955ccb1a60409934061b092d5f96da2359bc86923f0ff"
+    },
+    "WoW/Source/DB/Rec/TerrainTypeRec.cpp": {
+      "bytes": 1552,
+      "sha256": "683f1a43291c987bfee6ca75218c5724335d4c92a6c3ec29e6a758adf31913b8"
+    },
+    "WoW/Source/DB/Rec/TerrainTypeRec.h": {
+      "bytes": 730,
+      "sha256": "87ac58fe1145d78257aa1ac71d787716d52f4ceb9d535b52f5443937067744a6"
+    },
+    "WoW/Source/DB/Rec/TerrainTypeSoundsRec.cpp": {
+      "bytes": 645,
+      "sha256": "3dca95d08999fc5a0fb8628eae2f9ba37ac7c1d10131e598a6a64ec46de3cb0c"
+    },
+    "WoW/Source/DB/Rec/TerrainTypeSoundsRec.h": {
+      "bytes": 520,
+      "sha256": "7865f59aa090f50b7156d963905b44cad816e4d8243db00096c1c3ef00233800"
+    },
+    "WoW/Source/DB/Rec/TotemCategoryRec.cpp": {
+      "bytes": 3296,
+      "sha256": "c874fb7afe0504b065435be0cb59404b62bd5ef35379082e0feda09f8266260c"
+    },
+    "WoW/Source/DB/Rec/TotemCategoryRec.h": {
+      "bytes": 625,
+      "sha256": "da8f9330ac68070bacfda16147586568f9242b4294c701c79909f024ef53074f"
+    },
+    "WoW/Source/DB/Rec/TransportAnimationRec.cpp": {
+      "bytes": 1422,
+      "sha256": "f6fc7a6c9ce821818b13757ad35684738af2f8c5961b2ed6faa2487f1cc1c27e"
+    },
+    "WoW/Source/DB/Rec/TransportAnimationRec.h": {
+      "bytes": 669,
+      "sha256": "a3d5eb49f86bf05139da265600261d91c914078325ff36d3284aeb64fe1efc61"
+    },
+    "WoW/Source/DB/Rec/TransportPhysicsRec.cpp": {
+      "bytes": 2086,
+      "sha256": "160a3568875367d792a012d62c16f83ccb6b24997a990431cdc725ec24e63c26"
+    },
+    "WoW/Source/DB/Rec/TransportPhysicsRec.h": {
+      "bytes": 876,
+      "sha256": "dda73e113465d9ff275d9d74406167228d662c479bcaab71ecf829eedc9be33c"
+    },
+    "WoW/Source/DB/Rec/TransportRotationRec.cpp": {
+      "bytes": 1402,
+      "sha256": "d15088f0e09f66a54b771a073069fb0dff522a518c368fccd003f85b154383b2"
+    },
+    "WoW/Source/DB/Rec/TransportRotationRec.h": {
+      "bytes": 629,
+      "sha256": "577ad2309a1adb766cfebdc27a1eca4014b349f13a0b3722eedc0df38585b105"
+    },
+    "WoW/Source/DB/Rec/UISoundLookupsRec.cpp": {
+      "bytes": 1013,
+      "sha256": "78ed3c649dc6a31ada42c37dacaf32f3164f8110910202e3cba82033fc4402d9"
+    },
+    "WoW/Source/DB/Rec/UISoundLookupsRec.h": {
+      "bytes": 580,
+      "sha256": "40f899cd434c1a1303c2c377903ab0078b1698a9912463c20b8bf346d0f91c7a"
+    },
+    "WoW/Source/DB/Rec/UnitBloodLevelsRec.cpp": {
+      "bytes": 739,
+      "sha256": "f85f95a7c7dc429d3ad6abd96d586aac185e8cfe38b7cdafe36b5e455528d8c3"
+    },
+    "WoW/Source/DB/Rec/UnitBloodLevelsRec.h": {
+      "bytes": 555,
+      "sha256": "ebbf5befec9a5fc002870ba82b61ea9d61224d5684f19ca550c7d4addcd90692"
+    },
+    "WoW/Source/DB/Rec/UnitBloodRec.cpp": {
+      "bytes": 2342,
+      "sha256": "9e73ef9edae627a5804e7ff1f1caa66e016a32a002cb8ca421449bd0ec9005be"
+    },
+    "WoW/Source/DB/Rec/UnitBloodRec.h": {
+      "bytes": 631,
+      "sha256": "52bf23c59666caae39f627ce7eab37359e5298a3d2a9be674d04267c801f5efb"
+    },
+    "WoW/Source/DB/Rec/VehicleRec.cpp": {
+      "bytes": 6198,
+      "sha256": "2ad2d9ca9e557dde4a38f83f5ffda15a49aedbc9a6d762556869829be5b186ec"
+    },
+    "WoW/Source/DB/Rec/VehicleRec.h": {
+      "bytes": 1675,
+      "sha256": "c085e1396928ac1159cf1c0e183b1ad8af83ff3a066a7c6a6fef9d4a03373cc4"
+    },
+    "WoW/Source/DB/Rec/VehicleSeatRec.cpp": {
+      "bytes": 10023,
+      "sha256": "655d79bfadcd1229a3a02e56f25c0f046bbbf8eecbbb067dbdd2d52168517f4e"
+    },
+    "WoW/Source/DB/Rec/VehicleSeatRec.h": {
+      "bytes": 2735,
+      "sha256": "2cd17fdc3f7a71d826298a0537942371146ac26ef93c59266f4eae4955039c9e"
+    },
+    "WoW/Source/DB/Rec/VehicleUIIndSeatRec.cpp": {
+      "bytes": 1190,
+      "sha256": "6500444b6040a91df4bfc1fa1ca36bb043fffa2e31a339321e820b2dda4cb9bb"
+    },
+    "WoW/Source/DB/Rec/VehicleUIIndSeatRec.h": {
+      "bytes": 664,
+      "sha256": "1842ddb3d17f8b28237e8648e91d2194518e99959c56ae7edf1d6bec505e6b1e"
+    },
+    "WoW/Source/DB/Rec/VehicleUIIndicatorRec.cpp": {
+      "bytes": 975,
+      "sha256": "e1b92044ef104bf44489273e9e3a815371da3ef57b40678f1e948fb291a39a75"
+    },
+    "WoW/Source/DB/Rec/VehicleUIIndicatorRec.h": {
+      "bytes": 573,
+      "sha256": "d5f957f4494df2a49d639a794b4240245f621b0e43c8381cfea2b6fa936b3a7a"
+    },
+    "WoW/Source/DB/Rec/VocalUISoundsRec.cpp": {
+      "bytes": 1209,
+      "sha256": "3901a885f83a40641c4c479b897847e02c3a763db8e578a3178ef1657cc60d6d"
+    },
+    "WoW/Source/DB/Rec/VocalUISoundsRec.h": {
+      "bytes": 660,
+      "sha256": "76cceff471afe2d1be5f27177fb724ad709a9b8627a3170025a36440bb043c92"
+    },
+    "WoW/Source/DB/Rec/WMOAreaTableRec.cpp": {
+      "bytes": 4791,
+      "sha256": "e4ae833a4793f2703dc0e35b3a728c68fa8ad46963b231e0c372f93c516bf25f"
+    },
+    "WoW/Source/DB/Rec/WMOAreaTableRec.h": {
+      "bytes": 920,
+      "sha256": "e99693b8bb9d627fbff1e83b8ee07cafd6f1f2b5230434ff3839008941cb48ab"
+    },
+    "WoW/Source/DB/Rec/WeaponImpactSoundsRec.cpp": {
+      "bytes": 1317,
+      "sha256": "577ab4f0347cbdd50abab7a5a3af36f18bfdbdeb4643a06bef39e5e1f577514c"
+    },
+    "WoW/Source/DB/Rec/WeaponImpactSoundsRec.h": {
+      "bytes": 705,
+      "sha256": "e26e605569556c03bd0e26469b4ce24a4cd7a798c0bb63a6e68118f9847954ce"
+    },
+    "WoW/Source/DB/Rec/WeaponSwingSounds2Rec.cpp": {
+      "bytes": 1004,
+      "sha256": "95585efe7b415126ce7dd0feef7e8742adf6465f5f916285e72f0e05ee3d9efe"
+    },
+    "WoW/Source/DB/Rec/WeaponSwingSounds2Rec.h": {
+      "bytes": 627,
+      "sha256": "b9aefdcb547b8d2649a18c04d6c80b8f78e66edb47bbc9845a3de67b202330d1"
+    },
+    "WoW/Source/DB/Rec/WeatherRec.cpp": {
+      "bytes": 1515,
+      "sha256": "0cecd4f9d3f02a47c49230a795f4c10610153ebdd6ccc145e165e57a51f82eb1"
+    },
+    "WoW/Source/DB/Rec/WeatherRec.h": {
+      "bytes": 670,
+      "sha256": "676de874c55002e328503bf3483f530313f9815b983d7d0996af38105a326ab9"
+    },
+    "WoW/Source/DB/Rec/WorldChunkSoundsRec.cpp": {
+      "bytes": 1830,
+      "sha256": "0d58bd356d2fe3dbd9d428c925cdd467bcf654bd342b0c5aa163c16693a3181b"
+    },
+    "WoW/Source/DB/Rec/WorldChunkSoundsRec.h": {
+      "bytes": 867,
+      "sha256": "6d070d73d412aca92ccfb1040bd712db3d65d3a91036524d58628b8082236e1d"
+    },
+    "WoW/Source/DB/Rec/WorldMapAreaRec.cpp": {
+      "bytes": 2208,
+      "sha256": "3bdf45a684608c7fecd4f3004fecec7331b596ec54cae528c38e02da289d51ed"
+    },
+    "WoW/Source/DB/Rec/WorldMapAreaRec.h": {
+      "bytes": 859,
+      "sha256": "d432bca36c71f92b4b5879f3d7bc20d05499da818491a700b5f573ef6f5f06ee"
+    },
+    "WoW/Source/DB/Rec/WorldMapContinentRec.cpp": {
+      "bytes": 2559,
+      "sha256": "e96ced376e700315803532bab4d0857a100c4b3a52eef6d658470c8b9ce1e078"
+    },
+    "WoW/Source/DB/Rec/WorldMapContinentRec.h": {
+      "bytes": 895,
+      "sha256": "471ff536620ce137ad9c3ec4eb2efab76b953e02ccd88727c9a80b97940889e4"
+    },
+    "WoW/Source/DB/Rec/WorldMapOverlayRec.cpp": {
+      "bytes": 2693,
+      "sha256": "1b1fab20e62815ed2fc379847136adc5d7b307595d06a25c8b300f89b34650f0"
+    },
+    "WoW/Source/DB/Rec/WorldMapOverlayRec.h": {
+      "bytes": 1000,
+      "sha256": "62e4fd772dc49587a4ae8620c19a623b36f4a1dee41fc6eb3b92e2d6b1a59756"
+    },
+    "WoW/Source/DB/Rec/WorldMapTransformsRec.cpp": {
+      "bytes": 1936,
+      "sha256": "807260ab8563d7525dd7af05a25df4c52e3089414d6be814bf82fb46c9479ee7"
+    },
+    "WoW/Source/DB/Rec/WorldMapTransformsRec.h": {
+      "bytes": 753,
+      "sha256": "944caaf5c02701cec450c8d30baf840130b66f33a51ee69300a5b5faa6bd5c68"
+    },
+    "WoW/Source/DB/Rec/WorldSafeLocsRec.cpp": {
+      "bytes": 3807,
+      "sha256": "ce0fef684e530a89b3a18b1765fe1f56b78b585d4992e9dc93c125b08731f581"
+    },
+    "WoW/Source/DB/Rec/WorldSafeLocsRec.h": {
+      "bytes": 609,
+      "sha256": "ca3f80a97ec5e5ea0f90b08ab0d630695d31628c4216d67f8e5489fdcd55610f"
+    },
+    "WoW/Source/DB/Rec/WorldStateUIRec.cpp": {
+      "bytes": 10337,
+      "sha256": "2e74ecdb04b4236bbcf83ce5b3cbe0bddf6fa927ef562c6c5e3b181f3a6fd63f"
+    },
+    "WoW/Source/DB/Rec/WorldStateUIRec.h": {
+      "bytes": 963,
+      "sha256": "34913862cb1e635ce02a3a7cca5d4f6ea3d96636b03fb5b690a083715a62733a"
+    },
+    "WoW/Source/DB/Rec/WorldStateZoneSoundsRec.cpp": {
+      "bytes": 1796,
+      "sha256": "f35cbe18f305ef9519b2ad3dfafcd78ef22e2b4e506b41edf3a737cd53e4af4b"
+    },
+    "WoW/Source/DB/Rec/WorldStateZoneSoundsRec.h": {
+      "bytes": 870,
+      "sha256": "17efca5b50dbaff155e115ffd90f59c69a2b6edd54f68c3ebb58f21622d2f5b7"
+    },
+    "WoW/Source/DB/Rec/ZoneIntroMusicTableRec.cpp": {
+      "bytes": 1366,
+      "sha256": "ad5a5c38c000921373df2818b157ba758afeacdec917dd4d8e732bb6c62282da"
+    },
+    "WoW/Source/DB/Rec/ZoneIntroMusicTableRec.h": {
+      "bytes": 677,
+      "sha256": "0b615e8df3234f08583a09ab19b0c6f2bec81e6da76f3e382c932d82661549dd"
+    },
+    "WoW/Source/DB/Rec/ZoneMusicRec.cpp": {
+      "bytes": 1355,
+      "sha256": "4844d0740b7229d0bb8bab8682dc7d989dad028146808e730be88d65e2e9b3f6"
+    },
+    "WoW/Source/DB/Rec/ZoneMusicRec.h": {
+      "bytes": 654,
+      "sha256": "67e37fad00e10b932733cc21aa789f92352c74c3f745260208751ed8b20c6409"
+    },
+    "WoW/Source/DB/Rec/gtBarberShopCostBaseRec.cpp": {
+      "bytes": 630,
+      "sha256": "933592c17f78856d6560eda1119ecbb9932fbdf0cf1914100771f61ddebc3317"
+    },
+    "WoW/Source/DB/Rec/gtBarberShopCostBaseRec.h": {
+      "bytes": 572,
+      "sha256": "1ab727cec069cc2cc844f5cd6d1f4f430a5b1848cb75fd9643ba5532eafae2fa"
+    },
+    "WoW/Source/DB/Rec/gtChanceToMeleeCritBaseRec.cpp": {
+      "bytes": 654,
+      "sha256": "e62cacf59a54324e6526dd0dd407a45568f425c7584f12a3e07cf4b6d444da97"
+    },
+    "WoW/Source/DB/Rec/gtChanceToMeleeCritBaseRec.h": {
+      "bytes": 587,
+      "sha256": "fb8559f742598c6a5a1f924cbca5195d59eaa1a39739d713c18ee4e719b421ce"
+    },
+    "WoW/Source/DB/Rec/gtChanceToMeleeCritRec.cpp": {
+      "bytes": 622,
+      "sha256": "a98062f7e93dfa50b56dbf1a3d9293434a4b4596014ec81446754aed491b1da4"
+    },
+    "WoW/Source/DB/Rec/gtChanceToMeleeCritRec.h": {
+      "bytes": 567,
+      "sha256": "45d0aa96205b52443e5053632c27e8ea76bd2870b8bd8e4cf58f5afe27fc6282"
+    },
+    "WoW/Source/DB/Rec/gtChanceToSpellCritBaseRec.cpp": {
+      "bytes": 654,
+      "sha256": "e64a895e222c41903194f236cf03af31d80e4f1379a6feb72865a117c457d8ff"
+    },
+    "WoW/Source/DB/Rec/gtChanceToSpellCritBaseRec.h": {
+      "bytes": 587,
+      "sha256": "f0ef652253571d0ec3b98c9e40ca2682424cccdd4d39d14fa96937fab04468c4"
+    },
+    "WoW/Source/DB/Rec/gtChanceToSpellCritRec.cpp": {
+      "bytes": 622,
+      "sha256": "5a674453921b3259d77f676e5c85cc33a7f52a070eb209b15a59c3f246b21b6c"
+    },
+    "WoW/Source/DB/Rec/gtChanceToSpellCritRec.h": {
+      "bytes": 567,
+      "sha256": "2fe244a59d9ff4573b417ab7c1a738e72af9ebeb43d30f00ccaa86951b949e9e"
+    },
+    "WoW/Source/DB/Rec/gtCombatRatingsRec.cpp": {
+      "bytes": 590,
+      "sha256": "457f0659e0fefd4672f48ada5e2b8bec7681f263c35e9a25d6c631e4e6c250b9"
+    },
+    "WoW/Source/DB/Rec/gtCombatRatingsRec.h": {
+      "bytes": 547,
+      "sha256": "ff1b97a647108e79642971b26a783641a54fea530151391a9d742a845bcf6d63"
+    },
+    "WoW/Source/DB/Rec/gtNPCManaCostScalerRec.cpp": {
+      "bytes": 622,
+      "sha256": "0c00711ac4ed4c1bada88810435c576387417c702f07625e4863065ede0b2642"
+    },
+    "WoW/Source/DB/Rec/gtNPCManaCostScalerRec.h": {
+      "bytes": 567,
+      "sha256": "59342b7eacf26de7ae80a2e035754319d5eea05fefb009b8a27f77c4ee5935d4"
+    },
+    "WoW/Source/DB/Rec/gtOCTClassCombatRatingScalarRec.cpp": {
+      "bytes": 808,
+      "sha256": "7a796086076f0de7ae1241ae1b28cf0065e7456f7ac7ae6479cbd22204e5162c"
+    },
+    "WoW/Source/DB/Rec/gtOCTClassCombatRatingScalarRec.h": {
+      "bytes": 604,
+      "sha256": "3ee0645518071d3ada747f849cd452b5bb781cd20511960df2e634b877808bba"
+    },
+    "WoW/Source/DB/Rec/gtOCTRegenHPRec.cpp": {
+      "bytes": 566,
+      "sha256": "0bb996a0cfc8b89d66afb9c017da6ef93a57a8cdc69e9052f5f2cd9e26af7505"
+    },
+    "WoW/Source/DB/Rec/gtOCTRegenHPRec.h": {
+      "bytes": 532,
+      "sha256": "3dd4e0b4cb46f4379be32f68ce2551db5691702080580d232876ae714e69bd9f"
+    },
+    "WoW/Source/DB/Rec/gtOCTRegenMPRec.cpp": {
+      "bytes": 566,
+      "sha256": "9eab31a5b15e15850176b5f7edef8a27a645a9bc929676e22699236680620149"
+    },
+    "WoW/Source/DB/Rec/gtOCTRegenMPRec.h": {
+      "bytes": 532,
+      "sha256": "1fc761423ee10f159806a88017f061cfc2f8ce97398ac443e5d004f0ea92af1a"
+    },
+    "WoW/Source/DB/Rec/gtRegenHPPerSptRec.cpp": {
+      "bytes": 590,
+      "sha256": "c3817d53845f16bba2b2ae9089bfa24ba1f99407b0738e0461188f313fffdc5b"
+    },
+    "WoW/Source/DB/Rec/gtRegenHPPerSptRec.h": {
+      "bytes": 547,
+      "sha256": "635ee5847ab2996ec5bbf9a5122e873ea07a9248ca5ae82fe791a5172dbae071"
+    },
+    "WoW/Source/DB/Rec/gtRegenMPPerSptRec.cpp": {
+      "bytes": 590,
+      "sha256": "3efea09821fc4d9befd4953ffd3415c546e8e2778ef6b5dd1a66b8dc2b4a5bdc"
+    },
+    "WoW/Source/DB/Rec/gtRegenMPPerSptRec.h": {
+      "bytes": 547,
+      "sha256": "286423e2636a72c2f716b04236ba559387beb779f63da03e2876cb277228f9a7"
+    },
+    "WoW/Source/DB/WowClientDB.h": {
+      "bytes": 33779,
+      "sha256": "1850a4e2fb8cfc43c59e9fc13004b29e9645d4782eece71e19ff69b418607469"
+    }
+  },
+  "storeCount": 238
+}

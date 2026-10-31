@@ -212,10 +212,10 @@ public final class GameSessionOwnerTests {
         check(events.equals(List.of("release","[65513, 65473, 65473, 65513]","[true, true, false, false]")),"Source-supported Alt+F4 is one atomic sequence after releaseAll");
         Path root=Files.createTempDirectory("esteria-shader-selection-").toRealPath();
         try {
-            Path game=Files.createDirectory(root.resolve("game")),tools=Files.createDirectory(root.resolve("tools")),work=Files.createDirectory(root.resolve("work"));
+            Path game=Files.createDirectory(root.resolve("game")),tools=Files.createDirectory(root.resolve("tools")),work=Files.createDirectory(root.resolve("work")),helpers=Files.createDirectory(root.resolve("helpers"));
             Files.writeString(game.resolve("current"),"a".repeat(64)+"\n");Path generations=Files.createDirectory(game.resolve("generations"));Path imported=Files.createDirectory(Files.createDirectory(generations.resolve("a".repeat(64))).resolve("data"));Path data=Files.createDirectory(imported.resolve("Data"));
             Files.write(data.resolve("common.MPQ"),new byte[]{0});Path enUS=Files.createDirectory(data.resolve("enUS"));Files.write(enUS.resolve("locale-enUS.MPQ"),new byte[]{0});
-            ShaderRunPlan plan=new ShaderRunPlan(game,tools,work,"b".repeat(40),"enUS");
+            ShaderRunPlan plan=new ShaderRunPlan(game,tools,work,helpers,"b".repeat(40),"enUS");
             Constructor<ShaderSetup.Result> constructor=ShaderSetup.Result.class.getDeclaredConstructor(ShaderRunPlan.class,String.class,Path.class,Path.class,int.class,long.class,boolean.class);constructor.setAccessible(true);
             ShaderSetup.Result original=constructor.newInstance(plan,"c".repeat(64),root.resolve("shaders"),root.resolve("logs"),4,123L,false);
             ShaderSetup.Result same=constructor.newInstance(plan,"c".repeat(64),root.resolve("shaders"),root.resolve("other-log"),4,123L,false);

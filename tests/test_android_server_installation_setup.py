@@ -28,7 +28,7 @@ class InstallationComposition(unittest.TestCase):
         self.connection = object(); self.calls = []; self.leases = []; self.cancelled = False; self.service_checks = 0
         for name in (schema.JOURNAL, updates.JOURNAL, 'realm-loopback.json', 'local-account.json'):
             db.atomic_json(self.state / name, dict(testFixture=True))
-        self.profile = dict(setup.configurations._LOCAL_PORTS, playerbots=dict(setup.configurations._BOT_POLICY))
+        self.profile = dict(setup.configurations._LOCAL_PORTS, content_profile=setup.configurations.CONTENT_PROFILE, playerbots=dict(setup.configurations._BOT_POLICY))
         self.patch(setup.schema, 'initialize', self.baseline)
         self.patch(setup.updates, 'prepare', self.prepare_update)
         self.patch(setup.updates, 'apply', self.apply_update)

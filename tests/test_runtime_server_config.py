@@ -93,6 +93,13 @@ class RuntimeServerConfiguration(unittest.TestCase):
                          {'modules/' + name for name in self.content.compiled['configFiles']})
         proof = json.loads(expected['module-configuration.json'])
         self.assertEqual(len(proof['configFiles']), 50)
+        self.assertEqual(proof['contentProfile'], 'stock-3.3.5a')
+        self.assertEqual(second['content_profile'], 'stock-3.3.5a')
+        self.assertIn(b'Updates.EnableDatabases = 0', expected['worldserver.conf'])
+        self.assertIn(b'ClasslessWildcard.Enable = 0', expected['modules/classless_wildcard.conf'])
+        self.assertIn(b'WxlDbc.Enable = 0', expected['modules/mod_wxl_dbc.conf'])
+        self.assertIn(b'Battlemon.Enable = 0', expected['modules/mod_battlemon.conf'])
+        self.assertIn(b'Playerbots.Updates.EnableDatabases = 0', expected['modules/playerbots.conf'])
         self.assertEqual(proof['inventorySha256'], self.content.identities['files']['metadata/content-manifest.json']['sha256'])
         self.assertEqual(proof['compiledSelectionSha256'], self.content.identities['files']['metadata/compiled-modules.json']['sha256'])
         self.assertFalse(proof['moduleStartupQualified']); self.assertFalse(proof['gameplayQualified'])
@@ -158,12 +165,14 @@ class RuntimeServerConfiguration(unittest.TestCase):
     def test_runtime_requires_complete_verified_content_and_sealed_policy(self):
         with self.assertRaisesRegex(ValueError, 'Verified extracted'):
             runtime.render_verified(self.content.manifest, self.state, self.data, self.mysql, profile=self.profile)
-        for change in ('port', 'bot-population', 'bot-ceiling', 'typed-port'):
+        for change in ('port', 'bot-population', 'bot-ceiling', 'typed-port', 'custom-profile', 'missing-profile'):
             profile = copy.deepcopy(self.profile)
             if change == 'port': profile['database_port'] = 3306
             elif change == 'bot-population': profile['playerbots']['AiPlayerbot.RandomBotAutologin'] = 1
             elif change == 'bot-ceiling': profile['playerbots']['AiPlayerbot.MaxAddedBots'] = 5
-            else: profile['database_port'] = '13306'
+            elif change == 'typed-port': profile['database_port'] = '13306'
+            elif change == 'custom-profile': profile['content_profile'] = 'esteria-custom'
+            else: del profile['content_profile']
             with self.subTest(change=change), self.assertRaisesRegex(ValueError, 'sealed'):
                 self.runtime_render(profile=profile)
         self.assertFalse((self.state / 'config').exists())

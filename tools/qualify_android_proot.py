@@ -12,7 +12,8 @@ except ImportError:
     from qualify_android_installer import digest, instrument_passed, run_bounded
     from verify_android_proot_probe import verify, require
 
-PACKAGE='io.github.russianranger.esteria'
+NAMESPACE='io.github.russianranger.esteria'
+PACKAGE=NAMESPACE+'.stock'
 SCOPE='android-13-x86_64-proot-glibc-execution'
 FLAGS=('androidProotExecuted','privateElfLoaderExecuted','directPrivateBionicExecRejected',
        'dynamicLibraryAndTlsVerified','forkExecLoopbackVerified','relaunchPersistenceVerified',
@@ -69,7 +70,7 @@ def main():
         command('install-app',['install',str(args.apk)]);installed=True
         command('install-tests',['install',str(args.test_apk)])
         _,result=command('proot-contracts',['shell','am','instrument','-w','-r','-e','class',
-            PACKAGE+'.runtime.ProotExecutionTest#privateGlibcExecutesThroughApkLoader',
+            NAMESPACE+'.runtime.ProotExecutionTest#privateGlibcExecutesThroughApkLoader',
             PACKAGE+'.test/androidx.test.runner.AndroidJUnitRunner'],timeout=240)
         require(instrument_passed(result),'proot-instrumentation-did-not-pass')
         _,raw=command('app-receipt',['exec-out','run-as',PACKAGE,'cat','files/proot-probe-qualification.json'])

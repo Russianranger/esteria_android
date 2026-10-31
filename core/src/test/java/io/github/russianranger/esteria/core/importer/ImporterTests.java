@@ -24,7 +24,9 @@ public final class ImporterTests {
     private static int passed;
     public static void main(String[] args) throws Exception {
         run("PE version resource validates exact build", ImporterTests::versionResources);
+        run("stock report verifies actual version headers locale speech and preserves standard patches", ImporterTests::stockCompatibility);
         run("MPQ signature and table bounds", ImporterTests::mpqBounds);
+        run("stock selection preserves source and essential patches, excludes only confirmed overlays and loose UI", ImporterTests::stockSelection);
         run("Esteria selection catalogs validate complete bounded records", ImporterTests::selectionCatalogs);
         run("invalid catalog update preserves active assets and permits corrected retry", ImporterTests::catalogUpdate);
         run("folder import and repeat skips copied bytes", ImporterTests::folderCommit);
@@ -76,6 +78,28 @@ public final class ImporterTests {
         write(client.resolve("Data/enUS/locale-enUS.MPQ"), mpq());
         write(client.resolve("Interface/AddOns/MyAddon/config.txt"), "old config".getBytes(StandardCharsets.UTF_8));
         return client;
+    }
+    private static String digest(Path file)throws Exception {
+        StringBuilder result=new StringBuilder();for(byte value:java.security.MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(file)))result.append(String.format(java.util.Locale.ROOT,"%02x",value&255));return result.toString();
+    }
+    private static void stockSelection()throws Exception {
+        Path root=temp(),source=client(root);write(source.resolve("Data/enUS/speech-enUS.MPQ"),mpq());
+        write(source.resolve("Data/patch-extra.MPQ"),mpq());write(source.resolve("Fonts/ARIALN.TTF"),new byte[]{1,2,3});
+        GameDataImporter importer=importer(root);GameDataImporter.Result imported=folder(importer,source,GameDataImporter.ImportKind.BASE_CLIENT);
+        String overlayDigest=digest(imported.gameDirectory.resolve("Data/patch-extra.MPQ"));
+        fails(()->StockClientSelection.apply(importer,imported.gameDirectory,imported.generation,Map.of("Data/patch-extra.MPQ","f".repeat(64)),"a".repeat(64),GameDataImporter.NO_PROGRESS,GameDataImporter.NEVER_CANCELLED),"wrong content identity");
+        check(importer.resolveCurrent().equals(imported.gameDirectory),"rejected exclusion preserves active import");
+        fails(()->StockClientSelection.apply(importer,imported.gameDirectory,imported.generation,Map.of("Data/patch-3.MPQ",overlayDigest),"a".repeat(64),GameDataImporter.NO_PROGRESS,GameDataImporter.NEVER_CANCELLED),"required stock patch cannot be excluded");
+        AtomicBoolean cancelSelection=new AtomicBoolean();
+        fails(()->StockClientSelection.apply(importer,imported.gameDirectory,imported.generation,Map.of("Data/patch-extra.MPQ",overlayDigest),"a".repeat(64),
+            (path,bytes,total,count,files)->cancelSelection.set(true),cancelSelection::get),"interrupted stock selection");
+        check(importer.resolveCurrent().equals(imported.gameDirectory),"interrupted selection cannot activate incomplete data");
+        Path selected=StockClientSelection.apply(importer,imported.gameDirectory,imported.generation,Map.of("Data/patch-extra.MPQ",overlayDigest),"a".repeat(64),GameDataImporter.NO_PROGRESS,GameDataImporter.NEVER_CANCELLED);
+        check(!selected.equals(imported.gameDirectory)&&importer.resolveCurrent().equals(selected),"completed stock selection atomically activates separate generation");
+        check(!Files.exists(selected.resolve("Interface"))&&!Files.exists(selected.resolve("Fonts"))&&!Files.exists(selected.resolve("Data/patch-extra.MPQ")),"loose UI/font and audited optional archive are absent from stock view");
+        for(String patch:List.of("patch.MPQ","patch-2.MPQ","patch-3.MPQ"))check(Files.exists(selected.resolve("Data/"+patch)),"stock Blizzard patch retained");
+        check(Files.exists(imported.gameDirectory.resolve("Interface/AddOns/MyAddon/config.txt"))&&Files.exists(source.resolve("Data/patch-extra.MPQ"))&&digest(imported.gameDirectory.resolve("Data/patch-extra.MPQ")).equals(overlayDigest),"original source and imported generation unchanged");
+        check(StockClientSelection.apply(importer,selected,selected.getParent().getFileName().toString(),Map.of(),"b".repeat(64),GameDataImporter.NO_PROGRESS,GameDataImporter.NEVER_CANCELLED).equals(selected),"unchanged stock selection avoids another copy");
     }
     private static byte[] selectionCatalog() {
         ByteBuffer bytes = ByteBuffer.allocate(12 + 6 * 156).order(ByteOrder.LITTLE_ENDIAN);
@@ -155,6 +179,36 @@ public final class ImporterTests {
         Files.write(file, loose); fails(() -> GameDataVerifier.verifyWowVersion(file), "version signature outside type16 resource");
         byte[] bad = pe(12340); ByteBuffer.wrap(bad).order(ByteOrder.LITTLE_ENDIAN).putInt(512 + 96, 0x9999);
         Files.write(file, bad); fails(() -> GameDataVerifier.verifyWowVersion(file), "out of bounds resource RVA");
+    }
+    private static void stockCompatibility() throws Exception {
+        Path source = client(temp());
+        StockClientCompatibility.Report missing = StockClientCompatibility.inspect(source, "enUS");
+        check(missing.effectiveLocale.equals("enUS") && missing.errors.stream().anyMatch(error -> error.contains("Data/enUS/speech-enUS.MPQ")), "missing essential speech must be exact");
+        fails(missing::requirePreparationInputs, "preparation rejects absent mandatory speech");
+        write(source.resolve("Data/enUS/speech-enUS.MPQ"), mpq());
+        write(source.resolve("Data/enUS/patch-enUS.MPQ"), mpq());
+        write(source.resolve("Data/enUS/patch-enUS-2.MPQ"), mpq());
+        write(source.resolve("Data/patch-Z.MPQ"), mpq());
+        StockClientCompatibility.Report report = StockClientCompatibility.inspect(source, "frFR");
+        report.requirePreparationInputs();
+        check(report.effectiveLocale.equals("enUS") && report.installedLocales.equals(Arrays.asList("enUS")), "source locale rotation must match installed data");
+        check(report.candidateOverlays.equals(Arrays.asList("Data/patch-Z.MPQ")), "stock root and locale patches must not be classified as additional overlays");
+        check(Files.exists(source.resolve("Data/patch.MPQ")) && Files.exists(source.resolve("Data/patch-2.MPQ")) && Files.exists(source.resolve("Data/patch-3.MPQ")) && Files.exists(source.resolve("Data/patch-Z.MPQ")), "inspection must preserve all source bytes");
+        check(report.toText().contains("runtimeExecution=not demonstrated") && report.toText().contains("signedUi=not authenticated") && report.toText().contains("filename alone does not establish identity"), "report must distinguish observed bytes from content/runtime proof");
+        write(source.resolve("Wow.exe"), pe(12341));
+        check(StockClientCompatibility.inspect(source, "enUS").errors.stream().anyMatch(error -> error.contains("3.3.5.12341")), "version resource mismatch must remain an error");
+        write(source.resolve("Wow.exe"), pe(12340));
+        write(source.resolve("Data/enUS/speech-enUS.MPQ"), Arrays.copyOf(mpq(), 40));
+        check(StockClientCompatibility.inspect(source, "enUS").errors.stream().anyMatch(error -> error.contains("speech-enUS.MPQ") && error.contains("Truncated")), "corrupt mandatory archive must identify its path");
+        Files.delete(source.resolve("Data/patch-3.MPQ"));
+        check(StockClientCompatibility.inspect(source, "enUS").errors.stream().anyMatch(error -> error.contains("Data/patch-3.MPQ")), "missing Blizzard patch-3 must remain an essential error");
+        Path clean = client(temp());
+        GameDataImporter.Result imported = folder(importer(clean.getParent()), clean, GameDataImporter.ImportKind.BASE_CLIENT);
+        check(Files.readString(imported.gameDirectory.getParent().resolve(StockClientCompatibility.REPORT_NAME)).contains("speech-enUS.MPQ"), "completed import must retain useful structural failure evidence");
+        for (int i = 0; i < 160; i++) write(clean.resolve("Data/patch-unclassified-" + i + ".MPQ"), mpq());
+        StockClientCompatibility.Report bounded = StockClientCompatibility.inspect(clean, "enUS");
+        check(bounded.toText().getBytes(StandardCharsets.UTF_8).length <= 8192 && bounded.toText().contains("detailsOmitted="), "large overlay inventory must produce bounded support text");
+        check(bounded.toText().contains("Data/enUS/speech-enUS.MPQ") && bounded.toText().contains("unclassifiedOverlayCount=160"), "bounded report must prioritize exact essential failures and retain total inventory counts");
     }
     private static void mpqBounds() throws Exception {
         Path file = temp().resolve("base.MPQ"); Files.write(file, mpq()); GameDataVerifier.verifyMpq(file);

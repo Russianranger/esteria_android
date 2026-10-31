@@ -15,7 +15,8 @@ except ImportError:
     from qualify_android_installer import digest, instrument_passed, run_bounded
     from verify_android_wine_probe import verify, require
 
-PACKAGE='io.github.russianranger.esteria'
+NAMESPACE='io.github.russianranger.esteria'
+PACKAGE=NAMESPACE+'.stock'
 SCOPE='android-13-x86_64-wine-reconstructed-client-diagnostics'
 FALSE_FLAGS=('arm64Qualified','graphicsQualified','audioQualified','authenticationQualified','commonMainStarted','assetsLoaded','gameplayQualified')
 PHASES=('entry','offline','loopback')
@@ -94,7 +95,7 @@ def main():
         command('install-app',['install',str(args.apk)]);installed=True
         command('install-tests',['install',str(args.test_apk)])
         _,result=command('wine-test',['shell','am','instrument','-w','-r','-e','class',
-            PACKAGE+'.runtime.WineExecutionTest#actualReconstructedClientRunsThroughWine',
+            NAMESPACE+'.runtime.WineExecutionTest#actualReconstructedClientRunsThroughWine',
             PACKAGE+'.test/androidx.test.runner.AndroidJUnitRunner'],timeout=1500)
         require(instrument_passed(result),'wine-instrumentation-did-not-pass')
         _,raw=command('app-receipt',['exec-out','run-as',PACKAGE,'cat','files/wine-probe-qualification.json'])

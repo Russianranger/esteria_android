@@ -1,10 +1,11 @@
 {
+  "content_profile": "stock-3.3.5a",
   "database_engine": "MySQL >= 8.0; MariaDB is not qualified",
   "database_port": 13306,
   "auth_port": 3724,
   "world_port": 8085,
   "client_build": 12340,
-  "qualification": "Initial four controlled account-bot ceiling; device memory and thermals unmeasured",
+  "qualification": "Stock 3.3.5a world bring-up; bot AI and custom content deferred; device memory and thermals unmeasured",
   "playerbots": {
     "AiPlayerbot.Enabled": 1,
     "AiPlayerbot.RandomBotAutologin": 0,

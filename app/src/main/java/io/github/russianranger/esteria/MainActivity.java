@@ -86,21 +86,11 @@ public final class MainActivity extends Activity {
         LinearLayout layout = new LinearLayout(this); layout.setOrientation(LinearLayout.VERTICAL);
         int padding = dp(24); layout.setPadding(padding, padding, padding, padding); scroll.addView(layout);
         TextView title = text("ESTERIA", 34, Color.rgb(220, 186, 113)); layout.addView(title);
-        TextView subtitle = text("Your local world", 18, Color.rgb(184, 199, 211)); layout.addView(subtitle);
-        TextView explanation = text("Import your World of Warcraft 3.3.5a build 12340 client folder directly, or choose a ZIP. Custom content can be added later. Imported data stays in the app between updates.\n\nFolder imports avoid an extra archive copy. Keep the source folder unchanged until import finishes. ZIP imports need space for an archive copy and expanded files. Updates retain previous data versions; automatic cleanup is not available yet.\n\n"+(completeProfile()?"This build includes the local client/server session. Hardware rendering, world entry and gameplay validation are pending.":"This build has an incomplete runtime profile; gameplay is unavailable."), 15, Color.rgb(184, 199, 211));
+        TextView subtitle = text("Stock 3.3.5a / non-custom", 18, Color.rgb(184, 199, 211)); layout.addView(subtitle);
+        TextView explanation = text("Import your complete ChromieCraft 3.3.5a build 12340 client folder, or choose a ZIP. Keep Blizzard's standard patch archives. No Esteria, HD or challenge-mode patches are required.\n\nThis stock app keeps its own client copy, local account, world data and saved characters. Your original realmlist and account files stay in the source installation. Folder imports avoid an extra archive copy; keep the source unchanged until import finishes.\n\n"+(completeProfile()?"After import, choose your client language and Prepare local runtime / world, then Start local game. World entry and Thor validation are pending.":"This build has an incomplete runtime profile; gameplay is unavailable."), 15, Color.rgb(184, 199, 211));
         explanation.setPadding(0, dp(20), 0, dp(12)); layout.addView(explanation);
         button(layout, "Import client folder", () -> chooseFolder(BASE_FOLDER));
         button(layout, "Import client ZIP", () -> chooseArchive(BASE));
-        button(layout, "Add custom content folder", () -> chooseFolder(OVERLAY_FOLDER));
-        button(layout, "Add custom content ZIP", () -> chooseArchive(OVERLAY));
-        layout.addView(text("Custom packages should have Data/ at their top level. Choose its parent folder, rather than Data/ itself. Matched server packages can also include EsteriaServerData/ at that level.",13,Color.rgb(145,163,177)));
-        button(layout, "Prepare client runtime", () -> operation(new Intent(this, SessionService.class).setAction(SessionService.PREPARE_RUNTIME)));
-        TextView runtimeNote = text("Initial runtime setup may download files. Progress shows the copied size; interrupted setup can resume. Previous versions and imported game data are retained.", 13, Color.rgb(145, 163, 177));
-        layout.addView(runtimeNote);
-        if (BuildConfig.SERVER_RUNTIME_PACKAGED) {
-            button(layout, "Prepare server dependencies · bundled", () -> operation(new Intent(this, SessionService.class).setAction(SessionService.PREPARE_SERVER_RUNTIME)));
-            layout.addView(text("Prepare the bundled server files before preparing the local world. Imported game data, database files and saved characters are stored separately from application updates.", 13, Color.rgb(145, 163, 177)));
-        }
         if(BuildConfig.SERVER_DATA_TOOLS_PACKAGED&&BuildConfig.SERVER_PROGRAMS_PACKAGED&&BuildConfig.SERVER_CONTENT_PACKAGED&&BuildConfig.SHADER_TOOLS_PACKAGED) {
             layout.addView(text("Imported client language",14,Color.rgb(184,199,211)));
             clientLanguage=new Spinner(this);
@@ -109,7 +99,7 @@ public final class MainActivity extends Activity {
             String selected=getPreferences(MODE_PRIVATE).getString("clientLanguage","enUS");
             for(int i=0;i<CLIENT_LOCALES.length;i++)if(CLIENT_LOCALES[i].equals(selected))clientLanguage.setSelection(i);
             layout.addView(clientLanguage);
-            button(layout,"Prepare local world",()->{
+            button(layout,"Prepare local runtime / world",()->{
                 String locale=(String)clientLanguage.getSelectedItem();
                 getPreferences(MODE_PRIVATE).edit().putString("clientLanguage",locale).apply();
                 operation(new Intent(this,SessionService.class).setAction(SessionService.PREPARE_WORLD).putExtra(SessionService.WORLD_LOCALE,locale));

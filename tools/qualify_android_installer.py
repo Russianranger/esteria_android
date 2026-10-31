@@ -10,13 +10,14 @@ import subprocess
 import time
 import threading
 
-PACKAGE = 'io.github.russianranger.esteria'
-TEST = PACKAGE + '.core.runtime.install.RuntimeInstallationInstrumentedTest'
-HELPER_TEST = PACKAGE + '.runtime.DatabaseServiceAssetsTest'
-SCHEMA_HELPER_TEST = PACKAGE + '.runtime.ServerSchemaAssetsTest'
-INSTALLATION_HELPER_TEST = PACKAGE + '.runtime.ServerInstallationAssetsTest'
-DATA_HELPER_TEST = PACKAGE + '.runtime.ServerDataAssetsTest'
-SESSION_HELPER_TEST = PACKAGE + '.runtime.ServerSessionAssetsTest'
+NAMESPACE = 'io.github.russianranger.esteria'
+PACKAGE = NAMESPACE + '.stock'
+TEST = NAMESPACE + '.core.runtime.install.RuntimeInstallationInstrumentedTest'
+HELPER_TEST = NAMESPACE + '.runtime.DatabaseServiceAssetsTest'
+SCHEMA_HELPER_TEST = NAMESPACE + '.runtime.ServerSchemaAssetsTest'
+INSTALLATION_HELPER_TEST = NAMESPACE + '.runtime.ServerInstallationAssetsTest'
+DATA_HELPER_TEST = NAMESPACE + '.runtime.ServerDataAssetsTest'
+SESSION_HELPER_TEST = NAMESPACE + '.runtime.ServerSessionAssetsTest'
 SCHEMA_HELPER_METHODS = ('nestedOriginalSourcesInstallAndResumeWithoutRewriting',
     'unexpectedNestedModuleIsPreservedAndRefused',
     'linkedResourceDirectoryIsPreservedAndRefused')

@@ -13,7 +13,8 @@ except ImportError:
     from qualify_android_installer import digest, instrument_passed, run_bounded
     from verify_android_mysql_probe import verify, require
 
-PACKAGE = 'io.github.russianranger.esteria'
+NAMESPACE = 'io.github.russianranger.esteria'
+PACKAGE = NAMESPACE + '.stock'
 SCOPE = 'android-13-x86_64-mysql-bootstrap-and-restart'
 FLAGS = ('exactBootstrapHelpersVerified', 'runtimeInstalledByProductionInstaller', 'databaseInitialized',
          'rootSqlAuthenticated', 'applicationSqlAuthenticated', 'socketOnly', 'instanceIdentityVerified',
@@ -92,7 +93,7 @@ def main():
         command('install-app', ['install', str(args.apk)]); installed = True
         command('install-tests', ['install', str(args.test_apk)])
         _, result = command('mysql-test', ['shell', 'am', 'instrument', '-w', '-r', '-e', 'class',
-            PACKAGE + '.runtime.MySqlExecutionTest#actualMysqlInitializesAuthenticatesAndRestarts',
+            NAMESPACE + '.runtime.MySqlExecutionTest#actualMysqlInitializesAuthenticatesAndRestarts',
             PACKAGE + '.test/androidx.test.runner.AndroidJUnitRunner'], timeout=1800)
         require(instrument_passed(result), 'mysql-instrumentation-did-not-pass')
         _, raw = command('app-receipt', ['exec-out', 'run-as', PACKAGE, 'cat', 'files/mysql-probe-qualification.json'])
@@ -101,7 +102,7 @@ def main():
         validate_receipt(evidence, args.source_revision, properties['ro.build.fingerprint'], proof_raw, proot)
         report['appEvidence'] = evidence; report['androidMysqlBootstrapQualified'] = True
         _, result = command('mysql-service-test', ['shell', 'am', 'instrument', '-w', '-r', '-e', 'class',
-            PACKAGE + '.runtime.MySqlExecutionTest#actualJavaServiceAdapterOwnsReadinessShutdownAndRestart',
+            NAMESPACE + '.runtime.MySqlExecutionTest#actualJavaServiceAdapterOwnsReadinessShutdownAndRestart',
             PACKAGE + '.test/androidx.test.runner.AndroidJUnitRunner'], timeout=1800)
         require(instrument_passed(result), 'mysql-service-instrumentation-did-not-pass')
         _, raw = command('service-app-receipt', ['exec-out', 'run-as', PACKAGE, 'cat', 'files/mysql-service-probe-qualification.json'])

@@ -35,7 +35,9 @@ NATIVE_FILES = {'lib/arm64-v8a/' + name for name in
 NDK_NOTICES = {'NDK-28.2.13676358-NOTICE.txt': 'android-ndk-r28c/NOTICE',
                'LLVM-RUNTIME-NOTICE.txt': 'android-ndk-r28c/toolchains/llvm/prebuilt/linux-x86_64/NOTICE',
                'NDK-SYSROOT-NOTICE.txt': 'android-ndk-r28c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/NOTICE'}
-HELPER_SETS = {'database-setup': ('mysql_bootstrap.py', 'android_database_setup.py'),
+HELPER_SETS = {'stock-client': ('stock_content_inspection.py', 'stock_shader_generation.py', 'shader_generation.py',
+                    'extractor_order.py', 'server_data_preflight.py'),
+               'database-setup': ('mysql_bootstrap.py', 'android_database_setup.py'),
                'database-service': ('mysql_bootstrap.py', 'mysql_service.py'),
                'server-schema': ('android_server_schema_setup.py', 'mysql_bootstrap.py', 'mysql_service.py',
                                  'server_content.py', 'server_schema_setup.py', 'server_schema_baseline.py',

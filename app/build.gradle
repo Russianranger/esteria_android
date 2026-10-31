@@ -1,6 +1,7 @@
 plugins { id 'com.android.application' }
 def sourceLock = new groovy.json.JsonSlurper().parse(rootProject.file('sources.lock.json'))
 def clientRevision = sourceLock.sources.client.commit
+def selectedVersionCode = providers.gradleProperty('buildVersionCode').getOrElse('1').toInteger()
 def serverRevision = sourceLock.sources.server.commit
 def prootProvider = providers.gradleProperty('prootProviderDir').orNull
 def serverProvider = providers.gradleProperty('serverRuntimeProviderDir').orNull
@@ -25,12 +26,15 @@ android {
     compileSdk 35
     buildToolsVersion '35.0.0'
     defaultConfig {
-        applicationId 'io.github.russianranger.esteria'
+        // A distinct package keeps the custom app, databases and saves intact.
+        applicationId 'io.github.russianranger.esteria.stock'
         minSdk 26
         targetSdk 35
-        versionCode providers.gradleProperty('buildVersionCode').getOrElse('1').toInteger()
+        versionCode selectedVersionCode
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
-        versionName '0.1.0-dev'
+        versionName '0.1.0-non-custom.' + selectedVersionCode
+        buildConfigField 'String', 'CONTENT_PROFILE', '"stock-3.3.5a"'
+        buildConfigField 'String', 'CONTENT_PROFILE_LABEL', '"Stock 3.3.5a / non-custom"'
         buildConfigField 'String', 'SOURCE_REVISION', '"' + providers.gradleProperty('sourceRevision').getOrElse('local-uncommitted').replaceAll('[^a-zA-Z0-9._-]', '_') + '"'
         buildConfigField 'String', 'CLIENT_REVISION', '"' + clientRevision + '"'
         buildConfigField 'String', 'SERVER_REVISION', '"' + serverRevision + '"'
@@ -202,3 +206,5 @@ apply from: 'world-setup.gradle'
 apply from: 'game-session.gradle'
 apply from: 'server-installation-probe.gradle'
 apply from: 'handoff-probe.gradle'
+
+apply from: 'stock-client.gradle'

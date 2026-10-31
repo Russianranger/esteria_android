@@ -9,18 +9,18 @@ from tools.render_server_config import overlay, quoted, render, MODULE_OVERRIDES
 
 
 AUTH = '''BindIP LogsDir SourceDirectory MySQLExecutable TempDir LoginDatabaseInfo
-LoginDatabase.WorkerThreads LoginDatabase.SynchThreads RealmServerPort'''.split()
+LoginDatabase.WorkerThreads LoginDatabase.SynchThreads RealmServerPort Updates.EnableDatabases'''.split()
 WORLD = '''BindIP LogsDir SourceDirectory MySQLExecutable TempDir LoginDatabaseInfo
 LoginDatabase.WorkerThreads LoginDatabase.SynchThreads WorldServerPort DataDir
 WorldDatabaseInfo CharacterDatabaseInfo WorldDatabase.WorkerThreads WorldDatabase.SynchThreads
 CharacterDatabase.WorkerThreads CharacterDatabase.SynchThreads Console.Enable Ra.Enable SOAP.Enabled
-Network.Threads MapUpdate.Threads Wintergrasp.DeferShutdownTimer'''.split()
+Network.Threads MapUpdate.Threads Wintergrasp.DeferShutdownTimer Updates.EnableDatabases'''.split()
 
 
 def fixture(root):
     server = root / 'server'
     profile = json.loads((Path(__file__).parents[1] / 'config/local-server.json').read_text())
-    bots = list(profile['playerbots']) + ['PlayerbotsDatabaseInfo']
+    bots = list(profile['playerbots']) + ['PlayerbotsDatabaseInfo', 'Playerbots.Updates.EnableDatabases']
     for path, keys in [('src/server/apps/authserver/authserver.conf.dist', AUTH),
                        ('src/server/apps/worldserver/worldserver.conf.dist', WORLD),
                        ('modules/mod-playerbots/conf/playerbots.conf.dist', bots)]:

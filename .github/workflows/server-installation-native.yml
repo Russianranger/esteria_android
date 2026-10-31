@@ -2,7 +2,7 @@ name: Native owned installation finish and clean-stop receipts
 on:
   workflow_dispatch:
   push:
-    branches: [android/client-server]
+    branches: [android/client-server, non-custom]
     paths:
       - .github/workflows/server-installation-native.yml
       - tools/prepare_server_installation_inputs.py
@@ -20,6 +20,7 @@ on:
       - runtime/server_updater.py
       - runtime/server_content.py
       - runtime/server_config.py
+      - config/local-server.json
       - runtime/server_schema_setup.py
       - runtime/server_schema_baseline.py
       - runtime/server_schema_adaptations.py
@@ -34,7 +35,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   owned-installation:
-    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    if: github.repository == 'Russianranger/esteria_android' && (github.ref == 'refs/heads/android/client-server' || github.ref == 'refs/heads/non-custom')
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 60
     steps:

@@ -1,0 +1,139 @@
+{
+  "formatVersion": 1,
+  "scope": "read-only-stock-sql-source-audit",
+  "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
+  "sqlExecuted": false,
+  "worldserverExecuted": false,
+  "files": {
+    "data/sql/base/db_world/playercreateinfo.sql": {
+      "bytes": 4852,
+      "sha256": "0d74fddfeaac43fc07da188d1b6244a30088ca01b4d598d4ca7d317f619fdeac"
+    },
+    "data/sql/base/db_world/chrraces_dbc.sql": {
+      "bytes": 7698,
+      "sha256": "1d9379c0317241cc752f9cf3c8e5f12e83d4b407ee6c62c8b71a0439bf45d479"
+    },
+    "data/sql/base/db_world/map_dbc.sql": {
+      "bytes": 6856,
+      "sha256": "672b510e0f1fa36be0997548799e2453c501d4a82885eaf0c827c697305eace0"
+    },
+    "data/sql/base/db_world/charstartoutfit_dbc.sql": {
+      "bytes": 5183,
+      "sha256": "a440667efaf5e672791e8ad9a02da7b40664ae03f79c44d056772fbdbc8bc4f3"
+    },
+    "data/sql/base/db_world/spell_dbc.sql": {
+      "bytes": 3180868,
+      "sha256": "4244b73996af464366d3ad857008b202f188e9c2247aea0931b25ba3109ef5f8"
+    },
+    "data/sql/updates/pending_db_world/rev_20260929001000000.sql": {
+      "bytes": 1642,
+      "sha256": "315941b5af6763f24dde75a704761fd7750eee375aebaa0de63c5971843042ed"
+    },
+    "data/sql/updates/pending_db_world/rev_20261005010000000.sql": {
+      "bytes": 78971,
+      "sha256": "e43185ff1b91aeaf99c1014ccd578261f907c11a397bb250f478a037f59eb6c3"
+    },
+    "modules/mod-custom-server/data/sql/db-world/updates/base/playercreateinfo.sql": {
+      "bytes": 10499,
+      "sha256": "1560724ba616bcef7dc8ebf7ca9339783e03557a70f8cdd5436730746a6d8b83"
+    },
+    "modules/mod-custom-server/data/sql/db-world/updates/dbc/chrraces_dbc.sql": {
+      "bytes": 23093,
+      "sha256": "19a1bc6a4bfabcc466c5e5a940eae73a336baa039def41239a964391c8bc364c"
+    },
+    "modules/mod-custom-server/data/sql/db-world/updates/u_custom_server_2026_08_29_races.sql": {
+      "bytes": 251773,
+      "sha256": "6e51a034f4ae649ecd2e558ac948a9f12e40122198e762e0e6dccc0cdc420f53"
+    },
+    "modules/mod-classless-wildcard/data/sql/db-world/cw_world_class_loot.sql": {
+      "bytes": 1711,
+      "sha256": "003a78424f882afc2edb7f7c0112cdbe78fedcc7909ddda7b1eee14643c7d927"
+    },
+    "modules/mod-classless-wildcard/data/sql/db-world/cw_world_class_quests.sql": {
+      "bytes": 2267,
+      "sha256": "05f600f69e3b4b61daa1bb202072d31fb92446a98a531457ffd9abb2a6cf21d2"
+    },
+    "modules/mod-classless-wildcard/data/sql/db-world/cw_world_item_classes.sql": {
+      "bytes": 3138,
+      "sha256": "ca2b58f16b8a60b5cf307ff939ef52c93887f670620868702c8370347a0081e2"
+    },
+    "modules/mod-classless-wildcard/data/sql/db-world/cw_world_spell_scripts.sql": {
+      "bytes": 4234,
+      "sha256": "c203fca6f7f7363e4faadb68685eff3d6b23b5f1836923b964cb2154673b3893"
+    },
+    "modules/mod-battlemon/data/sql/world/base/2026_08_21_00_battlemon_overworld.sql": {
+      "bytes": 1650,
+      "sha256": "840418a485a1b9c231c896aedca5df34d223c93c199fbb3faa3e7e2eecc95907"
+    },
+    "modules/mod-battlemon/data/sql/world/base/2026_08_21_02_battlemon_overworld_form_npcs.sql": {
+      "bytes": 560948,
+      "sha256": "7ec1d069b97200a761cf3c82519d4401c56e0c325cf86073eec2ee240bcf222b"
+    },
+    "modules/mod-transmog/data/sql/db-world/2016_11_17_transmog_npc.sql": {
+      "bytes": 8550,
+      "sha256": "43ab22a1c8272e5b94b1e6d04e3a3647f07fd19fff5fa772835d7151557fa64b"
+    },
+    "modules/mod-dungeon-master/data/sql/db-world/base/dm_setup.sql": {
+      "bytes": 15217,
+      "sha256": "988d08914bffbcc1c28e91a6240fd837ac1560ffaac8d1f850bc9d9710fc6311"
+    },
+    "src/server/database/Updater/UpdateFetcher.cpp": {
+      "bytes": 18497,
+      "sha256": "9b153a1a637f11613dd6ea00a68d4b5b2e3d47c33d6b8ca7ab5fd5bf38a5259a"
+    },
+    "src/server/database/Updater/DBUpdater.cpp": {
+      "bytes": 18834,
+      "sha256": "ec89596c91676c4e6cd22494522fef1022cc67bf4b49e0cda7e59baed29d0857"
+    },
+    "src/server/database/Database/DatabaseLoader.cpp": {
+      "bytes": 7882,
+      "sha256": "fc509520ac19cbe5ab35ac5aa114852892364f7e3e7cd11c772e3f5fa74af1e5"
+    }
+  },
+  "findings": [
+    {
+      "at": "data/sql/base/db_world/playercreateinfo.sql:43",
+      "result": "Human Warrior starts in stock Elwynn/Northshire, map0 zone12. mod-custom-server base INSERT IGNORE preserves the same row."
+    },
+    {
+      "at": "src/server/database/Updater/UpdateFetcher.cpp:129-185",
+      "result": "SourceDirectory projection can omit selected source SQL: absent $/include directory is warned/skipped, absent module data/sql directory is skipped; children containing world are discovered. No per-module updater config selector found."
+    },
+    {
+      "at": "data/sql/updates/pending_db_world/rev_20260929001000000.sql:6-36",
+      "result": "Four schema-only exact-race start tables, no inserted custom content. Retain for compiled source schema compatibility."
+    },
+    {
+      "at": "modules/mod-custom-server/data/sql/db-world/updates/dbc/chrraces_dbc.sql:3-7,87-130",
+      "result": "Auto-discovered custom race registry replaces SQL IDs1..28,32..42 and references custom models. Exclude this module world SQL in stock projection."
+    },
+    {
+      "at": "modules/mod-custom-server/data/sql/db-world/updates/u_custom_server_2026_08_29_races.sql:1407-1410",
+      "result": "Adds CharStartOutfit SQL IDs901002+ even for Human Warrior; source baseline CharStartOutfit SQL is empty."
+    },
+    {
+      "at": "modules/mod-classless-wildcard/data/sql/db-world/cw_world_class_quests.sql:41",
+      "result": "Clears all stock quest class restrictions. Config disabling alone does not undo applied SQL."
+    },
+    {
+      "at": "modules/mod-classless-wildcard/data/sql/db-world/cw_world_item_classes.sql:59",
+      "result": "Clears stock item class restrictions. Exclude module world SQL for ordinary class behavior."
+    },
+    {
+      "at": "modules/mod-battlemon/data/sql/world/base/2026_08_21_00_battlemon_overworld.sql:1-3",
+      "result": "Custom Pikachu display50037 creature; exclude all three world/base scripts. Retain separate db-world/base catalog/shop tables for compiled startup loader; no core creature/item INSERT found in those17 files."
+    },
+    {
+      "at": "modules/mod-transmog/data/sql/db-world/2016_11_17_transmog_npc.sql:48-49",
+      "result": "Stock-display NPCs also add custom client spell200100; exclude module world SQL while custom appearance feature is disabled."
+    },
+    {
+      "at": "modules/mod-dungeon-master/data/sql/db-world/base/dm_setup.sql:64-73,200-210",
+      "result": "NPC additions use stock displays3167/4307; no missing custom art implied."
+    },
+    {
+      "at": "data/sql/base/db_world/*_dbc.sql",
+      "result": "110 base DBC SQL tables inspected,15 have baseline INSERT data; preserve originals rather than clearing every overlay. spell_dbc has4491 rows; only five IDs>80864 are preexisting server-side helper/correction spells."
+    }
+  ]
+}

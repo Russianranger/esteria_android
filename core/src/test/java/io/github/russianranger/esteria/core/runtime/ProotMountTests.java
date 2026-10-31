@@ -74,6 +74,9 @@ public final class ProotMountTests {
                 rejects(()->fixture.create(List.of(new ProotLaunch.Mount(fixture.work,target))));
             }
             rejects(()->new ProotLaunch.Mount(fixture.binary,"/esteria-shader-tools/tools"));
+            check(fixture.create(List.of(new ProotLaunch.Mount(fixture.binary,"/esteria-stock-client")))
+                    .arguments.contains(fixture.binary+":/esteria-stock-client!"),"Fixed stock helper binding is explicit");
+            rejects(()->new ProotLaunch.Mount(fixture.binary,"/esteria-stock-client/helpers"));
             rejects(()->fixture.create(List.of(new ProotLaunch.Mount(fixture.work,"/esteria-shader-tools"))));
 
             for (String target:List.of("/", "/work", "/tmp", "/proc", "/dev", "/usr", "/esteria-data/child", "/esteria-data!"))

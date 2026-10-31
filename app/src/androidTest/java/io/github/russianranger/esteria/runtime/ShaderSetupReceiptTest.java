@@ -32,15 +32,16 @@ public final class ShaderSetupReceiptTest {
     @Test public void exactReceiptAndCurrentInputRequired()throws Exception {
         Path base=Files.createTempDirectory(InstrumentationRegistry.getInstrumentation().getTargetContext().getCacheDir().toPath(),"shader-receipt-").toRealPath();
         try {
-            Path game=Files.createDirectory(base.resolve("game")),tools=Files.createDirectory(base.resolve("tools")),work=Files.createDirectory(base.resolve("work"));
+            Path game=Files.createDirectory(base.resolve("game")),tools=Files.createDirectory(base.resolve("tools")),work=Files.createDirectory(base.resolve("work")),helpers=Files.createDirectory(base.resolve("helpers"));
             String imported="1".repeat(64),revision="2".repeat(40),manifest="3".repeat(64);
             Path data=Files.createDirectories(game.resolve("generations/"+imported+"/data"));
             write(game.resolve("current"),imported+"\n");
             byte[] complete="explicit synthetic metadata".getBytes(StandardCharsets.UTF_8),journal="synthetic journal".getBytes(StandardCharsets.UTF_8);
             Files.write(data.getParent().resolve("complete"),complete);Files.write(data.getParent().resolve("journal.tsv"),journal);
             JSONObject metadata=new JSONObject().put(imported+"/complete",pin(complete)).put(imported+"/journal.tsv",pin(journal));
-            JSONObject inputs=new JSONObject().put("formatVersion",1).put("importGeneration",imported).put("clientRevision",revision)
-                .put("locale","enUS").put("importMetadata",metadata).put("toolManifestSha256",manifest);
+            byte[] helper="synthetic APK helper".getBytes(StandardCharsets.UTF_8);Files.write(helpers.resolve("stock_shader_generation.py"),helper);
+            JSONObject inputs=new JSONObject().put("formatVersion",1).put("contentProfile","stock-3.3.5a").put("importGeneration",imported).put("clientRevision",revision)
+                .put("locale","enUS").put("importMetadata",metadata).put("toolManifestSha256",manifest).put("preparationHelperSha256",hash(helper));
             String generation=hash((canonical(inputs)+"\n").getBytes(StandardCharsets.UTF_8));
             Path output=Files.createDirectories(work.resolve("shaders/generations/"+generation+"/shaders"));
             JSONObject outputs=new JSONObject();
@@ -52,7 +53,7 @@ public final class ShaderSetupReceiptTest {
                 .put("androidQualified",false).put("gameplayQualified",false);
             Path receiptFile=output.getParent().resolve("receipt.json");write(receiptFile,receipt.toString());
             write(work.resolve("shaders/current"),generation+"\n");
-            ShaderRunPlan plan=new ShaderRunPlan(game,tools,work,revision,"enUS");
+            ShaderRunPlan plan=new ShaderRunPlan(game,tools,work,helpers,revision,"enUS");
             ShaderSetup.Result result=ShaderSetup.validatePrepared(plan,manifest,base,false);
             assertEquals(4,result.outputFiles);assertEquals(generation,result.generation);assertEquals(output,result.shaders);
             receipt.put("androidQualified",true);write(receiptFile,receipt.toString());refuses(()->ShaderSetup.validatePrepared(plan,manifest,base,false));

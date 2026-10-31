@@ -1,3 +1,7 @@
+# Non-custom branch test scope
+
+For this branch, use `NON-CUSTOM-TESTING.md` as the single consolidated procedure. Acceptance is stock build12340 Human Warrior creation/world entry, movement/camera, clean persistent relaunch and offline repetition. Full Esteria assets and bot AI are deferred. The historical checks below preserve evidence and do not broaden stock acceptance.
+
 # Validation gates
 
 ## Focused local checks

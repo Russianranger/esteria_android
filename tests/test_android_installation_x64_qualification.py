@@ -223,7 +223,7 @@ class AndroidInstallationQualification(unittest.TestCase):
             self.assertNotIn('not-for-artifacts', path.read_text()); self.assertNotIn('/private/foreign', path.read_text())
 
     def test_private_java_output_exports_only_known_classes_and_owned_source_line_locations(self):
-        owner = qualification.PACKAGE + '.runtime.ServerInstallationSetup'
+        owner = qualification.NAMESPACE + '.runtime.ServerInstallationSetup'
         raw = ('INSTRUMENTATION_STATUS: stack=java.io.IOException: password=NEVER_EXPORT /private/db\n'
             '\tat ' + owner + '$Handle.secretValue(ServerInstallationSetup.java:42)\n'
             '\tat ' + owner + '.method(/private/foreign.java:4)\n'

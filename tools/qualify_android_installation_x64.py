@@ -33,8 +33,9 @@ from tools import qualify_android_handoff as manifest
 from tools.qualify_android_installer import instrument_passed, run_bounded
 
 ROOT = Path(__file__).resolve().parents[1]
-PACKAGE = 'io.github.russianranger.esteria'
-TEST_CLASS = PACKAGE + '.runtime.ServerInstallationX64Test'
+NAMESPACE = 'io.github.russianranger.esteria'
+PACKAGE = NAMESPACE + '.stock'
+TEST_CLASS = NAMESPACE + '.runtime.ServerInstallationX64Test'
 TEST = TEST_CLASS + '#actualAndroidCoordinatorInitializesFourSchemasPromotesAndRestarts'
 SCOPE = 'android-13-x86_64-current-java-four-schema-installation-and-restart'
 APP_SCOPE = 'android13-x64-owned-four-schema-installation-and-restart'
@@ -65,15 +66,15 @@ def _java_sources():
     rows = {}
     for name in ('ServerInstallationSetup', 'ServerDatabaseSetup', 'ServerDatabaseService', 'GuestHelperAssets',
             'ProotProcess', 'NativeProcessBridge', 'ServerSourceSelection'):
-        rows[PACKAGE + '.runtime.' + name] = 'app/src/main/java/io/github/russianranger/esteria/runtime/' + name + '.java'
+        rows[NAMESPACE + '.runtime.' + name] = 'app/src/main/java/io/github/russianranger/esteria/runtime/' + name + '.java'
     for name in ('ServerInstallationX64Test', 'InstallationX64Inputs', 'InstallationX64Lifetime'):
-        rows[PACKAGE + '.runtime.' + name] = 'app/src/androidTest/java/io/github/russianranger/esteria/runtime/' + name + '.java'
+        rows[NAMESPACE + '.runtime.' + name] = 'app/src/androidTest/java/io/github/russianranger/esteria/runtime/' + name + '.java'
     for family, names in (('install', ('FreshServerInstallations', 'RuntimeInstaller', 'RuntimeFiles', 'RuntimeWork')),
             ('process', ('OwnedProcess', 'ProotLaunch'))):
         for name in names:
-            rows[PACKAGE + '.core.runtime.' + family + '.' + name] = 'core/src/main/java/io/github/russianranger/esteria/core/runtime/' + family + '/' + name + '.java'
+            rows[NAMESPACE + '.core.runtime.' + family + '.' + name] = 'core/src/main/java/io/github/russianranger/esteria/core/runtime/' + family + '/' + name + '.java'
     for name in ('ExclusiveFileLease', 'ServiceOperationGuard'):
-        rows[PACKAGE + '.core.runtime.' + name] = 'core/src/main/java/io/github/russianranger/esteria/core/runtime/' + name + '.java'
+        rows[NAMESPACE + '.core.runtime.' + name] = 'core/src/main/java/io/github/russianranger/esteria/core/runtime/' + name + '.java'
     return rows
 
 

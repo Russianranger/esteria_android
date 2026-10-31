@@ -23,6 +23,8 @@ class Connection:
 
     def query(self, sql):
         self.queries.append(sql)
+        if sql == setup.STOCK_OVERLAYS_SQL: return ['0\t0\t0\t0']
+        if sql == setup.STOCK_START_SQL: return ['1']
         if sql == 'SELECT VERSION(), @@version_comment, @@server_uuid, @@datadir':
             return ['8.0.46\tMySQL Community\t' + self.owner.uuid + '\t' + str(self.owner.state / 'database')]
         if sql == 'SELECT @@port, @@bind_address': return ['13306\t127.0.0.1']
@@ -144,6 +146,60 @@ class RuntimeUpdaterSetup(unittest.TestCase):
         self.assertFalse(second['compiledUpdaterExecuted']); self.assertEqual(len(self.runs), 1)
         self.assertEqual(account.read_bytes(), b'preserved later private account intent')
         self.assertNotIn('credentials', second); self.assertNotIn('invocation', second)
+
+    def test_stock_sql_view_uses_only_selected_exact_source_bytes_and_rejects_tampering(self):
+        # These are explicit fixture bytes. This checks real projection IO and
+        # policy admission, and makes no SQL/world execution claim.
+        rows = [
+            ('data/sql/updates/pending_db_world/rev_20261005010000000.sql', False),
+            ('modules/mod-classless-wildcard/data/sql/db-world/cw_world_item_classes.sql', False),
+            ('modules/mod-battlemon/data/sql/world/base/2026_08_21_00_battlemon_overworld.sql', False),
+            ('modules/mod-battlemon/data/sql/db-world/base/2026_08_20_catalog.sql', True),
+            ('data/sql/updates/db_world/2024_01_01_stock.sql', True),
+        ]
+        for index, (path, selected) in enumerate(rows):
+            raw = ('-- SOURCE FIXTURE ' + str(index) + '\n').encode()
+            self.fixture.payload['source/' + path] = raw
+            self.fixture.manifest['files'][path] = content_fixture.source_identity(raw)
+            self.fixture.manifest['databases']['world']['updateOrder'].append(
+                dict(path=path, state='PENDING' if '/pending_' in path else 'MODULE',
+                     origin='base-updates_include' if path.startswith('data/') else path.split('/')[1]))
+        # Reverify metadata through the actual archive verifier. Keep the
+        # unrelated preexisting completed DB fixture out of this IO-only test.
+        self.fixture.write(); self.content = self.fixture.verify()
+        plan = self.prepare()
+        operation = self.root / 'stock-operation'; operation.mkdir()
+        destination, inventory = setup._project_stock_sql(plan, operation)
+        setup._verify_stock_sql(destination, inventory)
+        self.assertEqual(plan.binding['contentProfile'], 'stock-3.3.5a')
+        self.assertEqual(plan.binding['sqlSelectionPolicy'], setup.STOCK_SQL_POLICY)
+        for path, selected in rows:
+            self.assertEqual((destination / path).exists(), selected)
+            if selected:
+                self.assertEqual((destination / path).read_bytes(), (self.content.source / path).read_bytes())
+            self.assertTrue((self.content.source / path).is_file())
+        self.assertIn(baseline.CUSTOM_RACE_DDL, inventory)
+        extra = destination / 'data/sql/updates/db_world/injected.sql'
+        extra.write_bytes(b'-- unexpected SQL\n')
+        with self.assertRaisesRegex(db.BootstrapError, 'file set changed'):
+            setup._verify_stock_sql(destination, inventory)
+        extra.unlink()
+        selected = destination / rows[-1][0]
+        selected.write_bytes(b'-- substituted SQL\n')
+        with self.assertRaisesRegex(db.BootstrapError, 'artifact'):
+            setup._verify_stock_sql(destination, inventory)
+
+    def test_stock_sql_gate_rejects_custom_overlay_or_missing_human_start(self):
+        # A fixture connection exercises error boundaries only. Real MySQL
+        # qualification is separate and must execute these same queries.
+        original = self.connection.query
+        for query, response, message in ((setup.STOCK_OVERLAYS_SQL, ['1\t0\t0\t0'], 'overlays must be empty'),
+                                         (setup.STOCK_START_SQL, ['0'], 'Human Warrior start')):
+            def changed(sql):
+                return response if sql == query else original(sql)
+            with self.subTest(query=query), patch.object(self.connection, 'query', side_effect=changed), \
+                    self.assertRaisesRegex(db.BootstrapError, message):
+                setup.stock_world_sql_snapshot(self.connection)
 
     def test_real_outer_lease_is_forwarded_to_baseline_validation_and_update_scope(self):
         with db.state_lock(self.state) as lease:

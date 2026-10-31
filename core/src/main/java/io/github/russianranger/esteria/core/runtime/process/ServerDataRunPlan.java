@@ -1,6 +1,7 @@
 package io.github.russianranger.esteria.core.runtime.process;
 
 import io.github.russianranger.esteria.core.importer.ContentPackageLayout;
+import io.github.russianranger.esteria.core.content.ContentProfile;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -49,7 +50,8 @@ public final class ServerDataRunPlan {
         arguments=Collections.unmodifiableList(Arrays.asList("/usr/bin/python3","-B","-s","-E",
             "/work/data-helpers/"+helperGeneration+"/server_data_generation.py","--store","/work/server-data",
             "--game","/esteria-data","--generation",importGeneration,"--tools","/esteria-server-extractors",
-            "--selection","/work/data-tools-selection.json","--locale",locale,"--threads",Integer.toString(threads)));
+            "--selection","/work/data-tools-selection.json","--locale",locale,"--threads",Integer.toString(threads),
+            "--content-profile",ContentProfile.ID));
         mounts=Collections.unmodifiableList(Arrays.asList(new ProotLaunch.Mount(game,"/esteria-data"),
             new ProotLaunch.Mount(tools,"/esteria-server-extractors")));
     }

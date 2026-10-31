@@ -64,14 +64,13 @@ class RuntimePlayerbotsSetup(unittest.TestCase):
         self.owner, self.fixture, self.root, self.state = owner, owner.fixture, owner.root, owner.state
         source_templates = config_fixture.fixture(self.root)
         world = source_templates / 'src/server/apps/worldserver/worldserver.conf.dist'
-        keys = ('Updates.AutoSetup Updates.EnableDatabases Updates.Redundancy Updates.AllowRehash '
+        keys = ('Updates.AutoSetup Updates.Redundancy Updates.AllowRehash '
                 'Updates.ArchivedRedundancy Updates.CleanDeadRefMaxCount Database.Reconnect.Attempts '
                 'Database.Reconnect.Seconds Logger.root').split()
         world.write_text(world.read_text() + '\nRealmID = 1\nExpansion = 2\n' +
                          '\n'.join(key + ' = 0' for key in keys) + '\n')
         bot = source_templates / 'modules/mod-playerbots/conf/playerbots.conf.dist'
-        bot.write_text(bot.read_text() + '\nPlayerbots.Updates.EnableDatabases = 0\n'
-                       'PlayerbotsDatabase.WorkerThreads = 1\nPlayerbotsDatabase.SynchThreads = 1\n')
+        bot.write_text(bot.read_text() + '\nPlayerbotsDatabase.WorkerThreads = 1\nPlayerbotsDatabase.SynchThreads = 1\n')
         for name in (*config.MAIN_CONFIG_TEMPLATES, 'modules/mod-playerbots/conf/playerbots.conf.dist'):
             raw = (source_templates / name).read_bytes()
             self.fixture.payload['source/' + name] = raw

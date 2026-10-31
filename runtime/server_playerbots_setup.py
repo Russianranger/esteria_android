@@ -173,7 +173,9 @@ def render_configuration(content, state, mysql, data, profile, operation):
     source = state / 'config/generations' / generation
     (operation / 'modules').mkdir(mode=0o700)
     world = config.overlay(config.bounded_plain(source / 'worldserver.conf', 4 << 20).decode(), {
-        'Updates.AutoSetup': 0, 'Updates.EnableDatabases': 7, 'Updates.Redundancy': 1,
+        # Core pools already completed the separately journalled stock SQL
+        # projection. Only the fourth playerbots loader may update here.
+        'Updates.AutoSetup': 0, 'Updates.EnableDatabases': 0, 'Updates.Redundancy': 1,
         'Updates.AllowRehash': 1, 'Updates.ArchivedRedundancy': 0, 'Updates.CleanDeadRefMaxCount': 0,
         'Database.Reconnect.Attempts': 1, 'Database.Reconnect.Seconds': 1, 'Logger.root': '4,Console',
         'TempDir': config.quoted(operation)})

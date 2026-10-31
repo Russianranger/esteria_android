@@ -1,0 +1,22 @@
+// APK-owned content inspection, separate from the immutable upstream compiler provider.
+def stockClientHelpers = ['stock_content_inspection.py', 'stock_shader_generation.py', 'shader_generation.py', 'extractor_order.py', 'server_data_preflight.py']
+def stockClientAssets = layout.buildDirectory.dir('generated/stockClient')
+def packageStockClient = tasks.register('packageStockClient') {
+    inputs.files(stockClientHelpers.collect { rootProject.file('runtime/' + it) })
+    outputs.dir(stockClientAssets)
+    doLast {
+        def directory = new File(stockClientAssets.get().asFile, 'stock-client')
+        delete directory
+        directory.mkdirs()
+        def records = new TreeMap()
+        stockClientHelpers.each { name ->
+            byte[] bytes = rootProject.file('runtime/' + name).bytes
+            if (bytes.length == 0 || bytes.length > 131072) throw new GradleException('Unexpected stock client helper size')
+            new File(directory, name).bytes = bytes
+            records[name] = [bytes: bytes.length, sha256: java.security.MessageDigest.getInstance('SHA-256').digest(bytes).encodeHex().toString()]
+        }
+        new File(directory, 'manifest.json').text = groovy.json.JsonOutput.toJson([formatVersion: 1, files: records]) + '\n'
+    }
+}
+android.sourceSets.main.assets.srcDir(stockClientAssets)
+tasks.named('preBuild').configure { dependsOn packageStockClient }

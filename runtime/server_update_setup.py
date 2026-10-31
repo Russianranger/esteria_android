@@ -30,6 +30,125 @@ JOURNAL = '.server-compiled-updater.json'
 SCOPE = 'owned-packaged-content-compiled-updater-only'
 BLOCK = 128 * 1024
 require = schema.require
+CONTENT_PROFILE = updater.config.CONTENT_PROFILE
+STOCK_SQL_POLICY = 'stock-world-source-selection-v1'
+_CUSTOM_WORLD_MODULES = frozenset(('mod-custom-server', 'mod-classless-wildcard', 'mod-worgoblin-high-elf'))
+STOCK_OVERLAYS_SQL = ('SELECT (SELECT COUNT(*) FROM acore_world.chrraces_dbc),'
+    '(SELECT COUNT(*) FROM acore_world.chrclasses_dbc),'
+    '(SELECT COUNT(*) FROM acore_world.map_dbc),'
+    '(SELECT COUNT(*) FROM acore_world.charstartoutfit_dbc)')
+STOCK_START_SQL = ('SELECT COUNT(*) FROM acore_world.playercreateinfo WHERE race=1 AND class=1 '
+    'AND map=0 AND zone=12 AND ABS(position_x + 8949.95)<0.005 '
+    'AND ABS(position_y + 132.493)<0.0005 AND ABS(position_z - 83.5312)<0.0005 '
+    'AND ABS(orientation)<0.0001')
+
+
+def stock_world_sql_snapshot(connection):
+    """Query the actual combined-content SQL input, without claiming DBC loads.
+
+    Four source-baseline empty overlays must leave races/classes/maps/outfits to
+    the supplied stock DBCs. Other source corrections (including Spell.dbc SQL)
+    remain unchanged. The world loader still validates actual DBC rows and
+    geographical data before the owned readiness protocol can complete.
+    """
+    require(connection.query(STOCK_OVERLAYS_SQL) == ['0\t0\t0\t0'],
+            'Stock SQL closure changed: ChrRaces/ChrClasses/Map/CharStartOutfit overlays must be empty; '
+            'preserving this installation for diagnosis')
+    require(connection.query(STOCK_START_SQL) == ['1'],
+            'Stock Human Warrior start missing or changed: expected map 0, zone 12, Northshire; '
+            'preserving this installation for diagnosis')
+    return dict(contentProfile=CONTENT_PROFILE, stockRaceClassMapOutfitSqlOverlaysEmpty=True,
+                humanWarriorNorthshireStartVerified=True, actualFileDbcRowsLoaded=False,
+                worldStartupExecuted=False, gameplayQualified=False)
+
+
+def stock_update_selected(database, row):
+    """Select authentic source files, keeping compiled schema requirements.
+
+    The pinned core pending-world directory contains custom race/model/map
+    content. Its pure four-table DDL prerequisite is retained; ordinary released
+    and archived core updates, and character/auth schema updates, are unchanged.
+    Battlemon's catalog schemas remain available to its unconditional loader,
+    while its separate custom world actors are not installed.
+    """
+    path = row['path']
+    if database != 'world':
+        return True
+    if path.startswith('data/sql/updates/pending_db_world/'):
+        return path == baseline.CUSTOM_RACE_DDL
+    parts = Path(path).parts
+    if len(parts) >= 2 and parts[0] == 'modules' and parts[1] in _CUSTOM_WORLD_MODULES:
+        return False
+    if path.startswith('modules/mod-battlemon/data/sql/world/'):
+        return False
+    if path == 'modules/mod-transmog/data/sql/db-world/2016_11_17_transmog_npc.sql':
+        return False
+    return True
+
+
+def _stock_selection(content):
+    require(content.manifest.get('source', {}).get('commit') == baseline.SUPPORTED_SERVER,
+            'Stock SQL selection requires the audited server revision')
+    return {database: [row for row in content.manifest['databases'][database]['updateOrder']
+                       if stock_update_selected(database, row)] for database in updater.DATABASES}
+
+
+def _project_stock_sql(plan, operation, *, cancelled=None):
+    """Stream a private, source-verified SQL view; never modify packaged source.
+
+    The source-supported dbimport discovery sees only selected paths. Copying
+    prevents a shared hard link from weakening immutable-source validation. All
+    SQL bytes remain exact source bytes, with no generated rows or ledger edits.
+    """
+    destination = operation / 'stock-sql-source'
+    destination.mkdir(mode=0o700)
+    selected = _stock_selection(plan.content)
+    require(hashlib.sha256(updater.canonical_identity(selected)).hexdigest() ==
+            plan.binding['selectedSourcePathsSha256'], 'Prepared stock SQL path selection changed')
+    inventory = {}
+    for database in updater.DATABASES:
+        for row in selected[database]:
+            checkpoint(cancelled)
+            relative = row['path']; packaged._path(relative)
+            pin = _pin({key: plan.content.manifest['files'][relative][key] for key in ('bytes', 'sha256')})
+            archived = plan.content.receipt['archiveFiles']['source/' + relative]
+            require(pin == {key: archived[key] for key in ('bytes', 'sha256')}, 'Stock SQL archived pin changed')
+            target = destination / relative
+            target.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+            count, digest = 0, hashlib.sha256()
+            with updater.plain_file(plan.content.source / relative) as source, target.open('xb') as output:
+                os.chmod(target, 0o600)
+                before = os.fstat(source.fileno())
+                require(before.st_size == pin['bytes'] and before.st_nlink == 1, 'Stock SQL source size or sharing changed')
+                while block := source.read(BLOCK):
+                    checkpoint(cancelled)
+                    count += len(block)
+                    require(count <= pin['bytes'], 'Stock SQL source grew while projecting')
+                    digest.update(block); output.write(block)
+                output.flush(); os.fsync(output.fileno())
+                after = os.fstat(source.fileno())
+            require(dict(bytes=count, sha256=digest.hexdigest()) == pin and
+                    (before.st_size, before.st_mtime_ns, before.st_ctime_ns) ==
+                    (after.st_size, after.st_mtime_ns, after.st_ctime_ns), 'Stock SQL source identity changed')
+            inventory[relative] = pin
+    receipt = dict(formatVersion=1, contentProfile=CONTENT_PROFILE, sqlSelectionPolicy=STOCK_SQL_POLICY,
+                   selectedUpdatesSha256=plan.binding['selectedUpdatesSha256'], files=inventory,
+                   sourceFilesModified=False, sqlExecuted=False, worldStartupExecuted=False)
+    db.atomic_json(destination / 'stock-sql-selection.json', receipt)
+    return destination, inventory
+
+
+def _verify_stock_sql(destination, inventory):
+    expected = set(inventory) | {'stock-sql-selection.json'}
+    actual = set()
+    for folder, dirs, names in os.walk(destination, followlinks=False):
+        for name in dirs + names:
+            require(not (Path(folder) / name).is_symlink(), 'Stock SQL projection contains a link')
+        actual.update((Path(folder) / name).relative_to(destination).as_posix() for name in names)
+        require(len(actual) <= len(expected), 'Stock SQL projection file set changed')
+    require(actual == expected, 'Stock SQL projection file set changed')
+    for relative, pin in inventory.items():
+        _hash(destination / relative, pin)
 
 
 class UpdateCancelled(RuntimeError):
@@ -103,6 +222,7 @@ def _content_inputs(content, *, progress=None, cancelled=None):
             content.manifest.get('sourceLockSha256') == content.compiled.get('sourceLockSha256') ==
             content.receipt.get('sourceLockSha256'), 'Updater source selection differs')
     expected = {}
+    selected = _stock_selection(content)
     for database in updater.DATABASES:
         expected[database] = {}
         for row in content.manifest['databases'][database]['updateOrder']:
@@ -114,11 +234,14 @@ def _content_inputs(content, *, progress=None, cancelled=None):
             name = Path(path).name
             require(name not in expected[database] and row['state'] in ('RELEASED', 'ARCHIVED', 'PENDING', 'CUSTOM', 'MODULE'),
                     'Duplicate or invalid selected updater SQL')
-            expected[database][name] = (digest, row['state'])
+            if stock_update_selected(database, row):
+                expected[database][name] = (digest, row['state'])
     binding = dict(contentReceipt=copy.deepcopy(content.identities['receipt']),
         source=copy.deepcopy(content.manifest['source']), sourceLockSha256=content.receipt['sourceLockSha256'],
         compiledModules=metadata['compiled-modules'], contentManifest=metadata['content-manifest'],
         originalBuild=_pin(content.compiled.get('serverBuild')),
+        contentProfile=CONTENT_PROFILE, sqlSelectionPolicy=STOCK_SQL_POLICY,
+        selectedSourcePathsSha256=hashlib.sha256(updater.canonical_identity(selected)).hexdigest(),
         selectedUpdatesSha256=hashlib.sha256(updater.canonical_identity(expected)).hexdigest())
     return expected, binding
 
@@ -194,12 +317,15 @@ def _untouched(connection):
     return snapshot
 
 
-def _receipt(binding, bootstrap, operation, executed, snapshot):
+def _receipt(binding, bootstrap, operation, executed, snapshot, stock_sql):
     return dict(formatVersion=1, scope=SCOPE, operation=operation, qualificationSucceeded=True,
         mysqlUuid=bootstrap['uuid'], mysqlVersion=bootstrap['version'],
         contentReceipt=binding['contentReceipt'], sourceLockSha256=binding['sourceLockSha256'],
         source=copy.deepcopy(binding['source']), compiledModules=binding['compiledModules'],
         contentManifest=binding['contentManifest'], selectedUpdatesSha256=binding['selectedUpdatesSha256'],
+        contentProfile=binding['contentProfile'], sqlSelectionPolicy=binding['sqlSelectionPolicy'],
+        selectedSourcePathsSha256=binding['selectedSourcePathsSha256'],
+        stockWorldSql=stock_sql,
         originalBuild=binding['originalBuild'], selectedProgram=binding['selectedProgram'],
         template=binding['template'], compiledUpdaterExecuted=executed, compiledUpdaterCompleted=True,
         sourceLedgersVerified=True, credentialsAndAccountJournalPreserved=True, baselineJournalUnchanged=True,
@@ -244,6 +370,8 @@ def _verify_completed(content, connection, state, version, expected_uuid, verify
     checkpoint(cancelled)
     snapshot = updater.core_schema_snapshot(connection, expected)
     require(snapshot == journal.get('snapshot'), 'Completed updater live ledger or table set changed')
+    stock_sql = stock_world_sql_snapshot(connection)
+    require(stock_sql == journal.get('stockWorldSql'), 'Completed stock SQL closure changed')
     playerbots = None
     if connection.query('SHOW TABLES FROM `acore_playerbots`') or os.path.lexists(state / '.server-playerbots-schema.json'):
         # A source-owned fourth pool has its own durable execution journal. The
@@ -261,7 +389,7 @@ def _verify_completed(content, connection, state, version, expected_uuid, verify
             _credentials(state) == credentials and schema.account_identity(state) == account and
             baseline.file_identity(path) == journal_identity and baseline.file_identity(baseline_path) == baseline_identity,
             'Completed updater private context changed during verification')
-    result = dict(_receipt(binding, bootstrap, 'verified-completed-updater', False, snapshot),
+    result = dict(_receipt(binding, bootstrap, 'verified-completed-updater', False, snapshot, stock_sql),
                   journalIdentity=journal_identity, baselineJournalIdentity=baseline_identity)
     if playerbots is not None:
         result['playerbots'] = playerbots
@@ -352,7 +480,8 @@ def apply(plan, connection, state, version, *, progress=None, cancelled=None, ve
             (operation / 'run').mkdir(mode=0o700); (operation / 'logs').mkdir(mode=0o700)
             _hash(plan.template, plan.template_identity, cancelled=cancelled)
             password = db.read_secret(state / 'accounts/database-secret')
-            configuration = updater.render_importer(plan.template, plan.content.source, operation, plan.mysql, password)
+            sql_source, sql_inventory = _project_stock_sql(plan, operation, cancelled=cancelled)
+            configuration = updater.render_importer(plan.template, sql_source, operation, plan.mysql, password)
             configuration_pin = baseline.file_identity(configuration)
             _hash(plan.template, plan.template_identity, cancelled=cancelled)
             _hash(plan.executable, plan.selected_program_identity, cancelled=cancelled)
@@ -381,16 +510,19 @@ def apply(plan, connection, state, version, *, progress=None, cancelled=None, ve
                 _hash(plan.template, plan.template_identity)
                 _hash(configuration, configuration_pin)
                 _hash(plan.executable, plan.selected_program_identity)
+                _verify_stock_sql(sql_source, sql_inventory)
                 execution = updater.run_importer(plan.executable, configuration,
                     operation / 'logs/updater-private.log', on_started=on_started)
                 require(started, 'Updater did not establish actual process creation')
                 _instance(connection, state, version); _service(verify_service)
                 snapshot = updater.schema_snapshot(connection, plan.expected)
+                stock_sql = stock_world_sql_snapshot(connection)
                 require(_credentials(state) == credentials and schema.account_identity(state) == account and
                         baseline.file_identity(baseline_path) == baseline_identity, 'Private identities changed during updater')
-                journal.update(phase='complete', compiledUpdaterExecuted=True, run=execution, snapshot=snapshot)
+                journal.update(phase='complete', compiledUpdaterExecuted=True, run=execution, snapshot=snapshot,
+                               stockWorldSql=stock_sql)
                 db.atomic_json(path, journal)
-                return _receipt(plan.binding, bootstrap, 'executed-compiled-updater', True, snapshot)
+                return _receipt(plan.binding, bootstrap, 'executed-compiled-updater', True, snapshot, stock_sql)
             except BaseException:
                 journal.update(phase='failed', compiledUpdaterExecuted=started)
                 db.atomic_json(path, journal)

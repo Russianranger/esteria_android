@@ -26,7 +26,7 @@ public final class ProotLaunch {
         public final String destination;
         public Mount(Path source, String destination) {
             if (source == null || destination == null || !Arrays.asList("/esteria-client", "/esteria-data",
-                    "/esteria-content", "/esteria-server", "/esteria-server-programs", "/esteria-server-content", "/esteria-server-extractors", "/esteria-bridges", "/esteria-shaders", "/esteria-shader-tools", "/esteria-turnip").contains(destination))
+                    "/esteria-content", "/esteria-server", "/esteria-server-programs", "/esteria-server-content", "/esteria-server-extractors", "/esteria-bridges", "/esteria-shaders", "/esteria-shader-tools", "/esteria-stock-client", "/esteria-turnip").contains(destination))
                 throw new IllegalArgumentException("Unsupported runtime provider mount");
             this.source = source; this.destination = destination;
         }

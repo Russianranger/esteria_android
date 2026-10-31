@@ -34,7 +34,7 @@ class ServerSessionPreparationTests(unittest.TestCase):
         self.uuid = '01234567-89ab-4cde-8fab-0123456789ab';self.pin = dict(bytes=1,sha256='a'*64)
         self.verified = session.content.VerifiedContent(self.root/'content',self.root/'content/source',{}, {},
             dict(sourceLockSha256='b'*64),dict(receipt=self.pin))
-        self.profile = dict(session.config._LOCAL_PORTS,playerbots=dict(session.config._BOT_POLICY))
+        self.profile = json.loads((Path(__file__).parents[1] / 'config/local-server.json').read_bytes())
         self.connection = Connection();self.calls = [];self.lease = None
         self.bots = dict(playerbotsSchemaInitialized=True,exactSourceLedgerVerified=True,
                          preparedStatementCount=session.playerbots.STATEMENTS,mysqlUuid=self.uuid,journalIdentity=self.pin)

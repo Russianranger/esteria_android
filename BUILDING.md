@@ -1,3 +1,39 @@
+## Non-custom branch package and release
+
+This branch defaults to `Stock 3.3.5a / non-custom` (`stock-3.3.5a`) and builds
+`io.github.russianranger.esteria.stock`, labelled **Esteria Stock 3.3.5a**. It installs
+beside the original custom package. Android private storage, local databases,
+imports, generated data, shader caches and saves are separate; no automatic copy
+or database migration from the custom app occurs. Keep the complete original
+client installation unchanged and import it into the stock application.
+
+`.github/workflows/android-local-game-profile.yml` now targets `non-custom` and
+retains the full exact provider/source/debug verification. The version name is
+`0.1.0-non-custom.<versionCode>`. Dispatch with `build_version_code=1` for the
+first stock package; increase it for later stock updates. `publish_non_custom`
+(default false) enables persistent signing and additive prerelease publication
+only after the complete unsigned release passes the byte/manifest checks. A
+`non-custom` push whose commit message contains `[publish non-custom]` enables
+the same final signing/publication path when manual dispatch is unavailable.
+
+Signing uses the existing `ESTERIA_KEYSTORE_BASE64`, `ESTERIA_KEYSTORE_PASSWORD`,
+`ESTERIA_KEY_PASSWORD` and optional `ESTERIA_KEY_ALIAS` CI configuration. The
+stock package's public certificate/update baseline is
+`app/stock-signing.lock.json`; the original custom signing lock is preserved.
+Private material is staged outside the checkout with owner-only permissions and
+removed after success or failure. Missing secrets stop publication with
+`persistent-signing-secrets-not-configured`; no debug/temporary identity is
+substituted. `tools/sign_android_apk.py --lock app/stock-signing.lock.json` also
+supports external signing with the project key. The first stock release uses
+`--initial-baseline`; later updates must supply the exact previously published
+stock APK and increase the version code. Update the stock lock's `lastPublished`
+only after the signed download's hash/certificate have been verified.
+
+Publication creates a new `non-custom-v<versionName>` prerelease and refuses any
+existing tag. It attaches one signed ARM64 APK, SHA-256, exact source/build
+metadata, signing receipt and `NON-CUSTOM-TESTING.md`. Provider/build/signature
+proof remains separate from actual client-data validation and world entry.
+
 # Building Esteria Android
 
 Build from `android/client-server`. `sources.lock.json` is authoritative; its branch labels never choose build inputs. Existing GPL-3.0 LICENSE is unchanged.

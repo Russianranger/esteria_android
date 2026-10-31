@@ -288,6 +288,18 @@ def run(prepared, mysql, mysqld, version, output):
                 verify_service=live, expected_uuid=uuid, state_lease=lease)
             require(staged['scope'] == installation.SCOPE and staged['playerbotsSchemaVerified'] is False,
                     'Initial composition must remain pending playerbots')
+            stock_sql = updater.stock_world_sql_snapshot(connection)
+            update_journal = schema.private_journal(state / updater.JOURNAL)
+            require(update_journal.get('binding', {}).get('contentProfile') == config.CONTENT_PROFILE and
+                    update_journal['binding'].get('sqlSelectionPolicy') == updater.STOCK_SQL_POLICY and
+                    update_journal.get('stockWorldSql') == stock_sql,
+                    'Actual completed stock SQL policy or live content closure differs')
+            selected_world = updater._stock_selection(verified)['world']
+            evidence.update(contentProfile=config.CONTENT_PROFILE, stockWorldSql=stock_sql,
+                sqlSelectionPolicy=updater.STOCK_SQL_POLICY,
+                selectedWorldUpdateCount=len(selected_world),
+                excludedCustomWorldUpdateCount=len(verified.manifest['databases']['world']['updateOrder']) - len(selected_world),
+                selectedSourcePathsSha256=update_journal['binding']['selectedSourcePathsSha256'])
             evidence.update(productionCoreCompositionCompleted=True, productionCoreComposition=staged)
             immutable = {name: baseline.file_identity(state / name) for name in
                 (schema.JOURNAL, updater.JOURNAL, account.JOURNAL, installation.STAGED_REPORT,

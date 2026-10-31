@@ -1,4 +1,4 @@
-name: Complete local-game provider profile ARM64 packaging qualification
+name: Complete non-custom local-game ARM64 package
 on:
   workflow_dispatch:
     inputs:
@@ -7,9 +7,17 @@ on:
         required: false
         default: '1'
         type: string
+      publish_non_custom:
+        description: Sign and publish an additive non-custom prerelease using the configured persistent key
+        required: false
+        default: false
+        type: boolean
   push:
-    branches: [android/client-server]
+    branches: [non-custom]
     paths:
+      - 'STATUS.md'
+      - 'HANDOFF.md'
+      - 'NON-CUSTOM-TESTING.md'
       - 'app/**'
       - 'core/**'
       - 'native/**'
@@ -23,6 +31,9 @@ on:
       - 'runtime/wine-cohort-publication/published-release.json'
       - 'tools/verify_wine_cohort_apk.py'
       - 'tools/sign_android_apk.py'
+      - 'tools/sign_non_custom_ci.py'
+      - 'tools/prepare_non_custom_release.py'
+      - 'tests/test_non_custom_release.py'
       - 'tools/plan_wine_cohort_adoption.py'
       - 'tests/test_wine_cohort_apk.py'
       - 'runtime/server/programs-playerbots-provider.lock.json'
@@ -93,9 +104,12 @@ jobs:
           PY
   package:
     needs: selection
-    if: needs.selection.outputs.selected == 'true' && github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    if: needs.selection.outputs.selected == 'true' && github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/non-custom'
     runs-on: ubuntu-24.04
     timeout-minutes: 90
+    permissions:
+      contents: write
+      actions: read
     env:
       RELEASE_VERSION_CODE: ${{ inputs.build_version_code || '1' }}
     steps:
@@ -127,7 +141,8 @@ jobs:
             tests.test_server_provider_qualification tests.test_combined_android \
             tests.test_playerbots_programs_provider tests.test_playerbots_programs_qualification \
             tests.test_server_data_tools_provider tests.test_qualified_data_tools_inputs \
-            tests.test_public_local_server_profile -v
+            tests.test_public_local_server_profile tests.test_android_signing \
+            tests.test_non_custom_release -v
           python3 tools/fetch_sources.py client --output sources
           git fetch --no-tags --depth 1 origin 75f50445112818c97f8d8e575d2b1c21e59af6e5
           git fetch --no-tags --depth 1 origin 681b2e9f30b19e94bf8e8de44f67fedba5033c8a
@@ -260,6 +275,12 @@ jobs:
             -PserverContentProviderDir="$SERVER_STOCK_PROVIDERS/content" \
             -PclientRuntimeArtifact="$RUNNER_TEMP/cohort-inputs/release/client-original.zip" \
             -PclientRuntimeSource="$GITHUB_WORKSPACE/sources/client" 2>&1 | tee out/coherent-logs/gradle.log
+      - name: Exercise actual SDK signing and isolated package identities with the pre-existing debug fixture key
+        run: |
+          test -f "$HOME/.android/debug.keystore"
+          ESTERIA_SIGNING_TEST_BUILD_TOOLS="$ANDROID_HOME/build-tools/35.0.0" \
+          ESTERIA_SIGNING_TEST_DEBUG_KEY="$HOME/.android/debug.keystore" \
+            python3 -m unittest tests.test_android_signing.ActualSdkSigning -v
       - name: Install the complete selected server provider profile on a bounded Java heap
         run: |
           mkdir -p out/java-reference
@@ -453,7 +474,7 @@ jobs:
           from tools import sign_android_apk as signing
           apk=Path('app/build/outputs/apk/release/app-release-unsigned.apk')
           tools=signing.sdk_tools(Path(os.environ['ANDROID_HOME'])/'build-tools/35.0.0')
-          manifest=signing.manifest(apk,tools,signing.version(int(os.environ['RELEASE_VERSION_CODE'])))
+          manifest=signing.manifest(apk,tools,signing.version(int(os.environ['RELEASE_VERSION_CODE'])),signing.STOCK_PACKAGE)
           assert manifest['debuggable'] is False, 'release-apk-must-not-be-debuggable'
           with zipfile.ZipFile(apk) as archive:
               assert not any(re.fullmatch(r'META-INF/[^/]+\.(SF|RSA|DSA|EC)',name,re.I)
@@ -494,6 +515,48 @@ jobs:
           compression-level: 0
           retention-days: 30
           if-no-files-found: error
+      - name: Sign only with the configured persistent identity and preserve the unsigned input
+        id: stock_signed
+        if: steps.release_verified.outcome == 'success' && (inputs.publish_non_custom == true || (github.event_name == 'push' && contains(github.event.head_commit.message, '[publish non-custom]')))
+        env:
+          ESTERIA_KEYSTORE_BASE64: ${{ secrets.ESTERIA_KEYSTORE_BASE64 }}
+          ESTERIA_KEYSTORE_PASSWORD: ${{ secrets.ESTERIA_KEYSTORE_PASSWORD }}
+          ESTERIA_KEY_PASSWORD: ${{ secrets.ESTERIA_KEY_PASSWORD }}
+          ESTERIA_KEY_ALIAS: ${{ secrets.ESTERIA_KEY_ALIAS }}
+        run: |
+          python3 tools/sign_non_custom_ci.py --build-tools "$ANDROID_HOME/build-tools/35.0.0" \
+            --apk app/build/outputs/apk/release/app-release-unsigned.apk \
+            --version-code "$RELEASE_VERSION_CODE" --private-directory "$RUNNER_TEMP/stock-signing-private" \
+            --output out/non-custom-signed
+      - name: Retain signed non-custom APK and exact signing receipt
+        if: steps.stock_signed.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: signed-non-custom-arm64-${{ github.sha }}
+          path: out/non-custom-signed/
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+      - name: Publish one additive labelled stock prerelease
+        if: steps.stock_signed.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/prepare_non_custom_release.py --signed out/non-custom-signed \
+            --cohort-proof out/coherent-release-evidence/coherent-release-apk.json \
+            --app-revision "$GITHUB_SHA" --run-id "$GITHUB_RUN_ID" --output out/non-custom-release
+          tag=$(python3 -c 'import json;print(json.load(open("out/non-custom-release/release.json"))["tag"])')
+          # This is additive. An existing tag/release is never overwritten.
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" >/dev/null 2>&1; then
+            echo 'Non-custom tag already exists; refusing publication.'
+            exit 2
+          fi
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --prerelease --title "Esteria Stock 3.3.5a / non-custom" \
+            --notes-file out/non-custom-release/RELEASE-NOTES.md \
+            out/non-custom-release/Esteria-Stock-3.3.5a-arm64.apk \
+            out/non-custom-release/SHA256SUMS out/non-custom-release/release.json \
+            out/non-custom-signed/signing-receipt.json NON-CUSTOM-TESTING.md
       - name: Preserve bounded diagnostics after success or failure
         if: always()
         run: |

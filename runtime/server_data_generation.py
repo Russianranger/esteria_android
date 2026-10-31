@@ -37,6 +37,8 @@ MMAP_CONFIG = {'bytes': 7888, 'sha256': '324479ef3821a0f9ef0c3f2d6b42c011eba1c31
 PROFILE = dict(classical=True, trial=False, streaming=False, directAccess=False,
                retailVirtualProviders=False, parentDataVisible=False, installDataVisible=False)
 MAX_FILES, MAX_FILE, MAX_TOTAL, MAX_METADATA = 300000, 16 << 30, 96 << 30, 64 << 20
+CONTENT_PROFILES = ('stock-3.3.5a', 'esteria-custom')
+DEFAULT_CONTENT_PROFILE = CONTENT_PROFILES[0]
 CAPABILITY = b'esteria-classical-ordered-providers-v1; archive/folder/prefix; no conversion qualification'
 PREPARATION_HELPERS = ('server_data_generation.py', 'server_data_preflight.py', 'shader_generation.py',
                        'extractor_order.py', 'owned_process_group.py')
@@ -331,7 +333,12 @@ def _completed_metadata(destination, expected_inputs=None, *, expected_generatio
                    'threads', 'importMetadata', 'toolSelectionSha256'}
     version = inputs.get('formatVersion') if type(inputs) is dict else None
     fields = base_fields if version == 1 else base_fields | {'serverDataPackage', 'preparationHelperGeneration'}
+    # Historical receipts remain readable only as the custom profile. Every new
+    # generation binds an explicit profile; stock callers require that identity.
+    if type(inputs) is dict and 'contentProfile' in inputs: fields |= {'contentProfile'}
+    if type(inputs) is dict and 'preparationHelperGeneration' in inputs: fields |= {'preparationHelperGeneration'}
     require(type(inputs) is dict and set(inputs) == fields and type(version) is int and version in (1, 2) and
+            inputs.get('contentProfile', 'esteria-custom') in CONTENT_PROFILES and
             inputs['clientRevision'] == CLIENT_REVISION and inputs['serverRevision'] == formats.SERVER_REVISION and
             inputs['locale'] in order.LOCALES and type(inputs['threads']) is int and inputs['threads'] in (1, 2) and
             type(inputs['importGeneration']) is str and storage.HASH.fullmatch(inputs['importGeneration']) and
@@ -340,6 +347,7 @@ def _completed_metadata(destination, expected_inputs=None, *, expected_generatio
             'prepared data input selection differs')
     if version == 2:
         validate_package_selection(inputs['serverDataPackage'])
+    if 'preparationHelperGeneration' in inputs:
         require(inputs['preparationHelperGeneration'] == preparation_helper_generation(),
                 'prepared server package helper source changed; prepare a new generation')
     for name, identity in inputs['importMetadata'].items():
@@ -374,7 +382,8 @@ def verify_completed(destination, expected_inputs=None, *, expected_generation=N
 
 
 def generate(store, game, generation, tools, selection, locale, *, threads=1, timeout=24 * 3600,
-             cancelled=lambda: False, progress=lambda phase: None):
+             cancelled=lambda: False, progress=lambda phase: None, content_profile=DEFAULT_CONTENT_PROFILE):
+    require(content_profile in CONTENT_PROFILES, 'unsupported content profile')
     require(type(threads) is int and threads in (1, 2), 'one or two extraction workers required')
     require(type(timeout) is int and 0 < timeout <= 48 * 3600, 'invalid extraction deadline')
     require(locale in order.LOCALES, 'explicit extraction locale required')
@@ -384,12 +393,15 @@ def generate(store, game, generation, tools, selection, locale, *, threads=1, ti
     lock = os.open(store / '.setup.lock', os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
     try:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        inputs = {'formatVersion': 1, 'importGeneration': generation, 'locale': locale, 'threads': threads,
+        inputs = {'formatVersion': 1, 'contentProfile': content_profile, 'importGeneration': generation, 'locale': locale, 'threads': threads,
                   'clientRevision': CLIENT_REVISION, 'serverRevision': formats.SERVER_REVISION,
                   'importMetadata': storage.imported(game, generation),
-                  'toolSelectionSha256': tools_verified(tools, selection)}
+                  'toolSelectionSha256': tools_verified(tools, selection),
+                  'preparationHelperGeneration': preparation_helper_generation()}
         source = game / 'generations' / generation / 'data'
         external = package_selection(source)
+        require(content_profile != 'stock-3.3.5a' or external is None,
+                'Stock 3.3.5a generates matching data from stock client archives; custom server-data overlays require the Esteria profile')
         if external is not None:
             inputs.update(formatVersion=2, serverDataPackage=external,
                           preparationHelperGeneration=preparation_helper_generation())
@@ -460,7 +472,8 @@ def generate(store, game, generation, tools, selection, locale, *, threads=1, ti
             preflight = formats.check_server_data(data)
             require(preflight['checks_passed'], 'generated server data failed format preflight')
             require(not cancelled() and storage.imported(game, generation) == inputs['importMetadata'] and
-                    tools_verified(tools, selection) == inputs['toolSelectionSha256'] and package_selection(source) == external,
+                    tools_verified(tools, selection) == inputs['toolSelectionSha256'] and package_selection(source) == external and
+                    preparation_helper_generation() == inputs['preparationHelperGeneration'],
                     'extraction inputs changed before completion')
             receipt = {'formatVersion': 1, 'scope': SCOPE, 'generation': key, 'inputs': inputs,
                        'files': inventory(data), 'preflight': preflight,
@@ -478,7 +491,8 @@ def generate(store, game, generation, tools, selection, locale, *, threads=1, ti
             storage.atomic(final / 'receipt.json', storage.encoded(receipt))
             os.rename(final, destination); storage.sync(generations)
         require(not cancelled() and storage.imported(game, generation) == inputs['importMetadata'] and
-                package_selection(source) == external,
+                package_selection(source) == external and
+                preparation_helper_generation() == inputs['preparationHelperGeneration'],
                 'import changed before server data activation')
         storage.atomic(store / 'current', (key + '\n').encode())
         progress('extraction-format-checked')
@@ -493,15 +507,16 @@ def main():
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--generation', required=True)
     parser.add_argument('--locale', required=True)
+    parser.add_argument('--content-profile', choices=CONTENT_PROFILES, default=DEFAULT_CONTENT_PROFILE)
     parser.add_argument('--threads', type=int, default=1, choices=(1, 2))
     args = parser.parse_args()
     try:
         receipt = generate(args.store, args.game, args.generation, args.tools, document(args.selection), args.locale,
-            threads=args.threads, progress=lambda value: print(value, flush=True))
+            threads=args.threads, content_profile=args.content_profile, progress=lambda value: print(value, flush=True))
         print('Server data format checked: ' + receipt['generation'] + '; world coverage remains unqualified')
         return 0
     except (OSError, ValueError) as error:
-        print('Server data preparation failed (' + type(error).__name__ + '); active output preserved', flush=True)
+        print('Server data preparation failed (' + type(error).__name__ + '): ' + str(error) + '; active output preserved', flush=True)
         return 1
 
 

@@ -25,9 +25,10 @@ except ImportError:
     from qualify_android_installer import digest, instrument_passed, run_bounded
 
 ROOT = Path(__file__).resolve().parents[1]
-PACKAGE = 'io.github.russianranger.esteria'
-SERVICE = PACKAGE + '.core.runtime.install.HandoffProbeService'
-TEST_CLASS = PACKAGE + '.core.runtime.install.LocalHandoffRecoveryInstrumentedTest'
+NAMESPACE = 'io.github.russianranger.esteria'
+PACKAGE = NAMESPACE + '.stock'
+SERVICE = NAMESPACE + '.core.runtime.install.HandoffProbeService'
+TEST_CLASS = NAMESPACE + '.core.runtime.install.LocalHandoffRecoveryInstrumentedTest'
 TEST = TEST_CLASS + '#remoteOwnerDeathRecoversOnlyKnownHandoffs'
 BUILD_ASSET = 'assets/handoff-probe/build-evidence.json'
 BUILD_SCOPE = 'android-x64-handoff-fixture-build-only'

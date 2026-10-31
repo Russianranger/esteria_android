@@ -1,5 +1,6 @@
 package io.github.russianranger.esteria.core.runtime.process;
 
+import io.github.russianranger.esteria.core.content.ContentProfile;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -15,17 +16,18 @@ import java.nio.file.DirectoryStream;
  */
 public final class ShaderRunPlan {
     public static final String TOOL_MOUNT="/esteria-shader-tools";
+    public static final String HELPER_MOUNT="/esteria-stock-client";
     // Client471 Client.cpp::g_localeNames/CheckAvailableLocales order. The
     // pinned translator supports ten locales; enCN/enTW cannot be invented.
     private static final List<String> CLIENT_LOCALES=List.of("deDE","enGB","enUS","esES","frFR","koKR","zhCN","zhTW","enCN","enTW","esMX","ruRU");
     private static final List<String> SHADER_LOCALES=List.of("enUS","enGB","koKR","frFR","deDE","zhCN","zhTW","esES","esMX","ruRU");
-    public final Path game,tools,work;
+    public final Path game,tools,work,helpers;
     public final String importGeneration,clientRevision,requestedLocale,locale;
     public final List<String> arguments;
     public final List<ProotLaunch.Mount> mounts;
-    public ShaderRunPlan(Path game,Path tools,Path work,String clientRevision,String locale)throws IOException {
-        this.game=directory(game);this.tools=directory(tools);this.work=directory(work);
-        for(Path[] pair:new Path[][]{{game,tools},{game,work},{tools,work}})
+    public ShaderRunPlan(Path game,Path tools,Path work,Path helpers,String clientRevision,String locale)throws IOException {
+        this.game=directory(game);this.tools=directory(tools);this.work=directory(work);this.helpers=directory(helpers);
+        for(Path[] pair:new Path[][]{{game,tools},{game,work},{tools,work},{game,helpers},{tools,helpers},{work,helpers}})
             if(pair[0].startsWith(pair[1])||pair[1].startsWith(pair[0]))throw new IOException("Shader inputs, tools and work must be separate");
         if(clientRevision==null||!clientRevision.matches("[0-9a-f]{40}"))throw new IOException("Shader tools require a full source revision");
         if(locale==null||!CLIENT_LOCALES.contains(locale))throw new IOException("Choose an explicit supported client locale");
@@ -34,10 +36,11 @@ public final class ShaderRunPlan {
         Path imported=directory(game.resolve("generations").resolve(importGeneration).resolve("data"));
         this.locale=effectiveLocale(imported,requestedLocale);
         arguments=Collections.unmodifiableList(Arrays.asList("/usr/bin/python3","-B","-s","-E",
-            TOOL_MOUNT+"/helpers/shader_generation.py","--store","/work/shaders","--game","/esteria-data",
-            "--generation",importGeneration,"--tools",TOOL_MOUNT+"/tools","--client-revision",clientRevision,"--locale",this.locale));
+            HELPER_MOUNT+"/stock_shader_generation.py","--store","/work/shaders","--game","/esteria-data",
+            "--generation",importGeneration,"--tools",TOOL_MOUNT+"/tools","--client-revision",clientRevision,"--locale",this.locale,
+            "--content-profile",ContentProfile.ID));
         mounts=Collections.unmodifiableList(Arrays.asList(new ProotLaunch.Mount(game,"/esteria-data"),
-            new ProotLaunch.Mount(tools,TOOL_MOUNT)));
+            new ProotLaunch.Mount(tools,TOOL_MOUNT),new ProotLaunch.Mount(helpers,HELPER_MOUNT)));
     }
     public void requireCurrentImport()throws IOException {
         if(!importGeneration.equals(current(game)))throw new IOException("Import changed during shader setup; prepared outputs are retained");

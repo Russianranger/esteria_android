@@ -38,6 +38,8 @@ import io.github.russianranger.esteria.core.diagnostics.SupportBundle;
 import io.github.russianranger.esteria.core.diagnostics.SupportLogSelection;
 import io.github.russianranger.esteria.core.runtime.process.ProcessUsageSnapshot;
 import io.github.russianranger.esteria.core.importer.GameDataImporter;
+import io.github.russianranger.esteria.core.importer.StockClientCompatibility;
+import io.github.russianranger.esteria.core.content.ContentProfile;
 import io.github.russianranger.esteria.core.importer.ContentPackageLayout;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeInstaller;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
@@ -54,6 +56,7 @@ import io.github.russianranger.esteria.runtime.TurnipSetup;
 import io.github.russianranger.esteria.runtime.TurnipReadinessProbe;
 import io.github.russianranger.esteria.runtime.ServerDataToolsSetup;
 import io.github.russianranger.esteria.runtime.LocalWorldSetup;
+import io.github.russianranger.esteria.runtime.StockClientSetup;
 import io.github.russianranger.esteria.runtime.GameSession;
 import io.github.russianranger.esteria.presentation.GamePresentationPanel;
 import java.time.Duration;
@@ -92,6 +95,7 @@ public final class SessionService extends Service {
     // The worker retains this handle across every failure until all setup
     // children and their data/import leases have confirmed cleanup.
     private volatile LocalWorldSetup.Handle worldSetup;
+    private volatile StockClientSetup.Handle stockSetup;
     private volatile LocalWorldSetup.Result preparedWorld;
     private volatile TurnipReadinessProbe.Handle graphicsProbe;
     private volatile Map<String,String> graphicsProbeFacts=Map.of("turnip.probe.result","not-attempted");
@@ -183,7 +187,11 @@ public final class SessionService extends Service {
                 else if (START.equals(intent.getAction())) startLocalGame(intent.getStringExtra(WORLD_LOCALE));
                 else if (PREPARE_RUNTIME.equals(intent.getAction())) prepareRuntime();
                 else if (PREPARE_SERVER_RUNTIME.equals(intent.getAction())) prepareServerRuntime();
-                else if (PREPARE_WORLD.equals(intent.getAction())) prepareWorld(intent.getStringExtra(WORLD_LOCALE));
+                else if (PREPARE_WORLD.equals(intent.getAction())) {
+                    String locale=intent.getStringExtra(WORLD_LOCALE);
+                    inspectStockClient(locale,true);
+                    prepareStockRuntime(locale);prepareServerRuntime();prepareWorld(locale);
+                }
                 else if (ACCEPT_UI.equals(intent.getAction())) acceptUiReview(intent.getStringExtra(UI_REVIEW_DIGEST));
                 else if (KEEP_UI.equals(intent.getAction())) keepCurrentUi(intent.getStringExtra(UI_REVIEW_DIGEST));
                 else throw new IOException("Unknown operation");
@@ -201,7 +209,7 @@ public final class SessionService extends Service {
             } catch (Exception e) {
                 if(EXPORT.equals(intent.getAction()))supportStatus="";
                 status = START.equals(intent.getAction())?(lastRecoveryRequired?"The local session stopped with recovery checks required. Export the support bundle for details."
-                        :"Local startup or shutdown did not complete normally. Export the support bundle for details.")
+                        :"Local startup or shutdown did not complete normally: "+e.getMessage()+". Export the support bundle for details.")
                         :cancelled.get() ? "Operation cancelled. Existing game data remains active."
                         : e.getClass().getSimpleName() + ": " + e.getMessage();
                 log(status+" failure="+e.getClass().getSimpleName()+": "+e.getMessage());
@@ -247,7 +255,8 @@ public final class SessionService extends Service {
             // Delete only the temporary ZIP after the importer has published a complete generation.
             Files.deleteIfExists(archive);
         }
-        status = "Import complete: " + result.copiedFiles + " copied, " + result.reusedFiles + " resumed.\nBuild 12340 base checks passed; full Esteria content and runtime are not yet qualified.";
+        status = "Import complete: " + result.copiedFiles + " copied, " + result.reusedFiles + " resumed.\n"
+            +inspectStockClient(getSharedPreferences("world",MODE_PRIVATE).getString("locale","enUS"),false).toText();
         log("Import complete generation=" + result.generation + " copied=" + result.copiedFiles + " reused=" + result.reusedFiles);
     }
     private void startLocalGame(String locale) throws IOException {
@@ -259,7 +268,8 @@ public final class SessionService extends Service {
             throw new IOException("This build does not include the complete local game profile");
         if(locale==null)locale=getSharedPreferences("world",MODE_PRIVATE).getString("locale",null);
         if(locale==null)throw new IOException("Select the imported client language before starting");
-        prepareRuntime();prepareServerRuntime();prepareWorld(locale);
+        inspectStockClient(locale,true);
+        prepareStockRuntime(locale);prepareServerRuntime();prepareWorld(locale);
         if(cancelled.get())throw new RuntimeWork.CancelledException();
         LocalWorldSetup.Result setup=preparedWorld;
         if(setup==null)throw new IOException("Local world setup did not complete");
@@ -290,6 +300,14 @@ public final class SessionService extends Service {
         }
         status=lastRecoveryRequired?"Session stopped. Recovery checks are required before the next launch.":"Local session stopped.";
     }
+    private StockClientCompatibility.Report inspectStockClient(String locale,boolean required)throws IOException {
+        Path imported=new GameDataImporter(root.resolve("game")).resolveCurrent();
+        if(imported==null)throw new IOException("Import your complete ChromieCraft 3.3.5a client folder or ZIP first");
+        StockClientCompatibility.Report report=StockClientCompatibility.inspect(imported,locale==null?"enUS":locale);
+        log("Content profile="+ContentProfile.ID+"\n"+report.toText());
+        if(required)report.requirePreparationInputs();
+        return report;
+    }
     private IOException closeGame(GameSession.Handle owner) {
         IOException failure=null;boolean interrupted=Thread.interrupted();
         while(owner.state()!=GameSession.State.CLOSED) {
@@ -311,7 +329,38 @@ public final class SessionService extends Service {
             .putBoolean("lastClientExitAcknowledged",owner.clientExitAcknowledged()).commit();
         game=null;if(interrupted)Thread.currentThread().interrupt();return failure;
     }
-    private void prepareRuntime() throws IOException {
+    private void prepareRuntime() throws IOException { prepareRuntime(true); }
+    private void prepareStockRuntime(String locale)throws IOException {
+        clearSelectedLogs("setup.stock.");
+        prepareRuntime(false);
+        StockClientSetup.Handle owner=StockClientSetup.begin(this,root,new RuntimeSetup(this,root),new ShaderToolsSetup(this,root),locale);
+        stockSetup=owner;Throwable operationFailure=null;
+        try {
+            owner.prepare((phase,path,completed,total)->{
+                keepAwake();rememberLogs(owner.diagnosticLogs());
+                status="Checking and selecting stock client content…"+(path==null||path.isEmpty()?"":"\n"+path);
+            },cancelled::get);
+            log("Stock client selection completed contentProfile="+ContentProfile.ID+" gameplayQualified=false");
+        }catch(IOException|RuntimeException error){operationFailure=error;throw error;}
+        finally {
+            IOException cleanup=null;boolean interrupted=Thread.interrupted();
+            while(owner.state()!=StockClientSetup.State.CLOSED) {
+                keepAwake();rememberLogs(owner.diagnosticLogs());
+                try{owner.close(Duration.ofSeconds(30));}
+                catch(IOException error){if(cleanup==null)cleanup=error;else if(cleanup!=error&&cleanup.getSuppressed().length<15)cleanup.addSuppressed(error);}
+                if(owner.state()!=StockClientSetup.State.CLOSED) {
+                    status="Stopping the stock content check safely…";
+                    try{Thread.sleep(250);}catch(InterruptedException ignored){interrupted=true;}
+                }
+            }
+            rememberLogs(owner.diagnosticLogs());stockSetup=null;
+            if(interrupted)Thread.currentThread().interrupt();
+            if(cleanup!=null){if(operationFailure!=null)operationFailure.addSuppressed(cleanup);else throw cleanup;}
+        }
+        inspectStockClient(locale,true);
+        prepareClientView(new ClientRuntimeSetup(this,root),null);
+    }
+    private void prepareRuntime(boolean prepareView) throws IOException {
         pendingUiReview=null;
         status = "Preparing client runtime…";
         RuntimeSetup setup = new RuntimeSetup(this, root);
@@ -390,7 +439,7 @@ public final class SessionService extends Service {
             log("Reconstructed client prepared generation=" + installed.generation + " revision=" + client.sourceRevision()
                     + " build=" + client.buildId() + " reusedFiles=" + installed.reusedFiles
                     + " copiedBytes=" + installed.copiedBytes + " gameRuntimeQualified=false");
-            prepareClientView(client,null);
+            if(prepareView)prepareClientView(client,null);
         }
         status = "Client runtime files are prepared. Local services and gameplay are still under development.";
     }
@@ -522,7 +571,7 @@ public final class SessionService extends Service {
                 : "Database dependencies and server programs are prepared. Local server startup is still under development.";
     }
     private void prepareWorld(String locale)throws IOException {
-        clearSelectedLogs("setup.");
+        for(String stage:new String[]{"data","shader","installation","turnip"})clearSelectedLogs("setup."+stage+".");
         if(locale==null||!java.util.Set.of("deDE","enGB","enUS","esES","frFR","koKR","zhCN","zhTW","enCN","enTW","esMX","ruRU").contains(locale))
             throw new IOException("Select the language of the imported client before preparing the world");
         if(!BuildConfig.SERVER_RUNTIME_PACKAGED||!BuildConfig.SERVER_PROGRAMS_PACKAGED||!BuildConfig.SERVER_CONTENT_PACKAGED||
@@ -638,6 +687,10 @@ public final class SessionService extends Service {
         facts.put("app.sourceRevision", BuildConfig.SOURCE_REVISION);
         facts.put("buildPin.client", BuildConfig.CLIENT_REVISION); facts.put("buildPin.server", BuildConfig.SERVER_REVISION);
         facts.put("app.versionCode", String.valueOf(BuildConfig.VERSION_CODE));
+        facts.put("content.profile",ContentProfile.ID);
+        facts.put("content.label",ContentProfile.LABEL);
+        try { facts.put("content.compatibility",inspectStockClient(getSharedPreferences("world",MODE_PRIVATE).getString("locale","enUS"),false).toText()); }
+        catch(IOException failure){facts.put("content.compatibility",failure.getMessage());}
         facts.put("android.api", String.valueOf(Build.VERSION.SDK_INT)); facts.put("android.release", Build.VERSION.RELEASE);
         facts.put("device.model", Build.MODEL); facts.put("device.manufacturer", Build.MANUFACTURER);
         facts.put("device.abis", android.text.TextUtils.join(",", Build.SUPPORTED_ABIS));
@@ -682,6 +735,9 @@ public final class SessionService extends Service {
             }
         }
         LocalWorldSetup.Handle setupOwner=worldSetup;
+        StockClientSetup.Handle stockOwner=stockSetup;
+        facts.put("stockSetup.retained",Boolean.toString(stockOwner!=null));
+        if(stockOwner!=null){facts.put("stockSetup.state",stockOwner.state().name());rememberLogs(stockOwner.diagnosticLogs());}
         facts.put("worldSetup.retained",Boolean.toString(setupOwner!=null));
         facts.putAll(graphicsProbeFacts);
         TurnipReadinessProbe.Handle probeOwner=graphicsProbe;

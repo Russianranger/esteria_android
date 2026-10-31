@@ -27,6 +27,8 @@ except ImportError:
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE = 'io.github.russianranger.esteria'
+STOCK_PACKAGE = PACKAGE + '.stock'
+PACKAGES = frozenset((PACKAGE, STOCK_PACKAGE))
 LOCK = ROOT / 'app/development-signing.lock.json'
 MAX_VERSION = 2_100_000_000
 HEX = re.compile(r'[0-9a-f]{64}')
@@ -75,7 +77,7 @@ def load_lock(path, qualification=False):
     lock = json.loads(path.read_text())
     require(set(lock) == {'formatVersion', 'purpose', 'packageId', 'certificateSha256', 'lastPublished'},
             'signing-lock-fields')
-    require(lock['formatVersion'] == 1 and lock['packageId'] == PACKAGE, 'signing-lock-identity')
+    require(lock['formatVersion'] == 1 and isinstance(lock['packageId'], str) and lock['packageId'] in PACKAGES, 'signing-lock-identity')
     require(lock['purpose'] == ('qualification-only' if qualification else 'persistent-development'),
             'signing-lock-purpose')
     require(isinstance(lock['certificateSha256'], str) and HEX.fullmatch(lock['certificateSha256']),
@@ -151,14 +153,15 @@ def command(arguments, operation):
                         stream.close()
 
 
-def manifest(apk, tools, expected_version):
+def manifest(apk, tools, expected_version, expected_package=PACKAGE):
+    require(expected_package in PACKAGES, 'unsupported-package-identity')
     apk = plain(apk)
     require(0 < apk.stat().st_size <= 2 * 1024**3, 'apk-size-limit')
     output = command([tools['aapt'], 'dump', 'badging', apk], 'manifest-inspection')
     matches = re.findall(r"^package: name='([^']+)' versionCode='([0-9]+)' versionName='([^']*)'.*$", output, re.M)
     require(len(matches) == 1, 'apk-package-metadata')
     package, code, name = matches[0]
-    require(package == PACKAGE and version(int(code)) == version(expected_version), 'apk-package-or-version-mismatch')
+    require(package == expected_package and version(int(code)) == version(expected_version), 'apk-package-or-version-mismatch')
     require(re.findall(r"^sdkVersion:'(\d+)'$", output, re.M) == ['26']
             and re.findall(r"^targetSdkVersion:'(\d+)'$", output, re.M) == ['35'], 'apk-sdk-levels')
     require(not re.search(r'\bsplit=', output.splitlines()[0]), 'split-apk-unsupported')
@@ -167,7 +170,7 @@ def manifest(apk, tools, expected_version):
 
 
 def verify(apk, tools, lock, expected_version, qualification=False):
-    result = manifest(apk, tools, expected_version)
+    result = manifest(apk, tools, expected_version, lock.get('packageId', PACKAGE))
     require(qualification or not result['debuggable'], 'debuggable-apk-not-distributable')
     output = command([tools['apksigner'], 'verify', '--verbose', '--print-certs', apk], 'signature-verification')
     certificates = re.findall(r'^Signer #[0-9]+ certificate SHA-256 digest: ([0-9a-f]{64})$', output, re.M)
@@ -236,7 +239,7 @@ def sign(args):
     lock_hash = digest(Path(args.lock))
     tools = sdk_tools(args.build_tools)
     source = plain(args.apk)
-    identity = manifest(source, tools, args.version_code)
+    identity = manifest(source, tools, args.version_code, lock['packageId'])
     require(args.qualification_only or not identity['debuggable'], 'debuggable-apk-not-distributable')
     prior = continuity(lock, args.previous_apk, tools, args.version_code,
                        args.initial_baseline, args.qualification_only)

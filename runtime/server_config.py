@@ -31,7 +31,17 @@ MODULE_OVERRIDES = {
     'ChatTransmitter.conf': {'ChatTransmitter.Enabled': 0},
     'mod_esteria_chat.conf': {'EsteriaChat.Enable': 0},
     'mod_launcher_api.conf': {'LauncherApi.Enable': 0, 'LauncherApi.Bind': '"127.0.0.1"'},
+    # These source-supported switches prevent custom catalogues, AIO UI and
+    # continuation data from changing the ordinary stock character path.
+    'mod_wxl_dbc.conf': {'WxlDbc.Enable': 0},
+    'classless_wildcard.conf': {'ClasslessWildcard.Enable': 0},
+    'challenge_modes.conf': {'ChallengeModes.Enable': 0},
+    'mod_battlemon_battles.conf': {'BattlemonBattles.Enable': 0},
+    'mod_battlemon_overworld.conf': {'BattlemonOverworld.Enable': 0},
+    'transmog.conf': {'Transmogrification.Enable': 0},
 }
+MODULE_OVERRIDES['mod_battlemon.conf']['Battlemon.Enable'] = 0
+CONTENT_PROFILE = 'stock-3.3.5a'
 
 
 def quoted(value: str | Path) -> str:
@@ -156,6 +166,7 @@ def _module_configurations(server, inventory, compiled, inventory_identity, comp
     if sorted(name[len('modules/'):] for name in files) != sorted(names):
         raise ValueError('Not every compiled module configuration was prepared')
     proof = {'formatVersion': 1, 'scope': 'prepared-module-configurations-not-startup-qualified',
+             'contentProfile': CONTENT_PROFILE,
              'sourceLockSha256': inventory['sourceLockSha256'],
              'inventorySha256': inventory_identity['sha256'],
              'compiledSelectionSha256': compiled_identity['sha256'],
@@ -173,7 +184,9 @@ def _configuration_files(server: Path, state: Path, data: Path, sql_source: Path
     common = {'BindIP': quoted('127.0.0.1'), 'LogsDir': quoted(state / 'logs'),
               'SourceDirectory': quoted(sql_source), 'MySQLExecutable': quoted(mysql_client),
               'LoginDatabaseInfo': database_info('acore_auth'),
-              'LoginDatabase.WorkerThreads': 1, 'LoginDatabase.SynchThreads': 1}
+              'LoginDatabase.WorkerThreads': 1, 'LoginDatabase.SynchThreads': 1,
+              # SQL setup is owned and journalled before either server starts.
+              'Updates.EnableDatabases': 0}
     auth = common | {'RealmServerPort': profile['auth_port'], 'TempDir': quoted(state / 'run/authserver')}
     world = common | {'WorldServerPort': profile['world_port'], 'DataDir': quoted(data),
                       'TempDir': quoted(state / 'run/worldserver'),
@@ -184,7 +197,8 @@ def _configuration_files(server: Path, state: Path, data: Path, sql_source: Path
                       'Console.Enable': 1, 'Ra.Enable': 0, 'SOAP.Enabled': 0,
                       'Wintergrasp.DeferShutdownTimer': 0,
                       'Network.Threads': 1, 'MapUpdate.Threads': 1}
-    bots = profile['playerbots'] | {'PlayerbotsDatabaseInfo': database_info('acore_playerbots')}
+    bots = profile['playerbots'] | {'PlayerbotsDatabaseInfo': database_info('acore_playerbots'),
+                                   'Playerbots.Updates.EnableDatabases': 0}
     main_templates = {name: bounded_plain(server.absolute() / name, 4 << 20) for name in (
         'src/server/apps/authserver/authserver.conf.dist', 'src/server/apps/worldserver/worldserver.conf.dist')}
     files = {
@@ -193,6 +207,7 @@ def _configuration_files(server: Path, state: Path, data: Path, sql_source: Path
         'modules/playerbots.conf': overlay(bounded_plain(server.absolute() / 'modules/mod-playerbots/conf/playerbots.conf.dist', 4 << 20).decode('utf-8'), bots),
     }
     files['worldserver.conf'] = disable_unqualified_lua(files['worldserver.conf'])
+    files['worldserver.conf'] = '# Content profile: ' + CONTENT_PROFILE + '\n' + files['worldserver.conf']
     module_proof = None
     if module_preparer is not None:
         module_files, module_proof = module_preparer(bots, main_templates)
@@ -311,6 +326,7 @@ def _render(server: Path, state: Path, data: Path, sql_source: Path, mysql_clien
         finally:
             os.close(descriptor)
         return {'generation': digest, 'config': str(state / 'config/current'),
+                'content_profile': CONTENT_PROFILE,
                 'database_initialized': False, 'runtime_validated': False,
                 'module_configurations_complete': module_proof is not None,
                 'module_startup_qualified': False,
@@ -332,14 +348,14 @@ _BOT_POLICY = {
 
 
 def _sealed_profile(profile):
-    if not isinstance(profile, dict) or any(type(profile.get(key)) is not int or profile[key] != value
+    if not isinstance(profile, dict) or profile.get('content_profile') != CONTENT_PROFILE or any(type(profile.get(key)) is not int or profile[key] != value
                                             for key, value in _LOCAL_PORTS.items()):
         raise ValueError('Explicit sealed local endpoint profile required')
     bots = profile.get('playerbots')
     if not isinstance(bots, dict) or set(bots) != set(_BOT_POLICY) or any(
             type(bots[key]) is not int or bots[key] != value for key, value in _BOT_POLICY.items()):
         raise ValueError('Explicit sealed controlled-playerbots profile required')
-    return dict(_LOCAL_PORTS, playerbots=dict(bots))
+    return dict(_LOCAL_PORTS, content_profile=CONTENT_PROFILE, playerbots=dict(bots))
 
 
 # The portable provisioning APIs use exactly the renderer's reviewed policy.

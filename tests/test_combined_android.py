@@ -71,7 +71,9 @@ class CombinedPackageGuards(unittest.TestCase):
         return repository, path
 
     def test_setup_and_service_helpers_are_both_exact_source_bound(self):
-        self.assertEqual(bundle.HELPER_SETS, {'database-setup': ('mysql_bootstrap.py', 'android_database_setup.py'),
+        self.assertEqual(bundle.HELPER_SETS, {'stock-client': ('stock_content_inspection.py', 'stock_shader_generation.py', 'shader_generation.py',
+                'extractor_order.py', 'server_data_preflight.py'),
+            'database-setup': ('mysql_bootstrap.py', 'android_database_setup.py'),
                                             'database-service': ('mysql_bootstrap.py', 'mysql_service.py'),
                                             'server-schema': ('android_server_schema_setup.py', 'mysql_bootstrap.py', 'mysql_service.py',
                                                               'server_content.py', 'server_schema_setup.py', 'server_schema_baseline.py',
