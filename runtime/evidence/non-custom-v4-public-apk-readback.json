@@ -1,0 +1,28 @@
+{
+  "formatVersion": 1,
+  "scope": "anonymous-public-v4-apk-complete-byte-and-sdk-signature-readback",
+  "releaseId": 430186739,
+  "releaseUrl": "https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.4",
+  "tag": "non-custom-v0.1.0-non-custom.4",
+  "assetId": 696483916,
+  "appSourceRevision": "2c8eeb08a3079edf7354cd373b7cbaf94d859365",
+  "publisherRevision": "8d0ba78bed3256b5eee3340b62fe1c8de41c3d52",
+  "publisherRunId": 41241976822,
+  "publisherJobId": 124657555352,
+  "completeAnonymousReadback": true,
+  "actualSdkSignatureVerified": true,
+  "previousPublishedCertificateContinuityVerified": true,
+  "signedApk": {
+    "packageId": "io.github.russianranger.esteria.stock",
+    "versionCode": 4,
+    "versionName": "0.1.0-non-custom.4",
+    "debuggable": false,
+    "minSdk": 26,
+    "targetSdk": 35,
+    "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+    "apkSha256": "af4b77d9ad183e8a4855a9bcce0644da2276e1d6309bb86d0727691ad79e1b29",
+    "apkBytes": 336767421
+  },
+  "thorQualified": false,
+  "gameplayQualified": false
+}

@@ -1,0 +1,32 @@
+{
+  "formatVersion": 1,
+  "scope": "anonymous-public-v4-release-all-assets-complete-byte-readback",
+  "releaseId": 430186739,
+  "allSixPublicAssetsRead": true,
+  "assets": {
+    "Esteria-Stock-3.3.5a-arm64.apk": {
+      "bytes": 336767421,
+      "sha256": "af4b77d9ad183e8a4855a9bcce0644da2276e1d6309bb86d0727691ad79e1b29"
+    },
+    "NON-CUSTOM-TESTING.md": {
+      "bytes": 6429,
+      "sha256": "cce2673eaac52b5bb427ffdf48f41c920b032b015c032078524b3b9353e0a10b"
+    },
+    "publication-evidence.json": {
+      "bytes": 3760,
+      "sha256": "b5c57938a6ce2b2df3b9dd826f707e7945eb0eea063c371d047975c0f7b28020"
+    },
+    "release.json": {
+      "bytes": 2532,
+      "sha256": "6961e83d3c6634357cc3216a670aa95046ee6877f437cb442c37398b57112f4b"
+    },
+    "SHA256SUMS": {
+      "bytes": 97,
+      "sha256": "c9a521e05f9691f5b1503118550afdaa6c109edc1bccf8fbce146182c4ce1db7"
+    },
+    "signing-receipt.json": {
+      "bytes": 1050,
+      "sha256": "a9f9d17bb05e496af77156357bf1084e69e1403d71129a9b11eb45f6a88bf1de"
+    }
+  }
+}

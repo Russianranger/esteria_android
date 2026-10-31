@@ -1,0 +1,15 @@
+{
+  "formatVersion": 1,
+  "scope": "post-publication-test-fixture-correction-only",
+  "historicalFailedRun": 41241976734,
+  "historicalFailedJob": 124657555446,
+  "cause": "Whole-file numeric substring assertion could match digits in a randomly generated disposable test credential.",
+  "correction": "Deterministic credential containing those digits; assertions check exact bot-setting lines.",
+  "correctionRevision": "7c38f27756eac24821cd848ee59d475acfba0bdc",
+  "passingFullToolingRun": 41242372352,
+  "focusedTestsPassed": 29,
+  "applicationSourceRevision": "2c8eeb08a3079edf7354cd373b7cbaf94d859365",
+  "distributedApkChanged": false,
+  "distributedApkSha256": "af4b77d9ad183e8a4855a9bcce0644da2276e1d6309bb86d0727691ad79e1b29",
+  "testSourceSha256": "1dabf21fe0f1179a123853160fc4d5b7b55ebec38fa75092687c464a3d100df6"
+}
