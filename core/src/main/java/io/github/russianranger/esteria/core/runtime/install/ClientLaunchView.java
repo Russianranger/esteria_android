@@ -18,6 +18,10 @@ public final class ClientLaunchView {
     private static final int MAX_ENTRIES=8192, MAX_DEPTH=32;
     private static final String[] BINARIES={"WowClient64.exe","XvidDecoder.dll"};
     private static final String[] STATE={"WTF","Cache","Logs","Screenshots"};
+    /** Client471 loads RunOnce*.wtf after Config.wtf and before OpenArchives. */
+    public static final String LOCALE_INPUT="RunOnce~EsteriaLocale.wtf";
+    private static final String LOCALE_OWNER="// Esteria managed startup locale v1\n";
+    private static final List<String> CLIENT_LOCALES=Arrays.asList("deDE","enGB","enUS","esES","frFR","koKR","zhCN","zhTW","enCN","enTW","esMX","ruRU");
     private static final String LOCAL_REALM="SET realmList \"127.0.0.1:3724\"\nSET realmListbn \"\"\nSET portal \"\"\nSET serverAlert \"\"\n";
     private static final Set<String> LOCALES=new HashSet<>(Arrays.asList("enus","engb","kokr","frfr","dede","zhcn","zhtw","eses","esmx","ruru"));
     private final Path work, launches, stages, state;
@@ -173,6 +177,53 @@ public final class ClientLaunchView {
             return new Result(target,plan.generation,reused,false,sync);
         }
     }
+    /** Publish only our fixed companion while the caller retains the stopped
+     * client/import leases. The selected effective locale is supplied by the
+     * completed shader/data result, never guessed from Config.wtf. */
+    public List<String> argumentsForLocale(Plan plan,String effectiveLocale,RuntimeWork.Cancellation cancellation)throws IOException {
+        RuntimeFiles.require(plan!=null&&CLIENT_LOCALES.contains(effectiveLocale),"Prepared effective client locale is invalid");
+        List<String> arguments=plan.arguments();
+        String archive="Data/"+effectiveLocale+"/locale-"+effectiveLocale+".MPQ";
+        RuntimeFiles.require(plan.links.keySet().stream().anyMatch(name->name.equalsIgnoreCase(archive)),
+            "Prepared effective locale is absent from the client view");
+        try(RuntimeFiles.Lock ignored=RuntimeFiles.lock(launches)) {
+            RuntimeWork.check(cancellation);validateState();
+            Path launch=existingDirectory(launches.resolve(plan.generation));
+            RuntimeFiles.require(RuntimeFiles.smallText(launch.resolve(".owner"),256).equals(OWNER+plan.generation+"\n"),
+                "Prepared launch ownership changed; startup settings preserved");
+            Path wtf=existingDirectory(state.resolve("WTF")),target=wtf.resolve(LOCALE_INPUT);
+            String order=LOCALE_INPUT.toUpperCase(Locale.ROOT);int count=0;
+            try(DirectoryStream<Path> children=Files.newDirectoryStream(wtf)) {
+                for(Path child:children) {
+                    RuntimeFiles.require(++count<=MAX_ENTRIES,"Client startup settings inventory exceeds its bound");
+                    String name=child.getFileName().toString(),folded=name.toLowerCase(Locale.ROOT);
+                    if(!folded.startsWith("runonce")||!folded.endsWith(".wtf"))continue;
+                    RuntimeFiles.plain(child);
+                    if(name.equals(LOCALE_INPUT))continue;
+                    RuntimeFiles.require(!name.equalsIgnoreCase(LOCALE_INPUT),"Case-colliding managed startup settings preserved");
+                    // SStrSortUTF8I uses uppercase ASCII sort values, with
+                    // original-case tie breaking. Refuse unsupported Unicode
+                    // ordering and any later input rather than parse its CVars.
+                    for(int i=0;i<name.length();i++)RuntimeFiles.require(name.charAt(i)>=32&&name.charAt(i)<127,
+                        "Additional startup settings have unsupported ordering; existing files preserved");
+                    RuntimeFiles.require(name.toUpperCase(Locale.ROOT).compareTo(order)<0,
+                        "Later startup settings could override the prepared locale; existing files preserved");
+                }
+            }
+            String next=localeInput(effectiveLocale);
+            if(Files.exists(target,LinkOption.NOFOLLOW_LINKS)) {
+                privateRegular(target);String previous=RuntimeFiles.smallText(target,256);
+                boolean owned=false;
+                for(String locale:CLIENT_LOCALES)if(previous.equals(localeInput(locale))){owned=true;break;}
+                RuntimeFiles.require(owned,"Changed managed startup settings preserved");
+                if(previous.equals(next))return arguments;
+            }
+            RuntimeWork.check(cancellation);
+            RuntimeFiles.atomicText(target,next,sync);
+            return arguments;
+        }
+    }
+    private static String localeInput(String locale){return LOCALE_OWNER+"SET locale \""+locale+"\"\n";}
     private void validateState()throws IOException {
         RuntimeFiles.require(RuntimeFiles.smallText(state.resolve(".owner"),128).equals(STATE_OWNER),"Client state ownership changed");
         for(String name:STATE)existingDirectory(state.resolve(name));
@@ -240,7 +291,7 @@ public final class ClientLaunchView {
     }
     private static void privateRegular(Path path)throws IOException {
         RuntimeFiles.plain(path);
-        try{RuntimeFiles.require(((Number)Files.getAttribute(path,"unix:nlink",LinkOption.NOFOLLOW_LINKS)).longValue()==1,"Shared executable file rejected");}
+        try{RuntimeFiles.require(((Number)Files.getAttribute(path,"unix:nlink",LinkOption.NOFOLLOW_LINKS)).longValue()==1,"Shared client file rejected");}
         catch(UnsupportedOperationException unsupported){/* Android may not expose unix:nlink; private copies are never linked by this class. */}
     }
     private static Path ownedDirectory(Path path,String owner)throws IOException {

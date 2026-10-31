@@ -261,6 +261,23 @@ overlays/continuations for the features and world content under test. The first
 classic input permits that independent startup work while those custom features
 remain unqualified. See `runtime/evidence/classic-asset-minimum-471-audit.json`.
 
+The matching server's normal startup is also source-plausible with that complete
+stock input, generated stock DBC/maps/vmaps/mmaps/Cameras and its initialized
+matching database. At pinned `f35f04d01689f034778e3474b3c820092f51e461` plus the
+seven bound adaptations, the audited fatal asset gates check stock starting-area
+maps/vmaps and required base DBCs with stock12340 sentinel rows. The enabled WXL
+hook explicitly accepts an absent or empty continuation directory; race/player
+and bot creation filter available DBC/PlayerInfo/appearance entries. No globally
+fatal custom-catalog/MPQ requirement was found in these inspected paths.
+
+This adds a server source audit to the client-only minimum; it is no world-startup
+or gameplay evidence, and it does not qualify custom races/maps or appearance
+features. Keep the full Esteria objective and matching custom inputs active;
+the unavailable custom bundle need not block a first coherent classic candidate.
+Exact source and seven-patch bindings and the three findings are recorded in
+`runtime/evidence/stock-server-minimum-f35f-audit.json`. No schema, source, feature
+policy or module selection was changed by this audit.
+
 ## Recommended full Esteria input set
 
 Use the complete build 12340 client with its original MPQs and the matching

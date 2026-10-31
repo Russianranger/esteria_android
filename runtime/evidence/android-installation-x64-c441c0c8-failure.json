@@ -1,0 +1,137 @@
+{
+  "actualFourSchemaSqlExecutionEstablished": false,
+  "androidX64CoordinatorQualified": false,
+  "authserverExecuted": false,
+  "characterPersistenceQualified": false,
+  "collectorPhase": "actual-four-schema-coordinator",
+  "completeProductDownloadedLocally": false,
+  "debugApkAndroidTestBuildAndLintPassedInCi": true,
+  "establishedFailure": "The actual device failed InstallationX64Inputs.requireCurrentSelection at line139 while comparing generated provenance byte-count Long values to JSONObject-parsed small Integer values. install() at line62 is called at test line111, before the coordinator, SQL, and failed-app receipt are initialized.",
+  "everySmallArtifactMemberCrcAndSha256Verified": true,
+  "evidenceArtifact": {
+    "bytes": 254449,
+    "id": 13021790737,
+    "sha256": "5510ea1f23a10124d963b7e5f3d714edcd7ecfe313d9c99a08d9ffb62dab120e"
+  },
+  "failureDiagnostics": {
+    "failedAppReceiptUnavailable": true,
+    "formatVersion": 1,
+    "guest": [],
+    "java": {
+      "exceptionTypes": [
+        "java.io.IOException"
+      ],
+      "sourceFrames": [
+        {
+          "className": "io.github.russianranger.esteria.runtime.InstallationX64Inputs",
+          "file": "InstallationX64Inputs.java",
+          "line": 204
+        },
+        {
+          "className": "io.github.russianranger.esteria.runtime.InstallationX64Inputs",
+          "file": "InstallationX64Inputs.java",
+          "line": 139
+        },
+        {
+          "className": "io.github.russianranger.esteria.runtime.InstallationX64Inputs",
+          "file": "InstallationX64Inputs.java",
+          "line": 62
+        },
+        {
+          "className": "io.github.russianranger.esteria.runtime.ServerInstallationX64Test",
+          "file": "ServerInstallationX64Test.java",
+          "line": 111
+        }
+      ]
+    },
+    "qualificationSucceeded": false,
+    "scope": "sanitized-owned-installation-failure-locations-only"
+  },
+  "formatVersion": 1,
+  "freshProviderMeasurementRequired": true,
+  "fullMeasuredProviderAndOriginalSourceAcquisitionPassedInCi": true,
+  "gameplayQualified": false,
+  "historicalJavaServiceEvidenceAppliesToCurrentCaller": false,
+  "hostRegression": {
+    "actualAndroidParserRegressionAddedToFixedTest": true,
+    "actualAndroidParserRegressionExecuted": false,
+    "androidTestCompilationAndLint": {
+      "actionableTasks": 46,
+      "androidExecuted": false,
+      "apkAssembled": false,
+      "command": "./gradlew --offline --no-daemon :app:compileDebugAndroidTestJavaWithJavac :app:lintDebug",
+      "elapsedSeconds": 19,
+      "executedTasks": 10,
+      "passed": true,
+      "upToDateTasks": 36
+    },
+    "covered": "nested object/array identities, Integer and Long boundaries, changed byte count/digest, float/string/boolean type refusal, integer overflow, double rounding, extra keys and array order",
+    "currentSourceInputs": {
+      "app/src/androidTest/java/io/github/russianranger/esteria/runtime/ServerInstallationX64Test.java": {
+        "bytes": 15553,
+        "sha256": "3aa52e1dcfed07baee91f309ef1a1fd786ad329469133ba30f0c3901411c5240"
+      },
+      "app/src/main/java/io/github/russianranger/esteria/runtime/ServerSourceSelection.java": {
+        "bytes": 4167,
+        "sha256": "a657e6318574b030619005e384ef5b79f5c9df640a9f153f42f13b7709f194ea"
+      },
+      "tests/native-java-installation/src/io/github/russianranger/esteria/runtime/NativeJavaInstallation.java": {
+        "bytes": 16415,
+        "sha256": "8a7bd277b14c1cf889fd155986288dc6996561365a356c1af35d7dc9c94b616a"
+      },
+      "tests/native-java-installation/src/io/github/russianranger/esteria/runtime/ServerSourceSelectionNumbers.java": {
+        "bytes": 2643,
+        "sha256": "2eaddb6350b031e130b774590173de2b03e1e964d3f1f09cdb69ab2fcde3d774"
+      }
+    },
+    "exactCleanJsonSourceVerified": true,
+    "fixedComparatorRealParserRegressionPassed": true,
+    "heapMiB": 32,
+    "jsonRepository": "https://github.com/stleary/JSON-java.git",
+    "jsonRevision": "f9b5587c87aaf02e4a5ed1991d48d6c05993624a",
+    "oldComparatorFailureReproducedWithActualParser": true,
+    "oldComparatorRejectedEqual32521LongAndParsedInteger": true,
+    "symmetricComparisonGroups": 16
+  },
+  "nativeSqlReceipt": {
+    "bytes": 19483,
+    "sha256": "44448b43339efeaf6dad1421261c74c9fceab979779d1c70ae8a063907b76fed"
+  },
+  "oldProviderCurrentExecutableSourceAdmissionCorrectlyRefused": true,
+  "originalElfOrRuntimeBytesChanged": false,
+  "originalNativeSqlProofUnchanged": true,
+  "playerbotsAiQualified": false,
+  "producer": {
+    "conclusion": "failure",
+    "integrationRevision": "c441c0c8f8dc8a7ff7008e388cd26684c58c5365",
+    "job": 124372243950,
+    "status": "completed",
+    "workflowRun": 41146327749
+  },
+  "productionArm64ProviderQualified": false,
+  "providerDescriptor": {
+    "bytes": 26368,
+    "sha256": "666e7589d50175510070afe78e5a9af4aa7895928bd97b546370604e246c2359"
+  },
+  "providerMeasurementRevision": "fff2111453ac619d63feb779a67df0e760ee6e41",
+  "rawMembers": {
+    "evidence/qualification.json": {
+      "bytes": 300420,
+      "sha256": "54c7783e010d5b272dab2a8548656575878cf3ffd4bf1fe436d6cd7c9e026bc2"
+    },
+    "evidence/source-companion.json": {
+      "bytes": 282408,
+      "sha256": "029a609e67b1f614d7901fd0d1def43b11d148950b7d7c26d1e08e65e7dfbcf7"
+    },
+    "inputs/acquisition.json": {
+      "bytes": 272000,
+      "sha256": "6d6eb2f5880f4815b96316f7acdc18d18b84803845bd83086c81514fbf2d8e67"
+    }
+  },
+  "scope": "actual-android13-x64-pre-sql-source-identity-failure-and-host-regression",
+  "serverDataQualified": false,
+  "slotPromotionEstablished": false,
+  "sourceFix": "Normalize only Integer/Long pairs through exact longValue equality; retain every object key, digest, value, array order, and other type comparison.",
+  "thorQualified": false,
+  "worldserverExecuted": false
+}

@@ -25,6 +25,45 @@ public final class ClientLaunchViewTests {
         return new RuntimePackagePlan("client-arm64",RuntimeFiles.hashText(identity),"client.tar.gz",128,"f".repeat(64),2,2L<<20,
             new RuntimePackagePlan.Limits(10,2L<<20,4L<<20,4096,1<<20),pins);
     }
+    private static void localeInput(ClientLaunchView views,ClientLaunchView.Plan plan,Path work)throws Exception {
+        Path wtf=work.resolve("client-state/WTF"),config=wtf.resolve("Config.wtf"),input=wtf.resolve(ClientLaunchView.LOCALE_INPUT);
+        byte[] settings=Files.readAllBytes(config);
+        Path early=wtf.resolve("RunOnce-user.wtf");byte[] other="SET farclip \"777\"\r\n".getBytes(java.nio.charset.StandardCharsets.UTF_8);Files.write(early,other);
+        List<String> actual=views.argumentsForLocale(plan,"ruRU",RuntimeWork.NEVER_CANCELLED);
+        check(actual.equals(plan.arguments()));
+        String russian="// Esteria managed startup locale v1\nSET locale \"ruRU\"\n";
+        check(Files.readString(input).equals(russian));check(Arrays.equals(settings,Files.readAllBytes(config)));
+        check(Arrays.equals(other,Files.readAllBytes(early)));
+        check(views.argumentsForLocale(plan,"ruRU",RuntimeWork.NEVER_CANCELLED).equals(actual));
+        // Rejected/cancelled updates retain the previous complete companion.
+        fails(()->views.argumentsForLocale(plan,"ruRU\"\nSET farclip \"0",RuntimeWork.NEVER_CANCELLED));
+        fails(()->views.argumentsForLocale(plan,"deDE",RuntimeWork.NEVER_CANCELLED));
+        fails(()->views.argumentsForLocale(plan,"enUS",()->true));check(Files.readString(input).equals(russian));
+        Path late=wtf.resolve("RunOnce~z.wtf");Files.writeString(late,"SET locale \"enUS\"\n");
+        fails(()->views.argumentsForLocale(plan,"enUS",RuntimeWork.NEVER_CANCELLED));
+        check(Files.readString(input).equals(russian)&&Files.readString(late).contains("enUS"));Files.delete(late);
+        Path unicode=wtf.resolve("RunOnce\u03a9.wtf");Files.writeString(unicode,"SET locale \"enUS\"\n");
+        fails(()->views.argumentsForLocale(plan,"enUS",RuntimeWork.NEVER_CANCELLED));Files.delete(unicode);
+        Path collision=wtf.resolve(ClientLaunchView.LOCALE_INPUT.toLowerCase(Locale.ROOT));
+        Files.move(input,collision);fails(()->views.argumentsForLocale(plan,"enUS",RuntimeWork.NEVER_CANCELLED));
+        check(Files.readString(collision).equals(russian));Files.move(collision,input);
+        Files.writeString(input,"changed startup file must be preserved");
+        fails(()->views.argumentsForLocale(plan,"enUS",RuntimeWork.NEVER_CANCELLED));
+        check(Files.readString(input).equals("changed startup file must be preserved"));Files.delete(input);
+        Files.createSymbolicLink(input,config);fails(()->views.argumentsForLocale(plan,"enUS",RuntimeWork.NEVER_CANCELLED));
+        check(Files.isSymbolicLink(input)&&Arrays.equals(settings,Files.readAllBytes(config)));Files.delete(input);
+        Files.createLink(input,config);fails(()->views.argumentsForLocale(plan,"enUS",RuntimeWork.NEVER_CANCELLED));
+        check(Arrays.equals(settings,Files.readAllBytes(config)));Files.delete(input);
+        // Client471 consumes/deletes this RunOnce file on normal shutdown.
+        // A subsequent launch recreates it or replaces a recognized crash remnant.
+        views.argumentsForLocale(plan,"enUS",RuntimeWork.NEVER_CANCELLED);
+        check(Files.readString(input).endsWith("SET locale \"enUS\"\n"));
+        views.argumentsForLocale(plan,"ruRU",RuntimeWork.NEVER_CANCELLED);check(Files.readString(input).equals(russian));
+        Files.delete(input);views.argumentsForLocale(plan,"ruRU",RuntimeWork.NEVER_CANCELLED);
+        check(Files.readString(input).equals(russian)&&Arrays.equals(settings,Files.readAllBytes(config))&&Arrays.equals(other,Files.readAllBytes(early)));
+        try(var paths=Files.list(wtf)){check(paths.noneMatch(p->p.getFileName().toString().startsWith("."+ClientLaunchView.LOCALE_INPUT+"-")));}
+        System.out.println("PASS: effective ruRU/enUS startup companion, unchanged argv/Config/other settings, crash-remnant/recreation and invalid/cancelled/late/case/link refusal");
+    }
     public static void main(String[] args)throws Exception {
         Path root=Files.createTempDirectory("esteria-launch-tests-");
         try {
@@ -32,6 +71,7 @@ public final class ClientLaunchViewTests {
             RuntimePackagePlan client=client(source,"revision1");Files.createDirectories(imported.resolve("Data/enUS"));
             Files.writeString(imported.resolve("Data/common.MPQ"),"fixture-content-not-a-real-MPQ");
             Files.writeString(imported.resolve("Data/enUS/locale-enUS.MPQ"),"fixture-locale");
+            Files.createDirectories(imported.resolve("Data/ruRU"));Files.writeString(imported.resolve("Data/ruRU/locale-ruRU.MPQ"),"fixture-second-locale");
             Path original=imported.resolve("Data/enUS/realmlist.wtf");Files.writeString(original,"SET realmList \"remote.example\"\n");
             Files.createDirectories(imported.resolve("Fonts"));Files.writeString(imported.resolve("Fonts/FRIZQT__.TTF"),"synthetic-font");
             Files.writeString(imported.resolve("EsteriaItems.bin"),"fixture-catalog");Files.writeString(imported.resolve("EsteriaOff.txt"),"do not import");
@@ -59,6 +99,7 @@ public final class ClientLaunchViewTests {
             check(Files.readString(work.resolve("client-state/WTF/Config.wtf")).equals("user-settings-preserved"));
             check(next.arguments().equals(Arrays.asList("-datadir","Z:\\work\\launch\\"+next.generation,"-vulkan")));
             check(next.environment().get("GX_VULKAN_SHADERS").equals("Z:\\esteria-shaders"));
+            localeInput(views,next,work);
             Path shadow=ready.directory.resolve("Data/enUS/Realmlist.wtf");Files.writeString(shadow,"SET realmList \"remote.invalid\"");
             fails(()->views.prepare(plan,RuntimeWork.NONE,RuntimeWork.NEVER_CANCELLED));Files.delete(shadow);
             Files.createDirectories(imported.resolve("interface/AddOns/Test"));

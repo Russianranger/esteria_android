@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,6 +34,20 @@ import static org.junit.Assume.assumeTrue;
  * No source check, build or native SQL receipt makes this Android test pass. */
 @RunWith(AndroidJUnit4.class)
 public final class ServerInstallationX64Test {
+    private static void verifyParsedSourceIdentity()throws Exception {
+        // Exercise the device's actual JSONObject parser before admitting SQL.
+        JSONObject generated=new JSONObject().put("bytes",32521L).put("sha256","a".repeat(64));
+        JSONObject parsed=new JSONObject(generated.toString());
+        assertTrue(generated.get("bytes") instanceof Long);assertTrue(parsed.get("bytes") instanceof Integer);
+        assertTrue(ServerSourceSelection.sameJson(generated,parsed));assertTrue(ServerSourceSelection.sameJson(parsed,generated));
+        assertTrue(ServerSourceSelection.sameJson(new JSONArray().put(32521L).put(Long.MAX_VALUE),
+            new JSONArray("[32521,9223372036854775807]")));
+        assertFalse(ServerSourceSelection.sameJson(generated,new JSONObject(parsed.toString()).put("bytes",32521.0)));
+        assertFalse(ServerSourceSelection.sameJson(generated,new JSONObject(parsed.toString()).put("bytes","32521")));
+        assertFalse(ServerSourceSelection.sameJson(generated,new JSONObject(parsed.toString()).put("sha256","b".repeat(64))));
+        assertFalse(ServerSourceSelection.sameJson(Integer.valueOf(-1),Long.valueOf(4294967295L)));
+        assertFalse(ServerSourceSelection.sameJson(Long.valueOf(9007199254740993L),Double.valueOf(9007199254740992.0)));
+    }
     private static String privateHash(Path file)throws IOException {
         assertTrue(Files.isRegularFile(file,LinkOption.NOFOLLOW_LINKS));assertEquals(file,file.toRealPath());
         try(InputStream input=Files.newInputStream(file,LinkOption.NOFOLLOW_LINKS)) {
@@ -99,6 +114,7 @@ public final class ServerInstallationX64Test {
     }
     @Test public void actualAndroidCoordinatorInitializesFourSchemasPromotesAndRestarts()throws Exception {
         assumeTrue(BuildConfig.SERVER_INSTALLATION_PROBE_PACKAGED);
+        verifyParsedSourceIdentity();
         Context context=InstrumentationRegistry.getInstrumentation().getTargetContext();
         assertTrue(BuildConfig.DEBUG);assertEquals(33,Build.VERSION.SDK_INT);assertEquals(35,context.getApplicationInfo().targetSdkVersion);
         Path root=context.getFilesDir().getCanonicalFile().toPath();

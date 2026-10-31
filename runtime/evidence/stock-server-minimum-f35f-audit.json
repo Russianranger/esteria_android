@@ -1,0 +1,16 @@
+{
+  "formatVersion":1,
+  "scope":"source-only-stock12340-server-minimum-audit",
+  "serverRevision":"f35f04d01689f034778e3474b3c820092f51e461",
+  "adaptationLock":["runtime/server/server-build-sources.lock.json","5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"],
+  "patchPrefix":"patches/server/",
+  "patches":{"0001-eluna-declare-area-trigger.patch":"c26b145188c5f97bf30d032e1fe3bd7fe17aa1f8f0daa6793e51f5d830fe7aa6","0002-eluna-include-map-manager.patch":"4e277dbe56c31ae30640c8e9ad4dee12e944e0f051d9bdc8d62aaa239c50433f","0003-eluna-hooks-include-types.patch":"5999402d985fcc709abdc90bb4272072d1d5e3e261b2cc7ec19460320c14295f","0004-attunement-stat-api.patch":"d9ef6ca8f96ab186c37c072b22143cdded9976aa3a62d083f893c502a5745cb8","0005-script-grid-templates.patch":"6b459c90839e7831df8533966442fabd476ae1773f0302c50ccc8a997f157369","0006-empty-script-modules.patch":"ea0beb357c71d8b8c187af9d4afede520e7ac9877e40fbdc5fab99d54fc21f97","0007-runtime-module-config-directory.patch":"5e41d474179ef553ec9c2544de947a3724885fd7f3ac233af3d89797acd032ff"},
+  "sourceFiles":{"world":["src/server/game/World/World.cpp","038c6b2d11ba12b3efa97d5874009a15535bad6e4779bb68b4433b7d79c0dc40"],"dbc":["src/server/game/DataStores/DBCStores.cpp","d83093815f834c562fdd10d82bfb2748322415fad4924e21c33842f79c466168"],"wxl":["modules/mod-wxl-dbc/src/WxlDbcLoader.cpp","79aa6f75c97ccfb2b1f5d04e5dd7dd5c42d3587b085f22d4fe17072ac793c234"],"race":["src/server/game/Entities/Player/RaceMgr.cpp","6189069d90fa5848e65bd2102b578148b0a42ec44b7b5b020d36a0febe9edb48"],"players":["src/server/game/Globals/ObjectMgr.cpp","4e6e440e3b50fece00e36aa5a5c53cb8fb8eaaef3646b9cbb0f3dd8b276d4030"],"bots":["modules/mod-playerbots/src/Bot/Factory/RandomPlayerbotFactory.cpp","b4580a1418279ee662fcad9e644eda8e2faf1dff06b09a56c37a1383e44812f2"]},
+  "findings":[{"at":["world:348-361","dbc:660-687"],"result":"Fatal asset gates cover stock starting maps/vmaps and base DBC/12340 sentinel rows; no custom asset is named."},{"at":["wxl:19-45"],"result":"Enabled WXL hook returns normally when dbc-continuations is absent or empty."},{"at":["race:47-80","players:4393-4424","bots:133-151,171-172,828"],"result":"Available DBC races/classes and PlayerInfo/appearance filter creation; missing custom rows do not themselves require custom assets at global startup."}],
+  "conclusion":"With matching initialized DB and complete generated stock data, a classic candidate is source-plausible; unavailable Esteria assets are not a demonstrated global boot blocker.",
+  "inferenceOnly":true,
+  "worldStartupExecuted":false,
+  "gameplayQualified":false,
+  "customFeaturesQualified":false,
+  "sourceOrSchemaChanged":false
+}

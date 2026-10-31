@@ -2,7 +2,7 @@
 
 A local client/server application for AYN Thor Max, in active bring-up. Target: Android 13 ARM64 / Snapdragon 8 Gen 2 / Adreno 740. Gameplay will use the reconstructed Esteria client, local server and MySQL 8, with no network dependency after setup.
 
-**No playable Android package is qualified yet.** Internal launcher APKs test import/UI/lifecycle only. Current source pins and validation evidence are in [STATUS.md](STATUS.md).
+**No playable Android package is qualified yet.** Complete runtime APKs build, and service, import, controls and recovery components have separate host/emulator evidence. Normal game startup and world gameplay still require qualification with imported data. Current source pins and validation evidence are in [STATUS.md](STATUS.md).
 
 - [Implementation plan](ANDROID-PORT-PLAN.md)
 - [Build instructions](BUILDING.md)

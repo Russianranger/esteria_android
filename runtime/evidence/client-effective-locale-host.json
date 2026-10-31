@@ -1,0 +1,105 @@
+{
+  "behavior": {
+    "actualLaunchArgumentsUnchanged": true,
+    "caseAndLateOrderingConflictsRefused": true,
+    "configurationFileReadOrRewritten": false,
+    "effectiveLocaleSource": "ShaderSetup.Result.locale, already matched to ServerDataBinding.effectiveLocale; requestedLocale is not used",
+    "engineOrProviderPinsChanged": false,
+    "existingLaunchAndStateOwnershipChecked": true,
+    "fixedCompanion": "client-state/WTF/RunOnce~EsteriaLocale.wtf",
+    "linkedOrSharedManagedInputRefused": true,
+    "managedBodyMustMatchKnownCanonicalTemplate": true,
+    "otherStartupFileContentsReadOrRewritten": false,
+    "ownedMarker": "// Esteria managed startup locale v1",
+    "payload": "One fixed SET locale line with an exact allowed client tag; no arbitrary CVar/parser extension.",
+    "unsupportedUnicodeStartupOrderingRefused": true,
+    "writeUsesExistingForcedFileAndAtomicRename": true
+  },
+  "exactSelectedClientSourceInputs": {
+    "Engine/Source/ConsoleBase/ConsoleVar.cpp": {
+      "bytes": 22890,
+      "sha256": "7f58d0e9359153cbdd09589a3ca7b3ac52a7926b0bc25c97d37e4bcfab3cf361"
+    },
+    "Engine/Source/Storm/Source/SStr.cpp": {
+      "bytes": 26686,
+      "sha256": "eff4d50bbdb245c50a901f7bc729f4f6f3e7999215606441b3dc3efe4286f29e"
+    },
+    "WoW/Source/Client.cpp": {
+      "bytes": 73746,
+      "sha256": "1c656a2432cfb6aa485c8d56a973d604147b37ead064b19e2a5322b71fa91787"
+    },
+    "WoW/Source/Client_CVar.cpp": {
+      "bytes": 25852,
+      "sha256": "9865c6a19330e019909c8514feafd3c608523d80f92e295d9469fd7f7c838718"
+    }
+  },
+  "executionBoundary": {
+    "androidClientLocaleExecuted": false,
+    "cppCvarParserExecutedHere": false,
+    "deviceTestCandidate": false,
+    "gameLoginQualified": false,
+    "gameplayQualified": false,
+    "hardwareQualified": false,
+    "normalCommonMainExecuted": false,
+    "realClientAssetsUsed": false,
+    "wineClientLocaleExecuted": false,
+    "worldEntryQualified": false
+  },
+  "existingClientContract": {
+    "initialization": "Client.cpp1720-1750: Config.wtf, ForEveryRunOnceWTF/CVar::Load, locale registration/fallback, OpenArchives",
+    "lineParser": "ConsoleVar.cpp208-251: only SET lines execute; other lines including owner marker are ignored",
+    "normalConsumption": "Client.cpp1819-1823 invokes CVar::Delete; ConsoleVar.cpp279-296 deletes the file with WTF fallback",
+    "ordering": "SStr.cpp265-300 and386-410: uppercase ASCII primary sort and original-case tie breaking",
+    "registration": "ConsoleVar.cpp784-812 retains loaded value when LocaleCallback accepts it; Client_CVar.cpp639-643 accepts/copies locale.",
+    "runOnceEnumeration": "Client.cpp1679-1695: WTF/RunOnce*.wtf and SStrSortUTF8I qsort"
+  },
+  "formatVersion": 1,
+  "hostValidation": {
+    "actionableTasks": 39,
+    "actualFilesystemFixturePassed": true,
+    "appJavaCompiled": true,
+    "appLintPassed": true,
+    "completionLog": {
+      "bytes": 2602,
+      "sha256": "6db68c8d4fc98bfefe466e755c7bc3ccb96ccc76add3b4679751ff1de08d377e"
+    },
+    "coreTestMaximumHeapBytes": 33554432,
+    "executedTasks": 13,
+    "gradleBuildLine": "BUILD SUCCESSFUL in 22s",
+    "gradleCommand": "env JAVA_HOME=/workspace/scratch/6ba4742880b1/toolchain/jdk/usr/lib/jvm/java-17-openjdk-amd64 ANDROID_HOME=/workspace/scratch/6ba4742880b1/toolchain/android-sdk GRADLE_OPTS= ./gradlew --offline --no-daemon --init-script /tmp/esteria-wine-profile-xdyphqjf/outputs.gradle :core:clientLaunchViewTest :app:compileDebugJavaWithJavac :app:lintDebug",
+    "scenarios": [
+      "Two installed locale paths: ruRU companion with original argv",
+      "enUS update and recognized crash-remnant replacement",
+      "Recreation after modeled normal client deletion",
+      "Config.wtf and another early RunOnce file remain byte-identical",
+      "Invalid/absent locale and cancelled update preserve prior complete input",
+      "Later startup, Unicode ordering, case collision and changed managed-body refusal",
+      "Symlink and hardlink refusal without Config.wtf mutation",
+      "No abandoned atomic-writer temporary files"
+    ],
+    "upToDateTasks": 26
+  },
+  "integrationHeadAtObservation": "c441c0c8f8dc8a7ff7008e388cd26684c58c5365",
+  "observedAtUtc": "2026-10-31T00:00:18.888747+00:00",
+  "scope": "host-effective-client-locale-startup-companion-and-app-compile",
+  "selectedClientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "sourceSnapshotExact": false,
+  "testedWorktreeInputs": {
+    "app/src/main/java/io/github/russianranger/esteria/presentation/ClientPresentationSession.java": {
+      "bytes": 25096,
+      "sha256": "88bbedb64dfe510750cf29426f8b6b898dc2ddffdc4a224a7b44e41993d2d902"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ClientLaunchView.java": {
+      "bytes": 26210,
+      "sha256": "a7aea548e92bb85c48e59b4d440cf4db6d48bf29b7e3f0ad27d5664f21cb6ccf"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/install/ClientLaunchViewTests.java": {
+      "bytes": 14526,
+      "sha256": "ba7910231baaf3a17c6db29b0904399266ee5ab0703c9425fd6cfefe84975c9e"
+    },
+    "runtime/client/LAUNCH-VIEW.md": {
+      "bytes": 12101,
+      "sha256": "77a02b8a2dcd8768ee84ac7706dd80d2e61713dcbbecf6b447dca1f7ba1dc1e1"
+    }
+  }
+}

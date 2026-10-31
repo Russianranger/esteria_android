@@ -35,8 +35,8 @@ content is present without an active reviewed writable UI selection**.
 constructor accepts only a typed `ClientUiStore.Selection`; it binds the exact
 import/root/work store and is revalidated before preparation and argument use.
 See [WRITABLE-UI.md](WRITABLE-UI.md). A preparation result alone is not permission
-to skip this gate. The selected client
-`0f931bbade36a4b197725d691b8eff7caea7b3be` implements the separately reviewed
+to skip this gate. The earlier client
+`0f931bbade36a4b197725d691b8eff7caea7b3be` introduced the separately reviewed
 `--local-offline` policy. `Plan.arguments()` still does not add that flag or start
 the client. A future admitted full-client session must require the matching
 offline-capable provider, explicitly add the flag and qualify that Android
@@ -79,8 +79,36 @@ other environment settings, prefix, home and display/audio session locations.
 
 ## Source audit and loopback configuration
 
+The current admitted application launch also calls
+`argumentsForLocale(plan, shaders.locale, cancellation)` while the session keeps
+the stopped client/import leases. This writes the fixed private
+`client-state/WTF/RunOnce~EsteriaLocale.wtf` with a version marker and one
+`SET locale "<effective-locale>"` line. It returns the same `-datadir`/`-vulkan`
+arguments and does not read or rewrite `Config.wtf`, saved variables, imported
+files or other RunOnce contents. The effective locale comes from the matched
+completed data/shader results, including requested-language fallback.
+
+At selected client `471ee42faadf4a97a1d0a86989cf1452621f2dc5`,
+`WoW/Source/Client.cpp:1720–1750` loads Config, then sorted `RunOnce*.wtf` files,
+then registers/selects the locale before opening archives. `ConsoleVar.cpp`
+executes only SET lines, preserves a loaded locale during registration, and
+deletes RunOnce files during normal shutdown through `CVar::Delete`.
+`SStrSortUTF8I` supplies uppercase ASCII primary ordering with original-case
+tie breaking. The companion must sort after all other admitted RunOnce files;
+later, case-colliding, linked or unsupported-Unicode startup inputs fail with
+the existing files preserved. The app does not parse other files' settings.
+
+The companion uses the existing forced-file/atomic-rename metadata writer. A
+recognized complete companion left by interrupted startup can be replaced for
+the next selected locale; a changed/unowned body is preserved and refused.
+Normal client deletion is handled by recreating the companion on the next
+launch. Invalid/cancelled updates leave prior settings untouched. Host tests use
+two synthetic locale providers and real private files to check this behavior;
+they do not establish actual asset-backed CommonMain or Android/Wine locale
+execution. See `runtime/evidence/client-effective-locale-host.json`.
+
 The original writable-path audit used reconstructed client
-`69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa`. The selected provider now uses
+`69ccfaa6a0dd01607d0a99be9b27b7b25dafc5aa`. An earlier admitted provider used
 `0f931bbade36a4b197725d691b8eff7caea7b3be`; the path/overlay requirements remain,
 with the additional opt-in policy in `Engine/Source/Platform/LocalOffline.h` and
 the actual command parser. Asset-free native Windows and ARM64 Linux Wine
@@ -105,7 +133,7 @@ the game or qualify Android gameplay.
 - The audited C++ source does not define `patchlist`, `loginserver`, or
   `patchprompt` CVars. Adding those strings would not implement an offline
   policy. The default client retains server-alert, streaming, patch, Battle.net
-  and extension network paths. The selected 0f revision adds explicit local-offline
+  and extension network paths. The earlier 0f revision introduced explicit local-offline
   controls; callers must actually enable that mode. Empty configuration values
   alone do **not** prove zero external traffic.
 - Root `WoW.mfil`, updater executables and imported `Config.wtf` are not added to

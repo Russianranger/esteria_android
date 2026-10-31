@@ -8,7 +8,7 @@ server-repository writes or preliminary Thor APK requests.
 
 ## Exact source and delivery identity
 
-- App:Russianranger/esteria_android, android/client-server. Published reference checkpointf44f854099f9abd70fd722633663e587278d5c0d; functional runtime changes84fa637867ad6c2c916a455c703e577cd60a298c. Fetch current state before editing.
+- App:Russianranger/esteria_android, android/client-server. Published diagnostic checkpointc441c0c8f8dc8a7ff7008e388cd26684c58c5365; functional runtime changes84fa637867ad6c2c916a455c703e577cd60a298c. Fetch current state before editing.
 - Package:io.github.russianranger.esteria. Private stable signing is backed up; public certificate:app/development-signing.lock.json. No delivered update baseline.
 - Selected client binary:471ee42faadf4a97a1d0a86989cf1452621f2dc5.
 - Client development:Russianranger/wowdecomp_esteria, android/arm64-port atc8b0ab201f52e18ffaba1e6c55aad6e26c740251. Allfive41131932778 jobs pass. Complete Retail-ON Windows ARM64/x64 passes41127220146 atceb; source readback retained. Do not advance app/cohort pins without deliberate requalification.
@@ -46,21 +46,28 @@ Large source/build artifacts are fully verified in CI; label local-read boundari
    checked. Descriptor26368B SHA666e7589d50175510070afe78e5a9af4aa7895928bd97b546370604e246c2359.
    Complete artifact13019200327 is1,969,017,146B and NOT read locally; full CI
    source/product readback and mandatory downstream acquisition remain explicit.
-   Measured provider/transport selectors are enabled. Actual Android995 run
-   41143986520/job124364696182 passes complete source/product admission, build,
-   install and fresh emulator checks, then fails instrumentation after50.059s.
-   Its old collector lost the failed app receipt/raw assertion; do not invent a
-   SQL phase. See android-installation-x64-9959658f-failure.json. Qualifier-only
-   diagnostics now collect bounded validated phase/class/source frames before
-   force-stop; all82 measured code pins remain identical. Run the fresh workflow,
-   inspect this exact failure, implement its real fix and rerun. Do not remeasure
-   unchanged provider bytes or claim Android success from build/admission jobs.
+   Actual995 and c441 Android runs pass full admission/build/install but fail
+   before SQL. c441's improved collector isolates InstallationX64Inputs:139:
+   parsed Integer byte counts compare unequal to identical generated Long counts.
+   ServerSourceSelection now normalizes only exact Integer/Long values, retaining
+   hash/count/type/overflow distinctions. Real JSON-java parser regression and
+   actual Android-parser assertions are added; native Java runs the same check.
+   The changed code requires a fresh P measurement. Both selectors are pending/
+   disabled; original native SQL and runtime bytes are unchanged. Read the new
+   measured artifact, activate exact P pins, then rerun Android SQL. Do not
+   transfer the oldfff caller proof or rebuild original1850-object tools.
 4. Android input-widget41138732113@50123a9 passes eight required groups and
    optional real registered-device ranges/camera/EOF cleanup. Preserve its actual
    proof and earlier1180 toolbar/IME-window failure. Kernel/physical delivery,
    production panel session, Wine/X11/ARM64/gameplay are still false. No rerun of
    the green component is needed without a relevant change.
-5. Continue real data/gameplay gates below; do not request a basic Thor startup test.
+5. Effective locale now reaches client471 through its fixed owned RunOnce
+   companion; Config.wtf and other settings stay untouched. Focused real-file
+   tests and Java/lint pass. Actual CommonMain/Wine consumption remains open.
+6. Continue real data/gameplay gates below; do not request a basic Thor startup test.
+   The additional stock-server-minimum source audit found no demonstrated global
+   custom-asset boot requirement. Complete original12340 Data/one locale remains
+   the practical first input; this is no world-startup execution evidence.
 
 ## Completed evidence to preserve
 

@@ -51,6 +51,11 @@ final class ServerSourceSelection {
             for (int i = 0; i < a.length(); i++) if (!sameJson(a.get(i), b.get(i))) return false;
             return true;
         }
+        // JSON integers have no Java wrapper width. Android parses small
+        // counts as Integer, while file metadata is supplied as Long.
+        if ((left instanceof Integer || left instanceof Long) &&
+                (right instanceof Integer || right instanceof Long))
+            return ((Number) left).longValue() == ((Number) right).longValue();
         return left.equals(right);
     }
 

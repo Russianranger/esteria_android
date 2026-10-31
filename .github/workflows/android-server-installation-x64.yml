@@ -47,6 +47,7 @@ on:
       - tools/qualify_android_installation_x64.py
       - tests/test_android_installation_x64*.py
       - .github/workflows/android-server-installation-x64.yml
+      - app/src/main/java/io/github/russianranger/esteria/runtime/ServerSourceSelection.java
 permissions:
   contents: read
   actions: read

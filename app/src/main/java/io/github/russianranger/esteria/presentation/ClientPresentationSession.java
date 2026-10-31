@@ -10,6 +10,8 @@ import android.system.StructStat;
 import io.github.russianranger.esteria.core.presentation.InputSink;
 import io.github.russianranger.esteria.core.presentation.X11SessionPlan;
 import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
+import io.github.russianranger.esteria.core.runtime.install.ClientLaunchView;
+import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
 import io.github.russianranger.esteria.core.runtime.process.ProotLaunch;
 import io.github.russianranger.esteria.runtime.GuestBridgeSetup;
@@ -202,7 +204,8 @@ public final class ClientPresentationSession implements AutoCloseable {
                     !view.plan.importedGeneration.equals(shaders.importGeneration)||!provider.sourceRevision().equals(shaders.clientRevision))
                 throw new IOException("Current matched reconstructed client, view and shaders required");
             List<String> command=new ArrayList<>();command.add("/opt/wine/bin/wine");command.add(view.plan.windowsExecutable());
-            command.addAll(view.plan.arguments());command.addAll(provider.localLoginArguments());
+            command.addAll(new ClientLaunchView(view.work).argumentsForLocale(view.plan,shaders.locale,RuntimeWork.NEVER_CANCELLED));
+            command.addAll(provider.localLoginArguments());
             Map<String,String> environment=new java.util.TreeMap<>(wineEnvironment());environment.putAll(view.plan.environment());
             List<ProotLaunch.Mount> mounts=clientMounts(view.importedData,shaders.shaders,prepared.bridgeRoot);
             if(turnip!=null) {

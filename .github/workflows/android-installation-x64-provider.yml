@@ -13,6 +13,7 @@ on:
       - app/src/androidTest/**/InstallationX64*.java
       - app/src/androidTest/**/ServerInstallationX64Test.java
       - .github/workflows/android-installation-x64-provider.yml
+      - app/src/main/java/io/github/russianranger/esteria/runtime/ServerSourceSelection.java
 permissions:
   contents: read
   actions: read

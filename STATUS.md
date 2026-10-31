@@ -1,6 +1,6 @@
 # Status
 
-Updated2026-10-30UTC. Autonomous development continues. No Thor gameplay
+Updated2026-10-31UTC. Autonomous development continues. No Thor gameplay
 candidate has been delivered or requested. No supported weekly-usage meter is
 exposed; stop if the user reports the requested50% threshold.
 
@@ -87,18 +87,16 @@ qualify exclusive cache publication or ARM64 semantics.
 1. Original x64 build41119182502 and actual native SQL41139757153 pass. Source/
    debug/runtime preservation is complete; original868MB component is fully
    admitted in CI, while local readback is bounded to source/receipt evidence.
-2. Provider measurement41141559961@fff211 passes full original source/runtime
-   acquisition, product construction and independent readback/seal. Six bounded
-   receipts and82P/current-code pins are independently read;1,969,017,146B complete
-   artifact remains local-metadata-only. Descriptor SHA666e7589d50175510070afe78e5a9af4aa7895928bd97b546370604e246c2359.
-   Genuine measured provider/transport selectors are now enabled for the test-only
-   Android four-schema fixture. Actual run41143986520@995 passes full source/
-   product acquisition, APK build/install and emulator admission, then fails
-   instrumentation after50.059s. The original collector discarded the private
-   failure before reading its receipt; exact SQL phase is unknown. The preserved
-   negative proof and qualifier-only bounded phase/source-frame collector fix
-   support a fresh rerun. All82 measured code pins remain byte-identical; production
-   ARM64 admission and five save-selection fields remain unchanged.
+2. Historical provider measurement41141559961@fff211 passes complete original
+   source/runtime acquisition, construction and readback. Actual Android995 and
+   c441 runs pass full acquisition/build/install but fail before SQL. Improved
+   c441 diagnostics identify an Integer/Long JSON byte-count comparison at
+   InstallationX64Inputs:139. The narrow source-comparator fix passes a real
+   parser negative control/regression; the fixed Android test also checks its
+   actual parser before setup. Fresh provider measurement is required because
+   the caller code changed: selectors are intentionally provider-pending with
+   APK execution disabled. Original native SQL/ELF/runtime bytes remain unchanged.
+   Keep historicalfff proofs; admit the fresh measured P before Android rerun.
 3. Preserve actual Android input-widget41138732113 success and its prior test-
    toolbar failure. Physical controller/kernel input, Wine and gameplay remain
    separate gates.

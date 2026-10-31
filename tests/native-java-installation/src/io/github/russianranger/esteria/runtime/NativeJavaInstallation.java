@@ -111,6 +111,7 @@ public final class NativeJavaInstallation {
         if(failure!=null)throw failure;
     }
     public static void main(String[] args)throws Exception {
+        ServerSourceSelectionNumbers.verify();
         if(args.length!=3)throw new IllegalArgumentException("canonical-assets new-private-root new-public-result required");
         Path assets=Path.of(args[0]),root=Path.of(args[1]),output=Path.of(args[2]);
         require("Linux".equals(System.getProperty("os.name"))&&"aarch64".equals(System.getProperty("os.arch")),"Native Linux ARM64 required");
