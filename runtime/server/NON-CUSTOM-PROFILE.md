@@ -21,6 +21,9 @@ The stock projection excludes:
   `rev_20260929001000000.sql` DDL required by the compiled race loader.
 - World SQL from `mod-custom-server`, `mod-classless-wildcard` and
   `mod-worgoblin-high-elf`.
+- Individual Progression world SQL, which replaces stock outfits and restores
+  Vanilla-era quests/NPC stats even when its runtime configuration is disabled.
+  Its character schema remains available to the compiled module.
 - Battlemon's separate `data/sql/world` custom actor/model scripts. Its
   `data/sql/db-world` catalog schemas remain for the unconditional catalog loader.
 - The transmog NPC/summoner script that includes custom client spell 200100.
@@ -41,10 +44,15 @@ partial or existing saves; repeats verify completed journals without SQL replay.
 ## Runtime content policy
 
 All compiled configuration files remain present and hash checked. Source-supported
-options disable WXL DBC continuations, classless gameplay, challenge modes,
+options disable WXL DBC continuations, classless gameplay, Individual Progression, challenge modes,
 Battlemon/battles/overworld, transmog UI, external bridges and unqualified Lua.
 Other asset-independent modules remain configured. Bot population/autologin are
 off; bot AI qualification is deferred.
+
+Individual Progression's unconditional `OnAfterConfigLoad` overrides are also
+disabled separately: SimpleConfigOverride, MaxMonsterSight, DisableQuestMarkers
+and DisableRDF. This retains the main source configuration's Wrath regeneration,
+breathing timer, item-attribute validation and quest markers.
 
 After actual updater execution and on completed setup verification, live SQL
 queries require empty ChrRaces, ChrClasses, Map and CharStartOutfit overlay tables,

@@ -1,0 +1,177 @@
+{
+  "formatVersion": 1,
+  "scope": "exact-source-retained-world-sql-and-individual-progression-stock-policy-audit",
+  "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
+  "sqlExecuted": false,
+  "worldserverExecuted": false,
+  "runtimeGameplayQualified": false,
+  "retainedBodyScan": {
+    "policyBoundary": "Original stock-world-source-selection-v1 projection before IndividualProgression exclusions; all source modules with SQL were confirmed to have committed src/ directories. Compiled selection itself is qualified elsewhere.",
+    "fileCount": 3219,
+    "regularFileBytes": 258703533,
+    "orderedIdentitySha256": "d6bad8a7dba5631d26aa1cc3b9b3374f607e5b9dd3c1e40190d73d22410ef966",
+    "orderedIdentityEncoding": "UTF-8 json.dumps(rows,sort_keys=True,separators=(comma,colon)), no newline; rows sorted ascending by path; each row has path,gitBlob,bytes,sha256",
+    "identityInventoryFile": "stock-sql-retained-v1-f35f-identities.json",
+    "scan": "git grep -n -I -i -E chrraces_dbc|chrclasses_dbc|map_dbc|charstartoutfit_dbc HEAD -- <all ordered paths>; exact Git blobs fetched and fully SHA-256-read",
+    "matchingPaths": [
+      "data/sql/archive/db_world/2023_04_27_02.sql",
+      "data/sql/archive/db_world/2023_04_29_01.sql",
+      "data/sql/updates/db_world/2026_09_03_00.sql",
+      "modules/mod-individual-progression/data/sql/world/base/player_starting_gear.sql"
+    ],
+    "matchingSourceLineCount": 10,
+    "findings": [
+      {
+        "path": "modules/mod-individual-progression/data/sql/world/base/player_starting_gear.sql",
+        "lines": [
+          1,
+          2,
+          3
+        ],
+        "result": "Only retained INSERT/REPLACE source matching the four guarded overlay names: deletes outfit IDs1..346 and inserts source-authored Vanilla-era outfits, including Human Warrior ID1 with item25/2362/117; conflicts with the branch policy that actual stock CharStartOutfit DBC is authoritative."
+      },
+      {
+        "path": "data/sql/updates/db_world/2026_09_03_00.sql",
+        "lines": [
+          1,
+          6
+        ],
+        "result": "Updates Worgen row12 in ChrRaces only; creates no row when the stock overlay is empty. Removes two obsolete custom-race starting spells."
+      },
+      {
+        "path": "data/sql/archive/db_world/2023_04_27_02.sql",
+        "lines": [
+          2,
+          3
+        ],
+        "result": "Drops/recreates ChrRaces SQL table; no INSERT."
+      },
+      {
+        "path": "data/sql/archive/db_world/2023_04_29_01.sql",
+        "lines": [
+          19,
+          94
+        ],
+        "result": "Drops/recreates/deletes empty ChrRaces SQL table; no INSERT."
+      }
+    ]
+  },
+  "sourceFiles": {
+    "modules/mod-individual-progression/data/sql/world/base/player_starting_gear.sql": {
+      "bytes": 30544,
+      "sha256": "66b14722f68b9e6eadd0c6b4bb62478e2d22c0962f66da0e10f80d4c6bf1c52e",
+      "gitBlob": "fecbde51975bec17e99238ef9c1ce7d3122a3c83"
+    },
+    "modules/mod-individual-progression/conf/individualProgression.conf.dist": {
+      "bytes": 24182,
+      "sha256": "bb3126c0905ae96fca1b21c8faed0c72d37b3dae4f93fff90a634163848eb977",
+      "gitBlob": "441ca84578407f01b66c8bbd8290c02320d09f27"
+    },
+    "modules/mod-individual-progression/src/IndividualProgression.cpp": {
+      "bytes": 49190,
+      "sha256": "ec61b0e011f00750faaedd8c2f57d5f2666bb00dffdebd55575d04eb636927c1",
+      "gitBlob": "67c926e2eda362ad09124e82b351fe1d4e1e7587"
+    },
+    "modules/mod-individual-progression/src/IndividualProgressionPlayer.cpp": {
+      "bytes": 71086,
+      "sha256": "ea267e24e61e63e57c0733aa2d7626df68cf3093c5bd418e43ca37da1f2574b3",
+      "gitBlob": "e60797f488c730b24029b870b2e3b44962287661"
+    },
+    "modules/mod-individual-progression/src/IndividualProgressionAwareness.cpp": {
+      "bytes": 24856,
+      "sha256": "a132c8fa1dad21a85b314db2cd0a5bf11044cec99564ba2e0e698f5c6cccd76f",
+      "gitBlob": "5585c342b5a4d2fd4884e158711eb6c440a19873"
+    },
+    "modules/mod-individual-progression/data/sql/world/base/00_cleanup.sql": {
+      "bytes": 6173,
+      "sha256": "c5745ffe9b7452e0a946547b099fde09bf4b88f0259bcfab54184c30f8e8d93d",
+      "gitBlob": "77c80da1a524c584418a47162cb3ce41be8405bf"
+    },
+    "data/sql/updates/db_world/2026_09_03_00.sql": {
+      "bytes": 397,
+      "sha256": "733d40eb73ea634d947b048fb8ac8ef207ece1ee5fd49fbb87fc06ec990f66dd",
+      "gitBlob": "56f4a48668783457f28e2602513665f29e9b0765"
+    }
+  },
+  "individualProgressionPolicy": {
+    "configuration": {
+      "key": "IndividualProgression.Enable",
+      "default": 1,
+      "templateLines": [
+        11,
+        21
+      ],
+      "sourceRead": {
+        "path": "modules/mod-individual-progression/src/IndividualProgression.cpp",
+        "line": 1036
+      }
+    },
+    "disableBoundary": "Enable=0 guards many player/progression handlers but is not a complete module disable. Source template explicitly states SQL changes remain even after config disable.",
+    "guardedBehaviors": [
+      {
+        "path": "modules/mod-individual-progression/src/IndividualProgressionPlayer.cpp",
+        "lines": [
+          20,
+          23
+        ],
+        "result": "OnPlayerLogin returns immediately when enabled is false."
+      },
+      {
+        "path": "modules/mod-individual-progression/src/IndividualProgressionPlayer.cpp",
+        "lines": [
+          97,
+          118
+        ],
+        "result": "Quest XP override and XP cap hook return when enabled is false."
+      },
+      {
+        "path": "modules/mod-individual-progression/src/IndividualProgression.cpp",
+        "lines": [
+          105,
+          108
+        ],
+        "result": "CheckAdjustments returns when enabled is false."
+      },
+      {
+        "path": "modules/mod-individual-progression/src/IndividualProgression.cpp",
+        "lines": [
+          1096,
+          1115
+        ],
+        "result": "LoadXpValues queries custom_quest_xp only when enabled&&questXpFix, so excluded IP world table is not an initial loader dependency with Enable=0."
+      }
+    ],
+    "unguardedConfigOverrides": {
+      "path": "modules/mod-individual-progression/src/IndividualProgression.cpp",
+      "lines": [
+        1126,
+        1148
+      ],
+      "result": "OnAfterConfigLoad lacks enabled check. It independently changes world water breathing, player settings, regen, DBC item enforcement, monster sight, RDF and quest markers/sparkles based on four feature flags.",
+      "requiredStockOverrides": {
+        "IndividualProgression.Enable": 0,
+        "IndividualProgression.SimpleConfigOverride": 0,
+        "IndividualProgression.MaxMonsterSight": 0,
+        "IndividualProgression.DisableRDF": 0,
+        "IndividualProgression.DisableQuestMarkers": 0
+      },
+      "templateKeyLines": {
+        "IndividualProgression.Enable": 21,
+        "IndividualProgression.SimpleConfigOverride": 187,
+        "IndividualProgression.DisableQuestMarkers": 196,
+        "IndividualProgression.DisableRDF": 206,
+        "IndividualProgression.MaxMonsterSight": 218
+      }
+    },
+    "sqlDisableBoundary": {
+      "path": "modules/mod-individual-progression/conf/individualProgression.conf.dist",
+      "lines": [
+        13,
+        16
+      ],
+      "result": "Template explicitly documents that world database changes (restored Vanilla quests/NPC stats) remain after disabling; omitting only player_starting_gear is insufficient for an ordinary Wrath world."
+    },
+    "recommendedSourceSelection": "Omit IP module world SQL for a fresh stock profile while retaining source-verified character schema inputs required by compiled code. Preserve all excluded original packaged files. Seal the five listed source-supported configuration keys at0.",
+    "qualification": "Source policy audit; no actual world/character/gameplay run."
+  }
+}

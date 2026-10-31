@@ -153,6 +153,7 @@ class RuntimeUpdaterSetup(unittest.TestCase):
         rows = [
             ('data/sql/updates/pending_db_world/rev_20261005010000000.sql', False),
             ('modules/mod-classless-wildcard/data/sql/db-world/cw_world_item_classes.sql', False),
+            ('modules/mod-individual-progression/data/sql/world/base/player_starting_gear.sql', False),
             ('modules/mod-battlemon/data/sql/world/base/2026_08_21_00_battlemon_overworld.sql', False),
             ('modules/mod-battlemon/data/sql/db-world/base/2026_08_20_catalog.sql', True),
             ('data/sql/updates/db_world/2024_01_01_stock.sql', True),

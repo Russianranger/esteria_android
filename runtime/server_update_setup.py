@@ -31,8 +31,9 @@ SCOPE = 'owned-packaged-content-compiled-updater-only'
 BLOCK = 128 * 1024
 require = schema.require
 CONTENT_PROFILE = updater.config.CONTENT_PROFILE
-STOCK_SQL_POLICY = 'stock-world-source-selection-v1'
-_CUSTOM_WORLD_MODULES = frozenset(('mod-custom-server', 'mod-classless-wildcard', 'mod-worgoblin-high-elf'))
+STOCK_SQL_POLICY = 'stock-world-source-selection-v2'
+_CUSTOM_WORLD_MODULES = frozenset(('mod-custom-server', 'mod-classless-wildcard', 'mod-worgoblin-high-elf',
+                                  'mod-individual-progression'))
 STOCK_OVERLAYS_SQL = ('SELECT (SELECT COUNT(*) FROM acore_world.chrraces_dbc),'
     '(SELECT COUNT(*) FROM acore_world.chrclasses_dbc),'
     '(SELECT COUNT(*) FROM acore_world.map_dbc),'

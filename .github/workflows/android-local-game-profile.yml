@@ -57,7 +57,7 @@ permissions:
   actions: read
 concurrency:
   group: coherent-local-game-provider-profile-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   selection:
     runs-on: ubuntu-24.04

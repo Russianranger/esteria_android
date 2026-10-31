@@ -39,6 +39,14 @@ MODULE_OVERRIDES = {
     'mod_battlemon_battles.conf': {'BattlemonBattles.Enable': 0},
     'mod_battlemon_overworld.conf': {'BattlemonOverworld.Enable': 0},
     'transmog.conf': {'Transmogrification.Enable': 0},
+    'individualProgression.conf': {
+        'IndividualProgression.Enable': 0,
+        # The pinned OnAfterConfigLoad applies these even when Enable=0.
+        'IndividualProgression.SimpleConfigOverride': 0,
+        'IndividualProgression.MaxMonsterSight': 0,
+        'IndividualProgression.DisableQuestMarkers': 0,
+        'IndividualProgression.DisableRDF': 0,
+    },
 }
 MODULE_OVERRIDES['mod_battlemon.conf']['Battlemon.Enable'] = 0
 CONTENT_PROFILE = 'stock-3.3.5a'
