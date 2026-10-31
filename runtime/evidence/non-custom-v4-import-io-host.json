@@ -1,0 +1,41 @@
+{
+  "formatVersion": 1,
+  "scope": "host-import-io-policy-native-cache-advice-and-android-arm64-cross-build",
+  "normalBytesPerSecond": 8388608,
+  "pressureBytesPerSecond": 2097152,
+  "syncWindowBytes": 2097152,
+  "severePauseAfterSeconds": 60,
+  "maxSleepSliceMillis": 100,
+  "governorGroupsPassed": 6,
+  "existingImporterGroupsPassed": 42,
+  "coreCheckPassed": true,
+  "androidDebugAndTestCompilationPassed": true,
+  "androidLintDebugPassed": true,
+  "androidArm64BridgeCrossBuilt": true,
+  "realJniCacheAdviceExecutedOnLinux": true,
+  "ownerLowMemoryKillReproduced": false,
+  "thorQualified": false,
+  "gameplayQualified": false,
+  "sources": {
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/ImportIoGovernor.java": {
+      "bytes": 6842,
+      "sha256": "4105882a22948e64f8337f01d318c3422bcac9d48c93783c3c174397ac25ceab"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/GameDataImporter.java": {
+      "bytes": 54255,
+      "sha256": "ffd838d703b4df7c9d522e59aabee54442f6046a23f3b12a98b54bfb3a2958e7"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/SourceStreamPositioner.java": {
+      "bytes": 2465,
+      "sha256": "f86b348cfcfb812391f795c709f9b8e4789922e8e2961c47e6a12602c1b605e3"
+    },
+    "native/process-owner/jni_bridge.cpp": {
+      "bytes": 6612,
+      "sha256": "95cb10a497efb29e2d233bb7624a60f45bf1d422718851a78bc8cf3f7393e832"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/NativeImportCache.java": {
+      "bytes": 863,
+      "sha256": "b4cd01b2d1a214ad37cf3e4ca6a9013abdc3c7a58fe60019911ed22cda158a29"
+    }
+  }
+}

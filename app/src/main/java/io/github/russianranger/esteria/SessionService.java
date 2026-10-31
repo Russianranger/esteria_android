@@ -91,6 +91,7 @@ public final class SessionService extends Service {
     private volatile String supportStatus="";
     private volatile SafTreeSource activeFolderSource;
     private volatile ImportDiagnostics lastImport;
+    private volatile ImportIoController activeImportIo;
     private volatile int lastMemoryTrimLevel = -1;
     private volatile long lastMemoryTrimAt;
     // Ephemeral decisions are never restored as approval after service/process recreation.
@@ -116,7 +117,11 @@ public final class SessionService extends Service {
         if(busy.get()){keepAwake();main.postDelayed(this,60*1000L);}
     }};
     private Path root;
-    String status() { String support=supportStatus;return support.isEmpty()?status:status+"\n"+support; }
+    String status() {
+        ImportIoController io = activeImportIo;
+        String current = io == null ? status : status + "\n" + io.statusHint();
+        String support=supportStatus;return support.isEmpty()?current:current+"\n"+support;
+    }
     boolean busy() { return busy.get(); }
     boolean supportExportAvailable(){return !exporting.get()&&!(busy.get()&&EXPORT.equals(activeAction));}
     ClientLaunchSetup.UiReview uiReview() { return pendingUiReview; }
@@ -209,7 +214,8 @@ public final class SessionService extends Service {
                 status = setupPaused(intent.getAction(), false);
                 log("Runtime setup paused");
             } catch (GameDataImporter.ImportCancelledException e) {
-                status = "Import paused. Select the same folder or archive to resume where source metadata permits; existing game data is unchanged.";
+                status = e instanceof GameDataImporter.ImportMemoryPressureException ? e.getMessage()
+                        : "Import paused. Select the same folder or archive to resume where source metadata permits; existing game data is unchanged.";
                 log("Import paused");
             } catch (Exception e) {
                 if(EXPORT.equals(intent.getAction()))supportStatus="";
@@ -251,9 +257,11 @@ public final class SessionService extends Service {
                 folder ? "folder display name pending cancellable inventory" : "ZIP document; client root pending inspection");
         log("Import started " + diagnostics.context());
         pendingUiReview=null;
-        GameDataImporter importer = new GameDataImporter(root.resolve("game"));
-        GameDataImporter.Result result;
         try {
+        ImportIoController io = new ImportIoController(this, diagnostics);
+        activeImportIo = io;
+        GameDataImporter importer = new GameDataImporter(root.resolve("game"), io.governor());
+        GameDataImporter.Result result;
         if (folder) {
             status = "Reading selected folder…";
             diagnostics.phase("folder-enumeration", "not-yet-detected", "");
@@ -262,14 +270,14 @@ public final class SessionService extends Service {
                     if (current != null && current.selectedRootName() != null) diagnostics.selectedRoot(current.selectedRootName());
                     diagnostics.memory();
                     status = "Reading folder: " + files + " files, " + directories + " folders"
-                            + (reliableTimes ? "" : "\nThis provider omits modification times; interrupted imports must start a new copy."); })) {
+                            + (reliableTimes ? "" : "\nThis provider omits modification times; interrupted imports must start a new copy."); }, io.governor(), io)) {
                 activeFolderSource = source;
                 result = importer.importSource(source, kind, importListener(diagnostics, source), cancelled::get);
             } finally { activeFolderSource = null; }
         } else {
             diagnostics.phase("zip-document-copy", "not-yet-detected", "");
             Path archive = UriStager.stage(getContentResolver(), uri, root.resolve("imports"), cancelled,
-                    (copied, total) -> { diagnostics.memory(); status = "Copying archive: " + mib(copied) + (total >= 0 ? " / " + mib(total) : "") + " MiB"; });
+                    (copied, total) -> { diagnostics.memory(); status = "Copying archive: " + mib(copied) + (total >= 0 ? " / " + mib(total) : "") + " MiB"; }, io.governor(), io);
             result = importer.importZip(archive, kind, importListener(diagnostics, null), cancelled::get);
             // Delete only the temporary ZIP after the importer has published a complete generation.
             Files.deleteIfExists(archive);
@@ -280,9 +288,14 @@ public final class SessionService extends Service {
         diagnostics.finish("complete", null);
         log("Import complete generation=" + result.generation + " copied=" + result.copiedFiles + " reused=" + result.reusedFiles);
         } catch (GameDataImporter.ImportCancelledException paused) {
-            diagnostics.finish("paused", paused); log("Import paused " + diagnostics.context()); throw paused;
+            diagnostics.finish(paused instanceof GameDataImporter.ImportMemoryPressureException ? "paused-memory" : "paused", paused);
+            log("Import paused " + diagnostics.context()); throw paused;
         } catch (Exception failure) {
             diagnostics.finish("failed", failure); log("Import failed " + diagnostics.context()); throw failure;
+        } finally {
+            ImportIoController io = activeImportIo;
+            if (io != null) io.recordFinal();
+            activeImportIo = null;
         }
     }
     private GameDataImporter.ProgressListener importListener(ImportDiagnostics diagnostics, SafTreeSource source) {
@@ -1140,6 +1153,14 @@ public final class SessionService extends Service {
         super.onTrimMemory(level);
         // Observe pressure without cancelling valid work or allocating an export.
         lastMemoryTrimLevel = level; lastMemoryTrimAt = System.currentTimeMillis();
+        ImportIoController io = activeImportIo;
+        if (io != null) io.onTrimMemory(level);
+    }
+    @SuppressWarnings("deprecation") // Retain Android 13 callback compatibility.
+    @Override public void onLowMemory() {
+        super.onLowMemory();
+        ImportIoController io = activeImportIo;
+        if (io != null) io.onTrimMemory(android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL);
     }
     @Override public void onTimeout(int startId, int foregroundServiceType) {
         requestCancellation(); status = "Android stopped this setup operation. Start it again to resume completed work where supported.";

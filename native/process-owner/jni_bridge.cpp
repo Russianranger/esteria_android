@@ -2,6 +2,10 @@
 #include "process_owner.h"
 #include <jni.h>
 #include <stdexcept>
+#include <cerrno>
+#include <cstdint>
+#include <fcntl.h>
+#include <limits>
 
 namespace {
 std::string string(JNIEnv* env,jstring value) {
@@ -98,4 +102,15 @@ Java_io_github_russianranger_esteria_runtime_NativeProcessBridge_usageNative(JNI
             value.changed_members,value.denied_entries,0};
         auto result=env->NewLongArray(16);if(result)env->SetLongArrayRegion(result,0,16,wire);return result;
     }catch(const std::exception& problem){error(env,problem);return nullptr;}
+}
+
+// The caller owns the fd and syncs completed output windows before this advice.
+// POSIX_FADV_DONTNEED releases clean file-cache pages where supported; it never
+// changes bytes, closes the fd, or drops another application's anonymous memory.
+extern "C" JNIEXPORT jint JNICALL
+Java_io_github_russianranger_esteria_NativeImportCache_dropNative(JNIEnv*,jclass,jint fd,jlong offset,jlong length) {
+    if (fd < 0 || offset < 0 || length <= 0 ||
+            offset > std::numeric_limits<off_t>::max() ||
+            length > std::numeric_limits<off_t>::max() - offset) return EINVAL;
+    return posix_fadvise(fd,static_cast<off_t>(offset),static_cast<off_t>(length),POSIX_FADV_DONTNEED);
 }

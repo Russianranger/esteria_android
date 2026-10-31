@@ -18,6 +18,7 @@ import java.security.MessageDigest;
 import java.util.concurrent.atomic.AtomicBoolean;
 import io.github.russianranger.esteria.core.importer.GameDataImporter;
 import io.github.russianranger.esteria.core.importer.SourceStreamPositioner;
+import io.github.russianranger.esteria.core.importer.ImportIoGovernor;
 
 /** Turns a SAF document into a seekable ZIP without ever buffering the archive in RAM. */
 final class UriStager {
@@ -30,13 +31,19 @@ final class UriStager {
         String fingerprint() { return size + ":" + modified; }
     }
     static Path stage(ContentResolver resolver, Uri uri, Path directory, AtomicBoolean cancelled, Progress progress) throws Exception {
+        return stage(resolver, uri, directory, cancelled, progress, ImportIoGovernor.unthrottled(), null);
+    }
+    static Path stage(ContentResolver resolver, Uri uri, Path directory, AtomicBoolean cancelled, Progress progress,
+                      ImportIoGovernor governor, ImportIoController controller) throws Exception {
         if (!"content".equals(uri.getScheme())) throw new IOException("Choose an archive through Android's file picker");
         Files.createDirectories(directory);
         try (ExclusiveFileLease lease = ExclusiveFileLease.acquire(directory.resolve("stage.lock"),"A previous archive copy is still stopping; retry in a moment")) {
-            return stageLocked(resolver, uri, directory, cancelled, progress);
+            return stageLocked(resolver, uri, directory, cancelled, progress, governor, controller);
         }
     }
-    private static Path stageLocked(ContentResolver resolver, Uri uri, Path directory, AtomicBoolean cancelled, Progress progress) throws Exception {
+    private static Path stageLocked(ContentResolver resolver, Uri uri, Path directory, AtomicBoolean cancelled, Progress progress,
+                                    ImportIoGovernor governor, ImportIoController controller) throws Exception {
+        governor.checkpoint(cancelled::get);
         Info info = info(resolver, uri);
         if (info.size > MAX_ARCHIVE_BYTES) throw new IOException("Archive exceeds the 256 GiB import limit");
         String id = digest(uri.toString() + "\n" + info.fingerprint());
@@ -51,18 +58,26 @@ final class UriStager {
         long remaining = info.size >= 0 ? info.size - offset : RESERVE;
         if (directory.toFile().getUsableSpace() < remaining + RESERVE)
             throw new IOException("Not enough storage to stage this archive. A ZIP copy is needed before extraction.");
-        try (InputStream input = resolver.openInputStream(uri); RandomAccessFile output = new RandomAccessFile(partial.toFile(), "rw")) {
+        try (android.content.res.AssetFileDescriptor descriptor = resolver.openAssetFileDescriptor(uri, "r");
+             InputStream input = descriptor == null ? null : descriptor.createInputStream();
+             RandomAccessFile output = new RandomAccessFile(partial.toFile(), "rw")) {
             if (input == null) throw new IOException("The selected document could not be opened");
             output.setLength(offset);
-            SourceStreamPositioner.advance(input, offset, cancelled::get);
+            SourceStreamPositioner.advance(input, offset, cancelled::get, governor);
+            ImportIoController.SourceCache sourceCache = controller == null ? null : controller.sourceCache(descriptor.getParcelFileDescriptor(), descriptor.getStartOffset() + offset);
             output.seek(offset);
+            ImportIoGovernor.Transfer transfer = governor.begin(partial, output.getChannel(), offset, cancelled::get);
             byte[] buffer = new byte[128 * 1024];
             long copied = offset, reportAt = 0;
-            for (int count; (count = input.read(buffer)) != -1;) {
+            while (true) {
+                governor.checkpoint(cancelled::get);
+                int count = input.read(buffer); if (count == -1) break;
                 if (cancelled.get()) throw new GameDataImporter.ImportCancelledException();
                 copied += count;
                 if (copied > MAX_ARCHIVE_BYTES || (info.size >= 0 && copied > info.size)) throw new IOException("Archive changed size during import");
                 output.write(buffer, 0, count);
+                transfer.wrote(count);
+                if (sourceCache != null) sourceCache.consumed(count);
                 long now = System.nanoTime();
                 if (now - reportAt >= 200_000_000L) { progress.update(copied, info.size); reportAt = now; }
             }
@@ -70,7 +85,8 @@ final class UriStager {
             Info after = info(resolver, uri);
             if (info.reliable() && !info.fingerprint().equals(after.fingerprint())) throw new IOException("Archive metadata changed during import");
             if (cancelled.get()) throw new GameDataImporter.ImportCancelledException();
-            output.getFD().sync();
+            transfer.finish();
+            if (sourceCache != null) sourceCache.finish();
         }
         Files.move(partial, archive, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
         // Preserve provider identity across staging cleanup/reimport; otherwise a fresh local

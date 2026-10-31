@@ -22,7 +22,12 @@ final class ImportDiagnostics {
     private static final int MAX_BYTES = 32 * 1024;
     private static final Set<String> KEYS = Set.of("route", "kind", "sourceProvider", "sourceIdentitySha256",
             "selectedRoot", "detectedRoot", "phase", "path", "result", "failure", "startedAtEpochMs",
-            "javaHeapUsedBytes", "javaHeapPeakObservedBytes", "javaHeapLimitBytes", "memorySampleAtEpochMs");
+            "javaHeapUsedBytes", "javaHeapPeakObservedBytes", "javaHeapLimitBytes", "memorySampleAtEpochMs",
+            "ioPolicy", "ioNormalBytesPerSecond", "ioPressureBytesPerSecond", "ioPressureLevel", "ioActiveBytesPerSecond",
+            "ioMemoryAvailableBytes", "ioMemoryThresholdBytes", "ioMemoryLow", "ioMemorySampleAtEpochMs",
+            "ioTrimLevel", "ioTrimAtEpochMs", "ioCacheDropCalls", "ioCacheDropBytes", "ioCacheDropErrno",
+            "ioCacheDropStatus", "ioCacheDropErrors", "ioSystemDirtyKiB", "ioSystemWritebackKiB",
+            "ioSystemDirtyPeakKiB", "ioSystemWritebackPeakKiB");
     private final Path receipt;
     private final Map<String, String> values = new LinkedHashMap<>();
     private long savedAt;
@@ -59,6 +64,13 @@ final class ImportDiagnostics {
     }
 
     synchronized void phase(String phase) { phase(phase, values.getOrDefault("detectedRoot", "not-yet-detected"), ""); }
+    synchronized void io(String key, long value) { io(key, Long.toString(value)); }
+    synchronized void io(String key, String value) {
+        if (!KEYS.contains(key) || !key.startsWith("io")) throw new IllegalArgumentException("Unknown bounded import I/O fact");
+        values.put(key, bounded(value, 256));
+        if (savedAt != 0 && System.nanoTime() - savedAt > 2_000_000_000L) save();
+    }
+    synchronized void checkpoint() { save(); }
     synchronized void selectedRoot(String name) {
         String bounded = bounded(name, 2048);
         if (!bounded.equals(values.get("selectedRoot"))) { values.put("selectedRoot", bounded); save(); }

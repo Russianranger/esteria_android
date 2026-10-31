@@ -48,13 +48,20 @@ public final class ImportMemoryStressTest {
         for(String route:List.of("folder","zip")){
             Path root=temporary();try{
                 assertTrue("Disposable 4GiB userdata must fit staged ZIP plus imported GiB",root.toFile().getUsableSpace()>(2300L<<20));
-                Provider provider=new Provider(GIB,0);ContentResolver resolver=ContentResolver.wrap(provider);AtomicBoolean cancel=new AtomicBoolean();Samples samples=new Samples(root,route);long began=System.nanoTime();GameDataImporter importer=new GameDataImporter(root.resolve("store"));GameDataImporter.Result result;
-                if(route.equals("folder")){try(SafTreeSource source=new SafTreeSource(resolver,provider.tree(),cancel,(f,d,t)->{})){result=importer.importSource(source,GameDataImporter.ImportKind.BASE_CLIENT,samples,cancel::get);}}
-                else{Path zip=UriStager.stage(resolver,provider.archiveUri(),root.resolve("stage"),cancel,(n,t)->samples.onProgress("zip-document-copy",n,t,0,1));assertTrue("Exercise large ZIP copy rather than tiny compressed zeros",Files.size(zip)>=GIB);samples.sample();samples.next=0;result=importer.importZip(zip,GameDataImporter.ImportKind.BASE_CLIENT,samples,cancel::get);}
-                samples.diagnostics.finish("complete",null);samples.sample();provider.requireFinished();samples.requireBounded();assertEquals(GIB,Files.size(result.gameDirectory.resolve(LARGE)));assertEquals(provider.fileCount(),result.copiedFiles);
+                Provider provider=new Provider(GIB,0);ContentResolver resolver=ContentResolver.wrap(provider);AtomicBoolean cancel=new AtomicBoolean();Samples samples=new Samples(root,route);
+                ImportIoController io=new ImportIoController(InstrumentationRegistry.getInstrumentation().getTargetContext(),samples.diagnostics);
+                long began=System.nanoTime();GameDataImporter importer=new GameDataImporter(root.resolve("store"),io.governor());GameDataImporter.Result result;
+                if(route.equals("folder")){try(SafTreeSource source=new SafTreeSource(resolver,provider.tree(),cancel,(f,d,t)->{},io.governor(),io)){result=importer.importSource(source,GameDataImporter.ImportKind.BASE_CLIENT,samples,cancel::get);}}
+                else{Path zip=UriStager.stage(resolver,provider.archiveUri(),root.resolve("stage"),cancel,(n,t)->samples.onProgress("zip-document-copy",n,t,0,1),io.governor(),io);assertTrue("Exercise large ZIP copy rather than tiny compressed zeros",Files.size(zip)>=GIB);samples.sample();samples.next=0;result=importer.importZip(zip,GameDataImporter.ImportKind.BASE_CLIENT,samples,cancel::get);}
+                io.recordFinal();samples.diagnostics.finish("complete",null);samples.sample();provider.requireFinished();samples.requireBounded();assertEquals(GIB,Files.size(result.gameDirectory.resolve(LARGE)));assertEquals(provider.fileCount(),result.copiedFiles);
+                long elapsed=(System.nanoTime()-began)/1000000L;
+                assertTrue("Actual default policy must limit the full route",elapsed>=(route.equals("folder")?125000:250000));
+                Map<String,String> ioFacts=samples.diagnostics.facts();
+                assertTrue("Synced output windows must be advised repeatedly",Long.parseLong(ioFacts.get("import.last.ioCacheDropCalls"))>=512);
+                assertEquals("Native advisory path succeeds in this Android fixture","0",ioFacts.get("import.last.ioCacheDropErrors"));
                 String digest=null;for(String line:Files.readAllLines(result.gameDirectory.getParent().resolve("journal.tsv"),StandardCharsets.UTF_8)){String[] f=line.split("\t");if(new String(Base64.getDecoder().decode(f[0]),StandardCharsets.UTF_8).equals(LARGE))digest=f[3];}
                 assertNotNull("Provider completed streamed source digest",provider.largeDigest.get());assertEquals("Actual journal matches streamed source",provider.largeDigest.get(),digest);
-                report(samples.result(route).put("payloadBytes",GIB).put("copiedFiles",result.copiedFiles).put("copiedBytes",result.copiedBytes).put("sha256",digest).put("elapsedMillis",(System.nanoTime()-began)/1000000L));
+                report(samples.result(route).put("payloadBytes",GIB).put("copiedFiles",result.copiedFiles).put("copiedBytes",result.copiedBytes).put("sha256",digest).put("elapsedMillis",elapsed).put("ioPolicy",new JSONObject(ioFacts)));
             }finally{remove(root);}
         }
     }

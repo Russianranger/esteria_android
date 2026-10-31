@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import io.github.russianranger.esteria.core.importer.GameDataImporter;
+import io.github.russianranger.esteria.core.importer.ImportIoGovernor;
 
 /** Read-only document-tree adapter. It never resolves provider IDs to filesystem paths. */
 final class SafTreeSource implements GameDataImporter.InputSource, AutoCloseable {
@@ -57,6 +58,8 @@ final class SafTreeSource implements GameDataImporter.InputSource, AutoCloseable
     private final AtomicBoolean cancelled;
     private final CancellationSignal queryCancellation = new CancellationSignal();
     private final Progress progress;
+    private final ImportIoGovernor governor;
+    private final ImportIoController ioController;
     private final Map<String, Object> observed = new HashMap<>();
     private final Map<String, String> mimeTypes = new HashMap<>();
     private final List<Document> directories = new ArrayList<>();
@@ -68,9 +71,14 @@ final class SafTreeSource implements GameDataImporter.InputSource, AutoCloseable
     private String selectedRootName;
 
     SafTreeSource(ContentResolver resolver, Uri tree, AtomicBoolean cancelled, Progress progress) throws IOException {
+        this(resolver, tree, cancelled, progress, ImportIoGovernor.unthrottled(), null);
+    }
+    SafTreeSource(ContentResolver resolver, Uri tree, AtomicBoolean cancelled, Progress progress,
+                  ImportIoGovernor governor, ImportIoController ioController) throws IOException {
         if (tree == null || !"content".equals(tree.getScheme()) || !DocumentsContract.isTreeUri(tree))
             throw new IOException("Choose a folder through Android's folder picker");
         this.resolver = resolver; this.tree = tree; this.cancelled = cancelled; this.progress = progress;
+        this.governor = governor; this.ioController = ioController;
     }
     @Override public String identity() { return "android-saf-tree-v1\n" + tree; }
     boolean hasReliableFileTimes() { return reliableFileTimes; }
@@ -140,8 +148,19 @@ final class SafTreeSource implements GameDataImporter.InputSource, AutoCloseable
         final InputStream input;
         try { input = descriptor.createInputStream(); }
         catch (IOException | RuntimeException failure) { descriptor.close(); throw failure; }
+        ImportIoController.SourceCache sourceCache = ioController == null ? null
+                : ioController.sourceCache(descriptor.getParcelFileDescriptor(), descriptor.getStartOffset());
         FilterInputStream tracked = new FilterInputStream(input) {
+            @Override public int read() throws IOException {
+                int value = in.read(); if (value >= 0 && sourceCache != null) sourceCache.consumed(1); return value;
+            }
+            @Override public int read(byte[] bytes, int offset, int length) throws IOException {
+                int count = in.read(bytes, offset, length);
+                if (sourceCache != null) sourceCache.consumed(count);
+                return count;
+            }
             @Override public void close() throws IOException {
+                if (sourceCache != null) sourceCache.finish();
                 try { super.close(); }
                 finally {
                     try { descriptor.close(); }
@@ -260,9 +279,10 @@ final class SafTreeSource implements GameDataImporter.InputSource, AutoCloseable
         if (cancelled.get() || queryCancellation.isCanceled()) return new GameDataImporter.ImportCancelledException();
         return new IOException(message + " (" + failure.getClass().getSimpleName() + ")", failure);
     }
-    private void checkCancelled() throws GameDataImporter.ImportCancelledException {
+    private void checkCancelled() throws IOException {
         if (cancelled.get() || queryCancellation.isCanceled() || Thread.currentThread().isInterrupted()
                 || (importerCancellation != null && importerCancellation.isCancelled())) throw new GameDataImporter.ImportCancelledException();
+        governor.checkpoint(() -> cancelled.get() || (importerCancellation != null && importerCancellation.isCancelled()));
     }
     void cancel() {
         queryCancellation.cancel();

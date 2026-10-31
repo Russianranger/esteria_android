@@ -31,6 +31,14 @@ tasks.register('zipSafetyMemoryTest', JavaExec) {
 }
 check.dependsOn hostTest, diagnosticsTest, importerTest, importMemoryTest, zipSafetyMemoryTest
 
+tasks.register('importIoGovernorTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.importer.ImportIoGovernorTests'
+    maxHeapSize = '32m'
+}
+check.dependsOn importIoGovernorTest
+
 // Actual Linux JVM parent-death fixture; never copied into Android test APKs.
 tasks.register('localAccountHandoffRecoveryTest', JavaExec) {
     dependsOn testClasses

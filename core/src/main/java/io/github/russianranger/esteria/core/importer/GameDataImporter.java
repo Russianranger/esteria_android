@@ -72,9 +72,16 @@ public final class GameDataImporter {
     }
     public static final Cancellation NEVER_CANCELLED = () -> false;
     public static final ProgressListener NO_PROGRESS = (p, b, t, n, f) -> {};
-    public static final class ImportCancelledException extends IOException {
+    public static class ImportCancelledException extends IOException {
         private static final long serialVersionUID = 1L;
-        public ImportCancelledException() { super("Import cancelled; completed files are retained for resume"); }
+        public ImportCancelledException() { this("Import cancelled; completed files are retained for resume"); }
+        protected ImportCancelledException(String message) { super(message); }
+    }
+    public static final class ImportMemoryPressureException extends ImportCancelledException {
+        private static final long serialVersionUID = 1L;
+        public ImportMemoryPressureException() {
+            super("Import paused because Android still reports low memory; completed files are retained. Retry the same source after memory recovers.");
+        }
     }
     public static final class Result {
         public final Path gameDirectory;
@@ -138,12 +145,15 @@ public final class GameDataImporter {
     }
     private final Path root;
     private final Limits limits;
+    private final ImportIoGovernor io;
     /** True when this filesystem accepted directory fsync; false means process-crash guarantees only. */
     public final boolean directorySyncSupported;
 
-    public GameDataImporter(Path storeRoot) throws IOException { this(storeRoot, Limits.defaults()); }
-    public GameDataImporter(Path storeRoot, Limits limits) throws IOException {
-        this.root = storeRoot.toAbsolutePath().normalize(); this.limits = limits;
+    public GameDataImporter(Path storeRoot) throws IOException { this(storeRoot, Limits.defaults(), ImportIoGovernor.unthrottled()); }
+    public GameDataImporter(Path storeRoot, Limits limits) throws IOException { this(storeRoot, limits, ImportIoGovernor.unthrottled()); }
+    public GameDataImporter(Path storeRoot, ImportIoGovernor governor) throws IOException { this(storeRoot, Limits.defaults(), governor); }
+    public GameDataImporter(Path storeRoot, Limits limits, ImportIoGovernor governor) throws IOException {
+        this.root = storeRoot.toAbsolutePath().normalize(); this.limits = limits; this.io = java.util.Objects.requireNonNull(governor);
         Files.createDirectories(root);
         rejectSymlinkAncestors(root);
         Files.createDirectories(root.resolve("generations"));
@@ -200,6 +210,7 @@ public final class GameDataImporter {
 
     private Result performImport(Source source, ImportKind kind, ProgressListener listener, Cancellation cancellation, ImportContext context) throws IOException {
         checkCancelled(cancellation);
+        io.checkpoint(cancellation);
         context.phase("inventory", null);
         List<Entry> entries = source.entries(cancellation);
         if (entries.isEmpty()) throw new IOException("No files to import");
@@ -271,6 +282,7 @@ public final class GameDataImporter {
             if (Files.isSymbolicLink(partial) || Files.isSymbolicLink(target)) throw new IOException("Symlink in import destination");
             MessageDigest digest = sha256(); CRC32 crc = new CRC32(); long bytes = 0;
             try (InputStream input = source.open(entry); FileChannel output = FileChannel.open(partial, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
+                ImportIoGovernor.Transfer transfer = io.begin(partial, output, 0, cancellation);
                 int read;
                 long reportAt = 0;
                 while ((read = input.read(buffer)) != -1) {
@@ -279,11 +291,12 @@ public final class GameDataImporter {
                     block.clear(); block.limit(read);
                     while (block.hasRemaining()) output.write(block);
                     digest.update(buffer, 0, read); crc.update(buffer, 0, read); bytes += read;
+                    transfer.wrote(read);
                     long now = System.nanoTime();
                     if (now - reportAt > 200_000_000L) { listener.onProgress(entry.path, completed + bytes, total, finished, entries.size()); reportAt = now; }
                 }
                 if (bytes != entry.size || (entry.crc >= 0 && crc.getValue() != entry.crc)) throw new IOException("Truncated or corrupt source: " + entry.path);
-                output.force(true);
+                transfer.finish();
             } catch (IOException | RuntimeException failure) { Files.deleteIfExists(partial); throw failure; }
             context.phase("file-verification", entry);
             source.verifyUnchanged(entry);
@@ -338,12 +351,14 @@ public final class GameDataImporter {
                     if (Files.isSymbolicLink(partial)) throw new IOException("Symlink seed destination");
                     try {
                         try (InputStream input = Files.newInputStream(file); FileChannel output = FileChannel.open(partial, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
+                            ImportIoGovernor.Transfer transfer = io.begin(partial, output, 0, cancellation);
                             int read;
                             while ((read = input.read(buffer)) != -1) {
                                 checkCancelled(cancellation);
                                 block.clear(); block.limit(read); while (block.hasRemaining()) output.write(block);
+                                transfer.wrote(read);
                             }
-                            output.force(true);
+                            transfer.finish();
                         }
                         Files.move(partial, target, StandardCopyOption.ATOMIC_MOVE);
                     } finally { Files.deleteIfExists(partial); }

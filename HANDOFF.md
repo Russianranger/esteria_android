@@ -1,3 +1,15 @@
+# Version 4 import memory-pressure update
+
+The active update is versionCode 4 on `non-custom`, package `io.github.russianranger.esteria.stock`, preserving v3 certificate/data and exact client/server/runtime pins. It is undergoing validation/publication; historical v3 identities below remain the published baseline until verified readback.
+
+Both public routes share an 8 MiB/s I/O governor. ZIP staging/extraction, folder copy, fallback overlay copy and nonseekable resume consumption are paced. Output is forced every 2 MiB before advisory clean-cache release; regular SAF input windows receive advice too. Android memory/headroom/heap/trim observations reduce copying to 2 MiB/s or wait before more I/O. Sustained severe pressure pauses safely after 60 seconds; Stop is checked in at most 100 ms sleep slices. UI-hidden callbacks alone are not pressure.
+
+This addresses sustained I/O/cache/writeback pressure outside the previous Java-allocation measurements. No fresh owner kill bundle accompanies this report; the Thor exit cause is not confirmed. Receipts retain policy, system memory, Dirty/Writeback and cache-advice facts. Advisory acceptance does not guarantee reclaimed bytes. Existing validation, transactional publication and resume fingerprints remain.
+
+Host checks cover pacing, pressure recovery/pause, interruption, sync-before-advice and actual folder/ZIP cancellation/resume with unchanged generation/hash. JNI/libc advice preserves synced-file bytes and descriptor ownership; the bridge cross-builds for Android ARM64. Android 13 tests build the x64 bridge and exercise the actual controller with 1 GiB folder/ZIP fixtures and timing/cache/hash assertions. Final results/publication identities follow after verification; fixtures are not Thor qualification.
+
+Install the eventual v4 over the existing app, retain data and retry the same full client source. Keep `Wow.exe` beside `Data`. Each 1 GiB copy takes at least 128 seconds; ZIPs need staging plus extraction. On a memory pause, retry after recovery. If Android closes the app again, reopen and export the whole support bundle before another import, including last stage/file.
+
 # Esteria Stock — published low-memory import update
 
 Updated 2026-10-31 UTC. Branch `non-custom`; package `io.github.russianranger.esteria.stock`, profile `stock-3.3.5a`. Version `0.1.0-non-custom.3` / versionCode **3** is published as an additive prerelease. Install over the existing stock app with its current data. No private key or generated APK belongs in Git.

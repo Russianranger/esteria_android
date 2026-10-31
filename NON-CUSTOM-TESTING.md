@@ -1,3 +1,11 @@
+# Version 4 import retry
+
+Install v4 over the existing Esteria Stock app and keep its data. Retry the same complete ChromieCraft folder or ZIP with `Wow.exe` beside `Data`; MPQs stay inside `Data`.
+
+Import is deliberately capped at 8 MiB/s with small forced write batches. Under pressure it slows to 2 MiB/s or waits for Android memory to recover. Each 1 GiB copy takes at least 128 seconds; a ZIP adds staging before extraction. Stop remains available. Sustained severe pressure pauses after 60 seconds and retains completed files for retry; folder reuse depends on reliable modification times.
+
+First retry the route that failed, then follow preparation/start below. If Android closes it again, reopen and export the whole support bundle before another import with the last stage/file. New receipts include active speed, memory/headroom, Dirty/Writeback and cache-advice results alongside exit history.
+
 # Esteria Stock 3.3.5a / non-custom — consolidated Thor procedure
 
 This is the separate `io.github.russianranger.esteria.stock` app. Version `0.1.0-non-custom.3` (versionCode 3) updates stock versions 1 and 2 with the same persistent certificate. Install it over the existing stock app; do not uninstall either app or clear app data. Imports, completed preparation and saves remain app-owned. This app creates its own local account and private saves; it does not use a ChromieCraft account or public realm.

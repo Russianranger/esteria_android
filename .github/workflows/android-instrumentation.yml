@@ -53,16 +53,16 @@ jobs:
       - name: Install pinned Android platform and build tools
         run: |
           (set +o pipefail; yes | sdkmanager --sdk_root="$ANDROID_HOME" --licenses >/dev/null)
-          sdkmanager --sdk_root="$ANDROID_HOME" 'platforms;android-35' 'build-tools;35.0.0'
+          sdkmanager --sdk_root="$ANDROID_HOME" 'platforms;android-35' 'build-tools;35.0.0' 'ndk;28.2.13676358' 'cmake;3.22.1'
       - name: Build both update versions with the same isolated CI debug key
         run: |
           mkdir -p out/android-installer
           sha256sum --check gradle/wrapper/SHA256SUMS
           python3 -m unittest tests.test_android_installer_qualification -v
-          ./gradlew --no-daemon :app:assembleDebug :app:assembleDebugAndroidTest -PbuildVersionCode=1 -PsourceRevision="$GITHUB_SHA"
+          ./gradlew --no-daemon :app:assembleDebug :app:assembleDebugAndroidTest -PnativeRuntimeBridge=true -PnativeBridgeAbi=x86_64 -PbuildVersionCode=1 -PsourceRevision="$GITHUB_SHA"
           cp app/build/outputs/apk/debug/app-debug.apk out/android-installer/initial.apk
           cp app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk out/android-installer/tests.apk
-          ./gradlew --no-daemon :app:assembleDebug -PbuildVersionCode=2 -PsourceRevision="$GITHUB_SHA"
+          ./gradlew --no-daemon :app:assembleDebug -PnativeRuntimeBridge=true -PnativeBridgeAbi=x86_64 -PbuildVersionCode=2 -PsourceRevision="$GITHUB_SHA"
           cp app/build/outputs/apk/debug/app-debug.apk out/android-installer/update.apk
       - name: Prepare bounded stock shader and helper component readback
         run: |
@@ -149,19 +149,24 @@ jobs:
                   receipt['stdout'] = dict(bytes=log.stat().st_size, sha256=digest(log))
               (destination / 'saf-import-component.json').write_text(json.dumps(receipt, sort_keys=True, indent=2) + '\n')
           print(json.dumps(receipt, sort_keys=True, indent=2))
-          selected = 'io.github.russianranger.esteria.ImportMemoryStressTest,io.github.russianranger.esteria.ProcessExitDiagnosticsTest'
+          selected = 'io.github.russianranger.esteria.ImportMemoryStressTest,io.github.russianranger.esteria.ProcessExitDiagnosticsTest,io.github.russianranger.esteria.ImportIoControllerTest'
           files = ['app/src/androidTest/java/io/github/russianranger/esteria/ImportMemoryStressTest.java',
                    'app/src/androidTest/java/io/github/russianranger/esteria/ProcessExitDiagnosticsTest.java',
+                   'app/src/androidTest/java/io/github/russianranger/esteria/ImportIoControllerTest.java',
                    'app/src/main/java/io/github/russianranger/esteria/ProcessExitDiagnostics.java',
                    'app/src/main/java/io/github/russianranger/esteria/SafTreeSource.java',
                    'app/src/main/java/io/github/russianranger/esteria/UriStager.java',
                    'app/src/main/java/io/github/russianranger/esteria/ImportDiagnostics.java',
                    'app/src/main/java/io/github/russianranger/esteria/SessionService.java',
                    'core/src/main/java/io/github/russianranger/esteria/core/importer/GameDataImporter.java',
-                   'core/src/main/java/io/github/russianranger/esteria/core/importer/ZipSafety.java']
+                   'core/src/main/java/io/github/russianranger/esteria/core/importer/ZipSafety.java',
+                   'core/src/main/java/io/github/russianranger/esteria/core/importer/ImportIoGovernor.java',
+                   'app/src/main/java/io/github/russianranger/esteria/ImportIoController.java',
+                   'app/src/main/java/io/github/russianranger/esteria/NativeImportCache.java',
+                   'native/process-owner/jni_bridge.cpp']
           receipt = dict(formatVersion=1, scope='android13-x64-large-streaming-import-memory-and-exit-history-components',
               appSourceRevision=os.environ['GITHUB_SHA'], contentProfile='stock-3.3.5a',
-              testClass=selected, expectedTests=5, emulatorProperties=properties,
+              testClass=selected, expectedTests=9, emulatorProperties=properties,
               sources={name: dict(bytes=(root / name).stat().st_size, sha256=digest(root / name)) for name in files},
               componentTestsExecuted=False, componentTestsPassed=False,
               realLowMemoryKillReproduced=False, ownerDocumentProviderTested=False,
@@ -171,7 +176,7 @@ jobs:
               code, output = run_bounded(['adb', 'shell', 'am', 'instrument', '-w', '-r', '-e', 'class',
                   selected, PACKAGE + '.test/androidx.test.runner.AndroidJUnitRunner'], log, 1200, 256 * 1024)
               receipt.update(componentTestsExecuted=True, processExitCode=code)
-              passed = code == 0 and bool(re.search(r'^OK \(5 tests\)\s*$', output, re.M)) and bool(
+              passed = code == 0 and bool(re.search(r'^OK \(9 tests\)\s*$', output, re.M)) and bool(
                   re.search(r'^INSTRUMENTATION_CODE: -1\s*$', output, re.M)) and not re.search(
                   r'FAILURES!!!|INSTRUMENTATION_FAILED|Process crashed|INSTRUMENTATION_STATUS_CODE: -[12]', output)
               observations = [json.loads(line.split('IMPORT_MEMORY_STRESS=', 1)[1].strip())
@@ -181,7 +186,7 @@ jobs:
               receipt['stressObservations'] = observations
               receipt['componentTestsPassed'] = passed
               if not passed:
-                  raise RuntimeError('Import memory/exit-history components did not report exactly five successful tests')
+                  raise RuntimeError('Import memory/exit-history components did not report exactly nine successful tests')
           except Exception as error:
               receipt['failure'] = type(error).__name__ + ': ' + str(error)[:1024]
               raise
