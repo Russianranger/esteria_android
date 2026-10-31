@@ -63,8 +63,9 @@ closure. Its actual native four-schema SQL41139757153 now passes; provider measu
 its old collector can preserve the private assertion. The measured fixture is
 enabled. Rerun with bounded failure diagnostics, fix the observed cause, then
 qualify real Android four-schema promotion/restart. The c441 diagnostic run now
-isolates equal JSON Integer/Long byte counts; the exact comparator fix and fresh
-provider measurement must precede the next Android execution. Historical817 MySQL bytes
+isolates equal JSON Integer/Long byte counts. The exact comparator fix is
+published at651; fresh651 provider measurement41148040884 now passes and its
+exact selectors are activated. Execute Android SQL/promotion/restart next. Historical817 MySQL bytes
 must be admitted from their exact frozen source; current Java inherits no old
 runtime proof. Keep production ARM64 admission and the five save-selection fields.
 

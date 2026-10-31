@@ -1,0 +1,856 @@
+{
+  "androidRuntimeQualified": false,
+  "fileBytes": 1969217426,
+  "files": {
+    "corresponding-source/SOURCE-MANIFEST.json": {
+      "bytes": 116088,
+      "sha256": "001090640852bfb514f8c6ac7c8e3f697efd8285f78e7221d40adea94e82d711"
+    },
+    "corresponding-source/original-mysql-metadata/SOURCE-MANIFEST.json": {
+      "bytes": 53070,
+      "sha256": "ca5c6d1ee9559430b62590d242788ff756393cc4d7de2248b943633b3221c04f"
+    },
+    "corresponding-source/original-mysql-metadata/provider.json": {
+      "bytes": 5405,
+      "sha256": "a2005edbd843f56d3813a47572e1e5478043f9f6b4ded09481fc7996525a7afc"
+    },
+    "corresponding-source/original-mysql-metadata/runtime.json": {
+      "bytes": 33125,
+      "sha256": "109ac9bc069911045ba9055c35b1822ec2c543b469aa66faf0acee905b92b024"
+    },
+    "corresponding-source/original-mysql-metadata/sources.lock.json": {
+      "bytes": 6499,
+      "sha256": "012af95659e8ee2e98907d185ccdb5abc64e87614a9a4ee43b5b8679ff92b512"
+    },
+    "corresponding-source/original-mysql-proot-completeSources.zip": {
+      "bytes": 905093502,
+      "sha256": "de0a9922035314e9d7a566490932475d276f8f29aba9b4fb09be717d2bada04c"
+    },
+    "corresponding-source/original-proot-provider/assets/proot-probe/build-evidence.json": {
+      "bytes": 4833,
+      "sha256": "b5d14a16d9a83835e027d71d2e0a6f521280057de365244a8963e49b570a463a"
+    },
+    "corresponding-source/original-proot-provider/assets/proot-probe/notices/ESTERIA-GPL-3.txt": {
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    "corresponding-source/original-proot-provider/assets/proot-probe/notices/FTA-MIT-LICENSE.txt": {
+      "bytes": 1070,
+      "sha256": "f9c4b27004805765d801d72b2d97dcfea8c05b4d5675d65545164090914ae354"
+    },
+    "corresponding-source/original-proot-provider/assets/proot-probe/notices/libc6-copyright.txt": {
+      "bytes": 25467,
+      "sha256": "40c7e1f2118531f038ca22999bd976901254e1bc5cd1b0f0211bdd064c599987"
+    },
+    "corresponding-source/original-proot-provider/assets/proot-probe/notices/libc6-dev-copyright.txt": {
+      "bytes": 25467,
+      "sha256": "40c7e1f2118531f038ca22999bd976901254e1bc5cd1b0f0211bdd064c599987"
+    },
+    "corresponding-source/original-proot-provider/assets/proot-probe/notices/linux-libc-dev-copyright.txt": {
+      "bytes": 13378,
+      "sha256": "b747c37629e008bbb10bf2d44c5bb6e014ce2dde36b9ef1dc81e1425417c24bf"
+    },
+    "corresponding-source/original-proot-provider/assets/proot-probe/notices/proot-COPYING.txt": {
+      "bytes": 19106,
+      "sha256": "0ffa6454acbe7e410ac6f0007df83b9b3161fe55484c1f4b87487c0f2d228a6d"
+    },
+    "corresponding-source/original-proot-provider/assets/proot-probe/notices/talloc-COPYING.txt": {
+      "bytes": 7651,
+      "sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768"
+    },
+    "corresponding-source/original-proot-provider/assets/proot-probe/rootfs/lib/x86_64-linux-gnu/libc.so.6": {
+      "bytes": 1926232,
+      "sha256": "6b4a45352fd0c540a9c7c718f35ce8c8e46a4e482f9d3885a910c32d1a0e1421"
+    },
+    "corresponding-source/original-proot-provider/assets/proot-probe/rootfs/lib64/ld-linux-x86-64.so.2": {
+      "bytes": 215000,
+      "sha256": "02bcda52c1a5dfc236f94d9e5255b4a0e26347d8a372a5223b650e31f291ce3c"
+    },
+    "corresponding-source/original-proot-provider/assets/proot-probe/rootfs/probe": {
+      "bytes": 16160,
+      "sha256": "b1dd5b28c57718e907f452629002e385be4677bd98f6595d9847a7d695c9d495"
+    },
+    "corresponding-source/original-proot-provider/assets/proot-probe/rootfs/probe-owner": {
+      "bytes": 13312,
+      "sha256": "485785fd1949b29554f65d63edddf93ad151f23b305e6cfd9cf91a5daa53fd92"
+    },
+    "corresponding-source/original-proot-provider/assets/proot-probe/rootfs/probe-plugin.so": {
+      "bytes": 3328,
+      "sha256": "5ed97ba5e696301162e9f5fa1e3e88a04b304f38f8d3c1fd2e9f0914ff9d5d6b"
+    },
+    "corresponding-source/original-proot-provider/jniLibs/x86_64/libproot_probe.so": {
+      "bytes": 277720,
+      "sha256": "8901163fb083b63e741b7c6bc7958cf82c646bb1d897052c39c3dc8e427526c5"
+    },
+    "corresponding-source/original-proot-provider/jniLibs/x86_64/libproot_probe_control.so": {
+      "bytes": 277720,
+      "sha256": "29dbcbbab429fc77bbf45580a35b6d2c659f19162b9bf764b43ebb2da625f970"
+    },
+    "corresponding-source/original-proot-provider/jniLibs/x86_64/libproot_probe_loader.so": {
+      "bytes": 18344,
+      "sha256": "4a324117c6a16fe996af18ea388191379f5517309e963c80186fd3563a78410a"
+    },
+    "corresponding-source/packaging-recipe/app/server-installation-probe.gradle": {
+      "bytes": 6673,
+      "sha256": "97a5c21574c8aea9a188b69fcb1e192f8e836c1c642d36401cfb7d98abec990e"
+    },
+    "corresponding-source/packaging-recipe/app/src/androidTest/java/io/github/russianranger/esteria/runtime/InstallationX64Inputs.java": {
+      "bytes": 19116,
+      "sha256": "5880374edfaa33e5536c89d5389992ecc09d339f2cfec79ba353b86d0eb9fd40"
+    },
+    "corresponding-source/packaging-recipe/app/src/androidTest/java/io/github/russianranger/esteria/runtime/InstallationX64Lifetime.java": {
+      "bytes": 3468,
+      "sha256": "fe1ddbaf940aa3df58a4dd3c5fe38ca6460fe9237f2867337365d126a2eb918d"
+    },
+    "corresponding-source/packaging-recipe/app/src/androidTest/java/io/github/russianranger/esteria/runtime/ServerInstallationX64Test.java": {
+      "bytes": 15553,
+      "sha256": "3aa52e1dcfed07baee91f309ef1a1fd786ad329469133ba30f0c3901411c5240"
+    },
+    "corresponding-source/packaging-recipe/app/src/main/java/io/github/russianranger/esteria/runtime/GuestHelperAssets.java": {
+      "bytes": 7797,
+      "sha256": "b27921fc56209fbbfb97a62249a2e731f9edcc9cc4106861e1f74f4b55ae16cf"
+    },
+    "corresponding-source/packaging-recipe/app/src/main/java/io/github/russianranger/esteria/runtime/NativeProcessBridge.java": {
+      "bytes": 1873,
+      "sha256": "53ab4c623af8c2ccbb5b178c1f8dcc205fc3371b95ab3ae7f88d0ed00adc9a9c"
+    },
+    "corresponding-source/packaging-recipe/app/src/main/java/io/github/russianranger/esteria/runtime/ProotProcess.java": {
+      "bytes": 17351,
+      "sha256": "02141e0e5e56c2edfc99709b76dd9668e426106167a47f5c6f87f7b038850512"
+    },
+    "corresponding-source/packaging-recipe/app/src/main/java/io/github/russianranger/esteria/runtime/ServerContentSetup.java": {
+      "bytes": 12242,
+      "sha256": "0a109409665327778922f352a83011bb947bd02789a83e714436c2cab43e168f"
+    },
+    "corresponding-source/packaging-recipe/app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseService.java": {
+      "bytes": 17173,
+      "sha256": "48ec81e90911f8729ed2664d85d2aa06b1374703621e93886e9e1b47485c6caa"
+    },
+    "corresponding-source/packaging-recipe/app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseSetup.java": {
+      "bytes": 18343,
+      "sha256": "7b8c20c6cc524d757331013b44624e247d9c3d01c91a35aad110a8dadda3997f"
+    },
+    "corresponding-source/packaging-recipe/app/src/main/java/io/github/russianranger/esteria/runtime/ServerInstallationSetup.java": {
+      "bytes": 45822,
+      "sha256": "f004e28f8ab986f62c0efa0e2383aaa061cff821b17acf8887504bff7e0232e5"
+    },
+    "corresponding-source/packaging-recipe/app/src/main/java/io/github/russianranger/esteria/runtime/ServerProgramsSetup.java": {
+      "bytes": 22261,
+      "sha256": "00476380157f485e291ace044100da368adbefb088acf9e8128be5dddecc7b33"
+    },
+    "corresponding-source/packaging-recipe/app/src/main/java/io/github/russianranger/esteria/runtime/ServerRuntimeSetup.java": {
+      "bytes": 9898,
+      "sha256": "dc82e8f2d175b6a8ad92a48a37d1b10226a77c11c41eb7132dcf87437393a57d"
+    },
+    "corresponding-source/packaging-recipe/app/src/main/java/io/github/russianranger/esteria/runtime/ServerSourceSelection.java": {
+      "bytes": 4167,
+      "sha256": "a657e6318574b030619005e384ef5b79f5c9df640a9f153f42f13b7709f194ea"
+    },
+    "corresponding-source/packaging-recipe/config/local-server.json": {
+      "bytes": 858,
+      "sha256": "6750fa3e1a7c0101b5922f4163c6dfa87d90faba25ce011d5a36de8a578e2d4d"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/diagnostics/SupportBundle.java": {
+      "bytes": 5524,
+      "sha256": "a5881221c30ad91ad4dbfb636bd18ca7b7000b4e57d000c424f7bdf3d4155cc5"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/diagnostics/SupportLogSelection.java": {
+      "bytes": 8022,
+      "sha256": "d806eaa14d7ee1b5ba5639669076aee9a5d636d7d1ad6da50ae3432386a5d202"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/importer/ContentPackageLayout.java": {
+      "bytes": 25813,
+      "sha256": "6f5a6dbbf9823f9bc10f2bb9cfe55009ad9dcf0ed68edfcb30ceb43f8794d8e8"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/importer/EsteriaCatalogVerifier.java": {
+      "bytes": 3383,
+      "sha256": "1d4453913747ed2c608d9a46e6106dd514215aac5e9fe6100f36cd2f0688c2ad"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/importer/GameDataImporter.java": {
+      "bytes": 42143,
+      "sha256": "22549bdbdf724368a079af6b49ce848d89e3033b7e251f832f23bf4f6354f1ee"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/importer/GameDataVerifier.java": {
+      "bytes": 14575,
+      "sha256": "33f1c8397f21d9a22e9ca7be3243ada2366a5d304304f01b3ac5f46c841ec21c"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/importer/SourceStreamPositioner.java": {
+      "bytes": 2004,
+      "sha256": "aacdff1bcd579c6cc2fc75e8c940e9029f6cd204efadd02414c90f761f6e1c0f"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/importer/ZipSafety.java": {
+      "bytes": 5240,
+      "sha256": "8a9f03db1f7b1899b0819352feefa452ab33bf9d9b70a63b20199795103fd241"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/input/GameInputRouter.java": {
+      "bytes": 6893,
+      "sha256": "f3508f2ea63a3ef3bcc4d11ed4ffa0b7d05b2829c839a2e736d1df87b0982f84"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/input/KeyboardText.java": {
+      "bytes": 5090,
+      "sha256": "b4ca85731bedfc6ceb3687817184533953edb379c190698c72946587527c1b61"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/presentation/InputProtocol.java": {
+      "bytes": 1058,
+      "sha256": "20e2fac7231e1ae272cad0ed4184501822d0aec12033400ea1784e8b278249f0"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/presentation/InputSink.java": {
+      "bytes": 1151,
+      "sha256": "e96d947d64bc76581183044bc2032c583fdafa383c0a499d78e4c0877286bc2d"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/presentation/PcmProtocol.java": {
+      "bytes": 3629,
+      "sha256": "92937ce8e1fb8d6afd358576f66119c9274fe98c9b1fe836ae0c9f225c9db360"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/presentation/X11SessionPlan.java": {
+      "bytes": 2458,
+      "sha256": "6f5a912fd4a067f3d8820c4818502a3b3d7d12f2ab62b991a7023bfaa9d990a0"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/ExclusiveFileLease.java": {
+      "bytes": 4211,
+      "sha256": "b550d39bc159a58cc15bd76700650315641bffd34b3810b59154a5b9a04f120b"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/LoggedProcess.java": {
+      "bytes": 3836,
+      "sha256": "afaa73bc65421997bc28c14ebc5bd704aeb358cab28de1efafbac78a62bb7872"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/ServiceOperationGuard.java": {
+      "bytes": 2419,
+      "sha256": "f7f3f81ebc41396cae10d0a9ad4dc53b1e385fcd6ada44985490c2227f47e42e"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/SessionSupervisor.java": {
+      "bytes": 11187,
+      "sha256": "ed8df92912d21f6d0879c8fcf2db4b450aa32fd97b98b8a6956ab009d8fff221"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/WineRuntimeProfile.java": {
+      "bytes": 1892,
+      "sha256": "7f342780a9fdc62a33950ed5f0aa6ca7a6e43e694c8ef7d7ceaadc1a2954f3c5"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ClientLaunchView.java": {
+      "bytes": 26210,
+      "sha256": "a7aea548e92bb85c48e59b4d440cf4db6d48bf29b7e3f0ad27d5664f21cb6ccf"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ClientUiStore.java": {
+      "bytes": 17477,
+      "sha256": "506c34861b643f4442142bdfa14af32cde8fce21ed31d6a0d06fd98c1c1b712e"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/DownloadCache.java": {
+      "bytes": 10149,
+      "sha256": "2a4493d41860c98b2ea9639b66c52499868d22332b81f273b1d5819807286461"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/EmbeddedArchiveCache.java": {
+      "bytes": 6363,
+      "sha256": "224a86ac24ab3c5080869de48efd2783bdbbfb0107a6fc1514ede8cab8be38eb"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/FreshServerInstallations.java": {
+      "bytes": 20551,
+      "sha256": "1feda7897b56b5793ad995c0075013d375c132946f668fa91acdd92a77884ff7"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ImportedUiSource.java": {
+      "bytes": 8841,
+      "sha256": "4543f39127bc8dfba6ca7aa6362ecc765a108676d82b472607640a88cd2fdc2d"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/LocalAccountHandoff.java": {
+      "bytes": 9226,
+      "sha256": "10a367e13e2a2f21c23d7d3d59149382d4b5bbc8f09bc3cfebcdc42c5a03a96f"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/LocalHandoffRecovery.java": {
+      "bytes": 13954,
+      "sha256": "b5170bfda38a2dc6cfd7016bd531c1d3d597262141fa63c1f9582c907679e60f"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/PreparedDataCachePin.java": {
+      "bytes": 14809,
+      "sha256": "f9bcbdf96a3439c53a16c238e3927a7aec43bae85ee401d592b6a288ec5a8b56"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeFiles.java": {
+      "bytes": 7009,
+      "sha256": "8d9d321cb78c71d5c4e25c34fa4755b1343ab1dd7c32e62bb1c34ae6c606cc5d"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeInstaller.java": {
+      "bytes": 38016,
+      "sha256": "843968c15b088b501df93db1a395c6e392175f9589ad9250364583ef31b05723"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimePackagePlan.java": {
+      "bytes": 4262,
+      "sha256": "e035eb2981be83545b9cd03957cbf64e4eb81aaecc3181bb08e7cf4868dd036f"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeWork.java": {
+      "bytes": 992,
+      "sha256": "36ee9284e1a0bfa4734f979506db964c4d23d3c1699ce94b496906dff0f1b5c0"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ServerDataToolSelection.java": {
+      "bytes": 3725,
+      "sha256": "80c5923dce5f719d869e9fc2e20ce5248db75ceab7d4152a0a1cd6e049b1f9ae"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/UiFiles.java": {
+      "bytes": 8096,
+      "sha256": "431243f76e2aee6bc72de80487a9d5021b5fd931ee574a2d76a7de35b8d79826"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/process/OwnedProcess.java": {
+      "bytes": 15680,
+      "sha256": "626f874bb89bef35a418a1106576e63716edf63c453da9abad5be47a58df67db"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/process/ProcessUsageSnapshot.java": {
+      "bytes": 4766,
+      "sha256": "262de0d0d0fdfee9f3e9c6e69dfb3a86e639ee2178d0cc008125ed1df71df83d"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/process/ProotLaunch.java": {
+      "bytes": 7504,
+      "sha256": "ff482a9a1680cfebf965fb664c4476d3b804d917c3178e125cf8251a2ee17d5e"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/process/ServerDataRunPlan.java": {
+      "bytes": 5903,
+      "sha256": "b891ec7987ee4b408173d291cd9c8e490249ba40cad61530235a4dc1affc1279"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/process/ShaderRunPlan.java": {
+      "bytes": 6966,
+      "sha256": "dbd033e5429358266744ae14a285965de5374f793839159e9474c53372ac11be"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/process/TurnipProbeContract.java": {
+      "bytes": 4181,
+      "sha256": "777a2290d3a3b8176a394ad0f37d7e20e651d6a87ee6c1438b71e32f1861be8d"
+    },
+    "corresponding-source/packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/process/WorldConsoleShutdown.java": {
+      "bytes": 916,
+      "sha256": "b3f5208d9ae9c7471dae8ec9904a929ae2fe71d0580c3167d0eacef3610f522c"
+    },
+    "corresponding-source/packaging-recipe/native/process-owner/jni_bridge.cpp": {
+      "bytes": 5850,
+      "sha256": "361d5ac9299d8dee3d985027e2a41d50beeeb983e839cf072e29a5cfa1f2218e"
+    },
+    "corresponding-source/packaging-recipe/native/process-owner/process_owner.cpp": {
+      "bytes": 18774,
+      "sha256": "6047296536321ddb04da2447253fbbb42debdc3e346b50aa435cbc0bc6be30d8"
+    },
+    "corresponding-source/packaging-recipe/native/process-owner/process_owner.h": {
+      "bytes": 1702,
+      "sha256": "53d6813f2b07ab1a5afca7cc76a9fd1b33218767ce04cdc0559c8c9871e65d35"
+    },
+    "corresponding-source/packaging-recipe/native/process-owner/process_usage.cpp": {
+      "bytes": 11676,
+      "sha256": "80989ccf8d2c024643d0476d7a67724aeebdeb0c00b075548bbfab09a69f1ed9"
+    },
+    "corresponding-source/packaging-recipe/native/process-owner/process_usage.h": {
+      "bytes": 1989,
+      "sha256": "6f7ef7f8ef6c41804eefc2c7ddecc8bf0ca5ebc221b8356c8c13a82ff2f58f8a"
+    },
+    "corresponding-source/packaging-recipe/runtime/android_server_installation_setup.py": {
+      "bytes": 41474,
+      "sha256": "fe45968a0c3a32d559de27f591b5e968139e2f4ab5f04b4fc57e4bc98a330df6"
+    },
+    "corresponding-source/packaging-recipe/runtime/android_server_schema_setup.py": {
+      "bytes": 11875,
+      "sha256": "9526275258a6b98930e3253c0011627844ed10e1816658b3d5d07e23cd3dfd02"
+    },
+    "corresponding-source/packaging-recipe/runtime/mysql_bootstrap.py": {
+      "bytes": 32698,
+      "sha256": "e69d5b64c4a5f5ace86fa521589d5a64613f601c59aedb011b42a1e5b743b47d"
+    },
+    "corresponding-source/packaging-recipe/runtime/mysql_service.py": {
+      "bytes": 18078,
+      "sha256": "8b30e9598f20ee715685a51aba59cefcafc6213d9d5d5cb6c6f3a73efa6b71c2"
+    },
+    "corresponding-source/packaging-recipe/runtime/owned_process_group.py": {
+      "bytes": 2795,
+      "sha256": "c19ed5c05e94d7b537df1055983fca75e20447f594419084f2207d60f99f138e"
+    },
+    "corresponding-source/packaging-recipe/runtime/provision_local_account.py": {
+      "bytes": 19542,
+      "sha256": "e5d2c7d35e83176841107da200ff737bdb8e3671e1a5db91f9438c4228f6701d"
+    },
+    "corresponding-source/packaging-recipe/runtime/provision_local_realm.py": {
+      "bytes": 25452,
+      "sha256": "703ed8a0f1f011191fdf4374aa7e999ca5cff5a87cd4e6e7b3907d7d1c53c994"
+    },
+    "corresponding-source/packaging-recipe/runtime/server/appearance-schema-v1.sql": {
+      "bytes": 790,
+      "sha256": "8e35e8e41d74979eaa98f6f2d824d831b73f63a4a6b2f573b869484b2ff15d46"
+    },
+    "corresponding-source/packaging-recipe/runtime/server/appearance-schema.lock.json": {
+      "bytes": 7783,
+      "sha256": "6ccf5e363ec3daa5c37cbbe753d29a7e6b5d10f18eef407b700fc0d67985428d"
+    },
+    "corresponding-source/packaging-recipe/runtime/server_config.py": {
+      "bytes": 21005,
+      "sha256": "8c22c17f6fc7b28f842c49793f9d89b84cbea3f6ce5a1d638b503c97d932f472"
+    },
+    "corresponding-source/packaging-recipe/runtime/server_content.py": {
+      "bytes": 20541,
+      "sha256": "e32102ba850f4df7201c39c53e6c5530e59992cef1d3587ac809aca2ad681f8c"
+    },
+    "corresponding-source/packaging-recipe/runtime/server_playerbots_setup.py": {
+      "bytes": 22756,
+      "sha256": "c928a5ab26fae98f6458807231450d1bdcd1cc670e21844aa6b4e7b909a32451"
+    },
+    "corresponding-source/packaging-recipe/runtime/server_schema_adaptations.py": {
+      "bytes": 6316,
+      "sha256": "a49e1f8477d8b840964ce47783ed5af6873dc0dcde5b4a52280b696159082b44"
+    },
+    "corresponding-source/packaging-recipe/runtime/server_schema_baseline.py": {
+      "bytes": 8606,
+      "sha256": "21d0bd526145f6699db90e9f90bb3ec01cf15316b59e27f8db6649f03480df20"
+    },
+    "corresponding-source/packaging-recipe/runtime/server_schema_setup.py": {
+      "bytes": 11262,
+      "sha256": "6ed4f83f882101a8af0f06212c870cf71b2cee81a654b2ad4c14d9f83ef08026"
+    },
+    "corresponding-source/packaging-recipe/runtime/server_update_setup.py": {
+      "bytes": 25241,
+      "sha256": "7ff3b5272f9ec3fe38a42413f8d2d6a45f72d206f794c26869d7422439be2310"
+    },
+    "corresponding-source/packaging-recipe/runtime/server_updater.py": {
+      "bytes": 7538,
+      "sha256": "8efabb037c012a89848d854fea8a12eff8c3bab7a9d1e9a3f3ea36369c4a6007"
+    },
+    "corresponding-source/packaging-recipe/tests/android-installation-x64/installation_x64_entry.py": {
+      "bytes": 25931,
+      "sha256": "f0af3e47709300b31e4ac94c943a3129bf8b4e9853b9065f1d7de12f72fd7ae7"
+    },
+    "corresponding-source/packaging-recipe/tests/native-java-installation/restart_probe.py": {
+      "bytes": 3698,
+      "sha256": "bffa2578a01e89789e56d3fdc1fdb85ff6fe97e6e2cc789de6cfb58556053196"
+    },
+    "corresponding-source/packaging-recipe/tools/android_installation_x64_inputs.py": {
+      "bytes": 17117,
+      "sha256": "1bca504ba1740cbda7ff86b5d5b6bacdf7eb64d1012d02409c7e1a71676837f9"
+    },
+    "corresponding-source/packaging-recipe/tools/provider_android_installation_x64.py": {
+      "bytes": 38848,
+      "sha256": "77c59fd5f085f39dc5b23c944329b9b90fd09ed22ec7e4d5a60ba8ecb46d7c57"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/SOURCE-MANIFEST.json": {
+      "bytes": 4760,
+      "sha256": "81938c9d1001139e7b8e81cbd0be0480aed38df1f215157f8de329cad7da5f13"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/boost1.83_1.83.0-2.1ubuntu3.2.debian.tar.xz": {
+      "bytes": 380048,
+      "sha256": "2928da323658936427908c055a9f5f2eddb1a48d60a58d6e161985d36abdc5dc"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/boost1.83_1.83.0-2.1ubuntu3.2.dsc": {
+      "bytes": 10382,
+      "sha256": "ac3ec418c2af36e3ba409b3f3014413d6948c556328b10c684a712d48442ce4b"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/boost1.83_1.83.0.orig.tar.xz": {
+      "bytes": 77376520,
+      "sha256": "404df4b4072fc7f2d4483d4fc2d61ff6f554dd80c9a812652684d5952e881c91"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/gcc-14_14.2.0-4ubuntu2~24.04.1.debian.tar.xz": {
+      "bytes": 1950432,
+      "sha256": "cfece214c2fb790ef5f3baffb9a53e40618e7ae12d053610b251e94d77d08ade"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/gcc-14_14.2.0-4ubuntu2~24.04.1.dsc": {
+      "bytes": 46930,
+      "sha256": "50950080874a6ec6780dd60c243e21d9cda9d736bb32bca98d16095d27cc01b5"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/gcc-14_14.2.0.orig.tar.gz": {
+      "bytes": 97158172,
+      "sha256": "768c314c11eeab56ccebb91eb42ec4a41122fa94f0d83400126401942622197b"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/glibc_2.39-0ubuntu8.9.debian.tar.xz": {
+      "bytes": 491440,
+      "sha256": "d6114f2302896a3c8612453e1bf1d0e61603e3029ba4a7c246fbb1ab4c48d2b0"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/glibc_2.39-0ubuntu8.9.dsc": {
+      "bytes": 9387,
+      "sha256": "1b73a89e0910eb3e5920cde639ac7eb606256d8ee809688ff9b5912b67002711"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/glibc_2.39.orig.tar.xz": {
+      "bytes": 18520988,
+      "sha256": "f77bd47cf8170c57365ae7bf86696c118adb3b120d3259c64c502d3dc1e2d926"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/glibc_2.39.orig.tar.xz.asc": {
+      "bytes": 833,
+      "sha256": "2cce427ef7933c17379f5514e4f0ccf8dffae5bf8c72f0f7e0bf8b8401f34be5"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/libzstd_1.5.5+dfsg2-2build1.1.debian.tar.xz": {
+      "bytes": 21288,
+      "sha256": "c1df6d2628b26d085259b8e7ac020eb060e4c1feca98d6103058eda5ded725bc"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/libzstd_1.5.5+dfsg2-2build1.1.dsc": {
+      "bytes": 2485,
+      "sha256": "c190a5dff9e7c5b5b1399f0d701bb2c173bc7cbdf14d5e05970f5ac066c25570"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/libzstd_1.5.5+dfsg2.orig.tar.xz": {
+      "bytes": 1784164,
+      "sha256": "d7cf3c10d416fd999cb8fcf7685d9268ba7bec8eb78121fc2d0d916fa393d22b"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/mysql-8.0_8.0.46-0ubuntu0.24.04.4.debian.tar.xz": {
+      "bytes": 235036,
+      "sha256": "f922343a3252ad355579d1ec5dcc6707e2b97e1d717d498572f945713e4e713d"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/mysql-8.0_8.0.46-0ubuntu0.24.04.4.dsc": {
+      "bytes": 3613,
+      "sha256": "5b95ccbed23c569db1cb3b144b6e002ee9bec8a94bfd54c5fe1aefb6286c6d87"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/mysql-8.0_8.0.46.orig.tar.gz": {
+      "bytes": 492495969,
+      "sha256": "dff4332ee7f8f37fc0516c66763600a22a81c8192c743c477b6484206e314f2f"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/openssl_3.0.13-0ubuntu3.16.debian.tar.xz": {
+      "bytes": 223332,
+      "sha256": "77893129922c917792dd187c2853fb36ce1c98597c442b42d8190252959b7f6c"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/openssl_3.0.13-0ubuntu3.16.dsc": {
+      "bytes": 2516,
+      "sha256": "7d1e552a6f519836c352407e521bafdda7552ec6d1ba242968c35fc0e17f47b6"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/openssl_3.0.13.orig.tar.gz": {
+      "bytes": 15294843,
+      "sha256": "88525753f79d3bec27d2fa7c66aa0b92b3aa9498dafd93d7cfa4b3780cdae313"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/server-runtime.json": {
+      "bytes": 686,
+      "sha256": "f7bd7272cbcf6a4b027153ef11256ec7e52ea4ef1001a0397ad3017d6979d594"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/sources.lock.json": {
+      "bytes": 6499,
+      "sha256": "012af95659e8ee2e98907d185ccdb5abc64e87614a9a4ee43b5b8679ff92b512"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/zlib_1.3.dfsg-3.1ubuntu2.3.debian.tar.xz": {
+      "bytes": 61772,
+      "sha256": "ada8a0c4a1016eb8cd549f4689fd9f73b04d9c55163a318cabdfb0c3872cfe1c"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/zlib_1.3.dfsg-3.1ubuntu2.3.dsc": {
+      "bytes": 3162,
+      "sha256": "01d8c26d0549eacbbd65bc4b51c076c407e9e429d081e4d472a13ec499ec2a3a"
+    },
+    "corresponding-source/x64-component/corresponding-library-sources/zlib_1.3.dfsg.orig.tar.xz": {
+      "bytes": 1128572,
+      "sha256": "5eea0322c1c21c75cad3b607ac1c43ff5c71e014b8ac4a34300b5e2b80d02e70"
+    },
+    "corresponding-source/x64-component/library-runtime.json": {
+      "bytes": 686,
+      "sha256": "f7bd7272cbcf6a4b027153ef11256ec7e52ea4ef1001a0397ad3017d6979d594"
+    },
+    "corresponding-source/x64-component/library-source-readback.json": {
+      "bytes": 700,
+      "sha256": "0bfd6d7b3cc43de79c4a821367ad1ca73680fb2fe353b15f8f78e22d88cd469b"
+    },
+    "corresponding-source/x64-component/payload/bin/dbimport": {
+      "bytes": 1862240,
+      "sha256": "d7ca8295d99f90a1c8ec26dffcd39d36037e2fe9231f97578fd30992c6430948"
+    },
+    "corresponding-source/x64-component/payload/bin/playerbots-schema": {
+      "bytes": 1755704,
+      "sha256": "57c90150262ab7b79e17ab5f780ce058b3b29d12ca00d7ce3f59eec0e0fd102c"
+    },
+    "corresponding-source/x64-component/payload/build-receipt.json": {
+      "bytes": 32433,
+      "sha256": "5e6646ae314bfefbac00a7cae1eb892b76a29e06feffc9ba88a2a55b2f4d5522"
+    },
+    "corresponding-source/x64-component/payload/corresponding-source/integration-recipe.tar": {
+      "bytes": 10352640,
+      "sha256": "1579ea5a54116a642321e29af164c5017e8e46c76546fb5c7f9ae27982d45d90"
+    },
+    "corresponding-source/x64-component/payload/corresponding-source/integration/LICENSE": {
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    "corresponding-source/x64-component/payload/corresponding-source/integration/runtime/server/server-build-sources.lock.json": {
+      "bytes": 2170,
+      "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+    },
+    "corresponding-source/x64-component/payload/corresponding-source/integration/sources.lock.json": {
+      "bytes": 2170,
+      "sha256": "dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90"
+    },
+    "corresponding-source/x64-component/payload/corresponding-source/integration/tests/auth_srp_reference.cpp": {
+      "bytes": 1525,
+      "sha256": "ab7287d08fdb674f4779ca28227076dbab97a6475136f46486c37ea14944436b"
+    },
+    "corresponding-source/x64-component/payload/corresponding-source/integration/tests/config_path_reference.cmake": {
+      "bytes": 1071,
+      "sha256": "7edb126ada44a9a452f490919db7ad5dbee42ab6eeeb8e9831d5a884cdad83fc"
+    },
+    "corresponding-source/x64-component/payload/corresponding-source/integration/tests/config_path_reference.cpp": {
+      "bytes": 3734,
+      "sha256": "6e40a099fbce0911fed327efff402e2397d198bafdcc2e58f29cd6c883fbd352"
+    },
+    "corresponding-source/x64-component/payload/corresponding-source/integration/tests/playerbots_database_reference.cmake": {
+      "bytes": 1075,
+      "sha256": "254a8946088c364bff34a901acc546b747e2cf5fe1cda4a61e5b11d3d26fc61a"
+    },
+    "corresponding-source/x64-component/payload/corresponding-source/integration/tests/playerbots_database_reference.cpp": {
+      "bytes": 2552,
+      "sha256": "75c54da4fcae709d23723a0c8dfa7c0affc7d97ecf310a47f293e0071dae7da0"
+    },
+    "corresponding-source/x64-component/payload/corresponding-source/integration/tests/srp6_reference.cmake": {
+      "bytes": 1415,
+      "sha256": "ef9813ea2fdcf40ee470fc4f354467bc5130f369d9f9e8479e9b6a45fe40a152"
+    },
+    "corresponding-source/x64-component/payload/corresponding-source/integration/tests/srp6_reference.cpp": {
+      "bytes": 1455,
+      "sha256": "bb182c943040fe108d8a1952dd4b70dff9a6f2b4ef89bb3234efb3eddbb7baf7"
+    },
+    "corresponding-source/x64-component/payload/corresponding-source/integration/tools/build_server_setup_x64_probe.py": {
+      "bytes": 18734,
+      "sha256": "6487f55b06eba372ad360dd7584f0dd70e8bdb5d5f609a7a23f1068c469f2141"
+    },
+    "corresponding-source/x64-component/payload/corresponding-source/source-inputs/server-engine-source-inputs.tar.gz": {
+      "bytes": 18216368,
+      "sha256": "8c820a962947d2b8e2028c434ccedc969127716390f557626444d23ff8e15b99"
+    },
+    "corresponding-source/x64-component/payload/corresponding-source/source-inputs/source-inputs-receipt.json": {
+      "bytes": 1746751,
+      "sha256": "46a4ef82021d49699694bccab545591f3debbd6f4ab9e208c54e4796326bc03e"
+    },
+    "corresponding-source/x64-component/payload/corresponding-source/supplements/modules/ModulesScriptLoader.h": {
+      "bytes": 850,
+      "sha256": "cee2616d8f99a84111b5c2380946c316623b418fa615836b5afac8c235a4efb3"
+    },
+    "corresponding-source/x64-component/payload/debug/dbimport.debug": {
+      "bytes": 25562104,
+      "sha256": "0ceea8acfda67f61ce29fe6d192ac23da814b2a276ebdda54c9dcdc6084f3098"
+    },
+    "corresponding-source/x64-component/payload/debug/playerbots-schema.debug": {
+      "bytes": 24134456,
+      "sha256": "3605bd21a0349eb8cb45eaec85dd73382b6ec6a28cf7ce9b5a7eb425331502ac"
+    },
+    "corresponding-source/x64-component/payload/libraries/lib64/ld-linux-x86-64.so.2": {
+      "bytes": 236616,
+      "sha256": "c20a2dc8917c755f02b94049356320fe1f62ac7d9f8994731f807d9df39302da"
+    },
+    "corresponding-source/x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2": {
+      "bytes": 236616,
+      "sha256": "c20a2dc8917c755f02b94049356320fe1f62ac7d9f8994731f807d9df39302da"
+    },
+    "corresponding-source/x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libboost_filesystem.so.1.83.0": {
+      "bytes": 137640,
+      "sha256": "2c137b29a3740fb6d12a4c18823bc2b15215646c3ba3bb208b89782df28559f0"
+    },
+    "corresponding-source/x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libboost_program_options.so.1.83.0": {
+      "bytes": 264376,
+      "sha256": "15f34bcb75dfb0fa30af13cf2b82fb7a9a8e0fbbadf7cabcd397dd65bde552f3"
+    },
+    "corresponding-source/x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libc.so.6": {
+      "bytes": 2129424,
+      "sha256": "3a15d66867d83762c7f2f1e37359cb8f6c5743edb369c65285cb0b1c4f7498bf"
+    },
+    "corresponding-source/x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libcrypto.so.3": {
+      "bytes": 5309400,
+      "sha256": "6866ed711dab8927e1bf82bf1cd30e828bdfc34f3cc1e83b1c9eb01ce6c37d9a"
+    },
+    "corresponding-source/x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libgcc_s.so.1": {
+      "bytes": 183024,
+      "sha256": "d93224d2b0dab4247598be683adca02f5cf00586f99c187579cd7e92058fb7cb"
+    },
+    "corresponding-source/x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libm.so.6": {
+      "bytes": 952616,
+      "sha256": "fce00b6f25f459cf4ae0b7fae4257909a1a8a86f9149e7c029a5d617baf1ccd0"
+    },
+    "corresponding-source/x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libmysqlclient.so.21": {
+      "bytes": 6793144,
+      "sha256": "4707393164b8a29b11a35a87ad213612a936df43360c491555b1a0e528967080"
+    },
+    "corresponding-source/x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libresolv.so.2": {
+      "bytes": 64008,
+      "sha256": "1d730ea434da5a5595bc6a961d7a9ace83e03703205df9644044b3dca79c362f"
+    },
+    "corresponding-source/x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libssl.so.3": {
+      "bytes": 696512,
+      "sha256": "a40e7b67489bbd257e432c700ff8f6a1ad796425b5eccecdc2930127fdd86624"
+    },
+    "corresponding-source/x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libstdc++.so.6": {
+      "bytes": 2592224,
+      "sha256": "1fd75fe70354a416d75aef22bcae68c47bd25d20e2d0568c30b1a9838cf62f11"
+    },
+    "corresponding-source/x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libz.so.1": {
+      "bytes": 113000,
+      "sha256": "f61677c7bdb7c2aa2a243ea781bfd16afcb361cede7b4ef76127a9d8eb9a5242"
+    },
+    "corresponding-source/x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libzstd.so.1": {
+      "bytes": 755864,
+      "sha256": "0a2128bc10841fb29e76d08d945864dfb0b6a66da5df6df5d8299197439e54bb"
+    },
+    "corresponding-source/x64-component/payload/notices/libboost-filesystem1.83.0/copyright": {
+      "bytes": 2175464,
+      "sha256": "87ff229c71d391f951383b2246ba630c849e2024ea42a2ac9113dc9646f1e667"
+    },
+    "corresponding-source/x64-component/payload/notices/libboost-program-options1.83.0/copyright": {
+      "bytes": 2175464,
+      "sha256": "87ff229c71d391f951383b2246ba630c849e2024ea42a2ac9113dc9646f1e667"
+    },
+    "corresponding-source/x64-component/payload/notices/libc6/copyright": {
+      "bytes": 26462,
+      "sha256": "d3c95b56fa33e28b57860580f0baf4e4f4de2a268a2b80f1d031a5191bade265"
+    },
+    "corresponding-source/x64-component/payload/notices/libgcc-s1/copyright": {
+      "bytes": 69004,
+      "sha256": "20390f8a6f3b1e4d7cb45dd8652dabb259bbef688cbad839bcdb0b9ba7252f79"
+    },
+    "corresponding-source/x64-component/payload/notices/libmysqlclient21/copyright": {
+      "bytes": 28966,
+      "sha256": "d6b8a9a033b07c56afb1b448098760891d0cc872eaf0013c830f439864203094"
+    },
+    "corresponding-source/x64-component/payload/notices/libssl3t64/copyright": {
+      "bytes": 2543,
+      "sha256": "6a7da622fe0637a334d2a8fc470852d2ffb77d9a2b2f930f854e32a41ad6ef35"
+    },
+    "corresponding-source/x64-component/payload/notices/libstdc++6/copyright": {
+      "bytes": 69004,
+      "sha256": "20390f8a6f3b1e4d7cb45dd8652dabb259bbef688cbad839bcdb0b9ba7252f79"
+    },
+    "corresponding-source/x64-component/payload/notices/libzstd1/copyright": {
+      "bytes": 5389,
+      "sha256": "35e85e8e9bbb71492c5f5dddf39ed65b68775a02ad8d710c25d097b497f06c49"
+    },
+    "corresponding-source/x64-component/payload/notices/zlib1g/copyright": {
+      "bytes": 2927,
+      "sha256": "9e5b96d63773a5d177ba264254390f792be07e41748ebd94730981c6cac31cc6"
+    },
+    "corresponding-source/x64-component/payload/originals/dbimport": {
+      "bytes": 27024728,
+      "sha256": "1ae159d4f42ce6df6a7af4efaeeb8588641af75e475de0c9dcecf474248f0913"
+    },
+    "corresponding-source/x64-component/payload/originals/playerbots-schema": {
+      "bytes": 25515104,
+      "sha256": "406cded3b0fae689914a4abd882a6ddfbbd7367d26d5e4dcbac2d1f6d671e6fc"
+    },
+    "measurement-recipe.tar": {
+      "bytes": 12288000,
+      "sha256": "d6a58bf2d0815b3259eba4160ffd5383e803e1875f3d656ee0d119ca441c82f3"
+    },
+    "measurement.json": {
+      "bytes": 972,
+      "sha256": "9663725a53070743f9131ca2f25bd735fd0b845dcd35344d26c8059e5a67c205"
+    },
+    "provider/assets/installation-probe-helpers/android_server_installation_setup.py": {
+      "bytes": 41474,
+      "sha256": "fe45968a0c3a32d559de27f591b5e968139e2f4ab5f04b4fc57e4bc98a330df6"
+    },
+    "provider/assets/installation-probe-helpers/android_server_schema_setup.py": {
+      "bytes": 11875,
+      "sha256": "9526275258a6b98930e3253c0011627844ed10e1816658b3d5d07e23cd3dfd02"
+    },
+    "provider/assets/installation-probe-helpers/installation-x64-inputs.json": {
+      "bytes": 197,
+      "sha256": "de583bbc939c2df0808b80e90985295917241960685b76b6a17ef5e4d1dfdf3e"
+    },
+    "provider/assets/installation-probe-helpers/installation_x64_entry.py": {
+      "bytes": 25931,
+      "sha256": "f0af3e47709300b31e4ac94c943a3129bf8b4e9853b9065f1d7de12f72fd7ae7"
+    },
+    "provider/assets/installation-probe-helpers/local-server.json": {
+      "bytes": 858,
+      "sha256": "6750fa3e1a7c0101b5922f4163c6dfa87d90faba25ce011d5a36de8a578e2d4d"
+    },
+    "provider/assets/installation-probe-helpers/manifest.json": {
+      "bytes": 2951,
+      "sha256": "9c45ad343c975160122cb9cd04432a79e5785ac43e3401fde2c74552f06fa361"
+    },
+    "provider/assets/installation-probe-helpers/mysql_bootstrap.py": {
+      "bytes": 32698,
+      "sha256": "e69d5b64c4a5f5ace86fa521589d5a64613f601c59aedb011b42a1e5b743b47d"
+    },
+    "provider/assets/installation-probe-helpers/mysql_service.py": {
+      "bytes": 18078,
+      "sha256": "8b30e9598f20ee715685a51aba59cefcafc6213d9d5d5cb6c6f3a73efa6b71c2"
+    },
+    "provider/assets/installation-probe-helpers/owned_process_group.py": {
+      "bytes": 2795,
+      "sha256": "c19ed5c05e94d7b537df1055983fca75e20447f594419084f2207d60f99f138e"
+    },
+    "provider/assets/installation-probe-helpers/provision_local_account.py": {
+      "bytes": 19542,
+      "sha256": "e5d2c7d35e83176841107da200ff737bdb8e3671e1a5db91f9438c4228f6701d"
+    },
+    "provider/assets/installation-probe-helpers/provision_local_realm.py": {
+      "bytes": 25452,
+      "sha256": "703ed8a0f1f011191fdf4374aa7e999ca5cff5a87cd4e6e7b3907d7d1c53c994"
+    },
+    "provider/assets/installation-probe-helpers/server/appearance-schema-v1.sql": {
+      "bytes": 790,
+      "sha256": "8e35e8e41d74979eaa98f6f2d824d831b73f63a4a6b2f573b869484b2ff15d46"
+    },
+    "provider/assets/installation-probe-helpers/server/appearance-schema.lock.json": {
+      "bytes": 7783,
+      "sha256": "6ccf5e363ec3daa5c37cbbe753d29a7e6b5d10f18eef407b700fc0d67985428d"
+    },
+    "provider/assets/installation-probe-helpers/server_config.py": {
+      "bytes": 21005,
+      "sha256": "8c22c17f6fc7b28f842c49793f9d89b84cbea3f6ce5a1d638b503c97d932f472"
+    },
+    "provider/assets/installation-probe-helpers/server_content.py": {
+      "bytes": 20541,
+      "sha256": "e32102ba850f4df7201c39c53e6c5530e59992cef1d3587ac809aca2ad681f8c"
+    },
+    "provider/assets/installation-probe-helpers/server_playerbots_setup.py": {
+      "bytes": 22756,
+      "sha256": "c928a5ab26fae98f6458807231450d1bdcd1cc670e21844aa6b4e7b909a32451"
+    },
+    "provider/assets/installation-probe-helpers/server_schema_adaptations.py": {
+      "bytes": 6316,
+      "sha256": "a49e1f8477d8b840964ce47783ed5af6873dc0dcde5b4a52280b696159082b44"
+    },
+    "provider/assets/installation-probe-helpers/server_schema_baseline.py": {
+      "bytes": 8606,
+      "sha256": "21d0bd526145f6699db90e9f90bb3ec01cf15316b59e27f8db6649f03480df20"
+    },
+    "provider/assets/installation-probe-helpers/server_schema_setup.py": {
+      "bytes": 11262,
+      "sha256": "6ed4f83f882101a8af0f06212c870cf71b2cee81a654b2ad4c14d9f83ef08026"
+    },
+    "provider/assets/installation-probe-helpers/server_update_setup.py": {
+      "bytes": 25241,
+      "sha256": "7ff3b5272f9ec3fe38a42413f8d2d6a45f72d206f794c26869d7422439be2310"
+    },
+    "provider/assets/installation-probe-helpers/server_updater.py": {
+      "bytes": 7538,
+      "sha256": "8efabb037c012a89848d854fea8a12eff8c3bab7a9d1e9a3f3ea36369c4a6007"
+    },
+    "provider/assets/installation-probe/content-provider.json": {
+      "bytes": 6443,
+      "sha256": "9e5977e78ddc45deeba9863be5f1127c521d4675dbf8fc490743f49322640970"
+    },
+    "provider/assets/installation-probe/content-receipt.json": {
+      "bytes": 1343739,
+      "sha256": "1c00990e090e85af0232fe633b64e2718071a5f8e81f3b0ca1c8f2b214ffb3af"
+    },
+    "provider/assets/installation-probe/content.archive": {
+      "bytes": 167585802,
+      "sha256": "0f41b2deea5344fcea4cbc70bbddf0bab1dfda1cd0346e23e92592aac63056e6"
+    },
+    "provider/assets/installation-probe/native-sql-qualification.json": {
+      "bytes": 19483,
+      "sha256": "44448b43339efeaf6dad1421261c74c9fceab979779d1c70ae8a063907b76fed"
+    },
+    "provider/assets/installation-probe/programs.archive": {
+      "bytes": 9914398,
+      "sha256": "ca3675ba320b5bae482db6f385604a50f84277faaa7b0b6159c749fc9ca87ed1"
+    },
+    "provider/assets/installation-probe/programs.json": {
+      "bytes": 19822,
+      "sha256": "959a5ab35d3de49a101861b17f32a8d43e7e0ada69b459c29682b7bea15497da"
+    },
+    "provider/assets/installation-probe/provider.json": {
+      "bytes": 26368,
+      "sha256": "909b0dcd00c24289cf2bf59e1a36b075885cec62de008fc1cbb47e37eeb5c573"
+    },
+    "provider/assets/installation-probe/restart_probe.py": {
+      "bytes": 3698,
+      "sha256": "bffa2578a01e89789e56d3fdc1fdb85ff6fe97e6e2cc789de6cfb58556053196"
+    }
+  },
+  "formatVersion": 1,
+  "fourSchemaCoordinatorQualified": false,
+  "gameplayQualified": false,
+  "integrationRecipe": {
+    "bytes": 12288000,
+    "sha256": "d6a58bf2d0815b3259eba4160ffd5383e803e1875f3d656ee0d119ca441c82f3"
+  },
+  "playerbotsAiQualified": false,
+  "productionArm64ProviderQualified": false,
+  "providerDescriptor": {
+    "bytes": 26368,
+    "sha256": "909b0dcd00c24289cf2bf59e1a36b075885cec62de008fc1cbb47e37eeb5c573"
+  },
+  "scope": "closed-android-x64-installation-provider-product-no-execution",
+  "serverDataQualified": false,
+  "slotPromoted": false,
+  "sourceCompanionManifest": {
+    "bytes": 116088,
+    "sha256": "001090640852bfb514f8c6ac7c8e3f697efd8285f78e7221d40adea94e82d711"
+  },
+  "sqlExecuted": false,
+  "worldserverQualified": false
+}

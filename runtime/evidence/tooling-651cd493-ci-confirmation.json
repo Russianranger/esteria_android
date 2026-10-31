@@ -1,0 +1,22 @@
+{
+  "formatVersion": 1,
+  "scope": "actual-canonical-integration-tooling-result-only",
+  "repository": "Russianranger/esteria_android",
+  "sourceRevision": "651cd493c1dee9436c6fc98da0d6b4485ff19900",
+  "workflowRun": 41148040883,
+  "job": 124377645506,
+  "status": "completed",
+  "conclusion": "success",
+  "syntaxAndPinnedPatchCheckPassed": true,
+  "tests": 1414,
+  "passed": 1344,
+  "explicitSkips": 70,
+  "elapsedSeconds": 65.680,
+  "reportedResult": "OK (skipped=70)",
+  "rawLogsIncluded": false,
+  "providerMeasurementQualified": false,
+  "androidFourSchemaSqlQualified": false,
+  "worldStartupExecuted": false,
+  "thorQualified": false,
+  "gameplayQualified": false
+}

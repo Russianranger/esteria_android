@@ -1,0 +1,2283 @@
+{
+  "androidRuntimeQualified": false,
+  "currentPackagingRecipe": {
+    "commit": "651cd493c1dee9436c6fc98da0d6b4485ff19900",
+    "files": {
+      "app/server-installation-probe.gradle": {
+        "bytes": 6673,
+        "sha256": "97a5c21574c8aea9a188b69fcb1e192f8e836c1c642d36401cfb7d98abec990e"
+      },
+      "app/src/androidTest/java/io/github/russianranger/esteria/runtime/InstallationX64Inputs.java": {
+        "bytes": 19116,
+        "sha256": "5880374edfaa33e5536c89d5389992ecc09d339f2cfec79ba353b86d0eb9fd40"
+      },
+      "app/src/androidTest/java/io/github/russianranger/esteria/runtime/InstallationX64Lifetime.java": {
+        "bytes": 3468,
+        "sha256": "fe1ddbaf940aa3df58a4dd3c5fe38ca6460fe9237f2867337365d126a2eb918d"
+      },
+      "app/src/androidTest/java/io/github/russianranger/esteria/runtime/ServerInstallationX64Test.java": {
+        "bytes": 15553,
+        "sha256": "3aa52e1dcfed07baee91f309ef1a1fd786ad329469133ba30f0c3901411c5240"
+      },
+      "app/src/main/java/io/github/russianranger/esteria/runtime/GuestHelperAssets.java": {
+        "bytes": 7797,
+        "sha256": "b27921fc56209fbbfb97a62249a2e731f9edcc9cc4106861e1f74f4b55ae16cf"
+      },
+      "app/src/main/java/io/github/russianranger/esteria/runtime/NativeProcessBridge.java": {
+        "bytes": 1873,
+        "sha256": "53ab4c623af8c2ccbb5b178c1f8dcc205fc3371b95ab3ae7f88d0ed00adc9a9c"
+      },
+      "app/src/main/java/io/github/russianranger/esteria/runtime/ProotProcess.java": {
+        "bytes": 17351,
+        "sha256": "02141e0e5e56c2edfc99709b76dd9668e426106167a47f5c6f87f7b038850512"
+      },
+      "app/src/main/java/io/github/russianranger/esteria/runtime/ServerContentSetup.java": {
+        "bytes": 12242,
+        "sha256": "0a109409665327778922f352a83011bb947bd02789a83e714436c2cab43e168f"
+      },
+      "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseService.java": {
+        "bytes": 17173,
+        "sha256": "48ec81e90911f8729ed2664d85d2aa06b1374703621e93886e9e1b47485c6caa"
+      },
+      "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseSetup.java": {
+        "bytes": 18343,
+        "sha256": "7b8c20c6cc524d757331013b44624e247d9c3d01c91a35aad110a8dadda3997f"
+      },
+      "app/src/main/java/io/github/russianranger/esteria/runtime/ServerInstallationSetup.java": {
+        "bytes": 45822,
+        "sha256": "f004e28f8ab986f62c0efa0e2383aaa061cff821b17acf8887504bff7e0232e5"
+      },
+      "app/src/main/java/io/github/russianranger/esteria/runtime/ServerProgramsSetup.java": {
+        "bytes": 22261,
+        "sha256": "00476380157f485e291ace044100da368adbefb088acf9e8128be5dddecc7b33"
+      },
+      "app/src/main/java/io/github/russianranger/esteria/runtime/ServerRuntimeSetup.java": {
+        "bytes": 9898,
+        "sha256": "dc82e8f2d175b6a8ad92a48a37d1b10226a77c11c41eb7132dcf87437393a57d"
+      },
+      "app/src/main/java/io/github/russianranger/esteria/runtime/ServerSourceSelection.java": {
+        "bytes": 4167,
+        "sha256": "a657e6318574b030619005e384ef5b79f5c9df640a9f153f42f13b7709f194ea"
+      },
+      "config/local-server.json": {
+        "bytes": 858,
+        "sha256": "6750fa3e1a7c0101b5922f4163c6dfa87d90faba25ce011d5a36de8a578e2d4d"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/diagnostics/SupportBundle.java": {
+        "bytes": 5524,
+        "sha256": "a5881221c30ad91ad4dbfb636bd18ca7b7000b4e57d000c424f7bdf3d4155cc5"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/diagnostics/SupportLogSelection.java": {
+        "bytes": 8022,
+        "sha256": "d806eaa14d7ee1b5ba5639669076aee9a5d636d7d1ad6da50ae3432386a5d202"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/importer/ContentPackageLayout.java": {
+        "bytes": 25813,
+        "sha256": "6f5a6dbbf9823f9bc10f2bb9cfe55009ad9dcf0ed68edfcb30ceb43f8794d8e8"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/importer/EsteriaCatalogVerifier.java": {
+        "bytes": 3383,
+        "sha256": "1d4453913747ed2c608d9a46e6106dd514215aac5e9fe6100f36cd2f0688c2ad"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/importer/GameDataImporter.java": {
+        "bytes": 42143,
+        "sha256": "22549bdbdf724368a079af6b49ce848d89e3033b7e251f832f23bf4f6354f1ee"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/importer/GameDataVerifier.java": {
+        "bytes": 14575,
+        "sha256": "33f1c8397f21d9a22e9ca7be3243ada2366a5d304304f01b3ac5f46c841ec21c"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/importer/SourceStreamPositioner.java": {
+        "bytes": 2004,
+        "sha256": "aacdff1bcd579c6cc2fc75e8c940e9029f6cd204efadd02414c90f761f6e1c0f"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/importer/ZipSafety.java": {
+        "bytes": 5240,
+        "sha256": "8a9f03db1f7b1899b0819352feefa452ab33bf9d9b70a63b20199795103fd241"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/input/GameInputRouter.java": {
+        "bytes": 6893,
+        "sha256": "f3508f2ea63a3ef3bcc4d11ed4ffa0b7d05b2829c839a2e736d1df87b0982f84"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/input/KeyboardText.java": {
+        "bytes": 5090,
+        "sha256": "b4ca85731bedfc6ceb3687817184533953edb379c190698c72946587527c1b61"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/presentation/InputProtocol.java": {
+        "bytes": 1058,
+        "sha256": "20e2fac7231e1ae272cad0ed4184501822d0aec12033400ea1784e8b278249f0"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/presentation/InputSink.java": {
+        "bytes": 1151,
+        "sha256": "e96d947d64bc76581183044bc2032c583fdafa383c0a499d78e4c0877286bc2d"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/presentation/PcmProtocol.java": {
+        "bytes": 3629,
+        "sha256": "92937ce8e1fb8d6afd358576f66119c9274fe98c9b1fe836ae0c9f225c9db360"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/presentation/X11SessionPlan.java": {
+        "bytes": 2458,
+        "sha256": "6f5a912fd4a067f3d8820c4818502a3b3d7d12f2ab62b991a7023bfaa9d990a0"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/ExclusiveFileLease.java": {
+        "bytes": 4211,
+        "sha256": "b550d39bc159a58cc15bd76700650315641bffd34b3810b59154a5b9a04f120b"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/LoggedProcess.java": {
+        "bytes": 3836,
+        "sha256": "afaa73bc65421997bc28c14ebc5bd704aeb358cab28de1efafbac78a62bb7872"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/ServiceOperationGuard.java": {
+        "bytes": 2419,
+        "sha256": "f7f3f81ebc41396cae10d0a9ad4dc53b1e385fcd6ada44985490c2227f47e42e"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/SessionSupervisor.java": {
+        "bytes": 11187,
+        "sha256": "ed8df92912d21f6d0879c8fcf2db4b450aa32fd97b98b8a6956ab009d8fff221"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/WineRuntimeProfile.java": {
+        "bytes": 1892,
+        "sha256": "7f342780a9fdc62a33950ed5f0aa6ca7a6e43e694c8ef7d7ceaadc1a2954f3c5"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ClientLaunchView.java": {
+        "bytes": 26210,
+        "sha256": "a7aea548e92bb85c48e59b4d440cf4db6d48bf29b7e3f0ad27d5664f21cb6ccf"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ClientUiStore.java": {
+        "bytes": 17477,
+        "sha256": "506c34861b643f4442142bdfa14af32cde8fce21ed31d6a0d06fd98c1c1b712e"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/DownloadCache.java": {
+        "bytes": 10149,
+        "sha256": "2a4493d41860c98b2ea9639b66c52499868d22332b81f273b1d5819807286461"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/EmbeddedArchiveCache.java": {
+        "bytes": 6363,
+        "sha256": "224a86ac24ab3c5080869de48efd2783bdbbfb0107a6fc1514ede8cab8be38eb"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/FreshServerInstallations.java": {
+        "bytes": 20551,
+        "sha256": "1feda7897b56b5793ad995c0075013d375c132946f668fa91acdd92a77884ff7"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ImportedUiSource.java": {
+        "bytes": 8841,
+        "sha256": "4543f39127bc8dfba6ca7aa6362ecc765a108676d82b472607640a88cd2fdc2d"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/LocalAccountHandoff.java": {
+        "bytes": 9226,
+        "sha256": "10a367e13e2a2f21c23d7d3d59149382d4b5bbc8f09bc3cfebcdc42c5a03a96f"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/LocalHandoffRecovery.java": {
+        "bytes": 13954,
+        "sha256": "b5170bfda38a2dc6cfd7016bd531c1d3d597262141fa63c1f9582c907679e60f"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/PreparedDataCachePin.java": {
+        "bytes": 14809,
+        "sha256": "f9bcbdf96a3439c53a16c238e3927a7aec43bae85ee401d592b6a288ec5a8b56"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeFiles.java": {
+        "bytes": 7009,
+        "sha256": "8d9d321cb78c71d5c4e25c34fa4755b1343ab1dd7c32e62bb1c34ae6c606cc5d"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeInstaller.java": {
+        "bytes": 38016,
+        "sha256": "843968c15b088b501df93db1a395c6e392175f9589ad9250364583ef31b05723"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimePackagePlan.java": {
+        "bytes": 4262,
+        "sha256": "e035eb2981be83545b9cd03957cbf64e4eb81aaecc3181bb08e7cf4868dd036f"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeWork.java": {
+        "bytes": 992,
+        "sha256": "36ee9284e1a0bfa4734f979506db964c4d23d3c1699ce94b496906dff0f1b5c0"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ServerDataToolSelection.java": {
+        "bytes": 3725,
+        "sha256": "80c5923dce5f719d869e9fc2e20ce5248db75ceab7d4152a0a1cd6e049b1f9ae"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/UiFiles.java": {
+        "bytes": 8096,
+        "sha256": "431243f76e2aee6bc72de80487a9d5021b5fd931ee574a2d76a7de35b8d79826"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/OwnedProcess.java": {
+        "bytes": 15680,
+        "sha256": "626f874bb89bef35a418a1106576e63716edf63c453da9abad5be47a58df67db"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/ProcessUsageSnapshot.java": {
+        "bytes": 4766,
+        "sha256": "262de0d0d0fdfee9f3e9c6e69dfb3a86e639ee2178d0cc008125ed1df71df83d"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/ProotLaunch.java": {
+        "bytes": 7504,
+        "sha256": "ff482a9a1680cfebf965fb664c4476d3b804d917c3178e125cf8251a2ee17d5e"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/ServerDataRunPlan.java": {
+        "bytes": 5903,
+        "sha256": "b891ec7987ee4b408173d291cd9c8e490249ba40cad61530235a4dc1affc1279"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/ShaderRunPlan.java": {
+        "bytes": 6966,
+        "sha256": "dbd033e5429358266744ae14a285965de5374f793839159e9474c53372ac11be"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/TurnipProbeContract.java": {
+        "bytes": 4181,
+        "sha256": "777a2290d3a3b8176a394ad0f37d7e20e651d6a87ee6c1438b71e32f1861be8d"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/process/WorldConsoleShutdown.java": {
+        "bytes": 916,
+        "sha256": "b3f5208d9ae9c7471dae8ec9904a929ae2fe71d0580c3167d0eacef3610f522c"
+      },
+      "native/process-owner/jni_bridge.cpp": {
+        "bytes": 5850,
+        "sha256": "361d5ac9299d8dee3d985027e2a41d50beeeb983e839cf072e29a5cfa1f2218e"
+      },
+      "native/process-owner/process_owner.cpp": {
+        "bytes": 18774,
+        "sha256": "6047296536321ddb04da2447253fbbb42debdc3e346b50aa435cbc0bc6be30d8"
+      },
+      "native/process-owner/process_owner.h": {
+        "bytes": 1702,
+        "sha256": "53d6813f2b07ab1a5afca7cc76a9fd1b33218767ce04cdc0559c8c9871e65d35"
+      },
+      "native/process-owner/process_usage.cpp": {
+        "bytes": 11676,
+        "sha256": "80989ccf8d2c024643d0476d7a67724aeebdeb0c00b075548bbfab09a69f1ed9"
+      },
+      "native/process-owner/process_usage.h": {
+        "bytes": 1989,
+        "sha256": "6f7ef7f8ef6c41804eefc2c7ddecc8bf0ca5ebc221b8356c8c13a82ff2f58f8a"
+      },
+      "runtime/android_server_installation_setup.py": {
+        "bytes": 41474,
+        "sha256": "fe45968a0c3a32d559de27f591b5e968139e2f4ab5f04b4fc57e4bc98a330df6"
+      },
+      "runtime/android_server_schema_setup.py": {
+        "bytes": 11875,
+        "sha256": "9526275258a6b98930e3253c0011627844ed10e1816658b3d5d07e23cd3dfd02"
+      },
+      "runtime/mysql_bootstrap.py": {
+        "bytes": 32698,
+        "sha256": "e69d5b64c4a5f5ace86fa521589d5a64613f601c59aedb011b42a1e5b743b47d"
+      },
+      "runtime/mysql_service.py": {
+        "bytes": 18078,
+        "sha256": "8b30e9598f20ee715685a51aba59cefcafc6213d9d5d5cb6c6f3a73efa6b71c2"
+      },
+      "runtime/owned_process_group.py": {
+        "bytes": 2795,
+        "sha256": "c19ed5c05e94d7b537df1055983fca75e20447f594419084f2207d60f99f138e"
+      },
+      "runtime/provision_local_account.py": {
+        "bytes": 19542,
+        "sha256": "e5d2c7d35e83176841107da200ff737bdb8e3671e1a5db91f9438c4228f6701d"
+      },
+      "runtime/provision_local_realm.py": {
+        "bytes": 25452,
+        "sha256": "703ed8a0f1f011191fdf4374aa7e999ca5cff5a87cd4e6e7b3907d7d1c53c994"
+      },
+      "runtime/server/appearance-schema-v1.sql": {
+        "bytes": 790,
+        "sha256": "8e35e8e41d74979eaa98f6f2d824d831b73f63a4a6b2f573b869484b2ff15d46"
+      },
+      "runtime/server/appearance-schema.lock.json": {
+        "bytes": 7783,
+        "sha256": "6ccf5e363ec3daa5c37cbbe753d29a7e6b5d10f18eef407b700fc0d67985428d"
+      },
+      "runtime/server_config.py": {
+        "bytes": 21005,
+        "sha256": "8c22c17f6fc7b28f842c49793f9d89b84cbea3f6ce5a1d638b503c97d932f472"
+      },
+      "runtime/server_content.py": {
+        "bytes": 20541,
+        "sha256": "e32102ba850f4df7201c39c53e6c5530e59992cef1d3587ac809aca2ad681f8c"
+      },
+      "runtime/server_playerbots_setup.py": {
+        "bytes": 22756,
+        "sha256": "c928a5ab26fae98f6458807231450d1bdcd1cc670e21844aa6b4e7b909a32451"
+      },
+      "runtime/server_schema_adaptations.py": {
+        "bytes": 6316,
+        "sha256": "a49e1f8477d8b840964ce47783ed5af6873dc0dcde5b4a52280b696159082b44"
+      },
+      "runtime/server_schema_baseline.py": {
+        "bytes": 8606,
+        "sha256": "21d0bd526145f6699db90e9f90bb3ec01cf15316b59e27f8db6649f03480df20"
+      },
+      "runtime/server_schema_setup.py": {
+        "bytes": 11262,
+        "sha256": "6ed4f83f882101a8af0f06212c870cf71b2cee81a654b2ad4c14d9f83ef08026"
+      },
+      "runtime/server_update_setup.py": {
+        "bytes": 25241,
+        "sha256": "7ff3b5272f9ec3fe38a42413f8d2d6a45f72d206f794c26869d7422439be2310"
+      },
+      "runtime/server_updater.py": {
+        "bytes": 7538,
+        "sha256": "8efabb037c012a89848d854fea8a12eff8c3bab7a9d1e9a3f3ea36369c4a6007"
+      },
+      "tests/android-installation-x64/installation_x64_entry.py": {
+        "bytes": 25931,
+        "sha256": "f0af3e47709300b31e4ac94c943a3129bf8b4e9853b9065f1d7de12f72fd7ae7"
+      },
+      "tests/native-java-installation/restart_probe.py": {
+        "bytes": 3698,
+        "sha256": "bffa2578a01e89789e56d3fdc1fdb85ff6fe97e6e2cc789de6cfb58556053196"
+      },
+      "tools/android_installation_x64_inputs.py": {
+        "bytes": 17117,
+        "sha256": "1bca504ba1740cbda7ff86b5d5b6bacdf7eb64d1012d02409c7e1a71676837f9"
+      },
+      "tools/provider_android_installation_x64.py": {
+        "bytes": 38848,
+        "sha256": "77c59fd5f085f39dc5b23c944329b9b90fd09ed22ec7e4d5a60ba8ecb46d7c57"
+      }
+    },
+    "repository": "Russianranger/esteria_android"
+  },
+  "fileBytes": 1777578924,
+  "files": {
+    "original-mysql-metadata/SOURCE-MANIFEST.json": {
+      "bytes": 53070,
+      "sha256": "ca5c6d1ee9559430b62590d242788ff756393cc4d7de2248b943633b3221c04f"
+    },
+    "original-mysql-metadata/provider.json": {
+      "bytes": 5405,
+      "sha256": "a2005edbd843f56d3813a47572e1e5478043f9f6b4ded09481fc7996525a7afc"
+    },
+    "original-mysql-metadata/runtime.json": {
+      "bytes": 33125,
+      "sha256": "109ac9bc069911045ba9055c35b1822ec2c543b469aa66faf0acee905b92b024"
+    },
+    "original-mysql-metadata/sources.lock.json": {
+      "bytes": 6499,
+      "sha256": "012af95659e8ee2e98907d185ccdb5abc64e87614a9a4ee43b5b8679ff92b512"
+    },
+    "original-mysql-proot-completeSources.zip": {
+      "bytes": 905093502,
+      "sha256": "de0a9922035314e9d7a566490932475d276f8f29aba9b4fb09be717d2bada04c"
+    },
+    "original-proot-provider/assets/proot-probe/build-evidence.json": {
+      "bytes": 4833,
+      "sha256": "b5d14a16d9a83835e027d71d2e0a6f521280057de365244a8963e49b570a463a"
+    },
+    "original-proot-provider/assets/proot-probe/notices/ESTERIA-GPL-3.txt": {
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    "original-proot-provider/assets/proot-probe/notices/FTA-MIT-LICENSE.txt": {
+      "bytes": 1070,
+      "sha256": "f9c4b27004805765d801d72b2d97dcfea8c05b4d5675d65545164090914ae354"
+    },
+    "original-proot-provider/assets/proot-probe/notices/libc6-copyright.txt": {
+      "bytes": 25467,
+      "sha256": "40c7e1f2118531f038ca22999bd976901254e1bc5cd1b0f0211bdd064c599987"
+    },
+    "original-proot-provider/assets/proot-probe/notices/libc6-dev-copyright.txt": {
+      "bytes": 25467,
+      "sha256": "40c7e1f2118531f038ca22999bd976901254e1bc5cd1b0f0211bdd064c599987"
+    },
+    "original-proot-provider/assets/proot-probe/notices/linux-libc-dev-copyright.txt": {
+      "bytes": 13378,
+      "sha256": "b747c37629e008bbb10bf2d44c5bb6e014ce2dde36b9ef1dc81e1425417c24bf"
+    },
+    "original-proot-provider/assets/proot-probe/notices/proot-COPYING.txt": {
+      "bytes": 19106,
+      "sha256": "0ffa6454acbe7e410ac6f0007df83b9b3161fe55484c1f4b87487c0f2d228a6d"
+    },
+    "original-proot-provider/assets/proot-probe/notices/talloc-COPYING.txt": {
+      "bytes": 7651,
+      "sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768"
+    },
+    "original-proot-provider/assets/proot-probe/rootfs/lib/x86_64-linux-gnu/libc.so.6": {
+      "bytes": 1926232,
+      "sha256": "6b4a45352fd0c540a9c7c718f35ce8c8e46a4e482f9d3885a910c32d1a0e1421"
+    },
+    "original-proot-provider/assets/proot-probe/rootfs/lib64/ld-linux-x86-64.so.2": {
+      "bytes": 215000,
+      "sha256": "02bcda52c1a5dfc236f94d9e5255b4a0e26347d8a372a5223b650e31f291ce3c"
+    },
+    "original-proot-provider/assets/proot-probe/rootfs/probe": {
+      "bytes": 16160,
+      "sha256": "b1dd5b28c57718e907f452629002e385be4677bd98f6595d9847a7d695c9d495"
+    },
+    "original-proot-provider/assets/proot-probe/rootfs/probe-owner": {
+      "bytes": 13312,
+      "sha256": "485785fd1949b29554f65d63edddf93ad151f23b305e6cfd9cf91a5daa53fd92"
+    },
+    "original-proot-provider/assets/proot-probe/rootfs/probe-plugin.so": {
+      "bytes": 3328,
+      "sha256": "5ed97ba5e696301162e9f5fa1e3e88a04b304f38f8d3c1fd2e9f0914ff9d5d6b"
+    },
+    "original-proot-provider/jniLibs/x86_64/libproot_probe.so": {
+      "bytes": 277720,
+      "sha256": "8901163fb083b63e741b7c6bc7958cf82c646bb1d897052c39c3dc8e427526c5"
+    },
+    "original-proot-provider/jniLibs/x86_64/libproot_probe_control.so": {
+      "bytes": 277720,
+      "sha256": "29dbcbbab429fc77bbf45580a35b6d2c659f19162b9bf764b43ebb2da625f970"
+    },
+    "original-proot-provider/jniLibs/x86_64/libproot_probe_loader.so": {
+      "bytes": 18344,
+      "sha256": "4a324117c6a16fe996af18ea388191379f5517309e963c80186fd3563a78410a"
+    },
+    "packaging-recipe/app/server-installation-probe.gradle": {
+      "bytes": 6673,
+      "sha256": "97a5c21574c8aea9a188b69fcb1e192f8e836c1c642d36401cfb7d98abec990e"
+    },
+    "packaging-recipe/app/src/androidTest/java/io/github/russianranger/esteria/runtime/InstallationX64Inputs.java": {
+      "bytes": 19116,
+      "sha256": "5880374edfaa33e5536c89d5389992ecc09d339f2cfec79ba353b86d0eb9fd40"
+    },
+    "packaging-recipe/app/src/androidTest/java/io/github/russianranger/esteria/runtime/InstallationX64Lifetime.java": {
+      "bytes": 3468,
+      "sha256": "fe1ddbaf940aa3df58a4dd3c5fe38ca6460fe9237f2867337365d126a2eb918d"
+    },
+    "packaging-recipe/app/src/androidTest/java/io/github/russianranger/esteria/runtime/ServerInstallationX64Test.java": {
+      "bytes": 15553,
+      "sha256": "3aa52e1dcfed07baee91f309ef1a1fd786ad329469133ba30f0c3901411c5240"
+    },
+    "packaging-recipe/app/src/main/java/io/github/russianranger/esteria/runtime/GuestHelperAssets.java": {
+      "bytes": 7797,
+      "sha256": "b27921fc56209fbbfb97a62249a2e731f9edcc9cc4106861e1f74f4b55ae16cf"
+    },
+    "packaging-recipe/app/src/main/java/io/github/russianranger/esteria/runtime/NativeProcessBridge.java": {
+      "bytes": 1873,
+      "sha256": "53ab4c623af8c2ccbb5b178c1f8dcc205fc3371b95ab3ae7f88d0ed00adc9a9c"
+    },
+    "packaging-recipe/app/src/main/java/io/github/russianranger/esteria/runtime/ProotProcess.java": {
+      "bytes": 17351,
+      "sha256": "02141e0e5e56c2edfc99709b76dd9668e426106167a47f5c6f87f7b038850512"
+    },
+    "packaging-recipe/app/src/main/java/io/github/russianranger/esteria/runtime/ServerContentSetup.java": {
+      "bytes": 12242,
+      "sha256": "0a109409665327778922f352a83011bb947bd02789a83e714436c2cab43e168f"
+    },
+    "packaging-recipe/app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseService.java": {
+      "bytes": 17173,
+      "sha256": "48ec81e90911f8729ed2664d85d2aa06b1374703621e93886e9e1b47485c6caa"
+    },
+    "packaging-recipe/app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseSetup.java": {
+      "bytes": 18343,
+      "sha256": "7b8c20c6cc524d757331013b44624e247d9c3d01c91a35aad110a8dadda3997f"
+    },
+    "packaging-recipe/app/src/main/java/io/github/russianranger/esteria/runtime/ServerInstallationSetup.java": {
+      "bytes": 45822,
+      "sha256": "f004e28f8ab986f62c0efa0e2383aaa061cff821b17acf8887504bff7e0232e5"
+    },
+    "packaging-recipe/app/src/main/java/io/github/russianranger/esteria/runtime/ServerProgramsSetup.java": {
+      "bytes": 22261,
+      "sha256": "00476380157f485e291ace044100da368adbefb088acf9e8128be5dddecc7b33"
+    },
+    "packaging-recipe/app/src/main/java/io/github/russianranger/esteria/runtime/ServerRuntimeSetup.java": {
+      "bytes": 9898,
+      "sha256": "dc82e8f2d175b6a8ad92a48a37d1b10226a77c11c41eb7132dcf87437393a57d"
+    },
+    "packaging-recipe/app/src/main/java/io/github/russianranger/esteria/runtime/ServerSourceSelection.java": {
+      "bytes": 4167,
+      "sha256": "a657e6318574b030619005e384ef5b79f5c9df640a9f153f42f13b7709f194ea"
+    },
+    "packaging-recipe/config/local-server.json": {
+      "bytes": 858,
+      "sha256": "6750fa3e1a7c0101b5922f4163c6dfa87d90faba25ce011d5a36de8a578e2d4d"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/diagnostics/SupportBundle.java": {
+      "bytes": 5524,
+      "sha256": "a5881221c30ad91ad4dbfb636bd18ca7b7000b4e57d000c424f7bdf3d4155cc5"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/diagnostics/SupportLogSelection.java": {
+      "bytes": 8022,
+      "sha256": "d806eaa14d7ee1b5ba5639669076aee9a5d636d7d1ad6da50ae3432386a5d202"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/importer/ContentPackageLayout.java": {
+      "bytes": 25813,
+      "sha256": "6f5a6dbbf9823f9bc10f2bb9cfe55009ad9dcf0ed68edfcb30ceb43f8794d8e8"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/importer/EsteriaCatalogVerifier.java": {
+      "bytes": 3383,
+      "sha256": "1d4453913747ed2c608d9a46e6106dd514215aac5e9fe6100f36cd2f0688c2ad"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/importer/GameDataImporter.java": {
+      "bytes": 42143,
+      "sha256": "22549bdbdf724368a079af6b49ce848d89e3033b7e251f832f23bf4f6354f1ee"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/importer/GameDataVerifier.java": {
+      "bytes": 14575,
+      "sha256": "33f1c8397f21d9a22e9ca7be3243ada2366a5d304304f01b3ac5f46c841ec21c"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/importer/SourceStreamPositioner.java": {
+      "bytes": 2004,
+      "sha256": "aacdff1bcd579c6cc2fc75e8c940e9029f6cd204efadd02414c90f761f6e1c0f"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/importer/ZipSafety.java": {
+      "bytes": 5240,
+      "sha256": "8a9f03db1f7b1899b0819352feefa452ab33bf9d9b70a63b20199795103fd241"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/input/GameInputRouter.java": {
+      "bytes": 6893,
+      "sha256": "f3508f2ea63a3ef3bcc4d11ed4ffa0b7d05b2829c839a2e736d1df87b0982f84"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/input/KeyboardText.java": {
+      "bytes": 5090,
+      "sha256": "b4ca85731bedfc6ceb3687817184533953edb379c190698c72946587527c1b61"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/presentation/InputProtocol.java": {
+      "bytes": 1058,
+      "sha256": "20e2fac7231e1ae272cad0ed4184501822d0aec12033400ea1784e8b278249f0"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/presentation/InputSink.java": {
+      "bytes": 1151,
+      "sha256": "e96d947d64bc76581183044bc2032c583fdafa383c0a499d78e4c0877286bc2d"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/presentation/PcmProtocol.java": {
+      "bytes": 3629,
+      "sha256": "92937ce8e1fb8d6afd358576f66119c9274fe98c9b1fe836ae0c9f225c9db360"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/presentation/X11SessionPlan.java": {
+      "bytes": 2458,
+      "sha256": "6f5a912fd4a067f3d8820c4818502a3b3d7d12f2ab62b991a7023bfaa9d990a0"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/ExclusiveFileLease.java": {
+      "bytes": 4211,
+      "sha256": "b550d39bc159a58cc15bd76700650315641bffd34b3810b59154a5b9a04f120b"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/LoggedProcess.java": {
+      "bytes": 3836,
+      "sha256": "afaa73bc65421997bc28c14ebc5bd704aeb358cab28de1efafbac78a62bb7872"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/ServiceOperationGuard.java": {
+      "bytes": 2419,
+      "sha256": "f7f3f81ebc41396cae10d0a9ad4dc53b1e385fcd6ada44985490c2227f47e42e"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/SessionSupervisor.java": {
+      "bytes": 11187,
+      "sha256": "ed8df92912d21f6d0879c8fcf2db4b450aa32fd97b98b8a6956ab009d8fff221"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/WineRuntimeProfile.java": {
+      "bytes": 1892,
+      "sha256": "7f342780a9fdc62a33950ed5f0aa6ca7a6e43e694c8ef7d7ceaadc1a2954f3c5"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ClientLaunchView.java": {
+      "bytes": 26210,
+      "sha256": "a7aea548e92bb85c48e59b4d440cf4db6d48bf29b7e3f0ad27d5664f21cb6ccf"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ClientUiStore.java": {
+      "bytes": 17477,
+      "sha256": "506c34861b643f4442142bdfa14af32cde8fce21ed31d6a0d06fd98c1c1b712e"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/DownloadCache.java": {
+      "bytes": 10149,
+      "sha256": "2a4493d41860c98b2ea9639b66c52499868d22332b81f273b1d5819807286461"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/EmbeddedArchiveCache.java": {
+      "bytes": 6363,
+      "sha256": "224a86ac24ab3c5080869de48efd2783bdbbfb0107a6fc1514ede8cab8be38eb"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/FreshServerInstallations.java": {
+      "bytes": 20551,
+      "sha256": "1feda7897b56b5793ad995c0075013d375c132946f668fa91acdd92a77884ff7"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ImportedUiSource.java": {
+      "bytes": 8841,
+      "sha256": "4543f39127bc8dfba6ca7aa6362ecc765a108676d82b472607640a88cd2fdc2d"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/LocalAccountHandoff.java": {
+      "bytes": 9226,
+      "sha256": "10a367e13e2a2f21c23d7d3d59149382d4b5bbc8f09bc3cfebcdc42c5a03a96f"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/LocalHandoffRecovery.java": {
+      "bytes": 13954,
+      "sha256": "b5170bfda38a2dc6cfd7016bd531c1d3d597262141fa63c1f9582c907679e60f"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/PreparedDataCachePin.java": {
+      "bytes": 14809,
+      "sha256": "f9bcbdf96a3439c53a16c238e3927a7aec43bae85ee401d592b6a288ec5a8b56"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeFiles.java": {
+      "bytes": 7009,
+      "sha256": "8d9d321cb78c71d5c4e25c34fa4755b1343ab1dd7c32e62bb1c34ae6c606cc5d"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeInstaller.java": {
+      "bytes": 38016,
+      "sha256": "843968c15b088b501df93db1a395c6e392175f9589ad9250364583ef31b05723"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimePackagePlan.java": {
+      "bytes": 4262,
+      "sha256": "e035eb2981be83545b9cd03957cbf64e4eb81aaecc3181bb08e7cf4868dd036f"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeWork.java": {
+      "bytes": 992,
+      "sha256": "36ee9284e1a0bfa4734f979506db964c4d23d3c1699ce94b496906dff0f1b5c0"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ServerDataToolSelection.java": {
+      "bytes": 3725,
+      "sha256": "80c5923dce5f719d869e9fc2e20ce5248db75ceab7d4152a0a1cd6e049b1f9ae"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/UiFiles.java": {
+      "bytes": 8096,
+      "sha256": "431243f76e2aee6bc72de80487a9d5021b5fd931ee574a2d76a7de35b8d79826"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/process/OwnedProcess.java": {
+      "bytes": 15680,
+      "sha256": "626f874bb89bef35a418a1106576e63716edf63c453da9abad5be47a58df67db"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/process/ProcessUsageSnapshot.java": {
+      "bytes": 4766,
+      "sha256": "262de0d0d0fdfee9f3e9c6e69dfb3a86e639ee2178d0cc008125ed1df71df83d"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/process/ProotLaunch.java": {
+      "bytes": 7504,
+      "sha256": "ff482a9a1680cfebf965fb664c4476d3b804d917c3178e125cf8251a2ee17d5e"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/process/ServerDataRunPlan.java": {
+      "bytes": 5903,
+      "sha256": "b891ec7987ee4b408173d291cd9c8e490249ba40cad61530235a4dc1affc1279"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/process/ShaderRunPlan.java": {
+      "bytes": 6966,
+      "sha256": "dbd033e5429358266744ae14a285965de5374f793839159e9474c53372ac11be"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/process/TurnipProbeContract.java": {
+      "bytes": 4181,
+      "sha256": "777a2290d3a3b8176a394ad0f37d7e20e651d6a87ee6c1438b71e32f1861be8d"
+    },
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/process/WorldConsoleShutdown.java": {
+      "bytes": 916,
+      "sha256": "b3f5208d9ae9c7471dae8ec9904a929ae2fe71d0580c3167d0eacef3610f522c"
+    },
+    "packaging-recipe/native/process-owner/jni_bridge.cpp": {
+      "bytes": 5850,
+      "sha256": "361d5ac9299d8dee3d985027e2a41d50beeeb983e839cf072e29a5cfa1f2218e"
+    },
+    "packaging-recipe/native/process-owner/process_owner.cpp": {
+      "bytes": 18774,
+      "sha256": "6047296536321ddb04da2447253fbbb42debdc3e346b50aa435cbc0bc6be30d8"
+    },
+    "packaging-recipe/native/process-owner/process_owner.h": {
+      "bytes": 1702,
+      "sha256": "53d6813f2b07ab1a5afca7cc76a9fd1b33218767ce04cdc0559c8c9871e65d35"
+    },
+    "packaging-recipe/native/process-owner/process_usage.cpp": {
+      "bytes": 11676,
+      "sha256": "80989ccf8d2c024643d0476d7a67724aeebdeb0c00b075548bbfab09a69f1ed9"
+    },
+    "packaging-recipe/native/process-owner/process_usage.h": {
+      "bytes": 1989,
+      "sha256": "6f7ef7f8ef6c41804eefc2c7ddecc8bf0ca5ebc221b8356c8c13a82ff2f58f8a"
+    },
+    "packaging-recipe/runtime/android_server_installation_setup.py": {
+      "bytes": 41474,
+      "sha256": "fe45968a0c3a32d559de27f591b5e968139e2f4ab5f04b4fc57e4bc98a330df6"
+    },
+    "packaging-recipe/runtime/android_server_schema_setup.py": {
+      "bytes": 11875,
+      "sha256": "9526275258a6b98930e3253c0011627844ed10e1816658b3d5d07e23cd3dfd02"
+    },
+    "packaging-recipe/runtime/mysql_bootstrap.py": {
+      "bytes": 32698,
+      "sha256": "e69d5b64c4a5f5ace86fa521589d5a64613f601c59aedb011b42a1e5b743b47d"
+    },
+    "packaging-recipe/runtime/mysql_service.py": {
+      "bytes": 18078,
+      "sha256": "8b30e9598f20ee715685a51aba59cefcafc6213d9d5d5cb6c6f3a73efa6b71c2"
+    },
+    "packaging-recipe/runtime/owned_process_group.py": {
+      "bytes": 2795,
+      "sha256": "c19ed5c05e94d7b537df1055983fca75e20447f594419084f2207d60f99f138e"
+    },
+    "packaging-recipe/runtime/provision_local_account.py": {
+      "bytes": 19542,
+      "sha256": "e5d2c7d35e83176841107da200ff737bdb8e3671e1a5db91f9438c4228f6701d"
+    },
+    "packaging-recipe/runtime/provision_local_realm.py": {
+      "bytes": 25452,
+      "sha256": "703ed8a0f1f011191fdf4374aa7e999ca5cff5a87cd4e6e7b3907d7d1c53c994"
+    },
+    "packaging-recipe/runtime/server/appearance-schema-v1.sql": {
+      "bytes": 790,
+      "sha256": "8e35e8e41d74979eaa98f6f2d824d831b73f63a4a6b2f573b869484b2ff15d46"
+    },
+    "packaging-recipe/runtime/server/appearance-schema.lock.json": {
+      "bytes": 7783,
+      "sha256": "6ccf5e363ec3daa5c37cbbe753d29a7e6b5d10f18eef407b700fc0d67985428d"
+    },
+    "packaging-recipe/runtime/server_config.py": {
+      "bytes": 21005,
+      "sha256": "8c22c17f6fc7b28f842c49793f9d89b84cbea3f6ce5a1d638b503c97d932f472"
+    },
+    "packaging-recipe/runtime/server_content.py": {
+      "bytes": 20541,
+      "sha256": "e32102ba850f4df7201c39c53e6c5530e59992cef1d3587ac809aca2ad681f8c"
+    },
+    "packaging-recipe/runtime/server_playerbots_setup.py": {
+      "bytes": 22756,
+      "sha256": "c928a5ab26fae98f6458807231450d1bdcd1cc670e21844aa6b4e7b909a32451"
+    },
+    "packaging-recipe/runtime/server_schema_adaptations.py": {
+      "bytes": 6316,
+      "sha256": "a49e1f8477d8b840964ce47783ed5af6873dc0dcde5b4a52280b696159082b44"
+    },
+    "packaging-recipe/runtime/server_schema_baseline.py": {
+      "bytes": 8606,
+      "sha256": "21d0bd526145f6699db90e9f90bb3ec01cf15316b59e27f8db6649f03480df20"
+    },
+    "packaging-recipe/runtime/server_schema_setup.py": {
+      "bytes": 11262,
+      "sha256": "6ed4f83f882101a8af0f06212c870cf71b2cee81a654b2ad4c14d9f83ef08026"
+    },
+    "packaging-recipe/runtime/server_update_setup.py": {
+      "bytes": 25241,
+      "sha256": "7ff3b5272f9ec3fe38a42413f8d2d6a45f72d206f794c26869d7422439be2310"
+    },
+    "packaging-recipe/runtime/server_updater.py": {
+      "bytes": 7538,
+      "sha256": "8efabb037c012a89848d854fea8a12eff8c3bab7a9d1e9a3f3ea36369c4a6007"
+    },
+    "packaging-recipe/tests/android-installation-x64/installation_x64_entry.py": {
+      "bytes": 25931,
+      "sha256": "f0af3e47709300b31e4ac94c943a3129bf8b4e9853b9065f1d7de12f72fd7ae7"
+    },
+    "packaging-recipe/tests/native-java-installation/restart_probe.py": {
+      "bytes": 3698,
+      "sha256": "bffa2578a01e89789e56d3fdc1fdb85ff6fe97e6e2cc789de6cfb58556053196"
+    },
+    "packaging-recipe/tools/android_installation_x64_inputs.py": {
+      "bytes": 17117,
+      "sha256": "1bca504ba1740cbda7ff86b5d5b6bacdf7eb64d1012d02409c7e1a71676837f9"
+    },
+    "packaging-recipe/tools/provider_android_installation_x64.py": {
+      "bytes": 38848,
+      "sha256": "77c59fd5f085f39dc5b23c944329b9b90fd09ed22ec7e4d5a60ba8ecb46d7c57"
+    },
+    "x64-component/corresponding-library-sources/SOURCE-MANIFEST.json": {
+      "bytes": 4760,
+      "sha256": "81938c9d1001139e7b8e81cbd0be0480aed38df1f215157f8de329cad7da5f13"
+    },
+    "x64-component/corresponding-library-sources/boost1.83_1.83.0-2.1ubuntu3.2.debian.tar.xz": {
+      "bytes": 380048,
+      "sha256": "2928da323658936427908c055a9f5f2eddb1a48d60a58d6e161985d36abdc5dc"
+    },
+    "x64-component/corresponding-library-sources/boost1.83_1.83.0-2.1ubuntu3.2.dsc": {
+      "bytes": 10382,
+      "sha256": "ac3ec418c2af36e3ba409b3f3014413d6948c556328b10c684a712d48442ce4b"
+    },
+    "x64-component/corresponding-library-sources/boost1.83_1.83.0.orig.tar.xz": {
+      "bytes": 77376520,
+      "sha256": "404df4b4072fc7f2d4483d4fc2d61ff6f554dd80c9a812652684d5952e881c91"
+    },
+    "x64-component/corresponding-library-sources/gcc-14_14.2.0-4ubuntu2~24.04.1.debian.tar.xz": {
+      "bytes": 1950432,
+      "sha256": "cfece214c2fb790ef5f3baffb9a53e40618e7ae12d053610b251e94d77d08ade"
+    },
+    "x64-component/corresponding-library-sources/gcc-14_14.2.0-4ubuntu2~24.04.1.dsc": {
+      "bytes": 46930,
+      "sha256": "50950080874a6ec6780dd60c243e21d9cda9d736bb32bca98d16095d27cc01b5"
+    },
+    "x64-component/corresponding-library-sources/gcc-14_14.2.0.orig.tar.gz": {
+      "bytes": 97158172,
+      "sha256": "768c314c11eeab56ccebb91eb42ec4a41122fa94f0d83400126401942622197b"
+    },
+    "x64-component/corresponding-library-sources/glibc_2.39-0ubuntu8.9.debian.tar.xz": {
+      "bytes": 491440,
+      "sha256": "d6114f2302896a3c8612453e1bf1d0e61603e3029ba4a7c246fbb1ab4c48d2b0"
+    },
+    "x64-component/corresponding-library-sources/glibc_2.39-0ubuntu8.9.dsc": {
+      "bytes": 9387,
+      "sha256": "1b73a89e0910eb3e5920cde639ac7eb606256d8ee809688ff9b5912b67002711"
+    },
+    "x64-component/corresponding-library-sources/glibc_2.39.orig.tar.xz": {
+      "bytes": 18520988,
+      "sha256": "f77bd47cf8170c57365ae7bf86696c118adb3b120d3259c64c502d3dc1e2d926"
+    },
+    "x64-component/corresponding-library-sources/glibc_2.39.orig.tar.xz.asc": {
+      "bytes": 833,
+      "sha256": "2cce427ef7933c17379f5514e4f0ccf8dffae5bf8c72f0f7e0bf8b8401f34be5"
+    },
+    "x64-component/corresponding-library-sources/libzstd_1.5.5+dfsg2-2build1.1.debian.tar.xz": {
+      "bytes": 21288,
+      "sha256": "c1df6d2628b26d085259b8e7ac020eb060e4c1feca98d6103058eda5ded725bc"
+    },
+    "x64-component/corresponding-library-sources/libzstd_1.5.5+dfsg2-2build1.1.dsc": {
+      "bytes": 2485,
+      "sha256": "c190a5dff9e7c5b5b1399f0d701bb2c173bc7cbdf14d5e05970f5ac066c25570"
+    },
+    "x64-component/corresponding-library-sources/libzstd_1.5.5+dfsg2.orig.tar.xz": {
+      "bytes": 1784164,
+      "sha256": "d7cf3c10d416fd999cb8fcf7685d9268ba7bec8eb78121fc2d0d916fa393d22b"
+    },
+    "x64-component/corresponding-library-sources/mysql-8.0_8.0.46-0ubuntu0.24.04.4.debian.tar.xz": {
+      "bytes": 235036,
+      "sha256": "f922343a3252ad355579d1ec5dcc6707e2b97e1d717d498572f945713e4e713d"
+    },
+    "x64-component/corresponding-library-sources/mysql-8.0_8.0.46-0ubuntu0.24.04.4.dsc": {
+      "bytes": 3613,
+      "sha256": "5b95ccbed23c569db1cb3b144b6e002ee9bec8a94bfd54c5fe1aefb6286c6d87"
+    },
+    "x64-component/corresponding-library-sources/mysql-8.0_8.0.46.orig.tar.gz": {
+      "bytes": 492495969,
+      "sha256": "dff4332ee7f8f37fc0516c66763600a22a81c8192c743c477b6484206e314f2f"
+    },
+    "x64-component/corresponding-library-sources/openssl_3.0.13-0ubuntu3.16.debian.tar.xz": {
+      "bytes": 223332,
+      "sha256": "77893129922c917792dd187c2853fb36ce1c98597c442b42d8190252959b7f6c"
+    },
+    "x64-component/corresponding-library-sources/openssl_3.0.13-0ubuntu3.16.dsc": {
+      "bytes": 2516,
+      "sha256": "7d1e552a6f519836c352407e521bafdda7552ec6d1ba242968c35fc0e17f47b6"
+    },
+    "x64-component/corresponding-library-sources/openssl_3.0.13.orig.tar.gz": {
+      "bytes": 15294843,
+      "sha256": "88525753f79d3bec27d2fa7c66aa0b92b3aa9498dafd93d7cfa4b3780cdae313"
+    },
+    "x64-component/corresponding-library-sources/server-runtime.json": {
+      "bytes": 686,
+      "sha256": "f7bd7272cbcf6a4b027153ef11256ec7e52ea4ef1001a0397ad3017d6979d594"
+    },
+    "x64-component/corresponding-library-sources/sources.lock.json": {
+      "bytes": 6499,
+      "sha256": "012af95659e8ee2e98907d185ccdb5abc64e87614a9a4ee43b5b8679ff92b512"
+    },
+    "x64-component/corresponding-library-sources/zlib_1.3.dfsg-3.1ubuntu2.3.debian.tar.xz": {
+      "bytes": 61772,
+      "sha256": "ada8a0c4a1016eb8cd549f4689fd9f73b04d9c55163a318cabdfb0c3872cfe1c"
+    },
+    "x64-component/corresponding-library-sources/zlib_1.3.dfsg-3.1ubuntu2.3.dsc": {
+      "bytes": 3162,
+      "sha256": "01d8c26d0549eacbbd65bc4b51c076c407e9e429d081e4d472a13ec499ec2a3a"
+    },
+    "x64-component/corresponding-library-sources/zlib_1.3.dfsg.orig.tar.xz": {
+      "bytes": 1128572,
+      "sha256": "5eea0322c1c21c75cad3b607ac1c43ff5c71e014b8ac4a34300b5e2b80d02e70"
+    },
+    "x64-component/library-runtime.json": {
+      "bytes": 686,
+      "sha256": "f7bd7272cbcf6a4b027153ef11256ec7e52ea4ef1001a0397ad3017d6979d594"
+    },
+    "x64-component/library-source-readback.json": {
+      "bytes": 700,
+      "sha256": "0bfd6d7b3cc43de79c4a821367ad1ca73680fb2fe353b15f8f78e22d88cd469b"
+    },
+    "x64-component/payload/bin/dbimport": {
+      "bytes": 1862240,
+      "sha256": "d7ca8295d99f90a1c8ec26dffcd39d36037e2fe9231f97578fd30992c6430948"
+    },
+    "x64-component/payload/bin/playerbots-schema": {
+      "bytes": 1755704,
+      "sha256": "57c90150262ab7b79e17ab5f780ce058b3b29d12ca00d7ce3f59eec0e0fd102c"
+    },
+    "x64-component/payload/build-receipt.json": {
+      "bytes": 32433,
+      "sha256": "5e6646ae314bfefbac00a7cae1eb892b76a29e06feffc9ba88a2a55b2f4d5522"
+    },
+    "x64-component/payload/corresponding-source/integration-recipe.tar": {
+      "bytes": 10352640,
+      "sha256": "1579ea5a54116a642321e29af164c5017e8e46c76546fb5c7f9ae27982d45d90"
+    },
+    "x64-component/payload/corresponding-source/integration/LICENSE": {
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    "x64-component/payload/corresponding-source/integration/runtime/server/server-build-sources.lock.json": {
+      "bytes": 2170,
+      "sha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1"
+    },
+    "x64-component/payload/corresponding-source/integration/sources.lock.json": {
+      "bytes": 2170,
+      "sha256": "dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90"
+    },
+    "x64-component/payload/corresponding-source/integration/tests/auth_srp_reference.cpp": {
+      "bytes": 1525,
+      "sha256": "ab7287d08fdb674f4779ca28227076dbab97a6475136f46486c37ea14944436b"
+    },
+    "x64-component/payload/corresponding-source/integration/tests/config_path_reference.cmake": {
+      "bytes": 1071,
+      "sha256": "7edb126ada44a9a452f490919db7ad5dbee42ab6eeeb8e9831d5a884cdad83fc"
+    },
+    "x64-component/payload/corresponding-source/integration/tests/config_path_reference.cpp": {
+      "bytes": 3734,
+      "sha256": "6e40a099fbce0911fed327efff402e2397d198bafdcc2e58f29cd6c883fbd352"
+    },
+    "x64-component/payload/corresponding-source/integration/tests/playerbots_database_reference.cmake": {
+      "bytes": 1075,
+      "sha256": "254a8946088c364bff34a901acc546b747e2cf5fe1cda4a61e5b11d3d26fc61a"
+    },
+    "x64-component/payload/corresponding-source/integration/tests/playerbots_database_reference.cpp": {
+      "bytes": 2552,
+      "sha256": "75c54da4fcae709d23723a0c8dfa7c0affc7d97ecf310a47f293e0071dae7da0"
+    },
+    "x64-component/payload/corresponding-source/integration/tests/srp6_reference.cmake": {
+      "bytes": 1415,
+      "sha256": "ef9813ea2fdcf40ee470fc4f354467bc5130f369d9f9e8479e9b6a45fe40a152"
+    },
+    "x64-component/payload/corresponding-source/integration/tests/srp6_reference.cpp": {
+      "bytes": 1455,
+      "sha256": "bb182c943040fe108d8a1952dd4b70dff9a6f2b4ef89bb3234efb3eddbb7baf7"
+    },
+    "x64-component/payload/corresponding-source/integration/tools/build_server_setup_x64_probe.py": {
+      "bytes": 18734,
+      "sha256": "6487f55b06eba372ad360dd7584f0dd70e8bdb5d5f609a7a23f1068c469f2141"
+    },
+    "x64-component/payload/corresponding-source/source-inputs/server-engine-source-inputs.tar.gz": {
+      "bytes": 18216368,
+      "sha256": "8c820a962947d2b8e2028c434ccedc969127716390f557626444d23ff8e15b99"
+    },
+    "x64-component/payload/corresponding-source/source-inputs/source-inputs-receipt.json": {
+      "bytes": 1746751,
+      "sha256": "46a4ef82021d49699694bccab545591f3debbd6f4ab9e208c54e4796326bc03e"
+    },
+    "x64-component/payload/corresponding-source/supplements/modules/ModulesScriptLoader.h": {
+      "bytes": 850,
+      "sha256": "cee2616d8f99a84111b5c2380946c316623b418fa615836b5afac8c235a4efb3"
+    },
+    "x64-component/payload/debug/dbimport.debug": {
+      "bytes": 25562104,
+      "sha256": "0ceea8acfda67f61ce29fe6d192ac23da814b2a276ebdda54c9dcdc6084f3098"
+    },
+    "x64-component/payload/debug/playerbots-schema.debug": {
+      "bytes": 24134456,
+      "sha256": "3605bd21a0349eb8cb45eaec85dd73382b6ec6a28cf7ce9b5a7eb425331502ac"
+    },
+    "x64-component/payload/libraries/lib64/ld-linux-x86-64.so.2": {
+      "bytes": 236616,
+      "sha256": "c20a2dc8917c755f02b94049356320fe1f62ac7d9f8994731f807d9df39302da"
+    },
+    "x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2": {
+      "bytes": 236616,
+      "sha256": "c20a2dc8917c755f02b94049356320fe1f62ac7d9f8994731f807d9df39302da"
+    },
+    "x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libboost_filesystem.so.1.83.0": {
+      "bytes": 137640,
+      "sha256": "2c137b29a3740fb6d12a4c18823bc2b15215646c3ba3bb208b89782df28559f0"
+    },
+    "x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libboost_program_options.so.1.83.0": {
+      "bytes": 264376,
+      "sha256": "15f34bcb75dfb0fa30af13cf2b82fb7a9a8e0fbbadf7cabcd397dd65bde552f3"
+    },
+    "x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libc.so.6": {
+      "bytes": 2129424,
+      "sha256": "3a15d66867d83762c7f2f1e37359cb8f6c5743edb369c65285cb0b1c4f7498bf"
+    },
+    "x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libcrypto.so.3": {
+      "bytes": 5309400,
+      "sha256": "6866ed711dab8927e1bf82bf1cd30e828bdfc34f3cc1e83b1c9eb01ce6c37d9a"
+    },
+    "x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libgcc_s.so.1": {
+      "bytes": 183024,
+      "sha256": "d93224d2b0dab4247598be683adca02f5cf00586f99c187579cd7e92058fb7cb"
+    },
+    "x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libm.so.6": {
+      "bytes": 952616,
+      "sha256": "fce00b6f25f459cf4ae0b7fae4257909a1a8a86f9149e7c029a5d617baf1ccd0"
+    },
+    "x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libmysqlclient.so.21": {
+      "bytes": 6793144,
+      "sha256": "4707393164b8a29b11a35a87ad213612a936df43360c491555b1a0e528967080"
+    },
+    "x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libresolv.so.2": {
+      "bytes": 64008,
+      "sha256": "1d730ea434da5a5595bc6a961d7a9ace83e03703205df9644044b3dca79c362f"
+    },
+    "x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libssl.so.3": {
+      "bytes": 696512,
+      "sha256": "a40e7b67489bbd257e432c700ff8f6a1ad796425b5eccecdc2930127fdd86624"
+    },
+    "x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libstdc++.so.6": {
+      "bytes": 2592224,
+      "sha256": "1fd75fe70354a416d75aef22bcae68c47bd25d20e2d0568c30b1a9838cf62f11"
+    },
+    "x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libz.so.1": {
+      "bytes": 113000,
+      "sha256": "f61677c7bdb7c2aa2a243ea781bfd16afcb361cede7b4ef76127a9d8eb9a5242"
+    },
+    "x64-component/payload/libraries/usr/lib/x86_64-linux-gnu/libzstd.so.1": {
+      "bytes": 755864,
+      "sha256": "0a2128bc10841fb29e76d08d945864dfb0b6a66da5df6df5d8299197439e54bb"
+    },
+    "x64-component/payload/notices/libboost-filesystem1.83.0/copyright": {
+      "bytes": 2175464,
+      "sha256": "87ff229c71d391f951383b2246ba630c849e2024ea42a2ac9113dc9646f1e667"
+    },
+    "x64-component/payload/notices/libboost-program-options1.83.0/copyright": {
+      "bytes": 2175464,
+      "sha256": "87ff229c71d391f951383b2246ba630c849e2024ea42a2ac9113dc9646f1e667"
+    },
+    "x64-component/payload/notices/libc6/copyright": {
+      "bytes": 26462,
+      "sha256": "d3c95b56fa33e28b57860580f0baf4e4f4de2a268a2b80f1d031a5191bade265"
+    },
+    "x64-component/payload/notices/libgcc-s1/copyright": {
+      "bytes": 69004,
+      "sha256": "20390f8a6f3b1e4d7cb45dd8652dabb259bbef688cbad839bcdb0b9ba7252f79"
+    },
+    "x64-component/payload/notices/libmysqlclient21/copyright": {
+      "bytes": 28966,
+      "sha256": "d6b8a9a033b07c56afb1b448098760891d0cc872eaf0013c830f439864203094"
+    },
+    "x64-component/payload/notices/libssl3t64/copyright": {
+      "bytes": 2543,
+      "sha256": "6a7da622fe0637a334d2a8fc470852d2ffb77d9a2b2f930f854e32a41ad6ef35"
+    },
+    "x64-component/payload/notices/libstdc++6/copyright": {
+      "bytes": 69004,
+      "sha256": "20390f8a6f3b1e4d7cb45dd8652dabb259bbef688cbad839bcdb0b9ba7252f79"
+    },
+    "x64-component/payload/notices/libzstd1/copyright": {
+      "bytes": 5389,
+      "sha256": "35e85e8e9bbb71492c5f5dddf39ed65b68775a02ad8d710c25d097b497f06c49"
+    },
+    "x64-component/payload/notices/zlib1g/copyright": {
+      "bytes": 2927,
+      "sha256": "9e5b96d63773a5d177ba264254390f792be07e41748ebd94730981c6cac31cc6"
+    },
+    "x64-component/payload/originals/dbimport": {
+      "bytes": 27024728,
+      "sha256": "1ae159d4f42ce6df6a7af4efaeeb8588641af75e475de0c9dcecf474248f0913"
+    },
+    "x64-component/payload/originals/playerbots-schema": {
+      "bytes": 25515104,
+      "sha256": "406cded3b0fae689914a4abd882a6ddfbbd7367d26d5e4dcbac2d1f6d671e6fc"
+    }
+  },
+  "formatVersion": 1,
+  "fourSchemaCoordinatorQualified": false,
+  "gameplayQualified": false,
+  "originalMysqlProotSourceReadback": {
+    "allOriginalSourceZipMembers": {
+      "_temp/proot-probe/corresponding-source.tar.gz": {
+        "bytes": 28425243,
+        "sha256": "c21eb7f82d9b2899e9740fb8f0c402fb701c103989420ab78bf2a8ad47667c48"
+      },
+      "esteria_android/esteria_android/LICENSE": {
+        "bytes": 35149,
+        "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+      },
+      "esteria_android/esteria_android/app/database-service.gradle": {
+        "bytes": 1254,
+        "sha256": "bc6fcc3044d2ce4902c89dd84e84f1ef8c56a5441ec055604ec1673be8434149"
+      },
+      "esteria_android/esteria_android/app/database-setup.gradle": {
+        "bytes": 1296,
+        "sha256": "454d0292fac9ca6ff705aa03f087440c31f8228f2d34740d9064f670dbe2e023"
+      },
+      "esteria_android/esteria_android/app/mysql-probe.gradle": {
+        "bytes": 1624,
+        "sha256": "3ac7f3a969e1af31a2123fbfd9d3677b69e54ec78a06d8cbe4a64a342eaecb6e"
+      },
+      "esteria_android/esteria_android/app/src/androidTest/java/io/github/russianranger/esteria/runtime/MySqlExecutionTest.java": {
+        "bytes": 28348,
+        "sha256": "55a62b7cfad371948b87d84465dee8df827f37577148cbbe12c0103e10b55d59"
+      },
+      "esteria_android/esteria_android/app/src/main/java/io/github/russianranger/esteria/runtime/GuestHelperAssets.java": {
+        "bytes": 7797,
+        "sha256": "b27921fc56209fbbfb97a62249a2e731f9edcc9cc4106861e1f74f4b55ae16cf"
+      },
+      "esteria_android/esteria_android/app/src/main/java/io/github/russianranger/esteria/runtime/ServerDatabaseService.java": {
+        "bytes": 16233,
+        "sha256": "de6d8820d5e21ae6a6c4c0b53a2030ecb806d71682ebd2cbd0fe865ada184526"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/SOURCE-MANIFEST.json": {
+        "bytes": 53070,
+        "sha256": "ca5c6d1ee9559430b62590d242788ff756393cc4d7de2248b943633b3221c04f"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/acl_2.3.2-1build1.1.debian.tar.xz": {
+        "bytes": 23472,
+        "sha256": "0d324adb403a50aa2889a11e098d34ce5adecd1cb89f83799f66dbb1d8b71280"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/acl_2.3.2-1build1.1.dsc": {
+        "bytes": 2616,
+        "sha256": "da831b979338d324df2adcedd5a06f9a5f303e83be2b43d58ee39288dde8fc88"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/acl_2.3.2.orig.tar.xz": {
+        "bytes": 371680,
+        "sha256": "97203a72cae99ab89a067fe2210c1cbf052bc492b479eca7d226d9830883b0bd"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/acl_2.3.2.orig.tar.xz.asc": {
+        "bytes": 833,
+        "sha256": "184c6a903490885a096095db67b433a04542c6569f167cbe8115268c0f227273"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/apt_2.8.3.dsc": {
+        "bytes": 2973,
+        "sha256": "1d41cd04115e1a79f0fa4d738e5c34603ae8a4f40122d8a18a622fd6d20a5523"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/apt_2.8.3.tar.xz": {
+        "bytes": 2354680,
+        "sha256": "088522b3613b28fdbcfa61f1f7e476bf6dc6b0120a8f74409e9527580c9f9d3b"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/attr_2.5.2-1ubuntu0.1.debian.tar.xz": {
+        "bytes": 39340,
+        "sha256": "11d4663edfac0d6738201ff942b65706cb1eb29ae0e8dad50790c9bf6509fc1f"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/attr_2.5.2-1ubuntu0.1.dsc": {
+        "bytes": 2592,
+        "sha256": "3b0921ea6607447a2c61e5fa6136a72977712d1b1c7d24a205d107a17e7b3ad6"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/attr_2.5.2.orig.tar.xz": {
+        "bytes": 334180,
+        "sha256": "f2e97b0ab7ce293681ab701915766190d607a1dba7fae8a718138150b700a70b"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/attr_2.5.2.orig.tar.xz.asc": {
+        "bytes": 833,
+        "sha256": "eeac729088d3c6379e91b7596cb3582e46b047c47f0fa3c5c77f9c9e84dc3a4c"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/audit_3.1.2-2.1ubuntu0.1.debian.tar.xz": {
+        "bytes": 19524,
+        "sha256": "4af490a6361d5f4e4fca5b72fd72e1b265e01d95c511ee0a85e89a67c33a98df"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/audit_3.1.2-2.1ubuntu0.1.dsc": {
+        "bytes": 2902,
+        "sha256": "22df755ed1da11800c58a7b967398a8438e0c9381c53076172218fea74eb262a"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/audit_3.1.2.orig.tar.gz": {
+        "bytes": 1219860,
+        "sha256": "c0b1792d1f0a88c6f1828710509cbb987059fc68712c97669ca90eae103d287d"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/base-files_13ubuntu10.5.dsc": {
+        "bytes": 1625,
+        "sha256": "326996812284298ceb029ae175af1bc55480c977f652469775983b53ae005d9a"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/base-files_13ubuntu10.5.tar.xz": {
+        "bytes": 94204,
+        "sha256": "536ba84ca53e25f5c0aa46c144fddcdad1e477c7a470e70baccd17d7ecfdfc41"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/base-passwd_3.6.3build1.dsc": {
+        "bytes": 1779,
+        "sha256": "6c7289264d48fd871e1c516c8dd0814160558e339202cffa8768621785302185"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/base-passwd_3.6.3build1.tar.xz": {
+        "bytes": 58252,
+        "sha256": "ea51df18f6f7d969ff93d25ce42780ded35ccb4292353780ba6ad9861857d787"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/bash_5.2.21-2ubuntu4.debian.tar.xz": {
+        "bytes": 94124,
+        "sha256": "bdb10c18d167dda3b265cb3db75314d524edbf7794fed36f0fb0dcc32f5e6ac9"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/bash_5.2.21-2ubuntu4.dsc": {
+        "bytes": 2437,
+        "sha256": "d5a89c09f42c828d5e31dc3a1680882aa0ddaad5072963e563dec7dfc4919d33"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/bash_5.2.21.orig.tar.xz": {
+        "bytes": 5598816,
+        "sha256": "ec21ab4efd6bd7a6e2802fbda622b81bfc43a8095d721234d4bf075797683014"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/bzip2_1.0.8-5.1ubuntu0.1.debian.tar.bz2": {
+        "bytes": 27529,
+        "sha256": "77c61e0490ff7cf49aa8ffe62e117e85b3af08e14341c4b851f8d7ec757fe099"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/bzip2_1.0.8-5.1ubuntu0.1.dsc": {
+        "bytes": 1699,
+        "sha256": "87d782671790af480ab3c3b258885ad2c239e41772e0116ceda6446c493f9dd4"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/bzip2_1.0.8.orig.tar.gz": {
+        "bytes": 810029,
+        "sha256": "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/ca-certificates_20260816ubuntu0.24.04.1.dsc": {
+        "bytes": 1876,
+        "sha256": "130f40a0d3fdade2dd533facf828afde6601bc50e74c82537ea4ae8dab007ad9"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/ca-certificates_20260816ubuntu0.24.04.1.tar.xz": {
+        "bytes": 273380,
+        "sha256": "f592cceb98257d66ac320f853f35989ddb51914fbe52f91470cdb646f4a838ce"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/cdebconf_0.271ubuntu3.dsc": {
+        "bytes": 2910,
+        "sha256": "87a9567bdbdc9401d5cde6e5dbc8fb48619d7a2ef38795156c24a7fef3200ef5"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/cdebconf_0.271ubuntu3.tar.xz": {
+        "bytes": 285500,
+        "sha256": "a4b242e7aef7923fd16d3aeb5a220ab6f4d27bc005b9d1e7d67449faaa68bcd1"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/coreutils_9.4-3ubuntu6.3.debian.tar.xz": {
+        "bytes": 43156,
+        "sha256": "23eb9e94564e2451ea02a879daa0ee9ba8db3777e84e020fcd08d49aaebc57d4"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/coreutils_9.4-3ubuntu6.3.dsc": {
+        "bytes": 2030,
+        "sha256": "419fea2f0fec8299d95cafb11425391fe45d60b30d052c7f1e3a162ea56a6653"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/coreutils_9.4.orig.tar.xz": {
+        "bytes": 5979200,
+        "sha256": "ea613a4cf44612326e917201bbbcdfbd301de21ffc3b59b6e5c07e040b275e52"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/dash_0.5.12-6ubuntu5.debian.tar.xz": {
+        "bytes": 39616,
+        "sha256": "84671be9725b738725575d44069f9e7a41344ae6a8027d8ba2d6a172b5e406d6"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/dash_0.5.12-6ubuntu5.dsc": {
+        "bytes": 2124,
+        "sha256": "be4a5ba81756b24d0d22f30cd9e609f5b84f8a8d685cb9825e9eae6201c52cf9"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/dash_0.5.12.orig.tar.gz": {
+        "bytes": 246054,
+        "sha256": "6a474ac46e8b0b32916c4c60df694c82058d3297d8b385b74508030ca4a8f28a"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/db5.3_5.3.28+dfsg2-7.debian.tar.xz": {
+        "bytes": 35232,
+        "sha256": "9cee8969e1f440ec8aa2fbacd3a5819907829e0e7e7f1f746dccaa2c93fbf3f2"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/db5.3_5.3.28+dfsg2-7.dsc": {
+        "bytes": 2374,
+        "sha256": "f7313fb306b5bf7ad6a428bffb581e649318859df139e35dd47c3d1f733803b2"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/db5.3_5.3.28+dfsg2.orig.tar.xz": {
+        "bytes": 21287688,
+        "sha256": "ad41b507415dec8316e828b2230242af2251d2c86eefa3c7aa9ef47c5239ef33"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/debconf_1.5.86ubuntu1.dsc": {
+        "bytes": 2030,
+        "sha256": "fc3475b7134c7780b34d21dde63bea3be2a225215a3e9f9c90e27df40189f1bc"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/debconf_1.5.86ubuntu1.tar.xz": {
+        "bytes": 574112,
+        "sha256": "1a50d1697b9c36b3600d1746b6a47864ed4adfd26c3d180f2d2b1286ad51c6f4"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/debianutils_5.17build1.dsc": {
+        "bytes": 1771,
+        "sha256": "f6479aa03505646f946cc42d7d093bc0d47dd2d374b7dcc84d84330f7e86095d"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/debianutils_5.17build1.tar.xz": {
+        "bytes": 80468,
+        "sha256": "f1f157a50769fcf8117909938dd8cbb75d39da26cff5a5aa15aa34b4d6c9acc2"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/diffutils_3.10-1ubuntu0.1.debian.tar.xz": {
+        "bytes": 15332,
+        "sha256": "5010764e1ebbb3e2a99b90e0c14b86d44d15508f8ba7fa2ec7a51ffcba706d49"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/diffutils_3.10-1ubuntu0.1.dsc": {
+        "bytes": 2175,
+        "sha256": "cd25a52b3cc70a46c98462e3893491d9a461cebbf8600461c879c0c900ae88b4"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/diffutils_3.10.orig.tar.xz": {
+        "bytes": 1624240,
+        "sha256": "90e5e93cc724e4ebe12ede80df1634063c7a855692685919bfe60b556c9bd09e"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/diffutils_3.10.orig.tar.xz.asc": {
+        "bytes": 833,
+        "sha256": "a94faf8f1baa04ff220f7b2ccb137c16337284e023ebc4a1d5df475c08d810f7"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/dpkg_1.22.6ubuntu6.6.dsc": {
+        "bytes": 3156,
+        "sha256": "5828d5dd77635c8bd0197116446bc64ec76913500affbcb42aaae1644acb749d"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/dpkg_1.22.6ubuntu6.6.tar.xz": {
+        "bytes": 5548716,
+        "sha256": "7048ee31e30066ae123cdcb891cfa1ad55b2f42a4e04fca2c5db41607ae25196"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/e2fsprogs_1.47.0-2.4~exp1ubuntu4.1.debian.tar.xz": {
+        "bytes": 90580,
+        "sha256": "26b381ec175ff52d1cc2fd1b217f84b9e1d7d33a58dcbaf8942115dd27a03f84"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/e2fsprogs_1.47.0-2.4~exp1ubuntu4.1.dsc": {
+        "bytes": 3294,
+        "sha256": "215fe7b95c246894654c59a01514dfdc16ec17a0dcb09dc7a7c1ec1246ed4964"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/e2fsprogs_1.47.0.orig.tar.gz": {
+        "bytes": 9637717,
+        "sha256": "6667afde56eef0c6af26684974400e4d2288ea49e9441bf5e6229195d51a3578"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/e2fsprogs_1.47.0.orig.tar.gz.asc": {
+        "bytes": 488,
+        "sha256": "704928204a52ddaa0ac8ef549c1bfba3c38e66c361d3853c8a4c38e6082b90f1"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/expat_2.6.1-2ubuntu0.6.debian.tar.xz": {
+        "bytes": 75472,
+        "sha256": "95ae84284d153f5108255b21bc0e76f8cdabaf0bb74cdc61ef410f4b77146517"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/expat_2.6.1-2ubuntu0.6.dsc": {
+        "bytes": 1474,
+        "sha256": "d1a0cb48d939de61f2121669c941664b844d9a1adf9d8db28e000489df665070"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/expat_2.6.1.orig.tar.gz": {
+        "bytes": 8414649,
+        "sha256": "14113ed69357172a0bf5a268793c8b5b01afc77c7a2e5fb8dd0b06cb87c02c4a"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/findutils_4.9.0-5build1.debian.tar.xz": {
+        "bytes": 32864,
+        "sha256": "c266ae3fdf861d29b71436237f7a564058d68810029daa95e581b219c5c69d5c"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/findutils_4.9.0-5build1.dsc": {
+        "bytes": 2404,
+        "sha256": "c586baab1e53ace30420e86364df848fb8c6f754c1935ff556060b030052f603"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/findutils_4.9.0.orig.tar.xz": {
+        "bytes": 2046252,
+        "sha256": "a2bfb8c09d436770edc59f50fa483e785b161a3b7b9d547573cb08065fd462fe"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/findutils_4.9.0.orig.tar.xz.asc": {
+        "bytes": 488,
+        "sha256": "924c3719d066eda1b3e47175f8b83e90e9a23f0a639ebe7445621917b283c385"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/gcc-14_14.2.0-4ubuntu2~24.04.1.debian.tar.xz": {
+        "bytes": 1950432,
+        "sha256": "cfece214c2fb790ef5f3baffb9a53e40618e7ae12d053610b251e94d77d08ade"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/gcc-14_14.2.0-4ubuntu2~24.04.1.dsc": {
+        "bytes": 46930,
+        "sha256": "50950080874a6ec6780dd60c243e21d9cda9d736bb32bca98d16095d27cc01b5"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/gcc-14_14.2.0.orig.tar.gz": {
+        "bytes": 97158172,
+        "sha256": "768c314c11eeab56ccebb91eb42ec4a41122fa94f0d83400126401942622197b"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/glibc_2.39-0ubuntu8.9.debian.tar.xz": {
+        "bytes": 491440,
+        "sha256": "d6114f2302896a3c8612453e1bf1d0e61603e3029ba4a7c246fbb1ab4c48d2b0"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/glibc_2.39-0ubuntu8.9.dsc": {
+        "bytes": 9387,
+        "sha256": "1b73a89e0910eb3e5920cde639ac7eb606256d8ee809688ff9b5912b67002711"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/glibc_2.39.orig.tar.xz": {
+        "bytes": 18520988,
+        "sha256": "f77bd47cf8170c57365ae7bf86696c118adb3b120d3259c64c502d3dc1e2d926"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/glibc_2.39.orig.tar.xz.asc": {
+        "bytes": 833,
+        "sha256": "2cce427ef7933c17379f5514e4f0ccf8dffae5bf8c72f0f7e0bf8b8401f34be5"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/gmp_6.3.0+dfsg-2ubuntu6.1.debian.tar.xz": {
+        "bytes": 38908,
+        "sha256": "0a7592ee94876fcc0dba60c9a9fba806a72752c104c04d553803e1b7a97026a3"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/gmp_6.3.0+dfsg-2ubuntu6.1.dsc": {
+        "bytes": 2345,
+        "sha256": "7fdd2464ee453296e33598dad6f84dd489640c08f50552389469bcf90537582e"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/gmp_6.3.0+dfsg.orig.tar.xz": {
+        "bytes": 1870556,
+        "sha256": "bd2966e6d277f79328e894a5a9f3ba3fbf2ed2be81def5f48623e30c23fb1572"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/gnupg2_2.4.4-2ubuntu17.6.debian.tar.xz": {
+        "bytes": 97820,
+        "sha256": "c66b2623b54792f70c6598367ad1f3c4dcf7c65e68c2a4e4e98f0ba6eaa8ba80"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/gnupg2_2.4.4-2ubuntu17.6.dsc": {
+        "bytes": 3947,
+        "sha256": "67504c8f474dce8880c25a5a14993d419b3f39db2a77039f24e65903ce93f4b9"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/gnupg2_2.4.4.orig.tar.bz2": {
+        "bytes": 7886036,
+        "sha256": "67ebe016ca90fa7688ce67a387ebd82c6261e95897db7b23df24ff335be85bc6"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/gnupg2_2.4.4.orig.tar.bz2.asc": {
+        "bytes": 386,
+        "sha256": "47986167998b2cb6be4e4cdeef0c468139e06580ed65ce2cf241c527d74e54db"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/gnutls28_3.8.3-1.1ubuntu3.6.debian.tar.xz": {
+        "bytes": 124984,
+        "sha256": "b4cc6ebad4cb21ffe82d094f6d9c90de31e08a8b31ed36911a2adbe5aaa56d47"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/gnutls28_3.8.3-1.1ubuntu3.6.dsc": {
+        "bytes": 3397,
+        "sha256": "34455be2f5fb343b5833ff40cc00623106326e6cc88aaf9862943f6b3aa5ab60"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/gnutls28_3.8.3.orig.tar.xz": {
+        "bytes": 6463720,
+        "sha256": "f74fc5954b27d4ec6dfbb11dea987888b5b124289a3703afcada0ee520f4173e"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/gnutls28_3.8.3.orig.tar.xz.asc": {
+        "bytes": 854,
+        "sha256": "b2b90d225728890b0e2aa7c05e5f25f8ba1282821b46e72cd99f0c732b639cef"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/grep_3.11-4build1.debian.tar.xz": {
+        "bytes": 20584,
+        "sha256": "f87cd3d0db16527f5c3a8eb6c737a72b0404eaafdbba19d707f8d89315d32e4a"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/grep_3.11-4build1.dsc": {
+        "bytes": 2379,
+        "sha256": "2d0a5ced73347bbf22f35421c31360fc2fe4a0e6267dc31578e2630abe97afa4"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/grep_3.11.orig.tar.xz": {
+        "bytes": 1703776,
+        "sha256": "1db2aedde89d0dea42b16d9528f894c8d15dae4e190b59aecc78f5a951276eab"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/grep_3.11.orig.tar.xz.asc": {
+        "bytes": 833,
+        "sha256": "89ec23ffd59b68822732dc8204fc89883c3af30a90ae390feb94346d9d09a589"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/gzip_1.12-1ubuntu3.2.debian.tar.xz": {
+        "bytes": 22820,
+        "sha256": "13008977038dcf4058301a96006e994a5c3c48877d2bc39ee4c29d234ba21832"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/gzip_1.12-1ubuntu3.2.dsc": {
+        "bytes": 2042,
+        "sha256": "5919ccc72dbb8a02b7c461345f3c04bd3b33445ff2a23035b8d5837db3f09d44"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/gzip_1.12.orig.tar.xz": {
+        "bytes": 825548,
+        "sha256": "ce5e03e519f637e1f814011ace35c4f87b33c0bbabeec35baf5fbd3479e91956"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/hostname_3.23+nmu2ubuntu2.dsc": {
+        "bytes": 1567,
+        "sha256": "547a860636d92c3696b47ca33807293b74a0c80a92e6f1210b75aa1f27650e79"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/hostname_3.23+nmu2ubuntu2.tar.xz": {
+        "bytes": 13276,
+        "sha256": "38e2dcc815ccebd90a7623197a530da2538d8f14f64546147c95cffba5138e7f"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/icu_74.2-1ubuntu3.1.debian.tar.xz": {
+        "bytes": 64432,
+        "sha256": "45c74f50709547b0bfe3de020fd77be92c44d55e7020e718b0a47a0d0382f074"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/icu_74.2-1ubuntu3.1.dsc": {
+        "bytes": 2350,
+        "sha256": "6cbf2e7018b5d16d634994e32af96f4d60f4468c36674c57f897b68812bbd883"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/icu_74.2.orig.tar.gz": {
+        "bytes": 26618071,
+        "sha256": "5e4fb11d6a3e6b85afb55de8da8a71538f1d8fd64fce893986b37d60e5bb0091"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/icu_74.2.orig.tar.gz.asc": {
+        "bytes": 659,
+        "sha256": "1ca528b0017bae639fec7e89e3f988d0fa7def3e2436e5f7f5f9ec7dec2d9ece"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/init-system-helpers_1.66ubuntu1.dsc": {
+        "bytes": 2353,
+        "sha256": "99bad9c4c7b98a89f4cb6b2a7151f4ed0dee46d5671712782ae98cc879d1feb2"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/init-system-helpers_1.66ubuntu1.tar.xz": {
+        "bytes": 45100,
+        "sha256": "ca60a744414997068de76bfeff98a6834ebd92c1c691bfc28d49df93e67b6a78"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/keyutils_1.6.3-3build1.debian.tar.xz": {
+        "bytes": 13456,
+        "sha256": "71904f9f862c496333fd04c7af70c15b42198b90b41f460c501c80e86c3f1d3d"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/keyutils_1.6.3-3build1.dsc": {
+        "bytes": 2211,
+        "sha256": "d81679165d93bfcadd5bf3fdca123ce0e4562e2ad9712aa2b9d8c2d1c701324d"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/keyutils_1.6.3.orig.tar.gz": {
+        "bytes": 137022,
+        "sha256": "a61d5706136ae4c05bd48f86186bcfdbd88dd8bd5107e3e195c924cfc1b39bb4"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/krb5_1.20.1-6ubuntu2.10.debian.tar.xz": {
+        "bytes": 132764,
+        "sha256": "e3a9136f4c3d93f41b5ffb3533ff472fedf52efecebaba79127fbc1fbdced6ca"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/krb5_1.20.1-6ubuntu2.10.dsc": {
+        "bytes": 3890,
+        "sha256": "58839693f92867ecb31e253dc61198a94166f17da3afb1f9b740dc112f511a4b"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/krb5_1.20.1.orig.tar.gz": {
+        "bytes": 8661660,
+        "sha256": "704aed49b19eb5a7178b34b2873620ec299db08752d6a8574f95d41879ab8851"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libaio_0.3.113-6build1.1.debian.tar.xz": {
+        "bytes": 24824,
+        "sha256": "9e33ca6ce335e41bfccf329110d6d52f823f7b9d1e4d75f7df9b2895c0a55aae"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libaio_0.3.113-6build1.1.dsc": {
+        "bytes": 2210,
+        "sha256": "8679d0334e4f82f3e4d627e40dcc7d88ad03e2e52ec8fde15af426de9874d601"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libaio_0.3.113.orig.tar.gz": {
+        "bytes": 49980,
+        "sha256": "2c44d1c5fd0d43752287c9ae1eb9c023f04ef848ea8d4aafa46e9aedb678200b"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libassuan_2.5.6-1build1.debian.tar.xz": {
+        "bytes": 14412,
+        "sha256": "f6e12195adc071a935556ccea239a64cd305ce667dde4ce9a11691e41278a1c4"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libassuan_2.5.6-1build1.dsc": {
+        "bytes": 2734,
+        "sha256": "f1f7508772b8f7c4620b115cf5d6adce5133d3f43d2d61cf5d9ea7152fa7cf9e"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libassuan_2.5.6.orig.tar.bz2": {
+        "bytes": 577012,
+        "sha256": "e9fd27218d5394904e4e39788f9b1742711c3e6b41689a31aa3380bd5aa4f426"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libassuan_2.5.6.orig.tar.bz2.asc": {
+        "bytes": 228,
+        "sha256": "a1be6f5611de2f563a904c539e0415dd5823d9e1c4c0c1071418e7412174eaea"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libbsd_0.12.1-1build1.1.debian.tar.xz": {
+        "bytes": 18732,
+        "sha256": "4086dc52ae53f0d7625a593c331460377868edc2a5606f4d8a341565aa94b2be"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libbsd_0.12.1-1build1.1.dsc": {
+        "bytes": 2458,
+        "sha256": "a44c2a70dbb9703c342ae49525507d22795b37308302c6167d72c3cbd3e76236"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libbsd_0.12.1.orig.tar.xz": {
+        "bytes": 444048,
+        "sha256": "d7747f8ec1baa6ff5c096a9dd587c061233dec90da0f1aedd66d830f6db6996a"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libbsd_0.12.1.orig.tar.xz.asc": {
+        "bytes": 833,
+        "sha256": "04a4b66da93ea3c761e15fcedd705a969b67597d0619c3ebc5fe3cf72d477f1f"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libcap-ng_0.8.4-2build2.debian.tar.xz": {
+        "bytes": 7384,
+        "sha256": "dcbce4356e06358e39e94ea66c9fdf9ef4e635e560467918345c732df5237691"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libcap-ng_0.8.4-2build2.dsc": {
+        "bytes": 2351,
+        "sha256": "fb7456a3439418628d6c62c5545da55a7ee1a65e539b44b48c39ee9c2d3d9ce4"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libcap-ng_0.8.4.orig.tar.gz": {
+        "bytes": 59317,
+        "sha256": "5615c76a61039e283a6bd107c4faf345ae5ad4dcd45907defe5e474d8fdb6fd2"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libcap2_2.66-5ubuntu2.4.debian.tar.xz": {
+        "bytes": 24724,
+        "sha256": "7eb46752c6b59984494d2f641a049b9d4b394b7d1fe067729ccbc413c5943136"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libcap2_2.66-5ubuntu2.4.dsc": {
+        "bytes": 2319,
+        "sha256": "8178019803f285b92e52e82cf84b0a6fc18840041270b2c588db826b8277e3e0"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libcap2_2.66.orig.tar.xz": {
+        "bytes": 181592,
+        "sha256": "15c40ededb3003d70a283fe587a36b7d19c8b3b554e33f86129c059a4bb466b2"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libedit_3.1-20230828-1build1.debian.tar.xz": {
+        "bytes": 16748,
+        "sha256": "0df7e31ff4324654caa22386b7a7d404f769838e035555507eacd6e86bcf570d"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libedit_3.1-20230828-1build1.dsc": {
+        "bytes": 2399,
+        "sha256": "8f0644bf36c5c07122dccfdf6025941b7d6625582562292544068f323505b4bd"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libedit_3.1-20230828.orig.tar.gz": {
+        "bytes": 534072,
+        "sha256": "4ee8182b6e569290e7d1f44f0f78dac8716b35f656b76528f699c69c98814dad"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libevent_2.1.12-stable-9ubuntu2.2.debian.tar.xz": {
+        "bytes": 25660,
+        "sha256": "8c5b852843e08a7e1f123f1dca5b2ba1b0697222868ca27167d70243f80f676e"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libevent_2.1.12-stable-9ubuntu2.2.dsc": {
+        "bytes": 2559,
+        "sha256": "aee19702424f37e65f4fab0d0b82fd0f5a166a04e0209772a5a391075d8d00cd"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libevent_2.1.12-stable.orig.tar.gz": {
+        "bytes": 1100847,
+        "sha256": "92e6de1be9ec176428fd2367677e61ceffc2ee1cb119035037a27d346b0403bb"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libffi_3.4.6-1build1.debian.tar.xz": {
+        "bytes": 10736,
+        "sha256": "9d8712818b833baf002a2413552194b8770800cb20b802ba1d3714156eba14fe"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libffi_3.4.6-1build1.dsc": {
+        "bytes": 2055,
+        "sha256": "a7a2c320c04149192a6dd78df8be28b2b27fd38e48d76f2ee6ba0c19ae0758f6"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libffi_3.4.6.orig.tar.gz": {
+        "bytes": 598175,
+        "sha256": "9ac790464c1eb2f5ab5809e978a1683e9393131aede72d1b0a0703771d3c6cda"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libgcrypt20_1.10.3-2ubuntu0.2.debian.tar.xz": {
+        "bytes": 66364,
+        "sha256": "8298a57538f427d3c1112f2d86e374dd8223156e06b403f5c7945dd3d86f2050"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libgcrypt20_1.10.3-2ubuntu0.2.dsc": {
+        "bytes": 2914,
+        "sha256": "688df10bc9c90b241926470d1f12a4d5092157263a6c1555996c53bcf40ca7d1"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libgcrypt20_1.10.3.orig.tar.bz2": {
+        "bytes": 3783827,
+        "sha256": "8b0870897ac5ac67ded568dcfadf45969cfa8a6beb0fd60af2a9eadc2a3272aa"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libgcrypt20_1.10.3.orig.tar.bz2.asc": {
+        "bytes": 390,
+        "sha256": "f02a5f961b89c034a78decbb355ea5a8d9356df5a9636dec53ae548d7d814b14"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libgpg-error_1.47-3build2.1.debian.tar.xz": {
+        "bytes": 18776,
+        "sha256": "f02a079a6ddf9930659c3402820b6bd190687e8f1c223f340c965a9da74abcd5"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libgpg-error_1.47-3build2.1.dsc": {
+        "bytes": 3007,
+        "sha256": "3c8abf463c9ade945fe2e9d87c4aa2bff0026964207b07e99432d9ef6d9436d8"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libgpg-error_1.47.orig.tar.bz2": {
+        "bytes": 1020862,
+        "sha256": "9e3c670966b96ecc746c28c2c419541e3bcb787d1a73930f5e5f5e1bcbbb9bdb"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libgpg-error_1.47.orig.tar.bz2.asc": {
+        "bytes": 228,
+        "sha256": "6ab547bf020761e1df80b08335773a91c345ff2c1344f15b1f7d195293ab21a5"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libidn2_2.3.7-2build1.1.debian.tar.xz": {
+        "bytes": 16468,
+        "sha256": "50d3154a3a5b3506aa340c1784f96bfe0f4c5608e2a1a9dd265aa204da4ef327"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libidn2_2.3.7-2build1.1.dsc": {
+        "bytes": 2651,
+        "sha256": "fa2970145d391578511ef78bc74a9ba7a57cff510d9e5fba39520f63b023986c"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libidn2_2.3.7.orig.tar.gz": {
+        "bytes": 2155214,
+        "sha256": "4c21a791b610b9519b9d0e12b8097bf2f359b12f8dd92647611a929e6bfd7d64"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libidn2_2.3.7.orig.tar.gz.asc": {
+        "bytes": 228,
+        "sha256": "d4e78fc1c5a5c35980be3a04dd864574f450d55921360b0aa19326c75ada4a98"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libmd_1.1.0-2build1.1.debian.tar.xz": {
+        "bytes": 8448,
+        "sha256": "ed337af7e336b7dbb6b246c339baa34c9e832bf614a44d06158238259df12307"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libmd_1.1.0-2build1.1.dsc": {
+        "bytes": 2391,
+        "sha256": "11dfd22bba97a4c4ca6c09f34743ac6c72a34eb81344e3a1681c45e2d60ce239"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libmd_1.1.0.orig.tar.xz": {
+        "bytes": 271228,
+        "sha256": "1bd6aa42275313af3141c7cf2e5b964e8b1fd488025caf2f971f43b00776b332"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libmd_1.1.0.orig.tar.xz.asc": {
+        "bytes": 833,
+        "sha256": "402fd3024e43ab975733d09e661804a58ca58697194e4b15216b1217cfe1dadb"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libseccomp_2.5.5-1ubuntu3.1.debian.tar.xz": {
+        "bytes": 24484,
+        "sha256": "ee1e79bc46f18a992ac80f349fdd5cfa0b5f2f6b298473b587c7cf5af89a8df6"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libseccomp_2.5.5-1ubuntu3.1.dsc": {
+        "bytes": 2838,
+        "sha256": "8039579c8cd02819d8246b40483d69e2113979b5acc5900d7206e0b4bebff392"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libseccomp_2.5.5.orig.tar.gz": {
+        "bytes": 642445,
+        "sha256": "248a2c8a4d9b9858aa6baf52712c34afefcf9c9e94b76dce02c1c9aa25fb3375"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libseccomp_2.5.5.orig.tar.gz.asc": {
+        "bytes": 833,
+        "sha256": "f3bf8a946020d3047581f11fe6ac71971a842115ddb362562b193861ef57d97b"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libselinux_3.5-2ubuntu2.1.debian.tar.xz": {
+        "bytes": 38112,
+        "sha256": "13e47e0983f59235e34f5abe07a2a0d1af3dd2d255962c6a50fac4698c3fe891"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libselinux_3.5-2ubuntu2.1.dsc": {
+        "bytes": 3098,
+        "sha256": "96134581a745ed85b3d5f1c24cdd88fa7d3e29548c0f80a683094ed886b7f150"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libselinux_3.5.orig.tar.gz": {
+        "bytes": 211453,
+        "sha256": "9a3a3705ac13a2ccca2de6d652b6356fead10f36fb33115c185c5ccdf29eec19"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libselinux_3.5.orig.tar.gz.asc": {
+        "bytes": 981,
+        "sha256": "fd37d441e0c08cabe9ac8f7815f52355bab2011549ec5792424fe18be9e1e015"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libsemanage_3.5-1build5.debian.tar.xz": {
+        "bytes": 30188,
+        "sha256": "522654c2f5e0f508ce7c82f3c58cd394e1b9386226a2a6ac917e7fed9d8895b7"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libsemanage_3.5-1build5.dsc": {
+        "bytes": 3105,
+        "sha256": "352d869841ec5d98fd97791aa9b9896af905d5f3517ec99850f48b095c8c3193"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libsemanage_3.5.orig.tar.gz": {
+        "bytes": 185060,
+        "sha256": "f53534e50247538280ed0d76c6ce81d8fb3939bd64cadb89da10dba42e40dd9c"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libsemanage_3.5.orig.tar.gz.asc": {
+        "bytes": 981,
+        "sha256": "f9126c861c666f3308b60cea4405c5e686a056113ca3cbd0a5b0e4af7600c8f5"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libsepol_3.5-2build1.debian.tar.xz": {
+        "bytes": 27716,
+        "sha256": "2e0b6c45b864f36e58c2e1fdeed262283e5ad1aed1599ebb43a859a8760b2307"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libsepol_3.5-2build1.dsc": {
+        "bytes": 2458,
+        "sha256": "476b00c198591e38927f274a17dc91bc716e619537f13db58180b10c3daa16e0"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libsepol_3.5.orig.tar.gz": {
+        "bytes": 497522,
+        "sha256": "78fdaf69924db780bac78546e43d9c44074bad798c2c415d0b9bb96d065ee8a2"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libsepol_3.5.orig.tar.gz.asc": {
+        "bytes": 981,
+        "sha256": "2309ab5e7cd38e2eb9196f92a60e00d4508cb293f1181d34a5a050128c9b7b24"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libtasn1-6_4.19.0-3ubuntu0.24.04.2.debian.tar.xz": {
+        "bytes": 25112,
+        "sha256": "23e6e79b1be16c247e0d3b152a5838d5d182a788ba053c640b2a120b8b00adad"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libtasn1-6_4.19.0-3ubuntu0.24.04.2.dsc": {
+        "bytes": 2801,
+        "sha256": "a322b48ad14f13ef24ccebcc1feab975817c67000382096146a281d0b4354e7e"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libtasn1-6_4.19.0.orig.tar.gz": {
+        "bytes": 1786576,
+        "sha256": "1613f0ac1cf484d6ec0ce3b8c06d56263cc7242f1c23b30d82d23de345a63f7a"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libtasn1-6_4.19.0.orig.tar.gz.asc": {
+        "bytes": 228,
+        "sha256": "8410c0c004f3509c218a98b276b3308b9c46f48068e8b1a6d9ebfd61ea9f357a"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libtirpc_1.3.4+ds-1.1build1.debian.tar.xz": {
+        "bytes": 11912,
+        "sha256": "0d7f12fe6a6ae1fbb9946cada2cc9cf5dfaefb85a118383de18328fa5ec187b0"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libtirpc_1.3.4+ds-1.1build1.dsc": {
+        "bytes": 2280,
+        "sha256": "454da7bf0822a8a3845a3aef505f56a5aa63b471a99c5bcdaf7cd0c1deed0505"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libtirpc_1.3.4+ds.orig.tar.gz": {
+        "bytes": 700735,
+        "sha256": "730101dbb756b258164e496109bfdeee87eb0fcc05cd5a820e5f34537a1e637d"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libunistring_1.1-2build1.1.debian.tar.xz": {
+        "bytes": 14188,
+        "sha256": "06254c8f2ad989bd8ff267fd921d6711fbc0390ff10b99bc3be09fe870baab5e"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libunistring_1.1-2build1.1.dsc": {
+        "bytes": 2292,
+        "sha256": "496ec65625b57a9c5cd0577843814cbd4701ab123a6146a56053dcc9463ae09e"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libunistring_1.1.orig.tar.xz": {
+        "bytes": 2397676,
+        "sha256": "827c1eb9cb6e7c738b171745dac0888aa58c5924df2e59239318383de0729b98"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libunistring_1.1.orig.tar.xz.asc": {
+        "bytes": 833,
+        "sha256": "dadae6c38f85f9e8776231436c601c386924ceb44d511456c61c9be73608933d"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libxcrypt_4.4.36-4build1.debian.tar.xz": {
+        "bytes": 8356,
+        "sha256": "b75925e5d2c40abab99f8078c40f2a666125067b080466a38eb670730188ca4a"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libxcrypt_4.4.36-4build1.dsc": {
+        "bytes": 2300,
+        "sha256": "68df46e1ca34983971acc5490a3eec493c6e88cdf4868acdcafba2831e910d78"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libxcrypt_4.4.36.orig.tar.xz": {
+        "bytes": 392732,
+        "sha256": "7b7abbc89f13f5194211aa6861ed954e4fa3a210a4cb64f7e13dc8cf413e7f2a"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libzstd_1.5.5+dfsg2-2build1.1.debian.tar.xz": {
+        "bytes": 21288,
+        "sha256": "c1df6d2628b26d085259b8e7ac020eb060e4c1feca98d6103058eda5ded725bc"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libzstd_1.5.5+dfsg2-2build1.1.dsc": {
+        "bytes": 2485,
+        "sha256": "c190a5dff9e7c5b5b1399f0d701bb2c173bc7cbdf14d5e05970f5ac066c25570"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/libzstd_1.5.5+dfsg2.orig.tar.xz": {
+        "bytes": 1784164,
+        "sha256": "d7cf3c10d416fd999cb8fcf7685d9268ba7bec8eb78121fc2d0d916fa393d22b"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/lz4_1.9.4-1build1.1.debian.tar.xz": {
+        "bytes": 8356,
+        "sha256": "9551b039576db7c87f38c3c847283877de65114cca06488accb9596a7c4f1ead"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/lz4_1.9.4-1build1.1.dsc": {
+        "bytes": 2061,
+        "sha256": "ba7b585b15d8b4c955dd68c7af5aa89901cfbb3fdb4f2607ccad51628857d669"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/lz4_1.9.4.orig.tar.gz": {
+        "bytes": 354063,
+        "sha256": "0b0e3aa07c8c063ddf40b082bdf7e37a1562bda40a0ff5272957f3e987e0e54b"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/mawk_1.3.4.20240123-1build1.debian.tar.xz": {
+        "bytes": 15704,
+        "sha256": "354344a65a3626c162b69430aabc5e4861d5c4ad0c862c3df5a44c6186f273ef"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/mawk_1.3.4.20240123-1build1.dsc": {
+        "bytes": 2312,
+        "sha256": "3b5a9d204c10db2e6793e4b0c10e2dda1c7584771567e6a9b8fc4e96e4124979"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/mawk_1.3.4.20240123.orig.tar.gz": {
+        "bytes": 413943,
+        "sha256": "a8e319a83744b1f1fb6988dfa189d61887f866e9140cc9a49eb003b2b0655e88"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/mawk_1.3.4.20240123.orig.tar.gz.asc": {
+        "bytes": 729,
+        "sha256": "3b688572de36ecbb8a013cda92e294038324ed2745485e883508e9a6fdbd2472"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/mecab_0.996-14ubuntu4.debian.tar.xz": {
+        "bytes": 13556,
+        "sha256": "43c98fe565ffd8b4bc7294db26bb0fe25c40ace537918a713c32510f5941bc78"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/mecab_0.996-14ubuntu4.dsc": {
+        "bytes": 2743,
+        "sha256": "f0469d42369726edaf047480d21aeb1ba9863ab812eb5f68cc46d51416091eb3"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/mecab_0.996.orig.tar.gz": {
+        "bytes": 1398663,
+        "sha256": "e073325783135b72e666145c781bb48fada583d5224fb2490fb6c1403ba69c59"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/media-types_10.1.0.dsc": {
+        "bytes": 1624,
+        "sha256": "1470ba869117eed57ba24c1e54664116a7ab6b4417e4b911e8c8051ffe19d626"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/media-types_10.1.0.tar.xz": {
+        "bytes": 59052,
+        "sha256": "c35ec1ae0d0446aa903322f8f91a908a0d4270444326bfbad24b61fbe5600a0d"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/mysql-8.0_8.0.46-0ubuntu0.24.04.4.debian.tar.xz": {
+        "bytes": 235036,
+        "sha256": "f922343a3252ad355579d1ec5dcc6707e2b97e1d717d498572f945713e4e713d"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/mysql-8.0_8.0.46-0ubuntu0.24.04.4.dsc": {
+        "bytes": 3613,
+        "sha256": "5b95ccbed23c569db1cb3b144b6e002ee9bec8a94bfd54c5fe1aefb6286c6d87"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/mysql-8.0_8.0.46.orig.tar.gz": {
+        "bytes": 492495969,
+        "sha256": "dff4332ee7f8f37fc0516c66763600a22a81c8192c743c477b6484206e314f2f"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/mysql-defaults_1.1.0build1.dsc": {
+        "bytes": 2411,
+        "sha256": "0691dca9519e31cd6d360b40a1b3b0420075b400f6edd4aa8c86165ba637e519"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/mysql-defaults_1.1.0build1.tar.xz": {
+        "bytes": 7524,
+        "sha256": "12e866315a78f79f8c803fdce2f85863a7ed51a66f018032beda8f8c8c273c0b"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/ncurses_6.4+20240113-1ubuntu2.2.debian.tar.xz": {
+        "bytes": 50532,
+        "sha256": "c7bbb8483d7ec358fb925a370575d8ebef63d6e455edce140de2ca7b86cf98d1"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/ncurses_6.4+20240113-1ubuntu2.2.dsc": {
+        "bytes": 3942,
+        "sha256": "a7dea4604db5c8bc113eda2c4a7353f357618a74d96e404ae98655128e2f03ec"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/ncurses_6.4+20240113.orig.tar.gz": {
+        "bytes": 3688489,
+        "sha256": "37a12a0f8ae2605012c9a164dd286b0cfa02b51b5055836d09eb3d597fc351b1"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/ncurses_6.4+20240113.orig.tar.gz.asc": {
+        "bytes": 729,
+        "sha256": "b70cfa4f155f61dfa7c085ad1e3f90c73132ad198764d7793a44cd7fdca51f1b"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/netbase_6.4.dsc": {
+        "bytes": 898,
+        "sha256": "dc26cfcaa49fd874cc27c65216b2f8b6d3ad62845b78da4bdf0aea55592af756"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/netbase_6.4.tar.xz": {
+        "bytes": 32712,
+        "sha256": "fa6621826ff1150e581bd90bc3c8a4ecafe5df90404f207db6dcdf2c75f26ad7"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/nettle_3.9.1-2.2build1.1.debian.tar.xz": {
+        "bytes": 24848,
+        "sha256": "be4ad3b97b32c4c4bacc10aa4caef2f3fa0840c21c642407fc3d48c4535b7c5e"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/nettle_3.9.1-2.2build1.1.dsc": {
+        "bytes": 2325,
+        "sha256": "db439554d51174b657660a2a47d3d4128838e063f3c9c7da67bb3fe91931d1d2"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/nettle_3.9.1.orig.tar.gz": {
+        "bytes": 2396741,
+        "sha256": "ccfeff981b0ca71bbd6fbcb054f407c60ffb644389a5be80d6716d5b550c6ce3"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/nettle_3.9.1.orig.tar.gz.asc": {
+        "bytes": 573,
+        "sha256": "9746017a1a7fe60aad4b929ea592bc6ac51e12ea7179f289944eb44828d958af"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/npth_1.6-3.1build1.debian.tar.xz": {
+        "bytes": 11036,
+        "sha256": "5ca6d77eef4b2d04db11ab1c1a4691769a419ba42391d41ae36cf8a0968ef94e"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/npth_1.6-3.1build1.dsc": {
+        "bytes": 2107,
+        "sha256": "7e83a0dc387e8ab8cf152500526fefd46440b2b652470007b57b65b579539a32"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/npth_1.6.orig.tar.bz2": {
+        "bytes": 300486,
+        "sha256": "1393abd9adcf0762d34798dc34fdcf4d0d22a8410721e76f1e3afcd1daa4e2d1"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/numactl_2.0.18-1ubuntu0.24.04.1.debian.tar.xz": {
+        "bytes": 7936,
+        "sha256": "4f4c6d80e15af0eba522e6d777d372b74be223405fb3100bff14baaa42578296"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/numactl_2.0.18-1ubuntu0.24.04.1.dsc": {
+        "bytes": 2144,
+        "sha256": "fde5318bd6384807136bcb1abd118cc1001954becd99b63717d3dae7a7f88b00"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/numactl_2.0.18.orig.tar.gz": {
+        "bytes": 218289,
+        "sha256": "8cd6c13f3096e9c2293c1d732f56e2aa37a7ada1a98deed3fac7bd6da1aaaaf6"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/openssl_3.0.13-0ubuntu3.16.debian.tar.xz": {
+        "bytes": 223332,
+        "sha256": "77893129922c917792dd187c2853fb36ce1c98597c442b42d8190252959b7f6c"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/openssl_3.0.13-0ubuntu3.16.dsc": {
+        "bytes": 2516,
+        "sha256": "7d1e552a6f519836c352407e521bafdda7552ec6d1ba242968c35fc0e17f47b6"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/openssl_3.0.13.orig.tar.gz": {
+        "bytes": 15294843,
+        "sha256": "88525753f79d3bec27d2fa7c66aa0b92b3aa9498dafd93d7cfa4b3780cdae313"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/p11-kit_0.25.3-4ubuntu2.2.debian.tar.xz": {
+        "bytes": 28712,
+        "sha256": "297b8c03f6cf5bc9a00487ddcfee8ab674040afb7b256029a5eeaf8c5edb18a5"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/p11-kit_0.25.3-4ubuntu2.2.dsc": {
+        "bytes": 2406,
+        "sha256": "c3975f825965d6ee899edcfb8bce29d56716b322859df37f200e3aa80d0da69e"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/p11-kit_0.25.3.orig.tar.xz": {
+        "bytes": 991528,
+        "sha256": "d8ddce1bb7e898986f9d250ccae7c09ce14d82f1009046d202a0eb1b428b2adc"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/pam_1.5.3-5ubuntu5.7.debian.tar.xz": {
+        "bytes": 207384,
+        "sha256": "20a011e675ba5c2fdb22b681c395b3282128dfff119b8bec9adc39f4e87cddf9"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/pam_1.5.3-5ubuntu5.7.dsc": {
+        "bytes": 2772,
+        "sha256": "df25ccfc35891011b8976281516ea239a6eb2cb17bec07c17d4ee2fc7a7be96e"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/pam_1.5.3.orig.tar.xz": {
+        "bytes": 1020076,
+        "sha256": "7ac4b50feee004a9fa88f1dfd2d2fa738a82896763050cd773b3c54b0a818283"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/pcre2_10.42-4ubuntu2.1.diff.gz": {
+        "bytes": 8431,
+        "sha256": "29c5cb6ff392544bf48bd3ec2a98aa0da5297457fa4f4199a1c392ec3d41f19c"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/pcre2_10.42-4ubuntu2.1.dsc": {
+        "bytes": 2277,
+        "sha256": "6272177be186d6f8ad16b668bb508b2e07645e05b5b8402d446492cb6d18104e"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/pcre2_10.42.orig.tar.gz": {
+        "bytes": 2397194,
+        "sha256": "c33b418e3b936ee3153de2c61cc638e7e4fe3156022a5c77d0711bcbb9d64f1f"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/perl_5.38.2-3.2ubuntu0.6.debian.tar.xz": {
+        "bytes": 184740,
+        "sha256": "5c94f7708145fbe1ca97233c5c83c2bb70c6875013fc17ac50137ec735242bb7"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/perl_5.38.2-3.2ubuntu0.6.dsc": {
+        "bytes": 3081,
+        "sha256": "ece66ceafd3502733ece75ac7aaae4122123fde84921d95d5b8151ebf115057f"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/perl_5.38.2.orig-regen-configure.tar.xz": {
+        "bytes": 418808,
+        "sha256": "4d1b34cc058f9963cb89785ecc040d57f6d7725cd83329cfa4ef8b27566454d2"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/perl_5.38.2.orig.tar.xz": {
+        "bytes": 13679524,
+        "sha256": "d91115e90b896520e83d4de6b52f8254ef2b70a8d545ffab33200ea9f1cf29e8"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/procps_4.0.4-4ubuntu3.3.debian.tar.xz": {
+        "bytes": 39588,
+        "sha256": "895493786388b9ffa8a9ba894f473371cd4bbd2aa5089a8327cfdf00cf7cbc2d"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/procps_4.0.4-4ubuntu3.3.dsc": {
+        "bytes": 2280,
+        "sha256": "0a57e936bcadc6f226991a0d02f20a190763eba59a830784ef51669c04745d58"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/procps_4.0.4.orig.tar.xz": {
+        "bytes": 1401540,
+        "sha256": "22870d6feb2478adb617ce4f09a787addaf2d260c5a8aa7b17d889a962c5e42e"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/protobuf_3.21.12-8.2ubuntu0.4.debian.tar.xz": {
+        "bytes": 46716,
+        "sha256": "874f771ecbcfdf89e73460f5e4890e6fc1606be56f8c6a26f8a2b558ce6b8e08"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/protobuf_3.21.12-8.2ubuntu0.4.dsc": {
+        "bytes": 3203,
+        "sha256": "1ea2ac44ae3737510c780124c20aeef9e986387cbce7c9299669e58dd18b40e2"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/protobuf_3.21.12.orig.tar.gz": {
+        "bytes": 5141502,
+        "sha256": "930c2c3b5ecc6c9c12615cf5ad93f1cd6e12d0aba862b572e076259970ac3a53"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/python3-defaults_3.12.3-0ubuntu2.1.dsc": {
+        "bytes": 3116,
+        "sha256": "79676920120c7f45f1605d92047174fca9cc75a39d9df91c9740be98fb8cc542"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/python3-defaults_3.12.3-0ubuntu2.1.tar.gz": {
+        "bytes": 147765,
+        "sha256": "1a6b241d5fb2df35d0f1b683a783ced7b4fe0f05c29db3d3592e64da8cc188ae"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/python3.12_3.12.3-1ubuntu0.17.debian.tar.xz": {
+        "bytes": 302472,
+        "sha256": "17b15629cb10825924cf7b85055255080ec773133ae0f8b8ce5ea2eec90dd200"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/python3.12_3.12.3-1ubuntu0.17.dsc": {
+        "bytes": 3916,
+        "sha256": "941700b999737d869b80c3b5a0adc0996a0fd760b982e18551bd2104da779384"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/python3.12_3.12.3.orig.tar.xz": {
+        "bytes": 20625068,
+        "sha256": "56bfef1fdfc1221ce6720e43a661e3eb41785dd914ce99698d8c7896af4bdaa1"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/readline_8.2-4build1.debian.tar.xz": {
+        "bytes": 33816,
+        "sha256": "d3b4bfa92d0026f5d3f5d2b21e2bf6d8ae163f9ccdebdcef20afde77901c7b70"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/readline_8.2-4build1.dsc": {
+        "bytes": 2926,
+        "sha256": "442c688eb851652987a0b1a7f85d236c6fa445757f188bc275ec475d0fabf22f"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/readline_8.2.orig.tar.gz": {
+        "bytes": 3043952,
+        "sha256": "3feb7171f16a84ee82ca18a36d7b9be109a52c04f492a053331d7d1095007c35"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/sed_4.9-2ubuntu0.24.04.1.debian.tar.xz": {
+        "bytes": 63288,
+        "sha256": "81ac2757638817c9628f51dbdf425e0bfc820dd8a97e2bdef10cdaeba1dec7c0"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/sed_4.9-2ubuntu0.24.04.1.dsc": {
+        "bytes": 1999,
+        "sha256": "b62f26deec4d06d8d096d577e0a0eb004f4e79da2c75ed5338e1ed8c175f9fcf"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/sed_4.9.orig.tar.xz": {
+        "bytes": 1397092,
+        "sha256": "6e226b732e1cd739464ad6862bd1a1aba42d7982922da7a53519631d24975181"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/sensible-utils_0.0.22.dsc": {
+        "bytes": 1737,
+        "sha256": "2a49b3be4b85b3f455f9c15c26f9bfb6c508496025a414f32649b16fe6326773"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/sensible-utils_0.0.22.tar.xz": {
+        "bytes": 74412,
+        "sha256": "c744d604ad6e1f3c8b4831cd84d653cf86bf9867a856724bf3f4fceb2de215b5"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/server-runtime.json": {
+        "bytes": 33125,
+        "sha256": "109ac9bc069911045ba9055c35b1822ec2c543b469aa66faf0acee905b92b024"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/shadow_4.13+dfsg1-4ubuntu3.2.debian.tar.xz": {
+        "bytes": 96392,
+        "sha256": "ff01a3e94111ca8c4dca097ebe54edbee912cbdeba042c214bfa4c34e7839f61"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/shadow_4.13+dfsg1-4ubuntu3.2.dsc": {
+        "bytes": 2400,
+        "sha256": "0be17fd044f3e23f714a5b286a04bd040f246af1ac32fcc406b63756baa9c368"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/shadow_4.13+dfsg1.orig.tar.xz": {
+        "bytes": 1811752,
+        "sha256": "a8bb3a2aceff1cbe39d0f50687dcc1d7e7be0516a9d954d8e2eedb93f5906207"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/sources.lock.json": {
+        "bytes": 6499,
+        "sha256": "012af95659e8ee2e98907d185ccdb5abc64e87614a9a4ee43b5b8679ff92b512"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/sqlite3_3.45.1-1ubuntu2.8.debian.tar.xz": {
+        "bytes": 37512,
+        "sha256": "d543bf91c6f14ccd52ebe44d6ef3b360196b2596e0a7ca86089aef5fc52f5ec0"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/sqlite3_3.45.1-1ubuntu2.8.dsc": {
+        "bytes": 2601,
+        "sha256": "f3c0a904d2d2386e81b39774f2a2f00f92c42adb2f141ff59cc6a347c4487a69"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/sqlite3_3.45.1.orig-www.tar.xz": {
+        "bytes": 5693812,
+        "sha256": "79b60798195a024d447e661e5bbc1eb40af50387ebf840e6f581190cc02064b6"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/sqlite3_3.45.1.orig.tar.xz": {
+        "bytes": 8257884,
+        "sha256": "e32e817f7b4166a301f60b14a711871bfab7d35c1d7e29b585dfc479ae150aa4"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/systemd_255.4-1ubuntu8.18.debian.tar.xz": {
+        "bytes": 273272,
+        "sha256": "ec3ce620c3e072d34bbeaf9a4155cd91b5bee94eb412071bf81182f230ae2657"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/systemd_255.4-1ubuntu8.18.dsc": {
+        "bytes": 7324,
+        "sha256": "04154737afced0898fc7966b85e88505fb3a17f46c8c7079576d022cdeb67304"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/systemd_255.4.orig.tar.gz": {
+        "bytes": 14952427,
+        "sha256": "96e75bd08c57ad401677456fb88ef54a9f05bb1695693013bc6ecce839640fd5"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/sysvinit_3.08-6ubuntu3.debian.tar.xz": {
+        "bytes": 140128,
+        "sha256": "1a8a8365cdc393e349fc115094a8ef7c52082ed22e7f1337ab1b8dd6b5e0103b"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/sysvinit_3.08-6ubuntu3.dsc": {
+        "bytes": 2495,
+        "sha256": "e440a6f97aaf42f8067f87e2589dd7636bd0e95bc6fcb8b902f50631f83157c0"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/sysvinit_3.08.orig.tar.gz": {
+        "bytes": 513674,
+        "sha256": "325e42ae4ae5ae3e4d989e0604aeb5e4eae5f3ee21e401db3c79000718f8c836"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/tar_1.35+dfsg-3ubuntu0.4.debian.tar.xz": {
+        "bytes": 52244,
+        "sha256": "66111c3bd3ca8c4d619ae67c6f80eaeee46f239dbfecad78d1f08ce0a924a133"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/tar_1.35+dfsg-3ubuntu0.4.dsc": {
+        "bytes": 2124,
+        "sha256": "08ed7d5680f4d342723e0ef5c568c95be1c5053b4c2d0f2723b63ddd378a908d"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/tar_1.35+dfsg.orig.tar.xz": {
+        "bytes": 2111608,
+        "sha256": "9ae57e981c1e73c0eebc2b26c9b0c4497fe310ef1d516ea430efb5470b71f7a8"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/tzdata_2026e-0ubuntu0.24.04.1.debian.tar.xz": {
+        "bytes": 189608,
+        "sha256": "3a4832de76177e0f77785b9a538a335ef8638c29f6986b844443dc3fe6dc6cb6"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/tzdata_2026e-0ubuntu0.24.04.1.dsc": {
+        "bytes": 2728,
+        "sha256": "144d0332baa9dfbc243284f41a2cd9e934aac66a68ca93e494d32625e8032cc3"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/tzdata_2026e.orig.tar.gz": {
+        "bytes": 481989,
+        "sha256": "b26882805f26aac59d5b222978e6580484b834ccdc98be89df2f05a6dc53a652"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/tzdata_2026e.orig.tar.gz.asc": {
+        "bytes": 833,
+        "sha256": "91b37052145786c4a238115bc69f5edb947d9cdd19164910c40c249be27a7eda"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/ubuntu-keyring_2023.11.28.1.dsc": {
+        "bytes": 1872,
+        "sha256": "c71c8e5a1dd5e8ef682b7104645a88f0bc9eeb9380bf64288adcf78f40bcf68b"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/ubuntu-keyring_2023.11.28.1.tar.xz": {
+        "bytes": 20236,
+        "sha256": "aecd455ae15561371d6e454f121f079f0641d5e1b579a5563a2bc363fc74aa2e"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/unminimize_0.2.1.dsc": {
+        "bytes": 1554,
+        "sha256": "04cec314558830aba7f2c0a47fc156875c083db3f711d5525bea25a9a26fb638"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/unminimize_0.2.1.tar.xz": {
+        "bytes": 9400,
+        "sha256": "f15f4c1df275fa116024ea1142730f524cc552da1222effeec981aebc04f7461"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/util-linux_2.39.3-9ubuntu6.6.debian.tar.xz": {
+        "bytes": 155164,
+        "sha256": "d63476e26c149179ae8a19f4c701e27cf9235c3df2482714d369211683824e37"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/util-linux_2.39.3-9ubuntu6.6.dsc": {
+        "bytes": 4726,
+        "sha256": "b30cb22e05473810a48e14db8b5ea7786bb38aed7617dc89ad4f81cd7c6c3397"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/util-linux_2.39.3.orig.tar.xz": {
+        "bytes": 8526168,
+        "sha256": "7b6605e48d1a49f43cc4b4cfc59f313d0dd5402fa40b96810bd572e167dfed0f"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/xxhash_0.8.2-2build1.debian.tar.xz": {
+        "bytes": 5048,
+        "sha256": "2ec69c1d868b3634a91c6f9e4921b86101fd9384b186f2401fdbac532c78830c"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/xxhash_0.8.2-2build1.dsc": {
+        "bytes": 2076,
+        "sha256": "a500864f82084ce3c431c0f4a233fb1c0c48a3a8486cc49989ea073e05814d31"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/xxhash_0.8.2.orig.tar.gz": {
+        "bytes": 1141188,
+        "sha256": "baee0c6afd4f03165de7a4e67988d16f0f2b257b51d0e3cb91909302a26a79c4"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/xz-utils_5.6.1+really5.4.5-1ubuntu0.4.debian.tar.xz": {
+        "bytes": 33844,
+        "sha256": "b11106c2e0e0898d87cf186d14073770c1ff8999e7c8c4cb02b55bfc0cc8b424"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/xz-utils_5.6.1+really5.4.5-1ubuntu0.4.dsc": {
+        "bytes": 2684,
+        "sha256": "a9d6c2e7561c928d75594277a3b9f2ffe3b61293d272e282aab5110de18d0109"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/xz-utils_5.6.1+really5.4.5.orig.tar.xz": {
+        "bytes": 1680520,
+        "sha256": "da9dec6c12cf2ecf269c31ab65b5de18e8e52b96f35d5bcd08c12b43e6878803"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/zlib_1.3.dfsg-3.1ubuntu2.3.debian.tar.xz": {
+        "bytes": 61772,
+        "sha256": "ada8a0c4a1016eb8cd549f4689fd9f73b04d9c55163a318cabdfb0c3872cfe1c"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/zlib_1.3.dfsg-3.1ubuntu2.3.dsc": {
+        "bytes": 3162,
+        "sha256": "01d8c26d0549eacbbd65bc4b51c076c407e9e429d081e4d472a13ec499ec2a3a"
+      },
+      "esteria_android/esteria_android/out/mysql-sources/zlib_1.3.dfsg.orig.tar.xz": {
+        "bytes": 1128572,
+        "sha256": "5eea0322c1c21c75cad3b607ac1c43ff5c71e014b8ac4a34300b5e2b80d02e70"
+      },
+      "esteria_android/esteria_android/runtime/android_database_setup.py": {
+        "bytes": 5488,
+        "sha256": "a2bdc53753d8c301e6e8fa633a8e12026f7285881f08c22e2aedf6819d31a813"
+      },
+      "esteria_android/esteria_android/runtime/mysql-probe/Dockerfile": {
+        "bytes": 2912,
+        "sha256": "d516ea4ce52f6a71c71b1c9f3bd169729e5e288313b11b70644d516291c63ebf"
+      },
+      "esteria_android/esteria_android/runtime/mysql-probe/Dockerfile.dockerignore": {
+        "bytes": 179,
+        "sha256": "ff3705d5422ab933518a1e9a1898063dbfcf104abb472ca455f6dc73d87d9130"
+      },
+      "esteria_android/esteria_android/runtime/mysql-probe/README.md": {
+        "bytes": 13105,
+        "sha256": "37df2f89ad9b437accfc59a4421cb750e41a4e58c937f673771b559adec18dff"
+      },
+      "esteria_android/esteria_android/runtime/mysql-probe/guest_check.py": {
+        "bytes": 8978,
+        "sha256": "36fd8cd42851df051df421eec1df01fab9b711092ba21cc728daea8d5050fee9"
+      },
+      "esteria_android/esteria_android/runtime/mysql-probe/mysql-binaries.SHA256SUMS": {
+        "bytes": 361,
+        "sha256": "d1f390b4d9f9f63d62a069a202b824f9c273d6e3695b4a1f4a40357184184303"
+      },
+      "esteria_android/esteria_android/runtime/mysql-probe/record_runtime.py": {
+        "bytes": 4590,
+        "sha256": "02dc95b182414d78e890eb89ff6121d94d3a45ac268efa896fbba95ce6577cea"
+      },
+      "esteria_android/esteria_android/runtime/mysql-probe/sources.lock.json": {
+        "bytes": 6499,
+        "sha256": "012af95659e8ee2e98907d185ccdb5abc64e87614a9a4ee43b5b8679ff92b512"
+      },
+      "esteria_android/esteria_android/runtime/mysql_bootstrap.py": {
+        "bytes": 32698,
+        "sha256": "e69d5b64c4a5f5ace86fa521589d5a64613f601c59aedb011b42a1e5b743b47d"
+      },
+      "esteria_android/esteria_android/runtime/mysql_service.py": {
+        "bytes": 18078,
+        "sha256": "8b30e9598f20ee715685a51aba59cefcafc6213d9d5d5cb6c6f3a73efa6b71c2"
+      },
+      "esteria_android/esteria_android/runtime/server/capture_sources.py": {
+        "bytes": 3191,
+        "sha256": "5568e32bf0d912e45e65ffdfa02404d604138e86a8534d8c097b111b0445010b"
+      },
+      "esteria_android/esteria_android/runtime/server/inrelease.SHA256SUMS": {
+        "bytes": 413,
+        "sha256": "16405ad6b24709c3cc1ca2f249cf72590a8893a3e5b1263f299465915eabc39d"
+      },
+      "esteria_android/esteria_android/runtime/server/ubuntu.sources": {
+        "bytes": 204,
+        "sha256": "3bca581187f9aa8d51605ee49a8493619779338f630de58553ae7888aa82fd16"
+      },
+      "esteria_android/esteria_android/tools/build_android_mysql_probe.py": {
+        "bytes": 9284,
+        "sha256": "ece850eb73804ac85e5ce511c5d7085e35420ea2b1f628222daf813a149d84ed"
+      },
+      "esteria_android/esteria_android/tools/package_server_runtime.py": {
+        "bytes": 13619,
+        "sha256": "e3fca010d44223bab12f34fe5f8bc984e21e518419f60edf72acdd6299fb93f7"
+      },
+      "esteria_android/esteria_android/tools/prepare_runtime.py": {
+        "bytes": 22126,
+        "sha256": "113ae7612cba7f557fab79550448578a9a6b8ceb674cff80b38fcf40e8257078"
+      },
+      "esteria_android/esteria_android/tools/preserve_android_mysql_probe.py": {
+        "bytes": 6607,
+        "sha256": "15d81568176f58bc7bb2fbc4340bab9dba7d481f6bcf68f41563a210a4f1f21a"
+      },
+      "esteria_android/esteria_android/tools/qualify_android_mysql.py": {
+        "bytes": 11098,
+        "sha256": "19d0c7ce57b2982c98c8a0857eb5c99ea76794d9c7ff957b892885bec6c94d49"
+      },
+      "esteria_android/esteria_android/tools/verify_android_mysql_probe.py": {
+        "bytes": 8006,
+        "sha256": "acb0b354745b48146060b1c105ca76dbea2b1fd8a0cdc9e8c0c38590b7078867"
+      }
+    },
+    "installedSourceArchiveBytes": 876239964,
+    "installedSourceArchiveFiles": 275,
+    "installedSourceDirectory": "esteria_android/esteria_android/out/mysql-sources",
+    "prootCorrespondingSource": {
+      "bytes": 28425243,
+      "path": "_temp/proot-probe/corresponding-source.tar.gz",
+      "sha256": "c21eb7f82d9b2899e9740fb8f0c402fb701c103989420ab78bf2a8ad47667c48"
+    },
+    "sourcePackages": 88
+  },
+  "playerbotsAiQualified": false,
+  "productionArm64ProviderQualified": false,
+  "scope": "android-x64-installation-complete-original-source-debug-and-new-recipe",
+  "serverDataQualified": false,
+  "slotPromoted": false,
+  "sqlExecuted": false,
+  "worldserverQualified": false
+}

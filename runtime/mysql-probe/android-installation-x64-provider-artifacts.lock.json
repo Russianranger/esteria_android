@@ -1,22 +1,44 @@
 {
   "androidRuntimeQualified": false,
-  "enabled": false,
-  "evidenceArtifact": null,
+  "enabled": true,
+  "evidenceArtifact": {
+    "bytes": 207104,
+    "id": 13022340157,
+    "sha256": "7f9c21f76b1c5b2e422cb96ff29cf8958a1617f144955ec90807ce5cdd8f2630"
+  },
   "formatVersion": 1,
   "fourSchemaCoordinatorQualified": false,
   "gameplayQualified": false,
-  "measurementEvidence": null,
+  "measurementEvidence": {
+    "bytes": 9979,
+    "path": "runtime/evidence/android-installation-provider-651cd493-readback.json",
+    "sha256": "b52c6eb503081e71441022701d4ac1f5a8cd0a68ffbe75f41cf688d9d41d7e8b"
+  },
   "playerbotsAiQualified": false,
-  "producer": null,
-  "productArtifact": null,
-  "productManifest": null,
+  "producer": {
+    "integrationRevision": "651cd493c1dee9436c6fc98da0d6b4485ff19900",
+    "job": 124377702411,
+    "workflowRun": 41148040884
+  },
+  "productArtifact": {
+    "bytes": 1969319740,
+    "id": 13022260387,
+    "sha256": "b1e807374d564b2671f9da8a2d88e894bac6304385d1fc9692f7db7b62df8953"
+  },
+  "productManifest": {
+    "bytes": 45102,
+    "sha256": "a788d9c4d5192e39ff65626eeb2350a05ca45dc4c107a3effabd6e2fd6fc18f4"
+  },
   "productionArm64ProviderQualified": false,
-  "providerDescriptor": null,
+  "providerDescriptor": {
+    "bytes": 26368,
+    "sha256": "909b0dcd00c24289cf2bf59e1a36b075885cec62de008fc1cbb47e37eeb5c573"
+  },
   "repository": "Russianranger/esteria_android",
   "scope": "android-x64-installation-provider-artifact-selection",
   "serverDataQualified": false,
   "slotPromoted": false,
   "sqlExecuted": false,
-  "state": "pending-actual-provider-artifact-measurement",
+  "state": "measured-provider-artifacts",
   "worldserverQualified": false
 }

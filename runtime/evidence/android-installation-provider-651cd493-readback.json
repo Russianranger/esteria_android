@@ -1,0 +1,265 @@
+{
+  "actualProviderReadback": {
+    "allPackagedProviderFilesReadBack": true,
+    "allProgramElfAndCapturedLibraryBytesReadBack": true,
+    "androidRuntimeQualified": false,
+    "formatVersion": 1,
+    "fourSchemaCoordinatorQualified": false,
+    "fullOriginalSourcesAndPairedDebugReadBack": true,
+    "gameplayQualified": false,
+    "invocationScriptsHaveSeparateIdentities": true,
+    "nativeInputSelection": {
+      "bytes": 3333,
+      "sha256": "b4761fa5f6b1de914637c17f4248872b8749565738efb4e0098c8e13d4c4540a"
+    },
+    "nativeSqlReceipt": {
+      "bytes": 19483,
+      "sha256": "44448b43339efeaf6dad1421261c74c9fceab979779d1c70ae8a063907b76fed"
+    },
+    "originalElfBytesUnchanged": true,
+    "playerbotsAiQualified": false,
+    "productionArm64ProviderQualified": false,
+    "providerDescriptor": {
+      "bytes": 26368,
+      "sha256": "909b0dcd00c24289cf2bf59e1a36b075885cec62de008fc1cbb47e37eeb5c573"
+    },
+    "scope": "independent-android-x64-installation-provider-readback",
+    "serverDataQualified": false,
+    "slotPromoted": false,
+    "sourceCompanionManifest": {
+      "bytes": 116088,
+      "sha256": "001090640852bfb514f8c6ac7c8e3f697efd8285f78e7221d40adea94e82d711"
+    },
+    "sqlExecuted": false,
+    "worldserverQualified": false
+  },
+  "all14OriginalCapturedElfLibraryMetadataBindingsVerified": true,
+  "allSmallArtifactZipBytesReadBack": true,
+  "androidExecutionQualified": false,
+  "androidRuntimeQualified": false,
+  "artifacts": {
+    "evidence": {
+      "bytes": 207104,
+      "id": 13022340157,
+      "sha256": "7f9c21f76b1c5b2e422cb96ff29cf8958a1617f144955ec90807ce5cdd8f2630"
+    },
+    "product": {
+      "bytes": 1969319740,
+      "id": 13022260387,
+      "sha256": "b1e807374d564b2671f9da8a2d88e894bac6304385d1fc9692f7db7b62df8953"
+    }
+  },
+  "canonicalIntegrationRecipeStreamReadLocally": {
+    "bytes": 12288000,
+    "sha256": "d6a58bf2d0815b3259eba4160ffd5383e803e1875f3d656ee0d119ca441c82f3"
+  },
+  "completeProductDownloadedLocally": false,
+  "completeProductReadbackRequiredBeforeApk": true,
+  "declaredProductFileBytes": 1969217426,
+  "declaredProductFiles": 207,
+  "everySmallArtifactMemberCrcAndSha256Verified": true,
+  "formatVersion": 1,
+  "fourSchemaCoordinatorQualified": false,
+  "fullProductAndOriginalSourceReadbackCompletedInCi": true,
+  "gameplayQualified": false,
+  "historicalJavaProofInherited": false,
+  "jobs": [
+    {
+      "completedAt": "2026-10-31T00:03:45Z",
+      "conclusion": "success",
+      "id": 124377645634,
+      "name": "selection",
+      "startedAt": "2026-10-31T00:03:37Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-31T00:03:39Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "startedAt": "2026-10-31T00:03:38Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:03:40Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "startedAt": "2026-10-31T00:03:39Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:03:42Z",
+          "conclusion": "success",
+          "name": "Check real source and default-off transport boundaries",
+          "startedAt": "2026-10-31T00:03:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:03:42Z",
+          "conclusion": "success",
+          "name": "Require an actual separately qualified native four-schema SQL receipt",
+          "startedAt": "2026-10-31T00:03:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:03:42Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "startedAt": "2026-10-31T00:03:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:03:42Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "startedAt": "2026-10-31T00:03:42Z",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "completedAt": "2026-10-31T00:06:14Z",
+      "conclusion": "success",
+      "id": 124377702411,
+      "name": "measure",
+      "startedAt": "2026-10-31T00:03:48Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-31T00:03:49Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "startedAt": "2026-10-31T00:03:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:03:50Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "startedAt": "2026-10-31T00:03:49Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:03:50Z",
+          "conclusion": "success",
+          "name": "Resolve private measurement paths on the assigned runner",
+          "startedAt": "2026-10-31T00:03:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:03:51Z",
+          "conclusion": "success",
+          "name": "Prepare exact frozen runtime recipe outside the clean measurement checkout",
+          "startedAt": "2026-10-31T00:03:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:04:59Z",
+          "conclusion": "success",
+          "name": "Read all actual original source debug runtime and content inputs without executing SQL",
+          "startedAt": "2026-10-31T00:03:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:05:42Z",
+          "conclusion": "success",
+          "name": "Prepare the fixed source-bound provider and exact full source companion",
+          "startedAt": "2026-10-31T00:04:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:06:10Z",
+          "conclusion": "success",
+          "name": "Preserve complete product and original source bytes for later exact acquisition",
+          "startedAt": "2026-10-31T00:05:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:06:11Z",
+          "conclusion": "success",
+          "name": "Preserve only bounded measurement and independent readback receipts",
+          "startedAt": "2026-10-31T00:06:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:06:11Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "startedAt": "2026-10-31T00:06:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:06:11Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "startedAt": "2026-10-31T00:06:11Z",
+          "status": "completed"
+        }
+      ]
+    }
+  ],
+  "original905093502ByteMysqlSourceZipIdentityBound": true,
+  "originalExecutableDebugAndLargeSourceBytesReadLocally": false,
+  "originalProgramAndRuntimeArtifactIdentitiesUnchangedFromPreviousMeasurement": true,
+  "playerbotsAiQualified": false,
+  "producerPackagingSourcesMatchExactGitBlobs": true,
+  "productManifest": {
+    "bytes": 45102,
+    "sha256": "a788d9c4d5192e39ff65626eeb2350a05ca45dc4c107a3effabd6e2fd6fc18f4"
+  },
+  "productionArm64ProviderQualified": false,
+  "providerDescriptor": {
+    "bytes": 26368,
+    "sha256": "909b0dcd00c24289cf2bf59e1a36b075885cec62de008fc1cbb47e37eeb5c573"
+  },
+  "rawMembers": {
+    "measurement-source.json": {
+      "bytes": 16600,
+      "path": "runtime/evidence/android-installation-provider-651cd493/measurement-source.json",
+      "sha256": "deac1f7121f60c7100693465b8a47f3dbc76ea088e88e641cd96cb6707bb7cd5"
+    },
+    "measurement.json": {
+      "bytes": 972,
+      "path": "runtime/evidence/android-installation-provider-651cd493/measurement.json",
+      "sha256": "9663725a53070743f9131ca2f25bd735fd0b845dcd35344d26c8059e5a67c205"
+    },
+    "product-manifest.json": {
+      "bytes": 45102,
+      "path": "runtime/evidence/android-installation-provider-651cd493/product-manifest.json",
+      "sha256": "a788d9c4d5192e39ff65626eeb2350a05ca45dc4c107a3effabd6e2fd6fc18f4"
+    },
+    "provider-readback.json": {
+      "bytes": 1170,
+      "path": "runtime/evidence/android-installation-provider-651cd493/provider-readback.json",
+      "sha256": "5998b31d5e7751fb5888cbecfad84cc4d7835d285c0b12f23351e5651daffb7b"
+    },
+    "provider.json": {
+      "bytes": 26368,
+      "path": "runtime/evidence/android-installation-provider-651cd493/provider.json",
+      "sha256": "909b0dcd00c24289cf2bf59e1a36b075885cec62de008fc1cbb47e37eeb5c573"
+    },
+    "source-manifest.json": {
+      "bytes": 116088,
+      "path": "runtime/evidence/android-installation-provider-651cd493/source-manifest.json",
+      "sha256": "001090640852bfb514f8c6ac7c8e3f697efd8285f78e7221d40adea94e82d711"
+    }
+  },
+  "scope": "independent-android-x64-provider-measurement-artifact-readback",
+  "serverDataQualified": false,
+  "slotPromoted": false,
+  "sourceRecipeChangedFilesFromPreviousMeasurement": [
+    "packaging-recipe/app/src/androidTest/java/io/github/russianranger/esteria/runtime/ServerInstallationX64Test.java",
+    "packaging-recipe/app/src/main/java/io/github/russianranger/esteria/runtime/ServerSourceSelection.java",
+    "packaging-recipe/core/src/main/java/io/github/russianranger/esteria/core/runtime/install/ClientLaunchView.java"
+  ],
+  "sourceRecipeGitAndCurrentActivationCodeFilesVerified": 82,
+  "sqlExecuted": false,
+  "workflow": {
+    "conclusion": "success",
+    "headSha": "651cd493c1dee9436c6fc98da0d6b4485ff19900",
+    "htmlUrl": "https://github.com/Russianranger/esteria_android/actions/runs/41148040884",
+    "id": 41148040884,
+    "job": 124377702411,
+    "status": "completed"
+  },
+  "worldserverQualified": false
+}

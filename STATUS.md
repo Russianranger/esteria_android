@@ -32,7 +32,7 @@ qualify Android ARM64, Adreno or Thor. Docker is for development only.
 | Android13x64 MySQL |41109642918@4fd bootstrap/service lifecycle; fresh817 run41119182193 also passes. | Distinct runtime bytes; current code inherits no historical Java proof. |
 | Android recovery |41129893390@7c five handoff deaths;41132701736@84fa adds actual generic lease death/reacquisition. | Component-only; source/APK readbacks separate from full app restart. |
 | Android updates |41129893361 package/private-file/update contracts pass. | No delivered stable-key update baseline. |
-| Canonical tooling |41133823889@f44:1346tests/46.019s,1276passed/70explicit skips, zero errors. Both84fa harness failures fixed; production source guard unchanged. | Unpublished fixture work excluded. |
+| Canonical tooling |41148040883@651:1414checks/65.680s,1344passed/70explicit skips; syntax and pinned patch checks pass. | Host tooling; runtime/gameplay remain separate. |
 
 Proofs are under runtime/evidence. The84fa APK provider/helper/native identities
 match the fully read7c cohort. The first7c APK attempt failed an NDK HTTP/2
@@ -87,16 +87,15 @@ qualify exclusive cache publication or ARM64 semantics.
 1. Original x64 build41119182502 and actual native SQL41139757153 pass. Source/
    debug/runtime preservation is complete; original868MB component is fully
    admitted in CI, while local readback is bounded to source/receipt evidence.
-2. Historical provider measurement41141559961@fff211 passes complete original
-   source/runtime acquisition, construction and readback. Actual Android995 and
-   c441 runs pass full acquisition/build/install but fail before SQL. Improved
-   c441 diagnostics identify an Integer/Long JSON byte-count comparison at
-   InstallationX64Inputs:139. The narrow source-comparator fix passes a real
-   parser negative control/regression; the fixed Android test also checks its
-   actual parser before setup. Fresh provider measurement is required because
-   the caller code changed: selectors are intentionally provider-pending with
-   APK execution disabled. Original native SQL/ELF/runtime bytes remain unchanged.
-   Keep historicalfff proofs; admit the fresh measured P before Android rerun.
+2. Fresh provider measurement41148040884@651 passes complete acquisition,
+   construction and independent readback after the Integer/Long JSON comparison
+   fix. All82 source pins match; descriptor SHA909b0dcd00c24289cf2bf59e1a36b075885cec62de008fc1cbb47e37eeb5c573.
+   Six bounded receipts are fully read locally; complete1,969,319,740B product is
+   read in CI and remains local-metadata-only. Exact newP selectors are enabled
+   for a fresh Android SQL/promotion/restart run. Original native SQL/ELF/runtime
+   bytes are unchanged. Preserve995/c441 failures and historicalfff proof; no
+   Android four-schema success is established yet. Native ARM64 Java651 is also
+   rerunning actual SQL and restart; complete ARM64 APK651 is building.
 3. Preserve actual Android input-widget41138732113 success and its prior test-
    toolbar failure. Physical controller/kernel input, Wine and gameplay remain
    separate gates.

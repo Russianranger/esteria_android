@@ -1,0 +1,30 @@
+{
+  "androidRuntimeQualified": false,
+  "formatVersion": 1,
+  "fourSchemaCoordinatorQualified": false,
+  "gameplayQualified": false,
+  "independentReadbackRequired": true,
+  "nativeInputSelection": {
+    "bytes": 3333,
+    "sha256": "b4761fa5f6b1de914637c17f4248872b8749565738efb4e0098c8e13d4c4540a"
+  },
+  "nativeSqlReceipt": {
+    "bytes": 19483,
+    "sha256": "44448b43339efeaf6dad1421261c74c9fceab979779d1c70ae8a063907b76fed"
+  },
+  "playerbotsAiQualified": false,
+  "productionArm64ProviderQualified": false,
+  "providerDescriptor": {
+    "bytes": 26368,
+    "sha256": "909b0dcd00c24289cf2bf59e1a36b075885cec62de008fc1cbb47e37eeb5c573"
+  },
+  "scope": "android-x64-installation-provider-measurement-no-execution",
+  "serverDataQualified": false,
+  "slotPromoted": false,
+  "sourceCompanionManifest": {
+    "bytes": 116088,
+    "sha256": "001090640852bfb514f8c6ac7c8e3f697efd8285f78e7221d40adea94e82d711"
+  },
+  "sqlExecuted": false,
+  "worldserverQualified": false
+}

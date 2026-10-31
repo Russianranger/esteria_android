@@ -52,10 +52,16 @@ Large source/build artifacts are fully verified in CI; label local-read boundari
    ServerSourceSelection now normalizes only exact Integer/Long values, retaining
    hash/count/type/overflow distinctions. Real JSON-java parser regression and
    actual Android-parser assertions are added; native Java runs the same check.
-   The changed code requires a fresh P measurement. Both selectors are pending/
-   disabled; original native SQL and runtime bytes are unchanged. Read the new
-   measured artifact, activate exact P pins, then rerun Android SQL. Do not
-   transfer the oldfff caller proof or rebuild original1850-object tools.
+   Fresh P651 measurement41148040884/job124377702411 now passes. All82 code
+   pins/canonical12,288,000B P tar and207product/175source metadata entries were
+   independently checked. Descriptor SHA909b0dcd00c24289cf2bf59e1a36b075885cec62de008fc1cbb47e37eeb5c573.
+   Small artifact13022340157 is207104B, fully read locally; complete product
+   13022260387 is1,969,319,740B, full CI readback but NOT downloaded locally.
+   Exact measured651 selectors are enabled. Run fresh Android SQL next; retain
+   the actual parser check before setup and all failure diagnostics. Original
+   native SQL/runtime/ELF bytes are unchanged; do not transfer oldfff caller
+   proof or rebuild original1850-object tools. Native Java41148040872 and full
+   APK41148040843@651 are also running; inspect real completion/artifacts.
 4. Android input-widget41138732113@50123a9 passes eight required groups and
    optional real registered-device ranges/camera/EOF cleanup. Preserve its actual
    proof and earlier1180 toolbar/IME-window failure. Kernel/physical delivery,
