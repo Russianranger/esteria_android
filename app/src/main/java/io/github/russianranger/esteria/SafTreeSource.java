@@ -36,11 +36,17 @@ final class SafTreeSource implements GameDataImporter.InputSource, AutoCloseable
     private static final class Document {
         final String id, name, mime;
         final long size, modified;
-        final int flags;
-        Document(String id, String name, String mime, long size, long modified, int flags) {
-            this.id = id; this.name = name; this.mime = mime; this.size = size; this.modified = modified; this.flags = flags;
+        Document(String id, String name, String mime, long size, long modified) {
+            this.id = id; this.name = name; this.mime = mime; this.size = size; this.modified = modified;
         }
         boolean directory() { return DocumentsContract.Document.MIME_TYPE_DIR.equals(mime); }
+    }
+    private static final class ObservedFile {
+        // Share the same entry with snapshot()/the importer instead of retaining
+        // another Document with duplicate ID/name/size/mtime for every file.
+        final GameDataImporter.InputEntry entry;
+        final String mime;
+        ObservedFile(GameDataImporter.InputEntry entry, String mime) { this.entry = entry; this.mime = mime; }
     }
     private static final class Directory {
         final Document document; final String path; final int depth;
@@ -51,7 +57,8 @@ final class SafTreeSource implements GameDataImporter.InputSource, AutoCloseable
     private final AtomicBoolean cancelled;
     private final CancellationSignal queryCancellation = new CancellationSignal();
     private final Progress progress;
-    private final Map<String, Document> observed = new HashMap<>();
+    private final Map<String, Object> observed = new HashMap<>();
+    private final Map<String, String> mimeTypes = new HashMap<>();
     private final List<Document> directories = new ArrayList<>();
     private final GameDataImporter.MetadataBudget metadataBudget = new GameDataImporter.MetadataBudget();
     private final Object streamLock = new Object();
@@ -77,7 +84,7 @@ final class SafTreeSource implements GameDataImporter.InputSource, AutoCloseable
         selectedRootName = root.name;
         progress.update(0, 1, reliableFileTimes);
         metadataBudget.add("", root.id, true);
-        observe(root); directories.add(root);
+        observe(root.id, root); directories.add(root);
         ArrayDeque<Directory> pending = new ArrayDeque<>(); pending.add(new Directory(root, "", 0));
         List<GameDataImporter.InputEntry> files = new ArrayList<>();
         long totalBytes = 0, reportedAt = 0;
@@ -94,8 +101,8 @@ final class SafTreeSource implements GameDataImporter.InputSource, AutoCloseable
                     if (depth > MAX_DEPTH || path.getBytes(StandardCharsets.UTF_8).length > 1024)
                         throw new IOException("The source folder contains a path that is too deep or too long");
                     metadataBudget.add(path, child.id, child.directory());
-                    observe(child); // Reject repeated IDs, including ancestor cycles and aliases.
                     if (child.directory()) {
+                        observe(child.id, child); // Reject repeated IDs, including ancestor cycles and aliases.
                         directories.add(child); pending.add(new Directory(child, path, depth));
                     } else {
                         if (child.size < 0) throw new IOException("The file provider cannot report the size of " + path + ". Copy this client to local storage before importing.");
@@ -103,7 +110,9 @@ final class SafTreeSource implements GameDataImporter.InputSource, AutoCloseable
                             throw new IOException("The source exceeds the import size limits");
                         totalBytes += child.size;
                         if (child.modified <= 0) reliableFileTimes = false;
-                        files.add(new GameDataImporter.InputEntry(child.id, path, child.size, child.modified));
+                        GameDataImporter.InputEntry entry = new GameDataImporter.InputEntry(child.id, path, child.size, child.modified);
+                        observe(child.id, new ObservedFile(entry, child.mime));
+                        files.add(entry);
                     }
                     long now = System.nanoTime();
                     if (now - reportedAt >= 200_000_000L) { progress.update(files.size(), directories.size(), reliableFileTimes); reportedAt = now; }
@@ -120,7 +129,7 @@ final class SafTreeSource implements GameDataImporter.InputSource, AutoCloseable
     }
 
     @Override public InputStream open(GameDataImporter.InputEntry entry) throws IOException {
-        checkCancelled(); Document document = known(entry);
+        checkCancelled(); GameDataImporter.InputEntry document = known(entry).entry;
         AssetFileDescriptor descriptor;
         try { descriptor = resolver.openAssetFileDescriptor(documentUri(document.id), "r", queryCancellation); }
         catch (OperationCanceledException e) { throw new GameDataImporter.ImportCancelledException(); }
@@ -150,7 +159,17 @@ final class SafTreeSource implements GameDataImporter.InputSource, AutoCloseable
 
     @Override public void verifyUnchanged(GameDataImporter.InputEntry entry) throws IOException {
         checkCancelled();
-        try { verify(known(entry)); }
+        try {
+            ObservedFile expected = known(entry);
+            Document actual = readDocument(expected.entry.id);
+            String originalPath = expected.entry.relativePath;
+            if (actual.directory() || !actual.id.equals(expected.entry.id)
+                    || !actual.name.equals(originalPath.substring(originalPath.lastIndexOf('/') + 1)))
+                throw new IOException("The source identity, filename or type changed during import");
+            if (!actual.mime.equals(expected.mime) || actual.size != expected.entry.size
+                    || (expected.entry.modifiedMillis > 0 && actual.modified != expected.entry.modifiedMillis))
+                throw new IOException("The source metadata changed during import. Keep the selected folder unchanged and retry.");
+        }
         catch (GameDataImporter.ImportCancelledException cancelled) { throw cancelled; }
         catch (IOException changed) { throw new IOException("Source verification failed at relative path '" + entry.relativePath
                 + "' in selected folder '" + selectedRootName + "': " + changed.getMessage(), changed); }
@@ -167,15 +186,18 @@ final class SafTreeSource implements GameDataImporter.InputSource, AutoCloseable
                 || (expected.modified > 0 && actual.modified != expected.modified))
             throw new IOException("The source changed during import. Keep the selected folder unchanged and retry.");
     }
-    private Document known(GameDataImporter.InputEntry entry) throws IOException {
-        Document document = observed.get(entry.id);
-        if (document == null || document.directory() || document.size != entry.size || document.modified != entry.modifiedMillis)
+    private ObservedFile known(GameDataImporter.InputEntry entry) throws IOException {
+        Object value = observed.get(entry.id);
+        if (!(value instanceof ObservedFile)) throw new IOException("Unknown source document");
+        ObservedFile document = (ObservedFile) value;
+        if (document.entry.size != entry.size || document.entry.modifiedMillis != entry.modifiedMillis
+                || !document.entry.relativePath.equals(entry.relativePath))
             throw new IOException("Unknown source document");
         return document;
     }
-    private void observe(Document document) throws IOException {
+    private void observe(String id, Object document) throws IOException {
         if (observed.size() >= MAX_DOCUMENTS) throw new IOException("The selected folder contains too many documents (maximum 200,000)");
-        if (observed.put(document.id, document) != null) throw new IOException("The file provider returned a repeated document or folder cycle");
+        if (observed.put(id, document) != null) throw new IOException("The file provider returned a repeated document or folder cycle");
     }
     private Document readDocument(String id) throws IOException {
         checkCancelled();
@@ -196,7 +218,7 @@ final class SafTreeSource implements GameDataImporter.InputSource, AutoCloseable
         } catch (OperationCanceledException e) { throw new GameDataImporter.ImportCancelledException(); }
         catch (RuntimeException e) { throw providerFailure("The file provider denied access to the selected folder", e); }
     }
-    private static Document fromCursor(Cursor cursor) throws IOException {
+    private Document fromCursor(Cursor cursor) throws IOException {
         String id = requiredString(cursor, DocumentsContract.Document.COLUMN_DOCUMENT_ID);
         String name = requiredString(cursor, DocumentsContract.Document.COLUMN_DISPLAY_NAME);
         String mime = requiredString(cursor, DocumentsContract.Document.COLUMN_MIME_TYPE);
@@ -214,7 +236,10 @@ final class SafTreeSource implements GameDataImporter.InputSource, AutoCloseable
         int timeIndex = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_LAST_MODIFIED);
         long size = sizeIndex >= 0 && !cursor.isNull(sizeIndex) ? cursor.getLong(sizeIndex) : -1;
         long modified = timeIndex >= 0 && !cursor.isNull(timeIndex) ? cursor.getLong(timeIndex) : -1;
-        return new Document(id, name, mime, size, modified, flags);
+        String canonical = mimeTypes.get(mime);
+        if (canonical != null) mime = canonical;
+        else if (mimeTypes.size() < 256) mimeTypes.put(mime, mime);
+        return new Document(id, name, mime, size, modified);
     }
     private static String requiredString(Cursor cursor, String column) throws IOException {
         int index = cursor.getColumnIndex(column);
@@ -245,5 +270,10 @@ final class SafTreeSource implements GameDataImporter.InputSource, AutoCloseable
         synchronized (streamLock) { input = activeStream; }
         if (input != null) try { input.close(); } catch (IOException ignored) { }
     }
-    @Override public void close() { cancel(); }
+    @Override public void close() {
+        cancel();
+        // The owning importer has settled before its try-with-resources closes
+        // this adapter. Release metadata before subsequent stock inspection.
+        observed.clear(); directories.clear(); mimeTypes.clear();
+    }
 }

@@ -41,6 +41,10 @@ final class ZipSafety {
             // then charge decoded names/maps and optional metadata as each entry is read.
             GameDataImporter.MetadataBudget budget = new GameDataImporter.MetadataBudget(maxMetadataBytes);
             budget.reserve(size);
+            // Reuse one small scratch array across the entire directory. Long
+            // client ZIP inventories otherwise allocate one name-sized byte[]
+            // per entry before ZipFile decodes the same names a second time.
+            byte[] nameBytes = new byte[1025];
             long at = offset;
             for (long i = 0; i < count; i++) {
                 if (cancellation.isCancelled() || Thread.currentThread().isInterrupted()) throw new GameDataImporter.ImportCancelledException();
@@ -59,8 +63,8 @@ final class ZipSafety {
                 long next = at + 46 + nameLength + extraLength + commentLength;
                 if (next > offset + size) throw new IOException("ZIP central directory overrun");
                 if (nameLength == 0 || nameLength > 1025) throw new IOException("ZIP name exceeds the bounded metadata policy");
-                byte[] nameBytes = new byte[nameLength]; f.seek(at + 46); f.readFully(nameBytes);
-                String name = new String(nameBytes, StandardCharsets.UTF_8); boolean directory = name.endsWith("/");
+                f.seek(at + 46); f.readFully(nameBytes, 0, nameLength);
+                String name = new String(nameBytes, 0, nameLength, StandardCharsets.UTF_8); boolean directory = name.endsWith("/");
                 budget.add(directory ? name.substring(0, name.length() - 1) : name, "", directory);
                 budget.reserve((extraLength + commentLength) * 2L);
                 at = next;

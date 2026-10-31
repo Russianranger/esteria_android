@@ -106,6 +106,12 @@ public final class SafImportTest {
                 fixture.records.get(entry.id).modified++;
                 assertTrue(refuses(() -> source.verifyUnchanged(entry)).getMessage().contains("Data/common.MPQ"));
                 fixture.records.get(entry.id).modified--;
+                fixture.records.get(entry.id).mimeOverride = "application/x-changed-fixture";
+                assertTrue(refuses(() -> source.verifyUnchanged(entry)).getMessage().contains("Data/common.MPQ"));
+                fixture.records.get(entry.id).mimeOverride = null;
+                source.verifyUnchanged(entry);
+                assertTrue(refuses(() -> source.open(new GameDataImporter.InputEntry(entry.id, "Data/other.MPQ", entry.size,
+                        entry.modifiedMillis))).getMessage().contains("Unknown source document"));
                 fixture.denyOpen = true;
                 IOException denial = refuses(() -> source.open(entry));
                 assertTrue(denial.getMessage().contains("Data/common.MPQ"));
@@ -133,6 +139,9 @@ public final class SafImportTest {
             assertEquals("layout-validation", facts.get("import.last.phase"));
             assertEquals("Data/Interface.MPQ", facts.get("import.last.path"));
             assertEquals("failed", facts.get("import.last.result"));
+            assertTrue(Long.parseLong(facts.get("import.last.startedAtEpochMs")) > 0);
+            long peak = Long.parseLong(facts.get("import.last.javaHeapPeakObservedBytes"));
+            assertTrue(peak > 0 && peak <= Long.parseLong(facts.get("import.last.javaHeapLimitBytes")));
             assertTrue(facts.get("import.last.sourceIdentitySha256").matches("[0-9a-f]{64}"));
             String saved = new String(Files.readAllBytes(receipt), StandardCharsets.UTF_8);
             assertFalse(saved.contains(source)); assertFalse(saved.contains("private-test-value"));
@@ -169,6 +178,7 @@ public final class SafImportTest {
     }
     private static final class Record {
         final String id, path, name; final boolean directory; final Path bytes;
+        String mimeOverride;
         long modified = 1700000000000L;
         Record(String id, String path, boolean directory, Path bytes) {
             this.id = id; this.path = path; this.directory = directory; this.bytes = bytes;
@@ -220,7 +230,8 @@ public final class SafImportTest {
                 String key = projection[i];
                 if (DocumentsContract.Document.COLUMN_DOCUMENT_ID.equals(key)) values[i] = record.id;
                 else if (DocumentsContract.Document.COLUMN_DISPLAY_NAME.equals(key)) values[i] = record.name;
-                else if (DocumentsContract.Document.COLUMN_MIME_TYPE.equals(key)) values[i] = record.directory ? DocumentsContract.Document.MIME_TYPE_DIR : "application/octet-stream";
+                else if (DocumentsContract.Document.COLUMN_MIME_TYPE.equals(key)) values[i] = record.mimeOverride != null ? record.mimeOverride
+                        : record.directory ? DocumentsContract.Document.MIME_TYPE_DIR : "application/octet-stream";
                 else if (DocumentsContract.Document.COLUMN_FLAGS.equals(key)) values[i] = 0;
                 else if (DocumentsContract.Document.COLUMN_LAST_MODIFIED.equals(key)) values[i] = record.modified;
                 else if (DocumentsContract.Document.COLUMN_SIZE.equals(key)) try { values[i] = record.directory ? 0 : Files.size(record.bytes); } catch (IOException e) { throw new IllegalStateException(e); }

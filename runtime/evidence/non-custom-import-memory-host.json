@@ -1,0 +1,36 @@
+{
+  "actualAndroidMemoryStressExecuted": false,
+  "actualOwnerKillCauseConfirmed": false,
+  "baselineRevision": "3ff41e8292a08258f05f84e20317d04bb5c2eb4e",
+  "formatVersion": 1,
+  "logs": {
+    "baseline": {
+      "bytes": 546,
+      "sha256": "f405e273b2d03c42e5fda8629ac0aaf3d0ded8d679426fde82cc5d44ddf71239",
+      "text": "streaming-small bytes=67108864 reads=65536 allocatedBytes=4472464\nstreaming-large bytes=268435456 reads=262144 allocatedBytes=15482608\nstreaming-allocation-growth bytes=11010144 addedPayloadBytes=201326592\nException in thread \"main\" java.lang.AssertionError: streaming payload grew per-thread allocations by 11010144 bytes; expected below 1 MiB\n\tat io.github.russianranger.esteria.core.importer.ImportMemoryTests.check(ImportMemoryTests.java:71)\n\tat io.github.russianranger.esteria.core.importer.ImportMemoryTests.main(ImportMemoryTests.java:38)\n"
+    },
+    "publicRoutes": {
+      "bytes": 629,
+      "sha256": "dd9e61716341e6fb208e5887549ad1620210acb17dc9db8fcf909183252f2709",
+      "text": "PASS metadata budget matches exact UTF-8 byte formula and byte caps without changing admission\nstreaming-small bytes=67108864 reads=65536 allocatedBytes=482312\nstreaming-large bytes=268435456 reads=262144 allocatedBytes=481960\nstreaming-allocation-growth bytes=-352 addedPayloadBytes=201326592\nPASS public folder/ZIP streaming bytes=134217728 compressedZipBytes=132235 sha256=254bcc3fc4f27172636df4bf32de9f107f620d559b20d760197e452b97453917 crc32=2154119505; original client bytes/mtimes preserved\nImport memory tests passed: 64/256 MiB short-read imports and equivalent 128 MiB public folder/ZIP imports; no asset-sized buffers\n"
+    },
+    "revised": {
+      "bytes": 393,
+      "sha256": "5561e13bf568ce72a470740c1606af8a4e584fe9f1d69607b52d229e984f5ccb",
+      "text": "PASS metadata budget matches exact UTF-8 byte formula and byte caps without changing admission\nstreaming-small bytes=67108864 reads=65536 allocatedBytes=483032\nstreaming-large bytes=268435456 reads=262144 allocatedBytes=483032\nstreaming-allocation-growth bytes=0 addedPayloadBytes=201326592\nImport memory tests passed: real 64/256 MiB streamed imports with short reads; no asset-sized buffers\n"
+    },
+    "v2Resume": {
+      "bytes": 371,
+      "sha256": "f7e54ff6cc25462cef9768710a49809ce23b6b8006aa1d236d943dd6b6e1f5fa",
+      "text": "baseline-paused generation=4a6f2a7c04742e99835094fd97e5b7b9b899c48a42933fe8ea5159f4768fcbeb durableRows=4 active=false\nrevised-resumed generation=4a6f2a7c04742e99835094fd97e5b7b9b899c48a42933fe8ea5159f4768fcbeb reusedFiles=4 copiedFiles=7 active=true\nrevised-repeat generation=4a6f2a7c04742e99835094fd97e5b7b9b899c48a42933fe8ea5159f4768fcbeb reusedFiles=11 copiedBytes=0\n"
+    }
+  },
+  "scope": "host-Java-stream-allocation-and-v2-resume-representative-fixtures",
+  "sources": {
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/GameDataImporter.java": "a5aa10eb0f4829e0150726b540ed9f00aee385854a8886f179d1da750ecf3aea",
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/ZipSafety.java": "8d679d094b47a31a3b434e1d056f0e109757624535097f04330208453321ef25",
+    "core/src/test/java/io/github/russianranger/esteria/core/importer/ImportMemoryTests.java": "5024cc4c781dfa4b33572440ce2e6d09c550f8190ed11b433c2eae1bf0c6689a",
+    "core/src/test/java/io/github/russianranger/esteria/core/importer/ZipSafetyMemoryTests.java": "fc090598497ae3858314f0a9ce5e7f6b845843304a724c4670e360d3f6779b93"
+  },
+  "thorQualified": false
+}

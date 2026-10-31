@@ -108,6 +108,7 @@ class RealPinnedMpqInspection(unittest.TestCase):
             fixture_source = (client_tools / 'tests/test_archive.py').read_text().replace('] * 32', '] * (1 << max(5, (len(records) * 2).bit_length()))')
             exec(compile(fixture_source, 'source-derived-variable-table-fixture', 'exec'), namespace)
         self.make_mpq = namespace['make_mpq']
+        self.encrypt_table = namespace['encrypt']
         self.generation = 'a' * 64; self.at = self.root / 'game/generations' / self.generation
         self.source = self.at / 'data'; self.source.mkdir(parents=True)
         self.files = {'signaturefile': b'2\r\n2\r\nRELEASE\r\nsynthetic-not-signed',
@@ -306,6 +307,114 @@ class RealPinnedMpqInspection(unittest.TestCase):
                 'scope': 'host Java public importer to exact client reader over encrypted synthetic MPQs',
                 'clientRevision': stock.CLIENT_REVISION, 'routes': runs, 'unknownOverlayRoutesRejected': 2,
                 'ownerClientData': False, 'androidExecution': False, 'worldEntry': False}))
+
+    def test_compact_table_rows_members_locales_and_compressed_v1_match_pinned_reader(self):
+        compact = stock.compact_mpq_class(self.reader)
+        for compressed in (False, True):
+            path = self.root / ('tables-' + str(compressed) + '.MPQ')
+            members = [('sample.bin', b'neutral', 0), ('sample.bin', b'localized', 0x409),
+                       ('other.bin', b'other payload', 0)]
+            self.make_mpq(path, members, compressed=compressed)
+            for high_words in (False, True) if compressed else (False,):
+                if high_words:
+                    raw = bytearray(path.read_bytes())
+                    count = struct.unpack_from('<I', raw, 28)[0]
+                    struct.pack_into('<Q', raw, 32, len(raw)); raw.extend(b'\0' * (2 * count))
+                    path.write_bytes(raw)
+                for locale in (0, 0x409, 0x40c):
+                    original, packed = self.reader.mq.MPQ(path, locale), compact(path, locale)
+                    try:
+                        self.assertEqual(list(original.hash_table), list(packed.hash_table))
+                        self.assertEqual(list(original.block_table), list(packed.block_table))
+                        self.assertIsInstance(packed.hash_table, stock.PackedTable)
+                        for name in ('sample.bin', 'other.bin', '(listfile)', 'absent.bin'):
+                            self.assertEqual(original.find(name), packed.find(name))
+                            self.assertEqual(original.read_file(name), packed.read_file(name))
+                    finally:
+                        original.close(); packed.close()
+
+    def test_inplace_table_cipher_matches_pinned_decoder_including_partial_words(self):
+        import io
+        from types import SimpleNamespace
+        for size in (0, 1, 3, 4, 5, 64, 4099):
+            raw = bytes((i * 131 + 17) & 255 for i in range(size))
+            for key in (0, 0xffffffff, self.reader.mq.hash_string('(hash table)', 3)):
+                archive = SimpleNamespace(f=io.BytesIO(raw), path='synthetic-table')
+                self.assertEqual(stock.read_decrypted_table(archive, len(raw), key, self.reader.mq.CT),
+                                 self.reader.mq.decrypt(raw, key))
+                if size:
+                    with patch.object(stock.sys, 'byteorder', 'big'):
+                        archive.f.seek(0)
+                        self.assertEqual(stock.read_decrypted_table(archive, len(raw), key, self.reader.mq.CT),
+                                         self.reader.mq.decrypt(raw, key))
+        with self.assertRaisesRegex(ValueError, 'truncated MPQ data'):
+            stock.read_decrypted_table(SimpleNamespace(f=io.BytesIO(b'x'), path='short'), 4, 0, self.reader.mq.CT)
+
+    def test_table_bounds_fail_before_retained_growth_and_bad_headers_before_decode(self):
+        with patch.object(stock, 'MAX_TABLE_ENTRIES', 1):
+            with self.assertRaisesRegex(ValueError, 'memory bound before retaining'):
+                self.inspect()
+        compact = stock.compact_mpq_class(self.reader)
+        path = self.root / 'bad-tables.MPQ'
+        self.make_mpq(path, [('sample', b'payload', 0)])
+        good = path.read_bytes()
+        cases = []
+        for at, value in ((24, 3), (24, self.reader.mq.MAX_TABLE_ENTRIES + 1), (16, 0), (20, 0)):
+            raw = bytearray(good); struct.pack_into('<I', raw, at, value); cases.append(raw)
+        cases.append(good[:-2])
+        for raw in cases:
+            path.write_bytes(raw)
+            with patch.object(stock, 'read_decrypted_table') as decode:
+                with self.assertRaises(ValueError):
+                    stock.preflight_tables([path], self.reader, 'enUS')
+                decode.assert_not_called()
+            with self.assertRaises(ValueError) as original:
+                self.reader.mq.MPQ(path, 0)
+            with self.assertRaises(ValueError) as packed:
+                compact(path, 0)
+            self.assertEqual(str(packed.exception), str(original.exception))
+
+    def test_stored_member_length_is_bounded_before_payload_read(self):
+        from unittest.mock import Mock
+        path = self.root / 'huge-stored-member.MPQ'
+        self.make_mpq(path, [('sample.bin', b'x', 0)])
+        raw = bytearray(path.read_bytes())
+        original = self.reader.mq.MPQ(path, 0)
+        try:
+            index, start, count = original.find('sample.bin'), original.block_table_pos, original.block_table_size
+        finally:
+            original.close()
+        blocks = bytearray(self.reader.mq.decrypt(raw[start:start + count * 16],
+            self.reader.mq.hash_string('(block table)', 3)))
+        struct.pack_into('<I', blocks, index * 16 + 4, 1 << 28)
+        raw[start:start + count * 16] = self.encrypt_table(blocks, self.reader.mq.hash_string('(block table)', 3))
+        physical_size = (1 << 28) + 4096
+        struct.pack_into('<I', raw, 8, physical_size)
+        with path.open('wb') as output:
+            output.write(raw); output.truncate(physical_size)  # sparse fixture, no large allocation
+        packed = stock.compact_mpq_class(self.reader)(path, 0)
+        real_file = packed.f
+        packed.f = Mock(wraps=real_file)
+        try:
+            with self.assertRaisesRegex(ValueError, 'bounded member and sector-table limit'):
+                packed.read_file('sample.bin')
+            packed.f.read.assert_not_called()
+        finally:
+            packed.close()
+
+    def test_compact_stack_keeps_stock_optional_and_unknown_reports_identical(self):
+        for state in ('stock', 'identified-optional', 'unknown-active'):
+            if state == 'identified-optional':
+                self.archive('Data/patch-renamed.MPQ', {'Esteria\\EsteriaNaga.bin':
+                    struct.pack('<3I', 0x314D4845, 1, 0), 'DBFilesClient\\ChrRaces.dbc': b'excluded'})
+            elif state == 'unknown-active':
+                self.archive('Data/patch-Unknown.MPQ', {'Interface\\Icons\\Generic.blp': b'unknown'})
+            compact_report = self.inspect()
+            with patch.object(stock, 'compact_mpq_class', lambda reader: reader.mq.MPQ):
+                original_report = self.inspect()
+            self.assertEqual(compact_report, original_report, state)
+            self.assertEqual(len(compact_report['checks']['clientDbcs']), 238)
+            self.assertEqual(compact_report['passed'], state != 'unknown-active')
 
     def test_active_folder_provider_members_are_not_mistaken_for_ancillary(self):
         self.ancillary('Data/patch-folder.MPQ/inner.MPQ')

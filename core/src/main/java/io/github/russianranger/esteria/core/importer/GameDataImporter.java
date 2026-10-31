@@ -25,6 +25,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -114,13 +115,19 @@ public final class GameDataImporter {
         public void add(String relativePath, String documentId, boolean directory) throws IOException {
             if (relativePath == null || documentId == null || relativePath.length() > 1024 || documentId.length() > 4096)
                 throw new IOException("Source metadata contains an oversized name or document identity");
-            int pathBytes = relativePath.getBytes(StandardCharsets.UTF_8).length, idBytes = documentId.getBytes(StandardCharsets.UTF_8).length;
+            int pathBytes = utf8Length(relativePath), idBytes = utf8Length(documentId);
             if (pathBytes > 1024 || idBytes > 4096) throw new IOException("Source metadata contains an oversized name or document identity");
             long cost = (directory ? 512L : 1024L) + pathBytes * 8L + idBytes * 6L;
             // Validation holds canonical and case-folded parent names/maps together.
             // Charging each parent again per file intentionally overestimates shared paths.
-            for (int slash = relativePath.indexOf('/'); slash >= 0; slash = relativePath.indexOf('/', slash + 1))
-                cost += 256L + relativePath.substring(0, slash).getBytes(StandardCharsets.UTF_8).length * 8L;
+            int prefixBytes = 0;
+            for (int at = 0; at < relativePath.length(); at++) {
+                char value = relativePath.charAt(at);
+                if (value == '/') cost += 256L + prefixBytes * 8L;
+                int width = utf8Width(relativePath, at);
+                prefixBytes += width;
+                if (width == 4) at++; // One supplementary code point, two UTF-16 units.
+            }
             reserve(cost);
         }
         void reserve(long bytes) throws IOException {
@@ -249,11 +256,12 @@ public final class GameDataImporter {
         long completed = 0, copiedBytes = 0;
         int copied = 0, reused = 0, finished = 0;
         byte[] buffer = new byte[128 * 1024];
+        ByteBuffer block = ByteBuffer.wrap(buffer);
         for (Entry entry : entries) {
             context.phase("staging", entry);
             checkCancelled(cancellation);
             Path target = safeTarget(data, entry.path);
-            if (reusable(data, entry, saved.get(entry.path))) {
+            if (reusable(data, entry, saved.remove(entry.path))) {
                 completed += entry.size; reused++; finished++;
                 listener.onProgress(entry.path, completed, total, finished, entries.size());
                 continue;
@@ -268,11 +276,11 @@ public final class GameDataImporter {
                 while ((read = input.read(buffer)) != -1) {
                     checkCancelled(cancellation);
                     if (bytes > entry.size - read) throw new IOException("Source grew beyond declared length: " + entry.path);
-                    ByteBuffer block = ByteBuffer.wrap(buffer, 0, read);
+                    block.clear(); block.limit(read);
                     while (block.hasRemaining()) output.write(block);
                     digest.update(buffer, 0, read); crc.update(buffer, 0, read); bytes += read;
                     long now = System.nanoTime();
-                    if (now - reportAt > 100_000_000L) { listener.onProgress(entry.path, completed + bytes, total, finished, entries.size()); reportAt = now; }
+                    if (now - reportAt > 200_000_000L) { listener.onProgress(entry.path, completed + bytes, total, finished, entries.size()); reportAt = now; }
                 }
                 if (bytes != entry.size || (entry.crc >= 0 && crc.getValue() != entry.crc)) throw new IOException("Truncated or corrupt source: " + entry.path);
                 output.force(true);
@@ -306,6 +314,10 @@ public final class GameDataImporter {
 
     private void seedBase(Path source, Path destination, Cancellation cancellation, boolean replaceServerData) throws IOException {
         Files.walkFileTree(source, new SimpleFileVisitor<Path>() {
+            // Allocate only if hard links are unavailable, then reuse the
+            // bounded transfer storage across sequential fallback copies.
+            private byte[] buffer;
+            private ByteBuffer block;
             @Override public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attributes) throws IOException {
                 checkCancelled(cancellation); if (attributes.isSymbolicLink()) throw new IOException("Symlink in active data");
                 if (replaceServerData && !dir.equals(source) && ContentPackageLayout.reserved(source.relativize(dir).toString().replace('\\', '/'))) return FileVisitResult.SKIP_SUBTREE;
@@ -321,14 +333,15 @@ public final class GameDataImporter {
                 }
                 try { Files.createLink(target, file); }
                 catch (UnsupportedOperationException | IOException noLinks) {
+                    if (buffer == null) { buffer = new byte[128 * 1024]; block = ByteBuffer.wrap(buffer); }
                     Path partial = target.resolveSibling(target.getFileName() + ".esteria-seed");
                     if (Files.isSymbolicLink(partial)) throw new IOException("Symlink seed destination");
                     try {
                         try (InputStream input = Files.newInputStream(file); FileChannel output = FileChannel.open(partial, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
-                            byte[] buffer = new byte[128 * 1024]; int read;
+                            int read;
                             while ((read = input.read(buffer)) != -1) {
                                 checkCancelled(cancellation);
-                                ByteBuffer block = ByteBuffer.wrap(buffer, 0, read); while (block.hasRemaining()) output.write(block);
+                                block.clear(); block.limit(read); while (block.hasRemaining()) output.write(block);
                             }
                             output.force(true);
                         }
@@ -395,25 +408,24 @@ public final class GameDataImporter {
     private static String stripClientWrapper(List<Entry> entries) throws IOException {
         // Search only already-enumerated descendants of the granted source.
         // No filesystem parent lookup or document-ID path interpretation occurs.
-        Set<String> paths = new HashSet<>();
         List<String> candidates = new ArrayList<>(), complete = new ArrayList<>();
-        for (Entry entry : entries) paths.add(entry.path.toLowerCase(Locale.ROOT));
+        boolean dataOnly = false;
         for (Entry entry : entries) {
-            String lower = entry.path.toLowerCase(Locale.ROOT);
-            if (metadataPath(entry.path) || !(lower.equals("wow.exe") || lower.endsWith("/wow.exe"))) continue;
+            String path = entry.path;
+            if (path.equalsIgnoreCase("common.mpq") || dataOnlyLocale(path)) dataOnly = true;
+            int executable = path.length() - "Wow.exe".length();
+            if (executable < 0 || !path.regionMatches(true, executable, "Wow.exe", 0, 7) ||
+                    (executable > 0 && path.charAt(executable - 1) != '/') || metadataPath(path)) continue;
             String prefix = entry.path.substring(0, entry.path.length() - "Wow.exe".length());
             if (prefix.chars().filter(character -> character == '/').count() > 8)
                 throw new IOException("Client root discovery exceeds eight enclosing folders: " + entry.path);
             if (candidates.size() >= 128) throw new IOException("Too many possible client roots in selected source");
             candidates.add(prefix);
-            String folded = prefix.toLowerCase(Locale.ROOT);
-            boolean hasData = paths.stream().anyMatch(path -> path.startsWith(folded + "data/"));
-            if (hasData) {
-                List<String> relative = new ArrayList<>();
-                for (Entry item : entries) if (item.path.startsWith(prefix)) relative.add(item.path.substring(prefix.length()));
-                try { GameDataVerifier.verifyBaseLayout(relative); complete.add(prefix); }
-                catch (IOException incomplete) { /* Use exact missing-data reason after unique root selection. */ }
-            }
+            // Iterate relative names lazily. The original inventory remains
+            // authoritative without retaining a second lowercase set and a
+            // full substring list for every candidate root.
+            try { GameDataVerifier.verifyBaseLayout(relativePaths(entries, prefix)); complete.add(prefix); }
+            catch (IOException incomplete) { /* Use exact missing-data reason after unique root selection. */ }
         }
         if (complete.size() > 1) throw new IOException("Ambiguous selected source contains multiple complete clients: " + roots(complete) + "; select exactly one client root containing Wow.exe and Data");
         String prefix;
@@ -421,7 +433,7 @@ public final class GameDataImporter {
         else if (candidates.size() == 1) prefix = candidates.get(0);
         else if (candidates.size() > 1) throw new IOException("Ambiguous selected source contains multiple possible clients: " + roots(candidates) + "; select exactly one client root containing Wow.exe and Data");
         else {
-            if (paths.contains("common.mpq") || paths.stream().anyMatch(path -> path.matches("[a-z]{4}/locale-[a-z]{4}\\.mpq")))
+            if (dataOnly)
                 throw new IOException("Selected source appears to be Data itself. Select its parent client folder containing Wow.exe and Data; ordinary MPQs remain inside Data");
             throw new IOException("No client root found in selected source; choose the folder containing Wow.exe and Data (or its complete ZIP)");
         }
@@ -431,6 +443,34 @@ public final class GameDataImporter {
         entries.removeIf(entry -> !entry.path.startsWith(selected) || metadataPath(entry.path));
         for (Entry entry : entries) entry.path = entry.path.substring(prefix.length());
         return prefix.isEmpty() ? "." : prefix.substring(0, prefix.length() - 1);
+    }
+    private static Iterable<String> relativePaths(List<Entry> entries, String prefix) {
+        return () -> new Iterator<String>() {
+            private int at;
+            private Entry next;
+            public boolean hasNext() {
+                while (next == null && at < entries.size()) {
+                    Entry candidate = entries.get(at++);
+                    if (candidate.path.startsWith(prefix)) next = candidate;
+                }
+                return next != null;
+            }
+            public String next() {
+                if (!hasNext()) throw new java.util.NoSuchElementException();
+                String value = next.path.substring(prefix.length()); next = null; return value;
+            }
+        };
+    }
+    private static boolean dataOnlyLocale(String path) {
+        if (path.length() != 20 || path.charAt(4) != '/' ||
+                !path.regionMatches(true, 5, "locale-", 0, 7) ||
+                !path.regionMatches(true, 0, path, 12, 4) ||
+                !path.regionMatches(true, 16, ".mpq", 0, 4)) return false;
+        for (int at = 0; at < 4; at++) {
+            char value = path.charAt(at);
+            if (!((value >= 'a' && value <= 'z') || (value >= 'A' && value <= 'Z'))) return false;
+        }
+        return true;
     }
     private static void observeSourceSpelling(Map<String, String> spelling, String path) throws IOException {
         String current = path;
@@ -458,7 +498,7 @@ public final class GameDataImporter {
     }
 
     static String validatePath(String path) throws IOException {
-        if (path.isEmpty() || path.getBytes(StandardCharsets.UTF_8).length > 1024 || path.startsWith("/") || path.indexOf('\\') >= 0 || path.indexOf(':') >= 0) throw new IOException("Unsafe import path: " + path);
+        if (path.isEmpty() || utf8Length(path) > 1024 || path.startsWith("/") || path.indexOf('\\') >= 0 || path.indexOf(':') >= 0) throw new IOException("Unsafe import path: " + path);
         for (int i = 0; i < path.length(); i++) if (path.charAt(i) < 32 || path.charAt(i) == 127) throw new IOException("Control character in import path");
         String[] components = path.split("/", -1);
         if (components.length > 32) throw new IOException("Import path is too deeply nested");
@@ -524,7 +564,7 @@ public final class GameDataImporter {
         try (BufferedReader in = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             String line; while ((line = boundedLine(in)) != null) {
                 try {
-                    String[] parts = line.split("\t"); if (parts.length != 4 || !parts[3].matches("[0-9a-f]{64}")) continue;
+                    String[] parts = line.split("\t"); if (parts.length != 4 || !isDigest(parts[3])) continue;
                     String name = validatePath(new String(Base64.getDecoder().decode(parts[0]), StandardCharsets.UTF_8));
                     if (!entries.containsKey(name)) budget.add(name, "", false);
                     entries.put(name, new Saved(Long.parseLong(parts[1]), Long.parseLong(parts[2])));
@@ -557,10 +597,52 @@ public final class GameDataImporter {
         return new ImportLock(ExclusiveFileLease.acquire(lockPath,"Another import is active or lock unavailable"));
     }
     private static MessageDigest sha256() { try { return MessageDigest.getInstance("SHA-256"); } catch (NoSuchAlgorithmException e) { throw new AssertionError(e); } }
-    private static String hex(byte[] value) { StringBuilder out = new StringBuilder(value.length * 2); for (byte b : value) out.append(String.format(Locale.ROOT, "%02x", b & 255)); return out.toString(); }
+    private static String hex(byte[] value) {
+        char[] out = new char[value.length * 2];
+        final String digits = "0123456789abcdef";
+        for (int at = 0; at < value.length; at++) {
+            int unsigned = value[at] & 255;
+            out[at * 2] = digits.charAt(unsigned >>> 4); out[at * 2 + 1] = digits.charAt(unsigned & 15);
+        }
+        return new String(out);
+    }
+    private static boolean isDigest(String value) {
+        if (value.length() != 64) return false;
+        for (int at = 0; at < value.length(); at++) {
+            char unit = value.charAt(at);
+            if (!((unit >= '0' && unit <= '9') || (unit >= 'a' && unit <= 'f'))) return false;
+        }
+        return true;
+    }
+    private static int utf8Width(String value, int at) {
+        char unit = value.charAt(at);
+        if (unit < 0x80) return 1;
+        if (unit < 0x800) return 2;
+        if (Character.isHighSurrogate(unit) && at + 1 < value.length() && Character.isLowSurrogate(value.charAt(at + 1))) return 4;
+        // StandardCharsets.UTF_8 replaces an unmatched surrogate with one '?'.
+        return Character.isSurrogate(unit) ? 1 : 3;
+    }
+    private static int utf8Length(String value) {
+        int bytes = 0;
+        for (int at = 0; at < value.length(); at++) {
+            int width = utf8Width(value, at); bytes += width;
+            if (width == 4) at++;
+        }
+        return bytes;
+    }
+    private static void updateLength(MessageDigest digest, int length) {
+        digest.update((byte) (length >>> 24)); digest.update((byte) (length >>> 16));
+        digest.update((byte) (length >>> 8)); digest.update((byte) length);
+    }
     private static final class Saved { final long size, modified; Saved(long s, long m) { size = s; modified = m; } }
     private static final class ImportLock implements AutoCloseable { final ExclusiveFileLease lease; ImportLock(ExclusiveFileLease lease) { this.lease=lease; } public void close() throws IOException { lease.close(); } }
-    private static final class Entry { String path; final String original; final long size, modified, crc; Entry(String path, long size, long modified, long crc) { this.path = path; this.original = path; this.size = size; this.modified = modified; this.crc = crc; } }
+    private static final class Entry {
+        String path; final String original; final long size, modified, crc; final InputEntry document;
+        Entry(String path, long size, long modified, long crc) { this(path, size, modified, crc, null); }
+        Entry(String path, long size, long modified, long crc, InputEntry document) {
+            this.path = path; this.original = path; this.size = size; this.modified = modified; this.crc = crc; this.document = document;
+        }
+    }
     private static final class ImportContext {
         final ProgressListener listener; String phase = "initialization", detectedRoot = "undetected"; Entry entry;
         ImportContext(ProgressListener listener) { this.listener = listener; }
@@ -575,7 +657,6 @@ public final class GameDataImporter {
     }
     private final class ExternalSource implements Source {
         private final InputSource input;
-        private final Map<String, InputEntry> byPath = new HashMap<>();
         private List<InputEntry> snapshot;
         private String sourceIdentity;
         private Cancellation cancellation;
@@ -583,7 +664,7 @@ public final class GameDataImporter {
         public List<Entry> entries(Cancellation cancellation) throws IOException {
             this.cancellation = cancellation;
             String identity = input.identity();
-            if (identity == null || identity.isEmpty() || identity.getBytes(StandardCharsets.UTF_8).length > 4096) throw new IOException("Invalid document source identity");
+            if (identity == null || identity.isEmpty() || utf8Length(identity) > 4096) throw new IOException("Invalid document source identity");
             List<InputEntry> observed = input.snapshot(cancellation);
             if (observed == null || observed.size() > limits.maxFiles) throw new IOException("Invalid or excessive document inventory");
             if (observed.size() > limits.maxMetadataBytes / 1024) throw new IOException("Source metadata exceeds the import memory budget; use a smaller content package");
@@ -594,23 +675,22 @@ public final class GameDataImporter {
             boolean resumeSafe = true;
             for (InputEntry entry : observed) {
                 checkCancelled(cancellation);
-                if (entry == null || entry.id == null || entry.id.isEmpty() || entry.id.getBytes(StandardCharsets.UTF_8).length > 4096 || !ids.add(entry.id))
+                if (entry == null || entry.id == null || entry.id.isEmpty() || utf8Length(entry.id) > 4096 || !ids.add(entry.id))
                     throw new IOException("Duplicate or invalid document ID");
                 if (entry.relativePath == null) throw new IOException("Document relative path is missing");
                 budget.add(entry.relativePath, entry.id, false);
                 validatePath(entry.relativePath);
                 if (entry.size < 0) throw new IOException("Document size is unknown: " + entry.relativePath);
-                if (byPath.put(entry.relativePath, entry) != null) throw new IOException("Duplicate document path");
                 if (entry.modifiedMillis <= 0) resumeSafe = false;
-                owned.add(entry); result.add(new Entry(entry.relativePath, entry.size, entry.modifiedMillis, -1));
+                owned.add(entry); result.add(new Entry(entry.relativePath, entry.size, entry.modifiedMillis, -1, entry));
             }
             owned.sort(Comparator.comparing(entry -> entry.relativePath));
             snapshot = Collections.unmodifiableList(owned);
             MessageDigest identityHash = sha256();
             for (InputEntry entry : snapshot) {
                 byte[] path = entry.relativePath.getBytes(StandardCharsets.UTF_8), id = entry.id.getBytes(StandardCharsets.UTF_8);
-                identityHash.update(ByteBuffer.allocate(4).putInt(path.length).array()); identityHash.update(path);
-                identityHash.update(ByteBuffer.allocate(4).putInt(id.length).array()); identityHash.update(id);
+                updateLength(identityHash, path.length); identityHash.update(path);
+                updateLength(identityHash, id.length); identityHash.update(id);
             }
             sourceIdentity = identity + "\ndocuments=" + hex(identityHash.digest());
             if (!resumeSafe) sourceIdentity += "\nunversioned=" + UUID.randomUUID();
@@ -619,7 +699,7 @@ public final class GameDataImporter {
         public String identity() { return sourceIdentity; }
         public InputStream open(Entry entry) throws IOException {
             verifyUnchanged(entry);
-            InputStream stream = input.open(byPath.get(entry.original));
+            InputStream stream = input.open(entry.document);
             if (stream == null) throw new IOException("Document stream is unavailable: " + entry.path);
             return stream;
         }
@@ -628,7 +708,7 @@ public final class GameDataImporter {
             if (entry == null) {
                 for (InputEntry original : snapshot) { checkCancelled(cancellation); input.verifyUnchanged(original); }
                 input.verifySnapshot(snapshot);
-            } else input.verifyUnchanged(byPath.get(entry.original));
+            } else input.verifyUnchanged(entry.document);
         }
     }
     private final class FolderSource implements Source {

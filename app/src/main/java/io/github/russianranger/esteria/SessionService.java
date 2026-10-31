@@ -91,6 +91,8 @@ public final class SessionService extends Service {
     private volatile String supportStatus="";
     private volatile SafTreeSource activeFolderSource;
     private volatile ImportDiagnostics lastImport;
+    private volatile int lastMemoryTrimLevel = -1;
+    private volatile long lastMemoryTrimAt;
     // Ephemeral decisions are never restored as approval after service/process recreation.
     private volatile ClientLaunchSetup.UiReview pendingUiReview;
     // The worker retains this handle across every failure until all setup
@@ -114,7 +116,7 @@ public final class SessionService extends Service {
         if(busy.get()){keepAwake();main.postDelayed(this,60*1000L);}
     }};
     private Path root;
-    String status() { String support=supportStatus;return status+(support.isEmpty()?"":"\n"+support); }
+    String status() { String support=supportStatus;return support.isEmpty()?status:status+"\n"+support; }
     boolean busy() { return busy.get(); }
     boolean supportExportAvailable(){return !exporting.get()&&!(busy.get()&&EXPORT.equals(activeAction));}
     ClientLaunchSetup.UiReview uiReview() { return pendingUiReview; }
@@ -182,6 +184,7 @@ public final class SessionService extends Service {
         getSharedPreferences("session", MODE_PRIVATE).edit().putString("operation", operationId)
                 .putString("operationAction", intent.getAction()).putBoolean("interrupted", true).commit();
         worker.execute(() -> {
+            boolean fatalFailure = false;
             try {
                 if (root == null) throw new IOException("App storage is unavailable");
                 if (IMPORT.equals(intent.getAction())) importData(intent);
@@ -215,13 +218,18 @@ public final class SessionService extends Service {
                         :cancelled.get() ? "Operation cancelled. Existing game data remains active."
                         : e.getClass().getSimpleName() + ": " + e.getMessage();
                 log(status + ImportDiagnostics.failure(e));
+            } catch (Error fatal) {
+                // An uncaught Java OOM is not orderly completion; keep recovery state.
+                fatalFailure = true;
+                throw fatal;
             } finally {
                 // Serialize completion with onStartCommand. Publishing idle before stopSelf
                 // could otherwise cancel a newly queued import. A replaced service instance
                 // may own a newer recovery marker; never clear that instance's operation.
+                final boolean retainRecoveryMarker = fatalFailure;
                 main.post(new Runnable(){public void run(){
                     if(exporting.get()){main.postDelayed(this,200);return;}
-                    if (operationId.equals(getSharedPreferences("session", MODE_PRIVATE).getString("operation", "")))
+                    if (!retainRecoveryMarker && operationId.equals(getSharedPreferences("session", MODE_PRIVATE).getString("operation", "")))
                         getSharedPreferences("session", MODE_PRIVATE).edit().putBoolean("interrupted", false).commit();
                     if (!destroyed) { stopForeground(STOP_FOREGROUND_REMOVE); stopSelf(latestStartId); }
                     main.removeCallbacks(wakeHeartbeat);releaseWake();
@@ -252,6 +260,7 @@ public final class SessionService extends Service {
             try (SafTreeSource source = new SafTreeSource(getContentResolver(), uri, cancelled, (files, directories, reliableTimes) -> {
                     SafTreeSource current = activeFolderSource;
                     if (current != null && current.selectedRootName() != null) diagnostics.selectedRoot(current.selectedRootName());
+                    diagnostics.memory();
                     status = "Reading folder: " + files + " files, " + directories + " folders"
                             + (reliableTimes ? "" : "\nThis provider omits modification times; interrupted imports must start a new copy."); })) {
                 activeFolderSource = source;
@@ -260,7 +269,7 @@ public final class SessionService extends Service {
         } else {
             diagnostics.phase("zip-document-copy", "not-yet-detected", "");
             Path archive = UriStager.stage(getContentResolver(), uri, root.resolve("imports"), cancelled,
-                    (copied, total) -> status = "Copying archive: " + mib(copied) + (total >= 0 ? " / " + mib(total) : "") + " MiB");
+                    (copied, total) -> { diagnostics.memory(); status = "Copying archive: " + mib(copied) + (total >= 0 ? " / " + mib(total) : "") + " MiB"; });
             result = importer.importZip(archive, kind, importListener(diagnostics, null), cancelled::get);
             // Delete only the temporary ZIP after the importer has published a complete generation.
             Files.deleteIfExists(archive);
@@ -278,7 +287,12 @@ public final class SessionService extends Service {
     }
     private GameDataImporter.ProgressListener importListener(ImportDiagnostics diagnostics, SafTreeSource source) {
         return new GameDataImporter.ProgressListener() {
+            private long reportedAt;
             @Override public void onProgress(String path, long bytes, long total, int count, int files) {
+                diagnostics.memory();
+                long now = System.nanoTime();
+                if (count != files && now - reportedAt < 200_000_000L) return;
+                reportedAt = now;
                 status = importProgress(path, bytes, total, count, files)
                     + (source == null || source.hasReliableFileTimes() ? "" : "\nResume is unavailable for this source because some files have no modification time.");
             }
@@ -724,6 +738,10 @@ public final class SessionService extends Service {
         facts.put("device.model", Build.MODEL); facts.put("device.manufacturer", Build.MANUFACTURER);
         facts.put("device.abis", android.text.TextUtils.join(",", Build.SUPPORTED_ABIS));
         facts.put("status", previousStatus); facts.put("runtime.qualified", "false");
+        facts.put("operation.busy", Boolean.toString(busy.get()));
+        facts.put("operation.action", activeAction == null ? "none" : activeAction);
+        if (Build.VERSION.SDK_INT >= 29) facts.put("operation.foregroundServiceType", Integer.toString(getForegroundServiceType()));
+        facts.putAll(ProcessExitDiagnostics.collect(this));
         ImportDiagnostics importDiagnostic = lastImport;
         if (importDiagnostic != null) facts.putAll(importDiagnostic.facts());
         GameSession.Handle gameOwner=game;
@@ -1012,6 +1030,14 @@ public final class SessionService extends Service {
     private void addPerformanceSnapshot(Map<String, String> facts) {
         facts.put("snapshot.scope", "launcher-process and Android system observation; excludes child-process PSS; not a combined gameplay benchmark");
         facts.put("snapshot.capturedAtEpochMs", String.valueOf(System.currentTimeMillis()));
+        facts.put("snapshot.launcherProcess.lastTrimLevel", Integer.toString(lastMemoryTrimLevel));
+        facts.put("snapshot.launcherProcess.lastTrimAtEpochMs", Long.toString(lastMemoryTrimAt));
+        try {
+            ActivityManager.RunningAppProcessInfo self = new ActivityManager.RunningAppProcessInfo();
+            ActivityManager.getMyMemoryState(self);
+            facts.put("snapshot.launcherProcess.importance", Integer.toString(self.importance));
+            facts.put("snapshot.launcherProcess.importanceReasonCode", Integer.toString(self.importanceReasonCode));
+        } catch (RuntimeException unavailable) { facts.put("snapshot.launcherProcess.importance", "unavailable"); }
         try {
             ActivityManager manager = getSystemService(ActivityManager.class);
             if (manager == null) facts.put("snapshot.memory.status", "unavailable");
@@ -1110,6 +1136,11 @@ public final class SessionService extends Service {
     }
     private synchronized void releaseWake(){if(operationWake!=null&&operationWake.isHeld())operationWake.release();wakeRenewAfter=0;}
     @Override public void onDestroy() { destroyed = true; requestCancellation(); worker.shutdown();supportWorker.shutdown();if(!busy.get())releaseWake();super.onDestroy(); }
+    @Override public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        // Observe pressure without cancelling valid work or allocating an export.
+        lastMemoryTrimLevel = level; lastMemoryTrimAt = System.currentTimeMillis();
+    }
     @Override public void onTimeout(int startId, int foregroundServiceType) {
         requestCancellation(); status = "Android stopped this setup operation. Start it again to resume completed work where supported.";
         stopForeground(STOP_FOREGROUND_REMOVE); stopSelf(startId);

@@ -16,7 +16,20 @@ tasks.register('importerTest', JavaExec) {
     mainClass = 'io.github.russianranger.esteria.core.importer.ImporterTests'
     maxHeapSize = '32m'
 }
-check.dependsOn hostTest, diagnosticsTest, importerTest
+// Host allocation regression: real large synthetic streams stay inside a small heap.
+tasks.register('importMemoryTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.importer.ImportMemoryTests'
+    maxHeapSize = '16m'
+}
+tasks.register('zipSafetyMemoryTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.importer.ZipSafetyMemoryTests'
+    maxHeapSize = '32m'
+}
+check.dependsOn hostTest, diagnosticsTest, importerTest, importMemoryTest, zipSafetyMemoryTest
 
 // Actual Linux JVM parent-death fixture; never copied into Android test APKs.
 tasks.register('localAccountHandoffRecoveryTest', JavaExec) {

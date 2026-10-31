@@ -51,7 +51,8 @@ public final class MainActivity extends Activity {
     private final Runnable refresh = new Runnable() {
         public void run() {
             if (service != null) {
-                status.setText(service.status());
+                String latestStatus = service.status();
+                if (!android.text.TextUtils.equals(status.getText(), latestStatus)) status.setText(latestStatus);
                 for (Button action : actions) action.setEnabled(!service.busy());
                 startGame.setEnabled(!service.busy()&&completeProfile());
                 exportSupport.setEnabled(service.supportExportAvailable());
@@ -161,7 +162,10 @@ public final class MainActivity extends Activity {
             getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             if(resumed)gamePanel.resume();
         }
-        if(gameStatus!=null)gameStatus.setText(service.status());
+        if(gameStatus!=null) {
+            String latestStatus = service.status();
+            if(!android.text.TextUtils.equals(gameStatus.getText(),latestStatus))gameStatus.setText(latestStatus);
+        }
         if(forceStop!=null){forceStop.setVisibility(owner.needsForceStop()?View.VISIBLE:View.GONE);forceStop.setEnabled(owner.needsForceStop());}
         if(owner.state()!=GameSession.State.CLIENT_STARTED&&gamePanel!=null)gamePanel.pause();
     }

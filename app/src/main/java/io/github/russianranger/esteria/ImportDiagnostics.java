@@ -21,10 +21,12 @@ import java.util.Set;
 final class ImportDiagnostics {
     private static final int MAX_BYTES = 32 * 1024;
     private static final Set<String> KEYS = Set.of("route", "kind", "sourceProvider", "sourceIdentitySha256",
-            "selectedRoot", "detectedRoot", "phase", "path", "result", "failure");
+            "selectedRoot", "detectedRoot", "phase", "path", "result", "failure", "startedAtEpochMs",
+            "javaHeapUsedBytes", "javaHeapPeakObservedBytes", "javaHeapLimitBytes", "memorySampleAtEpochMs");
     private final Path receipt;
     private final Map<String, String> values = new LinkedHashMap<>();
     private long savedAt;
+    private long memorySampleAt, heapPeak;
 
     ImportDiagnostics(Path receipt) {
         this.receipt = receipt;
@@ -42,7 +44,9 @@ final class ImportDiagnostics {
         // Document IDs and URIs can contain user information and are opaque; never interpret or retain them as paths.
         values.put("sourceIdentitySha256", fingerprint(sourceIdentity));
         values.put("selectedRoot", bounded(selectedRoot, 2048)); values.put("detectedRoot", "not-yet-detected");
-        values.put("phase", "source-selection"); values.put("result", "running"); save();
+        values.put("phase", "source-selection"); values.put("result", "running");
+        values.put("startedAtEpochMs", Long.toString(System.currentTimeMillis()));
+        memorySampleAt = 0; heapPeak = 0; memory(); save();
     }
 
     synchronized void phase(String phase, String detectedRoot, String path) {
@@ -63,6 +67,20 @@ final class ImportDiagnostics {
         values.put("result", bounded(result, 32));
         if (failure != null) values.put("failure", failure(failure));
         save();
+    }
+    synchronized void memory() {
+        long now = System.nanoTime();
+        if (memorySampleAt != 0 && now - memorySampleAt < 1_000_000_000L) return;
+        memorySampleAt = now;
+        Runtime runtime = Runtime.getRuntime();
+        long used = runtime.totalMemory() - runtime.freeMemory();
+        heapPeak = Math.max(heapPeak, used);
+        values.put("javaHeapUsedBytes", Long.toString(used));
+        values.put("javaHeapPeakObservedBytes", Long.toString(heapPeak));
+        values.put("javaHeapLimitBytes", Long.toString(runtime.maxMemory()));
+        values.put("memorySampleAtEpochMs", Long.toString(System.currentTimeMillis()));
+        // Cheap VM counters only, at most once per second; no PSS/asset/process scan.
+        if (savedAt != 0 && now - savedAt > 2_000_000_000L) save();
     }
     synchronized Map<String, String> facts() {
         Map<String, String> facts = new LinkedHashMap<>();

@@ -1,6 +1,6 @@
 # Esteria Stock 3.3.5a / non-custom — consolidated Thor procedure
 
-This is the separate `io.github.russianranger.esteria.stock` app. Version `0.1.0-non-custom.2` (versionCode 2) updates stock version 1 with the same persistent certificate. Install it over the existing stock app; do not uninstall either app or clear app data. Imports, completed preparation and saves remain app-owned. This app creates its own local account and private saves; it does not use a ChromieCraft account or public realm.
+This is the separate `io.github.russianranger.esteria.stock` app. Version `0.1.0-non-custom.3` (versionCode 3) updates stock versions 1 and 2 with the same persistent certificate. Install it over the existing stock app; do not uninstall either app or clear app data. Imports, completed preparation and saves remain app-owned. This app creates its own local account and private saves; it does not use a ChromieCraft account or public realm.
 
 The release's `release.json`, signing receipt and `SHA256SUMS` identify the exact APK version, app/client/server revisions and certificate. Check the published APK hash before installing. World entry on actual client data and Android ARM64/Thor must be reported separately from host/build evidence.
 
@@ -16,6 +16,8 @@ The release's `release.json`, signing receipt and `SHA256SUMS` identify the exac
 8. After initial preparation, enable airplane mode and disable Wi-Fi. Repeat startup, world entry, movement, a clean stop and relaunch. Gameplay must remain local and offline.
 
 ## If a stage fails
+
+If Android kills the app during import, reopen it and export support BEFORE starting another import. The update records Android exit history (including reporting capability, reason/status/importance and sampled PSS/RSS), alongside the last import phase/file and observed Java heap. No new kill report was available during development, so synthetic stress success must not be treated as proof that the owner’s failure is eliminated. Select the same source on retry to reuse completed files when source metadata permits.
 
 Use **Export support bundle** (also available from the game toolbar) immediately after the failure and choose a destination ZIP. Keep successful preparation and app data. For import failures the update records the route, phase, selected-root display label, detected relative root, observed/normalized path and exception chain; opaque document identifiers are represented by fingerprints. Include `status.txt` (the `import.last.*` fields) and `launcher.log` from the bundle together, plus the displayed error if possible. For preparation or startup failures export the whole bundle so the retained stock/world/runtime logs accompany the exact failing stage. The bundle excludes databases, passwords and client assets. A forced termination is recorded as recovery required rather than a successful save.
 

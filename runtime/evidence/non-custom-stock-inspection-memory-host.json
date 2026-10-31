@@ -1,0 +1,116 @@
+{
+  "androidExecution": false,
+  "baselineHelperSha256": "d855304663f1ddf89065ae6eb32d6abcd48ba350549a338a8c149b204d1128f3",
+  "baselineRevision": "3ff41e8292a08258f05f84e20317d04bb5c2eb4e",
+  "clientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "excludedLargeOptionalProviders": 9,
+  "fixedHelperSha256": "ba8da0330824d69a6c4eb1534b3efef78106ef42bdf194626fbe9a4e7ab82cd8",
+  "hashEntriesPerLargeProvider": 131072,
+  "largeProviderCount": 8,
+  "metric": "Linux ru_maxrss, KiB, independent subprocesses",
+  "ownerClientData": false,
+  "ownerKillCauseConfirmed": false,
+  "regressionTests": {
+    "crossLayerJavaFolderZipCases": 6,
+    "module": "tests.test_stock_content_inspection",
+    "passed": 18,
+    "skipped": 0
+  },
+  "reportsIdentical": true,
+  "runs": [
+    {
+      "dbcLayouts": 238,
+      "elapsedSeconds": 6.656261,
+      "exclusions": 13,
+      "mode": "baseline",
+      "passed": true,
+      "peakRssKiB": 344476,
+      "providers": 18,
+      "reportSha256": "7cb36fcfd0816b9a3ed8e0f824a399dbbd6b1bfd561bf66c2e9e00aab4ebeb98",
+      "unknownOverlays": 0,
+      "variant": "excluded-optional-over-budget"
+    },
+    {
+      "dbcLayouts": 238,
+      "elapsedSeconds": 5.475475,
+      "exclusions": 13,
+      "mode": "fixed",
+      "passed": true,
+      "peakRssKiB": 38612,
+      "providers": 18,
+      "reportSha256": "7cb36fcfd0816b9a3ed8e0f824a399dbbd6b1bfd561bf66c2e9e00aab4ebeb98",
+      "unknownOverlays": 0,
+      "variant": "excluded-optional-over-budget"
+    },
+    {
+      "dbcLayouts": 238,
+      "elapsedSeconds": 3.190229,
+      "exclusions": 4,
+      "mode": "baseline",
+      "passed": true,
+      "peakRssKiB": 279588,
+      "providers": 9,
+      "reportSha256": "48334e3072820ded03b8c356c41cef3971ce692b859c8df532a4ab15bfc24f0e",
+      "unknownOverlays": 0,
+      "variant": "stock"
+    },
+    {
+      "dbcLayouts": 238,
+      "elapsedSeconds": 2.656502,
+      "exclusions": 4,
+      "mode": "fixed",
+      "passed": true,
+      "peakRssKiB": 36564,
+      "providers": 9,
+      "reportSha256": "48334e3072820ded03b8c356c41cef3971ce692b859c8df532a4ab15bfc24f0e",
+      "unknownOverlays": 0,
+      "variant": "stock"
+    },
+    {
+      "dbcLayouts": 238,
+      "elapsedSeconds": 3.252023,
+      "exclusions": 4,
+      "mode": "baseline",
+      "passed": false,
+      "peakRssKiB": 279588,
+      "providers": 10,
+      "reportSha256": "16be15488448f41d504129cf37d77be7aee119a07ecd9647aa7a43dfe320c985",
+      "unknownOverlays": 1,
+      "variant": "unknown-overlay"
+    },
+    {
+      "dbcLayouts": 238,
+      "elapsedSeconds": 2.631621,
+      "exclusions": 4,
+      "mode": "fixed",
+      "passed": false,
+      "peakRssKiB": 36564,
+      "providers": 10,
+      "reportSha256": "16be15488448f41d504129cf37d77be7aee119a07ecd9647aa7a43dfe320c985",
+      "unknownOverlays": 1,
+      "variant": "unknown-overlay"
+    }
+  ],
+  "scope": "encrypted synthetic MPQ host memory reference; handcrafted import journals; no owner assets",
+  "sourceHashes": {
+    "runtime/stock_content_inspection.py": "ba8da0330824d69a6c4eb1534b3efef78106ef42bdf194626fbe9a4e7ab82cd8",
+    "tests/stock_memory_reference.py": "6379a7e66d2e749d11dceaed38ce94ddcd0db929ba09f4d3c538254bc9d57662",
+    "tests/test_stock_content_inspection.py": "3c47ceb268fef1eaffd8b633e14335611c9968fb0813a686790de7792ed9ee9f"
+  },
+  "tools": "/workspace/scratch/f772a4d8096c/stock-memory-fixture/tools",
+  "variants": {
+    "excluded-optional-over-budget": {
+      "generation": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "source": "/workspace/scratch/f772a4d8096c/stock-memory-fixture/game/generations/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/data"
+    },
+    "stock": {
+      "generation": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "source": "/workspace/scratch/f772a4d8096c/stock-memory-fixture/game/generations/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/data"
+    },
+    "unknown-overlay": {
+      "generation": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "source": "/workspace/scratch/f772a4d8096c/stock-memory-fixture/game/generations/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb/data"
+    }
+  },
+  "worldEntry": false
+}

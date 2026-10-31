@@ -206,14 +206,162 @@ def standard_provider(relative, locale):
     return False
 
 
+class PackedTable:
+    """The pinned reader's indexed rows backed by compact decoded bytes.
+
+    Lookup and member decoding still execute the verified provider reader. Only
+    table representation changes: a row is unpacked when queried instead of
+    retaining millions of Python tuples and integer objects across the stack.
+    """
+    def __init__(self, raw, format_, count, high=None):
+        require(len(raw) == count * 16, 'decoded MPQ table length differs')
+        self.raw, self.row, self.count, self.high = raw, struct.Struct(format_), count, high
+
+    def __len__(self):
+        return self.count
+
+    def __getitem__(self, index):
+        if index < 0:
+            index += self.count
+        if index < 0 or index >= self.count:
+            raise IndexError(index)
+        row = self.row.unpack_from(self.raw, index * 16)
+        if self.high is not None:
+            row = (row[0] | struct.unpack_from('<H', self.high, index * 2)[0] << 32,) + row[1:]
+        return row
+
+
+def table_spans(archive, maximum):
+    """Same v0/v1 extent guards as the pinned reader, before allocation."""
+    for position, count in ((archive.hash_table_pos, archive.hash_table_size),
+                            (archive.block_table_pos, archive.block_table_size)):
+        require(count <= maximum and archive.header_size <= position <= archive.archive_size,
+                'invalid or oversized MPQ table: ' + str(archive.path))
+    require(archive.hash_table_size and not archive.hash_table_size & (archive.hash_table_size - 1),
+            'MPQ hash table count must be a power of two: ' + str(archive.path))
+    hash_expected, block_expected = archive.hash_table_size * 16, archive.block_table_size * 16
+    if archive.format_version == 0:
+        hash_stored, block_stored = hash_expected, block_expected
+        require(not (archive.hash_table_pos < archive.block_table_pos + block_stored and
+                archive.block_table_pos < archive.hash_table_pos + hash_stored),
+                'overlapping MPQ tables: ' + str(archive.path))
+    else:
+        hash_stored = archive.block_table_pos - archive.hash_table_pos
+        block_end = archive.high_block_pos or min(archive.archive_size, archive.block_table_pos + block_expected)
+        block_stored = block_end - archive.block_table_pos
+        require(2 <= hash_stored <= hash_expected and 0 <= block_stored <= block_expected,
+                'unsupported MPQ table ordering/extent: ' + str(archive.path))
+        require(not archive.block_table_size or block_stored >= 2,
+                'truncated MPQ block table: ' + str(archive.path))
+        require(not archive.high_block_pos or archive.high_block_pos + archive.block_table_size * 2 <= archive.archive_size,
+                'truncated MPQ high-block table: ' + str(archive.path))
+    require(archive.hash_table_pos + hash_stored <= archive.archive_size and
+            archive.block_table_pos + block_stored <= archive.archive_size,
+            'truncated MPQ tables: ' + str(archive.path))
+    return hash_stored, block_stored
+
+
+def read_decrypted_table(archive, size, key, crypt):
+    """Pinned MPQ word cipher, in-place; preserve a final partial word."""
+    raw = bytearray(size)
+    with memoryview(raw) as view:
+        at = 0
+        while at < size:
+            got = archive.f.readinto(view[at:])
+            require(got, 'truncated MPQ data: ' + str(archive.path))
+            at += got
+        seed, key = 0xEEEEEEEE, key & 0xFFFFFFFF
+        # Android ARM64 and the host runners are little endian. Keep an exact
+        # portable path for other hosts rather than changing the archive format.
+        if sys.byteorder == 'little':
+            with view[:size // 4 * 4].cast('I') as words:
+                for index in range(len(words)):
+                    seed = (seed + crypt[0x400 + (key & 0xFF)]) & 0xFFFFFFFF
+                    plain = (words[index] ^ ((key + seed) & 0xFFFFFFFF)) & 0xFFFFFFFF
+                    words[index] = plain
+                    key = ((((~key) << 0x15) + 0x11111111) | (key >> 0x0B)) & 0xFFFFFFFF
+                    seed = (plain + seed + (seed << 5) + 3) & 0xFFFFFFFF
+        else:
+            for at in range(0, size // 4 * 4, 4):
+                seed = (seed + crypt[0x400 + (key & 0xFF)]) & 0xFFFFFFFF
+                plain = (struct.unpack_from('<I', raw, at)[0] ^ ((key + seed) & 0xFFFFFFFF)) & 0xFFFFFFFF
+                struct.pack_into('<I', raw, at, plain)
+                key = ((((~key) << 0x15) + 0x11111111) | (key >> 0x0B)) & 0xFFFFFFFF
+                seed = (plain + seed + (seed << 5) + 3) & 0xFFFFFFFF
+    return raw
+
+
+def compact_mpq_class(reader):
+    """App-owned storage adapter; the immutable provider bytes stay unchanged."""
+    mq = reader.mq
+    class CompactMPQ(mq.MPQ):
+        def _read_exact(self, size):
+            # The provider limits decoded members to64MiB, but its single-unit
+            # path otherwise reads the declared stored length first. Bound
+            # that allocation too, including the largest legitimate sector
+            # offset/CRC table (512-byte sectors plus two offsets).
+            maximum = mq.MAX_FILE_SIZE + ((mq.MAX_FILE_SIZE + 511) // 512 + 2) * 4
+            require(0 <= size <= maximum,
+                    'MPQ read exceeds bounded member and sector-table limit: ' + str(self.path))
+            return super()._read_exact(size)
+
+        def _read_tables(self):
+            hash_stored, block_stored = table_spans(self, mq.MAX_TABLE_ENTRIES)
+            for name, position, stored, count, format_ in (
+                    ('hash_table', self.hash_table_pos, hash_stored, self.hash_table_size, '<IIHHI'),
+                    ('block_table', self.block_table_pos, block_stored, self.block_table_size, '<IIII')):
+                self.f.seek(self.archive_offset + position)
+                raw = read_decrypted_table(self, stored, mq.hash_string('(' + name.replace('_', ' ') + ')', 3), mq.CT)
+                if stored != count * 16:
+                    raw = mq.decompress_sector(raw, count * 16)
+                high = None
+                if name == 'block_table' and self.high_block_pos:
+                    self.f.seek(self.archive_offset + self.high_block_pos)
+                    high = self._read_exact(count * 2)
+                setattr(self, name, PackedTable(raw, format_, count, high))
+    return CompactMPQ
+
+
+def preflight_tables(paths, reader, locale):
+    """Bound each prospective provider before decrypting its packed tables.
+
+    Optional classification needs the archive's real catalogue members. Keep
+    one bounded packed candidate as headroom, then enforce the historical
+    combined limit only when retaining an effective provider. Content-confirmed
+    optional archives never consume that retained-provider budget.
+    """
+    class HeaderProbe(reader.mq.MPQ):
+        def _read_tables(self):
+            pass  # Reuse only the pinned header discovery; no table allocation.
+    counts = {}
+    for path in paths:
+        probe = HeaderProbe(path, reader.LOCALES[locale])
+        try:
+            table_spans(probe, reader.mq.MAX_TABLE_ENTRIES)
+            counts[path] = probe.hash_table_size + probe.block_table_size
+        finally:
+            probe.close()
+    return counts
+
+
 class Stack:
     def __init__(self, source, locale, reader, pins):
         self.archives = []
         self.providers, self.exclusions, self.unknown = [], [], []
-        table_count = 0
         data_dirs = [path for path in source.iterdir() if path.name.casefold() == 'data']
         require(len(data_dirs) == 1, 'one stock Data directory required')
         paths = reader.provider_paths(data_dirs[0], locale)
+        require(len(paths) <= order.MAX_PROVIDERS, 'stock provider inventory bound')
+        for path in paths:
+            relative = path.relative_to(source).as_posix()
+            require(path.is_file() and not path.is_symlink(),
+                    'Stock 3.3.5a requires regular archive providers; inspect folder overlay: ' + relative)
+            pin = pins.get(relative.casefold())
+            require(pin is not None and path.stat().st_size == pin['bytes'],
+                    'archive differs from its completed streaming import: ' + relative)
+        table_counts = preflight_tables(paths, reader, locale)
+        retained_count = 0
+        archive_type = compact_mpq_class(reader)
         try:
             for path in paths:
                 relative = path.relative_to(source).as_posix()
@@ -222,7 +370,7 @@ class Stack:
                 pin = pins.get(relative.casefold())
                 require(pin is not None and path.stat().st_size == pin['bytes'],
                         'archive differs from its completed streaming import: ' + relative)
-                archive = reader.mq.MPQ(path, reader.LOCALES[locale])
+                archive = archive_type(path, reader.LOCALES[locale])
                 retained = False
                 try:
                     require(archive.find('(listfile)') is not None, 'missing shader/listfile inventory: ' + relative)
@@ -256,12 +404,16 @@ class Stack:
                         row.update(classification='stock-candidate', reason='Conventional archive; effective members validated below, cryptographic authenticity remains a client startup check')
                     self.providers.append(row)
                     if not markers:
-                        table_count += len(archive.hash_table) + len(archive.block_table)
-                        require(table_count <= MAX_TABLE_ENTRIES, 'combined stock MPQ table memory bound')
+                        retained_count += table_counts[path]
+                        require(retained_count <= MAX_TABLE_ENTRIES,
+                                'combined retained stock MPQ table memory bound before retaining: ' + relative)
                         self.archives.append((relative, archive)); retained = True
                 finally:
                     if not retained:
                         archive.close()
+                        # Release this candidate before the next constructor
+                        # so optional archives use one packed-table headroom.
+                        archive = None
         except Exception:
             self.close()
             raise

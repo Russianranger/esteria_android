@@ -136,6 +136,23 @@ class PublicationGuards(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'stock-update-baseline'):
             publication.application_identity(first, lock)
 
+    def test_version_three_update_remains_bound_to_exact_version_two_baseline(self):
+        lock = self.signing_lock()
+        lock['lastPublished'] = dict(versionCode=2, apkSha256='e' * 64)
+        receipt = self.signing_receipt()
+        receipt['previousPublished'] = copy.deepcopy(lock['lastPublished'])
+        receipt['signedApk'].update(versionCode=3, versionName='0.1.0-non-custom.3')
+        self.assertEqual(publication.application_identity(receipt, lock)['versionCode'], 3)
+        # A matching certificate cannot reuse the prior update or substitute a
+        # different previous APK. Each historical version retains its baseline.
+        receipt['signedApk'].update(versionCode=2, versionName='0.1.0-non-custom.2')
+        with self.assertRaisesRegex(ValueError, 'stock-update-baseline'):
+            publication.application_identity(receipt, lock)
+        receipt['signedApk'].update(versionCode=3, versionName='0.1.0-non-custom.3')
+        receipt['previousPublished']['apkSha256'] = 'f' * 64
+        with self.assertRaisesRegex(ValueError, 'stock-update-baseline'):
+            publication.application_identity(receipt, lock)
+
     def run_rows(self):
         run = dict(id=TEST_RUN, repository=dict(full_name=publication.REPOSITORY),
             head_repository=dict(full_name=publication.REPOSITORY), head_sha=TEST_APP,

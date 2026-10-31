@@ -1,87 +1,36 @@
-# Non-custom stock import recovery — version 2
+# Esteria Stock — low-memory import update (version 3)
 
-Updated 2026-10-31 America/Chicago. Branch `non-custom`; package `io.github.russianranger.esteria.stock`, profile `stock-3.3.5a`. Version `0.1.0-non-custom.2`, versionCode **2**, 336,751,037 bytes. Install over stock version 1 with existing app data retained.
+Updated 2026-10-31 America/Chicago. Branch `non-custom`; package `io.github.russianranger.esteria.stock`, profile `stock-3.3.5a`; candidate `0.1.0-non-custom.3`, versionCode3. Work through full provider build, Android memory stress, signing, additive publication and public readback before handing off. No private key or generated APK belongs in Git.
 
-- APK SHA-256: `8caaeb58ccb658fa6fd13d0c7ba77f43c2285dd487cbbcdcd9503e4bff34823a`.
-- Persistent certificate: `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`; exact prior stock APK and increased version were verified with Android SDK35. v2/v3 signatures, nondebug manifest and preserved APK payload pass. Actual Thor install-over remains a device check.
-- Exact APK producer: `1adf97b35fc1cfeedf05e94b10357bce8185d84a`. Complete ARM64 package run `41232081429`, job `124628326637` succeeded. Unsigned artifact `13054396562`:336,757,779B ZIP, SHA `c9bc42deaa4b306e7c880dc7fed860167d8eef55ddbdd73f252562abfde44a7e`.
-- Client `471ee42faadf4a97a1d0a86989cf1452621f2dc5`; server `f35f04d01689f034778e3474b3c820092f51e461` with seven unchanged adaptations. Exact source/provider locks and the existing local ARM64 Wine/PRoot/MySQL architecture remain unchanged; no original x86 Wow.exe substitution or custom/HD prerequisite.
-- Published prerelease: https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.2. Direct APK: https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.2/Esteria-Stock-3.3.5a-arm64.apk. Publisher run `41233459451` at `b2adbe3257d8e2b5ee7f0f988dad266d895e049c` succeeded; release `430134490`, all six assets and the complete anonymous APK download match their recorded hashes. SDK35 independently reverified the public APK certificate/package/version. See `runtime/evidence/non-custom-v2-public-apk-readback.json` and `runtime/releases/non-custom-v0.1.0-non-custom.2.json`. Historical version-1 metadata/assets are preserved.
+## Report and evidence boundary
 
-## Confirmed diagnosis and changes
+The owner reports repeated Android low-memory kills during import after version2. No new support bundle, exit record, route or exact failing phase accompanies this report. The two old uploaded text files describe version1's provider-location rejection and contain no LMK evidence. Do not label a particular Java/Python allocation as the confirmed cause of this owner's kill. Import copying/automatic structural compatibility and Python stock preparation are separate phases; Python starts only during Prepare/Start.
 
-Both supplied files (`launcher.log`, `status.txt`) were inspected completely. Three generic MPQ provider-location errors are interleaved with two missing-import messages. The first source-matched error is the shared provider-location validator; the missing-import messages are consistent with preparation after rejected imports. The old logger omits the offending filename, normalized path, selected root, folder/ZIP route and exception chain. Those exact owner facts cannot be recovered from this report. No additional permission, storage, OOM, process or runtime failure is demonstrated; preparation was not reached. See `runtime/evidence/non-custom-import-recovery-report.json` for exact report identities and limits.
+## Implemented reductions
 
-The shared validator applied explicit-overlay provider naming rules to a complete base client. The pinned classical engine does not load every file ending `.MPQ`. Representative inactive MPQs reproduce the same original failure through both public import routes. Base import now preserves inactive ancillary archives and inert folder-MPQ members; content inspection records journal-bound exclusions in a separate app-owned stock selection. Standard base/locale archives and Blizzard patches retain structural/content validation, while unknown active providers and unsupported alternate/folder views remain inspection gates. Original source files, previous active imports, completed preparation and saves are preserved.
+- Core import still streams through one128KiB buffer, verifies SHA256/ZIP CRC, enforces the16MiB metadata budget, source changes and paths, and promotes transactionally. The transfer ByteBuffer is reused instead of allocated for every read. Duplicate original-source lookup maps and root-discovery lists are removed; UTF8 budget/length encoding and digest formatting avoid temporary arrays/Formatter objects. Consumed resume records and fallback seed buffers are released/reused. ZIP name scratch storage is reused.
+- SAF shares the original InputEntry with its retained verification record instead of duplicating file metadata; MIME values are shared and the finished inventory is released. Exact filename, MIME, type, opaque-ID, alias and source-change checks remain. Status formatting is capped at5Hz and unchanged text is not rebuilt in TextViews; IO speed is not throttled. The Android heap limit is unchanged.
+- Import receipts record sampled Java heap, observed peak/limit and timestamps. Support export records bounded own-package Android exit history, explicit LMK reporting capability, reason/status/importance and last sampled PSS/RSS. SIGKILL/crash/large RSS alone are not claimed as LMK or Java OOM. Memory-trim/current importance/foreground-role facts accompany them. A fatal Java Error no longer clears the interrupted recovery marker.
+- Stock preparation retains MPQ tables as packed decoded bytes with the exact pinned reader handling header discovery, lookup and member decoding. Cipher/endian/v0/v1/high-word behavior remains tested. Per-provider extents are checked before table allocation; the old retained-provider count policy is preserved, including content-confirmed optional exclusions. One bounded candidate has temporary headroom; closed optional candidates are released. Malformed oversized stored member reads are bounded before allocation. Frozen provider bytes and all source locks remain unchanged.
 
-Folder, ZIP and opaque document sources share bounded unique-root discovery. Normal wrappers can coexist with README/LICENSE and Apple ZIP metadata. Multiple complete clients, file/directory conflicts and case collisions (including explicit ZIP directories) are rejected. Data-only selection identifies the parent containing Wow.exe and Data without escaping the granted source. The generation's internal `data` directory stays distinct from client `Data`. Original source mappings, mapped-source fingerprints, source-change detection, streamed copying, cancellation and resume remain enforced.
+## Validation to date
 
-Support export retains route/kind, provider/fingerprint, selected-root display label, detected root/phase/path and bounded exception causes in `status.txt` (`import.last.*`) and `launcher.log`. Opaque document IDs are never interpreted as destination paths. Folder labels come from cancellable inventory; ZIP logical roots come from inspection. Composed server-data-tool status is separate from the historical optional extractor flag.
+- All42 importer groups pass. A64/256MiB short-read fixture formerly allocated4,472,464/15,482,608B, now approximately482KB for either size. This is host total allocation, not Android peak RSS.
+- Real public folder/ZIP128MiB fixtures pass at12MiB heap with matching SHA256/CRC. An interrupted version2 import resumes its exact generation, reuses4 completed files and copies7; the following retry reuses all11/copies zero. See `runtime/evidence/non-custom-import-memory-host.json`.
+- Stock inspection's final18tests pass, including six actual Java folder/ZIP-to-preparation pipelines and exact baseline/fixed reports. Large-table host RSS falls279,588→36,564KiB (86.9%),3.19→2.66s. Optional-over-budget data remains accepted/excluded correctly, with identical238DBC/UI/shader/provider reports. See `runtime/evidence/non-custom-stock-inspection-memory-host.json`. These are encrypted synthetic MPQs, not owner assets.
+- Full final Python suite:1468tests passed,108 explicit dependency skips. Strict Android-only Java/API compilation passed production and SAF/exit tests; the memory fixture also compiles against the actual Android API.
+- Added actual Android13 tests for1GiB generated pipe-folder and nonseekableZIP imports,3200 extra opaque documents (3210files), Java/native/PSS samples and real persisted import diagnostics. No whole-client bytearray is generated. Five memory/exit tests and three measured records must actually pass in CI. These component tests do not claim a real LMK was reproduced or eliminated on Thor.
 
-## Validation
+Full ARM64 packaging, Android stress execution and signed publication are pending this checkpoint. Keep prior version2 available: https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.2 (APK SHA8caaeb58ccb658fa6fd13d0c7ba77f43c2285dd487cbbcdcd9503e4bff34823a).
 
-| Check | Result and boundary |
-| --- | --- |
-| Shared importer | 42 groups under32MiB; original folder/ZIP rejection reproduced, then standard archives, wrappers/metadata, casing, Data-only guidance, opaque IDs, source changes, cancellation/resume and corrupt-input rollback passed. |
-| Import to preparation | Six actual Java folder/ZIP pipelines (direct, wrapped/metadata, mixed-case) passed exact-client MPQ inspection,238DBC layouts/UI/shader inventory, journal-bound stock selection and second inspection. Both active unknown-patch routes were rejected. Encrypted synthetic MPQs, not owner assets. See `non-custom-import-preparation-host.json`. |
-| Android13 x64 | Run `41232081285`, artifact `13054690144` passed actual filesystem/update contracts and exactly3 SAF import component tests, plus existing stock-helper/shader receipts. All3 named SAF successes, source hashes and log digest independently read. Repeat Android13 installer/SAF CI `41233459469` also passed at the publisher checkpoint. In-process provider fixture, not the owner's document provider or ARM64 hardware. See `non-custom-import-android13.json` and `.log`. |
-| Ownership | Ten app owner/profile/lifetime entrypoints pass under32MiB. Three host fixtures were corrected to require the new contextual inventory phase and exact preserved sentinel cause; live-lease/no-scan and cleanup assertions remain intact. These test-only corrections are carried by publisher checkpoint b2adbe; production files match APK producer1adf. Corrected full launcher/core/owner/build/lint CI `41233459444` passed on that checkpoint. See `non-custom-import-owner-host.json`. |
-| Native ARM64 SQL | Run `41232081499`, job `124628433113`, artifact `13053779504` at exact APK producer passed genuine stock SQL/Human starting row, four schemas, finish/reentry, restart and bound clean stop. Full ZIP and `verify_native_sql` readback passed. No worldserver/gameplay claim. |
-| Packaging/signing | Full-provider compile/lint, bounded four-provider installation/cache checks, source/debug/provider-byte proof and release manifest passed. Eight actual SDK signing/detached-signature tests passed locally. The full Python suite passed1461 tests with112 explicit dependency skips before the added cross-layer case; final13 stock tests passed separately. |
+## Architecture and continuity
 
-## One consolidated device procedure
+Client remains `471ee42faadf4a97a1d0a86989cf1452621f2dc5`; server `f35f04d01689f034778e3474b3c820092f51e461` plus its seven pinned adaptations; Eluna `58d7652138887783228b9727bd1fa4e08f00342b`. Retain ARM64 reconstructed client/Wine in Debian12 PRoot and Linux ARM64 server/MySQL in Ubuntu24 PRoot. No original x86 Wow.exe substitution, custom/HD dependency, source-file mutation or save reseeding. Ordinary client layout and all version2 import-path fixes remain active.
 
-Follow `NON-CUSTOM-TESTING.md`: update the existing stock app → retry one normal folder **or** ZIP import → Prepare local runtime / world → Start local game → Human Warrior/world entry → clean stop/relaunch → offline repeat. Select the root containing Wow.exe and Data; keep ordinary archives inside Data and locale archives inside Data/<locale>. Do not uninstall, clear data, move/rename MPQs or rebuild the ZIP. Both routes were independently checked; a double large device import is unnecessary.
+Sign code3 with the persistent certificate5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa and exact published version2 APK as prior baseline. The official ledger remains code2 until public version3 readback succeeds. New public signatures/provenance use `runtime/releases/non-custom/update-3/`; update-2 and earlier assets remain unchanged. Later publication/test/evidence commits must not be substituted as the APK producer.
 
-If blocked, export the entire support bundle immediately at that stage, retaining app data and completed work. Import details are in status.txt/import.last.* and launcher.log; preparation/runtime logs are needed when those later stages fail. No complete owner ChromieCraft data or Thor was accessible here. Actual owner extraction/shaders, graphical login/world entry, controller/audio and character persistence remain device validation limits. All required build/publication and corrected-check runs have completed; no development or test execution remains running for this handoff. Resume implementation from the next owner device report.
+## One owner test after publication
 
-## Published update continuity
+Install the final signed update over the stock app; keep app data and select the same source to reuse completed work where provider metadata supports resume. Do not uninstall, clear data, move MPQs or rebuild a ZIP. Retry one import route, then Prepare local runtime/world → Start local game → Human Warrior/world entry → clean stop/relaunch and offline repeat. Actual owner client data, extraction, Thor rendering/world entry/controller/audio/persistence remain unqualified here.
 
-Official `app/stock-signing.lock.json` now records published versionCode2 and the verified signed hash. Future updates require versionCode>=3, the same certificate/package and the exact version2 APK as the prior baseline. Never use `--initial-baseline` again. The version2 producer/publisher commits retain their original baseline1 lock and public signature receipt; this final metadata checkpoint intentionally retires publisher replay. No private key was placed in Git or CI.
-
-## Historical version-1 baseline
-
-# Non-custom stock package status
-
-Updated 2026-10-31 America/Chicago. Profile `stock-3.3.5a`; branch `non-custom`; separate package `io.github.russianranger.esteria.stock`.
-
-## Signed candidate
-
-Version `0.1.0-non-custom.1`, versionCode `1`; 336,746,941 bytes.
-APK SHA-256: `802cb3f8575f4413e19ddef937e75394370ec9682c3f71631fff3579976df718`.
-Certificate: `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`; actual SDK v2/v3 signature, nondebuggable manifest and complete payload preservation verified. Published additive prerelease: https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.1. Public anonymous HTTP200, filename,336,746,941B and the complete SHA-256 readback match the SDK-verified signed APK. All six release assets have recorded digests. Backup download saved. Official stock signing baseline is versionCode1; future updates require>=2.
-
-- Exact app producer: `8d31e4fa832cd8ef0f738d36088fb9e64ae3aa41`; full ARM64 build `41213324528`, job `124572722479`.
-- Reconstructed ARM64 client: `471ee42faadf4a97a1d0a86989cf1452621f2dc5`.
-- Server: `f35f04d01689f034778e3474b3c820092f51e461`, unchanged seven pinned integration adaptations; Eluna source `58d7652138887783228b9727bd1fa4e08f00342b`.
-- `sources.lock.json` and native provider locks remain unchanged. Wine/Debian12 and server/MySQL/Ubuntu24 PRoot roots remain separate. No x86 Wow.exe substitution.
-
-The separate stock app installs beside custom Esteria and owns its client copy, database, shaders and mutable state. Original client files/realmlist/accounts, custom app saves, `main`, `android/client-server`, custom branches and the previous published assets remain untouched.
-
-## Implemented stock behavior
-
-Import → Prepare local runtime / world → Start local game. The import report reads actual PE VERSIONINFO, base MPQ structure, installed/effective locale and speech. Content inspection checks effective archive members, authentic UI closure/signature structure, 238 source-derived client DBC layouts and shader inventory. Cryptographic UI validation remains in the reconstructed client. It preserves standard Blizzard root/locale patches, refuses unclassified overlays precisely, and removes only content-confirmed optional overlays plus known loose UI/custom trees in a separate app-owned stock generation.
-
-Preparation uses that same selection for client launch, ordered DBC/maps/vmaps/mmaps/Cameras extraction and Vulkan shaders. Profile, importer ancestry, exact tools and app helper identities bind reuse. It retains completed stages, diagnostics and saves on failure without repeated full-client hashing on ordinary launches.
-
-Stock SQL policy `stock-world-source-selection-v2` projects authentic source files and excludes custom race/map/classless/progression world changes. All 3,219 policy-v1 retained world SQL source identities were audited; the real SQL failure exposed Individual Progression's outfit/Vanilla rewrites, now excluded with its source-supported runtime switches disabled. No fabricated rows, cleared-all-DBC shortcut or blanket success return. Normal startup cannot reapply the full custom SQL tree. Fresh setup/clean stop/restart preserve ownership and refuse reseeding active saves.
-
-## Actual evidence
-
-| Check | Result | Boundary |
-| --- | --- | --- |
-| Full ARM64 app/build | `41213324528` passed native compilation, core tests, lint, complete provider/source/debug checks, bounded Java installation, SDK signing fixtures, nondebug release and final APK byte verification. Unsigned artifact `13046713724`:336,750,863B, SHA `f0892de3928c0cc413786cb67f48def535b457ab62f7cd17e79dc7226ffca706`. | Actual packaging; no game execution. |
-| Native ARM64 stock SQL | `41213324577` on the exact app producer passed live empty race/class/map/outfit overlays, Human Warrior Northshire row, four schemas, finish/reentry without replay, same-UUID restart and two clean stops. 3,070 world updates selected/270 excluded;31 bot-schema updates/30 tables. | Actual SQL/setup; no DBC files/auth/world/character-save/bot-AI/Android execution. |
-| Android13 x64 | `41213324526` on the exact producer passed19 filesystem/update contract groups and exactly2 stock-helper/receipt tests. Artifact `13047332325` and all29 files read;7 source hashes match. | Actual Android component behavior; tiny test APK, no full ARM64/client/world/rendering claim. |
-| Input/content/source checks | 34 low-heap importer groups;8 tests with selected471's actual MPQ reader over encrypted-table synthetic archives;238 layouts reproduced from479 source inputs; source/fixture and tooling CI pass. | Source support and synthetic behavior, not the owner's assets or gameplay. |
-| Signing | The existing persistent certificate verifies the signed APK with SDK35; payload and manifest preserved. | Signature/package integrity; actual delivered install-over and gameplay unqualified. |
-
-Both failed native SQL runs `41211067232` and `41211577406`, the exact guard reason, source audits and successful receipts remain under `runtime/evidence/non-custom-*`.
-
-## Remaining real validation
-
-No complete owner ChromieCraft client folder/archive or Thor was accessible here. No actual stock MPQ extraction/game shader generation, normal graphical startup/login, character creation/world entry, character saves, real controller/audio or offline gameplay was executed. Run the one `NON-CUSTOM-TESTING.md` procedure with the existing complete12340 client. This needs no custom MPQ bundle, pre-extracted world download, ChromieCraft credentials or manual MySQL administration.
-
-Full Esteria MPQs/catalogues/races/appearance, HD art, custom maps, Retail/Forever, Lua/AIO/custom gameplay and bot AI qualification are deferred and never stock acceptance gates. All custom sources remain recoverable.
-
-Publication run `41215249412` at metadata commit `35310cd093aae28239ac6b35d5f69c854865341e` independently reverified source-run/artifact/nativeSQL provenance, reconstructed the exact signed APK, verified SDK certificate/manifest/payload, then published. See runtime/releases/non-custom-v0.1.0-non-custom.1.json and runtime/evidence/non-custom-public-apk-readback.json. The APK producer remains8d31; later commits only retain evidence/publication/signing-ledger metadata.
+If Android kills it again, reopen and export the whole support bundle BEFORE starting another import, preserving the last receipt. Provide the last displayed stage/file plus status.txt/launcher.log; the exit-history and sampled memory fields distinguish reported reasons and their limits. Avoid manually clearing completed import/preparation state. No developer task is considered complete merely because compilation passes.

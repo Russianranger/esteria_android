@@ -149,6 +149,47 @@ jobs:
                   receipt['stdout'] = dict(bytes=log.stat().st_size, sha256=digest(log))
               (destination / 'saf-import-component.json').write_text(json.dumps(receipt, sort_keys=True, indent=2) + '\n')
           print(json.dumps(receipt, sort_keys=True, indent=2))
+          selected = 'io.github.russianranger.esteria.ImportMemoryStressTest,io.github.russianranger.esteria.ProcessExitDiagnosticsTest'
+          files = ['app/src/androidTest/java/io/github/russianranger/esteria/ImportMemoryStressTest.java',
+                   'app/src/androidTest/java/io/github/russianranger/esteria/ProcessExitDiagnosticsTest.java',
+                   'app/src/main/java/io/github/russianranger/esteria/ProcessExitDiagnostics.java',
+                   'app/src/main/java/io/github/russianranger/esteria/SafTreeSource.java',
+                   'app/src/main/java/io/github/russianranger/esteria/UriStager.java',
+                   'app/src/main/java/io/github/russianranger/esteria/ImportDiagnostics.java',
+                   'app/src/main/java/io/github/russianranger/esteria/SessionService.java',
+                   'core/src/main/java/io/github/russianranger/esteria/core/importer/GameDataImporter.java',
+                   'core/src/main/java/io/github/russianranger/esteria/core/importer/ZipSafety.java']
+          receipt = dict(formatVersion=1, scope='android13-x64-large-streaming-import-memory-and-exit-history-components',
+              appSourceRevision=os.environ['GITHUB_SHA'], contentProfile='stock-3.3.5a',
+              testClass=selected, expectedTests=5, emulatorProperties=properties,
+              sources={name: dict(bytes=(root / name).stat().st_size, sha256=digest(root / name)) for name in files},
+              componentTestsExecuted=False, componentTestsPassed=False,
+              realLowMemoryKillReproduced=False, ownerDocumentProviderTested=False,
+              ownerGameDataImported=False, androidArm64Qualified=False, thorQualified=False, gameplayQualified=False)
+          log = destination / 'import-memory-component.log'
+          try:
+              code, output = run_bounded(['adb', 'shell', 'am', 'instrument', '-w', '-r', '-e', 'class',
+                  selected, PACKAGE + '.test/androidx.test.runner.AndroidJUnitRunner'], log, 1200, 256 * 1024)
+              receipt.update(componentTestsExecuted=True, processExitCode=code)
+              passed = code == 0 and bool(re.search(r'^OK \(5 tests\)\s*$', output, re.M)) and bool(
+                  re.search(r'^INSTRUMENTATION_CODE: -1\s*$', output, re.M)) and not re.search(
+                  r'FAILURES!!!|INSTRUMENTATION_FAILED|Process crashed|INSTRUMENTATION_STATUS_CODE: -[12]', output)
+              observations = [json.loads(line.split('IMPORT_MEMORY_STRESS=', 1)[1].strip())
+                  for line in output.splitlines() if 'IMPORT_MEMORY_STRESS=' in line]
+              if len(observations) != 3 or any(not isinstance(row, dict) for row in observations):
+                  raise RuntimeError('Expected three measured import-memory stress observations')
+              receipt['stressObservations'] = observations
+              receipt['componentTestsPassed'] = passed
+              if not passed:
+                  raise RuntimeError('Import memory/exit-history components did not report exactly five successful tests')
+          except Exception as error:
+              receipt['failure'] = type(error).__name__ + ': ' + str(error)[:1024]
+              raise
+          finally:
+              if log.exists():
+                  receipt['stdout'] = dict(bytes=log.stat().st_size, sha256=digest(log))
+              (destination / 'import-memory-component.json').write_text(json.dumps(receipt, sort_keys=True, indent=2) + '\n')
+          print(json.dumps(receipt, sort_keys=True, indent=2))
           PY
       - name: Run real app-private filesystem and package-update contracts
         uses: ReactiveCircus/android-emulator-runner@324029e2f414c084d8b15ba075288885e74aef9c # v2.34.0
@@ -159,7 +200,7 @@ jobs:
           cores: 2
           ram-size: 2048M
           heap-size: 256M
-          disk-size: 2048M
+          disk-size: 4096M
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
           disable-animations: true
           script: |
