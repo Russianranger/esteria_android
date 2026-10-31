@@ -1,3 +1,9 @@
+# Version3 current publication transport
+
+Current public inputs are `update-3/signature-recipe.json`, `update-3/signing-receipt.json` and `update-3/publication-inputs.json`. Preserve update-2 and earlier files. Sign version3 with the same stock certificate and exact published version2 as the previous APK; never use --initial-baseline again. The official ledger changes to3 only after complete public APK hash/SDK certificate readback. The producer/publisher commits retain the baseline2 lock that binds the receipt. Future updates need their own directory and increased version.
+
+The following older transport notes remain historical.
+
 # Current update transport
 
 Version2 uses `update-2/signature-recipe.json`, `update-2/signing-receipt.json` and `update-2/publication-inputs.json`. The signer requires exact published version1 as `--previous-apk`; never use `--initial-baseline` for an update. The publisher validates the unchanged stock certificate/package, exact prior ledger and increasing version, then independently rechecks source/native SQL/provider/SDK/payload proof. Preserve the historical files below; future updates should use their own directory. Update the official signing ledger only after public signed download readback.

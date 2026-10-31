@@ -1,6 +1,14 @@
 # Esteria Stock — low-memory import update (version 3)
 
-Updated 2026-10-31 America/Chicago. Branch `non-custom`; package `io.github.russianranger.esteria.stock`, profile `stock-3.3.5a`; candidate `0.1.0-non-custom.3`, versionCode3. Work through full provider build, Android memory stress, signing, additive publication and public readback before handing off. No private key or generated APK belongs in Git.
+Updated 2026-10-31 America/Chicago. Branch `non-custom`; package `io.github.russianranger.esteria.stock`, profile `stock-3.3.5a`; signed candidate `0.1.0-non-custom.3`, versionCode3. Full provider build, Android memory stress and signing passed; additive publication/public download readback are pending this checkpoint. No private key or generated APK belongs in Git.
+
+## Exact candidate identity
+
+- APK producer/app source: `4b45fc004ce635ece9dc2e13ebeb5cf5f5f3d908`. Full package run `41236388424`, job `124640987755`; unsigned ZIPartifact `13055367592` SHA`cb0942d4fcf6be0daff760ae42e35b2f43d97943e1900cef4455c45db8716113`.
+- Signed APK 336,759,229 bytes; SHA256 `659bae66e2fcadaaad642dd02ba01564ca9724d2a5190cdf1922f4a9258fd9aa`; certificate `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`. SDK35 verifies package/version/nondebug manifest, v2/v3 signatures and unchanged payload. Exact published version2 was verified as previous baseline; local public-recipe reconstruction also matches byte-for-byte. Actual Thor install-over is unqualified here.
+- Native ARM64 SQL run `41236388396`, job `124640956699`, artifact `13055467841` passes exact same producer, stock policy/Human starting row, reentry/restart/clean stop; worldserver/gameplay remain unqualified.
+- Android13 x64 run `41236388434`, job `124640956536`, artifact `13055781447` passed all5 memory/exit tests plus existing SAF/update/helper contracts. Independent readback verified 33members,5named successes,3measurements and9source hashes.
+- Generic launcher/core/owner/lint `41236388456` passed all42importer groups and low-heap import/ZIP regressions. FinalPython1468 passed/108dependency skips; focusedstock18 passed with configuredJDK and exact reader source.
 
 ## Report and evidence boundary
 
@@ -19,9 +27,9 @@ The owner reports repeated Android low-memory kills during import after version2
 - Real public folder/ZIP128MiB fixtures pass at12MiB heap with matching SHA256/CRC. An interrupted version2 import resumes its exact generation, reuses4 completed files and copies7; the following retry reuses all11/copies zero. See `runtime/evidence/non-custom-import-memory-host.json`.
 - Stock inspection's final18tests pass, including six actual Java folder/ZIP-to-preparation pipelines and exact baseline/fixed reports. Large-table host RSS falls279,588→36,564KiB (86.9%),3.19→2.66s. Optional-over-budget data remains accepted/excluded correctly, with identical238DBC/UI/shader/provider reports. See `runtime/evidence/non-custom-stock-inspection-memory-host.json`. These are encrypted synthetic MPQs, not owner assets.
 - Full final Python suite:1468tests passed,108 explicit dependency skips. Strict Android-only Java/API compilation passed production and SAF/exit tests; the memory fixture also compiles against the actual Android API.
-- Added actual Android13 tests for1GiB generated pipe-folder and nonseekableZIP imports,3200 extra opaque documents (3210files), Java/native/PSS samples and real persisted import diagnostics. No whole-client bytearray is generated. Five memory/exit tests and three measured records must actually pass in CI. These component tests do not claim a real LMK was reproduced or eliminated on Thor.
+- Added actual Android13 tests for1GiB generated pipe-folder and nonseekableZIP imports,3200 extra opaque documents (3210files), Java/native/PSS samples and real persisted import diagnostics. No whole-client bytearray is generated. All five memory/exit tests and three measured records passed in CI. These component tests do not claim a real LMK was reproduced or eliminated on Thor.
 
-Full ARM64 packaging, Android stress execution and signed publication are pending this checkpoint. Keep prior version2 available: https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.2 (APK SHA8caaeb58ccb658fa6fd13d0c7ba77f43c2285dd487cbbcdcd9503e4bff34823a).
+Full ARM64 packaging and Android stress execution passed; the signed candidate is ready for additive publication. Android measured1GiB folder import10.710s with1,071,432B Java/64,080B native/2,421,760B PSS observed growth;1GiB nonseekableZIP staging+import26.229s with1,230,648B Java/291,936B native/474,112B PSS growth;3210files stayed bounded. Both payload hashes match. See `runtime/evidence/non-custom-import-memory-android13.json`, `.log` and `-readback.json`. These are observed component deltas, not total process memory, real owner-data execution or proof that a Thor kill was eliminated. Keep prior version2 available: https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.2 (APK SHA8caaeb58ccb658fa6fd13d0c7ba77f43c2285dd487cbbcdcd9503e4bff34823a).
 
 ## Architecture and continuity
 

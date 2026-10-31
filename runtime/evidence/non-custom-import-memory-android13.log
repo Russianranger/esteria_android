@@ -1,0 +1,89 @@
+INSTRUMENTATION_STATUS: class=io.github.russianranger.esteria.ImportMemoryStressTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=
+io.github.russianranger.esteria.ImportMemoryStressTest:
+INSTRUMENTATION_STATUS: test=gibibyteFolderAndNonseekableZipImportsKeepBoundedMemory
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: stream=IMPORT_MEMORY_STRESS={"route":"folder","samples":16,"initialJavaBytes":12808832,"peakJavaBytes":13880264,"javaGrowthBytes":1071432,"initialNativeBytes":4634544,"peakNativeBytes":4698624,"nativeGrowthBytes":64080,"initialPssBytes":35369984,"peakPssBytes":37791744,"pssGrowthBytes":2421760,"payloadBytes":1073741824,"copiedFiles":10,"copiedBytes":1073743360,"sha256":"41f9c660a072eb1c4f528c0cbbac593596e1121ec1ac1d88dbcb1ee53e2d5096","elapsedMillis":10710,"scope":"android13-generated-structural-client-memory-fixture","ownerData":false,"thorQualified":false,"gameplayQualified":false}
+
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: stream=IMPORT_MEMORY_STRESS={"route":"zip","samples":31,"initialJavaBytes":3387160,"peakJavaBytes":4617808,"javaGrowthBytes":1230648,"initialNativeBytes":4699568,"peakNativeBytes":4991504,"nativeGrowthBytes":291936,"initialPssBytes":29777920,"peakPssBytes":30252032,"pssGrowthBytes":474112,"payloadBytes":1073741824,"copiedFiles":10,"copiedBytes":1073743360,"sha256":"41f9c660a072eb1c4f528c0cbbac593596e1121ec1ac1d88dbcb1ee53e2d5096","elapsedMillis":26229,"scope":"android13-generated-structural-client-memory-fixture","ownerData":false,"thorQualified":false,"gameplayQualified":false}
+
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: class=io.github.russianranger.esteria.ImportMemoryStressTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=gibibyteFolderAndNonseekableZipImportsKeepBoundedMemory
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.russianranger.esteria.ImportMemoryStressTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=thousandsOfOpaqueDocumentsStayBoundedAndSourceChecksRemainActive
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: stream=IMPORT_MEMORY_STRESS={"route":"opaque-inventory","samples":56,"initialJavaBytes":9441704,"peakJavaBytes":9597416,"javaGrowthBytes":155712,"initialNativeBytes":4645408,"peakNativeBytes":5054160,"nativeGrowthBytes":408752,"initialPssBytes":35492864,"peakPssBytes":38121472,"pssGrowthBytes":2628608,"documents":3210,"opaqueIdCharacters":135,"sourceQueries":9639,"scope":"android13-generated-structural-client-memory-fixture","ownerData":false,"thorQualified":false,"gameplayQualified":false}
+
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: class=io.github.russianranger.esteria.ImportMemoryStressTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=thousandsOfOpaqueDocumentsStayBoundedAndSourceChecksRemainActive
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.russianranger.esteria.ProcessExitDiagnosticsTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=
+io.github.russianranger.esteria.ProcessExitDiagnosticsTest:
+INSTRUMENTATION_STATUS: test=actualAndroidHistoryQueryIsBoundedToOwnPackage
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.russianranger.esteria.ProcessExitDiagnosticsTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=actualAndroidHistoryQueryIsBoundedToOwnPackage
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.russianranger.esteria.ProcessExitDiagnosticsTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=descriptionsAreBoundedRedactedAndSingleLine
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.russianranger.esteria.ProcessExitDiagnosticsTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=descriptionsAreBoundedRedactedAndSingleLine
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.russianranger.esteria.ProcessExitDiagnosticsTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=lowMemoryKillJavaOomAndOtherExitsRemainDistinct
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.russianranger.esteria.ProcessExitDiagnosticsTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=lowMemoryKillJavaOomAndOtherExitsRemainDistinct
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_RESULT: stream=
+
+Time: 47.46
+
+OK (5 tests)
+
+
+INSTRUMENTATION_CODE: -1

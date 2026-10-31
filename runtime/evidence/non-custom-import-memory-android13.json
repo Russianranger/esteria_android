@@ -1,0 +1,131 @@
+{
+  "androidArm64Qualified": false,
+  "appSourceRevision": "4b45fc004ce635ece9dc2e13ebeb5cf5f5f3d908",
+  "componentTestsExecuted": true,
+  "componentTestsPassed": true,
+  "contentProfile": "stock-3.3.5a",
+  "emulatorProperties": {
+    "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+    "ro.build.version.sdk": "33",
+    "ro.kernel.qemu": "1",
+    "ro.product.cpu.abi": "x86_64"
+  },
+  "expectedTests": 5,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "ownerDocumentProviderTested": false,
+  "ownerGameDataImported": false,
+  "processExitCode": 0,
+  "realLowMemoryKillReproduced": false,
+  "scope": "android13-x64-large-streaming-import-memory-and-exit-history-components",
+  "sources": {
+    "app/src/androidTest/java/io/github/russianranger/esteria/ImportMemoryStressTest.java": {
+      "bytes": 14438,
+      "sha256": "8bf0bc63c272732bf121a15d6a74820187967a775927d7ee8f5edcac405965a2"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/ProcessExitDiagnosticsTest.java": {
+      "bytes": 4165,
+      "sha256": "c08a3465133d27b1a0bea412bdd92f51aadfc98b481c4a5fb32ac1dba3391b02"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/ImportDiagnostics.java": {
+      "bytes": 7750,
+      "sha256": "17eef45823f8817b842e6770d9d6c73d97bc64896075ee730fccaacad4834a7f"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/ProcessExitDiagnostics.java": {
+      "bytes": 6564,
+      "sha256": "157c5c9e69ebc28afc81300aa8dfc4bc3bf90354a9234d32e0139dbe7550964e"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/SafTreeSource.java": {
+      "bytes": 18415,
+      "sha256": "03538456538d24c567d9409246447815a0c2c5575e5f3e7ba2208a17e2886a84"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/SessionService.java": {
+      "bytes": 80605,
+      "sha256": "2064dded460a86bddf7b72d66e801993d3cfd2b245be6da0ff8ec6095595a3c8"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/UriStager.java": {
+      "bytes": 6157,
+      "sha256": "4efc853b2667fd89ce818c5714cd88e02b607d286e9068831a5cc7c79392d756"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/GameDataImporter.java": {
+      "bytes": 53045,
+      "sha256": "a5aa10eb0f4829e0150726b540ed9f00aee385854a8886f179d1da750ecf3aea"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/ZipSafety.java": {
+      "bytes": 5512,
+      "sha256": "8d679d094b47a31a3b434e1d056f0e109757624535097f04330208453321ef25"
+    }
+  },
+  "stdout": {
+    "bytes": 5512,
+    "sha256": "48e8077e3bda8abb220e25c2980451f0f0aba8aed8da22eace9a1fe9ad72b347"
+  },
+  "stressObservations": [
+    {
+      "copiedBytes": 1073743360,
+      "copiedFiles": 10,
+      "elapsedMillis": 10710,
+      "gameplayQualified": false,
+      "initialJavaBytes": 12808832,
+      "initialNativeBytes": 4634544,
+      "initialPssBytes": 35369984,
+      "javaGrowthBytes": 1071432,
+      "nativeGrowthBytes": 64080,
+      "ownerData": false,
+      "payloadBytes": 1073741824,
+      "peakJavaBytes": 13880264,
+      "peakNativeBytes": 4698624,
+      "peakPssBytes": 37791744,
+      "pssGrowthBytes": 2421760,
+      "route": "folder",
+      "samples": 16,
+      "scope": "android13-generated-structural-client-memory-fixture",
+      "sha256": "41f9c660a072eb1c4f528c0cbbac593596e1121ec1ac1d88dbcb1ee53e2d5096",
+      "thorQualified": false
+    },
+    {
+      "copiedBytes": 1073743360,
+      "copiedFiles": 10,
+      "elapsedMillis": 26229,
+      "gameplayQualified": false,
+      "initialJavaBytes": 3387160,
+      "initialNativeBytes": 4699568,
+      "initialPssBytes": 29777920,
+      "javaGrowthBytes": 1230648,
+      "nativeGrowthBytes": 291936,
+      "ownerData": false,
+      "payloadBytes": 1073741824,
+      "peakJavaBytes": 4617808,
+      "peakNativeBytes": 4991504,
+      "peakPssBytes": 30252032,
+      "pssGrowthBytes": 474112,
+      "route": "zip",
+      "samples": 31,
+      "scope": "android13-generated-structural-client-memory-fixture",
+      "sha256": "41f9c660a072eb1c4f528c0cbbac593596e1121ec1ac1d88dbcb1ee53e2d5096",
+      "thorQualified": false
+    },
+    {
+      "documents": 3210,
+      "gameplayQualified": false,
+      "initialJavaBytes": 9441704,
+      "initialNativeBytes": 4645408,
+      "initialPssBytes": 35492864,
+      "javaGrowthBytes": 155712,
+      "nativeGrowthBytes": 408752,
+      "opaqueIdCharacters": 135,
+      "ownerData": false,
+      "peakJavaBytes": 9597416,
+      "peakNativeBytes": 5054160,
+      "peakPssBytes": 38121472,
+      "pssGrowthBytes": 2628608,
+      "route": "opaque-inventory",
+      "samples": 56,
+      "scope": "android13-generated-structural-client-memory-fixture",
+      "sourceQueries": 9639,
+      "thorQualified": false
+    }
+  ],
+  "testClass": "io.github.russianranger.esteria.ImportMemoryStressTest,io.github.russianranger.esteria.ProcessExitDiagnosticsTest",
+  "thorQualified": false
+}

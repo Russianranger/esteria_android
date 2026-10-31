@@ -1,0 +1,100 @@
+{
+  "actualLoggedRunnerHeredocMatchedProducerWorkflow": true,
+  "actualLoggedRunnerSource": {
+    "bytes": 8923,
+    "sha256": "f767d14df20b549af5966cd900fb78801c6cca43d5a922337e647d906e3b0550"
+  },
+  "allArtifactMembersRead": 33,
+  "allNineSourceIdentitiesMatched": true,
+  "appSourceRevision": "4b45fc004ce635ece9dc2e13ebeb5cf5f5f3d908",
+  "artifact": {
+    "bytes": 15972,
+    "sha256": "b6fbd582ab9a63e21219c13e48dae6ac397ca83cad419b101b35d80cf829c0d6"
+  },
+  "artifactId": 13055781447,
+  "componentStdout": {
+    "bytes": 5512,
+    "sha256": "48e8077e3bda8abb220e25c2980451f0f0aba8aed8da22eace9a1fe9ad72b347"
+  },
+  "exitHistoryEvidenceBoundary": "Actual own-package Android history API query and field/classification guards passed; no real low-memory kill generated and no historical death record is attributed to owner import.",
+  "fiveNamedTestSuccessStatusesVerified": true,
+  "folderAndZipPayloadSha256Matched": true,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "jobId": 124640956536,
+  "ownerGameDataImported": false,
+  "runId": 41236388434,
+  "scope": "independent-readback-of-Android13-import-memory-component-evidence",
+  "stressObservations": [
+    {
+      "copiedBytes": 1073743360,
+      "copiedFiles": 10,
+      "elapsedMillis": 10710,
+      "gameplayQualified": false,
+      "initialJavaBytes": 12808832,
+      "initialNativeBytes": 4634544,
+      "initialPssBytes": 35369984,
+      "javaGrowthBytes": 1071432,
+      "nativeGrowthBytes": 64080,
+      "ownerData": false,
+      "payloadBytes": 1073741824,
+      "peakJavaBytes": 13880264,
+      "peakNativeBytes": 4698624,
+      "peakPssBytes": 37791744,
+      "pssGrowthBytes": 2421760,
+      "route": "folder",
+      "samples": 16,
+      "scope": "android13-generated-structural-client-memory-fixture",
+      "sha256": "41f9c660a072eb1c4f528c0cbbac593596e1121ec1ac1d88dbcb1ee53e2d5096",
+      "thorQualified": false
+    },
+    {
+      "copiedBytes": 1073743360,
+      "copiedFiles": 10,
+      "elapsedMillis": 26229,
+      "gameplayQualified": false,
+      "initialJavaBytes": 3387160,
+      "initialNativeBytes": 4699568,
+      "initialPssBytes": 29777920,
+      "javaGrowthBytes": 1230648,
+      "nativeGrowthBytes": 291936,
+      "ownerData": false,
+      "payloadBytes": 1073741824,
+      "peakJavaBytes": 4617808,
+      "peakNativeBytes": 4991504,
+      "peakPssBytes": 30252032,
+      "pssGrowthBytes": 474112,
+      "route": "zip",
+      "samples": 31,
+      "scope": "android13-generated-structural-client-memory-fixture",
+      "sha256": "41f9c660a072eb1c4f528c0cbbac593596e1121ec1ac1d88dbcb1ee53e2d5096",
+      "thorQualified": false
+    },
+    {
+      "documents": 3210,
+      "gameplayQualified": false,
+      "initialJavaBytes": 9441704,
+      "initialNativeBytes": 4645408,
+      "initialPssBytes": 35492864,
+      "javaGrowthBytes": 155712,
+      "nativeGrowthBytes": 408752,
+      "opaqueIdCharacters": 135,
+      "ownerData": false,
+      "peakJavaBytes": 9597416,
+      "peakNativeBytes": 5054160,
+      "peakPssBytes": 38121472,
+      "pssGrowthBytes": 2628608,
+      "route": "opaque-inventory",
+      "samples": 56,
+      "scope": "android13-generated-structural-client-memory-fixture",
+      "sourceQueries": 9639,
+      "thorQualified": false
+    }
+  ],
+  "thorQualified": false,
+  "threeStressObservationsMatched": true,
+  "workflowSource": {
+    "bytes": 14701,
+    "sha256": "5009801c7cf1ee25d7888e943186087445b9e92007c22760df750de27149bdfc"
+  }
+}

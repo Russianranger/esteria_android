@@ -70,6 +70,18 @@ APK SHA-256: `{signed['apkSha256']}`.
 Custom MPQs/races/appearances/HD/Retail/Forever content and bot AI qualification
 are deferred. Generated stock world data and Vulkan shaders remain required.
 '''
+    if signed['versionCode'] == 3:
+        notes += '''
+Version 3 reduces import allocation and retained source metadata, preserves
+version-2 import resume, and stores stock-inspection MPQ tables compactly.
+Android 13 component stress tests imported 1 GiB by folder and ZIP and checked
+3,210 files. These fixtures do not reproduce the owner's Thor low-memory kill.
+
+Install over the existing stock app without uninstalling or clearing data.
+Retry the same client source with its normal Data layout. If Android kills the
+app again, reopen it and export support before another import; the bundle now
+contains sampled import heap values and bounded Android process-exit history.
+'''
     (args.output / 'RELEASE-NOTES.md').write_text(notes)
     return result
 
