@@ -134,7 +134,7 @@ public final class SafImportTest {
             assertEquals("Data/Interface.MPQ", facts.get("import.last.path"));
             assertEquals("failed", facts.get("import.last.result"));
             assertTrue(facts.get("import.last.sourceIdentitySha256").matches("[0-9a-f]{64}"));
-            String saved = Files.readString(receipt);
+            String saved = new String(Files.readAllBytes(receipt), StandardCharsets.UTF_8);
             assertFalse(saved.contains(source)); assertFalse(saved.contains("private-test-value"));
             assertTrue(facts.get("import.last.failure").contains("caused-by=java.lang.SecurityException"));
             assertTrue(facts.get("import.last.failure").contains("suppressed=java.io.IOException"));
