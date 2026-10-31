@@ -1,0 +1,32 @@
+{
+  "actualThorInstallQualified": false,
+  "bytes": 336759229,
+  "formatVersion": 1,
+  "headers": {
+    "Content-Disposition": "attachment; filename=Esteria-Stock-3.3.5a-arm64.apk",
+    "Content-Length": "336759229",
+    "Content-Type": "application/vnd.android.package-archive"
+  },
+  "httpStatus": 200,
+  "manifestAndV2V3SignaturesVerifiedBy": "Android SDK build-tools 35.0.0",
+  "persistentCertificateVerified": true,
+  "previousPublished": {
+    "apkSha256": "8caaeb58ccb658fa6fd13d0c7ba77f43c2285dd487cbbcdcd9503e4bff34823a",
+    "versionCode": 2
+  },
+  "scope": "anonymous-full-public-APK-download-readback",
+  "sha256": "659bae66e2fcadaaad642dd02ba01564ca9724d2a5190cdf1922f4a9258fd9aa",
+  "signedApk": {
+    "apkBytes": 336759229,
+    "apkSha256": "659bae66e2fcadaaad642dd02ba01564ca9724d2a5190cdf1922f4a9258fd9aa",
+    "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+    "debuggable": false,
+    "minSdk": 26,
+    "packageId": "io.github.russianranger.esteria.stock",
+    "targetSdk": 35,
+    "versionCode": 3,
+    "versionName": "0.1.0-non-custom.3"
+  },
+  "signingReceiptMatched": true,
+  "url": "https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.3/Esteria-Stock-3.3.5a-arm64.apk"
+}

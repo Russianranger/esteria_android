@@ -1,0 +1,38 @@
+{
+  "appRevision": "4b45fc004ce635ece9dc2e13ebeb5cf5f5f3d908",
+  "assets": {
+    "Esteria-Stock-3.3.5a-arm64.apk": {
+      "bytes": 336759229,
+      "sha256": "659bae66e2fcadaaad642dd02ba01564ca9724d2a5190cdf1922f4a9258fd9aa"
+    },
+    "NON-CUSTOM-TESTING.md": {
+      "bytes": 5519,
+      "sha256": "9b841e6bd5e3ea7aa8b3437b644dd18b7eb73af18a095b771484086fb51bcdaf"
+    },
+    "SHA256SUMS": {
+      "bytes": 97,
+      "sha256": "751135c4962b3f423d8464290da7abab2d1c6c860803edec06dd0da58d7b92ba"
+    },
+    "publication-evidence.json": {
+      "bytes": 3760,
+      "sha256": "86be9966bb4b10053b88960e3ae70b4677876b44d963557242a0299b6382c84c"
+    },
+    "release.json": {
+      "bytes": 2532,
+      "sha256": "3755a48aea606ae267870b3de8f51c9dca7e5b1de6bdaa75310b0a6958980118"
+    },
+    "signing-receipt.json": {
+      "bytes": 1050,
+      "sha256": "d77fe8940dd1667343ada7dd35bbcae27126012cf44dc0426aec454bed7bb38e"
+    }
+  },
+  "formatVersion": 1,
+  "publisherJobId": 124646006651,
+  "publisherNeverOverwrites": true,
+  "publisherRevision": "2b3b1d867e2ed297a6b063e1e3352dc15f083a27",
+  "publisherRunId": 41238092829,
+  "releaseId": 430162393,
+  "scope": "additive-detached-stock-apk-prerelease",
+  "tag": "non-custom-v0.1.0-non-custom.3",
+  "url": "https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.3"
+}

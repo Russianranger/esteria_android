@@ -1,0 +1,62 @@
+{
+  "appRevision": "4b45fc004ce635ece9dc2e13ebeb5cf5f5f3d908",
+  "exactVersionTwoBaselineVerified": true,
+  "files": {
+    "NON-CUSTOM-TESTING.md": {
+      "anonymousHttp200": true,
+      "assetId": 696383659,
+      "bytes": 5519,
+      "sha256": "9b841e6bd5e3ea7aa8b3437b644dd18b7eb73af18a095b771484086fb51bcdaf",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.3/NON-CUSTOM-TESTING.md"
+    },
+    "SHA256SUMS": {
+      "anonymousHttp200": true,
+      "assetId": 696383599,
+      "bytes": 97,
+      "sha256": "751135c4962b3f423d8464290da7abab2d1c6c860803edec06dd0da58d7b92ba",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.3/SHA256SUMS"
+    },
+    "publication-evidence.json": {
+      "anonymousHttp200": true,
+      "assetId": 696383639,
+      "bytes": 3760,
+      "sha256": "86be9966bb4b10053b88960e3ae70b4677876b44d963557242a0299b6382c84c",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.3/publication-evidence.json"
+    },
+    "release.json": {
+      "anonymousHttp200": true,
+      "assetId": 696383611,
+      "bytes": 2532,
+      "sha256": "3755a48aea606ae267870b3de8f51c9dca7e5b1de6bdaa75310b0a6958980118",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.3/release.json"
+    },
+    "signing-receipt.json": {
+      "anonymousHttp200": true,
+      "assetId": 696383624,
+      "bytes": 1050,
+      "sha256": "d77fe8940dd1667343ada7dd35bbcae27126012cf44dc0426aec454bed7bb38e",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.3/signing-receipt.json"
+    }
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "publicApkDownloadPerformed": false,
+  "publicMetadataExactlyMatchesCiArtifact": true,
+  "publisherArtifact": {
+    "bytes": 4586,
+    "id": 13056132720,
+    "sha256": "0ddac1703212e727e0ef1cf71bf3fbc53c1c747b7fea396d9ddc21b92fd25315"
+  },
+  "publisherDecodedJobLog": {
+    "bytes": 37421,
+    "sha256": "9434512da89e0cb33f7388dbc99749b70d72937160956ec52aaf859d250b04a2"
+  },
+  "publisherJobId": 124646006651,
+  "publisherRevision": "2b3b1d867e2ed297a6b063e1e3352dc15f083a27",
+  "publisherRunId": 41238092829,
+  "publisherSourceArtifactSdkAndPayloadProofVerified": true,
+  "releaseId": 430162393,
+  "releaseUrl": "https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.3",
+  "samePersistentCertificateVerified": true,
+  "scope": "anonymous-public-stock-v3-small-release-assets-and-publisher-evidence-readback"
+}
