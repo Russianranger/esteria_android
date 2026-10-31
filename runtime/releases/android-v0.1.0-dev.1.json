@@ -1,0 +1,65 @@
+{
+  "formatVersion": 1,
+  "scope": "first-signed-Thor-content-and-device-test-candidate-publication",
+  "releaseId": 429624537,
+  "tag": "android-v0.1.0-dev.1",
+  "releaseUrl": "https://github.com/Russianranger/esteria_android/releases/tag/android-v0.1.0-dev.1",
+  "tagCommit": "8c1e63d43ee0b552d796b862a2c1b1c146a0a7c4",
+  "publishedAt": "2026-10-31T00:51:30Z",
+  "prerelease": true,
+  "applicationRevision": "8c1e63d43ee0b552d796b862a2c1b1c146a0a7c4",
+  "clientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
+  "buildRun": 41149985842,
+  "assets": [
+    {
+      "id": 693914728,
+      "name": "build-manifest.json",
+      "bytes": 16885,
+      "sha256": "4e0f79ef97d6497a91c632dbd301ff216e0799fdc4d1f7d4c00c9eee044e5422",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/android-v0.1.0-dev.1/build-manifest.json",
+      "state": "uploaded"
+    },
+    {
+      "id": 693914501,
+      "name": "Esteria-Android-0.1.0-dev1-8c1e63d-arm64.apk",
+      "bytes": 336697265,
+      "sha256": "8b953bc5e959a4feb716abed3ff7083ee85a2fdedafa44105fc1caeef2e25baa",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/android-v0.1.0-dev.1/Esteria-Android-0.1.0-dev1-8c1e63d-arm64.apk",
+      "state": "uploaded"
+    },
+    {
+      "id": 693914733,
+      "name": "SHA256SUMS",
+      "bytes": 286,
+      "sha256": "cba7508fe59aed5f8c72efeef70ab9a1cf031df112140251a237ef134bb16142",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/android-v0.1.0-dev.1/SHA256SUMS",
+      "state": "uploaded"
+    },
+    {
+      "id": 693914726,
+      "name": "THOR-TEST-CANDIDATE.md",
+      "bytes": 4621,
+      "sha256": "691d1897e21425489bfc7ccea70a297f79a6dec9c8d3ac17c4852610dee4c11b",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/android-v0.1.0-dev.1/THOR-TEST-CANDIDATE.md",
+      "state": "uploaded"
+    }
+  ],
+  "allFourPublishedAssetDigestsMatchLocalFiles": true,
+  "persistentCertificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+  "signingReceipt": "runtime/evidence/android-v0.1.0-dev.1-signing.json",
+  "downloadCheck": {
+    "method": "HEAD with redirects",
+    "status": 200,
+    "contentLength": 336697265,
+    "filename": "Esteria-Android-0.1.0-dev1-8c1e63d-arm64.apk",
+    "fullPublicApkBodyReadHere": false
+  },
+  "thorTestRequestedByDelivery": true,
+  "actualAndroidArm64SessionQualified": false,
+  "worldEntryQualified": false,
+  "characterGameplayPersistenceQualified": false,
+  "playerbotsAiQualified": false,
+  "gameplayQualified": false,
+  "customEsteriaContentQualified": false
+}

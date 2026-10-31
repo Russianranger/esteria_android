@@ -30,58 +30,44 @@ Large source/build artifacts are fully verified in CI; label local-read boundari
 
 ## Immediate execution
 
-1. Original full x64 build41119182502/job124281186151 succeeded22:19:16UTC.
-  1850/1850 original dbimport objects and real52-statement helper link; actual
-  ELF62/debug/22library-source metadata is in x64-server-setup-build-817cbc proof.
-  Small51,701B evidence read locally;868,530,955B complete artifact remains
-  local-unread and requires full CI source/byte admission before execution.
-2. Actual native x64 SQL41139757153/job124350948175@7d4 passes in245s:
-   original core/helper,52statements,29base31updates/30bot tables, reentry,
-   four-schema preservation, same-instance restart/probe cleanup/clean stop.
-   Exact rawqualification19483B/readback27894B and58Git/eightsource-profile pins
-   are preserved in runtime/evidence/x64-server-setup-sql-7d4b1cf-*.
-3. Actual provider measurement41141559961/job124356842748@fff211 passes; six
-   small receipts plus82P/current-code identities,207product/175source metadata,
-   canonicalP Git tar and14captured DSO/six original-debug bindings independently
-   checked. Descriptor26368B SHA666e7589d50175510070afe78e5a9af4aa7895928bd97b546370604e246c2359.
-   Complete artifact13019200327 is1,969,017,146B and NOT read locally; full CI
-   source/product readback and mandatory downstream acquisition remain explicit.
-   Actual995 and c441 Android runs pass full admission/build/install but fail
-   before SQL. c441's improved collector isolates InstallationX64Inputs:139:
-   parsed Integer byte counts compare unequal to identical generated Long counts.
-   ServerSourceSelection now normalizes only exact Integer/Long values, retaining
-   hash/count/type/overflow distinctions. Real JSON-java parser regression and
-   actual Android-parser assertions are added; native Java runs the same check.
-   Fresh P651 measurement41148040884/job124377702411 now passes. All82 code
-   pins/canonical12,288,000B P tar and207product/175source metadata entries were
-   independently checked. Descriptor SHA909b0dcd00c24289cf2bf59e1a36b075885cec62de008fc1cbb47e37eeb5c573.
-   Small artifact13022340157 is207104B, fully read locally; complete product
-   13022260387 is1,969,319,740B, full CI readback but NOT downloaded locally.
-   Exact measured651 selectors are enabled. Run fresh Android SQL next; retain
-   the actual parser check before setup and all failure diagnostics. Original
-   native SQL/runtime/ELF bytes are unchanged; do not transfer oldfff caller
-   proof or rebuild original1850-object tools. Native Java41148040872 and full
-   APK41148040843@651 were also launched. The full debug APK now passes: raw
-   337,032,998B SHA187e07c2bd654005de47775adc01b7c91f42e300b87601b4dec5c26b5b5f2b22;
-   all1114Git/30PRoot/15ARM64objects independently checked, wholeAPK CI-only.
-   Native Java also succeeds:63exact inputs/192classes, actual SQL/promotion/
-   restart and the real parser regression before setup. The updated full-profile
-   workflow now builds and separately verifies an unsigned non-debuggable
-   release APK after preserving debug/source artifacts. Inspect its actual CI
-   release result before persistent signing; the signer refuses debuggable
-   distribution and no key operation runs in CI.
-4. Android input-widget41138732113@50123a9 passes eight required groups and
-   optional real registered-device ranges/camera/EOF cleanup. Preserve its actual
-   proof and earlier1180 toolbar/IME-window failure. Kernel/physical delivery,
-   production panel session, Wine/X11/ARM64/gameplay are still false. No rerun of
-   the green component is needed without a relevant change.
-5. Effective locale now reaches client471 through its fixed owned RunOnce
-   companion; Config.wtf and other settings stay untouched. Focused real-file
-   tests and Java/lint pass. Actual CommonMain/Wine consumption remains open.
-6. Continue real data/gameplay gates below; do not request a basic Thor startup test.
-   The additional stock-server-minimum source audit found no demonstrated global
-   custom-asset boot requirement. Complete original12340 Data/one locale remains
-   the practical first input; this is no world-startup execution evidence.
+The first signed candidate is published and its download/digests verified:
+https://github.com/Russianranger/esteria_android/releases/tag/android-v0.1.0-dev.1
+Tag points exactly to8c1e63d43ee0b552d796b862a2c1b1c146a0a7c4/build41149985842.
+One APK336,697,265B SHA8b953bc5e959a4feb716abed3ff7083ee85a2fdedafa44105fc1caeef2e25baa;
+packageio.github.russianranger.esteria/versionCode1/persistent certificate5e6921a0….
+All4public asset digests and HTTP200 APK filename/length match. Preserve assets/tag.
+
+1. Use THOR-TEST-CANDIDATE.md as the one consolidated content/Thor procedure.
+   Complete original12340 Data/one locale and Wow.exe is the practical first
+   input. Import/setup are in-app; no manual database administration. Main
+   world/gameplay, actual AndroidARM64 session, physical input/audio, character
+   saves, botAI, combined resources and offline behavior await this test. Keep
+   full custom Esteria inputs/features active and separately unqualified.
+2. Actual Android13x64 four-schema41148736592@1d181/P651 PASSES all13 flags:
+   30bot tables/31updates, promotion, reseed refusal, same-instance/private-state
+   preservation and two clean stops.952.488s instrumentation, real Android JSON
+   parser regression. Exact1122 Q files/82P/Q pins independently checked.
+   Raw304228B071bf175… and compact15481B287995ad… are retained. No hardware/
+   auth/world/character/AI proof transfers from this typed x64 fixture.
+3. Native ARM64 Java41148040872@651 PASSES actual SQL/promotion/restart with
+   63exact Git inputs/192classes and parser regression before setup. Full debug
+   APK651 and full8provider nondebug release8c both pass. Original source/debug
+   companions and bounded/local-versus-CI read boundaries are preserved.
+4. Release signing uses the existing external key; public lock now records
+   baseline1. Future signed updates require a higher workflow_dispatch
+   build_version_code and the previous published APK/certificate/hash. Never
+   regenerate the key or use qualification-only signing for distribution.
+   Private key/password files stay outside Git and CI; no private data shipped.
+5. Resume from the returned support bundle or real available content. Begin
+   with one same-account Human Warrior alt; random population is OFF/max4.
+   Do not mark normal world entry or custom appearances qualified from source
+   audits, SQL receipts or compiled APKs. This final metadata checkpoint changes
+   no runtime code or payload; the immutable delivered build remains8c.
+
+Historical original x64 build41119182502, native x64 SQL41139757153 and measured
+providersfff/651 remain preserved. Current651 descriptor SHA909b0dcd00c24289cf2bf59e1a36b075885cec62de008fc1cbb47e37eeb5c573;
+complete1,969,319,740B product13022260387 is CI-read/local-metadata-only. Do not
+rebuild original1850-object tools or transfer old caller proof to changed code.
 
 ## Completed evidence to preserve
 

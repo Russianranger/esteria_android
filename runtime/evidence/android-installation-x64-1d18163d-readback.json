@@ -1,0 +1,427 @@
+{
+  "acquisitionReceiptIdentity": {
+    "bytes": 272000,
+    "sha256": "bfcbef6d7b16afb972d3d0da8fe29feecf56de5d511a7986ca54215093df5cc1"
+  },
+  "actualAndroidJsonIntegerParserRegressionExecuted": true,
+  "actualAppQualification": {
+    "abi": "x86_64",
+    "activeFreshInitializationRefused": true,
+    "actualCoreAccountRealmAndBotSqlPreserved": true,
+    "actualFourSchemaSqlExecuted": true,
+    "androidBionicProotLocatorExecuted": true,
+    "androidJavaCoordinatorExecuted": true,
+    "api": 33,
+    "authserverExecuted": false,
+    "characterPersistenceQualified": false,
+    "completedSelectionReadBack": true,
+    "contentReceiptSha256": "1c00990e090e85af0232fe633b64e2718071a5f8e81f3b0ca1c8f2b214ffb3af",
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "mysqlUuid": "79c609cd-d4c0-11f1-9954-aa8cbc0c05f5",
+    "mysqlVersion": "8.0.46-0ubuntu0.24.04.4",
+    "ordinaryNativeOwnerExecuted": true,
+    "phase": "complete",
+    "playerbotsAiQualified": false,
+    "playerbotsTableCount": 30,
+    "playerbotsUpdateCount": 31,
+    "privateJournalsAndCredentialsPreserved": true,
+    "productionArm64ProviderQualified": false,
+    "programsArchiveSha256": "ca3675ba320b5bae482db6f385604a50f84277faaa7b0b6159c749fc9ca87ed1",
+    "providerSha256": "909b0dcd00c24289cf2bf59e1a36b075885cec62de008fc1cbb47e37eeb5c573",
+    "qualificationSucceeded": true,
+    "restartedSameLiveSqlUuid": true,
+    "runtimeArchiveSha256": "159c75f03fd851796f261688fec7a02f8fe1fec8cebb5701c2504bdb2304413f",
+    "scope": "android13-x64-owned-four-schema-installation-and-restart",
+    "serverDataQualified": false,
+    "slotPromoted": true,
+    "sourceBoundGuestHelpersExecuted": true,
+    "sourceLockSha256": "5f72e02c89a265acb64c64a8743953926faa5b76b50c9b146846f17063be80c1",
+    "sourceRevision": "1d18163df7e550c94d75eb33303afe9cdeef8671",
+    "thorQualified": false,
+    "twoCleanDatabaseStopsVerified": true,
+    "worldserverExecuted": false
+  },
+  "actualInstrumentationPassed": true,
+  "allActivationSourceGitBlobsReadLocally": true,
+  "allActivationSourceModesAndSha256Verified": true,
+  "allSmallArtifactZipBytesReadBack": true,
+  "androidX64CoordinatorQualified": true,
+  "apkAndCurrentSourceArtifactDownloadedLocally": false,
+  "artifacts": {
+    "android-x64-installation-coordinator-evidence-1d18163df7e550c94d75eb33303afe9cdeef8671": {
+      "bytes": 256511,
+      "id": 13022617253,
+      "sha256": "1a2384d4154c954d803ba1a8f82358bb4834163d0cf8a54c253ff439c42270ad"
+    },
+    "android-x64-installation-execution-selection-1d18163df7e550c94d75eb33303afe9cdeef8671": {
+      "bytes": 555,
+      "id": 13022405781,
+      "sha256": "6044e1488d55039b60e3ad1cd441bdd7060dd3f3b8e943083cf43efc5db7ce31"
+    },
+    "measured-android-x64-installation-provider-original-sources-1d18163df7e550c94d75eb33303afe9cdeef8671": {
+      "bytes": 1777738132,
+      "id": 13022816936,
+      "sha256": "d09dbdfacf2029e131ec9d2a186068c9b200ed69092e7475af799f3439ef2e9a"
+    },
+    "unqualified-android-x64-installation-apks-and-activation-source-1d18163df7e550c94d75eb33303afe9cdeef8671": {
+      "bytes": 298103059,
+      "id": 13022607546,
+      "sha256": "8be580551e98beb0dee1f38dfdd4e70d6385464e530b7585e4a62f92b1276aca"
+    }
+  },
+  "authserverExecuted": false,
+  "canonicalActivationSourceArchiveStreamReadLocally": {
+    "bytes": 2836204,
+    "sha256": "8e9851883589b41bf55065336997edf45e4f4699da70c4c564f84d3d8b8ceea1"
+  },
+  "characterPersistenceQualified": false,
+  "commandResults": [
+    {
+      "elapsedMilliseconds": 3,
+      "exitCode": 0,
+      "role": "serial"
+    },
+    {
+      "elapsedMilliseconds": 33,
+      "exitCode": 0,
+      "role": "ro.kernel.qemu"
+    },
+    {
+      "elapsedMilliseconds": 66,
+      "exitCode": 0,
+      "role": "ro.build.version.sdk"
+    },
+    {
+      "elapsedMilliseconds": 32,
+      "exitCode": 0,
+      "role": "ro.product.cpu.abi"
+    },
+    {
+      "elapsedMilliseconds": 32,
+      "exitCode": 0,
+      "role": "ro.build.fingerprint"
+    },
+    {
+      "elapsedMilliseconds": 67,
+      "exitCode": 1,
+      "role": "preexisting-app"
+    },
+    {
+      "elapsedMilliseconds": 65,
+      "exitCode": 1,
+      "role": "preexisting-tests"
+    },
+    {
+      "elapsedMilliseconds": 4833,
+      "exitCode": 0,
+      "role": "install-app"
+    },
+    {
+      "elapsedMilliseconds": 566,
+      "exitCode": 0,
+      "role": "install-tests"
+    },
+    {
+      "elapsedMilliseconds": 952488,
+      "exitCode": 0,
+      "role": "instrument"
+    },
+    {
+      "elapsedMilliseconds": 64,
+      "exitCode": 0,
+      "role": "receipt"
+    },
+    {
+      "elapsedMilliseconds": 64,
+      "exitCode": 0,
+      "role": "stop-owned-fixture"
+    }
+  ],
+  "completeProductDownloadedLocally": false,
+  "emulatorProperties": {
+    "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+    "ro.build.version.sdk": "33",
+    "ro.kernel.qemu": "1",
+    "ro.product.cpu.abi": "x86_64"
+  },
+  "everySmallArtifactMemberCrcAndSha256Verified": true,
+  "formatVersion": 1,
+  "freshDisposableEmulatorAdmissionPassedInCi": true,
+  "gameplayQualified": false,
+  "historicalJavaServiceEvidenceAppliesToCurrentCaller": false,
+  "jobs": [
+    {
+      "completedAt": "2026-10-31T00:11:04Z",
+      "conclusion": "success",
+      "id": 124379899130,
+      "name": "selection",
+      "startedAt": "2026-10-31T00:10:55Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-31T00:10:57Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "startedAt": "2026-10-31T00:10:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:10:58Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "startedAt": "2026-10-31T00:10:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:10:58Z",
+          "conclusion": "success",
+          "name": "Resolve private selection paths on the assigned runner",
+          "startedAt": "2026-10-31T00:10:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:10:59Z",
+          "conclusion": "success",
+          "name": "Admit both measured provider and complete artifact transport before downloads",
+          "startedAt": "2026-10-31T00:10:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:11:01Z",
+          "conclusion": "success",
+          "name": "Check source admission, receipt validation and default-off execution boundaries",
+          "startedAt": "2026-10-31T00:10:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:11:02Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "startedAt": "2026-10-31T00:11:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:11:02Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "startedAt": "2026-10-31T00:11:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:11:02Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "startedAt": "2026-10-31T00:11:02Z",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "completedAt": "2026-10-31T00:32:48Z",
+      "conclusion": "success",
+      "id": 124379964392,
+      "name": "qualify",
+      "startedAt": "2026-10-31T00:11:07Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-31T00:11:09Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "startedAt": "2026-10-31T00:11:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:11:11Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "startedAt": "2026-10-31T00:11:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:11:11Z",
+          "conclusion": "success",
+          "name": "Resolve private qualification paths on the assigned runner",
+          "startedAt": "2026-10-31T00:11:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:11:12Z",
+          "conclusion": "success",
+          "name": "Admit the exact frozen consumer outside the clean activation checkout",
+          "startedAt": "2026-10-31T00:11:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:12:04Z",
+          "conclusion": "success",
+          "name": "Read every independently measured provider and original source artifact byte",
+          "startedAt": "2026-10-31T00:11:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:12:08Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+          "startedAt": "2026-10-31T00:12:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:12:32Z",
+          "conclusion": "success",
+          "name": "Install the pinned Android SDK and native owner toolchain",
+          "startedAt": "2026-10-31T00:12:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:14:07Z",
+          "conclusion": "success",
+          "name": "Build only the measured x64 coordinator fixture from exact activation source Q",
+          "startedAt": "2026-10-31T00:12:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:14:07Z",
+          "conclusion": "success",
+          "name": "Export complete source Q separately from the measured provider producer P",
+          "startedAt": "2026-10-31T00:14:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:14:07Z",
+          "conclusion": "success",
+          "name": "Enable KVM for the disposable x64 emulator",
+          "startedAt": "2026-10-31T00:14:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:32:31Z",
+          "conclusion": "success",
+          "name": "Execute the actual retained coordinator, four schemas, promotion and same-instance restart",
+          "startedAt": "2026-10-31T00:14:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:32:32Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "startedAt": "2026-10-31T00:32:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:32:35Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "startedAt": "2026-10-31T00:32:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:32:44Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "startedAt": "2026-10-31T00:32:35Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:32:45Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+          "startedAt": "2026-10-31T00:32:44Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:32:45Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "startedAt": "2026-10-31T00:32:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-31T00:32:45Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "startedAt": "2026-10-31T00:32:45Z",
+          "status": "completed"
+        }
+      ]
+    }
+  ],
+  "materialLimitations": [
+    "SQL/setup component qualification on an Android13 x64 emulator; production ARM64/Thor execution is unqualified.",
+    "No authserver, worldserver, game content, playable character persistence or playerbot AI execution.",
+    "Initial instrumentation including setup and readback took952.488seconds; no Thor thermal, memory or gameplay performance measurement."
+  ],
+  "nativeSqlReceipt": {
+    "bytes": 19483,
+    "sha256": "44448b43339efeaf6dad1421261c74c9fceab979779d1c70ae8a063907b76fed"
+  },
+  "originalLargeSourcesDownloadedLocally": false,
+  "originalRecipePAndCurrentActivationCodeBoundSeparately": true,
+  "originalSourcesPreservedInSuccessfulCiArtifact": true,
+  "playerbotsAiQualified": false,
+  "productionArm64ProviderQualified": false,
+  "providerAndOriginalSourcesFullyAcquiredAndReadBackInCi": true,
+  "providerDescriptor": {
+    "bytes": 26368,
+    "sha256": "909b0dcd00c24289cf2bf59e1a36b075885cec62de008fc1cbb47e37eeb5c573"
+  },
+  "providerMeasurementRevision": "651cd493c1dee9436c6fc98da0d6b4485ff19900",
+  "qualification": {
+    "bytes": 304228,
+    "path": "runtime/evidence/android-installation-x64-1d18163d-qualification.json",
+    "sha256": "071bf17507913342bc8d16010942e6603b84fb19f19d6ab163d36efe2f91a9f5"
+  },
+  "rawMembers": {
+    "evidence/qualification.json": {
+      "bytes": 304228,
+      "sha256": "071bf17507913342bc8d16010942e6603b84fb19f19d6ab163d36efe2f91a9f5"
+    },
+    "evidence/source-companion.json": {
+      "bytes": 285731,
+      "sha256": "b7f9ba263c02a1c844d00fdb3ff3377ec49374ea8c5f7a06580306fc84f8d49a"
+    },
+    "inputs/acquisition.json": {
+      "bytes": 272000,
+      "sha256": "bfcbef6d7b16afb972d3d0da8fe29feecf56de5d511a7986ca54215093df5cc1"
+    }
+  },
+  "scope": "independent-actual-android13-x64-four-schema-installation-and-restart-readback",
+  "serverDataQualified": false,
+  "sourceCompanionIdentity": {
+    "bytes": 285731,
+    "sha256": "b7f9ba263c02a1c844d00fdb3ff3377ec49374ea8c5f7a06580306fc84f8d49a"
+  },
+  "sourceFileBytes": 11566217,
+  "sourceFiles": 1122,
+  "sourceRecipeGitAndQCodeFilesVerified": 82,
+  "sourceRevision": "1d18163df7e550c94d75eb33303afe9cdeef8671",
+  "strictActualAndroidPositiveReceiptValidatorPassed": true,
+  "thorQualified": false,
+  "verifiedApksInCi": {
+    "apk": {
+      "bytes": 293177645,
+      "sha256": "ba92934c2fd0358c8b657f03d8912c3d363f17bda916dbed837b1d6884055283"
+    },
+    "apkBuiltForActivationRevision": "1d18163df7e550c94d75eb33303afe9cdeef8671",
+    "compiledProviderSha256": "909b0dcd00c24289cf2bf59e1a36b075885cec62de008fc1cbb47e37eeb5c573",
+    "currentDatabaseHelperBytesVerified": true,
+    "defaultPackageVerified": true,
+    "exactSelectedAssetsVerified": true,
+    "fixedTestClassVerified": true,
+    "targetSdk": 35,
+    "testApk": {
+      "bytes": 1802945,
+      "sha256": "3de8be11a3740ad332fbe6b3196a7325c00a20bcf851de57d63d19910c7693a1"
+    }
+  },
+  "workflow": {
+    "conclusion": "success",
+    "headSha": "1d18163df7e550c94d75eb33303afe9cdeef8671",
+    "htmlUrl": "https://github.com/Russianranger/esteria_android/actions/runs/41148736592",
+    "id": 41148736592,
+    "job": 124379964392,
+    "status": "completed"
+  },
+  "worldserverExecuted": false
+}

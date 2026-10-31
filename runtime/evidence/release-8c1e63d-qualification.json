@@ -1,0 +1,32 @@
+{
+  "androidExecutionQualified": false,
+  "apk": {
+    "bytes": 336686745,
+    "sha256": "3d1cef952e4855d0aae3ed962ed028646953ec43e0263b26a4a33b34cecff006"
+  },
+  "commonMainQualified": false,
+  "completeProviderAndSourceBytesVerified": true,
+  "debugReferenceArtifactRetainedSeparately": true,
+  "deviceTestCandidate": false,
+  "formatVersion": 1,
+  "gameLoginQualified": false,
+  "gameplayQualified": false,
+  "hardwareQualified": false,
+  "integrationRevision": "8c1e63d43ee0b552d796b862a2c1b1c146a0a7c4",
+  "localWorldReadinessQualified": false,
+  "manifest": {
+    "debuggable": false,
+    "minSdk": 26,
+    "packageId": "io.github.russianranger.esteria",
+    "targetSdk": 35,
+    "versionCode": 1,
+    "versionName": "0.1.0-dev"
+  },
+  "persistentSigningQualified": false,
+  "playerbotsAiQualified": false,
+  "privateSigningPerformed": false,
+  "releaseInstallationQualified": false,
+  "scope": "unsigned-nondebug-local-game-profile-release-packaging-only",
+  "sourceAndPairedDebugCompanionsRetainedSeparately": true,
+  "unsignedSignatureStructureVerified": true
+}

@@ -4,6 +4,12 @@ A local client/server application for AYN Thor Max, in active bring-up. Target: 
 
 **No playable Android package is qualified yet.** Complete runtime APKs build, and service, import, controls and recovery components have separate host/emulator evidence. Normal game startup and world gameplay still require qualification with imported data. Current source pins and validation evidence are in [STATUS.md](STATUS.md).
 
+The signed [0.1.0-dev.1 Thor test candidate](https://github.com/Russianranger/esteria_android/releases/tag/android-v0.1.0-dev.1)
+bundles the complete local runtime. Import your own build12340 client files and
+follow [one consolidated procedure](THOR-TEST-CANDIDATE.md). Native ARM64 SQL,
+Android13 x64 setup/restart and release/signature checks pass; actual Thor world
+play and unavailable custom features remain unqualified.
+
 - [Implementation plan](ANDROID-PORT-PLAN.md)
 - [Build instructions](BUILDING.md)
 - [Asset inventory](ASSET-REQUIREMENTS.md)

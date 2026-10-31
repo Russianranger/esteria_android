@@ -17,6 +17,18 @@ provider/ABI profile requires a clean app build. After
 assembly, verify every selected provider against the final APK, including stored
 archive bytes, original metadata/notices and exact source companions.
 
+## Latest Android SQL gate
+
+Actual run41148736592 at1d181/P651 executes the retained Java coordinator and
+source-bound original tools through Android13 x64 Bionic PRoot. All13 positive
+flags pass: four schemas,30bot tables/31updates, promotion, reseed refusal, same
+UUID persistent restart, preserved SQL/journals/credentials and two clean stops.
+Instrumentation takes952.488s and first checks Android's real Integer/Long JSON
+parser regression. Independent readback validates all1122 Q source files and
+82 P/Q code pins. See runtime/evidence/android-installation-x64-1d18163d-*.
+This typed x64 fixture does not qualify Android ARM64, auth/world execution,
+character saves, bot AI or gameplay. Historical rows retain their source scopes.
+
 ## Actual evidence boundaries
 
 | Gate | Actual result | Does not establish |
@@ -55,7 +67,7 @@ alone do not qualify Android behavior.
 
 Initial partial baseline journals still refuse replay. The staged fresh-installation coordinator retains all bootstrap/guest/database
 and workspace owners through errors; three Java timeout/retry tests and strict17-
-helper APK readback pass. Actual Android SQL and complete promotion remain open; never erase/reinitialize an active or
+helper APK readback pass. The latest typed Android x64 gate above now passes SQL and promotion; never erase/reinitialize an active or
 legacy database to make a test pass. Never claim clean saving after forced stop.
 
 ## Shutdown and Android API regression checks

@@ -1,0 +1,349 @@
+{
+  "allExpectedAssetBytesVerified": true,
+  "allProviderAndCorrespondingSourceBytesReadBack": true,
+  "androidExecutionQualified": false,
+  "apk": {
+    "bytes": 336686745,
+    "sha256": "3d1cef952e4855d0aae3ed962ed028646953ec43e0263b26a4a33b34cecff006"
+  },
+  "assets": 17,
+  "assetsQualified": false,
+  "cohortRecipe": "4d27ba80aed0669bdbe15871ad5ddb59c14b3a39",
+  "cohortTag": "deps-wine-cohort-471ee42f-c0e13ed15a69",
+  "commonMainQualified": false,
+  "completeAssetInventoryVerified": true,
+  "completeWineSourceReadBackHere": false,
+  "composedDataToolsIncluded": true,
+  "debugAndSourceCompanionsKeptOutsideApk": true,
+  "deviceTestCandidate": false,
+  "exactCurrentHelperClosureVerified": true,
+  "formatVersion": 1,
+  "gameLoginQualified": false,
+  "gameplayQualified": false,
+  "hardwareQualified": false,
+  "localGameRuntimeExecutionQualified": false,
+  "localWorldReadinessQualified": false,
+  "ndkNotices": {
+    "LLVM-RUNTIME-NOTICE.txt": {
+      "bytes": 130424,
+      "sha256": "f96f763beb66a7ba7a667647fc64c0226ace875e590c831fdd9579ec1c1d91e1"
+    },
+    "NDK-28.2.13676358-NOTICE.txt": {
+      "bytes": 516438,
+      "sha256": "faf0dc52cf6ce9ab09a04b0c074a378dd2565ee1ed9bc1179d83793bcdba012e"
+    },
+    "NDK-SYSROOT-NOTICE.txt": {
+      "bytes": 494921,
+      "sha256": "2905ac5c59628352af990c748a8f4c3675a04f36eca7914612e3068661d2c6a6"
+    }
+  },
+  "persistentSigningQualified": false,
+  "playerbotsAiQualified": false,
+  "playerbotsSchemaHelperIncluded": true,
+  "proot": {
+    "androidBridgeBuilt": true,
+    "androidBridgeExecuted": false,
+    "androidRuntimeQualified": false,
+    "apkBytesVerified": true,
+    "payloads": {
+      "libproot-loader.so": "614591192bb34c98cc6cef528fb74ecfc1c97d0fabf4e352df1f16873c71d447",
+      "libproot.so": "46dcafabc77b386a7127f6cb7c71bdac03c372ff6bb4db0e1e9493ee29332adb"
+    },
+    "sourceBuiltJniBridges": {
+      "libesteria-presentation.so": {
+        "bytes": 6600,
+        "elf": {
+          "executableStack": false,
+          "machine": "AArch64",
+          "minimumLoadAlignment": 16384,
+          "needed": [
+            "libandroid.so",
+            "libc.so",
+            "libdl.so",
+            "libm.so"
+          ],
+          "soname": "libesteria-presentation.so",
+          "type": "DYN"
+        },
+        "sha256": "142d486ad42dc3f2ed4748e2e63f58a2f11dad7f060fef0d5f78b9fdde4b5de3"
+      },
+      "libesteria_process.so": {
+        "bytes": 410104,
+        "elf": {
+          "executableStack": false,
+          "machine": "AArch64",
+          "minimumLoadAlignment": 16384,
+          "needed": [
+            "libc.so",
+            "libdl.so",
+            "libm.so"
+          ],
+          "soname": "libesteria_process.so",
+          "type": "DYN"
+        },
+        "sha256": "6ce12719b8d0b7f381ca84a3df6c01995f1ecaa403561472ca39d052622e9efc"
+      }
+    }
+  },
+  "prootCorrespondingSources": {
+    "archive": {
+      "bytes": 1147818,
+      "sha256": "b581671df5781ee88d247ab8c1e1be433fd527e9bc6f3d06a5547312a4da4729"
+    },
+    "files": {
+      "build-evidence.json": {
+        "bytes": 2099,
+        "sha256": "14d09032d6b44bbd4f58956861375c35721b46e286dfde1b0c2c3803842507f8"
+      },
+      "esteria/LICENSE": {
+        "bytes": 35149,
+        "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+      },
+      "esteria/runtime/proot/FTA-MIT-LICENSE.txt": {
+        "bytes": 1070,
+        "sha256": "f9c4b27004805765d801d72b2d97dcfea8c05b4d5675d65545164090914ae354"
+      },
+      "esteria/runtime/proot/README.md": {
+        "bytes": 5186,
+        "sha256": "b5ca3648b71b08f26cf2d92d592c9ce54aeec06552536bf40b378b32dd491e1f"
+      },
+      "esteria/runtime/proot/ownership_fixture.c": {
+        "bytes": 1026,
+        "sha256": "040b6d5f288e55666a3bd155fecbb17061132e6227160870ee0c4cd497b7c0ea"
+      },
+      "esteria/runtime/proot/proot-exitkill.patch": {
+        "bytes": 515,
+        "sha256": "509160bd6ec3663d525fa0e795a7bb45b8ccc283a6de8e1398e8cd6624fe86de"
+      },
+      "esteria/runtime/proot/sources.lock.json": {
+        "bytes": 1970,
+        "sha256": "d4383760217a5b71a4a28cd02d6fc354b5876ca9e21e1db0fe1c733564a58bf2"
+      },
+      "esteria/tools/android_elf.py": {
+        "bytes": 3738,
+        "sha256": "3d85699c1e66cfbd4c012045848dcf925a73656fe356dee43fb2de4cccdac136"
+      },
+      "esteria/tools/build_android_proot.py": {
+        "bytes": 12917,
+        "sha256": "80d460817977a7df0f11cc188c568633fa03a0cd6e7948e395e02995bee9832a"
+      },
+      "esteria/tools/prepare_runtime.py": {
+        "bytes": 22126,
+        "sha256": "113ae7612cba7f557fab79550448578a9a6b8ceb674cff80b38fcf40e8257078"
+      },
+      "original/build-proot.sh": {
+        "bytes": 4647,
+        "sha256": "7ddcee055714f27c2a53fea816c8d43171efc54b655771e979735a30ba343319"
+      },
+      "original/native/proot-acceleration.patch": {
+        "bytes": 825,
+        "sha256": "46ab8e6f80260044bccbd831e22a7fc3a376e45ef945772cac790485ab70306f"
+      },
+      "original/native/proot-sysvipc.patch": {
+        "bytes": 1158,
+        "sha256": "e8e3cb956bdb8b1bcbdf72a23b67ad86fc33fa51430f3a1ee37e1a053f5f0330"
+      },
+      "original/proot-source.tar.gz": {
+        "bytes": 322118,
+        "sha256": "d43ad342bb2e8f4d2afe6119b5ec3a1d8bb912d5897e2db7d2ddf928548c1c84"
+      },
+      "original/talloc-2.4.3.tar.gz": {
+        "bytes": 684092,
+        "sha256": "dc46c40b9f46bb34dd97fe41f548b0e8b247b77a918576733c528e83abd854dd"
+      },
+      "talloc-build-objects/lib/replace/closefrom.c.1.o": {
+        "bytes": 2680,
+        "sha256": "971ba46eb29664f8d4019e59f6279a86121ebde01870878f54d8fee660e1c4a5"
+      },
+      "talloc-build-objects/lib/replace/closefrom.c.2.o": {
+        "bytes": 2680,
+        "sha256": "f1e8489603f41d8206d53f5ae2e84ea23be9873079270057cd192823d74028a1"
+      },
+      "talloc-build-objects/lib/replace/replace.c.1.o": {
+        "bytes": 4472,
+        "sha256": "16ecfb8cabee44f367bbf0ab025cae6b5f9e72b3697729b2d719e2aa3ef54c10"
+      },
+      "talloc-build-objects/lib/replace/replace.c.2.o": {
+        "bytes": 4472,
+        "sha256": "f77d97ada0efcedb4fe298ed4ee2caafa12d23bffa6c78d6f1db7dad8477ca4b"
+      },
+      "talloc-build-objects/lib/replace/replace.empty.c.4.o": {
+        "bytes": 784,
+        "sha256": "635675b728144ce0b0f11cc3d6f4f05f23d817978a500c5b056540facd8481bf"
+      },
+      "talloc-build-objects/lib/replace/tests/getifaddrs.c.5.o": {
+        "bytes": 2872,
+        "sha256": "76e2dbccd8858a5d927ae30beb4bfb16ff815d64c517de50496236e2032b9261"
+      },
+      "talloc-build-objects/lib/replace/tests/main.c.6.o": {
+        "bytes": 1288,
+        "sha256": "4279bca7a086e9caa9861bf5c383d1c4d50cadec5d6094942d3ddf927a7a2f94"
+      },
+      "talloc-build-objects/lib/replace/tests/os2_delete.c.5.o": {
+        "bytes": 7944,
+        "sha256": "412466400a10e9d3f11cc459513f18d9af451daab047dcbeb0895b947d50a06b"
+      },
+      "talloc-build-objects/lib/replace/tests/strptime.c.5.o": {
+        "bytes": 4984,
+        "sha256": "25c3ccbbf1b832973577665c39ae481428bdcda8fdcac9bd590ba0236371aed1"
+      },
+      "talloc-build-objects/lib/replace/tests/testsuite.c.5.o": {
+        "bytes": 201416,
+        "sha256": "3ba4bdcbfd110fe08f632d3c8b7eb9bd9e6502abbe4ee63fa42fdf0301c7c396"
+      },
+      "talloc-build-objects/talloc.c.5.o": {
+        "bytes": 59856,
+        "sha256": "7f9b8abb86b7700511b4d1c64a5ec2d6ed728c2763aa90096013fdc0bcee8d6a"
+      },
+      "talloc-build-objects/talloc.c.6.o": {
+        "bytes": 59856,
+        "sha256": "ab3af6d4d3dbc8bf91676a96e3b81ae0f8ef9565d1f10b932470a92eb04d5a63"
+      },
+      "talloc-build-objects/test_magic_differs_helper.c.3.o": {
+        "bytes": 1552,
+        "sha256": "0307d45031a0cf40c2e07c9b51c4e317e97f43aaaead2ea978db4b104fe84927"
+      },
+      "talloc-build-objects/testsuite.c.1.o": {
+        "bytes": 158576,
+        "sha256": "f022c2476b2078d1863155228f9f75b8afd2e02ae7a881ce422a59a7cdba19ee"
+      },
+      "talloc-build-objects/testsuite_main.c.1.o": {
+        "bytes": 1296,
+        "sha256": "ef93c57454b579144af122f5eeb9aeb474e8c1d67b67e550db472e655f2d488c"
+      }
+    },
+    "relinkableArm64Objects": 15
+  },
+  "providerSubtrees": 4,
+  "publicPublicationVerifiedHere": false,
+  "releaseSelection": {
+    "bytes": 15764,
+    "sha256": "a15491aa8a2f075794e3379813e1e4700753699f16ebedb2c68c4c9735c9cbdd"
+  },
+  "runtimeArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+  "scope": "source-and-paired-debug-verified-local-game-profile-apk-bytes",
+  "selectedInputs": {
+    "runtime/client/android-provider.lock.json": {
+      "bytes": 492,
+      "sha256": "7ecb7dfd4e9917e742fb467d81a72af9273394c8488e5a6cb3e25fa70c29ed5b"
+    },
+    "runtime/runtime-sources.lock.json": {
+      "bytes": 105545,
+      "sha256": "562bf73630b7217c2c3ae0adf85b7a16d6979d3c257227e287757c9cbc3154c7"
+    },
+    "sources.lock.json": {
+      "bytes": 2170,
+      "sha256": "dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90"
+    }
+  },
+  "serverProfile": "local-game",
+  "serverProgramsExecuted": false,
+  "serverProviders": {
+    "androidGuestExecuted": false,
+    "androidRuntimeQualified": false,
+    "apk": {
+      "bytes": 336686745,
+      "sha256": "3d1cef952e4855d0aae3ed962ed028646953ec43e0263b26a4a33b34cecff006"
+    },
+    "composedDataToolsIncluded": true,
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "localWorldReadinessQualified": false,
+    "playerbotsAiQualified": false,
+    "playerbotsSchemaHelperIncluded": true,
+    "providers": {
+      "content": {
+        "androidRuntimeQualified": false,
+        "apkBytesVerified": true,
+        "archive": {
+          "assetPath": "server-content/server-content.archive",
+          "bytes": 167585802,
+          "file": "server-content.tar.gz",
+          "sha256": "0f41b2deea5344fcea4cbc70bbddf0bab1dfda1cd0346e23e92592aac63056e6"
+        },
+        "archiveEntries": 4063,
+        "archiveFileBytes": 654243888,
+        "fullSourceSelectedInventoryVerified": true,
+        "gameplayQualified": false,
+        "providerVerified": true,
+        "sqlExecuted": false
+      },
+      "dataTools": {
+        "androidRuntimeQualified": false,
+        "apkBytesVerified": true,
+        "clientMpqConversionQualified": false,
+        "customEsteriaDataLoadOrderQualified": false,
+        "gameLoginQualified": false,
+        "gameplayQualified": false,
+        "nativeArgumentConfigQualified": true,
+        "pairedDebugVerified": true,
+        "providerVerified": true,
+        "sourceCompanionVerified": true
+      },
+      "dependencies": {
+        "androidRuntimeQualified": false,
+        "apkBytesVerified": true,
+        "archive": {
+          "assetPath": "server-runtime/server-runtime-arm64.archive",
+          "bytes": 112374096,
+          "file": "server-runtime-arm64.tar.gz",
+          "sha256": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5"
+        },
+        "maximumPhysicalFileBytes": 388996294,
+        "providerVerified": true
+      },
+      "programs": {
+        "androidRuntimeQualified": false,
+        "apkBytesVerified": true,
+        "archive": {
+          "bytes": 30730491,
+          "file": "server-programs-runtime-arm64.tar.gz",
+          "sha256": "963a23c1390440260b85ffe164b2d7508c56b005b315dce8a919ae443a46d1bf"
+        },
+        "archiveEntries": 131,
+        "archiveFileBytes": 92638681,
+        "compilerExecuted": false,
+        "gameplayQualified": false,
+        "helperExecuted": false,
+        "helperNames": [
+          "playerbots-schema"
+        ],
+        "helperNativeProofTransferredToNewExecutable": false,
+        "helperSourceCompanionVerified": true,
+        "nativeHelperSqlProofPreserved": true,
+        "originalStockProviderVerification": {
+          "androidRuntimeQualified": false,
+          "apkBytesVerified": false,
+          "gameLoginQualified": false,
+          "gameplayQualified": false,
+          "nativeAuthWorldVersionQualified": true,
+          "pairedDebugVerified": true,
+          "providerVerified": true,
+          "sourceCompanionVerified": true
+        },
+        "originalThreeProgramsAndReceiptsUnchanged": true,
+        "pairedOriginalDebugVerified": true,
+        "playerbotsAiQualified": false,
+        "productionActivated": false,
+        "programNames": [
+          "authserver",
+          "worldserver",
+          "dbimport"
+        ],
+        "providerVerified": true,
+        "slotPromoted": false,
+        "sourceCompanionVerified": true,
+        "sqlExecuted": false,
+        "worldserverQualified": false
+      }
+    },
+    "scope": "four-server-component-local-game-install-profile-apk-byte-verification",
+    "serverProgramsExecuted": false,
+    "sourceCompanionAndPairedDebugVerified": true,
+    "sqlExecuted": false,
+    "stockContentAndDatabaseRuntimeArchivesUnchanged": true
+  },
+  "sqlExecuted": false,
+  "stockExtractorsIncluded": false,
+  "stockServerProgramsContentAndExtractorsIncluded": false
+}

@@ -1,8 +1,16 @@
 # Status
 
-Updated2026-10-31UTC. Autonomous development continues. No Thor gameplay
-candidate has been delivered or requested. No supported weekly-usage meter is
-exposed; stop if the user reports the requested50% threshold.
+Updated2026-10-31UTC. Signed candidate0.1.0-dev.1 is published for one consolidated
+content/device test. No Thor/world gameplay result exists yet. No supported
+weekly-usage meter is exposed; stop if the user reports the requested50% threshold.
+
+APK/source/build identity and the procedure: THOR-TEST-CANDIDATE.md.
+Release: https://github.com/Russianranger/esteria_android/releases/tag/android-v0.1.0-dev.1
+Signed336,697,265B APK SHA8b953bc5e959a4feb716abed3ff7083ee85a2fdedafa44105fc1caeef2e25baa;
+application8c1e63d43ee0b552d796b862a2c1b1c146a0a7c4, build41149985842, versionCode1.
+Public download HTTP200/size and all four GitHub asset digests verified. Persistent
+certificate matches the pinned5e6921a0… identity; v2/v3 and payload preservation
+pass. Initial update baseline is recorded; future published versions must increase.
 
 ## Exact selection
 
@@ -29,6 +37,7 @@ qualify Android ARM64, Adreno or Thor. Docker is for development only.
 | Public server preservation |41117618335:12assets/1,783,413,529B, complete source/debug and anonymous readback. Release429422570 at recipe7e498c50cdf55027e679d63e31f0a5e4b117f934. | GitHub immutable=false; pins/no replacement enforced. |
 | Native ARM64 Java coordinator |41148040872@651: actual four schemas, promotion, active reseed refusal, two clean stops, same UUID/restart;30bot tables/31updates.63exact Git inputs/192classes checked; real parser regression runs before SQL. | Linux payload-locator seam; no Android/world/character-save/bot-AI claim. |
 | Native x64 SQL |41139757153@7d4: actual original dbimport/52-statement helper,29base files/31updates,30bot tables, reentry, four-schema preservation, restart and clean stop pass in245s.58caller Git inputs/eight source-profile pins checked. | Native Linux x64; Android/world/AI remain false. |
+| Android13x64 four-schema coordinator |41148736592@1d181/P651: all13 SQL/lifecycle flags pass;30bot tables/31updates; promotion, active reseed refusal, same-instance/private-state preservation and two clean stops. Actual parser regression passes;952.488s instrumentation. | Exact typed x64 fixture; no Android ARM64/auth/world/character/bot-AI claim. |
 | Android13x64 MySQL |41109642918@4fd bootstrap/service lifecycle; fresh817 run41119182193 also passes. | Distinct runtime bytes; current code inherits no historical Java proof. |
 | Android recovery |41129893390@7c five handoff deaths;41132701736@84fa adds actual generic lease death/reacquisition. | Component-only; source/APK readbacks separate from full app restart. |
 | Android updates |41129893361 package/private-file/update contracts pass. | No delivered stable-key update baseline. |
@@ -91,24 +100,28 @@ qualify exclusive cache publication or ARM64 semantics.
    construction and independent readback after the Integer/Long JSON comparison
    fix. All82 source pins match; descriptor SHA909b0dcd00c24289cf2bf59e1a36b075885cec62de008fc1cbb47e37eeb5c573.
    Six bounded receipts are fully read locally; complete1,969,319,740B product is
-   read in CI and remains local-metadata-only. Exact newP selectors are enabled
-   for a fresh Android SQL/promotion/restart run. Original native SQL/ELF/runtime
-   bytes are unchanged. Preserve995/c441 failures and historicalfff proof; no
-   Android four-schema success is established yet. Native ARM64 Java651 is also
-   passes actual SQL and restart, including the new parser regression. Complete
-   ARM64 debug APK651 also passes. The workflow now builds/verifies a separate
-   non-debuggable release with the same providers for later stable-key signing;
-   its complete release CI result remains pending.
+   read in CI and remains local-metadata-only. Actual Android41148736592@1d181
+   now passes four-schema SQL, promotion, reseed refusal, same-instance restart,
+   private-state preservation and two clean stops in952.488s. Independent Q
+   source readback covers1122files and all82 P/Qcode pins. Original native SQL/
+   ELF/runtime bytes are unchanged;995/c441 failures remain preserved. Native
+   ARM64 Java651 and complete ARM64 debug APK651 also pass. Full8provider release
+   compilation/lint and complete release byte/manifest checks at8c succeed. The
+   non-debuggable APK is persistently signed and published as0.1.0-dev.1. Exact
+   release metadata/signing proof are in runtime/releases and runtime/evidence.
+   World/gameplay remains open.
 3. Preserve actual Android input-widget41138732113 success and its prior test-
    toolbar failure. Physical controller/kernel input, Wine and gameplay remain
    separate gates.
 4. Import real12340 MPQs and matched Esteria catalogs/textures/DBC/maps; generate
    shaders and validate normal login, characters/world, combat/loot/inventory/
    quests/audio/saves/relog. No complete base/custom data is available here.
-5. Measure combined resource use with one-to-four supported bots, offline play
-   and lifecycle; deliver one stable-key signed Thor candidate only when coherent.
+5. Run the single THOR-TEST-CANDIDATE.md procedure with complete client data:
+   normal world/gameplay, controller/audio, saves/relog, in-place update, one bot
+   and offline lifecycle. Return one support bundle. Measure combined resources
+   before increasing toward the four-bot ceiling; custom features remain open.
 
-Private persistent RSA4096 signing is provisioned; public certificate is in
+Private persistent RSA4096 signing baseline1 is published; public certificate is in
 app/development-signing.lock.json. Defaults/server repository remain unchanged.
 Assets, initialized databases/prefixes, saves, credentials and private keys stay
 outside Git. See HANDOFF.md for the next concrete actions.

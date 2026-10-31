@@ -1,0 +1,98 @@
+{
+ "actualReleaseSteps": {
+  "assembleReleaseAndLintRelease": "success",
+  "separateReleaseArtifactUpload": "success",
+  "verifyAllProviderBytesAndNondebugUnsignedManifest": "success"
+ },
+ "formatVersion": 1,
+ "independentChecks": {
+  "allEightProviderAndCurrentHelperSourceReceiptsMatch": true,
+  "bothVariantJniElfMachines": "AArch64",
+  "bothVariantJniLoadAlignment": 16384,
+  "bothVariantJniNonExecutableStack": true,
+  "cohortProviders": [
+   "client-runtime",
+   "guest-bridges",
+   "shader-tools",
+   "turnip"
+  ],
+  "distinctSourcePaths": 14,
+  "manifest": {
+   "debuggable": false,
+   "minSdk": 26,
+   "packageId": "io.github.russianranger.esteria",
+   "targetSdk": 35,
+   "versionCode": 1,
+   "versionName": "0.1.0-dev"
+  },
+  "producerAndApkIdentitiesMatch": true,
+  "releaseAndDebugProviderMetadataMatchExceptApkAndVariantJniByteIdentities": true,
+  "serverProviders": [
+   "programs-with-playerbots-schema-helper",
+   "data-tools",
+   "content",
+   "dependencies"
+  ],
+  "sourcePinComparisonsAgainstProducerGitBlobs": 15,
+  "sourcePinComparisonsCanonicalJsonSha256": "d5778da18bb54ccf194582d845354cf771f48f942b05651db3c974fd3b619e43",
+  "unsignedSignatureStructureVerified": true
+ },
+ "independentSmallArtifact": {
+  "all20MembersCrcAndSha256Read": true,
+  "bytes": 40518,
+  "id": 13022862486,
+  "memberInventoryCanonicalJsonSha256": "342d16d934e893f6a6309edc629bd84d41875de2bb37c2763b420afa4bc26880",
+  "rawLogsNotCopiedIntoRepository": true,
+  "sha256": "a405ba87e03a0dad6f52eb71778d6e0d36ad14a4d715dc5d65baa6bc667b426c"
+ },
+ "producer": {
+  "completedAt": "2026-10-31T00:37:17Z",
+  "conclusion": "success",
+  "jobId": 124383994247,
+  "repository": "Russianranger/esteria_android",
+  "revision": "8c1e63d43ee0b552d796b862a2c1b1c146a0a7c4",
+  "runId": 41149985842,
+  "workflow": ".github/workflows/android-local-game-profile.yml"
+ },
+ "qualificationFlags": {
+  "androidExecutionQualified": false,
+  "commonMainQualified": false,
+  "deviceTestCandidate": false,
+  "gameLoginQualified": false,
+  "gameplayQualified": false,
+  "hardwareQualified": false,
+  "localWorldReadinessQualified": false,
+  "persistentSigningQualified": false,
+  "playerbotsAiQualified": false
+ },
+ "releaseInstallationQualified": false,
+ "scope": "actual-unsigned-nondebug-arm64-release-ci-and-bounded-independent-readback",
+ "serverProgramsExecutedHere": false,
+ "signingReceiptIncluded": false,
+ "sourceReadbackBoundary": "Full original sources/debug were read and separately retained in CI. Independent local scope: small ZIP plus three JSONs. Root alone read full unsigned ZIP/APK; no local large-source read claim.",
+ "sqlExecutedHere": false,
+ "unsignedArtifact": {
+  "bytes": 336701733,
+  "id": 13022637855,
+  "members": {
+   "app-release-unsigned.apk": {
+    "bytes": 336686745,
+    "sha256": "3d1cef952e4855d0aae3ed962ed028646953ec43e0263b26a4a33b34cecff006"
+   },
+   "coherent-release-apk.json": {
+    "bytes": 12928,
+    "sha256": "19a28ed95491c6e09b05f11032ccd99eb76953f5c2f5dcad73b57a8705900d71"
+   },
+   "release-manifest.json": {
+    "bytes": 161,
+    "sha256": "0f8541411ba75b5863a16589cdf508f4fa2f3284286e115a8155d99826bc1146"
+   },
+   "unsigned-release-package.json": {
+    "bytes": 1071,
+    "sha256": "99d47cecad2461ae763f7202f9994ef980785110b53a9596c394edf2b5c02f28"
+   }
+  },
+  "rootAgentFullZipCrcShaReadback": true,
+  "sha256": "f15352c467f166d5816d63a039c7bbf6dc8d518f896aef5d1ec1b6b40d4804d2"
+ }
+}

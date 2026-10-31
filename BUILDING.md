@@ -334,9 +334,9 @@ with the unchanged full cohort verifier and signing tool's manifest reader,
 including package/version, minSdk26, targetSdk35 and `debuggable=false`. Its
 separate `unsigned-local-game-profile-release-arm64-<revision>` artifact contains
 one unsigned APK and three bounded JSON proofs, with combined input bytes below
-500,000,000. This workflow implementation is not an actual release-build or
-installation result until its CI job succeeds; gameplay qualification remains
-separate.
+500,000,000. Actual8c run41149985842 passes this full release path. Signed0.1.0-dev.1
+is published with the persistent certificate and baseline1; content/device
+installation and gameplay qualification remain separate.
 
 `workflow_dispatch` accepts `build_version_code` (default1; positive and at most
 2,100,000,000); increase it before publishing a signed update. Push builds use1.

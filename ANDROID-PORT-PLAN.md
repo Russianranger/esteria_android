@@ -35,10 +35,10 @@ their original full-lock identity.
 | --- | --- | --- |
 | 1. Reproducible references | Exact pins, full Windows ARM64/x64 client and linked ARM64 server/tools complete; protocol layouts match. | Passed41051669638/41078079045; preserve exact sources and paired debug. |
 | 2. Client platform | Full Windows ARM64/x64 and actual ARM64 Wine entry/codec/software Vulkan/FMOD/transport pass. Complete Retail-ON builds pass atceb; latestc8 all-five checks pass. Android x64 Surface/AudioTrack/ownership components pass. | App still selects471. Normal asset-backed initialization, actual Android ARM64 graphics/audio and gameplay remain. |
-| 3. Local services | Original seven-patch providers are public and source-preserved. Native ARM64 production typed Java/PRoot four-schema SQL/promotion/restart passes at84fa, including the shared lease changes; actual Android x64 MySQL service passes separately. | Original full x64 tools41119182502 and native SQL41139757153 pass; provider measurement41141559961 passes; fix and rerun the actual Android four-schema fixture with its preserved failure diagnostics. |
+| 3. Local services | Original seven-patch providers are public and source-preserved. Native ARM64 production typed Java/PRoot four-schema SQL/promotion/restart passes at84fa, including the shared lease changes; actual Android x64 MySQL service passes separately. | Original full x64 tools41119182502 and native SQL41139757153 pass; provider measurement41141559961 passes; Actual Android13 x64 four-schema41148736592 now passes with the fixed source; Android ARM64/auth/world remain. |
 | 4. Matched gameplay | Current471/c0e/seven-patch SRP pairing passes41088546780; normal initialization/world remain untested. | Matched login, character/world/gameplay and actual persistence/bots. |
 | 5. Android application | Import/runtime/data/shader/SQL/game ownership and controls implemented; complete public-input APK passes CI and local byte readback. Actual Android update preservation and six-case handoff/shared-lease process-death recovery pass. | Qualify complete asset-backed session, input, audio, lifecycle and actual character saves. Offscreen graphics setup check has no hardware result here. |
-| 6. Thor candidate | Not ready; stable signing identity provisioned. | One coherent offline playable, update-compatible APK with available data and consolidated test. |
+| 6. Thor candidate | Signed0.1.0-dev.1/build41149985842 published; persistent key/baseline1, complete release payload and Android SQL gates pass. | Run THOR-TEST-CANDIDATE.md with genuine Data; actual world/Thor/gameplay and custom-feature qualification remain. |
 
 ## Execution order
 1. Pin sources and Eluna, create repeatable source preparation and field-layout tests. Build x64 + ARM64 client and Linux ARM64 server continuously.
@@ -65,7 +65,9 @@ enabled. Rerun with bounded failure diagnostics, fix the observed cause, then
 qualify real Android four-schema promotion/restart. The c441 diagnostic run now
 isolates equal JSON Integer/Long byte counts. The exact comparator fix is
 published at651; fresh651 provider measurement41148040884 now passes and its
-exact selectors are activated. Execute Android SQL/promotion/restart next. Historical817 MySQL bytes
+exact selectors are activated. Actual Android SQL/promotion/restart41148736592
+now passes. Full-profile release packaging and persistent signing precede the
+main coherent content/hardware test. Historical817 MySQL bytes
 must be admitted from their exact frozen source; current Java inherits no old
 runtime proof. Keep production ARM64 admission and the five save-selection fields.
 
