@@ -1,0 +1,56 @@
+{
+  "androidArm64Qualified": false,
+  "appSourceRevision": "1adf97b35fc1cfeedf05e94b10357bce8185d84a",
+  "componentTestsExecuted": true,
+  "componentTestsPassed": true,
+  "contentProfile": "stock-3.3.5a",
+  "emulatorProperties": {
+    "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+    "ro.build.version.sdk": "33",
+    "ro.kernel.qemu": "1",
+    "ro.product.cpu.abi": "x86_64"
+  },
+  "expectedTests": 3,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "ownerDocumentProviderTested": false,
+  "ownerGameDataImported": false,
+  "processExitCode": 0,
+  "scope": "android13-x64-document-resolver-synthetic-client-import-components",
+  "sources": {
+    "app/src/androidTest/java/io/github/russianranger/esteria/SafImportTest.java": {
+      "bytes": 17016,
+      "sha256": "bd243d515dd3fe9fd22883be060f19efdf38adb704fd51df9a5d85c83980adda"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/ImportDiagnostics.java": {
+      "bytes": 6638,
+      "sha256": "562c00649a1d6f89c71f033017761f1dc44ff31810a5410ed635e1d0a6510dd4"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/SafTreeSource.java": {
+      "bytes": 16453,
+      "sha256": "047a63f5ccf99833ea11d7a8314e6214f6c28457603a1553657f67855d4b5cb4"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/SessionService.java": {
+      "bytes": 78580,
+      "sha256": "ba75769ec5bb5621f96eb52274b23c9f262c7f98a4681ba5656275ba47d5a70b"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/UriStager.java": {
+      "bytes": 6157,
+      "sha256": "4efc853b2667fd89ce818c5714cd88e02b607d286e9068831a5cc7c79392d756"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/ContentPackageLayout.java": {
+      "bytes": 27763,
+      "sha256": "481713ee0676203d3e8d894670ea6f18bbb7187bfb9995a2dacd0ec33f3e6c82"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/GameDataImporter.java": {
+      "bytes": 50127,
+      "sha256": "8b303d1f2bc6cc4e7758d18ce62d0ea930c220143f3a8bb1ecdc00ba0143eabc"
+    }
+  },
+  "stdout": {
+    "bytes": 2200,
+    "sha256": "4515221f0378eee4017d43a60f3dbf2bce30af33ade651377acb8f6e12d1c99a"
+  },
+  "testClass": "io.github.russianranger.esteria.SafImportTest",
+  "thorQualified": false
+}

@@ -1,0 +1,156 @@
+{
+  "allPassed": true,
+  "androidExecution": false,
+  "appSourceRevision": "1adf97b35fc1cfeedf05e94b10357bce8185d84a",
+  "executedEntrypoints": 10,
+  "executions": {
+    "presentation.InputBatchReservationTests": {
+      "exitCode": 0,
+      "stdout": {
+        "bytes": 157,
+        "sha256": "be49f5909619d72e5f0876a4dddd9c8f7790fd1a3e7e309d5268c62f56ad9b8b"
+      },
+      "stdoutRepositoryPath": "runtime/evidence/non-custom-import-owners/presentation.InputBatchReservationTests.log"
+    },
+    "runtime.GameSessionOwnerTests": {
+      "exitCode": 0,
+      "stdout": {
+        "bytes": 212,
+        "sha256": "6f59675c24c5bfb37f43ef923a855fc8b3d1377fc505bfbe86528b7a6a602e9b"
+      },
+      "stdoutRepositoryPath": "runtime/evidence/non-custom-import-owners/runtime.GameSessionOwnerTests.log"
+    },
+    "runtime.InstallationX64LifetimeTests": {
+      "exitCode": 0,
+      "stdout": {
+        "bytes": 240,
+        "sha256": "84462407e730b69de4ade5dad62e629283b1274c9ee2bb0f82bd71a2955bca7a"
+      },
+      "stdoutRepositoryPath": "runtime/evidence/non-custom-import-owners/runtime.InstallationX64LifetimeTests.log"
+    },
+    "runtime.LocalServerSessionOwnerTests": {
+      "exitCode": 0,
+      "stdout": {
+        "bytes": 116,
+        "sha256": "dc0d075b9fb2e68b63ea80eceaff5ade55786699e23255034ab7d69c98d06305"
+      },
+      "stdoutRepositoryPath": "runtime/evidence/non-custom-import-owners/runtime.LocalServerSessionOwnerTests.log"
+    },
+    "runtime.LocalWorldSetupOwnerTests": {
+      "exitCode": 0,
+      "stdout": {
+        "bytes": 121,
+        "sha256": "6c47e8b8f30e2917c5a6f42cb9f167123f959e0b15e17a3f6e02b997db3ace7b"
+      },
+      "stdoutRepositoryPath": "runtime/evidence/non-custom-import-owners/runtime.LocalWorldSetupOwnerTests.log"
+    },
+    "runtime.PresentationShaderOwnerTests": {
+      "exitCode": 0,
+      "stdout": {
+        "bytes": 150,
+        "sha256": "73d030d7f41ef5bfbbfd6c760ee5970289c01b608c5f17f9ff19d825da265e43"
+      },
+      "stdoutRepositoryPath": "runtime/evidence/non-custom-import-owners/runtime.PresentationShaderOwnerTests.log"
+    },
+    "runtime.ServerDataSetupOwnerTests": {
+      "exitCode": 0,
+      "stdout": {
+        "bytes": 119,
+        "sha256": "eb9d75899c04b49ce77187864707131f767d18b0a0c6cddb621949b6a85b4fa7"
+      },
+      "stdoutRepositoryPath": "runtime/evidence/non-custom-import-owners/runtime.ServerDataSetupOwnerTests.log"
+    },
+    "runtime.ServerInstallationOwnerTests": {
+      "exitCode": 0,
+      "stdout": {
+        "bytes": 175,
+        "sha256": "e0e5453fa9ca8ec6d9962465f724fe614cf6de57c1611c2c4df2f85b280a6cc5"
+      },
+      "stdoutRepositoryPath": "runtime/evidence/non-custom-import-owners/runtime.ServerInstallationOwnerTests.log"
+    },
+    "runtime.ServerProgramsProfileTests": {
+      "exitCode": 0,
+      "stdout": {
+        "bytes": 115,
+        "sha256": "14a57af3d7b6ca083bce75f74a2f6a5aeae895b17e1840732d536c5f00248049"
+      },
+      "stdoutRepositoryPath": "runtime/evidence/non-custom-import-owners/runtime.ServerProgramsProfileTests.log"
+    },
+    "runtime.TurnipReadinessOwnerTests": {
+      "exitCode": 0,
+      "stdout": {
+        "bytes": 257,
+        "sha256": "74dafe2678de09fe81a172bdf31a4742cda42337f2db0e1837380e63d432dca2"
+      },
+      "stdoutRepositoryPath": "runtime/evidence/non-custom-import-owners/runtime.TurnipReadinessOwnerTests.log"
+    }
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "guestExecution": false,
+  "heapMiB": 32,
+  "java": "Temurin17.0.13+11",
+  "pendingTestOnlyChanges": [
+    "app/src/test/java/io/github/russianranger/esteria/runtime/GameSessionOwnerTests.java",
+    "app/src/test/java/io/github/russianranger/esteria/runtime/LocalWorldSetupOwnerTests.java",
+    "app/src/test/java/io/github/russianranger/esteria/runtime/ServerDataSetupOwnerTests.java"
+  ],
+  "productionPathsDiffFromApkProducer": [],
+  "scope": "host-jvm-actual-app-owner-lock-and-lifetime-fixtures",
+  "sources": {
+    "app/src/androidTest/java/io/github/russianranger/esteria/runtime/InstallationX64Lifetime.java": {
+      "bytes": 3468,
+      "sha256": "fe1ddbaf940aa3df58a4dd3c5fe38ca6460fe9237f2867337365d126a2eb918d"
+    },
+    "app/src/test/java/android/net/LocalSocket.java": {
+      "bytes": 1161,
+      "sha256": "b08f584335ed631fff5c1833bda84166c906f5ff6f7416f1b6022935acd83dda"
+    },
+    "app/src/test/java/android/os/Looper.java": {
+      "bytes": 312,
+      "sha256": "a213b8ac5bd644bbe71b0fe7864e30524dec09f9fca60600c2ec5a600022354d"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/presentation/InputBatchReservationTests.java": {
+      "bytes": 5510,
+      "sha256": "1e1fa72f36b0512d369a49e52148c253654ee790f4228431fb089d10443c65fe"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/runtime/GameSessionOwnerTests.java": {
+      "bytes": 31282,
+      "sha256": "0bd780626b95edcabfe637a2ced5ecc269886ca95e7a15dc5c843ed5139afe54"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/runtime/InstallationX64LifetimeTests.java": {
+      "bytes": 5179,
+      "sha256": "e56e4f45e9b027dbd3e26f1e9c1bf1994650fb9b00fa551408860277157e4b48"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/runtime/LocalServerSessionOwnerTests.java": {
+      "bytes": 11608,
+      "sha256": "9637449f6f02bbbaba37565d7c672886a6a34b679efac96170bdae8055e921bc"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/runtime/LocalWorldSetupOwnerTests.java": {
+      "bytes": 11415,
+      "sha256": "452e4e362fd9eb2d9ab5b581eedce8dae1e6755fdb8f8da9591aed6f50dd9ec2"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/runtime/PresentationShaderOwnerTests.java": {
+      "bytes": 17249,
+      "sha256": "39eb9ccad5b4f8ddb3818fe99aefbf6c9f431ac64ddcc1615a0a56ca6818ad3e"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/runtime/ServerDataSetupOwnerTests.java": {
+      "bytes": 14542,
+      "sha256": "d0b7a0ca463697cb9e0a006d289923c6c8bdb484b8ebb0b01932ebb53c19a463"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/runtime/ServerInstallationOwnerTests.java": {
+      "bytes": 18397,
+      "sha256": "18308b49cce735122aeb02c3df20bef76a9d397bb17950ea196cbcd950cb304b"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/runtime/ServerProgramsProfileTests.java": {
+      "bytes": 9506,
+      "sha256": "5baf3cd46c60cb54b3426cb77c010070af334a2185c5f1cb6bbc6d9a44b00e59"
+    },
+    "app/src/test/java/io/github/russianranger/esteria/runtime/TurnipReadinessOwnerTests.java": {
+      "bytes": 7546,
+      "sha256": "c65088ac48bb888f40cd1d60fd9a0796670e9fc026511942d20dc4ba6bbe5c51"
+    }
+  },
+  "testChanges": "Three admission assertions check contextual inventory phase and preserved exact sentinel cause; held-lease scans remain forbidden.",
+  "testSourceBaseRevision": "1adf97b35fc1cfeedf05e94b10357bce8185d84a"
+}

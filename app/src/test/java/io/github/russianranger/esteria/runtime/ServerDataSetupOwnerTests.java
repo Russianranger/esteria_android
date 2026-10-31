@@ -75,7 +75,8 @@ public final class ServerDataSetupOwnerTests {
             try{owner.close(Duration.ofSeconds(1));}catch(IOException expected){check(owner.cleanupFailure()!=null,"Original cleanup failure remains diagnostic");}
             check(owner.state()==ServerDataSetup.State.CLOSED&&!owners().containsKey(work),"Only completed reaping permits final lease release");
             try{importer.importSource(source(scans),GameDataImporter.ImportKind.BASE_CLIENT,GameDataImporter.NO_PROGRESS,GameDataImporter.NEVER_CANCELLED);throw new AssertionError();}
-            catch(IOException expected){check(expected.getMessage().equals("TEST_ONLY_ADMITTED_SNAPSHOT"),"Actual importer is admitted after the data owner stops");}
+            catch(IOException expected){check(expected.getMessage().contains("phase=inventory") && expected.getCause()!=null
+                    && "TEST_ONLY_ADMITTED_SNAPSHOT".equals(expected.getCause().getMessage()),"Actual importer reaches the causal snapshot sentinel after the data owner stops");}
             check(scans.get()==1,"Source snapshot occurs only after confirmed cleanup");
             check(Files.readString(game.resolve("retained-user-sentinel")).equals("TEST_ONLY_IMPORTED_STATE")&&Files.readString(work.resolve("partial-output")).equals("TEST_ONLY_INTERRUPTED_STAGE"),"Imported and partial output bytes remain intact");
         } finally {

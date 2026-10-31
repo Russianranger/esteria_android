@@ -1,3 +1,9 @@
+# Current update transport
+
+Version2 uses `update-2/signature-recipe.json`, `update-2/signing-receipt.json` and `update-2/publication-inputs.json`. The signer requires exact published version1 as `--previous-apk`; never use `--initial-baseline` for an update. The publisher validates the unchanged stock certificate/package, exact prior ledger and increasing version, then independently rechecks source/native SQL/provider/SDK/payload proof. Preserve the historical files below; future updates should use their own directory. Update the official signing ledger only after public signed download readback.
+
+The following original version1 transport record remains historical.
+
 # Detached public signing transport
 
 The owner signs the exact verified full ARM64 release APK locally with the

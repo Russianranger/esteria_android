@@ -1,0 +1,1 @@
+Turnip owner passed2 actual filesystem/ownership groups: fixed support roles, single-use close, active-owner recovery refusal, exact failed/stop-requested recovery, retained opaque child/lock after timeout and confirmed-reap retry; no GPU/Android execution

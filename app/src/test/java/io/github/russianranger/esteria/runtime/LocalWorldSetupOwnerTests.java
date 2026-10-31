@@ -76,7 +76,9 @@ public final class LocalWorldSetupOwnerTests {
             public void verifySnapshot(List<GameDataImporter.InputEntry> entries){throw new AssertionError("No actual import is authorized by this fixture");}
         };
         try{new GameDataImporter(game).importSource(source,GameDataImporter.ImportKind.BASE_CLIENT,GameDataImporter.NO_PROGRESS,GameDataImporter.NEVER_CANCELLED);throw new AssertionError();}
-        catch(IOException error){check(admitted==error.getMessage().equals("TEST_ONLY_SCAN_ADMITTED"),"Importer admission must follow confirmed cleanup");}
+        catch(IOException error){boolean scanned=error.getMessage().contains("phase=inventory") && error.getCause()!=null
+                && "TEST_ONLY_SCAN_ADMITTED".equals(error.getCause().getMessage());
+            check(admitted==scanned,"Importer admission must follow confirmed cleanup, preserving the causal inventory sentinel");}
     }
     private static void dependentCleanup()throws Exception {
         Backend backend=new Backend();OwnedProcess process=null;

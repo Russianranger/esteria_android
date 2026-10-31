@@ -1,0 +1,1 @@
+Installation x64 lifetime passed2 actual owner/lease groups: timed-out observer retains DB/coordinator/lease, no replacement start, reaped retry closes parents in order, parent cleanup failure retains later owners; no SQL/Android execution

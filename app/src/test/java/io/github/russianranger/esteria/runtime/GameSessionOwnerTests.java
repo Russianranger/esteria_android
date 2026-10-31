@@ -77,7 +77,8 @@ public final class GameSessionOwnerTests {
     private static void admitted(Path root)throws IOException {
         AtomicInteger scans=new AtomicInteger();
         try{new GameDataImporter(root.resolve("game")).importSource(source(scans),GameDataImporter.ImportKind.BASE_CLIENT,GameDataImporter.NO_PROGRESS,GameDataImporter.NEVER_CANCELLED);throw new AssertionError();}
-        catch(IOException expected){check(expected.getMessage().equals("TEST_ONLY_ADMITTED"),"Importer admitted only after known cleanup");}
+        catch(IOException expected){check(expected.getMessage().contains("phase=inventory") && expected.getCause()!=null
+                && "TEST_ONLY_ADMITTED".equals(expected.getCause().getMessage()),"Importer reaches the causal snapshot sentinel only after known cleanup");}
         check(scans.get()==1,"Exactly one source inventory after cleanup");
         try(ClientLaunchSetup.Lease lease=ClientLaunchSetup.claim(root)){lease.require(root);}
     }
