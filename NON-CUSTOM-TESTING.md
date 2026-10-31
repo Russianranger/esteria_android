@@ -8,7 +8,7 @@ First retry the route that failed, then follow preparation/start below. If Andro
 
 # Esteria Stock 3.3.5a / non-custom — consolidated Thor procedure
 
-This is the separate `io.github.russianranger.esteria.stock` app. Version `0.1.0-non-custom.3` (versionCode 3) updates stock versions 1 and 2 with the same persistent certificate. Install it over the existing stock app; do not uninstall either app or clear app data. Imports, completed preparation and saves remain app-owned. This app creates its own local account and private saves; it does not use a ChromieCraft account or public realm.
+This is the separate `io.github.russianranger.esteria.stock` app. Version `0.1.0-non-custom.4` (versionCode 4) updates stock versions 1 through 3 with the same persistent certificate. Install it over the existing stock app; do not uninstall either app or clear app data. Imports, completed preparation and saves remain app-owned. This app creates its own local account and private saves; it does not use a ChromieCraft account or public realm.
 
 The release's `release.json`, signing receipt and `SHA256SUMS` identify the exact APK version, app/client/server revisions and certificate. Check the published APK hash before installing. World entry on actual client data and Android ARM64/Thor must be reported separately from host/build evidence.
 

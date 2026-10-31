@@ -82,6 +82,20 @@ Retry the same client source with its normal Data layout. If Android kills the
 app again, reopen it and export support before another import; the bundle now
 contains sampled import heap values and bounded Android process-exit history.
 '''
+    if signed['versionCode'] == 4:
+        notes += '''
+Version 4 deliberately slows both folder and ZIP imports to 8 MiB/s, flushes
+2 MiB write batches and asks Android to release their clean file-cache pages.
+Low-memory observations reduce copying to 2 MiB/s or wait for recovery.
+Sustained severe pressure pauses safely with completed work retained for retry.
+The ZIP staging pass and nonseekable resume reads use the same policy.
+
+Install over the existing stock app without uninstalling or clearing data.
+Retry the same complete client source with its normal Data layout. Each 1 GiB
+copy takes at least 128 seconds; ZIPs require staging and extraction passes.
+If Android closes the app again, reopen and export the whole support bundle
+before another import. Actual Thor import/gameplay still need device confirmation.
+'''
     (args.output / 'RELEASE-NOTES.md').write_text(notes)
     return result
 

@@ -1,0 +1,223 @@
+{
+  "androidArm64Qualified": false,
+  "appSourceRevision": "2c8eeb08a3079edf7354cd373b7cbaf94d859365",
+  "componentTestsExecuted": true,
+  "componentTestsPassed": true,
+  "contentProfile": "stock-3.3.5a",
+  "emulatorProperties": {
+    "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+    "ro.build.version.sdk": "33",
+    "ro.kernel.qemu": "1",
+    "ro.product.cpu.abi": "x86_64"
+  },
+  "expectedTests": 9,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "ownerDocumentProviderTested": false,
+  "ownerGameDataImported": false,
+  "processExitCode": 0,
+  "realLowMemoryKillReproduced": false,
+  "scope": "android13-x64-large-streaming-import-memory-and-exit-history-components",
+  "sources": {
+    "app/src/androidTest/java/io/github/russianranger/esteria/ImportIoControllerTest.java": {
+      "bytes": 6355,
+      "sha256": "a4e94b7cda62042f3f3507b77af6bce8059b6ab7496b193c9dcf97bb23637649"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/ImportMemoryStressTest.java": {
+      "bytes": 15225,
+      "sha256": "9745781048dba8a3e97b41d2091149e9a35077a75a474381e5666cf7a5052d41"
+    },
+    "app/src/androidTest/java/io/github/russianranger/esteria/ProcessExitDiagnosticsTest.java": {
+      "bytes": 4165,
+      "sha256": "c08a3465133d27b1a0bea412bdd92f51aadfc98b481c4a5fb32ac1dba3391b02"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/ImportDiagnostics.java": {
+      "bytes": 8694,
+      "sha256": "e4a61150845705644a3a7394320b837b5dab346fc7f42265e02f8da03e78aeb6"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/ImportIoController.java": {
+      "bytes": 9136,
+      "sha256": "deee09c658328bf0ae1087af82fe2ca5a61f6aa5b095823a5fdafe5e9b04d548"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/NativeImportCache.java": {
+      "bytes": 863,
+      "sha256": "b4cd01b2d1a214ad37cf3e4ca6a9013abdc3c7a58fe60019911ed22cda158a29"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/ProcessExitDiagnostics.java": {
+      "bytes": 6564,
+      "sha256": "157c5c9e69ebc28afc81300aa8dfc4bc3bf90354a9234d32e0139dbe7550964e"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/SafTreeSource.java": {
+      "bytes": 19754,
+      "sha256": "900ed98aaf0d629df1bf77ac616ed07028df284953c83b52209381a73f5b023d"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/SessionService.java": {
+      "bytes": 81723,
+      "sha256": "2aeb1763fc0975eca9a0c6014ad467a3bdfe924554ea667401b5f50541905e0a"
+    },
+    "app/src/main/java/io/github/russianranger/esteria/UriStager.java": {
+      "bytes": 7433,
+      "sha256": "43c37ff23137457bd4883300cde4cf9063f66a24c82cf97cf76a44214af46f14"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/GameDataImporter.java": {
+      "bytes": 54255,
+      "sha256": "ffd838d703b4df7c9d522e59aabee54442f6046a23f3b12a98b54bfb3a2958e7"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/ImportIoGovernor.java": {
+      "bytes": 6842,
+      "sha256": "4105882a22948e64f8337f01d318c3422bcac9d48c93783c3c174397ac25ceab"
+    },
+    "core/src/main/java/io/github/russianranger/esteria/core/importer/ZipSafety.java": {
+      "bytes": 5512,
+      "sha256": "8d679d094b47a31a3b434e1d056f0e109757624535097f04330208453321ef25"
+    },
+    "native/process-owner/jni_bridge.cpp": {
+      "bytes": 6612,
+      "sha256": "95cb10a497efb29e2d233bb7624a60f45bf1d422718851a78bc8cf3f7393e832"
+    }
+  },
+  "stdout": {
+    "bytes": 11301,
+    "sha256": "112ee46877c51994bb671e177fa79b57d88d1184ca7c777a77ee2737b9eb79bf"
+  },
+  "stressObservations": [
+    {
+      "copiedBytes": 1073743360,
+      "copiedFiles": 10,
+      "elapsedMillis": 142432,
+      "gameplayQualified": false,
+      "initialJavaBytes": 2798808,
+      "initialNativeBytes": 4646688,
+      "initialPssBytes": 35321856,
+      "ioPolicy": {
+        "import.last.detectedRoot": ".",
+        "import.last.ioActiveBytesPerSecond": "8388608",
+        "import.last.ioCacheDropBytes": "1073743360",
+        "import.last.ioCacheDropCalls": "521",
+        "import.last.ioCacheDropErrno": "0",
+        "import.last.ioCacheDropErrors": "0",
+        "import.last.ioCacheDropStatus": "advisory-supported-or-not-yet-needed",
+        "import.last.ioMemoryAvailableBytes": "850038784",
+        "import.last.ioMemoryLow": "false",
+        "import.last.ioMemorySampleAtEpochMs": "1793480276828",
+        "import.last.ioMemoryThresholdBytes": "226492416",
+        "import.last.ioNormalBytesPerSecond": "8388608",
+        "import.last.ioPolicy": "8MiB-per-second-2MiB-sync-cache-windows",
+        "import.last.ioPressureBytesPerSecond": "2097152",
+        "import.last.ioPressureLevel": "0",
+        "import.last.ioSystemDirtyKiB": "20132",
+        "import.last.ioSystemDirtyPeakKiB": "63188",
+        "import.last.ioSystemWritebackKiB": "0",
+        "import.last.ioSystemWritebackPeakKiB": "84",
+        "import.last.ioTrimAtEpochMs": "0",
+        "import.last.ioTrimLevel": "-1",
+        "import.last.javaHeapLimitBytes": "201326592",
+        "import.last.javaHeapPeakObservedBytes": "5207440",
+        "import.last.javaHeapUsedBytes": "3151256",
+        "import.last.kind": "BASE_CLIENT",
+        "import.last.memorySampleAtEpochMs": "1793480275965",
+        "import.last.path": "",
+        "import.last.phase": "promotion",
+        "import.last.result": "complete",
+        "import.last.route": "folder",
+        "import.last.selectedRoot": "Generated client",
+        "import.last.sourceIdentitySha256": "4e206197c95c9a9344f8359f8570d7c9fee4e8fe1cf9161e672fe160d36a1f22",
+        "import.last.sourceProvider": "fixture",
+        "import.last.startedAtEpochMs": "1793480134395"
+      },
+      "javaGrowthBytes": 2306200,
+      "nativeGrowthBytes": 78560,
+      "ownerData": false,
+      "payloadBytes": 1073741824,
+      "peakJavaBytes": 5105008,
+      "peakNativeBytes": 4725248,
+      "peakPssBytes": 36609024,
+      "pssGrowthBytes": 1287168,
+      "route": "folder",
+      "samples": 18,
+      "scope": "android13-generated-structural-client-memory-fixture",
+      "sha256": "41f9c660a072eb1c4f528c0cbbac593596e1121ec1ac1d88dbcb1ee53e2d5096",
+      "thorQualified": false
+    },
+    {
+      "copiedBytes": 1073743360,
+      "copiedFiles": 10,
+      "elapsedMillis": 272448,
+      "gameplayQualified": false,
+      "initialJavaBytes": 4323272,
+      "initialNativeBytes": 4726192,
+      "initialPssBytes": 27848704,
+      "ioPolicy": {
+        "import.last.detectedRoot": ".",
+        "import.last.ioActiveBytesPerSecond": "8388608",
+        "import.last.ioCacheDropBytes": "2147651887",
+        "import.last.ioCacheDropCalls": "1007",
+        "import.last.ioCacheDropErrno": "0",
+        "import.last.ioCacheDropErrors": "0",
+        "import.last.ioCacheDropStatus": "advisory-supported-or-not-yet-needed",
+        "import.last.ioMemoryAvailableBytes": "943493120",
+        "import.last.ioMemoryLow": "false",
+        "import.last.ioMemorySampleAtEpochMs": "1793480549290",
+        "import.last.ioMemoryThresholdBytes": "226492416",
+        "import.last.ioNormalBytesPerSecond": "8388608",
+        "import.last.ioPolicy": "8MiB-per-second-2MiB-sync-cache-windows",
+        "import.last.ioPressureBytesPerSecond": "2097152",
+        "import.last.ioPressureLevel": "0",
+        "import.last.ioSystemDirtyKiB": "168",
+        "import.last.ioSystemDirtyPeakKiB": "22240",
+        "import.last.ioSystemWritebackKiB": "0",
+        "import.last.ioSystemWritebackPeakKiB": "80",
+        "import.last.ioTrimAtEpochMs": "0",
+        "import.last.ioTrimLevel": "-1",
+        "import.last.javaHeapLimitBytes": "201326592",
+        "import.last.javaHeapPeakObservedBytes": "4801824",
+        "import.last.javaHeapUsedBytes": "2638256",
+        "import.last.kind": "BASE_CLIENT",
+        "import.last.memorySampleAtEpochMs": "1793480548960",
+        "import.last.path": "",
+        "import.last.phase": "promotion",
+        "import.last.result": "complete",
+        "import.last.route": "zip",
+        "import.last.selectedRoot": "Generated client",
+        "import.last.sourceIdentitySha256": "4e206197c95c9a9344f8359f8570d7c9fee4e8fe1cf9161e672fe160d36a1f22",
+        "import.last.sourceProvider": "fixture",
+        "import.last.startedAtEpochMs": "1793480276845"
+      },
+      "javaGrowthBytes": 429048,
+      "nativeGrowthBytes": 280768,
+      "ownerData": false,
+      "payloadBytes": 1073741824,
+      "peakJavaBytes": 4752320,
+      "peakNativeBytes": 5006960,
+      "peakPssBytes": 29834240,
+      "pssGrowthBytes": 1985536,
+      "route": "zip",
+      "samples": 35,
+      "scope": "android13-generated-structural-client-memory-fixture",
+      "sha256": "41f9c660a072eb1c4f528c0cbbac593596e1121ec1ac1d88dbcb1ee53e2d5096",
+      "thorQualified": false
+    },
+    {
+      "documents": 3210,
+      "gameplayQualified": false,
+      "initialJavaBytes": 7193280,
+      "initialNativeBytes": 4601328,
+      "initialPssBytes": 35490816,
+      "javaGrowthBytes": 2353000,
+      "nativeGrowthBytes": 706736,
+      "opaqueIdCharacters": 135,
+      "ownerData": false,
+      "peakJavaBytes": 9546280,
+      "peakNativeBytes": 5308064,
+      "peakPssBytes": 43418624,
+      "pssGrowthBytes": 7927808,
+      "route": "opaque-inventory",
+      "samples": 56,
+      "scope": "android13-generated-structural-client-memory-fixture",
+      "sourceQueries": 9639,
+      "thorQualified": false
+    }
+  ],
+  "testClass": "io.github.russianranger.esteria.ImportMemoryStressTest,io.github.russianranger.esteria.ProcessExitDiagnosticsTest,io.github.russianranger.esteria.ImportIoControllerTest",
+  "thorQualified": false
+}

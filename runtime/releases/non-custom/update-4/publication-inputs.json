@@ -1,0 +1,42 @@
+{
+  "formatVersion": 1,
+  "scope": "exact-non-custom-detached-signature-publication",
+  "repository": "Russianranger/esteria_android",
+  "branch": "non-custom",
+  "appRevision": "2c8eeb08a3079edf7354cd373b7cbaf94d859365",
+  "packageRunId": 41240790028,
+  "packageJobId": 124654094771,
+  "packageWorkflow": ".github/workflows/android-local-game-profile.yml",
+  "packageArtifact": {
+    "id": 13057911266,
+    "name": "unsigned-local-game-profile-release-arm64-2c8eeb08a3079edf7354cd373b7cbaf94d859365",
+    "bytes": 336770359,
+    "sha256": "650471c4bcfb2e728c66e074229f12ed1312e9948cd431a4a3dded3559577ff0"
+  },
+  "nativeSqlRunId": 41240789998,
+  "nativeSqlJobId": 124654064489,
+  "nativeSqlRevision": "2c8eeb08a3079edf7354cd373b7cbaf94d859365",
+  "nativeSqlWorkflow": ".github/workflows/server-installation-native.yml",
+  "nativeSqlArtifact": {
+    "id": 13057268378,
+    "name": "server-installation-native-evidence-2c8eeb08a3079edf7354cd373b7cbaf94d859365",
+    "bytes": 12659,
+    "sha256": "594729d9da0a70b8449aeb094a421d820545e2c2348c8ac9532e84a8eced3f9a"
+  },
+  "signatureRecipe": {
+    "bytes": 12106,
+    "sha256": "e4e61c0788a0142606ce70c58747c50360076d8c4d3a25fe7e1bbab0c31add8f"
+  },
+  "signingReceipt": {
+    "bytes": 1050,
+    "sha256": "a9f9d17bb05e496af77156357bf1084e69e1403d71129a9b11eb45f6a88bf1de"
+  },
+  "sourceLock": {
+    "bytes": 2170,
+    "sha256": "dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90"
+  },
+  "stockSigningLock": {
+    "bytes": 343,
+    "sha256": "c6abc8c7f9c3a60d8862ed681414bf0b7346f831bd589c3f6a5efe69ea988710"
+  }
+}
