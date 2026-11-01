@@ -1,0 +1,72 @@
+{
+  "allRequiredSourceCiPassed": true,
+  "android13": {
+    "all33ArtifactMembersRead": true,
+    "allThirteenNamedTestsPassed": true,
+    "artifactBytes": 18501,
+    "artifactId": 13068915124,
+    "artifactSha256": "143c0d637c29e45dc049789b8ed622997aacb50e15b65e50cbc2cdeca8b469d3",
+    "jobId": 124735369892,
+    "runId": 41268215574
+  },
+  "appRevision": "4adb12f9502af7d734174a94fb8233226d9b4c60",
+  "checks": {
+    "41268215573": [
+      {
+        "conclusion": "success",
+        "id": 124735369730,
+        "name": "tooling",
+        "status": "completed"
+      }
+    ],
+    "41268215575": [
+      {
+        "conclusion": "success",
+        "id": 124735369534,
+        "name": "selection",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 124735393777,
+        "name": "package",
+        "status": "completed"
+      }
+    ],
+    "41268215602": [
+      {
+        "conclusion": "success",
+        "id": 124735369719,
+        "name": "launcher",
+        "status": "completed"
+      }
+    ],
+    "41268215619": [
+      {
+        "conclusion": "success",
+        "id": 124735369772,
+        "name": "owned-installation",
+        "status": "completed"
+      }
+    ]
+  },
+  "exactPublicSignatureReconstructionVerified": true,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "ownerWorldPreparationQualified": false,
+  "persistentSigningVerified": true,
+  "publicDownloadVerificationPending": true,
+  "scope": "exact-producer-v5-release-gates-and-signing",
+  "signedApk": {
+    "apkBytes": 336796416,
+    "apkSha256": "55a00a604d622c90e1d95a104512f9a9a0e085dbd7ed587a1b8ee93ebdca515f",
+    "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+    "debuggable": false,
+    "minSdk": 26,
+    "packageId": "io.github.russianranger.esteria.stock",
+    "targetSdk": 35,
+    "versionCode": 5,
+    "versionName": "0.1.0-non-custom.5"
+  },
+  "thorQualified": false
+}
