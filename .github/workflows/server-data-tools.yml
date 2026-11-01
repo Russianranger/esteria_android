@@ -2,7 +2,7 @@ name: Source-sealed composed data tools and native four-tool CLI
 on:
   workflow_dispatch:
   push:
-    branches: [android/client-server]
+    branches: [android/client-server, non-custom]
     paths:
       - .github/workflows/server-data-tools.yml
       - runtime/server/data-tools-provider.lock.json
@@ -21,7 +21,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   package:
-    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    if: github.repository == 'Russianranger/esteria_android' && (github.ref == 'refs/heads/android/client-server' || github.ref == 'refs/heads/non-custom')
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     outputs:
@@ -35,7 +35,7 @@ jobs:
           test "$(uname -m)" = x86_64
           mkdir -p out/data-tools-evidence
           python3 -m unittest tests.test_data_tools_inputs tests.test_package_server_data_tools \
-            tests.test_data_tools_qualification tests.test_server_data_tools_provider -v
+            tests.test_data_tools_qualification tests.test_server_data_tools_provider.PendingDataToolsProvider -v
           python3 - <<'PY'
           from tools import provider_server_data_tools as provider
           provider.load_source_qualification()

@@ -215,7 +215,7 @@ def validate_native_cli(cli,pin):
             all(row==dict(exitCode=0,output=capability) for row in cli['capabilities'].values()),
             'server-data-tools-complete-native-capabilities-required')
     names=cli.get('lookupTestNames')
-    require(type(names) is list and len(names)>=22 and
+    require(type(names) is list and names==required_lookup_names() and
             all(type(name) is str and name.startswith('tests.test_extractor_order.RealArchiveReader.test_') for name in names) and
             len(names)==len(set(names)) and
             type(cli.get('lookupTestsRun')) is int and cli['lookupTestsRun']==len(names) and
@@ -225,6 +225,18 @@ def validate_native_cli(cli,pin):
             'server-data-tools-all-native-lookups-without-skips-required')
     for key in ('cliPhase','lookupResult','fixturePreparation'):
         identity(cli[key])
+
+
+def required_lookup_names():
+    """Require every current source-bound ordered-reader native regression.
+
+    Frozen historical providers retain their historical recipe and test roster;
+    they are never reinterpreted as this newly compiled pair.
+    """
+    import unittest
+    from tests.test_extractor_order import RealArchiveReader
+    return ['tests.test_extractor_order.RealArchiveReader.'+name for name in
+            unittest.defaultTestLoader.getTestCaseNames(RealArchiveReader)]
 
 
 def verify_sources(directory,pin):

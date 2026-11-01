@@ -6,6 +6,7 @@
     "sha256": "9a6b5f48a56ac82623f2965724ac1d4fac9b4bd304ddb81a85c4894486f8694e"
   },
   "appRevision": "bad963b8ae2edd0c8bcfe0db852ac4557f1cc700",
+  "derivedNativeCliPending": true,
   "formatVersion": 1,
   "gameplayQualified": false,
   "intermediateTooling": {
@@ -70,6 +71,47 @@
   "nativeBuildPending": false,
   "nativeBuildRunId": 41327929457,
   "scope": "v7-first-native-source-checkpoint",
-  "sourceCompanionSealingPending": true,
+  "sourceArtifact": {
+    "bytes": 65523494,
+    "id": 13092047579,
+    "integrationRevision": "ae905634a994216c676cb1e7739b0a7d52dce25e",
+    "job": 124913293701,
+    "members": {
+      "ordered-extractor-complete-sources.tar.gz": {
+        "bytes": 64313120,
+        "sha256": "fa7baf936d6b749871dd232121cfbdd5b81579aa01e35c04b8ee2b6627d7c0b3",
+        "target": "ordered-sources/ordered-extractor-complete-sources.tar.gz"
+      },
+      "ordered-source-receipt.json": {
+        "bytes": 1210032,
+        "sha256": "6b83cd456c040f5a28d5d28d93ecbc5d2af2765ee985d41ae23f472ae4bb9c08",
+        "target": "ordered-sources/ordered-source-receipt.json"
+      }
+    },
+    "sha256": "6308164396476e4875abc03a305f70e72565f8c46eade8cae369e60864dedc2b",
+    "workflowRun": 41328465330
+  },
+  "sourceCompanionSealed": true,
+  "sourceCompanionSealingPending": false,
+  "sourceQualification": {
+    "archive": {
+      "bytes": 64313120,
+      "sha256": "fa7baf936d6b749871dd232121cfbdd5b81579aa01e35c04b8ee2b6627d7c0b3"
+    },
+    "dependencyObservation": {
+      "bytes": 3571508,
+      "sha256": "478aa936b9742b0f585220b65d319fd3d52ac81ff6f85de3570541e60d217561"
+    },
+    "nativeBuild": {
+      "bytes": 35934,
+      "sha256": "4f2388644d9507ff06e22219cb180df78b6bdc57eeadff4e3e814b6ff69602a3"
+    },
+    "receipt": {
+      "bytes": 1210032,
+      "sha256": "6b83cd456c040f5a28d5d28d93ecbc5d2af2765ee985d41ae23f472ae4bb9c08"
+    }
+  },
+  "sourceSealJobId": 124913293701,
+  "sourceSealRunId": 41328465330,
   "thorQualified": false
 }

@@ -4,8 +4,9 @@
 Run/job/artifact JSON is retained from read-only GitHub API responses. Every
 selected ZIP and member is hashed locally before a candidate is emitted. This
 does not edit committed locks, compile or execute native programs, or qualify
-Android/gameplay. Native source sealing and derived four-tool CLI remain later
-independent gates.
+Android/gameplay. Native source sealing and derived four-tool CLI are later
+independent gates; the composed command reads their completed outputs through
+the existing complete provider/source/debug/native-CLI admission checks.
 """
 from __future__ import annotations
 
@@ -16,6 +17,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import sys
 import tempfile
 
@@ -25,12 +27,24 @@ from tools import build_ordered_extractors as ordered
 from tools import prepare_ordered_extractor_sources as transfer
 from tools import seal_ordered_extractor_sources as seal
 from tools import provider_server_data_tools as provider
+from tools import measure_server_data_tools as composed_measurement
+from tools import prepare_data_tools_provider as qualified_inputs
 
 ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY = 'Russianranger/esteria_android'
 require = seal.require
 identity = seal.files.identity
 read_json = seal.read_json
+COMPOSED_PACKAGE_MEMBERS = {
+    'data-tools-package/' + name: 'package/' + name for name in (
+        'package-receipt.json', seal.RECEIPT, seal.SOURCE_ARCHIVE,
+        'native-ordered-build.json', 'dependency-observation.json',
+        'ordered-strip-receipt.json', 'ordered-extractors-debug-arm64.tar.gz',
+        'stock-package-receipt.json', provider.RUNTIME)}
+COMPOSED_PACKAGE_MEMBERS['data-tools-inputs/stock-debug/stock-extractors-debug-arm64.tar.gz'] = \
+    'stock-debug/stock-extractors-debug-arm64.tar.gz'
+COMPOSED_NATIVE_MEMBERS = {name: 'native/' + name for name in
+                           ('native-cli.json', 'native-cli-phase.json', 'lookup-result.json')}
 
 
 def document(raw):
@@ -191,15 +205,97 @@ def source_candidate(base, measured, run, job, artifact, source_zip):
     return candidate
 
 
+def extract_selected(path, selected, destination):
+    """Retain only the fixed package/native input closure from a bounded ZIP."""
+    require(type(selected) is dict and 0 < len(selected) <= 16 and
+            len(set(selected.values())) == len(selected), 'ordered-update-selected-member-bound')
+    for name, target in selected.items():
+        seal.engine.content.safe_path(name); seal.engine.content.safe_path(target)
+    rows = {}
+    with transfer.remote.bounded_zip(path) as (archive, members):
+        require(set(selected) <= set(members), 'ordered-update-selected-member-missing')
+        total = 0
+        for name, relative in selected.items():
+            item = members[name]; total += item.file_size
+            require(item.file_size <= 128 << 20 and total <= 256 << 20 and
+                    (not name.endswith('.json') or item.file_size <= 16 << 20),
+                    'ordered-update-selected-input-byte-bound')
+            target = destination / relative; target.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+            with archive.open(item) as incoming, target.open('xb') as outgoing:
+                digest = seal.archives.hash_stream(incoming, item.file_size, outgoing)
+                outgoing.flush(); os.fsync(outgoing.fileno())
+            target.chmod(0o444)
+            row = dict(bytes=item.file_size, sha256=digest)
+            require(identity(target) == row, 'ordered-update-extracted-input-changed')
+            rows[name] = dict(row, target=relative)
+    return rows
+
+
+def composed_candidates(run, jobs, package_artifact, package_zip, native_artifact, native_zip, output):
+    """Measure both final locks through the existing complete source/debug verifier."""
+    package_job = successful_job(run, jobs, 'server-data-tools.yml', 'package')
+    native_job = successful_job(run, jobs, 'server-data-tools.yml', 'native')
+    package_pin = artifact_pin(package_artifact, run, package_zip, 'composed-data-tools-package-')
+    native_pin = artifact_pin(native_artifact, run, native_zip, 'composed-data-tools-native-evidence-')
+    output = Path(os.path.abspath(output)); seal.archives.directory(output.parent)
+    require(not os.path.lexists(output), 'ordered-update-existing-output-preserved')
+    stage = Path(tempfile.mkdtemp(prefix='.' + output.name + '.stage-', dir=output.parent))
+    try:
+        inputs = stage / 'inputs'; inputs.mkdir(mode=0o700)
+        package_members = extract_selected(package_zip, COMPOSED_PACKAGE_MEMBERS, inputs)
+        native_members = extract_selected(native_zip, COMPOSED_NATIVE_MEMBERS, inputs)
+        receipt_id = identity(inputs / 'package/package-receipt.json')
+        cli_id = identity(inputs / 'native/native-cli.json')
+        measured = composed_measurement.measure(inputs / 'package', inputs / 'native',
+            inputs / 'stock-debug/stock-extractors-debug-arm64.tar.gz', stage / 'measured',
+            expected_package_sha256=receipt_id['sha256'], expected_native_sha256=cli_id['sha256'])
+        result = stage / 'result'; result.mkdir(mode=0o700)
+        provider_lock = result / 'data-tools-provider.lock.json'
+        seal.engine.copy_verified(stage / 'measured/data-tools-provider.lock.json', provider_lock,
+                                  identity(stage / 'measured/data-tools-provider.lock.json'), 0o444)
+        qualified = dict(formatVersion=1, scope='exact-actual-composed-data-tools-provider-inputs',
+            providerInputLock=identity(provider_lock), artifacts={
+                'package': dict(package_pin, workflowRun=run['id'], integrationRevision=run['head_sha'],
+                                members=package_members),
+                'native': dict(native_pin, workflowRun=run['id'], integrationRevision=run['head_sha'],
+                               members=native_members)},
+            androidRuntimeQualified=False, clientMpqConversionQualified=False, gameplayQualified=False)
+        qualified_lock = result / 'data-tools-qualified-artifacts.lock.json'
+        seal.engine.put_metadata(qualified_lock, qualified)
+        old_provider_lock, old_qualified_lock = provider.LOCK, qualified_inputs.LOCK
+        try:
+            provider.LOCK = provider_lock
+            qualified_inputs.LOCK = qualified_lock
+            require(qualified_inputs.load_pin() == qualified, 'ordered-update-qualified-candidate-readback-differs')
+        finally:
+            provider.LOCK, qualified_inputs.LOCK = old_provider_lock, old_qualified_lock
+        proof = dict(formatVersion=1, scope='measured-updated-composed-data-tools-lock-pair',
+            integrationRevision=run['head_sha'], workflowRun=run['id'],
+            packageJob=package_job['id'], nativeJob=native_job['id'],
+            providerInputLock=identity(provider_lock), qualifiedArtifactsLock=identity(qualified_lock),
+            packageArtifact=package_pin, nativeArtifact=native_pin,
+            fixedPackageMembers=len(package_members), fixedNativeMembers=len(native_members),
+            fullSourceRuntimeDebugAndNativeCliReadback=measured,
+            candidateQualifiedPinReadbackVerified=True, committedPinChanged=False,
+            nativeProgramsExecuted=False, androidRuntimeQualified=False, gameplayQualified=False)
+        seal.engine.put_metadata(result / 'measurement.json', proof)
+        provider.transaction.publish_directory(result, output)
+        seal.archives.sync_directory(output.parent)
+        return proof
+    finally:
+        if stage.exists(): shutil.rmtree(stage)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest='operation', required=True)
-    for operation in ('native', 'source'):
+    for operation in ('native', 'source', 'composed'):
         command = sub.add_parser(operation)
         for name in ('run', 'jobs', 'artifact', 'zip', 'output'):
             command.add_argument('--' + name, type=Path, required=True)
-        if operation == 'native':
-            command.add_argument('--base-pin', type=Path, default=seal.LOCK)
+        if operation in ('native', 'composed'):
+            if operation == 'native':
+                command.add_argument('--base-pin', type=Path, default=seal.LOCK)
             command.add_argument('--evidence-artifact', type=Path, required=True)
             command.add_argument('--evidence-zip', type=Path, required=True)
         else:
@@ -207,6 +303,12 @@ def main():
     args = parser.parse_args()
     run, _ = read_json(args.run); jobs, _ = read_json(args.jobs)
     if type(jobs) is dict: jobs = jobs.get('jobs')
+    if args.operation == 'composed':
+        package_metadata, _ = read_json(args.artifact)
+        native_metadata, _ = read_json(args.evidence_artifact)
+        proof = composed_candidates(run, jobs, package_metadata, args.zip, native_metadata,
+                                    args.evidence_zip, args.output)
+        print(json.dumps(proof, indent=2)); return
     workflow, name, prefix = (
         ('server-extractor-order.yml', 'ordered-targets', 'separate-ordered-extractors-')
         if args.operation == 'native' else

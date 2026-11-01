@@ -5,6 +5,7 @@ from pathlib import Path
 import tempfile
 import unittest
 import zipfile
+from unittest.mock import patch
 
 from tools import measure_ordered_extractor_update as measurement
 
@@ -96,6 +97,71 @@ class ProducerAndArtifactAdmission(unittest.TestCase):
             output.writestr(measurement.seal.RECEIPT, b'{}')
         with self.assertRaisesRegex(ValueError, 'complete-source-seal-required'):
             measurement.source_candidate(base, measured, self.run, self.job, {}, archive)
+
+
+class ComposedInputMeasurement(unittest.TestCase):
+    """Transfer/rollback fixtures below do not qualify any native executable."""
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory(prefix='composed-update-measurement-')
+        self.addCleanup(temporary.cleanup); self.root = Path(temporary.name)
+        self.run = dict(id=44, head_sha='d' * 40, head_branch='non-custom', event='push',
+            path='.github/workflows/server-data-tools.yml', status='completed', conclusion='success',
+            repository=dict(id=7, full_name=measurement.REPOSITORY),
+            head_repository=dict(id=7, full_name=measurement.REPOSITORY))
+        self.jobs = [dict(id=55 + i, name=name, run_id=44, head_sha='d' * 40,
+                          status='completed', conclusion='success')
+                     for i, name in enumerate(('package', 'native'))]
+        self.package, self.package_row = self.archive('package.zip', measurement.COMPOSED_PACKAGE_MEMBERS,
+                                                     'composed-data-tools-package-', 66)
+        self.native, self.native_row = self.archive('native.zip', measurement.COMPOSED_NATIVE_MEMBERS,
+                                                   'composed-data-tools-native-evidence-', 77)
+
+    def archive(self, name, selected, prefix, artifact_id):
+        path = self.root / name
+        with zipfile.ZipFile(path, 'w') as archive:
+            for member in selected:
+                archive.writestr(member, b'{}\n' if member.endswith('.json') else b'synthetic bounded archive')
+            archive.writestr('diagnostic-only.log', b'unselected fixture diagnostic')
+        row = measurement.identity(path)
+        metadata = dict(id=artifact_id, name=prefix + self.run['head_sha'], expired=False,
+            size_in_bytes=row['bytes'], digest='sha256:' + row['sha256'], workflow_run=dict(
+                id=44, head_sha=self.run['head_sha'], head_branch='non-custom', repository_id=7, head_repository_id=7))
+        return path, metadata
+
+    def test_only_fixed_package_and_native_closures_are_extracted_and_hashed(self):
+        target = self.root / 'selected'; target.mkdir()
+        package = measurement.extract_selected(self.package, measurement.COMPOSED_PACKAGE_MEMBERS, target)
+        native = measurement.extract_selected(self.native, measurement.COMPOSED_NATIVE_MEMBERS, target)
+        self.assertEqual(len(package), 10); self.assertEqual(len(native), 3)
+        expected = set(measurement.COMPOSED_PACKAGE_MEMBERS.values()) | set(measurement.COMPOSED_NATIVE_MEMBERS.values())
+        self.assertEqual({p.relative_to(target).as_posix() for p in target.rglob('*') if p.is_file()}, expected)
+        for row in [*package.values(), *native.values()]:
+            self.assertEqual(measurement.identity(target / row['target']), {k: row[k] for k in ('bytes', 'sha256')})
+        with self.assertRaisesRegex(ValueError, 'selected-member-missing'):
+            measurement.extract_selected(self.native, {'missing.json': 'native/missing.json'}, target)
+
+    def test_native_job_must_pass_even_when_run_and_package_job_claim_success(self):
+        jobs = copy.deepcopy(self.jobs); jobs[1]['conclusion'] = 'failure'
+        output = self.root / 'not-published'
+        with self.assertRaisesRegex(ValueError, 'source-matched-job'):
+            measurement.composed_candidates(self.run, jobs, self.package_row, self.package,
+                                             self.native_row, self.native, output)
+        self.assertFalse(output.exists())
+
+    def test_candidate_reader_failure_restores_lock_paths_and_publishes_nothing(self):
+        before = measurement.provider.LOCK, measurement.qualified_inputs.LOCK
+        output = self.root / 'not-published'
+        def incomplete_measurement(package, native, stock_debug, destination, **kwargs):
+            destination.mkdir()
+            (destination / 'data-tools-provider.lock.json').write_bytes(b'{}\n')
+            return {'fixture': 'deliberately incomplete; never native qualification'}
+        with patch.object(measurement.composed_measurement, 'measure', side_effect=incomplete_measurement):
+            with self.assertRaisesRegex(ValueError, 'server-data-tools-input-scope'):
+                measurement.composed_candidates(self.run, self.jobs, self.package_row, self.package,
+                                                 self.native_row, self.native, output)
+        self.assertEqual((measurement.provider.LOCK, measurement.qualified_inputs.LOCK), before)
+        self.assertFalse(output.exists())
+        self.assertFalse(list(self.root.glob('.not-published.stage-*')))
 
 
 if __name__ == '__main__': unittest.main()
