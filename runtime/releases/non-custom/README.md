@@ -1,3 +1,15 @@
+# Version 6 publication transport
+
+Producer `cca8f81abe412b65f0c85da2902f24848a694fd2`; publisher `79c9b8e5744daefcbe4b108652ba26297876bc11`, run/job `41277919602` / `124763764353`. Release `430387223`, APK asset `697446059`. APK 336,796,416 bytes, SHA-256 `11dc96d63d9cf2f00774804216dc9ec45a0785654f40c6a08030ffb91c70ffce`; certificate `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`.
+
+Current public inputs: `update-6/signature-recipe.json`, `update-6/signing-receipt.json`, `update-6/publication-inputs.json`.
+
+All six public assets passed anonymous length/hash downloads. Exact producer tag, SDK v2/v3 signatures/certificate/stock version 6 manifest and local signed-byte equality passed. The official signing ledger advanced to v6 afterward. Update-6 receipts retain their baseline-5 binding; future updates require a higher code, the same certificate and exact public v6 as previous APK. Preserve all historical releases/transports/evidence.
+
+Records: `../non-custom-v0.1.0-non-custom.6.json` and `../../evidence/non-custom-v6-public-apk-readback.json`. Component results do not qualify physical Thor graphics/preparation/gameplay.
+
+The following v5 and older records remain historical.
+
 # Version 5 publication transport
 
 V5 is published and complete anonymous public APK/all-six-asset readback plus SDK v2/v3 signature/certificate/manifest checks passed. Release `430339293`, APK asset `697210840`. Producer `4adb12f9502af7d734174a94fb8233226d9b4c60`; publisher `46bf279d0283c31132c0752df3450d5a0612608b`, run/job `41269263210` / `124738460624`.

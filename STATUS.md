@@ -1,14 +1,18 @@
-# Esteria Stock v6 — graphics probe deadline fix pending
+# Esteria Stock v6 — graphics deadline update published
 
-Version `0.1.0-non-custom.6` / code 6 is being prepared on `non-custom`; **no v6 APK is published at this checkpoint**. Keep package `io.github.russianranger.esteria.stock`, the persistent certificate, existing data and completed import. Fresh exact-producer ARM64 packaging, native SQL, Android execution, signing and public download readback remain release gates.
+[Signed ARM64 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.6/Esteria-Stock-3.3.5a-arm64.apk) · [Testing procedure](NON-CUSTOM-TESTING.md).
 
-## Current owner failure
+Install over the existing `io.github.russianranger.esteria.stock` app, keep data and the completed import, then retry **Prepare local runtime / world** with the same locale. Do not reimport. One 15.6 GiB full hash pass still takes about 34 minutes at 8 MiB/s; later phases and pressure add time. Export support before another retry after failure. Physical Thor v6 preparation, GPU/world rendering, controls/audio and persistence remain unqualified.
 
-The v5 support bundle `Esteria-support-1793508266985.zip` reports `Turnip component probe exceeded five seconds; owned cleanup requested` during `world-graphics-check`. About 9 GB remained available and memory pressure was false. The retained `LOW_MEMORY` exit predates this attempt; the new failure is a Java graphics timeout. Stock inspection completed, and the fixed preparation logs survived export.
+The latest owner report was a five-second Turnip graphics timeout with about 9 GB available and no new low-memory kill. V6 completes paced provider/specification admission before starting the unchanged five-second native execution budget, which still includes native startup. GPU receipt/provider validation, cancellation and owned cleanup remain required. Existing preparation memory controls remain active.
 
-V5 preparation pacing exposed a timing boundary error: the graphics owner started its five-second timer before synchronous provider/launch-specification admission, which performs paced hash verification. V6 separates that admission from the native execution interval. The execution budget still includes native startup, stays at five seconds, and retains actual GPU receipt, provider identity, cancellation and owned-child cleanup requirements. Memory controls and source pins remain active.
+Producer `cca8f81abe412b65f0c85da2902f24848a694fd2`; publisher `79c9b8e5744daefcbe4b108652ba26297876bc11`, run/job `41277919602` / `124763764353`. Release `430387223`, APK asset `697446059`. APK 336,796,416 bytes, SHA-256 `11dc96d63d9cf2f00774804216dc9ec45a0785654f40c6a08030ffb91c70ffce`; certificate `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`.
 
-After the signed v6 release is verified, install over the existing stock app and retry **Prepare local runtime / world** with the current import and locale. No reimport or data clearing is needed. One full 15.6 GiB verification pass still takes about 34 minutes at the normal 8 MiB/s rate; later work and pressure add time. Physical Thor v6 preparation/world entry remains unqualified until the owner retry.
+All five exact-producer ARM64 package/native SQL/launcher/tooling/Android gates passed. Android 13 x64 passed 14 named components; readback verified 33 artifact members and 37 source identities. A real paced 48 MiB admission took 6.146 seconds before a 26 ms JNI fixture child; hung/late/launch-budget/cancellation/mutation checks passed. This timing fixture executes no PRoot, Vulkan/KGSL driver or owner game data. Local validation passed 109 Gradle tasks, 1,504 host tests (1,373 passed, 131 dependency skips) and 39 actual SDK tests.
+
+All six public assets passed anonymous length/hash downloads. Exact producer tag, SDK v2/v3 signatures/certificate/stock version 6 manifest and local signed-byte equality passed. The official signing ledger advanced to v6 afterward. Update-6 receipts retain their baseline-5 binding; future updates require a higher code, the same certificate and exact public v6 as previous APK. Preserve all historical releases/transports/evidence.
+
+Records: `runtime/releases/non-custom-v0.1.0-non-custom.6.json`, `runtime/evidence/non-custom-v6-public-apk-readback.json`, `non-custom-v6-release-gates.json`, `non-custom-v6-android13.json`, `non-custom-v6-host-timing.json` and `non-custom-v6-owner-turnip-timeout.json`. Client/server/Eluna pins remain unchanged.
 
 ## Published v5 update baseline — historical
 
