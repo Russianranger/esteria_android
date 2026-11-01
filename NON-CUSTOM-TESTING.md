@@ -1,6 +1,6 @@
-# Version 6 graphics-check retry — release pending
+# Version 6 graphics-check retry
 
-This procedure is prepared for `0.1.0-non-custom.6` / versionCode 6; **the v6 APK is not yet published at this checkpoint**. Once available, use its signed ARM64 APK to update stock versions 1 through 5 with the same persistent certificate. Keep the existing app data and completed import.
+Use the signed `0.1.0-non-custom.6` / versionCode 6 ARM64 update over stock versions 1 through 5 with the same persistent certificate. Check the supplied APK hash and signing receipt. Keep the existing app data and completed import.
 
 Your supplied v4 reports confirm successful folder import. **Keep that import and app data; do not import the client again.** After installing v6 over the existing Esteria Stock app, select the same installed locale and retry **Prepare local runtime / world**. Do not uninstall the app, clear storage, move MPQs or delete completed setup files.
 
@@ -10,7 +10,7 @@ Preparation verification is deliberately slower: Java/Python reads run at up to 
 
 ## One preparation and play session
 
-1. After v6 is published, install its signed ARM64 APK over the existing `io.github.russianranger.esteria.stock` app. The persistent certificate is unchanged. Preserve existing app data, completed import, setup state and saves. Check the release's `SHA256SUMS`, `release.json` and signing receipt for the exact APK/source identity.
+1. Install the signed v6 ARM64 APK over the existing `io.github.russianranger.esteria.stock` app. The persistent certificate is unchanged. Preserve existing app data, completed import, setup state and saves. Check the release's `SHA256SUMS`, `release.json` and signing receipt for the exact APK/source identity.
 2. Use the completed client import already shown by the app. Only if this is a fresh installation or no import ever completed, choose **Import client folder** or **Import client ZIP** and provide one complete ChromieCraft 3.3.5a build 12340 client. Select the root containing `Wow.exe` beside `Data`; keep normal MPQs inside `Data`, and locale/speech/locale-patch MPQs inside `Data/<installed-locale>`. Do not move archives next to `Wow.exe` or rebuild the ZIP. Folder import avoids ZIP staging. A normal enclosing client folder and harmless sibling README/Apple ZIP metadata are supported; selecting `Data` alone requires choosing its parent.
 3. Read the compatibility result and keep the installed locale unchanged. Missing or malformed essential data remains a real error. Inactive ancillary archives stay in the original import and can be excluded from the separate stock selection; do not remove every archive containing “patch.” No additional Esteria or HD archive is required for this stock milestone.
 4. Choose **Prepare local runtime / world**. Leave the app active while admission and hashing progress, even when a large-file phase lasts many minutes. The app prepares its tools, checks/selects stock data, generates dbc/maps/vmaps/mmaps/Cameras and graphics shaders, then initializes its local database when needed. No pre-extracted world download or manual MySQL setup is required. Keep adequate disk space for client/world/shader/database outputs; fresh database setup separately reserves 4 GiB of free storage.
