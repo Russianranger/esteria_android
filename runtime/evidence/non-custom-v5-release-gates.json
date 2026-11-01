@@ -55,7 +55,8 @@
   "gameplayQualified": false,
   "ownerWorldPreparationQualified": false,
   "persistentSigningVerified": true,
-  "publicDownloadVerificationPending": true,
+  "publicDownloadVerificationPending": false,
+  "publicReadbackEvidence": "runtime/evidence/non-custom-v5-public-apk-readback.json",
   "scope": "exact-producer-v5-release-gates-and-signing",
   "signedApk": {
     "apkBytes": 336796416,

@@ -1,3 +1,13 @@
+# Version 5 publication transport
+
+V5 is published and complete anonymous public APK/all-six-asset readback plus SDK v2/v3 signature/certificate/manifest checks passed. Release `430339293`, APK asset `697210840`. Producer `4adb12f9502af7d734174a94fb8233226d9b4c60`; publisher `46bf279d0283c31132c0752df3450d5a0612608b`, run/job `41269263210` / `124738460624`.
+
+Current public inputs are `update-5/signature-recipe.json`, `update-5/signing-receipt.json` and `update-5/publication-inputs.json`. Exact reconstructed/signed APK: code 5, 336,796,416 bytes, SHA-256 `55a00a604d622c90e1d95a104512f9a9a0e085dbd7ed587a1b8ee93ebdca515f`, certificate `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`. Records: `../non-custom-v0.1.0-non-custom.5.json` and `../../evidence/non-custom-v5-public-apk-readback.json`.
+
+The official ledger now pins verified v5. Original update-5 receipts retain their baseline-4 binding; preserve them and all historical releases/transports. Future updates require a higher code, the same certificate and exact public v5 as previous APK; never initial-baseline. Packaging/signing/native SQL and Android components do not qualify physical Thor preparation or gameplay.
+
+The following records and workflow details remain historical.
+
 # Version 4 publication transport
 
 Version 4 is published and its complete public APK passed hash/SDK certificate readback. Current public inputs are `update-4/signature-recipe.json`, `update-4/signing-receipt.json` and `update-4/publication-inputs.json`; identities are in `../non-custom-v0.1.0-non-custom.4.json`. The official signing ledger now pins code 4 and its exact public APK hash. Future updates require a higher code, the same certificate and this APK as the previous baseline. Preserve update-4 and all earlier releases; never use initial-baseline again. Producer/publisher commits retain the baseline-3 lock which binds this historical signing receipt. The following records remain historical.
