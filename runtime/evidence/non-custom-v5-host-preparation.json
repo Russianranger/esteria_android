@@ -48,10 +48,23 @@
     "v5-runtime-read-policy-tests.log": {
       "bytes": 1264,
       "sha256": "242f4749e193d43f7915098b00f7c21d9a8d052bb68496a8184089e927aefa62"
+    },
+    "v5-shader-timeout-check.log": {
+      "bytes": 2135,
+      "sha256": "2c633ae542a5edeee18da1282a93af7fc8ffde83a165f823fc540c9f5632cbf5"
     }
   },
   "ownerWorldPreparationQualified": false,
   "scope": "host-preparation-memory-and-lifecycle-checks-only",
+  "shaderDeadlineReview": {
+    "androidOwnerSeconds": 9000,
+    "fullArchiveHashPassesInShader": 0,
+    "javaCompileAndPresentationOwnerTestsPassed": true,
+    "maximumAcceptedShaderOutputBytes": 2147483648,
+    "minimumGovernedRateBytesPerSecond": 2097152,
+    "outputHashBudgetSeconds": 1024,
+    "translatorSeconds": 7200
+  },
   "shaderMemory": {
     "androidExecuted": false,
     "baselinePeakBytes": 46701725,

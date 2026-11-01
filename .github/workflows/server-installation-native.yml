@@ -6,6 +6,7 @@ on:
     paths:
       - .github/workflows/server-installation-native.yml
       - app/build.gradle
+      - app/src/main/java/io/github/russianranger/esteria/runtime/ShaderSetup.java
       - tools/prepare_server_installation_inputs.py
       - tools/qualify_server_installation.py
       - tests/test_server_installation_inputs.py

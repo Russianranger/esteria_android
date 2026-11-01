@@ -155,7 +155,9 @@ public final class ShaderSetup {
             process=ProotProcess.start(context,wine.installer(),wine.packagePlan(),work,session,
                 plan.arguments,wine.wineEnvironment(),plan.mounts,null);
             if(progress!=null)progress.update("shaders-child-started","",0,-1);
-            long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(125);
+            // The translator has a two-hour budget; paced output validation
+            // can take another seventeen minutes for its allowed 2 GiB output.
+            long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(150);
             long nextProgress=0;
             ServerDataSetup.ProgressLines lines=new ServerDataSetup.ProgressLines();
             String observedPhase="shaders-generating";
