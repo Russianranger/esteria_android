@@ -1,3 +1,17 @@
+# Esteria Stock v7 handoff — full APK gates pending
+
+The public APK/signing baseline remains v6. Keep package `io.github.russianranger.esteria.stock`, persistent certificate, import, databases and saves. V7 defaults select code 7 and use the genuinely rebuilt ordered extractor pair, not the historical data-tools archive.
+
+The new owner error was `map_extractor` exit 2 at `ordered effective file count bound`; graphics passed in 243 ms and no new low-memory exit was recorded. Select the DBC namespace/extension before retention; keep per-list input and selected-output bounds, strict provider order, tombstones and cancellation/ownership. The fixed header/patch/adapted System.cpp are SHA-bound in `extractor-order.lock.json`; client/server/Eluna pins remain unchanged.
+
+Actual gates: native build `bad963b8ae2edd0c8bcfe0db852ac4557f1cc700`, run/job 41327929457 / 124911701196; source sealing `ae905634a994216c676cb1e7739b0a7d52dce25e`, 41328465330 / 124913293701; composed tools `8d016467af4d23ab88303ed8ec877f28334e1049`, run 41328868562, package/native jobs 124914523335 / 124914647426. The actual native suite passed all 26 reader cases without skips; four-tool CLI/configuration, complete source and paired-debug readback passed. New runtime: 2,913,905 bytes, SHA-256 `e80d1d731902907297ae89f68d8241bca0aa79b8a281521c669353654ce5b436`.
+
+Source/debug preservation: publisher `f57e02162006c14b275d70757f61c1605f7050e0`, run/job 41329589487 / 124916688467, public component release 430726308 / `non-custom-data-tools-v7`. All four full public assets and complete source/runtime/debug/native proof passed independent anonymous readback. Both publication receipts are committed with the final APK producer. The explicit data-tools-update lock permits exactly the two data-input lock changes; frozen old providers are still fully verified, old data tools are excluded from the APK, and unaffected programs/content/extractors remain original. The APK workflow must select the updated provider path.
+
+Full APK/Android/native SQL/signing/public download gates remain pending; advance the v6 signing ledger only after full public v7 SDK readback. Retain source and component proofs under `runtime/evidence/non-custom-v7-*`. Local checks passed 109 Gradle tasks, 39 actual SDK tests and 1,532 host tests (1,428 passed, 104 skips). No owner-data conversion, Thor world entry or gameplay is claimed. Update over v6, keep data/import and retry preparation with the same locale; export support before another retry after failure.
+
+## Published v6 baseline — historical
+
 # Esteria Stock v6 handoff
 
 [Signed ARM64 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.6/Esteria-Stock-3.3.5a-arm64.apk). Version `0.1.0-non-custom.6` / code 6.

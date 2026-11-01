@@ -1,3 +1,15 @@
+# Esteria Stock v7 — native fix verified; APK build pending
+
+The owner v6 support bundle `Esteria-support-1793550413267.zip` confirms graphics readback passed in 243 ms. Map/DBC extraction then failed at `ordered effective file count bound`; no new low-memory exit was recorded and about 9.9 GB remained available. Preserve the completed import and all app data.
+
+V7 selects DBFilesClient/*.dbc before retaining archive names, parses bounded listfiles without redundant all-name copies, and checks decoded metadata size before allocation. Provider priority, deletion markers, path checks and selected-count bounds remain enforced. Host regression: 120,238 distinct synthetic names, 238 selected DBCs, 34 tests passed; the old behavior failed the regression.
+
+Actual ARM64 rebuild passed at `bad963b8ae2edd0c8bcfe0db852ac4557f1cc700`, followed by complete source sealing and four-tool qualification at `8d016467af4d23ab88303ed8ec877f28334e1049`. All 26 actual native reader tests passed without skips. The new runtime archive is `e80d1d731902907297ae89f68d8241bca0aa79b8a281521c669353654ce5b436`. Its complete source/debug package is public in `non-custom-data-tools-v7` (release 430726308); all four public assets and complete provider proof passed independent anonymous readback. Unaffected programs/content/assembler/navigation and client/server/Eluna pins remain unchanged.
+
+The complete v7 APK build, Android components, native SQL, persistent signing and public APK verification remain required before delivery. No v7 APK is published at this checkpoint. Local validation passed 109 Gradle tasks, 39 actual SDK release tests and 1,532 host tests (1,428 passed, 104 dependency/environment skips). Actual Thor preparation and gameplay remain unqualified. See `NON-CUSTOM-TESTING.md` and the `non-custom-v7-*` evidence.
+
+## Published v6 baseline — historical
+
 # Esteria Stock v6 — graphics deadline update published
 
 [Signed ARM64 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.6/Esteria-Stock-3.3.5a-arm64.apk) · [Testing procedure](NON-CUSTOM-TESTING.md).

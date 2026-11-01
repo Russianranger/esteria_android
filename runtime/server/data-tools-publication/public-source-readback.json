@@ -1,0 +1,34 @@
+{
+  "allStoredBytesReadBack": true,
+  "androidRuntimeQualified": false,
+  "assets": {
+    "SHA256SUMS": {
+      "bytes": 292,
+      "sha256": "c16aac21016c7432baf06d85f0d6f67d0d410de0d0fd93cdaeee4fe6de1cb4e2"
+    },
+    "composed-data-tools-native-evidence.zip": {
+      "bytes": 20289,
+      "sha256": "66da8911ad3f175906d194fb99ad85c9ac5b73abde5d5e2d458a075e7045d74c"
+    },
+    "composed-data-tools-package.zip": {
+      "bytes": 131937309,
+      "sha256": "40f5aff200e1f41f7c7affe52c6888aae4cc5284c2368d94a04c6741149b9d11"
+    },
+    "release-manifest.json": {
+      "bytes": 4755,
+      "sha256": "594bc23b7586069b93723678cac3b120da5afd93673321761a12cd59b1eb72c2"
+    }
+  },
+  "completeSourcesAndPairedDebugVerified": true,
+  "extractorExecutedHere": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "ownerGameDataSupplied": false,
+  "qualifiedInputLock": {
+    "bytes": 4062,
+    "sha256": "56e8e89de2d3a300bc7abe3fbda1095dbf66e0cf495f569482b474ccaa5a56fe"
+  },
+  "releaseId": 430726308,
+  "scope": "anonymous-data-tools-complete-source-debug-readback",
+  "targetCommit": "8d016467af4d23ab88303ed8ec877f28334e1049"
+}

@@ -55,7 +55,7 @@ def stage(args):
     (args.output / 'SHA256SUMS').write_text(signed['apkSha256'] + '  ' + name + '\n')
     setup = ('Keep the completed client import and retry Prepare local runtime / world, then\n'
              'start the local game. Follow the attached NON-CUSTOM-TESTING.md procedure, including\n'
-             'the offline repeat and support bundle export if a stage fails.' if signed['versionCode'] in (5, 6) else
+             'the offline repeat and support bundle export if a stage fails.' if signed['versionCode'] in (5, 6, 7) else
              'Import your complete ChromieCraft client, prepare the local runtime/world, then\n'
              'start the local game. Follow the attached NON-CUSTOM-TESTING.md procedure, including\n'
              'the offline repeat and support bundle export if a stage fails.')
@@ -145,6 +145,25 @@ or data clearing is needed. A full verification pass over 15.6 GiB still takes
 roughly 34 minutes at the normal 8 MiB/s rate; later phases add time. If a stage
 fails, export the complete support bundle before another preparation attempt.
 Actual Thor world preparation, rendering and gameplay remain unqualified.
+'''
+    if signed['versionCode'] == 7:
+        notes += '''
+Version 7 corrects ordered map/DBC extractor file enumeration. Archive listfiles
+are bounded and checked while only the requested DBC names are retained, so
+unrelated texture, audio and world filenames do not exhaust the effective DBC
+inventory. Provider order, path validation and deletion markers remain enforced.
+The native extractor pair is rebuilt from the pinned server and adapted sources.
+
+The v6 support report confirms the graphics probe passed in 243 ms, followed by
+map_extractor exit 2 at the ordered effective file count bound. It records no
+new low-memory kill. Existing preparation memory controls remain active.
+
+Install over the existing stock app. Keep the completed import and app data,
+select the same locale, and retry Prepare local runtime / world. Do not reimport,
+uninstall or clear data. Completed compatible phases remain reusable; the new
+extractor identity requires affected data phases to run again. Export support
+before another retry after any failure. Actual Thor world preparation and
+gameplay remain unqualified until the device retry.
 '''
     (args.output / 'RELEASE-NOTES.md').write_text(notes)
     return result

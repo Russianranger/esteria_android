@@ -1,0 +1,36 @@
+{
+  "assets": {
+    "SHA256SUMS": {
+      "assetId": 698948045,
+      "bytes": 292,
+      "sha256": "c16aac21016c7432baf06d85f0d6f67d0d410de0d0fd93cdaeee4fe6de1cb4e2",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/non-custom-data-tools-v7/SHA256SUMS"
+    },
+    "composed-data-tools-native-evidence.zip": {
+      "assetId": 698948090,
+      "bytes": 20289,
+      "sha256": "66da8911ad3f175906d194fb99ad85c9ac5b73abde5d5e2d458a075e7045d74c",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/non-custom-data-tools-v7/composed-data-tools-native-evidence.zip"
+    },
+    "composed-data-tools-package.zip": {
+      "assetId": 698948122,
+      "bytes": 131937309,
+      "sha256": "40f5aff200e1f41f7c7affe52c6888aae4cc5284c2368d94a04c6741149b9d11",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/non-custom-data-tools-v7/composed-data-tools-package.zip"
+    },
+    "release-manifest.json": {
+      "assetId": 698948568,
+      "bytes": 4755,
+      "sha256": "594bc23b7586069b93723678cac3b120da5afd93673321761a12cd59b1eb72c2",
+      "url": "https://github.com/Russianranger/esteria_android/releases/download/non-custom-data-tools-v7/release-manifest.json"
+    }
+  },
+  "formatVersion": 1,
+  "publisherNeverOverwrites": true,
+  "releaseId": 430726308,
+  "repository": "Russianranger/esteria_android",
+  "scope": "exact-qualified-data-tools-source-debug-write-once-release",
+  "tag": "non-custom-data-tools-v7",
+  "targetCommit": "8d016467af4d23ab88303ed8ec877f28334e1049",
+  "url": "https://github.com/Russianranger/esteria_android/releases/tag/non-custom-data-tools-v7"
+}

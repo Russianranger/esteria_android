@@ -5,7 +5,7 @@ on:
       build_version_code:
         description: Positive release versionCode, increased before a signed update
         required: false
-        default: '6'
+        default: '7'
         type: string
       publish_non_custom:
         description: Sign and publish an additive non-custom prerelease using the configured persistent key
@@ -40,12 +40,17 @@ on:
       - 'runtime/server/playerbots-helper-source-qualified.lock.json'
       - 'runtime/server/data-tools-provider.lock.json'
       - 'runtime/server/data-tools-qualified-artifacts.lock.json'
+      - 'runtime/server/data-tools-update.lock.json'
+      - 'runtime/server/data-tools-publication/**'
       - 'tools/provider_playerbots_programs.py'
       - 'tools/qualify_playerbots_programs.py'
       - 'tools/measure_playerbots_programs.py'
       - 'tools/provider_server_data_tools.py'
       - 'tools/prepare_data_tools_provider.py'
       - 'tools/measure_server_data_tools.py'
+      - 'tools/select_updated_data_tools.py'
+      - 'tools/publish_data_tools_update.py'
+      - 'tests/test_updated_data_tools_selection.py'
       - 'runtime/server-components-publication/dependency-release.lock.json'
       - 'runtime/server-components-publication/published-release.json'
       - 'runtime/server-components-publication/public-source-readback.json'
@@ -67,6 +72,7 @@ jobs:
       recipe: ${{ steps.profile.outputs.recipe }}
       server_source: ${{ steps.profile.outputs.server_source }}
       server_recipe: ${{ steps.profile.outputs.server_recipe }}
+      data_update: ${{ steps.profile.outputs.data_update }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -84,6 +90,7 @@ jobs:
           server=selection()
           print('server_source='+server['source'])
           print('server_recipe='+(server['recipeRevision'] or ''))
+          print('data_update='+str('dataToolsUpdate' in server).lower())
           selected=bool(environment)
           print('selected='+str(selected).lower())
           if selected:
@@ -112,7 +119,7 @@ jobs:
       contents: write
       actions: read
     env:
-      RELEASE_VERSION_CODE: ${{ inputs.build_version_code || '6' }}
+      RELEASE_VERSION_CODE: ${{ inputs.build_version_code || '7' }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -143,7 +150,7 @@ jobs:
             tests.test_playerbots_programs_provider tests.test_playerbots_programs_qualification \
             tests.test_server_data_tools_provider tests.test_qualified_data_tools_inputs \
             tests.test_public_local_server_profile tests.test_android_signing \
-            tests.test_non_custom_release -v
+            tests.test_non_custom_release tests.test_updated_data_tools_selection -v
           python3 tools/fetch_sources.py client --output sources
           git fetch --no-tags --depth 1 origin 75f50445112818c97f8d8e575d2b1c21e59af6e5
           git fetch --no-tags --depth 1 origin 681b2e9f30b19e94bf8e8de44f67fedba5033c8a
@@ -216,7 +223,7 @@ jobs:
           # the self-contained optional provider. Preserve those copies below.
           rm -rf "$RUNNER_TEMP/helper-programs-inputs"
       - name: Acquire and reproduce qualified composed data tools without a server rebuild
-        if: needs.selection.outputs.server_source == 'retained-actions'
+        if: needs.selection.outputs.server_source == 'retained-actions' || needs.selection.outputs.data_update == 'true'
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
@@ -225,6 +232,7 @@ jobs:
           cp "$RUNNER_TEMP/data-tools-inputs/acquisition.json" out/coherent-evidence/data-tools-acquisition.json
           python3 tools/prepare_data_tools_provider.py build --inputs "$RUNNER_TEMP/data-tools-inputs" \
             --output "$RUNNER_TEMP/data-tools-providers" > out/coherent-evidence/data-tools-provider-build.json
+          echo "SERVER_DATA_TOOLS_PROVIDER=$RUNNER_TEMP/data-tools-providers/provider" >> "$GITHUB_ENV"
           # The provider now owns fully verified runtime/source/debug copies.
           rm -rf "$RUNNER_TEMP/data-tools-inputs"
       - name: Read back the exact public cohort once and restore all four providers

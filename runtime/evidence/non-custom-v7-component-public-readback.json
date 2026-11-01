@@ -1,0 +1,29 @@
+{
+  "allFourPublicAssetsAnonymouslyDownloaded": true,
+  "androidRuntimeQualified": false,
+  "clientServerPinsUnchanged": true,
+  "completeSourceRuntimeDebugAndNativeEvidenceReadBack": true,
+  "componentReadback": "runtime/server/data-tools-publication/public-source-readback.json",
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "metadataAccess": "read-only GitHub connector; asset downloads anonymous",
+  "newRuntimeArchive": {
+    "bytes": 2913905,
+    "file": "server-data-tools-runtime-arm64.tar.gz",
+    "sha256": "e80d1d731902907297ae89f68d8241bca0aa79b8a281521c669353654ce5b436"
+  },
+  "oldFrozenDataProviderSelectedForApk": false,
+  "publisherAndIndependentReadbacksMatched": true,
+  "publisherArtifact": {
+    "bytes": 2624,
+    "sha256": "fe5d32172364e59b7e943502be11a9409d83c236c9188ccc4336afc0efb67dc0"
+  },
+  "publisherArtifactId": 13092653107,
+  "publisherJobId": 124916688467,
+  "publisherRevision": "f57e02162006c14b275d70757f61c1605f7050e0",
+  "publisherRunId": 41329589487,
+  "releaseId": 430726308,
+  "scope": "independent-v7-data-tools-public-component-readback",
+  "targetCommit": "8d016467af4d23ab88303ed8ec877f28334e1049",
+  "thorQualified": false
+}
