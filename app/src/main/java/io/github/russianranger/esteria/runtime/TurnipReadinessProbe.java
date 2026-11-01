@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.LongSupplier;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -37,8 +38,11 @@ public final class TurnipReadinessProbe {
     private static final Map<Path,Handle> OWNERS=new ConcurrentHashMap<>();
     private TurnipReadinessProbe(){ }
     public enum State { ALLOCATED,RUNNING,PASSED,FAILED,CLOSED }
+    @FunctionalInterface interface Admission { OwnedProcess.Specification prepare()throws IOException; }
+    @FunctionalInterface interface Launcher { OwnedProcess start(OwnedProcess.Specification specification)throws IOException; }
     public static final class Result {
         public final String deviceName,wineGeneration,driverGeneration,wineArchiveSha256,driverArchiveSha256,driverSourceRevision,buildReceiptSha256;
+        /** Native launch/execution time; paced provider reads are separate. */
         public final long deviceId,elapsedMillis;
         public final Map<String,Path> diagnosticLogs;
         private Result(Handle owner,TurnipProbeContract.Receipt receipt,long elapsed) {
@@ -131,34 +135,56 @@ public final class TurnipReadinessProbe {
                 RuntimeWork.Cancellation cancelled=()->operations.isStopRequested()||Thread.currentThread().isInterrupted()||
                     (cancellation!=null&&cancellation.isCancelled());
                 try {
+                    if(progress!=null)progress.update("graphics-provider-admission","",0,1);
                     checkCancelled(cancelled);requireCurrent();noGlobalPreload(wineRoot);
                     Map<String,String> environment=TurnipProbeContract.environment(turnip.selectedEnvironment(wine.archiveSha256()));
-                    if(progress!=null)progress.update("graphics-component-probe","",0,1);
-                    long started=System.nanoTime(),deadline=started+TimeUnit.MILLISECONDS.toNanos(TurnipProbeContract.TIMEOUT_MILLIS);
-                    process=ProotProcess.start(context,wine.installer(),wine.packagePlan(),work,session,
-                        TurnipProbeContract.arguments(),wine.wineEnvironment(environment),List.of(new ProotLaunch.Mount(driverRoot,TurnipProbeContract.MOUNT)),null);
-                    while(process.isAlive()) {
-                        checkCancelled(cancelled);
-                        if(System.nanoTime()>=deadline)throw new IOException("Turnip component probe exceeded five seconds; owned cleanup requested");
-                        try{Thread.sleep(10);}catch(InterruptedException interrupted){Thread.currentThread().interrupt();throw new RuntimeWork.CancelledException();}
-                    }
-                    if(System.nanoTime()>=deadline)throw new IOException("Turnip component probe exceeded five seconds; result was not accepted");
-                    checkCancelled(cancelled);
-                    if(process.failure()!=null)throw new IOException("Turnip probe ownership or log capture failed",process.failure());
-                    if(process.wasForced()||process.exitCode()!=0)throw new IOException("Turnip component probe failed (exit "+process.exitCode()+"); export the retained component logs");
+                    long elapsed=runPrepared(()->{
+                        OwnedProcess.Specification prepared=ProotProcess.prepare(context,wine.installer(),wine.packagePlan(),work,session,
+                            TurnipProbeContract.arguments(),wine.wineEnvironment(environment),List.of(new ProotLaunch.Mount(driverRoot,TurnipProbeContract.MOUNT)));
+                        if(progress!=null)progress.update("graphics-component-probe","",0,1);
+                        return prepared;
+                    },prepared->OwnedProcess.start(new NativeProcessBridge(),prepared,null),System::nanoTime,cancelled);
+                    if(progress!=null)progress.update("graphics-component-readback","",0,1);
                     requireCurrent();TurnipProbeContract.Receipt receipt=readReceipt(work.resolve(TurnipProbeContract.RECEIPT));
-                    Result result=new Result(this,receipt,TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-started));
+                    Result result=new Result(this,receipt,elapsed);
                     state=State.PASSED;if(progress!=null)progress.update("graphics-component-verified-not-gameplay","",1,1);return result;
                 }catch(IOException|RuntimeException|Error error) {
-                    state=State.FAILED;
-                    if(process!=null&&process.isAlive()) {
-                        boolean interrupted=Thread.interrupted();
-                        try{process.terminateAuxiliary();}catch(IOException cleanup){cleanupFailure=cleanup;error.addSuppressed(cleanup);}
-                        finally{if(interrupted)Thread.currentThread().interrupt();}
-                    }
+                    if(state!=State.FAILED)failAndCleanup(error);
                     throw error;
                 }
             });
+        }
+        /** Five seconds cover native launch/execution, after every potentially
+         * paced admission read. Failure retains the owner and lease for close. */
+        long runPrepared(Admission admission,Launcher launcher,LongSupplier nanoTime,RuntimeWork.Cancellation cancelled)throws IOException {
+            if(state==State.ALLOCATED)state=State.RUNNING;
+            if(state!=State.RUNNING||process!=null)throw new IOException("Turnip probe launch is single-use");
+            try {
+                checkCancelled(cancelled);
+                OwnedProcess.Specification prepared=admission.prepare();
+                checkCancelled(cancelled);
+                long started=nanoTime.getAsLong(),budget=TimeUnit.MILLISECONDS.toNanos(TurnipProbeContract.TIMEOUT_MILLIS);
+                process=launcher.start(prepared);
+                while(process.isAlive()) {
+                    checkCancelled(cancelled);
+                    if(nanoTime.getAsLong()-started>=budget)throw new IOException("Turnip component probe exceeded five seconds; owned cleanup requested");
+                    try{Thread.sleep(10);}catch(InterruptedException interrupted){Thread.currentThread().interrupt();throw new RuntimeWork.CancelledException();}
+                }
+                long elapsed=nanoTime.getAsLong()-started;
+                if(elapsed>=budget)throw new IOException("Turnip component probe exceeded five seconds; result was not accepted");
+                checkCancelled(cancelled);
+                if(process.failure()!=null)throw new IOException("Turnip probe ownership or log capture failed",process.failure());
+                if(process.wasForced()||process.exitCode()!=0)throw new IOException("Turnip component probe failed (exit "+process.exitCode()+"); export the retained component logs");
+                return TimeUnit.NANOSECONDS.toMillis(elapsed);
+            }catch(IOException|RuntimeException|Error error){failAndCleanup(error);throw error;}
+        }
+        private void failAndCleanup(Throwable error) {
+            state=State.FAILED;
+            if(process!=null&&process.isAlive()) {
+                boolean interrupted=Thread.interrupted();
+                try{process.terminateAuxiliary();}catch(IOException cleanup){cleanupFailure=cleanup;error.addSuppressed(cleanup);}
+                finally{if(interrupted)Thread.currentThread().interrupt();}
+            }
         }
         private void requireCurrent()throws IOException {
             if(!wineRoot.equals(wine.current())||!driverRoot.equals(turnip.current()))throw new IOException("Turnip or Wine provider changed during the component probe");

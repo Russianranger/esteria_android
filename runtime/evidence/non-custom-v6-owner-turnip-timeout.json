@@ -1,0 +1,55 @@
+{
+  "actualNewGpuFailureConfirmed": false,
+  "actualWorldPreparationQualified": false,
+  "androidLowMemory": false,
+  "appRevision": "4adb12f9502af7d734174a94fb8233226d9b4c60",
+  "appVersion": "0.1.0-non-custom.5",
+  "availableMemoryBytes": 9261002752,
+  "bundle": {
+    "bytes": 10091,
+    "name": "Esteria-support-1793508266985.zip",
+    "sha256": "763662492ac4529e9012132e34e36bf177ee1812037c894f9a2cb2541bf8feba"
+  },
+  "failure": "Turnip component probe exceeded five seconds; owned cleanup requested",
+  "failureRecordedAtEpochMs": 1793508255486,
+  "formatVersion": 1,
+  "helperLogs": {
+    "logs/setup.data.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/setup.data.stdout.log": {
+      "bytes": 26,
+      "sha256": "e117aee6bb177f0e4beaf4caba807e7913dbdea7d70b712838c8ff50c3ae8f8a"
+    },
+    "logs/setup.stock.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/setup.stock.stdout.log": {
+      "bytes": 1273,
+      "sha256": "1a5e38e8a9ced1843f595ebbaff308c6c41f4face3560c9d646bb50f67f73896"
+    },
+    "logs/setup.turnip.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/setup.turnip.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "importComplete": true,
+  "latestAndroidExit": {
+    "reason": "USER_REQUESTED",
+    "timestampEpochMs": 1793505201359
+  },
+  "newExitDuringCurrentOperationRecorded": false,
+  "operationStartedAtEpochMs": 1793508134160,
+  "phase": "world-graphics-check",
+  "result": "failed",
+  "retainedSupportLogRejections": 0,
+  "scope": "owner-v5-graphics-timeout-diagnosis",
+  "sourceFinding": "Five-second child deadline starts before synchronous paced Wine provider verification in ProotProcess.start; time can expire before the native probe is launched.",
+  "thorWorldEntryQualified": false
+}

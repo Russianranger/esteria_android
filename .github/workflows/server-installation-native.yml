@@ -7,6 +7,8 @@ on:
       - .github/workflows/server-installation-native.yml
       - app/build.gradle
       - app/src/main/java/io/github/russianranger/esteria/runtime/ShaderSetup.java
+      - app/src/main/java/io/github/russianranger/esteria/runtime/TurnipReadinessProbe.java
+      - app/src/main/java/io/github/russianranger/esteria/runtime/ProotProcess.java
       - core/src/main/java/io/github/russianranger/esteria/core/diagnostics/SupportLogSelection.java
       - app/src/androidTest/java/io/github/russianranger/esteria/runtime/PreparationChildFixture.java
       - tools/prepare_server_installation_inputs.py

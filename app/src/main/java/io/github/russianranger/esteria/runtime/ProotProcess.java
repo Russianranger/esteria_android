@@ -69,6 +69,13 @@ public final class ProotProcess {
         return OwnedProcess.start(new NativeProcessBridge(),specification(context,installer,plan,work,session,
             guestCommand,guestEnvironment,mounts,null),gracefulStop);
     }
+    /** Verify providers/paths before a caller starts a child-only deadline.
+     * This creates the same immutable specification without launching it. */
+    static OwnedProcess.Specification prepare(Context context,RuntimeInstaller installer,RuntimePackagePlan plan,
+            Path work,Path session,List<String> guestCommand,Map<String,String> guestEnvironment,
+            List<ProotLaunch.Mount> mounts)throws IOException {
+        return specification(context,installer,plan,work,session,guestCommand,guestEnvironment,mounts,null);
+    }
     public static OwnedProcess startPresentation(Context context,RuntimeInstaller installer,RuntimePackagePlan plan,
             Path work,Path session,List<String> guestCommand,Map<String,String> guestEnvironment,
             List<ProotLaunch.Mount> mounts,ProotLaunch.PresentationBindings presentation) throws IOException {

@@ -1,3 +1,19 @@
+# Esteria Stock v6 implementation handoff — publication pending
+
+Branch `non-custom`; defaults now select `0.1.0-non-custom.6` / code 6. The current published and signing-ledger baseline is v5. Retain `io.github.russianranger.esteria.stock`, its certificate, completed import, setup state, databases and saves. Do not reimport the client.
+
+## New failure and correction
+
+Owner bundle `Esteria-support-1793508266985.zip` is from v5 source `4adb12f9502af7d734174a94fb8233226d9b4c60`. It records the graphics readiness exception `Turnip component probe exceeded five seconds; owned cleanup requested`, roughly 23 seconds after the last completed provider stage. Memory availability was about 9 GB and low-memory pressure was false; no new `LOW_MEMORY` exit is recorded. The old low-memory record is historical. Stock inspection and support-log persistence worked in this attempt.
+
+The deadline began before `ProotProcess.start` performed synchronous, paced provider/specification verification. V6 separates that verified admission from native execution. Start the unchanged five-second budget before the actual owned native launch, including spawn time; never disable pacing or accept a synthetic/no-GPU receipt. Retain provider/receipt validation, cancellation and cleanup ownership through every failure path. Other agents own the implementation and its timing/cancellation/reaping regressions.
+
+Fresh complete ARM64 packaging, native SQL, launcher/tooling and Android results are required for the final producer before signing/publication. Sign against the exact verified v5 APK with the existing persistent key. New detached transport is `runtime/releases/non-custom/update-6`; preserve update-5 and its original baseline-4 receipt. Advance `app/stock-signing.lock.json` from v5 only after the v6 public APK and SDK readback pass. No v6 APK, signature, release ID or device success is claimed here.
+
+After publication, retain data/import and retry preparation with the same locale. The 34-minute estimate applies to one 15.6 GiB full hash pass at 8 MiB/s, not total setup or native extractor throughput. Export support before another attempt after any failure. Real Thor preparation, GPU/world rendering, input/audio, persistence and offline play remain separate owner qualification gates.
+
+## Published v5 identities and evidence — historical
+
 # Esteria Stock v5 handoff
 
 Signed `0.1.0-non-custom.5` / code 5, package `io.github.russianranger.esteria.stock`. [APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.5/Esteria-Stock-3.3.5a-arm64.apk). **Update over the existing app, retain data and the completed import, and retry Prepare local runtime / world without reimporting.**

@@ -734,7 +734,10 @@ public final class SessionService extends Service {
         try {
             status="Checking graphics support…";
             rememberLogs(owner.diagnosticLogs());
-            TurnipReadinessProbe.Result result=owner.run((phase,path,completed,total)->keepAwake(),cancelled::get);
+            TurnipReadinessProbe.Result result=owner.run((phase,path,completed,total)->{
+                keepAwake();
+                if(activePreparationIo!=null)preparationProgress(phase,path,completed,total);
+            },cancelled::get);
             graphicsProbeFacts=result.diagnosticFacts();
             log("Graphics component readback passed deviceId="+result.deviceId+" elapsedMillis="+result.elapsedMillis
                 +" driverGeneration="+result.driverGeneration+" wineGeneration="+result.wineGeneration+" gameplayQualified=false");

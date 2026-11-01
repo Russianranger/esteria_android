@@ -28,6 +28,7 @@ def turnipProbeOwnerClasspath = files(providers.provider { android.bootClasspath
 def compileTurnipProbeOwner = tasks.register('compileTurnipProbeOwnerFixture', JavaCompile) {
     dependsOn 'compileDebugJavaWithJavac', ':core:classes'
     source file('src/test/java/io/github/russianranger/esteria/runtime/TurnipReadinessOwnerTests.java')
+    source file('src/androidTest/java/io/github/russianranger/esteria/core/runtime/install/TurnipAdmissionReadFixture.java')
     source file('src/test/java/android/os/Looper.java')
     classpath = turnipProbeOwnerClasspath
     destinationDirectory = layout.buildDirectory.dir('turnipProbeOwnerFixture')

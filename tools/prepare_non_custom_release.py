@@ -55,7 +55,7 @@ def stage(args):
     (args.output / 'SHA256SUMS').write_text(signed['apkSha256'] + '  ' + name + '\n')
     setup = ('Keep the completed client import and retry Prepare local runtime / world, then\n'
              'start the local game. Follow the attached NON-CUSTOM-TESTING.md procedure, including\n'
-             'the offline repeat and support bundle export if a stage fails.' if signed['versionCode'] == 5 else
+             'the offline repeat and support bundle export if a stage fails.' if signed['versionCode'] in (5, 6) else
              'Import your complete ChromieCraft client, prepare the local runtime/world, then\n'
              'start the local game. Follow the attached NON-CUSTOM-TESTING.md procedure, including\n'
              'the offline repeat and support bundle export if a stage fails.')
@@ -125,6 +125,26 @@ Two v4 owner bundles recorded successful folder import and three unique Android
 LOW_MEMORY exits during later preparation. Missing helper logs did not identify
 the exact child or allocation. Host/synthetic checks do not establish that the
 Thor failure is eliminated; actual v5 preparation and gameplay remain unqualified.
+'''
+    if signed['versionCode'] == 6:
+        notes += '''
+Version 6 fixes the Turnip graphics readiness timeout seen during v5 preparation.
+Paced provider and launch-specification validation now completes before the
+five-second native probe execution budget begins. Native process startup remains
+inside that budget. The probe still requires the original GPU pixel-readback
+receipt and retains cancellation, provider identity and owned cleanup checks.
+
+The reported v5 failure was a graphics timeout with about 9 GB of memory
+available, not a newly recorded low-memory kill. Existing preparation memory
+controls remain active: paced verification, bounded shader retention and native
+child memory guards. No graphics check is skipped and no source pin is changed.
+
+Install over the existing stock app, keep app data and the completed client
+import, and retry Prepare local runtime / world with the same locale. No reimport
+or data clearing is needed. A full verification pass over 15.6 GiB still takes
+roughly 34 minutes at the normal 8 MiB/s rate; later phases add time. If a stage
+fails, export the complete support bundle before another preparation attempt.
+Actual Thor world preparation, rendering and gameplay remain unqualified.
 '''
     (args.output / 'RELEASE-NOTES.md').write_text(notes)
     return result

@@ -1,3 +1,17 @@
+# Esteria Stock v6 — graphics probe deadline fix pending
+
+Version `0.1.0-non-custom.6` / code 6 is being prepared on `non-custom`; **no v6 APK is published at this checkpoint**. Keep package `io.github.russianranger.esteria.stock`, the persistent certificate, existing data and completed import. Fresh exact-producer ARM64 packaging, native SQL, Android execution, signing and public download readback remain release gates.
+
+## Current owner failure
+
+The v5 support bundle `Esteria-support-1793508266985.zip` reports `Turnip component probe exceeded five seconds; owned cleanup requested` during `world-graphics-check`. About 9 GB remained available and memory pressure was false. The retained `LOW_MEMORY` exit predates this attempt; the new failure is a Java graphics timeout. Stock inspection completed, and the fixed preparation logs survived export.
+
+V5 preparation pacing exposed a timing boundary error: the graphics owner started its five-second timer before synchronous provider/launch-specification admission, which performs paced hash verification. V6 separates that admission from the native execution interval. The execution budget still includes native startup, stays at five seconds, and retains actual GPU receipt, provider identity, cancellation and owned-child cleanup requirements. Memory controls and source pins remain active.
+
+After the signed v6 release is verified, install over the existing stock app and retry **Prepare local runtime / world** with the current import and locale. No reimport or data clearing is needed. One full 15.6 GiB verification pass still takes about 34 minutes at the normal 8 MiB/s rate; later work and pressure add time. Physical Thor v6 preparation/world entry remains unqualified until the owner retry.
+
+## Published v5 update baseline — historical
+
 # Esteria Stock v5 — preparation memory update published
 
 [Download signed ARM64 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.5/Esteria-Stock-3.3.5a-arm64.apk) · [Release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.5) · [Testing procedure](NON-CUSTOM-TESTING.md).

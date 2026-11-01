@@ -1,0 +1,46 @@
+{
+  "formatVersion": 1,
+  "freshAndroidTimingExecutionPending": true,
+  "gradle": {
+    "all109TasksPassed": true,
+    "coreCheck": true,
+    "debugAndAndroidTestBuilt": true,
+    "lintDebug": true,
+    "turnipProbeOwnerTest": true
+  },
+  "hostPython": {
+    "errors": 0,
+    "failures": 0,
+    "passed": 1373,
+    "run": 1504,
+    "skipped": 131
+  },
+  "logs": {
+    "v6-final-gradle.log": {
+      "bytes": 15525,
+      "sha256": "680a37775e5df84a9d904fb319bf70998abce9cda710cd33aad759e6191ecb2f"
+    },
+    "v6-full-host-tests.log": {
+      "bytes": 291895,
+      "sha256": "3da07527f42fc4607873f9f17e74d86b043f1b3ac5527b7c69fc005076668e78"
+    },
+    "v6-release-prep-tests.log": {
+      "bytes": 6720,
+      "sha256": "b9386d85d36685fc7701ba0a7e1693fc5ff905e3a0079b4e85cf05fa3c82a9dd"
+    },
+    "v6-turnip-direct-host-tests.log": {
+      "bytes": 242,
+      "sha256": "9fc06a2ce6ec6bf340f4b4341e576d275cbc885ee77bce7c240090a122777900"
+    },
+    "v6-turnip-mutated-timer-regression.log": {
+      "bytes": 586,
+      "sha256": "6d37904690b6d1136bfe55c4fd7c8fca8e61cde0ea0fea75bd9a7d26a5cf15e0"
+    }
+  },
+  "nativeExecutionDeadlineMillis": 5000,
+  "realGpuExecuted": false,
+  "scope": "v6-host-probe-timing-and-build-regressions",
+  "sourcePinsUnchanged": true,
+  "thorWorldPreparationQualified": false,
+  "timerBeforeAdmissionMutationRejected": true
+}
