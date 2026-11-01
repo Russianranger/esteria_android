@@ -1,0 +1,41 @@
+{
+  "formatVersion": 1,
+  "scope": "rejected-Android13-checkpoint-not-release-qualification",
+  "appSourceRevision": "51690463c1ed956bc6f489a7305c53101be48751",
+  "runId": 41267143265,
+  "jobId": 124732193371,
+  "artifactId": 13067563643,
+  "artifact": {
+    "bytes": 18692,
+    "sha256": "5eb9d3d822f460043b6788ab58e7369e941983979fde562742d3dbd7789153b6"
+  },
+  "artifactDigestVerified": true,
+  "testsRun": 13,
+  "failureCount": 1,
+  "namedSuccesses": [
+    "gibibyteFolderAndNonseekableZipImportsKeepBoundedMemory",
+    "thousandsOfOpaqueDocumentsStayBoundedAndSourceChecksRemainActive",
+    "actualAndroidHistoryQueryIsBoundedToOwnPackage",
+    "descriptionsAreBoundedRedactedAndSingleLine",
+    "lowMemoryKillJavaOomAndOtherExitsRemainDistinct",
+    "severePressureBlocksWritesAndStopRemainsPrompt",
+    "trimSignalsAndSystemHeadroomSelectTheCorrectPolicy",
+    "controllerPersistsRealSyncCacheAndSystemPressureObservations",
+    "nativeCacheAdvicePreservesSyncedFileBytes",
+    "actualSharedPreferencesXmlRoundTripPreservesOwnedLogRecords",
+    "parentPreparationReadsUseBoundedRealCacheAdviceAndRemainCancellable",
+    "oneInvalidRetainedRolePreservesOtherStrictlyValidatedLogs"
+  ],
+  "failures": [
+    {
+      "test": "phaseAndRealOwnedChildObservationSurviveDiagnosticReconstruction",
+      "observed": "Test-only shell argv repeated sh although NativeProcessBridge already prepends the executable; actual shell exited 127 instead of the requested 75. The typed pause mapping was therefore not exercised.",
+      "repair": "Remove the redundant shell argv in both PreparationChildFixture methods. Existing Linux/JNI integration group directly asserts actual native shell exit codes 75 and 0."
+    }
+  ],
+  "preferenceXmlRoundTripPassed": true,
+  "productionChangedForThisRepair": false,
+  "thorQualified": false,
+  "gameplayQualified": false,
+  "evidenceBoundary": "This failed checkpoint is retained for diagnosis only. The fixture-only repair requires a fresh exact-source APK producer and Android readback; this checkpoint does not qualify Thor execution or elimination of the reported world-preparation kill."
+}

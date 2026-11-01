@@ -29,6 +29,10 @@
     "skipped": 108
   },
   "logs": {
+    "native-v5-fixture-command.log": {
+      "bytes": 6114,
+      "sha256": "4ed4f6dba9e1133d0055f868b9c57789207313aad952ff72bb64590eb7b12985"
+    },
     "v5-docs-release-notes-tests.log": {
       "bytes": 4533,
       "sha256": "ec300c14df0653979ee5ba6216a050b72413088c8d267c2d1b6b640f8c00347a"
@@ -40,6 +44,10 @@
     "v5-final-python-io-tests.log": {
       "bytes": 14462,
       "sha256": "01c6091cdf60bfb5216955144d8aac269e35f7106e73da21c07ca777c6656758"
+    },
+    "v5-fixture-command-android-compile.log": {
+      "bytes": 2363,
+      "sha256": "c47fd3aa3a20d90cd6d21811c622cd205f646806c95b04c4dcd7a6f166c14793"
     },
     "v5-full-python-green-tests.log": {
       "bytes": 290958,
@@ -57,6 +65,14 @@
       "bytes": 2135,
       "sha256": "2c633ae542a5edeee18da1282a93af7fc8ffde83a165f823fc540c9f5632cbf5"
     }
+  },
+  "nativeFixtureCommandReview": {
+    "androidFixtureCompilationPassed": true,
+    "executableIsSuppliedByNativeOwner": true,
+    "freshAndroidExecutionPending": true,
+    "productionCodeUnchanged": true,
+    "realNativeShellExit75And0Asserted": true,
+    "shellArgsBeginWithDashC": true
   },
   "ownerWorldPreparationQualified": false,
   "preferenceTransportReview": {

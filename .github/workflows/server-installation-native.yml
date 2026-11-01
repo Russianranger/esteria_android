@@ -8,6 +8,7 @@ on:
       - app/build.gradle
       - app/src/main/java/io/github/russianranger/esteria/runtime/ShaderSetup.java
       - core/src/main/java/io/github/russianranger/esteria/core/diagnostics/SupportLogSelection.java
+      - app/src/androidTest/java/io/github/russianranger/esteria/runtime/PreparationChildFixture.java
       - tools/prepare_server_installation_inputs.py
       - tools/qualify_server_installation.py
       - tests/test_server_installation_inputs.py

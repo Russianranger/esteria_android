@@ -35,6 +35,10 @@ public final class NativeOwnerIntegrationTest {
             done(exit); check(exit.exitCode()==7 && exit.failure()==null,"nonzero exit status lost");
             check(Files.readString(root.resolve("utf8/out")).equals("🌍 café"),"JNI UTF-8 corrupted");
             check(exit.diagnostics()[0]==10 && exit.diagnostics()[1]==10,"log byte accounting differs");
+            for(int code:List.of(75,0)){
+                OwnedProcess preparation=OwnedProcess.start(backend,spec(root.resolve("preparation-exit-"+code),List.of("-c","exit "+code)),null);
+                done(preparation);check(preparation.exitCode()==code && preparation.failure()==null,"preparation shell exit differs: "+code);
+            }
             System.out.println("PASS JNI UTF-8, actual exit and byte accounting");
 
             Path graceful=root.resolve("graceful");
