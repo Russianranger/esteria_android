@@ -28,29 +28,47 @@ public final class WorldPreparationDiagnosticsTest {
     private static Map<String,Path> logs(Path root){String op="a".repeat(32);return Map.of(
         "setup.data.stdout.log",root.resolve("state/server-data-operations/"+op+"/logs/stdout.log"),
         "setup.turnip.stderr.log",root.resolve("state/turnip-probe-operations/"+op+"/logs/stderr.log"));}
+    private static String persistedPreference(String name)throws Exception{
+        Path xml=context().getFilesDir().getParentFile().toPath().resolve("shared_prefs/"+name+".xml");
+        try(InputStream input=Files.newInputStream(xml)){
+            XmlPullParser parser=Xml.newPullParser();parser.setInput(input,"UTF-8");
+            for(int type=parser.getEventType();type!=XmlPullParser.END_DOCUMENT;type=parser.next())
+                if(type==XmlPullParser.START_TAG&&"string".equals(parser.getName())&&"ownedSupportLogs".equals(parser.getAttributeValue(null,"name")))return parser.nextText();
+        }
+        return null;
+    }
     @Test public void actualSharedPreferencesXmlRoundTripPreservesOwnedLogRecords()throws Exception{
         Path root=temporary();String name="world-log-roundtrip-"+UUID.randomUUID().toString().replace("-","");
         try{
-            String encoded=SupportLogSelection.encode(root,logs(root));
-            assertTrue(context().getSharedPreferences(name,Context.MODE_PRIVATE).edit().putString("ownedSupportLogs",encoded).commit());
-            Path xml=context().getFilesDir().getParentFile().toPath().resolve("shared_prefs/"+name+".xml");String actual=null;
-            try(InputStream input=Files.newInputStream(xml)){
-                XmlPullParser parser=Xml.newPullParser();parser.setInput(input,"UTF-8");
-                for(int type=parser.getEventType();type!=XmlPullParser.END_DOCUMENT;type=parser.next())
-                    if(type==XmlPullParser.START_TAG&&"string".equals(parser.getName())&&"ownedSupportLogs".equals(parser.getAttributeValue(null,"name")))actual=parser.nextText();
-            }
-            assertEquals("Reconstruct from persisted XML independently of the in-memory preference cache",encoded,actual);
-            assertEquals(logs(root),SupportLogSelection.decode(root,actual));
+            String stored=SupportLogSelection.encodePreference(root,logs(root));
+            assertFalse(stored.contains("\n"));assertFalse(stored.contains("\t"));
+            assertTrue(context().getSharedPreferences(name,Context.MODE_PRIVATE).edit().putString("ownedSupportLogs",stored).commit());
+            String actual=persistedPreference(name);
+            assertEquals("Single-line preference envelope must round-trip actual XML exactly",stored,actual);
+            assertEquals(logs(root),SupportLogSelection.recoverPreference(root,actual).logs);
+            String legacy=SupportLogSelection.encode(root,logs(root));
+            assertTrue(context().getSharedPreferences(name,Context.MODE_PRIVATE).edit().putString("ownedSupportLogs",legacy).commit());
+            actual=persistedPreference(name);assertNotNull(actual);assertTrue(actual.startsWith(legacy));
+            for(int i=legacy.length();i<actual.length();i++)assertEquals(' ',actual.charAt(i));
+            assertEquals("Only serializer-added outer spaces are normalized",logs(root),SupportLogSelection.recoverPreference(root,actual).logs);
+            assertEquals(logs(root),SupportLogSelection.recoverPreference(root,legacy+"    ").logs);
+            try{SupportLogSelection.decode(root,legacy+"    ");fail("Strict legacy decoder accepted XML padding");}catch(java.io.IOException expected){}
         }finally{context().deleteSharedPreferences(name);remove(root);}
     }
     @Test public void oneInvalidRetainedRolePreservesOtherStrictlyValidatedLogs()throws Exception{
         Path root=temporary();try{
             String encoded=SupportLogSelection.encode(root,logs(root)).replace("server-data-operations/","server-data-work/");
             try{SupportLogSelection.decode(root,encoded);fail("Strict decoder accepted invalid role");}catch(java.io.IOException expected){}
-            SupportLogSelection.Recovery recovery=SupportLogSelection.recover(root,encoded);
+            SupportLogSelection.Recovery recovery=SupportLogSelection.recoverPreference(root,encoded+"    ");
             assertEquals(1,recovery.rejected);assertEquals(1,recovery.logs.size());assertTrue(recovery.logs.containsKey("setup.turnip.stderr.log"));
             assertEquals(recovery.logs,SupportLogSelection.decode(root,SupportLogSelection.encode(root,recovery.logs)));
             assertTrue(recovery.reason.length()>0&&recovery.reason.length()<128);
+            String frame=SupportLogSelection.encodePreference(root,logs(root));String prefix=frame.substring(0,frame.indexOf(':')+1);
+            String privateRecord=SupportLogSelection.encode(root,logs(root)).replace("state/server-data-operations/"+"a".repeat(32)+"/logs/stdout.log","config/private.log");
+            recovery=SupportLogSelection.recoverPreference(root,prefix+java.util.Base64.getEncoder().encodeToString(privateRecord.getBytes(java.nio.charset.StandardCharsets.US_ASCII)));
+            assertEquals(1,recovery.rejected);assertEquals(1,recovery.logs.size());assertTrue(recovery.logs.containsKey("setup.turnip.stderr.log"));
+            String unsafe=SupportLogSelection.encode(root,logs(root)).replace("logs/stdout.log\n","logs/stdout.log \n");
+            recovery=SupportLogSelection.recoverPreference(root,unsafe+"    ");assertEquals(1,recovery.rejected);assertFalse(recovery.logs.containsKey("setup.data.stdout.log"));
         }finally{remove(root);}
     }
     @Test public void phaseAndRealOwnedChildObservationSurviveDiagnosticReconstruction()throws Exception{

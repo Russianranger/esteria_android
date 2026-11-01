@@ -89,6 +89,18 @@ public final class SupportLogSelectionTests {
         try{
             Map<String,Path> roles=roles(root);Map<String,Path> selected=Map.of("setup.stock.stdout.log",roles.get("setup.stock.stdout.log"),"setup.turnip.stdout.log",roles.get("setup.turnip.stdout.log"));
             String encoded=SupportLogSelection.encode(root,selected);
+            String preference=SupportLogSelection.encodePreference(root,selected);
+            check(!preference.contains("\n")&&!preference.contains("\t")&&SupportLogSelection.recoverPreference(root,preference).logs.equals(selected),"Single-line preference frame preserves the exact strict selection");
+            refused(()->SupportLogSelection.decode(root,encoded+"    "));
+            check(SupportLogSelection.recoverPreference(root,encoded+"    ").logs.equals(selected),"Legacy XML outer-space recovery preserves all valid roles");
+            check(SupportLogSelection.recoverPreference(root,preference+" ").logs.isEmpty(),"Malformed preference frame padding is not normalized");
+            String fieldSpace=encoded.replace("stock-client-operations/"+OP+"/logs/stdout.log\n","stock-client-operations/"+OP+"/logs/stdout.log \n");
+            SupportLogSelection.Recovery fieldRecovery=SupportLogSelection.recoverPreference(root,fieldSpace+"    ");
+            check(fieldRecovery.rejected==1&&!fieldRecovery.logs.containsKey("setup.stock.stdout.log"),"Legacy XML recovery never trims a path field");
+            String privateRecord=encoded.replace("state/stock-client-operations/"+OP+"/logs/stdout.log","config/private.log");
+            String preferencePrefix=preference.substring(0,preference.indexOf(':')+1);
+            fieldRecovery=SupportLogSelection.recoverPreference(root,preferencePrefix+java.util.Base64.getEncoder().encodeToString(privateRecord.getBytes(java.nio.charset.StandardCharsets.US_ASCII)));
+            check(fieldRecovery.rejected==1&&fieldRecovery.logs.size()==1&&fieldRecovery.logs.containsKey("setup.turnip.stdout.log"),"Framed private paths remain excluded independently");
             String invalid=encoded.replace("stock-client-operations/","stock-client-work/");
             refused(()->SupportLogSelection.decode(root,invalid));
             SupportLogSelection.Recovery recovered=SupportLogSelection.recover(root,invalid);

@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 public final class SupportLogSelection {
     public static final int MAX_NAMES=32,MAX_ENCODED_BYTES=64*1024,MAX_RELATIVE_PATH=1024;
     private static final String HEADER="Esteria owned support logs v1";
+    private static final String PREFERENCE_HEADER="Esteria owned support logs b64 v2:";
     private static final String OP="[a-f0-9]{32}",SLOT="[a-f0-9]{16}";
     private static final Set<String> PRIVATE_COMPONENTS=Set.of("accounts","config","wtf","client-state","home","prefix",
         "game","runtimes","engine-private.log","handoffs","xauthority","local-player.json","database-secret","esteria-local-login.bin");
@@ -29,6 +30,30 @@ public final class SupportLogSelection {
     private static final Pattern PRESENTATION=Pattern.compile("game\\.presentation\\.(xserver|frame|input|client)\\.(stdout|stderr)\\.log");
     private static final Pattern SETUP=Pattern.compile("setup\\.(data|shader|stock|installation|turnip)\\.(stdout|stderr)\\.log");
     private SupportLogSelection(){ }
+    /** Single-line transport avoids Android XML indentation on newline-terminated strings. */
+    public static String encodePreference(Path canonicalAppRoot,Map<String,Path> fixedOwnedLogPaths)throws IOException {
+        String value=PREFERENCE_HEADER+java.util.Base64.getEncoder().encodeToString(encode(canonicalAppRoot,fixedOwnedLogPaths).getBytes(java.nio.charset.StandardCharsets.US_ASCII));
+        if(value.length()>MAX_ENCODED_BYTES)throw new IOException("Owned diagnostic selection exceeds its preference bound");
+        return value;
+    }
+    public static Recovery recoverPreference(Path canonicalAppRoot,String stored)throws IOException {
+        root(canonicalAppRoot);
+        if(stored==null||stored.length()>MAX_ENCODED_BYTES)return new Recovery(Map.of(),1,"preference-bound");
+        if(stored.startsWith(PREFERENCE_HEADER)){
+            String payload=stored.substring(PREFERENCE_HEADER.length());
+            try{
+                byte[] decoded=java.util.Base64.getDecoder().decode(payload);
+                if(decoded.length>MAX_ENCODED_BYTES||!java.util.Base64.getEncoder().encodeToString(decoded).equals(payload))return new Recovery(Map.of(),1,"preference-encoding");
+                for(byte value:decoded)if(value<0)return new Recovery(Map.of(),1,"preference-encoding");
+                return recover(canonicalAppRoot,new String(decoded,java.nio.charset.StandardCharsets.US_ASCII));
+            }catch(IllegalArgumentException malformed){return new Recovery(Map.of(),1,"preference-encoding");}
+        }
+        // Remove only outer ASCII spaces after the final legacy record newline.
+        // Roles, records and paths retain their exact strict validation.
+        int end=stored.length();while(end>0&&stored.charAt(end-1)==' ')end--;
+        if(end<stored.length()&&end>0&&stored.charAt(end-1)=='\n')stored=stored.substring(0,end);
+        return recover(canonicalAppRoot,stored);
+    }
     /** Recovery never widens the allowlist. Each surviving role passes the exact strict validator. */
     public static final class Recovery {
         public final Map<String,Path> logs;

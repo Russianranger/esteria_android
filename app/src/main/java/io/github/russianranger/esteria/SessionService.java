@@ -143,9 +143,10 @@ public final class SessionService extends Service {
             lastPreparation = new WorldPreparationDiagnostics(root.resolve("state/world-preparation-last.properties"));
             try {
                 String saved=getSharedPreferences("session",MODE_PRIVATE).getString("ownedSupportLogs","");
-                SupportLogSelection.Recovery recovery=SupportLogSelection.recover(root,saved);
+                SupportLogSelection.Recovery recovery=SupportLogSelection.recoverPreference(root,saved);
                 selectedLogs.putAll(recovery.logs);selectedLogsEncoded=SupportLogSelection.encode(root,recovery.logs);
                 recordLogRecovery(recovery);
+                if(!saved.equals(SupportLogSelection.encodePreference(root,recovery.logs)))persistLogSelection(recovery.logs);
             }catch(IOException|RuntimeException invalid){log("Retained support-log selection is invalid; private files were excluded");}
             if (getSharedPreferences("session", MODE_PRIVATE).getBoolean("interrupted", false)) {
                 String action = getSharedPreferences("session", MODE_PRIVATE).getString("operationAction", "");
@@ -1033,7 +1034,7 @@ public final class SessionService extends Service {
         // Revalidate every selected path against current filesystem metadata at
         // export, including ancestor links. Persisted metadata grants no open lease.
         synchronized(selectedLogs) {
-            try{SupportLogSelection.Recovery recovery=SupportLogSelection.recover(root,selectedLogsEncoded);logs.putAll(recovery.logs);recordLogRecovery(recovery);}
+            try{SupportLogSelection.Recovery recovery=SupportLogSelection.recoverPreference(root,selectedLogsEncoded);logs.putAll(recovery.logs);recordLogRecovery(recovery);}
             catch(IOException invalid){facts.put("support.ownedLogs","selection-invalid-private-files-excluded");}
         }
         try (OutputStream output = getContentResolver().openOutputStream(destination, "w")) {
@@ -1054,10 +1055,14 @@ public final class SessionService extends Service {
                 String encoded=SupportLogSelection.encode(root,recovery.logs);
                 if(encoded.equals(selectedLogsEncoded))return;
                 selectedLogs.clear();selectedLogs.putAll(recovery.logs);selectedLogsEncoded=encoded;
-                if(!getSharedPreferences("session",MODE_PRIVATE).edit().putString("ownedSupportLogs",encoded).commit())
+                if(!persistLogSelection(recovery.logs))
                     log("Support-log metadata could not be retained across service recreation");
             }catch(IOException|RuntimeException invalid){log("Invalid owned support-log paths excluded");}
         }
+    }
+    @SuppressLint("ApplySharedPref")
+    private boolean persistLogSelection(Map<String,Path> logs)throws IOException{
+        return getSharedPreferences("session",MODE_PRIVATE).edit().putString("ownedSupportLogs",SupportLogSelection.encodePreference(root,logs)).commit();
     }
     @SuppressLint("ApplySharedPref")
     private void recordLogRecovery(SupportLogSelection.Recovery recovery){

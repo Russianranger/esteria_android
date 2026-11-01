@@ -45,6 +45,10 @@
       "bytes": 290958,
       "sha256": "af09cb890b217dff8c6ee4e1ce5f0b336610d9921e0f8ff32ee0899ffd726dab"
     },
+    "v5-preference-envelope-gradle.log": {
+      "bytes": 5343,
+      "sha256": "4cf47a250c52defc0d45cd17a9ecbc798a977532348c229a35251585bc25ddd1"
+    },
     "v5-runtime-read-policy-tests.log": {
       "bytes": 1264,
       "sha256": "242f4749e193d43f7915098b00f7c21d9a8d052bb68496a8184089e927aefa62"
@@ -55,6 +59,13 @@
     }
   },
   "ownerWorldPreparationQualified": false,
+  "preferenceTransportReview": {
+    "canonicalSingleLineBase64": true,
+    "focusedCoreAndroidCompilationAndLintPassed": true,
+    "freshAndroidXmlReadbackPending": true,
+    "legacyXmlPaddingOnlyAfterFinalNewline": true,
+    "strictLegacyPathValidatorUnchanged": true
+  },
   "scope": "host-preparation-memory-and-lifecycle-checks-only",
   "shaderDeadlineReview": {
     "androidOwnerSeconds": 9000,

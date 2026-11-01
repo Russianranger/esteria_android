@@ -22,7 +22,7 @@ permissions:
   contents: read
 concurrency:
   group: android-instrumentation-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   installer:
     runs-on: ubuntu-24.04

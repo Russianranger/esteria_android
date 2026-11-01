@@ -1,0 +1,43 @@
+{
+  "appSourceRevision": "1c4f223bad93edb1a8fb7231a4fb62692869bf2f",
+  "artifact": {
+    "bytes": 19012,
+    "sha256": "45569477d921ea9907602bd4007196459d3b4405436c42152263cd9a97ce5560"
+  },
+  "artifactDigestVerified": true,
+  "artifactId": 13067366309,
+  "evidenceBoundary": "This failed checkpoint is retained for diagnosis only; source changes require a new APK producer and Android readback. It does not qualify Thor execution or elimination of the reported world-preparation kill.",
+  "failureCount": 2,
+  "failures": [
+    {
+      "observed": "Android persisted XML appended four ASCII spaces after the legacy metadata final newline.",
+      "repair": "Single-line versioned base64 preference envelope; bounded backwards normalization only after the final record newline; strict field/path validation retained.",
+      "test": "actualSharedPreferencesXmlRoundTripPreservesOwnedLogRecords"
+    },
+    {
+      "observed": "NoSuchMethodError for java.nio.file.Path.of on Android13 in PreparationChildFixture.",
+      "repair": "Use Android-supported java.nio.file.Paths.get in the test fixture.",
+      "test": "phaseAndRealOwnedChildObservationSurviveDiagnosticReconstruction"
+    }
+  ],
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "jobId": 124727515296,
+  "namedSuccesses": [
+    "gibibyteFolderAndNonseekableZipImportsKeepBoundedMemory",
+    "thousandsOfOpaqueDocumentsStayBoundedAndSourceChecksRemainActive",
+    "actualAndroidHistoryQueryIsBoundedToOwnPackage",
+    "descriptionsAreBoundedRedactedAndSingleLine",
+    "lowMemoryKillJavaOomAndOtherExitsRemainDistinct",
+    "severePressureBlocksWritesAndStopRemainsPrompt",
+    "trimSignalsAndSystemHeadroomSelectTheCorrectPolicy",
+    "controllerPersistsRealSyncCacheAndSystemPressureObservations",
+    "nativeCacheAdvicePreservesSyncedFileBytes",
+    "parentPreparationReadsUseBoundedRealCacheAdviceAndRemainCancellable",
+    "oneInvalidRetainedRolePreservesOtherStrictlyValidatedLogs"
+  ],
+  "runId": 41265554521,
+  "scope": "rejected-Android13-checkpoint-not-release-qualification",
+  "testsRun": 13,
+  "thorQualified": false
+}
