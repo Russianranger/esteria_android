@@ -206,12 +206,13 @@ inline int Locate(Provider& provider,const std::string& name,uint32_t& file) {
         i=(i+1)&(count-1);
     } while(i!=start);return 0;
 }
-inline bool ReadArchive(Provider& p,const std::string& name,std::vector<char>& out,bool& deleted) {
+inline bool ReadArchive(Provider& p,const std::string& name,std::vector<char>& out,bool& deleted,uint64_t maximum=MaxMember) {
     uint32_t file=0;int found=Locate(p,name,file);deleted=found<0;if(found<=0)return false;
     auto* archive=p.handle.get();auto block=archive->mpq_map[file].block_table_indices;
     Need(!(archive->mpq_block[block].flags&0x00010000u),"encrypted ordered MPQ members unsupported; no fallback");
-    libmpq__off_t size=0,transferred=0;Need(libmpq__file_unpacked_size(p.handle.get(),file,&size)==0 && size>=0 && uint64_t(size)<=MaxMember,
-        "ordered member size bound");out.resize(size_t(size));
+    libmpq__off_t size=0,transferred=0;Need(libmpq__file_unpacked_size(p.handle.get(),file,&size)==0 && size>=0,
+        "ordered member size bound");
+    Need(uint64_t(size)<=maximum,name=="(listfile)"?"ordered listfile byte bound":"ordered member size bound");out.resize(size_t(size));
     if(size)Need(libmpq__file_read(p.handle.get(),file,reinterpret_cast<uint8_t*>(out.data()),size,&transferred)==0 && transferred==size,
         "ordered member decode failed; no fallback");return true;
 }
@@ -242,23 +243,44 @@ inline bool Exists(const std::string& requested) {
     }
     return false;
 }
-inline std::vector<std::string> FileList() {
+// Enumerate only the names the caller consumes. A complete client can contain
+// far more than 100000 distinct names across its provider stack; unrelated
+// textures/sounds must not fill the DBC extraction inventory. Input listfiles
+// still have the original per-provider byte/count bounds, and every data path
+// is validated before selection. No per-provider name vector or full text copy
+// is retained alongside the one bounded decoded listfile.
+inline std::vector<std::string> FileList(const std::string& prefix={},const std::string& suffix={}) {
     Need(Active(),"ordered mode is not configured");std::map<std::string,std::string> unique;
+    const auto wantedPrefix=Lower(prefix),wantedSuffix=Lower(suffix);
+    auto select=[&](std::string name) {
+        name=Relative(name);const auto key=Lower(name);
+        if(key.rfind(wantedPrefix,0)!=0 || key.size()<wantedSuffix.size() ||
+           key.compare(key.size()-wantedSuffix.size(),wantedSuffix.size(),wantedSuffix)!=0)return;
+        if(unique.find(key)!=unique.end())return;
+        Need(unique.size()<100000,"ordered effective file count bound");
+        std::replace(name.begin(),name.end(),'/','\\');unique.emplace(key,std::move(name));
+    };
     for(auto& p:Current().providers) {
-        std::vector<std::string> names;
-        if(p.kind=="directory")for(auto& [_,file]:p.files)names.push_back(file.path);
-        else {
-            std::vector<char> raw;bool deleted=false;
-            Need(ReadArchive(p,"(listfile)",raw,deleted) && !deleted,"ordered archive requires a readable listfile");
-            Need(raw.size()<=(16u<<20),"ordered listfile byte bound");std::istringstream input(std::string(raw.begin(),raw.end()));std::string line;
-            while(std::getline(input,line)) {if(!line.empty() && line.back()=='\r')line.pop_back();if(!line.empty() && line.back()=='\0')line.pop_back();
-                if(line.empty() || line.front()=='(')continue;
-                line=Relative(line);
-                if(!p.prefix.empty()) {auto prefix=Lower(p.prefix)+"/";if(Lower(line).rfind(prefix,0)!=0)continue;line=line.substr(prefix.size());}
-                names.push_back(line);Need(names.size()<=100000,"ordered listfile count bound");}
+        if(p.kind=="directory") {for(auto& [_,file]:p.files)select(file.path);continue;}
+        std::vector<char> raw;bool deleted=false;
+        // Enforce the listfile limit before allocating or decoding the member.
+        Need(ReadArchive(p,"(listfile)",raw,deleted,16u<<20) && !deleted,"ordered archive requires a readable listfile");
+        size_t scanned=0,start=0;
+        while(start<raw.size()) {
+            size_t end=start;while(end<raw.size() && raw[end]!='\n')++end;
+            size_t length=end-start;
+            if(length && raw[start+length-1]=='\r')--length;
+            if(length && raw[start+length-1]=='\0')--length;
+            if(length && raw[start]!='(') {
+                Need(++scanned<=100000,"ordered listfile count bound");
+                Need(length<260,"unsupported ordered member path");
+                auto name=Relative(std::string(raw.data()+start,length));
+                if(p.prefix.empty())select(std::move(name));
+                else {const auto view=Lower(p.prefix)+"/";
+                    if(Lower(name).rfind(view,0)==0)select(name.substr(view.size()));}
+            }
+            start=end+1;
         }
-        for(auto name:names) {name=Relative(name);std::replace(name.begin(),name.end(),'/','\\');unique.emplace(Lower(name),name);}
-        Need(unique.size()<=100000,"ordered effective file count bound");
     }
     std::vector<std::string> result;for(auto& [_,name]:unique)if(Exists(name))result.push_back(name);return result;
 }

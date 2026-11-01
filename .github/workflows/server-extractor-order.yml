@@ -2,7 +2,7 @@ name: Separate ordered extractor targets and synthetic provider gates
 on:
   workflow_dispatch:
   push:
-    branches: [android/client-server]
+    branches: [android/client-server, non-custom]
     paths:
       - .github/workflows/server-extractor-order.yml
       - runtime/extractor_order.py
@@ -25,7 +25,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   ordered-targets:
-    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    if: github.repository == 'Russianranger/esteria_android' && (github.ref == 'refs/heads/android/client-server' || github.ref == 'refs/heads/non-custom')
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 90
     steps:

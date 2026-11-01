@@ -1,8 +1,8 @@
 {
   "adaptedFiles": {
     "src/tools/map_extractor/System.cpp": {
-      "bytes": 39735,
-      "sha256": "547c38dabe77883059859210273850e36b6d9c8bd7079e571b2a8bc46d856852"
+      "bytes": 39564,
+      "sha256": "db190419ae47525f7d0dafb9437f779f2a32c59503aef51792f7268572a639e6"
     },
     "src/tools/map_extractor/mpq_libmpq.cpp": {
       "bytes": 4250,
@@ -137,10 +137,10 @@
   "gameplayQualified": false,
   "globalServerPatchListChanged": false,
   "header": {
-    "bytes": 19299,
+    "bytes": 20461,
     "file": "runtime/server/extractor-order/EsteriaArchiveOrder.h",
     "installedPath": "src/tools/EsteriaArchiveOrder.h",
-    "sha256": "da78de99a6850b7fcbb7f15e72985c89414bbf372c008a17d620e18e6c634d29"
+    "sha256": "efeb10aaae55782e3a659f34a60be0010cd1f1a44fd829a0f63d31f8e7a9695e"
   },
   "libraryFiles": {
     "deps/bzip2/bzlib.h": {
@@ -246,9 +246,9 @@
   },
   "nativeAdaptedToolsQualified": false,
   "patch": {
-    "bytes": 7088,
+    "bytes": 6913,
     "file": "runtime/server/extractor-order/0001-explicit-ordered-providers.patch",
-    "sha256": "8645bb3643ada0db7bdc7122e87a2a941f8f511d7666ef0360c18621f5a78e24"
+    "sha256": "3dec4701cc9419e2c2d0a4781a5e7b0446410b1f4cbd1006fad34889a54232a7"
   },
   "recipes": {
     "runtime/extractor_order.py": {

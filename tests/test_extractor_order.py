@@ -123,7 +123,7 @@ class RealArchiveReader(Planner):
         super().setUp()
         for name in ('Data/common.MPQ','Data/enUS/locale-enUS.MPQ','Data/enUS/speech-enUS.MPQ'):self.archive(name,{})
 
-    def archive(self,name,members):
+    def archive(self,name,members,listfile=None):
         path=self.root/name;path.parent.mkdir(parents=True,exist_ok=True)
         source=self.base/('fixture-'+str(len(list(self.base.glob('fixture-*'))))+'.tsv')
         rows=[]
@@ -134,8 +134,20 @@ class RealArchiveReader(Planner):
             if unpacked:fields.append(str(unpacked[0]))
             rows.append('\t'.join(fields))
         source.write_text('\n'.join(rows)+('\n' if rows else ''))
-        subprocess.run([str(self.executable),'--create-fixture',str(path),str(source)],check=True,capture_output=True,timeout=10)
+        if listfile is None:
+            command=[str(self.executable),'--create-fixture',str(path),str(source)]
+        else:
+            custom=source.with_suffix('.listfile');custom.write_bytes(listfile)
+            command=[str(self.executable),'--create-listfile-fixture',str(path),str(source),str(custom)]
+        subprocess.run(command,check=True,capture_output=True,timeout=10)
         return path
+
+    def listing(self,kind='dbc',locale='enUS'):
+        """Call the actual header selection API, without running asset conversion."""
+        wire=order.wire(self.plan(locale));manifest=self.base/'listing.tsv';manifest.write_bytes(wire)
+        command=[str(self.executable),'--esteria-order',str(manifest),'--esteria-input-root',str(self.root),
+                 '--esteria-order-sha256',hashlib.sha256(wire).hexdigest(),'--list'+('-'+kind if kind else '')]
+        return subprocess.run(command,cwd=self.base,stdin=subprocess.DEVNULL,capture_output=True,text=True,timeout=15)
 
     def invoke(self,member='World/Maps/Test/Test.wdt',locale='enUS',wire=None,extra=(),sha=None):
         wire=wire if wire is not None else order.wire(self.plan(locale))
@@ -242,6 +254,56 @@ class RealArchiveReader(Planner):
         self.put('Data/patch-z.MPQ/dbfilesclient/new.DBC',b'new')
         got=self.invoke(member=None,extra=('--esteria-order-list',));self.assertEqual(got.returncode,0,got.stderr)
         self.assertEqual({n.lower() for n in got.stdout.splitlines()},{'dbfilesclient\\other.dbc','dbfilesclient\\new.dbc'})
+
+    def test_dbc_selection_accepts_large_irrelevant_union_without_raising_global_bound(self):
+        # The owner's failure was the all-file union, not a large DBC inventory.
+        # Each actual encrypted-table MPQ remains within the original per-list limit.
+        expected={f'dbfilesclient\\table{i:03}.dbc' for i in range(238)}
+        base={f'Textures/Base{i:05}.blp':b'x' for i in range(60000)}
+        base.update({f'DBFilesClient/Table{i:03}.dbc':b'dbc fixture' for i in range(238)})
+        self.archive('Data/common.MPQ',base)
+        self.archive('Data/patch-a.MPQ',{f'World/Other{i:05}.adt':b'y' for i in range(60000)})
+        selected=self.listing();self.assertEqual(selected.returncode,0,selected.stderr)
+        self.assertEqual({n.lower() for n in selected.stdout.splitlines()},expected)
+        unfiltered=self.listing('');self.assertEqual(unfiltered.returncode,2,unfiltered.stderr)
+        self.assertIn('ordered effective file count bound',unfiltered.stderr)
+
+    def test_selected_listing_keeps_case_folders_prefix_views_and_tombstones(self):
+        self.archive('Data/common.MPQ',{'DBFilesClient/Map.dbc':b'base','DBFilesClient/Other.dbc':b'other',
+            'DBFilesClient/NotATable.dbc.bak':b'ignore','Textures/Ignore.blp':b'ignore',
+            'World/One.wmo':b'model','World/Other.wmo.bak':b'ignore'})
+        self.archive('Data/patch-a.MPQ',{'DBFilesClient/Map.dbc':(b'x',0x83000000,0),
+            'dbfilesclient/OTHER.DBC':b'winning','alternate/DBFilesClient/Prefix.dbc':b'prefix',
+            'World/One.wmo':(b'x',0x83000000,0),'alternate/World/Prefix.WMO':b'prefix model'})
+        self.put('Data/patch-z.MPQ/dbfilesclient/New.DBC',b'loose')
+        self.put('Data/patch-z.MPQ/World/Loose.wmo',b'loose model')
+        for name in ('Data/zhCN/locale-zhCN.MPQ','Data/zhCN/speech-zhCN.MPQ'):self.archive(name,{})
+        for locale,extra in [('enUS',set()),('zhCN',{'dbfilesclient\\prefix.dbc'})]:
+            with self.subTest(locale=locale):
+                selected=self.listing(locale=locale);self.assertEqual(selected.returncode,0,selected.stderr)
+                self.assertEqual({n.lower() for n in selected.stdout.splitlines()},
+                    {'dbfilesclient\\other.dbc','dbfilesclient\\new.dbc'}|extra)
+        model=self.listing('wmo','zhCN');self.assertEqual(model.returncode,0,model.stderr)
+        # Prefix-qualified members remain ordinary paths in the base view as well.
+        self.assertEqual({n.lower() for n in model.stdout.splitlines()},
+            {'world\\loose.wmo','world\\prefix.wmo','alternate\\world\\prefix.wmo'})
+
+    def test_filtered_listing_still_validates_unselected_paths_and_scanned_count(self):
+        for bad in ('Textures/../escape.blp','Textures/'+('x'*260)+'.blp','Textures/bad\tname.blp'):
+            with self.subTest(path=bad):
+                self.archive('Data/common.MPQ',{'DBFilesClient/Map.dbc':b'x'},
+                    ('DBFilesClient/Map.dbc\n'+bad+'\n').encode())
+                got=self.listing();self.assertEqual(got.returncode,2,got.stderr)
+                self.assertRegex(got.stderr,'ordered (member path|path)|unsafe ordered')
+        self.archive('Data/common.MPQ',{'DBFilesClient/Map.dbc':b'x'},
+            b'Textures/Repeated.blp\n'*100001)
+        got=self.listing();self.assertEqual(got.returncode,2,got.stderr)
+        self.assertIn('ordered listfile count bound',got.stderr)
+
+    def test_filtered_listing_still_refuses_oversized_listfile(self):
+        self.archive('Data/common.MPQ',{'DBFilesClient/Map.dbc':b'x'},b'x'*((16<<20)+1))
+        got=self.listing();self.assertEqual(got.returncode,2,got.stderr)
+        self.assertIn('ordered listfile byte bound',got.stderr)
 
     def test_separate_patch_replays_only_four_tools_and_retains_default_path(self):
         output=self.base/'source-copy'

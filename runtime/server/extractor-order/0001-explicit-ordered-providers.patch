@@ -20,7 +20,7 @@
      if (!m.isEof())
          fwrite(m.getPointer(), 1, m.getSize(), output);
  
-@@ -1041,8 +1047,18 @@
+@@ -1041,8 +1047,14 @@
  
      std::set<std::string> dbcfiles;
  
@@ -29,19 +29,15 @@
 +    // Explicit ordered mode lists the same effective provider stack used by reads.
 +    if (EsteriaOrder::Active())
 +    {
-+        for (auto const& file : EsteriaOrder::FileList())
-+        {
-+            auto lower = EsteriaOrder::Lower(file);
-+            if (lower.rfind("dbfilesclient/", 0) == 0 && lower.size() > 4 && lower.substr(lower.size() - 4) == ".dbc")
-+                dbcfiles.insert(file);
-+        }
++        for (auto const& file : EsteriaOrder::FileList("dbfilesclient/", ".dbc"))
++            dbcfiles.insert(file);
 +    }
 +    // get DBC file list (original desktop mode)
 +    else for (auto & gOpenArchive : gOpenArchives)
      {
          vector<string> files;
          gOpenArchive->GetFileListTo(files);
-@@ -1178,12 +1194,25 @@
+@@ -1178,12 +1190,25 @@
      gOpenArchives.clear();
  }
  
@@ -68,7 +64,7 @@
  
      int FirstLocale = -1;
      uint32 build = 0;
-@@ -1259,3 +1288,32 @@
+@@ -1259,3 +1284,32 @@
  
      return 0;
  }

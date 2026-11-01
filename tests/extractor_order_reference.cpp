@@ -10,12 +10,17 @@ static std::string Unhex(const std::string& value) {
     for(size_t i=0;i<value.size();i+=2)out.push_back(char(std::stoul(value.substr(i,2),nullptr,16)));
     return out;
 }
-static void Create(const char* path,const char* inputPath) {
+static void Create(const char* path,const char* inputPath,const char* listPath=nullptr) {
     std::ifstream input(inputPath);std::string line;std::vector<Entry> entries;std::string list;
     std::vector<uint32_t> unpacked;
     while(std::getline(input,line)) {auto f=EsteriaOrder::Fields(line);EsteriaOrder::Need(f.size()==4 || f.size()==5,"fixture fields");
         Entry e;e.name=f[0];e.flags=uint32_t(std::stoull(f[1]));e.locale=uint16_t(std::stoul(f[2]));e.data=Unhex(f[3]);
         list+=e.name+"\r\n";unpacked.push_back(f.size()==5?uint32_t(std::stoul(f[4])):uint32_t(e.data.size()));entries.push_back(e);}
+    if(listPath) {
+        std::ifstream custom(listPath,std::ios::binary);
+        EsteriaOrder::Need(bool(custom),"fixture custom listfile open");
+        list.assign(std::istreambuf_iterator<char>(custom),std::istreambuf_iterator<char>());
+    }
     entries.push_back({"(listfile)",list,0x81000000u,0});uint32_t slots=2;while(slots<entries.size()*2)slots*=2;
     unpacked.push_back(list.size());
     std::vector<mpq_hash_s> hashes(slots);std::memset(hashes.data(),255,hashes.size()*sizeof(mpq_hash_s));
@@ -37,6 +42,7 @@ static void Create(const char* path,const char* inputPath) {
 int main(int argc,char** argv) {
     try {
         if(argc==4 && std::string(argv[1])=="--create-fixture") {Create(argv[2],argv[3]);return 0;}
+        if(argc==5 && std::string(argv[1])=="--create-listfile-fixture") {Create(argv[2],argv[3],argv[4]);return 0;}
         bool mapArguments=argc>1 && std::string(argv[1])=="--check-map-conversion-argv";
         bool vmapArguments=argc>1 && std::string(argv[1])=="--check-vmap-conversion-argv";
         if(mapArguments || vmapArguments) {
@@ -54,8 +60,12 @@ int main(int argc,char** argv) {
         int status=EsteriaOrder::Bootstrap(argc,argv);if(status>=0)return status;
         if(!EsteriaOrder::MemberProbe().empty()) {std::vector<char> bytes;bool found=EsteriaOrder::Read(EsteriaOrder::MemberProbe(),bytes);
             return EsteriaOrder::EmitProbe(bytes.data(),bytes.size(),found);}
-        if(EsteriaOrder::Active() && argc==2 && std::string(argv[1])=="--list") {
-            for(auto& name:EsteriaOrder::FileList())std::puts(name.c_str());
+        if(EsteriaOrder::Active() && argc==2 && (std::string(argv[1])=="--list" ||
+                std::string(argv[1])=="--list-dbc" || std::string(argv[1])=="--list-wmo")) {
+            std::string mode=argv[1];
+            auto names=mode=="--list-dbc"?EsteriaOrder::FileList("dbfilesclient/", ".dbc"):
+                (mode=="--list-wmo"?EsteriaOrder::FileList("", ".wmo"):EsteriaOrder::FileList());
+            for(auto& name:names)std::puts(name.c_str());
             return 0;}
         throw std::runtime_error("reference requires an explicit ordered lookup or list");
     } catch(std::exception const& error) {std::fprintf(stderr,"ordered fixture refused: %s\n",error.what());return 2;}

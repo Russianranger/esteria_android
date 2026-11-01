@@ -1,0 +1,26 @@
+{
+  "appRevision": "cca8f81abe412b65f0c85da2902f24848a694fd2",
+  "bundle": {
+    "bytes": 15410,
+    "name": "Esteria-support-1793550413267.zip",
+    "sha256": "1d2d4bdaeb9eac7c3200bb72ae62f081018d149e0ff2457d054392db8d4c653b"
+  },
+  "clientDataSuppliedToBuildHost": false,
+  "combinedUnfilteredNamesLowerBound": 100001,
+  "diagnostic": "ordered effective file count bound",
+  "exactClientFileCountKnown": false,
+  "exitStatus": 2,
+  "failedWorker": "map_extractor",
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "graphicsProbeMillis": 243,
+  "graphicsProbePassed": true,
+  "newLowMemoryExitRecorded": false,
+  "preparationMemoryAvailableBytes": 9907892224,
+  "preparationMemoryLow": false,
+  "proposedCorrection": "Bounded selective streaming enumeration before retention, preserve provider/path/tombstone semantics and rebuild native extractor pair.",
+  "rootCause": "Native FileList unions every archive name before map extractor filters DBFilesClient/*.dbc; unrelated names exhaust its global 100000 entry bound.",
+  "scope": "owner-v6-ordered-extractor-inventory-bound-diagnosis",
+  "thorQualified": false,
+  "worldPreparationQualified": false
+}

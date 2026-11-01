@@ -1,0 +1,50 @@
+{
+  "androidArm64Executed": false,
+  "assetConversionExecuted": false,
+  "gameplayQualified": false,
+  "largeFixture": {
+    "distinctNonmetadataUnion": 120238,
+    "largestProviderEntries": 60238,
+    "selectedDbcNames": 238,
+    "unfilteredOriginalGlobalBoundStillRefused": true
+  },
+  "mutantLog": {
+    "bytes": 1233,
+    "sha256": "88076f13b84998170dfc3a308d94daedf39179673a66324aa32cd21db5519c85"
+  },
+  "newRegressionTests": 4,
+  "ownerDataSupplied": false,
+  "scope": "actual-host-libmpq-selective-enumeration-synthetic-mpq-regression",
+  "sourceArchiveMembersVerified": 29,
+  "sources": {
+    "runtime/server/extractor-order.lock.json": {
+      "bytes": 10416,
+      "sha256": "9a6b5f48a56ac82623f2965724ac1d4fac9b4bd304ddb81a85c4894486f8694e"
+    },
+    "runtime/server/extractor-order/0001-explicit-ordered-providers.patch": {
+      "bytes": 6913,
+      "sha256": "3dec4701cc9419e2c2d0a4781a5e7b0446410b1f4cbd1006fad34889a54232a7"
+    },
+    "runtime/server/extractor-order/EsteriaArchiveOrder.h": {
+      "bytes": 20461,
+      "sha256": "efeb10aaae55782e3a659f34a60be0010cd1f1a44fd829a0f63d31f8e7a9695e"
+    },
+    "tests/extractor_order_reference.cpp": {
+      "bytes": 5662,
+      "sha256": "8d47f4038851bc91d827a3ef3704961ce21b575809aecbb8024e7078152b57b6"
+    },
+    "tests/test_extractor_order.py": {
+      "bytes": 22701,
+      "sha256": "80ed3e72ec534670300b151e2b6dff240cea9f4662ffa6532e884782bad4e213"
+    }
+  },
+  "testLog": {
+    "bytes": 6783,
+    "sha256": "970b7a42816180db369cfa601ea80acb67bf9c9bc599cd8302b675e8e0185292"
+  },
+  "testsPassed": 34,
+  "testsRun": 34,
+  "testsSkipped": 0,
+  "thorQualified": false,
+  "unfilteredMutationRejected": true
+}
