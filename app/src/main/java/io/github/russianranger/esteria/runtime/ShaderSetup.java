@@ -117,6 +117,8 @@ public final class ShaderSetup {
         /** Fixed wrapper streams only; retained after failed startup and close. */
         public Map<String,Path> diagnosticLogs(){return diagnosticLogs;}
         public IOException cleanupFailure(){return cleanupFailure;}
+        public boolean processAlive(){OwnedProcess child=process;return child!=null&&child.isAlive();}
+        public io.github.russianranger.esteria.core.runtime.process.ProcessUsageSnapshot usage(){OwnedProcess child=process;return child==null?null:child.usage();}
         /** Single use. Keep this owner on failure; cancellation stops the
          * complete owned guest. Atomic shader promotion may win that race. */
         public Result prepare(RuntimeWork.Progress progress,RuntimeWork.Cancellation cancellation)throws IOException {
@@ -139,6 +141,7 @@ public final class ShaderSetup {
         }
         private Result run(RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled)throws IOException {
             checkCancelled(cancelled);
+            if(progress!=null)progress.update("shaders-provider-admission","",0,-1);
             if(!wineRoot.equals(wine.current())||!toolsRoot.equals(tools.current()))throw new IOException("Shader providers changed after allocation");
             ShaderRunPlan plan=new ShaderRunPlan(root.resolve("game"),toolsRoot,work,StockClientSetup.installHelpers(context,root),tools.revision(),locale);
             if(progress!=null)progress.update("shaders-locale-selected","requested "+plan.requestedLocale+"; effective "+plan.locale,0,-1);
@@ -151,12 +154,18 @@ public final class ShaderSetup {
             if(progress!=null)progress.update("shaders-generating","",0,-1);
             process=ProotProcess.start(context,wine.installer(),wine.packagePlan(),work,session,
                 plan.arguments,wine.wineEnvironment(),plan.mounts,null);
+            if(progress!=null)progress.update("shaders-child-started","",0,-1);
             long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(125);
+            long nextProgress=0;
+            ServerDataSetup.ProgressLines lines=new ServerDataSetup.ProgressLines();
+            String observedPhase="shaders-generating";
             while(process.isAlive()) {
                 checkCancelled(cancelled);
+                if(progress!=null&&System.nanoTime()>=nextProgress){String observed=lines.read(session.resolve("logs/stdout.log"));if(observed!=null)observedPhase="shaders-"+observed;progress.update(observedPhase,"",0,-1);nextProgress=System.nanoTime()+TimeUnit.SECONDS.toNanos(1);}
                 if(System.nanoTime()>=deadline)throw new IOException("Shader setup timed out; previous and staged outputs were retained");
                 try{Thread.sleep(100);}catch(InterruptedException error){Thread.currentThread().interrupt();throw new IOException("Shader setup interrupted; outputs were retained",error);}
             }
+            RuntimeWork.checkMemoryPressureExit(process.exitCode());
             if(process.failure()!=null)throw new IOException("Shader setup process ownership failed",process.failure());
             if(process.exitCode()!=0||process.wasForced())throw new IOException("Shader setup failed (exit "+process.exitCode()+"); retained private logs describe the failure");
             plan.requireCurrentImport();
@@ -219,7 +228,14 @@ public final class ShaderSetup {
                 !Boolean.FALSE.equals(receipt.get("androidQualified"))||!Boolean.FALSE.equals(receipt.get("gameplayQualified")))
                 throw new IOException("Shader result scope differs");
             JSONObject inputs=receipt.getJSONObject("inputs");
-            requireKeys(inputs,"formatVersion","contentProfile","importGeneration","clientRevision","locale","importMetadata","toolManifestSha256","preparationHelperSha256");
+            requireKeys(inputs,"formatVersion","contentProfile","importGeneration","clientRevision","locale","importMetadata","toolManifestSha256","preparationHelperSha256","preparationHelperFiles");
+            JSONObject helperFiles=inputs.getJSONObject("preparationHelperFiles");
+            requireKeys(helperFiles,"stock_content_inspection.py","stock_shader_generation.py","stock_shader_translate.py","shader_generation.py","extractor_order.py","server_data_preflight.py","world_io.py");
+            for(Iterator<String> names=helperFiles.keys();names.hasNext();){
+                String name=names.next();JSONObject item=helperFiles.getJSONObject(name);long bytes=filePin(item,131072);
+                Path selected=plan.helpers.resolve(name);canonicalFile(selected);
+                if(Files.size(selected)!=bytes||!hashFile(selected,bytes).equals(item.getString("sha256")))throw new IOException("Prepared shader helper closure changed");
+            }
             Path helper=plan.helpers.resolve("stock_shader_generation.py");canonicalFile(helper);
             long helperBytes=Files.size(helper);
             if(helperBytes<=0||helperBytes>131072)throw new IOException("Bounded app shader helper required");
@@ -313,7 +329,7 @@ public final class ShaderSetup {
     private static String hashFile(Path path,long maximum)throws IOException {
         MessageDigest digest=digest();long total=0;
         try(var input=Files.newInputStream(path,LinkOption.NOFOLLOW_LINKS)) {
-            byte[] buffer=new byte[65536];for(int count;(count=input.read(buffer))!=-1;){total+=count;if(total>maximum)throw new IOException("Shader input grew beyond bound");digest.update(buffer,0,count);}
+            byte[] buffer=new byte[65536];for(int count;(count=input.read(buffer))!=-1;){total+=count;if(total>maximum)throw new IOException("Shader input grew beyond bound");digest.update(buffer,0,count);io.github.russianranger.esteria.core.runtime.install.RuntimeReadPolicy.consumed(path,total-count,count);}
         }if(total!=maximum)throw new IOException("Shader input size changed");return hex(digest.digest());
     }
     private static void background(){if(Looper.myLooper()==Looper.getMainLooper())throw new IllegalStateException("Shader lifecycle work must run off the UI thread");}

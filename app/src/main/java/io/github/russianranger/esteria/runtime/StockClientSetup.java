@@ -25,7 +25,7 @@ import org.json.*;
  * not arbitrary user JSON. Runtime signatures/world execution stay separate. */
 public final class StockClientSetup {
     private static final Map<Path,Handle> OWNERS=new ConcurrentHashMap<>();
-    private static final Set<String> HELPERS=Set.of("stock_content_inspection.py","stock_shader_generation.py","shader_generation.py","extractor_order.py","server_data_preflight.py");
+    private static final Set<String> HELPERS=Set.of("stock_content_inspection.py","stock_shader_generation.py","shader_generation.py","extractor_order.py","server_data_preflight.py","world_io.py","stock_shader_translate.py");
     private StockClientSetup() { }
     /** Install only immutable APK-owned helpers; callers mount this directory
      * separately from the preserved upstream shader compiler provider. */
@@ -62,6 +62,8 @@ public final class StockClientSetup {
         }
         public State state(){return state;}
         public Map<String,Path> diagnosticLogs(){return logs;}
+        public boolean processAlive(){OwnedProcess child=process;return child!=null&&child.isAlive();}
+        public io.github.russianranger.esteria.core.runtime.process.ProcessUsageSnapshot usage(){OwnedProcess child=process;return child==null?null:child.usage();}
         public Path prepare(RuntimeWork.Progress progress,RuntimeWork.Cancellation cancellation)throws IOException {
             background();return operations.run(()->{
                 if(state!=State.ALLOCATED)throw new IOException("Stock setup owner is single use");state=State.RUNNING;
@@ -101,14 +103,17 @@ public final class StockClientSetup {
             if(progress!=null)progress.update("stock-client-inspecting","Checking effective stock UI, DBC and shader inputs",0,-1);
             List<String> args=Arrays.asList("/usr/bin/python3","-B","-s","-E","/work/helpers/"+helper+"/stock_content_inspection.py",
                 "--source","/esteria-data/generations/"+generation+"/data","--tools","/esteria-shader-tools/tools",
-                "--client-revision",tools.revision(),"--locale",locale,"--generation",generation,"--report","/work/"+reportName);
+                "--client-revision",tools.revision(),"--locale",locale,"--generation",generation,"--report","/work/"+reportName,"--android-low-memory");
             process=ProotProcess.start(context,wine.installer(),wine.packagePlan(),work,session,args,wine.wineEnvironment(),
                 Arrays.asList(new ProotLaunch.Mount(root.resolve("game"),"/esteria-data"),new ProotLaunch.Mount(tools.current(),"/esteria-shader-tools")),null);
             long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(30);
+            long nextProgress=0;ServerDataSetup.ProgressLines lines=new ServerDataSetup.ProgressLines();String observedPhase="stock-client-inspecting";
             while(process.isAlive()) {
                 check(stop);if(System.nanoTime()>=deadline)throw new IOException("Stock inspection timed out; logs and imported data retained");
+                if(progress!=null&&System.nanoTime()>=nextProgress){String observed=lines.read(session.resolve("logs/stdout.log"));if(observed!=null)observedPhase="stock-client-"+observed;progress.update(observedPhase,"Checking stock content",0,-1);nextProgress=System.nanoTime()+TimeUnit.SECONDS.toNanos(1);}
                 try{Thread.sleep(100);}catch(InterruptedException error){Thread.currentThread().interrupt();throw new IOException("Stock inspection interrupted; owner retained",error);}
             }
+            RuntimeWork.checkMemoryPressureExit(process.exitCode());
             if(process.failure()!=null||process.wasForced()||(process.exitCode()!=0&&!Files.isRegularFile(work.resolve(reportName),LinkOption.NOFOLLOW_LINKS)))throw new IOException("Stock content inspection failed (exit "+process.exitCode()+"); export the support bundle for the exact member/codec failure",process.failure());
         }
         private JSONObject readReport(Path report,String generation)throws IOException {
@@ -174,7 +179,7 @@ public final class StockClientSetup {
     private static void updateDigest(Path file,long maximum,java.security.MessageDigest digest)throws IOException {
         if(!Files.isRegularFile(file,LinkOption.NOFOLLOW_LINKS)||!file.equals(file.toRealPath())||Files.size(file)>maximum)throw new IOException("Invalid bounded stock import metadata");
         java.nio.file.attribute.BasicFileAttributes before=Files.readAttributes(file,java.nio.file.attribute.BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS);long count=0;
-        try(InputStream input=Files.newInputStream(file,LinkOption.NOFOLLOW_LINKS)) {byte[] block=new byte[128<<10];for(int got;(got=input.read(block))!=-1;){count+=got;if(count>maximum)throw new IOException("Stock metadata grew beyond bound");digest.update(block,0,got);}}
+        try(InputStream input=Files.newInputStream(file,LinkOption.NOFOLLOW_LINKS)) {byte[] block=new byte[128<<10];for(int got;(got=input.read(block))!=-1;){count+=got;if(count>maximum)throw new IOException("Stock metadata grew beyond bound");digest.update(block,0,got);io.github.russianranger.esteria.core.runtime.install.RuntimeReadPolicy.consumed(file,count-got,got);}}
         java.nio.file.attribute.BasicFileAttributes after=Files.readAttributes(file,java.nio.file.attribute.BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS);
         if(count!=before.size()||count!=after.size()||!before.lastModifiedTime().equals(after.lastModifiedTime()))throw new IOException("Stock import metadata changed during inspection reuse check");
     }

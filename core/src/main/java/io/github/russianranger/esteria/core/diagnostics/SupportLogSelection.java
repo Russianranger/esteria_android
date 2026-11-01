@@ -29,6 +29,50 @@ public final class SupportLogSelection {
     private static final Pattern PRESENTATION=Pattern.compile("game\\.presentation\\.(xserver|frame|input|client)\\.(stdout|stderr)\\.log");
     private static final Pattern SETUP=Pattern.compile("setup\\.(data|shader|stock|installation|turnip)\\.(stdout|stderr)\\.log");
     private SupportLogSelection(){ }
+    /** Recovery never widens the allowlist. Each surviving role passes the exact strict validator. */
+    public static final class Recovery {
+        public final Map<String,Path> logs;
+        public final int rejected;
+        public final String reason;
+        private Recovery(Map<String,Path> logs,int rejected,String reason){this.logs=Collections.unmodifiableMap(new TreeMap<>(logs));this.rejected=rejected;this.reason=reason;}
+    }
+    public static Recovery recover(Path canonicalAppRoot,String encoded)throws IOException {
+        root(canonicalAppRoot);
+        if(encoded==null||encoded.length()>MAX_ENCODED_BYTES)return new Recovery(Map.of(),1,"selection-bound");
+        if(encoded.isEmpty())return new Recovery(Map.of(),0,"");
+        String[] lines=encoded.split("\n",-1);
+        if(lines.length<2||lines.length>MAX_NAMES+2||!HEADER.equals(lines[0])||!lines[lines.length-1].isEmpty())
+            return new Recovery(Map.of(),1,"selection-format");
+        TreeMap<String,Path> result=new TreeMap<>();Set<String> seen=new java.util.HashSet<>();int rejected=0;String reason="";
+        for(int index=1;index<lines.length-1;index++){
+            String line=lines[index];int tab=line.indexOf('\t');String name=tab>0?line.substring(0,tab):"";
+            try{
+                if(tab<=0||tab!=line.lastIndexOf('\t'))throw new IOException("record-format");
+                for(int i=0;i<line.length();i++)if(line.charAt(i)>127||(line.charAt(i)<32&&line.charAt(i)!='\t'))throw new IOException("record-encoding");
+                Path path=validate(canonicalAppRoot,name,line.substring(tab+1));
+                if(!seen.add(name)){result.remove(name);throw new IOException("duplicate-role");}
+                result.put(name,path);
+            }catch(IOException|RuntimeException invalid){rejected++;if(reason.isEmpty())reason=reason(invalid);}
+        }
+        return new Recovery(result,rejected,reason);
+    }
+    public static Recovery recover(Path canonicalAppRoot,Map<String,Path> fixedOwnedLogPaths)throws IOException {
+        root(canonicalAppRoot);
+        if(fixedOwnedLogPaths==null||fixedOwnedLogPaths.size()>MAX_NAMES)return new Recovery(Map.of(),1,"selection-bound");
+        TreeMap<String,Path> result=new TreeMap<>();int rejected=0;String reason="";
+        for(Map.Entry<String,Path> entry:fixedOwnedLogPaths.entrySet())try{
+            encode(canonicalAppRoot,Map.of(entry.getKey(),entry.getValue()));result.put(entry.getKey(),entry.getValue());
+        }catch(IOException|RuntimeException invalid){rejected++;if(reason.isEmpty())reason=reason(invalid);}
+        return new Recovery(result,rejected,reason);
+    }
+    private static String reason(Throwable failure){
+        // Only the validator's fixed error vocabulary is exposed, never a provider/path exception message.
+        String text=failure.getMessage();
+        if(text!=null&&Set.of("record-format","record-encoding","duplicate-role","Invalid owned diagnostic path or role",
+                "Private diagnostic paths are excluded","Unsupported owned diagnostic role or path",
+                "Owned diagnostic path contains a link or unexpected file type","Owned diagnostic path must be canonical and app-relative").contains(text))return text;
+        return "validation-"+failure.getClass().getSimpleName();
+    }
 
     /** Stable ASCII metadata only. Missing logs are retained for later startup
      * or rotation. The map and its paths are never expanded into a directory scan. */

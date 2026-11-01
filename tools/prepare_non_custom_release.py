@@ -53,15 +53,19 @@ def stage(args):
     shutil.copyfile(apk, args.output / name)
     (args.output / 'release.json').write_text(json.dumps(result, sort_keys=True, indent=2) + '\n')
     (args.output / 'SHA256SUMS').write_text(signed['apkSha256'] + '  ' + name + '\n')
+    setup = ('Keep the completed client import and retry Prepare local runtime / world, then\n'
+             'start the local game. Follow the attached NON-CUSTOM-TESTING.md procedure, including\n'
+             'the offline repeat and support bundle export if a stage fails.' if signed['versionCode'] == 5 else
+             'Import your complete ChromieCraft client, prepare the local runtime/world, then\n'
+             'start the local game. Follow the attached NON-CUSTOM-TESTING.md procedure, including\n'
+             'the offline repeat and support bundle export if a stage fails.')
     notes = f'''Esteria Stock 3.3.5a / non-custom {signed['versionName']}
 
 Separate Android package `{signing.STOCK_PACKAGE}`; installs beside the custom app.
 The source path targets genuine stock build 12340 client data and keeps original
 signed UI checks. Client files and Thor gameplay are not verified by this build.
 
-Import your complete ChromieCraft client, prepare the local runtime/world, then
-start the local game. Follow the attached NON-CUSTOM-TESTING.md procedure, including
-the offline repeat and support bundle export if a stage fails.
+{setup}
 
 App `{args.app_revision}`; reconstructed ARM64 client `{result['clientRevision']}`;
 server `{result['serverRevision']}`. Build run `{args.run_id}`.
@@ -95,6 +99,32 @@ Retry the same complete client source with its normal Data layout. Each 1 GiB
 copy takes at least 128 seconds; ZIPs require staging and extraction passes.
 If Android closes the app again, reopen and export the whole support bundle
 before another import. Actual Thor import/gameplay still need device confirmation.
+'''
+    if signed['versionCode'] == 5:
+        notes += '''
+Version 5 extends memory controls to local-world preparation after the owner's
+v4 folder import completed successfully. Keep that completed import and app data;
+install over the existing stock app and retry Prepare local runtime / world.
+No client reimport, uninstall or data clearing is required.
+
+Java/Python preparation verification is limited to 8 MiB/s, dropping to 2 MiB/s
+under pressure or pausing. One full hash pass over the reported 15.6 GiB archive
+set takes roughly 34 minutes at the normal rate; later phases add time. Native
+extractors retain their own speed. Their children receive a 4 GiB virtual-address
+limit per process, clean-input cache advice and supervised cleanup. This is not
+a native I/O cap, an RSS measurement or a total app-plus-children RAM guarantee.
+
+The shader adapter uses packed archive tables and bounded shader records while
+retaining the verified original decoder/emitter/compiler path. Memory pauses use
+a distinct outcome, retain completed phases and do not cache failed stock reports.
+Durable phase receipts and independently validated partial logs improve support
+exports. If Android closes the app, reopen and export support before another
+preparation attempt. Do not reimport the already completed client.
+
+Two v4 owner bundles recorded successful folder import and three unique Android
+LOW_MEMORY exits during later preparation. Missing helper logs did not identify
+the exact child or allocation. Host/synthetic checks do not establish that the
+Thor failure is eliminated; actual v5 preparation and gameplay remain unqualified.
 '''
     (args.output / 'RELEASE-NOTES.md').write_text(notes)
     return result

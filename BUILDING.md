@@ -295,11 +295,12 @@ from verified ordered-reader and original assembler/navigation providers. See
 `runtime/server/DATA-PREPARATION.md`. This helper is not yet a launcher action,
 and the stock four-tool provider does not imply ordered-reader support.
 
-`app/server-data.gradle` packages exactly five helpers. The combined APK sealer
-checks that same closure. `:core:serverDataRunPlanTest` verifies fixed commands,
+`app/server-data.gradle` packages exactly six helpers. The combined APK sealer
+checks that same closure. The stock-client closure has seven APK-owned helpers,
+including the bounded shader adapter and preparation I/O policy. `:core:serverDataRunPlanTest` verifies fixed commands,
 private separate paths and source/import changes without running an extractor.
 
-`app/server-session.gradle` packages23 exact server-session helper/profile files.
+`app/server-session.gradle` packages 24 exact server-session helper/profile files.
 The composed data-tools profile uses `app/server-data-tools.gradle`, remains
 default false while its source/native pin is pending, and is mutually exclusive
 with the stock extractors property. The standalone new-cohort packaging workflow
@@ -388,7 +389,7 @@ Client generation imports can include the reserved matched server-data namespace
 described in `runtime/server/IMPORTED-SERVER-DATA.md`. Generation input format2
 binds that manifest and exact APK helper generation; ordinary generated data
 keeps format1. Do not alter the helper byte manifest independently of
-ServerDataRunPlan: the actual five-file manifest hash is checked against the
+ServerDataRunPlan: the actual six-file manifest hash is checked against the
 preparer and APK. Source-side tests use explicitly synthetic tiny headers and
 do not qualify actual maps, DBC rows or world entry.
 

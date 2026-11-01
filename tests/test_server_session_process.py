@@ -49,9 +49,10 @@ class ServerSessionProcessTests(unittest.TestCase):
 
     def test_actual_owned_child_listener_inode_and_world_protocol(self):
         child = self.child('authserver', '''import signal,socket,time
+from pathlib import Path
 signal.signal(signal.SIGTERM,lambda *_:exit(0))
 s=socket.socket();s.bind(('127.0.0.1',0));s.listen()
-open('port','w').write(str(s.getsockname()[1]))
+Path('port.tmp').write_text(str(s.getsockname()[1]));Path('port.tmp').replace('port')
 while True: time.sleep(.05)
 ''').start()
         self.await_file('port'); port = int((self.root / 'port').read_text())
@@ -68,8 +69,9 @@ while True: time.sleep(.05)
 
     def test_actual_world_console_processing_challenge_and_shutdown(self):
         child = self.child('worldserver', '''import socket,struct,sys,threading
+from pathlib import Path
 s=socket.socket();s.bind(('127.0.0.1',0));s.listen()
-open('port','w').write(str(s.getsockname()[1]))
+Path('port.tmp').write_text(str(s.getsockname()[1]));Path('port.tmp').replace('port')
 def challenge():
  while True:
   c,_=s.accept()
@@ -121,9 +123,10 @@ for line in sys.stdin:
 
     def test_actual_auth_probe_sends_build12340_challenge_without_proof_or_credentials(self):
         child = self.child('authserver', '''import signal,socket,struct,time
+from pathlib import Path
 signal.signal(signal.SIGTERM,lambda *_:exit(0))
 s=socket.socket();s.bind(('127.0.0.1',0));s.listen()
-open('port','w').write(str(s.getsockname()[1]))
+Path('port.tmp').write_text(str(s.getsockname()[1]));Path('port.tmp').replace('port')
 c,_=s.accept()
 with c:
  packet=b''

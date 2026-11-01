@@ -14,14 +14,21 @@ import java.nio.file.Path;
 
 /** Import-only pressure probe and advisory cache release. Never raises the app heap limit. */
 final class ImportIoController {
+    interface Diagnostics {
+        void io(String key, long value);
+        void io(String key, String value);
+        void memory();
+        void checkpoint();
+    }
     static final long NORMAL_BYTES_PER_SECOND = 8L << 20;
     static final long PRESSURE_BYTES_PER_SECOND = 2L << 20;
     private static final long SAMPLE_INTERVAL_NANOS = 1_000_000_000L;
     private static final long TRIM_WINDOW_NANOS = 15_000_000_000L;
     private static final long CACHE_WINDOW = 2L << 20;
     private final ActivityManager manager;
-    private final ImportDiagnostics diagnostics;
+    private final Diagnostics diagnostics;
     private final ImportIoGovernor governor;
+    private final String operationLabel;
     private volatile int trimLevel = -1;
     private volatile long trimAtNanos, trimAtEpochMs;
     private int pressureTrimLevel = -1;
@@ -30,9 +37,15 @@ final class ImportIoController {
     private int pressure, lastCacheErrno;
     private volatile String statusHint = "Import speed is limited to 8 MiB/s to reduce memory pressure.";
 
-    ImportIoController(Context context, ImportDiagnostics diagnostics) {
+    private Path readPath;
+    private long readStart, readBytes;
+    ImportIoController(Context context, Diagnostics diagnostics) {
+        this(context,diagnostics,"Import");
+    }
+    ImportIoController(Context context, Diagnostics diagnostics, String operationLabel) {
         manager = context.getSystemService(ActivityManager.class);
         this.diagnostics = diagnostics;
+        this.operationLabel = operationLabel;
         governor = new ImportIoGovernor(NORMAL_BYTES_PER_SECOND, PRESSURE_BYTES_PER_SECOND, this::pressure, this::release);
         diagnostics.io("ioPolicy", "8MiB-per-second-2MiB-sync-cache-windows");
         diagnostics.io("ioNormalBytesPerSecond", NORMAL_BYTES_PER_SECOND);
@@ -40,8 +53,20 @@ final class ImportIoController {
         pressure();
     }
     ImportIoGovernor governor() { return governor; }
+    int pressureLevel() { return pressure(); }
+    void readObserved(Path path, long offset, int count, io.github.russianranger.esteria.core.importer.GameDataImporter.Cancellation cancellation) throws IOException {
+        if (path == null || offset < 0 || count <= 0) throw new IllegalArgumentException("Bounded prepared file read required");
+        governor.read(count, cancellation);
+        if (!path.equals(readPath) || offset != readStart + readBytes) { releaseRead(); readPath = path; readStart = offset; }
+        readBytes += count;
+        if (readBytes >= CACHE_WINDOW) releaseRead();
+    }
+    private void releaseRead() {
+        if (readPath != null && readBytes > 0) release(readPath, readStart, readBytes);
+        readPath = null; readStart = 0; readBytes = 0;
+    }
     String statusHint() { return statusHint; }
-    synchronized void recordFinal() { sampledAt = 0; pressure(); diagnostics.checkpoint(); }
+    synchronized void recordFinal() { releaseRead(); sampledAt = 0; pressure(); diagnostics.checkpoint(); }
     synchronized void onTrimMemory(int level) {
         trimLevel = level; trimAtEpochMs = System.currentTimeMillis(); trimAtNanos = System.nanoTime();
         if (trimPressure(level) > 0) { pressureTrimLevel = level; pressureTrimAtNanos = trimAtNanos; }
@@ -87,8 +112,8 @@ final class ImportIoController {
         int previousPressure = pressure;
         pressure = pressureLevel(available, threshold, low, vm.totalMemory() - vm.freeMemory(), vm.maxMemory(), recentTrim);
         statusHint = pressure == 2 ? "Waiting for Android memory to recover. Stop remains available."
-                : pressure == 1 ? "Android memory is low; import is limited to 2 MiB/s."
-                : "Import speed is limited to 8 MiB/s to reduce memory pressure.";
+                : pressure == 1 ? "Android memory is low; "+operationLabel.toLowerCase(java.util.Locale.ROOT)+" is limited to 2 MiB/s."
+                : operationLabel+" speed is limited to 8 MiB/s to reduce memory pressure.";
         diagnostics.memory();
         diagnostics.io("ioPressureLevel", pressure);
         diagnostics.io("ioActiveBytesPerSecond", pressure == 2 ? 0 : pressure == 1 ? PRESSURE_BYTES_PER_SECOND : NORMAL_BYTES_PER_SECOND);

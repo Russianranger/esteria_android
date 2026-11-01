@@ -1,6 +1,6 @@
 // Exact source-only closure; no executable provider or gameplay action enabled.
 def serverDataHelpers = ['server_data_generation.py', 'server_data_preflight.py',
-    'shader_generation.py', 'extractor_order.py', 'owned_process_group.py']
+    'shader_generation.py', 'extractor_order.py', 'owned_process_group.py', 'world_io.py']
 def serverDataAssets = layout.buildDirectory.dir('generated/serverData')
 def packageServerData = tasks.register('packageServerData') {
     inputs.files(serverDataHelpers.collect { rootProject.file('runtime/' + it) })

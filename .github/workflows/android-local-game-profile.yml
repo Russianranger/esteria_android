@@ -5,7 +5,7 @@ on:
       build_version_code:
         description: Positive release versionCode, increased before a signed update
         required: false
-        default: '4'
+        default: '5'
         type: string
       publish_non_custom:
         description: Sign and publish an additive non-custom prerelease using the configured persistent key
@@ -112,7 +112,7 @@ jobs:
       contents: write
       actions: read
     env:
-      RELEASE_VERSION_CODE: ${{ inputs.build_version_code || '4' }}
+      RELEASE_VERSION_CODE: ${{ inputs.build_version_code || '5' }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -149,9 +149,11 @@ jobs:
           git fetch --no-tags --depth 1 origin 681b2e9f30b19e94bf8e8de44f67fedba5033c8a
       - name: Exercise both public import routes through actual pinned-reader stock preparation
         run: |
+          python3 tools/check_world_preparation_flow.py
           ESTERIA_CLIENT_SOURCE="$PWD/sources/client" \
           ESTERIA_STOCK_PIPELINE_EVIDENCE="$PWD/out/coherent-evidence/stock-import-preparation.json" \
-            python3 -m unittest tests.test_stock_content_inspection -v
+          ESTERIA_SHADER_MEMORY_EVIDENCE="$PWD/out/coherent-evidence/shader-memory-adapter.json" \
+            python3 -m unittest tests.test_stock_content_inspection tests.test_shader_memory_adapter tests.test_world_io -v
           python3 - <<'PY'
           import json
           from pathlib import Path

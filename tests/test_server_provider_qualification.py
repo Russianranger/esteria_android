@@ -49,7 +49,9 @@ class ProviderQualificationGuards(unittest.TestCase):
                     archive.writestr('assets/'+directory+'/manifest.json',json.dumps({'formatVersion':1,'files':records}))
             receipt=qualification.verify_final(output,self.root/'dependencies',apk)
             self.assertTrue(receipt['exactSourceHelperClosureVerified'])
-            self.assertEqual(receipt['helperFiles']['server-data'],5)
+            self.assertEqual(receipt['helperFiles']['server-data'],6)
+            self.assertEqual(receipt['helperFiles']['stock-client'],7)
+            self.assertEqual(receipt['helperFiles']['server-session'],24)
             self.assertFalse(receipt['androidGuestExecuted'])
 
     def test_wrong_remote_revision_or_zip_digest_refuses_before_extraction(self):

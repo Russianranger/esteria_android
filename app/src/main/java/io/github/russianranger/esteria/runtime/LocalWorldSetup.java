@@ -6,6 +6,7 @@ import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
 import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
 import io.github.russianranger.esteria.core.runtime.install.FreshServerInstallations;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
+import io.github.russianranger.esteria.core.runtime.process.ProcessUsageSnapshot;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -47,6 +48,11 @@ public final class LocalWorldSetup {
     public static Handle begin(Context context,Path root,ServerRuntimeSetup server,ServerProgramsSetup programs,
             ServerContentSetup content,ServerDataToolsSetup dataTools,RuntimeSetup wine,ShaderToolsSetup shaderTools,
             String locale,int threads,long freshDatabaseReserve)throws IOException {
+        return begin(context,root,server,programs,content,dataTools,wine,shaderTools,locale,threads,freshDatabaseReserve,RuntimeWork.NONE);
+    }
+    public static Handle begin(Context context,Path root,ServerRuntimeSetup server,ServerProgramsSetup programs,
+            ServerContentSetup content,ServerDataToolsSetup dataTools,RuntimeSetup wine,ShaderToolsSetup shaderTools,
+            String locale,int threads,long freshDatabaseReserve,RuntimeWork.Progress progress)throws IOException {
         background();
         if(context==null||root==null||!root.equals(context.getFilesDir().getCanonicalFile().toPath()))
             throw new IOException("Private canonical setup storage required");
@@ -55,10 +61,18 @@ public final class LocalWorldSetup {
         if(freshDatabaseReserve<=0||freshDatabaseReserve>(32L<<30))throw new IOException("Invalid fresh database storage budget");
         programs.requireServerRuntimeArchive(server.archiveSha256());content.requireServerRuntimeArchive(server.archiveSha256());
         dataTools.requireServerRuntimeArchive(server.archiveSha256());shaderTools.requireWineArchive(wine.archiveSha256());
-        if(server.current()==null||programs.current()==null||content.current()==null||dataTools.current()==null||
-                wine.current()==null||shaderTools.current()==null)throw new IOException("Prepare all pinned runtime providers before local world setup");
+        RuntimeWork.Progress updates=progress==null?RuntimeWork.NONE:progress;
+        updates.update("world-admission-server-runtime","",0,-1);Path serverRoot=server.current();
+        updates.update("world-admission-server-programs","",0,-1);Path programsRoot=programs.current();
+        updates.update("world-admission-server-content","",0,-1);Path contentRoot=content.current();
+        updates.update("world-admission-data-tools","",0,-1);Path dataRoot=dataTools.current();
+        updates.update("world-admission-client-runtime","",0,-1);Path wineRoot=wine.current();
+        updates.update("world-admission-shader-tools","",0,-1);Path shaderRoot=shaderTools.current();
+        if(serverRoot==null||programsRoot==null||contentRoot==null||dataRoot==null||wineRoot==null||shaderRoot==null)
+            throw new IOException("Prepare all pinned runtime providers before local world setup");
         // This is deliberately before extraction and before fresh SQL. A stock
         // programs-only APK must not begin an installation it cannot complete.
+        updates.update("world-admission-existing-database","",0,-1);
         FreshServerInstallations.Active previous=ServerInstallationSetup.completedOrNull(context,root,server,programs,content);
         Path state=GuestHelperAssets.directory(root,"state");Path lockPath=state.resolve(".local-world-setup.lock");
         if(Files.exists(lockPath,LinkOption.NOFOLLOW_LINKS)&&(!Files.isRegularFile(lockPath,LinkOption.NOFOLLOW_LINKS)||
@@ -114,6 +128,12 @@ public final class LocalWorldSetup {
             return Collections.unmodifiableMap(logs);
         }
         public IOException failure(){return failure;}
+        public Map<String,ProcessUsageSnapshot> diagnosticUsage(){
+            Map<String,ProcessUsageSnapshot> usage=new LinkedHashMap<>();
+            ServerDataSetup.Handle currentData=data;if(currentData!=null&&currentData.processAlive())usage.put("data",currentData.usage());
+            ShaderSetup.Handle currentShaders=shaders;if(currentShaders!=null&&currentShaders.processAlive())usage.put("shader",currentShaders.usage());
+            return usage;
+        }
         public Result prepare(RuntimeWork.Progress progress,RuntimeWork.Cancellation cancellation)throws IOException {
             background();return operations.run(()->{
                 if(state!=State.ALLOCATED)throw new IOException("Local world setup is single-use; retain and close this owner");
@@ -121,8 +141,10 @@ public final class LocalWorldSetup {
                 RuntimeWork.Cancellation stop=()->operations.isStopRequested()||(cancellation!=null&&cancellation.isCancelled());
                 RuntimeWork.Progress updates=progress==null?RuntimeWork.NONE:progress;
                 try {
+                    updates.update("world-data-owner-admission","",0,-1);
                     check(stop);data=ServerDataSetup.begin(context,root,server,tools,locale,threads);
                     ServerDataBinding binding=data.prepare(updates,stop);
+                    updates.update("world-shader-owner-admission","",0,-1);
                     check(stop);shaders=ShaderSetup.begin(context,root,wine,shaderTools,locale);
                     ShaderSetup.Result generated=shaders.prepare(updates,stop);
                     if(!generated.locale.equals(binding.effectiveLocale))
@@ -132,6 +154,7 @@ public final class LocalWorldSetup {
                     if(active==null) {
                         // Recheck absence under the transactional installation
                         // lock in beginFresh; never replace an intervening save.
+                        updates.update("world-database-owner-admission","",0,-1);
                         installation=ServerInstallationSetup.beginFresh(context,root,server,programs,content,binding.directory,reserve);
                         installation.prepare(updates,stop);check(stop);
                         installation.finishPlayerbots(updates,stop);check(stop);

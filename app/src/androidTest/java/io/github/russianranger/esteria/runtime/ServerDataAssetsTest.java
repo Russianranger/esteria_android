@@ -27,7 +27,7 @@ public final class ServerDataAssetsTest {
             }
             assertEquals(generation,ServerDataAssets.install(context,root));
             assertEquals(stamp,Files.getLastModifiedTime(retained));
-            try(var files=Files.walk(installed)){assertEquals(5,files.filter(Files::isRegularFile).count());}
+            try(var files=Files.walk(installed)){assertEquals(6,files.filter(Files::isRegularFile).count());}
         }finally {
             try(var paths=Files.walk(root)) {
                 for(Path path:paths.sorted(Comparator.reverseOrder()).toArray(Path[]::new))Files.delete(path);

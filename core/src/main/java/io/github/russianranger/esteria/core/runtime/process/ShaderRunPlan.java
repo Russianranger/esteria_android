@@ -38,7 +38,7 @@ public final class ShaderRunPlan {
         arguments=Collections.unmodifiableList(Arrays.asList("/usr/bin/python3","-B","-s","-E",
             HELPER_MOUNT+"/stock_shader_generation.py","--store","/work/shaders","--game","/esteria-data",
             "--generation",importGeneration,"--tools",TOOL_MOUNT+"/tools","--client-revision",clientRevision,"--locale",this.locale,
-            "--content-profile",ContentProfile.ID));
+            "--content-profile",ContentProfile.ID,"--android-low-memory"));
         mounts=Collections.unmodifiableList(Arrays.asList(new ProotLaunch.Mount(game,"/esteria-data"),
             new ProotLaunch.Mount(tools,TOOL_MOUNT),new ProotLaunch.Mount(helpers,HELPER_MOUNT)));
     }

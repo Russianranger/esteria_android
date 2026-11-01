@@ -62,8 +62,9 @@ public final class EmbeddedArchiveCache {
                 long total = 0;
                 try (InputStream input = Files.newInputStream(partial, LinkOption.NOFOLLOW_LINKS)) {
                     for (int count; (count = input.read(buffer)) != -1;) {
-                        RuntimeWork.check(cancellation); total += count;
+                        RuntimeWork.check(cancellation); long start = total; total += count;
                         RuntimeFiles.require(total <= offset, "Embedded partial changed"); hash.update(buffer, 0, count);
+                        if(count>0)RuntimeReadPolicy.consumed(partial,start,count);
                         progress.update("verify-embedded-resume", name, total, offset);
                     }
                 }

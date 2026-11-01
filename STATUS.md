@@ -1,31 +1,42 @@
-# Esteria Stock — version 4 published
+# Esteria Stock — version 5 preparation update pending
 
-Updated 2026-10-31. Branch `non-custom`; package `io.github.russianranger.esteria.stock`. Signed **0.1.0-non-custom.4**, versionCode **4**, installs over the existing stock app with the same persistent certificate and app data.
+Version `0.1.0-non-custom.5` / code **5** is an implementation checkpoint on `non-custom`; it is **not published yet**. Fresh complete ARM64 packaging, native SQL, Android 13 execution, signing and public download verification remain release gates. Package `io.github.russianranger.esteria.stock`, the persistent certificate and existing app data are retained.
 
-- [ARM64 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.4/Esteria-Stock-3.3.5a-arm64.apk) / [release and instructions](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.4).
+## Owner evidence and current failure
+
+The two supplied v4 support bundles both confirm a completed **folder import**, 14 archives and zero import cache-advice errors. Android history contains **three unique `LOW_MEMORY` exits** during subsequent local-world preparation. The last completed launcher stage was the graphics component check. Missing private helper logs and a rejected retained log selection prevent identifying the exact preparation child, allocation or input member. Launcher PSS does not include preparation children or kernel cache.
+
+The original input contains 16,742,408,801 archive bytes, approximately 15.6 GiB. Preparation previously hashed these at storage speed after import. This is a concrete unpaced I/O path, not proof of which allocation caused an owner exit. The normalized evidence is `runtime/evidence/non-custom-v5-owner-world-failure.json`. Successful owner import is now confirmed; owner ZIP import, successful world preparation and gameplay remain separate evidence boundaries.
+
+## Version 5 changes
+
+- Java runtime verification and APK-owned Python preparation hashing use an explicit 8 MiB/s policy, reducing to 2 MiB/s under pressure, with bounded cancellation checks and clean-input cache advice. Full hashes, source identities and metadata checks remain required. Existing import controls continue unchanged.
+- Native extraction/translation children receive a **4 GiB virtual-address-space limit per process**, repeated advice for clean MPQ inputs and a pressure guard that stops and reaps the child before returning a pause. This is not a native I/O speed cap, a resident-memory measurement or a total app-plus-children budget.
+- The shader adapter keeps packed MPQ tables and bounded record/bytecode inventories, retaining expanded shader IR only while needed. The original verified decoder, emitter and compiler paths remain; source-pinned recipe modules and published provider bytes stay unchanged. The APK helper closure includes every adapter dependency.
+- Memory pauses use the distinct child exit **75**, propagate through supervisors and Android owners, and retain completed phases. A transient pause does not become a cached failed stock-content report. Stop during parent verification is recorded as preparation paused.
+- Durable preparation receipts retain the last phase, observed parent memory and explicitly partial child observations. Fixed owned logs survive interruption; individually invalid log selections are excluded while independently validated roles remain available. Private paths are still rejected by the original strict validator.
+
+A first full 15.6 GiB hash pass takes roughly **34 minutes at 8 MiB/s**, before later extraction, repeated verification, shaders and database work. Pressure can make it substantially longer. Native extraction retains its own throughput. Keep completed import and preparation state; this update does not require reimporting the client.
+
+## Checkpoint validation
+
+Focused host checks passed for governed hashes, unchanged fingerprints, native child limits/reaping, pause/retry, log recovery and bounded shader equivalence. The final focused Python preparation set ran **74 tests successfully**. Java runtime installer tests passed 20 groups; the final local Gradle run passed core checks, all owner fixtures, app/test assembly and lint (120 tasks, 2 minutes 18 seconds). SDK-backed signing/publication tests passed 39 cases. Synthetic shader fixtures produced matching outputs with a structural compiler fixture; these are not real shader compiler/GPU or owner-data execution evidence.
+
+Final full host discovery passed: **1,504 run, 1,396 passed, 108 explicit dependency skips**, no failures. Fresh exact-producer complete APK, native SQL and Android 13 runs are pending. No v5 APK, signature or public artifact identity is claimed here. Host success does not reproduce the Thor kill or establish world entry.
+
+## Published v4 update baseline — historical
+
+The current public package is [v4 ARM64 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.4/Esteria-Stock-3.3.5a-arm64.apk), [release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.4), release ID `430186739`.
+
 - APK: 336,767,421 bytes; SHA-256 `af4b77d9ad183e8a4855a9bcce0644da2276e1d6309bb86d0727691ad79e1b29`.
-- Certificate SHA-256: `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`.
-- APK producer `2c8eeb08a3079edf7354cd373b7cbaf94d859365`; publisher `8d0ba78bed3256b5eee3340b62fe1c8de41c3d52`, successful run `41241976822`. Release ID `430186739`. Anonymous complete APK download, hash, manifest and SDK v2/v3 signature/certificate checks passed. All six public assets were read and checked.
+- Certificate: `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`.
+- Producer `2c8eeb08a3079edf7354cd373b7cbaf94d859365`; publisher `8d0ba78bed3256b5eee3340b62fe1c8de41c3d52`; successful publication run `41241976822`. Full APK/all-six-asset public readback passed. Historical records remain in `runtime/releases/non-custom-v0.1.0-non-custom.4.json` and `runtime/evidence/non-custom-v4-*`.
+- Test-only correction `7c38f27756eac24821cd848ee59d475acfba0bdc` passed tooling run `41242372352`; preserve it and its evidence. Historical failed tooling run `41241976734` is retained as diagnosis evidence.
 
-## Import change
+The signing ledger pins v4. Sign v5 against this exact previous APK with the same certificate; preserve historical releases and `update-4` transport. Use new `update-5` metadata and advance the ledger only after verified public readback.
 
-Both folder and ZIP routes share an 8 MiB/s governor, including ZIP staging/extraction, nonseekable resume consumption and fallback overlay copies. Small output batches are forced before advisory clean-cache release. Regular SAF sources also receive cache advice. Android memory/headroom/heap/trim observations reduce copying to 2 MiB/s or wait before further I/O; sustained severe pressure produces a resumable pause after 60 seconds. Cancellation is checked within 100 ms sleep slices. UI-hidden callbacks alone do not count as pressure. Existing validation, transactional promotion and source/resume fingerprints remain unchanged.
+## Next device session after publication
 
-This targets sustained I/O/cache/writeback pressure outside v3's Java-allocation changes. No fresh owner kill bundle was supplied, so the Thor exit cause is not confirmed. Diagnostics retain speed, system memory/headroom, Dirty/Writeback and advice results. Kernel acceptance of advice does not guarantee a number of reclaimed pages.
+Install v5 over the existing stock app, keep app data and the successful import, then retry **Prepare local runtime / world** with the same installed locale. If paused for memory, allow recovery and retry preparation. If Android closes the app, reopen and export the whole support bundle **before another preparation attempt**. Include the last displayed stage and the `preparation.last.*` observations. Continue startup, Human Warrior world entry, clean-stop persistence and offline repeat only after preparation succeeds. See `NON-CUSTOM-TESTING.md`.
 
-## Validation
-
-- Six governor groups; 42 existing importer groups; bounded allocation/ZIP metadata tests and actual folder/ZIP cancellation/resume/hash continuity. Core checks, Android compile/lint, JNI/libc byte-preservation tests and Android ARM64 bridge cross-build passed.
-- Full host Python discovery: 1,468 run, 1,360 passed, 108 dependency skips, no failures. Exact producer complete ARM64 package `41240790028`, native SQL `41240789998`, Android13 `41240790022`, launcher `41240789955` and tooling `41240790024` passed.
-- Android13 x64 readback checked 33 artifact members, 14 source identities and nine named test successes. The 1 GiB folder route took 142.432 s with 521 accepted cache calls; nonseekable ZIP staging/import took 272.448 s with 1,007 accepted calls. Both had zero advice errors and identical payload hashes. Representative fixtures are not owner data or a real LMK reproduction.
-- Publication checks, exact signed reconstruction and public readback passed. A later publisher-revision tooling run exposed an unrelated flaky assertion matching digits in a generated test password; the test-only correction is `7c38f27756eac24821cd848ee59d475acfba0bdc`, preserving APK/runtime bytes.
-
-Evidence: `runtime/evidence/non-custom-v4-*`; publication identities: `runtime/releases/non-custom-v0.1.0-non-custom.4.json`. The signing ledger now pins the verified public v4. Future updates require a higher version and this exact APK as the previous baseline; preserve historical releases and update-4 transport.
-
-## Device boundary
-
-Install over the existing app, retain data, and retry the same complete client source with `Wow.exe` beside `Data`. Each 1 GiB copy takes at least 128 seconds; ZIPs add staging. On a memory pause retry after recovery. If Android closes it again, reopen and export support before another import, including last stage/file. Continue preparation/start only after import succeeds; see `NON-CUSTOM-TESTING.md`.
-
-Actual Thor import, graphical startup/world entry, controller/audio and persistence remain unqualified. Client stays `471ee42faadf4a97a1d0a86989cf1452621f2dc5`; server stays `f35f04d01689f034778e3474b3c820092f51e461` plus seven pinned adaptations. Custom/HD content and bot AI remain deferred.
-
-The corrected full tooling CI run `41242372352` passed at test-only revision `7c38f27756eac24821cd848ee59d475acfba0bdc`; see `runtime/evidence/non-custom-v4-tooling-fixture-fix.json`.
+Client stays `471ee42faadf4a97a1d0a86989cf1452621f2dc5`; server stays `f35f04d01689f034778e3474b3c820092f51e461` plus seven pinned adaptations; Eluna stays `58d7652138887783228b9727bd1fa4e08f00342b`. Custom/HD content and bot AI remain deferred. Actual Thor preparation, graphical startup/world entry, controller/audio and persistence remain unqualified.

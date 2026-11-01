@@ -27,7 +27,7 @@ public final class ShaderSetupReceiptTest {
         Path root=context.getFilesDir().getCanonicalFile().toPath();
         Path helpers=StockClientSetup.installHelpers(context,root);
         java.util.Set<String> expected=java.util.Set.of("stock_content_inspection.py","stock_shader_generation.py",
-            "shader_generation.py","extractor_order.py","server_data_preflight.py");
+            "shader_generation.py","extractor_order.py","server_data_preflight.py","world_io.py","stock_shader_translate.py");
         try(var files=Files.list(helpers)) {
             assertEquals(expected,files.map(path->path.getFileName().toString()).collect(java.util.stream.Collectors.toSet()));
         }
@@ -64,8 +64,10 @@ public final class ShaderSetupReceiptTest {
             Files.write(data.getParent().resolve("complete"),complete);Files.write(data.getParent().resolve("journal.tsv"),journal);
             JSONObject metadata=new JSONObject().put(imported+"/complete",pin(complete)).put(imported+"/journal.tsv",pin(journal));
             byte[] helper="synthetic APK helper".getBytes(StandardCharsets.UTF_8);Files.write(helpers.resolve("stock_shader_generation.py"),helper);
+            JSONObject helperFiles=new JSONObject();
+            for(String name:java.util.Set.of("stock_content_inspection.py","stock_shader_generation.py","stock_shader_translate.py","shader_generation.py","extractor_order.py","server_data_preflight.py","world_io.py")){byte[] content=name.equals("stock_shader_generation.py")?helper:("synthetic:"+name).getBytes(StandardCharsets.UTF_8);Files.write(helpers.resolve(name),content);helperFiles.put(name,pin(content));}
             JSONObject inputs=new JSONObject().put("formatVersion",1).put("contentProfile","stock-3.3.5a").put("importGeneration",imported).put("clientRevision",revision)
-                .put("locale","enUS").put("importMetadata",metadata).put("toolManifestSha256",manifest).put("preparationHelperSha256",hash(helper));
+                .put("locale","enUS").put("importMetadata",metadata).put("toolManifestSha256",manifest).put("preparationHelperSha256",hash(helper)).put("preparationHelperFiles",helperFiles);
             String generation=hash((canonical(inputs)+"\n").getBytes(StandardCharsets.UTF_8));
             Path output=Files.createDirectories(work.resolve("shaders/generations/"+generation+"/shaders"));
             JSONObject outputs=new JSONObject();
@@ -80,6 +82,7 @@ public final class ShaderSetupReceiptTest {
             ShaderRunPlan plan=new ShaderRunPlan(game,tools,work,helpers,revision,"enUS");
             ShaderSetup.Result result=ShaderSetup.validatePrepared(plan,manifest,base,false);
             assertEquals(4,result.outputFiles);assertEquals(generation,result.generation);assertEquals(output,result.shaders);
+            byte[] previousWrapper=Files.readAllBytes(helpers.resolve("stock_shader_translate.py"));write(helpers.resolve("stock_shader_translate.py"),"changed-wrapper");refuses(()->ShaderSetup.validatePrepared(plan,manifest,base,false));Files.write(helpers.resolve("stock_shader_translate.py"),previousWrapper);
             receipt.put("androidQualified",true);write(receiptFile,receipt.toString());refuses(()->ShaderSetup.validatePrepared(plan,manifest,base,false));
             receipt.put("androidQualified",false).put("formatVersion","1");write(receiptFile,receipt.toString());refuses(()->ShaderSetup.validatePrepared(plan,manifest,base,false));
             receipt.put("formatVersion",1);write(receiptFile,receipt.toString());

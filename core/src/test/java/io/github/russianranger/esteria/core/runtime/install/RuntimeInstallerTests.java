@@ -39,6 +39,7 @@ public final class RuntimeInstallerTests {
         run("generation promotion interruption recovers",RuntimeInstallerTests::promotionRecovery);
         run("rejected archive residue cannot enter a later generation",RuntimeInstallerTests::rejectedResidue);
         run("same-size modified required binaries fail cached verification",RuntimeInstallerTests::requiredTamper);
+        run("scoped runtime reads retain hashes, cancellation and worker isolation",RuntimeInstallerTests::readPolicy);
         run("unsafe paths, duplicate names and link ancestors rejected",RuntimeInstallerTests::unsafePaths);
         run("escaping links, hardlink chains and special members rejected",RuntimeInstallerTests::unsafeLinks);
         run("GNU long names work and metadata budgets are bounded",RuntimeInstallerTests::longNamesAndLimits);
@@ -52,6 +53,52 @@ public final class RuntimeInstallerTests {
         System.out.println("Runtime installer tests passed: "+passed);
     }
     static void run(String name,Test test)throws Exception{test.run();passed++;System.out.println("PASS "+name);}
+    static void readPolicy()throws Exception {
+        Path root=temp(),file=root.resolve("large.bin");
+        byte[] block=new byte[65536];Arrays.fill(block,(byte)37);
+        java.security.MessageDigest expected=RuntimeFiles.digest();
+        try(OutputStream out=Files.newOutputStream(file)) {
+            for(int i=0;i<64;i++){out.write(block);expected.update(block);}
+        }
+        long length=Files.size(file);String hash=RuntimeFiles.hex(expected.digest());
+        long[] observed={0};int[] calls={0};
+        RuntimeReadPolicy.Scope outer=RuntimeReadPolicy.install((path,offset,size)->{
+            check(path.equals(file)&&offset==observed[0]&&size>0&&size<=RuntimeFiles.BUFFER,"Sequential bounded read ranges");
+            observed[0]+=size;calls[0]++;
+        });
+        try {
+            check(hash.equals(RuntimeFiles.hashFile(file,length,RuntimeWork.NEVER_CANCELLED)),"Observed bytes retain exact digest");
+            check(observed[0]==length&&calls[0]>1,"Policy covers the whole large verification");
+            java.util.concurrent.atomic.AtomicReference<Throwable> threadFailure=new java.util.concurrent.atomic.AtomicReference<>();
+            Thread thread=new Thread(()->{try{RuntimeFiles.hashFile(file,length,RuntimeWork.NEVER_CANCELLED);}catch(Throwable error){threadFailure.set(error);}});
+            int before=calls[0];thread.start();thread.join();
+            check(threadFailure.get()==null&&calls[0]==before,"Read policy does not leak into another worker");
+            try(RuntimeReadPolicy.Scope nested=RuntimeReadPolicy.install((p,o,n)->{})) {
+                try{outer.close();throw new AssertionError("Out-of-order close accepted");}
+                catch(IllegalStateException correct){check(correct.getMessage().contains("reverse order"),"Nested scope ownership");}
+                RuntimeFiles.hashFile(file,length,RuntimeWork.NEVER_CANCELLED);
+                check(calls[0]==before,"Nested observer temporarily replaces outer policy");
+            }
+        } finally {outer.close();outer.close();}
+        check(hash.equals(RuntimeFiles.hashFile(file,length,RuntimeWork.NEVER_CANCELLED)),"Closing scope restores ordinary verification");
+        int[] reads={0};
+        try(RuntimeReadPolicy.Scope scope=RuntimeReadPolicy.install((p,o,n)->{if(++reads[0]==3)throw new RuntimeWork.CancelledException();})) {
+            fail(()->RuntimeFiles.hashFile(file,length,RuntimeWork.NEVER_CANCELLED));
+            check(reads[0]==3,"Preparation policy cancellation propagates at a bounded chunk");
+        }
+        check(hash.equals(RuntimeFiles.hashFile(file,length,RuntimeWork.NEVER_CANCELLED)),"Policy cancellation leaves source bytes intact");
+        List<Member> members=base();Path archive=tar(root,members);RuntimePackagePlan pin=plan(archive,members);
+        RuntimeInstaller installer=new RuntimeInstaller(root.resolve("store"));RuntimeInstaller.Result installed=install(installer,archive,pin);
+        int[] requiredReads={0};
+        try(RuntimeReadPolicy.Scope scope=RuntimeReadPolicy.install((p,o,n)->{requiredReads[0]++;throw new RuntimeWork.CancelledException();})) {
+            fail(()->installer.resolveCurrent(pin));
+        }
+        check(requiredReads[0]==1&&installer.resolveCurrent(pin).equals(installed.rootfs),"Cached provider checks honor policy and retain generation");
+        Path tool=installed.rootfs.resolve("usr/bin/tool");Files.write(tool,bytes("Xxecutable-data"));
+        try(RuntimeReadPolicy.Scope scope=RuntimeReadPolicy.install((p,o,n)->{})) {
+            fail(()->installer.resolveCurrent(pin));
+        }
+    }
     static void check(boolean value,String reason){if(!value)throw new AssertionError(reason);}
     static void fail(Test test)throws Exception{try{test.run();}catch(IOException expected){return;}throw new AssertionError("Expected IOException");}
     static Path temp()throws IOException{return (temporaryRoot==null?Files.createTempDirectory("esteria-runtime-test-"):Files.createTempDirectory(temporaryRoot,"runtime-test-")).toRealPath();}

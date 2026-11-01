@@ -5,6 +5,7 @@ on:
     branches: [android/client-server, non-custom]
     paths:
       - .github/workflows/server-installation-native.yml
+      - app/build.gradle
       - tools/prepare_server_installation_inputs.py
       - tools/qualify_server_installation.py
       - tests/test_server_installation_inputs.py

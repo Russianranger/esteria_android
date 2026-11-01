@@ -149,10 +149,19 @@ jobs:
                   receipt['stdout'] = dict(bytes=log.stat().st_size, sha256=digest(log))
               (destination / 'saf-import-component.json').write_text(json.dumps(receipt, sort_keys=True, indent=2) + '\n')
           print(json.dumps(receipt, sort_keys=True, indent=2))
-          selected = 'io.github.russianranger.esteria.ImportMemoryStressTest,io.github.russianranger.esteria.ProcessExitDiagnosticsTest,io.github.russianranger.esteria.ImportIoControllerTest'
+          selected = 'io.github.russianranger.esteria.ImportMemoryStressTest,io.github.russianranger.esteria.ProcessExitDiagnosticsTest,io.github.russianranger.esteria.ImportIoControllerTest,io.github.russianranger.esteria.WorldPreparationDiagnosticsTest'
           files = ['app/src/androidTest/java/io/github/russianranger/esteria/ImportMemoryStressTest.java',
                    'app/src/androidTest/java/io/github/russianranger/esteria/ProcessExitDiagnosticsTest.java',
                    'app/src/androidTest/java/io/github/russianranger/esteria/ImportIoControllerTest.java',
+                   'app/src/androidTest/java/io/github/russianranger/esteria/WorldPreparationDiagnosticsTest.java',
+                   'app/src/main/java/io/github/russianranger/esteria/WorldPreparationDiagnostics.java',
+                   'app/src/androidTest/java/io/github/russianranger/esteria/runtime/PreparationChildFixture.java',
+                   'core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeFiles.java',
+                   'core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeWork.java',
+                   'runtime/world_io.py',
+                   'runtime/stock_shader_translate.py',
+                   'core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeReadPolicy.java',
+                   'core/src/main/java/io/github/russianranger/esteria/core/diagnostics/SupportLogSelection.java',
                    'app/src/main/java/io/github/russianranger/esteria/ProcessExitDiagnostics.java',
                    'app/src/main/java/io/github/russianranger/esteria/SafTreeSource.java',
                    'app/src/main/java/io/github/russianranger/esteria/UriStager.java',
@@ -166,7 +175,7 @@ jobs:
                    'native/process-owner/jni_bridge.cpp']
           receipt = dict(formatVersion=1, scope='android13-x64-large-streaming-import-memory-and-exit-history-components',
               appSourceRevision=os.environ['GITHUB_SHA'], contentProfile='stock-3.3.5a',
-              testClass=selected, expectedTests=9, emulatorProperties=properties,
+              testClass=selected, expectedTests=13, emulatorProperties=properties,
               sources={name: dict(bytes=(root / name).stat().st_size, sha256=digest(root / name)) for name in files},
               componentTestsExecuted=False, componentTestsPassed=False,
               realLowMemoryKillReproduced=False, ownerDocumentProviderTested=False,
@@ -176,7 +185,7 @@ jobs:
               code, output = run_bounded(['adb', 'shell', 'am', 'instrument', '-w', '-r', '-e', 'class',
                   selected, PACKAGE + '.test/androidx.test.runner.AndroidJUnitRunner'], log, 1200, 256 * 1024)
               receipt.update(componentTestsExecuted=True, processExitCode=code)
-              passed = code == 0 and bool(re.search(r'^OK \(9 tests\)\s*$', output, re.M)) and bool(
+              passed = code == 0 and bool(re.search(r'^OK \(13 tests\)\s*$', output, re.M)) and bool(
                   re.search(r'^INSTRUMENTATION_CODE: -1\s*$', output, re.M)) and not re.search(
                   r'FAILURES!!!|INSTRUMENTATION_FAILED|Process crashed|INSTRUMENTATION_STATUS_CODE: -[12]', output)
               observations = [json.loads(line.split('IMPORT_MEMORY_STRESS=', 1)[1].strip())
@@ -186,7 +195,7 @@ jobs:
               receipt['stressObservations'] = observations
               receipt['componentTestsPassed'] = passed
               if not passed:
-                  raise RuntimeError('Import memory/exit-history components did not report exactly nine successful tests')
+                  raise RuntimeError('Import memory/exit-history components did not report exactly thirteen successful tests')
           except Exception as error:
               receipt['failure'] = type(error).__name__ + ': ' + str(error)[:1024]
               raise

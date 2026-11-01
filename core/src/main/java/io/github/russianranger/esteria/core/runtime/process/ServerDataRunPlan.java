@@ -41,7 +41,7 @@ public final class ServerDataRunPlan {
         serverDataPackage=ContentPackageLayout.inspectServerManifest(game.resolve("generations").resolve(importGeneration).resolve("data"));
         Path helpers=directory(directory(work.resolve("data-helpers")).resolve(helperGeneration));
         for(String name:Arrays.asList("server_data_generation.py","server_data_preflight.py","shader_generation.py",
-                "extractor_order.py","owned_process_group.py")) {
+                "extractor_order.py","owned_process_group.py","world_io.py")) {
             Path file=helpers.resolve(name);
             if(!Files.isRegularFile(file,LinkOption.NOFOLLOW_LINKS)||Files.size(file)<=0||Files.size(file)>131072)
                 throw new IOException("Complete installed data helper closure required");
@@ -51,7 +51,7 @@ public final class ServerDataRunPlan {
             "/work/data-helpers/"+helperGeneration+"/server_data_generation.py","--store","/work/server-data",
             "--game","/esteria-data","--generation",importGeneration,"--tools","/esteria-server-extractors",
             "--selection","/work/data-tools-selection.json","--locale",locale,"--threads",Integer.toString(threads),
-            "--content-profile",ContentProfile.ID));
+            "--content-profile",ContentProfile.ID,"--android-low-memory"));
         mounts=Collections.unmodifiableList(Arrays.asList(new ProotLaunch.Mount(game,"/esteria-data"),
             new ProotLaunch.Mount(tools,"/esteria-server-extractors")));
     }

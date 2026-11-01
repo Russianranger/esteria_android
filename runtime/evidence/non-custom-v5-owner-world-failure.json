@@ -1,0 +1,60 @@
+{
+  "formatVersion": 1,
+  "scope": "owner-provided-v4-world-preparation-low-memory-failure",
+  "bundles": [
+    {
+      "bundle": "Esteria-support-1793497599102.zip",
+      "bytes": 7070,
+      "sha256": "fccd9bf0f7f402065ae68ef813e2f91a98bf94d8da8318b2acf405edfb96e8d7",
+      "version": "0.1.0-non-custom.4",
+      "importResult": "complete",
+      "importRoute": "folder",
+      "importCacheErrors": "0",
+      "archiveCount": 14,
+      "lastCompletedStage": "Graphics component readback passed",
+      "privateHelperLogsIncluded": false,
+      "retainedSelectionRejected": true
+    },
+    {
+      "bundle": "Esteria-support-1793497632557.zip",
+      "bytes": 7282,
+      "sha256": "e2bc84a83ba8bfbe40b2457f3db54f7f56fab4abd5f7c10e3365bf87cc265767",
+      "version": "0.1.0-non-custom.4",
+      "importResult": "complete",
+      "importRoute": "folder",
+      "importCacheErrors": "0",
+      "archiveCount": 14,
+      "lastCompletedStage": "Graphics component readback passed",
+      "privateHelperLogsIncluded": false,
+      "retainedSelectionRejected": true
+    }
+  ],
+  "androidRecordedExits": [
+    {
+      "timestampEpochMs": "1793497477133",
+      "reason": "LOW_MEMORY",
+      "importance": "100",
+      "pssKiB": "77520",
+      "rssKiB": "183240"
+    },
+    {
+      "timestampEpochMs": "1793497590157",
+      "reason": "LOW_MEMORY",
+      "importance": "100",
+      "pssKiB": "71489",
+      "rssKiB": "159368"
+    },
+    {
+      "timestampEpochMs": "1793497627313",
+      "reason": "LOW_MEMORY",
+      "importance": "100",
+      "pssKiB": "73477",
+      "rssKiB": "163580"
+    }
+  ],
+  "ownerFolderImportConfirmed": true,
+  "exactChildPhaseConfirmed": false,
+  "causeBoundary": "Android reports LOW_MEMORY; missing private logs do not identify exact preparation child or allocation.",
+  "knownNewRisk": "Unpaced preparation hashes scan 16742408801 archive bytes; parent PSS excludes preparation children and kernel cache.",
+  "worldEntryQualified": false
+}

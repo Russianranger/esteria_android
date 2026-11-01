@@ -125,6 +125,10 @@ public final class ServerDataSetup {
         public IOException cleanupFailure(){return cleanupFailure;}
         public Path privateLogs(){return logs;}
         public String phase(){return phase;}
+        public boolean processAlive(){OwnedProcess child=process;return child!=null&&child.isAlive();}
+        public io.github.russianranger.esteria.core.runtime.process.ProcessUsageSnapshot usage(){
+            OwnedProcess child=process;return child==null?null:child.usage();
+        }
         public long elapsedSeconds(){return beganNanos==0?0:TimeUnit.NANOSECONDS.toSeconds(System.nanoTime()-beganNanos);}
         /** Single-use. Canonical selection is supplied by the typed source-
          * qualified provider; no public self-hashed plan can replace it. */
@@ -134,23 +138,27 @@ public final class ServerDataSetup {
                 state=State.PREPARING;beganNanos=System.nanoTime();
                 RuntimeWork.Cancellation cancelled=()->operations.isStopRequested()||(cancellation!=null&&cancellation.isCancelled());
                 try {
+                    phase="provider-admission";report(progress);
                     check(cancelled);providers();
                     if(!imported.equals(ShaderRunPlan.current(game)))throw new IOException("Import changed after data ownership allocation");
                     phase="helpers";report(progress);
                     String helper=ServerDataAssets.install(context,work);
                     ServerDataToolSelection selected=tools.selection();
                     atomicSelection(work.resolve("data-tools-selection.json"),selected.bytes(),directorySyncSupported);
+                    phase="plan-admission";report(progress);
                     plan=new ServerDataRunPlan(game,toolsRoot,work,helper,selected.sha256,locale,threads);
+                    phase="provider-recheck";report(progress);
                     check(cancelled);providers();
                     Path sessions=GuestHelperAssets.directory(root,"state/server-data-operations");
                     Path session=Files.createDirectory(sessions.resolve(UUID.randomUUID().toString().replace("-","")),
                         PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------")));
-                    logs=session.resolve("logs");phase="preparing";report(progress);
+                    logs=session.resolve("logs");phase="child-launch";report(progress);
                     check(cancelled);
                     long deadline=beganNanos+TimeUnit.HOURS.toNanos(24);
                     if(System.nanoTime()>=deadline)throw new IOException("Data preparation exceeded24hours before launch; outputs retained");
                     process=ProotProcess.start(context,runtime.installer(),runtime.packagePlan(),work,session,
                         plan.arguments,java.util.Collections.emptyMap(),plan.mounts,null);
+                    phase="child-started";report(progress);
                     long nextProgress=0;
                     ProgressLines lines=new ProgressLines();
                     while(process.isAlive()) {
@@ -162,6 +170,7 @@ public final class ServerDataSetup {
                         }
                         try{Thread.sleep(100);}catch(InterruptedException error){Thread.currentThread().interrupt();throw new IOException("Data preparation interrupted; owner and outputs retained",error);}
                     }
+                    RuntimeWork.checkMemoryPressureExit(process.exitCode());
                     if(process.failure()!=null||process.wasForced()||process.exitCode()!=0)
                         throw new IOException("Source-qualified data preparation failed; private logs and outputs retained",process.failure());
                     check(cancelled);providers();plan.requireInputsUnchanged();
@@ -206,7 +215,7 @@ public final class ServerDataSetup {
         }
     }
     /** Read only new bounded log bytes; only known phase identifiers reach UI. */
-    private static final class ProgressLines {
+    static final class ProgressLines {
         private long offset;
         private final ByteArrayOutputStream pending=new ByteArrayOutputStream();
         private boolean overflow;
@@ -232,6 +241,10 @@ public final class ServerDataSetup {
             return last;
         }
         private static String known(String value) {
+            if(value.startsWith("WORLD_IO ")&&value.length()<=4096)try{
+                String phase=new org.json.JSONObject(value.substring(9)).getString("phase");
+                if(phase.matches("[a-z][a-z0-9_-]{0,80}"))return "io-"+phase;
+            }catch(org.json.JSONException invalid){return null;}
             switch(value) {
                 case "extraction-provider-order":return "provider-order";
                 case "extraction-map_extractor":return "maps-dbc-cameras";

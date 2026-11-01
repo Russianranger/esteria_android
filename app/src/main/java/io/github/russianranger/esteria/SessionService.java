@@ -43,6 +43,7 @@ import io.github.russianranger.esteria.core.content.ContentProfile;
 import io.github.russianranger.esteria.core.importer.ContentPackageLayout;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeInstaller;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
+import io.github.russianranger.esteria.core.runtime.install.RuntimeReadPolicy;
 import io.github.russianranger.esteria.runtime.RuntimeSetup;
 import io.github.russianranger.esteria.runtime.ServerRuntimeSetup;
 import io.github.russianranger.esteria.runtime.ServerProgramsSetup;
@@ -92,6 +93,10 @@ public final class SessionService extends Service {
     private volatile SafTreeSource activeFolderSource;
     private volatile ImportDiagnostics lastImport;
     private volatile ImportIoController activeImportIo;
+    private volatile ImportIoController activePreparationIo;
+    private volatile WorldPreparationDiagnostics lastPreparation;
+    private volatile String supportLogRecoveryReason="";
+    private volatile int supportLogRejected;
     private volatile int lastMemoryTrimLevel = -1;
     private volatile long lastMemoryTrimAt;
     // Ephemeral decisions are never restored as approval after service/process recreation.
@@ -118,7 +123,7 @@ public final class SessionService extends Service {
     }};
     private Path root;
     String status() {
-        ImportIoController io = activeImportIo;
+        ImportIoController io = activeImportIo == null ? activePreparationIo : activeImportIo;
         String current = io == null ? status : status + "\n" + io.statusHint();
         String support=supportStatus;return support.isEmpty()?current:current+"\n"+support;
     }
@@ -135,9 +140,12 @@ public final class SessionService extends Service {
             root = getFilesDir().getCanonicalFile().toPath();
             Files.createDirectories(root.resolve("state/logs"));
             lastImport = new ImportDiagnostics(root.resolve("state/import-last.properties"));
+            lastPreparation = new WorldPreparationDiagnostics(root.resolve("state/world-preparation-last.properties"));
             try {
                 String saved=getSharedPreferences("session",MODE_PRIVATE).getString("ownedSupportLogs","");
-                selectedLogs.putAll(SupportLogSelection.decode(root,saved));selectedLogsEncoded=saved;
+                SupportLogSelection.Recovery recovery=SupportLogSelection.recover(root,saved);
+                selectedLogs.putAll(recovery.logs);selectedLogsEncoded=SupportLogSelection.encode(root,recovery.logs);
+                recordLogRecovery(recovery);
             }catch(IOException|RuntimeException invalid){log("Retained support-log selection is invalid; private files were excluded");}
             if (getSharedPreferences("session", MODE_PRIVATE).getBoolean("interrupted", false)) {
                 String action = getSharedPreferences("session", MODE_PRIVATE).getString("operationAction", "");
@@ -192,30 +200,22 @@ public final class SessionService extends Service {
             boolean fatalFailure = false;
             try {
                 if (root == null) throw new IOException("App storage is unavailable");
-                if (IMPORT.equals(intent.getAction())) importData(intent);
-                else if (EXPORT.equals(intent.getAction())) exportBundle(intent.getData());
-                else if (START.equals(intent.getAction())) startLocalGame(intent.getStringExtra(WORLD_LOCALE));
-                else if (PREPARE_RUNTIME.equals(intent.getAction())) prepareRuntime();
-                else if (PREPARE_SERVER_RUNTIME.equals(intent.getAction())) prepareServerRuntime();
-                else if (PREPARE_WORLD.equals(intent.getAction())) {
-                    String locale=intent.getStringExtra(WORLD_LOCALE);
-                    inspectStockClient(locale,true);
-                    prepareStockRuntime(locale);prepareServerRuntime();prepareWorld(locale);
-                }
-                else if (ACCEPT_UI.equals(intent.getAction())) acceptUiReview(intent.getStringExtra(UI_REVIEW_DIGEST));
-                else if (KEEP_UI.equals(intent.getAction())) keepCurrentUi(intent.getStringExtra(UI_REVIEW_DIGEST));
-                else throw new IOException("Unknown operation");
+                runOperation(intent);
             } catch (ClientLaunchSetup.ReviewRequired review) {
                 pendingUiReview=review.review;
                 status="Review the imported UI changes below. Your current UI and saved variables are retained.";
                 log("UI review pending digest="+review.review.digest+" currentChanges="+review.review.currentChanges
                         +" candidateChanges="+review.review.candidateChanges+" conflicts="+review.review.conflicts);
+            } catch (RuntimeWork.MemoryPressureException e) {
+                status=e.getMessage();log(status);
+            } catch (WorldPreparationDiagnostics.MemoryPause e) {
+                status=e.getMessage();log(status);
             } catch (RuntimeWork.CancelledException e) {
                 status = setupPaused(intent.getAction(), false);
                 log("Runtime setup paused");
             } catch (GameDataImporter.ImportCancelledException e) {
-                status = e instanceof GameDataImporter.ImportMemoryPressureException ? e.getMessage()
-                        : "Import paused. Select the same folder or archive to resume where source metadata permits; existing game data is unchanged.";
+                status = e instanceof GameDataImporter.ImportMemoryPressureException ? (IMPORT.equals(intent.getAction()) ? e.getMessage() : "World preparation paused because Android memory is low. Completed work and saves are retained; retry after memory recovers.")
+                        : IMPORT.equals(intent.getAction()) ? "Import paused. Select the same folder or archive to resume where source metadata permits; existing game data is unchanged." : setupPaused(intent.getAction(),false);
                 log("Import paused");
             } catch (Exception e) {
                 if(EXPORT.equals(intent.getAction()))supportStatus="";
@@ -244,6 +244,50 @@ public final class SessionService extends Service {
             }
         });
         return START_NOT_STICKY;
+    }
+    private void runOperation(Intent intent)throws Exception {
+        String action=intent.getAction();
+        if(!isRuntimeSetup(action)){dispatchOperation(intent);return;}
+        runPreparation(action,()->dispatchOperation(intent));
+    }
+    private interface PreparationOperation {void run()throws Exception;}
+    private void runPreparation(String action,PreparationOperation operation)throws Exception {
+        if(activePreparationIo!=null){operation.run();return;}
+        WorldPreparationDiagnostics diagnostics=new WorldPreparationDiagnostics(root.resolve("state/world-preparation-last.properties"));
+        diagnostics.begin(action);lastPreparation=diagnostics;
+        ImportIoController io=null;
+        try{
+            ImportIoController installed=new ImportIoController(this,diagnostics,"Preparation");io=installed;activePreparationIo=installed;
+            try(RuntimeReadPolicy.Scope scope=RuntimeReadPolicy.install((path,offset,count)->installed.readObserved(path,offset,count,cancelled::get))){operation.run();}
+            diagnostics.finish("complete",null);
+        }catch(ClientLaunchSetup.ReviewRequired review){diagnostics.finish("review-required",null);throw review;}
+        catch(Exception failure){diagnostics.failed(failure);throw failure;}
+        finally{if(io!=null)io.recordFinal();activePreparationIo=null;}
+    }
+    private void dispatchOperation(Intent intent)throws Exception {
+                if (IMPORT.equals(intent.getAction())) importData(intent);
+                else if (EXPORT.equals(intent.getAction())) exportBundle(intent.getData());
+                else if (START.equals(intent.getAction())) startLocalGame(intent.getStringExtra(WORLD_LOCALE));
+                else if (PREPARE_RUNTIME.equals(intent.getAction())) prepareRuntime();
+                else if (PREPARE_SERVER_RUNTIME.equals(intent.getAction())) prepareServerRuntime();
+                else if (PREPARE_WORLD.equals(intent.getAction())) {
+                    String locale=intent.getStringExtra(WORLD_LOCALE);
+                    inspectStockClient(locale,true);
+                    prepareStockRuntime(locale);prepareServerRuntime();prepareWorld(locale);
+                }
+                else if (ACCEPT_UI.equals(intent.getAction())) acceptUiReview(intent.getStringExtra(UI_REVIEW_DIGEST));
+                else if (KEEP_UI.equals(intent.getAction())) keepCurrentUi(intent.getStringExtra(UI_REVIEW_DIGEST));
+                else throw new IOException("Unknown operation");
+    }
+    private void preparationProgress(String phase,String path,long completed,long total){
+        WorldPreparationDiagnostics diagnostics=lastPreparation;
+        if(diagnostics!=null){diagnostics.phase(phase,path);diagnostics.memory();}
+        LocalWorldSetup.Handle owner=worldSetup;
+        if(owner!=null){rememberLogs(owner.diagnosticLogs());if(diagnostics!=null)owner.diagnosticUsage().forEach(diagnostics::child);}
+        ImportIoController io=activePreparationIo;
+        if(io!=null&&io.pressureLevel()>=2){if(diagnostics!=null)diagnostics.checkpoint();throw new WorldPreparationDiagnostics.MemoryPause();}
+        String label=phase.startsWith("server-data")?"Preparing world data":phase.startsWith("shader")?"Preparing graphics data":"Preparing local components";
+        status=label+"…"+(path==null||path.isEmpty()?"":"\n"+path);
     }
     private void importData(Intent intent) throws Exception {
         Uri uri = intent.getData();
@@ -315,7 +359,7 @@ public final class SessionService extends Service {
             }
         };
     }
-    private void startLocalGame(String locale) throws IOException {
+    private void startLocalGame(String locale) throws Exception {
         clearSelectedLogs("game.");
         if (new GameDataImporter(root.resolve("game")).resolveCurrent() == null) throw new IOException("Import a build 12340 client first");
         if(!BuildConfig.PROOT_PACKAGED||!BuildConfig.CLIENT_RUNTIME_PACKAGED||!BuildConfig.GUEST_BRIDGES_PACKAGED||
@@ -324,8 +368,8 @@ public final class SessionService extends Service {
             throw new IOException("This build does not include the complete local game profile");
         if(locale==null)locale=getSharedPreferences("world",MODE_PRIVATE).getString("locale",null);
         if(locale==null)throw new IOException("Select the imported client language before starting");
-        inspectStockClient(locale,true);
-        prepareStockRuntime(locale);prepareServerRuntime();prepareWorld(locale);
+        String selectedLocale=locale;
+        runPreparation(START,()->{inspectStockClient(selectedLocale,true);prepareStockRuntime(selectedLocale);prepareServerRuntime();prepareWorld(selectedLocale);});
         if(cancelled.get())throw new RuntimeWork.CancelledException();
         LocalWorldSetup.Result setup=preparedWorld;
         if(setup==null)throw new IOException("Local world setup did not complete");
@@ -387,13 +431,16 @@ public final class SessionService extends Service {
     }
     private void prepareRuntime() throws IOException { prepareRuntime(true); }
     private void prepareStockRuntime(String locale)throws IOException {
-        clearSelectedLogs("setup.stock.");
+        preparationProgress("world-client-runtime","",0,-1);
         prepareRuntime(false);
+        preparationProgress("world-stock-selection","",0,-1);
         StockClientSetup.Handle owner=StockClientSetup.begin(this,root,new RuntimeSetup(this,root),new ShaderToolsSetup(this,root),locale);
         stockSetup=owner;Throwable operationFailure=null;
         try {
             owner.prepare((phase,path,completed,total)->{
                 keepAwake();rememberLogs(owner.diagnosticLogs());
+                preparationProgress(phase,path,completed,total);
+                if(lastPreparation!=null&&owner.processAlive())lastPreparation.child("stock",owner.usage());
                 status="Checking and selecting stock client content…"+(path==null||path.isEmpty()?"":"\n"+path);
             },cancelled::get);
             log("Stock client selection completed contentProfile="+ContentProfile.ID+" gameplayQualified=false");
@@ -539,6 +586,7 @@ public final class SessionService extends Service {
         log("UI review dismissed; existing UI pointer preserved");
     }
     private void prepareServerRuntime() throws IOException {
+        preparationProgress("world-server-runtime","",0,-1);
         status = "Preparing bundled database and server dependencies…";
         ServerRuntimeSetup setup = new ServerRuntimeSetup(this, root);
         ServerProgramsSetup programs = BuildConfig.SERVER_PROGRAMS_PACKAGED ? new ServerProgramsSetup(this, root) : null;
@@ -627,7 +675,8 @@ public final class SessionService extends Service {
                 : "Database dependencies and server programs are prepared. Local server startup is still under development.";
     }
     private void prepareWorld(String locale)throws IOException {
-        for(String stage:new String[]{"data","shader","installation","turnip"})clearSelectedLogs("setup."+stage+".");
+        // Keep the previous fixed logs until a replacement owner supplies its paths.
+        preparationProgress("world-admission","",0,-1);
         if(locale==null||!java.util.Set.of("deDE","enGB","enUS","esES","frFR","koKR","zhCN","zhTW","enCN","enTW","esMX","ruRU").contains(locale))
             throw new IOException("Select the language of the imported client before preparing the world");
         if(!BuildConfig.SERVER_RUNTIME_PACKAGED||!BuildConfig.SERVER_PROGRAMS_PACKAGED||!BuildConfig.SERVER_CONTENT_PACKAGED||
@@ -639,20 +688,16 @@ public final class SessionService extends Service {
         ServerContentSetup content=new ServerContentSetup(this,root);
         ServerDataToolsSetup tools=new ServerDataToolsSetup(this,root);
         RuntimeSetup wine=new RuntimeSetup(this,root);ShaderToolsSetup shaders=new ShaderToolsSetup(this,root);
+        preparationProgress("world-graphics-check","",0,-1);
         if(BuildConfig.TURNIP_PACKAGED)verifyGraphics(wine,new TurnipSetup(this,root));
         status="Preparing the local world. Completed data is reused when its inputs match…";
         // Four GiB is a conservative free-space policy for fresh database work,
         // separate from imported/extracted assets; no device footprint claim.
-        LocalWorldSetup.Handle owner=LocalWorldSetup.begin(this,root,server,programs,content,tools,wine,shaders,locale,1,4L<<30);
+        LocalWorldSetup.Handle owner=LocalWorldSetup.begin(this,root,server,programs,content,tools,wine,shaders,locale,1,4L<<30,this::preparationProgress);
         worldSetup=owner;
         Throwable operationFailure=null;LocalWorldSetup.Result result;
         try {
-            result=owner.prepare((phase,path,completed,total)->{
-                keepAwake();
-                rememberLogs(owner.diagnosticLogs());
-                String label=phase.startsWith("server-data")?"Preparing world data":phase.startsWith("shader")?"Preparing graphics data":"Preparing the local database";
-                status=label+"…"+(path==null||path.isEmpty()?"":"\n"+path);
-            },cancelled::get);
+            result=owner.prepare((phase,path,completed,total)->{keepAwake();preparationProgress(phase,path,completed,total);},cancelled::get);
             log("World setup completed dataGeneration="+result.data.generation+" shaders="+result.shaders.generation
                 +" installation="+result.installation.slotId+" reusedInstallation="+result.reusedInstallation
                 +" worldQualified=false gameplayQualified=false");
@@ -757,6 +802,10 @@ public final class SessionService extends Service {
         facts.putAll(ProcessExitDiagnostics.collect(this));
         ImportDiagnostics importDiagnostic = lastImport;
         if (importDiagnostic != null) facts.putAll(importDiagnostic.facts());
+        WorldPreparationDiagnostics preparationDiagnostic=lastPreparation;
+        if(preparationDiagnostic!=null)facts.putAll(preparationDiagnostic.facts());
+        facts.put("support.ownedLogsRejected",Integer.toString(supportLogRejected));
+        facts.put("support.ownedLogsRecoveryReason",supportLogRecoveryReason);
         GameSession.Handle gameOwner=game;
         facts.put("game.retained",Boolean.toString(gameOwner!=null));
         facts.put("game.lastRecoveryRequired",Boolean.toString(lastRecoveryRequired));
@@ -984,7 +1033,7 @@ public final class SessionService extends Service {
         // Revalidate every selected path against current filesystem metadata at
         // export, including ancestor links. Persisted metadata grants no open lease.
         synchronized(selectedLogs) {
-            try{logs.putAll(SupportLogSelection.decode(root,selectedLogsEncoded));}
+            try{SupportLogSelection.Recovery recovery=SupportLogSelection.recover(root,selectedLogsEncoded);logs.putAll(recovery.logs);recordLogRecovery(recovery);}
             catch(IOException invalid){facts.put("support.ownedLogs","selection-invalid-private-files-excluded");}
         }
         try (OutputStream output = getContentResolver().openOutputStream(destination, "w")) {
@@ -1000,13 +1049,25 @@ public final class SessionService extends Service {
             Map<String,Path> candidate=new LinkedHashMap<>(selectedLogs);candidate.putAll(fixed);
             if(!selectedLogsEncoded.isEmpty()&&candidate.equals(selectedLogs))return;
             try {
-                String encoded=SupportLogSelection.encode(root,candidate);
+                SupportLogSelection.Recovery recovery=SupportLogSelection.recover(root,candidate);
+                recordLogRecovery(recovery);
+                String encoded=SupportLogSelection.encode(root,recovery.logs);
                 if(encoded.equals(selectedLogsEncoded))return;
-                selectedLogs.clear();selectedLogs.putAll(candidate);selectedLogsEncoded=encoded;
+                selectedLogs.clear();selectedLogs.putAll(recovery.logs);selectedLogsEncoded=encoded;
                 if(!getSharedPreferences("session",MODE_PRIVATE).edit().putString("ownedSupportLogs",encoded).commit())
                     log("Support-log metadata could not be retained across service recreation");
             }catch(IOException|RuntimeException invalid){log("Invalid owned support-log paths excluded");}
         }
+    }
+    @SuppressLint("ApplySharedPref")
+    private void recordLogRecovery(SupportLogSelection.Recovery recovery){
+        if(recovery.rejected<=0){
+            if(supportLogRejected==0){supportLogRejected=getSharedPreferences("session",MODE_PRIVATE).getInt("ownedLogsRejected",0);supportLogRecoveryReason=getSharedPreferences("session",MODE_PRIVATE).getString("ownedLogsRecoveryReason","");}
+            return;
+        }
+        supportLogRejected=recovery.rejected;supportLogRecoveryReason=recovery.reason;
+        getSharedPreferences("session",MODE_PRIVATE).edit().putInt("ownedLogsRejected",supportLogRejected).putString("ownedLogsRecoveryReason",supportLogRecoveryReason).commit();
+        log("Owned support-log recovery retained="+recovery.logs.size()+" rejected="+recovery.rejected+" reason="+recovery.reason);
     }
     private void clearSelectedLogs(String prefix) {
         synchronized(selectedLogs) {
@@ -1114,6 +1175,8 @@ public final class SessionService extends Service {
         return PREPARE_RUNTIME.equals(action) || PREPARE_SERVER_RUNTIME.equals(action) || PREPARE_WORLD.equals(action) || ACCEPT_UI.equals(action) || KEEP_UI.equals(action);
     }
     private static String setupPaused(String action, boolean interrupted) {
+        if(START.equals(action))return "Local preparation "+(interrupted?"was interrupted":"paused")
+            +". Choose Start local game to reuse completed work. Previous databases and saves are retained.";
         if(PREPARE_WORLD.equals(action))return "Local world setup "+(interrupted?"was interrupted":"paused")
             +". Choose Prepare local world to reuse completed data. Previous databases and saves are retained.";
         if(ACCEPT_UI.equals(action)||KEEP_UI.equals(action))return "UI preparation " + (interrupted ? "was interrupted" : "paused")
@@ -1155,12 +1218,14 @@ public final class SessionService extends Service {
         lastMemoryTrimLevel = level; lastMemoryTrimAt = System.currentTimeMillis();
         ImportIoController io = activeImportIo;
         if (io != null) io.onTrimMemory(level);
+        ImportIoController preparation=activePreparationIo;if(preparation!=null)preparation.onTrimMemory(level);
     }
     @SuppressWarnings("deprecation") // Retain Android 13 callback compatibility.
     @Override public void onLowMemory() {
         super.onLowMemory();
         ImportIoController io = activeImportIo;
         if (io != null) io.onTrimMemory(android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL);
+        ImportIoController preparation=activePreparationIo;if(preparation!=null)preparation.onTrimMemory(android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL);
     }
     @Override public void onTimeout(int startId, int foregroundServiceType) {
         requestCancellation(); status = "Android stopped this setup operation. Start it again to resume completed work where supported.";

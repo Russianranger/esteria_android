@@ -12,6 +12,8 @@ import sys
 import tempfile
 import unittest
 import zipfile
+import io
+from contextlib import redirect_stderr, redirect_stdout
 from unittest.mock import patch
 
 from runtime import stock_content_inspection as stock
@@ -150,6 +152,42 @@ class RealPinnedMpqInspection(unittest.TestCase):
         self.assertTrue(report['passed'], report['errors'])
         self.assertEqual(len(report['checks']['clientDbcs']), 238)
         self.assertFalse(report['runtimeSignatureValidation']); self.assertFalse(report['runtimeExecution'])
+
+    def test_transient_android_pressure_never_publishes_failed_report_and_same_inputs_retry_succeeds(self):
+        expected = self.inspect()
+        report_path = self.root / 'stock-report.json'
+        arguments = ['stock-inspection', '--source', str(self.source), '--tools', str(self.tools),
+            '--report', str(report_path), '--client-revision', stock.CLIENT_REVISION,
+            '--locale', 'enUS', '--generation', self.generation, '--android-low-memory']
+        original_context = stock.world_io.android_policy
+        now = [0.0]
+        def sleep(delay): now[0] += delay
+        def policy(available):
+            return lambda *args, **kwargs: original_context(*args, **kwargs, clock=lambda: now[0],
+                sleeper=sleep, memory_probe=lambda: available)
+        stderr, stdout = io.StringIO(), io.StringIO()
+        with patch.object(sys, 'argv', arguments), patch.object(stock.world_io, 'android_policy', side_effect=policy(100 << 20)), \
+                redirect_stderr(stderr), redirect_stdout(stdout):
+            self.assertEqual(stock.main(), stock.world_io.PAUSED_EXIT_CODE)
+        self.assertFalse(report_path.exists(), 'Transient pressure must not poison the Android cached validation report')
+        self.assertIn('ESTERIA_PREPARATION_PAUSED', stderr.getvalue())
+        self.assertNotIn(str(self.source), stderr.getvalue())
+        with patch.object(sys, 'argv', arguments), patch.object(stock.world_io, 'android_policy', side_effect=policy(4 << 30)), \
+                redirect_stderr(io.StringIO()), redirect_stdout(io.StringIO()):
+            self.assertEqual(stock.main(), 0)
+        self.assertEqual(json.loads(report_path.read_text()), expected)
+        self.assertTrue(json.loads(report_path.read_text())['passed'])
+
+    def test_transient_pause_inside_ui_or_dbc_validation_bubbles_instead_of_becoming_bad_content(self):
+        real_read = stock.Stack.read
+        for paused_name in ('signaturefile', 'DBFilesClient\\ChrRaces.dbc'):
+            def read(stack, name, maximum=64 << 20):
+                if name == paused_name:
+                    raise stock.world_io.PreparationPaused('Fixture transient memory pressure')
+                return real_read(stack, name, maximum)
+            with self.subTest(paused_name=paused_name), patch.object(stock.Stack, 'read', read), \
+                    self.assertRaises(stock.world_io.PreparationPaused):
+                self.inspect()
 
     def test_nonprovider_mpqs_are_recorded_without_opening_and_sources_are_preserved(self):
         names = ('Data/wow-update-base-12340.MPQ', 'Data/sound.MpQ', 'uninstall.MPQ',

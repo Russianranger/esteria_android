@@ -2,9 +2,15 @@ import unittest
 import pathlib
 import tempfile
 import sys
-from tools.qualify_android_installer import instrument_passed, run_bounded
+from tools.qualify_android_installer import instrument_passed, run_bounded, HELPER_ASSET_FILES
 
 class InstrumentationResults(unittest.TestCase):
+    def test_receipt_helper_counts_match_the_exact_packaged_closures(self):
+        from tools.package_combined_android import HELPER_SETS
+        self.assertEqual({'server-installation': 18, 'server-data': 6, 'server-session': 24}, HELPER_ASSET_FILES)
+        for directory, count in HELPER_ASSET_FILES.items():
+            self.assertEqual(count, len(HELPER_SETS[directory]), directory)
+
     def test_requires_one_completed_test(self):
         self.assertTrue(instrument_passed('OK (1 test)\nINSTRUMENTATION_CODE: -1\n'))
         for output in ('OK (0 tests)\nINSTRUMENTATION_CODE: -1\n', 'OK (1 test)\n',

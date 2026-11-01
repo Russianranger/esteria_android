@@ -96,7 +96,11 @@ final class RuntimeFiles {
         plain(path); require(Files.size(path)==expected, "Runtime file size differs");
         MessageDigest digest = digest(); long total=0; byte[] buffer=new byte[BUFFER];
         try (InputStream input=Files.newInputStream(path,LinkOption.NOFOLLOW_LINKS)) {
-            int count; while ((count=input.read(buffer))!=-1) { RuntimeWork.check(cancellation); total+=count; require(total<=expected,"Runtime file grew"); digest.update(buffer,0,count); }
+            int count; while ((count=input.read(buffer))!=-1) {
+                RuntimeWork.check(cancellation); long offset=total; total+=count;
+                require(total<=expected,"Runtime file grew"); digest.update(buffer,0,count);
+                if(count>0)RuntimeReadPolicy.consumed(path,offset,count);
+            }
         }
         require(total==expected,"Runtime file was truncated"); return hex(digest.digest());
     }

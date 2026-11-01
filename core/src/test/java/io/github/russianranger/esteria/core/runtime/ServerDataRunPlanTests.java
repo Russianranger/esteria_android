@@ -18,14 +18,14 @@ public final class ServerDataRunPlanTests {
             String generation="1".repeat(64),helpers="2".repeat(64);
             Files.createDirectories(game.resolve("generations/"+generation+"/data"));Files.writeString(game.resolve("current"),generation+"\n");
             Path helperRoot=Files.createDirectories(work.resolve("data-helpers/"+helpers));
-            for(String name:List.of("server_data_generation.py","server_data_preflight.py","shader_generation.py","extractor_order.py","owned_process_group.py"))
+            for(String name:List.of("server_data_generation.py","server_data_preflight.py","shader_generation.py","extractor_order.py","owned_process_group.py","world_io.py"))
                 Files.writeString(helperRoot.resolve(name),"# unexecuted synthetic helper fixture\n");
             byte[] selection="{}\n".getBytes(java.nio.charset.StandardCharsets.UTF_8);Files.write(work.resolve("data-tools-selection.json"),selection);
             StringBuilder pin=new StringBuilder();for(byte value:MessageDigest.getInstance("SHA-256").digest(selection))pin.append(String.format("%02x",value&255));
             ServerDataRunPlan plan=new ServerDataRunPlan(game,tools,work,helpers,pin.toString(),"enUS",1);
             if(!plan.arguments.equals(List.of("/usr/bin/python3","-B","-s","-E","/work/data-helpers/"+helpers+"/server_data_generation.py",
                 "--store","/work/server-data","--game","/esteria-data","--generation",generation,"--tools","/esteria-server-extractors",
-                "--selection","/work/data-tools-selection.json","--locale","enUS","--threads","1","--content-profile","stock-3.3.5a")))throw new AssertionError("Fixed data command changed");
+                "--selection","/work/data-tools-selection.json","--locale","enUS","--threads","1","--content-profile","stock-3.3.5a","--android-low-memory")))throw new AssertionError("Fixed data command changed");
             if(!plan.mounts.get(0).source.equals(game)||!plan.mounts.get(1).source.equals(tools))throw new AssertionError("Complete import ancestry and separate selected tools required");
             plan.requireInputsUnchanged();Files.writeString(work.resolve("data-tools-selection.json"),"[]\n");rejects(plan::requireInputsUnchanged);
             Files.write(work.resolve("data-tools-selection.json"),selection);Files.writeString(game.resolve("current"),"3".repeat(64)+"\n");rejects(plan::requireInputsUnchanged);

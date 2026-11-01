@@ -36,7 +36,7 @@ NDK_NOTICES = {'NDK-28.2.13676358-NOTICE.txt': 'android-ndk-r28c/NOTICE',
                'LLVM-RUNTIME-NOTICE.txt': 'android-ndk-r28c/toolchains/llvm/prebuilt/linux-x86_64/NOTICE',
                'NDK-SYSROOT-NOTICE.txt': 'android-ndk-r28c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/NOTICE'}
 HELPER_SETS = {'stock-client': ('stock_content_inspection.py', 'stock_shader_generation.py', 'shader_generation.py',
-                    'extractor_order.py', 'server_data_preflight.py'),
+                    'extractor_order.py', 'server_data_preflight.py', 'stock_shader_translate.py', 'world_io.py'),
                'database-setup': ('mysql_bootstrap.py', 'android_database_setup.py'),
                'database-service': ('mysql_bootstrap.py', 'mysql_service.py'),
                'server-schema': ('android_server_schema_setup.py', 'mysql_bootstrap.py', 'mysql_service.py',
@@ -50,13 +50,13 @@ HELPER_SETS = {'stock-client': ('stock_content_inspection.py', 'stock_shader_gen
                     'provision_local_account.py', 'server/appearance-schema-v1.sql', 'server/appearance-schema.lock.json',
                     'local-server.json'),
                'server-data': ('server_data_generation.py', 'server_data_preflight.py', 'shader_generation.py',
-                    'extractor_order.py', 'owned_process_group.py'),
+                    'extractor_order.py', 'owned_process_group.py', 'world_io.py'),
                'server-session': ('server_session.py', 'server_session_process.py', 'android_server_schema_setup.py',
                     'mysql_bootstrap.py', 'mysql_service.py', 'server_content.py', 'server_schema_setup.py',
                     'server_schema_baseline.py', 'server_schema_adaptations.py', 'server_update_setup.py', 'server_updater.py',
                     'server_playerbots_setup.py', 'owned_process_group.py', 'server_config.py', 'provision_local_realm.py',
                     'provision_local_account.py', 'server_data_generation.py', 'server_data_preflight.py', 'shader_generation.py',
-                    'extractor_order.py', 'server/appearance-schema-v1.sql', 'server/appearance-schema.lock.json', 'local-server.json')}
+                    'extractor_order.py', 'world_io.py', 'server/appearance-schema-v1.sql', 'server/appearance-schema.lock.json', 'local-server.json')}
 
 
 def selected_client_runtime_options():

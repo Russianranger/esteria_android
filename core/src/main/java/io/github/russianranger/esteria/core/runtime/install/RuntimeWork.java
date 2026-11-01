@@ -13,6 +13,13 @@ public final class RuntimeWork {
         private static final long serialVersionUID = 1L;
         public CancelledException() { super("Runtime setup cancelled; completed work is retained for resume"); }
     }
+    public static final class MemoryPressureException extends IOException {
+        private static final long serialVersionUID = 1L;
+        public MemoryPressureException() { super("World preparation paused because Android memory is low. Completed work and saves are retained; retry after memory recovers."); }
+    }
+    public static void checkMemoryPressureExit(int exitCode) throws MemoryPressureException {
+        if (exitCode == 75) throw new MemoryPressureException();
+    }
     static void check(Cancellation cancellation) throws IOException {
         if (cancellation.isCancelled() || Thread.currentThread().isInterrupted()) throw new CancelledException();
     }

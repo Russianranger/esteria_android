@@ -34,7 +34,7 @@ public final class ServerSessionAssetsTest {
             }
             assertEquals(generation,GuestHelperAssets.install(context,"server-session",generations,LocalServerSession.HELPERS));
             assertEquals(stamp,Files.getLastModifiedTime(retained));
-            try(var files=Files.walk(installed)){assertEquals(23,files.filter(Files::isRegularFile).count());}
+            try(var files=Files.walk(installed)){assertEquals(24,files.filter(Files::isRegularFile).count());}
         }finally{remove(root);}
     }
     @FunctionalInterface private interface Action {void run()throws Exception;}

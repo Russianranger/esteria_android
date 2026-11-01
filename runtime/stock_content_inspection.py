@@ -22,10 +22,11 @@ import struct
 import sys
 
 try:
-    from . import shader_generation as storage, extractor_order as order
+    from . import shader_generation as storage, extractor_order as order, world_io
 except ImportError:
     import shader_generation as storage
     import extractor_order as order
+    import world_io
 
 CLIENT_REVISION = '471ee42faadf4a97a1d0a86989cf1452621f2dc5'
 PROFILE = 'stock-3.3.5a'
@@ -519,6 +520,8 @@ def inspect(source, tools, revision, locale, generation, *, reader_loader=load_r
         def run(name, action):
             try:
                 checks[name] = action()
+            except world_io.PreparationPaused:
+                raise
             except (OSError, ValueError, RuntimeError, struct.error) as error:
                 report['errors'].append(name + ': ' + str(error))
         def signaturefile():
@@ -538,6 +541,8 @@ def inspect(source, tools, revision, locale, generation, *, reader_loader=load_r
                 return result
             try:
                 dbc()
+            except world_io.PreparationPaused:
+                raise
             except (OSError, ValueError, RuntimeError, struct.error) as error:
                 report['errors'].append(str(error))
         def shaders():
@@ -558,10 +563,15 @@ def main():
         parser.add_argument('--' + name, required=True, type=Path)
     for name in ('client-revision', 'locale', 'generation'):
         parser.add_argument('--' + name, required=True)
+    parser.add_argument('--android-low-memory', action='store_true', help='Use the fixed Android preparation I/O policy')
     args = parser.parse_args()
     report = None
     try:
-        report = inspect(args.source, args.tools, args.client_revision, args.locale, args.generation)
+        if args.android_low_memory:
+            with world_io.android_policy(progress=lambda value: print(value, flush=True)):
+                report = inspect(args.source, args.tools, args.client_revision, args.locale, args.generation)
+        else:
+            report = inspect(args.source, args.tools, args.client_revision, args.locale, args.generation)
         storage.atomic(args.report, storage.encoded(report))
         print('Stock profile: ' + report['contentProfile'] + '; import: ' + report['importGeneration'] +
               '; requested locale: ' + report['requestedLocale'] + '; effective locale: ' + report['effectiveLocale'])
@@ -577,6 +587,9 @@ def main():
             return 0  # A complete diagnostic report is the result consumed by the Android owner.
         print('Stock client data inspected; client signatures and world entry still require runtime execution')
         return 0
+    except world_io.PreparationPaused:
+        world_io.print_pause()
+        return world_io.PAUSED_EXIT_CODE
     except (OSError, ValueError, RuntimeError, struct.error) as error:
         report = report or {'formatVersion': 1, 'contentProfile': PROFILE, 'importGeneration': args.generation,
             'clientRevision': args.client_revision, 'requestedLocale': args.locale, 'effectiveLocale': '',

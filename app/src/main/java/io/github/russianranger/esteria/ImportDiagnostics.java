@@ -18,7 +18,7 @@ import java.util.Properties;
 import java.util.Set;
 
 /** Small app-owned receipt for the last import, including failures before a generation exists. */
-final class ImportDiagnostics {
+final class ImportDiagnostics implements ImportIoController.Diagnostics {
     private static final int MAX_BYTES = 32 * 1024;
     private static final Set<String> KEYS = Set.of("route", "kind", "sourceProvider", "sourceIdentitySha256",
             "selectedRoot", "detectedRoot", "phase", "path", "result", "failure", "startedAtEpochMs",
@@ -64,13 +64,13 @@ final class ImportDiagnostics {
     }
 
     synchronized void phase(String phase) { phase(phase, values.getOrDefault("detectedRoot", "not-yet-detected"), ""); }
-    synchronized void io(String key, long value) { io(key, Long.toString(value)); }
-    synchronized void io(String key, String value) {
+    public synchronized void io(String key, long value) { io(key, Long.toString(value)); }
+    public synchronized void io(String key, String value) {
         if (!KEYS.contains(key) || !key.startsWith("io")) throw new IllegalArgumentException("Unknown bounded import I/O fact");
         values.put(key, bounded(value, 256));
         if (savedAt != 0 && System.nanoTime() - savedAt > 2_000_000_000L) save();
     }
-    synchronized void checkpoint() { save(); }
+    public synchronized void checkpoint() { save(); }
     synchronized void selectedRoot(String name) {
         String bounded = bounded(name, 2048);
         if (!bounded.equals(values.get("selectedRoot"))) { values.put("selectedRoot", bounded); save(); }
@@ -80,7 +80,7 @@ final class ImportDiagnostics {
         if (failure != null) values.put("failure", failure(failure));
         save();
     }
-    synchronized void memory() {
+    public synchronized void memory() {
         long now = System.nanoTime();
         if (memorySampleAt != 0 && now - memorySampleAt < 1_000_000_000L) return;
         memorySampleAt = now;

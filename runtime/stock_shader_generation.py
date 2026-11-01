@@ -8,11 +8,41 @@ try:
     from .shader_generation import *
 except ImportError:
     from shader_generation import *
+try:
+    from . import world_io
+except ImportError:
+    import world_io
+
+# Keep byte-pinned recipe modules unchanged; this free coordinator owns the
+# optional paced I/O and supervised-child adapters.
+identity = world_io.identity
+execute = world_io.shader_execute
 
 CONTENT_PROFILES = ('stock-3.3.5a', 'esteria-custom')
 DEFAULT_CONTENT_PROFILE = CONTENT_PROFILES[0]
+HELPER_DIRECTORY = Path(__file__).resolve().parent
+TRANSLATION_ADAPTER = HELPER_DIRECTORY / 'stock_shader_translate.py'
+PREPARATION_HELPERS = ('stock_content_inspection.py', 'stock_shader_generation.py', 'stock_shader_translate.py',
+                       'shader_generation.py', 'extractor_order.py', 'server_data_preflight.py', 'world_io.py')
 
-def generate(store, game, generation, tools, revision, locale, timeout=7200, *, content_profile=DEFAULT_CONTENT_PROFILE):
+def helper_files():
+    return {name: identity(Path(__file__).resolve() if name == 'stock_shader_generation.py'
+            else TRANSLATION_ADAPTER if name == 'stock_shader_translate.py' else HELPER_DIRECTORY / name, 131072)
+            for name in PREPARATION_HELPERS}
+
+
+def generate(store, game, generation, tools, revision, locale, timeout=7200, *,
+             content_profile=DEFAULT_CONTENT_PROFILE, android_low_memory=False):
+    if android_low_memory:
+        with world_io.android_policy():
+            return _generate(store, game, generation, tools, revision, locale, timeout, content_profile=content_profile)
+    if world_io.enabled():
+        return _generate(store, game, generation, tools, revision, locale, timeout, content_profile=content_profile)
+    with world_io.adapt_helpers():
+        return _generate(store, game, generation, tools, revision, locale, timeout, content_profile=content_profile)
+
+
+def _generate(store, game, generation, tools, revision, locale, timeout=7200, *, content_profile=DEFAULT_CONTENT_PROFILE):
     require(content_profile in CONTENT_PROFILES, 'unsupported content profile')
     require(locale in LOCALES, 'explicit supported locale required')
     store, game, tools = canonical(store, create=True), canonical(game), canonical(tools)
@@ -24,7 +54,8 @@ def generate(store, game, generation, tools, revision, locale, timeout=7200, *, 
         inputs = {'formatVersion': 1, 'contentProfile': content_profile, 'importGeneration': generation, 'clientRevision': revision,
                   'locale': locale, 'importMetadata': imported(game, generation),
                   'toolManifestSha256': tool_identity(tools, revision),
-                  'preparationHelperSha256': identity(Path(__file__).resolve(), 131072)['sha256']}
+                  'preparationHelperSha256': identity(Path(__file__).resolve(), 131072)['sha256'],
+                  'preparationHelperFiles': helper_files()}
         key = hashlib.sha256(encoded(inputs)).hexdigest()
         generations = canonical(store / 'generations', create=True)
         destination = generations / key
@@ -43,14 +74,22 @@ def generate(store, game, generation, tools, revision, locale, timeout=7200, *, 
             staging.mkdir(mode=0o700)
             shaders = staging / 'shaders'
             shaders.mkdir(mode=0o700)
-            execute([sys.executable, '-B', '-s', '-E', str(tools / 'translate_shaders.py'),
+            command = [sys.executable, '-B', '-s', '-E', str(TRANSLATION_ADAPTER),
+                     '--tools', str(tools), '--client-revision', revision,
                      '--strict', '--client', str(game / 'generations' / generation / 'data'),
                      '--locale', locale, '--glslang', str(tools / 'bin/glslangValidator'),
-                     '--out', str(shaders)], staging / 'setup.log', timeout)
+                     '--out', str(shaders)]
+            if world_io.enabled():
+                command.append('--android-low-memory')
+                execute(command, staging / 'setup.log', timeout,
+                        cache_inputs=world_io.archive_paths(game / 'generations' / generation / 'data'))
+            else:
+                execute(command, staging / 'setup.log', timeout)
             outputs = validate_output(shaders)
             require(imported(game, generation) == inputs['importMetadata'] and
                     tool_identity(tools, revision) == inputs['toolManifestSha256'] and
-                    identity(Path(__file__).resolve(), 131072)['sha256'] == inputs['preparationHelperSha256'], 'inputs changed during shader setup')
+                    identity(Path(__file__).resolve(), 131072)['sha256'] == inputs['preparationHelperSha256'] and
+                    helper_files() == inputs['preparationHelperFiles'], 'inputs changed during shader setup')
             receipt = {'formatVersion': 1, 'scope': 'local-generated-shaders-not-render-qualified',
                        'generation': key, 'inputs': inputs, 'outputs': outputs,
                        'graphicsQualified': False, 'androidQualified': False, 'gameplayQualified': False}
@@ -65,7 +104,8 @@ def generate(store, game, generation, tools, revision, locale, timeout=7200, *, 
             os.rename(staging, destination)
             sync(generations)
         require(imported(game, generation) == inputs['importMetadata'] and
-                identity(Path(__file__).resolve(), 131072)['sha256'] == inputs['preparationHelperSha256'],
+                identity(Path(__file__).resolve(), 131072)['sha256'] == inputs['preparationHelperSha256'] and
+                helper_files() == inputs['preparationHelperFiles'],
                 'import or helper changed before shader activation')
         atomic(store / 'current', (key + '\n').encode())
         return receipt
@@ -81,11 +121,16 @@ def main():
     parser.add_argument('--client-revision', required=True)
     parser.add_argument('--locale', required=True)
     parser.add_argument('--content-profile', choices=CONTENT_PROFILES, default=DEFAULT_CONTENT_PROFILE)
+    parser.add_argument('--android-low-memory', action='store_true')
     args = parser.parse_args()
     try:
-        receipt = generate(args.store, args.game, args.generation, args.tools, args.client_revision, args.locale, content_profile=args.content_profile)
+        receipt = generate(args.store, args.game, args.generation, args.tools, args.client_revision, args.locale,
+                           content_profile=args.content_profile, android_low_memory=args.android_low_memory)
         print('Shader generation prepared: ' + receipt['generation'] + '; rendering remains unqualified')
         return 0
+    except world_io.PreparationPaused:
+        world_io.print_pause()
+        return world_io.PAUSED_EXIT_CODE
     except (OSError, ValueError) as error:
         print('Shader generation failed (' + type(error).__name__ + '): ' + str(error) + '; previous output preserved', file=sys.stderr)
         return 1

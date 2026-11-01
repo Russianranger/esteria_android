@@ -74,6 +74,36 @@ class ShaderGenerationTest(unittest.TestCase):
         self.assertFalse(receipt['gameplayQualified'])
         self.assertEqual((self.store / 'current').read_text(), receipt['generation'] + '\n')
 
+    def test_android_active_coordinator_uses_owned_child_adapter_and_cache_inputs(self):
+        from runtime import shader_generation as frozen
+        original = frozen.identity, frozen.execute
+        source = self.game / 'generations' / self.generation / 'data/Data/common.MPQ'
+        source.parent.mkdir()
+        source.write_bytes(b'immutable synthetic cache input')
+        fixture = self.root / 'compiled-fixture'
+        fixture.mkdir()
+        output(fixture)
+        adapter = self.root / 'fixture-adapter.py'
+        adapter.write_text('import pathlib,shutil,sys\n'
+            'source=pathlib.Path(__file__).with_name("compiled-fixture")\n'
+            'target=pathlib.Path(sys.argv[sys.argv.index("--out")+1])\n'
+            'assert "--android-low-memory" in sys.argv\n'
+            'shutil.copytree(source,target,dirs_exist_ok=True)\n'
+            'print("synthetic guarded child fixture; no compiler or game shaders")\n')
+        policy = shaders.world_io.android_policy
+        with patch.object(shaders, 'TRANSLATION_ADAPTER', adapter), \
+                patch.object(shaders, 'execute', wraps=shaders.world_io.shader_execute) as execute, \
+                patch.object(shaders.world_io, 'android_policy',
+                    side_effect=lambda: policy(memory_probe=lambda: 4 << 30)):
+            receipt = shaders.generate(self.store, self.game, self.generation, self.tools, self.revision,
+                'enUS', android_low_memory=True)
+        execute.assert_called_once()
+        self.assertEqual(execute.call_args.kwargs['cache_inputs'], (source,))
+        self.assertIn('--android-low-memory', execute.call_args.args[0])
+        self.assertEqual((self.store / 'current').read_text(), receipt['generation'] + '\n')
+        self.assertEqual((frozen.identity, frozen.execute), original)
+        self.assertFalse(shaders.world_io.enabled())
+
     def test_content_profile_separates_reuse_identity_and_rejects_unknown_profiles(self):
         with patch.object(shaders, 'execute', side_effect=self.fake_execute) as run:
             stock = self.run_generation()
@@ -95,6 +125,42 @@ class ShaderGenerationTest(unittest.TestCase):
             self.assertNotEqual(first['generation'], second['generation'])
             self.assertNotEqual(first['inputs']['preparationHelperSha256'], second['inputs']['preparationHelperSha256'])
             self.assertEqual(run.call_count, 2)
+
+    def test_adapter_only_changes_invalidate_reuse_without_changing_provider_bytes(self):
+        with patch.object(shaders, 'execute', side_effect=self.fake_execute) as run:
+            first = self.run_generation()
+            changed = self.root / 'changed-adapter.py'; changed.write_text('# synthetic adapter change\n')
+            with patch.object(shaders, 'TRANSLATION_ADAPTER', changed):
+                second = self.run_generation()
+            self.assertNotEqual(first['generation'], second['generation'])
+            self.assertEqual(first['inputs']['preparationHelperSha256'], second['inputs']['preparationHelperSha256'])
+            self.assertNotEqual(first['inputs']['preparationHelperFiles'], second['inputs']['preparationHelperFiles'])
+            self.assertEqual(run.call_count, 2)
+
+    def test_transient_pressure_preserves_previous_generation_and_retry_is_not_poisoned(self):
+        with patch.object(shaders, 'execute', side_effect=self.fake_execute):
+            first = self.run_generation()
+        (self.tools / 'bls/emitter.py').write_text('# synthetic new source identity\n')
+        self.write_tools()
+        with patch.object(shaders, 'execute', side_effect=shaders.world_io.PreparationPaused()):
+            with self.assertRaises(shaders.world_io.PreparationPaused):
+                self.run_generation()
+        self.assertEqual((self.store / 'current').read_text(), first['generation'] + '\n')
+        self.assertFalse(list((self.store / 'staging').rglob('receipt.json')))
+        with patch.object(shaders, 'execute', side_effect=self.fake_execute):
+            second = self.run_generation()
+        self.assertNotEqual(first['generation'], second['generation'])
+        self.assertEqual((self.store / 'current').read_text(), second['generation'] + '\n')
+
+    def test_main_returns_distinct_pause_without_turning_it_into_failure(self):
+        arguments = ['stock_shader_generation.py', '--store', str(self.store), '--game', str(self.game),
+            '--tools', str(self.tools), '--generation', self.generation, '--client-revision', self.revision,
+            '--locale', 'enUS', '--android-low-memory']
+        with patch.object(sys, 'argv', arguments), patch.object(shaders, 'generate', side_effect=shaders.world_io.PreparationPaused()), \
+                patch.object(shaders.world_io, 'print_pause') as marker:
+            self.assertEqual(shaders.main(), shaders.world_io.PAUSED_EXIT_CODE)
+            marker.assert_called_once()
+        self.assertFalse(self.store.exists())
 
     def test_failed_or_changed_inputs_keep_previous_generation(self):
         with patch.object(shaders, 'execute', side_effect=self.fake_execute):

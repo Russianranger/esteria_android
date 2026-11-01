@@ -18,6 +18,7 @@ SCHEMA_HELPER_TEST = NAMESPACE + '.runtime.ServerSchemaAssetsTest'
 INSTALLATION_HELPER_TEST = NAMESPACE + '.runtime.ServerInstallationAssetsTest'
 DATA_HELPER_TEST = NAMESPACE + '.runtime.ServerDataAssetsTest'
 SESSION_HELPER_TEST = NAMESPACE + '.runtime.ServerSessionAssetsTest'
+HELPER_ASSET_FILES = {'server-installation': 18, 'server-data': 6, 'server-session': 24}
 SCHEMA_HELPER_METHODS = ('nestedOriginalSourcesInstallAndResumeWithoutRewriting',
     'unexpectedNestedModuleIsPreservedAndRefused',
     'linkedResourceDirectoryIsPreservedAndRefused')
@@ -139,9 +140,9 @@ def main():
         emulatorProperties=properties, artifacts=artifacts, runtimeContractGroups=int(groups[0]),
         databaseHelperAssetContractGroups=len(HELPER_METHODS), databaseHelperAssetsQualified=True,
         schemaHelperAssetContractGroups=len(SCHEMA_HELPER_METHODS), schemaHelperAssetsQualified=True, schemaSqlExecuted=False,
-        installationHelperAssetFiles=18, installationHelperAssetsQualified=True, installationSetupExecuted=False,
-        dataHelperAssetFiles=5, dataHelperAssetsQualified=True, dataPreparationExecuted=False,
-        sessionHelperAssetFiles=23, sessionHelperAssetsQualified=True, privateDataMetadataBindingQualified=True,
+        installationHelperAssetFiles=HELPER_ASSET_FILES['server-installation'], installationHelperAssetsQualified=True, installationSetupExecuted=False,
+        dataHelperAssetFiles=HELPER_ASSET_FILES['server-data'], dataHelperAssetsQualified=True, dataPreparationExecuted=False,
+        sessionHelperAssetFiles=HELPER_ASSET_FILES['server-session'], sessionHelperAssetsQualified=True, privateDataMetadataBindingQualified=True,
         authWorldSessionExecuted=False,
         databaseServiceExecuted=False,
         runtimeFilesystemQualified=True, sameJobDebugKeyUpdatePreservedRuntimeAndSentinel=True,

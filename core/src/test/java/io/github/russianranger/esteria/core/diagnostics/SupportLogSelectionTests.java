@@ -84,9 +84,28 @@ public final class SupportLogSelectionTests {
             check(Files.readString(foreign.resolve("credential")).equals("TEST_ONLY_PRIVATE_SENTINEL"),"Rejected symlinks never read/modify/delete private content");
         }finally{remove(root);remove(foreign);}
     }
+    private static void independentRecovery()throws Exception {
+        Path root=Files.createTempDirectory("esteria-log-recovery-").toRealPath();
+        try{
+            Map<String,Path> roles=roles(root);Map<String,Path> selected=Map.of("setup.stock.stdout.log",roles.get("setup.stock.stdout.log"),"setup.turnip.stdout.log",roles.get("setup.turnip.stdout.log"));
+            String encoded=SupportLogSelection.encode(root,selected);
+            String invalid=encoded.replace("stock-client-operations/","stock-client-work/");
+            refused(()->SupportLogSelection.decode(root,invalid));
+            SupportLogSelection.Recovery recovered=SupportLogSelection.recover(root,invalid);
+            check(recovered.rejected==1&&recovered.logs.equals(Map.of("setup.turnip.stdout.log",selected.get("setup.turnip.stdout.log"))),"One invalid role must not discard the other fixed valid role");
+            check(!recovered.reason.isEmpty()&&recovered.reason.length()<128,"Recovery carries a bounded fixed reason");
+            check(SupportLogSelection.decode(root,SupportLogSelection.encode(root,recovered.logs)).equals(recovered.logs),"Recovered metadata passes strict validation");
+            String line=encoded.substring(encoded.indexOf("setup.stock.stdout.log"),encoded.indexOf('\n',encoded.indexOf("setup.stock.stdout.log"))+1);
+            recovered=SupportLogSelection.recover(root,encoded+line);
+            check(recovered.rejected==1&&!recovered.logs.containsKey("setup.stock.stdout.log")&&recovered.logs.size()==1,"Duplicate role ambiguity excludes that role only");
+            Map<String,Path> partial=new LinkedHashMap<>(selected);partial.put("setup.data.stdout.log",root.resolve("config/private.log"));
+            recovered=SupportLogSelection.recover(root,partial);check(recovered.rejected==1&&recovered.logs.equals(selected),"Live fixed maps recover independently with the same allowlist");
+            check(SupportLogSelection.recover(root,encoded.replace("v1","v2")).logs.isEmpty(),"Unknown whole format grants no paths");
+        }finally{remove(root);}
+    }
     private static void remove(Path root)throws IOException {try(var paths=Files.walk(root)){for(Path path:paths.sorted(Comparator.reverseOrder()).toArray(Path[]::new))Files.delete(path);}}
     public static void main(String[] arguments)throws Exception {
-        roundTripAndRotation();badMetadata();privatePathsAndSymlinks();
-        System.out.println("Support log selection passed3 actual filesystem metadata groups:24 fixed roles, missing/rotated roundtrip, bounds/private/foreign/traversal/symlink refusal; no log bytes read by selector");
+        roundTripAndRotation();badMetadata();privatePathsAndSymlinks();independentRecovery();
+        System.out.println("Support log selection passed4 actual filesystem metadata groups:24 fixed roles, missing/rotated roundtrip, bounds/private/foreign/traversal/symlink refusal, independently validated recovery; no log bytes read by selector");
     }
 }

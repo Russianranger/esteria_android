@@ -1,0 +1,70 @@
+{
+  "actualHash": {
+    "bytes": 268435456,
+    "cacheCalls": 128,
+    "cacheErrors": 0,
+    "lifetimeRusageMaxRssKiB": 159060,
+    "pacedSeconds": 32.0,
+    "peakRssKiB": 11512,
+    "readBytes": 268435456,
+    "sha256": "a6d72ac7690f53be6ae46ba88506bd97302a093f7108472bd9efc3cefda06484"
+  },
+  "formatVersion": 1,
+  "freshAndroidExecutionPending": true,
+  "frozenRecipeHelpersUnchanged": true,
+  "gradle": {
+    "allLifecycleOwnerFixturesPassed": true,
+    "androidDebugAndInstrumentationCompiled": true,
+    "coreCheck": true,
+    "lintDebug": true,
+    "result": "BUILD SUCCESSFUL",
+    "tasks": 120
+  },
+  "hashTimingBoundary": "256MiB bytes were actually read and hashed; pacedSeconds is budget accounting using an injected clock, not elapsed wall time. Android real pacing is a separate CI gate.",
+  "hostPython": {
+    "errors": 0,
+    "failures": 0,
+    "passed": 1396,
+    "run": 1504,
+    "skipped": 108
+  },
+  "logs": {
+    "v5-docs-release-notes-tests.log": {
+      "bytes": 4533,
+      "sha256": "ec300c14df0653979ee5ba6216a050b72413088c8d267c2d1b6b640f8c00347a"
+    },
+    "v5-final-gradle.log": {
+      "bytes": 16709,
+      "sha256": "ed0a9e0df749204e94c56136df9e010f8285520428a50665db836c794b2e4242"
+    },
+    "v5-final-python-io-tests.log": {
+      "bytes": 14462,
+      "sha256": "01c6091cdf60bfb5216955144d8aac269e35f7106e73da21c07ca777c6656758"
+    },
+    "v5-full-python-green-tests.log": {
+      "bytes": 290958,
+      "sha256": "af09cb890b217dff8c6ee4e1ce5f0b336610d9921e0f8ff32ee0899ffd726dab"
+    },
+    "v5-runtime-read-policy-tests.log": {
+      "bytes": 1264,
+      "sha256": "242f4749e193d43f7915098b00f7c21d9a8d052bb68496a8184089e927aefa62"
+    }
+  },
+  "ownerWorldPreparationQualified": false,
+  "scope": "host-preparation-memory-and-lifecycle-checks-only",
+  "shaderMemory": {
+    "androidExecuted": false,
+    "baselinePeakBytes": 46701725,
+    "baselineRetainedBytes": 45854419,
+    "boundedPeakBytes": 2177553,
+    "boundedRetainedBytes": 878699,
+    "compilerExecuted": false,
+    "gameplayQualified": false,
+    "ownerData": false,
+    "recordBytes": 8208,
+    "recordSummariesEqual": true,
+    "records": 96,
+    "scope": "host-pinned-reader-encrypted-synthetic-shader-memory"
+  },
+  "thorQualified": false
+}

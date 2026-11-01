@@ -1,5 +1,5 @@
 // APK-owned content inspection, separate from the immutable upstream compiler provider.
-def stockClientHelpers = ['stock_content_inspection.py', 'stock_shader_generation.py', 'shader_generation.py', 'extractor_order.py', 'server_data_preflight.py']
+def stockClientHelpers = ['stock_content_inspection.py', 'stock_shader_generation.py', 'shader_generation.py', 'extractor_order.py', 'server_data_preflight.py', 'stock_shader_translate.py', 'world_io.py']
 def stockClientAssets = layout.buildDirectory.dir('generated/stockClient')
 def packageStockClient = tasks.register('packageStockClient') {
     inputs.files(stockClientHelpers.collect { rootProject.file('runtime/' + it) })

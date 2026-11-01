@@ -22,12 +22,13 @@ import time
 import uuid
 
 try:
-    from . import shader_generation as storage, extractor_order as order, server_data_preflight as formats
+    from . import shader_generation as storage, extractor_order as order, server_data_preflight as formats, world_io
     from .owned_process_group import OwnedGroup
 except ImportError:
     import shader_generation as storage
     import extractor_order as order
     import server_data_preflight as formats
+    import world_io
     from owned_process_group import OwnedGroup
 
 SCOPE = 'local-server-data-format-checked-not-world-qualified'
@@ -41,7 +42,7 @@ CONTENT_PROFILES = ('stock-3.3.5a', 'esteria-custom')
 DEFAULT_CONTENT_PROFILE = CONTENT_PROFILES[0]
 CAPABILITY = b'esteria-classical-ordered-providers-v1; archive/folder/prefix; no conversion qualification'
 PREPARATION_HELPERS = ('server_data_generation.py', 'server_data_preflight.py', 'shader_generation.py',
-                       'extractor_order.py', 'owned_process_group.py')
+                       'extractor_order.py', 'owned_process_group.py', 'world_io.py')
 
 
 def require(condition, reason):
@@ -140,9 +141,7 @@ def merge_supplied(source, destination, *, cancelled=lambda: False):
                 except OSError as error:
                     if error.errno not in (errno.EPERM, errno.EXDEV, errno.EOPNOTSUPP, errno.ENOSYS): raise
                     with original.open('rb') as incoming, temporary.open('xb') as outgoing:
-                        while block := incoming.read(128 << 10):
-                            require(not cancelled(), 'supplied server copy cancelled; active data preserved')
-                            outgoing.write(block)
+                        world_io.copy_stream(incoming, outgoing, cancelled=cancelled)
                         outgoing.flush(); os.fsync(outgoing.fileno())
                     os.chmod(temporary, 0o600)
                 require(not output.is_symlink() and (not output.exists() or output.is_file()),
@@ -227,17 +226,17 @@ def clone(source, destination):
                 if error.errno not in (errno.EPERM, errno.EXDEV, errno.EOPNOTSUPP, errno.ENOSYS):
                     raise
                 with original.open('rb') as incoming, output.open('xb') as outgoing:
-                    shutil.copyfileobj(incoming, outgoing, 128 << 10)
+                    world_io.copy_stream(incoming, outgoing)
                 os.chmod(output, 0o600)
 
 
-def execute(command, cwd, log_path, timeout, *, cancelled=lambda: False):
+def execute(command, cwd, log_path, timeout, *, cancelled=lambda: False, cache_inputs=()):
     """Actual serial child, reserved process-group identity and bounded private logs."""
     require(type(timeout) is int and 0 < timeout <= 48 * 3600, 'invalid extraction deadline')
     require(not cancelled(), 'data preparation cancelled')
-    with log_path.open('xb') as log:
+    with log_path.open('x+b') as log, world_io.native_inputs(cache_inputs) as cache:
         os.chmod(log_path, 0o600)
-        child = subprocess.Popen(command, cwd=cwd, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+        child = subprocess.Popen(world_io.guarded_command(command), cwd=cwd, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT, start_new_session=True,
             env={**os.environ, 'PYTHONDONTWRITEBYTECODE': '1', 'PYTHONNOUSERSITE': '1'})
         owner = OwnedGroup(child)
@@ -245,6 +244,7 @@ def execute(command, cwd, log_path, timeout, *, cancelled=lambda: False):
         deadline, written, observed, tail = time.monotonic() + timeout, 0, 0, b''
         try:
             while True:
+                cache.tick()
                 require(not cancelled(), 'data preparation cancelled')
                 require(time.monotonic() < deadline, 'data preparation deadline exceeded')
                 while True:
@@ -284,7 +284,11 @@ def execute(command, cwd, log_path, timeout, *, cancelled=lambda: False):
                 if tail:
                     log.write(b'\n[bounded log tail]\n' + tail)
                 log.flush(); os.fsync(log.fileno())
-        require(status == 0, 'extractor failed; active server data preserved')
+        if status == world_io.PAUSED_EXIT_CODE:
+            raise world_io.PreparationPaused('Native preparation paused; completed phases retained')
+        if status != 0:
+            raise ValueError('extractor failed; active server data preserved; ' +
+                world_io.child_failure(Path(command[0]).name, status, log))
         return {'exitStatus': status, 'logBytesObserved': observed, 'logBytesRetained': log.tell()}
 
 
@@ -383,6 +387,13 @@ def verify_completed(destination, expected_inputs=None, *, expected_generation=N
 
 def generate(store, game, generation, tools, selection, locale, *, threads=1, timeout=24 * 3600,
              cancelled=lambda: False, progress=lambda phase: None, content_profile=DEFAULT_CONTENT_PROFILE):
+    with world_io.adapt_helpers(cancelled=cancelled):
+        return _generate(store, game, generation, tools, selection, locale, threads=threads, timeout=timeout,
+            cancelled=cancelled, progress=progress, content_profile=content_profile)
+
+
+def _generate(store, game, generation, tools, selection, locale, *, threads=1, timeout=24 * 3600,
+             cancelled=lambda: False, progress=lambda phase: None, content_profile=DEFAULT_CONTENT_PROFILE):
     require(content_profile in CONTENT_PROFILES, 'unsupported content profile')
     require(type(threads) is int and threads in (1, 2), 'one or two extraction workers required')
     require(type(timeout) is int and 0 < timeout <= 48 * 3600, 'invalid extraction deadline')
@@ -436,9 +447,11 @@ def generate(store, game, generation, tools, selection, locale, *, threads=1, ti
             deadline = time.monotonic() + timeout
             def run(name, args, cwd, log):
                 progress('extraction-' + name)
+                world_io.phase('extraction-' + name)
                 remaining = int(deadline - time.monotonic())
                 require(remaining > 0, 'data preparation deadline exceeded')
-                return execute([str(tools / 'bin' / name), *args], cwd, log, remaining, cancelled=cancelled)
+                cache_inputs = tuple(source / row['path'] for row in plan['providers'] if row['kind'] == 'mpq')
+                return execute([str(tools / 'bin' / name), *args], cwd, log, remaining, cancelled=cancelled, cache_inputs=cache_inputs)
             complete_external = external is not None and external['mode'] == 'complete'
             if not complete_external:
                 for name in PROGRAMS[:2]:
@@ -509,12 +522,22 @@ def main():
     parser.add_argument('--locale', required=True)
     parser.add_argument('--content-profile', choices=CONTENT_PROFILES, default=DEFAULT_CONTENT_PROFILE)
     parser.add_argument('--threads', type=int, default=1, choices=(1, 2))
+    parser.add_argument('--android-low-memory', action='store_true', help='Use the fixed Android preparation I/O policy')
     args = parser.parse_args()
     try:
-        receipt = generate(args.store, args.game, args.generation, args.tools, document(args.selection), args.locale,
-            threads=args.threads, content_profile=args.content_profile, progress=lambda value: print(value, flush=True))
+        def run():
+            return generate(args.store, args.game, args.generation, args.tools, document(args.selection), args.locale,
+                threads=args.threads, content_profile=args.content_profile, progress=lambda value: print(value, flush=True))
+        if args.android_low_memory:
+            with world_io.android_policy(progress=lambda value: print(value, flush=True)):
+                receipt = run()
+        else:
+            receipt = run()
         print('Server data format checked: ' + receipt['generation'] + '; world coverage remains unqualified')
         return 0
+    except world_io.PreparationPaused:
+        world_io.print_pause()
+        return world_io.PAUSED_EXIT_CODE
     except (OSError, ValueError) as error:
         print('Server data preparation failed (' + type(error).__name__ + '): ' + str(error) + '; active output preserved', flush=True)
         return 1
