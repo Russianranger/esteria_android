@@ -1,10 +1,22 @@
-# Esteria Stock v8 — output-path update pending
+# Esteria Stock v8 — output-path fix published
 
-The latest owner bundle `Esteria-support-1793558417807.zip` reports `map_extractor` exit 1 while creating its DBC output directory. The native extractor silently truncates its `-o` argument to 127 characters, cutting off the staging path before `/data`; its generic permissions message describes a nonexistent truncated parent. This attempt records no new low-memory exit, about 8.6 GB available and no active memory pressure.
+[Signed ARM64 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.8/Esteria-Stock-3.3.5a-arm64.apk) · [Testing procedure](NON-CUSTOM-TESTING.md).
 
-V8 passes `-o .` inside the already-created, verified private phase working directory. This keeps extraction output in that same directory without a long native path argument. The v7 native data runtime and source/debug companion remain unchanged; client/server/Eluna pins, archive bounds, provider order and memory controls remain active. Preserve the completed import, app data, databases and saves.
+Install over the existing `io.github.russianranger.esteria.stock` app. Keep the completed import, app data, databases and saves, and retry **Prepare local runtime / world** with the same locale. Do not reimport or clear storage. Verification remains paced at 8 MiB/s, dropping to 2 MiB/s or pausing under pressure; one 15.6 GiB hash pass takes about 34 minutes, with later phases adding time. Export support before another retry after failure.
 
-Focused adapter/storage/I/O checks passed 51 tests without skips; restoring the old absolute argument failed the long-path regression. Actual shipped-extractor output creation, complete APK, Android/native SQL checks, signing and public download verification remain release gates. No v8 APK is published at this checkpoint. Actual Thor preparation/world entry and gameplay remain unqualified.
+The v7 owner report stopped at DBC directory creation, with no new low-memory kill and about 8.6 GB available. The extractor truncated its absolute `-o` output argument to 127 bytes and tried to create a directory beneath that nonexistent truncated parent. V8 passes `-o .` inside the same verified private phase working directory. The v7 ordered native tools, input bounds, provider priority, cleanup and memory controls remain unchanged.
+
+Producer `7c1755968afee2fc1ec5448ce7c853a815750b3f`; publisher `7b01584c8a7679536aa95831c0107a81bc0aca1d`, run/job `41341085661` / `124951043905`. Release `430800823`, APK asset `699278685`. APK 336,808,704 bytes, SHA-256 `cfd47c5f0cc921fef0fcceda12df664367471269fe77d4c846c0100defadb76f`; certificate `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`.
+
+All six exact-producer gates passed: complete ARM64 APK, native SQL, Android 13 components, launcher/core/lint, tooling and shipped ARM64 extractor output creation. Android readback verified all 14 named tests, 37 source identities and 33 artifact members, including update preservation. Local validation passed 109 Gradle tasks, 39 actual SDK release tests, 51 focused adapter/storage/I/O tests and ran 1,539 host tests (1,435 passed, 104 dependency/environment skips). Restoring the old absolute-path argument fails the new regression.
+
+The shipped ARM64 extractor reproduced the old absolute-path failure with a 152-byte output path. The fixed relative output succeeded for fresh and existing directories and emitted the exact synthetic DBC bytes, using the production execute and memory policies. Inputs remained unchanged. This is output-path/DBC-fixture evidence; it converts no owner data, map tiles or camera models and does not establish Android/Thor world preparation.
+
+All six public release assets passed full anonymous length/hash readback. The exact producer tag, SDK v2/v3 signatures, persistent certificate, stock version 8 manifest and local signed-byte equality passed. Update-8 receipts retain their baseline-7 binding; future updates require a higher code, the same certificate and the exact public v8 APK. Preserve all historical releases and transports.
+
+Physical Thor preparation, rendering/world entry, controls/audio, persistence and offline gameplay remain unqualified until the owner retry. Client/server/Eluna and native-provider pins remain unchanged.
+
+Records: `runtime/releases/non-custom-v0.1.0-non-custom.8.json`, `runtime/evidence/non-custom-v8-public-apk-readback.json`, `non-custom-v8-release-gates.json`, `non-custom-v8-native-output.json`, `non-custom-v8-android13.json`, `non-custom-v8-owner-output-path.json` and `non-custom-v8-adapter-host.json`.
 
 ## Published v7 baseline — historical
 

@@ -1,0 +1,61 @@
+{
+  "formatVersion": 1,
+  "scope": "anonymous-full-public-v8-apk-and-six-assets-readback",
+  "releaseId": 430800823,
+  "appRevision": "7c1755968afee2fc1ec5448ce7c853a815750b3f",
+  "tagCommitVerified": true,
+  "metadataAccess": "read-only GitHub connector; asset downloads independently anonymous",
+  "assets": {
+    "Esteria-Stock-3.3.5a-arm64.apk": {
+      "assetId": 699278685,
+      "bytes": 336808704,
+      "sha256": "cfd47c5f0cc921fef0fcceda12df664367471269fe77d4c846c0100defadb76f",
+      "anonymousFullDownloadVerified": true
+    },
+    "NON-CUSTOM-TESTING.md": {
+      "assetId": 699279237,
+      "bytes": 6717,
+      "sha256": "1daca1f70ead9b006a1432f8fcfb2bf66458d16de0269e8e7133206008040a1a",
+      "anonymousFullDownloadVerified": true
+    },
+    "publication-evidence.json": {
+      "assetId": 699279222,
+      "bytes": 3760,
+      "sha256": "175a6ea76a029917e629c4b62b87b07754146b39e0b5a6639e101fb65b35b9e4",
+      "anonymousFullDownloadVerified": true
+    },
+    "release.json": {
+      "assetId": 699279171,
+      "bytes": 2532,
+      "sha256": "7498cad92867a1b68eb52f90fe31feb51a569cab505f5f81e94fb548738675a5",
+      "anonymousFullDownloadVerified": true
+    },
+    "SHA256SUMS": {
+      "assetId": 699279144,
+      "bytes": 97,
+      "sha256": "531d9b56717cf9689862f0227764812f78d996ef65b18f4b5898b3e4fd3b3fd1",
+      "anonymousFullDownloadVerified": true
+    },
+    "signing-receipt.json": {
+      "assetId": 699279190,
+      "bytes": 1050,
+      "sha256": "bf287350864895bb12f1af00d529ec58a4c7d6b40c78b6534a7d8ab8c18ebef6",
+      "anonymousFullDownloadVerified": true
+    }
+  },
+  "sdkVerifiedApk": {
+    "packageId": "io.github.russianranger.esteria.stock",
+    "versionCode": 8,
+    "versionName": "0.1.0-non-custom.8",
+    "debuggable": false,
+    "minSdk": 26,
+    "targetSdk": 35,
+    "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+    "apkSha256": "cfd47c5f0cc921fef0fcceda12df664367471269fe77d4c846c0100defadb76f",
+    "apkBytes": 336808704
+  },
+  "exactLocalSignedApkMatched": true,
+  "ownerWorldPreparationQualified": false,
+  "thorQualified": false,
+  "gameplayQualified": false
+}

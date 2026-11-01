@@ -1,3 +1,17 @@
+# Version 8 publication transport
+
+Producer `7c1755968afee2fc1ec5448ce7c853a815750b3f`; publisher `7b01584c8a7679536aa95831c0107a81bc0aca1d`, run/job `41341085661` / `124951043905`. Release `430800823`, APK asset `699278685`. APK 336,808,704 bytes, SHA-256 `cfd47c5f0cc921fef0fcceda12df664367471269fe77d4c846c0100defadb76f`; certificate `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`.
+
+Public inputs: `update-8/signature-recipe.json`, `update-8/signing-receipt.json`, `update-8/publication-inputs.json`.
+
+All six public release assets passed full anonymous length/hash readback. The exact producer tag, SDK v2/v3 signatures, persistent certificate, stock version 8 manifest and local signed-byte equality passed. Update-8 receipts retain their baseline-7 binding; future updates require a higher code, the same certificate and the exact public v8 APK. Preserve all historical releases and transports.
+
+V8 changes the app-owned output-path adapter and retains the v7 native data provider, complete source/debug companion and client/server pins. Keep app data and the completed import. Real ARM64 synthetic DBC output creation passed; physical Thor world preparation remains unqualified.
+
+Records: `../non-custom-v0.1.0-non-custom.8.json`, `../../evidence/non-custom-v8-public-apk-readback.json` and `../../evidence/non-custom-v8-native-output.json`.
+
+The following v7 and older records remain historical.
+
 # Version 7 publication transport
 
 Producer `31e306fa0d243e850ccfdfed50fc0d400a2ab577`; publisher `86b82a348f91cd1c2b9c1e372c89381dc752ec85`, run/job `41331836047` / `124923385734`. Release `430741271`, APK asset `699011971`. APK 336,808,704 bytes, SHA-256 `d0c307a23bc77efa0a6fb6d13a905552fda35e9e3622713e7437f4f8638a1016`; certificate `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`.

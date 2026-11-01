@@ -2,11 +2,11 @@
 
 Local Wrath 3.3.5a build 12340 client/server bring-up for AYN Thor Max: Android 13 ARM64, Snapdragon 8 Gen 2, Adreno 740. The reconstructed ARM64 client uses pinned Wine/PRoot with local server/MySQL; gameplay is intended to remain offline after setup.
 
-**V7 bounded extraction update:** [signed ARM64 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.7/Esteria-Stock-3.3.5a-arm64.apk) · [testing procedure](NON-CUSTOM-TESTING.md).
+**V8 output-path fix:** [signed ARM64 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.8/Esteria-Stock-3.3.5a-arm64.apk) · [testing procedure](NON-CUSTOM-TESTING.md).
 
-Install over the existing stock app, preserve the completed import and all data, and retry **Prepare local runtime / world** with the same locale. Do not reimport. V7 filters the extractor's file inventory before retention, fixing the reported 100,000-name union failure while preserving input bounds, archive order and memory controls.
+Install over the existing stock app, preserve the completed import and all data, and retry **Prepare local runtime / world** with the same locale. Do not reimport. V8 uses a short relative output argument inside the verified private phase directory, avoiding the native extractor's 127-byte path truncation. Existing v7 native tools, archive bounds and memory controls remain active.
 
-Complete ARM64 packaging, native SQL, 14 Android components, all 26 actual native reader cases and public APK/signature readback passed. New extractor sources/debug are preserved in the public component release. Physical Thor preparation/world entry and gameplay remain unqualified; export support before another retry after failure. [STATUS.md](STATUS.md) records exact identities and limits.
+Complete ARM64 packaging, native SQL, 14 named Android tests, real shipped ARM64 extractor output/DBC fixtures and public APK/signature readback passed. Physical Thor preparation/world entry and gameplay remain unqualified; export support before another retry after failure. [STATUS.md](STATUS.md) records exact identities and limits.
 
 - [Implementation plan](ANDROID-PORT-PLAN.md)
 - [Build instructions](BUILDING.md)

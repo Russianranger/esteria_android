@@ -1,12 +1,33 @@
-# Esteria Stock v8 handoff — output-path release gates pending
+# Esteria Stock v8 handoff
 
-The public APK and signing baseline is v7. V8 defaults select code 8 and retain `io.github.russianranger.esteria.stock`, its persistent certificate, the completed import, setup state, databases and saves. Do not reimport or clear storage.
+[Signed ARM64 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.8/Esteria-Stock-3.3.5a-arm64.apk) · [Testing procedure](NON-CUSTOM-TESTING.md).
 
-Owner bundle `Esteria-support-1793558417807.zip` is from v7 producer `31e306fa0d243e850ccfdfed50fc0d400a2ab577`. The new failure is `map_extractor` exit 1 at DBC directory creation. Its fixed 128-byte output buffer cuts the absolute `-o` argument to 127 characters, truncating the phase UUID and `/data`; the resulting generic permissions error targets a nonexistent parent. No new low-memory kill is recorded; about 8.6 GB was available and memory pressure was false.
+Install over the existing `io.github.russianranger.esteria.stock` app. Keep the completed import, app data, databases and saves, and retry **Prepare local runtime / world** with the same locale. Do not reimport or clear storage. Verification remains paced at 8 MiB/s, dropping to 2 MiB/s or pausing under pressure; one 15.6 GiB hash pass takes about 34 minutes, with later phases adding time. Export support before another retry after failure.
 
-The adapter now passes `-o .` with the same verified private `cwd=data`. Generation fingerprints, output ownership, atomic promotion and cancellation remain intact. The v7 native runtime/archive, source/debug qualifications and unchanged assembler/navigation pair are reused. Client/server/Eluna and provider pins remain unchanged; existing 8 MiB/s verification, 2 MiB/s pressure backoff and native memory guards remain active.
+The v7 owner report stopped at DBC directory creation, with no new low-memory kill and about 8.6 GB available. The extractor truncated its absolute `-o` output argument to 127 bytes and tried to create a directory beneath that nonexistent truncated parent. V8 passes `-o .` inside the same verified private phase working directory. The v7 ordered native tools, input bounds, provider priority, cleanup and memory controls remain unchanged.
 
-The 51 focused adapter/storage/I/O tests passed without skips and the old absolute-path mutant failed. Require genuine shipped-extractor long-path output creation and the final exact-producer APK/Android/native SQL/signing/public readback gates before delivery. Advance the signing ledger only after full public v8 APK and SDK verification. No v8 APK or owner world-entry success is claimed here. After installing the consolidated update over v7, retain the import and retry preparation with the same locale; export support before another attempt after failure.
+Producer `7c1755968afee2fc1ec5448ce7c853a815750b3f`; publisher `7b01584c8a7679536aa95831c0107a81bc0aca1d`, run/job `41341085661` / `124951043905`. Release `430800823`, APK asset `699278685`. APK 336,808,704 bytes, SHA-256 `cfd47c5f0cc921fef0fcceda12df664367471269fe77d4c846c0100defadb76f`; certificate `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`.
+
+| Gate | Run | Job |
+| --- | ---: | ---: |
+| Complete ARM64 package | 41339632720 | 124946725754 |
+| Native SQL | 41339632739 | 124946691034 |
+| Android 13 | 41339632718 | 124946691229 |
+| Launcher/core/lint | 41339632703 | 124946691137 |
+| Tooling | 41339632709 | 124946691205 |
+| Native extractor output/DBC | 41339632774 | 124946691389 |
+
+All six exact-producer gates passed: complete ARM64 APK, native SQL, Android 13 components, launcher/core/lint, tooling and shipped ARM64 extractor output creation. Android readback verified all 14 named tests, 37 source identities and 33 artifact members, including update preservation. Local validation passed 109 Gradle tasks, 39 actual SDK release tests, 51 focused adapter/storage/I/O tests and ran 1,539 host tests (1,435 passed, 104 dependency/environment skips). Restoring the old absolute-path argument fails the new regression.
+
+The shipped ARM64 extractor reproduced the old absolute-path failure with a 152-byte output path. The fixed relative output succeeded for fresh and existing directories and emitted the exact synthetic DBC bytes, using the production execute and memory policies. Inputs remained unchanged. This is output-path/DBC-fixture evidence; it converts no owner data, map tiles or camera models and does not establish Android/Thor world preparation.
+
+Native output run/job `41339632774` / `124946691389`; artifact `13096971824`, 4,013 bytes, SHA-256 `f1aad887dff91ef34e50442492363e8542b71b22565a977c7321158dc28bb004`. The same source/debug-qualified v7 data runtime remains selected: SHA-256 `e80d1d731902907297ae89f68d8241bca0aa79b8a281521c669353654ce5b436`, preserved in public component release `430726308` / `non-custom-data-tools-v7`. No native rebuild or provider reinterpretation is required for the adapter change.
+
+All six public release assets passed full anonymous length/hash readback. The exact producer tag, SDK v2/v3 signatures, persistent certificate, stock version 8 manifest and local signed-byte equality passed. Update-8 receipts retain their baseline-7 binding; future updates require a higher code, the same certificate and the exact public v8 APK. Preserve all historical releases and transports.
+
+Physical Thor preparation, rendering/world entry, controls/audio, persistence and offline gameplay remain unqualified until the owner retry. Client/server/Eluna and native-provider pins remain unchanged.
+
+Records: `runtime/releases/non-custom-v0.1.0-non-custom.8.json`, `runtime/evidence/non-custom-v8-public-apk-readback.json`, `non-custom-v8-release-gates.json`, `non-custom-v8-native-output.json`, `non-custom-v8-android13.json`, `non-custom-v8-owner-output-path.json` and `non-custom-v8-adapter-host.json`.
 
 ## Published v7 baseline — historical
 

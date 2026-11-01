@@ -14,6 +14,7 @@
   },
   "appRevision": "7c1755968afee2fc1ec5448ce7c853a815750b3f",
   "exactPublicSignatureReconstructionVerified": true,
+  "finalPublicationGuardTestsPassed": 14,
   "formatVersion": 1,
   "gameplayQualified": false,
   "localValidation": {
@@ -43,7 +44,32 @@
   },
   "ownerWorldPreparationQualified": false,
   "persistentSigningVerified": true,
-  "publicDownloadVerificationPending": true,
+  "publicDownloadVerificationPending": false,
+  "publicReadbackEvidence": "runtime/evidence/non-custom-v8-public-apk-readback.json",
+  "publisherJobId": 124951043905,
+  "publisherPassed": true,
+  "publisherRevision": "7b01584c8a7679536aa95831c0107a81bc0aca1d",
+  "publisherRunId": 41341085661,
+  "publisherValidationCiPassed": true,
+  "publisherValidationRuns": [
+    {
+      "conclusion": "success",
+      "head_sha": "7b01584c8a7679536aa95831c0107a81bc0aca1d",
+      "html_url": "https://github.com/Russianranger/esteria_android/actions/runs/41341085657",
+      "id": 41341085657,
+      "name": "Android launcher and host behavior checks",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "head_sha": "7b01584c8a7679536aa95831c0107a81bc0aca1d",
+      "html_url": "https://github.com/Russianranger/esteria_android/actions/runs/41341085655",
+      "id": 41341085655,
+      "name": "Integration tooling behavior",
+      "status": "completed"
+    }
+  ],
+  "releaseId": 430800823,
   "runtimeDataAdapter": {
     "assetPath": "assets/server-data/server_data_generation.py",
     "bytes": 32387,
