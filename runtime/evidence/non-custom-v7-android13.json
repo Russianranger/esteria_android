@@ -1,0 +1,127 @@
+{
+  "allArtifactMembersRead": 33,
+  "allComponentSourceIdentitiesMatched": true,
+  "allComponentSourceIdentityCount": 37,
+  "androidArm64Qualified": false,
+  "appSourceRevision": "31e306fa0d243e850ccfdfed50fc0d400a2ab577",
+  "artifact": {
+    "bytes": 19255,
+    "sha256": "f0d847a036aad604c5525c3c70865cab46dffbef1ccf09984af815fb2c8c7c03"
+  },
+  "artifactId": 13093487091,
+  "artifactRosterVerified": true,
+  "baseHelperAssetFiles": {
+    "data": 6,
+    "installation": 18,
+    "session": 24
+  },
+  "boundary": "Real Android13 x64 filesystem/update, document API, synthetic imports/shader receipts, and JNI fixture-child tests only. No rebuilt ARM64 extractor conversion, PRoot, Vulkan/KGSL driver, owner game data, Thor world preparation or gameplay is executed here.",
+  "componentSourceIdentityManifestSha256": "05bb43bbe686d4b0cd81c1d6046037287bfb9f526992da00750b244f27c7ec5b",
+  "componentStdout": {
+    "bytes": 15638,
+    "sha256": "608a77115f057e0e89e4b3616836591edc4000b60170de4bff69233de7a959d2"
+  },
+  "driverExecuted": false,
+  "emulatorProperties": {
+    "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+    "ro.build.version.sdk": "33",
+    "ro.kernel.qemu": "1",
+    "ro.product.cpu.abi": "x86_64"
+  },
+  "exactFourteenNamedTestSuccessStatusesVerified": true,
+  "folderZipPayloadSha256Matched": true,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "jobId": 124918852542,
+  "memorySourceIdentityCount": 28,
+  "namedTests": [
+    "io.github.russianranger.esteria.ImportMemoryStressTest.gibibyteFolderAndNonseekableZipImportsKeepBoundedMemory",
+    "io.github.russianranger.esteria.ImportMemoryStressTest.thousandsOfOpaqueDocumentsStayBoundedAndSourceChecksRemainActive",
+    "io.github.russianranger.esteria.ProcessExitDiagnosticsTest.actualAndroidHistoryQueryIsBoundedToOwnPackage",
+    "io.github.russianranger.esteria.ProcessExitDiagnosticsTest.descriptionsAreBoundedRedactedAndSingleLine",
+    "io.github.russianranger.esteria.ProcessExitDiagnosticsTest.lowMemoryKillJavaOomAndOtherExitsRemainDistinct",
+    "io.github.russianranger.esteria.ImportIoControllerTest.severePressureBlocksWritesAndStopRemainsPrompt",
+    "io.github.russianranger.esteria.ImportIoControllerTest.trimSignalsAndSystemHeadroomSelectTheCorrectPolicy",
+    "io.github.russianranger.esteria.ImportIoControllerTest.controllerPersistsRealSyncCacheAndSystemPressureObservations",
+    "io.github.russianranger.esteria.ImportIoControllerTest.nativeCacheAdvicePreservesSyncedFileBytes",
+    "io.github.russianranger.esteria.WorldPreparationDiagnosticsTest.actualSharedPreferencesXmlRoundTripPreservesOwnedLogRecords",
+    "io.github.russianranger.esteria.WorldPreparationDiagnosticsTest.parentPreparationReadsUseBoundedRealCacheAdviceAndRemainCancellable",
+    "io.github.russianranger.esteria.WorldPreparationDiagnosticsTest.phaseAndRealOwnedChildObservationSurviveDiagnosticReconstruction",
+    "io.github.russianranger.esteria.WorldPreparationDiagnosticsTest.oneInvalidRetainedRolePreservesOtherStrictlyValidatedLogs",
+    "io.github.russianranger.esteria.runtime.TurnipReadinessTimingTest.governedAdmissionDoesNotSpendChildWindowAndFailuresKeepOwnership"
+  ],
+  "ownerGameDataImported": false,
+  "privateLocalLoginHandoffFilesystemQualified": true,
+  "realLowMemoryKillReproduced": false,
+  "rebuiltArm64ExtractorConversionExecuted": false,
+  "runId": 41330323385,
+  "runtimeContractGroups": 20,
+  "safNamedTests": [
+    "io.github.russianranger.esteria.SafImportTest.opaqueFolderDocumentsAndStagedZipUseTheSameClientRoot",
+    "io.github.russianranger.esteria.SafImportTest.providerMutationDenialAndCancellationKeepTheirCausalDetails",
+    "io.github.russianranger.esteria.SafImportTest.failedImportReceiptSurvivesRecreationAndExportsBoundedRedactedCauses"
+  ],
+  "sameJobDebugKeyUpdatePreservedRuntimeAndSentinel": true,
+  "scope": "independent-Android13-x64-v7-installer-update-and-component-artifact-readback",
+  "sourceTree": "cd2238e1f09357bae6c5064787721fa0bd066526",
+  "stockShaderReceiptNamedTests": [
+    "io.github.russianranger.esteria.runtime.ShaderSetupReceiptTest.packagedStockHelpersReuseAndPreserveChangedBytes",
+    "io.github.russianranger.esteria.runtime.ShaderSetupReceiptTest.exactReceiptAndCurrentInputRequired"
+  ],
+  "stressObservations": [
+    {
+      "gameplayQualified": false,
+      "javaGrowthBytes": 2306216,
+      "nativeGrowthBytes": 83568,
+      "ownerData": false,
+      "payloadBytes": 1073741824,
+      "pssGrowthBytes": 1481728,
+      "route": "folder",
+      "sha256": "41f9c660a072eb1c4f528c0cbbac593596e1121ec1ac1d88dbcb1ee53e2d5096",
+      "thorQualified": false
+    },
+    {
+      "gameplayQualified": false,
+      "javaGrowthBytes": 365608,
+      "nativeGrowthBytes": 280208,
+      "ownerData": false,
+      "payloadBytes": 1073741824,
+      "pssGrowthBytes": 3712000,
+      "route": "zip",
+      "sha256": "41f9c660a072eb1c4f528c0cbbac593596e1121ec1ac1d88dbcb1ee53e2d5096",
+      "thorQualified": false
+    },
+    {
+      "documents": 3210,
+      "gameplayQualified": false,
+      "javaGrowthBytes": 5851288,
+      "nativeGrowthBytes": 797728,
+      "ownerData": false,
+      "pssGrowthBytes": 10509312,
+      "route": "opaque-inventory",
+      "thorQualified": false
+    }
+  ],
+  "thorQualified": false,
+  "turnipTimingObservation": {
+    "androidArm64Qualified": false,
+    "childMillis": 29,
+    "gameplayQualified": false,
+    "governedAdmissionMillis": 6223,
+    "governedBytes": 50331648,
+    "gpuExecuted": false,
+    "hungChildReaped": true,
+    "lateCompletedResultRejected": true,
+    "launchBudgetEnforced": true,
+    "nativeFixtureChildExecuted": true,
+    "prelaunchCancellationVerified": true,
+    "providerAndReceiptMutationRejected": true,
+    "scope": "android13-owned-turnip-timing-fixture-no-gpu",
+    "thorQualified": false
+  },
+  "userSigningIdentityQualified": false,
+  "workflowSource": {
+    "bytes": 18020,
+    "sha256": "b3f24e78769d1774458dee8ebe7d686cf48498c44aa8aff33d588ecd83f3eac7"
+  }
+}

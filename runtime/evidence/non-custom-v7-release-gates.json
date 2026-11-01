@@ -1,0 +1,101 @@
+{
+  "allRequiredSourceCiPassed": true,
+  "android13": {
+    "all33ArtifactMembersRead": true,
+    "all37SourceIdentitiesMatched": true,
+    "allFourteenNamedTestsPassed": true,
+    "artifact": {
+      "bytes": 19255,
+      "sha256": "f0d847a036aad604c5525c3c70865cab46dffbef1ccf09984af815fb2c8c7c03"
+    },
+    "artifactId": 13093487091,
+    "jobId": 124918852542,
+    "runId": 41330323385
+  },
+  "appRevision": "31e306fa0d243e850ccfdfed50fc0d400a2ab577",
+  "exactPublicSignatureReconstructionVerified": true,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "localValidation": {
+    "actualSdkTestsPassed": 39,
+    "gradleTasksPassed": 109,
+    "hostTestsPassed": 1428,
+    "hostTestsRun": 1532,
+    "hostTestsSkipped": 104,
+    "oldUnionMutantRejected": true
+  },
+  "nativeExtractorQualification": {
+    "all26ReaderTestsPassedWithoutSkip": true,
+    "completePublicSourceAndDebugReadBack": true,
+    "componentReleaseId": 430726308,
+    "composedRunId": 41328868562,
+    "evidence": "runtime/evidence/non-custom-v7-data-tools-native.json",
+    "nativeBuildRunId": 41327929457,
+    "sourceSealRunId": 41328465330
+  },
+  "ownerWorldPreparationQualified": false,
+  "persistentSigningVerified": true,
+  "publicDownloadVerificationPending": true,
+  "scope": "exact-producer-v7-release-gates-and-signing",
+  "signedApk": {
+    "apkBytes": 336808704,
+    "apkSha256": "d0c307a23bc77efa0a6fb6d13a905552fda35e9e3622713e7437f4f8638a1016",
+    "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+    "debuggable": false,
+    "minSdk": 26,
+    "packageId": "io.github.russianranger.esteria.stock",
+    "targetSdk": 35,
+    "versionCode": 7,
+    "versionName": "0.1.0-non-custom.7"
+  },
+  "sourceRuns": [
+    {
+      "conclusion": "success",
+      "head_sha": "31e306fa0d243e850ccfdfed50fc0d400a2ab577",
+      "html_url": "https://github.com/Russianranger/esteria_android/actions/runs/41330323397",
+      "id": 41330323397,
+      "name": "Complete non-custom local-game ARM64 package",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "head_sha": "31e306fa0d243e850ccfdfed50fc0d400a2ab577",
+      "html_url": "https://github.com/Russianranger/esteria_android/actions/runs/41330323365",
+      "id": 41330323365,
+      "name": "Native owned installation finish and clean-stop receipts",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "head_sha": "31e306fa0d243e850ccfdfed50fc0d400a2ab577",
+      "html_url": "https://github.com/Russianranger/esteria_android/actions/runs/41330323385",
+      "id": 41330323385,
+      "name": "Android 13 installer and APK update",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "head_sha": "31e306fa0d243e850ccfdfed50fc0d400a2ab577",
+      "html_url": "https://github.com/Russianranger/esteria_android/actions/runs/41330323337",
+      "id": 41330323337,
+      "name": "Android launcher and host behavior checks",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "head_sha": "31e306fa0d243e850ccfdfed50fc0d400a2ab577",
+      "html_url": "https://github.com/Russianranger/esteria_android/actions/runs/41330323383",
+      "id": 41330323383,
+      "name": "Integration tooling behavior",
+      "status": "completed"
+    }
+  ],
+  "thorQualified": false,
+  "updatedDataTools": {
+    "assetPath": "assets/server-data-tools/server-data-tools.archive",
+    "bytes": 2913905,
+    "descriptorMatched": true,
+    "oldFrozenDataSelected": false,
+    "sha256": "e80d1d731902907297ae89f68d8241bca0aa79b8a281521c669353654ce5b436"
+  }
+}
