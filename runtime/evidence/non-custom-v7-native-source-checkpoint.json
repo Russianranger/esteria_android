@@ -1,0 +1,75 @@
+{
+  "actualApkProduced": false,
+  "actualArtifactReadbackVerified": true,
+  "adaptationLock": {
+    "bytes": 10416,
+    "sha256": "9a6b5f48a56ac82623f2965724ac1d4fac9b4bd304ddb81a85c4894486f8694e"
+  },
+  "appRevision": "bad963b8ae2edd0c8bcfe0db852ac4557f1cc700",
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "intermediateTooling": {
+    "cause": "ordered-source-original-selection-pin; historical data-provider pins cannot admit changed adaptation before actual native measurement and source sealing",
+    "conclusion": "failure",
+    "errors": 5,
+    "failures": 1,
+    "jobId": 124911701325,
+    "runId": 41327929538,
+    "skipped": 100,
+    "testsRun": 1508
+  },
+  "nativeBuild": {
+    "dependencyObservation": {
+      "bytes": 3571508,
+      "sha256": "478aa936b9742b0f585220b65d319fd3d52ac81ff6f85de3570541e60d217561"
+    },
+    "evidenceArtifact": {
+      "bytes": 499936,
+      "id": 13092386240,
+      "sha256": "659750b75453f43a42afa14c7f58efa508a6e760daefbe19d12b17abec9c8bf3"
+    },
+    "integrationRevision": "bad963b8ae2edd0c8bcfe0db852ac4557f1cc700",
+    "job": 124911701196,
+    "payloadArtifact": {
+      "bytes": 105185114,
+      "id": 13092252150,
+      "sha256": "c7f61744b3be5050bb1d0965bde6712527a57aaba44b7beef2c54ab89dddd09d"
+    },
+    "programs": {
+      "map_extractor": {
+        "bytes": 6035576,
+        "elf": {
+          "class": "ELF64",
+          "endianness": "little",
+          "interpreter": "/lib/ld-linux-aarch64.so.1",
+          "machine": "AArch64",
+          "type": "DYN"
+        },
+        "sha256": "ab8314422eba964b6c347fa2f653b3557a863477b9ee870c7cc9129b5cc79277"
+      },
+      "vmap4_extractor": {
+        "bytes": 13695224,
+        "elf": {
+          "class": "ELF64",
+          "endianness": "little",
+          "interpreter": "/lib/ld-linux-aarch64.so.1",
+          "machine": "AArch64",
+          "type": "DYN"
+        },
+        "sha256": "c38e29221524e4f4ae4703486f9cccf93f345b82a449c59a946efbf1fb27d05e"
+      }
+    },
+    "receipt": {
+      "bytes": 35934,
+      "sha256": "4f2388644d9507ff06e22219cb180df78b6bdc57eeadff4e3e814b6ff69602a3"
+    },
+    "workflowRun": 41327929457
+  },
+  "nativeBuildJobId": 124911701196,
+  "nativeBuildPassed": true,
+  "nativeBuildPending": false,
+  "nativeBuildRunId": 41327929457,
+  "scope": "v7-first-native-source-checkpoint",
+  "sourceCompanionSealingPending": true,
+  "thorQualified": false
+}

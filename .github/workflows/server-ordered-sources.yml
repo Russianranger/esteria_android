@@ -2,7 +2,7 @@ name: Retain complete ordered extractor source companion
 on:
   workflow_dispatch:
   push:
-    branches: [android/client-server]
+    branches: [android/client-server, non-custom]
     paths:
       - .github/workflows/server-ordered-sources.yml
       - runtime/server/ordered-tools-inputs.lock.json
@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   ordered-sources:
-    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/android/client-server'
+    if: github.repository == 'Russianranger/esteria_android' && (github.ref == 'refs/heads/android/client-server' || github.ref == 'refs/heads/non-custom')
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
