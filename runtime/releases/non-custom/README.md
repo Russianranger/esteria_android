@@ -1,3 +1,17 @@
+# Version 7 publication transport
+
+Producer `31e306fa0d243e850ccfdfed50fc0d400a2ab577`; publisher `86b82a348f91cd1c2b9c1e372c89381dc752ec85`, run/job `41331836047` / `124923385734`. Release `430741271`, APK asset `699011971`. APK 336,808,704 bytes, SHA-256 `d0c307a23bc77efa0a6fb6d13a905552fda35e9e3622713e7437f4f8638a1016`; certificate `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`.
+
+Public inputs: `update-7/signature-recipe.json`, `update-7/signing-receipt.json`, `update-7/publication-inputs.json`.
+
+All six public APK release assets passed full anonymous length/hash readback. The exact tag, SDK v2/v3 signatures, certificate, stock version 7 manifest and local signed-byte equality passed. Update-7 receipts retain their baseline-6 binding; future updates require a higher code, the same certificate and the exact public v7 APK. Preserve historical releases and transports.
+
+The rebuilt ordered pair and complete source/debug package are preserved separately in `non-custom-data-tools-v7` (release `430726308`), with all four component assets independently read back. The APK retains the same stock package/certificate and unchanged client/server pins. Install over the existing app and preserve import/data; physical Thor preparation/world entry remains unqualified.
+
+Records: `../non-custom-v0.1.0-non-custom.7.json`, `../../evidence/non-custom-v7-public-apk-readback.json` and `../../server/data-tools-publication/`.
+
+The following v6 and older records remain historical.
+
 # Version 6 publication transport
 
 Producer `cca8f81abe412b65f0c85da2902f24848a694fd2`; publisher `79c9b8e5744daefcbe4b108652ba26297876bc11`, run/job `41277919602` / `124763764353`. Release `430387223`, APK asset `697446059`. APK 336,796,416 bytes, SHA-256 `11dc96d63d9cf2f00774804216dc9ec45a0785654f40c6a08030ffb91c70ffce`; certificate `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`.

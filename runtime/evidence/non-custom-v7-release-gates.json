@@ -35,7 +35,32 @@
   },
   "ownerWorldPreparationQualified": false,
   "persistentSigningVerified": true,
-  "publicDownloadVerificationPending": true,
+  "publicDownloadVerificationPending": false,
+  "publicReadbackEvidence": "runtime/evidence/non-custom-v7-public-apk-readback.json",
+  "publisherJobId": 124923385734,
+  "publisherPassed": true,
+  "publisherRevision": "86b82a348f91cd1c2b9c1e372c89381dc752ec85",
+  "publisherRunId": 41331836047,
+  "publisherValidationCiPassed": true,
+  "publisherValidationRuns": [
+    {
+      "conclusion": "success",
+      "head_sha": "86b82a348f91cd1c2b9c1e372c89381dc752ec85",
+      "html_url": "https://github.com/Russianranger/esteria_android/actions/runs/41331836014",
+      "id": 41331836014,
+      "name": "Integration tooling behavior",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "head_sha": "86b82a348f91cd1c2b9c1e372c89381dc752ec85",
+      "html_url": "https://github.com/Russianranger/esteria_android/actions/runs/41331835908",
+      "id": 41331835908,
+      "name": "Android launcher and host behavior checks",
+      "status": "completed"
+    }
+  ],
+  "releaseId": 430741271,
   "scope": "exact-producer-v7-release-gates-and-signing",
   "signedApk": {
     "apkBytes": 336808704,

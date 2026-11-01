@@ -1,12 +1,22 @@
-# Esteria Stock v7 — native fix verified; APK build pending
+# Esteria Stock v7 — bounded extraction update published
 
-The owner v6 support bundle `Esteria-support-1793550413267.zip` confirms graphics readback passed in 243 ms. Map/DBC extraction then failed at `ordered effective file count bound`; no new low-memory exit was recorded and about 9.9 GB remained available. Preserve the completed import and all app data.
+[Signed ARM64 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.7/Esteria-Stock-3.3.5a-arm64.apk) · [Testing procedure](NON-CUSTOM-TESTING.md).
 
-V7 selects DBFilesClient/*.dbc before retaining archive names, parses bounded listfiles without redundant all-name copies, and checks decoded metadata size before allocation. Provider priority, deletion markers, path checks and selected-count bounds remain enforced. Host regression: 120,238 distinct synthetic names, 238 selected DBCs, 34 tests passed; the old behavior failed the regression.
+Install over the existing `io.github.russianranger.esteria.stock` app. Keep the completed import, app data, databases and saves; retry **Prepare local runtime / world** with the same locale. Do not reimport or clear data. Verification remains paced at 8 MiB/s (2 MiB/s or paused under pressure); one 15.6 GiB hash pass takes about 34 minutes, with later work adding time. Export support before another retry after failure.
 
-Actual ARM64 rebuild passed at `bad963b8ae2edd0c8bcfe0db852ac4557f1cc700`, followed by complete source sealing and four-tool qualification at `8d016467af4d23ab88303ed8ec877f28334e1049`. All 26 actual native reader tests passed without skips. The new runtime archive is `e80d1d731902907297ae89f68d8241bca0aa79b8a281521c669353654ce5b436`. Its complete source/debug package is public in `non-custom-data-tools-v7` (release 430726308); all four public assets and complete provider proof passed independent anonymous readback. Unaffected programs/content/assembler/navigation and client/server/Eluna pins remain unchanged.
+The v6 owner report passed graphics readback in 243 ms, then `map_extractor` failed at `ordered effective file count bound`, with no new low-memory exit and about 9.9 GB available. V7 selects `DBFilesClient/*.dbc` before retaining archive names and avoids redundant listfile copies. Input/selected-count bounds, provider priority, tombstones, path validation and existing memory controls remain enforced.
 
-The complete v7 APK build, Android components, native SQL, persistent signing and public APK verification remain required before delivery. No v7 APK is published at this checkpoint. Local validation passed 109 Gradle tasks, 39 actual SDK release tests and 1,532 host tests (1,428 passed, 104 dependency/environment skips). Actual Thor preparation and gameplay remain unqualified. See `NON-CUSTOM-TESTING.md` and the `non-custom-v7-*` evidence.
+Producer `31e306fa0d243e850ccfdfed50fc0d400a2ab577`; publisher `86b82a348f91cd1c2b9c1e372c89381dc752ec85`, run/job `41331836047` / `124923385734`. Release `430741271`, APK asset `699011971`. APK 336,808,704 bytes, SHA-256 `d0c307a23bc77efa0a6fb6d13a905552fda35e9e3622713e7437f4f8638a1016`; certificate `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`.
+
+All five exact-producer ARM64 package/native SQL/launcher/tooling/Android gates passed. Android 13 x64 passed 14 components with 37 source identities and 33 artifact members verified. Actual ARM64 rebuilt readers passed all 26 lookup cases without skips; four-tool CLI/configuration and complete source/debug checks passed. These fixtures do not establish owner-data conversion or Thor world entry.
+
+Complete source/debug ZIPs remain public in `non-custom-data-tools-v7` (release `430726308`); all four component assets and complete provider proof passed independent anonymous readback. Unaffected programs/content/assembler/navigation remain original.
+
+All six public APK release assets passed full anonymous length/hash readback. The exact tag, SDK v2/v3 signatures, certificate, stock version 7 manifest and local signed-byte equality passed. Update-7 receipts retain their baseline-6 binding; future updates require a higher code, the same certificate and the exact public v7 APK. Preserve historical releases and transports.
+
+Local validation passed 109 Gradle tasks, 39 actual SDK release tests and 1,532 host tests (1,428 passed, 104 dependency/environment skips). The old enumeration behavior fails the new regression. Physical Thor preparation, rendering/world entry, controls/audio, persistence and offline gameplay remain unqualified until the owner retry.
+
+Records: `runtime/releases/non-custom-v0.1.0-non-custom.7.json`, `runtime/evidence/non-custom-v7-public-apk-readback.json`, `non-custom-v7-release-gates.json`, `non-custom-v7-android13.json` and the native/component evidence under `runtime/evidence/non-custom-v7-*`. Client/server/Eluna pins remain unchanged.
 
 ## Published v6 baseline — historical
 
