@@ -1,3 +1,15 @@
+# Esteria Stock v8 handoff — output-path release gates pending
+
+The public APK and signing baseline is v7. V8 defaults select code 8 and retain `io.github.russianranger.esteria.stock`, its persistent certificate, the completed import, setup state, databases and saves. Do not reimport or clear storage.
+
+Owner bundle `Esteria-support-1793558417807.zip` is from v7 producer `31e306fa0d243e850ccfdfed50fc0d400a2ab577`. The new failure is `map_extractor` exit 1 at DBC directory creation. Its fixed 128-byte output buffer cuts the absolute `-o` argument to 127 characters, truncating the phase UUID and `/data`; the resulting generic permissions error targets a nonexistent parent. No new low-memory kill is recorded; about 8.6 GB was available and memory pressure was false.
+
+The adapter now passes `-o .` with the same verified private `cwd=data`. Generation fingerprints, output ownership, atomic promotion and cancellation remain intact. The v7 native runtime/archive, source/debug qualifications and unchanged assembler/navigation pair are reused. Client/server/Eluna and provider pins remain unchanged; existing 8 MiB/s verification, 2 MiB/s pressure backoff and native memory guards remain active.
+
+The 51 focused adapter/storage/I/O tests passed without skips and the old absolute-path mutant failed. Require genuine shipped-extractor long-path output creation and the final exact-producer APK/Android/native SQL/signing/public readback gates before delivery. Advance the signing ledger only after full public v8 APK and SDK verification. No v8 APK or owner world-entry success is claimed here. After installing the consolidated update over v7, retain the import and retry preparation with the same locale; export support before another attempt after failure.
+
+## Published v7 baseline — historical
+
 # Esteria Stock v7 handoff
 
 [Signed ARM64 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.7/Esteria-Stock-3.3.5a-arm64.apk). Version `0.1.0-non-custom.7` / code 7.

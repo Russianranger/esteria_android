@@ -55,7 +55,7 @@ def stage(args):
     (args.output / 'SHA256SUMS').write_text(signed['apkSha256'] + '  ' + name + '\n')
     setup = ('Keep the completed client import and retry Prepare local runtime / world, then\n'
              'start the local game. Follow the attached NON-CUSTOM-TESTING.md procedure, including\n'
-             'the offline repeat and support bundle export if a stage fails.' if signed['versionCode'] in (5, 6, 7) else
+             'the offline repeat and support bundle export if a stage fails.' if signed['versionCode'] in (5, 6, 7, 8) else
              'Import your complete ChromieCraft client, prepare the local runtime/world, then\n'
              'start the local game. Follow the attached NON-CUSTOM-TESTING.md procedure, including\n'
              'the offline repeat and support bundle export if a stage fails.')
@@ -164,6 +164,24 @@ uninstall or clear data. Completed compatible phases remain reusable; the new
 extractor identity requires affected data phases to run again. Export support
 before another retry after any failure. Actual Thor world preparation and
 gameplay remain unqualified until the device retry.
+'''
+    if signed['versionCode'] == 8:
+        notes += '''
+Version 8 fixes map/DBC output creation when the private staging path is long.
+The extractor's legacy 128-byte output buffer truncated the absolute path and
+reported a directory permissions error. The adapter now uses a short relative
+output path inside the same verified private phase working directory.
+
+The existing v7 ordered readers and their source/debug-qualified runtime remain
+unchanged. File selection bounds, provider order, source pins and preparation
+memory controls remain active. The v7 report records no new low-memory kill.
+
+Install over the existing stock app. Keep the completed client import, app data,
+databases and saves, then retry Prepare local runtime / world with the same
+locale. Do not reimport, uninstall or clear storage. Completed compatible phases
+are reused; changed helper identities require affected data phases to run again.
+Export support before another retry after failure. Actual Thor world preparation
+and gameplay remain unqualified until the device retry.
 '''
     (args.output / 'RELEASE-NOTES.md').write_text(notes)
     return result

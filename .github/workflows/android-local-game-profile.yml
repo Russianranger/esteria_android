@@ -5,7 +5,7 @@ on:
       build_version_code:
         description: Positive release versionCode, increased before a signed update
         required: false
-        default: '7'
+        default: '8'
         type: string
       publish_non_custom:
         description: Sign and publish an additive non-custom prerelease using the configured persistent key
@@ -34,6 +34,9 @@ on:
       - 'tools/sign_non_custom_ci.py'
       - 'tools/prepare_non_custom_release.py'
       - 'tests/test_non_custom_release.py'
+      - 'tools/qualify_extractor_output.py'
+      - 'tests/test_extractor_output_qualification.py'
+      - '.github/workflows/native-extractor-output.yml'
       - 'tools/plan_wine_cohort_adoption.py'
       - 'tests/test_wine_cohort_apk.py'
       - 'runtime/server/programs-playerbots-provider.lock.json'
@@ -119,7 +122,7 @@ jobs:
       contents: write
       actions: read
     env:
-      RELEASE_VERSION_CODE: ${{ inputs.build_version_code || '7' }}
+      RELEASE_VERSION_CODE: ${{ inputs.build_version_code || '8' }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:

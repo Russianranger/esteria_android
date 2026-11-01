@@ -9,6 +9,9 @@ on:
       - tools/qualify_android_installer.py
       - tests/test_android_installer_qualification.py
       - .github/workflows/android-instrumentation.yml
+      - tools/qualify_extractor_output.py
+      - tests/test_extractor_output_qualification.py
+      - .github/workflows/native-extractor-output.yml
   pull_request:
     paths:
       - app/**

@@ -1,3 +1,13 @@
+# Esteria Stock v8 — output-path update pending
+
+The latest owner bundle `Esteria-support-1793558417807.zip` reports `map_extractor` exit 1 while creating its DBC output directory. The native extractor silently truncates its `-o` argument to 127 characters, cutting off the staging path before `/data`; its generic permissions message describes a nonexistent truncated parent. This attempt records no new low-memory exit, about 8.6 GB available and no active memory pressure.
+
+V8 passes `-o .` inside the already-created, verified private phase working directory. This keeps extraction output in that same directory without a long native path argument. The v7 native data runtime and source/debug companion remain unchanged; client/server/Eluna pins, archive bounds, provider order and memory controls remain active. Preserve the completed import, app data, databases and saves.
+
+Focused adapter/storage/I/O checks passed 51 tests without skips; restoring the old absolute argument failed the long-path regression. Actual shipped-extractor output creation, complete APK, Android/native SQL checks, signing and public download verification remain release gates. No v8 APK is published at this checkpoint. Actual Thor preparation/world entry and gameplay remain unqualified.
+
+## Published v7 baseline — historical
+
 # Esteria Stock v7 — bounded extraction update published
 
 [Signed ARM64 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.7/Esteria-Stock-3.3.5a-arm64.apk) · [Testing procedure](NON-CUSTOM-TESTING.md).

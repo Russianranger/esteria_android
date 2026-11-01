@@ -6,6 +6,9 @@ on:
     paths:
       - .github/workflows/server-installation-native.yml
       - app/build.gradle
+      - tools/qualify_extractor_output.py
+      - tests/test_extractor_output_qualification.py
+      - .github/workflows/native-extractor-output.yml
       - app/src/main/java/io/github/russianranger/esteria/runtime/ShaderSetup.java
       - app/src/main/java/io/github/russianranger/esteria/runtime/TurnipReadinessProbe.java
       - app/src/main/java/io/github/russianranger/esteria/runtime/ProotProcess.java

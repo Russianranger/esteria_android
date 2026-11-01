@@ -459,8 +459,11 @@ def _generate(store, game, generation, tools, selection, locale, *, threads=1, t
                     run(name, ['--esteria-order-capabilities'], work, capability_log)
                     require(storage.read(capability_log, 4096).rstrip(b'\n') == CAPABILITY,
                             'ordered extractor capability differs; no stock fallback')
+                # The original extractor truncates -o to 127 bytes. Its private
+                # phase data directory is already the child cwd; use that short
+                # relative destination while keeping full paths for ownership.
                 maps = phase(work, 'maps-dbc-cameras', lambda data, at:
-                    run('map_extractor', [*ordered, '-o', str(data), '-e', '7'], data, at / 'extract.log'))
+                    run('map_extractor', [*ordered, '-o', '.', '-e', '7'], data, at / 'extract.log'))
                 raw = phase(work, 'raw-vmaps', lambda data, at:
                     run('vmap4_extractor', ordered, data, at / 'extract.log'))
                 def assemble(data, at):

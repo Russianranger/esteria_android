@@ -1,0 +1,28 @@
+{
+  "appRevision": "31e306fa0d243e850ccfdfed50fc0d400a2ab577",
+  "bundle": {
+    "bytes": 15824,
+    "name": "Esteria-support-1793558417807.zip",
+    "sha256": "d4c645a3fbfb15f2acd022a0de83ea3ad225a944ae808f33034cc27adb794934"
+  },
+  "completeOwnerPhasePathKnown": false,
+  "correction": "Use short relative output . while keeping the existing verified private phase/data working directory.",
+  "errorPath": "/work/server-data/staging/3cd8a91f8bb1f663af00384414a6810a9f643d8464a2bc4868162e36c12c1901/maps-dbc-cameras-d4e429ae53d9471989c/dbc/",
+  "exitStatus": 1,
+  "expectedPhaseDataSuffixTruncated": true,
+  "failedWorker": "map_extractor",
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "importPreserved": true,
+  "legacyOutputBufferBytes": 128,
+  "nativeDataToolsArchiveUnchanged": true,
+  "newLowMemoryExitRecorded": false,
+  "observedOutputPrefixBytes": 127,
+  "ownerDataSupplied": false,
+  "preparationMemoryAvailableBytes": 8626307072,
+  "preparationMemoryLow": false,
+  "rootCause": "Legacy -o argument uses a 128-byte buffer and silently truncates the long absolute phase data path before directory creation.",
+  "scope": "owner-v7-map-output-argument-truncation",
+  "thorQualified": false,
+  "worldPreparationQualified": false
+}

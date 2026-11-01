@@ -49,6 +49,7 @@ class ServerDataGenerationTests(unittest.TestCase):
         log.write_text('synthetic storage fixture\n')
         if name == 'map_extractor':
             self.assertEqual(command[command.index('-e') + 1], '7')
+            self.assertEqual(command[command.index('-o') + 1], '.')
             self.assertIn('--esteria-order', command)
             self.assertNotIn('-i', command)
             for name in ('maps', 'dbc', 'Cameras'):
@@ -152,6 +153,35 @@ class ServerDataGenerationTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'prepared server data changed'):
                 self.generate()
         self.assertEqual(len(self.calls), 6)
+
+    def test_long_private_phase_uses_short_output_in_existing_data_cwd(self):
+        self.store = self.root / 'private-runtime-state' / ('s' * 64) / 'server-data'
+        observed = []
+        def capture(command, cwd, log, timeout, **kwargs):
+            if Path(command[0]).name == 'map_extractor' and '-e' in command:
+                # Exercise the actual generation/phase path, including the
+                # 64-byte generation and fresh UUID, rather than a short fixture.
+                self.assertGreater(len(os.fsencode(cwd)), 127)
+                self.assertEqual(cwd.name, 'data')
+                self.assertTrue(cwd.is_dir())
+                self.assertFalse(cwd.is_symlink())
+                self.assertEqual(cwd.parent.parent.parent, self.store / 'staging')
+                output = command[command.index('-o') + 1]
+                self.assertEqual(output, '.')
+                self.assertFalse(Path(output).is_absolute())
+                self.assertEqual((cwd / output).resolve(), cwd.resolve())
+                observed.append(cwd)
+            self.fake_execute(command, cwd, log, timeout, **kwargs)
+        with patch.object(data, 'execute', side_effect=capture):
+            receipt = self.generate()
+        self.assertEqual(len(observed), 1)
+        completed = list((self.store / 'staging').glob('*/maps-dbc-cameras-complete/data'))
+        self.assertEqual(len(completed), 1)
+        self.assertTrue((completed[0] / 'dbc/Map.dbc').is_file())
+        self.assertEqual((self.store / 'current').read_text(), receipt['generation'] + '\n')
+        # Format-only synthetic storage coverage; no native conversion claim.
+        self.assertFalse(receipt['worldQualified'])
+        self.assertFalse(receipt['gameplayQualified'])
 
     def test_changed_cached_preflight_is_refused(self):
         with patch.object(data, 'execute', side_effect=self.fake_execute):

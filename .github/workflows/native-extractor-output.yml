@@ -1,0 +1,86 @@
+name: Native extractor output path and DBC conversion
+on:
+  workflow_dispatch:
+  push:
+    branches: [non-custom]
+    paths:
+      - .github/workflows/native-extractor-output.yml
+      - app/build.gradle
+      - runtime/server_data_generation.py
+      - runtime/world_io.py
+      - tools/qualify_extractor_output.py
+      - tests/test_extractor_output_qualification.py
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: native-extractor-output-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  output-probe:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/non-custom' && !(github.event_name == 'push' && contains(github.event.head_commit.message, '[publish detached non-custom]'))
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check output qualification guards before real native execution
+        run: |
+          test "$(uname -m)" = aarch64
+          python3 -m unittest tests.test_extractor_output_qualification tests.test_server_data_generation -v
+          mkdir -p out/native-output-evidence out/native-output-state
+      - name: Restore and fully verify the unchanged v7 data tools and complete source/debug
+        run: |
+          env -u GITHUB_TOKEN -u GH_TOKEN python3 tools/prepare_data_tools_provider.py acquire --output out/output-inputs > out/native-output-evidence/provider-acquisition.log 2>&1
+          python3 tools/prepare_data_tools_provider.py build --inputs out/output-inputs --output out/output-providers > out/native-output-evidence/provider-build.log 2>&1
+          rm -rf out/output-inputs
+      - name: Construct and read back the exact ARM64 Ubuntu reference without APT
+        run: |
+          env -u GITHUB_TOKEN -u GH_TOKEN python3 tools/release_server_dependencies.py prepare --output out/output-dependencies > out/native-output-evidence/dependency-download.log 2>&1
+          python3 tools/prepare_server_dependency_image.py --inputs out/output-dependencies --output out/output-image > out/native-output-evidence/image-context.log 2>&1
+          rm -rf out/output-dependencies
+          docker build --network none --platform linux/arm64 -t esteria-native-output:verified out/output-image/context > out/native-output-evidence/image-build.log 2>&1
+          docker run --rm --network none --read-only \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/tools/verify_server_dependency_image.py,dst=/verify-image.py,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/output-image/context-receipt.json,dst=/context-receipt.json,readonly" \
+            esteria-native-output:verified python3 /verify-image.py --context-receipt /context-receipt.json > out/native-output-evidence/dependency-image-check.json
+      - name: Reproduce the old truncation and extract real synthetic DBCs with relative output
+        run: |
+          image_check=$(sha256sum out/native-output-evidence/dependency-image-check.json | cut -d' ' -f1)
+          docker run --rm --init --network none --read-only --user "$(id -u):$(id -g)" \
+            --tmpfs "/tmp:rw,nosuid,nodev,size=128m,uid=$(id -u),gid=$(id -g),mode=0700" \
+            --env PYTHONDONTWRITEBYTECODE=1 \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/native-output-state,dst=/state" \
+            --workdir /qualification esteria-native-output:verified python3 tools/qualify_extractor_output.py \
+            --provider /qualification/out/output-providers/provider --output /state/probe \
+            --source-revision "$GITHUB_SHA" \
+            --reference-image-check /qualification/out/native-output-evidence/dependency-image-check.json \
+            --reference-image-check-sha256 "$image_check" > out/native-output-evidence/native-output.log 2>&1
+      - name: Retain only bounded conversion receipt and case logs
+        if: always()
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import shutil
+          source=Path('out/native-output-state/probe');target=Path('out/native-output-evidence')
+          for name in ('native-output.json','legacyAbsolute.log','relativeFresh.log','relativeExisting.log'):
+              path=source/name
+              if path.is_file() and not path.is_symlink() and path.stat().st_size<=128<<10:
+                  shutil.copyfile(path,target/name)
+          PY
+      - name: Retain exact native output proof without owner game data
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: native-extractor-output-evidence-${{ github.sha }}
+          path: |
+            out/native-output-evidence/native-output.json
+            out/native-output-evidence/legacyAbsolute.log
+            out/native-output-evidence/relativeFresh.log
+            out/native-output-evidence/relativeExisting.log
+            out/native-output-evidence/dependency-image-check.json
+          if-no-files-found: warn
+          retention-days: 30
+

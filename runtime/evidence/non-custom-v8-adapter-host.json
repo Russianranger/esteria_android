@@ -1,0 +1,39 @@
+{
+  "actualNativeConversionExecuted": false,
+  "androidArm64Qualified": false,
+  "childCwdRemainsFullCanonicalPrivateDataDirectory": true,
+  "errors": 0,
+  "failures": 0,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "longPhasePathExceedsLegacy127ByteOutputLimit": true,
+  "mapOutputOperand": ".",
+  "mutationExpectedFailures": 1,
+  "mutationLog": {
+    "bytes": 3721,
+    "sha256": "fa3c1834bb09775b53401425943873961443a43fc31d41bb3b90401f2d001a27"
+  },
+  "mutationTestsRun": 1,
+  "ownerGameAssetsSupplied": false,
+  "priorAbsoluteArgumentMutationRejected": true,
+  "scope": "host-runtime-data-adapter-short-output-and-private-phase-regression",
+  "seconds": 4.715,
+  "sources": {
+    "runtime/server_data_generation.py": {
+      "bytes": 32387,
+      "sha256": "0e3f305cd0d1b2659b6a095529d53db3c15394337169af4740e2f45bae1ed3d3"
+    },
+    "tests/test_server_data_generation.py": {
+      "bytes": 18794,
+      "sha256": "09996eb796fff24f1bcb1ce2adcfcdf294af62cf625d61ef24ed0b42cb94518e"
+    }
+  },
+  "testLog": {
+    "bytes": 9898,
+    "sha256": "3472fe96dc6a2043f7a2149721f4829a77a406065d338990b3a851ad2fa7b258"
+  },
+  "testsPassed": 51,
+  "testsRun": 51,
+  "testsSkipped": 0,
+  "thorQualified": false
+}
