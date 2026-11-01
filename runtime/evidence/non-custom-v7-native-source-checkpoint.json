@@ -6,7 +6,12 @@
     "sha256": "9a6b5f48a56ac82623f2965724ac1d4fac9b4bd304ddb81a85c4894486f8694e"
   },
   "appRevision": "bad963b8ae2edd0c8bcfe0db852ac4557f1cc700",
-  "derivedNativeCliPending": true,
+  "derivedNativeCliPassed": true,
+  "derivedNativeCliPending": false,
+  "derivedNativeEvidence": "runtime/evidence/non-custom-v7-data-tools-native.json",
+  "derivedNativeJobId": 124914647426,
+  "derivedNativeRunId": 41328868562,
+  "derivedPackageJobId": 124914523335,
   "formatVersion": 1,
   "gameplayQualified": false,
   "intermediateTooling": {

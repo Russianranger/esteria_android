@@ -2,33 +2,33 @@
   "androidRuntimeQualified": false,
   "artifacts": {
     "native": {
-      "bytes": 19822,
-      "id": 13000058168,
-      "integrationRevision": "64dd9bcba52c448f07dcbe2ff0e407d41484ad4f",
+      "bytes": 20289,
+      "id": 13091963388,
+      "integrationRevision": "8d016467af4d23ab88303ed8ec877f28334e1049",
       "members": {
         "lookup-result.json": {
-          "bytes": 3001,
-          "sha256": "77a154490cd9278a2146f763485243259bda75fc1ab28300894c8701777d8b08",
+          "bytes": 3485,
+          "sha256": "16fe58cc870a72c3c65756fa58f3b33463dc5fd482c62926ab7990e63447eefd",
           "target": "native/lookup-result.json"
         },
         "native-cli-phase.json": {
           "bytes": 5270,
-          "sha256": "8f1bc2fdf7cb22985ae260ab2f87cd77c0e75f6b738607c6187c0c61f71753ce",
+          "sha256": "2a481f5d2bd9ba1f53d03459216b6a667f0cc50d6c90eed288dc257710bdc542",
           "target": "native/native-cli-phase.json"
         },
         "native-cli.json": {
-          "bytes": 9904,
-          "sha256": "cf339ae140e65702b2e9d977c668db2f432a6ad1904d3d16a4697a7755de47ae",
+          "bytes": 10389,
+          "sha256": "b716c91ac1f4fa56477113207598095144eda2c08f2a52d1f9d535ceb637fdcc",
           "target": "native/native-cli.json"
         }
       },
-      "sha256": "3607411cb00c93e574ebe429fc840cfb113ca99be9431dc6b9b71b2626fbd147",
-      "workflowRun": 41103915829
+      "sha256": "66da8911ad3f175906d194fb99ad85c9ac5b73abde5d5e2d458a075e7045d74c",
+      "workflowRun": 41328868562
     },
     "package": {
-      "bytes": 131080114,
-      "id": 13000131588,
-      "integrationRevision": "64dd9bcba52c448f07dcbe2ff0e407d41484ad4f",
+      "bytes": 131937309,
+      "id": 13092119371,
+      "integrationRevision": "8d016467af4d23ab88303ed8ec877f28334e1049",
       "members": {
         "data-tools-inputs/stock-debug/stock-extractors-debug-arm64.tar.gz": {
           "bytes": 25375231,
@@ -37,42 +37,42 @@
         },
         "data-tools-package/dependency-observation.json": {
           "bytes": 3571508,
-          "sha256": "229eea9562dd96230e7d8581b4faa4c03cadac9dcf89f2191fe25b226752927e",
+          "sha256": "478aa936b9742b0f585220b65d319fd3d52ac81ff6f85de3570541e60d217561",
           "target": "package/dependency-observation.json"
         },
         "data-tools-package/native-ordered-build.json": {
-          "bytes": 35935,
-          "sha256": "be05f185c75d20bbcc79374ff4df5f1fa79e90252a9cafd532f4084ebaa60edf",
+          "bytes": 35934,
+          "sha256": "4f2388644d9507ff06e22219cb180df78b6bdc57eeadff4e3e814b6ff69602a3",
           "target": "package/native-ordered-build.json"
         },
         "data-tools-package/ordered-extractor-complete-sources.tar.gz": {
-          "bytes": 63802409,
-          "sha256": "5fb68b3d204a50c6573857a63192aeff3c92733def9ec69348998624b5571786",
+          "bytes": 64313120,
+          "sha256": "fa7baf936d6b749871dd232121cfbdd5b81579aa01e35c04b8ee2b6627d7c0b3",
           "target": "package/ordered-extractor-complete-sources.tar.gz"
         },
         "data-tools-package/ordered-extractors-debug-arm64.tar.gz": {
-          "bytes": 8622984,
-          "sha256": "bef970ea2743836bfdf7c27a2302f7c178cebec1984b569edeb21b5cfca18bf3",
+          "bytes": 8901659,
+          "sha256": "0d633c17dac2786121682d4c268e028c349e0bfffebed15b88697690b1e60b34",
           "target": "package/ordered-extractors-debug-arm64.tar.gz"
         },
         "data-tools-package/ordered-source-receipt.json": {
-          "bytes": 1180783,
-          "sha256": "1cbf3a0d25980a3a4785ce7ee50a6de061b6d20875d364a4ae3c8d3c43656149",
+          "bytes": 1210032,
+          "sha256": "6b83cd456c040f5a28d5d28d93ecbc5d2af2765ee985d41ae23f472ae4bb9c08",
           "target": "package/ordered-source-receipt.json"
         },
         "data-tools-package/ordered-strip-receipt.json": {
-          "bytes": 68349,
-          "sha256": "17b9f68de8fc28397204f688d4ae438655c03914ea1afe2b24a5ae736ba4d338",
+          "bytes": 82608,
+          "sha256": "ef5bde16057379b881bc230faa1274425f3e8546c3f6f8f10f3d5d9be8bbc856",
           "target": "package/ordered-strip-receipt.json"
         },
         "data-tools-package/package-receipt.json": {
-          "bytes": 60159,
-          "sha256": "25d87f1f20f74f6bed041a6a06de235fe0f5e50f56bcdbe11bf2e56ab9fd44c0",
+          "bytes": 73031,
+          "sha256": "f7f09057421d26c7c6b95643c504182c42aa9edb1b6f715aafdc3c15420b1030",
           "target": "package/package-receipt.json"
         },
         "data-tools-package/server-data-tools-runtime-arm64.tar.gz": {
-          "bytes": 2902474,
-          "sha256": "21ce4e1b9a4ff054df4a781cf6b83f37149ab941014d2759f33d93bbfebf231b",
+          "bytes": 2913905,
+          "sha256": "e80d1d731902907297ae89f68d8241bca0aa79b8a281521c669353654ce5b436",
           "target": "package/server-data-tools-runtime-arm64.tar.gz"
         },
         "data-tools-package/stock-package-receipt.json": {
@@ -81,16 +81,16 @@
           "target": "package/stock-package-receipt.json"
         }
       },
-      "sha256": "26a0e897720e3700eea7bbda211c77b15a2072e8decae5a784510fae77dd6fa2",
-      "workflowRun": 41103915829
+      "sha256": "40f5aff200e1f41f7c7affe52c6888aae4cc5284c2368d94a04c6741149b9d11",
+      "workflowRun": 41328868562
     }
   },
   "clientMpqConversionQualified": false,
   "formatVersion": 1,
   "gameplayQualified": false,
   "providerInputLock": {
-    "bytes": 26660,
-    "sha256": "bd3e7039b75eed0c4d09e578f6b9bb5f625543529b1181e3383d5cef6f3a2970"
+    "bytes": 26661,
+    "sha256": "163e8ff6baeec763649346ac88eb3ad380bb3e49757379c8fe039e2287ee786a"
   },
   "scope": "exact-actual-composed-data-tools-provider-inputs"
 }

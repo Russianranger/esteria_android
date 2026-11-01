@@ -14,7 +14,14 @@ class QualifiedDataToolsInputs(unittest.TestCase):
         pin=inputs.load_pin()
         self.assertEqual(pin['providerInputLock'],inputs.files.identity(inputs.provider.LOCK))
         package=pin['artifacts']['package'];native=pin['artifacts']['native']
-        self.assertEqual(package['workflowRun'],41103915829)
+        retained=json.loads((inputs.ROOT/'runtime/evidence/non-custom-v7-data-tools-native.json').read_text())
+        self.assertEqual(retained['scope'],'actual-v7-composed-native-data-tools-and-full-artifact-readback')
+        self.assertEqual(package['workflowRun'],retained['runId'])
+        self.assertEqual(native['workflowRun'],retained['runId'])
+        self.assertEqual(package['integrationRevision'],retained['appRevision'])
+        self.assertEqual(native['integrationRevision'],retained['appRevision'])
+        self.assertEqual(retained['nativeCliReceipt']['identity'],
+            inputs.provider.load_pin(sealed=True)['nativeCliReceipt'])
         self.assertEqual(len(package['members']),10);self.assertEqual(len(native['members']),3)
         self.assertEqual(package['members']['data-tools-package/server-data-tools-runtime-arm64.tar.gz']['sha256'],
             inputs.provider.load_pin(sealed=True)['archive']['sha256'])

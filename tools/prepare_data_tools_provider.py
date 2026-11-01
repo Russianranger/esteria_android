@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Acquire the exact qualified data4 provider inputs; do not rebuild the server.
 
-Source and paired-debug archives stay outside Android assets. This reads pinned
-Actions artifacts through the supported authenticated GitHub API. Their expiry
-must be resolved by durable preservation before a final user package is released.
+Source and paired-debug archives stay outside Android assets. Published updates
+use the exact durably preserved ZIPs after complete anonymous source/debug
+readback. Unpublished inputs retain the pinned authenticated Actions route.
 """
 from __future__ import annotations
 import argparse
@@ -74,16 +74,23 @@ def load_pin():
 
 
 def acquire(output,api=None):
-    pin=load_pin();output=Path(os.path.abspath(output));archives.directory(output.parent,create=True)
+    pin=load_pin()
+    from tools import publish_data_tools_update as public
+    published=public.public_selection(pin)
+    output=Path(os.path.abspath(output));archives.directory(output.parent,create=True)
     require(not os.path.lexists(output),'existing-qualified-data-tools-inputs-preserved')
     require(shutil.disk_usage(output.parent).free>=1<<30,'qualified-data-tools-acquisition-requires-1-GiB-free')
-    api=api or remote.Github(os.environ.get('GITHUB_TOKEN'));output.mkdir(mode=0o700)
-    for name,row in pin['artifacts'].items():
-        transfer.verify_remote(api,row);path=output/(name+'.zip')
-        api.download(remote.API+'/actions/artifacts/'+str(row['id'])+'/zip',path,row)
-        transfer.extract_selected(path,output,row);path.unlink()
-    proof=dict(formatVersion=1,scope='exact-qualified-data-tools-provider-input-readback',inputLock=files.identity(LOCK),
-        everySelectedInputHashVerified=True,serverRebuilt=False,androidRuntimeQualified=False,gameplayQualified=False)
+    output.mkdir(mode=0o700)
+    if published is not None:
+        proof=public.acquire_public(pin,output,published)
+    else:
+        api=api or remote.Github(os.environ.get('GITHUB_TOKEN'))
+        for name,row in pin['artifacts'].items():
+            transfer.verify_remote(api,row);path=output/(name+'.zip')
+            api.download(remote.API+'/actions/artifacts/'+str(row['id'])+'/zip',path,row)
+            transfer.extract_selected(path,output,row);path.unlink()
+        proof=dict(formatVersion=1,scope='exact-qualified-data-tools-provider-input-readback',inputLock=files.identity(LOCK),
+            everySelectedInputHashVerified=True,serverRebuilt=False,androidRuntimeQualified=False,gameplayQualified=False)
     engine.put_metadata(output/'acquisition.json',proof);return proof
 
 

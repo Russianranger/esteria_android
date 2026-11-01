@@ -202,5 +202,47 @@ class PublicLocalServerProfile(unittest.TestCase):
         self.assertEqual(set(result['currentProviderAdmission']), {'programs', 'data-tools', 'content', 'extractors'})
         self.assertTrue((self.root / 'download/acquisition.json').is_file())
 
+    def test_separate_data_update_keeps_old_data_under_its_frozen_verifier(self):
+        lock, source, _ = self.recipe(); _, expected = self.publish(lock)
+        chosen = consumer.selection(self.app)
+        chosen['dataToolsUpdate'] = {'testOnlyExplicitUpdate': True}
+        historical = dict(providerVerified=True, sourceCompanionVerified=True,
+            pairedDebugVerified=True, nativeArgumentConfigQualified=True,
+            **{name: False for name in release.data_provider.FALSE_FLAGS})
+        restored = dict(scope='public-local-server-provider-directories-restored',
+            selectedInputs=lock['selectedInputs'], providers={'data-tools': historical},
+            actionsArtifactsUsed=False, completeOriginalSourceAndPairedDebugVerified=True,
+            **{name: False for name in release.FALSE_FLAGS})
+        admissions = {name: mock.Mock(return_value={'testOnlyProviderVerified': True})
+            for name in release.BUNDLES}
+        bundles = {name: (relative, admissions[name]) for name, (relative, _) in release.BUNDLES.items()}
+        with mock.patch.object(consumer, 'selection', return_value=chosen), \
+                mock.patch.object(consumer, 'run_frozen', side_effect=[expected, restored]), \
+                mock.patch.dict(release.BUNDLES, bundles, clear=True):
+            result = consumer.acquire(source, self.root / 'download', self.root / 'providers', self.app)
+        admissions['server-data-tools-provider.tar.gz'].assert_not_called()
+        for name, admission in admissions.items():
+            if name != 'server-data-tools-provider.tar.gz': admission.assert_called_once()
+        data = result['currentProviderAdmission']['data-tools']
+        self.assertEqual(data['baselineFrozenAdmission'], historical)
+        self.assertEqual(data['currentDataToolsUpdate'], chosen['dataToolsUpdate'])
+        self.assertIs(data['selectedForApk'], False)
+
+    def test_data_update_cannot_replace_a_missing_frozen_source_debug_proof(self):
+        lock, source, _ = self.recipe(); _, expected = self.publish(lock)
+        chosen = consumer.selection(self.app)
+        chosen['dataToolsUpdate'] = {'testOnlyExplicitUpdate': True}
+        restored = dict(scope='public-local-server-provider-directories-restored',
+            selectedInputs=lock['selectedInputs'], providers={'data-tools': {}},
+            actionsArtifactsUsed=False, completeOriginalSourceAndPairedDebugVerified=True,
+            **{name: False for name in release.FALSE_FLAGS})
+        admission = mock.Mock(return_value={})
+        bundles = {name: (relative, admission) for name, (relative, _) in release.BUNDLES.items()}
+        with mock.patch.object(consumer, 'selection', return_value=chosen), \
+                mock.patch.object(consumer, 'run_frozen', side_effect=[expected, restored]), \
+                mock.patch.dict(release.BUNDLES, bundles, clear=True), \
+                self.assertRaisesRegex(ValueError, 'frozen-original-data-provider-proof-required'):
+            consumer.acquire(source, self.root / 'download', self.root / 'providers', self.app)
+
 
 if __name__ == '__main__': unittest.main()

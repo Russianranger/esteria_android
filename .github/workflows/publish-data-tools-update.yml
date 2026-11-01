@@ -1,0 +1,50 @@
+name: Preserve qualified v7 data tools and complete sources
+on:
+  workflow_dispatch:
+  push:
+    branches: [non-custom]
+    paths:
+      - runtime/server/data-tools-publication/**
+      - tools/publish_data_tools_update.py
+      - tools/prepare_data_tools_provider.py
+      - tests/test_data_tools_publication.py
+      - .github/workflows/publish-data-tools-update.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: publish-non-custom-data-tools-v7
+  cancel-in-progress: false
+jobs:
+  preserve:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/non-custom' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[publish data tools update]'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check exact input and additive publication guards
+        run: |
+          python3 -m py_compile tools/publish_data_tools_update.py tools/prepare_data_tools_provider.py
+          python3 -m unittest tests.test_data_tools_publication -v
+      - name: Recheck genuine native inputs, complete sources and debug, publish and anonymously read back
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/publish_data_tools_update.py stage --output out/data-tools-publication --publish
+      - name: Retain bounded publication and full public readback receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: data-tools-publication-${{ github.sha }}
+          path: |
+            out/data-tools-publication/stage.json
+            out/data-tools-publication/publication-draft.json
+            out/data-tools-publication/published-release.json
+            out/data-tools-publication/public-source-readback.json
+          if-no-files-found: warn
+          retention-days: 30

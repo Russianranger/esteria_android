@@ -1,0 +1,109 @@
+{
+  "androidRuntimeQualified": false,
+  "artifacts": {
+    "native": {
+      "bytes": 20289,
+      "id": 13091963388,
+      "integrationRevision": "8d016467af4d23ab88303ed8ec877f28334e1049",
+      "members": {
+        "lookup-result.json": {
+          "bytes": 3485,
+          "sha256": "16fe58cc870a72c3c65756fa58f3b33463dc5fd482c62926ab7990e63447eefd",
+          "target": "native/lookup-result.json"
+        },
+        "native-cli-phase.json": {
+          "bytes": 5270,
+          "sha256": "2a481f5d2bd9ba1f53d03459216b6a667f0cc50d6c90eed288dc257710bdc542",
+          "target": "native/native-cli-phase.json"
+        },
+        "native-cli.json": {
+          "bytes": 10389,
+          "sha256": "b716c91ac1f4fa56477113207598095144eda2c08f2a52d1f9d535ceb637fdcc",
+          "target": "native/native-cli.json"
+        }
+      },
+      "sha256": "66da8911ad3f175906d194fb99ad85c9ac5b73abde5d5e2d458a075e7045d74c",
+      "workflowRun": 41328868562
+    },
+    "package": {
+      "bytes": 131937309,
+      "id": 13092119371,
+      "integrationRevision": "8d016467af4d23ab88303ed8ec877f28334e1049",
+      "members": {
+        "data-tools-inputs/stock-debug/stock-extractors-debug-arm64.tar.gz": {
+          "bytes": 25375231,
+          "sha256": "40e7880bc1ac15391cb63cf61bdc58fb5b90f267f7b93fdf65966a3a0deb7a10",
+          "target": "stock-debug/stock-extractors-debug-arm64.tar.gz"
+        },
+        "data-tools-package/dependency-observation.json": {
+          "bytes": 3571508,
+          "sha256": "478aa936b9742b0f585220b65d319fd3d52ac81ff6f85de3570541e60d217561",
+          "target": "package/dependency-observation.json"
+        },
+        "data-tools-package/native-ordered-build.json": {
+          "bytes": 35934,
+          "sha256": "4f2388644d9507ff06e22219cb180df78b6bdc57eeadff4e3e814b6ff69602a3",
+          "target": "package/native-ordered-build.json"
+        },
+        "data-tools-package/ordered-extractor-complete-sources.tar.gz": {
+          "bytes": 64313120,
+          "sha256": "fa7baf936d6b749871dd232121cfbdd5b81579aa01e35c04b8ee2b6627d7c0b3",
+          "target": "package/ordered-extractor-complete-sources.tar.gz"
+        },
+        "data-tools-package/ordered-extractors-debug-arm64.tar.gz": {
+          "bytes": 8901659,
+          "sha256": "0d633c17dac2786121682d4c268e028c349e0bfffebed15b88697690b1e60b34",
+          "target": "package/ordered-extractors-debug-arm64.tar.gz"
+        },
+        "data-tools-package/ordered-source-receipt.json": {
+          "bytes": 1210032,
+          "sha256": "6b83cd456c040f5a28d5d28d93ecbc5d2af2765ee985d41ae23f472ae4bb9c08",
+          "target": "package/ordered-source-receipt.json"
+        },
+        "data-tools-package/ordered-strip-receipt.json": {
+          "bytes": 82608,
+          "sha256": "ef5bde16057379b881bc230faa1274425f3e8546c3f6f8f10f3d5d9be8bbc856",
+          "target": "package/ordered-strip-receipt.json"
+        },
+        "data-tools-package/package-receipt.json": {
+          "bytes": 73031,
+          "sha256": "f7f09057421d26c7c6b95643c504182c42aa9edb1b6f715aafdc3c15420b1030",
+          "target": "package/package-receipt.json"
+        },
+        "data-tools-package/server-data-tools-runtime-arm64.tar.gz": {
+          "bytes": 2913905,
+          "sha256": "e80d1d731902907297ae89f68d8241bca0aa79b8a281521c669353654ce5b436",
+          "target": "package/server-data-tools-runtime-arm64.tar.gz"
+        },
+        "data-tools-package/stock-package-receipt.json": {
+          "bytes": 70343,
+          "sha256": "ec9252de82070bd0dd3bb436562b477bb03903ae9ae47132ec9f82ed5a861b1f",
+          "target": "package/stock-package-receipt.json"
+        }
+      },
+      "sha256": "40f5aff200e1f41f7c7affe52c6888aae4cc5284c2368d94a04c6741149b9d11",
+      "workflowRun": 41328868562
+    }
+  },
+  "extractorExecutedHere": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "nativeJobId": 124914647426,
+  "ownerGameDataSupplied": false,
+  "packageJobId": 124914523335,
+  "repository": "Russianranger/esteria_android",
+  "scope": "exact-qualified-data-tools-source-debug-write-once-release",
+  "selectedInputs": {
+    "providerInputLock": {
+      "bytes": 26661,
+      "sha256": "163e8ff6baeec763649346ac88eb3ad380bb3e49757379c8fe039e2287ee786a"
+    },
+    "qualifiedInputLock": {
+      "bytes": 4062,
+      "sha256": "56e8e89de2d3a300bc7abe3fbda1095dbf66e0cf495f569482b474ccaa5a56fe"
+    }
+  },
+  "tag": "non-custom-data-tools-v7",
+  "targetCommit": "8d016467af4d23ab88303ed8ec877f28334e1049",
+  "workflowRun": 41328868562
+}

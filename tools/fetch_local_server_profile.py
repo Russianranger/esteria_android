@@ -20,6 +20,7 @@ import tempfile
 
 if not __package__: sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from tools import release_local_server_components as release
+from tools import select_updated_data_tools as data_update
 
 ROOT = release.ROOT
 DIRECTORY = 'runtime/server-components-publication'
@@ -43,9 +44,12 @@ def measured_lock(path):
         require(all(lock[key] is None for key in ('targetCommit', 'ownedDraftReleaseId', 'selectedInputs',
             'recipeInputs', 'files')), 'public-server-profile-pending-selection')
         return lock
+    current_inputs = release.selected_inputs()
+    updated = data_update.selection(path, lock.get('selectedInputs'), current_inputs,
+                                    root=Path(path).parent.parent.parent)
     require(lock['state'] in ('measured-unbound', 'owned-draft-bound') and
         re.fullmatch('[0-9a-f]{40}', lock.get('targetCommit') or '') and
-        lock['selectedInputs'] == release.selected_inputs() and
+        (lock['selectedInputs'] == current_inputs or updated is not None) and
         type(lock['files']) is dict and set(lock['files']) == release.PAYLOAD,
         'public-server-profile-measured-source-selection')
     release.validate_inventory(lock['recipeInputs'], release.MAX_RECIPE)
@@ -110,11 +114,14 @@ def selection(root=ROOT):
         readback['allStoredBytesReadBack'] is True and readback['completeOriginalSourceAndPairedDebugVerified'] is True and
         readback['actionsArtifactsUsed'] is False and all(readback[name] is False for name in release.FALSE_FLAGS),
         'public-server-profile-anonymous-full-source-readback-required')
-    return dict(formatVersion=1, scope='local-game-server-input-selection', source='public-release',
+    result = dict(formatVersion=1, scope='local-game-server-input-selection', source='public-release',
         recipeRevision=lock['targetCommit'], releaseId=lock['ownedDraftReleaseId'], publicationReceiptsPresent=True,
         releaseSelection=release.identity(lock_path), publicationReceipt=release.identity(receipt_paths[0]),
         publicSourceReadback=release.identity(receipt_paths[1]), assets=expected,
         runtimeQualified=False, gameplayQualified=False)
+    updated = data_update.selection(lock_path, lock['selectedInputs'], release.selected_inputs(), root)
+    if updated is not None: result['dataToolsUpdate'] = updated
+    return result
 
 
 def wrapper_attributes(source):
@@ -206,7 +213,21 @@ def acquire(source, output, providers, root=ROOT):
     actual = {}
     for asset, (_, verifier) in release.BUNDLES.items():
         name = release.CONSUMER_DIRECTORIES[asset]
-        actual[name] = verifier(providers / name)
+        if name == 'data-tools' and 'dataToolsUpdate' in chosen:
+            # The frozen consumer checked every old source/debug/runtime byte.
+            # Current admission selects a different measured data provider; do
+            # not interpret this historical directory through that new pin.
+            historical = restored.get('providers', {}).get(name, {})
+            require(all(historical.get(key) is True for key in
+                ('providerVerified', 'sourceCompanionVerified', 'pairedDebugVerified',
+                 'nativeArgumentConfigQualified')) and
+                all(historical.get(key) is False for key in
+                    release.data_provider.FALSE_FLAGS),
+                'public-server-profile-frozen-original-data-provider-proof-required')
+            actual[name] = dict(baselineFrozenAdmission=historical,
+                currentDataToolsUpdate=chosen['dataToolsUpdate'], selectedForApk=False)
+        else:
+            actual[name] = verifier(providers / name)
     # A later source checkout cannot quietly reinterpret a historical provider.
     require(selection(root) == chosen, 'public-server-profile-selection-changed-during-acquisition')
     receipt = dict(formatVersion=1, scope='public-local-game-server-provider-acquisition', selection=chosen,

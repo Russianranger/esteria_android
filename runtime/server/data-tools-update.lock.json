@@ -1,0 +1,55 @@
+{
+  "androidRuntimeQualified": false,
+  "baselineInputs": {
+    "runtime/server/data-tools-provider.lock.json": {
+      "bytes": 26660,
+      "sha256": "bd3e7039b75eed0c4d09e578f6b9bb5f625543529b1181e3383d5cef6f3a2970"
+    },
+    "runtime/server/data-tools-qualified-artifacts.lock.json": {
+      "bytes": 4061,
+      "sha256": "49eac3b56d8986772fdf6f29221f5fa3935fc3a08c0a04d27a38f55dfcccc616"
+    }
+  },
+  "baselineReleaseLock": {
+    "bytes": 178915,
+    "sha256": "b8e36e40c522c6191a50e5e56dcc93ac2fb3c1401afa81962c81e715f4a05264"
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "nativeInputLock": {
+    "bytes": 3391,
+    "sha256": "f3bd31f9667bac5f068af10681c9e881f52d88d7d6bee18205dd4a9966c0c9e0"
+  },
+  "oldPublicProviderReinterpreted": false,
+  "orderedSourceQualification": {
+    "archive": {
+      "bytes": 64313120,
+      "sha256": "fa7baf936d6b749871dd232121cfbdd5b81579aa01e35c04b8ee2b6627d7c0b3"
+    },
+    "dependencyObservation": {
+      "bytes": 3571508,
+      "sha256": "478aa936b9742b0f585220b65d319fd3d52ac81ff6f85de3570541e60d217561"
+    },
+    "nativeBuild": {
+      "bytes": 35934,
+      "sha256": "4f2388644d9507ff06e22219cb180df78b6bdc57eeadff4e3e814b6ff69602a3"
+    },
+    "receipt": {
+      "bytes": 1210032,
+      "sha256": "6b83cd456c040f5a28d5d28d93ecbc5d2af2765ee985d41ae23f472ae4bb9c08"
+    }
+  },
+  "scope": "measured-data-tools-update-over-frozen-local-server-profile",
+  "serverProgramsChanged": false,
+  "state": "source-and-native-qualified",
+  "updatedInputs": {
+    "runtime/server/data-tools-provider.lock.json": {
+      "bytes": 26661,
+      "sha256": "163e8ff6baeec763649346ac88eb3ad380bb3e49757379c8fe039e2287ee786a"
+    },
+    "runtime/server/data-tools-qualified-artifacts.lock.json": {
+      "bytes": 4062,
+      "sha256": "56e8e89de2d3a300bc7abe3fbda1095dbf66e0cf495f569482b474ccaa5a56fe"
+    }
+  }
+}
