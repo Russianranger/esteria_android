@@ -1,0 +1,59 @@
+{
+  "actualTurnipTimingObservationCount": 0,
+  "allArtifactMembersRead": 33,
+  "allComponentSourceIdentitiesMatchedRevision": true,
+  "allComponentSourceIdentityCount": 37,
+  "androidArm64Qualified": false,
+  "appSourceRevision": "a8be6eedd5e31cd4ff3972e6fc4c4096e6faa593",
+  "artifact": {
+    "bytes": 18957,
+    "sha256": "d38f6ce95ea9226175a817a0070ed2bc39c6fe28a062fa9a61d35004b5881c2c"
+  },
+  "artifactId": 13071601030,
+  "artifactRosterVerified": true,
+  "baseHelperAssetFiles": {
+    "data": 6,
+    "installation": 18,
+    "session": 24
+  },
+  "boundary": "Android13 x86_64 synthetic hashing/native-child component test; missing timing observation prevents successful evidence qualification. No PRoot, Vulkan, KGSL, owner game data, ARM64 device or gameplay qualification.",
+  "cause": "Fixture System.out.println output reached logcat rather than am instrument stdout. All 14 tests passed, but the required timing observation was absent; this checkpoint is rejected.",
+  "componentStdout": {
+    "bytes": 15127,
+    "sha256": "a5805b32539a8e0a9728fe20ad06d7f01b3566829adbb34adfec1921713352aa"
+  },
+  "correction": "Test fixture sends the identical observation through Instrumentation.sendStatus(2, Bundle stream), matching existing import stress reporting.",
+  "exactFourteenNamedTestSuccessStatusesVerified": true,
+  "expectedTurnipTimingObservationCount": 1,
+  "failure": "RuntimeError: Expected one actual owned-child Turnip timing regression observation",
+  "folderZipPayloadSha256Matched": true,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "gpuExecuted": false,
+  "jobId": 124757192729,
+  "memorySourceIdentityCount": 28,
+  "namedTests": [
+    "io.github.russianranger.esteria.ImportMemoryStressTest.gibibyteFolderAndNonseekableZipImportsKeepBoundedMemory",
+    "io.github.russianranger.esteria.ImportMemoryStressTest.thousandsOfOpaqueDocumentsStayBoundedAndSourceChecksRemainActive",
+    "io.github.russianranger.esteria.ProcessExitDiagnosticsTest.actualAndroidHistoryQueryIsBoundedToOwnPackage",
+    "io.github.russianranger.esteria.ProcessExitDiagnosticsTest.descriptionsAreBoundedRedactedAndSingleLine",
+    "io.github.russianranger.esteria.ProcessExitDiagnosticsTest.lowMemoryKillJavaOomAndOtherExitsRemainDistinct",
+    "io.github.russianranger.esteria.ImportIoControllerTest.severePressureBlocksWritesAndStopRemainsPrompt",
+    "io.github.russianranger.esteria.ImportIoControllerTest.trimSignalsAndSystemHeadroomSelectTheCorrectPolicy",
+    "io.github.russianranger.esteria.ImportIoControllerTest.controllerPersistsRealSyncCacheAndSystemPressureObservations",
+    "io.github.russianranger.esteria.ImportIoControllerTest.nativeCacheAdvicePreservesSyncedFileBytes",
+    "io.github.russianranger.esteria.WorldPreparationDiagnosticsTest.actualSharedPreferencesXmlRoundTripPreservesOwnedLogRecords",
+    "io.github.russianranger.esteria.WorldPreparationDiagnosticsTest.parentPreparationReadsUseBoundedRealCacheAdviceAndRemainCancellable",
+    "io.github.russianranger.esteria.WorldPreparationDiagnosticsTest.phaseAndRealOwnedChildObservationSurviveDiagnosticReconstruction",
+    "io.github.russianranger.esteria.WorldPreparationDiagnosticsTest.oneInvalidRetainedRolePreservesOtherStrictlyValidatedLogs",
+    "io.github.russianranger.esteria.runtime.TurnipReadinessTimingTest.governedAdmissionDoesNotSpendChildWindowAndFailuresKeepOwnership"
+  ],
+  "releaseQualified": false,
+  "runConclusion": "failure",
+  "runId": 41275653190,
+  "safNamedTestSuccesses": 3,
+  "scope": "rejected-Android13-v6-turnip-timing-observation-transport-checkpoint",
+  "stockShaderNamedTestSuccesses": 2,
+  "stressObservationCount": 3,
+  "thorQualified": false
+}

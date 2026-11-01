@@ -2,6 +2,7 @@ package io.github.russianranger.esteria.runtime;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Bundle;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import io.github.russianranger.esteria.core.importer.ImportIoGovernor;
@@ -178,11 +179,13 @@ public final class TurnipReadinessTimingTest {
             assertTrue(read.invoke(null,receipt) instanceof TurnipProbeContract.Receipt);
             Files.write(receipt,receipt().put("pixelsVerified",4095).toString().getBytes(StandardCharsets.UTF_8));refuseReceipt(read,receipt);
             Files.write(receipt,receipt().put("noKgslHostVerified",true).toString().getBytes(StandardCharsets.UTF_8));refuseReceipt(read,receipt);
-            System.out.println("TURNIP_TIMING_FIXTURE="+new JSONObject().put("scope","android13-owned-turnip-timing-fixture-no-gpu")
+            JSONObject observation=new JSONObject().put("scope","android13-owned-turnip-timing-fixture-no-gpu")
                 .put("governedAdmissionMillis",admissionMillis).put("childMillis",childMillis).put("governedBytes",48L<<20)
                 .put("nativeFixtureChildExecuted",true).put("hungChildReaped",true).put("launchBudgetEnforced",true)
                 .put("lateCompletedResultRejected",true).put("prelaunchCancellationVerified",true).put("providerAndReceiptMutationRejected",true)
-                .put("gpuExecuted",false).put("androidArm64Qualified",false).put("thorQualified",false).put("gameplayQualified",false));
+                .put("gpuExecuted",false).put("androidArm64Qualified",false).put("thorQualified",false).put("gameplayQualified",false);
+            Bundle status=new Bundle();status.putString("stream","TURNIP_TIMING_FIXTURE="+observation+"\n");
+            InstrumentationRegistry.getInstrumentation().sendStatus(2,status);
         }finally{
             for(OwnedProcess child:children)if(child.isAlive())try{child.terminateAuxiliary();}catch(IOException cleanup){}
             for(TurnipReadinessProbe.Handle owner:retained)if(owner.state()!=TurnipReadinessProbe.State.CLOSED)owner.close(Duration.ZERO);

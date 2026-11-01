@@ -11,6 +11,7 @@ on:
       - app/src/main/java/io/github/russianranger/esteria/runtime/ProotProcess.java
       - core/src/main/java/io/github/russianranger/esteria/core/diagnostics/SupportLogSelection.java
       - app/src/androidTest/java/io/github/russianranger/esteria/runtime/PreparationChildFixture.java
+      - app/src/androidTest/java/io/github/russianranger/esteria/runtime/TurnipReadinessTimingTest.java
       - tools/prepare_server_installation_inputs.py
       - tools/qualify_server_installation.py
       - tests/test_server_installation_inputs.py
