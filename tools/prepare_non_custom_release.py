@@ -55,7 +55,7 @@ def stage(args):
     (args.output / 'SHA256SUMS').write_text(signed['apkSha256'] + '  ' + name + '\n')
     setup = ('Keep the completed client import and retry Prepare local runtime / world, then\n'
              'start the local game. Follow the attached NON-CUSTOM-TESTING.md procedure, including\n'
-             'the offline repeat and support bundle export if a stage fails.' if signed['versionCode'] in (5, 6, 7, 8, 9) else
+             'the offline repeat and support bundle export if a stage fails.' if signed['versionCode'] in (5, 6, 7, 8, 9, 10) else
              'Import your complete ChromieCraft client, prepare the local runtime/world, then\n'
              'start the local game. Follow the attached NON-CUSTOM-TESTING.md procedure, including\n'
              'the offline repeat and support bundle export if a stage fails.')
@@ -207,6 +207,27 @@ start with Balanced, and retry Prepare local runtime / world. If comparing speed
 Stop and wait for cleanup before changing the setting. Export the support bundle
 before another attempt after a failure. Full Thor preparation, rendering and
 local/offline gameplay still need device confirmation.
+'''
+    if signed['versionCode'] == 10:
+        notes += '''
+Version 10 corrects the data-format preflight reached after navigation-mesh
+preparation in the v9 report. Matching completed v9 extraction/navigation work
+is retained and revalidated for reuse, so the preflight retry does not require
+a new client import or deliberately discard completed world output. Malformed
+or incompatible data still fails validation; no essential format check is skipped.
+
+Preparation controls are unchanged: Gentle 8 MiB/s, Balanced 32 MiB/s (default)
+and Fast 64 MiB/s govern Java/Python verification and copying. Native conversion
+remains one worker with the existing memory guard. Memory-pressure backoff/pause,
+bounded cache advice, safe idle storage trim and resumable phases remain active.
+These I/O levels are not total-world completion estimates.
+
+Install over the existing stock app, retain the completed import, generated world
+work, databases and saves, select the same locale and retry Prepare local runtime
+/ world. Keep the chosen speed unless comparing it deliberately while idle.
+Do not reimport, uninstall, clear storage or delete completed navigation files.
+Export support before another attempt after a failure. Actual Thor preparation,
+rendering, persistence and offline gameplay still need device confirmation.
 '''
     (args.output / 'RELEASE-NOTES.md').write_text(notes)
     return result

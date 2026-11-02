@@ -1,0 +1,4 @@
+# Preserve exact upstream source identities and original whitespace/notices.
+client/** -text -whitespace
+server/** -text -whitespace
+map_file_format.inc -text -whitespace

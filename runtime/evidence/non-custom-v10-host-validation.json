@@ -1,0 +1,50 @@
+{
+  "additionalFinalChangesRequireTheirFocusedTests": true,
+  "finalFocusedValidation": {
+    "log": {
+      "bytes": 17972,
+      "sha256": "53e4ac3f18ee4c68bac841a2d53f40b204011cdc895140e347861022f58cf881"
+    },
+    "passed": 89,
+    "run": 89,
+    "scope": "stock-layout-v9-migration-cache-and-publication-guards",
+    "skipped": 0
+  },
+  "focusedRuntime": {
+    "log": {
+      "bytes": 13139,
+      "sha256": "6bedeafcb4ef1fbdca63931e646ac792b46c184071ac20fdaab781fca9d9cd7e"
+    },
+    "passed": 67,
+    "run": 67,
+    "skipped": 0
+  },
+  "formatVersion": 1,
+  "fullArm64PackageQualified": false,
+  "fullHostTests": {
+    "log": {
+      "bytes": 309502,
+      "sha256": "79989eb37a9ecafb03e6a0fef6d06c0b55e21447ab5b9917ef40ec29db5a7d60"
+    },
+    "passed": 1497,
+    "run": 1601,
+    "skipped": 104
+  },
+  "gameplayQualified": false,
+  "gradle": {
+    "log": {
+      "bytes": 4732,
+      "sha256": "6df545de1a4d6a94686da60f4b449521c7ed1d39f376871f7a0e8fd03f668787"
+    },
+    "result": "success",
+    "targets": [
+      ":core:test",
+      ":app:serverDataSetupOwnerTest",
+      ":app:assembleRelease",
+      ":app:lintRelease"
+    ],
+    "tasks": 79
+  },
+  "scope": "local-v10-host-and-android-source-validation",
+  "thorQualified": false
+}

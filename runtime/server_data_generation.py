@@ -46,8 +46,11 @@ DEFAULT_CONTENT_PROFILE = CONTENT_PROFILES[0]
 CAPABILITY = b'esteria-classical-ordered-providers-v1; archive/folder/prefix; no conversion qualification'
 PREPARATION_HELPERS = ('server_data_generation.py', 'server_data_preflight.py', 'shader_generation.py',
                        'extractor_order.py', 'owned_process_group.py', 'world_io.py')
-# Only this reviewed v8 six-file APK helper manifest may donate compatible work.
+# Only explicitly reviewed six-file APK helper manifests may donate old work.
 V8_HELPER_GENERATION = '8b50b139c4b3ee78406da672cc267eb88baef0fb508ed5e6d2d3213bb545376c'
+# Exact published f39b52459d08fb85bf4fe6da5edddf8bccdea8bf helper manifest.
+V9_HELPER_GENERATION = 'f13edc9bf94c33bc411491702580999a2c3df73e8f6428d9f4563f7dece1560c'
+REVIEWED_HELPERS = {8: V8_HELPER_GENERATION, 9: V9_HELPER_GENERATION}
 PHASES = ('maps-dbc-cameras', 'raw-vmaps', 'assembled-vmaps', 'navigation')
 MAX_ATTEMPTS = 1024
 
@@ -437,6 +440,8 @@ def phase(root, name, action, *, progress=lambda value: None, navigation_inputs=
     require(name in PHASES, 'unknown extraction phase')
     completed = root / (name + '-complete')
     if completed.exists() or completed.is_symlink():
+        progress('extraction-' + name + '-verifying')
+        world_io.phase('phase-output-hashing-' + name)
         _phase_verified(completed, name)
         progress('extraction-reused-' + name)
         world_io.phase('reused-' + name)
@@ -454,6 +459,8 @@ def phase(root, name, action, *, progress=lambda value: None, navigation_inputs=
         (working / 'data').mkdir(mode=0o700)
     data = working / 'data'
     action(data, working)
+    progress('extraction-' + name + '-verifying')
+    world_io.phase('phase-output-hashing-' + name)
     rows = inventory(data)
     for relative in rows:
         with (data / relative).open('rb') as source:
@@ -470,54 +477,93 @@ def _v8_inputs(inputs):
 
 
 def _v8_work(staging, work, inputs, progress):
+    return _reviewed_work(staging, work, inputs, progress, 8)
+
+
+def _reviewed_inputs(inputs, version):
+    require(type(version) is int and version in REVIEWED_HELPERS, 'unreviewed extraction helper version')
+    return dict(inputs, preparationHelperGeneration=REVIEWED_HELPERS[version])
+
+
+def _owned_phase_work_remaining(root):
+    """Only exact flat helper-owned phase names can hold donated checkpoints."""
+    fixed = {name + suffix for name in PHASES for suffix in ('-complete', '-in-progress')}
+    prefixes = (*PHASES, 'final')
+    with os.scandir(root) as entries:
+        for index, entry in enumerate(entries):
+            require(index < MAX_ATTEMPTS, 'reviewed extraction work entry bound')
+            if entry.name in fixed: return True
+            for prefix in prefixes:
+                if entry.name.startswith(prefix + '-') and re.fullmatch('[0-9a-f]{32}', entry.name[len(prefix) + 1:]):
+                    return True
+    return False
+
+
+def _reviewed_work(staging, work, inputs, progress, version):
     """Move verified phases only from the explicitly reviewed old APK key."""
-    old_key = hashlib.sha256(storage.encoded(_v8_inputs(inputs))).hexdigest()
+    previous_inputs = _reviewed_inputs(inputs, version)
+    label = 'v' + str(version)
+    old_key = hashlib.sha256(storage.encoded(previous_inputs)).hexdigest()
     old = staging / old_key
     if old == work or not old.exists() and not old.is_symlink(): return
     storage.canonical(old)
-    marker = work / 'migrated-v8.json'
+    marker = work / ('migrated-' + label + '.json')
     if marker.exists() or marker.is_symlink():
         saved = document(marker)
         require(type(saved) is dict and set(saved) == {'scope', 'oldGeneration', 'newGeneration', 'orderManifest', 'orderWire'} and
-                saved['scope'] == 'reviewed-v8-work-transferred' and saved['oldGeneration'] == old_key and
+                saved['scope'] == 'reviewed-' + label + '-work-transferred' and saved['oldGeneration'] == old_key and
                 saved['newGeneration'] == work.name and
                 storage.identity(work / 'order.json', order.MAX_MANIFEST) == pin(saved['orderManifest']) and
                 storage.identity(work / 'order.tsv', order.MAX_MANIFEST) == pin(saved['orderWire']),
-                'reviewed v8 migration completion binding differs')
+                'reviewed ' + label + ' migration completion binding differs')
         # Old cleanup may stop after unlinking order metadata, or may preserve
         # unknown owner entries. The transferred validated work remains usable.
         _trim_work(old)
         return
+    old_plan = old / 'order.json'
+    if not old_plan.exists() and not old_plan.is_symlink():
+        # A previous reviewed update can have transferred all owned checkpoints
+        # and removed its metadata, while preserving unknown owner entries. No
+        # migration authority is needed to ignore this empty-of-owned-work root;
+        # it donates nothing and every unknown entry stays untouched.
+        require(not _owned_phase_work_remaining(old),
+                'reviewed ' + label + ' provider metadata missing for retained extraction work')
+        return
     plan = document(old / 'order.json'); wire = order.wire(plan)
     require(plan['configuredLocale'] == inputs['locale'] and plan['profile'] == PROFILE and
             storage.read(old / 'order.tsv', order.MAX_MANIFEST) == wire,
-            'reviewed v8 provider projection differs')
+            'reviewed ' + label + ' provider projection differs')
     if (work / 'order.json').exists() or (work / 'order.json').is_symlink():
         require(storage.encoded(document(work / 'order.json')) == storage.encoded(plan) and
                 storage.read(work / 'order.tsv', order.MAX_MANIFEST) == wire,
-                'reviewed v8 provider selection changed')
+                'reviewed ' + label + ' provider selection changed')
     else:
         storage.atomic(work / 'order.tsv', wire)
         storage.atomic(work / 'order.json', order.canonical(plan))
     for name in PHASES:
         previous, target = old / (name + '-complete'), work / (name + '-complete')
         if previous.exists() or previous.is_symlink():
+            progress('extraction-' + name + '-verifying')
+            world_io.phase('phase-output-hashing-' + name)
             rows = _phase_verified(previous, name)
             if target.exists() or target.is_symlink():
                 require(storage.encoded(_phase_verified(target, name)) == storage.encoded(rows),
-                        'reviewed v8 completed phase conflicts with current work')
+                        'reviewed ' + label + ' completed phase conflicts with current work')
                 _discard(previous)
             else: os.rename(previous, target)
-    for candidate in _attempts(old, 'navigation'):
+    candidates = _attempts(old, 'navigation') + _attempts(old, 'final')
+    navigation = old / 'navigation-in-progress'
+    if navigation.exists() or navigation.is_symlink(): candidates.append(storage.canonical(navigation))
+    for candidate in candidates:
         target = work / candidate.name
-        require(not target.exists() and not target.is_symlink(), 'reviewed v8 navigation attempt conflicts')
+        require(not target.exists() and not target.is_symlink(), 'reviewed ' + label + ' extraction attempt conflicts')
         os.rename(candidate, target)
     storage.sync(old); storage.sync(work)
-    storage.atomic(marker, storage.encoded(dict(scope='reviewed-v8-work-transferred', oldGeneration=old_key,
+    storage.atomic(marker, storage.encoded(dict(scope='reviewed-' + label + '-work-transferred', oldGeneration=old_key,
         newGeneration=work.name, orderManifest=storage.identity(work / 'order.json', order.MAX_MANIFEST),
         orderWire=storage.identity(work / 'order.tsv', order.MAX_MANIFEST))))
-    progress('extraction-resumed-reviewed-v8-work')
-    world_io.phase('resumed-reviewed-v8-work')
+    progress('extraction-resumed-reviewed-' + label + '-work')
+    world_io.phase('resumed-reviewed-' + label + '-work')
     _trim_work(old)
 
 
@@ -535,7 +581,7 @@ def _trim_work(root):
             require(index < MAX_ATTEMPTS, 'extraction metadata entry bound')
             names.append(entry.name)
     for name in names:
-        if name in ('order.json', 'order.tsv', 'migrated-v8.json') or re.fullmatch(r'capability-(map_extractor|vmap4_extractor)-[0-9a-f]{32}\.log', name):
+        if name in ('order.json', 'order.tsv', 'migrated-v8.json', 'migrated-v9.json') or re.fullmatch(r'capability-(map_extractor|vmap4_extractor)-[0-9a-f]{32}\.log', name):
             storage.canonical(root / name, False).unlink()
     if not any(root.iterdir()): root.rmdir()
 
@@ -575,10 +621,71 @@ def _retire_v8_generation(previous, receipt):
     for name in ('order.json', 'order.tsv', 'receipt.json'):
         path = previous / name
         if path.exists() and stat.S_ISREG(path.lstat().st_mode): path.unlink()
+    report = previous / 'preflight.json'
+    if report.exists() and stat.S_ISREG(report.lstat().st_mode):
+        try: known_report = _metadata_bytes(report, 1 << 20) == storage.encoded(receipt['preflight'])
+        except (ValueError, OSError): known_report = False
+        if known_report: report.unlink()
     _remove_empty(previous)
 
 
-def _completed_metadata(destination, expected_inputs=None, *, expected_generation=None, _reviewed_v8=False):
+def _retained_final(work, parts):
+    """Reuse a fully assembled failed candidate only after exact phase hashes.
+
+    Failed candidates never establish completion. At most the newest candidate
+    is read; an incomplete copy is retained until a fresh replacement activates.
+    """
+    attempts = _attempts(work, 'final')
+    if not attempts: return None
+    final = max(attempts, key=lambda path: path.stat().st_mtime_ns)
+    data = final / 'data'
+    if not data.exists() and not data.is_symlink(): return None
+    expected = {}
+    for base, groups in parts:
+        saved = document(base.parent / 'phase.json')
+        require(type(saved) is dict and set(saved) == {'phase', 'files'} and
+                saved['phase'] == base.parent.name.removesuffix('-complete') and saved['phase'] in PHASES and
+                type(saved['files']) is dict, 'retained final source phase metadata differs')
+        for name, row in saved['files'].items():
+            if name.split('/', 1)[0] in groups:
+                require(name not in expected and len(expected) < MAX_FILES, 'retained final source file bound')
+                expected[name] = row
+    try: actual = inventory(data)
+    except ValueError as error:
+        if str(error) == 'extractor produced no data files': return None
+        raise
+    return final if storage.encoded(actual) == storage.encoded(expected) else None
+
+
+def preflight_failure(report):
+    """A bounded diagnostic projection; never relay unchecked absolute paths."""
+    require(type(report) is dict and report.get('checks_passed') is False and
+            type(report.get('error_count')) is int and 0 < report['error_count'] <= MAX_FILES * 6 + 32 and
+            type(report.get('errors')) is list and 0 < len(report['errors']) <= 100 and
+            report['error_count'] >= len(report['errors']), 'invalid failed server data preflight report')
+    details = []
+    for row in report['errors'][:4]:
+        require(type(row) is dict and set(row) == {'path', 'error'} and type(row['error']) is str,
+                'invalid server data preflight error detail')
+        path = order.safe(row['path'], 1024)
+        group = path.split('/', 1)[0]
+        require(group in formats.SERVER_DATA_GROUPS, 'invalid server data preflight error group')
+        reason = ''.join(c if 32 <= ord(c) < 127 else '?' for c in row['error'][:384])
+        details.append(dict(group=group, path=path[:256], reason=reason))
+        candidate = json.dumps(dict(errorCount=report['error_count'], errors=details), separators=(',', ':'))
+        if len(('PREFLIGHT_FAILURE ' + candidate + '\n').encode('ascii')) > 4096:
+            details.pop()
+            break
+    projection = dict(errorCount=report['error_count'], errors=details)
+    raw = json.dumps(projection, separators=(',', ':'))
+    require(details and len(('PREFLIGHT_FAILURE ' + raw + '\n').encode('ascii')) <= 4096,
+            'server data preflight summary bound')
+    print('PREFLIGHT_FAILURE ' + raw, flush=True)
+    return 'generated server data failed format preflight: errors=' + str(report['error_count']) + '; ' + \
+        ' | '.join(row['group'] + ': ' + row['path'] + ': ' + row['reason'] for row in details)
+
+
+def _completed_metadata(destination, expected_inputs=None, *, expected_generation=None, _reviewed_helper=None):
     """Metadata only. Its caller must independently verify the data payload.
 
     Kept private so a metadata receipt is never confused with verify_completed's
@@ -615,8 +722,10 @@ def _completed_metadata(destination, expected_inputs=None, *, expected_generatio
     if version == 2:
         validate_package_selection(inputs['serverDataPackage'])
     if 'preparationHelperGeneration' in inputs:
+        require(_reviewed_helper is None or _reviewed_helper in REVIEWED_HELPERS.values(),
+                'unreviewed prepared data helper generation')
         require(inputs['preparationHelperGeneration'] ==
-                (V8_HELPER_GENERATION if _reviewed_v8 else preparation_helper_generation()),
+                (_reviewed_helper if _reviewed_helper is not None else preparation_helper_generation()),
                 'prepared server package helper source changed; prepare a new generation')
     for name, identity in inputs['importMetadata'].items():
         order.safe(name, 1024); pin(identity)
@@ -643,23 +752,28 @@ def verify_completed(destination, expected_inputs=None, *, expected_generation=N
     receipt = _completed_metadata(destination, expected_inputs, expected_generation=expected_generation)
     require(storage.encoded(receipt['files']) == storage.encoded(inventory(destination / 'data')),
             'prepared server data changed')
-    preflight = formats.check_server_data(destination / 'data')
+    preflight = formats.check_server_data(destination / 'data',
+        content_profile=receipt['inputs'].get('contentProfile', 'esteria-custom'))
     require(preflight['checks_passed'] and storage.encoded(receipt['preflight']) == storage.encoded(preflight),
             'prepared server data preflight changed')
     return receipt
 
 
 def _v8_completed(generations, inputs):
-    previous_inputs = _v8_inputs(inputs)
+    return _reviewed_completed(generations, inputs, 8)
+
+
+def _reviewed_completed(generations, inputs, version):
+    previous_inputs = _reviewed_inputs(inputs, version)
     key = hashlib.sha256(storage.encoded(previous_inputs)).hexdigest()
     previous = generations / key
     if inputs == previous_inputs or not previous.exists() and not previous.is_symlink(): return None
-    receipt = _completed_metadata(previous, previous_inputs, _reviewed_v8=True)
+    receipt = _completed_metadata(previous, previous_inputs, _reviewed_helper=REVIEWED_HELPERS[version])
     require(storage.encoded(receipt['files']) == storage.encoded(inventory(previous / 'data')),
-            'reviewed v8 prepared data changed')
-    checked = formats.check_server_data(previous / 'data')
+            'reviewed v' + str(version) + ' prepared data changed')
+    checked = formats.check_server_data(previous / 'data', content_profile=inputs.get('contentProfile', 'esteria-custom'))
     require(checked['checks_passed'] and storage.encoded(checked) == storage.encoded(receipt['preflight']),
-            'reviewed v8 prepared data preflight changed')
+            'reviewed v' + str(version) + ' prepared data preflight changed')
     return previous
 
 
@@ -703,12 +817,18 @@ def _generate(store, game, generation, tools, selection, locale, *, threads=1, t
             previous = None
         else:
             work = storage.canonical(staging / key, create=True)
-            previous = _v8_completed(generations, inputs)
+            previous = None; previous_version = None
+            for reviewed_version in (9, 8):
+                previous = _reviewed_completed(generations, inputs, reviewed_version)
+                if previous is not None:
+                    previous_version = reviewed_version
+                    break
             if previous is not None and not (work / 'order.json').exists() and not (work / 'order.json').is_symlink():
                 storage.atomic(work / 'order.tsv', storage.read(previous / 'order.tsv', order.MAX_MANIFEST))
                 storage.atomic(work / 'order.json', storage.read(previous / 'order.json', order.MAX_MANIFEST))
-                progress('extraction-migrated-reviewed-v8-generation')
-                world_io.phase('migrated-reviewed-v8-generation')
+                progress('extraction-migrated-reviewed-v' + str(previous_version) + '-generation')
+                world_io.phase('migrated-reviewed-v' + str(previous_version) + '-generation')
+            _reviewed_work(staging, work, inputs, progress, 9)
             _v8_work(staging, work, inputs, progress)
             plan_path = work / 'order.json'
             if plan_path.exists() or plan_path.is_symlink():
@@ -744,7 +864,9 @@ def _generate(store, game, generation, tools, selection, locale, *, threads=1, t
                 return execute([str(tools / 'bin' / name), *args], cwd, log, remaining, cancelled=cancelled, cache_inputs=cache_inputs)
             complete_external = external is not None and external['mode'] == 'complete'
             if previous is None and not complete_external:
-                for name in PROGRAMS[:2]:
+                for name, source_phase in zip(PROGRAMS[:2], PHASES[:2]):
+                    completed_phase = work / (source_phase + '-complete')
+                    if completed_phase.exists() or completed_phase.is_symlink(): continue
                     capability_log = work / ('capability-' + name + '-' + uuid.uuid4().hex + '.log')
                     run(name, ['--esteria-order-capabilities'], work, capability_log)
                     require(storage.read(capability_log, 4096).rstrip(b'\n') == CAPABILITY,
@@ -771,19 +893,36 @@ def _generate(store, game, generation, tools, selection, locale, *, threads=1, t
                     run('mmaps_generator', ['--config', str(tools / 'etc/mmaps-config.yaml'), '--threads', str(threads), '--silent'],
                         data, at / 'extract.log')
                 nav = phase(work, 'navigation', navigation, progress=progress, navigation_inputs=(maps, vmaps))
-            final = work / ('final-' + uuid.uuid4().hex); final.mkdir(mode=0o700)
+            progress('extraction-final-assembly')
+            world_io.phase('final-assembly')
+            parts = ((maps, ('maps', 'dbc', 'Cameras')), (vmaps, ('vmaps',)), (nav, ('mmaps',))) \
+                if previous is None and not complete_external else ()
+            final = _retained_final(work, parts) if parts and external is None else None
+            retained = final is not None
+            if retained:
+                progress('extraction-reused-final-assembly')
+                world_io.phase('reused-final-assembly')
+            else:
+                final = work / ('final-' + uuid.uuid4().hex); final.mkdir(mode=0o700)
             data = final / 'data'
-            if previous is not None: clone(previous / 'data', data)
-            else: data.mkdir(mode=0o700)
-            if previous is None and not complete_external:
-                for base, names in ((maps, ('maps', 'dbc', 'Cameras')), (vmaps, ('vmaps',)), (nav, ('mmaps',))):
+            if not retained:
+                if previous is not None: clone(previous / 'data', data)
+                else: data.mkdir(mode=0o700)
+            if not retained and previous is None and not complete_external:
+                for base, names in parts:
                     for name in names:
                         clone(base / name, data / name)
             if previous is None and external is not None:
                 progress('extraction-supplied-server-data')
                 merge_supplied(source / formats.SERVER_NAMESPACE / 'data', data, cancelled=cancelled)
-            preflight = formats.check_server_data(data)
-            require(preflight['checks_passed'], 'generated server data failed format preflight')
+            progress('extraction-format-preflight')
+            world_io.phase('format-preflight')
+            preflight = formats.check_server_data(data, content_profile=content_profile)
+            report = storage.encoded(preflight)
+            require(len(report) <= 1 << 20, 'server data preflight report byte bound')
+            storage.atomic(final / 'preflight.json', report)
+            if preflight['checks_passed'] is not True:
+                raise ValueError(preflight_failure(preflight))
             require(not cancelled() and storage.imported(game, generation) == inputs['importMetadata'] and
                     tools_verified(tools, selection) == inputs['toolSelectionSha256'] and package_selection(source) == external and
                     preparation_helper_generation() == inputs['preparationHelperGeneration'],
@@ -808,13 +947,13 @@ def _generate(store, game, generation, tools, selection, locale, *, threads=1, t
                 preparation_helper_generation() == inputs['preparationHelperGeneration'],
                 'import changed before server data activation')
         storage.atomic(store / 'current', (key + '\n').encode())
-        previous_key = hashlib.sha256(storage.encoded(_v8_inputs(inputs))).hexdigest()
-        previous_generation = generations / previous_key
-        if previous_generation != destination and (previous_generation.exists() or previous_generation.is_symlink()):
-            # Equivalent, fully reverified v9 data is now active. Old receipt and
-            # clones can be reclaimed without touching the promoted generation.
-            # Retrying also finishes an interrupted old-generation reclamation.
-            _retire_v8_generation(previous_generation, receipt)
+        for reviewed_version in (9, 8):
+            previous_key = hashlib.sha256(storage.encoded(_reviewed_inputs(inputs, reviewed_version))).hexdigest()
+            previous_generation = generations / previous_key
+            if previous_generation != destination and (previous_generation.exists() or previous_generation.is_symlink()):
+                # Equivalent, fully reverified data is active; retry can also
+                # finish interrupted known-path reclamation of the old copy.
+                _retire_v8_generation(previous_generation, receipt)
         if (staging / key).exists():
             _trim_work(staging / key)
         progress('extraction-format-checked')

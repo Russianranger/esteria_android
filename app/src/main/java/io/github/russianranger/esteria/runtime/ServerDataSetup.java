@@ -266,11 +266,23 @@ public final class ServerDataSetup {
                 case "extraction-reused-assembled-vmaps":return "reused-assembled-collision";
                 case "extraction-reused-navigation":return "reused-navigation";
                 case "extraction-resumed-reviewed-v8-work":return "resumed-reviewed-v8-work";
+                case "extraction-resumed-reviewed-v9-work":return "resumed-reviewed-v9-work";
+                case "extraction-migrated-reviewed-v9-generation":return "migrated-reviewed-v9-generation";
+                case "extraction-reused-final-assembly":details="Completed extraction outputs retained";return "reused-final-assembly";
+                case "extraction-final-assembly":details="";return "final-assembly";
+                case "extraction-format-preflight":details="";return "format-preflight";
+                case "extraction-maps-dbc-cameras-verifying":
+                case "extraction-raw-vmaps-verifying":
+                case "extraction-assembled-vmaps-verifying":
+                case "extraction-navigation-verifying":details="";return "output-verifying";
                 default:break;
             }
             if(value.startsWith("WORLD_IO ")&&value.length()<=4096)try{
                 String phase=new org.json.JSONObject(value.substring(9)).getString("phase");
-                if(phase.matches("[a-z][a-z0-9_-]{0,80}"))return "io-"+phase;
+                if(phase.matches("[a-z][a-z0-9_-]{0,80}")){
+                    if(phase.startsWith("phase-output-hashing-")||phase.startsWith("final-")||phase.equals("format-preflight"))details="";
+                    return "io-"+phase;
+                }
             }catch(org.json.JSONException invalid){return null;}
             switch(value) {
                 case "extraction-provider-order":return "provider-order";

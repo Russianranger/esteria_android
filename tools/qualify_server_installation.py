@@ -41,6 +41,114 @@ PRIVATE_FILES = (schema.JOURNAL, updater.JOURNAL, playerbots.JOURNAL, account.JO
 JOURNAL_FIELDS = dict(sourceBaselineJournal=schema.JOURNAL, compiledUpdaterJournal=updater.JOURNAL,
     playerbotsSchemaJournal=playerbots.JOURNAL, localAccountJournal=account.JOURNAL,
     stagedInstallationReceipt=installation.STAGED_REPORT, playerbotsFinishJournal=installation.FINISH_JOURNAL)
+# Exact active f35 DBCStores.cpp LOAD_DBC bindings. gtOCTRegenMP is commented
+# out there and is deliberately absent. SELECT * consumes one SQL column per
+# format character, including skipped fields. PowerDisplay may remain empty:
+# its original packed file path is qualified separately, never by SQL counts.
+STOCK_DBC_SQL_BINDINGS = (
+    ('gtBarberShopCostBase.dbc', 'gtbarbershopcostbase_dbc', 'df'),
+    ('gtCombatRatings.dbc', 'gtcombatratings_dbc', 'df'),
+    ('gtChanceToMeleeCritBase.dbc', 'gtchancetomeleecritbase_dbc', 'df'),
+    ('gtChanceToMeleeCrit.dbc', 'gtchancetomeleecrit_dbc', 'df'),
+    ('gtChanceToSpellCritBase.dbc', 'gtchancetospellcritbase_dbc', 'df'),
+    ('gtChanceToSpellCrit.dbc', 'gtchancetospellcrit_dbc', 'df'),
+    ('gtNPCManaCostScaler.dbc', 'gtnpcmanacostscaler_dbc', 'df'),
+    ('gtOCTClassCombatRatingScalar.dbc', 'gtoctclasscombatratingscalar_dbc', 'df'),
+    ('gtOCTRegenHP.dbc', 'gtoctregenhp_dbc', 'df'),
+    ('gtRegenHPPerSpt.dbc', 'gtregenhpperspt_dbc', 'df'),
+    ('gtRegenMPPerSpt.dbc', 'gtregenmpperspt_dbc', 'df'),
+    ('PowerDisplay.dbc', 'powerdisplay_dbc', 'nixxxx'),
+)
+
+
+def stock_dbc_sql_columns(content, table, fmt):
+    """Bind SQL column order/types to the exact verified source CREATE TABLE.
+
+    This reads bounded source DDL; it never creates, alters or seeds a table.
+    The real source-selected updater must supply every row queried below.
+    """
+    require((table, fmt) in {(row[1], row[2]) for row in STOCK_DBC_SQL_BINDINGS} and
+            content.manifest.get('source', {}).get('commit') == baseline.SUPPORTED_SERVER and
+            content.manifest.get('contentSha256Complete') is True,
+            'Canonical stock DBC SQL requires the pinned server source and binding')
+    path = 'data/sql/base/db_world/' + table + '.sql'
+    row = content.manifest.get('files', {}).get(path, {})
+    require(path in content.manifest.get('databases', {}).get('world', {}).get('base', []) and
+            type(row.get('bytes')) is int and 0 < row['bytes'] <= 4 << 30 and
+            isinstance(row.get('sha256'), str) and re.fullmatch('[0-9a-f]{64}', row['sha256']),
+            'Canonical stock DBC SQL source selection differs')
+    expected = {key: row[key] for key in ('bytes', 'sha256')}
+    source = content.source / path
+    require(baseline.file_identity(source) == expected,
+            'Canonical stock DBC SQL source bytes differ')
+    with source.open('rb') as stream:
+        prefix = stream.read(64 << 10)
+    require(baseline.file_identity(source) == expected,
+            'Canonical stock DBC SQL source changed during DDL inspection')
+    match = re.search(rb'CREATE TABLE `' + table.encode('ascii') + rb'` \(\r?\n(.*?)\r?\n\) ENGINE=',
+                      prefix, re.S)
+    require(match is not None, 'Canonical stock DBC SQL source DDL unavailable')
+    columns = []
+    for line in match[1].splitlines():
+        if not line.lstrip().startswith(b'`'):
+            continue
+        column = re.fullmatch(rb'\s*`([A-Za-z_][A-Za-z0-9_]*)`\s+([a-z]+)(?:\([^\r\n)]*\))?(.*)', line)
+        require(column is not None, 'Canonical stock DBC SQL column declaration differs')
+        tail = column[3].upper()
+        columns.append(dict(position=len(columns) + 1, name=column[1].decode('ascii'),
+            mysqlType=column[2].decode('ascii'), nullable=b'NOT NULL' not in tail,
+            unsigned=bool(re.search(rb'\bUNSIGNED\b', tail))))
+    names = ('ID', 'ActualType', 'GlobalstringBaseTag', 'Red', 'Green', 'Blue') if table == 'powerdisplay_dbc' else ('ID', 'Data')
+    require(tuple(column['name'] for column in columns) == names and len(columns) == len(fmt),
+            'Canonical stock DBC SQL columns do not match the server loader binding')
+    for column, character in zip(columns, fmt):
+        column['serverFormat'] = character
+    return dict(path=path, **expected), columns
+
+
+def stock_dbc_sql_snapshot(connection, content):
+    """Observe actual canonical SQL backing without loading file DBCs/world.
+
+    GT tables must be nonempty. Empty PowerDisplay SQL is recorded truthfully;
+    it cannot establish a SQL fallback and still requires its native file path.
+    Counts below come only from the actual owned SQL service in native runs.
+    """
+    tables = {}
+    for dbc, table, fmt in STOCK_DBC_SQL_BINDINGS:
+        source, columns = stock_dbc_sql_columns(content, table, fmt)
+        actual = connection.query('SELECT COLUMN_NAME,DATA_TYPE,IS_NULLABLE,'
+            "IF(LOCATE('unsigned',COLUMN_TYPE)>0,1,0) FROM INFORMATION_SCHEMA.COLUMNS "
+            "WHERE TABLE_SCHEMA='acore_world' AND TABLE_NAME='" + table + "' ORDER BY ORDINAL_POSITION")
+        expected = ['\t'.join((column['name'], column['mysqlType'], 'YES' if column['nullable'] else 'NO',
+                              '1' if column['unsigned'] else '0')) for column in columns]
+        require(actual == expected, 'Canonical stock DBC SQL live column binding differs: ' + table)
+        rows = connection.query('SELECT COUNT(*),COUNT(DISTINCT `ID`),MIN(`ID`),MAX(`ID`) '
+                                'FROM `acore_world`.`' + table + '`')
+        require(type(rows) is list and len(rows) == 1 and isinstance(rows[0], str),
+                'Canonical stock DBC SQL row observation differs: ' + table)
+        fields = rows[0].split('\t')
+        required = table != 'powerdisplay_dbc'
+        if fields == ['0', '0', 'NULL', 'NULL']:
+            require(not required, 'Canonical stock GT SQL backing is empty: ' + table)
+            count, distinct, low, high = 0, 0, None, None
+        else:
+            require(len(fields) == 4 and all(re.fullmatch(r'(?:0|[1-9][0-9]{0,9})', value) for value in fields),
+                    'Canonical stock DBC SQL backing has invalid counts or IDs: ' + table)
+            count, distinct, low, high = map(int, fields)
+            require(0 < count == distinct <= (1 << 32) - 1 and 0 <= low <= high < (1 << 32) - 1 and
+                    count <= high - low + 1,
+                    'Canonical stock DBC SQL backing has invalid counts or IDs: ' + table)
+        tables[table] = dict(dbc=dbc, serverFormat=fmt, sourceSql=source, columns=columns,
+            rowCount=count, distinctIds=distinct, minimumId=low, maximumId=high,
+            sourceAndLiveColumnsMatched=True, nonemptyRequired=required,
+            nonemptyBackingVerified=count > 0, fileDbcRequiredWhenSqlEmpty=count == 0,
+            nativeFileLoadQualified=False)
+    return dict(formatVersion=1, scope='stock-canonical-dbc-sql-backing-observation',
+        serverRevision=baseline.SUPPORTED_SERVER, database='acore_world', tables=tables,
+        observedTableCount=len(tables), requiredNonemptyGtTableCount=11,
+        allCanonicalColumnsMatched=True, allRequiredGtBackingNonempty=True,
+        readOnlyQueries=True, actualFileDbcRowsLoaded=False, worldserverExecuted=False,
+        androidRuntimeQualified=False, gameplayQualified=False)
 
 
 def public_record(value):
@@ -273,6 +381,7 @@ def run(prepared, mysql, mysqld, version, output):
         completedFinishReentryWithoutExecution=False, restartPersistenceVerified=False,
         restartedFinishReentryWithoutExecution=False, productionReadyAndStoppedAcknowledgmentsVerified=False,
         sourcePrivateJournalsAccountCredentialsPreserved=False, nativeSqlSetupReceiptVerified=False,
+        stockDbcSqlBackingVerified=False, stockDbcSqlBackingRestartVerified=False,
         cleanShutdownVerified=False, compilerExecuted=False, javaCoordinatorExecuted=False,
         completeSetupQualified=False, slotPromoted=False, existingStateModified=False,
         authserverExecuted=False, worldserverExecuted=False, serverDataQualified=False,
@@ -342,6 +451,9 @@ def run(prepared, mysql, mysqld, version, output):
                 selectedWorldUpdateCount=len(selected_world),
                 excludedCustomWorldUpdateCount=len(verified.manifest['databases']['world']['updateOrder']) - len(selected_world),
                 selectedSourcePathsSha256=update_journal['binding']['selectedSourcePathsSha256'])
+            evidence['phase'] = 'stock-dbc-sql-backing'
+            dbc_backing = stock_dbc_sql_snapshot(connection, verified)
+            evidence.update(stockDbcSqlBacking=dbc_backing, stockDbcSqlBackingVerified=True)
             evidence.update(productionCoreCompositionCompleted=True, productionCoreComposition=staged)
             immutable = {name: baseline.file_identity(state / name) for name in
                 (schema.JOURNAL, updater.JOURNAL, account.JOURNAL, installation.STAGED_REPORT,
@@ -380,6 +492,11 @@ def run(prepared, mysql, mysqld, version, output):
             evidence['phase'] = 'restart-completed-installation-verification'
             require(private_identities(state) == stable and playerbots.preserved_core(connection) == core_rows,
                     'Production restart changed private journals/account/credentials/core rows')
+            evidence['phase'] = 'restart-stock-dbc-sql-backing'
+            require(stock_dbc_sql_snapshot(connection, verified) == dbc_backing,
+                    'Canonical stock DBC SQL backing changed after production restart')
+            evidence['stockDbcSqlBackingRestartVerified'] = True
+            evidence['phase'] = 'restart-completed-installation-verification'
             final = installation.finish_playerbots(verified, connection, state, version,
                 **dict(arguments, data=final_data, staged_data=data, expected_uuid=uuid, verify_service=live, state_lease=lease))
             require(final['compiledPlayerbotsLoaderExecuted'] is False and final['compiledUpdaterExecuted'] is False and

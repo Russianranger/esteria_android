@@ -3,6 +3,7 @@ import errno
 import fcntl
 import hashlib
 import io
+import json
 import os
 from pathlib import Path
 import shutil
@@ -35,6 +36,7 @@ class ServerDataGenerationTests(unittest.TestCase):
                      'providers': [{'rank': 0, 'kind': 'mpq', 'path': 'Data/common.MPQ', 'prefix': '',
                                     'bytes': 1, 'sha256': 'c' * 64}]}
         self.calls = []
+        self.base_preflight = data.formats.check_server_data
 
     def generate(self, **kwargs):
         with patch.object(data, 'tools_verified', return_value='d' * 64), \
@@ -176,6 +178,205 @@ class ServerDataGenerationTests(unittest.TestCase):
         self.assertFalse(old.exists())
         self.assertEqual(sum(n == 'map_extractor' and '-e' in a for n, a in self.calls), 1)
         self.assertNotEqual(receipt['inputs']['preparationHelperGeneration'], data.V8_HELPER_GENERATION)
+
+    def fail_final_preflight(self, root, **kwargs):
+        report = self.base_preflight(root, **kwargs)
+        self.assertTrue(report['checks_passed'])
+        report.update(checks_passed=False, error_count=1,
+            errors=[dict(path='dbc/gtCombatRatings.dbc', error='controlled fixture layout mismatch')])
+        return report
+
+    def test_reviewed_v9_failed_final_keeps_completed_navigation_and_reuses_assembly(self):
+        with patch.object(data, 'preparation_helper_generation', return_value=data.V9_HELPER_GENERATION), \
+             patch.object(data, 'execute', side_effect=self.fake_execute), \
+             patch.object(data.formats, 'check_server_data', side_effect=self.fail_final_preflight), redirect_stdout(io.StringIO()):
+            with self.assertRaisesRegex(ValueError, 'dbc/gtCombatRatings.dbc.*controlled fixture layout mismatch'):
+                self.generate()
+        self.assertEqual(len(self.calls), 6)
+        old = next((self.store / 'staging').iterdir()); final = next(old.glob('final-*'))
+        inode = (final / 'data').stat().st_ino; final_name = final.name
+        # Actual v9 did not persist the report; it left this assembled payload.
+        (final / 'preflight.json').unlink()
+        (old / 'owner-note.txt').write_text('preserve unknown old work')
+        for name in data.PHASES: self.assertTrue((old / (name + '-complete/phase.json')).is_file())
+        events = []
+        with patch.object(data, 'execute', side_effect=AssertionError('completed v9 phases must not rerun native tools')), \
+             patch.object(data.order, 'plan', side_effect=AssertionError('provider order must be reused')), \
+             patch.object(data.formats, 'check_server_data', side_effect=self.fail_final_preflight), redirect_stdout(io.StringIO()):
+            with self.assertRaisesRegex(ValueError, 'controlled fixture layout mismatch'): self.generate(progress=events.append)
+        work = next(path for path in (self.store / 'staging').iterdir() if path != old)
+        self.assertIn('extraction-resumed-reviewed-v9-work', events)
+        self.assertIn('extraction-reused-navigation', events)
+        self.assertIn('extraction-reused-final-assembly', events)
+        self.assertLess(events.index('extraction-navigation-verifying'), events.index('extraction-final-assembly'))
+        self.assertLess(events.index('extraction-final-assembly'), events.index('extraction-format-preflight'))
+        self.assertEqual((work / final_name / 'data').stat().st_ino, inode)
+        self.assertEqual(len(list(work.glob('final-*'))), 1)
+        self.assertEqual(data.document(work / final_name / 'preflight.json')['errors'][0]['path'], 'dbc/gtCombatRatings.dbc')
+        self.assertFalse((self.store / 'current').exists())
+        with patch.object(data, 'execute', side_effect=AssertionError('completed navigation must remain reusable')), \
+             patch.object(data.order, 'plan', side_effect=AssertionError('provider order must remain reusable')):
+            receipt = self.generate()
+        promoted = self.store / 'generations' / receipt['generation']
+        self.assertEqual((promoted / 'data').stat().st_ino, inode)
+        self.assertTrue(data.document(promoted / 'preflight.json')['checks_passed'])
+        self.assertEqual((old / 'owner-note.txt').read_text(), 'preserve unknown old work')
+        self.assertFalse(work.exists())
+        self.assertFalse(receipt['worldQualified'])
+
+    def reviewed_chain_to_v9(self, *, navigation_complete):
+        with patch.object(data, 'preparation_helper_generation', return_value=data.V8_HELPER_GENERATION), \
+             patch.object(data, 'execute', side_effect=self.pause_navigation):
+            with self.assertRaises(data.world_io.PreparationPaused): self.generate()
+        old_v8 = next((self.store / 'staging').iterdir())
+        (old_v8 / 'owner-note.txt').write_text('preserve original v8 note')
+        with patch.object(data, 'preparation_helper_generation', return_value=data.V9_HELPER_GENERATION), \
+             patch.object(data, 'execute', side_effect=self.fake_execute if navigation_complete else self.pause_navigation), \
+             patch.object(data.formats, 'check_server_data', side_effect=self.fail_final_preflight), redirect_stdout(io.StringIO()):
+            with self.assertRaises(ValueError if navigation_complete else data.world_io.PreparationPaused): self.generate()
+        old_v9 = next(path for path in (self.store / 'staging').iterdir() if path != old_v8)
+        self.assertTrue((old_v9 / 'migrated-v8.json').is_file())
+        self.assertEqual({path.name for path in old_v8.iterdir()}, {'owner-note.txt'})
+        return old_v8, old_v9
+
+    def test_v8_v9_v10_partial_navigation_chain_skips_exhausted_v8_root_and_keeps_note(self):
+        old_v8, old_v9 = self.reviewed_chain_to_v9(navigation_complete=False)
+        def resume(command, cwd, log, timeout, **kwargs):
+            if Path(command[0]).name == 'mmaps_generator':
+                self.assertEqual((cwd / 'mmaps/0000000.mmtile').read_bytes(), self.tile())
+                self.assertFalse((cwd / 'mmaps/0000001.mmtile').exists())
+            self.fake_execute(command, cwd, log, timeout, **kwargs)
+        with patch.object(data, 'execute', side_effect=resume): receipt = self.generate()
+        self.assertEqual((old_v8 / 'owner-note.txt').read_text(), 'preserve original v8 note')
+        self.assertFalse(old_v9.exists())
+        self.assertEqual(sum(name == 'mmaps_generator' for name, _ in self.calls), 3)
+        self.assertEqual(sum(name == 'map_extractor' and '-e' in args for name, args in self.calls), 1)
+        self.assertEqual((self.store / 'current').read_text(), receipt['generation'] + '\n')
+
+    def test_v8_v9_v10_completed_navigation_chain_runs_no_more_native_tools(self):
+        old_v8, old_v9 = self.reviewed_chain_to_v9(navigation_complete=True)
+        final = next(old_v9.glob('final-*')); inode = (final / 'data').stat().st_ino
+        count = len(self.calls)
+        with patch.object(data, 'execute', side_effect=AssertionError('chained completed navigation must not rerun')), \
+             patch.object(data.order, 'plan', side_effect=AssertionError('chained provider plan must be retained')):
+            receipt = self.generate()
+        self.assertEqual(len(self.calls), count)
+        self.assertEqual((self.store / 'generations' / receipt['generation'] / 'data').stat().st_ino, inode)
+        self.assertEqual((old_v8 / 'owner-note.txt').read_text(), 'preserve original v8 note')
+        self.assertFalse(old_v9.exists())
+
+    def test_missing_old_provider_metadata_cannot_skip_retained_completed_work(self):
+        with patch.object(data, 'preparation_helper_generation', return_value=data.V9_HELPER_GENERATION), \
+             patch.object(data, 'execute', side_effect=self.fake_execute), \
+             patch.object(data.formats, 'check_server_data', side_effect=self.fail_final_preflight), redirect_stdout(io.StringIO()):
+            with self.assertRaises(ValueError): self.generate()
+        old = next((self.store / 'staging').iterdir()); (old / 'order.json').unlink()
+        with patch.object(data, 'execute', side_effect=AssertionError('missing metadata cannot select unverified work')):
+            with self.assertRaisesRegex(ValueError, 'provider metadata missing for retained extraction work'):
+                self.generate()
+        self.assertTrue((old / 'navigation-complete/phase.json').exists())
+        self.assertFalse((self.store / 'current').exists())
+
+    def test_reviewed_v9_partial_navigation_keeps_deterministic_resume_slot(self):
+        with patch.object(data, 'preparation_helper_generation', return_value=data.V9_HELPER_GENERATION), \
+             patch.object(data, 'execute', side_effect=self.pause_navigation):
+            with self.assertRaises(data.world_io.PreparationPaused): self.generate()
+        old = next((self.store / 'staging').iterdir())
+        self.assertTrue((old / 'navigation-in-progress/data/mmaps/0000000.mmtile').exists())
+        def resume(command, cwd, log, timeout, **kwargs):
+            if Path(command[0]).name == 'mmaps_generator':
+                self.assertEqual((cwd / 'mmaps/0000000.mmtile').read_bytes(), self.tile())
+                self.assertFalse((cwd / 'mmaps/0000001.mmtile').exists())
+            self.fake_execute(command, cwd, log, timeout, **kwargs)
+        with patch.object(data, 'execute', side_effect=resume): self.generate()
+        self.assertFalse(old.exists())
+        self.assertEqual(sum(name == 'mmaps_generator' for name, _ in self.calls), 2)
+        self.assertEqual(sum(name == 'map_extractor' and '-e' in args for name, args in self.calls), 1)
+
+    def test_reviewed_v9_mutated_completed_navigation_is_never_relabelled(self):
+        with patch.object(data, 'preparation_helper_generation', return_value=data.V9_HELPER_GENERATION), \
+             patch.object(data, 'execute', side_effect=self.fake_execute), \
+             patch.object(data.formats, 'check_server_data', side_effect=self.fail_final_preflight), redirect_stdout(io.StringIO()):
+            with self.assertRaises(ValueError): self.generate()
+        old = next((self.store / 'staging').iterdir())
+        (old / 'navigation-complete/data/mmaps/000.mmap').write_bytes(b'corrupt')
+        with patch.object(data, 'execute', side_effect=AssertionError('do not start native work after a corrupt checkpoint')):
+            with self.assertRaisesRegex(ValueError, 'completed extraction phase changed'): self.generate()
+        self.assertFalse((self.store / 'current').exists())
+
+    def test_unreviewed_helper_cannot_donate_completed_navigation(self):
+        with patch.object(data, 'preparation_helper_generation', return_value='7' * 64), \
+             patch.object(data, 'execute', side_effect=self.fake_execute), \
+             patch.object(data.formats, 'check_server_data', side_effect=self.fail_final_preflight), redirect_stdout(io.StringIO()):
+            with self.assertRaises(ValueError): self.generate()
+        old = next((self.store / 'staging').iterdir())
+        with patch.object(data, 'execute', side_effect=self.fake_execute): self.generate()
+        self.assertEqual(sum(name == 'mmaps_generator' for name, _ in self.calls), 2)
+        self.assertTrue((old / 'navigation-complete/phase.json').exists())
+        for version in (True, 7, 10, '9'):
+            with self.assertRaisesRegex(ValueError, 'unreviewed'): data._reviewed_inputs({}, version)
+
+    def test_retained_incomplete_final_is_preserved_until_valid_replacement_activates(self):
+        with patch.object(data, 'execute', side_effect=self.fake_execute), \
+             patch.object(data.formats, 'check_server_data', side_effect=self.fail_final_preflight), redirect_stdout(io.StringIO()):
+            with self.assertRaises(ValueError): self.generate()
+        work = next((self.store / 'staging').iterdir()); old_final = next(work.glob('final-*'))
+        target = old_final / 'data/dbc/Map.dbc'; target.unlink(); target.write_bytes(b'incomplete copy')
+        trim = data._trim_work
+        def after_activation(root):
+            if root == work:
+                self.assertEqual(target.read_bytes(), b'incomplete copy')
+                current = (self.store / 'current').read_text().strip()
+                self.assertTrue((self.store / 'generations' / current / 'receipt.json').exists())
+            return trim(root)
+        with patch.object(data, 'execute', side_effect=AssertionError('completed phases remain valid')), \
+             patch.object(data, '_trim_work', side_effect=after_activation): receipt = self.generate()
+        self.assertFalse(old_final.exists())
+        self.assertNotEqual((self.store / 'generations' / receipt['generation'] / 'data/dbc/Map.dbc').read_bytes(), b'incomplete copy')
+
+    def test_preflight_failure_projection_is_bounded_and_rejects_untrusted_paths(self):
+        rows = [dict(path='vmaps/' + 'x' * 900, error='line\n' + 'r' * 5000) for _ in range(100)]
+        report = dict(checks_passed=False, error_count=100, errors=rows)
+        observed = io.StringIO()
+        with redirect_stdout(observed): summary = data.preflight_failure(report)
+        line = observed.getvalue().strip()
+        self.assertLessEqual(len(line), 4096)
+        projection = json.loads(line.removeprefix('PREFLIGHT_FAILURE '))
+        self.assertEqual(projection['errorCount'], 100)
+        self.assertEqual(len(projection['errors']), 4)
+        self.assertTrue(all(len(row['path']) <= 256 and len(row['reason']) <= 384 and '\n' not in row['reason']
+                            for row in projection['errors']))
+        self.assertLess(len(summary), 3000)
+        for path in ('/private/owner/path', '../escape', 'unknown/table.dbc'):
+            with self.assertRaises(ValueError):
+                data.preflight_failure(dict(checks_passed=False, error_count=1, errors=[dict(path=path, error='no')]))
+
+    def test_full_failed_preflight_report_preserves_details_beyond_stdout_summary(self):
+        errors = [dict(path='dbc/Table' + str(i) + '.dbc', error='controlled report row ' + str(i)) for i in range(100)]
+        def failed(root, **kwargs):
+            report = self.base_preflight(root, **kwargs)
+            self.assertTrue(report['checks_passed'])
+            report.update(checks_passed=False, error_count=100, errors=errors)
+            return report
+        observed = io.StringIO()
+        with patch.object(data, 'execute', side_effect=self.fake_execute), \
+             patch.object(data.formats, 'check_server_data', side_effect=failed), redirect_stdout(observed):
+            with self.assertRaisesRegex(ValueError, 'errors=100'): self.generate()
+        report = data.document(next((self.store / 'staging').glob('*/final-*/preflight.json')))
+        self.assertEqual(report['errors'], errors)
+        projection = json.loads(observed.getvalue().strip().removeprefix('PREFLIGHT_FAILURE '))
+        self.assertEqual(len(projection['errors']), 4)
+        self.assertFalse((self.store / 'current').exists())
+
+    def test_preflight_projection_json_escaping_stays_within_complete_line_budget(self):
+        rows = [dict(path='vmaps/' + '"q' * 400, error='"\\' * 5000) for _ in range(100)]
+        observed = io.StringIO()
+        with redirect_stdout(observed):
+            data.preflight_failure(dict(checks_passed=False, error_count=100, errors=rows))
+        self.assertLessEqual(len(observed.getvalue().encode('ascii')), 4096)
+        projection = json.loads(observed.getvalue().strip().removeprefix('PREFLIGHT_FAILURE '))
+        self.assertGreaterEqual(len(projection['errors']), 1)
+        self.assertLessEqual(len(projection['errors']), 4)
 
     def test_navigation_recovers_crash_before_data_directory_creation(self):
         with patch.object(data, 'execute', side_effect=self.pause_navigation):

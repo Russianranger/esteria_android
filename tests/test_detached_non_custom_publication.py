@@ -253,11 +253,13 @@ class PublicationGuards(unittest.TestCase):
             'productionCoreCompositionCompleted', 'productionFinishPlayerbotsExecuted', 'nestedDataDirectoryConfigurationVerified',
             'completedFinishReentryWithoutExecution', 'restartPersistenceVerified', 'restartedFinishReentryWithoutExecution',
             'productionReadyAndStoppedAcknowledgmentsVerified', 'sourcePrivateJournalsAccountCredentialsPreserved',
-            'nativeSqlSetupReceiptVerified', 'cleanShutdownVerified')})
+            'nativeSqlSetupReceiptVerified', 'cleanShutdownVerified',
+            'stockDbcSqlBackingVerified', 'stockDbcSqlBackingRestartVerified')})
         value.update({name: False for name in ('compilerExecuted', 'javaCoordinatorExecuted', 'authserverExecuted',
             'worldserverExecuted', 'serverDataQualified', 'playerbotsAiQualified', 'androidRuntimeQualified', 'gameplayQualified')})
         value['stockWorldSql'] = dict(contentProfile='stock-3.3.5a', stockRaceClassMapOutfitSqlOverlaysEmpty=True,
             humanWarriorNorthshireStartVerified=True, actualFileDbcRowsLoaded=False, worldStartupExecuted=False, gameplayQualified=False)
+        value['stockDbcSqlBacking'] = self.dbc_sql_backing()
         if mutate: mutate(value)
         raw = json.dumps(value).encode()
         env = dict(formatVersion=1, scope='native-installation-finish-and-clean-stop-environment', integrationRevision=TEST_APP,
@@ -267,6 +269,22 @@ class PublicationGuards(unittest.TestCase):
             archive.writestr('native-installation-qualification.json', raw)
             archive.writestr('environment-receipt.json', json.dumps(env))
         return path
+
+    def dbc_sql_backing(self):
+        # Synthetic observation metadata only; no SQL service or file DBC runs.
+        tables = publication.native_dbc_sql_bindings()
+        for table, row in tables.items():
+            power = table == 'powerdisplay_dbc'
+            row.update(rowCount=0 if power else 17, distinctIds=0 if power else 17,
+                minimumId=None if power else 0, maximumId=None if power else 16,
+                sourceAndLiveColumnsMatched=True, nonemptyRequired=not power,
+                nonemptyBackingVerified=not power, fileDbcRequiredWhenSqlEmpty=power,
+                nativeFileLoadQualified=False)
+        return dict(formatVersion=1, scope='stock-canonical-dbc-sql-backing-observation',
+            serverRevision=publication.DBC_SQL_SERVER_REVISION, database='acore_world', tables=tables,
+            observedTableCount=12, requiredNonemptyGtTableCount=11, allCanonicalColumnsMatched=True,
+            allRequiredGtBackingNonempty=True, readOnlyQueries=True, actualFileDbcRowsLoaded=False,
+            worldserverExecuted=False, androidRuntimeQualified=False, gameplayQualified=False)
 
     def test_native_success_requires_actual_sql_policy_restart_and_same_environment_source(self):
         proof = publication.verify_native_sql(self.sql_zip(), TEST_APP)
@@ -281,6 +299,89 @@ class PublicationGuards(unittest.TestCase):
             publication.verify_native_sql(self.sql_zip(lambda v: v['stockWorldSql'].update(humanWarriorNorthshireStartVerified=False)), TEST_APP)
         with self.assertRaisesRegex(ValueError, 'native-sql-source-binding'):
             publication.verify_native_sql(self.sql_zip(), 'c' * 40)
+
+    def test_native_dbc_backing_requires_both_completed_observation_stages(self):
+        proof = publication.verify_native_sql(self.sql_zip(), TEST_APP)
+        self.assertTrue(proof['canonicalGtSqlBackingAndRestartVerified'])
+        backing = proof['canonicalDbcSqlBacking']
+        self.assertEqual(backing['observedTableCount'], 12)
+        self.assertEqual(backing['requiredNonemptyGtTableCount'], 11)
+        power = backing['tables']['powerdisplay_dbc']
+        self.assertEqual(power['rowCount'], 0); self.assertTrue(power['fileDbcRequiredWhenSqlEmpty'])
+        self.assertFalse(power['nativeFileLoadQualified']); self.assertFalse(backing['actualFileDbcRowsLoaded'])
+        self.assertFalse(backing['worldserverExecuted']); self.assertFalse(backing['gameplayQualified'])
+        for field in ('stockDbcSqlBackingVerified', 'stockDbcSqlBackingRestartVerified'):
+            for value in (False, 1, 'true', None):
+                with self.subTest(field=field, value=value), self.assertRaisesRegex(ValueError, 'native-sql-not-qualified'):
+                    publication.verify_native_sql(self.sql_zip(lambda v: v.update({field: value})), TEST_APP)
+            with self.subTest(missing=field), self.assertRaisesRegex(ValueError, 'native-sql-not-qualified'):
+                publication.verify_native_sql(self.sql_zip(lambda v: v.pop(field)), TEST_APP)
+        with self.assertRaisesRegex(ValueError, 'native-dbc-sql-contract'):
+            publication.verify_native_sql(self.sql_zip(lambda v: v.pop('stockDbcSqlBacking')), TEST_APP)
+
+    def test_native_dbc_backing_pins_exact_active_tables_source_bytes_and_column_bindings(self):
+        table = 'gtcombatratings_dbc'
+        mutations = [
+            ('missing-table', lambda b: b['tables'].pop(table)),
+            ('extra-unused-table', lambda b: b['tables'].update(gtoctregenmp_dbc=copy.deepcopy(b['tables'][table]))),
+            ('wrong-source', lambda b: b.update(serverRevision='0' * 40)),
+            ('wrong-database', lambda b: b.update(database='other_world')),
+            ('wrong-file', lambda b: b['tables'][table].update(dbc='gtOther.dbc')),
+            ('wrong-format', lambda b: b['tables'][table].update(serverFormat='nf')),
+            ('wrong-source-hash', lambda b: b['tables'][table]['sourceSql'].update(sha256='0' * 64)),
+            ('wrong-source-size', lambda b: b['tables'][table]['sourceSql'].update(bytes=1)),
+            ('wrong-source-path', lambda b: b['tables'][table]['sourceSql'].update(path='../../outside.sql')),
+            ('wrong-column-order', lambda b: b['tables'][table]['columns'].reverse()),
+            ('wrong-column-name', lambda b: b['tables'][table]['columns'][1].update(name='Other')),
+            ('wrong-column-type', lambda b: b['tables'][table]['columns'][1].update(mysqlType='double')),
+            ('boolean-position', lambda b: b['tables'][table]['columns'][0].update(position=True)),
+            ('numeric-nullable', lambda b: b['tables'][table]['columns'][0].update(nullable=0)),
+            ('numeric-unsigned', lambda b: b['tables'][table]['columns'][0].update(unsigned=0)),
+            ('power-name-case', lambda b: b['tables']['powerdisplay_dbc']['columns'][2].update(name='GlobalStringBaseTag')),
+            ('power-byte-type', lambda b: b['tables']['powerdisplay_dbc']['columns'][3].update(mysqlType='int')),
+            ('power-byte-sign', lambda b: b['tables']['powerdisplay_dbc']['columns'][3].update(unsigned=False)),
+            ('power-nullable-string', lambda b: b['tables']['powerdisplay_dbc']['columns'][2].update(nullable=False)),
+            ('extra-field', lambda b: b['tables'][table].update(unrecognizedPrivateField='must-not-project')),
+        ]
+        for label, mutate in mutations:
+            with self.subTest(label=label), self.assertRaises(ValueError):
+                publication.verify_native_sql(self.sql_zip(lambda v: mutate(v['stockDbcSqlBacking'])), TEST_APP)
+
+    def test_native_dbc_backing_requires_nonempty_gt_and_consistent_integer_observations(self):
+        for table, *_ in publication.DBC_SQL_GT_BINDINGS:
+            def empty(backing):
+                backing['tables'][table].update(rowCount=0, distinctIds=0, minimumId=None, maximumId=None,
+                    nonemptyBackingVerified=False, fileDbcRequiredWhenSqlEmpty=True)
+            with self.subTest(empty=table), self.assertRaisesRegex(ValueError, 'native-dbc-sql-nonempty-gt'):
+                publication.verify_native_sql(self.sql_zip(lambda v: empty(v['stockDbcSqlBacking'])), TEST_APP)
+        table = 'gtcombatratings_dbc'
+        for changed in (dict(rowCount=True, distinctIds=1, minimumId=0, maximumId=0),
+                        dict(rowCount=17.0), dict(distinctIds=16), dict(rowCount=-1),
+                        dict(minimumId=False), dict(minimumId=17), dict(maximumId=0),
+                        dict(maximumId=4294967295), dict(nonemptyRequired=False),
+                        dict(nonemptyBackingVerified=1), dict(nativeFileLoadQualified=True)):
+            with self.subTest(changed=changed), self.assertRaises(ValueError):
+                publication.verify_native_sql(self.sql_zip(lambda v: v['stockDbcSqlBacking']['tables'][table].update(changed)), TEST_APP)
+        for changed in (dict(formatVersion=True), dict(observedTableCount=11), dict(requiredNonemptyGtTableCount=10),
+                        dict(allCanonicalColumnsMatched=1), dict(readOnlyQueries=False),
+                        dict(actualFileDbcRowsLoaded=True), dict(worldserverExecuted=True),
+                        dict(androidRuntimeQualified=True), dict(gameplayQualified=True)):
+            with self.subTest(scope=changed), self.assertRaisesRegex(ValueError, 'native-dbc-sql-contract'):
+                publication.verify_native_sql(self.sql_zip(lambda v: v['stockDbcSqlBacking'].update(changed)), TEST_APP)
+
+    def test_native_dbc_backing_preserves_observed_power_count_without_assuming_file_execution(self):
+        def positive(value):
+            value['stockDbcSqlBacking']['tables']['powerdisplay_dbc'].update(rowCount=7, distinctIds=7,
+                minimumId=100, maximumId=106, nonemptyBackingVerified=True, fileDbcRequiredWhenSqlEmpty=False)
+        result = publication.verify_native_sql(self.sql_zip(positive), TEST_APP)
+        power = result['canonicalDbcSqlBacking']['tables']['powerdisplay_dbc']
+        self.assertEqual(power['rowCount'], 7); self.assertEqual(power['minimumId'], 100)
+        self.assertFalse(power['fileDbcRequiredWhenSqlEmpty']); self.assertFalse(power['nativeFileLoadQualified'])
+        for changed in (dict(fileDbcRequiredWhenSqlEmpty=False), dict(nonemptyBackingVerified=True),
+                        dict(minimumId=0), dict(maximumId=0), dict(rowCount=False),
+                        dict(nativeFileLoadQualified=True)):
+            with self.subTest(emptyPower=changed), self.assertRaises(ValueError):
+                publication.verify_native_sql(self.sql_zip(lambda v: v['stockDbcSqlBacking']['tables']['powerdisplay_dbc'].update(changed)), TEST_APP)
 
     def test_unsigned_proof_requires_full_provider_flags_exact_source_and_integer_version(self):
         source = self.write('sources.lock.json', dict(synthetic='engine-pins-not-runtime-evidence'))

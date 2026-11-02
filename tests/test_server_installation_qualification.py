@@ -1,5 +1,6 @@
 """Host metadata/owned-child fixtures, never native SQL or phone qualification."""
 import copy
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -12,6 +13,137 @@ import unittest
 from unittest.mock import Mock, patch
 
 from tools import qualify_server_installation as setup
+
+
+class StockDbcSqlBacking(unittest.TestCase):
+    """Synthetic source/query guards only; actual SQL runs in the native job."""
+    TABLES = ('gtbarbershopcostbase_dbc', 'gtcombatratings_dbc', 'gtchancetomeleecritbase_dbc',
+        'gtchancetomeleecrit_dbc', 'gtchancetospellcritbase_dbc', 'gtchancetospellcrit_dbc',
+        'gtnpcmanacostscaler_dbc', 'gtoctclasscombatratingscalar_dbc', 'gtoctregenhp_dbc',
+        'gtregenhpperspt_dbc', 'gtregenmpperspt_dbc', 'powerdisplay_dbc')
+    GT_COLUMNS = ['ID\tint\tNO\t0', 'Data\tfloat\tNO\t0']
+    POWER_COLUMNS = ['ID\tint\tNO\t0', 'ActualType\tint\tNO\t0',
+        'GlobalstringBaseTag\tvarchar\tYES\t0', 'Red\ttinyint\tNO\t1',
+        'Green\ttinyint\tNO\t1', 'Blue\ttinyint\tNO\t1']
+
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory(prefix='est-dbc-sql-source-'); self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name)
+        self.manifest = dict(source=dict(commit=setup.baseline.SUPPORTED_SERVER), contentSha256Complete=True,
+            files={}, databases=dict(world=dict(base=[])))
+        self.content = Mock(source=self.root, manifest=self.manifest)
+        for table in self.TABLES:
+            columns = ("  `ID` int NOT NULL DEFAULT '0',\n"
+                "  `ActualType` int NOT NULL DEFAULT '0',\n"
+                "  `GlobalstringBaseTag` varchar(100) CHARACTER SET utf8mb4 DEFAULT NULL,\n"
+                "  `Red` tinyint unsigned NOT NULL DEFAULT '0',\n"
+                "  `Green` tinyint unsigned NOT NULL DEFAULT '0',\n"
+                "  `Blue` tinyint unsigned NOT NULL DEFAULT '0',\n") if table == 'powerdisplay_dbc' else (
+                "  `ID` int NOT NULL DEFAULT '0',\n  `Data` float NOT NULL DEFAULT '0',\n")
+            self.write_source(table, 'CREATE TABLE `' + table + '` (\n' + columns +
+                              '  PRIMARY KEY (`ID`)\n) ENGINE=InnoDB;\n')
+
+    def write_source(self, table, text):
+        path = 'data/sql/base/db_world/' + table + '.sql'
+        target = self.root / path; target.parent.mkdir(parents=True, exist_ok=True); target.write_text(text)
+        self.manifest['files'][path] = dict(bytes=target.stat().st_size,
+            sha256=hashlib.sha256(target.read_bytes()).hexdigest())
+        if path not in self.manifest['databases']['world']['base']:
+            self.manifest['databases']['world']['base'].append(path)
+
+    def connection(self, *, columns=None, counts=None):
+        columns, counts = columns or {}, counts or {}
+        def query(sql):
+            self.assertTrue(sql.startswith('SELECT ')); self.assertNotIn(';', sql)
+            if 'INFORMATION_SCHEMA.COLUMNS' in sql:
+                table = sql.split("TABLE_NAME='")[1].split("'", 1)[0]
+                self.assertTrue(sql.endswith('ORDER BY ORDINAL_POSITION'))
+                self.assertIn(table, self.TABLES)
+                return columns.get(table, self.POWER_COLUMNS if table == 'powerdisplay_dbc' else self.GT_COLUMNS)
+            self.assertTrue(sql.startswith('SELECT COUNT(*),COUNT(DISTINCT `ID`),MIN(`ID`),MAX(`ID`) '))
+            table = sql.split('FROM `acore_world`.`')[1][:-1]
+            self.assertIn(table, self.TABLES)
+            return counts.get(table, ['0\t0\tNULL\tNULL'] if table == 'powerdisplay_dbc' else ['17\t17\t0\t16'])
+        return Mock(query=Mock(side_effect=query))
+
+    def test_all_active_source_bindings_and_empty_power_are_observed_without_native_file_claim(self):
+        connection = self.connection()
+        result = setup.stock_dbc_sql_snapshot(connection, self.content)
+        self.assertEqual(tuple(result['tables']), self.TABLES)
+        self.assertEqual(result['observedTableCount'], 12); self.assertEqual(result['requiredNonemptyGtTableCount'], 11)
+        self.assertTrue(result['allRequiredGtBackingNonempty']); self.assertTrue(result['readOnlyQueries'])
+        self.assertFalse(result['actualFileDbcRowsLoaded']); self.assertFalse(result['worldserverExecuted'])
+        self.assertFalse(result['androidRuntimeQualified']); self.assertFalse(result['gameplayQualified'])
+        self.assertEqual(connection.query.call_count, 24)
+        self.assertNotIn('gtoctregenmp_dbc', result['tables'])
+        for table in self.TABLES[:-1]:
+            row = result['tables'][table]
+            self.assertEqual(row['rowCount'], 17); self.assertEqual(row['serverFormat'], 'df')
+            self.assertTrue(row['nonemptyRequired']); self.assertTrue(row['nonemptyBackingVerified'])
+            self.assertEqual([c['name'] for c in row['columns']], ['ID', 'Data'])
+        power = result['tables']['powerdisplay_dbc']
+        self.assertEqual(power['rowCount'], 0); self.assertIsNone(power['minimumId']); self.assertIsNone(power['maximumId'])
+        self.assertFalse(power['nonemptyRequired']); self.assertFalse(power['nonemptyBackingVerified'])
+        self.assertTrue(power['fileDbcRequiredWhenSqlEmpty']); self.assertFalse(power['nativeFileLoadQualified'])
+        self.assertEqual([c['serverFormat'] for c in power['columns']], list('nixxxx'))
+        self.assertEqual(power['columns'][2]['name'], 'GlobalstringBaseTag')
+        self.assertTrue(power['columns'][2]['nullable']); self.assertTrue(power['columns'][3]['unsigned'])
+
+    def test_all_eleven_gt_tables_require_real_nonempty_unique_valid_id_observations(self):
+        for table in self.TABLES[:-1]:
+            with self.subTest(table=table), self.assertRaisesRegex(ValueError, 'GT SQL backing is empty'):
+                setup.stock_dbc_sql_snapshot(self.connection(counts={table: ['0\t0\tNULL\tNULL']}), self.content)
+        table = self.TABLES[0]
+        for rows in ([], ['1'], ['1\t1\t0\t0', '1\t1\t0\t0'], ['0\t0\t0\t0'],
+                     ['2\t1\t0\t1'], ['2\t2\t0\t0'], ['1\t1\t-1\t0'],
+                     ['1\t1\t0\t4294967295'], ['true\t1\t0\t0']):
+            with self.subTest(rows=rows), self.assertRaises(ValueError):
+                setup.stock_dbc_sql_snapshot(self.connection(counts={table: rows}), self.content)
+
+    def test_live_column_order_types_nullability_and_unsigned_flags_must_match_source(self):
+        table = self.TABLES[0]
+        for columns in (list(reversed(self.GT_COLUMNS)), ['ID\tint\tNO\t0'],
+                        ['ID\tint\tNO\t0', 'Data\tdouble\tNO\t0'],
+                        ['ID\tint\tYES\t0', 'Data\tfloat\tNO\t0']):
+            with self.subTest(columns=columns), self.assertRaisesRegex(ValueError, 'live column binding differs'):
+                setup.stock_dbc_sql_snapshot(self.connection(columns={table: columns}), self.content)
+        for before, after in [('GlobalstringBaseTag', 'GlobalStringBaseTag'), ('YES', 'NO'),
+                              ('Red\ttinyint\tNO\t1', 'Red\ttinyint\tNO\t0')]:
+            changed = [line.replace(before, after) for line in self.POWER_COLUMNS]
+            with self.subTest(power=after), self.assertRaisesRegex(ValueError, 'live column binding differs'):
+                setup.stock_dbc_sql_snapshot(self.connection(columns={'powerdisplay_dbc': changed}), self.content)
+
+    def test_source_selection_identity_and_exact_loader_binding_are_required_before_queries(self):
+        table = self.TABLES[0]; path = 'data/sql/base/db_world/' + table + '.sql'
+        for change in ('pin', 'incomplete', 'unselected', 'hash'):
+            manifest = copy.deepcopy(self.manifest)
+            if change == 'pin': manifest['source']['commit'] = '0' * 40
+            if change == 'incomplete': manifest['contentSha256Complete'] = False
+            if change == 'unselected': manifest['databases']['world']['base'].remove(path)
+            if change == 'hash': manifest['files'][path]['sha256'] = '0' * 64
+            connection = self.connection()
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                setup.stock_dbc_sql_snapshot(connection, Mock(source=self.root, manifest=manifest))
+            connection.query.assert_not_called()
+        for invalid, fmt in [('../escape', 'df'), (table, 'nixxxx'), ('gtoctregenmp_dbc', 'df')]:
+            with self.subTest(binding=invalid), self.assertRaisesRegex(ValueError, 'pinned server source and binding'):
+                setup.stock_dbc_sql_columns(self.content, invalid, fmt)
+
+    def test_source_ddl_columns_are_inspected_and_changed_source_is_not_accepted(self):
+        table = self.TABLES[0]; path = 'data/sql/base/db_world/' + table + '.sql'; target = self.root / path
+        text = target.read_text()
+        for changed in (text.replace('`Data`', '`Other`'), text.replace('CREATE TABLE', 'CREATE VIEW'),
+                        text.replace('  PRIMARY KEY', "  `Extra` int NOT NULL,\n  PRIMARY KEY")):
+            self.write_source(table, changed)
+            connection = self.connection()
+            with self.subTest(changed=changed), self.assertRaises(ValueError):
+                setup.stock_dbc_sql_snapshot(connection, self.content)
+            connection.query.assert_not_called()
+        self.write_source(table, text); target.write_text(text + '-- changed after manifest\n')
+        connection = self.connection()
+        with self.assertRaisesRegex(ValueError, 'source bytes differ'):
+            setup.stock_dbc_sql_snapshot(connection, self.content)
+        connection.query.assert_not_called()
 
 
 class InstallationQualification(unittest.TestCase):

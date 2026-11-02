@@ -330,7 +330,9 @@ public final class SessionService extends Service {
     }
     private static String preparationLabel(String phase){
         if(phase.startsWith("server-data")){
-            if(phase.contains("resumed-reviewed-v8-work"))return "Continuing compatible work from the previous version";
+            if(phase.contains("resumed-reviewed-v8-work")||phase.contains("resumed-reviewed-v9-work")||phase.contains("migrated-reviewed-v9-generation"))return "Continuing compatible work from the previous version";
+            if(phase.contains("output-hashing")||phase.contains("output-verifying")||phase.contains("format-preflight"))return "World data · checking generated files";
+            if(phase.contains("final-assembly"))return "World data · assembling validated output";
             if(phase.contains("reused-"))return "Reusing completed world data · "+phase.substring(phase.indexOf("reused-")+7).replace('-',' ');
             if(phase.contains("mmaps")||phase.contains("navigation"))return "World data · navigation meshes";
             if(phase.contains("vmap4_assembler")||phase.contains("assembled-collision"))return "World data · assembling collision models";

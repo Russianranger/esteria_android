@@ -1,3 +1,13 @@
+# Esteria Stock v10 — post-navigation preflight fix in validation
+
+The latest v9 support bundle reaches generated-data preflight after navigation, then returns a format error. It records no new low-memory kill. The exact offending filename was omitted by the old diagnostic. Source review found eleven valid stock client disk layouts rejected by the server SQL-layout check: ten single-float GT tables and packed PowerDisplay. V10 admits only those exact layouts for the explicit stock profile; malformed data, custom profiles, continuation fragments and unrelated tables retain strict checks. Actual pinned native loader tests read packed PowerDisplay rows and demonstrate the GT disk/SQL distinction.
+
+Reviewed v9 checkpoints and failed final assemblies are verified and reused, including completed navigation. The retry retains imported content, saves and databases. New bounded diagnostics identify offending group/path/reason and show hashing, final assembly and preflight separately. Existing speed levels, memory guards, source pins and the v7 native data provider remain unchanged.
+
+Version 10 packaging, native SQL backing/restart, Android components and public signed-APK readback remain pending. Version 9 remains the published baseline until those gates pass. Do not install a launcher-only build or clear/reimport owner data.
+
+## Published v9 baseline — historical
+
 # Esteria Stock v9 — preparation speed, resume and storage update published
 
 [Signed ARM64 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.9/Esteria-Stock-3.3.5a-arm64.apk) · [Testing procedure](NON-CUSTOM-TESTING.md).

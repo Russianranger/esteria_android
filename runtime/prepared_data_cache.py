@@ -170,7 +170,7 @@ def seal(root,generation,receipt_pin,helper_generation,output,*,expected_inputs=
                 else:stats=node_stamp(path,'directory')
                 record['stat']=stats;write(record);count+=1
             require(files==begin['expectedFiles'] and total==begin['expectedFileBytes'],'prepared-data file inventory differs')
-            preflight=data.formats.check_server_data(root/'data')
+            preflight=data.formats.check_server_data(root/'data',content_profile=receipt['inputs'].get('contentProfile','esteria-custom'))
             require(preflight['checks_passed'] and encoded(preflight)==encoded(receipt['preflight']),
                 'prepared-data header preflight differs')
             write(dict(end=True,nodes=count,files=files,fileBytes=total))

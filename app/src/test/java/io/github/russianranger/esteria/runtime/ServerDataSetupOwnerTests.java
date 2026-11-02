@@ -136,6 +136,14 @@ public final class ServerDataSetupOwnerTests {
             check(read.invoke(progress,log)==null&&!details.invoke(progress).toString().contains("PRIVATE_TEXT"),"Malformed progress and added raw child fields remain excluded");
             Files.writeString(log,"extraction-navigation-resume-123-tiles\n",StandardOpenOption.APPEND);
             check("navigation-resume".equals(read.invoke(progress,log))&&details.invoke(progress).equals("Continuing 123 validated navigation tiles"),"Resume is visibly distinct from a fresh native phase");
+            Files.writeString(log,"extraction-navigation-verifying\n",StandardOpenOption.APPEND);
+            check("output-verifying".equals(read.invoke(progress,log))&&details.invoke(progress).equals(""),"Output verification clears stale navigation percentage");
+            Files.writeString(log,"extraction-resumed-reviewed-v9-work\n",StandardOpenOption.APPEND);
+            check("resumed-reviewed-v9-work".equals(read.invoke(progress,log)),"Reviewed v9 work has a bounded explicit phase");
+            Files.writeString(log,"extraction-final-assembly\n",StandardOpenOption.APPEND);
+            check("final-assembly".equals(read.invoke(progress,log)),"Final output assembly has an explicit phase");
+            Files.writeString(log,"extraction-format-preflight\n",StandardOpenOption.APPEND);
+            check("format-preflight".equals(read.invoke(progress,log))&&details.invoke(progress).equals(""),"Final format checks do not retain native progress");
         }finally{remove(root);}
     }
     private static void remove(Path root)throws IOException {try(var paths=Files.walk(root)){for(Path path:paths.sorted(Comparator.reverseOrder()).toArray(Path[]::new))Files.delete(path);}}

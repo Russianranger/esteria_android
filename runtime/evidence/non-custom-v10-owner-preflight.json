@@ -1,0 +1,53 @@
+{
+  "androidOwnerRetryQualified": false,
+  "application": {
+    "sourceRevision": "f39b52459d08fb85bf4fe6da5edddf8bccdea8bf",
+    "version": "0.1.0-non-custom.9"
+  },
+  "change": {
+    "boundedPathAndReasonDiagnostics": true,
+    "customProfileRemainsStrict": true,
+    "explicitStockProfileWhitelist": true,
+    "payloadRewritten": false,
+    "reviewedV9CheckpointMigration": true
+  },
+  "failure": {
+    "dataPreparationElapsedSeconds": 8329,
+    "exactOffendingOutputNotRecorded": true,
+    "observedError": "Server data preparation failed (ValueError): generated server data failed format preflight; active output preserved",
+    "operationElapsedSeconds": 8412,
+    "outputReadBytes": 13741878254,
+    "phaseLabelWasStale": true
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "memory": {
+    "javaHeapPeakObservedBytes": 50224320,
+    "lastAvailableBytes": 10490597376,
+    "lastPressureLevel": 0,
+    "nativePressureAborts": 0,
+    "newLowMemoryKillEstablished": false
+  },
+  "scope": "owner-v9-post-navigation-failure-and-source-format-regression",
+  "sourceDiagnosis": {
+    "exactOwnerOutputQualified": false,
+    "indexedGtScalarRemainsStrict": true,
+    "mismatchedLoadedClientDiskLayouts": 11,
+    "ownerFailureIsConsistentWithSourceBug": true,
+    "packedPowerDisplay": {
+      "bytes": 15,
+      "emptySqlTableAllowed": true,
+      "fields": 6,
+      "nativeDiskLoaderCompatible": true
+    },
+    "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
+    "singleFloatGtTables": 10,
+    "stockClientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5"
+  },
+  "supportBundle": {
+    "bytes": 17871,
+    "filename": "Esteria-support-1793590491615.zip",
+    "sha256": "b418ff3e6c047b3a2396cd2b3dedbb1e4b247556a90d85189da12fb88fc1a484"
+  },
+  "worldQualified": false
+}

@@ -1,8 +1,8 @@
-# Version 9 preparation speed, resume and storage controls
+# Version 10 data-format preflight retry
 
-Install the signed `0.1.0-non-custom.9` / versionCode 9 ARM64 update over the existing Esteria Stock app. The package and persistent certificate are unchanged. **Keep the completed client import and all app data. Do not uninstall, clear storage or reimport the client.** Check `SHA256SUMS`, `release.json` and the signing receipt for the exact APK/source identity.
+Install the signed `0.1.0-non-custom.10` / versionCode 10 ARM64 update over the existing Esteria Stock app. The package and persistent certificate are unchanged. **Keep the completed client import and all app data. Do not uninstall, clear storage or reimport the client.** Check `SHA256SUMS`, `release.json` and the signing receipt for the exact APK/source identity.
 
-The latest v8 support report reached navigation-mesh generation. One attempt paused for memory pressure after about 103 minutes; a later attempt was cancelled. It records no new Android low-memory kill. The visible runtime preparations reused the same generations with zero copied bytes. Failed navigation attempts could leave separate partial directories that were not reused on retry. V9 retains valid partial navigation output and migrates compatible v8 work after checking its inputs and outputs.
+The latest v9 report reached navigation-mesh preparation, then stopped at the generated-data format preflight. V10 corrects that preflight and revalidates compatible completed v9 world work for reuse. **Keep the completed navigation output; do not delete it to retry.** Incomplete or incompatible output is still rebuilt or rejected as appropriate. Preparation speeds, pressure handling and storage controls remain as in v9.
 
 ## Choose a preparation speed
 
@@ -18,11 +18,11 @@ These are verification/copy pacing limits, not total-world completion estimates.
 
 Memory pressure still reduces governed reads to 2 MiB/s or pauses preparation. An isolated trim signal with verified healthy headroom backs off instead of immediately cancelling a long native phase. Genuine low-memory observations remain a pause condition. Clean-input cache advice now works through bounded windows rather than repeatedly advising every complete archive in each short interval.
 
-## Resume without discarding useful work
+## Retry the preflight without discarding useful work
 
-1. Install v9 over the current app and retain the existing import. Select its installed locale and **Balanced**.
+1. Install v10 over the current app and retain the existing import. Select its installed locale and **Balanced**.
 2. Choose **Prepare local runtime / world**. The status identifies the current phase, so a transition from maps to collision or navigation work is distinguishable from a restart. Provider checks still run before reused outputs are accepted.
-3. Leave the operation running while it makes progress. Completed compatible phases and valid partial navigation tiles are reused. Malformed or incomplete partial tiles are regenerated; a stopped phase is never reported as complete.
+3. Leave the operation running while it makes progress. Compatible completed v9 phases, including navigation output, and valid partial navigation tiles are checked before reuse. Malformed or incomplete partial tiles are regenerated; a stopped phase is never reported as complete.
 4. To compare speeds, press **Stop** and wait for cleanup to finish before changing the level. Retry with the same locale. Changing only speed does not change the data generation or require reimporting the client.
 5. If a memory pause occurs, wait for headroom to recover, choose a slower level if appropriate, and retry. If a stage fails or Android closes the app, export support before another preparation attempt.
 
@@ -32,7 +32,7 @@ A speed comparison made across different phases is not a benchmark: hashing, mod
 
 Use the storage scan while the app is idle to see recognized reclaimable files, then use the trim action. Maintenance is unavailable during preparation or gameplay. It preserves the imported client, current and expected runtime generations, mutable database, character saves, client configuration and usable world work. It removes only recognized obsolete immutable runtime generations and redundant runtime archive caches. It does not delete normal Blizzard MPQs or ask you to move files out of `Data`.
 
-Compatible v8 world staging is kept until it can be checked and migrated. The preparation helper then removes recognized abandoned duplicate phase directories after the child process has stopped. This avoids deleting potentially useful long-running work merely because it was created by the previous version. Unknown files are retained rather than guessed to be disposable. The reported reclaimable byte count is a file inventory, not a promise of an identical increase in Android free-space accounting.
+Compatible v8/v9 world staging is kept until it can be checked and migrated. The preparation helper then removes recognized abandoned duplicate phase directories after the child process has stopped. This avoids deleting potentially useful long-running work merely because it was created by the previous version. Unknown files are retained rather than guessed to be disposable. The reported reclaimable byte count is a file inventory, not a promise of an identical increase in Android free-space accounting.
 
 ## Complete the local game test
 

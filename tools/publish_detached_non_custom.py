@@ -39,7 +39,7 @@ BRANCH = 'non-custom'
 FAILED_SQL_RUN = 41211067232  # Retained failure; never reused as success.
 PACKAGE_WORKFLOW = '.github/workflows/android-local-game-profile.yml'
 SQL_WORKFLOW = '.github/workflows/server-installation-native.yml'
-PUBLICATION_DIRECTORY = 'runtime/releases/non-custom/update-9'
+PUBLICATION_DIRECTORY = 'runtime/releases/non-custom/update-10'
 SELECTION = ROOT / PUBLICATION_DIRECTORY / 'publication-inputs.json'
 RECIPE = PUBLICATION_DIRECTORY + '/signature-recipe.json'
 RECEIPT = PUBLICATION_DIRECTORY + '/signing-receipt.json'
@@ -48,6 +48,84 @@ MAX_JSON = 4 << 20
 MAX_ARTIFACT = 500_000_000
 HEX = re.compile('[0-9a-f]{64}')
 require = signing.require
+# Exact f35 SQL source bytes and active DBCStores.cpp bindings. These are
+# identities from the preserved source-content package, not invented row counts.
+DBC_SQL_SERVER_REVISION = 'f35f04d01689f034778e3474b3c820092f51e461'
+DBC_SQL_GT_BINDINGS = (
+    ('gtbarbershopcostbase_dbc', 'gtBarberShopCostBase.dbc', 3063, 'ac8330eb79ff2eda7ee422dbd17b892ee1b07348d0c19b2714fa16df229f527e'),
+    ('gtcombatratings_dbc', 'gtCombatRatings.dbc', 46984, '8b855d7a0cb4c26d3e83c15fb88cbdf9c67298087d799b6d9f4c15a9e01cbd8c'),
+    ('gtchancetomeleecritbase_dbc', 'gtChanceToMeleeCritBase.dbc', 2093, '953fc269b8e3790e83b10b35bc818769639ecb6086a9c6f5e5113af36d05feeb'),
+    ('gtchancetomeleecrit_dbc', 'gtChanceToMeleeCrit.dbc', 19001, '62faba498fd345ef0c01d846c34eff0d6fb5e10d4cdacf9cb392594041148b69'),
+    ('gtchancetospellcritbase_dbc', 'gtChanceToSpellCritBase.dbc', 2070, '4860ee6d13c2b0525b24ab47057436270aae93895f9ce2b5d391baa40cf8a465'),
+    ('gtchancetospellcrit_dbc', 'gtChanceToSpellCrit.dbc', 16606, 'f637e88c919f09d6b4ba2e807efc7ba3e07d1b7821a90a406af6be1768f2779e'),
+    ('gtnpcmanacostscaler_dbc', 'gtNPCManaCostScaler.dbc', 3094, 'e4f56018c5eb751afd3958fb9e95ac135863ec71bc017da1d647337dad62c07f'),
+    ('gtoctclasscombatratingscalar_dbc', 'gtOCTClassCombatRatingScalar.dbc', 5074, 'b4c3f0aed5bd50a6efb429b82c6eeb2406449633a45ca0ca07fb18c7110be0bd'),
+    ('gtoctregenhp_dbc', 'gtOCTRegenHP.dbc', 17996, '99b0b3e6bb62be27cee18e5787f0a4a950ebc47a1a1569643edc8cc144ffe364'),
+    ('gtregenhpperspt_dbc', 'gtRegenHPPerSpt.dbc', 17161, '6683c7486814bae39b36c4582b6495cb561b04a2e85f86f243ee3d560e53330b'),
+    ('gtregenmpperspt_dbc', 'gtRegenMPPerSpt.dbc', 16469, '78d6f3d74c92b3f5c00e35098fb351f0bcb8fbecaa4732dd65594a1d45c13db6'),
+)
+
+
+def native_dbc_sql_bindings():
+    """Independent canonical schema/source contract for the native SQL proof."""
+    result = {}
+    for table, dbc, size, digest in (*DBC_SQL_GT_BINDINGS,
+            ('powerdisplay_dbc', 'PowerDisplay.dbc', 2056, '936ca692cbe784c87e134f23c39957b2a6309a345e2c2d45a3d5247bfafed7be')):
+        power = table == 'powerdisplay_dbc'
+        fmt = 'nixxxx' if power else 'df'
+        names = ('ID', 'ActualType', 'GlobalstringBaseTag', 'Red', 'Green', 'Blue') if power else ('ID', 'Data')
+        types = ('int', 'int', 'varchar', 'tinyint', 'tinyint', 'tinyint') if power else ('int', 'float')
+        columns = [dict(position=index + 1, name=name, mysqlType=kind, nullable=power and index == 2,
+            unsigned=power and index >= 3, serverFormat=fmt[index]) for index, (name, kind) in enumerate(zip(names, types))]
+        result[table] = dict(dbc=dbc, serverFormat=fmt, sourceSql=dict(path='data/sql/base/db_world/' + table + '.sql',
+            bytes=size, sha256=digest), columns=columns)
+    return result
+
+
+def verify_native_dbc_sql(value):
+    """Require real, source-bound GT backing; empty PowerDisplay needs its file.
+
+    SQL observations cannot qualify the separate native packed-file loader or
+    world execution. Counts are validated as observations, never prescribed.
+    """
+    expected = native_dbc_sql_bindings()
+    fields = {'formatVersion', 'scope', 'serverRevision', 'database', 'tables', 'observedTableCount',
+        'requiredNonemptyGtTableCount', 'allCanonicalColumnsMatched', 'allRequiredGtBackingNonempty',
+        'readOnlyQueries', 'actualFileDbcRowsLoaded', 'worldserverExecuted', 'androidRuntimeQualified', 'gameplayQualified'}
+    require(type(value) is dict and set(value) == fields and type(value['formatVersion']) is int and
+        value['formatVersion'] == 1 and value['scope'] == 'stock-canonical-dbc-sql-backing-observation' and
+        value['serverRevision'] == DBC_SQL_SERVER_REVISION and value['database'] == 'acore_world' and
+        type(value['observedTableCount']) is int and value['observedTableCount'] == 12 and
+        type(value['requiredNonemptyGtTableCount']) is int and value['requiredNonemptyGtTableCount'] == 11 and
+        all(value[name] is True for name in ('allCanonicalColumnsMatched', 'allRequiredGtBackingNonempty', 'readOnlyQueries')) and
+        all(value[name] is False for name in ('actualFileDbcRowsLoaded', 'worldserverExecuted', 'androidRuntimeQualified', 'gameplayQualified')) and
+        type(value['tables']) is dict and set(value['tables']) == set(expected), 'publication-native-dbc-sql-contract')
+    row_fields = {'dbc', 'serverFormat', 'sourceSql', 'columns', 'rowCount', 'distinctIds', 'minimumId', 'maximumId',
+        'sourceAndLiveColumnsMatched', 'nonemptyRequired', 'nonemptyBackingVerified', 'fileDbcRequiredWhenSqlEmpty', 'nativeFileLoadQualified'}
+    column_fields = {'position', 'name', 'mysqlType', 'nullable', 'unsigned', 'serverFormat'}
+    for table, binding in expected.items():
+        row = value['tables'][table]
+        require(type(row) is dict and set(row) == row_fields and row['dbc'] == binding['dbc'] and
+            row['serverFormat'] == binding['serverFormat'] and type(row['sourceSql']) is dict and
+            set(row['sourceSql']) == {'path', 'bytes', 'sha256'}, 'publication-native-dbc-sql-table-binding')
+        pin({key: row['sourceSql'][key] for key in ('bytes', 'sha256')}, 4 << 30)
+        require(row['sourceSql'] == binding['sourceSql'] and type(row['columns']) is list and
+            len(row['columns']) == len(binding['columns']) and
+            all(type(column) is dict and set(column) == column_fields and type(column['position']) is int and
+                type(column['nullable']) is bool and type(column['unsigned']) is bool for column in row['columns']) and
+            row['columns'] == binding['columns'], 'publication-native-dbc-sql-canonical-columns')
+        required = table != 'powerdisplay_dbc'
+        count = row['rowCount']
+        require(type(count) is int and 0 <= count <= (1 << 32) - 1 and type(row['distinctIds']) is int and
+            row['distinctIds'] == count and row['sourceAndLiveColumnsMatched'] is True and
+            row['nonemptyRequired'] is required and row['nonemptyBackingVerified'] is (count > 0) and
+            row['fileDbcRequiredWhenSqlEmpty'] is (count == 0) and row['nativeFileLoadQualified'] is False,
+            'publication-native-dbc-sql-observations')
+        low, high = row['minimumId'], row['maximumId']
+        require((not required and count == 0 and low is None and high is None) or
+            (count > 0 and type(low) is int and type(high) is int and
+             0 <= low <= high < (1 << 32) - 1 and count <= high - low + 1), 'publication-native-dbc-sql-nonempty-gt')
+    return value
 
 
 def unique(rows):
@@ -387,7 +465,8 @@ def verify_native_sql(path, revision):
             'productionCoreCompositionCompleted', 'productionFinishPlayerbotsExecuted', 'nestedDataDirectoryConfigurationVerified',
             'completedFinishReentryWithoutExecution', 'restartPersistenceVerified', 'restartedFinishReentryWithoutExecution',
             'productionReadyAndStoppedAcknowledgmentsVerified', 'sourcePrivateJournalsAccountCredentialsPreserved',
-            'nativeSqlSetupReceiptVerified', 'cleanShutdownVerified')) and
+            'nativeSqlSetupReceiptVerified', 'cleanShutdownVerified',
+            'stockDbcSqlBackingVerified', 'stockDbcSqlBackingRestartVerified')) and
         all(value.get(name) is False for name in ('compilerExecuted', 'javaCoordinatorExecuted', 'authserverExecuted',
             'worldserverExecuted', 'serverDataQualified', 'playerbotsAiQualified', 'androidRuntimeQualified', 'gameplayQualified')),
         'publication-native-sql-not-qualified')
@@ -396,7 +475,9 @@ def verify_native_sql(path, revision):
         stock.get('humanWarriorNorthshireStartVerified') is True and stock.get('actualFileDbcRowsLoaded') is False and
         stock.get('worldStartupExecuted') is False and stock.get('gameplayQualified') is False,
         'publication-native-stock-sql-closure')
+    backing = verify_native_dbc_sql(value.get('stockDbcSqlBacking'))
     return dict(actualNativeSqlSetupAndRestartVerified=True, stockSqlPolicyAndHumanStartVerified=True,
+        canonicalGtSqlBackingAndRestartVerified=True, canonicalDbcSqlBacking=backing,
         sourceRevision=revision, sqlSelectionPolicy=STOCK_SQL_POLICY, worldserverExecuted=False, gameplayQualified=False)
 
 

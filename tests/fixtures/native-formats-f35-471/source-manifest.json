@@ -1,0 +1,353 @@
+{
+  "clientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "files": {
+    "client/WoW/Source/DB/Rec/PowerDisplayRec.cpp": {
+      "bytes": 1504,
+      "path": "WoW/Source/DB/Rec/PowerDisplayRec.cpp",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "e175fd7208d7e974122238dcc7a20817fac1894a800b84b66c909e640cadf1fa"
+    },
+    "client/WoW/Source/DB/Rec/PowerDisplayRec.h": {
+      "bytes": 673,
+      "path": "WoW/Source/DB/Rec/PowerDisplayRec.h",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "1c50785fd686fc23cea4907017a3f980563aa58951f92ec40e9d3a75176673bb"
+    },
+    "client/WoW/Source/DB/Rec/gtBarberShopCostBaseRec.cpp": {
+      "bytes": 630,
+      "path": "WoW/Source/DB/Rec/gtBarberShopCostBaseRec.cpp",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "933592c17f78856d6560eda1119ecbb9932fbdf0cf1914100771f61ddebc3317"
+    },
+    "client/WoW/Source/DB/Rec/gtBarberShopCostBaseRec.h": {
+      "bytes": 572,
+      "path": "WoW/Source/DB/Rec/gtBarberShopCostBaseRec.h",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "1ab727cec069cc2cc844f5cd6d1f4f430a5b1848cb75fd9643ba5532eafae2fa"
+    },
+    "client/WoW/Source/DB/Rec/gtChanceToMeleeCritBaseRec.cpp": {
+      "bytes": 654,
+      "path": "WoW/Source/DB/Rec/gtChanceToMeleeCritBaseRec.cpp",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "e62cacf59a54324e6526dd0dd407a45568f425c7584f12a3e07cf4b6d444da97"
+    },
+    "client/WoW/Source/DB/Rec/gtChanceToMeleeCritBaseRec.h": {
+      "bytes": 587,
+      "path": "WoW/Source/DB/Rec/gtChanceToMeleeCritBaseRec.h",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "fb8559f742598c6a5a1f924cbca5195d59eaa1a39739d713c18ee4e719b421ce"
+    },
+    "client/WoW/Source/DB/Rec/gtChanceToMeleeCritRec.cpp": {
+      "bytes": 622,
+      "path": "WoW/Source/DB/Rec/gtChanceToMeleeCritRec.cpp",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "a98062f7e93dfa50b56dbf1a3d9293434a4b4596014ec81446754aed491b1da4"
+    },
+    "client/WoW/Source/DB/Rec/gtChanceToMeleeCritRec.h": {
+      "bytes": 567,
+      "path": "WoW/Source/DB/Rec/gtChanceToMeleeCritRec.h",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "45d0aa96205b52443e5053632c27e8ea76bd2870b8bd8e4cf58f5afe27fc6282"
+    },
+    "client/WoW/Source/DB/Rec/gtChanceToSpellCritBaseRec.cpp": {
+      "bytes": 654,
+      "path": "WoW/Source/DB/Rec/gtChanceToSpellCritBaseRec.cpp",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "e64a895e222c41903194f236cf03af31d80e4f1379a6feb72865a117c457d8ff"
+    },
+    "client/WoW/Source/DB/Rec/gtChanceToSpellCritBaseRec.h": {
+      "bytes": 587,
+      "path": "WoW/Source/DB/Rec/gtChanceToSpellCritBaseRec.h",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "f0ef652253571d0ec3b98c9e40ca2682424cccdd4d39d14fa96937fab04468c4"
+    },
+    "client/WoW/Source/DB/Rec/gtChanceToSpellCritRec.cpp": {
+      "bytes": 622,
+      "path": "WoW/Source/DB/Rec/gtChanceToSpellCritRec.cpp",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "5a674453921b3259d77f676e5c85cc33a7f52a070eb209b15a59c3f246b21b6c"
+    },
+    "client/WoW/Source/DB/Rec/gtChanceToSpellCritRec.h": {
+      "bytes": 567,
+      "path": "WoW/Source/DB/Rec/gtChanceToSpellCritRec.h",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "2fe244a59d9ff4573b417ab7c1a738e72af9ebeb43d30f00ccaa86951b949e9e"
+    },
+    "client/WoW/Source/DB/Rec/gtCombatRatingsRec.cpp": {
+      "bytes": 590,
+      "path": "WoW/Source/DB/Rec/gtCombatRatingsRec.cpp",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "457f0659e0fefd4672f48ada5e2b8bec7681f263c35e9a25d6c631e4e6c250b9"
+    },
+    "client/WoW/Source/DB/Rec/gtCombatRatingsRec.h": {
+      "bytes": 547,
+      "path": "WoW/Source/DB/Rec/gtCombatRatingsRec.h",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "ff1b97a647108e79642971b26a783641a54fea530151391a9d742a845bcf6d63"
+    },
+    "client/WoW/Source/DB/Rec/gtNPCManaCostScalerRec.cpp": {
+      "bytes": 622,
+      "path": "WoW/Source/DB/Rec/gtNPCManaCostScalerRec.cpp",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "0c00711ac4ed4c1bada88810435c576387417c702f07625e4863065ede0b2642"
+    },
+    "client/WoW/Source/DB/Rec/gtNPCManaCostScalerRec.h": {
+      "bytes": 567,
+      "path": "WoW/Source/DB/Rec/gtNPCManaCostScalerRec.h",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "59342b7eacf26de7ae80a2e035754319d5eea05fefb009b8a27f77c4ee5935d4"
+    },
+    "client/WoW/Source/DB/Rec/gtOCTClassCombatRatingScalarRec.cpp": {
+      "bytes": 808,
+      "path": "WoW/Source/DB/Rec/gtOCTClassCombatRatingScalarRec.cpp",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "7a796086076f0de7ae1241ae1b28cf0065e7456f7ac7ae6479cbd22204e5162c"
+    },
+    "client/WoW/Source/DB/Rec/gtOCTClassCombatRatingScalarRec.h": {
+      "bytes": 604,
+      "path": "WoW/Source/DB/Rec/gtOCTClassCombatRatingScalarRec.h",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "3ee0645518071d3ada747f849cd452b5bb781cd20511960df2e634b877808bba"
+    },
+    "client/WoW/Source/DB/Rec/gtOCTRegenHPRec.cpp": {
+      "bytes": 566,
+      "path": "WoW/Source/DB/Rec/gtOCTRegenHPRec.cpp",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "0bb996a0cfc8b89d66afb9c017da6ef93a57a8cdc69e9052f5f2cd9e26af7505"
+    },
+    "client/WoW/Source/DB/Rec/gtOCTRegenHPRec.h": {
+      "bytes": 532,
+      "path": "WoW/Source/DB/Rec/gtOCTRegenHPRec.h",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "3dd4e0b4cb46f4379be32f68ce2551db5691702080580d232876ae714e69bd9f"
+    },
+    "client/WoW/Source/DB/Rec/gtRegenHPPerSptRec.cpp": {
+      "bytes": 590,
+      "path": "WoW/Source/DB/Rec/gtRegenHPPerSptRec.cpp",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "c3817d53845f16bba2b2ae9089bfa24ba1f99407b0738e0461188f313fffdc5b"
+    },
+    "client/WoW/Source/DB/Rec/gtRegenHPPerSptRec.h": {
+      "bytes": 547,
+      "path": "WoW/Source/DB/Rec/gtRegenHPPerSptRec.h",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "635ee5847ab2996ec5bbf9a5122e873ea07a9248ca5ae82fe791a5172dbae071"
+    },
+    "client/WoW/Source/DB/Rec/gtRegenMPPerSptRec.cpp": {
+      "bytes": 590,
+      "path": "WoW/Source/DB/Rec/gtRegenMPPerSptRec.cpp",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "3efea09821fc4d9befd4953ffd3415c546e8e2778ef6b5dd1a66b8dc2b4a5bdc"
+    },
+    "client/WoW/Source/DB/Rec/gtRegenMPPerSptRec.h": {
+      "bytes": 547,
+      "path": "WoW/Source/DB/Rec/gtRegenMPPerSptRec.h",
+      "repository": "Russianranger/wowdecomp_esteria",
+      "revision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "sha256": "286423e2636a72c2f716b04236ba559387beb779f63da03e2876cb277228f9a7"
+    },
+    "map_file_format.inc": {
+      "bytes": 2269,
+      "noticeRetained": true,
+      "path": "src/tools/map_extractor/System.cpp",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "8c6b406e4a9087613f93861f008ec21cfba9e3e08d212061aa3a772caafccadd",
+      "sourceBytes": 37480,
+      "sourceRange": [
+        8317,
+        9839
+      ],
+      "sourceSha256": "07e1d9425b9e1b210cc6c015b67dff45ee605cf35eee687dab7b3bd709434c16"
+    },
+    "server/deps/recastnavigation/Detour/Include/DetourAlloc.h": {
+      "bytes": 2657,
+      "path": "deps/recastnavigation/Detour/Include/DetourAlloc.h",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "5f617c7f162069c395d7edfc59f0e06a9b6afaf6698de8fd674c80f00056ab71"
+    },
+    "server/deps/recastnavigation/Detour/Include/DetourAssert.h": {
+      "bytes": 2247,
+      "path": "deps/recastnavigation/Detour/Include/DetourAssert.h",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "4e453656cd092b58520c780daccbf4328842616f3eb0ca2ebb5b307ceecc9c7e"
+    },
+    "server/deps/recastnavigation/Detour/Include/DetourCommon.h": {
+      "bytes": 19466,
+      "path": "deps/recastnavigation/Detour/Include/DetourCommon.h",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "762e499282c7dab9bbe733ecf19fd875ea5804d2e11eaf3c39b7e81fb9151c30"
+    },
+    "server/deps/recastnavigation/Detour/Include/DetourMath.h": {
+      "bytes": 763,
+      "path": "deps/recastnavigation/Detour/Include/DetourMath.h",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "90c4799b672852b0d07531eb29fb029a1e4f34e46d97aa003c7e119531f9c535"
+    },
+    "server/deps/recastnavigation/Detour/Include/DetourNavMesh.h": {
+      "bytes": 32019,
+      "path": "deps/recastnavigation/Detour/Include/DetourNavMesh.h",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "201732481a638843164065b8fde938621c3e9d44fe1e067dc1cc5f602c4fbf18"
+    },
+    "server/deps/recastnavigation/Detour/Include/DetourNavMeshBuilder.h": {
+      "bytes": 6756,
+      "path": "deps/recastnavigation/Detour/Include/DetourNavMeshBuilder.h",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "39fde320de4931e85949215ca9395e1027980572afe4962dfbc7d02804131798"
+    },
+    "server/deps/recastnavigation/Detour/Include/DetourNode.h": {
+      "bytes": 4645,
+      "path": "deps/recastnavigation/Detour/Include/DetourNode.h",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "e9db7762a40736d3c857f44e4926b3d922924eb05a46f894dd469e08aee5a980"
+    },
+    "server/deps/recastnavigation/Detour/Include/DetourStatus.h": {
+      "bytes": 2806,
+      "path": "deps/recastnavigation/Detour/Include/DetourStatus.h",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "9b7c39b6dc1327db8c14ff78b86d0acd75027daadba667ea84fd883374473db9"
+    },
+    "server/deps/recastnavigation/Detour/Source/DetourAlloc.cpp": {
+      "bytes": 1515,
+      "path": "deps/recastnavigation/Detour/Source/DetourAlloc.cpp",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "ddf4d9857e9e1714daa9dd9b687ac8139085cc602359db0dba4f1dedbedc69c1"
+    },
+    "server/deps/recastnavigation/Detour/Source/DetourAssert.cpp": {
+      "bytes": 1194,
+      "path": "deps/recastnavigation/Detour/Source/DetourAssert.cpp",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "d7e05a59d390b02c3d7b2c3bbdf5c243f11ea36962243600c5acb26cdb80f796"
+    },
+    "server/deps/recastnavigation/Detour/Source/DetourCommon.cpp": {
+      "bytes": 9833,
+      "path": "deps/recastnavigation/Detour/Source/DetourCommon.cpp",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "eb7516240af2ab86d7c1c2b64a7cd7e379bbd3acf9df3825c85d342ba407ccc6"
+    },
+    "server/deps/recastnavigation/Detour/Source/DetourNavMesh.cpp": {
+      "bytes": 45086,
+      "path": "deps/recastnavigation/Detour/Source/DetourNavMesh.cpp",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "ea7835ebf172b2a9a123f36cd35fe9e05f296ba4a23c53ea5ab13cf00df5c603"
+    },
+    "server/deps/recastnavigation/Detour/Source/DetourNavMeshBuilder.cpp": {
+      "bytes": 24212,
+      "path": "deps/recastnavigation/Detour/Source/DetourNavMeshBuilder.cpp",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "bbe5adf461cae282291e498db50550eb3a12706e352dd83021165d38950119f3"
+    },
+    "server/deps/recastnavigation/Detour/Source/DetourNode.cpp": {
+      "bytes": 4884,
+      "path": "deps/recastnavigation/Detour/Source/DetourNode.cpp",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "067ffb9a81f7315f2253ff217263acb1c01590d130e01d4de4500308d756132b"
+    },
+    "server/src/common/Collision/Maps/MapDefines.h": {
+      "bytes": 3561,
+      "path": "src/common/Collision/Maps/MapDefines.h",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "ce27c387563bfc942c4434705f4a97da5e7e214df4c2bce41765b32f4e9d5608"
+    },
+    "server/src/common/Collision/VMapDefinitions.h": {
+      "bytes": 1209,
+      "path": "src/common/Collision/VMapDefinitions.h",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "ebf5598fec9691c58bbdeec63cac292f2989b28acacee23f939338f63810fc92"
+    },
+    "server/src/common/CompilerDefs.h": {
+      "bytes": 1871,
+      "path": "src/common/CompilerDefs.h",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "d15fc32a75011ef0c77395f5f7296528121ce7416a676e3620f0f0ce02846960"
+    },
+    "server/src/common/DataStores/DBCFileLoader.cpp": {
+      "bytes": 8974,
+      "path": "src/common/DataStores/DBCFileLoader.cpp",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "8c1996712c5d0e353c2bb7f75e0518c33b3975b0a15cb04da9dba2a581026fc3"
+    },
+    "server/src/common/DataStores/DBCFileLoader.h": {
+      "bytes": 4110,
+      "path": "src/common/DataStores/DBCFileLoader.h",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "f6e25acda7a1e82f0911200e523137df04e0fc15f30012542b5fc22d28082aa5"
+    },
+    "server/src/common/Define.h": {
+      "bytes": 2992,
+      "path": "src/common/Define.h",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "b7b3efb5fd8fd9061cf27435112ca3b149bafbfedbe96f0ddd96d82fe57ed9a6"
+    },
+    "server/src/common/Utilities/ByteConverter.h": {
+      "bytes": 2404,
+      "path": "src/common/Utilities/ByteConverter.h",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "ff4408a915c14ef750f29769b289a8fb48fb4cea5c0f7dcebb5a347947f6af62"
+    },
+    "server/src/server/shared/DataStores/DBCfmt.h": {
+      "bytes": 8273,
+      "path": "src/server/shared/DataStores/DBCfmt.h",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "9fbfb1f145d4db03d952311aa2bc05bb1c9496a980d2c42fe111c8b2d0d144a5"
+    },
+    "server/src/tools/vmap4_extractor/modelheaders.h": {
+      "bytes": 2650,
+      "path": "src/tools/vmap4_extractor/modelheaders.h",
+      "repository": "Russianranger/EsteriaWoW",
+      "revision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "sha256": "e139feeca80fcfa9e2a17d08b72b2a0ecc57c7210a6836a5d97540017044fcfa"
+    }
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "scope": "pinned-native-declarations-and-client-row-reader-reference-only",
+  "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
+  "worldQualified": false
+}

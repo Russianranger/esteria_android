@@ -1,0 +1,78 @@
+{
+  "actualArm64ExtractorExecuted": false,
+  "actualPinnedDetourTriangleBuiltAndLoaded": true,
+  "actualServerGtSingleFloatProjectionRejected": true,
+  "actualServerIndexedGtProjectionLoaded": true,
+  "actualServerPowerDisplayTwoPackedRowsLoaded": true,
+  "androidRuntimeQualified": false,
+  "clientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "clientRowReadersExecuted": 12,
+  "clientRowTruncationsRejected": 12,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "headerSizes": {
+    "cameraModel": 304,
+    "detourMesh": 100,
+    "map": 44,
+    "mmapIndex": 28,
+    "mmapTile": 56
+  },
+  "hostCompiledCppExecuted": true,
+  "limitations": [
+    "VMAP checks cover native magic and classification only; full body/model closure remains a loader gate.",
+    "Synthetic maps and camera headers do not establish owner-data coverage or conversion.",
+    "The real server file loader is executed, but SQL fallback and live database loading are not executed by this fixture.",
+    "Host execution does not qualify Android ARM64, Thor preparation, world entry or gameplay."
+  ],
+  "logs": {
+    "v10-native-format-old-policy-mutant.log": {
+      "bytes": 16352,
+      "sha256": "74e2e398dbd5077e7a6947ea4d743c0ae79486aec6f09db103d3e5bf103a2051"
+    },
+    "v10-native-format-tests.log": {
+      "bytes": 2878,
+      "sha256": "8f9455a949f8766d59041f05128f543fbff4e929a4de389a29614a4b1b5bd966"
+    }
+  },
+  "mutantSubtestErrors": 11,
+  "mutantTestsRun": 2,
+  "nativeSqlFallbackExecuted": false,
+  "oldStrictPolicyMutantRejected": true,
+  "ownerAssetsUsed": false,
+  "pinnedSourceManifest": "tests/fixtures/native-formats-f35-471/source-manifest.json",
+  "pinnedUpstreamFiles": 48,
+  "pinnedUpstreamSourceIdentitiesVerified": true,
+  "scope": "host-compiled-pinned-format-declarations-client-readers-and-actual-DBCFileLoader",
+  "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
+  "sourceIdentities": {
+    "tests/fixtures/native-formats-f35-471/native_format_writer.cpp": {
+      "bytes": 10833,
+      "sha256": "61a647fd0bcf570ccb0518bced4e55758d9ee9954607b83fa987eeb07d700dfe"
+    },
+    "tests/fixtures/native-formats-f35-471/source-manifest.json": {
+      "bytes": 17104,
+      "sha256": "d93a1e55e7c952dff5822c3aaf4868b600bcb2ceac3405292224c21975866bfc"
+    },
+    "tests/fixtures/native-formats-f35-471/support/Engine/Source/BlizzardCore/SFile2-Core.h": {
+      "bytes": 807,
+      "sha256": "23c1f1be1baa9b32239d288c8df384d16376420836962e07679bce6a51312bc8"
+    },
+    "tests/fixtures/native-formats-f35-471/support/Errors.h": {
+      "bytes": 333,
+      "sha256": "0ba08b05edf54d922e9e3ac70a1e839e68cd69262b0dcf21e3c88c19a41e5493"
+    },
+    "tests/test_server_data_native_formats.py": {
+      "bytes": 13969,
+      "sha256": "72079389cf14eed9c305c0b14e6631e30d635403401fde8a1d407942e0629a57"
+    }
+  },
+  "stockCompatibilityDoesNotBroadenCustomOrContinuations": true,
+  "testOnlyBridges": [
+    "bounded in-memory SFileReadFile adapter for unchanged client row readers",
+    "assertion bridge for unchanged server DBCFileLoader"
+  ],
+  "testsPassed": 14,
+  "testsSkipped": 0,
+  "thorQualified": false,
+  "worldPreparationQualified": false
+}
