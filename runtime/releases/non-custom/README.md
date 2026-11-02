@@ -1,3 +1,19 @@
+# Version 9 publication transport
+
+Producer `f39b52459d08fb85bf4fe6da5edddf8bccdea8bf`; publisher `92537ac872242efd0e5b20513c47136b65c2d3bc`, run/job `41369089018` / `125035452108`. Release `430963964`, APK asset `699999137`. APK 336,829,184 bytes, SHA-256 `5066512b124da61a8b6e662f91b3617720fd8f249824300c4e2f6afebfa386d2`; certificate `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`.
+
+[Signed ARM64 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.9/Esteria-Stock-3.3.5a-arm64.apk) · [Public release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.9).
+
+Public inputs: `update-9/signature-recipe.json`, `update-9/signing-receipt.json`, `update-9/publication-inputs.json`.
+
+All six public release assets passed full anonymous length/hash readback. The exact producer tag, SDK v2/v3 signatures, persistent certificate, stock version 9 manifest and equality with the locally signed APK passed. Update-9 receipts retain their baseline-8 binding; future updates require a higher code, the same certificate and the exact public v9 APK. Preserve all historical releases and transports.
+
+V9 changes app-owned preparation speed, resume, diagnostics and storage maintenance. The v7 native data provider, full source/debug companion and client/server/Eluna pins remain unchanged. The actual APK readback matches all current 6/7/24 data/stock/session helper closures, including every changed helper copy. Keep the completed import and app data; physical Thor world preparation remains unqualified.
+
+Records: `../non-custom-v0.1.0-non-custom.9.json`, `../../evidence/non-custom-v9-public-apk-readback.json`, `../../evidence/non-custom-v9-release-gates.json` and `../../evidence/non-custom-v9-native-output.json`.
+
+The following v8 and older records remain historical.
+
 # Version 8 publication transport
 
 Producer `7c1755968afee2fc1ec5448ce7c853a815750b3f`; publisher `7b01584c8a7679536aa95831c0107a81bc0aca1d`, run/job `41341085661` / `124951043905`. Release `430800823`, APK asset `699278685`. APK 336,808,704 bytes, SHA-256 `cfd47c5f0cc921fef0fcceda12df664367471269fe77d4c846c0100defadb76f`; certificate `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`.

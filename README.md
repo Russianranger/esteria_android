@@ -2,11 +2,11 @@
 
 Local Wrath 3.3.5a build 12340 client/server bring-up for AYN Thor Max: Android 13 ARM64, Snapdragon 8 Gen 2, Adreno 740. The reconstructed ARM64 client uses pinned Wine/PRoot with local server/MySQL; gameplay is intended to remain offline after setup.
 
-**V8 output-path fix:** [signed ARM64 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.8/Esteria-Stock-3.3.5a-arm64.apk) · [testing procedure](NON-CUSTOM-TESTING.md).
+**V9 preparation speed, resume and storage controls:** [signed ARM64 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.9/Esteria-Stock-3.3.5a-arm64.apk) · [testing procedure](NON-CUSTOM-TESTING.md).
 
-Install over the existing stock app, preserve the completed import and all data, and retry **Prepare local runtime / world** with the same locale. Do not reimport. V8 uses a short relative output argument inside the verified private phase directory, avoiding the native extractor's 127-byte path truncation. Existing v7 native tools, archive bounds and memory controls remain active.
+Install over the existing stock app and preserve the completed import and all data. Start with **Balanced 32 MiB/s**, select the same locale and retry **Prepare local runtime / world**. Gentle 8 and Fast 64 MiB/s are also available while idle. Compatible completed work and valid partial navigation tiles resume; idle storage controls trim recognized obsolete files. Do not reimport. Native conversion stays at one worker with the existing memory guard.
 
-Complete ARM64 packaging, native SQL, 14 named Android tests, real shipped ARM64 extractor output/DBC fixtures and public APK/signature readback passed. Physical Thor preparation/world entry and gameplay remain unqualified; export support before another retry after failure. [STATUS.md](STATUS.md) records exact identities and limits.
+All six exact-producer source gates passed, covering ARM64 packaging, native SQL, Android tests and native extractor fixtures. Public APK/signature readback also passed. The selected rate governs verification/copy I/O, not total navigation CPU time. Physical Thor preparation/world entry and gameplay remain unqualified; export support before another retry after failure. [STATUS.md](STATUS.md) records exact identities and limits.
 
 - [Implementation plan](ANDROID-PORT-PLAN.md)
 - [Build instructions](BUILDING.md)

@@ -1,12 +1,39 @@
-# Esteria Stock v9 — preparation speed, resume and storage update pending
+# Esteria Stock v9 handoff
 
-The v8 owner bundle records a memory-pressure pause after about 103 minutes, followed by another attempt that reached navigation meshes and was cancelled. It records no new low-memory kill. Visible runtime setup reused the same generations with zero copied bytes; repeated downloads are not established. The old phase code retained failed UUID navigation directories but started fresh on retry, which could repeat native work and grow storage.
+[Signed ARM64 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.9/Esteria-Stock-3.3.5a-arm64.apk) · [Testing procedure](NON-CUSTOM-TESTING.md).
 
-V9 adds Gentle 8, Balanced 32 (default) and Fast 64 MiB/s preparation verification/copy profiles. Imports keep their existing 8 MiB/s policy. Real pressure retains 2 MiB/s backoff/pause, one native worker and the 4 GiB native address-space guard. A critical trim callback with verified healthy system/heap headroom now causes backoff instead of immediately aborting native preparation. Native navigation CPU time is separate from the chosen I/O rate.
+Install over the existing `io.github.russianranger.esteria.stock` app. Keep the completed import, app data, databases and saves. Start with **Balanced** preparation speed and retry **Prepare local runtime / world** with the same locale. To compare a different speed, Stop and wait for cleanup before changing it. While idle, use **Check reclaimable storage**, then **Trim obsolete files**. Do not reimport or clear storage; export support before another retry after failure.
 
-Valid partial navigation tiles and reviewed compatible v8 work can resume after complete input/output checks. Recognized duplicate phase attempts are reclaimed; unknown data remains protected. Idle-only storage scan/trim removes obsolete immutable runtime generations and redundant owned archive copies while preserving imports, current/expected runtime, world checkpoints, databases and saves. Bounded rotating input-cache windows replace repeated whole-archive sweeps. Stage, native tile progress and operation/cancellation diagnostics distinguish continued work from a new attempt.
+The v8 owner bundle records a memory-pressure pause after about 103 minutes, followed by another attempt that reached navigation meshes and was cancelled. The exact cause of the first memory pause is unknown because the next attempt replaced its diagnostic sample; an automatic restart is not established. No new low-memory kill is recorded. Visible runtime setup reused the same generations with zero copied bytes. The old phase code retained failed UUID navigation directories but started fresh on retry, repeating native work and retaining additional partial copies.
 
-Local build/lint, storage filesystem and speed-policy checks passed. Full exact-producer APK, native/Android source-bound evidence, persistent signing and anonymous public readback remain release gates. Physical Thor preparation/world entry remain unqualified. Preserve the completed import and app data; no reimport or clear-storage procedure is requested.
+V9 offers Gentle 8, Balanced 32 (default) and Fast 64 MiB/s preparation verification/copy limits. These are I/O pacing levels, not total-world ETAs; native navigation CPU time remains separate. Imports keep their existing 8 MiB/s policy. Real pressure still causes 2 MiB/s backoff or a pause. A critical trim signal with verified healthy system/heap headroom backs off instead of immediately aborting native preparation. Native conversion remains one worker with the 4 GiB address-space guard. Bounded rotating clean-input cache windows replace repeated whole-archive advice.
+
+Exact input/output checks permit completed compatible phases and valid partial navigation tiles to resume, including reviewed v8 staging. Incomplete or incompatible tiles are rebuilt and a stopped phase is never marked complete. Recognized duplicate phase attempts are reclaimed after child cleanup. Idle-only storage maintenance removes obsolete immutable runtime generations and redundant owned archive copies while preserving the current/expected runtime, imported client, world checkpoints, databases and saves. Unrecognized objects remain protected. Stage, native tile and operation/cancellation diagnostics distinguish continued work from a new attempt.
+
+Producer `f39b52459d08fb85bf4fe6da5edddf8bccdea8bf`; publisher `92537ac872242efd0e5b20513c47136b65c2d3bc`, run/job `41369089018` / `125035452108`. Release `430963964`, APK asset `699999137`. APK 336,829,184 bytes, SHA-256 `5066512b124da61a8b6e662f91b3617720fd8f249824300c4e2f6afebfa386d2`; certificate `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`.
+
+| Gate | Run | Job |
+| --- | ---: | ---: |
+| Complete ARM64 package | 41367490992 | 125030771941 |
+| Native SQL | 41367490871 | 125030646825 |
+| Android 13 | 41367490918 | 125030684376 |
+| Launcher/core/lint | 41367490903 | 125030729067 |
+| Tooling | 41367490877 | 125030647252 |
+| Native extractor output/DBC | 41367490934 | 125030647184 |
+
+All six exact-producer source gates passed: complete ARM64 APK, native SQL, Android 13, launcher/core/lint, tooling and shipped ARM64 extractor output creation. Android readback verified all 35 artifact members, the existing 14 named import/diagnostic/timing tests and four new preparation-control tests, with 46 unique source identities matched. The new component checks cover activity speed persistence, trim-only backoff versus real low memory, worker-scoped policy and owned-storage cleanup preservation.
+
+Local validation passed 113 Gradle tasks and ran 1,564 host tests: 1,460 passed and 104 dependency/environment skips. Focused checks passed 50 resume tests, 28 speed-policy tests and nine storage filesystem tests. The real-clock host hash fixture exercised all three speed levels with unchanged bytes under a 96 MiB address-space limit; its timings do not measure Android conversion or owner-world preparation.
+
+The unchanged native data archive is 2,913,905 bytes, SHA-256 `e80d1d731902907297ae89f68d8241bca0aa79b8a281521c669353654ce5b436`, preserved with its complete source/debug companion in component release `430726308` / `non-custom-data-tools-v7`. Fresh final-producer native output run/job `41367490934` / `125030647184`, artifact `13107404192`, re-executed the shipped ARM64 map extractor and verified all five proof members. Actual native SQL setup/restart/clean-stop also passed; neither receipt establishes world entry.
+
+Android run/job `41367490918` / `125030684376`, artifact `13107893934` (22,727 bytes, SHA-256 `d426db3fd01ac7cacc16b2799fa9712923eeb1d644648365ff6f6221791394f2`), retains the existing import/update/helper/shader/SAF and native fixture-child boundaries. It additionally verifies the four v9 controls tests against 15 component source bindings; combined with the existing 37 bindings, the independently checked union contains 46 unique source files. These are disposable Android 13 x64 tests, not Thor or ARM64 guest execution.
+
+All six public release assets passed full anonymous length/hash readback. The exact producer tag, SDK v2/v3 signatures, persistent certificate, stock version 9 manifest and equality with the locally signed APK passed. Update-9 receipts retain their baseline-8 binding; future updates require a higher code, the same certificate and the exact public v9 APK. Preserve all historical releases and transports.
+
+Physical Thor preparation, rendering/world entry, controls/audio, persistence and offline gameplay remain unqualified until the owner retry. Client/server/Eluna pins and the source/debug-qualified v7 native data provider remain unchanged. Native extractor evidence covers synthetic DBC output and long-path/reentry behavior; it converts no owner data, map tiles or camera models.
+
+Records: `runtime/releases/non-custom-v0.1.0-non-custom.9.json`, `runtime/evidence/non-custom-v9-public-apk-readback.json`, `non-custom-v9-release-gates.json`, `non-custom-v9-android13.json`, `non-custom-v9-native-output.json`, `non-custom-v9-owner-preparation.json`, `non-custom-v9-resume-host.json`, `non-custom-v9-resume-review.json`, `non-custom-v9-speed-host.json` and `non-custom-v9-storage-host.json`.
 
 ## Published v8 baseline — historical
 
