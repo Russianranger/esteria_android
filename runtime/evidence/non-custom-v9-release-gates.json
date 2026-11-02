@@ -1,0 +1,375 @@
+{
+  "allRequiredSourceCiPassed": true,
+  "android13": {
+    "all35ArtifactMembersRead": true,
+    "allFourteenNamedTestsPassed": true,
+    "artifact": {
+      "bytes": 22727,
+      "sha256": "d426db3fd01ac7cacc16b2799fa9712923eeb1d644648365ff6f6221791394f2"
+    },
+    "artifactId": 13107893934,
+    "jobId": 125030684376,
+    "preparationControlsComponent": {
+      "allSourceIdentitiesMatched": true,
+      "exactFourNamedSuccessStatusesVerified": true,
+      "namedTests": [
+        "io.github.russianranger.esteria.PreparationControlsTest.selectedSpeedSurvivesActivityRecreationWithoutStartingPreparation",
+        "io.github.russianranger.esteria.PreparationControlsTest.criticalTrimBacksOffWithHeadroomAndActualLowMemoryStillPauses",
+        "io.github.russianranger.esteria.PreparationControlsTest.workerPolicyScopeCarriesOnlySelectedSpeed",
+        "io.github.russianranger.esteria.PreparationControlsTest.storagePreviewAndTrimPreserveCurrentImportsSavesAndWorldWork"
+      ],
+      "observations": [
+        {
+          "afterCloseUnselected": true,
+          "case": "workerPolicyScopeCarriesOnlySelectedSpeed",
+          "gameplayQualified": false,
+          "inputEnvironmentUnchanged": true,
+          "nestedSelectionRestored": true,
+          "ownerGameData": false,
+          "scope": "android13-x64-preparation-controls-fixture",
+          "thorQualified": false,
+          "unrelatedWorkerUnaffected": true,
+          "workerScoped": true
+        },
+        {
+          "case": "selectedSpeedSurvivesActivityRecreationWithoutStartingPreparation",
+          "defaultSpeed": "balanced",
+          "gameplayQualified": false,
+          "operationUnchanged": true,
+          "ownerGameData": false,
+          "rates": {
+            "balanced": 33554432,
+            "fast": 67108864,
+            "gentle": 8388608
+          },
+          "reopenedSpeed": "fast",
+          "scope": "android13-x64-preparation-controls-fixture",
+          "thorQualified": false,
+          "visibleLevels": 3
+        },
+        {
+          "actualTrimRecorded": true,
+          "case": "criticalTrimBacksOffWithHeadroomAndActualLowMemoryStillPauses",
+          "gameplayQualified": false,
+          "healthyCriticalTrimLevel": 1,
+          "ownerGameData": false,
+          "pressureBytesPerSecond": 2097152,
+          "realLowMemoryLevel": 2,
+          "scope": "android13-x64-preparation-controls-fixture",
+          "selectedNormalBytesPerSecond": 33554432,
+          "thorQualified": false,
+          "unknownMemoryCriticalTrimLevel": 2
+        },
+        {
+          "afterReclaimableBytes": 0,
+          "busyRefused": true,
+          "case": "storagePreviewAndTrimPreserveCurrentImportsSavesAndWorldWork",
+          "currentAndExpectedPreserved": true,
+          "gameplayQualified": false,
+          "importSavesAndPartialWorldPreserved": true,
+          "outsideSymlinkTargetPreserved": true,
+          "ownerGameData": false,
+          "previewBytes": 361,
+          "removedBytes": 361,
+          "scope": "android13-x64-preparation-controls-fixture",
+          "thorQualified": false
+        }
+      ],
+      "sourceIdentityCount": 15,
+      "stdout": {
+        "bytes": 4741,
+        "sha256": "812bdd281a10176c53518f7fc512d13e8ae859c7f0c982d6c5e9414312327ac5"
+      }
+    },
+    "runId": 41367490918,
+    "sourceIdentitiesMatched": true,
+    "uniqueSourceIdentities": 46
+  },
+  "appRevision": "f39b52459d08fb85bf4fe6da5edddf8bccdea8bf",
+  "exactPublicSignatureReconstructionVerified": true,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "localValidation": {
+    "actualLibmpqReaderFixturesEnabled": true,
+    "actualSdkFixturesEnabled": true,
+    "gradleTasksPassed": 113,
+    "hostTestsPassed": 1460,
+    "hostTestsRun": 1564,
+    "hostTestsSkipped": 104,
+    "resumeFocusedTestsPassed": 50,
+    "resumeMutantsRejected": 2,
+    "speedPolicyTestsPassed": 28,
+    "storageFilesystemTestsPassed": 9
+  },
+  "nativeExtractorOutput": {
+    "actualShippedArm64MapExtractorExecuted": true,
+    "allFiveArtifactMembersRead": true,
+    "artifact": {
+      "bytes": 4014,
+      "sha256": "f5df42bc62230eaa8aacbcbe1569d54591eddc933392088b8c05650e416e7382"
+    },
+    "artifactId": 13107404192,
+    "evidence": "runtime/evidence/non-custom-v9-native-output.json",
+    "jobId": 125030647184,
+    "runId": 41367490934
+  },
+  "ownerWorldPreparationQualified": false,
+  "persistentSigningVerified": true,
+  "publicDownloadVerificationPending": true,
+  "runtimeDataAdapter": {
+    "assetPath": "assets/server-data/server_data_generation.py",
+    "bytes": 48775,
+    "manifestMatched": true,
+    "sha256": "48160ae1764e1901600b662a67475d5e35aef33ecde9055c9facd030f467fc5e"
+  },
+  "runtimeHelperClosures": {
+    "server-data": {
+      "allCurrentBytesMatched": true,
+      "exactRosterMatched": true,
+      "files": {
+        "extractor_order.py": {
+          "bytes": 9884,
+          "sha256": "5c6d30d23c2a8ebb13d037907cbcc6e7b67ea31f4b99798d925c5e3da756128c"
+        },
+        "owned_process_group.py": {
+          "bytes": 2795,
+          "sha256": "c19ed5c05e94d7b537df1055983fca75e20447f594419084f2207d60f99f138e"
+        },
+        "server_data_generation.py": {
+          "bytes": 48775,
+          "sha256": "48160ae1764e1901600b662a67475d5e35aef33ecde9055c9facd030f467fc5e"
+        },
+        "server_data_preflight.py": {
+          "bytes": 27886,
+          "sha256": "8b9a1d44b70a8c1fce7a54e0ee39bba68621026f34270982cb68cb8d326374e0"
+        },
+        "shader_generation.py": {
+          "bytes": 19353,
+          "sha256": "8bb48952c36bdc4c69516c2ffa6f5c2d2eb59e84019e6420948d94bc81683ac5"
+        },
+        "world_io.py": {
+          "bytes": 20688,
+          "sha256": "2e1e027ef358b29e840591b054251c913b3143343386bebc2f7aa9a4f9e75f1a"
+        }
+      },
+      "manifest": {
+        "bytes": 718,
+        "sha256": "f13edc9bf94c33bc411491702580999a2c3df73e8f6428d9f4563f7dece1560c"
+      }
+    },
+    "server-session": {
+      "allCurrentBytesMatched": true,
+      "exactRosterMatched": true,
+      "files": {
+        "android_server_schema_setup.py": {
+          "bytes": 11875,
+          "sha256": "9526275258a6b98930e3253c0011627844ed10e1816658b3d5d07e23cd3dfd02"
+        },
+        "extractor_order.py": {
+          "bytes": 9884,
+          "sha256": "5c6d30d23c2a8ebb13d037907cbcc6e7b67ea31f4b99798d925c5e3da756128c"
+        },
+        "local-server.json": {
+          "bytes": 915,
+          "sha256": "3e78c598c44076f961c0ee039ce32633560240e70b6581d098a52ff28501446a"
+        },
+        "mysql_bootstrap.py": {
+          "bytes": 32698,
+          "sha256": "e69d5b64c4a5f5ace86fa521589d5a64613f601c59aedb011b42a1e5b743b47d"
+        },
+        "mysql_service.py": {
+          "bytes": 18078,
+          "sha256": "8b30e9598f20ee715685a51aba59cefcafc6213d9d5d5cb6c6f3a73efa6b71c2"
+        },
+        "owned_process_group.py": {
+          "bytes": 2795,
+          "sha256": "c19ed5c05e94d7b537df1055983fca75e20447f594419084f2207d60f99f138e"
+        },
+        "provision_local_account.py": {
+          "bytes": 19542,
+          "sha256": "e5d2c7d35e83176841107da200ff737bdb8e3671e1a5db91f9438c4228f6701d"
+        },
+        "provision_local_realm.py": {
+          "bytes": 25452,
+          "sha256": "703ed8a0f1f011191fdf4374aa7e999ca5cff5a87cd4e6e7b3907d7d1c53c994"
+        },
+        "server/appearance-schema-v1.sql": {
+          "bytes": 790,
+          "sha256": "8e35e8e41d74979eaa98f6f2d824d831b73f63a4a6b2f573b869484b2ff15d46"
+        },
+        "server/appearance-schema.lock.json": {
+          "bytes": 7783,
+          "sha256": "6ccf5e363ec3daa5c37cbbe753d29a7e6b5d10f18eef407b700fc0d67985428d"
+        },
+        "server_config.py": {
+          "bytes": 22472,
+          "sha256": "118487f7138c65778fa33ec7240a1a95a62dda5727e6a6738e437e011a7605eb"
+        },
+        "server_content.py": {
+          "bytes": 20541,
+          "sha256": "e32102ba850f4df7201c39c53e6c5530e59992cef1d3587ac809aca2ad681f8c"
+        },
+        "server_data_generation.py": {
+          "bytes": 48775,
+          "sha256": "48160ae1764e1901600b662a67475d5e35aef33ecde9055c9facd030f467fc5e"
+        },
+        "server_data_preflight.py": {
+          "bytes": 27886,
+          "sha256": "8b9a1d44b70a8c1fce7a54e0ee39bba68621026f34270982cb68cb8d326374e0"
+        },
+        "server_playerbots_setup.py": {
+          "bytes": 22904,
+          "sha256": "73137fd0bbba225d24290934f9d397eb485a23f08b0bcca40750a5a4c7e6b984"
+        },
+        "server_schema_adaptations.py": {
+          "bytes": 6316,
+          "sha256": "a49e1f8477d8b840964ce47783ed5af6873dc0dcde5b4a52280b696159082b44"
+        },
+        "server_schema_baseline.py": {
+          "bytes": 8606,
+          "sha256": "21d0bd526145f6699db90e9f90bb3ec01cf15316b59e27f8db6649f03480df20"
+        },
+        "server_schema_setup.py": {
+          "bytes": 11262,
+          "sha256": "6ed4f83f882101a8af0f06212c870cf71b2cee81a654b2ad4c14d9f83ef08026"
+        },
+        "server_session.py": {
+          "bytes": 25194,
+          "sha256": "7d159953d2a9c2027bd75aaf59f6a541ef3cbc51b16c7756ca2a71253551f0ee"
+        },
+        "server_session_process.py": {
+          "bytes": 12854,
+          "sha256": "2ee8ac79a1e045f503616715b2eeb9f34ae10d509391190ca3be09e30e242ec2"
+        },
+        "server_update_setup.py": {
+          "bytes": 32998,
+          "sha256": "f1feffc74eadf5b01ef1f5886f8f739ca303a82f8e9c73a94e3b9bd5c345eb7e"
+        },
+        "server_updater.py": {
+          "bytes": 7538,
+          "sha256": "8efabb037c012a89848d854fea8a12eff8c3bab7a9d1e9a3f3ea36369c4a6007"
+        },
+        "shader_generation.py": {
+          "bytes": 19353,
+          "sha256": "8bb48952c36bdc4c69516c2ffa6f5c2d2eb59e84019e6420948d94bc81683ac5"
+        },
+        "world_io.py": {
+          "bytes": 20688,
+          "sha256": "2e1e027ef358b29e840591b054251c913b3143343386bebc2f7aa9a4f9e75f1a"
+        }
+      },
+      "manifest": {
+        "bytes": 2831,
+        "sha256": "f2fe74d7cec52d31c994508c441affb951f832cff85d28304e049fb74b33b06a"
+      }
+    },
+    "stock-client": {
+      "allCurrentBytesMatched": true,
+      "exactRosterMatched": true,
+      "files": {
+        "extractor_order.py": {
+          "bytes": 9884,
+          "sha256": "5c6d30d23c2a8ebb13d037907cbcc6e7b67ea31f4b99798d925c5e3da756128c"
+        },
+        "server_data_preflight.py": {
+          "bytes": 27886,
+          "sha256": "8b9a1d44b70a8c1fce7a54e0ee39bba68621026f34270982cb68cb8d326374e0"
+        },
+        "shader_generation.py": {
+          "bytes": 19353,
+          "sha256": "8bb48952c36bdc4c69516c2ffa6f5c2d2eb59e84019e6420948d94bc81683ac5"
+        },
+        "stock_content_inspection.py": {
+          "bytes": 43963,
+          "sha256": "1eb33dd5ff689ad15b85de72d54552fac400517f4c68ce5af0c3cba65ac0420c"
+        },
+        "stock_shader_generation.py": {
+          "bytes": 8101,
+          "sha256": "8b2904596f983d60365b3f9edb51d9d6b5c9dd22e3a534c7e558e610e4f162df"
+        },
+        "stock_shader_translate.py": {
+          "bytes": 13356,
+          "sha256": "299a6c9bbd614a3d90d558b8c1dde66c8303a7a412bb68b5ff77a45371a57172"
+        },
+        "world_io.py": {
+          "bytes": 20688,
+          "sha256": "2e1e027ef358b29e840591b054251c913b3143343386bebc2f7aa9a4f9e75f1a"
+        }
+      },
+      "manifest": {
+        "bytes": 844,
+        "sha256": "ddc01a68c15571193e60d1eeb15f34d0903071224930cb8c9b02106d80f573e4"
+      }
+    }
+  },
+  "scope": "exact-producer-v9-release-gates-and-signing",
+  "selectedDataTools": {
+    "assetPath": "assets/server-data-tools/server-data-tools.archive",
+    "bytes": 2913905,
+    "descriptorMatched": true,
+    "oldFrozenDataSelected": false,
+    "sha256": "e80d1d731902907297ae89f68d8241bca0aa79b8a281521c669353654ce5b436"
+  },
+  "signedApk": {
+    "apkBytes": 336829184,
+    "apkSha256": "5066512b124da61a8b6e662f91b3617720fd8f249824300c4e2f6afebfa386d2",
+    "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+    "debuggable": false,
+    "minSdk": 26,
+    "packageId": "io.github.russianranger.esteria.stock",
+    "targetSdk": 35,
+    "versionCode": 9,
+    "versionName": "0.1.0-non-custom.9"
+  },
+  "sourceRuns": [
+    {
+      "conclusion": "success",
+      "head_sha": "f39b52459d08fb85bf4fe6da5edddf8bccdea8bf",
+      "html_url": "https://github.com/Russianranger/esteria_android/actions/runs/41367490992",
+      "id": 41367490992,
+      "name": "Complete non-custom local-game ARM64 package",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "head_sha": "f39b52459d08fb85bf4fe6da5edddf8bccdea8bf",
+      "html_url": "https://github.com/Russianranger/esteria_android/actions/runs/41367490871",
+      "id": 41367490871,
+      "name": "Native owned installation finish and clean-stop receipts",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "head_sha": "f39b52459d08fb85bf4fe6da5edddf8bccdea8bf",
+      "html_url": "https://github.com/Russianranger/esteria_android/actions/runs/41367490918",
+      "id": 41367490918,
+      "name": "Android 13 installer and APK update",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "head_sha": "f39b52459d08fb85bf4fe6da5edddf8bccdea8bf",
+      "html_url": "https://github.com/Russianranger/esteria_android/actions/runs/41367490903",
+      "id": 41367490903,
+      "name": "Android launcher and host behavior checks",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "head_sha": "f39b52459d08fb85bf4fe6da5edddf8bccdea8bf",
+      "html_url": "https://github.com/Russianranger/esteria_android/actions/runs/41367490877",
+      "id": 41367490877,
+      "name": "Integration tooling behavior",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "head_sha": "f39b52459d08fb85bf4fe6da5edddf8bccdea8bf",
+      "html_url": "https://github.com/Russianranger/esteria_android/actions/runs/41367490934",
+      "id": 41367490934,
+      "name": "Native extractor output path and DBC conversion",
+      "status": "completed"
+    }
+  ],
+  "thorQualified": false
+}

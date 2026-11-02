@@ -1,0 +1,203 @@
+{
+  "allArtifactMembersRead": 35,
+  "allComponentSourceIdentitiesMatched": true,
+  "allComponentSourceIdentityCount": 37,
+  "allV9ComponentSourceIdentitiesMatched": true,
+  "allV9ComponentSourceIdentityCount": 46,
+  "allV9ComponentSourceIdentityManifestSha256": "7f5c80d28ca020184592082e4fd69642171d249725aa0a637b3239031e1337db",
+  "androidArm64Qualified": false,
+  "appSourceRevision": "f39b52459d08fb85bf4fe6da5edddf8bccdea8bf",
+  "artifact": {
+    "bytes": 22727,
+    "sha256": "d426db3fd01ac7cacc16b2799fa9712923eeb1d644648365ff6f6221791394f2"
+  },
+  "artifactId": 13107893934,
+  "artifactRosterVerified": true,
+  "baseHelperAssetFiles": {
+    "data": 6,
+    "installation": 18,
+    "session": 24
+  },
+  "boundary": "Real Android13 x64 filesystem/update, document API, synthetic imports/shader receipts, JNI fixture-child, launcher speed controls, scoped policy and synthetic owned-storage maintenance tests only. No rebuilt ARM64 extractor conversion, PRoot, Vulkan/KGSL driver, owner game data, Thor world preparation or gameplay is executed here.",
+  "componentSourceIdentityManifestSha256": "0890646d11691127a112831c80fc382c158befd2bf69c0e89e39c423e5fe7d6f",
+  "componentStdout": {
+    "bytes": 15637,
+    "sha256": "ee4b2861aaaabb72d9c213034de2eb7581328f442697acc8ca7da173491521ff"
+  },
+  "driverExecuted": false,
+  "emulatorProperties": {
+    "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+    "ro.build.version.sdk": "33",
+    "ro.kernel.qemu": "1",
+    "ro.product.cpu.abi": "x86_64"
+  },
+  "exactFourteenNamedTestSuccessStatusesVerified": true,
+  "folderZipPayloadSha256Matched": true,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "jobId": 125030684376,
+  "memorySourceIdentityCount": 28,
+  "namedTests": [
+    "io.github.russianranger.esteria.ImportMemoryStressTest.gibibyteFolderAndNonseekableZipImportsKeepBoundedMemory",
+    "io.github.russianranger.esteria.ImportMemoryStressTest.thousandsOfOpaqueDocumentsStayBoundedAndSourceChecksRemainActive",
+    "io.github.russianranger.esteria.ProcessExitDiagnosticsTest.actualAndroidHistoryQueryIsBoundedToOwnPackage",
+    "io.github.russianranger.esteria.ProcessExitDiagnosticsTest.descriptionsAreBoundedRedactedAndSingleLine",
+    "io.github.russianranger.esteria.ProcessExitDiagnosticsTest.lowMemoryKillJavaOomAndOtherExitsRemainDistinct",
+    "io.github.russianranger.esteria.ImportIoControllerTest.severePressureBlocksWritesAndStopRemainsPrompt",
+    "io.github.russianranger.esteria.ImportIoControllerTest.trimSignalsAndSystemHeadroomSelectTheCorrectPolicy",
+    "io.github.russianranger.esteria.ImportIoControllerTest.controllerPersistsRealSyncCacheAndSystemPressureObservations",
+    "io.github.russianranger.esteria.ImportIoControllerTest.nativeCacheAdvicePreservesSyncedFileBytes",
+    "io.github.russianranger.esteria.WorldPreparationDiagnosticsTest.actualSharedPreferencesXmlRoundTripPreservesOwnedLogRecords",
+    "io.github.russianranger.esteria.WorldPreparationDiagnosticsTest.parentPreparationReadsUseBoundedRealCacheAdviceAndRemainCancellable",
+    "io.github.russianranger.esteria.WorldPreparationDiagnosticsTest.phaseAndRealOwnedChildObservationSurviveDiagnosticReconstruction",
+    "io.github.russianranger.esteria.WorldPreparationDiagnosticsTest.oneInvalidRetainedRolePreservesOtherStrictlyValidatedLogs",
+    "io.github.russianranger.esteria.runtime.TurnipReadinessTimingTest.governedAdmissionDoesNotSpendChildWindowAndFailuresKeepOwnership"
+  ],
+  "oldComponentSourceIdentityCount": 37,
+  "ownerGameDataImported": false,
+  "preparationControlsComponent": {
+    "allSourceIdentitiesMatched": true,
+    "exactFourNamedSuccessStatusesVerified": true,
+    "namedTests": [
+      "io.github.russianranger.esteria.PreparationControlsTest.selectedSpeedSurvivesActivityRecreationWithoutStartingPreparation",
+      "io.github.russianranger.esteria.PreparationControlsTest.criticalTrimBacksOffWithHeadroomAndActualLowMemoryStillPauses",
+      "io.github.russianranger.esteria.PreparationControlsTest.workerPolicyScopeCarriesOnlySelectedSpeed",
+      "io.github.russianranger.esteria.PreparationControlsTest.storagePreviewAndTrimPreserveCurrentImportsSavesAndWorldWork"
+    ],
+    "observations": [
+      {
+        "afterCloseUnselected": true,
+        "case": "workerPolicyScopeCarriesOnlySelectedSpeed",
+        "gameplayQualified": false,
+        "inputEnvironmentUnchanged": true,
+        "nestedSelectionRestored": true,
+        "ownerGameData": false,
+        "scope": "android13-x64-preparation-controls-fixture",
+        "thorQualified": false,
+        "unrelatedWorkerUnaffected": true,
+        "workerScoped": true
+      },
+      {
+        "case": "selectedSpeedSurvivesActivityRecreationWithoutStartingPreparation",
+        "defaultSpeed": "balanced",
+        "gameplayQualified": false,
+        "operationUnchanged": true,
+        "ownerGameData": false,
+        "rates": {
+          "balanced": 33554432,
+          "fast": 67108864,
+          "gentle": 8388608
+        },
+        "reopenedSpeed": "fast",
+        "scope": "android13-x64-preparation-controls-fixture",
+        "thorQualified": false,
+        "visibleLevels": 3
+      },
+      {
+        "actualTrimRecorded": true,
+        "case": "criticalTrimBacksOffWithHeadroomAndActualLowMemoryStillPauses",
+        "gameplayQualified": false,
+        "healthyCriticalTrimLevel": 1,
+        "ownerGameData": false,
+        "pressureBytesPerSecond": 2097152,
+        "realLowMemoryLevel": 2,
+        "scope": "android13-x64-preparation-controls-fixture",
+        "selectedNormalBytesPerSecond": 33554432,
+        "thorQualified": false,
+        "unknownMemoryCriticalTrimLevel": 2
+      },
+      {
+        "afterReclaimableBytes": 0,
+        "busyRefused": true,
+        "case": "storagePreviewAndTrimPreserveCurrentImportsSavesAndWorldWork",
+        "currentAndExpectedPreserved": true,
+        "gameplayQualified": false,
+        "importSavesAndPartialWorldPreserved": true,
+        "outsideSymlinkTargetPreserved": true,
+        "ownerGameData": false,
+        "previewBytes": 361,
+        "removedBytes": 361,
+        "scope": "android13-x64-preparation-controls-fixture",
+        "thorQualified": false
+      }
+    ],
+    "sourceIdentityCount": 15,
+    "stdout": {
+      "bytes": 4741,
+      "sha256": "812bdd281a10176c53518f7fc512d13e8ae859c7f0c982d6c5e9414312327ac5"
+    }
+  },
+  "privateLocalLoginHandoffFilesystemQualified": true,
+  "realLowMemoryKillReproduced": false,
+  "rebuiltArm64ExtractorConversionExecuted": false,
+  "runId": 41367490918,
+  "runtimeContractGroups": 20,
+  "safNamedTests": [
+    "io.github.russianranger.esteria.SafImportTest.opaqueFolderDocumentsAndStagedZipUseTheSameClientRoot",
+    "io.github.russianranger.esteria.SafImportTest.providerMutationDenialAndCancellationKeepTheirCausalDetails",
+    "io.github.russianranger.esteria.SafImportTest.failedImportReceiptSurvivesRecreationAndExportsBoundedRedactedCauses"
+  ],
+  "sameJobDebugKeyUpdatePreservedRuntimeAndSentinel": true,
+  "scope": "independent-Android13-x64-v9-installer-update-and-component-artifact-readback",
+  "sourceTree": "92c9fda0227a9312f376a70f528e3eb046e01b02",
+  "stockShaderReceiptNamedTests": [
+    "io.github.russianranger.esteria.runtime.ShaderSetupReceiptTest.packagedStockHelpersReuseAndPreserveChangedBytes",
+    "io.github.russianranger.esteria.runtime.ShaderSetupReceiptTest.exactReceiptAndCurrentInputRequired"
+  ],
+  "stressObservations": [
+    {
+      "gameplayQualified": false,
+      "javaGrowthBytes": 2343096,
+      "nativeGrowthBytes": 68448,
+      "ownerData": false,
+      "payloadBytes": 1073741824,
+      "pssGrowthBytes": 1363968,
+      "route": "folder",
+      "sha256": "41f9c660a072eb1c4f528c0cbbac593596e1121ec1ac1d88dbcb1ee53e2d5096",
+      "thorQualified": false
+    },
+    {
+      "gameplayQualified": false,
+      "javaGrowthBytes": 463056,
+      "nativeGrowthBytes": 281200,
+      "ownerData": false,
+      "payloadBytes": 1073741824,
+      "pssGrowthBytes": 2091008,
+      "route": "zip",
+      "sha256": "41f9c660a072eb1c4f528c0cbbac593596e1121ec1ac1d88dbcb1ee53e2d5096",
+      "thorQualified": false
+    },
+    {
+      "documents": 3210,
+      "gameplayQualified": false,
+      "javaGrowthBytes": 4016864,
+      "nativeGrowthBytes": 508096,
+      "ownerData": false,
+      "pssGrowthBytes": 6818816,
+      "route": "opaque-inventory",
+      "thorQualified": false
+    }
+  ],
+  "thorQualified": false,
+  "turnipTimingObservation": {
+    "androidArm64Qualified": false,
+    "childMillis": 27,
+    "gameplayQualified": false,
+    "governedAdmissionMillis": 6228,
+    "governedBytes": 50331648,
+    "gpuExecuted": false,
+    "hungChildReaped": true,
+    "lateCompletedResultRejected": true,
+    "launchBudgetEnforced": true,
+    "nativeFixtureChildExecuted": true,
+    "prelaunchCancellationVerified": true,
+    "providerAndReceiptMutationRejected": true,
+    "scope": "android13-owned-turnip-timing-fixture-no-gpu",
+    "thorQualified": false
+  },
+  "userSigningIdentityQualified": false,
+  "workflowSource": {
+    "bytes": 18523,
+    "sha256": "912cf1524f1b5a71c4f676ca75b6cd31c1b0f70a38a77b35a9a95b79f42cc51f"
+  }
+}
