@@ -1,5 +1,6 @@
 {
   "allRequiredSourceCiPassed": true,
+  "allSixPublicAssetsReadBack": true,
   "android13": {
     "all35ArtifactMembersRead": true,
     "allFourPreparationControlTestsPassed": true,
@@ -16,6 +17,7 @@
   },
   "appRevision": "a7e9f6354f557c0ac52b756a602cbeeaafa7b789",
   "exactPublicSignatureReconstructionVerified": true,
+  "finalPublicationGuardTestsPassed": 18,
   "formatVersion": 1,
   "gameplayQualified": false,
   "localValidation": {
@@ -139,8 +141,34 @@
   "ownerWorldPreparationQualified": false,
   "persistentSigningVerified": true,
   "privateSigningTemporaryRemoved": true,
-  "publicDownloadVerificationPending": true,
-  "publisherPassed": false,
+  "publicDownloadVerificationPending": false,
+  "publicReadbackEvidence": "runtime/evidence/non-custom-v10-public-apk-readback.json",
+  "publisherJobId": 125094812270,
+  "publisherPassed": true,
+  "publisherRevision": "ea0f7c416786b5f881b07a66cde61ae04e191aee",
+  "publisherRunId": 41388591990,
+  "publisherValidationCiPassed": true,
+  "publisherValidationRuns": [
+    {
+      "conclusion": "success",
+      "head_sha": "ea0f7c416786b5f881b07a66cde61ae04e191aee",
+      "html_url": "https://github.com/Russianranger/esteria_android/actions/runs/41388592008",
+      "id": 41388592008,
+      "jobId": 125094812283,
+      "name": "Integration tooling behavior",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "head_sha": "ea0f7c416786b5f881b07a66cde61ae04e191aee",
+      "html_url": "https://github.com/Russianranger/esteria_android/actions/runs/41388592006",
+      "id": 41388592006,
+      "jobId": 125094812527,
+      "name": "Android launcher and host behavior checks",
+      "status": "completed"
+    }
+  ],
+  "releaseId": 431071858,
   "runtimeDataAdapter": {
     "assetPath": "assets/server-data/server_data_generation.py",
     "bytes": 56794,

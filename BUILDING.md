@@ -1,42 +1,30 @@
 ## Non-custom branch package and release
 
-This branch defaults to `Stock 3.3.5a / non-custom` (`stock-3.3.5a`) and builds
-`io.github.russianranger.esteria.stock`, labelled **Esteria Stock 3.3.5a**. It installs
-beside the original custom package. Android private storage, local databases,
-imports, generated data, shader caches and saves are separate; no automatic copy
-or database migration from the custom app occurs. Keep the complete original
-client installation unchanged and import it into the stock application.
+This branch builds `io.github.russianranger.esteria.stock` with the explicit `stock-3.3.5a` profile. It retains its own imported client, generated data, local database and saves; it does not migrate or reseed the separate custom app. Preserve the original client installation and installed stock app data.
 
-`.github/workflows/android-local-game-profile.yml` now targets `non-custom` and
-retains the full exact provider/source/debug verification. The version name is
-`0.1.0-non-custom.<versionCode>`. Dispatch with `build_version_code=1` for the
-first stock package; increase it for later stock updates. `publish_non_custom`
-(default false) enables persistent signing and additive prerelease publication
-only after the complete unsigned release passes the byte/manifest checks. A
-`non-custom` push whose commit message contains `[publish non-custom]` enables
-the same final signing/publication path when manual dispatch is unavailable.
+The current [published stock APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.10/Esteria-Stock-3.3.5a-arm64.apk) is `0.1.0-non-custom.10` / code 10. Exact producer: `a7e9f6354f557c0ac52b756a602cbeeaafa7b789`. Full-provider package/native SQL/Android/output gates are recorded in `runtime/evidence/non-custom-v10-release-gates.json`. Client/server/Eluna pins, the source/debug-qualified v7 data provider and the offline architecture remain unchanged. Component success does not qualify Thor world entry.
 
-Signing uses the existing `ESTERIA_KEYSTORE_BASE64`, `ESTERIA_KEYSTORE_PASSWORD`,
-`ESTERIA_KEY_PASSWORD` and optional `ESTERIA_KEY_ALIAS` CI configuration. The
-stock package's public certificate/update baseline is
-`app/stock-signing.lock.json`; the original custom signing lock is preserved.
-Private material is staged outside the checkout with owner-only permissions and
-removed after success or failure. Missing secrets stop publication with
-`persistent-signing-secrets-not-configured`; no debug/temporary identity is
-substituted. `tools/sign_android_apk.py --lock app/stock-signing.lock.json` also
-supports external signing with the project key. The first stock release uses
-`--initial-baseline`; later updates must supply the exact previously published
-stock APK and increase the version code. Update the stock lock's `lastPublished`
-only after the signed download's hash/certificate have been verified.
+Use `.github/workflows/android-local-game-profile.yml` with every verified production provider. This checkout defaults to code 10 for push/dispatch builds; select a higher code before preparing a new signed release. The full unsigned release artifact must belong to the exact successful source commit. A plain launcher/debug build is not a replacement for this package.
 
-Publication creates a new `non-custom-v<versionName>` prerelease and refuses any
-existing tag. It attaches one signed ARM64 APK, SHA-256, exact source/build
-metadata, signing receipt and `NON-CUSTOM-TESTING.md`. Provider/build/signature
-proof remains separate from actual client-data validation and world entry.
+Current delivery uses the [detached public signing transport](runtime/releases/non-custom/README.md): sign the exact reviewed unsigned APK with the persistent stock certificate, retain its public signature recipe and exact successful package/native SQL selection, then publish additively through `publish-non-custom-detached.yml`. Private keys/passwords stay outside Git. Optional configured CI signing remains supported; missing persistent secrets must fail rather than substitute a temporary identity. `tools/sign_android_apk.py --lock app/stock-signing.lock.json` requires the exact previous public stock APK for an update. Advance `lastPublished` only after complete anonymous asset readback and SDK signature/manifest verification. Existing tags/assets and old transports are never overwritten.
+
+V10 distinguishes stock client disk layouts from server SQL layouts. Only ten named single-float GT tables and packed PowerDisplay gain the source-backed stock allowance; indexed GT, other DBCs, declared lengths and custom/continuation inputs remain strict. The server's eleven GT SQL tables must retain canonical source columns and nonempty rows across restart. PowerDisplay's source SQL table legitimately has zero rows; its original packed client file must load natively. No rows or client payload bytes are fabricated.
+
+Focused checks for changes to these contracts:
+
+```sh
+python3 -m unittest tests.test_stock_server_disk_layouts tests.test_server_data_native_formats tests.test_server_data_generation tests.test_prepared_data_cache tests.test_server_installation_qualification -v
+```
+
+The C++ fixtures require a host C++ compiler. They exercise exact pinned reader/format code and synthetic inputs, not owner assets or Thor rendering. Native SQL qualification uses the actual source-selected database and verifies backing before/after restart. Retain the full provider/launcher/lint/Android and public signed-byte gates for release.
+
+For a host stock format report, use `python3 runtime/server_data_preflight.py --server-data <generated-data> --content-profile stock-3.3.5a`; the default remains strict custom validation. Header/layout/length checks do not prove world coverage. A helper-manifest change must use only reviewed migration identities and verify retained phase bytes; unknown old outputs cannot be relabelled complete. Compatible completed v9 navigation/final assemblies need no new native extraction. New failures retain bounded relative group/path/reason diagnostics.
+
+The following sections retain build/provider background and older integration checkpoints.
 
 # Building Esteria Android
 
-Build from `android/client-server`. `sources.lock.json` is authoritative; its branch labels never choose build inputs. Existing GPL-3.0 LICENSE is unchanged.
+Build from `non-custom`. `sources.lock.json` is authoritative; its branch labels never choose build inputs. Existing GPL-3.0 LICENSE is unchanged.
 
 ## Pinned sources
 ```
@@ -375,8 +363,9 @@ one unsigned APK and three bounded JSON proofs, with combined input bytes below
 is published with the persistent certificate and baseline1; content/device
 installation and gameplay qualification remain separate.
 
-`workflow_dispatch` accepts `build_version_code` (default1; positive and at most
-2,100,000,000); increase it before publishing a signed update. Push builds use1.
+`workflow_dispatch` accepts `build_version_code` (default10 in this checkout; positive and at most
+2,100,000,000). Push builds use10. After published v10, explicitly choose a higher
+code for a new update and update the reviewed version/transport inputs together.
 The release build explicitly clears signing environment variables and performs
 no private-key operation. Sign the reviewed `app-release-unsigned.apk` separately
 with `tools/sign_android_apk.py` and the owner-provisioned persistent development

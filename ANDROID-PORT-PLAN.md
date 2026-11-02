@@ -1,5 +1,11 @@
 # Esteria Android non-custom implementation plan
 
+## Current checkpoint: v10
+
+The [published v10 update](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.10/Esteria-Stock-3.3.5a-arm64.apk) addresses the post-navigation stock DBC preflight contract while retaining reviewed v9 navigation/checkpoints and the completed import. Ten source-backed GT disk variants use the pinned server's SQL path; packed PowerDisplay uses its native disk reader. V9 omitted the exact offending filename, so the diagnosis is source-backed rather than an inspection of unavailable owner outputs.
+
+Complete provider packaging, native SQL backing/restart, native extractor output, pinned C++ format fixtures, Android 13 components and public APK/signature readback passed. The next device gate is to install over v9, keep data, retry preparation with the same locale, then complete shaders/SQL and the ordinary local Human Warrior/world/persistence/offline procedure below. Source pins, stock acceptance and deferred custom/bot scope remain unchanged. See [STATUS.md](STATUS.md), [HANDOFF.md](HANDOFF.md) and [NON-CUSTOM-TESTING.md](NON-CUSTOM-TESTING.md) for exact identities and the consolidated retry.
+
 ## Current objective
 
 One local stock Wrath 3.3.5a build 12340 session on AYN Thor Max (Android 13, Snapdragon 8 Gen 2, Adreno 740, 16 GB). Import the owner's ChromieCraft client data, prepare matching world data/shaders/MySQL automatically, start the reconstructed ARM64 client with local auth/world, create a Human Warrior, enter its ordinary starting area, stop cleanly and relaunch offline with the character retained.

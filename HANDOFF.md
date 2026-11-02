@@ -1,10 +1,33 @@
-# Esteria Stock v10 — post-navigation preflight fix in validation
+# Esteria Stock v10 handoff
 
-The latest v9 support bundle reaches generated-data preflight after navigation, then returns a format error. It records no new low-memory kill. The exact offending filename was omitted by the old diagnostic. Source review found eleven valid stock client disk layouts rejected by the server SQL-layout check: ten single-float GT tables and packed PowerDisplay. V10 admits only those exact layouts for the explicit stock profile; malformed data, custom profiles, continuation fragments and unrelated tables retain strict checks. Actual pinned native loader tests read packed PowerDisplay rows and demonstrate the GT disk/SQL distinction.
+[Signed ARM64 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.10/Esteria-Stock-3.3.5a-arm64.apk) · [Testing procedure](NON-CUSTOM-TESTING.md).
 
-Reviewed v9 checkpoints and failed final assemblies are verified and reused, including completed navigation. The retry retains imported content, saves and databases. New bounded diagnostics identify offending group/path/reason and show hashing, final assembly and preflight separately. Existing speed levels, memory guards, source pins and the v7 native data provider remain unchanged.
+Install v10 over the existing `io.github.russianranger.esteria.stock` app. Keep the completed import, app data, databases and saves. Use the same locale and **Balanced** speed, then retry **Prepare local runtime / world**. Compatible completed navigation and the failed final assembly are verified for reuse. Hash verification still takes time; a verification stage is not a fresh extraction. Do not reimport or clear storage. Export support before another retry after failure.
 
-Version 10 packaging, native SQL backing/restart, Android components and public signed-APK readback remain pending. Version 9 remains the published baseline until those gates pass. Do not install a launcher-only build or clear/reimport owner data.
+The v9 owner bundle reached final generated-data preflight after about 140 minutes and returned a generic format error, with no new low-memory kill recorded. The exact offending filename is unknown because the old diagnostic omitted it. Source review found eleven stock disk layouts rejected by a server SQL-layout check: ten single-float GT tables and packed PowerDisplay. V10 admits only these exact client471 variants in the explicit stock profile, without rewriting payloads. Malformed headers/lengths, custom profiles, continuation fragments and unrelated tables remain strict.
+
+The ten GT variants use the pinned server's SQL loading path. PowerDisplay is read natively from the original packed client file; its source SQL table is empty, so that client file remains required. Reviewed v8/v9 checkpoints and compatible final assemblies survive retry. Bounded diagnostics retain offending group/path/reason and distinguish phase hashing, final assembly and preflight. Existing speed levels, memory controls, one native worker, source pins and the v7 native data provider remain unchanged.
+
+Producer `a7e9f6354f557c0ac52b756a602cbeeaafa7b789`; publisher `ea0f7c416786b5f881b07a66cde61ae04e191aee`, run/job `41388591990` / `125094812270`. Release `431071858`, APK asset `700505644`. APK 336,837,376 bytes, SHA-256 `a18be108682833e7d3efbc1bf6ae2a2722641127e0dda6c5f57211991a4a991d`; certificate `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`.
+
+| Gate | Run | Job |
+| --- | ---: | ---: |
+| Complete ARM64 package | 41387058436 | 125090158512 |
+| Native SQL | 41387058523 | 125090110061 |
+| Android 13 | 41387058516 | 125090110250 |
+| Launcher/core/lint | 41387058456 | 125090110304 |
+| Tooling | 41387058556 | 125090110150 |
+| Native extractor output/DBC | 41387058539 | 125090109916 |
+
+All six exact-producer source gates passed: complete ARM64 package, native SQL, Android 13, launcher/core/lint, tooling and shipped ARM64 extractor output. Android readback verified all 35 artifact members, 14 existing named tests plus four preparation-control tests, and 46 unique source identities. Actual native SQL verified canonical nonempty backing for all eleven GT tables across restart; PowerDisplay retained its authentic zero SQL rows. Host C++ fixtures exercised packed PowerDisplay decoding and the GT disk/SQL distinction. The five-member ARM64 extractor proof covers synthetic DBC output and long-path/reentry behavior.
+
+Local host discovery ran 1,601 tests: 1,497 passed and 104 dependency/environment skips. Final focused guards passed 89 tests. Fourteen native-format host fixtures and 61 resume tests passed. Exact-producer tooling CI ran 1,608 tests: 1,507 passed and 101 skipped. These are separate validation runs; fixtures do not establish owner-data conversion or world entry.
+
+All six public release assets passed complete anonymous length/hash readback. The exact producer tag, SDK v2/v3 signatures, persistent certificate, version 10 manifest and equality with the locally signed APK passed. Publisher validation jobs also passed. Update-10 receipts retain their baseline-9 binding; future publication requires a higher code and the exact public v10 APK as its prior baseline. Preserve historical releases, transports and source/debug companions.
+
+Physical Thor preparation, shader completion, normal client login/world entry, controls/audio, persistence and offline gameplay still require the owner retry. No host, SQL, emulator or packaging receipt establishes those device results.
+
+Records: `runtime/releases/non-custom-v0.1.0-non-custom.10.json`, `runtime/evidence/non-custom-v10-public-apk-readback.json`, `non-custom-v10-release-gates.json`, `non-custom-v10-owner-preflight.json`, `non-custom-v10-preflight-review.json`, `non-custom-v10-native-format-host.json`, `non-custom-v10-resume-host.json`, `non-custom-v10-native-sql.json`, `non-custom-v10-native-output.json` and `non-custom-v10-android13.json`.
 
 ## Published v9 baseline — historical
 
