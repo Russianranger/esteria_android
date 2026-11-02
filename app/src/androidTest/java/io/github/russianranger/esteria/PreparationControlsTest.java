@@ -106,7 +106,7 @@ public final class PreparationControlsTest {
         assertEquals(2,ImportIoController.preparationPressureLevel(10L<<30,256L<<20,true,32L<<20,256L<<20,critical));
         assertEquals(2,ImportIoController.preparationPressureLevel(10L<<30,256L<<20,false,240L<<20,256L<<20,critical));
         assertEquals(2,ImportIoController.preparationPressureLevel(-1,256L<<20,false,32L<<20,256L<<20,critical));
-        Path root=Files.createTempDirectory(context.getCacheDir().toPath(),"preparation-pressure-");
+        Path root=Files.createTempDirectory(context.getCacheDir().getCanonicalFile().toPath(),"preparation-pressure-");
         try {
             Path receipt=root.resolve("preparation.properties");WorldPreparationDiagnostics diagnostics=new WorldPreparationDiagnostics(receipt);
             diagnostics.begin(SessionService.PREPARE_WORLD);
@@ -148,8 +148,8 @@ public final class PreparationControlsTest {
         write(at.resolve("rootfs/payload.bin"),bytes);return at;
     }
     @Test public void storagePreviewAndTrimPreserveCurrentImportsSavesAndWorldWork()throws Exception {
-        Path root=Files.createTempDirectory(context.getCacheDir().toPath(),"preparation-storage-");
-        Path outside=Files.createTempDirectory(context.getCacheDir().toPath(),"preparation-outside-");
+        Path root=Files.createTempDirectory(context.getCacheDir().getCanonicalFile().toPath(),"preparation-storage-");
+        Path outside=Files.createTempDirectory(context.getCacheDir().getCanonicalFile().toPath(),"preparation-outside-");
         try {
             Path runtime=Files.createDirectories(root.resolve("runtimes/wine-arm64"));
             Path current=generation(runtime,"generations",A,"current"),expected=generation(runtime,"generations",B,"expected");
