@@ -1,43 +1,46 @@
 {
-  "formatVersion": 1,
-  "scope": "host-reviewed-v9-checkpoint-final-assembly-and-preflight-diagnostics",
-  "reviewedV9SourceRevision": "f39b52459d08fb85bf4fe6da5edddf8bccdea8bf",
-  "reviewedV9HelperGeneration": "f13edc9bf94c33bc411491702580999a2c3df73e8f6428d9f4563f7dece1560c",
-  "focusedTestsRun": 58,
-  "focusedTestsPassed": 58,
+  "androidRuntimeQualified": false,
+  "chainedV8V9V10StagingTested": true,
+  "completedNavigationNativeRerunRejectedInHostFixture": true,
+  "failedFinalInodeRetainedInHostFixture": true,
+  "focusedTestsPassed": 61,
+  "focusedTestsRun": 61,
   "focusedTestsSkipped": 0,
+  "formatVersion": 1,
+  "fullPrivatePreflightReportPreserved": true,
+  "gameplayQualified": false,
   "log": {
-    "bytes": 11529,
-    "sha256": "395c328a762d29fb6c2508433eebdd6071ed2a0de911e04ec5f3dc7e7473038f"
+    "bytes": 12172,
+    "sha256": "f95c2dad8998fa0d9d0d93be11b87ec99b66943ab2e2250a35956fc5d0c2689a"
   },
+  "missingProviderMetadataCannotSkipOwnedWork": true,
   "mutants": [
     {
-      "mutant": "v9-checkpoint-migration-disabled",
-      "rejected": true,
       "log": {
         "bytes": 3014,
         "sha256": "314925635a63441c1ffc0c842a0c8ea6b9f9d3fd808f085a2f8aee2ded6bd1ea"
-      }
+      },
+      "mutant": "v9-checkpoint-migration-disabled",
+      "rejected": true
     },
     {
-      "mutant": "failed-final-reuse-disabled",
-      "rejected": true,
       "log": {
         "bytes": 1588,
         "sha256": "b13ecb03ade0a1873473c4a179abbc9f41a22fe329c4db941953f6721bf0d1f6"
-      }
+      },
+      "mutant": "failed-final-reuse-disabled",
+      "rejected": true
     }
   ],
-  "completedNavigationNativeRerunRejectedInHostFixture": true,
-  "failedFinalInodeRetainedInHostFixture": true,
-  "fullPrivatePreflightReportPreserved": true,
-  "stdoutDetailsMax": 4,
-  "stdoutCompleteLineMaxBytes": 4096,
-  "postNativeStagesObserved": true,
   "nativeArm64ExtractorExecuted": false,
   "ownerDataSupplied": false,
-  "androidRuntimeQualified": false,
+  "postNativeStagesObserved": true,
+  "reviewedV9HelperGeneration": "f13edc9bf94c33bc411491702580999a2c3df73e8f6428d9f4563f7dece1560c",
+  "reviewedV9SourceRevision": "f39b52459d08fb85bf4fe6da5edddf8bccdea8bf",
+  "scope": "host-reviewed-v9-checkpoint-final-assembly-and-preflight-diagnostics",
+  "stdoutCompleteLineMaxBytes": 4096,
+  "stdoutDetailsMax": 4,
   "thorQualified": false,
-  "worldPreparationQualified": false,
-  "gameplayQualified": false
+  "unknownLegacyNotesPreserved": true,
+  "worldPreparationQualified": false
 }

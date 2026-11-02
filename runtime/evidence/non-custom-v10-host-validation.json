@@ -1,5 +1,14 @@
 {
   "additionalFinalChangesRequireTheirFocusedTests": true,
+  "exactProducerToolingCi": {
+    "appRevision": "a7e9f6354f557c0ac52b756a602cbeeaafa7b789",
+    "jobId": 125090110150,
+    "result": "success",
+    "runId": 41387058556,
+    "testsPassed": 1507,
+    "testsRun": 1608,
+    "testsSkipped": 101
+  },
   "finalFocusedValidation": {
     "log": {
       "bytes": 17972,

@@ -14,9 +14,9 @@
   "failure": {
     "dataPreparationElapsedSeconds": 8329,
     "exactOffendingOutputNotRecorded": true,
+    "helperGovernedReadBytes": 13741878254,
     "observedError": "Server data preparation failed (ValueError): generated server data failed format preflight; active output preserved",
     "operationElapsedSeconds": 8412,
-    "outputReadBytes": 13741878254,
     "phaseLabelWasStale": true
   },
   "formatVersion": 1,

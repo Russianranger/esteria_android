@@ -1,0 +1,69 @@
+{
+  "allFindingsResolved": false,
+  "androidRuntimeQualified": false,
+  "blockingIssuesRemaining": false,
+  "cacheContracts": {
+    "defaultCustomValidationStillRejectsStockVariants": true,
+    "receiptBoundProfileUsed": true,
+    "stockCompatibilityReportFullSealAndVerifyPassed": true
+  },
+  "findings": [
+    {
+      "checks": [
+        "v8->v9->v10 partial navigation resumes",
+        "v8->v9->v10 complete navigation and final assembly execute no additional native child",
+        "missing provider metadata with retained checkpoint remains rejected"
+      ],
+      "id": "chained-staging-with-preserved-v8-note",
+      "priority": "P1",
+      "resolution": "_owned_phase_work_remaining permits absent old plan only when no recognized checkpoint/attempt remains; unknown entries preserved.",
+      "status": "resolved-independently-verified"
+    },
+    {
+      "currentOwnerImpact": "No blocker established for reported owner: v9 failed final preflight and retained staging, not a successfully activated then retired completed generation. Normal current cached generation also bypasses reviewed completed lookups.",
+      "function": "_reviewed_completed",
+      "id": "retired-completed-generation-with-unknown-note",
+      "issue": "A selectively retired reviewed completed-generation root can contain only preserved unknown notes and no receipt.json; _reviewed_completed raises FileNotFoundError when explicitly asked to inspect it rather than ignoring this non-donor root.",
+      "priority": "P2",
+      "recommendation": "Future hardening may ignore genuinely exhausted previous generation roots with absent receipt and no owned payload; preserve unknown objects and reject missing receipt when recognized payload remains.",
+      "reproduction": "Create complete V9helper generation, add root note, generate current helper to retire old known paths, call _reviewed_completed on old reviewed key: receipt.json is absent and lookup fails.",
+      "status": "nonblocking-hardening-note"
+    }
+  ],
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "originalBlockerResolved": true,
+  "ownerWorldPreparationQualified": false,
+  "reviewedFiles": {
+    "runtime/prepared_data_cache.py": {
+      "bytes": 15257,
+      "sha256": "3acf84f793c76b0fcd48a745420785ee5497f7cda2fa18fded5542775e04c8d7"
+    },
+    "runtime/server_data_generation.py": {
+      "bytes": 56794,
+      "sha256": "127d459893eeb685b77b36a89455a8a84d2f7262ccd73c01f155e5fc03b8b3fd"
+    },
+    "runtime/server_data_preflight.py": {
+      "bytes": 31164,
+      "sha256": "026c70c1da2de4ee7899479960909d51e4549b8b67b7b0a56dd0a48b7c0a7f24"
+    }
+  },
+  "schemaContracts": {
+    "customAndContinuationLayoutsRemainStrict": true,
+    "exactElevenSourceBackedVariants": true,
+    "indexedGtRemainsStrict": true,
+    "oldSuccessfulReportCompatibilityVerified": true,
+    "payloadRewritten": false,
+    "powerDisplayNativeDiskPrefixAndStrideVerified": true,
+    "tenGtUseSourceSql": true
+  },
+  "scope": "independent-v10-preflight-cache-and-reviewed-migration-source-review",
+  "status": "current-owner-recovery-reviewed-with-nonblocking-edge-note",
+  "targetedChecks": {
+    "existingFocusedTestsPassed": 7,
+    "manualOriginalChainedStagingReproductionFixed": true,
+    "manualRetiredGenerationNoteLookupEdgeReproduced": true,
+    "manualStockSealAndVerifyPassed": true
+  },
+  "thorQualified": false
+}

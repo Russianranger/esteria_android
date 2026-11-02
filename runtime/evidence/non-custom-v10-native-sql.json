@@ -1,0 +1,574 @@
+{
+  "formatVersion": 1,
+  "scope": "independent-v10-native-arm64-sql-and-canonical-dbc-backing-readback",
+  "appRevision": "a7e9f6354f557c0ac52b756a602cbeeaafa7b789",
+  "sourceTree": "904e1b7b04403d812dd3b09d12129335823940a0",
+  "runId": 41387058523,
+  "jobId": 125090110061,
+  "artifactId": 13115474341,
+  "artifact": {
+    "bytes": 14201,
+    "sha256": "60e8a10ef9ce36c3f971ef8426439b59783994bb3aa2b0e255b2e7761d7788c8"
+  },
+  "allArtifactMembersRead": 11,
+  "members": {
+    "dependency-context.json": {
+      "bytes": 2187,
+      "sha256": "2d46f7fc1f0a406527aae025cd20d8991767e1367aab122acbe1f4bf6adc604d"
+    },
+    "dependency-context.log": {
+      "bytes": 2187,
+      "sha256": "d31bdb7b2d7e906e3e8bc5fe722afd251bf1163f4ff84f222d29d2f65c00a8a9"
+    },
+    "dependency-download.log": {
+      "bytes": 110,
+      "sha256": "5d3e81dea3a4bdbc90c02cd799cdc3669f9f787ac129cd08efcd740453575ff9"
+    },
+    "dependency-image-check.json": {
+      "bytes": 1433,
+      "sha256": "ded60395aa7547a75286b373acbc9e674e63cac21333f4cf735a7bb78242fa63"
+    },
+    "environment-receipt.json": {
+      "bytes": 1943,
+      "sha256": "4dfc7f5e25581624c6fb96bd78eb2643ec728d59c957a5434bd444ff9bf6b1a2"
+    },
+    "image-build.log": {
+      "bytes": 641,
+      "sha256": "4fd29f52895d81d69584dd0fc0b17152b88a39d8c957736dedf8c79f3662567c"
+    },
+    "input-acquisition.log": {
+      "bytes": 1566,
+      "sha256": "04e2a3faada331d2a87d7f13e55e26e61f1f0881e45192327f1f3da157cecaf5"
+    },
+    "input-preparation.json": {
+      "bytes": 1566,
+      "sha256": "04e2a3faada331d2a87d7f13e55e26e61f1f0881e45192327f1f3da157cecaf5"
+    },
+    "mysql-state-mount-preflight.json": {
+      "bytes": 171,
+      "sha256": "c0525585aedb47e63737e4f736e97640d59ae56f501a47e0958046f78d4bb58f"
+    },
+    "native-installation-qualification.json": {
+      "bytes": 51016,
+      "sha256": "206068a98b5e513d2e9442ab016bf8bb77b1a87a060a16bd98da495f05d11a12"
+    },
+    "runtime-preparation.json": {
+      "bytes": 1362,
+      "sha256": "da9ef8189231352878b4ed4b95846088ea32a720c51821b7c7e1d1c3b586226d"
+    }
+  },
+  "zipCrcVerified": true,
+  "allEnvironmentFileBindingsMatched": true,
+  "canonicalColumnsAndSourcePinsVerified": true,
+  "canonicalGtBackingNonemptyVerified": true,
+  "actualBackingRowCounts": {
+    "gtbarbershopcostbase_dbc": 100,
+    "gtchancetomeleecrit_dbc": 1100,
+    "gtchancetomeleecritbase_dbc": 11,
+    "gtchancetospellcrit_dbc": 1100,
+    "gtchancetospellcritbase_dbc": 11,
+    "gtcombatratings_dbc": 3200,
+    "gtnpcmanacostscaler_dbc": 100,
+    "gtoctclasscombatratingscalar_dbc": 352,
+    "gtoctregenhp_dbc": 1100,
+    "gtregenhpperspt_dbc": 1100,
+    "gtregenmpperspt_dbc": 1100,
+    "powerdisplay_dbc": 0
+  },
+  "powerDisplaySqlRows": 0,
+  "sqlBackingRestartEqualityVerified": true,
+  "nativeSql": {
+    "actualNativeSqlSetupAndRestartVerified": true,
+    "stockSqlPolicyAndHumanStartVerified": true,
+    "canonicalGtSqlBackingAndRestartVerified": true,
+    "canonicalDbcSqlBacking": {
+      "actualFileDbcRowsLoaded": false,
+      "allCanonicalColumnsMatched": true,
+      "allRequiredGtBackingNonempty": true,
+      "androidRuntimeQualified": false,
+      "database": "acore_world",
+      "formatVersion": 1,
+      "gameplayQualified": false,
+      "observedTableCount": 12,
+      "readOnlyQueries": true,
+      "requiredNonemptyGtTableCount": 11,
+      "scope": "stock-canonical-dbc-sql-backing-observation",
+      "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
+      "tables": {
+        "gtbarbershopcostbase_dbc": {
+          "columns": [
+            {
+              "mysqlType": "int",
+              "name": "ID",
+              "nullable": false,
+              "position": 1,
+              "serverFormat": "d",
+              "unsigned": false
+            },
+            {
+              "mysqlType": "float",
+              "name": "Data",
+              "nullable": false,
+              "position": 2,
+              "serverFormat": "f",
+              "unsigned": false
+            }
+          ],
+          "dbc": "gtBarberShopCostBase.dbc",
+          "distinctIds": 100,
+          "fileDbcRequiredWhenSqlEmpty": false,
+          "maximumId": 99,
+          "minimumId": 0,
+          "nativeFileLoadQualified": false,
+          "nonemptyBackingVerified": true,
+          "nonemptyRequired": true,
+          "rowCount": 100,
+          "serverFormat": "df",
+          "sourceAndLiveColumnsMatched": true,
+          "sourceSql": {
+            "bytes": 3063,
+            "path": "data/sql/base/db_world/gtbarbershopcostbase_dbc.sql",
+            "sha256": "ac8330eb79ff2eda7ee422dbd17b892ee1b07348d0c19b2714fa16df229f527e"
+          }
+        },
+        "gtchancetomeleecrit_dbc": {
+          "columns": [
+            {
+              "mysqlType": "int",
+              "name": "ID",
+              "nullable": false,
+              "position": 1,
+              "serverFormat": "d",
+              "unsigned": false
+            },
+            {
+              "mysqlType": "float",
+              "name": "Data",
+              "nullable": false,
+              "position": 2,
+              "serverFormat": "f",
+              "unsigned": false
+            }
+          ],
+          "dbc": "gtChanceToMeleeCrit.dbc",
+          "distinctIds": 1100,
+          "fileDbcRequiredWhenSqlEmpty": false,
+          "maximumId": 1099,
+          "minimumId": 0,
+          "nativeFileLoadQualified": false,
+          "nonemptyBackingVerified": true,
+          "nonemptyRequired": true,
+          "rowCount": 1100,
+          "serverFormat": "df",
+          "sourceAndLiveColumnsMatched": true,
+          "sourceSql": {
+            "bytes": 19001,
+            "path": "data/sql/base/db_world/gtchancetomeleecrit_dbc.sql",
+            "sha256": "62faba498fd345ef0c01d846c34eff0d6fb5e10d4cdacf9cb392594041148b69"
+          }
+        },
+        "gtchancetomeleecritbase_dbc": {
+          "columns": [
+            {
+              "mysqlType": "int",
+              "name": "ID",
+              "nullable": false,
+              "position": 1,
+              "serverFormat": "d",
+              "unsigned": false
+            },
+            {
+              "mysqlType": "float",
+              "name": "Data",
+              "nullable": false,
+              "position": 2,
+              "serverFormat": "f",
+              "unsigned": false
+            }
+          ],
+          "dbc": "gtChanceToMeleeCritBase.dbc",
+          "distinctIds": 11,
+          "fileDbcRequiredWhenSqlEmpty": false,
+          "maximumId": 10,
+          "minimumId": 0,
+          "nativeFileLoadQualified": false,
+          "nonemptyBackingVerified": true,
+          "nonemptyRequired": true,
+          "rowCount": 11,
+          "serverFormat": "df",
+          "sourceAndLiveColumnsMatched": true,
+          "sourceSql": {
+            "bytes": 2093,
+            "path": "data/sql/base/db_world/gtchancetomeleecritbase_dbc.sql",
+            "sha256": "953fc269b8e3790e83b10b35bc818769639ecb6086a9c6f5e5113af36d05feeb"
+          }
+        },
+        "gtchancetospellcrit_dbc": {
+          "columns": [
+            {
+              "mysqlType": "int",
+              "name": "ID",
+              "nullable": false,
+              "position": 1,
+              "serverFormat": "d",
+              "unsigned": false
+            },
+            {
+              "mysqlType": "float",
+              "name": "Data",
+              "nullable": false,
+              "position": 2,
+              "serverFormat": "f",
+              "unsigned": false
+            }
+          ],
+          "dbc": "gtChanceToSpellCrit.dbc",
+          "distinctIds": 1100,
+          "fileDbcRequiredWhenSqlEmpty": false,
+          "maximumId": 1099,
+          "minimumId": 0,
+          "nativeFileLoadQualified": false,
+          "nonemptyBackingVerified": true,
+          "nonemptyRequired": true,
+          "rowCount": 1100,
+          "serverFormat": "df",
+          "sourceAndLiveColumnsMatched": true,
+          "sourceSql": {
+            "bytes": 16606,
+            "path": "data/sql/base/db_world/gtchancetospellcrit_dbc.sql",
+            "sha256": "f637e88c919f09d6b4ba2e807efc7ba3e07d1b7821a90a406af6be1768f2779e"
+          }
+        },
+        "gtchancetospellcritbase_dbc": {
+          "columns": [
+            {
+              "mysqlType": "int",
+              "name": "ID",
+              "nullable": false,
+              "position": 1,
+              "serverFormat": "d",
+              "unsigned": false
+            },
+            {
+              "mysqlType": "float",
+              "name": "Data",
+              "nullable": false,
+              "position": 2,
+              "serverFormat": "f",
+              "unsigned": false
+            }
+          ],
+          "dbc": "gtChanceToSpellCritBase.dbc",
+          "distinctIds": 11,
+          "fileDbcRequiredWhenSqlEmpty": false,
+          "maximumId": 10,
+          "minimumId": 0,
+          "nativeFileLoadQualified": false,
+          "nonemptyBackingVerified": true,
+          "nonemptyRequired": true,
+          "rowCount": 11,
+          "serverFormat": "df",
+          "sourceAndLiveColumnsMatched": true,
+          "sourceSql": {
+            "bytes": 2070,
+            "path": "data/sql/base/db_world/gtchancetospellcritbase_dbc.sql",
+            "sha256": "4860ee6d13c2b0525b24ab47057436270aae93895f9ce2b5d391baa40cf8a465"
+          }
+        },
+        "gtcombatratings_dbc": {
+          "columns": [
+            {
+              "mysqlType": "int",
+              "name": "ID",
+              "nullable": false,
+              "position": 1,
+              "serverFormat": "d",
+              "unsigned": false
+            },
+            {
+              "mysqlType": "float",
+              "name": "Data",
+              "nullable": false,
+              "position": 2,
+              "serverFormat": "f",
+              "unsigned": false
+            }
+          ],
+          "dbc": "gtCombatRatings.dbc",
+          "distinctIds": 3200,
+          "fileDbcRequiredWhenSqlEmpty": false,
+          "maximumId": 3199,
+          "minimumId": 0,
+          "nativeFileLoadQualified": false,
+          "nonemptyBackingVerified": true,
+          "nonemptyRequired": true,
+          "rowCount": 3200,
+          "serverFormat": "df",
+          "sourceAndLiveColumnsMatched": true,
+          "sourceSql": {
+            "bytes": 46984,
+            "path": "data/sql/base/db_world/gtcombatratings_dbc.sql",
+            "sha256": "8b855d7a0cb4c26d3e83c15fb88cbdf9c67298087d799b6d9f4c15a9e01cbd8c"
+          }
+        },
+        "gtnpcmanacostscaler_dbc": {
+          "columns": [
+            {
+              "mysqlType": "int",
+              "name": "ID",
+              "nullable": false,
+              "position": 1,
+              "serverFormat": "d",
+              "unsigned": false
+            },
+            {
+              "mysqlType": "float",
+              "name": "Data",
+              "nullable": false,
+              "position": 2,
+              "serverFormat": "f",
+              "unsigned": false
+            }
+          ],
+          "dbc": "gtNPCManaCostScaler.dbc",
+          "distinctIds": 100,
+          "fileDbcRequiredWhenSqlEmpty": false,
+          "maximumId": 99,
+          "minimumId": 0,
+          "nativeFileLoadQualified": false,
+          "nonemptyBackingVerified": true,
+          "nonemptyRequired": true,
+          "rowCount": 100,
+          "serverFormat": "df",
+          "sourceAndLiveColumnsMatched": true,
+          "sourceSql": {
+            "bytes": 3094,
+            "path": "data/sql/base/db_world/gtnpcmanacostscaler_dbc.sql",
+            "sha256": "e4f56018c5eb751afd3958fb9e95ac135863ec71bc017da1d647337dad62c07f"
+          }
+        },
+        "gtoctclasscombatratingscalar_dbc": {
+          "columns": [
+            {
+              "mysqlType": "int",
+              "name": "ID",
+              "nullable": false,
+              "position": 1,
+              "serverFormat": "d",
+              "unsigned": false
+            },
+            {
+              "mysqlType": "float",
+              "name": "Data",
+              "nullable": false,
+              "position": 2,
+              "serverFormat": "f",
+              "unsigned": false
+            }
+          ],
+          "dbc": "gtOCTClassCombatRatingScalar.dbc",
+          "distinctIds": 352,
+          "fileDbcRequiredWhenSqlEmpty": false,
+          "maximumId": 352,
+          "minimumId": 1,
+          "nativeFileLoadQualified": false,
+          "nonemptyBackingVerified": true,
+          "nonemptyRequired": true,
+          "rowCount": 352,
+          "serverFormat": "df",
+          "sourceAndLiveColumnsMatched": true,
+          "sourceSql": {
+            "bytes": 5074,
+            "path": "data/sql/base/db_world/gtoctclasscombatratingscalar_dbc.sql",
+            "sha256": "b4c3f0aed5bd50a6efb429b82c6eeb2406449633a45ca0ca07fb18c7110be0bd"
+          }
+        },
+        "gtoctregenhp_dbc": {
+          "columns": [
+            {
+              "mysqlType": "int",
+              "name": "ID",
+              "nullable": false,
+              "position": 1,
+              "serverFormat": "d",
+              "unsigned": false
+            },
+            {
+              "mysqlType": "float",
+              "name": "Data",
+              "nullable": false,
+              "position": 2,
+              "serverFormat": "f",
+              "unsigned": false
+            }
+          ],
+          "dbc": "gtOCTRegenHP.dbc",
+          "distinctIds": 1100,
+          "fileDbcRequiredWhenSqlEmpty": false,
+          "maximumId": 1099,
+          "minimumId": 0,
+          "nativeFileLoadQualified": false,
+          "nonemptyBackingVerified": true,
+          "nonemptyRequired": true,
+          "rowCount": 1100,
+          "serverFormat": "df",
+          "sourceAndLiveColumnsMatched": true,
+          "sourceSql": {
+            "bytes": 17996,
+            "path": "data/sql/base/db_world/gtoctregenhp_dbc.sql",
+            "sha256": "99b0b3e6bb62be27cee18e5787f0a4a950ebc47a1a1569643edc8cc144ffe364"
+          }
+        },
+        "gtregenhpperspt_dbc": {
+          "columns": [
+            {
+              "mysqlType": "int",
+              "name": "ID",
+              "nullable": false,
+              "position": 1,
+              "serverFormat": "d",
+              "unsigned": false
+            },
+            {
+              "mysqlType": "float",
+              "name": "Data",
+              "nullable": false,
+              "position": 2,
+              "serverFormat": "f",
+              "unsigned": false
+            }
+          ],
+          "dbc": "gtRegenHPPerSpt.dbc",
+          "distinctIds": 1100,
+          "fileDbcRequiredWhenSqlEmpty": false,
+          "maximumId": 1099,
+          "minimumId": 0,
+          "nativeFileLoadQualified": false,
+          "nonemptyBackingVerified": true,
+          "nonemptyRequired": true,
+          "rowCount": 1100,
+          "serverFormat": "df",
+          "sourceAndLiveColumnsMatched": true,
+          "sourceSql": {
+            "bytes": 17161,
+            "path": "data/sql/base/db_world/gtregenhpperspt_dbc.sql",
+            "sha256": "6683c7486814bae39b36c4582b6495cb561b04a2e85f86f243ee3d560e53330b"
+          }
+        },
+        "gtregenmpperspt_dbc": {
+          "columns": [
+            {
+              "mysqlType": "int",
+              "name": "ID",
+              "nullable": false,
+              "position": 1,
+              "serverFormat": "d",
+              "unsigned": false
+            },
+            {
+              "mysqlType": "float",
+              "name": "Data",
+              "nullable": false,
+              "position": 2,
+              "serverFormat": "f",
+              "unsigned": false
+            }
+          ],
+          "dbc": "gtRegenMPPerSpt.dbc",
+          "distinctIds": 1100,
+          "fileDbcRequiredWhenSqlEmpty": false,
+          "maximumId": 1099,
+          "minimumId": 0,
+          "nativeFileLoadQualified": false,
+          "nonemptyBackingVerified": true,
+          "nonemptyRequired": true,
+          "rowCount": 1100,
+          "serverFormat": "df",
+          "sourceAndLiveColumnsMatched": true,
+          "sourceSql": {
+            "bytes": 16469,
+            "path": "data/sql/base/db_world/gtregenmpperspt_dbc.sql",
+            "sha256": "78d6f3d74c92b3f5c00e35098fb351f0bcb8fbecaa4732dd65594a1d45c13db6"
+          }
+        },
+        "powerdisplay_dbc": {
+          "columns": [
+            {
+              "mysqlType": "int",
+              "name": "ID",
+              "nullable": false,
+              "position": 1,
+              "serverFormat": "n",
+              "unsigned": false
+            },
+            {
+              "mysqlType": "int",
+              "name": "ActualType",
+              "nullable": false,
+              "position": 2,
+              "serverFormat": "i",
+              "unsigned": false
+            },
+            {
+              "mysqlType": "varchar",
+              "name": "GlobalstringBaseTag",
+              "nullable": true,
+              "position": 3,
+              "serverFormat": "x",
+              "unsigned": false
+            },
+            {
+              "mysqlType": "tinyint",
+              "name": "Red",
+              "nullable": false,
+              "position": 4,
+              "serverFormat": "x",
+              "unsigned": true
+            },
+            {
+              "mysqlType": "tinyint",
+              "name": "Green",
+              "nullable": false,
+              "position": 5,
+              "serverFormat": "x",
+              "unsigned": true
+            },
+            {
+              "mysqlType": "tinyint",
+              "name": "Blue",
+              "nullable": false,
+              "position": 6,
+              "serverFormat": "x",
+              "unsigned": true
+            }
+          ],
+          "dbc": "PowerDisplay.dbc",
+          "distinctIds": 0,
+          "fileDbcRequiredWhenSqlEmpty": true,
+          "maximumId": null,
+          "minimumId": null,
+          "nativeFileLoadQualified": false,
+          "nonemptyBackingVerified": false,
+          "nonemptyRequired": false,
+          "rowCount": 0,
+          "serverFormat": "nixxxx",
+          "sourceAndLiveColumnsMatched": true,
+          "sourceSql": {
+            "bytes": 2056,
+            "path": "data/sql/base/db_world/powerdisplay_dbc.sql",
+            "sha256": "936ca692cbe784c87e134f23c39957b2a6309a345e2c2d45a3d5247bfafed7be"
+          }
+        }
+      },
+      "worldserverExecuted": false
+    },
+    "sourceRevision": "a7e9f6354f557c0ac52b756a602cbeeaafa7b789",
+    "sqlSelectionPolicy": "stock-world-source-selection-v2",
+    "worldserverExecuted": false,
+    "gameplayQualified": false
+  },
+  "androidRuntimeQualified": false,
+  "ownerWorldPreparationQualified": false,
+  "thorQualified": false,
+  "gameplayQualified": false
+}
