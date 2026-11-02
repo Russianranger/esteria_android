@@ -9,6 +9,7 @@ on:
       - runtime/**
       - patches/**
       - tests/**
+      - app/src/androidTest/java/io/github/russianranger/esteria/PreparationControlsTest.java
       - .github/workflows/tooling.yml
   pull_request:
     paths:
@@ -18,6 +19,7 @@ on:
       - runtime/**
       - patches/**
       - tests/**
+      - app/src/androidTest/java/io/github/russianranger/esteria/PreparationControlsTest.java
       - .github/workflows/tooling.yml
   workflow_dispatch:
 permissions:

@@ -6,6 +6,8 @@ on:
     paths:
       - .github/workflows/native-extractor-output.yml
       - app/build.gradle
+      # Keep release receipts on the exact producer after controls fixture fixes.
+      - app/src/androidTest/java/io/github/russianranger/esteria/PreparationControlsTest.java
       - runtime/server_data_generation.py
       - runtime/world_io.py
       - tools/qualify_extractor_output.py
