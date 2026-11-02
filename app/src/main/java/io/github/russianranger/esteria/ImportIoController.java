@@ -7,6 +7,7 @@ import android.os.ParcelFileDescriptor;
 import android.system.Os;
 import android.system.OsConstants;
 import io.github.russianranger.esteria.core.importer.ImportIoGovernor;
+import io.github.russianranger.esteria.core.runtime.install.PreparationSpeed;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -29,6 +30,8 @@ final class ImportIoController {
     private final Diagnostics diagnostics;
     private final ImportIoGovernor governor;
     private final String operationLabel;
+    private final long normalBytesPerSecond;
+    private final boolean preparation;
     private volatile int trimLevel = -1;
     private volatile long trimAtNanos, trimAtEpochMs;
     private int pressureTrimLevel = -1;
@@ -43,12 +46,20 @@ final class ImportIoController {
         this(context,diagnostics,"Import");
     }
     ImportIoController(Context context, Diagnostics diagnostics, String operationLabel) {
+        this(context, diagnostics, operationLabel, PreparationSpeed.GENTLE, false);
+    }
+    ImportIoController(Context context, Diagnostics diagnostics, String operationLabel, PreparationSpeed speed) {
+        this(context, diagnostics, operationLabel, speed, true);
+    }
+    private ImportIoController(Context context, Diagnostics diagnostics, String operationLabel, PreparationSpeed speed, boolean preparation) {
         manager = context.getSystemService(ActivityManager.class);
         this.diagnostics = diagnostics;
         this.operationLabel = operationLabel;
-        governor = new ImportIoGovernor(NORMAL_BYTES_PER_SECOND, PRESSURE_BYTES_PER_SECOND, this::pressure, this::release);
-        diagnostics.io("ioPolicy", "8MiB-per-second-2MiB-sync-cache-windows");
-        diagnostics.io("ioNormalBytesPerSecond", NORMAL_BYTES_PER_SECOND);
+        this.preparation = preparation;
+        normalBytesPerSecond = java.util.Objects.requireNonNull(speed).bytesPerSecond;
+        governor = new ImportIoGovernor(normalBytesPerSecond, PRESSURE_BYTES_PER_SECOND, this::pressure, this::release);
+        diagnostics.io("ioPolicy", (normalBytesPerSecond >> 20) + "MiB-per-second-2MiB-sync-cache-windows");
+        diagnostics.io("ioNormalBytesPerSecond", normalBytesPerSecond);
         diagnostics.io("ioPressureBytesPerSecond", PRESSURE_BYTES_PER_SECOND);
         pressure();
     }
@@ -95,6 +106,13 @@ final class ImportIoController {
                 || (heapLimit > 0 && heapUsed >= heapLimit - heapLimit / 4)) return Math.max(1, trim);
         return trim;
     }
+    /** A trim callback can outlive the system shortage. Preparation keeps useful
+     * completed work running slowly when a fresh system/heap sample is healthy. */
+    static int preparationPressureLevel(long available, long threshold, boolean low, long heapUsed, long heapLimit, int trim) {
+        boolean healthy = !low && available >= Math.max(threshold + (512L << 20), 768L << 20)
+                && heapLimit > 0 && heapUsed < heapLimit - heapLimit / 4;
+        return pressureLevel(available, threshold, low, heapUsed, heapLimit, healthy ? Math.min(trim, 1) : trim);
+    }
     private synchronized int pressure() {
         long now = System.nanoTime();
         if (sampledAt != 0 && now - sampledAt < SAMPLE_INTERVAL_NANOS) return pressure;
@@ -110,13 +128,15 @@ final class ImportIoController {
         Runtime vm = Runtime.getRuntime();
         int recentTrim = recentTrimPressure();
         int previousPressure = pressure;
-        pressure = pressureLevel(available, threshold, low, vm.totalMemory() - vm.freeMemory(), vm.maxMemory(), recentTrim);
+        long heapUsed = vm.totalMemory() - vm.freeMemory(), heapLimit = vm.maxMemory();
+        pressure = preparation ? preparationPressureLevel(available, threshold, low, heapUsed, heapLimit, recentTrim)
+                : pressureLevel(available, threshold, low, heapUsed, heapLimit, recentTrim);
         statusHint = pressure == 2 ? "Waiting for Android memory to recover. Stop remains available."
                 : pressure == 1 ? "Android memory is low; "+operationLabel.toLowerCase(java.util.Locale.ROOT)+" is limited to 2 MiB/s."
-                : operationLabel+" speed is limited to 8 MiB/s to reduce memory pressure.";
+                : operationLabel+" verification/copy limit is "+(normalBytesPerSecond >> 20)+" MiB/s.";
         diagnostics.memory();
         diagnostics.io("ioPressureLevel", pressure);
-        diagnostics.io("ioActiveBytesPerSecond", pressure == 2 ? 0 : pressure == 1 ? PRESSURE_BYTES_PER_SECOND : NORMAL_BYTES_PER_SECOND);
+        diagnostics.io("ioActiveBytesPerSecond", pressure == 2 ? 0 : pressure == 1 ? PRESSURE_BYTES_PER_SECOND : normalBytesPerSecond);
         diagnostics.io("ioMemoryAvailableBytes", available);
         diagnostics.io("ioMemoryThresholdBytes", threshold);
         diagnostics.io("ioMemoryLow", Boolean.toString(low));

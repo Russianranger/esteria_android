@@ -1,0 +1,36 @@
+{
+  "formatVersion": 1,
+  "scope": "host-private-data-resume-and-trim-storage-fixtures",
+  "focusedTestsRun": 50,
+  "focusedTestsPassed": 50,
+  "focusedTestsSkipped": 0,
+  "logSha256": "3868d1aac3bfa4ca2c89a0721120134ce7e7573399689ce56a9287e390a81f19",
+  "mutants": [
+    {
+      "mutant": "restart-loses-finished-tiles",
+      "rejected": true,
+      "failedTests": 1,
+      "log": {
+        "bytes": 4271,
+        "sha256": "d2a2c4c01c1a870e5e25a81afc256ea0a80fb03189793fb21df9a2f06d9f4751"
+      }
+    },
+    {
+      "mutant": "header-only-retains-truncated-tile",
+      "rejected": true,
+      "failedTests": 1,
+      "log": {
+        "bytes": 3576,
+        "sha256": "64285993c8b9ef5376645d27b1399834e2b065b3b220eea646c82b48c8ca5cd1"
+      }
+    }
+  ],
+  "actualOwnedHostProgressFixtureExecuted": true,
+  "nativeArm64ExtractorExecuted": false,
+  "ownerDataSupplied": false,
+  "androidRuntimeQualified": false,
+  "thorQualified": false,
+  "worldPreparationQualified": false,
+  "gameplayQualified": false,
+  "unknownOldGenerationEntriesPreserved": true
+}

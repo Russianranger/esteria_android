@@ -1,3 +1,15 @@
+# Esteria Stock v9 — preparation speed, resume and storage update pending
+
+The v8 owner bundle records a memory-pressure pause after about 103 minutes, followed by another attempt that reached navigation meshes and was cancelled. It records no new low-memory kill. Visible runtime setup reused the same generations with zero copied bytes; repeated downloads are not established. The old phase code retained failed UUID navigation directories but started fresh on retry, which could repeat native work and grow storage.
+
+V9 adds Gentle 8, Balanced 32 (default) and Fast 64 MiB/s preparation verification/copy profiles. Imports keep their existing 8 MiB/s policy. Real pressure retains 2 MiB/s backoff/pause, one native worker and the 4 GiB native address-space guard. A critical trim callback with verified healthy system/heap headroom now causes backoff instead of immediately aborting native preparation. Native navigation CPU time is separate from the chosen I/O rate.
+
+Valid partial navigation tiles and reviewed compatible v8 work can resume after complete input/output checks. Recognized duplicate phase attempts are reclaimed; unknown data remains protected. Idle-only storage scan/trim removes obsolete immutable runtime generations and redundant owned archive copies while preserving imports, current/expected runtime, world checkpoints, databases and saves. Bounded rotating input-cache windows replace repeated whole-archive sweeps. Stage, native tile progress and operation/cancellation diagnostics distinguish continued work from a new attempt.
+
+Local build/lint, storage filesystem and speed-policy checks passed. Full exact-producer APK, native/Android source-bound evidence, persistent signing and anonymous public readback remain release gates. Physical Thor preparation/world entry remain unqualified. Preserve the completed import and app data; no reimport or clear-storage procedure is requested.
+
+## Published v8 baseline — historical
+
 # Esteria Stock v8 handoff
 
 [Signed ARM64 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.8/Esteria-Stock-3.3.5a-arm64.apk) · [Testing procedure](NON-CUSTOM-TESTING.md).

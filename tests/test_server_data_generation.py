@@ -2,6 +2,7 @@
 import errno
 import fcntl
 import hashlib
+import io
 import os
 from pathlib import Path
 import shutil
@@ -10,6 +11,7 @@ import sys
 import tempfile
 import time
 import unittest
+from contextlib import redirect_stdout
 from unittest.mock import patch
 
 from runtime import server_data_generation as data
@@ -43,6 +45,9 @@ class ServerDataGenerationTests(unittest.TestCase):
         """Deliberately no extractor, MPQ, ARM64 or usable game data is executed."""
         name = Path(command[0]).name
         self.calls.append((name, list(command[1:])))
+        expected_cache = (self.import_root / 'data/Data/common.MPQ',) if name in data.PROGRAMS[:2] and \
+            command[1:] != ['--esteria-order-capabilities'] else ()
+        self.assertEqual(kwargs.get('cache_inputs'), expected_cache)
         if command[1:] == ['--esteria-order-capabilities']:
             log.write_bytes(data.CAPABILITY + b'\n')
             return
@@ -70,7 +75,7 @@ class ServerDataGenerationTests(unittest.TestCase):
             self.assertIn('--silent', command)
             self.assertTrue((cwd / 'maps/0000000.map').is_file())
             self.assertTrue((cwd / 'vmaps/000.vmtree').is_file())
-            (cwd / 'mmaps').mkdir()
+            (cwd / 'mmaps').mkdir(exist_ok=True)
             (cwd / 'mmaps/000.mmap').write_bytes(b'\0' * 28)
         else:
             self.fail(name)
@@ -113,6 +118,243 @@ class ServerDataGenerationTests(unittest.TestCase):
             self.assertNotEqual(first['generation'], second['generation'])
             self.assertEqual(second['inputs']['preparationHelperGeneration'], '9' * 64)
 
+    @staticmethod
+    def tile(payload=b'fixture-navmesh'):
+        # Structural write-completion fixture, not a generated Detour mesh.
+        return struct.pack('<4I', 0x4D4D4150, 7, 20, len(payload)) + b'\0' * 40 + payload
+
+    def pause_navigation(self, command, cwd, log, timeout, **kwargs):
+        self.fake_execute(command, cwd, log, timeout, **kwargs)
+        if Path(command[0]).name == 'mmaps_generator':
+            (cwd / 'mmaps/0000000.mmtile').write_bytes(self.tile())
+            # Native shouldSkipTile accepts this header; our retry must remove
+            # the truncated payload before giving that process the directory.
+            (cwd / 'mmaps/0000001.mmtile').write_bytes(self.tile()[:57])
+            raise data.world_io.PreparationPaused('controlled memory pause')
+
+    def test_navigation_retry_keeps_finished_tiles_and_rebuilds_only_partial_output(self):
+        events = []
+        with patch.object(data, 'execute', side_effect=self.pause_navigation):
+            for _ in range(3):
+                with self.assertRaisesRegex(data.world_io.PreparationPaused, 'controlled memory pause'):
+                    self.generate(progress=events.append)
+                attempts = list((self.store / 'staging').glob('*/navigation-in-progress'))
+                self.assertEqual(len(attempts), 1)
+                self.assertFalse((self.store / 'current').exists())
+        retained = attempts[0] / 'data/mmaps/0000000.mmtile'
+        self.assertEqual(retained.read_bytes(), self.tile())
+        def resume(command, cwd, log, timeout, **kwargs):
+            if Path(command[0]).name == 'mmaps_generator':
+                self.assertEqual((cwd / 'mmaps/0000000.mmtile').read_bytes(), self.tile())
+                self.assertFalse((cwd / 'mmaps/0000001.mmtile').exists())
+            self.fake_execute(command, cwd, log, timeout, **kwargs)
+        with patch.object(data, 'execute', side_effect=resume):
+            receipt = self.generate(progress=events.append)
+        self.assertIn('extraction-navigation-resume-1-tiles', events)
+        self.assertIn('extraction-reused-maps-dbc-cameras', events)
+        self.assertEqual(sum(n == 'map_extractor' and '-e' in a for n, a in self.calls), 1)
+        self.assertEqual(sum(n == 'vmap4_extractor' and '--esteria-order' in a for n, a in self.calls), 1)
+        self.assertEqual(sum(n == 'vmap4_assembler' for n, _ in self.calls), 1)
+        self.assertEqual(list((self.store / 'staging').iterdir()), [])
+        self.assertFalse(receipt['worldQualified'])
+
+    def test_reviewed_v8_staging_migrates_without_reextracting_completed_phases(self):
+        with patch.object(data, 'preparation_helper_generation', return_value=data.V8_HELPER_GENERATION), \
+             patch.object(data, 'execute', side_effect=self.pause_navigation):
+            with self.assertRaises(data.world_io.PreparationPaused): self.generate()
+        old = next((self.store / 'staging').iterdir())
+        # v8 used a new UUID attempt rather than the v9 deterministic slot.
+        old_attempt = old / ('navigation-' + '1' * 32)
+        (old / 'navigation-in-progress').rename(old_attempt)
+        events = []
+        def resume(command, cwd, log, timeout, **kwargs):
+            if Path(command[0]).name == 'mmaps_generator':
+                self.assertEqual((cwd / 'mmaps/0000000.mmtile').read_bytes(), self.tile())
+            self.fake_execute(command, cwd, log, timeout, **kwargs)
+        with patch.object(data, 'execute', side_effect=resume): receipt = self.generate(progress=events.append)
+        self.assertIn('extraction-resumed-reviewed-v8-work', events)
+        self.assertFalse(old.exists())
+        self.assertEqual(sum(n == 'map_extractor' and '-e' in a for n, a in self.calls), 1)
+        self.assertNotEqual(receipt['inputs']['preparationHelperGeneration'], data.V8_HELPER_GENERATION)
+
+    def test_navigation_recovers_crash_before_data_directory_creation(self):
+        with patch.object(data, 'execute', side_effect=self.pause_navigation):
+            with self.assertRaises(data.world_io.PreparationPaused): self.generate()
+        attempt = next((self.store / 'staging').glob('*/navigation-in-progress'))
+        shutil.rmtree(attempt / 'data')
+        with patch.object(data, 'execute', side_effect=self.fake_execute): receipt = self.generate()
+        self.assertEqual((self.store / 'current').read_text(), receipt['generation'] + '\n')
+        self.assertEqual(sum(n == 'map_extractor' and '-e' in a for n, a in self.calls), 1)
+
+    def test_navigation_keeps_most_finished_legacy_attempt_and_discards_duplicates(self):
+        with patch.object(data, 'execute', side_effect=self.pause_navigation):
+            with self.assertRaises(data.world_io.PreparationPaused): self.generate()
+        work = next((self.store / 'staging').iterdir())
+        selected = work / 'navigation-in-progress'
+        older = work / ('navigation-' + '1' * 32)
+        shutil.copytree(selected, older)
+        (older / 'data/mmaps/0000002.mmtile').write_bytes(self.tile(b'second completed tile'))
+        events = []
+        def resume(command, cwd, log, timeout, **kwargs):
+            if Path(command[0]).name == 'mmaps_generator':
+                self.assertEqual((cwd / 'mmaps/0000002.mmtile').read_bytes(), self.tile(b'second completed tile'))
+                self.assertFalse(older.exists())
+                self.assertFalse((cwd / 'mmaps/0000001.mmtile').exists())
+            self.fake_execute(command, cwd, log, timeout, **kwargs)
+        with patch.object(data, 'execute', side_effect=resume): self.generate(progress=events.append)
+        self.assertIn('extraction-navigation-resume-2-tiles', events)
+
+    def test_navigation_symlink_checkpoint_never_touches_external_target(self):
+        with patch.object(data, 'execute', side_effect=self.pause_navigation):
+            with self.assertRaises(data.world_io.PreparationPaused): self.generate()
+        attempt = next((self.store / 'staging').glob('*/navigation-in-progress'))
+        outside = self.root / 'keep'; outside.write_bytes(b'preserve me')
+        (attempt / 'data/mmaps/0000003.mmtile').symlink_to(outside)
+        with patch.object(data, 'execute', side_effect=self.fake_execute):
+            with self.assertRaisesRegex(ValueError, 'symlink'): self.generate()
+        self.assertEqual(outside.read_bytes(), b'preserve me')
+
+    def test_successful_trim_preserves_unrecognized_staging_entries(self):
+        marker = []
+        def capture(command, cwd, log, timeout, **kwargs):
+            self.fake_execute(command, cwd, log, timeout, **kwargs)
+            if Path(command[0]).name == 'mmaps_generator':
+                path = cwd.parent.parent / 'owner-note.txt'; path.write_bytes(b'keep unknown content'); marker.append(path)
+        with patch.object(data, 'execute', side_effect=capture): receipt = self.generate()
+        self.assertEqual(marker[0].read_bytes(), b'keep unknown content')
+        self.assertEqual({p.name for p in marker[0].parent.iterdir()}, {'owner-note.txt'})
+        self.assertTrue((self.store / 'generations' / receipt['generation'] / 'data/dbc/Map.dbc').exists())
+
+    def test_reviewed_v8_completed_generation_migrates_without_children_or_replan(self):
+        with patch.object(data, 'preparation_helper_generation', return_value=data.V8_HELPER_GENERATION), \
+             patch.object(data, 'execute', side_effect=self.fake_execute): previous = self.generate()
+        count = len(self.calls); events = []
+        with patch.object(data, 'execute', side_effect=AssertionError('old complete output must be reused')), \
+             patch.object(data.order, 'plan', side_effect=AssertionError('old provider order must be reused')):
+            receipt = self.generate(progress=events.append)
+        self.assertEqual(receipt['files'], previous['files'])
+        self.assertNotEqual(receipt['generation'], previous['generation'])
+        self.assertEqual(count, len(self.calls))
+        self.assertIn('extraction-migrated-reviewed-v8-generation', events)
+        self.assertFalse((self.store / 'generations' / previous['generation']).exists())
+        self.assertFalse(receipt['worldQualified'])
+
+    def test_reviewed_v8_migration_cleanup_can_retry_after_old_metadata_is_removed(self):
+        with patch.object(data, 'preparation_helper_generation', return_value=data.V8_HELPER_GENERATION), \
+             patch.object(data, 'execute', side_effect=self.pause_navigation):
+            with self.assertRaises(data.world_io.PreparationPaused): self.generate()
+        old = next((self.store / 'staging').iterdir())
+        (old / 'navigation-in-progress').rename(old / ('navigation-' + '2' * 32))
+        (old / 'owner-note.txt').write_bytes(b'preserved unknown content')
+        with patch.object(data, 'execute', side_effect=self.pause_navigation):
+            with self.assertRaises(data.world_io.PreparationPaused): self.generate()
+        self.assertTrue(old.is_dir())
+        self.assertFalse((old / 'order.json').exists())
+        with patch.object(data, 'execute', side_effect=self.fake_execute): self.generate()
+        self.assertEqual((old / 'owner-note.txt').read_bytes(), b'preserved unknown content')
+
+    def test_completed_migration_retires_old_generation_after_interrupted_cleanup(self):
+        with patch.object(data, 'preparation_helper_generation', return_value=data.V8_HELPER_GENERATION), \
+             patch.object(data, 'execute', side_effect=self.fake_execute): previous = self.generate()
+        old = self.store / 'generations' / previous['generation']
+        real_retire = data._retire_v8_generation
+        def interrupted(path, receipt):
+            if path == old:
+                (old / 'receipt.json').unlink()
+                raise OSError('controlled interrupted old cleanup')
+            return real_retire(path, receipt)
+        with patch.object(data, '_retire_v8_generation', side_effect=interrupted):
+            with self.assertRaisesRegex(OSError, 'controlled interrupted old cleanup'): self.generate()
+        self.assertNotEqual((self.store / 'current').read_text(), previous['generation'] + '\n')
+        with patch.object(data, 'execute', side_effect=AssertionError('verified v9 output must remain usable')):
+            receipt = self.generate()
+        self.assertFalse(old.exists())
+        self.assertEqual((self.store / 'current').read_text(), receipt['generation'] + '\n')
+
+    def test_completed_v8_retirement_preserves_unknown_root_and_nested_entries(self):
+        with patch.object(data, 'preparation_helper_generation', return_value=data.V8_HELPER_GENERATION), \
+             patch.object(data, 'execute', side_effect=self.fake_execute): previous = self.generate()
+        old = self.store / 'generations' / previous['generation']
+        (old / 'owner-note.txt').write_bytes(b'preserve root note')
+        real_retire = data._retire_v8_generation
+        def add_unknown(path, receipt):
+            (path / 'data/owner-note.txt').write_bytes(b'preserve nested note')
+            return real_retire(path, receipt)
+        with patch.object(data, '_retire_v8_generation', side_effect=add_unknown): receipt = self.generate()
+        self.assertEqual((old / 'owner-note.txt').read_bytes(), b'preserve root note')
+        self.assertEqual((old / 'data/owner-note.txt').read_bytes(), b'preserve nested note')
+        self.assertFalse((old / 'receipt.json').exists())
+        self.assertEqual({path.name for path in old.iterdir()}, {'data', 'owner-note.txt'})
+        self.assertEqual({path.name for path in (old / 'data').iterdir()}, {'owner-note.txt'})
+        with patch.object(data, 'execute', side_effect=AssertionError('verified v9 data remains usable')):
+            self.assertEqual(self.generate(), receipt)
+
+    def interrupt_migrated_order(self, *, completed):
+        with patch.object(data, 'preparation_helper_generation', return_value=data.V8_HELPER_GENERATION), \
+             patch.object(data, 'execute', side_effect=self.fake_execute if completed else self.pause_navigation):
+            if completed: previous = self.generate()['generation']
+            else:
+                with self.assertRaises(data.world_io.PreparationPaused): self.generate()
+                old = next((self.store / 'staging').iterdir()); previous = old.name
+                (old / 'navigation-in-progress').rename(old / ('navigation-' + '3' * 32))
+        real_atomic = data.storage.atomic; interrupted = []
+        def publish(path, raw):
+            if path.name == 'order.json' and path.parent.parent == self.store / 'staging' and path.parent.name != previous:
+                interrupted.append(path.parent)
+                raise OSError('controlled interruption before migration JSON commit')
+            return real_atomic(path, raw)
+        with patch.object(data.storage, 'atomic', side_effect=publish):
+            with self.assertRaisesRegex(OSError, 'controlled interruption before migration JSON commit'): self.generate()
+        self.assertEqual(len(interrupted), 1)
+        self.assertTrue((interrupted[0] / 'order.tsv').is_file())
+        self.assertFalse((interrupted[0] / 'order.json').exists())
+        with patch.object(data, 'execute', side_effect=self.fake_execute): receipt = self.generate()
+        self.assertEqual((self.store / 'current').read_text(), receipt['generation'] + '\n')
+
+    def test_staging_migration_commits_wire_before_json_and_recovers_interruption(self):
+        self.interrupt_migrated_order(completed=False)
+
+    def test_completed_migration_commits_wire_before_json_and_recovers_interruption(self):
+        self.interrupt_migrated_order(completed=True)
+
+    def test_reviewed_v8_mutated_phase_is_refused_and_prior_pointer_preserved(self):
+        self.store.mkdir(); (self.store / 'current').write_text('f' * 64 + '\n')
+        with patch.object(data, 'preparation_helper_generation', return_value=data.V8_HELPER_GENERATION), \
+             patch.object(data, 'execute', side_effect=self.pause_navigation):
+            with self.assertRaises(data.world_io.PreparationPaused): self.generate()
+        old = next((self.store / 'staging').iterdir())
+        (old / 'maps-dbc-cameras-complete/data/dbc/Map.dbc').write_bytes(b'corrupt')
+        with self.assertRaisesRegex(ValueError, 'completed extraction phase changed'): self.generate()
+        self.assertEqual((self.store / 'current').read_text(), 'f' * 64 + '\n')
+
+    def test_navigation_progress_is_numeric_bounded_throttled_and_split_safe(self):
+        rows = []; clock = [0]
+        progress = data.NavigationProgress(emit=rows.append, clock=lambda: clock[0])
+        progress.feed(b'10% [Map 0000] Building ti')
+        progress.feed(b'le [12,34]\n')
+        progress.feed(b'11% [Map 0000] Building tile [13,34]\n')
+        self.assertEqual(rows, [dict(percent=10, map=0, tileX=12, tileY=34)])
+        clock[0] = 3
+        progress.feed(b'/private/path 80% [Map 0001] Building tile [12,34]\n')
+        progress.feed(b'x' * 10000 + b'\n101% [Map 0000] Building tile [12,34]\n')
+        progress.feed(b'20% [Map 0000] Building tile [99,34]\n')
+        progress.feed(b'20% [Map 0001] Building tile [12,34]\n')
+        self.assertEqual(rows[-1], dict(percent=20, map=1, tileX=12, tileY=34))
+        self.assertEqual(len(rows), 2)
+        self.assertLessEqual(len(progress.pending), 256)
+
+    def test_real_host_fixture_progress_relay_drops_raw_paths(self):
+        executable = self.root / 'mmaps_generator'
+        executable.write_text('#!' + sys.executable + '\n' +
+            'print("/private/owner/path 19% [Map 0000] Building tile [12,34]")\n' +
+            'print("20% [Map 0000] Building tile [12,34]")\n')
+        executable.chmod(0o700); observed = io.StringIO()
+        with redirect_stdout(observed):
+            result = data.execute([str(executable)], self.root, self.root / 'native-fixture.log', 10)
+        self.assertEqual(result['exitStatus'], 0)
+        self.assertEqual(observed.getvalue(), 'NAVIGATION_PROGRESS {"percent":20,"map":0,"tileX":12,"tileY":34}\n')
+        # Real owned host process only. This executes no shipped ARM64 code.
+
     def test_interrupted_vmap_phase_reuses_only_completed_map_phase(self):
         prior = 'f' * 64 + '\n'
         self.store.mkdir(); (self.store / 'current').write_text(prior)
@@ -124,6 +366,8 @@ class ServerDataGenerationTests(unittest.TestCase):
         with patch.object(data, 'execute', side_effect=fail):
             with self.assertRaisesRegex(ValueError, 'interrupted raw'):
                 self.generate()
+        partial = list((self.store / 'staging').glob('*/raw-vmaps-*/data/Buildings/dir_bin'))
+        self.assertTrue(any(path.read_bytes() == b'partial' for path in partial))
         self.assertEqual((self.store / 'current').read_text(), prior)
         initial_maps = sum(name == 'map_extractor' and '-e' in args for name, args in self.calls)
         with patch.object(data, 'execute', side_effect=self.fake_execute), \
@@ -131,8 +375,7 @@ class ServerDataGenerationTests(unittest.TestCase):
             with patch.object(data, 'tools_verified', return_value='d' * 64):
                 self.assertFalse(data.generate(self.store, self.game, self.generation, self.tools, {}, 'enUS')['worldQualified'])
         self.assertEqual(sum(name == 'map_extractor' and '-e' in args for name, args in self.calls), initial_maps)
-        partial = list((self.store / 'staging').glob('*/raw-vmaps-*/data/Buildings/dir_bin'))
-        self.assertTrue(any(path.read_bytes() == b'partial' for path in partial))
+        self.assertEqual(list((self.store / 'staging').iterdir()), [])
 
     def test_input_change_before_activation_preserves_current(self):
         self.store.mkdir(); (self.store / 'current').write_text('f' * 64 + '\n')
@@ -175,9 +418,9 @@ class ServerDataGenerationTests(unittest.TestCase):
         with patch.object(data, 'execute', side_effect=capture):
             receipt = self.generate()
         self.assertEqual(len(observed), 1)
-        completed = list((self.store / 'staging').glob('*/maps-dbc-cameras-complete/data'))
-        self.assertEqual(len(completed), 1)
-        self.assertTrue((completed[0] / 'dbc/Map.dbc').is_file())
+        self.assertEqual(list((self.store / 'staging').iterdir()), [])
+        completed = self.store / 'generations' / receipt['generation'] / 'data'
+        self.assertTrue((completed / 'dbc/Map.dbc').is_file())
         self.assertEqual((self.store / 'current').read_text(), receipt['generation'] + '\n')
         # Format-only synthetic storage coverage; no native conversion claim.
         self.assertFalse(receipt['worldQualified'])

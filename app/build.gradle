@@ -1,7 +1,7 @@
 plugins { id 'com.android.application' }
 def sourceLock = new groovy.json.JsonSlurper().parse(rootProject.file('sources.lock.json'))
 def clientRevision = sourceLock.sources.client.commit
-def selectedVersionCode = providers.gradleProperty('buildVersionCode').getOrElse('8').toInteger()
+def selectedVersionCode = providers.gradleProperty('buildVersionCode').getOrElse('9').toInteger()
 def serverRevision = sourceLock.sources.server.commit
 def prootProvider = providers.gradleProperty('prootProviderDir').orNull
 def serverProvider = providers.gradleProperty('serverRuntimeProviderDir').orNull

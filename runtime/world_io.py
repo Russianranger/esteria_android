@@ -18,6 +18,10 @@ import time
 
 NORMAL_RATE, PRESSURE_RATE = 8 << 20, 2 << 20
 CACHE_WINDOW, WAIT_SLICE, PRESSURE_TIMEOUT = 2 << 20, .1, 60
+SPEED_ENVIRONMENT = 'ESTERIA_PREPARATION_SPEED'
+SPEED_RATES = {'gentle': NORMAL_RATE, 'balanced': 32 << 20, 'fast': 64 << 20}
+NATIVE_CACHE_BATCH, NATIVE_CACHE_INTERVAL = 8 << 20, 1.0
+NATIVE_CACHE_PRESSURE_INTERVAL = .1
 NATIVE_ADDRESS_SPACE_BYTES = 4 << 30
 PAUSED_EXIT_CODE = 75
 _active = ContextVar('esteria_world_io_policy', default=None)
@@ -193,7 +197,13 @@ def _memory_available():
 
 class Policy:
     def __init__(self, cancelled=lambda: False, progress=lambda value: None, *,
-                 clock=time.monotonic, sleeper=time.sleep, memory_probe=_memory_available, advice=None):
+                 clock=time.monotonic, sleeper=time.sleep, memory_probe=_memory_available, advice=None, speed=None):
+        # A missing selection retains the historical component-fixture policy.
+        # The launcher explicitly supplies its persisted preparation choice.
+        self.speed = os.environ.get(SPEED_ENVIRONMENT, 'gentle') if speed is None else speed
+        if not isinstance(self.speed, str) or self.speed not in SPEED_RATES:
+            raise ValueError('Unknown world preparation speed')
+        self.normal_rate = SPEED_RATES[self.speed]
         self.cancelled, self.progress = cancelled, progress
         self.clock, self.sleeper, self.memory_probe = clock, sleeper, memory_probe
         self.advice = advice if advice is not None else getattr(os, 'posix_fadvise', None)
@@ -232,7 +242,7 @@ class Policy:
     def consumed(self, count):
         self.checkpoint()
         self.read_bytes += count
-        rate = PRESSURE_RATE if self.pressure() else NORMAL_RATE
+        rate = PRESSURE_RATE if self.pressure() else self.normal_rate
         self.deadline = max(self.deadline, self.clock()) + count / rate
         while self.deadline - self.clock() > 0:
             self.checkpoint()
@@ -260,9 +270,11 @@ class Policy:
             return
         self.report_at = now
         self.progress('WORLD_IO ' + json.dumps(dict(phase=self.phase, readBytes=self.read_bytes,
-            normalBytesPerSecond=NORMAL_RATE, pressureBytesPerSecond=PRESSURE_RATE,
+            speed=self.speed, normalBytesPerSecond=self.normal_rate, pressureBytesPerSecond=PRESSURE_RATE,
             availableBytes=self.available, pressureLevel=self.pressure(), pressureWaits=self.pressure_waits,
             nativeAddressSpaceLimitBytes=NATIVE_ADDRESS_SPACE_BYTES, nativePressureAborts=self.native_pressure_aborts,
+            nativeCacheWindowBytes=CACHE_WINDOW, nativeCacheBatchBytes=NATIVE_CACHE_BATCH,
+            nativeCachePolicy='bounded-rotating-clean-input-windows',
             cacheCalls=self.cache_calls, cacheAdvisedBytes=self.cache_bytes, cacheErrors=self.cache_errors),
             separators=(',', ':'), sort_keys=True))
 
@@ -358,9 +370,16 @@ def archive_paths(root):
 
 
 class NativeInputs:
-    """Repeated clean-input advice; no child rate cap or reclaimed-byte claim."""
+    """Bounded rotating clean-input advice; no child rate cap/reclaimed-byte claim.
+
+    Advising every byte of every MPQ every 100ms discards useful native read
+    cache repeatedly. Keep memory/cancellation checks at every tick, but advance
+    through at most 8MiB in 2MiB windows once per second while memory is healthy.
+    Pressure increases advice frequency without growing a batch or a buffer.
+    """
     def __init__(self, paths):
         self.policy, self.files, self.next_at = _active.get(), [], 0
+        self.offsets, self.cursor = [], 0
         if self.policy is None:
             return
         seen = set()
@@ -376,7 +395,8 @@ class NativeInputs:
                         raise ValueError('Regular native cache input required')
                     key = (info.st_dev, info.st_ino)
                     if key not in seen:
-                        self.files.append((fd, info.st_size)); seen.add(key); fd = None
+                        self.files.append((fd, info.st_size)); self.offsets.append(0)
+                        seen.add(key); fd = None
                 finally:
                     if fd is not None:
                         os.close(fd)
@@ -388,22 +408,42 @@ class NativeInputs:
         if self.policy is None:
             return
         self.policy.check_cancelled()
-        if self.policy.pressure() >= 2:
+        pressure = self.policy.pressure()
+        if pressure >= 2:
             self.policy.native_pressure_aborts += 1
             self.policy.report(force=True)
             raise PreparationPaused('World preparation paused because memory is critically low; the native operation is stopped and completed phases are retained.')
         now = self.policy.clock()
         if not force and now < self.next_at:
             return
-        self.next_at = now + WAIT_SLICE
-        for fd, size in self.files:
-            self.policy.release(fd, 0, size)
+        self.next_at = now + (NATIVE_CACHE_PRESSURE_INTERVAL if pressure else NATIVE_CACHE_INTERVAL)
+        budget, completed = NATIVE_CACHE_BATCH, set()
+        for _ in range(NATIVE_CACHE_BATCH // CACHE_WINDOW):
+            # Completed small files receive no repeated advice within a batch;
+            # all nonempty inputs rotate fairly across ticks.
+            for _ in range(len(self.files)):
+                index = self.cursor
+                self.cursor = (self.cursor + 1) % len(self.files)
+                fd, size = self.files[index]
+                if size > 0 and index not in completed:
+                    break
+            else:
+                break
+            offset = self.offsets[index]
+            length = min(CACHE_WINDOW, budget, size - offset)
+            self.policy.release(fd, offset, length)
+            self.offsets[index] = offset + length
+            if self.offsets[index] == size:
+                self.offsets[index] = 0
+                completed.add(index)
+            budget -= length
         self.policy.report()
 
     def close(self):
         while self.files:
             fd, _ = self.files.pop()
             os.close(fd)
+        self.offsets.clear()
 
     def __enter__(self):
         try:

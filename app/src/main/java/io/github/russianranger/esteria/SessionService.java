@@ -44,6 +44,8 @@ import io.github.russianranger.esteria.core.importer.ContentPackageLayout;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeInstaller;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeReadPolicy;
+import io.github.russianranger.esteria.core.runtime.install.PreparationSpeed;
+import io.github.russianranger.esteria.core.runtime.install.RuntimeStorageMaintenance;
 import io.github.russianranger.esteria.runtime.RuntimeSetup;
 import io.github.russianranger.esteria.runtime.ServerRuntimeSetup;
 import io.github.russianranger.esteria.runtime.ServerProgramsSetup;
@@ -72,6 +74,8 @@ public final class SessionService extends Service {
     static final String PREPARE_SERVER_RUNTIME = "io.github.russianranger.esteria.PREPARE_SERVER_RUNTIME";
     static final String PREPARE_WORLD = "io.github.russianranger.esteria.PREPARE_WORLD";
     static final String WORLD_LOCALE = "worldLocale";
+    static final String SCAN_STORAGE = "io.github.russianranger.esteria.SCAN_STORAGE";
+    static final String TRIM_STORAGE = "io.github.russianranger.esteria.TRIM_STORAGE";
     static final String FORCE_STOP = "io.github.russianranger.esteria.FORCE_STOP";
     static final String ACCEPT_UI = "io.github.russianranger.esteria.ACCEPT_UI";
     static final String KEEP_UI = "io.github.russianranger.esteria.KEEP_UI";
@@ -90,6 +94,11 @@ public final class SessionService extends Service {
     private int latestStartId;
     private volatile String status = "Ready to import your 3.3.5a build 12340 client folder or ZIP.";
     private volatile String supportStatus="";
+    private volatile String storageStatus="No storage scan has run. Imported client, saves and resumable world work are retained.";
+    private volatile boolean storageCanTrim;
+    private volatile String operationIdForLog="none";
+    private volatile long operationBeganNanos;
+    private String lastLoggedPreparationPhase="";
     private volatile SafTreeSource activeFolderSource;
     private volatile ImportDiagnostics lastImport;
     private volatile ImportIoController activeImportIo;
@@ -128,7 +137,10 @@ public final class SessionService extends Service {
         String support=supportStatus;return support.isEmpty()?current:current+"\n"+support;
     }
     boolean busy() { return busy.get(); }
-    boolean supportExportAvailable(){return !exporting.get()&&!(busy.get()&&EXPORT.equals(activeAction));}
+    boolean supportExportAvailable(){return !exporting.get()&&!(busy.get()&&(EXPORT.equals(activeAction)||isStorageAction(activeAction)));}
+    String storageStatus(){return storageStatus;}
+    boolean storageMaintenanceAvailable(){return !busy.get()&&!exporting.get()&&game==null&&worldSetup==null&&stockSetup==null&&graphicsProbe==null;}
+    boolean storageTrimAvailable(){return storageMaintenanceAvailable()&&storageCanTrim;}
     ClientLaunchSetup.UiReview uiReview() { return pendingUiReview; }
     GameSession.Handle game() { return game; }
     GamePresentationPanel.SessionEvents presentationEvents() { return gameEvents; }
@@ -141,6 +153,7 @@ public final class SessionService extends Service {
             Files.createDirectories(root.resolve("state/logs"));
             lastImport = new ImportDiagnostics(root.resolve("state/import-last.properties"));
             lastPreparation = new WorldPreparationDiagnostics(root.resolve("state/world-preparation-last.properties"));
+            storageStatus=getSharedPreferences("storage-maintenance",MODE_PRIVATE).getString("summary",storageStatus);
             try {
                 String saved=getSharedPreferences("session",MODE_PRIVATE).getString("ownedSupportLogs","");
                 SupportLogSelection.Recovery recovery=SupportLogSelection.recoverPreference(root,saved);
@@ -175,26 +188,29 @@ public final class SessionService extends Service {
             return START_NOT_STICKY;
         }
         if (CANCEL.equals(intent.getAction())) {
-            if (busy.get()) { requestCancellation(); status = "Stopping at a safe point…"; }
+            if (busy.get()) { log("Operation cancellation requested id="+operationIdForLog+" reason=user-stop action="+activeAction);requestCancellation(); status = "Stopping at a safe point…"; }
             else stopSelf(startId);
             return START_NOT_STICKY;
         }
         // A repeated startForegroundService call still requires a foreground response.
         foreground("Preparing Esteria",busy.get()?activeAction:intent.getAction());
         if(EXPORT.equals(intent.getAction())&&busy.get()) {
+            if(isStorageAction(activeAction)){supportStatus="Storage maintenance is active; export support after it finishes.";return START_NOT_STICKY;}
             if(!EXPORT.equals(activeAction)&&exporting.compareAndSet(false,true))supportWorker.execute(()->{
                 try{exportBundle(intent.getData());}catch(Exception error){supportStatus="Support export failed: "+error.getMessage();log(supportStatus);}
                 finally{exporting.set(false);}
             });
             return START_NOT_STICKY;
         }
-        if (!busy.compareAndSet(false, true)) return START_NOT_STICKY;
+        if (!busy.compareAndSet(false, true)) {log("Operation ignored while busy id="+operationIdForLog+" active="+activeAction+" requested="+intent.getAction());return START_NOT_STICKY;}
         activeAction=intent.getAction();
         if(!EXPORT.equals(activeAction))supportStatus="";
         cancelled.set(false);
         keepAwake();
         main.removeCallbacks(wakeHeartbeat);main.postDelayed(wakeHeartbeat,60*1000L);
         String operationId = UUID.randomUUID().toString();
+        operationIdForLog=operationId;operationBeganNanos=System.nanoTime();lastLoggedPreparationPhase="";
+        log("Operation began id="+operationId+" action="+activeAction);
         getSharedPreferences("session", MODE_PRIVATE).edit().putString("operation", operationId)
                 .putString("operationAction", intent.getAction()).putBoolean("interrupted", true).commit();
         worker.execute(() -> {
@@ -230,6 +246,8 @@ public final class SessionService extends Service {
                 fatalFailure = true;
                 throw fatal;
             } finally {
+                log("Operation worker finished id="+operationId+" action="+intent.getAction()+" cancelled="+cancelled.get()
+                    +" fatal="+fatalFailure+" elapsedSeconds="+java.util.concurrent.TimeUnit.NANOSECONDS.toSeconds(System.nanoTime()-operationBeganNanos));
                 // Serialize completion with onStartCommand. Publishing idle before stopSelf
                 // could otherwise cancel a newly queued import. A replaced service instance
                 // may own a newer recovery marker; never clear that instance's operation.
@@ -258,11 +276,20 @@ public final class SessionService extends Service {
         diagnostics.begin(action);lastPreparation=diagnostics;
         ImportIoController io=null;
         try{
-            ImportIoController installed=new ImportIoController(this,diagnostics,"Preparation");io=installed;activePreparationIo=installed;
-            try(RuntimeReadPolicy.Scope scope=RuntimeReadPolicy.install((path,offset,count)->installed.readObserved(path,offset,count,cancelled::get))){operation.run();}
+            PreparationSpeed speed=preparationSpeed();
+            ImportIoController installed=new ImportIoController(this,diagnostics,"Preparation",speed);io=installed;activePreparationIo=installed;
+            log("Preparation policy id="+operationIdForLog+" speed="+speed.id+" bytesPerSecond="+speed.bytesPerSecond+" nativeWorkers=1");
+            try(RuntimeReadPolicy.Scope scope=RuntimeReadPolicy.install((path,offset,count)->installed.readObserved(path,offset,count,cancelled::get),speed)){operation.run();}
             diagnostics.finish("complete",null);
         }catch(ClientLaunchSetup.ReviewRequired review){diagnostics.finish("review-required",null);throw review;}
-        catch(Exception failure){diagnostics.failed(failure);throw failure;}
+        catch(Exception failure){
+            diagnostics.failed(failure);Map<String,String> observed=diagnostics.facts();
+            log("Preparation stopped id="+operationIdForLog+" result="+observed.get("preparation.last.result")
+                +" phase="+observed.get("preparation.last.phase")+" availableBytes="+observed.get("preparation.last.ioMemoryAvailableBytes")
+                +" pressure="+observed.get("preparation.last.ioPressureLevel")+" trim="+observed.get("preparation.last.ioTrimLevel")
+                +" trimAt="+observed.get("preparation.last.ioTrimAtEpochMs")+" heapUsed="+observed.get("preparation.last.javaHeapUsedBytes"));
+            throw failure;
+        }
         finally{if(io!=null)io.recordFinal();activePreparationIo=null;}
     }
     private void dispatchOperation(Intent intent)throws Exception {
@@ -276,6 +303,8 @@ public final class SessionService extends Service {
                     inspectStockClient(locale,true);
                     prepareStockRuntime(locale);prepareServerRuntime();prepareWorld(locale);
                 }
+                else if (SCAN_STORAGE.equals(intent.getAction())) maintainStorage(false);
+                else if (TRIM_STORAGE.equals(intent.getAction())) maintainStorage(true);
                 else if (ACCEPT_UI.equals(intent.getAction())) acceptUiReview(intent.getStringExtra(UI_REVIEW_DIGEST));
                 else if (KEEP_UI.equals(intent.getAction())) keepCurrentUi(intent.getStringExtra(UI_REVIEW_DIGEST));
                 else throw new IOException("Unknown operation");
@@ -287,8 +316,73 @@ public final class SessionService extends Service {
         if(owner!=null){rememberLogs(owner.diagnosticLogs());if(diagnostics!=null)owner.diagnosticUsage().forEach(diagnostics::child);}
         ImportIoController io=activePreparationIo;
         if(io!=null&&io.pressureLevel()>=2){if(diagnostics!=null)diagnostics.checkpoint();throw new WorldPreparationDiagnostics.MemoryPause();}
-        String label=phase.startsWith("server-data")?"Preparing world data":phase.startsWith("shader")?"Preparing graphics data":"Preparing local components";
+        if(!phase.equals(lastLoggedPreparationPhase)){
+            lastLoggedPreparationPhase=phase;
+            log("Preparation phase id="+operationIdForLog+" phase="+phase+" elapsedSeconds="
+                +java.util.concurrent.TimeUnit.NANOSECONDS.toSeconds(System.nanoTime()-operationBeganNanos));
+        }
+        String label=preparationLabel(phase);
         status=label+"…"+(path==null||path.isEmpty()?"":"\n"+path);
+    }
+    private PreparationSpeed preparationSpeed(){
+        try{return PreparationSpeed.fromId(getSharedPreferences("preparation",MODE_PRIVATE).getString("speed",PreparationSpeed.DEFAULT.id));}
+        catch(IllegalArgumentException invalid){return PreparationSpeed.DEFAULT;}
+    }
+    private static String preparationLabel(String phase){
+        if(phase.startsWith("server-data")){
+            if(phase.contains("resumed-reviewed-v8-work"))return "Continuing compatible work from the previous version";
+            if(phase.contains("reused-"))return "Reusing completed world data · "+phase.substring(phase.indexOf("reused-")+7).replace('-',' ');
+            if(phase.contains("mmaps")||phase.contains("navigation"))return "World data · navigation meshes";
+            if(phase.contains("vmap4_assembler")||phase.contains("assembled-collision"))return "World data · assembling collision models";
+            if(phase.contains("vmap4_extractor")||phase.contains("raw-collision"))return "World data · extracting collision models";
+            if(phase.contains("map_extractor")||phase.contains("maps-dbc-cameras"))return "World data · maps, DBC and cameras";
+            if(phase.contains("hash")||phase.contains("provider"))return "World data · checking source files";
+            if(phase.contains("format"))return "World data · checking generated files";
+            return "World data · "+phase.substring("server-data".length()).replaceFirst("^-","").replace('-',' ');
+        }
+        return phase.startsWith("shader")?"Preparing graphics data":"Preparing local components";
+    }
+    private static String storageSize(long bytes){
+        if(bytes<1024)return bytes+" bytes";
+        return String.format(java.util.Locale.ROOT,bytes>=(1L<<30)?"%.1f GiB":"%.1f MiB",bytes/(double)(bytes>=(1L<<30)?1L<<30:1L<<20));
+    }
+    private static boolean isStorageAction(String action){return SCAN_STORAGE.equals(action)||TRIM_STORAGE.equals(action);}
+    private void requireMaintenanceIdle()throws IOException {
+        if(!isStorageAction(activeAction)||game!=null||worldSetup!=null||stockSetup!=null||graphicsProbe!=null||exporting.get())
+            throw new IOException("Stop the local game or preparation and allow cleanup to finish before storage maintenance");
+    }
+    private Map<String,String> expectedRuntimeGenerations()throws IOException {
+        Map<String,String> expected=new LinkedHashMap<>();
+        expected.put("wine-arm64",new RuntimeSetup(this,root).generation());
+        if(BuildConfig.SERVER_RUNTIME_PACKAGED)expected.put("server-arm64",new ServerRuntimeSetup(this,root).generation());
+        if(BuildConfig.SERVER_PROGRAMS_PACKAGED)expected.put("server-programs-arm64",new ServerProgramsSetup(this,root).generation());
+        if(BuildConfig.SERVER_CONTENT_PACKAGED)expected.put("server-content-arm64",new ServerContentSetup(this,root).generation());
+        if(BuildConfig.SERVER_EXTRACTORS_PACKAGED)expected.put("server-extractors-arm64",new ServerExtractorsSetup(this,root).generation());
+        if(BuildConfig.SERVER_DATA_TOOLS_PACKAGED)expected.put("server-data-tools-arm64",new ServerDataToolsSetup(this,root).packagePlan().generation);
+        if(BuildConfig.GUEST_BRIDGES_PACKAGED)expected.put("guest-bridges-arm64",new GuestBridgeSetup(this,root).generation());
+        if(BuildConfig.CLIENT_RUNTIME_PACKAGED)expected.put("client-arm64",new ClientRuntimeSetup(this,root).generation());
+        if(BuildConfig.SHADER_TOOLS_PACKAGED)expected.put("shader-tools-arm64",new ShaderToolsSetup(this,root).generation());
+        if(BuildConfig.TURNIP_PACKAGED)expected.put("turnip-arm64",new TurnipSetup(this,root).generation());
+        return expected;
+    }
+    private void maintainStorage(boolean trim)throws IOException {
+        requireMaintenanceIdle();storageCanTrim=false;
+        status=trim?"Removing obsolete runtime files…":"Checking reclaimable runtime storage…";
+        Map<String,String> expected=expectedRuntimeGenerations();
+        RuntimeStorageMaintenance.Report report=trim
+            ?RuntimeStorageMaintenance.trim(root,expected,this::requireMaintenanceIdle,cancelled::get,(phase,path,completed,total)->{
+                keepAwake();status="Removing obsolete runtime files…\n"+mib(completed)+" MiB removed";
+            })
+            :RuntimeStorageMaintenance.scan(root,expected,this::requireMaintenanceIdle,cancelled::get);
+        storageCanTrim=!trim&&report.reclaimableBytes>0;
+        storageStatus=trim?"Removed "+storageSize(report.removedBytes)+" of obsolete runtime files."
+            :"Reclaimable runtime files: "+storageSize(report.reclaimableBytes)+". Select Trim obsolete files to remove them.";
+        storageStatus+=" Imported client, saves, current runtime and resumable world work are retained. Sizes count file bytes; allocated space may differ.";
+        getSharedPreferences("storage-maintenance",MODE_PRIVATE).edit().putString("summary",storageStatus).apply();
+        status=trim?"Storage cleanup finished.":"Storage check finished.";
+        log("Storage maintenance id="+operationIdForLog+" trim="+trim+" reclaimableBytes="+report.reclaimableBytes
+            +" removedBytes="+report.removedBytes+" obsoleteGenerations="+report.obsoleteGenerations+" cachedArchives="+report.cachedArchives
+            +" unknownItemsPreserved="+report.unknownItemsPreserved+" removedItems="+report.removedItems);
     }
     private void importData(Intent intent) throws Exception {
         Uri uri = intent.getData();
@@ -802,6 +896,10 @@ public final class SessionService extends Service {
         facts.put("status", previousStatus); facts.put("runtime.qualified", "false");
         facts.put("operation.busy", Boolean.toString(busy.get()));
         facts.put("operation.action", activeAction == null ? "none" : activeAction);
+        facts.put("operation.id",operationIdForLog);
+        facts.put("operation.elapsedSeconds",Long.toString(operationBeganNanos==0?0:java.util.concurrent.TimeUnit.NANOSECONDS.toSeconds(System.nanoTime()-operationBeganNanos)));
+        facts.put("preparation.selectedSpeed",preparationSpeed().id);
+        facts.put("storage.maintenance.summary",storageStatus);
         if (Build.VERSION.SDK_INT >= 29) facts.put("operation.foregroundServiceType", Integer.toString(getForegroundServiceType()));
         facts.putAll(ProcessExitDiagnostics.collect(this));
         ImportDiagnostics importDiagnostic = lastImport;
@@ -1183,6 +1281,7 @@ public final class SessionService extends Service {
         return PREPARE_RUNTIME.equals(action) || PREPARE_SERVER_RUNTIME.equals(action) || PREPARE_WORLD.equals(action) || ACCEPT_UI.equals(action) || KEEP_UI.equals(action);
     }
     private static String setupPaused(String action, boolean interrupted) {
+        if(isStorageAction(action))return "Storage maintenance stopped. Imported client, saves and resumable world work are retained.";
         if(START.equals(action))return "Local preparation "+(interrupted?"was interrupted":"paused")
             +". Choose Start local game to reuse completed work. Previous databases and saves are retained.";
         if(PREPARE_WORLD.equals(action))return "Local world setup "+(interrupted?"was interrupted":"paused")
@@ -1219,7 +1318,7 @@ public final class SessionService extends Service {
         if(operationWake!=null&&now>=wakeRenewAfter){operationWake.acquire(10*60*1000L);wakeRenewAfter=now+60*1000L;}
     }
     private synchronized void releaseWake(){if(operationWake!=null&&operationWake.isHeld())operationWake.release();wakeRenewAfter=0;}
-    @Override public void onDestroy() { destroyed = true; requestCancellation(); worker.shutdown();supportWorker.shutdown();if(!busy.get())releaseWake();super.onDestroy(); }
+    @Override public void onDestroy() { destroyed = true;if(busy.get())log("Operation cancellation requested id="+operationIdForLog+" reason=service-destroyed action="+activeAction);requestCancellation(); worker.shutdown();supportWorker.shutdown();if(!busy.get())releaseWake();super.onDestroy(); }
     @Override public void onTrimMemory(int level) {
         super.onTrimMemory(level);
         // Observe pressure without cancelling valid work or allocating an export.
@@ -1236,6 +1335,7 @@ public final class SessionService extends Service {
         ImportIoController preparation=activePreparationIo;if(preparation!=null)preparation.onTrimMemory(android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL);
     }
     @Override public void onTimeout(int startId, int foregroundServiceType) {
+        log("Operation cancellation requested id="+operationIdForLog+" reason=android-service-timeout action="+activeAction);
         requestCancellation(); status = "Android stopped this setup operation. Start it again to resume completed work where supported.";
         stopForeground(STOP_FOREGROUND_REMOVE); stopSelf(startId);
     }

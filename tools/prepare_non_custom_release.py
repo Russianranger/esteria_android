@@ -55,7 +55,7 @@ def stage(args):
     (args.output / 'SHA256SUMS').write_text(signed['apkSha256'] + '  ' + name + '\n')
     setup = ('Keep the completed client import and retry Prepare local runtime / world, then\n'
              'start the local game. Follow the attached NON-CUSTOM-TESTING.md procedure, including\n'
-             'the offline repeat and support bundle export if a stage fails.' if signed['versionCode'] in (5, 6, 7, 8) else
+             'the offline repeat and support bundle export if a stage fails.' if signed['versionCode'] in (5, 6, 7, 8, 9) else
              'Import your complete ChromieCraft client, prepare the local runtime/world, then\n'
              'start the local game. Follow the attached NON-CUSTOM-TESTING.md procedure, including\n'
              'the offline repeat and support bundle export if a stage fails.')
@@ -182,6 +182,31 @@ locale. Do not reimport, uninstall or clear storage. Completed compatible phases
 are reused; changed helper identities require affected data phases to run again.
 Export support before another retry after failure. Actual Thor world preparation
 and gameplay remain unqualified until the device retry.
+'''
+    if signed['versionCode'] == 9:
+        notes += '''
+Version 9 adds selectable preparation verification speeds: Gentle 8 MiB/s,
+Balanced 32 MiB/s (default) and Fast 64 MiB/s. Choose a level while idle; changing
+it does not require a client reimport. Import copying retains its 8 MiB/s policy.
+Pressure still slows reads to 2 MiB/s or pauses them. Native conversion remains
+one worker with the existing memory guard; these rates are not total-world ETAs.
+
+Compatible completed phases and valid partial navigation-mesh tiles can be reused
+on retry, including strictly checked v8 staging. Abandoned duplicate phase copies
+are reclaimed after migration. Idle storage maintenance reports and removes only
+recognized obsolete runtime generations and redundant archive caches, preserving
+the current runtime, imported client, usable world work, databases and saves.
+
+Transient Android trim signals with verified healthy headroom back off rather
+than immediately discarding a long native phase. Actual low-memory conditions
+retain the safe pause behavior. Native clean-cache advice is bounded and cycled
+instead of repeatedly advising every complete archive in each short interval.
+
+Install over the existing stock app and keep all app data. Select the same locale,
+start with Balanced, and retry Prepare local runtime / world. If comparing speeds,
+Stop and wait for cleanup before changing the setting. Export the support bundle
+before another attempt after a failure. Full Thor preparation, rendering and
+local/offline gameplay still need device confirmation.
 '''
     (args.output / 'RELEASE-NOTES.md').write_text(notes)
     return result

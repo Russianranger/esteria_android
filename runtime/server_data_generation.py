@@ -1,20 +1,23 @@
 #!/usr/bin/env python3
 """Stopped-session, resumable preparation of source-matched server data.
 
-Each extractor runs in a fresh phase directory. Only completed, byte-verified
-phases are reused; interrupted raw vmap output is never passed to the assembler.
+Raw extractors run in fresh phase directories. Completed, byte-verified phases
+are reused; navigation additionally retains length-checked finished tile files.
+Interrupted raw vmap output is never passed to the assembler.
 The final pointer describes format-checked output, not coverage or gameplay.
 No network acquisition or modification of imported client files occurs here.
 """
 from __future__ import annotations
 
 import argparse
+from bisect import bisect_left
 import errno
 import fcntl
 import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import stat
 import subprocess
@@ -43,6 +46,10 @@ DEFAULT_CONTENT_PROFILE = CONTENT_PROFILES[0]
 CAPABILITY = b'esteria-classical-ordered-providers-v1; archive/folder/prefix; no conversion qualification'
 PREPARATION_HELPERS = ('server_data_generation.py', 'server_data_preflight.py', 'shader_generation.py',
                        'extractor_order.py', 'owned_process_group.py', 'world_io.py')
+# Only this reviewed v8 six-file APK helper manifest may donate compatible work.
+V8_HELPER_GENERATION = '8b50b139c4b3ee78406da672cc267eb88baef0fb508ed5e6d2d3213bb545376c'
+PHASES = ('maps-dbc-cameras', 'raw-vmaps', 'assembled-vmaps', 'navigation')
+MAX_ATTEMPTS = 1024
 
 
 def require(condition, reason):
@@ -230,6 +237,32 @@ def clone(source, destination):
                 os.chmod(output, 0o600)
 
 
+class NavigationProgress:
+    """Relay only a fixed numeric native status line, never paths/child text."""
+    PATTERN = re.compile(rb'([0-9]{1,3})% \[Map ([0-9]{4,5})\] Building tile \[([0-9]{2}),([0-9]{2})\]')
+    def __init__(self, *, emit=lambda row: print('NAVIGATION_PROGRESS ' + json.dumps(row, separators=(',', ':')), flush=True),
+                 clock=time.monotonic):
+        self.pending = bytearray(); self.overflow = False
+        self.emit, self.clock, self.next_report, self.reports = emit, clock, 0, 0
+
+    def feed(self, block):
+        for value in block:
+            if value in (10, 13):
+                if not self.overflow:
+                    matched = self.PATTERN.fullmatch(self.pending)
+                    if matched is not None:
+                        percent, map_id, x, y = map(int, matched.groups())
+                        now = self.clock()
+                        if percent <= 100 and map_id <= 65535 and x <= 63 and y <= 63 and \
+                                now >= self.next_report and self.reports < 8192:
+                            self.emit(dict(percent=percent, map=map_id, tileX=x, tileY=y))
+                            self.reports += 1; self.next_report = now + 2
+                self.pending.clear(); self.overflow = False
+            elif not self.overflow:
+                if len(self.pending) < 256: self.pending.append(value)
+                else: self.pending.clear(); self.overflow = True
+
+
 def execute(command, cwd, log_path, timeout, *, cancelled=lambda: False, cache_inputs=()):
     """Actual serial child, reserved process-group identity and bounded private logs."""
     require(type(timeout) is int and 0 < timeout <= 48 * 3600, 'invalid extraction deadline')
@@ -240,6 +273,7 @@ def execute(command, cwd, log_path, timeout, *, cancelled=lambda: False, cache_i
             stderr=subprocess.STDOUT, start_new_session=True,
             env={**os.environ, 'PYTHONDONTWRITEBYTECODE': '1', 'PYTHONNOUSERSITE': '1'})
         owner = OwnedGroup(child)
+        navigation_progress = NavigationProgress() if Path(command[0]).name == 'mmaps_generator' else None
         os.set_blocking(child.stdout.fileno(), False)
         deadline, written, observed, tail = time.monotonic() + timeout, 0, 0, b''
         try:
@@ -254,6 +288,7 @@ def execute(command, cwd, log_path, timeout, *, cancelled=lambda: False, cache_i
                         break
                     if not block:
                         break
+                    if navigation_progress is not None: navigation_progress.feed(block)
                     observed += len(block)
                     keep = min(len(block), max(0, (4 << 20) - written))
                     log.write(block[:keep]); written += keep
@@ -269,6 +304,7 @@ def execute(command, cwd, log_path, timeout, *, cancelled=lambda: False, cache_i
                             break
                         if not block:
                             break
+                        if navigation_progress is not None: navigation_progress.feed(block)
                         observed += len(block)
                         keep = min(len(block), max(0, (4 << 20) - written))
                         log.write(block[:keep]); written += keep
@@ -292,17 +328,131 @@ def execute(command, cwd, log_path, timeout, *, cancelled=lambda: False, cache_i
         return {'exitStatus': status, 'logBytesObserved': observed, 'logBytesRetained': log.tell()}
 
 
-def phase(root, name, action):
+def _attempts(root, name):
+    """Only exact source-owned attempt names qualify for reclamation."""
+    result = []
+    with os.scandir(storage.canonical(root)) as entries:
+        for index, entry in enumerate(entries):
+            require(index < MAX_ATTEMPTS, 'extraction attempt count bound')
+            suffix = entry.name.removeprefix(name + '-')
+            if entry.name.startswith(name + '-') and re.fullmatch('[0-9a-f]{32}', suffix):
+                result.append(storage.canonical(root / entry.name))
+    return result
+
+
+def _discard(path):
+    """Delete a stopped private attempt, refusing links and unbounded trees."""
+    storage.canonical(path)
+    count = 0
+    for parent, dirs, files in os.walk(path, followlinks=False, onerror=walk_error):
+        require(len(Path(parent).relative_to(path).parts) <= 20, 'obsolete extraction depth bound')
+        for name in dirs + files:
+            count += 1
+            require(count <= MAX_FILES + 32, 'obsolete extraction entry bound')
+            order.safe((Path(parent) / name).relative_to(path).as_posix(), 1024)
+            storage.canonical(Path(parent) / name, directory=name in dirs)
+    shutil.rmtree(path)
+
+
+def _phase_verified(completed, name):
+    saved = document(completed / 'phase.json')
+    require(type(saved) is dict and set(saved) == {'phase', 'files'} and saved['phase'] == name and
+            storage.encoded(saved['files']) == storage.encoded(inventory(completed / 'data')),
+            'completed extraction phase changed')
+    return saved['files']
+
+
+def _navigation_tiles(data, *, prune=False):
+    """Native skip checks only a header; reject truncated payloads on retry.
+    These files remain unqualified until the complete child exits successfully.
+    """
+    root = data / 'mmaps'
+    if not root.exists() and not root.is_symlink(): return 0
+    storage.canonical(root)
+    tiles = total = 0
+    with os.scandir(root) as entries:
+        for index, entry in enumerate(entries):
+            require(index < MAX_FILES, 'navigation checkpoint file bound')
+            path = storage.canonical(root / entry.name, False)
+            require(re.fullmatch(r'[0-9]{3,10}\.mmap|[0-9]{7,14}\.mmtile', entry.name),
+                    'unexpected navigation checkpoint output')
+            size = path.stat().st_size
+            require(size <= MAX_FILE, 'navigation checkpoint size bound')
+            total += size
+            require(total <= MAX_TOTAL, 'navigation checkpoint total bound')
+            try:
+                if path.suffix == '.mmtile': formats.check_mmtile(path)
+                else: formats.check_mmap(path)
+            except ValueError:
+                if prune: path.unlink()
+                continue
+            if path.suffix == '.mmtile': tiles += 1
+    if prune: storage.sync(root)
+    return tiles
+
+
+def _navigation_inputs(data, maps, vmaps):
+    """Compare retained inputs with byte-verified completed source phases."""
+    with os.scandir(data) as entries:
+        for index, entry in enumerate(entries):
+            require(index < 3 and entry.name in ('maps', 'vmaps', 'mmaps'),
+                    'unexpected navigation attempt content')
+    for name, source in (('maps', maps / 'maps'), ('vmaps', vmaps / 'vmaps')):
+        target = data / name
+        if not target.exists() and not target.is_symlink(): return False
+        try: actual = inventory(target)
+        except ValueError as error:
+            if str(error) == 'extractor produced no data files': return False
+            raise
+        if storage.encoded(actual) != storage.encoded(inventory(source)): return False
+    return True
+
+
+def _navigation_work(root, maps, vmaps):
+    selected = root / 'navigation-in-progress'
+    candidates = _attempts(root, 'navigation')
+    if selected.exists() or selected.is_symlink(): candidates.append(storage.canonical(selected))
+    usable = []
+    for path in candidates:
+        if not (path / 'data').exists() and not (path / 'data').is_symlink(): continue
+        data = storage.canonical(path / 'data')
+        if _navigation_inputs(data, maps, vmaps):
+            usable.append((_navigation_tiles(data), path.stat().st_mtime_ns, path))
+    chosen = max(usable, key=lambda row: (row[0], row[1]))[2] if usable else None
+    # All candidates are stopped under the same exact generation/setup lock.
+    for path in candidates:
+        if path != chosen: _discard(path)
+    if chosen is not None and chosen != selected:
+        os.rename(chosen, selected); storage.sync(root)
+    if chosen is None:
+        selected.mkdir(mode=0o700)
+        data = selected / 'data'; data.mkdir(mode=0o700)
+        clone(maps / 'maps', data / 'maps')
+        clone(vmaps / 'vmaps', data / 'vmaps')
+    _navigation_tiles(selected / 'data', prune=True)
+    return selected
+
+
+def phase(root, name, action, *, progress=lambda value: None, navigation_inputs=None):
+    require(name in PHASES, 'unknown extraction phase')
     completed = root / (name + '-complete')
     if completed.exists() or completed.is_symlink():
-        saved = document(completed / 'phase.json')
-        require(type(saved) is dict and set(saved) == {'phase', 'files'} and saved['phase'] == name and
-                storage.encoded(saved['files']) == storage.encoded(inventory(completed / 'data')),
-                'completed extraction phase changed')
+        _phase_verified(completed, name)
+        progress('extraction-reused-' + name)
+        world_io.phase('reused-' + name)
         return completed / 'data'
-    working = root / (name + '-' + uuid.uuid4().hex)
-    working.mkdir(mode=0o700)
-    data = working / 'data'; data.mkdir(mode=0o700)
+    if name == 'navigation':
+        require(navigation_inputs is not None, 'verified navigation inputs required')
+        working = _navigation_work(root, *navigation_inputs)
+        tiles = _navigation_tiles(working / 'data')
+        progress('extraction-navigation-resume-' + str(tiles) + '-tiles')
+        world_io.phase('navigation-resume-' + str(tiles) + '-tiles')
+    else:
+        for abandoned in _attempts(root, name): _discard(abandoned)
+        working = root / (name + '-' + uuid.uuid4().hex)
+        working.mkdir(mode=0o700)
+        (working / 'data').mkdir(mode=0o700)
+    data = working / 'data'
     action(data, working)
     rows = inventory(data)
     for relative in rows:
@@ -315,7 +465,120 @@ def phase(root, name, action):
     return completed / 'data'
 
 
-def _completed_metadata(destination, expected_inputs=None, *, expected_generation=None):
+def _v8_inputs(inputs):
+    return dict(inputs, preparationHelperGeneration=V8_HELPER_GENERATION)
+
+
+def _v8_work(staging, work, inputs, progress):
+    """Move verified phases only from the explicitly reviewed old APK key."""
+    old_key = hashlib.sha256(storage.encoded(_v8_inputs(inputs))).hexdigest()
+    old = staging / old_key
+    if old == work or not old.exists() and not old.is_symlink(): return
+    storage.canonical(old)
+    marker = work / 'migrated-v8.json'
+    if marker.exists() or marker.is_symlink():
+        saved = document(marker)
+        require(type(saved) is dict and set(saved) == {'scope', 'oldGeneration', 'newGeneration', 'orderManifest', 'orderWire'} and
+                saved['scope'] == 'reviewed-v8-work-transferred' and saved['oldGeneration'] == old_key and
+                saved['newGeneration'] == work.name and
+                storage.identity(work / 'order.json', order.MAX_MANIFEST) == pin(saved['orderManifest']) and
+                storage.identity(work / 'order.tsv', order.MAX_MANIFEST) == pin(saved['orderWire']),
+                'reviewed v8 migration completion binding differs')
+        # Old cleanup may stop after unlinking order metadata, or may preserve
+        # unknown owner entries. The transferred validated work remains usable.
+        _trim_work(old)
+        return
+    plan = document(old / 'order.json'); wire = order.wire(plan)
+    require(plan['configuredLocale'] == inputs['locale'] and plan['profile'] == PROFILE and
+            storage.read(old / 'order.tsv', order.MAX_MANIFEST) == wire,
+            'reviewed v8 provider projection differs')
+    if (work / 'order.json').exists() or (work / 'order.json').is_symlink():
+        require(storage.encoded(document(work / 'order.json')) == storage.encoded(plan) and
+                storage.read(work / 'order.tsv', order.MAX_MANIFEST) == wire,
+                'reviewed v8 provider selection changed')
+    else:
+        storage.atomic(work / 'order.tsv', wire)
+        storage.atomic(work / 'order.json', order.canonical(plan))
+    for name in PHASES:
+        previous, target = old / (name + '-complete'), work / (name + '-complete')
+        if previous.exists() or previous.is_symlink():
+            rows = _phase_verified(previous, name)
+            if target.exists() or target.is_symlink():
+                require(storage.encoded(_phase_verified(target, name)) == storage.encoded(rows),
+                        'reviewed v8 completed phase conflicts with current work')
+                _discard(previous)
+            else: os.rename(previous, target)
+    for candidate in _attempts(old, 'navigation'):
+        target = work / candidate.name
+        require(not target.exists() and not target.is_symlink(), 'reviewed v8 navigation attempt conflicts')
+        os.rename(candidate, target)
+    storage.sync(old); storage.sync(work)
+    storage.atomic(marker, storage.encoded(dict(scope='reviewed-v8-work-transferred', oldGeneration=old_key,
+        newGeneration=work.name, orderManifest=storage.identity(work / 'order.json', order.MAX_MANIFEST),
+        orderWire=storage.identity(work / 'order.tsv', order.MAX_MANIFEST))))
+    progress('extraction-resumed-reviewed-v8-work')
+    world_io.phase('resumed-reviewed-v8-work')
+    _trim_work(old)
+
+
+def _trim_work(root):
+    """Reclaim recognized obsolete work; preserve unrecognized entries."""
+    for name in PHASES:
+        for path in _attempts(root, name): _discard(path)
+        for suffix in ('-complete', '-in-progress'):
+            path = root / (name + suffix)
+            if path.exists() or path.is_symlink(): _discard(path)
+    for path in _attempts(root, 'final'): _discard(path)
+    names = []
+    with os.scandir(root) as entries:
+        for index, entry in enumerate(entries):
+            require(index < MAX_ATTEMPTS, 'extraction metadata entry bound')
+            names.append(entry.name)
+    for name in names:
+        if name in ('order.json', 'order.tsv', 'migrated-v8.json') or re.fullmatch(r'capability-(map_extractor|vmap4_extractor)-[0-9a-f]{32}\.log', name):
+            storage.canonical(root / name, False).unlink()
+    if not any(root.iterdir()): root.rmdir()
+
+
+def _remove_empty(path):
+    try: path.rmdir()
+    except OSError as error:
+        if error.errno not in (errno.ENOTEMPTY, errno.EEXIST): raise
+
+
+def _retire_v8_generation(previous, receipt):
+    """Reclaim only the promoted generation's known old data/metadata paths.
+
+    Unknown root entries or newly added nested files are preserved. Cached v9
+    retries can finish known-path cleanup even after the old receipt was removed.
+    """
+    previous = storage.canonical(previous)
+    expected = receipt['files']; names = sorted(expected)
+    require(len(names) <= MAX_FILES, 'obsolete generation file bound')
+    root = previous / 'data'
+    if root.exists() and stat.S_ISDIR(root.lstat().st_mode):
+        storage.canonical(root)
+        directories = []; count = 0
+        for parent, dirs, files in os.walk(root, followlinks=False, onerror=walk_error):
+            at = Path(parent); directories.append(at)
+            require(len(at.relative_to(root).parts) <= 16, 'obsolete generation depth bound')
+            count += len(dirs) + len(files)
+            require(count <= MAX_FILES + 32, 'obsolete generation entry bound')
+            for name in list(dirs):
+                path = at / name; prefix = path.relative_to(root).as_posix() + '/'
+                index = bisect_left(names, prefix)
+                if path.is_symlink() or index == len(names) or not names[index].startswith(prefix): dirs.remove(name)
+            for name in files:
+                path = at / name
+                if path.relative_to(root).as_posix() in expected and stat.S_ISREG(path.lstat().st_mode): path.unlink()
+        for path in reversed(directories): _remove_empty(path)
+    for name in ('order.json', 'order.tsv', 'receipt.json'):
+        path = previous / name
+        if path.exists() and stat.S_ISREG(path.lstat().st_mode): path.unlink()
+    _remove_empty(previous)
+
+
+def _completed_metadata(destination, expected_inputs=None, *, expected_generation=None, _reviewed_v8=False):
     """Metadata only. Its caller must independently verify the data payload.
 
     Kept private so a metadata receipt is never confused with verify_completed's
@@ -352,7 +615,8 @@ def _completed_metadata(destination, expected_inputs=None, *, expected_generatio
     if version == 2:
         validate_package_selection(inputs['serverDataPackage'])
     if 'preparationHelperGeneration' in inputs:
-        require(inputs['preparationHelperGeneration'] == preparation_helper_generation(),
+        require(inputs['preparationHelperGeneration'] ==
+                (V8_HELPER_GENERATION if _reviewed_v8 else preparation_helper_generation()),
                 'prepared server package helper source changed; prepare a new generation')
     for name, identity in inputs['importMetadata'].items():
         order.safe(name, 1024); pin(identity)
@@ -383,6 +647,20 @@ def verify_completed(destination, expected_inputs=None, *, expected_generation=N
     require(preflight['checks_passed'] and storage.encoded(receipt['preflight']) == storage.encoded(preflight),
             'prepared server data preflight changed')
     return receipt
+
+
+def _v8_completed(generations, inputs):
+    previous_inputs = _v8_inputs(inputs)
+    key = hashlib.sha256(storage.encoded(previous_inputs)).hexdigest()
+    previous = generations / key
+    if inputs == previous_inputs or not previous.exists() and not previous.is_symlink(): return None
+    receipt = _completed_metadata(previous, previous_inputs, _reviewed_v8=True)
+    require(storage.encoded(receipt['files']) == storage.encoded(inventory(previous / 'data')),
+            'reviewed v8 prepared data changed')
+    checked = formats.check_server_data(previous / 'data')
+    require(checked['checks_passed'] and storage.encoded(checked) == storage.encoded(receipt['preflight']),
+            'reviewed v8 prepared data preflight changed')
+    return previous
 
 
 def generate(store, game, generation, tools, selection, locale, *, threads=1, timeout=24 * 3600,
@@ -422,8 +700,16 @@ def _generate(store, game, generation, tools, selection, locale, *, threads=1, t
         destination = generations / key
         if destination.exists() or destination.is_symlink():
             receipt = verify_completed(destination, inputs)
+            previous = None
         else:
             work = storage.canonical(staging / key, create=True)
+            previous = _v8_completed(generations, inputs)
+            if previous is not None and not (work / 'order.json').exists() and not (work / 'order.json').is_symlink():
+                storage.atomic(work / 'order.tsv', storage.read(previous / 'order.tsv', order.MAX_MANIFEST))
+                storage.atomic(work / 'order.json', storage.read(previous / 'order.json', order.MAX_MANIFEST))
+                progress('extraction-migrated-reviewed-v8-generation')
+                world_io.phase('migrated-reviewed-v8-generation')
+            _v8_work(staging, work, inputs, progress)
             plan_path = work / 'order.json'
             if plan_path.exists() or plan_path.is_symlink():
                 plan = document(plan_path)
@@ -450,39 +736,50 @@ def _generate(store, game, generation, tools, selection, locale, *, threads=1, t
                 world_io.phase('extraction-' + name)
                 remaining = int(deadline - time.monotonic())
                 require(remaining > 0, 'data preparation deadline exceeded')
-                cache_inputs = tuple(source / row['path'] for row in plan['providers'] if row['kind'] == 'mpq')
+                # Assembly/navigation consume generated maps/models, not MPQs.
+                # Advising every archive throughout those hours of CPU work
+                # repeatedly evicts unrelated data without protecting the child.
+                cache_inputs = tuple(source / row['path'] for row in plan['providers'] if row['kind'] == 'mpq') \
+                    if name in PROGRAMS[:2] and args != ['--esteria-order-capabilities'] else ()
                 return execute([str(tools / 'bin' / name), *args], cwd, log, remaining, cancelled=cancelled, cache_inputs=cache_inputs)
             complete_external = external is not None and external['mode'] == 'complete'
-            if not complete_external:
+            if previous is None and not complete_external:
                 for name in PROGRAMS[:2]:
                     capability_log = work / ('capability-' + name + '-' + uuid.uuid4().hex + '.log')
                     run(name, ['--esteria-order-capabilities'], work, capability_log)
                     require(storage.read(capability_log, 4096).rstrip(b'\n') == CAPABILITY,
                             'ordered extractor capability differs; no stock fallback')
+                    capability_log.unlink()
                 # The original extractor truncates -o to 127 bytes. Its private
                 # phase data directory is already the child cwd; use that short
                 # relative destination while keeping full paths for ownership.
                 maps = phase(work, 'maps-dbc-cameras', lambda data, at:
-                    run('map_extractor', [*ordered, '-o', '.', '-e', '7'], data, at / 'extract.log'))
+                    run('map_extractor', [*ordered, '-o', '.', '-e', '7'], data, at / 'extract.log'), progress=progress)
                 raw = phase(work, 'raw-vmaps', lambda data, at:
-                    run('vmap4_extractor', ordered, data, at / 'extract.log'))
+                    run('vmap4_extractor', ordered, data, at / 'extract.log'), progress=progress)
                 def assemble(data, at):
                     (data / 'vmaps').mkdir(mode=0o700)
                     run('vmap4_assembler', [str(raw / 'Buildings'), str(data / 'vmaps')], data, at / 'extract.log')
-                vmaps = phase(work, 'assembled-vmaps', assemble)
+                vmaps = phase(work, 'assembled-vmaps', assemble, progress=progress)
                 def navigation(data, at):
-                    clone(maps / 'maps', data / 'maps')
-                    clone(vmaps / 'vmaps', data / 'vmaps')
+                    # The reusable attempt already owns verified input clones.
+                    # Old logs are dispensable after their causal tail has been
+                    # exported by the owned child; avoid one log per retry.
+                    for path in at.iterdir():
+                        if path.name == 'extract.log' or re.fullmatch(r'extract-[0-9a-f]{32}\.log', path.name):
+                            storage.canonical(path, False).unlink()
                     run('mmaps_generator', ['--config', str(tools / 'etc/mmaps-config.yaml'), '--threads', str(threads), '--silent'],
                         data, at / 'extract.log')
-                nav = phase(work, 'navigation', navigation)
+                nav = phase(work, 'navigation', navigation, progress=progress, navigation_inputs=(maps, vmaps))
             final = work / ('final-' + uuid.uuid4().hex); final.mkdir(mode=0o700)
-            data = final / 'data'; data.mkdir(mode=0o700)
-            if not complete_external:
+            data = final / 'data'
+            if previous is not None: clone(previous / 'data', data)
+            else: data.mkdir(mode=0o700)
+            if previous is None and not complete_external:
                 for base, names in ((maps, ('maps', 'dbc', 'Cameras')), (vmaps, ('vmaps',)), (nav, ('mmaps',))):
                     for name in names:
                         clone(base / name, data / name)
-            if external is not None:
+            if previous is None and external is not None:
                 progress('extraction-supplied-server-data')
                 merge_supplied(source / formats.SERVER_NAMESPACE / 'data', data, cancelled=cancelled)
             preflight = formats.check_server_data(data)
@@ -511,6 +808,15 @@ def _generate(store, game, generation, tools, selection, locale, *, threads=1, t
                 preparation_helper_generation() == inputs['preparationHelperGeneration'],
                 'import changed before server data activation')
         storage.atomic(store / 'current', (key + '\n').encode())
+        previous_key = hashlib.sha256(storage.encoded(_v8_inputs(inputs))).hexdigest()
+        previous_generation = generations / previous_key
+        if previous_generation != destination and (previous_generation.exists() or previous_generation.is_symlink()):
+            # Equivalent, fully reverified v9 data is now active. Old receipt and
+            # clones can be reclaimed without touching the promoted generation.
+            # Retrying also finishes an interrupted old-generation reclamation.
+            _retire_v8_generation(previous_generation, receipt)
+        if (staging / key).exists():
+            _trim_work(staging / key)
         progress('extraction-format-checked')
         return receipt
     finally:

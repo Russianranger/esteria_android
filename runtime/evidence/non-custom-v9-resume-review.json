@@ -1,0 +1,59 @@
+{
+  "scope": "independent-v9-resume-source-review",
+  "sourceFilesAtReadback": {
+    "runtime/server_data_generation.py": "48160ae1764e1901600b662a67475d5e35aef33ecde9055c9facd030f467fc5e",
+    "tests/test_server_data_generation.py": "c76668d03503c7cced954968d85a88bea3e2883271a5104ec5d793967aa4e7e5"
+  },
+  "v8SixFileHelperGenerationIndependentlyRecomputed": "8b50b139c4b3ee78406da672cc267eb88baef0fb508ed5e6d2d3213bb545376c",
+  "nativeSkipSemanticsVerified": {
+    "headerOnly": true,
+    "magicDetourMmapVersionAndRecastConfigChecked": true,
+    "payloadLengthNotCheckedByNative": true,
+    "headerWrittenBeforePayload": true
+  },
+  "findings": [
+    {
+      "priority": "P2",
+      "path": "runtime/server_data_generation.py",
+      "line": 778,
+      "issue": "Whole old generation rmtree removes unrecognized top-level content; cached v9 path does not validate old directory before deleting.",
+      "reproduction": "Create valid completed v8 generation with test fixture, add owner-note.txt at generation root, migrate to v9: new data exists and owner-note.txt is deleted.",
+      "recommendation": "Preserve unknown top-level entries; reclaim only known receipt/order/data closure using bound crash-safe cleanup state.",
+      "status": "resolved-independently-verified",
+      "resolution": "Selective _retire_v8_generation removes only promoted receipt data paths and known metadata; preserves unknown root/nested files, empty directories and symlinks. Cached v9 retry completes interrupted cleanup without old receipt."
+    }
+  ],
+  "otherBlockingReuseIssuesFound": false,
+  "reviewedBoundaries": [
+    "same-source/helper/import/tool generation binding",
+    "interrupted raw phase not reused",
+    "navigation maps/vmaps inventories",
+    "truncated mmtile removal",
+    "native recast mismatch forces rebuild",
+    "v8 migration wire-first and marker recovery",
+    "hardlink unlink preserves promoted payload"
+  ],
+  "worldPreparationQualified": false,
+  "gameplayQualified": false,
+  "allFindingsResolved": true,
+  "blockingIssuesRemaining": false,
+  "retirementReproduction": {
+    "rootNotePreserved": true,
+    "nestedNotePreserved": true,
+    "unknownEmptyDirectoryPreserved": true,
+    "unknownSymlinkPreserved": true,
+    "cachedRetryPassed": true,
+    "promotedDataPreserved": true
+  },
+  "targetedChecks": {
+    "testsRun": 4,
+    "testsPassed": 4,
+    "testsSkipped": 0,
+    "covers": [
+      "old receipt removed mid cleanup",
+      "unknown root and nested notes",
+      "wire-first partial staging migration",
+      "wire-first completed generation migration"
+    ]
+  }
+}

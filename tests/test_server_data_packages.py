@@ -54,12 +54,20 @@ class SuppliedDataTests(unittest.TestCase):
         supplied={'dbc/Map.dbc':dbc(value=99),'dbc-continuations/Map.dbc1-new':dbc(value=123),
             'dbc-continuations/wxl-dbc.manifest':b'Map.dbc1-new\n'}
         self.package(files=supplied)
-        with patch.object(data,'execute',side_effect=self.fake_execute):proof=self.generate()
+        checked=[];trim=data._trim_work
+        def inspect_before_trim(work):
+            original=work/'maps-dbc-cameras-complete/data/dbc/Map.dbc'
+            if original.exists():
+                self.assertEqual(original.read_bytes(),struct.pack('<4s4I',b'WDBC',0,66,264,1)+b'\0')
+                checked.append(original)
+            trim(work)
+        with patch.object(data,'execute',side_effect=self.fake_execute),patch.object(data,'_trim_work',side_effect=inspect_before_trim):
+            proof=self.generate()
         root=self.store/'generations'/proof['generation']/'data'
         self.assertEqual((root/'dbc/Map.dbc').read_bytes(),supplied['dbc/Map.dbc'])
         self.assertEqual((root/'dbc-continuations/Map.dbc1-new').read_bytes(),supplied['dbc-continuations/Map.dbc1-new'])
-        original=self.store/'staging'/proof['generation']/'maps-dbc-cameras-complete/data/dbc/Map.dbc'
-        self.assertEqual(original.read_bytes(),struct.pack('<4s4I',b'WDBC',0,66,264,1)+b'\0')
+        self.assertEqual(len(checked),1,'Overlay leaves base bytes intact until successful-stage reclamation')
+        self.assertFalse(checked[0].exists(),'Successful activation reclaims its redundant staging copy')
         self.assertEqual(proof['preflight']['continuations']['order'],['Map.dbc1-new'])
 
     def test_replacement_import_generation_never_reuses_prior_continuations(self):

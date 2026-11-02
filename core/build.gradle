@@ -197,3 +197,19 @@ tasks.register('runtimeLeaseTest', JavaExec) {
     onlyIf { System.getProperty('os.name') == 'Linux' }
 }
 check.dependsOn runtimeLeaseTest
+
+tasks.register('preparationSpeedTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.runtime.install.PreparationSpeedTests'
+    maxHeapSize = '32m'
+}
+check.dependsOn preparationSpeedTest
+
+tasks.register('runtimeStorageMaintenanceTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.runtime.install.RuntimeStorageMaintenanceTests'
+    maxHeapSize = '32m'
+}
+check.dependsOn runtimeStorageMaintenanceTest

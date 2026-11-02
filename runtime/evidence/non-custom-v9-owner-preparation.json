@@ -1,0 +1,155 @@
+{
+  "formatVersion": 1,
+  "scope": "owner-v8-preparation-speed-restart-and-growth-audit",
+  "appRevision": "7c1755968afee2fc1ec5448ce7c853a815750b3f",
+  "bundle": {
+    "name": "Esteria-support-1793576791815.zip",
+    "bytes": 15062,
+    "sha256": "6c1248ee1fc6973f63a7385bdc18afd7043c497b2b482cf15ed7746f134a807b"
+  },
+  "firstAttempt": {
+    "graphicsReadyEpochMs": 1793561776697,
+    "memoryPauseEpochMs": 1793567968327,
+    "graphicsToMemoryPauseSeconds": 6191.63,
+    "reason": "launcher records app memory pause; exact triggering sample overwritten by next attempt"
+  },
+  "latestAttempt": {
+    "startedAtEpochMs": 1793568049431,
+    "updatedAtEpochMs": 1793569448593,
+    "endLoggedEpochMs": 1793569449150,
+    "result": "paused",
+    "phase": "server-data-io-extraction-mmaps_generator",
+    "displayedElapsed": "Elapsed: 1179s",
+    "memoryAvailableBytes": 10639527936,
+    "lowMemory": false,
+    "javaHeapPeakObservedBytes": 36020864
+  },
+  "visibleRuntimePreparations": [
+    {
+      "atEpochMs": 1793561671473,
+      "component": "Runtime",
+      "generation": "dda9221e408dd167796e8a80042f5d7e7e168185eef63dfea088053b0a965c9d",
+      "reusedFiles": 11895,
+      "copiedBytes": 0
+    },
+    {
+      "atEpochMs": 1793561671717,
+      "component": "Guest bridges",
+      "generation": "982562a10d95a5807dd1eae515bc90ba88fccc51089ab1a3349d0d2c6d545b8c",
+      "reusedFiles": 30,
+      "copiedBytes": 0
+    },
+    {
+      "atEpochMs": 1793561676241,
+      "component": "Shader tools",
+      "generation": "1607c300f598b348201f8f2ddf1db4f9527b09bf645240e996cabc69e40db24d",
+      "reusedFiles": 73,
+      "copiedBytes": 0
+    },
+    {
+      "atEpochMs": 1793561686468,
+      "component": "Reconstructed client",
+      "generation": "07feae8242474cdf397e3e1955dcf21cedabfa406795b91a52b4d68044cb9337",
+      "reusedFiles": 30,
+      "copiedBytes": 0
+    },
+    {
+      "atEpochMs": 1793561717823,
+      "component": "Server dependencies",
+      "generation": "078c8dfac185688f6e2a250398c320693b8bfd8793f8bb670000507d8da9a17f",
+      "reusedFiles": 4840,
+      "copiedBytes": 0
+    },
+    {
+      "atEpochMs": 1793561742027,
+      "component": "Server programs",
+      "generation": "d7a76adec6bf2c04fbfc954901cf8d647c822d37f8665d3ed33c1bdd47686810",
+      "reusedFiles": 131,
+      "copiedBytes": 0
+    },
+    {
+      "atEpochMs": 1793561742733,
+      "component": "Server source content",
+      "generation": "ebdf3e2b2ec3766d18af0442cf01a228a6d9adba00e41a996af3089251d78edf",
+      "reusedFiles": 4063,
+      "copiedBytes": 0
+    },
+    {
+      "atEpochMs": 1793568060555,
+      "component": "Runtime",
+      "generation": "dda9221e408dd167796e8a80042f5d7e7e168185eef63dfea088053b0a965c9d",
+      "reusedFiles": 11895,
+      "copiedBytes": 0
+    },
+    {
+      "atEpochMs": 1793568060901,
+      "component": "Guest bridges",
+      "generation": "982562a10d95a5807dd1eae515bc90ba88fccc51089ab1a3349d0d2c6d545b8c",
+      "reusedFiles": 30,
+      "copiedBytes": 0
+    },
+    {
+      "atEpochMs": 1793568065616,
+      "component": "Shader tools",
+      "generation": "1607c300f598b348201f8f2ddf1db4f9527b09bf645240e996cabc69e40db24d",
+      "reusedFiles": 73,
+      "copiedBytes": 0
+    },
+    {
+      "atEpochMs": 1793568075945,
+      "component": "Reconstructed client",
+      "generation": "07feae8242474cdf397e3e1955dcf21cedabfa406795b91a52b4d68044cb9337",
+      "reusedFiles": 30,
+      "copiedBytes": 0
+    },
+    {
+      "atEpochMs": 1793568122649,
+      "component": "Server dependencies",
+      "generation": "078c8dfac185688f6e2a250398c320693b8bfd8793f8bb670000507d8da9a17f",
+      "reusedFiles": 4840,
+      "copiedBytes": 0
+    },
+    {
+      "atEpochMs": 1793568147241,
+      "component": "Server programs",
+      "generation": "d7a76adec6bf2c04fbfc954901cf8d647c822d37f8665d3ed33c1bdd47686810",
+      "reusedFiles": 131,
+      "copiedBytes": 0
+    },
+    {
+      "atEpochMs": 1793568147948,
+      "component": "Server source content",
+      "generation": "ebdf3e2b2ec3766d18af0442cf01a228a6d9adba00e41a996af3089251d78edf",
+      "reusedFiles": 4063,
+      "copiedBytes": 0
+    }
+  ],
+  "runtimeGenerationCount": 1,
+  "visibleRuntimePreparationCopiedBytes": 0,
+  "newLowMemoryExitRecorded": false,
+  "exitReasons": [
+    "USER_REQUESTED",
+    "USER_REQUESTED"
+  ],
+  "nativeTail": {
+    "rows": 193,
+    "phases": [
+      "extraction-mmaps_generator"
+    ],
+    "readBytesFirst": 1369720090,
+    "readBytesLast": 1369720090,
+    "cacheCallsFirst": 109126,
+    "cacheCallsLast": 139846,
+    "cacheAdvisedBytesLast": 121220812065604,
+    "pressureLevels": [
+      0
+    ],
+    "minimumAvailableBytes": 12380712960,
+    "pressureWaits": 0,
+    "nativePressureAborts": 0
+  },
+  "restartTriggerEstablished": false,
+  "worldPreparationQualified": false,
+  "thorQualified": false,
+  "gameplayQualified": false
+}

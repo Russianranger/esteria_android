@@ -129,7 +129,8 @@ public final class ProotProcess {
         if (!Files.exists(home)) Files.createDirectory(home,PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------")));
         privatePath(privateRoot,home);
         return ProotLaunch.create(payload.tracer,payload.loader,rootfs,
-            work,temporary,logs,guestCommand,guestEnvironment,mounts,presentation);
+            work,temporary,logs,guestCommand,
+            io.github.russianranger.esteria.core.runtime.install.RuntimeReadPolicy.preparationEnvironment(guestEnvironment),mounts,presentation);
     }
     private static Payload inspectQualification(Context context)throws IOException {
         requireQualificationProfile();

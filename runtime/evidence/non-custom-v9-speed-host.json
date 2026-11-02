@@ -1,0 +1,164 @@
+{
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "measurement": {
+    "allSelectedSpeedsExecuted": true,
+    "androidRuntimeQualified": false,
+    "boundary": "Actual Linux host file hashing with real clocks under a 96MiB process address-space limit; no MPQ conversion, Android or owner-world timing is measured.",
+    "cases": [
+      {
+        "addressSpaceLimitBytes": 100663296,
+        "cacheCalls": 16,
+        "cacheErrors": 0,
+        "elapsedSeconds": 4.105842613000277,
+        "finalObservation": {
+          "availableBytes": 4294967296,
+          "cacheAdvisedBytes": 33554432,
+          "cacheCalls": 16,
+          "cacheErrors": 0,
+          "nativeAddressSpaceLimitBytes": 4294967296,
+          "nativeCacheBatchBytes": 8388608,
+          "nativeCachePolicy": "bounded-rotating-clean-input-windows",
+          "nativeCacheWindowBytes": 2097152,
+          "nativePressureAborts": 0,
+          "normalBytesPerSecond": 8388608,
+          "phase": "provider-order-hashing",
+          "pressureBytesPerSecond": 2097152,
+          "pressureLevel": 0,
+          "pressureWaits": 0,
+          "readBytes": 33554432,
+          "speed": "gentle"
+        },
+        "normalBytesPerSecond": 8388608,
+        "observedMiBPerSecond": 7.7937717092902705,
+        "peakRssKiB": 11564,
+        "pressureBytesPerSecond": 2097152,
+        "readBytes": 33554432,
+        "sourceIdentity": {
+          "bytes": 33554432,
+          "sha256": "e09320c5b00b34bb704802136c599a95b3996332ba84d7c7f21112b6231b6bd0"
+        },
+        "sourceMetadataUnchanged": true,
+        "speed": "gentle"
+      },
+      {
+        "addressSpaceLimitBytes": 100663296,
+        "cacheCalls": 16,
+        "cacheErrors": 0,
+        "elapsedSeconds": 1.0553083359991433,
+        "finalObservation": {
+          "availableBytes": 4294967296,
+          "cacheAdvisedBytes": 33554432,
+          "cacheCalls": 16,
+          "cacheErrors": 0,
+          "nativeAddressSpaceLimitBytes": 4294967296,
+          "nativeCacheBatchBytes": 8388608,
+          "nativeCachePolicy": "bounded-rotating-clean-input-windows",
+          "nativeCacheWindowBytes": 2097152,
+          "nativePressureAborts": 0,
+          "normalBytesPerSecond": 33554432,
+          "phase": "provider-order-hashing",
+          "pressureBytesPerSecond": 2097152,
+          "pressureLevel": 0,
+          "pressureWaits": 0,
+          "readBytes": 33554432,
+          "speed": "balanced"
+        },
+        "normalBytesPerSecond": 33554432,
+        "observedMiBPerSecond": 30.32289133744318,
+        "peakRssKiB": 11572,
+        "pressureBytesPerSecond": 2097152,
+        "readBytes": 33554432,
+        "sourceIdentity": {
+          "bytes": 33554432,
+          "sha256": "e09320c5b00b34bb704802136c599a95b3996332ba84d7c7f21112b6231b6bd0"
+        },
+        "sourceMetadataUnchanged": true,
+        "speed": "balanced"
+      },
+      {
+        "addressSpaceLimitBytes": 100663296,
+        "cacheCalls": 16,
+        "cacheErrors": 0,
+        "elapsedSeconds": 0.5986847550011589,
+        "finalObservation": {
+          "availableBytes": 4294967296,
+          "cacheAdvisedBytes": 33554432,
+          "cacheCalls": 16,
+          "cacheErrors": 0,
+          "nativeAddressSpaceLimitBytes": 4294967296,
+          "nativeCacheBatchBytes": 8388608,
+          "nativeCachePolicy": "bounded-rotating-clean-input-windows",
+          "nativeCacheWindowBytes": 2097152,
+          "nativePressureAborts": 0,
+          "normalBytesPerSecond": 67108864,
+          "phase": "provider-order-hashing",
+          "pressureBytesPerSecond": 2097152,
+          "pressureLevel": 0,
+          "pressureWaits": 0,
+          "readBytes": 33554432,
+          "speed": "fast"
+        },
+        "normalBytesPerSecond": 67108864,
+        "observedMiBPerSecond": 53.45050083985863,
+        "peakRssKiB": 11568,
+        "pressureBytesPerSecond": 2097152,
+        "readBytes": 33554432,
+        "sourceIdentity": {
+          "bytes": 33554432,
+          "sha256": "e09320c5b00b34bb704802136c599a95b3996332ba84d7c7f21112b6231b6bd0"
+        },
+        "sourceMetadataUnchanged": true,
+        "speed": "fast"
+      }
+    ],
+    "fixture": {
+      "bytes": 33554432,
+      "sha256": "e09320c5b00b34bb704802136c599a95b3996332ba84d7c7f21112b6231b6bd0"
+    },
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "hashesAndMetadataPreserved": true,
+    "ownerGameDataSupplied": false,
+    "scope": "actual-host-synthetic-hash-selected-preparation-speed-measurement",
+    "sourceIdentities": {
+      "app/src/main/java/io/github/russianranger/esteria/ImportIoController.java": {
+        "bytes": 11937,
+        "sha256": "5c7c3e76acd533147ad28bacf0d6d199686dc8602f35c905ba4a0093fd3ff497"
+      },
+      "app/src/main/java/io/github/russianranger/esteria/runtime/ProotProcess.java": {
+        "bytes": 18005,
+        "sha256": "0b92b0f31b9e87612e4d419952c824098cc599852f51de367aed0735cc8296cb"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/PreparationSpeed.java": {
+        "bytes": 997,
+        "sha256": "ed879f2f2301a8c27609ef84d39a0cb0bf12ec563538b11b5d7783f0b0609b62"
+      },
+      "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeReadPolicy.java": {
+        "bytes": 3132,
+        "sha256": "488b1228afd22984b408e9cda39664effaa8cd04755acd00f89f83e0ac241dbb"
+      },
+      "runtime/world_io.py": {
+        "bytes": 20688,
+        "sha256": "2e1e027ef358b29e840591b054251c913b3143343386bebc2f7aa9a4f9e75f1a"
+      }
+    },
+    "thorQualified": false,
+    "worldPreparationQualified": false
+  },
+  "nativeAdviceMutant": {
+    "formatVersion": 1,
+    "gameplayQualified": false,
+    "oldRevision": "f22c28550fdd6ca351525929a6dcfc89ac5d527d",
+    "oldSourceSha256": "5e46ce0b4c3887f7ebda533b8494c71df73246c96ee054abdb8733cfe8a44b2d",
+    "oldWholeInputAdviceRejected": true,
+    "productionSourceChanged": false,
+    "scope": "old-whole-input-cache-advice-mutant-regression",
+    "testErrors": 0,
+    "testFailures": 1,
+    "thorQualified": false
+  },
+  "policyTestsPassed": 28,
+  "scope": "host-synthetic-32MiB-preparation-speed-and-bounded-native-advice",
+  "thorQualified": false
+}

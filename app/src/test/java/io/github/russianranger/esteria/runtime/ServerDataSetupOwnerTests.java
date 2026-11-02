@@ -129,6 +129,13 @@ public final class ServerDataSetupOwnerTests {
             Files.writeString(log,"x".repeat(100000)+"\nextraction-mmaps_generator\n",StandardOpenOption.APPEND);Object observed=null;
             for(int i=0;i<4&&observed==null;i++)observed=read.invoke(progress,log);
             check("navigation".equals(observed),"Bounded overlong log discard preserves the next valid phase");
+            Method details=type.getDeclaredMethod("details");details.setAccessible(true);
+            Files.writeString(log,"NAVIGATION_PROGRESS {\"percent\":42,\"map\":0,\"tileX\":12,\"tileY\":34}\n",StandardOpenOption.APPEND);
+            check("navigation".equals(read.invoke(progress,log))&&details.invoke(progress).equals("Navigation: 42% · map 0 · tile 12, 34"),"Only bounded numeric native tile progress reaches UI");
+            Files.writeString(log,"NAVIGATION_PROGRESS {\"percent\":999,\"map\":0,\"tileX\":12,\"tileY\":34}\nNAVIGATION_PROGRESS {\"percent\":42,\"map\":0,\"tileX\":12,\"tileY\":34,\"path\":\"PRIVATE_TEXT\"}\n",StandardOpenOption.APPEND);
+            check(read.invoke(progress,log)==null&&!details.invoke(progress).toString().contains("PRIVATE_TEXT"),"Malformed progress and added raw child fields remain excluded");
+            Files.writeString(log,"extraction-navigation-resume-123-tiles\n",StandardOpenOption.APPEND);
+            check("navigation-resume".equals(read.invoke(progress,log))&&details.invoke(progress).equals("Continuing 123 validated navigation tiles"),"Resume is visibly distinct from a fresh native phase");
         }finally{remove(root);}
     }
     private static void remove(Path root)throws IOException {try(var paths=Files.walk(root)){for(Path path:paths.sorted(Comparator.reverseOrder()).toArray(Path[]::new))Files.delete(path);}}

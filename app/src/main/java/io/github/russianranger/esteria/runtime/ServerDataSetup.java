@@ -112,6 +112,7 @@ public final class ServerDataSetup {
         private volatile IOException failure,cleanupFailure;
         private volatile Path logs;
         private volatile String phase="allocated";
+        private volatile String progressDetails="";
         private volatile long beganNanos;
         private ServerDataRunPlan plan;
         private Handle(Context context,Path root,Path game,Path work,ServerRuntimeSetup runtime,ServerDataToolsSetup tools,
@@ -166,6 +167,7 @@ public final class ServerDataSetup {
                         if(System.nanoTime()>=deadline)throw new IOException("Data preparation exceeded24hours; previous and staged outputs retained");
                         if(System.nanoTime()>=nextProgress) {
                             String observed=lines.read(logs.resolve("stdout.log"));if(observed!=null)phase=observed;
+                            progressDetails=lines.details();
                             report(progress);nextProgress=System.nanoTime()+TimeUnit.SECONDS.toNanos(1);
                         }
                         try{Thread.sleep(100);}catch(InterruptedException error){Thread.currentThread().interrupt();throw new IOException("Data preparation interrupted; owner and outputs retained",error);}
@@ -192,7 +194,8 @@ public final class ServerDataSetup {
             tools.requireServerRuntimeArchive(runtime.packagePlan().archiveSha256);
         }
         private void report(RuntimeWork.Progress progress) {
-            if(progress!=null)progress.update("server-data-"+phase,"Elapsed: "+elapsedSeconds()+"s",0,-1);
+            if(progress!=null)progress.update("server-data-"+phase,"Data preparation elapsed: "+elapsedSeconds()+"s"
+                +(progressDetails.isEmpty()?"":"\n"+progressDetails),0,-1);
         }
         @Override public void close()throws IOException {close(Duration.ofSeconds(20));}
         /** Stop requests cancellation before the safe-boundary wait. A timeout
@@ -219,6 +222,10 @@ public final class ServerDataSetup {
         private long offset;
         private final ByteArrayOutputStream pending=new ByteArrayOutputStream();
         private boolean overflow;
+        private String details="";
+        private static final java.util.regex.Pattern TILE=java.util.regex.Pattern.compile(
+            "NAVIGATION_PROGRESS \\{\\\"percent\\\":(0|[1-9][0-9]{0,2}),\\\"map\\\":(0|[1-9][0-9]{0,4}),\\\"tileX\\\":(0|[1-9][0-9]?),\\\"tileY\\\":(0|[1-9][0-9]?)\\}");
+        String details(){return details;}
         String read(Path path)throws IOException {
             if(!Files.exists(path,LinkOption.NOFOLLOW_LINKS))return null;
             if(!Files.isRegularFile(path,LinkOption.NOFOLLOW_LINKS)||!path.toRealPath().equals(path))throw new IOException("Invalid data progress log");
@@ -240,7 +247,27 @@ public final class ServerDataSetup {
             }
             return last;
         }
-        private static String known(String value) {
+        private String known(String value) {
+            java.util.regex.Matcher tile=TILE.matcher(value);
+            if(tile.matches()){
+                int percent=Integer.parseInt(tile.group(1)),map=Integer.parseInt(tile.group(2)),x=Integer.parseInt(tile.group(3)),y=Integer.parseInt(tile.group(4));
+                if(percent>100||map>65535||x>64||y>64)return null;
+                details="Navigation: "+percent+"% · map "+map+" · tile "+x+", "+y;
+                return "navigation";
+            }
+            if(value.matches("extraction-navigation-resume-[0-9]{1,6}-tiles")){
+                int tiles=Integer.parseInt(value.substring("extraction-navigation-resume-".length(),value.length()-"-tiles".length()));
+                if(tiles>300000)return null;
+                details="Continuing "+tiles+" validated navigation tiles";return "navigation-resume";
+            }
+            switch(value){
+                case "extraction-reused-maps-dbc-cameras":return "reused-maps-dbc-cameras";
+                case "extraction-reused-raw-vmaps":return "reused-raw-collision";
+                case "extraction-reused-assembled-vmaps":return "reused-assembled-collision";
+                case "extraction-reused-navigation":return "reused-navigation";
+                case "extraction-resumed-reviewed-v8-work":return "resumed-reviewed-v8-work";
+                default:break;
+            }
             if(value.startsWith("WORLD_IO ")&&value.length()<=4096)try{
                 String phase=new org.json.JSONObject(value.substring(9)).getString("phase");
                 if(phase.matches("[a-z][a-z0-9_-]{0,80}"))return "io-"+phase;

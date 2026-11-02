@@ -1,0 +1,33 @@
+{
+  "formatVersion": 1,
+  "scope": "host-real-filesystem-runtime-storage-maintenance",
+  "testsPassed": 9,
+  "heapLimitMiB": 32,
+  "actualRuntimeInstallerAndDownloadCacheExecuted": true,
+  "repeatWithoutArchiveOrNetworkVerified": true,
+  "currentAndExpectedGenerationPreserved": true,
+  "importDatabaseWorldStagingPreserved": true,
+  "unknownObjectsPreserved": true,
+  "symlinksNotFollowed": true,
+  "idleAndRuntimeCacheLeaseRefusalVerified": true,
+  "cancellationAndTrashResumeVerified": true,
+  "missingSelectedRootKeepsRepairArchive": true,
+  "logicalByteCountsOnly": true,
+  "androidRuntimeQualified": false,
+  "thorQualified": false,
+  "gameplayQualified": false,
+  "log": {
+    "bytes": 740,
+    "sha256": "6f6c42abfac8098476e02d1cbbc3285efa79fee57099feedc72cb1ad50e1a1a5"
+  },
+  "sourceIdentities": {
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/RuntimeStorageMaintenance.java": {
+      "bytes": 19690,
+      "sha256": "97de25701a630be4ab4f199c598a6adfcb5fc0e715ce3b0d637d7337df6f5e36"
+    },
+    "core/src/test/java/io/github/russianranger/esteria/core/runtime/install/RuntimeStorageMaintenanceTests.java": {
+      "bytes": 18032,
+      "sha256": "d2dd72ff0249db4a82b5a4545c7992aa511728b889176049c686ee2f8173b8c6"
+    }
+  }
+}

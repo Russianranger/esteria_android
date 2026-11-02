@@ -222,6 +222,10 @@ jobs:
                   receipt['stdout'] = dict(bytes=log.stat().st_size, sha256=digest(log))
               (destination / 'import-memory-component.json').write_text(json.dumps(receipt, sort_keys=True, indent=2) + '\n')
           print(json.dumps(receipt, sort_keys=True, indent=2))
+          # Separate exact-method v9 controls/maintenance component; retain the
+          # preceding 14-test memory roster and receipt unchanged.
+          from tools.qualify_android_installer import qualify_preparation_components
+          qualify_preparation_components(root, destination, properties, installer['artifacts'], os.environ['GITHUB_SHA'])
           PY
       - name: Run real app-private filesystem and package-update contracts
         uses: ReactiveCircus/android-emulator-runner@324029e2f414c084d8b15ba075288885e74aef9c # v2.34.0

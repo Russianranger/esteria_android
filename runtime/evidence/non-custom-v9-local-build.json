@@ -1,0 +1,16 @@
+{
+  "androidInstrumentationExecuted": false,
+  "appLog": {
+    "bytes": 16610,
+    "sha256": "31794c6e8c314df8d0f6a8b727749d521c2c98dd073b0b069c1f0706b9894104"
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "gradleAppBuildLintOwnerPassed": true,
+  "gradleAppTasks": 113,
+  "gradleCoreCheckPassed": true,
+  "gradleCoreTasksIncludedInAppCount": true,
+  "gradleStorageTestsPassed": 9,
+  "scope": "local-v9-java-build-lint-owner-and-core-checks",
+  "thorQualified": false
+}

@@ -12,7 +12,7 @@ class EmbeddedCacheHost(unittest.TestCase):
     def test_owned_asset_copy_resume_and_bounded_heap(self):
         with tempfile.TemporaryDirectory() as directory:
             base='io/github/russianranger/esteria/core/runtime/install/'
-            sources=[ROOT/'core/src/main/java'/base/(name+'.java') for name in ('RuntimeFiles','RuntimeWork','RuntimeReadPolicy','EmbeddedArchiveCache')]
+            sources=[ROOT/'core/src/main/java'/base/(name+'.java') for name in ('RuntimeFiles','RuntimeWork','RuntimeReadPolicy','PreparationSpeed','EmbeddedArchiveCache')]
             sources.append(ROOT/'core/src/main/java/io/github/russianranger/esteria/core/runtime/ExclusiveFileLease.java')
             sources.append(ROOT/'core/src/test/java'/base/'EmbeddedArchiveCacheTests.java')
             subprocess.run(['javac','-d',directory,*map(str,sources)],check=True,capture_output=True,text=True)

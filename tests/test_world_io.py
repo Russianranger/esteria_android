@@ -106,6 +106,42 @@ class WorldIoTests(unittest.TestCase):
             policy.consumed(2 << 20)
             self.assertAlmostEqual(self.clock.now - began, 1, places=6)
 
+    def test_explicit_speed_levels_keep_the_same_bounded_hash_and_pressure_backoff(self):
+        source = self.source()
+        expected = order.file_identity(source)
+        for speed, rate in (('gentle', 8 << 20), ('balanced', 32 << 20), ('fast', 64 << 20)):
+            with self.subTest(speed=speed):
+                began = self.clock.now
+                messages = []
+                with self.context(speed=speed, progress=messages.append) as policy:
+                    self.assertEqual(order.file_identity(source), expected)
+                    self.assertEqual(policy.read_bytes, 5 << 20)
+                    self.assertEqual(policy.cache_calls, 3, 'Speed does not enlarge cache windows')
+                self.assertAlmostEqual(self.clock.now - began, (5 << 20) / rate, places=6)
+                observation = json.loads(messages[-1].removeprefix('WORLD_IO '))
+                self.assertEqual(observation['speed'], speed)
+                self.assertEqual(observation['normalBytesPerSecond'], rate)
+                self.assertEqual(observation['nativeAddressSpaceLimitBytes'], 4 << 30)
+                began = self.clock.now
+                with self.context(speed=speed, memory_probe=lambda: 400 << 20) as policy:
+                    policy.consumed(2 << 20)
+                self.assertAlmostEqual(self.clock.now - began, 1, places=6)
+
+    def test_guest_environment_selection_is_explicit_and_unknown_speeds_are_refused(self):
+        for speed in io.SPEED_RATES:
+            with self.subTest(speed=speed), patch.dict(os.environ, {io.SPEED_ENVIRONMENT: speed}):
+                with self.context() as policy:
+                    self.assertEqual(policy.speed, speed)
+                    self.assertEqual(policy.normal_rate, io.SPEED_RATES[speed])
+        with patch.dict(os.environ, {io.SPEED_ENVIRONMENT: 'unlimited'}):
+            with self.assertRaisesRegex(ValueError, 'Unknown world preparation speed'):
+                with self.context():
+                    self.fail('Invalid environment choice accepted')
+        for speed in ('', 'FAST', '64', ['fast'], 64):
+            with self.subTest(speed=speed), self.assertRaisesRegex(ValueError, 'Unknown world preparation speed'):
+                with self.context(speed=speed):
+                    self.fail('Invalid speed accepted')
+
     def test_actual_clock_enforces_reduced_hash_rate(self):
         source = self.source(2 << 20)
         began = time.monotonic()
@@ -213,15 +249,74 @@ print(json.dumps(result))
             calls.append((offset, size, os.fstat(fd).st_ino))
             os.posix_fadvise(fd, offset, size, kind)
         code = 'import hashlib,pathlib,sys,time;p=pathlib.Path(sys.argv[1]);print(hashlib.sha256(p.read_bytes()).hexdigest(),flush=True);time.sleep(.45)'
+        began = time.monotonic()
         with io.android_policy(memory_probe=lambda: 4 << 30, advice=advice):
             result = data.execute([sys.executable, '-c', code, str(source)], self.root,
                 self.root / 'native.log', 5, cache_inputs=(source, source))
         self.assertEqual(result['exitStatus'], 0)
         self.assertIn(expected, (self.root / 'native.log').read_text())
-        self.assertGreaterEqual(len(calls), 5)
+        self.assertGreaterEqual(len(calls), 2)
+        self.assertLessEqual(len(calls), int(time.monotonic() - began) + 2,
+            'Healthy native inputs are advised once per second plus entry/exit, not every100ms')
         self.assertTrue(all(row == (0, 2 << 20, before.st_ino) for row in calls))
         self.assertEqual(hashlib.sha256(source.read_bytes()).hexdigest(), expected)
         self.assertEqual(source.stat().st_mtime_ns, before.st_mtime_ns)
+
+    def test_native_cache_rotates_bounded_windows_without_whole_archive_repeats(self):
+        paths, calls = [], []
+        for name in ('common', 'patch', 'locale'):
+            path = self.root / (name + '.MPQ')
+            with path.open('wb') as stream:
+                stream.truncate(10 << 20)
+            paths.append(path)
+        def advice(fd, offset, length, kind):
+            calls.append((os.fstat(fd).st_ino, offset, length))
+        with self.context(advice=advice) as policy:
+            with io.native_inputs(paths) as guard:
+                first = len(calls)
+                self.assertGreater(first, 0)
+                self.assertLessEqual(first, 4)
+                self.assertLessEqual(sum(row[2] for row in calls), 8 << 20)
+                self.assertTrue(all(0 < row[2] <= 2 << 20 for row in calls))
+                for _ in range(9):
+                    self.clock.now += .1
+                    guard.tick()
+                self.assertEqual(len(calls), first, 'Healthy ticks keep useful cache between batches')
+                self.clock.now = 1
+                guard.tick()
+                self.assertGreater(len(calls), first)
+                self.assertLessEqual(len(calls), first + 4)
+                self.assertEqual(len({row[0] for row in calls}), 3, 'All archive descriptors rotate fairly')
+                self.assertEqual(len(set(calls)), len(calls), 'Offsets advance rather than repeatedly dropping whole inputs')
+                self.assertTrue(all(0 < row[2] <= 2 << 20 and row[1] + row[2] <= 10 << 20 for row in calls))
+                self.assertLessEqual(policy.cache_bytes, 16 << 20)
+
+    def test_native_advice_pressure_keeps_batches_bounded_and_checks_cancel_between_them(self):
+        source = self.source()
+        calls, cancelled = [], [False]
+        def advice(fd, offset, length, kind):
+            calls.append((offset, length))
+        with self.context(advice=advice, cancelled=lambda: cancelled[0], memory_probe=lambda: 400 << 20):
+            with io.native_inputs((source,)) as guard:
+                first = len(calls)
+                self.assertLessEqual(first, 4)
+                self.assertLessEqual(sum(row[1] for row in calls), 8 << 20)
+                self.clock.now = .1
+                guard.tick()
+                self.assertGreater(len(calls), first)
+                self.assertLessEqual(len(calls) - first, 4)
+                cancelled[0] = True
+                with self.assertRaisesRegex(io.PreparationPaused, 'cancelled'):
+                    guard.tick()
+                cancelled[0] = False
+
+    def test_native_cache_tiny_inputs_get_no_duplicate_advice_in_one_batch(self):
+        source = self.source(1)
+        calls = []
+        with self.context(advice=lambda fd, offset, length, kind: calls.append((offset, length))):
+            with io.native_inputs((source, source)) as guard:
+                self.assertEqual(calls, [(0, 1)])
+                self.assertEqual(len(guard.files), 1)
 
     @unittest.skipUnless(sys.platform.startswith('linux'), 'Linux resource limit and exec contract')
     def test_guarded_child_has4gib_limit_with_exact_argv_cwd_environment_and_clean_stdout(self):

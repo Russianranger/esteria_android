@@ -21,7 +21,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
+import io.github.russianranger.esteria.core.runtime.install.PreparationSpeed;
 import io.github.russianranger.esteria.runtime.GameSession;
 import io.github.russianranger.esteria.presentation.GamePresentationPanel;
 import io.github.russianranger.esteria.runtime.ClientLaunchSetup;
@@ -39,6 +41,9 @@ public final class MainActivity extends Activity {
     private String displayedUiDigest;
     private boolean bound;
     private Spinner clientLanguage;
+    private Spinner preparationSpeed;
+    private TextView storageSummary;
+    private Button scanStorage, trimStorage;
     private FrameLayout rootView;
     private ScrollView launcher;
     private LinearLayout gameRoot;
@@ -59,6 +64,10 @@ public final class MainActivity extends Activity {
                 launcherForceStop.setVisibility(service.forceStopAvailable()?View.VISIBLE:View.GONE);
                 launcherForceStop.setEnabled(service.forceStopAvailable());
                 if(clientLanguage!=null)clientLanguage.setEnabled(!service.busy());
+                preparationSpeed.setEnabled(!service.busy());
+                scanStorage.setEnabled(service.storageMaintenanceAvailable());
+                trimStorage.setEnabled(service.storageTrimAvailable());
+                if(!android.text.TextUtils.equals(storageSummary.getText(),service.storageStatus()))storageSummary.setText(service.storageStatus());
                 cancel.setEnabled(service.busy());
                 ClientLaunchSetup.UiReview review=service.uiReview();
                 if(review==null) {
@@ -92,6 +101,24 @@ public final class MainActivity extends Activity {
         explanation.setPadding(0, dp(20), 0, dp(12)); layout.addView(explanation);
         button(layout, "Import client folder", () -> chooseFolder(BASE_FOLDER));
         button(layout, "Import client ZIP", () -> chooseArchive(BASE));
+        layout.addView(text("World preparation speed",14,Color.rgb(184,199,211)));
+        preparationSpeed=new Spinner(this);preparationSpeed.setId(R.id.preparation_speed);
+        PreparationSpeed[] speeds=PreparationSpeed.values();
+        String[] speedLabels=new String[speeds.length];for(int i=0;i<speeds.length;i++)speedLabels[i]=speeds[i].label;
+        ArrayAdapter<String> speedAdapter=new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,speedLabels);
+        speedAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);preparationSpeed.setAdapter(speedAdapter);
+        PreparationSpeed savedSpeed=PreparationSpeed.DEFAULT;
+        try{savedSpeed=PreparationSpeed.fromId(getSharedPreferences("preparation",MODE_PRIVATE).getString("speed",PreparationSpeed.DEFAULT.id));}
+        catch(IllegalArgumentException invalid){getSharedPreferences("preparation",MODE_PRIVATE).edit().remove("speed").apply();}
+        preparationSpeed.setSelection(savedSpeed.ordinal());
+        preparationSpeed.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+            public void onItemSelected(AdapterView<?> parent,View view,int position,long id){
+                getSharedPreferences("preparation",MODE_PRIVATE).edit().putString("speed",speeds[position].id).apply();
+            }
+            public void onNothingSelected(AdapterView<?> parent){ }
+        });
+        layout.addView(preparationSpeed);
+        layout.addView(text("Controls file checks and copies; navigation meshes also need CPU time. Memory backoff stays active at every speed. Change while idle, then retry preparation to continue valid completed work.",13,Color.rgb(145,163,177)));
         if(BuildConfig.SERVER_DATA_TOOLS_PACKAGED&&BuildConfig.SERVER_PROGRAMS_PACKAGED&&BuildConfig.SERVER_CONTENT_PACKAGED&&BuildConfig.SHADER_TOOLS_PACKAGED) {
             layout.addView(text("Imported client language",14,Color.rgb(184,199,211)));
             clientLanguage=new Spinner(this);
@@ -117,6 +144,10 @@ public final class MainActivity extends Activity {
             if(clientLanguage!=null)intent.putExtra(SessionService.WORLD_LOCALE,(String)clientLanguage.getSelectedItem());
             operation(intent);
         });startGame.setEnabled(completeProfile());
+        scanStorage=button(layout,"Check reclaimable storage",()->operation(new Intent(this,SessionService.class).setAction(SessionService.SCAN_STORAGE)));
+        trimStorage=button(layout,"Trim obsolete files",()->operation(new Intent(this,SessionService.class).setAction(SessionService.TRIM_STORAGE)));
+        trimStorage.setEnabled(false);
+        storageSummary=text("Check storage to find obsolete runtime generations and redundant download archives. Your imported client, saves and resumable world work are retained.",13,Color.rgb(145,163,177));layout.addView(storageSummary);
         exportSupport=button(layout, "Export support bundle", this::chooseExport);
         cancel = new Button(this); cancel.setText(R.string.stop_session); cancel.setEnabled(false);
         cancel.setOnClickListener(v -> startService(new Intent(this, SessionService.class).setAction(SessionService.CANCEL))); layout.addView(cancel);
