@@ -1,0 +1,156 @@
+{
+  "actualAndroidCompiledExecutionPerformedByThisAudit": false,
+  "aospSources": {
+    "JSON.java": {
+      "bytes": 3884,
+      "path": "json/src/main/java/org/json/JSON.java",
+      "repository": "https://android.googlesource.com/platform/libcore",
+      "revision": "android-13.0.0_r1",
+      "sha256": "a2cc5e4bf64bfe3edd73c6a14409f3200640454051d9947ee79f16a2396a19b1"
+    },
+    "JSONArray.java": {
+      "bytes": 20699,
+      "path": "json/src/main/java/org/json/JSONArray.java",
+      "repository": "https://android.googlesource.com/platform/libcore",
+      "revision": "android-13.0.0_r1",
+      "sha256": "24f10dbe57a9228b8aec8a891355c26285e7fc4e070a2f826a080300e3ca4180"
+    },
+    "JSONException.java": {
+      "bytes": 1824,
+      "path": "json/src/main/java/org/json/JSONException.java",
+      "repository": "https://android.googlesource.com/platform/libcore",
+      "revision": "android-13.0.0_r1",
+      "sha256": "26e10aae9c209dabbc8f15b4156fe9fdc87f5d9d2cb2d2f078b475a61ba0df7d"
+    },
+    "JSONObject.java": {
+      "bytes": 30517,
+      "path": "json/src/main/java/org/json/JSONObject.java",
+      "repository": "https://android.googlesource.com/platform/libcore",
+      "revision": "android-13.0.0_r1",
+      "sha256": "4d3ce46839c56c6b4ec650aa983ed40fbda9fdf07895372f6c27bcc8cf0cca85"
+    },
+    "JSONStringer.java": {
+      "bytes": 13540,
+      "path": "json/src/main/java/org/json/JSONStringer.java",
+      "repository": "https://android.googlesource.com/platform/libcore",
+      "revision": "android-13.0.0_r1",
+      "sha256": "8772ac80610cd62e906330152b09864c471a0921f199f4b9d670d98050e3d86c"
+    },
+    "JSONTokener.java": {
+      "bytes": 20899,
+      "path": "json/src/main/java/org/json/JSONTokener.java",
+      "repository": "https://android.googlesource.com/platform/libcore",
+      "revision": "android-13.0.0_r1",
+      "sha256": "da4841221e26bcf2f8205905eadb702328d5a45af73cc3318917df73e56f4466"
+    },
+    "JsonReader.java": {
+      "bytes": 38554,
+      "path": "core/java/android/util/JsonReader.java",
+      "repository": "https://android.googlesource.com/platform/frameworks/base",
+      "revision": "android-13.0.0_r1",
+      "sha256": "c5de3f4eebdab3aab6813f994eaf4d3539f782235c1bfc4cc5e35fe2332ac58f"
+    },
+    "JsonScope.java": {
+      "bytes": 1675,
+      "path": "core/java/android/util/JsonScope.java",
+      "repository": "https://android.googlesource.com/platform/frameworks/base",
+      "revision": "android-13.0.0_r1",
+      "sha256": "39125e4a72edbdb184f811ea98259625a869e969d9c7fce47f9a6441c927e80e"
+    },
+    "JsonToken.java": {
+      "bytes": 2141,
+      "path": "core/java/android/util/JsonToken.java",
+      "repository": "https://android.googlesource.com/platform/frameworks/base",
+      "revision": "android-13.0.0_r1",
+      "sha256": "05c100694db201b65d3daef4458a940fe47d6a89df86e4d45a739b37cf553cbf"
+    },
+    "MalformedJsonException.java": {
+      "bytes": 1022,
+      "path": "core/java/android/util/MalformedJsonException.java",
+      "repository": "https://android.googlesource.com/platform/frameworks/base",
+      "revision": "android-13.0.0_r1",
+      "sha256": "94a997b990db2e9dbdf090fade094dd3470231b0322f0dc4bd054db2446f31ea"
+    },
+    "StringPool.java": {
+      "bytes": 2518,
+      "path": "core/java/com/android/internal/util/StringPool.java",
+      "repository": "https://android.googlesource.com/platform/frameworks/base",
+      "revision": "android-13.0.0_r1",
+      "sha256": "887d7b8b3587bb0f808ebc989419300a170e126cf950f86889c5ed1b959a52e7"
+    }
+  },
+  "downstream": {
+    "localServerSessionCanonicalCallsAreStructuralComparisonsOnly": true,
+    "runtimeSetupIdentityIsJavaOwnedAndShouldRemainUnchanged": true,
+    "sessionSelectionAndroidEscapesAreParsedBeforePythonRehash": true
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "memory": {
+    "activityManagerSource": {
+      "bytes": 203941,
+      "path": "core/java/android/app/ActivityManager.java",
+      "repository": "https://android.googlesource.com/platform/frameworks/base",
+      "revision": "android-13.0.0_r1",
+      "sha256": "1a6d75283397373185997b96d01100aed92eeb5f267abcea849c0ac2f6f16894"
+    },
+    "aospImportanceMeaning": "cached",
+    "consistentWithCachedBackgroundDeath": true,
+    "currentFailureIsExplicitJavaException": true,
+    "currentJavaHeapPeakObservedBytes": 34722464,
+    "currentLowMemoryFalse": true,
+    "currentPreparationStartedAtEpochMs": 1793662820534,
+    "currentPressureLevel": 0,
+    "earlierHistoricalLowMemoryExitEpochMs": 1793647314348,
+    "exactPriorKillTriggerNotEstablished": true,
+    "exitImportance": 400,
+    "lastLoggedOperationFinishedEpochMs": 1793590494134,
+    "noLoggedPreparationAtKillTime": true,
+    "priorKillToCurrentStartSeconds": 15506.186
+  },
+  "newCodecManualReview": {
+    "arrayNullFloatStillRejected": true,
+    "file": "app/src/main/java/io/github/russianranger/esteria/runtime/PythonReceiptJson.java",
+    "integerTypesRemainStrict": true,
+    "literalSolidus": true,
+    "pythonEnsureAsciiAndDel": true,
+    "sha256": "15993e9fcf9ffcc07e152e3fe8ed277b8b5f3ae0e994c976f91d9d21f2a6a728",
+    "shaderBooleansStillRejected": true,
+    "surrogatePairEscaping": true,
+    "unicodeCodePointKeyOrdering": true
+  },
+  "observedFailure": {
+    "dataElapsedSeconds": 2426,
+    "javaFailure": "Prepared data source/import selection differs",
+    "javaLocation": "ServerDataBinding.java:79",
+    "operationElapsedSeconds": 2513,
+    "pythonCompletedGeneration": "cdf2eec23f3bea5f7036f57c307ae7c91300fd059bcc716ba65b2733bd0b3d7e"
+  },
+  "originalJavaSources": {
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ServerDataBinding.java": "647b6734da5a0f5b2bea393acf95f2884ca0a2c696b3436e548437c2050e1cd0",
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ShaderSetup.java": "2327b497fd216b808a7930df8dd4616d8d7e9145ceab8dbd5d8ad2a19fe87075"
+  },
+  "ownerReceiptFileAvailable": false,
+  "ownerWorldQualified": false,
+  "reuse": {
+    "cachedBranchVerifiesFullPayloadWithoutNativeExtraction": true,
+    "javaOnlyChangesPreservePythonGeneration": true,
+    "pythonAlreadyActivatedCurrentPointer": true,
+    "pythonHelperGeneration": "c911baddd7c49fa21fa4a3bc022d75c69fa66daddde3a6970129cf652dad18ff",
+    "reimportRequired": false
+  },
+  "rootCause": {
+    "allOriginalHashChecksMustRemain": true,
+    "androidJSONObjectQuoteEscapesSolidus": true,
+    "mandatoryImportMetadataKeysContainSolidus": true,
+    "pythonCompactJsonDoesNotEscapeSolidus": true,
+    "secondToolSelectionCheckContainsSolidus": true,
+    "shaderConsumerHasSameBug": true
+  },
+  "scope": "independent-source-audit-of-v10-android-python-canonical-handoff",
+  "supportBundle": {
+    "bytes": 19410,
+    "filename": "Esteria-support-1793665339812.zip",
+    "sha256": "9ec99df9846ac3b78f50b48de6ea04cad8d31061b611d206d454e1b914be1ed2"
+  }
+}

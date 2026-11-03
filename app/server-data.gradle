@@ -41,3 +41,21 @@ tasks.register('serverDataSetupOwnerTest', JavaExec) {
     mainClass = 'io.github.russianranger.esteria.runtime.ServerDataSetupOwnerTests'
     maxHeapSize = '32m'
 }
+
+// Test APK only: Python's real producers supply receipt bytes and generation
+// hashes. Android consumers must not manufacture their own expected hashes.
+def pythonReceiptAssets = layout.buildDirectory.dir('generated/pythonReceiptFixtures')
+def pythonReceiptHelpers = (serverDataHelpers + ['stock_content_inspection.py',
+    'stock_shader_generation.py', 'stock_shader_translate.py']).unique()
+def preparePythonReceipts = tasks.register('preparePythonReceiptFixtures', Exec) {
+    inputs.file(rootProject.file('tools/prepare_android_receipt_fixtures.py'))
+    inputs.files(pythonReceiptHelpers.collect { rootProject.file('runtime/' + it) })
+    outputs.dir(pythonReceiptAssets)
+    doFirst { delete pythonReceiptAssets }
+    commandLine 'python3', rootProject.file('tools/prepare_android_receipt_fixtures.py'),
+        '--output', pythonReceiptAssets.map { it.dir('python-receipts').asFile }.get()
+}
+android.sourceSets.androidTest.assets.srcDir(pythonReceiptAssets)
+tasks.matching { it.name == 'preDebugAndroidTestBuild' }.configureEach {
+    dependsOn preparePythonReceipts
+}

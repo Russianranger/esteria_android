@@ -1,0 +1,45 @@
+{
+  "actualAndroidConsumerExecution": false,
+  "completeProviderApkQualified": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "gradle": {
+    "jdk": "Temurin17.0.13+11",
+    "log": {
+      "bytes": 24217,
+      "sha256": "4d49742f26a3dc311d3d050210b9ebb6966f8a8acfc58da4603eea18b086ebdc"
+    },
+    "result": "success",
+    "sdkBuildTools": "35.0.0",
+    "targets": [
+      ":core:check",
+      ":app:serverDataSetupOwnerTest",
+      ":app:assembleRelease",
+      ":app:lintRelease",
+      ":app:assembleDebugAndroidTest"
+    ],
+    "tasks": 135
+  },
+  "host": {
+    "log": {
+      "bytes": 313701,
+      "sha256": "10b958c8dc35e9e5766bb0cf0e8cec402c6f378d6a81b6730793ed4e99123b65"
+    },
+    "testsPassed": 1482,
+    "testsRun": 1613,
+    "testsSkipped": 131
+  },
+  "productionPythonHelpersUnchangedFromV10": true,
+  "pythonToAospReceiptHostTestsPassed": 5,
+  "scope": "v11-local-host-sdk-and-android-source-build-validation",
+  "sdkSigningAndPublicationGuards": {
+    "log": {
+      "bytes": 6120,
+      "sha256": "77eacb1218dfc988bf92b9ae746d0478d891d4758f584ccf48076f0740de7e8d"
+    },
+    "testsPassed": 31,
+    "testsRun": 31,
+    "testsSkipped": 0
+  },
+  "thorQualified": false
+}

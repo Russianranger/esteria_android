@@ -1,8 +1,8 @@
-# Version 10 data-format preflight retry
+# Version 11 completed-data handoff retry
 
-Install the signed `0.1.0-non-custom.10` / versionCode 10 ARM64 update over the existing Esteria Stock app. The package and persistent certificate are unchanged. **Keep the completed client import and all app data. Do not uninstall, clear storage or reimport the client.** Check `SHA256SUMS`, `release.json` and the signing receipt for the exact APK/source identity.
+Install the signed `0.1.0-non-custom.11` / versionCode 11 ARM64 update over the existing Esteria Stock app. The package and persistent certificate are unchanged. **Keep the completed client import and all app data. Do not uninstall, clear storage or reimport the client.** Check `SHA256SUMS`, `release.json` and the signing receipt for the exact APK/source identity.
 
-The latest v9 report reached navigation-mesh preparation, then stopped at the generated-data format preflight. V10 corrects that preflight and revalidates compatible completed v9 world work for reuse. **Keep the completed navigation output; do not delete it to retry.** Incomplete or incompatible output is still rebuilt or rejected as appropriate. Preparation speeds, pressure handling and storage controls remain as in v9.
+The latest v10 report completed the world-data format checks, then the Android completed-data inspector rejected its selection receipt. V11 addresses that handoff and retains compatible completed v10 world data for checked reuse. **Keep the completed world and navigation output; do not delete it to retry.** Missing, changed or incompatible output remains subject to validation and rebuilding. Preparation speeds, pressure handling and storage controls are unchanged.
 
 ## Choose a preparation speed
 
@@ -18,11 +18,11 @@ These are verification/copy pacing limits, not total-world completion estimates.
 
 Memory pressure still reduces governed reads to 2 MiB/s or pauses preparation. An isolated trim signal with verified healthy headroom backs off instead of immediately cancelling a long native phase. Genuine low-memory observations remain a pause condition. Clean-input cache advice now works through bounded windows rather than repeatedly advising every complete archive in each short interval.
 
-## Retry the preflight without discarding useful work
+## Retry the completed-data handoff without discarding useful work
 
-1. Install v10 over the current app and retain the existing import. Select its installed locale and **Balanced**.
+1. Install v11 over the current app and retain the existing import. Select its installed locale and **Balanced**.
 2. Choose **Prepare local runtime / world**. The status identifies the current phase, so a transition from maps to collision or navigation work is distinguishable from a restart. Provider checks still run before reused outputs are accepted.
-3. Leave the operation running while it makes progress. Compatible completed v9 phases, including navigation output, and valid partial navigation tiles are checked before reuse. Malformed or incomplete partial tiles are regenerated; a stopped phase is never reported as complete.
+3. Leave the operation running while it makes progress. Matching completed v10 world data is checked before reuse. Compatible older checkpoints and valid partial navigation tiles remain reusable. Malformed or incomplete output is rejected or regenerated; a stopped phase is never reported as complete.
 4. To compare speeds, press **Stop** and wait for cleanup to finish before changing the level. Retry with the same locale. Changing only speed does not change the data generation or require reimporting the client.
 5. If a memory pause occurs, wait for headroom to recover, choose a slower level if appropriate, and retry. If a stage fails or Android closes the app, export support before another preparation attempt.
 

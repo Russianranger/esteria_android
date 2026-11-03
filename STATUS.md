@@ -1,3 +1,13 @@
+# Esteria Stock v11 — Python/Android receipt fix in validation
+
+The v10 owner attempt completed Python world-data validation and activated generation `cdf2eec23f3bea5f7036f57c307ae7c91300fd059bcc716ba65b2733bd0b3d7e`, then Android rejected its receipt with `Prepared data source/import selection differs`. The current attempt took 2,513 seconds; the report separately records an earlier low-memory exit. Current pressure was zero and Java heap peak was about 34.7 MB.
+
+Android JSON serialization escapes forward slashes while Python canonical receipt JSON does not. Mandatory import ancestry keys and data-tool paths expose this mismatch. The same formatter is used by shader receipt verification. V11 aligns both Java consumers with the existing Python bytes and keeps the six data helpers, shader helpers and all source/native pins unchanged, allowing completed v10 output to be verified and reused. No reimport or data deletion is required.
+
+Cross-language regressions, full-provider packaging, native/Android source gates and signed public APK readback remain pending. V10 remains the published baseline until all release checks complete.
+
+## Published v10 baseline — historical
+
 # Esteria Stock v10 — post-navigation preflight update published
 
 [Signed ARM64 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.10/Esteria-Stock-3.3.5a-arm64.apk) · [Testing procedure](NON-CUSTOM-TESTING.md).

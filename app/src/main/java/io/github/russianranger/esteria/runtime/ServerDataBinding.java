@@ -18,7 +18,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.TreeSet;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -192,13 +191,7 @@ public final class ServerDataBinding {
         return records;
     }
     static String canonical(JSONObject value)throws IOException,JSONException {
-        TreeSet<String> names=new TreeSet<>();value.keys().forEachRemaining(names::add);StringBuilder out=new StringBuilder("{");
-        for(String name:names){if(out.length()>1)out.append(',');out.append(JSONObject.quote(name)).append(':');Object item=value.get(name);
-            if(item instanceof JSONObject)out.append(canonical((JSONObject)item));
-            else if(item instanceof String)out.append(JSONObject.quote((String)item));
-            else if(item instanceof Boolean||item instanceof Integer||item instanceof Long)out.append(item);
-            else throw new IOException("Unsupported canonical data input value");}
-        return out.append('}').toString();
+        return PythonReceiptJson.canonical(value);
     }
     private static long integer(JSONObject value,String name)throws JSONException,IOException {Object item=value.get(name);if(!(item instanceof Integer)&&!(item instanceof Long))throw new IOException("Data metadata integer type differs");return ((Number)item).longValue();}
     private static void keys(JSONObject value,String... expected)throws IOException {Set<String> actual=new HashSet<>();value.keys().forEachRemaining(actual::add);if(!actual.equals(Set.of(expected)))throw new IOException("Data metadata field set differs");}

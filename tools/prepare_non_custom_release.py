@@ -55,7 +55,7 @@ def stage(args):
     (args.output / 'SHA256SUMS').write_text(signed['apkSha256'] + '  ' + name + '\n')
     setup = ('Keep the completed client import and retry Prepare local runtime / world, then\n'
              'start the local game. Follow the attached NON-CUSTOM-TESTING.md procedure, including\n'
-             'the offline repeat and support bundle export if a stage fails.' if signed['versionCode'] in (5, 6, 7, 8, 9, 10) else
+             'the offline repeat and support bundle export if a stage fails.' if signed['versionCode'] in (5, 6, 7, 8, 9, 10, 11) else
              'Import your complete ChromieCraft client, prepare the local runtime/world, then\n'
              'start the local game. Follow the attached NON-CUSTOM-TESTING.md procedure, including\n'
              'the offline repeat and support bundle export if a stage fails.')
@@ -227,6 +227,23 @@ work, databases and saves, select the same locale and retry Prepare local runtim
 / world. Keep the chosen speed unless comparing it deliberately while idle.
 Do not reimport, uninstall, clear storage or delete completed navigation files.
 Export support before another attempt after a failure. Actual Thor preparation,
+rendering, persistence and offline gameplay still need device confirmation.
+'''
+    if signed['versionCode'] == 11:
+        notes += '''
+Version 11 addresses the completed-world-data handoff reached after v10 finished
+its format checks. The v10 report records successful world-data preparation,
+followed by the Android receipt inspector rejecting the completed selection.
+Matching completed v10 world data is retained and checked before reuse; no new
+client import or deliberate deletion of navigation output is required.
+
+Preparation speeds and memory controls are unchanged. Keep the completed import,
+generated data, databases and saves. Install over the existing stock app, select
+the same locale and retry Prepare local runtime / world. Hash verification still
+takes time. Native extraction remains necessary for missing or incompatible data.
+Do not uninstall, clear storage, reimport or delete completed world files.
+
+Export support before another attempt after a failure. Actual Thor completion,
 rendering, persistence and offline gameplay still need device confirmation.
 '''
     (args.output / 'RELEASE-NOTES.md').write_text(notes)

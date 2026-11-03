@@ -1,0 +1,51 @@
+{
+  "androidOutcome": {
+    "dataPreparationElapsedSeconds": 2426,
+    "failure": "Prepared data source/import selection differs",
+    "line": 79,
+    "operationElapsedSeconds": 2513,
+    "source": "ServerDataBinding.java"
+  },
+  "application": {
+    "sourceRevision": "a7e9f6354f557c0ac52b756a602cbeeaafa7b789",
+    "version": "0.1.0-non-custom.10"
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "memory": {
+    "currentFailureIsExplicitJavaReceiptRejection": true,
+    "earlierLowMemoryExit": {
+      "importance": 400,
+      "predatesCurrentPreparation": true,
+      "pssKiB": 38550,
+      "reason": "LOW_MEMORY",
+      "rssKiB": 122608,
+      "timestampEpochMs": 1793647314348
+    },
+    "helperAvailableBytes": 10508005376,
+    "javaHeapPeakObservedBytes": 34722464,
+    "lastPressureLevel": 0,
+    "nativePressureAborts": 0
+  },
+  "ownerWorldPreparationQualified": false,
+  "pythonOutcome": {
+    "completedGeneration": "cdf2eec23f3bea5f7036f57c307ae7c91300fd059bcc716ba65b2733bd0b3d7e",
+    "dataFormatChecksPassed": true,
+    "helperGovernedReadBytes": 31771725012
+  },
+  "scope": "owner-v10-python-success-android-receipt-binding-failure",
+  "sourceDiagnosis": {
+    "androidJsonEscapesForwardSlashes": true,
+    "completedPythonGenerationMustRemainReusable": true,
+    "mandatoryImportMetadataPathsAffected": true,
+    "pythonCanonicalJsonDoesNotEscapeForwardSlashes": true,
+    "shaderReceiptAlsoAffected": true,
+    "toolSelectionPathsAffected": true
+  },
+  "supportBundle": {
+    "bytes": 19410,
+    "filename": "Esteria-support-1793665339812.zip",
+    "sha256": "9ec99df9846ac3b78f50b48de6ea04cad8d31061b611d206d454e1b914be1ed2"
+  },
+  "thorRetryQualified": false
+}

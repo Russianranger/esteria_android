@@ -25,7 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.json.JSONException;
@@ -293,15 +292,7 @@ public final class ShaderSetup {
         if(!names.equals(new HashSet<>(Arrays.asList(expected))))throw new IOException("Shader receipt fields differ");
     }
     private static String canonical(JSONObject value)throws JSONException,IOException {
-        TreeSet<String> keys=new TreeSet<>();value.keys().forEachRemaining(keys::add);StringBuilder out=new StringBuilder("{");
-        for(String key:keys) {
-            if(out.length()>1)out.append(',');out.append(JSONObject.quote(key)).append(':');Object item=value.get(key);
-            if(item instanceof JSONObject)out.append(canonical((JSONObject)item));
-            else if(item instanceof String)out.append(JSONObject.quote((String)item));
-            else if(item instanceof Integer||item instanceof Long)out.append(item);
-            else throw new IOException("Unsupported shader input receipt value");
-        }
-        return out.append('}').toString();
+        return PythonReceiptJson.canonical(value,false);
     }
     private static Path directories(Path root,String relative)throws IOException {
         Path path=root;for(Path part:java.nio.file.Paths.get(relative)) {

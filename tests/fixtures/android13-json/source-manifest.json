@@ -1,0 +1,66 @@
+{
+  "androidExecutionQualified": false,
+  "annotationStubsOnly": true,
+  "files": {
+    "aosp/JSON.java": {
+      "bytes": 3884,
+      "sha256": "a2cc5e4bf64bfe3edd73c6a14409f3200640454051d9947ee79f16a2396a19b1",
+      "url": "https://android.googlesource.com/platform/libcore/+/refs/tags/android-13.0.0_r1/json/src/main/java/org/json/JSON.java"
+    },
+    "aosp/JSONArray.java": {
+      "bytes": 20699,
+      "sha256": "24f10dbe57a9228b8aec8a891355c26285e7fc4e070a2f826a080300e3ca4180",
+      "url": "https://android.googlesource.com/platform/libcore/+/refs/tags/android-13.0.0_r1/json/src/main/java/org/json/JSONArray.java"
+    },
+    "aosp/JSONException.java": {
+      "bytes": 1824,
+      "sha256": "26e10aae9c209dabbc8f15b4156fe9fdc87f5d9d2cb2d2f078b475a61ba0df7d",
+      "url": "https://android.googlesource.com/platform/libcore/+/refs/tags/android-13.0.0_r1/json/src/main/java/org/json/JSONException.java"
+    },
+    "aosp/JSONObject.java": {
+      "bytes": 30517,
+      "sha256": "4d3ce46839c56c6b4ec650aa983ed40fbda9fdf07895372f6c27bcc8cf0cca85",
+      "url": "https://android.googlesource.com/platform/libcore/+/refs/tags/android-13.0.0_r1/json/src/main/java/org/json/JSONObject.java"
+    },
+    "aosp/JSONStringer.java": {
+      "bytes": 13540,
+      "sha256": "8772ac80610cd62e906330152b09864c471a0921f199f4b9d670d98050e3d86c",
+      "url": "https://android.googlesource.com/platform/libcore/+/refs/tags/android-13.0.0_r1/json/src/main/java/org/json/JSONStringer.java"
+    },
+    "aosp/JSONTokener.java": {
+      "bytes": 20899,
+      "sha256": "da4841221e26bcf2f8205905eadb702328d5a45af73cc3318917df73e56f4466",
+      "url": "https://android.googlesource.com/platform/libcore/+/refs/tags/android-13.0.0_r1/json/src/main/java/org/json/JSONTokener.java"
+    },
+    "aosp/JsonReader.java": {
+      "bytes": 38554,
+      "sha256": "c5de3f4eebdab3aab6813f994eaf4d3539f782235c1bfc4cc5e35fe2332ac58f",
+      "url": "https://android.googlesource.com/platform/frameworks/base/+/refs/tags/android-13.0.0_r1/core/java/android/util/JsonReader.java"
+    },
+    "aosp/JsonScope.java": {
+      "bytes": 1675,
+      "sha256": "39125e4a72edbdb184f811ea98259625a869e969d9c7fce47f9a6441c927e80e",
+      "url": "https://android.googlesource.com/platform/frameworks/base/+/refs/tags/android-13.0.0_r1/core/java/android/util/JsonScope.java"
+    },
+    "aosp/JsonToken.java": {
+      "bytes": 2141,
+      "sha256": "05c100694db201b65d3daef4458a940fe47d6a89df86e4d45a739b37cf553cbf",
+      "url": "https://android.googlesource.com/platform/frameworks/base/+/refs/tags/android-13.0.0_r1/core/java/android/util/JsonToken.java"
+    },
+    "aosp/MalformedJsonException.java": {
+      "bytes": 1022,
+      "sha256": "94a997b990db2e9dbdf090fade094dd3470231b0322f0dc4bd054db2446f31ea",
+      "url": "https://android.googlesource.com/platform/frameworks/base/+/refs/tags/android-13.0.0_r1/core/java/android/util/MalformedJsonException.java"
+    },
+    "aosp/StringPool.java": {
+      "bytes": 2518,
+      "sha256": "887d7b8b3587bb0f808ebc989419300a170e126cf950f86889c5ed1b959a52e7",
+      "url": "https://android.googlesource.com/platform/frameworks/base/+/refs/tags/android-13.0.0_r1/core/java/com/android/internal/util/StringPool.java"
+    }
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "scope": "unchanged-android13-json-reader-and-quote-source-for-host-cross-language-fixtures",
+  "sourceFilesUnmodified": true,
+  "tag": "android-13.0.0_r1"
+}
