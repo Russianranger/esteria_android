@@ -2,11 +2,15 @@
 
 This branch builds `io.github.russianranger.esteria.stock` with the explicit `stock-3.3.5a` profile. It retains its own imported client, generated data, local database and saves; it does not migrate or reseed the separate custom app. Preserve the original client installation and installed stock app data.
 
-The current [published stock APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.10/Esteria-Stock-3.3.5a-arm64.apk) is `0.1.0-non-custom.10` / code 10. Exact producer: `a7e9f6354f557c0ac52b756a602cbeeaafa7b789`. Full-provider package/native SQL/Android/output gates are recorded in `runtime/evidence/non-custom-v10-release-gates.json`. Client/server/Eluna pins, the source/debug-qualified v7 data provider and the offline architecture remain unchanged. Component success does not qualify Thor world entry.
+The current [published stock APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.11/Esteria-Stock-3.3.5a-arm64.apk) is `0.1.0-non-custom.11` / code 11. Exact producer: `22ef2c726abbd4414c88be19cae921a70d4535c2`. Full-provider package/native SQL/Android/output gates are recorded in `runtime/evidence/non-custom-v11-release-gates.json`. Client/server/Eluna pins, the source/debug-qualified v7 data provider and the offline architecture remain unchanged. Component success does not qualify Thor world entry.
 
-Use `.github/workflows/android-local-game-profile.yml` with every verified production provider. This checkout defaults to code 10 for push/dispatch builds; select a higher code before preparing a new signed release. The full unsigned release artifact must belong to the exact successful source commit. A plain launcher/debug build is not a replacement for this package.
+Use `.github/workflows/android-local-game-profile.yml` with every verified production provider. This checkout defaults to code 11 for push/dispatch builds; select a higher code before preparing a new signed release. The full unsigned release artifact must belong to the exact successful source commit. A plain launcher/debug build is not a replacement for this package.
 
 Current delivery uses the [detached public signing transport](runtime/releases/non-custom/README.md): sign the exact reviewed unsigned APK with the persistent stock certificate, retain its public signature recipe and exact successful package/native SQL selection, then publish additively through `publish-non-custom-detached.yml`. Private keys/passwords stay outside Git. Optional configured CI signing remains supported; missing persistent secrets must fail rather than substitute a temporary identity. `tools/sign_android_apk.py --lock app/stock-signing.lock.json` requires the exact previous public stock APK for an update. Advance `lastPublished` only after complete anonymous asset readback and SDK signature/manifest verification. Existing tags/assets and old transports are never overwritten.
+
+V11 fixes the Java readers of Python-produced data/shader receipts. Python uses sorted compact JSON with ASCII escapes and literal forward slashes; Android `JSONObject.quote` is not that byte contract. `PythonReceiptJson` supplies matching quoting and Unicode code-point key ordering while retaining the existing accepted types and all source/import/tool/helper checks. Do not change production Python helpers or generation keys to fix a Java-only receipt mismatch. Their unchanged bytes permit checked reuse of completed v10 output.
+
+Run `python3 -m unittest tests.test_python_receipt_binding -v` with JDK 17 for the five source-backed host cross-language checks. They compile eleven exact Android 13 JSON/reader classes and execute production Python coordinators with synthetic tool/compiler boundaries. The distinct Android `PythonReceiptBindingTest` executes both real Java consumers against those Python-produced fixtures and checks canonical vectors and matching-hash negative cases. These fixtures are test-only and supply no owner game assets or GPU/world qualification.
 
 V10 distinguishes stock client disk layouts from server SQL layouts. Only ten named single-float GT tables and packed PowerDisplay gain the source-backed stock allowance; indexed GT, other DBCs, declared lengths and custom/continuation inputs remain strict. The server's eleven GT SQL tables must retain canonical source columns and nonempty rows across restart. PowerDisplay's source SQL table legitimately has zero rows; its original packed client file must load natively. No rows or client payload bytes are fabricated.
 
@@ -363,8 +367,8 @@ one unsigned APK and three bounded JSON proofs, with combined input bytes below
 is published with the persistent certificate and baseline1; content/device
 installation and gameplay qualification remain separate.
 
-`workflow_dispatch` accepts `build_version_code` (default10 in this checkout; positive and at most
-2,100,000,000). Push builds use10. After published v10, explicitly choose a higher
+`workflow_dispatch` accepts `build_version_code` (default11 in this checkout; positive and at most
+2,100,000,000). Push builds use11. After published v11, explicitly choose a higher
 code for a new update and update the reviewed version/transport inputs together.
 The release build explicitly clears signing environment variables and performs
 no private-key operation. Sign the reviewed `app-release-unsigned.apk` separately

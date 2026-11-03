@@ -1,6 +1,7 @@
 {
   "allPackagedRuntimeHelpersAndManifestsIdenticalToV10": true,
   "allRequiredSourceCiPassed": true,
+  "allSixPublicAssetsReadBack": true,
   "allTaskSigningTemporaryDirectoriesRemoved": true,
   "android13": {
     "all37ArtifactMembersRead": true,
@@ -80,6 +81,7 @@
     "testsSkipped": 101
   },
   "exactPublicSignatureReconstructionVerified": true,
+  "finalPublicationGuardTestsPassed": 18,
   "formatVersion": 1,
   "gameplayQualified": false,
   "localValidation": {
@@ -189,8 +191,34 @@
   "persistentSigningVerified": true,
   "privateSigningTemporaryRemoved": true,
   "productionPythonReceiptFixtureAssetsExcluded": true,
-  "publicDownloadVerificationPending": true,
-  "publisherPassed": false,
+  "publicDownloadVerificationPending": false,
+  "publicReadbackEvidence": "runtime/evidence/non-custom-v11-public-apk-readback.json",
+  "publisherJobId": 125659464379,
+  "publisherPassed": true,
+  "publisherRevision": "c174d6f8d9bb4a652c816a5751c99453be35c2c3",
+  "publisherRunId": 41557382781,
+  "publisherValidationCiPassed": true,
+  "publisherValidationRuns": [
+    {
+      "conclusion": "success",
+      "head_sha": "c174d6f8d9bb4a652c816a5751c99453be35c2c3",
+      "html_url": "https://github.com/Russianranger/esteria_android/actions/runs/41557382847",
+      "id": 41557382847,
+      "jobId": 125659464196,
+      "name": "Integration tooling behavior",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "head_sha": "c174d6f8d9bb4a652c816a5751c99453be35c2c3",
+      "html_url": "https://github.com/Russianranger/esteria_android/actions/runs/41557382782",
+      "id": 41557382782,
+      "jobId": 125659463983,
+      "name": "Android launcher and host behavior checks",
+      "status": "completed"
+    }
+  ],
+  "releaseId": 432139507,
   "runtimeDataAdapter": {
     "assetPath": "assets/server-data/server_data_generation.py",
     "bytes": 56794,

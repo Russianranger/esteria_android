@@ -1,10 +1,10 @@
 # Esteria Android non-custom implementation plan
 
-## Current checkpoint: v10
+## Current checkpoint: v11
 
-The [published v10 update](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.10/Esteria-Stock-3.3.5a-arm64.apk) addresses the post-navigation stock DBC preflight contract while retaining reviewed v9 navigation/checkpoints and the completed import. Ten source-backed GT disk variants use the pinned server's SQL path; packed PowerDisplay uses its native disk reader. V9 omitted the exact offending filename, so the diagnosis is source-backed rather than an inspection of unavailable owner outputs.
+The [published v11 update](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.11/Esteria-Stock-3.3.5a-arm64.apk) fixes Python/Android receipt fingerprint compatibility after completed world-file verification. It aligns both data and shader consumers while preserving all production Python helper bytes and valid completed v10 data. Source/import/tool/helper bindings and full cached-file verification remain required; no reimport or new native extraction is required for matching valid completed output.
 
-Complete provider packaging, native SQL backing/restart, native extractor output, pinned C++ format fixtures, Android 13 components and public APK/signature readback passed. The next device gate is to install over v9, keep data, retry preparation with the same locale, then complete shaders/SQL and the ordinary local Human Warrior/world/persistence/offline procedure below. Source pins, stock acceptance and deferred custom/bot scope remain unchanged. See [STATUS.md](STATUS.md), [HANDOFF.md](HANDOFF.md) and [NON-CUSTOM-TESTING.md](NON-CUSTOM-TESTING.md) for exact identities and the consolidated retry.
+Complete ARM64 packaging, native SQL/output, actual Python-to-Android data/shader receipt tests and public signed-APK readback passed. The next device gate remains the same: install over v10, keep all data, retry preparation with the same locale, then complete the ordinary Human Warrior/world/persistence/offline procedure below. Source pins, memory controls, stock acceptance and deferred custom/bot scope remain unchanged. See [STATUS.md](STATUS.md), [HANDOFF.md](HANDOFF.md) and [NON-CUSTOM-TESTING.md](NON-CUSTOM-TESTING.md).
 
 ## Current objective
 

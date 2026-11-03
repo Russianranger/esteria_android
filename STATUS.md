@@ -1,10 +1,24 @@
-# Esteria Stock v11 — Python/Android receipt fix in validation
+# Esteria Stock v11 — completed-data receipt update published
 
-The v10 owner attempt completed Python world-data validation and activated generation `cdf2eec23f3bea5f7036f57c307ae7c91300fd059bcc716ba65b2733bd0b3d7e`, then Android rejected its receipt with `Prepared data source/import selection differs`. The current attempt took 2,513 seconds; the report separately records an earlier low-memory exit. Current pressure was zero and Java heap peak was about 34.7 MB.
+[Signed ARM64 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.11/Esteria-Stock-3.3.5a-arm64.apk) · [Testing procedure](NON-CUSTOM-TESTING.md).
 
-Android JSON serialization escapes forward slashes while Python canonical receipt JSON does not. Mandatory import ancestry keys and data-tool paths expose this mismatch. The same formatter is used by shader receipt verification. V11 aligns both Java consumers with the existing Python bytes and keeps the six data helpers, shader helpers and all source/native pins unchanged, allowing completed v10 output to be verified and reused. No reimport or data deletion is required.
+Install v11 over the existing `io.github.russianranger.esteria.stock` app. Keep the completed import, world/navigation output, app data, databases and saves. Use the same locale and **Balanced** speed, then retry **Prepare local runtime / world**. Matching completed v10 data receives full byte verification before reuse; unchanged valid output does not require another extraction. Hashing still takes time. Do not uninstall, clear storage, reimport or delete the completed output. Export support before another retry after failure.
 
-Cross-language regressions, full-provider packaging, native/Android source gates and signed public APK readback remain pending. V10 remains the published baseline until all release checks complete.
+The v10 owner attempt passed Python world-data checks and activated generation `cdf2eec23f3bea5f7036f57c307ae7c91300fd059bcc716ba65b2733bd0b3d7e`, then Android returned `Prepared data source/import selection differs` after 2,513 seconds. Android JSON escaped forward slashes in mandatory import-ancestry keys and tool paths, while Python generated the fingerprint with literal slashes. V11 fixes that byte contract in both completed-data and shader receipt consumers. Source/import/tool/helper checks remain enforced.
+
+The report separately records a low-memory exit about 4h18m before this attempt, at Android cached-process importance 400. No operation is logged at that timestamp and its trigger is unknown. The reported preparation ended with an explicit Java exception, pressure zero and about 34.7 MB Java heap use. Existing memory guards and speed controls remain active.
+
+All production Python helpers remain byte-identical to v10. The six-file data helper generation remains `c911baddd7c49fa21fa4a3bc022d75c69fa66daddde3a6970129cf652dad18ff`; this Java-only compatibility fix preserves the completed generation key. Client/server/Eluna pins, native providers, one-worker extraction and the offline architecture are unchanged.
+
+Producer `22ef2c726abbd4414c88be19cae921a70d4535c2`; publisher `c174d6f8d9bb4a652c816a5751c99453be35c2c3`, run/job `41557382781` / `125659464379`. Release `432139507`, APK asset `703775893`. APK 336,837,376 bytes, SHA-256 `80bb686f779878d9c9dd459eb642a45fabe55ffb59d2a4d94f0964520e531a80`; certificate `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`.
+
+All six exact-producer gates passed: complete ARM64 package, native SQL, Android 13, launcher/core/lint, tooling and shipped ARM64 extractor output. Android readback verified all 37 artifact members and 60 unique source identities, preserving the earlier import/update/helper/shader/SAF/control checks and adding three Python-produced receipt tests. Those new tests exercise both Java consumers and canonical byte vectors through Android's own JSON implementation. Native SQL backing/restart and the unchanged native extractor proof retain their separate component scopes.
+
+All six public assets passed complete anonymous length/hash readback. The exact producer tag, SDK v2/v3 signatures, persistent certificate, version 11 manifest and equality with the locally signed APK passed. Update-11 receipts retain their baseline-10 binding. Future publication requires a higher version code and the exact public v11 APK; preserve historical releases and transports. Publisher validation jobs also passed.
+
+Actual Thor shader completion, SQL preparation, normal local client/world startup, controls/audio, persistence and offline relaunch still require the owner retry. Host synthetic formats, native component checks, emulator receipts and package/signature checks do not qualify those device results.
+
+Records: `runtime/releases/non-custom-v0.1.0-non-custom.11.json`, `runtime/evidence/non-custom-v11-public-apk-readback.json`, `non-custom-v11-release-gates.json`, `non-custom-v11-owner-binding.json`, `non-custom-v11-canonical-json-audit.json`, `non-custom-v11-python-receipt-host.json`, `non-custom-v11-host-validation.json`, `non-custom-v11-native-sql.json`, `non-custom-v11-native-output.json` and `non-custom-v11-android13.json`.
 
 ## Published v10 baseline — historical
 
