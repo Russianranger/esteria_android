@@ -127,6 +127,8 @@ class StatQualification(unittest.TestCase):
             javaNioMetadata=dict(scope='android-java-nio-private-cache-metadata',fileKeyAvailable=True,fileKeyStable=True,
                 unixLinkCount=1,privateFileAndDirectoryPermissions=True,nanosecondMtimePreserved=True,
                 sameSizeRestoredMtimeChangedCtime=True,replacementChangedFileKey=True,noFollowSymlinkOpenRejected=True,
+                requestedMtimeNs='1700000000123456789',initialMtimeNs='1700000000123456789',restoredMtimeNs='1700000000123456789',
+                ctimeBeforeNs='1700000000111111111',ctimeAfterNs='1700000000222222222',
                 productionCacheEnabled=False),
             mutation=self.mutation,relaunch=self.relaunch,productionCacheEnabled=False,arm64Qualified=False,
             hardwareQualified=False,unchangedMetadataCorruptionDetectionClaimed=False,gameplayQualified=False)
@@ -143,16 +145,34 @@ class StatQualification(unittest.TestCase):
 
     def test_guest_success_cannot_substitute_for_android_java_metadata_capabilities(self):
         original=self.receipt()
-        for field in ('fileKeyAvailable','fileKeyStable','privateFileAndDirectoryPermissions','nanosecondMtimePreserved',
-                'sameSizeRestoredMtimeChangedCtime','replacementChangedFileKey','noFollowSymlinkOpenRejected'):
+        for field in ('fileKeyAvailable','fileKeyStable','privateFileAndDirectoryPermissions',
+                'replacementChangedFileKey','noFollowSymlinkOpenRejected'):
             changed=copy.deepcopy(original);changed['javaNioMetadata'][field]=False
-            with self.subTest(field=field),self.assertRaisesRegex(ValueError,'android-java-nio'):
-                stat_probe.validate_receipt(changed,'a'*40,'host-synthetic-admission-only',{}, {})
+            with self.subTest(field=field):
+                result=stat_probe.validate_receipt(changed,'a'*40,'host-synthetic-admission-only',{}, {})
+                self.assertTrue(result['androidJavaNioMetadataObservationsCompleted'])
+                self.assertFalse(result['androidJavaNioMetadataQualified'])
+                self.assertEqual(result['androidJavaNioUnqualifiedCapabilities'],[field])
         for value in (None,{},dict(original['javaNioMetadata'],unixLinkCount=True),
                 dict(original['javaNioMetadata'],unixLinkCount=2),dict(original['javaNioMetadata'],productionCacheEnabled=True)):
             changed=copy.deepcopy(original);changed['javaNioMetadata']=value
             with self.subTest(value=value),self.assertRaisesRegex(ValueError,'android-java-nio'):
                 stat_probe.validate_receipt(changed,'a'*40,'host-synthetic-admission-only',{}, {})
+
+    def test_java_seconds_precision_preserves_observations_without_qualifying_cache(self):
+        changed=self.receipt();java=changed['javaNioMetadata']
+        java.update(initialMtimeNs='1700000000000000000',restoredMtimeNs='1700000000000000000',
+            ctimeBeforeNs='1700000000000000000',ctimeAfterNs='1700000000000000000',
+            nanosecondMtimePreserved=False,sameSizeRestoredMtimeChangedCtime=False)
+        result=stat_probe.validate_receipt(changed,'a'*40,'host-synthetic-admission-only',{}, {})
+        self.assertTrue(result['androidJavaNioMetadataObservationsCompleted'])
+        self.assertFalse(result['androidJavaNioMetadataQualified']);self.assertFalse(result['productionCacheEnabled'])
+        self.assertEqual(result['androidJavaNioUnqualifiedCapabilities'],['nanosecondMtimePreserved','sameSizeRestoredMtimeChangedCtime'])
+        for field,value in (('nanosecondMtimePreserved',True),('sameSizeRestoredMtimeChangedCtime',True),
+                ('ctimeAfterNs',123),('initialMtimeNs','-1'),('restoredMtimeNs','01700000000000000000')):
+            invalid=copy.deepcopy(changed);invalid['javaNioMetadata'][field]=value
+            with self.subTest(field=field),self.assertRaisesRegex(ValueError,'android-java-nio'):
+                stat_probe.validate_receipt(invalid,'a'*40,'host-synthetic-admission-only',{}, {})
 
 
 class StatWorkflowCleanup(unittest.TestCase):

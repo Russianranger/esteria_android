@@ -91,36 +91,47 @@ public final class ProotStatMetadataTest {
         Path directory=directory(root.resolve("java-metadata")),file=directory.resolve("regular");
         Files.write(file,"AAAAAAAA".getBytes(StandardCharsets.US_ASCII),StandardOpenOption.CREATE_NEW);
         Files.setPosixFilePermissions(file,PosixFilePermissions.fromString("rw-------"));
-        assertEquals("rwx------",PosixFilePermissions.toString(Files.getPosixFilePermissions(directory,LinkOption.NOFOLLOW_LINKS)));
-        assertEquals("rw-------",PosixFilePermissions.toString(Files.getPosixFilePermissions(file,LinkOption.NOFOLLOW_LINKS)));
+        boolean privatePermissions="rwx------".equals(PosixFilePermissions.toString(Files.getPosixFilePermissions(directory,LinkOption.NOFOLLOW_LINKS)))&&
+            "rw-------".equals(PosixFilePermissions.toString(Files.getPosixFilePermissions(file,LinkOption.NOFOLLOW_LINKS)));
         BasicFileAttributes first=Files.readAttributes(file,BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS);
-        assertTrue(first.isRegularFile());assertEquals(8,first.size());assertNotNull("Android NIO fileKey is required",first.fileKey());
-        assertEquals(first.fileKey(),Files.readAttributes(file,BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS).fileKey());
+        assertTrue(first.isRegularFile());assertEquals(8,first.size());
+        boolean fileKeyAvailable=first.fileKey()!=null,fileKeyStable=fileKeyAvailable&&
+            first.fileKey().equals(Files.readAttributes(file,BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS).fileKey());
         Object links=Files.getAttribute(file,"unix:nlink",LinkOption.NOFOLLOW_LINKS);
         assertTrue("Android NIO unix:nlink must be numeric",links instanceof Number);assertEquals(1,((Number)links).longValue());
         FileTime fixed=FileTime.from(1700000000123456789L,TimeUnit.NANOSECONDS);
         Files.setLastModifiedTime(file,fixed);
-        assertEquals(fixed,Files.getLastModifiedTime(file,LinkOption.NOFOLLOW_LINKS));
+        // Android13 NIO can expose seconds even while the guest sees nanos.
+        // Record failed capability and continue the other real observations.
+        FileTime initialMtime=Files.getLastModifiedTime(file,LinkOption.NOFOLLOW_LINKS);
         Object before=Files.getAttribute(file,"unix:ctime",LinkOption.NOFOLLOW_LINKS);
         assertTrue("Android NIO unix:ctime must be a FileTime",before instanceof FileTime);
         Thread.sleep(2);Files.write(file,"BBBBBBBB".getBytes(StandardCharsets.US_ASCII));Files.setLastModifiedTime(file,fixed);
-        assertEquals(8,Files.size(file));assertEquals(fixed,Files.getLastModifiedTime(file,LinkOption.NOFOLLOW_LINKS));
-        assertNotEquals("A same-size restored-mtime edit must expose changed ctime",before,Files.getAttribute(file,"unix:ctime",LinkOption.NOFOLLOW_LINKS));
-        assertEquals(first.fileKey(),Files.readAttributes(file,BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS).fileKey());
+        assertEquals(8,Files.size(file));FileTime restoredMtime=Files.getLastModifiedTime(file,LinkOption.NOFOLLOW_LINKS);
+        Object after=Files.getAttribute(file,"unix:ctime",LinkOption.NOFOLLOW_LINKS);
+        assertTrue("Android NIO unix:ctime must remain a FileTime",after instanceof FileTime);
+        fileKeyStable&=fileKeyAvailable&&first.fileKey().equals(Files.readAttributes(file,BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS).fileKey());
+        boolean nanoMtime=fixed.equals(initialMtime)&&fixed.equals(restoredMtime);
+        boolean ctimeChanged=initialMtime.equals(restoredMtime)&&!before.equals(after);
         Path replacement=directory.resolve("replacement");Files.write(replacement,Files.readAllBytes(file),StandardOpenOption.CREATE_NEW);
         Files.setPosixFilePermissions(replacement,PosixFilePermissions.fromString("rw-------"));Files.setLastModifiedTime(replacement,fixed);
         Files.move(replacement,file,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);
-        assertEquals(fixed,Files.getLastModifiedTime(file,LinkOption.NOFOLLOW_LINKS));
-        assertNotEquals("Same-content replacement must expose a new fileKey",first.fileKey(),Files.readAttributes(file,BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS).fileKey());
+        Object replacementKey=Files.readAttributes(file,BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS).fileKey();
+        boolean replacementChanged=fileKeyAvailable&&replacementKey!=null&&!first.fileKey().equals(replacementKey);
         Path symbolic=directory.resolve("symbolic");Files.createSymbolicLink(symbolic,file);
         assertTrue(Files.readAttributes(symbolic,BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS).isSymbolicLink());
         boolean refused=false;try(InputStream ignored=Files.newInputStream(symbolic,LinkOption.NOFOLLOW_LINKS)){ }
-        catch(IOException expected){refused=true;}assertTrue("Java NIO must reject a no-follow symlink open",refused);
+        catch(IOException expected){refused=true;}
         return new JSONObject().put("scope","android-java-nio-private-cache-metadata")
-            .put("fileKeyAvailable",true).put("fileKeyStable",true).put("unixLinkCount",1)
-            .put("privateFileAndDirectoryPermissions",true).put("nanosecondMtimePreserved",true)
-            .put("sameSizeRestoredMtimeChangedCtime",true).put("replacementChangedFileKey",true)
-            .put("noFollowSymlinkOpenRejected",true).put("productionCacheEnabled",false);
+            .put("fileKeyAvailable",fileKeyAvailable).put("fileKeyStable",fileKeyStable).put("unixLinkCount",1)
+            .put("privateFileAndDirectoryPermissions",privatePermissions).put("nanosecondMtimePreserved",nanoMtime)
+            .put("sameSizeRestoredMtimeChangedCtime",ctimeChanged).put("replacementChangedFileKey",replacementChanged)
+            .put("requestedMtimeNs",Long.toString(fixed.to(TimeUnit.NANOSECONDS)))
+            .put("initialMtimeNs",Long.toString(initialMtime.to(TimeUnit.NANOSECONDS)))
+            .put("restoredMtimeNs",Long.toString(restoredMtime.to(TimeUnit.NANOSECONDS)))
+            .put("ctimeBeforeNs",Long.toString(((FileTime)before).to(TimeUnit.NANOSECONDS)))
+            .put("ctimeAfterNs",Long.toString(((FileTime)after).to(TimeUnit.NANOSECONDS)))
+            .put("noFollowSymlinkOpenRejected",refused).put("productionCacheEnabled",false);
     }
     @Test public void statTuplesSurviveAliasesAndExposeMutations()throws Exception {
         Context context=InstrumentationRegistry.getInstrumentation().getTargetContext(),testContext=InstrumentationRegistry.getInstrumentation().getContext();

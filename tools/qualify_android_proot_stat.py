@@ -121,11 +121,20 @@ def validate_receipt(value,revision,fingerprint,build,stat_build):
     java=value.get('javaNioMetadata')
     flags={'fileKeyAvailable','fileKeyStable','privateFileAndDirectoryPermissions','nanosecondMtimePreserved',
         'sameSizeRestoredMtimeChangedCtime','replacementChangedFileKey','noFollowSymlinkOpenRejected'}
-    require(type(java) is dict and set(java)==flags|{'scope','unixLinkCount','productionCacheEnabled'} and
-        java.get('scope')=='android-java-nio-private-cache-metadata' and all(java.get(key) is True for key in flags) and
+    times={'requestedMtimeNs','initialMtimeNs','restoredMtimeNs','ctimeBeforeNs','ctimeAfterNs'}
+    require(type(java) is dict and set(java)==flags|times|{'scope','unixLinkCount','productionCacheEnabled'} and
+        java.get('scope')=='android-java-nio-private-cache-metadata' and all(type(java.get(key)) is bool for key in flags) and
         type(java.get('unixLinkCount')) is int and java['unixLinkCount']==1 and java.get('productionCacheEnabled') is False,
-        'android-java-nio-private-cache-capability-unqualified')
-    return dict(validate_guests(value['mutation'],value['relaunch']),androidJavaNioMetadataQualified=True)
+        'android-java-nio-private-cache-observation-schema')
+    require(all(type(java[key]) is str and re.fullmatch(r'0|[1-9][0-9]{0,18}',java[key]) is not None and
+        int(java[key])<(1<<63) for key in times) and java['requestedMtimeNs']=='1700000000123456789',
+        'android-java-nio-time-observation-schema')
+    require(java['nanosecondMtimePreserved']==(java['requestedMtimeNs']==java['initialMtimeNs']==java['restoredMtimeNs']) and
+        java['sameSizeRestoredMtimeChangedCtime']==(java['initialMtimeNs']==java['restoredMtimeNs'] and
+        java['ctimeBeforeNs']!=java['ctimeAfterNs']),'android-java-nio-time-claim-mismatch')
+    return dict(validate_guests(value['mutation'],value['relaunch']),androidJavaNioMetadataObservationsCompleted=True,
+        androidJavaNioMetadataQualified=all(java[key] for key in flags),
+        androidJavaNioUnqualifiedCapabilities=sorted(key for key in flags if not java[key]))
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
@@ -170,7 +179,7 @@ def main():
         # An explicit platform denial is useful evidence, never a successful
         # hardlink mutation. Keep the overall qualification flag false until
         # every requested mutation has actually been exercised and reviewed.
-        report['androidX64StatQualified']=report['checks']['linkMutationQualified']
+        report['androidX64StatQualified']=report['checks']['linkMutationQualified'] and report['checks']['androidJavaNioMetadataQualified']
     except Exception as error:failure=error;report['error']=str(error)
     finally:
         if installed:
