@@ -68,6 +68,14 @@ def stage(args):
                  'Do not uninstall, clear storage,\n'
                  'reimport or delete completed navigation output. Follow NON-CUSTOM-TESTING.md;\n'
                  'export support before another attempt after a failure.')
+    if signed['versionCode'] == 13:
+        setup = ('Install over the existing Esteria Stock app. Keep the completed import, world data,\n'
+                 'databases, configuration and saves. Select the same locale used for preparation.\n'
+                 'After the v12 shader failure, choose **Repair local component → Shaders**. Once it\n'
+                 'finishes, choose **Start local game**. If it reports a missing database, use\n'
+                 '**Repair local component → Database setup**, then start the local game again.\n'
+                 'If a stage fails, wait for cleanup, tap **Export support bundle**, choose a\n'
+                 'destination and tap **Save**. Send the whole ZIP before retrying.')
     notes = f'''Esteria Stock 3.3.5a / non-custom {signed['versionName']}
 
 Separate Android package `{signing.STOCK_PACKAGE}`; installs beside the custom app.
@@ -280,6 +288,16 @@ normal local login, Human Warrior world entry, saving and three cold offline
 relaunches still require execution with the owner's retained client and device.
 Host fixtures, component tests and a successful package build do not prove those
 stages. Custom content and MPQ authoring remain deferred until stock acceptance.
+'''
+    if signed['versionCode'] == 13:
+        notes += '''
+V12 accepted the retained Thor world generation and reached shader translation.
+Both initial setup and named shader repair stopped in the reader for Data/patch.MPQ
+with “MPQ delete markers are unsupported”. V13 handles MPQ deletion markers
+during shader selection. The completed world generation remains selectable.
+
+Confirmation on the imported Thor MPQs, a graphical login frame, world entry,
+saving and offline relaunches still require device execution.
 '''
     (args.output / 'RELEASE-NOTES.md').write_text(notes)
     return result

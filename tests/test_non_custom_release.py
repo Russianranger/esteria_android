@@ -169,6 +169,19 @@ class StockReleaseBoundary(unittest.TestCase):
             self.assertIs(result[key], False)
         self.assertEqual((self.args.output / 'Esteria-Stock-3.3.5a-arm64.apk').read_bytes(), self.apk.read_bytes())
 
+    def test_v13_staging_directs_retained_install_to_named_shader_repair(self):
+        self.receipt['signedApk'].update(versionCode=13, versionName='0.1.0-non-custom.13')
+        self.write()
+        result = release.stage(self.args)
+        notes = (self.args.output / 'RELEASE-NOTES.md').read_text()
+        self.assertEqual(result['tag'], 'non-custom-v0.1.0-non-custom.13')
+        self.assertIn('Repair local component → Shaders', notes)
+        self.assertIn('Repair local component → Database setup', notes)
+        self.assertIn('MPQ delete markers are unsupported', notes)
+        self.assertIn('Export support bundle', notes)
+        self.assertNotIn('Import your complete ChromieCraft client', notes)
+        self.assertFalse(result['thorQualified'])
+
     def test_existing_release_output_is_never_overwritten(self):
         self.args.output.mkdir(); marker = self.args.output / 'old-apk'; marker.write_text('preserve')
         with self.assertRaisesRegex(ValueError, 'release-output-already-exists'):

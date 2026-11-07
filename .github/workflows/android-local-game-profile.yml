@@ -68,7 +68,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   selection:
-    if: github.event_name != 'push' || !contains(github.event.head_commit.message, '[publish detached non-custom]')
+    if: github.event_name != 'push' || !(contains(github.event.head_commit.message, '[publish detached non-custom]') || contains(github.event.head_commit.message, '[stage detached non-custom]'))
     runs-on: ubuntu-24.04
     outputs:
       selected: ${{ steps.profile.outputs.selected }}
