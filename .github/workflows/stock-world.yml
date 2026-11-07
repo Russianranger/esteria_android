@@ -24,6 +24,9 @@ jobs:
           test "$(uname -m)" = aarch64
           stage=$(mktemp -d "$RUNNER_TEMP/stock-world-XXXXXXXX")
           echo "WORLD_QA=$stage" >> "$GITHUB_ENV"
+          # Share the real runner budget across acquisition, import, generation and admission.
+          # Keep ten minutes of the 355-minute grant for collecting receipts and private cleanup.
+          echo "WORLD_QA_UNTIL=$(($(date +%s) + 345 * 60))" >> "$GITHUB_ENV"
           mkdir "$stage/derived" "$stage/state" "$stage/evidence"
           if [ "$(df --output=avail -B1 "$stage" | tail -1)" -lt 42000000000 ]; then
             sudo rm -rf /usr/local/lib/android/sdk /usr/share/dotnet /opt/ghc
@@ -33,11 +36,17 @@ jobs:
           docker import --platform linux/arm64 "$stage/package/server-runtime.tar.gz" esteria-world:packaged
       - name: Verify the official complete ZIP and run the actual build-12340 Java importer
         run: |
-          python3 -m tools.qualify_stock_world import --work "$WORLD_QA/import" --evidence "$WORLD_QA/evidence/import.json" \
+          remaining=$((WORLD_QA_UNTIL - $(date +%s)))
+          test "$remaining" -gt 0
+          timeout --kill-after=30s "${remaining}s" python3 -m tools.qualify_stock_world import --acquire-until "$WORLD_QA_UNTIL" \
+            --work "$WORLD_QA/import" --evidence "$WORLD_QA/evidence/import.json" \
             2>"$WORLD_QA/import-private.log"
       - name: Generate all stock DBC, map, camera, VMap and MMap data without network access
         run: |
-          docker run --rm --init --network none --read-only --tmpfs /tmp:rw,nosuid,nodev,size=64m \
+          remaining=$((WORLD_QA_UNTIL - $(date +%s)))
+          test "$remaining" -gt 0
+          timeout --kill-after=30s "${remaining}s" \
+            docker run --rm --init --network none --read-only --tmpfs /tmp:rw,nosuid,nodev,size=64m \
             --env PYTHONDONTWRITEBYTECODE=1 \
             --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
             --mount "type=bind,src=$WORLD_QA/package,dst=/package,readonly" \
@@ -50,7 +59,10 @@ jobs:
         run: |
           generation=$(sudo cat "$WORLD_QA/derived/current")
           [[ "$generation" =~ ^[0-9a-f]{64}$ ]]
-          docker run --rm --init --network none --read-only --tmpfs /tmp:rw,nosuid,nodev,size=64m \
+          remaining=$((WORLD_QA_UNTIL - $(date +%s)))
+          test "$remaining" -gt 0
+          timeout --kill-after=30s "${remaining}s" \
+            docker run --rm --init --network none --read-only --tmpfs /tmp:rw,nosuid,nodev,size=64m \
             --env PYTHONDONTWRITEBYTECODE=1 \
             --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
             --mount "type=bind,src=$WORLD_QA/package,dst=/package,readonly" \

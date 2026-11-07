@@ -50,7 +50,10 @@ def require(condition, message):
 
 def torrent_pieces():
     with urllib.request.urlopen(TORRENT, timeout=60) as response:
-        raw = response.read(256 << 10)
+        return checked_torrent_pieces(response.read(256 << 10))
+
+
+def checked_torrent_pieces(raw):
     require(hashlib.sha256(raw).hexdigest() == TORRENT_HASH, 'official torrent digest changed')
     field = re.search(rb'6:pieces([0-9]+):', raw)
     length = int(field[1])
