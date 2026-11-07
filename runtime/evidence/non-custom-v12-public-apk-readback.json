@@ -1,0 +1,63 @@
+{
+  "appRevision": "7f556ff7bec24cdb6472efb0af7b319116dfae4f",
+  "assets": [
+    {
+      "assetId": 719252553,
+      "bytes": 336849664,
+      "completeAnonymousReadback": true,
+      "name": "Esteria-Stock-3.3.5a-arm64.apk",
+      "sha256": "255d3157f0b251b810b9087bbe2c12937927d8cc1a1e0c99cda346716f259fd7"
+    },
+    {
+      "assetId": 719253043,
+      "bytes": 4783,
+      "completeAnonymousReadback": true,
+      "name": "NON-CUSTOM-TESTING.md",
+      "sha256": "02bec4d1ad52312e8c316f7b4ac45c92fffeb481b22ee9ade8172ea71fdf5b09"
+    },
+    {
+      "assetId": 719253031,
+      "bytes": 19234,
+      "completeAnonymousReadback": true,
+      "name": "publication-evidence.json",
+      "sha256": "1e866e411baa6ba03d140cf90a25b03473f8511c638d1d7e6f09d024da2371a8"
+    },
+    {
+      "assetId": 719252992,
+      "bytes": 2535,
+      "completeAnonymousReadback": true,
+      "name": "release.json",
+      "sha256": "5aed6fa2ace33e6397a2aa598ec88527ea388cb634142cbb4784227989b1fb27"
+    },
+    {
+      "assetId": 719252972,
+      "bytes": 97,
+      "completeAnonymousReadback": true,
+      "name": "SHA256SUMS",
+      "sha256": "edf0003e39340b120715a5c9d152e58308f0681c592df0d1dc7ae84871fd2184"
+    },
+    {
+      "assetId": 719253019,
+      "bytes": 1053,
+      "completeAnonymousReadback": true,
+      "name": "signing-receipt.json",
+      "sha256": "0badbd7b53d226ba9d38436ad139d6f633534415af943f2190b7f56430d28d29"
+    }
+  ],
+  "failedCiPublicationRuns": [
+    42325350302,
+    42325605341
+  ],
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "persistentCertificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+  "publicationRoute": "authorized GitHub browser; CI staging and independent SDK verification passed; CI POST release creation returned HTTP403",
+  "releaseId": 437249264,
+  "releaseUrl": "https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.12",
+  "scope": "published-stock-v12-full-asset-byte-readback",
+  "sdkManifestVerified": true,
+  "sdkV2AndV3SignatureVerified": true,
+  "tag": "non-custom-v0.1.0-non-custom.12",
+  "tagTargetExactlyMatchesProducer": true,
+  "thorQualified": false
+}

@@ -1,0 +1,110 @@
+{
+  "androidX64StatObservationsCompleted": true,
+  "androidX64StatQualified": false,
+  "arm64Qualified": false,
+  "checks": {
+    "aliasAndRawSyscallTuplesMatched": true,
+    "androidJavaNioMetadataObservationsCompleted": true,
+    "androidJavaNioMetadataQualified": false,
+    "androidJavaNioUnqualifiedCapabilities": [
+      "nanosecondMtimePreserved",
+      "sameSizeRestoredMtimeChangedCtime"
+    ],
+    "arm64Qualified": false,
+    "directoryAddDeleteWithRestoredMtimeChangedCtime": true,
+    "finalNodes": 8,
+    "gameplayQualified": false,
+    "hardlinkAddDeleteChangedLinkCountAndCtime": false,
+    "hardlinkMutationDeniedAndUnchanged": true,
+    "hardlinkOperation": "blocked-eacces",
+    "leafOnlySymlinkProtectionClaimed": false,
+    "linkAttemptErrno": 13,
+    "linkAttemptOutcome": "denied",
+    "linkDenialObserved": true,
+    "linkMutationQualified": false,
+    "modeChangesVisible": true,
+    "nanosecondMtimePreserved": true,
+    "observations": 15,
+    "productionCacheEnabled": false,
+    "reapedGuestRelaunchTuplesStable": true,
+    "sameContentsReplacementChangedInode": true,
+    "sameLengthWriteRestoredMtimeChangedCtime": true,
+    "symlinkAncestorVisible": true,
+    "terminalSymlinkVisible": true,
+    "unchangedMetadataCorruptionDetectionClaimed": false
+  },
+  "cleanup": {
+    "childExitCodes": [
+      0,
+      0
+    ],
+    "forcedChildren": [
+      false,
+      false
+    ],
+    "remainingNativeMembers": [
+      0,
+      0
+    ]
+  },
+  "downloadedReceiptIndependentlyValidated": true,
+  "environment": {
+    "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+    "ro.build.version.sdk": "33",
+    "ro.kernel.qemu": "1",
+    "ro.product.cpu.abi": "x86_64"
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "hardwareQualified": false,
+  "javaNioObservation": {
+    "ctimeAfterNs": "1794015639000000000",
+    "ctimeBeforeNs": "1794015639000000000",
+    "fileKeyAvailable": true,
+    "fileKeyStable": true,
+    "initialMtimeNs": "1700000000000000000",
+    "nanosecondMtimePreserved": false,
+    "noFollowSymlinkOpenRejected": true,
+    "privateFileAndDirectoryPermissions": true,
+    "productionCacheEnabled": false,
+    "replacementChangedFileKey": true,
+    "requestedMtimeNs": "1700000000123456789",
+    "restoredMtimeNs": "1700000000000000000",
+    "sameSizeRestoredMtimeChangedCtime": false,
+    "scope": "android-java-nio-private-cache-metadata",
+    "unixLinkCount": 1
+  },
+  "limitations": [
+    "The followup records unsupported Java timestamp precision as failed capability and completes the remaining observations; successful workflow execution does not establish cache qualification.",
+    "Java mtime round-trip lost fractional seconds. Java ctime was unchanged during the same-size write with restored mtime; those Java timestamps cannot establish mutation detection for this observed edit.",
+    "Guest alias/raw-syscall nanosecond timestamp and mutation checks passed, but hardlink creation was denied with EACCES 13; the hardlink mutation is unqualified.",
+    "No production cache owner integration, ARM64/Thor execution, private game assets, world loading, gameplay, or saved-character persistence was exercised.",
+    "Metadata-preserving corruption detection is not claimed; production full-byte verification remains enabled."
+  ],
+  "observationRun": {
+    "artifactBytes": 46679,
+    "artifactId": 13555121370,
+    "artifactSha256": "7cef99a0800456678f2a0b717c144f2fa21af0e2e3aaea76706d0f467a0917ab",
+    "conclusion": "success",
+    "jobId": 128257799229,
+    "runId": 42324899164,
+    "scopeNote": "Qualifier-only followup; no production runtime or APK source changes are represented by this observation run.",
+    "sourceRevision": "05b656272f58a06bb2fbefd40c9d10c4a9f8cf13",
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/42324899164"
+  },
+  "priorProducerProbe": {
+    "artifactBytes": 29668,
+    "artifactId": 13554526319,
+    "artifactSha256": "ee937eee243170511eff6c7908bf26bde34253df95f3f42ec9958c311ef4fb3a",
+    "conclusion": "failure",
+    "failure": "The Java nanosecond mtime assertion failed: requested 2023-11-14T22:13:20.123456789Z, observed 2023-11-14T22:13:20Z.",
+    "jobId": 128253945228,
+    "remainingJavaObservationsExecuted": false,
+    "runId": 42323699884,
+    "sourceRevision": "7f556ff7bec24cdb6472efb0af7b319116dfae4f",
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/42323699884"
+  },
+  "productionApkProducer": "7f556ff7bec24cdb6472efb0af7b319116dfae4f",
+  "productionCacheEnabled": false,
+  "scope": "android13-x86_64-guest-and-java-metadata-observations-not-production-cache-qualification"
+}

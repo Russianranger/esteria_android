@@ -1,0 +1,91 @@
+{
+  "actualArm64AndroidClientExecuted": false,
+  "android13": {
+    "actualClientCaptureSelected": false,
+    "failures": 0,
+    "instrumentationSkips": 0,
+    "multiLinkNegativeSubcaseExecuted": false,
+    "namedTestsPassed": 43
+  },
+  "appRevision": "7f556ff7bec24cdb6472efb0af7b319116dfae4f",
+  "existingThorUpdateAndSavePreservationQualified": false,
+  "formatVersion": 1,
+  "gates": [
+    {
+      "conclusion": "success",
+      "jobId": 128253988659,
+      "name": "complete-arm64-package",
+      "runId": 42323699677
+    },
+    {
+      "conclusion": "success",
+      "jobId": 128253944663,
+      "name": "launcher-core-lint",
+      "runId": 42323699791
+    },
+    {
+      "conclusion": "success",
+      "jobId": 128253944740,
+      "name": "tooling",
+      "runId": 42323699763
+    },
+    {
+      "conclusion": "success",
+      "jobId": 128253944505,
+      "name": "native-arm64-owned-sql",
+      "runId": 42323699722
+    },
+    {
+      "conclusion": "success",
+      "jobId": 128253944368,
+      "name": "android13-install-update-receipts",
+      "runId": 42323699667
+    },
+    {
+      "conclusion": "success",
+      "jobId": 128253944764,
+      "name": "native-extractor-output",
+      "runId": 42323699775
+    }
+  ],
+  "publisherDiagnosticChecks": {
+    "browserPublicationCompleted": true,
+    "launcherConclusion": "success",
+    "launcherRunId": 42325605294,
+    "publicationConclusion": "failure",
+    "publicationFailure": "publication-github-post-http-403",
+    "publicationRunId": 42325605341,
+    "sourceRevision": "c5325527469886ec3754b9c36cb6f9148d06c947",
+    "toolingConclusion": "success",
+    "toolingRunId": 42325605286
+  },
+  "scope": "exact-producer-component-build-gates-not-gameplay",
+  "separateCacheQualifier": {
+    "androidJavaNioMetadataQualified": false,
+    "appRevision": "05b656272f58a06bb2fbefd40c9d10c4a9f8cf13",
+    "jobId": 128257799229,
+    "observationsCompleted": true,
+    "overallStatQualified": false,
+    "productionCacheEnabled": false,
+    "runId": 42324899164
+  },
+  "signing": {
+    "apkBytes": 336849664,
+    "apkSha256": "255d3157f0b251b810b9087bbe2c12937927d8cc1a1e0c99cda346716f259fd7",
+    "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+    "payloadPreserved": true,
+    "previousApkSha256": "80bb686f779878d9c9dd459eb642a45fabe55ffb59d2a4d94f0964520e531a80",
+    "previousPublishedVersionCode": 11,
+    "sdkV2AndV3Verified": true
+  },
+  "stockSigningCertificateContinuitySdkVerified": true,
+  "thorQualified": false,
+  "threeColdOfflineRelaunchesQualified": false,
+  "tooling": {
+    "passed": 1519,
+    "run": 1620,
+    "skipReasons": "Dependency/toolchain/native-provider/environment-specific prerequisites; no skipped test counted as pass.",
+    "skipped": 101
+  },
+  "worldEntryQualified": false
+}
