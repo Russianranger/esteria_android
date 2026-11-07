@@ -192,7 +192,7 @@ public final class PythonReceiptBindingTest {
             assertTrue(polls.get()>3);
         }
         assertEquals(previous,ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,null).generation);
-        assertEquals(previous+"\n",Files.readString(pointer));assertArrayEquals(before,Files.readAllBytes(receipt));
+        assertEquals(previous+"\n",new String(Files.readAllBytes(pointer),StandardCharsets.US_ASCII));assertArrayEquals(before,Files.readAllBytes(receipt));
         assertArrayEquals(original,Files.readAllBytes(payload));assertEquals(mtime,Files.getLastModifiedTime(payload));
     }
 

@@ -39,6 +39,29 @@ public final class ShaderPreparedIntegrityTests {
             ShaderRunPlan plan=new ShaderRunPlan(root.resolve("game"),tools,root.resolve("work"),helpers,info.getString("clientRevision"),"enUS");
             String manifest=info.getString("toolManifestSha256");
             ShaderSetup.Result selected=ShaderSetup.validatePrepared(plan,manifest,null,false);
+            check(ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,null)==null,"Current recipe uses its normal audit");
+            String previous=info.getString("previousGeneration");
+            Path current=plan.work.resolve("shaders/current");
+            Files.writeString(current,previous+"\n");
+            ShaderSetup.Result legacy=ShaderSetup.validatePrepared(plan,manifest,null,false);
+            check(legacy.generation.equals(previous),"Normal Start selects the original v12 key");
+            check(ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,null).generation.equals(previous),"Full audit reuses the old output");
+            check(ShaderSetup.verifyCompatibleCompleted(plan,"0".repeat(64),null,null)==null,"Different provider cannot reuse v12 output");
+            byte[] before=Files.readAllBytes(legacy.shaders.resolveSibling("receipt.json"));
+            try(RuntimeReadPolicy.Scope scope=RuntimeReadPolicy.install((path,offset,count)->{
+                if(path.startsWith(legacy.shaders))throw new RuntimeWork.CancelledException();
+            })){
+                try{ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,null);throw new AssertionError("Cancelled audit returned a selection");}
+                catch(RuntimeWork.CancelledException expected){ }
+            }
+            check(Files.readString(current).equals(previous+"\n"),"Interrupted audit must preserve current");
+            check(java.util.Arrays.equals(before,Files.readAllBytes(legacy.shaders.resolveSibling("receipt.json"))),"Interrupted audit must preserve the original receipt");
+            check(ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,null).generation.equals(previous),"Interrupted v12 verification can reenter");
+            Path donor=legacy.shaders.resolve("manifest.txt");byte[] good=Files.readAllBytes(donor),bad=good.clone();bad[0]^=1;
+            Files.write(donor,bad);
+            check(ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,null)==null,"Corrupt v12 payload must not bypass translation");
+            Files.write(donor,good);
+            Files.writeString(current,selected.generation+"\n");
             Path output=selected.shaders.resolve("manifest.txt");byte[] original=Files.readAllBytes(output);
             var timestamp=Files.getLastModifiedTime(output);
             for(int launch=0;launch<3;launch++) {

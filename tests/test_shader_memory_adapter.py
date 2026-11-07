@@ -32,20 +32,21 @@ class ShaderMemoryAdapter(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup);self.root=Path(self.temp.name)
         source=Path(os.environ['ESTERIA_CLIENT_SOURCE'])/'Tools/VulkanShaders'
-        self.tools=self.root/'tools';self.tools.mkdir()
-        for name in stock.storage.TOOL_FILES:
-            target=self.tools/name;target.parent.mkdir(parents=True,exist_ok=True)
-            if name!='bin/glslangValidator':shutil.copyfile(source/name,target)
-            elif os.environ.get('ESTERIA_PACKAGED_GLSLANG'):
-                compiler = Path(os.environ['ESTERIA_PACKAGED_GLSLANG'])
-                pin_path = Path(__file__).resolve().parents[1] / 'runtime/shaders/android-provider.lock.json'
-                pin = json.loads(pin_path.read_bytes())['files']['tools/bin/glslangValidator']
-                self.assertEqual(stock.storage.identity(compiler, 64 << 20), pin)
-                shutil.copy(compiler, target)
-            else:
-                # Structural compiler fixture: not real GLSL/SPIR-V validation.
-                target.write_text('#!/usr/bin/env python3\nimport struct,sys\nout=sys.argv[sys.argv.index("-o")+1]\nstage=sys.argv[sys.argv.index("-S")+1]\nopen(out,"wb").write(struct.pack("<10I",0x07230203,0x10000,0,3,0,(5<<16)|15,0 if stage=="vert" else 4,1,0x6e69616d,0))\nprint("; SPIR-V structural fixture")\n');target.chmod(0o700)
-        (self.tools/'shader-tools.json').write_bytes(stock.storage.encoded(dict(formatVersion=1,clientRevision=stock.CLIENT_REVISION,files={n:stock.storage.identity(self.tools/n,64<<20) for n in stock.storage.TOOL_FILES})))
+        packaged_tools = os.environ.get('ESTERIA_PACKAGED_SHADER_TOOLS')
+        if packaged_tools:
+            self.tools = Path(packaged_tools)
+            pin_path = Path(__file__).resolve().parents[1] / 'runtime/shaders/android-provider.lock.json'
+            manifest_hash = json.loads(pin_path.read_bytes())['toolManifestSha256']
+            self.assertEqual(stock.storage.tool_identity(self.tools, stock.CLIENT_REVISION), manifest_hash)
+        else:
+            self.tools=self.root/'tools';self.tools.mkdir()
+            for name in stock.storage.TOOL_FILES:
+                target=self.tools/name;target.parent.mkdir(parents=True,exist_ok=True)
+                if name!='bin/glslangValidator':shutil.copyfile(source/name,target)
+                else:
+                    # Structural compiler fixture: not real GLSL/SPIR-V validation.
+                    target.write_text('#!/usr/bin/env python3\nimport struct,sys\nout=sys.argv[sys.argv.index("-o")+1]\nstage=sys.argv[sys.argv.index("-S")+1]\nopen(out,"wb").write(struct.pack("<10I",0x07230203,0x10000,0,3,0,(5<<16)|15,0 if stage=="vert" else 4,1,0x6e69616d,0))\nprint("; SPIR-V structural fixture")\n');target.chmod(0o700)
+            (self.tools/'shader-tools.json').write_bytes(stock.storage.encoded(dict(formatVersion=1,clientRevision=stock.CLIENT_REVISION,files={n:stock.storage.identity(self.tools/n,64<<20) for n in stock.storage.TOOL_FILES})))
         self.reader,self.manifest=stock.load_reader(self.tools,stock.CLIENT_REVISION)
         old=sys.dont_write_bytecode;sys.dont_write_bytecode=True;self.addCleanup(setattr,sys,'dont_write_bytecode',old)
         self.translate=importlib.import_module(self.reader.__package__+'.translate')

@@ -25,6 +25,7 @@ on:
       # Detached publication binds native receipts to the exact APK producer, including its import regression fixture.
       - app/src/androidTest/java/io/github/russianranger/esteria/SafImportTest.java
       - app/src/androidTest/java/io/github/russianranger/esteria/PreparationControlsTest.java
+      - app/src/androidTest/java/io/github/russianranger/esteria/runtime/PythonReceiptBindingTest.java
       - runtime/server/installation-native-inputs.lock.json
       - runtime/android_server_installation_setup.py
       - runtime/android_server_schema_setup.py

@@ -125,7 +125,7 @@ jobs:
       - name: Compile the synthetic deleted and restored MPQ shader selections with the packaged ARM64 compiler
         env:
           ESTERIA_CLIENT_SOURCE: ${{ github.workspace }}/sources/client
-          ESTERIA_PACKAGED_GLSLANG: ${{ runner.temp }}/glslangValidator
+          ESTERIA_PACKAGED_SHADER_TOOLS: ${{ runner.temp }}/shader-qualification/tools
         run: |
           test "$(uname -m)" = aarch64
           python3 tools/fetch_sources.py client --output sources
@@ -141,10 +141,13 @@ jobs:
           with tarfile.open(cohort, 'r:gz') as outer:
               payload = outer.extractfile(provider.ASSETS + '/' + provider.ARCHIVE).read()
           with tarfile.open(fileobj=io.BytesIO(payload), mode='r:gz') as inner:
-              executable = inner.extractfile(provider.COMPILER).read()
-          compiler = Path(os.environ['ESTERIA_PACKAGED_GLSLANG'])
-          compiler.write_bytes(executable)
-          compiler.chmod(0o700)
+              root = Path(os.environ['ESTERIA_PACKAGED_SHADER_TOOLS'])
+              for name in provider.load_pin()['files']:
+                  if name.startswith('tools/'):
+                      target = root / name.removeprefix('tools/')
+                      target.parent.mkdir(parents=True, exist_ok=True)
+                      target.write_bytes(inner.extractfile(name).read())
+                      target.chmod(0o700 if name == provider.COMPILER else 0o600)
           PYTHON
           python3 -m unittest -v tests.test_shader_memory_adapter.ShaderMemoryAdapter.test_patch_delete_resolves_each_profile_and_translates_only_live_winners
   package:
