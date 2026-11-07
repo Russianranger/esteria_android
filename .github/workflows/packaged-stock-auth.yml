@@ -6,10 +6,15 @@ on:
     paths:
       - .github/workflows/packaged-stock-auth.yml
       - tools/qualify_packaged_server_auth.py
+      - tools/qualify_packaged_grunt.py
+      - tools/qualify_client_auth.py
+      - tools/client_auth_contract.py
+      - runtime/client/renderer-compatibility.json
 permissions:
   contents: read
 jobs:
   packaged-auth:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/non-custom'
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 45
     steps:
@@ -18,31 +23,57 @@ jobs:
           persist-credentials: false
       - name: Verify and extract the shipped ARM64 runtime, programs, stock content and helper identities
         run: |
-          mkdir -p out
-          python3 -m tools.qualify_packaged_server_auth stage --output out/packaged-server
-          docker import --platform linux/arm64 out/packaged-server/server-runtime.tar.gz esteria-packaged-server:qualified
-      - name: Exercise the local protocol on fully populated fresh stock schemas and reopen the same instance
-        run: |
           umask 077
-          mkdir out/disposable-server out/server-evidence
-          docker run --rm --init --network none --read-only --tmpfs /tmp:rw,nosuid,nodev,size=32m \
-            --env PYTHONDONTWRITEBYTECODE=1 \
-            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
-            --mount "type=bind,src=$GITHUB_WORKSPACE/out/packaged-server,dst=/package,readonly" \
-            --mount "type=bind,src=$GITHUB_WORKSPACE/out/disposable-server,dst=/work" \
-            --mount "type=bind,src=$GITHUB_WORKSPACE/out/server-evidence,dst=/evidence" \
-            --workdir /qualification esteria-packaged-server:qualified \
-            python3 -m tools.qualify_packaged_server_auth run >out/stock-auth-private-run.log 2>&1
-      - name: Export typed evidence
-        if: always()
+          GRUNT_QA=$(mktemp -d "$RUNNER_TEMP/stock-grunt-XXXXXXXX")
+          echo "GRUNT_QA=$GRUNT_QA" >> "$GITHUB_ENV"
+          python3 -m tools.qualify_packaged_server_auth stage --output "$GRUNT_QA/packaged-server"
+          docker import --platform linux/arm64 "$GRUNT_QA/packaged-server/server-runtime.tar.gz" esteria-packaged-server:qualified
+      - name: Verify the selected reconstructed executable and exact Wine provider
         run: |
-          if sudo test -f out/server-evidence/stock-auth.json; then
-            sudo chmod 0644 out/server-evidence/stock-auth.json
-            sudo chmod 0755 out/server-evidence
-          fi
+          python3 -m tools.qualify_packaged_grunt stage --output "$GRUNT_QA/grunt"
+          docker import --platform linux/arm64 "$GRUNT_QA/grunt/cache/wine-arm64.tar.gz" esteria-stock-grunt:qualified
+      - name: Log in twice through the actual Grunt client and the same four-schema database
+        run: |
+          set -eu
+          umask 077
+          mkdir "$GRUNT_QA/disposable-server" "$GRUNT_QA/server-evidence"
+          cleanup() { docker rm -f stock-grunt-client stock-grunt-server >/dev/null 2>&1 || true; }
+          trap cleanup EXIT
+          shared=(--init --read-only --env PYTHONDONTWRITEBYTECODE=1
+              --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly"
+              --mount "type=bind,src=$GRUNT_QA/grunt/fixture,dst=/esteria-qualification"
+              --workdir /qualification)
+          docker run -d --name stock-grunt-server --network none "${shared[@]}" --tmpfs /tmp:rw,nosuid,nodev,size=32m \
+            --mount "type=bind,src=$GRUNT_QA/packaged-server,dst=/package,readonly" \
+            --mount "type=bind,src=$GRUNT_QA/disposable-server,dst=/work" \
+            --mount "type=bind,src=$GRUNT_QA/server-evidence,dst=/evidence" \
+            esteria-packaged-server:qualified python3 -m tools.qualify_packaged_server_auth run --grunt
+          docker run -d --name stock-grunt-client --network container:stock-grunt-server "${shared[@]}" \
+            --tmpfs /tmp:rw,nosuid,nodev,mode=1777,size=192m \
+            esteria-stock-grunt:qualified /usr/bin/python3 -m tools.qualify_packaged_grunt client
+          while :; do
+            server=$(docker inspect -f '{{.State.Status}}:{{.State.ExitCode}}' stock-grunt-server)
+            client=$(docker inspect -f '{{.State.Status}}:{{.State.ExitCode}}' stock-grunt-client)
+            case "$server/$client" in exited:0/exited:0) break;; exited:[1-9]*|*/exited:[1-9]*) exit 1;; esac
+            sleep 2
+          done
+      - name: Export typed evidence
+        if: always() && env.GRUNT_QA != ''
+        run: |
+          mkdir -p out/server-evidence
+          for pair in server-evidence/stock-auth.json grunt/fixture/client-phase.json; do
+            if sudo test -f "$GRUNT_QA/$pair"; then
+              sudo install -m 0644 "$GRUNT_QA/$pair" "out/server-evidence/${pair##*/}"
+            fi
+          done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: packaged-stock-auth-${{ github.sha }}
-          path: out/server-evidence/stock-auth.json
+          path: out/server-evidence/*.json
           retention-days: 14
+      - name: Remove the disposable fixtures
+        if: always() && env.GRUNT_QA != ''
+        run: |
+          [[ "$GRUNT_QA" == "$RUNNER_TEMP"/stock-grunt-???????? ]]
+          sudo rm -rf -- "$GRUNT_QA"

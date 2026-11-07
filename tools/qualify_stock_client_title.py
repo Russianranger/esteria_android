@@ -101,7 +101,31 @@ def stage_renderer(view, cache, pairing, build, artifact):
     return pin['sha256']
 
 
-def capture(work, client, shaders, revision, *, candidate_artifact=None):
+def stage_client_data(client, view, locale):
+    if locale not in shader_generation.LOCALES:
+        raise ValueError('capture-locale')
+    # The stock first-run GlueXML uses the localized loose documents via CSimpleHTML.
+    # Retain absence when the private source is an MPQ-only qualification corpus.
+    docs = {'eula.html', 'tos.html', 'termination.html'}
+    for src in sorted((client/'Data').rglob('*')):
+        relative = src.relative_to(client)
+        agreement = (relative.parent in (Path('Data'), Path('Data')/locale) and
+                     src.name.lower() in docs)
+        if src.suffix.lower() != '.mpq' and not agreement:
+            continue
+        if any(parent.suffix.lower() == '.mpq' for parent in relative.parents):
+            continue
+        if src.is_symlink() or (not src.is_file() and (agreement or not src.is_dir())):
+            raise ValueError('capture-provider-type')
+        dest = view/relative
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.symlink_to(Path('/esteria-data')/relative)
+    local = view/'Data'/locale
+    local.mkdir(parents=True, exist_ok=True)
+    (local/'realmlist.wtf').write_text('set realmlist 127.0.0.1\n')
+
+
+def capture(work, client, shaders, revision, *, candidate_artifact=None, locale='enUS'):
     report = dict(environment='linux-arm64-software-vulkan', titleQualified=False, gameplayQualified=False,
                   phase='reference-inputs', preparedClientRevision=revision, externalNetwork=False)
     try:
@@ -177,17 +201,12 @@ def capture(work, client, shaders, revision, *, candidate_artifact=None):
         report['clientExecutableSha256']=next(e['sha256'] for e in built['files'] if e['name']==PE)
         report['wineArchiveSha256']=wine['archive']['sha256']
         report['donorApkSha256']=apk['sha256']
-        for src in sorted((client/'Data').rglob('*')):
-            if src.is_file() and src.suffix.lower()=='.mpq':
-                dest = view/src.relative_to(client)
-                dest.parent.mkdir(parents=True,exist_ok=True)
-                dest.symlink_to(Path('/esteria-data')/src.relative_to(client))
-        (view/'Data/enUS/realmlist.wtf').write_text('set realmlist 127.0.0.1\n')
+        stage_client_data(client, view, locale)
         for name in ('WTF','Cache','Logs','Screenshots'):
             state = root/'work/client-state'/name
             state.mkdir(parents=True)
             (view/name).symlink_to(Path('/work/client-state')/name)
-        (root/'work/client-state/WTF/RunOnce~EsteriaLocale.wtf').write_text('SET locale "enUS"\n')
+        (root/'work/client-state/WTF/RunOnce~EsteriaLocale.wtf').write_text(f'SET locale "{locale}"\n')
         shutil.copyfile(HELPERS/'guest.py',root/'work/guest.py')
         # Running Wine is confined to a new mount/PID/network namespace; it uses the unprivileged runner UID.
         report['phase']='launch-namespace'
@@ -231,7 +250,7 @@ def replay_existing(work, game, *, store=None, candidate_artifact=None, locale='
             shader_generation.validate_output(generation/'shaders') != receipt['outputs']):
         raise ValueError('prepared-selection')
     result = capture(work, game/'generations'/client_id/'data', generation/'shaders',
-                     inputs['clientRevision'], candidate_artifact=candidate_artifact)
+                     inputs['clientRevision'], candidate_artifact=candidate_artifact, locale=inputs['locale'])
     if (shader_generation.read(store/'current', 65) != (key+'\n').encode('ascii') or
             shader_generation.imported(game,client_id) != inputs['importMetadata']):
         raise ValueError('prepared-selection-changed')

@@ -10,6 +10,21 @@ from tools import provider_client_runtime, qualify_stock_client_title as title
 
 
 class StockTitleProvider(unittest.TestCase):
+    def test_stage_preserves_selected_localized_agreement_body_and_owns_realm(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            client, view = root/'import', root/'view'
+            locale = client/'Data'/'frFR'
+            locale.mkdir(parents=True)
+            for name in ('eula.html', 'tos.html', 'locale-frFR.MPQ', 'realmlist.wtf'):
+                (locale/name).write_bytes(b'original')
+            title.stage_client_data(client, view, 'frFR')
+            for name in ('eula.html', 'tos.html', 'locale-frFR.MPQ'):
+                self.assertEqual((view/'Data/frFR'/name).readlink(), Path('/esteria-data/Data/frFR')/name)
+            self.assertEqual((view/'Data/frFR/realmlist.wtf').read_text(), 'set realmlist 127.0.0.1\n')
+            self.assertEqual((locale/'realmlist.wtf').read_bytes(), b'original')
+            self.assertFalse((view/'Data/frFR/termination.html').exists())
+
     def test_measured_candidate_is_bound_to_zip_and_final_pe(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

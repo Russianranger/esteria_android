@@ -116,6 +116,13 @@ def prepared_wine(runtime,runtime_lock=None,private_pe_copy=False):
                 runtimeLockSha256=lock_sha,wineEnvironment=environment)
 
 
+def verify_persisted_session(connection, intent, key):
+    session = connection.query('SELECT LOWER(HEX(session_key)),os,locale FROM acore_auth.account WHERE id=' +
+                               str(intent['accountId']))
+    require(len(session) == 1 and hmac.compare_digest(session[0], key.hex() + '\tWin\t0'),
+            'client-and-persisted-server-session-key-differ')
+
+
 def typed_success(value, exit_code):
     return (type(exit_code) is int and exit_code==0 and value.get('workerCompleted') is True and
         type(value.get('formatVersion')) is int and value['formatVersion']==1 and value.get('scope')==SCOPE and
@@ -296,8 +303,7 @@ def worker(plan_path):
         receipt,digest=contract.read_receipt(fixture/contract.RECEIPT,nonce);key=contract.read_key(fixture/contract.KEY)
         result.update(clientReceipt=receipt,clientReceiptSha256=digest,reconstructedClientAuthenticated=True)
         with db.option_file(state,'esteria',password) as options,db.Mysql(mysql,options) as connection:
-            session=connection.query('SELECT LOWER(HEX(session_key)),os,locale FROM acore_auth.account WHERE id='+str(intent['accountId']))
-            require(len(session)==1 and hmac.compare_digest(session[0],key.hex()+'\tWin\t0'),'client-and-persisted-server-session-key-differ')
+            verify_persisted_session(connection,intent,key)
             result['persistedSessionKeyVerified']=True
             require(importer.schema_snapshot(connection,expected)==before,'authentication-changed-schema-or-ledger')
             result['schemaLedgerPreserved']=True

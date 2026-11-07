@@ -97,10 +97,10 @@ def selections(package):
     return [('core', core), ('playerbots', dict(core, playerbotsHelper=pb))], pin('bin/authserver')
 
 
-def protocol_probe(state, mysql, version, program, expected, configuration):
+def protocol_probe(state, mysql, version, program, expected, configuration, *, client_probe=None, attempt=1):
     require(identity(program) == expected, 'selected authserver changed before execution')
     intent = account.read_intent(state / account.JOURNAL, db.read_receipt(state / 'database-bootstrap.json', version))
-    child = auth.OwnedAuthserver(program, configuration / 'authserver.conf', state / 'logs/auth-probe-private.log')
+    child = auth.OwnedAuthserver(program, configuration / 'authserver.conf', state / 'logs' / f'auth-probe-{attempt}-private.log')
     try:
         auth.wait_authserver(child)
         with socket.create_connection(('127.0.0.1', 3724), timeout=5) as transport:
@@ -115,11 +115,13 @@ def protocol_probe(state, mysql, version, program, expected, configuration):
                                         + str(intent['accountId']))
                 require(len(rows) == 1 and hmac.compare_digest(rows[0], key.hex() + '\tWin\t0'),
                         'negotiated auth key differs from persistent session')
+                if client_probe is not None:
+                    return client_probe(state, connection, intent, child, attempt)
     finally:
         child.stop()
 
 
-def run(package, work, evidence, world_probe=None):
+def run(package, work, evidence, world_probe=None, client_probe=None):
     require(platform.machine().lower() in ('aarch64', 'arm64'), 'native Linux ARM64 required')
     require(not any(work.iterdir()), 'an empty disposable state directory is required')
     os.umask(0o077)
@@ -130,6 +132,8 @@ def run(package, work, evidence, world_probe=None):
     if world_probe is not None:
         proof['scope'] = 'packaged-stock-native-world-session'
         del proof['worldserverExecuted']
+    if client_probe is not None:
+        proof['scope'] = 'packaged-stock-four-schema-reconstructed-grunt-authentication'
     def record(stage, **details):
         if stage == 'real-worldserver-ready-and-cleanly-stopped':
             proof['worldserverExecuted'] = True
@@ -166,8 +170,12 @@ def run(package, work, evidence, world_probe=None):
                 'four source-bound schemas required before auth probe')
         record('four-schemas-verified')
         with db.state_lock(state):
-            protocol_probe(state, mysql, version, package / 'server-programs/bin/authserver', expected_auth,
-                           state / 'config/generations' / result['configGeneration'])
+            configuration = state / 'config/generations' / result['configGeneration']
+            program = package / 'server-programs/bin/authserver'
+            first_client = protocol_probe(state, mysql, version, program, expected_auth, configuration, client_probe=client_probe)
+            if client_probe is not None:
+                proof['reconstructedClientExecuted'] = True
+                record('reconstructed-grunt-login', **first_client)
         record('auth-srp-12340-loopback-session-key-verified', authserverSha256=expected_auth['sha256'])
         repeated = install_phase(*phases[-1])
         require(repeated['fourSchemasVerified'] and not repeated['compiledPlayerbotsLoaderExecuted']
@@ -186,6 +194,11 @@ def run(package, work, evidence, world_probe=None):
     reopened = sql.ServiceProcess(state, sessions, mysql, mysqld, version)
     try:
         reopened.wait_ready(uuid)
+        if client_probe is not None:
+            with db.state_lock(state):
+                again = protocol_probe(state, mysql, version, program, expected_auth, configuration,
+                                       client_probe=client_probe, attempt=2)
+            record('same-database-reconstructed-grunt-login', **again)
         if world_probe is not None:
             record('enter-world-admission')
             world_probe(package, state, reopened, version, uuid, record)
@@ -202,7 +215,8 @@ def main():
     prep.add_argument('--apk', type=Path)
     prep.add_argument('--readback', type=Path, default=BASELINE)
     prep.add_argument('--output', type=Path, required=True)
-    actions.add_parser('run')
+    running = actions.add_parser('run')
+    running.add_argument('--grunt', action='store_true')
     args = parser.parse_args()
     if args.action == 'stage':
         stage(args.output, args.apk, args.readback)
@@ -210,7 +224,10 @@ def main():
         evidence = Path('/evidence/stock-auth.json')
         work = Path('/work')
         try:
-            run(Path('/package'), work, evidence)
+            client_probe = None
+            if args.grunt:
+                from tools.qualify_packaged_grunt import server_probe as client_probe
+            run(Path('/package'), work, evidence, client_probe=client_probe)
         except Exception as error:
             proof = document(evidence) if evidence.is_file() else {}
             proof.update(failureClass=type(error).__name__, **sql.safe_failure_context(error, work / 'state'))
