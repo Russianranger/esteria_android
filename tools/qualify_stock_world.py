@@ -7,6 +7,8 @@ import os
 from pathlib import Path
 import re
 import shutil
+import stat
+import tempfile
 import subprocess
 import tarfile
 import time
@@ -97,6 +99,47 @@ def collector_archive(spool, progress):
     return spool / 'client-texture-input.zip', hashes
 
 
+def validate_fixture_directory(path):
+    info = path.lstat()
+    corpus.require(stat.S_ISDIR(info.st_mode) and info.st_uid == os.geteuid() and info.st_mode & 0o077 == 0,
+                   'retained import must be a private owned directory')
+
+
+def private_import(scratch, source, progress):
+    # Match the production ZipSource identity (canonical path, bytes and millisecond mtime),
+    # then bind it to the independently authenticated original publisher bytes.
+    info = source.stat()
+    binding = dict(formatVersion=1, scope='verified-official-zip-import', torrentSha256=corpus.TORRENT_HASH,
+                   source=str(source.resolve(strict=True)), bytes=info.st_size, modifiedMs=info.st_mtime_ns // 1_000_000)
+    marker = scratch / 'qualification-source.json'
+    if os.path.lexists(scratch):
+        validate_fixture_directory(scratch)
+        corpus.require(marker.is_file() and not marker.is_symlink() and marker.stat().st_size < 8192 and
+                       auth.document(marker) == binding, 'retained import belongs to a different or unknown source')
+        validate_fixture_directory(scratch / 'game')
+        # GameDataImporter computes its exact remaining copy using its own authenticated source identity,
+        # entry journal and current filesystem metadata under its import lock, including its 64 MiB reserve.
+        progress('resume-source-bound-java-import')
+        return
+    unit = os.statvfs(scratch.parent).f_frsize
+    with zipfile.ZipFile(source) as archive:
+        files = [member.file_size for member in archive.infolist() if not member.is_dir()]
+    allocated = sum((size + unit - 1) // unit * unit for size in files)
+    required = allocated + (64 << 20)
+    free = shutil.disk_usage(scratch.parent).free
+    progress('private-import-capacity', regularEntries=len(files), unpackedBytes=sum(files),
+             allocatedFileBytes=allocated, allocationUnitBytes=unit, requiredBytes=required, availableBytes=free)
+    corpus.require(free >= required, 'insufficient private disk for the complete official import')
+    # Publish the marker and private game store together. No interrupted Java output exists before this point.
+    with tempfile.TemporaryDirectory(dir=scratch.parent) as staging:
+        prepared = Path(staging) / 'fixture'
+        prepared.mkdir(mode=0o700)
+        (prepared / 'game').mkdir(mode=0o700)
+        db.atomic_json(prepared / marker.name, binding)
+        prepared.rename(scratch)
+        db.sync_directory(scratch.parent)
+
+
 def import_source(scratch, source, progress, spool=None, deadline=None):
     owned_download = source is None and spool is None
     identity = None
@@ -104,27 +147,31 @@ def import_source(scratch, source, progress, spool=None, deadline=None):
         source, hashes = collector_archive(spool, progress)
         progress('verify-existing-collector-zip')
         identity = verify_archive(source, hashes)
-    scratch.mkdir(mode=0o700)
+        private_import(scratch, source, progress)
+    else:
+        scratch.mkdir(mode=0o700)
+        (scratch / 'game').mkdir(mode=0o700)
     game = scratch / 'game'
-    classes = scratch / 'classes'
-    game.mkdir()
-    classes.mkdir()
     if owned_download:
-        # ZIP safety inspects the complete ZIP/ZIP64 central directory. Direct import from it
-        # avoids materializing a second loose copy of every uncompressed archive.
+        # Direct import from the complete ZIP avoids a second loose copy of every archive.
         auth.require(shutil.disk_usage(scratch).free >= corpus.TOTAL + 18000000000 + (1 << 30),
                      'insufficient disk for authentic ZIP and production import')
         source = scratch / 'official.zip'
         progress('official-zip-transfer', verifiedBytes=0)
         download(source, progress, deadline)
     progress('production-java-import')
-    subprocess.run(['javac', '-d', classes, '-sourcepath', ROOT / 'core/src/main/java',
-                    ROOT / 'tools/stock_world/StockWorldImport.java'], check=True)
-    subprocess.run(['java', '-cp', classes, 'StockWorldImport', source, game], check=True)
+    # Class output is operation-private. Only the source-bound production game store is reopened.
+    with tempfile.TemporaryDirectory(dir=scratch) as classes:
+        subprocess.run(['javac', '-d', classes, '-sourcepath', ROOT / 'core/src/main/java',
+                        ROOT / 'tools/stock_world/StockWorldImport.java'], check=True)
+        result = subprocess.run(['java', '-cp', classes, 'StockWorldImport', source, game],
+                                check=True, stdout=subprocess.PIPE, text=True)
     if identity is not None:
         corpus.require(archive_identity(source) == identity, 'stock ZIP changed during Java import')
     current = (game / 'current').read_text().strip()
-    progress('source-import-complete', generation=current)
+    completed = re.fullmatch(r'Imported build 12340; generation=([a-f0-9]{64}) copiedBytes=([0-9]+) reusedFiles=([0-9]+)\n', result.stdout)
+    corpus.require(completed and current == completed[1], 'source-bound Java import receipt differs')
+    progress('source-import-complete', generation=current, copiedBytes=int(completed[2]), reusedFiles=int(completed[3]))
     if owned_download:
         source.unlink()
 
