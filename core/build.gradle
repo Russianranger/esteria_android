@@ -213,3 +213,12 @@ tasks.register('runtimeStorageMaintenanceTest', JavaExec) {
     maxHeapSize = '32m'
 }
 check.dependsOn runtimeStorageMaintenanceTest
+
+// Monotonic admission/native budgets; source-bound progress never grants readiness.
+tasks.register('serverStartupTimingTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.runtime.ServerStartupTimingTests'
+    maxHeapSize = '32m'
+}
+check.dependsOn serverStartupTimingTest

@@ -177,7 +177,7 @@ public final class GameSession {
                 RuntimeWork.Cancellation stop=()->operations.isStopRequested()||(cancellation!=null&&cancellation.isCancelled());
                 try {
                     check(stop);leases.client.require(root);setup.data.requireUnchanged();
-                    ShaderSetup.Result shaders=ShaderSetup.requireCurrent(context,root,setup.wine,setup.shaderTools,setup.shaders);
+                    ShaderSetup.Result shaders=ShaderSetup.requireCurrent(context,root,setup.wine,setup.shaderTools,setup.shaders,updates,stop);
                     ClientLaunchSetup.Prepared view=ClientLaunchSetup.prepareUnderOwnedLease(context,root,client,leases.client,updates,stop);
                     if(view==null||!view.plan.importedGeneration.equals(shaders.importGeneration))throw new IOException("Current client data and shaders differ; prepare local setup again");
                     var current=ServerInstallationSetup.completed(context,root,setup.server,setup.programs,setup.content);

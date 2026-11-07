@@ -113,7 +113,26 @@ public final class LocalWorldSetupOwnerTests {
             check(fixture.owner.state()==LocalWorldSetup.State.CLOSED&&!fixture.lock.isValid(),"Safe boundary permits lease release");
         }
     }
+    private static void preparedSelectionCancellation()throws Exception {
+        for(boolean repair:new boolean[]{false,true})try(Fixture fixture=new Fixture()) {
+            Path retained=fixture.work.resolve("retained-completed-generation");Files.writeString(retained,"TEST_ONLY_RETAINED_BYTES");
+            try {
+                if(repair)fixture.owner.repair(LocalWorldSetup.Component.SHADERS,null,()->true);
+                else fixture.owner.selectPrepared(null,()->true);
+                throw new AssertionError("Cancelled selection/repair must not start a component");
+            }catch(io.github.russianranger.esteria.core.runtime.install.RuntimeWork.CancelledException expected){ }
+            check(fixture.owner.state()==LocalWorldSetup.State.FAILED&&fixture.lock.isValid(),"Cancelled selection retains its actual owner until close");
+            check(field(fixture.owner,"data")==null&&field(fixture.owner,"shaders")==null&&field(fixture.owner,"installation")==null,
+                "Cancelled selection/repair launches no extraction, shader or database work");
+            check(Files.readString(retained).equals("TEST_ONLY_RETAINED_BYTES"),"Cancellation preserves completed work");
+            fixture.owner.close(Duration.ofSeconds(1));check(!fixture.lock.isValid(),"No-child selection closes its real lease");
+        }
+        try(Fixture fixture=new Fixture()) {
+            try{fixture.owner.repair(LocalWorldSetup.Component.CLIENT_RUNTIME,null,null);throw new AssertionError("World repair cannot install unrelated runtime components");}
+            catch(IOException expected){check(fixture.owner.state()==LocalWorldSetup.State.ALLOCATED,"Unsupported repair is refused before mutation");}
+        }
+    }
     public static void main(String[] ignored)throws Exception {
-        dependentCleanup();prelaunchCancellation();System.out.println("Local world setup passed2 actual Java dependency/import-lock/prelaunch cleanup groups; no guest SQL or Android execution");
+        dependentCleanup();prelaunchCancellation();preparedSelectionCancellation();System.out.println("Local world setup passed3 actual Java dependency/import-lock/prelaunch and prepared-selection cancellation groups; no guest SQL or Android execution");
     }
 }

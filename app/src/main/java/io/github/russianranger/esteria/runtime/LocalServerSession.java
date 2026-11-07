@@ -4,9 +4,12 @@ import android.content.Context;
 import android.os.Looper;
 import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
 import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
+import io.github.russianranger.esteria.core.runtime.ServerStartupTiming;
 import io.github.russianranger.esteria.core.runtime.install.FreshServerInstallations;
 import io.github.russianranger.esteria.core.runtime.install.RuntimePackagePlan;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
+import io.github.russianranger.esteria.core.runtime.install.PreparationSpeed;
+import io.github.russianranger.esteria.core.runtime.install.RuntimeReadPolicy;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
 import io.github.russianranger.esteria.core.runtime.process.ProotLaunch;
 import io.github.russianranger.esteria.core.runtime.process.WorldConsoleShutdown;
@@ -104,6 +107,9 @@ public final class LocalServerSession {
         private volatile IOException failure;
         private volatile Result result;
         private volatile Path guestSession,logs;
+        private final String operation=UUID.randomUUID().toString().replace("-","");
+        private volatile ServerStartupTiming timing;
+        private java.util.Map<String,String> admissionEnvironment=java.util.Map.of();
         private Handle(Context context,Path root,Path work,ServerRuntimeSetup runtime,ServerProgramsSetup programs,
                 ServerContentSetup content,FreshServerInstallations.Active active,ServerDatabaseService.Handle database,
                 ServerDataBinding data,Events events,ExclusiveFileLease lease) {
@@ -133,11 +139,16 @@ public final class LocalServerSession {
             background();return operations.run(()->{
                 if(state!=State.ALLOCATED)throw new IOException("Local server startup is single-use");
                 state=State.STARTING;
+                PreparationSpeed speed;
+                try{speed=PreparationSpeed.fromId(context.getSharedPreferences("preparation",Context.MODE_PRIVATE)
+                    .getString("speed",PreparationSpeed.DEFAULT.id));}catch(IllegalArgumentException invalid){speed=PreparationSpeed.DEFAULT;}
+                // Capture the caller's choice before crossing the retained worker boundary.
+                admissionEnvironment=RuntimeReadPolicy.preparationEnvironment(java.util.Map.of(PreparationSpeed.ENVIRONMENT_KEY,speed.id));
+                timing=new ServerStartupTiming(monotonicMillis(),operation,content.sourceLockSha256(),active.proofSha256);
                 worker=new Thread(()->run(progress,cancellation),"esteria-local-server-session");worker.setDaemon(true);worker.start();
-                long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(12);
                 while(startup.getCount()!=0) {
                     if(stopping.get()||(cancellation!=null&&cancellation.isCancelled())){stopping.set(true);throw new RuntimeWork.CancelledException();}
-                    if(System.nanoTime()>=deadline){stopping.set(true);throw new IOException("Local server startup timed out; retained owner is stopping");}
+                    if(timing.expired(monotonicMillis())){stopping.set(true);throw new IOException("Local server startup timed out; "+timing.diagnostic(monotonicMillis())+"; retained owner is stopping");}
                     try{startup.await(100,TimeUnit.MILLISECONDS);}catch(InterruptedException error){stopping.set(true);Thread.currentThread().interrupt();throw new IOException("Local server startup interrupted; owner retained",error);}
                 }
                 if(failure!=null)throw failure;
@@ -164,7 +175,6 @@ public final class LocalServerSession {
             data.requireUnchanged();
             Path helpers=GuestHelperAssets.directory(work,"session-helpers");
             String helper=GuestHelperAssets.install(context,"server-session",helpers,HELPERS);
-            String operation=UUID.randomUUID().toString().replace("-","");
             guestSession=directory(GuestHelperAssets.directory(work,"server-sessions").resolve(operation));
             Path outer=directory(GuestHelperAssets.directory(root,"state/server-session-runtime-operations").resolve(operation));logs=outer.resolve("logs");
             JSONObject selected;
@@ -190,11 +200,12 @@ public final class LocalServerSession {
             process=ProotProcess.startInteractive(context,runtime.installer(),runtime.packagePlan(),work,outer,
                 List.of("/usr/bin/python3","-B","-s","-E","/work/session-helpers/"+helper+"/server_session.py",
                     "--expected-version",version,"--operation-id",operation,"--service-operation-id",serviceOperation,"--instance-uuid",uuid),
-                java.util.Collections.emptyMap(),List.of(new ProotLaunch.Mount(programs.current(),ServerProgramsSetup.guestMount()),
+                admissionEnvironment,List.of(new ProotLaunch.Mount(programs.current(),ServerProgramsSetup.guestMount()),
                     new ProotLaunch.Mount(content.current(),ServerContentSetup.guestMount()),new ProotLaunch.Mount(data.directory,"/esteria-data")),
                 new WorldConsoleShutdown());
             try {
                 while(process.isAlive()) {
+                    startupStatus(progress);
                     if(stopRequested(cancellation)||!database.isAlive()) {
                         stopping.set(true);state=State.STOPPING;
                         try{process.stop(Duration.ofSeconds(30));}catch(IOException error){remember(error);if(process.isAlive())continue;}
@@ -208,8 +219,9 @@ public final class LocalServerSession {
                     }
                     try{Thread.sleep(100);}catch(InterruptedException error){stopping.set(true);Thread.currentThread().interrupt();throw new IOException("Server session monitor interrupted",error);}
                 }
+                startupStatus(progress);
                 if(process.failure()!=null||process.wasForced()||process.exitCode()!=0)
-                    throw new IOException("Local auth/world helper did not exit cleanly",process.failure());
+                    throw new IOException("Local auth/world helper did not exit cleanly; "+timing.diagnostic(monotonicMillis()),process.failure());
                 stopped(object(guestSession.resolve("stopped.json")),operation,serviceOperation,uuid,version,active.proofSha256);
             }finally {
                 // Do not return/release the database lease while native cleanup
@@ -220,6 +232,14 @@ public final class LocalServerSession {
                 if(interrupted)Thread.currentThread().interrupt();
             }
         }
+        private void startupStatus(RuntimeWork.Progress progress)throws IOException {
+            Path status=guestSession.resolve("startup-status.json");
+            if(!Files.exists(status,LinkOption.NOFOLLOW_LINKS))return;
+            JSONObject value=object(status);
+            if(ServerStartupStatus.accept(value,timing,monotonicMillis())&&progress!=null)
+                progress.update("server-session-startup-progress",timing.diagnostic(monotonicMillis()),0,-1);
+        }
+        private static long monotonicMillis(){return TimeUnit.NANOSECONDS.toMillis(System.nanoTime());}
         private synchronized void remember(IOException error){if(failure==null)failure=error;else if(failure!=error&&failure.getSuppressed().length<15)failure.addSuppressed(error);}
         @Override public void close()throws IOException {close(Duration.ofSeconds(30));}
         /** Deadline failure retains process, worker, operation lock, providers

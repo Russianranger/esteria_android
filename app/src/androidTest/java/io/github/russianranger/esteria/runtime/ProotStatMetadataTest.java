@@ -15,8 +15,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.security.MessageDigest;
 import java.time.Duration;
@@ -81,6 +85,43 @@ public final class ProotStatMetadataTest {
     private static JSONObject readReport(Path file)throws Exception {
         try(InputStream incoming=Files.newInputStream(file)){return new JSONObject(new String(bounded(incoming,65536),StandardCharsets.UTF_8));}
     }
+    /** Exercise the Java filesystem provider used by PreparedDataCachePin.
+     * Guest stat success cannot establish these Android NIO capabilities. */
+    private static JSONObject javaMetadata(Path root)throws Exception {
+        Path directory=directory(root.resolve("java-metadata")),file=directory.resolve("regular");
+        Files.write(file,"AAAAAAAA".getBytes(StandardCharsets.US_ASCII),StandardOpenOption.CREATE_NEW);
+        Files.setPosixFilePermissions(file,PosixFilePermissions.fromString("rw-------"));
+        assertEquals("rwx------",PosixFilePermissions.toString(Files.getPosixFilePermissions(directory,LinkOption.NOFOLLOW_LINKS)));
+        assertEquals("rw-------",PosixFilePermissions.toString(Files.getPosixFilePermissions(file,LinkOption.NOFOLLOW_LINKS)));
+        BasicFileAttributes first=Files.readAttributes(file,BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS);
+        assertTrue(first.isRegularFile());assertEquals(8,first.size());assertNotNull("Android NIO fileKey is required",first.fileKey());
+        assertEquals(first.fileKey(),Files.readAttributes(file,BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS).fileKey());
+        Object links=Files.getAttribute(file,"unix:nlink",LinkOption.NOFOLLOW_LINKS);
+        assertTrue("Android NIO unix:nlink must be numeric",links instanceof Number);assertEquals(1,((Number)links).longValue());
+        FileTime fixed=FileTime.from(1700000000123456789L,TimeUnit.NANOSECONDS);
+        Files.setLastModifiedTime(file,fixed);
+        assertEquals(fixed,Files.getLastModifiedTime(file,LinkOption.NOFOLLOW_LINKS));
+        Object before=Files.getAttribute(file,"unix:ctime",LinkOption.NOFOLLOW_LINKS);
+        assertTrue("Android NIO unix:ctime must be a FileTime",before instanceof FileTime);
+        Thread.sleep(2);Files.write(file,"BBBBBBBB".getBytes(StandardCharsets.US_ASCII));Files.setLastModifiedTime(file,fixed);
+        assertEquals(8,Files.size(file));assertEquals(fixed,Files.getLastModifiedTime(file,LinkOption.NOFOLLOW_LINKS));
+        assertNotEquals("A same-size restored-mtime edit must expose changed ctime",before,Files.getAttribute(file,"unix:ctime",LinkOption.NOFOLLOW_LINKS));
+        assertEquals(first.fileKey(),Files.readAttributes(file,BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS).fileKey());
+        Path replacement=directory.resolve("replacement");Files.write(replacement,Files.readAllBytes(file),StandardOpenOption.CREATE_NEW);
+        Files.setPosixFilePermissions(replacement,PosixFilePermissions.fromString("rw-------"));Files.setLastModifiedTime(replacement,fixed);
+        Files.move(replacement,file,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);
+        assertEquals(fixed,Files.getLastModifiedTime(file,LinkOption.NOFOLLOW_LINKS));
+        assertNotEquals("Same-content replacement must expose a new fileKey",first.fileKey(),Files.readAttributes(file,BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS).fileKey());
+        Path symbolic=directory.resolve("symbolic");Files.createSymbolicLink(symbolic,file);
+        assertTrue(Files.readAttributes(symbolic,BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS).isSymbolicLink());
+        boolean refused=false;try(InputStream ignored=Files.newInputStream(symbolic,LinkOption.NOFOLLOW_LINKS)){ }
+        catch(IOException expected){refused=true;}assertTrue("Java NIO must reject a no-follow symlink open",refused);
+        return new JSONObject().put("scope","android-java-nio-private-cache-metadata")
+            .put("fileKeyAvailable",true).put("fileKeyStable",true).put("unixLinkCount",1)
+            .put("privateFileAndDirectoryPermissions",true).put("nanosecondMtimePreserved",true)
+            .put("sameSizeRestoredMtimeChangedCtime",true).put("replacementChangedFileKey",true)
+            .put("noFollowSymlinkOpenRejected",true).put("productionCacheEnabled",false);
+    }
     @Test public void statTuplesSurviveAliasesAndExposeMutations()throws Exception {
         Context context=InstrumentationRegistry.getInstrumentation().getTargetContext(),testContext=InstrumentationRegistry.getInstrumentation().getContext();
         assertEquals(33,Build.VERSION.SDK_INT);assertEquals(35,context.getApplicationInfo().targetSdkVersion);
@@ -126,6 +167,7 @@ public final class ProotStatMetadataTest {
             } finally {if(child.isAlive())child.stop(Duration.ZERO);}
         }
         assertNotNull(mutation);assertNotNull(relaunch);
+        JSONObject javaNio=javaMetadata(root);
         for(String name:FINAL)for(String view:VIEWS)equalTuples(mutation.getJSONObject("finalSnapshot").getJSONObject(name).getJSONObject(view),
             relaunch.getJSONObject("finalSnapshot").getJSONObject(name).getJSONObject(view));
         assertArrayEquals("Same-content replacement remains exact", "BBBBBBBB".getBytes(StandardCharsets.US_ASCII),Files.readAllBytes(generation.resolve("data/regular.bin")));
@@ -141,6 +183,7 @@ public final class ProotStatMetadataTest {
             .put("targetSdk",context.getApplicationInfo().targetSdkVersion).put("abi","x86_64").put("guestLaunches",2)
             .put("aliases",new JSONObject().put("work",PRIMARY).put("data","/esteria-data"))
             .put("buildEvidence",build).put("statBuildEvidence",statBuild).put("mutation",mutation).put("relaunch",relaunch)
+            .put("javaNioMetadata",javaNio)
             .put("childExitCodes",exits).put("forcedChildren",forced).put("remainingNativeMembers",remaining)
             .put("noFollowAncestorOpenRejected",rejected).put("productionCacheEnabled",false).put("arm64Qualified",false)
             .put("hardwareQualified",false).put("unchangedMetadataCorruptionDetectionClaimed",false).put("gameplayQualified",false);

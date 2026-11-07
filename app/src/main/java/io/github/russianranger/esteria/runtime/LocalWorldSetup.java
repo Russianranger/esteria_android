@@ -25,6 +25,30 @@ public final class LocalWorldSetup {
     private static final ConcurrentHashMap<Path,Handle> OWNERS=new ConcurrentHashMap<>();
     private LocalWorldSetup(){ }
     public enum State { ALLOCATED,PREPARING,PREPARED,FAILED,CLOSED }
+    public enum Component {
+        CLIENT_RUNTIME("Client runtime"),SERVER_RUNTIME("Server runtime"),WORLD_DATA("World data"),SHADERS("Shaders"),DATABASE("Database setup");
+        public final String label;
+        Component(String label){this.label=label;}
+    }
+    /** A named missing/incompatible selection is not an instruction to delete
+     * retained work. Repairs remain explicit and limited to this component. */
+    public static final class PreparationRequired extends IOException {
+        public final Component component;
+        public PreparationRequired(Component component,IOException cause) {
+            super(component.label+" is not ready: "+cause.getMessage()+". Use Repair local component → "+component.label+". Existing imports and saves are retained.",cause);
+            this.component=component;
+        }
+    }
+    private interface Checked<T>{T get()throws IOException;}
+    private static <T> T component(Component selected,Checked<T> action)throws IOException {
+        try{return action.get();}
+        catch(RuntimeWork.CancelledException error){throw error;}
+        catch(PreparationRequired error){throw error;}
+        catch(IOException error){throw new PreparationRequired(selected,error);}
+    }
+    private static Path installed(Component selected,Checked<Path> action)throws IOException {
+        return component(selected,()->{Path path=action.get();if(path==null)throw new IOException("The selected bundled provider is not installed");return path;});
+    }
     public static final class Result {
         public final ServerDataBinding data;
         public final ShaderSetup.Result shaders;
@@ -62,18 +86,16 @@ public final class LocalWorldSetup {
         programs.requireServerRuntimeArchive(server.archiveSha256());content.requireServerRuntimeArchive(server.archiveSha256());
         dataTools.requireServerRuntimeArchive(server.archiveSha256());shaderTools.requireWineArchive(wine.archiveSha256());
         RuntimeWork.Progress updates=progress==null?RuntimeWork.NONE:progress;
-        updates.update("world-admission-server-runtime","",0,-1);Path serverRoot=server.current();
-        updates.update("world-admission-server-programs","",0,-1);Path programsRoot=programs.current();
-        updates.update("world-admission-server-content","",0,-1);Path contentRoot=content.current();
-        updates.update("world-admission-data-tools","",0,-1);Path dataRoot=dataTools.current();
-        updates.update("world-admission-client-runtime","",0,-1);Path wineRoot=wine.current();
-        updates.update("world-admission-shader-tools","",0,-1);Path shaderRoot=shaderTools.current();
-        if(serverRoot==null||programsRoot==null||contentRoot==null||dataRoot==null||wineRoot==null||shaderRoot==null)
-            throw new IOException("Prepare all pinned runtime providers before local world setup");
+        updates.update("world-admission-server-runtime","",0,-1);installed(Component.SERVER_RUNTIME,server::current);
+        updates.update("world-admission-server-programs","",0,-1);installed(Component.SERVER_RUNTIME,programs::current);
+        updates.update("world-admission-server-content","",0,-1);installed(Component.SERVER_RUNTIME,content::current);
+        updates.update("world-admission-data-tools","",0,-1);installed(Component.SERVER_RUNTIME,dataTools::current);
+        updates.update("world-admission-client-runtime","",0,-1);installed(Component.CLIENT_RUNTIME,wine::current);
+        updates.update("world-admission-shader-tools","",0,-1);installed(Component.CLIENT_RUNTIME,shaderTools::current);
         // This is deliberately before extraction and before fresh SQL. A stock
         // programs-only APK must not begin an installation it cannot complete.
         updates.update("world-admission-existing-database","",0,-1);
-        FreshServerInstallations.Active previous=ServerInstallationSetup.completedOrNull(context,root,server,programs,content);
+        FreshServerInstallations.Active previous=component(Component.DATABASE,()->ServerInstallationSetup.completedOrNull(context,root,server,programs,content));
         Path state=GuestHelperAssets.directory(root,"state");Path lockPath=state.resolve(".local-world-setup.lock");
         if(Files.exists(lockPath,LinkOption.NOFOLLOW_LINKS)&&(!Files.isRegularFile(lockPath,LinkOption.NOFOLLOW_LINKS)||
                 !lockPath.equals(lockPath.toRealPath())))throw new IOException("Invalid local setup ownership file");
@@ -135,6 +157,22 @@ public final class LocalWorldSetup {
             return usage;
         }
         public Result prepare(RuntimeWork.Progress progress,RuntimeWork.Cancellation cancellation)throws IOException {
+            return run(null,false,progress,cancellation);
+        }
+        /** Normal startup selects completed receipts only. No extraction,
+         * translation, SQL setup, download or runtime installer is invoked. */
+        public Result selectPrepared(RuntimeWork.Progress progress,RuntimeWork.Cancellation cancellation)throws IOException {
+            return run(null,true,progress,cancellation);
+        }
+        /** Rebuild/revalidate just the named derived component. Database setup
+         * uses the existing transactional owner and never initializes over an
+         * active save. Other components must already be selectable. */
+        public Result repair(Component selected,RuntimeWork.Progress progress,RuntimeWork.Cancellation cancellation)throws IOException {
+            if(selected!=Component.WORLD_DATA&&selected!=Component.SHADERS&&selected!=Component.DATABASE)
+                throw new IOException("Runtime components use their separate runtime preparation action");
+            return run(selected,false,progress,cancellation);
+        }
+        private Result run(Component repair,boolean selectOnly,RuntimeWork.Progress progress,RuntimeWork.Cancellation cancellation)throws IOException {
             background();return operations.run(()->{
                 if(state!=State.ALLOCATED)throw new IOException("Local world setup is single-use; retain and close this owner");
                 state=State.PREPARING;
@@ -142,28 +180,35 @@ public final class LocalWorldSetup {
                 RuntimeWork.Progress updates=progress==null?RuntimeWork.NONE:progress;
                 try {
                     updates.update("world-data-owner-admission","",0,-1);
-                    check(stop);data=ServerDataSetup.begin(context,root,server,tools,locale,threads);
-                    ServerDataBinding binding=data.prepare(updates,stop);
+                    check(stop);data=component(Component.WORLD_DATA,()->ServerDataSetup.begin(context,root,server,tools,locale,threads));
+                    ServerDataBinding binding=component(Component.WORLD_DATA,()->
+                        !selectOnly&&(repair==null||repair==Component.WORLD_DATA)?data.prepare(updates,stop):data.selectPrepared(updates,stop));
                     updates.update("world-shader-owner-admission","",0,-1);
-                    check(stop);shaders=ShaderSetup.begin(context,root,wine,shaderTools,locale);
-                    ShaderSetup.Result generated=shaders.prepare(updates,stop);
+                    check(stop);shaders=component(Component.SHADERS,()->ShaderSetup.begin(context,root,wine,shaderTools,locale));
+                    ShaderSetup.Result generated=component(Component.SHADERS,()->
+                        !selectOnly&&(repair==null||repair==Component.SHADERS)?shaders.prepare(updates,stop):shaders.selectPrepared(updates,stop));
                     if(!generated.locale.equals(binding.effectiveLocale))
                         throw new IOException("Shader and server data effective client locales differ; prepared outputs are retained");
                     binding.requireUnchanged();check(stop);
                     FreshServerInstallations.Active active=previous;
                     if(active==null) {
+                        if(selectOnly||(repair!=null&&repair!=Component.DATABASE))
+                            throw new PreparationRequired(Component.DATABASE,new IOException("No completed source-matched database setup is selected"));
                         // Recheck absence under the transactional installation
                         // lock in beginFresh; never replace an intervening save.
                         updates.update("world-database-owner-admission","",0,-1);
-                        installation=ServerInstallationSetup.beginFresh(context,root,server,programs,content,binding.directory,reserve);
-                        installation.prepare(updates,stop);check(stop);
-                        installation.finishPlayerbots(updates,stop);check(stop);
-                        active=installation.stopAndPromote(Duration.ofSeconds(30));
-                    } else active=ServerInstallationSetup.completed(context,root,server,programs,content);
+                        installation=component(Component.DATABASE,()->ServerInstallationSetup.beginFresh(context,root,server,programs,content,binding.directory,reserve));
+                        active=component(Component.DATABASE,()->{
+                            installation.prepare(updates,stop);check(stop);
+                            installation.finishPlayerbots(updates,stop);check(stop);
+                            return installation.stopAndPromote(Duration.ofSeconds(30));
+                        });
+                    } else active=component(Component.DATABASE,()->ServerInstallationSetup.completed(context,root,server,programs,content));
                     binding.requireUnchanged();check(stop);
                     if(!generated.importGeneration.equals(binding.inputs().getString("importGeneration")))
                         throw new IOException("Shader and server data import generations differ");
                     state=State.PREPARED;
+                    if(selectOnly)updates.update("world-reused-source-bound-prepared-selection","Payload integrity is checked by the new session owner",0,-1);
                     return new Result(this,binding,generated,active);
                 }catch(org.json.JSONException error){failure=new IOException("Invalid prepared input identity",error);state=State.FAILED;throw failure;}
                 catch(IOException|RuntimeException error){failure=error instanceof IOException?(IOException)error:new IOException("Local world setup failed",error);state=State.FAILED;throw error;}

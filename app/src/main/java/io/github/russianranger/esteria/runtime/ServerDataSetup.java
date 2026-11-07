@@ -131,6 +131,31 @@ public final class ServerDataSetup {
             OwnedProcess child=process;return child==null?null:child.usage();
         }
         public long elapsedSeconds(){return beganNanos==0?0:TimeUnit.NANOSECONDS.toSeconds(System.nanoTime()-beganNanos);}
+        /** Select an existing source-bound receipt without invoking extraction.
+         * This owner retains the import/setup leases; the later server-session
+         * owner must independently verify payload bytes after taking ownership. */
+        public ServerDataBinding selectPrepared(RuntimeWork.Progress progress,RuntimeWork.Cancellation cancellation)throws IOException {
+            background();return operations.run(()->{
+                if(state!=State.ALLOCATED)throw new IOException("Data selection already ran; close/retry with a new owner");
+                state=State.PREPARING;beganNanos=System.nanoTime();
+                RuntimeWork.Cancellation cancelled=()->operations.isStopRequested()||(cancellation!=null&&cancellation.isCancelled());
+                try {
+                    phase="selecting-prepared";report(progress);check(cancelled);providers();
+                    if(!imported.equals(ShaderRunPlan.current(game)))throw new IOException("Import changed after data ownership allocation");
+                    String helper=ServerDataAssets.install(context,work);
+                    ServerDataToolSelection selected=tools.selection();
+                    // Do not rewrite a missing/changed selection into apparent readiness.
+                    plan=new ServerDataRunPlan(game,toolsRoot,work,helper,selected.sha256,locale,threads);
+                    ServerDataBinding binding=ServerDataBinding.inspect(plan,ServerDataToolSelection.SERVER_REVISION);
+                    providers();binding.requireUnchanged();check(cancelled);
+                    phase="reused-bound-receipt-payload-verification-at-session-admission";state=State.PREPARED;report(progress);
+                    return binding;
+                }catch(IOException|RuntimeException error) {
+                    state=State.FAILED;failure=error instanceof IOException?(IOException)error:new IOException("Prepared data selection failed",error);
+                    throw error;
+                }
+            });
+        }
         /** Single-use. Canonical selection is supplied by the typed source-
          * qualified provider; no public self-hashed plan can replace it. */
         public ServerDataBinding prepare(RuntimeWork.Progress progress,RuntimeWork.Cancellation cancellation)throws IOException {

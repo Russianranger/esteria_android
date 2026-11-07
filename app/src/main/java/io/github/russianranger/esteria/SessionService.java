@@ -73,6 +73,7 @@ public final class SessionService extends Service {
     static final String PREPARE_RUNTIME = "io.github.russianranger.esteria.PREPARE_RUNTIME";
     static final String PREPARE_SERVER_RUNTIME = "io.github.russianranger.esteria.PREPARE_SERVER_RUNTIME";
     static final String PREPARE_WORLD = "io.github.russianranger.esteria.PREPARE_WORLD";
+    static final String REPAIR_COMPONENT = "repairComponent";
     static final String WORLD_LOCALE = "worldLocale";
     static final String SCAN_STORAGE = "io.github.russianranger.esteria.SCAN_STORAGE";
     static final String TRIM_STORAGE = "io.github.russianranger.esteria.TRIM_STORAGE";
@@ -300,8 +301,18 @@ public final class SessionService extends Service {
                 else if (PREPARE_SERVER_RUNTIME.equals(intent.getAction())) prepareServerRuntime();
                 else if (PREPARE_WORLD.equals(intent.getAction())) {
                     String locale=intent.getStringExtra(WORLD_LOCALE);
-                    inspectStockClient(locale,true);
-                    prepareStockRuntime(locale);prepareServerRuntime();prepareWorld(locale);
+                    String repair=intent.getStringExtra(REPAIR_COMPONENT);
+                    if(repair==null){
+                        inspectStockClient(locale,true);
+                        prepareStockRuntime(locale);prepareServerRuntime();prepareWorld(locale);
+                    } else {
+                        LocalWorldSetup.Component selected;
+                        try{selected=LocalWorldSetup.Component.valueOf(repair);}
+                        catch(IllegalArgumentException invalid){throw new IOException("Choose a named local component to repair",invalid);}
+                        if(selected==LocalWorldSetup.Component.CLIENT_RUNTIME){inspectStockClient(locale,true);prepareStockRuntime(locale);}
+                        else if(selected==LocalWorldSetup.Component.SERVER_RUNTIME)prepareServerRuntime();
+                        else worldOperation(locale,selected,false);
+                    }
                 }
                 else if (SCAN_STORAGE.equals(intent.getAction())) maintainStorage(false);
                 else if (TRIM_STORAGE.equals(intent.getAction())) maintainStorage(true);
@@ -466,7 +477,7 @@ public final class SessionService extends Service {
         if(locale==null)locale=getSharedPreferences("world",MODE_PRIVATE).getString("locale",null);
         if(locale==null)throw new IOException("Select the imported client language before starting");
         String selectedLocale=locale;
-        runPreparation(START,()->{inspectStockClient(selectedLocale,true);prepareStockRuntime(selectedLocale);prepareServerRuntime();prepareWorld(selectedLocale);});
+        runPreparation(START,()->{selectPreparedWorld(selectedLocale);});
         if(cancelled.get())throw new RuntimeWork.CancelledException();
         LocalWorldSetup.Result setup=preparedWorld;
         if(setup==null)throw new IOException("Local world setup did not complete");
@@ -483,7 +494,14 @@ public final class SessionService extends Service {
         game=owner;lastRecoveryRequired=false;lastClientExitAcknowledged=false;
         Throwable operationFailure=null;
         try {
-            owner.start((phase,path,completed,total)->{keepAwake();rememberLogs(owner.diagnosticLogs());status=phase.contains("database")?"Starting the local database…":phase.startsWith("server")?"Starting local services…":"Starting the reconstructed client…";},cancelled::get);
+            // A new owner rechecks actual payload integrity; keep reads paced,
+            // cancellable and observed without extending the scope into play.
+            runPreparation(START,()->{owner.start((phase,path,completed,total)->{
+                keepAwake();rememberLogs(owner.diagnosticLogs());preparationProgress(phase,path,completed,total);
+                status=(phase.startsWith("shaders-session")?"Verifying prepared shaders…":phase.contains("database")?"Starting the local database…":phase.startsWith("server")?"Starting local services…":"Starting the reconstructed client…")
+                    +(path==null||path.isEmpty()?"":"\n"+path);
+                if(phase.startsWith("server-session")&&path!=null&&!path.isEmpty())log("Local services "+path);
+            },cancelled::get);});
             rememberLogs(owner.diagnosticLogs());
             status="Local client started. Displayed login and world state have not been automatically verified.";
             while(!cancelled.get()&&owner.state()==GameSession.State.CLIENT_STARTED&&owner.isClientAlive()) {
@@ -772,6 +790,19 @@ public final class SessionService extends Service {
                 : "Database dependencies and server programs are prepared. Local server startup is still under development.";
     }
     private void prepareWorld(String locale)throws IOException {
+        worldOperation(locale,null,false);
+    }
+    private void selectPreparedWorld(String locale)throws IOException {
+        RuntimeSetup wine=new RuntimeSetup(this,root);ClientRuntimeSetup client=new ClientRuntimeSetup(this,root);
+        GuestBridgeSetup bridges=new GuestBridgeSetup(this,root);TurnipSetup turnip=new TurnipSetup(this,root);
+        try {
+            client.requireWineArchive(wine.archiveSha256());bridges.requireWineArchive(wine.archiveSha256());turnip.requireWineArchive(wine.archiveSha256());
+            if(client.current()==null||bridges.current()==null||turnip.current()==null)
+                throw new IOException("The matching reconstructed client, presentation or graphics provider is not installed");
+        }catch(IOException error){throw new LocalWorldSetup.PreparationRequired(LocalWorldSetup.Component.CLIENT_RUNTIME,error);}
+        worldOperation(locale,null,true);
+    }
+    private void worldOperation(String locale,LocalWorldSetup.Component repair,boolean selectOnly)throws IOException {
         // Keep the previous fixed logs until a replacement owner supplies its paths.
         preparationProgress("world-admission","",0,-1);
         if(locale==null||!java.util.Set.of("deDE","enGB","enUS","esES","frFR","koKR","zhCN","zhTW","enCN","enTW","esMX","ruRU").contains(locale))
@@ -785,18 +816,22 @@ public final class SessionService extends Service {
         ServerContentSetup content=new ServerContentSetup(this,root);
         ServerDataToolsSetup tools=new ServerDataToolsSetup(this,root);
         RuntimeSetup wine=new RuntimeSetup(this,root);ShaderToolsSetup shaders=new ShaderToolsSetup(this,root);
-        preparationProgress("world-graphics-check","",0,-1);
-        if(BuildConfig.TURNIP_PACKAGED)verifyGraphics(wine,new TurnipSetup(this,root));
-        status="Preparing the local world. Completed data is reused when its inputs match…";
+        if(!selectOnly&&repair==null){
+            preparationProgress("world-graphics-check","",0,-1);
+            if(BuildConfig.TURNIP_PACKAGED)verifyGraphics(wine,new TurnipSetup(this,root));
+        }
+        status=selectOnly?"Selecting prepared local components…":repair==null?"Preparing and fully verifying the local world…":"Repairing "+repair.label+"…";
         // Four GiB is a conservative free-space policy for fresh database work,
         // separate from imported/extracted assets; no device footprint claim.
         LocalWorldSetup.Handle owner=LocalWorldSetup.begin(this,root,server,programs,content,tools,wine,shaders,locale,1,4L<<30,this::preparationProgress);
         worldSetup=owner;
         Throwable operationFailure=null;LocalWorldSetup.Result result;
         try {
-            result=owner.prepare((phase,path,completed,total)->{keepAwake();preparationProgress(phase,path,completed,total);},cancelled::get);
-            log("World setup completed dataGeneration="+result.data.generation+" shaders="+result.shaders.generation
+            RuntimeWork.Progress progress=(phase,path,completed,total)->{keepAwake();preparationProgress(phase,path,completed,total);};
+            result=selectOnly?owner.selectPrepared(progress,cancelled::get):repair==null?owner.prepare(progress,cancelled::get):owner.repair(repair,progress,cancelled::get);
+            log((selectOnly?"World setup reused":"World setup completed")+" dataGeneration="+result.data.generation+" shaders="+result.shaders.generation
                 +" installation="+result.installation.slotId+" reusedInstallation="+result.reusedInstallation
+                +(selectOnly?" reason=source-import-provider-helper-receipts-match extractionInvocations=0 shaderCompilerInvocations=0 runtimeDownloads=0 clientCopiedBytes=0 integrity=verify-under-new-session-ownership":"")
                 +" worldQualified=false gameplayQualified=false");
         }catch(IOException|RuntimeException error){operationFailure=error;throw error;}
         finally {
@@ -806,7 +841,7 @@ public final class SessionService extends Service {
         }
         preparedWorld=result;
         getSharedPreferences("world",MODE_PRIVATE).edit().putString("locale",locale).apply();
-        status="World data, shaders and the local database are prepared. World entry has not yet been validated.";
+        status=selectOnly?"Reusing prepared world data, shaders and saved database; checking integrity at session startup.":"World data, shaders and the local database are prepared. World entry has not yet been validated.";
     }
     /** Explicit setup checks the installed driver before lengthy extraction or
      * SQL. The Service keeps cleanup ownership and logs through cancellation. */

@@ -44,6 +44,43 @@ SELECTION_SCOPE = 'android-owned-auth-world-selection'
 _PREPARED_CAPABILITY = object()
 
 
+class StartupStatus:
+    """Bounded public phase facts; never logs, paths, credentials or SQL text.
+
+    Atomic status is operation/source bound and does not authorize readiness.
+    Its fixed-vocabulary stdout is included by the existing support exporter.
+    """
+    def __init__(self, operation_root, operation, selected, *, clock=time.monotonic):
+        self.root, self.operation, self.selected, self.clock = operation_root, operation, selected, clock
+        self.started = clock(); self.native_started = None; self.sequence = 0
+        self.process, self.condition = 'helper', 'source-selection'
+
+    def update(self, condition, process='helper', *, native=False, failure=None):
+        require(condition in ('source-selection', 'provider-verification', 'prepared-data-verification',
+            'schema-verification', 'configuration-verification', 'native-launch', 'owned-auth-listener',
+            'auth-challenge', 'owned-world-listener', 'world-challenge', 'world-console', 'owned-ready') and
+            process in ('helper', 'authserver', 'worldserver'), 'Fixed server startup diagnostic required')
+        now = self.clock()
+        if native and self.native_started is None:
+            self.native_started = now
+        self.process, self.condition = process, condition
+        self.sequence += 1
+        kind = '' if failure is None else type(failure).__name__
+        require(not kind or re.fullmatch('[A-Za-z][A-Za-z0-9]{0,63}', kind), 'Bounded startup failure kind required')
+        row = dict(formatVersion=1, scope='owned-local-server-startup-status', operationId=self.operation,
+            sourceLockSha256=self.selected['sourceLockSha256'], activeProofSha256=self.selected['activeProofSha256'],
+            sequence=self.sequence, phase='admission' if self.native_started is None else 'native-startup',
+            process=process, readiness=condition, elapsedMs=max(0, int((now-self.started)*1000)),
+            nativeElapsedMs=-1 if self.native_started is None else max(0, int((now-self.native_started)*1000)),
+            failureType=kind)
+        db.atomic_json(self.root / 'startup-status.json', row)
+        print('Server startup phase={phase} process={process} readiness={readiness} elapsedMs={elapsedMs} '
+              'nativeElapsedMs={nativeElapsedMs} failure={failureType}'.format(**row), flush=True)
+
+    def failed(self, error):
+        self.update(self.condition, self.process, failure=error)
+
+
 @dataclass(frozen=True)
 class Prepared:
     """Created only by prepare's actual source/schema/data/config verification."""
@@ -87,7 +124,7 @@ def _programs(programs):
 
 
 def prepare(verified, connection, state, version, *, programs, data_generation, expected_data_inputs,
-            profile, mysql, expected_uuid, verify_service, state_lease=None, cancelled=lambda: False):
+            profile, mysql, expected_uuid, verify_service, state_lease=None, cancelled=lambda: False, progress=lambda *_: None):
     """Verify actual four-schema ownership before preparing session config.
 
     Caller holds the database's live service lease. Complete promotion is a
@@ -103,8 +140,10 @@ def prepare(verified, connection, state, version, *, programs, data_generation, 
     selected = _programs(programs)
     data_root = data.storage.canonical(Path(data_generation))
     expected_generation = hashlib.sha256(data.storage.encoded(expected_data_inputs)).hexdigest()
+    progress('prepared-data-verification')
     checked_data = data.verify_completed(data_root, expected_data_inputs, expected_generation=expected_generation)
     require(checked_data['inputs']['serverRevision'] == realm.SERVER_REVISION, 'Prepared data server source differs')
+    progress('schema-verification')
     with db.state_scope(state, state_lease) as lease:
         # Verify the real completed compiled loader first. Missing fourth-schema
         # proof must not change any active configuration or start any process.
@@ -116,6 +155,7 @@ def prepare(verified, connection, state, version, *, programs, data_generation, 
                 'Completed same-instance playerbots schema required')
         # Whole prepared-generation mount: the actual server DataDir is its
         # data child. This changes generated configs only, never setup journals.
+        progress('configuration-verification')
         rendered = config.render_verified(verified, state, data_root / 'data', Path(mysql), profile=profile)
         require(rendered.get('module_configurations_complete') is True, 'Complete source module configuration required')
         common = dict(profile=profile, data=data_root / 'data', mysql=Path(mysql), expected_uuid=expected_uuid,
@@ -197,13 +237,15 @@ class Session:
     def _await(self, condition, deadline, cancelled):
         while True:
             require(not cancelled(), 'Owned server startup cancelled')
-            self._check()
-            if condition():
-                return
             require(time.monotonic() < deadline, 'Owned server readiness deadline exceeded')
+            self._check()
+            satisfied = condition()
+            require(time.monotonic() < deadline, 'Owned server readiness deadline exceeded')
+            if satisfied:
+                return
             time.sleep(.05)
 
-    def start(self, *, timeout=180, cancelled=lambda: False):
+    def start(self, *, timeout=180, cancelled=lambda: False, progress=lambda *_, **__: None):
         require(not self.started and self.auth is None and self.world is None and not self.closed and 0 < timeout <= 600,
                 'Server session startup is single-use and bounded')
         self.started = True
@@ -220,24 +262,35 @@ class Session:
         password = None
         _programs(selected.programs)
         self._check(); deadline = time.monotonic() + timeout
+        progress('native-launch', 'authserver', native=True)
         configurations = selected.state / 'config/generations' / selected.generation
         self.auth = processes.ServerChild('authserver', selected.programs['authserver']['path'],
             configurations / 'authserver.conf', selected.state / 'run/authserver', self.operation / 'authserver.log')
         self.auth.start()
+        progress('owned-auth-listener', 'authserver')
         self._await(lambda: processes.owns_loopback_listener(self.auth.group, 3724), deadline, cancelled)
-        require(processes.auth_challenge(), 'Auth source challenge callback failed')
+        progress('auth-challenge', 'authserver')
+        require(time.monotonic() < deadline and not cancelled(), 'Owned auth challenge startup deadline/cancellation')
+        require(processes.auth_challenge(timeout=min(1, deadline-time.monotonic())), 'Auth source challenge callback failed')
         require(processes.owns_loopback_listener(self.auth.group, 3724), 'Auth listener changed during protocol probe')
         self._check()
+        progress('native-launch', 'worldserver')
         self.world = processes.ServerChild('worldserver', selected.programs['worldserver']['path'],
             configurations / 'worldserver.conf', selected.state / 'run/worldserver', self.operation / 'worldserver.log')
         self.world.start()
+        progress('owned-world-listener', 'worldserver')
         self._await(lambda: processes.owns_loopback_listener(self.world.group, 8085), deadline, cancelled)
-        require(processes.world_challenge(), 'World source protocol challenge failed')
+        progress('world-challenge', 'worldserver')
+        require(time.monotonic() < deadline and not cancelled(), 'Owned world challenge startup deadline/cancellation')
+        require(processes.world_challenge(timeout=min(1, deadline-time.monotonic())), 'World source protocol challenge failed')
         require(processes.owns_loopback_listener(self.world.group, 8085), 'World listener changed during protocol probe')
+        progress('world-console', 'worldserver')
         before = self.world.info_counter(); self.world.send_world(processes.WORLD_INFO)
         self._await(lambda: self.world.info_counter() > before, deadline, cancelled)
         self._check(world_ready=True)
+        require(time.monotonic() < deadline and not cancelled(), 'Owned native startup deadline/cancellation before ready')
         self.ready = True
+        progress('owned-ready', 'worldserver')
         return dict(formatVersion=1, scope=SCOPE, mysqlUuid=selected.uuid, mysqlVersion=selected.version,
             configGeneration=selected.generation, dataReceipt=selected.data_receipt,
             contentReceipt=selected.content.identities['receipt'], sourceLockSha256=selected.content.receipt['sourceLockSha256'],
@@ -320,6 +373,8 @@ def run(state, operation_root, content_root, receipt_path, programs_root, servic
     require(state != operation_root and not state.is_relative_to(operation_root) and not operation_root.is_relative_to(state),
             'Session operation must be separate from database state')
     selected = selected_inputs(operation_root / 'selection.json')
+    status = StartupStatus(operation_root, operation, selected)
+    status.update('source-selection')
     require(baseline.file_identity(state / 'server-setup-complete.json') == selected['setupReceipt'],
             'Promoted complete setup receipt changed')
     compiled, pin = owner.read_json(programs_root / 'provenance/server-modules.json', content.MAX_METADATA)
@@ -344,6 +399,7 @@ def run(state, operation_root, content_root, receipt_path, programs_root, servic
             raise StopRequested('Owned server stop requested')
     current = None; failure = None; reported = None
     try:
+        status.update('provider-verification')
         verified = content.verify(content_root, receipt_path, selected['contentReceipt']['sha256'], selected['source'],
             selected['sourceLockSha256'], compiled, cancelled=requested)
         password = db.read_secret(state / 'accounts/database-secret')
@@ -354,12 +410,17 @@ def run(state, operation_root, content_root, receipt_path, programs_root, servic
                 def verify_service():
                     owner.live_service(connection, state, service_session, version, service_operation, uuid)
                     return True
-                prepared = prepare(verified, connection, state, version, programs=selected_programs,
-                    data_generation=data_root, expected_data_inputs=selected['dataInputs'], profile=profile, mysql=mysql,
-                    expected_uuid=uuid, verify_service=verify_service, state_lease=lease, cancelled=requested)
+                # Scope ends before native launch. The frozen data helpers are
+                # adapted only for this admission; no receipt/generation changes.
+                with data.world_io.android_policy(cancelled=requested,
+                        progress=lambda value: print('SESSION_ADMISSION ' + value, flush=True)):
+                    data.world_io.phase('server-session-admission')
+                    prepared = prepare(verified, connection, state, version, programs=selected_programs,
+                        data_generation=data_root, expected_data_inputs=selected['dataInputs'], profile=profile, mysql=mysql,
+                        expected_uuid=uuid, verify_service=verify_service, state_lease=lease, cancelled=requested, progress=status.update)
                 current = Session(prepared, connection, operation_root, verify_service)
                 try:
-                    reported = dict(current.start(cancelled=requested), operationId=operation, serviceOperationId=service_operation,
+                    reported = dict(current.start(cancelled=requested, progress=status.update), operationId=operation, serviceOperationId=service_operation,
                                     activeProofSha256=selected['activeProofSha256'])
                     db.atomic_json(operation_root / 'ready.json', reported)
                     while not requested():
@@ -369,7 +430,7 @@ def run(state, operation_root, content_root, receipt_path, programs_root, servic
                             stop_reason[0] = reason
                 except Exception as error:
                     if not isinstance(error, StopRequested) and not requested():
-                        failure = type(error).__name__
+                        failure = type(error).__name__; status.failed(error)
                 finally:
                     # Reap failures do not turn into a fake clean exit. Keep the
                     # real guest alive and its database/config dependencies held.
@@ -384,7 +445,7 @@ def run(state, operation_root, content_root, receipt_path, programs_root, servic
                 connection.close()
     except Exception as error:
         if not isinstance(error, StopRequested):
-            failure = failure or type(error).__name__
+            failure = failure or type(error).__name__; status.failed(error)
     finally:
         control.close()
     auth_clean = current is not None and current.auth is not None and current.auth.shutdown_acknowledged

@@ -1,0 +1,85 @@
+{
+  "scope": "host-linux-instrumented-production-python-coordinator-synthetic-storage-fixture",
+  "realExtractorExecution": false,
+  "ownerGameData": false,
+  "androidOrProotExecution": false,
+  "nativeServiceStartupExecuted": false,
+  "counts": "Inventory bytes count complete payload SHA reads. Tracked hashes include helper/import/order metadata. Small header reads are not included. Metadata writes exclude simulated extractor writes. Clone uses real host hardlinks; no fallbacks forced. Session sample is data subphase only, excluding SQL and binaries.",
+  "preparedFixturePayloadBytes": 109,
+  "environment": {
+    "system": "Linux",
+    "machine": "x86_64",
+    "python": "3.12.14"
+  },
+  "sourceSha256": {
+    "runtime/server_data_generation.py": "127d459893eeb685b77b36a89455a8a84d2f7262ccd73c01f155e5fc03b8b3fd",
+    "runtime/server_data_preflight.py": "026c70c1da2de4ee7899479960909d51e4549b8b67b7b0a56dd0a48b7c0a7f24",
+    "runtime/world_io.py": "2e1e027ef358b29e840591b054251c913b3143343386bebc2f7aa9a4f9e75f1a",
+    "tests/test_server_data_generation.py": "5cde68d670a3b4de06b78929394cddb373954e07dab6ffff37e0dc02af0608b9",
+    "tools/measure_prepared_data_reads.py": "8deb71dab720c00f1a1fbc8fda69b62d39b8ffa2e9b14316ea041b909164f93b"
+  },
+  "measurements": [
+    {
+      "phase": "initial-preparation",
+      "inventoryCalls": 5,
+      "inventoryPayloadBytesRead": 294,
+      "cloneCalls": 7,
+      "linkedPayloadBytes": 161,
+      "copiedPayloadBytes": 0,
+      "metadataBytesWritten": 5821,
+      "extractorInvocations": 4,
+      "capabilityInvocations": 2,
+      "allTrackedHashBytesRead": 423652,
+      "reuseReasons": [],
+      "elapsedSeconds": 0.069318
+    },
+    {
+      "phase": "unchanged-warm-preparation",
+      "inventoryCalls": 1,
+      "inventoryPayloadBytesRead": 109,
+      "cloneCalls": 0,
+      "linkedPayloadBytes": 0,
+      "copiedPayloadBytes": 0,
+      "metadataBytesWritten": 65,
+      "extractorInvocations": 0,
+      "capabilityInvocations": 0,
+      "allTrackedHashBytesRead": 423261,
+      "reuseReasons": [],
+      "elapsedSeconds": 0.010494
+    },
+    {
+      "phase": "session-admission-data-verification-only",
+      "inventoryCalls": 1,
+      "inventoryPayloadBytesRead": 109,
+      "cloneCalls": 0,
+      "linkedPayloadBytes": 0,
+      "copiedPayloadBytes": 0,
+      "metadataBytesWritten": 0,
+      "extractorInvocations": 0,
+      "capabilityInvocations": 0,
+      "allTrackedHashBytesRead": 141493,
+      "reuseReasons": [],
+      "elapsedSeconds": 0.005415
+    },
+    {
+      "phase": "retained-completed-phases-and-final-assembly-retry",
+      "inventoryCalls": 6,
+      "inventoryPayloadBytesRead": 403,
+      "cloneCalls": 0,
+      "linkedPayloadBytes": 0,
+      "copiedPayloadBytes": 0,
+      "metadataBytesWritten": 4119,
+      "extractorInvocations": 0,
+      "capabilityInvocations": 0,
+      "allTrackedHashBytesRead": 423761,
+      "reuseReasons": [
+        "extraction-reused-maps-dbc-cameras",
+        "extraction-reused-raw-vmaps",
+        "extraction-reused-assembled-vmaps",
+        "extraction-reused-navigation",
+        "extraction-reused-final-assembly"
+      ],
+      "elapsedSeconds": 0.037512
+    }
+  ]
+}

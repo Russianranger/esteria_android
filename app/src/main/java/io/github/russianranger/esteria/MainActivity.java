@@ -127,12 +127,23 @@ public final class MainActivity extends Activity {
             String selected=getPreferences(MODE_PRIVATE).getString("clientLanguage","enUS");
             for(int i=0;i<CLIENT_LOCALES.length;i++)if(CLIENT_LOCALES[i].equals(selected))clientLanguage.setSelection(i);
             layout.addView(clientLanguage);
-            button(layout,"Prepare local runtime / world",()->{
+            button(layout,"Prepare / fully verify local runtime and world",()->{
                 String locale=(String)clientLanguage.getSelectedItem();
                 getPreferences(MODE_PRIVATE).edit().putString("clientLanguage",locale).apply();
                 operation(new Intent(this,SessionService.class).setAction(SessionService.PREPARE_WORLD).putExtra(SessionService.WORLD_LOCALE,locale));
             });
-            layout.addView(text("This prepares world data, graphics data and the local database. Use the language of the imported client. Initial preparation can take a long time; completed stages are reused. Fresh database setup reserves 4 GiB in addition to world data.",13,Color.rgb(145,163,177)));
+            layout.addView(text("Use preparation after import, or for an explicit full integrity check. Completed compatible work is verified and retained. Start local game selects existing prepared components and does not rerun preparation. Fresh database setup reserves 4 GiB in addition to world data.",13,Color.rgb(145,163,177)));
+            button(layout,"Repair local component",()->{
+                io.github.russianranger.esteria.runtime.LocalWorldSetup.Component[] components=io.github.russianranger.esteria.runtime.LocalWorldSetup.Component.values();
+                String[] labels=new String[components.length];for(int i=0;i<components.length;i++)labels[i]=components[i].label;
+                new android.app.AlertDialog.Builder(this).setTitle("Choose the component reported as not ready")
+                    .setItems(labels,(dialog,index)->{
+                        String locale=(String)clientLanguage.getSelectedItem();
+                        operation(new Intent(this,SessionService.class).setAction(SessionService.PREPARE_WORLD)
+                            .putExtra(SessionService.WORLD_LOCALE,locale).putExtra(SessionService.REPAIR_COMPONENT,components[index].name()));
+                    }).setNegativeButton("Cancel",null).show();
+            });
+            layout.addView(text("Repair resumes or revalidates only the chosen component. Other completed components must match the current import and source versions. Corrupt completed output is preserved and may still require diagnosis from a support bundle. Database setup resumes unfinished setup or checks the existing database; it does not reset characters.",13,Color.rgb(145,163,177)));
         }
         uiReview=text("",14,Color.rgb(220,186,113)); uiReview.setTextIsSelectable(true);
         uiReview.setPadding(0,dp(16),0,dp(8)); uiReview.setVisibility(View.GONE); layout.addView(uiReview);

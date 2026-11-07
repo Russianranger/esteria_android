@@ -118,6 +118,26 @@ public final class ShaderSetup {
         public IOException cleanupFailure(){return cleanupFailure;}
         public boolean processAlive(){OwnedProcess child=process;return child!=null&&child.isAlive();}
         public io.github.russianranger.esteria.core.runtime.process.ProcessUsageSnapshot usage(){OwnedProcess child=process;return child==null?null:child.usage();}
+        /** Receipt selection only; no translator is launched. Caller holds the
+         * import lease, as for prepare. A new client owner performs full output
+         * verification at its own admission boundary through requireCurrent. */
+        public Result selectPrepared(RuntimeWork.Progress progress,RuntimeWork.Cancellation cancellation)throws IOException {
+            background();return operations.run(()->{
+                if(state!=State.ALLOCATED)throw new IOException("Shader selection already ran; close/retry with a new owner");
+                state=State.RUNNING;
+                RuntimeWork.Cancellation stop=()->operations.isStopRequested()||(cancellation!=null&&cancellation.isCancelled());
+                try {
+                    checkCancelled(stop);
+                    if(progress!=null)progress.update("shaders-selecting-prepared","",0,-1);
+                    if(!wineRoot.equals(wine.current())||!toolsRoot.equals(tools.current()))throw new IOException("Shader providers changed after allocation");
+                    ShaderRunPlan plan=new ShaderRunPlan(root.resolve("game"),toolsRoot,work,StockClientSetup.installHelpers(context,root),tools.revision(),locale);
+                    Result result=validatePrepared(plan,tools.toolManifestSha256(),null,false);
+                    checkCancelled(stop);state=State.SUCCEEDED;
+                    if(progress!=null)progress.update("shaders-reused-bound-receipt-payload-verification-at-client-admission","",result.outputFiles,result.outputFiles);
+                    return result;
+                }catch(IOException|RuntimeException error){state=State.FAILED;throw error;}
+            });
+        }
         /** Single use. Keep this owner on failure; cancellation stops the
          * complete owned guest. Atomic shader promotion may win that race. */
         public Result prepare(RuntimeWork.Progress progress,RuntimeWork.Cancellation cancellation)throws IOException {
@@ -195,12 +215,19 @@ public final class ShaderSetup {
     /** Recheck current provider/import/output metadata while the caller owns
      * import and client-view leases. This remains format-only shader evidence. */
     static Result requireCurrent(Context context,Path root,RuntimeSetup wine,ShaderToolsSetup tools,Result expected)throws IOException {
+        return requireCurrent(context,root,wine,tools,expected,RuntimeWork.NONE,null);
+    }
+    static Result requireCurrent(Context context,Path root,RuntimeSetup wine,ShaderToolsSetup tools,Result expected,
+            RuntimeWork.Progress progress,RuntimeWork.Cancellation cancellation)throws IOException {
         background();
+        checkCancelled(cancellation);
         if(expected==null||!root.equals(context.getFilesDir().getCanonicalFile().toPath()))throw new IOException("Private prepared shaders required");
         tools.requireWineArchive(wine.archiveSha256());
         if(wine.current()==null||tools.current()==null)throw new IOException("Prepared shader providers required");
         ShaderRunPlan plan=new ShaderRunPlan(root.resolve("game"),tools.current(),root.resolve("state/shader-work"),StockClientSetup.installHelpers(context,root),tools.revision(),expected.requestedLocale);
-        Result current=validatePrepared(plan,tools.toolManifestSha256(),expected.processLogs,false);
+        if(progress!=null)progress.update("shaders-session-integrity","Verifying prepared shaders under current session ownership",0,expected.outputBytes);
+        Result current=validatePrepared(plan,tools.toolManifestSha256(),expected.processLogs,false,true,cancellation);
+        if(progress!=null)progress.update("shaders-session-integrity-complete","Prepared shaders match their bound receipt",current.outputBytes,current.outputBytes);
         requireSameSelection(current,expected);return current;
     }
     static void requireSameSelection(Result current,Result expected)throws IOException {
@@ -214,6 +241,17 @@ public final class ShaderSetup {
      * This host readback checks those output paths/sizes, not GPU correctness.
      */
     static Result validatePrepared(ShaderRunPlan plan,String manifest,Path logs,boolean cancelled)throws IOException {
+        return validatePrepared(plan,manifest,logs,cancelled,false);
+    }
+    /** Full verification is required after ownership changes. The selection
+     * path above does only metadata admission; it never supplies an integrity
+     * lease or authorizes skipping these hashes in a later client session. */
+    static Result validatePrepared(ShaderRunPlan plan,String manifest,Path logs,boolean cancelled,boolean verifyPayload)throws IOException {
+        return validatePrepared(plan,manifest,logs,cancelled,verifyPayload,null);
+    }
+    static Result validatePrepared(ShaderRunPlan plan,String manifest,Path logs,boolean cancelled,boolean verifyPayload,
+            RuntimeWork.Cancellation cancellation)throws IOException {
+        checkCancelled(cancellation);
         Path store=canonicalDirectory(plan.work.resolve("shaders"));
         String generation=new String(read(store.resolve("current"),65),StandardCharsets.US_ASCII);
         if(!generation.matches("[0-9a-f]{64}\\n"))throw new IOException("Invalid prepared shader generation");
@@ -235,12 +273,12 @@ public final class ShaderSetup {
             for(Iterator<String> names=helperFiles.keys();names.hasNext();){
                 String name=names.next();JSONObject item=helperFiles.getJSONObject(name);long bytes=filePin(item,131072);
                 Path selected=plan.helpers.resolve(name);canonicalFile(selected);
-                if(Files.size(selected)!=bytes||!hashFile(selected,bytes).equals(item.getString("sha256")))throw new IOException("Prepared shader helper closure changed");
+                if(Files.size(selected)!=bytes||!hashFile(selected,bytes,cancellation).equals(item.getString("sha256")))throw new IOException("Prepared shader helper closure changed");
             }
             Path helper=plan.helpers.resolve("stock_shader_generation.py");canonicalFile(helper);
             long helperBytes=Files.size(helper);
             if(helperBytes<=0||helperBytes>131072)throw new IOException("Bounded app shader helper required");
-            if(!hashFile(helper,helperBytes).equals(inputs.get("preparationHelperSha256"))||
+            if(!hashFile(helper,helperBytes,cancellation).equals(inputs.get("preparationHelperSha256"))||
                 !io.github.russianranger.esteria.core.content.ContentProfile.ID.equals(inputs.get("contentProfile"))||
                 integer(inputs,"formatVersion")!=1||!plan.importGeneration.equals(inputs.get("importGeneration"))||
                 !plan.clientRevision.equals(inputs.get("clientRevision"))||!plan.locale.equals(inputs.get("locale"))||
@@ -256,13 +294,14 @@ public final class ShaderSetup {
                 JSONObject item=metadata.getJSONObject(name);long bytes=filePin(item,32L<<20);
                 metadataBytes+=bytes;if(metadataBytes>64L<<20)throw new IOException("Shader import metadata exceeds bound");
                 Path file=plan.game.resolve("generations").resolve(name);canonicalFile(file);
-                if(Files.size(file)!=bytes||!hashFile(file,bytes).equals(item.getString("sha256")))throw new IOException("Import metadata changed after shader setup");
+                if(Files.size(file)!=bytes||!hashFile(file,bytes,cancellation).equals(item.getString("sha256")))throw new IOException("Import metadata changed after shader setup");
             }
             JSONObject outputs=receipt.getJSONObject("outputs");
             if(outputs.length()<4||outputs.length()>32768*3+2||!outputs.has("manifest.txt")||!outputs.has("index.txt"))
                 throw new IOException("Incomplete shader output inventory");
             long total=0;int vertex=0,pixel=0;
             for(Iterator<String> names=outputs.keys();names.hasNext();) {
+                checkCancelled(cancellation);
                 String name=names.next();
                 if(!name.equals("manifest.txt")&&!name.equals("index.txt")&&!name.matches("(?:vertex|pixel)/[0-9a-f]{32}\\.(?:spv|glsl|spvasm)"))
                     throw new IOException("Unexpected shader output path");
@@ -270,10 +309,31 @@ public final class ShaderSetup {
                 if(total>2L<<30)throw new IOException("Shader output exceeds bound");
                 Path file=shaders.resolve(name);canonicalFile(file);
                 if(Files.size(file)!=bytes)throw new IOException("Prepared shader output size changed");
+                if(verifyPayload&&!hashFile(file,bytes,cancellation).equals(outputs.getJSONObject(name).getString("sha256")))
+                    throw new IOException("Prepared shader output bytes changed: "+name+"; repair shaders");
                 if(name.startsWith("vertex/")&&name.endsWith(".spv"))vertex++;
                 if(name.startsWith("pixel/")&&name.endsWith(".spv"))pixel++;
             }
             if(vertex==0||pixel==0)throw new IOException("Both prepared shader stages are required");
+            if(verifyPayload) {
+                // Detect additions as well as changed/deleted listed files.
+                int count=0;
+                try(var paths=Files.walk(shaders)) {
+                    for(var iterator=paths.iterator();iterator.hasNext();) {
+                        Path path=iterator.next();checkCancelled(cancellation);
+                        String relative=shaders.relativize(path).toString().replace(java.io.File.separatorChar,'/');
+                        if(Files.isDirectory(path,LinkOption.NOFOLLOW_LINKS)) {
+                            canonicalDirectory(path);
+                            if(!relative.isEmpty()&&!relative.equals("vertex")&&!relative.equals("pixel"))
+                                throw new IOException("Unexpected prepared shader directory: "+relative+"; repair shaders");
+                            continue;
+                        }
+                        canonicalFile(path);
+                        if(++count>outputs.length()||!outputs.has(relative))throw new IOException("Unexpected prepared shader output: "+relative+"; repair shaders");
+                    }
+                }
+                if(count!=outputs.length())throw new IOException("Prepared shader output inventory changed; repair shaders");
+            }
             plan.requireCurrentImport();
             return new Result(plan,generation,shaders,logs,outputs.length(),total,cancelled);
         }catch(JSONException error){throw new IOException("Invalid prepared shader receipt",error);}
@@ -320,9 +380,12 @@ public final class ShaderSetup {
     private static String hex(byte[] raw){StringBuilder out=new StringBuilder(64);for(byte b:raw)out.append(String.format(java.util.Locale.ROOT,"%02x",b&255));return out.toString();}
     private static String sha256(byte[] raw)throws IOException{return hex(digest().digest(raw));}
     private static String hashFile(Path path,long maximum)throws IOException {
+        return hashFile(path,maximum,null);
+    }
+    private static String hashFile(Path path,long maximum,RuntimeWork.Cancellation cancellation)throws IOException {
         MessageDigest digest=digest();long total=0;
         try(var input=Files.newInputStream(path,LinkOption.NOFOLLOW_LINKS)) {
-            byte[] buffer=new byte[65536];for(int count;(count=input.read(buffer))!=-1;){total+=count;if(total>maximum)throw new IOException("Shader input grew beyond bound");digest.update(buffer,0,count);io.github.russianranger.esteria.core.runtime.install.RuntimeReadPolicy.consumed(path,total-count,count);}
+            byte[] buffer=new byte[65536];for(int count;(count=input.read(buffer))!=-1;){checkCancelled(cancellation);total+=count;if(total>maximum)throw new IOException("Shader input grew beyond bound");digest.update(buffer,0,count);io.github.russianranger.esteria.core.runtime.install.RuntimeReadPolicy.consumed(path,total-count,count);}
         }if(total!=maximum)throw new IOException("Shader input size changed");return hex(digest.digest());
     }
     private static void background(){if(Looper.myLooper()==Looper.getMainLooper())throw new IllegalStateException("Shader lifecycle work must run off the UI thread");}

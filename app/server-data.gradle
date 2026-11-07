@@ -59,3 +59,22 @@ android.sourceSets.androidTest.assets.srcDir(pythonReceiptAssets)
 tasks.matching { it.name == 'preDebugAndroidTestBuild' }.configureEach {
     dependsOn preparePythonReceipts
 }
+
+// Host executes the production shader receipt consumer, with actual AOSP JSON
+// implementations ahead of the SDK stubs. No substitute serializer is used.
+def compileShaderIntegrity = tasks.register('compileShaderPreparedIntegrityFixture', JavaCompile) {
+    dependsOn 'compileDebugJavaWithJavac', ':core:classes'
+    source file('src/test/java/io/github/russianranger/esteria/runtime/ShaderPreparedIntegrityTests.java')
+    source rootProject.fileTree('tests/fixtures/android13-json/aosp') { include '*.java' }
+    source rootProject.fileTree('tests/fixtures/android13-json/support') { include '*.java' }
+    classpath = dataOwnerClasspath
+    destinationDirectory = layout.buildDirectory.dir('shaderPreparedIntegrityFixture')
+    sourceCompatibility = '17'; targetCompatibility = '17'
+}
+tasks.register('shaderPreparedIntegrityTest', JavaExec) {
+    dependsOn compileShaderIntegrity, preparePythonReceipts
+    classpath = files(compileShaderIntegrity.flatMap { it.destinationDirectory }) + dataOwnerClasspath
+    mainClass = 'io.github.russianranger.esteria.runtime.ShaderPreparedIntegrityTests'
+    args pythonReceiptAssets.map { it.dir('python-receipts').asFile }.get(), rootProject.file('runtime')
+    maxHeapSize = '32m'
+}

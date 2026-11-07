@@ -114,6 +114,24 @@ public final class PythonReceiptBindingTest {
             byte[] original=Files.readAllBytes(receipt);Path output=selected.resolve("shaders/manifest.txt");byte[] retained=Files.readAllBytes(output);var stamp=Files.getLastModifiedTime(output);
             ShaderSetup.Result result=ShaderSetup.validatePrepared(plan,info.getString("toolManifestSha256"),root,false);
             assertEquals(info.getString("generation"),result.generation);assertEquals(4,result.outputFiles);
+            // Metadata selection does not carry an integrity lease into the
+            // next session. Exercise that production full-verification mode
+            // against equal-length corruption, additions and cancellation.
+            ShaderSetup.validatePrepared(plan,info.getString("toolManifestSha256"),root,false,true);
+            byte[] changedPayload=retained.clone();changedPayload[0]^=1;Files.write(output,changedPayload);
+            ShaderSetup.validatePrepared(plan,info.getString("toolManifestSha256"),root,false);
+            refuses(()->ShaderSetup.validatePrepared(plan,info.getString("toolManifestSha256"),root,false,true));
+            Files.write(output,retained);Files.setLastModifiedTime(output,stamp);
+            Path extra=selected.resolve("shaders/unexpected.spv");write(extra,"UNEXPECTED");
+            refuses(()->ShaderSetup.validatePrepared(plan,info.getString("toolManifestSha256"),root,false,true));Files.delete(extra);
+            java.util.concurrent.atomic.AtomicInteger checks=new java.util.concurrent.atomic.AtomicInteger();
+            try {
+                ShaderSetup.validatePrepared(plan,info.getString("toolManifestSha256"),root,false,true,()->checks.incrementAndGet()>3);
+                fail("Full verification must observe cancellation");
+            } catch(io.github.russianranger.esteria.core.runtime.install.RuntimeWork.CancelledException expected) {
+                assertTrue(checks.get()>3);
+            }
+            ShaderSetup.validatePrepared(plan,info.getString("toolManifestSha256"),root,false,true);
             JSONArray mutants=new JSONArray(new String(asset("shader-mutants.json"),StandardCharsets.UTF_8));
             for(int index=0;index<mutants.length();index++) {
                 JSONObject mutant=mutants.getJSONObject(index),changed=new JSONObject(new String(original,StandardCharsets.UTF_8));

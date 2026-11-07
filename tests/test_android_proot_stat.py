@@ -124,6 +124,10 @@ class StatQualification(unittest.TestCase):
             api=33,targetSdk=35,abi='x86_64',guestLaunches=2,buildEvidence={},statBuildEvidence={},
             aliases=dict(work='/work/server-data/generations/'+'a'*64,data='/esteria-data'),
             childExitCodes=[0,0],forcedChildren=[False,False],remainingNativeMembers=[0,0],noFollowAncestorOpenRejected=True,
+            javaNioMetadata=dict(scope='android-java-nio-private-cache-metadata',fileKeyAvailable=True,fileKeyStable=True,
+                unixLinkCount=1,privateFileAndDirectoryPermissions=True,nanosecondMtimePreserved=True,
+                sameSizeRestoredMtimeChangedCtime=True,replacementChangedFileKey=True,noFollowSymlinkOpenRejected=True,
+                productionCacheEnabled=False),
             mutation=self.mutation,relaunch=self.relaunch,productionCacheEnabled=False,arm64Qualified=False,
             hardwareQualified=False,unchangedMetadataCorruptionDetectionClaimed=False,gameplayQualified=False)
 
@@ -135,6 +139,19 @@ class StatQualification(unittest.TestCase):
             ('unchangedMetadataCorruptionDetectionClaimed',True),('noFollowAncestorOpenRejected',False),('guestLaunches',True)):
             changed=copy.deepcopy(original);changed[field]=value
             with self.subTest(field=field),self.assertRaises(ValueError):
+                stat_probe.validate_receipt(changed,'a'*40,'host-synthetic-admission-only',{}, {})
+
+    def test_guest_success_cannot_substitute_for_android_java_metadata_capabilities(self):
+        original=self.receipt()
+        for field in ('fileKeyAvailable','fileKeyStable','privateFileAndDirectoryPermissions','nanosecondMtimePreserved',
+                'sameSizeRestoredMtimeChangedCtime','replacementChangedFileKey','noFollowSymlinkOpenRejected'):
+            changed=copy.deepcopy(original);changed['javaNioMetadata'][field]=False
+            with self.subTest(field=field),self.assertRaisesRegex(ValueError,'android-java-nio'):
+                stat_probe.validate_receipt(changed,'a'*40,'host-synthetic-admission-only',{}, {})
+        for value in (None,{},dict(original['javaNioMetadata'],unixLinkCount=True),
+                dict(original['javaNioMetadata'],unixLinkCount=2),dict(original['javaNioMetadata'],productionCacheEnabled=True)):
+            changed=copy.deepcopy(original);changed['javaNioMetadata']=value
+            with self.subTest(value=value),self.assertRaisesRegex(ValueError,'android-java-nio'):
                 stat_probe.validate_receipt(changed,'a'*40,'host-synthetic-admission-only',{}, {})
 
 

@@ -1,7 +1,7 @@
 plugins { id 'com.android.application' }
 def sourceLock = new groovy.json.JsonSlurper().parse(rootProject.file('sources.lock.json'))
 def clientRevision = sourceLock.sources.client.commit
-def selectedVersionCode = providers.gradleProperty('buildVersionCode').getOrElse('11').toInteger()
+def selectedVersionCode = providers.gradleProperty('buildVersionCode').getOrElse('12').toInteger()
 def serverRevision = sourceLock.sources.server.commit
 def prootProvider = providers.gradleProperty('prootProviderDir').orNull
 def serverProvider = providers.gradleProperty('serverRuntimeProviderDir').orNull
@@ -204,6 +204,7 @@ apply from: 'server-session.gradle'
 apply from: 'server-data-tools.gradle'
 apply from: 'world-setup.gradle'
 apply from: 'game-session.gradle'
+apply from: 'client-startup.gradle'
 apply from: 'server-installation-probe.gradle'
 apply from: 'handoff-probe.gradle'
 

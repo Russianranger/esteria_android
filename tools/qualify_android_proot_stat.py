@@ -118,7 +118,14 @@ def validate_receipt(value,revision,fingerprint,build,stat_build):
         all(type(item) is bool for item in value['forcedChildren']),'android-stat-reaping-field-types')
     require(all(value.get(key) is False for key in ('productionCacheEnabled','arm64Qualified','hardwareQualified',
         'unchangedMetadataCorruptionDetectionClaimed','gameplayQualified')),'android-stat-receipt-overclaims')
-    return validate_guests(value['mutation'],value['relaunch'])
+    java=value.get('javaNioMetadata')
+    flags={'fileKeyAvailable','fileKeyStable','privateFileAndDirectoryPermissions','nanosecondMtimePreserved',
+        'sameSizeRestoredMtimeChangedCtime','replacementChangedFileKey','noFollowSymlinkOpenRejected'}
+    require(type(java) is dict and set(java)==flags|{'scope','unixLinkCount','productionCacheEnabled'} and
+        java.get('scope')=='android-java-nio-private-cache-metadata' and all(java.get(key) is True for key in flags) and
+        type(java.get('unixLinkCount')) is int and java['unixLinkCount']==1 and java.get('productionCacheEnabled') is False,
+        'android-java-nio-private-cache-capability-unqualified')
+    return dict(validate_guests(value['mutation'],value['relaunch']),androidJavaNioMetadataQualified=True)
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)

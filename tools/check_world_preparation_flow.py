@@ -36,16 +36,20 @@ def verify(text):
     start = body(source, 'startLocalGame')
     protected = re.search(r'runPreparation\s*\(\s*START\s*,\s*\(\s*\)\s*->\s*\{', start)
     if not protected:
-        raise ValueError('START must own automatic preparation through runPreparation')
+        raise ValueError('START must own prepared selection through runPreparation')
     opening = start.index('{', protected.start())
     closing = end_brace(start, opening)
     preparation = start[opening + 1:closing]
+    if not re.search(r'\bselectPreparedWorld\s*\(', preparation):
+        raise ValueError('START must select existing prepared components')
     for name in ('inspectStockClient', 'prepareStockRuntime', 'prepareServerRuntime', 'prepareWorld'):
-        if not re.search(r'\b' + name + r'\s*\(', preparation):
-            raise ValueError('START preparation scope is missing ' + name)
+        if re.search(r'\b' + name + r'\s*\(', start):
+            raise ValueError('START must not invoke preparation orchestration: ' + name)
     game = re.search(r'\bGameSession\.begin\s*\(', start)
     if not game or game.start() <= closing:
-        raise ValueError('GameSession must begin after the preparation scope returns')
+        raise ValueError('GameSession must begin after prepared-selection ownership closes')
+    if not re.search(r'runPreparation\s*\(\s*START\s*,\s*\(\s*\)\s*->\s*\{\s*owner\.start', start):
+        raise ValueError('new session admission must retain observed cancellable read policy')
     owner = body(source, 'runPreparation')
     if not re.search(r'if\s*\(\s*activePreparationIo\s*!=\s*null\s*\)\s*\{\s*operation\.run\(\);\s*return;', owner):
         raise ValueError('nested preparation must retain the existing controller')
@@ -58,7 +62,8 @@ def main():
     verify(text)
     for previous, changed in (
         ('runPreparation(START,', 'unprotectedPreparation(START,'),
-        ('prepareWorld(selectedLocale);', 'unprotectedWorld(selectedLocale);'),
+        ('selectPreparedWorld(selectedLocale);', 'prepareWorld(selectedLocale);'),
+        ('runPreparation(START,()->{owner.start', 'unprotectedStartup(START,()->{owner.start'),
         ('if(activePreparationIo!=null){operation.run();return;}', 'if(false){operation.run();return;}'),
     ):
         if previous not in text:
@@ -69,7 +74,7 @@ def main():
             pass
         else:
             raise ValueError('flow guard accepted an unprotected START mutation')
-    print('PASS START scopes stock/server/world preparation, preserves nested ownership and exits before gameplay; three bypass mutations rejected')
+    print('PASS START selects prepared components without setup replay; fresh admission owns read policy; four bypass mutations rejected')
 
 
 if __name__ == '__main__':

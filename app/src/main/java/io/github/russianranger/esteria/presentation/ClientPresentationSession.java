@@ -11,6 +11,7 @@ import io.github.russianranger.esteria.core.presentation.InputSink;
 import io.github.russianranger.esteria.core.presentation.X11SessionPlan;
 import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
 import io.github.russianranger.esteria.core.runtime.install.ClientLaunchView;
+import io.github.russianranger.esteria.core.runtime.install.LocalAccountHandoff;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
 import io.github.russianranger.esteria.core.runtime.process.ProotLaunch;
@@ -195,6 +196,18 @@ public final class ClientPresentationSession implements AutoCloseable {
      * The higher session owner establishes local services/account first. */
     public OwnedProcess startClient(ClientRuntimeSetup provider,ClientLaunchSetup.Prepared view,ShaderSetup.Result shaders,
             TurnipSetup turnip)throws IOException {
+        return startClient(provider,view,shaders,turnip,true);
+    }
+    /** Internal asset-backed title investigation. This deliberately supplies no
+     * local-login request/account handoff and requires no database or world.
+     * A running process or X11 frame is not evidence of CommonMain/title success.
+     * The caller must retain the import/view leases until confirmed cleanup. */
+    public OwnedProcess startClientTitle(ClientRuntimeSetup provider,ClientLaunchSetup.Prepared view,ShaderSetup.Result shaders,
+            TurnipSetup turnip)throws IOException {
+        return startClient(provider,view,shaders,turnip,false);
+    }
+    private OwnedProcess startClient(ClientRuntimeSetup provider,ClientLaunchSetup.Prepared view,ShaderSetup.Result shaders,
+            TurnipSetup turnip,boolean localLogin)throws IOException {
         background();return operations.run(()->{
             check();if(!ready||clientStartAttempted)throw new IOException("Client presentation launch is unavailable or already attempted");
             clientStartAttempted=true;providersUnchanged(prepared);
@@ -205,8 +218,11 @@ public final class ClientPresentationSession implements AutoCloseable {
                 throw new IOException("Current matched reconstructed client, view and shaders required");
             List<String> command=new ArrayList<>();command.add("/opt/wine/bin/wine");command.add(view.plan.windowsExecutable());
             command.addAll(new ClientLaunchView(view.work).argumentsForLocale(view.plan,shaders.locale,RuntimeWork.NEVER_CANCELLED));
-            command.addAll(provider.localLoginArguments());
+            command.addAll(clientModeArguments(provider.localLoginArguments(),view.view.directory,localLogin));
             Map<String,String> environment=new java.util.TreeMap<>(wineEnvironment());environment.putAll(view.plan.environment());
+            // Internal title capture needs real file-read observations, not a
+            // synthetic frame. Native output is bounded to 8 MiB per stream.
+            if(!localLogin)environment.put("WINEDEBUG","+file");
             List<ProotLaunch.Mount> mounts=clientMounts(view.importedData,shaders.shaders,prepared.bridgeRoot);
             if(turnip!=null) {
                 turnip.requireWineArchive(prepared.runtime.archiveSha256());Path driver=turnip.current();
@@ -219,6 +235,14 @@ public final class ClientPresentationSession implements AutoCloseable {
                 prepared.work,process,command,prepared.runtime.wineEnvironment(environment),mounts,bindings);
             return client;
         });
+    }
+    private static List<String> clientModeArguments(List<String> validatedLocalArguments,Path view,boolean localLogin)throws IOException {
+        if(!validatedLocalArguments.equals(List.of("--local-offline","--local-login")))
+            throw new IOException("Selected client launch capability differs");
+        if(localLogin)return validatedLocalArguments;
+        if(Files.exists(view.resolve(LocalAccountHandoff.FILENAME),LinkOption.NOFOLLOW_LINKS))
+            throw new IOException("Title investigation refuses a retained local-login handoff; existing record preserved");
+        return List.of("--local-offline");
     }
     /** The Wine process itself opens the selected ALSA configuration/plugin.
      * Bind the verified bridge generation for it as well as the X11 helpers;

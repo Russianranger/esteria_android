@@ -1,0 +1,18 @@
+// Internal title lifecycle fixture; no test-only component enters a production APK.
+def titleOwnerClasspath = files(providers.provider { android.bootClasspath },
+    providers.provider { tasks.named('compileDebugJavaWithJavac').get().destinationDirectory.get().asFile },
+    project(':core').layout.buildDirectory.dir('classes/java/main'))
+def compileTitleOwner = tasks.register('compileClientStartupOwnerFixture', JavaCompile) {
+    dependsOn 'compileDebugJavaWithJavac', ':core:classes'
+    source file('src/test/java/io/github/russianranger/esteria/runtime/ClientStartupOwnerTests.java')
+    source file('src/test/java/android/os/Looper.java')
+    classpath = titleOwnerClasspath
+    destinationDirectory = layout.buildDirectory.dir('clientStartupOwnerFixture')
+    sourceCompatibility = '17'; targetCompatibility = '17'
+}
+tasks.register('clientStartupOwnerTest', JavaExec) {
+    dependsOn compileTitleOwner
+    classpath = files(compileTitleOwner.flatMap { it.destinationDirectory }) + titleOwnerClasspath
+    mainClass = 'io.github.russianranger.esteria.runtime.ClientStartupOwnerTests'
+    maxHeapSize = '32m'
+}
