@@ -1,0 +1,80 @@
+{
+  "appRevision": "d5e7715587b980d9e41f9070c21e0fc21c543101",
+  "branch": "non-custom",
+  "detachedStaging": {
+    "evidenceArtifact": 13594821930,
+    "evidenceSha256": "4b3c3aee5be3092d3c78233c649a3d635ca2d11a53a2ee1b86375f54c90ad23c",
+    "job": 128560100882,
+    "result": "success",
+    "run": 42424609984,
+    "x86Android13SignedInstall": "INSTALL_FAILED_NO_MATCHING_ABIS; signed update independently exercised on Android 13 ARM64"
+  },
+  "exactProducerAndroid13X86Instrumentation": {
+    "job": 128556719663,
+    "reason": "Hosted AVD had 3319.15 MB free and needed 7372.80 MB. The corrected workflow releases its unused SDK before starting the same AVD.",
+    "result": "failed before app execution",
+    "run": 42423489644,
+    "workflowRepair": "1d665c88d30cf927e4457d18246a32b771b8f42f"
+  },
+  "formatVersion": 1,
+  "graphicalRealmLoginQualified": false,
+  "host": {
+    "elapsedSeconds": 153.264,
+    "passed": 1561,
+    "skipReasons": "Optional NDK, native reference binaries, GCC/Ninja, SDK/disposable key and socket fixtures. Pinned inputs were exercised in the separate focused runs.",
+    "skipped": 83,
+    "tests": 1644
+  },
+  "hostedTooling": {
+    "job": 128556719607,
+    "result": "success",
+    "run": 42423489649
+  },
+  "launcher": {
+    "job": 128556719668,
+    "result": "success",
+    "run": 42423489712
+  },
+  "nativeReconstructedClientSrp": "stock-client-packaged-grunt-linux-arm64.json",
+  "nativeShaderPackageTest": {
+    "job": 128556821698,
+    "run": 42423489624,
+    "scope": "Exact packaged ARM64 compiler and synthetic test inputs"
+  },
+  "nativeSql": {
+    "artifact": {
+      "bytes": 14226,
+      "id": 13594556504,
+      "name": "server-installation-native-evidence-8e97a60e0b459a8fc7ab4833fe9d95c68c50fe82",
+      "sha256": "426ac322ae6c4ea3f3ef936677eb5a65a6c5a3c0910470272aba0784e133f250"
+    },
+    "job": 128557387814,
+    "revision": "8e97a60e0b459a8fc7ab4833fe9d95c68c50fe82",
+    "run": 42423711295,
+    "scope": "Real stock four schemas, stock Human Warrior SQL/start identity, same MySQL UUID after clean restart"
+  },
+  "nativeStockShaderCorpus": "non-custom-v14-native-shaders.json",
+  "package": {
+    "artifact": {
+      "bytes": 336866216,
+      "id": 13595190433,
+      "name": "unsigned-local-game-profile-release-arm64-d5e7715587b980d9e41f9070c21e0fc21c543101",
+      "sha256": "03b888893661708c2d2cb756d189def31f8efea3c2db96d01bb256bd469459a9"
+    },
+    "job": 128556821757,
+    "run": 42423489624,
+    "scope": "Clean build using declared complete provider set; debug/unsigned release and lint"
+  },
+  "packageId": "io.github.russianranger.esteria.stock",
+  "packagedAssets": "non-custom-v15-apk-asset-continuity.json",
+  "physicalEvidence": "non-custom-v14-thor-v13-repair.json",
+  "publicReadback": "non-custom-v15-public-apk-readback.json",
+  "referenceFirstFrame": "stock-client-bc1-initialization-linux-arm64.json",
+  "savedCharacterReentryQualified": false,
+  "signedAndroid13Arm64": "non-custom-v15-signed-update-renderer.json",
+  "stockShaderCoordinatorAndReuse": "non-custom-v14-shader-receipt-reuse.json",
+  "tag": "non-custom-v0.1.0-non-custom.15",
+  "thorGameplayQualified": false,
+  "versionCode": 15,
+  "worldserverWithSelectedDataQualified": false
+}

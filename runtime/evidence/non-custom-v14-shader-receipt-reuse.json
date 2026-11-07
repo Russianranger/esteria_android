@@ -118,6 +118,14 @@
         57792,
         54842
       ]
+    },
+    "independentCleanCompilerCorpus": {
+      "generation": "3609dd1b67e77a12a6c1641cfba7341fc1681af57bef503f7b9ce8d64dc8139f",
+      "shaderReceiptSha256": "8ceaf67054c93693a08424722df6546f0578d5e229afb8c25b3b6e6c8c5a7b34",
+      "producerCompilerCalls": 1580,
+      "files": 4742,
+      "sessionAdmissionBytes": 102130554,
+      "elapsedMs": 136409
     }
   },
   "verifiedReplayedCorpusJavaAdmission": {

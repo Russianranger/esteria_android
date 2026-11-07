@@ -10,6 +10,8 @@ The stock launch-view adapter also rejected a normal loose `Interface` directory
 
 On offline Linux ARM64 the repaired PE rendered the animated Northrend front end, read 17 external SPIR-V files and scrolled the first-run license screen through the selected input bridge. A separate native ARM64 run authenticated two fresh instances of the PE against the packaged authserver on loopback, with a clean MySQL restart between them. The outstanding production boundary is worldserver readiness with the complete selected data. The physical Thor report ends at v13 shader translation. [Graphical execution](runtime/evidence/stock-client-bc1-initialization-linux-arm64.json) · [Grunt authentication](runtime/evidence/stock-client-packaged-grunt-linux-arm64.json) · [Installation and support export](NON-CUSTOM-TESTING.md).
 
+The public v15 installed over signed v14 on offline Android 13 ARM64. The existing UID, private directory, configuration and disposable database row survived. The installed Java shader consumer authenticated all 4,742 outputs of the independently compiled generation, and the corrected renderer provider was reused with zero copied bytes on reentry. The packaged Linux Turnip ICD found no KGSL character device on this emulator. The Thor has yet to run this candidate. [Signed upgrade and Android execution](runtime/evidence/non-custom-v15-signed-update-renderer.json) · [Test and release gates](runtime/evidence/non-custom-v15-release-gates.json).
+
 ## Historical v14 checkpoint
 
 # Stock v14 terrain shader repair

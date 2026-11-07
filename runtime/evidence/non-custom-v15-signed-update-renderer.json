@@ -1,0 +1,158 @@
+{
+  "formatVersion": 1,
+  "scope": "Signed Android 13 ARM64 in-place package replacement and selected renderer/shader component admission",
+  "environment": {
+    "host": "Linux x86_64",
+    "guestKernel": "Linux 6.1.0-54-arm64 under QEMU TCG",
+    "android": "Redroid Android 13 ARM64",
+    "imageManifestSha256": "c815ac1b1d5bd0a099b74c3e3e0eeea3b32bed8d7ab1f788c20fb74e35891716",
+    "fingerprint": "redroid/redroid_arm64_only/redroid_arm64_only:13/TQ3A.230805.001.S1/eng.frank.20240527.134411:userdebug/test-keys",
+    "sdk": 33,
+    "abi": "arm64-v8a",
+    "network": "No VM network interface. adb shell via guest loopback.",
+    "storage": "Disposable guest ext4"
+  },
+  "packageId": "io.github.russianranger.esteria.stock",
+  "androidSourceCommit": "d5e7715587b980d9e41f9070c21e0fc21c543101",
+  "releases": [
+    {
+      "versionCode": 14,
+      "versionName": "0.1.0-non-custom.14",
+      "sha256": "fdeac1008d4fbac4d0b3e9b16d0106b877cf92541705f2e7a45ce16c454f4c32",
+      "bytes": 336857856,
+      "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+      "apksignerV2Verified": true
+    },
+    {
+      "versionCode": 15,
+      "versionName": "0.1.0-non-custom.15",
+      "sha256": "f6aa8c4ad674e71d3aed59099f0b952efc44a0ae2333a77efdbff81188489510",
+      "bytes": 336862047,
+      "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+      "apksignerV2Verified": true
+    }
+  ],
+  "verifiedArtifactPayload": {
+    "bin/WowClient64.exe": {
+      "bytes": 20786176,
+      "sha256": "d2a1b74a3353f2682dcc3bc2b09f649f3b5bf53b55e6f74ccb43071c9aa4b634"
+    },
+    "metadata/sources.lock.json": {
+      "bytes": 2162,
+      "sha256": "8c7d85373801f0d19ed9b5627031318ad55430f46602f2761cc311e7ae2f4a3b"
+    }
+  },
+  "identicalPreviousApkMemberGroups": {
+    "assets/server-data/": 7,
+    "assets/stock-client/": 8,
+    "assets/shader-tools/": 4,
+    "assets/sources.lock.json": 1
+  },
+  "packageManager": {
+    "replaceCommand": "pm install -r --user 0",
+    "result": "Success",
+    "preservedFirstInstallTime": "2026-11-07 22:18:12",
+    "v15LastUpdateTime": "2026-11-07 23:20:27",
+    "sameSigningRecord": true,
+    "sameUidAndGid": 10077,
+    "sameApplicationDataInode": 526035,
+    "noUninstallOrClearData": true,
+    "activity": {
+      "component": "io.github.russianranger.esteria.MainActivity",
+      "startStatus": "ok",
+      "waitTimeMs": 4315
+    }
+  },
+  "preservation": {
+    "applicationPreference": "The existing signed app shared_prefs/session.xml matched byte-for-byte.",
+    "syntheticAppPrivateState": "Complete retained v13 compiler generation from the encrypted fixture import, isolated configuration/import markers, and read-only seeded SQLite.",
+    "unchangedFiles": 29,
+    "unchangedBytes": 64875,
+    "sameSha256SizeMtimeNsUidAndGid": true,
+    "sqliteApplicationId": 125414,
+    "seededSqliteRowUnchanged": true
+  },
+  "apkJavaAdmission": {
+    "environment": "A separate Android app_process64 per selection. Actual installed v15 classes.dex and package AssetManager. Isolated renderer extraction store on ext4.",
+    "negativePreUpdate": "Installed v14 correctly failed v15 executable provider selection before the update.",
+    "methods": [
+      "ClientRuntimeSetup.prepare",
+      "ShaderToolsSetup.toolManifestSha256",
+      "ShaderSetup.validatePrepared",
+      "ShaderSetup.requireSameSelection",
+      "ClientRuntimeSetup.requirePreparedShaders"
+    ],
+    "rendererGeneration": "21dc52833dd146ff8221e2d62881fbd1b1f9b585b288e8e9bb4a9a8686f2eca8",
+    "descriptorSha256": "82347475a9fecb7dc270dc7b3158b9b39283252428341aaed7ec353f93768050",
+    "executableRevision": "807c4384ef28f4da51d3c50eec5082627cad36ea",
+    "executableArchiveSha256": "8fe371164401a4c693d09cc7dae876656aec529c6bdc2ef160f723ee490485a0",
+    "preparedRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+    "shaderManifestSha256": "36e3032524c2136c4273908f887a1ca59ebb414e806f52d47e778332ed4acda6",
+    "operations": [
+      {
+        "selection": "Preserved complete v13 compiler result from the app-private encrypted fixture import",
+        "generation": "a76ff0743c5c1fcf2b6e1297375a1d3b945d997e0ff0b84ab0a48a35bf40c210",
+        "files": 14,
+        "verifiedShaderOutputBytes": 44313,
+        "shaderAdmissionElapsedMs": 348,
+        "runtimeAdmissionPlusPeAuditMs": 19101,
+        "runtimeCopiedBytes": 21516792,
+        "existingRendererGeneration": false
+      },
+      {
+        "selection": "Verified distribution shader members with real ARM64 compiler result replay after fresh GLSL comparisons",
+        "generation": "3609dd1b67e77a12a6c1641cfba7341fc1681af57bef503f7b9ce8d64dc8139f",
+        "files": 4742,
+        "verifiedShaderOutputBytes": 102136874,
+        "shaderAdmissionElapsedMs": 86576,
+        "runtimeAdmissionPlusPeAuditMs": 3300,
+        "runtimeCopiedBytes": 0,
+        "existingRendererGeneration": true
+      },
+      {
+        "selection": "Independent clean production coordinator receipt from all 1,580 actual ARM64 compiler calls over verified distribution shader members",
+        "generation": "3609dd1b67e77a12a6c1641cfba7341fc1681af57bef503f7b9ce8d64dc8139f",
+        "shaderReceiptSha256": "8ceaf67054c93693a08424722df6546f0578d5e229afb8c25b3b6e6c8c5a7b34",
+        "files": 4742,
+        "verifiedShaderOutputBytes": 102130554,
+        "shaderAdmissionElapsedMs": 88226,
+        "runtimeAdmissionPlusPeAuditMs": 2532,
+        "runtimeCopiedBytes": 0,
+        "existingRendererGeneration": true
+      }
+    ],
+    "retainedSourceCancellation": {
+      "scope": "A separate Android ART observer interrupted verification of the independently compiled stock shader selection. A fresh owner then reacquired both leases and verified every output.",
+      "cancelledAfterBytes": 1066838,
+      "reentryVerifiedBytes": 102130554,
+      "samePointerBytesInodeAndMTime": true
+    }
+  },
+  "androidPackagedGraphics": {
+    "scope": "Android PRoot executable from the installed signed v15 APK; private read-only rootfs unpacked from the selected Wine archive.",
+    "wineVersion": "wine-10.13",
+    "wineArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+    "turnipArchiveSha256": "445c38ddf7e66f65ee90aa7fd2006db88d6fecd72c8567d801f2ee4c4000a772",
+    "productionGpuReadbackExit": 70,
+    "componentMessage": "Turnip probe failed: KGSL character device required",
+    "directIcdLoaded": true,
+    "directIcdDevices": 0,
+    "vulkanLoaderEnumerationResult": -3,
+    "readbackPixels": 0,
+    "androidOsVulkanDevice": "SwiftShader Device (LLVM 10.0.0)",
+    "androidVulkanDeviceApi": "1.2.0",
+    "guestKgslCharacterDevice": false,
+    "hostDrmRenderNode": false,
+    "guestDrmRenderNode": false
+  },
+  "qualified": {
+    "emulatorSignedUpgrade": true,
+    "installedPackageJavaRendererAndShaderPairing": true,
+    "actualOfflineRendererReuse": true,
+    "fullOfficialGameImport": false,
+    "physicalThor": false,
+    "productionTurnipGpu": false,
+    "characterSave": false,
+    "normalGameSession": false
+  }
+}
