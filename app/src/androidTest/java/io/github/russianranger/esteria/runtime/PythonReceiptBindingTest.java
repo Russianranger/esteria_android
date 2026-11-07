@@ -156,8 +156,44 @@ public final class PythonReceiptBindingTest {
             refuses(()->ShaderSetup.validatePrepared(plan,info.getString("toolManifestSha256"),root,false));Files.delete(output);Files.move(moved,output);
             ShaderSetup.validatePrepared(plan,info.getString("toolManifestSha256"),root,false);
             assertArrayEquals(retained,Files.readAllBytes(output));assertEquals(stamp,Files.getLastModifiedTime(output));
+            exerciseV12ShaderReuse(plan,info,store);
             report("pythonShaderGenerationAcceptedAndMutationsRejected",info,mutants.length());
         }finally {remove(root);}
+    }
+
+    private static void exerciseV12ShaderReuse(ShaderRunPlan plan,JSONObject info,Path store)throws Exception {
+        String manifest=info.getString("toolManifestSha256"),previous=info.getString("previousGeneration");
+        assertNull(ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,null));
+        Path pointer=store.resolve("current"),generation=store.resolve("generations").resolve(previous);
+        Path payload=generation.resolve("shaders/manifest.txt"),receipt=generation.resolve("receipt.json");
+        byte[] original=Files.readAllBytes(payload),before=Files.readAllBytes(receipt);
+        var mtime=Files.getLastModifiedTime(payload);
+        write(pointer,previous+"\n");
+        assertEquals(previous,ShaderSetup.validatePrepared(plan,manifest,null,false).generation);
+        assertEquals(previous,ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,null).generation);
+        assertNull(ShaderSetup.verifyCompatibleCompleted(plan,"0".repeat(64),null,null));
+        byte[] corrupt=original.clone();corrupt[0]^=1;
+        Files.write(payload,corrupt);
+        assertNull(ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,null));
+        refuses(()->ShaderSetup.validatePrepared(plan,manifest,null,false,true));
+        Files.write(payload,original);Files.setLastModifiedTime(payload,mtime);
+        Path adapter=plan.helpers.resolve("stock_shader_translate.py");
+        byte[] installed=Files.readAllBytes(adapter);
+        try {
+            write(adapter,"future-adapter-with-unreviewed-semantics");
+            refuses(()->ShaderSetup.validatePrepared(plan,manifest,null,false));
+            assertNull(ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,null));
+        }finally {Files.write(adapter,installed);}
+        java.util.concurrent.atomic.AtomicInteger polls=new java.util.concurrent.atomic.AtomicInteger();
+        try {
+            ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,()->polls.incrementAndGet()>3);
+            fail("Cancellation during v12 verification was lost");
+        }catch(io.github.russianranger.esteria.core.runtime.install.RuntimeWork.CancelledException expected){
+            assertTrue(polls.get()>3);
+        }
+        assertEquals(previous,ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,null).generation);
+        assertEquals(previous+"\n",Files.readString(pointer));assertArrayEquals(before,Files.readAllBytes(receipt));
+        assertArrayEquals(original,Files.readAllBytes(payload));assertEquals(mtime,Files.getLastModifiedTime(payload));
     }
 
     @Test public void pythonCanonicalVectorsMatchExactly()throws Exception {

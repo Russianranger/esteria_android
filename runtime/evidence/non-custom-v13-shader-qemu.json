@@ -1,0 +1,34 @@
+{
+  "hostArchitecture": "x86_64",
+  "environment": "Ubuntu 24.04 x86_64 with QEMU AArch64 user-mode",
+  "qemuVersion": "qemu-aarch64 version 8.2.2 (Debian 1:8.2.2+ds-0ubuntu1.18)",
+  "compilerSha256": "279cb8d922fa71319e12eb63b46a1c6f80938d07747cec73326ec64928a044fc",
+  "toolManifestSha256": "36e3032524c2136c4273908f887a1ca59ebb414e806f52d47e778332ed4acda6",
+  "clientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "adapterSha256": "ac355c2d1c32352d380e3c2f74d42adf48aaffe2984ffa2d195c0131009aa7b6",
+  "compilerInvocations": 8,
+  "fixture": "test_patch_delete_resolves_each_profile_and_translates_only_live_winners",
+  "modules": {
+    "vertex/3373211e723049cbbb4b1716e060f3c8.spv": {
+      "bytes": 1404,
+      "sha256": "a0e1bda3b2f1466e64ec4c211deeeb3a87b61e9a7dfc666d8f23c897db4687e8"
+    },
+    "vertex/27ea21012bb4dec7093ad85c412f19a2.spv": {
+      "bytes": 1672,
+      "sha256": "a70939e26c95e4fab923ec21dd6566a24325ae91bdb2cb7b0e20440c51b218a5"
+    },
+    "pixel/1d8728f9b14ea8fd318f5d65a01d3eeb.spv": {
+      "bytes": 4620,
+      "sha256": "3690adcb55965230069ee9ee2a1b0fb1785dc1a44c54ea7c54c97fbd9da164cc"
+    },
+    "pixel/6dbf31d6d6922c4c362cc184cb545040.spv": {
+      "bytes": 1152,
+      "sha256": "692593b5ab997f00a9230063b134375c79b56a39f1db02d3b63a46b1949aac17"
+    }
+  },
+  "sameCompleteOutputsAsReference": true,
+  "ownerMPQs": false,
+  "nativeArmRunner": false,
+  "androidExecution": false,
+  "gameplayQualified": false
+}

@@ -25,6 +25,9 @@ public final class ShaderSetupReceiptTest {
             assertEquals(expected,files.map(path->path.getFileName().toString()).collect(java.util.stream.Collectors.toSet()));
         }
         assertEquals(helpers,StockClientSetup.installHelpers(context,root));
+        assertEquals("985308ff612f55f8ea8dab322963ff5a4b45d44dd527983490c31124b61261fd",
+                StockClientSetup.inspectionHelperIdentity(helpers.getFileName().toString()));
+        assertEquals("unreviewed-helper", StockClientSetup.inspectionHelperIdentity("unreviewed-helper"));
         Path coordinator=helpers.resolve("stock_shader_generation.py");
         byte[] original=Files.readAllBytes(coordinator),changed="changed-helper-preserved".getBytes(StandardCharsets.US_ASCII);
         try {

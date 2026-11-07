@@ -29,6 +29,12 @@ MAX_RECORD_BYTES = 1 << 20
 MAX_CODE_BYTES = 64 << 20
 MAX_RECORD_METADATA = 64 << 20
 MAX_RECORDS = 262144
+MPQ_FILE_PATCH_FILE = 0x00100000
+MPQ_FILE_DELETE_MARKER = 0x02000000
+
+
+class DeletedMember(ValueError):
+    """The winning provider explicitly removed this virtual path."""
 
 
 class CompactRecord:
@@ -74,8 +80,14 @@ def bounded_adapter(reader, translate):
         def read_file(self, name):
             index = self.find(name)
             if index is not None:
+                _, _, size, flags = self.block_table[index]
+                if flags & MPQ_FILE_DELETE_MARKER:
+                    member = '%s in %s' % (name, self.path)
+                    stock.require(flags & reader.mq.FLAG_EXISTS, 'MPQ hash references an absent block: ' + member)
+                    stock.require(not flags & MPQ_FILE_PATCH_FILE, 'ambiguous MPQ delete marker and delta-patch: ' + member)
+                    raise DeletedMember('MPQ delete marker for ' + member)
                 maximum = MAX_LISTFILE if name.lower() == '(listfile)' else reader.mq.MAX_FILE_SIZE
-                stock.require(self.block_table[index][2] <= maximum,
+                stock.require(size <= maximum,
                               'shader/listfile member exceeds bound before allocation: ' + str(self.path))
             return super().read_file(name)
 
@@ -140,24 +152,29 @@ def bounded_adapter(reader, translate):
             inventory = reader.inventory(opened)
             for kind, profile, name in reader.resolve(inventory):
                 chain = reader.VS_FALLBACK if kind == 'vertex' else reader.PS_FALLBACK
-                data = None
                 for candidate in chain[chain.index(profile):]:
                     low = name.lower()
                     if low not in inventory.get((kind, candidate), {}):
                         continue
+                    candidate_name = inventory[(kind, candidate)][low]
                     path = reader.BS.join(['Shaders', kind.capitalize(), candidate,
-                                          inventory[(kind, candidate)][low] + '.bls'])
-                    _, data = reader.grab(opened, path)
+                                          candidate_name + '.bls'])
+                    try:
+                        provider, data = reader.grab(opened, path)
+                    except DeletedMember:
+                        # grab() already chose the winning provider. A marker removes
+                        # only this profile path, even when a lower MPQ lists its bytes.
+                        continue
                     if data is None or len(data) < 12:
                         if strict:
-                            raise ValueError('selected shader container is missing or truncated: %s' % path)
-                        data = None
+                            raise ValueError('selected shader container is missing or truncated: %s (%s)' %
+                                             (path, provider or 'no provider'))
                         continue
-                    profile = candidate
+                    profile, name = candidate, candidate_name
                     break
-                if data is None:
-                    if strict:
-                        raise ValueError('no usable shader container for %s:%s' % (kind, name))
+                else:
+                    # No surviving profile. Strict translation still checks that both
+                    # required stages have live records before publishing anything.
                     continue
                 for permutation, header, code in container_records(data, strict):
                     stock.require(len(result) < MAX_RECORDS, 'shader record count exceeds memory bound')

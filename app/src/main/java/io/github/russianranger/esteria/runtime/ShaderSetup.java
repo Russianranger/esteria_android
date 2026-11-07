@@ -35,6 +35,13 @@ import org.json.JSONObject;
  */
 public final class ShaderSetup {
     private ShaderSetup() { }
+    // The v12 strict translator aborted on every selected delete marker. Its
+    // successful outputs therefore also satisfy the reviewed v13 reader, whose
+    // only new successful branch starts at that exception. Pin the full donor
+    // recipe and the specific replacement. Later changes need their own review.
+    private static final String V12_HELPER_FILES_SHA256="60584deae493d314e347cc25818e75122029d0daa5789c81256cfed123d274cc";
+    private static final String V13_ADAPTER_SHA256="ac355c2d1c32352d380e3c2f74d42adf48aaffe2984ffa2d195c0131009aa7b6";
+
     public static final class Result {
         public final String generation,importGeneration,clientRevision,requestedLocale,locale;
         public final Path shaders,processLogs;
@@ -164,6 +171,8 @@ public final class ShaderSetup {
             if(!wineRoot.equals(wine.current())||!toolsRoot.equals(tools.current()))throw new IOException("Shader providers changed after allocation");
             ShaderRunPlan plan=new ShaderRunPlan(root.resolve("game"),toolsRoot,work,StockClientSetup.installHelpers(context,root),tools.revision(),locale);
             if(progress!=null)progress.update("shaders-locale-selected","requested "+plan.requestedLocale+"; effective "+plan.locale,0,-1);
+            Result retained=verifyCompatibleCompleted(plan,tools.toolManifestSha256(),progress,cancelled);
+            if(retained!=null)return retained;
             Path sessions=directories(root,"state/shader-operations");
             Path session=sessions.resolve(UUID.randomUUID().toString().replace("-",""));
             Files.createDirectory(session,PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------")));
@@ -236,6 +245,26 @@ public final class ShaderSetup {
                 !current.requestedLocale.equals(expected.requestedLocale)||!current.locale.equals(expected.locale)||current.outputFiles!=expected.outputFiles||current.outputBytes!=expected.outputBytes)
             throw new IOException("Prepared shader selection changed; run local setup again");
     }
+    /** Called under import and shader ownership. Keep a compatible completed
+     * receipt and generation in place. An interrupted read changes no pointer. */
+    static Result verifyCompatibleCompleted(ShaderRunPlan plan,String manifest,RuntimeWork.Progress progress,
+            RuntimeWork.Cancellation cancellation)throws IOException {
+        checkCancelled(cancellation);
+        if(!Files.exists(plan.work.resolve("shaders/current"),LinkOption.NOFOLLOW_LINKS))return null;
+        try {
+            Result retained=validatePrepared(plan,manifest,null,false,true,cancellation,true);
+            if(retained!=null&&progress!=null)progress.update("shaders-reused-verified-v12","Verified compatible completed shader payload",
+                    retained.outputBytes,retained.outputBytes);
+            return retained;
+        }catch(RuntimeWork.CancelledException error){throw error;}
+        catch(IOException error){
+            // A previous selection may belong to another locale/import. Leave
+            // it intact and let the normal coordinator prepare the current one.
+            checkCancelled(cancellation);
+            if(progress!=null)progress.update("shaders-preparing-current-selection",error.getMessage(),0,-1);
+            return null;
+        }
+    }
     /** Validate the owned helper's completed receipt and metadata, without a full
      * rescan of imported MPQs. The helper itself hashes every generated output.
      * This host readback checks those output paths/sizes, not GPU correctness.
@@ -251,6 +280,10 @@ public final class ShaderSetup {
     }
     static Result validatePrepared(ShaderRunPlan plan,String manifest,Path logs,boolean cancelled,boolean verifyPayload,
             RuntimeWork.Cancellation cancellation)throws IOException {
+        return validatePrepared(plan,manifest,logs,cancelled,verifyPayload,cancellation,false);
+    }
+    private static Result validatePrepared(ShaderRunPlan plan,String manifest,Path logs,boolean cancelled,boolean verifyPayload,
+            RuntimeWork.Cancellation cancellation,boolean previousOnly)throws IOException {
         checkCancelled(cancellation);
         Path store=canonicalDirectory(plan.work.resolve("shaders"));
         String generation=new String(read(store.resolve("current"),65),StandardCharsets.US_ASCII);
@@ -270,10 +303,16 @@ public final class ShaderSetup {
             requireKeys(inputs,"formatVersion","contentProfile","importGeneration","clientRevision","locale","importMetadata","toolManifestSha256","preparationHelperSha256","preparationHelperFiles");
             JSONObject helperFiles=inputs.getJSONObject("preparationHelperFiles");
             requireKeys(helperFiles,"stock_content_inspection.py","stock_shader_generation.py","stock_shader_translate.py","shader_generation.py","extractor_order.py","server_data_preflight.py","world_io.py");
+            boolean previous=V12_HELPER_FILES_SHA256.equals(sha256((canonical(helperFiles)+"\n").getBytes(StandardCharsets.UTF_8)));
+            if(previousOnly&&!previous)return null;
             for(Iterator<String> names=helperFiles.keys();names.hasNext();){
                 String name=names.next();JSONObject item=helperFiles.getJSONObject(name);long bytes=filePin(item,131072);
                 Path selected=plan.helpers.resolve(name);canonicalFile(selected);
-                if(Files.size(selected)!=bytes||!hashFile(selected,bytes,cancellation).equals(item.getString("sha256")))throw new IOException("Prepared shader helper closure changed");
+                long selectedBytes=Files.size(selected);
+                if(selectedBytes<=0||selectedBytes>131072)throw new IOException("Invalid installed shader helper size");
+                String digest=hashFile(selected,selectedBytes,cancellation);
+                if(previous&&name.equals("stock_shader_translate.py")&&V13_ADAPTER_SHA256.equals(digest))continue;
+                if(selectedBytes!=bytes||!digest.equals(item.getString("sha256")))throw new IOException("Prepared shader helper closure changed");
             }
             Path helper=plan.helpers.resolve("stock_shader_generation.py");canonicalFile(helper);
             long helperBytes=Files.size(helper);

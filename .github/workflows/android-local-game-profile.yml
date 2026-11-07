@@ -5,7 +5,7 @@ on:
       build_version_code:
         description: Positive release versionCode, increased before a signed update
         required: false
-        default: '12'
+        default: '13'
         type: string
       publish_non_custom:
         description: Sign and publish an additive non-custom prerelease using the configured persistent key
@@ -113,6 +113,40 @@ jobs:
             data_inputs.load_pin()
             print('recipe='+lock['targetCommit'])
           PY
+  native-shader-translation:
+    needs: selection
+    if: needs.selection.outputs.selected == 'true' && github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/non-custom'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Compile the synthetic deleted and restored MPQ shader selections with the packaged ARM64 compiler
+        env:
+          ESTERIA_CLIENT_SOURCE: ${{ github.workspace }}/sources/client
+          ESTERIA_PACKAGED_GLSLANG: ${{ runner.temp }}/glslangValidator
+        run: |
+          test "$(uname -m)" = aarch64
+          python3 tools/fetch_sources.py client --output sources
+          python3 - <<'PYTHON'
+          import io, json, os, tarfile
+          from pathlib import Path
+          from tools import prepare_runtime
+          from tools import provider_shader_tools as provider
+
+          public = json.loads(Path('runtime/wine-cohort-publication/published-release.json').read_bytes())
+          name = 'provider-assets.tar.gz'
+          cohort = prepare_runtime.fetch(dict(public['assets'][name], file=name), Path(os.environ['RUNNER_TEMP']))
+          with tarfile.open(cohort, 'r:gz') as outer:
+              payload = outer.extractfile(provider.ASSETS + '/' + provider.ARCHIVE).read()
+          with tarfile.open(fileobj=io.BytesIO(payload), mode='r:gz') as inner:
+              executable = inner.extractfile(provider.COMPILER).read()
+          compiler = Path(os.environ['ESTERIA_PACKAGED_GLSLANG'])
+          compiler.write_bytes(executable)
+          compiler.chmod(0o700)
+          PYTHON
+          python3 -m unittest -v tests.test_shader_memory_adapter.ShaderMemoryAdapter.test_patch_delete_resolves_each_profile_and_translates_only_live_winners
   package:
     needs: selection
     if: needs.selection.outputs.selected == 'true' && github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/non-custom' && !(github.event_name == 'push' && contains(github.event.head_commit.message, '[publish detached non-custom]'))
@@ -122,7 +156,7 @@ jobs:
       contents: write
       actions: read
     env:
-      RELEASE_VERSION_CODE: ${{ inputs.build_version_code || '12' }}
+      RELEASE_VERSION_CODE: ${{ inputs.build_version_code || '13' }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:

@@ -1,8 +1,8 @@
-# Version 12 prepared-state startup candidate
+# Version 13 stock shader repair
 
-Install the signed `0.1.0-non-custom.12` / versionCode 12 ARM64 update over the existing Esteria Stock app, package `io.github.russianranger.esteria.stock`. Keep imports, prepared world/navigation output, configuration, databases and saves. **Do not uninstall, clear storage, reimport or delete completed output.** Check the release's `SHA256SUMS`, `release.json` and signing receipt. Package/signature verification does not establish an actual update on your Thor.
+Install the signed `0.1.0-non-custom.13` ARM64 update over the existing Esteria Stock app. For the reported v12 shader failure, keep **enUS** and **Balanced**. Tap **Repair local component → Shaders**. The completed world receipt is reused. If the app then reports **Database setup** as missing, tap **Repair local component → Database setup**. When preparation is ready tap **Start local game**. Keep app storage, the import, standard Blizzard patch archives and existing databases. A full world audit is optional.
 
-The last supplied Thor report reached Python world-data format verification in v10. V11 fixed the subsequent Android receipt escaping mismatch; v12 retains that fix and the exact client/server/provider pins and six generated-data helpers. The existing completed generation remains selectable. Actual shader completion, database/server startup and reconstructed-client world entry still need a real device session.
+The published shader generation is bound to the selected import, profile, providers and helper recipe. Normal startup selects it again and verifies the output under session ownership. Record the first failing phase and export the entire support ZIP before retrying. The repair must pass on the real imported data before title/login and gameplay can be assessed.
 
 ## Start with the existing preparation
 

@@ -27,6 +27,12 @@ public final class StockClientSetup {
     private static final Map<Path,Handle> OWNERS=new ConcurrentHashMap<>();
     private static final Set<String> HELPERS=Set.of("stock_content_inspection.py","stock_shader_generation.py","shader_generation.py","extractor_order.py","server_data_preflight.py","world_io.py","stock_shader_translate.py");
     private StockClientSetup() { }
+    // These two APK manifests differ only in the translator, which the stock
+    // inspector never imports. Keep the original report key for this exact pair.
+    static String inspectionHelperIdentity(String installed) {
+        return installed.equals("599d31b0430f0ff8fd2aa163a9db4ef40920c6510da2e5f534ddf40ab9c8e95d")
+                ? "985308ff612f55f8ea8dab322963ff5a4b45d44dd527983490c31124b61261fd" : installed;
+    }
     /** Install only immutable APK-owned helpers; callers mount this directory
      * separately from the preserved upstream shader compiler provider. */
     public static Path installHelpers(Context context,Path root)throws IOException {
@@ -78,7 +84,7 @@ public final class StockClientSetup {
                         if(source==null)throw new IOException("Import your complete build12340 client first");
                         StockClientCompatibility.Report structure=StockClientCompatibility.inspect(source,locale);structure.requirePreparationInputs();
                         String generation=source.getParent().getFileName().toString();
-                        String cacheIdentity=sha256((helper+"\n"+tools.toolManifestSha256()+"\n"+importMetadata(source)).getBytes(StandardCharsets.US_ASCII));
+                        String cacheIdentity=sha256((inspectionHelperIdentity(helper)+"\n"+tools.toolManifestSha256()+"\n"+importMetadata(source)).getBytes(StandardCharsets.US_ASCII));
                         String reportName="report-"+generation+"-"+locale+"-"+cacheIdentity+".json";
                         Path report=work.resolve(reportName);
                         if(!Files.exists(report,LinkOption.NOFOLLOW_LINKS))runInspection(source,generation,helper,reportName,progress,stop);

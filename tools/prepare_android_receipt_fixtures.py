@@ -126,11 +126,17 @@ def shader_fixture(root):
 
     with patch.object(shader, 'tool_identity', return_value=manifest), \
             patch.object(shader, 'execute', side_effect=translate):
+        # V12 retained the exact v11 shader recipe. Generate the old schema
+        # through the production coordinator with its published file pins.
+        evidence = json.loads((ROOT / 'runtime/evidence/non-custom-v11-release-gates.json').read_bytes())
+        old_files = evidence['runtimeHelperClosures']['stock-client']['files']
+        with patch.object(shader, 'helper_files', return_value=old_files):
+            previous = shader.generate(work / 'shaders', game, IMPORT, tools, data.CLIENT_REVISION, 'enUS')
         receipt = shader.generate(work / 'shaders', game, IMPORT, tools, data.CLIENT_REVISION, 'enUS')
     with patch.object(shader, 'tool_identity', return_value=manifest), \
             patch.object(shader, 'execute', side_effect=AssertionError('Completed shaders must not recompile')):
         assert shader.generate(work / 'shaders', game, IMPORT, tools, data.CLIENT_REVISION, 'enUS') == receipt
-    return dict(generation=receipt['generation'], toolManifestSha256=manifest,
+    return dict(generation=receipt['generation'], previousGeneration=previous['generation'], toolManifestSha256=manifest,
         clientRevision=data.CLIENT_REVISION, locale='enUS')
 
 
