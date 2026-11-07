@@ -1,8 +1,8 @@
 {
-  "clientArchiveSha256": "8fe371164401a4c693d09cc7dae876656aec529c6bdc2ef160f723ee490485a0",
-  "executableRevision": "807c4384ef28f4da51d3c50eec5082627cad36ea",
-  "executableSha256": "d2a1b74a3353f2682dcc3bc2b09f649f3b5bf53b55e6f74ccb43071c9aa4b634",
-  "executableSourceLockSha256": "8c7d85373801f0d19ed9b5627031318ad55430f46602f2761cc311e7ae2f4a3b",
+  "clientArchiveSha256": "a413045a85ea84d31cdaa8008f381540442f2d0de9df0fa4fe20c9695edc5086",
+  "executableRevision": "fa3e74b7f332fef0f212e954a0de18f685ead8bd",
+  "executableSha256": "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317",
+  "executableSourceLockSha256": "4daef14068f010ce31a05512f67ec62ee2e1927156187306cc8da018f91a6a67",
   "formatVersion": 1,
   "preparedClientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
   "preparedSourceLockSha256": "dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90",
@@ -12,5 +12,5 @@
   "scope": "stock-renderer-only",
   "shaderToolManifestSha256": "36e3032524c2136c4273908f887a1ca59ebb414e806f52d47e778332ed4acda6",
   "shaderToolsArchiveSha256": "c48c4d78952d4a2c02c26b7a6da0087d29b21eb19a81b643cb5a9a97cf7389af",
-  "sourceDiffSha256": "7ea9621e50744489e506cc22b6967cf0748cb5ad8e27bb3ee304a506e932a676"
+  "sourceDiffSha256": "182c4df27c204cb3e3a10333cabff2a8c8f70ef7ca0bcf4f174ce676ad850547"
 }

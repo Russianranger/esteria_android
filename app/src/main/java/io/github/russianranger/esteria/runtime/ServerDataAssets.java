@@ -7,7 +7,7 @@ import java.util.Set;
 
 /** Source-owned data preparation helpers. Installation executes no extractor. */
 public final class ServerDataAssets {
-    static final Set<String> HELPERS=Set.of("server_data_generation.py","server_data_preflight.py",
+    static final Set<String> HELPERS=Set.of("server-data-reader.sha256","server_data_generation.py","server_data_preflight.py",
         "shader_generation.py","extractor_order.py","owned_process_group.py","world_io.py");
     private ServerDataAssets(){ }
     public static String install(Context context,Path work)throws IOException {

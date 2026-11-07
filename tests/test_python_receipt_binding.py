@@ -74,7 +74,7 @@ class PythonToAndroidJavaReceipt(unittest.TestCase):
         cls.fixture = fixtures.prepare(cls.assets)
         helper = cls.assets / 'data/work/data-helpers' / cls.fixture['data']['helperGeneration']
         helper.mkdir(parents=True)
-        for name in data.PREPARATION_HELPERS:
+        for name in (*data.PREPARATION_HELPERS, data.READER_LOCK):
             shutil.copyfile(ROOT / 'runtime' / name, helper / name)
         cls.classes = cls.root / 'classes'
         cls.compile(cls.classes)

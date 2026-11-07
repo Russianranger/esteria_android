@@ -5,6 +5,8 @@ on:
     branches: [android/client-server, non-custom]
     paths:
       - .github/workflows/server-installation-native.yml
+      # Versioned APK producers need a source-matched native SQL receipt.
+      - .github/workflows/android-local-game-profile.yml
       - app/build.gradle
       - tools/qualify_extractor_output.py
       - tests/test_extractor_output_qualification.py

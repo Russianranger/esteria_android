@@ -99,7 +99,7 @@ def data_fixture(root):
             patch.object(data.order, 'plan', side_effect=AssertionError('Completed data must not replan')), \
             patch.object(data, 'execute', side_effect=AssertionError('Completed data must not reextract')):
         assert data.generate(work / 'server-data', game, IMPORT, tools, selection, 'enUS') == receipt
-    return dict(generation=receipt['generation'], helperGeneration=data.preparation_helper_generation(),
+    return dict(generation=receipt['generation'], helperGeneration=data.installed_helper_generation(),
         toolSelectionSha256=selection_hash, clientRevision=data.CLIENT_REVISION,
         serverRevision=data.formats.SERVER_REVISION, locale='enUS')
 

@@ -1,4 +1,4 @@
-# Esteria Stock 0.1.0-non-custom.15 for AYN Thor
+# Esteria Stock 0.1.0-non-custom.16 for AYN Thor
 
 Install the signed ARM64 APK over the existing **Esteria Stock** app. Keep the existing import, locale (**enUS** for the reported device) and **Balanced** preparation speed.
 

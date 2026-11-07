@@ -3,7 +3,7 @@
   "sources": {
     "client": {
       "url": "https://github.com/Russianranger/wowdecomp_esteria.git",
-      "commit": "807c4384ef28f4da51d3c50eec5082627cad36ea",
+      "commit": "fa3e74b7f332fef0f212e954a0de18f685ead8bd",
       "branch": "non-custom",
       "submodules": {},
       "patches": []

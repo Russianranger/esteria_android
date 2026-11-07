@@ -1,0 +1,125 @@
+{
+  "formatVersion": 1,
+  "scope": "post-v15-Wine-forwarded-Vulkan-buffer-destruction",
+  "baselineEvidence": "stock-client-bc1-initialization-linux-arm64.json",
+  "environment": "x86_64 host, QEMU TCG ARM64 Linux 6.1.0-54-arm64, no external NIC, packaged Wine 10.13 and X11 frame bridge, Mesa llvmpipe software Vulkan 22.3.6, Khronos layer 1.3.239",
+  "originalWindowsArtifact": {
+    "revision": "fa3e74b7f332fef0f212e954a0de18f685ead8bd",
+    "workflowRun": "42423823140.1",
+    "artifactId": 13594842694,
+    "sha256": "4dd3d593b21b9b9bb34c4acff05b87c380f814eaf09d55bcfb40f28735baf2f6",
+    "executableSha256": "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317",
+    "codecSha256": "b4c774430942d709ca7e3f03a1890d6aec7aaa2e432bee0e698e57027a70d006"
+  },
+  "componentProbe": {
+    "baselineStillMapped": false,
+    "fixedStillMapped": true,
+    "actualForwardOwner": "winevulkan.dll",
+    "baselineBufferDestructionCalls": 0,
+    "fixedBufferDestructionCalls": 1,
+    "createdBuffersPerCase": 1,
+    "logSha256": "fb16b9f6a79b5e11e7a82a83dd161127b6a04722aead4733a963a913fa5048b9"
+  },
+  "inputs": {
+    "preparedClientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+    "wineArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+    "shaderGeneration": "3609dd1b67e77a12a6c1641cfba7341fc1681af57bef503f7b9ce8d64dc8139f",
+    "receiptSha256": "8ceaf67054c93693a08424722df6546f0578d5e229afb8c25b3b6e6c8c5a7b34",
+    "rehashedFilesAgainstGenuineReceipt": 4742,
+    "mount": "Independent, read-only projection of the fully published coordinator output; same offline Wine prefix, config, authentic MPQ ranges and loose localized documents as the v15 reference."
+  },
+  "run": {
+    "commonMainReached": true,
+    "clientDatabaseStores": 236,
+    "externalGeneratedModuleReads": 17,
+    "externalModuleBytes": 102224,
+    "vkCreateShaderModuleSuccesses": 27,
+    "externalModuleReadOrderMatchesNativeCodeSizes": true,
+    "windowTitle": "World of Warcraft",
+    "windowClass": "wowclient64.exe",
+    "pid": 691,
+    "startTicks": 149796,
+    "windowXid": "0x1200005",
+    "privateBridgeFrame": 17,
+    "bgrxSha256": "87b2afc6593ca445b236c4bb0e5c12a38c711606de25181a37d7d7cbf63d8af9",
+    "privatePngSha256": "91e6c5f9210d9381759bb261a1ce20a2ea4307c7b02a63194fd762841a9bc914",
+    "imageDescription": "Stock Northrend front end with the populated original agreement and both controls. No agreement selection made."
+  },
+  "shutdown": {
+    "method": "WM_DELETE_WINDOW to the owned game XID",
+    "clientOnShutdown": true,
+    "extensionsUnloaded": true,
+    "wineExit": 0,
+    "deviceTornDown": true,
+    "textureImagesCreated": 222,
+    "textureImagesDestroyed": 222,
+    "khronosValidationErrors": 0,
+    "unchangedConfigSha256": "3a42fc073b544dfa98b4b880990cd26229bda144ea6fd71033d369ad0052db07",
+    "validationStderrSha256": "81d0fbb21e833ed601664b212e934d773e3f7ada565d4832733be6549f946714",
+    "driverProbeLogSha256": "d4532fb3171cd1ff40e8e39736d76c0178263d94b6aa2e5a28e8de66e8035451"
+  },
+  "androidPresentationQualified": false,
+  "physicalThorQualified": false,
+  "gameplayQualified": false,
+  "selectableProviderQualification": {
+    "environment": "Linux x86_64 host JDK 17 for Java selection and runtime installer, Python factory against clean fetched sources",
+    "publicTag": "https://github.com/Russianranger/wowdecomp_esteria/releases/tag/stock-client-arm64-fa3e74b7f332fef0f212e954a0de18f685ead8bd",
+    "frozenToNewGitDiffSha256": "182c4df27c204cb3e3a10333cabff2a8c8f70ef7ca0bcf4f174ce676ad850547",
+    "v15ToNewGitDiffSha256": "6eba8647520043e4c322170fd889b4b6154d78e6e9c77397e906967cedc3fd26",
+    "cohort": "Original source-owned Wine cohort, unchanged binary codec, 254 container slots, 25 quest slots, 32 client classes, server, patches, SQL and preparation helper inputs.",
+    "freshSourceAcquisition": "acquire_stock_renderer fetched the public exact commit and original Windows ZIP in an empty stage, rebuilt and verified the source companion and renderer provider. Independent downloads of the published source companion and receipt matched byte for byte.",
+    "archiveSha256": "a413045a85ea84d31cdaa8008f381540442f2d0de9df0fa4fe20c9695edc5086",
+    "archiveBytes": 7314759,
+    "providerManifestSha256": "6d84dd92daca74ee3bfdb46e288a0e043a63e8b00a74a13901d7b016375bc3dc",
+    "correspondingSourceSha256": "2f49d22d132cc6486295afb01d14a61c1f090be10eb93adefe869ddc293da68d",
+    "sourceReceiptSha256": "cbfa284aaf92fbf2efae9804d3e01b03887339ca34a06d26f465e9badc7a176f",
+    "repeatedFactoryProductsIdentical": true,
+    "changedMembersFromV15": [
+      "bin/WowClient64.exe",
+      "client-runtime.json",
+      "metadata/client-build.json",
+      "metadata/sources.lock.json"
+    ],
+    "unchangedMembersFromV15": 26,
+    "genuinePreparedShaderJavaAdmission": {
+      "class": "io.github.russianranger.esteria.runtime.RendererCompatibility",
+      "pe": "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317",
+      "executableRevision": "fa3e74b7f332fef0f212e954a0de18f685ead8bd",
+      "preparedRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+      "shaderGeneration": "3609dd1b67e77a12a6c1641cfba7341fc1681af57bef503f7b9ce8d64dc8139f",
+      "shaderOutputs": 4742,
+      "verifiedShaderBytes": 102130554,
+      "profile": "stock-3.3.5a"
+    },
+    "previousPublicApkInstallations": {
+      "14": {
+        "oldGeneration": "07feae8242474cdf397e3e1955dcf21cedabfa406795b91a52b4d68044cb9337",
+        "newGeneration": "588b5f2cff13237c2f14491cebee23d737066953d43b90120941ca591acc2cf2",
+        "cancelKeptOldSelected": true,
+        "resumedFiles": 1,
+        "warmCopiedBytes": 0,
+        "previousAndNextRestorableWithoutArchive": true
+      },
+      "15": {
+        "oldGeneration": "21dc52833dd146ff8221e2d62881fbd1b1f9b585b288e8e9bb4a9a8686f2eca8",
+        "newGeneration": "588b5f2cff13237c2f14491cebee23d737066953d43b90120941ca591acc2cf2",
+        "cancelKeptOldSelected": true,
+        "resumedFiles": 1,
+        "warmCopiedBytes": 0,
+        "previousAndNextRestorableWithoutArchive": true
+      }
+    },
+    "migrationMethod": "Real RuntimeInstaller consumed each previous public APK client asset in its own disposable store. Cancelling the next renderer after its first completed file kept the previous pointer selected. Resuming installed the measured new PE; restoring either previously completed renderer required zero copied bytes without its archive.",
+    "tests": {
+      "passed": 24,
+      "skipped": 0,
+      "suites": [
+        "test_stock_renderer_provider",
+        "test_stock_title_provider",
+        "test_client_runtime_provider",
+        "test_python_receipt_binding"
+      ]
+    },
+    "wrongPreviousZipRejectedForCurrentRenderer": true
+  }
+}

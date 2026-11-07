@@ -13,11 +13,18 @@ from tools import provider_client_runtime as client
 
 ROOT = client.ROOT
 STOCK = '471ee42faadf4a97a1d0a86989cf1452621f2dc5'
-EXECUTABLE = '807c4384ef28f4da51d3c50eec5082627cad36ea'
-SOURCE_DIFF = '7ea9621e50744489e506cc22b6967cf0748cb5ad8e27bb3ee304a506e932a676'
+PREVIOUS_RENDERER = '807c4384ef28f4da51d3c50eec5082627cad36ea'
+EXECUTABLE = 'fa3e74b7f332fef0f212e954a0de18f685ead8bd'
+SOURCE_DIFF = '182c4df27c204cb3e3a10333cabff2a8c8f70ef7ca0bcf4f174ce676ad850547'
+LOADER_DIFF = '6eba8647520043e4c322170fd889b4b6154d78e6e9c77397e906967cedc3fd26'
 DESCRIPTOR = 'renderer-compatibility.json'
 BASE = 'client-runtime/'
-REVIEWED_FILES = {
+LOADER_FILES = {
+    'Engine/Source/Gx/CGxDeviceVulkan/Vulkan/Loader.cpp',
+    'Engine/Source/Gx/CGxDeviceVulkan/Vulkan/Loader.hpp',
+    'Tools/VulkanTests/texture_device.cpp',
+}
+REVIEWED_FILES = LOADER_FILES | {
     'Engine/Source/Gx/CGxDeviceVulkan/Vulkan/Texture.cpp',
     'Engine/Source/Gx/CGxDeviceVulkan/CGxDeviceVulkanTexture.cpp',
     '.github/workflows/arm64-client.yml', 'Tools/RuntimeManifest/reuse_stock_xvid.py',
@@ -54,13 +61,13 @@ def descriptor(path):
     return item
 
 
-def changed_files(source, old, new):
+def changed_files(source, old, new, reviewed_files):
     git = ['git', '-C', str(source)]
     subprocess.run([*git, 'merge-base', '--is-ancestor', old, new], check=True)
     diff = [*git, '-c', 'diff.noprefix=false', '-c', 'diff.mnemonicPrefix=false', 'diff',
             '--no-color', '--no-ext-diff', '--no-textconv', '--no-renames', '--src-prefix=a/', '--dst-prefix=b/']
     paths = set(subprocess.check_output([*diff, '--name-only', '-z', old, new, '--']).decode().rstrip('\0').split('\0'))
-    require(paths == REVIEWED_FILES, 'renderer-diff-paths')
+    require(paths == reviewed_files, 'renderer-diff-paths')
     delta = subprocess.check_output([*diff, '--binary', '--full-index', old, new, '--'])
     require(0 < len(delta) <= 2 << 20, 'renderer-diff-size')
     return digest(delta)
@@ -86,7 +93,9 @@ def selected(source, source_lock, input_lock):
     client.archives.pin_identity(dict(measured['artifact'], file='client.zip'))
     require(22 <= measured['artifact']['bytes'] <= 512 << 20, 'renderer-artifact-size-limit')
     client.fetch_sources.verify_checkout(source, lock['sources']['client'], [])
-    source_diff = changed_files(source, STOCK, revision)
+    require(changed_files(source, PREVIOUS_RENDERER, revision, LOADER_FILES) == LOADER_DIFF,
+            'renderer-reviewed-loader-diff')
+    source_diff = changed_files(source, STOCK, revision, REVIEWED_FILES)
     require(source_diff == SOURCE_DIFF, 'renderer-reviewed-source-diff')
     return measured, source_diff
 

@@ -18,8 +18,12 @@ import java.util.Locale;
  * The Python helper rechecks actual files, source identities and capabilities.
  */
 public final class ServerDataRunPlan {
+    // The installed bytes select the guest executable; this single reviewed, output-compatible
+    // reader preserves the immutable v10–v15 generation, including interrupted phase staging.
+    private static final String REVIEWED_READER = "06ede7399445e1aace7566a0c584d6fba2c005703393afd2f7ba0fd9e5c4fe29";
+    private static final String OUTPUT_RECIPE = "c911baddd7c49fa21fa4a3bc022d75c69fa66daddde3a6970129cf652dad18ff";
     public final Path game,tools,work;
-    public final String importGeneration,helperGeneration,toolSelectionSha256,locale;
+    public final String importGeneration,helperGeneration,recipeGeneration,toolSelectionSha256,locale;
     public final int threads;
     public final ContentPackageLayout.ServerManifest serverDataPackage;
     public final List<String> arguments;
@@ -34,7 +38,9 @@ public final class ServerDataRunPlan {
         if(!Arrays.asList("deDE","enGB","enUS","esES","frFR","koKR","zhCN","zhTW","enCN","enTW","esMX","ruRU").contains(locale))
             throw new IOException("Choose an explicit supported data locale");
         if(threads<1||threads>2)throw new IOException("One or two data extraction workers required");
-        this.helperGeneration=helperGeneration;this.toolSelectionSha256=toolSelectionSha256;this.locale=locale;this.threads=threads;
+        this.helperGeneration=helperGeneration;
+        recipeGeneration=REVIEWED_READER.equals(helperGeneration)?OUTPUT_RECIPE:helperGeneration;
+        this.toolSelectionSha256=toolSelectionSha256;this.locale=locale;this.threads=threads;
         importGeneration=ShaderRunPlan.current(game);
         directory(game.resolve("generations"));directory(game.resolve("generations").resolve(importGeneration));
         directory(game.resolve("generations").resolve(importGeneration).resolve("data"));
@@ -46,12 +52,18 @@ public final class ServerDataRunPlan {
             if(!Files.isRegularFile(file,LinkOption.NOFOLLOW_LINKS)||Files.size(file)<=0||Files.size(file)>131072)
                 throw new IOException("Complete installed data helper closure required");
         }
+        if(REVIEWED_READER.equals(helperGeneration)) {
+            Path reader=helpers.resolve("server-data-reader.sha256");
+            if(!Files.isRegularFile(reader,LinkOption.NOFOLLOW_LINKS)||Files.size(reader)!=65)
+                throw new IOException("Reviewed data reader identity required");
+        }
         requireSelection();
         arguments=Collections.unmodifiableList(Arrays.asList("/usr/bin/python3","-B","-s","-E",
             "/work/data-helpers/"+helperGeneration+"/server_data_generation.py","--store","/work/server-data",
             "--game","/esteria-data","--generation",importGeneration,"--tools","/esteria-server-extractors",
             "--selection","/work/data-tools-selection.json","--locale",locale,"--threads",Integer.toString(threads),
-            "--content-profile",ContentProfile.ID,"--android-low-memory"));
+            "--content-profile",ContentProfile.ID,"--android-low-memory",
+            "--installed-data-reader",helperGeneration,"--data-recipe",recipeGeneration));
         mounts=Collections.unmodifiableList(Arrays.asList(new ProotLaunch.Mount(game,"/esteria-data"),
             new ProotLaunch.Mount(tools,"/esteria-server-extractors")));
     }

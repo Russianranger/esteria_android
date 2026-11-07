@@ -1,5 +1,5 @@
 // Exact source-only closure; no executable provider or gameplay action enabled.
-def serverDataHelpers = ['server_data_generation.py', 'server_data_preflight.py',
+def serverDataHelpers = ['server-data-reader.sha256', 'server_data_generation.py', 'server_data_preflight.py',
     'shader_generation.py', 'extractor_order.py', 'owned_process_group.py', 'world_io.py']
 def serverDataAssets = layout.buildDirectory.dir('generated/serverData')
 def packageServerData = tasks.register('packageServerData') {
@@ -49,6 +49,7 @@ def pythonReceiptHelpers = (serverDataHelpers + ['stock_content_inspection.py',
     'stock_shader_generation.py', 'stock_shader_translate.py']).unique()
 def preparePythonReceipts = tasks.register('preparePythonReceiptFixtures', Exec) {
     inputs.file(rootProject.file('tools/prepare_android_receipt_fixtures.py'))
+    inputs.file(rootProject.file('config/stock-prepared-data-reader.json'))
     inputs.file(rootProject.file('runtime/evidence/non-custom-v11-release-gates.json'))
     inputs.files(pythonReceiptHelpers.collect { rootProject.file('runtime/' + it) })
     outputs.dir(pythonReceiptAssets)

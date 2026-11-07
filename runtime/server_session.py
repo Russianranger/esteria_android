@@ -467,6 +467,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('expected-version', 'operation-id', 'service-operation-id', 'instance-uuid'):
         parser.add_argument('--' + name, required=True)
+    parser.add_argument('--installed-data-reader', required=True)
+    parser.add_argument('--data-recipe', required=True)
     args = parser.parse_args(); stopped = [False]
     for signum in (signal.SIGTERM, signal.SIGINT):
         signal.signal(signum, lambda *_: stopped.__setitem__(0, True))
@@ -474,11 +476,12 @@ def main():
         require(re.fullmatch('[a-f0-9]{32}', args.operation_id) and re.fullmatch('[a-f0-9]{32}', args.service_operation_id),
                 'Invalid server session operation identity')
         operation = Path('/work/server-sessions') / args.operation_id
-        run(Path('/work/state'), operation, Path('/esteria-server-content'), operation / 'content-receipt.json',
-            Path('/esteria-server-programs'), Path('/work/mysql-sessions') / args.service_operation_id,
-            Path('/esteria-data'), Path(__file__).parent / 'local-server.json', Path('/usr/bin/mysql'),
-            args.expected_version, args.operation_id, args.service_operation_id, args.instance_uuid,
-            interrupted=lambda: stopped[0])
+        with data.reader_admission(args.installed_data_reader, args.data_recipe):
+            run(Path('/work/state'), operation, Path('/esteria-server-content'), operation / 'content-receipt.json',
+                Path('/esteria-server-programs'), Path('/work/mysql-sessions') / args.service_operation_id,
+                Path('/esteria-data'), Path(__file__).parent / 'local-server.json', Path('/usr/bin/mysql'),
+                args.expected_version, args.operation_id, args.service_operation_id, args.instance_uuid,
+                interrupted=lambda: stopped[0])
         print('Owned local auth/world stopped; character/bot persistence and gameplay remain unqualified')
         return 0
     except Exception as error:

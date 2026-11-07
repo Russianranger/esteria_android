@@ -403,7 +403,9 @@ raise SystemExit(23)
         arguments = ['helper', '--store', str(self.root / 'store'), '--game', str(self.root / 'game'),
             '--tools', str(self.root / 'tools'), '--generation', 'a' * 64, '--locale', 'enUS']
         for module in (data, stock_shaders):
-            argv = arguments + (['--selection', str(self.root / 'selection.json')] if module is data
+            argv = arguments + (['--selection', str(self.root / 'selection.json'),
+                '--installed-data-reader', data.installed_helper_generation(),
+                '--data-recipe', data.preparation_helper_generation()] if module is data
                 else ['--client-revision', 'b' * 40])
             stderr, stdout = text_io.StringIO(), text_io.StringIO()
             with patch.object(sys, 'argv', argv), patch.object(module, 'generate',

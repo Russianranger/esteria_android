@@ -35,6 +35,8 @@ public final class ServerDataBinding {
         this.plan=plan;this.directory=directory;this.generation=generation;this.effectiveLocale=effectiveLocale;
         inputsJson=inputs.toString();receiptJson=receipt.toString();
     }
+    String installedDataReader(){return plan.helperGeneration;}
+    String dataRecipe(){return plan.recipeGeneration;}
     /** Deliberately package-private. Only a future source-qualified composed
      * tool/setup owner may attach this inspector to its verified provider.
      * A caller-pinned launch plan is not public source qualification authority. */
@@ -65,11 +67,11 @@ public final class ServerDataBinding {
                 JSONObject expected=new JSONObject().put("formatVersion",1).put("scope","user-supplied-format-checked")
                     .put("namespace","EsteriaServerData").put("mode",supplied.mode)
                     .put("clientProviderOrderSha256",supplied.clientProviderOrderSha256).put("manifest",manifest);
-                if(integer(inputs,"formatVersion")!=2||!plan.helperGeneration.equals(inputs.get("preparationHelperGeneration"))||
+                if(integer(inputs,"formatVersion")!=2||!plan.recipeGeneration.equals(inputs.get("preparationHelperGeneration"))||
                         !canonical(expected).equals(canonical(inputs.getJSONObject("serverDataPackage"))))
                     throw new IOException("User-supplied server data manifest, provenance or helper selection differs");
             }
-            if(!plan.helperGeneration.equals(inputs.get("preparationHelperGeneration"))||
+            if(!plan.recipeGeneration.equals(inputs.get("preparationHelperGeneration"))||
                     !io.github.russianranger.esteria.core.content.ContentProfile.ID.equals(inputs.get("contentProfile"))||
                     !BuildConfig.CLIENT_REVISION.equals(inputs.get("clientRevision"))||
                     !verifiedServerRevision.equals(inputs.get("serverRevision"))||!plan.importGeneration.equals(inputs.get("importGeneration"))||

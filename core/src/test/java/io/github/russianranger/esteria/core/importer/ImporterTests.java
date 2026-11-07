@@ -295,6 +295,12 @@ public final class ImporterTests {
         StockClientCompatibility.Report report = StockClientCompatibility.inspect(source, "frFR");
         report.requirePreparationInputs();
         check(report.effectiveLocale.equals("enUS") && report.installedLocales.equals(Arrays.asList("enUS")), "source locale rotation must match installed data");
+        check(report.archiveEvidence.stream().anyMatch(row -> row.startsWith("Data/enUS/patch-enUS-2.MPQ;")) &&
+                report.archiveEvidence.stream().noneMatch(row -> row.startsWith("Data/enUS/patch-enUS-3.MPQ;")),
+                "report must distinguish a present numbered locale provider from an absent one");
+        write(source.resolve("Data/enUS/patch-enUS-3.MPQ"), mpq());
+        check(StockClientCompatibility.inspect(source, "enUS").archiveEvidence.stream()
+                .anyMatch(row -> row.startsWith("Data/enUS/patch-enUS-3.MPQ;")), "report must record the third stock locale patch");
         check(report.candidateOverlays.equals(Arrays.asList("Data/patch-Z.MPQ")), "stock root and locale patches must not be classified as additional overlays");
         check(Files.exists(source.resolve("Data/patch.MPQ")) && Files.exists(source.resolve("Data/patch-2.MPQ")) && Files.exists(source.resolve("Data/patch-3.MPQ")) && Files.exists(source.resolve("Data/patch-Z.MPQ")), "inspection must preserve all source bytes");
         check(report.toText().contains("runtimeExecution=not demonstrated") && report.toText().contains("signedUi=not authenticated") && report.toText().contains("filename alone does not establish identity"), "report must distinguish observed bytes from content/runtime proof");

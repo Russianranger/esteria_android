@@ -75,3 +75,22 @@ controller now sends only the explicit manifest/root/hash selection plus the
 map output/mode flags. A test compiled against the actual pinned C++ Bootstrap
 and libmpq accepts both conversion command forms and rejects either conflicting
 legacy selector; it does not call extractor main or convert game data.
+
+### Reusing a prepared generation after the inventory reader update
+
+The Android launcher passes the installed reader hash and the reviewed output
+recipe to both guest entry points. The guest measures its bundled files before
+opening the preparation store or starting a server session. Standalone runs
+from a source checkout use `config/stock-prepared-data-reader.json`.
+Updating the reader sidecar alone gives an unknown implementation its own data
+identity. A reviewed pair keeps the v10–v15 generation and interrupted staging
+at their existing paths.
+
+Within one exclusive preparation operation, the coordinator can reuse a hash
+for a stable private path or a verified corresponding hard link. It accounts
+for distinct directory entries before trusting a multiply linked file. Native
+writers and releasing the setup lock end the proof. Unrecognized aliases,
+unverified copied files and separate full admission or audit operations read
+the payload again. To measure both private filesystem modes, run
+`python3 -B tools/measure_prepared_data_reads.py --vmap-mib 32`, then repeat
+with `--force-copy`.

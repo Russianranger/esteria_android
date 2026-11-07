@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import shutil
 import struct
+import subprocess
 import sys
 import tempfile
 import time
@@ -700,9 +701,220 @@ class ServerDataGenerationTests(unittest.TestCase):
             with self.assertRaises(BlockingIOError):
                 self.generate()
         with patch.object(data, 'execute', side_effect=self.fake_execute):
-            with self.assertRaisesRegex(ValueError, 'import changed before server data activation|extraction inputs changed'):
+            with self.assertRaisesRegex(ValueError, 'data preparation cancelled during output inventory'):
                 self.generate(cancelled=lambda: True)
         self.assertEqual((self.store / 'current').read_text(), 'f' * 64 + '\n')
+
+    def test_retained_hard_link_changed_after_format_check_is_not_published(self):
+        with patch.object(data, 'execute', side_effect=self.fake_execute), \
+                patch.object(data.formats, 'check_server_data', side_effect=self.fail_final_preflight), redirect_stdout(io.StringIO()):
+            with self.assertRaises(ValueError):
+                self.generate()
+        work = next((self.store / 'staging').iterdir())
+        final = next(work.glob('final-*')) / 'data'
+        target = final / 'dbc/Map.dbc'
+        phase_file = work / 'maps-dbc-cameras-complete/data/dbc/Map.dbc'
+        self.assertTrue(target.samefile(phase_file))
+        def mutate_after_success(root, **kwargs):
+            result = self.base_preflight(root, **kwargs)
+            self.assertTrue(result['checks_passed'])
+            timestamp = target.stat()
+            with target.open('r+b') as stream:
+                stream.seek(-1, os.SEEK_END)
+                stream.write(b'X')
+            os.utime(target, ns=(timestamp.st_atime_ns, timestamp.st_mtime_ns))
+            return result
+        with patch.object(data, 'execute', side_effect=AssertionError('retained phases need no child')), \
+                patch.object(data.formats, 'check_server_data', side_effect=mutate_after_success):
+            with self.assertRaisesRegex(ValueError, 'assembled output differs'):
+                self.generate()
+        self.assertFalse((self.store / 'current').exists())
+
+    def test_private_copy_fallback_is_verified_and_retry_restores_complete_assembly(self):
+        original_copy = data.world_io.copy_stream
+        def corrupt_copy(incoming, outgoing, *args, **kwargs):
+            original_copy(incoming, outgoing, *args, **kwargs)
+            if '/final-' in outgoing.name and outgoing.name.endswith('/Map.dbc'):
+                outgoing.seek(-1, os.SEEK_END)
+                outgoing.write(b'X')
+        with patch.object(data.os, 'link', side_effect=OSError(errno.EXDEV, 'fixture')), \
+                patch.object(data.world_io, 'copy_stream', side_effect=corrupt_copy), \
+                patch.object(data, 'execute', side_effect=self.fake_execute):
+            with self.assertRaisesRegex(ValueError, 'assembled output differs'):
+                self.generate()
+        self.assertFalse((self.store / 'current').exists())
+        with patch.object(data.os, 'link', side_effect=OSError(errno.EXDEV, 'fixture')), \
+                patch.object(data, 'execute', side_effect=AssertionError('verified phases need no child')):
+            receipt = self.generate()
+        result = self.store / 'generations' / receipt['generation']
+        self.assertEqual(receipt, data.verify_completed(result, receipt['inputs']))
+
+    def test_replaced_owner_and_closed_operation_cannot_donate(self):
+        factory = data.OperationInventory
+        captured = []
+        def capture(*args):
+            proof = factory(*args)
+            captured.append(proof)
+            return proof
+        def replace(phase):
+            if phase == 'extraction-final-assembly':
+                lock = self.store / '.setup.lock'
+                lock.rename(self.store / 'original.lock')
+                lock.touch()
+        with patch.object(data, 'OperationInventory', side_effect=capture), \
+                patch.object(data, 'execute', side_effect=self.fake_execute):
+            with self.assertRaisesRegex(ValueError, 'inventory owner or generation changed'):
+                self.generate(progress=replace)
+        self.assertFalse((self.store / 'current').exists())
+        self.assertFalse(captured[0].files)
+        with self.assertRaisesRegex(ValueError, 'inventory owner or generation changed'):
+            captured[0].check(captured[0].work)
+
+    def test_changed_installed_reader_cannot_finish_under_the_same_recipe(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            folder = Path(temporary)
+            origin = Path(data.__file__).parent
+            for name in (*data.PREPARATION_HELPERS, data.READER_LOCK):
+                shutil.copyfile(origin / name, folder / name)
+            def swap_reader(phase):
+                if phase == 'extraction-format-preflight':
+                    with (folder / 'world_io.py').open('ab') as helper:
+                        helper.write(b'\n# changed while receipt recipe stays the same\n')
+                    pins = {name: data.storage.identity(folder / name, 131072) for name in data.PREPARATION_HELPERS}
+                    (folder / data.READER_LOCK).write_text(data._helper_manifest(pins) + '\n')
+                    self.assertEqual(data._measured_helper()[1], data.V10_RECIPE)
+                    self.assertNotEqual(data.preparation_helper_generation(), data.V10_RECIPE)
+            with patch.object(data, '__file__', str(folder / 'server_data_generation.py')), \
+                    patch.object(data, 'execute', side_effect=self.fake_execute):
+                with self.assertRaisesRegex(ValueError, 'inputs changed before completion'):
+                    self.generate(progress=swap_reader)
+        self.assertFalse((self.store / 'current').exists())
+
+    def test_two_views_of_one_directory_entry_cannot_cover_an_external_link(self):
+        work = self.store / 'staging' / ('b' * 64)
+        left, right = work / 'left', work / 'right'
+        left.mkdir(parents=True)
+        right.mkdir()
+        file, alias = left / 'payload', right / 'payload'
+        file.write_bytes(b'1234')
+        os.link(file, alias)
+        with (self.store / '.setup.lock').open('wb') as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            proof = data.OperationInventory(work, lock.fileno(), lambda: False)
+            proof.digest(file)
+            # Simulate a second PRoot view of one parent directory. The second
+            # real hard link is consequently unaccounted for in this namespace.
+            stat = Path.stat
+            def alias_parent(path, *args, **kwargs):
+                return stat(left if path == right else path, *args, **kwargs)
+            with patch.object(Path, 'stat', alias_parent), \
+                    patch.object(data.storage, 'identity', wraps=data.storage.identity) as hashed:
+                self.assertEqual(proof.digest(alias, file), proof.digest(file))
+                self.assertEqual(hashed.call_count, 2)
+            proof.close()
+
+    def test_external_hardlink_and_parent_alias_never_donate_even_with_static_metadata(self):
+        work = self.store / 'staging' / ('b' * 64)
+        work.mkdir(parents=True)
+        local, outside = work / 'payload', self.root / 'mutable'
+        local.write_bytes(b'1234')
+        os.link(local, outside)
+        with (self.store / '.setup.lock').open('wb') as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            proof = data.OperationInventory(work, lock.fileno(), lambda: False)
+            proof.check(work)
+            with self.assertRaisesRegex(ValueError, 'inventory owner or generation changed'):
+                proof.check(work / '..' / 'unrelated')
+            with self.assertRaisesRegex(ValueError, 'inventory owner or generation changed'):
+                proof.digest(outside)
+            # Simulate a filesystem that cannot distinguish the two writes in
+            # its timestamps. An unaccounted second link requires a fresh hash.
+            before = proof.stamp(local)
+            with patch.object(proof, 'stamp', return_value=before), \
+                    patch.object(data.storage, 'identity', wraps=data.storage.identity) as hashed:
+                original = proof.digest(local)
+                outside.write_bytes(b'5678')
+                updated = proof.digest(local)
+                self.assertNotEqual(original, updated)
+                self.assertEqual(hashed.call_count, 2)
+            proof.close()
+            with self.assertRaisesRegex(ValueError, 'inventory owner or generation changed'):
+                proof.digest(local)
+        with (self.store / '.setup.lock').open('rb') as next_lock:
+            fcntl.flock(next_lock, fcntl.LOCK_EX)
+            new_owner = data.OperationInventory(work, next_lock.fileno(), lambda: False)
+            with patch.object(data.storage, 'identity', wraps=data.storage.identity) as hashed:
+                self.assertEqual(updated, new_owner.digest(local))
+                self.assertEqual(hashed.call_count, 1)
+            new_owner.close()
+
+    def test_two_changed_files_cannot_select_old_recipe_without_independent_approval(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            folder = Path(temporary)
+            origin = Path(data.__file__).parent
+            approved = data.installed_helper_generation()
+            for name in (*data.PREPARATION_HELPERS, data.READER_LOCK):
+                shutil.copyfile(origin / name, folder / name)
+            with (folder / 'server_data_preflight.py').open('ab') as helper:
+                helper.write(b'\n# independent change to the generated data validator\n')
+            with patch.object(data, '__file__', str(folder / 'server_data_generation.py')):
+                # A genuinely unreviewed change cannot be blessed by a launch
+                # parameter alone. Recomputing the sidecar alone is insufficient too.
+                changed = data.installed_helper_generation()
+                with self.assertRaisesRegex(ValueError, 'launch selection'):
+                    with data.reader_admission(changed, data.V10_RECIPE): pass
+                pins = {name:data.storage.identity(folder / name,131072) for name in data.PREPARATION_HELPERS}
+                (folder / data.READER_LOCK).write_text(data._helper_manifest(pins)+'\n')
+                changed = data.installed_helper_generation()
+                self.assertEqual(data.preparation_helper_generation(), changed)
+                with data.reader_admission(changed, changed):
+                    self.assertEqual(data.preparation_helper_generation(), changed)
+                # Standalone recertification needs an explicitly supplied
+                # independent approval matching both the exact bytes and recipe.
+                with data.reader_admission(changed, data.V10_RECIPE):
+                    self.assertEqual(data.preparation_helper_generation(), data.V10_RECIPE)
+                self.assertEqual(data.preparation_helper_generation(), changed)
+                # Change the actual accepted VMAP format, update the untrusted
+                # sidecar too, then reuse the formerly valid independent approval.
+                validator = folder / 'server_data_preflight.py'
+                text = validator.read_text()
+                self.assertEqual(text.count("if header != b'VMAP_4.8':"), 1)
+                validator.write_text(text.replace("if header != b'VMAP_4.8':", "if header != b'VMAP_9.9':"))
+                pins = {name:data.storage.identity(folder / name,131072) for name in data.PREPARATION_HELPERS}
+                (folder / data.READER_LOCK).write_text(data._helper_manifest(pins)+'\n')
+                self.assertNotEqual(data.preparation_helper_generation(), data.V10_RECIPE)
+                with self.assertRaisesRegex(ValueError, 'launch selection'):
+                    with data.reader_admission(changed, data.V10_RECIPE): pass
+            private_store = folder / 'must-not-exist'
+            argv = [sys.executable, '-B', str(folder / 'server_data_generation.py'),
+                    '--installed-data-reader', approved, '--data-recipe', data.V10_RECIPE,
+                    '--store', str(private_store), '--game', str(self.game), '--tools', str(self.tools),
+                    '--selection', str(folder / 'never-read.json'), '--locale', 'enUS',
+                    '--generation', self.generation]
+            # Actual Android ARM64 Python under TCG took 41s to start this fresh process.
+            result = subprocess.run(argv, capture_output=True, text=True, timeout=120)
+            self.assertEqual(result.returncode, 1)
+            self.assertIn('executing data reader or reviewed output recipe differs', result.stdout)
+            self.assertFalse(private_store.exists())
+
+    def test_unknown_helper_closure_uses_its_actual_distinct_generation(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            folder = Path(temporary)
+            origin = Path(data.__file__).parent
+            for name in (*data.PREPARATION_HELPERS, data.READER_LOCK):
+                shutil.copyfile(origin / name, folder / name)
+            with patch.object(data, '__file__', str(folder / 'server_data_generation.py')):
+                reviewed = data.installed_helper_generation()
+                self.assertEqual(data.preparation_helper_generation(), data.V10_RECIPE)
+                with (folder / 'server_data_preflight.py').open('ab') as helper:
+                    helper.write(b'\n# unreviewed fixture change\n')
+                changed = data.installed_helper_generation()
+                self.assertNotEqual(changed, reviewed)
+                self.assertNotEqual(changed, data.V10_RECIPE)
+                self.assertEqual(data.preparation_helper_generation(), changed)
+                (folder / data.READER_LOCK).write_bytes(b'invalid')
+                with self.assertRaisesRegex(ValueError, 'invalid extraction reader compatibility lock'):
+                    data.preparation_helper_generation()
 
     def test_stock_capability_cannot_start_conversion(self):
         def stock(command, cwd, log, timeout, **kwargs):

@@ -40,7 +40,7 @@ public final class LocalServerSession {
         "android_server_schema_setup.py","mysql_bootstrap.py","mysql_service.py","server_content.py",
         "server_schema_setup.py","server_schema_baseline.py","server_schema_adaptations.py","server_update_setup.py",
         "server_updater.py","server_playerbots_setup.py","owned_process_group.py","server_config.py",
-        "provision_local_realm.py","provision_local_account.py","server_data_generation.py","server_data_preflight.py",
+        "provision_local_realm.py","provision_local_account.py","server-data-reader.sha256","server_data_generation.py","server_data_preflight.py",
         "shader_generation.py","extractor_order.py","world_io.py","server/appearance-schema-v1.sql","server/appearance-schema.lock.json","local-server.json");
     private static final ConcurrentHashMap<Path,Handle> OWNERS=new ConcurrentHashMap<>();
     private LocalServerSession(){ }
@@ -199,7 +199,8 @@ public final class LocalServerSession {
             if(progress!=null)progress.update("server-session-starting","",0,-1);
             process=ProotProcess.startInteractive(context,runtime.installer(),runtime.packagePlan(),work,outer,
                 List.of("/usr/bin/python3","-B","-s","-E","/work/session-helpers/"+helper+"/server_session.py",
-                    "--expected-version",version,"--operation-id",operation,"--service-operation-id",serviceOperation,"--instance-uuid",uuid),
+                    "--expected-version",version,"--operation-id",operation,"--service-operation-id",serviceOperation,"--instance-uuid",uuid,
+                    "--installed-data-reader",data.installedDataReader(),"--data-recipe",data.dataRecipe()),
                 admissionEnvironment,List.of(new ProotLaunch.Mount(programs.current(),ServerProgramsSetup.guestMount()),
                     new ProotLaunch.Mount(content.current(),ServerContentSetup.guestMount()),new ProotLaunch.Mount(data.directory,"/esteria-data")),
                 new WorldConsoleShutdown());

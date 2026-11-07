@@ -1,0 +1,507 @@
+{
+  "formatVersion": 1,
+  "scope": "writer-excluded single-operation SHA reuse in stopped preparation",
+  "baseSource": "973c9948e654f9857cecefbf6709d54a430f4c59",
+  "reviewedReaderSource": "b185449da851a5268d4acf10335ef8fd9267e9b9",
+  "installedReader": "06ede7399445e1aace7566a0c584d6fba2c005703393afd2f7ba0fd9e5c4fe29",
+  "outputRecipe": "c911baddd7c49fa21fa4a3bc022d75c69fa66daddde3a6970129cf652dad18ff",
+  "sixReaderFiles": "51bd942239d5cad8003915e1a6b86bb15a08693f31ba6c3d4d6cf21010c682cf",
+  "standaloneApprovalSha256": "4855dd701170f7b3ef44f7ddbf26866103f90d10850e562181a1cba32bd38676",
+  "selection": {
+    "completedV10ToV15": "same source-bound input hash, receipt, payload paths and staging generation",
+    "changedInputSourceProviderProfileOrThreads": "independent inputs yield distinct key",
+    "unrecognizedReader": "own installed hash or explicit launch mismatch refusal before mutation",
+    "unknownHardlinkOrNewInode": "full byte hash",
+    "nativeWriter": "discard all operation proof before launch",
+    "sessionOrNewOperation": "fresh ownership and independent admission"
+  },
+  "donorReplay": {
+    "directSelection": {
+      "generation": "bc5a5b6f745415a4d9ccfd8c1e75aac9cdeb81df2d84b6e167528e6600a7f128",
+      "filesRetainingInodeSizeAndMtime": 9,
+      "dataFiles": 5,
+      "rawReceiptAndOutputUnchanged": true,
+      "extractorInvocations": 0,
+      "cloneInvocations": 0,
+      "generationRenames": 0
+    },
+    "retainedFailedFinal": {
+      "generation": "bc5a5b6f745415a4d9ccfd8c1e75aac9cdeb81df2d84b6e167528e6600a7f128",
+      "confirmedOutputInodes": 5,
+      "events": [
+        "extraction-reused-maps-dbc-cameras",
+        "extraction-reused-raw-vmaps",
+        "extraction-reused-assembled-vmaps",
+        "extraction-reused-navigation",
+        "extraction-reused-final-assembly"
+      ],
+      "extractorInvocations": 0,
+      "cloneInvocations": 0
+    },
+    "donor": "signed v15 APK production six-file server-data helper closure",
+    "clientAssets": "synthetic host fixture",
+    "oldAndNewRecipe": "c911baddd7c49fa21fa4a3bc022d75c69fa66daddde3a6970129cf652dad18ff",
+    "installedCandidate": "06ede7399445e1aace7566a0c584d6fba2c005703393afd2f7ba0fd9e5c4fe29"
+  },
+  "host": {
+    "environment": "Linux x86_64 Python 3.12, regular 32 MiB synthetic VMAP",
+    "hashCounts": "Actual SHA reads during payload walks. Tracked hash totals also include helper, metadata and provider checks. Process I/O includes fixture and measurement I/O; physical I/O depends on the filesystem cache.",
+    "hardLinks": {
+      "before": [
+        {
+          "phase": "initial-preparation",
+          "elapsedSeconds": 0.172281,
+          "inventoryPayloadBytesRead": 100663590,
+          "allTrackedHashBytesRead": 101086948,
+          "currentProcessProcIoDelta": {
+            "rchar": 101092748,
+            "wchar": 33560693,
+            "read_bytes": 8192,
+            "write_bytes": 33796096
+          },
+          "metadataBytesWritten": 5842,
+          "linkedPayloadBytes": 67109025,
+          "copiedPayloadBytes": 0,
+          "extractorInvocations": 4,
+          "capabilityInvocations": 2,
+          "reuseReasons": []
+        },
+        {
+          "phase": "unchanged-warm-preparation",
+          "elapsedSeconds": 0.032736,
+          "inventoryPayloadBytesRead": 33554541,
+          "allTrackedHashBytesRead": 33977693,
+          "currentProcessProcIoDelta": {
+            "rchar": 33985809,
+            "wchar": 65,
+            "read_bytes": 0,
+            "write_bytes": 4096
+          },
+          "metadataBytesWritten": 65,
+          "linkedPayloadBytes": 0,
+          "copiedPayloadBytes": 0,
+          "extractorInvocations": 0,
+          "capabilityInvocations": 0,
+          "reuseReasons": []
+        },
+        {
+          "phase": "session-admission-data-verification-only",
+          "elapsedSeconds": 0.028599,
+          "inventoryPayloadBytesRead": 33554541,
+          "allTrackedHashBytesRead": 33695925,
+          "currentProcessProcIoDelta": {
+            "rchar": 33703567,
+            "wchar": 0,
+            "read_bytes": 0,
+            "write_bytes": 0
+          },
+          "metadataBytesWritten": 0,
+          "linkedPayloadBytes": 0,
+          "copiedPayloadBytes": 0,
+          "extractorInvocations": 0,
+          "capabilityInvocations": 0,
+          "reuseReasons": []
+        },
+        {
+          "phase": "retained-completed-phases-and-final-assembly-retry",
+          "elapsedSeconds": 0.119177,
+          "inventoryPayloadBytesRead": 134218131,
+          "allTrackedHashBytesRead": 134641489,
+          "currentProcessProcIoDelta": {
+            "rchar": 134649701,
+            "wchar": 4126,
+            "read_bytes": 0,
+            "write_bytes": 20480
+          },
+          "metadataBytesWritten": 4126,
+          "linkedPayloadBytes": 0,
+          "copiedPayloadBytes": 0,
+          "extractorInvocations": 0,
+          "capabilityInvocations": 0,
+          "reuseReasons": [
+            "extraction-reused-maps-dbc-cameras",
+            "extraction-reused-raw-vmaps",
+            "extraction-reused-assembled-vmaps",
+            "extraction-reused-navigation",
+            "extraction-reused-final-assembly"
+          ]
+        }
+      ],
+      "after": [
+        {
+          "phase": "initial-preparation",
+          "elapsedSeconds": 0.196029,
+          "inventoryPayloadBytesRead": 67109078,
+          "allTrackedHashBytesRead": 67564581,
+          "currentProcessProcIoDelta": {
+            "rchar": 67572039,
+            "wchar": 33560693,
+            "read_bytes": 0,
+            "write_bytes": 33841152
+          },
+          "metadataBytesWritten": 5842,
+          "linkedPayloadBytes": 67109025,
+          "copiedPayloadBytes": 0,
+          "extractorInvocations": 4,
+          "capabilityInvocations": 2,
+          "reuseReasons": []
+        },
+        {
+          "phase": "unchanged-warm-preparation",
+          "elapsedSeconds": 0.033061,
+          "inventoryPayloadBytesRead": 33554541,
+          "allTrackedHashBytesRead": 34009838,
+          "currentProcessProcIoDelta": {
+            "rchar": 34018741,
+            "wchar": 65,
+            "read_bytes": 0,
+            "write_bytes": 4096
+          },
+          "metadataBytesWritten": 65,
+          "linkedPayloadBytes": 0,
+          "copiedPayloadBytes": 0,
+          "extractorInvocations": 0,
+          "capabilityInvocations": 0,
+          "reuseReasons": []
+        },
+        {
+          "phase": "session-admission-data-verification-only",
+          "elapsedSeconds": 0.028803,
+          "inventoryPayloadBytesRead": 33554541,
+          "allTrackedHashBytesRead": 33706640,
+          "currentProcessProcIoDelta": {
+            "rchar": 33714541,
+            "wchar": 0,
+            "read_bytes": 0,
+            "write_bytes": 0
+          },
+          "metadataBytesWritten": 0,
+          "linkedPayloadBytes": 0,
+          "copiedPayloadBytes": 0,
+          "extractorInvocations": 0,
+          "capabilityInvocations": 0,
+          "reuseReasons": []
+        },
+        {
+          "phase": "retained-completed-phases-and-final-assembly-retry",
+          "elapsedSeconds": 0.076873,
+          "inventoryPayloadBytesRead": 67109049,
+          "allTrackedHashBytesRead": 67564552,
+          "currentProcessProcIoDelta": {
+            "rchar": 67573553,
+            "wchar": 4126,
+            "read_bytes": 0,
+            "write_bytes": 20480
+          },
+          "metadataBytesWritten": 4126,
+          "linkedPayloadBytes": 0,
+          "copiedPayloadBytes": 0,
+          "extractorInvocations": 0,
+          "capabilityInvocations": 0,
+          "reuseReasons": [
+            "extraction-reused-maps-dbc-cameras",
+            "extraction-reused-raw-vmaps",
+            "extraction-reused-assembled-vmaps",
+            "extraction-reused-navigation",
+            "extraction-reused-final-assembly"
+          ]
+        }
+      ]
+    },
+    "privateCopyFallback": {
+      "before": [
+        {
+          "phase": "initial-preparation",
+          "elapsedSeconds": 0.309644,
+          "inventoryPayloadBytesRead": 100663590,
+          "allTrackedHashBytesRead": 101086948,
+          "currentProcessProcIoDelta": {
+            "rchar": 168201772,
+            "wchar": 100669718,
+            "read_bytes": 0,
+            "write_bytes": 100937728
+          },
+          "metadataBytesWritten": 5842,
+          "linkedPayloadBytes": 0,
+          "copiedPayloadBytes": 67109025,
+          "extractorInvocations": 4,
+          "capabilityInvocations": 2,
+          "reuseReasons": []
+        },
+        {
+          "phase": "unchanged-warm-preparation",
+          "elapsedSeconds": 0.032627,
+          "inventoryPayloadBytesRead": 33554541,
+          "allTrackedHashBytesRead": 33977693,
+          "currentProcessProcIoDelta": {
+            "rchar": 33985811,
+            "wchar": 65,
+            "read_bytes": 0,
+            "write_bytes": 4096
+          },
+          "metadataBytesWritten": 65,
+          "linkedPayloadBytes": 0,
+          "copiedPayloadBytes": 0,
+          "extractorInvocations": 0,
+          "capabilityInvocations": 0,
+          "reuseReasons": []
+        },
+        {
+          "phase": "session-admission-data-verification-only",
+          "elapsedSeconds": 0.025794,
+          "inventoryPayloadBytesRead": 33554541,
+          "allTrackedHashBytesRead": 33695925,
+          "currentProcessProcIoDelta": {
+            "rchar": 33703569,
+            "wchar": 0,
+            "read_bytes": 0,
+            "write_bytes": 0
+          },
+          "metadataBytesWritten": 0,
+          "linkedPayloadBytes": 0,
+          "copiedPayloadBytes": 0,
+          "extractorInvocations": 0,
+          "capabilityInvocations": 0,
+          "reuseReasons": []
+        },
+        {
+          "phase": "retained-completed-phases-and-final-assembly-retry",
+          "elapsedSeconds": 0.204651,
+          "inventoryPayloadBytesRead": 134218131,
+          "allTrackedHashBytesRead": 134641489,
+          "currentProcessProcIoDelta": {
+            "rchar": 134649703,
+            "wchar": 4126,
+            "read_bytes": 0,
+            "write_bytes": 20480
+          },
+          "metadataBytesWritten": 4126,
+          "linkedPayloadBytes": 0,
+          "copiedPayloadBytes": 0,
+          "extractorInvocations": 0,
+          "capabilityInvocations": 0,
+          "reuseReasons": [
+            "extraction-reused-maps-dbc-cameras",
+            "extraction-reused-raw-vmaps",
+            "extraction-reused-assembled-vmaps",
+            "extraction-reused-navigation",
+            "extraction-reused-final-assembly"
+          ]
+        }
+      ],
+      "after": [
+        {
+          "phase": "initial-preparation",
+          "elapsedSeconds": 0.310771,
+          "inventoryPayloadBytesRead": 100663590,
+          "allTrackedHashBytesRead": 101119093,
+          "currentProcessProcIoDelta": {
+            "rchar": 168235576,
+            "wchar": 100669718,
+            "read_bytes": 0,
+            "write_bytes": 100810752
+          },
+          "metadataBytesWritten": 5842,
+          "linkedPayloadBytes": 0,
+          "copiedPayloadBytes": 67109025,
+          "extractorInvocations": 4,
+          "capabilityInvocations": 2,
+          "reuseReasons": []
+        },
+        {
+          "phase": "unchanged-warm-preparation",
+          "elapsedSeconds": 0.030257,
+          "inventoryPayloadBytesRead": 33554541,
+          "allTrackedHashBytesRead": 34009838,
+          "currentProcessProcIoDelta": {
+            "rchar": 34018746,
+            "wchar": 65,
+            "read_bytes": 0,
+            "write_bytes": 4096
+          },
+          "metadataBytesWritten": 65,
+          "linkedPayloadBytes": 0,
+          "copiedPayloadBytes": 0,
+          "extractorInvocations": 0,
+          "capabilityInvocations": 0,
+          "reuseReasons": []
+        },
+        {
+          "phase": "session-admission-data-verification-only",
+          "elapsedSeconds": 0.028106,
+          "inventoryPayloadBytesRead": 33554541,
+          "allTrackedHashBytesRead": 33706640,
+          "currentProcessProcIoDelta": {
+            "rchar": 33714544,
+            "wchar": 0,
+            "read_bytes": 0,
+            "write_bytes": 0
+          },
+          "metadataBytesWritten": 0,
+          "linkedPayloadBytes": 0,
+          "copiedPayloadBytes": 0,
+          "extractorInvocations": 0,
+          "capabilityInvocations": 0,
+          "reuseReasons": []
+        },
+        {
+          "phase": "retained-completed-phases-and-final-assembly-retry",
+          "elapsedSeconds": 0.104434,
+          "inventoryPayloadBytesRead": 100663590,
+          "allTrackedHashBytesRead": 101119093,
+          "currentProcessProcIoDelta": {
+            "rchar": 101128097,
+            "wchar": 4126,
+            "read_bytes": 0,
+            "write_bytes": 28672
+          },
+          "metadataBytesWritten": 4126,
+          "linkedPayloadBytes": 0,
+          "copiedPayloadBytes": 0,
+          "extractorInvocations": 0,
+          "capabilityInvocations": 0,
+          "reuseReasons": [
+            "extraction-reused-maps-dbc-cameras",
+            "extraction-reused-raw-vmaps",
+            "extraction-reused-assembled-vmaps",
+            "extraction-reused-navigation",
+            "extraction-reused-final-assembly"
+          ]
+        }
+      ]
+    }
+  },
+  "android": {
+    "environment": "ARM64 Redroid under QEMU TCG, actual packaged Android PRoot, Debian Python 3.11.2, app UID ext4 and regular 32 MiB synthetic VMAP",
+    "comparison": "one donor run and a later final candidate run, elapsed times include emulation and concurrent host load",
+    "originalSixFiles": "Shipped v14 and v15 APKs byte-identical to v10 release-gate manifest",
+    "donor": [
+      {
+        "phase": "initial-preparation",
+        "inventoryPayloadBytesRead": 100663590,
+        "linkedPayloadBytes": 67109025,
+        "copiedPayloadBytes": 0,
+        "metadataBytesWritten": 5842,
+        "extractorInvocations": 4,
+        "reuseReasons": [],
+        "elapsedSeconds": 41.329261
+      },
+      {
+        "phase": "unchanged-warm-preparation",
+        "inventoryPayloadBytesRead": 33554541,
+        "linkedPayloadBytes": 0,
+        "copiedPayloadBytes": 0,
+        "metadataBytesWritten": 65,
+        "extractorInvocations": 0,
+        "reuseReasons": [],
+        "elapsedSeconds": 9.910079
+      },
+      {
+        "phase": "session-admission-data-verification-only",
+        "inventoryPayloadBytesRead": 33554541,
+        "linkedPayloadBytes": 0,
+        "copiedPayloadBytes": 0,
+        "metadataBytesWritten": 0,
+        "extractorInvocations": 0,
+        "reuseReasons": [],
+        "elapsedSeconds": 4.963455
+      },
+      {
+        "phase": "retained-completed-phases-and-final-assembly-retry",
+        "inventoryPayloadBytesRead": 134218131,
+        "linkedPayloadBytes": 0,
+        "copiedPayloadBytes": 0,
+        "metadataBytesWritten": 4126,
+        "extractorInvocations": 0,
+        "reuseReasons": [
+          "extraction-reused-maps-dbc-cameras",
+          "extraction-reused-raw-vmaps",
+          "extraction-reused-assembled-vmaps",
+          "extraction-reused-navigation",
+          "extraction-reused-final-assembly"
+        ],
+        "elapsedSeconds": 31.292422
+      }
+    ],
+    "candidate": [
+      {
+        "phase": "initial-preparation",
+        "inventoryPayloadBytesRead": 67109078,
+        "linkedPayloadBytes": 67109025,
+        "copiedPayloadBytes": 0,
+        "metadataBytesWritten": 5842,
+        "extractorInvocations": 4,
+        "reuseReasons": [],
+        "elapsedSeconds": 35.949321
+      },
+      {
+        "phase": "unchanged-warm-preparation",
+        "inventoryPayloadBytesRead": 33554541,
+        "linkedPayloadBytes": 0,
+        "copiedPayloadBytes": 0,
+        "metadataBytesWritten": 65,
+        "extractorInvocations": 0,
+        "reuseReasons": [],
+        "elapsedSeconds": 11.147979
+      },
+      {
+        "phase": "session-admission-data-verification-only",
+        "inventoryPayloadBytesRead": 33554541,
+        "linkedPayloadBytes": 0,
+        "copiedPayloadBytes": 0,
+        "metadataBytesWritten": 0,
+        "extractorInvocations": 0,
+        "reuseReasons": [],
+        "elapsedSeconds": 6.050135
+      },
+      {
+        "phase": "retained-completed-phases-and-final-assembly-retry",
+        "inventoryPayloadBytesRead": 67109049,
+        "linkedPayloadBytes": 0,
+        "copiedPayloadBytes": 0,
+        "metadataBytesWritten": 4126,
+        "extractorInvocations": 0,
+        "reuseReasons": [
+          "extraction-reused-maps-dbc-cameras",
+          "extraction-reused-raw-vmaps",
+          "extraction-reused-assembled-vmaps",
+          "extraction-reused-navigation",
+          "extraction-reused-final-assembly"
+        ],
+        "elapsedSeconds": 26.871409
+      }
+    ],
+    "adversarialAlias": {
+      "installed": "06ede7399445e1aace7566a0c584d6fba2c005703393afd2f7ba0fd9e5c4fe29",
+      "sameRealParentThroughTwoProotBinds": true,
+      "externalHardlink": true,
+      "deliberatelyIndistinguishableRecordedMetadata": true,
+      "fullHashReads": 2,
+      "changedDigestObserved": true
+    },
+    "priorUnchangedInventoryFaultCasesPassed": 7,
+    "finalAdversarialReaderApprovalCasePassed": true,
+    "finalAdversarialReaderApprovalElapsedSeconds": 41.345,
+    "fixtureSubprocessTimeoutSeconds": 120,
+    "rawEvidenceSha256": {
+      "lease-ab-final.log": "8f014a8559f982cb6cbd411e74550bcd70e025f244672e617bb21448386fc35b",
+      "lease-ab-authorized.log": "6ed0067212815f2cf8fe73207fc477df59b46632b7c2797ce00c6c74240cb8cd"
+    }
+  },
+  "hostTests": {
+    "coordinatorReceiptCacheSessionAndPackaging": 149,
+    "worldIoIncludingAuthorizedPauseExit75": 26,
+    "skips": [
+      "managed host child/socket proc inode projection differs",
+      "optional exact libmpq host bridge absent"
+    ],
+    "observedRetry": "one pre-existing auth probe signal-shutdown race on a prior run; isolated rerun and subsequent complete focused runs passed",
+    "coreRunPlan": "compiled and ran production Java command/source/identity/path guards"
+  },
+  "physicalThor": false,
+  "nativeExtractionExecuted": false,
+  "nativeServiceStartupExecuted": false,
+  "physicalGameDataTimed": false,
+  "gameplayQualified": false,
+  "crossOperationCacheChanged": false
+}

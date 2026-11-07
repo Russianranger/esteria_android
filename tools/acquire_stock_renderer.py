@@ -59,9 +59,8 @@ def acquire(output, cohort):
     output.mkdir(parents=True, exist_ok=False)
     fetch_sources.fetch('client', source, output / 'source', ROOT, offline=False)
     checkout = output / 'source/client'
-    # The reviewed renderer commit is a child of the prepared source. Make
-    # both trees available for the factory's exact diff and ancestry checks.
-    subprocess.run(['git', 'fetch', '--depth', '2', '--no-tags', 'origin', revision], cwd=checkout, check=True)
+    # Include both reviewed renderer commits and their frozen preparation baseline.
+    subprocess.run(['git', 'fetch', '--depth', '3', '--no-tags', 'origin', revision], cwd=checkout, check=True)
     tag = 'stock-client-arm64-' + revision
     url = f'{REPOSITORY}/releases/download/{tag}/client-ARM64-{revision}.zip'
     original = prepare_runtime.fetch(dict(build['artifact'], file='client-original.zip', url=url), output / 'cache')

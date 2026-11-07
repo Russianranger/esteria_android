@@ -95,12 +95,14 @@ class RendererProviderTest(unittest.TestCase):
         git('commit','-qm','renderer')
         head = git('rev-parse','HEAD').decode().strip()
         expected = renderer.digest(git('diff','--binary','--full-index','--no-renames',base,head))
-        self.assertEqual(renderer.changed_files(source, base, head), expected)
+        self.assertEqual(renderer.changed_files(source, base, head, renderer.REVIEWED_FILES), expected)
+        with self.assertRaisesRegex(ValueError, 'renderer-diff-paths'):
+            renderer.changed_files(source, base, head, renderer.LOADER_FILES)
         (source/'protocol.h').write_text('fixture')
         git('add','--all')
         git('commit','-qm','unreviewed')
         with self.assertRaisesRegex(ValueError,'renderer-diff-paths'):
-            renderer.changed_files(source, base, git('rev-parse','HEAD').decode().strip())
+            renderer.changed_files(source, base, git('rev-parse','HEAD').decode().strip(), renderer.REVIEWED_FILES)
 
     def test_codec_and_notice_inventory_must_be_identical(self):
         member = dict(bytes=10,sha256='a'*64)

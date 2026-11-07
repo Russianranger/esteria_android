@@ -18,7 +18,7 @@ SCHEMA_HELPER_TEST = NAMESPACE + '.runtime.ServerSchemaAssetsTest'
 INSTALLATION_HELPER_TEST = NAMESPACE + '.runtime.ServerInstallationAssetsTest'
 DATA_HELPER_TEST = NAMESPACE + '.runtime.ServerDataAssetsTest'
 SESSION_HELPER_TEST = NAMESPACE + '.runtime.ServerSessionAssetsTest'
-HELPER_ASSET_FILES = {'server-installation': 18, 'server-data': 6, 'server-session': 24}
+HELPER_ASSET_FILES = {'server-installation': 18, 'server-data': 7, 'server-session': 25}
 PREPARATION_TEST = NAMESPACE + '.PreparationControlsTest'
 PREPARATION_METHODS = (
     'selectedSpeedSurvivesActivityRecreationWithoutStartingPreparation',

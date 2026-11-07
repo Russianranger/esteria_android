@@ -1,3 +1,7 @@
+# Current non-custom implementation
+
+The published installable is stock v15 below. The next candidate selects reconstructed PE `fa3e74b7f332fef0f212e954a0de18f685ead8bd`. Its complete Wine front-end replay exited with zero Vulkan validation errors. The reviewed world-data reader `06ede7399445e1aace7566a0c584d6fba2c005703393afd2f7ba0fd9e5c4fe29` keeps the v10–v15 output recipe `c911baddd7c49fa21fa4a3bc022d75c69fa66daddde3a6970129cf652dad18ff`. Preparation can reuse verified hashes within one uninterrupted ownership period. The selected import, receipt, prepared generation and interrupted work keep their identities. Each new owner independently verifies its data. [Renderer replay](runtime/evidence/stock-client-forwarded-loader-linux-arm64.json) · [Measured reader behavior and compatibility](runtime/evidence/prepared-operation-inventory.json).
+
 # Stock v15 signed startup candidate
 
 [Signed stock v15 release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.15) · version `0.1.0-non-custom.15` (15), produced at `d5e7715587b980d9e41f9070c21e0fc21c543101`. The 336,862,047-byte APK has SHA-256 `f6aa8c4ad674e71d3aed59099f0b952efc44a0ae2333a77efdbff81188489510`. All six published assets matched their staged bytes. Android SDK v2/v3 verification matched the stock signing identity. [Public readback](runtime/evidence/non-custom-v15-public-apk-readback.json) · [Packaged asset comparison](runtime/evidence/non-custom-v15-apk-asset-continuity.json).

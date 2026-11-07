@@ -117,6 +117,10 @@ public final class StockClientCompatibility {
                 if (path == null) warnings.add("Not supplied: Data/" + effective + "/" + name + "; completeness and required effective bytes still depend on preparation/runtime");
                 else inspectArchive(path, "Data/" + effective + "/" + name, false, errors, archives);
             }
+            for (int number : Arrays.asList(2, 3)) {
+                String name = "patch-" + effective + "-" + number + ".MPQ";
+                inspectArchive(members.get(name.toLowerCase(Locale.ROOT)), "Data/" + effective + "/" + name, false, errors, archives);
+            }
             if (effective.equals("enCN") || effective.equals("enTW")) errors.add("Effective locale " + effective + " is recognized by the client but unsupported by the pinned shader translator");
             if (!effective.equals(requestedLocale)) warnings.add("Requested " + requestedLocale + " is absent; source-defined client locale rotation selects " + effective);
         }

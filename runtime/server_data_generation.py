@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import argparse
 from bisect import bisect_left
+from contextlib import contextmanager
+from contextvars import ContextVar
 import errno
 import fcntl
 import hashlib
@@ -96,13 +98,73 @@ def pin(value):
     return value
 
 
-def preparation_helper_generation():
-    """Match the APK's exact compact, ordered helper manifest generation."""
-    files = {name: storage.identity(Path(__file__).resolve().parent / name, 131072)
-             for name in sorted(PREPARATION_HELPERS)}
-    raw = (json.dumps({'formatVersion': 1, 'files': files}, separators=(',', ':')) + '\n').encode()
+READER_LOCK = 'server-data-reader.sha256'
+V10_RECIPE = 'c911baddd7c49fa21fa4a3bc022d75c69fa66daddde3a6970129cf652dad18ff'
+
+
+def _helper_manifest(files):
+    raw = (json.dumps({'formatVersion': 1, 'files': dict(sorted(files.items()))},
+                      separators=(',', ':')) + '\n').encode()
     return hashlib.sha256(raw).hexdigest()
 
+
+# A checked-out source tree has its own reviewed release selection. The two
+# packaged guest entry points receive exactly the selection authorized by Java.
+CHECKOUT_APPROVAL = (Path(__file__).resolve().parents[1] / 'config' / 'stock-prepared-data-reader.json'
+                     if __package__ == 'runtime' else None)
+_reader_authority = ContextVar('esteria_installed_data_reader', default=None)
+
+
+def _measured_helper():
+    """Return the executable closure and the output recipe. Both are checked under the owner."""
+    root = Path(__file__).resolve().parent
+    files = {name: storage.identity(root / name, 131072) for name in PREPARATION_HELPERS}
+    closure = _helper_manifest(files)
+    reviewed = _metadata_bytes(root / READER_LOCK, 65)
+    require(re.fullmatch(b'[0-9a-f]{64}\n', reviewed), 'invalid extraction reader compatibility lock')
+    files[READER_LOCK] = {'bytes': len(reviewed), 'sha256': hashlib.sha256(reviewed).hexdigest()}
+    installed = _helper_manifest(files)
+    return installed, V10_RECIPE if closure.encode() + b'\n' == reviewed else installed
+
+
+def _helper_selection():
+    installed, compatible = _measured_helper()
+    authority = _reader_authority.get()
+    if authority is not None:
+        expected, recipe = authority
+        require(installed == expected and recipe in (installed, compatible),
+                'executing data reader or reviewed output recipe differs from launch selection')
+        return installed, recipe
+    if CHECKOUT_APPROVAL is not None and CHECKOUT_APPROVAL.exists():
+        saved = document(CHECKOUT_APPROVAL)
+        require(type(saved) is dict and set(saved) == {'formatVersion', 'installedReader', 'outputRecipe'} and
+                type(saved['formatVersion']) is int and saved['formatVersion'] == 1 and
+                all(isinstance(saved[k], str) and storage.HASH.fullmatch(saved[k])
+                    for k in ('installedReader', 'outputRecipe')), 'invalid standalone data reader approval')
+        if saved['installedReader'] == installed:
+            require(saved['outputRecipe'] in (installed, compatible), 'unreviewed standalone data output recipe')
+            return installed, saved['outputRecipe']
+    return installed, installed
+
+
+@contextmanager
+def reader_admission(installed, recipe):
+    require(all(isinstance(v, str) and storage.HASH.fullmatch(v) for v in (installed, recipe)),
+            'exact installed data reader and output recipe required')
+    token = _reader_authority.set((installed, recipe))
+    try:
+        _helper_selection()  # Before creating the store, lock, stage, pointer, or session.
+        yield
+    finally:
+        _reader_authority.reset(token)
+
+
+def installed_helper_generation():
+    return _measured_helper()[0]
+
+
+def preparation_helper_generation(selection=None):
+    return (selection or _helper_selection())[1]
 
 def package_selection(source, *, validate=False):
     namespace = source / formats.SERVER_NAMESPACE
@@ -191,9 +253,129 @@ def tools_verified(root, selection):
     return hashlib.sha256(storage.encoded(selection)).hexdigest()
 
 
-def inventory(root):
+class OperationInventory:
+    """Disposable path-bound hashes for the writer-excluded generation staging tree."""
+    LIMIT = 32768
+
+    def __init__(self, work, lock, cancelled):
+        self.work = work
+        self.owner = work.stat()
+        self.lock = lock
+        self.lock_path = work.parent.parent / '.setup.lock'
+        self.cancelled = cancelled
+        self.files = {}
+        self.aliases = {}
+
+    def in_scope(self, path):
+        require(self.lock is not None and path.is_relative_to(self.work) and '..' not in path.parts,
+                'prepared inventory owner or generation changed')
+
+    def check(self, root):
+        self.in_scope(root)
+        owner = storage.canonical(self.work).stat()
+        require(os.path.samestat(self.owner, owner) and
+                (self.owner.st_mode, self.owner.st_uid, self.owner.st_gid) == (owner.st_mode, owner.st_uid, owner.st_gid) and
+                os.path.samestat(os.fstat(self.lock), self.lock_path.lstat()),
+                'prepared inventory owner or generation changed')
+        require(not self.cancelled(), 'data preparation cancelled during output inventory')
+
+    @staticmethod
+    def stamp(path):
+        info = path.lstat()
+        require(stat.S_ISREG(info.st_mode), 'regular prepared output required')
+        return (info.st_dev, info.st_ino, info.st_mode, info.st_size, info.st_mtime_ns,
+                info.st_ctime_ns, info.st_nlink, info.st_uid, info.st_gid)
+
+    def save(self, path, stamp, row):
+        if stamp[0] and stamp[1] and stamp[5] > 0 and (len(self.files) < self.LIMIT or path in self.files):
+            previous = self.files.get(path)
+            key = stamp[:2]
+            if previous is not None and previous[0][:2] != key:
+                old = previous[0][:2]
+                self.aliases[old].discard(path)
+                if not self.aliases[old]: del self.aliases[old]
+            self.files[path] = (stamp, row)
+            self.aliases.setdefault(key, set()).add(path)
+
+    def all_links_owned(self, path, stamp):
+        # The staging flock cannot exclude a writer through a link in another
+        # namespace. Only a bounded, exhaustive set of real private paths proves
+        # exclusion; unaccounted links always use the original full SHA read.
+        count = stamp[6]
+        if count == 1: return True
+        if not 1 < count <= 8: return False
+        known = self.aliases.get(stamp[:2], set())
+        if len(known) > count: return False
+        names = known | {path}
+        if len(names) != count: return False
+        try:
+            entries = set()
+            for name in names:
+                if self.stamp(storage.canonical(name, False)) != stamp: return False
+                parent = name.parent.stat()
+                # Two PRoot paths into one directory entry are only one link.
+                entries.add((parent.st_dev, parent.st_ino, name.name.casefold()))
+            return len(entries) == count
+        except FileNotFoundError:
+            return False
+
+    def matching(self, path, stamp, equivalent=None):
+        # A preexisting hard link may only donate from the exact corresponding
+        # path in a selected, byte-verified phase, never by a global inode key.
+        self.in_scope(path)
+        if equivalent is not None: self.in_scope(equivalent)
+        for candidate in (path, equivalent):
+            saved = self.files.get(candidate)
+            if saved is None or saved[0] != stamp: continue
+            if candidate != path and self.stamp(storage.canonical(candidate, False)) != stamp: continue
+            if self.all_links_owned(path, stamp):
+                self.save(path, stamp, saved[1])
+                return saved[1]
+        return None
+
+    def digest(self, path, equivalent=None):
+        require(not self.cancelled(), 'data preparation cancelled during output inventory')
+        self.in_scope(path)
+        before = self.stamp(path)
+        matched = self.matching(path, before, equivalent)
+        if matched is not None:
+            return matched
+        row = storage.identity(path, MAX_FILE)
+        require(self.stamp(path) == before, 'prepared output replaced during hash')
+        self.save(path, before, row)
+        return row
+
+    def clear(self):
+        self.files.clear()
+        self.aliases.clear()
+
+    def close(self):
+        self.clear()
+        self.lock = None
+
+    def linked(self, source, target, before):
+        saved = self.files.get(source)
+        if saved is None or saved[0] != before:
+            return
+        after = self.stamp(source)
+        require(after == self.stamp(target) and after[:5] == before[:5] and
+                after[6] == before[6] + 1 and after[7:] == before[7:], 'prepared output changed during private hard link')
+        self.save(source, after, saved[1])
+        self.save(target, after, saved[1])
+
+    def renamed(self, source, target):
+        for path in tuple(self.files):
+            if path.is_relative_to(source):
+                new_path = target / path.relative_to(source)
+                stamp, row = self.files.pop(path)
+                self.aliases[stamp[:2]].remove(path)
+                self.save(new_path, stamp, row)
+
+
+def inventory(root, *, proof=None, sources=None):
     """Hash a completed phase once, bounded and without following links."""
     storage.canonical(root)
+    if proof is not None: proof.check(root)
     rows, total, entries = {}, 0, 0
     for parent, dirs, files in os.walk(root, followlinks=False, onerror=walk_error):
         require(len(Path(parent).relative_to(root).parts) <= 16, 'data output depth bound')
@@ -209,7 +391,11 @@ def inventory(root):
         for name in files:
             path = Path(parent) / name
             relative = path.relative_to(root).as_posix()
-            rows[relative] = storage.identity(path, MAX_FILE)
+            if proof is None:
+                rows[relative] = storage.identity(path, MAX_FILE)
+            else:
+                source = (sources or {}).get(relative.split('/', 1)[0])
+                rows[relative] = proof.digest(path, source / relative if source else None)
             total += rows[relative]['bytes']
             require(len(rows) <= MAX_FILES and total <= MAX_TOTAL, 'data output inventory bound')
     require(rows, 'extractor produced no data files')
@@ -217,9 +403,12 @@ def inventory(root):
     return rows
 
 
-def clone(source, destination):
+def clone(source, destination, *, proof=None, equivalent=None):
     """Private output only: prefer hard links; bounded fallback handles Android denial."""
     storage.canonical(source)
+    if proof is not None:
+        proof.check(source); proof.check(destination)
+        if equivalent is not None: proof.check(equivalent)
     destination.mkdir(mode=0o700)
     for parent, dirs, files in os.walk(source, followlinks=False, onerror=walk_error):
         at = Path(parent)
@@ -230,14 +419,22 @@ def clone(source, destination):
         for name in files:
             original = storage.canonical(at / name, False)
             output = target / name
+            if proof is not None:
+                require(not proof.cancelled(), 'data preparation cancelled during final assembly')
+            before = proof.stamp(original) if proof is not None else None
+            if equivalent is not None:
+                proof.matching(original, before, equivalent / original.relative_to(source))
             try:
                 os.link(original, output, follow_symlinks=False)
             except OSError as error:
                 if error.errno not in (errno.EPERM, errno.EXDEV, errno.EOPNOTSUPP, errno.ENOSYS):
                     raise
                 with original.open('rb') as incoming, output.open('xb') as outgoing:
-                    world_io.copy_stream(incoming, outgoing)
+                    if proof is None: world_io.copy_stream(incoming, outgoing)
+                    else: world_io.copy_stream(incoming, outgoing, cancelled=proof.cancelled)
                 os.chmod(output, 0o600)
+            else:
+                if proof is not None: proof.linked(original, output, before)
 
 
 class NavigationProgress:
@@ -357,10 +554,10 @@ def _discard(path):
     shutil.rmtree(path)
 
 
-def _phase_verified(completed, name):
+def _phase_verified(completed, name, *, proof=None, sources=None):
     saved = document(completed / 'phase.json')
     require(type(saved) is dict and set(saved) == {'phase', 'files'} and saved['phase'] == name and
-            storage.encoded(saved['files']) == storage.encoded(inventory(completed / 'data')),
+            storage.encoded(saved['files']) == storage.encoded(inventory(completed / 'data', proof=proof, sources=sources)),
             'completed extraction phase changed')
     return saved['files']
 
@@ -436,13 +633,14 @@ def _navigation_work(root, maps, vmaps):
     return selected
 
 
-def phase(root, name, action, *, progress=lambda value: None, navigation_inputs=None):
+def phase(root, name, action, *, progress=lambda value: None, navigation_inputs=None, proof=None):
     require(name in PHASES, 'unknown extraction phase')
     completed = root / (name + '-complete')
     if completed.exists() or completed.is_symlink():
         progress('extraction-' + name + '-verifying')
         world_io.phase('phase-output-hashing-' + name)
-        _phase_verified(completed, name)
+        sources = dict(zip(('maps', 'vmaps'), navigation_inputs)) if navigation_inputs else None
+        _phase_verified(completed, name, proof=proof, sources=sources)
         progress('extraction-reused-' + name)
         world_io.phase('reused-' + name)
         return completed / 'data'
@@ -461,7 +659,7 @@ def phase(root, name, action, *, progress=lambda value: None, navigation_inputs=
     action(data, working)
     progress('extraction-' + name + '-verifying')
     world_io.phase('phase-output-hashing-' + name)
-    rows = inventory(data)
+    rows = inventory(data, proof=proof)
     for relative in rows:
         with (data / relative).open('rb') as source:
             os.fsync(source.fileno())
@@ -469,6 +667,7 @@ def phase(root, name, action, *, progress=lambda value: None, navigation_inputs=
         storage.sync(Path(parent))
     storage.atomic(working / 'phase.json', storage.encoded({'phase': name, 'files': rows}))
     os.rename(working, completed); storage.sync(root)
+    if proof is not None: proof.renamed(working, completed)
     return completed / 'data'
 
 
@@ -629,7 +828,25 @@ def _retire_v8_generation(previous, receipt):
     _remove_empty(previous)
 
 
-def _retained_final(work, parts):
+def _phase_projection(parts):
+    expected = {}
+    for base, groups in parts:
+        saved = document(base.parent / 'phase.json')
+        require(type(saved) is dict and set(saved) == {'phase', 'files'} and
+                saved['phase'] == base.parent.name.removesuffix('-complete') and saved['phase'] in PHASES and
+                type(saved['files']) is dict, 'retained final source phase metadata differs')
+        for name, row in saved['files'].items():
+            if name.split('/', 1)[0] in groups:
+                require(type(row) is dict and set(row) == {'bytes', 'sha256'} and
+                        type(row['bytes']) is int and 0 <= row['bytes'] <= MAX_FILE and
+                        type(row['sha256']) is str and storage.HASH.fullmatch(row['sha256']),
+                        'retained final source file metadata differs')
+                require(name not in expected and len(expected) < MAX_FILES, 'retained final source file bound')
+                expected[name] = row
+    return expected
+
+
+def _retained_final(work, parts, expected, proof):
     """Reuse a fully assembled failed candidate only after exact phase hashes.
 
     Failed candidates never establish completion. At most the newest candidate
@@ -640,21 +857,12 @@ def _retained_final(work, parts):
     final = max(attempts, key=lambda path: path.stat().st_mtime_ns)
     data = final / 'data'
     if not data.exists() and not data.is_symlink(): return None
-    expected = {}
-    for base, groups in parts:
-        saved = document(base.parent / 'phase.json')
-        require(type(saved) is dict and set(saved) == {'phase', 'files'} and
-                saved['phase'] == base.parent.name.removesuffix('-complete') and saved['phase'] in PHASES and
-                type(saved['files']) is dict, 'retained final source phase metadata differs')
-        for name, row in saved['files'].items():
-            if name.split('/', 1)[0] in groups:
-                require(name not in expected and len(expected) < MAX_FILES, 'retained final source file bound')
-                expected[name] = row
-    try: actual = inventory(data)
+    sources = {name: base for base, groups in parts for name in groups}
+    try: actual = inventory(data, proof=proof, sources=sources)
     except ValueError as error:
         if str(error) == 'extractor produced no data files': return None
         raise
-    return final if storage.encoded(actual) == storage.encoded(expected) else None
+    return final if actual == expected else None
 
 
 def preflight_failure(report):
@@ -793,21 +1001,22 @@ def _generate(store, game, generation, tools, selection, locale, *, threads=1, t
     store, game, tools = storage.canonical(store, create=True), storage.canonical(game), storage.canonical(tools)
     require(not any(a == b or a in b.parents or b in a.parents for a, b in
                     ((store, game), (store, tools), (game, tools))), 'extraction roots must be separate')
+    proof = None
     lock = os.open(store / '.setup.lock', os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
     try:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        helper = _helper_selection()
         inputs = {'formatVersion': 1, 'contentProfile': content_profile, 'importGeneration': generation, 'locale': locale, 'threads': threads,
                   'clientRevision': CLIENT_REVISION, 'serverRevision': formats.SERVER_REVISION,
                   'importMetadata': storage.imported(game, generation),
                   'toolSelectionSha256': tools_verified(tools, selection),
-                  'preparationHelperGeneration': preparation_helper_generation()}
+                  'preparationHelperGeneration': preparation_helper_generation(helper)}
         source = game / 'generations' / generation / 'data'
         external = package_selection(source)
         require(content_profile != 'stock-3.3.5a' or external is None,
                 'Stock 3.3.5a generates matching data from stock client archives; custom server-data overlays require the Esteria profile')
         if external is not None:
-            inputs.update(formatVersion=2, serverDataPackage=external,
-                          preparationHelperGeneration=preparation_helper_generation())
+            inputs.update(formatVersion=2, serverDataPackage=external)
         key = hashlib.sha256(storage.encoded(inputs)).hexdigest()
         staging = storage.canonical(store / 'staging', create=True)
         generations = storage.canonical(store / 'generations', create=True)
@@ -817,6 +1026,7 @@ def _generate(store, game, generation, tools, selection, locale, *, threads=1, t
             previous = None
         else:
             work = storage.canonical(staging / key, create=True)
+            proof = OperationInventory(work, lock, cancelled)
             previous = None; previous_version = None
             for reviewed_version in (9, 8):
                 previous = _reviewed_completed(generations, inputs, reviewed_version)
@@ -852,6 +1062,7 @@ def _generate(store, game, generation, tools, selection, locale, *, threads=1, t
                        '--esteria-input-root', str(source)]
             deadline = time.monotonic() + timeout
             def run(name, args, cwd, log):
+                proof.clear()  # A native writer starts. No proof crosses its lifetime.
                 progress('extraction-' + name)
                 world_io.phase('extraction-' + name)
                 remaining = int(deadline - time.monotonic())
@@ -876,13 +1087,13 @@ def _generate(store, game, generation, tools, selection, locale, *, threads=1, t
                 # phase data directory is already the child cwd; use that short
                 # relative destination while keeping full paths for ownership.
                 maps = phase(work, 'maps-dbc-cameras', lambda data, at:
-                    run('map_extractor', [*ordered, '-o', '.', '-e', '7'], data, at / 'extract.log'), progress=progress)
+                    run('map_extractor', [*ordered, '-o', '.', '-e', '7'], data, at / 'extract.log'), progress=progress, proof=proof)
                 raw = phase(work, 'raw-vmaps', lambda data, at:
                     run('vmap4_extractor', ordered, data, at / 'extract.log'), progress=progress)
                 def assemble(data, at):
                     (data / 'vmaps').mkdir(mode=0o700)
                     run('vmap4_assembler', [str(raw / 'Buildings'), str(data / 'vmaps')], data, at / 'extract.log')
-                vmaps = phase(work, 'assembled-vmaps', assemble, progress=progress)
+                vmaps = phase(work, 'assembled-vmaps', assemble, progress=progress, proof=proof)
                 def navigation(data, at):
                     # The reusable attempt already owns verified input clones.
                     # Old logs are dispensable after their causal tail has been
@@ -892,12 +1103,13 @@ def _generate(store, game, generation, tools, selection, locale, *, threads=1, t
                             storage.canonical(path, False).unlink()
                     run('mmaps_generator', ['--config', str(tools / 'etc/mmaps-config.yaml'), '--threads', str(threads), '--silent'],
                         data, at / 'extract.log')
-                nav = phase(work, 'navigation', navigation, progress=progress, navigation_inputs=(maps, vmaps))
+                nav = phase(work, 'navigation', navigation, progress=progress, navigation_inputs=(maps, vmaps), proof=proof)
             progress('extraction-final-assembly')
             world_io.phase('final-assembly')
             parts = ((maps, ('maps', 'dbc', 'Cameras')), (vmaps, ('vmaps',)), (nav, ('mmaps',))) \
                 if previous is None and not complete_external else ()
-            final = _retained_final(work, parts) if parts and external is None else None
+            expected = _phase_projection(parts) if parts and external is None else None
+            final = _retained_final(work, parts, expected, proof) if expected is not None else None
             retained = final is not None
             if retained:
                 progress('extraction-reused-final-assembly')
@@ -911,7 +1123,10 @@ def _generate(store, game, generation, tools, selection, locale, *, threads=1, t
             if not retained and previous is None and not complete_external:
                 for base, names in parts:
                     for name in names:
-                        clone(base / name, data / name)
+                        # The finished navigation phase also hashed its input maps/vmaps.
+                        # Only identical, corresponding hard links can donate those reads.
+                        duplicate = nav / name if name in ('maps', 'vmaps') else None
+                        clone(base / name, data / name, proof=proof, equivalent=duplicate)
             if previous is None and external is not None:
                 progress('extraction-supplied-server-data')
                 merge_supplied(source / formats.SERVER_NAMESPACE / 'data', data, cancelled=cancelled)
@@ -925,10 +1140,13 @@ def _generate(store, game, generation, tools, selection, locale, *, threads=1, t
                 raise ValueError(preflight_failure(preflight))
             require(not cancelled() and storage.imported(game, generation) == inputs['importMetadata'] and
                     tools_verified(tools, selection) == inputs['toolSelectionSha256'] and package_selection(source) == external and
-                    preparation_helper_generation() == inputs['preparationHelperGeneration'],
+                    _helper_selection() == helper,
                     'extraction inputs changed before completion')
+            rows = inventory(data, proof=proof if expected is not None else None)
+            require(expected is None or rows == expected,
+                    'assembled output differs from selected verified phases')
             receipt = {'formatVersion': 1, 'scope': SCOPE, 'generation': key, 'inputs': inputs,
-                       'files': inventory(data), 'preflight': preflight,
+                       'files': rows, 'preflight': preflight,
                        'providerOrder': {'effectiveLocale': plan['effectiveLocale'],
                            'manifest': storage.identity(plan_path, order.MAX_MANIFEST),
                            'wire': storage.identity(work / 'order.tsv', order.MAX_MANIFEST)},
@@ -944,7 +1162,7 @@ def _generate(store, game, generation, tools, selection, locale, *, threads=1, t
             os.rename(final, destination); storage.sync(generations)
         require(not cancelled() and storage.imported(game, generation) == inputs['importMetadata'] and
                 package_selection(source) == external and
-                preparation_helper_generation() == inputs['preparationHelperGeneration'],
+                _helper_selection() == helper,
                 'import changed before server data activation')
         storage.atomic(store / 'current', (key + '\n').encode())
         for reviewed_version in (9, 8):
@@ -959,6 +1177,7 @@ def _generate(store, game, generation, tools, selection, locale, *, threads=1, t
         progress('extraction-format-checked')
         return receipt
     finally:
+        if proof is not None: proof.close()
         os.close(lock)
 
 
@@ -966,6 +1185,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('store', 'game', 'tools', 'selection'):
         parser.add_argument('--' + name, type=Path, required=True)
+    parser.add_argument('--installed-data-reader', required=True)
+    parser.add_argument('--data-recipe', required=True)
     parser.add_argument('--generation', required=True)
     parser.add_argument('--locale', required=True)
     parser.add_argument('--content-profile', choices=CONTENT_PROFILES, default=DEFAULT_CONTENT_PROFILE)
@@ -976,11 +1197,12 @@ def main():
         def run():
             return generate(args.store, args.game, args.generation, args.tools, document(args.selection), args.locale,
                 threads=args.threads, content_profile=args.content_profile, progress=lambda value: print(value, flush=True))
-        if args.android_low_memory:
-            with world_io.android_policy(progress=lambda value: print(value, flush=True)):
+        with reader_admission(args.installed_data_reader, args.data_recipe):
+            if args.android_low_memory:
+                with world_io.android_policy(progress=lambda value: print(value, flush=True)):
+                    receipt = run()
+            else:
                 receipt = run()
-        else:
-            receipt = run()
         print('Server data format checked: ' + receipt['generation'] + '; world coverage remains unqualified')
         return 0
     except world_io.PreparationPaused:
