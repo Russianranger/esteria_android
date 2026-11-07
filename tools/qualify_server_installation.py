@@ -419,10 +419,14 @@ def run(prepared, mysql, mysqld, version, output):
         data = output / 'unavailable-game-data'; final_data = data / 'data'
         password = db.read_secret(state / 'accounts/database-secret', create=True)
         evidence['phase'] = 'initialize-owned-mysql'
+        began = time.monotonic_ns()
         with db.state_lock(state): db.initialize(mysqld, mysql, state, version)
+        evidence['mysqlInitializationElapsedMs'] = (time.monotonic_ns() - began) // 1_000_000
         bootstrap = db.read_receipt(state / 'database-bootstrap.json', version); uuid = bootstrap['uuid']
         evidence.update(initializedNewInstance=True, mysqlUuid=uuid)
+        began = time.monotonic_ns()
         owned = ServiceProcess(state, sessions, mysql, mysqld, version); owned.wait_ready(uuid)
+        evidence['firstReadyElapsedMs'] = (time.monotonic_ns() - began) // 1_000_000
         evidence['firstReadyReceipt'] = public_service_receipt(owned.session, 'ready.json', owned.ready)
         with db.option_file(state, 'esteria', password) as options, db.Mysql(mysql, options) as connection, db.state_lock(state) as lease:
             live = lambda: owned.verify(connection, uuid)
@@ -485,7 +489,9 @@ def run(prepared, mysql, mysqld, version, output):
         evidence['phase'] = 'production-first-clean-stop'
         stopped = owned.stop(uuid)
         evidence['firstStoppedReceipt'] = public_service_receipt(owned.session, 'stopped.json', stopped); owned = None
+        began = time.monotonic_ns()
         owned = ServiceProcess(state, sessions, mysql, mysqld, version); owned.wait_ready(uuid)
+        evidence['restartedReadyElapsedMs'] = (time.monotonic_ns() - began) // 1_000_000
         evidence['restartedReadyReceipt'] = public_service_receipt(owned.session, 'ready.json', owned.ready)
         with db.option_file(state, 'esteria', password) as options, db.Mysql(mysql, options) as connection, db.state_lock(state) as lease:
             live = lambda: owned.verify(connection, uuid)
