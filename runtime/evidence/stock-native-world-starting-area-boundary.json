@@ -1,0 +1,71 @@
+{
+  "androidRuntimeQualified": false,
+  "apkSha256": "9d9809d5e04b4bac5d1f0826d4fb0255a53318fe3220f5a7d19e8a077b01dbae",
+  "apkSourceTag": "non-custom-v0.1.0-non-custom.13",
+  "artifactBytes": 2367,
+  "artifactId": 13596415335,
+  "artifactSha256": "98005213f1cf5d989c0797f585f73e3c2695094feb361d589fb9bca3ed7f3e30",
+  "databaseSameUuidCleanlyReopenedAndStopped": true,
+  "formatVersion": 1,
+  "inputScope": "A fresh disposable stock SQL partition and a deliberately empty read-only data mount. The normal worldserver command, all four pools and its first required world-content check were executed under source-rendered configuration.",
+  "packagedServerArchives": {
+    "server-content": "0f41b2deea5344fcea4cbc70bbddf0bab1dfda1cd0346e23e92592aac63056e6",
+    "server-programs": "963a23c1390440260b85ffe164b2d7508c56b005b315dce8a919ae443a46d1bf",
+    "server-runtime": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5"
+  },
+  "productionAuthLoopbackIdentity": {
+    "executableSha256": "d2a1b74a3353f2682dcc3bc2b09f649f3b5bf53b55e6f74ccb43071c9aa4b634",
+    "nativeServerElapsedSeconds": [
+      149.498,
+      165.432
+    ],
+    "verifiedBeforeAndAfterEachRealLogin": true,
+    "wineArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46"
+  },
+  "result": {
+    "configErrors": false,
+    "configuredFileRead": true,
+    "dataReceiptUsed": false,
+    "dataStoresEntered": false,
+    "databasePoolFailed": false,
+    "databasePoolsOpened": [
+      "acore_auth",
+      "acore_characters",
+      "acore_playerbots",
+      "acore_world"
+    ],
+    "dryRun": false,
+    "elapsedSeconds": 1.746,
+    "environment": "native Linux ARM64 on a disposable fully installed four-schema database",
+    "gameSessionExecuted": false,
+    "gameplayQualified": false,
+    "mapFilesNamed": [],
+    "missingSharedLibraries": false,
+    "missingSqlTable": false,
+    "mysqlConnectionFailed": false,
+    "mysqlErrorCodes": [],
+    "mysqlStillAuthenticated": true,
+    "nativeElapsedSeconds": 0.486,
+    "nativeExit": 1,
+    "nativeProcessReaped": true,
+    "phase": "stock-starting-area-map-gate",
+    "preparedStatementError": false,
+    "scope": "normal-packaged-worldserver-before-stock-starting-area-data",
+    "startingAreaDataRequired": true,
+    "unknownSqlColumn": false,
+    "worldEntryQualified": false,
+    "worldInformationStarted": true,
+    "worldReadyQualified": false,
+    "worldVersionLoaded": true,
+    "worldserverExecuted": true,
+    "worldserverSha256": "9757f0bbb2ee159d18070d8f5fe7ecdf5b4b8b7171116198039f418d5ec13aa1"
+  },
+  "scope": "native-packaged-worldserver-first-stock-data-dependency",
+  "serverSource": "f35f04d01689f034778e3474b3c820092f51e461",
+  "stockAuthReceiptSha256": "536efa176cb524e7520b445cd95cb1e82d2aa6da73c51eb914e9cf55ff298c71",
+  "testedIntegrationRevision": "a6c557a291403628abb6d5e302351db5b0cacd60",
+  "workflowJob": 128567542740,
+  "workflowRun": 42427079960,
+  "workflowUrl": "https://github.com/Russianranger/esteria_android/actions/runs/42427079960/job/128567542740",
+  "worldStartupReceiptSha256": "8b706f92fb4c2c086f0e7de64d2b000c98aa8f0bffd7ba5d6e77fefdb91548a8"
+}

@@ -1,0 +1,67 @@
+{
+  "allWinningProvidersMatch": true,
+  "archiveReportOmitsRecognizedNumberedLocalePatches": true,
+  "completeOutputFilesMatchingPriorActualCompilation": 4742,
+  "emittedGlslSources": 1580,
+  "environment": "Linux x86_64 host, OpenJDK 17, v15 stock low-memory shader adapter, real official enUS archive sections validated against SHA-256 locks",
+  "formatVersion": 1,
+  "guardedReads": {
+    "candidate": {
+      "mpqReadBytes": 12487303,
+      "mpqReadCalls": 4407
+    },
+    "reference": {
+      "mpqReadBytes": 12662008,
+      "mpqReadCalls": 4466
+    }
+  },
+  "indexSha256": "3faf998a5c4e7a4bdb3d01ba73f64f2949daf0305b1847daddafa08c5179a698",
+  "javaReport": {
+    "actualFixtureProviderCounts": [
+      14,
+      16
+    ],
+    "bothJvmReportsIdenticalToPhysicalStatusSection": true,
+    "numberedStockLocalePatchesRecognizedAndExcludedFromArchiveEvidence": true,
+    "reportBytes": 1815,
+    "reportSha256": "ac0a1ae8593d5c9ef72adaaaee29c755c97470c03590f8c410de4e85256dcfb4",
+    "reportedArchives": 14,
+    "sourceFileSha256": "03f1780e5a694a142398741d5fc8518f9172a0c41c67b1508b52cc3d2d63dc19",
+    "v13AndV15ConsumerByteIdentical": true
+  },
+  "manifestSha256": "aadc092990d67c969a683ce4d1284e55a3dd24bb4a5ceebddd639296d37494d6",
+  "modernPs30Terrain1Permutations": 32,
+  "modulePathAndSourceSha256Digest": "0aa02690f263aacc2e018daa4f1346c9473ef313dd17ae5093ed1962a2755062",
+  "newCompilerInvocations": 0,
+  "orderedTerrainBytecodeDigest": "5d3facf9b2adb18b81c68fe27d40931569629b9f0b84c750e127efee50c8caf1",
+  "originalActualAArch64CompilerReceiptSha256": "8ceaf67054c93693a08424722df6546f0578d5e229afb8c25b3b6e6c8c5a7b34",
+  "ownerSupportSha256": "f7c6e579320197243d4152839f8e443840e89439df8f139ecb80d0ce9c39817f",
+  "physicalProviderCountDetermined": false,
+  "physicalThorShaderCompilationExecuted": false,
+  "privateAssetsIncluded": false,
+  "referenceArchives": 16,
+  "referenceScope": "Offline comparison with original 1,580-call AArch64 glslang compilation under QEMU. The host reused binary output only after each freshly emitted GLSL file and corresponding source hash matched.",
+  "reportArchiveRows": 14,
+  "reportedOfficialSizeDifferences": [],
+  "scope": "Host authenticated stock shader comparison",
+  "selectedBls": 117,
+  "selectedBlsPresent": 102,
+  "selectedWfx": 5,
+  "selectedWfxPresent": 5,
+  "signedApkSource": "d5e7715587b980d9e41f9070c21e0fc21c543101",
+  "strictRecords": 2778,
+  "winningBlsAndWfxProviderPayloadDigest": "d74ddb59cd2e7ce95fd170666c554f63ff52c64d211fb7b5536f429e7c696e65",
+  "winningProviders": {
+    "bls": {
+      "patch-2.MPQ": 33,
+      "patch-3.MPQ": 5,
+      "patch.MPQ": 64
+    },
+    "blsDeletionMarkers": {
+      "patch.MPQ": 15
+    },
+    "wfx": {
+      "patch.MPQ": 5
+    }
+  }
+}
