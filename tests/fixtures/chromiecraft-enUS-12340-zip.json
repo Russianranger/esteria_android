@@ -1,0 +1,18 @@
+[
+  {"path": "ChromieCraft_3.3.5a/Data/common-2.MPQ", "local": 1140656, "bytes": 1810430636, "compressed": 1786684635, "method": 8, "crc": 1550240784},
+  {"path": "ChromieCraft_3.3.5a/Data/common.MPQ", "local": 1787825386, "bytes": 2881154862, "compressed": 2862935465, "method": 8, "crc": 2114807805},
+  {"path": "ChromieCraft_3.3.5a/Data/lichking.MPQ", "local": 4650760944, "bytes": 2553948549, "compressed": 2521752892, "method": 8, "crc": 3958948186},
+  {"path": "ChromieCraft_3.3.5a/Data/patch-3.MPQ", "local": 7172513931, "bytes": 605089137, "compressed": 602236882, "method": 8, "crc": 1038533351},
+  {"path": "ChromieCraft_3.3.5a/Data/patch.MPQ", "local": 7774750907, "bytes": 4004713057, "compressed": 3966171787, "method": 8, "crc": 2897263329},
+  {"path": "ChromieCraft_3.3.5a/Data/enUS/lichking-speech-enUS.MPQ", "local": 11740932325, "bytes": 354008839, "compressed": 354048645, "method": 8, "crc": 3826841388},
+  {"path": "ChromieCraft_3.3.5a/Data/enUS/expansion-speech-enUS.MPQ", "local": 12100172486, "bytes": 241033297, "compressed": 241070932, "method": 8, "crc": 2438229290},
+  {"path": "ChromieCraft_3.3.5a/Data/enUS/lichking-locale-enUS.MPQ", "local": 12888787745, "bytes": 12354378, "compressed": 12344021, "method": 8, "crc": 1344212883},
+  {"path": "ChromieCraft_3.3.5a/Data/enUS/patch-enUS.MPQ", "local": 12901131878, "bytes": 296616080, "compressed": 295660694, "method": 8, "crc": 3316581925},
+  {"path": "ChromieCraft_3.3.5a/Data/enUS/patch-enUS-3.MPQ", "local": 13196792674, "bytes": 100373935, "compressed": 99809125, "method": 8, "crc": 1667139013},
+  {"path": "ChromieCraft_3.3.5a/Data/enUS/patch-enUS-2.MPQ", "local": 13296602117, "bytes": 225570171, "compressed": 224923688, "method": 8, "crc": 1215700307},
+  {"path": "ChromieCraft_3.3.5a/Data/enUS/speech-enUS.MPQ", "local": 13716738320, "bytes": 438430439, "compressed": 434446383, "method": 8, "crc": 3585932646},
+  {"path": "ChromieCraft_3.3.5a/Data/enUS/locale-enUS.MPQ", "local": 14151223423, "bytes": 204291376, "compressed": 200569625, "method": 8, "crc": 2170251506},
+  {"path": "ChromieCraft_3.3.5a/Data/enUS/expansion-locale-enUS.MPQ", "local": 14351793151, "bytes": 17389181, "compressed": 17310982, "method": 8, "crc": 2717370117},
+  {"path": "ChromieCraft_3.3.5a/Data/expansion.MPQ", "local": 14369115547, "bytes": 1921219911, "compressed": 1896505758, "method": 8, "crc": 3529188968},
+  {"path": "ChromieCraft_3.3.5a/Data/patch-2.MPQ", "local": 16265621401, "bytes": 1401729059, "compressed": 1395431629, "method": 8, "crc": 3875743651}
+]
