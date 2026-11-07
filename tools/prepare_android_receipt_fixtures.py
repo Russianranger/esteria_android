@@ -126,17 +126,30 @@ def shader_fixture(root):
 
     with patch.object(shader, 'tool_identity', return_value=manifest), \
             patch.object(shader, 'execute', side_effect=translate):
-        # V12 retained the exact v11 shader recipe. Generate the old schema
-        # through the production coordinator with its published file pins.
+        # The v13 APK differs from v12 in exactly this one shader helper.
+        # Generate both donors through the same production receipt protocol.
         evidence = json.loads((ROOT / 'runtime/evidence/non-custom-v11-release-gates.json').read_bytes())
-        old_files = evidence['runtimeHelperClosures']['stock-client']['files']
-        with patch.object(shader, 'helper_files', return_value=old_files):
-            previous = shader.generate(work / 'shaders', game, IMPORT, tools, data.CLIENT_REVISION, 'enUS')
+        v12 = evidence['runtimeHelperClosures']['stock-client']['files']
+        v13 = {**v12, 'stock_shader_translate.py': {
+            'bytes': 14400, 'sha256': 'ac355c2d1c32352d380e3c2f74d42adf48aaffe2984ffa2d195c0131009aa7b6'}}
+        donor_keys = []
+        for files in (v12, v13):
+            # Old receipts include their coordinator digest both by itself and
+            # inside the helper closure. Bind both to the published recipe.
+            def historical_coordinator(path, maximum):
+                assert path == Path(shader.__file__).resolve() and maximum == 131072
+                return files['stock_shader_generation.py']
+
+            with patch.object(shader, 'helper_files', return_value=files), \
+                    patch.object(shader, 'identity', side_effect=historical_coordinator):
+                donor = shader.generate(work / 'shaders', game, IMPORT, tools, data.CLIENT_REVISION, 'enUS')
+                donor_keys.append(donor['generation'])
         receipt = shader.generate(work / 'shaders', game, IMPORT, tools, data.CLIENT_REVISION, 'enUS')
     with patch.object(shader, 'tool_identity', return_value=manifest), \
             patch.object(shader, 'execute', side_effect=AssertionError('Completed shaders must not recompile')):
         assert shader.generate(work / 'shaders', game, IMPORT, tools, data.CLIENT_REVISION, 'enUS') == receipt
-    return dict(generation=receipt['generation'], previousGeneration=previous['generation'], toolManifestSha256=manifest,
+    assert len(set(donor_keys + [receipt['generation']])) == 3
+    return dict(generation=receipt['generation'], previousGenerations=donor_keys, toolManifestSha256=manifest,
         clientRevision=data.CLIENT_REVISION, locale='enUS')
 
 

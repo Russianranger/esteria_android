@@ -1,5 +1,6 @@
 """Pinned-reader/emitter memory/equivalence fixtures, without owner data or GPU proof."""
 import contextlib
+import hashlib
 import gc
 import importlib
 import io
@@ -68,7 +69,7 @@ class ShaderMemoryAdapter(unittest.TestCase):
         args=['--data',str(self.data),'--locale','enUS','--strict','--glslang',str(self.tools/'bin/glslangValidator')]
         with contextlib.redirect_stdout(io.StringIO()),contextlib.redirect_stderr(io.StringIO()):
             self.assertEqual(self.translate.main(args+['--out',str(original)]),0)
-            with adapter.bounded_adapter(self.reader,self.translate):self.assertEqual(self.translate.main(args+['--out',str(changed)]),0)
+            with adapter.bounded_adapter(self.reader,self.translate,stock_vulkan=True):self.assertEqual(self.translate.main(args+['--out',str(changed)]),0)
         self.assertEqual(self.files(original),self.files(changed));self.assertIn('companion ',(changed/'manifest.txt').read_text())
         self.assertEqual(stock.storage.tool_identity(self.tools,stock.CLIENT_REVISION),self.manifest)
     def test_verified_original_entry_does_not_mutate_provider(self):
@@ -91,13 +92,52 @@ class ShaderMemoryAdapter(unittest.TestCase):
             stream.seek(offset)
             stream.write(self.encrypt_table(block_table, self.reader.mq.hash_string('(block table)', 3)))
 
-    def translate_strict(self, out):
+    def translate_strict(self, out, *, stock_vulkan=False):
         errors = io.StringIO()
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(errors):
             result = adapter.run(self.tools, stock.CLIENT_REVISION, [
                 '--strict', '--client', str(self.data.parent), '--locale', 'enUS',
-                '--glslang', str(self.tools / 'bin/glslangValidator'), '--out', str(out)])
+                '--glslang', str(self.tools / 'bin/glslangValidator'), '--out', str(out)], stock_vulkan=stock_vulkan)
         return result, errors.getvalue()
+
+    def test_stock_vulkan_requires_matching_legacy_bytes_modern_set_and_effects(self):
+        vertex = r'Shaders\Vertex\vs_2_0\Basic.bls'
+        terrain = r'Shaders\Pixel\ps_3_0\Terrain1.bls'
+        legacy_path = r'Shaders\Pixel\ps_1_1\Terrain1w.bls'
+        effect = r'Shaders\Effects\Model2.wfx'
+        modern = tokens(0xffff0300, 0x02000001, 0x800f0800, 0xa0e40000, 0xffff)
+        # Authored PS1 fixture; only the test adds its full-container hash.
+        legacy = container(tokens(0xffff0101, 0x42, 0xb00f0000, 1, 0x800f0000, 0xb0e40000, 0xffff))
+        members = {vertex: container(VERTEX), terrain: container(*([modern] * 32)),
+                   legacy_path: legacy, effect: b'PixelShader(Terrain1)'}
+        self.archive('common.MPQ', members)
+        out = self.root / 'stock-vulkan'
+        status, error = self.translate_strict(out, stock_vulkan=True)
+        self.assertEqual(status, 2)
+        self.assertIn(legacy_path + ' in common.MPQ, permutation 0, token 0xffff0101', error)
+        with patch.dict(adapter.LEGACY_TERRAIN_CONTAINERS, {
+                ('ps_1_1', 'terrain1w'): hashlib.sha256(legacy).hexdigest()}):
+            status, error = self.translate_strict(out)  # General/custom profile stays strict.
+            self.assertEqual(status, 2)
+            self.assertIn('unsupported shader model', error)
+            status, error = self.translate_strict(out, stock_vulkan=True)
+            self.assertEqual(status, 0, error)
+            baseline = self.files(out)
+            manifest = (out / 'manifest.txt').read_text().splitlines()
+            self.assertTrue(all('name Terrain1:%d' % i in manifest for i in range(32)))
+            self.assertFalse(any('Terrain1w' in line for line in manifest))
+            for changes, failure in (
+                    ({terrain: container(*([modern] * 31))}, '32 selected ps_3_0'),
+                    ({terrain: container(*([PIXEL] * 32))}, '32 selected ps_3_0'),
+                    ({terrain: container(VERTEX)}, 'stage mismatch: vs_2_0'),
+                    ({legacy_path: legacy[:-4] + bytes(4)}, 'unsupported shader model'),
+                    ({effect: b'PixelShader(tERRain1W_1)'}, 'effect requests legacy terrain')):
+                with self.subTest(reason=failure):
+                    self.archive('patch.MPQ', changes)
+                    status, error = self.translate_strict(out, stock_vulkan=True)
+                    self.assertEqual(status, 2, error)
+                    self.assertIn(failure, error)
+                    self.assertEqual(self.files(out), baseline)
 
     def test_patch_delete_resolves_each_profile_and_translates_only_live_winners(self):
         best = r'Shaders\Vertex\vs_3_0\Fallback.bls'

@@ -21,7 +21,7 @@ import urllib.request
 import zlib
 
 from runtime import shader_generation, stock_shader_translate as adapter
-from tools import prepare_runtime, provider_shader_tools
+from tools import prepare_runtime, provider_shader_tools, qualify_stock_client_title
 
 ROOT = Path(__file__).resolve().parents[1]
 LOCK = ROOT / 'tests/fixtures/chromiecraft-enUS-12340-zip.json'
@@ -188,12 +188,40 @@ def model_requirement(code, ir):
     return {'model': '%s_%d_%d' % (stage, major, minor), 'instructionSet': sorted(seen)}
 
 
+def input_failure(reader, data, error):
+    # Production strict input errors now give the rejected provider, path and permutation.
+    # Re-read that exact winner for the public instruction vocabulary, without raw tokens.
+    pattern = (r'(Shaders[\\/](Vertex|Pixel)[\\/]([a-z0-9_]+)[\\/][A-Za-z0-9_-]+\.bls) in '
+               r'([A-Za-z0-9_./-]+), permutation ([0-9]+), token 0x[0-9a-f]{8}: ([A-Za-z0-9 ._-]{1,100})')
+    match = re.fullmatch(pattern, str(error))
+    if not match:
+        if str(error).startswith('stock Vulkan requires all 32'):
+            return [dict(reason='required 32 Terrain1 ps_3_0 permutations were not selected')]
+        if str(error).startswith('stock Vulkan effect requests legacy terrain'):
+            return [dict(reason='a selected effect references legacy terrain')]
+        return [dict(reason='stock provider input rejected')]
+    path, kind, profile, provider, permutation, reason = match.groups()
+    opened = reader.archives(data, 'enUS')
+    try:
+        actual, body = reader.grab(opened, path)
+        require(actual == provider, 'shader winner changed during diagnosis')
+        code = next(code for index, _, code in adapter.container_records(body, True) if index == int(permutation))
+        return [dict(path=path.replace(chr(92), '/'), kind=kind.lower(), profile=profile, provider=provider,
+                     permutation=int(permutation), reason=reason, **model_requirement(code, reader.ir))]
+    finally:
+        for _, archive in opened:
+            archive.close()
+
+
 def diagnose(tools, revision, data, capture):
     reader, _ = adapter.stock.load_reader(tools, revision)
     translate = importlib.import_module(reader.__package__ + '.translate')
     failures = []
-    with adapter.bounded_adapter(reader, translate):
-        records = reader.enumerate_records(data, 'enUS', strict=True)
+    with adapter.bounded_adapter(reader, translate, stock_vulkan=True):
+        try:
+            records = reader.enumerate_records(data, 'enUS', strict=True)
+        except ValueError as exc:
+            return input_failure(reader, data, exc)
         opened = reader.archives(data, 'enUS')
         try:
             for rec in records:
@@ -250,21 +278,33 @@ def qualify(work, report):
     require(set(effective) == {client / name for name in report['verifiedProviders']},
             'verified ZIP members differ from effective provider stack')
     report['phase'] = 'strict-translation'
+    started = time.monotonic()
     output = work / 'compiled'
     # Raw diagnostics can include disassembly or compiler input. Keep them private.
     with tempfile.TemporaryFile(mode='w+t', encoding='utf8') as private:
         args = ['--strict', '--client', str(client), '--locale', 'enUS', '--glslang',
                 str(tools / 'bin/glslangValidator'), '--out', str(output)]
         with redirect_stdout(private), redirect_stderr(private):
-            code = adapter.run(tools, pin['clientRevision'], args)
-        report['strictExit'] = code
+            code = adapter.run(tools, pin['clientRevision'], args, stock_vulkan=True)
+        report.update(strictExit=code, strictSeconds=round(time.monotonic() - started, 2))
+        private.seek(0)
+        capture = private.read(1 << 20)
         if code:
-            private.seek(0)
-            report['failures'] = diagnose(tools, pin['clientRevision'], client / 'Data', private.read(1 << 20))
+            report['failures'] = diagnose(tools, pin['clientRevision'], client / 'Data', capture)
             raise Invalid('strict translation rejected the selected stock corpus')
     report['phase'] = 'validate-production-output'
     inventory = shader_generation.validate_output(output)
-    report.update(files=len(inventory), phase='qualified', passed=True)
+    report.update(files=len(inventory), modules=sum(name.endswith('.spv') for name in inventory),
+                  outputBytes=sum(item['bytes'] for item in inventory.values()), phase='qualified', passed=True)
+    summary = re.search(r'^records: (\d+) total, (\d+) decodable, (\d+) distinct; (\d+) selected:',
+                        capture, re.MULTILINE)
+    if summary:
+        report.update(zip(('records', 'decodable', 'distinct', 'selected'), map(int, summary.groups())))
+    if shutil.disk_usage(work).free < (3 << 30):
+        report['clientCapture'] = dict(phase='insufficient-title-scratch', titleQualified=False)
+    else:
+        report['clientCapture'] = qualify_stock_client_title.capture(work, client, output, pin['clientRevision'])
+
 
 
 def main():

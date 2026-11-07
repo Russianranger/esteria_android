@@ -193,8 +193,23 @@ public final class PresentationShaderOwnerTests {
     private static void remove(Path root)throws IOException {
         try(var paths=Files.walk(root)){for(Path path:paths.sorted(Comparator.reverseOrder()).toArray(Path[]::new))Files.delete(path);}
     }
+    private static void shaderWorkerDiagnostic()throws IOException {
+        Path root=Files.createTempDirectory("shader-worker-diagnostic-").toRealPath();
+        try {
+            Path stderr=root.resolve("stderr.log");
+            String rejection="strict setup refuses 10 undecodable or mismatched-stage record(s): Terrain1w:0";
+            Files.writeString(stderr,"[owned child log tail]\nshader input validation failed: "+rejection+
+                    "\ntranslation failed (2)\n");
+            String message=ShaderSetup.workerFailure(1,stderr).getMessage();
+            check(message.contains(rejection)&&message.contains("(exit 1)"),"Show the shader rejection and helper exit");
+            Files.writeString(stderr,"shader input validation failed: token=TEST_PRIVATE_TOKEN\n");
+            check(!ShaderSetup.workerFailure(1,stderr).getMessage().contains("TEST_PRIVATE_TOKEN"),"Redact the diagnostic");
+            Files.delete(stderr);
+            check(ShaderSetup.workerFailure(1,stderr).getMessage().contains("(exit 1)"),"Missing stderr preserves the worker failure");
+        } finally { remove(root); }
+    }
     public static void main(String[] arguments)throws Exception {
-        presentationTimeout();shaderTimeout();shaderPrelaunchStop();clientAudioMount();
-        System.out.println("Presentation/shader owners passed4 host delayed-cleanup, interruption, prelaunch guard and client ALSA mount fixtures; no native or Android execution");
+        presentationTimeout();shaderTimeout();shaderPrelaunchStop();clientAudioMount();shaderWorkerDiagnostic();
+        System.out.println("Five presentation/shader owner and worker diagnostic host checks passed");
     }
 }

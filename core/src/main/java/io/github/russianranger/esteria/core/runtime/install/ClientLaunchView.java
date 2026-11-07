@@ -181,6 +181,10 @@ public final class ClientLaunchView {
      * client/import leases. The selected effective locale is supplied by the
      * completed shader/data result, never guessed from Config.wtf. */
     public List<String> argumentsForLocale(Plan plan,String effectiveLocale,RuntimeWork.Cancellation cancellation)throws IOException {
+        return argumentsForLocale(plan,effectiveLocale,cancellation,"stock-3.3.5a");
+    }
+    public List<String> argumentsForLocale(Plan plan,String effectiveLocale,RuntimeWork.Cancellation cancellation,String contentProfile)throws IOException {
+        RuntimeFiles.require("stock-3.3.5a".equals(contentProfile)||"esteria-custom".equals(contentProfile),"Unknown client content profile");
         RuntimeFiles.require(plan!=null&&CLIENT_LOCALES.contains(effectiveLocale),"Prepared effective client locale is invalid");
         List<String> arguments=plan.arguments();
         String archive="Data/"+effectiveLocale+"/locale-"+effectiveLocale+".MPQ";
@@ -210,6 +214,7 @@ public final class ClientLaunchView {
                         "Later startup settings could override the prepared locale; existing files preserved");
                 }
             }
+            if("stock-3.3.5a".equals(contentProfile))StockVulkanStartup.requireCompatible(launch,wtf,cancellation);
             String next=localeInput(effectiveLocale);
             if(Files.exists(target,LinkOption.NOFOLLOW_LINKS)) {
                 privateRegular(target);String previous=RuntimeFiles.smallText(target,256);

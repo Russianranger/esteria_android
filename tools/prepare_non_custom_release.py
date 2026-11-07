@@ -68,10 +68,11 @@ def stage(args):
                  'Do not uninstall, clear storage,\n'
                  'reimport or delete completed navigation output. Follow NON-CUSTOM-TESTING.md;\n'
                  'export support before another attempt after a failure.')
-    if signed['versionCode'] == 13:
+    if signed['versionCode'] in (13, 14):
+        prior = signed['versionCode'] - 1
         setup = ('Install over the existing Esteria Stock app. Keep the completed import, world data,\n'
                  'databases, configuration and saves. Select the same locale used for preparation.\n'
-                 'After the v12 shader failure, choose **Repair local component → Shaders**. Once it\n'
+                 f'After the v{prior} shader failure, choose **Repair local component → Shaders**. Once it\n'
                  'finishes, choose **Start local game**. If it reports a missing database, use\n'
                  '**Repair local component → Database setup**, then start the local game again.\n'
                  'If a stage fails, wait for cleanup, tap **Export support bundle**, choose a\n'
@@ -298,6 +299,18 @@ during shader selection. The completed world generation remains selectable.
 
 Confirmation on the imported Thor MPQs, a graphical login frame, world entry,
 saving and offline relaunches still require device execution.
+'''
+    if signed['versionCode'] == 14:
+        notes += '''
+The v13 Thor run reused the prepared world and then refused ten legacy terrain
+pixel shaders, including Terrain1w:0. The stock Vulkan client selects all 32
+Terrain1 ps_3_0 permutations. V14 verifies this selection and checks the winning
+effects for legacy terrain references before excluding the five exact PS1-only
+containers. Other unsupported shader records still fail strict preparation.
+
+Named shader repair keeps the selected import, completed world generation,
+configuration and saves. Full shader preparation on the retained Thor import,
+graphical login, world entry and saved-character relaunch require device verification.
 '''
     (args.output / 'RELEASE-NOTES.md').write_text(notes)
     return result

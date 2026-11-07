@@ -19,6 +19,37 @@ public final class ShaderPreparedIntegrityTests {
     private static void refuses(Action action)throws Exception {
         try{action.run();throw new AssertionError("Corrupt completed shaders were admitted");}catch(IOException expected){ }
     }
+    private static void exercisePreviousGeneration(ShaderRunPlan plan,String manifest,Path current,String previous)throws Exception {
+        Files.writeString(current,previous+"\n");
+        ShaderSetup.Result legacy=ShaderSetup.validatePrepared(plan,manifest,null,false);
+        check(legacy.generation.equals(previous),"Normal Start selects the original donor key");
+        check(ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,null).generation.equals(previous),"Full audit reuses the old output");
+        check(ShaderSetup.verifyCompatibleCompleted(plan,"0".repeat(64),null,null)==null,"Different provider cannot reuse previous output");
+        // Compatibility belongs to the complete installed recipe. A future
+        // coordinator paired with the reviewed adapter cannot consume a donor.
+        Path coordinator=plan.helpers.resolve("stock_shader_generation.py");
+        byte[] installed=Files.readAllBytes(coordinator);
+        try {
+            Files.writeString(coordinator,"unknown coordinator");
+            refuses(()->ShaderSetup.validatePrepared(plan,manifest,null,false));
+            check(ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,null)==null,"Unreviewed coordinator accepted donor");
+        }finally {Files.write(coordinator,installed);}
+        byte[] before=Files.readAllBytes(legacy.shaders.resolveSibling("receipt.json"));
+        try(RuntimeReadPolicy.Scope scope=RuntimeReadPolicy.install((path,offset,count)->{
+            if(path.startsWith(legacy.shaders))throw new RuntimeWork.CancelledException();
+        })){
+            try{ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,null);throw new AssertionError("Cancelled audit returned a selection");}
+            catch(RuntimeWork.CancelledException expected){ }
+        }
+        check(Files.readString(current).equals(previous+"\n"),"Interrupted audit must preserve current");
+        check(java.util.Arrays.equals(before,Files.readAllBytes(legacy.shaders.resolveSibling("receipt.json"))),"Interrupted audit must preserve the original receipt");
+        check(ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,null).generation.equals(previous),"Interrupted donor verification can reenter");
+        Path donor=legacy.shaders.resolve("manifest.txt");byte[] good=Files.readAllBytes(donor),bad=good.clone();bad[0]^=1;
+        Files.write(donor,bad);
+        check(ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,null)==null,"Corrupt donor payload must not bypass translation");
+        Files.write(donor,good);
+    }
+
     public static void main(String[] arguments)throws Exception {
         Path assets=Path.of(arguments[0]),sources=Path.of(arguments[1]);
         Path root=Files.createTempDirectory("esteria-shader-integrity-").toRealPath();
@@ -40,27 +71,12 @@ public final class ShaderPreparedIntegrityTests {
             String manifest=info.getString("toolManifestSha256");
             ShaderSetup.Result selected=ShaderSetup.validatePrepared(plan,manifest,null,false);
             check(ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,null)==null,"Current recipe uses its normal audit");
-            String previous=info.getString("previousGeneration");
             Path current=plan.work.resolve("shaders/current");
-            Files.writeString(current,previous+"\n");
-            ShaderSetup.Result legacy=ShaderSetup.validatePrepared(plan,manifest,null,false);
-            check(legacy.generation.equals(previous),"Normal Start selects the original v12 key");
-            check(ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,null).generation.equals(previous),"Full audit reuses the old output");
-            check(ShaderSetup.verifyCompatibleCompleted(plan,"0".repeat(64),null,null)==null,"Different provider cannot reuse v12 output");
-            byte[] before=Files.readAllBytes(legacy.shaders.resolveSibling("receipt.json"));
-            try(RuntimeReadPolicy.Scope scope=RuntimeReadPolicy.install((path,offset,count)->{
-                if(path.startsWith(legacy.shaders))throw new RuntimeWork.CancelledException();
-            })){
-                try{ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,null);throw new AssertionError("Cancelled audit returned a selection");}
-                catch(RuntimeWork.CancelledException expected){ }
+            var donors=info.getJSONArray("previousGenerations");
+            check(donors.length()==2,"Both reviewed donor recipes must be exercised");
+            for(int i=0;i<donors.length();i++) {
+                exercisePreviousGeneration(plan,manifest,current,donors.getString(i));
             }
-            check(Files.readString(current).equals(previous+"\n"),"Interrupted audit must preserve current");
-            check(java.util.Arrays.equals(before,Files.readAllBytes(legacy.shaders.resolveSibling("receipt.json"))),"Interrupted audit must preserve the original receipt");
-            check(ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,null).generation.equals(previous),"Interrupted v12 verification can reenter");
-            Path donor=legacy.shaders.resolve("manifest.txt");byte[] good=Files.readAllBytes(donor),bad=good.clone();bad[0]^=1;
-            Files.write(donor,bad);
-            check(ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,null)==null,"Corrupt v12 payload must not bypass translation");
-            Files.write(donor,good);
             Files.writeString(current,selected.generation+"\n");
             Path output=selected.shaders.resolve("manifest.txt");byte[] original=Files.readAllBytes(output);
             var timestamp=Files.getLastModifiedTime(output);

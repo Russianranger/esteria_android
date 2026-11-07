@@ -21,8 +21,8 @@ jobs:
         run: |
           test "$(uname -m)" = aarch64
           python3 -m unittest -v tests.test_stock_shader_corpus
-          # Hosted runner only. The complete effective MPQ stack occupies 17.0 GB.
-          if [ "$(df --output=avail -B1 "$RUNNER_TEMP" | tail -1)" -lt 21000000000 ]; then
+          # Hosted runner only. Reserve 17.1 GB for MPQs plus the shader outputs and isolated Wine client.
+          if [ "$(df --output=avail -B1 "$RUNNER_TEMP" | tail -1)" -lt 24000000000 ]; then
             sudo rm -rf /usr/local/lib/android/sdk /usr/share/dotnet /opt/ghc
           fi
           PYTHONDONTWRITEBYTECODE=1 python3 -m tools.qualify_stock_shader_corpus

@@ -35,12 +35,13 @@ import org.json.JSONObject;
  */
 public final class ShaderSetup {
     private ShaderSetup() { }
-    // The v12 strict translator aborted on every selected delete marker. Its
-    // successful outputs therefore also satisfy the reviewed v13 reader, whose
-    // only new successful branch starts at that exception. Pin the full donor
-    // recipe and the specific replacement. Later changes need their own review.
-    private static final String V12_HELPER_FILES_SHA256="60584deae493d314e347cc25818e75122029d0daa5789c81256cfed123d274cc";
-    private static final String V13_ADAPTER_SHA256="ac355c2d1c32352d380e3c2f74d42adf48aaffe2984ffa2d195c0131009aa7b6";
+    // Both older strict recipes aborted on the input newly handled by their
+    // successors. Only a completed donor and this exact installed recipe can use
+    // this exception. Every other helper, input and output check stays active.
+    private static final Set<String> COMPATIBLE_PREVIOUS_HELPER_FILES = Set.of(
+            "60584deae493d314e347cc25818e75122029d0daa5789c81256cfed123d274cc", // v12
+            "7234a79084dcdf524e239fe93cf62d779d2052793d1bc8b8a78d4c5371ad85a0"); // v13
+    private static final String V14_HELPER_FILES_SHA256="31a2073b5145571c88febb57437d6cffbdc232c8ab7ac080673ba59b17680c7d";
 
     public static final class Result {
         public final String generation,importGeneration,clientRevision,requestedLocale,locale;
@@ -197,7 +198,7 @@ public final class ShaderSetup {
             }
             RuntimeWork.checkMemoryPressureExit(process.exitCode());
             if(process.failure()!=null)throw new IOException("Shader setup process ownership failed",process.failure());
-            if(process.exitCode()!=0||process.wasForced())throw new IOException("Shader setup failed (exit "+process.exitCode()+"); retained private logs describe the failure");
+            if(process.exitCode()!=0||process.wasForced())throw workerFailure(process.exitCode(),session.resolve("logs/stderr.log"));
             plan.requireCurrentImport();
             Result result=validatePrepared(plan,tools.toolManifestSha256(),session.resolve("logs"),cancelled!=null&&cancelled.isCancelled());
             if(progress!=null)progress.update("shaders-prepared-not-render-qualified","",result.outputFiles,result.outputFiles);
@@ -253,7 +254,7 @@ public final class ShaderSetup {
         if(!Files.exists(plan.work.resolve("shaders/current"),LinkOption.NOFOLLOW_LINKS))return null;
         try {
             Result retained=validatePrepared(plan,manifest,null,false,true,cancellation,true);
-            if(retained!=null&&progress!=null)progress.update("shaders-reused-verified-v12","Verified compatible completed shader payload",
+            if(retained!=null&&progress!=null)progress.update("shaders-reused-verified-previous-recipe","Verified compatible completed shader payload",
                     retained.outputBytes,retained.outputBytes);
             return retained;
         }catch(RuntimeWork.CancelledException error){throw error;}
@@ -303,21 +304,23 @@ public final class ShaderSetup {
             requireKeys(inputs,"formatVersion","contentProfile","importGeneration","clientRevision","locale","importMetadata","toolManifestSha256","preparationHelperSha256","preparationHelperFiles");
             JSONObject helperFiles=inputs.getJSONObject("preparationHelperFiles");
             requireKeys(helperFiles,"stock_content_inspection.py","stock_shader_generation.py","stock_shader_translate.py","shader_generation.py","extractor_order.py","server_data_preflight.py","world_io.py");
-            boolean previous=V12_HELPER_FILES_SHA256.equals(sha256((canonical(helperFiles)+"\n").getBytes(StandardCharsets.UTF_8)));
+            String receiptRecipe=sha256((canonical(helperFiles)+"\n").getBytes(StandardCharsets.UTF_8));
+            boolean previous=COMPATIBLE_PREVIOUS_HELPER_FILES.contains(receiptRecipe);
             if(previousOnly&&!previous)return null;
+            JSONObject installed=new JSONObject();
             for(Iterator<String> names=helperFiles.keys();names.hasNext();){
-                String name=names.next();JSONObject item=helperFiles.getJSONObject(name);long bytes=filePin(item,131072);
+                String name=names.next();filePin(helperFiles.getJSONObject(name),131072);
                 Path selected=plan.helpers.resolve(name);canonicalFile(selected);
                 long selectedBytes=Files.size(selected);
                 if(selectedBytes<=0||selectedBytes>131072)throw new IOException("Invalid installed shader helper size");
-                String digest=hashFile(selected,selectedBytes,cancellation);
-                if(previous&&name.equals("stock_shader_translate.py")&&V13_ADAPTER_SHA256.equals(digest))continue;
-                if(selectedBytes!=bytes||!digest.equals(item.getString("sha256")))throw new IOException("Prepared shader helper closure changed");
+                installed.put(name,new JSONObject().put("bytes",selectedBytes).put("sha256",hashFile(selected,selectedBytes,cancellation)));
             }
-            Path helper=plan.helpers.resolve("stock_shader_generation.py");canonicalFile(helper);
-            long helperBytes=Files.size(helper);
-            if(helperBytes<=0||helperBytes>131072)throw new IOException("Bounded app shader helper required");
-            if(!hashFile(helper,helperBytes,cancellation).equals(inputs.get("preparationHelperSha256"))||
+            String installedRecipe=sha256((canonical(installed)+"\n").getBytes(StandardCharsets.UTF_8));
+            boolean compatible=previous&&V14_HELPER_FILES_SHA256.equals(installedRecipe);
+            if(!receiptRecipe.equals(installedRecipe)&&!compatible)throw new IOException("Prepared shader helper closure changed");
+            if(previousOnly&&!compatible)return null;
+            String coordinator=helperFiles.getJSONObject("stock_shader_generation.py").getString("sha256");
+            if(!coordinator.equals(inputs.get("preparationHelperSha256"))||
                 !io.github.russianranger.esteria.core.content.ContentProfile.ID.equals(inputs.get("contentProfile"))||
                 integer(inputs,"formatVersion")!=1||!plan.importGeneration.equals(inputs.get("importGeneration"))||
                 !plan.clientRevision.equals(inputs.get("clientRevision"))||!plan.locale.equals(inputs.get("locale"))||
@@ -403,6 +406,22 @@ public final class ShaderSetup {
     private static Path canonicalDirectory(Path path)throws IOException {
         if(!path.isAbsolute()||!Files.isDirectory(path,LinkOption.NOFOLLOW_LINKS)||!path.toRealPath().equals(path))
             throw new IOException("Shader path is not canonical private storage");return path;
+    }
+    static IOException workerFailure(int exitCode,Path stderr) {
+        String message="Shader setup failed (exit "+exitCode+")";
+        String prefix="shader input validation failed: ";
+        try {
+            for(String line:new String(read(stderr,64<<10),StandardCharsets.UTF_8).split("\\r?\\n")) {
+                if(line.startsWith(prefix)) {
+                    String detail=io.github.russianranger.esteria.core.diagnostics.SupportBundle.redact(line.substring(prefix.length()));
+                    detail=detail.replaceAll("[\\p{Cntrl}\\p{Cf}]"," ").trim();
+                    if(!detail.isEmpty())return new IOException(message+". "+detail.substring(0,Math.min(320,detail.length())));
+                }
+            }
+        } catch(IOException ignored) {
+            // A rotated, oversized or absent diagnostic cannot mask the worker exit.
+        }
+        return new IOException(message+". See setup.shader.stderr.log in the support bundle");
     }
     private static void canonicalFile(Path path)throws IOException {
         if(!Files.isRegularFile(path,LinkOption.NOFOLLOW_LINKS)||!path.toRealPath().equals(path))throw new IOException("Shader metadata/output is not a canonical regular file");

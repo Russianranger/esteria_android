@@ -61,6 +61,32 @@ public final class ClientLaunchViewTests {
         views.argumentsForLocale(plan,"ruRU",RuntimeWork.NEVER_CANCELLED);check(Files.readString(input).equals(russian));
         Files.delete(input);views.argumentsForLocale(plan,"ruRU",RuntimeWork.NEVER_CANCELLED);
         check(Files.readString(input).equals(russian)&&Arrays.equals(settings,Files.readAllBytes(config))&&Arrays.equals(other,Files.readAllBytes(early)));
+        Path view=work.resolve("launch").resolve(plan.generation);
+        String legacy="\uFEFFSET \"gXoVeRriDe\" \"8,1;0,3\"\r\n";
+        Files.writeString(config,legacy);
+        fails(()->views.argumentsForLocale(plan,"ruRU",RuntimeWork.NEVER_CANCELLED));
+        check(Files.readString(config).equals(legacy)&&Files.readString(input).equals(russian));
+        check(views.argumentsForLocale(plan,"ruRU",RuntimeWork.NEVER_CANCELLED,"esteria-custom").equals(actual));
+        Files.writeString(early,"SET gxOverride \"8,1;7,0\"\n");
+        check(views.argumentsForLocale(plan,"ruRU",RuntimeWork.NEVER_CANCELLED).equals(actual));
+        // The selected client opens bare filenames before WTF/. Config and RunOnce can be shadowed independently.
+        Path shadow=view.resolve(early.getFileName());
+        Files.writeString(shadow,"SET gxOverride \"0,4\"\n");
+        fails(()->views.argumentsForLocale(plan,"ruRU",RuntimeWork.NEVER_CANCELLED));
+        Files.delete(shadow);
+        Files.writeString(early,"SET gxOverride \"\"\nSET fixedFunction \"1\"\n");
+        fails(()->views.argumentsForLocale(plan,"ruRU",RuntimeWork.NEVER_CANCELLED));
+        Files.writeString(early,"SET gxOverride \"8 , 0;1,2\"\nSET fixedFunction \"0\"\n");
+        fails(()->views.argumentsForLocale(plan,"ruRU",RuntimeWork.NEVER_CANCELLED));
+        Files.writeString(early,"SET gxOverride \""+ "0".repeat(255) +"1,2\"\n");
+        fails(()->views.argumentsForLocale(plan,"ruRU",RuntimeWork.NEVER_CANCELLED));
+        Files.writeString(early,"SET gxOverride \"\"\nSET fixedFunction \"1\"\nSET f\u0131xedFunction \"0\"\n");
+        fails(()->views.argumentsForLocale(plan,"ruRU",RuntimeWork.NEVER_CANCELLED));
+        Files.write(config,settings);Files.write(early,other);
+        Path first=wtf.resolve("RunOnceA.wtf"),last=wtf.resolve("RunOnce[.wtf");
+        Files.writeString(first,"SET fixedFunction \"0\"\n");Files.writeString(last,"SET fixedFunction \"1\"\n");
+        fails(()->views.argumentsForLocale(plan,"ruRU",RuntimeWork.NEVER_CANCELLED));
+        Files.delete(first);Files.delete(last);
         try(var paths=Files.list(wtf)){check(paths.noneMatch(p->p.getFileName().toString().startsWith("."+ClientLaunchView.LOCALE_INPUT+"-")));}
         System.out.println("PASS: effective ruRU/enUS startup companion, unchanged argv/Config/other settings, crash-remnant/recreation and invalid/cancelled/late/case/link refusal");
     }

@@ -217,7 +217,7 @@ public final class ClientPresentationSession implements AutoCloseable {
                     !view.plan.importedGeneration.equals(shaders.importGeneration)||!provider.sourceRevision().equals(shaders.clientRevision))
                 throw new IOException("Current matched reconstructed client, view and shaders required");
             List<String> command=new ArrayList<>();command.add("/opt/wine/bin/wine");command.add(view.plan.windowsExecutable());
-            command.addAll(new ClientLaunchView(view.work).argumentsForLocale(view.plan,shaders.locale,RuntimeWork.NEVER_CANCELLED));
+            command.addAll(new ClientLaunchView(view.work).argumentsForLocale(view.plan,shaders.locale,RuntimeWork.NEVER_CANCELLED,io.github.russianranger.esteria.BuildConfig.CONTENT_PROFILE));
             command.addAll(clientModeArguments(provider.localLoginArguments(),view.view.directory,localLogin));
             Map<String,String> environment=new java.util.TreeMap<>(wineEnvironment());environment.putAll(view.plan.environment());
             // Internal title capture needs real file-read observations, not a

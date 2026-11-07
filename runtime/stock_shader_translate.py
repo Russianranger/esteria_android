@@ -13,6 +13,7 @@ import hashlib
 import importlib
 import importlib.util
 import io
+import re
 from pathlib import Path
 import struct
 import sys
@@ -31,6 +32,20 @@ MAX_RECORD_METADATA = 64 << 20
 MAX_RECORDS = 262144
 MPQ_FILE_PATCH_FILE = 0x00100000
 MPQ_FILE_DELETE_MARKER = 0x02000000
+
+
+# CMap::Initialize on the stock Vulkan PS3 tier loads Terrain1[0..31].
+# These exact stock containers serve its separate PS1.1/1.4 branches. A single
+# legacy bytecode digest is shared between flat and cube-map draws, so compiling
+# it with an assumed sampler type would produce an incorrect manifest.
+LEGACY_TERRAIN_CONTAINERS = {
+    ('ps_1_1', 'terrain1w'): '0137d20560289c42d2c316359cf72ab5bf467f298efbc846d0e1175afc323220',
+    ('ps_1_4', 'terrain1w_1'): '09f8aa83145a186a86e3c63d36894bdc634e52f14bf51e877faed51d1c3026a9',
+    ('ps_1_4', 'terrain1w_2'): '023b4ff2350a86281908f65e35bde51e5c15ea5832843449ddbe5532c3e55272',
+    ('ps_1_4', 'terrain1w_3'): '64ab82e635c09c16657135076e9f1e7f7721e69ab14bd08d08362c90551b0d92',
+    ('ps_1_4', 'terrain1w_4'): 'd9c6ed0e373ee312d5a0997fdd6ee1e652237fee46998b7086ca59fbc317f41c',
+}
+STOCK_EFFECT_FILES = ('MapObj.wfx', 'MapObjU.wfx', 'Model2.wfx', 'Particle.wfx', 'ShadowMap.wfx')
 
 
 class DeletedMember(ValueError):
@@ -70,11 +85,12 @@ def container_records(data, strict):
 
 
 @contextmanager
-def bounded_adapter(reader, translate):
+def bounded_adapter(reader, translate, *, stock_vulkan=False):
     """Install only in this fresh helper process; never rewrite provider files."""
     original = (reader.archives, reader.entries, reader.enumerate_records, translate.Emitter)
     packed = stock.compact_mpq_class(reader)
     last_emitter = [None]
+    effect_paths = set()
 
     class BoundedMPQ(packed):
         def read_file(self, name):
@@ -142,10 +158,14 @@ def bounded_adapter(reader, translate):
                     stock.require(len(result) < MAX_RECORDS and total <= MAX_RECORD_METADATA,
                                   'combined shader inventory memory bound')
                     result.add(line)
+                    if stock_vulkan and line.lower().endswith('.wfx'):
+                        effect_paths.add(line.lower())
         return sorted(result)
 
     def enumerate_records(datadir, locale=None, strict=False):
+        effect_paths.clear()
         opened = archives(datadir, locale)
+        legacy_paths = []
         result, code_pool, code_bytes, metadata_bytes = [], {}, 0, 0
         decode = reader.ir.decode_strict if strict else reader.ir.decode
         try:
@@ -176,6 +196,11 @@ def bounded_adapter(reader, translate):
                     # No surviving profile. Strict translation still checks that both
                     # required stages have live records before publishing anything.
                     continue
+                if strict and stock_vulkan and kind == 'pixel':
+                    known = LEGACY_TERRAIN_CONTAINERS.get((profile, name.lower()))
+                    if known and hashlib.sha256(data).hexdigest() == known:
+                        legacy_paths.append(path)
+                        continue
                 for permutation, header, code in container_records(data, strict):
                     stock.require(len(result) < MAX_RECORDS, 'shader record count exceeds memory bound')
                     metadata_bytes += 256 + len(name.encode('utf-8')) * 4
@@ -195,12 +220,37 @@ def bounded_adapter(reader, translate):
                     record._strict = strict
                     try:
                         shader = decode(code)
+                        if strict and shader.kind != ('ps' if kind == 'pixel' else 'vs'):
+                            raise ValueError('stage mismatch: ' + shader.profile)
                         record._summary = SimpleNamespace(kind=shader.kind, major=shader.major,
                             minor=shader.minor, profile=shader.profile)
                         shader = None
-                    except ValueError:
+                    except ValueError as error:
+                        if strict:
+                            version, = struct.unpack_from('<I', code)
+                            raise ValueError('%s in %s, permutation %d, token 0x%08x: %s' %
+                                             (path, provider, permutation, version, error)) from error
                         record._summary = None
                     result.append(record)
+            if legacy_paths:
+                active = [r for r in result if r.kind == 'pixel' and r.name.lower() == 'terrain1']
+                stock.require(len(active) == 32 and all(r.perm == i and r.profile == 'ps_3_0' and
+                              r.sh.profile == 'ps_3_0' for i, r in enumerate(active)),
+                              'stock Vulkan requires all 32 selected ps_3_0 Terrain1 permutations')
+                # Stock names are probed directly even if a provider omitted them from
+                # its listfile. The native effect parser accepts literal shader names.
+                effect_paths.update(reader.BS.join(('Shaders', 'Effects', name)).lower()
+                                    for name in STOCK_EFFECT_FILES)
+                for effect in sorted(effect_paths):
+                    try:
+                        provider, body = reader.grab(opened, effect)
+                    except DeletedMember:
+                        continue
+                    if body is not None and re.search(b'terrain1w', body, re.IGNORECASE):
+                        raise ValueError('stock Vulkan effect requests legacy terrain: %s in %s' %
+                                         (effect, provider))
+                print('Stock Vulkan vs_3_0/ps_3_0: selected 32 Terrain1 permutations; '
+                      'excluded reviewed PS1-only containers: ' + ', '.join(legacy_paths), flush=True)
             return result
         finally:
             for _, provider in opened:
@@ -254,7 +304,7 @@ def bounded_adapter(reader, translate):
         reader.archives, reader.entries, reader.enumerate_records, translate.Emitter = original
 
 
-def run(tools, revision, arguments):
+def run(tools, revision, arguments, *, stock_vulkan=False):
     previous_bytecode = sys.dont_write_bytecode
     previous_bls = sys.modules.get('bls')
     previous_path = list(sys.path)
@@ -267,7 +317,7 @@ def run(tools, revision, arguments):
         entry = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(entry)
         sys.modules['bls'] = package
-        with bounded_adapter(reader, translate):
+        with bounded_adapter(reader, translate, stock_vulkan=stock_vulkan):
             result = entry.main(arguments)
         stock.require(stock.storage.tool_identity(Path(tools), revision) == manifest,
                       'immutable shader provider changed during translation')
@@ -288,6 +338,7 @@ def main():
     parser.add_argument('--client-revision', required=True)
     parser.add_argument('--locale', required=True)
     parser.add_argument('--strict', action='store_true', required=True)
+    parser.add_argument('--stock-vulkan', action='store_true')
     parser.add_argument('--android-low-memory', action='store_true')
     args = parser.parse_args()
     stock.require(args.glslang == args.tools / 'bin/glslangValidator', 'verified shader compiler path required')
@@ -296,8 +347,8 @@ def main():
     try:
         if args.android_low_memory:
             with world_io.android_policy():
-                return run(args.tools, args.client_revision, arguments)
-        return run(args.tools, args.client_revision, arguments)
+                return run(args.tools, args.client_revision, arguments, stock_vulkan=args.stock_vulkan)
+        return run(args.tools, args.client_revision, arguments, stock_vulkan=args.stock_vulkan)
     except world_io.PreparationPaused:
         world_io.print_pause()
         return world_io.PAUSED_EXIT_CODE

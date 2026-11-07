@@ -169,18 +169,23 @@ class StockReleaseBoundary(unittest.TestCase):
             self.assertIs(result[key], False)
         self.assertEqual((self.args.output / 'Esteria-Stock-3.3.5a-arm64.apk').read_bytes(), self.apk.read_bytes())
 
-    def test_v13_staging_directs_retained_install_to_named_shader_repair(self):
-        self.receipt['signedApk'].update(versionCode=13, versionName='0.1.0-non-custom.13')
-        self.write()
-        result = release.stage(self.args)
-        notes = (self.args.output / 'RELEASE-NOTES.md').read_text()
-        self.assertEqual(result['tag'], 'non-custom-v0.1.0-non-custom.13')
-        self.assertIn('Repair local component → Shaders', notes)
-        self.assertIn('Repair local component → Database setup', notes)
-        self.assertIn('MPQ delete markers are unsupported', notes)
-        self.assertIn('Export support bundle', notes)
-        self.assertNotIn('Import your complete ChromieCraft client', notes)
-        self.assertFalse(result['thorQualified'])
+    def test_recent_shader_updates_preserve_imports_and_direct_named_repair(self):
+        for code, failure in [(13, 'MPQ delete markers are unsupported'), (14, 'Terrain1w:0')]:
+            with self.subTest(version_code=code):
+                version = '0.1.0-non-custom.' + str(code)
+                self.receipt['signedApk'].update(versionCode=code, versionName=version)
+                self.write()
+                self.args.output = self.root / ('out-' + str(code))
+                result = release.stage(self.args)
+                notes = (self.args.output / 'RELEASE-NOTES.md').read_text()
+                self.assertEqual(result['tag'], 'non-custom-v' + version)
+                self.assertIn('After the v' + str(code - 1) + ' shader failure', notes)
+                self.assertIn('Repair local component → Shaders', notes)
+                self.assertIn('Repair local component → Database setup', notes)
+                self.assertIn(failure, notes)
+                self.assertIn('Export support bundle', notes)
+                self.assertNotIn('Import your complete ChromieCraft client', notes)
+                self.assertFalse(result['thorQualified'])
 
     def test_existing_release_output_is_never_overwritten(self):
         self.args.output.mkdir(); marker = self.args.output / 'old-apk'; marker.write_text('preserve')

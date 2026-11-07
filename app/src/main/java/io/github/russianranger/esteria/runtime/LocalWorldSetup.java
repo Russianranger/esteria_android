@@ -35,7 +35,12 @@ public final class LocalWorldSetup {
     public static final class PreparationRequired extends IOException {
         public final Component component;
         public PreparationRequired(Component component,IOException cause) {
-            super(component.label+" is not ready: "+cause.getMessage()+". Use Repair local component → "+component.label+". Existing imports and saves are retained.",cause);
+            this(component,cause,false);
+        }
+        private PreparationRequired(Component component,IOException cause,boolean repairAttempted) {
+            super(repairAttempted
+                    ? component.label+" repair failed. "+cause.getMessage()+". Export support bundle before retrying."
+                    : component.label+" is not ready: "+cause.getMessage()+". Use Repair local component → "+component.label+". Existing imports and saves are retained.",cause);
             this.component=component;
         }
     }
@@ -170,7 +175,12 @@ public final class LocalWorldSetup {
         public Result repair(Component selected,RuntimeWork.Progress progress,RuntimeWork.Cancellation cancellation)throws IOException {
             if(selected!=Component.WORLD_DATA&&selected!=Component.SHADERS&&selected!=Component.DATABASE)
                 throw new IOException("Runtime components use their separate runtime preparation action");
-            return run(selected,false,progress,cancellation);
+            try{return run(selected,false,progress,cancellation);}
+            catch(PreparationRequired error){
+                // A successful repair can expose a different missing component.
+                if(error.component!=selected)throw error;
+                throw new PreparationRequired(selected,(IOException)error.getCause(),true);
+            }
         }
         private Result run(Component repair,boolean selectOnly,RuntimeWork.Progress progress,RuntimeWork.Cancellation cancellation)throws IOException {
             background();return operations.run(()->{

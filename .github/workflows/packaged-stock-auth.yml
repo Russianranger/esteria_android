@@ -1,0 +1,48 @@
+name: Packaged stock four-schema and auth protocol
+on:
+  workflow_dispatch:
+  push:
+    branches: [non-custom]
+    paths:
+      - .github/workflows/packaged-stock-auth.yml
+      - tools/qualify_packaged_server_auth.py
+permissions:
+  contents: read
+jobs:
+  packaged-auth:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify and extract the shipped ARM64 runtime, programs, stock content and helper identities
+        run: |
+          mkdir -p out
+          python3 -m tools.qualify_packaged_server_auth stage --output out/packaged-server
+          docker import --platform linux/arm64 out/packaged-server/server-runtime.tar.gz esteria-packaged-server:qualified
+      - name: Exercise the local protocol on fully populated fresh stock schemas and reopen the same instance
+        run: |
+          umask 077
+          mkdir out/disposable-server out/server-evidence
+          docker run --rm --init --network none --read-only --tmpfs /tmp:rw,nosuid,nodev,size=32m \
+            --env PYTHONDONTWRITEBYTECODE=1 \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/packaged-server,dst=/package,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/disposable-server,dst=/work" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/out/server-evidence,dst=/evidence" \
+            --workdir /qualification esteria-packaged-server:qualified \
+            python3 -m tools.qualify_packaged_server_auth run >out/stock-auth-private-run.log 2>&1
+      - name: Export typed evidence
+        if: always()
+        run: |
+          if sudo test -f out/server-evidence/stock-auth.json; then
+            sudo chmod 0644 out/server-evidence/stock-auth.json
+            sudo chmod 0755 out/server-evidence
+          fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: packaged-stock-auth-${{ github.sha }}
+          path: out/server-evidence/stock-auth.json
+          retention-days: 14

@@ -27,10 +27,14 @@ public final class StockClientSetup {
     private static final Map<Path,Handle> OWNERS=new ConcurrentHashMap<>();
     private static final Set<String> HELPERS=Set.of("stock_content_inspection.py","stock_shader_generation.py","shader_generation.py","extractor_order.py","server_data_preflight.py","world_io.py","stock_shader_translate.py");
     private StockClientSetup() { }
-    // These two APK manifests differ only in the translator, which the stock
-    // inspector never imports. Keep the original report key for this exact pair.
+    // Only the shader adapter and coordinator changed since v12. The stock
+    // inspector imports neither, so reports from the same source remain valid.
+    private static final Set<String> V12_INSPECTION_EQUIVALENTS = Set.of(
+            "599d31b0430f0ff8fd2aa163a9db4ef40920c6510da2e5f534ddf40ab9c8e95d", // v13
+            "6e2073161ea00b3c9379a38e0ecb64612e312816819795a66c2c029545f787ba");
+
     static String inspectionHelperIdentity(String installed) {
-        return installed.equals("599d31b0430f0ff8fd2aa163a9db4ef40920c6510da2e5f534ddf40ab9c8e95d")
+        return V12_INSPECTION_EQUIVALENTS.contains(installed)
                 ? "985308ff612f55f8ea8dab322963ff5a4b45d44dd527983490c31124b61261fd" : installed;
     }
     /** Install only immutable APK-owned helpers; callers mount this directory

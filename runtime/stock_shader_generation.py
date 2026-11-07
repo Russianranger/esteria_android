@@ -79,6 +79,8 @@ def _generate(store, game, generation, tools, revision, locale, timeout=7200, *,
                      '--strict', '--client', str(game / 'generations' / generation / 'data'),
                      '--locale', locale, '--glslang', str(tools / 'bin/glslangValidator'),
                      '--out', str(shaders)]
+            if content_profile == DEFAULT_CONTENT_PROFILE:
+                command.append('--stock-vulkan')
             if world_io.enabled():
                 command.append('--android-low-memory')
                 execute(command, staging / 'setup.log', timeout,
