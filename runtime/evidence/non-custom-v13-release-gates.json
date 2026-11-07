@@ -1,0 +1,101 @@
+{
+  "actualCharacterPersistenceQualified": false,
+  "android13": {
+    "job": 128522559507,
+    "record": "non-custom-v13-android13.json",
+    "result": "success",
+    "run": 42412200685
+  },
+  "apkAssetComparison": "non-custom-v13-apk-asset-continuity.json",
+  "appRevision": "2a9daba045da516a6ae7212d7bac94262f559d59",
+  "branch": "non-custom",
+  "clientNonCustomBranchCreatedAt": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "detachedStaging": {
+    "evidenceArchiveSha256": "f957e0f14d095b23ca6f5d58961aa5343c62548eb7141889dd81798a2f169ac8",
+    "evidenceArtifactId": 13590551986,
+    "job": 128527319383,
+    "result": "success",
+    "run": 42413768403,
+    "sha": "d029781576022dbd06234665cc504064f745ba9a"
+  },
+  "firstDetachedStage": {
+    "detachedPayloadAndReceiptsVerified": true,
+    "jobId": 128526673282,
+    "runId": 42413568552,
+    "signedUpdateEmulator": "sdkmanager missing from runner PATH; corrected in d029781576022dbd06234665cc504064f745ba9a"
+  },
+  "formatVersion": 1,
+  "launcherUnitAndLint": {
+    "job": 128522625865,
+    "result": "success",
+    "run": 42412200755
+  },
+  "nativeShader": {
+    "fixture": "encrypted synthetic MPQs with winning deletions and re-addition",
+    "job": 128522677377,
+    "result": "success",
+    "run": 42412200744,
+    "runner": "ubuntu-24.04-arm"
+  },
+  "nativeSql": {
+    "artifact": 13590026596,
+    "artifactSha256": "51fe45d096133a976fefd7cb90b1df1d1f75fb6dfb34053c2446715efd35c663",
+    "authWorldExecuted": false,
+    "job": 128523250769,
+    "result": "success",
+    "run": 42412200687
+  },
+  "package": {
+    "artifact": 13589434773,
+    "artifactBytes": 336857150,
+    "artifactSha256": "9af6efc7aaeecbd6a5696ad734c8db49d7baa4c9b93cc73e082396ca05427416",
+    "job": 128522677337,
+    "profile": "clean APK and bridge build with verified frozen native provider archives and source companions",
+    "result": "success",
+    "run": 42412200744
+  },
+  "packageId": "io.github.russianranger.esteria.stock",
+  "physicalEvidence": {
+    "device": "AYN Thor Android 13 arm64-v8a",
+    "error": "MPQ delete markers are unsupported: Data/patch.MPQ",
+    "lastObserved": "Retained world-data selection and shader translator worker entry",
+    "repairShaderWorkerStartedAfterSeconds": 39,
+    "source": "owner-v12-support-export",
+    "supportZipSha256": "a22d3cb811f1f81bc1f27d1c47e38d5fa2484d675dec9fd1d576aae0fc62db84",
+    "unproven": "v13 complete shader generation on retained owner import",
+    "workerExit": 2,
+    "worldGeneration": "cdf2eec23f3bea5f7036f57c307ae7c91300fd059bcc716ba65b2733bd0b3d7e",
+    "worldReceiptReusedAfterSeconds": 32,
+    "worldVerificationMeasuredReadBytes": 7309202449
+  },
+  "publicByteVerification": "non-custom-v13-public-apk-readback.json",
+  "publicSigningTransport": "runtime/releases/non-custom/update-13",
+  "publishedApkSha256": "9d9809d5e04b4bac5d1f0826d4fb0255a53318fe3220f5a7d19e8a077b01dbae",
+  "publishedRelease": "https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.13",
+  "publishedReleaseId": 437839805,
+  "selectedClient": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "selectedServer": "f35f04d01689f034778e3474b3c820092f51e461",
+  "serverPatches": 7,
+  "shaderResumeAndReuse": "non-custom-v13-offline-shader-reuse.json",
+  "signedUpdatePackageManager": {
+    "reason": "Android 13 AVD advertised only x86_64. Package Manager rejected the arm64-only v12 baseline with INSTALL_FAILED_NO_MATCHING_ABIS.",
+    "record": "non-custom-v13-signed-update-android13.json",
+    "status": "skipped-incompatible-emulator-abi"
+  },
+  "thorGameplayQualified": false,
+  "tooling": {
+    "job": 128522559388,
+    "passed": 1522,
+    "result": "success",
+    "run": 42412200670,
+    "skipReason": "Opt-in inputs including exact source checkouts, SDK/NDK/native tools, keys and disposable database binaries are not supplied in the generic tooling job.",
+    "skipped": 103,
+    "tests": 1625
+  },
+  "upstreamReview": {
+    "client": "7e9bb032ec4b365a541626ae6363786767fc4846",
+    "server": "06fe6ad94d15e243274a819f4204cd719fe60ca1",
+    "sourcesAdopted": false
+  },
+  "versionCode": 13
+}

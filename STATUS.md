@@ -1,3 +1,19 @@
+# Stock v13 shader repair
+
+[Signed v13 release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.13) · `0.1.0-non-custom.13`, version code 13 · producer `2a9daba045da516a6ae7212d7bac94262f559d59` · APK SHA-256 `9d9809d5e04b4bac5d1f0826d4fb0255a53318fe3220f5a7d19e8a077b01dbae`. All six public assets matched the staged bytes. The public APK passed SDK v2/v3 verification against the v12 stock signing certificate and package identity.
+
+Android 13 x86_64 instrumentation passed both production receipt consumers and its same-key debug update. The separate signed-production update attempt stopped at baseline installation because the emulator supports x86_64 only. Exact-signer continuity is verified. In-place installation and saved-character persistence on the Thor remain open. [Build, test and support evidence](runtime/evidence/non-custom-v13-release-gates.json).
+
+The November 7 Thor report from v12 reached the production shader translator. Android accepted world generation `cdf2eec23f3bea5f7036f57c307ae7c91300fd059bcc716ba65b2733bd0b3d7e`. The full verification read 7,309,202,449 bytes in the preparation helper. A named shader repair selected the same world receipt at 32 seconds and started the shader worker at 39 seconds. Both workers exited 2 on a winning delete marker in `Data/patch.MPQ`.
+
+The v13 APK-owned shader reader treats a winning deleted BLS member as absent for that exact path. A lower shader profile or a newer live replacement can still supply the shader. The compiler, executable, client/server revisions, world-data helpers, providers and stock SQL profile retain their v12 identities. The v12 support export contains neither the private MPQ payload nor a shader receipt. First complete shader translation on that import is the next physical-device gate.
+
+The exact packaged compiler passed on a native ARM64 Linux runner with synthetic encrypted patch archives. In a separate offline x86 Linux/QEMU test, cancellation during the first compile preserved the import. A fresh process resumed and compiled four modules. Three subsequent cold processes took 0.344, 0.343 and 0.345 seconds, invoked the compiler zero times, and preserved the receipt and every output byte and mtime. Three separate offline JVMs admitted the resulting receipt through production ShaderSetup and verified all 44,313 bytes and 14 files each time. [Measured runs](runtime/evidence/non-custom-v13-offline-shader-reuse.json).
+
+Install over the existing stock app. Keep **enUS** and **Balanced**, then select **Repair local component → Shaders**. If the next reported component is **Database setup**, select **Repair local component → Database setup**. Once ready, choose **Start local game**. Keep the existing import and app data. See [device testing and support export](NON-CUSTOM-TESTING.md).
+
+## Historical v12 handoff
+
 # Esteria Stock v12 — signed startup candidate published
 
 Producer `7f556ff7bec24cdb6472efb0af7b319116dfae4f` on `non-custom`; version `0.1.0-non-custom.12`, code 12, package `io.github.russianranger.esteria.stock`. [Published release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.12); APK 336,849,664 bytes, SHA-256 `255d3157f0b251b810b9087bbe2c12937927d8cc1a1e0c99cda346716f259fd7`. Android SDK v2/v3 signature and manifest checks passed against the exact v11 baseline; the original certificate is unchanged. All six public assets passed complete anonymous byte readback. Release `437249264`, APK asset `719252553`. [Testing procedure](NON-CUSTOM-TESTING.md).

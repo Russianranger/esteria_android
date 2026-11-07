@@ -1,0 +1,39 @@
+{
+  "baselineApk": {
+    "apkBytes": 336849664,
+    "apkSha256": "255d3157f0b251b810b9087bbe2c12937927d8cc1a1e0c99cda346716f259fd7",
+    "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+    "debuggable": false,
+    "minSdk": 26,
+    "packageId": "io.github.russianranger.esteria.stock",
+    "targetSdk": 35,
+    "versionCode": 12,
+    "versionName": "0.1.0-non-custom.12"
+  },
+  "buildFingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+  "characterPersistenceQualified": false,
+  "databaseSchemaQualified": false,
+  "emulatorAbis": [
+    "x86_64"
+  ],
+  "fixtureDataOnly": true,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "installDiagnostic": "Performing Streamed Install\nadb: failed to install /home/runner/work/_temp/signed-stock-baseline.apk: Failure [INSTALL_FAILED_NO_MATCHING_ABIS: INSTALL_FAILED_NO_MATCHING_ABIS: Failed to extract native libraries, res=-113]",
+  "packageManagerUpdateExecuted": false,
+  "scope": "android13-emulator-signed-apk-filesystem-update",
+  "sourceCommit": "2a9daba045da516a6ae7212d7bac94262f559d59",
+  "status": "skipped-incompatible-emulator-abi",
+  "thorQualified": false,
+  "updateApk": {
+    "apkBytes": 336853760,
+    "apkSha256": "9d9809d5e04b4bac5d1f0826d4fb0255a53318fe3220f5a7d19e8a077b01dbae",
+    "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+    "debuggable": false,
+    "minSdk": 26,
+    "packageId": "io.github.russianranger.esteria.stock",
+    "targetSdk": 35,
+    "versionCode": 13,
+    "versionName": "0.1.0-non-custom.13"
+  }
+}

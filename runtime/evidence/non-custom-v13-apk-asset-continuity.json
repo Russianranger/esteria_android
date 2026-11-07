@@ -1,0 +1,19 @@
+{
+  "changedAssetFiles": [
+    "assets/stock-client/manifest.json",
+    "assets/stock-client/stock_shader_translate.py"
+  ],
+  "dataHelperManifestSha256": "c911baddd7c49fa21fa4a3bc022d75c69fa66daddde3a6970129cf652dad18ff",
+  "totalAssetFiles": 117,
+  "unchangedProviderArchiveBytes": 335322697,
+  "unchangedProviderArchives": {
+    "assets/client-runtime/client-arm64.archive": "5997af5a94a1151e708cf80fa9931e4055a887598e01c9cf21e6b3af0d438759",
+    "assets/guest-bridges/guest-bridges-arm64.archive": "7e0356f14bf3654a0e1ecc903726bd479fea0c761c8a4e8a4356e2e476726a55",
+    "assets/server-content/server-content.archive": "0f41b2deea5344fcea4cbc70bbddf0bab1dfda1cd0346e23e92592aac63056e6",
+    "assets/server-data-tools/server-data-tools.archive": "e80d1d731902907297ae89f68d8241bca0aa79b8a281521c669353654ce5b436",
+    "assets/server-programs/server-programs.archive": "963a23c1390440260b85ffe164b2d7508c56b005b315dce8a919ae443a46d1bf",
+    "assets/server-runtime/server-runtime-arm64.archive": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5",
+    "assets/shader-tools/shader-tools-arm64.archive": "c48c4d78952d4a2c02c26b7a6da0087d29b21eb19a81b643cb5a9a97cf7389af",
+    "assets/turnip/turnip-arm64.archive": "445c38ddf7e66f65ee90aa7fd2006db88d6fecd72c8567d801f2ee4c4000a772"
+  }
+}

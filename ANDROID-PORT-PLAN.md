@@ -1,10 +1,8 @@
 # Esteria Android non-custom implementation plan
 
-## Current checkpoint: v11
+## Current checkpoint
 
-The [published v11 update](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.11/Esteria-Stock-3.3.5a-arm64.apk) fixes Python/Android receipt fingerprint compatibility after completed world-file verification. It aligns both data and shader consumers while preserving all production Python helper bytes and valid completed v10 data. Source/import/tool/helper bindings and full cached-file verification remain required; no reimport or new native extraction is required for matching valid completed output.
-
-Complete ARM64 packaging, native SQL/output, actual Python-to-Android data/shader receipt tests and public signed-APK readback passed. The next device gate remains the same: install over v10, keep all data, retry preparation with the same locale, then complete the ordinary Human Warrior/world/persistence/offline procedure below. Source pins, memory controls, stock acceptance and deferred custom/bot scope remain unchanged. See [STATUS.md](STATUS.md), [HANDOFF.md](HANDOFF.md) and [NON-CUSTOM-TESTING.md](NON-CUSTOM-TESTING.md).
+The Thor accepted the retained world-data receipt on v12, then the shader translator rejected a winning MPQ delete marker. V13 fixes this path. For the same import use **Repair local component → Shaders**. Full shader completion and a graphical title frame remain the next device gates. [Current release and evidence](STATUS.md).
 
 ## Current objective
 

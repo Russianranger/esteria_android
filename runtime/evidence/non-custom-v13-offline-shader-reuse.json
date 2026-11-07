@@ -1,0 +1,75 @@
+{
+  "source": "2a9daba045da516a6ae7212d7bac94262f559d59",
+  "coverage": "Linux x86_64 with QEMU user-mode AArch64 compiler, synthetic encrypted MPQs and import metadata, separate fresh Python processes; no Android UI, PRoot or owner assets",
+  "offline": "seccomp rejected socket and connect for each process and descendants; verified ENETDOWN before every launcher exec",
+  "generation": "a76ff0743c5c1fcf2b6e1297375a1d3b945d997e0ff0b84ab0a48a35bf40c210",
+  "importGeneration": "3f7d2cb419e4c39a7316d6aeda6dddb6462d24ab3670b9c0b3ad28088a90963e",
+  "compilerSha256": "279cb8d922fa71319e12eb63b46a1c6f80938d07747cec73326ec64928a044fc",
+  "toolManifestSha256": "36e3032524c2136c4273908f887a1ca59ebb414e806f52d47e778332ed4acda6",
+  "attempts": [
+    {
+      "operation": "cancel during first compile",
+      "elapsedSec": 0.748,
+      "returnCode": 75,
+      "compilerCalls": 1
+    },
+    {
+      "operation": "reentry and first completion",
+      "elapsedSec": 6.061,
+      "returnCode": 0,
+      "compilerCalls": 4
+    },
+    {
+      "operation": "cold offline reuse 1",
+      "elapsedSec": 0.344,
+      "returnCode": 0,
+      "compilerCalls": 0
+    },
+    {
+      "operation": "cold offline reuse 2",
+      "elapsedSec": 0.343,
+      "returnCode": 0,
+      "compilerCalls": 0
+    },
+    {
+      "operation": "cold offline reuse 3",
+      "elapsedSec": 0.345,
+      "returnCode": 0,
+      "compilerCalls": 0
+    }
+  ],
+  "outputFileCount": 14,
+  "receiptBytes": 3706,
+  "receiptSha256": "7fbf80757944e409bbb110e98b26f221b6d9e9b19bc6dff7e05d09f3a3f12a9c",
+  "spvFiles": 4,
+  "coldReusePayloadBytesAndMtimesUnchanged": true,
+  "importBytesAndMtimesUnchanged": true,
+  "recompiledOnColdReuse": false,
+  "failedStagingTreesRetained": 1,
+  "javaAdmitted": [
+    {
+      "generation": "a76ff0743c5c1fcf2b6e1297375a1d3b945d997e0ff0b84ab0a48a35bf40c210",
+      "files": 14,
+      "bytesRead": 44313,
+      "requireSameSelection": true,
+      "elapsedMs": 245
+    },
+    {
+      "generation": "a76ff0743c5c1fcf2b6e1297375a1d3b945d997e0ff0b84ab0a48a35bf40c210",
+      "files": 14,
+      "bytesRead": 44313,
+      "requireSameSelection": true,
+      "elapsedMs": 189
+    },
+    {
+      "generation": "a76ff0743c5c1fcf2b6e1297375a1d3b945d997e0ff0b84ab0a48a35bf40c210",
+      "files": 14,
+      "bytesRead": 44313,
+      "requireSameSelection": true,
+      "elapsedMs": 153
+    }
+  ],
+  "javaEnvironment": "OpenJDK17 x86_64, production ShaderRunPlan, ShaderSetup.validatePrepared with payload verification enabled, ShaderSetup.requireSameSelection, AOSP Android13 JSON source; socket/connect denied by seccomp",
+  "javaObservedBeforeAfterHashesAndMtimesIdentical": true,
+  "fixtureLocaleArchive": "Data/enUS/locale-enUS.MPQ created using selected encrypted MPQ writer before binding import generation"
+}

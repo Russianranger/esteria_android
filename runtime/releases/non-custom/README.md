@@ -1,3 +1,9 @@
+# Current stock publication
+
+The v13 producer is `2a9daba045da516a6ae7212d7bac94262f559d59`. The three files in `update-13/` bind its verified unsigned APK to the stock signer and exact native SQL run using the v12 baseline. The detached staging run was `42413768403`. [Public release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.13) · [verified assets and APK checksum](../../evidence/non-custom-v13-public-apk-readback.json).
+
+The stock signing ledger now requires the exact v13 APK for subsequent updates. Earlier transports remain bound to their original baselines.
+
 # Version 9 publication transport
 
 Producer `f39b52459d08fb85bf4fe6da5edddf8bccdea8bf`; publisher `92537ac872242efd0e5b20513c47136b65c2d3bc`, run/job `41369089018` / `125035452108`. Release `430963964`, APK asset `699999137`. APK 336,829,184 bytes, SHA-256 `5066512b124da61a8b6e662f91b3617720fd8f249824300c4e2f6afebfa386d2`; certificate `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`.
