@@ -10,6 +10,28 @@
     "x86Android13SignedInstall": "INSTALL_FAILED_NO_MATCHING_ABIS; signed update independently exercised on Android 13 ARM64"
   },
   "exactProducerAndroid13X86Instrumentation": {
+    "correctedWorkflowRun": {
+      "componentTestsPassed": {
+        "import-memory": 14,
+        "preparation-controls": 4,
+        "python-receipt": 3,
+        "saf-import": 3,
+        "stock-shader": 2
+      },
+      "environment": "GitHub-hosted Android 13 x86_64 emulator",
+      "evidenceArtifact": 13595681136,
+      "evidenceBytes": 26528,
+      "evidenceSha256": "31b9e22921f4998e60b6f053134235955bc5730d6df1bcccbb1d6ad7d23b401e",
+      "job": 128561822758,
+      "privateLocalLoginHandoffFilesystemQualified": true,
+      "productionSignedApkInstalled": false,
+      "result": "success",
+      "run": 42425159587,
+      "runnerFreeSpaceGiB": 95,
+      "runtimeContractGroups": 20,
+      "sameJobDebugKeyUpdatePreservedRuntimeAndSentinel": true,
+      "sourceRevision": "1d665c88d30cf927e4457d18246a32b771b8f42f"
+    },
     "job": 128556719663,
     "reason": "Hosted AVD had 3319.15 MB free and needed 7372.80 MB. The corrected workflow releases its unused SDK before starting the same AVD.",
     "result": "failed before app execution",
