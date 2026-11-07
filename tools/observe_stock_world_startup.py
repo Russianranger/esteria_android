@@ -1,5 +1,6 @@
 """Observe the normal packaged worldserver up to its first content dependency on disposable stock SQL."""
 import json
+import os
 import re
 import socket
 import time
@@ -57,7 +58,13 @@ def observe(package, selected, state, database, uuid, configuration, evidence):
             conf = configuration / 'worldserver.conf'
             log = state / 'logs/world-bootstrap-stdout.log'
             file_log = state / 'logs/Server.log'
-            require(not file_log.exists() and not file_log.is_symlink(), 'unique worldserver file log required')
+            # The installation helper already uses Server.log. Keep its private bytes before
+            # the native world logger opens Server.log in its configured truncate mode.
+            if os.path.lexists(file_log):
+                previous = file_log.with_name('Server-before-world-observation.log')
+                require(file_log.is_file() and not file_log.is_symlink() and not os.path.lexists(previous),
+                        'isolated regular installer log required')
+                file_log.rename(previous)
             child = processes.ServerChild('worldserver', binary, conf, state / 'run/worldserver', log)
             native_start = time.monotonic()
             exit_code = None
