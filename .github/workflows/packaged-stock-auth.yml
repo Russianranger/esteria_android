@@ -7,6 +7,7 @@ on:
       - .github/workflows/packaged-stock-auth.yml
       - tools/qualify_packaged_server_auth.py
       - tools/qualify_packaged_grunt.py
+      - tools/observe_stock_world_startup.py
       - tools/qualify_client_auth.py
       - tools/client_auth_contract.py
       - runtime/client/renderer-compatibility.json
@@ -43,11 +44,11 @@ jobs:
               --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly"
               --mount "type=bind,src=$GRUNT_QA/grunt/fixture,dst=/esteria-qualification"
               --workdir /qualification)
-          docker run -d --name stock-grunt-server --network none "${shared[@]}" --tmpfs /tmp:rw,nosuid,nodev,size=32m \
+          docker run -d --name stock-grunt-server --network none --tmpfs /esteria-data:ro,nosuid,nodev,noexec,size=1m "${shared[@]}" --tmpfs /tmp:rw,nosuid,nodev,size=32m \
             --mount "type=bind,src=$GRUNT_QA/packaged-server,dst=/package,readonly" \
             --mount "type=bind,src=$GRUNT_QA/disposable-server,dst=/work" \
             --mount "type=bind,src=$GRUNT_QA/server-evidence,dst=/evidence" \
-            esteria-packaged-server:qualified python3 -m tools.qualify_packaged_server_auth run --grunt
+            esteria-packaged-server:qualified python3 -m tools.qualify_packaged_server_auth run --grunt --observe-world
           docker run -d --name stock-grunt-client --network container:stock-grunt-server "${shared[@]}" \
             --tmpfs /tmp:rw,nosuid,nodev,mode=1777,size=192m \
             esteria-stock-grunt:qualified /usr/bin/python3 -m tools.qualify_packaged_grunt client
@@ -61,7 +62,7 @@ jobs:
         if: always() && env.GRUNT_QA != ''
         run: |
           mkdir -p out/server-evidence
-          for pair in server-evidence/stock-auth.json grunt/fixture/client-phase.json; do
+          for pair in server-evidence/stock-auth.json server-evidence/world-startup.json grunt/fixture/client-phase.json; do
             if sudo test -f "$GRUNT_QA/$pair"; then
               sudo install -m 0644 "$GRUNT_QA/$pair" "out/server-evidence/${pair##*/}"
             fi

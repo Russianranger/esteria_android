@@ -13,7 +13,7 @@ import time
 import zipfile
 
 from runtime import android_database_setup, android_server_installation_setup as installation
-from runtime import mysql_bootstrap as db, provision_local_account as account
+from runtime import mysql_bootstrap as db, provision_local_account as account, server_session_process as processes
 from tools import auth_protocol, prepare_runtime, qualify_authserver as auth, qualify_server_installation as sql
 from tools.verify_server_build import identity
 
@@ -100,12 +100,15 @@ def selections(package):
 def protocol_probe(state, mysql, version, program, expected, configuration, *, client_probe=None, attempt=1):
     require(identity(program) == expected, 'selected authserver changed before execution')
     intent = account.read_intent(state / account.JOURNAL, db.read_receipt(state / 'database-bootstrap.json', version))
-    child = auth.OwnedAuthserver(program, configuration / 'authserver.conf', state / 'logs' / f'auth-probe-{attempt}-private.log')
+    child = processes.ServerChild('authserver', program, configuration / 'authserver.conf', state / 'run/authserver',
+                                  state / 'logs' / f'auth-probe-{attempt}-private.log')
     try:
+        child.start()
         auth.wait_authserver(child)
+        require(processes.owns_loopback_listener(child.group, 3724), 'production auth listener ownership failed')
         with socket.create_connection(('127.0.0.1', 3724), timeout=5) as transport:
             realms, key = auth_protocol.login(transport, intent)
-        require(auth.owns_listener(child.process.pid), 'auth listener ownership changed')
+        require(processes.owns_loopback_listener(child.group, 3724), 'auth listener ownership changed')
         require(len(realms) == 1 and realms[0]['id'] == 1 and realms[0]['address'] == '127.0.0.1:8085'
                 and realms[0]['locked'] == 0 and realms[0]['build'] in (None, (3, 3, 5, 12340)),
                 'authserver realm does not match local build 12340')
@@ -116,12 +119,14 @@ def protocol_probe(state, mysql, version, program, expected, configuration, *, c
                 require(len(rows) == 1 and hmac.compare_digest(rows[0], key.hex() + '\tWin\t0'),
                         'negotiated auth key differs from persistent session')
                 if client_probe is not None:
-                    return client_probe(state, connection, intent, child, attempt)
+                    result = client_probe(state, connection, intent, child, attempt)
+                    require(processes.owns_loopback_listener(child.group, 3724), 'production auth listener changed during PE login')
+                    return dict(result, productionOwnedAuthListenerVerified=True)
     finally:
-        child.stop()
+        child.stop(auth_timeout=30)
 
 
-def run(package, work, evidence, world_probe=None, client_probe=None):
+def run(package, work, evidence, world_probe=None, client_probe=None, observe_world=False):
     require(platform.machine().lower() in ('aarch64', 'arm64'), 'native Linux ARM64 required')
     require(not any(work.iterdir()), 'an empty disposable state directory is required')
     os.umask(0o077)
@@ -191,6 +196,7 @@ def run(package, work, evidence, world_probe=None, client_probe=None):
         owned.close()
     require(android_database_setup.setup(state, mysql, mysqld, version)['operation'] == 'already-initialized',
             'database was not reused')
+    observed_expected_boundary = True
     reopened = sql.ServiceProcess(state, sessions, mysql, mysqld, version)
     try:
         reopened.wait_ready(uuid)
@@ -199,6 +205,13 @@ def run(package, work, evidence, world_probe=None, client_probe=None):
                 again = protocol_probe(state, mysql, version, program, expected_auth, configuration,
                                        client_probe=client_probe, attempt=2)
             record('same-database-reconstructed-grunt-login', **again)
+        if observe_world:
+            from tools.observe_stock_world_startup import observe
+            observed_expected_boundary = observe(package, phases[0][1], state, reopened, uuid, configuration,
+                                                 evidence.parent / 'world-startup.json')
+            proof['worldserverExecuted'] = True
+            proof['worldReadyQualified'] = False
+            record('separate-incomplete-world-startup-observation')
         if world_probe is not None:
             record('enter-world-admission')
             world_probe(package, state, reopened, version, uuid, record)
@@ -206,6 +219,7 @@ def run(package, work, evidence, world_probe=None, client_probe=None):
     finally:
         reopened.close()
     record('same-uuid-reopened-and-cleanly-stopped', uuid=uuid)
+    require(observed_expected_boundary, 'worldserver stopped before its expected stock starting-area content boundary')
 
 
 def main():
@@ -217,6 +231,7 @@ def main():
     prep.add_argument('--output', type=Path, required=True)
     running = actions.add_parser('run')
     running.add_argument('--grunt', action='store_true')
+    running.add_argument('--observe-world', action='store_true')
     args = parser.parse_args()
     if args.action == 'stage':
         stage(args.output, args.apk, args.readback)
@@ -227,7 +242,7 @@ def main():
             client_probe = None
             if args.grunt:
                 from tools.qualify_packaged_grunt import server_probe as client_probe
-            run(Path('/package'), work, evidence, client_probe=client_probe)
+            run(Path('/package'), work, evidence, client_probe=client_probe, observe_world=args.observe_world)
         except Exception as error:
             proof = document(evidence) if evidence.is_file() else {}
             proof.update(failureClass=type(error).__name__, **sql.safe_failure_context(error, work / 'state'))
