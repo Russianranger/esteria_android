@@ -1,0 +1,143 @@
+{
+  "androidRuntimeQualified": false,
+  "artifactBytes": 1615,
+  "artifactId": 13594024074,
+  "artifactSha256": "fad9637498dd71dbf1845f07f0983b005ee21013e544e3d23a73510cebeb0e67",
+  "characterPersistenceQualified": false,
+  "clientPhase": "two-clients-and-wine-cleanly-stopped",
+  "clientPhaseReceiptSha256": "4dae5377881000bfbf37eafd895e7c27cd3d080a8db85d812f72495c1c6132a0",
+  "environment": "GitHub-hosted native Linux ARM64. Separate immutable server and Wine images share a loopback-only network namespace and private challenge directory.",
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "graphicalLoginQualified": false,
+  "result": {
+    "apkSha256": "9d9809d5e04b4bac5d1f0826d4fb0255a53318fe3220f5a7d19e8a077b01dbae",
+    "archives": {
+      "server-content": "0f41b2deea5344fcea4cbc70bbddf0bab1dfda1cd0346e23e92592aac63056e6",
+      "server-programs": "963a23c1390440260b85ffe164b2d7508c56b005b315dce8a919ae443a46d1bf",
+      "server-runtime": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5"
+    },
+    "environment": "Linux ARM64",
+    "gameplayQualified": false,
+    "reconstructedClientExecuted": true,
+    "scope": "packaged-stock-four-schema-reconstructed-grunt-authentication",
+    "stages": [
+      {
+        "elapsedSeconds": 0.018,
+        "stage": "bootstrap"
+      },
+      {
+        "elapsedSeconds": 7.548,
+        "stage": "authenticated-database",
+        "uuid": "0df89ea5-db00-11f1-95ee-aea328dcd8a4",
+        "version": "8.0.46-0ubuntu0.24.04.4"
+      },
+      {
+        "elapsedSeconds": 7.563,
+        "stage": "enter-core"
+      },
+      {
+        "elapsedSeconds": 111.412,
+        "stage": "enter-playerbots"
+      },
+      {
+        "elapsedSeconds": 142.119,
+        "stage": "four-schemas-verified"
+      },
+      {
+        "authReceiptSha256": "6834137f8734a33f551f64915da8332fc4380a0fa86e172602a2a3319189de94",
+        "callbacks": [
+          "actualCommandParser",
+          "connectedCallback",
+          "connectionRefsReleased",
+          "controlledDisconnect",
+          "gruntTimerJoined",
+          "gruntTimerThread",
+          "localOfflineEnabled",
+          "networkThreadsJoined",
+          "newSessionRequest",
+          "realmListCallback",
+          "serverProofVerified",
+          "twoWorkerThreads",
+          "versionChallengeObserved"
+        ],
+        "characterPersistenceQualified": false,
+        "clientServerSessionKeyMatched": true,
+        "elapsedSeconds": 143.817,
+        "executableRevision": "807c4384ef28f4da51d3c50eec5082627cad36ea",
+        "executableSha256": "d2a1b74a3353f2682dcc3bc2b09f649f3b5bf53b55e6f74ccb43071c9aa4b634",
+        "fourLedgersPreserved": true,
+        "freshClientProcess": true,
+        "graphicalLoginQualified": false,
+        "loopbackOnly": true,
+        "nonceMatched": true,
+        "realmCount": 1,
+        "realmId": 1,
+        "stage": "reconstructed-grunt-login",
+        "wineArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+        "worldEndpoint": "127.0.0.1:8085"
+      },
+      {
+        "authserverSha256": "04cbda982ca1385903929eb46ca52b7cb41ca222e8a48f9898af716d2b878531",
+        "elapsedSeconds": 143.818,
+        "stage": "auth-srp-12340-loopback-session-key-verified"
+      },
+      {
+        "elapsedSeconds": 143.82,
+        "stage": "enter-playerbots"
+      },
+      {
+        "elapsedSeconds": 157.042,
+        "stage": "sql-completion-bound-to-clean-stop"
+      },
+      {
+        "authReceiptSha256": "5dd8d824c272b74e2db3b692bcb3e4c02d5f752b77491d0b2d56e870942b76ef",
+        "callbacks": [
+          "actualCommandParser",
+          "connectedCallback",
+          "connectionRefsReleased",
+          "controlledDisconnect",
+          "gruntTimerJoined",
+          "gruntTimerThread",
+          "localOfflineEnabled",
+          "networkThreadsJoined",
+          "newSessionRequest",
+          "realmListCallback",
+          "serverProofVerified",
+          "twoWorkerThreads",
+          "versionChallengeObserved"
+        ],
+        "characterPersistenceQualified": false,
+        "clientServerSessionKeyMatched": true,
+        "elapsedSeconds": 160.047,
+        "executableRevision": "807c4384ef28f4da51d3c50eec5082627cad36ea",
+        "executableSha256": "d2a1b74a3353f2682dcc3bc2b09f649f3b5bf53b55e6f74ccb43071c9aa4b634",
+        "fourLedgersPreserved": true,
+        "freshClientProcess": true,
+        "graphicalLoginQualified": false,
+        "loopbackOnly": true,
+        "nonceMatched": true,
+        "realmCount": 1,
+        "realmId": 1,
+        "stage": "same-database-reconstructed-grunt-login",
+        "wineArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+        "worldEndpoint": "127.0.0.1:8085"
+      },
+      {
+        "elapsedSeconds": 161.455,
+        "stage": "same-uuid-reopened-and-cleanly-stopped",
+        "uuid": "0df89ea5-db00-11f1-95ee-aea328dcd8a4"
+      }
+    ],
+    "tag": "non-custom-v0.1.0-non-custom.13",
+    "worldserverExecuted": false
+  },
+  "sourceScope": "Two fresh executions of the reconstructed PE using --auth-check --local-offline. Each uses the source-provisioned disposable account, performs actual C++ Grunt callbacks and SRP proof, returns the single stock realm, and writes its fresh negotiated session key for comparison to the live MySQL account row. The second execution follows clean database stop and same-UUID restart.",
+  "stockAuthReceiptSha256": "3b85ef424e26fd81ad3f0c2f396a182a16e00ca5fbf0bd09aa1ac8502e5fc7d1",
+  "testedIntegrationRevision": "14b89eaa389a71e036e8b41a9ae166b1bd3e28d4",
+  "workflowJob": 128557536164,
+  "workflowRun": 42423761431,
+  "workflowUrl": "https://github.com/Russianranger/esteria_android/actions/runs/42423761431/job/128557536164",
+  "worldEntryQualified": false,
+  "worldserverExecuted": false
+}

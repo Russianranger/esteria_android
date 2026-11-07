@@ -1,6 +1,6 @@
 # Current stock handoff
 
-The corrected client now has an independently reproducible provider and corresponding-source package. The renderer selection is explicit in the v15 APK. All stock preparation still uses its original source lock. Keep the retained world generation and use the named client repair on upgrade. [Active gate and execution environments](STATUS.md) · [Device steps](NON-CUSTOM-TESTING.md).
+Use the signed v15 update over the existing stock app. The production shader coordinator compiled the complete selected stock corpus. Three cold preparations reused the same output with zero compiles. Linux ARM64 Wine reached the genuine first-run front end and the reconstructed client passed two loopback authserver logins using the retained database. The highest physical Thor evidence remains the v13 world receipt and reported shader failure. Reproduce the next native boundary with the stock worldserver qualification and complete verified import. Continue through character creation, world entry, shutdown and three cold offline gameplay launches. [Published candidate and exact inputs](STATUS.md) · [Install and collect support](NON-CUSTOM-TESTING.md).
 
 ## Historical v14 handoff
 

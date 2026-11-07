@@ -1,4 +1,6 @@
-# Stock v15 renderer integration
+# Stock v15 signed startup candidate
+
+[Signed stock v15 release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.15) · version `0.1.0-non-custom.15` (15), produced at `d5e7715587b980d9e41f9070c21e0fc21c543101`. The 336,862,047-byte APK has SHA-256 `f6aa8c4ad674e71d3aed59099f0b952efc44a0ae2333a77efdbff81188489510`. All six published assets matched their staged bytes. Android SDK v2/v3 verification matched the stock signing identity. [Public readback](runtime/evidence/non-custom-v15-public-apk-readback.json) · [Packaged asset comparison](runtime/evidence/non-custom-v15-apk-asset-continuity.json).
 
 The v13 Thor support export reached a complete world receipt before ten legacy terrain shaders failed translation. The v14 shader selection passed the complete native ARM64 stock corpus. With all 1,580 generated modules present, the real reconstructed client reached its first frame and issued 210 invalid Vulkan compressed-image clears. The software renderer crashed before showing the title. [Reproducer and validation](runtime/evidence/stock-client-bc1-initialization-linux-arm64.json).
 
@@ -6,7 +8,7 @@ The v15 runtime selects corrected client `807c4384ef28f4da51d3c50eec5082627cad36
 
 The stock launch-view adapter also rejected a normal loose `Interface` directory in the official ZIP. The stock selection now leaves that directory in the immutable import and loads signed UI from the selected MPQs. A regression exercises the production adapter through first launch-view preparation and warm reuse, and verifies that a custom UI selection retains its preservation rules.
 
-In the offline Linux ARM64 Wine replay the corrected executable produced the animated Northrend front end and first-run license screen. The first unverified production session stage after auth is worldserver readiness with fully extracted stock data. The physical Thor report ends at v13 shader translation. Login, world entry and saved-character gameplay still require evidence. [Installation and support export](NON-CUSTOM-TESTING.md).
+On offline Linux ARM64 the repaired PE rendered the animated Northrend front end, read 17 external SPIR-V files and scrolled the first-run license screen through the selected input bridge. A separate native ARM64 run authenticated two fresh instances of the PE against the packaged authserver on loopback, with a clean MySQL restart between them. The outstanding production boundary is worldserver readiness with the complete selected data. The physical Thor report ends at v13 shader translation. [Graphical execution](runtime/evidence/stock-client-bc1-initialization-linux-arm64.json) · [Grunt authentication](runtime/evidence/stock-client-packaged-grunt-linux-arm64.json) · [Installation and support export](NON-CUSTOM-TESTING.md).
 
 ## Historical v14 checkpoint
 

@@ -1,0 +1,20 @@
+{
+  "androidExecution": false,
+  "appRevision": "d5e7715587b980d9e41f9070c21e0fc21c543101",
+  "clientArchiveSha256": "8fe371164401a4c693d09cc7dae876656aec529c6bdc2ef160f723ee490485a0",
+  "clientExeSha256": "d2a1b74a3353f2682dcc3bc2b09f649f3b5bf53b55e6f74ccb43071c9aa4b634",
+  "clientRevision": "807c4384ef28f4da51d3c50eec5082627cad36ea",
+  "codecAndExePinned": true,
+  "completeZipImportTestedHere": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "guestEulaLink": "/esteria-data/Data/enUS/eula.html",
+  "looseAddonPublicFilesRetained": 23,
+  "mutableWtfPreserved": true,
+  "priorFailure": "Loose Interface content requires a preserving writable-copy policy before gameplay launch",
+  "scope": "Production Java stock launch view selected on Linux x86_64 with authenticated partial ChromieCraft inputs and the signed v15 client provider",
+  "stockViewGeneration": "01d23cfd5b15dc8a74019774355b27a3ff48a73daf8c1a59518c138b18922b0e",
+  "stockViewLooseInterfaceOmitted": true,
+  "warmClientCopies": 0,
+  "warmSelections": 3
+}

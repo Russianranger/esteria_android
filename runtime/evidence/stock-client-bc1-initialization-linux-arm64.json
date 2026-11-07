@@ -218,5 +218,42 @@
     },
     "androidOrThorQualified": false,
     "gameplayOrCharacterPersistenceQualified": false
+  },
+  "localizedFirstRunAgreement": {
+    "executableRevision": "807c4384ef28f4da51d3c50eec5082627cad36ea",
+    "pePid": 590,
+    "peStartTicks": 61254,
+    "windowXid": "0x1200005",
+    "windowClass": "wowclient64.exe",
+    "sourceFiles": {
+      "Data/enUS/eula.html": "eedf58879c9c37ad3cecf01c08af1715e60dfea300b18fb01f8eb99bf5ed569d",
+      "Data/enUS/tos.html": "8502d0ccabf001e200673db224a28a8764413b27ce69579902329d493e3d1707"
+    },
+    "projection": "The selected stock AccountLogin.xml declares its EULA/TOS SimpleHTML documents by basename. The private view exposed the two CRC-verified loose files through read-only localized links matching the production launch view.",
+    "privateFrame": {
+      "number": 17,
+      "bgrxSha256": "35e1b8886244710f86291b3cdbffca41417701ab111dafbeaf8d645fe693cc82",
+      "pngSha256": "05e41eacecec16c1da9f3c5f378a1952b032177aad874546fd5267a5f8851626",
+      "sampleColors": 4187
+    },
+    "visualObservation": "The rendered agreement body contains its version heading and paragraphs. Accept is disabled at the beginning of the document.",
+    "input": {
+      "transport": "Packaged esteria-x11-input on the same X display",
+      "absoluteMotionAcknowledged": true,
+      "scrollWheelDownPressReleasePairsAcknowledged": 4,
+      "primaryButtonEvents": 0,
+      "result": "Subsequent bridge frame visibly scrolled to later paragraphs; no agreement selection was made.",
+      "laterPrivateFramePngSha256": "fd3adfcc54cbe343b7a3572d3d643f30dd073bf80a45cb1d692f210e3500cf88"
+    },
+    "exit": {
+      "method": "WM_DELETE_WINDOW",
+      "wineExit": 0,
+      "clientOnShutdown": true,
+      "configSha256After": "3a42fc073b544dfa98b4b880990cd26229bda144ea6fd71033d369ad0052db07",
+      "compressedClearValidationErrors": 0,
+      "unreleasedBufferValidationErrors": 25
+    },
+    "credentialEntryScreenObserved": false,
+    "characterOrWorldEntryQualified": false
   }
 }

@@ -1,0 +1,33 @@
+{
+  "addedAssetFiles": [
+    "assets/client-runtime/renderer-compatibility.json"
+  ],
+  "baselineApkSha256": "fdeac1008d4fbac4d0b3e9b16d0106b877cf92541705f2e7a45ce16c454f4c32",
+  "baselineVersionCode": 14,
+  "candidateApkSha256": "f6aa8c4ad674e71d3aed59099f0b952efc44a0ae2333a77efdbff81188489510",
+  "candidateVersionCode": 15,
+  "changedAssetFiles": [
+    "assets/client-runtime/client-arm64.archive",
+    "assets/client-runtime/provider.json"
+  ],
+  "changedProviderArchives": {
+    "assets/client-runtime/client-arm64.archive": {
+      "previousSha256": "5997af5a94a1151e708cf80fa9931e4055a887598e01c9cf21e6b3af0d438759",
+      "sha256": "8fe371164401a4c693d09cc7dae876656aec529c6bdc2ef160f723ee490485a0"
+    }
+  },
+  "formatVersion": 1,
+  "removedAssetFiles": [],
+  "totalAssetFiles": 118,
+  "unchangedAssetFiles": 115,
+  "unchangedProviderArchiveBytes": 328009404,
+  "unchangedProviderArchives": {
+    "assets/guest-bridges/guest-bridges-arm64.archive": "7e0356f14bf3654a0e1ecc903726bd479fea0c761c8a4e8a4356e2e476726a55",
+    "assets/server-content/server-content.archive": "0f41b2deea5344fcea4cbc70bbddf0bab1dfda1cd0346e23e92592aac63056e6",
+    "assets/server-data-tools/server-data-tools.archive": "e80d1d731902907297ae89f68d8241bca0aa79b8a281521c669353654ce5b436",
+    "assets/server-programs/server-programs.archive": "963a23c1390440260b85ffe164b2d7508c56b005b315dce8a919ae443a46d1bf",
+    "assets/server-runtime/server-runtime-arm64.archive": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5",
+    "assets/shader-tools/shader-tools-arm64.archive": "c48c4d78952d4a2c02c26b7a6da0087d29b21eb19a81b643cb5a9a97cf7389af",
+    "assets/turnip/turnip-arm64.archive": "445c38ddf7e66f65ee90aa7fd2006db88d6fecd72c8567d801f2ee4c4000a772"
+  }
+}

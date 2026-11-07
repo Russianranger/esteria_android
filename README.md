@@ -2,11 +2,9 @@
 
 Local Wrath 3.3.5a build 12340 client/server bring-up for AYN Thor Max: Android 13 ARM64, Snapdragon 8 Gen 2, Adreno 740. The reconstructed ARM64 client uses pinned Wine/PRoot with local server/MySQL; gameplay is intended to remain offline after setup.
 
-**V9 preparation speed, resume and storage controls:** [signed ARM64 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.9/Esteria-Stock-3.3.5a-arm64.apk) · [testing procedure](NON-CUSTOM-TESTING.md).
+[Signed stock v15 release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.15) · [Device testing and support export](NON-CUSTOM-TESTING.md).
 
-Install over the existing stock app and preserve the completed import and all data. Start with **Balanced 32 MiB/s**, select the same locale and retry **Prepare local runtime / world**. Gentle 8 and Fast 64 MiB/s are also available while idle. Compatible completed work and valid partial navigation tiles resume; idle storage controls trim recognized obsolete files. Do not reimport. Native conversion stays at one worker with the existing memory guard.
-
-All six exact-producer source gates passed, covering ARM64 packaging, native SQL, Android tests and native extractor fixtures. Public APK/signature readback also passed. The selected rate governs verification/copy I/O, not total navigation CPU time. Physical Thor preparation/world entry and gameplay remain unqualified; export support before another retry after failure. [STATUS.md](STATUS.md) records exact identities and limits.
+Install over Esteria Stock and retain the selected import and completed world data. Use **Repair local component → Client runtime** once for the corrected ARM64 executable, then **Shaders** if the previous attempt failed there. Choose **Start local game**. [Current startup evidence](STATUS.md).
 
 - [Implementation plan](ANDROID-PORT-PLAN.md)
 - [Build instructions](BUILDING.md)

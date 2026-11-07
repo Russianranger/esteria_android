@@ -138,5 +138,56 @@
     "inputScope": "Production Python coordinator over verified stock distribution shader/listfile extents and authored import records. It checked fresh GLSL against previously compiled output and replayed the real 1,580 ARM64 glslang results before validation and promotion.",
     "freshCompilerExecutionsInReceiptReplay": 0,
     "replayedCompilerResults": 1580
+  },
+  "qualifiedDistributionShaderMembers": {
+    "scope": "Linux x86_64 OpenJDK17, AOSP Android13 JSON and production ShaderSetup byte verification of genuine compiler generation",
+    "networkDeniedBySeccomp": true,
+    "shaderReceiptSha256": "8ceaf67054c93693a08424722df6546f0578d5e229afb8c25b3b6e6c8c5a7b34",
+    "unchangedShaderBytesAndMtimes": true,
+    "importBytesAndMtimesCompared": false,
+    "freshOfflineJvmElapsedMs": [
+      1089,
+      1277,
+      860
+    ],
+    "generation": "3609dd1b67e77a12a6c1641cfba7341fc1681af57bef503f7b9ce8d64dc8139f",
+    "files": 4742,
+    "bytesRead": 102130554,
+    "requireSameSelection": true,
+    "inputScope": "Production MPQ reader over the verified distribution shader/listfile extents with authored import metadata; this fixture is not a complete game import",
+    "importGeneration": "015bc80093dc01d7837ba5054a3de0343b30bf5c3bb37afc5bae651cef7e1ba5",
+    "modules": 1580,
+    "pythonAttempts": [
+      {
+        "phase": "initial",
+        "elapsedSeconds": 2959.582,
+        "compilerCalls": 1580,
+        "exitCode": 0
+      },
+      {
+        "phase": "cold-offline-reuse-1",
+        "elapsedSeconds": 7.968,
+        "compilerCalls": 0,
+        "exitCode": 0
+      },
+      {
+        "phase": "cold-offline-reuse-2",
+        "elapsedSeconds": 7.367,
+        "compilerCalls": 0,
+        "exitCode": 0
+      },
+      {
+        "phase": "cold-offline-reuse-3",
+        "elapsedSeconds": 8.23,
+        "compilerCalls": 0,
+        "exitCode": 0
+      }
+    ],
+    "independentCleanCompilationVsReplay": {
+      "identicalSpv": 1580,
+      "identicalGlsl": 1580,
+      "identicalIndexAndManifest": true,
+      "identicalSpvDisassemblyExcludingFirstDiagnosticLine": 1580
+    }
   }
 }
