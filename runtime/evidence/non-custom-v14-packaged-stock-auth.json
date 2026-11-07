@@ -1,0 +1,81 @@
+{
+  "apkSha256": "9d9809d5e04b4bac5d1f0826d4fb0255a53318fe3220f5a7d19e8a077b01dbae",
+  "archives": {
+    "server-content": "0f41b2deea5344fcea4cbc70bbddf0bab1dfda1cd0346e23e92592aac63056e6",
+    "server-programs": "963a23c1390440260b85ffe164b2d7508c56b005b315dce8a919ae443a46d1bf",
+    "server-runtime": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5"
+  },
+  "environment": "Linux ARM64",
+  "evidenceSource": {
+    "artifactBytes": 861,
+    "artifactId": 13592258104,
+    "artifactSha256": "57e887d840a3a392e0dbaa9a07126ba4bd7d2503e17377697ebdac39e2e4ed0f",
+    "branch": "non-custom",
+    "commit": "556f65d3987a8d8f219562238e6fb9be99e5d347",
+    "jobId": 128543262299,
+    "jobUrl": "https://github.com/Russianranger/esteria_android/actions/runs/42419032926/job/128543262299",
+    "member": "stock-auth.json",
+    "memberSha256": "a42e365a4be082ac32bd2679bb7d9e9bd78ccd58712d81de7bf598643b53fa6d",
+    "repository": "Russianranger/esteria_android",
+    "runId": 42419032926,
+    "workflow": ".github/workflows/packaged-stock-auth.yml"
+  },
+  "fixture": {
+    "androidCoordinatorExecuted": false,
+    "compiledUpdaterReplayedOnCompletedReentry": false,
+    "containerNetwork": "none",
+    "database": "fresh disposable stock database",
+    "playerbotsLoaderReplayedOnCompletedReentry": false,
+    "protocolClient": "build-12340 SRP test codec",
+    "reopenedSameUuid": true,
+    "runner": "ubuntu-24.04-arm",
+    "thorExecuted": false
+  },
+  "gameplayQualified": false,
+  "reconstructedClientExecuted": false,
+  "scope": "packaged-stock-server-database-and-standalone-auth",
+  "stages": [
+    {
+      "elapsedSeconds": 0.018,
+      "stage": "bootstrap"
+    },
+    {
+      "elapsedSeconds": 5.834,
+      "stage": "authenticated-database",
+      "uuid": "8b8adce7-daf7-11f1-9dda-0e217e16f177",
+      "version": "8.0.46-0ubuntu0.24.04.4"
+    },
+    {
+      "elapsedSeconds": 5.836,
+      "stage": "enter-core"
+    },
+    {
+      "elapsedSeconds": 109.048,
+      "stage": "enter-playerbots"
+    },
+    {
+      "elapsedSeconds": 143.168,
+      "stage": "four-schemas-verified"
+    },
+    {
+      "authserverSha256": "04cbda982ca1385903929eb46ca52b7cb41ca222e8a48f9898af716d2b878531",
+      "elapsedSeconds": 143.343,
+      "stage": "auth-srp-12340-loopback-session-key-verified"
+    },
+    {
+      "elapsedSeconds": 143.346,
+      "stage": "enter-playerbots"
+    },
+    {
+      "elapsedSeconds": 156.378,
+      "stage": "sql-completion-bound-to-clean-stop"
+    },
+    {
+      "elapsedSeconds": 158.78,
+      "stage": "same-uuid-reopened-and-cleanly-stopped",
+      "uuid": "8b8adce7-daf7-11f1-9dda-0e217e16f177"
+    }
+  ],
+  "tag": "non-custom-v0.1.0-non-custom.13",
+  "worldserverExecuted": false
+}

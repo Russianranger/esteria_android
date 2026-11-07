@@ -1,0 +1,86 @@
+{
+  "formatVersion": 1,
+  "scope": "real-reconstructed-PE-startup-in-isolated-ARM64-Linux-TCG",
+  "environment": {
+    "host": "x86_64",
+    "guest": "Debian 12 ARM64, Linux 6.1.0-54-arm64",
+    "processor": "QEMU TCG",
+    "network": "No virtual NIC",
+    "clientData": "Read-only exact original MPQ ranges; unpublished ranges wait or fail EIO.",
+    "display": "Packaged Xtigervnc 1280x720, 24-bit",
+    "frameReceiver": "Packaged esteria-x11-frame",
+    "renderer": "Mesa llvmpipe Vulkan ICD from pinned Wine archive"
+  },
+  "clientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "clientSha256": "06557024cfaa974d02482eb98fedc186bc6b323ca730178347e153105343e12a",
+  "codecSha256": "b4c774430942d709ca7e3f03a1890d6aec7aaa2e432bee0e698e57027a70d006",
+  "providerApkSha256": "9d9809d5e04b4bac5d1f0826d4fb0255a53318fe3220f5a7d19e8a077b01dbae",
+  "wineArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+  "wineVersion": "10.13",
+  "path": "--local-offline -vulkan -datadir, no --local-login or account handoff",
+  "firstControl": {
+    "missingContent": "CommonMain / InitializeGlobal / OpenArchives reported Failed to open archive interface.MPQ on a genuinely empty Data view.",
+    "nativeDllsLoaded": true,
+    "forcedCleanup": true
+  },
+  "boundedOriginalData": {
+    "confirmedOriginalArchivesOpened": 16,
+    "commonMainQualified": true,
+    "clientDatabaseStoresLoaded": 236,
+    "rendererStages": {
+      "device": true,
+      "swapchain": true,
+      "pipelines": true,
+      "presentation": true,
+      "extensionsStarted": true,
+      "worldModelRequested": true,
+      "stockUiVertex": true,
+      "stockUiPixel": true,
+      "clientDatabasesInitialized": true,
+      "clientInitialized": true
+    },
+    "swapchain": [
+      1024,
+      768
+    ],
+    "defaultResolutionUnmodified": true,
+    "externallyGeneratedShaderLoadsQualified": false,
+    "reason": "Shader generation pending at this capture; the exact client logged no manifest.",
+    "glueModelEvidence": {
+      "northrendSkinSections": 61,
+      "northrendSkinBatches": 64
+    },
+    "sourceSelection": "Verified original English ChromieCraft ZIP; comparison corpus, not device MPQ file checksums.",
+    "firstUpdate": true,
+    "firstFrameBegin": true,
+    "firstFrameEnd": true,
+    "clientExit": 139,
+    "readRequestsFailedByExtentGuard": 0,
+    "visualObservation": "The private 1280x720 capture showed an X11 pointer over black. The selected process exited before a title was visually confirmed."
+  },
+  "turnip": {
+    "gpuReadbackExit": 70,
+    "reason": "KGSL character device required",
+    "noKgslControlExit": 0,
+    "receipt": {
+      "formatVersion": 2,
+      "scope": "linux-arm64-turnip-kgsl-component-probe",
+      "icdLoaded": true,
+      "noKgslHostVerified": true,
+      "turnip740ShaderReadbackQualified": false,
+      "directIcdNoDevicesVerified": true,
+      "loaderEnumerationResult": -3,
+      "pixelsVerified": 0,
+      "vendorId": 0,
+      "deviceId": 0,
+      "deviceName": "",
+      "x11PresentationQualified": false,
+      "androidQualified": false,
+      "gameplayQualified": false
+    }
+  },
+  "titleFrameQualified": false,
+  "androidRuntimeQualified": false,
+  "physicalThorQualified": false,
+  "gameplayQualified": false
+}

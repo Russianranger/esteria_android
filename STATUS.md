@@ -1,3 +1,15 @@
+# Stock v14 terrain shader repair
+
+[Signed stock release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.14) · `0.1.0-non-custom.14` (14) · producer `6b37bfe4b75bf298fe765ec9667e92e739c4e53e` · APK SHA-256 `fdeac1008d4fbac4d0b3e9b16d0106b877cf92541705f2e7a45ce16c454f4c32`. All six public assets matched their staged bytes. The public APK passed v2/v3 verification with the v13 signing certificate. [Build and execution evidence](runtime/evidence/non-custom-v14-release-gates.json).
+
+On the Thor, v13 reused the completed world receipt after 31 seconds and then failed strict translation on ten legacy terrain records. The v14 Vulkan selection checks the five exact legacy containers, winning effect files and all 32 active Terrain1 permutations. A native ARM64 Linux run strictly translated 2,778 real stock records and compiled and validated 1,580 SPIR-V modules in 122 seconds. A separate native run prepared all four database schemas, verified an authserver build-12340 SRP session key and cleanly reopened the same MySQL instance. [Native shader run](runtime/evidence/non-custom-v14-native-shaders.json) · [Database and authserver](runtime/evidence/non-custom-v14-packaged-stock-auth.json).
+
+The selected client, server, seven patches, SQL and eight native archives keep their previous identities. The world helper manifest `c911baddd7c49fa21fa4a3bc022d75c69fa66daddde3a6970129cf652dad18ff` continues to select Thor generation `cdf2eec23f3bea5f7036f57c307ae7c91300fd059bcc716ba65b2733bd0b3d7e`. V14 can fully revalidate compatible completed v12/v13 shaders. Session admission retains its independent integrity check. [Asset continuity](runtime/evidence/non-custom-v14-apk-asset-continuity.json).
+
+Install in place, keep **enUS** and **Balanced**, then select **Repair local component → Shaders** followed by **Start local game**. Repair **Database setup** if the launcher names it. The next physical gate is completion of shader preparation on the retained import. The reference graphics guest ran the real client through its first frame callback on software Vulkan. Its no-generated-shader control exited 139 with a black frame and pointer. A visible login, stock world entry and saved-character relaunch still need proof. [Reference client](runtime/evidence/non-custom-v14-stock-client-reference.json) · [Testing and support export](NON-CUSTOM-TESTING.md).
+
+## Historical v13 checkpoint
+
 # Stock v13 shader repair
 
 [Signed v13 release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.13) · `0.1.0-non-custom.13`, version code 13 · producer `2a9daba045da516a6ae7212d7bac94262f559d59` · APK SHA-256 `9d9809d5e04b4bac5d1f0826d4fb0255a53318fe3220f5a7d19e8a077b01dbae`. All six public assets matched the staged bytes. The public APK passed SDK v2/v3 verification against the v12 stock signing certificate and package identity.

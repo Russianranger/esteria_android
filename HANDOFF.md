@@ -1,3 +1,11 @@
+# Current stock handoff
+
+Use the signed v14 update for the v13 Thor shader failure. The release, source, checksum and verified startup boundaries are in [STATUS.md](STATUS.md). Start from the selected enUS import and the retained world generation. Use **Repair local component → Shaders** once, then **Start local game**. Follow a named database repair only if the launcher requests it. Preserve the whole support export on the first new failure. [Device steps](NON-CUSTOM-TESTING.md).
+
+The real native Linux ARM64 compiler passed the selected ChromieCraft shader corpus. The next graphics test uses the matching external shader generation with the reconstructed PE under Wine. Stock readiness and world entry require real server/data and client evidence. Preserve the pinned helpers and selection while diagnosing the next observed boundary.
+
+## Historical v13 handoff
+
 # Stock v13 shader repair
 
 [Signed v13 release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.13) · `0.1.0-non-custom.13`, version code 13 · producer `2a9daba045da516a6ae7212d7bac94262f559d59` · APK SHA-256 `9d9809d5e04b4bac5d1f0826d4fb0255a53318fe3220f5a7d19e8a077b01dbae`. All six public assets matched the staged bytes. The public APK passed SDK v2/v3 verification against the v12 stock signing certificate and package identity.

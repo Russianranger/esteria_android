@@ -1,0 +1,85 @@
+{
+  "actualCharacterPersistenceQualified": false,
+  "android13": "non-custom-v14-android13.json",
+  "apkAssetComparison": "non-custom-v14-apk-asset-continuity.json",
+  "appRevision": "6b37bfe4b75bf298fe765ec9667e92e739c4e53e",
+  "branch": "non-custom",
+  "detachedStaging": {
+    "evidenceArchiveSha256": "dec554992ae17daffa3a3604acf40b5de11dcfd7a2324515c545b11745087309",
+    "evidenceArtifactId": 13592532141,
+    "job": 128541124642,
+    "result": "success",
+    "run": 42418323076,
+    "sha": "b6cd53550bb22f7cd1525dcaeb37b3e6879e13bf",
+    "signedPackageInstallOnX86": "baseline returned INSTALL_FAILED_NO_MATCHING_ABIS"
+  },
+  "formatVersion": 1,
+  "launcherUnitAndLint": {
+    "job": 128537637827,
+    "result": "success",
+    "run": 42417161949
+  },
+  "nativeExtractor": {
+    "job": 128537637825,
+    "result": "success",
+    "run": 42417161932,
+    "scope": "real ARM64 native extractor and synthetic DBC inputs"
+  },
+  "nativePackagedSqlAuth": "non-custom-v14-packaged-stock-auth.json",
+  "nativeShaderChromieCraft": "non-custom-v14-native-shaders.json",
+  "nativeShaderSynthetic": {
+    "job": 128537672137,
+    "result": "success",
+    "run": 42417161919
+  },
+  "nativeSql": {
+    "artifact": 13592370417,
+    "artifactSha256": "9ab52f1cb3de7c5ae769907bf8e371c32998393e096d0ed03dfc11b6256a6ec1",
+    "job": 128537637533,
+    "result": "success",
+    "run": 42417161886
+  },
+  "package": {
+    "artifact": 13591868367,
+    "artifactSha256": "9330a6bbbe8e90274ba4c42da5580755a0b034df145604ade26424bf84086ebf",
+    "job": 128537672030,
+    "result": "success",
+    "run": 42417161919,
+    "scope": "fresh APK and native bridge build with verified frozen engine/provider inputs"
+  },
+  "packageId": "io.github.russianranger.esteria.stock",
+  "physicalEvidence": "non-custom-v14-thor-v13-repair.json",
+  "pinnedArchiveReaderHost": {
+    "module": "tests.test_extractor_order",
+    "passed": 34,
+    "scope": "Linux x86_64 native library and source integration, 29 verified source files",
+    "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
+    "skipped": 0,
+    "tests": 34
+  },
+  "pinnedShaderHost": {
+    "modules": [
+      "tests.test_stock_content_inspection",
+      "tests.test_shader_memory_adapter"
+    ],
+    "passed": 31,
+    "scope": "Linux x86_64 Python, pinned reader, JDK17 import fixtures",
+    "skipped": 0,
+    "source": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+    "tests": 31
+  },
+  "publicReadback": "non-custom-v14-public-apk-readback.json",
+  "referenceClient": "non-custom-v14-stock-client-reference.json",
+  "tag": "non-custom-v0.1.0-non-custom.14",
+  "thorGameplayQualified": false,
+  "titleQualified": false,
+  "tooling": {
+    "job": 128537637854,
+    "passed": 1528,
+    "result": "success",
+    "run": 42417161859,
+    "skipped": 104,
+    "skips": "Optional source checkouts, native references, SDK/NDK/key and disposable service fixtures. Separate targeted runs supply relevant pinned inputs.",
+    "total": 1632
+  }
+}

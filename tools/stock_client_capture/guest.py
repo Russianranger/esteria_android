@@ -47,6 +47,29 @@ def frame():
             'sampleColors': len({bytes(pixels[i:i+3]) for i in range(0, length, 127*4)})}
 
 
+def renderer_stages():
+    """Read only source-owned startup markers. Raw driver and extension logs stay private."""
+    folder = Path('/work/client-state/Logs')
+    markers = {
+        'vulkan.log': {'device': b'logical device created', 'swapchain': b'swapchain created',
+                       'pipelines': b'pipelines: ready', 'presentation': b'present: ready'},
+        'Extensions.log': {'extensionsStarted': b': OnStartup', 'worldModelRequested': b'OnFileOpened world\\model.blob',
+                           'stockUiVertex': b'OnFileOpened Shaders\\Vertex\\vs_3_0\\UI.bls',
+                           'stockUiPixel': b'OnFileOpened Shaders\\Pixel\\ps_3_0\\UI.bls',
+                           'clientDatabasesInitialized': b': OnClientDBInitialize,',
+                           'clientInitialized': b': OnClientInitialized'},
+    }
+    stages = {}
+    for name, needles in markers.items():
+        try:
+            with (folder/name).open('rb') as log:
+                output = log.read(1 << 20)
+        except FileNotFoundError:
+            output = b''
+        stages.update({stage: needle in output for stage, needle in needles.items()})
+    return stages
+
+
 def run():
     report = {'phase': 'x11', 'frameSamples': [], 'titleQualified': False}
     try:
@@ -96,6 +119,7 @@ def run():
                 proc.kill()
                 proc.wait()
         report['wrappersReaped'] = all(child.poll() is not None for child in PROCS)
+        report['rendererStages'] = renderer_stages()
         RESULT.write_text(json.dumps(report))
 
 

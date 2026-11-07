@@ -2,7 +2,7 @@
 
 ## Current checkpoint
 
-The Thor accepted the retained world-data receipt on v12, then the shader translator rejected a winning MPQ delete marker. V13 fixes this path. For the same import use **Repair local component → Shaders**. Full shader completion and a graphical title frame remain the next device gates. [Current release and evidence](STATUS.md).
+V13 reused the retained Thor world generation, then stopped before compiling ten legacy terrain records. The v14 stock Vulkan repair passed the matching ChromieCraft shader corpus on native ARM64 Linux. The device retry starts at **Repair local component → Shaders**. Follow the real client, worldserver and character evidence through clean offline reopen. [Current release and evidence](STATUS.md).
 
 ## Current objective
 
@@ -31,7 +31,7 @@ Keep the reconstructed Windows ARM64 client under ARM64 Wine in a Debian 12 PRoo
 
 ## Evidence rules
 
-Record source-reviewed support, structural/content validation and actual execution separately. Compilation, synthetic files, SQL receipts, mock owners and listening ports do not demonstrate gameplay. No complete ChromieCraft client or Thor is presently accessible in this checkout; continue all independent implementation and package diagnosis for the first consolidated test.
+Record source-reviewed support, structural/content validation and actual execution separately. Compilation, synthetic files, SQL receipts, mock owners and listening ports do not demonstrate gameplay. Qualify the official English comparison corpus separately from the retained Thor import. A public comparison corpus cannot establish identity of every byte on the physical device.
 
 ## Deferred beyond this milestone
 

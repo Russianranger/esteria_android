@@ -34,6 +34,9 @@ def public_result(path):
     if raw.get('failure') in ('OSError', 'ValueError', 'RuntimeError', 'TimeoutExpired', 'TimeoutError',
                               'ConnectionRefusedError', 'PermissionError', 'FileNotFoundError'):
         public['failure'] = raw['failure']
+    public['rendererStages'] = {k: raw.get('rendererStages', {}).get(k) is True for k in
+        ('device', 'swapchain', 'pipelines', 'presentation', 'extensionsStarted', 'worldModelRequested',
+         'stockUiVertex', 'stockUiPixel', 'clientDatabasesInitialized', 'clientInitialized')}
     counts = raw['successfulClientAccesses']
     public['successfulClientAccesses'] = {
         k: v for k in ('locale','mpq','spirv') if type(v := counts[k]) is int and 0 <= v <= 65536}

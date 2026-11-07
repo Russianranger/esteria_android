@@ -1,0 +1,93 @@
+{
+  "appRevision": "6b37bfe4b75bf298fe765ec9667e92e739c4e53e",
+  "artifactId": 13592875107,
+  "artifactSha256": "c26dabdd60fe1c36e4233ac8afaa39cb93bbac0442a3bad9f7197bf7326c3ba1",
+  "components": {
+    "import-memory-component.json": {
+      "componentTestsPassed": true,
+      "expectedTests": 14,
+      "processExitCode": 0,
+      "scope": "android13-x64-large-streaming-import-memory-and-exit-history-components",
+      "testClass": "io.github.russianranger.esteria.ImportMemoryStressTest,io.github.russianranger.esteria.ProcessExitDiagnosticsTest,io.github.russianranger.esteria.ImportIoControllerTest,io.github.russianranger.esteria.WorldPreparationDiagnosticsTest,io.github.russianranger.esteria.runtime.TurnipReadinessTimingTest"
+    },
+    "preparation-controls-component.json": {
+      "componentTestsPassed": true,
+      "expectedTests": 4,
+      "processExitCode": 0,
+      "scope": "android13-x64-preparation-controls-pressure-and-owned-storage-components",
+      "testClass": "io.github.russianranger.esteria.PreparationControlsTest"
+    },
+    "python-receipt-component.json": {
+      "componentTestsPassed": true,
+      "expectedTests": 3,
+      "processExitCode": 0,
+      "scope": "android13-x64-python-produced-data-shader-receipt-consumers",
+      "testClass": "io.github.russianranger.esteria.runtime.PythonReceiptBindingTest"
+    },
+    "saf-import-component.json": {
+      "componentTestsPassed": true,
+      "expectedTests": 3,
+      "processExitCode": 0,
+      "scope": "android13-x64-document-resolver-synthetic-client-import-components",
+      "testClass": "io.github.russianranger.esteria.SafImportTest"
+    },
+    "stock-shader-component.json": {
+      "componentTestsPassed": true,
+      "expectedTests": 2,
+      "processExitCode": 0,
+      "scope": "android13-x64-stock-helper-and-synthetic-shader-receipt-components",
+      "testClass": "io.github.russianranger.esteria.runtime.ShaderSetupReceiptTest"
+    }
+  },
+  "emulatorProperties": {
+    "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+    "ro.build.version.sdk": "33",
+    "ro.kernel.qemu": "1",
+    "ro.product.cpu.abi": "x86_64"
+  },
+  "gameplayQualified": false,
+  "jobId": 128537637891,
+  "receiptChecks": [
+    {
+      "case": "pythonShaderGenerationAcceptedAndMutationsRejected",
+      "consumer": "production-android-java",
+      "gameplayQualified": false,
+      "generation": "ef3a971dc77c55c2ddee60eb234b9db5be261265ee1513fd46590fb6440e7a7c",
+      "matchingPythonHashMutantsRejected": 10,
+      "nativeToolExecution": false,
+      "ownerGameData": false,
+      "producer": "production-python",
+      "scope": "android13-x64-production-python-receipt-fixture",
+      "thorQualified": false
+    },
+    {
+      "case": "pythonDataGenerationAcceptedAndMutationsRejected",
+      "consumer": "production-android-java",
+      "gameplayQualified": false,
+      "generation": "7cd705c60aa2a1e6e83f5b1da0f0f87450c6ece6204e37b95825298618d9ba3c",
+      "matchingPythonHashMutantsRejected": 11,
+      "nativeToolExecution": false,
+      "ownerGameData": false,
+      "producer": "production-python",
+      "scope": "android13-x64-production-python-receipt-fixture",
+      "thorQualified": false
+    },
+    {
+      "asciiUnicodeEscapes": true,
+      "case": "pythonCanonicalVectorsMatchExactly",
+      "gameplayQualified": false,
+      "literalSlash": true,
+      "nativeToolExecution": false,
+      "ownerGameData": false,
+      "pythonCodepointKeyOrder": true,
+      "scope": "android13-x64-production-python-receipt-fixture",
+      "strictValueTypes": true,
+      "thorQualified": false,
+      "vectors": 6
+    }
+  ],
+  "runId": 42417161934,
+  "sameJobDebugKeyUpdatePreservedRuntimeAndSentinel": true,
+  "thorQualified": false,
+  "uniqueSourceBindingsVerified": 60
+}
