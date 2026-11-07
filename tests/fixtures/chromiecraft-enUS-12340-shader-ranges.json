@@ -1,0 +1,397 @@
+{
+  "version": 1,
+  "providers": {
+    "Data/common-2.MPQ": [
+      {
+        "start": 1140751,
+        "compressedBytes": 49,
+        "restart": "entry",
+        "skip": 0,
+        "offset": 0,
+        "bytes": 44,
+        "sha256": "b1b3daced571203a8a26b9152a58a6d75a93bc330a9d945a989bb235b3676c94"
+      },
+      {
+        "start": 1772729665,
+        "compressedBytes": 10457195,
+        "restart": "stored",
+        "skip": 117737,
+        "offset": 1795203095,
+        "bytes": 10572313,
+        "sha256": "740d7f7adf5bf717340e8626721e6fa12faa83be653b9f497b9c3f4fe5292bb7"
+      },
+      {
+        "start": 1784956232,
+        "compressedBytes": 2869154,
+        "restart": "stored",
+        "skip": 41478,
+        "offset": 1807591060,
+        "bytes": 2839576,
+        "sha256": "9c7459bba3d4ce5b2254285e2862efe55a249c3e61fe85eb438ef5b0e2920b17"
+      }
+    ],
+    "Data/common.MPQ": [
+      {
+        "start": 1787825479,
+        "compressedBytes": 93,
+        "restart": "entry",
+        "skip": 0,
+        "offset": 0,
+        "bytes": 44,
+        "sha256": "35ddf4c9539e11fd72e40379b57b2eee6bb657d2d4f1874ff80b71bd1f3acaff"
+      },
+      {
+        "start": 4644041366,
+        "compressedBytes": 6719578,
+        "restart": "stored",
+        "skip": 780546,
+        "offset": 2875172711,
+        "bytes": 5982151,
+        "sha256": "261dea41320af73c398f1081f34f1ec1493bdd5c0e96cb0e473f7d49098a9f33"
+      }
+    ],
+    "Data/lichking.MPQ": [
+      {
+        "start": 4650761039,
+        "compressedBytes": 49,
+        "restart": "entry",
+        "skip": 0,
+        "offset": 0,
+        "bytes": 44,
+        "sha256": "2b2730216e6cfb1a35054f70cbae748b4465ee78b822210add85154c5df98896"
+      },
+      {
+        "start": 7171242140,
+        "compressedBytes": 1271791,
+        "restart": "stored",
+        "skip": 64253,
+        "offset": 2552736771,
+        "bytes": 1211778,
+        "sha256": "f4d988e8ef04e39bc0408848b66fd44b890e85eb3683f29c77c83dc6b90bd957"
+      }
+    ],
+    "Data/patch-3.MPQ": [
+      {
+        "start": 7172514025,
+        "compressedBytes": 96,
+        "restart": "entry",
+        "skip": 0,
+        "offset": 0,
+        "bytes": 44,
+        "sha256": "3cdf144105154f706fa1659c6baac1dbe75c9a14f8012265be8d090d897b4b53"
+      },
+      {
+        "start": 7568058678,
+        "compressedBytes": 1518557,
+        "restart": "stored",
+        "skip": 123824,
+        "offset": 396088737,
+        "bytes": 1425634,
+        "sha256": "c4b1f7a752b10d5b053b3c65278dd897f3f54be8bb77b6b255d398d4f10c67a5"
+      },
+      {
+        "start": 7774500021,
+        "compressedBytes": 250886,
+        "restart": "stored",
+        "skip": 56434,
+        "offset": 604894230,
+        "bytes": 194907,
+        "sha256": "9515a3d71e4a1d6da02d127526a9665c895efabfbe0d6f142091d320408324f4"
+      }
+    ],
+    "Data/patch.MPQ": [
+      {
+        "start": 7774750999,
+        "compressedBytes": 128,
+        "restart": "entry",
+        "skip": 0,
+        "offset": 0,
+        "bytes": 44,
+        "sha256": "5cc8bcf2f1d2debec7d66b370235c63691410d34c8f704c99e8ae3807d5a2539"
+      },
+      {
+        "start": 8135477526,
+        "compressedBytes": 11959818,
+        "restart": "stored",
+        "skip": 11832089,
+        "offset": 375207697,
+        "bytes": 376326,
+        "sha256": "4dede818b6dce77a47a3c570c4fb76584baba554671cdd7026cef32cc82ef495"
+      },
+      {
+        "start": 8606780081,
+        "compressedBytes": 92768,
+        "restart": "stored",
+        "skip": 94535,
+        "offset": 839568674,
+        "bytes": 171,
+        "sha256": "9993d0ffd9a3880d2bdd088f832bf1c6b66883c6cc88da28b17cf3b4bfb383db"
+      },
+      {
+        "start": 9588461682,
+        "compressedBytes": 3380650,
+        "restart": "stored",
+        "skip": 103160,
+        "offset": 1826581791,
+        "bytes": 3333244,
+        "sha256": "2791b08a389c672599e2660fcc7c24504371e3e62a215153fcf421422db84a4a"
+      },
+      {
+        "start": 9697754453,
+        "compressedBytes": 151783,
+        "restart": "stored",
+        "skip": 157730,
+        "offset": 1937507047,
+        "bytes": 876,
+        "sha256": "0a8efe891e1f3d2717b3c71249beb29a59ab90adfca9df5481a591d3807de514"
+      },
+      {
+        "start": 11737732719,
+        "compressedBytes": 3190067,
+        "restart": "stored",
+        "skip": 375119,
+        "offset": 4001883005,
+        "bytes": 2830052,
+        "sha256": "d52b4fbb8b9528f7380b406e19eaf8493ff9d8c41d9ad0432ed12083698ccf1f"
+      }
+    ],
+    "Data/enUS/lichking-speech-enUS.MPQ": [
+      {
+        "start": 11740932437,
+        "compressedBytes": 104,
+        "restart": "entry",
+        "skip": 0,
+        "offset": 0,
+        "bytes": 44,
+        "sha256": "6adb59551a52e24ca0c6f4fb39c2598f2eb5f88fa5112c1fa8bd14e6903c3c6a"
+      },
+      {
+        "start": 12094805116,
+        "compressedBytes": 175966,
+        "restart": "stored",
+        "skip": 31276,
+        "offset": 353864050,
+        "bytes": 144789,
+        "sha256": "c2ed47696010e63adc801fb4c334363ac38fb5cd558bbc80861994da7ed5da5a"
+      }
+    ],
+    "Data/enUS/expansion-speech-enUS.MPQ": [
+      {
+        "start": 12100172599,
+        "compressedBytes": 49,
+        "restart": "entry",
+        "skip": 0,
+        "offset": 0,
+        "bytes": 44,
+        "sha256": "a10636e30601f463c484b8aad8dcd0a2bb489abad27560f0ad731274a0ac12c9"
+      },
+      {
+        "start": 12341090528,
+        "compressedBytes": 153003,
+        "restart": "stored",
+        "skip": 54302,
+        "offset": 240934557,
+        "bytes": 98740,
+        "sha256": "f64c44b061f042ea13c5c62d696fe0b1d4bd8bfeaa507f6bd50ca4a81ba3715d"
+      }
+    ],
+    "Data/enUS/lichking-locale-enUS.MPQ": [
+      {
+        "start": 12888787857,
+        "compressedBytes": 89,
+        "restart": "entry",
+        "skip": 0,
+        "offset": 0,
+        "bytes": 44,
+        "sha256": "71c892e89d2bebd96589a3e8faf85007b0282506c6ce669cd5ac19c41dcf32a8"
+      },
+      {
+        "start": 12900878745,
+        "compressedBytes": 253133,
+        "restart": "stored",
+        "skip": 252313,
+        "offset": 12349643,
+        "bytes": 4735,
+        "sha256": "b39be96c5a6f568e093feaa3eed9eaac56adbb8efe5b70e305417902fbb349e2"
+      }
+    ],
+    "Data/enUS/patch-enUS.MPQ": [
+      {
+        "start": 12901131980,
+        "compressedBytes": 99,
+        "restart": "entry",
+        "skip": 0,
+        "offset": 0,
+        "bytes": 44,
+        "sha256": "13d4b20fb509229cec66eca00d37a65ea1b9f9694cdac215561cad31285690a7"
+      },
+      {
+        "start": 13195034128,
+        "compressedBytes": 1758546,
+        "restart": "stored",
+        "skip": 1397559,
+        "offset": 296254659,
+        "bytes": 361421,
+        "sha256": "c5132cffb3c97734b1e55060367a1a5e680743d732dec62f467b0b6914a1bd62"
+      }
+    ],
+    "Data/enUS/patch-enUS-3.MPQ": [
+      {
+        "start": 13196792778,
+        "compressedBytes": 128,
+        "restart": "entry",
+        "skip": 0,
+        "offset": 0,
+        "bytes": 44,
+        "sha256": "377bd7c08c2d14abe7b9a5649f1e97f52c0bfd45bec29932613346960ac35d0e"
+      },
+      {
+        "start": 13296160887,
+        "compressedBytes": 441016,
+        "restart": "stored",
+        "skip": 367603,
+        "offset": 100299555,
+        "bytes": 74380,
+        "sha256": "289dd202dbee94532ed73917a782e4f5244dfe7cfd423723ea861bd7dec080bd"
+      }
+    ],
+    "Data/enUS/patch-enUS-2.MPQ": [
+      {
+        "start": 13296602221,
+        "compressedBytes": 118,
+        "restart": "entry",
+        "skip": 0,
+        "offset": 0,
+        "bytes": 44,
+        "sha256": "c5c3a1e6741521a4f6947b932d143f9f850d3b2afc1114d03ecfe63156b03206"
+      },
+      {
+        "start": 13520287076,
+        "compressedBytes": 1238833,
+        "restart": "stored",
+        "skip": 1079236,
+        "offset": 225403570,
+        "bytes": 166601,
+        "sha256": "8540a332eb98d5a0d27622e9f3cb32f9ba8d148f43413a4000668a80c370d415"
+      }
+    ],
+    "Data/enUS/speech-enUS.MPQ": [
+      {
+        "start": 13716738423,
+        "compressedBytes": 102,
+        "restart": "entry",
+        "skip": 0,
+        "offset": 0,
+        "bytes": 44,
+        "sha256": "2c734c3b5ef31bfd2ef57a023e0cd98e4086a0acf1568b0ee740cff09aa69e4c"
+      },
+      {
+        "start": 14150790743,
+        "compressedBytes": 394063,
+        "restart": "stored",
+        "skip": 40790,
+        "offset": 438076460,
+        "bytes": 353979,
+        "sha256": "49918591262c603f68049daeab6ff626c80a45ade6c4315cf532d6274fb517e1"
+      }
+    ],
+    "Data/enUS/locale-enUS.MPQ": [
+      {
+        "start": 14151223526,
+        "compressedBytes": 49,
+        "restart": "entry",
+        "skip": 0,
+        "offset": 0,
+        "bytes": 44,
+        "sha256": "121c0d31d7736f6a8bf2bba390dbde9a1fecbd205a57cd2cf5f35c09607adbdc"
+      },
+      {
+        "start": 14350913499,
+        "compressedBytes": 879652,
+        "restart": "stored",
+        "skip": 161819,
+        "offset": 203560425,
+        "bytes": 730951,
+        "sha256": "ae78fdac07c792b4a4bdb107b8067a4562eaa95c79c35eb89657535ed63c825c"
+      }
+    ],
+    "Data/enUS/expansion-locale-enUS.MPQ": [
+      {
+        "start": 14351793264,
+        "compressedBytes": 105,
+        "restart": "entry",
+        "skip": 0,
+        "offset": 0,
+        "bytes": 44,
+        "sha256": "890b6a0cab578fa91b4c1a916cbb7a102640bb3a73b75861134cf9f385493458"
+      },
+      {
+        "start": 14368984625,
+        "compressedBytes": 119621,
+        "restart": "stored",
+        "skip": 85653,
+        "offset": 17355157,
+        "bytes": 34024,
+        "sha256": "d6a5a0c2e33378a2a009d47a969e70a32c2ed5ac4b64e494d9b36a8fa2d029b5"
+      }
+    ],
+    "Data/expansion.MPQ": [
+      {
+        "start": 14369115643,
+        "compressedBytes": 94,
+        "restart": "entry",
+        "skip": 0,
+        "offset": 0,
+        "bytes": 44,
+        "sha256": "21a4a721429ece5b612035a66ae44a664d1a02fc8021818c19bd1a1a315d2027"
+      },
+      {
+        "start": 16264805387,
+        "compressedBytes": 816014,
+        "restart": "stored",
+        "skip": 45154,
+        "offset": 1920446640,
+        "bytes": 773271,
+        "sha256": "4ada3a37eb4e8925bdf50a89ba570e149c652607a49877076459f2776db52c77"
+      }
+    ],
+    "Data/patch-2.MPQ": [
+      {
+        "start": 16265621495,
+        "compressedBytes": 85,
+        "restart": "entry",
+        "skip": 0,
+        "offset": 0,
+        "bytes": 44,
+        "sha256": "e2f680417a80479e0050d02e0bb1ea72778256ae8fb1b307b3f39d5e25495825"
+      },
+      {
+        "start": 16448910652,
+        "compressedBytes": 1617487,
+        "restart": "stored",
+        "skip": 141316,
+        "offset": 184240179,
+        "bytes": 1505874,
+        "sha256": "9719f5d48c8925cc823249bf6b632fbf32bd5b5a0271181e0ee7084afe16155b"
+      },
+      {
+        "start": 17479523863,
+        "compressedBytes": 1682747,
+        "restart": "stored",
+        "skip": 42201,
+        "offset": 1218985649,
+        "bytes": 1710317,
+        "sha256": "6e389c4f43df0ac356edb5a7d8dc5c866861135337c96faf5078dffb21977a7a"
+      },
+      {
+        "start": 17660246314,
+        "compressedBytes": 806810,
+        "restart": "stored",
+        "skip": 40968,
+        "offset": 1400960939,
+        "bytes": 768120,
+        "sha256": "a9eaf5906e2286e2316a7cd3921fb42d94db98dac648929525009c5f4d653ab8"
+      }
+    ]
+  }
+}

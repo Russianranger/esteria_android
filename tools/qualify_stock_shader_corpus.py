@@ -1,6 +1,7 @@
 """Native CI qualification using the English providers from ChromieCraft's stock ZIP."""
 from concurrent.futures import ThreadPoolExecutor
-from contextlib import redirect_stderr, redirect_stdout
+from contextlib import ExitStack, contextmanager, redirect_stderr, redirect_stdout
+import builtins
 import hashlib
 import http.client
 import importlib
@@ -15,9 +16,11 @@ import struct
 import sys
 import tarfile
 import tempfile
+from threading import Lock
 import time
 import urllib.error
 import urllib.request
+from unittest.mock import patch
 import zlib
 
 from runtime import shader_generation, stock_shader_translate as adapter
@@ -255,24 +258,107 @@ def diagnose(tools, revision, data, capture):
     return failures
 
 
-def qualify(work, report):
+@contextmanager
+def verified_reads(extents, stats):
+    """Reject any read of an MPQ byte absent from the authenticated projection."""
+    if extents is None:
+        yield
+        return
+    spans = {}
+    for path, ranges in extents.items():
+        merged = []
+        for lo, hi in sorted(ranges):
+            require(0 <= lo < hi <= path.stat().st_size, 'invalid authenticated MPQ extent')
+            if merged and lo <= merged[-1][1]:
+                merged[-1] = (merged[-1][0], max(hi, merged[-1][1]))
+            else:
+                merged.append((lo, hi))
+        spans[path.resolve()] = merged
+
+    class CoveredArchive:
+        def __init__(self, stream, bounds):
+            self.stream = stream
+            self.bounds = bounds
+
+        def check(self, size):
+            start = self.stream.tell()
+            require(size >= 0 and any(lo <= start and start + size <= hi for lo, hi in self.bounds),
+                    'production reader accessed unverified MPQ extent')
+            stats['mpqReadCalls'] += 1
+            stats['mpqReadBytes'] += size
+
+        def read(self, size=-1):
+            self.check(size)
+            return self.stream.read(size)
+
+        def readinto(self, buffer):
+            self.check(len(buffer))
+            return self.stream.readinto(buffer)
+
+        def seek(self, *args):
+            return self.stream.seek(*args)
+
+        def close(self):
+            self.stream.close()
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            self.close()
+
+    def guarded(opener):
+        def opened(file, mode='r', *args, **kwargs):
+            if isinstance(file, (str, os.PathLike)) and Path(file).suffix.lower() == '.mpq':
+                path = Path(file).resolve()
+                require(mode == 'rb' and path in spans, 'production reader selected unexpected MPQ')
+                return CoveredArchive(opener(file, mode, *args, **kwargs), spans[path])
+            return opener(file, mode, *args, **kwargs)
+        return opened
+
+    with ExitStack() as stack:
+        for module in (builtins, io):
+            stack.enter_context(patch.object(module, 'open', guarded(module.open)))
+        yield
+
+
+def qualify(work, report, *, complete_client=False):
     rows = json.loads(LOCK.read_bytes())
-    required = sum(row['bytes'] for row in rows) + (3 << 30)
-    require(shutil.disk_usage(work).free >= required, 'insufficient scratch for effective MPQs and compiler')
+    required = (sum(row['bytes'] for row in rows) if complete_client else 512 << 20) + (3 << 30)
+    require(shutil.disk_usage(work).free >= required, 'insufficient scratch for requested corpus and compiler')
     require(platform.machine() == 'aarch64', 'native Linux ARM64 runner required')
     report['phase'] = 'packaged-tools'
     tools, pin = prepare_tools(work)
-    report.update(clientRevision=pin['clientRevision'], toolManifestSha256=pin['toolManifestSha256'])
+    report.update(clientRevision=pin['clientRevision'], toolManifestSha256=pin['toolManifestSha256'],
+                  adapterSha256=hashlib.sha256(Path(adapter.__file__).read_bytes()).hexdigest())
     report['phase'] = 'verified-stock-zip'
+    report['inputScope'] = 'complete-effective-providers' if complete_client else 'verified-shader-extents'
     hashes = torrent_pieces()
     deadline = time.monotonic() + DEADLINE
     client = work / 'client'
-    def materialize(row):
-        path = extract(row, client, hashes, lambda start, end: range_bytes(start, end, deadline))
-        print('Verified', str(path.relative_to(client)), row['bytes'], flush=True)
-        return str(path.relative_to(client))
-    with ThreadPoolExecutor(max_workers=4) as pool:
-        report['verifiedProviders'] = sorted(pool.map(materialize, rows))
+    started = time.monotonic()
+    transfer = dict(rangeRequestsCompleted=0, zipRangeBytes=0)
+    transfer_lock = Lock()
+    report['transfer'] = transfer
+    def fetch(start, end):
+        data = range_bytes(start, end, deadline)
+        with transfer_lock:
+            transfer['rangeRequestsCompleted'] += 1
+            transfer['zipRangeBytes'] += len(data)
+        return data
+    extents = None
+    if complete_client:
+        def materialize(row):
+            path = extract(row, client, hashes, fetch)
+            print('Verified', str(path.relative_to(client)), row['bytes'], flush=True)
+            return str(path.relative_to(client))
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            report['verifiedProviders'] = sorted(pool.map(materialize, rows))
+    else:
+        from tools import stock_shader_ranges
+        extents = stock_shader_ranges.materialize(client, rows, fetch, hashes)
+        report['verifiedProviders'] = sorted(str(path.relative_to(client)) for path in extents)
+    report['inputSeconds'] = round(time.monotonic() - started, 2)
     reader, _ = adapter.stock.load_reader(tools, pin['clientRevision'])
     effective = reader.provider_paths(client / 'Data', 'enUS')
     require(set(effective) == {client / name for name in report['verifiedProviders']},
@@ -281,7 +367,10 @@ def qualify(work, report):
     started = time.monotonic()
     output = work / 'compiled'
     # Raw diagnostics can include disassembly or compiler input. Keep them private.
-    with tempfile.TemporaryFile(mode='w+t', encoding='utf8') as private:
+    read_stats = dict(mpqReadCalls=0, mpqReadBytes=0)
+    if extents is not None:
+        report['authenticatedReads'] = read_stats
+    with verified_reads(extents, read_stats), tempfile.TemporaryFile(mode='w+t', encoding='utf8') as private:
         args = ['--strict', '--client', str(client), '--locale', 'enUS', '--glslang',
                 str(tools / 'bin/glslangValidator'), '--out', str(output)]
         with redirect_stdout(private), redirect_stderr(private):
@@ -300,7 +389,9 @@ def qualify(work, report):
                         capture, re.MULTILINE)
     if summary:
         report.update(zip(('records', 'decodable', 'distinct', 'selected'), map(int, summary.groups())))
-    if shutil.disk_usage(work).free < (3 << 30):
+    if not complete_client:
+        report['clientCapture'] = dict(phase='shader-extents-only', titleQualified=False)
+    elif shutil.disk_usage(work).free < (3 << 30):
         report['clientCapture'] = dict(phase='insufficient-title-scratch', titleQualified=False)
     else:
         report['clientCapture'] = qualify_stock_client_title.capture(work, client, output, pin['clientRevision'])
@@ -314,7 +405,7 @@ def main():
                   officialTorrentSha256=TORRENT_HASH, passed=False, phase='disk-admission')
     try:
         with tempfile.TemporaryDirectory(dir=os.environ['RUNNER_TEMP']) as tmp:
-            qualify(Path(tmp), report)
+            qualify(Path(tmp), report, complete_client=os.environ.get('COMPLETE_CLIENT') == 'true')
     except Exception as error:
         report['error'] = str(error) if isinstance(error, Invalid) else type(error).__name__
         if isinstance(error, urllib.error.HTTPError):

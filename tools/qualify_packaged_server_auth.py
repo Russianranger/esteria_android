@@ -72,6 +72,7 @@ def stage(output, apk, readback):
                     local.endswith(('.py', '.sql')) or local.startswith('server/') and local.endswith('.json')):
                 require((ROOT / 'runtime' / local).read_bytes() == signed.read(member), 'APK helper differs: ' + local)
     (output / 'bindings.json').write_text(json.dumps(bindings))
+    return apk
 
 
 def selections(package):
@@ -118,7 +119,7 @@ def protocol_probe(state, mysql, version, program, expected, configuration):
         child.stop()
 
 
-def run(package, work, evidence):
+def run(package, work, evidence, world_probe=None):
     require(platform.machine().lower() in ('aarch64', 'arm64'), 'native Linux ARM64 required')
     require(not any(work.iterdir()), 'an empty disposable state directory is required')
     os.umask(0o077)
@@ -126,7 +127,12 @@ def run(package, work, evidence):
     proof = dict(scope='packaged-stock-server-database-and-standalone-auth', environment='Linux ARM64',
                  worldserverExecuted=False, reconstructedClientExecuted=False, gameplayQualified=False,
                  stages=[], **document(package / 'bindings.json'))
+    if world_probe is not None:
+        proof['scope'] = 'packaged-stock-native-world-session'
+        del proof['worldserverExecuted']
     def record(stage, **details):
+        if stage == 'real-worldserver-ready-and-cleanly-stopped':
+            proof['worldserverExecuted'] = True
         proof['stages'].append(dict(stage=stage, elapsedSeconds=round(time.monotonic()-started, 3), **details))
         db.atomic_json(evidence, proof)
     state = work / 'state'
@@ -143,7 +149,7 @@ def run(package, work, evidence):
     try:
         owned.wait_ready(uuid)
         record('authenticated-database', version=version, uuid=uuid)
-        for phase, selection in phases:
+        def install_phase(phase, selection):
             operation = secrets.token_hex(16)
             directory = work / operation
             directory.mkdir(mode=0o700)
@@ -151,9 +157,11 @@ def run(package, work, evidence):
             receipt = directory / 'content-receipt.json'
             shutil.copyfile(package / 'content-receipt.json', receipt)
             record('enter-' + phase)
-            result = installation.run(state, directory, package / 'server-content', receipt, package / 'server-programs',
+            return installation.run(state, directory, package / 'server-content', receipt, package / 'server-programs',
                                       owned.session, mysql, Path('/esteria-data'), package / 'local-server.json',
                                       version, operation, owned.operation, uuid, phase=phase)
+        for phase, selection in phases:
+            result = install_phase(phase, selection)
         require(result['fourSchemasVerified'] and result['playerbotsSchemaVerified'] and result['mysqlUuid'] == uuid,
                 'four source-bound schemas required before auth probe')
         record('four-schemas-verified')
@@ -161,7 +169,16 @@ def run(package, work, evidence):
             protocol_probe(state, mysql, version, package / 'server-programs/bin/authserver', expected_auth,
                            state / 'config/generations' / result['configGeneration'])
         record('auth-srp-12340-loopback-session-key-verified', authserverSha256=expected_auth['sha256'])
+        repeated = install_phase(*phases[-1])
+        require(repeated['fourSchemasVerified'] and not repeated['compiledPlayerbotsLoaderExecuted']
+                and not repeated['compiledUpdaterExecuted'], 'completed stock schemas must be verified without replay')
         owned.stop(uuid)
+        helper = phases[-1][1]['playerbotsHelper']
+        pins = dict(helperExecutable=helper['executable'], helperBuildReceipt=helper['buildReceipt'],
+                    helperNativeReceipt=helper['nativeReceipt'])
+        sql.complete_sql_receipt(state, owned.session, document(state / installation.VERIFIED_REPORT),
+                                 pins, version, uuid, owned.operation)
+        record('sql-completion-bound-to-clean-stop')
     finally:
         owned.close()
     require(android_database_setup.setup(state, mysql, mysqld, version)['operation'] == 'already-initialized',
@@ -169,6 +186,9 @@ def run(package, work, evidence):
     reopened = sql.ServiceProcess(state, sessions, mysql, mysqld, version)
     try:
         reopened.wait_ready(uuid)
+        if world_probe is not None:
+            record('enter-world-admission')
+            world_probe(package, state, reopened, version, uuid, record)
         reopened.stop(uuid)
     finally:
         reopened.close()

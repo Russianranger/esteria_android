@@ -1,0 +1,83 @@
+name: Qualify the stock native worldserver
+on:
+  workflow_dispatch:
+  push:
+    branches: [non-custom]
+permissions:
+  contents: read
+jobs:
+  world:
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/non-custom' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[qualify stock world]'))
+    concurrency:
+      group: native-stock-world-${{ github.sha }}
+      cancel-in-progress: false
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 355
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Admit private disk and the signed APK component selection
+        run: |
+          set -eu
+          umask 077
+          test "$(uname -m)" = aarch64
+          stage=$(mktemp -d "$RUNNER_TEMP/stock-world-XXXXXXXX")
+          echo "WORLD_QA=$stage" >> "$GITHUB_ENV"
+          mkdir "$stage/derived" "$stage/state" "$stage/evidence"
+          if [ "$(df --output=avail -B1 "$stage" | tail -1)" -lt 42000000000 ]; then
+            sudo rm -rf /usr/local/lib/android/sdk /usr/share/dotnet /opt/ghc
+          fi
+          df -B1 "$stage"
+          python3 -m tools.qualify_stock_world package --output "$stage/package"
+          docker import --platform linux/arm64 "$stage/package/server-runtime.tar.gz" esteria-world:packaged
+      - name: Verify the official complete ZIP and run the actual build-12340 Java importer
+        run: |
+          python3 -m tools.qualify_stock_world import --work "$WORLD_QA/import" --evidence "$WORLD_QA/evidence/import.json" \
+            2>"$WORLD_QA/import-private.log"
+      - name: Generate all stock DBC, map, camera, VMap and MMap data without network access
+        run: |
+          docker run --rm --init --network none --read-only --tmpfs /tmp:rw,nosuid,nodev,size=64m \
+            --env PYTHONDONTWRITEBYTECODE=1 \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
+            --mount "type=bind,src=$WORLD_QA/package,dst=/package,readonly" \
+            --mount "type=bind,src=$WORLD_QA/import/game,dst=/game,readonly" \
+            --mount "type=bind,src=$WORLD_QA/derived,dst=/derived" \
+            --mount "type=bind,src=$WORLD_QA/evidence,dst=/evidence" \
+            --workdir /qualification esteria-world:packaged python3 -m tools.qualify_stock_world generate \
+            >"$WORLD_QA/prepare-private.log" 2>&1
+      - name: Reopen a cleanly verified fresh stock database and enter real auth and world readiness
+        run: |
+          generation=$(sudo cat "$WORLD_QA/derived/current")
+          [[ "$generation" =~ ^[0-9a-f]{64}$ ]]
+          docker run --rm --init --network none --read-only --tmpfs /tmp:rw,nosuid,nodev,size=64m \
+            --env PYTHONDONTWRITEBYTECODE=1 \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly" \
+            --mount "type=bind,src=$WORLD_QA/package,dst=/package,readonly" \
+            --mount "type=bind,src=$WORLD_QA/import/game,dst=/game,readonly" \
+            --mount "type=bind,src=$WORLD_QA/derived/generations/$generation,dst=/esteria-data,readonly" \
+            --mount "type=bind,src=$WORLD_QA/state,dst=/work" \
+            --mount "type=bind,src=$WORLD_QA/evidence,dst=/evidence" \
+            --workdir /qualification esteria-world:packaged python3 -m tools.qualify_stock_world world \
+            >"$WORLD_QA/session-private.log" 2>&1
+      - name: Collect scope-limited receipts
+        if: always() && env.WORLD_QA != ''
+        run: |
+          mkdir -p out/world-evidence
+          for name in import generation world; do
+            if sudo test -f "$WORLD_QA/evidence/$name.json"; then
+              sudo install -m 0644 "$WORLD_QA/evidence/$name.json" "out/world-evidence/$name.json"
+            fi
+          done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always() && env.WORLD_QA != ''
+        with:
+          name: stock-world-${{ github.sha }}
+          path: out/world-evidence/*.json
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Remove the private runner fixture
+        if: always() && env.WORLD_QA != ''
+        run: |
+          [[ "$WORLD_QA" == "$RUNNER_TEMP"/stock-world-???????? ]]
+          sudo rm -rf -- "$WORLD_QA"

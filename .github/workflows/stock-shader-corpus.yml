@@ -1,18 +1,25 @@
 name: Qualify stock ChromieCraft shaders
 on:
   workflow_dispatch:
+    inputs:
+      complete_client:
+        description: Download full providers for the separate native Wine client attempt
+        type: boolean
+        default: false
   push:
     branches: [non-custom]
 permissions:
   contents: read
-concurrency:
-  group: stock-shader-corpus
-  cancel-in-progress: false
 jobs:
   translate:
-    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/non-custom' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[qualify stock shaders]'))
+    concurrency:
+      group: stock-shader-corpus-${{ github.sha }}
+      cancel-in-progress: false
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/non-custom' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[qualify stock shaders]') || contains(github.event.head_commit.message, '[qualify stock client]'))
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 120
+    env:
+      COMPLETE_CLIENT: ${{ (inputs.complete_client == true || contains(github.event.head_commit.message, '[qualify stock client]')) && 'true' || 'false' }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -22,7 +29,7 @@ jobs:
           test "$(uname -m)" = aarch64
           python3 -m unittest -v tests.test_stock_shader_corpus
           # Hosted runner only. Reserve 17.1 GB for MPQs plus the shader outputs and isolated Wine client.
-          if [ "$(df --output=avail -B1 "$RUNNER_TEMP" | tail -1)" -lt 24000000000 ]; then
+          if [ "$COMPLETE_CLIENT" = true ] && [ "$(df --output=avail -B1 "$RUNNER_TEMP" | tail -1)" -lt 24000000000 ]; then
             sudo rm -rf /usr/local/lib/android/sdk /usr/share/dotnet /opt/ghc
           fi
           PYTHONDONTWRITEBYTECODE=1 python3 -m tools.qualify_stock_shader_corpus

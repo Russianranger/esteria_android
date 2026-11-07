@@ -76,6 +76,31 @@ class StockShaderCorpus(unittest.TestCase):
             with self.subTest(patch=patch), TemporaryDirectory() as temp, self.assertRaises(corpus.Invalid):
                 self.extract(Path(temp), dict(self.row, **patch))
 
+    def test_guarded_sparse_reads_refuse_holes_aliases_and_writes(self):
+        with TemporaryDirectory() as tmp:
+            path = Path(tmp) / 'patch.MPQ'
+            path.write_bytes(b'AB' + bytes(8) + b'CD')
+            other = Path(tmp) / 'other.MPQ'
+            stats = dict(mpqReadCalls=0, mpqReadBytes=0)
+            with corpus.verified_reads({path: [(0, 1), (1, 2), (10, 12)]}, stats):
+                with path.open('rb') as stream:
+                    self.assertEqual(stream.read(2), b'AB')
+                    with self.assertRaisesRegex(corpus.Invalid, 'unverified MPQ extent'):
+                        stream.read(1)
+                    stream.seek(10)
+                    copied = bytearray(2)
+                    self.assertEqual(stream.readinto(copied), 2)
+                    self.assertEqual(copied, b'CD')
+                    stream.seek(0)
+                    with self.assertRaisesRegex(corpus.Invalid, 'unverified MPQ extent'):
+                        stream.readinto(bytearray(12))
+                with self.assertRaisesRegex(corpus.Invalid, 'unexpected MPQ'):
+                    open(other, 'rb')
+                with self.assertRaisesRegex(corpus.Invalid, 'unexpected MPQ'):
+                    open(path, 'wb')
+            self.assertEqual(stats, dict(mpqReadCalls=2, mpqReadBytes=4))
+            self.assertEqual(path.stat().st_size, 12)
+
     def test_pinned_effective_english_members(self):
         rows = json.loads(corpus.LOCK.read_bytes())
         self.assertEqual(len({r['path'] for r in rows}), 16)
