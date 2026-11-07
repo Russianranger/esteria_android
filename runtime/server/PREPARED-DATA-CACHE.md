@@ -48,6 +48,12 @@ results do not qualify Android ARM64, Android's Java filesystem provider, PRoot
 aliases or the Thor. Production remains on full byte verification until the
 platform and owner integration gates are met.
 
+## Android 13 ARM64 measurements
+
+The signed app’s Java publisher passed seven groups and the packaged PRoot passed 15 Python cache tests on disposable Redroid ext4. Three fresh ART processes independently verified the complete shader output. Killing a publisher during a 96 MiB replacement preserved the prior anchor and a fresh process successfully published the replacement. The interrupted process left an unselected pending directory.
+
+Java and PRoot observed the same inode through both guest aliases. Android’s Java filesystem view reported the app UID and whole-second timestamps. PRoot’s root mapping reported UID 0 and nanosecond timestamps. The current code cannot equate those two tuples. Production still uses full verification. Target-device metadata behavior, writer exclusion in the full session and fail-closed production integration remain open. [Measured Android and PRoot results](../evidence/prepared-data-cache-android13.json).
+
 ## Host evidence
 
 `runtime/evidence/prepared-data-cache-host.json` records the exact modified source

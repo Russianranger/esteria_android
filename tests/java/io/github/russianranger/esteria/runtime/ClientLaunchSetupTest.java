@@ -68,7 +68,18 @@ public final class ClientLaunchSetupTest {
             Path binaries=root.resolve("client");RuntimePackagePlan plan=binaryFixture(binaries);
             check(prepare(root,binaries,plan,null,RuntimeWork.NONE)==null);
             String base=id("base");Path original=imported(root,base,null,Map.of("Data/common.MPQ","synthetic-data-not-a-game-asset",
-                    "Interface/AddOns/Test/main.lua","source-main","Interface/AddOns/Test/remove.lua","source-remove"));
+                    "Interface/AddOns/Test/main.lua","source-main","Interface/AddOns/Test/remove.lua","source-remove",
+                    "Interface/AddOns/Blizzard_TradeSkillUI/Blizzard_TradeSkillUI.pub","fixture-public-key"));
+            try(ClientLaunchSetup.Lease lease=ClientLaunchSetup.claim(root)) {
+                ClientLaunchSetup.Prepared stock=ClientLaunchSetup.prepareStockStoredUnderOwnedLease(
+                        root,binaries,plan,lease,RuntimeWork.NONE,RuntimeWork.NEVER_CANCELLED);
+                check(!Files.exists(stock.view.directory.resolve("Interface"),LinkOption.NOFOLLOW_LINKS));
+                check(Files.readString(original.resolve("Interface/AddOns/Test/main.lua")).equals("source-main"));
+                check(stock.plan.arguments().contains("-vulkan"));
+                ClientLaunchSetup.Prepared warm=ClientLaunchSetup.prepareStockStoredUnderOwnedLease(
+                        root,binaries,plan,lease,RuntimeWork.NONE,RuntimeWork.NEVER_CANCELLED);
+                check(warm.view.alreadyPrepared&&warm.view.generation.equals(stock.view.generation));
+            }
             ClientLaunchSetup.Prepared first=prepare(root,binaries,plan,null,RuntimeWork.NONE);
             check(first.plan.deferredLooseTrees.isEmpty());first.plan.arguments();
             ClientUiStore store=new ClientUiStore(first.work);Path initial=store.current(RuntimeWork.NEVER_CANCELLED);

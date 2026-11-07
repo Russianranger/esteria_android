@@ -1,0 +1,103 @@
+{
+  "formatVersion": 1,
+  "scope": "Android 13 ARM64 prepared data cache component qualification",
+  "productionFastPathEnabled": false,
+  "environment": {
+    "platform": "Offline Debian 12 ARM64 kernel 6.1.0-54-arm64 guest under QEMU TCG",
+    "androidImage": "Redroid Android 13 ARM64",
+    "androidImageManifestSha256": "c815ac1b1d5bd0a099b74c3e3e0eeea3b32bed8d7ab1f788c20fb74e35891716",
+    "androidFingerprint": "redroid/redroid_arm64_only/redroid_arm64_only:13/TQ3A.230805.001.S1/eng.frank.20240527.134411:userdebug/test-keys",
+    "sdk": 33,
+    "storage": "App-private ext4 in the guest",
+    "selinux": "disabled in disposable emulator",
+    "apkRevision": "6b37bfe4b75bf298fe765ec9667e92e739c4e53e",
+    "apkSha256": "fdeac1008d4fbac4d0b3e9b16d0106b877cf92541705f2e7a45ce16c454f4c32",
+    "physicalThor": false
+  },
+  "codeSha256": {
+    "pythonImplementation": "3acf84f793c76b0fcd48a745420785ee5497f7cda2fa18fded5542775e04c8d7",
+    "javaPublisher": "f9bcbdf96a3439c53a16c238e3927a7aec43bae85ee401d592b6a288ec5a8b56",
+    "pythonTests": "b922ec9f9f23e5b0926b7ef4c3336a2753af6c54008c818db22d9a80f90985c1",
+    "javaTests": "d97b4bbcde6d194140d133cb4ea8caf12d46761bf44d46356129c12e4268ca2c"
+  },
+  "proot": {
+    "tracerSha256": "46dcafabc77b386a7127f6cb7c71bdac03c372ff6bb4db0e1e9493ee29332adb",
+    "loaderSha256": "614591192bb34c98cc6cef528fb74ecfc1c97d0fabf4e352df1f16873c71d447",
+    "pythonSha256": "2ceb9199570aaf34a254b9ea88b1d77f38530833e2a12688d002a59c905b51b2",
+    "execution": "Installed v14 native libraries as Android app UID 10077, PROOT_NO_SECCOMP=1, --kill-on-exit --sysvipc -0, separate work/tmp and two guest names bound to one app-owned directory",
+    "testModule": "tests.test_prepared_data_cache",
+    "syntheticServerData": true,
+    "run": 15,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "elapsedSeconds": 901.261,
+    "runner": "Python unittest completed with OK and explicit result counts. The outer 720-second emulator watchdog was paused while the suite made progress and reported 124 after completion."
+  },
+  "androidJava": {
+    "execution": "ARM64 Android ART, signed v14 PreparedDataCachePin, ext4 private directories, 32 MiB Java heap, separate QA driver launched by emulator root",
+    "testClass": "PreparedDataCachePinTests",
+    "groupsPassed": 7,
+    "fixtureAdaptation": "Android API 33 lacks Files.writeString. The initial fixture stopped at this call. A test-only copy used Files.write with the same ASCII bytes at the two mutation sites."
+  },
+  "sameFile": {
+    "pythonStatForBothGuestAliases": {
+      "ctimeNs": 1794091096840000000,
+      "dev": 65040,
+      "gid": 20077,
+      "ino": 526120,
+      "mode": 33188,
+      "mtimeNs": 1794091096840000000,
+      "nlink": 1,
+      "size": 15,
+      "uid": 0
+    },
+    "androidJavaFilesUnixAttributes": {
+      "dev": 65040,
+      "ino": 526120,
+      "mode": 33188,
+      "uid": 10077,
+      "gid": 20077,
+      "nlink": 1,
+      "size": 15,
+      "mtimeNs": 1794091096000000000,
+      "ctimeNs": 1794091096000000000
+    },
+    "matchingFields": [
+      "dev",
+      "ino",
+      "mode",
+      "gid",
+      "nlink",
+      "size"
+    ],
+    "observations": [
+      "PRoot -0 reports the effective application owner as UID 0. Android Files reports UID 10077.",
+      "The guest exposes subsecond mtime and ctime. The Android 13 Java unix attribute view exposed whole seconds for the same file."
+    ]
+  },
+  "pending": [
+    "Production selection and continuous ownership across competing writers",
+    "Application capability qualification and fail-closed fallback on the target filesystem",
+    "Retained physical Thor generation and audit"
+  ],
+  "abruptAndroidPublication": {
+    "environment": "Same signed v14 PreparedDataCachePin class, five fresh Android ART processes executed as actual application UID 10077, app-owned ext4 fixture, -Xmx32m",
+    "priorAnchor": {
+      "bytes": 21,
+      "sha256": "0a547322c9df7cd70770a59e03f7dca91c9a40bf6d88e10a8b84c434eceb37d6"
+    },
+    "replacement": {
+      "bytes": 100663296,
+      "sha256": "425382d5857f04fc49585cabbdef6fc647472ee26f52c54caaaeaad17320b3f8"
+    },
+    "signal": "SIGKILL",
+    "signalAtObservedStagedBytes": 196608,
+    "writerExitSignal": 9,
+    "firstRestartReadPriorAnchor": true,
+    "secondRestartReplacedAnchor": true,
+    "thirdRestartReadReplacement": true,
+    "oldProofStillIntact": true,
+    "unpublishedPartialDirectoriesRemaining": 1
+  }
+}

@@ -101,5 +101,122 @@
     "clientArchiveSha256": "5997af5a94a1151e708cf80fa9931e4055a887598e01c9cf21e6b3af0d438759",
     "guestBridgesArchiveSha256": "7e0356f14bf3654a0e1ecc903726bd479fea0c761c8a4e8a4356e2e476726a55",
     "turnipArchiveSha256": "445c38ddf7e66f65ee90aa7fd2006db88d6fecd72c8567d801f2ee4c4000a772"
+  },
+  "correctedClientRun": {
+    "originalWindowsBuildRun": "42421007418.1",
+    "originalWindowsBuildArchiveSha256": "109fa36f9151bef89fe1c87423181218a70651230b4996b05047ef6d2b4ca192",
+    "executableRevision": "807c4384ef28f4da51d3c50eec5082627cad36ea",
+    "executableSha256": "d2a1b74a3353f2682dcc3bc2b09f649f3b5bf53b55e6f74ccb43071c9aa4b634",
+    "codecSha256": "b4c774430942d709ca7e3f03a1890d6aec7aaa2e432bee0e698e57027a70d006",
+    "preparedClientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+    "shaderManifestSha256": "aadc092990d67c969a683ce4d1284e55a3dd24bb4a5ceebddd639296d37494d6",
+    "lifecycle": "--local-offline -vulkan -datadir, no local-login or service credentials",
+    "archiveFilesAccessedBySelectedPE": 16,
+    "unavailableArchiveReads": 0,
+    "content": {
+      "clientDbStores": 236,
+      "stockUiVertexBlsOpened": true,
+      "stockUiPixelBlsOpened": true,
+      "northrendSkinSections": 61,
+      "northrendSkinBatches": 64,
+      "clientInitialized": true
+    },
+    "shaderManifestRecords": 1580,
+    "externalSpirvModuleAccessesObserved": 0,
+    "frontEnd": {
+      "firstFramePresented": true,
+      "defaultSwapchain": [
+        1024,
+        768
+      ],
+      "bridgeDimensions": [
+        1280,
+        720
+      ],
+      "windowTitle": "World of Warcraft",
+      "windowClass": "wowclient64.exe",
+      "windowXid": "0xe00005",
+      "pePid": 1139,
+      "peStartTicks": 468391,
+      "frame": 18,
+      "frameSampleColors": 4174,
+      "privateFrameBgrxSha256": "b250478e5d5e9ea6056c0db4a57deecab62e86e2f2cf57067593d0afb7304e6b",
+      "privateFramePngSha256": "fec26d1cb3680db7d7ae031e6a2e6a9e5eaecc90f74756891e73c6f25d0c2410",
+      "visualObservation": "Stock Northrend animated front-end background and End User License Agreement dialog with both buttons. No selection made."
+    },
+    "explicitClose": {
+      "method": "WM_DELETE_WINDOW sent to the selected PE window",
+      "wineExit": 0,
+      "clientDatabaseShutdownStores": 236,
+      "clientOnShutdown": true,
+      "extensionsUnloaded": true,
+      "textureImagesCreated": 219,
+      "textureImagesDestroyed": 219,
+      "validationErrors": {
+        "VUID-vkDestroyDevice-device-00378": 51
+      },
+      "remainingDeviceObjects": {
+        "VK_OBJECT_TYPE_BUFFER": 51
+      }
+    },
+    "compressedClearValidationErrors": 0,
+    "rawLogDigests": {
+      "clientStderr": "9c5e31a63416e32bf00b3a36fde94456dc619f9bbc2f20d80a3031829747d94e",
+      "vulkan": "ba39f3b1bd1447496fe314fe694ba989c76740c6ad407db1768dc0dd58f6fe60",
+      "extensions": "bfe8b3e7c54c0ad22481c241158378704be0c32f59cdccc4877a475d976bc04f"
+    },
+    "stockFirstFrontEndFrameVisuallyConfirmed": true,
+    "credentialEntryScreenObserved": false,
+    "loginQualified": false,
+    "androidOrThorGraphicsQualified": false,
+    "gameplayQualified": false
+  },
+  "correctedClientColdGuestRestart": {
+    "sameMutablePrefixAndConfiguration": true,
+    "networkDevice": false,
+    "sameImmutableSelectedInputs": true,
+    "extractionRuns": 0,
+    "runtimeDownloads": 0,
+    "clientRecopies": 0,
+    "configurationBeforeAndAfterSha256": "3a42fc073b544dfa98b4b880990cd26229bda144ea6fd71033d369ad0052db07",
+    "kernelModuleTrace": {
+      "driverSha256": "ce6f6917dd22ed612ae8649a9eb9c615a973a2e9eb9a58b8cc8655f22c933c6b",
+      "function": "vk_common_CreateShaderModule",
+      "elfOffset": "0xc69c0",
+      "spirvMagic": "0x07230203",
+      "successfulModuleCreations": 27,
+      "failedModuleCreations": 0,
+      "builtInPipelineAndPresentationModules": 10,
+      "externalShaderFilesReadBySelectedPE": 17,
+      "externalVertexModules": 9,
+      "externalPixelModules": 8,
+      "externalModuleBytes": 102224,
+      "externalReadOrderMatchesSubmittedSizes": true,
+      "method": "Read-only FUSE recorded PE PID 411 and each original generated module path. Native ARM64 kernel entry/return probes on the exact driver observed the matching ordered full code sizes and VK_SUCCESS.",
+      "readLogSha256": "869e76155cfd9c918c98928710336923933679dfbaf18d4347bdcf68b4ab8cfb",
+      "driverTraceSha256": "5a297925ef1381081dd472b647f7740c12bd9ca1448ae036e8f9df76708f2eec"
+    },
+    "frame": {
+      "pePid": 411,
+      "peStartTicks": 14057,
+      "windowXid": "0x1200005",
+      "ordinal": 15,
+      "sampleColors": 4156,
+      "privateBgrxSha256": "357a28e49a7144fcc3dd30786e7628debefb0e7959efecb6604f9e2fe8f6fbeb",
+      "privatePngSha256": "47e16f1bc78abf64dd96c4449b7a0d718ea2a85c39f1896c559c8cefe3a273d1",
+      "visualObservation": "Northrend background and first-run agreement displayed again. Buttons untouched; the private MPQ-only view omitted the loose agreement body."
+    },
+    "shutdown": {
+      "wineExit": 0,
+      "clientDbStoresReleased": 236,
+      "onShutdown": true,
+      "extensionsUnloaded": true,
+      "validationErrors": {
+        "VUID-vkDestroyDevice-device-00378": 20
+      },
+      "remainingDeviceObjectType": "VK_OBJECT_TYPE_BUFFER"
+    },
+    "androidOrThorQualified": false,
+    "gameplayOrCharacterPersistenceQualified": false
   }
 }

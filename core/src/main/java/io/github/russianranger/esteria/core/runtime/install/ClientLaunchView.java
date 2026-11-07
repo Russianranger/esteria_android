@@ -39,6 +39,16 @@ public final class ClientLaunchView {
             this(clientRoot,client,importedRoot,importedGeneration,null);
         }
         public Plan(Path clientRoot, RuntimePackagePlan client, Path importedRoot, String importedGeneration,ClientUiStore.Selection ui) throws IOException {
+            this(clientRoot,client,importedRoot,importedGeneration,ui,false);
+        }
+        /** The stock client finds signed UI in its MPQs. A loose Interface directory
+         * may remain in the immutable import without entering the launch view. */
+        public static Plan stock(Path clientRoot, RuntimePackagePlan client, Path importedRoot,
+                                 String importedGeneration) throws IOException {
+            return new Plan(clientRoot,client,importedRoot,importedGeneration,null,true);
+        }
+        private Plan(Path clientRoot, RuntimePackagePlan client, Path importedRoot, String importedGeneration,
+                     ClientUiStore.Selection ui, boolean stockArchiveUi) throws IOException {
             this.ui=ui;
             this.clientRoot=existingDirectory(clientRoot);this.importedRoot=existingDirectory(importedRoot);
             RuntimeFiles.require(client.packageId.equals("client-arm64"),"Expected reconstructed ARM64 client provider");
@@ -61,7 +71,8 @@ public final class ClientLaunchView {
             }
             List<String> deferred=new ArrayList<>();
             if(rootEntries.containsKey("interface")) {
-                existingDirectory(rootEntries.get("interface"));if(ui==null)deferred.add("Interface");
+                existingDirectory(rootEntries.get("interface"));
+                if(ui==null && !stockArchiveUi)deferred.add("Interface");
             }
             deferredLooseTrees=Collections.unmodifiableList(new ArrayList<>(deferred));
             Set<String> folded=new HashSet<>();final int[] count={0};

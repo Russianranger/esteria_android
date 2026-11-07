@@ -124,7 +124,11 @@ for line in sys.stdin:
     def test_actual_auth_probe_sends_build12340_challenge_without_proof_or_credentials(self):
         child = self.child('authserver', '''import signal,socket,struct,time
 from pathlib import Path
-signal.signal(signal.SIGTERM,lambda *_:exit(0))
+stopping=False
+def stop(*_):
+ global stopping
+ stopping=True
+signal.signal(signal.SIGTERM,stop)
 s=socket.socket();s.bind(('127.0.0.1',0));s.listen()
 Path('port.tmp').write_text(str(s.getsockname()[1]));Path('port.tmp').replace('port')
 c,_=s.accept()
@@ -140,8 +144,8 @@ with c:
  open('challenge-bytes','wb').write(packet)
  c.sendall(b'\\x00\\x00\\x04')
  assert c.recv(1)==b''
- open('no-proof','w').write('TEST_ONLY')
-while True:time.sleep(.05)
+ Path('no-proof.tmp').write_text('TEST_ONLY');Path('no-proof.tmp').replace('no-proof')
+while not stopping:time.sleep(.01)
 ''').start()
         self.await_file('port');self.assertTrue(process.auth_challenge(int((self.root/'port').read_text())))
         self.await_file('no-proof');self.assertEqual((self.root/'challenge-bytes').stat().st_size,50)

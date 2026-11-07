@@ -149,7 +149,7 @@ public final class ClientLaunchSetup {
         GameDataImporter importer=new GameDataImporter(root.resolve("game"));Path data=importer.resolveCurrent();
         if(data==null)return null;
         String generation=data.getParent().getFileName().toString();
-        ClientLaunchView.Plan plan=new ClientLaunchView.Plan(binaries,client,data,generation,null);
+        ClientLaunchView.Plan plan=ClientLaunchView.Plan.stock(binaries,client,data,generation);
         plan.requireSupportedLooseContent();
         ClientLaunchView.Result view=new ClientLaunchView(lease.work).prepare(plan,progress,stop);
         if(!data.equals(importer.resolveCurrent()))throw new IOException("Stock import changed while preparing the client view");

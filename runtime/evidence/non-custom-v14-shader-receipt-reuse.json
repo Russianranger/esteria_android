@@ -112,8 +112,12 @@
       "shaderReceiptSha256": "5b3cae6214e919eda3421dcdea915122dfb679dc5e966d1cc68252f20b0464a7",
       "files": 4742,
       "sessionAdmissionBytes": 102136874,
-      "elapsedMs": 57310,
-      "source": "ARM64 glslang outputs reused after fresh GLSL byte comparisons; signed v14 APK ShaderSetup executed inside Android 13 app_process64"
+      "source": "ARM64 glslang outputs reused after fresh GLSL byte comparisons; signed v14 APK ShaderSetup executed inside Android 13 app_process64",
+      "freshProcessElapsedMs": [
+        57310,
+        57792,
+        54842
+      ]
     }
   },
   "verifiedReplayedCorpusJavaAdmission": {

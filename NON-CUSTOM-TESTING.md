@@ -2,7 +2,7 @@
 
 Install the signed ARM64 APK over the existing **Esteria Stock** app. Keep the existing import, locale (**enUS** for the reported device) and **Balanced** preparation speed.
 
-1. Tap **Repair local component → Client runtime** to install the repaired reconstructed Windows ARM64 executable. This update initializes compressed textures that the client loads on its first frame.
+1. Tap **Repair local component → Client runtime** to install the repaired reconstructed Windows ARM64 executable. This installs the corrected client and prepares its stock launch view. You can leave the original `Interface/AddOns` directory in place.
 2. If shaders have never completed on this import, tap **Repair local component → Shaders**. This selects the current stock terrain shaders and this operation checks all 32 modern terrain variants. An already completed compatible shader generation can be used on **Start local game**.
 3. Tap **Start local game**. If the launcher identifies **Database setup**, use **Repair local component → Database setup**, then start again. The existing import, prepared world, matching shaders, database and configuration remain selectable.
 
