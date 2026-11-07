@@ -1,4 +1,4 @@
-name: Android 13 x64 guest stat alias and mutation qualification
+name: Android 13 x64 guest and Java filesystem metadata qualification
 on:
   workflow_dispatch:
   push:
