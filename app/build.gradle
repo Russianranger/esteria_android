@@ -1,13 +1,19 @@
 plugins { id 'com.android.application' }
 def sourceLock = new groovy.json.JsonSlurper().parse(rootProject.file('sources.lock.json'))
 def clientRevision = sourceLock.sources.client.commit
-def selectedVersionCode = providers.gradleProperty('buildVersionCode').getOrElse('14').toInteger()
+def selectedVersionCode = providers.gradleProperty('buildVersionCode').getOrElse('15').toInteger()
 def serverRevision = sourceLock.sources.server.commit
 def prootProvider = providers.gradleProperty('prootProviderDir').orNull
 def serverProvider = providers.gradleProperty('serverRuntimeProviderDir').orNull
 def clientProvider = providers.gradleProperty('clientRuntimeProviderDir').orNull
 def clientArtifact = providers.gradleProperty('clientRuntimeArtifact').orNull
 def clientSource = providers.gradleProperty('clientRuntimeSource').orNull
+def rendererCohort = providers.gradleProperty('stockRendererCohortDir').orElse(providers.environmentVariable('STOCK_RENDERER_COHORT_DIR')).orNull
+def rendererSourcePackage = providers.gradleProperty('stockRendererSourcePackage').orElse(providers.environmentVariable('STOCK_RENDERER_SOURCE_PACKAGE')).orNull
+def rendererContract = rootProject.file('runtime/client/renderer-compatibility.json')
+if ((rendererCohort || rendererSourcePackage) && !(rendererCohort && rendererSourcePackage && clientProvider && rendererContract.isFile()))
+    throw new GradleException('Stock renderer requires its measured contract, client provider, source companion and original provider receipts')
+def rendererContractHash = rendererCohort ? java.security.MessageDigest.getInstance('SHA-256').digest(rendererContract.bytes).encodeHex().toString() : ''
 if ((clientProvider || clientArtifact || clientSource) && !(clientProvider && clientArtifact && clientSource))
     throw new GradleException('Client provider requires clientRuntimeProviderDir, clientRuntimeArtifact and clientRuntimeSource for exact source/artifact verification')
 def guestBridgeProvider = providers.gradleProperty('guestBridgeProviderDir').orNull
@@ -37,6 +43,7 @@ android {
         buildConfigField 'String', 'CONTENT_PROFILE_LABEL', '"Stock 3.3.5a / non-custom"'
         buildConfigField 'String', 'SOURCE_REVISION', '"' + providers.gradleProperty('sourceRevision').getOrElse('local-uncommitted').replaceAll('[^a-zA-Z0-9._-]', '_') + '"'
         buildConfigField 'String', 'CLIENT_REVISION', '"' + clientRevision + '"'
+        buildConfigField 'String', 'RENDERER_COMPATIBILITY_SHA256', '"' + rendererContractHash + '"'
         buildConfigField 'String', 'SERVER_REVISION', '"' + serverRevision + '"'
         buildConfigField 'boolean', 'PROOT_PACKAGED', prootProvider ? 'true' : 'false'
         buildConfigField 'boolean', 'SERVER_RUNTIME_PACKAGED', serverProvider ? 'true' : 'false'
@@ -165,10 +172,15 @@ if (clientProvider) {
         throw new GradleException('Unsupported selected Wine environment profile')
     def verifyClientRuntime = tasks.register('verifyClientRuntimeProvider', Exec) {
         workingDir rootProject.projectDir
-        def arguments = ['python3', 'tools/provider_client_runtime.py', 'verify',
+        def arguments = rendererCohort ? ['python3', '-m', 'tools.stock_renderer_provider', 'verify',
+            '--cohort-inputs', file(rendererCohort).absolutePath, '--source-package', file(rendererSourcePackage).absolutePath,
+            '--source-lock', 'runtime/client/stock-renderer-sources.lock.json',
+            '--client-input-lock', 'runtime/client/stock-renderer-build.lock.json',
+            '--compatibility', rendererContract.absolutePath] : ['python3', 'tools/provider_client_runtime.py', 'verify']
+        arguments += [
             '--provider', provider.absolutePath, '--artifact', file(clientArtifact).absolutePath,
             '--client-source', file(clientSource).absolutePath]
-        if (!wineEnvironment.isEmpty()) arguments += ['--runtime-lock', selectedRuntimeFile.absolutePath]
+        if (!rendererCohort && !wineEnvironment.isEmpty()) arguments += ['--runtime-lock', selectedRuntimeFile.absolutePath]
         commandLine arguments
     }
     tasks.named('preBuild').configure { dependsOn verifyClientRuntime }

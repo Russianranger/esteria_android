@@ -1,3 +1,13 @@
+# Stock v15 renderer integration
+
+The v13 Thor support export reached a complete world receipt before ten legacy terrain shaders failed translation. The v14 shader selection passed the complete native ARM64 stock corpus. With all 1,580 generated modules present, the real reconstructed client reached its first frame and issued 210 invalid Vulkan compressed-image clears. The software renderer crashed before showing the title. [Reproducer and validation](runtime/evidence/stock-client-bc1-initialization-linux-arm64.json).
+
+The v15 runtime selects corrected client `807c4384ef28f4da51d3c50eec5082627cad36ea` and retains prepared client `471ee42faadf4a97a1d0a86989cf1452621f2dc5`. The six-file client diff affects texture initialization, its test and the build workflow. The executable and provider archive change. The stock world helper, seven server patches, SQL, shader inputs and compiler retain their exact identities. An APK-owned digest binds the measured executable to its reviewed prepared identities. Existing generation `cdf2eec23f3bea5f7036f57c307ae7c91300fd059bcc716ba65b2733bd0b3d7e` stays selectable. [Executable pairing](runtime/client/renderer-compatibility.json) · [GPU readback](runtime/evidence/non-custom-v15-compressed-clear-readback.json).
+
+In the offline Linux ARM64 Wine replay the corrected executable produced the animated Northrend front end and first-run license screen. The first unverified production session stage after auth is worldserver readiness with fully extracted stock data. The physical Thor report ends at v13 shader translation. Login, world entry and saved-character gameplay still require evidence. [Installation and support export](NON-CUSTOM-TESTING.md).
+
+## Historical v14 checkpoint
+
 # Stock v14 terrain shader repair
 
 [Signed stock release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.14) · `0.1.0-non-custom.14` (14) · producer `6b37bfe4b75bf298fe765ec9667e92e739c4e53e` · APK SHA-256 `fdeac1008d4fbac4d0b3e9b16d0106b877cf92541705f2e7a45ce16c454f4c32`. All six public assets matched their staged bytes. The public APK passed v2/v3 verification with the v13 signing certificate. [Build and execution evidence](runtime/evidence/non-custom-v14-release-gates.json).

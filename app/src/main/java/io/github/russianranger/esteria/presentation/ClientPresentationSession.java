@@ -214,8 +214,9 @@ public final class ClientPresentationSession implements AutoCloseable {
             provider.requireWineArchive(prepared.runtime.archiveSha256());
             if(view==null||shaders==null||provider.current()==null||!prepared.work.equals(view.work)||
                     !provider.generation().equals(view.plan.clientGeneration)||!view.plan.generation.equals(view.view.generation)||
-                    !view.plan.importedGeneration.equals(shaders.importGeneration)||!provider.sourceRevision().equals(shaders.clientRevision))
+                    !view.plan.importedGeneration.equals(shaders.importGeneration))
                 throw new IOException("Current matched reconstructed client, view and shaders required");
+            provider.requirePreparedShaders(shaders);
             List<String> command=new ArrayList<>();command.add("/opt/wine/bin/wine");command.add(view.plan.windowsExecutable());
             command.addAll(new ClientLaunchView(view.work).argumentsForLocale(view.plan,shaders.locale,RuntimeWork.NEVER_CANCELLED,io.github.russianranger.esteria.BuildConfig.CONTENT_PROFILE));
             command.addAll(clientModeArguments(provider.localLoginArguments(),view.view.directory,localLogin));

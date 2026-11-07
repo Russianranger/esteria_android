@@ -193,6 +193,33 @@ class StockReleaseBoundary(unittest.TestCase):
             release.stage(self.args)
         self.assertEqual(marker.read_text(), 'preserve')
 
+    def test_renderer_release_records_executable_and_preparation_revisions(self):
+        tree = self.root / 'integration'
+        assets = tree / 'runtime/client'
+        assets.mkdir(parents=True)
+        for name in ('sources.lock.json', 'NON-CUSTOM-TESTING.md'):
+            (tree / name).write_bytes((signing.ROOT / name).read_bytes())
+        base = json.loads((tree / 'sources.lock.json').read_bytes())['sources']['client']['commit']
+        renderer = dict(preparedClientRevision=base, executableRevision='b'*40,
+                        preparedSourceLockSha256=signing.digest(tree/'sources.lock.json'),
+                        executableSha256='3'*64, clientArchiveSha256='4'*64)
+        contract = assets / 'renderer-compatibility.json'
+        contract.write_text(json.dumps(renderer))
+        pin = dict(bytes=contract.stat().st_size, sha256=signing.digest(contract))
+        self.proof.update(rendererSelection=renderer, rendererContract=pin)
+        self.receipt['signedApk'].update(versionCode=15, versionName='0.1.0-non-custom.15')
+        self.write()
+        with patch.object(signing, 'ROOT', tree):
+            result = release.stage(self.args)
+            self.assertEqual(result['clientRevision'], renderer['executableRevision'])
+            self.assertEqual(result['preparedClientRevision'], base)
+            self.assertEqual(result['rendererCompatibilitySha256'], pin['sha256'])
+            self.assertIn('Repair local component → Client runtime', (self.args.output/'RELEASE-NOTES.md').read_text())
+            contract.write_text(json.dumps(dict(renderer, executableSha256='9'*64)))
+            self.args.output = self.root / 'rejected'
+            with self.assertRaisesRegex(ValueError, 'release-renderer-recipe-selection-differs'):
+                release.stage(self.args)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -52,7 +52,7 @@ public final class GameSession {
         if(turnip!=null){turnip.requireWineArchive(setup.wine.archiveSha256());if(turnip.current()==null)throw new IOException("Prepare the selected Turnip provider first");}
         if(client.current()==null||bridges.current()==null||setup.wine.current()==null)
             throw new IOException("Prepare the matching reconstructed client, Wine and presentation providers first");
-        if(!client.sourceRevision().equals(setup.shaders.clientRevision))throw new IOException("Client and prepared shaders use different source revisions");
+        client.requirePreparedShaders(setup.shaders);
         if(OWNERS.containsKey(root))throw new IOException("Previous game session ownership remains retained");
         Leases leases=claim(root);
         try {

@@ -1,0 +1,105 @@
+{
+  "formatVersion": 1,
+  "scope": "stock-client-Vulkan-BC1-initialization-Linux-ARM64-reference",
+  "environment": {
+    "host": "x86_64",
+    "guest": "QEMU TCG Linux 6.1.0-54-arm64, no external NIC",
+    "graphics": "Mesa 22.3.6-1+deb12u2 software Vulkan",
+    "component": "libvulkan_lvp.so",
+    "elfBuildId": "cb892ec40983198d595df409b019ffc42327d37b",
+    "presentation": "Packaged Xtigervnc and esteria-x11-frame at 1280x720"
+  },
+  "clientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "clientSha256": "06557024cfaa974d02482eb98fedc186bc6b323ca730178347e153105343e12a",
+  "providerApkSha256": "9d9809d5e04b4bac5d1f0826d4fb0255a53318fe3220f5a7d19e8a077b01dbae",
+  "wineArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+  "priorObservation": "non-custom-v14-stock-client-reference.json",
+  "beforeExternalShaders": {
+    "wineExit": 139,
+    "kernelSignals": [
+      "SIGSEGV",
+      "SIGSEGV"
+    ],
+    "coreCaptured": true,
+    "inner": {
+      "pc": "0x0",
+      "indirectCall": "libvulkan_lvp.so+0x1e19a0",
+      "instruction": "blr x3",
+      "x3": "0x0"
+    },
+    "secondary": {
+      "pc": "ntdll.so+0x38944",
+      "address": "0x3a0",
+      "x0": "0x0"
+    },
+    "interpretation": "Native packaged Mesa software renderer worker indirect call, followed by a Wine signal-handler fault. External SPIR-V was absent in both runs."
+  },
+  "formatEvidence": {
+    "pipeFormat": 163,
+    "format": "PIPE_FORMAT_DXT1_RGBA",
+    "vulkanFormat": "VK_FORMAT_BC1_RGBA_UNORM_BLOCK",
+    "task": "native Mesa software worker",
+    "origin": "rt_sigframe preserved w21 across the null format callback; native return address and matching Debian ELF symbols identify handle_clear_color_image / util_clear_texture"
+  },
+  "validationLayerRun": {
+    "state": "completed",
+    "layer": "VK_LAYER_KHRONOS_validation",
+    "version": "1.3.239.0-2",
+    "packageSha256": "00bf594bad5b40ce4eef3eb46e022361807403dbd1a4ba0b6542629f9303f4b7",
+    "wineExit": 139,
+    "externalShaders": "absent in this control",
+    "validationErrors": {
+      "VUID-vkCmdClearColorImage-image-00007": 210
+    },
+    "compressedFormats": {
+      "VK_FORMAT_BC1_RGBA_UNORM_BLOCK": 60,
+      "VK_FORMAT_BC2_UNORM_BLOCK": 82,
+      "VK_FORMAT_BC3_UNORM_BLOCK": 68
+    },
+    "gameplayQualified": false
+  },
+  "titleFrameQualified": false,
+  "androidGraphicsQualified": false,
+  "physicalThorQualified": false,
+  "gameplayQualified": false,
+  "matchedShaderRun": {
+    "compiler": "Pinned ARM64 glslang",
+    "generatedPrograms": 1578,
+    "generatedCompanions": 2,
+    "validatedFiles": 4742,
+    "validatedBytes": 102119494,
+    "manifestSha256": "aadc092990d67c969a683ce4d1284e55a3dd24bb4a5ceebddd639296d37494d6",
+    "indexSha256": "3faf998a5c4e7a4bdb3d01ba73f64f2949daf0305b1847daddafa08c5179a698",
+    "selection": "Read-only private copy revalidated by production validate_output. Coordinator promotion was rejected after a concurrent host tool directory change.",
+    "clientManifestCounts": {
+      "vertex": 792,
+      "pixel": 788,
+      "names": 2883,
+      "companionBindings": 4,
+      "unresolved": 0,
+      "skipped": 0,
+      "ignored": 0,
+      "truncated": 0
+    },
+    "archiveFilesAccessedBySelectedPE": 16,
+    "externalSpirvModuleAccessesObserved": 0,
+    "validationErrors": {
+      "VUID-vkCmdClearColorImage-image-00007": 210
+    },
+    "compressedFormats": {
+      "VK_FORMAT_BC1_RGBA_UNORM_BLOCK": 60,
+      "VK_FORMAT_BC2_UNORM_BLOCK": 82,
+      "VK_FORMAT_BC3_UNORM_BLOCK": 68
+    },
+    "clientInitialized": true,
+    "firstFrameEndCallback": true,
+    "wineExit": 139,
+    "titleConfirmed": false
+  },
+  "v14ProviderContinuity": {
+    "apkSha256": "fdeac1008d4fbac4d0b3e9b16d0106b877cf92541705f2e7a45ce16c454f4c32",
+    "clientArchiveSha256": "5997af5a94a1151e708cf80fa9931e4055a887598e01c9cf21e6b3af0d438759",
+    "guestBridgesArchiveSha256": "7e0356f14bf3654a0e1ecc903726bd479fea0c761c8a4e8a4356e2e476726a55",
+    "turnipArchiveSha256": "445c38ddf7e66f65ee90aa7fd2006db88d6fecd72c8567d801f2ee4c4000a772"
+  }
+}

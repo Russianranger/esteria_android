@@ -66,6 +66,7 @@ tasks.matching { it.name == 'preDebugAndroidTestBuild' }.configureEach {
 def compileShaderIntegrity = tasks.register('compileShaderPreparedIntegrityFixture', JavaCompile) {
     dependsOn 'compileDebugJavaWithJavac', ':core:classes'
     source file('src/test/java/io/github/russianranger/esteria/runtime/ShaderPreparedIntegrityTests.java')
+    source file('src/test/java/io/github/russianranger/esteria/runtime/RendererCompatibilityTests.java')
     source rootProject.fileTree('tests/fixtures/android13-json/aosp') { include '*.java' }
     source rootProject.fileTree('tests/fixtures/android13-json/support') { include '*.java' }
     classpath = dataOwnerClasspath

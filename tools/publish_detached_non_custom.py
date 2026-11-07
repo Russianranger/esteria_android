@@ -432,6 +432,16 @@ def verify_unsigned(directory, selected, tools, application):
         item = archive.getinfo('assets/sources.lock.json')
         require(item.file_size == selected['sourceLock']['bytes'] and item.file_size <= 2 << 20 and
             archive.read(item) == (ROOT / 'sources.lock.json').read_bytes(), 'publication-apk-exact-engine-pins')
+        renderer_name = 'assets/client-runtime/renderer-compatibility.json'
+        if renderer_name in archive.namelist() or 'rendererSelection' in cohort:
+            contract = ROOT / 'runtime/client/renderer-compatibility.json'
+            renderer = read_json(contract, 16384)
+            member = archive.getinfo(renderer_name)
+            require(cohort.get('rendererContract') == identity(contract) and
+                    member.file_size == contract.stat().st_size and archive.read(member) == contract.read_bytes() and
+                    cohort.get('rendererSelection') == renderer and
+                    renderer['preparedSourceLockSha256'] == selected['sourceLock']['sha256'],
+                    'publication-renderer-recipe-or-executable-differs')
         require(not any(re.fullmatch(r'META-INF/[^/]+\.(?:SF|RSA|DSA|EC)', name, re.I) for name in archive.namelist()),
             'publication-unsigned-apk-v1-signature')
     return unsigned

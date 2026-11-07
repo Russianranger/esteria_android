@@ -1,0 +1,89 @@
+{
+  "formatVersion": 1,
+  "scope": "Signed stock v13 to v14 in-place replacement on Android 13 ARM64",
+  "environment": {
+    "host": "Linux x86_64",
+    "guestKernel": "Linux 6.1.0-54-arm64 under QEMU TCG",
+    "android": "Redroid Android 13 ARM64",
+    "imageManifestSha256": "c815ac1b1d5bd0a099b74c3e3e0eeea3b32bed8d7ab1f788c20fb74e35891716",
+    "fingerprint": "redroid/redroid_arm64_only/redroid_arm64_only:13/TQ3A.230805.001.S1/eng.frank.20240527.134411:userdebug/test-keys",
+    "sdk": 33,
+    "abi": "arm64-v8a",
+    "network": "No VM network interface. adb shell via guest loopback.",
+    "storage": "Disposable guest ext4"
+  },
+  "packageId": "io.github.russianranger.esteria.stock",
+  "releases": [
+    {
+      "appRevision": "2a9daba045da516a6ae7212d7bac94262f559d59",
+      "versionCode": 13,
+      "versionName": "0.1.0-non-custom.13",
+      "apkSha256": "9d9809d5e04b4bac5d1f0826d4fb0255a53318fe3220f5a7d19e8a077b01dbae",
+      "apkBytes": 336853760,
+      "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+      "pmUserId": 10077,
+      "firstInstallTime": "2026-11-07 22:18:12",
+      "lastUpdateTime": "2026-11-07 22:22:55"
+    },
+    {
+      "appRevision": "6b37bfe4b75bf298fe765ec9667e92e739c4e53e",
+      "versionCode": 14,
+      "versionName": "0.1.0-non-custom.14",
+      "apkSha256": "fdeac1008d4fbac4d0b3e9b16d0106b877cf92541705f2e7a45ce16c454f4c32",
+      "apkBytes": 336857856,
+      "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+      "pmUserId": 10077,
+      "firstInstallTime": "2026-11-07 22:18:12",
+      "lastUpdateTime": "2026-11-07 22:26:06"
+    }
+  ],
+  "packageManager": {
+    "v13Install": "Success",
+    "v14InstallReplace": "Success",
+    "command": "pm install -r --user 0",
+    "uninstallCount": 0,
+    "clearDataCount": 0,
+    "signingRecordPreserved": true,
+    "ownerUid": 10077,
+    "ownerGid": 10077,
+    "applicationDataInodeBefore": 526035,
+    "applicationDataInodeAfter": 526035
+  },
+  "launcher": {
+    "activity": "io.github.russianranger.esteria.MainActivity",
+    "v13StartStatus": "ok",
+    "v13WaitMs": 3950,
+    "v14StartStatus": "ok",
+    "v14WaitMs": 3297,
+    "v14Sequence": "The initial activity request reached the Android notification permission dialog. A subsequent launch after granting the permission reached MainActivity."
+  },
+  "realApplicationState": {
+    "file": "shared_prefs/session.xml",
+    "producer": "Signed v13 MainActivity",
+    "sha256Before": "025dc1195a49a47736e476a2fcd250b2faf77285c252d3725f9694dbf8b29468",
+    "verifiedUnchangedAfterReplacement": true
+  },
+  "syntheticPreservationFixture": {
+    "storage": "App-owned files in a dedicated QA subdirectory",
+    "unchangedSha256": {
+      "import-marker.bin": "e733da59987dcefd83f3eecdee80f7c8f4c28ead4d5b8553d611b84d093c0776",
+      "prepared-marker.bin": "a91f8c7da33731c50452c7324473a08a9c6474f5474142ad04f044d761bac29f",
+      "settings.txt": "e56d1ff91600c5364eb3a8b64e5e9f0fc6b96de55e7e516968cb3d593bc6a3de",
+      "state.sqlite": "16103d7c617e2aa7754afa49b7783e880063fd0e062ad884d04de7dff4a1ab0c"
+    },
+    "sqliteReadOnlyCheck": {
+      "applicationId": 125414,
+      "characterName": "WarriorQA",
+      "level": 4
+    },
+    "covers": "Byte preservation and read-only reopening of an isolated SQLite fixture"
+  },
+  "qualified": {
+    "emulatorInstallOver": true,
+    "physicalThor": false,
+    "realCharacterSave": false,
+    "worldDatabase": false,
+    "preparedWorldGeneration": false,
+    "offlineGameplay": false
+  }
+}

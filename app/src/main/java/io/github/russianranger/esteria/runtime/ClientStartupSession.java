@@ -59,7 +59,7 @@ public final class ClientStartupSession implements AutoCloseable {
         client.requireWineArchive(wine.archiveSha256());bridges.requireWineArchive(wine.archiveSha256());
         tools.requireWineArchive(wine.archiveSha256());
         if(turnip!=null)turnip.requireWineArchive(wine.archiveSha256());
-        if(!client.sourceRevision().equals(shaders.clientRevision))throw new IOException("Title client/shader source differs");
+        client.requirePreparedShaders(shaders);
         if(OWNERS.containsKey(root))throw new IOException("Previous title investigation still owns its client");
         GameSession.Leases leases=GameSession.claim(root);
         try {
@@ -97,7 +97,7 @@ public final class ClientStartupSession implements AutoCloseable {
                     throw new IOException("Title presentation selection changed");
                 Map<String,String> identity=new TreeMap<>();
                 identity.put("scope","real-client-title-investigation-not-qualified");
-                identity.put("clientSource",client.sourceRevision());identity.put("clientArchive",client.archiveSha256());
+                identity.put("preparedClientSource",shaders.clientRevision);identity.put("clientSource",client.sourceRevision());identity.put("clientArchive",client.archiveSha256());
                 identity.put("clientGeneration",client.generation());identity.put("importGeneration",shaders.importGeneration);
                 identity.put("clientExecutableSha256",client.packagePlan().required.get("bin/WowClient64.exe").sha256);
                 identity.put("windowsExecutable",view.plan.windowsExecutable());

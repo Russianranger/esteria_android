@@ -44,12 +44,13 @@ public final class ShaderSetup {
     private static final String V14_HELPER_FILES_SHA256="31a2073b5145571c88febb57437d6cffbdc232c8ab7ac080673ba59b17680c7d";
 
     public static final class Result {
-        public final String generation,importGeneration,clientRevision,requestedLocale,locale;
+        public final String generation,importGeneration,clientRevision,requestedLocale,locale,toolManifestSha256;
         public final Path shaders,processLogs;
         public final int outputFiles;
         public final long outputBytes;
         public final boolean cancellationRequested;
-        private Result(ShaderRunPlan plan,String generation,Path shaders,Path logs,int files,long bytes,boolean cancelled) {
+        private Result(ShaderRunPlan plan,String generation,Path shaders,Path logs,int files,long bytes,boolean cancelled,String toolManifestSha256) {
+            this.toolManifestSha256=toolManifestSha256;
             this.generation=generation;importGeneration=plan.importGeneration;clientRevision=plan.clientRevision;requestedLocale=plan.requestedLocale;locale=plan.locale;
             this.shaders=shaders;processLogs=logs;outputFiles=files;outputBytes=bytes;cancellationRequested=cancelled;
         }
@@ -242,7 +243,7 @@ public final class ShaderSetup {
     }
     static void requireSameSelection(Result current,Result expected)throws IOException {
         if(!current.generation.equals(expected.generation)||!current.shaders.equals(expected.shaders)||
-                !current.importGeneration.equals(expected.importGeneration)||!current.clientRevision.equals(expected.clientRevision)||
+                !current.toolManifestSha256.equals(expected.toolManifestSha256)||!current.importGeneration.equals(expected.importGeneration)||!current.clientRevision.equals(expected.clientRevision)||
                 !current.requestedLocale.equals(expected.requestedLocale)||!current.locale.equals(expected.locale)||current.outputFiles!=expected.outputFiles||current.outputBytes!=expected.outputBytes)
             throw new IOException("Prepared shader selection changed; run local setup again");
     }
@@ -377,7 +378,7 @@ public final class ShaderSetup {
                 if(count!=outputs.length())throw new IOException("Prepared shader output inventory changed; repair shaders");
             }
             plan.requireCurrentImport();
-            return new Result(plan,generation,shaders,logs,outputs.length(),total,cancelled);
+            return new Result(plan,generation,shaders,logs,outputs.length(),total,cancelled,manifest);
         }catch(JSONException error){throw new IOException("Invalid prepared shader receipt",error);}
     }
     private static long filePin(JSONObject item,long maximum)throws IOException,JSONException {

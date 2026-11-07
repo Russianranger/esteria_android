@@ -1,5 +1,9 @@
 # Current stock handoff
 
+The corrected client now has an independently reproducible provider and corresponding-source package. The renderer selection is explicit in the v15 APK. All stock preparation still uses its original source lock. Keep the retained world generation and use the named client repair on upgrade. [Active gate and execution environments](STATUS.md) · [Device steps](NON-CUSTOM-TESTING.md).
+
+## Historical v14 handoff
+
 Use the signed v14 update for the v13 Thor shader failure. The release, source, checksum and verified startup boundaries are in [STATUS.md](STATUS.md). Start from the selected enUS import and the retained world generation. Use **Repair local component → Shaders** once, then **Start local game**. Follow a named database repair only if the launcher requests it. Preserve the whole support export on the first new failure. [Device steps](NON-CUSTOM-TESTING.md).
 
 The real native Linux ARM64 compiler passed the selected ChromieCraft shader corpus. The next graphics test uses the matching external shader generation with the reconstructed PE under Wine. Stock readiness and world entry require real server/data and client evidence. Preserve the pinned helpers and selection while diagnosing the next observed boundary.

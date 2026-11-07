@@ -48,6 +48,19 @@ def stage(args):
         signedApk=signed, completeProviderBytesVerified=True, sourceReviewedStockSupport=True,
         actualUserClientValidated=False, graphicalClientStartupQualified=False,
         characterCreationQualified=False, worldEntryQualified=False, thorQualified=False)
+    if 'rendererSelection' in proof:
+        contract = signing.ROOT / 'runtime/client/renderer-compatibility.json'
+        renderer = json.loads(contract.read_bytes())
+        signing.require(proof['rendererSelection'] == renderer and
+                       proof.get('rendererContract') == {'bytes': contract.stat().st_size, 'sha256': signing.digest(contract)} and
+                       renderer['preparedClientRevision'] == result['clientRevision'] and
+                       renderer['preparedSourceLockSha256'] == result['sourceLockSha256'],
+                       'release-renderer-recipe-selection-differs')
+        result.update(preparedClientRevision=renderer['preparedClientRevision'],
+                      clientRevision=renderer['executableRevision'],
+                      clientExecutableSha256=renderer['executableSha256'],
+                      clientRuntimeArchiveSha256=renderer['clientArchiveSha256'],
+                      rendererCompatibilitySha256=proof['rendererContract']['sha256'])
     args.output.mkdir(parents=True)
     name = 'Esteria-Stock-3.3.5a-arm64.apk'
     shutil.copyfile(apk, args.output / name)
@@ -77,6 +90,13 @@ def stage(args):
                  '**Repair local component → Database setup**, then start the local game again.\n'
                  'If a stage fails, wait for cleanup, tap **Export support bundle**, choose a\n'
                  'destination and tap **Save**. Send the whole ZIP before retrying.')
+    if 'rendererSelection' in proof:
+        setup = ('Install over the existing Esteria Stock app. Keep enUS and Balanced. Select '
+                 '**Repair local component → Client runtime** to install the corrected executable. '
+                 'If shaders previously failed, choose **Repair local component → Shaders** once. '
+                 'A completed compatible shader generation can be reused. Choose **Start local game**. '
+                 'Use **Repair local component → Database setup** if the launcher names it. '
+                 'For a new failure, tap **Export support bundle**, choose a destination and tap **Save**.')
     notes = f'''Esteria Stock 3.3.5a / non-custom {signed['versionName']}
 
 Separate Android package `{signing.STOCK_PACKAGE}`; installs beside the custom app.

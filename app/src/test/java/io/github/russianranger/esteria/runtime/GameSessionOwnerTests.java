@@ -217,11 +217,11 @@ public final class GameSessionOwnerTests {
             Files.writeString(game.resolve("current"),"a".repeat(64)+"\n");Path generations=Files.createDirectory(game.resolve("generations"));Path imported=Files.createDirectory(Files.createDirectory(generations.resolve("a".repeat(64))).resolve("data"));Path data=Files.createDirectory(imported.resolve("Data"));
             Files.write(data.resolve("common.MPQ"),new byte[]{0});Path enUS=Files.createDirectory(data.resolve("enUS"));Files.write(enUS.resolve("locale-enUS.MPQ"),new byte[]{0});
             ShaderRunPlan plan=new ShaderRunPlan(game,tools,work,helpers,"b".repeat(40),"enUS");
-            Constructor<ShaderSetup.Result> constructor=ShaderSetup.Result.class.getDeclaredConstructor(ShaderRunPlan.class,String.class,Path.class,Path.class,int.class,long.class,boolean.class);constructor.setAccessible(true);
-            ShaderSetup.Result original=constructor.newInstance(plan,"c".repeat(64),root.resolve("shaders"),root.resolve("logs"),4,123L,false);
-            ShaderSetup.Result same=constructor.newInstance(plan,"c".repeat(64),root.resolve("shaders"),root.resolve("other-log"),4,123L,false);
+            Constructor<ShaderSetup.Result> constructor=ShaderSetup.Result.class.getDeclaredConstructor(ShaderRunPlan.class,String.class,Path.class,Path.class,int.class,long.class,boolean.class,String.class);constructor.setAccessible(true);
+            ShaderSetup.Result original=constructor.newInstance(plan,"c".repeat(64),root.resolve("shaders"),root.resolve("logs"),4,123L,false,"e".repeat(64));
+            ShaderSetup.Result same=constructor.newInstance(plan,"c".repeat(64),root.resolve("shaders"),root.resolve("other-log"),4,123L,false,"e".repeat(64));
             ShaderSetup.requireSameSelection(same,original);
-            for(ShaderSetup.Result changed:List.of(constructor.newInstance(plan,"d".repeat(64),root.resolve("shaders"),root,4,123L,false),constructor.newInstance(plan,"c".repeat(64),root.resolve("changed"),root,4,123L,false),constructor.newInstance(plan,"c".repeat(64),root.resolve("shaders"),root,5,123L,false)))
+            for(ShaderSetup.Result changed:List.of(constructor.newInstance(plan,"d".repeat(64),root.resolve("shaders"),root,4,123L,false,"e".repeat(64)),constructor.newInstance(plan,"c".repeat(64),root.resolve("changed"),root,4,123L,false,"e".repeat(64)),constructor.newInstance(plan,"c".repeat(64),root.resolve("shaders"),root,5,123L,false,"e".repeat(64))))
                 try{ShaderSetup.requireSameSelection(changed,original);throw new AssertionError("Stale shader selection was accepted");}catch(IOException expected){ }
         }finally{remove(root);}
     }

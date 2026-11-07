@@ -2,7 +2,7 @@
 
 ## Current checkpoint
 
-V13 reused the retained Thor world generation, then stopped before compiling ten legacy terrain records. The v14 stock Vulkan repair passed the matching ChromieCraft shader corpus on native ARM64 Linux. The device retry starts at **Repair local component → Shaders**. Follow the real client, worldserver and character evidence through clean offline reopen. [Current release and evidence](STATUS.md).
+The v13 Thor world receipt passed. V14 compiled the 2,778 selected ChromieCraft shader records on native ARM64. The matched-shader Wine run then exposed an illegal Vulkan clear on compressed textures. V15 binds the corrected executable to the original prepared identities. Run the retained import through shader admission, a visible title and the normal production session. [Current evidence and device procedure](STATUS.md).
 
 ## Current objective
 

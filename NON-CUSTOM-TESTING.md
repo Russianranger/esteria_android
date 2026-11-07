@@ -1,8 +1,10 @@
-# Esteria Stock 0.1.0-non-custom.14 for AYN Thor
+# Esteria Stock 0.1.0-non-custom.15 for AYN Thor
 
-Install the signed ARM64 APK over your existing **Esteria Stock** installation. Keep app storage, imports, settings and databases. For the reported v13 failure, keep **enUS** and **Balanced**, then tap **Repair local component → Shaders**. The Thor already accepted the retained world-data receipt. This update selects the terrain shaders used by the stock Vulkan renderer and checks all 32 active terrain permutations.
+Install the signed ARM64 APK over the existing **Esteria Stock** app. Keep the existing import, locale (**enUS** for the reported device) and **Balanced** preparation speed.
 
-When shader preparation finishes, use **Start local game**. If **Database setup** is the next missing component, use **Repair local component → Database setup** and then start again. Reuse the same character on later launches. After a failure, export the whole support ZIP before another repair. The save-picker procedure is below.
+1. Tap **Repair local component → Client runtime** to install the repaired reconstructed Windows ARM64 executable. This update initializes compressed textures that the client loads on its first frame.
+2. If shaders have never completed on this import, tap **Repair local component → Shaders**. This selects the current stock terrain shaders and this operation checks all 32 modern terrain variants. An already completed compatible shader generation can be used on **Start local game**.
+3. Tap **Start local game**. If the launcher identifies **Database setup**, use **Repair local component → Database setup**, then start again. The existing import, prepared world, matching shaders, database and configuration remain selectable.
 
 ## Start with the existing preparation
 

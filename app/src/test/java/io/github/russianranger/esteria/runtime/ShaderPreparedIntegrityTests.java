@@ -22,6 +22,7 @@ public final class ShaderPreparedIntegrityTests {
     private static void exercisePreviousGeneration(ShaderRunPlan plan,String manifest,Path current,String previous)throws Exception {
         Files.writeString(current,previous+"\n");
         ShaderSetup.Result legacy=ShaderSetup.validatePrepared(plan,manifest,null,false);
+        RendererCompatibilityTests.run(legacy);
         check(legacy.generation.equals(previous),"Normal Start selects the original donor key");
         check(ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,null).generation.equals(previous),"Full audit reuses the old output");
         check(ShaderSetup.verifyCompatibleCompleted(plan,"0".repeat(64),null,null)==null,"Different provider cannot reuse previous output");
@@ -70,6 +71,7 @@ public final class ShaderPreparedIntegrityTests {
             ShaderRunPlan plan=new ShaderRunPlan(root.resolve("game"),tools,root.resolve("work"),helpers,info.getString("clientRevision"),"enUS");
             String manifest=info.getString("toolManifestSha256");
             ShaderSetup.Result selected=ShaderSetup.validatePrepared(plan,manifest,null,false);
+            RendererCompatibilityTests.run(selected);
             check(ShaderSetup.verifyCompatibleCompleted(plan,manifest,null,null)==null,"Current recipe uses its normal audit");
             Path current=plan.work.resolve("shaders/current");
             var donors=info.getJSONArray("previousGenerations");

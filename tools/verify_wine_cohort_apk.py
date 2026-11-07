@@ -33,7 +33,7 @@ def apk_assets(apk,assets,inputs):
     return dict(assets=len(expected),providerSubtrees=len(prefixes),allExpectedAssetBytesVerified=True)
 
 
-def verify(apk,directory,lock_path,source):
+def verify(apk,directory,lock_path,source,renderer_provider=None):
     lock,source=consumer.selection(lock_path,source)
     expected=consumer.expected_assets(lock)
     for name,pin in expected.items():release.client.verify_identity(directory/name,pin)
@@ -44,10 +44,18 @@ def verify(apk,directory,lock_path,source):
     inputs={'assets/sources.lock.json':lock['selectedInputs']['sources.lock.json'],
         'assets/runtime-sources.lock.json':lock['selectedInputs']['runtime/runtime-sources.lock.json'],
         'assets/x11-runtime.lock.json':x11}
-    result=apk_assets(apk,assets['members'],inputs)
+    members = assets['members']
+    renderer = {}
+    if renderer_provider is not None:
+        from tools import stock_renderer_provider
+        contract = release.ROOT / 'runtime/client/renderer-compatibility.json'
+        members = stock_renderer_provider.apk_members(members, contract, renderer_provider)
+        renderer = dict(rendererSelection=json.loads(release.client.small(contract)),
+                        rendererContract=release.identity(contract))
+    result=apk_assets(apk,members,inputs)
     return dict(formatVersion=1,scope='coherent-source-owned-wine-cohort-apk-bytes-only',apk=release.identity(apk),
         releaseSelection=release.identity(lock_path),cohortTag=lock['tag'],cohortRecipe=lock['targetCommit'],
-        runtimeArchiveSha256=release.measured.RUNTIME,selectedInputs=lock['selectedInputs'],**result,
+        runtimeArchiveSha256=release.measured.RUNTIME,selectedInputs=lock['selectedInputs'],**result,**renderer,
         allProviderAndCorrespondingSourceBytesReadBack=True,publicPublicationVerifiedHere=False,
         completeWineSourceReadBackHere=False,persistentSigningQualified=False,androidExecutionQualified=False,
         hardwareQualified=False,commonMainQualified=False,assetsQualified=False,gameplayQualified=False)
@@ -95,7 +103,9 @@ def complete(args):
     from tools import verify_android_proot as proot
     from tools import package_combined_android as combined
     profile,server_directories=server_profile_paths(args)
-    proof=verify(args.apk,args.cohort_release,args.release_lock,args.packaging_source)
+    renderer_provider = getattr(args, 'stock_renderer_provider', None)
+    require(renderer_provider is None or profile == 'local-game', 'stock-renderer-requires-local-game-profile')
+    proof=verify(args.apk,args.cohort_release,args.release_lock,args.packaging_source,renderer_provider)
     proof['proot']=proot.verify(args.proot_provider,args.apk)
     proof['prootCorrespondingSources']=combined.proot_sources(args.proot_sources,args.proot_provider)
     proof['serverProviders']=server_profile_checks(args,profile)
@@ -103,6 +113,8 @@ def complete(args):
     directories=[args.proot_provider,args.dependency_provider,*server_directories]
     assets=json.loads(release.client.small(args.cohort_release/'provider-assets-receipt.json'))
     expected={'assets/'+name for name in assets['members']}
+    if renderer_provider is not None:
+        expected.add('assets/client-runtime/renderer-compatibility.json')
     for directory in directories:
         for path in (directory/'assets').rglob('*'):
             if path.is_file():expected.add('assets/'+str(path.relative_to(directory/'assets')))
@@ -142,6 +154,7 @@ def main():
     parser.add_argument('--server-profile',choices=('stock','local-game'),default='stock')
     parser.add_argument('--playerbots-programs-provider',type=Path)
     parser.add_argument('--data-tools-provider',type=Path)
+    parser.add_argument('--stock-renderer-provider',type=Path)
     args=parser.parse_args();require(not args.output.exists(),'cohort-apk-evidence-output-exists')
     result=complete(args)
     release.wine.write_new(args.output,release.encoded(result));print(json.dumps(result,indent=2))

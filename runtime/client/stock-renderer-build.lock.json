@@ -1,0 +1,14 @@
+{
+  "formatVersion": 1,
+  "scope": "measured-reconstructed-client-provider-inputs",
+  "sourceRevision": "807c4384ef28f4da51d3c50eec5082627cad36ea",
+  "workflowRun": 42421007418,
+  "buildId": "42421007418.1",
+  "artifactId": 13593268342,
+  "artifact": {
+    "bytes": 45925296,
+    "sha256": "109fa36f9151bef89fe1c87423181218a70651230b4996b05047ef6d2b4ca192"
+  },
+  "buildManifestSha256": "41a92837cb21ea357b960d6f06bb4165614f9dc39b6eb1cca981cc3b84afff89",
+  "androidRuntimeQualified": false
+}

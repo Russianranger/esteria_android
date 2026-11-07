@@ -5,7 +5,7 @@ on:
       build_version_code:
         description: Positive release versionCode, increased before a signed update
         required: false
-        default: '14'
+        default: '15'
         type: string
       publish_non_custom:
         description: Sign and publish an additive non-custom prerelease using the configured persistent key
@@ -29,6 +29,11 @@ on:
       - 'runtime/turnip/sources.lock.json'
       - 'runtime/shaders/android-provider.lock.json'
       - 'runtime/wine-cohort-publication/published-release.json'
+      - 'runtime/client/renderer-compatibility.json'
+      - 'runtime/client/stock-renderer-*.lock.json'
+      - 'tools/acquire_stock_renderer.py'
+      - 'tools/stock_renderer_provider.py'
+      - 'tests/test_stock_renderer_provider.py'
       - 'tools/verify_wine_cohort_apk.py'
       - 'tools/sign_android_apk.py'
       - 'tools/sign_non_custom_ci.py'
@@ -159,7 +164,7 @@ jobs:
       contents: write
       actions: read
     env:
-      RELEASE_VERSION_CODE: ${{ inputs.build_version_code || '14' }}
+      RELEASE_VERSION_CODE: ${{ inputs.build_version_code || '15' }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -283,6 +288,36 @@ jobs:
             --packaging-source "$GITHUB_WORKSPACE/source-packaging" \
             --output "$RUNNER_TEMP/cohort-inputs" --providers "$RUNNER_TEMP/cohort-providers" \
             > out/coherent-evidence/public-cohort-consumer.json
+      - name: Select the reconstructed executable for this build
+        id: renderer
+        run: |
+          set -eu
+          provider="$RUNNER_TEMP/cohort-providers/client-provider"
+          artifact="$RUNNER_TEMP/cohort-inputs/release/client-original.zip"
+          source="$GITHUB_WORKSPACE/sources/client"
+          if [ -f runtime/client/renderer-compatibility.json ]; then
+            root="$RUNNER_TEMP/renderer-inputs"
+            python3 -m tools.acquire_stock_renderer --output "$root" --cohort-inputs "$RUNNER_TEMP/cohort-inputs/release"
+            provider="$root/provider"
+            artifact="$root/cache/client-original.zip"
+            source="$root/source/client"
+            echo "STOCK_RENDERER_SOURCE_PACKAGE=$root/source-companion" >> "$GITHUB_ENV"
+            echo "STOCK_RENDERER_COHORT_DIR=$RUNNER_TEMP/cohort-inputs/release" >> "$GITHUB_ENV"
+            echo "corrected=true" >> "$GITHUB_OUTPUT"
+          fi
+          echo "BUILD_CLIENT_PROVIDER=$provider" >> "$GITHUB_ENV"
+          echo "BUILD_CLIENT_ARTIFACT=$artifact" >> "$GITHUB_ENV"
+          echo "BUILD_CLIENT_SOURCE=$source" >> "$GITHUB_ENV"
+      - name: Retain the exact renderer build, symbols and complete source companion
+        if: steps.renderer.outputs.corrected == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: stock-renderer-source-and-debug-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/renderer-inputs/cache/client-original.zip
+            ${{ runner.temp }}/renderer-inputs/source-companion/
+          if-no-files-found: error
+          retention-days: 30
       - name: Read back the complete Wine source companion before subsequent packaging
         run: |
           python3 tools/fetch_wine_arm64_release.py \
@@ -331,15 +366,15 @@ jobs:
             -PprootProviderDir="$RUNNER_TEMP/proot-build/provider" \
             -PserverRuntimeProviderDir="$RUNNER_TEMP/server-provider" \
             -PguestBridgeProviderDir="$RUNNER_TEMP/cohort-providers/bridge-provider" \
-            -PclientRuntimeProviderDir="$RUNNER_TEMP/cohort-providers/client-provider" \
+            -PclientRuntimeProviderDir="$BUILD_CLIENT_PROVIDER" \
             -PshaderToolsProviderDir="$RUNNER_TEMP/cohort-providers/shader-provider-verified" \
             -PturnipProviderDir="$RUNNER_TEMP/cohort-providers/turnip-provider" \
             -PserverProgramsProfile=playerbots-schema-helper \
             -PserverProgramsProviderDir="$SERVER_HELPER_PROGRAMS_PROVIDER" \
             -PserverDataToolsProviderDir="$SERVER_DATA_TOOLS_PROVIDER" \
             -PserverContentProviderDir="$SERVER_STOCK_PROVIDERS/content" \
-            -PclientRuntimeArtifact="$RUNNER_TEMP/cohort-inputs/release/client-original.zip" \
-            -PclientRuntimeSource="$GITHUB_WORKSPACE/sources/client" 2>&1 | tee out/coherent-logs/gradle.log
+            -PclientRuntimeArtifact="$BUILD_CLIENT_ARTIFACT" \
+            -PclientRuntimeSource="$BUILD_CLIENT_SOURCE" 2>&1 | tee out/coherent-logs/gradle.log
       - name: Exercise actual SDK signing and isolated package identities with an explicit disposable fixture key
         run: |
           umask 077
@@ -395,7 +430,11 @@ jobs:
       - name: Verify every provider helper native ABI and selected source profile in the actual APK
         id: verified
         run: |
-          python3 tools/verify_wine_cohort_apk.py \
+          renderer_args=()
+          if [ -n "${STOCK_RENDERER_SOURCE_PACKAGE:-}" ]; then
+            renderer_args=(--stock-renderer-provider "$BUILD_CLIENT_PROVIDER")
+          fi
+          python3 tools/verify_wine_cohort_apk.py "${renderer_args[@]}" \
             --apk app/build/outputs/apk/debug/app-debug.apk \
             --cohort-release "$RUNNER_TEMP/cohort-inputs/release" \
             --release-lock runtime/wine-cohort-publication/dependency-release.lock.json \
@@ -515,20 +554,24 @@ jobs:
             -PprootProviderDir="$RUNNER_TEMP/proot-build/provider" \
             -PserverRuntimeProviderDir="$RUNNER_TEMP/server-provider" \
             -PguestBridgeProviderDir="$RUNNER_TEMP/cohort-providers/bridge-provider" \
-            -PclientRuntimeProviderDir="$RUNNER_TEMP/cohort-providers/client-provider" \
+            -PclientRuntimeProviderDir="$BUILD_CLIENT_PROVIDER" \
             -PshaderToolsProviderDir="$RUNNER_TEMP/cohort-providers/shader-provider-verified" \
             -PturnipProviderDir="$RUNNER_TEMP/cohort-providers/turnip-provider" \
             -PserverProgramsProfile=playerbots-schema-helper \
             -PserverProgramsProviderDir="$SERVER_HELPER_PROGRAMS_PROVIDER" \
             -PserverDataToolsProviderDir="$SERVER_DATA_TOOLS_PROVIDER" \
             -PserverContentProviderDir="$SERVER_STOCK_PROVIDERS/content" \
-            -PclientRuntimeArtifact="$RUNNER_TEMP/cohort-inputs/release/client-original.zip" \
-            -PclientRuntimeSource="$GITHUB_WORKSPACE/sources/client" 2>&1 | tee out/coherent-logs/gradle-release.log
+            -PclientRuntimeArtifact="$BUILD_CLIENT_ARTIFACT" \
+            -PclientRuntimeSource="$BUILD_CLIENT_SOURCE" 2>&1 | tee out/coherent-logs/gradle-release.log
       - name: Verify release provider bytes and nondebug unsigned APK identity without a key
         id: release_verified
         run: |
           mkdir -p out/coherent-release-evidence
-          python3 tools/verify_wine_cohort_apk.py \
+          renderer_args=()
+          if [ -n "${STOCK_RENDERER_SOURCE_PACKAGE:-}" ]; then
+            renderer_args=(--stock-renderer-provider "$BUILD_CLIENT_PROVIDER")
+          fi
+          python3 tools/verify_wine_cohort_apk.py "${renderer_args[@]}" \
             --apk app/build/outputs/apk/release/app-release-unsigned.apk \
             --cohort-release "$RUNNER_TEMP/cohort-inputs/release" \
             --release-lock runtime/wine-cohort-publication/dependency-release.lock.json \

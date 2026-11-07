@@ -921,6 +921,7 @@ public final class SessionService extends Service {
         Map<String, String> facts = new LinkedHashMap<>();
         facts.put("app.id", BuildConfig.APPLICATION_ID); facts.put("app.version", BuildConfig.VERSION_NAME);
         facts.put("app.sourceRevision", BuildConfig.SOURCE_REVISION);
+        facts.put("buildPin.preparedClient", BuildConfig.CLIENT_REVISION);
         facts.put("buildPin.client", BuildConfig.CLIENT_REVISION); facts.put("buildPin.server", BuildConfig.SERVER_REVISION);
         facts.put("app.versionCode", String.valueOf(BuildConfig.VERSION_CODE));
         facts.put("content.profile",ContentProfile.ID);
@@ -1101,7 +1102,9 @@ public final class SessionService extends Service {
                 ClientRuntimeSetup client = new ClientRuntimeSetup(this, root);
                 client.requireWineArchive(new RuntimeSetup(this, root).archiveSha256());
                 facts.put("runtime.reconstructedClient.archiveSha256", client.archiveSha256());
+                facts.put("buildPin.client", client.sourceRevision());
                 facts.put("runtime.reconstructedClient.sourceRevision", client.sourceRevision());
+                facts.put("runtime.reconstructedClient.preparedSourceRevision", client.preparedSourceRevision());
                 facts.put("runtime.reconstructedClient.buildId", client.buildId());
                 facts.put("runtime.reconstructedClient.expectedGeneration", client.generation());
                 facts.put("runtime.reconstructedClient.prepared", String.valueOf(client.current() != null));

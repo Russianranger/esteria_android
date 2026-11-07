@@ -35,6 +35,7 @@ public final class ClientRuntimeSetup {
     private final Path store, cache;
     private final RuntimePackagePlan plan;
     private final String revision, buildId, wineArchive;
+    private final RendererCompatibility compatibility;
     private final long freshFreeBytes;
     private final boolean localAccountHandoff;
 
@@ -49,9 +50,13 @@ public final class ClientRuntimeSetup {
                     proof.getBoolean("gameInitializationQualified") || proof.getBoolean("gameLoginQualified"))
                 throw new IOException("Unexpected reconstructed client provider scope");
             revision = proof.getString("sourceRevision"); buildId = proof.getString("buildId");
-            if (!revision.equals(BuildConfig.CLIENT_REVISION) || !buildId.matches("[A-Za-z0-9._-]{1,96}") ||
-                    !hash(asset("sources.lock.json")).equals(proof.getString("sourceLockSha256")))
-                throw new IOException("Reconstructed client does not match this application source lock");
+            if (!buildId.matches("[A-Za-z0-9._-]{1,96}")) throw new IOException("Invalid client build identity");
+            String approved = BuildConfig.RENDERER_COMPATIBILITY_SHA256;
+            boolean hasDescriptor = Arrays.asList(assets.list("client-runtime")).contains("renderer-compatibility.json");
+            byte[] compatibilityBytes = hasDescriptor ? asset("client-runtime/renderer-compatibility.json") : null;
+            JSONObject shaderTools = approved.isEmpty() ? null : new JSONObject(new String(asset("shader-tools/provider.json"), StandardCharsets.UTF_8));
+            compatibility = RendererCompatibility.select(BuildConfig.CLIENT_REVISION, hash(asset("sources.lock.json")),
+                    BuildConfig.CONTENT_PROFILE, proof, approved, compatibilityBytes, shaderTools);
             JSONObject protocol = proof.getJSONObject("protocol");
             if (protocol.length() != 4 || protocol.getInt("build") != 12340 || protocol.getInt("container_slots") != 254 ||
                     protocol.getInt("quest_slots") != 25 || protocol.getInt("max_class_id") != 32)
@@ -112,6 +117,11 @@ public final class ClientRuntimeSetup {
     public String generation() { return plan.generation; }
     public String archiveSha256() { return plan.archiveSha256; }
     public String sourceRevision() { return revision; }
+    public String preparedSourceRevision() { return compatibility.preparedRevision; }
+    public void requirePreparedShaders(ShaderSetup.Result shaders) throws IOException {
+        if (shaders == null) throw new IOException("Prepared shaders are required");
+        compatibility.requirePreparedShaders(shaders.clientRevision, shaders.toolManifestSha256);
+    }
     public String buildId() { return buildId; }
 
     /** The live session owner must establish the owned account and both local services first. */
@@ -189,7 +199,7 @@ public final class ClientRuntimeSetup {
             return output.toByteArray();
         }
     }
-    private static String hash(byte[] bytes) throws IOException {
+    static String hash(byte[] bytes) throws IOException {
         try {
             StringBuilder value = new StringBuilder(64);
             for (byte part : MessageDigest.getInstance("SHA-256").digest(bytes))
