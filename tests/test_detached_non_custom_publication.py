@@ -27,6 +27,16 @@ class Api:
 
 
 class PublicationGuards(unittest.TestCase):
+    def test_release_http_failure_retains_status_without_response_or_credentials(self):
+        self.assertEqual(publication.safe_failure_reason(ValueError(
+            'GitHub POST /releases failed with HTTP 403; no token/response exported')),
+            'publication-github-post-http-403')
+        for error in (ValueError('GitHub POST /releases?token=secret failed with HTTP 403; no token/response exported'),
+                      ValueError('GitHub POST /releases failed with HTTP 403; response=secret'),
+                      OSError('private signing path or signed download query'),
+                      KeyError('private-value')):
+            self.assertEqual(publication.safe_failure_reason(error), 'detached-publication-validation-failed')
+
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(); self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)

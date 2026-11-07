@@ -584,6 +584,18 @@ def publish(api, directory, result):
     return proof
 
 
+def safe_failure_reason(error):
+    """Retain controlled HTTP operation/status, never exception bodies or URLs."""
+    if type(error) is ValueError:
+        message = str(error)
+        if re.fullmatch('[a-z0-9-]+', message):
+            return message
+        http = re.fullmatch(r'GitHub (GET|POST|PATCH) /(?:releases(?:/[0-9]+|/tags/[A-Za-z0-9._-]+)?|git/ref/tags/[A-Za-z0-9._-]+) failed with HTTP ([1-5][0-9]{2}); no token/response exported', message)
+        if http:
+            return 'publication-github-' + http[1].lower() + '-http-' + http[2]
+    return 'detached-publication-validation-failed'
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action', choices=('schema', 'inspect', 'stage'), nargs='?', default='stage')
@@ -619,8 +631,7 @@ def main():
             result = publish(api, args.output, result)
         print(json.dumps(result, sort_keys=True))
     except (OSError, ValueError, KeyError, zipfile.BadZipFile) as error:
-        message = str(error) if type(error) is ValueError and re.fullmatch('[a-z0-9-]+', str(error)) else 'detached-publication-validation-failed'
-        parser.exit(1, message + '\n')
+        parser.exit(1, safe_failure_reason(error) + '\n')
 
 
 if __name__ == '__main__':
