@@ -1,0 +1,26 @@
+{
+  "appRevision": "7f556ff7bec24cdb6472efb0af7b319116dfae4f",
+  "artifactId": 13554038286,
+  "artifactSha256": "d39815c4427faf2d4ef038ca4342be6d7a05cf5dc00ecd90b16920cdc9120425",
+  "environment": "disposable native ARM64 MySQL installation in CI",
+  "formatVersion": 1,
+  "jobId": 128253944505,
+  "observations": {
+    "androidRuntimeQualified": false,
+    "authserverExecuted": false,
+    "cleanShutdownVerified": true,
+    "completedFinishReentryWithoutExecution": true,
+    "existingStateModified": false,
+    "gameplayQualified": false,
+    "nestedDataDirectoryConfigurationVerified": true,
+    "productionFinishPlayerbotsExecuted": true,
+    "qualificationSucceeded": true,
+    "restartPersistenceVerified": true,
+    "restartedFinishReentryWithoutExecution": true,
+    "stockDbcSqlBackingRestartVerified": true,
+    "stockDbcSqlBackingVerified": true,
+    "worldserverExecuted": false
+  },
+  "runId": 42323699722,
+  "scope": "native-sql-component-evidence-not-gameplay"
+}

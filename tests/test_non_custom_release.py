@@ -151,6 +151,24 @@ class StockReleaseBoundary(unittest.TestCase):
             release.stage(self.args)
         self.assertFalse(self.args.output.exists())
 
+    def test_v12_staging_preserves_existing_preparation_and_reports_unqualified_gameplay(self):
+        self.receipt['signedApk'].update(versionCode=12, versionName='0.1.0-non-custom.12')
+        self.write()
+        result = release.stage(self.args)
+        notes = (self.args.output / 'RELEASE-NOTES.md').read_text()
+        self.assertIn('choose Start local game if preparation already completed', notes)
+        self.assertIn('If stock shaders or\ndatabase preparation are still missing', notes)
+        self.assertIn('Do not uninstall, clear storage,\nreimport or delete completed navigation output', notes)
+        self.assertNotIn('Import your complete ChromieCraft client', notes)
+        self.assertIn('Full payload verification remains required', notes)
+        self.assertIn('still disabled', notes)
+        self.assertIn('This candidate is not Thor gameplay-qualified', notes)
+        self.assertEqual(result['tag'], 'non-custom-v0.1.0-non-custom.12')
+        for key in ('actualUserClientValidated', 'graphicalClientStartupQualified',
+                    'characterCreationQualified', 'worldEntryQualified', 'thorQualified'):
+            self.assertIs(result[key], False)
+        self.assertEqual((self.args.output / 'Esteria-Stock-3.3.5a-arm64.apk').read_bytes(), self.apk.read_bytes())
+
     def test_existing_release_output_is_never_overwritten(self):
         self.args.output.mkdir(); marker = self.args.output / 'old-apk'; marker.write_text('preserve')
         with self.assertRaisesRegex(ValueError, 'release-output-already-exists'):

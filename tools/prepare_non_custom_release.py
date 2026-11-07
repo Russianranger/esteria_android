@@ -59,6 +59,15 @@ def stage(args):
              'Import your complete ChromieCraft client, prepare the local runtime/world, then\n'
              'start the local game. Follow the attached NON-CUSTOM-TESTING.md procedure, including\n'
              'the offline repeat and support bundle export if a stage fails.')
+    if signed['versionCode'] == 12:
+        setup = ('Install over the existing Esteria Stock app and keep its completed import, prepared\n'
+                 'world data, configuration, databases and saves. With the same locale selected,\n'
+                 'choose Start local game if preparation already completed. If stock shaders or\n'
+                 'database preparation are still missing, use Prepare / fully verify local runtime\n'
+                 'and world to finish that preparation, then Start local game.\n'
+                 'Do not uninstall, clear storage,\n'
+                 'reimport or delete completed navigation output. Follow NON-CUSTOM-TESTING.md;\n'
+                 'export support before another attempt after a failure.')
     notes = f'''Esteria Stock 3.3.5a / non-custom {signed['versionName']}
 
 Separate Android package `{signing.STOCK_PACKAGE}`; installs beside the custom app.
@@ -245,6 +254,32 @@ Do not uninstall, clear storage, reimport or delete completed world files.
 
 Export support before another attempt after a failure. Actual Thor completion,
 rendering, persistence and offline gameplay still need device confirmation.
+'''
+    if signed['versionCode'] == 12:
+        notes += '''
+Version 12 separates normal startup from preparation. Start local game selects
+source-bound existing runtime, world data and shader generations, with explicit
+repair guidance for missing or invalid components. It does not rerun extraction,
+download runtime packages or recopy a valid imported client on that startup path.
+Full payload verification remains required; the prepared-data fast cache is
+still disabled. Reuse must not be read as a claim that all hashing is eliminated.
+
+Server admission and native auth/world startup now have separate bounded clocks,
+with the failing phase, process, readiness condition and elapsed time retained in
+support diagnostics. Admission verification observes the selected preparation
+speed and cancellation. A full verification that exceeds its admission budget
+still reports a failure; this update does not establish faster Thor loading.
+
+The v11 receipt compatibility fix, all generation-bound preparation helper bytes,
+client/server pins, native providers and stock SQL selection are unchanged.
+Compatible completed v10/v11 data remains eligible for checked reuse. Missing or
+incompatible components still need preparation; existing databases are not reset.
+
+This candidate is not Thor gameplay-qualified. A genuine graphical client frame,
+normal local login, Human Warrior world entry, saving and three cold offline
+relaunches still require execution with the owner's retained client and device.
+Host fixtures, component tests and a successful package build do not prove those
+stages. Custom content and MPQ authoring remain deferred until stock acceptance.
 '''
     (args.output / 'RELEASE-NOTES.md').write_text(notes)
     return result

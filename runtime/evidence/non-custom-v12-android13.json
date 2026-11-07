@@ -1,0 +1,202 @@
+{
+  "allArtifactMemberCrcsVerified": true,
+  "allArtifactMembersRead": 37,
+  "allJobStepsSucceeded": true,
+  "androidArm64Qualified": false,
+  "appSourceRevision": "7f556ff7bec24cdb6472efb0af7b319116dfae4f",
+  "artifact": {
+    "bytes": 26498,
+    "sha256": "de5f099973c0029ed98d8f21fb356d043362b8acd382178e0b09a834d20c3d94"
+  },
+  "artifactId": 13554552633,
+  "artifactMemberManifestSha256": "295f47707649ce92aba40213a1ce4800a24415220beb24f998618965ca2ddc88",
+  "artifactName": "android-13-installer-evidence-7f556ff7bec24cdb6472efb0af7b319116dfae4f",
+  "artifactSha256MatchesGitHubDigest": true,
+  "authWorldSessionExecuted": false,
+  "baseHelperAssetFiles": {
+    "data": 6,
+    "installation": 18,
+    "session": 24
+  },
+  "boundary": "Actual Android13 emulator filesystem/update and production Java receipt-consumer evidence only. The package update uses one job-local debug key and fixtures; it does not verify the public stock signing identity or preservation of actual owner saves.",
+  "branch": "non-custom",
+  "clientCommonMainExecuted": false,
+  "clientLoginExecuted": false,
+  "components": {
+    "import-memory-component": {
+      "passed": true,
+      "receipt": {
+        "bytes": 13199,
+        "sha256": "8cef1d5794b009cfc13bf1913d2444000da9955b818c3808b3f2cfa2835c6b3c"
+      },
+      "scope": "android13-x64-large-streaming-import-memory-and-exit-history-components",
+      "selectedTestCount": 14,
+      "sourceIdentityCount": 28,
+      "stdout": {
+        "bytes": 15635,
+        "sha256": "6210af56b3eb8761c50f89877375d12d53edddf32ef0f922d955efafb7d6b77c"
+      }
+    },
+    "preparation-controls-component": {
+      "passed": true,
+      "receipt": {
+        "bytes": 6565,
+        "sha256": "706f95717e7754743fe57b90b9f15fa16cffe5d377a84883ba60e401fa298e77"
+      },
+      "scope": "android13-x64-preparation-controls-pressure-and-owned-storage-components",
+      "selectedTestCount": 4,
+      "sourceIdentityCount": 15,
+      "stdout": {
+        "bytes": 4741,
+        "sha256": "bbed4a9a99b11e5e833aa988afd8426ff4eff7f526de7fa055d329b3a4811bf2"
+      }
+    },
+    "python-receipt-component": {
+      "passed": true,
+      "receipt": {
+        "bytes": 6425,
+        "sha256": "f055f1363a8d4c25fb6b72196e080a42517447c5f57fc54f31e12a125cfbadfe"
+      },
+      "scope": "android13-x64-python-produced-data-shader-receipt-consumers",
+      "selectedTestCount": 3,
+      "sourceIdentityCount": 19,
+      "stdout": {
+        "bytes": 3631,
+        "sha256": "726f16c418883f606c0687ece995669c7339ebe5caec29e72f585df2bdd98a25"
+      }
+    },
+    "saf-import-component": {
+      "passed": true,
+      "receipt": {
+        "bytes": 2303,
+        "sha256": "e950906a96e3963d1fb2b8d7a8c556246e4d2ec577d8d7722e6d3feb68abb1c5"
+      },
+      "scope": "android13-x64-document-resolver-synthetic-client-import-components",
+      "selectedTestCount": 3,
+      "sourceIdentityCount": 7,
+      "stdout": {
+        "bytes": 2200,
+        "sha256": "58a6bc95f04d1779d77ad20e95831e3c399323635768fa842d033fe93ae36d8e"
+      }
+    },
+    "stock-shader-component": {
+      "passed": true,
+      "receipt": {
+        "bytes": 2872,
+        "sha256": "8514d065198e29428ddce7ec4fb705d80f246a302ac064b871afcd3c3c808b0d"
+      },
+      "scope": "android13-x64-stock-helper-and-synthetic-shader-receipt-components",
+      "selectedTestCount": 2,
+      "sourceIdentityCount": 7,
+      "stdout": {
+        "bytes": 2017,
+        "sha256": "dc8e54d69c5b08db02e99b86fbe23c8cbbe3279384d99829f2a80d58d0ed8c50"
+      }
+    }
+  },
+  "databaseServiceExecuted": false,
+  "emulatorOnlyApks": {
+    "initialApk": {
+      "bytes": 1308911,
+      "sha256": "d76ceb13025a55bebc0d0e8ae5d61056fcf0efe517c212e8994e748cc54efe95"
+    },
+    "testApk": {
+      "bytes": 1884935,
+      "sha256": "3b3f98b0fc845b38926086be6765974c5b22bf925ddc3fe72136d7d41da5b624"
+    },
+    "updateApk": {
+      "bytes": 1308919,
+      "sha256": "316506ed7ba44d91f3ff5774facad39eba1de7172c3285835886db1b81153e8c"
+    }
+  },
+  "emulatorProperties": {
+    "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+    "ro.build.version.sdk": "33",
+    "ro.kernel.qemu": "1",
+    "ro.product.cpu.abi": "x86_64"
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "jobId": 128253944368,
+  "notExecuted": [
+    {
+      "case": "local-account handoff multi-link negative subcase",
+      "reason": "Emulator fixture reported hard-link creation not permitted; multi-link negative was not executed."
+    },
+    {
+      "case": "RealClientStartupCaptureTest",
+      "reason": "This workflow explicitly selects component tests; the opt-in real-client capture was not invoked. No runtime assumption-skip result is claimed.",
+      "status": "not-selected"
+    },
+    {
+      "case": "PRoot metadata cache qualification",
+      "reason": "Separate Android/PRoot workflow; not part of this installer receipt."
+    },
+    {
+      "case": "ARM64 client, native game shader compilation, database/auth/world startup, Thor gameplay/persistence/offline relaunch",
+      "reason": "Disposable Android13 x86_64 component environment, synthetic input data and no real owner game assets."
+    }
+  ],
+  "ownerGameDataImported": false,
+  "privateLocalLoginHandoffFilesystemQualified": true,
+  "pythonReceiptConsumers": {
+    "canonicalVectorsMatched": 6,
+    "dataInputHashMutantsRejected": 11,
+    "fixturesUseSyntheticNativeToolOutputs": true,
+    "newShaderIntegrityChecksExecuted": [
+      "same-size payload corruption rejected by full verification",
+      "unexpected output rejected",
+      "full verification observes cancellation",
+      "retained valid output passes reentry"
+    ],
+    "productionAndroidConsumersExecuted": true,
+    "productionPythonDataReceiptAccepted": true,
+    "productionPythonShaderSchemaReceiptAccepted": true,
+    "shaderInputHashMutantsRejected": 10
+  },
+  "runConclusion": "success",
+  "runId": 42323699667,
+  "runUrl": "https://github.com/Russianranger/esteria_android/actions/runs/42323699667",
+  "runtimeContractGroups": 20,
+  "sameJobDebugKeyUpdatePreservedRuntimeAndSentinel": true,
+  "scope": "android13-x86_64-installer-update-and-production-receipt-consumer-readback",
+  "selectedTests": {
+    "exactNamedStartsAndSuccessStatusesMatched": true,
+    "failed": 0,
+    "instrumentationSkipped": 0,
+    "passed": 43,
+    "successCountByLog": {
+      "actualBundledHelpersInstallAndRepeatWithoutRewriting.log": 1,
+      "changedExistingHelperIsPreservedAndRefused.log": 1,
+      "completeDataHelperClosureInstallsAndReusesExactBytes.log": 1,
+      "completeInstallationHelperClosureInstallsAndReusesExactBytes.log": 1,
+      "completeSessionHelperClosureInstallsAndReusesExactBytes.log": 1,
+      "expectedHelperSymlinkNeverReplacesOrWritesItsTarget.log": 1,
+      "extraModulesNativeExtensionsAndCachesCannotEnterImportPath.log": 1,
+      "import-memory-component.log": 14,
+      "linkedResourceDirectoryIsPreservedAndRefused.log": 1,
+      "nestedOriginalSourcesInstallAndResumeWithoutRewriting.log": 1,
+      "partialGenerationResumesAndRetainsHarmlessInterruptedWrite.log": 1,
+      "preparation-controls-component.log": 4,
+      "privateDataMetadataBindingRejectsChangedAncestryAndQualificationClaims.log": 1,
+      "privateLocalLoginHandoffContracts.log": 1,
+      "python-receipt-component.log": 3,
+      "runtimeContracts.log": 1,
+      "saf-import-component.log": 3,
+      "seedBeforeUpdate.log": 1,
+      "stock-shader-component.log": 2,
+      "temporarySymlinkDoesNotBypassClosure.log": 1,
+      "unexpectedNestedModuleIsPreservedAndRefused.log": 1,
+      "verifyAfterUpdate.log": 1
+    }
+  },
+  "shaderCompilerExecuted": false,
+  "sourceVerification": {
+    "allComponentSourceIdentitiesMatched": true,
+    "canonicalManifestSha256": "dc0ef54aea08532695302816a1c9da39761c08051aa4ba945b0ad9cd5b5fc118",
+    "exactProducerGitObjectsVerified": true,
+    "uniqueSourceIdentityCount": 60
+  },
+  "thorQualified": false,
+  "userSigningIdentityQualified": false
+}

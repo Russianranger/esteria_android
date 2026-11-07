@@ -1,49 +1,35 @@
-# Version 11 completed-data handoff retry
+# Version 12 prepared-state startup candidate
 
-Install the signed `0.1.0-non-custom.11` / versionCode 11 ARM64 update over the existing Esteria Stock app. The package and persistent certificate are unchanged. **Keep the completed client import and all app data. Do not uninstall, clear storage or reimport the client.** Check `SHA256SUMS`, `release.json` and the signing receipt for the exact APK/source identity.
+Install the signed `0.1.0-non-custom.12` / versionCode 12 ARM64 update over the existing Esteria Stock app, package `io.github.russianranger.esteria.stock`. Keep imports, prepared world/navigation output, configuration, databases and saves. **Do not uninstall, clear storage, reimport or delete completed output.** Check the release's `SHA256SUMS`, `release.json` and signing receipt. Package/signature verification does not establish an actual update on your Thor.
 
-The latest v10 report completed the world-data format checks, then the Android completed-data inspector rejected its selection receipt. V11 addresses that handoff and retains compatible completed v10 world data for checked reuse. **Keep the completed world and navigation output; do not delete it to retry.** Missing, changed or incompatible output remains subject to validation and rebuilding. Preparation speeds, pressure handling and storage controls are unchanged.
+The last supplied Thor report reached Python world-data format verification in v10. V11 fixed the subsequent Android receipt escaping mismatch; v12 retains that fix and the exact client/server/provider pins and six generated-data helpers. The existing completed generation remains selectable. Actual shader completion, database/server startup and reconstructed-client world entry still need a real device session.
 
-## Choose a preparation speed
+## Start with the existing preparation
 
-Select **Preparation speed** while the app is idle, then use the same imported client language and choose **Prepare local runtime / world**. The selection is remembered after reopening the app.
+1. Install the update in place. Retain the same imported client language and select **Balanced** under **Preparation speed** while idle.
+2. Choose **Start local game**. It selects existing prepared components without replaying preparation. Status explains reuse or names the missing/invalid component. Admission still performs independent full world-data and shader checks; the metadata cache remains disabled.
+3. If preparation never completed, choose **Prepare / fully verify local runtime and world** once to finish the missing stages. Compatible completed work is verified and reused. This is also the explicit full integrity audit, not a step required before every normal launch.
+4. For a specifically reported missing component, **Repair local component** offers client runtime, server runtime, world data, shaders or database. It resumes/revalidates that component within existing ownership rules and does not reseed an existing database. Corrupt completed output is preserved and may require diagnosis rather than automatic regeneration; export support if the same rejection repeats.
+5. After preparation succeeds, use **Start local game**. Admission has a 12-minute limit, separate from the 180-second auth/world readiness budget. Large data or pressure fallback can still exceed admission; record the phase/time and export support before retrying an unchanged failure.
 
-| Level | Normal Java/Python verification rate | Use |
+## Verify the normal session and retained state
+
+Use managed local login, not ChromieCraft credentials. Create an ordinary **Human Warrior**, enter the stock starting area, and check rendering, movement, camera, touch/controller input and basic interaction/combat. Keep the existing resolution.
+
+Exit normally and wait for **Local session stopped**. Reopen the same character and confirm location/progress. Enable airplane mode and disable Wi-Fi, then perform **three cold relaunches**, stopping the app between cleanly closed sessions without clearing data. Each must preserve the same character and avoid extraction, client copying or runtime downloading. Full admission hashing remains expected until the cache path qualifies.
+
+For cancellation/resume, press **Stop** during an explicit preparation/verification, wait for cleanup, then retry the same locale. Valid completed phases must remain reusable. Forced termination is not a successful character save. Compare the same phase when comparing speeds.
+
+| Level | Normal governed Java/Python reads | Guidance |
 | --- | ---: | --- |
-| Gentle | 8 MiB/s | Compare with the earlier pacing or use when other apps need memory. |
-| Balanced (default) | 32 MiB/s | Start here for the next preparation attempt. |
-| Fast | 64 MiB/s | Try after Balanced if the device has sufficient memory headroom. |
+| Gentle | 8 MiB/s | Lower activity; large admission may exceed its bound. |
+| Balanced | 32 MiB/s | Default for this attempt. |
+| Fast | 64 MiB/s | Optional comparison with adequate memory headroom. |
 
-These are verification/copy pacing limits, not total-world completion estimates. Actual storage can be slower, and repeated validation, extraction, navigation meshes, shaders and database work add time. Native conversion stays at one worker with the existing 4 GiB virtual-address guard. Bounded buffers and cache windows remain in use at every level; selecting Fast does not increase worker count or remove memory checks. Import copying keeps its separate 8 MiB/s policy.
+These are pacing limits, not total preparation estimates. Pressure may reduce reads to 2 MiB/s or pause work. Native conversion remains one worker with its existing memory guard. Changing speed alone does not invalidate the generation. Import copying retains its separate policy.
 
-Memory pressure still reduces governed reads to 2 MiB/s or pauses preparation. An isolated trim signal with verified healthy headroom backs off instead of immediately cancelling a long native phase. Genuine low-memory observations remain a pause condition. Clean-input cache advice now works through bounded windows rather than repeatedly advising every complete archive in each short interval.
+## Export a failure before retrying
 
-## Retry the completed-data handoff without discarding useful work
+Reopen Esteria Stock if necessary. Tap **Export support bundle**, choose a destination in Android's save picker, and tap **Save** for `Esteria-support-<timestamp>.zip`. Send the **whole ZIP** plus the selected speed, last displayed phase, elapsed time and whether Stop or Android interrupted the operation. Export before another attempt so retained diagnostics are not overwritten. The bundle excludes credentials, databases and game assets.
 
-1. Install v11 over the current app and retain the existing import. Select its installed locale and **Balanced**.
-2. Choose **Prepare local runtime / world**. The status identifies the current phase, so a transition from maps to collision or navigation work is distinguishable from a restart. Provider checks still run before reused outputs are accepted.
-3. Leave the operation running while it makes progress. Matching completed v10 world data is checked before reuse. Compatible older checkpoints and valid partial navigation tiles remain reusable. Malformed or incomplete output is rejected or regenerated; a stopped phase is never reported as complete.
-4. To compare speeds, press **Stop** and wait for cleanup to finish before changing the level. Retry with the same locale. Changing only speed does not change the data generation or require reimporting the client.
-5. If a memory pause occurs, wait for headroom to recover, choose a slower level if appropriate, and retry. If a stage fails or Android closes the app, export support before another preparation attempt.
-
-A speed comparison made across different phases is not a benchmark: hashing, model extraction and navigation mesh generation have different workloads. Include the chosen level and last displayed phase when reporting results. The support bundle records the selected rate, pressure/headroom observations and operation outcome.
-
-## Trim obsolete files
-
-Use the storage scan while the app is idle to see recognized reclaimable files, then use the trim action. Maintenance is unavailable during preparation or gameplay. It preserves the imported client, current and expected runtime generations, mutable database, character saves, client configuration and usable world work. It removes only recognized obsolete immutable runtime generations and redundant runtime archive caches. It does not delete normal Blizzard MPQs or ask you to move files out of `Data`.
-
-Compatible v8/v9 world staging is kept until it can be checked and migrated. The preparation helper then removes recognized abandoned duplicate phase directories after the child process has stopped. This avoids deleting potentially useful long-running work merely because it was created by the previous version. Unknown files are retained rather than guessed to be disposable. The reported reclaimable byte count is a file inventory, not a promise of an identical increase in Android free-space accounting.
-
-## Complete the local game test
-
-After world preparation succeeds, choose **Start local game**. Allow database/auth/world readiness and graphics initialization to finish. Use the app's managed local login rather than ChromieCraft credentials. Create an ordinary **Human Warrior**, enter its stock starting area and check world rendering, movement, camera, touch/controller input and basic interactions.
-
-Exit normally and wait for **Local session stopped**. Start the same character again and verify location and progress. Then enable airplane mode and disable Wi-Fi, and repeat startup, world entry, movement, clean stop and relaunch. Gameplay must remain local and offline.
-
-Only a fresh installation or a missing completed import needs **Import client folder** or **Import client ZIP**. Select the complete ChromieCraft 3.3.5a build 12340 root containing `Wow.exe` beside `Data`, including one installed locale/speech set. Preserve root patch MPQs and locale MPQs in their normal locations. No extra Esteria/HD/custom archive is required for the stock milestone.
-
-## If preparation stops
-
-Reopen the app and **Export support bundle before another attempt**. Include the whole ZIP, selected speed, last displayed phase and whether you pressed Stop or Android interrupted it. Do not clear data or reimport. The bundle includes bounded retained logs and observations while excluding databases, credentials and client assets. Accepted cache advice does not measure pages actually reclaimed, and visible child RSS/PSS is not whole-guest memory coverage. Forced termination is never a successful character save.
-
-This remains the separate stock app with the reconstructed ARM64 client, local server/database and offline objective. Custom races/appearances/maps, HD/Retail/Forever content, Lua/AIO and bot AI qualification are deferred. Genuine stock world/shader data and normal signed UI remain required. Component, host and emulator checks do not establish actual Thor preparation, rendering, controls/audio, persistence or gameplay; those still need this device session.
+Only a fresh installation or genuinely missing import needs folder/ZIP import. Keep standard MPQs in their normal `Data` and locale directories. Custom assets, bots and optional MPQ authoring remain deferred until stock startup and persistence are demonstrated. Host fixtures, native SQL checks and Android emulator tests are component evidence; they do not establish Thor gameplay.

@@ -2,11 +2,50 @@
 
 This branch builds `io.github.russianranger.esteria.stock` with the explicit `stock-3.3.5a` profile. It retains its own imported client, generated data, local database and saves; it does not migrate or reseed the separate custom app. Preserve the original client installation and installed stock app data.
 
-The current [published stock APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.11/Esteria-Stock-3.3.5a-arm64.apk) is `0.1.0-non-custom.11` / code 11. Exact producer: `22ef2c726abbd4414c88be19cae921a70d4535c2`. Full-provider package/native SQL/Android/output gates are recorded in `runtime/evidence/non-custom-v11-release-gates.json`. Client/server/Eluna pins, the source/debug-qualified v7 data provider and the offline architecture remain unchanged. Component success does not qualify Thor world entry.
+The current build candidate is `0.1.0-non-custom.12` / code 12, producer `7f556ff7bec24cdb6472efb0af7b319116dfae4f`. Its unsigned build restores the exact selected provider archives and validates their source/debug companions. The original stock signer has been recovered and its certificate matches `app/stock-signing.lock.json`; signed publication is still pending. Build/signing availability does not establish title rendering, world entry or persistence on Thor.
 
-Use `.github/workflows/android-local-game-profile.yml` with every verified production provider. This checkout defaults to code 11 for push/dispatch builds; select a higher code before preparing a new signed release. The full unsigned release artifact must belong to the exact successful source commit. A plain launcher/debug build is not a replacement for this package.
+The latest [published stock APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.11/Esteria-Stock-3.3.5a-arm64.apk) remains `0.1.0-non-custom.11` / code 11, producer `22ef2c726abbd4414c88be19cae921a70d4535c2`. Its full-provider package/native SQL/Android/output gates are recorded in `runtime/evidence/non-custom-v11-release-gates.json`. V12 preserves the client/server/Eluna pins, source/debug-qualified v7 data provider, stock SQL profile and preparation-helper identities used by valid completed v10/v11 generations.
+
+Use `.github/workflows/android-local-game-profile.yml` with every verified production provider. This checkout defaults to code 12 for push/dispatch builds; subsequent signed updates must increase the published code. The full unsigned release artifact must belong to the exact successful source commit. A plain launcher/debug build is not a replacement for this package.
 
 Current delivery uses the [detached public signing transport](runtime/releases/non-custom/README.md): sign the exact reviewed unsigned APK with the persistent stock certificate, retain its public signature recipe and exact successful package/native SQL selection, then publish additively through `publish-non-custom-detached.yml`. Private keys/passwords stay outside Git. Optional configured CI signing remains supported; missing persistent secrets must fail rather than substitute a temporary identity. `tools/sign_android_apk.py --lock app/stock-signing.lock.json` requires the exact previous public stock APK for an update. Advance `lastPublished` only after complete anonymous asset readback and SDK signature/manifest verification. Existing tags/assets and old transports are never overwritten.
+
+## V12 preparation, startup and diagnosis
+
+- **Initial preparation or explicit full verification:** choose the retained import's locale and **Prepare / fully verify local runtime and world**. Completed compatible stages are checked and reused; missing stages can be prepared. This action is not a read-only audit.
+- **Normal launch:** **Start local game** selects existing data, shader and database receipts under actual ownership. It does not replay runtime installation, stock selection, extraction, shader compilation or SQL preparation. It records selected generations and reuse reasons. A new session still verifies shader payload bytes and server-data integrity after acquiring its own ownership; no proof survives a released lease.
+- **Named repair:** **Repair local component** resumes or revalidates the selected client runtime, server runtime, world data, shaders or database setup. Other completed components must remain compatible. Corrupt completed output is preserved and may still require support diagnosis; these actions do not reset imports or characters.
+- **Diagnosis:** native service progress distinguishes admission/validation from process readiness and reports phase, process, condition and elapsed time. After a device-only failure, let cleanup settle and use **Export support bundle** before retrying. The [internal real-client title harness](runtime/client/STARTUP-CAPTURE.md) permits authorized runner investigation before database/world readiness, using the actual reconstructed client and matching content/shaders. It does not qualify a title or gameplay merely by starting Wine or capturing a frame.
+
+The existing prepared-data cache remains disabled (`PRODUCTION_FAST_PATH_ENABLED=False`); Android/PRoot qualification and production ownership integration are still required. Full-byte verification remains the fallback. No MPQ/custom-content milestone is accepted before stock world entry and persistence.
+
+For focused implementation checks, use the existing tooling and Gradle tasks:
+
+```sh
+python3 tools/check_world_preparation_flow.py
+python3 -m unittest tests.test_python_receipt_binding tests.test_prepared_data_cache -v
+./gradlew --no-daemon :app:localWorldSetupOwnerTest :app:gameSessionOwnerTest :app:shaderPreparedIntegrityTest :app:clientStartupOwnerTest
+```
+
+These host/fixture checks cover receipt consumers, ownership, cancellation, shader corruption and launch-path separation. They do not replace actual Android/PRoot, real-asset or Thor execution. Reuse the complete-provider workflow above for the installable artifact and retain applicable native, emulator, signing and update-preservation gates.
+
+## Component rebuild rules
+
+Before changing any source, helper or provider identity, record the exact retained generation and inputs, the outputs whose meaning changes, and whether existing completed outputs remain selectable. A compatible reuse/migration path needs interruption/reentry tests; preserving old files without selecting them is insufficient. Validate database migrations against disposable copies, then preserve the live database identity and saves. Freeze unrelated pins and SQL selections.
+
+| Change | Rebuild or migrate |
+| --- | --- |
+| Launcher/integration behavior | Rebuild and sign the APK; retain compatible runtime and prepared generations. |
+| Server logic | Rebuild affected server binaries and apply only necessary, tested migrations. |
+| Server-only content using existing assets | Apply the versioned content migration; rebuild binaries only if code changes. |
+| Cosmetic client content | Rebuild its explicit overlay and actually affected consumers after provider-order and compatibility checks. |
+| Shader inputs | Generate matching shaders; preserve unrelated server data when reviewed compatible. |
+| Geometry, collision or maps | Rebuild affected derived server data and any changed client assets. |
+| Protocol or DBC layout | Produce a matched client/server/data/schema release with explicit save migration. |
+
+These rules identify required work; they do not relax receipt bindings or grant blanket compatibility to changed revisions. The minimal custom MPQ workflow remains a later milestone after stock acceptance.
+
+## Retained preparation compatibility
 
 V11 fixes the Java readers of Python-produced data/shader receipts. Python uses sorted compact JSON with ASCII escapes and literal forward slashes; Android `JSONObject.quote` is not that byte contract. `PythonReceiptJson` supplies matching quoting and Unicode code-point key ordering while retaining the existing accepted types and all source/import/tool/helper checks. Do not change production Python helpers or generation keys to fix a Java-only receipt mismatch. Their unchanged bytes permit checked reuse of completed v10 output.
 
