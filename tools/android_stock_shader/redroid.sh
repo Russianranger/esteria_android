@@ -40,6 +40,8 @@ with (base / 'binder-control').open('r+b', buffering=0) as control:
             assert version[0] == 8
         path.chmod(0o666)
 PY
+  local boot_started
+  boot_started=$(date -u '+%Y-%m-%d %H:%M:%S')
   docker run -d --name "$redroid_name" --pull=never --platform linux/arm64 \
     --privileged --network none --cgroupns=private \
     --device "$work/binder/binder:/dev/binder" \
@@ -59,6 +61,10 @@ PY
       docker inspect -f 'container={{.State.Status}} exit={{.State.ExitCode}}' "$redroid_name"
       docker exec "$redroid_name" /system/bin/sh -c 'for s in zygote servicemanager surfaceflinger; do echo "$s=$(/system/bin/getprop init.svc.$s)"; done' || true
       docker logs "$redroid_name" > "$work/android-boot-private.log" 2>&1 || true
+      # Android is still in early init; neither the APK nor the stock data was opened.
+      head -c 6000 "$work/android-boot-private.log"
+      echo "kernel=$(uname -r) pages=$(getconf PAGESIZE)"
+      sudo dmesg --since "$boot_started" | grep -Ei 'init:|redroid|binder|surfaceflinger|/dev/kmsg|avc: denied|segfault' | tail -65 || true
       return 1
     fi
     sleep 2
