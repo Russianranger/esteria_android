@@ -2,6 +2,7 @@ package io.github.russianranger.esteria.core.runtime;
 
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
 import io.github.russianranger.esteria.core.runtime.process.ProotLaunch;
+import io.github.russianranger.esteria.core.runtime.process.ShaderRunPlan;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -77,6 +78,8 @@ public final class ProotMountTests {
             check(fixture.create(List.of(new ProotLaunch.Mount(fixture.binary,"/esteria-stock-client")))
                     .arguments.contains(fixture.binary+":/esteria-stock-client!"),"Fixed stock helper binding is explicit");
             rejects(()->new ProotLaunch.Mount(fixture.binary,"/esteria-stock-client/helpers"));
+            check(fixture.create(List.of(new ProotLaunch.Mount(fixture.binary,ShaderRunPlan.REPAIR_MOUNT)))
+                    .arguments.contains(fixture.binary+":/esteria-shader-repair!"),"Named repair has a separate pinned helper mount");
             rejects(()->fixture.create(List.of(new ProotLaunch.Mount(fixture.work,"/esteria-shader-tools"))));
 
             for (String target:List.of("/", "/work", "/tmp", "/proc", "/dev", "/usr", "/esteria-data/child", "/esteria-data!"))

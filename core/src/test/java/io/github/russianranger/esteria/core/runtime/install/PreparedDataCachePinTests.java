@@ -40,6 +40,8 @@ public final class PreparedDataCachePinTests {
             check(first.file.startsWith(root.resolve("state/prepared-data-cache"))&&!first.file.startsWith(root.resolve("server-data-work")),"Guest path became cache authority");
             check(first.sha256.equals(digest)&&PreparedDataCachePin.read(root,source).sha256.equals(digest),"Private SHA anchor did not round trip");
             check(java.util.Arrays.equals(Files.readAllBytes(input),original),"Publisher changed owned source candidate");
+            check(PreparedDataCachePin.read(root,new PreparedDataCachePin.Selection(source.generation,123,source.receiptSha256,
+                source.helperGeneration,"e".repeat(64),source.implementationSha256))==null,"New installed reader adopted the previous proof");
             check(PreparedDataCachePin.read(root,new PreparedDataCachePin.Selection(source.generation,123,"f".repeat(64),source.helperGeneration,source.implementationSha256))==null,"Foreign receipt adopted existing proof");
             reject(()->PreparedDataCachePin.read(root,new PreparedDataCachePin.Selection(source.generation,124,source.receiptSha256,source.helperGeneration,source.implementationSha256)));passed++;
             Files.writeString(input,"source changed after anchoring\n");check(PreparedDataCachePin.read(root,source).sha256.equals(digest),"Private copy aliases writable candidate");
@@ -68,12 +70,12 @@ public final class PreparedDataCachePinTests {
             reject(()->PreparedDataCachePin.anchor(root,source,operation,PreparedDataCachePin.MAX_CACHE_BYTES+1,replacement));
             reject(()->new PreparedDataCachePin.Selection("A".repeat(64),123,source.receiptSha256,source.helperGeneration,source.implementationSha256));
             reject(()->new PreparedDataCachePin.Selection(source.generation,0,source.receiptSha256,source.helperGeneration,source.implementationSha256));
-            check(!PreparedDataCachePin.PRODUCTION_FAST_PATH_ENABLED,"Unqualified cache fast path enabled");passed++;
+            check(!PreparedDataCachePin.UNCONDITIONAL_FAST_PATH_ENABLED,"Unqualified cache fast path enabled");passed++;
             String largeOperation="2".repeat(32);Path large=candidate(root,largeOperation,new byte[0]);long bytes=48L<<20;
             try(FileChannel channel=FileChannel.open(large,StandardOpenOption.WRITE)){channel.position(bytes-1);channel.write(ByteBuffer.wrap(new byte[]{0}));channel.force(true);}
             PreparedDataCachePin largePin=PreparedDataCachePin.anchor(root,source,largeOperation,bytes,hash(large));
             check(largePin.bytes==bytes&&PreparedDataCachePin.read(root,source).bytes==bytes,"Large private cache did not stream on bounded heap");passed++;
-            System.out.println("Prepared data private SHA index passed"+passed+" actual filesystem groups at bounded heap; fast path OFF, no guest/data producer qualification");
+            System.out.println("Prepared data private SHA index passed"+passed+" actual filesystem groups at bounded heap; unconditional admission OFF, no guest qualification in this host test");
         }finally{try(var paths=Files.walk(root)){for(Path path:paths.sorted(java.util.Comparator.reverseOrder()).toArray(Path[]::new))Files.delete(path);}}
     }
 }

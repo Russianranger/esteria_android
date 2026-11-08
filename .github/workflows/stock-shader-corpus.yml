@@ -6,6 +6,10 @@ on:
         description: Download full providers for the separate native Wine client attempt
         type: boolean
         default: false
+      named_repair:
+        description: Exercise the production generator and bounded repair on verified provider extents
+        type: boolean
+        default: false
   push:
     branches: [non-custom]
 permissions:
@@ -15,10 +19,11 @@ jobs:
     concurrency:
       group: stock-shader-corpus-${{ github.sha }}
       cancel-in-progress: false
-    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/non-custom' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[qualify stock shaders]') || contains(github.event.head_commit.message, '[qualify stock client]'))
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/non-custom' && (contains(github.event.head_commit.message, '[qualify shader repair]') || github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[qualify stock shaders]') || contains(github.event.head_commit.message, '[qualify stock client]'))
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 120
     env:
+      NAMED_SHADER_REPAIR: ${{ (inputs.named_repair == true || contains(github.event.head_commit.message, '[qualify shader repair]')) && 'true' || 'false' }}
       COMPLETE_CLIENT: ${{ (inputs.complete_client == true || contains(github.event.head_commit.message, '[qualify stock client]')) && 'true' || 'false' }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262

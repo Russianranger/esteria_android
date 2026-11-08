@@ -16,6 +16,7 @@ import java.nio.file.DirectoryStream;
  */
 public final class ShaderRunPlan {
     public static final String TOOL_MOUNT="/esteria-shader-tools";
+    public static final String REPAIR_MOUNT="/esteria-shader-repair";
     public static final String HELPER_MOUNT="/esteria-stock-client";
     // Client471 Client.cpp::g_localeNames/CheckAvailableLocales order. The
     // pinned translator supports ten locales; enCN/enTW cannot be invented.
@@ -41,6 +42,12 @@ public final class ShaderRunPlan {
             "--content-profile",ContentProfile.ID,"--android-low-memory"));
         mounts=Collections.unmodifiableList(Arrays.asList(new ProotLaunch.Mount(game,"/esteria-data"),
             new ProotLaunch.Mount(tools,TOOL_MOUNT),new ProotLaunch.Mount(helpers,HELPER_MOUNT)));
+    }
+    /** Same source, providers, locale and output recipe. Only explicit repair uses the independent driver. */
+    public List<String> repairArguments() {
+        java.util.ArrayList<String> adjusted=new java.util.ArrayList<>(arguments);
+        adjusted.set(adjusted.indexOf(HELPER_MOUNT+"/stock_shader_generation.py"),REPAIR_MOUNT+"/stock_shader_repair.py");
+        return Collections.unmodifiableList(adjusted);
     }
     public void requireCurrentImport()throws IOException {
         if(!importGeneration.equals(current(game)))throw new IOException("Import changed during shader setup; prepared outputs are retained");

@@ -1,0 +1,84 @@
+{
+  "complementaryAndroid": {
+    "enforcingAndroid13": "runtime/evidence/stock-server-listener-enforcing-android13.json",
+    "signedArm64PRoot": {
+      "androidImageSha256": "c815ac1b1d5bd0a099b74c3e3e0eeea3b32bed8d7ab1f788c20fb74e35891716",
+      "appUid": 10077,
+      "execution": "Offline Redroid Android 13 AArch64 userdebug under QEMU TCG. SELinux disabled. The ordinary enforcing Android run is referenced separately.",
+      "fixtureHelperSha256": "784e56cfe05631c083d7eca1c584ac4c33295432dad5c87752a74905829b1753",
+      "guestPython": "Packaged ARM64 CPython 3.12",
+      "guestRootfsSha256": "078c8dfac185688f6e2a250398c320693b8bfd8793f8bb670000507d8da9a17f",
+      "kernel": "6.1.0-54-arm64",
+      "logSha256": "cc2783b4f69847f96004c36ac24c0beb0f635b1a59a3ac2894be501a4edd96f5",
+      "outcome": "Actual PRoot exec children accepted one real IPv4 listener, rejected a second IPv6 listener, and both children were reaped. The production helper ran with external timing.",
+      "proot": "Original signed v15 libproot.so --kill-on-exit --sysvipc -0, PROOT_NO_SECCOMP=1",
+      "runnerSha256": "a25ae2124c670458c2c5facf2b64525b618f89f666cb68a586b468a21086f275",
+      "sameListenerHelperSha256": true
+    }
+  },
+  "defaultDockerSeccomp": {
+    "archiveSha256": "e234371ec70536b6e4e97ded256f72de9ab4466bb9fa21ac0ee68711757ab9e6",
+    "outcome": "After all four schemas, explicit pidfd_getfd verification raised PermissionError and refused readiness.",
+    "runUrl": "https://github.com/Russianranger/esteria_android/actions/runs/42430109893"
+  },
+  "elapsedSeconds": {
+    "auth-srp-12340-loopback-session-key-verified": 142.758,
+    "four-schemas-verified": 142.578,
+    "same-database-second-srp-and-kernel-fd-proof": 156.724,
+    "same-uuid-reopened-and-cleanly-stopped": 157.872,
+    "sql-completion-bound-to-clean-stop": 155.393
+  },
+  "environment": {
+    "architecture": "aarch64",
+    "effectiveCapabilities": 0,
+    "kernel": "7.0.0-1017-azure",
+    "mysqlVersion": "8.0.46-0ubuntu0.24.04.4",
+    "namespaces": [
+      "pid",
+      "mount",
+      "network"
+    ],
+    "networkInterfaces": [
+      "lo"
+    ],
+    "noNewPrivileges": true,
+    "uid": 1001
+  },
+  "evidence": {
+    "archiveSha256": "e93d9bb68ada1bd23ed872063652b495d2e1df780cb7139d1d2a7e38bdb90439",
+    "artifactId": 13597218255,
+    "reportMember": "stock-auth.json",
+    "reportSha256": "2689ee8db7305fc55dad31302c53f96ab7d2dc2b90a7fe6b1a44731d4cb2bfaf",
+    "runUrl": "https://github.com/Russianranger/esteria_android/actions/runs/42430404165"
+  },
+  "formatVersion": 1,
+  "result": {
+    "beforeAndAfterOwnedUnreapedChildFdInspection": true,
+    "completeFourSchemas": true,
+    "connectedPeerAndLocalLoopbackVerified": true,
+    "gameplayQualified": false,
+    "loginCount": 2,
+    "normalServerConfiguration": true,
+    "persistedSessionKeyMatched": true,
+    "physicalThorTested": false,
+    "protocol": "Grunt SRP, build 12340",
+    "reconstructedClientExecuted": false,
+    "sameDatabaseIdentityAfterCleanReopen": true,
+    "worldserverExecuted": false
+  },
+  "scope": "Two live build-12340 SRP auth sessions with selected native authserver and kernel socket ownership checks across a clean reopen of one disposable four-schema database.",
+  "source": {
+    "androidQaRevision": "26e778b46599e9d10e1ddad66b8d605fe91f9e99",
+    "androidQaTree": "a33b9f14bb3738dd7f5ded264436853708ec90b7",
+    "archiveApkSha256": "9d9809d5e04b4bac5d1f0826d4fb0255a53318fe3220f5a7d19e8a077b01dbae",
+    "archiveSha256": {
+      "server-content": "0f41b2deea5344fcea4cbc70bbddf0bab1dfda1cd0346e23e92592aac63056e6",
+      "server-programs": "963a23c1390440260b85ffe164b2d7508c56b005b315dce8a919ae443a46d1bf",
+      "server-runtime": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5"
+    },
+    "authserverSha256": "04cbda982ca1385903929eb46ca52b7cb41ca222e8a48f9898af716d2b878531",
+    "listenerHelperSha256": "5c2f12cef29c6f2e88aa9203083b8f386e2fd26506d7436b20207c789b43f014",
+    "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
+    "stockArchiveTag": "non-custom-v0.1.0-non-custom.13"
+  }
+}

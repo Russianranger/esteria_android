@@ -1,0 +1,83 @@
+{
+  "databaseMigrationPerformed": false,
+  "enforcingAndroid": {
+    "candidateHelperSha256": "5c2f12cef29c6f2e88aa9203083b8f386e2fd26506d7436b20207c789b43f014",
+    "cases": [
+      {
+        "case": "selected",
+        "outcome": "True",
+        "reaped": true
+      },
+      {
+        "case": "aliased",
+        "outcome": "True",
+        "reaped": true
+      },
+      {
+        "case": "foreign",
+        "outcome": "False",
+        "reaped": true
+      },
+      {
+        "case": "ipv6-extra",
+        "outcome": "IPv6",
+        "reaped": true
+      },
+      {
+        "case": "wildcard",
+        "outcome": "IPv4",
+        "reaped": true
+      }
+    ],
+    "coldNonDebuggableActivityResult": true,
+    "control": {
+      "childSocketDescriptorVisible": true,
+      "childTcp6TableErrno": 13,
+      "childTcpTableErrno": 13,
+      "duplicatedRealEndpointAndSO_ACCEPTCONNMatched": true,
+      "groupReaped": true,
+      "netlinkSockDiagErrno": 13,
+      "pidfd_getfd": 438,
+      "pidfd_open": 434,
+      "productionOwnsLoopbackListener": "PermissionError(13), /proc/<owned child>/net/tcp"
+    },
+    "controllerAndChildDomain": "untrusted_app",
+    "entryPoint": "server_session_process.owns_loopback_listener",
+    "execution": "Standard Android SDK AOSP API 33 default x86_64 r02 system image, QEMU TCG. Non-debuggable disposable qualification app with the stock package name and target. No game content used.",
+    "firmware": "Android/sdk_phone64_x86_64/emulator64_x86_64:13/TE1A.220922.034/10940250:userdebug/test-keys",
+    "fixtureApkSha256": "41c044e1bbb9d4df815041c3ee06e161f4a104a06b367c93562512c2e49b26a3",
+    "groupOwnerSha256": "c19ed5c05e94d7b537df1055983fca75e20447f594419084f2207d60f99f138e",
+    "instrumentationApkSha256": "8720e6248e92d8f475d99c770eb32b24146df85ef0dd663308ca2cafdfa22711",
+    "instrumentationExit": -1,
+    "kernel": "5.15.41-android13-8-00055-g4f5025129fe8-ab8949913",
+    "kernelAuditPermissive": 0,
+    "kernelSha256": "c4c44731cc03aee2868a9baa4fd0c4ac649411124027a79213701c18bed64a08",
+    "logSha256": {
+      "coldNonDebuggableActivity": "60cea640dc9edbdee6fdd094b23e195055e0146cd10138af0b5c9899c93a6932",
+      "instrumentation": "8682821166007ddadc80f48c4de1d0d62c892dfefa3bdd18e490731a672ad0c3",
+      "originalActivity": "0b4c52bf7041007cc8f4fe47b2691271c16e5268a69a1f05fc067c6654094e40"
+    },
+    "originalHelperSha256": "2ee8ac79a1e045f503616715b2eeb9f34ae10d509391190ca3be09e30e242ec2",
+    "originalHelperSource": "Byte-identical to assets/server-session/server_session_process.py in the signed v15 stock APK.",
+    "python": {
+      "implementation": "official CPython 3.14.0 x86_64 Android release",
+      "sha256": "5c953df43e47c43ce55888acc5f09f6cac67f2e292480b906be37c14381516e7",
+      "url": "https://www.python.org/ftp/python/3.14.0/python-3.14.0-x86_64-linux-android.tar.gz"
+    },
+    "scopeOfChildren": "Actual Linux descriptor inheritance across exec of /system/bin/sleep; branch accepts or refuses live kernel listeners in a retained owned child. Production auth/world binaries are separately qualified.",
+    "selinuxMode": "Enforcing",
+    "selinuxTarget": "proc_net_tcp_udp",
+    "systemImage": {
+      "bytes": 694005732,
+      "officialSdkSha1": "d4698590184a21fe1e8754284130ad3006b5fc79",
+      "url": "https://dl.google.com/android/repository/sys-img/android/x86_64-33_r02.zip"
+    },
+    "uid": 10126
+  },
+  "formatVersion": 1,
+  "package": "io.github.russianranger.esteria.stock",
+  "physicalThorTested": false,
+  "scope": "Android 13 enclosing-app kernel ownership of auth/world listener descriptors using live executable children",
+  "targetSdk": 35,
+  "wineOrGameSessionTestedByThisObservation": false
+}

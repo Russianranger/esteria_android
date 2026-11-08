@@ -366,6 +366,13 @@ def qualify(work, report, *, complete_client=False):
     effective = reader.provider_paths(client / 'Data', 'enUS')
     require(set(effective) == {client / name for name in report['verifiedProviders']},
             'verified ZIP members differ from effective provider stack')
+    if os.environ.get('NAMED_SHADER_REPAIR') == 'true':
+        from tools.qualify_named_shader_repair import qualify as qualify_repair
+        report['phase'] = 'explicit-named-shader-repair'
+        report['repair'] = {}
+        report['repair'].update(qualify_repair(work, client, tools, pin['clientRevision'], extents, report['repair']))
+        report.update(phase='qualified', passed=True)
+        return
     report['phase'] = 'strict-translation'
     started = time.monotonic()
     output = work / 'compiled'

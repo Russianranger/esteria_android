@@ -22,7 +22,7 @@ try:
     from . import mysql_bootstrap as db, server_content as content, server_schema_setup as schema
     from . import server_schema_baseline as baseline, server_config as config
     from . import provision_local_realm as realm, provision_local_account as account
-    from . import server_playerbots_setup as playerbots, server_data_generation as data
+    from . import server_playerbots_setup as playerbots, server_data_generation as data, prepared_data_cache
     from . import server_session_process as processes, android_server_schema_setup as owner, mysql_service as service
 except ImportError:
     import mysql_bootstrap as db
@@ -34,6 +34,7 @@ except ImportError:
     import provision_local_account as account
     import server_playerbots_setup as playerbots
     import server_data_generation as data
+    import prepared_data_cache
     import server_session_process as processes
     import android_server_schema_setup as owner
     import mysql_service as service
@@ -124,7 +125,8 @@ def _programs(programs):
 
 
 def prepare(verified, connection, state, version, *, programs, data_generation, expected_data_inputs,
-            profile, mysql, expected_uuid, verify_service, state_lease=None, cancelled=lambda: False, progress=lambda *_: None):
+            profile, mysql, expected_uuid, verify_service, state_lease=None, cancelled=lambda: False, progress=lambda *_: None,
+            admission=None):
     """Verify actual four-schema ownership before preparing session config.
 
     Caller holds the database's live service lease. Complete promotion is a
@@ -141,7 +143,11 @@ def prepare(verified, connection, state, version, *, programs, data_generation, 
     data_root = data.storage.canonical(Path(data_generation))
     expected_generation = hashlib.sha256(data.storage.encoded(expected_data_inputs)).hexdigest()
     progress('prepared-data-verification')
-    checked_data = data.verify_completed(data_root, expected_data_inputs, expected_generation=expected_generation)
+    if admission is None:
+        checked_data = data.verify_completed(data_root, expected_data_inputs, expected_generation=expected_generation)
+    else:
+        receipt, scratch, trusted_pin = admission
+        checked_data = prepared_data_cache.admit(data_root, expected_data_inputs, receipt, scratch, trusted_pin, cancelled=cancelled)
     require(checked_data['inputs']['serverRevision'] == realm.SERVER_REVISION, 'Prepared data server source differs')
     progress('schema-verification')
     with db.state_scope(state, state_lease) as lease:
@@ -358,7 +364,7 @@ def selected_inputs(path):
 
 
 def run(state, operation_root, content_root, receipt_path, programs_root, service_session, data_root,
-        profile_path, mysql, version, operation, service_operation, uuid, *, descriptor=0, interrupted=lambda: False):
+        profile_path, mysql, version, operation, service_operation, uuid, *, descriptor=0, interrupted=lambda: False, cache_pin=None):
     """Fixed guest entrypoint under a retained application database lease.
 
     On an exceptional reap failure the actual execution mechanism keeps retrying
@@ -412,12 +418,14 @@ def run(state, operation_root, content_root, receipt_path, programs_root, servic
                     return True
                 # Scope ends before native launch. The frozen data helpers are
                 # adapted only for this admission; no receipt/generation changes.
-                with data.world_io.android_policy(cancelled=requested,
-                        progress=lambda value: print('SESSION_ADMISSION ' + value, flush=True)):
+                report = prepared_data_cache.admission_progress(operation_root, operation, selected['dataReceipt']['sha256'],
+                    'session-audit', lambda value: print('SESSION_ADMISSION ' + value, flush=True))
+                with data.world_io.android_policy(cancelled=requested, progress=report):
                     data.world_io.phase('server-session-admission')
                     prepared = prepare(verified, connection, state, version, programs=selected_programs,
                         data_generation=data_root, expected_data_inputs=selected['dataInputs'], profile=profile, mysql=mysql,
-                        expected_uuid=uuid, verify_service=verify_service, state_lease=lease, cancelled=requested, progress=status.update)
+                        expected_uuid=uuid, verify_service=verify_service, state_lease=lease, cancelled=requested, progress=status.update,
+                        admission=(selected['dataReceipt'],Path('/esteria-data-admission'),cache_pin))
                 current = Session(prepared, connection, operation_root, verify_service)
                 try:
                     reported = dict(current.start(cancelled=requested, progress=status.update), operationId=operation, serviceOperationId=service_operation,
@@ -469,6 +477,8 @@ def main():
         parser.add_argument('--' + name, required=True)
     parser.add_argument('--installed-data-reader', required=True)
     parser.add_argument('--data-recipe', required=True)
+    parser.add_argument('--cache-bytes',type=int)
+    parser.add_argument('--cache-sha256')
     args = parser.parse_args(); stopped = [False]
     for signum in (signal.SIGTERM, signal.SIGINT):
         signal.signal(signum, lambda *_: stopped.__setitem__(0, True))
@@ -481,7 +491,8 @@ def main():
                 Path('/esteria-server-programs'), Path('/work/mysql-sessions') / args.service_operation_id,
                 Path('/esteria-data'), Path(__file__).parent / 'local-server.json', Path('/usr/bin/mysql'),
                 args.expected_version, args.operation_id, args.service_operation_id, args.instance_uuid,
-                interrupted=lambda: stopped[0])
+                interrupted=lambda: stopped[0], cache_pin=None if args.cache_bytes is None else
+                dict(bytes=args.cache_bytes,sha256=args.cache_sha256))
         print('Owned local auth/world stopped; character/bot persistence and gameplay remain unqualified')
         return 0
     except Exception as error:

@@ -1,6 +1,8 @@
 # Current stock handoff
 
-Use the signed v15 update over the existing stock app. The production shader coordinator compiled the complete selected stock corpus. Three cold preparations reused the same output with zero compiles. Linux ARM64 Wine reached the genuine first-run front end and the reconstructed client passed two loopback authserver logins using the retained database. The highest physical Thor evidence remains the v13 world receipt and reported shader failure. Reproduce the next native boundary with the stock worldserver qualification and complete verified import. Continue through character creation, world entry, shutdown and three cold offline gameplay launches. [Published candidate and exact inputs](STATUS.md) · [Install and collect support](NON-CUSTOM-TESTING.md).
+The v16 candidate addresses reproducible repeated shader repair rejection and Android's denial of the procfs TCP tables during auth admission. The public v15 baseline, component identities and executable SHA are recorded in [STATUS.md](STATUS.md). Preserve the signed stock package and use the named shader repair on the existing import. The latest physical report has no matching new ZIP yet. Its exact inner exception and installed version remain unknown.
+
+Linux ARM64 Wine rendered the stock animated front end with loaded external shaders. Separate native sessions authenticated across MySQL restart. The full official source import and stock worldserver qualification are the next independent boundary. Keep world entry, clean character saving and three cold offline relaunches open until exercised. [Candidate procedure and support export](NON-CUSTOM-TESTING.md).
 
 ## Historical v14 handoff
 

@@ -51,6 +51,6 @@ public final class ReceiptBindingHarness {
         Path journal=game.resolve("generations").resolve(metadata.getString("importGeneration")).resolve("journal.tsv");byte[] retained=Files.readAllBytes(journal);
         Files.writeString(journal,"CHANGED\n");refuses(bound::requireUnchanged);Files.write(journal,retained);bound.requireUnchanged();
         check(stamp.equals(Files.getLastModifiedTime(world)),"Consumer rewrote completed world data");
-        System.out.println("{\"pythonGenerationAccepted\":true,\"matchingHashMutantsRejected\":"+mutants.length()+",\"completedDataUnchanged\":true,\"generation\":\""+bound.generation+"\"}");
+        System.out.println("{\"pythonGenerationAccepted\":true,\"matchingHashMutantsRejected\":"+mutants.length()+",\"completedDataUnchanged\":true,\"payloadBytes\":"+bound.payloadBytes+",\"generation\":\""+bound.generation+"\"}");
     }
 }

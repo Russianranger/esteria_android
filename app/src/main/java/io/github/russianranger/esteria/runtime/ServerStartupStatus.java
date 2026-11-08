@@ -23,6 +23,16 @@ final class ServerStartupStatus {
                 integer(value,"nativeElapsedMs"),value.getString("failureType"));
         }catch(JSONException error){throw new IOException("Invalid server startup phase receipt",error);}
     }
+    static boolean acceptRead(JSONObject value,ServerStartupTiming timing,long now,String operation,String receipt,
+            ServerStartupTiming.ReadStage stage)throws IOException {
+        try {
+            if(value.length()!=6||!operation.equals(value.getString("operationId"))||
+                    !receipt.equals(value.getString("receiptSha256"))||!stage.id.equals(value.getString("role")))
+                throw new IOException("Admission read operation/receipt/role differs");
+            return timing.readProgress(now,stage,integer(value,"readBytes"),integer(value,"normalBytesPerSecond"),
+                integer(value,"lowestBytesPerSecond"));
+        }catch(JSONException error){throw new IOException("Invalid admission read receipt",error);}
+    }
     private static long integer(JSONObject value,String key)throws JSONException,IOException {
         Object item=value.get(key);
         if(!(item instanceof Integer)&&!(item instanceof Long))throw new IOException("Integer server startup timing required");

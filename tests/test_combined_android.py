@@ -71,7 +71,7 @@ class CombinedPackageGuards(unittest.TestCase):
         return repository, path
 
     def test_setup_and_service_helpers_are_both_exact_source_bound(self):
-        self.assertEqual(bundle.HELPER_SETS, {'stock-client': ('stock_content_inspection.py', 'stock_shader_generation.py', 'shader_generation.py',
+        self.assertEqual(bundle.HELPER_SETS, {'shader-repair': ('stock_shader_repair.py',), 'stock-client': ('stock_content_inspection.py', 'stock_shader_generation.py', 'shader_generation.py',
                 'extractor_order.py', 'server_data_preflight.py', 'stock_shader_translate.py', 'world_io.py'),
             'database-setup': ('mysql_bootstrap.py', 'android_database_setup.py'),
                                             'database-service': ('mysql_bootstrap.py', 'mysql_service.py'),
@@ -85,7 +85,7 @@ class CombinedPackageGuards(unittest.TestCase):
                 'provision_local_account.py', 'server/appearance-schema-v1.sql', 'server/appearance-schema.lock.json', 'local-server.json'),
             'server-data': ('server-data-reader.sha256', 'server_data_generation.py', 'server_data_preflight.py', 'shader_generation.py',
                 'extractor_order.py', 'owned_process_group.py', 'world_io.py'),
-            'server-session': ('server_session.py', 'server_session_process.py', 'android_server_schema_setup.py',
+            'server-session': ('server_session.py', 'prepared_data_cache.py', 'server_session_process.py', 'android_server_schema_setup.py',
                 'mysql_bootstrap.py', 'mysql_service.py', 'server_content.py', 'server_schema_setup.py',
                 'server_schema_baseline.py', 'server_schema_adaptations.py', 'server_update_setup.py', 'server_updater.py',
                 'server_playerbots_setup.py', 'owned_process_group.py', 'server_config.py', 'provision_local_realm.py',
@@ -97,7 +97,7 @@ class CombinedPackageGuards(unittest.TestCase):
 
     def test_session_source_closure_and_nested_manifest_tamper_refused(self):
         repository, path = self.helper_fixture()
-        self.assertEqual(len(bundle.HELPER_SETS['server-session']), 25)
+        self.assertEqual(len(bundle.HELPER_SETS['server-session']), 26)
         with zipfile.ZipFile(path) as archive:
             original = {name:archive.read(name) for name in archive.namelist()}
         prefix = 'assets/server-session/'

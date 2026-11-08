@@ -8,7 +8,7 @@ import org.json.JSONObject;
 
 /** Host execution of the production status consumer with actual Android JSON sources. */
 public final class ServerStartupStatusTests {
-    private static ServerStartupTiming timing(){return new ServerStartupTiming(0,"a".repeat(32),"b".repeat(64),"c".repeat(64));}
+    private static ServerStartupTiming timing(){return new ServerStartupTiming(0,"a".repeat(32),"b".repeat(64),"c".repeat(64),7L<<30,8L<<20);}
     private static void rejected(JSONObject value)throws Exception {
         try{ServerStartupStatus.accept(value,timing(),10);throw new AssertionError("Invalid status accepted");}
         catch(IOException expected){ }
@@ -25,6 +25,15 @@ public final class ServerStartupStatusTests {
         }
         JSONObject changed=new JSONObject(text);changed.put("gameplayQualified",true);rejected(changed);
         changed=new JSONObject(text);changed.remove("scope");rejected(changed);
+        String report=Files.readString(Path.of(args[1]));
+        ServerStartupTiming.ReadStage stage=ServerStartupTiming.ReadStage.AUDIT;
+        if(!ServerStartupStatus.acceptRead(new JSONObject(report),timing(),10,"a".repeat(32),"d".repeat(64),stage))
+            throw new AssertionError("Actual paced payload report was not accepted");
+        for(String key:new String[]{"operationId","role","receiptSha256","readBytes","normalBytesPerSecond","lowestBytesPerSecond"}) {
+            JSONObject bad=new JSONObject(report).put(key,"foreign");
+            try{ServerStartupStatus.acceptRead(bad,timing(),10,"a".repeat(32),"d".repeat(64),stage);
+                throw new AssertionError("Unbound/wrong type "+key+" accepted");}catch(IOException expected){ }
+        }
         System.out.println("PASS: Python startup receipt consumed by production Android JSON consumer");
     }
 }

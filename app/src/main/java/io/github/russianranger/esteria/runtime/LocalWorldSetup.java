@@ -101,6 +101,19 @@ public final class LocalWorldSetup {
         // programs-only APK must not begin an installation it cannot complete.
         updates.update("world-admission-existing-database","",0,-1);
         FreshServerInstallations.Active previous=component(Component.DATABASE,()->ServerInstallationSetup.completedOrNull(context,root,server,programs,content));
+        return allocate(context,root,server,programs,content,dataTools,wine,shaderTools,locale,threads,freshDatabaseReserve,previous);
+    }
+    public static Handle beginShaderRepair(Context context,Path root,RuntimeSetup wine,ShaderToolsSetup shaderTools,String locale)throws IOException {
+        background();
+        if(!root.equals(context.getFilesDir().getCanonicalFile().toPath()))throw new IOException("Private canonical setup storage required");
+        shaderTools.requireWineArchive(wine.archiveSha256());
+        installed(Component.CLIENT_RUNTIME,wine::current);
+        installed(Component.CLIENT_RUNTIME,shaderTools::current);
+        return allocate(context,root,null,null,null,null,wine,shaderTools,locale,0,0,null);
+    }
+    private static Handle allocate(Context context,Path root,ServerRuntimeSetup server,ServerProgramsSetup programs,
+            ServerContentSetup content,ServerDataToolsSetup dataTools,RuntimeSetup wine,ShaderToolsSetup shaderTools,
+            String locale,int threads,long freshDatabaseReserve,FreshServerInstallations.Active previous)throws IOException {
         Path state=GuestHelperAssets.directory(root,"state");Path lockPath=state.resolve(".local-world-setup.lock");
         if(Files.exists(lockPath,LinkOption.NOFOLLOW_LINKS)&&(!Files.isRegularFile(lockPath,LinkOption.NOFOLLOW_LINKS)||
                 !lockPath.equals(lockPath.toRealPath())))throw new IOException("Invalid local setup ownership file");
@@ -132,6 +145,7 @@ public final class LocalWorldSetup {
         private volatile IOException failure;
         private volatile ServerDataSetup.Handle data;
         private volatile ShaderSetup.Handle shaders;
+        private ExclusiveFileLease shaderImport;
         private volatile ServerInstallationSetup.Handle installation;
         private Handle(Context context,Path root,ServerRuntimeSetup server,ServerProgramsSetup programs,ServerContentSetup content,
                 ServerDataToolsSetup tools,RuntimeSetup wine,ShaderToolsSetup shaderTools,String locale,int threads,long reserve,
@@ -160,6 +174,24 @@ public final class LocalWorldSetup {
             ServerDataSetup.Handle currentData=data;if(currentData!=null&&currentData.processAlive())usage.put("data",currentData.usage());
             ShaderSetup.Handle currentShaders=shaders;if(currentShaders!=null&&currentShaders.processAlive())usage.put("shader",currentShaders.usage());
             return usage;
+        }
+        /** Named shader repair owns only the import, selected shader runtime and derived output. */
+        public ShaderSetup.Result repairShaders(RuntimeWork.Progress progress,RuntimeWork.Cancellation cancellation)throws IOException {
+            background();
+            return operations.run(()->{
+                if(state!=State.ALLOCATED||server!=null)throw new IOException("A fresh shader repair owner is required");
+                state=State.PREPARING;
+                RuntimeWork.Cancellation stop=()->operations.isStopRequested()||(cancellation!=null&&cancellation.isCancelled());
+                try {
+                    check(stop);
+                    shaderImport=ExclusiveFileLease.acquire(root.resolve("game/import.lock"),"Import/client data is already in use");
+                    shaders=component(Component.SHADERS,()->ShaderSetup.begin(context,root,wine,shaderTools,locale));
+                    ShaderSetup.Result result=shaders.repair(progress,stop);
+                    check(stop);state=State.PREPARED;
+                    return result;
+                }catch(RuntimeWork.CancelledException error){state=State.FAILED;failure=error;throw error;}
+                catch(IOException error){state=State.FAILED;failure=error;throw new PreparationRequired(Component.SHADERS,error,true);}
+            });
         }
         public Result prepare(RuntimeWork.Progress progress,RuntimeWork.Cancellation cancellation)throws IOException {
             return run(null,false,progress,cancellation);
@@ -196,7 +228,8 @@ public final class LocalWorldSetup {
                     updates.update("world-shader-owner-admission","",0,-1);
                     check(stop);shaders=component(Component.SHADERS,()->ShaderSetup.begin(context,root,wine,shaderTools,locale));
                     ShaderSetup.Result generated=component(Component.SHADERS,()->
-                        !selectOnly&&(repair==null||repair==Component.SHADERS)?shaders.prepare(updates,stop):shaders.selectPrepared(updates,stop));
+                        repair==Component.SHADERS?shaders.repair(updates,stop):
+                        !selectOnly&&repair==null?shaders.prepare(updates,stop):shaders.selectPrepared(updates,stop));
                     if(!generated.locale.equals(binding.effectiveLocale))
                         throw new IOException("Shader and server data effective client locales differ; prepared outputs are retained");
                     binding.requireUnchanged();check(stop);
@@ -240,6 +273,7 @@ public final class LocalWorldSetup {
                 if(shaders!=null&&shaders.state()!=ShaderSetup.State.CLOSED)throw retained(error);
                 if(data!=null)try{data.close(permit.remaining());}catch(IOException issue){error=add(error,issue);}
                 if(data!=null&&data.state()!=ServerDataSetup.State.CLOSED)throw retained(error);
+                if(shaderImport!=null){shaderImport.close();shaderImport=null;}
                 lease.close();state=State.CLOSED;OWNERS.remove(root,this);
                 if(error!=null)throw error;
             }

@@ -1,0 +1,152 @@
+{
+  "formatVersion": 1,
+  "scope": "Real APK-owned graphics readiness and targeted Wine prefix diagnosis on a disposable ARM64 Android 13 system",
+  "environment": {
+    "model": "Redroid ARM64 under QEMU system emulation (TCG, two virtual CPUs)",
+    "androidSdk": 33,
+    "fingerprint": "redroid/redroid_arm64_only/redroid_arm64_only:13/TQ3A.230805.001.S1/eng.frank.20240527.134411:userdebug/test-keys",
+    "selinux": "Disabled",
+    "hostGpuDevice": false,
+    "guestKgsl": false,
+    "guestAndroidVulkan": "SwiftShader Device (LLVM 10.0.0), physical-device API 1.2, instance API 1.3",
+    "desktopPixels": [
+      1920,
+      1080
+    ],
+    "network": "No VM network adapter",
+    "guestRamMiB": 1536
+  },
+  "selection": {
+    "package": "io.github.russianranger.esteria.stock",
+    "apkProducer": "d5e7715587b980d9e41f9070c21e0fc21c543101",
+    "signedApkSha256": "f6aa8c4ad674e71d3aed59099f0b952efc44a0ae2333a77efdbff81188489510",
+    "executableRevision": "807c4384ef28f4da51d3c50eec5082627cad36ea",
+    "executableSha256": "d2a1b74a3353f2682dcc3bc2b09f649f3b5bf53b55e6f74ccb43071c9aa4b634",
+    "preparedRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+    "shaderGeneration": "3609dd1b67e77a12a6c1641cfba7341fc1681af57bef503f7b9ce8d64dc8139f",
+    "independentShaderReceiptSha256": "8ceaf67054c93693a08424722df6546f0578d5e229afb8c25b3b6e6c8c5a7b34",
+    "wineArchive": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+    "turnipArchive": "445c38ddf7e66f65ee90aa7fd2006db88d6fecd72c8567d801f2ee4c4000a772",
+    "wineVersion": "wine-10.13",
+    "wineSourceCommit": "a6844d10622fc1a973ec1f22fc4f78a0fcd6cb29"
+  },
+  "installedJavaGraphicsOwner": {
+    "operation": "Stage the retained authenticated Wine archive with the signed RuntimeInstaller, prepare the bundled Turnip provider, then TurnipReadinessProbe.begin/run/close through NativeProcessBridge and installed PRoot.",
+    "storage": "Dedicated ext4 directory under guest app files. No import, configuration or save data supplied or overwritten.",
+    "wineGeneration": "dda9221e408dd167796e8a80042f5d7e7e168185eef63dfea088053b0a965c9d",
+    "turnipGeneration": "725738ddaae1b154aa61dbe97eaeb5b5652711717cae1edb9894095fc72346db",
+    "initialCopyBytes": {
+      "wine": 1325744204,
+      "turnip": 16833635
+    },
+    "initialInstallElapsedMs": 1344317,
+    "warmCopyBytes": {
+      "wine": 0,
+      "turnip": 0
+    },
+    "warmInstallElapsedMs": 3904,
+    "productionProbeElapsedMs": 10170,
+    "exitCode": 70,
+    "stderr": "Turnip probe failed: KGSL character device required",
+    "handleStateBeforeClose": "FAILED",
+    "pendingOwnerAfterClose": false,
+    "priorObserverCorrection": "Two external ART observer attempts used an unavailable Java API to read stderr after the real native probe returned 70. Android logs isolated the failure to that observer method. The corrected observer returned the measured failure and closed the owner.",
+    "directDriverControl": {
+      "qualifiedNoKgsl": true,
+      "directIcdLoaded": true,
+      "directIcdPhysicalDevices": 0,
+      "loaderEnumerationResult": -3,
+      "readbackPixels": 0
+    }
+  },
+  "wineBootstrap": {
+    "runtimeInputCheck": {
+      "opt/wine/bin/wine": {
+        "bytes": 67744,
+        "sha256": "7d7f35b538ccf2e998fe0bb6c46a2ef0e24ade47e0aefc1df653f80f73ad68c3",
+        "elfMachine": 183
+      },
+      "opt/wine/bin/wineserver": {
+        "bytes": 725840,
+        "sha256": "d2761747e82e560aba395b2b70061c196ee0d943dfd17ea7ed4f7e81b35ea266",
+        "elfMachine": 183
+      },
+      "opt/wine/lib/wine/aarch64-windows/kernel32.dll": {
+        "bytes": 1114112,
+        "sha256": "366e1aeb898a451da12334ca74013df911f8a93dad1585c74588a55c14920dfa",
+        "peMachine": "0xaa64"
+      },
+      "opt/wine/lib/wine/aarch64-windows/kernelbase.dll": {
+        "bytes": 2162688,
+        "sha256": "d1126500b633b956d352b665616bb45d80fba05962aa65a69e3fac3968586b57",
+        "peMachine": "0xaa64"
+      },
+      "opt/wine/lib/wine/aarch64-windows/ntdll.dll": {
+        "bytes": 1769472,
+        "sha256": "ee9faf7292b63a890ed1d42e65b79dffd83f7650d82f21d2d9b54a838aa2d6e4",
+        "peMachine": "0xaa64"
+      },
+      "opt/wine/lib/wine/aarch64-windows/wineboot.exe": {
+        "bytes": 589824,
+        "sha256": "a53dbf5b78a8ac0d1c1dd9712c2cfa5351e165c5c3ad6dd3ca206e556d761923",
+        "peMachine": "0xaa64"
+      },
+      "opt/wine/lib/wine/aarch64-unix/ntdll.so": {
+        "bytes": 531176,
+        "sha256": "70a81a6b936851bd5675551c9ced3d6c9707f1e9033737ea0dbe96728631875b",
+        "elfMachine": 183
+      },
+      "opt/wine/share/wine/wine.inf": {
+        "bytes": 58179,
+        "sha256": "c2042873062d575d2700672e3187674240019f64e740e4f36e82cc90fe75b4c0"
+      }
+    },
+    "reference": "Bounded read-only FUSE projection accepts verified ranges of 16 stock MPQs. Second guard observes the complete previously generated shader directory. Both saw zero MPQ/SPIR-V payload reads in these failed launches.",
+    "readOnlyProjection": {
+      "scope": "APK tracer and selected Wine rootfs exposed over read-only 9p, disposable ext4 prefix; packaged software ICD requested for observation.",
+      "firstAttempt": "X11 screen 0 and Wine private-PE mapping, then explicit diagnostic wineboot --init reached its 240-second outer deadline.",
+      "secondAttempt": "Separate normal Wine invocation for the repaired PE reused the diagnostic prefix. Wine started internal wineboot.exe and wineserver, exited with c0000135 after a five-minute internal boot event wait."
+    },
+    "declaredGuestEnvironment": {
+      "scope": "Actual installed Wine rootfs on ext4; Android UID/GID 10077, separate PRoot owners for X11, frame bridge and Wine, declared PE and title arguments, fresh /work/home/.wine, selected KGSL environment. External diagnostic supplied a bounded private view. This command did not call ClientStartupSession or GameSession.",
+      "sourcePeCopiesCheckedUnderHostUidAndThroughProot": true,
+      "winebootChildReached": true,
+      "servicesAndRundll32Reached": true,
+      "wineInfOpened": true,
+      "bootstrapOpenedPackagedKernel32AndKernelbase": true,
+      "wineInfOpenAfterParentTimeout": true,
+      "capturedAccessDeniedOrAccessViolation": false,
+      "terminal": "run_wineboot boot event wait timed out; wine: could not load kernel32.dll, status c0000135",
+      "exitCode": 53,
+      "prefixSystem32RegularFiles": 2,
+      "prefixSystemRegBytes": 47096,
+      "prefixUserRegBytes": 6100,
+      "prefixUserDefRegBytes": 123,
+      "dosDevicesC": "../drive_c",
+      "dosDevicesZ": "/",
+      "capture": {
+        "scope": "Filtered +file diagnostics of owned disposable processes",
+        "bytes": 402022,
+        "sha256": "5499a7a0c8823b2a5f7a58a0a6c0b28e542428834cff7e3fac6f94d8aabcc0e7"
+      }
+    },
+    "sameKernelLinuxControl": {
+      "scope": "Native Linux chroot in same ARM64 QEMU instance and kernel, identical read-only installed Wine root, fresh independent prefix and X11.",
+      "command": "wine wineboot.exe -u",
+      "exitCode": 53,
+      "elapsedSeconds": 308,
+      "systemRegBytes": 1347798,
+      "createdNtdllBytes": 1769472,
+      "createdKernel32Bytes": 1114112,
+      "terminal": "start.exe c0000135; Wine reported gdi32/shell32/user32 imports missing during incomplete prefix creation."
+    }
+  },
+  "qualified": {
+    "packagedAndroidProotWineVersion": true,
+    "signedNativeGraphicsFailureAndCleanup": true,
+    "apkClientCommonMain": false,
+    "apkClientFrame": false,
+    "localGameplay": false,
+    "physicalThor": false
+  }
+}

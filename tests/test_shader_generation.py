@@ -104,6 +104,107 @@ class ShaderGenerationTest(unittest.TestCase):
         self.assertEqual((frozen.identity, frozen.execute), original)
         self.assertFalse(shaders.world_io.enabled())
 
+    def repair(self):
+        from runtime import stock_shader_repair
+        return stock_shader_repair.repair(self.store,self.game,self.generation,self.tools,self.revision,'enUS')
+
+    def test_named_repair_same_size_damage_then_pointer_only_reuse(self):
+        with patch.object(shaders,'execute',side_effect=self.fake_execute) as driver:
+            original=self.run_generation()
+            key=original['generation']
+            dest=self.store/'generations'/key
+            changed=dest/'shaders/index.txt'
+            raw=changed.read_bytes()
+            changed.write_bytes(bytes([raw[0]^1])+raw[1:])
+            for _ in range(2):
+                with self.assertRaisesRegex(shaders.ShaderError,'prepared shader generation changed'):
+                    self.run_generation()
+            self.assertEqual(driver.call_count,1)
+            self.assertEqual(self.repair(),(key,'published-replacement'))
+            self.assertEqual(changed.read_bytes(),raw)
+            self.assertEqual(json.loads((dest/'receipt.json').read_bytes()),original)
+            self.assertEqual(self.repair(),(key,'verified-existing'))
+            pointer=self.store/'current'
+            for text in (None,'invalid\n','f'*64+'\n'):
+                if text is None: pointer.unlink()
+                else: pointer.write_text(text)
+                self.assertEqual(self.repair(),(key,'verified-existing'))
+                self.assertEqual(pointer.read_text(),key+'\n')
+            self.assertEqual(driver.call_count,2)
+
+    def test_repair_maintains_previous_generation_and_writer_exclusion(self):
+        import fcntl
+        with patch.object(shaders,'execute',side_effect=self.fake_execute) as compiler:
+            old=self.run_generation()
+            old_path=self.store/'generations'/old['generation']
+            changed=self.tools/'translate_shaders.py'
+            changed.write_text('revised fixture tool')
+            with self.assertRaisesRegex(shaders.ShaderError,'shader tool bytes differ'):
+                self.repair()
+            self.assertEqual((self.store/'current').read_text().strip(),old['generation'])
+            self.write_tools()
+            with (self.store/'.setup.lock').open('r+b') as lease:
+                fcntl.flock(lease,fcntl.LOCK_EX)
+                with self.assertRaises(BlockingIOError): self.repair()
+            key, action=self.repair()
+            self.assertNotEqual(key,old['generation'])
+            self.assertEqual(action,'published-replacement')
+            self.assertEqual(json.loads((old_path/'receipt.json').read_bytes()),old)
+            self.assertEqual(compiler.call_count,2)
+
+    def test_independent_scratch_owner_excludes_damaged_candidate_quarantine(self):
+        import fcntl
+        import shutil
+        with patch.object(shaders, 'execute', side_effect=self.fake_execute) as compiler:
+            key = self.run_generation()['generation']
+            primary = self.store / 'generations' / key
+            scratch = self.store / 'repair'
+            staged = scratch / 'generations' / key
+            shutil.copytree(primary, staged)
+            for tree in (primary, staged):
+                (tree / 'shaders/index.txt').unlink()
+            with (scratch / '.setup.lock').open('w+b') as owner:
+                fcntl.flock(owner, fcntl.LOCK_EX)
+                with self.assertRaises(BlockingIOError):
+                    self.repair()
+            self.assertTrue(staged.is_dir())
+            self.assertTrue(primary.is_dir())
+            self.assertFalse(list(scratch.glob('invalid-staged-*')))
+            self.assertEqual(compiler.call_count, 1)
+            self.assertEqual(self.repair(), (key, 'published-replacement'))
+            self.assertEqual(compiler.call_count, 2)
+
+    def test_repair_staged_before_primary_move_and_crash_reenters_without_compiler(self):
+        from runtime import stock_shader_repair
+        with patch.object(shaders,'execute',side_effect=self.fake_execute):
+            key=self.run_generation()['generation']
+        dst=self.store/'generations'/key
+        (dst/'shaders/index.txt').unlink()
+        with patch.object(shaders,'execute',side_effect=shaders.world_io.PreparationPaused('fixture pressure')):
+            with self.assertRaises(shaders.world_io.PreparationPaused): self.repair()
+        self.assertTrue(dst.is_dir())
+        self.assertFalse(list((self.store/'repair').glob('replaced-*')))
+        # Kill the entire owner exactly after the rejected directory was moved and
+        # before the sealed replacement moves. The next process must reuse staging.
+        pid=os.fork()
+        if pid == 0:
+            try:
+                rename=Path.rename
+                def cutover(path, target):
+                    if path == self.store/'repair/generations'/key and target == dst:
+                        os._exit(23)
+                    return rename(path,target)
+                with patch.object(shaders,'execute',side_effect=self.fake_execute),patch.object(Path,'rename',cutover):
+                    self.repair()
+            finally: os._exit(24)
+        self.assertEqual(os.waitpid(pid,0)[1],23<<8)
+        self.assertFalse(dst.exists())
+        self.assertTrue((self.store/'repair/generations'/key/'receipt.json').is_file())
+        with patch.object(shaders,'execute',side_effect=AssertionError('unexpected recompilation')):
+            self.assertEqual(self.repair(),(key,'published-replacement'))
+            self.assertEqual(self.repair(),(key,'verified-existing'))
+        self.assertTrue((dst/'shaders/index.txt').is_file())
+
     def test_content_profile_separates_reuse_identity_and_rejects_unknown_profiles(self):
         with patch.object(shaders, 'execute', side_effect=self.fake_execute) as run:
             stock = self.run_generation()

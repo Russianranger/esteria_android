@@ -138,6 +138,9 @@ class PythonToAndroidJavaReceipt(unittest.TestCase):
         self.assertTrue(value['pythonGenerationAccepted'])
         self.assertEqual(value['matchingHashMutantsRejected'], 11)
         self.assertTrue(value['completedDataUnchanged'])
+        receipt = self.assets / 'data/work/server-data/generations' / value['generation'] / 'receipt.json'
+        expected = sum(row['bytes'] for row in json.loads(receipt.read_bytes())['files'].values())
+        self.assertEqual(value['payloadBytes'], expected)
         self.assertEqual(value['generation'], self.fixture['data']['generation'])
 
     def test_restoring_android_quote_hash_policy_reproduces_the_owner_failure(self):

@@ -45,7 +45,7 @@ class PreparedDataCacheTests(unittest.TestCase):
             checked=self.verify(proof['cache'])
         self.assertEqual(checked['payloadBytesRead'],0)
         self.assertTrue(all(path==self.selected/'receipt.json' for path in reads))
-        self.assertFalse(checked['productionFastPathEnabled']);self.assertFalse(cache.PRODUCTION_FAST_PATH_ENABLED)
+        self.assertFalse(checked['unconditionalFastPathEnabled']);self.assertFalse(cache.UNCONDITIONAL_FAST_PATH_ENABLED)
 
     def test_same_length_write_with_restored_mtime_rejects_changed_ctime(self):
         path=self.selected/'data/dbc/Map.dbc';before=path.stat()

@@ -10,7 +10,7 @@ from tools.qualify_android_installer import (instrument_passed, named_instrument
 class InstrumentationResults(unittest.TestCase):
     def test_receipt_helper_counts_match_the_exact_packaged_closures(self):
         from tools.package_combined_android import HELPER_SETS
-        self.assertEqual({'server-installation': 18, 'server-data': 7, 'server-session': 25}, HELPER_ASSET_FILES)
+        self.assertEqual({'server-installation': 18, 'server-data': 7, 'server-session': 26}, HELPER_ASSET_FILES)
         for directory, count in HELPER_ASSET_FILES.items():
             self.assertEqual(count, len(HELPER_SETS[directory]), directory)
 

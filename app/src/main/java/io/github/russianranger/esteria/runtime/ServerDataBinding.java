@@ -29,11 +29,12 @@ import org.json.JSONObject;
 public final class ServerDataBinding {
     public final String generation,effectiveLocale;
     public final Path directory;
+    final long payloadBytes;
     private final ServerDataRunPlan plan;
     private final String inputsJson,receiptJson;
-    private ServerDataBinding(ServerDataRunPlan plan,Path directory,String generation,JSONObject inputs,JSONObject receipt,String effectiveLocale)throws IOException {
+    private ServerDataBinding(ServerDataRunPlan plan,Path directory,String generation,JSONObject inputs,JSONObject receipt,String effectiveLocale,long payloadBytes)throws IOException {
         this.plan=plan;this.directory=directory;this.generation=generation;this.effectiveLocale=effectiveLocale;
-        inputsJson=inputs.toString();receiptJson=receipt.toString();
+        inputsJson=inputs.toString();receiptJson=receipt.toString();this.payloadBytes=payloadBytes;
     }
     String installedDataReader(){return plan.helperGeneration;}
     String dataRecipe(){return plan.recipeGeneration;}
@@ -93,7 +94,7 @@ public final class ServerDataBinding {
                     !canonical(identity(selected.resolve("order.tsv"),16L<<20)).equals(canonical(provider.getJSONObject("wire"))))
                 throw new IOException("Prepared provider order metadata changed");
             plan.requireInputsUnchanged();
-            return new ServerDataBinding(plan,selected,generation,inputs,receipt.identity,(String)effective);
+            return new ServerDataBinding(plan,selected,generation,inputs,receipt.identity,(String)effective,receipt.payloadBytes);
         }catch(JSONException error){throw new IOException("Invalid completed server data metadata",error);}
     }
     public void requireUnchanged()throws IOException {
@@ -109,14 +110,15 @@ public final class ServerDataBinding {
     private static JSONObject object(String value)throws IOException {try{return new JSONObject(value);}catch(JSONException error){throw new IOException("Invalid retained data metadata",error);}}
     private static final class Parsed {
         final JSONObject value,identity;
-        Parsed(JSONObject value,JSONObject identity){this.value=value;this.identity=identity;}
+        final long payloadBytes;
+        Parsed(JSONObject value,JSONObject identity,long payloadBytes){this.value=value;this.identity=identity;this.payloadBytes=payloadBytes;}
     }
     /** Stream the potentially large inventory instead of materializing it in
      * the Android heap. The guest performs its actual file hash comparison. */
     private static Parsed parseReceipt(Path path)throws IOException,JSONException {
         file(path);BasicFileAttributes before=Files.readAttributes(path,BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS);
         if(before.size()>64L<<20)throw new IOException("Prepared data receipt exceeds bound");
-        MessageDigest digest=digest();JSONObject result=new JSONObject();Set<String> names=new HashSet<>();
+        MessageDigest digest=digest();JSONObject result=new JSONObject();Set<String> names=new HashSet<>();long payloadBytes=0;
         try(DigestInputStream input=new DigestInputStream(new BoundedInput(Files.newInputStream(path,LinkOption.NOFOLLOW_LINKS),64L<<20),digest);
                 JsonReader reader=new JsonReader(new InputStreamReader(input,StandardCharsets.UTF_8))) {
             reader.setLenient(false);reader.beginObject();
@@ -132,7 +134,9 @@ public final class ServerDataBinding {
                                 relative.contains("//")||relative.equals(".")||relative.equals("..")||relative.startsWith("../")||relative.endsWith("/..")||
                                 relative.contains("/../")||relative.contains("/./")||relative.startsWith("./")||relative.endsWith("/.")||
                                 (previous!=null&&previous.compareTo(relative)>=0)||++count>300000)throw new IOException("Invalid streamed data inventory");
-                        previous=relative;pin((JSONObject)json(reader,0),16L<<30);
+                        previous=relative;JSONObject row=(JSONObject)json(reader,0);pin(row,16L<<30);
+                        payloadBytes+=integer(row,"bytes");
+                        if(payloadBytes>(96L<<30))throw new IOException("Prepared data byte total exceeds bound");
                     }
                     reader.endObject();if(count==0)throw new IOException("Empty prepared data inventory");result.put(name,JSONObject.NULL);
                 } else result.put(name,json(reader,0));
@@ -142,7 +146,7 @@ public final class ServerDataBinding {
         BasicFileAttributes after=Files.readAttributes(path,BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS);
         if(before.size()!=after.size()||!before.lastModifiedTime().equals(after.lastModifiedTime())||
                 (before.fileKey()!=null&&!before.fileKey().equals(after.fileKey())))throw new IOException("Prepared data metadata changed while reading");
-        return new Parsed(result,new JSONObject().put("bytes",before.size()).put("sha256",hex(digest.digest())));
+        return new Parsed(result,new JSONObject().put("bytes",before.size()).put("sha256",hex(digest.digest())),payloadBytes);
     }
     private static final class BoundedInput extends java.io.FilterInputStream {
         private final long maximum;private long count;

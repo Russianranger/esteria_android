@@ -176,6 +176,22 @@ def import_source(scratch, source, progress, spool=None, deadline=None):
         source.unlink()
 
 
+def last_published_readback(root):
+    signing = auth.document(root / 'app/stock-signing.lock.json')
+    published = signing['lastPublished']
+    version = published['versionCode']
+    auth.require(type(version) is int and version > 0, 'invalid published version code')
+    path = root / f'runtime/evidence/non-custom-v{version}-public-apk-readback.json'
+    measured = auth.document(path)
+    apks = [item for item in measured['assets'] if item['name'].endswith('.apk')]
+    auth.require(len(apks) == 1 and apks[0]['sha256'] == published['apkSha256']
+                 and apks[0]['completeAnonymousReadback'] is True
+                 and measured['persistentCertificateSha256'] == signing['certificateSha256']
+                 and measured['sdkV2AndV3SignatureVerified'] is True,
+                 'published world qualification APK differs from signing ledger')
+    return path
+
+
 def stage(destination, readback, apk):
     archive = auth.stage(destination, apk, readback)
     provider = 'server-data-tools'
@@ -283,7 +299,7 @@ def main():
     modes = parser.add_subparsers(dest='mode', required=True)
     prepare = modes.add_parser('package')
     prepare.add_argument('--output', required=True, type=Path)
-    prepare.add_argument('--readback', default=auth.BASELINE, type=Path)
+    prepare.add_argument('--readback', type=Path, help='verified APK readback (defaults to the published stock signing ledger)')
     prepare.add_argument('--apk', type=Path)
     importing = modes.add_parser('import')
     importing.add_argument('--work', type=Path, required=True)
@@ -297,7 +313,7 @@ def main():
     args = parser.parse_args()
     os.umask(0o077)
     if args.mode == 'package':
-        stage(args.output, args.readback, args.apk)
+        stage(args.output, args.readback or last_published_readback(ROOT), args.apk)
     elif args.mode == 'import':
         started = time.monotonic()
         state = {}

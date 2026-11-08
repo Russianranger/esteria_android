@@ -5,6 +5,7 @@ import android.os.Looper;
 import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
+import io.github.russianranger.esteria.core.runtime.process.ProotLaunch;
 import io.github.russianranger.esteria.core.runtime.process.ShaderRunPlan;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,7 +19,9 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -150,12 +153,18 @@ public final class ShaderSetup {
         /** Single use. Keep this owner on failure; cancellation stops the
          * complete owned guest. Atomic shader promotion may win that race. */
         public Result prepare(RuntimeWork.Progress progress,RuntimeWork.Cancellation cancellation)throws IOException {
+            return prepare(progress,cancellation,false);
+        }
+        public Result repair(RuntimeWork.Progress progress,RuntimeWork.Cancellation cancellation)throws IOException {
+            return prepare(progress,cancellation,true);
+        }
+        private Result prepare(RuntimeWork.Progress progress,RuntimeWork.Cancellation cancellation,boolean repair)throws IOException {
             background();return operations.run(()->{
                 if(state!=State.ALLOCATED)throw new IOException("Shader setup already ran; retained state must not be replayed");
                 state=State.RUNNING;
                 RuntimeWork.Cancellation cancelled=()->operations.isStopRequested()||(cancellation!=null&&cancellation.isCancelled());
                 try {
-                    Result result=run(progress,cancelled);state=State.SUCCEEDED;return result;
+                    Result result=run(progress,cancelled,repair);state=State.SUCCEEDED;return result;
                 }catch(IOException|RuntimeException error) {
                     state=State.FAILED;
                     if(process!=null&&process.isAlive()) {
@@ -167,7 +176,7 @@ public final class ShaderSetup {
                 }
             });
         }
-        private Result run(RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled)throws IOException {
+        private Result run(RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled,boolean repair)throws IOException {
             checkCancelled(cancelled);
             if(progress!=null)progress.update("shaders-provider-admission","",0,-1);
             if(!wineRoot.equals(wine.current())||!toolsRoot.equals(tools.current()))throw new IOException("Shader providers changed after allocation");
@@ -182,8 +191,17 @@ public final class ShaderSetup {
                 "setup.shader.stderr.log",session.resolve("logs/stderr.log"));
             checkCancelled(cancelled);
             if(progress!=null)progress.update("shaders-generating","",0,-1);
+            List<String> arguments=plan.arguments;
+            List<ProotLaunch.Mount> mounts=plan.mounts;
+            if(repair) {
+                Path helpers=directories(root,"state/shader-repair-helpers");
+                String selection=GuestHelperAssets.install(context,"shader-repair",helpers,Set.of("stock_shader_repair.py"));
+                arguments=plan.repairArguments();
+                mounts=new ArrayList<>(plan.mounts);
+                mounts.add(new ProotLaunch.Mount(helpers.resolve(selection),ShaderRunPlan.REPAIR_MOUNT));
+            }
             process=ProotProcess.start(context,wine.installer(),wine.packagePlan(),work,session,
-                plan.arguments,wine.wineEnvironment(),plan.mounts,null);
+                arguments,wine.wineEnvironment(),mounts,null);
             if(progress!=null)progress.update("shaders-child-started","",0,-1);
             // The translator has a two-hour budget; paced output validation
             // can take another seventeen minutes for its allowed 2 GiB output.
@@ -410,10 +428,10 @@ public final class ShaderSetup {
     }
     static IOException workerFailure(int exitCode,Path stderr) {
         String message="Shader setup failed (exit "+exitCode+")";
-        String prefix="shader input validation failed: ";
+        List<String> prefixes=List.of("shader input validation failed: ","shader repair failed: ");
         try {
             for(String line:new String(read(stderr,64<<10),StandardCharsets.UTF_8).split("\\r?\\n")) {
-                if(line.startsWith(prefix)) {
+                for(String prefix:prefixes)if(line.startsWith(prefix)) {
                     String detail=io.github.russianranger.esteria.core.diagnostics.SupportBundle.redact(line.substring(prefix.length()));
                     detail=detail.replaceAll("[\\p{Cntrl}\\p{Cf}]"," ").trim();
                     if(!detail.isEmpty())return new IOException(message+". "+detail.substring(0,Math.min(320,detail.length())));

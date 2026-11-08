@@ -22,24 +22,26 @@ import java.util.Set;
 import java.util.UUID;
 
 /** Exact SHA authority from the fixed private index, never imported game data.
- * No production fast path is enabled by this class. The publisher remains
- * package-private until a source-owned Android full-verification adapter and
- * actual Android/PRoot stat qualification are integrated. */
+ * The dedicated verifier and retained import owner supply the authority for publication. */
 public final class PreparedDataCachePin {
-    public static final boolean PRODUCTION_FAST_PATH_ENABLED=false;
+    /** No cache can authorize admission without the retained Android owner and a local trial. */
+    public static final boolean UNCONDITIONAL_FAST_PATH_ENABLED=false;
     public static final long MAX_CACHE_BYTES=128L<<20;
     private static final String STORE="state/prepared-data-cache";
     private static final Set<String> FIELDS=Set.of("format","scope","generation","receiptBytes","receiptSha256",
-        "helperGeneration","implementationSha256","cacheBytes","cacheSha256");
+        "helperGeneration","installedReader","implementationSha256","cacheBytes","cacheSha256");
     public static final class Selection {
-        public final String generation,receiptSha256,helperGeneration,implementationSha256;
+        public final String generation,receiptSha256,helperGeneration,installedReader,implementationSha256;
         public final long receiptBytes;
         /** Values come from typed current data/helper selection, not an Intent. */
         public Selection(String generation,long receiptBytes,String receiptSha256,String helperGeneration,String implementationSha256)throws IOException {
-            hash(generation);hash(receiptSha256);hash(helperGeneration);hash(implementationSha256);
+            this(generation,receiptBytes,receiptSha256,helperGeneration,helperGeneration,implementationSha256);
+        }
+        public Selection(String generation,long receiptBytes,String receiptSha256,String helperGeneration,String installedReader,String implementationSha256)throws IOException {
+            hash(generation);hash(receiptSha256);hash(helperGeneration);hash(installedReader);hash(implementationSha256);
             require(receiptBytes>0&&receiptBytes<=(64L<<20),"Bounded prepared-data receipt required");
             this.generation=generation;this.receiptBytes=receiptBytes;this.receiptSha256=receiptSha256;
-            this.helperGeneration=helperGeneration;this.implementationSha256=implementationSha256;
+            this.helperGeneration=helperGeneration;this.installedReader=installedReader;this.implementationSha256=implementationSha256;
         }
     }
     public final Selection selection;
@@ -63,16 +65,14 @@ public final class PreparedDataCachePin {
         require(fields.keySet().equals(FIELDS)&&"1".equals(fields.get("format"))&&
             "private-prepared-data-cache-sha-anchor".equals(fields.get("scope"))&&
             selected.generation.equals(fields.get("generation"))&&Long.toString(selected.receiptBytes).equals(fields.get("receiptBytes"))&&
-            selected.receiptSha256.equals(fields.get("receiptSha256"))&&selected.helperGeneration.equals(fields.get("helperGeneration"))&&
+            selected.receiptSha256.equals(fields.get("receiptSha256"))&&selected.helperGeneration.equals(fields.get("helperGeneration"))&&selected.installedReader.equals(fields.get("installedReader"))&&
             selected.implementationSha256.equals(fields.get("implementationSha256"))&&chosen.equals(fields.get("cacheSha256")),
             "Private prepared-data cache source/receipt/helper binding differs");
         long bytes=number(fields.get("cacheBytes"));require(bytes>0&&bytes<=MAX_CACHE_BYTES,"Private cache size exceeds bound");
         Path file=generation.resolve("cache.jsonl");require(identity(file,bytes).equals(chosen),"Private prepared-data cache bytes changed");
         return new PreparedDataCachePin(selected,file,bytes,chosen);
     }
-    /** Internal publisher only. Future Android callers must additionally prove
-     * the exact source-owned full-verification child completed successfully.
-     * There is deliberately no public user-path/boolean publication API. */
+    /** Internal publisher of a completed operation whose selected child was verified. */
     static PreparedDataCachePin anchor(Path applicationRoot,Selection selected,String operation,long expectedBytes,String expectedSha)throws IOException {
         Path root=root(applicationRoot);require(operation!=null&&operation.matches("[0-9a-f]{32}"),"Owned cache operation required");
         hash(expectedSha);require(expectedBytes>0&&expectedBytes<=MAX_CACHE_BYTES,"Bounded verified cache required");
@@ -101,12 +101,59 @@ public final class PreparedDataCachePin {
         finally{Files.deleteIfExists(next);}
         return read(root,selected);
     }
+    /** Only the finished dedicated sealer's private stdout can nominate bytes.
+     * The app passes its real import lease and known child; no guest file is authority. */
+    public static PreparedDataCachePin fromCompletedSealer(Path applicationRoot,Selection selected,
+            String operation,io.github.russianranger.esteria.core.runtime.ExclusiveFileLease owner,
+            io.github.russianranger.esteria.core.runtime.process.OwnedProcess sealer)throws IOException {
+        require(operation!=null&&operation.matches("[0-9a-f]{32}")&&owner!=null&&owner.owns(applicationRoot.resolve("game/import.lock"))&&
+            sealer!=null&&!sealer.isAlive()&&!sealer.wasForced()&&sealer.failure()==null&&sealer.exitCode()==0,"Successful owned cache sealer required");
+        Path output=applicationRoot.resolve("state/server-admission-cache-operations").resolve(operation).resolve("logs/stdout.log");
+        require(output.equals(sealer.logPaths().get("stdout"))&&output.equals(output.toRealPath())&&
+                Files.isRegularFile(output,LinkOption.NOFOLLOW_LINKS)&&Files.size(output)<=80,"Fixed bounded cache sealer output required");
+        byte[] raw=small(output,80);
+        String result=new String(raw,StandardCharsets.US_ASCII);
+        require(result.matches("[1-9][0-9]{0,8} [a-f0-9]{64}\n"),"Invalid completed cache sealer result");
+        String[] parts=result.trim().split(" ");
+        long bytes=Long.parseLong(parts[0]);
+        require(bytes>0&&bytes<=MAX_CACHE_BYTES,"Bounded completed sealer output required");
+        Path candidate=applicationRoot.resolve("server-data-work/server-data/cache-candidates").resolve(operation).resolve("cache.jsonl");
+        return new PreparedDataCachePin(selected,candidate,bytes,parts[1]);
+    }
+
+    /** Copy a genuine completed operation to the private index for future sessions.
+     * Failure only loses persistent reuse; the same owner still has the child's exact pin. */
+    public void publishForLater(Path root,String operation)throws IOException {
+        require(file.equals(root.resolve("server-data-work/server-data/cache-candidates").resolve(operation).resolve("cache.jsonl")),
+            "Only the verified sealer output can be published");
+        anchor(root,selection,operation,bytes,sha256);
+    }
+
+    /** A fresh checked private copy for the single selected guest operation. */
+    public void copyForGuest(Path applicationRoot,String operation)throws IOException {
+        require(operation!=null&&operation.matches("[0-9a-f]{32}"),"Owned cache operation required");
+        Path scratch=applicationRoot.resolve("server-data-work/server-data/cache-candidates").resolve(operation);
+        require(existingDirectories(applicationRoot,scratch),"Private cache operation missing");
+        copy(file,scratch.resolve("cache.jsonl"),bytes,sha256);
+    }
+
+    public void retireIfCurrent(Path applicationRoot,io.github.russianranger.esteria.core.runtime.ExclusiveFileLease owner)throws IOException {
+        require(owner!=null&&owner.owns(applicationRoot.resolve("game/import.lock")),"Owned cache retirement required");
+        Path directory=key(root(applicationRoot),selection);
+        if(existingDirectories(applicationRoot,directory)){
+            Path pointer=directory.resolve("current");
+            if(Files.exists(pointer,LinkOption.NOFOLLOW_LINKS)&&
+                    (sha256+"\n").equals(new String(small(pointer,65),StandardCharsets.US_ASCII))){
+                Files.delete(pointer);sync(directory);
+            }
+        }
+    }
     private static byte[] description(Selection s,long bytes,String sha) {
         return ("format=1\nscope=private-prepared-data-cache-sha-anchor\ngeneration="+s.generation+"\nreceiptBytes="+s.receiptBytes+
-            "\nreceiptSha256="+s.receiptSha256+"\nhelperGeneration="+s.helperGeneration+"\nimplementationSha256="+s.implementationSha256+
+            "\nreceiptSha256="+s.receiptSha256+"\nhelperGeneration="+s.helperGeneration+"\ninstalledReader="+s.installedReader+"\nimplementationSha256="+s.implementationSha256+
             "\ncacheBytes="+bytes+"\ncacheSha256="+sha+"\n").getBytes(StandardCharsets.US_ASCII);
     }
-    private static Path key(Path root,Selection s){return root.resolve(STORE).resolve(s.generation).resolve(s.receiptSha256).resolve(s.helperGeneration).resolve(s.implementationSha256);}
+    private static Path key(Path root,Selection s){return root.resolve(STORE).resolve(s.generation).resolve(s.receiptSha256).resolve(s.helperGeneration).resolve(s.installedReader).resolve(s.implementationSha256);}
     private static Path root(Path path)throws IOException {require(path!=null&&path.isAbsolute()&&path.normalize().equals(path)&&Files.isDirectory(path,LinkOption.NOFOLLOW_LINKS)&&path.toRealPath().equals(path),"Canonical private application root required");return path;}
     private static boolean existingDirectories(Path root,Path target)throws IOException {
         Path cursor=root;

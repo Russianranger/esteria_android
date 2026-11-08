@@ -7,6 +7,7 @@ import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
 import io.github.russianranger.esteria.core.runtime.ServerStartupTiming;
 import io.github.russianranger.esteria.core.runtime.install.FreshServerInstallations;
 import io.github.russianranger.esteria.core.runtime.install.RuntimePackagePlan;
+import io.github.russianranger.esteria.core.runtime.install.PreparedDataCachePin;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import io.github.russianranger.esteria.core.runtime.install.PreparationSpeed;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeReadPolicy;
@@ -36,7 +37,7 @@ import org.json.JSONObject;
  * action uses this adapter. Readiness proves local owned listeners/protocol/CLI,
  * never world entry, character/bot persistence, Android or gameplay qualification. */
 public final class LocalServerSession {
-    static final Set<String> HELPERS=Set.of("server_session.py","server_session_process.py",
+    static final Set<String> HELPERS=Set.of("server_session.py","prepared_data_cache.py","server_session_process.py",
         "android_server_schema_setup.py","mysql_bootstrap.py","mysql_service.py","server_content.py",
         "server_schema_setup.py","server_schema_baseline.py","server_schema_adaptations.py","server_update_setup.py",
         "server_updater.py","server_playerbots_setup.py","owned_process_group.py","server_config.py",
@@ -59,7 +60,13 @@ public final class LocalServerSession {
     public static Handle begin(Context context,Path root,ServerRuntimeSetup runtime,ServerProgramsSetup programs,
             ServerContentSetup content,FreshServerInstallations.Active active,ServerDatabaseService.Handle database,
             ServerDataBinding data,Events events)throws IOException {
+        return begin(context,root,runtime,programs,content,active,database,data,events,null);
+    }
+    static Handle begin(Context context,Path root,ServerRuntimeSetup runtime,ServerProgramsSetup programs,
+            ServerContentSetup content,FreshServerInstallations.Active active,ServerDatabaseService.Handle database,
+            ServerDataBinding data,Events events,ExclusiveFileLease imported)throws IOException {
         background();
+        if(imported!=null&&!imported.owns(root.resolve("game/import.lock")))throw new IOException("Current imported data owner required");
         if(!root.equals(context.getFilesDir().getCanonicalFile().toPath())||active==null||database==null||data==null)
             throw new IOException("Owned promoted installation, data binding and database required");
         FreshServerInstallations.Active current=ServerInstallationSetup.completed(context,root,runtime,programs,content);
@@ -83,6 +90,7 @@ public final class LocalServerSession {
         try {
             Files.setPosixFilePermissions(lockPath,PosixFilePermissions.fromString("rw-------"));
             Handle owner=new Handle(context.getApplicationContext(),root,work,runtime,programs,content,active,database,data,events,lease);
+            owner.imported=imported;
             if(OWNERS.putIfAbsent(work,owner)!=null)throw new IOException("Previous local server ownership remains retained");
             return owner;
         }catch(IOException|RuntimeException|Error error){try{lease.close();}catch(IOException close){error.addSuppressed(close);}throw error;}
@@ -98,6 +106,7 @@ public final class LocalServerSession {
         private final ServerDataBinding data;
         private final Events events;
         private final ExclusiveFileLease lease;
+        private ExclusiveFileLease imported;
         private final ServiceOperationGuard operations=new ServiceOperationGuard();
         private final AtomicBoolean stopping=new AtomicBoolean();
         private final CountDownLatch startup=new CountDownLatch(1),finished=new CountDownLatch(1);
@@ -110,6 +119,8 @@ public final class LocalServerSession {
         private final String operation=UUID.randomUUID().toString().replace("-","");
         private volatile ServerStartupTiming timing;
         private java.util.Map<String,String> admissionEnvironment=java.util.Map.of();
+        private long nextReadPoll;
+        private String selectedReceiptSha;
         private Handle(Context context,Path root,Path work,ServerRuntimeSetup runtime,ServerProgramsSetup programs,
                 ServerContentSetup content,FreshServerInstallations.Active active,ServerDatabaseService.Handle database,
                 ServerDataBinding data,Events events,ExclusiveFileLease lease) {
@@ -144,7 +155,8 @@ public final class LocalServerSession {
                     .getString("speed",PreparationSpeed.DEFAULT.id));}catch(IllegalArgumentException invalid){speed=PreparationSpeed.DEFAULT;}
                 // Capture the caller's choice before crossing the retained worker boundary.
                 admissionEnvironment=RuntimeReadPolicy.preparationEnvironment(java.util.Map.of(PreparationSpeed.ENVIRONMENT_KEY,speed.id));
-                timing=new ServerStartupTiming(monotonicMillis(),operation,content.sourceLockSha256(),active.proofSha256);
+                long selectedRate=PreparationSpeed.fromId(admissionEnvironment.get(PreparationSpeed.ENVIRONMENT_KEY)).bytesPerSecond;
+                timing=new ServerStartupTiming(monotonicMillis(),operation,content.sourceLockSha256(),active.proofSha256,data.payloadBytes,selectedRate);
                 worker=new Thread(()->run(progress,cancellation),"esteria-local-server-session");worker.setDaemon(true);worker.start();
                 while(startup.getCount()!=0) {
                     if(stopping.get()||(cancellation!=null&&cancellation.isCancelled())){stopping.set(true);throw new RuntimeWork.CancelledException();}
@@ -179,6 +191,7 @@ public final class LocalServerSession {
             Path outer=directory(GuestHelperAssets.directory(root,"state/server-session-runtime-operations").resolve(operation));logs=outer.resolve("logs");
             JSONObject selected;
             try {
+                selectedReceiptSha=data.receiptIdentity().getString("sha256");
                 JSONObject profile=new JSONObject(new String(read(helpers.resolve(helper).resolve("local-server.json"),65536),StandardCharsets.UTF_8));
                 JSONObject contentPin=identity(content.receiptPath(),16L<<20);
                 if(!content.receiptSha256().equals(contentPin.getString("sha256")))throw new IOException("Prepared content receipt differs from APK selection");
@@ -197,41 +210,151 @@ public final class LocalServerSession {
             }catch(JSONException error){throw new IOException("Cannot bind local server selection",error);}
             if(stopRequested(cancellation))throw new RuntimeWork.CancelledException();
             if(progress!=null)progress.update("server-session-starting","",0,-1);
-            process=ProotProcess.startInteractive(context,runtime.installer(),runtime.packagePlan(),work,outer,
-                List.of("/usr/bin/python3","-B","-s","-E","/work/session-helpers/"+helper+"/server_session.py",
+            var command=new java.util.ArrayList<>(List.of("/usr/bin/python3","-B","-s","-E","/work/session-helpers/"+helper+"/server_session.py",
                     "--expected-version",version,"--operation-id",operation,"--service-operation-id",serviceOperation,"--instance-uuid",uuid,
-                    "--installed-data-reader",data.installedDataReader(),"--data-recipe",data.dataRecipe()),
-                admissionEnvironment,List.of(new ProotLaunch.Mount(programs.current(),ServerProgramsSetup.guestMount()),
-                    new ProotLaunch.Mount(content.current(),ServerContentSetup.guestMount()),new ProotLaunch.Mount(data.directory,"/esteria-data")),
-                new WorldConsoleShutdown());
+                    "--installed-data-reader",data.installedDataReader(),"--data-recipe",data.dataRecipe()));
+            var mounts=new java.util.ArrayList<>(List.of(new ProotLaunch.Mount(programs.current(),ServerProgramsSetup.guestMount()),
+                    new ProotLaunch.Mount(content.current(),ServerContentSetup.guestMount()),new ProotLaunch.Mount(data.directory,"/esteria-data")));
+            PreparedDataCachePin pin=null;
+            ExclusiveFileLease cacheOwner=null;
+            Path scratch=null;
             try {
-                while(process.isAlive()) {
-                    startupStatus(progress);
-                    if(stopRequested(cancellation)||!database.isAlive()) {
-                        stopping.set(true);state=State.STOPPING;
-                        try{process.stop(Duration.ofSeconds(30));}catch(IOException error){remember(error);if(process.isAlive())continue;}
+                if(imported!=null){
+                    try {
+                        scratch=directory(GuestHelperAssets.directory(root,"server-data-work/server-data/cache-candidates").resolve(operation));
+                        cacheOwner=ExclusiveFileLease.acquire(scratch.resolve("owner.lock"),"Data admission already owned");
+                        pin=cacheSelection(helper,helpers,scratch,progress,()->stopRequested(cancellation)||!database.isAlive());
+                    }catch(RuntimeWork.CancelledException | InvalidPreparedData stopped){throw stopped;}
+                    catch(IOException unavailable){
+                        if(stopRequested(cancellation))throw new RuntimeWork.CancelledException();
+                        if(progress!=null)progress.update("server-session-cache-full-verification",unavailable.getMessage(),0,-1);
                     }
-                    Path ready=guestSession.resolve("ready.json");
-                    if(result==null&&Files.exists(ready,LinkOption.NOFOLLOW_LINKS)&&!stopping.get()) {
-                        JSONObject receipt=object(ready);ready(receipt,selected,operation,serviceOperation,uuid,version);
-                        try{result=new Result(receipt,logs);}catch(JSONException error){throw new IOException(error);}
-                        state=State.READY;startup.countDown();
-                        if(progress!=null)progress.update("server-session-owned-listeners-ready","",1,1);
-                    }
-                    try{Thread.sleep(100);}catch(InterruptedException error){stopping.set(true);Thread.currentThread().interrupt();throw new IOException("Server session monitor interrupted",error);}
                 }
-                startupStatus(progress);
-                if(process.failure()!=null||process.wasForced()||process.exitCode()!=0)
-                    throw new IOException("Local auth/world helper did not exit cleanly; "+timing.diagnostic(monotonicMillis()),process.failure());
-                stopped(object(guestSession.resolve("stopped.json")),operation,serviceOperation,uuid,version,active.proofSha256);
-            }finally {
-                // Do not return/release the database lease while native cleanup
-                // remains active. This retained worker is the retry mechanism.
-                boolean interrupted=Thread.interrupted();
-                while(process.isAlive())try{process.stop(Duration.ofSeconds(30));}
-                    catch(IOException error){remember(error);if(process.isAlive())try{Thread.sleep(100);}catch(InterruptedException again){interrupted=true;}}
-                if(interrupted)Thread.currentThread().interrupt();
+                if(pin!=null){
+                    mounts.add(new ProotLaunch.Mount(scratch,"/esteria-data-admission"));
+                    command.addAll(List.of("--cache-bytes",Long.toString(pin.bytes),"--cache-sha256",pin.sha256));
+                }
+                data.requireUnchanged();
+                if(stopRequested(cancellation))throw new RuntimeWork.CancelledException();
+                process=ProotProcess.startInteractive(context,runtime.installer(),runtime.packagePlan(),work,outer,
+                    command,admissionEnvironment,mounts,new WorldConsoleShutdown());
+                try {
+                    while(process.isAlive()) {
+                        if(result==null)readProgress(ServerStartupTiming.ReadStage.AUDIT,progress);
+                        startupStatus(progress);
+                        if(stopRequested(cancellation)||!database.isAlive()) {
+                            stopping.set(true);state=State.STOPPING;
+                            try{process.stop(Duration.ofSeconds(30));}catch(IOException error){remember(error);if(process.isAlive())continue;}
+                        }
+                        Path ready=guestSession.resolve("ready.json");
+                        if(result==null&&Files.exists(ready,LinkOption.NOFOLLOW_LINKS)&&!stopping.get()) {
+                            if(timing.expired(monotonicMillis()))throw new IOException("Local server readiness arrived after deadline; "+timing.diagnostic(monotonicMillis()));
+                            JSONObject receipt=object(ready);ready(receipt,selected,operation,serviceOperation,uuid,version);
+                            try{result=new Result(receipt,logs);}catch(JSONException error){throw new IOException(error);}
+                            state=State.READY;startup.countDown();
+                            if(progress!=null)progress.update("server-session-owned-listeners-ready","",1,1);
+                        }
+                        try{Thread.sleep(100);}catch(InterruptedException error){stopping.set(true);Thread.currentThread().interrupt();throw new IOException("Server session monitor interrupted",error);}
+                    }
+                    startupStatus(progress);
+                    if(process.failure()!=null||process.wasForced()||process.exitCode()!=0)
+                        throw new IOException("Local auth/world helper did not exit cleanly; "+timing.diagnostic(monotonicMillis()),process.failure());
+                    stopped(object(guestSession.resolve("stopped.json")),operation,serviceOperation,uuid,version,active.proofSha256);
+                }finally {
+                    // Do not return/release the database lease while native cleanup
+                    // remains active. This retained worker is the retry mechanism.
+                    boolean interrupted=Thread.interrupted();
+                    while(process.isAlive())try{process.stop(Duration.ofSeconds(30));}
+                        catch(IOException error){remember(error);if(process.isAlive())try{Thread.sleep(100);}catch(InterruptedException again){interrupted=true;}}
+                    if(interrupted)Thread.currentThread().interrupt();
+                }
+            } finally {
+                try {
+                    if(pin!=null&&Files.isRegularFile(scratch.resolve("stale"),LinkOption.NOFOLLOW_LINKS))
+                        pin.retireIfCurrent(root,imported);
+                } finally {
+                    if(cacheOwner!=null)cacheOwner.close();
+                    if(scratch!=null){
+                        for(String name:List.of("cache.jsonl","stale","owner.lock"))Files.deleteIfExists(scratch.resolve(name));
+                        try(var partials=Files.newDirectoryStream(scratch,".cache.jsonl-*")){
+                            for(Path partial:partials)if(partial.getFileName().toString().matches("\\.cache\\.jsonl-[0-9a-f]{32}")&&
+                                    Files.isRegularFile(partial,LinkOption.NOFOLLOW_LINKS))Files.deleteIfExists(partial);
+                        }
+                        // Keep an interrupted unknown partial for bounded diagnostics.
+                        try{Files.delete(scratch);}catch(java.nio.file.DirectoryNotEmptyException partial){ }
+                    }
+                }
             }
+        }
+        private PreparedDataCachePin cacheSelection(String helper,Path helpers,Path scratch,RuntimeWork.Progress progress,
+                RuntimeWork.Cancellation cancellation)throws IOException {
+            if(!imported.owns(root.resolve("game/import.lock")))throw new IOException("Data admission import owner changed");
+            PreparedDataCachePin.Selection selected;
+            try{
+                JSONObject receipt=data.receiptIdentity();
+                selected=new PreparedDataCachePin.Selection(data.generation,receipt.getLong("bytes"),receipt.getString("sha256"),
+                    data.dataRecipe(),data.installedDataReader(),identity(helpers.resolve(helper).resolve("prepared_data_cache.py"),131072).getString("sha256"));
+            }catch(JSONException invalid){throw new IOException("Invalid data admission selection",invalid);}
+            PreparedDataCachePin pin=PreparedDataCachePin.read(root,selected);
+            if(pin==null){
+                Path outer=directory(GuestHelperAssets.directory(root,"state/server-admission-cache-operations").resolve(operation));
+                if(progress!=null)progress.update("server-session-data-full-verification","Private integrity index missing",0,-1);
+                process=ProotProcess.start(context,runtime.installer(),runtime.packagePlan(),work,outer,
+                    List.of("/usr/bin/python3","-B","-s","-E","/work/session-helpers/"+helper+"/prepared_data_cache.py",operation,selected.generation,selected.receiptSha256,
+                        selected.installedReader,selected.helperGeneration),
+                    admissionEnvironment,List.of(new ProotLaunch.Mount(data.directory,"/esteria-data"),
+                        new ProotLaunch.Mount(scratch,"/esteria-data-admission")),null);
+                timing.sealing(true);
+                try {
+                    while(process.isAlive()){
+                        readProgress(ServerStartupTiming.ReadStage.SEAL,progress);
+                        if(cancellation.isCancelled())throw new RuntimeWork.CancelledException();
+                        try{Thread.sleep(100);}catch(InterruptedException error){Thread.currentThread().interrupt();throw new RuntimeWork.CancelledException();}
+                    }
+                }finally{
+                    boolean interrupted=Thread.interrupted();
+                    while(process.isAlive())try{process.stop(Duration.ofSeconds(5));}catch(IOException error){remember(error);}
+                    timing.sealing(false);
+                    if(interrupted)Thread.currentThread().interrupt();
+                }
+                data.requireUnchanged();
+                if(!process.isAlive()&&process.exitCode()==65)
+                    throw new InvalidPreparedData("Prepared world data differs from its receipt; repair world data");
+                if(!process.isAlive()&&process.exitCode()==78){
+                    String reason=lastCacheReason(process.logPaths().get("stderr"));
+                    throw new IOException(reason);
+                }
+                pin=PreparedDataCachePin.fromCompletedSealer(root,selected,operation,imported,process);
+                try{pin.publishForLater(root,operation);}
+                catch(IOException unavailable){
+                    if(progress!=null)progress.update("server-session-data-verified-for-this-start","Private index publication unavailable",0,-1);
+                }
+                return pin;
+            }
+            pin.copyForGuest(root,operation);
+            return pin;
+        }
+        private static final class InvalidPreparedData extends IOException {
+            InvalidPreparedData(String message){super(message);}
+        }
+        private static String lastCacheReason(Path stderr)throws IOException {
+            // Diagnostics are from the selected sealer only. Read its bounded tail.
+            try(var channel=java.nio.channels.FileChannel.open(stderr,StandardOpenOption.READ,LinkOption.NOFOLLOW_LINKS)){
+                long size=channel.size();channel.position(Math.max(0,size-256));
+                var buf=java.nio.ByteBuffer.allocate(256);while(buf.hasRemaining()&&channel.read(buf)>0){ }
+                String[] lines=new String(buf.array(),0,buf.position(),StandardCharsets.UTF_8).trim().split("\n");
+                String line=lines[lines.length-1];
+                return line.startsWith("Prepared data cache unavailable: ")&&line.length()<=192?line:"Prepared data cache trial failed";
+            }
+        }
+        private void readProgress(ServerStartupTiming.ReadStage stage,RuntimeWork.Progress progress)throws IOException {
+            long now=monotonicMillis();
+            if(now<nextReadPoll)return;
+            nextReadPoll=now+1000;
+            Path meter=guestSession.resolve(stage.id+"-io.json");
+            if(Files.exists(meter,LinkOption.NOFOLLOW_LINKS)&&
+                    ServerStartupStatus.acceptRead(object(meter),timing,now,operation,selectedReceiptSha,stage)&&progress!=null)
+                progress.update("server-session-startup-progress",timing.diagnostic(now),0,-1);
         }
         private void startupStatus(RuntimeWork.Progress progress)throws IOException {
             Path status=guestSession.resolve("startup-status.json");

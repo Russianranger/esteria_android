@@ -21,6 +21,11 @@ public final class ShaderRunPlanTests {
             if(!plan.arguments.equals(List.of("/usr/bin/python3","-B","-s","-E","/esteria-stock-client/stock_shader_generation.py",
                 "--store","/work/shaders","--game","/esteria-data","--generation",generation,"--tools","/esteria-shader-tools/tools",
                 "--client-revision",revision,"--locale","enUS","--content-profile","stock-3.3.5a","--android-low-memory")))throw new AssertionError("Pinned command changed");
+            List<String> repair=plan.repairArguments();
+            if(!repair.get(4).equals("/esteria-shader-repair/stock_shader_repair.py")||
+                    !repair.subList(0,4).equals(plan.arguments.subList(0,4))||
+                    !repair.subList(5,repair.size()).equals(plan.arguments.subList(5,plan.arguments.size())))
+                throw new AssertionError("Named shader repair changed a selected source, provider or recipe argument");
             if(!plan.mounts.get(0).source.equals(game)||!plan.mounts.get(1).source.equals(tools)||!plan.mounts.get(2).source.equals(helpers))throw new AssertionError("Whole import ancestry and separate tools must be bound");
             if(!plan.requestedLocale.equals("enUS")||!plan.locale.equals("enUS"))throw new AssertionError("Requested and effective locale differ unexpectedly");
             ShaderRunPlan fallback=new ShaderRunPlan(game,tools,work,helpers,revision,"deDE");

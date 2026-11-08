@@ -1,4 +1,5 @@
 import hashlib
+import json
 import os
 from types import SimpleNamespace
 import zipfile
@@ -22,6 +23,22 @@ class StockWorldSource(unittest.TestCase):
         (self.spool / 'official.torrent').write_bytes(b'test metadata')
         self.journal = self.spool / 'verified-pieces'
         self.events = []
+
+    def test_next_stock_release_selects_the_ledger_apk_before_acquisition(self):
+        root = self.spool
+        (root / 'app').mkdir()
+        (root / 'runtime/evidence').mkdir(parents=True)
+        ledger = {'lastPublished': {'versionCode': 21, 'apkSha256': 'a' * 64}, 'certificateSha256': 'c' * 64}
+        (root / 'app/stock-signing.lock.json').write_text(json.dumps(ledger))
+        path = root / 'runtime/evidence/non-custom-v21-public-apk-readback.json'
+        proof = {'assets': [{'name': 'stock.apk', 'sha256': 'a' * 64, 'completeAnonymousReadback': True}],
+                 'persistentCertificateSha256': 'c' * 64, 'sdkV2AndV3SignatureVerified': True}
+        path.write_text(json.dumps(proof))
+        self.assertEqual(world.last_published_readback(root), path)
+        proof['assets'][0]['sha256'] = 'b' * 64
+        path.write_text(json.dumps(proof))
+        with self.assertRaisesRegex(ValueError, 'differs from signing ledger'):
+            world.last_published_readback(root)
 
     def progress(self, phase, **details):
         self.events.append((phase, details))

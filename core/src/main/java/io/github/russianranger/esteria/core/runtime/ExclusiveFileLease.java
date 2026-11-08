@@ -61,6 +61,11 @@ public final class ExclusiveFileLease implements AutoCloseable {
 
     public synchronized boolean isValid(){return !closed&&channel.isOpen()&&lock.isValid();}
 
+    /** Match the retained descriptor to the exact private writer lock. */
+    public synchronized boolean owns(Path expected) {
+        return path.equals(expected) && isValid() && OWNERS.get(path)==reservation;
+    }
+
     @Override public synchronized void close()throws IOException {
         if(closed)return;
         IOException failure=null;

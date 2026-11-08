@@ -9,7 +9,7 @@ public final class ServerStartupTimingTests {
     private static void rejected(Checked action)throws Exception {
         try{action.run();throw new AssertionError("Invalid status accepted");}catch(IOException expected){ }
     }
-    private static ServerStartupTiming timing(){return new ServerStartupTiming(0,"op","source","proof");}
+    private static ServerStartupTiming timing(){return new ServerStartupTiming(0,"op","source","proof",7L<<30,8L<<20);}
     private static boolean nativeStatus(ServerStartupTiming clock,long now,long sequence,long elapsed)throws IOException {
         return clock.observe(now,"op","source","proof",sequence,"native-startup","worldserver","owned-world-listener",now,elapsed,"");
     }
@@ -42,6 +42,41 @@ public final class ServerStartupTimingTests {
         String detail=stale.diagnostic(102);
         check(detail.contains("process=worldserver")&&detail.contains("readiness=owned-world-listener")&&
             detail.contains("nativeElapsedMs=52")&&detail.contains("failure=TimeoutError"),"Precise bounded failure diagnosis");
+        // A 7 GiB receipt needs 896 seconds of scheduled reads at the configured Gentle rate,
+        // before filesystem and digest work. Exercise both an incomplete seal and a full fallback.
+        var seal=ServerStartupTiming.ReadStage.SEAL;
+        var audit=ServerStartupTiming.ReadStage.AUDIT;
+        var bulk=timing();long rate=8L<<20,bytes=7L<<30;
+        for(int second=1;second<=896;second++)
+            check(bulk.readProgress(second*1000L,seal,second*rate,rate,rate),"Seal progress");
+        check(!bulk.expired(896000),"Full seal may outlive old admission deadline");
+        for(int second=1;second<=896;second++)
+            check(bulk.readProgress((896+second)*1000L,audit,second*rate,rate,rate),"Fallback progress");
+        check(!bulk.readProgress(1793000,audit,bytes+1000,rate,rate),"Extra metadata cannot earn another pass");
+        check(!bulk.expired(1792000+admission-1)&&bulk.expired(1792000+admission),"Stalled read is bounded");
+        nativeStatus(bulk,1794000,1,0);
+        check(!bulk.expired(1794000+nativeBudget-1)&&bulk.expired(1794000+nativeBudget),"Full audit does not buy native time");
+        var phase=timing();
+        for(int second=1;second<=896;second++)phase.readProgress(second*1000L,audit,second*rate,rate,rate);
+        phase.observe(1000000,"op","source","proof",1,"admission","helper","schema-verification",1000000,-1,"");
+        check(!phase.expired(896000+admission),"A newly reached real schema phase updates idle time");
+        rejected(()->phase.observe(1000001,"op","source","proof",2,"admission","helper","source-selection",1000001,-1,""));
+        phase.observe(1000002,"op","source","proof",2,"admission","helper","schema-verification",1000002,-1,"");
+        check(phase.expired(1000000+admission),"Repeated schema heartbeat cannot refresh idle deadline");
+        var idle=timing();idle.readProgress(100,audit,1,rate,rate);
+        check(!idle.readProgress(admission-1,audit,1,rate,rate),"Same byte count is not fresh progress");
+        rejected(()->idle.readProgress(admission+100,audit,2,rate,rate));
+        var pressure=new ServerStartupTiming(0,"op","source","proof",bytes,64L<<20);
+        for(int second=1;second<=3584;second++)
+            pressure.readProgress(second*1000L,audit,second*(2L<<20),64L<<20,2L<<20);
+        check(!pressure.expired(3584000),"Active memory-pressure rate is distinct from configured Fast");
+        rejected(()->pressure.readProgress(3584100,audit,bytes-1,64L<<20,2L<<20));
+        rejected(()->pressure.readProgress(3584100,audit,bytes,rate,rate));
+        rejected(()->pressure.readProgress(3584100,audit,bytes,64L<<20,1));
+        // Sparse one-byte heartbeats cannot outlive the receipt-sized hard budget.
+        var trickle=timing();
+        for(int i=1;i<12;i++)trickle.readProgress(i*60000L,audit,i,rate,rate);
+        check(trickle.expired(admission),"Trickle cannot renew the hard deadline");
         System.out.println("PASS: separate startup budgets and immutable source/operation-bound progress");
     }
 }

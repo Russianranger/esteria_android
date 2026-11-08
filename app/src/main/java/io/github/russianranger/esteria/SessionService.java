@@ -55,6 +55,7 @@ import io.github.russianranger.esteria.runtime.GuestBridgeSetup;
 import io.github.russianranger.esteria.runtime.ClientRuntimeSetup;
 import io.github.russianranger.esteria.runtime.ClientLaunchSetup;
 import io.github.russianranger.esteria.runtime.ShaderToolsSetup;
+import io.github.russianranger.esteria.runtime.ShaderSetup;
 import io.github.russianranger.esteria.runtime.TurnipSetup;
 import io.github.russianranger.esteria.runtime.TurnipReadinessProbe;
 import io.github.russianranger.esteria.runtime.ServerDataToolsSetup;
@@ -807,14 +808,11 @@ public final class SessionService extends Service {
         preparationProgress("world-admission","",0,-1);
         if(locale==null||!java.util.Set.of("deDE","enGB","enUS","esES","frFR","koKR","zhCN","zhTW","enCN","enTW","esMX","ruRU").contains(locale))
             throw new IOException("Select the language of the imported client before preparing the world");
-        if(!BuildConfig.SERVER_RUNTIME_PACKAGED||!BuildConfig.SERVER_PROGRAMS_PACKAGED||!BuildConfig.SERVER_CONTENT_PACKAGED||
-                !BuildConfig.SERVER_DATA_TOOLS_PACKAGED||!BuildConfig.SHADER_TOOLS_PACKAGED)
+        boolean shaderOnly=repair==LocalWorldSetup.Component.SHADERS;
+        if(!BuildConfig.SHADER_TOOLS_PACKAGED||(!shaderOnly&&(!BuildConfig.SERVER_RUNTIME_PACKAGED||!BuildConfig.SERVER_PROGRAMS_PACKAGED||
+                !BuildConfig.SERVER_CONTENT_PACKAGED||!BuildConfig.SERVER_DATA_TOOLS_PACKAGED)))
             throw new IOException("This build does not include the complete source-qualified local world setup profile");
         preparedWorld=null;pendingUiReview=null;
-        ServerRuntimeSetup server=new ServerRuntimeSetup(this,root);
-        ServerProgramsSetup programs=new ServerProgramsSetup(this,root);
-        ServerContentSetup content=new ServerContentSetup(this,root);
-        ServerDataToolsSetup tools=new ServerDataToolsSetup(this,root);
         RuntimeSetup wine=new RuntimeSetup(this,root);ShaderToolsSetup shaders=new ShaderToolsSetup(this,root);
         if(!selectOnly&&repair==null){
             preparationProgress("world-graphics-check","",0,-1);
@@ -823,11 +821,25 @@ public final class SessionService extends Service {
         status=selectOnly?"Selecting prepared local components…":repair==null?"Preparing and fully verifying the local world…":"Repairing "+repair.label+"…";
         // Four GiB is a conservative free-space policy for fresh database work,
         // separate from imported/extracted assets; no device footprint claim.
-        LocalWorldSetup.Handle owner=LocalWorldSetup.begin(this,root,server,programs,content,tools,wine,shaders,locale,1,4L<<30,this::preparationProgress);
+        LocalWorldSetup.Handle owner;
+        if(shaderOnly)owner=LocalWorldSetup.beginShaderRepair(this,root,wine,shaders,locale);
+        else {
+            ServerRuntimeSetup server=new ServerRuntimeSetup(this,root);
+            ServerProgramsSetup programs=new ServerProgramsSetup(this,root);
+            ServerContentSetup content=new ServerContentSetup(this,root);
+            ServerDataToolsSetup tools=new ServerDataToolsSetup(this,root);
+            owner=LocalWorldSetup.begin(this,root,server,programs,content,tools,wine,shaders,locale,1,4L<<30,this::preparationProgress);
+        }
         worldSetup=owner;
         Throwable operationFailure=null;LocalWorldSetup.Result result;
         try {
             RuntimeWork.Progress progress=(phase,path,completed,total)->{keepAwake();preparationProgress(phase,path,completed,total);};
+            if(shaderOnly){
+                ShaderSetup.Result repaired=owner.repairShaders(progress,cancelled::get);
+                log("Shader repair verified generation="+repaired.generation+" files="+repaired.outputFiles+" bytes="+repaired.outputBytes);
+                status="Shaders are ready for the selected import. Start local game to check the next component.";
+                return;
+            }
             result=selectOnly?owner.selectPrepared(progress,cancelled::get):repair==null?owner.prepare(progress,cancelled::get):owner.repair(repair,progress,cancelled::get);
             log((selectOnly?"World setup reused":"World setup completed")+" dataGeneration="+result.data.generation+" shaders="+result.shaders.generation
                 +" installation="+result.installation.slotId+" reusedInstallation="+result.reusedInstallation

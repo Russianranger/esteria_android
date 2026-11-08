@@ -2,33 +2,31 @@
 
 Install the signed ARM64 APK over the existing **Esteria Stock** app. Keep the existing import, locale (**enUS** for the reported device) and **Balanced** preparation speed.
 
-1. Tap **Repair local component → Client runtime** to install the repaired reconstructed Windows ARM64 executable. This installs the corrected client and prepares its stock launch view. You can leave the original `Interface/AddOns` directory in place.
-2. If shaders have never completed on this import, tap **Repair local component → Shaders**. This selects the current stock terrain shaders and this operation checks all 32 modern terrain variants. An already completed compatible shader generation can be used on **Start local game**.
-3. Tap **Start local game**. If the launcher identifies **Database setup**, use **Repair local component → Database setup**, then start again. The existing import, prepared world, matching shaders, database and configuration remain selectable.
+1. Tap **Repair local component → Client runtime** once to select the updated Windows ARM64 executable and its stock launch view.
+2. For the reported shader failure, tap **Repair local component → Shaders**. Wait for **Shaders are ready for the selected import**. The repair owns only the current import and shader store. It can reselect a verified generation, recover a completed staged replacement or compile a replacement for damaged output.
+3. Tap **Start local game**. If the app specifically names **Database setup**, tap **Repair local component → Database setup**, then start again. Keep the same import, prepared world, configuration and saves.
 
-## Start with the existing preparation
+## Subsequent launches and verification
 
-1. Install the update in place. Retain the same imported client language and select **Balanced** under **Preparation speed** while idle.
-2. Choose **Start local game**. It selects existing prepared components without replaying preparation. Status explains reuse or names the missing/invalid component. Admission still performs independent full world-data and shader checks; the metadata cache remains disabled.
-3. If preparation never completed, choose **Prepare / fully verify local runtime and world** once to finish the missing stages. Compatible completed work is verified and reused. This is also the explicit full integrity audit, not a step required before every normal launch.
-4. For a specifically reported missing component, **Repair local component** offers client runtime, server runtime, world data, shaders or database. It resumes/revalidates that component within existing ownership rules and does not reseed an existing database. Corrupt completed output is preserved and may require diagnosis rather than automatic regeneration; export support if the same rejection repeats.
-5. After preparation succeeds, use **Start local game**. Admission has a 12-minute limit, separate from the 180-second auth/world readiness budget. Large data or pressure fallback can still exceed admission; record the phase/time and export support before retrying an unchanged failure.
+Use **Start local game** on subsequent launches. The session selects the completed import, world, shaders and database. A new owner checks shader bytes. For world data, it compares the selected receipt and all recorded filesystem metadata when the current volume and ownership qualify. Otherwise, the session performs a full world-data byte and header audit. Startup reports the phase and reason for fallback. Only observed reads of the selected inventory extend the admission allowance. Twelve minutes without progress stops admission. The native auth/world readiness timer starts separately and allows 180 seconds.
+
+Use **Prepare / fully verify local runtime and world** for an explicit full audit or initial preparation. For a missing or damaged component, choose the component named in the error. If that repair fails, export support before retrying.
 
 ## Verify the normal session and retained state
 
-Use managed local login, not ChromieCraft credentials. Create an ordinary **Human Warrior**, enter the stock starting area, and check rendering, movement, camera, touch/controller input and basic interaction/combat. Keep the existing resolution.
+Use the managed local login. Create an ordinary **Human Warrior**, enter the stock starting area, and check rendering, movement, camera, touch/controller input and basic interaction/combat. Keep the existing resolution.
 
-Exit normally and wait for **Local session stopped**. Reopen the same character and confirm location/progress. Enable airplane mode and disable Wi-Fi, then perform **three cold relaunches**, stopping the app between cleanly closed sessions without clearing data. Each must preserve the same character and avoid extraction, client copying or runtime downloading. Full admission hashing remains expected until the cache path qualifies.
+Exit normally and wait for **Local session stopped**. Reopen the same character and confirm location/progress. Enable airplane mode and disable Wi-Fi, then perform **three cold relaunches**, stopping the app between cleanly closed sessions without clearing data. Each must preserve the same character and avoid extraction, client copying or runtime downloading.
 
 For cancellation/resume, press **Stop** during an explicit preparation/verification, wait for cleanup, then retry the same locale. Valid completed phases must remain reusable. Forced termination is not a successful character save. Compare the same phase when comparing speeds.
 
 | Level | Normal governed Java/Python reads | Guidance |
 | --- | ---: | --- |
-| Gentle | 8 MiB/s | Lower activity; large admission may exceed its bound. |
+| Gentle | 8 MiB/s | Lower governed read rate. |
 | Balanced | 32 MiB/s | Default for this attempt. |
 | Fast | 64 MiB/s | Optional comparison with adequate memory headroom. |
 
-These are pacing limits, not total preparation estimates. Pressure may reduce reads to 2 MiB/s or pause work. Native conversion remains one worker with its existing memory guard. Changing speed alone does not invalidate the generation. Import copying retains its separate policy.
+These limits apply to governed I/O. Pressure may reduce reads to 2 MiB/s or pause work. Native conversion remains one worker with its existing memory guard. Changing speed alone does not invalidate the generation. Import copying retains its separate policy.
 
 ## Export a failure before retrying
 

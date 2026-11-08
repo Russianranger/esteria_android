@@ -38,13 +38,28 @@ class StartupTimingTests(unittest.TestCase):
             output = Path(output)
             session.StartupStatus(output, 'a'*32,
                 dict(sourceLockSha256='b'*64, activeProofSha256='c'*64)).update('source-selection')
+            # Drive the same policy and atomically published meter as an owned guest reading payload.
+            io = session.data.world_io
+            tick = [0.]
+            def sleep(seconds):
+                tick[0] += seconds
+            report = session.prepared_data_cache.admission_progress(output, 'a'*32, 'd'*64, 'session-audit',
+                                                                    lambda _: None, clock=lambda: tick[0])
+            with io.android_policy(progress=report, speed='gentle', clock=lambda: tick[0],
+                                  sleeper=sleep, memory_probe=lambda: 8 << 30):
+                io.phase('server-session-admission')
+                # First report is forced at phase start. The next observed byte follows after 5s.
+                sleep(5)
+                with (output/'startup-status.json').open('rb') as stream:
+                    read = sum(map(len, io.chunks(stream, 128 << 10)))
+            self.assertEqual(json.loads((output/'session-audit-io.json').read_bytes())['readBytes'], read)
             sources = list((fixture / 'aosp').glob('*.java')) + list((fixture / 'support').glob('*.java'))
             sources += [ROOT / 'core/src/main/java/io/github/russianranger/esteria/core/runtime/ServerStartupTiming.java',
                 ROOT / 'app/src/main/java/io/github/russianranger/esteria/runtime/ServerStartupStatus.java',
                 ROOT / 'app/src/test/java/io/github/russianranger/esteria/runtime/ServerStartupStatusTests.java']
             subprocess.run(['javac', '-d', str(output), *map(str, sources)], check=True, capture_output=True, timeout=30)
             result = subprocess.run(['java', '-cp', str(output),
-                'io.github.russianranger.esteria.runtime.ServerStartupStatusTests', str(output / 'startup-status.json')],
+                'io.github.russianranger.esteria.runtime.ServerStartupStatusTests', str(output / 'startup-status.json'), str(output / 'session-audit-io.json')],
                 check=True, capture_output=True, text=True, timeout=30)
             self.assertIn('PASS:', result.stdout)
 

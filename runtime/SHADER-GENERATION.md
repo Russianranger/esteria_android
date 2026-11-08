@@ -105,3 +105,6 @@ game assets. Actual glslang source-build qualification is recorded separately by
 the Turnip build. No complete base/custom MPQ stack is available here, so no game
 shader generation, Android shader setup, Adreno rendering or gameplay is claimed.
 The receipt keeps all rendering/Android/gameplay qualification flags false.
+
+
+**Repair local component → Shaders** takes the import and shader leases directly. It verifies the requested import lineage, effective locale, selected tool manifest and seven-file recipe. Valid output can restore a missing or malformed current pointer without translation. For damaged output the repair driver builds and verifies a separate candidate, retains the replaced directory under `shaders/repair`, and publishes the same generation key. An interrupted cutover can resume from the completed candidate. The repair driver is packaged separately so an update to the repair operation preserves existing shader and world-data identities.

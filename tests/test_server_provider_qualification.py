@@ -51,7 +51,7 @@ class ProviderQualificationGuards(unittest.TestCase):
             self.assertTrue(receipt['exactSourceHelperClosureVerified'])
             self.assertEqual(receipt['helperFiles']['server-data'],7)
             self.assertEqual(receipt['helperFiles']['stock-client'],7)
-            self.assertEqual(receipt['helperFiles']['server-session'],25)
+            self.assertEqual(receipt['helperFiles']['server-session'],26)
             self.assertFalse(receipt['androidGuestExecuted'])
 
     def test_wrong_remote_revision_or_zip_digest_refuses_before_extraction(self):

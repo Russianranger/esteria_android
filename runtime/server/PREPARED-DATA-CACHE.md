@@ -1,17 +1,8 @@
-# Prepared-data cache qualification
+# Prepared world data admission
 
-The production world-data verifier still hashes every prepared payload and checks
-its headers. `PRODUCTION_FAST_PATH_ENABLED` is `false` in both
-`runtime/prepared_data_cache.py` and Core `PreparedDataCachePin`. No application
-call site uses the optional cache. Android/PRoot stat qualification and a
-source-owned capability check remain activation gates.
+The stock Android session checks source identities and the active receipt under its retained import lease. An eligible private generation can reuse a SHA-anchored stat inventory. Each session runs a new filesystem trial with the packaged PRoot and compares every captured file and directory. The full byte/header verification remains available to normal startup and the explicit world-data integrity check.
 
-The proposed optimization covers only immutable, already prepared server data.
-The current setup and session paths each fully verify that data, so a hypothetical
-60 GiB prepared set can require about 120 GiB of payload reads across those two
-boundaries. That is an estimate from the call paths, not a Thor measurement.
-Imported-source, runtime-provider, source-selection and SQL verification remain
-unchanged; this cache does not remove their cost or establish world coverage.
+A warm admission requires an independently approved installed data reader, compatible output recipe, matching cache implementation, generation and receipt. The filesystem trial checks that the selected root and scratch share a device, the Android owner excludes a second writer and same-size writes with restored mtime, replacement and directory entry changes update captured metadata. Nodes with external hard links, multiple filesystem devices or timestamps too recent for the trial use full verification. Corruption that preserves every captured stat field requires a full audit.
 
 ## Candidate and authority
 
@@ -23,10 +14,11 @@ link count, size, nanosecond mtime and nanosecond ctime. An exclusive publicatio
 step preserves any candidate another operation has already published. Cancelled
 or failed seals leave no new completed candidate.
 
-Core's package-private publisher copies the exact size/SHA-bound candidate from
+The Android owner checks the successful dedicated verifier's bounded private stdout and copies the exact size/SHA-bound candidate from
 its fixed owned-operation path to `state/prepared-data-cache`, outside guest
-mounts. A typed selection binds the current generation, receipt bytes/SHA, helper
-generation and cache implementation SHA. The private index supplies the cache's
+mounts. A typed selection binds the current generation, receipt bytes/SHA, output
+recipe, installed data reader and cache implementation SHA. An index publication
+failure leaves the verified operation-local candidate available for the same owner. The private index supplies the cache's
 trusted SHA; a caller boolean, imported cache file, self-declared hash or Intent
 path cannot provide authority. Files are private, single-link regular files under
 private canonical directories. Missing index state requires full verification;
@@ -43,16 +35,15 @@ A mismatch requires full verification/recovery; it never rewrites the old receip
 or treats the cache's own contents as a new trusted pin.
 
 Metadata can detect only changes exposed by the filesystem. Byte corruption that
-preserves every captured field is outside this mechanism's guarantee. Linux host
-results do not qualify Android ARM64, Android's Java filesystem provider, PRoot
-aliases or the Thor. Production remains on full byte verification until the
-platform and owner integration gates are met.
+preserves every captured field is outside this mechanism's guarantee. Each later owner must acquire new locks and complete a new comparison. A stale
+private index requests a full audit, then retires the matching pointer. The next
+owner can seal the verified output again. Historical proof directories remain intact.
 
 ## Android 13 ARM64 measurements
 
 The signed app’s Java publisher passed seven groups and the packaged PRoot passed 15 Python cache tests on disposable Redroid ext4. Three fresh ART processes independently verified the complete shader output. Killing a publisher during a 96 MiB replacement preserved the prior anchor and a fresh process successfully published the replacement. The interrupted process left an unselected pending directory.
 
-Java and PRoot observed the same inode through both guest aliases. Android’s Java filesystem view reported the app UID and whole-second timestamps. PRoot’s root mapping reported UID 0 and nanosecond timestamps. The current code cannot equate those two tuples. Production still uses full verification. Target-device metadata behavior, writer exclusion in the full session and fail-closed production integration remain open. [Measured Android and PRoot results](../evidence/prepared-data-cache-android13.json).
+Java and PRoot observed the same inode through both guest aliases. Android’s Java filesystem view reported the app UID and whole-second timestamps. PRoot’s root mapping reported UID 0 and nanosecond timestamps. The PRoot verifier compares its own tuples under an Android-held lease. Android anchors the exact cache digest privately. A separate app-UID owner reused all 10 nodes of a five-file disposable generation without reading any payload, and a same-size edit with restored mtime failed admission. A Thor session must independently qualify its volume and selection. [Measured Android and PRoot results](../evidence/prepared-data-cache-android13.json).
 
 ## Host evidence
 

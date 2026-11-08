@@ -189,7 +189,7 @@ public final class GameSession {
                     database=ServerDatabaseService.startActive(context,root,setup.server,setup.installation);
                     try{ServerDatabaseService.awaitReady(database,System.nanoTime()+TimeUnit.MINUTES.toNanos(3),stop);}
                     catch(InterruptedException error){Thread.currentThread().interrupt();throw new IOException("Database startup interrupted; owner retained",error);}
-                    check(stop);servers=LocalServerSession.begin(context,root,setup.server,setup.programs,setup.content,setup.installation,database,setup.data,code->notifyFailure(code));
+                    check(stop);servers=LocalServerSession.begin(context,root,setup.server,setup.programs,setup.content,setup.installation,database,setup.data,code->notifyFailure(code),leases.imported);
                     StartupCancellation serverStartup=new StartupCancellation(stop);
                     servers.start(updates,serverStartup);serverStartup.handOff();check(stop);
                     // Presentation inspect recreates providers from the exact APK metadata;

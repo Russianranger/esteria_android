@@ -132,7 +132,21 @@ public final class LocalWorldSetupOwnerTests {
             catch(IOException expected){check(fixture.owner.state()==LocalWorldSetup.State.ALLOCATED,"Unsupported repair is refused before mutation");}
         }
     }
+    private static void isolatedShaderRepair()throws Exception {
+        try(Fixture fixture=new Fixture();ExclusiveFileLease held=ExclusiveFileLease.acquire(fixture.game.resolve("import.lock"),"test")) {
+            try {
+                fixture.owner.repairShaders(null,()->false);
+                throw new AssertionError("Named shader repair must respect the current import writer");
+            }catch(LocalWorldSetup.PreparationRequired expected){
+                check(expected.component==LocalWorldSetup.Component.SHADERS,"Repair identifies only the selected shader component");
+            }
+            check(held.isValid()&&fixture.owner.state()==LocalWorldSetup.State.FAILED,"Busy import remains owned");
+            check(field(fixture.owner,"data")==null&&field(fixture.owner,"installation")==null&&field(fixture.owner,"shaders")==null,
+                    "The named shader path never starts world-data or database setup");
+            fixture.owner.close(Duration.ofSeconds(1));
+        }
+    }
     public static void main(String[] ignored)throws Exception {
-        dependentCleanup();prelaunchCancellation();preparedSelectionCancellation();System.out.println("Local world setup passed3 actual Java dependency/import-lock/prelaunch and prepared-selection cancellation groups; no guest SQL or Android execution");
+        dependentCleanup();prelaunchCancellation();preparedSelectionCancellation();isolatedShaderRepair();System.out.println("Local world setup passed4 actual Java dependency/import-lock/prelaunch and prepared-selection cancellation groups; no guest SQL or Android execution");
     }
 }
