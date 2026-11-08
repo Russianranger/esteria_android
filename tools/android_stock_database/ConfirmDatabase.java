@@ -172,6 +172,7 @@ public final class ConfirmDatabase {
             finally{if(child.isAlive())child.stop(Duration.ofSeconds(15));}
         }
         result.put("after",StockWinePrefix.inspect(work,runtime,wine.archiveSha256()).status().toString());
+        result.put("candidateGateDetails",ConfirmPrefixTrace.inspect(work,runtime,wine.archiveSha256()));
         Path pending=work.resolve(".stock-wine-prefix-repair-v1.pending");
         result.put("pending",Files.isRegularFile(pending)).put("ownerClosed",true);
         Path q=work.resolve("qa-original-check.json");
