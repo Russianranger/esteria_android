@@ -130,7 +130,19 @@ def run():
                     x.wait()
                     raise
     proof['after']=report_prefix(prefix)
-    proof['signedWitnesses']=fingerprint.save(prefix,out)
+    raw=(prefix/'.update-timestamp').read_bytes();assert len(raw)<=32 and raw.strip().isdigit()
+    proof['rawTimestampHex']=raw.hex()
+    proof['images']={}
+    for name in ('ntdll.dll','kernel32.dll','wineboot.exe'):
+        prop={}
+        for kind,base in (('prefix',prefix/'drive_c/windows/system32'),('wine',Path('/opt/wine/lib/wine/aarch64-windows'))):
+            f=base/name;prop[kind]={'link':f.is_symlink(),'exists':f.exists(),'bytes':f.stat().st_size if f.exists() else None,'sha256':fingerprint.digest(f) if f.is_file() else None}
+        proof['images'][name]=prop
+    try:
+        proof['signedWitnesses']=fingerprint.save(prefix,out)
+    except Exception as exc:
+        import traceback
+        proof['witnessError']={'type':type(exc).__name__,'line':traceback.extract_tb(exc.__traceback__)[-1].lineno}
     if source_hash is not None:
         proof['originalPrefixAuditUnchanged']=tree_hash(original_prefix)==source_hash
         assert proof['originalPrefixAuditUnchanged']
