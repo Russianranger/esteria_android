@@ -22,6 +22,11 @@ def observe(prefix):
         for suffix in ('shell folders','user shell folders'):
             startup=data.get(explorer+'\\'+suffix,{}).get('startup');v=(startup or '').strip('"')
             vals[suffix.replace(' ','')+'Startup']={'present':bool(startup),'standardRelative':v.endswith(r'\start menu\programs\startup'),'standardUserRoot':bool(re.fullmatch(r'c:\\users\\[^\\]+\\(?:appdata\\roaming\\microsoft\\windows\\)?start menu\\programs\\startup',v)),'usesUserProfile':v.startswith('%userprofile%'),'typeExpand':v.startswith('str(2):')}
+        for k in ('shell folders','user shell folders'):
+            val=data.get(explorer+'\\'+k,{}).get('startup','')
+            val=val.removeprefix('str(2):').strip('"')
+            vals[k.replace(' ','')+'Template']={'appdata':val==r'%appdata%\microsoft\windows\start menu\programs\startup', 'userprofile':val==r'%userprofile%\appdata\roaming\microsoft\windows\start menu\programs\startup',
+              'absoluteUserHome':any(val=='c:\\users\\'+d.name.lower()+r'\appdata\roaming\microsoft\windows\start menu\programs\startup' for d in (prefix/'drive_c/users').iterdir())}
         vals['pendingRenameCount']=sum(int('pendingfilerenameoperations' in rows) for k,rows in data.items() if k==session or re.fullmatch(r'system\\controlset\d{3}\\control\\session manager',k))
         vals['userChoice']={}
         for scheme in ('ftp','http','https'):
@@ -29,4 +34,8 @@ def observe(prefix):
         vals['navigatingEmptyDefaults']=sum(1 for k,v in data.items() if k.endswith(r'\navigating\.current') and v.get('@')=='""');vals['navigatingNonemptyDefaults']=sum(1 for k,v in data.items() if k.endswith(r'\navigating\.current') and v.get('@') not in (None,'""'))
         vals['directXInstalledVersionExpected']=data.get(r'software\microsoft\directx',{}).get('installedversion')=='hex:00,00,00,09,00,00,00,00';vals['aeDebugAutoExpected']=data.get(r'software\microsoft\windows nt\currentversion\aedebug',{}).get('auto')=='"1"'
         result[hive]={'bytes':(prefix/(hive+'.reg')).stat().st_size,'defaults':vals}
+    cache=prefix/'drive_c/windows/system32/dllcache'
+    result['dllCacheDirectoryAbsentOrEmpty']=not cache.is_symlink() and (not cache.exists() or (cache.is_dir() and next(cache.iterdir(),None) is None))
+    winlogon=r'software\microsoft\windows nt\currentversion\winlogon'
+    result['sfcdllcachedirAbsent']='sfcdllcachedir' not in files['system'].get(winlogon,{})
     return result

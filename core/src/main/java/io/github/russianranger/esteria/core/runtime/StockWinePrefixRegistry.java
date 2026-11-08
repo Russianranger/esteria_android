@@ -34,6 +34,7 @@ final class StockWinePrefixRegistry {
             CLSID + "{82d353df-90bd-4382-8bc2-3f6192b76e34}\\inprocserver32";
     private static final String DIRECTX = MS + "directx",
             DEBUG = MS + "windows nt\\currentversion\\aedebug";
+    private static final String WINLOGON = MS + "windows nt\\currentversion\\winlogon";
     private static final String SESSION = "system\\currentcontrolset\\control\\session manager";
     private static final String SHELL = CV + "explorer\\shell folders",
             USER_SHELL = CV + "explorer\\user shell folders";
@@ -45,7 +46,7 @@ final class StockWinePrefixRegistry {
     private static final String[] SCHEMES = {"ftp", "http", "https"};
     private static final String CONTROL_SET = "system\\controlset001\\control\\session manager";
     private static final Set<String> SYSTEM =
-            Set.of(QUARTZ, QEDIT, WMV, DIRECTX, DEBUG, SESSION, CONTROL_SET);
+            Set.of(QUARTZ, QEDIT, WMV, DIRECTX, DEBUG, SESSION, CONTROL_SET, WINLOGON);
     private static final Set<String> USER =
             Set.of(
                     NAV,
@@ -82,6 +83,7 @@ final class StockWinePrefixRegistry {
                     user = read(prefix.resolve("user.reg"), false);
             if (system.containsKey("autorun")
                     || user.containsKey("autorun")
+                    || !absentOr(system, WINLOGON, "SFCDllCacheDir", quoted(FILE_PATH + "dllcache"))
                     || value(system, SESSION, "PendingFileRenameOperations") != null
                     || value(system, CONTROL_SET, "PendingFileRenameOperations") != null
                     || !absentOr(system, DIRECTX, "Version", quoted("4.09.00.0904"))
@@ -93,6 +95,8 @@ final class StockWinePrefixRegistry {
             Path c = prefix.resolve("drive_c"), windows = c.resolve("windows");
             if (!directory(c) || !directory(windows) || child(windows, "wininit.ini") != null)
                 return false;
+            // wineboot -u installs and then deletes each queued Windows File Protection file.
+            if (!emptyFolderIfPresent(c, "windows", "system32", "dllcache")) return false;
             Path users = c.resolve("users");
             if (!directory(users)) return false;
             Set<String> folders = new HashSet<>();
@@ -104,7 +108,15 @@ final class StockWinePrefixRegistry {
                     if (!name.matches("[A-Za-z0-9._ -]{1,80}")) return false;
                     folders.add(
                             quoted("c:\\users\\" + name + "\\" + STARTUP).toLowerCase(Locale.ROOT));
-                    if (!emptyStartup(home)) return false;
+                    if (!emptyFolderIfPresent(
+                            home,
+                            "AppData",
+                            "Roaming",
+                            "Microsoft",
+                            "Windows",
+                            "Start Menu",
+                            "Programs",
+                            "Startup")) return false;
                 }
             }
             for (String key : new String[] {SHELL, USER_SHELL}) {
@@ -116,7 +128,7 @@ final class StockWinePrefixRegistry {
                                 "str(2):"
                                         + quoted(
                                                 "%APPDATA%\\Microsoft\\Windows\\Start"
-                                                    + " Menu\\Programs\\Startup")))
+                                                        + " Menu\\Programs\\Startup")))
                     return false;
             }
             return true;
@@ -129,18 +141,8 @@ final class StockWinePrefixRegistry {
         return Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS);
     }
 
-    private static boolean emptyStartup(Path home) throws IOException {
-        Path at = home;
-        for (String component :
-                new String[] {
-                    "AppData",
-                    "Roaming",
-                    "Microsoft",
-                    "Windows",
-                    "Start Menu",
-                    "Programs",
-                    "Startup"
-                }) {
+    private static boolean emptyFolderIfPresent(Path at, String... components) throws IOException {
+        for (String component : components) {
             at = child(at, component);
             if (at == null) return true;
             if (!directory(at)) return false;
@@ -204,12 +206,10 @@ final class StockWinePrefixRegistry {
                                 StandardCharsets.UTF_8))) {
             if (!"WINE REGISTRY Version 2".equals(f.readLine()))
                 throw new IOException("Registry version");
-            String root = f.readLine();
-            if (root == null
-                    || !(machine
-                            ? root.equalsIgnoreCase(";; All keys relative to \\\\Machine")
-                            : root.toLowerCase(Locale.ROOT)
-                                    .startsWith(";; all keys relative to \\\\user\\\\s-1-")))
+            // Wine's dump_path includes the REGISTRY root key. Its fixed local_user_sid
+            // is S-1-5-21-0-0-0-1000 for this Wine source on ARM64.
+            String hive = machine ? "Machine" : "User\\\\S-1-5-21-0-0-0-1000";
+            if (!(";; All keys relative to REGISTRY\\\\" + hive).equals(f.readLine()))
                 throw new IOException("Registry root");
             if (!"".equals(f.readLine()) || !"#arch=win64".equals(f.readLine()))
                 throw new IOException("Registry architecture");

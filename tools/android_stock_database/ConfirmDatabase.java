@@ -127,7 +127,27 @@ public final class ConfirmDatabase {
         result.put("changedSource",StockWinePrefix.inspect(work,runtime,"0000000000000000000000000000000000000000000000000000000000000000").status().toString());
         Path foreign=Files.createDirectories(root.resolve("qa-negative/home/.wine/drive_c/windows/system32"));
         result.put("foreign",StockWinePrefix.inspect(root.resolve("qa-negative"),runtime,wine.archiveSha256()).status().toString());
-        if(Arrays.asList("cancel","update","finish","noop").contains(mode)){
+        if(mode.equals("unknown")){
+            Path retained=root.resolve("qa-observer-healthy-prefix"),source=work.resolve("home/.wine");
+            Files.move(source,retained,java.nio.file.StandardCopyOption.ATOMIC_MOVE);
+            try{
+                Files.createDirectory(source);
+                Path marker=source.resolve("unrelated-existing-owner");
+                byte[] prior="unrelated-private-qa-prefix".getBytes(StandardCharsets.US_ASCII);
+                Files.write(marker,prior,java.nio.file.StandardOpenOption.CREATE_NEW);
+                java.nio.file.attribute.FileTime stamp=Files.getLastModifiedTime(marker); long inode=((Number)Files.getAttribute(marker,"unix:ino")).longValue();
+                java.util.List<String> phases=new java.util.ArrayList<>();
+                boolean did=StockWinePrefixRepair.runIfRequired(context,root,(phase,path,done,total)->phases.add(phase),RuntimeWork.NEVER_CANCELLED);
+                result.put("handlerReturn",did).put("phases",new org.json.JSONArray(phases));
+                result.put("preservedUnknownMarker",Files.getLastModifiedTime(marker).equals(stamp) && inode==((Number)Files.getAttribute(marker,"unix:ino")).longValue() && java.util.Arrays.equals(prior,Files.readAllBytes(marker)));
+                try(java.util.stream.Stream<Path> siblings=Files.list(source)){result.put("unknownFileCount",siblings.count());}
+                result.put("unknownPending",Files.exists(work.resolve(".stock-wine-prefix-repair-v1.pending")));
+                Files.delete(marker);
+                Files.delete(source);
+            }finally{
+                if(Files.notExists(source))Files.move(retained,source,java.nio.file.StandardCopyOption.ATOMIC_MOVE);
+            }
+        }else if(Arrays.asList("cancel","update","finish","noop").contains(mode)){
             final long[] registered={0};final boolean[] live={false},busy={false};
             java.util.List<String> phases=new java.util.ArrayList<>();
             try{
@@ -180,7 +200,7 @@ public final class ConfirmDatabase {
         return result;
     }
     public static void main(String[] args) throws Exception {
-        if(args.length!=1 || !Arrays.asList("reference","interrupt","reentry","clone","cancel","update","finish","noop","audit","warm").contains(args[0])) throw new IllegalArgumentException();
+        if(args.length!=1 || !Arrays.asList("reference","interrupt","reentry","clone","cancel","update","finish","noop","audit","warm","unknown").contains(args[0])) throw new IllegalArgumentException();
         if(Looper.myLooper()==null) Looper.prepareMainLooper();
         Class<?> thread=Class.forName("android.app.ActivityThread");
         Object instance=thread.getMethod("systemMain").invoke(null);

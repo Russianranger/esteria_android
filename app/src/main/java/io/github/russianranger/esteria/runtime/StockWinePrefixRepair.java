@@ -54,7 +54,16 @@ public final class StockWinePrefixRepair {
         }
     }
 
-    /** False delegates ordinary absent/complete cases to the existing client-runtime repair. */
+    /** Only a source-bound interrupted prefix authorizes Wine. Other selections
+     * leave the existing named provider repair available. */
+    static StockWinePrefix selectForUpdate(Path work, Path runtime, String archive, RuntimeWork.Progress progress) {
+        StockWinePrefix prefix=StockWinePrefix.inspect(work,runtime,archive);
+        if (prefix.status()==StockWinePrefix.Status.UNRECOGNIZED)
+            progress.update("client-prefix-preserved","",0,-1);
+        return prefix.requiresRepair() ? prefix : null;
+    }
+
+    /** False delegates to the existing client-runtime provider repair. */
     public static boolean runIfRequired(Context context,Path root,RuntimeWork.Progress progress,
             RuntimeWork.Cancellation cancelled)throws IOException {
         if(Looper.myLooper()==Looper.getMainLooper())throw new IllegalStateException("Wine prefix repair requires a worker");
@@ -72,10 +81,8 @@ public final class StockWinePrefixRepair {
         }
         Throwable failure=null;
         try {
-            StockWinePrefix prefix=StockWinePrefix.inspect(work.work,runtime,wine.archiveSha256());
-            if(prefix.status()==StockWinePrefix.Status.UNRECOGNIZED)
-                throw new IOException("Wine prefix does not match the supported interrupted installation. Existing files were preserved.");
-            if(!prefix.requiresRepair())return false;
+            StockWinePrefix prefix=selectForUpdate(work.work,runtime,wine.archiveSha256(),progress);
+            if(prefix==null)return false;
             if(cancelled.isCancelled())throw new RuntimeWork.CancelledException();
             if(prefix.status()==StockWinePrefix.Status.RESUME && prefix.finishVerifiedIfComplete(work.workLease()))return true;
             ClientPresentationSession.Prepared prepared=ClientPresentationSession.Prepared.inspect(context,work.work);

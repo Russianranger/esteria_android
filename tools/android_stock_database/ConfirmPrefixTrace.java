@@ -33,6 +33,14 @@ final class ConfirmPrefixTrace {
     d.put("imagesPinned",call(c,"matchesPrefixImages",null,fp,system));
     d.put("stage",String.valueOf(call(r,"inspect",null,fp,p)));d.put("safeToUpdate",call(r,"safeToUpdate",null,fp,p));
     for(String name:Arrays.asList("system.reg","user.reg")){
+       try(java.io.BufferedReader source=Files.newBufferedReader(p.resolve(name),StandardCharsets.UTF_8)){
+           String h1=source.readLine(),h2=source.readLine(),blank=source.readLine(),arch=source.readLine();
+           boolean systemRoot=";; All keys relative to REGISTRY\\\\Machine".equalsIgnoreCase(h2);
+           boolean userRoot=h2!=null && h2.toLowerCase(Locale.ROOT).startsWith(";; all keys relative to registry\\\\user\\\\s-1-")
+                 && h2.substring(h2.lastIndexOf('\\')+1).matches("(?i)S-1-([0-9]{1,10}-){1,14}[0-9]{1,10}");
+           d.put(name+"ExpectedSignedHeader", "WINE REGISTRY Version 2".equals(h1) && (name.equals("system.reg")?systemRoot:userRoot)
+                       && "".equals(blank) && "#arch=win64".equals(arch));
+       }
        Object parsed=call(r,"read",null,new Class<?>[]{Path.class,boolean.class},p.resolve(name),name.equals("system.reg"));
        d.put(name+"Parser",parsed instanceof Map?((Map<?,?>)parsed).size():parsed);
     }

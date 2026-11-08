@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        control: [retained]
+        control: [retained, reference]
     env:
       ESTERIA_WINE_CONTROL: ${{ matrix.control }}
     steps:
@@ -50,7 +50,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: wine-predicate-diagnostics-${{ matrix.control }}
+          name: wine-prefix-native-handler-${{ matrix.control }}
           path: ${{ runner.temp }}/android-stock-db-evidence/*.json
           retention-days: 7
           if-no-files-found: warn

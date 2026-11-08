@@ -117,7 +117,7 @@ def exercise(report):
     report.update(packageUid=package_uid,selinux=shell(CONTAINER,'getenforce').strip(),
                   fingerprint=shell(CONTAINER,'getprop ro.build.fingerprint').strip())
     scenario=os.environ['ESTERIA_WINE_CONTROL'];assert scenario in ('reference','retained')
-    phases=['reference','noop'] if scenario=='reference' else ['interrupt','reentry','clone','cancel','update','finish','noop','warm','audit']
+    phases=['reference','noop','unknown'] if scenario=='reference' else ['interrupt','reentry','clone','cancel','update','finish','noop','warm','audit']
     report['samples']={}
     for mode in phases:
         report['phase']=mode
@@ -153,6 +153,7 @@ def exercise(report):
         if mode=='cancel':checked(item.get('nativeCancelled') and item.get('liveWinebootBeforeCancel') and item['competingLeaseDenied'] and item['pending'] and item['after']=='RESUME','cancelled updater/lease/pending recovery not proven')
         if mode=='update':checked(item.get('cutAfterGuestExitBeforePendingRetired') and item['pending'] and item['after']=='RESUME' and item['competingLeaseDenied'],'named recovery failed to return through verify')
         if mode=='finish':checked(item.get('handlerReturn') and not item['phases'] and item['after']=='NO_REPAIR' and not item['pending'],'side-effect-complete recovery did not retire pending once')
+        if mode=='unknown':checked(item.get('handlerReturn') is False and item['phases']==['client-prefix-preserved'] and item['preservedUnknownMarker'] and item['unknownFileCount']==1 and not item['unknownPending'],'unknown prefix changed instead of allowing named provider repair')
         if mode=='noop':checked(item.get('handlerReturn') is False and not item['phases'],'unnecessary prefix repair')
         if mode in ('warm','reference'):checked(all(v['expectedValuePresent'] for v in sample['prefix']['registry'].values()),'real post-registration witnesses missing')
         if mode=='audit':checked(item['copy']['originalTreeUnchanged'] and item['copy']['sentinelRetained'],'source prefix changed')
