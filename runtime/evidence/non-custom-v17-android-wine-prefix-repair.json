@@ -1,0 +1,324 @@
+{
+  "formatVersion": 1,
+  "scope": "Original signed v16 Wine/PRoot/PE and native Android filesystem, with the five candidate APK classes in a QA DEX. The three matched runs vary only the updater child directory name.",
+  "productionPackageUid": 10077,
+  "androidBuild": "redroid/redroid_arm64_only/redroid_arm64_only:13/TQ3A.230805.001.S1/eng.frank.20240527.134411:userdebug/test-keys",
+  "selinux": "Disabled",
+  "physicalThor": false,
+  "stockGameplay": false,
+  "networkMode": "none",
+  "apkSha256": "de9d108a725aeb7a8eea1041bd1a72eb7a5acde811595cf71c886f6937f74ab4",
+  "apkVersionCode": 16,
+  "wineArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+  "selectedPESha256": "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317",
+  "candidateSources": {
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/StockWinePrefix.java": "0ece0141c24593c41676be51992f852542edd8fb01f2dab0336ba595d932b5c5",
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/StockWinePrefixRegistry.java": "b52aa9701ee9de9b955ea9014e74b1f45d670c50b2f59f4b6dafd51054601780",
+    "app/src/main/java/io/github/russianranger/esteria/runtime/StockWinePrefixRepair.java": "087ff1fce8be1a551b5931b4d0900b2938080e99bc798be1bb29d708b64a4e70",
+    "app/src/main/java/io/github/russianranger/esteria/presentation/ClientPresentationSession.java": "7ade9b9cb866ea674b79ec7a149c500f4c173538fd1ed481c2935c43309775a2",
+    "app/src/main/java/io/github/russianranger/esteria/runtime/ClientLaunchSetup.java": "35b6cd607a28650b7e9bbe8c964f1bb6b87303676bdf192da282c9cb26421c80"
+  },
+  "actualRuntimeProofs": {
+    "healthyAndForeign": {
+      "runId": 42442639420,
+      "qaHead": "a16c84a567fe00c8bbfe0eb08cd18387fedcce9f",
+      "artifactSha256": "7b09800fd9d0b15ee2e53eed063572894238616263fed29ebcd2a14767177b2b",
+      "elapsedSeconds": 65.511,
+      "results": [
+        {
+          "control": "reference",
+          "before": "ABSENT",
+          "after": "NO_REPAIR",
+          "pending": false,
+          "ownerClosed": true,
+          "sourceHivesParsed": true,
+          "sourceRegistryStage": "COMPLETE"
+        },
+        {
+          "control": "noop",
+          "before": "NO_REPAIR",
+          "after": "NO_REPAIR",
+          "handlerReturn": false,
+          "phases": [],
+          "pending": false,
+          "ownerClosed": true,
+          "liveWinebootBeforeCancel": false,
+          "competingLeaseDenied": false,
+          "sourceHivesParsed": true,
+          "sourceRegistryStage": "COMPLETE"
+        },
+        {
+          "control": "unknown",
+          "before": "NO_REPAIR",
+          "after": "NO_REPAIR",
+          "handlerReturn": false,
+          "phases": [
+            "client-prefix-preserved"
+          ],
+          "pending": false,
+          "ownerClosed": true,
+          "preservedUnknownMarker": true,
+          "unknownFileCount": 1,
+          "unknownPending": false,
+          "sourceHivesParsed": true,
+          "sourceRegistryStage": "COMPLETE"
+        }
+      ]
+    },
+    "oldInterruptedAndNamedRepair": {
+      "runId": 42443932397,
+      "qaHead": "bc9f199c7ef4555495bdf5d68182ef0b7747129c",
+      "artifactSha256": "487b7ea93ac40d32e525e98e044531d8522de919c294d85236762ffb29852551",
+      "elapsedSeconds": 117.564,
+      "results": [
+        {
+          "control": "interrupt",
+          "before": "ABSENT",
+          "after": "INCOMPLETE",
+          "pending": false,
+          "ownerClosed": true,
+          "sourceHivesParsed": true,
+          "sourceRegistryStage": "MISSING_DEFAULTS"
+        },
+        {
+          "control": "reentry",
+          "before": "INCOMPLETE",
+          "after": "INCOMPLETE",
+          "pending": false,
+          "ownerClosed": true,
+          "sourceHivesParsed": true,
+          "sourceRegistryStage": "MISSING_DEFAULTS"
+        },
+        {
+          "control": "clone",
+          "before": "ABSENT",
+          "after": "INCOMPLETE",
+          "pending": false,
+          "ownerClosed": true,
+          "sourceHivesParsed": true,
+          "sourceRegistryStage": "MISSING_DEFAULTS",
+          "originalFileAudit": true,
+          "privateUserSentinelRetained": true
+        },
+        {
+          "control": "cancel",
+          "before": "INCOMPLETE",
+          "after": "RESUME",
+          "phases": [
+            "client-prefix-display",
+            "client-prefix-wineboot"
+          ],
+          "pending": true,
+          "ownerClosed": true,
+          "nativeCancelled": true,
+          "liveWinebootBeforeCancel": true,
+          "competingLeaseDenied": true,
+          "sourceHivesParsed": true,
+          "sourceRegistryStage": "MISSING_DEFAULTS",
+          "originalFileAudit": true,
+          "privateUserSentinelRetained": true
+        },
+        {
+          "control": "update",
+          "before": "RESUME",
+          "after": "RESUME",
+          "phases": [
+            "client-prefix-display",
+            "client-prefix-wineboot",
+            "client-prefix-services",
+            "client-prefix-verify"
+          ],
+          "pending": true,
+          "ownerClosed": true,
+          "liveWinebootBeforeCancel": false,
+          "competingLeaseDenied": true,
+          "cutAfterGuestExitBeforePendingRetired": true,
+          "sourceHivesParsed": true,
+          "sourceRegistryStage": "COMPLETE",
+          "originalFileAudit": true,
+          "privateUserSentinelRetained": true
+        },
+        {
+          "control": "finish",
+          "before": "RESUME",
+          "after": "NO_REPAIR",
+          "handlerReturn": true,
+          "phases": [],
+          "pending": false,
+          "ownerClosed": true,
+          "liveWinebootBeforeCancel": false,
+          "competingLeaseDenied": false,
+          "sourceHivesParsed": true,
+          "sourceRegistryStage": "COMPLETE",
+          "originalFileAudit": true,
+          "privateUserSentinelRetained": true
+        },
+        {
+          "control": "noop",
+          "before": "NO_REPAIR",
+          "after": "NO_REPAIR",
+          "handlerReturn": false,
+          "phases": [],
+          "pending": false,
+          "ownerClosed": true,
+          "liveWinebootBeforeCancel": false,
+          "competingLeaseDenied": false,
+          "sourceHivesParsed": true,
+          "sourceRegistryStage": "COMPLETE",
+          "originalFileAudit": true,
+          "privateUserSentinelRetained": true
+        },
+        {
+          "control": "warm",
+          "before": "NO_REPAIR",
+          "after": "NO_REPAIR",
+          "pending": false,
+          "ownerClosed": true,
+          "sourceHivesParsed": true,
+          "sourceRegistryStage": "COMPLETE",
+          "originalFileAudit": true,
+          "privateUserSentinelRetained": true
+        },
+        {
+          "control": "audit",
+          "before": "NO_REPAIR",
+          "after": "NO_REPAIR",
+          "pending": false,
+          "ownerClosed": true,
+          "sourceHivesParsed": true,
+          "sourceRegistryStage": "COMPLETE",
+          "originalFileAudit": true,
+          "privateUserSentinelRetained": true
+        }
+      ]
+    }
+  },
+  "startup": "The explicit named action ran the immutable Wine updater on the disposable copy of a real old interrupted prefix. Read-only control and user-state sentinel in the original were preserved.",
+  "candidateSourceDescription": "Common SHA-256 is from the declared-path control. Per-run presentation SHA-256 captures the tested directory basename. Production diagnostics were revised subsequently.",
+  "nativeSocketControls": [
+    {
+      "pathShape": "declared",
+      "component": "prefix-update",
+      "oneVariable": "private session directory basename",
+      "runId": 42443932397,
+      "qaCommit": "bc9f199c7ef4555495bdf5d68182ef0b7747129c",
+      "artifactId": 13602763238,
+      "redactedArtifactSha256": "36fc3be57b33c783352b3604af1bb89992abaed41a640fbd12c996b6ae64fb30",
+      "elapsedSeconds": 76.123,
+      "canonicalTemporaryDirectoryBytes": [
+        91
+      ],
+      "expandedWineSocketPathBytes": [
+        124
+      ],
+      "presentationSourceSha256": "7ade9b9cb866ea674b79ec7a149c500f4c173538fd1ed481c2935c43309775a2",
+      "competingLeaseRejected": true,
+      "zeroRemainingPackageUidProcesses": true,
+      "status": "failed",
+      "nativeWineExit": 1,
+      "stderr": "wineserver: bind: Invalid argument",
+      "firstFailedPhase": "client-prefix-wineboot",
+      "selectionAfterFailure": "RESUME",
+      "laterPhasesSkipped": "wineserver exited before wineboot could start"
+    },
+    {
+      "pathShape": "short",
+      "component": "u",
+      "oneVariable": "private session directory basename",
+      "runId": 42443932397,
+      "qaCommit": "bc9f199c7ef4555495bdf5d68182ef0b7747129c",
+      "artifactId": 13603096476,
+      "redactedArtifactSha256": "487b7ea93ac40d32e525e98e044531d8522de919c294d85236762ffb29852551",
+      "elapsedSeconds": 117.564,
+      "canonicalTemporaryDirectoryBytes": [
+        79
+      ],
+      "expandedWineSocketPathBytes": [
+        112
+      ],
+      "presentationSourceSha256": "363b2bb3f649d0e3c37bc6f794d0a558f6429afc2386398b50ed60cf7538c0c3",
+      "competingLeaseRejected": true,
+      "zeroRemainingPackageUidProcesses": true,
+      "status": "passed",
+      "liveUpdaterCancelled": true,
+      "matchingPendingIntentRecovered": true,
+      "phases": [
+        "client-prefix-display",
+        "client-prefix-wineboot",
+        "client-prefix-services",
+        "client-prefix-verify"
+      ],
+      "nativeWineserverWaitReturned": true,
+      "cutAfterNativeCompletion": true,
+      "nextOwnerRetiredCompletedIntent": true,
+      "warmNamedRepairStartedProcesses": false,
+      "postRegistrationQueries": {
+        "postRegistrationDirectX": {
+          "returnCode": 0,
+          "expectedValuePresent": true
+        },
+        "postRegistrationAeDebug": {
+          "returnCode": 0,
+          "expectedValuePresent": true
+        }
+      },
+      "originalByteInodeModificationTimeAudit": true,
+      "userStateSentinelPreserved": true
+    },
+    {
+      "pathShape": "client",
+      "component": "client",
+      "oneVariable": "private session directory basename",
+      "runId": 42443976054,
+      "qaCommit": "66c147ca2066185c8287514634ffc9623af1d560",
+      "artifactId": 13603200549,
+      "redactedArtifactSha256": "8cf82bf513d2f8d477a4ed6782d69d493c8133ae257522fc146a9eed3d3ca952",
+      "elapsedSeconds": 114.882,
+      "canonicalTemporaryDirectoryBytes": [
+        84
+      ],
+      "expandedWineSocketPathBytes": [
+        117
+      ],
+      "presentationSourceSha256": "1822f860eef741502f5d2f23bd39636c655e57f967f162ddfa27d135e28b3839",
+      "competingLeaseRejected": true,
+      "zeroRemainingPackageUidProcesses": true,
+      "status": "passed",
+      "liveUpdaterCancelled": true,
+      "matchingPendingIntentRecovered": true,
+      "phases": [
+        "client-prefix-display",
+        "client-prefix-wineboot",
+        "client-prefix-services",
+        "client-prefix-verify"
+      ],
+      "nativeWineserverWaitReturned": true,
+      "cutAfterNativeCompletion": true,
+      "nextOwnerRetiredCompletedIntent": true,
+      "warmNamedRepairStartedProcesses": false,
+      "postRegistrationQueries": {
+        "postRegistrationDirectX": {
+          "returnCode": 0,
+          "expectedValuePresent": true
+        },
+        "postRegistrationAeDebug": {
+          "returnCode": 0,
+          "expectedValuePresent": true
+        }
+      },
+      "originalByteInodeModificationTimeAudit": true,
+      "userStateSentinelPreserved": true
+    }
+  ],
+  "limits": [
+    "The Android image uses disabled SELinux. No physical Thor was exercised.",
+    "Native component repair runs only on a disposable copy of the actual interrupted test prefix.",
+    "These captures exercise native Wine and a built-in Windows command. They do not qualify game rendering, local world entry or saves.",
+    "The stock production client path control used the same updater as the other cases, under the ordinary client directory. The real reconstructed PE authentication is covered separately."
+  ],
+  "sourceMechanism": {
+    "wineRevision": "a6844d10622fc1a973ec1f22fc4f78a0fcd6cb29",
+    "wine": "server/request.c creates /tmp/.wine-UID/server-DEV-INO, then chdir and bind(\"socket\").",
+    "proot": "src/syscall/socket.c derives a host path for a guest AF_UNIX bind. If both the translated name and its temporary replacement are too long, it returns EINVAL. src/path/temp.c builds the replacement inside PROOT_TMP_DIR."
+  }
+}

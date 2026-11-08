@@ -90,7 +90,14 @@ def stage(args):
                  '**Repair local component → Database setup**, then start the local game again.\n'
                  'If a stage fails, wait for cleanup, tap **Export support bundle**, choose a\n'
                  'destination and tap **Save**. Send the whole ZIP before retrying.')
-    if 'rendererSelection' in proof:
+    if signed['versionCode'] == 17:
+        setup = ('Install over Esteria Stock and keep the existing import and saves. '
+                 'From v16 with the client and shaders prepared, tap **Start local game**. '
+                 'For a previous shader failure, choose **Repair local component → Shaders** once, then start. '
+                 'If upgrading from before v16 and you still need the corrected client, or Start names it, '
+                 'choose **Repair local component → Client runtime**. '
+                 'For a new failure, export the complete support ZIP before retrying.')
+    elif 'rendererSelection' in proof:
         setup = ('Install over the existing Esteria Stock app. Keep enUS and Balanced. Select '
                  '**Repair local component → Client runtime** to install the corrected executable. '
                  'If shaders previously failed, choose **Repair local component → Shaders** once. '
@@ -331,6 +338,19 @@ containers. Other unsupported shader records still fail strict preparation.
 Named shader repair keeps the selected import, completed world generation,
 configuration and saves. Full shader preparation on the retained Thor import,
 graphical login, world entry and saved-character relaunch require device verification.
+'''
+    if signed['versionCode'] == 17:
+        notes += '''
+On offline Android ARM64, the original first launch of the reconstructed client
+spent about five minutes waiting for Wine's optional Mono installer. The native
+stock client and codec have no managed-code dependency. Disabling that installer
+reduced the first authenticated client run from 311.7 to 30.8 seconds in a
+disposable database test. This measures the client's authentication diagnostic.
+
+V17 uses this Wine setting for ordinary stock client launches. Client runtime
+repair can also finish the recognized interrupted Wine installation in place.
+The APK uses the same client, Wine package, shaders, world-data recipe and SQL
+profile as v16. Physical Thor shader completion and gameplay remain open.
 '''
     (args.output / 'RELEASE-NOTES.md').write_text(notes)
     return result

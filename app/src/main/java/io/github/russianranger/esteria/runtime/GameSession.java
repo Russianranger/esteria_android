@@ -8,6 +8,7 @@ import android.system.OsConstants;
 import android.system.StructStat;
 import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
 import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
+import io.github.russianranger.esteria.core.runtime.StockWinePrefix;
 import io.github.russianranger.esteria.core.runtime.install.LocalAccountHandoff;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
@@ -50,12 +51,14 @@ public final class GameSession {
             throw new IOException("Typed completed local setup and private canonical application storage required");
         client.requireWineArchive(setup.wine.archiveSha256());bridges.requireWineArchive(setup.wine.archiveSha256());
         if(turnip!=null){turnip.requireWineArchive(setup.wine.archiveSha256());if(turnip.current()==null)throw new IOException("Prepare the selected Turnip provider first");}
-        if(client.current()==null||bridges.current()==null||setup.wine.current()==null)
+        Path wineRoot=setup.wine.current();
+        if(client.current()==null||bridges.current()==null||wineRoot==null)
             throw new IOException("Prepare the matching reconstructed client, Wine and presentation providers first");
         client.requirePreparedShaders(setup.shaders);
         if(OWNERS.containsKey(root))throw new IOException("Previous game session ownership remains retained");
         Leases leases=claim(root);
         try {
+            leases.requireLaunchablePrefix(wineRoot,setup.wine.archiveSha256());
             setup.data.requireUnchanged();
             Handle owner=new Handle(context.getApplicationContext(),root,setup,client,bridges,turnip,events,leases);
             if(OWNERS.putIfAbsent(root,owner)!=null)throw new IOException("Previous game session ownership remains retained");
@@ -91,6 +94,17 @@ public final class GameSession {
         private final ExclusiveFileLease imported;
         private boolean closed;
         private Leases(ClientLaunchSetup.Lease client,ExclusiveFileLease imported){this.client=client;this.imported=imported;}
+        void requireLaunchablePrefix(Path wineRoot,String archive)throws IOException {
+            if (!"stock-3.3.5a".equals(io.github.russianranger.esteria.BuildConfig.CONTENT_PROFILE)) return;
+            if (wineRoot==null) return;
+            StockWinePrefix prefix=StockWinePrefix.inspect(client.work,wineRoot,archive);
+            if (prefix.requiresRepair()) {
+                String reason=prefix.status()==StockWinePrefix.Status.RESUME
+                        ? "Wine has a previous client prefix repair to verify"
+                        : "Wine's previous first-use installation was interrupted before Vulkan setup completed";
+                throw new LocalWorldSetup.PreparationRequired(LocalWorldSetup.Component.CLIENT_RUNTIME,new IOException(reason));
+            }
+        }
         @Override public void close()throws IOException {
             if(closed)return;client.close();imported.close();closed=true;
         }

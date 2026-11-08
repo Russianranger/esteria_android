@@ -3,6 +3,7 @@ package io.github.russianranger.esteria.runtime;
 import android.content.Context;
 import android.os.Handler;
 import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
+import io.github.russianranger.esteria.core.runtime.WineRuntimeProfile;
 import io.github.russianranger.esteria.core.presentation.X11SessionPlan;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
 import io.github.russianranger.esteria.core.runtime.process.ProotLaunch;
@@ -102,6 +103,79 @@ public final class PresentationShaderOwnerTests {
             remove(root);
         }
     }
+    private static void prefixUpdateCleanup()throws Exception {
+        Path root=Files.createTempDirectory("esteria-prefix-update-owner-").toRealPath();
+        Backend backend=new Backend();
+        ClientLaunchSetup.Lease work=ClientLaunchSetup.claim(root);
+        ClientPresentationSession display=presentation(root);
+        retain(display);
+        OwnedProcess updater=start(backend,root);
+        set(display,"prefixUpdater",updater);
+        Class<?> ownerType=Class.forName(StockWinePrefixRepair.class.getName()+"$Owner");
+        Constructor<?> factory=ownerType.getDeclaredConstructor(ClientLaunchSetup.Lease.class);
+        factory.setAccessible(true);
+        Object owner=factory.newInstance(work);
+        set(owner,"presentation",display);
+        set(owner,"operating",false);
+        Field ownersField=StockWinePrefixRepair.class.getDeclaredField("OWNERS");
+        ownersField.setAccessible(true);
+        @SuppressWarnings("unchecked") Map<Path,Object> owners=(Map<Path,Object>)ownersField.get(null);
+        check(owners.putIfAbsent(root,owner)==null,"Fresh retained prefix owner required");
+        Path authority=root.resolve("session/io/Xauthority");
+        try {
+            long start=System.nanoTime();
+            try {StockWinePrefixRepair.retryPendingCleanup(root);throw new AssertionError("Live updater released");}
+            catch(IOException expected) {
+                check(updater.isAlive() && backend.terminating.getCount()==0 && Files.isRegularFile(authority)
+                    && System.nanoTime()-start<TimeUnit.SECONDS.toNanos(12),"Bounded failure retains updater and Xauthority");
+            }
+            try(ClientLaunchSetup.Lease ignored=ClientLaunchSetup.claim(root)){throw new AssertionError("Live prefix lease released");}
+            catch(IOException expected){check(owners.get(root)==owner,"Named owner retained across refused concurrent claim");}
+            settle(updater,backend);
+
+            // Fail cleanup of the authority once after the native process is reaped.
+            Files.delete(authority);Files.createDirectory(authority);
+            Path obstruction=Files.createFile(authority.resolve("fixture"));
+            try {StockWinePrefixRepair.retryPendingCleanup(root);throw new AssertionError("Failed authority cleanup succeeded");}
+            catch(IOException expected){check(!display.isClosed()&&owners.get(root)==owner,"Incomplete bindings remain owned");}
+            Files.delete(obstruction);
+            StockWinePrefixRepair.retryPendingCleanup(root);
+            check(display.isClosed() && !Files.exists(authority) && !owners.containsKey(root),"Single recovered retry releases all ownership");
+            try(ClientLaunchSetup.Lease next=ClientLaunchSetup.claim(root)){next.require(root);}
+        } finally {
+            backend.release.countDown();
+            if(updater.isAlive())updater.terminateAuxiliary();
+            owners.remove(root,owner);
+            work.close();
+            remove(root);
+        }
+    }
+    private static void unrelatedPrefixDelegatesToProviders()throws Exception {
+        Path root=Files.createTempDirectory("esteria-prefix-provider-fallback-").toRealPath();
+        try {
+            Path runtime=Files.createDirectory(root.resolve("wine-runtime"));
+            try(ClientLaunchSetup.Lease owner=ClientLaunchSetup.claim(root)) {
+                Path prefix=Files.createDirectories(owner.work.resolve("home/.wine"));
+                Path settings=Files.writeString(prefix.resolve("user.reg"),"unrelated retained user settings");
+                var stamp=Files.getLastModifiedTime(settings);
+                String archive="c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46";
+                for(boolean hasPending:new boolean[]{false,true}) {
+                    Path pending=owner.work.resolve(".stock-wine-prefix-repair-v1.pending");
+                    if(hasPending)Files.writeString(pending,"unrelated retained repair intent");
+                    var phases=new java.util.ArrayList<String>();
+                    var selected=StockWinePrefixRepair.selectForUpdate(owner.work,runtime,archive,
+                            (phase,path,completed,total)->phases.add(phase));
+                    check(selected==null && phases.equals(List.of("client-prefix-preserved")),
+                            "Unknown prefix must select only the existing provider fallback, never the Wine updater");
+                    check(Files.readString(settings).equals("unrelated retained user settings")
+                            && Files.getLastModifiedTime(settings).equals(stamp),"Retain unrelated user prefix state");
+                    check(hasPending ? Files.readString(pending).equals("unrelated retained repair intent") : !Files.exists(pending),
+                            "Never create, replace or retire an unrelated prefix intent");
+                }
+            }
+            try(ClientLaunchSetup.Lease providers=ClientLaunchSetup.claim(root)){providers.require(root);}
+        } finally {remove(root);}
+    }
     private static ShaderSetup.Handle shader(Path root,ExclusiveFileLease lock)throws Exception {
         Constructor<ShaderSetup.Handle> constructor=ShaderSetup.Handle.class.getDeclaredConstructor(Context.class,Path.class,Path.class,
             RuntimeSetup.class,ShaderToolsSetup.class,String.class,Path.class,Path.class,ExclusiveFileLease.class);
@@ -171,11 +245,30 @@ public final class PresentationShaderOwnerTests {
             Method method=ClientPresentationSession.class.getDeclaredMethod("clientMounts",Path.class,Path.class,Path.class);
             method.setAccessible(true);
             @SuppressWarnings("unchecked") List<ProotLaunch.Mount> mounts=(List<ProotLaunch.Mount>)method.invoke(null,data,shaders,bridge);
-            Map<String,String> environment=X11SessionPlan.environment(987);
-            OwnedProcess.Specification specification=ProotLaunch.create(tracer,loader,rootfs,work,temporary,logs,
-                    List.of("/opt/wine/bin/wine","Z:\\work\\launch\\WowClient64.exe"),environment,mounts,
-                    new ProotLaunch.PresentationBindings(endpoints,x11));
-            List<String> argv=specification.arguments;
+            Map<String,String> presentation=X11SessionPlan.environment(987);
+            WineRuntimeProfile wine=new WineRuntimeProfile(Map.of(WineRuntimeProfile.PRIVATE_PE_COPY,"1"));
+            Method compose=ClientPresentationSession.class.getDeclaredMethod("clientEnvironment",Map.class,Map.class,String.class,boolean.class);
+            compose.setAccessible(true);
+            ProotLaunch.PresentationBindings bindings=new ProotLaunch.PresentationBindings(endpoints,x11);
+            List<String> command=List.of("/opt/wine/bin/wine","Z:\\work\\launch\\WowClient64.exe");
+            String shaderPath="Z:\\esteria-shaders";
+            for (String profile:List.of("stock-3.3.5a","esteria-custom")) {
+                for (boolean localLogin:List.of(true,false)) {
+                    @SuppressWarnings("unchecked") Map<String,String> client=(Map<String,String>)compose.invoke(null,
+                            wine.merge(presentation),Map.of("GX_VULKAN_SHADERS",shaderPath),profile,localLogin);
+                    List<String> guest=ProotLaunch.create(tracer,loader,rootfs,work,temporary,logs,command,
+                            wine.merge(client),mounts,bindings).arguments;
+                    String overrides="WINEDLLOVERRIDES=winepulse.drv="+(profile.equals("stock-3.3.5a")?";mscoree=":"");
+                    check(guest.contains(overrides)&&guest.stream().filter(s->s.startsWith("WINEDLLOVERRIDES=")).count()==1,
+                            "Only stock PE launches suppress the interactive Mono installer");
+                    check(guest.contains("WINEDEBUG=+file")==!localLogin,"Only the title investigation traces file access");
+                    check(guest.containsAll(List.of("HOME=/work/home","WINE_ANDROID_PRIVATE_PE_COPY=1",
+                            "GX_VULKAN_SHADERS="+shaderPath,"DISPLAY=:987","WINEESYNC=0","WINEFSYNC=0")),
+                            "Client retains its existing prefix, display, shader and private PE settings");
+                }
+            }
+            check(presentation.get("WINEDLLOVERRIDES").equals("winepulse.drv="),"Presentation helper override remains independent");
+            List<String> argv=ProotLaunch.create(tracer,loader,rootfs,work,temporary,logs,command,presentation,mounts,bindings).arguments;
             check(argv.contains("ALSA_CONFIG_PATH="+GuestBridgeSetup.alsaConfigPath()),"Wine retains the selected ALSA configuration");
             for(String guest:List.of(GuestBridgeSetup.alsaConfigPath(),"/esteria-bridges/lib/alsa-lib/libasound_module_pcm_esteria.so")) {
                 Path actual=null;
@@ -193,6 +286,50 @@ public final class PresentationShaderOwnerTests {
     private static void remove(Path root)throws IOException {
         try(var paths=Files.walk(root)){for(Path path:paths.sorted(Comparator.reverseOrder()).toArray(Path[]::new))Files.delete(path);}
     }
+    private static void prefixSocketBudget()throws Exception {
+        Field leaf=ClientPresentationSession.class.getDeclaredField("PREFIX_UPDATE_LEAF");
+        leaf.setAccessible(true);
+        String chosen=(String)leaf.get(null);
+        String session="/io.github.russianranger.esteria.stock/files/s/0123456789abcdef/";
+        // Pinned PRoot's exact Unix socket fallback uses six mktemp characters
+        // and the decimal tracer PID (Linux PID_MAX_LIMIT is 4,194,304).
+        String socket="/tmp/proot-4194304-XXXXXX";
+        for(String user:List.of("/data/data","/data/user/0","/data/user/10","/data/user/21474")) {
+            int bytes=(user+session+chosen+socket).getBytes(java.nio.charset.StandardCharsets.UTF_8).length;
+            check(bytes<=108,"The complete chosen PRoot socket fits sockaddr_un on standard Android app storage");
+        }
+        check(("/data/data"+session+"prefix-update"+socket).length()>108,"Match the original native bind EINVAL");
+        check(("/data/user/0"+session+"client"+socket).length()<=108,"Original stock client runtime leaf still fits");
+    }
+    private static void prefixWorkerDiagnostic()throws Exception {
+        Path root=Files.createTempDirectory("wine-prefix-worker-log-").toRealPath();
+        Backend backend=new Backend();
+        OwnedProcess child=start(backend,root);
+        try {
+            Path stderr=root.resolve("prefix.stderr");
+            Files.writeString(stderr,"permission denied".repeat(1024)+"\n"+ "x".repeat(8192)
+                    +"\nwineserver: bind: Invalid argument\nwine: could not load kernel32.dll, status c0000135; /private/TEST_SECRET\n");
+            Method report=ClientPresentationSession.class.getDeclaredMethod("prefixUpdateFailure",OwnedProcess.class,
+                    Path.class,boolean.class,long.class,boolean.class);
+            report.setAccessible(true);
+            IOException timeout=(IOException)report.invoke(null,child,stderr,false,System.nanoTime()-2_000_000_000L,true);
+            check(timeout.getMessage().matches("Wine prefix update timed out after [0-9]+ ms [(]wineboot.exe -u, still running[)].*")
+                    && timeout.getMessage().contains("wineserver: bind: invalid argument")
+                    && timeout.getMessage().contains("c0000135")&&!timeout.getMessage().contains("permission denied")
+                    && !timeout.getMessage().contains("TEST_SECRET"),"Only typed redacted reasons from the final bounded log are returned");
+            backend.release.countDown();
+            child.terminateAuxiliary();
+            Files.delete(stderr);
+            Files.createSymbolicLink(stderr,Files.writeString(root.resolve("unrelated-private.log"),"could not load kernel32.dll"));
+            IOException failed=(IOException)report.invoke(null,child,stderr,true,System.nanoTime(),false);
+            check(failed.getMessage().contains("Wine service shutdown failed") && failed.getMessage().contains("wineserver -w, exit 143")
+                    && !failed.getMessage().contains("kernel32"),"Final owned status survives an absent or unsafe native log");
+        } finally {
+            backend.release.countDown();
+            if(child.isAlive())child.terminateAuxiliary();
+            remove(root);
+        }
+    }
     private static void shaderWorkerDiagnostic()throws IOException {
         Path root=Files.createTempDirectory("shader-worker-diagnostic-").toRealPath();
         try {
@@ -209,7 +346,7 @@ public final class PresentationShaderOwnerTests {
         } finally { remove(root); }
     }
     public static void main(String[] arguments)throws Exception {
-        presentationTimeout();shaderTimeout();shaderPrelaunchStop();clientAudioMount();shaderWorkerDiagnostic();
-        System.out.println("Five presentation/shader owner and worker diagnostic host checks passed");
+        presentationTimeout();prefixUpdateCleanup();unrelatedPrefixDelegatesToProviders();shaderTimeout();shaderPrelaunchStop();clientAudioMount();shaderWorkerDiagnostic();prefixWorkerDiagnostic();prefixSocketBudget();
+        System.out.println("Nine presentation, prefix and shader owner and diagnostic host checks passed");
     }
 }

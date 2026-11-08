@@ -24,6 +24,48 @@ class StockWorldSource(unittest.TestCase):
         self.journal = self.spool / 'verified-pieces'
         self.events = []
 
+    def test_recipe_and_real_java_consumer_use_the_same_one_worker(self):
+        from tools import prepare_android_receipt_fixtures as fixtures
+        import shutil
+        if not shutil.which('javac'):
+            self.skipTest('JDK 17 is needed for the Android production Java binding')
+        fixture = self.spool / 'data'
+        fixture.mkdir()
+        metadata = fixtures.data_fixture(fixture)
+        game, tools, work = (fixture / key for key in ('game','tools','work'))
+        package = self.spool / 'provider'
+        package.mkdir()
+        (package / 'server-data-tools').mkdir()
+        (package / 'data-tool-selection.json').write_bytes((work / 'data-tools-selection.json').read_bytes())
+        helper = work / 'data-helpers' / metadata['helperGeneration']
+        helper.mkdir(parents=True)
+        for name in (*world.data.PREPARATION_HELPERS, world.data.READER_LOCK):
+            shutil.copyfile(world.ROOT / 'runtime' / name, helper / name)
+        receipt = self.spool / 'binding.json'
+        # Synthetic signed-tool stand-ins and file headers from the existing receipt regression.
+        # The production Java class and Android 13 streaming JSON implementations are unmodified.
+        with patch.object(world.data,'tools_verified',return_value=metadata['toolSelectionSha256']), \
+             patch.object(world,'GAME',game), patch.object(world,'PACKAGE',package):
+            self.assertEqual(world.selection()[3]['threads'],1)
+            lock = self.spool / 'fixture-mpqs.json'
+            lock.write_text(json.dumps([dict(path=world.corpus.PREFIX+'Data/common.MPQ',bytes=1)]))
+            with patch.object(world,'OUTPUT',work/'server-data'), patch.object(world,'EVIDENCE',self.spool), \
+                 patch.object(world.corpus,'LOCK',lock), \
+                 patch.object(world.data,'execute',side_effect=AssertionError('unexpected extraction')):
+                world.generate()
+            self.assertEqual(world.auth.document(self.spool/'generation.json')['generation'],metadata['generation'])
+            world.bind_receipt(game,tools,work,receipt)
+            admitted = world.auth.document(receipt)
+            self.assertEqual((admitted['threads'],admitted['generation']), (1, metadata['generation']))
+            self.assertEqual(admitted['outputRecipe'], world.data.preparation_helper_generation())
+            bad = work / 'server-data/generations' / metadata['generation'] / 'receipt.json'
+            value = world.auth.document(bad)
+            value['inputs']['threads'] = 2
+            bad.write_bytes(world.data.storage.encoded(value))
+            with self.assertRaisesRegex(ValueError, 'ServerDataBinding'):
+                world.bind_receipt(game,tools,work,self.spool / 'rejected.json')
+            self.assertFalse((self.spool / 'rejected.json').exists())
+
     def test_next_stock_release_selects_the_ledger_apk_before_acquisition(self):
         root = self.spool
         (root / 'app').mkdir()

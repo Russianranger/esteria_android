@@ -1,10 +1,11 @@
-# Esteria Stock 0.1.0-non-custom.16 for AYN Thor
+# Esteria Stock 0.1.0-non-custom.17 for AYN Thor
 
-Install the signed ARM64 APK over the existing **Esteria Stock** app. Keep the existing import, locale (**enUS** for the reported device) and **Balanced** preparation speed.
+Install the signed ARM64 APK over **Esteria Stock**. Keep your existing import, locale, configuration and saves.
 
-1. Tap **Repair local component → Client runtime** once to select the updated Windows ARM64 executable and its stock launch view.
-2. For the reported shader failure, tap **Repair local component → Shaders**. Wait for **Shaders are ready for the selected import**. The repair owns only the current import and shader store. It can reselect a verified generation, recover a completed staged replacement or compile a replacement for damaged output.
-3. Tap **Start local game**. If the app specifically names **Database setup**, tap **Repair local component → Database setup**, then start again. Keep the same import, prepared world, configuration and saves.
+- From v16 with the client and shaders prepared, tap **Start local game**.
+- For a previous shader failure, tap **Repair local component → Shaders** once. After **Shaders are ready for the selected import**, tap **Start local game**.
+- If you are upgrading from before v16 and still need the corrected client, or Start names it, tap **Repair local component → Client runtime**. Follow the shader repair above if shaders previously failed.
+- If Start reports an interrupted Wine installation, **Client runtime** repair finishes the recognized prefix in place. Wait for **Wine prefix repaired and verified**, then use **Start local game**. This operation has its own private display and can take a short time after the Wine update finishes.
 
 ## Subsequent launches and verification
 
@@ -30,6 +31,6 @@ These limits apply to governed I/O. Pressure may reduce reads to 2 MiB/s or paus
 
 ## Export a failure before retrying
 
-Reopen Esteria Stock if necessary. Tap **Export support bundle**, choose a destination in Android's save picker, and tap **Save** for `Esteria-support-<timestamp>.zip`. Send the **whole ZIP** plus the selected speed, last displayed phase, elapsed time and whether Stop or Android interrupted the operation. Export before another attempt so retained diagnostics are not overwritten. The bundle excludes credentials, databases and game assets.
+Reopen Esteria Stock if necessary. Tap **Export support bundle**, choose **Downloads** in Android's save picker, and tap **Save** for `Esteria-support-<timestamp>.zip`. Send the **whole ZIP** plus the installed version, selected speed, last displayed phase, elapsed time and whether Stop or Android interrupted the operation. Export before another attempt so the bundle retains the failed run. The bundle excludes credentials, databases and game assets.
 
 Only a fresh installation or genuinely missing import needs folder/ZIP import. Keep standard MPQs in their normal `Data` and locale directories. Custom assets, bots and optional MPQ authoring remain deferred until stock startup and persistence are demonstrated. Host fixtures, native SQL checks and Android emulator tests are component evidence; they do not establish Thor gameplay.

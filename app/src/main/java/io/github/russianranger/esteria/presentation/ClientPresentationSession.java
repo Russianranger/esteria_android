@@ -10,6 +10,8 @@ import android.system.StructStat;
 import io.github.russianranger.esteria.core.presentation.InputSink;
 import io.github.russianranger.esteria.core.presentation.X11SessionPlan;
 import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
+import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
+import io.github.russianranger.esteria.core.runtime.StockWinePrefix;
 import io.github.russianranger.esteria.core.runtime.install.ClientLaunchView;
 import io.github.russianranger.esteria.core.runtime.install.LocalAccountHandoff;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
@@ -73,6 +75,9 @@ public final class ClientPresentationSession implements AutoCloseable {
     // Also retain legacy start() failures: neither a caller exception nor GC may
     // discard a still-running guest and its IPC/provider identities.
     private static final Map<Path,ClientPresentationSession> OWNERS=new ConcurrentHashMap<>();
+    // PRoot maps Wine's long relative socket name to tmp/proot-<pid>-XXXXXX.
+    // Keep this ephemeral leaf short enough for that second sockaddr_un path.
+    private static final String PREFIX_UPDATE_LEAF="u";
     private final Context context;
     private final Prepared prepared;
     private final Events events;
@@ -86,6 +91,7 @@ public final class ClientPresentationSession implements AutoCloseable {
     private final AtomicBoolean closing=new AtomicBoolean();
     private final AtomicReference<String> failure=new AtomicReference<>();
     private volatile OwnedProcess client;
+    private OwnedProcess prefixUpdater;
     private boolean clientStartAttempted;
     private AudioBridge audio;
     private InputBridge input;
@@ -191,6 +197,94 @@ public final class ClientPresentationSession implements AutoCloseable {
                 List.of(new ProotLaunch.Mount(prepared.bridgeRoot,GuestBridgeSetup.guestMount())),bindings);
         children.add(child);return child;
     }
+    /** Repair only an inspected stock prefix under its existing client-work lease.
+     * Wine gets a private authenticated X server. No game, frame or audio consumer is started. */
+    public void updateStockWinePrefix(ExclusiveFileLease lease,RuntimeWork.Progress progress,
+            RuntimeWork.Cancellation cancelled)throws IOException {
+        background();
+        operations.run(()->{
+            check();
+            if(started || !"stock-3.3.5a".equals(io.github.russianranger.esteria.BuildConfig.CONTENT_PROFILE))
+                throw new IOException("Wine prefix repair requires a fresh stock presentation owner");
+            started=true;
+            providersUnchanged(prepared);
+            StockWinePrefix prefix=StockWinePrefix.inspect(prepared.work,prepared.runtimeRoot,prepared.wineArchiveSha256);
+            if(!prefix.requiresRepair() || !lease.owns(prepared.work.resolve(".client-launch-setup.lock")))
+                throw new IOException("The selected stock Wine prefix and its retained work lease are required");
+            checkCancellation(cancelled);
+            long startedAt=System.nanoTime();
+            long deadline=startedAt+Duration.ofSeconds(180).toNanos();
+            progress.update("client-prefix-display","",0,-1);
+            OwnedProcess server=launch("xserver",X11SessionPlan.server(display));
+            await(server,()->{checkCancellation(cancelled);return x11Socket();},null,null);
+            providersUnchanged(prepared);
+            checkCancellation(cancelled);
+            prefix.beginRepair(lease);
+            progress.update("client-prefix-wineboot","",0,-1);
+            Map<String,String> environment=clientEnvironment(X11SessionPlan.environment(display),Map.of(),
+                    io.github.russianranger.esteria.BuildConfig.CONTENT_PROFILE,true);
+            Path process=directory(session.resolve(PREFIX_UPDATE_LEAF));
+            prefixUpdater=ProotProcess.startPresentation(context,prepared.runtime.installer(),prepared.runtime.packagePlan(),
+                    prepared.work,process,List.of("/bin/sh","-c","/opt/wine/bin/wine 'C:\\windows\\system32\\wineboot.exe' -u && : > /session/prefix-update-finished && exec /opt/wine/bin/wineserver -w"),
+                    prepared.runtime.wineEnvironment(environment),
+                    List.of(new ProotLaunch.Mount(prepared.bridgeRoot,GuestBridgeSetup.guestMount())),bindings);
+            Path finished=endpoints.resolve("prefix-update-finished");
+            Path stderr=process.resolve("logs/stderr.log");
+            boolean waitingForServices=false;
+            while(prefixUpdater.isAlive()) {
+                checkCancellation(cancelled);
+                if(!server.isAlive())throw new IOException("Private display exited during Wine prefix repair");
+                if(!waitingForServices && Files.isRegularFile(finished,LinkOption.NOFOLLOW_LINKS)) {
+                    waitingForServices=true;
+                    progress.update("client-prefix-services","",0,-1);
+                }
+                if(System.nanoTime()>=deadline)throw prefixUpdateFailure(prefixUpdater,stderr,waitingForServices,startedAt,true);
+                try{Thread.sleep(100);}
+                catch(InterruptedException error){Thread.currentThread().interrupt();throw new IOException("Wine prefix repair interrupted",error);}
+            }
+            if(prefixUpdater.wasForced() || prefixUpdater.exitCode()!=0 || prefixUpdater.failure()!=null)
+                throw prefixUpdateFailure(prefixUpdater,stderr,
+                        waitingForServices || Files.isRegularFile(finished,LinkOption.NOFOLLOW_LINKS),startedAt,false);
+            checkCancellation(cancelled);
+            return null;
+        });
+    }
+    private static IOException prefixUpdateFailure(OwnedProcess child,Path stderr,boolean services,long startedAt,boolean timeout) {
+        long elapsed=Duration.ofNanos(System.nanoTime()-startedAt).toMillis();
+        String status=child.isAlive()?"still running":"exit "+child.exitCode();
+        String message=(services?"Wine service shutdown":"Wine prefix update")+(timeout?" timed out":" failed")
+                +" after "+elapsed+" ms ("+(services?"wineserver -w":"wineboot.exe -u")+", "+status
+                +(child.wasForced()?", forced":"")+(child.failure()!=null?", process owner error":"")+")";
+        // Support exports the exception. Only fixed diagnostic terms may leave the
+        // private working directory, never shell arguments, paths, or Wine output.
+        try {
+            if(Files.isRegularFile(stderr,LinkOption.NOFOLLOW_LINKS) && stderr.equals(stderr.toRealPath())) {
+                try(java.nio.channels.SeekableByteChannel file=Files.newByteChannel(stderr,
+                        StandardOpenOption.READ,LinkOption.NOFOLLOW_LINKS)) {
+                    long size=file.size();
+                    java.nio.ByteBuffer tail=java.nio.ByteBuffer.allocate((int)Math.min(8192L,size));
+                    file.position(size-tail.remaining());
+                    while(tail.hasRemaining() && file.read(tail)>0) { }
+                    tail.flip();
+                    String output=StandardCharsets.UTF_8.decode(tail).toString().toLowerCase(java.util.Locale.ROOT);
+                    List<String> reasons=new ArrayList<>();
+                    for (String term:List.of("wineserver: bind: invalid argument","could not load kernel32.dll",
+                            "c0000135","bad exe format",
+                            "error while loading shared libraries","failed to open","not owned by you",
+                            "could not connect to wineserver","permission denied","operation not permitted",
+                            "no such file or directory","not found","file name too long","cannot create")) {
+                        if(output.contains(term))reasons.add(term);
+                        if(reasons.size()==3)break;
+                    }
+                    if(!reasons.isEmpty())message+=". "+String.join(", ",reasons);
+                }
+            }
+        } catch(IOException ignored) { /* The owned exit and elapsed time remain available. */ }
+        return new IOException(message,child.failure());
+    }
+    private static void checkCancellation(RuntimeWork.Cancellation cancelled)throws IOException {
+        if(cancelled.isCancelled())throw new RuntimeWork.CancelledException();
+    }
     /** Fixed reconstructed-client launch only. This owner retains the client
      * before returning; no failed caller may discard its presentation bindings.
      * The higher session owner establishes local services/account first. */
@@ -220,10 +314,8 @@ public final class ClientPresentationSession implements AutoCloseable {
             List<String> command=new ArrayList<>();command.add("/opt/wine/bin/wine");command.add(view.plan.windowsExecutable());
             command.addAll(new ClientLaunchView(view.work).argumentsForLocale(view.plan,shaders.locale,RuntimeWork.NEVER_CANCELLED,io.github.russianranger.esteria.BuildConfig.CONTENT_PROFILE));
             command.addAll(clientModeArguments(provider.localLoginArguments(),view.view.directory,localLogin));
-            Map<String,String> environment=new java.util.TreeMap<>(wineEnvironment());environment.putAll(view.plan.environment());
-            // Internal title capture needs real file-read observations, not a
-            // synthetic frame. Native output is bounded to 8 MiB per stream.
-            if(!localLogin)environment.put("WINEDEBUG","+file");
+            Map<String,String> environment=clientEnvironment(wineEnvironment(),view.plan.environment(),
+                    io.github.russianranger.esteria.BuildConfig.CONTENT_PROFILE,localLogin);
             List<ProotLaunch.Mount> mounts=clientMounts(view.importedData,shaders.shaders,prepared.bridgeRoot);
             if(turnip!=null) {
                 turnip.requireWineArchive(prepared.runtime.archiveSha256());Path driver=turnip.current();
@@ -236,6 +328,17 @@ public final class ClientPresentationSession implements AutoCloseable {
                 prepared.work,process,command,prepared.runtime.wineEnvironment(environment),mounts,bindings);
             return client;
         });
+    }
+    private static Map<String,String> clientEnvironment(Map<String,String> presentation,Map<String,String> view,
+            String contentProfile,boolean localLogin) {
+        Map<String,String> environment=new java.util.TreeMap<>(presentation);
+        environment.putAll(view);
+        // The stock PE and its codec are native. With mscoree enabled, first-use
+        // wineboot waits for the interactive Mono installer on our private display.
+        if ("stock-3.3.5a".equals(contentProfile))
+            environment.merge("WINEDLLOVERRIDES","mscoree=",(current,extra)->current+";"+extra);
+        if (!localLogin) environment.put("WINEDEBUG","+file");
+        return environment;
     }
     private static List<String> clientModeArguments(List<String> validatedLocalArguments,Path view,boolean localLogin)throws IOException {
         if(!validatedLocalArguments.equals(List.of("--local-offline","--local-login")))
@@ -345,6 +448,12 @@ public final class ClientPresentationSession implements AutoCloseable {
             if(closed){if(closeFailure!=null)throw closeFailure;return;}
             if(client!=null&&client.isAlive())throw new IOException("Client still owns presentation bindings; stop and reap it before presentation cleanup");
             IOException error=null;boolean stopped=true;
+            // Keep Xauthority and the display available until the exact updater and
+            // its PRoot tracees have terminated, including cancellation and timeout.
+            if(prefixUpdater!=null && prefixUpdater.isAlive()) {
+                prefixUpdater.terminateAuxiliary();
+                if(prefixUpdater.isAlive())throw new IOException("Wine prefix update cleanup is still owned");
+            }
             if(monitor!=null&&monitor!=Thread.currentThread()) {
                 monitor.interrupt();try{monitor.join(2000);if(monitor.isAlive()){stopped=false;error=add(error,new IOException("Presentation monitor remains alive"));}}
                 catch(InterruptedException interrupted){Thread.currentThread().interrupt();stopped=false;error=add(error,new IOException("Presentation close interrupted",interrupted));}

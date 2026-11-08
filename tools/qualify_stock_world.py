@@ -18,6 +18,8 @@ from runtime import mysql_bootstrap as db, server_content, server_data_generatio
 from tools import qualify_packaged_server_auth as auth, qualify_stock_shader_corpus as corpus
 
 PROFILE = 'stock-3.3.5a'
+# The Android caller passes one worker. This value is part of the generation identity.
+STOCK_THREADS = 1
 ROOT = auth.ROOT
 PACKAGE = Path('/package')
 GAME = Path('/game')
@@ -212,14 +214,73 @@ def stage(destination, readback, apk):
                          'preparation helper differs from APK')
         with tarfile.open(tarball, 'r:gz') as tar:
             tar.extractall(destination / provider, filter='data')
-        (destination / 'data-tool-selection.json').write_text(json.dumps(proof['toolSelection']))
+        (destination / 'data-tool-selection.json').write_bytes(data.storage.encoded(proof['toolSelection']))
+    stage_reader(destination.parent / 'prepared-work', archive)
+
+
+def stage_reader(work, archive):
+    """Stage just the checked APK reader and its exact provider selection. All paths are QA-owned."""
+    work.mkdir(mode=0o700, exist_ok=True)
+    approved = auth.document(ROOT / 'config/stock-prepared-data-reader.json')
+    manifest_name = 'assets/server-data/manifest.json'
+    with zipfile.ZipFile(archive) as signed:
+        raw = signed.read(manifest_name)
+        installed = hashlib.sha256(raw).hexdigest()
+        auth.require(installed == approved['installedReader'] == data.installed_helper_generation() and
+                     approved['outputRecipe'] == data.preparation_helper_generation(), 'APK data reader or recipe differs')
+        helpers = work / 'data-helpers' / installed
+        helpers.mkdir(mode=0o700, parents=True, exist_ok=True)
+        def immutable(path, expected):
+            if path.exists():
+                auth.require(not path.is_symlink() and path.read_bytes() == expected, 'QA reader selection changed')
+            else:
+                with path.open('xb') as target:
+                    target.write(expected)
+        files = json.loads(raw)['files']
+        auth.require(set(files) == set(data.PREPARATION_HELPERS) | {data.READER_LOCK}, 'incomplete signed data reader')
+        for name, pin in files.items():
+            payload = signed.read('assets/server-data/' + name)
+            auth.require(dict(bytes=len(payload), sha256=hashlib.sha256(payload).hexdigest()) == pin and
+                         (ROOT / 'runtime' / name).read_bytes() == payload, 'checkout differs from signed data reader')
+            immutable(helpers / name, payload)
+        proof = json.loads(signed.read('assets/server-data-tools/provider.json'))
+        immutable(work / 'data-tools-selection.json', data.storage.encoded(proof['toolSelection']))
+
+
+def bind_receipt(game, tools, work, evidence):
+    """Independent host JVM using the pinned Android 13 JSON classes and unchanged production consumer."""
+    approved = auth.document(ROOT / 'config/stock-prepared-data-reader.json')
+    pins = auth.document(work / 'data-tools-selection.json')
+    tool_digest = data.tools_verified(tools, pins)
+    generation = (work / 'server-data/current').read_text('ascii').strip()
+    auth.require(re.fullmatch(r'[a-f0-9]{64}', generation), 'invalid selected data generation')
+    runtime = ROOT / 'app/src/main/java/io/github/russianranger/esteria/runtime'
+    fixtures = ROOT / 'tests/fixtures/android13-json'
+    lock = auth.document(ROOT / 'sources.lock.json')['sources']
+    started = time.monotonic()
+    with tempfile.TemporaryDirectory() as directory:
+        classes = Path(directory)
+        build = classes / 'BuildConfig.java'
+        build.write_text('package io.github.russianranger.esteria; public final class BuildConfig {'
+                         'public static final String CLIENT_REVISION="' + lock['client']['commit'] + '";}')
+        subprocess.run(['javac', '-d', classes, '-sourcepath', ROOT / 'core/src/main/java',
+                        *sorted((fixtures / 'aosp').glob('*.java')), *sorted((fixtures / 'support').glob('*.java')),
+                        build, runtime / 'PythonReceiptJson.java', runtime / 'ServerDataBinding.java',
+                        ROOT / 'tools/stock_world/StockWorldBinding.java'], check=True)
+        call = subprocess.run(['java', '-cp', classes, 'io.github.russianranger.esteria.runtime.StockWorldBinding',
+                               game, tools, work, approved['installedReader'], tool_digest, lock['server']['commit'],
+                               approved['outputRecipe'], generation], text=True, capture_output=True)
+        auth.require(call.returncode == 0, 'production ServerDataBinding rejected the staged receipt')
+        result = json.loads(call.stdout)
+    db.atomic_json(evidence, dict(phase='production-java-data-binding', environment='host JVM; Android 13 AOSP JSON',
+                                  elapsedSeconds=round(time.monotonic()-started, 3), **result))
 
 
 def selection():
     generation = data.storage.read(GAME / 'current', 66).decode().strip()
     tools = PACKAGE / 'server-data-tools'
     pins = auth.document(PACKAGE / 'data-tool-selection.json')
-    inputs = dict(formatVersion=1, contentProfile=PROFILE, importGeneration=generation, locale='enUS', threads=2,
+    inputs = dict(formatVersion=1, contentProfile=PROFILE, importGeneration=generation, locale='enUS', threads=STOCK_THREADS,
                   clientRevision=data.CLIENT_REVISION, serverRevision=data.formats.SERVER_REVISION,
                   importMetadata=data.storage.imported(GAME, generation), toolSelectionSha256=data.tools_verified(tools, pins),
                   preparationHelperGeneration=data.preparation_helper_generation())
@@ -242,8 +303,8 @@ def generate():
             stages.append(phase)
             db.atomic_json(EVIDENCE / 'generation.json', dict(phase=phase, stages=stages,
                 freeBytes=shutil.disk_usage(OUTPUT).free, elapsedSeconds=round(time.monotonic()-started, 2)))
-    result = data.generate(OUTPUT, GAME, generation, tools, pins, 'enUS', threads=2,
-                           content_profile=PROFILE, progress=progress, timeout=3*3600)
+    result = data.generate(OUTPUT, GAME, generation, tools, pins, 'enUS', threads=STOCK_THREADS,
+                           content_profile=PROFILE, progress=progress)
     members = {row['path'].removeprefix(corpus.PREFIX) for row in auth.document(corpus.LOCK)}
     final = OUTPUT / 'generations' / result['generation']
     providers = auth.document(final / 'order.json')['providers']
@@ -261,6 +322,10 @@ def world(package, state, database, version, uuid, record):
     data_root = Path('/esteria-data')
     auth.require(auth.document(data_root / 'receipt.json')['generation'] == expected_generation,
                  'mounted data generation differs from live import/tools/profile')
+    binding = auth.document(EVIDENCE / 'data-binding.json')
+    auth.require(binding['phase'] == 'production-java-data-binding' and binding['generation'] == expected_generation and
+                 binding['outputRecipe'] == expected_inputs['preparationHelperGeneration'] and
+                 binding['threads'] == expected_inputs['threads'], 'matching production Java receipt admission required')
     phases, _ = auth.selections(package)
     selected = phases[0][1]
     verified = server_content.verify(package / 'server-content', package / 'content-receipt.json',
@@ -308,12 +373,17 @@ def main():
     sources.add_argument('--source', type=Path, help='existing owner-supplied private client folder or ZIP')
     sources.add_argument('--verified-spool', type=Path, help='read the existing official ZIP, torrent and verified piece journal offline')
     sources.add_argument('--acquire-until', type=int, help='fetch a fresh official ZIP until this Unix epoch time')
+    binding = modes.add_parser('bind-receipt')
+    for name in ('game', 'tools', 'work', 'evidence'):
+        binding.add_argument('--' + name, required=True, type=Path)
     modes.add_parser('generate')
     modes.add_parser('world')
     args = parser.parse_args()
     os.umask(0o077)
     if args.mode == 'package':
         stage(args.output, args.readback or last_published_readback(ROOT), args.apk)
+    elif args.mode == 'bind-receipt':
+        bind_receipt(args.game.resolve(), args.tools.resolve(), args.work.resolve(), args.evidence)
     elif args.mode == 'import':
         started = time.monotonic()
         state = {}

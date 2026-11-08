@@ -46,6 +46,7 @@ import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeReadPolicy;
 import io.github.russianranger.esteria.core.runtime.install.PreparationSpeed;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeStorageMaintenance;
+import io.github.russianranger.esteria.runtime.StockWinePrefixRepair;
 import io.github.russianranger.esteria.runtime.RuntimeSetup;
 import io.github.russianranger.esteria.runtime.ServerRuntimeSetup;
 import io.github.russianranger.esteria.runtime.ServerProgramsSetup;
@@ -310,7 +311,13 @@ public final class SessionService extends Service {
                         LocalWorldSetup.Component selected;
                         try{selected=LocalWorldSetup.Component.valueOf(repair);}
                         catch(IllegalArgumentException invalid){throw new IOException("Choose a named local component to repair",invalid);}
-                        if(selected==LocalWorldSetup.Component.CLIENT_RUNTIME){inspectStockClient(locale,true);prepareStockRuntime(locale);}
+                        if(selected==LocalWorldSetup.Component.CLIENT_RUNTIME) {
+                            if(StockWinePrefixRepair.runIfRequired(
+                                    this,root,this::preparationProgress,cancelled::get)) {
+                                status="Wine prefix repaired and verified.";
+                                log("Owned stock Wine prefix repair completed");
+                            } else {inspectStockClient(locale,true);prepareStockRuntime(locale);}
+                        }
                         else if(selected==LocalWorldSetup.Component.SERVER_RUNTIME)prepareServerRuntime();
                         else worldOperation(locale,selected,false);
                     }
@@ -341,6 +348,11 @@ public final class SessionService extends Service {
         catch(IllegalArgumentException invalid){return PreparationSpeed.DEFAULT;}
     }
     private static String preparationLabel(String phase){
+        if(phase.equals("client-prefix-preserved"))return "Existing Wine prefix preserved. Checking runtime providers";
+        if(phase.equals("client-prefix-display"))return "Starting private display for Wine repair";
+        if(phase.equals("client-prefix-wineboot"))return "Repairing Wine system files";
+        if(phase.equals("client-prefix-services"))return "Waiting for Wine services to finish";
+        if(phase.equals("client-prefix-verify"))return "Checking the repaired Wine prefix";
         if(phase.startsWith("server-data")){
             if(phase.contains("resumed-reviewed-v8-work")||phase.contains("resumed-reviewed-v9-work")||phase.contains("migrated-reviewed-v9-generation"))return "Continuing compatible work from the previous version";
             if(phase.contains("output-hashing")||phase.contains("output-verifying")||phase.contains("format-preflight"))return "World data · checking generated files";
@@ -1370,7 +1382,16 @@ public final class SessionService extends Service {
         if(operationWake!=null&&now>=wakeRenewAfter){operationWake.acquire(10*60*1000L);wakeRenewAfter=now+60*1000L;}
     }
     private synchronized void releaseWake(){if(operationWake!=null&&operationWake.isHeld())operationWake.release();wakeRenewAfter=0;}
-    @Override public void onDestroy() { destroyed = true;if(busy.get())log("Operation cancellation requested id="+operationIdForLog+" reason=service-destroyed action="+activeAction);requestCancellation(); worker.shutdown();supportWorker.shutdown();if(!busy.get())releaseWake();super.onDestroy(); }
+    @Override public void onDestroy() {
+        destroyed=true;
+        if(busy.get())log("Operation cancellation requested id="+operationIdForLog+" reason=service-destroyed action="+activeAction);
+        requestCancellation();
+        if(root!=null)worker.execute(()->{
+            try {StockWinePrefixRepair.retryPendingCleanup(root);}
+            catch(IOException failure){log("Wine prefix repair cleanup retained: "+failure.getMessage());}
+        });
+        worker.shutdown();supportWorker.shutdown();if(!busy.get())releaseWake();super.onDestroy();
+    }
     @Override public void onTrimMemory(int level) {
         super.onTrimMemory(level);
         // Observe pressure without cancelling valid work or allocating an export.

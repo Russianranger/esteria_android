@@ -38,6 +38,8 @@ public final class PresentationProcessTests {
     }
     private static byte[] field(DataInputStream in) throws IOException { byte[] b=new byte[in.readUnsignedShort()];in.readFully(b);return b; }
     public static void main(String[] args)throws Exception {
+        StockWinePrefixTests.inspectOrdinaryLaunch();
+        StockWinePrefixRegistryTests.main(args);
         byte[] cookie=new byte[16];for(int i=0;i<cookie.length;i++)cookie[i]=(byte)(i+1);
         DataInputStream auth=new DataInputStream(new ByteArrayInputStream(X11SessionPlan.authority(987,cookie)));
         check(auth.readUnsignedShort()==65535&&field(auth).length==0,"Xauthority family/address encoding");

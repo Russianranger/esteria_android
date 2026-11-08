@@ -215,6 +215,16 @@ class StockReleaseBoundary(unittest.TestCase):
             self.assertEqual(result['preparedClientRevision'], base)
             self.assertEqual(result['rendererCompatibilitySha256'], pin['sha256'])
             self.assertIn('Repair local component → Client runtime', (self.args.output/'RELEASE-NOTES.md').read_text())
+            self.receipt['signedApk'].update(versionCode=17, versionName='0.1.0-non-custom.17')
+            self.write()
+            self.args.output = self.root / 'v17'
+            current = release.stage(self.args)
+            notes = (self.args.output / 'RELEASE-NOTES.md').read_text()
+            self.assertEqual(current['clientRevision'], result['clientRevision'])
+            self.assertEqual(current['tag'], 'non-custom-v0.1.0-non-custom.17')
+            self.assertIn('From v16 with the client and shaders prepared, tap **Start local game**', notes)
+            self.assertIn('For a previous shader failure, choose **Repair local component → Shaders** once', notes)
+            self.assertIn('If upgrading from before v16 and you still need the corrected client', notes)
             contract.write_text(json.dumps(dict(renderer, executableSha256='9'*64)))
             self.args.output = self.root / 'rejected'
             with self.assertRaisesRegex(ValueError, 'release-renderer-recipe-selection-differs'):

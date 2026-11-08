@@ -63,6 +63,7 @@ public final class ClientStartupSession implements AutoCloseable {
         if(OWNERS.containsKey(root))throw new IOException("Previous title investigation still owns its client");
         GameSession.Leases leases=GameSession.claim(root);
         try {
+            leases.requireLaunchablePrefix(wine.current(),wine.archiveSha256());
             ClientStartupSession owner=new ClientStartupSession(context.getApplicationContext(),root,wine,client,
                 bridges,tools,shaders,turnip,events,leases);
             if(OWNERS.putIfAbsent(root,owner)!=null)throw new IOException("Previous title investigation still owns its client");

@@ -4,7 +4,7 @@ This branch builds `io.github.russianranger.esteria.stock` with the explicit `st
 
 For v16, the package workflow builds the renderer provider from `runtime/client/stock-renderer-build.lock.json` and the measured client source lock beside it. The factory checks the full nine-file diff against the prepared source and the three-file change against the v15 executable source, reproduces the archive and corresponding source, and verifies the descriptor embedded in the APK. The server, SQL, imported data and v14 shader recipe keep their previous identities. [Source and measured execution](STATUS.md).
 
-Use the **Complete non-custom local-game ARM64 package** workflow for the complete provider set. This revision defaults to version code 16 on push and manual dispatch. For a signed update, use the exact successful unsigned release artifact and advance its version code over the installed stock release.
+Use the **Complete non-custom local-game ARM64 package** workflow for the complete provider set. Local builds, push builds and manual dispatch default to version code 17. For a signed update, use the exact successful unsigned release artifact and advance its version code over the installed stock release.
 
 Current delivery uses the [detached public signing transport](runtime/releases/non-custom/README.md): sign the exact reviewed unsigned APK with the persistent stock certificate, retain its public signature recipe and exact successful package/native SQL selection, then publish additively through `publish-non-custom-detached.yml`. Private keys/passwords stay outside Git. Optional configured CI signing remains supported; missing persistent secrets must fail rather than substitute a temporary identity. `tools/sign_android_apk.py --lock app/stock-signing.lock.json` requires the exact previous public stock APK for an update. For independent CI verification ahead of browser publication, push the reviewed public transport with `[stage detached non-custom]`. Advance `lastPublished` only after complete anonymous asset readback and SDK signature/manifest verification. Existing tags/assets and old transports are never overwritten.
 
@@ -406,9 +406,9 @@ one unsigned APK and three bounded JSON proofs, with combined input bytes below
 is published with the persistent certificate and baseline1; content/device
 installation and gameplay qualification remain separate.
 
-`workflow_dispatch` accepts `build_version_code` (default11 in this checkout; positive and at most
-2,100,000,000). Push builds use11. After published v11, explicitly choose a higher
-code for a new update and update the reviewed version/transport inputs together.
+`workflow_dispatch` accepts `build_version_code` from 1 to 2,100,000,000.
+The stock signing ledger pins the preceding public APK. Select a higher code for
+an update and write its public transport files in the corresponding release directory.
 The release build explicitly clears signing environment variables and performs
 no private-key operation. Sign the reviewed `app-release-unsigned.apk` separately
 with `tools/sign_android_apk.py` and the owner-provisioned persistent development
