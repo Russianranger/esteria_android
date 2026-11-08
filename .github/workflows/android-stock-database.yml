@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         control: [retained]
-        pathShape: [declared, short]
+        pathShape: [client]
     env:
       ESTERIA_SOCKET_SHAPE: ${{ matrix.pathShape }}
       ESTERIA_WINE_CONTROL: ${{ matrix.control }}

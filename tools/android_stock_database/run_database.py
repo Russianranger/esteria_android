@@ -16,7 +16,7 @@ CONTAINER='esteria-android-qa'
 
 def updater_logs():
     base='/data/data/'+PACKAGE+'/files'
-    raw=shell(CONTAINER,'''for f in "$1"/s/*/{prefix-update,u}/logs/{stdout,stderr}.log; do
+    raw=shell(CONTAINER,'''for f in "$1"/s/*/{prefix-update,u,client}/logs/{stdout,stderr}.log; do
         if test -f "$f"; then echo "PRIVATE-QA-STREAM"; tail -c 8192 "$f"; echo; fi
     done''',base)
     # This fresh offline container never carries a game import, account or user data.
@@ -31,7 +31,7 @@ def updater_logs():
         if re.fullmatch(r'wineserver: [a-z ]{1,24}: (?:Invalid argument|File name too long|Address already in use|Operation not permitted|Permission denied|No such file or directory|Bad file descriptor|Not a directory|Not a socket|Function not implemented|Connection refused)',line):row['syscallError']=line
         if len(line)<160 and line.isascii() and line.startswith('wineserver: ') and '/' not in line and '\\' not in line and re.fullmatch(r"[A-Za-z0-9 ,.():='-]{1,159}",line):row['fixedSystemDiagnostic']=line
         if row not in lines:lines.append(row)
-    lengths=shell(CONTAINER,'''for tmp in "$1"/s/*/{prefix-update,u}/tmp; do
+    lengths=shell(CONTAINER,'''for tmp in "$1"/s/*/{prefix-update,u,client}/tmp; do
         if test -d "$tmp"; then
           real=$(readlink -f "$tmp"); echo "TMP ${#real}"
           for socketdir in "$real"/.wine-*/server-*; do if test -d "$socketdir"; then d="$socketdir/socket"; echo "CANDIDATE ${#d}"; fi; done
