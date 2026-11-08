@@ -13,7 +13,7 @@ import threading
 import time
 
 NAMES = ('wineboot', 'rundll32', 'services.exe', 'winedevice', 'rpcss', 'msiexec',
-         'appwiz.cpl', 'cmd.exe', 'wowclient64.exe', 'wineserver', 'winemenubuilder')
+         'appwiz.cpl', 'control.exe', 'cmd.exe', 'wowclient64.exe', 'wineserver', 'winemenubuilder')
 PATTERNS = {
     'preInstall':b'installhinfsection preinstall', 'defaultInstall':b'installhinfsection defaultinstall',
     'wineInf':b'wine.inf','c0000135':b'c0000135', 'kernel32LoadFailure':b'could not load kernel32',
@@ -21,9 +21,15 @@ PATTERNS = {
     'deviceFailed':b'winedevice1 failed to start','monoInstaller':b'wine mono installer',
     'geckoInstaller':b'wine gecko installer','socketNameTooLong':b'file name too long',
     'socketPermission':b'permission denied','mapProtection':b'change protection',
-    'appwizGecko':b'installwinegecko','appwizMono':b'installwinemono',
+    'controlAddonDownload':b'appwizcpl:start_download',
+    'controlMonoLaunched':b' appwiz.cpl install_mono','systemCommandRan':b'microsoft windows',
+    'registryInstallSection':b'do_register_dll calling dllregisterserver','mountDriverReported':b'mountmgr.sys',
+    'registryInstallFinished':b'setupinstallservicesfrominfsectionw' ,'monoRuntimeMissing':b'mono runtime not found',
+    'bootFinished':b'wineboot:wmain operation done','postInfWineUpdate':b'has been updated.',
+    'appwizGecko':b'install_gecko','appwizMono':b'install_mono',
     'setupCopyFile':b'setup_install_file','ntMapViewFailure':b'ntmapviewofsection failed',
 }
+REGISTRATIONS = ('shell32.dll', 'quartz.dll', 'colorcnv.dll', 'cryptdlg.dll', 'cryptnet.dll', 'devenum.dll', 'l3codecx.ax', 'mfasfsrcsnk.dll', 'mfh264enc.dll', 'mfmp4srcsnk.dll', 'mp3dmod.dll', 'msauddecmft.dll', 'mscoree.dll', 'mshtml.dll', 'msisip.dll', 'msmpeg2vdec.dll', 'msvproc.dll', 'qcap.dll', 'qedit.dll', 'resampledmo.dll', 'urlmon.dll', 'windowscodecs.dll', 'winegstreamer.dll', 'wineps.drv', 'winevulkan.dll', 'winprint.dll', 'wintrust.dll', 'wmadmod.dll', 'wmvdecod.dll', 'iexplore.exe')
 DLLS = ('kernel32.dll','kernelbase.dll','ntdll.dll','cmd.exe','rundll32.exe','gdi32.dll',
         'user32.dll','shell32.dll','wineboot.exe','services.exe')
 
@@ -34,11 +40,12 @@ def processes():
     for item in Path('/proc').glob('[0-9]*/cmdline'):
         try:
             with item.open('rb') as f:
-                command = f.read(1024).split(b'\x00',1)[0].lower()
+                arguments = f.read(4096).lower()
+                command = arguments.split(b'\x00',1)[0]
             for name in NAMES:
                 if name.encode() in command:
                     result.add(name)
-                    if name in ('rundll32','wineboot'):
+                    if name in ('rundll32','wineboot','control.exe'):
                         channels=[]
                         for path in (item.parent/'task').glob('[0-9]*/wchan'):
                             try:
@@ -50,7 +57,9 @@ def processes():
                                          'pipe_read','__arm64_sys_ppoll','hrtimer_nanosleep','epoll_wait'):
                                 w='sha256:'+hashlib.sha256(w.encode()).hexdigest()
                             channels.append(w)
-                        waits[item.parent.name]={'name':name,'waits':sorted(set(channels))}
+                        waits[item.parent.name]={'name':name,'waits':sorted(set(channels)),
+                            'appwizMono':b'appwiz.cpl' in arguments and b'install_mono' in arguments,
+                            'appwizGecko':b'appwiz.cpl' in arguments and b'install_gecko' in arguments}
 
         except OSError:
             continue
@@ -66,7 +75,8 @@ def observe(command,env,prefix,out):
     output_lock=threading.Lock()
     consumed=[0]
     last_setup=[None]
-    trace_env={**env,'WINEDEBUG':'-all,err+all,+process,+setupapi,+module'}
+    last_registration=[None]
+    trace_env={**env,'WINEDEBUG':'-all,err+all,+process,+setupapi,+module,+mscoree,+appwizcpl,+wineboot'}
     def pump(pipe):
         with pipe:
             while True:
@@ -79,6 +89,9 @@ def observe(command,env,prefix,out):
                     if match:
                         # Only Wine's compile-time function name and diagnostic thread ID.
                         last_setup[0]={'tid':int(match[1],16),'function':match[2][:80].decode()}
+                        if match[2]==b'do_register_dll' and b'calling dllregisterserver in ' in low:
+                            for dll in REGISTRATIONS:
+                                if dll.encode() in low: last_registration[0]=dll
 
                     observed.update(key for key,token in PATTERNS.items() if token in low)
     def launch():
@@ -95,6 +108,7 @@ def observe(command,env,prefix,out):
         images=sorted(n for n in DLLS if (system32/n).is_file())
         with output_lock:
             setup=last_setup[0]
+            registering=last_registration[0]
             flags=sorted(observed)
             count=consumed[0]
         update_time=None
@@ -109,7 +123,7 @@ def observe(command,env,prefix,out):
             windows=wine_windows.snapshot(env['DISPLAY'])
         except (OSError,AttributeError):
             windows=[]
-        markers=dict(seconds=age,setup=setup,waits=waits,windows=windows,wineInfMtime=int(Path('/opt/wine/share/wine/wine.inf').stat().st_mtime),
+        markers=dict(seconds=age,registration=registering,setup=setup,waits=waits,windows=windows,wineInfMtime=int(Path('/opt/wine/share/wine/wine.inf').stat().st_mtime),
                      updateTimestamp=update_time,system32Entries=len(members),systemRegBytes=(prefix/'system.reg').stat().st_size
                      if (prefix/'system.reg').is_file() else 0,installed=images,
                      processes=names,traceMarkers=flags,traceBytes=count,
@@ -121,19 +135,17 @@ def observe(command,env,prefix,out):
         return markers
     try:
         p=launch()
-        deadline=started+900
+        deadline=started+375
         while time.monotonic()<deadline:
             state=snapshot()
-            code=p.poll()
-            installers=set(state['processes']) & {'wineboot','rundll32'}
-            if code==0:
-                if (system32/'kernel32.dll').is_file() and (prefix/'system.reg').is_file():
-                    return
-                raise RuntimeError('Windows command exited without installed prefix')
-            if code is not None and not installers:
-                raise RuntimeError('Actual PE first-use exited before verified Grunt receipt')
-            time.sleep(10)
-        raise TimeoutError('Windows first-use or owned setup children exceeded observation')
+            if p.poll() is not None and not ({'wineboot','rundll32','control.exe'} & set(state['processes'])):
+                break
+            time.sleep(5)
+        state=snapshot()
+        result=dict(command='wine cmd.exe /c ver',commandExitBeforeCleanup=p.poll(),
+            reachedObservationLimit=time.monotonic()>=deadline,seconds=state['seconds'],
+            freshPrefix=True,environmentOverride=env['WINEDLLOVERRIDES'])
+        (out/'control-result.json').write_text(json.dumps(result))
     finally:
         for child in commands:
             if child.poll() is None:

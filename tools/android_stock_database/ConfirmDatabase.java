@@ -91,111 +91,22 @@ public final class ConfirmDatabase {
 
     }
 
-    private static String auth(Context context,Path root,ServerRuntimeSetup server,ServerProgramsSetup programs,
-            FreshServerInstallations.Active active,ServerDatabaseService.Handle database,RuntimeSetup wine,boolean cold) throws IOException {
-        Path work=active.directoryFor(root);
-        String mode=cold?"cold":"warm";
-        String generation=GuestHelperAssets.install(context,"server-session",GuestHelperAssets.directory(work,"qa-auth-helpers"),LocalServerSession.HELPERS);
-        Path observer=Files.createDirectory(work.resolve("qa-auth-"+mode));
-        for(String source:Arrays.asList("auth_phase.py","client_auth_contract.py","prepare_runtime.py","world_probe.py","stock_world_observation.py"))
-            Files.copy(new java.io.File("/esteria-qa/input/"+source).toPath(),observer.resolve(source));
-        Path processSession=Files.createDirectory(root.resolve("qa-auth-process-"+mode));
-        RuntimePackagePlan.RequiredFile pin=programs.packagePlan().required.get("bin/authserver");
-        RuntimePackagePlan.RequiredFile world=programs.packagePlan().required.get("bin/worldserver");
-        if(pin==null || pin.elfMachine!=183 || world==null || world.elfMachine!=183) throw new IOException("Selected packaged ARM64 authserver required");
-        return database.withReadyLease(server.current(),(operation,version,uuid)->{
-            OwnedProcess child=ServerDatabaseService.installedRuntime(context,server).launch(work,processSession,
-                Arrays.asList("/usr/bin/python3","-B","-s","-E","/work/qa-auth-"+mode+"/auth_phase.py",generation,
-                    mode,operation,version,uuid,active.setupReceiptSha256,pin.sha256,Long.toString(pin.bytes),world.sha256,Long.toString(world.bytes)),
-                Arrays.asList(new ProotLaunch.Mount(programs.current(),ServerProgramsSetup.guestMount()),
-                        new ProotLaunch.Mount(root.resolve("qa-server-data-directory"),"/esteria-data"),
-                        new ProotLaunch.Mount(root.resolve("state/client-work"),"/esteria-client")));
-            OwnedProcess grunt=null;
-            try {
-                grunt=wineGuest(context,root,root.resolve("state/client-work"),wine,mode);
-                long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(cold ? 20 : 6);
-                while((child.isAlive() || grunt.isAlive()) && System.nanoTime()<deadline) {
-                    if(!child.isAlive()) requireExit(child);
-                    if(!grunt.isAlive()) requireExit(grunt);
-                    pause();
-                }
-                requireExit(child);
-                requireExit(grunt);
-                Path result=observer.resolve("verified.json");
-                if(Files.size(result)>4096) throw new IOException("Unexpected auth observation size");
-                return new String(Files.readAllBytes(result),StandardCharsets.UTF_8);
-            } finally {
-                try { if(grunt!=null && grunt.isAlive()) grunt.stop(Duration.ofSeconds(15)); }
-                finally { if(child.isAlive()) child.stop(Duration.ofSeconds(15)); }
-            }
-        });
-    }
-
-    private static JSONObject run(Context context, Path root, boolean cold) throws Exception {
-        Path data=root.resolve("qa-server-data-directory");
-        if(cold) Files.createDirectory(data);
-        if(!Files.isDirectory(data) || !data.equals(data.toRealPath()))
-            throw new IllegalStateException("Disjoint QA schema config directory required");
+    private static JSONObject run(Context context,Path root,String control) throws Exception {
         RuntimeSetup wine=new RuntimeSetup(context,root);
-        prepareClient(context,root,root.resolve("state/client-work"),wine,cold);
-        ServerRuntimeSetup server=new ServerRuntimeSetup(context,root);
-        ServerProgramsSetup programs=new ServerProgramsSetup(context,root);
-        ServerContentSetup content=new ServerContentSetup(context,root);
-        long start=System.nanoTime();
-        HashSet<String> reported=new HashSet<>();
-        RuntimeWork.Progress progress=(phase,path,done,total)->{
-            if(reported.add(phase)) System.out.println("ANDROID_DB_PHASE "+phase+" "+elapsed(start));
-        };
-        RuntimeInstaller.Result runtime=server.prepare(progress,RuntimeWork.NEVER_CANCELLED);
-        RuntimeInstaller.Result executables=programs.prepare(server.archiveSha256(),progress,RuntimeWork.NEVER_CANCELLED);
-        RuntimeInstaller.Result sql=content.prepare(server.archiveSha256(),progress,RuntimeWork.NEVER_CANCELLED);
-        long copied=runtime.copiedBytes+executables.copiedBytes+sql.copiedBytes;
-        if(cold==(runtime.alreadyInstalled || executables.alreadyInstalled || sql.alreadyInstalled) ||
-           (cold ? copied<=0 : copied!=0)) throw new IllegalStateException("Unexpected provider reuse");
-        long providers=elapsed(start);
-        FreshServerInstallations.Active active;
-        if(cold) {
-            if(ServerInstallationSetup.completedOrNull(context,root,server,programs,content)!=null)
-                throw new IllegalStateException("Fresh installed package already has active DB");
-            try(ServerInstallationSetup.Handle setup=ServerInstallationSetup.beginFresh(
-                    context,root,server,programs,content,data,4L<<30)) {
-                Path socket=root.resolve("db").resolve(setup.slotId()).resolve("state/run/bootstrap.sock");
-                System.out.println("ANDROID_DB_SOCKET_BYTES "+socket.toString().getBytes(StandardCharsets.UTF_8).length);
-                setup.prepare(progress,RuntimeWork.NEVER_CANCELLED);
-                setup.finishPlayerbots(progress,RuntimeWork.NEVER_CANCELLED);
-                active=setup.stopAndPromote(Duration.ofSeconds(30));
-            }
-        } else {
-            active=ServerInstallationSetup.completed(context,root,server,programs,content);
-        }
-        long prepared=elapsed(start);
-        System.out.println("ANDROID_DB_PHASE promoted-slot-selected "+prepared);
-        ServerDatabaseService.Handle database=ServerDatabaseService.startActive(context,root,server,active);
-        long ready;
-        String authReport;
-        long authenticated;
+        Path work=root.resolve("state/client-work");
+        prepareClient(context,root,work,wine,true);
+        OwnedProcess child=wineGuest(context,root,work,wine,control);
         try {
-            ServerDatabaseService.awaitReady(database,System.nanoTime()+TimeUnit.MINUTES.toNanos(3),new AtomicBoolean(false));
-            ready=elapsed(start);
-            if(!active.mysqlUuid.equals(database.instanceUuid())) throw new IllegalStateException("Owned SQL service identity differs");
-            authReport=auth(context,root,server,programs,active,database,wine,cold);
-            authenticated=elapsed(start);
-        } finally {
-            database.stop(Duration.ofSeconds(30));
-        }
-        if(database.isAlive() || database.exitCode()!=0) throw new IllegalStateException("SQL service did not close cleanly");
-        return new JSONObject().put("mode",cold?"cold":"warm").put("instanceUuid",active.mysqlUuid)
-            .put("slotId",active.slotId).put("promotionProof",active.proofSha256).put("setupReceipt",active.setupReceiptSha256)
-            .put("providerGeneration",runtime.generation).put("programsGeneration",executables.generation)
-            .put("contentGeneration",sql.generation).put("providerCopiedBytes",copied)
-            .put("version",server.expectedMysqlVersion()).put("providerMs",providers)
-            .put("schemaSetupOrSelectionMs",prepared-providers).put("activeNativeStartupMs",ready-prepared)
-            .put("reconstructedClientSha256",PE).put("sourceRevision",SOURCE).put("wineArchive",wine.archiveSha256())
-            .put("auth",new JSONObject(authReport)).put("cleanShutdownMs",elapsed(start)-authenticated).put("sameAuthenticatedInstance",true).put("closed",true);
+            long end=System.nanoTime()+TimeUnit.MINUTES.toNanos(8);
+            while(child.isAlive() && System.nanoTime()<end) pause();
+            requireExit(child);
+        } finally { if(child.isAlive()) child.stop(Duration.ofSeconds(15)); }
+        return new JSONObject().put("control",control).put("wineArchive",wine.archiveSha256())
+            .put("clientRevision",SOURCE).put("verifiedPE",PE).put("ownerClosed",!child.isAlive());
     }
 
     public static void main(String[] args) throws Exception {
-        if(args.length!=1 || !(args[0].equals("cold") || args[0].equals("warm"))) throw new IllegalArgumentException();
+        if(args.length!=1 || !(args[0].equals("baseline") || args[0].equals("suppress-mono"))) throw new IllegalArgumentException();
         if(Looper.myLooper()==null) Looper.prepareMainLooper();
         Class<?> thread=Class.forName("android.app.ActivityThread");
         Object instance=thread.getMethod("systemMain").invoke(null);
@@ -207,7 +118,7 @@ public final class ConfirmDatabase {
         };
         System.load(pkg.getApplicationInfo().nativeLibraryDir+"/libesteria_process.so");
         Path root=context.getFilesDir().getCanonicalFile().toPath();
-        FutureTask<JSONObject> operation=new FutureTask<>(()->run(context,root,args[0].equals("cold")));
+        FutureTask<JSONObject> operation=new FutureTask<>(()->run(context,root,args[0]));
         new Thread(operation,"qa-signed-slot-owner").start();
         try {System.out.println("ANDROID_DB_RESULT "+operation.get());}
         catch(java.util.concurrent.ExecutionException failure) {

@@ -1,4 +1,5 @@
 """Start and stop the APK's production MySQL twice on an offline, fresh Android package."""
+import os
 import hashlib
 import json
 from pathlib import Path
@@ -32,16 +33,19 @@ def wine_details(report):
         if test -f "$f"; then cat "$f"; fi
     done''',root)
     if observation:
-        from tools.android_stock_database.wine_prefix import DLLS, NAMES, PATTERNS
+        from tools.android_stock_database.wine_prefix import DLLS, NAMES, PATTERNS, REGISTRATIONS
         timeline=[]
         for sample in json.loads(observation)['samples'][-100:]:
             row={k:v for k,v in sample.items() if k in ('seconds','system32Entries','systemRegBytes','traceBytes','wineInfMtime','updateTimestamp') and type(v) is int}
             for k,allowed in [('installed',DLLS),('processes',NAMES),('traceMarkers',PATTERNS)]:
                 row[k]=[v for v in sample[k] if v in allowed]
             row['commandExits']=[v for v in sample['commandExits'][:2] if v is None or type(v) is int]
-            row['waits']={pid:{'name':w['name'],'waits':[v for v in w['waits'] if re.fullmatch(
+            row['waits']={pid:{'name':w['name'],'appwizMono':w['appwizMono'] is True,
+                                'appwizGecko':w['appwizGecko'] is True,'waits':[v for v in w['waits'] if re.fullmatch(
                 r'(?:[0-9a-z_]{1,40}|sha256:[a-f0-9]{64})',v)]} for pid,w in sample['waits'].items()
-                if re.fullmatch(r'\d{1,8}',pid) and w['name'] in ('rundll32','wineboot')}
+                if re.fullmatch(r'\d{1,8}',pid) and w['name'] in ('rundll32','wineboot','control.exe')}
+            if sample['registration'] in REGISTRATIONS:
+                row['lastSelectedRegistration']=sample['registration']
             # These labels were safely mapped before they crossed the X11 process boundary.
             from tools.android_stock_database.wine_windows import LABELS
             allow=lambda v: isinstance(v,str) and (v in LABELS or re.fullmatch(r'sha256:[0-9a-f]{64}',v))
@@ -111,46 +115,40 @@ def exercise(report):
     report['operations']=[]
     report.update(packageUid=package_uid,selinux=shell(CONTAINER,'getenforce').strip(),
                   fingerprint=shell(CONTAINER,'getprop ro.build.fingerprint').strip())
-    for mode in ('cold','warm'):
-        report['phase']=mode
-        cmd=['docker','exec','--user',f'{package_uid}:{package_uid}',CONTAINER,
-             '/system/bin/env','-i',*boot,'CLASSPATH=/esteria-qa/input/driver.jar:'+apk,
-             '/system/bin/app_process64','-Djava.library.path='+native+':/system/lib64','/system/bin',
-             'io.github.russianranger.esteria.runtime.ConfirmDatabase',mode]
-        result=subprocess.run(cmd,capture_output=True,text=True,timeout=50*60)
-        phases=[line for line in result.stdout.splitlines() if re.fullmatch(r'ANDROID_DB_PHASE [a-z0-9_-]+ \d+',line)]
-        report['lastPhases']=phases
-        sizes=re.findall(r'^ANDROID_DB_SOCKET_BYTES (\d+)$',result.stdout,re.MULTILINE)
-        if sizes: report['coldPhysicalBootstrapSocketBytes']=int(sizes[-1])
-        rows=[line.removeprefix('ANDROID_DB_RESULT ') for line in result.stdout.splitlines() if line.startswith('ANDROID_DB_RESULT ')]
-        if result.returncode or len(rows)!=1:
-            report['exitCode']=result.returncode
-            report['appStack']=re.findall(r'^\s*at (io\.github\.russianranger\.esteria(?:\.[A-Za-z_$0-9]+)+)\(([A-Za-z0-9_]+\.java:\d+)\)',result.stderr,re.MULTILINE)[:30]
-            report['exceptionClasses']=re.findall(r'^ANDROID_DB_EXCEPTION ([A-Za-z0-9_.]+)$',result.stderr,re.MULTILINE)
-            failure_details(report)
-            raise RuntimeError('signed database owner failed')
-        item=json.loads(rows[0])
-        checked(item['mode']==mode and item['closed'] and item['sameAuthenticatedInstance'] and
-                re.fullmatch(r'[a-f0-9-]{36}',item['instanceUuid']),'invalid signed SQL result')
-        auth=item['auth']
-        checked(auth['build']==12340 and all(auth[k] is True for k in ('sourceChallenge','ownedListener','srpAndRealmList','mysqlKeyMatched','authserverExitedCleanly')) and
-                auth['worldAddress']=='127.0.0.1:8085','incomplete authserver handshake')
-        checked(auth['gruntChecks']==13 and re.fullmatch(r'[a-f0-9]{64}',auth['clientReceiptSha256']) and
-                auth['commonMainStarted'] is False and auth['assetsLoaded'] is False, 'incomplete actual PE receipt')
-        if mode=='warm':
-            first=report['operations'][0]
-            checked(first['auth']['clientReceiptSha256']!=auth['clientReceiptSha256'], 'same challenge receipt')
-            checked(first['instanceUuid']==item['instanceUuid'] and all(first[k]==item[k] for k in ('providerGeneration','programsGeneration','contentGeneration','slotId','promotionProof','setupReceipt')) and
-                    item['providerCopiedBytes']==0,'warm persisted instance or provider changed')
-        check_empty(CONTAINER,package_uid)
-        report['operations'].append(item)
+    mode=os.environ['ESTERIA_WINE_CONTROL']
+    assert mode in ('baseline','suppress-mono')
+    report['phase']=mode
+    cmd=['docker','exec','--user',f'{package_uid}:{package_uid}',CONTAINER,
+         '/system/bin/env','-i',*boot,'CLASSPATH=/esteria-qa/input/driver.jar:'+apk,
+         '/system/bin/app_process64','-Djava.library.path='+native+':/system/lib64','/system/bin',
+         'io.github.russianranger.esteria.runtime.ConfirmDatabase',mode]
+    result=subprocess.run(cmd,capture_output=True,text=True,timeout=50*60)
+    phases=[line for line in result.stdout.splitlines() if re.fullmatch(r'ANDROID_DB_PHASE [a-z0-9_-]+ \d+',line)]
+    report['lastPhases']=phases
+    sizes=re.findall(r'^ANDROID_DB_SOCKET_BYTES (\d+)$',result.stdout,re.MULTILINE)
+    if sizes: report['coldPhysicalBootstrapSocketBytes']=int(sizes[-1])
+    rows=[line.removeprefix('ANDROID_DB_RESULT ') for line in result.stdout.splitlines() if line.startswith('ANDROID_DB_RESULT ')]
+    if result.returncode or len(rows)!=1:
+        report['exitCode']=result.returncode
+        report['appStack']=re.findall(r'^\s*at (io\.github\.russianranger\.esteria(?:\.[A-Za-z_$0-9]+)+)\(([A-Za-z0-9_]+\.java:\d+)\)',result.stderr,re.MULTILINE)[:30]
+        report['exceptionClasses']=re.findall(r'^ANDROID_DB_EXCEPTION ([A-Za-z0-9_.]+)$',result.stderr,re.MULTILINE)
+        failure_details(report)
+        raise RuntimeError('signed database owner failed')
+    item=json.loads(rows[0]); checked(item['control']==mode and item['ownerClosed'],'invalid observer exit')
+    check_empty(CONTAINER,package_uid)
+    report['postCleanupPackageUidProcesses']=0
+    report['operations'].append(item)
+    item=json.loads(shell(CONTAINER,'cat "$1/state/client-work/cold/control-result.json"','/data/data/'+PACKAGE+'/files'))
+    expected='winepulse.drv=' if mode=='baseline' else 'winepulse.drv=;mscoree='
+    checked(item['freshPrefix'] and item['command']=='wine cmd.exe /c ver' and item['environmentOverride']==expected,'unexpected guest selection')
+    report['controlResult']=item
     wine_details(report)
     report['phase']='complete'
 
 
 if __name__=='__main__':
-    report=dict(scope='signed Android 13 ARM64 production slot, stock SQL/updater/four schemas and owned MySQL, disjoint empty world-data directory for config path',phase='initial',
-                reconstructedGruntTarget=True,actualWorldSession=False,graphicalLogin=False,physicalThor=False)
+    report=dict(scope='Dedicated fresh signed Android 13 ARM64 stock Wine first-use prefix and real cmd.exe, observed without UI action',phase='initial',
+                reconstructedGruntTarget=False,actualWorldSession=False,graphicalLogin=False,physicalThor=False)
     start=time.monotonic()
     try:
         exercise(report)

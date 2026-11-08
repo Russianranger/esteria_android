@@ -10,14 +10,16 @@ import wine_prefix
 
 work = Path('/work')
 mode = sys.argv[1]
-assert mode in {'cold', 'warm'}
+assert mode in {'baseline', 'suppress-mono'}
 os.umask(0o077)
-out = work / mode
+out = work / 'cold'
 out.mkdir(mode=0o700, exist_ok=False)
 start = time.monotonic()
 env = {**os.environ, 'DISPLAY': ':77', 'WINEPREFIX': '/work/home/.wine',
        'WINEDLLOVERRIDES':'winepulse.drv=', 'WINEESYNC':'0', 'WINEFSYNC':'0',
        'WINEDEBUG': '-all,err+all'}
+if mode=='suppress-mono':
+    env['WINEDLLOVERRIDES']+=';mscoree='
 prefix = Path(env['WINEPREFIX'])
 wine = '/opt/wine/bin/wine'
 server = '/opt/wine/bin/wineserver'
@@ -47,10 +49,7 @@ def checked(phase, command, timeout):
 
 def run():
     assert env['HOME']=='/work/home' and env['WINE_ANDROID_PRIVATE_PE_COPY']=='1'
-    if mode=='cold':
-        assert not prefix.exists()
-    else:
-        assert (prefix/'system.reg').is_file()
+    assert not prefix.exists()
     status('display')
     with (out/'display.private.log').open('xb') as log:
         x = subprocess.Popen(['/usr/bin/Xtigervnc',env['DISPLAY'],'-geometry','1920x1080','-depth','24',
@@ -63,18 +62,8 @@ def run():
                 if sock.exists() and stat.S_ISSOCK(sock.lstat().st_mode): break
                 time.sleep(.1)
             else: raise RuntimeError('private X11 startup failed')
-            status('wait-owned-authserver')
-            deadline = time.monotonic()+110
-            while time.monotonic()<deadline:
-                if (work/('ready-'+mode+'.json')).is_file(): break
-                time.sleep(.1)
-            else: raise RuntimeError('credential handoff not ready')
-            command=[wine,r'Z:\work\bin\WowClient64.exe','--auth-check','--local-offline']
-            if mode=='cold':
-                status('reconstructed-grunt-first-use')
-                wine_prefix.observe(command,env,prefix,out)
-            else:
-                checked('reconstructed-grunt',command,120)
+            status('windows-first-use')
+            wine_prefix.observe([wine,'cmd.exe','/c','ver'],env,prefix,out)
         finally:
             try:
                 for flag in ('-k','-w'):
