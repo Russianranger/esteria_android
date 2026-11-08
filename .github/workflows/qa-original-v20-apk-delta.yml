@@ -40,7 +40,7 @@ jobs:
           grep -Fx 'Verified using v2 scheme (APK Signature Scheme v2): true' baseline-sdk.txt
           grep -Fx 'Verified using v3 scheme (APK Signature Scheme v3): true' baseline-sdk.txt
           for version in 19 20; do
-            "$tools/aapt2" dump badging "v$version.apk" > "sdk-$version.txt"
+            "$tools/aapt" dump badging "v$version.apk" > "sdk-$version.txt"
             grep -F "name='io.github.russianranger.esteria.stock' versionCode='$version' versionName='0.1.0-non-custom.$version'" "sdk-$version.txt"
             grep -Fx "sdkVersion:'26'" "sdk-$version.txt"
             grep -Fx "targetSdkVersion:'35'" "sdk-$version.txt"
