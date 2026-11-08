@@ -82,12 +82,13 @@ public final class SignedDatabaseUpdate {
             bytes+=dataTools.prepare(server.archiveSha256(),RuntimeWork.NONE,RuntimeWork.NEVER_CANCELLED).copiedBytes;
             bytes+=shaderTools.prepare(RuntimeWork.NONE,RuntimeWork.NEVER_CANCELLED).copiedBytes;
             System.out.println("ESTERIA_SEED providerCopiedBytes="+bytes+" client="+client.generation());
-            return;
         }
         require(Files.isDirectory(data),"missing prior qualification owner");
         client.requireWineArchive(wine.archiveSha256());bridges.requireWineArchive(wine.archiveSha256());graphics.requireWineArchive(wine.archiveSha256());
-        require(server.current()!=null&&programs.current()!=null&&content.current()!=null&&wine.current()!=null&&client.current()!=null&&
-                bridges.current()!=null&&graphics.current()!=null&&dataTools.current()!=null&&shaderTools.current()!=null,"retained provider unavailable");
+        Path[] roots={server.current(),programs.current(),content.current(),wine.current(),client.current(),
+            bridges.current(),graphics.current(),dataTools.current(),shaderTools.current()};
+        verifyRetainedFiles(qa,roots,client,phase.equals("seed19"));
+        if(phase.equals("seed19"))return;
         if(phase.equals("fail19")) {
             require(ServerInstallationSetup.completedOrNull(ctx,root,server,programs,content)==null,"unexpected preexisting slot");
             try(ServerInstallationSetup.Handle owner=ServerInstallationSetup.beginFresh(ctx,root,server,programs,content,data,1L<<30)) {
@@ -125,6 +126,38 @@ public final class SignedDatabaseUpdate {
         }finally{service.stop(Duration.ofSeconds(30));}
         require(!service.isAlive(),"MySQL did not stop");
         System.out.println("ESTERIA_ACTIVE slot="+active.slotId+" uuid="+active.mysqlUuid+" client="+client.generation()+" elapsedMs="+TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-start));
+    }
+    /** Measure every provider seal and the selected client payload across package replacement. */
+    private static void verifyRetainedFiles(Path qa,Path[] roots,ClientRuntimeSetup client,boolean seed)throws Exception{
+        MessageDigest summary=MessageDigest.getInstance("SHA-256");
+        for(Path selected:roots) {
+            require(selected!=null,"retained provider unavailable");
+            Path seal=selected.resolveSibling("complete");
+            observeFile(summary,seal);
+        }
+        long clientBytes=0;
+        for(String name:new java.util.TreeSet<>(client.packagePlan().required.keySet())) {
+            Path file=roots[4].resolve(name);
+            observeFile(summary,file);
+            clientBytes+=Files.size(file);
+        }
+        Path record=qa.resolve("selected-provider-identities");
+        byte[] measured=summary.digest();
+        if(seed)Files.write(record,measured,StandardOpenOption.CREATE_NEW);
+        else require(MessageDigest.isEqual(measured,Files.readAllBytes(record)),"provider seal or client payload changed");
+        System.out.println("ESTERIA_REUSE providerSeals="+roots.length+" clientRequiredFiles="+client.packagePlan().required.size()
+            +" clientRequiredBytes="+clientBytes+" matchPrevious="+!seed);
+    }
+    private static void observeFile(MessageDigest summary,Path file)throws Exception{
+        android.system.StructStat stat=android.system.Os.lstat(file.toString());
+        require(android.system.OsConstants.S_ISREG(stat.st_mode),"expected regular retained file");
+        String attributes=file+" "+stat.st_dev+" "+stat.st_ino+" "+stat.st_size+" "+Files.getLastModifiedTime(file)+"\n";
+        summary.update(attributes.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        try(java.io.InputStream input=Files.newInputStream(file)) {
+            byte[] buffer=new byte[65536];
+            int count;
+            while((count=input.read(buffer))!=-1)summary.update(buffer,0,count);
+        }
     }
     private static byte[] digest(Path file)throws Exception{return MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(file));}
     private static byte[] identity(Path root,FreshServerInstallations.Active active)throws Exception{

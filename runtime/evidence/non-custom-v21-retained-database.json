@@ -1,0 +1,130 @@
+{
+  "formatVersion": 1,
+  "scope": "Stock retained database repair and signed package evidence by environment",
+  "branch": "non-custom",
+  "androidProducer": "623a88115a394fc7bd433c51a60d0e0cda732b67",
+  "fixedSelection": "43849475677fcad2befa965b988bad05d55969d7",
+  "client": "c05a3af9be6c204c40d65d0e3eb6ccc2442012b6",
+  "preparedClientData": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "server": "f35f04d01689f034778e3474b3c820092f51e461",
+  "eluna": "58d7652138887783228b9727bd1fa4e08f00342b",
+  "thorReport": "non-custom-v19-thor-database-repair.json",
+  "host": {
+    "os": "Linux x86_64, OpenJDK 17, separate JVMs, filesystem Context and installed APK assets",
+    "fullHostSuite": {
+      "run": 1689,
+      "skipped": 148,
+      "failed": 0
+    },
+    "observedProductionFailure": "Server content receipt has not been prepared",
+    "retainedRuntimeAndProgramInstallCopiedBytes": [
+      0,
+      0
+    ],
+    "tamperControl": "one changed receipt byte, same length and timestamp, no slot allocation",
+    "tamperError": "Cannot select verified server content receipt: Cached embedded archive hash differs; preserved",
+    "immutableReceiptRecoveryBytes": 1343739,
+    "fullArchiveAvailableDuringRecovery": false,
+    "cancelledSlot": "76391e134ce14e21",
+    "previousFailedSlot": "959e9b05064a46a5",
+    "cancelledOwner": "CANCELLED",
+    "helperLaunchedOnCancellation": false,
+    "partialWorkspaceSentinelPreserved": true
+  },
+  "nativeSql": {
+    "environment": "Native Linux ARM64, packaged MySQL and schema helpers",
+    "run": 42493312842,
+    "job": 128770146832,
+    "artifact": 13622875417,
+    "artifactDigest": "sha256:be551c4090283ee9d3733eeec5f01b1709de23a210985e536f0a70e833b9e0d0",
+    "productionCoreAndFourthSchemaCompleted": true,
+    "cleanShutdownVerified": true,
+    "restartedFinishReentryWithoutExecution": true,
+    "restartPersistenceVerified": true
+  },
+  "package": {
+    "run": 42493312810,
+    "job": 128770178456,
+    "artifactId": 13623310057,
+    "comparison": {
+      "unsignedApkSha256": "e73c609e22acffc69bff0db6de7a1ad6bfd1c7126346a03b86acead277a243f8",
+      "packageArtifactSha256": "55b6534f004dc769dd62843f462a6994ccd32c04efc3d011ddb17c4d04ac2317",
+      "originalV19Sha256": "c0d251847496c64170bb31d534a925afd1d8e7f92c21687e0e1cbf82c056e6fa",
+      "referenceV20Sha256": "38a56437d2ace81548f0f8774445daf02781173772811bc88f47d341f1c3fa8d",
+      "unchangedAgainstV20Assets": 123,
+      "unchangedAgainstV20Libraries": 4,
+      "changedAgainstV19": [
+        "assets/server-session/manifest.json",
+        "assets/server-session/server_session.py",
+        "assets/server-session/server_session_process.py"
+      ]
+    }
+  },
+  "signed": {
+    "apkBytes": 336903449,
+    "apkSha256": "1036c59e2d6e75c95e2cc6918111dfa73f816b77e3cd56b729807787d9bfb11d",
+    "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+    "debuggable": false,
+    "minSdk": 26,
+    "packageId": "io.github.russianranger.esteria.stock",
+    "targetSdk": 35,
+    "versionCode": 21,
+    "versionName": "0.1.0-non-custom.21"
+  },
+  "previous": {
+    "apkSha256": "c0d251847496c64170bb31d534a925afd1d8e7f92c21687e0e1cbf82c056e6fa",
+    "versionCode": 19
+  },
+  "detachedRecipeSha256": "8aca2888653244c972da94fbb447c499303bd6537d574fc05ed89c7cec86fc35",
+  "locallyReconstructedByteForByte": true,
+  "physicalThorUpdated": false,
+  "normalCharacterEntryObserved": false,
+  "androidArm64Debug": {
+    "environment": "Offline native ARM64 Android 13 Redroid, installed debug APK, separate app-UID ART processes",
+    "run": 42493312810,
+    "job": 128773406342,
+    "artifact": 13622788470,
+    "scope": "Production SQL owner and fresh content selection. Disposable directory without world geometry. No graphical game session.",
+    "phases": [
+      "debug-seed",
+      "debug-repair",
+      "debug-cold",
+      "debug-cold",
+      "debug-cold"
+    ],
+    "providerSeedCopiedBytes": 1131934277,
+    "slot": "2d0c19b68ac44c78",
+    "uuid": "3b3d0a84-db88-11f1-9d21-d2379d6c4825",
+    "promotionMs": 410761,
+    "coldSqlReadyIdentityCheckAndStopMs": [
+      5595,
+      3697,
+      3574
+    ],
+    "phaseElapsedMs": {
+      "database-initializing": 1170,
+      "database-prepared": 7130,
+      "database-service-starting": 7131,
+      "installation-core-started": 8497,
+      "receipt": 8898,
+      "files": 9701,
+      "installation-baseline": 16226,
+      "schema-file-started": 17931,
+      "schema-file-complete": 18031,
+      "verify-updater-input": 112259,
+      "installation-updater": 116472,
+      "compiled-updater-intent-committed": 128403,
+      "installation-updater-reentry": 192291,
+      "installation-configurations": 197609,
+      "installation-local-realm": 197709,
+      "installation-local-account": 201521,
+      "installation-verify-owned-login": 205333,
+      "installation-playerbots-started": 213450,
+      "installation-playerbots-proofs": 221074,
+      "installation-playerbots-configurations": 230303,
+      "playerbots-schema-intent-committed": 239230,
+      "installation-playerbots-local-verify": 327001,
+      "installation-four-schemas-verified": 350371
+    }
+  }
+}
