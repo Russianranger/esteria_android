@@ -1,5 +1,9 @@
 # Current stock publication
 
+The v18 release uses producer `075ed711bd8be7aaeac8bdfca2be8c607afb8f4b` and the v17 signing baseline. The hosted staging job independently reconstructed and SDK-verified the 336,899,353-byte signed APK. Its SHA-256 is `60a90c58dfc211c53928853dbbebd04929668da69d46d4c0a027c143f6857eb6`. [Staging run](https://github.com/Russianranger/esteria_android/actions/runs/42458543080) · [Bound release inputs](update-18/publication-inputs.json).
+
+## Historical v13 publication
+
 The v13 producer is `2a9daba045da516a6ae7212d7bac94262f559d59`. The three files in `update-13/` bind its verified unsigned APK to the stock signer and exact native SQL run using the v12 baseline. The detached staging run was `42413768403`. [Public release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.13) · [verified assets and APK checksum](../../evidence/non-custom-v13-public-apk-readback.json).
 
 The stock signing ledger now requires the exact v13 APK for subsequent updates. Earlier transports remain bound to their original baselines.
