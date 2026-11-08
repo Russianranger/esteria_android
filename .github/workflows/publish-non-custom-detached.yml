@@ -26,10 +26,35 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
-      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+      - id: temurin
+        continue-on-error: true
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
         with:
           distribution: temurin
           java-version: '17.0.13+11'
+      - name: Recover the same Temurin JDK from the original release asset
+        if: steps.temurin.outcome == 'failure'
+        env:
+          RELEASE_READ_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(uname -m)" = x86_64
+          work=$(mktemp -d "$RUNNER_TEMP/temurin-17.XXXXXXXX")
+          archive="$work/temurin.tar.gz"
+          curl --fail --location --silent --show-error --retry 3 --connect-timeout 20 --max-time 180 \
+            -H 'Accept: application/octet-stream' -H "Authorization: Bearer $RELEASE_READ_TOKEN" \
+            "https://api.github.com/repos/adoptium/temurin17-binaries/releases/assets/199843869?run=${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+            -o "$archive"
+          unset RELEASE_READ_TOKEN
+          test "$(stat -c %s "$archive")" = 191867538
+          echo "8682892fc02965930b9022c066fa164dd6f458ef4a5dc262016aa28333b30f49  $archive" | sha256sum -c
+          tar -xzf "$archive" -C "$work"
+          jdk="$work/jdk-17.0.13+11"
+          grep -Fx 'IMPLEMENTOR_VERSION="Temurin-17.0.13+11"' "$jdk/release"
+          test -x "$jdk/bin/javac"
+          echo "JAVA_HOME=$jdk" >> "$GITHUB_ENV"
+          echo "$jdk/bin" >> "$GITHUB_PATH"
       - name: Install exact Android SDK tools for independent signature and manifest readback
         run: |
           export ANDROID_HOME="$RUNNER_TEMP/detached-publication-sdk"
