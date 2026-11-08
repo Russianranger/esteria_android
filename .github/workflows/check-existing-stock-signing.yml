@@ -1,0 +1,21 @@
+name: Check existing hosted stock signing configuration
+on:
+  push:
+    branches: [qa/stock-v20-signing-availability]
+permissions: {}
+jobs:
+  check:
+    if: github.repository == 'Russianranger/esteria_android'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - name: Check whether all inputs required by the stock CI signer are configured
+        env:
+          CONFIGURED: ${{ secrets.ESTERIA_KEYSTORE_BASE64 != '' && secrets.ESTERIA_KEYSTORE_PASSWORD != '' && secrets.ESTERIA_KEY_PASSWORD != '' }}
+        run: |
+          if [ "$CONFIGURED" = true ]; then
+            echo 'Existing stock signing inputs are configured'
+          else
+            echo 'Existing stock signing inputs are incomplete'
+            exit 1
+          fi
