@@ -1,0 +1,413 @@
+{
+  "scope": "Fresh Wine prefix, actual Windows command and cleanup in two separate networkless signed ARM64 Android installations",
+  "workflowRun": 42439452161,
+  "qaCommit": "652c4bf11f4c1fa00521e07ca6e591e319a2fab7",
+  "androidProducer": "b12fe53270a62677a625564582e264a8e5733d8b",
+  "apkSha256": "de9d108a725aeb7a8eea1041bd1a72eb7a5acde811595cf71c886f6937f74ab4",
+  "wineSource": "a6844d10622fc1a973ec1f22fc4f78a0fcd6cb29",
+  "disposableFreshPrefixPerArm": true,
+  "networkInterfaces": [
+    "lo"
+  ],
+  "inputAction": "No user input sent to Android or Wine guest during either Windows command or installation dialog.",
+  "clientStaticImports": {
+    "scope": "Exact v16 packaged native PE and local DLL plus reachable ordinary/delay imports in the selected ARM64 Wine system modules, API sets resolved from its own apisetschema.dll. Includes the two selected Vulkan modules.",
+    "images": [
+      {
+        "bytes": 20786176,
+        "sha256": "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317",
+        "delayDirectory": [
+          0,
+          0
+        ],
+        "clrDirectory": [
+          0,
+          0
+        ],
+        "name": "WowClient64.exe",
+        "normalImports": 35
+      },
+      {
+        "bytes": 566272,
+        "sha256": "b4c774430942d709ca7e3f03a1890d6aec7aaa2e432bee0e698e57027a70d006",
+        "delayDirectory": [
+          0,
+          0
+        ],
+        "clrDirectory": [
+          0,
+          0
+        ],
+        "name": "XvidDecoder.dll",
+        "normalImports": 8
+      }
+    ],
+    "regularAndDelayModules": 71,
+    "apiSetsResolved": 12,
+    "unresolved": [],
+    "managedModules": [],
+    "mscoreeIncluded": false,
+    "mshtmlIncluded": false,
+    "servicesAndSetupRegistrationsIncluded": false,
+    "applicationLoadedVulkanAdded": true
+  },
+  "arms": {
+    "suppress-mono": {
+      "artifactId": 13601545567,
+      "artifactSha256": "b1aea58bffd5b43f0b5fb1fe4b2b9ac2e1a6347e40b9fd1623cd09a462dc5d0c",
+      "packageUid": 10077,
+      "fingerprint": "redroid/redroid_arm64_only/redroid_arm64_only:13/TQ3A.230805.001.S1/eng.frank.20240527.134411:userdebug/test-keys",
+      "selinux": "Disabled",
+      "provider": {
+        "control": "suppress-mono",
+        "wineArchive": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+        "clientRevision": "fa3e74b7f332fef0f212e954a0de18f685ead8bd",
+        "verifiedPE": "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317",
+        "ownerClosed": true
+      },
+      "command": {
+        "command": "wine cmd.exe /c ver",
+        "commandExitBeforeCleanup": 0,
+        "reachedObservationLimit": false,
+        "seconds": 25,
+        "freshPrefix": true,
+        "environmentOverride": "winepulse.drv=;mscoree="
+      },
+      "firstObservedSeconds": {
+        "preInstall": 5,
+        "defaultInstall": 5,
+        "copiedKernel32": 10,
+        "allTenInitialModules": 15,
+        "traceMonoCommand": null,
+        "liveControlAppwizInstallMono": null,
+        "monoInstallerWindow": null,
+        "initialWineConfigUpdatedTrace": 25,
+        "bootEventTimeout": null,
+        "realWindowsCommandReturnedZero": 25
+      },
+      "end": {
+        "system32EntryCount": 790,
+        "wineInfUnixTimestamp": 1794105656,
+        "prefixUpdateTimestamp": 1794105656,
+        "processes": [
+          "rpcss",
+          "services.exe",
+          "winedevice",
+          "wineserver"
+        ],
+        "lastSelectedRegistration": "wmvdecod.dll",
+        "lastSetupFunction": {
+          "tid": 296,
+          "function": "setupdidestroydeviceinfolist"
+        },
+        "observedTraceFlags": [
+          "c0000135",
+          "defaultInstall",
+          "mountDriverReported",
+          "postInfWineUpdate",
+          "preInstall",
+          "registryInstallSection",
+          "rpcssFailed",
+          "systemCommandRan",
+          "wineInf"
+        ],
+        "postCleanupPackageUidProcesses": 0,
+        "wineMonoInstallerWindow": [],
+        "registryBytesBeforeNativeCleanup": 0
+      },
+      "sampleIntervalSeconds": 5
+    },
+    "baseline": {
+      "artifactId": 13600817847,
+      "artifactSha256": "f910c9ba3c7b8e81bdedf7f98d177b8b7878e7bfaba678d4a586f3bdb2d63426",
+      "packageUid": 10077,
+      "fingerprint": "redroid/redroid_arm64_only/redroid_arm64_only:13/TQ3A.230805.001.S1/eng.frank.20240527.134411:userdebug/test-keys",
+      "selinux": "Disabled",
+      "provider": {
+        "control": "baseline",
+        "wineArchive": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+        "clientRevision": "fa3e74b7f332fef0f212e954a0de18f685ead8bd",
+        "verifiedPE": "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317",
+        "ownerClosed": true
+      },
+      "command": {
+        "command": "wine cmd.exe /c ver",
+        "commandExitBeforeCleanup": 0,
+        "reachedObservationLimit": true,
+        "seconds": 377,
+        "freshPrefix": true,
+        "environmentOverride": "winepulse.drv="
+      },
+      "firstObservedSeconds": {
+        "preInstall": 5,
+        "defaultInstall": 5,
+        "copiedKernel32": 10,
+        "allTenInitialModules": 15,
+        "traceMonoCommand": 20,
+        "liveControlAppwizInstallMono": 20,
+        "monoInstallerWindow": 20,
+        "initialWineConfigUpdatedTrace": null,
+        "bootEventTimeout": 301,
+        "realWindowsCommandReturnedZero": 301
+      },
+      "end": {
+        "system32EntryCount": 788,
+        "wineInfUnixTimestamp": 1794105658,
+        "prefixUpdateTimestamp": 1794105658,
+        "processes": [
+          "control.exe",
+          "rundll32",
+          "services.exe",
+          "wineboot",
+          "winedevice",
+          "wineserver"
+        ],
+        "lastSelectedRegistration": "mscoree.dll",
+        "lastSetupFunction": {
+          "tid": 148,
+          "function": "do_register_dll"
+        },
+        "observedTraceFlags": [
+          "appwizMono",
+          "bootEventTimedOut",
+          "c0000135",
+          "controlMonoLaunched",
+          "defaultInstall",
+          "monoRuntimeMissing",
+          "mountDriverReported",
+          "preInstall",
+          "registryInstallSection",
+          "rpcssFailed",
+          "systemCommandRan",
+          "wineInf"
+        ],
+        "postCleanupPackageUidProcesses": 0,
+        "wineMonoInstallerWindow": [
+          {
+            "title": "Wine Mono Installer",
+            "pid": 2436
+          }
+        ],
+        "registryBytesBeforeNativeCleanup": 1625987,
+        "confirmedControlInstallMonoPid": 2436
+      },
+      "sampleIntervalSeconds": 5
+    }
+  },
+  "sourceDiscriminators": {
+    "sourceUrl": "https://github.com/bylaws/wine/tree/a6844d10622fc1a973ec1f22fc4f78a0fcd6cb29",
+    "arm64Registration": "loader/wine.inf.in [DefaultInstall.ntarm64]/[RegisterDllsSection] includes mscoree. dlls/setupapi/install.c do_register_dll calls DllRegisterServer synchronously.",
+    "mono": "dlls/mscoree/mscoree_main.c install_wine_mono, invoke_appwiz and DllRegisterServer check WoW64 and existing local Mono, then may execute control.exe appwiz.cpl install_mono and wait indefinitely. dlls/mscoree/metahost.c get_mono_path searches local Windows/Unix roots and registry.",
+    "offline": "dlls/appwiz.cpl/addons.c checks available MSI files and opens a dialog when absent. WM_INITDIALOG displays it. ID_DWL_INSTALL starts the download via URL moniker. Opening the dialog does not require network.",
+    "gecko": "Native mshtml.dll DllRegisterServer registers resources and classes. dlls/mshtml/nsembed.c excludes native AArch64 Gecko loading, confirmed by the exact message in the selected PE. The independently invokable appwiz.cpl supports an installer UI on AArch64.",
+    "menuAndMount": "loader/wine.inf.in starts winemenubuilder through RunServices, asynchronously. shell32/shelllink.c also launches the menu builder detached without waiting. MountMgr is added in PreInstall.Services. mountmgr.sys/mountmgr.c starts its run-loop on a separate thread. Both controls reached DefaultInstall.",
+    "priorPrefix": "programs/wineboot/wineboot.c:update_timestamp runs before PreInstall and DefaultInstall. A matching .update-timestamp in a previously interrupted prefix by itself does not certify that setup completed."
+  },
+  "ownerDeviceQualified": false,
+  "fixedProductionApkQualified": false,
+  "gameplayQualified": false,
+  "retainedPrefix": {
+    "run": 42440094011,
+    "qaCommit": "efd7f4de9672529343f5cb6839cc536edbe73082",
+    "installation": "Final signed v16 package, production UID, selected Wine provider on native ARM64 Android 13 Redroid. Separate disposable reference and retained-prefix containers, both offline.",
+    "windowsRegistryQueries": {
+      "postRegistrationDirectX": {
+        "key": "HKLM\\Software\\Microsoft\\DirectX",
+        "name": "Version",
+        "expected": "4.09.00.0904"
+      },
+      "postRegistrationAeDebug": {
+        "key": "HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AeDebug",
+        "name": "Debugger",
+        "expectedSubstring": "winedbg --auto"
+      }
+    },
+    "registryOrdering": "The selected wine.inf DefaultInstall.ntarm64 includes DirectX and Debugger. Wine SetupInstallFromInfSectionW runs AddReg after RegisterDlls. Each value was checked via actual reg.exe query in the identified prefix.",
+    "steps": {
+      "reference": {
+        "artifactId": 13601641447,
+        "artifactSha256": "1035917ce408e58c289b7160694afe2f8a9578b75339e182063a4fdb94097948",
+        "command": {
+          "command": "cmd.exe /c ver",
+          "commandExitBeforeCleanup": 0,
+          "confirmedMonoInterruption": false,
+          "reachedObservationLimit": false,
+          "seconds": 25,
+          "freshPrefix": true,
+          "environmentOverride": "winepulse.drv=;mscoree="
+        },
+        "mode": "reference",
+        "before": null,
+        "registry": {
+          "postRegistrationDirectX": {
+            "returnCode": 0,
+            "expectedValuePresent": true
+          },
+          "postRegistrationAeDebug": {
+            "returnCode": 0,
+            "expectedValuePresent": true
+          }
+        },
+        "after": {
+          "prefixInode": 6555925,
+          "timestamp": "1794106230",
+          "markerHash": null,
+          "markerInode": null
+        },
+        "endSystem32Entries": 790,
+        "observedDefaultInstall": true,
+        "observedConfigUpdated": true,
+        "postCleanupPackageUidProcesses": 0
+      },
+      "interrupt": {
+        "artifactId": 13600899414,
+        "artifactSha256": "9911642c143fc196c0ee942f2cd9696cc58b1aa893e33c16a99f0e79de2ccc1c",
+        "command": {
+          "command": "cmd.exe /c ver",
+          "commandExitBeforeCleanup": null,
+          "confirmedMonoInterruption": true,
+          "reachedObservationLimit": false,
+          "seconds": 20,
+          "freshPrefix": true,
+          "environmentOverride": "winepulse.drv="
+        },
+        "mode": "interrupt",
+        "before": null,
+        "registry": null,
+        "after": {
+          "prefixInode": 6567884,
+          "timestamp": "1794106229",
+          "markerHash": "9c32b130a27bd1d5d8813f95daf0d742b7f714d2648bf7211bb8b2fd99a48e3b",
+          "markerInode": 6568871
+        },
+        "endSystem32Entries": 788,
+        "observedDefaultInstall": true,
+        "observedConfigUpdated": false,
+        "postCleanupPackageUidProcesses": 0
+      },
+      "reentry": {
+        "artifactId": 13600899414,
+        "artifactSha256": "9911642c143fc196c0ee942f2cd9696cc58b1aa893e33c16a99f0e79de2ccc1c",
+        "command": {
+          "command": "cmd.exe /c ver",
+          "commandExitBeforeCleanup": 0,
+          "confirmedMonoInterruption": false,
+          "reachedObservationLimit": false,
+          "seconds": 5,
+          "freshPrefix": false,
+          "environmentOverride": "winepulse.drv=;mscoree="
+        },
+        "mode": "reentry",
+        "before": {
+          "prefixInode": 6567884,
+          "timestamp": "1794106229",
+          "markerHash": "9c32b130a27bd1d5d8813f95daf0d742b7f714d2648bf7211bb8b2fd99a48e3b",
+          "markerInode": 6568871
+        },
+        "registry": {
+          "postRegistrationDirectX": {
+            "returnCode": 1,
+            "expectedValuePresent": false
+          },
+          "postRegistrationAeDebug": {
+            "returnCode": 1,
+            "expectedValuePresent": false
+          }
+        },
+        "after": {
+          "prefixInode": 6567884,
+          "timestamp": "1794106229",
+          "markerHash": "9c32b130a27bd1d5d8813f95daf0d742b7f714d2648bf7211bb8b2fd99a48e3b",
+          "markerInode": 6568871
+        },
+        "endSystem32Entries": 788,
+        "observedDefaultInstall": false,
+        "observedConfigUpdated": false,
+        "postCleanupPackageUidProcesses": 0
+      },
+      "copy-force": {
+        "artifactId": 13600899414,
+        "artifactSha256": "9911642c143fc196c0ee942f2cd9696cc58b1aa893e33c16a99f0e79de2ccc1c",
+        "command": {
+          "command": "wineboot.exe -u",
+          "commandExitBeforeCleanup": 0,
+          "confirmedMonoInterruption": false,
+          "reachedObservationLimit": false,
+          "seconds": 25,
+          "freshPrefix": false,
+          "environmentOverride": "winepulse.drv=;mscoree="
+        },
+        "mode": "copy-force",
+        "before": {
+          "prefixInode": 6568942,
+          "timestamp": "1794106229",
+          "markerHash": "9c32b130a27bd1d5d8813f95daf0d742b7f714d2648bf7211bb8b2fd99a48e3b",
+          "markerInode": 6569904
+        },
+        "registry": {
+          "postRegistrationDirectX": {
+            "returnCode": 0,
+            "expectedValuePresent": true
+          },
+          "postRegistrationAeDebug": {
+            "returnCode": 0,
+            "expectedValuePresent": true
+          }
+        },
+        "after": {
+          "prefixInode": 6568942,
+          "timestamp": "1794106229",
+          "markerHash": "9c32b130a27bd1d5d8813f95daf0d742b7f714d2648bf7211bb8b2fd99a48e3b",
+          "markerInode": 6569904
+        },
+        "originalPrefixAuditUnchanged": true,
+        "endSystem32Entries": 790,
+        "observedDefaultInstall": true,
+        "observedConfigUpdated": true,
+        "postCleanupPackageUidProcesses": 0
+      },
+      "copy-warm": {
+        "artifactId": 13600899414,
+        "artifactSha256": "9911642c143fc196c0ee942f2cd9696cc58b1aa893e33c16a99f0e79de2ccc1c",
+        "command": {
+          "command": "cmd.exe /c ver",
+          "commandExitBeforeCleanup": 0,
+          "confirmedMonoInterruption": false,
+          "reachedObservationLimit": false,
+          "seconds": 5,
+          "freshPrefix": false,
+          "environmentOverride": "winepulse.drv=;mscoree="
+        },
+        "mode": "copy-warm",
+        "before": {
+          "prefixInode": 6568942,
+          "timestamp": "1794106229",
+          "markerHash": "9c32b130a27bd1d5d8813f95daf0d742b7f714d2648bf7211bb8b2fd99a48e3b",
+          "markerInode": 6569904
+        },
+        "registry": {
+          "postRegistrationDirectX": {
+            "returnCode": 0,
+            "expectedValuePresent": true
+          },
+          "postRegistrationAeDebug": {
+            "returnCode": 0,
+            "expectedValuePresent": true
+          }
+        },
+        "after": {
+          "prefixInode": 6568942,
+          "timestamp": "1794106229",
+          "markerHash": "9c32b130a27bd1d5d8813f95daf0d742b7f714d2648bf7211bb8b2fd99a48e3b",
+          "markerInode": 6569904
+        },
+        "originalPrefixAuditUnchanged": true,
+        "endSystem32Entries": 790,
+        "observedDefaultInstall": false,
+        "observedConfigUpdated": false,
+        "postCleanupPackageUidProcesses": 0
+      }
+    },
+    "sourceAudit": "During copy-force and copy-warm, the original prefix tree retained path, owner-independent inode, mode, size, mtime, regular-file hashes and symlink targets before and after each action. The copy uses a separate real directory, verified prior sentinel hash, and actual Wine update and command processes."
+  }
+}

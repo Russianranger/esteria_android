@@ -1,0 +1,207 @@
+{
+  "formatVersion": 1,
+  "scope": "ARM64 native Linux hosted kernel, networkless Android 13 Redroid, actual signed installed stock v16, disposable app UID and databases. The first Windows process is the reconstructed client in its Grunt diagnostic mode.",
+  "apk": {
+    "versionCode": 16,
+    "package": "io.github.russianranger.esteria.stock",
+    "producer": "b12fe53270a62677a625564582e264a8e5733d8b",
+    "sha256": "de9d108a725aeb7a8eea1041bd1a72eb7a5acde811595cf71c886f6937f74ab4"
+  },
+  "credentialScope": "Provisioned local account, secret, nonce input and 40-byte private session keys remained within fresh app-owned files and SQL. Each client receipt was validated against its own nonce, then removed with the private key.",
+  "prerequisites": {
+    "proprietaryGameDataPresent": false,
+    "worldAdmissionReceiptUsed": false,
+    "normalGameSession": false,
+    "graphicalLogin": false,
+    "commonMain": false,
+    "physicalThor": false,
+    "characterStateVerified": false
+  },
+  "shippedEnvironment": {
+    "sha256": "706d08de4cf2a87c2f781a19a3867ef631b4073e2a5041321146ded6692886ab",
+    "workflow": "https://github.com/Russianranger/esteria_android/actions/runs/42438991629",
+    "jobId": 128603953123,
+    "artifactId": 13601750294,
+    "head": "5644fbabc7451855d451ba834b8a7b89b71c4b0f",
+    "elapsedSeconds": 793.946,
+    "selinux": "Disabled",
+    "androidFingerprint": "redroid/redroid_arm64_only/redroid_arm64_only:13/TQ3A.230805.001.S1/eng.frank.20240527.134411:userdebug/test-keys",
+    "packageUid": 10077,
+    "wineDllOverrides": "winepulse.drv=",
+    "reconstructedClientSha256": "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317",
+    "sourceRevision": "fa3e74b7f332fef0f212e954a0de18f685ead8bd",
+    "wineArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+    "mysqlVersion": "8.0.46-0ubuntu0.24.04.4",
+    "authserverSha256": "04cbda982ca1385903929eb46ca52b7cb41ca222e8a48f9898af716d2b878531",
+    "providerGenerations": {
+      "providerGeneration": "078c8dfac185688f6e2a250398c320693b8bfd8793f8bb670000507d8da9a17f",
+      "programsGeneration": "d7a76adec6bf2c04fbfc954901cf8d647c822d37f8665d3ed33c1bdd47686810",
+      "contentGeneration": "ebdf3e2b2ec3766d18af0442cf01a228a6d9adba00e41a996af3089251d78edf"
+    },
+    "sameMysqlUuid": true,
+    "samePromotedSlotAndProof": true,
+    "sameSetupReceipt": true,
+    "independentOperations": [
+      {
+        "mode": "cold",
+        "providerCopiedBytes": 1131934277,
+        "providerMs": 18505,
+        "schemaSetupOrSelectionMs": 410375,
+        "activeNativeStartupMs": 3860,
+        "cleanShutdownMs": 1004,
+        "ownedAuthAndObservationMs": 311698,
+        "signedGruntReceiptSha256": "581c976ff5f072a51d150905b4635509aa4ae40a3995e599239e81a1b8b4685f",
+        "nonceAndAll13CallbacksVerified": true,
+        "sessionKeyMatchedMysql": true,
+        "localRealmEndpoint": "127.0.0.1:8085",
+        "authserverClosed": true,
+        "databaseClosed": true
+      },
+      {
+        "mode": "warm",
+        "providerCopiedBytes": 0,
+        "providerMs": 234,
+        "schemaSetupOrSelectionMs": 260,
+        "activeNativeStartupMs": 1906,
+        "cleanShutdownMs": 1525,
+        "ownedAuthAndObservationMs": 7143,
+        "signedGruntReceiptSha256": "e7b6736f3728eb3641c6f5057e0b88d89cf756f7a5cffe19e4a7da5f1177ccaf",
+        "nonceAndAll13CallbacksVerified": true,
+        "sessionKeyMatchedMysql": true,
+        "localRealmEndpoint": "127.0.0.1:8085",
+        "authserverClosed": true,
+        "databaseClosed": true
+      }
+    ],
+    "firstUse": {
+      "firstSuccessfulPeExitObservedSeconds": 311,
+      "firstMonoInstallerObservedSeconds": 20,
+      "monoInstallerWindowPid": 3781,
+      "criticalWindowsPrograms": 10,
+      "system32Entries": 788,
+      "timestampMatchesWineInf": true,
+      "internalBootWaitTimedOut": true,
+      "lastSetupFunction": "do_register_dll",
+      "remainingProcesses": [
+        "rundll32",
+        "services.exe",
+        "wineboot",
+        "winedevice",
+        "wineserver"
+      ]
+    },
+    "supplementalEmptyDataWorldserver": {
+      "phase": "starting-area-map-required",
+      "worldserverSha256": "9757f0bbb2ee159d18070d8f5fe7ecdf5b4b8b7171116198039f418d5ec13aa1",
+      "databasePoolsOpened": [
+        "acore_auth",
+        "acore_characters",
+        "acore_playerbots",
+        "acore_world"
+      ],
+      "elapsedSeconds": 1.042,
+      "worldVersionLoaded": true,
+      "startingAreaDataRequired": true,
+      "dataStoresEntered": false,
+      "worldReadyQualified": false,
+      "worldEntryQualified": false,
+      "dataBytes": 0,
+      "nativeExit": 1,
+      "originalChildReaped": true,
+      "mysqlStillAuthenticated": true
+    }
+  },
+  "candidateEnvironmentInUnchangedApk": {
+    "sha256": "eb0b62c697e5359a1514d65fc086be7c2eb40d8fd65b756525199e96c72f226e",
+    "workflow": "https://github.com/Russianranger/esteria_android/actions/runs/42440074267",
+    "jobId": 128607205002,
+    "artifactId": 13600764037,
+    "head": "e25d4bf60e3093764548bc18ffd188356423137b",
+    "elapsedSeconds": 522.916,
+    "selinux": "Disabled",
+    "androidFingerprint": "redroid/redroid_arm64_only/redroid_arm64_only:13/TQ3A.230805.001.S1/eng.frank.20240527.134411:userdebug/test-keys",
+    "packageUid": 10077,
+    "wineDllOverrides": "winepulse.drv=;mscoree=",
+    "reconstructedClientSha256": "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317",
+    "sourceRevision": "fa3e74b7f332fef0f212e954a0de18f685ead8bd",
+    "wineArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+    "mysqlVersion": "8.0.46-0ubuntu0.24.04.4",
+    "authserverSha256": "04cbda982ca1385903929eb46ca52b7cb41ca222e8a48f9898af716d2b878531",
+    "providerGenerations": {
+      "providerGeneration": "078c8dfac185688f6e2a250398c320693b8bfd8793f8bb670000507d8da9a17f",
+      "programsGeneration": "d7a76adec6bf2c04fbfc954901cf8d647c822d37f8665d3ed33c1bdd47686810",
+      "contentGeneration": "ebdf3e2b2ec3766d18af0442cf01a228a6d9adba00e41a996af3089251d78edf"
+    },
+    "sameMysqlUuid": true,
+    "samePromotedSlotAndProof": true,
+    "sameSetupReceipt": true,
+    "independentOperations": [
+      {
+        "mode": "cold",
+        "providerCopiedBytes": 1131934277,
+        "providerMs": 19991,
+        "schemaSetupOrSelectionMs": 417573,
+        "activeNativeStartupMs": 3863,
+        "cleanShutdownMs": 877,
+        "ownedAuthAndObservationMs": 30776,
+        "signedGruntReceiptSha256": "345aa668c2267112ad5764029c6ce34858b1acd958dc32e1ce6449110e252e79",
+        "nonceAndAll13CallbacksVerified": true,
+        "sessionKeyMatchedMysql": true,
+        "localRealmEndpoint": "127.0.0.1:8085",
+        "authserverClosed": true,
+        "databaseClosed": true
+      },
+      {
+        "mode": "warm",
+        "providerCopiedBytes": 0,
+        "providerMs": 232,
+        "schemaSetupOrSelectionMs": 260,
+        "activeNativeStartupMs": 2007,
+        "cleanShutdownMs": 1623,
+        "ownedAuthAndObservationMs": 9014,
+        "signedGruntReceiptSha256": "147c2e1d80fdb48cf68f860457ea38cad1bca4851d41135d1bac4020099a8d3e",
+        "nonceAndAll13CallbacksVerified": true,
+        "sessionKeyMatchedMysql": true,
+        "localRealmEndpoint": "127.0.0.1:8085",
+        "authserverClosed": true,
+        "databaseClosed": true
+      }
+    ],
+    "firstUse": {
+      "firstSuccessfulPeExitObservedSeconds": 30,
+      "firstMonoInstallerObservedSeconds": null,
+      "monoInstallerWindowPid": null,
+      "criticalWindowsPrograms": 10,
+      "system32Entries": 790,
+      "timestampMatchesWineInf": true,
+      "internalBootWaitTimedOut": false,
+      "lastSetupFunction": "setupdidestroydeviceinfolist",
+      "remainingProcesses": [
+        "rpcss",
+        "services.exe",
+        "winedevice",
+        "wineserver"
+      ]
+    },
+    "supplementalEmptyDataWorldserver": {
+      "phase": "starting-area-map-required",
+      "worldserverSha256": "9757f0bbb2ee159d18070d8f5fe7ecdf5b4b8b7171116198039f418d5ec13aa1",
+      "databasePoolsOpened": [
+        "acore_auth",
+        "acore_characters",
+        "acore_playerbots",
+        "acore_world"
+      ],
+      "elapsedSeconds": 1.04,
+      "worldVersionLoaded": true,
+      "startingAreaDataRequired": true,
+      "dataStoresEntered": false,
+      "worldReadyQualified": false,
+      "worldEntryQualified": false,
+      "dataBytes": 0,
+      "nativeExit": 1,
+      "originalChildReaped": true,
+      "mysqlStillAuthenticated": true
+    }
+  }
+}
