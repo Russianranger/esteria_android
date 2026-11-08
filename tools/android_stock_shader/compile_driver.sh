@@ -4,6 +4,11 @@ work=$(realpath -m "$1")
 out=$(realpath -m "$2")
 root=$(cd "$(dirname "$0")/../.." && pwd)
 sdk=${ANDROID_HOME:?Android SDK required}
+case "${3:-shader}" in
+    shader) driver="$root/tools/android_stock_shader/ConfirmShader.java"; name=ConfirmShader ;;
+    database) driver="$root/tools/android_stock_database/ConfirmDatabase.java"; name=ConfirmDatabase ;;
+    *) echo "Unknown observer" >&2; exit 2 ;;
+esac
 classes="$work/observer-classes"
 mkdir -p "$work" "$(dirname "$out")"
 mkdir "$classes"
@@ -19,9 +24,9 @@ else
     src="$src:$generated"
 fi
 javac --release 17 -implicit:none -cp "$cp" -sourcepath "$src" -d "$classes" \
-    "$root/tools/android_stock_shader/ConfirmShader.java"
+    "$driver"
 jar cf "$work/observer.jar" -C "$classes" .
-if find "$classes" -type f ! -name 'ConfirmShader*.class' | grep -q .; then
+if find "$classes" -type f ! -name "${name}*.class" | grep -q .; then
     echo "Unexpected non-observer class in QA driver" >&2
     exit 1
 fi
