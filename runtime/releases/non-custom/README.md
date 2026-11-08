@@ -1,5 +1,9 @@
 # Current stock publication
 
+V23 uses producer `0c712cd9d52e54be0b329925ed72943138cf23d5` and the original stock signing certificate. The signed APK SHA-256 is `fc0e04d96eb51766cdfb7dc576cdbe9d4149e9a5c0228d4eb8e0ac4670c75ff5`. On offline Android 13 ARM64, updating the exact public v22 installation to v23 retained its UID, database slot, UUID and account. The signed launcher saved a 3,526-byte support ZIP through Android DocumentsUI. [Public transport](update-23/publication-inputs.json) · [Signed replacement and export](https://github.com/Russianranger/esteria_android/actions/runs/42519575216/job/128850828066).
+
+## Previous v22 publication
+
 [Published v22](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.22) passed the [six-asset readback](../../evidence/non-custom-v22-public-apk-readback.json). Its transport binds Android producer `7084421f2faaf6ebe5f4ccc44fe8c5c5f91d99bc` to the original stock signing certificate and the exact published v21 baseline. Signed v21 reproduced a masked schema interruption on offline Android 13 ARM64. Its v22 replacement retained both failed slots, completed SQL through an unreadable progress sample, promoted a separate UUID and reopened the same account in a fresh process. [Transport](update-22/publication-inputs.json) · [Signed update test](https://github.com/Russianranger/esteria_android/actions/runs/42506258924/job/128810203620).
 
 ## Historical v21 publication
