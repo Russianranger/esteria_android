@@ -14,15 +14,20 @@ CONTAINER='esteria-android-qa'
 
 
 def failure_details(report):
-    base='/data/data/'+PACKAGE+'/files/qa-signed-stock-database/state'
-    raw=shell(CONTAINER,'''for f in "$1"/database-operations/*/logs/stderr.log; do
+    root='/data/data/'+PACKAGE+'/files'
+    paths=shell(CONTAINER,'''for dir in "$1"/db/*; do test -d "$dir" && basename "$dir"; done''',root).splitlines()
+    if len(paths)!=1 or not re.fullmatch(r'[a-f0-9]{16}',paths[0]):
+        report['allocatedSlots']=len(paths)
+        return
+    base=root+'/db/'+paths[0]
+    raw=shell(CONTAINER,'''for f in "$1"/database-operations/*/logs/stderr.log "$1"/installation-operations/*/logs/stderr.log; do
          if test -f "$f"; then tail -c 5000 "$f"; fi
      done''',base)
     matches=re.findall(r'Database setup failed \(([a-zA-Z0-9_:,;= -]{1,350})\)',raw)
     if matches:
         report['bootstrapDiagnostic']=matches[-1]
     for name, kind in [('mysql-initialize-engine.log','initialization'),('mysql-bootstrap-engine.log','bootstrap')]:
-        raw=shell(CONTAINER,'''f="$1/server-work/state/logs/$2"
+        raw=shell(CONTAINER,'''f="$1/state/logs/$2"
             if test -f "$f"; then tail -c 32000 "$f"; fi''',base,name)
         events=[]
         for line in raw.splitlines():
@@ -43,7 +48,10 @@ def failure_details(report):
                 events.append(row)
         report[kind+'Events']=events
         report[kind+'EngineLogSha256']=hashlib.sha256(raw.encode()).hexdigest()
-    report['socketPathBytes']=len(('/data/user/0/'+PACKAGE+'/files/qa-signed-stock-database/state/server-work/state/run/bootstrap.sock').encode())
+    meta=shell(CONTAINER,'''for file in database-bootstrap.json server-installation-staged.json server-installation-verified.json server-setup-complete.json; do
+            if test -f "$1/state/$file"; then echo "$file"; fi
+        done''',base)
+    report['durableComponentReceipts']=meta.splitlines()
 
 
 
@@ -66,9 +74,11 @@ def exercise(report):
              '/system/bin/env','-i',*boot,'CLASSPATH=/esteria-qa/input/driver.jar:'+apk,
              '/system/bin/app_process64','-Djava.library.path='+native+':/system/lib64','/system/bin',
              'io.github.russianranger.esteria.runtime.ConfirmDatabase',mode]
-        result=subprocess.run(cmd,capture_output=True,text=True,timeout=18*60)
+        result=subprocess.run(cmd,capture_output=True,text=True,timeout=50*60)
         phases=[line for line in result.stdout.splitlines() if re.fullmatch(r'ANDROID_DB_PHASE [a-z0-9_-]+ \d+',line)]
         report['lastPhases']=phases
+        sizes=re.findall(r'^ANDROID_DB_SOCKET_BYTES (\d+)$',result.stdout,re.MULTILINE)
+        if sizes: report['coldPhysicalBootstrapSocketBytes']=int(sizes[-1])
         rows=[line.removeprefix('ANDROID_DB_RESULT ') for line in result.stdout.splitlines() if line.startswith('ANDROID_DB_RESULT ')]
         if result.returncode or len(rows)!=1:
             report['exitCode']=result.returncode
@@ -80,7 +90,7 @@ def exercise(report):
                 re.fullmatch(r'[a-f0-9-]{36}',item['instanceUuid']),'invalid signed SQL result')
         if mode=='warm':
             first=report['operations'][0]
-            checked(first['instanceUuid']==item['instanceUuid'] and first['providerGeneration']==item['providerGeneration'] and
+            checked(first['instanceUuid']==item['instanceUuid'] and all(first[k]==item[k] for k in ('providerGeneration','programsGeneration','contentGeneration','slotId','promotionProof','setupReceipt')) and
                     item['providerCopiedBytes']==0,'warm persisted instance or provider changed')
         check_empty(CONTAINER,package_uid)
         report['operations'].append(item)
@@ -88,7 +98,7 @@ def exercise(report):
 
 
 if __name__=='__main__':
-    report=dict(scope='signed Android 13 ARM64 MySQL setup and service only',phase='initial',
+    report=dict(scope='signed Android 13 ARM64 production slot, stock SQL/updater/four schemas and owned MySQL, disjoint empty world-data directory for config path',phase='initial',
                 actualWorldSession=False,physicalThor=False)
     start=time.monotonic()
     try:

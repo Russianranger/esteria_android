@@ -8,7 +8,7 @@ jobs:
   database:
     if: github.repository == 'Russianranger/esteria_android' && contains(github.event.head_commit.message, '[qualify signed Android database]')
     runs-on: ubuntu-24.04-arm
-    timeout-minutes: 40
+    timeout-minutes: 72
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:

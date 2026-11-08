@@ -3,77 +3,96 @@ package io.github.russianranger.esteria.runtime;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.os.Looper;
+import io.github.russianranger.esteria.core.runtime.install.FreshServerInstallations;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeInstaller;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
-import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.time.Duration;
+import java.util.HashSet;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.json.JSONObject;
 
-/** Calls the installed APK as its package UID. Only a fresh, named QA store is writable. */
+/** Disposable fresh installed package. All SQL, native processes, receipts and leases belong to the signed APK. */
 public final class ConfirmDatabase {
+    private static long elapsed(long start) { return (System.nanoTime()-start)/1_000_000; }
+
+    private static JSONObject run(Context context, Path root, boolean cold) throws Exception {
+        Path data=root.resolve("qa-server-data-directory");
+        if(cold) Files.createDirectory(data);
+        if(!Files.isDirectory(data) || !data.equals(data.toRealPath()))
+            throw new IllegalStateException("Disjoint QA schema config directory required");
+        ServerRuntimeSetup server=new ServerRuntimeSetup(context,root);
+        ServerProgramsSetup programs=new ServerProgramsSetup(context,root);
+        ServerContentSetup content=new ServerContentSetup(context,root);
+        long start=System.nanoTime();
+        HashSet<String> reported=new HashSet<>();
+        RuntimeWork.Progress progress=(phase,path,done,total)->{
+            if(reported.add(phase)) System.out.println("ANDROID_DB_PHASE "+phase+" "+elapsed(start));
+        };
+        RuntimeInstaller.Result runtime=server.prepare(progress,RuntimeWork.NEVER_CANCELLED);
+        RuntimeInstaller.Result executables=programs.prepare(server.archiveSha256(),progress,RuntimeWork.NEVER_CANCELLED);
+        RuntimeInstaller.Result sql=content.prepare(server.archiveSha256(),progress,RuntimeWork.NEVER_CANCELLED);
+        long copied=runtime.copiedBytes+executables.copiedBytes+sql.copiedBytes;
+        if(cold==(runtime.alreadyInstalled || executables.alreadyInstalled || sql.alreadyInstalled) ||
+           (cold ? copied<=0 : copied!=0)) throw new IllegalStateException("Unexpected provider reuse");
+        long providers=elapsed(start);
+        FreshServerInstallations.Active active;
+        if(cold) {
+            if(ServerInstallationSetup.completedOrNull(context,root,server,programs,content)!=null)
+                throw new IllegalStateException("Fresh installed package already has active DB");
+            try(ServerInstallationSetup.Handle setup=ServerInstallationSetup.beginFresh(
+                    context,root,server,programs,content,data,4L<<30)) {
+                Path socket=root.resolve("db").resolve(setup.slotId()).resolve("state/run/bootstrap.sock");
+                System.out.println("ANDROID_DB_SOCKET_BYTES "+socket.toString().getBytes(StandardCharsets.UTF_8).length);
+                setup.prepare(progress,RuntimeWork.NEVER_CANCELLED);
+                setup.finishPlayerbots(progress,RuntimeWork.NEVER_CANCELLED);
+                active=setup.stopAndPromote(Duration.ofSeconds(30));
+            }
+        } else {
+            active=ServerInstallationSetup.completed(context,root,server,programs,content);
+        }
+        long prepared=elapsed(start);
+        System.out.println("ANDROID_DB_PHASE promoted-slot-selected "+prepared);
+        ServerDatabaseService.Handle database=ServerDatabaseService.startActive(context,root,server,active);
+        long ready;
+        try {
+            ServerDatabaseService.awaitReady(database,System.nanoTime()+TimeUnit.MINUTES.toNanos(3),new AtomicBoolean(false));
+            ready=elapsed(start);
+            if(!active.mysqlUuid.equals(database.instanceUuid())) throw new IllegalStateException("Owned SQL service identity differs");
+        } finally {
+            database.stop(Duration.ofSeconds(30));
+        }
+        if(database.isAlive() || database.exitCode()!=0) throw new IllegalStateException("SQL service did not close cleanly");
+        return new JSONObject().put("mode",cold?"cold":"warm").put("instanceUuid",active.mysqlUuid)
+            .put("slotId",active.slotId).put("promotionProof",active.proofSha256).put("setupReceipt",active.setupReceiptSha256)
+            .put("providerGeneration",runtime.generation).put("programsGeneration",executables.generation)
+            .put("contentGeneration",sql.generation).put("providerCopiedBytes",copied)
+            .put("version",server.expectedMysqlVersion()).put("providerMs",providers)
+            .put("schemaSetupOrSelectionMs",prepared-providers).put("activeNativeStartupMs",ready-prepared)
+            .put("cleanShutdownMs",elapsed(start)-ready).put("sameAuthenticatedInstance",true).put("closed",true);
+    }
+
     public static void main(String[] args) throws Exception {
-        if(args.length!=1 || !(args[0].equals("cold") || args[0].equals("warm")))
-            throw new IllegalArgumentException("cold or warm required");
+        if(args.length!=1 || !(args[0].equals("cold") || args[0].equals("warm"))) throw new IllegalArgumentException();
         if(Looper.myLooper()==null) Looper.prepareMainLooper();
         Class<?> thread=Class.forName("android.app.ActivityThread");
-        Object activity=thread.getMethod("systemMain").invoke(null);
-        Context system=(Context)thread.getMethod("getSystemContext").invoke(activity);
+        Object instance=thread.getMethod("systemMain").invoke(null);
+        Context system=(Context)thread.getMethod("getSystemContext").invoke(instance);
         Context pkg=system.createPackageContext("io.github.russianranger.esteria.stock",0);
-        if(android.os.Process.myUid()!=pkg.getApplicationInfo().uid)throw new IllegalStateException("Package UID required");
-        Path root=pkg.getFilesDir().getCanonicalFile().toPath().resolve("qa-signed-stock-database");
+        if(android.os.Process.myUid()!=pkg.getApplicationInfo().uid) throw new IllegalStateException("Installed package UID required");
         Context context=new ContextWrapper(pkg) {
-            @Override public Context getApplicationContext(){return this;}
-            @Override public File getFilesDir(){return root.toFile();}
+            @Override public Context getApplicationContext() {return this;}
         };
         System.load(pkg.getApplicationInfo().nativeLibraryDir+"/libesteria_process.so");
-        FutureTask<Void> job=new FutureTask<>(()->{
-            boolean cold=args[0].equals("cold");
-            if(cold)Files.createDirectory(root,PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------")));
-            ServerRuntimeSetup server=new ServerRuntimeSetup(context,root);
-            long start=System.nanoTime();
-            java.util.HashSet<String> reported=new java.util.HashSet<>();
-            RuntimeWork.Progress progress=(phase,path,done,total)->{
-                if(reported.add(phase))System.out.println("ANDROID_DB_PHASE "+phase+" "+(System.nanoTime()-start)/1_000_000);
-            };
-            RuntimeInstaller.Result provider=server.prepare(progress,RuntimeWork.NEVER_CANCELLED);
-            long installed=System.nanoTime();
-            if(cold==provider.alreadyInstalled || (cold ? provider.copiedBytes<=0 : provider.copiedBytes!=0))
-                throw new IllegalStateException("Unexpected provider reuse");
-            ServerDatabaseSetup.Result result=ServerDatabaseSetup.prepare(context,root,server,progress,RuntimeWork.NEVER_CANCELLED);
-            long prepared=System.nanoTime();
-            if(!(cold ? "initialized" : "already-initialized").equals(result.operation))
-                throw new IllegalStateException("Unexpected bootstrap operation");
-            System.out.println("ANDROID_DB_PHASE database-prepared "+(prepared-start)/1_000_000);
-            ServerDatabaseService.Handle handle=ServerDatabaseService.start(context,root,server);
-            long ready;
-            try {
-                ServerDatabaseService.awaitReady(handle,System.nanoTime()+TimeUnit.MINUTES.toNanos(3),new AtomicBoolean(false));
-                ready=System.nanoTime();
-                if(!result.instanceUuid.equals(handle.instanceUuid()))
-                    throw new IllegalStateException("Owned SQL service identity mismatch");
-            } finally {
-                handle.stop(Duration.ofSeconds(30));
-            }
-            if(handle.isAlive() || handle.exitCode()!=0)throw new IllegalStateException("SQL service did not close cleanly");
-            long stopped=System.nanoTime();
-            System.out.println("ANDROID_DB_RESULT "+new JSONObject().put("mode",args[0])
-                    .put("operation",result.operation).put("instanceUuid",result.instanceUuid)
-                    .put("providerGeneration",provider.generation).put("providerCopiedBytes",provider.copiedBytes)
-                    .put("version",result.version).put("providerMs",(installed-start)/1_000_000)
-                    .put("bootstrapMs",(prepared-installed)/1_000_000).put("nativeStartupMs",(ready-prepared)/1_000_000)
-                    .put("cleanShutdownMs",(stopped-ready)/1_000_000).put("sameAuthenticatedInstance",true)
-                    .put("closed",true));
-            return null;
-        });
-        new Thread(job,"qa-signed-database").start();
-        try { job.get(); }
-        catch(java.util.concurrent.ExecutionException failure){
+        Path root=context.getFilesDir().getCanonicalFile().toPath();
+        FutureTask<JSONObject> operation=new FutureTask<>(()->run(context,root,args[0].equals("cold")));
+        new Thread(operation,"qa-signed-slot-owner").start();
+        try {System.out.println("ANDROID_DB_RESULT "+operation.get());}
+        catch(java.util.concurrent.ExecutionException failure) {
             System.err.println("ANDROID_DB_EXCEPTION "+failure.getCause().getClass().getName());
             throw failure;
         }
