@@ -30,7 +30,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        scenario: [fresh, legacy]
+        scenario: ${{ fromJSON(contains(github.event.head_commit.message, '[fresh only]') && '["fresh"]' || contains(github.event.head_commit.message, '[legacy only]') && '["legacy"]' || '["fresh","legacy"]') }}
     if: github.repository == 'Russianranger/esteria_android' && (contains(github.event.head_commit.message, '[qualify native Android shaders]') || contains(github.event.head_commit.message, '[qualify installed Android shader repair]') || contains(github.event.head_commit.message, '[replay v13 shader failure]'))
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 160
@@ -60,10 +60,22 @@ jobs:
           bash tools/android_stock_shader/restore_candidate.sh "$work/package.zip" \
             detached-proof/runtime/releases/non-custom/update-19 "$work"
           echo "ESTERIA_DETACHED_CANDIDATE=$work/signed.apk" >> "$GITHUB_ENV"
-      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
-        with:
-          distribution: temurin
-          java-version: '17.0.13+11'
+      - name: Fetch the fixed ARM64 Temurin JDK through its release asset API
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdk="$RUNNER_TEMP/stock-java17"
+          archive="$RUNNER_TEMP/pinned-aarch64-jdk.tgz"
+          curl --fail --location --silent --show-error --retry 3 --connect-timeout 15 --max-time 180 \
+            -H 'Accept: application/octet-stream' \
+            "https://api.github.com/repos/adoptium/temurin17-binaries/releases/assets/199779632?run=$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" \
+            -o "$archive"
+          echo "0c17fa4f14c0d2cc9e9334f996fccdddc5da4459d768f3105c7ff0283c47bf62  $archive" | sha256sum -c
+          mkdir "$sdk"
+          tar xzf "$archive" --strip-components=1 -C "$sdk"
+          "$sdk/bin/javac" -version | grep -Fx 'javac 17.0.13'
+          echo "JAVA_HOME=$sdk" >> "$GITHUB_ENV"
+          echo "$sdk/bin" >> "$GITHUB_PATH"
       - name: Stage Android platform 35, portable D8 and host FUSE
         shell: bash
         run: |
