@@ -1,0 +1,116 @@
+{
+  "formatVersion": 1,
+  "scope": "Independent disposable full-system ARM64 Linux TCG, network disabled; stock packaged native binaries. No device assets or saves.",
+  "providerSource": "Signed stock v19 server provider archives, identical to v21. Python session observation uses non-custom source.",
+  "firstAttempt": {
+    "rootFiles": 179,
+    "totalBytes": 190432458,
+    "stageJournal": {
+      ".database-initialization.json": "initializing"
+    },
+    "autoCnfParents": [
+      "database-initializing"
+    ],
+    "engineCodes": [
+      "[MY-013169]",
+      "[MY-013576]",
+      "[MY-013577]",
+      "[MY-010453]"
+    ],
+    "engineStages": [
+      "InnoDB initialization has started",
+      "InnoDB initialization has ended"
+    ],
+    "clientExceptionClasses": [
+      "TimeoutExpired",
+      "TimeoutExpired"
+    ]
+  },
+  "disposableSecondBootstrap": {
+    "diagnosticLimitSeconds": 900,
+    "elapsedSeconds": 291.549,
+    "environment": "full-system QEMU TCG, no NIC, one separate disposable slot",
+    "exitCode": 0,
+    "productionSeconds": 180
+  },
+  "inspection": {
+    "retainedBootstrap": true,
+    "accountFilePreserved": true,
+    "sessionReceipts": [
+      {
+        "file": "database-bootstrap.json",
+        "uuid": "145fbc02-db8a-11f1-b439-f4c0e53c7cb7",
+        "version": "8.0.46-0ubuntu0.24.04.4"
+      }
+    ],
+    "engineEvents": [
+      {
+        "file": "mysql-bootstrap-engine.log",
+        "bytes": 1088,
+        "codes": [
+          "[MY-010116]",
+          "[MY-013576]",
+          "[MY-013577]",
+          "[MY-010068]",
+          "[MY-013602]",
+          "[MY-010931]",
+          "[MY-013172]",
+          "[MY-010910]"
+        ],
+        "ready": true,
+        "shutdown": true
+      },
+      {
+        "file": "mysql-initialize-engine.log",
+        "bytes": 525,
+        "codes": [
+          "[MY-013169]",
+          "[MY-013576]",
+          "[MY-013577]",
+          "[MY-010453]"
+        ],
+        "ready": false,
+        "shutdown": false
+      },
+      {
+        "file": "service-34004905e118a49c0a71766b236b2ab9-private.log",
+        "bytes": 0,
+        "codes": [],
+        "ready": false,
+        "shutdown": false
+      }
+    ]
+  },
+  "retainedSqlReopen": {
+    "environment": "network-isolated QEMU AArch64 TCG; pre-bootstrapped disposable instance",
+    "initializers": 0,
+    "normalStartupMeasured": false,
+    "stages": [
+      {
+        "elapsedSeconds": 0.0,
+        "stage": "retained-slot-opened"
+      },
+      {
+        "diagnosticObservationSeconds": 600,
+        "elapsedSeconds": 1.638,
+        "originalHarnessSeconds": 100,
+        "stage": "mysql-worker-started"
+      },
+      {
+        "elapsedSeconds": 138.942,
+        "instance": "145fbc02-db8a-11f1-b439-f4c0e53c7cb7",
+        "stage": "authenticated-ready"
+      },
+      {
+        "elapsedSeconds": 139.178,
+        "helperPhase": "core",
+        "stage": "schema-helper-entered"
+      }
+    ],
+    "uuid": "145fbc02-db8a-11f1-b439-f4c0e53c7cb7"
+  },
+  "worldListenerObserved": false,
+  "gameplayObserved": false,
+  "nativeFullDataRun": 42491096080,
+  "notes": "The Linux harness originally allowed 100 seconds for the service worker. Authenticated readiness in the retained TCG diagnostic took 138.942 seconds. No production timeouts or data checks were relaxed."
+}
