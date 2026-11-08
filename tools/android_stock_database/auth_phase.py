@@ -13,7 +13,7 @@ import types
 work=Path('/work')
 helper,operation,db_operation,version,uuid,setup_hash,program_hash,program_bytes,world_hash,world_bytes=sys.argv[1:]
 assert all(re.fullmatch(r'[a-f0-9]{64}',v) for v in (helper,setup_hash,program_hash))
-assert re.fullmatch(r'[a-f0-9]{32}',db_operation) and operation in ('cold','warm')
+assert re.fullmatch(r'[a-f0-9]{32}',db_operation) and operation in ('seed18','cold','warm')
 package=types.ModuleType('runtime')
 package.__path__=[str(work/'qa-auth-helpers'/helper)]
 sys.modules['runtime']=package
@@ -68,12 +68,12 @@ with realm.config_lock(state),db.option_file(observation,'esteria',secret) as op
             status('reconstructed-grunt-authenticate')
             peer=Path('/esteria-client')
             nonce=secrets.token_bytes(16)
-            private=[peer/'bin'/name for name in (contract.INPUT,contract.RECEIPT,contract.KEY)]
+            private=[peer/('bin18' if operation=='seed18' else 'bin19')/name for name in (contract.INPUT,contract.RECEIPT,contract.KEY)]
             require(all(not path.exists() and not path.is_symlink() for path in private),'Stale private challenge')
             try:
                 contract.write_input(private[0],intent,nonce)
                 db.atomic_json(peer/('ready-'+operation+'.json'),{'operation':operation})
-                deadline=time.monotonic()+(1080 if operation=="cold" else 180)
+                deadline=time.monotonic()+(1080 if operation=="seed18" else 180)
                 while time.monotonic()<deadline:
                     require(child.alive(),'Auth child exited during Grunt')
                     if (peer/operation/'exited').is_file(): break

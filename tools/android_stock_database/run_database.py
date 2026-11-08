@@ -28,7 +28,7 @@ def wine_details(report):
                      'prefixKernel32':bool,'prefixWineboot':bool}
             report['winePhases'].append(dict(phase=item['phase'],**{k:item[k] for k,t in allowed.items()
                                                if k in item and type(item[k]) is t}))
-    observation=shell(CONTAINER,'''for f in "$1"/state/client-work/cold/first-use.json; do
+    observation=shell(CONTAINER,'''for f in "$1"/state/client-work/seed18/first-use.json; do
         if test -f "$f"; then cat "$f"; fi
     done''',root)
     if observation:
@@ -107,18 +107,18 @@ def exercise(report,seed):
         result=shell(CONTAINER,'''apk=/data/local/tmp/esteria-prior-stock-qa.apk
             trap 'rm -f "$apk"' EXIT
             test ! -e "$apk"
-            cp /esteria-qa/input/stock-v17.apk "$apk"
+            cp /esteria-qa/input/stock-v18.apk "$apk"
             chmod 644 "$apk"
             pm install --user 0 "$apk"
         ''',timeout=360)
-        checked('Success' in result.splitlines(),'v17 installation failed')
+        checked('Success' in result.splitlines(),'v18 installation failed')
     else:
         report['packageUpdate']={}
-        package_lifecycle(CONTAINER,report['packageUpdate'],False,replace_from=17)
-        original=json.loads(Path(sys.argv[1]).with_name('v17-seed.json').read_bytes())
-        checked(original['phase']=='complete' and len(original['operations'])==1,'v17 seed missing')
+        package_lifecycle(CONTAINER,report['packageUpdate'],False,replace_from=18)
+        original=json.loads(Path(sys.argv[1]).with_name('v18-seed.json').read_bytes())
+        checked(original['phase']=='complete' and len(original['operations'])==1,'v18 seed missing')
         baseline=original['operations'][0]
-    package_uid=identity(CONTAINER,17 if seed else 18)
+    package_uid=identity(CONTAINER,18 if seed else 19)
     apk=shell(CONTAINER,'pm path "$1"',PACKAGE).strip()
     match=re.fullmatch(r'package:(/data/app/[A-Za-z0-9_./=+~-]+/base\.apk)',apk)
     checked(match,'single installed APK required')
@@ -130,7 +130,7 @@ def exercise(report,seed):
     report['operations']=[]
     report.update(packageUid=package_uid,selinux=shell(CONTAINER,'getenforce').strip(),
                   fingerprint=shell(CONTAINER,'getprop ro.build.fingerprint').strip())
-    for mode in (('seed17',) if seed else ('cold','warm')):
+    for mode in (('seed18',) if seed else ('cold','warm')):
         report['phase']=mode
         cmd=['docker','exec','--user',f'{package_uid}:{package_uid}',CONTAINER,
              '/system/bin/env','-i',*boot,'CLASSPATH=/esteria-qa/input/driver.jar:'+apk,
@@ -139,7 +139,7 @@ def exercise(report,seed):
         result=subprocess.run(cmd,capture_output=True,text=True,timeout=50*60)
         phases=[line for line in result.stdout.splitlines() if re.fullmatch(r'ANDROID_DB_PHASE [a-z0-9_-]+ \d+',line)]
         report['lastPhases']=phases
-        socket_rows=re.findall(r'^ANDROID_WINE_SOCKET (cold|warm) '
+        socket_rows=re.findall(r'^ANDROID_WINE_SOCKET (seed18|cold|warm) '
                                r'(/data/(?:data|user/0)/io[.]github[.]russianranger[.]esteria[.]stock/files/s/<16hex>/client/tmp) '
                                r'(true|false) (-?[0-9]{1,3}) (-?[0-9]{1,3}) (-?[0-9]{1,3}) (-?[0-9]{1,3})$',result.stdout,re.MULTILINE)
         if socket_rows:
@@ -161,20 +161,35 @@ def exercise(report,seed):
         item=json.loads(rows[0])
         checked(item['mode']==mode and item['closed'] and item['sameAuthenticatedInstance'] and
                 re.fullmatch(r'[a-f0-9-]{36}',item['instanceUuid']),'invalid signed SQL result')
+        client=item['clientProvider']
+        checked(client['previousProviderAndViewRetained'] and client['sameViewCodecFile']
+                and client['codecSha256']=='b4c774430942d709ca7e3f03a1890d6aec7aaa2e432bee0e698e57027a70d006',
+                'prior client or shared codec does not match exact pins')
         if seed:
-            checked(item['versionCode']==17 and item['providerCopiedBytes']>0 and item['clientAndWineProviderCopiedBytes']>0 and not item['auth'],
-                    'v17 SQL seed failed')
-            check_empty(CONTAINER,package_uid)
-            report['operations'].append(item)
-            continue
-        unchanged=('appUid','firstInstallTime','instanceUuid','slotId','promotionProof','setupReceipt',
-                   'providerGeneration','programsGeneration','contentGeneration','reconstructedClientSha256','sourceRevision','wineArchive')
-        checked(item['versionCode']==18 and item['existingBootstrapReused'] is True
-                and item['markerConfigAccountPersisted'] and item['providerCopiedBytes']==0 and item['clientAndWineProviderCopiedBytes']==0
-                and all(item[k]==baseline[k] for k in unchanged),'in-place update failed to retain sources, account or SQL')
+            checked(item['versionCode']==18 and item['providerCopiedBytes']>0 and client['providerCopiedBytes']>0
+                    and client['wineCopiedBytes']>0 and client['viewCopiedBytes']==client['peBytes']+566272
+                    and item['reconstructedClientSha256']=='fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317'
+                    and item['sourceRevision']=='fa3e74b7f332fef0f212e954a0de18f685ead8bd'
+                    and client['generation']==client['previousGeneration'], 'v18 SQL/client seed failed')
+        else:
+            unchanged=('appUid','firstInstallTime','instanceUuid','slotId','promotionProof','setupReceipt',
+                       'providerGeneration','programsGeneration','contentGeneration','wineArchive')
+            checked(item['versionCode']==19 and item['existingBootstrapReused'] is True
+                    and item['markerConfigAccountPersisted'] and item['providerCopiedBytes']==0 and client['wineCopiedBytes']==0
+                    and all(item[k]==baseline[k] for k in unchanged)
+                    and item['sourceRevision']=='c05a3af9be6c204c40d65d0e3eb6ccc2442012b6'
+                    and item['reconstructedClientSha256']=='e224cc5611511e47c3e4f20fa8c401419f9b9d2fc648a70908be58ca204aa561'
+                    and client['previousGeneration']==baseline['clientProvider']['generation']
+                    and client['previousViewPeInode']==baseline['clientProvider']['viewPeInode']
+                    and client['generation']!=client['previousGeneration']
+                    and client['viewPeInode']!=client['previousViewPeInode'], 'in-place upgrade lost selected state')
+            cold=mode=='cold'
+            checked((client['providerCopiedBytes']>0)==cold
+                    and client['viewCopiedBytes']==(client['peBytes'] if cold else 0),
+                    'unexpected signed client generation or test view copy')
         report.setdefault('signedPrefixSelections',[]).append(dict(mode=mode,before=item['stockPrefixBefore'],
                                                                    after=item['stockPrefixAfter']))
-        checked(item['stockPrefixBefore']==('ABSENT' if mode=='cold' else 'NO_REPAIR') and
+        checked(item['stockPrefixBefore']==('ABSENT' if seed else 'NO_REPAIR') and
                 item['stockPrefixAfter']=='NO_REPAIR','installed stock Wine prefix classifier disagrees with the PE lifecycle')
         auth=item['auth']
         checked(auth['build']==12340 and all(auth[k] is True for k in ('sourceChallenge','ownedListener','srpAndRealmList','mysqlKeyMatched','authserverExitedCleanly')) and
@@ -183,12 +198,15 @@ def exercise(report,seed):
                 auth['commonMainStarted'] is False and auth['assetsLoaded'] is False, 'incomplete actual PE receipt')
         if mode=='warm':
             first=report['operations'][0]
-            checked(first['auth']['clientReceiptSha256']!=auth['clientReceiptSha256'], 'same challenge receipt')
+            checked(len({first['auth']['clientReceiptSha256'],baseline['auth']['clientReceiptSha256'],auth['clientReceiptSha256']})==3, 'same challenge receipt')
             checked(first['instanceUuid']==item['instanceUuid'] and all(first[k]==item[k] for k in ('providerGeneration','programsGeneration','contentGeneration','slotId','promotionProof','setupReceipt')) and
-                    item['providerCopiedBytes']==0,'warm persisted instance or provider changed')
+                    item['providerCopiedBytes']==0 and all(first['clientProvider'][k]==client[k] for k in ('generation','viewPeInode','previousViewPeInode')),
+                    'warm persisted instance or provider changed')
         check_empty(CONTAINER,package_uid)
         report['operations'].append(item)
     if not seed:
+        report['v18SeedReceiptSha256']=hashlib.sha256(Path(sys.argv[1]).with_name('v18-seed.json').read_bytes()).hexdigest()
+        report['scopeDetail']='Installed runtime/QA Grunt view transfer counters. No graphical import or shader compile path requested.'
         wine_details(report)
         report['phase']='controlled-first-response'
         trial=report['operations'][-1].get('controlledSql') or {}
@@ -209,7 +227,7 @@ if __name__=='__main__':
                 installedProductionClientEnvironment=True,reconstructedGruntTarget=True,actualWorldSession=False,graphicalLogin=False,physicalThor=False)
     start=time.monotonic()
     try:
-        exercise(report,len(sys.argv)>2 and sys.argv[2]=="seed17")
+        exercise(report,len(sys.argv)>2 and sys.argv[2]=="seed18")
     except Exception as error:
         report['errorType']=type(error).__name__
         if isinstance(error,RuntimeError):report['reason']=str(error)

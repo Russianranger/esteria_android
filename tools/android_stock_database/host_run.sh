@@ -16,20 +16,24 @@ close() {
 }
 trap close EXIT
 apk="$work/input/stock.apk"
-# Final stock producer 075ed711bd8be7aaeac8bdfca2be8c607afb8f4b, verified release signing identity.
+# Original signed producer c99dbaef634412729742e120d2457d5c7b8bf1a1.
 repo_url='https://github.com/Russianranger/esteria_android/releases/download'
-curl --fail --location --silent --show-error --retry 3 \
-  "$repo_url/non-custom-v0.1.0-non-custom.18/Esteria-Stock-3.3.5a-arm64.apk" -o "$apk"
+if [[ -n "${ESTERIA_DETACHED_CANDIDATE:-}" ]]; then
+    ln -- "$ESTERIA_DETACHED_CANDIDATE" "$apk"
+else
+    curl --fail --location --silent --show-error --retry 3 \
+      "$repo_url/non-custom-v0.1.0-non-custom.19/Esteria-Stock-3.3.5a-arm64.apk" -o "$apk"
+fi
 test "$(stat -c %s "$apk")" = 336899353
-echo "60a90c58dfc211c53928853dbbebd04929668da69d46d4c0a027c143f6857eb6  $apk" | sha256sum -c
+echo "c0d251847496c64170bb31d534a925afd1d8e7f92c21687e0e1cbf82c056e6fa  $apk" | sha256sum -c
 java -jar "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" verify --verbose --print-certs "$apk" > "$work/signers"
 test "$(grep -c '^Signer #[0-9]* certificate SHA-256 digest:' "$work/signers")" = 1
 grep -qx 'Signer #1 certificate SHA-256 digest: 5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa' "$work/signers"
-previous="$work/input/stock-v17.apk"
+previous="$work/input/stock-v18.apk"
 curl --fail --location --silent --show-error --retry 3 \
-  "$repo_url/non-custom-v0.1.0-non-custom.17/Esteria-Stock-3.3.5a-arm64.apk" -o "$previous"
+  "$repo_url/non-custom-v0.1.0-non-custom.18/Esteria-Stock-3.3.5a-arm64.apk" -o "$previous"
 test "$(stat -c %s "$previous")" = 336899353
-echo "dc68c5ced8f0f4a155d86135f70a8522766e483957df06e0ce5544d488ac2ace  $previous" | sha256sum -c
+echo "60a90c58dfc211c53928853dbbebd04929668da69d46d4c0a027c143f6857eb6  $previous" | sha256sum -c
 java -jar "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" verify --verbose --print-certs "$previous" > "$work/previous-signers"
 diff -u <(grep '^Signer #[0-9]* certificate SHA-256 digest:' "$work/signers") \
         <(grep '^Signer #[0-9]* certificate SHA-256 digest:' "$work/previous-signers")
@@ -49,5 +53,5 @@ chmod 0444 "$work/input/"*.py
 chmod 755 "$work/input"
 chmod 644 "$apk" "$work/input/driver.jar"
 redroid_start "$work"
-python3 -m tools.android_stock_database.run_database "$out/v17-seed.json" seed17
+python3 -m tools.android_stock_database.run_database "$out/v18-seed.json" seed18
 python3 -m tools.android_stock_database.run_database "$out/owner.json"

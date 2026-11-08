@@ -9,8 +9,8 @@ import time
 
 PACKAGE = 'io.github.russianranger.esteria.stock'
 ACTIVITY = 'io.github.russianranger.esteria.MainActivity'
-NAME = '0.1.0-non-custom.18'
-SCOPE = 'disposable Android 13 signed v18 package lifecycle'
+NAME = '0.1.0-non-custom.19'
+SCOPE = 'disposable Android 13 signed v19 package lifecycle'
 
 
 def require(value, message):
@@ -25,7 +25,7 @@ def shell(container, script, *args, timeout=60):
     return call.stdout
 
 
-def identity(container, version=18):
+def identity(container, version=19):
     result = shell(container,'dumpsys package "$1"',PACKAGE)
     require(re.search(rf'^\s*versionCode={version}\b',result,re.MULTILINE) and
             re.search(r'^\s*versionName='+re.escape("0.1.0-non-custom."+str(version))+r'\s*$',result,re.MULTILINE),
@@ -76,8 +76,8 @@ def exercise(container, report, check_only, replace_from=None):
     if replace_from is None:
         require(shell(container,'pm list packages --user 0 "$1"',PACKAGE).strip()=='','fresh runtime required')
     else:
-        require(replace_from==17,'unexpected predecessor')
-        previous=identity(container,17)
+        require(replace_from==18,'unexpected predecessor')
+        previous=identity(container,18)
         check_empty(container,previous)
     output = shell(container,'''
         apk=/data/local/tmp/esteria-signed-stock-qa.apk
@@ -90,7 +90,7 @@ def exercise(container, report, check_only, replace_from=None):
     require('Success' in output.splitlines(),'package installation did not succeed')
     uid=identity(container)
     if replace_from is not None: require(uid==previous,'UID changed on replacement')
-    report.update(versionCode=18,versionName=NAME,uid=uid,phase='launcher')
+    report.update(versionCode=19,versionName=NAME,uid=uid,phase='launcher')
     try:
         component=PACKAGE+'/'+ACTIVITY
         result = shell(container,'am start -W --user 0 -n "$1"',component,timeout=120)

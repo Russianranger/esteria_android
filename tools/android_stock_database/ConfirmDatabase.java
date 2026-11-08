@@ -35,8 +35,12 @@ import org.json.JSONObject;
 public final class ConfirmDatabase {
     private static long elapsed(long start) { return (System.nanoTime()-start)/1_000_000; }
 
-    private static final String SOURCE = "fa3e74b7f332fef0f212e954a0de18f685ead8bd";
-    private static final String PE = "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317";
+    private static final String PREVIOUS_SOURCE = "fa3e74b7f332fef0f212e954a0de18f685ead8bd";
+    private static final String PREVIOUS_PE = "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317";
+
+    private static final String SOURCE = "c05a3af9be6c204c40d65d0e3eb6ccc2442012b6";
+    private static final String PE = "e224cc5611511e47c3e4f20fa8c401419f9b9d2fc648a70908be58ca204aa561";
+    private static final String XVID = "b4c774430942d709ca7e3f03a1890d6aec7aaa2e432bee0e698e57027a70d006";
 
     private static void verifyFile(Path path, RuntimePackagePlan.RequiredFile expected) throws IOException {
         if (!path.equals(path.toRealPath()) || Files.size(path) != expected.bytes || expected.peMachine != 0xaa64)
@@ -74,7 +78,7 @@ public final class ConfirmDatabase {
         } catch(ReflectiveOperationException e) { throw new IOException("Installed stock client environment selection failed",e); }
     }
 
-    /** Evaluate the installed v17 classifier. The v16 seed has no corresponding production class. */
+    /** Evaluate the classifier from the installed signed package. */
     private static String installedPrefixState(Path work,RuntimeSetup wine) throws Exception {
         Class<?> type=Class.forName("io.github.russianranger.esteria.core.runtime.StockWinePrefix");
         Object result=type.getMethod("inspect",Path.class,Path.class,String.class)
@@ -182,35 +186,66 @@ public final class ConfirmDatabase {
             throw new IOException("Signed Android child failed or exceeded its phase budget");
     }
 
-    private static long prepareClient(Context context, Path root, Path work, RuntimeSetup wine, boolean seed) throws IOException {
+    private static JSONObject prepareClient(Context context, Path root, Path work, RuntimeSetup wine, String mode) throws Exception {
+        boolean seed=mode.equals("seed18"), warm=mode.equals("warm");
         ClientRuntimeSetup client=new ClientRuntimeSetup(context,root);
         client.requireWineArchive(wine.archiveSha256());
-        if(!SOURCE.equals(client.sourceRevision()) || !PE.equals(client.packagePlan().required.get("bin/WowClient64.exe").sha256))
+        if(!(seed ? PREVIOUS_SOURCE : SOURCE).equals(client.sourceRevision()) ||
+                !(seed ? PREVIOUS_PE : PE).equals(client.packagePlan().required.get("bin/WowClient64.exe").sha256) ||
+                !XVID.equals(client.packagePlan().required.get("bin/XvidDecoder.dll").sha256))
             throw new IOException("Unexpected signed client source");
         RuntimeInstaller.Result wineFiles=wine.installer().install(Paths.get("/esteria-qa/input/wine.tar.gz"),
                 wine.packagePlan(),RuntimeWork.NONE,RuntimeWork.NEVER_CANCELLED);
         RuntimeInstaller.Result clientFiles=client.prepare(RuntimeWork.NONE,RuntimeWork.NEVER_CANCELLED);
-        if(seed ? (wineFiles.alreadyInstalled || clientFiles.alreadyInstalled) :
-                (!wineFiles.alreadyInstalled || !clientFiles.alreadyInstalled || wineFiles.copiedBytes+clientFiles.copiedBytes!=0))
+        if(wineFiles.alreadyInstalled==seed || clientFiles.alreadyInstalled!=warm ||
+                (wineFiles.copiedBytes>0)!=seed || (warm ? clientFiles.copiedBytes!=0 : clientFiles.copiedBytes!=client.packagePlan().expectedFileBytes) ||
+                !clientFiles.rootfs.equals(client.current()))
             throw new IOException("Unexpected Wine or reconstructed client admission");
         if(seed) {
             Files.createDirectories(work.getParent());
             Files.createDirectory(work);
-            Files.createDirectory(work.resolve("bin"));
+            Files.write(work.resolve("v18-generation"),clientFiles.generation.getBytes(StandardCharsets.US_ASCII),
+                    java.nio.file.StandardOpenOption.CREATE_NEW);
             for (String source:Arrays.asList("grunt_wine.py","wine_prefix.py","wine_windows.py"))
                 Files.copy(Paths.get("/esteria-qa/input/"+source),work.resolve(source));
         }
-        for (String name:Arrays.asList("bin/WowClient64.exe","bin/XvidDecoder.dll")) {
-            if (seed) Files.copy(clientFiles.rootfs.resolve(name),work.resolve(name));
-            verifyFile(work.resolve(name),client.packagePlan().required.get(name));
+        String previous=new String(Files.readAllBytes(work.resolve("v18-generation")),StandardCharsets.US_ASCII);
+        if(!previous.matches("[a-f0-9]{64}") || previous.equals(clientFiles.generation)!=seed)
+            throw new IOException("Previous provider selection differs");
+        Path priorRoot=clientFiles.rootfs.getParent().getParent().resolve(previous).resolve("rootfs");
+        Path view=work.resolve(seed ? "bin18" : "bin19");
+        if(!warm) Files.createDirectory(view);
+        long viewCopied=0;
+        for (String name:Arrays.asList("WowClient64.exe","XvidDecoder.dll")) {
+            RuntimePackagePlan.RequiredFile pin=client.packagePlan().required.get("bin/"+name);
+            verifyFile(clientFiles.rootfs.resolve("bin").resolve(name),pin);
+            if (!warm) {
+                if (!seed && name.equals("XvidDecoder.dll")) {
+                    Files.createLink(view.resolve(name),work.resolve("bin18").resolve(name));
+                } else {
+                    Files.copy(clientFiles.rootfs.resolve("bin").resolve(name),view.resolve(name));
+                    viewCopied+=pin.bytes;
+                }
+            }
+            verifyFile(view.resolve(name),pin);
+            RuntimePackagePlan.RequiredFile prior=name.endsWith(".exe")
+                    ? new RuntimePackagePlan.RequiredFile(20786176,PREVIOUS_PE,0,0xaa64) : pin;
+            verifyFile(priorRoot.resolve("bin").resolve(name),prior);
+            verifyFile(work.resolve("bin18").resolve(name),prior);
         }
-        return wineFiles.copiedBytes+clientFiles.copiedBytes;
+        return new JSONObject().put("generation",clientFiles.generation).put("previousGeneration",previous)
+                .put("previousProviderAndViewRetained",true).put("codecSha256",XVID)
+                .put("sameViewCodecFile",Files.isSameFile(work.resolve("bin18/XvidDecoder.dll"),view.resolve("XvidDecoder.dll")))
+                .put("peBytes",client.packagePlan().required.get("bin/WowClient64.exe").bytes)
+                .put("providerCopiedBytes",clientFiles.copiedBytes).put("wineCopiedBytes",wineFiles.copiedBytes)
+                .put("viewCopiedBytes",viewCopied).put("viewPeInode",android.system.Os.stat(view.resolve("WowClient64.exe").toString()).st_ino)
+                .put("previousViewPeInode",android.system.Os.stat(work.resolve("bin18/WowClient64.exe").toString()).st_ino);
+
     }
 
     private static String auth(Context context,Path root,ServerRuntimeSetup server,ServerProgramsSetup programs,
-            FreshServerInstallations.Active active,ServerDatabaseService.Handle database,RuntimeSetup wine,boolean cold) throws IOException {
+            FreshServerInstallations.Active active,ServerDatabaseService.Handle database,RuntimeSetup wine,String mode) throws IOException {
         Path work=active.directoryFor(root);
-        String mode=cold?"cold":"warm";
         String generation=GuestHelperAssets.install(context,"server-session",GuestHelperAssets.directory(work,"qa-auth-helpers"),LocalServerSession.HELPERS);
         Path observer=Files.createDirectory(work.resolve("qa-auth-"+mode));
         for(String source:Arrays.asList("auth_phase.py","client_auth_contract.py","prepare_runtime.py","world_probe.py","stock_world_observation.py"))
@@ -231,7 +266,7 @@ public final class ConfirmDatabase {
             OwnedProcess grunt=null;
             try {
                 grunt=wineGuest(context,wineOwner,root.resolve("state/client-work"),wine,mode);
-                long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(cold ? 20 : 6);
+                long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(mode.equals("seed18") ? 20 : 6);
                 while((child.isAlive() || grunt.isAlive()) && System.nanoTime()<deadline) {
                     witness.sample();
                     if(!child.isAlive()) requireExit(child);
@@ -334,17 +369,17 @@ public final class ConfirmDatabase {
     }
 
     private static JSONObject run(Context context, Path root, String mode) throws Exception {
-        boolean seed=mode.equals("seed17"),cold=mode.equals("cold");
+        boolean seed=mode.equals("seed18");
         android.content.pm.PackageInfo installed=context.getPackageManager().getPackageInfo(context.getPackageName(),0);
-        if(installed.getLongVersionCode()!=(seed?17:18)) throw new IOException("Unexpected installed app version");
+        if(installed.getLongVersionCode()!=(seed?18:19)) throw new IOException("Unexpected installed app version");
         Path data=root.resolve("qa-server-data-directory");
         if(seed) Files.createDirectory(data);
         if(!Files.isDirectory(data) || !data.equals(data.toRealPath()))
             throw new IllegalStateException("Disjoint QA schema config directory required");
         RuntimeSetup wine=new RuntimeSetup(context,root);
         Path clientWork=root.resolve("state/client-work");
-        long clientProviderCopied=prepareClient(context,root,clientWork,wine,seed);
-        String prefixBefore=seed?"unobserved-v17-seed":installedPrefixState(clientWork,wine);
+        JSONObject clientProvider=prepareClient(context,root,clientWork,wine,mode);
+        String prefixBefore=installedPrefixState(clientWork,wine);
         ServerRuntimeSetup server=new ServerRuntimeSetup(context,root);
         ServerProgramsSetup programs=new ServerProgramsSetup(context,root);
         ServerContentSetup content=new ServerContentSetup(context,root);
@@ -388,7 +423,7 @@ public final class ConfirmDatabase {
             ServerDatabaseService.awaitReady(database,System.nanoTime()+TimeUnit.MINUTES.toNanos(3),new AtomicBoolean(false));
             ready=elapsed(start);
             if(!active.mysqlUuid.equals(database.instanceUuid())) throw new IllegalStateException("Owned SQL service identity differs");
-            authReport=seed ? "{}" : auth(context,root,server,programs,active,database,wine,cold);
+            authReport=auth(context,root,server,programs,active,database,wine,mode);
             if(mode.equals("warm")) {
                 try { trial=coldSqlControl(context,root,server,active,database); }
                 catch(Exception failure) {
@@ -408,12 +443,12 @@ public final class ConfirmDatabase {
             database.stop(Duration.ofSeconds(30));
         }
         if(database.isAlive() || database.exitCode()!=0) throw new IllegalStateException("SQL service did not close cleanly");
-        String prefixAfter=seed?"unobserved-v17-seed":installedPrefixState(clientWork,wine);
+        String prefixAfter=installedPrefixState(clientWork,wine);
         checkRetainedOperatorFiles(root,active.directoryFor(root).resolve("state"),seed);
         return new JSONObject().put("mode",mode).put("appUid",android.os.Process.myUid())
             .put("firstInstallTime",installed.firstInstallTime).put("versionCode",installed.getLongVersionCode())
             .put("stockPrefixBefore",prefixBefore).put("stockPrefixAfter",prefixAfter)
-            .put("clientAndWineProviderCopiedBytes",clientProviderCopied)
+            .put("clientProvider",clientProvider)
             .put("markerConfigAccountPersisted",!seed).put("instanceUuid",active.mysqlUuid)
             .put("slotId",active.slotId).put("promotionProof",active.proofSha256).put("setupReceipt",active.setupReceiptSha256)
             .put("providerGeneration",runtime.generation).put("programsGeneration",executables.generation)
@@ -421,12 +456,12 @@ public final class ConfirmDatabase {
             .put("version",server.expectedMysqlVersion()).put("providerMs",providers)
             .put("schemaSetupOrSelectionMs",prepared-providers).put("activeNativeStartupMs",ready-beforeService).put("bootstrapReentryMs",beforeService-prepared)
             .put("existingBootstrapReused",!seed).put("controlledSql",trial)
-            .put("reconstructedClientSha256",PE).put("sourceRevision",SOURCE).put("wineArchive",wine.archiveSha256())
+            .put("reconstructedClientSha256",seed?PREVIOUS_PE:PE).put("sourceRevision",seed?PREVIOUS_SOURCE:SOURCE).put("wineArchive",wine.archiveSha256())
             .put("auth",new JSONObject(authReport)).put("cleanShutdownMs",elapsed(start)-authenticated).put("sameAuthenticatedInstance",true).put("closed",true);
     }
 
     public static void main(String[] args) throws Exception {
-        if(args.length!=1 || !(args[0].equals("cold") || args[0].equals("warm") || args[0].equals("seed17"))) throw new IllegalArgumentException();
+        if(args.length!=1 || !(args[0].equals("cold") || args[0].equals("warm") || args[0].equals("seed18"))) throw new IllegalArgumentException();
         if(Looper.myLooper()==null) Looper.prepareMainLooper();
         Class<?> thread=Class.forName("android.app.ActivityThread");
         Object instance=thread.getMethod("systemMain").invoke(null);

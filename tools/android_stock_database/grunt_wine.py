@@ -10,7 +10,7 @@ import wine_prefix
 
 work = Path('/work')
 mode = sys.argv[1]
-assert mode in {'cold', 'warm'}
+assert mode in {'seed18', 'cold', 'warm'}
 os.umask(0o077)
 out = work / mode
 out.mkdir(mode=0o700, exist_ok=False)
@@ -49,7 +49,7 @@ def checked(phase, command, timeout):
 
 def run():
     assert env['HOME']=='/work/home' and env['WINE_ANDROID_PRIVATE_PE_COPY']=='1'
-    if mode=='cold':
+    if mode=='seed18':
         assert not prefix.exists()
     else:
         assert (prefix/'system.reg').is_file()
@@ -71,8 +71,9 @@ def run():
                 if (work/('ready-'+mode+'.json')).is_file(): break
                 time.sleep(.1)
             else: raise RuntimeError('credential handoff not ready')
-            command=[wine,r'Z:\work\bin\WowClient64.exe','--auth-check','--local-offline']
-            if mode=='cold':
+            binary='bin18' if mode=='seed18' else 'bin19'
+            command=[wine,rf'Z:\work\{binary}\WowClient64.exe','--auth-check','--local-offline']
+            if mode=='seed18':
                 status('reconstructed-grunt-first-use')
                 wine_prefix.observe(command,env,prefix,out)
             else:
