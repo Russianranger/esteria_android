@@ -6,6 +6,7 @@ import stat
 import subprocess
 import sys
 import time
+import wine_prefix
 
 work = Path('/work')
 mode = sys.argv[1]
@@ -63,8 +64,8 @@ def run():
                 time.sleep(.1)
             else: raise RuntimeError('private X11 startup failed')
             if mode=='bootstrap':
-                checked('wineboot',[wine,'wineboot.exe','-u'],420)
-                checked('windows-prefix-command',[wine,'cmd.exe','/c','ver'],90)
+                status('windows-first-use')
+                wine_prefix.first_use(wine,env,prefix,out)
                 assert (prefix/'system.reg').is_file()
             else:
                 status('wait-owned-authserver')

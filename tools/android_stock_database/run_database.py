@@ -22,12 +22,25 @@ def failure_details(report):
     done''',root)
     for line in diagnostics.splitlines():
         item=json.loads(line)
-        if item.get('phase') in {'display','wineboot','windows-prefix-command','prefix-ready','wait-owned-authserver',
+        if item.get('phase') in {'display','wineboot','windows-prefix-command','windows-first-use','prefix-ready','wait-owned-authserver',
                                 'reconstructed-grunt','grunt-exited'}:
             allowed={'elapsedMs':int,'returnCode':int,'loaderStatus135':bool,'kernel32Mentioned':bool,
                      'prefixKernel32':bool,'prefixWineboot':bool}
             report['winePhases'].append(dict(phase=item['phase'],**{k:item[k] for k,t in allowed.items()
                                                if k in item and type(item[k]) is t}))
+    observation=shell(CONTAINER,'''for f in "$1"/qa-grunt/bootstrap/first-use.json "$1"/db/*/qa-grunt/bootstrap/first-use.json; do
+        if test -f "$f"; then cat "$f"; fi
+    done''',root)
+    if observation:
+        from tools.android_stock_database.wine_prefix import DLLS, NAMES, PATTERNS
+        timeline=[]
+        for sample in json.loads(observation)['samples'][-100:]:
+            row={k:v for k,v in sample.items() if k in ('seconds','system32Entries','systemRegBytes','traceBytes') and type(v) is int}
+            for k,allowed in [('installed',DLLS),('processes',NAMES),('traceMarkers',PATTERNS)]:
+                row[k]=[v for v in sample[k] if v in allowed]
+            row['commandExits']=[v for v in sample['commandExits'][:2] if v is None or type(v) is int]
+            timeline.append(row)
+        report['firstUseTimeline']=timeline
     paths=shell(CONTAINER,'''for dir in "$1"/db/*; do if test -d "$dir"; then basename "$dir"; fi; done''',root).splitlines()
     if len(paths)!=1 or not re.fullmatch(r'[a-f0-9]{16}',paths[0]):
         report['allocatedSlots']=len(paths)

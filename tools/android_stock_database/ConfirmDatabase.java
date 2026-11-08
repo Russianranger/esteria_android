@@ -78,7 +78,8 @@ public final class ConfirmDatabase {
         if(cold) {
             Files.createDirectory(work);
             Files.createDirectory(work.resolve("bin"));
-            Files.copy(Paths.get("/esteria-qa/input/grunt_wine.py"),work.resolve("grunt_wine.py"));
+            for (String source:Arrays.asList("grunt_wine.py","wine_prefix.py"))
+                Files.copy(Paths.get("/esteria-qa/input/"+source),work.resolve(source));
         }
         for (String name:Arrays.asList("bin/WowClient64.exe","bin/XvidDecoder.dll")) {
             if (cold) Files.copy(clientFiles.rootfs.resolve(name),work.resolve(name));
@@ -87,7 +88,7 @@ public final class ConfirmDatabase {
         if(cold) {
             OwnedProcess bootstrap=wineGuest(context,root,work,wine,"bootstrap");
             try {
-                long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(11);
+                long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(18);
                 while(bootstrap.isAlive() && System.nanoTime()<deadline) pause();
                 requireExit(bootstrap);
                 if(!Files.isRegularFile(work.resolve("bootstrap/exited"))) throw new IOException("Wine prefix not proven");
