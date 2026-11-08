@@ -5,6 +5,47 @@
   "artifactBytes": 2367,
   "artifactId": 13596415335,
   "artifactSha256": "98005213f1cf5d989c0797f585f73e3c2695094feb361d589fb9bca3ed7f3e30",
+  "boundedStartingAreaSourceRead": {
+    "derivedTilesVerified": false,
+    "extractionBoundary": "The selected map extractor supports all-map mode (-e 1). It must read prior winning ADTs. The first still-uncovered earlier source member is Azeroth_36_23.adt. The vmap extractor also requires real placed model geometry.",
+    "mapExtractorSha256": "feff46d5f2d24b0de446e807fa831373b06eb5eb28e886d5b26e2b30519719c7",
+    "method": "Rehashed each selected original ZIP piece against the pinned torrent. Positioned each independent DEFLATE window using 18 and 15 matching MPQ block-table entries respectively. Read only each winning patch.MPQ member within those certified extents. Verified build 12340, Map.dbc map 0/Azeroth and both WDT presence bits.",
+    "physicalThorDataReceiptInventoryAvailable": false,
+    "requiredVMapTree": "vmaps/000.vmtree",
+    "scope": "Separate offline host inspection of authenticated original stock MPQ member bytes. Selected ARM64 map_extractor usage was exercised under QEMU user emulation.",
+    "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
+    "tiles": [
+      {
+        "area": "Coldridge",
+        "bytes": 1556633,
+        "normalExtractorRecordsThroughTile": 402,
+        "outsideCompleteOrCertifiedSourceExtentsAfter": 206,
+        "outsideCompleteOrCertifiedSourceExtentsBefore": 219,
+        "requiredMap": "maps/0004331.map",
+        "requiredTiledVMap": "vmaps/000_31_43.vmtile",
+        "sourceMember": "World/Maps/Azeroth/Azeroth_31_43.adt",
+        "sourceSha256": "13d5f6ac4241486d574f5dba1d26c89585ebd2e253fb5dc6a139ea9e10968d46",
+        "v18Cells": 256,
+        "worldModelPlacements": 2
+      },
+      {
+        "area": "Northshire",
+        "bytes": 1824447,
+        "normalExtractorRecordsThroughTile": 490,
+        "outsideCompleteOrCertifiedSourceExtentsAfter": 250,
+        "outsideCompleteOrCertifiedSourceExtentsBefore": 272,
+        "requiredMap": "maps/0004832.map",
+        "requiredTiledVMap": "vmaps/000_32_48.vmtile",
+        "sourceMember": "World/Maps/Azeroth/Azeroth_32_48.adt",
+        "sourceSha256": "f0acc35fdc126a5bcd93a391238a74d4381f9f61e46a4d09a9ff61af17540797",
+        "v18Cells": 256,
+        "worldModelPlacements": 8
+      }
+    ],
+    "torrentSha256": "58731d43da3e615fbeb489ebd7a9401a8b56eeed8b7baf72f6b57646c574f62e",
+    "wdtSha256": "743c8c94d92c14bef0de50dc5ce60740dc596357567a2e0fd3f46dc60e069af0",
+    "worldserverExecutedWithTheseInputs": false
+  },
   "databaseSameUuidCleanlyReopenedAndStopped": true,
   "formatVersion": 1,
   "inputScope": "A fresh disposable stock SQL partition and a deliberately empty read-only data mount. The normal worldserver command, all four pools and its first required world-content check were executed under source-rendered configuration.",

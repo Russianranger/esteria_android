@@ -1,0 +1,238 @@
+{
+  "formatVersion": 1,
+  "scope": "Signed replacement, retained stock shader receipts and actual package-UID named shader repair on an isolated Android installation",
+  "environment": {
+    "android": "Independent disposable ARM64 Android 13 Redroid, two TCG vCPUs, 1536 MiB, no NIC, SELinux disabled",
+    "androidSdk": 33,
+    "fingerprint": "redroid/redroid_arm64_only/redroid_arm64_only:13/TQ3A.230805.001.S1/eng.frank.20240527.134411:userdebug/test-keys",
+    "kernel": "6.1.0-54-arm64",
+    "redroidManifestSha256": "c815ac1b1d5bd0a099b74c3e3e0eeea3b32bed8d7ab1f788c20fb74e35891716",
+    "networkInterfaces": [
+      "lo"
+    ],
+    "guestRamMiB": 1536,
+    "apkPackageContexts": true,
+    "deviceType": "QEMU TCG",
+    "guestBoot": "Android netd and SystemServer started after loading the guest kernel’s real XFRM, NFLOG and legacy packet-filter modules."
+  },
+  "signedArtifacts": {
+    "package": "io.github.russianranger.esteria.stock",
+    "releases": [
+      {
+        "versionCode": 15,
+        "versionName": "0.1.0-non-custom.15",
+        "sha256": "f6aa8c4ad674e71d3aed59099f0b952efc44a0ae2333a77efdbff81188489510",
+        "bytes": 336862047,
+        "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+        "apksignerV2Verified": true
+      },
+      {
+        "versionCode": 16,
+        "versionName": "0.1.0-non-custom.16",
+        "sha256": "de9d108a725aeb7a8eea1041bd1a72eb7a5acde811595cf71c886f6937f74ab4",
+        "bytes": 336887065,
+        "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+        "apksignerV2Verified": true
+      }
+    ],
+    "producer": "b12fe53270a62677a625564582e264a8e5733d8b",
+    "archiveVerified": {
+      "bin/WowClient64.exe": {
+        "bytes": 20786176,
+        "sha256": "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317"
+      },
+      "metadata/sources.lock.json": {
+        "bytes": 2162,
+        "sha256": "4daef14068f010ce31a05512f67ec62ee2e1927156187306cc8da018f91a6a67"
+      }
+    },
+    "sameArchiveMemberBytes": {
+      "assets/stock-client/": 8,
+      "assets/shader-tools/": 4,
+      "assets/sources.lock.json": 1
+    },
+    "separateShaderRepair": {
+      "manifestSha256": "1673f83944e000e35015acb818c3446c9608520c33180fabf4d3a96ad4d9c938",
+      "files": {
+        "stock_shader_repair.py": {
+          "bytes": 7493,
+          "sha256": "e74a84dfbcd155278d807ccd3f85ef496ef9e075067df5b4eeff9558d0e6dc20"
+        }
+      }
+    }
+  },
+  "packageManager": {
+    "operation": "pm install -r --user 0",
+    "result": "Success",
+    "before": {
+      "versionCode": 15,
+      "versionName": "0.1.0-non-custom.15",
+      "uid": 10077,
+      "firstInstallTime": "2026-11-08 01:17:24",
+      "lastUpdateTime": "2026-11-08 01:17:24"
+    },
+    "after": {
+      "versionCode": 16,
+      "versionName": "0.1.0-non-custom.16",
+      "uid": 10077,
+      "firstInstallTime": "2026-11-08 01:17:24",
+      "lastUpdateTime": "2026-11-08 01:34:43"
+    },
+    "packageSignatureRecord": "v3 [f2b1a0a6] in both installed records",
+    "ownerAndInode": "10077:10077 inode=394744",
+    "activityBefore": {
+      "Status": "ok",
+      "Activity": "io.github.russianranger.esteria.stock/io.github.russianranger.esteria.MainActivity",
+      "WaitTime": "558",
+      "LaunchState": "UNKNOWN (0)"
+    },
+    "activityAfter": {
+      "Status": "ok",
+      "Activity": "io.github.russianranger.esteria.stock/io.github.russianranger.esteria.MainActivity",
+      "WaitTime": "508",
+      "LaunchState": "UNKNOWN (0)"
+    },
+    "topResumedMainActivityOnBoth": true,
+    "activityObservation": "The first v15 launch presented the notification permission dialog. After granting that permission to the QA package, the launcher became top-resumed. On this emulator the first cold activity waits could time out before the launcher became visible. Subsequent ActivityManager focus and warm launches verified the actual component."
+  },
+  "preservation": {
+    "fixture": "Dedicated QA directories beneath the real app-private files directory, isolated from the default personal-data paths. SharedPreferences were produced by the real launcher service. A seeded SQLite row models persistent state.",
+    "previousCompiledFixture": {
+      "generation": "a76ff0743c5c1fcf2b6e1297375a1d3b945d997e0ff0b84ab0a48a35bf40c210",
+      "files": 29,
+      "bytes": 64875,
+      "exactHashesSizesMTimesOwners": true
+    },
+    "database": "Read-only SQLite checks before and after, application_id 125414 and one seeded WarriorQA row with level 4.",
+    "preferencesSha256": "025dc1195a49a47736e476a2fcd250b2faf77285c252d3725f9694dbf8b29468",
+    "preferencesCheck": "shared_prefs/session.xml: OK",
+    "markersChecked": [
+      "import-marker.bin: OK",
+      "prepared-marker.bin: OK",
+      "settings.txt: OK",
+      "state.sqlite: OK"
+    ],
+    "genuineStockShaderSnapshot": {
+      "generation": "3609dd1b67e77a12a6c1641cfba7341fc1681af57bef503f7b9ce8d64dc8139f",
+      "receiptSha256": "8ceaf67054c93693a08424722df6546f0578d5e229afb8c25b3b6e6c8c5a7b34",
+      "source": "Independent production coordinator with 1,580 native ARM64 compiler calls on authenticated 16-MPQ stock shader ranges.",
+      "files": 4742,
+      "outputBytes": 102130554,
+      "beforeAndAfterSnapshotSha256": "dd5ceca9fc2028247cc8662037534556a539b32d6f440c18d7cf0bb221d5df55",
+      "entries": 4766,
+      "checks": "Full hashes for shader bytes, receipt, journal and runtime selection pointers. Imported MPQ sizes, inodes, ownership, permissions and mtimes were compared within the bounded source projection."
+    }
+  },
+  "shaderToolsAndWineBeforeUpdate": {
+    "uid": 10077,
+    "wine": "dda9221e408dd167796e8a80042f5d7e7e168185eef63dfea088053b0a965c9d",
+    "wineCopied": 0,
+    "shaderTools": "1607c300f598b348201f8f2ddf1db4f9527b09bf645240e996cabc69e40db24d",
+    "shaderToolsCopied": 16690219,
+    "elapsedMs": 12929
+  },
+  "priorRendererRetainedAfterNewSelection": {
+    "bytes": 20786176,
+    "sha256": "d2a1b74a3353f2682dcc3bc2b09f649f3b5bf53b55e6f74ccb43071c9aa4b634",
+    "current": "588b5f2cff13237c2f14491cebee23d737066953d43b90120941ca591acc2cf2"
+  },
+  "admissionMeasurement": "Each ARM64 ART process resolves the signed PE and a source-bound shader receipt. elapsedMs measures the subsequent full session shader audit. runtimeAdmissionAndPeAuditMs includes production runtime preparation and an independent executable digest. These measurements cover component admission.",
+  "shaderAdmissions": {
+    "v15-donor": {
+      "generation": "a76ff0743c5c1fcf2b6e1297375a1d3b945d997e0ff0b84ab0a48a35bf40c210",
+      "verifiedFiles": 14,
+      "verifiedBytes": 44313,
+      "elapsedMs": 235,
+      "rendererGeneration": "21dc52833dd146ff8221e2d62881fbd1b1f9b585b288e8e9bb4a9a8686f2eca8",
+      "alreadyInstalled": false,
+      "runtimeCopiedBytes": 21516792,
+      "runtimeAdmissionAndPeAuditMs": 8562,
+      "preparedRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5"
+    },
+    "v15-clean": {
+      "generation": "3609dd1b67e77a12a6c1641cfba7341fc1681af57bef503f7b9ce8d64dc8139f",
+      "verifiedFiles": 4742,
+      "verifiedBytes": 102130554,
+      "elapsedMs": 51967,
+      "rendererGeneration": "21dc52833dd146ff8221e2d62881fbd1b1f9b585b288e8e9bb4a9a8686f2eca8",
+      "alreadyInstalled": true,
+      "runtimeCopiedBytes": 0,
+      "runtimeAdmissionAndPeAuditMs": 2306,
+      "preparedRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5"
+    },
+    "v16-donor": {
+      "generation": "a76ff0743c5c1fcf2b6e1297375a1d3b945d997e0ff0b84ab0a48a35bf40c210",
+      "verifiedFiles": 14,
+      "verifiedBytes": 44313,
+      "elapsedMs": 334,
+      "rendererGeneration": "588b5f2cff13237c2f14491cebee23d737066953d43b90120941ca591acc2cf2",
+      "alreadyInstalled": false,
+      "runtimeCopiedBytes": 21516792,
+      "runtimeAdmissionAndPeAuditMs": 12576,
+      "preparedRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5"
+    },
+    "v16-clean": {
+      "generation": "3609dd1b67e77a12a6c1641cfba7341fc1681af57bef503f7b9ce8d64dc8139f",
+      "verifiedFiles": 4742,
+      "verifiedBytes": 102130554,
+      "elapsedMs": 72925,
+      "rendererGeneration": "588b5f2cff13237c2f14491cebee23d737066953d43b90120941ca591acc2cf2",
+      "alreadyInstalled": true,
+      "runtimeCopiedBytes": 0,
+      "runtimeAdmissionAndPeAuditMs": 2498,
+      "preparedRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5"
+    }
+  },
+  "namedRepair": {
+    "scope": "Installed v16 LocalWorldSetup.beginShaderRepair and Handle.repairShaders, through the packaged PRoot under the app UID. Each run starts a separate owner, on source-bound verified MPQ ranges.",
+    "actions": [
+      {
+        "case": "pointer",
+        "action": "verified-existing",
+        "generation": "3609dd1b67e77a12a6c1641cfba7341fc1681af57bef503f7b9ce8d64dc8139f",
+        "importGeneration": "015bc80093dc01d7837ba5054a3de0343b30bf5c3bb37afc5bae651cef7e1ba5",
+        "outputFiles": 4742,
+        "outputBytes": 102130554,
+        "wineArchive": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+        "toolsManifest": "36e3032524c2136c4273908f887a1ca59ebb414e806f52d47e778332ed4acda6",
+        "package": "io.github.russianranger.esteria.stock",
+        "versionCode": 16,
+        "ownerClosed": true,
+        "uid": 10077,
+        "sdk": 33,
+        "abi": "arm64-v8a",
+        "elapsedMs": 760944
+      },
+      {
+        "case": "interrupted",
+        "action": "published-replacement",
+        "generation": "3609dd1b67e77a12a6c1641cfba7341fc1681af57bef503f7b9ce8d64dc8139f",
+        "importGeneration": "015bc80093dc01d7837ba5054a3de0343b30bf5c3bb37afc5bae651cef7e1ba5",
+        "outputFiles": 4742,
+        "outputBytes": 102130554,
+        "wineArchive": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+        "toolsManifest": "36e3032524c2136c4273908f887a1ca59ebb414e806f52d47e778332ed4acda6",
+        "package": "io.github.russianranger.esteria.stock",
+        "versionCode": 16,
+        "ownerClosed": true,
+        "uid": 10077,
+        "sdk": 33,
+        "abi": "arm64-v8a",
+        "elapsedMs": 1532038
+      }
+    ],
+    "completedCases": 2,
+    "postconditions": {
+      "sourceScope": "verified official shader ranges and scoped import journal",
+      "environment": "Android 13 ARM64 ReDroid",
+      "primaryAndScratchCompilerStagingDirectoriesCreated": 0,
+      "sealedDirectoryInodeActivated": true,
+      "originalReceiptAndAllOutputHashesVerified": true,
+      "sourceAndProviderPointersUnchanged": true,
+      "unrelatedPrivateMarkerUnchanged": true
+    }
+  },
+  "physicalThorQualified": false,
+  "playerDatabaseQualified": false,
+  "gameplayQualified": false
+}
