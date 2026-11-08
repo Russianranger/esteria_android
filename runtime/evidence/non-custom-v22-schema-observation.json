@@ -1,0 +1,58 @@
+{
+  "scope": "stock-schema-progress-observation-and-owned-helper-cleanup",
+  "formatVersion": 1,
+  "producer": "7084421f2faaf6ebe5f4ccc44fe8c5c5f91d99bc",
+  "branch": "non-custom",
+  "physicalReport": "non-custom-v21-thor-schema-interruption.json",
+  "physicalInitiatingException": "discarded by v21 cleanup; unknown",
+  "preservation": "Advisory progress read or JSON failure increments a bounded observation counter and the SQL child continues. Cancellation, process and service health, timeout, identity-bound completion, clean stop and promotion remain checked. Other errors retain the original exception with cleanup suppressed. Abandoned mutable staging is preserved; unverified DDL is never replayed or promoted.",
+  "host": {
+    "focusedTests": 71,
+    "fullTests": 1689,
+    "skipped": 148,
+    "failures": 0,
+    "retainedJournalObservationControls": [
+      "matching UUID exports phase, completed file count and pending flag",
+      "mismatched UUID omits journal facts",
+      "symlink refused",
+      "private sentinel never exported",
+      "no active slot selected"
+    ]
+  },
+  "linuxArm64": {
+    "runId": 42504462595,
+    "jobId": 128803985440,
+    "artifactId": 13627046321,
+    "qualificationSucceeded": true,
+    "cleanShutdownVerified": true,
+    "restartPersistenceVerified": true,
+    "worldserverExecuted": false
+  },
+  "apk": {
+    "packageRunId": 42504462662,
+    "packageJobId": 128804025419,
+    "packageArtifactId": 13626718443,
+    "comparison": {
+      "unsignedSha256": "08f1b7be98a2c8b83c3f6c3ecedd6ea0f9f1e89410d475c396b3b404e5a367e8",
+      "baselineSha256": "1036c59e2d6e75c95e2cc6918111dfa73f816b77e3cd56b729807787d9bfb11d",
+      "unchangedAssetEntries": 123,
+      "unchangedNativeLibraries": 4,
+      "unchangedProviderArchives": 8,
+      "identicalPayloadBytes": 340194487
+    },
+    "signed": {
+      "apkBytes": 336903449,
+      "apkSha256": "15f9241a643a37c7786723631cf9ef315ba657df933bc2d96c58a23207d6042b",
+      "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+      "debuggable": false,
+      "minSdk": 26,
+      "packageId": "io.github.russianranger.esteria.stock",
+      "targetSdk": 35,
+      "versionCode": 22,
+      "versionName": "0.1.0-non-custom.22"
+    },
+    "detachedRecipeReproducedIdenticalApk": true
+  },
+  "physicalV22Tested": false,
+  "graphicalEntryQualified": false
+}
