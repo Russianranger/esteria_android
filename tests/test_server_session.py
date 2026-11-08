@@ -104,6 +104,32 @@ class ServerSessionPreparationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'single-use'):owner.start()
         owner.close();self.assertTrue(owner.closed)
 
+    def test_interrupted_realm_start_preserves_two_argument_progress_observers(self):
+        from tests.test_interrupted_realm import RealmConnection
+
+        connection = RealmConnection(1)
+        (self.state / 'config').mkdir(mode=0o700)
+        journal = self.state / session.playerbots.JOURNAL
+        journal.write_bytes(b'fixture')
+        self.bots['journalIdentity'] = session.baseline.file_identity(journal)
+        self.mock(session.db, 'read_secret', lambda _: 'fixture')
+        self.mock(session.realm, 'active_config_verified', lambda *args, **kwargs: 'c' * 64)
+        observed = []
+        def progress(phase, process, **timing):
+            observed.append((phase, process, timing))
+
+        with session.db.state_lock(self.state) as lease:
+            prepared = self.prepare(state_lease=lease)
+            owner = session.Session(prepared, connection, self.root, lambda: True)
+            try:
+                with self.assertRaisesRegex(ValueError, 'startup cancelled'):
+                    owner.start(progress=progress, cancelled=lambda: connection.flag == '2')
+                self.assertEqual(observed, [('realm-offline-recovery', 'helper', {})])
+                self.assertEqual((connection.flag, connection.updates), ('2', 1))
+                self.assertIsNone(owner.auth)
+            finally:
+                owner.close()
+
     def test_world_cleanup_failure_retains_auth_and_configuration_dependency(self):
         from unittest.mock import Mock, MagicMock
         with session.db.state_lock(self.state) as lease:

@@ -43,6 +43,7 @@ on:
       - runtime/server_schema_baseline.py
       - runtime/server_schema_adaptations.py
       - runtime/provision_local_realm.py
+      - runtime/server_session.py
       - runtime/provision_local_account.py
       - runtime/owned_process_group.py
 permissions:
