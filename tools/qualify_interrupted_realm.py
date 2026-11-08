@@ -84,6 +84,61 @@ def disconnect_cancelled_writer(reader, mysql, options, state, service, uuid, le
                 'independent subsequent connection could not verify automatic rollback and named lock release')
 
 
+def pending_source_challenge(child, mysql, options, observer):
+    """Hold the source account table until the genuine C++ query is observably waiting beyond 1s."""
+    def require_owner():
+        require(child.alive() and child.error is None and processes.owns_loopback_listener(child.group, 3724),
+                'source auth listener changed while awaiting its real SQL reply')
+
+    def pending_account_reads():
+        # Both native connections authenticate as the original app SQL account, so this needs no
+        # PROCESS privilege. Process IDs and query texts never leave the disposable server.
+        pending = set()
+        for line in observer.query('SHOW FULL PROCESSLIST'):
+            fields = line.split('\t', 7)
+            if (len(fields) == 8 and fields[3] == 'acore_auth' and
+                    fields[6] in ('Waiting for table metadata lock', 'Waiting for table level lock') and
+                    'account' in fields[7].lower()):
+                pending.add(fields[0])
+        return pending
+
+    with db.Mysql(mysql, options) as blocker:
+        blocker.query('LOCK TABLES acore_auth.account WRITE')
+        released = False
+        pending_since = None
+        waits = []
+        try:
+            require(not pending_account_reads(), 'unrelated SQL blocker already present')
+            started = time.monotonic()
+            def check():
+                nonlocal released, pending_since
+                require_owner()
+                if released:
+                    return
+                pending = pending_account_reads()
+                if pending:
+                    require(len(pending) == 1, 'expected just the one genuine pending auth SQL statement')
+                    current = pending.pop()
+                    now = time.monotonic()
+                    if pending_since is None:
+                        pending_since = (current, now)
+                    require(current == pending_since[0], 'the original pending SQL connection changed')
+                    waits.append(now)
+                    if now - pending_since[1] > 1.15:
+                        blocker.query('UNLOCK TABLES')
+                        released = True
+            require(processes.auth_challenge(deadline=started + 12, check_pending=check),
+                    'original pending build-12340 reply was not observed')
+            require_owner()
+            require(released and len(waits) >= 2 and not pending_account_reads(),
+                    'same-connection delayed SQL qualification did not finish')
+            return dict(realSqlWaitSeconds=round(waits[-1]-waits[0],3), challengeElapsedSeconds=round(time.monotonic()-started,3),
+                        checkedPendingSqlSamples=len(waits), singleSourceRequestReturned=True, originalListenerRetained=True)
+        finally:
+            if not released:
+                blocker.query('UNLOCK TABLES')
+
+
 def probe(package, state, service, version, uuid, _record):
     selected, auth_pin = stock.selections(package)
     program = package / 'server-programs/bin/authserver'
@@ -101,8 +156,11 @@ def probe(package, state, service, version, uuid, _record):
         result['stages'].append(dict(phase=phase, elapsedSeconds=round(time.monotonic()-started, 3), **details))
         db.atomic_json(OUT, result)
 
-    require(result['serverSessionHelper'] == dict(bytes=33465, sha256='2ca345229b26e648dd324667d7910c73185bc29ab40bfc85f773e751c8aec1a8'),
+    require(result['serverSessionHelper'] == dict(bytes=33726, sha256='a7ed8fb8122bd3021a805ce2718db2ea82e86f8a8770bd9dd70d200c745885ef'),
             'native observer must call the exact reviewed production helper')
+    result['serverProcessHelper'] = stock.identity(Path(processes.__file__))
+    require(result['serverProcessHelper'] == dict(bytes=19208, sha256='269f5b28914ff72288cc213346366808e151a66165d9cf791cf8304b3495fd84'),
+            'native observer must call the exact reviewed challenge reader')
     record('verified-compiled-authserver-and-original-four-schema-reopen')
     mysql = Path('/usr/bin/mysql')
     secret = db.read_secret(state / 'accounts/database-secret')
@@ -191,6 +249,8 @@ def probe(package, state, service, version, uuid, _record):
                 # The fixture already issued a standalone source auth probe on attempt 1.
                 # Keep original logs and forward the contract's exact two sequential PE signals.
                 def client_probe(state, connection, intent, child, _number):
+                    delayed = pending_source_challenge(child, mysql, opts, connection)
+                    record('original-pending-auth-source-sql-challenge', attempt=attempt, **delayed)
                     return grunt.server_probe(state, connection, intent, child, attempt)
                 confirmed = stock.protocol_probe(state, mysql, version, program, auth_pin, config,
                                                   client_probe=client_probe, attempt=10+attempt)
