@@ -1,0 +1,55 @@
+{
+  "physicalDevice": "AYN Thor, Android 13 ARM64",
+  "bundle": "Esteria-support-1794147097987(1).zip",
+  "bundleSha256": "6dc736008568714d188ae68305e973dbe10a66376e8af2a40b6eeff385118d36",
+  "versionCode": 19,
+  "androidRevision": "c99dbaef634412729742e120d2457d5c7b8bf1a1",
+  "contentProfile": "stock-3.3.5a",
+  "preparationSpeed": "balanced",
+  "locale": "enUS",
+  "archiveCount": 16,
+  "errors": 0,
+  "warnings": 0,
+  "shaderRepair": {
+    "generation": "df7904e9ea9b0739e43c9f5321a91375ee991f734dcf480dff540d7f641d51b1",
+    "files": 4742,
+    "bytes": 102091054,
+    "elapsedSeconds": 245
+  },
+  "repair": {
+    "operation": "03f0b28e-c1a8-483d-9d8c-387916dedadd",
+    "reusedWorldAtSeconds": 32,
+    "reusedShadersAtSeconds": 37,
+    "databaseOwnerAtSeconds": 37,
+    "databaseInitializingAtSeconds": 65,
+    "databasePreparedAtSeconds": 77,
+    "failedAtSeconds": 93,
+    "pressure": 0,
+    "firstError": "Server content receipt has not been prepared",
+    "schemaInstallerLaunched": false,
+    "exportIncludesMysqlLogs": false,
+    "exportIncludesSlotJournal": false,
+    "cleanSqlStopVerified": false,
+    "corruptionEstablished": false
+  },
+  "contentGeneration": "ebdf3e2b2ec3766d18af0442cf01a228a6d9adba00e41a996af3089251d78edf",
+  "contentReceiptSha256": "1c00990e090e85af0232fe633b64e2718071a5f8e81f3b0ca1c8f2b214ffb3af",
+  "clientRepairCorrelation": {
+    "previousExecutable": "fa3e74b7f332fef0f212e954a0de18f685ead8bd",
+    "currentExecutable": "c05a3af9be6c204c40d65d0e3eb6ccc2442012b6",
+    "previousCopiedBytes": 21516792,
+    "currentCopiedBytes": 21517816,
+    "packageInstallExitRecordedAtMs": 1794101361859,
+    "sameVersionPersistentFailureEstablished": false
+  },
+  "hostControl": {
+    "environment": "Linux x86_64, OpenJDK 17, filesystem Context, actual v19 APK assets, two JVMs",
+    "baselineSource": "9b9a8af2cf95e2783524db653a831fb8414bd122",
+    "seedCopiedContentBytes": 654243888,
+    "freshProductionInputsError": "Server content receipt has not been prepared",
+    "fixedProducer": "43849475677fcad2befa965b988bad05d55969d7",
+    "freshVerifiedReceiptBytes": 1343739,
+    "serverArchiveReinstalled": false,
+    "sqlRunInThisControl": false
+  }
+}
