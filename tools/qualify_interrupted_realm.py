@@ -64,6 +64,8 @@ def probe(package, state, service, version, uuid, _record):
         result['stages'].append(dict(phase=phase, elapsedSeconds=round(time.monotonic()-started, 3), **details))
         db.atomic_json(OUT, result)
 
+    require(result['serverSessionHelper'] == dict(bytes=33388, sha256='5ac999c21443a483fc4070011aad4ea53cd0f37603a3a52e6e51a977223385cc'),
+            'native observer must call the exact reviewed production helper')
     record('verified-compiled-authserver-and-original-four-schema-reopen')
     mysql = Path('/usr/bin/mysql')
     secret = db.read_secret(state / 'accounts/database-secret')
@@ -99,18 +101,18 @@ def probe(package, state, service, version, uuid, _record):
             before_flag = sql.query(FLAG)
             with db.state_lock(state) as lease, realm.config_lock(state):
                 saw_uncommitted_fix = []
-                def cancel():
-                    require(verify(), 'source SQL owner lost')
+                def cancel_after_update():
                     if sql.query(FLAG) == ['2']:
                         saw_uncommitted_fix.append(True)
-                        raise InterruptedError('intentional cancellation before committing the real flag repair')
-                    return True
-                try:
-                    session.recover_interrupted_realm(sql, state, uuid, cancel, state_lease=lease)
-                except InterruptedError:
-                    pass
-                else:
-                    raise ValueError('cancellation did not reach the source verification boundary')
+                        return True
+                    return False
+                for cancelled in (lambda: True, cancel_after_update):
+                    try:
+                        session.recover_interrupted_realm(sql, state, uuid, verify, state_lease=lease, cancelled=cancelled)
+                    except ValueError as error:
+                        require(str(error) == 'Owned server startup cancelled', 'unexpected cancellation boundary')
+                    else:
+                        raise ValueError('production cancellation did not stop recovery')
                 require(saw_uncommitted_fix == [True] and sql.query(FLAG) == before_flag and preserved(sql, state) == before,
                         'cancelled operation mutated the realm, private state, account or ledgers')
             with db.state_lock(state) as lease, realm.config_lock(state):
@@ -122,7 +124,7 @@ def probe(package, state, service, version, uuid, _record):
                         and verify() and sql.query(FLAG) == ['2'] and preserved(sql, state) == before,
                         'later clean reentry repeated recovery or changed protected rows')
                 record('cancel-and-reenter-original-owned-database', attempt=attempt, beforeFlag=int(before_flag[0]),
-                       rolledBackAfterObservedUncommittedWrite=True,
+                       preMutationCancelObserved=True, rolledBackAfterObservedUncommittedWrite=True,
                        recoveredFlag=2, unchangedReentryWrote=False, preservedCredsAccountsRealmFieldsAndFourLedgers=True)
 
                 # Try an unrelated flag and a combined unknown transition on the disposable row inside an

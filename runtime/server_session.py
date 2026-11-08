@@ -210,8 +210,9 @@ class Control:
 
 
 def recover_interrupted_realm(connection, state, expected_uuid, verify_service, *, state_lease=None,
-                              progress=lambda *args: None):
+                              progress=lambda *args: None, cancelled=lambda: False):
     """Before auth starts, recover the selected world's two transient flags under its existing ownership."""
+    require(not cancelled(), 'Owned server startup cancelled')
     require(state_lease is not None, 'Retained stock session state lease required')
     flag_sql = 'SELECT `flag` FROM `acore_auth`.`realmlist` WHERE `id`=1'
     with db.state_scope(state, state_lease):
@@ -232,10 +233,12 @@ def recover_interrupted_realm(connection, state, expected_uuid, verify_service, 
                 ids = connection.query('SELECT `id` FROM `acore_auth`.`realmlist` ORDER BY `id` FOR UPDATE')
                 require(ids == ['1'] and connection.query(realm.ROW_SQL + ' FOR UPDATE') == [realm.EXPECTED_ROW] and
                         connection.query(flag_sql + ' FOR UPDATE') == flags, 'Interrupted singleton stock realm selection differs')
+                require(not cancelled(), 'Owned server startup cancelled')
                 # Keep the realm offline. Only the real world's normal readiness path can advertise it online.
                 connection.query('UPDATE `acore_auth`.`realmlist` SET `flag`=2 WHERE `id`=1 AND `flag` IN (1,3)')
                 require(connection.query(flag_sql) == ['2'] and verify_service() is not False,
                         'Owned interrupted realm could not be restored offline')
+                require(not cancelled(), 'Owned server startup cancelled')
                 connection.query('COMMIT')
             except BaseException:
                 connection.query('ROLLBACK')
@@ -303,7 +306,7 @@ class Session:
         _programs(selected.programs)
         self._check()
         recovered = recover_interrupted_realm(self.connection, selected.state, selected.uuid, self.verify_service,
-                                              state_lease=selected.state_lease, progress=progress)
+                                              state_lease=selected.state_lease, progress=progress, cancelled=cancelled)
         require(not cancelled(), 'Owned server startup cancelled')
         deadline = time.monotonic() + timeout
         progress('native-launch', 'authserver', native=True)
