@@ -17,6 +17,37 @@ def shell(*command):
     return subprocess.check_output(['docker', 'exec', CONTAINER, *command], text=True).strip()
 
 
+
+def platform_environment():
+    zygote = shell('pidof', 'zygote64')
+    assert re.fullmatch('[1-9][0-9]*', zygote)
+    environment = subprocess.check_output(['docker', 'exec', CONTAINER, 'cat', f'/proc/{zygote}/environ'])
+    boot = [item.decode() for item in environment.split(b'\0') if item.partition(b'=')[0].decode() in BOOT]
+    assert any(item.startswith('BOOTCLASSPATH=') for item in boot)
+    return boot
+
+
+def android_tool(*command, timeout=90):
+    """Docker exec starts outside Android init's environment. Java platform tools require its ART boot paths."""
+    result = subprocess.run(['docker', 'exec', CONTAINER, '/system/bin/env', *platform_environment(), *command],
+                            text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=timeout)
+    if result.returncode:
+        raise RuntimeError(f'{command[0]} returned {result.returncode}: {result.stdout[-1600:]}')
+    return result.stdout
+
+
+def interface_qualification(output):
+    shell('pm', 'grant', PACKAGE, 'android.permission.POST_NOTIFICATIONS')
+    android_tool('input', 'keyevent', 'KEYCODE_WAKEUP')
+    shell('wm', 'dismiss-keyguard')
+    result = android_tool('am', 'instrument', '-w', '-r', '-e', 'class',
+                          'io.github.russianranger.esteria.RealmInterfaceTest',
+                          PACKAGE + '.test/androidx.test.runner.AndroidJUnitRunner', timeout=150)
+    Path(output).write_text(result)
+    if 'OK (1 test)' not in result or 'INSTRUMENTATION_CODE: -1' not in result:
+        raise RuntimeError('Android interface instrumentation failed: ' + result[-2400:])
+
+
 def install(name, version):
     path = '/data/local/tmp/esteria-signed-update.apk'
     shell('cp', '/esteria-qa/input/' + name, path)
@@ -38,11 +69,7 @@ def run(phase, uid):
     apk = shell('pm', 'path', PACKAGE).removeprefix('package:')
     assert re.fullmatch(r'/data/app/[A-Za-z0-9_./=+~-]+/base\.apk', apk)
     native = apk.rsplit('/', 1)[0] + '/lib/arm64'
-    zygote = shell('pidof', 'zygote64')
-    assert re.fullmatch('[1-9][0-9]*', zygote)
-    environment = subprocess.check_output(['docker', 'exec', CONTAINER, 'cat', f'/proc/{zygote}/environ'])
-    boot = [item.decode() for item in environment.split(b'\0') if item.partition(b'=')[0].decode() in BOOT]
-    assert any(item.startswith('BOOTCLASSPATH=') for item in boot)
+    boot = platform_environment()
     classpath = '/esteria-qa/input/observer.jar:' + apk
     if phase.startswith('debug-'):
         test_apk = shell('pm', 'path', PACKAGE + '.test').removeprefix('package:')
@@ -63,6 +90,9 @@ def run(phase, uid):
 
 
 if __name__ == '__main__':
+    if sys.argv[2:] == ['interface']:
+        interface_qualification(sys.argv[1])
+        sys.exit(0)
     if sys.argv[2:] == ['debug']:
         uid = installed_uid()
         for phase in ('debug-seed', 'debug-repair', 'debug-cold', 'debug-cold', 'debug-cold'):

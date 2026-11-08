@@ -158,9 +158,6 @@ jobs:
           python3 tools/retained_database/device.py evidence/signed-update.jsonl v23
           # Disposable package with synthetic SQL. Capture only the launcher's original artwork.
           docker exec "$redroid_name" pm grant io.github.russianranger.esteria.stock android.permission.POST_NOTIFICATIONS
-          docker exec "$redroid_name" input keyevent KEYCODE_WAKEUP
-          docker exec "$redroid_name" wm dismiss-keyguard
-          docker exec "$redroid_name" am start -W -n io.github.russianranger.esteria.stock/io.github.russianranger.esteria.MainActivity
           python3 tools/retained_database/launcher_export.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

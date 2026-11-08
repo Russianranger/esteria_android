@@ -754,10 +754,7 @@ jobs:
             device chmod 644 "/data/local/tmp/$apk.apk"
             device pm install -t --user 0 "/data/local/tmp/$apk.apk" | grep -Fx Success
           done
-          device pm grant io.github.russianranger.esteria.stock android.permission.POST_NOTIFICATIONS
-          device am instrument -w -e class io.github.russianranger.esteria.RealmInterfaceTest \
-            io.github.russianranger.esteria.stock.test/androidx.test.runner.AndroidJUnitRunner | tee evidence/interface.txt
-          grep -F 'OK (1 test)' evidence/interface.txt
+          python3 tools/retained_database/device.py evidence/interface.txt interface
           python3 tools/retained_database/device.py evidence/results.jsonl debug
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

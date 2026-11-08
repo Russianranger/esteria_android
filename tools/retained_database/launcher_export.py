@@ -8,14 +8,14 @@ import time
 import xml.etree.ElementTree as ET
 import zipfile
 
-from device import CONTAINER, PACKAGE, shell
+from device import CONTAINER, PACKAGE, android_tool, shell
 
 
 def visible(match, seconds=45):
     deadline = time.monotonic() + seconds
     while time.monotonic() < deadline:
         try:
-            shell('uiautomator', 'dump', '/data/local/tmp/realm-ui.xml')
+            android_tool('uiautomator', 'dump', '/data/local/tmp/realm-ui.xml')
             root = ET.fromstring(shell('cat', '/data/local/tmp/realm-ui.xml'))
             for node in root.iter('node'):
                 if match(node.attrib):
@@ -30,7 +30,7 @@ def tap(node):
     bounds = re.fullmatch(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]', node['bounds'])
     assert bounds
     x, y, right, bottom = map(int, bounds.groups())
-    shell('input', 'tap', str((x + right) // 2), str((y + bottom) // 2))
+    android_tool('input', 'tap', str((x + right) // 2), str((y + bottom) // 2))
 
 
 def label(value):
@@ -38,6 +38,9 @@ def label(value):
 
 
 def main():
+    android_tool('input','keyevent','KEYCODE_WAKEUP')
+    shell('wm','dismiss-keyguard')
+    shell('cmd','activity','start-activity','-W','-n',PACKAGE+'/io.github.russianranger.esteria.MainActivity')
     label('Start local game')
     with Path('evidence/realm-launcher.png').open('wb') as output:
         subprocess.run(['docker', 'exec', CONTAINER, 'screencap', '-p'], stdout=output, check=True, timeout=20)
