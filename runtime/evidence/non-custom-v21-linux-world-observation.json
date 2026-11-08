@@ -112,5 +112,13 @@
   "worldListenerObserved": false,
   "gameplayObserved": false,
   "nativeFullDataRun": 42491096080,
-  "notes": "The Linux harness originally allowed 100 seconds for the service worker. Authenticated readiness in the retained TCG diagnostic took 138.942 seconds. No production timeouts or data checks were relaxed."
+  "notes": "The Linux harness originally allowed 100 seconds for the service worker. Authenticated readiness in the retained TCG diagnostic took 138.942 seconds. No production timeouts or data checks were relaxed.",
+  "nativeFullDataLastObserved": {
+    "run": 42491096080,
+    "job": 128763430075,
+    "observedAtUtc": "2026-11-08T16:20:27Z",
+    "completeOfficialZipAndProductionImport": "success",
+    "offlineStockDbcMapCameraVmapMmapGeneration": "in_progress",
+    "worldListenerObserved": false
+  }
 }
