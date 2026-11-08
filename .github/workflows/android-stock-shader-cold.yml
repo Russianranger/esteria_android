@@ -1,0 +1,27 @@
+name: Native Android stock shader preparation
+on:
+  push:
+    branches: [qa/android-arm64-kernel, non-custom]
+permissions:
+  contents: read
+jobs:
+  boot:
+    if: github.repository == 'Russianranger/esteria_android' && contains(github.event.head_commit.message, '[boot native Android]')
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Boot pinned, offline ARM64 Android and query PackageManager
+        shell: bash
+        run: |
+          set -euo pipefail
+          work=$(mktemp -d "$RUNNER_TEMP/esteria-boot.XXXXXX")
+          source tools/android_stock_shader/redroid.sh
+          trap 'redroid_stop "$work"' EXIT
+          redroid_start "$work"
+          echo "SDK=$(docker exec "$redroid_name" /system/bin/getprop ro.build.version.sdk)"
+          echo "ABI=$(docker exec "$redroid_name" /system/bin/getprop ro.product.cpu.abi)"
+          echo "SELinux=$(docker exec "$redroid_name" /system/bin/getenforce)"
+          echo 'PackageManager and installed app_process64 are ready with loopback only'
