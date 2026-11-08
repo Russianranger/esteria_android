@@ -1,0 +1,28 @@
+{
+  "actualInstallOverQualified": false,
+  "deviceCandidateQualified": false,
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "inputApkSha256": "e9f8a8d11c6f7ab37be4f5f6cfc82d4096d20ab3fa13603380b19983d438d5ff",
+  "payloadPreserved": true,
+  "persistentSigningIdentityVerified": true,
+  "previousPublished": {
+    "apkSha256": "dc68c5ced8f0f4a155d86135f70a8522766e483957df06e0ce5544d488ac2ace",
+    "versionCode": 17
+  },
+  "publicSigningLockSha256": "5faee5239d8d0bb311216132ffd38bb2bb58980e0b55fd3a02ac8399163dff54",
+  "qualificationOnly": false,
+  "scope": "apk-signature-and-update-identity",
+  "sdkBuildToolsVersion": "35.0.0",
+  "signedApk": {
+    "apkBytes": 336899353,
+    "apkSha256": "60a90c58dfc211c53928853dbbebd04929668da69d46d4c0a027c143f6857eb6",
+    "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+    "debuggable": false,
+    "minSdk": 26,
+    "packageId": "io.github.russianranger.esteria.stock",
+    "targetSdk": 35,
+    "versionCode": 18,
+    "versionName": "0.1.0-non-custom.18"
+  }
+}
