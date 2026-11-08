@@ -1,0 +1,139 @@
+{
+  "acquisitionRetries": [
+    {
+      "attempt": 1,
+      "phase": "Temurin resolver HTTP 504",
+      "run": 42464194945
+    },
+    {
+      "attempt": 2,
+      "phase": "v18 public browser asset route HTTP 504",
+      "run": 42464194945
+    },
+    {
+      "phase": "Gradle distribution GitHub CDN HTTP 504",
+      "run": 42464541083
+    }
+  ],
+  "actualInstalledSelectedApk": true,
+  "apkProducer": "c99dbaef634412729742e120d2457d5c7b8bf1a1",
+  "artifact": {
+    "bytes": 6480,
+    "digest": "sha256:556837699e32075ef57c84518b2dbf0b5afb39d9289df40cc682794d56a58de7",
+    "id": 13612175659
+  },
+  "baselineApkSha256": "60a90c58dfc211c53928853dbbebd04929668da69d46d4c0a027c143f6857eb6",
+  "characterPersistenceQualified": false,
+  "environment": "redroid/redroid_arm64_only/redroid_arm64_only:13/TQ3A.230805.001.S1/eng.frank.20240527.134411:userdebug/test-keys",
+  "formatVersion": 1,
+  "graphicalLogin": false,
+  "initialGruntSeedElapsedSeconds": 555.606,
+  "job": 128683997091,
+  "matchingOfflineAndGeneratedClasspathObserver": true,
+  "modes": [
+    {
+      "activeMysqlStartupMs": 4270,
+      "cleanShutdownMs": 808,
+      "clientProviderCopyBytes": 21516792,
+      "clientReceiptSha256": "c449f5973b055ca758c1701fa385b3ebdc0af945a916cef8639cc5ccfd872457",
+      "gruntViewCopyBytes": 21352448,
+      "mode": "seed18",
+      "reconstructedPeSha256": "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317",
+      "retainedPrefixSelection": "NO_REPAIR",
+      "schemaSetupOrSelectionMs": 444053,
+      "serverProviderCopyBytes": 1131934277,
+      "versionCode": 18,
+      "wineCopyBytes": 1325744204
+    },
+    {
+      "activeMysqlStartupMs": 2008,
+      "cleanShutdownMs": 1483,
+      "clientProviderCopyBytes": 21517816,
+      "clientReceiptSha256": "7eb8279150263f74224ec6b219351abadbdda9305ca0b3c78f7e8ed6d39da195",
+      "gruntViewCopyBytes": 20787200,
+      "mode": "cold",
+      "reconstructedPeSha256": "e224cc5611511e47c3e4f20fa8c401419f9b9d2fc648a70908be58ca204aa561",
+      "retainedPrefixSelection": "NO_REPAIR",
+      "schemaSetupOrSelectionMs": 263,
+      "serverProviderCopyBytes": 0,
+      "versionCode": 19,
+      "wineCopyBytes": 0
+    },
+    {
+      "activeMysqlStartupMs": 2161,
+      "cleanShutdownMs": 2775,
+      "clientProviderCopyBytes": 0,
+      "clientReceiptSha256": "d49d99235845af60859b0f7ee9d7cf2cc6632997e3624c58ecf21d176ab6f6a5",
+      "gruntViewCopyBytes": 0,
+      "mode": "warm",
+      "reconstructedPeSha256": "e224cc5611511e47c3e4f20fa8c401419f9b9d2fc648a70908be58ca204aa561",
+      "retainedPrefixSelection": "NO_REPAIR",
+      "schemaSetupOrSelectionMs": 266,
+      "serverProviderCopyBytes": 0,
+      "versionCode": 19,
+      "wineCopyBytes": 0
+    }
+  ],
+  "mutableWorldDataQualified": false,
+  "observedCommonMain": false,
+  "oldAndNewCodecSameViewInode": true,
+  "ownerCertificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+  "packageUpdate": {
+    "gameplayQualified": false,
+    "launcherComponent": "io.github.russianranger.esteria.stock/io.github.russianranger.esteria.MainActivity",
+    "launcherPid": 3845,
+    "launcherProcessVerified": true,
+    "launcherStatus": "ok",
+    "launcherStopped": true,
+    "launcherWaitMs": 475,
+    "package": "io.github.russianranger.esteria.stock",
+    "phase": "launcher-closed",
+    "physicalThor": false,
+    "postLauncherUidProcesses": 0,
+    "scope": "disposable Android 13 signed v19 package lifecycle",
+    "uid": 10077,
+    "versionCode": 19,
+    "versionName": "0.1.0-non-custom.19"
+  },
+  "physicalThor": false,
+  "priorSeedAttempt": {
+    "artifact": 13611551785,
+    "artifactBytes": 1252,
+    "artifactSha256": "0995fe51943caf05c8a9bba415cbb4a4a04707d36e2301b35efe0579158d3e43",
+    "exceptionClass": "java.io.IOException",
+    "exitCode": 137,
+    "furtherSpecificCauseUnconfirmed": true,
+    "job": 128681865670,
+    "phase": "fresh schema baseline; observed schema-file-complete",
+    "run": 42464850118,
+    "signedVersionCode": 18
+  },
+  "qaObserverDexSha256": "ba88149fdd56be28413f8879c265af7fb2e4a643fef8207cb4aec85c051d2355",
+  "run": 42465517207,
+  "sameInstallTimeAndUid": true,
+  "sameSqlUuidAndPromotedSlot": true,
+  "scope": "signed Android 13 ARM64 PM update and offline SRP/realm list against the owned stock database",
+  "selectedInstallViewRetained": true,
+  "signedApkSha256": "c0d251847496c64170bb31d534a925afd1d8e7f92c21687e0e1cbf82c056e6fa",
+  "signedUpdateElapsedSeconds": 46.886,
+  "testRevision": "e9553fe7f0035a3336693046368c6ad7034ab344",
+  "threeDistinctGruntReceipts": true,
+  "threeOwnedLoopbackSrpAndRealmLists": true,
+  "warmControlledSql": {
+    "allControlledClientsReaped": true,
+    "cancelReturnSeconds": 0.402,
+    "cancelledOutstandingColdRead": true,
+    "firstAuthenticatedDelayedResponseSeconds": 4.296,
+    "helperSha256": {
+      "mysql_bootstrap.py": "212bf5bae4c947c57069fe7e816be1c2c1fad6869ef378fc609df359c7f50f2e",
+      "mysql_service.py": "55fd55b11c614794929330a92f8b19637c8e02c3471c319f5e9429346fa716d4"
+    },
+    "inducedServerSleepSeconds": 4.25,
+    "normalStartupMeasurement": false,
+    "sameCliInducedTimeoutSeconds": 3.001,
+    "sameCliNormalResponseSeconds": 0.001,
+    "sameRealEngineAfterCancellation": true,
+    "scope": "controlled-delay-on-real-first-CLI-result",
+    "threeSecondWarmCapObserved": true
+  }
+}

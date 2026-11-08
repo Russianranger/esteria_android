@@ -1,0 +1,339 @@
+{
+  "android13X86Instrumentation": {
+    "artifact": 13611085062,
+    "artifactIdentity": {
+      "bytes": 26635,
+      "sha256": "67bd39b039453944ad8e73f6efe5ae8fa4cada3a928ffb1584d6801e2bc5e18d"
+    },
+    "components": {
+      "import-memory": 14,
+      "preparation-controls": 4,
+      "python-receipt": 3,
+      "saf-import": 3,
+      "stock-shader": 2
+    },
+    "countsAsReportedByNamedComponents": 26,
+    "job": 128674553941,
+    "ownerSigningIdentityTestedByX86Job": false,
+    "run": 42462482436,
+    "runtimeFilesystemQualified": true,
+    "sameJobDebugKeyUpdate": true,
+    "singleTestTranscripts": [
+      "actualBundledHelpersInstallAndRepeatWithoutRewriting",
+      "changedExistingHelperIsPreservedAndRefused",
+      "completeDataHelperClosureInstallsAndReusesExactBytes",
+      "completeInstallationHelperClosureInstallsAndReusesExactBytes",
+      "completeSessionHelperClosureInstallsAndReusesExactBytes",
+      "expectedHelperSymlinkNeverReplacesOrWritesItsTarget",
+      "extraModulesNativeExtensionsAndCachesCannotEnterImportPath",
+      "linkedResourceDirectoryIsPreservedAndRefused",
+      "nestedOriginalSourcesInstallAndResumeWithoutRewriting",
+      "partialGenerationResumesAndRetainsHarmlessInterruptedWrite",
+      "privateDataMetadataBindingRejectsChangedAncestryAndQualificationClaims",
+      "privateLocalLoginHandoffContracts",
+      "runtimeContracts",
+      "seedBeforeUpdate",
+      "temporarySymlinkDoesNotBypassClosure",
+      "unexpectedNestedModuleIsPreservedAndRefused",
+      "verifyAfterUpdate"
+    ]
+  },
+  "branch": "non-custom",
+  "clientRevision": "c05a3af9be6c204c40d65d0e3eb6ccc2442012b6",
+  "detachedStaging": {
+    "artifact": 13610931477,
+    "artifactBytes": 6285,
+    "artifactSha256": "667262d99ad5db3ad91a0343242be1df9bddf598f250adeee0217414d640a83c",
+    "job": 128678343619,
+    "publicationEvidenceAndReleaseAndSigningReceiptMatchPublicBytes": true,
+    "revision": "17506ec8df7a57847d72b03f3972d8eee88d4a45",
+    "run": 42463728583,
+    "signedUpdateAndroid13": {
+      "baselineApk": {
+        "apkBytes": 336899353,
+        "apkSha256": "60a90c58dfc211c53928853dbbebd04929668da69d46d4c0a027c143f6857eb6",
+        "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+        "debuggable": false,
+        "minSdk": 26,
+        "packageId": "io.github.russianranger.esteria.stock",
+        "targetSdk": 35,
+        "versionCode": 18,
+        "versionName": "0.1.0-non-custom.18"
+      },
+      "buildFingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+      "characterPersistenceQualified": false,
+      "databaseSchemaQualified": false,
+      "emulatorAbis": [
+        "x86_64"
+      ],
+      "fixtureDataOnly": true,
+      "formatVersion": 1,
+      "gameplayQualified": false,
+      "installDiagnostic": "Performing Streamed Install\nadb: failed to install /home/runner/work/_temp/signed-stock-baseline.apk: Failure [INSTALL_FAILED_NO_MATCHING_ABIS: INSTALL_FAILED_NO_MATCHING_ABIS: Failed to extract native libraries, res=-113]",
+      "packageManagerUpdateExecuted": false,
+      "scope": "android13-emulator-signed-apk-filesystem-update",
+      "sourceCommit": "c99dbaef634412729742e120d2457d5c7b8bf1a1",
+      "status": "skipped-incompatible-emulator-abi",
+      "thorQualified": false,
+      "updateApk": {
+        "apkBytes": 336899353,
+        "apkSha256": "c0d251847496c64170bb31d534a925afd1d8e7f92c21687e0e1cbf82c056e6fa",
+        "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+        "debuggable": false,
+        "minSdk": 26,
+        "packageId": "io.github.russianranger.esteria.stock",
+        "targetSdk": 35,
+        "versionCode": 19,
+        "versionName": "0.1.0-non-custom.19"
+      }
+    }
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "hostPythonTests": {
+    "arm64CompilerInvocations": 26,
+    "command": "python -B -m unittest discover -s tests -v",
+    "comparisonToV18": {
+      "newSkips": {},
+      "resolvedSkips": {
+        "requires exact client checkout and upstream Xvid archive": 1,
+        "requires exact measured client artifact and pinned source checkout": 2
+      },
+      "source": "075ed711bd8be7aaeac8bdfca2be8c607afb8f4b"
+    },
+    "elapsedSeconds": 236.43,
+    "environment": "Linux x86-64, JDK 17.0.13+11 and Ninja 1.12.1. Pinned extractor sources, source client + Windows ARM64 ZIP 471ee42, Xvid, Wine virtual.c and actual stock ARM64 glslangValidator through QEMU user emulation.",
+    "failureCause": "The differential test sends the inputs to different output directories. The actual compiler records those different source paths in its assembly listing. The test compares the complete listing bytes.",
+    "failureTest": "test_shader_memory_adapter.ShaderMemoryAdapter.test_original_manifest_index_glsl_and_companion_bytes_match",
+    "failures": 1,
+    "fixtureCorrection": {
+      "arm64CompilerInvocations": 34,
+      "change": "Reused the same compiler input and output paths across runs. Compared a complete in-memory snapshot of all first-run files to all second-run files.",
+      "changedPath": "tests/test_shader_memory_adapter.py",
+      "commit": "c7625ee24182bfc850a3738c8b53cd69c93f7fb3",
+      "completeAffectedModulePassed": true,
+      "correctedHostLogSha256": "f567c5a52f8a29fc825027cde4cb4aea3c249131e0aa253b5601e778224af8b7",
+      "elapsedSeconds": 52.31,
+      "fullCorrectedDiscoveryRun": false,
+      "moduleTests": 11,
+      "resourceUse": {
+        "minimumConservativeHeadroom": 4788617216,
+        "ownCap": 251658240,
+        "peakOwnedRss": 155000832,
+        "returncode": 0
+      },
+      "targetedDifferentialPassed": true,
+      "testsExecutedIncludingStandaloneRepeat": 12
+    },
+    "hostRawLogSha256": "b1b278e806cfbfe7ea2170e7ea12c24a48f77322c88b7522925c31b226943789",
+    "initialRun": {
+      "cause": "Native ARM64 compiler cannot execute directly on the x86-64 host. Selected QEMU dispatch for this binary before the complete rerun.",
+      "failures": 5
+    },
+    "passed": 1624,
+    "resourceUse": {
+      "minimumConservativeHeadroom": 5232320512,
+      "ownCap": 671088640,
+      "peakOwnedRss": 327954432,
+      "returncode": 1
+    },
+    "skips": 51,
+    "skipsByReason": {
+      "Managed host child/socket proc projection differs; no actual inode ownership proof claimed": 1,
+      "This host denies AF_UNIX creation; actual socket qualification requires CI": 3,
+      "actual SDK/pre-existing disposable key not supplied": 2,
+      "actual prepared revision recipe and host CMake not supplied": 1,
+      "exact NDK fixture not supplied": 1,
+      "exact NDK toolchain fixture not supplied": 15,
+      "exact local NDK ELF fixture not supplied": 1,
+      "exact local NDK toolchain fixture not supplied": 2,
+      "exact original source package not supplied": 1,
+      "exact retained engine/source inputs not supplied": 1,
+      "exact retained extractor inputs not supplied": 2,
+      "exact retained isolated preparation not supplied": 1,
+      "isolated real MySQL fixture not enabled": 1,
+      "pinned canonical SQL unavailable; actual gate verifies bytes before import": 1,
+      "pinned source checkout unavailable; actual SQL gate verifies bytes before import": 1,
+      "real SDK/key fixture not supplied; no key is generated": 3,
+      "requires actual pinned server C++ SRP6 reference binary": 2,
+      "requires actual source-built ConfigMgr module reference": 2,
+      "requires actual source-built ConfigMgr reference executable": 1,
+      "requires actual source-built probe provider": 1,
+      "requires actual source-built x64 probe": 2,
+      "requires exact measured reconstructed-client artifact and clean checkout": 1,
+      "requires explicit disposable real MySQL 8 binaries": 1,
+      "requires explicit disposable real MySQL 8 realm fixture": 1,
+      "requires explicit disposable real MySQL 8 service": 1,
+      "requires pinned server Git objects": 1,
+      "requires pinned server checkout and actual CMake": 1
+    },
+    "source": "c99dbaef634412729742e120d2457d5c7b8bf1a1",
+    "tests": 1676
+  },
+  "nativeSql": {
+    "artifact": 13609904233,
+    "artifactIdentity": {
+      "bytes": 14239,
+      "sha256": "50cdecdab27b6f7ab3fbae2a8d1300aeb1ced838aa7be4fc84f9fd5e215fd62a"
+    },
+    "cleanStop": true,
+    "firstMysqlReadyMs": 802,
+    "job": 128674553853,
+    "mysqlRestartPersistenceVerified": true,
+    "newMysqlInitializationMs": 5114,
+    "playerbotsFinishExecuted": true,
+    "qualified": true,
+    "restartedMysqlReadyMs": 1104,
+    "run": 42462482424
+  },
+  "originalAdditivePublication": {
+    "evidenceArtifact": 13611768719,
+    "evidenceIdentity": {
+      "bytes": 6418,
+      "sha256": "83f72bafd252e766ccf73a6ff32f6a5e5781ef791c98fa70af5cb1e04bf95619"
+    },
+    "job": 128688628698,
+    "originalFirstAttempt": {
+      "cause": "Temurin setup received HTTP 504 before publication; zero draft mutations",
+      "jobs": [
+        128687244162,
+        128687606710
+      ],
+      "run": 42466531822
+    },
+    "publishedId": 438145844,
+    "publisherNeverOverwrites": true,
+    "revision": "6d6795d5409dff450a4d44bdd905e9d384d9f0be",
+    "run": 42466977377
+  },
+  "package": {
+    "artifact": 13609629822,
+    "artifactIdentity": {
+      "bytes": 336905382,
+      "sha256": "8f9ca2bfb42fe091d1764b5c6350be01e63a3d76f628afd5cffcd537eed23267"
+    },
+    "inputUnsignedApkSha256": "abadb296d9e512eea3508854db038ab996979c3ba23d87cfe1706b2ef16e60fa",
+    "job": 128674579283,
+    "nativeShaderTranslationJob": 128674579230,
+    "requiredStepsSucceeded": true,
+    "run": 42462482257,
+    "verifiedPayloadChangesAndFrozenProviders": {
+      "addedAssetFiles": [],
+      "baselineApkSha256": "60a90c58dfc211c53928853dbbebd04929668da69d46d4c0a027c143f6857eb6",
+      "baselineVersionCode": 18,
+      "candidateVersionCode": 19,
+      "changedAssetFiles": [
+        "assets/client-runtime/client-arm64.archive",
+        "assets/client-runtime/provider.json",
+        "assets/client-runtime/renderer-compatibility.json"
+      ],
+      "clientArchiveChanges": {
+        "bin/WowClient64.exe": {
+          "new": {
+            "bytes": 20787200,
+            "sha256": "e224cc5611511e47c3e4f20fa8c401419f9b9d2fc648a70908be58ca204aa561"
+          },
+          "old": {
+            "bytes": 20786176,
+            "sha256": "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317"
+          }
+        },
+        "client-runtime.json": {
+          "new": {
+            "bytes": 3313,
+            "sha256": "147280dc8283de6261b6c1cddd0954e258fb869efa85a430011336d4ce8c8c49"
+          },
+          "old": {
+            "bytes": 3313,
+            "sha256": "35f56a0848f8875c5f6e1b7909cbe6d585f50b455a554fd7ee5de1c677565e52"
+          }
+        },
+        "metadata/client-build.json": {
+          "new": {
+            "bytes": 2803,
+            "sha256": "2ec0cf98bb42215bd1a8cc71aeba0504b14b5cc0578a5f38db8c2ab44e7270c5"
+          },
+          "old": {
+            "bytes": 2803,
+            "sha256": "4df04bde49c4f5b25506c572aac60ad9a4ee720b343b08afcf7f8924d0b179a9"
+          }
+        },
+        "metadata/sources.lock.json": {
+          "new": {
+            "bytes": 2162,
+            "sha256": "b770679b2c5daf8a86ef8022c6050047ab00c4ed7b0edbbd09acd5c46f0eaf87"
+          },
+          "old": {
+            "bytes": 2162,
+            "sha256": "4daef14068f010ce31a05512f67ec62ee2e1927156187306cc8da018f91a6a67"
+          }
+        }
+      },
+      "formatVersion": 1,
+      "removedAssetFiles": [],
+      "reviewedApkAssetChanges": {
+        "assets/client-runtime/client-arm64.archive": {
+          "new": {
+            "bytes": 7314685,
+            "sha256": "954ce4974672dc6fdab666d44d56abbe253199128fda9ccfaa39f09826cc65e9"
+          },
+          "old": {
+            "bytes": 7314759,
+            "sha256": "a413045a85ea84d31cdaa8008f381540442f2d0de9df0fa4fe20c9695edc5086"
+          }
+        },
+        "assets/client-runtime/provider.json": {
+          "new": {
+            "bytes": 6867,
+            "sha256": "94605fd84350631bff8784e7741bfc38af2eee764fe23988a00f9b1141eb3694"
+          },
+          "old": {
+            "bytes": 6867,
+            "sha256": "6d84dd92daca74ee3bfdb46e288a0e043a63e8b00a74a13901d7b016375bc3dc"
+          }
+        },
+        "assets/client-runtime/renderer-compatibility.json": {
+          "new": {
+            "bytes": 1176,
+            "sha256": "b4013027af0af7470157a9885db277cc1d12560e4f757db627c31bcdc7a36f32"
+          },
+          "old": {
+            "bytes": 1164,
+            "sha256": "18280b20574a50320820403e77e3f30ef8e292b43925f0115b432b22fb1946e1"
+          }
+        }
+      },
+      "totalAssetFiles": 123,
+      "unchangedAssetFiles": 120,
+      "unchangedNativeLibraries": 4,
+      "unchangedProviderArchiveBytes": 328009404,
+      "unchangedProviderArchives": {
+        "assets/guest-bridges/guest-bridges-arm64.archive": "7e0356f14bf3654a0e1ecc903726bd479fea0c761c8a4e8a4356e2e476726a55",
+        "assets/server-content/server-content.archive": "0f41b2deea5344fcea4cbc70bbddf0bab1dfda1cd0346e23e92592aac63056e6",
+        "assets/server-data-tools/server-data-tools.archive": "e80d1d731902907297ae89f68d8241bca0aa79b8a281521c669353654ce5b436",
+        "assets/server-programs/server-programs.archive": "963a23c1390440260b85ffe164b2d7508c56b005b315dce8a919ae443a46d1bf",
+        "assets/server-runtime/server-runtime-arm64.archive": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5",
+        "assets/shader-tools/shader-tools-arm64.archive": "c48c4d78952d4a2c02c26b7a6da0087d29b21eb19a81b643cb5a9a97cf7389af",
+        "assets/turnip/turnip-arm64.archive": "445c38ddf7e66f65ee90aa7fd2006db88d6fecd72c8567d801f2ee4c4000a772"
+      }
+    }
+  },
+  "previousPublic": {
+    "apkSha256": "60a90c58dfc211c53928853dbbebd04929668da69d46d4c0a027c143f6857eb6",
+    "versionCode": 18
+  },
+  "scope": "stock-v19-ci-gates-and-source-signature",
+  "signedApk": {
+    "apkBytes": 336899353,
+    "apkSha256": "c0d251847496c64170bb31d534a925afd1d8e7f92c21687e0e1cbf82c056e6fa",
+    "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+    "debuggable": false,
+    "minSdk": 26,
+    "packageId": "io.github.russianranger.esteria.stock",
+    "targetSdk": 35,
+    "versionCode": 19,
+    "versionName": "0.1.0-non-custom.19"
+  },
+  "sourceRevision": "c99dbaef634412729742e120d2457d5c7b8bf1a1",
+  "thorQualified": false
+}

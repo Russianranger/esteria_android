@@ -1,6 +1,6 @@
 # Current stock publication
 
-The v19 candidate uses APK producer `c99dbaef634412729742e120d2457d5c7b8bf1a1` on `non-custom`. Hosted staging reconstructed the 336,899,353-byte APK and verified its stock certificate against v18. SHA-256 `c0d251847496c64170bb31d534a925afd1d8e7f92c21687e0e1cbf82c056e6fa`. The reconstructed client completes short reads from stock MPQs. The selected import, shader outputs, world generation and four-schema SQL profile retain their identities. [Staging run](https://github.com/Russianranger/esteria_android/actions/runs/42463728583) · [Bound release inputs](update-19/publication-inputs.json).
+[The published v19 release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.19) uses APK producer `c99dbaef634412729742e120d2457d5c7b8bf1a1` on `non-custom`. Hosted staging reconstructed the 336,899,353-byte APK and verified its stock certificate against v18. SHA-256 `c0d251847496c64170bb31d534a925afd1d8e7f92c21687e0e1cbf82c056e6fa`. The reconstructed client completes short reads from stock MPQs. The selected import, shader outputs, world generation and four-schema SQL profile retain their identities. [Public readback](../../evidence/non-custom-v19-public-apk-readback.json) · [Publication run](https://github.com/Russianranger/esteria_android/actions/runs/42466977377) · [Bound release inputs](update-19/publication-inputs.json).
 
 ## Historical v18 publication
 

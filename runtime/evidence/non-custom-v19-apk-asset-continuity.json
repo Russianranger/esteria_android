@@ -1,0 +1,101 @@
+{
+  "addedAssetFiles": [],
+  "baselineApkSha256": "60a90c58dfc211c53928853dbbebd04929668da69d46d4c0a027c143f6857eb6",
+  "baselineVersionCode": 18,
+  "candidateApkSha256": "c0d251847496c64170bb31d534a925afd1d8e7f92c21687e0e1cbf82c056e6fa",
+  "candidateVersionCode": 19,
+  "changedAssetFiles": [
+    "assets/client-runtime/client-arm64.archive",
+    "assets/client-runtime/provider.json",
+    "assets/client-runtime/renderer-compatibility.json"
+  ],
+  "clientArchiveChanges": {
+    "bin/WowClient64.exe": {
+      "new": {
+        "bytes": 20787200,
+        "sha256": "e224cc5611511e47c3e4f20fa8c401419f9b9d2fc648a70908be58ca204aa561"
+      },
+      "old": {
+        "bytes": 20786176,
+        "sha256": "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317"
+      }
+    },
+    "client-runtime.json": {
+      "new": {
+        "bytes": 3313,
+        "sha256": "147280dc8283de6261b6c1cddd0954e258fb869efa85a430011336d4ce8c8c49"
+      },
+      "old": {
+        "bytes": 3313,
+        "sha256": "35f56a0848f8875c5f6e1b7909cbe6d585f50b455a554fd7ee5de1c677565e52"
+      }
+    },
+    "metadata/client-build.json": {
+      "new": {
+        "bytes": 2803,
+        "sha256": "2ec0cf98bb42215bd1a8cc71aeba0504b14b5cc0578a5f38db8c2ab44e7270c5"
+      },
+      "old": {
+        "bytes": 2803,
+        "sha256": "4df04bde49c4f5b25506c572aac60ad9a4ee720b343b08afcf7f8924d0b179a9"
+      }
+    },
+    "metadata/sources.lock.json": {
+      "new": {
+        "bytes": 2162,
+        "sha256": "b770679b2c5daf8a86ef8022c6050047ab00c4ed7b0edbbd09acd5c46f0eaf87"
+      },
+      "old": {
+        "bytes": 2162,
+        "sha256": "4daef14068f010ce31a05512f67ec62ee2e1927156187306cc8da018f91a6a67"
+      }
+    }
+  },
+  "formatVersion": 1,
+  "removedAssetFiles": [],
+  "reviewedApkAssetChanges": {
+    "assets/client-runtime/client-arm64.archive": {
+      "new": {
+        "bytes": 7314685,
+        "sha256": "954ce4974672dc6fdab666d44d56abbe253199128fda9ccfaa39f09826cc65e9"
+      },
+      "old": {
+        "bytes": 7314759,
+        "sha256": "a413045a85ea84d31cdaa8008f381540442f2d0de9df0fa4fe20c9695edc5086"
+      }
+    },
+    "assets/client-runtime/provider.json": {
+      "new": {
+        "bytes": 6867,
+        "sha256": "94605fd84350631bff8784e7741bfc38af2eee764fe23988a00f9b1141eb3694"
+      },
+      "old": {
+        "bytes": 6867,
+        "sha256": "6d84dd92daca74ee3bfdb46e288a0e043a63e8b00a74a13901d7b016375bc3dc"
+      }
+    },
+    "assets/client-runtime/renderer-compatibility.json": {
+      "new": {
+        "bytes": 1176,
+        "sha256": "b4013027af0af7470157a9885db277cc1d12560e4f757db627c31bcdc7a36f32"
+      },
+      "old": {
+        "bytes": 1164,
+        "sha256": "18280b20574a50320820403e77e3f30ef8e292b43925f0115b432b22fb1946e1"
+      }
+    }
+  },
+  "totalAssetFiles": 123,
+  "unchangedAssetFiles": 120,
+  "unchangedNativeLibraries": 4,
+  "unchangedProviderArchiveBytes": 328009404,
+  "unchangedProviderArchives": {
+    "assets/guest-bridges/guest-bridges-arm64.archive": "7e0356f14bf3654a0e1ecc903726bd479fea0c761c8a4e8a4356e2e476726a55",
+    "assets/server-content/server-content.archive": "0f41b2deea5344fcea4cbc70bbddf0bab1dfda1cd0346e23e92592aac63056e6",
+    "assets/server-data-tools/server-data-tools.archive": "e80d1d731902907297ae89f68d8241bca0aa79b8a281521c669353654ce5b436",
+    "assets/server-programs/server-programs.archive": "963a23c1390440260b85ffe164b2d7508c56b005b315dce8a919ae443a46d1bf",
+    "assets/server-runtime/server-runtime-arm64.archive": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5",
+    "assets/shader-tools/shader-tools-arm64.archive": "c48c4d78952d4a2c02c26b7a6da0087d29b21eb19a81b643cb5a9a97cf7389af",
+    "assets/turnip/turnip-arm64.archive": "445c38ddf7e66f65ee90aa7fd2006db88d6fecd72c8567d801f2ee4c4000a772"
+  }
+}
