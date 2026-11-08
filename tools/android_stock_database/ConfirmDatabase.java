@@ -186,7 +186,7 @@ public final class ConfirmDatabase {
                 Path sessions=Files.createDirectories(root.resolve("s"));Path owner=Files.createDirectory(sessions.resolve(UUID.randomUUID().toString().replace("-","").substring(0,16)));
                 child=ProotProcess.start(context,wine.installer(),wine.packagePlan(),work,Files.createDirectory(owner.resolve("client")),
                     Arrays.asList("/usr/bin/python3","-B","-s","-E","/work/prefix_helper_observer.py",mode),wine.wineEnvironment(),
-                    Arrays.asList(new ProotLaunch.Mount(original,"/qa-prefix-original")),null);
+                    Arrays.asList(new ProotLaunch.Mount(original,"/esteria-client")),null);
             }else child=wineGuest(context,root,work,wine,mode);
             try{long end=System.nanoTime()+TimeUnit.MINUTES.toNanos(6);while(child.isAlive()&&System.nanoTime()<end)pause();requireExit(child);}
             finally{if(child.isAlive())child.stop(Duration.ofSeconds(15));}

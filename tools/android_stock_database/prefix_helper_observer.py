@@ -1,7 +1,7 @@
 """Read-only original prefix and canonical production helper input on a standalone signed QA install."""
 import hashlib,json,os,shutil,stat,sys
 from pathlib import Path
-mode=sys.argv[1];base=Path('/work');original=Path('/qa-prefix-original/home/.wine');target=base/'home/.wine'
+mode=sys.argv[1];base=Path('/work');original=Path('/esteria-client/home/.wine');target=base/'home/.wine'
 def snapshot(p):
     h=hashlib.sha256()
     for f in sorted(p.rglob('*')):
