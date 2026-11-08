@@ -66,14 +66,14 @@ with realm.config_lock(state),db.option_file(observation,'esteria',secret) as op
             status('build-12340-challenge')
             require(processes.auth_challenge(timeout=1),'Production challenge callback failed')
             status('reconstructed-grunt-authenticate')
-            peer=work/'qa-grunt'
+            peer=Path('/esteria-client')
             nonce=secrets.token_bytes(16)
             private=[peer/'bin'/name for name in (contract.INPUT,contract.RECEIPT,contract.KEY)]
             require(all(not path.exists() and not path.is_symlink() for path in private),'Stale private challenge')
             try:
                 contract.write_input(private[0],intent,nonce)
                 db.atomic_json(peer/('ready-'+operation+'.json'),{'operation':operation})
-                deadline=time.monotonic()+180
+                deadline=time.monotonic()+(1080 if operation=="cold" else 180)
                 while time.monotonic()<deadline:
                     require(child.alive(),'Auth child exited during Grunt')
                     if (peer/operation/'exited').is_file(): break

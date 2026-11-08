@@ -10,7 +10,7 @@ import wine_prefix
 
 work = Path('/work')
 mode = sys.argv[1]
-assert mode in {'bootstrap', 'cold', 'warm'}
+assert mode in {'cold', 'warm'}
 os.umask(0o077)
 out = work / mode
 out.mkdir(mode=0o700, exist_ok=False)
@@ -47,7 +47,7 @@ def checked(phase, command, timeout):
 
 def run():
     assert env['HOME']=='/work/home' and env['WINE_ANDROID_PRIVATE_PE_COPY']=='1'
-    if mode=='bootstrap':
+    if mode=='cold':
         assert not prefix.exists()
     else:
         assert (prefix/'system.reg').is_file()
@@ -63,18 +63,18 @@ def run():
                 if sock.exists() and stat.S_ISSOCK(sock.lstat().st_mode): break
                 time.sleep(.1)
             else: raise RuntimeError('private X11 startup failed')
-            if mode=='bootstrap':
-                status('windows-first-use')
-                wine_prefix.first_use(wine,env,prefix,out)
-                assert (prefix/'system.reg').is_file()
+            status('wait-owned-authserver')
+            deadline = time.monotonic()+110
+            while time.monotonic()<deadline:
+                if (work/('ready-'+mode+'.json')).is_file(): break
+                time.sleep(.1)
+            else: raise RuntimeError('credential handoff not ready')
+            command=[wine,r'Z:\work\bin\WowClient64.exe','--auth-check','--local-offline']
+            if mode=='cold':
+                status('reconstructed-grunt-first-use')
+                wine_prefix.observe(command,env,prefix,out)
             else:
-                status('wait-owned-authserver')
-                deadline = time.monotonic()+110
-                while time.monotonic()<deadline:
-                    if (work/('ready-'+mode+'.json')).is_file(): break
-                    time.sleep(.1)
-                else: raise RuntimeError('credential handoff not ready')
-                checked('reconstructed-grunt',[wine,r'Z:\work\bin\WowClient64.exe','--auth-check','--local-offline'],120)
+                checked('reconstructed-grunt',command,120)
         finally:
             try:
                 for flag in ('-k','-w'):
@@ -88,7 +88,7 @@ def run():
                     x.kill()
                     x.wait()
                     raise
-    status('prefix-ready' if mode=='bootstrap' else 'grunt-exited')
+    status('grunt-exited')
     (out/'exited').touch(exist_ok=False)
 
 

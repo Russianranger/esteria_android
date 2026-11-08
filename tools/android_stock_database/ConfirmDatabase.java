@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.util.UUID;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
@@ -48,7 +48,9 @@ public final class ConfirmDatabase {
     }
 
     private static OwnedProcess wineGuest(Context context,Path root,Path work,RuntimeSetup wine,String mode) throws IOException {
-        Path processSession=Files.createDirectory(root.resolve("qa-wine-process-"+mode));
+        Path sessions=Files.createDirectories(root.resolve("s"));
+        Path owner=Files.createDirectory(sessions.resolve(UUID.randomUUID().toString().replace("-","").substring(0,16)));
+        Path processSession=Files.createDirectory(owner.resolve("client"));
         return ProotProcess.start(context,wine.installer(),wine.packagePlan(),work,processSession,
                 Arrays.asList("/usr/bin/python3","-B","-s","-E","/work/grunt_wine.py",mode),
                 wine.wineEnvironment(),null);
@@ -76,26 +78,17 @@ public final class ConfirmDatabase {
                 (!wineFiles.alreadyInstalled || !clientFiles.alreadyInstalled || wineFiles.copiedBytes+clientFiles.copiedBytes!=0))
             throw new IOException("Unexpected Wine or reconstructed client admission");
         if(cold) {
+            Files.createDirectories(work.getParent());
             Files.createDirectory(work);
             Files.createDirectory(work.resolve("bin"));
-            for (String source:Arrays.asList("grunt_wine.py","wine_prefix.py"))
+            for (String source:Arrays.asList("grunt_wine.py","wine_prefix.py","wine_windows.py"))
                 Files.copy(Paths.get("/esteria-qa/input/"+source),work.resolve(source));
         }
         for (String name:Arrays.asList("bin/WowClient64.exe","bin/XvidDecoder.dll")) {
             if (cold) Files.copy(clientFiles.rootfs.resolve(name),work.resolve(name));
             verifyFile(work.resolve(name),client.packagePlan().required.get(name));
         }
-        if(cold) {
-            OwnedProcess bootstrap=wineGuest(context,root,work,wine,"bootstrap");
-            try {
-                long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(18);
-                while(bootstrap.isAlive() && System.nanoTime()<deadline) pause();
-                requireExit(bootstrap);
-                if(!Files.isRegularFile(work.resolve("bootstrap/exited"))) throw new IOException("Wine prefix not proven");
-            } finally {
-                if(bootstrap.isAlive()) bootstrap.stop(Duration.ofSeconds(15));
-            }
-        }
+
     }
 
     private static String auth(Context context,Path root,ServerRuntimeSetup server,ServerProgramsSetup programs,
@@ -115,11 +108,12 @@ public final class ConfirmDatabase {
                 Arrays.asList("/usr/bin/python3","-B","-s","-E","/work/qa-auth-"+mode+"/auth_phase.py",generation,
                     mode,operation,version,uuid,active.setupReceiptSha256,pin.sha256,Long.toString(pin.bytes),world.sha256,Long.toString(world.bytes)),
                 Arrays.asList(new ProotLaunch.Mount(programs.current(),ServerProgramsSetup.guestMount()),
-                        new ProotLaunch.Mount(root.resolve("qa-server-data-directory"),"/esteria-data")));
+                        new ProotLaunch.Mount(root.resolve("qa-server-data-directory"),"/esteria-data"),
+                        new ProotLaunch.Mount(root.resolve("state/client-work"),"/esteria-client")));
             OwnedProcess grunt=null;
             try {
-                grunt=wineGuest(context,root,work.resolve("qa-grunt"),wine,mode);
-                long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(6);
+                grunt=wineGuest(context,root,root.resolve("state/client-work"),wine,mode);
+                long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(cold ? 20 : 6);
                 while((child.isAlive() || grunt.isAlive()) && System.nanoTime()<deadline) {
                     if(!child.isAlive()) requireExit(child);
                     if(!grunt.isAlive()) requireExit(grunt);
@@ -143,7 +137,7 @@ public final class ConfirmDatabase {
         if(!Files.isDirectory(data) || !data.equals(data.toRealPath()))
             throw new IllegalStateException("Disjoint QA schema config directory required");
         RuntimeSetup wine=new RuntimeSetup(context,root);
-        if(cold) prepareClient(context,root,root.resolve("qa-grunt"),wine,true);
+        prepareClient(context,root,root.resolve("state/client-work"),wine,cold);
         ServerRuntimeSetup server=new ServerRuntimeSetup(context,root);
         ServerProgramsSetup programs=new ServerProgramsSetup(context,root);
         ServerContentSetup content=new ServerContentSetup(context,root);
@@ -174,9 +168,6 @@ public final class ConfirmDatabase {
         } else {
             active=ServerInstallationSetup.completed(context,root,server,programs,content);
         }
-        Path peer=active.directoryFor(root).resolve("qa-grunt");
-        if(cold) Files.move(root.resolve("qa-grunt"),peer,StandardCopyOption.ATOMIC_MOVE);
-        else prepareClient(context,root,peer,wine,false);
         long prepared=elapsed(start);
         System.out.println("ANDROID_DB_PHASE promoted-slot-selected "+prepared);
         ServerDatabaseService.Handle database=ServerDatabaseService.startActive(context,root,server,active);
