@@ -175,6 +175,8 @@ public final class ConfirmDatabase {
                 // All strings in these internally-invoked paths originate in static production handlers. Never export arbitrary native output.
                 String message=String.valueOf(failure.getMessage());
                 result.put("ioFailure",failure.getClass().getSimpleName());
+                if(message.matches("Wine prefix update failed with exit -?[0-9]{1,4}")) result.put("nativeExit",Integer.parseInt(message.substring(message.lastIndexOf(' ')+1)));
+
                 for(String token:Arrays.asList("supported interrupted","prefix repair","timed out","presentation","Wine update","client-work lease","changed"))
                     if(message.contains(token))result.accumulate("errorKinds",token);
                 java.util.List<String> stack=new java.util.ArrayList<>();

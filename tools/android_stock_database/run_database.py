@@ -14,6 +14,23 @@ from tools.android_stock_shader.run_owner import BOOT_KEYS, PACKAGE, checked, sh
 CONTAINER='esteria-android-qa'
 
 
+def updater_logs():
+    base='/data/data/'+PACKAGE+'/files'
+    raw=shell(CONTAINER,'''for f in "$1"/s/*/prefix-update/logs/{stdout,stderr}.log; do
+        if test -f "$f"; then echo "PRIVATE-QA-STREAM"; tail -c 8192 "$f"; echo; fi
+    done''',base)
+    # This fresh offline container never carries a game import, account or user data.
+    # Export only allowlisted fixed native errors. Source line/strings are fixed.
+    keys=('err:','could not load','cannot execute','not found','no such file','Permission denied','not owned','not writable','Operation not permitted','failed','wine:','proot error','wine64','wineserver','kernel32','wineboot','/opt/wine/bin/wine','/bin/sh','/usr/bin/env','prefix-update-finished','/session','missing','c0000135','cannot find','error while loading shared libraries','cannot create','mkdir','boot event','chdir','execve','bad exe format','X connection','too long','file exists','python')
+    lines=[]
+    for line in raw.splitlines():
+        found=[k for k in keys if k.lower() in line.lower()]
+        if not found:continue
+        row={'matches':found, 'winstatus':re.findall(r'(?i)\b(?:c000|8007)[0-9a-f]{4}\b',line),
+             'knownFiles':re.findall(r'(?i)\b(?:wine(?:boot|server|64)?|kernel32|ntdll|kernelbase|services|cmd|rundll32|start|dash|Xauthority|ld-linux-aarch64|libwine)[.a-z0-9-]{0,10}\b',line)}
+        if row not in lines:lines.append(row)
+    return dict(streams=raw.count('PRIVATE-QA-STREAM'),signals=lines[:30],characters=len(raw))
+
 def wine_details(report, mode):
     root='/data/data/'+PACKAGE+'/files'
     # Private Wine and PE logs may contain memory dumps. Export only controlled status fields.
@@ -138,6 +155,8 @@ def exercise(report):
             failure_details(report)
             raise RuntimeError('signed database owner failed')
         item=json.loads(rows[0]); checked(item['control']==mode and item['ownerClosed'],'invalid observer exit')
+        if mode in ('cancel','update','finish'):
+            item['updaterLogEvidence']=updater_logs()
         check_empty(CONTAINER,package_uid)
         report['postCleanupPackageUidProcesses']=0
         report['operations'].append(item)

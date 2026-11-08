@@ -50,7 +50,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: wine-prefix-private-session-${{ matrix.control }}
+          name: wine-prefix-child-reason-${{ matrix.control }}
           path: ${{ runner.temp }}/android-stock-db-evidence/*.json
           retention-days: 7
           if-no-files-found: warn
