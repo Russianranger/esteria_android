@@ -295,6 +295,8 @@ jobs:
             > out/coherent-evidence/public-cohort-consumer.json
       - name: Select the reconstructed executable for this build
         id: renderer
+        env:
+          CI_PUBLIC_RELEASE_TOKEN: ${{ github.token }}
         run: |
           set -eu
           provider="$RUNNER_TEMP/cohort-providers/client-provider"
@@ -324,10 +326,10 @@ jobs:
           if-no-files-found: error
           retention-days: 30
       - name: Read back the complete Wine source companion before subsequent packaging
+        env:
+          CI_PUBLIC_RELEASE_TOKEN: ${{ github.token }}
         run: |
-          python3 tools/fetch_wine_arm64_release.py \
-            --release-lock runtime/wine-arm64-publication/dependency-release.lock.json \
-            --publication-receipt runtime/wine-arm64-publication/published-release.json \
+          python3 -m tools.ci_release_transport wine-runtime \
             --output "$RUNNER_TEMP/coherent-wine-inputs" > out/coherent-evidence/public-wine-consumer.json
           # Keep the unchanged complete original ZIP for the companion artifact.
           # Only this already verified reproducible expanded input tree is removed.
@@ -340,8 +342,10 @@ jobs:
             > out/coherent-logs/server-dependencies.log 2>&1
           python3 tools/provider_server_runtime.py build --package "$RUNNER_TEMP/server-release" --output "$RUNNER_TEMP/server-provider"
       - name: Build pinned Bionic ARM64 PRoot and matching complete source companion
+        env:
+          CI_PUBLIC_RELEASE_TOKEN: ${{ github.token }}
         run: |
-          curl --fail --location --retry 2 --max-time 600 https://github.com/Russianranger/uo-android-launcher/releases/download/v0.2.0/runtime-corresponding-sources.tar.gz -o "$RUNNER_TEMP/proot-original-sources.tar.gz"
+          python3 -m tools.ci_release_transport proot-original --output "$RUNNER_TEMP/proot-original-sources.tar.gz"
           curl --fail --location --retry 2 --retry-all-errors --retry-delay 2 --max-time 900 https://dl.google.com/android/repository/android-ndk-r28c-linux.zip -o "$RUNNER_TEMP/android-ndk-r28c-linux.zip"
           python3 tools/build_android_proot.py --sources "$RUNNER_TEMP/proot-original-sources.tar.gz" --ndk-zip "$RUNNER_TEMP/android-ndk-r28c-linux.zip" --work "$RUNNER_TEMP/proot-build"
           python3 tools/verify_android_proot.py --provider "$RUNNER_TEMP/proot-build/provider"

@@ -318,9 +318,15 @@ class Session:
         progress('owned-auth-listener', 'authserver')
         self._await(lambda: processes.owns_loopback_listener(self.auth.group, 3724), deadline, cancelled)
         progress('auth-challenge', 'authserver')
-        require(time.monotonic() < deadline and not cancelled(), 'Owned auth challenge startup deadline/cancellation')
-        require(processes.auth_challenge(timeout=min(1, deadline-time.monotonic())), 'Auth source challenge callback failed')
-        require(processes.owns_loopback_listener(self.auth.group, 3724), 'Auth listener changed during protocol probe')
+        def check_pending_auth():
+            require(not cancelled(), 'Owned server startup cancelled')
+            require(time.monotonic() < deadline, 'Owned auth challenge startup deadline exceeded')
+            require(self.auth.alive() and self.auth.error is None, 'Owned authserver exited during protocol probe')
+            require(processes.owns_loopback_listener(self.auth.group, 3724), 'Auth listener changed during protocol probe')
+
+        require(processes.auth_challenge(deadline=deadline, check_pending=check_pending_auth),
+                'Auth source challenge callback failed')
+        check_pending_auth()
         self._check()
         progress('native-launch', 'worldserver')
         self.world = processes.ServerChild('worldserver', selected.programs['worldserver']['path'],

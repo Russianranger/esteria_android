@@ -186,25 +186,78 @@ def _probe_read(connection, count, deadline):
     return result
 
 
-def auth_challenge(port=3724, *, timeout=1):
+def auth_challenge(port=3724, *, timeout=1, deadline=None, check_pending=None):
     """Process a source Grunt challenge without a password/proof/session key.
 
     A random16-character unknown name gets the source's three-byte error callback,
     proving actual auth I/O and async SQL processing. An unlikely name collision
     fails closed. No login/proof or client/auth SRP qualification is claimed.
-    Caller checks owned socket-inode identity immediately before and after.
+    A session supplies its remaining absolute native deadline and an ownership/
+    cancellation check. Standalone callers retain their original short ceiling.
     """
     require(type(port) is int and 1 <= port <= 65535 and 0 < timeout <= 3,
             'Fixed auth probe endpoint/deadline required')
     name = ('ERDY' + secrets.token_hex(6).upper()).encode('ascii')
     packet = struct.pack('<BBH4sBBBH4s4s4sI4sB', 0, 0, 30 + len(name), b'WoW\0', 3, 3, 5, 12340,
                          b'68x\0', b'niW\0', b'SUne', 0, socket.inet_aton('127.0.0.1'), len(name)) + name
-    deadline = time.monotonic() + timeout
-    with socket.create_connection(('127.0.0.1', port), timeout=timeout) as connection:
-        connection.settimeout(max(.001, deadline - time.monotonic()))
-        connection.sendall(packet)
-        require(_probe_read(connection, 3, deadline) == b'\0\0\x04',
-                'Auth challenge callback differs from the selected source')
+    started = time.monotonic()
+    if deadline is None:
+        require(check_pending is None, 'Pending auth check requires an explicit native deadline')
+        deadline = started + timeout
+    else:
+        require(callable(check_pending) and started < deadline <= started + 600,
+                'Bounded owned auth challenge deadline and check required')
+        check_pending()
+        if time.monotonic() >= deadline:
+            raise TimeoutError('Auth challenge deadline exceeded')
+    setup_deadline = min(time.monotonic() + timeout, deadline)
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as connection:
+        connection.setblocking(False)
+        poller = select.poll()
+        poller.register(connection, select.POLLOUT)
+
+        def await_io(event, limit):
+            poller.modify(connection, event)
+            while True:
+                remaining = limit - time.monotonic()
+                if remaining <= 0:
+                    raise TimeoutError('Auth challenge deadline exceeded')
+                interval = min(.25, remaining) if check_pending is not None else remaining
+                ready = poller.poll(interval * 1000)
+                if time.monotonic() >= limit:
+                    raise TimeoutError('Auth challenge deadline exceeded')
+                if ready:
+                    return
+                if check_pending is not None:
+                    check_pending()
+
+        status = connection.connect_ex(('127.0.0.1', port))
+        if status in (errno.EINPROGRESS, errno.EALREADY, errno.EWOULDBLOCK, errno.EINTR):
+            await_io(select.POLLOUT, setup_deadline)
+            status = connection.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
+        if status:
+            raise OSError(status, os.strerror(status))
+        unsent = memoryview(packet)
+        while unsent:
+            await_io(select.POLLOUT, setup_deadline)
+            try:
+                sent = connection.send(unsent)
+            except BlockingIOError:
+                continue
+            require(sent > 0, 'Auth challenge connection closed during request')
+            unsent = unsent[sent:]
+
+        expected = b'\0\0\x04'
+        while expected:
+            await_io(select.POLLIN, deadline)
+            try:
+                block = connection.recv(len(expected))
+            except BlockingIOError:
+                continue
+            require(block, 'Server protocol probe ended before its declared payload')
+            require(expected.startswith(block), 'Auth challenge callback differs from the selected source')
+            expected = expected[len(block):]
     return True
 
 

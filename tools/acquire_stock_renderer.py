@@ -63,12 +63,19 @@ def acquire(output, cohort):
     subprocess.run(['git', 'fetch', '--depth', '4', '--no-tags', 'origin', revision], cwd=checkout, check=True)
     tag = 'stock-client-arm64-' + revision
     url = f'{REPOSITORY}/releases/download/{tag}/client-ARM64-{revision}.zip'
+    public_ci = bool(os.environ.get('CI_PUBLIC_RELEASE_TOKEN'))
+    if public_ci:
+        from tools.ci_release_transport import client_inputs
+        client_inputs(output/'cache', revision, build)
     original = prepare_runtime.fetch(dict(build['artifact'], file='client-original.zip', url=url), output / 'cache')
     xvid = xvid_source(output / 'cache', cohort)
     factory = [sys.executable, '-m', 'tools.stock_renderer_provider']
     common = ['--client-source', checkout, '--source-lock', source_lock, '--client-input-lock', build_lock,
               '--source-package', output / 'source-companion']
     subprocess.run([*factory, 'source', *common, '--xvid-source', xvid], cwd=ROOT, check=True)
+    if public_ci:
+        for name in ('client-corresponding-source.tar.gz','source-receipt.json'):
+            client.verify_identity(output/'source-companion'/name, client.identity(output/'cache'/name))
     subprocess.run([*factory, 'build', *common, '--cohort-inputs', cohort, '--artifact', original,
                     '--provider', output / 'provider', '--compatibility', contract], cwd=ROOT, check=True)
 

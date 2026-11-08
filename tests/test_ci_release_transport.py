@@ -58,3 +58,38 @@ class ExactCiAsset(unittest.TestCase):
             self.assertEqual(path.read_bytes(),b'ok')
         self.assertEqual(calls[0].get_header('Authorization'),'Bearer ci-test-token')
         self.assertIsNone(calls[1].get_header('Authorization'))
+
+class UpstreamOriginals(unittest.TestCase):
+    def test_pinned_id_and_redirect_bytes_only(self):
+        from urllib.error import HTTPError
+        from unittest.mock import Mock
+        import hashlib
+        class Payload(io.BytesIO):
+            headers={'Content-Length':'2'}
+            def geturl(self):
+                return 'https://a.githubusercontent.com/object'
+        name='artifact.zip'
+        src='https://github.com/Russianranger/wowdecomp_esteria/releases/download/verified/'+name
+        pin=dict(bytes=2,sha256=hashlib.sha256(b'ok').hexdigest())
+        opener=Mock()
+        opener.open.side_effect=[HTTPError('',302,'Redirect',{'Location':'https://a.githubusercontent.com/object'},None),Payload(b'ok')]
+        with TemporaryDirectory() as work,patch.object(ci,'build_opener',return_value=opener),patch.dict(os.environ,{'CI_PUBLIC_RELEASE_TOKEN':'test'}):
+            actual=ci.fetch_external('Russianranger/wowdecomp_esteria',42,src,pin,Path(work)/name)
+            self.assertEqual(actual.read_bytes(),b'ok')
+            first,second=[call.args[0] for call in opener.open.call_args_list]
+            self.assertIn('api.github.com/repos/Russianranger/wowdecomp_esteria/releases/assets/42?',first.full_url)
+            self.assertEqual(first.get_header('Authorization'),'Bearer test')
+            self.assertIsNone(second.get_header('Authorization'))
+            bad=HTTPError('',302,'Redirect',{'Location':'https://releases.not-github.invalid/wrong'},None)
+            opener.open.side_effect=[bad]
+            with self.assertRaisesRegex(ValueError,'redirect'):
+                ci.fetch_external('Russianranger/wowdecomp_esteria',42,src,pin,Path(work)/'other.zip')
+            self.assertFalse((Path(work)/'other.zip').exists())
+
+    def test_client_original_and_both_source_files_are_release_bound(self):
+        build=github.small_json(ci.ROOT/'runtime/client/stock-renderer-build.lock.json')
+        with patch.object(ci,'fetch_external') as transfer:
+            ci.client_inputs(Path('/tmp/verified-client'),build['sourceRevision'],build)
+            self.assertEqual({call.args[1] for call in transfer.call_args_list},{723347201,723347284,723347318})
+        with patch.dict(build,artifactId=build['artifactId']-1),self.assertRaisesRegex(ValueError,'source-mismatch'):
+            ci.client_inputs(Path('/tmp/verified-client'),build['sourceRevision'],build)
