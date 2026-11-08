@@ -971,7 +971,7 @@ public final class SessionService extends Service {
         facts.put("storage.maintenance.summary",storageStatus);
         if (Build.VERSION.SDK_INT >= 29) facts.put("operation.foregroundServiceType", Integer.toString(getForegroundServiceType()));
         facts.putAll(ProcessExitDiagnostics.collect(this));
-        try{facts.putAll(ServerInstallationSetup.retainedDiagnostics(root));}
+        try{facts.put("database.retained.slots",new JSONObject(ServerInstallationSetup.retainedDiagnostics(root)).toString());}
         catch(IOException unavailable){facts.put("database.retained.inspection","unavailable");}
         ImportDiagnostics importDiagnostic = lastImport;
         if (importDiagnostic != null) facts.putAll(importDiagnostic.facts());

@@ -30,7 +30,10 @@ public final class RetainedDatabaseRepairTest {
     @Test public void retainedInstallation() throws Exception {
         String phase=InstrumentationRegistry.getArguments().getString("disposableDatabasePhase", "");
         assumeTrue(Set.of("seed","repair","cold").contains(phase));
-        Context context=InstrumentationRegistry.getInstrumentation().getTargetContext();
+        runPhase(InstrumentationRegistry.getInstrumentation().getTargetContext(),phase);
+    }
+
+    public static void runPhase(Context context,String phase) throws Exception {
         Path root=context.getFilesDir().getCanonicalFile().toPath();
         Path marker=root.resolve("retained-database-test-owner"),data=marker.resolve("empty-data");
         ServerRuntimeSetup runtime=new ServerRuntimeSetup(context,root);
@@ -63,7 +66,9 @@ public final class RetainedDatabaseRepairTest {
             try(ServerInstallationSetup.Handle unwanted=ServerInstallationSetup.beginFresh(context,root,runtime,programs,content,data,1L<<30)) {
                 fail("Modified receipt allocated a database slot");
             } catch(IOException expected) {assertTrue(expected.toString(),expected.getMessage().contains("receipt"));}
-            try(var slots=Files.list(root.resolve("db"))) {assertEquals(0,slots.count());}
+            if(Files.exists(root.resolve("db"))) {
+                try(var slots=Files.list(root.resolve("db"))) {assertEquals(0,slots.count());}
+            }
             Files.delete(receipt); // Only the deliberately damaged receipt in this test's disposable setup.
             assertArrayEquals(original,Files.readAllBytes(new ServerContentSetup(context,root).receiptPath()));
             Set<String> phases=new HashSet<>();

@@ -82,6 +82,21 @@ jobs:
           if [[ "$STAGE_ONLY" != true ]]; then options+=(--publish); fi
           python3 tools/publish_detached_non_custom.py --build-tools "$ANDROID_HOME/build-tools/35.0.0" \
             --output out/detached-publication "${options[@]}"
+      - name: Stage the signed candidate and observation-only DEX for native package replacement
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[stage detached non-custom]')
+        run: |
+          sdkmanager --sdk_root="$ANDROID_HOME" 'platforms;android-35'
+          bash tools/retained_database/compile.sh "$RUNNER_TEMP/retained-observer"
+          mkdir -p out/signed-update-input
+          cp "$RUNNER_TEMP/retained-observer/observer.jar" out/signed-update-input/
+          cp out/detached-publication/release/Esteria-Stock-3.3.5a-arm64.apk out/signed-update-input/candidate.apk
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[stage detached non-custom]')
+        with:
+          name: signed-retained-update-input
+          path: out/signed-update-input/
+          compression-level: 0
+          retention-days: 3
       - name: Test this staged signed update on a disposable Android 13 emulator
         if: github.event_name == 'push' && contains(github.event.head_commit.message, '[stage detached non-custom]')
         uses: ./.github/actions/signed-update-emulator
@@ -99,3 +114,52 @@ jobs:
             out/detached-publication/signed/signing-receipt.json
           if-no-files-found: warn
           retention-days: 30
+
+  signed-retained-android:
+    if: always() && !cancelled() && github.event_name == 'push' && contains(github.event.head_commit.message, '[stage detached non-custom]')
+    needs: publish
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: e9553fe7f0035a3336693046368c6ad7034ab344
+          path: previous-qa
+          sparse-checkout: tools/android_stock_shader
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: signed-retained-update-input
+          path: signed-input
+      - name: Exercise the original v19 failure and signed replacement on offline Android 13 ARM64
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          source previous-qa/tools/android_stock_shader/redroid.sh
+          work=$(mktemp -d "$RUNNER_TEMP/signed-retained.XXXXXXXX")
+          mkdir -p "$work/input" evidence
+          cp signed-input/* "$work/input/"
+          for asset in '723482619 previous.apk' '692421785 wine.tar.gz'; do
+            read -r id name <<< "$asset"
+            curl --fail --location --silent --show-error --retry 3 --max-time 600               -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/octet-stream'               "https://api.github.com/repos/Russianranger/esteria_android/releases/assets/$id?run=$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" -o "$work/input/$name"
+          done
+          unset GH_TOKEN
+          echo "c0d251847496c64170bb31d534a925afd1d8e7f92c21687e0e1cbf82c056e6fa  $work/input/previous.apk" | sha256sum -c
+          wine=$(jq -r '.packages["wine-arm64"].archive.sha256' runtime/runtime-sources.lock.json)
+          echo "$wine  $work/input/wine.tar.gz" | sha256sum -c
+          chmod 755 "$work/input"
+          chmod 644 "$work/input/"*
+          trap 'redroid_stop "$work"' EXIT
+          redroid_start "$work"
+          python3 tools/retained_database/device.py evidence/signed-update.jsonl
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: signed-retained-android-arm64
+          path: evidence/*.jsonl
+          retention-days: 14
+          if-no-files-found: warn

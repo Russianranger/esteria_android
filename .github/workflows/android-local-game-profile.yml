@@ -459,12 +459,18 @@ jobs:
             --data-tools-provider "$SERVER_DATA_TOOLS_PROVIDER" \
             --output out/coherent-evidence/coherent-apk.json
           git archive --format=tar.gz --output="$RUNNER_TEMP/coherent-integration-source.tar.gz" "$GITHUB_SHA"
+      - name: Compile observation-only DEX for fresh Android database processes
+        if: steps.verified.outcome == 'success'
+        run: |
+          bash tools/retained_database/compile.sh "$RUNNER_TEMP/retained-observer"
+          cp "$RUNNER_TEMP/retained-observer/observer.jar" observer.jar
       - name: Retain the unqualified complete-provider APK and exact source-selection proof
         if: steps.verified.outcome == 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: unqualified-local-game-profile-arm64-${{ github.sha }}
           path: |
+            observer.jar
             app/build/outputs/apk/debug/app-debug.apk
             app/build/outputs/apk/androidTest/debug/*.apk
             out/coherent-evidence/
@@ -704,12 +710,16 @@ jobs:
           if-no-files-found: warn
   retained-database:
     needs: package
-    if: always() && !cancelled() && needs.package.result != 'skipped'
+    if: success()
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
+          persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          path: previous-qa
           ref: e9553fe7f0035a3336693046368c6ad7034ab344
           sparse-checkout: tools/android_stock_shader
           persist-credentials: false
@@ -721,11 +731,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          source tools/android_stock_shader/redroid.sh
+          source previous-qa/tools/android_stock_shader/redroid.sh
           work=$(mktemp -d "$RUNNER_TEMP/stock-db.XXXXXXXX")
           mkdir -p "$work/input" evidence
           cp package/app/build/outputs/apk/debug/app-debug.apk "$work/input/app.apk"
           cp package/app/build/outputs/apk/androidTest/debug/*-androidTest.apk "$work/input/tests.apk"
+          cp package/observer.jar "$work/input/"
+          chmod 755 "$work/input"; chmod 644 "$work/input/"*
           cleanup() {
             docker exec "$redroid_name" logcat -d -s EsteriaDatabaseQA:I '*:S' > evidence/phases.txt || true
             redroid_stop "$work"
@@ -738,21 +750,7 @@ jobs:
             device chmod 644 "/data/local/tmp/$apk.apk"
             device pm install -t --user 0 "/data/local/tmp/$apk.apk" | grep -Fx Success
           done
-          pkg=io.github.russianranger.esteria.stock
-          for phase in seed repair cold cold cold; do
-            device am force-stop "$pkg"
-            device am instrument -w -r -e class io.github.russianranger.esteria.runtime.RetainedDatabaseRepairTest \
-              -e disposableDatabasePhase "$phase" "$pkg.test/androidx.test.runner.AndroidJUnitRunner" | tee "$work/$phase.txt"
-            grep -F 'OK (1 test)' "$work/$phase.txt"
-          done
-      - name: Collect only fixed, nonsecret phase and identity messages
-        if: always()
-        run: |
-          mkdir -p evidence
-          # The container's EXIT trap already reaped it. Instrumentation output is kept on the runner.
-          for f in "$RUNNER_TEMP"/stock-db.*/{seed,repair,cold}.txt; do
-            if test -f "$f"; then grep -E 'OK \(1 test\)|Tests run:|FAILURES|^java\.(lang|io)\.' "$f" >> evidence/results.txt || true; fi
-          done
+          python3 tools/retained_database/device.py evidence/results.jsonl debug
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
