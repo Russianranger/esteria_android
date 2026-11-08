@@ -1,0 +1,66 @@
+{
+  "formatVersion": 1,
+  "scope": "Sanitized complete-stock-data native ARM64 server qualification",
+  "repository": "Russianranger/esteria_android",
+  "branch": "non-custom",
+  "runId": 42491096080,
+  "jobId": 128763430075,
+  "runRevision": "fa415132eeea2056aa731596a8d847eb47e83181",
+  "artifactId": 13629347297,
+  "artifactSha256": "fa72818ca24ff279096ef21371c6acd09633e0c96dd33873847fb45eaf906454",
+  "environment": "Linux ARM64, offline after private input admission",
+  "acquisitionAndImport": {
+    "phase": "source-import-complete",
+    "elapsedSeconds": 5708.34,
+    "officialZipBytesVerified": 17674749792,
+    "copiedBytes": 17856504221,
+    "reusedFiles": 0,
+    "importGeneration": "51c3e33744e22ddf64b45fb08b70ff97c828d0c937b117aea7f61c4d09f8da65",
+    "separateAcquisitionDurationRecorded": false
+  },
+  "completeStockData": {
+    "phase": "generated",
+    "elapsedSeconds": 8197.91,
+    "generation": "01440b068c64cd1d3296826d457b154528e39a62e42ba810bc7f381933fb43bd",
+    "files": 22246,
+    "bytes": 7303166933,
+    "mapsDbcCamerasVerified": true,
+    "rawVmapsVerified": true,
+    "assembledVmapsVerified": true,
+    "mmapsGeneratorCompleted": true,
+    "navigationVerified": true,
+    "formatChecked": true
+  },
+  "productionDataBinding": {
+    "elapsedSeconds": 1.857,
+    "payloadBytes": 7303166933,
+    "filesBoundByGenerationReceipt": 22246,
+    "effectiveLocale": "enUS",
+    "threads": 1
+  },
+  "nativeServerSession": {
+    "apkSha256": "c0d251847496c64170bb31d534a925afd1d8e7f92c21687e0e1cbf82c056e6fa",
+    "mysqlAuthenticatedSeconds": 6.122,
+    "fourSchemasVerifiedSeconds": 136.348,
+    "authSrp12340LoopbackSessionKeyVerifiedSeconds": 136.526,
+    "sqlCompletionBoundToCleanStopSeconds": 149.695,
+    "authListenerSeconds": 165.897,
+    "authChallengeSeconds": 166.011,
+    "worldListenerSeconds": 166.023,
+    "worldChallengeSeconds": 200.073,
+    "worldOwnedReadySeconds": 200.507,
+    "worldserverReadyAndCleanlyStoppedSeconds": 201.941,
+    "sameDatabaseUuidReopenedAndCleanlyStoppedSeconds": 203.152,
+    "databaseUuid": "007659a0-dba3-11f1-b96c-502def28f866",
+    "worldserverExecuted": true
+  },
+  "graphicalClient": {
+    "reconstructedClientExecuted": false,
+    "graphicalEntryQualified": false,
+    "gameplayQualified": false,
+    "characterCreationQualified": false,
+    "saveAndRelaunchQualified": false
+  },
+  "firstRemainingGate": "Run signed v22 on the retained Thor through Database setup and ordinary Start, then exercise graphical login, Human Warrior entry, controls, clean save/stop and three offline relaunches.",
+  "implementationFailureObserved": false
+}
