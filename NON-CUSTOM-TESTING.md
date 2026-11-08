@@ -1,8 +1,8 @@
-# Esteria Stock 0.1.0-non-custom.19 for AYN Thor
+# Esteria Stock 0.1.0-non-custom.20 for AYN Thor
 
 Install the signed ARM64 APK over **Esteria Stock**. Keep your existing import, locale, configuration and saves.
 
-- After installing v19, tap **Repair local component → Client runtime** once to install the updated reconstructed executable. If shaders are already prepared, tap **Start local game**.
+- From a prepared v19 installation, tap **Start local game**. If an earlier world startup was interrupted, Start checks the local realm before restarting the servers. When updating from before v19, choose **Repair local component → Client runtime** once to install the corrected executable.
 - For a previous shader failure, tap **Repair local component → Shaders** once. After **Shaders are ready for the selected import**, tap **Start local game**.
 - If Start reports an interrupted Wine installation, **Client runtime** repair finishes the recognized prefix in place. Wait for **Wine prefix repaired and verified**, then use **Start local game**. This operation has its own private display and can take a short time after the Wine update finishes.
 

@@ -90,7 +90,14 @@ def stage(args):
                  '**Repair local component → Database setup**, then start the local game again.\n'
                  'If a stage fails, wait for cleanup, tap **Export support bundle**, choose a\n'
                  'destination and tap **Save**. Send the whole ZIP before retrying.')
-    if signed['versionCode'] == 19:
+    if signed['versionCode'] == 20:
+        setup = ('Install over Esteria Stock and keep your import, selected locale, databases and saves. '
+                 'From a prepared v19 installation, tap **Start local game**. '
+                 'When updating from before v19, use **Repair local component → Client runtime** once. '
+                 'For a previous shader failure, use **Repair local component → Shaders** once, then start. '
+                 'If startup fails, wait for cleanup, tap **Export support bundle**, choose Downloads '
+                 'and tap **Save**. Send the complete ZIP.')
+    elif signed['versionCode'] == 19:
         setup = ('Install over Esteria Stock. Keep the existing import, selected locale, prepared world and saves. '
                  'Tap **Repair local component → Client runtime** once to select the updated executable. '
                  'If shader preparation previously failed, tap **Repair local component → Shaders** once. '
@@ -376,6 +383,14 @@ The corrected read stops at the first true EOF or I/O error.
 The APK pairs the new executable with the existing prepared-data revision.
 Completed import, shader and world generations keep their original identities.
 The signed update uses the existing database and stock SQL profile.
+'''
+    if signed['versionCode'] == 20:
+        notes += '''
+After an interrupted world load, the next session checks the owned stock realm
+before starting authserver. If that realm still has the interrupted startup
+flags, it restores its offline status. The real worldserver handles its normal
+transition to online. The client, server binaries, prepared assets and stock SQL
+profile match v19.
 '''
     (args.output / 'RELEASE-NOTES.md').write_text(notes)
     return result

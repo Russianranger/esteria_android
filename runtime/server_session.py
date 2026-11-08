@@ -58,7 +58,7 @@ class StartupStatus:
 
     def update(self, condition, process='helper', *, native=False, failure=None):
         require(condition in ('source-selection', 'provider-verification', 'prepared-data-verification',
-            'schema-verification', 'configuration-verification', 'native-launch', 'owned-auth-listener',
+            'schema-verification', 'configuration-verification', 'realm-offline-recovery', 'native-launch', 'owned-auth-listener',
             'auth-challenge', 'owned-world-listener', 'world-challenge', 'world-console', 'owned-ready') and
             process in ('helper', 'authserver', 'worldserver'), 'Fixed server startup diagnostic required')
         now = self.clock()
@@ -209,6 +209,43 @@ class Control:
         self.selector.close(); os.set_blocking(self.descriptor, self.blocking)
 
 
+def recover_interrupted_realm(connection, state, expected_uuid, verify_service, *, state_lease=None,
+                              progress=lambda *args: None, cancelled=lambda: False):
+    """Before auth starts, recover the selected world's two transient flags under its existing ownership."""
+    require(not cancelled(), 'Owned server startup cancelled')
+    require(state_lease is not None, 'Retained stock session state lease required')
+    flag_sql = 'SELECT `flag` FROM `acore_auth`.`realmlist` WHERE `id`=1'
+    with db.state_scope(state, state_lease):
+        flags = connection.query(flag_sql)
+        require(len(flags) == 1 and re.fullmatch(r'0|[1-9][0-9]{0,2}', flags[0]) and int(flags[0]) <= 255,
+                'Invalid selected local realm flags')
+        if (int(flags[0]) & 1) == 0:
+            return False
+        # World sets VERSION_MISMATCH while loading. A crash leaves 1. Auth adds OFFLINE (3)
+        # then its source query excludes that row. Recover only these exact stock states.
+        require(flags in (['1'], ['3']), 'Unsupported local realm version flags')
+        progress('realm-offline-recovery')
+        with realm.named_locks(connection, ('esteria-local-realm',)):
+            connection.query('START TRANSACTION')
+            try:
+                require(verify_service() is not False and connection.query('SELECT @@server_uuid') == [expected_uuid],
+                        'Owned database changed before local realm recovery')
+                ids = connection.query('SELECT `id` FROM `acore_auth`.`realmlist` ORDER BY `id` FOR UPDATE')
+                require(ids == ['1'] and connection.query(realm.ROW_SQL + ' FOR UPDATE') == [realm.EXPECTED_ROW] and
+                        connection.query(flag_sql + ' FOR UPDATE') == flags, 'Interrupted singleton stock realm selection differs')
+                require(not cancelled(), 'Owned server startup cancelled')
+                # Keep the realm offline. Only the real world's normal readiness path can advertise it online.
+                connection.query('UPDATE `acore_auth`.`realmlist` SET `flag`=2 WHERE `id`=1 AND `flag` IN (1,3)')
+                require(connection.query(flag_sql) == ['2'] and verify_service() is not False,
+                        'Owned interrupted realm could not be restored offline')
+                require(not cancelled(), 'Owned server startup cancelled')
+                connection.query('COMMIT')
+            except BaseException:
+                connection.query('ROLLBACK')
+                raise
+    return True
+
+
 class Session:
     """Retained before child launch. Caller holds state/config/DB leases through close."""
     def __init__(self, prepared, connection, operation, verify_service):
@@ -267,7 +304,11 @@ class Session:
             'Prepared runtime configuration changed before launch')
         password = None
         _programs(selected.programs)
-        self._check(); deadline = time.monotonic() + timeout
+        self._check()
+        recovered = recover_interrupted_realm(self.connection, selected.state, selected.uuid, self.verify_service,
+                                              state_lease=selected.state_lease, progress=progress, cancelled=cancelled)
+        require(not cancelled(), 'Owned server startup cancelled')
+        deadline = time.monotonic() + timeout
         progress('native-launch', 'authserver', native=True)
         configurations = selected.state / 'config/generations' / selected.generation
         self.auth = processes.ServerChild('authserver', selected.programs['authserver']['path'],
@@ -301,6 +342,7 @@ class Session:
             configGeneration=selected.generation, dataReceipt=selected.data_receipt,
             contentReceipt=selected.content.identities['receipt'], sourceLockSha256=selected.content.receipt['sourceLockSha256'],
             ownedAuthListenerVerified=True, ownedWorldListenerVerified=True, liveSqlAuthenticated=True,
+            interruptedRealmRestoredOffline=recovered,
             authChallengeProcessed=True,
             worldChallengeVerified=True, worldConsoleLoopVerified=True,
             characterPersistenceQualified=False, botAiQualified=False, androidRuntimeQualified=False, gameplayQualified=False)

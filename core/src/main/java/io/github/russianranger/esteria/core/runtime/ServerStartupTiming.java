@@ -19,7 +19,7 @@ public final class ServerStartupTiming {
         ReadStage(String id){this.id=id;}
     }
     private static final List<String> ADMISSION_STEPS=List.of("source-selection","provider-verification",
-        "prepared-data-verification","schema-verification","configuration-verification");
+        "prepared-data-verification","schema-verification","configuration-verification","realm-offline-recovery");
     private int lastAdmissionStep=-1;
     private final long started,payloadBytes,normalRate;
     private final long[] counted=new long[ReadStage.values().length],lowestRate=new long[counted.length];
@@ -62,7 +62,7 @@ public final class ServerStartupTiming {
             throw new IOException("Server startup status operation/source identity differs");
         if(!Set.of("admission","native-startup").contains(phase)||!Set.of("helper","authserver","worldserver").contains(process)||
                 !Set.of("source-selection","provider-verification","prepared-data-verification","schema-verification",
-                    "configuration-verification","native-launch","owned-auth-listener","auth-challenge",
+                    "configuration-verification","realm-offline-recovery","native-launch","owned-auth-listener","auth-challenge",
                     "owned-world-listener","world-challenge","world-console","owned-ready").contains(condition)||
                 sequence<0||elapsed<0||elapsed>TimeUnit.DAYS.toMillis(3)||nativeElapsed< -1||nativeElapsed>elapsed||
                 (!failure.isEmpty()&&!failure.matches("[A-Za-z][A-Za-z0-9]{0,63}"))||

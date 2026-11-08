@@ -36,8 +36,10 @@ class StartupTimingTests(unittest.TestCase):
             self.assertEqual((len(raw), hashlib.sha256(raw).hexdigest()), (selected['bytes'], selected['sha256']))
         with tempfile.TemporaryDirectory() as output, redirect_stdout(StringIO()):
             output = Path(output)
-            session.StartupStatus(output, 'a'*32,
-                dict(sourceLockSha256='b'*64, activeProofSha256='c'*64)).update('source-selection')
+            status = session.StartupStatus(output, 'a'*32,
+                dict(sourceLockSha256='b'*64, activeProofSha256='c'*64))
+            status.update('source-selection')
+            status.update('realm-offline-recovery')
             # Drive the same policy and atomically published meter as an owned guest reading payload.
             io = session.data.world_io
             tick = [0.]

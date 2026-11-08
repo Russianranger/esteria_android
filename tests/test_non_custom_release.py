@@ -245,6 +245,16 @@ class StockReleaseBoundary(unittest.TestCase):
             self.assertEqual(staged['preparedClientRevision'], base)
             self.assertIn('Tap **Repair local component → Client runtime** once', notes)
             self.assertNotIn('Import your complete ChromieCraft client', notes)
+            self.receipt['signedApk'].update(versionCode=20, versionName='0.1.0-non-custom.20')
+            self.write()
+            self.args.output = self.root / 'v20'
+            staged = release.stage(self.args)
+            notes = (self.args.output / 'RELEASE-NOTES.md').read_text()
+            self.assertEqual(staged['tag'], 'non-custom-v0.1.0-non-custom.20')
+            self.assertEqual(staged['clientRevision'], renderer['executableRevision'])
+            self.assertEqual(staged['preparedClientRevision'], base)
+            self.assertIn('From a prepared v19 installation, tap **Start local game**', notes)
+            self.assertIn('restores its offline status', notes)
             contract.write_text(json.dumps(dict(renderer, executableSha256='9'*64)))
             self.args.output = self.root / 'rejected'
             with self.assertRaisesRegex(ValueError, 'release-renderer-recipe-selection-differs'):
