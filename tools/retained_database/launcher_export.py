@@ -84,7 +84,15 @@ def main():
     screen().save('evidence/realm-launcher.png')
     tap_label('Tools')
     tap_label('Export support bundle')
-    tap_label('Save',launcher=False)
+    # This device is freshly provisioned. Record only its synthetic picker if it cannot save.
+    try:
+        tap_label('Save',launcher=False)
+    except RuntimeError:
+        print('Picker foreground:',foreground(),flush=True)
+        print('Create handler:',shell('cmd','package','resolve-activity','--brief','-a','android.intent.action.CREATE_DOCUMENT',
+                                     '-c','android.intent.category.OPENABLE','-t','application/zip'),flush=True)
+        screen().save('evidence/qa-document-picker.png')
+        raise
     archive=completed_export()
     with zipfile.ZipFile(io.BytesIO(archive)) as z:
         assert z.testzip() is None
