@@ -306,7 +306,8 @@ class Session:
         _programs(selected.programs)
         self._check()
         recovered = recover_interrupted_realm(self.connection, selected.state, selected.uuid, self.verify_service,
-                                              state_lease=selected.state_lease, progress=progress, cancelled=cancelled)
+                                              state_lease=selected.state_lease, cancelled=cancelled,
+                                              progress=lambda phase: progress(phase, 'helper'))
         require(not cancelled(), 'Owned server startup cancelled')
         deadline = time.monotonic() + timeout
         progress('native-launch', 'authserver', native=True)

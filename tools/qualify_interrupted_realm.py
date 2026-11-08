@@ -47,6 +47,43 @@ def expect_rejected_auth(state, program, configuration):
             'original no-eligible-realm diagnosis was not observed')
 
 
+def disconnect_cancelled_writer(reader, mysql, options, state, service, uuid, lease, original):
+    """Hold the real transaction and named lock through sticky cancellation, then close its CLI."""
+    sticky = False
+    free_lock = "SELECT IS_FREE_LOCK('esteria-local-realm')"
+    require(reader.query(free_lock) == ['1'], 'another connection already owns the recovery lock')
+
+    def check_stop():
+        if sticky:
+            raise session.StopRequested('Owned server stop requested')
+
+    writer = session.service.LiveConnection(mysql, options, None, check_stop)
+    def cancelled():
+        nonlocal sticky
+        if writer.query(FLAG) == ['2']:
+            require(reader.query(FLAG) == original and reader.query(free_lock) == ['0'],
+                    'another session observed uncommitted data or a missing writer lock')
+            sticky = True
+        return sticky
+    try:
+        try:
+            session.recover_interrupted_realm(writer, state, uuid, lambda: service.verify(writer, uuid),
+                                              state_lease=lease, cancelled=cancelled)
+        except db.BootstrapError as error:
+            require(sticky and str(error) == 'Provisioning SQL lock release failed; owned service retained',
+                    'dedicated writer failed outside the forced disconnect boundary')
+        else:
+            raise ValueError('sticky cancellation failed to interrupt the recoverable update')
+        require(reader.query(FLAG) == original and reader.query(free_lock) == ['0'],
+                'transaction or named lock was lost before dedicated CLI close')
+    finally:
+        writer.close()
+    require(writer.inner.process.poll() is not None, 'the disconnected CLI was not reaped')
+    with db.Mysql(mysql, options) as fresh:
+        require(service.verify(fresh, uuid) and fresh.query(FLAG) == original and fresh.query(free_lock) == ['1'],
+                'independent subsequent connection could not verify automatic rollback and named lock release')
+
+
 def probe(package, state, service, version, uuid, _record):
     selected, auth_pin = stock.selections(package)
     program = package / 'server-programs/bin/authserver'
@@ -64,7 +101,7 @@ def probe(package, state, service, version, uuid, _record):
         result['stages'].append(dict(phase=phase, elapsedSeconds=round(time.monotonic()-started, 3), **details))
         db.atomic_json(OUT, result)
 
-    require(result['serverSessionHelper'] == dict(bytes=33388, sha256='5ac999c21443a483fc4070011aad4ea53cd0f37603a3a52e6e51a977223385cc'),
+    require(result['serverSessionHelper'] == dict(bytes=33465, sha256='2ca345229b26e648dd324667d7910c73185bc29ab40bfc85f773e751c8aec1a8'),
             'native observer must call the exact reviewed production helper')
     record('verified-compiled-authserver-and-original-four-schema-reopen')
     mysql = Path('/usr/bin/mysql')
@@ -100,6 +137,11 @@ def probe(package, state, service, version, uuid, _record):
             before = preserved(sql, state)
             before_flag = sql.query(FLAG)
             with db.state_lock(state) as lease, realm.config_lock(state):
+                disconnect_cancelled_writer(sql, mysql, opts, state, service, uuid, lease, before_flag)
+                require(preserved(sql, state) == before, 'closing the cancelled writer changed protected state')
+                record('sticky-cancel-dedicated-cli-closed', attempt=attempt, originalFlag=int(before_flag[0]),
+                       uncommittedRowInvisibleToOtherConnection=True, lockHeldUntilCliClose=True,
+                       rolledBackAndLockReleasedOnIndependentReconnect=True)
                 saw_uncommitted_fix = []
                 def cancel_after_update():
                     if sql.query(FLAG) == ['2']:
