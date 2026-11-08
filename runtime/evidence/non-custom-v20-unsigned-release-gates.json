@@ -1,0 +1,64 @@
+{
+  "hostedAPKGates": {
+    "producer": "869d5de3c20596b314536bdb3fb3bf07176920b1",
+    "build": 42470213791,
+    "packageJob": 128699024460,
+    "nativeShaderJob": 128699024379,
+    "android13": 42470213775,
+    "nativeSql": 42470213817,
+    "tooling": 42470213781
+  },
+  "observedHostTests": {
+    "record": "non-custom-v20-host-regression.json",
+    "tests": 1692,
+    "passed": 1641,
+    "skipped": 51
+  },
+  "launcherQualification": {
+    "originalRun": 42470213795,
+    "originalSetupFailure": "External JDK download returned HTTP 504 before product tests",
+    "followupCommit": "e996d9d740a640227093187c7b79876b8137b01c",
+    "launcher": 42471345951,
+    "tooling": 42471345965,
+    "result": "success"
+  },
+  "nativeSessionGates": {
+    "retainedRealmRecovery": 42468641691,
+    "oneSocketAuthReadiness": 42470240409,
+    "record": "non-custom-v20-native-realm-and-auth-readiness.json"
+  },
+  "unsignedPackage": {
+    "artifactId": 13613428032,
+    "apkBytes": 336890325,
+    "apkSha256": "38a56437d2ace81548f0f8774445daf02781173772811bc88f47d341f1c3fa8d",
+    "artifactZipBytes": 336906706,
+    "artifactZipSha256": "1aeadcc0dec370f2ef78e071b118a7390ec402f8986b4f9938fc013994b46ecb"
+  },
+  "independentComparison": {
+    "run": 42471339019,
+    "artifactId": 13613578140,
+    "result": "success",
+    "unchangedProviderArchives": 8,
+    "unchangedPackagedAssets": 120,
+    "totalPackagedAssets": 123,
+    "unchangedNativeLibraries": 4,
+    "assetChanges": "Two session helpers and their manifest. The Android manifest and DEX also changed."
+  },
+  "publication": {
+    "version": "0.1.0-non-custom.20",
+    "signedApk": null,
+    "stockSignerWorkspace": "unavailable",
+    "hostedConfigurationCheck": 42471159509,
+    "hostedSigningInputsComplete": false,
+    "v19ToV20SignedUpgrade": "unqualified",
+    "currentSignedVersion": "0.1.0-non-custom.19"
+  },
+  "runtimeBoundary": {
+    "record": "non-custom-v20-partial-world-observation.json",
+    "lastObserved": "worldserver loading stock quests in an isolated offline Linux ARM64 guest",
+    "physicalThorAfterV13": "no matching support export",
+    "worldReadiness": false,
+    "graphicalWorldEntry": false,
+    "characterPersistence": false
+  }
+}

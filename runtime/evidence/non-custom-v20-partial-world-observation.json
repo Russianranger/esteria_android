@@ -1,0 +1,80 @@
+{
+  "formatVersion": 1,
+  "scope": "Independent local full-system QEMU TCG AArch64 Linux, no NIC, original sealed stock maps, DBC, cameras and assembled VMaps, no navigation tiles supplied to worldserver. Private disposable copy-on-write SQL only.",
+  "selection": {
+    "serverCommit": "f35f04d01689f034778e3474b3c820092f51e461",
+    "worldserverSha256": "9757f0bbb2ee159d18070d8f5fe7ecdf5b4b8b7171116198039f418d5ec13aa1",
+    "providerExt4Sha256": "3effe3daa7ef5d61136ea5f165a4a75b308a7d393033868b58370fd5d043aba0",
+    "importGeneration": "a6800cb53df18cea0012ea4c7c86991edaf49f49433528ec237678454bea09cb",
+    "dataRecipe": "c8e53e9694a7f11ca09b777d3b0de3ec0b0a121a61b173cc3e4ae2795ed04153",
+    "serverSessionSha256": "2ca345229b26e648dd324667d7910c73185bc29ab40bfc85f773e751c8aec1a8"
+  },
+  "beforeCorrection": {
+    "normalNativeLimitSeconds": 180,
+    "ownedWorldListenerWaitBeforeCleanupSeconds": 180.612,
+    "nativeWorldExitDuringCleanup": -9,
+    "persistedStockRealmFlag": 1,
+    "subsequentAuthChangedToFlag": 3,
+    "subsequentAuthListener": false,
+    "databaseStoppedCleanly": true
+  },
+  "separateFirstRecoveryBoot": {
+    "observedHelperSha256": "978b9c1d6536f24bdd56bda1268ff1562b71686ad89e6e9a67e6c0c38b1bacb9",
+    "realFlagTransition": [
+      3,
+      2
+    ],
+    "recoveryRepeatedWithoutMutation": true,
+    "authListenerVerified": true,
+    "sourceChallengeTimedOutReadingThreeBytes": true,
+    "probeTimeoutSeconds": 1,
+    "originalAuthPid": 1048,
+    "sourceSignalExit": 0,
+    "dbCleanStop": true,
+    "cleanPoweroff": true,
+    "elapsedSeconds": 743.654
+  },
+  "lastObservedBoot": {
+    "guestRamMiB": 4608,
+    "guestCores": 3,
+    "ownedFourSchemas": true,
+    "originalUuidAndOrdinaryZeroCharacterAccountVerified": true,
+    "databaseInitializerInvoked": false,
+    "databaseWorkerBeforeEngineSeconds": 50.52,
+    "engineToAuthenticatedReadySeconds": 32.833,
+    "realmBefore": 3,
+    "realmAfter": 2,
+    "subsequentRecoveryRepeatedWithoutMutation": true,
+    "ownedAuthPid": 1047,
+    "ownedWorldPid": 1072,
+    "authProbe": {
+      "sameOriginalSocket": true,
+      "firstObservationSeconds": 1.035,
+      "bytesAtObservation": 0,
+      "completeSourceCallbackHex": "000004",
+      "completeSeconds": 2.258,
+      "externalDiagnosticReadGuardSeconds": 60,
+      "productionSharedNativeBudgetSeconds": 180
+    },
+    "separateExtendedWorldBudgetSeconds": 1800,
+    "lastObservedAtUtc": "2026-11-08T10:19:29Z",
+    "nativeWorldElapsedSeconds": 1044.295,
+    "worldRssKiB": 847924,
+    "guestMemAvailableKiB": 3014732,
+    "seenStages": [
+      "data stores",
+      "game object models",
+      "broadcast texts",
+      "localization",
+      "quests"
+    ],
+    "worldListenerObserved": false,
+    "worldChallengeObserved": false,
+    "characterCreationObserved": false,
+    "worldEntryObserved": false,
+    "executionStateAfterLastObservation": "unknown; the workspace execution environment became unavailable before terminal evidence could be read"
+  },
+  "completeNavigationWasStillRunningAtLastObservation": true,
+  "completeServerDataReceiptObserved": false,
+  "physicalThor": false
+}
