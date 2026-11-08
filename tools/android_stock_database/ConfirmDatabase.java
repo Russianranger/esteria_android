@@ -94,7 +94,7 @@ public final class ConfirmDatabase {
     private static JSONObject run(Context context,Path root,String control) throws Exception {
         RuntimeSetup wine=new RuntimeSetup(context,root);
         Path work=root.resolve("state/client-work");
-        prepareClient(context,root,work,wine,true);
+        prepareClient(context,root,work,wine,control.equals("reference") || control.equals("interrupt"));
         OwnedProcess child=wineGuest(context,root,work,wine,control);
         try {
             long end=System.nanoTime()+TimeUnit.MINUTES.toNanos(8);
@@ -106,7 +106,7 @@ public final class ConfirmDatabase {
     }
 
     public static void main(String[] args) throws Exception {
-        if(args.length!=1 || !(args[0].equals("baseline") || args[0].equals("suppress-mono"))) throw new IllegalArgumentException();
+        if(args.length!=1 || !Arrays.asList("reference","interrupt","reentry","copy-force","copy-warm","warm").contains(args[0])) throw new IllegalArgumentException();
         if(Looper.myLooper()==null) Looper.prepareMainLooper();
         Class<?> thread=Class.forName("android.app.ActivityThread");
         Object instance=thread.getMethod("systemMain").invoke(null);

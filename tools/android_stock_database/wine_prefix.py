@@ -66,7 +66,7 @@ def processes():
     return sorted(result),waits
 
 
-def observe(command,env,prefix,out):
+def observe(command,env,prefix,out,mode):
     system32=prefix/'drive_c/windows/system32'
     started=time.monotonic()
     observed=set()
@@ -135,17 +135,25 @@ def observe(command,env,prefix,out):
         return markers
     try:
         p=launch()
-        deadline=started+375
+        modal_seen=False
+        deadline=started+(100 if mode=='interrupt' else 130)
         while time.monotonic()<deadline:
             state=snapshot()
+            if mode=='interrupt':
+                last=state['waits'].values()
+                modal_seen=(any(w['title']=='Wine Mono Installer' for w in state['windows']) and
+                           ('appwizMono' in state['traceMarkers'] or any(w['appwizMono'] for w in last)) and
+                           len(state['installed'])==len(DLLS) and state['updateTimestamp']==state['wineInfMtime'])
+                if modal_seen:break
             if p.poll() is not None and not ({'wineboot','rundll32','control.exe'} & set(state['processes'])):
                 break
             time.sleep(5)
         state=snapshot()
-        result=dict(command='wine cmd.exe /c ver',commandExitBeforeCleanup=p.poll(),
+        result=dict(command=" ".join(command[1:]),commandExitBeforeCleanup=p.poll(),confirmedMonoInterruption=modal_seen,
             reachedObservationLimit=time.monotonic()>=deadline,seconds=state['seconds'],
-            freshPrefix=True,environmentOverride=env['WINEDLLOVERRIDES'])
+            freshPrefix=mode in ('reference','interrupt'),environmentOverride=env['WINEDLLOVERRIDES'])
         (out/'control-result.json').write_text(json.dumps(result))
+        assert modal_seen if mode=='interrupt' else p.poll()==0
     finally:
         for child in commands:
             if child.poll() is None:

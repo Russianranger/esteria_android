@@ -1,4 +1,4 @@
-name: Wine first-use Mono control on signed ARM64 Android
+name: Wine retained setup control on signed ARM64 Android
 on:
   push:
     branches: [qa/android-wine-prefix-mono-ab]
@@ -8,11 +8,11 @@ jobs:
   database:
     if: github.repository == 'Russianranger/esteria_android' && contains(github.event.head_commit.message, '[measure Mono control]')
     runs-on: ubuntu-24.04-arm
-    timeout-minutes: 24
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        control: [baseline, suppress-mono]
+        control: [reference, retained]
     env:
       ESTERIA_WINE_CONTROL: ${{ matrix.control }}
     steps:
@@ -50,7 +50,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: wine-control-${{ matrix.control }}
+          name: wine-reentry-${{ matrix.control }}
           path: ${{ runner.temp }}/android-stock-db-evidence/*.json
           retention-days: 7
           if-no-files-found: warn
