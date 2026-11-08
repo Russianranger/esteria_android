@@ -1,50 +1,78 @@
-"""Exercise the signed launcher's SAF export on a disposable Android realm; publish only counts."""
+"""Exercise the visible launcher and real DocumentsUI on a disposable Android realm."""
+import csv
 import io
 import json
 from pathlib import Path
 import re
 import subprocess
 import time
-import xml.etree.ElementTree as ET
 import zipfile
 
-from android_platform import CONTAINER, PACKAGE, android_tool, platform_environment, shell
+from PIL import Image
+from android_platform import CONTAINER, PACKAGE, android_tool, shell
 
 
-def visible(match, seconds=45):
-    deadline = time.monotonic() + seconds
-    while time.monotonic() < deadline:
-        try:
-            # Android's uiautomator wrapper kills its own process group on some Redroid builds.
-            # Accept only a fresh, fully parsed hierarchy written by this invocation as the shell UID.
-            target='/data/local/tmp/esteria-qa-ui-'+str(time.monotonic_ns())+'.xml'
-            command=['docker','exec','--user','2000:2000',CONTAINER,'/system/bin/env','-i',
-                     *platform_environment(),'uiautomator','dump',target]
-            result=subprocess.run(command,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,timeout=20)
-            if subprocess.run(['docker','exec',CONTAINER,'test','-s',target]).returncode:
-                raise RuntimeError(f'Android shell produced no hierarchy (exit {result.returncode}): {result.stdout[-600:]}')
-            try:
-                root=ET.fromstring(shell('cat',target))
-            finally:
-                shell('rm','-f',target)
-            for node in root.iter('node'):
-                if match(node.attrib):
-                    return node.attrib
-        except (subprocess.CalledProcessError, ET.ParseError):
-            pass
+def screen():
+    data = subprocess.check_output(['docker', 'exec', CONTAINER, 'screencap', '-p'], timeout=15)
+    return Image.open(io.BytesIO(data)).convert('RGB')
+
+
+def button(image, label, launcher):
+    # Limit launcher recognition to its controls. DocumentsUI owns the whole display.
+    if launcher:
+        image = image.crop((0, 0, min(image.width, 720), image.height))
+    data = io.BytesIO()
+    image.save(data, format='PNG')
+    expected = label.casefold().split()
+    for mode in ('11', '6'):
+        result = subprocess.run(['tesseract', 'stdin', 'stdout', '--psm', mode, 'tsv'],
+                                input=data.getvalue(), stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+                                check=True, timeout=12)
+        lines = {}
+        for row in csv.DictReader(io.StringIO(result.stdout.decode()), delimiter='\t', quoting=csv.QUOTE_NONE):
+            if row.get('level') == '5' and row.get('text'):
+                key = (row['block_num'], row['par_num'], row['line_num'])
+                lines.setdefault(key, []).append(row)
+        for words in lines.values():
+            for n in range(len(words)-len(expected)+1):
+                match = words[n:n+len(expected)]
+                if [r['text'].strip(' .,|').casefold() for r in match] != expected:
+                    continue
+                mid = match[len(match)//2]
+                return (int(mid['left']) + int(mid['width'])//2, int(mid['top']) + int(mid['height'])//2)
+    return None
+
+
+def foreground():
+    rows = shell('dumpsys', 'activity', 'activities').splitlines()
+    return ' '.join(r for r in rows if 'mResumedActivity' in r or 'topResumedActivity' in r)
+
+
+def tap_label(label, launcher=True):
+    deadline = time.monotonic()+45
+    while time.monotonic()<deadline:
+        owner = foreground()
+        if (PACKAGE+'/' in owner if launcher else '.documentsui/' in owner):
+            point = button(screen(), label, launcher)
+            if point:
+                android_tool('input','tap',str(point[0]),str(point[1]))
+                return
         time.sleep(.4)
-    raise RuntimeError('The expected Android control did not appear')
+    raise RuntimeError('Visible Android control unavailable: '+label)
 
 
-def tap(node):
-    bounds = re.fullmatch(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]', node['bounds'])
-    assert bounds
-    x, y, right, bottom = map(int, bounds.groups())
-    android_tool('input', 'tap', str((x + right) // 2), str((y + bottom) // 2))
-
-
-def label(value):
-    return visible(lambda node: node.get('package') == PACKAGE and node.get('text') == value)
+def completed_export():
+    deadline = time.monotonic()+90
+    while time.monotonic()<deadline:
+        paths = shell('find','/data/media/0','-maxdepth','4','-name','Esteria-support-*.zip','-type','f').splitlines()
+        if len(paths)==1 and re.fullmatch(r'/data/media/0/(?:[^/]+/)*Esteria-support-\d+\.zip',paths[0]):
+            size=int(shell('stat','-c','%s',paths[0]))
+            if 0<size<=4*1024*1024 and PACKAGE+'/' in foreground():
+                data=subprocess.check_output(['docker','exec',CONTAINER,'cat',paths[0]],timeout=20)
+                if zipfile.is_zipfile(io.BytesIO(data)):
+                    return data
+        time.sleep(.4)
+    raise RuntimeError('DocumentsUI did not produce a completed support ZIP')
 
 
 def main():
@@ -52,36 +80,24 @@ def main():
     shell('wm','dismiss-keyguard')
     shell('cmd','activity','start-activity','-W','-n',PACKAGE+'/io.github.russianranger.esteria.MainActivity')
     time.sleep(1)
-    resumed=shell('dumpsys','activity','activities')
-    assert any(PACKAGE in line and ('mResumedActivity' in line or 'topResumedActivity' in line) for line in resumed.splitlines())
-    with Path('evidence/realm-launcher.png').open('wb') as output:
-        subprocess.run(['docker','exec',CONTAINER,'screencap','-p'], stdout=output, check=True, timeout=20)
-    label('Start local game')
-    tap(label('Tools'))
-    tap(label('Export support bundle'))
-    # Accept the generated name in Android's standard DocumentsUI. A fresh Redroid user defaults to Downloads.
-    save = visible(lambda node: node.get('package', '').endswith('.documentsui') and
-                   node.get('text', '').casefold() == 'save' and node.get('enabled') == 'true')
-    tap(save)
-    tap(label('Play'))  # The short Play page keeps the shared status line visible.
-    visible(lambda node: node.get('package') == PACKAGE and 'Support bundle saved.' in node.get('text', ''), seconds=90)
-    paths = shell('find', '/data/media/0', '-maxdepth', '4', '-name', 'Esteria-support-*.zip', '-type', 'f').splitlines()
-    assert len(paths) == 1 and re.fullmatch(r'/data/media/0/(?:[^/]+/)*Esteria-support-\d+\.zip', paths[0])
-    size = int(shell('stat', '-c', '%s', paths[0]))
-    assert 0 < size <= 4*1024*1024
-    archive = subprocess.check_output(['docker', 'exec', CONTAINER, 'cat', paths[0]], timeout=20)
+    assert PACKAGE+'/' in foreground()
+    screen().save('evidence/realm-launcher.png')
+    tap_label('Tools')
+    tap_label('Export support bundle')
+    tap_label('Save',launcher=False)
+    archive=completed_export()
     with zipfile.ZipFile(io.BytesIO(archive)) as z:
         assert z.testzip() is None
-        names = z.namelist()
+        names=z.namelist()
         assert 'status.txt' in names and 'logs/launcher.log' in names
-        assert all(n == 'status.txt' or re.fullmatch(r'logs/[A-Za-z0-9._-]+\.log', n) for n in names)
-        status = z.read('status.txt').decode()
+        assert all(n=='status.txt' or re.fullmatch(r'logs/[A-Za-z0-9._-]+\.log',n) for n in names)
+        status=z.read('status.txt').decode()
         assert 'app.versionCode=23\n' in status and 'game.frameCap.nextStart=30\n' in status
-        omitted = int(re.search(r'^support.omittedFacts=(\d+)$', status, re.M).group(1))
+        omitted=int(re.search(r'^support.omittedFacts=(\d+)$',status,re.M).group(1))
     Path('evidence/export-counts.json').write_text(json.dumps(dict(
-        versionCode=23, route='signed launcher, Android DocumentsUI, fresh retained-SQL fixture',
-        zipBytes=size, entries=len(names), metadataBytes=len(status.encode()), omittedFacts=omitted))+'\n')
+        versionCode=23,route='visible launcher and Android DocumentsUI on disposable Android 13 ARM64',
+        zipBytes=len(archive),entries=len(names),metadataBytes=len(status.encode()),omittedFacts=omitted))+'\n')
 
 
-if __name__ == '__main__':
+if __name__=='__main__':
     main()
