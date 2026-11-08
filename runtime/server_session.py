@@ -218,7 +218,7 @@ def recover_interrupted_realm(connection, state, expected_uuid, verify_service, 
         flags = connection.query(flag_sql)
         require(len(flags) == 1 and re.fullmatch(r'0|[1-9][0-9]{0,2}', flags[0]) and int(flags[0]) <= 255,
                 'Invalid selected local realm flags')
-        if not int(flags[0]) & 1:
+        if (int(flags[0]) & 1) == 0:
             return False
         # World sets VERSION_MISMATCH while loading. A crash leaves 1. Auth adds OFFLINE (3)
         # then its source query excludes that row. Recover only these exact stock states.
@@ -230,8 +230,8 @@ def recover_interrupted_realm(connection, state, expected_uuid, verify_service, 
                 require(verify_service() is not False and connection.query('SELECT @@server_uuid') == [expected_uuid],
                         'Owned database changed before local realm recovery')
                 ids = connection.query('SELECT `id` FROM `acore_auth`.`realmlist` ORDER BY `id` FOR UPDATE')
-                require(ids == ['1'] and connection.query(realm.ROW_SQL) == [realm.EXPECTED_ROW] and
-                        connection.query(flag_sql) == flags, 'Interrupted singleton stock realm selection differs')
+                require(ids == ['1'] and connection.query(realm.ROW_SQL + ' FOR UPDATE') == [realm.EXPECTED_ROW] and
+                        connection.query(flag_sql + ' FOR UPDATE') == flags, 'Interrupted singleton stock realm selection differs')
                 # Keep the realm offline. Only the real world's normal readiness path can advertise it online.
                 connection.query('UPDATE `acore_auth`.`realmlist` SET `flag`=2 WHERE `id`=1 AND `flag` IN (1,3)')
                 require(connection.query(flag_sql) == ['2'] and verify_service() is not False,

@@ -33,9 +33,11 @@ jobs:
           python3 -m tools.qualify_packaged_server_auth stage --apk "$apk" --readback runtime/evidence/non-custom-v19-public-apk-readback.json --output "$GRUNT_QA/packaged-server"
           docker import --platform linux/arm64 "$GRUNT_QA/packaged-server/server-runtime.tar.gz" esteria-packaged-server:qualified
       - name: Verify the selected reconstructed executable and exact Wine provider
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          python3 -m tools.qualify_packaged_grunt stage --output "$GRUNT_QA/grunt"
-          docker import --platform linux/arm64 "$GRUNT_QA/grunt/cache/wine-arm64.tar.gz" esteria-stock-grunt:qualified
+          python3 -m tools.qualify_realm_inputs "$GRUNT_QA/provider-cache" "$GRUNT_QA/grunt"
+          docker import --platform linux/arm64 "$GRUNT_QA/provider-cache/wine-arm64.tar.gz" esteria-stock-grunt:qualified
       - name: Reproduce both source flags, abort and reopen the owned recovery, then verify two real Grunt logins
         run: |
           set -eu

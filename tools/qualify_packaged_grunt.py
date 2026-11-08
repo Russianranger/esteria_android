@@ -28,10 +28,10 @@ def selection():
     return selected, pair, build
 
 
-def stage(destination):
+def stage(destination, *, input_cache=None):
     selected, pair, build = selection()
     destination.mkdir(mode=0o700)
-    cache = destination / 'cache'
+    cache = input_cache if input_cache is not None else destination / 'cache'
     fixture = destination / 'fixture'
     fixture.mkdir(mode=0o700)
     for pin in (selected['archive'], selected['manifest']):
