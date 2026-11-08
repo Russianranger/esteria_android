@@ -1,6 +1,6 @@
 # Current stock publication
 
-The v22 transport binds Android producer `7084421f2faaf6ebe5f4ccc44fe8c5c5f91d99bc` to the original stock signing certificate and the exact published v21 baseline. Signed v21 reproduced a masked schema interruption on offline Android 13 ARM64. Its v22 replacement retained both failed slots, completed SQL through an unreadable progress sample, promoted a separate UUID and reopened the same account in a fresh process. [Transport](update-22/publication-inputs.json) · [Signed update test](https://github.com/Russianranger/esteria_android/actions/runs/42506258924/job/128810203620).
+[Published v22](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.22) passed the [six-asset readback](../../evidence/non-custom-v22-public-apk-readback.json). Its transport binds Android producer `7084421f2faaf6ebe5f4ccc44fe8c5c5f91d99bc` to the original stock signing certificate and the exact published v21 baseline. Signed v21 reproduced a masked schema interruption on offline Android 13 ARM64. Its v22 replacement retained both failed slots, completed SQL through an unreadable progress sample, promoted a separate UUID and reopened the same account in a fresh process. [Transport](update-22/publication-inputs.json) · [Signed update test](https://github.com/Russianranger/esteria_android/actions/runs/42506258924/job/128810203620).
 
 ## Historical v21 publication
 
