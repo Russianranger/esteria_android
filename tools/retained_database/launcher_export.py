@@ -8,7 +8,7 @@ import subprocess
 import time
 import zipfile
 
-from PIL import Image
+from PIL import Image, ImageChops
 from android_platform import CONTAINER, PACKAGE, android_tool, shell
 
 
@@ -19,12 +19,24 @@ def screen():
 
 def button(image, label, launcher):
     # Limit launcher recognition to its controls. DocumentsUI owns the whole display.
+    offset_x = offset_y = 0
+    modes = ('11', '6')
     if launcher:
         image = image.crop((0, 0, min(image.width, 720), image.height))
+    else:
+        # Android 13 DocumentsUI presents Save as a small blue pill. OCR the label inside it.
+        region = (image.width*3//4, image.height*3//5, image.width, image.height*95//100)
+        corner = image.crop(region)
+        red, _, blue = corner.split()
+        box = ImageChops.subtract(blue, red).point(lambda value: 255 if value>90 else 0).getbbox()
+        if box:
+            offset_x, offset_y = region[0]+box[0], region[1]+box[1]
+            image = corner.crop(box)
+            modes = ('8','11','7')
     data = io.BytesIO()
     image.save(data, format='PNG')
     expected = label.casefold().split()
-    for mode in ('11', '6'):
+    for mode in modes:
         result = subprocess.run(['tesseract', 'stdin', 'stdout', '--psm', mode, 'tsv'],
                                 input=data.getvalue(), stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
                                 check=True, timeout=12)
@@ -39,7 +51,8 @@ def button(image, label, launcher):
                 if [r['text'].strip(' .,|').casefold() for r in match] != expected:
                     continue
                 mid = match[len(match)//2]
-                return (int(mid['left']) + int(mid['width'])//2, int(mid['top']) + int(mid['height'])//2)
+                return (offset_x + int(mid['left']) + int(mid['width'])//2,
+                        offset_y + int(mid['top']) + int(mid['height'])//2)
     return None
 
 
