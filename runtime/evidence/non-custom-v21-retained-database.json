@@ -220,5 +220,90 @@
     "status": "skipped-incompatible-emulator-abi",
     "packageManagerUpdateExecuted": false,
     "error": "INSTALL_FAILED_NO_MATCHING_ABIS"
+  },
+  "signedAndroidArm64Grunt": {
+    "environment": "Offline native ARM64 Android 13, actual signed v21 installed over an independent signed v18 seed",
+    "run": 42497527503,
+    "job": 128782997245,
+    "artifactId": 13624705427,
+    "artifactSha256": "ee6e65e322a71d7518f5b86df2524216928ce8096b016e044d80cc85e376482e",
+    "phase": "complete",
+    "scope": "Reconstructed Grunt login, source-matched server response and disposable empty-geometry worldserver observation. The normal graphical login was not run.",
+    "observations": [
+      {
+        "mode": "cold",
+        "instanceUuid": "98111f5c-db8d-11f1-99fa-d2389f7673dd",
+        "slotId": "4908c29aefca452e",
+        "providerCopiedBytes": 0,
+        "sourceRevision": "c05a3af9be6c204c40d65d0e3eb6ccc2442012b6",
+        "existingBootstrapReused": true,
+        "auth": {
+          "ownedListener": true,
+          "srpAndRealmList": true,
+          "mysqlKeyMatched": true,
+          "authserverExitedCleanly": true,
+          "commonMainStarted": false,
+          "authserverElapsedMs": 8065,
+          "clientReceiptSha256": "dd6db8f0c26de522a61d5ebe0dbeb068191ce78a54d8c3d4dba4dea1cbc31dff",
+          "supplementalWorld": null
+        }
+      },
+      {
+        "mode": "warm",
+        "instanceUuid": "98111f5c-db8d-11f1-99fa-d2389f7673dd",
+        "slotId": "4908c29aefca452e",
+        "providerCopiedBytes": 0,
+        "sourceRevision": "c05a3af9be6c204c40d65d0e3eb6ccc2442012b6",
+        "existingBootstrapReused": true,
+        "auth": {
+          "ownedListener": true,
+          "srpAndRealmList": true,
+          "mysqlKeyMatched": true,
+          "authserverExitedCleanly": true,
+          "commonMainStarted": false,
+          "authserverElapsedMs": 9182,
+          "clientReceiptSha256": "7c3d5b26fb91fc0c6b80e83c57d97048666333c7332bc217fa65461ffd76b0ab",
+          "supplementalWorld": {
+            "configErrors": false,
+            "configuredFileRead": true,
+            "dataBytes": 0,
+            "dataFiles": 0,
+            "dataMount": "/esteria-data",
+            "dataReceiptUsed": false,
+            "dataStoresEntered": false,
+            "databasePoolFailed": false,
+            "databasePoolsOpened": [
+              "acore_auth",
+              "acore_characters",
+              "acore_playerbots",
+              "acore_world"
+            ],
+            "elapsedSeconds": 1.102,
+            "gameSessionExecuted": false,
+            "mapFilesNamed": [],
+            "missingSharedLibraries": false,
+            "missingSqlTable": false,
+            "mysqlConnectionFailed": false,
+            "mysqlErrorCodes": [],
+            "mysqlStillAuthenticated": true,
+            "nativeExit": 1,
+            "originalChildReaped": true,
+            "phase": "starting-area-map-required",
+            "physicalThor": false,
+            "preparedStatementError": false,
+            "privateDiagnosticSha256": "72b96731091060d5aab740d39667d906939252a4ed67e7d5a0c5f3dabca5267f",
+            "scope": "disposable Android stock four-schema worldserver loader with empty data directory",
+            "startingAreaDataRequired": true,
+            "startingAreaLoaded": false,
+            "unknownSqlColumn": false,
+            "worldEntryQualified": false,
+            "worldInformationStarted": true,
+            "worldReadyQualified": false,
+            "worldVersionLoaded": true,
+            "worldserverSha256": "9757f0bbb2ee159d18070d8f5fe7ecdf5b4b8b7171116198039f418d5ec13aa1"
+          }
+        }
+      }
+    ]
   }
 }

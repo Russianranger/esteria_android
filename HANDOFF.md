@@ -6,6 +6,8 @@ Android producer `623a88115a394fc7bd433c51a60d0e0cda732b67` retains the v20 real
 
 The original stock signing backup is `Esteria-Android-private-signing-backup.zip` in the owner's saved files (reference `libfile_64427ea40a948191bacdf375aeb2ada6`). Recover it privately and verify its certificate against `app/stock-signing.lock.json`. The local signer accepts two distinct owner-only password files outside the checkout. Use the exact last published stock APK and export a fresh recipe for each candidate. For v21 the backup signed the fixed APK, the public recipe reproduced its bytes, the SDK verified v2/v3 and all six public assets were downloaded and verified. [Procedure](BUILDING.md) · [Release readback](runtime/evidence/non-custom-v21-public-apk-readback.json).
 
+Published v21 passed cold and warm reconstructed Grunt authentication on native Android ARM64. The separate empty-data world probe opened all four SQL pools and stopped at its starting-area map check. [Android authentication and worldserver run](https://github.com/Russianranger/esteria_android/actions/runs/42497527503).
+
 The next physical gate is the first normal v21 Start on the retained Thor after database repair. Record the world listener and startup phase, normal graphical login, Human Warrior creation/entry, input, clean stop and three cold offline relaunches. The independent full-data runner obtains its own stock ZIP and navigation data. [Native full-data run](https://github.com/Russianranger/esteria_android/actions/runs/42491096080).
 
 ## Historical v18 handoff
