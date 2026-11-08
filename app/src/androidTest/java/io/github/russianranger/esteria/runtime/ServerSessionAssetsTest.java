@@ -28,7 +28,7 @@ public final class ServerSessionAssetsTest {
             }
             assertEquals(generation,GuestHelperAssets.install(context,"server-session",generations,LocalServerSession.HELPERS));
             assertEquals(stamp,Files.getLastModifiedTime(retained));
-            try(var files=Files.walk(installed)){assertEquals(24,files.filter(Files::isRegularFile).count());}
+            try(var files=Files.walk(installed)){assertEquals(LocalServerSession.HELPERS.size(),files.filter(Files::isRegularFile).count());}
         }finally{remove(root);}
     }
     @Test public void privateDataMetadataBindingRejectsChangedAncestryAndQualificationClaims()throws Exception {
