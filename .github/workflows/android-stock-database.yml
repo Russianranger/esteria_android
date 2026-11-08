@@ -13,9 +13,8 @@ jobs:
       fail-fast: false
       matrix:
         control: [retained]
-        pathShape: [client]
     env:
-      ESTERIA_SOCKET_SHAPE: ${{ matrix.pathShape }}
+      ESTERIA_SOCKET_SHAPE: signed-v17
       ESTERIA_WINE_CONTROL: ${{ matrix.control }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -52,7 +51,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: wine-prefix-socket-${{ matrix.pathShape }}
+          name: wine-prefix-signed-v17-${{ matrix.control }}
           path: ${{ runner.temp }}/android-stock-db-evidence/*.json
           retention-days: 7
           if-no-files-found: warn

@@ -25,10 +25,10 @@ def shell(container, script, *args, timeout=60):
     return call.stdout
 
 
-def identity(container):
+def identity(container, version=16):
     result = shell(container,'dumpsys package "$1"',PACKAGE)
-    require(re.search(r'^\s*versionCode=16\b',result,re.MULTILINE) and
-            re.search(r'^\s*versionName='+re.escape(NAME)+r'\s*$',result,re.MULTILINE),
+    require(re.search(r'^\s*versionCode='+str(version)+r'\b',result,re.MULTILINE) and
+            re.search(r'^\s*versionName='+re.escape('0.1.0-non-custom.'+str(version))+r'\s*$',result,re.MULTILINE),
             'installed package version differs')
     package_list = shell(container,'pm list packages --user 0 -U "$1"',PACKAGE)
     match = re.search(r'^package:'+re.escape(PACKAGE)+r' uid:(\d+)\s*$',package_list,re.MULTILINE)

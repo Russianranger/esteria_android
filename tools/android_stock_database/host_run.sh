@@ -33,12 +33,13 @@ curl --fail --location --silent --show-error --retry 3 "$wine" -o "$work/input/w
 test "$(stat -c %s "$work/input/wine.tar.gz")" = 282628308
 echo "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46  $work/input/wine.tar.gz" | sha256sum -c
 chmod 0444 "$work/input/wine.tar.gz"
-if [[ "${ESTERIA_SOCKET_SHAPE:-declared}" == client ]]; then
-    # Single-variable diagnostic, only the operation's ephemeral host directory label.
-    presentation=app/src/main/java/io/github/russianranger/esteria/presentation/ClientPresentationSession.java
-    test "$(grep -c 'directory(session.resolve("prefix-update"))' "$presentation")" = 1
-    sed -i 's/directory(session.resolve("prefix-update"))/directory(session.resolve("client"))/' "$presentation"
-fi
+apk17="$work/input/update17.apk"
+curl --fail --location --silent --show-error --retry 3 "$repo_url/non-custom-v0.1.0-non-custom.17/Esteria-Stock-3.3.5a-arm64.apk" -o "$apk17"
+test "$(stat -c %s "$apk17")" = 336899353
+echo "dc68c5ced8f0f4a155d86135f70a8522766e483957df06e0ce5544d488ac2ace  $apk17" | sha256sum -c
+java -jar "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" verify --verbose --print-certs "$apk17" > "$work/signers17"
+grep '^Signer #1 certificate SHA-256 digest: 5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa$' "$work/signers17"
+chmod 0644 "$apk17"
 bash tools/android_stock_shader/compile_driver.sh "$work/dex" "$work/input/driver.jar" database
 cp tools/android_stock_database/{auth_phase,grunt_wine,fingerprint,prefix_helper_observer,safe_registry,wine_prefix,wine_windows,world_probe}.py tools/{client_auth_contract,prepare_runtime,stock_world_observation}.py "$work/input/"
 chmod 0444 "$work/input/"*.py

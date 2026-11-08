@@ -48,13 +48,23 @@ public final class ConfirmDatabase {
         } catch(NoSuchAlgorithmException error) { throw new IOException(error); }
     }
 
+    @SuppressWarnings("unchecked")
+    private static java.util.Map<String,String> shippedClientEnvironment(RuntimeSetup wine) throws IOException {
+        try{
+            Class<?> cls=Class.forName("io.github.russianranger.esteria.presentation.ClientPresentationSession");
+            java.lang.reflect.Method m=cls.getDeclaredMethod("clientEnvironment",java.util.Map.class,java.util.Map.class,String.class,boolean.class);
+            m.setAccessible(true);
+            java.util.Map<String,String> session=io.github.russianranger.esteria.core.presentation.X11SessionPlan.environment(77);
+            return wine.wineEnvironment((java.util.Map<String,String>)m.invoke(null,session,java.util.Collections.emptyMap(),"stock-3.3.5a",true));
+        }catch(ReflectiveOperationException error){throw new IOException("Failed to observe signed stock launch environment",error);}
+    }
     private static OwnedProcess wineGuest(Context context,Path root,Path work,RuntimeSetup wine,String mode) throws IOException {
         Path sessions=Files.createDirectories(root.resolve("s"),java.nio.file.attribute.PosixFilePermissions.asFileAttribute(java.nio.file.attribute.PosixFilePermissions.fromString("rwx------")));
         Path owner=Files.createDirectory(sessions.resolve(UUID.randomUUID().toString().replace("-","").substring(0,16)));
         Path processSession=Files.createDirectory(owner.resolve("client"));
         return ProotProcess.start(context,wine.installer(),wine.packagePlan(),work,processSession,
                 Arrays.asList("/usr/bin/python3","-B","-s","-E","/work/grunt_wine.py",mode),
-                wine.wineEnvironment(),null);
+                shippedClientEnvironment(wine),null);
     }
 
     private static void pause() throws IOException {

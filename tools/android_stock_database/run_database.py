@@ -8,7 +8,7 @@ import subprocess
 import sys
 import time
 
-from tools.android_stock_shader.package_lifecycle import identity, check_empty
+from tools.android_stock_shader.package_lifecycle import ACTIVITY, identity, check_empty
 from tools.android_stock_shader.run_owner import BOOT_KEYS, PACKAGE, checked, shell
 
 CONTAINER='esteria-android-qa'
@@ -131,11 +131,6 @@ def failure_details(report):
 
 def exercise(report):
     package_uid=identity(CONTAINER)
-    apk=shell(CONTAINER,'pm path "$1"',PACKAGE).strip()
-    match=re.fullmatch(r'package:(/data/app/[A-Za-z0-9_./=+~-]+/base\.apk)',apk)
-    checked(match,'single installed APK required')
-    apk=match[1]
-    native=apk.rsplit('/',1)[0]+'/lib/arm64'
     raw=shell(CONTAINER, "set -- $(pidof zygote64); test $# -eq 1; tr '\\000' '\\n' </proc/$1/environ")
     boot=[v for v in raw.splitlines() if '=' in v and v.split('=',1)[0] in BOOT_KEYS]
     checked(any(v.startswith('BOOTCLASSPATH=') for v in boot),'missing ART environment')
@@ -146,11 +141,38 @@ def exercise(report):
     phases=['reference','noop','unknown'] if scenario=='reference' else ['interrupt','reentry','clone','cancel','update','finish','noop','warm','audit']
     report['samples']={}
     for mode in phases:
+        if mode=='reentry':
+            def retained_snapshot():
+                fp='/data/data/'+PACKAGE+'/files/qa-original/state/client-work/home/.wine'
+                verified=shell(CONTAINER,'''cd "$1"
+                    for x in . .update-timestamp system.reg user.reg userdef.reg drive_c/esteria-qa-prior-state.bin; do
+                        stat -c '%i %s %Y %u %g' "$x"; if test -f "$x"; then sha256sum "$x"; fi
+                    done''',fp)
+                return hashlib.sha256(verified.encode()).hexdigest()
+            before=retained_snapshot()
+            test=shell(CONTAINER,'''p=/data/local/tmp/esteria-stock-repair-qa17.apk; test ! -e "$p"; trap 'rm -f "$p"' EXIT
+                cp /esteria-qa/input/update17.apk "$p"; chmod 644 "$p"; pm install -r --user 0 "$p"''',timeout=360)
+            checked('Success' in test.splitlines() and identity(CONTAINER,17)==package_uid,'in-place signed update must preserve UID')
+            checked(retained_snapshot()==before,'update changed the old prefix')
+            report.update(installedSignedUpgrade=True,retainedOldPrefixSnapshot=before,signedV17MainActivity=True)
+            ui=shell(CONTAINER,'am start -W --user 0 -n "$1"',PACKAGE+"/"+ACTIVITY,timeout=90)
+            checked(re.search(r'^Status: ok$',ui,re.M),'updated launcher failed')
+            shell(CONTAINER,'am force-stop "$1"',PACKAGE);check_empty(CONTAINER,package_uid)
+        apk=shell(CONTAINER,'pm path "$1"',PACKAGE).strip()
+        match=re.fullmatch(r'package:(/data/app/[A-Za-z0-9_./=+~-]+/base\.apk)',apk)
+        checked(match,'single installed APK required')
+        apk=match[1]
+        native=apk.rsplit('/',1)[0]+'/lib/arm64'
+        if mode in ('interrupt','reentry'):
+            shipped=shell(CONTAINER,'sha256sum "$1" "$2" /esteria-qa/input/driver.jar',apk,'/esteria-qa/input/'+('stock.apk' if mode=='interrupt' else 'update17.apk')).splitlines()
+            hashes=[i.split()[0] for i in shipped]
+            checked(len(hashes)==3 and hashes[0]==hashes[1] and all(re.fullmatch(r'[0-9a-f]{64}',i) for i in hashes),'installed APK/dex identity mismatch')
+            report['signedApk'+('16' if mode=='interrupt' else '17')]=hashes[0]; report['observerDexJarSha256']=hashes[2]
         report['phase']=mode
         cmd=['docker','exec','--user',f'{package_uid}:{package_uid}',CONTAINER,
              '/system/bin/env','-i',*boot,'CLASSPATH=/esteria-qa/input/driver.jar:'+apk,
              '/system/bin/app_process64','-Djava.library.path='+native+':/system/lib64','/system/bin',
-             'io.github.russianranger.esteria.runtime.ConfirmDatabase',mode]
+             ('io.github.russianranger.esteria.runtime.ConfirmLegacy' if mode=='interrupt' else 'io.github.russianranger.esteria.runtime.ConfirmDatabase'),mode]
         result=subprocess.run(cmd,capture_output=True,text=True,timeout=50*60)
         phases=[line for line in result.stdout.splitlines() if re.fullmatch(r'ANDROID_DB_PHASE [a-z0-9_-]+ \d+',line)]
         report['lastPhases']=phases
@@ -169,14 +191,15 @@ def exercise(report):
         check_empty(CONTAINER,package_uid)
         report['postCleanupPackageUidProcesses']=0
         report['operations'].append(item)
-        checked(item['changedSource']=='UNRECOGNIZED' and item['foreign']=='UNRECOGNIZED','unexpected non-selected source acceptance')
+        if mode!='interrupt':checked(item['changedSource']=='UNRECOGNIZED' and item['foreign']=='UNRECOGNIZED','unexpected non-selected source acceptance')
         sample={'owner':item,'postCleanupPackageUidProcesses':0};report['samples'][mode]=sample
         if mode in ('interrupt','reentry','reference','warm'):
             files='/data/data/'+PACKAGE+'/files'+('/qa-original' if mode in ('interrupt','reentry') else '')
             def proof(name):return json.loads(shell(CONTAINER,'cat "$1/state/client-work/$2/$3"',files,mode,name))
             sample['controlResult']=proof('control-result.json');sample['prefix']=proof('prefix-proof.json');wine_details(sample,mode)
         if mode=='reference':checked(item['before']=='ABSENT' and item['after']=='NO_REPAIR','fresh healthy classification failed')
-        if mode in ('interrupt','reentry'):checked(item['after']=='INCOMPLETE','actual interrupted prefix failed classification')
+        if mode=='interrupt':checked(item['versionCode']==16 and sample['controlResult']['confirmedMonoInterruption'],'real signed v16 Mono interruption required')
+        if mode=='reentry':checked(item['after']=='INCOMPLETE','actual interrupted prefix failed classification')
         if mode=='clone':checked(item['after']=='INCOMPLETE' and item['copy']['originalTreeUnchanged'],'ineligible clone')
         if mode=='cancel':checked(item.get('nativeCancelled') and item.get('liveWinebootBeforeCancel') and item['competingLeaseDenied'] and item['pending'] and item['after']=='RESUME','cancelled updater/lease/pending recovery not proven')
         if mode=='update':checked(item.get('cutAfterGuestExitBeforePendingRetired') and item['pending'] and item['after']=='RESUME' and item['competingLeaseDenied'],'named recovery failed to return through verify')
@@ -189,7 +212,7 @@ def exercise(report):
 
 
 if __name__=='__main__':
-    report=dict(scope='Dedicated fresh signed Android 13 ARM64 stock Wine first-use prefix and real cmd.exe, observed without UI action',phase='initial',
+    report=dict(scope='Installed original-signed v16 and v17 DEX with app UID, offline Android 13 ARM64. Only the small QA observers are in the external DEX.',phase='initial',
                 reconstructedGruntTarget=False,actualWorldSession=False,graphicalLogin=False,physicalThor=False)
     start=time.monotonic()
     try:

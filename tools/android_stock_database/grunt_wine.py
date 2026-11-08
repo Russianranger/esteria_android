@@ -20,10 +20,8 @@ out = work / mode
 out.mkdir(mode=0o700, exist_ok=False)
 start = time.monotonic()
 env = {**os.environ, 'DISPLAY': ':77', 'WINEPREFIX': '/work/home/.wine',
-       'WINEDLLOVERRIDES':'winepulse.drv=', 'WINEESYNC':'0', 'WINEFSYNC':'0',
        'WINEDEBUG': '-all,err+all'}
-if mode!='interrupt':
-    env['WINEDLLOVERRIDES']+=';mscoree='
+assert env['WINEDLLOVERRIDES']==('winepulse.drv=' if mode=='interrupt' else 'winepulse.drv=;mscoree=')
 original_prefix = Path(env['WINEPREFIX'])
 if mode.startswith('copy-'):
     env['WINEPREFIX']='/work/home/.wine-repair-copy'
