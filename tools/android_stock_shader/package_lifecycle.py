@@ -9,8 +9,8 @@ import time
 
 PACKAGE = 'io.github.russianranger.esteria.stock'
 ACTIVITY = 'io.github.russianranger.esteria.MainActivity'
-NAME = '0.1.0-non-custom.16'
-SCOPE = 'disposable Android 13 signed v16 package lifecycle'
+NAME = '0.1.0-non-custom.19'
+SCOPE = 'disposable Android 13 signed v19 package lifecycle'
 
 
 def require(value, message):
@@ -27,7 +27,7 @@ def shell(container, script, *args, timeout=60):
 
 def identity(container):
     result = shell(container,'dumpsys package "$1"',PACKAGE)
-    require(re.search(r'^\s*versionCode=16\b',result,re.MULTILINE) and
+    require(re.search(r'^\s*versionCode=19\b',result,re.MULTILINE) and
             re.search(r'^\s*versionName='+re.escape(NAME)+r'\s*$',result,re.MULTILINE),
             'installed package version differs')
     package_list = shell(container,'pm list packages --user 0 -U "$1"',PACKAGE)
@@ -84,7 +84,7 @@ def exercise(container, report, check_only):
         ''',timeout=360)
     require('Success' in output.splitlines(),'package installation did not succeed')
     uid=identity(container)
-    report.update(versionCode=16,versionName=NAME,uid=uid,phase='launcher')
+    report.update(versionCode=19,versionName=NAME,uid=uid,phase='launcher')
     try:
         component=PACKAGE+'/'+ACTIVITY
         result = shell(container,'am start -W --user 0 -n "$1"',component,timeout=120)

@@ -1,9 +1,10 @@
 name: Native Android stock shader preparation
 on:
   push:
-    branches: [qa/android-arm64-kernel, non-custom]
+    branches: [qa/android-arm64-shader-v19]
 permissions:
   contents: read
+  actions: read
 jobs:
   boot:
     if: github.repository == 'Russianranger/esteria_android' && contains(github.event.head_commit.message, '[boot native Android]')
@@ -33,6 +34,28 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 17506ec8df7a57847d72b03f3972d8eee88d4a45
+          path: detached-proof
+          sparse-checkout: runtime/releases/non-custom/update-19
+          persist-credentials: false
+      - name: Restore the measured v19 signature over the original unsigned CI producer
+        shell: bash
+        env:
+          ARTIFACT_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          work=$(mktemp -d "$RUNNER_TEMP/stock-detached.XXXXXXXX")
+          test "$(git -C detached-proof rev-parse HEAD)" = 17506ec8df7a57847d72b03f3972d8eee88d4a45
+          curl --fail --location --silent --show-error --retry 3 \
+            -H "Authorization: Bearer $ARTIFACT_TOKEN" \
+            https://api.github.com/repos/Russianranger/esteria_android/actions/artifacts/13609629822/zip \
+            -o "$work/package.zip"
+          unset ARTIFACT_TOKEN
+          bash tools/android_stock_shader/restore_candidate.sh "$work/package.zip" \
+            detached-proof/runtime/releases/non-custom/update-19 "$work"
+          echo "ESTERIA_DETACHED_CANDIDATE=$work/signed.apk" >> "$GITHUB_ENV"
       - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
         with:
           distribution: temurin
@@ -62,6 +85,7 @@ jobs:
           sudo apt-get install -y --no-install-recommends python3-fusepy libfuse2t64
       - name: Install signed stock APK and exercise offline cold and warm owners
         env:
+          PUBLIC_RELEASE_TOKEN: ${{ github.token }}
           ESTERIA_EXERCISE_NAMED_REPAIR: ${{ contains(github.event.head_commit.message, '[qualify installed Android shader repair]') }}
         run: bash tools/android_stock_shader/host_run.sh
       - name: Publish safe counts, source identities and phase results
