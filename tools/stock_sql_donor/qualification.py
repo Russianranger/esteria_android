@@ -35,9 +35,9 @@ def verify():
     require(all(previous[k]==v for k,v in PACKAGE.items()))
     labels=[r['stage'] for r in previous['stages']]
     ordered=['bootstrap','authenticated-database','enter-core','enter-playerbots','four-schemas-verified',
-             'auth-srp-12340-loopback-session-key-verified','sql-completion-bound-to-clean-stop',
+             'auth-srp-12340-loopback-session-key-verified','enter-playerbots','sql-completion-bound-to-clean-stop',
              'separate-incomplete-world-startup-observation','same-uuid-reopened-and-cleanly-stopped']
-    require(all(labels.count(k)==1 for k in ordered) and sorted(labels.index(k) for k in ordered)==[labels.index(k) for k in ordered])
+    require(labels==ordered)
     require(auth.document(evidence/'world-startup.json')['phase']=='stock-starting-area-map-gate')
     uuid=previous['stages'][-1]['uuid']
     version=auth.document(Path('/etc/esteria-server-runtime.json'))['expectedMysqlSqlVersion']
