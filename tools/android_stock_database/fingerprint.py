@@ -1,5 +1,6 @@
 """Measure only runtime-authored system32 entries and exact signed-COM registry witnesses in a fresh disposable lab."""
 import hashlib,json,os,re,stat
+import safe_registry
 from pathlib import Path
 WINEDLL=Path('/opt/wine/lib/wine/aarch64-windows')
 INF=Path('/opt/wine/share/wine/wine.inf')
@@ -37,4 +38,4 @@ def save(prefix,out):
  for name in ('ntdll.dll','wineboot.exe','kernel32.dll'):
     installed=full[name];from_wine=WINEDLL/name
     images[name]={'prefixSha256':installed['sha256'],'prefixBytes':installed['bytes'],'winePackageSha256':digest(from_wine),'winePackageBytes':from_wine.stat().st_size}
- return {'prefixWineIdentities':images,'timestampAscii':marker.decode(),'timestampBytes':len(marker),'timestampHex':marker.hex(),'registryClasses':rows,'wineInfSha256':digest(INF),'selectedWineInfMtime':int(INF.stat().st_mtime),'system32Count':len(full),'deltaFromInterrupt':diff}
+ return {'safetyFacts':safe_registry.observe(prefix),'prefixWineIdentities':images,'timestampAscii':marker.decode(),'timestampBytes':len(marker),'timestampHex':marker.hex(),'registryClasses':rows,'wineInfSha256':digest(INF),'selectedWineInfMtime':int(INF.stat().st_mtime),'system32Count':len(full),'deltaFromInterrupt':diff}

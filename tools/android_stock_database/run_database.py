@@ -115,8 +115,8 @@ def exercise(report):
     report['operations']=[]
     report.update(packageUid=package_uid,selinux=shell(CONTAINER,'getenforce').strip(),
                   fingerprint=shell(CONTAINER,'getprop ro.build.fingerprint').strip())
-    scenario=os.environ['ESTERIA_WINE_CONTROL'];assert scenario=='early-proof'
-    pending=['interrupt']
+    scenario=os.environ['ESTERIA_WINE_CONTROL'];assert scenario in ('early-proof','late-proof')
+    pending=['interrupt' if scenario=='early-proof' else 'reference']
     report['samples']={}; reference=None
     while pending:
         mode=pending.pop(0);report['phase']=mode
