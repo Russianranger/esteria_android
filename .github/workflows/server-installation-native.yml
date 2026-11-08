@@ -77,8 +77,10 @@ jobs:
           cp out/installation-inputs/preparation.json out/installation-evidence/input-preparation.json
           cp out/installation-inputs/runtime-inputs/preparation.json out/installation-evidence/runtime-preparation.json
       - name: Prepare and read back the exact compiler-free dependency image without APT
+        env:
+          CI_PUBLIC_RELEASE_TOKEN: ${{ github.token }}
         run: |
-          env -u GITHUB_TOKEN python3 tools/release_server_dependencies.py prepare --output out/installation-dependency-release \
+          python3 -m tools.ci_release_transport server-dependencies --output out/installation-dependency-release \
             > out/installation-evidence/dependency-download.log 2>&1
           python3 tools/prepare_server_dependency_image.py --inputs out/installation-dependency-release \
             --output out/installation-dependency-image > out/installation-evidence/dependency-context.log 2>&1

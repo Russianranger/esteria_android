@@ -134,10 +134,12 @@ jobs:
       - name: Compile the synthetic deleted and restored MPQ shader selections with the packaged ARM64 compiler
         env:
           ESTERIA_CLIENT_SOURCE: ${{ github.workspace }}/sources/client
+          CI_PUBLIC_RELEASE_TOKEN: ${{ github.token }}
           ESTERIA_PACKAGED_SHADER_TOOLS: ${{ runner.temp }}/shader-qualification/tools
         run: |
           test "$(uname -m)" = aarch64
           python3 tools/fetch_sources.py client --output sources
+          python3 -m tools.ci_release_transport shader-cohort --output "$RUNNER_TEMP"
           python3 - <<'PYTHON'
           import io, json, os, tarfile
           from pathlib import Path
@@ -173,10 +175,9 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
-      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+      - uses: ./.github/actions/locked-java-gradle
         with:
-          distribution: temurin
-          java-version: '17.0.13+11'
+          read_token: ${{ github.token }}
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: ${{ needs.selection.outputs.recipe }}
@@ -276,7 +277,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          python3 tools/prepare_data_tools_provider.py acquire --output "$RUNNER_TEMP/data-tools-inputs" \
+          CI_PUBLIC_RELEASE_TOKEN="$GITHUB_TOKEN" python3 tools/prepare_data_tools_provider.py acquire --output "$RUNNER_TEMP/data-tools-inputs" \
             > out/coherent-logs/data-tools-acquisition.log 2>&1
           cp "$RUNNER_TEMP/data-tools-inputs/acquisition.json" out/coherent-evidence/data-tools-acquisition.json
           python3 tools/prepare_data_tools_provider.py build --inputs "$RUNNER_TEMP/data-tools-inputs" \
@@ -285,10 +286,10 @@ jobs:
           # The provider now owns fully verified runtime/source/debug copies.
           rm -rf "$RUNNER_TEMP/data-tools-inputs"
       - name: Read back the exact public cohort once and restore all four providers
+        env:
+          CI_PUBLIC_RELEASE_TOKEN: ${{ github.token }}
         run: |
-          python3 tools/fetch_wine_cohort.py \
-            --release-lock runtime/wine-cohort-publication/dependency-release.lock.json \
-            --publication-receipt runtime/wine-cohort-publication/published-release.json \
+          python3 -m tools.ci_release_transport wine-cohort \
             --packaging-source "$GITHUB_WORKSPACE/source-packaging" \
             --output "$RUNNER_TEMP/cohort-inputs" --providers "$RUNNER_TEMP/cohort-providers" \
             > out/coherent-evidence/public-cohort-consumer.json
@@ -332,8 +333,10 @@ jobs:
           # Only this already verified reproducible expanded input tree is removed.
           rm -rf "$RUNNER_TEMP/coherent-wine-inputs/sources-export"
       - name: Acquire the pinned public database dependency runtime once with its entire sources
+        env:
+          CI_PUBLIC_RELEASE_TOKEN: ${{ github.token }}
         run: |
-          env -u GITHUB_TOKEN python3 tools/release_server_dependencies.py prepare --output "$RUNNER_TEMP/server-release" \
+          python3 -m tools.ci_release_transport server-dependencies --output "$RUNNER_TEMP/server-release" \
             > out/coherent-logs/server-dependencies.log 2>&1
           python3 tools/provider_server_runtime.py build --package "$RUNNER_TEMP/server-release" --output "$RUNNER_TEMP/server-provider"
       - name: Build pinned Bionic ARM64 PRoot and matching complete source companion

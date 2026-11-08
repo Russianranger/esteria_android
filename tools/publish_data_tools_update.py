@@ -255,7 +255,11 @@ def public_selection(pin):
 
 
 def acquire_public(pin, output, selected):
-    api = github.Github(None)
+    if os.environ.get('CI_PUBLIC_RELEASE_TOKEN'):
+        from tools.ci_release_transport import LockedRelease
+        api = LockedRelease(selected['publication'])
+    else:
+        api = github.Github(None)
     for key, row in pin['artifacts'].items():
         name = NAMES[key]; path = output / name
         api.download(selected['publication']['assets'][name]['url'], path, row)
