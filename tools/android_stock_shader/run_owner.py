@@ -35,6 +35,17 @@ def shell(container, script, *args, timeout=75):
                'export PATH=/system/bin; set -eu\n' + script, 'qa', *args, timeout=timeout)
 
 
+def mount_state(container, path):
+    canonical = shell(container,'readlink -f "$1"',path).strip()
+    checked(canonical.startswith('/') and not any(ch.isspace() for ch in canonical),
+            'canonical private mount path required')
+    mounts = shell(container,'cat /proc/self/mountinfo').splitlines()
+    selected = [line.split() for line in mounts if len(line.split()) > 6 and line.split()[4] == canonical]
+    checked(len(selected) == 1 and 'ro' in selected[0][5].split(','),
+            'read-only mount required for authenticated shader input')
+    return selected[0][2], selected[0][3]
+
+
 def pinned_archive():
     archive = json.loads(RUNTIME_LOCK.read_bytes())['packages']['wine-arm64']['archive']
     name, size, sha = archive['file'], archive['bytes'], archive['sha256']
@@ -71,6 +82,8 @@ def exercise(container, report):
         report['phase'] = 'prepare-private-actor'
         shell(container,'''
             root=$1; uid=$2; selected=$3; source=$4; name=$5
+            step=actor-precondition
+            trap 'rc=$?; test "$rc" = 0 || echo "QA_ACTOR_STEP $step $rc" >&2' EXIT
             umask 077
             test ! -e "$root"
             if test -e "${root%/*}"; then
@@ -79,22 +92,34 @@ def exercise(container, report):
                 mkdir "${root%/*}"
                 chown "$uid:$uid" "${root%/*}"
             fi
+            step=actor-mkdir
             mkdir "$root"
             dst="$root/game/generations/$selected"
             mkdir -p "$dst/data" "$root/runtime-downloads"
+            step=import-metadata
             cp "$source/current" "$root/game/current"
             for file in journal.tsv complete; do cp "$source/generations/$selected/$file" "$dst/$file"; done
+            step=archive-file-size
             archive="$root/runtime-downloads/$name"
             test "$(stat -c %s /esteria-qa/input/wine.tar.gz)" = "$6"
+            step=seed-verified-download
             cp /esteria-qa/input/wine.tar.gz "$archive"
+            step=actor-ownership
             chown -R "$uid:$uid" "$root"
             test "$(cat "$root/game/current")" = "$selected"
             ''', ACTOR,uid,source,META,cache_file,size,timeout=300)
-        shell(container, 'mount -o bind /esteria-qa/mpq "$1"',target)
+        report['phase'] = 'verified-source-mount'
+        source_mount = mount_state(container,'/esteria-qa/mpq')
+        report['phase'] = 'bind-private-import'
+        shell(container,'mount -o bind /esteria-qa/mpq "$1"',target)
         mounted = True
-        shell(container, '''mount -o remount,bind,ro /esteria-qa/mpq "$1"
-            awk -v p="$1" '$5==p && $6 ~ /(^|,)ro(,|$)/ {found=1} END {exit !found}' /proc/self/mountinfo
-            test -d "$1/Data"''',target)
+        report['phase'] = 'verify-private-import-mount'
+        # Linux inherits the mount flags from the read-only FUSE source. Android 13's
+        # mount utility refuses a redundant remount on this private bind alias.
+        checked(mount_state(container,target) == source_mount, 'private bind mount differs from guarded input')
+        inode = shell(container,'stat -c "%d %i" /esteria-qa/mpq "$1"',target).splitlines()
+        checked(len(inode)==2 and inode[0]==inode[1], 'private bind root identity differs')
+        shell(container,'test -d "$1/Data"',target)
         report.update(importGeneration=source, packageUid=int(uid), abi='arm64-v8a', sdk=33,
                       wineArchiveSha256=sha, package=PACKAGE, operations=[])
         report['phase'] = 'signed-android-owner'
@@ -166,7 +191,18 @@ def main():
         exercise(args.container, report)
     except Exception as error:
         report['failureType']=type(error).__name__
-        print('Android shader qualification failed in '+report['phase']+' ('+type(error).__name__+')',file=sys.stderr)
+        if isinstance(error,subprocess.CalledProcessError):
+            report['exitCode'] = error.returncode
+            diagnostic = error.stderr or ''
+            at = re.search(r'^QA_ACTOR_STEP ([a-z-]+) ([0-9]+)$',diagnostic,re.MULTILINE)
+            if at: report['actorStep'] = at[1]
+            for note in ('Permission denied','Read-only file system','No such file or directory',
+                         'not in /proc/mounts','No space left on device','Operation not permitted'):
+                if note in diagnostic: report['reason'] = note; break
+        elif isinstance(error,(RuntimeError,ValueError)):
+            report['reason']=str(error)[:160]
+        print('Android shader qualification failed in '+report['phase']+' ('+type(error).__name__+
+              ', '+report.get('actorStep','')+' '+report.get('reason','')+')',file=sys.stderr)
         return 1
     finally:
         report['elapsedSeconds']=round(time.monotonic()-start,3)
