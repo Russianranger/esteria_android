@@ -81,7 +81,7 @@ public final class ConfirmDatabase {
             Files.createDirectories(work.getParent());
             Files.createDirectory(work);
             Files.createDirectory(work.resolve("bin"));
-            for (String source:Arrays.asList("grunt_wine.py","wine_prefix.py","wine_windows.py"))
+            for (String source:Arrays.asList("grunt_wine.py","fingerprint.py","wine_prefix.py","wine_windows.py"))
                 Files.copy(Paths.get("/esteria-qa/input/"+source),work.resolve(source));
         }
         for (String name:Arrays.asList("bin/WowClient64.exe","bin/XvidDecoder.dll")) {

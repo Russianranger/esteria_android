@@ -10,6 +10,7 @@ import subprocess
 import sys
 import time
 import wine_prefix
+import fingerprint
 
 work = Path('/work')
 mode = sys.argv[1]
@@ -129,6 +130,7 @@ def run():
                     x.wait()
                     raise
     proof['after']=report_prefix(prefix)
+    proof['signedWitnesses']=fingerprint.save(prefix,out)
     if source_hash is not None:
         proof['originalPrefixAuditUnchanged']=tree_hash(original_prefix)==source_hash
         assert proof['originalPrefixAuditUnchanged']
