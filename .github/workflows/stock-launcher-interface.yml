@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [non-custom]
-    paths: [.github/workflows/stock-launcher-interface.yml, tools/retained_database/launcher_export.py]
+    paths: [.github/workflows/stock-launcher-interface.yml]
 permissions:
   contents: read
   actions: read
@@ -45,11 +45,7 @@ jobs:
             docker exec "$redroid_name" pm install -t --user 0 "/data/local/tmp/$apk.apk" | grep -Fx Success
           done
           python3 tools/retained_database/android_platform.py evidence/interface.txt
-          if ! command -v tesseract >/dev/null || ! /usr/bin/python3 -c 'from PIL import Image'; then
-            sudo apt-get update -qq
-            sudo apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-eng python3-pil
-          fi
-          /usr/bin/python3 tools/retained_database/launcher_export.py
+          python3 tools/retained_database/launcher_export.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
