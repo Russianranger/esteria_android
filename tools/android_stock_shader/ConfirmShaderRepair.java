@@ -96,6 +96,30 @@ final class ConfirmShaderRepair {
         return result;
     }
 
+    static void normalAdmission(Context context, Path root, String expectedImport) throws Exception {
+        require(root.toRealPath().equals(root) && root.endsWith("qa-signed-stock-shaders"),"isolated actor required");
+        RuntimeSetup wine = new RuntimeSetup(context,root);
+        ShaderToolsSetup tools = new ShaderToolsSetup(context,root);
+        tools.requireWineArchive(wine.archiveSha256());
+        require(wine.current()!=null && tools.current()!=null,"source-bound completed providers required");
+        long started=System.nanoTime();
+        ShaderSetup.Result result;
+        boolean launched;
+        try (GameSession.Leases leases=GameSession.claim(root);
+             ShaderSetup.Handle owner=ShaderSetup.begin(context,root,wine,tools,"enUS")) {
+            result=owner.selectPrepared(QUIET,RuntimeWork.NEVER_CANCELLED);
+            require(result.importGeneration.equals(expectedImport) && result.outputFiles==4742,"different selected import");
+            ShaderSetup.requireCurrent(context,root,wine,tools,result,QUIET,RuntimeWork.NEVER_CANCELLED);
+            launched=!owner.diagnosticLogs().isEmpty();
+            require(!launched,"expected read-only shader admission launched a translator");
+        }
+        System.out.println("ANDROID_HISTORICAL_SHADER_RESULT "+new JSONObject()
+                .put("mode","admit").put("importGeneration",expectedImport).put("generation",result.generation)
+                .put("files",result.outputFiles).put("bytes",result.outputBytes).put("normalCurrentProviders",true)
+                .put("ownedTranslatorLaunched",launched).put("fullShaderAdmission",true).put("closed",true)
+                .put("elapsedMs",(System.nanoTime()-started)/1_000_000));
+    }
+
     static void historical(Context context, Path root, String importKey, boolean old) throws Exception {
         require(root.toRealPath().equals(root) && root.endsWith("qa-signed-stock-shaders"), "isolated actor required");
         require(text(root.resolve("game/current")).equals(importKey+"\n"), "import changed");

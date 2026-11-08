@@ -75,17 +75,31 @@ def exercise(container, report, range_counters, repair_report=None):
     report['phase'] = 'android-package'
     checked(shell(container,'getprop ro.build.version.sdk').strip() == '33' and
             shell(container,'getprop ro.product.cpu.abi').strip() == 'arm64-v8a', 'Android 13 ARM64 required')
+    report['phase']='read-signed-package-base'
     apk = shell(container,'pm path "$1"', PACKAGE).strip()
     match = re.fullmatch(r'package:(/data/app/[A-Za-z0-9_./=+~-]+/base\.apk)', apk)
     checked(match, 'installed stock package base APK required')
     apk = match[1]
+    report['phase']='read-package-store-uid'
     uid = shell(container,'stat -c %u "$1"', '/data/data/' + PACKAGE).strip()
     checked(uid.isdecimal() and 10_000 <= int(uid) < 100_000, 'stock package UID required')
+    report['phase']='read-import-fixture-current'
     source = shell(container,'cat "$1/current"',META).strip()
     checked(re.fullmatch(r'[a-f0-9]{64}', source), 'invalid selected import')
     target = ACTOR + '/game/generations/' + source + '/data'
     cache_file, size, sha = pinned_archive()
-    boot = shell(container, "set -- $(pidof zygote64); test $# -eq 1; tr '\\000' '\\n' </proc/$1/environ")
+    report['phase']='read-live-android-art-environment'
+    # The kernel's new ART zygote may briefly be unavailable after the real launcher stops.
+    # Select a single live system zygote; do not invent Android's boot or classpath state.
+    boot=None
+    for attempt in range(10):
+        try:
+            boot=shell(container,"set -- $(pidof zygote64); test $# -eq 1; tr '\\000' '\\n' </proc/$1/environ")
+            break
+        except subprocess.CalledProcessError:
+            if attempt==9:raise
+            time.sleep(1)
+    report['androidBootReadAttempts']=attempt+1
     selected = dict(item.split('=',1) for item in boot.splitlines() if '=' in item and
                     item.split('=',1)[0] in BOOT_KEYS)
     checked('BOOTCLASSPATH' in selected and 'ANDROID_ROOT' in selected, 'Android ART boot environment missing')

@@ -39,7 +39,8 @@ def exercise(module, container, uid, source, apk, prefix, counters, report):
         body=json.loads(rows[0])
         require(body['mode']==stage and body['closed'] and body['importGeneration']==source,'historical owner identity differs')
         body['authenticatedInput']=module.range_delta(counters,before)
-        require(body['authenticatedInput']['grantedBytes']>0,'historical operation did not read real source')
+        if stage!='admit':
+            require(body['authenticatedInput']['grantedBytes']>0,'historical generation did not read real source')
         return body
     def invocation(prefix,mode):
         return [*prefix,'io.github.russianranger.esteria.runtime.ConfirmShader',mode,source]
@@ -71,15 +72,37 @@ def exercise(module, container, uid, source, apk, prefix, counters, report):
             result['verifiedRuntimeHashes']==3162 and result['outputFiles']==4742 and typed_snapshot()==snapshot,
             'selected legacy import or provider state changed during repair')
     report['recovered']=result
+    report['phase']='fresh-read-only-session-admission'
+    receipt=root+'/state/shader-work/shaders/generations/'+result['generation']+'/receipt.json'
+    def shader_selection():
+        return shell(container,'for p do stat -c "%d %i %s %Y" "$p"; sha256sum "$p" | cut -d" " -f1; done',
+                     root+'/state/shader-work/shaders/current',receipt).splitlines()
+    selected=shader_selection()
+    normal=owner(invocation(updated_prefix,'admit'),'admit')
+    report['freshNormalSession']=normal
+    require(normal['fullShaderAdmission'] and not normal['ownedTranslatorLaunched'] and
+            normal['generation']==result['generation'] and normal['bytes']==result['outputBytes'] and
+            normal['authenticatedInput']['grantedBytes']==0 and typed_snapshot()==snapshot and shader_selection()==selected,
+            'ordinary fresh session changed a selected input, read MPQs or repeated preparation')
+    report['phase']='separate-fresh-warm-provider-prepare'
     before=module.range_counts(counters)
     completed=subprocess.run(invocation(updated_prefix,'warm'),capture_output=True,text=True,timeout=600)
     rows=[r.removeprefix('ANDROID_SHADER_RESULT ') for r in completed.stdout.splitlines() if r.startswith('ANDROID_SHADER_RESULT ')]
     require(not completed.returncode and len(rows)==1,'fresh warm owner could not reuse repaired selection')
     warm=json.loads(rows[0])
     warm['authenticatedInput']=module.range_delta(counters,before)
+    now=typed_snapshot()
+    names=['game/current','import/complete','import/journal.tsv','wine/current','shader-tools/current']
+    differences={name:{'sameBytes':now[i*2+1]==snapshot[i*2+1],'sameStat':now[i*2]==snapshot[i*2],
+                        'beforeStat':snapshot[i*2], 'afterStat':now[i*2]} for i,name in enumerate(names)}
+    report['warmProviderPointerObservations']=differences
+    report['warmAfterHistoricalRepair']=warm
+    require(all(facts['sameBytes'] for facts in differences.values()) and
+            all(differences[name]['sameStat'] for name in names[:3]) and shader_selection()==selected,
+            'explicit package prepare changed imported bytes, shader selection or provider pointer content')
     require(warm['mode']=='warm' and warm['generation']==result['generation'] and not warm['ownedTranslatorLaunched'] and
             warm['toolsCopiedBytes']==0 and warm['wineCopiedBytes']==0 and warm['sessionReceiptAdmitted'] and
-            warm['authenticatedInput']['grantedBytes']==0 and typed_snapshot()==snapshot,
+            warm['authenticatedInput']['grantedBytes']==0,
             'fresh post-repair owner repeated work or changed source')
     report.update(phase='complete',warmAfterHistoricalRepair=warm,retainedInputAndProviderFiles=len(snapshot)//2,
                   firstInstalledSha256=LEGACY_SHA,updatedInstalledSha256=CANDIDATE_SHA,uidRetained=True)

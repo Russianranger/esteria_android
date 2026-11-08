@@ -74,7 +74,7 @@ test "$(stat -c %s "$work/input/wine.tar.gz")" = 282628308
 echo "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46  $work/input/wine.tar.gz" | sha256sum -c
 phase=compile-observer
 bash tools/android_stock_shader/compile_driver.sh "$work/dex" "$work/input/driver.jar"
-test "$(unzip -p "$work/input/driver.jar" classes.dex | sha256sum | cut -d' ' -f1)" = 9feffe76d3d85526e11c27acabf310aed97a84469755ba8302d2fb36a2ec08eb
+test "$(unzip -p "$work/input/driver.jar" classes.dex | sha256sum | cut -d' ' -f1)" = 782356a05f642b338f2f5b3fa3498594ca37a924ecd3db84defb7fdaa833e541
 chmod 0755 "$work/input"
 chmod 0444 "$work/input/"{stock.apk,wine.tar.gz,driver.jar}
 phase=source-windows
