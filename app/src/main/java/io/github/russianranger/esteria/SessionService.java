@@ -980,6 +980,8 @@ public final class SessionService extends Service {
         facts.put("support.ownedLogsRejected",Integer.toString(supportLogRejected));
         facts.put("support.ownedLogsRecoveryReason",supportLogRecoveryReason);
         GameSession.Handle gameOwner=game;
+        facts.put("game.frameCap.nextStart",String.valueOf(getSharedPreferences("game-display",MODE_PRIVATE).getInt("frameCap",30)));
+        if(gameOwner!=null && gameOwner.presentation()!=null) facts.put("game.frameCap.session",String.valueOf(gameOwner.presentation().frameCap()));
         facts.put("game.retained",Boolean.toString(gameOwner!=null));
         facts.put("game.lastRecoveryRequired",Boolean.toString(lastRecoveryRequired));
         facts.put("game.lastClientExitAcknowledged",Boolean.toString(lastClientExitAcknowledged));
@@ -1213,7 +1215,7 @@ public final class SessionService extends Service {
         }
         try (OutputStream output = getContentResolver().openOutputStream(destination, "w")) {
             if (output == null) throw new IOException("Export destination could not be opened");
-            SupportBundle.write(output, facts, logs);
+            SupportBundle.writeSession(output, facts, logs);
         }
         supportStatus = "Support bundle saved. It contains status and bounded, redacted logs; no game assets or databases.";
     }

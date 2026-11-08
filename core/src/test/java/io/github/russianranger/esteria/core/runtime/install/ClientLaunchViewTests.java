@@ -35,6 +35,13 @@ public final class ClientLaunchViewTests {
         check(Files.readString(input).equals(russian));check(Arrays.equals(settings,Files.readAllBytes(config)));
         check(Arrays.equals(other,Files.readAllBytes(early)));
         check(views.argumentsForLocale(plan,"ruRU",RuntimeWork.NEVER_CANCELLED).equals(actual));
+        for(int cap:new int[]{24,30,60}) {
+            views.argumentsForLocale(plan,"ruRU",RuntimeWork.NEVER_CANCELLED,"stock-3.3.5a",cap);
+            check(Files.readString(input).equals(russian+"SET maxFPS \""+cap+"\"\nSET maxFPSBk \"15\"\n"));
+            check(Arrays.equals(settings,Files.readAllBytes(config)) && Arrays.equals(other,Files.readAllBytes(early)));
+        }
+        fails(()->views.argumentsForLocale(plan,"ruRU",RuntimeWork.NEVER_CANCELLED,"stock-3.3.5a",200));
+        views.argumentsForLocale(plan,"ruRU",RuntimeWork.NEVER_CANCELLED);
         // Rejected/cancelled updates retain the previous complete companion.
         fails(()->views.argumentsForLocale(plan,"ruRU\"\nSET farclip \"0",RuntimeWork.NEVER_CANCELLED));
         fails(()->views.argumentsForLocale(plan,"deDE",RuntimeWork.NEVER_CANCELLED));

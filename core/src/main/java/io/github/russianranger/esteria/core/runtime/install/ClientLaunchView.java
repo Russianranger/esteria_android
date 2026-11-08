@@ -195,6 +195,11 @@ public final class ClientLaunchView {
         return argumentsForLocale(plan,effectiveLocale,cancellation,"stock-3.3.5a");
     }
     public List<String> argumentsForLocale(Plan plan,String effectiveLocale,RuntimeWork.Cancellation cancellation,String contentProfile)throws IOException {
+        return argumentsForLocale(plan,effectiveLocale,cancellation,contentProfile,0);
+    }
+    /** A zero rate leaves the caller's existing game settings in control. */
+    public List<String> argumentsForLocale(Plan plan,String effectiveLocale,RuntimeWork.Cancellation cancellation,String contentProfile,int frameCap)throws IOException {
+        RuntimeFiles.require(frameCap==0 || frameCap==24 || frameCap==30 || frameCap==60,"Unsupported client frame cap");
         RuntimeFiles.require("stock-3.3.5a".equals(contentProfile)||"esteria-custom".equals(contentProfile),"Unknown client content profile");
         RuntimeFiles.require(plan!=null&&CLIENT_LOCALES.contains(effectiveLocale),"Prepared effective client locale is invalid");
         List<String> arguments=plan.arguments();
@@ -226,11 +231,12 @@ public final class ClientLaunchView {
                 }
             }
             if("stock-3.3.5a".equals(contentProfile))StockVulkanStartup.requireCompatible(launch,wtf,cancellation);
-            String next=localeInput(effectiveLocale);
+            String next=localeInput(effectiveLocale,frameCap);
             if(Files.exists(target,LinkOption.NOFOLLOW_LINKS)) {
                 privateRegular(target);String previous=RuntimeFiles.smallText(target,256);
                 boolean owned=false;
-                for(String locale:CLIENT_LOCALES)if(previous.equals(localeInput(locale))){owned=true;break;}
+                for(String locale:CLIENT_LOCALES)for(int cap:new int[]{0,24,30,60})
+                    if(previous.equals(localeInput(locale,cap)))owned=true;
                 RuntimeFiles.require(owned,"Changed managed startup settings preserved");
                 if(previous.equals(next))return arguments;
             }
@@ -239,7 +245,10 @@ public final class ClientLaunchView {
             return arguments;
         }
     }
-    private static String localeInput(String locale){return LOCALE_OWNER+"SET locale \""+locale+"\"\n";}
+    private static String localeInput(String locale,int frameCap){
+        String localeLine=LOCALE_OWNER+"SET locale \""+locale+"\"\n";
+        return frameCap==0 ? localeLine : localeLine+"SET maxFPS \""+frameCap+"\"\nSET maxFPSBk \"15\"\n";
+    }
     private void validateState()throws IOException {
         RuntimeFiles.require(RuntimeFiles.smallText(state.resolve(".owner"),128).equals(STATE_OWNER),"Client state ownership changed");
         for(String name:STATE)existingDirectory(state.resolve(name));

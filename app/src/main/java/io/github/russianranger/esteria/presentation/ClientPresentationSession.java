@@ -80,6 +80,7 @@ public final class ClientPresentationSession implements AutoCloseable {
     private static final String PREFIX_UPDATE_LEAF="u";
     private final Context context;
     private final Prepared prepared;
+    private int frameCap;
     private final Events events;
     private final Handler main;
     private final Path ownershipKey;
@@ -167,10 +168,12 @@ public final class ClientPresentationSession implements AutoCloseable {
         owner.close(Duration.ofSeconds(2));
     }
     private void startComponents()throws IOException {
+        frameCap=context.getSharedPreferences("game-display",Context.MODE_PRIVATE).getInt("frameCap",30);
+        if(frameCap!=24 && frameCap!=30 && frameCap!=60)frameCap=30;
         audio=AudioBridge.start(context,endpoints.toFile(),code->{if(code.endsWith("failed"))fail("presentation-audio-failed");});
         OwnedProcess server=launch("xserver",X11SessionPlan.server(display));
         await(server,()->x11Socket(),null,null);
-        OwnedProcess frame=launch("frame",X11SessionPlan.frame());
+        OwnedProcess frame=launch("frame",X11SessionPlan.frame(frameCap==60?60:30));
         await(frame,()->privateSocket("frame.sock"),session.resolve("frame/logs/stderr.log"),"ESTERIA_X11_FRAME_READY protocol=full-v1 capture=XGetImage");
         OwnedProcess keys=launch("input",X11SessionPlan.input());
         await(keys,()->privateSocket("input.sock"),session.resolve("input/logs/stderr.log"),"ESTERIA_X11_INPUT_READY protocol=1");
@@ -312,7 +315,7 @@ public final class ClientPresentationSession implements AutoCloseable {
                 throw new IOException("Current matched reconstructed client, view and shaders required");
             provider.requirePreparedShaders(shaders);
             List<String> command=new ArrayList<>();command.add("/opt/wine/bin/wine");command.add(view.plan.windowsExecutable());
-            command.addAll(new ClientLaunchView(view.work).argumentsForLocale(view.plan,shaders.locale,RuntimeWork.NEVER_CANCELLED,io.github.russianranger.esteria.BuildConfig.CONTENT_PROFILE));
+            command.addAll(new ClientLaunchView(view.work).argumentsForLocale(view.plan,shaders.locale,RuntimeWork.NEVER_CANCELLED,io.github.russianranger.esteria.BuildConfig.CONTENT_PROFILE,frameCap));
             command.addAll(clientModeArguments(provider.localLoginArguments(),view.view.directory,localLogin));
             Map<String,String> environment=clientEnvironment(wineEnvironment(),view.plan.environment(),
                     io.github.russianranger.esteria.BuildConfig.CONTENT_PROFILE,localLogin);
@@ -329,6 +332,7 @@ public final class ClientPresentationSession implements AutoCloseable {
             return client;
         });
     }
+    public int frameCap(){return frameCap;}
     private static Map<String,String> clientEnvironment(Map<String,String> presentation,Map<String,String> view,
             String contentProfile,boolean localLogin) {
         Map<String,String> environment=new java.util.TreeMap<>(presentation);

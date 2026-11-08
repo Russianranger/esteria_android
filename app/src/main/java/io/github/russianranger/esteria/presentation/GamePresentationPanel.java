@@ -60,7 +60,8 @@ public final class GamePresentationPanel extends FrameLayout {
     private final SessionEvents events;
     private final FrameLayout viewport;
     private final TextView message;
-    private final Button keyboard, stop;
+    private final Actions actions;
+    private boolean keyboardRequested;
     private ClientPresentationSession session;
     private GameInputView game;
     private boolean attached, foreground, failed, stopRequested;
@@ -71,31 +72,21 @@ public final class GamePresentationPanel extends FrameLayout {
         if (events == null || actions == null) throw new IllegalArgumentException("Session events and stop owner are required");
         this.events = events;
         setBackgroundColor(Color.BLACK);
-        LinearLayout layout = new LinearLayout(context);
-        layout.setOrientation(LinearLayout.VERTICAL);
+        this.actions = actions;
         viewport = new FrameLayout(context);
         viewport.addOnLayoutChangeListener((view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> fitGame());
-        layout.addView(viewport, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0, 1));
-        LinearLayout controls = new LinearLayout(context);
-        controls.setOrientation(LinearLayout.HORIZONTAL); controls.setGravity(Gravity.CENTER_VERTICAL);
-        controls.setBackgroundColor(Color.argb(225, 20, 27, 34));
-        message = new TextView(context); message.setTextColor(Color.WHITE);
-        message.setText("Connecting display…"); message.setPadding(dp(12), dp(6), dp(8), dp(6));
-        controls.addView(message, new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT, 1));
-        keyboard = new Button(context); keyboard.setText("Keyboard"); keyboard.setEnabled(false);
-        keyboard.setContentDescription("Open game software keyboard");
-        keyboard.setOnClickListener(v -> { if (game != null && !failed) game.showKeyboard(); });
-        controls.addView(keyboard);
-        stop = new Button(context); stop.setText("Stop");
-        stop.setContentDescription("Request session stop");
-        stop.setOnClickListener(v -> {
-            if (stopRequested) return;
-            stopRequested = true; pause(); stop.setEnabled(false);
-            message.setText("Stopping session…"); actions.requestStop();
-        });
-        controls.addView(stop);
-        layout.addView(controls, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-        addView(layout, new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        addView(viewport,new FrameLayout.LayoutParams(-1,-1));
+        message = new TextView(context);
+        message.setText("Connecting display…");
+    }
+
+    public String inputStatus(){return message.getText().toString();}
+    public void requestKeyboard(){
+        if(!failed && !stopRequested && game!=null){keyboardRequested=true;resumeView();}
+    }
+    public void requestStop(){
+        if(stopRequested)return;
+        stopRequested=true;pause();message.setText("Stopping session…");actions.requestStop();
     }
 
     /** Bind on the UI thread after the owner has started the real session off it. */
@@ -127,11 +118,11 @@ public final class GamePresentationPanel extends FrameLayout {
         if (!foreground || !attached || !hasWindowFocus() || failed || stopRequested || game == null) return;
         try {
             session.resumeInput();
-            game.resumeInput(); game.requestFocus(); keyboard.setEnabled(true);
+            game.resumeInput(); game.requestFocus();
+            if(keyboardRequested){keyboardRequested=false;game.showKeyboard();}
         } catch (IOException error) { events.failed("presentation-resume-failed"); }
     }
     private void pauseView() {
-        keyboard.setEnabled(false);
         if (game != null) { game.hideKeyboard(); game.pauseInput(); }
         if (session != null) try { session.pauseInput(); }
         catch (IOException error) { events.failed("presentation-pause-failed"); }
@@ -148,7 +139,7 @@ public final class GamePresentationPanel extends FrameLayout {
             videoWidth = width; videoHeight = height; fitGame();
         }
     }
-    /** Keep every game pixel visible and touchable above the launcher controls. */
+    /** Keep every game pixel visible and touchable across the available display. */
     private void fitGame() {
         if (game == null || videoWidth <= 0 || videoHeight <= 0 || viewport.getWidth() <= 0 || viewport.getHeight() <= 0) return;
         int width = viewport.getWidth();

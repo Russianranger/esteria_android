@@ -1,4 +1,17 @@
-# Esteria Stock 0.1.0-non-custom.22 for AYN Thor
+# Esteria Stock on AYN Thor
+
+## Update a working installation
+
+Install the signed update over the existing Esteria Stock package. Open **Play → Start local game** with the existing enUS import and character. Keep the prepared world, shaders and database. For a first installation only, use **Setup** to import and prepare.
+
+In game, tap the gear or press Android Back for settings. Drag the gear to move it. **Reset gear position** restores the upper-right placement. A swipe from the display edge reveals the Android system bars. The game fits the screen with its original aspect ratio.
+
+**Frame limit** defaults to 30 FPS. Choose 24 FPS for a lower render workload or 60 FPS for higher motion detail. A change applies at the next ordinary game start at the same render resolution. Compare temperatures at the same location, brightness and fan setting over the same duration. Android thermal status and the selected cap are included in support.
+
+Check movement and camera at all four screen edges. After logging out, use the gear's **Stop session** if the client is still running. From **Tools → Export support bundle**, save the ZIP. Reopen the same character offline three times and check the saved quest and position. If Start reports a component issue, use **Tools → Repair local component** for the named component only.
+
+## Earlier v22 recovery procedure
+
 
 1. Install the [signed v22 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.22/Esteria-Stock-3.3.5a-arm64.apk) over Esteria Stock v21. Keep the existing import, enUS, Balanced, world data, shaders and saves.
 2. On the Thor that stopped at `creature_loot_template.sql`, choose **Repair local component → Database setup** once. Let the installer verify the four schemas and stop MySQL cleanly. The two earlier failed slots are retained. A completed source-matched database is reused.

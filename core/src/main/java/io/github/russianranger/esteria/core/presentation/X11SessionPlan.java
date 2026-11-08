@@ -32,7 +32,10 @@ public final class X11SessionPlan {
         return Arrays.asList("/usr/bin/Xtigervnc",":"+display,"-geometry","1280x720","-depth","24",
                 "-nolisten","tcp","-rfbport","-1","-auth","/session/Xauthority","-noreset");
     }
-    public static List<String> frame() { return Arrays.asList("/esteria-bridges/bin/esteria-x11-frame","/session/frame.sock","30"); }
+    public static List<String> frame() { return frame(30); }
+    public static List<String> frame(int captureRate) {
+        if (captureRate!=30 && captureRate!=60) throw new IllegalArgumentException("Unsupported capture rate");
+        return Arrays.asList("/esteria-bridges/bin/esteria-x11-frame","/session/frame.sock",Integer.toString(captureRate)); }
     public static List<String> input() { return Arrays.asList("/esteria-bridges/bin/esteria-x11-input","/session/input.sock"); }
     public static Map<String,String> environment(int display) {
         checkDisplay(display);

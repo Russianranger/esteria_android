@@ -1,5 +1,16 @@
 # Current non-custom implementation
 
+## Thor gameplay and display update
+
+The owner has now booted both the client and world on the physical AYN Thor, created a character, accepted a quest, defeated an enemy and logged out. The screen report shows `IOException: Support bundle entry limit exceeded` during export. It also reports high temperatures and a reduced game viewport. No temperature reading, APK version readback or cold character reopen accompanied the screenshot. The full-data Actions follow-up completed previously. The v21 SQL interruption below is historical.
+
+The v23 source puts Start on the Play page, groups import and preparation under Setup, and places export and repair under Tools. Full-screen gameplay keeps the entire game image touchable and preserves its aspect ratio. A draggable gear opens game controls. The managed launch companion sets the Vulkan client's maxFPS to 30 by default, with 24 and 60 selectable for the next start. Compatible prepared providers and data retain their identities. A working installation can go straight to Start.
+
+The session exporter can now accept the five fixed launcher logs plus the bounded validated owned-log set. High-volume metadata prioritizes current operation, game and thermal observations. The ZIP records the omitted field count. The screenshot alone cannot identify which of the previous two count guards fired. Public device verification, including thermal comparison and three cold character reopens, remains separate from the reported playthrough.
+
+### Previous signed release and evidence
+
+
 **Esteria Stock v22 is published.** Install the signed update over v21, keep the existing ChromieCraft import, enUS and Balanced, and run **Repair local component → Database setup** once. After four-schema completion and a clean stop, choose **Start local game**. [APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.22/Esteria-Stock-3.3.5a-arm64.apk) · [Device instructions](NON-CUSTOM-TESTING.md).
 
 Branch `non-custom`, Android producer `7084421f2faaf6ebe5f4ccc44fe8c5c5f91d99bc`. The reconstructed Windows ARM64 client is `c05a3af9be6c204c40d65d0e3eb6ccc2442012b6`, prepared-data revision `471ee42faadf4a97a1d0a86989cf1452621f2dc5`, server `f35f04d01689f034778e3474b3c820092f51e461` with seven integration patches, and Eluna `58d7652138887783228b9727bd1fa4e08f00342b`. All eight provider archives, 123 APK asset entries and four native libraries matched v21. Package `io.github.russianranger.esteria.stock`, version code 22, APK SHA-256 `15f9241a643a37c7786723631cf9ef315ba657df933bc2d96c58a23207d6042b`, stock certificate SHA-256 `5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa`. [Anonymous readback](runtime/evidence/non-custom-v22-public-apk-readback.json) · [Publication](https://github.com/Russianranger/esteria_android/actions/runs/42507383308).

@@ -90,7 +90,11 @@ def stage(args):
                  '**Repair local component → Database setup**, then start the local game again.\n'
                  'If a stage fails, wait for cleanup, tap **Export support bundle**, choose a\n'
                  'destination and tap **Save**. Send the whole ZIP before retrying.')
-    if signed['versionCode'] == 22:
+    if signed['versionCode'] == 23:
+        setup = ('Install over your existing signed Esteria Stock app, then choose **Start local game**. '
+                 'Tap the movable gear for the keyboard, display settings and session controls. '
+                 'The default client cap is 30 FPS. Choose **Tools → Export support bundle** after logout.')
+    elif signed['versionCode'] == 22:
         setup = ('Install over the signed Esteria Stock v21 app. Keep the ChromieCraft import, enUS, Balanced '
                  'and both retained database attempts. Choose **Repair local component → Database setup** once. '
                  'Wait for four-schema completion and a clean stop, then choose **Start local game**. '

@@ -1,5 +1,16 @@
 # Current stock handoff
 
+## Thor gameplay and display update
+
+The owner has now booted both the client and world on the physical AYN Thor, created a character, accepted a quest, defeated an enemy and logged out. The screen report shows `IOException: Support bundle entry limit exceeded` during export. It also reports high temperatures and a reduced game viewport. No temperature reading, APK version readback or cold character reopen accompanied the screenshot. The full-data Actions follow-up completed previously. The v21 SQL interruption below is historical.
+
+The v23 source puts Start on the Play page, groups import and preparation under Setup, and places export and repair under Tools. Full-screen gameplay keeps the entire game image touchable and preserves its aspect ratio. A draggable gear opens game controls. The managed launch companion sets the Vulkan client's maxFPS to 30 by default, with 24 and 60 selectable for the next start. Compatible prepared providers and data retain their identities. A working installation can go straight to Start.
+
+The session exporter can now accept the five fixed launcher logs plus the bounded validated owned-log set. High-volume metadata prioritizes current operation, game and thermal observations. The ZIP records the omitted field count. The screenshot alone cannot identify which of the previous two count guards fired. Public device verification, including thermal comparison and three cold character reopens, remains separate from the reported playthrough.
+
+### Previous signed release and evidence
+
+
 **Esteria Stock v22 is published.** Install the signed update over v21, keep the existing ChromieCraft import, enUS and Balanced, and run **Repair local component → Database setup** once. After four-schema completion and a clean stop, choose **Start local game**. [APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.22/Esteria-Stock-3.3.5a-arm64.apk) · [Device instructions](NON-CUSTOM-TESTING.md).
 
 On the physical Thor, signed v21 reused world data at 32 s and shaders at 52 s. MySQL started, the core SQL helper launched at 113 s, and the launcher observed 20 schema file completions. The last observed file was `creature_loot_template.sql` at 205 s. At 208 s the helper cleanup exception replaced the initiating error. Both abandoned slots have a clean MySQL stop receipt. Their contents remain private. The v21 export cannot identify the original exception. [Thor evidence](runtime/evidence/non-custom-v21-thor-schema-interruption.json).

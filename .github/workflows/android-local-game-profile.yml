@@ -5,7 +5,7 @@ on:
       build_version_code:
         description: Positive release versionCode, increased before a signed update
         required: false
-        default: '22'
+        default: '23'
         type: string
       publish_non_custom:
         description: Sign and publish an additive non-custom prerelease using the configured persistent key
@@ -170,7 +170,7 @@ jobs:
       contents: write
       actions: read
     env:
-      RELEASE_VERSION_CODE: ${{ inputs.build_version_code || '22' }}
+      RELEASE_VERSION_CODE: ${{ inputs.build_version_code || '23' }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -750,6 +750,10 @@ jobs:
             device chmod 644 "/data/local/tmp/$apk.apk"
             device pm install -t --user 0 "/data/local/tmp/$apk.apk" | grep -Fx Success
           done
+          device pm grant io.github.russianranger.esteria.stock android.permission.POST_NOTIFICATIONS
+          device am instrument -w -e class io.github.russianranger.esteria.RealmInterfaceTest \
+            io.github.russianranger.esteria.stock.test/androidx.test.runner.AndroidJUnitRunner | tee evidence/interface.txt
+          grep -F 'OK (1 test)' evidence/interface.txt
           python3 tools/retained_database/device.py evidence/results.jsonl debug
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

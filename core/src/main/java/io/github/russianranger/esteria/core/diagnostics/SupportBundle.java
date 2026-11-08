@@ -18,7 +18,7 @@ import java.util.zip.ZipOutputStream;
 public final class SupportBundle {
     private SupportBundle() { }
     public static final int MAX_LOG_BYTES = 64 * 1024;
-    public static final int MAX_LOG_FILES = 32;
+    public static final int MAX_LOG_FILES = 5 + SupportLogSelection.MAX_NAMES;
     public static final int MAX_FACTS = 256;
     public static final int MAX_METADATA_BYTES = 256 * 1024;
     public static String redact(String value) {
@@ -30,6 +30,30 @@ public final class SupportBundle {
                 .replaceAll("(?im)(password|passwd|pwd|token|secret|authorization|cookie|account(?:name)?|username|session_?key|salt(?:hex)?|verifier(?:hex)?)([\"']?\\s*[=:]\\s*)([^\\r\\n]+)", "$1$2[redacted]")
                 .replaceAll("(?i)(mysql|mariadb)://[^\\s@]+@", "$1://[redacted]@")
                 .replaceAll("(?i)Bearer\\s+[A-Za-z0-9._~+/-]+=*", "Bearer [redacted]");
+    }
+    /** The service combines fixed launcher logs with individually validated owned roles.
+     * Keep recent observations before static manifest/submodule inventory when the metadata budget fills. */
+    public static void writeSession(OutputStream destination, Map<String,String> facts, Map<String,Path> logs) throws IOException {
+        Map<String,String> selected = new java.util.LinkedHashMap<>();
+        int bytes = 256; // Header and omitted-field count.
+        for (boolean inventory : new boolean[]{false,true}) {
+            for (Map.Entry<String,String> fact : facts.entrySet()) {
+                String key = fact.getKey();
+                boolean staticDetail = key.startsWith("runtime.manifest.") || key.contains(".submodule");
+                if (staticDetail != inventory) continue;
+                if (!key.matches("[a-zA-Z0-9._-]{1,64}")) throw new IOException("Invalid diagnostic field");
+                String raw = fact.getValue() == null ? "" : fact.getValue();
+                String value = raw.substring(0, Math.min(raw.length(),8192));
+                String row = key + "=" + value + "\n";
+                int size = Math.max(row.getBytes(StandardCharsets.UTF_8).length, redact(row).getBytes(StandardCharsets.UTF_8).length);
+                if (selected.size() >= MAX_FACTS-1 || bytes+size > MAX_METADATA_BYTES) continue;
+                selected.put(key,value);
+                bytes += size;
+            }
+        }
+        int omitted = facts.size()-selected.size();
+        selected.put("support.omittedFacts",Integer.toString(omitted));
+        write(destination,selected,logs);
     }
     public static void write(OutputStream destination, Map<String, String> facts, Map<String, Path> logs) throws IOException {
         if (facts.size() > MAX_FACTS || logs.size() > MAX_LOG_FILES) throw new IOException("Support bundle entry limit exceeded");

@@ -88,6 +88,21 @@ public final class SupportBundleTest {
         StringBuilder ascii = new StringBuilder(); for (int i = 0; i < 8192; i++) ascii.append('x');
         for (int i = 0; i < 33; i++) complete.put("large" + i, ascii.toString());
         rejectedBeforeOutput(complete);
+        complete.clear();
+        for(int i=0;i<300;i++)complete.put("runtime.manifest.field"+i,"value");
+        complete.put("snapshot.thermal.status","severe");
+        complete.put("status","session stopped");
+        Map<String,Path> sessionLogs=new LinkedHashMap<>();
+        for(int i=0;i<SupportBundle.MAX_LOG_FILES;i++)sessionLogs.put("owned"+i+".log",log);
+        ByteArrayOutputStream session=new ByteArrayOutputStream();
+        SupportBundle.writeSession(session,complete,sessionLogs);
+        String sessionStatus=readMetadata(session);
+        if(!sessionStatus.contains("snapshot.thermal.status=severe") || !sessionStatus.contains("support.omittedFacts=47"))
+            throw new AssertionError("session facts were lost or silently omitted");
+        try(ZipInputStream zip=new ZipInputStream(new ByteArrayInputStream(session.toByteArray()))) {
+            int entries=0;while(zip.getNextEntry()!=null)entries++;
+            if(entries!=1+sessionLogs.size())throw new AssertionError("session log roles lost");
+        }
         System.out.println("SupportBundle: complete provider metadata, UTF-8 bounds, credential redaction and traversal tests passed");
     }
     private static String readMetadata(ByteArrayOutputStream output) throws IOException {

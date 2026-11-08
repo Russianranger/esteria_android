@@ -45,12 +45,14 @@ public final class MainActivity extends Activity {
     private TextView storageSummary;
     private Button scanStorage, trimStorage;
     private FrameLayout rootView;
-    private ScrollView launcher;
-    private LinearLayout gameRoot;
+    private RealmLauncher launcher;
+    private FrameLayout gameRoot;
+    private io.github.russianranger.esteria.presentation.SettingsGear gear;
+    private android.app.AlertDialog gameSettings;
     private GamePresentationPanel gamePanel;
     private GameSession.Handle boundGame;
-    private TextView gameStatus;
-    private Button startGame,exportSupport,forceStop,launcherForceStop;
+
+    private Button startGame,exportSupport,launcherForceStop;
     private boolean resumed;
     private static final String[] CLIENT_LOCALES={"enUS","enGB","ruRU","deDE","esES","esMX","frFR","koKR","zhCN","zhTW","enCN","enTW"};
     private final Runnable refresh = new Runnable() {
@@ -69,6 +71,7 @@ public final class MainActivity extends Activity {
                 trimStorage.setEnabled(service.storageTrimAvailable());
                 if(!android.text.TextUtils.equals(storageSummary.getText(),service.storageStatus()))storageSummary.setText(service.storageStatus());
                 cancel.setEnabled(service.busy());
+                cancel.setVisibility(service.busy()?View.VISIBLE:View.GONE);
                 ClientLaunchSetup.UiReview review=service.uiReview();
                 if(review==null) {
                     displayedUiDigest=null; uiReview.setVisibility(View.GONE);
@@ -92,13 +95,9 @@ public final class MainActivity extends Activity {
     };
     @Override public void onCreate(Bundle savedState) {
         super.onCreate(savedState);
-        ScrollView scroll = new ScrollView(this); scroll.setFillViewport(true);launcher=scroll;
-        LinearLayout layout = new LinearLayout(this); layout.setOrientation(LinearLayout.VERTICAL);
-        int padding = dp(24); layout.setPadding(padding, padding, padding, padding); scroll.addView(layout);
-        TextView title = text("ESTERIA", 34, Color.rgb(220, 186, 113)); layout.addView(title);
-        TextView subtitle = text("Stock 3.3.5a / non-custom", 18, Color.rgb(184, 199, 211)); layout.addView(subtitle);
-        TextView explanation = text("Import your complete ChromieCraft 3.3.5a build 12340 client folder, or choose a ZIP. Keep Blizzard's standard patch archives. No Esteria, HD or challenge-mode patches are required.\n\nThis stock app keeps its own client copy, local account, world data and saved characters. Your original realmlist and account files stay in the source installation. Folder imports avoid an extra archive copy; keep the source unchanged until import finishes.\n\n"+(completeProfile()?"After import, choose your client language and Prepare local runtime / world, then Start local game. World entry and Thor validation are pending.":"This build has an incomplete runtime profile; gameplay is unavailable."), 15, Color.rgb(184, 199, 211));
-        explanation.setPadding(0, dp(20), 0, dp(12)); layout.addView(explanation);
+        launcher = new RealmLauncher(this,savedState==null?0:savedState.getInt("realmPage",0));
+        LinearLayout layout = launcher.setup;
+        layout.addView(text("Import your build 12340 client folder or ZIP, then prepare the local world.",15,RealmLauncher.PAPER));
         button(layout, "Import client folder", () -> chooseFolder(BASE_FOLDER));
         button(layout, "Import client ZIP", () -> chooseArchive(BASE));
         layout.addView(text("World preparation speed",14,Color.rgb(184,199,211)));
@@ -118,7 +117,7 @@ public final class MainActivity extends Activity {
             public void onNothingSelected(AdapterView<?> parent){ }
         });
         layout.addView(preparationSpeed);
-        layout.addView(text("Controls file checks and copies; navigation meshes also need CPU time. Memory backoff stays active at every speed. Change while idle, then retry preparation to continue valid completed work.",13,Color.rgb(145,163,177)));
+        layout.addView(text("Controls preparation speed. Completed work is reused.",13,Color.rgb(145,163,177)));
         if(BuildConfig.SERVER_DATA_TOOLS_PACKAGED&&BuildConfig.SERVER_PROGRAMS_PACKAGED&&BuildConfig.SERVER_CONTENT_PACKAGED&&BuildConfig.SHADER_TOOLS_PACKAGED) {
             layout.addView(text("Imported client language",14,Color.rgb(184,199,211)));
             clientLanguage=new Spinner(this);
@@ -132,8 +131,8 @@ public final class MainActivity extends Activity {
                 getPreferences(MODE_PRIVATE).edit().putString("clientLanguage",locale).apply();
                 operation(new Intent(this,SessionService.class).setAction(SessionService.PREPARE_WORLD).putExtra(SessionService.WORLD_LOCALE,locale));
             });
-            layout.addView(text("Use preparation after import, or for an explicit full integrity check. Completed compatible work is verified and retained. Start local game selects existing prepared components and does not rerun preparation. Fresh database setup reserves 4 GiB in addition to world data.",13,Color.rgb(145,163,177)));
-            button(layout,"Repair local component",()->{
+
+            button(launcher.tools,"Repair local component",()->{
                 io.github.russianranger.esteria.runtime.LocalWorldSetup.Component[] components=io.github.russianranger.esteria.runtime.LocalWorldSetup.Component.values();
                 String[] labels=new String[components.length];for(int i=0;i<components.length;i++)labels[i]=components[i].label;
                 new android.app.AlertDialog.Builder(this).setTitle("Choose the component reported as not ready")
@@ -143,8 +142,9 @@ public final class MainActivity extends Activity {
                             .putExtra(SessionService.WORLD_LOCALE,locale).putExtra(SessionService.REPAIR_COMPONENT,components[index].name()));
                     }).setNegativeButton("Cancel",null).show();
             });
-            layout.addView(text("Repair resumes or revalidates only the chosen component. Other completed components must match the current import and source versions. Corrupt completed output is preserved and may still require diagnosis from a support bundle. Database setup resumes unfinished setup or checks the existing database; it does not reset characters.",13,Color.rgb(145,163,177)));
+
         }
+        layout=launcher.play;
         uiReview=text("",14,Color.rgb(220,186,113)); uiReview.setTextIsSelectable(true);
         uiReview.setPadding(0,dp(16),0,dp(8)); uiReview.setVisibility(View.GONE); layout.addView(uiReview);
         useImportedUi=button(layout,"Use imported UI version",()->reviewDecision(SessionService.ACCEPT_UI));
@@ -154,27 +154,30 @@ public final class MainActivity extends Activity {
             Intent intent=new Intent(this,SessionService.class).setAction(SessionService.START);
             if(clientLanguage!=null)intent.putExtra(SessionService.WORLD_LOCALE,(String)clientLanguage.getSelectedItem());
             operation(intent);
-        });startGame.setEnabled(completeProfile());
+        });startGame.setEnabled(completeProfile());launcher.style(startGame,true);
+        if(!completeProfile())layout.addView(text("This installation has an incomplete runtime profile.",14,RealmLauncher.GOLD));
+        button(layout,"Game settings",this::showDisplaySettings);
+        layout=launcher.tools;
+        exportSupport=button(layout,"Export support bundle",this::chooseExport);
         scanStorage=button(layout,"Check reclaimable storage",()->operation(new Intent(this,SessionService.class).setAction(SessionService.SCAN_STORAGE)));
         trimStorage=button(layout,"Trim obsolete files",()->operation(new Intent(this,SessionService.class).setAction(SessionService.TRIM_STORAGE)));
         trimStorage.setEnabled(false);
-        storageSummary=text("Check storage to find obsolete runtime generations and redundant download archives. Your imported client, saves and resumable world work are retained.",13,Color.rgb(145,163,177));layout.addView(storageSummary);
-        exportSupport=button(layout, "Export support bundle", this::chooseExport);
-        cancel = new Button(this); cancel.setText(R.string.stop_session); cancel.setEnabled(false);
-        cancel.setOnClickListener(v -> startService(new Intent(this, SessionService.class).setAction(SessionService.CANCEL))); layout.addView(cancel);
+        storageSummary=text("Check how much space can be reclaimed from obsolete runtime files.",13,Color.rgb(145,163,177));layout.addView(storageSummary);
+        layout=launcher.footer;
+        cancel = new Button(this); cancel.setText(R.string.stop_session); cancel.setEnabled(false); cancel.setVisibility(View.GONE);
+        cancel.setOnClickListener(v -> startService(new Intent(this, SessionService.class).setAction(SessionService.CANCEL))); layout.addView(cancel);launcher.style(cancel,false);
         launcherForceStop=button(layout,"Force stop client · unsaved state may be lost",()->
             startService(new Intent(this,SessionService.class).setAction(SessionService.FORCE_STOP)));
         launcherForceStop.setVisibility(View.GONE);
         status = text("Connecting to local storage…", 16, Color.WHITE); status.setTextIsSelectable(true);
         status.setPadding(0, dp(20), 0, dp(12)); layout.addView(status);
-        TextView controls = text("D-pad: navigate · A: choose · B: minimize\nLB / RB: previous / next control", 13, Color.rgb(145, 163, 177)); layout.addView(controls);
-        rootView=new FrameLayout(this);rootView.addView(scroll,new FrameLayout.LayoutParams(-1,-1));setContentView(rootView);
+        rootView=new FrameLayout(this);rootView.addView(launcher,new FrameLayout.LayoutParams(-1,-1));setContentView(rootView);
         if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
             requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 20);
     }
     private Button button(LinearLayout layout, String label, Runnable action) {
         Button button = new Button(this); button.setText(label); button.setOnClickListener(v -> action.run());
-        button.setFocusable(true); actions.add(button); layout.addView(button); return button;
+        button.setFocusable(true); actions.add(button); layout.addView(button); launcher.style(button,false); return button;
     }
     private TextView text(String text, int size, int color) {
         TextView view = new TextView(this); view.setText(text); view.setTextSize(size); view.setTextColor(color); return view;
@@ -190,33 +193,87 @@ public final class MainActivity extends Activity {
         if(boundGame!=owner) {
             if(owner.state()!=GameSession.State.CLIENT_STARTED||owner.presentation()==null||!owner.presentation().isReady()||service.presentationEvents()==null)return;
             detachGameView();
-            gameRoot=new LinearLayout(this);gameRoot.setOrientation(LinearLayout.VERTICAL);gameRoot.setBackgroundColor(Color.BLACK);
+            gameRoot=new FrameLayout(this);gameRoot.setBackgroundColor(Color.BLACK);
             gamePanel=new GamePresentationPanel(this,service.presentationEvents(),()->startService(new Intent(this,SessionService.class).setAction(SessionService.CANCEL)));
             try{gamePanel.bind(owner.presentation());}catch(java.io.IOException error){gamePanel=null;gameRoot=null;return;}
-            gameRoot.addView(gamePanel,new LinearLayout.LayoutParams(-1,0,1));
-            gameStatus=text("",13,Color.WHITE);gameStatus.setPadding(dp(12),dp(4),dp(12),dp(4));gameRoot.addView(gameStatus);
-            LinearLayout tools=new LinearLayout(this);
-            Button support=new Button(this);support.setText("Support bundle");support.setOnClickListener(v->chooseExport());tools.addView(support,new LinearLayout.LayoutParams(0,-2,1));
-            forceStop=new Button(this);forceStop.setText("Force stop");forceStop.setVisibility(View.GONE);
-            forceStop.setOnClickListener(v->startService(new Intent(this,SessionService.class).setAction(SessionService.FORCE_STOP)));
-            tools.addView(forceStop,new LinearLayout.LayoutParams(0,-2,1));gameRoot.addView(tools);
+            gameRoot.addView(gamePanel,new FrameLayout.LayoutParams(-1,-1));
+            gear=new io.github.russianranger.esteria.presentation.SettingsGear(this,gameRoot,this::showGameSettings);
             rootView.addView(gameRoot,new FrameLayout.LayoutParams(-1,-1));launcher.setVisibility(View.GONE);boundGame=owner;
             getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            immersive(true);
             if(resumed)gamePanel.resume();
         }
-        if(gameStatus!=null) {
-            String latestStatus = service.status();
-            if(!android.text.TextUtils.equals(gameStatus.getText(),latestStatus))gameStatus.setText(latestStatus);
-        }
-        if(forceStop!=null){forceStop.setVisibility(owner.needsForceStop()?View.VISIBLE:View.GONE);forceStop.setEnabled(owner.needsForceStop());}
         if(owner.state()!=GameSession.State.CLIENT_STARTED&&gamePanel!=null)gamePanel.pause();
     }
     private void detachGameView() {
+        if(gameRoot==null)return;
+        if(gameSettings!=null)gameSettings.dismiss();
         if(gamePanel!=null){gamePanel.pause();gamePanel.unbind();}
         if(gameRoot!=null)rootView.removeView(gameRoot);
-        gamePanel=null;gameRoot=null;gameStatus=null;forceStop=null;boundGame=null;
+        gamePanel=null;gameRoot=null;gear=null;boundGame=null;immersive(false);
         if(launcher!=null)launcher.setVisibility(View.VISIBLE);
         getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+    @SuppressWarnings("deprecation")
+    private void immersive(boolean active){
+        if(Build.VERSION.SDK_INT>=30){
+            android.view.WindowInsetsController bars=getWindow().getInsetsController();
+            if(bars!=null){
+                bars.setSystemBarsBehavior(android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+                if(active)bars.hide(android.view.WindowInsets.Type.systemBars());else bars.show(android.view.WindowInsets.Type.systemBars());
+            }
+        }else getWindow().getDecorView().setSystemUiVisibility(active?
+                View.SYSTEM_UI_FLAG_FULLSCREEN|View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY:View.SYSTEM_UI_FLAG_VISIBLE);
+    }
+    @Override public void onWindowFocusChanged(boolean focus){
+        super.onWindowFocusChanged(focus);
+        if(focus && gamePanel!=null)immersive(true);
+    }
+    @Override protected void onSaveInstanceState(Bundle out){
+        super.onSaveInstanceState(out);out.putInt("realmPage",launcher.selectedPage());
+    }
+    @Override public void onBackPressed(){
+        if(gamePanel!=null){showGameSettings();return;}
+        if(launcher.selectedPage()!=0){launcher.select(0);return;}
+        super.onBackPressed();
+    }
+    private void showDisplaySettings(){
+        int[] rates={24,30,60};
+        android.content.SharedPreferences prefs=getSharedPreferences("game-display",MODE_PRIVATE);
+        int rate=prefs.getInt("frameCap",30);
+        String[] choices={"24 FPS · lower load","30 FPS · balanced","60 FPS · higher load"};
+        new android.app.AlertDialog.Builder(this).setTitle("Frame limit · next game start")
+            .setSingleChoiceItems(choices,rate==24?0:rate==60?2:1,(d,i)->{
+                prefs.edit().putInt("frameCap",rates[i]).apply(); d.dismiss();
+            }).setNegativeButton("Cancel",null).show();
+    }
+    private void showGameSettings(){
+        if(gamePanel==null || gameSettings!=null)return;
+        String limit="Frame limit · "+boundGame.presentation().frameCap()+" FPS this session";
+        java.util.List<String> items=new ArrayList<>(java.util.Arrays.asList(limit,"Open keyboard","Session details",
+                "Export support bundle","Reset gear position","Stop session"));
+        if(service!=null && service.forceStopAvailable())items.add("Force stop · unsaved state may be lost");
+        android.app.AlertDialog dialog=new android.app.AlertDialog.Builder(this).setTitle("Game settings")
+            .setItems(items.toArray(new String[0]),(d,i)->{
+                if(gamePanel==null)return;
+                switch(i){
+                case 0: showDisplaySettings();break;
+                case 1: gamePanel.requestKeyboard();break;
+                case 2:
+                    new android.app.AlertDialog.Builder(this).setTitle("Local session")
+                        .setMessage(gamePanel.inputStatus()+"\n\n"+service.status())
+                        .setPositiveButton("Return",null).show();break;
+                case 3: if(service.supportExportAvailable())chooseExport();else
+                    android.widget.Toast.makeText(this,"Wait for the current operation to finish.",android.widget.Toast.LENGTH_SHORT).show();break;
+                case 4: gear.resetPosition();break;
+                case 5: gamePanel.requestStop();break;
+                case 6: if(service.forceStopAvailable())startService(new Intent(this,SessionService.class).setAction(SessionService.FORCE_STOP));break;
+                default: break;
+                }
+            }).setNegativeButton("Return to game",null).create();
+        gameSettings=dialog;
+        dialog.setOnDismissListener(d->gameSettings=null);
+        dialog.show();
     }
     private void chooseArchive(int request) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT).setType("*/*").addCategory(Intent.CATEGORY_OPENABLE);

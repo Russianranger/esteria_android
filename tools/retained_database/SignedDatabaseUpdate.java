@@ -90,6 +90,26 @@ public final class SignedDatabaseUpdate {
             bridges.current(),graphics.current(),dataTools.current(),shaderTools.current()};
         verifyRetainedFiles(qa,roots,client,seed);
         if(seed)return;
+        if(phase.equals("baseline22") || phase.equals("reopen23")) {
+            if(phase.equals("baseline22")) {
+                try(ServerInstallationSetup.Handle owner=ServerInstallationSetup.beginFresh(ctx,root,server,programs,content,data,1L<<30)){
+                    owner.prepare(progress,RuntimeWork.NEVER_CANCELLED);
+                    owner.finishPlayerbots(progress,RuntimeWork.NEVER_CANCELLED);
+                    var active=owner.stopAndPromote(Duration.ofSeconds(30));
+                    Files.write(qa.resolve("active"),identity(root,active),StandardOpenOption.CREATE_NEW);
+                }
+            }
+            var active=ServerInstallationSetup.completed(ctx,root,server,programs,content);
+            require(Arrays.equals(identity(root,active),Files.readAllBytes(qa.resolve("active"))),"retained slot, account or UUID changed");
+            var service=ServerDatabaseService.startActive(ctx,root,server,active);
+            try {
+                ServerDatabaseService.awaitReady(service,System.nanoTime()+TimeUnit.MINUTES.toNanos(3),RuntimeWork.NEVER_CANCELLED);
+                require(active.mysqlUuid.equals(service.instanceUuid()),"SQL reopened different UUID");
+            }finally{service.stop(Duration.ofSeconds(30));}
+            require(!service.isAlive(),"SQL did not stop");
+            System.out.println("ESTERIA_ACTIVE slot="+active.slotId+" uuid="+active.mysqlUuid+" elapsedMs="+TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-start));
+            return;
+        }
         if(phase.equals("fail19")) {
             require(ServerInstallationSetup.completedOrNull(ctx,root,server,programs,content)==null,"unexpected preexisting slot");
             try(ServerInstallationSetup.Handle owner=ServerInstallationSetup.beginFresh(ctx,root,server,programs,content,data,1L<<30)) {

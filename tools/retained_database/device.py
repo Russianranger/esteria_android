@@ -68,6 +68,13 @@ if __name__ == '__main__':
         for phase in ('debug-seed', 'debug-repair', 'debug-cold', 'debug-cold', 'debug-cold'):
             run(phase, uid)
         sys.exit(0)
+    if sys.argv[2:] == ['v23']:
+        old = install('previous.apk', 22)
+        run('seed21', old)  # Existing provider seeding fixture shared by modern baselines.
+        run('baseline22', old)
+        assert install('candidate.apk', 23) == old
+        run('reopen23', old)
+        sys.exit(0)
     if sys.argv[2:] == ['v22']:
         old = install('previous.apk', 21)
         run('seed21', old)
