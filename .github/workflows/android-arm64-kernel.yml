@@ -1,0 +1,99 @@
+name: Inspect hosted ARM64 Android kernel capabilities
+on:
+  workflow_dispatch:
+  push:
+    branches: [non-custom, qa/android-arm64-kernel]
+permissions:
+  contents: read
+jobs:
+  kernel:
+    if: github.repository == 'Russianranger/esteria_android' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[check Android ARM64 kernel]'))
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 3
+    steps:
+      - name: Exercise the stock binder and KVM interfaces
+        shell: bash
+        run: |
+          set -eu
+          test "$(uname -m)" = aarch64
+          sudo -n unshare --mount --propagation private -- python3 - "$RUNNER_TEMP/android-arm64-kernel.json" "${ImageOS:-}" "${ImageVersion:-}" <<'PY'
+          import array, errno, fcntl, gzip, json, os, platform, stat, subprocess, sys, tempfile
+          from pathlib import Path
+
+          def run(*args):
+              p = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, timeout=10)
+              return {"exit": p.returncode, "message": p.stdout.strip()[:350]}
+
+          def binder_devices(directory, allocate):
+              result = {}
+              control = None
+              try:
+                  if allocate:
+                      control = os.open(directory / "binder-control", os.O_RDWR | os.O_CLOEXEC)
+                  for name in ("binder", "hwbinder", "vndbinder"):
+                      try:
+                          if control is not None:
+                              request = bytearray(264)
+                              request[:len(name)] = name.encode("ascii")
+                              fcntl.ioctl(control, 0xc1086201, request)
+                          with (directory / name).open("r+b", buffering=0) as dev:
+                              assert stat.S_ISCHR(os.fstat(dev.fileno()).st_mode)
+                              version = array.array("i", [0])
+                              fcntl.ioctl(dev, 0xc0046209, version)
+                              result[name] = {"version": version[0]}
+                      except OSError as error:
+                          result[name] = {"errno": error.errno}
+              finally:
+                  if control is not None:
+                      os.close(control)
+              return result
+
+          kernel = platform.release()
+          config = Path("/boot/config-" + kernel)
+          flags = {}
+          if config.is_file() or Path("/proc/config.gz").is_file():
+              lines = config.read_text().splitlines() if config.is_file() else gzip.open(
+                  "/proc/config.gz", "rt").read().splitlines()
+              for key in ("ANDROID_BINDER_IPC", "ANDROID_BINDERFS", "KVM"):
+                  name = "CONFIG_" + key
+                  flags[name] = next((s.split("=", 1)[1] for s in lines if s.startswith(name + "=")),
+                                     "n" if "# " + name + " is not set" in lines else "unspecified")
+          binder_module = run("modprobe", "binder_linux")
+          binder = {}
+          with tempfile.TemporaryDirectory() as work:
+              mount = run("mount", "-t", "binder", "binder", work)
+              if mount["exit"] == 0:
+                  try:
+                      binder = binder_devices(Path(work), True)
+                  finally:
+                      subprocess.run(["umount", work], check=True)
+          classic = binder_devices(Path("/dev"), False)
+          kvm = {}
+          try:
+              with open("/dev/kvm", "r+b", buffering=0) as device:
+                  kvm["api"] = fcntl.ioctl(device, 0xae00)
+                  vm = fcntl.ioctl(device, 0xae01, 0)
+                  try:
+                      vcpu = fcntl.ioctl(vm, 0xae41, 0)
+                      os.close(vcpu)
+                      kvm["createdArmVcpu"] = True
+                  finally:
+                      os.close(vm)
+          except OSError as error:
+              kvm["errno"] = error.errno
+          complete = lambda nodes: len(nodes) == 3 and all(n.get("version") == 8 for n in nodes.values())
+          result = dict(architecture=platform.machine(), kernel=kernel, runnerImage=sys.argv[2:],
+                        config=flags, stockBinderModule=binder_module, binderfsMount=mount,
+                        binderfsDevices=binder, classicBinderDevices=classic, kvm=kvm,
+                        nativeRedroidPossible=complete(binder) or complete(classic),
+                        nativeArmVirtualizationPossible=kvm.get("api")==12 and kvm.get("createdArmVcpu",False))
+          value = json.dumps(result, indent=2, sort_keys=True)
+          Path(sys.argv[1]).write_text(value + "\n")
+          print(value)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: android-arm64-kernel
+          path: ${{ runner.temp }}/android-arm64-kernel.json
+          if-no-files-found: error
+          retention-days: 7
