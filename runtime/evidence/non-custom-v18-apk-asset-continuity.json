@@ -1,0 +1,182 @@
+{
+  "addedAssetFiles": [],
+  "baselineApkSha256": "dc68c5ced8f0f4a155d86135f70a8522766e483957df06e0ce5544d488ac2ace",
+  "baselineVersionCode": 17,
+  "candidateApkSha256": "60a90c58dfc211c53928853dbbebd04929668da69d46d4c0a027c143f6857eb6",
+  "candidateVersionCode": 18,
+  "changedAssetFiles": [
+    "assets/database-service/manifest.json",
+    "assets/database-service/mysql_bootstrap.py",
+    "assets/database-service/mysql_service.py",
+    "assets/database-setup/manifest.json",
+    "assets/database-setup/mysql_bootstrap.py",
+    "assets/server-installation/manifest.json",
+    "assets/server-installation/mysql_bootstrap.py",
+    "assets/server-installation/mysql_service.py",
+    "assets/server-schema/manifest.json",
+    "assets/server-schema/mysql_bootstrap.py",
+    "assets/server-schema/mysql_service.py",
+    "assets/server-session/manifest.json",
+    "assets/server-session/mysql_bootstrap.py",
+    "assets/server-session/mysql_service.py"
+  ],
+  "changedHelperSourceAndManifestIdentities": {
+    "assets/database-service/manifest.json": {
+      "new": {
+        "bytes": 254,
+        "sha256": "91e09d4f7d73f53625e5912ecc2af85ed280eac80940fc738b2f659a8e89e346"
+      },
+      "old": {
+        "bytes": 254,
+        "sha256": "f7f05083969ce1e557fb1387c8a354a6aa2b80100729ca73cb6b4635a7ce475e"
+      }
+    },
+    "assets/database-service/mysql_bootstrap.py": {
+      "new": {
+        "bytes": 32786,
+        "sha256": "212bf5bae4c947c57069fe7e816be1c2c1fad6869ef378fc609df359c7f50f2e"
+      },
+      "old": {
+        "bytes": 32698,
+        "sha256": "e69d5b64c4a5f5ace86fa521589d5a64613f601c59aedb011b42a1e5b743b47d"
+      }
+    },
+    "assets/database-service/mysql_service.py": {
+      "new": {
+        "bytes": 18729,
+        "sha256": "55fd55b11c614794929330a92f8b19637c8e02c3471c319f5e9429346fa716d4"
+      },
+      "old": {
+        "bytes": 18078,
+        "sha256": "8b30e9598f20ee715685a51aba59cefcafc6213d9d5d5cb6c6f3a73efa6b71c2"
+      }
+    },
+    "assets/database-setup/manifest.json": {
+      "new": {
+        "bytes": 262,
+        "sha256": "36d19b1aed3d4b5177d792c23c30a00507c62f2919e4229e20d666f76fe3af35"
+      },
+      "old": {
+        "bytes": 262,
+        "sha256": "72afe9c5a043b1f20ef5484ae6a9a10626587d0e87caeb764a0701d6e91684b0"
+      }
+    },
+    "assets/database-setup/mysql_bootstrap.py": {
+      "new": {
+        "bytes": 32786,
+        "sha256": "212bf5bae4c947c57069fe7e816be1c2c1fad6869ef378fc609df359c7f50f2e"
+      },
+      "old": {
+        "bytes": 32698,
+        "sha256": "e69d5b64c4a5f5ace86fa521589d5a64613f601c59aedb011b42a1e5b743b47d"
+      }
+    },
+    "assets/server-installation/manifest.json": {
+      "new": {
+        "bytes": 2158,
+        "sha256": "e6d8606a33f373c7c6cf5031ca4469a1b16150507129e7c06ad6437168a4b58b"
+      },
+      "old": {
+        "bytes": 2158,
+        "sha256": "0c6edaf8d8d1c2c2fe73b0bbe6af408181505b3c10663920c1618f96df8c14d8"
+      }
+    },
+    "assets/server-installation/mysql_bootstrap.py": {
+      "new": {
+        "bytes": 32786,
+        "sha256": "212bf5bae4c947c57069fe7e816be1c2c1fad6869ef378fc609df359c7f50f2e"
+      },
+      "old": {
+        "bytes": 32698,
+        "sha256": "e69d5b64c4a5f5ace86fa521589d5a64613f601c59aedb011b42a1e5b743b47d"
+      }
+    },
+    "assets/server-installation/mysql_service.py": {
+      "new": {
+        "bytes": 18729,
+        "sha256": "55fd55b11c614794929330a92f8b19637c8e02c3471c319f5e9429346fa716d4"
+      },
+      "old": {
+        "bytes": 18078,
+        "sha256": "8b30e9598f20ee715685a51aba59cefcafc6213d9d5d5cb6c6f3a73efa6b71c2"
+      }
+    },
+    "assets/server-schema/manifest.json": {
+      "new": {
+        "bytes": 1101,
+        "sha256": "cae8fcccb64bab19738d74906d6ec1b3bad9a252a63afc4baf5543cd0467f191"
+      },
+      "old": {
+        "bytes": 1101,
+        "sha256": "978b0a784003474a31d05bcb07f423c47d0ec201613f96d227a59ad678b99972"
+      }
+    },
+    "assets/server-schema/mysql_bootstrap.py": {
+      "new": {
+        "bytes": 32786,
+        "sha256": "212bf5bae4c947c57069fe7e816be1c2c1fad6869ef378fc609df359c7f50f2e"
+      },
+      "old": {
+        "bytes": 32698,
+        "sha256": "e69d5b64c4a5f5ace86fa521589d5a64613f601c59aedb011b42a1e5b743b47d"
+      }
+    },
+    "assets/server-schema/mysql_service.py": {
+      "new": {
+        "bytes": 18729,
+        "sha256": "55fd55b11c614794929330a92f8b19637c8e02c3471c319f5e9429346fa716d4"
+      },
+      "old": {
+        "bytes": 18078,
+        "sha256": "8b30e9598f20ee715685a51aba59cefcafc6213d9d5d5cb6c6f3a73efa6b71c2"
+      }
+    },
+    "assets/server-session/manifest.json": {
+      "new": {
+        "bytes": 3065,
+        "sha256": "f05443d74b4467c7beff85d53b15db6c6403c13b452bf83fb26f0902616314a0"
+      },
+      "old": {
+        "bytes": 3065,
+        "sha256": "07895b009989a9d633e321c44a22c87d8dd59db65bd9a221ba05cd170705d501"
+      }
+    },
+    "assets/server-session/mysql_bootstrap.py": {
+      "new": {
+        "bytes": 32786,
+        "sha256": "212bf5bae4c947c57069fe7e816be1c2c1fad6869ef378fc609df359c7f50f2e"
+      },
+      "old": {
+        "bytes": 32698,
+        "sha256": "e69d5b64c4a5f5ace86fa521589d5a64613f601c59aedb011b42a1e5b743b47d"
+      }
+    },
+    "assets/server-session/mysql_service.py": {
+      "new": {
+        "bytes": 18729,
+        "sha256": "55fd55b11c614794929330a92f8b19637c8e02c3471c319f5e9429346fa716d4"
+      },
+      "old": {
+        "bytes": 18078,
+        "sha256": "8b30e9598f20ee715685a51aba59cefcafc6213d9d5d5cb6c6f3a73efa6b71c2"
+      }
+    }
+  },
+  "changedProviderArchives": {},
+  "formatVersion": 1,
+  "removedAssetFiles": [],
+  "totalAssetFiles": 123,
+  "unchangedAssetFiles": 109,
+  "unchangedNativeLibraries": 4,
+  "unchangedProviderArchiveBytes": 335324163,
+  "unchangedProviderArchives": {
+    "assets/client-runtime/client-arm64.archive": "a413045a85ea84d31cdaa8008f381540442f2d0de9df0fa4fe20c9695edc5086",
+    "assets/guest-bridges/guest-bridges-arm64.archive": "7e0356f14bf3654a0e1ecc903726bd479fea0c761c8a4e8a4356e2e476726a55",
+    "assets/server-content/server-content.archive": "0f41b2deea5344fcea4cbc70bbddf0bab1dfda1cd0346e23e92592aac63056e6",
+    "assets/server-data-tools/server-data-tools.archive": "e80d1d731902907297ae89f68d8241bca0aa79b8a281521c669353654ce5b436",
+    "assets/server-programs/server-programs.archive": "963a23c1390440260b85ffe164b2d7508c56b005b315dce8a919ae443a46d1bf",
+    "assets/server-runtime/server-runtime-arm64.archive": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5",
+    "assets/shader-tools/shader-tools-arm64.archive": "c48c4d78952d4a2c02c26b7a6da0087d29b21eb19a81b643cb5a9a97cf7389af",
+    "assets/turnip/turnip-arm64.archive": "445c38ddf7e66f65ee90aa7fd2006db88d6fecd72c8567d801f2ee4c4000a772"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "appRevision": "075ed711bd8be7aaeac8bdfca2be8c607afb8f4b",
+  "assets": [
+    {
+      "assetId": 723240536,
+      "bytes": 336899353,
+      "completeAnonymousReadback": true,
+      "name": "Esteria-Stock-3.3.5a-arm64.apk",
+      "sha256": "60a90c58dfc211c53928853dbbebd04929668da69d46d4c0a027c143f6857eb6"
+    },
+    {
+      "assetId": 723241055,
+      "bytes": 4110,
+      "completeAnonymousReadback": true,
+      "name": "NON-CUSTOM-TESTING.md",
+      "sha256": "cb2918c9474c09789331ee2ce06afa618f28cf36a68155a53543a1414b484386"
+    },
+    {
+      "assetId": 723241025,
+      "bytes": 19234,
+      "completeAnonymousReadback": true,
+      "name": "publication-evidence.json",
+      "sha256": "92abf71d3859770ed85681deb3e85af9dc8c82e8a84535c75fde7e30f6ae33f9"
+    },
+    {
+      "assetId": 723240971,
+      "bytes": 2904,
+      "completeAnonymousReadback": true,
+      "name": "release.json",
+      "sha256": "f1e86e6b3c31c99fb5098999623e9891f78d80858670103e19e32b56c21d2b32"
+    },
+    {
+      "assetId": 723240940,
+      "bytes": 97,
+      "completeAnonymousReadback": true,
+      "name": "SHA256SUMS",
+      "sha256": "74225c11ebd75a19a9f7cd05b76ef88463c687ed6131f948ba01ab2458a429eb"
+    },
+    {
+      "assetId": 723240999,
+      "bytes": 1053,
+      "completeAnonymousReadback": true,
+      "name": "signing-receipt.json",
+      "sha256": "5d6316a7305e2bfac3bf18c18f50053b82166e418880b1a134332ba16631e302"
+    }
+  ],
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "persistentCertificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+  "publicationRoute": "Hosted detached staging and original additive GitHub Actions publication",
+  "releaseId": 438097876,
+  "releaseUrl": "https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.18",
+  "scope": "published-stock-v17-full-asset-byte-readback",
+  "sdkManifestVerified": true,
+  "sdkV2AndV3SignatureVerified": true,
+  "tag": "non-custom-v0.1.0-non-custom.18",
+  "tagTargetExactlyMatchesProducer": true,
+  "thorQualified": false
+}

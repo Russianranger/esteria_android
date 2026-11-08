@@ -1,0 +1,81 @@
+{
+  "evidenceKind": "full stock shader generation, warm reuse and installed Android consumer admission",
+  "sourceCommit": "2149ae6001b68d896a1fef61f905aeb5fb3115c6",
+  "releaseTag": "non-custom-v0.1.0-non-custom.17",
+  "apk": {
+    "package": "io.github.russianranger.esteria.stock",
+    "versionCode": 17,
+    "bytes": 336899353,
+    "sha256": "dc68c5ced8f0f4a155d86135f70a8522766e483957df06e0ce5544d488ac2ace",
+    "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+    "installedInPlaceOverQaVersionCode": 15,
+    "installedFileMatchesPublishedRelease": true
+  },
+  "selection": {
+    "stockClientBuild": 12340,
+    "importFiles": 188,
+    "importGeneration": "a6800cb53df18cea0012ea4c7c86991edaf49f49433528ec237678454bea09cb",
+    "clientShaderRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+    "effectiveLocale": "enUS",
+    "shaderGeneration": "9d5f8a86c2ef253bd5ad9cde6b493e34e789cc5ab6b9a1f49008485b34b969f1",
+    "receiptSha256": "67640ae968737c56a2b0e4b3dd78cfeda9bd640370e4841e818de6482214e520",
+    "toolManifestSha256": "36e3032524c2136c4273908f887a1ca59ebb414e806f52d47e778332ed4acda6"
+  },
+  "host": {
+    "environment": "Linux host Python, exact signed helpers and packaged ARM64 compiler under offline QEMU user emulation, AOSP JSON in signed-source Java consumer",
+    "attempts": [
+      {
+        "operation": "prepare",
+        "compilerInvocations": 1580,
+        "elapsedSeconds": 2972.228
+      },
+      {
+        "operation": "warm",
+        "compilerInvocations": 0,
+        "elapsedSeconds": 7.02
+      }
+    ],
+    "validatedOutputFiles": 4742,
+    "outputBytesRead": 102132134,
+    "sourcePayloadCopiedBytes": 0
+  },
+  "installedAndroid": {
+    "environment": "offline Android 13 ARM64 Redroid under QEMU system emulation, public v17 PM-installed base.apk under same package UID",
+    "api": 33,
+    "abi": "arm64-v8a",
+    "uid": 10077,
+    "vm": "Dalvik",
+    "observerDexArchiveSha256": "859258139cb12f8b28936213304cd1cda9d17859492dc2c4232964b9ed4257ee",
+    "consumer": "Installed ShaderSetup.validatePrepared and requireSameSelection from the verified PackageManager base.apk. Each independent ART process reopens the selected receipt and verifies the complete shader payload.",
+    "deviceStorage": "Private read-only real normalized source via virtio and FUSE. The exact derived shader output and receipts were transferred to guest tmpfs under shared import and shader-generation writer exclusion.",
+    "originalImportPayloadBytesCopied": 0,
+    "derivedOutputBytesCopiedIntoGuest": 102132134,
+    "processes": [
+      {
+        "role": "first",
+        "elapsedMs": 104383,
+        "payloadFilesRead": 4742,
+        "payloadBytesRead": 102132134
+      },
+      {
+        "role": "fresh",
+        "elapsedMs": 87512,
+        "payloadFilesRead": 4742,
+        "payloadBytesRead": 102132134
+      }
+    ],
+    "compilerCalls": 0,
+    "foreignReceiptCheck": {
+      "pass": "first",
+      "expectedError": "Shader result input identity differs",
+      "sourceWasRejected": true,
+      "correctSelectionReadmitted": true,
+      "foreignImportGeneration": "015bc80093dc01d7837ba5054a3de0343b30bf5c3bb37afc5bae651cef7e1ba5",
+      "foreignShaderGeneration": "3609dd1b67e77a12a6c1641cfba7341fc1681af57bef503f7b9ce8d64dc8139f",
+      "foreignReceiptSha256": "8ceaf67054c93693a08424722df6546f0578d5e229afb8c25b3b6e6c8c5a7b34"
+    },
+    "cleanPoweroff": true
+  },
+  "physicalThor": false,
+  "normalGameSession": false
+}
