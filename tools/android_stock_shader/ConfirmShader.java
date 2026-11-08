@@ -17,7 +17,7 @@ public final class ConfirmShader {
     private static final String ACTOR = "qa-signed-stock-shaders";
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 2 || !(args[0].equals("cold") || args[0].equals("warm") || args[0].equals("repair"))
+        if (args.length != 2 || !(args[0].equals("cold") || args[0].equals("warm") || args[0].equals("repair") || args[0].equals("legacy") || args[0].equals("recovered"))
                 || !args[1].matches("[a-f0-9]{64}")) throw new IllegalArgumentException("mode and import required");
         if (Looper.myLooper() == null) Looper.prepareMainLooper();
         Class<?> activity = Class.forName("android.app.ActivityThread");
@@ -33,7 +33,9 @@ public final class ConfirmShader {
         };
         System.load(installed.getApplicationInfo().nativeLibraryDir + "/libesteria_process.so");
         FutureTask<Void> job = new FutureTask<>(() -> {
-            if (args[0].equals("repair")) ConfirmShaderRepair.exercise(context, root, args[1]);
+            if (args[0].equals("legacy") || args[0].equals("recovered"))
+                ConfirmShaderRepair.historical(context, root, args[1], args[0].equals("legacy"));
+            else if (args[0].equals("repair")) ConfirmShaderRepair.exercise(context, root, args[1]);
             else exercise(context,root,args[0].equals("cold"),args[1]);
             return null;
         });

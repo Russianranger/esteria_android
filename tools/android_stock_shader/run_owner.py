@@ -2,6 +2,7 @@
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import struct
@@ -140,6 +141,12 @@ def exercise(container, report, range_counters, repair_report=None):
         command_prefix += [k+'='+v for k,v in selected.items()]
         command_prefix += ['CLASSPATH='+INPUT+'/driver.jar:'+apk,'/system/bin/app_process64',
                            '-Djava.library.path='+native+':/system/lib64','/system/bin']
+        if os.environ.get('ESTERIA_LEGACY_SHADER_REPAIR')=='true':
+            import historical_owner
+            invocation_active = True
+            historical_owner.exercise(sys.modules[__name__],container,uid,source,apk,command_prefix,range_counters,report)
+            invocation_active = False
+            return
         for mode in ('cold','warm'):
             report['phase'] = mode
             command = [*command_prefix, 'io.github.russianranger.esteria.runtime.ConfirmShader', mode, source]

@@ -96,6 +96,68 @@ final class ConfirmShaderRepair {
         return result;
     }
 
+    static void historical(Context context, Path root, String importKey, boolean old) throws Exception {
+        require(root.toRealPath().equals(root) && root.endsWith("qa-signed-stock-shaders"), "isolated actor required");
+        require(text(root.resolve("game/current")).equals(importKey+"\n"), "import changed");
+        Path store = root.resolve("state/shader-work/shaders");
+        require(!Files.exists(store.resolve("current")), "unpublished shader store required");
+        RuntimeSetup wine = new RuntimeSetup(context, root);
+        ShaderToolsSetup tools = new ShaderToolsSetup(context, root);
+        tools.requireWineArchive(wine.archiveSha256());
+        long started = System.nanoTime();
+        JSONObject report = new JSONObject().put("importGeneration", importKey);
+        if (old) {
+            try (GameSession.Leases ignored = GameSession.claim(root)) {
+                var wr = wine.prepare(QUIET, RuntimeWork.NEVER_CANCELLED);
+                var sr = tools.prepare(QUIET, RuntimeWork.NEVER_CANCELLED);
+                require(!wr.alreadyInstalled && !sr.alreadyInstalled,"previous APK must prepare original providers");
+                ShaderSetup.Handle owner = ShaderSetup.begin(context, root, wine, tools, "enUS");
+                try (ShaderSetup.Handle owned = owner) {
+                    try {
+                        owned.prepare(QUIET, RuntimeWork.NEVER_CANCELLED);
+                        throw new IllegalStateException("Original v13 failure did not reproduce");
+                    } catch (IOException expected) {
+                        Path log = owned.diagnosticLogs().get("setup.shader.stderr.log");
+                        require(log != null, "missing original translator log");
+                        String failure = text(log);
+                        require(failure.contains("worker=shader-translator; exitStatus=2") &&
+                                failure.contains("strict setup refuses 10 undecodable or mismatched-stage record(s): Terrain1w:0, Terrain1w:1, Terrain1w:2, Terrain1w:3, Terrain1w:4, Terrain1w:5, Terrain1w_1:0, Terrain1w_2:0"),
+                                "original error differs from physical support export");
+                    }
+                }
+                require(!owner.processAlive() && owner.state()==ShaderSetup.State.CLOSED && !Files.exists(store.resolve("current")),
+                        "failed generator published or leaked its owner");
+                report.put("mode","legacy").put("failedLegacyPermutations",10).put("workerExit",2)
+                        .put("noCurrentPointer",true).put("wineGeneration",wr.generation)
+                        .put("toolGeneration",sr.generation);
+            }
+        } else {
+            LocalWorldSetup.Handle owner = LocalWorldSetup.beginShaderRepair(context,root,wine,tools,"enUS");
+            ShaderSetup.Result result;
+            try (LocalWorldSetup.Handle owned = owner) {
+                result = owned.repairShaders(QUIET, RuntimeWork.NEVER_CANCELLED);
+                require(result.outputFiles == 4742 && result.importGeneration.equals(importKey), "different repair selection");
+                Path log = owned.diagnosticLogs().get("setup.shader.stdout.log");
+                require(log != null && Arrays.asList(text(log).split("\n")).contains("Shader repair published-replacement generation="+result.generation),
+                        "named repair did not publish its completed replacement");
+            }
+            require(owner.state()==LocalWorldSetup.State.CLOSED,"repair owner still active");
+            admit(context,root,wine,tools,result);
+            String generation = result.generation;
+            Path done=store.resolve("generations").resolve(generation);
+            String generated=text(done.resolve("setup.log"));
+            require(generated.contains("1578 selected: validated 1578") && generated.contains("2 generated, validated 2"),
+                    "complete stock modules were not generated");
+            report.put("mode","recovered").put("generation",generation).put("outputFiles",result.outputFiles)
+                    .put("outputBytes",result.outputBytes).put("newValidatedModules",1580)
+                    .put("verifiedRuntimeHashes",runtimePins(done.resolve("receipt.json")).size())
+                    .put("receiptSha256",digest(done.resolve("receipt.json"))).put("namedRepairPublished",true)
+                    .put("freshSessionAdmission",true);
+        }
+        report.put("elapsedMs",(System.nanoTime()-started)/1_000_000).put("closed",true);
+        System.out.println("ANDROID_HISTORICAL_SHADER_RESULT "+report);
+    }
+
     static void exercise(Context context, Path root, String expectedImport) throws Exception {
         long start = System.nanoTime();
         require(root.toRealPath().equals(root) && root.endsWith("qa-signed-stock-shaders"),"isolated current private actor required");

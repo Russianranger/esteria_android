@@ -60,11 +60,21 @@ diff -u <(jq -cS '.packages["wine-arm64"].archive' runtime/runtime-sources.lock.
 wine=$(jq -er '.packages["wine-arm64"].archive.url' "$work/runtime.json")
 test "$wine" = "$repo_url/deps-wine-arm64-681b2e9-c0e13ed15a69/wine-arm64.tar.gz"
 release_asset "$wine" 692421785 "$work/input/wine.tar.gz"
+if [[ ${ESTERIA_LEGACY_SHADER_REPAIR:-false} == true ]]; then
+  legacy="$work/input/legacy.apk"
+  release_asset "$repo_url/non-custom-v0.1.0-non-custom.13/Esteria-Stock-3.3.5a-arm64.apk" 721924163 "$legacy"
+  test "$(stat -c %s "$legacy")" = 336853760
+  echo "9d9809d5e04b4bac5d1f0826d4fb0255a53318fe3220f5a7d19e8a077b01dbae  $legacy" | sha256sum -c
+  java -jar "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" verify --verbose --print-certs "$legacy" > "$work/legacy-signers"
+  diff -u <(grep '^Signer #[0-9]* certificate SHA-256 digest:' "$work/signers") <(grep '^Signer #[0-9]* certificate SHA-256 digest:' "$work/legacy-signers")
+  chmod 0444 "$legacy"
+fi
 unset release_token
 test "$(stat -c %s "$work/input/wine.tar.gz")" = 282628308
 echo "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46  $work/input/wine.tar.gz" | sha256sum -c
 phase=compile-observer
 bash tools/android_stock_shader/compile_driver.sh "$work/dex" "$work/input/driver.jar"
+test "$(unzip -p "$work/input/driver.jar" classes.dex | sha256sum | cut -d' ' -f1)" = 9feffe76d3d85526e11c27acabf310aed97a84469755ba8302d2fb36a2ec08eb
 chmod 0755 "$work/input"
 chmod 0444 "$work/input/"{stock.apk,wine.tar.gz,driver.jar}
 phase=source-windows

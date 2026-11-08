@@ -1,6 +1,7 @@
 """Check the signed APK's Android package and launcher in the disposable native ARM64 runner."""
 import argparse
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -9,7 +10,8 @@ import time
 
 PACKAGE = 'io.github.russianranger.esteria.stock'
 ACTIVITY = 'io.github.russianranger.esteria.MainActivity'
-NAME = '0.1.0-non-custom.19'
+VERSION = 13 if os.environ.get('ESTERIA_LEGACY_SHADER_REPAIR')=='true' and '--check-reaped' not in sys.argv else 19
+NAME = '0.1.0-non-custom.' + str(VERSION)
 SCOPE = 'disposable Android 13 signed v19 package lifecycle'
 
 
@@ -27,7 +29,7 @@ def shell(container, script, *args, timeout=60):
 
 def identity(container):
     result = shell(container,'dumpsys package "$1"',PACKAGE)
-    require(re.search(r'^\s*versionCode=19\b',result,re.MULTILINE) and
+    require(re.search(r'^\s*versionCode='+str(VERSION)+r'\b',result,re.MULTILINE) and
             re.search(r'^\s*versionName='+re.escape(NAME)+r'\s*$',result,re.MULTILINE),
             'installed package version differs')
     package_list = shell(container,'pm list packages --user 0 -U "$1"',PACKAGE)
@@ -69,7 +71,7 @@ def exercise(container, report, check_only):
         uid=identity(container)
         require(uid==report['uid'],'installed UID changed')
         check_empty(container,uid)
-        report.update(postShaderUidProcesses=0,postShaderOwnersReaped=True,phase='complete')
+        report.update(finalVersionCode=VERSION,postShaderUidProcesses=0,postShaderOwnersReaped=True,phase='complete')
         return
     report.update(scope=SCOPE,package=PACKAGE,phase='package-installation',physicalThor=False,
                   gameplayQualified=False)
@@ -78,13 +80,13 @@ def exercise(container, report, check_only):
         apk=/data/local/tmp/esteria-signed-stock-qa.apk
         test ! -e "$apk"
         trap 'rm -f "$apk"' EXIT
-        cp /esteria-qa/input/stock.apk "$apk"
+        cp "/esteria-qa/input/$1" "$apk"
         chmod 644 "$apk"
         pm install -r --user 0 "$apk"
-        ''',timeout=360)
+        ''','legacy.apk' if VERSION==13 else 'stock.apk', timeout=360)
     require('Success' in output.splitlines(),'package installation did not succeed')
     uid=identity(container)
-    report.update(versionCode=19,versionName=NAME,uid=uid,phase='launcher')
+    report.update(versionCode=VERSION,versionName=NAME,uid=uid,phase='launcher')
     try:
         component=PACKAGE+'/'+ACTIVITY
         result = shell(container,'am start -W --user 0 -n "$1"',component,timeout=120)

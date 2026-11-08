@@ -27,7 +27,11 @@ jobs:
           echo "SELinux=$(docker exec "$redroid_name" /system/bin/getenforce)"
           echo 'PackageManager and installed app_process64 are ready with loopback only'
   cold:
-    if: github.repository == 'Russianranger/esteria_android' && (contains(github.event.head_commit.message, '[qualify native Android shaders]') || contains(github.event.head_commit.message, '[qualify installed Android shader repair]'))
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario: [fresh, legacy]
+    if: github.repository == 'Russianranger/esteria_android' && (contains(github.event.head_commit.message, '[qualify native Android shaders]') || contains(github.event.head_commit.message, '[qualify installed Android shader repair]') || contains(github.event.head_commit.message, '[replay v13 shader failure]'))
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 160
     steps:
@@ -85,6 +89,7 @@ jobs:
           sudo apt-get install -y --no-install-recommends python3-fusepy libfuse2t64
       - name: Install signed stock APK and exercise offline cold and warm owners
         env:
+          ESTERIA_LEGACY_SHADER_REPAIR: ${{ matrix.scenario == 'legacy' }}
           PUBLIC_RELEASE_TOKEN: ${{ github.token }}
           ESTERIA_EXERCISE_NAMED_REPAIR: ${{ contains(github.event.head_commit.message, '[qualify installed Android shader repair]') }}
         run: bash tools/android_stock_shader/host_run.sh
@@ -92,7 +97,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: android-stock-shader-evidence
+          name: android-stock-shader-evidence-${{ matrix.scenario }}
           path: |
             ${{ runner.temp }}/android-stock-shader-evidence/host.json
             ${{ runner.temp }}/android-stock-shader-evidence/package.json

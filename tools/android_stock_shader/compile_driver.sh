@@ -13,9 +13,19 @@ src="$root/app/src/main/java:$root/core/src/main/java"
 if [[ -n "${ESTERIA_APP_CLASS_PATH:-}" ]]; then
     cp="$cp:$ESTERIA_APP_CLASS_PATH"
 else
-    (cd "$root" && ./gradlew --no-daemon :app:generateDebugBuildConfig)
-    generated="$root/app/build/generated/source/buildConfig/debug"
-    test -f "$generated/io/github/russianranger/esteria/BuildConfig.java"
+    # javac resolves installed API signatures from source. Only observer classes
+    # enter D8. Non-final field declarations cannot inline any configuration.
+    generated="$work/build-config-signatures"
+    mkdir -p "$generated/io/github/russianranger/esteria"
+    {
+        echo 'package io.github.russianranger.esteria; public final class BuildConfig {'
+        echo 'public static boolean DEBUG;'
+        awk -F"'" '/^[[:space:]]*(android[.]defaultConfig[.])?buildConfigField / {
+           if ($2 !~ /^(String|boolean|int|long)$/ || $4 !~ /^[A-Z_][A-Z_0-9]*$/) exit 1
+           print "public static " $2 " " $4 ";"
+        }' "$root"/app/*.gradle
+        echo '}'
+    } > "$generated/io/github/russianranger/esteria/BuildConfig.java"
     src="$src:$generated"
 fi
 javac --release 17 -implicit:none -cp "$cp" -sourcepath "$src" -d "$classes" \
