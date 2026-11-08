@@ -11,7 +11,7 @@ import zlib
 LOCK = Path(__file__).resolve().parents[1] / 'tests/fixtures/chromiecraft-enUS-12340-shader-ranges.json'
 
 
-def materialize(client, rows, fetch, hashes):
+def materialize(client, rows, fetch, hashes, *, index_path=None):
     """Return allowed half-open read extents keyed by each absolute sparse MPQ path.
 
     The lock locates independently decodable ZIP stored blocks or entry starts.
@@ -20,7 +20,7 @@ def materialize(client, rows, fetch, hashes):
     """
     from tools.qualify_stock_shader_corpus import PIECE, PREFIX, TOTAL, require, verified_slices
 
-    index = json.loads(LOCK.read_bytes())
+    index = json.loads((index_path or LOCK).read_bytes())
     providers = index['providers']
     require(index['version'] == 1 and len(rows) == len(providers) and
             {row['path'] for row in rows} == {PREFIX + name for name in providers},
