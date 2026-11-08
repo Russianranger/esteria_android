@@ -126,5 +126,99 @@
       "installation-playerbots-local-verify": 327001,
       "installation-four-schemas-verified": 350371
     }
+  },
+  "signedAndroidArm64": {
+    "environment": "Offline native Android 13 ARM64, signed v19 followed by Package Manager install -r of signed v21. Fresh processes use the installed classes, immutable assets, native libraries and actual app UID.",
+    "run": 42495218508,
+    "job": 128776867423,
+    "artifact": 13623287512,
+    "artifactSha256": "9c53a6c1a4a2b895c278ecc6cb7c22c056787522ee1f3e37f2b62700e28d487c",
+    "selection": "Producer code, no substitute receipt supplier. Separate empty data directory for SQL qualification. The normal world and graphical session were not exercised in this gate.",
+    "v19ObservedError": "Server content receipt has not been prepared",
+    "operations": [
+      {
+        "phase": "seed19",
+        "uid": 10077,
+        "returnCode": 0,
+        "observed": [
+          "ESTERIA_SEED providerCopiedBytes=2522455679 client=1783e57b784e0487ceb6456a2ad21c1ec322cda8b1b2d1f09329550fe63768db",
+          "ESTERIA_REUSE providerSeals=9 clientRequiredFiles=30 clientRequiredBytes=21517816 matchPrevious=false",
+          "ESTERIA_RESULT seed19 success"
+        ]
+      },
+      {
+        "phase": "fail19",
+        "uid": 10077,
+        "returnCode": 0,
+        "observed": [
+          "ESTERIA_REUSE providerSeals=9 clientRequiredFiles=30 clientRequiredBytes=21517816 matchPrevious=true",
+          "ESTERIA_PHASE database-initializing elapsedMs=1045",
+          "ESTERIA_PHASE database-prepared elapsedMs=7304",
+          "ESTERIA_RESULT fail19 success"
+        ]
+      },
+      {
+        "phase": "repair21",
+        "uid": 10077,
+        "returnCode": 0,
+        "observed": [
+          "ESTERIA_REUSE providerSeals=9 clientRequiredFiles=30 clientRequiredBytes=21517816 matchPrevious=true",
+          "ESTERIA_RETAINED {database.retained.b72c3005fc3c49c3=abandoned/failed, database.retained.b72c3005fc3c49c3.bootstrapUuid=2211592d-db8a-11f1-9b08-d2389e705866, database.retained.b72c3005fc3c49c3.cleanStopReceipts=1}",
+          "ESTERIA_PHASE database-initializing elapsedMs=1042",
+          "ESTERIA_PHASE database-prepared elapsedMs=8001",
+          "ESTERIA_PHASE database-service-starting elapsedMs=8001",
+          "ESTERIA_PHASE installation-core-started elapsedMs=9521",
+          "ESTERIA_PHASE installation-baseline elapsedMs=17448",
+          "ESTERIA_PHASE installation-updater elapsedMs=121829",
+          "ESTERIA_PHASE installation-updater-reentry elapsedMs=198862",
+          "ESTERIA_PHASE installation-configurations elapsedMs=204178",
+          "ESTERIA_PHASE installation-local-realm elapsedMs=204279",
+          "ESTERIA_PHASE installation-local-account elapsedMs=208091",
+          "ESTERIA_PHASE installation-verify-owned-login elapsedMs=212002",
+          "ESTERIA_PHASE installation-staged-pending-playerbots elapsedMs=219525",
+          "ESTERIA_PHASE installation-playerbots-started elapsedMs=220316",
+          "ESTERIA_PHASE installation-playerbots-configurations elapsedMs=237667",
+          "ESTERIA_PHASE installation-playerbots-local-verify elapsedMs=337363",
+          "ESTERIA_PHASE installation-four-schemas-verified elapsedMs=361535",
+          "ESTERIA_ACTIVE slot=94994d63c9da4166 uuid=29be006d-db8a-11f1-a7ec-d2389e705867 client=1783e57b784e0487ceb6456a2ad21c1ec322cda8b1b2d1f09329550fe63768db elapsedMs=428229",
+          "ESTERIA_RESULT repair21 success"
+        ]
+      },
+      {
+        "phase": "cold21",
+        "uid": 10077,
+        "returnCode": 0,
+        "observed": [
+          "ESTERIA_REUSE providerSeals=9 clientRequiredFiles=30 clientRequiredBytes=21517816 matchPrevious=true",
+          "ESTERIA_ACTIVE slot=94994d63c9da4166 uuid=29be006d-db8a-11f1-a7ec-d2389e705867 client=1783e57b784e0487ceb6456a2ad21c1ec322cda8b1b2d1f09329550fe63768db elapsedMs=3820",
+          "ESTERIA_RESULT cold21 success"
+        ]
+      },
+      {
+        "phase": "cold21",
+        "uid": 10077,
+        "returnCode": 0,
+        "observed": [
+          "ESTERIA_REUSE providerSeals=9 clientRequiredFiles=30 clientRequiredBytes=21517816 matchPrevious=true",
+          "ESTERIA_ACTIVE slot=94994d63c9da4166 uuid=29be006d-db8a-11f1-a7ec-d2389e705867 client=1783e57b784e0487ceb6456a2ad21c1ec322cda8b1b2d1f09329550fe63768db elapsedMs=3861",
+          "ESTERIA_RESULT cold21 success"
+        ]
+      },
+      {
+        "phase": "cold21",
+        "uid": 10077,
+        "returnCode": 0,
+        "observed": [
+          "ESTERIA_REUSE providerSeals=9 clientRequiredFiles=30 clientRequiredBytes=21517816 matchPrevious=true",
+          "ESTERIA_ACTIVE slot=94994d63c9da4166 uuid=29be006d-db8a-11f1-a7ec-d2389e705867 client=1783e57b784e0487ceb6456a2ad21c1ec322cda8b1b2d1f09329550fe63768db elapsedMs=3870",
+          "ESTERIA_RESULT cold21 success"
+        ]
+      }
+    ]
+  },
+  "androidX86Emulator": {
+    "status": "skipped-incompatible-emulator-abi",
+    "packageManagerUpdateExecuted": false,
+    "error": "INSTALL_FAILED_NO_MATCHING_ABIS"
   }
 }

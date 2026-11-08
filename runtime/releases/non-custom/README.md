@@ -1,5 +1,9 @@
 # Current stock publication
 
+The v21 detached transport in [update-21](update-21) binds Android producer `623a88115a394fc7bd433c51a60d0e0cda732b67` to the original stock signer. Native Android installed it over signed v19, preserved the failed slot and reopened the promoted four-schema database in three cold processes under the same package UID. [Signed replacement and SQL evidence](../../evidence/non-custom-v21-retained-database.json) · [Detached staging](https://github.com/Russianranger/esteria_android/actions/runs/42495218508).
+
+## Prior releases
+
 [The published v19 release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.19) uses APK producer `c99dbaef634412729742e120d2457d5c7b8bf1a1` on `non-custom`. Hosted staging reconstructed the 336,899,353-byte APK and verified its stock certificate against v18. SHA-256 `c0d251847496c64170bb31d534a925afd1d8e7f92c21687e0e1cbf82c056e6fa`. The reconstructed client completes short reads from stock MPQs. The selected import, shader outputs, world generation and four-schema SQL profile retain their identities. [Public readback](../../evidence/non-custom-v19-public-apk-readback.json) · [Publication run](https://github.com/Russianranger/esteria_android/actions/runs/42466977377) · [Bound release inputs](update-19/publication-inputs.json).
 
 ## Historical v18 publication
