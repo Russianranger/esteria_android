@@ -80,7 +80,7 @@ public final class ConfirmDatabase {
             throw new IOException("Unexpected Wine or reconstructed client admission");
         if(cold) {
             Files.createDirectories(work.getParent());
-            Files.createDirectory(work);
+            Files.createDirectory(work,java.nio.file.attribute.PosixFilePermissions.asFileAttribute(java.nio.file.attribute.PosixFilePermissions.fromString("rwx------")));
             Files.createDirectory(work.resolve("bin"));
             for (String source:Arrays.asList("grunt_wine.py","fingerprint.py","safe_registry.py","wine_prefix.py","wine_windows.py","prefix_helper_observer.py"))
                 Files.copy(Paths.get("/esteria-qa/input/"+source),work.resolve(source));
@@ -117,7 +117,10 @@ public final class ConfirmDatabase {
         Path canonical=root.resolve("state/client-work"),original=root.resolve("qa-original/state/client-work");
         boolean initial=mode.equals("reference")||mode.equals("interrupt");
         Path work=mode.equals("interrupt")||mode.equals("reentry")?original:canonical;
-        if(mode.equals("clone"))installTools(work,original);
+        if(mode.equals("clone")){
+            // Use the same owner as the application to allocate its canonical mode-0700 workspace.
+            try(ClientLaunchSetup.Lease owner=ClientLaunchSetup.claim(root)){installTools(owner.work,original);}
+        }
         prepareClient(context,root,work,wine,initial);
         if(initial){GuestBridgeSetup bridges=new GuestBridgeSetup(context,root);bridges.requireWineArchive(wine.archiveSha256());bridges.prepare(RuntimeWork.NONE,RuntimeWork.NEVER_CANCELLED);}
         Path runtime=wine.current();
