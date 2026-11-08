@@ -17,6 +17,20 @@ cp="$android"
 src="$root/app/src/main/java:$root/core/src/main/java"
 if [[ -n "${ESTERIA_APP_CLASS_PATH:-}" ]]; then
     cp="$cp:$ESTERIA_APP_CLASS_PATH"
+elif [[ ${3:-shader} == database ]]; then
+    # javac resolves installed API signatures from source. Only observer classes
+    # enter D8. Non-final field declarations cannot inline any configuration.
+    generated="$work/build-config-signatures"
+    mkdir -p "$generated/io/github/russianranger/esteria"
+    {
+        echo 'package io.github.russianranger.esteria; public final class BuildConfig {'
+        awk -F"'" '/^[[:space:]]*(android[.]defaultConfig[.])?buildConfigField / {
+           if ($2 !~ /^(String|boolean|int|long)$/ || $4 !~ /^[A-Z_][A-Z_0-9]*$/) exit 1
+           print "public static " $2 " " $4 ";"
+        }' "$root"/app/*.gradle
+        echo '}'
+    } > "$generated/io/github/russianranger/esteria/BuildConfig.java"
+    src="$src:$generated"
 else
     (cd "$root" && ./gradlew --no-daemon :app:generateDebugBuildConfig)
     generated="$root/app/build/generated/source/buildConfig/debug"
