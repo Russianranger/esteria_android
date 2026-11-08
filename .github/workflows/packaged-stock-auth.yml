@@ -2,7 +2,7 @@ name: Packaged stock four-schema and auth protocol
 on:
   workflow_dispatch:
   push:
-    branches: [non-custom]
+    branches: [qa/stock-pidfd-20261108]
     paths:
       - .github/workflows/packaged-stock-auth.yml
       - tools/qualify_packaged_server_auth.py
@@ -15,7 +15,7 @@ permissions:
   contents: read
 jobs:
   packaged-auth:
-    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/non-custom'
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/qa/stock-pidfd-20261108'
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 45
     steps:

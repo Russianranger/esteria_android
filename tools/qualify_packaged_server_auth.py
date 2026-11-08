@@ -105,10 +105,14 @@ def protocol_probe(state, mysql, version, program, expected, configuration, *, c
     try:
         child.start()
         auth.wait_authserver(child)
-        require(processes.owns_loopback_listener(child.group, 3724), 'production auth listener ownership failed')
+        def owns_listener():
+            root = Path('/proc') / str(child.process.pid)
+            return (processes.owns_loopback_listener(child.group, 3724) and
+                    processes._pidfd_listener(child.group, 3724, root))
+        require(owns_listener(), 'production auth listener ownership failed')
         with socket.create_connection(('127.0.0.1', 3724), timeout=5) as transport:
             realms, key = auth_protocol.login(transport, intent)
-        require(processes.owns_loopback_listener(child.group, 3724), 'auth listener ownership changed')
+        require(owns_listener(), 'auth listener ownership changed')
         require(len(realms) == 1 and realms[0]['id'] == 1 and realms[0]['address'] == '127.0.0.1:8085'
                 and realms[0]['locked'] == 0 and realms[0]['build'] in (None, (3, 3, 5, 12340)),
                 'authserver realm does not match local build 12340')
@@ -120,8 +124,8 @@ def protocol_probe(state, mysql, version, program, expected, configuration, *, c
                         'negotiated auth key differs from persistent session')
                 if client_probe is not None:
                     result = client_probe(state, connection, intent, child, attempt)
-                    require(processes.owns_loopback_listener(child.group, 3724), 'production auth listener changed during PE login')
-                    return dict(result, productionOwnedAuthListenerVerified=True)
+                    require(owns_listener(), 'production auth listener changed during PE login')
+                    return dict(result, productionOwnedAuthListenerVerified=True, kernelSocketDuplicationVerified=True)
     finally:
         child.stop(auth_timeout=30)
 

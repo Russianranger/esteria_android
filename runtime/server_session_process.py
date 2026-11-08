@@ -6,12 +6,16 @@ replays SQL or treats an open TCP port as owned server readiness.
 """
 from __future__ import annotations
 
+import ctypes
+import errno
 import os
+import platform
 from pathlib import Path
 import re
 import select
 import secrets
 import socket
+import stat
 import struct
 import subprocess
 import threading
@@ -40,6 +44,82 @@ def _read(path, maximum):
     return raw
 
 
+def _socket_fds(root):
+    sockets = {}
+    for count, descriptor in enumerate((root / 'fd').iterdir(), 1):
+        require(count <= 4096, 'Owned child descriptor count exceeds bound')
+        try:
+            target = os.readlink(descriptor)
+        except FileNotFoundError:
+            continue
+        matched = re.fullmatch(r'socket:\[([0-9]+)\]', target)
+        if matched:
+            sockets[int(descriptor.name)] = int(matched[1])
+    return sockets
+
+
+def _duplicate_fd(pidfd, remote):
+    # Linux UAPI pidfd_getfd. This path is restricted to the two qualified
+    # 64-bit ABIs. Permission failures stay failures.
+    require(platform.machine() in ('aarch64', 'x86_64') and ctypes.sizeof(ctypes.c_void_p) == 8,
+            'Unsupported owned socket inspection ABI')
+    syscall = ctypes.CDLL(None, use_errno=True).syscall
+    syscall.restype = ctypes.c_long
+    descriptor = syscall(438, pidfd, remote, 0)
+    if descriptor < 0:
+        err = ctypes.get_errno()
+        raise OSError(err, 'Cannot duplicate an owned server descriptor')
+    return descriptor
+
+
+def _pidfd_listener(group, port, root):
+    """Inspect live kernel sockets of this unreaped child, including IPv6.
+
+    A snapshot brackets FD duplication and kernel option reads. Transient
+    descriptor replacement retries the entire observation. No proof survives
+    this operation or substitutes for the before/after protocol checks.
+    """
+    require(hasattr(os, 'pidfd_open'), 'Owned listener kernel descriptor API unavailable')
+    pidfd = os.pidfd_open(group.process.pid)
+    try:
+        for _ in range(3):
+            sockets = _socket_fds(root)
+            listeners = set()
+            stable = True
+            for remote, inode in sockets.items():
+                try:
+                    descriptor = _duplicate_fd(pidfd, remote)
+                except OSError as error:
+                    if error.errno == errno.EBADF:
+                        stable = False
+                        break
+                    raise
+                try:
+                    info = os.fstat(descriptor)
+                    if not stat.S_ISSOCK(info.st_mode) or info.st_ino != inode:
+                        stable = False
+                        break
+                    sock = socket.socket(fileno=descriptor)
+                    try:
+                        if (sock.family in (socket.AF_INET, socket.AF_INET6) and
+                                sock.getsockopt(socket.SOL_SOCKET, socket.SO_ACCEPTCONN)):
+                            require(sock.family == socket.AF_INET, 'Server opened an unexpected IPv6 listener')
+                            require(sock.type == socket.SOCK_STREAM and sock.proto == socket.IPPROTO_TCP and
+                                    sock.getsockname() == ('127.0.0.1', port),
+                                    'Server opened an unexpected IPv4 listener')
+                            listeners.add(inode)
+                    finally:
+                        sock.detach()
+                finally:
+                    os.close(descriptor)
+            require(group.observe() is None, 'Server child exited during owned socket inspection')
+            if stable and sockets == _socket_fds(root):
+                return len(listeners) == 1
+        return False
+    finally:
+        os.close(pidfd)
+
+
 def owns_loopback_listener(group, port, *, proc=Path('/proc')):
     """Match the retained child's socket inode, rejecting every extra listener.
 
@@ -50,20 +130,13 @@ def owns_loopback_listener(group, port, *, proc=Path('/proc')):
             'Owned child and fixed listener port required')
     require(group.observe() is None, 'Server child exited before listener verification')
     root = proc / str(group.process.pid)
-    sockets, count = set(), 0
     try:
-        for descriptor in (root / 'fd').iterdir():
-            count += 1
-            require(count <= 4096, 'Owned child descriptor count exceeds bound')
-            try:
-                target = os.readlink(descriptor)
-            except FileNotFoundError:
-                continue
-            matched = re.fullmatch(r'socket:\[([0-9]+)\]', target)
-            if matched:
-                sockets.add(matched[1])
-        tables = {name: _read(root / 'net' / name, PROC_LIMIT).decode('ascii').splitlines()[1:]
-                  for name in ('tcp', 'tcp6')}
+        sockets = set(map(str, _socket_fds(root).values()))
+        try:
+            tables = {name: _read(root / 'net' / name, PROC_LIMIT).decode('ascii').splitlines()[1:]
+                      for name in ('tcp', 'tcp6')}
+        except PermissionError:
+            return _pidfd_listener(group, port, root)
     except FileNotFoundError:
         require(group.observe() is None, 'Server child exited during listener verification')
         return False
