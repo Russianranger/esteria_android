@@ -1,0 +1,65 @@
+{
+  "appRevision": "c99dbaef634412729742e120d2457d5c7b8bf1a1",
+  "assets": [
+    {
+      "assetId": 723482619,
+      "bytes": 336899353,
+      "completeAnonymousReadback": true,
+      "finalPublicReadRoute": "verified original anonymous download from preceding transfer",
+      "name": "Esteria-Stock-3.3.5a-arm64.apk",
+      "sha256": "c0d251847496c64170bb31d534a925afd1d8e7f92c21687e0e1cbf82c056e6fa"
+    },
+    {
+      "assetId": 723482868,
+      "bytes": 4008,
+      "completeAnonymousReadback": true,
+      "finalPublicReadRoute": "verified original anonymous download from preceding transfer",
+      "name": "NON-CUSTOM-TESTING.md",
+      "sha256": "05f1ec528ebf5ec9e78cccb29026ba153a0227fb71ba1db0d63cc668e18b0eda"
+    },
+    {
+      "assetId": 723482859,
+      "bytes": 19234,
+      "completeAnonymousReadback": true,
+      "finalPublicReadRoute": "verified original anonymous download from preceding transfer",
+      "name": "publication-evidence.json",
+      "sha256": "d8eb53adc4377e8bc1c467a33c2a8f6d7861a60491a78797dac5c0fe0cde6b95"
+    },
+    {
+      "assetId": 723482840,
+      "bytes": 2904,
+      "completeAnonymousReadback": true,
+      "finalPublicReadRoute": "verified original anonymous download from preceding transfer",
+      "name": "release.json",
+      "sha256": "9ef6fa2b72ac5efd95413824aab5dc70d7bfb5f244f63e01adbf3185bc49aee0"
+    },
+    {
+      "assetId": 723482829,
+      "bytes": 97,
+      "completeAnonymousReadback": true,
+      "finalPublicReadRoute": "anonymous GitHub release asset API",
+      "name": "SHA256SUMS",
+      "sha256": "840ac5db92b50bc2f8fb2de08161fa870cc234deb2ca3dd63b72a83181e7dc04"
+    },
+    {
+      "assetId": 723482851,
+      "bytes": 1053,
+      "completeAnonymousReadback": true,
+      "finalPublicReadRoute": "release URL",
+      "name": "signing-receipt.json",
+      "sha256": "93869ed21c33fa25692d9a2638d04bf2ab99e778f5be5f0fe4d7a648164d6391"
+    }
+  ],
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "persistentCertificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+  "publicationRoute": "Hosted detached staging and original additive GitHub Actions publication",
+  "releaseId": 438145844,
+  "releaseUrl": "https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.19",
+  "scope": "published-stock-v19-full-asset-byte-readback",
+  "sdkManifestVerified": true,
+  "sdkV2AndV3SignatureVerified": true,
+  "tag": "non-custom-v0.1.0-non-custom.19",
+  "tagTargetExactlyMatchesProducer": true,
+  "thorQualified": false
+}
