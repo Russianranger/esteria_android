@@ -1,0 +1,80 @@
+{
+  "scope": "Complete official stock source and production GameDataImporter on a private x86_64 Linux host with OpenJDK 17. Android device execution, derived world data and gameplay are separate stages.",
+  "fixtureRevision": "02b55199ae27991b53c61ce346698d35ad833856",
+  "gameDataImporterJavaSha256": "ffd838d703b4df7c9d522e59aabee54442f6046a23f3b12a98b54bfb3a2958e7",
+  "clientBuild": 12340,
+  "importGeneration": "a6800cb53df18cea0012ea4c7c86991edaf49f49433528ec237678454bea09cb",
+  "source": {
+    "publisher": "ChromieCraft",
+    "archive": "ChromieCraft_3.3.5a.zip",
+    "zipBytes": 17674749792,
+    "zipSha256": "fed612104085999e8875f077a5ed1e055aac7faaab413a33fed6a23bc2339732",
+    "officialTorrentSha256": "58731d43da3e615fbeb489ebd7a9401a8b56eeed8b7baf72f6b57646c574f62e",
+    "torrentPieceBytes": 2097152,
+    "verifiedPieces": 8428,
+    "retainedPiecesAfterInterruptedCollector": 3039,
+    "postFdatasyncReadbackBytes": 17674749792,
+    "postFdatasyncReadbackSeconds": 25.966,
+    "independentFullSourceCheckBeforeImport": true
+  },
+  "capacity": {
+    "allocationUnitBytes": 4096,
+    "normalizedAllocatedFileBytes": 17856942080,
+    "requiredBytesIncludingReserve": 17924050944,
+    "availableAtFirstAdmission": 18542366720
+  },
+  "cancellation": {
+    "completedFiles": 1,
+    "completedBytes": 15588224,
+    "elapsedSecondsIncludingCheckpointReadback": 0.423217,
+    "javaObservedCancellation": true,
+    "directorySynced": true,
+    "currentPublished": false,
+    "completePublished": false,
+    "completedMemberCrcAndJournalSha256Match": true
+  },
+  "resumedInitialImport": {
+    "regularFiles": 188,
+    "normalizedBytes": 17856504221,
+    "reusedFiles": 1,
+    "copiedBytes": 17840915997,
+    "totalSecondsIncludingIndependentSourceCheckAndCancellation": 76.41
+  },
+  "freshJavaWarmImport": {
+    "reusedFiles": 188,
+    "copiedBytes": 0,
+    "elapsedSeconds": 0.138,
+    "actorAndWaitedChildProcIoBytes": {
+      "rchar": 808110,
+      "read_bytes": 19161088,
+      "wchar": 174,
+      "write_bytes": 73728
+    }
+  },
+  "explicitNormalizedAudit": {
+    "publishedFilesRead": 188,
+    "payloadBytesRead": 17856504221,
+    "payloadBytesCopied": 0,
+    "elapsedSeconds": 19.563,
+    "everyOriginalZipCrcMatched": true,
+    "everyImportJournalSha256Matched": true,
+    "orderedMemberMetadataSha256": "e0dd435c07d7cf3552556188eb2830e978ac93104b39cded94054a212ab52d95",
+    "importControlsSha256": "5b49e15efa49003c09502ea5dff34270ed792a10038245d22853b69409294470"
+  },
+  "scratchZipRelease": {
+    "sourceStatAndSelectionRecheckedUnderBothOwners": true,
+    "normalizedStoreRetained": true,
+    "logicalBytesReleased": 17674749792,
+    "allocatedBytesReleased": 17674760192,
+    "availableBytesBefore": 685105152,
+    "availableBytesAfter": 18359865344
+  },
+  "privateEvidenceRecordSha256": {
+    "COMPLETE-SOURCE-READBACK.json": "1d4df0b412d248e951dcd0a60ddb7c3f1c58ff60de83498dc04039bd0c592c95",
+    "import-cancellation.json": "bdc817e57cbd0dc306ab1acf053b9ed62e4e75cea8febfecad183f83e3208bf2",
+    "import.json": "da4b5de2d88e86762ba7c34f7f1f51ec20e60bdac078f95239acc4f33b4d1ec9",
+    "warm-import.json": "2670a0e196b1f4335bc0e5bb2a4acaa1a39c5f316900d8b82db99cb6ba04609b",
+    "import-readback.json": "a304420258486ff5b3261bec24aaf27af8daefc12fbcbcfde9d42b5f1c23277f",
+    "original-zip-reclamation.json": "72be56bd3a91c2ab0602a972fe87b0164b58c5cb45c614d5c8441d4e4808f9a6"
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "stage": "First sealed phase of complete stock world preparation. Subsequent stages require their own receipts.",
+  "cancellation": {
+    "activeGenerationPublished": false,
+    "cancelledBeforeFirstVmapExtractorChild": true,
+    "completedPhase": "maps-dbc-cameras",
+    "elapsedSeconds": 382.475,
+    "environment": "AArch64 Linux executables, QEMU user emulation on x86_64 host",
+    "extractorCommandsEnteringLaunch": {
+      "map_extractor/capabilities": 1,
+      "map_extractor/extract": 1,
+      "vmap4_extractor/capabilities": 1
+    },
+    "generation": "c8e53e9694a7f11ca09b777d3b0de3ec0b0a121a61b173cc3e4ae2795ed04153",
+    "importGeneration": "a6800cb53df18cea0012ea4c7c86991edaf49f49433528ec237678454bea09cb",
+    "phaseBytes": 381325411,
+    "phaseFiles": 6004,
+    "phaseReceiptSha256": "802f18f77e343fda17da8a69531a1a40cb5e7b0d93e0aab2b3860ba7a86b667f",
+    "scope": "genuine packaged ARM64 map operation; original production cancellation callback",
+    "threads": 1
+  },
+  "phaseFileCounts": {
+    "Cameras": 14,
+    "dbc": 246,
+    "maps": 5744
+  },
+  "initialOperation": {
+    "clock": "monotonic",
+    "copiedBytes": 0,
+    "copyCalls": 0,
+    "elapsedSeconds": 382.40369,
+    "executorCalls": 4,
+    "extractorScope": "calls entering data.execute; failed calls can precede child exec",
+    "extractors": {
+      "map_extractor/capability": {
+        "attempts": 1,
+        "elapsedNs": 102713580,
+        "failed": 0,
+        "succeeded": 1
+      },
+      "map_extractor/extract": {
+        "attempts": 1,
+        "elapsedNs": 363093230016,
+        "failed": 0,
+        "succeeded": 1
+      },
+      "vmap4_extractor/capability": {
+        "attempts": 1,
+        "elapsedNs": 101903850,
+        "failed": 0,
+        "succeeded": 1
+      },
+      "vmap4_extractor/extract": {
+        "attempts": 1,
+        "elapsedNs": 7541,
+        "failed": 1,
+        "succeeded": 0
+      }
+    },
+    "failureClass": "ValueError",
+    "importGenerationAfter": "a6800cb53df18cea0012ea4c7c86991edaf49f49433528ec237678454bea09cb",
+    "importGenerationBefore": "a6800cb53df18cea0012ea4c7c86991edaf49f49433528ec237678454bea09cb",
+    "inventoryScope": "aggregate of production-returned file table only",
+    "logicalBytesScope": "bytes yielded by world_io.chunks only; copy output measured by destination offset",
+    "phaseEvents": [
+      {
+        "elapsedSeconds": 0.019432,
+        "phase": "extraction-provider-order"
+      },
+      {
+        "elapsedSeconds": 378.159687,
+        "phase": "extraction-maps-dbc-cameras-verifying"
+      }
+    ],
+    "procIoDelta": {
+      "rchar": 37111818569,
+      "read_bytes": 26646134784,
+      "wchar": 382525511,
+      "write_bytes": 403136512
+    },
+    "procScope": "actor plus waited children; includes observer and public progress I/O",
+    "pythonChunkBytes": {
+      "import": 17068381141,
+      "other": 5709873,
+      "output": 381325411
+    },
+    "reverifiedSelectedGenerationWithoutExtraction": false,
+    "scope": "initial",
+    "selectedGenerationAfter": null,
+    "selectedGenerationBefore": null,
+    "status": "failed",
+    "unmeasurableCopyCalls": 0
+  },
+  "startingTiles": {
+    "maps/0004331.map": {
+      "bytes": 67142,
+      "present": true,
+      "productionFormatCheck": true,
+      "sha256": "4240b1b7b9d1a0d572de80c429bedf34ad67e7a92bf831a489b2a9a3089efcab"
+    },
+    "maps/0004832.map": {
+      "bytes": 108690,
+      "present": true,
+      "productionFormatCheck": true,
+      "sha256": "0f585d989ac0a496671b2a910084f1b6a6e19249bb4bfa461ecc64747ea6d5b8"
+    }
+  },
+  "winningSources": [
+    {
+      "area": "Coldridge",
+      "locallyMatchesPriorAuthenticatedRead": true,
+      "originalBytes": 1556633,
+      "originalMember": "World/Maps/Azeroth/Azeroth_31_43.adt",
+      "originalSha256": "13d5f6ac4241486d574f5dba1d26c89585ebd2e253fb5dc6a139ea9e10968d46",
+      "providerArchiveSha256": "92b4a94a6c7a23c0b9fd88c47823e41792879a7ee1f70c2349a255153ca25d54",
+      "providerRank": 4,
+      "winner": "Data/patch.MPQ"
+    },
+    {
+      "area": "Northshire",
+      "locallyMatchesPriorAuthenticatedRead": true,
+      "originalBytes": 1824447,
+      "originalMember": "World/Maps/Azeroth/Azeroth_32_48.adt",
+      "originalSha256": "f0acc35fdc126a5bcd93a391238a74d4381f9f61e46a4d09a9ff61af17540797",
+      "providerArchiveSha256": "92b4a94a6c7a23c0b9fd88c47823e41792879a7ee1f70c2349a255153ca25d54",
+      "providerRank": 4,
+      "winner": "Data/patch.MPQ"
+    }
+  ]
+}
