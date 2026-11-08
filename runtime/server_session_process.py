@@ -18,8 +18,10 @@ import threading
 import time
 
 try:
+    from . import server_activation as activation
     from .owned_process_group import OwnedGroup
 except ImportError:
+    import server_activation as activation
     from owned_process_group import OwnedGroup
 
 LOG_LIMIT = 8 << 20
@@ -82,19 +84,26 @@ def owns_loopback_listener(group, port, *, proc=Path('/proc')):
     return found == [endpoint]
 
 
-def _probe_read(connection, count, deadline):
+def _probe_read(connection, count, deadline, check_wait=None):
     result = b''
     while len(result) < count:
         remaining = deadline - time.monotonic()
         require(remaining > 0, 'Server protocol probe deadline exceeded')
-        connection.settimeout(remaining)
-        block = connection.recv(count - len(result))
+        if check_wait is not None:
+            check_wait()
+        connection.settimeout(min(.25, remaining) if check_wait is not None else remaining)
+        try:
+            block = connection.recv(count - len(result))
+        except TimeoutError:
+            if check_wait is None:
+                raise
+            continue
         require(block, 'Server protocol probe ended before its declared payload')
         result += block
     return result
 
 
-def auth_challenge(port=3724, *, timeout=1):
+def auth_challenge(port=3724, *, timeout=1, check_wait=None):
     """Process a source Grunt challenge without a password/proof/session key.
 
     A random16-character unknown name gets the source's three-byte error callback,
@@ -102,7 +111,7 @@ def auth_challenge(port=3724, *, timeout=1):
     fails closed. No login/proof or client/auth SRP qualification is claimed.
     Caller checks owned socket-inode identity immediately before and after.
     """
-    require(type(port) is int and 1 <= port <= 65535 and 0 < timeout <= 3,
+    require(type(port) is int and 1 <= port <= 65535 and 0 < timeout <= (600 if callable(check_wait) else 3),
             'Fixed auth probe endpoint/deadline required')
     name = ('ERDY' + secrets.token_hex(6).upper()).encode('ascii')
     packet = struct.pack('<BBH4sBBBH4s4s4sI4sB', 0, 0, 30 + len(name), b'WoW\0', 3, 3, 5, 12340,
@@ -111,22 +120,22 @@ def auth_challenge(port=3724, *, timeout=1):
     with socket.create_connection(('127.0.0.1', port), timeout=timeout) as connection:
         connection.settimeout(max(.001, deadline - time.monotonic()))
         connection.sendall(packet)
-        require(_probe_read(connection, 3, deadline) == b'\0\0\x04',
+        require(_probe_read(connection, 3, deadline, check_wait) == b'\0\0\x04',
                 'Auth challenge callback differs from the selected source')
     return True
 
 
-def world_challenge(port=8085, *, timeout=1):
+def world_challenge(port=8085, *, timeout=1, check_wait=None):
     """Read only the source's initial SMSG_AUTH_CHALLENGE, no player login.
 
     Caller separately proves socket-inode ownership immediately before/after.
     This establishes neither character access nor world/gameplay readiness.
     """
-    require(type(port) is int and 1 <= port <= 65535 and 0 < timeout <= 3,
+    require(type(port) is int and 1 <= port <= 65535 and 0 < timeout <= (600 if callable(check_wait) else 3),
             'Fixed world probe endpoint/deadline required')
     deadline = time.monotonic() + timeout
     with socket.create_connection(('127.0.0.1', port), timeout=timeout) as connection:
-        packet = _probe_read(connection, 44, deadline)
+        packet = _probe_read(connection, 44, deadline, check_wait)
     require(packet[:4] == b'\x00\x2a\xec\x01' and struct.unpack_from('<I', packet, 4)[0] == 1,
             'World challenge differs from the selected build12340 source')
     return True
@@ -139,13 +148,15 @@ class ServerChild:
     confirmed reaping. These generic primitives also support explicit host child
     fixtures; they are not a route around the production verifier.
     """
-    def __init__(self, program, executable, configuration, working, log):
+    def __init__(self, program, executable, configuration, working, log, *, activate=None):
         require(program in ('authserver', 'worldserver'), 'Fixed server component required')
         self.program, self.executable = program, Path(executable)
         self.configuration, self.working, self.log = Path(configuration), Path(working), Path(log)
         require(all(path.is_absolute() for path in (self.executable, self.configuration, self.working, self.log)),
                 'Absolute verified server paths required')
         self.process = self.group = self.reader = self.output = None
+        self.activate = activate
+        self.listener = None
         self.error = None
         self.observed = self.stored = 0
         self.info_sequence = 0
@@ -161,10 +172,18 @@ class ServerChild:
         self.output = self.log.open('xb')
         os.chmod(self.log, 0o600)
         # Attach Popen to the retained object before any later operation can fail.
-        self.process = subprocess.Popen([str(self.executable), '--config', str(self.configuration)],
+        command = [str(self.executable), '--config', str(self.configuration)]
+        passed = ()
+        if self.activate is True or (self.activate is None and activation.tables_restricted()):
+            self.listener = activation.ActivatedListener(self.program)
+            command = self.listener.command(self.program, self.executable, self.configuration)
+            passed = (self.listener.socket.fileno(), self.listener.ack_write)
+        self.process = subprocess.Popen(command, pass_fds=passed,
             cwd=self.working, env={**os.environ, 'LC_ALL': 'C', 'LANG': 'C'}, umask=0o077,
             stdin=subprocess.PIPE if self.program == 'worldserver' else subprocess.DEVNULL,
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, start_new_session=True, bufsize=0)
+        if self.listener is not None:
+            self.listener.spawned()
         self.group = OwnedGroup(self.process)
         if self.process.stdin is not None:
             require(os.fpathconf(self.process.stdin.fileno(), 'PC_PIPE_BUF') >= 4096,
@@ -173,6 +192,11 @@ class ServerChild:
         self.reader = threading.Thread(target=self._drain, name='esteria-' + self.program + '-logs', daemon=True)
         self.reader.start()
         return self
+
+    def owns_listener(self, port):
+        if self.listener is not None:
+            return self.listener.owns(self.group, port)
+        return owns_loopback_listener(self.group, port)
 
     def _drain(self):
         pending = b''
@@ -230,6 +254,8 @@ class ServerChild:
             return
         status, forced, clean_world = None, False, False
         if self.process is None:
+            if self.listener is not None:
+                self.listener.close()
             if self.output is not None:
                 self.output.close()
             self.closed = True
@@ -258,6 +284,8 @@ class ServerChild:
                     self.auth_shutdown_requested = True
                 status, forced = self.group.stop(graceful_timeout=auth_timeout, reap_timeout=5)
                 forced = forced or not self.auth_shutdown_requested
+            if self.listener is not None:
+                self.listener.close()
             if self.process.stdin is not None:
                 self.process.stdin.close()
             if self.reader is not None:

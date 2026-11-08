@@ -51,7 +51,7 @@ HELPER_SETS = {'stock-client': ('stock_content_inspection.py', 'stock_shader_gen
                     'local-server.json'),
                'server-data': ('server-data-reader.sha256', 'server_data_generation.py', 'server_data_preflight.py', 'shader_generation.py',
                     'extractor_order.py', 'owned_process_group.py', 'world_io.py'),
-               'server-session': ('server_session.py', 'server_session_process.py', 'android_server_schema_setup.py',
+               'server-session': ('server_session.py', 'server_session_process.py', 'server_activation.py', 'android_server_schema_setup.py',
                     'mysql_bootstrap.py', 'mysql_service.py', 'server_content.py', 'server_schema_setup.py',
                     'server_schema_baseline.py', 'server_schema_adaptations.py', 'server_update_setup.py', 'server_updater.py',
                     'server_playerbots_setup.py', 'owned_process_group.py', 'server_config.py', 'provision_local_realm.py',

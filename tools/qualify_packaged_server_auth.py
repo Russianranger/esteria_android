@@ -101,14 +101,22 @@ def protocol_probe(state, mysql, version, program, expected, configuration, *, c
     require(identity(program) == expected, 'selected authserver changed before execution')
     intent = account.read_intent(state / account.JOURNAL, db.read_receipt(state / 'database-bootstrap.json', version))
     child = processes.ServerChild('authserver', program, configuration / 'authserver.conf', state / 'run/authserver',
-                                  state / 'logs' / f'auth-probe-{attempt}-private.log')
+                                  state / 'logs' / f'auth-probe-{attempt}-private.log', activate=True)
     try:
         child.start()
-        auth.wait_authserver(child)
-        require(processes.owns_loopback_listener(child.group, 3724), 'production auth listener ownership failed')
+        # Exercise the exact private Android fallback even on a readable Linux
+        # /proc. The real Grunt callback spans native startup on the held fd.
+        deadline = time.monotonic() + 120
+        while not child.owns_listener(3724):
+            require(time.monotonic() < deadline, 'activated auth guard startup timed out')
+            time.sleep(.05)
+        def check_wait():
+            require(child.owns_listener(3724), 'activated auth listener changed during startup')
+        processes.auth_challenge(timeout=deadline-time.monotonic(), check_wait=check_wait)
+        require(child.owns_listener(3724), 'production auth listener ownership failed')
         with socket.create_connection(('127.0.0.1', 3724), timeout=5) as transport:
             realms, key = auth_protocol.login(transport, intent)
-        require(processes.owns_loopback_listener(child.group, 3724), 'auth listener ownership changed')
+        require(child.owns_listener(3724), 'auth listener ownership changed')
         require(len(realms) == 1 and realms[0]['id'] == 1 and realms[0]['address'] == '127.0.0.1:8085'
                 and realms[0]['locked'] == 0 and realms[0]['build'] in (None, (3, 3, 5, 12340)),
                 'authserver realm does not match local build 12340')
@@ -120,8 +128,9 @@ def protocol_probe(state, mysql, version, program, expected, configuration, *, c
                         'negotiated auth key differs from persistent session')
                 if client_probe is not None:
                     result = client_probe(state, connection, intent, child, attempt)
-                    require(processes.owns_loopback_listener(child.group, 3724), 'production auth listener changed during PE login')
-                    return dict(result, productionOwnedAuthListenerVerified=True)
+                    require(child.owns_listener(3724), 'production auth listener changed during PE login')
+                    return dict(result, productionOwnedAuthListenerVerified=True,
+                                listenerSource='owned-systemd-fd3', childListenerGuard='seccomp-bpf')
     finally:
         child.stop(auth_timeout=30)
 
@@ -181,7 +190,8 @@ def run(package, work, evidence, world_probe=None, client_probe=None, observe_wo
             if client_probe is not None:
                 proof['reconstructedClientExecuted'] = True
                 record('reconstructed-grunt-login', **first_client)
-        record('auth-srp-12340-loopback-session-key-verified', authserverSha256=expected_auth['sha256'])
+        record('auth-srp-12340-loopback-session-key-verified', authserverSha256=expected_auth['sha256'],
+               listenerSource='owned-systemd-fd3', childListenerGuard='seccomp-bpf')
         repeated = install_phase(*phases[-1])
         require(repeated['fourSchemasVerified'] and not repeated['compiledPlayerbotsLoaderExecuted']
                 and not repeated['compiledUpdaterExecuted'], 'completed stock schemas must be verified without replay')

@@ -36,7 +36,7 @@ import org.json.JSONObject;
  * action uses this adapter. Readiness proves local owned listeners/protocol/CLI,
  * never world entry, character/bot persistence, Android or gameplay qualification. */
 public final class LocalServerSession {
-    static final Set<String> HELPERS=Set.of("server_session.py","server_session_process.py",
+    static final Set<String> HELPERS=Set.of("server_session.py","server_session_process.py","server_activation.py",
         "android_server_schema_setup.py","mysql_bootstrap.py","mysql_service.py","server_content.py",
         "server_schema_setup.py","server_schema_baseline.py","server_schema_adaptations.py","server_update_setup.py",
         "server_updater.py","server_playerbots_setup.py","owned_process_group.py","server_config.py",

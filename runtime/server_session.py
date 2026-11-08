@@ -245,6 +245,20 @@ class Session:
                 return
             time.sleep(.05)
 
+    @staticmethod
+    def _wire_probe(child, port, probe, deadline, cancelled):
+        # An activated listener is already bound before native startup. Queue a
+        # single real request and wait for the selected server's actual reply.
+        def check_wait():
+            require(not cancelled(), 'Owned server challenge cancelled')
+            require(child.owns_listener(port), 'Owned listener changed during native startup')
+
+        remaining = deadline - time.monotonic()
+        require(remaining > 0 and not cancelled(), 'Owned server challenge deadline/cancellation')
+        if child.listener is not None:
+            return probe(timeout=remaining, check_wait=check_wait)
+        return probe(timeout=min(1, remaining))
+
     def start(self, *, timeout=180, cancelled=lambda: False, progress=lambda *_, **__: None):
         require(not self.started and self.auth is None and self.world is None and not self.closed and 0 < timeout <= 600,
                 'Server session startup is single-use and bounded')
@@ -268,22 +282,22 @@ class Session:
             configurations / 'authserver.conf', selected.state / 'run/authserver', self.operation / 'authserver.log')
         self.auth.start()
         progress('owned-auth-listener', 'authserver')
-        self._await(lambda: processes.owns_loopback_listener(self.auth.group, 3724), deadline, cancelled)
+        self._await(lambda: self.auth.owns_listener(3724), deadline, cancelled)
         progress('auth-challenge', 'authserver')
         require(time.monotonic() < deadline and not cancelled(), 'Owned auth challenge startup deadline/cancellation')
-        require(processes.auth_challenge(timeout=min(1, deadline-time.monotonic())), 'Auth source challenge callback failed')
-        require(processes.owns_loopback_listener(self.auth.group, 3724), 'Auth listener changed during protocol probe')
+        require(self._wire_probe(self.auth, 3724, processes.auth_challenge, deadline, cancelled), 'Auth source challenge callback failed')
+        require(self.auth.owns_listener(3724), 'Auth listener changed during protocol probe')
         self._check()
         progress('native-launch', 'worldserver')
         self.world = processes.ServerChild('worldserver', selected.programs['worldserver']['path'],
             configurations / 'worldserver.conf', selected.state / 'run/worldserver', self.operation / 'worldserver.log')
         self.world.start()
         progress('owned-world-listener', 'worldserver')
-        self._await(lambda: processes.owns_loopback_listener(self.world.group, 8085), deadline, cancelled)
+        self._await(lambda: self.world.owns_listener(8085), deadline, cancelled)
         progress('world-challenge', 'worldserver')
         require(time.monotonic() < deadline and not cancelled(), 'Owned world challenge startup deadline/cancellation')
-        require(processes.world_challenge(timeout=min(1, deadline-time.monotonic())), 'World source protocol challenge failed')
-        require(processes.owns_loopback_listener(self.world.group, 8085), 'World listener changed during protocol probe')
+        require(self._wire_probe(self.world, 8085, processes.world_challenge, deadline, cancelled), 'World source protocol challenge failed')
+        require(self.world.owns_listener(8085), 'World listener changed during protocol probe')
         progress('world-console', 'worldserver')
         before = self.world.info_counter(); self.world.send_world(processes.WORLD_INFO)
         self._await(lambda: self.world.info_counter() > before, deadline, cancelled)
@@ -302,8 +316,8 @@ class Session:
     def monitor(self):
         require(self.ready and not self.closed, 'Ready owned server session required')
         self._check(world_ready=True)
-        require(processes.owns_loopback_listener(self.auth.group, 3724) and
-                processes.owns_loopback_listener(self.world.group, 8085), 'Owned listener identity changed during session')
+        require(self.auth.owns_listener(3724) and
+                self.world.owns_listener(8085), 'Owned listener identity changed during session')
 
     def close(self):
         self.ready = False
