@@ -1,0 +1,129 @@
+{
+  "database": {
+    "cleanCommandStop": true,
+    "completedSqlIdentityRetained": true,
+    "donorArtifact": 13609401182,
+    "donorRun": 42459525264,
+    "initialOwnedCharacterCount": 0,
+    "liveFourSchemaUpdaterAndPlayerbotsIdentityVerified": true,
+    "localAccountGmLevel": 0,
+    "localInitializerInvocations": 0,
+    "metadataAndWorkerLaunchSeconds": 90.634,
+    "migrationOrReseedExecuted": false,
+    "nativeToTypedAuthenticatedReadySeconds": 32.083,
+    "originalDonorSourceRetained": true,
+    "originalUuidAndCredentialsVerified": true,
+    "previousCleanProducerStops": 3,
+    "priorSignedStockPackageVerificationSeconds": 188.966,
+    "sourceLedgersElapsedSeconds": 156.389
+  },
+  "earlierAttempt": {
+    "elapsedSeconds": 2476.599,
+    "environment": "same local TCG guest, original package served over 9p, separate prior database volume",
+    "guestCleanPoweroff": false,
+    "hostOomKill": true,
+    "oldDiskUsedByThisTrial": false,
+    "worldStarted": false
+  },
+  "environment": {
+    "guest": "AArch64 Debian Linux 12 under full-system QEMU TCG",
+    "guestCores": 3,
+    "guestRamMiB": 3900,
+    "host": "x86_64 Linux",
+    "nic": "none",
+    "oomEvents": 0,
+    "oomKillEvents": 0,
+    "peakCgroupNonreclaimableBytes": 6320705536,
+    "peakQemuRssBytes": 5222477824,
+    "signedProviderReadOnlyExt4Sha256": "3effe3daa7ef5d61136ea5f165a4a75b308a7d393033868b58370fd5d043aba0"
+  },
+  "formatVersion": 1,
+  "native": {
+    "budgetSeconds": 180,
+    "condition": "owned-world-listener",
+    "console": false,
+    "elapsedBeforeCleanupSeconds": 180.612,
+    "finalTraceThroughCleanup": {
+      "completedTasks": [
+        {
+          "elapsedMs": 52,
+          "records": 2324,
+          "task": "game object models"
+        },
+        {
+          "elapsedMs": 23139,
+          "records": 3359,
+          "task": "script names"
+        },
+        {
+          "elapsedMs": 29,
+          "records": 85,
+          "task": "instance templates"
+        },
+        {
+          "elapsedMs": 4502,
+          "task": "instances and binds"
+        },
+        {
+          "elapsedMs": 20219,
+          "records": 73039,
+          "task": "broadcast texts"
+        }
+      ],
+      "completionObserved": false,
+      "finalTraceTiming": "includes the original 20-second console shutdown wait; individual completion records have no wall timestamps",
+      "nextCall": "ObjectMgr::LoadBroadcastTextLocales",
+      "objectSourceBlob": "7dc7c2a65cebaed6f9021248cfa38cf00c077156",
+      "objectSourceFile": "src/server/game/Globals/ObjectMgr.cpp",
+      "selectedTable": "broadcast_text_locale",
+      "worldSourceBlob": "778c4c1547865f82660e9bed2076c1d73e4d2b53",
+      "worldSourceFile": "src/server/game/World/World.cpp"
+    },
+    "lastSampleBeforeDeadline": {
+      "elapsedSeconds": 178.961,
+      "observedMilestones": [
+        "dataStoresEntered",
+        "playerRaceDataAfterDbcAndCameraLoad",
+        "gameObjectModelsEntered"
+      ],
+      "openedDatabasePools": 4
+    },
+    "listener": false,
+    "nativeContentErrorObserved": false,
+    "originalChildReaped": true,
+    "realWorldExitedSpontaneously": false,
+    "sourceCleanupExitCode": -9,
+    "worldChallenge": false,
+    "worldShutdownAcknowledged": false
+  },
+  "originReceiptSha256": {
+    "early-world.json": "f48d1ae0bf44637d8cac4fe0a67f637fd86e52cfbbf690cf2907eb2027ba0227",
+    "host.json": "9066cbbccf25cf70673a2f6071532cca8676204b1aff40933a341fa89c81e62c",
+    "memory.json": "1e86b03a52b118891aeccb53c5361921f0fd5d6d87bbde2d7ddca14c6a04f33f",
+    "receiver.json": "4a34bdc7bccb04e64eb2f7eba632a49167703f84018a834b6d5a4537d10bf8af",
+    "source-ready.json": "08b47f1ee8396a329dfd5769d0c0e083d8f6d184f1c63194058d6150c6e4147f"
+  },
+  "scope": "sealed stock maps, DBCs, cameras and assembled VMaps with independently generated four-schema SQL; one unchanged 180-second worldserver observation",
+  "source": {
+    "androidBranch": "non-custom",
+    "androidCommit": "075ed711bd8be7aaeac8bdfca2be8c607afb8f4b",
+    "apkSha256": "60a90c58dfc211c53928853dbbebd04929668da69d46d4c0a027c143f6857eb6",
+    "apkTag": "non-custom-v0.1.0-non-custom.18",
+    "completeServerDataAdmitted": false,
+    "dataRecipe": "c8e53e9694a7f11ca09b777d3b0de3ec0b0a121a61b173cc3e4ae2795ed04153",
+    "gameSessionExecuted": false,
+    "gameplayQualified": false,
+    "importGeneration": "a6800cb53df18cea0012ea4c7c86991edaf49f49433528ec237678454bea09cb",
+    "integrationPatches": 7,
+    "mmapsPresent": false,
+    "serverCommit": "f35f04d01689f034778e3474b3c820092f51e461",
+    "worldserverSha256": "9757f0bbb2ee159d18070d8f5fe7ecdf5b4b8b7171116198039f418d5ec13aa1"
+  },
+  "terminal": {
+    "cleanGuestPoweroff": true,
+    "elapsedSeconds": 1681.871,
+    "executionRunning": false,
+    "guestCommandExit": 1,
+    "qemuExit": 0
+  }
+}

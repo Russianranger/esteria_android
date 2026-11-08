@@ -1,0 +1,93 @@
+{
+  "scope": "Offline Linux ARM64 full-system TCG software Vulkan reference, original direct 9p msize 512000. Local services, QA Android and physical Thor not part of this client-only observer. No input events.",
+  "client": {
+    "revision": "c05a3af9be6c204c40d65d0e3eb6ccc2442012b6",
+    "buildRun": "42461366985.1",
+    "sha256": "e224cc5611511e47c3e4f20fa8c401419f9b9d2fc648a70908be58ca204aa561",
+    "mappedCodeWindows128Bytes": 2,
+    "wineArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+    "presentationArchiveSha256": "7e0356f14bf3654a0e1ecc903726bd479fea0c761c8a4e8a4356e2e476726a55"
+  },
+  "selection": {
+    "import": "a6800cb53df18cea0012ea4c7c86991edaf49f49433528ec237678454bea09cb",
+    "preparedShaderKey": "9d5f8a86c2ef253bd5ad9cde6b493e34e789cc5ab6b9a1f49008485b34b969f1",
+    "preparedShaderReceiptSha256": "67640ae968737c56a2b0e4b3dd78cfeda9bd640370e4841e818de6482214e520",
+    "frozenPreparationClient": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+    "sourceBoundShaderFiles": 4742,
+    "auditedShaderBytes": 102132134
+  },
+  "originalTransport": {
+    "positiveShortBranchesAtRva0xa3d48": 29,
+    "firstPatchTableOffsetsRequestedReturned": [
+      [
+        4003005889,
+        1048576,
+        507904
+      ],
+      [
+        4003513793,
+        540672,
+        507904
+      ]
+    ],
+    "mpqOpens": 16,
+    "archiveTableErrors": 0,
+    "effectFilesRead": 5,
+    "realEffectRegistrationCallbacks": 20,
+    "nonNullParticleEffect": true
+  },
+  "title": {
+    "peLaunchToFrameMs": 211524,
+    "frameWidth": 1280,
+    "frameHeight": 720,
+    "clientSwapchainWidth": 1024,
+    "clientSwapchainHeight": 768,
+    "loadedClientDbStores": 236,
+    "northrendLoginModelRead": true,
+    "shaderManifestRecords": 1580,
+    "spvUniquePathsRead": 17,
+    "peSpvFuseReadRequests": 44,
+    "vulkanShaderModulesCreated": 27,
+    "traceKernelDroppedEvents": 0,
+    "commonMainNamedEventOpenWhilePeLive": 0,
+    "commonMainNamedEventOpenAfterPeExit": 2
+  },
+  "observedUnacceptedEula": {
+    "firstPngSha256": "168a34d0d95ac61dd4561faf8c53008fab042d73d428cb1dfcf930aa72a8e680",
+    "sameAsAuthenticatedFullSourceFuseControl": true,
+    "sampleTimesMs": [
+      0,
+      28536,
+      42926,
+      61143,
+      110834
+    ],
+    "brightGreenPixelsOf25465": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "blueOrCyanPixelsOf25465": [
+      24955,
+      24955,
+      25032,
+      23888,
+      24954
+    ],
+    "settledPngSha256": "a6e7faed8fbbd3d274222d6d5263dd8e664f3a3283c82202dc17a2ebf7045e37"
+  },
+  "shutdown": {
+    "close": "WM_DELETE_WINDOW",
+    "wineExit": 0,
+    "closeToWineDrainMs": 17847,
+    "allOwnedChildrenReaped": true,
+    "unmodifiedConfigSha256": "3a42fc073b544dfa98b4b880990cd26229bda144ea6fd71033d369ad0052db07",
+    "noInput": true,
+    "observerExit": 0,
+    "qemuExit": 0,
+    "guestElapsedSeconds": 497.03
+  },
+  "expandedRecordSha256": "37a2e1583f264f578b87e3f97b20316bdc4331c40af6173361c44276fb177f17"
+}

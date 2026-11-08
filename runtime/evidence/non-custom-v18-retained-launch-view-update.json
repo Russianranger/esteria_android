@@ -1,0 +1,57 @@
+{
+  "evidenceKind": "Public v17 to v18 Android in-place update retaining the complete-source client launch view",
+  "package": "io.github.russianranger.esteria.stock",
+  "certSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+  "androidUid": 10077,
+  "environment": "Offline Android 13 ARM64 Redroid guest under QEMU TCG. Disposable QA app storage.",
+  "installedBefore": {
+    "versionCode": 17,
+    "verifiedInstalledApkSha256": "dc68c5ced8f0f4a155d86135f70a8522766e483957df06e0ce5544d488ac2ace"
+  },
+  "installedAfter": {
+    "versionCode": 18,
+    "source": "075ed711bd8be7aaeac8bdfca2be8c607afb8f4b",
+    "verifiedInstalledApkSha256": "60a90c58dfc211c53928853dbbebd04929668da69d46d4c0a027c143f6857eb6",
+    "installOperation": "pm install -r --user 0"
+  },
+  "input": "a6800cb53df18cea0012ea4c7c86991edaf49f49433528ec237678454bea09cb",
+  "retainedLaunchView": {
+    "generation": "931f31202464ac492d5a08293e0aec6cc90118fd8314de21fa3991644a1fcfbb",
+    "verifiedFiles": [
+      ".owner",
+      "WowClient64.exe",
+      "XvidDecoder.dll"
+    ],
+    "identicalFields": [
+      "sha256",
+      "st_dev",
+      "st_ino",
+      "st_size",
+      "st_mtime_ns",
+      "st_ctime_ns"
+    ],
+    "clientExecutableSha256": "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317",
+    "decoderSha256": "b4c774430942d709ca7e3f03a1890d6aec7aaa2e432bee0e698e57027a70d006"
+  },
+  "comparedAssetAndLibraryEntries": 127,
+  "changedEntries": [
+    "assets/database-service/manifest.json",
+    "assets/database-service/mysql_bootstrap.py",
+    "assets/database-service/mysql_service.py",
+    "assets/database-setup/manifest.json",
+    "assets/database-setup/mysql_bootstrap.py",
+    "assets/server-installation/manifest.json",
+    "assets/server-installation/mysql_bootstrap.py",
+    "assets/server-installation/mysql_service.py",
+    "assets/server-schema/manifest.json",
+    "assets/server-schema/mysql_bootstrap.py",
+    "assets/server-schema/mysql_service.py",
+    "assets/server-session/manifest.json",
+    "assets/server-session/mysql_bootstrap.py",
+    "assets/server-session/mysql_service.py"
+  ],
+  "cleanPoweroff": true,
+  "operationCondition": "The owner yielded its guest at the verified post-install checkpoint to free the native world/DB runner. This v18 attempt ended before shader admission and title launch.",
+  "physicalThor": false,
+  "normalGameplay": false
+}
