@@ -1,0 +1,100 @@
+{
+  "formatVersion": 1,
+  "scope": "Signed v17 to v18 app-private stock database and authenticated reconstructed PE Grunt",
+  "package": "io.github.russianranger.esteria.stock",
+  "release": "non-custom-v0.1.0-non-custom.18",
+  "sourceCommit": "075ed711bd8be7aaeac8bdfca2be8c607afb8f4b",
+  "apkSha256": "60a90c58dfc211c53928853dbbebd04929668da69d46d4c0a027c143f6857eb6",
+  "bytes": 336899353,
+  "priorApkSha256": "dc68c5ced8f0f4a155d86135f70a8522766e483957df06e0ce5544d488ac2ace",
+  "signerSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+  "workflow": "https://github.com/Russianranger/esteria_android/actions/runs/42459136531",
+  "workflowCommit": "02b9bd264ce823882752564a4e6de5a724f6046d",
+  "workflowJob": 128664446474,
+  "githubArtifactId": 13609441140,
+  "artifactZipSha256": "4fc80434c2d4839c8f2f6008a17de94dde7ae12e3c170fa0c7b3f83646ce5eb4",
+  "environment": {
+    "host": "GitHub hosted native Linux ARM64",
+    "android": "Redroid 13, network=none, actual app UID",
+    "selinux": "Disabled",
+    "physicalThor": false
+  },
+  "update": {
+    "initialVersion": 17,
+    "finalVersion": 18,
+    "method": "pm install -r",
+    "samePackageUidAndFirstInstallTime": true,
+    "samePromotionProofAndSlot": true,
+    "sameMysqlUuidAcrossThreeOwners": true,
+    "sameConfigAndAccountIntent": true,
+    "allFourStockSchemasPreparedUnderV17": true,
+    "sameProviderGenerations": true,
+    "originalStockSchemaSetupMs": 394355,
+    "initialServerProviderCopiedBytes": 1131934277,
+    "initialClientAndWineProviderCopiedBytes": 1347260996
+  },
+  "peInvocation": "WowClient64.exe --auth-check --local-offline, on fresh then retained Wine prefix",
+  "clientRevision": "fa3e74b7f332fef0f212e954a0de18f685ead8bd",
+  "clientSha256": "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317",
+  "wineArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+  "normalProductionDatabaseAndGrunt": [
+    {
+      "mode": "cold",
+      "activeNativeStartupMs": 1853,
+      "bootstrapReentryMs": 355,
+      "cleanShutdownMs": 1039,
+      "providerCopiedBytes": 0,
+      "clientAndWineProviderCopiedBytes": 0,
+      "stockPrefixBefore": "ABSENT",
+      "stockPrefixAfter": "NO_REPAIR",
+      "build": 12340,
+      "gruntChecks": 13,
+      "clientReceiptSha256": "cf855b24ec28dc6e9095d76eab4d6a1c02f1cb62324bf7f8d3236d7e30460c28",
+      "srpAndRealmList": true,
+      "ownedListener": true,
+      "authserverExitedCleanly": true,
+      "mysqlKeyMatched": true
+    },
+    {
+      "mode": "warm",
+      "activeNativeStartupMs": 1903,
+      "bootstrapReentryMs": 355,
+      "cleanShutdownMs": 3045,
+      "providerCopiedBytes": 0,
+      "clientAndWineProviderCopiedBytes": 0,
+      "stockPrefixBefore": "NO_REPAIR",
+      "stockPrefixAfter": "NO_REPAIR",
+      "build": 12340,
+      "gruntChecks": 13,
+      "clientReceiptSha256": "f99e6eb0a6ccbf554820208cda86cfeeeb7a42149c455cd138668fd5f437473a",
+      "srpAndRealmList": true,
+      "ownedListener": true,
+      "authserverExitedCleanly": true,
+      "mysqlKeyMatched": true
+    }
+  ],
+  "separateControlledSQL": {
+    "allControlledClientsReaped": true,
+    "cancelReturnSeconds": 0.402,
+    "cancelledOutstandingColdRead": true,
+    "firstAuthenticatedDelayedResponseSeconds": 4.295,
+    "helperSha256": {
+      "mysql_bootstrap.py": "212bf5bae4c947c57069fe7e816be1c2c1fad6869ef378fc609df359c7f50f2e",
+      "mysql_service.py": "55fd55b11c614794929330a92f8b19637c8e02c3471c319f5e9429346fa716d4"
+    },
+    "inducedServerSleepSeconds": 4.25,
+    "normalStartupMeasurement": false,
+    "sameCliInducedTimeoutSeconds": 3,
+    "sameCliNormalResponseSeconds": 0.001,
+    "sameRealEngineAfterCancellation": true,
+    "scope": "controlled-delay-on-real-first-CLI-result",
+    "threeSecondWarmCapObserved": true
+  },
+  "limits": {
+    "originalImportedWorldData": false,
+    "worldReady": false,
+    "normalGameSession": false,
+    "characterSaveMeasured": false,
+    "graphicalLogin": false
+  }
+}

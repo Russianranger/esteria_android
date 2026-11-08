@@ -1,0 +1,131 @@
+{
+  "scope": "Two original reconstructed Windows ARM64 PE launches on a no-NIC Debian Linux ARM64 guest under full-system QEMU TCG, genuine packaged Wine, Mesa lavapipe reference Vulkan and matching stock inputs. No login/account handoff, agreement input, physical Thor, or world services in this test.",
+  "dateUtc": "2026-11-08",
+  "packageRuntimeReference": "non-custom-v0.1.0-non-custom.17",
+  "clientSource": "fa3e74b7f332fef0f212e954a0de18f685ead8bd",
+  "windowsArm64PeSha256": "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317",
+  "wineArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+  "rendererSha256": "ce6f6917dd22ed612ae8649a9eb9c615a973a2e9eb9a58b8cc8655f22c933c6b",
+  "stockImport": {
+    "generation": "a6800cb53df18cea0012ea4c7c86991edaf49f49433528ec237678454bea09cb",
+    "verifiedFiles": 188,
+    "verifiedBytes": 17856504221
+  },
+  "shaders": {
+    "generation": "9d5f8a86c2ef253bd5ad9cde6b493e34e789cc5ab6b9a1f49008485b34b969f1",
+    "receiptSha256": "67640ae968737c56a2b0e4b3dd78cfeda9bd640370e4841e818de6482214e520",
+    "outputFiles": 4742,
+    "outputBytes": 102132134,
+    "manifestRecordsParsedOnRetry": 1580,
+    "proof": "selected-PE positive FUSE file reads. The manifest record count is distinct from module creation; driver creations were not attributable to the selected process in these failed attempts."
+  },
+  "retryClientReadEvidence": {
+    "realDbStoresLoaded": 236,
+    "northrendAndNightElfModelsAndSkinsOpened": true
+  },
+  "sameFaultBothRuns": {
+    "code": "0xC0000005",
+    "readAddress": "0x50",
+    "instructionVA": "0x14021AD38",
+    "faultRva": "0x21AD38",
+    "x8": "0x8",
+    "pdbGuid": "e4826115-7b2d-43c8-b47d-cd41e58e8898",
+    "pdbAge": 1,
+    "pdbSha256": "7e1f601f857461f357a04314b9375ac23c3fd5d5492993a6a1d641cd7893431b",
+    "stack": "original Storm exception PC and ARM64 frame pointers; return addresses converted to calling instructions and matched to exact Windows CI PDB",
+    "frames": [
+      [
+        "0x21AD38",
+        "CShaderEffect::SetShaders",
+        "ShaderEffect.cpp",
+        269
+      ],
+      [
+        "0x21A4B8",
+        "CShaderEffect::SetDefaultShaders",
+        "ShaderEffect.cpp",
+        301
+      ],
+      [
+        "0x212D48",
+        "CParticleEmitter2::RenderParticleVertices",
+        "ParticleSystem2.cpp",
+        858
+      ],
+      [
+        "0x1E5E98",
+        "CM2SceneRender::RenderBatchedParticle",
+        "CM2SceneRender.cpp",
+        751
+      ],
+      [
+        "0x1E5784",
+        "CM2SceneRender::DrawBatchedParticle",
+        "CM2SceneRender.cpp",
+        860
+      ],
+      [
+        "0x1E5914",
+        "CM2SceneRender::DrawParticle",
+        "CM2SceneRender.cpp",
+        894
+      ],
+      [
+        "0x1E442C",
+        "CM2SceneRender::Draw",
+        "CM2SceneRender.cpp",
+        1028
+      ],
+      [
+        "0x1D7414",
+        "CM2Scene::Draw",
+        "M2Scene.cpp",
+        2304
+      ],
+      [
+        "0x114578",
+        "CSimpleModel::RenderModelImpl",
+        "CSimpleModel.cpp",
+        514
+      ]
+    ]
+  },
+  "runs": [
+    {
+      "guest": "first",
+      "fullSystemSeconds": 1192.22,
+      "frameObserved": "original unaccepted EULA, black background and bright green geometry",
+      "privateFrameSha256": "590ebaba5cffc7e46f7934cad17da2dd40215ff03681bcb92abe0cfb6b1ac18e",
+      "crashReportSha256": "560d45b042dd30f7ead0436c3a6158484f60651438855e8cf84de95e021d808f",
+      "minidumpSha256": "b97b04689d2dee571d3b8dda3d55ef8029447fc2bcfc12cc64a1a6839f8e62f7",
+      "uniqueSpvPaths": 6,
+      "positiveSpvReadRequests": 14,
+      "manifestReadRequests": 7,
+      "spvConsumerPid": 57,
+      "spvConsumerStartTicks": 94520,
+      "guestObservationExit": 124,
+      "qemuExit": 0,
+      "cleanClientExit": false,
+      "cleanup": "outer observer timed out after duplicated guest integrity reads; guest powered off"
+    },
+    {
+      "guest": "retry",
+      "fullSystemSeconds": 734.83,
+      "frameObserved": "native client fatal dialog",
+      "privateFrameSha256": "26ad2fb19887d247b5cdc41311ad8d1a9fb919002a0c360d67718924d950a9e2",
+      "crashReportSha256": "1ecd92fb9c7b63a7ee90e9164ecdee8a574e9d75e03c7daf5e28c58bd40b3177",
+      "minidumpSha256": "364c03208b7fa19998447873f267d9ba18510fd94f415064d38826cbde3bc5dd",
+      "uniqueSpvPaths": 6,
+      "positiveSpvReadRequests": 14,
+      "manifestReadRequests": 7,
+      "spvConsumerPid": 59,
+      "spvConsumerStartTicks": 10232,
+      "guestObservationExit": 1,
+      "qemuExit": 0,
+      "cleanClientExit": false,
+      "cleanup": "bounded observer reaped direct children after fatal; guest powered off"
+    }
+  ],
+  "qualifiedStage": "A genuine first EULA frame was observed in the first run and both runs then faulted on a particle draw. Settled presentation and clean client exit with these full-source inputs remain unverified.",
+  "disposition": "Investigate exact effect-file admission and lookup on retained selected executable. Previous guarded-archive successes used a different source selection."
+}
