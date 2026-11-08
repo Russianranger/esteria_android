@@ -1,0 +1,127 @@
+{
+  "formatVersion": 1,
+  "scope": "Named Repair stock shaders in installed release v16 on network-isolated Android 13 ART/PRoot under native ARM64 Linux",
+  "apkSourceCommit": "b12fe53270a62677a625564582e264a8e5733d8b",
+  "apkSha256": "de9d108a725aeb7a8eea1041bd1a72eb7a5acde811595cf71c886f6937f74ab4",
+  "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+  "run": {
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/42435228440",
+    "jobId": 128592523312,
+    "qaRevision": "bb32b28503895ee180b2dbe22e3d2faa5f665c21",
+    "artifactId": 13599791006,
+    "artifactBytes": 2804,
+    "artifactSha256": "740bb5bd47e33f5355af661ca8e6c60e1b5d3d1114c36290b1a433b93f2e1679",
+    "completed": true,
+    "disposableStoreRemoved": true
+  },
+  "environment": {
+    "arch": "aarch64",
+    "kernel": "7.0.0-1017-azure",
+    "androidSdk": 33,
+    "abi": "arm64-v8a",
+    "selinux": "Disabled",
+    "network": "loopback only",
+    "physicalThor": false,
+    "gameplayQualified": false
+  },
+  "input": {
+    "scope": "official-stock-shader-windows-with-private-qa-journal",
+    "providers": 16,
+    "intervals": 40,
+    "verifiedBytes": 41645637,
+    "importFixture": "bef34b45e7ece99f092d8e2865556cce461e4144b3ab59a754a7765d56052699",
+    "rangeLockSha256": "a5f62abdcd6feff6d4a908757c083d9f6357c39ed5432343522ff6d437d725aa",
+    "torrentSha256": "58731d43da3e615fbeb489ebd7a9401a8b56eeed8b7baf72f6b57646c574f62e",
+    "elapsedSeconds": 157.158,
+    "zipRangeRequests": 53,
+    "zipRangeBytes": 111149056,
+    "windowRetriesAfterStall": 0
+  },
+  "sourceGuard": {
+    "intentionalPreflightEio": 1,
+    "androidEio": 0,
+    "freshOwner": {
+      "grantedCalls": 836,
+      "grantedBytes": 12897968,
+      "denied": 0
+    },
+    "freshWarmOwner": {
+      "grantedCalls": 0,
+      "grantedBytes": 0,
+      "denied": 0
+    },
+    "pointerAndDamagedPayloadAndWarmNamedRepairCombined": {
+      "grantedCalls": 836,
+      "grantedBytes": 12897968,
+      "denied": 0
+    }
+  },
+  "provider": {
+    "wineArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+    "wineGeneration": "dda9221e408dd167796e8a80042f5d7e7e168185eef63dfea088053b0a965c9d",
+    "shaderToolsGeneration": "1607c300f598b348201f8f2ddf1db4f9527b09bf645240e996cabc69e40db24d"
+  },
+  "cold": {
+    "elapsedMs": 214422,
+    "outputBytes": 102079994,
+    "files": 4742,
+    "modules": 1580,
+    "ownerClosed": true,
+    "sessionReceiptAdmitted": true
+  },
+  "warm": {
+    "elapsedMs": 1531,
+    "wineCopiedBytes": 0,
+    "toolsCopiedBytes": 0,
+    "ownedTranslatorLaunched": false,
+    "sameReceiptSha256AndInode": true,
+    "fullOutputSessionIntegrity": true
+  },
+  "repair": {
+    "generation": "1fcd9acf103c708da5118f5fe0b96570b7c9923f7b93c3aa6fcb705934c99cee",
+    "importGeneration": "bef34b45e7ece99f092d8e2865556cce461e4144b3ab59a754a7765d56052699",
+    "initialReceipt": "094d289b59924144663b53606c6d7284815ec97710974270c375b8de809d9b88",
+    "repairedReceipt": "d2b18812ed6a2d73ad55f4641de816ff265b5bbc702e6b686baaf9561cc02dd9",
+    "pointerRestored": true,
+    "pointerRecompiled": false,
+    "damagedRejectedByFullAdmission": true,
+    "sameSizeAndInodeAtInjection": true,
+    "javaMillisecondMtimePreserved": true,
+    "javaExactMtimePreserved": true,
+    "nativeRebuiltModulesValidated": 1580,
+    "runtimeFileDigestsPreserved": 3162,
+    "files": 4742,
+    "fullSessionReceiptAdmitted": true,
+    "previousRejectedGenerationRetained": true,
+    "sourceAndProviderPointersUnchanged": true,
+    "warmRecompiled": false,
+    "ownersClosed": true,
+    "pointerMs": 21650,
+    "rebuildAndAdmissionMs": 221359,
+    "warmMs": 21623
+  },
+  "package": {
+    "scope": "disposable Android 13 signed v16 package lifecycle",
+    "package": "io.github.russianranger.esteria.stock",
+    "phase": "complete",
+    "physicalThor": false,
+    "gameplayQualified": false,
+    "versionCode": 16,
+    "versionName": "0.1.0-non-custom.16",
+    "uid": 10077,
+    "launcherStatus": "ok",
+    "launcherComponent": "io.github.russianranger.esteria.stock/io.github.russianranger.esteria.MainActivity",
+    "launcherPid": 1881,
+    "launcherProcessVerified": true,
+    "launcherWaitMs": 198,
+    "launcherStopped": true,
+    "postLauncherUidProcesses": 0,
+    "postShaderUidProcesses": 0,
+    "postShaderOwnersReaped": true
+  },
+  "limits": [
+    "The private corpus contains authenticated stock shader windows from 16 MPQs, with a source-bound QA journal.",
+    "Full-session shader admission reads the prepared shader payload.",
+    "This exercise covers signed named shader repair. A complete stock game, phone graphics and a physical Thor save were outside this run."
+  ]
+}

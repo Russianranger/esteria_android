@@ -1,0 +1,208 @@
+{
+  "formatVersion": 1,
+  "scope": "Native ARM64 Android signed stock four-schema promotion, persisted database restart and authserver protocol",
+  "release": {
+    "version": "0.1.0-non-custom.16",
+    "versionCode": 16,
+    "sourceCommit": "b12fe53270a62677a625564582e264a8e5733d8b",
+    "apkSha256": "de9d108a725aeb7a8eea1041bd1a72eb7a5acde811595cf71c886f6937f74ab4",
+    "bytes": 336887065,
+    "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa"
+  },
+  "workflow": {
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/42434992650",
+    "qaCommit": "09265c0c8e33455e218156006275194c1a6c1d3b",
+    "artifactId": 13599323002,
+    "archiveSha256": "8d4995d6b46030c6cde6651697584389f9031b2ed20ee524b4b18b291a1eee28",
+    "fileSha256": {
+      "owner.json": "313a91f331a53dbd500a521374152e4638451b5b5560da3c2a9435b731cfca63",
+      "package.json": "85e7a37a82628c3918f5eddd935da05440b85c1d4f7bdec90444567334398d77"
+    }
+  },
+  "platform": {
+    "cpu": "native ARM64 GitHub runner",
+    "guest": "Redroid Android 13 ARM64 kernel container",
+    "selinux": "Disabled",
+    "fingerprint": "redroid/redroid_arm64_only/redroid_arm64_only:13/TQ3A.230805.001.S1/eng.frank.20240527.134411:userdebug/test-keys",
+    "network": "loopback only",
+    "actor": "Two separate app_process64 processes using installed package classes, assets, JNI, PRoot, packaged MySQL, programs and stock SQL",
+    "physicalThor": false
+  },
+  "package": {
+    "scope": "disposable Android 13 signed v16 package lifecycle",
+    "package": "io.github.russianranger.esteria.stock",
+    "phase": "launcher-closed",
+    "physicalThor": false,
+    "gameplayQualified": false,
+    "versionCode": 16,
+    "versionName": "0.1.0-non-custom.16",
+    "uid": 10077,
+    "launcherStatus": "ok",
+    "launcherComponent": "io.github.russianranger.esteria.stock/io.github.russianranger.esteria.MainActivity",
+    "launcherPid": 1837,
+    "launcherProcessVerified": true,
+    "launcherWaitMs": 1422,
+    "launcherStopped": true,
+    "postLauncherUidProcesses": 0
+  },
+  "worldData": {
+    "relativeDirectory": "files/qa-server-data-directory",
+    "files": 0,
+    "bytes": 0,
+    "guestMount": "/esteria-data",
+    "purpose": "Canonical configuration path. This database operation does not admit world data or start worldserver."
+  },
+  "database": {
+    "source": "ServerInstallationSetup.beginFresh, prepare, finishPlayerbots, stopAndPromote; authenticated ServerDatabaseService.startActive. Fresh ART uses ServerInstallationSetup.completed and independently starts and stops the same active SQL instance.",
+    "coldPhysicalBootstrapSocketBytes": 101,
+    "operations": [
+      {
+        "mode": "cold",
+        "instanceUuid": "1bd53199-db15-11f1-9eb0-cf2c6b96ac9e",
+        "slotId": "b68f9ae0f24845ee",
+        "promotionProof": "5e08228e0534e184324527e29314239bf297ea697d17ac062a5f0e5488a4cbec",
+        "setupReceipt": "d93c8cb9bc355bd64a32ce41f94c1bc3c685ff5cb357ec28e143444de9a1fe2c",
+        "providerGeneration": "078c8dfac185688f6e2a250398c320693b8bfd8793f8bb670000507d8da9a17f",
+        "programsGeneration": "d7a76adec6bf2c04fbfc954901cf8d647c822d37f8665d3ed33c1bdd47686810",
+        "contentGeneration": "ebdf3e2b2ec3766d18af0442cf01a228a6d9adba00e41a996af3089251d78edf",
+        "providerCopiedBytes": 1131934277,
+        "version": "8.0.46-0ubuntu0.24.04.4",
+        "providerMs": 30859,
+        "schemaSetupOrSelectionMs": 419350,
+        "activeNativeStartupMs": 4065,
+        "cleanShutdownMs": 1350,
+        "sameAuthenticatedInstance": true,
+        "closed": true
+      },
+      {
+        "mode": "warm",
+        "instanceUuid": "1bd53199-db15-11f1-9eb0-cf2c6b96ac9e",
+        "slotId": "b68f9ae0f24845ee",
+        "promotionProof": "5e08228e0534e184324527e29314239bf297ea697d17ac062a5f0e5488a4cbec",
+        "setupReceipt": "d93c8cb9bc355bd64a32ce41f94c1bc3c685ff5cb357ec28e143444de9a1fe2c",
+        "providerGeneration": "078c8dfac185688f6e2a250398c320693b8bfd8793f8bb670000507d8da9a17f",
+        "programsGeneration": "d7a76adec6bf2c04fbfc954901cf8d647c822d37f8665d3ed33c1bdd47686810",
+        "contentGeneration": "ebdf3e2b2ec3766d18af0442cf01a228a6d9adba00e41a996af3089251d78edf",
+        "providerCopiedBytes": 0,
+        "version": "8.0.46-0ubuntu0.24.04.4",
+        "providerMs": 240,
+        "schemaSetupOrSelectionMs": 263,
+        "activeNativeStartupMs": 2062,
+        "cleanShutdownMs": 1555,
+        "sameAuthenticatedInstance": true,
+        "closed": true
+      }
+    ],
+    "remainingPackageUidProcessesAfterEachOperation": 0,
+    "elapsedSeconds": 462.575
+  },
+  "control": {
+    "workflow": "https://github.com/Russianranger/esteria_android/actions/runs/42434678849",
+    "qaRoot": "A longer named QA root with the legacy state/server-work directory",
+    "physicalBootstrapSocketBytes": 124,
+    "firstErrorCode": "MY-010270",
+    "operation": "UNIX socket bind",
+    "osError": "Invalid argument",
+    "secondaryCodes": [
+      "MY-010258",
+      "MY-010119"
+    ],
+    "privateEngineCaptureSha256": "77c45a051d3099643334e273471acad93fc8bd05ff525f26c4769c0c3d684a24",
+    "disposition": "Canonical production slot passed with the shipped bootstrap and original deadlines."
+  },
+  "databaseRunQualification": {
+    "databaseBootstrap": true,
+    "stockAccountRealmAndFourSchemaPromotion": true,
+    "cleanSqlStopAndIndependentSqlRestart": true,
+    "authserverExecuted": false,
+    "worldserverExecuted": false,
+    "characterCreated": false,
+    "gameplayQualified": false
+  },
+  "independentAuthRun": {
+    "workflow": {
+      "url": "https://github.com/Russianranger/esteria_android/actions/runs/42435662248",
+      "qaCommit": "4c8cf126c6a1b9d493108b6ec2cebfea8f799b23",
+      "artifactId": 13598938438,
+      "archiveSha256": "74f2333b493a11edd38de94cf756218e7ad4fc433154848b76aec56036eb29a4",
+      "fileSha256": {
+        "owner.json": "91c87ae6e144d6a2d2f22c86d9dc9710a742f935662cbe2ae2e2440d4f84189f",
+        "package.json": "ed16fe98c7bc08f0f78bebdb96636fcb2ad6c230eb98ae37b74c8296388aed0a"
+      }
+    },
+    "environment": "A second fresh disposable Android, same signed v16 APK and platform. The cold invocation promotes a new four-schema slot. A fresh ART process reopens that same slot. Each holds an active SQL lease during authentication.",
+    "client": "Existing build-12340 QA codec in tools/auth_protocol.py",
+    "entry": "Selected packaged ARM64 authserver, signed server_session_process.ServerChild, owned listener before and after the production challenge and login. The negotiated key, operating system and locale match the account row in the live owned database.",
+    "operations": [
+      {
+        "mode": "cold",
+        "instanceUuid": "6748fa81-db16-11f1-9d3e-cf2c6c98b7ca",
+        "slotId": "b747f235e7014ac0",
+        "promotionProof": "79a2ead0b1c29e435a2e6666b6dd550a69051af51600ff0a769303bb7db3ad50",
+        "setupReceipt": "5951ca85cb45ce2175f650aa7432e2976c415519c6f5f583fbdfdb4e30de5aaa",
+        "providerGeneration": "078c8dfac185688f6e2a250398c320693b8bfd8793f8bb670000507d8da9a17f",
+        "programsGeneration": "d7a76adec6bf2c04fbfc954901cf8d647c822d37f8665d3ed33c1bdd47686810",
+        "contentGeneration": "ebdf3e2b2ec3766d18af0442cf01a228a6d9adba00e41a996af3089251d78edf",
+        "providerCopiedBytes": 1131934277,
+        "version": "8.0.46-0ubuntu0.24.04.4",
+        "providerMs": 30453,
+        "schemaSetupOrSelectionMs": 423519,
+        "activeNativeStartupMs": 3861,
+        "auth": {
+          "authserverElapsedMs": 384,
+          "authserverExitedCleanly": true,
+          "authserverSha256": "04cbda982ca1385903929eb46ca52b7cb41ca222e8a48f9898af716d2b878531",
+          "build": 12340,
+          "mysqlKeyMatched": true,
+          "ownedListener": true,
+          "sourceChallenge": true,
+          "srpAndRealmList": true,
+          "worldAddress": "127.0.0.1:8085"
+        },
+        "cleanShutdownMs": 1460,
+        "sameAuthenticatedInstance": true,
+        "closed": true
+      },
+      {
+        "mode": "warm",
+        "instanceUuid": "6748fa81-db16-11f1-9d3e-cf2c6c98b7ca",
+        "slotId": "b747f235e7014ac0",
+        "promotionProof": "79a2ead0b1c29e435a2e6666b6dd550a69051af51600ff0a769303bb7db3ad50",
+        "setupReceipt": "5951ca85cb45ce2175f650aa7432e2976c415519c6f5f583fbdfdb4e30de5aaa",
+        "providerGeneration": "078c8dfac185688f6e2a250398c320693b8bfd8793f8bb670000507d8da9a17f",
+        "programsGeneration": "d7a76adec6bf2c04fbfc954901cf8d647c822d37f8665d3ed33c1bdd47686810",
+        "contentGeneration": "ebdf3e2b2ec3766d18af0442cf01a228a6d9adba00e41a996af3089251d78edf",
+        "providerCopiedBytes": 0,
+        "version": "8.0.46-0ubuntu0.24.04.4",
+        "providerMs": 240,
+        "schemaSetupOrSelectionMs": 262,
+        "activeNativeStartupMs": 2009,
+        "auth": {
+          "authserverElapsedMs": 450,
+          "authserverExitedCleanly": true,
+          "authserverSha256": "04cbda982ca1385903929eb46ca52b7cb41ca222e8a48f9898af716d2b878531",
+          "build": 12340,
+          "mysqlKeyMatched": true,
+          "ownedListener": true,
+          "sourceChallenge": true,
+          "srpAndRealmList": true,
+          "worldAddress": "127.0.0.1:8085"
+        },
+        "cleanShutdownMs": 1208,
+        "sameAuthenticatedInstance": true,
+        "closed": true
+      }
+    ],
+    "elapsedSeconds": 468.033,
+    "remainingPackageUidProcessesAfterEachOperation": 0,
+    "authserverExecuted": true,
+    "sourceAuthChallenge": true,
+    "authenticatedRealmList": true,
+    "authenticatedRealmCount": 1,
+    "realmId": 1,
+    "graphicalClientExecuted": false,
+    "worldserverExecuted": false,
+    "characterCreated": false,
+    "gameplayQualified": false
+  }
+}

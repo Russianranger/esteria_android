@@ -1,0 +1,30 @@
+{
+  "artifactBytes": 564,
+  "artifactSha256": "1948a057f040923b2801108db823de75c92889b1a683c85c5b4b56828aea5a43",
+  "expectedZipBytes": 17674749792,
+  "failure": "stock ZIP range unavailable after three attempts without progress",
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "generatedData": false,
+  "importCompleted": false,
+  "lastAuthenticatedProgress": {
+    "acquisitionSecondsLeft": 9292,
+    "elapsedSeconds": 11397.73,
+    "freeBytes": 101406007296,
+    "verifiedBytes": 11274289152
+  },
+  "lastPhase": "official-zip-transfer",
+  "mechanism": "An outstanding bounded range request received no new bytes across three attempts and exhausted its retry allowance. The runner removed its ephemeral private input after retaining scope-limited evidence.",
+  "retainedLocalSource": "The independent private piece collector retains authenticated pieces in its own source spool across interruptions. No game material is in this receipt.",
+  "scope": "official stock ZIP acquisition on native hosted Linux ARM64",
+  "source": "f7dfe9e1021816d796b1b3d58b5f70163178995a",
+  "sourceStepExitUtc": "2026-11-08T01:38:42.376Z",
+  "sourceStepStartUtc": "2026-11-07T22:27:25.128Z",
+  "sourceStepWallSeconds": 11477.248,
+  "terminal": "failed",
+  "torrentSha256": "58731d43da3e615fbeb489ebd7a9401a8b56eeed8b7baf72f6b57646c574f62e",
+  "workflowArtifact": 13599610938,
+  "workflowJob": 128548197600,
+  "workflowRun": 42420669482,
+  "worldserverExecuted": false
+}
