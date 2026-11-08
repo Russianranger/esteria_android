@@ -56,7 +56,7 @@
  # This is the exact observer-only DEX independently compiled against the original generated classpath.
  test "$(unzip -p "$work/input/driver.jar" classes.dex | sha256sum | cut -d' ' -f1)" = \
 -    ba88149fdd56be28413f8879c265af7fb2e4a643fef8207cb4aec85c051d2355
-+    c405ee5277437f2edc94f8c1a69f581b66c4bb04a798442382b6b66940c11010
++    4538e014b276eb24ba6752851c657bdc0900372ee9d2cd80b20e9c5f044850db
  cp tools/android_stock_database/{auth_phase,grunt_wine,wine_prefix,wine_windows,world_probe,cold_sql_control}.py tools/{client_auth_contract,prepare_runtime,stock_world_observation}.py "$work/input/"
  chmod 0444 "$work/input/"*.py
  chmod 755 "$work/input"
