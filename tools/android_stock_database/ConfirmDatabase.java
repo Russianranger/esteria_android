@@ -49,7 +49,7 @@ public final class ConfirmDatabase {
     }
 
     private static OwnedProcess wineGuest(Context context,Path root,Path work,RuntimeSetup wine,String mode) throws IOException {
-        Path sessions=Files.createDirectories(root.resolve("s"));
+        Path sessions=Files.createDirectories(root.resolve("s"),java.nio.file.attribute.PosixFilePermissions.asFileAttribute(java.nio.file.attribute.PosixFilePermissions.fromString("rwx------")));
         Path owner=Files.createDirectory(sessions.resolve(UUID.randomUUID().toString().replace("-","").substring(0,16)));
         Path processSession=Files.createDirectory(owner.resolve("client"));
         return ProotProcess.start(context,wine.installer(),wine.packagePlan(),work,processSession,
@@ -186,7 +186,7 @@ public final class ConfirmDatabase {
         }else{
             OwnedProcess child;
             if(mode.equals("clone") || mode.equals("audit")){
-                Path sessions=Files.createDirectories(root.resolve("s"));Path owner=Files.createDirectory(sessions.resolve(UUID.randomUUID().toString().replace("-","").substring(0,16)));
+                Path sessions=Files.createDirectories(root.resolve("s"),java.nio.file.attribute.PosixFilePermissions.asFileAttribute(java.nio.file.attribute.PosixFilePermissions.fromString("rwx------")));Path owner=Files.createDirectory(sessions.resolve(UUID.randomUUID().toString().replace("-","").substring(0,16)));
                 child=ProotProcess.start(context,wine.installer(),wine.packagePlan(),work,Files.createDirectory(owner.resolve("client")),
                     Arrays.asList("/usr/bin/python3","-B","-s","-E","/work/prefix_helper_observer.py",mode),wine.wineEnvironment(),
                     Arrays.asList(new ProotLaunch.Mount(original,"/esteria-client")),null);
