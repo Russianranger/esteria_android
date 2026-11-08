@@ -18,7 +18,7 @@ from tools import auth_protocol, prepare_runtime, qualify_authserver as auth, qu
 from tools.verify_server_build import identity
 
 ROOT = Path(__file__).resolve().parents[1]
-BASELINE = ROOT / 'runtime/evidence/non-custom-v13-public-apk-readback.json'
+BASELINE = ROOT / 'runtime/evidence/non-custom-v18-public-apk-readback.json'
 ARCHIVES = (
     ('server-runtime', 'server-runtime-arm64', 'android-provider'),
     ('server-programs', 'server-programs', 'programs-playerbots-provider'),
