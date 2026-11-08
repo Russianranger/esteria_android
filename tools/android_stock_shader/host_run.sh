@@ -59,7 +59,8 @@ cp "$work/corpus/source-metrics.json" "$reports/source.json"
 mv "$work/corpus/import-metadata" "$work/import-metadata"
 phase=guard
 sudo modprobe fuse || test -c /dev/fuse
-sudo /usr/bin/python3 -B tools/android_stock_shader/serve_ranges.py "$work/corpus/source" "$work/mpq" > "$work/guard.log" 2>&1 &
+truncate -s 24 "$work/range-counters"
+sudo /usr/bin/python3 -B tools/android_stock_shader/serve_ranges.py "$work/corpus/source" "$work/mpq" --stats "$work/range-counters" > "$work/guard.log" 2>&1 &
 fuse_pid=$!
 deadline=$((SECONDS+45))
 until mountpoint -q "$work/mpq"; do
@@ -90,7 +91,11 @@ redroid_start "$work"
 phase=installed-apk-lifecycle
 python3 tools/android_stock_shader/package_lifecycle.py --container "$redroid_name" --report "$reports/package.json"
 phase=android-shader-owner
-python3 tools/android_stock_shader/run_owner.py --container "$redroid_name" --report "$reports/owner.json"
+extra=()
+if [[ ${ESTERIA_EXERCISE_NAMED_REPAIR:-false} == true ]]; then
+  extra+=(--repair-report "$reports/repair.json")
+fi
+python3 tools/android_stock_shader/run_owner.py --container "$redroid_name" --report "$reports/owner.json" --range-counters "$work/range-counters" "${extra[@]}"
 phase=owner-cleanup
 python3 tools/android_stock_shader/package_lifecycle.py --container "$redroid_name" --report "$reports/package.json" --check-reaped
 test "$(grep -c '^Denied unauthenticated shader read' "$work/guard.log")" = 1

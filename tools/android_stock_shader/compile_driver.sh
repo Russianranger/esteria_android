@@ -19,7 +19,7 @@ else
     src="$src:$generated"
 fi
 javac --release 17 -implicit:none -cp "$cp" -sourcepath "$src" -d "$classes" \
-    "$root/tools/android_stock_shader/ConfirmShader.java"
+    "$root/tools/android_stock_shader/ConfirmShader.java" "$root/tools/android_stock_shader/ConfirmShaderRepair.java"
 jar cf "$work/observer.jar" -C "$classes" .
 if find "$classes" -type f ! -name 'ConfirmShader*.class' | grep -q .; then
     echo "Unexpected non-observer class in QA driver" >&2

@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import struct
 import subprocess
 import sys
 import time
@@ -55,7 +56,18 @@ def pinned_archive():
     return key + '.archive', str(size), sha
 
 
-def exercise(container, report):
+def range_counts(path):
+    return struct.unpack('<QQQ', path.read_bytes())
+
+
+def range_delta(path, before):
+    after = range_counts(path)
+    result = [end - start for start, end in zip(before, after)]
+    checked(min(result) >= 0 and result[2] == 0, 'input guard recorded a changed source or a refused read')
+    return dict(grantedCalls=result[0], grantedBytes=result[1], denied=result[2])
+
+
+def exercise(container, report, range_counters, repair_report=None):
     inspected = json.loads(run('docker','inspect',container))[0]
     checked(inspected['State']['Running'] and inspected['HostConfig']['NetworkMode'] == 'none',
             'disposable Android must be running offline')
@@ -124,13 +136,14 @@ def exercise(container, report):
                       wineArchiveSha256=sha, package=PACKAGE, operations=[])
         report['phase'] = 'signed-android-owner'
         native = apk.rsplit('/',1)[0] + '/lib/arm64'
+        command_prefix = ['docker','exec','--user',uid+':'+uid,container,'/system/bin/env','-i']
+        command_prefix += [k+'='+v for k,v in selected.items()]
+        command_prefix += ['CLASSPATH='+INPUT+'/driver.jar:'+apk,'/system/bin/app_process64',
+                           '-Djava.library.path='+native+':/system/lib64','/system/bin']
         for mode in ('cold','warm'):
             report['phase'] = mode
-            command = ['docker','exec','--user',uid+':'+uid,container,'/system/bin/env','-i']
-            command += [k+'='+v for k,v in selected.items()]
-            command += ['CLASSPATH='+INPUT+'/driver.jar:'+apk,'/system/bin/app_process64',
-                        '-Djava.library.path='+native+':/system/lib64','/system/bin',
-                        'io.github.russianranger.esteria.runtime.ConfirmShader',mode,source]
+            command = [*command_prefix, 'io.github.russianranger.esteria.runtime.ConfirmShader', mode, source]
+            before = range_counts(range_counters)
             invocation_active = True
             completed = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                        text=True, timeout=145*60 if mode == 'cold' else 10*60)
@@ -150,6 +163,9 @@ def exercise(container, report):
                 raise RuntimeError('Android shader owner failed, exit '+str(completed.returncode))
             invocation_active = False
             result = json.loads(rows[0])
+            result['authenticatedInput'] = range_delta(range_counters, before)
+            if mode == 'cold':
+                checked(result['authenticatedInput']['grantedBytes'] > 0, 'cold build did not read authenticated input')
             checked(result['mode']==mode and result['importGeneration']==source and
                     re.fullmatch('[a-f0-9]{64}',result['generation']) and result['files']==4742 and
                     result['modules']==1580 and result['ownerClosed'] and result['sessionReceiptAdmitted'],
@@ -170,6 +186,16 @@ def exercise(container, report):
                 checked(result['ownedTranslatorLaunched'] and min(result['wineCopiedBytes'],result['toolsCopiedBytes'])>0,
                         'cold execution and fresh provider install required')
             report['operations'].append(result)
+        if repair_report is not None:
+            from repair_owner import run_repair
+            report['phase'] = 'installed-named-shader-repair'
+            invocation_active = True
+            before = range_counts(range_counters)
+            cold = report['operations'][0]
+            repaired = run_repair(container, command_prefix, source, cold['generation'], repair_report)
+            checked(repaired['initialReceipt'] == cold['receiptSha256'], 'repair began from a different shader receipt')
+            report['namedRepairAuthenticatedInput'] = range_delta(range_counters, before)
+            invocation_active = False
         report['phase'] = 'complete'
     finally:
         if invocation_active:
@@ -183,12 +209,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--container',required=True,choices=('esteria-android-qa',))
     parser.add_argument('--report',type=Path,required=True)
+    parser.add_argument('--range-counters', type=Path, required=True)
+    parser.add_argument('--repair-report', type=Path, help='exercise named repair after verified cold and warm admission')
     args = parser.parse_args()
     report = dict(formatVersion=1,scope='offline signed Android stock shader owner',phase='container',
                   physicalThor=False,gameplayQualified=False)
     start=time.monotonic()
     try:
-        exercise(args.container, report)
+        exercise(args.container, report, args.range_counters, args.repair_report)
     except Exception as error:
         report['failureType']=type(error).__name__
         if isinstance(error,subprocess.CalledProcessError):

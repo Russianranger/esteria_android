@@ -4,9 +4,11 @@ from bisect import bisect_right
 import errno
 import hashlib
 import json
+import mmap
 import os
 from pathlib import Path
 import stat
+import struct
 
 HERE = Path(__file__).resolve().parent
 
@@ -63,13 +65,30 @@ class VerifiedRanges:
         return content[i][offset - starts[i]:end - starts[i]]
 
 
-def serve(source, mount):
+def serve(source, mount, stats=None):
     try:
         from fusepy import FUSE, FuseOSError, Operations
     except ImportError:
         from fuse import FUSE, FuseOSError, Operations
 
     view = VerifiedRanges(source.resolve())
+    # Only the runner owns this optional file. Expose no additional path through FUSE.
+    counters = [0, 0, 0]  # granted calls, granted bytes, denied EIO calls
+    shared = None
+    if stats is not None:
+        with stats.open('r+b') as backing:
+            if os.fstat(backing.fileno()).st_size != 24:
+                raise ValueError('invalid initial read telemetry')
+            shared = mmap.mmap(backing.fileno(), 24)
+        struct.pack_into('<QQQ', shared, 0, *counters)
+
+    def update(granted, returned, denied):
+        if shared is not None:
+            counters[0] += granted
+            counters[1] += returned
+            counters[2] += denied
+            struct.pack_into('<QQQ', shared, 0, *counters)
+
 
     class Projection(Operations):
         def getattr(self, path, fh=None):
@@ -95,19 +114,27 @@ def serve(source, mount):
 
         def read(self, path, size, offset, fh):
             try:
-                return view.read(path, size, offset)
+                data = view.read(path, size, offset)
+                update(1, len(data), 0)
+                return data
             except OSError as error:
                 if error.errno == errno.EIO:
+                    update(0, 0, 1)
                     print('Denied unauthenticated shader read', path, offset, size, flush=True)
                 raise FuseOSError(error.errno)
 
-    FUSE(Projection(), str(mount), foreground=True, allow_other=True, ro=True, default_permissions=True,
-         direct_io=True, max_readahead=0, nothreads=True)
+    try:
+        FUSE(Projection(), str(mount), foreground=True, allow_other=True, ro=True, default_permissions=True,
+             direct_io=True, max_readahead=0, nothreads=True)
+    finally:
+        if shared is not None:
+            shared.close()
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('source', type=Path)
     parser.add_argument('mount', type=Path)
+    parser.add_argument('--stats', type=Path)
     args = parser.parse_args()
-    serve(args.source, args.mount)
+    serve(args.source, args.mount, args.stats)
