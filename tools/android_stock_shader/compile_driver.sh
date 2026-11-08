@@ -23,10 +23,18 @@ else
     test -f "$generated/io/github/russianranger/esteria/BuildConfig.java"
     src="$src:$generated"
 fi
+extra=()
+if [[ "${3:-}" == database ]]; then
+    extra+=("$root/core/src/main/java/io/github/russianranger/esteria/core/runtime/StockWinePrefix.java")
+    extra+=("$root/core/src/main/java/io/github/russianranger/esteria/core/runtime/StockWinePrefixRegistry.java")
+    extra+=("$root/app/src/main/java/io/github/russianranger/esteria/runtime/StockWinePrefixRepair.java")
+    extra+=("$root/app/src/main/java/io/github/russianranger/esteria/runtime/ClientLaunchSetup.java")
+    extra+=("$root/app/src/main/java/io/github/russianranger/esteria/presentation/ClientPresentationSession.java")
+fi
 javac --release 17 -implicit:none -cp "$cp" -sourcepath "$src" -d "$classes" \
-    "$driver"
+    "$driver" "${extra[@]}"
 jar cf "$work/observer.jar" -C "$classes" .
-if find "$classes" -type f ! -name "${name}*.class" | grep -q .; then
+if find "$classes" -type f ! -name "${name}*.class" ! -name 'StockWinePrefix*.class' ! -name 'ClientLaunchSetup*.class' ! -name 'ClientPresentationSession*.class' | grep -q .; then
     echo "Unexpected non-observer class in QA driver" >&2
     exit 1
 fi

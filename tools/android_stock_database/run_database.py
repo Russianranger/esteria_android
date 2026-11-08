@@ -17,6 +17,7 @@ CONTAINER='esteria-android-qa'
 def wine_details(report, mode):
     root='/data/data/'+PACKAGE+'/files'
     # Private Wine and PE logs may contain memory dumps. Export only controlled status fields.
+    if mode in ('interrupt','reentry'):root+='/qa-original'
     report['winePhases']=[]
     diagnostics=shell(CONTAINER,'''for f in "$1"/state/client-work/*/phase.json; do
         if test -f "$f"; then cat "$f"; echo; fi
@@ -115,11 +116,11 @@ def exercise(report):
     report['operations']=[]
     report.update(packageUid=package_uid,selinux=shell(CONTAINER,'getenforce').strip(),
                   fingerprint=shell(CONTAINER,'getprop ro.build.fingerprint').strip())
-    scenario=os.environ['ESTERIA_WINE_CONTROL'];assert scenario in ('early-proof','late-proof')
-    pending=['interrupt' if scenario=='early-proof' else 'reference']
-    report['samples']={}; reference=None
-    while pending:
-        mode=pending.pop(0);report['phase']=mode
+    scenario=os.environ['ESTERIA_WINE_CONTROL'];assert scenario in ('reference','retained')
+    phases=['reference','noop'] if scenario=='reference' else ['interrupt','reentry','clone','cancel','update','finish','noop','warm','audit']
+    report['samples']={}
+    for mode in phases:
+        report['phase']=mode
         cmd=['docker','exec','--user',f'{package_uid}:{package_uid}',CONTAINER,
              '/system/bin/env','-i',*boot,'CLASSPATH=/esteria-qa/input/driver.jar:'+apk,
              '/system/bin/app_process64','-Djava.library.path='+native+':/system/lib64','/system/bin',
@@ -140,23 +141,21 @@ def exercise(report):
         check_empty(CONTAINER,package_uid)
         report['postCleanupPackageUidProcesses']=0
         report['operations'].append(item)
-        args=('/data/data/'+PACKAGE+'/files',mode)
-        def proof(name):
-            return json.loads(shell(CONTAINER,'cat "$1/state/client-work/$2/$3"',*args,name))
-        selected=proof('control-result.json');prefix=proof('prefix-proof.json')
-        sample={'controlResult':selected,'prefix':prefix,'postCleanupPackageUidProcesses':0}
-        wine_details(sample,mode);report['samples'][mode]=sample
-        if mode=='interrupt':
-            assert selected['confirmedMonoInterruption'] and prefix['after']['markerHash']
-            reference=prefix['after']
-        if mode=='reentry':
-            before=prefix['before'];after=prefix['after']
-            assert all(before[k]==after[k]==reference[k] for k in ('prefixInode','markerHash','markerInode'))
-            pending.extend(['warm'] if all(v['expectedValuePresent'] for v in prefix['registry'].values()) else ['copy-force','copy-warm'])
-        if mode.startswith('copy-'):
-            assert prefix['originalPrefixAuditUnchanged'] and prefix['after']['markerHash']==reference['markerHash']
-        if mode in ('reference','copy-force','copy-warm','warm'):
-            checked(all(v['expectedValuePresent'] for v in prefix['registry'].values()),'post-registration registry witness missing')
+        checked(item['changedSource']=='UNRECOGNIZED' and item['foreign']=='UNRECOGNIZED','unexpected non-selected source acceptance')
+        sample={'owner':item,'postCleanupPackageUidProcesses':0};report['samples'][mode]=sample
+        if mode in ('interrupt','reentry','reference','warm'):
+            files='/data/data/'+PACKAGE+'/files'+('/qa-original' if mode in ('interrupt','reentry') else '')
+            def proof(name):return json.loads(shell(CONTAINER,'cat "$1/state/client-work/$2/$3"',files,mode,name))
+            sample['controlResult']=proof('control-result.json');sample['prefix']=proof('prefix-proof.json');wine_details(sample,mode)
+        if mode=='reference':checked(item['before']=='ABSENT' and item['after']=='NO_REPAIR','fresh healthy classification failed')
+        if mode in ('interrupt','reentry'):checked(item['after']=='INCOMPLETE','actual interrupted prefix failed classification')
+        if mode=='clone':checked(item['after']=='INCOMPLETE' and item['copy']['originalTreeUnchanged'],'ineligible clone')
+        if mode=='cancel':checked(item.get('nativeCancelled') and item.get('liveWinebootBeforeCancel') and item['competingLeaseDenied'] and item['pending'] and item['after']=='RESUME','cancelled updater/lease/pending recovery not proven')
+        if mode=='update':checked(item.get('cutAfterGuestExitBeforePendingRetired') and item['pending'] and item['after']=='RESUME' and item['competingLeaseDenied'],'named recovery failed to return through verify')
+        if mode=='finish':checked(item.get('handlerReturn') and not item['phases'] and item['after']=='NO_REPAIR' and not item['pending'],'side-effect-complete recovery did not retire pending once')
+        if mode=='noop':checked(item.get('handlerReturn') is False and not item['phases'],'unnecessary prefix repair')
+        if mode in ('warm','reference'):checked(all(v['expectedValuePresent'] for v in sample['prefix']['registry'].values()),'real post-registration witnesses missing')
+        if mode=='audit':checked(item['copy']['originalTreeUnchanged'] and item['copy']['sentinelRetained'],'source prefix changed')
     report['phase']='complete'
 
 

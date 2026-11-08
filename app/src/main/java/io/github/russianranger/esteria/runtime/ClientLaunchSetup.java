@@ -105,6 +105,7 @@ public final class ClientLaunchSetup {
         private Lease(Path root,Path work,ExclusiveFileLease lease) {
             this.root=root;this.work=work;this.lease=lease;
         }
+        ExclusiveFileLease workLease() { return lease; }
         void require(Path expected)throws IOException {
             if(closed||!lease.isValid()||!root.equals(expected))throw new IOException("Owned client view lease is unavailable");
         }

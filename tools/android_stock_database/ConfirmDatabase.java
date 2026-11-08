@@ -3,6 +3,7 @@ package io.github.russianranger.esteria.runtime;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.os.Looper;
+import io.github.russianranger.esteria.core.runtime.StockWinePrefix;
 import io.github.russianranger.esteria.core.runtime.install.FreshServerInstallations;
 import io.github.russianranger.esteria.core.runtime.install.RuntimePackagePlan;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
@@ -81,7 +82,7 @@ public final class ConfirmDatabase {
             Files.createDirectories(work.getParent());
             Files.createDirectory(work);
             Files.createDirectory(work.resolve("bin"));
-            for (String source:Arrays.asList("grunt_wine.py","fingerprint.py","safe_registry.py","wine_prefix.py","wine_windows.py"))
+            for (String source:Arrays.asList("grunt_wine.py","fingerprint.py","safe_registry.py","wine_prefix.py","wine_windows.py","prefix_helper_observer.py"))
                 Files.copy(Paths.get("/esteria-qa/input/"+source),work.resolve(source));
         }
         for (String name:Arrays.asList("bin/WowClient64.exe","bin/XvidDecoder.dll")) {
@@ -91,22 +92,94 @@ public final class ConfirmDatabase {
 
     }
 
-    private static JSONObject run(Context context,Path root,String control) throws Exception {
-        RuntimeSetup wine=new RuntimeSetup(context,root);
-        Path work=root.resolve("state/client-work");
-        prepareClient(context,root,work,wine,control.equals("reference") || control.equals("interrupt"));
-        OwnedProcess child=wineGuest(context,root,work,wine,control);
-        try {
-            long end=System.nanoTime()+TimeUnit.MINUTES.toNanos(8);
-            while(child.isAlive() && System.nanoTime()<end) pause();
-            requireExit(child);
-        } finally { if(child.isAlive()) child.stop(Duration.ofSeconds(15)); }
-        return new JSONObject().put("control",control).put("wineArchive",wine.archiveSha256())
-            .put("clientRevision",SOURCE).put("verifiedPE",PE).put("ownerClosed",!child.isAlive());
+    private static void installTools(Path work,Path source) throws IOException {
+        Files.createDirectories(work.resolve("bin"));
+        for(String name:Arrays.asList("grunt_wine.py","fingerprint.py","safe_registry.py","wine_prefix.py","wine_windows.py","prefix_helper_observer.py","bin/WowClient64.exe","bin/XvidDecoder.dll"))
+            Files.copy(source.resolve(name),work.resolve(name));
     }
-
+    private static boolean runningWineboot() {
+        java.io.File[] list=new java.io.File("/proc").listFiles();
+        if(list==null)return false;
+        for(java.io.File item:list){
+            if(!item.getName().matches("[0-9]+"))continue;
+            try(java.io.InputStream in=Files.newInputStream(item.toPath().resolve("cmdline"))){
+                byte[] data=new byte[500];int read=in.read(data);if(read<=0)continue;
+                String a=new String(data,0,read,StandardCharsets.ISO_8859_1).toLowerCase(java.util.Locale.ROOT);
+                int zero=a.indexOf('\0');String first=zero<0?a:a.substring(0,zero);
+                if(first.contains("wineboot.exe") && !first.contains("/bin/sh"))return true;
+            }catch(IOException|SecurityException ignored){ }
+        }
+        return false;
+    }
+    private static final class VerifyCut extends RuntimeException { }
+    private static JSONObject run(Context context,Path root,String mode) throws Exception {
+        RuntimeSetup wine=new RuntimeSetup(context,root);
+        Path canonical=root.resolve("state/client-work"),original=root.resolve("qa-original/state/client-work");
+        boolean initial=mode.equals("reference")||mode.equals("interrupt");
+        Path work=mode.equals("interrupt")||mode.equals("reentry")?original:canonical;
+        if(mode.equals("clone"))installTools(work,original);
+        prepareClient(context,root,work,wine,initial);
+        if(initial){GuestBridgeSetup bridges=new GuestBridgeSetup(context,root);bridges.requireWineArchive(wine.archiveSha256());bridges.prepare(RuntimeWork.NONE,RuntimeWork.NEVER_CANCELLED);}
+        Path runtime=wine.current();
+        JSONObject result=new JSONObject().put("control",mode).put("wineArchive",wine.archiveSha256()).put("clientRevision",SOURCE).put("verifiedPE",PE);
+        StockWinePrefix before=StockWinePrefix.inspect(work,runtime,wine.archiveSha256());
+        result.put("before",before.status().toString());
+        result.put("changedSource",StockWinePrefix.inspect(work,runtime,"0000000000000000000000000000000000000000000000000000000000000000").status().toString());
+        Path foreign=Files.createDirectories(root.resolve("qa-negative/home/.wine/drive_c/windows/system32"));
+        result.put("foreign",StockWinePrefix.inspect(root.resolve("qa-negative"),runtime,wine.archiveSha256()).status().toString());
+        if(Arrays.asList("cancel","update","finish","noop").contains(mode)){
+            final long[] registered={0};final boolean[] live={false},busy={false};
+            java.util.List<String> phases=new java.util.ArrayList<>();
+            try{
+                boolean did=StockWinePrefixRepair.runIfRequired(context,root,(phase,path,done,total)->{
+                    if(!phases.contains(phase))phases.add(phase);
+                    if(phase.equals("client-prefix-wineboot")){
+                        registered[0]=System.nanoTime();
+                        try(ClientLaunchSetup.Lease unexpected=ClientLaunchSetup.claim(root)){throw new IllegalStateException("Competing prefix owner acquired");}
+                        catch(IOException expected){busy[0]=true;}
+                    }
+                    if(mode.equals("update") && phase.equals("client-prefix-verify"))throw new VerifyCut();
+                },()->{
+                    if(!mode.equals("cancel")||registered[0]==0)return false;
+                    if(System.nanoTime()-registered[0]<300_000_000L)return false;
+                    if(runningWineboot())live[0]=true;
+                    return live[0];
+                });
+                result.put("handlerReturn",did);
+            }catch(RuntimeWork.CancelledException expected){result.put("nativeCancelled",true);}
+            catch(VerifyCut cut){result.put("cutAfterGuestExitBeforePendingRetired",true);}
+            catch(IOException failure){
+                // All strings in these internally-invoked paths originate in static production handlers. Never export arbitrary native output.
+                String message=String.valueOf(failure.getMessage());
+                result.put("ioFailure",failure.getClass().getSimpleName());
+                for(String token:Arrays.asList("supported interrupted","prefix repair","timed out","presentation","Wine update","client-work lease","changed"))
+                    if(message.contains(token))result.accumulate("errorKinds",token);
+                java.util.List<String> stack=new java.util.ArrayList<>();
+                for(StackTraceElement frame:failure.getStackTrace())if(frame.getClassName().startsWith("io.github.russianranger.esteria"))stack.add(frame.getClassName()+":"+frame.getLineNumber());
+                result.put("errorStack",new org.json.JSONArray(stack));
+            }
+            result.put("phases",new org.json.JSONArray(phases)).put("liveWinebootBeforeCancel",live[0]).put("competingLeaseDenied",busy[0]);
+            StockWinePrefixRepair.retryPendingCleanup(root);
+        }else{
+            OwnedProcess child;
+            if(mode.equals("clone") || mode.equals("audit")){
+                Path sessions=Files.createDirectories(root.resolve("s"));Path owner=Files.createDirectory(sessions.resolve(UUID.randomUUID().toString().replace("-","").substring(0,16)));
+                child=ProotProcess.start(context,wine.installer(),wine.packagePlan(),work,Files.createDirectory(owner.resolve("client")),
+                    Arrays.asList("/usr/bin/python3","-B","-s","-E","/work/prefix_helper_observer.py",mode),wine.wineEnvironment(),
+                    Arrays.asList(new ProotLaunch.Mount(original,"/qa-prefix-original")),null);
+            }else child=wineGuest(context,root,work,wine,mode);
+            try{long end=System.nanoTime()+TimeUnit.MINUTES.toNanos(6);while(child.isAlive()&&System.nanoTime()<end)pause();requireExit(child);}
+            finally{if(child.isAlive())child.stop(Duration.ofSeconds(15));}
+        }
+        result.put("after",StockWinePrefix.inspect(work,runtime,wine.archiveSha256()).status().toString());
+        Path pending=work.resolve(".stock-wine-prefix-repair-v1.pending");
+        result.put("pending",Files.isRegularFile(pending)).put("ownerClosed",true);
+        Path q=work.resolve("qa-original-check.json");
+        if(Files.isRegularFile(q))result.put("copy",new JSONObject(new String(Files.readAllBytes(q),StandardCharsets.UTF_8)));
+        return result;
+    }
     public static void main(String[] args) throws Exception {
-        if(args.length!=1 || !Arrays.asList("reference","interrupt","reentry","copy-force","copy-warm","warm").contains(args[0])) throw new IllegalArgumentException();
+        if(args.length!=1 || !Arrays.asList("reference","interrupt","reentry","clone","cancel","update","finish","noop","audit","warm").contains(args[0])) throw new IllegalArgumentException();
         if(Looper.myLooper()==null) Looper.prepareMainLooper();
         Class<?> thread=Class.forName("android.app.ActivityThread");
         Object instance=thread.getMethod("systemMain").invoke(null);

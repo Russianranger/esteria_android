@@ -34,7 +34,7 @@ test "$(stat -c %s "$work/input/wine.tar.gz")" = 282628308
 echo "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46  $work/input/wine.tar.gz" | sha256sum -c
 chmod 0444 "$work/input/wine.tar.gz"
 bash tools/android_stock_shader/compile_driver.sh "$work/dex" "$work/input/driver.jar" database
-cp tools/android_stock_database/{auth_phase,grunt_wine,fingerprint,safe_registry,wine_prefix,wine_windows,world_probe}.py tools/{client_auth_contract,prepare_runtime,stock_world_observation}.py "$work/input/"
+cp tools/android_stock_database/{auth_phase,grunt_wine,fingerprint,prefix_helper_observer,safe_registry,wine_prefix,wine_windows,world_probe}.py tools/{client_auth_contract,prepare_runtime,stock_world_observation}.py "$work/input/"
 chmod 0444 "$work/input/"*.py
 chmod 755 "$work/input"
 chmod 644 "$apk" "$work/input/driver.jar"
