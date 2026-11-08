@@ -54,5 +54,110 @@
     "detachedRecipeReproducedIdenticalApk": true
   },
   "physicalV22Tested": false,
-  "graphicalEntryQualified": false
+  "graphicalEntryQualified": false,
+  "androidArm64Debug": {
+    "runId": 42504462662,
+    "jobId": 128807154663,
+    "artifactId": 13627497568,
+    "repairElapsedMs": 416032,
+    "promotedSlot": "eef1be9812154a2d",
+    "uuid": "9f04f5c1-db9a-11f1-9e82-d339a58fdb9f",
+    "freshProcessReopensMs": [
+      5540,
+      3665,
+      3608
+    ],
+    "sameAccountVerified": true,
+    "cleanMysqlStops": true
+  },
+  "signedAndroidArm64": {
+    "runId": 42506258924,
+    "jobId": 128810203620,
+    "artifactId": 13627678793,
+    "update": "Android 13 native ARM64 pm install -r signed v21 to signed v22",
+    "sameUid": 10077,
+    "control": "A deliberate progress callback interruption during real baseline SQL reproduced v21's masking. The same v22 callback retained the initiating exception and the forced cleanup as suppressed.",
+    "oldAbandonedSlot": "94ca4c7816594c05",
+    "newInterruptedSlot": "95d578a4d8134e92",
+    "eachInterruptedSlotHadOneCleanMysqlStop": true,
+    "advisoryControl": "Injected a malformed progress.json sample in a disposable new core installation. Four rejected observations, then verified all schemas and cleanly promoted.",
+    "completedSlot": "73b8e6d3d12042bf",
+    "mysqlUuid": "7d142b38-db9c-11f1-b438-d339a692eae0",
+    "coldReopenMs": 3851,
+    "sameAccountProof": true,
+    "retainedProviderSeals": 9,
+    "retainedClientRequiredFiles": 30,
+    "retainedClientRequiredBytes": 21517816,
+    "phases": [
+      {
+        "phase": "seed21",
+        "uid": 10077,
+        "returnCode": 0,
+        "observed": [
+          "ESTERIA_SEED providerCopiedBytes=2522455679 client=1783e57b784e0487ceb6456a2ad21c1ec322cda8b1b2d1f09329550fe63768db",
+          "ESTERIA_REUSE providerSeals=9 clientRequiredFiles=30 clientRequiredBytes=21517816 matchPrevious=false",
+          "ESTERIA_RESULT seed21 success"
+        ]
+      },
+      {
+        "phase": "masked21",
+        "uid": 10077,
+        "returnCode": 0,
+        "observed": [
+          "ESTERIA_REUSE providerSeals=9 clientRequiredFiles=30 clientRequiredBytes=21517816 matchPrevious=true",
+          "ESTERIA_FAILURE_ORDER masked21 slot=94ca4c7816594c05 primary=IOException suppressed=0",
+          "ESTERIA_RESULT masked21 success"
+        ]
+      },
+      {
+        "phase": "primary22",
+        "uid": 10077,
+        "returnCode": 0,
+        "observed": [
+          "ESTERIA_REUSE providerSeals=9 clientRequiredFiles=30 clientRequiredBytes=21517816 matchPrevious=true",
+          "ESTERIA_FAILURE_ORDER primary22 slot=95d578a4d8134e92 primary=IllegalStateException suppressed=1",
+          "ESTERIA_RESULT primary22 success"
+        ]
+      },
+      {
+        "phase": "repair22",
+        "uid": 10077,
+        "returnCode": 0,
+        "observed": [
+          "ESTERIA_REUSE providerSeals=9 clientRequiredFiles=30 clientRequiredBytes=21517816 matchPrevious=true",
+          "ESTERIA_RETAINED {database.retained.94ca4c7816594c05=abandoned/failed, database.retained.94ca4c7816594c05.baselineCompletedFiles=0, database.retained.94ca4c7816594c05.baselinePendingFile=true, database.retained.94ca4c7816594c05.baselinePhase=importing, database.retained.94ca4c7816594c05.bootstrapUuid=6214a505-db9c-11f1-9c50-d339a692e9dc, database.retained.94ca4c7816594c05.cleanStopReceipts=1, database.retained.95d578a4d8134e92=abandoned/failed, database.retained.95d578a4d8134e92.baselineCompletedFiles=0, database.retained.95d578a4d8134e92.baselinePendingFile=true, database.retained.95d578a4d8134e92.baselinePhase=importing, database.retained.95d578a4d8134e92.bootstrapUuid=701665fa-db9c-11f1-a97c-d339a692eade, database.retained.95d578a4d8134e92.cleanStopReceipts=1}",
+          "ESTERIA_PHASE database-initializing elapsedMs=1051",
+          "ESTERIA_PHASE database-prepared elapsedMs=7008",
+          "ESTERIA_PHASE database-service-starting elapsedMs=7008",
+          "ESTERIA_PHASE installation-core-started elapsedMs=8484",
+          "ESTERIA_PHASE installation-baseline elapsedMs=16526",
+          "ESTERIA_PHASE installation-updater elapsedMs=121192",
+          "ESTERIA_PHASE installation-updater-reentry elapsedMs=196604",
+          "ESTERIA_PHASE installation-configurations elapsedMs=201819",
+          "ESTERIA_PHASE installation-local-realm elapsedMs=201920",
+          "ESTERIA_PHASE installation-local-account elapsedMs=205630",
+          "ESTERIA_PHASE installation-verify-owned-login elapsedMs=209340",
+          "ESTERIA_PHASE installation-staged-pending-playerbots elapsedMs=216661",
+          "ESTERIA_PROGRESS slot=73b8e6d3d12042bf mysqlUuid=7d142b38-db9c-11f1-b438-d339a692eae0 helper=core-launched owner=STAGED_PENDING_PLAYERBOTS unreadableProgress=4 lastProgressError=invalid-event",
+          "ESTERIA_PHASE installation-playerbots-started elapsedMs=217476",
+          "ESTERIA_PHASE installation-playerbots-configurations elapsedMs=234527",
+          "ESTERIA_PHASE installation-playerbots-local-verify elapsedMs=330206",
+          "ESTERIA_PHASE installation-four-schemas-verified elapsedMs=353872",
+          "ESTERIA_ACTIVE slot=73b8e6d3d12042bf uuid=7d142b38-db9c-11f1-b438-d339a692eae0 client=1783e57b784e0487ceb6456a2ad21c1ec322cda8b1b2d1f09329550fe63768db elapsedMs=421377",
+          "ESTERIA_RESULT repair22 success"
+        ]
+      },
+      {
+        "phase": "cold22",
+        "uid": 10077,
+        "returnCode": 0,
+        "observed": [
+          "ESTERIA_REUSE providerSeals=9 clientRequiredFiles=30 clientRequiredBytes=21517816 matchPrevious=true",
+          "ESTERIA_ACTIVE slot=73b8e6d3d12042bf uuid=7d142b38-db9c-11f1-b438-d339a692eae0 client=1783e57b784e0487ceb6456a2ad21c1ec322cda8b1b2d1f09329550fe63768db elapsedMs=3851",
+          "ESTERIA_RESULT cold22 success"
+        ]
+      }
+    ]
+  },
+  "x86Android13Emulator": "INSTALL_FAILED_NO_MATCHING_ABIS on ARM64-only baseline; package replacement measured on native Android ARM64."
 }
