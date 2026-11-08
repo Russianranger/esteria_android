@@ -99,5 +99,28 @@
     "thirdRestartReadReplacement": true,
     "oldProofStillIntact": true,
     "unpublishedPartialDirectoriesRemaining": 1
+  },
+  "composedPrivateOwner": {
+    "environment": "Offline Redroid Android 13 ARM64 ART under Android UID 10077, original-signer v14 sealer and v15 reentry, selected packaged PRoot",
+    "fixture": "Disposable server-data generation emitted by the production coordinator with synthetic extractor output",
+    "files": 5,
+    "nodes": 10,
+    "payloadBytes": 109,
+    "trustedCandidate": {
+      "bytes": 3243,
+      "sha256": "41edec759555437b200f97d72144ba1eabf9dec18d40575fd273da39ec9d9997"
+    },
+    "firstOwner": "Android import lease; competing PRoot lockf refused. PRoot full stable SHA/header seal. Java copied SHA-bound candidate into private state outside the guest mounts.",
+    "secondOwner": "Fresh Android lease and separate PRoot, all 10 recorded node stat tuples compared; 0 payload bytes read.",
+    "thirdOwner": "A same-size edit with restored mtime changed the PRoot stat tuple; fresh admission refused and preserved the previous pointer.",
+    "actualProductionGameSession": false,
+    "privateUserAssetsOrSaves": false,
+    "physicalThor": false,
+    "generation": "bc5a5b6f745415a4d9ccfd8c1e75aac9cdeb81df2d84b6e167528e6600a7f128",
+    "receipt": {
+      "bytes": 2606,
+      "sha256": "645da738e219945f6ab77fa9c9e73110cc39c6d119436aa2f3ffca5b6bb73d8d"
+    },
+    "helperGeneration": "c911baddd7c49fa21fa4a3bc022d75c69fa66daddde3a6970129cf652dad18ff"
   }
 }

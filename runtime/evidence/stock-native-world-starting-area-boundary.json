@@ -22,6 +22,36 @@
     "verifiedBeforeAndAfterEachRealLogin": true,
     "wineArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46"
   },
+  "rendererUpdateRerun": {
+    "actualClientLogins": 2,
+    "artifactBytes": 2363,
+    "artifactId": 13595853589,
+    "artifactSha256": "164887f8733f7736bbb9ad190657654dce400873e7f8a82d463e689df3e21410",
+    "authChecksPerLogin": 13,
+    "authReceiptSha256s": [
+      "5e076b4f0a39b05090ee44c9974e5c86addac36b46d9210f17135d29685d14fb",
+      "7f1a91587aac2e5fb02b347b71ace4d00da790b5cddfffe3b09b46514d2a0481"
+    ],
+    "bothClientSessionKeysMatched": true,
+    "cleanDatabaseReopenAndStop": true,
+    "dbcsLoaded": false,
+    "executableRevision": "fa3e74b7f332fef0f212e954a0de18f685ead8bd",
+    "executableSha256": "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317",
+    "fourDatabasePoolsOpened": true,
+    "nativeWorldElapsedSeconds": 0.507,
+    "nativeWorldExit": 1,
+    "nativeWorldPhase": "stock-starting-area-map-gate",
+    "productionLinuxOwnedAuthListenerVerifiedBothTimes": true,
+    "stockAuthReceiptSha256": "9ff9b165eca6de1ae009850af7367f338cfbf5a7756876d67a602ab42cd99291",
+    "testedIntegrationRevision": "87532a46eaf416cf7cb9beb4763e36748fc4f904",
+    "wineArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+    "workflowJob": 128569137261,
+    "workflowRun": 42427601003,
+    "workflowUrl": "https://github.com/Russianranger/esteria_android/actions/runs/42427601003/job/128569137261",
+    "worldReadyQualified": false,
+    "worldStartupReceiptSha256": "821213a7f95e16a040628d91058f439da54ba0f36a608194916ead1d292451ad",
+    "worldVersionLoaded": true
+  },
   "result": {
     "configErrors": false,
     "configuredFileRead": true,
