@@ -1,4 +1,5 @@
 """Start and stop the APK's production MySQL twice on an offline, fresh Android package."""
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -20,14 +21,30 @@ def failure_details(report):
     matches=re.findall(r'Database setup failed \(([a-zA-Z0-9_:,;= -]{1,350})\)',raw)
     if matches:
         report['bootstrapDiagnostic']=matches[-1]
-    raw=shell(CONTAINER,'''f="$1/server-work/state/logs/mysql-initialize-engine.log"
-        if test -f "$f"; then tail -c 12000 "$f"; fi''',base)
-    rows=[]
-    for line in raw.splitlines():
-        match=re.match(r'(\S+) .+?\[(MY-\d+)\].*',line)
-        if match and match[2] in {'MY-013169','MY-013576','MY-013577'}:
-            rows.append(dict(time=match[1],code=match[2]))
-    report['initializationEvents']=rows
+    for name, kind in [('mysql-initialize-engine.log','initialization'),('mysql-bootstrap-engine.log','bootstrap')]:
+        raw=shell(CONTAINER,'''f="$1/server-work/state/logs/$2"
+            if test -f "$f"; then tail -c 32000 "$f"; fi''',base,name)
+        events=[]
+        for line in raw.splitlines():
+            m=re.fullmatch(r'(\S+) \d+ \[(\w+)\] \[(MY-\d+)\] \[([\w ]+)\] (.*)',line)
+            if m:
+                row=dict(time=m[1],level=m[2],code=m[3],component=m[4])
+                msg=m[5]
+                # The isolated attempt has a newly generated secret, never record raw
+                # SQL, arbitrary daemon strings or a potentially password-bearing line.
+                if m[2] in {'ERROR','Warning'} and not re.search(
+                        r'password|secret|credential|authentication|statement|query|user=|identified by',msg,re.I):
+                    row['unixSocket']='socket' in msg.lower()
+                    row['fsError']=[error for error in ('Permission denied','No such file or directory',
+                        'File name too long','Address already in use','Operation not permitted',
+                        'Read-only file system','Invalid argument','Function not implemented','No space left on device')
+                        if error.lower() in msg.lower()]
+                    row['errno']=re.findall(r'(?:errno|errcode|OS error|operating system error number)[ :]*(\d+)',msg,re.I)
+                events.append(row)
+        report[kind+'Events']=events
+        report[kind+'EngineLogSha256']=hashlib.sha256(raw.encode()).hexdigest()
+    report['socketPathBytes']=len(('/data/user/0/'+PACKAGE+'/files/qa-signed-stock-database/state/server-work/state/run/bootstrap.sock').encode())
+
 
 
 def exercise(report):
