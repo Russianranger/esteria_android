@@ -52,6 +52,7 @@ import io.github.russianranger.esteria.runtime.ServerRuntimeSetup;
 import io.github.russianranger.esteria.runtime.ServerProgramsSetup;
 import io.github.russianranger.esteria.runtime.ServerExtractorsSetup;
 import io.github.russianranger.esteria.runtime.ServerContentSetup;
+import io.github.russianranger.esteria.runtime.ServerInstallationSetup;
 import io.github.russianranger.esteria.runtime.GuestBridgeSetup;
 import io.github.russianranger.esteria.runtime.ClientRuntimeSetup;
 import io.github.russianranger.esteria.runtime.ClientLaunchSetup;
@@ -820,6 +821,10 @@ public final class SessionService extends Service {
         preparationProgress("world-admission","",0,-1);
         if(locale==null||!java.util.Set.of("deDE","enGB","enUS","esES","frFR","koKR","zhCN","zhTW","enCN","enTW","esMX","ruRU").contains(locale))
             throw new IOException("Select the language of the imported client before preparing the world");
+        if(repair==LocalWorldSetup.Component.DATABASE) {
+            try{log("Database slots before named repair "+ServerInstallationSetup.retainedDiagnostics(root));}
+            catch(IOException error){log("Database slot inspection incomplete: "+error.getMessage());}
+        }
         boolean shaderOnly=repair==LocalWorldSetup.Component.SHADERS;
         if(!BuildConfig.SHADER_TOOLS_PACKAGED||(!shaderOnly&&(!BuildConfig.SERVER_RUNTIME_PACKAGED||!BuildConfig.SERVER_PROGRAMS_PACKAGED||
                 !BuildConfig.SERVER_CONTENT_PACKAGED||!BuildConfig.SERVER_DATA_TOOLS_PACKAGED)))
@@ -861,6 +866,8 @@ public final class SessionService extends Service {
         finally {
             rememberLogs(owner.diagnosticLogs());
             IOException cleanup=closeWorldSetup(owner);
+            String installation=owner.installationDiagnostic();
+            if(installation!=null)log("Database installation "+installation+" cleanup="+(cleanup==null?"finished":"failed"));
             if(cleanup!=null){if(operationFailure!=null)operationFailure.addSuppressed(cleanup);else throw cleanup;}
         }
         preparedWorld=result;
@@ -964,6 +971,8 @@ public final class SessionService extends Service {
         facts.put("storage.maintenance.summary",storageStatus);
         if (Build.VERSION.SDK_INT >= 29) facts.put("operation.foregroundServiceType", Integer.toString(getForegroundServiceType()));
         facts.putAll(ProcessExitDiagnostics.collect(this));
+        try{facts.putAll(ServerInstallationSetup.retainedDiagnostics(root));}
+        catch(IOException unavailable){facts.put("database.retained.inspection","unavailable");}
         ImportDiagnostics importDiagnostic = lastImport;
         if (importDiagnostic != null) facts.putAll(importDiagnostic.facts());
         WorldPreparationDiagnostics preparationDiagnostic=lastPreparation;

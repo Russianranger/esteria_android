@@ -38,7 +38,6 @@ public final class ServerContentSetup {
     private final byte[] receipt;
     private final String receiptHash, sourceLockHash, appSourceLockHash, dependencyHash, sourceJson, compiledJson;
     private final long freshFreeBytes;
-    private Path preparedReceipt;
 
     public ServerContentSetup(Context context, Path privateRoot) throws IOException {
         if (!BuildConfig.SERVER_CONTENT_PACKAGED) throw new IOException("This build has no bundled server content");
@@ -103,12 +102,7 @@ public final class ServerContentSetup {
             RuntimeWork.Cancellation cancelled) throws IOException {
         requireServerRuntimeArchive(actualDependencyArchive);
         EmbeddedArchiveCache embedded = new EmbeddedArchiveCache(cache);
-        // Keep the outer receipt beside the generation: it is the authority for,
-        // and intentionally not an extra member of, the original source archive.
-        preparedReceipt = embedded.obtain("package-receipt.json", receipt.length, receiptHash, offset -> {
-            if (offset < 0 || offset > receipt.length) throw new IOException("Invalid server receipt resume offset");
-            return new ByteArrayInputStream(receipt, (int) offset, receipt.length - (int) offset);
-        }, progress, cancelled);
+        obtainReceipt(embedded, progress, cancelled);
         RuntimeInstaller installer = installer();
         if (installer.resolveCurrent(plan) != null)
             return installer.install(cache.resolve("unused-completed-generation"), plan, progress, cancelled);
@@ -133,8 +127,24 @@ public final class ServerContentSetup {
     public JSONObject serverSource() throws IOException { return object(sourceJson); }
     public JSONObject compiledModulesIdentity() throws IOException { return object(compiledJson); }
     public Path receiptPath() throws IOException {
-        if (preparedReceipt == null) throw new IOException("Server content receipt has not been prepared");
-        return preparedReceipt;
+        if (current() == null) throw new IOException("No installed source-matched server content generation is selected");
+        return obtainReceipt(new EmbeddedArchiveCache(cache), RuntimeWork.NONE, RuntimeWork.NEVER_CANCELLED);
+    }
+
+    private Path obtainReceipt(EmbeddedArchiveCache embedded, RuntimeWork.Progress progress,
+            RuntimeWork.Cancellation cancelled) throws IOException {
+        try {
+            return embedded.obtainVerified("package-receipt.json", receipt.length, receiptHash,
+                    offset -> {
+                        int start = Math.toIntExact(offset);
+                        return new ByteArrayInputStream(receipt, start, receipt.length - start);
+                    },
+                    progress, cancelled);
+        } catch (RuntimeWork.CancelledException cancelledWork) {
+            throw cancelledWork;
+        } catch (IOException error) {
+            throw new IOException("Cannot select verified server content receipt: " + error.getMessage(), error);
+        }
     }
     public static String guestMount() { return "/esteria-server-content"; }
     private static JSONObject object(String json) throws IOException {

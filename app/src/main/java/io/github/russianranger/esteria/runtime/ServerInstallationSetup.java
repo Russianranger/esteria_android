@@ -123,6 +123,9 @@ public final class ServerInstallationSetup {
             if(serverData.startsWith(installed) || installed.startsWith(serverData))
                 throw new IOException("Imported server data must be separate from runtime and database workspaces");
         FreshServerInstallations.Selection selected=selection(inputs);
+        // Refuse an unavailable or changed receipt before reserving a slot or starting MySQL.
+        // runGuest checks again immediately before it materializes the helper's input.
+        verifiedContentReceipt(inputs);
         FreshServerInstallations.Attempt attempt=new FreshServerInstallations(root).begin(selected,requiredFreeBytes);
         try {return new Handle(context.getApplicationContext(),root,inputs,serverData,attempt,attempt.retainWorkspace());}
         catch(IOException|RuntimeException error){attempt.close();throw error;}
@@ -191,10 +194,12 @@ public final class ServerInstallationSetup {
         private final FreshServerInstallations.Workspace workspace;
         private final ServiceOperationGuard operations=new ServiceOperationGuard();
         private volatile State state=State.ALLOCATED;
-        private ServerDatabaseService.Handle database;
+        private volatile ServerDatabaseService.Handle database;
         private OwnedProcess setupProcess;
         private volatile Map<String,Path> diagnosticLogs=Map.of();
-        private ServerDatabaseSetup.BootstrapLease bootstrapLease;
+        private volatile ServerDatabaseSetup.BootstrapLease bootstrapLease;
+        private volatile Path bootstrapLogs;
+        private volatile String helperPhase="not-launched";
         private FreshServerInstallations.Workspace setupProcessWorkspace;
         private Result result;
         private boolean promotionAttempted;
@@ -209,7 +214,23 @@ public final class ServerInstallationSetup {
         }
         public State state(){return state;}
         /** Wrapper streams only. Engine-private capture and account/config files are excluded. */
-        public Map<String,Path> diagnosticLogs(){return diagnosticLogs;}
+        public Map<String,Path> diagnosticLogs(){
+            Map<String,Path> logs=new java.util.LinkedHashMap<>(diagnosticLogs);
+            ServerDatabaseSetup.BootstrapLease bootstrap=bootstrapLease;
+            Path directory=bootstrap==null?bootstrapLogs:bootstrap.wrapperLogs;
+            if(directory!=null) {
+                logs.put("setup.bootstrap.stdout.log",directory.resolve("stdout.log"));
+                logs.put("setup.bootstrap.stderr.log",directory.resolve("stderr.log"));
+            }
+            ServerDatabaseService.Handle service=database;
+            if(service!=null)service.diagnosticLogs().forEach((stream,path)->logs.put("setup.mysql."+stream+".log",path));
+            return logs;
+        }
+        public String diagnosticState(){
+            ServerDatabaseService.Handle service=database;
+            return "slot="+attempt.slotId+" mysqlUuid="+(service==null||service.instanceUuid()==null?"unavailable":service.instanceUuid())
+                    +" helper="+helperPhase+" owner="+state;
+        }
         public String slotId(){return attempt.slotId;}
         /** Off main thread. Keep this owner on every failure, then close/retry
          * shutdown; a timeout keeps the live engine and workspace leases held. */
@@ -228,6 +249,7 @@ public final class ServerInstallationSetup {
                     finally {releaseStoppedSetupProcess();}
                     if(bootstrap.cancellationRequested)throw new RuntimeWork.CancelledException();
                     check(cancelled);
+                    if(progress!=null)progress.update("database-service-starting","",0,-1);
                     database=ServerDatabaseService.startFreshInstalled(context,root,runtime,attempt);
                     try {ServerDatabaseService.awaitReady(database,System.nanoTime()+TimeUnit.MINUTES.toNanos(3),cancelled);}
                     catch(java.util.concurrent.CancellationException error){throw new RuntimeWork.CancelledException();}
@@ -311,6 +333,7 @@ public final class ServerInstallationSetup {
         }
         private void releaseStoppedSetupProcess() throws IOException {
             if(bootstrapLease!=null && (bootstrapLease.process()==null || !bootstrapLease.process().isAlive())) {
+                bootstrapLogs=bootstrapLease.wrapperLogs;
                 bootstrapLease.close();bootstrapLease=null;
             }
             if(bootstrapLease==null && (setupProcess==null || !setupProcess.isAlive())) {
@@ -348,6 +371,48 @@ public final class ServerInstallationSetup {
             }
         }
     }
+    /** Diagnostic observations only. Neither a bootstrap nor a clean stop qualifies a slot for promotion. */
+    public static Map<String,String> retainedDiagnostics(Path root) throws IOException {
+        if(!Files.exists(root.resolve("state/server-installations"),LinkOption.NOFOLLOW_LINKS))return Map.of();
+        Map<String,String> result=new java.util.TreeMap<>();
+        for(var entry:new FreshServerInstallations(root).retainedSlotStates().entrySet()) {
+            String id=entry.getKey(),key="database.retained."+id;
+            result.put(key,entry.getValue());
+            if(id.equals("truncated"))continue;
+            Path work=root.resolve("db").resolve(id),bootstrap=work.resolve("state/database-bootstrap.json");
+            if(!Files.exists(bootstrap,LinkOption.NOFOLLOW_LINKS))continue;
+            try {
+                JSONObject row=new JSONObject(new String(read(bootstrap,16384),StandardCharsets.UTF_8));
+                String uuid=row.getString("uuid"),version=row.getString("version");
+                if(!UUID.fromString(uuid).toString().equals(uuid))throw new IOException("Invalid bootstrap UUID");
+                result.put(key+".bootstrapUuid",uuid);
+                Path sessions=work.resolve("mysql-sessions");
+                if(!Files.isDirectory(sessions,LinkOption.NOFOLLOW_LINKS)||!sessions.equals(sessions.toRealPath()))continue;
+                int inspected=0,clean=0;
+                try(var children=Files.newDirectoryStream(sessions)) {
+                    for(Path session:children) {
+                        if(inspected==16){result.put(key+".sessionsTruncated","true");break;}
+                        inspected++;
+                        String operation=session.getFileName().toString();
+                        if(!operation.matches("[a-f0-9]{32}"))continue;
+                        Path receipt=session.resolve("stopped.json");
+                        if(!Files.exists(receipt,LinkOption.NOFOLLOW_LINKS))continue;
+                        try {
+                            validateStopped(new JSONObject(new String(read(receipt,16384),StandardCharsets.UTF_8)),operation,version,uuid);
+                            clean++;
+                        } catch(IOException|JSONException invalid){result.put(key+".unverifiedStop","true");}
+                    }
+                }
+                result.put(key+".cleanStopReceipts",String.valueOf(clean));
+            } catch(IOException|IllegalArgumentException|JSONException unavailable){result.put(key+".inspection","incomplete");}
+        }
+        return result;
+    }
+    private static byte[] verifiedContentReceipt(InstalledInputs inputs) throws IOException {
+        byte[] receipt=read(inputs.contentReceiptPath(),16<<20);
+        if(!hash(receipt).equals(inputs.contentReceiptSha256()))throw new IOException("Server content receipt changed");
+        return receipt;
+    }
     private static Result runGuest(Handle owner,Context context,Path root,InstalledInputs inputs,
             Path data,ServerDatabaseService.Handle service,String serviceOperation,String version,String uuid,
             RuntimeWork.Progress progress,RuntimeWork.Cancellation cancelled,boolean playerbots) throws IOException {
@@ -360,8 +425,7 @@ public final class ServerInstallationSetup {
         owner.diagnosticLogs=Map.of("setup.installation.stdout.log",processSession.resolve("logs/stdout.log"),
             "setup.installation.stderr.log",processSession.resolve("logs/stderr.log"));
         try {
-            byte[] receipt=read(inputs.contentReceiptPath(),16<<20);
-            if(!hash(receipt).equals(inputs.contentReceiptSha256()))throw new IOException("Server content receipt changed");
+            byte[] receipt=verifiedContentReceipt(inputs);
             write(operationFiles.resolve("content-receipt.json"),receipt);
             byte[] profile=asset(context,helpers.prefix+"/local-server.json",65536);
             JSONObject selected=new JSONObject().put("formatVersion",1).put("scope","android-owned-server-installation-selection")
@@ -380,9 +444,11 @@ public final class ServerInstallationSetup {
                 Arrays.asList(new ProotLaunch.Mount(inputs.contentDirectory(),ServerContentSetup.guestMount()),
                     new ProotLaunch.Mount(inputs.programsDirectory(),ServerProgramsSetup.guestMount()),new ProotLaunch.Mount(data,"/esteria-data")));
                 owner.setupProcess=process;
+                owner.helperPhase=playerbots?"playerbots-launched":"core-launched";
             } catch(IOException|RuntimeException error){owner.releaseStoppedSetupProcess();throw error;}
             boolean cancelSeen=false;String lastProgress="";long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(90);
             try {
+                if(progress!=null)progress.update(playerbots?"installation-playerbots-started":"installation-core-started","",0,-1);
                 while(process.isAlive()) {
                     if(!service.isAlive())throw new IOException("Owned database exited during setup; staging retained");
                     if((cancelled.isCancelled() || service.schemaCancellationRequested()) && !cancelSeen) {

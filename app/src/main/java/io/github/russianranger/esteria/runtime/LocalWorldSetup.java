@@ -156,6 +156,10 @@ public final class LocalWorldSetup {
         }
         public State state(){return state;}
         /** Known operation streams; no directory discovery or credential files. */
+        public String installationDiagnostic(){
+            ServerInstallationSetup.Handle owner=installation;
+            return owner==null?null:owner.diagnosticState();
+        }
         public Map<String,Path> diagnosticLogs(){
             Map<String,Path> logs=new LinkedHashMap<>();
             ServerDataSetup.Handle currentData=data;
@@ -244,6 +248,7 @@ public final class LocalWorldSetup {
                         active=component(Component.DATABASE,()->{
                             installation.prepare(updates,stop);check(stop);
                             installation.finishPlayerbots(updates,stop);check(stop);
+                            updates.update("installation-clean-stop-and-promotion","",0,-1);
                             return installation.stopAndPromote(Duration.ofSeconds(30));
                         });
                     } else active=component(Component.DATABASE,()->ServerInstallationSetup.completed(context,root,server,programs,content));

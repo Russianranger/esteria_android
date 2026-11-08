@@ -5,7 +5,7 @@ on:
       build_version_code:
         description: Positive release versionCode, increased before a signed update
         required: false
-        default: '20'
+        default: '21'
         type: string
       publish_non_custom:
         description: Sign and publish an additive non-custom prerelease using the configured persistent key
@@ -170,7 +170,7 @@ jobs:
       contents: write
       actions: read
     env:
-      RELEASE_VERSION_CODE: ${{ inputs.build_version_code || '20' }}
+      RELEASE_VERSION_CODE: ${{ inputs.build_version_code || '21' }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -701,4 +701,58 @@ jobs:
           name: local-game-provider-evidence-${{ github.sha }}
           path: out/coherent-evidence/
           retention-days: 30
+          if-no-files-found: warn
+  retained-database:
+    needs: package
+    if: always() && !cancelled() && needs.package.result != 'skipped'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: e9553fe7f0035a3336693046368c6ad7034ab344
+          sparse-checkout: tools/android_stock_shader
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: unqualified-local-game-profile-arm64-${{ github.sha }}
+          path: package
+      - name: Bootstrap and promote all schemas, then reopen the same slot in three new Android processes
+        shell: bash
+        run: |
+          set -euo pipefail
+          source tools/android_stock_shader/redroid.sh
+          work=$(mktemp -d "$RUNNER_TEMP/stock-db.XXXXXXXX")
+          mkdir -p "$work/input" evidence
+          cp package/app/build/outputs/apk/debug/app-debug.apk "$work/input/app.apk"
+          cp package/app/build/outputs/apk/androidTest/debug/*-androidTest.apk "$work/input/tests.apk"
+          cleanup() {
+            docker exec "$redroid_name" logcat -d -s EsteriaDatabaseQA:I '*:S' > evidence/phases.txt || true
+            redroid_stop "$work"
+          }
+          trap cleanup EXIT
+          redroid_start "$work"
+          device() { docker exec "$redroid_name" "$@"; }
+          device pm install -t /esteria-qa/input/app.apk | grep -Fx Success
+          device pm install -t /esteria-qa/input/tests.apk | grep -Fx Success
+          pkg=io.github.russianranger.esteria.stock
+          for phase in seed repair cold cold cold; do
+            device am force-stop "$pkg"
+            device am instrument -w -r -e class io.github.russianranger.esteria.runtime.RetainedDatabaseRepairTest \
+              -e disposableDatabasePhase "$phase" "$pkg.test/androidx.test.runner.AndroidJUnitRunner" | tee "$work/$phase.txt"
+            grep -F 'OK (1 test)' "$work/$phase.txt"
+          done
+      - name: Collect only fixed, nonsecret phase and identity messages
+        if: always()
+        run: |
+          mkdir -p evidence
+          # The container's EXIT trap already reaped it. Instrumentation output is kept on the runner.
+          for f in "$RUNNER_TEMP"/stock-db.*/{seed,repair,cold}.txt; do
+            if test -f "$f"; then grep -E 'OK \(1 test\)|Tests run:|FAILURES|^java\.(lang|io)\.' "$f" >> evidence/results.txt || true; fi
+          done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: retained-database-android-arm64-${{ github.sha }}
+          path: evidence/
           if-no-files-found: warn

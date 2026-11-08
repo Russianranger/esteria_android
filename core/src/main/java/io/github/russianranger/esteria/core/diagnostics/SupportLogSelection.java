@@ -28,7 +28,7 @@ public final class SupportLogSelection {
     private static final Pattern SERVER_HELPER=Pattern.compile("game\\.server\\.helper\\.(stdout|stderr)\\.log");
     private static final Pattern SERVER=Pattern.compile("game\\.server\\.(authserver|worldserver)\\.log");
     private static final Pattern PRESENTATION=Pattern.compile("game\\.presentation\\.(xserver|frame|input|client)\\.(stdout|stderr)\\.log");
-    private static final Pattern SETUP=Pattern.compile("setup\\.(data|shader|stock|installation|turnip)\\.(stdout|stderr)\\.log");
+    private static final Pattern SETUP=Pattern.compile("setup\\.(data|shader|stock|installation|turnip|mysql|bootstrap)\\.(stdout|stderr)\\.log");
     private SupportLogSelection(){ }
     /** Single-line transport avoids Android XML indentation on newline-terminated strings. */
     public static String encodePreference(Path canonicalAppRoot,Map<String,Path> fixedOwnedLogPaths)throws IOException {
@@ -159,8 +159,9 @@ public final class SupportLogSelection {
         if(expected==null&&(match=SERVER.matcher(name)).matches())expected="db/"+SLOT+"/server-sessions/"+OP+"/"+match.group(1)+"\\.log";
         if(expected==null&&(match=PRESENTATION.matcher(name)).matches())expected="s/"+SLOT+"/"+match.group(1)+"/logs/"+match.group(2)+"\\.log";
         if(expected==null&&(match=SETUP.matcher(name)).matches()) {
-            String directory=match.group(1).equals("data")?"server-data-operations":match.group(1).equals("shader")?"shader-operations":
-                match.group(1).equals("stock")?"stock-client-operations":match.group(1).equals("turnip")?"turnip-probe-operations":"server-installation-processes";
+            String directory=Map.of("data","server-data-operations","shader","shader-operations","stock","stock-client-operations",
+                    "turnip","turnip-probe-operations","installation","server-installation-processes",
+                    "mysql","database-service-operations","bootstrap","database-operations").get(match.group(1));
             expected="state/"+directory+"/"+OP+"/logs/"+match.group(2)+"\\.log";
         }
         if(expected==null||!relative.matches(expected))throw new IOException("Unsupported owned diagnostic role or path");

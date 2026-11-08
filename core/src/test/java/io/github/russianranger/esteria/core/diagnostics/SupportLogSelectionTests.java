@@ -23,8 +23,8 @@ public final class SupportLogSelectionTests {
             result.put("game.database."+stream+".log",root.resolve("state/database-service-operations/"+OP+"/logs/"+stream+".log"));
             result.put("game.server.helper."+stream+".log",root.resolve("state/server-session-runtime-operations/"+OP+"/logs/"+stream+".log"));
             for(String component:List.of("xserver","frame","input","client"))result.put("game.presentation."+component+"."+stream+".log",root.resolve("s/"+SLOT+"/"+component+"/logs/"+stream+".log"));
-            for(String setup:List.of("data","shader","stock","installation","turnip")) {
-                String directory=setup.equals("data")?"server-data-operations":setup.equals("shader")?"shader-operations":setup.equals("stock")?"stock-client-operations":setup.equals("turnip")?"turnip-probe-operations":"server-installation-processes";
+            for(String setup:List.of("data","shader","stock","installation","turnip","mysql","bootstrap")) {
+                String directory=setup.equals("data")?"server-data-operations":setup.equals("shader")?"shader-operations":setup.equals("stock")?"stock-client-operations":setup.equals("turnip")?"turnip-probe-operations":setup.equals("mysql")?"database-service-operations":setup.equals("bootstrap")?"database-operations":"server-installation-processes";
                 result.put("setup."+setup+"."+stream+".log",root.resolve("state/"+directory+"/"+OP+"/logs/"+stream+".log"));
             }
         }
@@ -34,7 +34,7 @@ public final class SupportLogSelectionTests {
     private static void roundTripAndRotation()throws Exception {
         Path root=Files.createTempDirectory("esteria-log-selection-").toRealPath();
         try {
-            Map<String,Path> logs=roles(root);check(logs.size()==24,"Only24 actual fixed roles are defined");
+            Map<String,Path> logs=roles(root);check(logs.size()==28,"Only 28 actual fixed roles are defined");
             // Every future log is initially absent: selection must not invent,
             // create or demand one before the source helper starts.
             String encoded=SupportLogSelection.encode(root,logs);check(SupportLogSelection.decode(root,encoded).equals(logs),"Missing future paths round-trip");
@@ -118,6 +118,6 @@ public final class SupportLogSelectionTests {
     private static void remove(Path root)throws IOException {try(var paths=Files.walk(root)){for(Path path:paths.sorted(Comparator.reverseOrder()).toArray(Path[]::new))Files.delete(path);}}
     public static void main(String[] arguments)throws Exception {
         roundTripAndRotation();badMetadata();privatePathsAndSymlinks();independentRecovery();
-        System.out.println("Support log selection passed4 actual filesystem metadata groups:24 fixed roles, missing/rotated roundtrip, bounds/private/foreign/traversal/symlink refusal, independently validated recovery; no log bytes read by selector");
+        System.out.println("Support log selection passed4 actual filesystem metadata groups:28 fixed roles, missing/rotated roundtrip, bounds/private/foreign/traversal/symlink refusal, independently validated recovery; no log bytes read by selector");
     }
 }

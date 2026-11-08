@@ -78,6 +78,7 @@ public final class ServerDatabaseSetup {
     static final class BootstrapLease implements AutoCloseable {
         private final ExclusiveFileLease lease;
         private OwnedProcess process;
+        volatile Path wrapperLogs;
         private boolean closed;
         private boolean operationActive=true;
         BootstrapLease(ExclusiveFileLease lease){this.lease=lease;}
@@ -159,6 +160,7 @@ public final class ServerDatabaseSetup {
         Path session=sessions.resolve(id);
         Files.createDirectory(session,PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------")));
         checkCancelled(cancelled);
+        ownership.wrapperLogs=session.resolve("logs");
         if (progress!=null) progress.update("database-initializing","",0,-1);
         OwnedProcess process=runtime.launch(work,session,
             Arrays.asList("/usr/bin/python3","-B","-s","-E","/work/helpers/"+helperGeneration+"/android_database_setup.py",

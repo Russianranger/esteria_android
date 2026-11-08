@@ -22,6 +22,18 @@ public final class EmbeddedArchiveCache {
     }
     public Path obtain(String name, long bytes, String sha, Source source,
             RuntimeWork.Progress progress, RuntimeWork.Cancellation cancellation) throws IOException {
+        return obtain(name, bytes, sha, source, progress, cancellation, false);
+    }
+
+    /** Receipts authorize SQL work. Verify their bytes on each selection, even
+     * when a same-length edit preserves the filesystem timestamp. */
+    public Path obtainVerified(String name, long bytes, String sha, Source source,
+            RuntimeWork.Progress progress, RuntimeWork.Cancellation cancellation) throws IOException {
+        return obtain(name, bytes, sha, source, progress, cancellation, true);
+    }
+
+    private Path obtain(String name, long bytes, String sha, Source source,
+            RuntimeWork.Progress progress, RuntimeWork.Cancellation cancellation, boolean verifyBytes) throws IOException {
         RuntimeFiles.hashPin(sha);
         RuntimeFiles.require(name != null && name.matches("[A-Za-z0-9._-]{1,128}") &&
                 !name.equals(".") && !name.equals("..") && bytes > 0 && bytes <= (8L << 30), "Invalid embedded archive pin");
@@ -35,10 +47,11 @@ public final class EmbeddedArchiveCache {
                 RuntimeFiles.plain(archive);
                 RuntimeFiles.require(Files.size(archive) == bytes, "Cached embedded archive size differs; preserved");
                 String proof = pin + Files.getLastModifiedTime(archive, LinkOption.NOFOLLOW_LINKS).toMillis() + "\n";
-                if (!Files.exists(receipt, LinkOption.NOFOLLOW_LINKS) || !RuntimeFiles.smallText(receipt, 1024).equals(proof)) {
+                boolean recorded = Files.exists(receipt, LinkOption.NOFOLLOW_LINKS) && RuntimeFiles.smallText(receipt, 1024).equals(proof);
+                if (verifyBytes || !recorded) {
                     RuntimeFiles.require(RuntimeFiles.hashFile(archive, bytes, cancellation).equals(sha),
                             "Cached embedded archive hash differs; preserved");
-                    RuntimeFiles.atomicText(receipt, proof, directorySync);
+                    if (!recorded) RuntimeFiles.atomicText(receipt, proof, directorySync);
                 }
                 progress.update("embedded-runtime-cached", name, bytes, bytes);
                 return archive;

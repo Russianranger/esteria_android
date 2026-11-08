@@ -132,6 +132,7 @@ public final class NativeJavaInstallation {
             ServerRuntimeSetup runtime=new ServerRuntimeSetup(context,root);runtime.prepare(RuntimeWork.NONE,RuntimeWork.NEVER_CANCELLED);
             ServerProgramsSetup programs=new ServerProgramsSetup(context,root);programs.prepare(runtime.archiveSha256(),RuntimeWork.NONE,RuntimeWork.NEVER_CANCELLED);
             ServerContentSetup content=new ServerContentSetup(context,root);content.prepare(runtime.archiveSha256(),RuntimeWork.NONE,RuntimeWork.NEVER_CANCELLED);
+            content=new ServerContentSetup(context,root); // New operation after provider preparation.
             // An empty, explicitly unavailable data namespace is sufficient for
             // SQL/configuration. No replacement map/DBC/header is fabricated.
             Path data=GuestHelperAssets.directory(root,"unavailable-game-data");GuestHelperAssets.directory(data,"data");
@@ -149,7 +150,7 @@ public final class NativeJavaInstallation {
             require(owner.state()==ServerInstallationSetup.State.PROMOTED,"Real coordinator did not promote");
             result.put("slotPromoted",true);
             Path work=active.directoryFor(root);Map<String,String> identities=privateIdentities(work);
-            FreshServerInstallations.Active loaded=ServerInstallationSetup.completed(context,root,runtime,programs,content);
+            FreshServerInstallations.Active loaded=ServerInstallationSetup.completed(context,root,runtime,programs,new ServerContentSetup(context,root));
             require(active.slotId.equals(loaded.slotId)&&active.mysqlUuid.equals(loaded.mysqlUuid)&&active.proofSha256.equals(loaded.proofSha256),"Promotion readback changed");
             close(owner);owner=null;
             phase="active-save-reinitialization-refusal";boolean refused=false;ServerInstallationSetup.Handle unexpected=null;

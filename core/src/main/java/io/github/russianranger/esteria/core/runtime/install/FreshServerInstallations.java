@@ -94,6 +94,23 @@ public final class FreshServerInstallations {
     public Active active(Selection expected) throws IOException {
         try(RuntimeFiles.Lock lock=RuntimeFiles.lock(metadata)){return recoverActive(expected);}
     }
+    /** Bounded observation for repair/support. Never recovers a pointer or opens a database. */
+    public Map<String,String> retainedSlotStates() throws IOException {
+        Map<String,String> states=new TreeMap<>();
+        try(RuntimeFiles.Lock lock=RuntimeFiles.lock(metadata);
+                var journals=Files.newDirectoryStream(metadata,"*.journal")) {
+            for(Path journal:journals) {
+                String name=journal.getFileName().toString();
+                if(!name.matches("[a-f0-9]{16}\\.journal"))throw new IOException("Unexpected installation journal name");
+                if(states.size()==16){states.put("truncated","true");break;}
+                String slot=name.substring(0,16);
+                Map<String,String> row=record(slot);
+                existingWork(slot);
+                states.put(slot,row.get("phase")+"/"+row.get("reason"));
+            }
+        }
+        return states;
+    }
     public Attempt begin(Selection selection,long requiredFreeBytes) throws IOException {
         RuntimeFiles.require(requiredFreeBytes>0 && requiredFreeBytes<=(32L<<30),"Measured fresh setup reserve required");
         RuntimeFiles.Lock lock=RuntimeFiles.lock(metadata);
