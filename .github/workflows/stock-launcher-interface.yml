@@ -45,9 +45,10 @@ jobs:
             docker exec "$redroid_name" pm install -t --user 0 "/data/local/tmp/$apk.apk" | grep -Fx Success
           done
           python3 tools/retained_database/android_platform.py evidence/interface.txt
+          python3 tools/retained_database/launcher_export.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: original-interface-replay
-          path: evidence/interface.txt
+          path: evidence/
           if-no-files-found: warn

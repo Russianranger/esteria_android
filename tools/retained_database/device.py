@@ -5,47 +5,7 @@ import re
 import subprocess
 import sys
 
-PACKAGE = 'io.github.russianranger.esteria.stock'
-CONTAINER = 'esteria-android-qa'
-BOOT = {'BOOTCLASSPATH', 'DEX2OATBOOTCLASSPATH', 'SYSTEMSERVERCLASSPATH', 'ANDROID_DATA',
-        'ANDROID_ROOT', 'ANDROID_ART_ROOT', 'ANDROID_I18N_ROOT', 'ANDROID_TZDATA_ROOT',
-        'ANDROID_RUNTIME_ROOT', 'ANDROID_SYSTEM_EXT_ROOT', 'ANDROID_ODM_ROOT', 'ANDROID_PRODUCT_ROOT',
-        'ANDROID_VENDOR_ROOT', 'ANDROID_STORAGE', 'PATH'}
-
-
-def shell(*command):
-    return subprocess.check_output(['docker', 'exec', CONTAINER, *command], text=True).strip()
-
-
-
-def platform_environment():
-    zygote = shell('pidof', 'zygote64')
-    assert re.fullmatch('[1-9][0-9]*', zygote)
-    environment = subprocess.check_output(['docker', 'exec', CONTAINER, 'cat', f'/proc/{zygote}/environ'])
-    boot = [item.decode() for item in environment.split(b'\0') if item.partition(b'=')[0].decode() in BOOT]
-    assert any(item.startswith('BOOTCLASSPATH=') for item in boot)
-    return boot
-
-
-def android_tool(*command, timeout=90):
-    """Docker exec starts outside Android init's environment. Java platform tools require its ART boot paths."""
-    result = subprocess.run(['docker', 'exec', CONTAINER, '/system/bin/env', *platform_environment(), *command],
-                            text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=timeout)
-    if result.returncode:
-        raise RuntimeError(f'{command[0]} returned {result.returncode}: {result.stdout[-1600:]}')
-    return result.stdout
-
-
-def interface_qualification(output):
-    shell('pm', 'grant', PACKAGE, 'android.permission.POST_NOTIFICATIONS')
-    android_tool('input', 'keyevent', 'KEYCODE_WAKEUP')
-    shell('wm', 'dismiss-keyguard')
-    result = android_tool('am', 'instrument', '-w', '-r', '-e', 'class',
-                          'io.github.russianranger.esteria.RealmInterfaceTest',
-                          PACKAGE + '.test/androidx.test.runner.AndroidJUnitRunner', timeout=150)
-    Path(output).write_text(result)
-    if 'OK (1 test)' not in result or 'INSTRUMENTATION_CODE: -1' not in result:
-        raise RuntimeError('Android interface instrumentation failed: ' + result[-2400:])
+from android_platform import CONTAINER, PACKAGE, interface_qualification, platform_environment, shell
 
 
 def install(name, version):

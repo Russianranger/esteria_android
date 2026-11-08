@@ -8,7 +8,7 @@ import time
 import xml.etree.ElementTree as ET
 import zipfile
 
-from device import CONTAINER, PACKAGE, android_tool, shell
+from android_platform import CONTAINER, PACKAGE, android_tool, shell
 
 
 def visible(match, seconds=45):

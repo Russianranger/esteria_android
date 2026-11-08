@@ -96,7 +96,7 @@ public final class SessionService extends Service {
     private final Handler main = new Handler(Looper.getMainLooper());
     private boolean destroyed;
     private int latestStartId;
-    private volatile String status = "Ready to import your 3.3.5a build 12340 client folder or ZIP.";
+    private volatile String status = "Open Setup to import your build 12340 client folder or ZIP.";
     private volatile String supportStatus="";
     private volatile String storageStatus="No storage scan has run. Imported client, saves and resumable world work are retained.";
     private volatile boolean storageCanTrim;
@@ -172,7 +172,7 @@ public final class SessionService extends Service {
                         : "Previous operation was interrupted. Select the same folder or archive to resume where source metadata permits. Existing game data remains active.";
             }
             else if (new GameDataImporter(root.resolve("game")).resolveCurrent() != null)
-                status = "Client data is imported. Local runtime qualification is still pending.";
+                status = "Client imported. Start your local realm, or open Setup for preparation.";
             lastRecoveryRequired=getSharedPreferences("session",MODE_PRIVATE).getBoolean("lastRecoveryRequired",false);
             lastClientExitAcknowledged=getSharedPreferences("session",MODE_PRIVATE).getBoolean("lastClientExitAcknowledged",false);
         } catch (IOException e) { status = "Storage unavailable: " + e.getMessage(); }

@@ -24,6 +24,7 @@ on:
       - 'tools/retained_database/compile.sh'
       - 'tools/retained_database/SignedDatabaseUpdate.java'
       - 'tools/retained_database/device.py'
+      - 'tools/retained_database/android_platform.py'
       - '!app/src/test/**'
       - 'core/**'
       - '!core/src/test/**'
