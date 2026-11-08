@@ -15,14 +15,16 @@ CONTAINER='esteria-android-qa'
 
 def failure_details(report):
     root='/data/data/'+PACKAGE+'/files'
-    paths=shell(CONTAINER,'''for dir in "$1"/db/*; do test -d "$dir" && basename "$dir"; done''',root).splitlines()
+    paths=shell(CONTAINER,'''for dir in "$1"/db/*; do if test -d "$dir"; then basename "$dir"; fi; done''',root).splitlines()
     if len(paths)!=1 or not re.fullmatch(r'[a-f0-9]{16}',paths[0]):
         report['allocatedSlots']=len(paths)
         return
     base=root+'/db/'+paths[0]
-    raw=shell(CONTAINER,'''for f in "$1"/database-operations/*/logs/stderr.log "$1"/installation-operations/*/logs/stderr.log; do
+    files=shell(CONTAINER,'''for f in "$2"/qa-auth-*/phase.json; do test ! -f "$f" || cat "$f"; done''',root,base)
+    report['authObserverPhases']=re.findall(r'"phase": "([a-z0-9-]+)"',files)
+    raw=shell(CONTAINER,'''for f in "$1"/state/database-operations/*/logs/stderr.log "$1"/state/server-installation-processes/*/logs/stderr.log; do
          if test -f "$f"; then tail -c 5000 "$f"; fi
-     done''',base)
+     done''',root)
     matches=re.findall(r'Database setup failed \(([a-zA-Z0-9_:,;= -]{1,350})\)',raw)
     if matches:
         report['bootstrapDiagnostic']=matches[-1]
@@ -82,12 +84,16 @@ def exercise(report):
         rows=[line.removeprefix('ANDROID_DB_RESULT ') for line in result.stdout.splitlines() if line.startswith('ANDROID_DB_RESULT ')]
         if result.returncode or len(rows)!=1:
             report['exitCode']=result.returncode
+            report['appStack']=re.findall(r'^\s*at (io\.github\.russianranger\.esteria(?:\.[A-Za-z_$0-9]+)+)\(([A-Za-z0-9_]+\.java:\d+)\)',result.stderr,re.MULTILINE)[:30]
             report['exceptionClasses']=re.findall(r'^ANDROID_DB_EXCEPTION ([A-Za-z0-9_.]+)$',result.stderr,re.MULTILINE)
             failure_details(report)
             raise RuntimeError('signed database owner failed')
         item=json.loads(rows[0])
         checked(item['mode']==mode and item['closed'] and item['sameAuthenticatedInstance'] and
                 re.fullmatch(r'[a-f0-9-]{36}',item['instanceUuid']),'invalid signed SQL result')
+        auth=item['auth']
+        checked(auth['build']==12340 and all(auth[k] is True for k in ('sourceChallenge','ownedListener','srpAndRealmList','mysqlKeyMatched','authserverExitedCleanly')) and
+                auth['worldAddress']=='127.0.0.1:8085','incomplete authserver handshake')
         if mode=='warm':
             first=report['operations'][0]
             checked(first['instanceUuid']==item['instanceUuid'] and all(first[k]==item[k] for k in ('providerGeneration','programsGeneration','contentGeneration','slotId','promotionProof','setupReceipt')) and

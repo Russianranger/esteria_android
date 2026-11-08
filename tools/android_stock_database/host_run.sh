@@ -25,6 +25,8 @@ java -jar "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" verify --verbose 
 test "$(grep -c '^Signer #[0-9]* certificate SHA-256 digest:' "$work/signers")" = 1
 grep -qx 'Signer #1 certificate SHA-256 digest: 5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa' "$work/signers"
 bash tools/android_stock_shader/compile_driver.sh "$work/dex" "$work/input/driver.jar" database
+cp tools/android_stock_database/auth_phase.py tools/auth_protocol.py "$work/input/"
+chmod 644 "$work/input/auth_phase.py" "$work/input/auth_protocol.py"
 chmod 755 "$work/input"
 chmod 644 "$apk" "$work/input/driver.jar"
 redroid_start "$work"

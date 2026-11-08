@@ -4,6 +4,11 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.os.Looper;
 import io.github.russianranger.esteria.core.runtime.install.FreshServerInstallations;
+import io.github.russianranger.esteria.core.runtime.install.RuntimePackagePlan;
+import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
+import io.github.russianranger.esteria.core.runtime.process.ProotLaunch;
+import java.io.IOException;
+import java.util.Arrays;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeInstaller;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import java.nio.charset.StandardCharsets;
@@ -19,6 +24,39 @@ import org.json.JSONObject;
 /** Disposable fresh installed package. All SQL, native processes, receipts and leases belong to the signed APK. */
 public final class ConfirmDatabase {
     private static long elapsed(long start) { return (System.nanoTime()-start)/1_000_000; }
+
+    private static String auth(Context context,Path root,ServerRuntimeSetup server,ServerProgramsSetup programs,
+            FreshServerInstallations.Active active,ServerDatabaseService.Handle database,boolean cold) throws IOException {
+        Path work=active.directoryFor(root);
+        String mode=cold?"cold":"warm";
+        String generation=GuestHelperAssets.install(context,"server-session",GuestHelperAssets.directory(work,"qa-auth-helpers"),LocalServerSession.HELPERS);
+        Path observer=Files.createDirectory(work.resolve("qa-auth-"+mode));
+        for(String source:Arrays.asList("auth_phase.py","auth_protocol.py"))
+            Files.copy(new java.io.File("/esteria-qa/input/"+source).toPath(),observer.resolve(source));
+        Path processSession=Files.createDirectory(root.resolve("qa-auth-process-"+mode));
+        RuntimePackagePlan.RequiredFile pin=programs.packagePlan().required.get("bin/authserver");
+        if(pin==null || pin.elfMachine!=183) throw new IOException("Selected packaged ARM64 authserver required");
+        return database.withReadyLease(server.current(),(operation,version,uuid)->{
+            OwnedProcess child=ServerDatabaseService.installedRuntime(context,server).launch(work,processSession,
+                Arrays.asList("/usr/bin/python3","-B","-s","-E","/work/qa-auth-"+mode+"/auth_phase.py",generation,
+                    mode,operation,version,uuid,active.setupReceiptSha256,pin.sha256,Long.toString(pin.bytes)),
+                Arrays.asList(new ProotLaunch.Mount(programs.current(),ServerProgramsSetup.guestMount())));
+            try {
+                long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(3);
+                while(child.isAlive() && System.nanoTime()<deadline) {
+                    try {Thread.sleep(100);}
+                    catch(InterruptedException e) {Thread.currentThread().interrupt();throw new IOException("Auth observation interrupted",e);}
+                }
+                if(child.isAlive() || child.exitCode()!=0 || child.wasForced() || child.failure()!=null)
+                    throw new IOException("Signed PRoot auth owner failed");
+                Path result=observer.resolve("verified.json");
+                if(Files.size(result)>4096) throw new IOException("Unexpected auth observation size");
+                return new String(Files.readAllBytes(result),StandardCharsets.UTF_8);
+            } finally {
+                if(child.isAlive()) child.stop(Duration.ofSeconds(15));
+            }
+        });
+    }
 
     private static JSONObject run(Context context, Path root, boolean cold) throws Exception {
         Path data=root.resolve("qa-server-data-directory");
@@ -59,10 +97,14 @@ public final class ConfirmDatabase {
         System.out.println("ANDROID_DB_PHASE promoted-slot-selected "+prepared);
         ServerDatabaseService.Handle database=ServerDatabaseService.startActive(context,root,server,active);
         long ready;
+        String authReport;
+        long authenticated;
         try {
             ServerDatabaseService.awaitReady(database,System.nanoTime()+TimeUnit.MINUTES.toNanos(3),new AtomicBoolean(false));
             ready=elapsed(start);
             if(!active.mysqlUuid.equals(database.instanceUuid())) throw new IllegalStateException("Owned SQL service identity differs");
+            authReport=auth(context,root,server,programs,active,database,cold);
+            authenticated=elapsed(start);
         } finally {
             database.stop(Duration.ofSeconds(30));
         }
@@ -73,7 +115,7 @@ public final class ConfirmDatabase {
             .put("contentGeneration",sql.generation).put("providerCopiedBytes",copied)
             .put("version",server.expectedMysqlVersion()).put("providerMs",providers)
             .put("schemaSetupOrSelectionMs",prepared-providers).put("activeNativeStartupMs",ready-prepared)
-            .put("cleanShutdownMs",elapsed(start)-ready).put("sameAuthenticatedInstance",true).put("closed",true);
+            .put("auth",new JSONObject(authReport)).put("cleanShutdownMs",elapsed(start)-authenticated).put("sameAuthenticatedInstance",true).put("closed",true);
     }
 
     public static void main(String[] args) throws Exception {
