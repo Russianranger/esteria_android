@@ -39,9 +39,12 @@ def wine_details(report):
             for k,allowed in [('installed',DLLS),('processes',NAMES),('traceMarkers',PATTERNS)]:
                 row[k]=[v for v in sample[k] if v in allowed]
             row['commandExits']=[v for v in sample['commandExits'][:2] if v is None or type(v) is int]
-            row['waits']={pid:{'name':w['name'],'waits':[v for v in w['waits'] if re.fullmatch(
+            row['waits']={pid:{'name':w['name'],'appwizMono':w['appwizMono'] is True,
+                                'appwizGecko':w['appwizGecko'] is True,'waits':[v for v in w['waits'] if re.fullmatch(
                 r'(?:[0-9a-z_]{1,40}|sha256:[a-f0-9]{64})',v)]} for pid,w in sample['waits'].items()
-                if re.fullmatch(r'\d{1,8}',pid) and w['name'] in ('rundll32','wineboot')}
+                if re.fullmatch(r'\d{1,8}',pid) and w['name'] in ('rundll32','wineboot','control.exe')}
+            if sample['registration'] in ('mscoree.dll','mshtml.dll','appwiz.cpl'):
+                row['lastSelectedRegistration']=sample['registration']
             # These labels were safely mapped before they crossed the X11 process boundary.
             from tools.android_stock_database.wine_windows import LABELS
             allow=lambda v: isinstance(v,str) and (v in LABELS or re.fullmatch(r'sha256:[0-9a-f]{64}',v))
@@ -150,7 +153,7 @@ def exercise(report):
 
 if __name__=='__main__':
     report=dict(scope='signed Android 13 ARM64 production slot, stock SQL/updater/four schemas and owned MySQL, disjoint empty world-data directory for config path',phase='initial',
-                reconstructedGruntTarget=True,actualWorldSession=False,graphicalLogin=False,physicalThor=False)
+                diagnosticWineDllOverrides="winepulse.drv=;mscoree=",reconstructedGruntTarget=True,actualWorldSession=False,graphicalLogin=False,physicalThor=False)
     start=time.monotonic()
     try:
         exercise(report)

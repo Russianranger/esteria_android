@@ -16,7 +16,7 @@ out = work / mode
 out.mkdir(mode=0o700, exist_ok=False)
 start = time.monotonic()
 env = {**os.environ, 'DISPLAY': ':77', 'WINEPREFIX': '/work/home/.wine',
-       'WINEDLLOVERRIDES':'winepulse.drv=', 'WINEESYNC':'0', 'WINEFSYNC':'0',
+       'WINEDLLOVERRIDES':'winepulse.drv=;mscoree=', 'WINEESYNC':'0', 'WINEFSYNC':'0',
        'WINEDEBUG': '-all,err+all'}
 prefix = Path(env['WINEPREFIX'])
 wine = '/opt/wine/bin/wine'
