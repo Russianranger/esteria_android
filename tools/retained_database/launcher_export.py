@@ -8,15 +8,25 @@ import time
 import xml.etree.ElementTree as ET
 import zipfile
 
-from android_platform import CONTAINER, PACKAGE, android_tool, shell
+from android_platform import CONTAINER, PACKAGE, android_tool, platform_environment, shell
 
 
 def visible(match, seconds=45):
     deadline = time.monotonic() + seconds
     while time.monotonic() < deadline:
         try:
-            android_tool('uiautomator', 'dump', '/data/local/tmp/realm-ui.xml')
-            root = ET.fromstring(shell('cat', '/data/local/tmp/realm-ui.xml'))
+            # Android's uiautomator wrapper kills its own process group on some Redroid builds.
+            # Accept only a fresh, fully parsed hierarchy written by this invocation as the shell UID.
+            target='/data/local/tmp/esteria-qa-ui-'+str(time.monotonic_ns())+'.xml'
+            command=['docker','exec','--user','2000:2000',CONTAINER,'/system/bin/env','-i',
+                     *platform_environment(),'uiautomator','dump',target]
+            result=subprocess.run(command,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,timeout=20)
+            if subprocess.run(['docker','exec',CONTAINER,'test','-s',target]).returncode:
+                raise RuntimeError(f'Android shell produced no hierarchy (exit {result.returncode}): {result.stdout[-600:]}')
+            try:
+                root=ET.fromstring(shell('cat',target))
+            finally:
+                shell('rm','-f',target)
             for node in root.iter('node'):
                 if match(node.attrib):
                     return node.attrib
@@ -41,9 +51,12 @@ def main():
     android_tool('input','keyevent','KEYCODE_WAKEUP')
     shell('wm','dismiss-keyguard')
     shell('cmd','activity','start-activity','-W','-n',PACKAGE+'/io.github.russianranger.esteria.MainActivity')
-    label('Start local game')
+    time.sleep(1)
+    resumed=shell('dumpsys','activity','activities')
+    assert any(PACKAGE in line and ('mResumedActivity' in line or 'topResumedActivity' in line) for line in resumed.splitlines())
     with Path('evidence/realm-launcher.png').open('wb') as output:
-        subprocess.run(['docker', 'exec', CONTAINER, 'screencap', '-p'], stdout=output, check=True, timeout=20)
+        subprocess.run(['docker','exec',CONTAINER,'screencap','-p'], stdout=output, check=True, timeout=20)
+    label('Start local game')
     tap(label('Tools'))
     tap(label('Export support bundle'))
     # Accept the generated name in Android's standard DocumentsUI. A fresh Redroid user defaults to Downloads.

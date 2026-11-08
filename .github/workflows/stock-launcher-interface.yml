@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [non-custom]
-    paths: [.github/workflows/stock-launcher-interface.yml]
+    paths: [.github/workflows/stock-launcher-interface.yml, tools/retained_database/launcher_export.py]
 permissions:
   contents: read
   actions: read
