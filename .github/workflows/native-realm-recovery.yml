@@ -15,11 +15,22 @@ jobs:
         with:
           persist-credentials: false
       - name: Verify and extract the shipped ARM64 runtime, programs, stock content and helper identities
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           umask 077
           GRUNT_QA=$(mktemp -d "$RUNNER_TEMP/stock-grunt-XXXXXXXX")
           echo "GRUNT_QA=$GRUNT_QA" >> "$GITHUB_ENV"
-          python3 -m tools.qualify_packaged_server_auth stage --readback runtime/evidence/non-custom-v19-public-apk-readback.json --output "$GRUNT_QA/packaged-server"
+          apk="$GRUNT_QA/published.apk"
+          if ! curl --proto '=https' --fail --silent --show-error --location --retry 3 --retry-all-errors \
+              --connect-timeout 20 --max-time 120 \
+              "https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.19/Esteria-Stock-3.3.5a-arm64.apk" -o "$apk"; then
+            # Public asset ID belongs to that exact signed release. gh resolves its temporary URL privately.
+            gh api -H 'Accept: application/octet-stream' repos/Russianranger/esteria_android/releases/assets/723482619 > "$apk"
+          fi
+          test "$(stat -c %s "$apk")" = 336899353
+          echo "c0d251847496c64170bb31d534a925afd1d8e7f92c21687e0e1cbf82c056e6fa  $apk" | sha256sum -c
+          python3 -m tools.qualify_packaged_server_auth stage --apk "$apk" --readback runtime/evidence/non-custom-v19-public-apk-readback.json --output "$GRUNT_QA/packaged-server"
           docker import --platform linux/arm64 "$GRUNT_QA/packaged-server/server-runtime.tar.gz" esteria-packaged-server:qualified
       - name: Verify the selected reconstructed executable and exact Wine provider
         run: |
