@@ -1,0 +1,53 @@
+{
+  "formatVersion": 1,
+  "scope": "In-place signed v16 to public signed v17 on a disposable native Android 13 ARM64 offline container. Production runtime classes and Wine launch settings came from each installed APK.",
+  "package": "io.github.russianranger.esteria.stock",
+  "updatedVersionCode": 17,
+  "currentProducer": "2149ae6001b68d896a1fef61f905aeb5fb3115c6",
+  "publicReleaseAssetId": 722852565,
+  "publicApkSha256": "dc68c5ced8f0f4a155d86135f70a8522766e483957df06e0ce5544d488ac2ace",
+  "previousApkSha256": "de9d108a725aeb7a8eea1041bd1a72eb7a5acde811595cf71c886f6937f74ab4",
+  "sameSigningCertificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+  "qaCommit": "63456631928bfe3c358246b6dffe5d29b8cd2a10",
+  "actionsRun": 42446197866,
+  "ownerArtifactId": 13603767790,
+  "ownerArtifactSha256": "a980f4855c783d6d805a0643a15c29b7b4ccacbeab320bffe99a408771bd8d1c",
+  "externalObserverJarSha256": "5491a2a4e438459a0af376ba8e786a7cf202c511406655bcfdc4ec548347ba46",
+  "externalRuntimeClassDefinitions": 0,
+  "packageUidBeforeAndAfter": 10077,
+  "offlineContainer": true,
+  "selinux": "Disabled",
+  "fingerprint": "redroid/redroid_arm64_only/redroid_arm64_only:13/TQ3A.230805.001.S1/eng.frank.20240527.134411:userdebug/test-keys",
+  "elapsedSeconds": 124.007,
+  "launcherStarted": true,
+  "preservedOldPrefixPrePostPackageUpdateDigest": "c896d3ce776e021f4094749f45cdabe7d4435ddc1a8524f00daea66c10b30fc1",
+  "legacyInstalledWineModalObserved": true,
+  "coldReentrySelection": "INCOMPLETE",
+  "disposableNewPrefixInodeDistinct": true,
+  "stoppedRealWineUpdaterOnCancel": true,
+  "competingWorkspaceLockExcluded": true,
+  "updatePhases": [
+    "client-prefix-display",
+    "client-prefix-wineboot",
+    "client-prefix-services",
+    "client-prefix-verify"
+  ],
+  "interruptionAfterWineSideEffectsBeforeRetiringPendingIntent": true,
+  "freshOwnerFinalizedWithoutReinvokingWine": true,
+  "warmNamedRepairStartedProcesses": false,
+  "warmWindowsRegistryQueries": {
+    "postRegistrationDirectX": {
+      "returnCode": 0,
+      "expectedValuePresent": true
+    },
+    "postRegistrationAeDebug": {
+      "returnCode": 0,
+      "expectedValuePresent": true
+    }
+  },
+  "originalTreeDigestVerifiedBeforeAndAfterRepair": true,
+  "originalUserStateMarkerPreserved": true,
+  "allPackageUidChildrenReaped": true,
+  "physicalThor": false,
+  "worldOrGameplayTest": false
+}

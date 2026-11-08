@@ -1,0 +1,119 @@
+{
+  "formatVersion": 1,
+  "scope": "Signed v16 to v17 application update, persisted stock database and offline local reconstructed Grunt",
+  "package": "io.github.russianranger.esteria.stock",
+  "release": "non-custom-v0.1.0-non-custom.17",
+  "sourceCommit": "2149ae6001b68d896a1fef61f905aeb5fb3115c6",
+  "bytes": 336899353,
+  "apkSha256": "dc68c5ced8f0f4a155d86135f70a8522766e483957df06e0ce5544d488ac2ace",
+  "priorApkSha256": "de9d108a725aeb7a8eea1041bd1a72eb7a5acde811595cf71c886f6937f74ab4",
+  "signerSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+  "workflow": "https://github.com/Russianranger/esteria_android/actions/runs/42446183340",
+  "workflowCommit": "d228a34fcccc5ebe96992cf230275caeec9e978c",
+  "workflowJob": 128625488528,
+  "githubArtifactId": 13603552604,
+  "artifactZipSha256": "8f9e72d76488fa84e1f02f4a67c5a3d66b0f8dce846ff419a1e97271ebdc92be",
+  "executionEnvironment": {
+    "host": "GitHub hosted native Linux ARM64",
+    "android": "Redroid 13, network=none, real app UID",
+    "selinux": "Disabled",
+    "physicalThor": false
+  },
+  "update": {
+    "initialAppVersion": 16,
+    "finalAppVersion": 17,
+    "installation": "Android pm install -r, matching certificate",
+    "unchangedPackageUidAndFirstInstallTime": true,
+    "privatePersistenceMarkerMatched": true,
+    "configurationAndAccountIntentMatched": true,
+    "allFourStockSchemasPreparedUnderV16": true,
+    "databaseUuidSlotSetupProofAndProviderGenerationsReusedUnderV17": true,
+    "originalSchemaSetupMs": 415506,
+    "initialDiskBytesCopiedForServerProviders": 1131934277
+  },
+  "sourceRevision": "fa3e74b7f332fef0f212e954a0de18f685ead8bd",
+  "clientSha256": "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317",
+  "wineArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+  "peInvocation": "WowClient64.exe --auth-check --local-offline, direct first Windows process on fresh prefix, repeat on retained prefix",
+  "firstUse": {
+    "finalSystem32Entries": 790,
+    "monoInstallerWindowObserved": false,
+    "internalWinebootTimeoutObserved": false
+  },
+  "wineSocketPathObservations": [
+    {
+      "mode": "cold",
+      "temporaryShape": "/data/user/0/io.github.russianranger.esteria.stock/files/s/<16hex>/client/tmp",
+      "tempSeen": true,
+      "canonicalTemporaryUtf8Bytes": 86,
+      "candidateSunPathUtf8Bytes": 119,
+      "observedSocketSunPathUtf8Bytes": -1,
+      "observedProotMappedSocketUtf8Bytes": 104
+    },
+    {
+      "mode": "warm",
+      "temporaryShape": "/data/user/0/io.github.russianranger.esteria.stock/files/s/<16hex>/client/tmp",
+      "tempSeen": true,
+      "canonicalTemporaryUtf8Bytes": 86,
+      "candidateSunPathUtf8Bytes": 119,
+      "observedSocketSunPathUtf8Bytes": -1,
+      "observedProotMappedSocketUtf8Bytes": 104
+    }
+  ],
+  "operations": [
+    {
+      "mode": "cold",
+      "serverProviderCopiedBytes": 0,
+      "nativeMysqlStartupMs": 1905,
+      "verifiedDatabaseScope": "8.0.46-0ubuntu0.24.04.4",
+      "schemaSelectionMs": 259,
+      "serverProviderMs": 233,
+      "nativeAuthAndObserverMs": 30742,
+      "databaseCleanShutdownMs": 940,
+      "signedPrefixBefore": "ABSENT",
+      "signedPrefixAfter": "NO_REPAIR",
+      "reconstructedClientReceiptSha256": "d6b5795c51b2a64a3b21baa0f6613a03336023026514d7fb9f8a2b410c9869a8",
+      "actualReconstructedGruntCallbacks": 13,
+      "verifiedNonceAndPrivate40ByteSqlSessionKey": true,
+      "realm": "127.0.0.1:8085",
+      "authAndDatabaseStoppedCleanly": true
+    },
+    {
+      "mode": "warm",
+      "serverProviderCopiedBytes": 0,
+      "nativeMysqlStartupMs": 1906,
+      "verifiedDatabaseScope": "8.0.46-0ubuntu0.24.04.4",
+      "schemaSelectionMs": 266,
+      "serverProviderMs": 235,
+      "nativeAuthAndObserverMs": 9253,
+      "databaseCleanShutdownMs": 1445,
+      "signedPrefixBefore": "NO_REPAIR",
+      "signedPrefixAfter": "NO_REPAIR",
+      "reconstructedClientReceiptSha256": "ea5c0fa8cdc3d80f9c1cf94b55413fbcf0eb0e4d40cb08653d7bfae26b78d4e0",
+      "actualReconstructedGruntCallbacks": 13,
+      "verifiedNonceAndPrivate40ByteSqlSessionKey": true,
+      "realm": "127.0.0.1:8085",
+      "authAndDatabaseStoppedCleanly": true
+    }
+  ],
+  "supplementalWorld": {
+    "selection": "Separate empty geometry diagnostic",
+    "phase": "starting-area-map-required",
+    "actualDatabasePools": [
+      "acore_auth",
+      "acore_characters",
+      "acore_playerbots",
+      "acore_world"
+    ],
+    "originalChildReaped": true,
+    "worldReady": false
+  },
+  "qualification": {
+    "commonMain": false,
+    "graphicalLogin": false,
+    "gameAssetsMounted": false,
+    "characterSaveMeasured": false,
+    "physicalThor": false,
+    "normalProductionGameSession": false
+  }
+}
