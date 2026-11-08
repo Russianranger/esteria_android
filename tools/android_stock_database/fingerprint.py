@@ -32,4 +32,9 @@ def save(prefix,out):
     old=json.loads(trial.read_text());diff['added']={};diff['removed']=sorted(old.keys()-full.keys());diff['changedFileCount']=sum(1 for k,v in old.items() if k in full and v!=full[k])
     for name in sorted(full.keys()-old.keys()):
         file=WINEDLL/name; diff['added'][name]={**full[name], 'winePackageBytes':file.stat().st_size if file.is_file() else None,'winePackageSha256':digest(file) if file.is_file() else None}
- return {'registryClasses':rows,'wineInfSha256':digest(INF),'selectedWineInfMtime':int(INF.stat().st_mtime),'system32Count':len(full),'deltaFromInterrupt':diff}
+ marker=(prefix/'.update-timestamp').read_bytes();assert re.fullmatch(rb'\d{1,12}\n',marker)
+ images={}
+ for name in ('ntdll.dll','wineboot.exe','kernel32.dll'):
+    installed=full[name];from_wine=WINEDLL/name
+    images[name]={'prefixSha256':installed['sha256'],'prefixBytes':installed['bytes'],'winePackageSha256':digest(from_wine),'winePackageBytes':from_wine.stat().st_size}
+ return {'prefixWineIdentities':images,'timestampAscii':marker.decode(),'timestampBytes':len(marker),'timestampHex':marker.hex(),'registryClasses':rows,'wineInfSha256':digest(INF),'selectedWineInfMtime':int(INF.stat().st_mtime),'system32Count':len(full),'deltaFromInterrupt':diff}
