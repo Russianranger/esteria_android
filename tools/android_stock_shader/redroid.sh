@@ -21,6 +21,8 @@ redroid_start() {
   docker pull --platform linux/arm64 "$redroid_image" > "$work/android-image-pull.log"
   test "$(docker image inspect -f '{{.Id}}' "$redroid_image")" = "$redroid_config"
   sudo modprobe binder_linux
+  sudo modprobe xfrm_user || true
+  sudo modprobe nfnetlink_log || true
   sudo mount -t binder binder "$work/binder"
   sudo python3 - "$work/binder" <<'PY'
 import array, fcntl, os, stat, sys
@@ -44,9 +46,9 @@ PY
   boot_started=$(date -u '+%Y-%m-%d %H:%M:%S')
   docker run -d --name "$redroid_name" --pull=never --platform linux/arm64 \
     --privileged --network none --cgroupns=private \
-    --device "$work/binder/binder:/dev/binder" \
-    --device "$work/binder/hwbinder:/dev/hwbinder" \
-    --device "$work/binder/vndbinder:/dev/vndbinder" \
+    --mount "type=bind,source=$work/binder/binder,target=/dev/binder" \
+    --mount "type=bind,source=$work/binder/hwbinder,target=/dev/hwbinder" \
+    --mount "type=bind,source=$work/binder/vndbinder,target=/dev/vndbinder" \
     --mount "type=bind,source=$work/data,target=/data" \
     --mount "type=bind,source=$work/input,target=/esteria-qa/input,readonly" \
     --mount "type=bind,source=$work/import-metadata,target=/esteria-qa/import-metadata,readonly" \
