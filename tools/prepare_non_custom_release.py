@@ -90,7 +90,11 @@ def stage(args):
                  '**Repair local component → Database setup**, then start the local game again.\n'
                  'If a stage fails, wait for cleanup, tap **Export support bundle**, choose a\n'
                  'destination and tap **Save**. Send the whole ZIP before retrying.')
-    if signed['versionCode'] == 20:
+    if signed['versionCode'] == 21:
+        setup = ('Install over Esteria Stock. On the retained v19 Thor installation, keep enUS and Balanced. '
+                 'Choose **Repair local component → Database setup**, wait for completion, then **Start local game**. '
+                 'If a phase fails, wait for cleanup and export the complete support ZIP before retrying.')
+    elif signed['versionCode'] == 20:
         setup = ('Install over Esteria Stock and keep your import, selected locale, databases and saves. '
                  'From a prepared v19 installation, tap **Start local game**. '
                  'When updating from before v19, use **Repair local component → Client runtime** once. '

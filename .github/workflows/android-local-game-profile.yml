@@ -733,8 +733,11 @@ jobs:
           trap cleanup EXIT
           redroid_start "$work"
           device() { docker exec "$redroid_name" "$@"; }
-          device pm install -t /esteria-qa/input/app.apk | grep -Fx Success
-          device pm install -t /esteria-qa/input/tests.apk | grep -Fx Success
+          for apk in app tests; do
+            device cp "/esteria-qa/input/$apk.apk" "/data/local/tmp/$apk.apk"
+            device chmod 644 "/data/local/tmp/$apk.apk"
+            device pm install -t --user 0 "/data/local/tmp/$apk.apk" | grep -Fx Success
+          done
           pkg=io.github.russianranger.esteria.stock
           for phase in seed repair cold cold cold; do
             device am force-stop "$pkg"

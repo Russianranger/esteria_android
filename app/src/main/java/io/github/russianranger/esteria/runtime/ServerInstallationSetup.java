@@ -38,7 +38,7 @@ public final class ServerInstallationSetup {
     private ServerInstallationSetup(){ }
     private static final String VERIFIED_SCOPE="owned-server-installation-four-schemas-verified";
     private static final String COMPLETE_SCOPE="owned-server-installation-four-schemas-cleanly-stopped";
-    public enum State { ALLOCATED,PREPARING,STAGED_PENDING_PLAYERBOTS,VERIFYING_PLAYERBOTS,SCHEMAS_VERIFIED,PROMOTED,FAILED,CLOSED }
+    public enum State { ALLOCATED,PREPARING,STAGED_PENDING_PLAYERBOTS,VERIFYING_PLAYERBOTS,SCHEMAS_VERIFIED,PROMOTED,CANCELLED,FAILED,CLOSED }
     public static final class Result {
         public final String instanceUuid,sourceLockSha256,configurationGeneration;
         public final Path privateProcessLogs;
@@ -258,7 +258,8 @@ public final class ServerInstallationSetup {
                     result=database.withReadyLease(runtime.current(),(serviceOperation,version,uuid)->
                         runGuest(this,context,root,inputs,data,database,serviceOperation,version,uuid,progress,cancelled,false));
                     state=State.STAGED_PENDING_PLAYERBOTS;return result;
-                } catch(IOException|RuntimeException error){state=State.FAILED;throw error;}
+                } catch(RuntimeWork.CancelledException cancelledWork){state=State.CANCELLED;throw cancelledWork;}
+                catch(IOException|RuntimeException error){state=State.FAILED;throw error;}
             });
         }
         /** Runs the fourth-schema phase only when the sealed immutable provider
@@ -276,7 +277,8 @@ public final class ServerInstallationSetup {
                     result=database.withReadyLease(runtime.current(),(serviceOperation,version,uuid)->
                         runGuest(this,context,root,inputs,data,database,serviceOperation,version,uuid,progress,cancelled,true));
                     state=State.SCHEMAS_VERIFIED;return result;
-                } catch(IOException|RuntimeException error){state=State.FAILED;throw error;}
+                } catch(RuntimeWork.CancelledException cancelledWork){state=State.CANCELLED;throw cancelledWork;}
+                catch(IOException|RuntimeException error){state=State.FAILED;throw error;}
             });
         }
         /** Stops the retained engine, checks its real acknowledgment, and only
