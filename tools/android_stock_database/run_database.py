@@ -7,7 +7,7 @@ import subprocess
 import sys
 import time
 
-from tools.android_stock_shader.package_lifecycle import identity, check_empty
+from tools.android_stock_shader.package_lifecycle import identity, check_empty, exercise as package_lifecycle
 from tools.android_stock_shader.run_owner import BOOT_KEYS, PACKAGE, checked, shell
 
 CONTAINER='esteria-android-qa'
@@ -101,8 +101,24 @@ def failure_details(report):
 
 
 
-def exercise(report):
-    package_uid=identity(CONTAINER)
+def exercise(report,seed):
+    if seed:
+        checked(not shell(CONTAINER,'pm list packages --user 0 "$1"',PACKAGE).strip(),'fresh PM store required')
+        result=shell(CONTAINER,'''apk=/data/local/tmp/esteria-prior-stock-qa.apk
+            trap 'rm -f "$apk"' EXIT
+            test ! -e "$apk"
+            cp /esteria-qa/input/stock-v16.apk "$apk"
+            chmod 644 "$apk"
+            pm install --user 0 "$apk"
+        ''',timeout=360)
+        checked('Success' in result.splitlines(),'v16 installation failed')
+    else:
+        report['packageUpdate']={}
+        package_lifecycle(CONTAINER,report['packageUpdate'],False,replace_from=16)
+        original=json.loads(Path(sys.argv[1]).with_name('v16-seed.json').read_bytes())
+        checked(original['phase']=='complete' and len(original['operations'])==1,'v16 seed missing')
+        baseline=original['operations'][0]
+    package_uid=identity(CONTAINER,16 if seed else 17)
     apk=shell(CONTAINER,'pm path "$1"',PACKAGE).strip()
     match=re.fullmatch(r'package:(/data/app/[A-Za-z0-9_./=+~-]+/base\.apk)',apk)
     checked(match,'single installed APK required')
@@ -114,7 +130,7 @@ def exercise(report):
     report['operations']=[]
     report.update(packageUid=package_uid,selinux=shell(CONTAINER,'getenforce').strip(),
                   fingerprint=shell(CONTAINER,'getprop ro.build.fingerprint').strip())
-    for mode in ('cold','warm'):
+    for mode in (('seed16',) if seed else ('cold','warm')):
         report['phase']=mode
         cmd=['docker','exec','--user',f'{package_uid}:{package_uid}',CONTAINER,
              '/system/bin/env','-i',*boot,'CLASSPATH=/esteria-qa/input/driver.jar:'+apk,
@@ -123,6 +139,16 @@ def exercise(report):
         result=subprocess.run(cmd,capture_output=True,text=True,timeout=50*60)
         phases=[line for line in result.stdout.splitlines() if re.fullmatch(r'ANDROID_DB_PHASE [a-z0-9_-]+ \d+',line)]
         report['lastPhases']=phases
+        socket_rows=re.findall(r'^ANDROID_WINE_SOCKET (cold|warm) '
+                               r'(/data/(?:data|user/0)/io[.]github[.]russianranger[.]esteria[.]stock/files/s/<16hex>/client/tmp) '
+                               r'(true|false) (-?[0-9]{1,3}) (-?[0-9]{1,3}) (-?[0-9]{1,3}) (-?[0-9]{1,3})$',result.stdout,re.MULTILINE)
+        if socket_rows:
+            m,shape,observed,temp,candidate,actual,mapped=socket_rows[-1]
+            checked(m==mode,'Wine endpoint observation crossed operations')
+            report.setdefault('signedWineSocketLengths',[]).append(dict(mode=mode,temporaryShape=shape,
+                tempSeen=observed=='true',canonicalTemporaryUtf8Bytes=int(temp),
+                candidateSunPathUtf8Bytes=int(candidate),observedSocketSunPathUtf8Bytes=int(actual),
+                observedProotMappedSocketUtf8Bytes=int(mapped)))
         sizes=re.findall(r'^ANDROID_DB_SOCKET_BYTES (\d+)$',result.stdout,re.MULTILINE)
         if sizes: report['coldPhysicalBootstrapSocketBytes']=int(sizes[-1])
         rows=[line.removeprefix('ANDROID_DB_RESULT ') for line in result.stdout.splitlines() if line.startswith('ANDROID_DB_RESULT ')]
@@ -135,6 +161,20 @@ def exercise(report):
         item=json.loads(rows[0])
         checked(item['mode']==mode and item['closed'] and item['sameAuthenticatedInstance'] and
                 re.fullmatch(r'[a-f0-9-]{36}',item['instanceUuid']),'invalid signed SQL result')
+        if seed:
+            checked(item['versionCode']==16 and item['providerCopiedBytes']>0 and not item['auth'],
+                    'v16 SQL seed failed')
+            check_empty(CONTAINER,package_uid)
+            report['operations'].append(item)
+            continue
+        unchanged=('appUid','firstInstallTime','instanceUuid','slotId','promotionProof','setupReceipt',
+                   'providerGeneration','programsGeneration','contentGeneration')
+        checked(item['versionCode']==17 and item['markerConfigAccountPersisted'] and item['providerCopiedBytes']==0
+                and all(item[k]==baseline[k] for k in unchanged),'in-place update failed to retain sources, account or SQL')
+        report.setdefault('signedPrefixSelections',[]).append(dict(mode=mode,before=item['stockPrefixBefore'],
+                                                                   after=item['stockPrefixAfter']))
+        checked(item['stockPrefixBefore']==('ABSENT' if mode=='cold' else 'NO_REPAIR') and
+                item['stockPrefixAfter']=='NO_REPAIR','installed stock Wine prefix classifier disagrees with the PE lifecycle')
         auth=item['auth']
         checked(auth['build']==12340 and all(auth[k] is True for k in ('sourceChallenge','ownedListener','srpAndRealmList','mysqlKeyMatched','authserverExitedCleanly')) and
                 auth['worldAddress']=='127.0.0.1:8085','incomplete authserver handshake')
@@ -147,16 +187,16 @@ def exercise(report):
                     item['providerCopiedBytes']==0,'warm persisted instance or provider changed')
         check_empty(CONTAINER,package_uid)
         report['operations'].append(item)
-    wine_details(report)
+    if not seed: wine_details(report)
     report['phase']='complete'
 
 
 if __name__=='__main__':
     report=dict(scope='signed Android 13 ARM64 production slot, stock SQL/updater/four schemas and owned MySQL, disjoint empty world-data directory for config path',phase='initial',
-                diagnosticWineDllOverrides="winepulse.drv=;mscoree=",reconstructedGruntTarget=True,actualWorldSession=False,graphicalLogin=False,physicalThor=False)
+                installedProductionClientEnvironment=True,reconstructedGruntTarget=True,actualWorldSession=False,graphicalLogin=False,physicalThor=False)
     start=time.monotonic()
     try:
-        exercise(report)
+        exercise(report,len(sys.argv)>2 and sys.argv[2]=="seed16")
     except Exception as error:
         report['errorType']=type(error).__name__
         if isinstance(error,RuntimeError):report['reason']=str(error)

@@ -9,8 +9,8 @@ import time
 
 PACKAGE = 'io.github.russianranger.esteria.stock'
 ACTIVITY = 'io.github.russianranger.esteria.MainActivity'
-NAME = '0.1.0-non-custom.16'
-SCOPE = 'disposable Android 13 signed v16 package lifecycle'
+NAME = '0.1.0-non-custom.17'
+SCOPE = 'disposable Android 13 signed v17 package lifecycle'
 
 
 def require(value, message):
@@ -25,10 +25,10 @@ def shell(container, script, *args, timeout=60):
     return call.stdout
 
 
-def identity(container):
+def identity(container, version=17):
     result = shell(container,'dumpsys package "$1"',PACKAGE)
-    require(re.search(r'^\s*versionCode=16\b',result,re.MULTILINE) and
-            re.search(r'^\s*versionName='+re.escape(NAME)+r'\s*$',result,re.MULTILINE),
+    require(re.search(rf'^\s*versionCode={version}\b',result,re.MULTILINE) and
+            re.search(r'^\s*versionName='+re.escape("0.1.0-non-custom."+str(version))+r'\s*$',result,re.MULTILINE),
             'installed package version differs')
     package_list = shell(container,'pm list packages --user 0 -U "$1"',PACKAGE)
     match = re.search(r'^package:'+re.escape(PACKAGE)+r' uid:(\d+)\s*$',package_list,re.MULTILINE)
@@ -59,7 +59,7 @@ def check_empty(container, uid):
         time.sleep(.5)
 
 
-def exercise(container, report, check_only):
+def exercise(container, report, check_only, replace_from=None):
     inspection=json.loads(subprocess.check_output(['docker','inspect',container],text=True))[0]
     require(inspection['State']['Running'] and inspection['HostConfig']['NetworkMode']=='none',
             'disposable networkless Android container required')
@@ -73,7 +73,12 @@ def exercise(container, report, check_only):
         return
     report.update(scope=SCOPE,package=PACKAGE,phase='package-installation',physicalThor=False,
                   gameplayQualified=False)
-    require(shell(container,'pm list packages --user 0 "$1"',PACKAGE).strip()=='','fresh runtime required')
+    if replace_from is None:
+        require(shell(container,'pm list packages --user 0 "$1"',PACKAGE).strip()=='','fresh runtime required')
+    else:
+        require(replace_from==16,'unexpected predecessor')
+        previous=identity(container,16)
+        check_empty(container,previous)
     output = shell(container,'''
         apk=/data/local/tmp/esteria-signed-stock-qa.apk
         test ! -e "$apk"
@@ -84,7 +89,8 @@ def exercise(container, report, check_only):
         ''',timeout=360)
     require('Success' in output.splitlines(),'package installation did not succeed')
     uid=identity(container)
-    report.update(versionCode=16,versionName=NAME,uid=uid,phase='launcher')
+    if replace_from is not None: require(uid==previous,'UID changed on replacement')
+    report.update(versionCode=17,versionName=NAME,uid=uid,phase='launcher')
     try:
         component=PACKAGE+'/'+ACTIVITY
         result = shell(container,'am start -W --user 0 -n "$1"',component,timeout=120)

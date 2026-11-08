@@ -15,9 +15,11 @@ os.umask(0o077)
 out = work / mode
 out.mkdir(mode=0o700, exist_ok=False)
 start = time.monotonic()
-env = {**os.environ, 'DISPLAY': ':77', 'WINEPREFIX': '/work/home/.wine',
-       'WINEDLLOVERRIDES':'winepulse.drv=;mscoree=', 'WINEESYNC':'0', 'WINEFSYNC':'0',
-       'WINEDEBUG': '-all,err+all'}
+env = {**os.environ, 'WINEPREFIX':'/work/home/.wine','WINEDEBUG':'-all,err+all'}
+# These values must arrive via the installed Java class, never assigned in the guest.
+assert env.get('WINEDLLOVERRIDES')=='winepulse.drv=;mscoree='
+assert env.get('WINEESYNC')=='0' and env.get('WINEFSYNC')=='0'
+assert env.get('DISPLAY')==':77' and env.get('XAUTHORITY')=='/session/Xauthority'
 prefix = Path(env['WINEPREFIX'])
 wine = '/opt/wine/bin/wine'
 server = '/opt/wine/bin/wineserver'
@@ -54,7 +56,7 @@ def run():
     status('display')
     with (out/'display.private.log').open('xb') as log:
         x = subprocess.Popen(['/usr/bin/Xtigervnc',env['DISPLAY'],'-geometry','1920x1080','-depth','24',
-                              '-rfbport','-1','-SecurityTypes','None','-nolisten','tcp','-ac'],
+                              '-rfbport','-1','-SecurityTypes','None','-nolisten','tcp','-auth',env['XAUTHORITY'],'-noreset'],
                              env=env,stdout=log,stderr=subprocess.STDOUT)
         try:
             deadline = time.monotonic()+25

@@ -16,14 +16,24 @@ close() {
 }
 trap close EXIT
 apk="$work/input/stock.apk"
+# Final stock producer 2149ae6001b68d896a1fef61f905aeb5fb3115c6, verified release signing identity.
 repo_url='https://github.com/Russianranger/esteria_android/releases/download'
 curl --fail --location --silent --show-error --retry 3 \
-  "$repo_url/non-custom-v0.1.0-non-custom.16/Esteria-Stock-3.3.5a-arm64.apk" -o "$apk"
-test "$(stat -c %s "$apk")" = 336887065
-echo "de9d108a725aeb7a8eea1041bd1a72eb7a5acde811595cf71c886f6937f74ab4  $apk" | sha256sum -c
+  "$repo_url/non-custom-v0.1.0-non-custom.17/Esteria-Stock-3.3.5a-arm64.apk" -o "$apk"
+test "$(stat -c %s "$apk")" = 336899353
+echo "dc68c5ced8f0f4a155d86135f70a8522766e483957df06e0ce5544d488ac2ace  $apk" | sha256sum -c
 java -jar "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" verify --verbose --print-certs "$apk" > "$work/signers"
 test "$(grep -c '^Signer #[0-9]* certificate SHA-256 digest:' "$work/signers")" = 1
 grep -qx 'Signer #1 certificate SHA-256 digest: 5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa' "$work/signers"
+previous="$work/input/stock-v16.apk"
+curl --fail --location --silent --show-error --retry 3 \
+  "$repo_url/non-custom-v0.1.0-non-custom.16/Esteria-Stock-3.3.5a-arm64.apk" -o "$previous"
+test "$(stat -c %s "$previous")" = 336887065
+echo "de9d108a725aeb7a8eea1041bd1a72eb7a5acde811595cf71c886f6937f74ab4  $previous" | sha256sum -c
+java -jar "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" verify --verbose --print-certs "$previous" > "$work/previous-signers"
+diff -u <(grep '^Signer #[0-9]* certificate SHA-256 digest:' "$work/signers") \
+        <(grep '^Signer #[0-9]* certificate SHA-256 digest:' "$work/previous-signers")
+chmod 0444 "$previous"
 unzip -p "$apk" assets/runtime-sources.lock.json > "$work/runtime.json"
 diff -u <(jq -cS '.packages["wine-arm64"].archive' runtime/runtime-sources.lock.json) \
         <(jq -cS '.packages["wine-arm64"].archive' "$work/runtime.json")
@@ -39,5 +49,5 @@ chmod 0444 "$work/input/"*.py
 chmod 755 "$work/input"
 chmod 644 "$apk" "$work/input/driver.jar"
 redroid_start "$work"
-python3 tools/android_stock_shader/package_lifecycle.py --container "$redroid_name" --report "$out/package.json"
+python3 -m tools.android_stock_database.run_database "$out/v16-seed.json" seed16
 python3 -m tools.android_stock_database.run_database "$out/owner.json"

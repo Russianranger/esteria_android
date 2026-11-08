@@ -20,7 +20,7 @@ PATTERNS = {
     'bootEventTimedOut':b'boot event wait timed out','rpcssFailed':b'failed to open rpcss',
     'deviceFailed':b'winedevice1 failed to start','monoInstaller':b'wine mono installer',
     'geckoInstaller':b'wine gecko installer','socketNameTooLong':b'file name too long',
-    'socketPermission':b'permission denied','mapProtection':b'change protection',
+    'socketPermission':b'permission denied','wineserverBindInvalidArgument':b'wineserver: bind: invalid argument','mapProtection':b'change protection',
     'appwizGecko':b'install_gecko','appwizMono':b'install_mono',
     'setupCopyFile':b'setup_install_file','ntMapViewFailure':b'ntmapviewofsection failed',
 }
