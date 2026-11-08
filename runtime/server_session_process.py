@@ -6,12 +6,16 @@ replays SQL or treats an open TCP port as owned server readiness.
 """
 from __future__ import annotations
 
+import ctypes
+import errno
 import os
+import platform
 from pathlib import Path
 import re
 import select
 import secrets
 import socket
+import stat
 import struct
 import subprocess
 import threading
@@ -40,6 +44,101 @@ def _read(path, maximum):
     return raw
 
 
+def _socket_fds(root):
+    sockets = {}
+    for count, descriptor in enumerate((root / 'fd').iterdir(), 1):
+        require(count <= 4096, 'Owned child descriptor count exceeds bound')
+        try:
+            target = os.readlink(descriptor)
+        except FileNotFoundError:
+            continue
+        matched = re.fullmatch(r'socket:\[([0-9]+)\]', target)
+        if matched:
+            sockets[int(descriptor.name)] = int(matched[1])
+    return sockets
+
+
+def _kernel_result(result, action):
+    if result < 0:
+        raise OSError(ctypes.get_errno(), action)
+    return result
+
+
+def _duplicate_fd(libc, pidfd, remote):
+    return _kernel_result(libc.syscall(438, pidfd, remote, 0), 'Cannot duplicate an owned server descriptor')
+
+
+def _is_listener(libc, fd, port):
+    # Query the duplicate directly. Wrapping an existing fd in a Python socket
+    # can set O_NONBLOCK on the child's shared open file description when the
+    # interpreter has a default timeout. This observer must never change it.
+    def option(name):
+        value = ctypes.c_int()
+        length = ctypes.c_uint(ctypes.sizeof(value))
+        _kernel_result(libc.getsockopt(fd, socket.SOL_SOCKET, name, ctypes.byref(value), ctypes.byref(length)),
+                       'Cannot inspect owned server socket option')
+        require(length.value == ctypes.sizeof(value), 'Owned socket option size differs')
+        return value.value
+
+    family = option(socket.SO_DOMAIN)
+    if family not in (socket.AF_INET, socket.AF_INET6) or not option(socket.SO_ACCEPTCONN):
+        return False
+    require(family == socket.AF_INET, 'Server opened an unexpected IPv6 listener')
+    # Linux sockaddr_in has a native-endian sa_family_t, network-order port
+    # and four address bytes. Ignore the kernel's eight padding bytes.
+    address = ctypes.create_string_buffer(16)
+    length = ctypes.c_uint(ctypes.sizeof(address))
+    _kernel_result(libc.getsockname(fd, address, ctypes.byref(length)), 'Cannot inspect owned listener address')
+    expected = struct.pack('=H', socket.AF_INET) + struct.pack('!H', port) + socket.inet_aton('127.0.0.1')
+    require(length.value == 16 and address.raw[:8] == expected and
+            option(socket.SO_TYPE) == socket.SOCK_STREAM and option(socket.SO_PROTOCOL) == socket.IPPROTO_TCP,
+            'Server opened an unexpected IPv4 listener')
+    return True
+
+
+def _pidfd_listener(group, port, root):
+    """Inspect live kernel sockets of this unreaped child, including IPv6.
+
+    A snapshot brackets FD duplication and kernel option reads. Transient
+    descriptor replacement retries the entire observation. No proof survives
+    this operation or substitutes for the before/after protocol checks.
+    """
+    require(platform.machine() in ('aarch64', 'x86_64') and ctypes.sizeof(ctypes.c_void_p) == 8,
+            'Unsupported owned socket inspection ABI')
+    libc = ctypes.CDLL(None, use_errno=True)
+    libc.syscall.restype = ctypes.c_long
+    # Android's CPython may omit os.pidfd_open even when the kernel supports it.
+    pidfd = _kernel_result(libc.syscall(434, group.process.pid, 0), 'Cannot open owned server pidfd')
+    try:
+        for _ in range(3):
+            sockets = _socket_fds(root)
+            listeners = set()
+            stable = True
+            for remote, inode in sockets.items():
+                try:
+                    descriptor = _duplicate_fd(libc, pidfd, remote)
+                except OSError as error:
+                    if error.errno == errno.EBADF:
+                        stable = False
+                        break
+                    raise
+                try:
+                    info = os.fstat(descriptor)
+                    if not stat.S_ISSOCK(info.st_mode) or info.st_ino != inode:
+                        stable = False
+                        break
+                    if _is_listener(libc, descriptor, port):
+                        listeners.add(inode)
+                finally:
+                    os.close(descriptor)
+            require(group.observe() is None, 'Server child exited during owned socket inspection')
+            if stable and sockets == _socket_fds(root):
+                return len(listeners) == 1
+        return False
+    finally:
+        os.close(pidfd)
+
+
 def owns_loopback_listener(group, port, *, proc=Path('/proc')):
     """Match the retained child's socket inode, rejecting every extra listener.
 
@@ -50,20 +149,13 @@ def owns_loopback_listener(group, port, *, proc=Path('/proc')):
             'Owned child and fixed listener port required')
     require(group.observe() is None, 'Server child exited before listener verification')
     root = proc / str(group.process.pid)
-    sockets, count = set(), 0
     try:
-        for descriptor in (root / 'fd').iterdir():
-            count += 1
-            require(count <= 4096, 'Owned child descriptor count exceeds bound')
-            try:
-                target = os.readlink(descriptor)
-            except FileNotFoundError:
-                continue
-            matched = re.fullmatch(r'socket:\[([0-9]+)\]', target)
-            if matched:
-                sockets.add(matched[1])
-        tables = {name: _read(root / 'net' / name, PROC_LIMIT).decode('ascii').splitlines()[1:]
-                  for name in ('tcp', 'tcp6')}
+        sockets = set(map(str, _socket_fds(root).values()))
+        try:
+            tables = {name: _read(root / 'net' / name, PROC_LIMIT).decode('ascii').splitlines()[1:]
+                      for name in ('tcp', 'tcp6')}
+        except PermissionError:
+            return _pidfd_listener(group, port, root)
     except FileNotFoundError:
         require(group.observe() is None, 'Server child exited during listener verification')
         return False

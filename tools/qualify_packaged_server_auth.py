@@ -105,10 +105,16 @@ def protocol_probe(state, mysql, version, program, expected, configuration, *, c
     try:
         child.start()
         auth.wait_authserver(child)
-        require(processes.owns_loopback_listener(child.group, 3724), 'production auth listener ownership failed')
+        def owns_listener():
+            root = Path('/proc') / str(child.process.pid)
+            return (processes.owns_loopback_listener(child.group, 3724) and
+                    processes._pidfd_listener(child.group, 3724, root))
+        require(owns_listener(), 'production auth listener ownership failed')
         with socket.create_connection(('127.0.0.1', 3724), timeout=5) as transport:
+            require(transport.getpeername() == ('127.0.0.1',3724) and transport.getsockname()[0] == '127.0.0.1',
+                    'actual Grunt peer/local endpoint differs')
             realms, key = auth_protocol.login(transport, intent)
-        require(processes.owns_loopback_listener(child.group, 3724), 'auth listener ownership changed')
+        require(owns_listener(), 'auth listener ownership changed')
         require(len(realms) == 1 and realms[0]['id'] == 1 and realms[0]['address'] == '127.0.0.1:8085'
                 and realms[0]['locked'] == 0 and realms[0]['build'] in (None, (3, 3, 5, 12340)),
                 'authserver realm does not match local build 12340')
@@ -120,8 +126,8 @@ def protocol_probe(state, mysql, version, program, expected, configuration, *, c
                         'negotiated auth key differs from persistent session')
                 if client_probe is not None:
                     result = client_probe(state, connection, intent, child, attempt)
-                    require(processes.owns_loopback_listener(child.group, 3724), 'production auth listener changed during PE login')
-                    return dict(result, productionOwnedAuthListenerVerified=True)
+                    require(owns_listener(), 'production auth listener changed during PE login')
+                    return dict(result, productionOwnedAuthListenerVerified=True, kernelSocketDuplicationVerified=True)
     finally:
         child.stop(auth_timeout=30)
 
@@ -151,7 +157,12 @@ def run(package, work, evidence, world_probe=None, client_probe=None, observe_wo
     mysql, mysqld = Path('/usr/bin/mysql'), Path('/usr/sbin/mysqld')
     version = document(Path('/etc/esteria-server-runtime.json'))['expectedMysqlSqlVersion']
     phases, expected_auth = selections(package)
-    record('bootstrap')
+    status = dict(line.split(':',1) for line in Path('/proc/self/status').read_text().splitlines() if ':' in line)
+    require(os.getuid() != 0 and os.geteuid() == os.getuid() and int(status['CapEff'],16) == 0
+            and int(status['NoNewPrivs']) == 1 and [n for _,n in socket.if_nameindex()] == ['lo'],
+            'ordinary isolated native UID/loopback required')
+    record('bootstrap', uid=os.getuid(), effectiveCapabilities=0, noNewPrivileges=True,
+           interfaceNames=['lo'], kernelRelease=platform.release())
     result = android_database_setup.setup(state, mysql, mysqld, version)
     uuid = result['uuid']
     owned = sql.ServiceProcess(state, sessions, mysql, mysqld, version)
@@ -181,7 +192,8 @@ def run(package, work, evidence, world_probe=None, client_probe=None, observe_wo
             if client_probe is not None:
                 proof['reconstructedClientExecuted'] = True
                 record('reconstructed-grunt-login', **first_client)
-        record('auth-srp-12340-loopback-session-key-verified', authserverSha256=expected_auth['sha256'])
+        record('auth-srp-12340-loopback-session-key-verified', authserverSha256=expected_auth['sha256'],
+               kernelSocketDuplicationVerified=True, bothKernelEndpointsVerified=True)
         repeated = install_phase(*phases[-1])
         require(repeated['fourSchemasVerified'] and not repeated['compiledPlayerbotsLoaderExecuted']
                 and not repeated['compiledUpdaterExecuted'], 'completed stock schemas must be verified without replay')
@@ -200,7 +212,12 @@ def run(package, work, evidence, world_probe=None, client_probe=None, observe_wo
     reopened = sql.ServiceProcess(state, sessions, mysql, mysqld, version)
     try:
         reopened.wait_ready(uuid)
-        if client_probe is not None:
+        if client_probe is None:
+            with db.state_lock(state):
+                protocol_probe(state, mysql, version, program, expected_auth, configuration, attempt=2)
+            record('same-database-second-srp-and-kernel-fd-proof',
+                   kernelSocketDuplicationVerified=True, bothKernelEndpointsVerified=True)
+        else:
             with db.state_lock(state):
                 again = protocol_probe(state, mysql, version, program, expected_auth, configuration,
                                        client_probe=client_probe, attempt=2)

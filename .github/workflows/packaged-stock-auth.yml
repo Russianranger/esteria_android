@@ -1,8 +1,8 @@
-name: Packaged stock four-schema and auth protocol
+name: Native unprivileged stock auth socket ownership
 on:
   workflow_dispatch:
   push:
-    branches: [non-custom]
+    branches: [qa/stock-pidfd-netns-20261108]
     paths:
       - .github/workflows/packaged-stock-auth.yml
       - tools/qualify_packaged_server_auth.py
@@ -15,7 +15,7 @@ permissions:
   contents: read
 jobs:
   packaged-auth:
-    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/non-custom'
+    if: github.repository == 'Russianranger/esteria_android' && github.ref == 'refs/heads/qa/stock-pidfd-netns-20261108'
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 45
     steps:
@@ -28,36 +28,14 @@ jobs:
           GRUNT_QA=$(mktemp -d "$RUNNER_TEMP/stock-grunt-XXXXXXXX")
           echo "GRUNT_QA=$GRUNT_QA" >> "$GITHUB_ENV"
           python3 -m tools.qualify_packaged_server_auth stage --output "$GRUNT_QA/packaged-server"
-          docker import --platform linux/arm64 "$GRUNT_QA/packaged-server/server-runtime.tar.gz" esteria-packaged-server:qualified
-      - name: Verify the selected reconstructed executable and exact Wine provider
-        run: |
-          python3 -m tools.qualify_packaged_grunt stage --output "$GRUNT_QA/grunt"
-          docker import --platform linux/arm64 "$GRUNT_QA/grunt/cache/wine-arm64.tar.gz" esteria-stock-grunt:qualified
-      - name: Log in twice through the actual Grunt client and the same four-schema database
+      - name: Run two stock SRP sessions with native unprivileged socket inspection
         run: |
           set -eu
           umask 077
-          mkdir "$GRUNT_QA/disposable-server" "$GRUNT_QA/server-evidence"
-          cleanup() { docker rm -f stock-grunt-client stock-grunt-server >/dev/null 2>&1 || true; }
-          trap cleanup EXIT
-          shared=(--init --read-only --env PYTHONDONTWRITEBYTECODE=1
-              --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/qualification,readonly"
-              --mount "type=bind,src=$GRUNT_QA/grunt/fixture,dst=/esteria-qualification"
-              --workdir /qualification)
-          docker run -d --name stock-grunt-server --network none --tmpfs /esteria-data:ro,nosuid,nodev,noexec,size=1m "${shared[@]}" --tmpfs /tmp:rw,nosuid,nodev,size=32m \
-            --mount "type=bind,src=$GRUNT_QA/packaged-server,dst=/package,readonly" \
-            --mount "type=bind,src=$GRUNT_QA/disposable-server,dst=/work" \
-            --mount "type=bind,src=$GRUNT_QA/server-evidence,dst=/evidence" \
-            esteria-packaged-server:qualified python3 -m tools.qualify_packaged_server_auth run --grunt --observe-world
-          docker run -d --name stock-grunt-client --network container:stock-grunt-server "${shared[@]}" \
-            --tmpfs /tmp:rw,nosuid,nodev,mode=1777,size=192m \
-            esteria-stock-grunt:qualified /usr/bin/python3 -m tools.qualify_packaged_grunt client
-          while :; do
-            server=$(docker inspect -f '{{.State.Status}}:{{.State.ExitCode}}' stock-grunt-server)
-            client=$(docker inspect -f '{{.State.Status}}:{{.State.ExitCode}}' stock-grunt-client)
-            case "$server/$client" in exited:0/exited:0) break;; exited:[1-9]*|*/exited:[1-9]*) exit 1;; esac
-            sleep 2
-          done
+          mkdir "$GRUNT_QA/guest" "$GRUNT_QA/disposable-server" "$GRUNT_QA/server-evidence"
+          sudo env RUNNER_TEMP="$RUNNER_TEMP" unshare --net --mount --pid --fork --mount-proc --kill-child \
+            bash "$GITHUB_WORKSPACE/tools/qualify_owned_fd_netns.sh" \
+            "$GRUNT_QA" "$GITHUB_WORKSPACE" "$(id -u)" "$(id -g)"
       - name: Export typed evidence
         if: always() && env.GRUNT_QA != ''
         run: |
