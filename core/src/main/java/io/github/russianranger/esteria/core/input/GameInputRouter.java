@@ -23,6 +23,11 @@ public final class GameInputRouter {
         if (sink == null) throw new IllegalArgumentException("A connected input sink is required");
         this.sink = sink;
     }
+    private int lookPercent=100;
+    public void setLookPercent(int percent){
+        if(percent!=75 && percent!=100 && percent!=150)throw new IllegalArgumentException("Unsupported stick sensitivity");
+        lookPercent=percent;
+    }
     public boolean cursorMode() { return cursorMode; }
     public void button(Button button, boolean down) throws IOException {
         boolean changed = down ? held.add(button) : held.remove(button);
@@ -58,7 +63,7 @@ public final class GameInputRouter {
     /** Frame-time integration prevents event frequency from changing camera speed. */
     public void step(double elapsedSeconds) throws IOException {
         if (!Double.isFinite(elapsedSeconds) || elapsedSeconds < 0) throw new IOException("Invalid input elapsed time");
-        double delta = Math.min(.05, elapsedSeconds), speed = cursorMode ? 700 : 1000;
+        double delta = Math.min(.05, elapsedSeconds), speed = (cursorMode ? 700 : 1000) * lookPercent / 100.0;
         remainderX += cameraX * delta * speed; remainderY += cameraY * delta * speed;
         int dx = (int)remainderX, dy = (int)remainderY;
         remainderX -= dx; remainderY -= dy;

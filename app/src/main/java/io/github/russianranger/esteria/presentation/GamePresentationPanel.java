@@ -80,6 +80,7 @@ public final class GamePresentationPanel extends FrameLayout {
         message.setText("Connecting display…");
     }
 
+    public void setLookPercent(int percent){if(game!=null)game.setLookPercent(percent);}
     public String inputStatus(){return message.getText().toString();}
     public void requestKeyboard(){
         if(!failed && !stopRequested && game!=null){keyboardRequested=true;resumeView();}

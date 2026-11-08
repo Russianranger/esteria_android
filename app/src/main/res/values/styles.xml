@@ -8,4 +8,14 @@
         <item name="android:navigationBarColor">#10161C</item>
         <item name="android:windowBackground">#10161C</item>
     </style>
+    <style name="RealmDialog" parent="android:style/Theme.Material.Dialog.Alert">
+        <item name="android:colorAccent">#E1BC76</item>
+        <item name="android:colorBackground">#202D28</item>
+        <item name="android:textColorPrimary">#F5EDDA</item>
+        <item name="android:windowTitleStyle">@style/RealmDialogTitle</item>
+    </style>
+    <style name="RealmDialogTitle" parent="android:style/TextAppearance.Material.Title">
+        <item name="android:fontFamily">@font/cinzel</item>
+        <item name="android:textColor">#E1BC76</item>
+    </style>
 </resources>

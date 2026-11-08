@@ -6,7 +6,7 @@ Install the signed update over the existing Esteria Stock package. Open **Play �
 
 In game, tap the gear or press Android Back for settings. Drag the gear to move it. **Reset gear position** restores the upper-right placement. A swipe from the display edge reveals the Android system bars. The game fits the screen with its original aspect ratio.
 
-**Frame limit** defaults to 30 FPS. Choose 24 FPS for a lower render workload or 60 FPS for higher motion detail. A change applies at the next ordinary game start at the same render resolution. Compare temperatures at the same location, brightness and fan setting over the same duration. Android thermal status and the selected cap are included in support.
+**Frame limit** defaults to 30 FPS. Choose 24 FPS for a lower render workload or 60 FPS for higher motion detail. Right-stick sensitivity applies immediately to camera and pointer controls. A frame limit change applies at the next ordinary game start at the same render resolution. Compare temperatures at the same location, brightness and fan setting over the same duration. Android thermal status and the selected cap are included in support.
 
 Check movement and camera at all four screen edges. After logging out, use the gear's **Stop session** if the client is still running. From **Tools → Export support bundle**, save the ZIP. Reopen the same character offline three times and check the saved quest and position. If Start reports a component issue, use **Tools → Repair local component** for the named component only.
 

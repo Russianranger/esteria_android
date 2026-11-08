@@ -42,6 +42,7 @@ public final class GameInputView extends SurfaceView implements SurfaceHolder.Ca
         setContentDescription("Game display. Controller Y switches between camera and pointer controls.");
         getHolder().addCallback(this);
     }
+    public void setLookPercent(int percent){router.setLookPercent(percent);}
     public void frameSize(int width, int height) {
         if (width <= 0 || height <= 0 || width > 1280 || height > 768 || (long)width * height > 1280 * 720) {
             fail("Invalid game frame geometry"); return;

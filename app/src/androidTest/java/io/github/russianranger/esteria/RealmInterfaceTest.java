@@ -23,6 +23,19 @@ public final class RealmInterfaceTest {
         MainActivity screen=(MainActivity)test.startActivitySync(new Intent(context,MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         test.waitForIdleSync();
         try {
+            test.runOnMainSync(()->screen.immersive(true));
+            long deadline=SystemClock.uptimeMillis()+5000;
+            java.util.concurrent.atomic.AtomicBoolean hidden=new java.util.concurrent.atomic.AtomicBoolean();
+            while(!hidden.get() && SystemClock.uptimeMillis()<deadline){
+                test.runOnMainSync(()->{
+                    android.view.WindowInsets insets=screen.getWindow().getDecorView().getRootWindowInsets();
+                    hidden.set(insets!=null && !insets.isVisible(android.view.WindowInsets.Type.statusBars())
+                            && !insets.isVisible(android.view.WindowInsets.Type.navigationBars()));
+                });
+                if(!hidden.get())SystemClock.sleep(50);
+            }
+            assertTrue("Both system bars are hidden for the game viewport",hidden.get());
+            test.runOnMainSync(()->screen.immersive(false));
             test.runOnMainSync(()->{
                 FrameLayout content=screen.findViewById(android.R.id.content);
                 RealmLauncher launcher=(RealmLauncher)((FrameLayout)content.getChildAt(0)).getChildAt(0);

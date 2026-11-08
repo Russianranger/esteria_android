@@ -135,7 +135,7 @@ public final class MainActivity extends Activity {
             button(launcher.tools,"Repair local component",()->{
                 io.github.russianranger.esteria.runtime.LocalWorldSetup.Component[] components=io.github.russianranger.esteria.runtime.LocalWorldSetup.Component.values();
                 String[] labels=new String[components.length];for(int i=0;i<components.length;i++)labels[i]=components[i].label;
-                new android.app.AlertDialog.Builder(this).setTitle("Choose the component reported as not ready")
+                new android.app.AlertDialog.Builder(this,R.style.RealmDialog).setTitle("Choose the component reported as not ready")
                     .setItems(labels,(dialog,index)->{
                         String locale=(String)clientLanguage.getSelectedItem();
                         operation(new Intent(this,SessionService.class).setAction(SessionService.PREPARE_WORLD)
@@ -156,7 +156,7 @@ public final class MainActivity extends Activity {
             operation(intent);
         });startGame.setEnabled(completeProfile());launcher.style(startGame,true);
         if(!completeProfile())layout.addView(text("This installation has an incomplete runtime profile.",14,RealmLauncher.GOLD));
-        button(layout,"Game settings",this::showDisplaySettings);
+        button(layout,"Frame limit",this::showDisplaySettings);
         layout=launcher.tools;
         exportSupport=button(layout,"Export support bundle",this::chooseExport);
         scanStorage=button(layout,"Check reclaimable storage",()->operation(new Intent(this,SessionService.class).setAction(SessionService.SCAN_STORAGE)));
@@ -196,6 +196,7 @@ public final class MainActivity extends Activity {
             gameRoot=new FrameLayout(this);gameRoot.setBackgroundColor(Color.BLACK);
             gamePanel=new GamePresentationPanel(this,service.presentationEvents(),()->startService(new Intent(this,SessionService.class).setAction(SessionService.CANCEL)));
             try{gamePanel.bind(owner.presentation());}catch(java.io.IOException error){gamePanel=null;gameRoot=null;return;}
+            gamePanel.setLookPercent(lookPercent());
             gameRoot.addView(gamePanel,new FrameLayout.LayoutParams(-1,-1));
             gear=new io.github.russianranger.esteria.presentation.SettingsGear(this,gameRoot,this::showGameSettings);
             rootView.addView(gameRoot,new FrameLayout.LayoutParams(-1,-1));launcher.setVisibility(View.GONE);boundGame=owner;
@@ -215,7 +216,7 @@ public final class MainActivity extends Activity {
         getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
     @SuppressWarnings("deprecation")
-    private void immersive(boolean active){
+    void immersive(boolean active){
         if(Build.VERSION.SDK_INT>=30){
             android.view.WindowInsetsController bars=getWindow().getInsetsController();
             if(bars!=null){
@@ -237,12 +238,26 @@ public final class MainActivity extends Activity {
         if(launcher.selectedPage()!=0){launcher.select(0);return;}
         super.onBackPressed();
     }
+    private int lookPercent(){
+        int value=getSharedPreferences("game-display",MODE_PRIVATE).getInt("lookPercent",100);
+        return value==75 || value==150 ? value : 100;
+    }
+    private void showLookSettings(){
+        int percent=lookPercent();
+        int[] values={75,100,150};
+        new android.app.AlertDialog.Builder(this,R.style.RealmDialog).setTitle("Right-stick sensitivity")
+            .setSingleChoiceItems(new String[]{"75% · precise","100% · standard","150% · fast"},percent==75?0:percent==150?2:1,(d,i)->{
+                getSharedPreferences("game-display",MODE_PRIVATE).edit().putInt("lookPercent",values[i]).apply();
+                if(gamePanel!=null)gamePanel.setLookPercent(values[i]);
+                d.dismiss();
+            }).setNegativeButton("Cancel",null).show();
+    }
     private void showDisplaySettings(){
         int[] rates={24,30,60};
         android.content.SharedPreferences prefs=getSharedPreferences("game-display",MODE_PRIVATE);
         int rate=prefs.getInt("frameCap",30);
         String[] choices={"24 FPS · lower load","30 FPS · balanced","60 FPS · higher load"};
-        new android.app.AlertDialog.Builder(this).setTitle("Frame limit · next game start")
+        new android.app.AlertDialog.Builder(this,R.style.RealmDialog).setTitle("Frame limit · next game start")
             .setSingleChoiceItems(choices,rate==24?0:rate==60?2:1,(d,i)->{
                 prefs.edit().putInt("frameCap",rates[i]).apply(); d.dismiss();
             }).setNegativeButton("Cancel",null).show();
@@ -251,23 +266,24 @@ public final class MainActivity extends Activity {
         if(gamePanel==null || gameSettings!=null)return;
         String limit="Frame limit · "+boundGame.presentation().frameCap()+" FPS this session";
         java.util.List<String> items=new ArrayList<>(java.util.Arrays.asList(limit,"Open keyboard","Session details",
-                "Export support bundle","Reset gear position","Stop session"));
+                "Export support bundle","Reset gear position","Right-stick sensitivity · "+lookPercent()+"%","Stop session"));
         if(service!=null && service.forceStopAvailable())items.add("Force stop · unsaved state may be lost");
-        android.app.AlertDialog dialog=new android.app.AlertDialog.Builder(this).setTitle("Game settings")
+        android.app.AlertDialog dialog=new android.app.AlertDialog.Builder(this,R.style.RealmDialog).setTitle("Game settings")
             .setItems(items.toArray(new String[0]),(d,i)->{
                 if(gamePanel==null)return;
                 switch(i){
                 case 0: showDisplaySettings();break;
                 case 1: gamePanel.requestKeyboard();break;
                 case 2:
-                    new android.app.AlertDialog.Builder(this).setTitle("Local session")
+                    new android.app.AlertDialog.Builder(this,R.style.RealmDialog).setTitle("Local session")
                         .setMessage(gamePanel.inputStatus()+"\n\n"+service.status())
                         .setPositiveButton("Return",null).show();break;
                 case 3: if(service.supportExportAvailable())chooseExport();else
                     android.widget.Toast.makeText(this,"Wait for the current operation to finish.",android.widget.Toast.LENGTH_SHORT).show();break;
                 case 4: gear.resetPosition();break;
-                case 5: gamePanel.requestStop();break;
-                case 6: if(service.forceStopAvailable())startService(new Intent(this,SessionService.class).setAction(SessionService.FORCE_STOP));break;
+                case 5: showLookSettings();break;
+                case 6: gamePanel.requestStop();break;
+                case 7: if(service.forceStopAvailable())startService(new Intent(this,SessionService.class).setAction(SessionService.FORCE_STOP));break;
                 default: break;
                 }
             }).setNegativeButton("Return to game",null).create();

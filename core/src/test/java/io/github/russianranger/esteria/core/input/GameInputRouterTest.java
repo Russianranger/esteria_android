@@ -27,6 +27,11 @@ public final class GameInputRouterTest {
         router.sticks(.2f,0,0,0,0,0);check(sink.keys.equals(Collections.singleton((int)'e')),"deadzone hysteresis");
         router.sticks(.1f,0,1,0,0,0);check(sink.keys.isEmpty()&&sink.mask==4,"camera holds right mouse");
         router.step(.02);check(sink.dx==20,"frame integrated camera motion");
+        int original=sink.dx;
+        router.setLookPercent(75);router.step(.02);check(sink.dx-original==15,"precise stick sensitivity");
+        original=sink.dx;
+        router.setLookPercent(150);router.step(.02);check(sink.dx-original==30,"fast stick sensitivity");
+        router.setLookPercent(100);
         router.sticks(0,0,0,0,0,0);check(sink.mask==0,"neutral camera releases mouse");
         router.button(GameInputRouter.Button.Y,true);router.button(GameInputRouter.Button.Y,true);router.button(GameInputRouter.Button.Y,false);
         check(router.cursorMode(),"cursor toggle");router.button(GameInputRouter.Button.A,true);check(sink.mask==1,"cursor A clicks");
