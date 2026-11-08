@@ -1,0 +1,91 @@
+{
+  "formatVersion": 1,
+  "scope": "stock-archive-read-update-provider-and-preparation-compatibility",
+  "environment": "Offline Linux x86-64 host, production Java classes with Android 13 JSON and JDK 17, actual signed v18 assets and genuine normalized stock import. The selected executable was produced on a Windows ARM64 runner.",
+  "previousApk": {
+    "versionCode": 18,
+    "sha256": "60a90c58dfc211c53928853dbbebd04929668da69d46d4c0a027c143f6857eb6",
+    "descriptorSha256": "18280b20574a50320820403e77e3f30ef8e292b43925f0115b432b22fb1946e1"
+  },
+  "windowsBuild": {
+    "repository": "Russianranger/wowdecomp_esteria",
+    "run": 42461366985,
+    "job": 128671165841,
+    "artifact": 13610057399,
+    "revision": "c05a3af9be6c204c40d65d0e3eb6ccc2442012b6",
+    "artifactSha256": "94d348a901dc234973eb651026985846f1c0f4f243349f81372883b5435f8c87",
+    "peSha256": "e224cc5611511e47c3e4f20fa8c401419f9b9d2fc648a70908be58ca204aa561"
+  },
+  "productionSourceDelta": {
+    "base": "fa3e74b7f332fef0f212e954a0de18f685ead8bd",
+    "sha256": "ee546a476750d04dd01bcb4232db80ac53be06ca6c2f838d32412cc9353864cb",
+    "changedRuntimeFiles": [
+      "Engine/Source/BlizzardCore/Source/Packages/iounit/IOFileUnit.cpp",
+      "Engine/Source/BlizzardCore/Source/Packages/iounit/ReadExactAt.h"
+    ],
+    "unchangedLimitsSha256": "16e5024377ebb4cd59b3fd0acb4029b35ae481f16c7bec39a5a6a9490867c188",
+    "unchangedCodecSha256": "b4c774430942d709ca7e3f03a1890d6aec7aaa2e432bee0e698e57027a70d006"
+  },
+  "provider": {
+    "archive": {
+      "bytes": 7314685,
+      "sha256": "954ce4974672dc6fdab666d44d56abbe253199128fda9ccfaa39f09826cc65e9"
+    },
+    "sourceCompanion": {
+      "bytes": 23467098,
+      "sha256": "5128ea4611f68c03740796abfd169e49f5e2a9b43646c73160db2ce268b3d536"
+    },
+    "descriptorSha256": "b4013027af0af7470157a9885db277cc1d12560e4f757db627c31bcdc7a36f32",
+    "reproducibleFromOriginal": true
+  },
+  "shaders": {
+    "oldShaderGeneration": "9d5f8a86c2ef253bd5ad9cde6b493e34e789cc5ab6b9a1f49008485b34b969f1",
+    "import": "a6800cb53df18cea0012ea4c7c86991edaf49f49433528ec237678454bea09cb",
+    "preparedClient": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+    "actualShaderFiles": 4742,
+    "actualShaderBytes": 102132134,
+    "compilerRuns": 0
+  },
+  "serverData": {
+    "scope": "Source selection and retained phase metadata only",
+    "selectedGeneration": "c8e53e9694a7f11ca09b777d3b0de3ec0b0a121a61b173cc3e4ae2795ed04153",
+    "contentProfile": "stock-3.3.5a",
+    "sourceImport": "a6800cb53df18cea0012ea4c7c86991edaf49f49433528ec237678454bea09cb",
+    "reader": "06ede7399445e1aace7566a0c584d6fba2c005703393afd2f7ba0fd9e5c4fe29",
+    "outputRecipe": "c911baddd7c49fa21fa4a3bc022d75c69fa66daddde3a6970129cf652dad18ff",
+    "preparedClient": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+    "selectedServer": "f35f04d01689f034778e3474b3c820092f51e461",
+    "signedV18HelpersByteIdentical": true,
+    "realToolSelectionSha256": "b7b4aae9f6758bf9950a6cec4f68a1369cc99d82e1c2d656098ff43a79e0f761",
+    "retainedPhaseReceipts": {
+      "maps-dbc-cameras": "802f18f77e343fda17da8a69531a1a40cb5e7b0d93e0aab2b3860ba7a86b667f",
+      "raw-vmaps": "3fa347a02bd86cdf85bfea34bf890b86f3f9f0c1a57f96887a00c6ffddb812fb",
+      "assembled-vmaps": "94707e46237bf0b1ba75c17123a4b51ab1f32037375052958deb582565602117"
+    },
+    "extractorInvocations": 0,
+    "completeWorldReceiptTested": false,
+    "physicalThorReceiptTested": false
+  },
+  "runtimeInstallation": {
+    "oldGeneration": "588b5f2cff13237c2f14491cebee23d737066953d43b90120941ca591acc2cf2",
+    "newGeneration": "1783e57b784e0487ceb6456a2ad21c1ec322cda8b1b2d1f09329550fe63768db",
+    "cancelKeptOldSelected": true,
+    "resumedFiles": 1,
+    "warmCopiedBytes": 0,
+    "previousAndNextRestorableWithoutArchive": true
+  },
+  "stockLaunchView": {
+    "previous": "931f31202464ac492d5a08293e0aec6cc90118fd8314de21fa3991644a1fcfbb",
+    "new": "23f72965f1a0304851df3bddf6e9505829649620ea0befe8ee5ff7af3efb072c",
+    "unchangedLaunches": 3,
+    "firstViewCopies": {
+      "WowClient64.exe": 20787200,
+      "XvidDecoder.dll": 566272
+    },
+    "laterCopiedBytes": 0,
+    "import": "a6800cb53df18cea0012ea4c7c86991edaf49f49433528ec237678454bea09cb",
+    "configPreserved": true
+  },
+  "deviceUpdateTestedByThisRun": false,
+  "worldEntryTestedByThisRun": false
+}

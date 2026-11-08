@@ -34,7 +34,7 @@ final class RendererCompatibility {
             throw new IOException("Missing or changed stock renderer compatibility descriptor");
         JSONObject pair = new JSONObject(new String(descriptor, StandardCharsets.UTF_8));
         if (pair.length() != HASH_FIELDS.size() + 4 || !Integer.valueOf(1).equals(pair.get("formatVersion"))
-                || !"stock-renderer-only".equals(pair.get("scope")))
+                || !"stock-renderer-and-archive-read".equals(pair.get("scope")))
             throw new IOException("Invalid stock renderer compatibility scope");
         for (String field : HASH_FIELDS) {
             Object hash = pair.get(field);

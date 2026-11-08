@@ -1,0 +1,140 @@
+{
+  "scope": "Original English agreement shown untouched by selected Windows ARM64 client under real packaged ARM64 Wine/Mesa lavapipe reference renderer; no-NIC full-system Debian guest/TCG. No local login, realm session or physical device in this observation.",
+  "transport": "complete read-only FUSE",
+  "revision": "fa3e74b7f332fef0f212e954a0de18f685ead8bd",
+  "data": "a6800cb53df18cea0012ea4c7c86991edaf49f49433528ec237678454bea09cb",
+  "shaders": "9d5f8a86c2ef253bd5ad9cde6b493e34e789cc5ab6b9a1f49008485b34b969f1",
+  "shaderReceipt": "67640ae968737c56a2b0e4b3dd78cfeda9bd640370e4841e818de6482214e520",
+  "peSha256": "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317",
+  "timeToGuestPoweroffSeconds": 658.07,
+  "guestExit": 0,
+  "qemuExit": 0,
+  "client": {
+    "sourceTree": "fa3e74b7f332fef0f212e954a0de18f685ead8bd",
+    "wineArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+    "bridgeArchiveSha256": "7e0356f14bf3654a0e1ecc903726bd479fea0c761c8a4e8a4356e2e476726a55",
+    "peLaunchToFrameMs": 310423,
+    "frameWidth": 1280,
+    "frameHeight": 720,
+    "clientSwapchainWidth": 1024,
+    "clientSwapchainHeight": 768,
+    "mappedExecutableCodeWindowsMatched": 2,
+    "commonMainNamedEventOpenWhilePeLive": 0,
+    "commonMainNamedEventOpenAfterPeExit": 2,
+    "openedArchiveLogEntries": 16,
+    "loadedClientDbStores": 236,
+    "northrendLoginModelRead": true,
+    "shaderManifestRecords": 1580,
+    "spvUniquePathsRead": 17,
+    "peSpvFuseReadRequests": 44,
+    "selectedManifestPositiveFuseRead": true,
+    "peUniqueVertexSpvFiles": 9,
+    "peUniquePixelSpvFiles": 8,
+    "vulkanShaderModulesCreated": 27,
+    "traceKernelDroppedEvents": 0,
+    "windowCloseToWineDrainMs": 24518,
+    "configSha256": "3a42fc073b544dfa98b4b880990cd26229bda144ea6fd71033d369ad0052db07",
+    "configPreserved": true,
+    "wineExit": 0,
+    "directChildrenReaped": true,
+    "windowManagerClose": true,
+    "noInputEventsSent": true,
+    "exit": 0,
+    "phase": "source-owned original unaccepted EULA, clean close"
+  },
+  "archiveOpenCount": 16,
+  "archiveTableErrors": 0,
+  "frames": [
+    {
+      "elapsedMs": 0,
+      "windowGeometry": {
+        "x": 0,
+        "y": 0,
+        "width": 1024,
+        "height": 768,
+        "depth": 24
+      },
+      "pngSha256": "168a34d0d95ac61dd4561faf8c53008fab042d73d428cb1dfcf930aa72a8e680",
+      "spvPathsReadSoFar": 17,
+      "nearBlack": 3,
+      "brightGreen": 0,
+      "blueOrCyan": 24955,
+      "sampledBackgroundPixels": 25465
+    },
+    {
+      "elapsedMs": 27928,
+      "windowGeometry": {
+        "x": 0,
+        "y": 0,
+        "width": 1024,
+        "height": 768,
+        "depth": 24
+      },
+      "pngSha256": "168a34d0d95ac61dd4561faf8c53008fab042d73d428cb1dfcf930aa72a8e680",
+      "spvPathsReadSoFar": 17,
+      "nearBlack": 3,
+      "brightGreen": 0,
+      "blueOrCyan": 24955,
+      "sampledBackgroundPixels": 25465
+    },
+    {
+      "elapsedMs": 44794,
+      "windowGeometry": {
+        "x": 0,
+        "y": 0,
+        "width": 1024,
+        "height": 768,
+        "depth": 24
+      },
+      "pngSha256": "168a34d0d95ac61dd4561faf8c53008fab042d73d428cb1dfcf930aa72a8e680",
+      "spvPathsReadSoFar": 17,
+      "nearBlack": 3,
+      "brightGreen": 0,
+      "blueOrCyan": 24955,
+      "sampledBackgroundPixels": 25465
+    },
+    {
+      "elapsedMs": 63831,
+      "windowGeometry": {
+        "x": 0,
+        "y": 0,
+        "width": 1024,
+        "height": 768,
+        "depth": 24
+      },
+      "pngSha256": "75a0ca438056b5b9a04b66bc0fbf43ecf093c4d1ba429f09c17350adf6e5e431",
+      "spvPathsReadSoFar": 17,
+      "nearBlack": 6,
+      "brightGreen": 0,
+      "blueOrCyan": 25003,
+      "sampledBackgroundPixels": 25465
+    },
+    {
+      "elapsedMs": 110738,
+      "windowGeometry": {
+        "x": 0,
+        "y": 0,
+        "width": 1024,
+        "height": 768,
+        "depth": 24
+      },
+      "pngSha256": "f04d1f3cdf2a9aec2f1dcfdd3bf32334c7b719f8dea0927405a66c19d653d814",
+      "spvPathsReadSoFar": 17,
+      "nearBlack": 9,
+      "brightGreen": 0,
+      "blueOrCyan": 24969,
+      "sampledBackgroundPixels": 25465
+    }
+  ],
+  "nativeEffectFilesOpened": 5,
+  "nativeEffectFilesRead": 5,
+  "nativeEffectCallbacks": 20,
+  "nativeParticleEffectPresent": true,
+  "independentPositionalWin32ReadAfterClientStop": {
+    "requested": 1048576,
+    "returned": 1048576,
+    "success": true,
+    "crc32": 3890262401
+  },
+  "stockReferenceFrameSameAsPriorGuardedSelection": true
+}

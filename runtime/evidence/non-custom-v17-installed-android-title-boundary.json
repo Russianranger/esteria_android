@@ -1,0 +1,38 @@
+{
+  "scope": "Android-only signed title investigation while the full stock world prepares",
+  "sourceCommit": "2149ae6001b68d896a1fef61f905aeb5fb3115c6",
+  "apkSha256": "dc68c5ced8f0f4a155d86135f70a8522766e483957df06e0ce5544d488ac2ace",
+  "environment": "offline Android 13 ARM64 Redroid under QEMU system emulation, public v17 PM-installed base.apk under same package UID",
+  "observedActualAppUid": 10077,
+  "observerDexJarSha256": "0aeaf6bd7ee5bc59fdf8e2b73e54e3597d9e5b9c44f7f1f121ed9895445739dc",
+  "observer": "Actual installed Application matches signed package, UID, attribution and PackageManager code path before ClientStartupSession.start. Earlier system-context wrapper had a separate TAKE_AUDIO_FOCUS attribution error.",
+  "importGeneration": "a6800cb53df18cea0012ea4c7c86991edaf49f49433528ec237678454bea09cb",
+  "shaderGeneration": "9d5f8a86c2ef253bd5ad9cde6b493e34e789cc5ab6b9a1f49008485b34b969f1",
+  "retainedProviders": {
+    "wine-arm64": "dda9221e408dd167796e8a80042f5d7e7e168185eef63dfea088053b0a965c9d",
+    "shader-tools-arm64": "1607c300f598b348201f8f2ddf1db4f9527b09bf645240e996cabc69e40db24d",
+    "turnip-arm64": "725738ddaae1b154aa61dbe97eaeb5b5652711717cae1edb9894095fc72346db"
+  },
+  "milestonesElapsedMs": {
+    "selected-source": 65306,
+    "shaders-session-integrity-complete": 153408,
+    "client-view-prepared": 272766
+  },
+  "signedPresentationEvidence": {
+    "x11ServerFromSignedProvider": true,
+    "frameHelperMessage": "ESTERIA_X11_FRAME_READY protocol=full-v1 capture=XGetImage",
+    "inputHelperMessage": "ESTERIA_X11_INPUT_READY protocol=1",
+    "clientDirectoryOrClientLogs": false,
+    "gameFrameObserved": false
+  },
+  "end": {
+    "observerSignal": 9,
+    "externalTimeoutFired": false,
+    "cause": "Unresolved; the stopped guest kernel journal and host cgroup had no kernel OOM victim, contemporary system ANRs and Bluetooth simulator tombstone name other processes. No persisted Android process-exit entry identifies this observer.",
+    "guestPoweroffClean": true,
+    "driverReturnedFinalClientStatus": false
+  },
+  "physicalThor": false,
+  "normalGameSession": false,
+  "gameplayQualified": false
+}

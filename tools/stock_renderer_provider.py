@@ -1,4 +1,4 @@
-"""Build a source-reviewed renderer-only replacement for the stock client provider."""
+"""Build the reviewed renderer and archive-read update for the stock client provider."""
 import argparse
 import hashlib
 import json
@@ -14,9 +14,13 @@ from tools import provider_client_runtime as client
 ROOT = client.ROOT
 STOCK = '471ee42faadf4a97a1d0a86989cf1452621f2dc5'
 PREVIOUS_RENDERER = '807c4384ef28f4da51d3c50eec5082627cad36ea'
-EXECUTABLE = 'fa3e74b7f332fef0f212e954a0de18f685ead8bd'
-SOURCE_DIFF = '182c4df27c204cb3e3a10333cabff2a8c8f70ef7ca0bcf4f174ce676ad850547'
+LAST_RENDERER = 'fa3e74b7f332fef0f212e954a0de18f685ead8bd'
+RENDERER_DIFF = '182c4df27c204cb3e3a10333cabff2a8c8f70ef7ca0bcf4f174ce676ad850547'
 LOADER_DIFF = '6eba8647520043e4c322170fd889b4b6154d78e6e9c77397e906967cedc3fd26'
+EXECUTABLE = 'c05a3af9be6c204c40d65d0e3eb6ccc2442012b6'
+ARCHIVE_READ_DIFF = 'ee546a476750d04dd01bcb4232db80ac53be06ca6c2f838d32412cc9353864cb'
+SOURCE_DIFF = 'c85f6cf085a135a39fe69742edcd4da16ebbc975526d3d4ab1c4137c67ecc67d'
+SCOPE = 'stock-renderer-and-archive-read'
 DESCRIPTOR = 'renderer-compatibility.json'
 BASE = 'client-runtime/'
 LOADER_FILES = {
@@ -24,12 +28,18 @@ LOADER_FILES = {
     'Engine/Source/Gx/CGxDeviceVulkan/Vulkan/Loader.hpp',
     'Tools/VulkanTests/texture_device.cpp',
 }
-REVIEWED_FILES = LOADER_FILES | {
+RENDERER_FILES = LOADER_FILES | {
     'Engine/Source/Gx/CGxDeviceVulkan/Vulkan/Texture.cpp',
     'Engine/Source/Gx/CGxDeviceVulkan/CGxDeviceVulkanTexture.cpp',
     '.github/workflows/arm64-client.yml', 'Tools/RuntimeManifest/reuse_stock_xvid.py',
     'Tools/VulkanTests/CMakeLists.txt', 'Tools/VulkanTests/compressed_clear.cpp',
 }
+ARCHIVE_READ_FILES = {
+    'Engine/Source/BlizzardCore/Source/Packages/iounit/IOFileUnit.cpp',
+    'Engine/Source/BlizzardCore/Source/Packages/iounit/ReadExactAt.h',
+    'Tools/PlatformTests/CMakeLists.txt', 'Tools/PlatformTests/test_file_read_exact.cpp',
+}
+REVIEWED_FILES = RENDERER_FILES | ARCHIVE_READ_FILES
 HELPERS = ('fetch_sources', 'prepare_runtime', 'provider_client_runtime', 'package_client_sources',
            'package_server_content', 'manifest_server_content', 'manifest_server_modules', 'verify_server_build')
 REVISIONS = {'preparedClientRevision', 'executableRevision'}
@@ -52,7 +62,7 @@ def descriptor(path):
     item = json.loads(raw)
     require(raw == client.encoded(item) and set(item) == HASHES | REVISIONS | {'formatVersion', 'scope'} and
             type(item['formatVersion']) is int and item['formatVersion'] == 1 and
-            item['scope'] == 'stock-renderer-only', 'renderer-descriptor-schema')
+            item['scope'] == SCOPE, 'renderer-descriptor-schema')
     require(all(isinstance(item[k], str) and re.fullmatch('[0-9a-f]{64}', item[k]) for k in HASHES) and
             all(isinstance(item[k], str) and re.fullmatch('[0-9a-f]{40}', item[k]) for k in REVISIONS) and
             item['preparedClientRevision'] == STOCK and item['executableRevision'] == EXECUTABLE and item['sourceDiffSha256'] == SOURCE_DIFF and
@@ -93,8 +103,12 @@ def selected(source, source_lock, input_lock):
     client.archives.pin_identity(dict(measured['artifact'], file='client.zip'))
     require(22 <= measured['artifact']['bytes'] <= 512 << 20, 'renderer-artifact-size-limit')
     client.fetch_sources.verify_checkout(source, lock['sources']['client'], [])
-    require(changed_files(source, PREVIOUS_RENDERER, revision, LOADER_FILES) == LOADER_DIFF,
+    require(changed_files(source, PREVIOUS_RENDERER, LAST_RENDERER, LOADER_FILES) == LOADER_DIFF,
             'renderer-reviewed-loader-diff')
+    require(changed_files(source, STOCK, LAST_RENDERER, RENDERER_FILES) == RENDERER_DIFF,
+            'renderer-reviewed-previous-diff')
+    require(changed_files(source, LAST_RENDERER, revision, ARCHIVE_READ_FILES) == ARCHIVE_READ_DIFF,
+            'renderer-reviewed-archive-read-diff')
     source_diff = changed_files(source, STOCK, revision, REVIEWED_FILES)
     require(source_diff == SOURCE_DIFF, 'renderer-reviewed-source-diff')
     return measured, source_diff
@@ -204,7 +218,7 @@ def issue(members, old, shader, new, source_diff):
     require(set(before) == set(after), 'renderer-provider-members-changed')
     for name in before.keys() - changing:
         require(before[name] == after[name], 'renderer-provider-bytes-changed:'+name)
-    return dict(formatVersion=1, scope='stock-renderer-only', preparedClientRevision=old['sourceRevision'],
+    return dict(formatVersion=1, scope=SCOPE, preparedClientRevision=old['sourceRevision'],
                 preparedSourceLockSha256=old['sourceLockSha256'], previousClientArchiveSha256=old['archive']['sha256'],
                 previousExecutableSha256=before['bin/WowClient64.exe']['sha256'], executableRevision=new['sourceRevision'],
                 executableSourceLockSha256=new['sourceLockSha256'], sourceDiffSha256=source_diff,

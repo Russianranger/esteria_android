@@ -1,0 +1,75 @@
+{
+  "environment": "Debian ARM64 TCG, genuine production Wine/PE, read-only QEMU 9p game-data mount and Mesa lavapipe. No NIC/physical device/world/user input.",
+  "source": "fa3e74b7f332fef0f212e954a0de18f685ead8bd",
+  "peSha256": "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317",
+  "wine": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+  "importGeneration": "a6800cb53df18cea0012ea4c7c86991edaf49f49433528ec237678454bea09cb",
+  "shaderGeneration": "9d5f8a86c2ef253bd5ad9cde6b493e34e789cc5ab6b9a1f49008485b34b969f1",
+  "shaderReceipt": "67640ae968737c56a2b0e4b3dd78cfeda9bd640370e4841e818de6482214e520",
+  "realClient": {
+    "openedArchives": 16,
+    "failedHashTableArchives": [
+      "patch.MPQ",
+      "lichking.MPQ",
+      "common.MPQ",
+      "common-2.MPQ"
+    ],
+    "targetMessageSize": 512000,
+    "ptraceExecutionBreakpointsInHashVerifiedAnonymousPe": 6,
+    "observedWfxOpens": 5,
+    "successfulWfxHandles": 0,
+    "parserCallbacks": 0,
+    "particleEffectPointerLive": false,
+    "crashRVA": "0x21AD38",
+    "access": "read 0x50",
+    "swapchain": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 768,
+      "depth": 24
+    },
+    "identicalOriginalGreenEulaFrameTimesMs": [
+      0,
+      14117,
+      22938
+    ],
+    "frameSha256": "590ebaba5cffc7e46f7934cad17da2dd40215ff03681bcb92abe0cfb6b1ac18e",
+    "sixteenSuccessfulVulkanCalls": 16,
+    "kernelTraceLoss": 0,
+    "shaderManifestRecords": 1580,
+    "distinctSpvFilesRead": 6,
+    "cleanClientExit": false,
+    "directTestChildrenReaped": true,
+    "qemuExit": 0
+  },
+  "comparison": {
+    "windowInput": "same original patch.MPQ after original owner stop",
+    "fileSize": 4004713057,
+    "realFileAttributes": 32,
+    "nativeSinglePreadMatched64KiBChunks": true,
+    "sampledNativeTables": 8,
+    "windowsSmallReadAuthentic": true,
+    "requestedBytes": 1048576,
+    "offset": 4003005889,
+    "ordinarySyncRead": {
+      "success": true,
+      "bytes": 1048576,
+      "crc32": 3890262401
+    },
+    "productionStylePositionalRead": {
+      "success": true,
+      "error": 0,
+      "bytes": 507904,
+      "crc32": 2272037407
+    },
+    "sixteenPositional64KiBReads": {
+      "success": true,
+      "error": 0,
+      "bytes": 1048576,
+      "crc32": 3890262401
+    },
+    "expectedFullTableCRC32": 3890262401
+  },
+  "disposition": "The exact-read consumer discards a valid archive when an ordinary successful positional short read returns nonzero progress; recovery must complete the request and reject actual EOF or I/O failure."
+}

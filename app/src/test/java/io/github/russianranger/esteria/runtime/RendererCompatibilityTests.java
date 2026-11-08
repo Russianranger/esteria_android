@@ -5,7 +5,7 @@ import java.nio.charset.StandardCharsets;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/** Tests a hypothetical renderer-only pair against a real selected shader receipt.
+/** Tests a hypothetical executable update against a real selected shader receipt.
  * The test descriptor and its synthetic PE hashes never enter the main APK. */
 final class RendererCompatibilityTests {
     private static final String OLD_ARCHIVE = "5997af5a94a1151e708cf80fa9931e4055a887598e01c9cf21e6b3af0d438759";
@@ -28,7 +28,7 @@ final class RendererCompatibilityTests {
                 .put("requiredFiles",new JSONObject().put("bin/WowClient64.exe",new JSONObject().put("sha256",pe)));
         JSONObject tools=new JSONObject().put("clientRevision",oldRevision).put("toolManifestSha256",receipt.toolManifestSha256)
                 .put("requiredWineArchiveSha256",wine).put("archive",new JSONObject().put("sha256",shaderArchive));
-        JSONObject pair=new JSONObject().put("formatVersion",1).put("scope","stock-renderer-only")
+        JSONObject pair=new JSONObject().put("formatVersion",1).put("scope","stock-renderer-and-archive-read")
                 .put("preparedClientRevision",oldRevision).put("preparedSourceLockSha256",oldLock)
                 .put("previousClientArchiveSha256",OLD_ARCHIVE).put("previousExecutableSha256",OLD_PE)
                 .put("executableRevision",newRevision).put("executableSourceLockSha256",newLock)

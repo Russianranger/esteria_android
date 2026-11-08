@@ -1,0 +1,66 @@
+{
+  "scope": "Released MySQL worker with a retained MySQL 8.0.46 private bootstrap, ordinary cold ownership through the production CLI",
+  "sourceCommit": "075ed711bd8be7aaeac8bdfca2be8c607afb8f4b",
+  "version": "0.1.0-non-custom.18",
+  "apkSha256": "60a90c58dfc211c53928853dbbebd04929668da69d46d4c0a027c143f6857eb6",
+  "appliedServiceHelpers": {
+    "mysql_bootstrap.py": {
+      "bytes": 32786,
+      "sha256": "212bf5bae4c947c57069fe7e816be1c2c1fad6869ef378fc609df359c7f50f2e"
+    },
+    "mysql_service.py": {
+      "bytes": 18729,
+      "sha256": "55fd55b11c614794929330a92f8b19637c8e02c3471c319f5e9429346fa716d4"
+    }
+  },
+  "environment": "Two no-network ARM64 Debian full-system QEMU/TCG guest boots on x86_64, using separately writable snapshots of the same private initialized MySQL source.",
+  "actualDevice": false,
+  "physicalThor": false,
+  "gameplayQualified": false,
+  "applicationSqlInstallationQualifiedByThisTrial": false,
+  "retainedDatabaseInitializerCalls": 0,
+  "originalNativeReadinessBudgetSeconds": 90,
+  "first": {
+    "preEngineAdmissionSeconds": 46.477,
+    "nativeEngineToTypedReadySeconds": 37.28,
+    "launchToTypedReadySeconds": 83.758,
+    "coldAuthenticatedQuerySeconds": 8.497,
+    "twoEstablishedQueriesSeconds": 0.036,
+    "databaseNameCount": 4,
+    "sameBootstrapAndUuid": true,
+    "workerMonitorExercised": true,
+    "cleanCommandStop": true,
+    "stopSeconds": 4.733,
+    "guestCleanPoweroff": true
+  },
+  "differentPrivateBranch": {
+    "preEngineAdmissionSeconds": 40.602,
+    "nativeEngineToTypedReadySeconds": 28.578,
+    "authenticatedAtSeconds": 71.076,
+    "coreEnteredAtSeconds": 71.423,
+    "sameOriginalBootstrapUuid": true,
+    "ownerActionAfterReadiness": "Canceled during immutable server-content verification to hand the fixed SQL slot to the authenticated four-schema donor. This run made no application-schema changes.",
+    "verifiedPackageInputFilesAtCancellation": 1884,
+    "expectedPackageInputFiles": 4063,
+    "verifiedPackageBytesAtCancellation": 214896884,
+    "guestCleanPoweroff": true
+  },
+  "separateInterruptedSameCowBoot": {
+    "reachedTypedReady": false,
+    "sameRetainedBootstrapAndUuid": true,
+    "differentColdBoot": true,
+    "nativeEngineReachedReadyLog": true,
+    "nativeEngineReachedCleanShutdownLog": true,
+    "reason": "Owner canceled for host memory after native engine readiness and before typed authentication.",
+    "guestCleanPoweroff": true
+  },
+  "sourceEvidenceSha256": {
+    "candidate-first.json": "78377721c793057ffb953060a3a42997bba751d8d84f6bd7a31fe06a73c8e479",
+    "host-first.json": "5cd665991c966d0427ba8900575efdb4003e3f0a49c5e74d29d4b38bb9701340",
+    "candidate-reopen.json": "96827d5ff8bbbad3442705bf2d0bce07dff405fa072305d0db9955e6efaa3918",
+    "host-reopen.json": "33a25c93857c05cc08ae9ba7035c674f76bf36ad86551d118d03d869803f02f9",
+    "early-world.json": "3da841071ae62a609fcdb9ab0bca84ff9a01833951f705ed3b274a1a05476a26",
+    "host-outcome.json": "3603ed13be160c8842146e301a3d39eddd39206309814d73cd86975eaa53bc7b",
+    "stop-early": "a900d3ea64db5a9fee11ce78c55fd721bc410336b3e432c6712677babc23e48e"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "releaseId": 438118575,
+  "tag": "stock-client-arm64-c05a3af9be6c204c40d65d0e3eb6ccc2442012b6",
+  "commit": "c05a3af9be6c204c40d65d0e3eb6ccc2442012b6",
+  "completeAnonymousReadback": true,
+  "assets": [
+    {
+      "name": "client-ARM64-c05a3af9be6c204c40d65d0e3eb6ccc2442012b6.zip",
+      "bytes": 45844904,
+      "sha256": "94d348a901dc234973eb651026985846f1c0f4f243349f81372883b5435f8c87",
+      "id": 723347201,
+      "publicUrl": "https://github.com/Russianranger/wowdecomp_esteria/releases/download/stock-client-arm64-c05a3af9be6c204c40d65d0e3eb6ccc2442012b6/client-ARM64-c05a3af9be6c204c40d65d0e3eb6ccc2442012b6.zip"
+    },
+    {
+      "name": "client-corresponding-source.tar.gz",
+      "bytes": 23467098,
+      "sha256": "5128ea4611f68c03740796abfd169e49f5e2a9b43646c73160db2ce268b3d536",
+      "id": 723347284,
+      "publicUrl": "https://github.com/Russianranger/wowdecomp_esteria/releases/download/stock-client-arm64-c05a3af9be6c204c40d65d0e3eb6ccc2442012b6/client-corresponding-source.tar.gz"
+    },
+    {
+      "name": "source-receipt.json",
+      "bytes": 3688,
+      "sha256": "816c750897f4546889b645a32b42b7e7000b01e3bc4d391a8584794e33cbb642",
+      "id": 723347318,
+      "publicUrl": "https://github.com/Russianranger/wowdecomp_esteria/releases/download/stock-client-arm64-c05a3af9be6c204c40d65d0e3eb6ccc2442012b6/source-receipt.json"
+    }
+  ],
+  "workflowRun": 42461366985,
+  "windowsArm64Job": 128671165841,
+  "windowsArm64OriginalArtifact": 13610057399,
+  "nativeLinuxArm64WineJob": 128673220646,
+  "nativeLinuxArm64WineArtifact": 13610237314,
+  "nativeLinuxArm64WineArtifactSha256": "90a41b599657e1b53c071407ab9a84094b85788b5090fc60f0b28dceb9046e75",
+  "nativeLinuxArm64WineArtifactBytes": 142375905
+}

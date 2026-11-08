@@ -60,7 +60,7 @@ class StockTitleProvider(unittest.TestCase):
             donor.write_text('{}')
             (shader/'android-provider.lock.json').write_text(json.dumps({'clientRevision': 'a'*40,
                                                                         'toolManifestSha256': '1'*64}))
-            pair = {'formatVersion': 1, 'scope': 'stock-renderer-only', 'preparedClientRevision': 'a'*40,
+            pair = {'formatVersion': 1, 'scope': 'stock-renderer-and-archive-read', 'preparedClientRevision': 'a'*40,
                     'executableRevision': 'b'*40, 'preparedSourceLockSha256': hashlib.sha256(donor.read_bytes()).hexdigest(),
                     'executableSourceLockSha256': hashlib.sha256(source.read_bytes()).hexdigest(),
                     'requiredWineArchiveSha256': '2'*64, 'shaderToolManifestSha256': '1'*64}

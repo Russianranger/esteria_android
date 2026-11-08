@@ -90,7 +90,14 @@ def stage(args):
                  '**Repair local component → Database setup**, then start the local game again.\n'
                  'If a stage fails, wait for cleanup, tap **Export support bundle**, choose a\n'
                  'destination and tap **Save**. Send the whole ZIP before retrying.')
-    if signed['versionCode'] == 18:
+    if signed['versionCode'] == 19:
+        setup = ('Install over Esteria Stock. Keep the existing import, selected locale, prepared world and saves. '
+                 'Tap **Repair local component → Client runtime** once to select the updated executable. '
+                 'If shader preparation previously failed, tap **Repair local component → Shaders** once. '
+                 'Once shaders are ready, tap **Start local game**. '
+                 'If either repair fails, use **Export support bundle**, choose Downloads and tap **Save** '
+                 'before retrying.')
+    elif signed['versionCode'] == 18:
         setup = ('Install over Esteria Stock. Keep the existing import, configuration, databases and saves. '
                  'With the client and shaders prepared, tap **Start local game**. '
                  'If the previous failure was at shaders, choose **Repair local component → Shaders** once, then start. '
@@ -357,6 +364,18 @@ V17 uses this Wine setting for ordinary stock client launches. Client runtime
 repair can also finish the recognized interrupted Wine installation in place.
 The APK uses the same client, Wine package, shaders, world-data recipe and SQL
 profile as v16. Physical Thor shader completion and gameplay remain open.
+'''
+    if signed['versionCode'] == 19:
+        notes += '''
+The reconstructed client now completes short positional reads of stock MPQs.
+On a full 3.3.5a import under ARM64 Wine, a successful read returned 507,904
+of 1,048,576 requested bytes. The previous executable treated the archive as
+empty, lost the front-end particle effects and crashed when drawing them.
+The corrected read stops at the first true EOF or I/O error.
+
+The APK pairs the new executable with the existing prepared-data revision.
+Completed import, shader and world generations keep their original identities.
+The signed update uses the existing database and stock SQL profile.
 '''
     (args.output / 'RELEASE-NOTES.md').write_text(notes)
     return result

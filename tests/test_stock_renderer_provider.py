@@ -25,7 +25,7 @@ class RendererProviderTest(unittest.TestCase):
         }
         pin = self.put(renderer.client.ARCHIVE, b'fixture archive')
         self.item = {key:'f'*64 for key in renderer.HASHES}
-        self.item.update(formatVersion=1, scope='stock-renderer-only', preparedClientRevision=renderer.STOCK,
+        self.item.update(formatVersion=1, scope=renderer.SCOPE, preparedClientRevision=renderer.STOCK,
                          executableRevision=renderer.EXECUTABLE, sourceDiffSha256=renderer.SOURCE_DIFF, executableSha256='1'*64, previousClientArchiveSha256='c'*64,
                          clientArchiveSha256=pin['sha256'], shaderToolsArchiveSha256='e'*64)
         self.save(self.item)
@@ -68,7 +68,7 @@ class RendererProviderTest(unittest.TestCase):
             renderer.apk_members(self.previous, self.compat, self.root)
 
     def test_strict_descriptor_types_and_new_identities(self):
-        for change in ({'formatVersion':True}, {'unknown':1}, {'scope':'stock'}, {'executableRevision':renderer.STOCK},
+        for change in ({'formatVersion':True}, {'unknown':1}, {'scope':'stock'}, {'scope':'stock-renderer-only'}, {'executableRevision':renderer.STOCK},
                        {'sourceDiffSha256':'AA'*32}, {'previousExecutableSha256':self.item['executableSha256']}):
             self.save(dict(self.item, **change))
             with self.subTest(change=change), self.assertRaises(ValueError):

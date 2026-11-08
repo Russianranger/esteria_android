@@ -1,16 +1,16 @@
 {
-  "clientArchiveSha256": "a413045a85ea84d31cdaa8008f381540442f2d0de9df0fa4fe20c9695edc5086",
-  "executableRevision": "fa3e74b7f332fef0f212e954a0de18f685ead8bd",
-  "executableSha256": "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317",
-  "executableSourceLockSha256": "4daef14068f010ce31a05512f67ec62ee2e1927156187306cc8da018f91a6a67",
+  "clientArchiveSha256": "954ce4974672dc6fdab666d44d56abbe253199128fda9ccfaa39f09826cc65e9",
+  "executableRevision": "c05a3af9be6c204c40d65d0e3eb6ccc2442012b6",
+  "executableSha256": "e224cc5611511e47c3e4f20fa8c401419f9b9d2fc648a70908be58ca204aa561",
+  "executableSourceLockSha256": "b770679b2c5daf8a86ef8022c6050047ab00c4ed7b0edbbd09acd5c46f0eaf87",
   "formatVersion": 1,
   "preparedClientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
   "preparedSourceLockSha256": "dd2d5e3f8d9de412caf931de74f19b3746d3065dced8353e10beee212c91fc90",
   "previousClientArchiveSha256": "5997af5a94a1151e708cf80fa9931e4055a887598e01c9cf21e6b3af0d438759",
   "previousExecutableSha256": "06557024cfaa974d02482eb98fedc186bc6b323ca730178347e153105343e12a",
   "requiredWineArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
-  "scope": "stock-renderer-only",
+  "scope": "stock-renderer-and-archive-read",
   "shaderToolManifestSha256": "36e3032524c2136c4273908f887a1ca59ebb414e806f52d47e778332ed4acda6",
   "shaderToolsArchiveSha256": "c48c4d78952d4a2c02c26b7a6da0087d29b21eb19a81b643cb5a9a97cf7389af",
-  "sourceDiffSha256": "182c4df27c204cb3e3a10333cabff2a8c8f70ef7ca0bcf4f174ce676ad850547"
+  "sourceDiffSha256": "c85f6cf085a135a39fe69742edcd4da16ebbc975526d3d4ab1c4137c67ecc67d"
 }

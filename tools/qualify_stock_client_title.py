@@ -66,7 +66,7 @@ def renderer_pair(prepared_revision, wine_digest):
     pairing = read(provider/'renderer-compatibility.json')
     build = read(provider/'stock-renderer-build.lock.json')
     shader = read(ROOT/'runtime/shaders/android-provider.lock.json')
-    if (pairing['formatVersion'] != 1 or pairing['scope'] != 'stock-renderer-only' or
+    if (pairing['formatVersion'] != 1 or pairing['scope'] != 'stock-renderer-and-archive-read' or
             not re.fullmatch('[0-9a-f]{40}', revision) or
             revision != pairing['executableRevision'] or revision != build['sourceRevision'] or
             prepared_revision != pairing['preparedClientRevision'] or prepared_revision != shader['clientRevision'] or
