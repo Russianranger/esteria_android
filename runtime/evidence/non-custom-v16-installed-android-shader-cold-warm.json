@@ -1,0 +1,135 @@
+{
+  "formatVersion": 1,
+  "scope": "Public v16 APK installed in Android 13 on a native hosted Linux ARM64 runner, offline from Android creation through shutdown",
+  "apk": {
+    "version": "0.1.0-non-custom.16",
+    "versionCode": 16,
+    "source": "b12fe53270a62677a625564582e264a8e5733d8b",
+    "bytes": 336887065,
+    "sha256": "de9d108a725aeb7a8eea1041bd1a72eb7a5acde811595cf71c886f6937f74ab4",
+    "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+    "package": "io.github.russianranger.esteria.stock"
+  },
+  "run": {
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/42433932899",
+    "jobId": 128588605272,
+    "qaRevision": "f5934811d7a8ec0151032885ae4f27e66f072564",
+    "artifactId": 13598629761,
+    "artifactBytes": 2093,
+    "artifactSha256": "121c8d2d9d82c2effdfa03f5f304a100ae2e9ad445f5eb1237afb155421f6e08",
+    "result": "success",
+    "finished": true,
+    "privateTestStoreRemoved": true
+  },
+  "environment": {
+    "kernel": "7.0.0-1017-azure",
+    "machine": "aarch64",
+    "androidSdk": 33,
+    "abi": "arm64-v8a",
+    "selinux": "Disabled",
+    "pinnedAndroidImage": "sha256:c815ac1b1d5bd0a099b74c3e3e0eeea3b32bed8d7ab1f788c20fb74e35891716",
+    "network": "private namespace with loopback only",
+    "startup": "stock MainActivity launched and stopped, followed by fresh package-UID app_process64 owners that load the installed APK classes and production native libraries"
+  },
+  "source": {
+    "scope": "official-stock-shader-windows-with-private-qa-journal",
+    "providers": 16,
+    "intervals": 40,
+    "verifiedBytes": 41645637,
+    "importFixture": "bef34b45e7ece99f092d8e2865556cce461e4144b3ab59a754a7765d56052699",
+    "rangeLockSha256": "a5f62abdcd6feff6d4a908757c083d9f6357c39ed5432343522ff6d437d725aa",
+    "torrentSha256": "58731d43da3e615fbeb489ebd7a9401a8b56eeed8b7baf72f6b57646c574f62e",
+    "elapsedSeconds": 194.275,
+    "zipRangeRequests": 53,
+    "zipRangeBytes": 111149056
+  },
+  "guard": {
+    "mode": "FUSE read-only original archive intervals, rehashed on mount, all other reads fail EIO",
+    "verifiedReadProbe": "stock MPQ magic",
+    "intentionalDeniedCrossBoundaryReads": 1,
+    "androidDeniedInputReads": 0,
+    "completeBaseZipImported": false
+  },
+  "androidPackage": {
+    "scope": "disposable Android 13 signed v16 package lifecycle",
+    "package": "io.github.russianranger.esteria.stock",
+    "phase": "complete",
+    "physicalThor": false,
+    "gameplayQualified": false,
+    "versionCode": 16,
+    "versionName": "0.1.0-non-custom.16",
+    "uid": 10077,
+    "launcherStatus": "ok",
+    "launcherComponent": "io.github.russianranger.esteria.stock/io.github.russianranger.esteria.MainActivity",
+    "launcherPid": 1854,
+    "launcherProcessVerified": true,
+    "launcherWaitMs": 1341,
+    "launcherStopped": true,
+    "postLauncherUidProcesses": 0,
+    "postShaderUidProcesses": 0,
+    "postShaderOwnersReaped": true
+  },
+  "shaderPreparation": {
+    "formatVersion": 1,
+    "scope": "offline signed Android stock shader owner",
+    "phase": "complete",
+    "physicalThor": false,
+    "gameplayQualified": false,
+    "importGeneration": "bef34b45e7ece99f092d8e2865556cce461e4144b3ab59a754a7765d56052699",
+    "packageUid": 10077,
+    "abi": "arm64-v8a",
+    "sdk": 33,
+    "wineArchiveSha256": "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46",
+    "package": "io.github.russianranger.esteria.stock",
+    "operations": [
+      {
+        "mode": "cold",
+        "generation": "1fcd9acf103c708da5118f5fe0b96570b7c9923f7b93c3aa6fcb705934c99cee",
+        "importGeneration": "bef34b45e7ece99f092d8e2865556cce461e4144b3ab59a754a7765d56052699",
+        "files": 4742,
+        "bytes": 102079994,
+        "modules": 1580,
+        "wineGeneration": "dda9221e408dd167796e8a80042f5d7e7e168185eef63dfea088053b0a965c9d",
+        "wineCopiedBytes": 1325744204,
+        "toolsGeneration": "1607c300f598b348201f8f2ddf1db4f9527b09bf645240e996cabc69e40db24d",
+        "toolsCopiedBytes": 16690219,
+        "ownedTranslatorLaunched": true,
+        "ownerClosed": true,
+        "sessionReceiptAdmitted": true,
+        "elapsedMs": 210842,
+        "receiptSha256": "df60d525089db09099501fb45ea69986ecda9e69742e255efb6570b8fa628f84",
+        "receiptStat": "2049 6574524 658551 1794101413"
+      },
+      {
+        "mode": "warm",
+        "generation": "1fcd9acf103c708da5118f5fe0b96570b7c9923f7b93c3aa6fcb705934c99cee",
+        "importGeneration": "bef34b45e7ece99f092d8e2865556cce461e4144b3ab59a754a7765d56052699",
+        "files": 4742,
+        "bytes": 102079994,
+        "modules": 1580,
+        "wineGeneration": "dda9221e408dd167796e8a80042f5d7e7e168185eef63dfea088053b0a965c9d",
+        "wineCopiedBytes": 0,
+        "toolsGeneration": "1607c300f598b348201f8f2ddf1db4f9527b09bf645240e996cabc69e40db24d",
+        "toolsCopiedBytes": 0,
+        "ownedTranslatorLaunched": false,
+        "ownerClosed": true,
+        "sessionReceiptAdmitted": true,
+        "elapsedMs": 1572,
+        "receiptSha256": "df60d525089db09099501fb45ea69986ecda9e69742e255efb6570b8fa628f84",
+        "receiptStat": "2049 6574524 658551 1794101413"
+      }
+    ],
+    "observedPhases": [
+      "ANDROID_SHADER_PHASE runtime-cached 76",
+      "ANDROID_SHADER_PHASE shaders-selecting-prepared 166",
+      "ANDROID_SHADER_PHASE shaders-session-integrity 601",
+      "ANDROID_SHADER_PHASE shaders-session-integrity-complete 1546"
+    ],
+    "elapsedSeconds": 215.555
+  },
+  "limits": [
+    "The 16-provider journal binds authenticated shader intervals and lengths. The complete game import and the physical Thor retained generation are separate sources.",
+    "The warm owner performs session integrity verification of the prepared shader payload.",
+    "Physical Thor execution, normal graphics and persistent character gameplay remain unqualified by this run."
+  ]
+}

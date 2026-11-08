@@ -86,7 +86,24 @@
       "sameSizeMutationWithRestoredMtimeRejected": true,
       "mutationFullAuditCalls": 1
     },
-    "observer": "The initial external 420 s per-process watchdog expired for cold and owner-loss test orchestration. The actual independently launched Android owners completed and recorded the above durable results. The first emulator process ended during the separate package-UID warm cancellation trial; no cancellation or mutation result for that trial is included."
+    "observer": "The initial external 420 s watchdog expired on the slow emulated cold and owner-loss trials. The Android owners recorded their durable results. After infrastructure interruption, a fresh offline boot over the retained Android store completed the separate cancellation and corruption trials.",
+    "warmCancellation": {
+      "uid": 10077,
+      "cancelledBeforeAdmission": true,
+      "fullPayloadAuditCalls": 0,
+      "privateCandidateBytes": 3331,
+      "elapsedMs": 221903,
+      "logSha256": "316a74ef80dcd0aae09db66d5e3c3b26270a60ce5ec78ac7c618f9bf8622ec65"
+    },
+    "sameSizeMutationRestoredMtime": {
+      "uid": 10077,
+      "rejected": true,
+      "fallbackReason": "prepared-data stat changed",
+      "fullPayloadAuditCalls": 1,
+      "privateCandidateBytes": 3331,
+      "elapsedMs": 95543,
+      "logSha256": "14eb1f869e77c81446a0954680b450bfbeb55ab385d7f5c7d1a5470681e3a073"
+    }
   },
   "privatePublicationFallback": {
     "actor": "Separate root-launched ART trial on same emulator with private index parent deliberately left mode 0755",
@@ -102,5 +119,24 @@
   "limits": [
     "Device-local proof applies only to the selected volume and owner on that admission. The Redroid kernel does not enforce SELinux. Hard-link denial, ineffective timestamps or lock contention proof, missing/stale index, or changed source selection yields the full audit or identity rejection. Eligibility on a physical Thor is unmeasured.",
     "These runs do not execute the subsequent SQL schema step, native auth/world service, client, gameplay or user saves. Wall times include staging and emulated Python process startup."
-  ]
+  ],
+  "independentFinalAdmissionMeter": {
+    "scope": "Packaged ARM64 PRoot test of the v16 meter helper in a separate disposable app-owned directory. One synthetic WDBC payload and small generated files. This trial calls the production audit and seal entry points directly.",
+    "preparedDataCacheSha256": "ff69ecaeb5f52fb9438012773a1c2a88d5083de9486ad5edaf6fa86f42a29cd9",
+    "selectedBytes": 50331778,
+    "policyBytesPerSecond": 8388608,
+    "fullAudit": {
+      "actualAuditPassed": true,
+      "policyBytes": 50483877,
+      "lastPulseBytes": 46813824,
+      "wallSeconds": 41.294
+    },
+    "cacheSeal": {
+      "actualAuditPassed": true,
+      "policyBytes": 51298130,
+      "lastPulseBytes": 50813590,
+      "wallSeconds": 19.601
+    },
+    "logSha256": "1cc4a5289daa935bd9d4d04c21543c1231681a38ca6ed24545d6b465fe5deebb"
+  }
 }
