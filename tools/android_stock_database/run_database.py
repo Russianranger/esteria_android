@@ -57,6 +57,18 @@ def wine_details(report):
             timeline.append(row)
         report['firstUseTimeline']=timeline
 def failure_details(report):
+    # app_process can send itself SIGKILL after reporting an uncaught Java
+    # exception. Disambiguate its cause without publishing logcat or SQL text.
+    crash=shell(CONTAINER, 'logcat -d -b crash -t 500 -v brief 2>/dev/null || true')
+    report['crashAppFrames']=re.findall(r'at (io\.github\.russianranger\.esteria(?:\.[A-Za-z0-9_$]+)+)\(([A-Za-z0-9_]+\.java:\d+)\)',crash)[-30:]
+    report['crashConditions']=[v for v in ('Owned database exited during setup','Installation helper failed',
+        'Installation process ownership failed','Installation phase timed out','No space left on device',
+        'OutOfMemoryError','Read-only file system','Invalid installation progress phase') if v in crash]
+    report['helperExitCodes']=[int(n) for n in re.findall(r'Installation helper failed \(exit (-?\d{1,3})\)',crash)]
+    oom=Path('/proc/vmstat').read_text()
+    report['hostOomKillsAfter']=int(re.search(r'^oom_kill (\d+)$',oom,re.M)[1])
+    space=shell(CONTAINER,'df -k /data | tail -1')
+    report['dataAvailableKiBAfter']=int(space.split()[3])
     wine_details(report)
     root='/data/data/'+PACKAGE+'/files'
     paths=shell(CONTAINER,'''for dir in "$1"/db/*; do if test -d "$dir"; then basename "$dir"; fi; done''',root).splitlines()
@@ -69,6 +81,25 @@ def failure_details(report):
     raw=shell(CONTAINER,'''for f in "$1"/state/database-operations/*/logs/stderr.log "$1"/state/server-installation-processes/*/logs/stderr.log; do
          if test -f "$f"; then tail -c 5000 "$f"; fi
      done''',root)
+    report['installationHelperKinds']=re.findall(r'Owned installation failed \(([A-Za-z_][A-Za-z0-9_]{0,63})\)',raw)
+    events=shell(CONTAINER,'''for f in "$1"/installation-operations/*/sql-*-private.log; do
+          test ! -s "$f" || grep -oE '^ERROR [0-9]{3,5} [(][0-9A-Z]{5}[)]' "$f" || true
+        done''',base)
+    report['schemaSqlErrors']=sorted(set(re.findall(r'^ERROR (\d{3,5} \([0-9A-Z]{5}\))$',events,re.M)))[:24]
+    progress=shell(CONTAINER,'''for f in "$1"/installation-operations/*/progress.json; do
+          test ! -f "$f" || cat "$f"
+        done''',base)
+    if progress.strip():
+        try:
+            event=json.loads(progress)
+            report['lastInstallationEvent']={k:v for k,v in event.items() if
+                (k in ('files','totalFiles','bytes','totalBytes') and type(v) is int) or
+                (k=='phase' and re.fullmatch(r'[a-z][a-z0-9-]{0,79}',str(v)))}
+            path=event.get('path')
+            if isinstance(path,str):
+                report['lastInstallationEvent']['relativeInputSha256']=hashlib.sha256(path.encode()).hexdigest()
+        except ValueError:
+            pass
     matches=re.findall(r'Database setup failed \(([a-zA-Z0-9_:,;= -]{1,350})\)',raw)
     if matches:
         report['bootstrapDiagnostic']=matches[-1]
@@ -102,6 +133,9 @@ def failure_details(report):
 
 
 def exercise(report,seed):
+    vmstat=Path('/proc/vmstat').read_text()
+    report['hostOomKillsBefore']=int(re.search(r'^oom_kill (\d+)$',vmstat,re.M)[1])
+    report['dataAvailableKiBBefore']=int(shell(CONTAINER,'df -k /data | tail -1').split()[3])
     if seed:
         checked(not shell(CONTAINER,'pm list packages --user 0 "$1"',PACKAGE).strip(),'fresh PM store required')
         result=shell(CONTAINER,'''apk=/data/local/tmp/esteria-prior-stock-qa.apk
