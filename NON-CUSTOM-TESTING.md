@@ -1,5 +1,7 @@
 # Esteria Stock 0.1.0-non-custom.21 for AYN Thor
 
+The November 8 signed v21 Thor repair reused world data at 32 s and shaders at 52 s. The core SQL helper launched at 113 s. The launcher observed 20 file completions and last saw `creature_loot_template.sql` start at 205 s. Cleanup reported forced helper termination at 208 s. MySQL recorded one clean stop in each abandoned slot. The export cannot recover the earlier exception that v21 discarded. Preserve both slots. On this Thor, wait for a signed update before another database attempt. [Physical evidence](runtime/evidence/non-custom-v21-thor-schema-interruption.json).
+
 Install the [signed Esteria Stock v21 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.21/Esteria-Stock-3.3.5a-arm64.apk) over v19. Keep the imported ChromieCraft 3.3.5a client, **enUS**, **Balanced**, and existing saves.
 
 1. For the November 8 Thor failure, choose **Repair local component → Database setup**. The device already selected the stock world and 4,742 shaders. Leave those selections in place.

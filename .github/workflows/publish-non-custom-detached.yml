@@ -134,7 +134,7 @@ jobs:
         with:
           name: signed-retained-update-input
           path: signed-input
-      - name: Exercise the original v19 failure and signed replacement on offline Android 13 ARM64
+      - name: Exercise the v21 schema observer failure and signed replacement on offline Android 13 ARM64
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -143,19 +143,19 @@ jobs:
           work=$(mktemp -d "$RUNNER_TEMP/signed-retained.XXXXXXXX")
           mkdir -p "$work/input" evidence
           cp signed-input/* "$work/input/"
-          for asset in '723482619 previous.apk' '692421785 wine.tar.gz'; do
+          for asset in '724391618 previous.apk' '692421785 wine.tar.gz'; do
             read -r id name <<< "$asset"
             curl --fail --location --silent --show-error --retry 3 --max-time 600               -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/octet-stream'               "https://api.github.com/repos/Russianranger/esteria_android/releases/assets/$id?run=$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" -o "$work/input/$name"
           done
           unset GH_TOKEN
-          echo "c0d251847496c64170bb31d534a925afd1d8e7f92c21687e0e1cbf82c056e6fa  $work/input/previous.apk" | sha256sum -c
+          echo "1036c59e2d6e75c95e2cc6918111dfa73f816b77e3cd56b729807787d9bfb11d  $work/input/previous.apk" | sha256sum -c
           wine=$(jq -r '.packages["wine-arm64"].archive.sha256' runtime/runtime-sources.lock.json)
           echo "$wine  $work/input/wine.tar.gz" | sha256sum -c
           chmod 755 "$work/input"
           chmod 644 "$work/input/"*
           trap 'redroid_stop "$work"' EXIT
           redroid_start "$work"
-          python3 tools/retained_database/device.py evidence/signed-update.jsonl
+          python3 tools/retained_database/device.py evidence/signed-update.jsonl v22
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

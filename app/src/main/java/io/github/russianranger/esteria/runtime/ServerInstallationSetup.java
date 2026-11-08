@@ -200,6 +200,8 @@ public final class ServerInstallationSetup {
         private volatile ServerDatabaseSetup.BootstrapLease bootstrapLease;
         private volatile Path bootstrapLogs;
         private volatile String helperPhase="not-launched";
+        private int unreadableProgress;
+        private String lastProgressError="none";
         private FreshServerInstallations.Workspace setupProcessWorkspace;
         private Result result;
         private boolean promotionAttempted;
@@ -229,7 +231,8 @@ public final class ServerInstallationSetup {
         public String diagnosticState(){
             ServerDatabaseService.Handle service=database;
             return "slot="+attempt.slotId+" mysqlUuid="+(service==null||service.instanceUuid()==null?"unavailable":service.instanceUuid())
-                    +" helper="+helperPhase+" owner="+state;
+                    +" helper="+helperPhase+" owner="+state+" unreadableProgress="+unreadableProgress
+                    +" lastProgressError="+lastProgressError;
         }
         public String slotId(){return attempt.slotId;}
         /** Off main thread. Keep this owner on every failure, then close/retry
@@ -388,6 +391,7 @@ public final class ServerInstallationSetup {
                 String uuid=row.getString("uuid"),version=row.getString("version");
                 if(!UUID.fromString(uuid).toString().equals(uuid))throw new IOException("Invalid bootstrap UUID");
                 result.put(key+".bootstrapUuid",uuid);
+                observeBaseline(result,key,work.resolve("state/.server-schema-initialization.json"),uuid,version);
                 Path sessions=work.resolve("mysql-sessions");
                 if(!Files.isDirectory(sessions,LinkOption.NOFOLLOW_LINKS)||!sessions.equals(sessions.toRealPath()))continue;
                 int inspected=0,clean=0;
@@ -414,6 +418,21 @@ public final class ServerInstallationSetup {
         byte[] receipt=read(inputs.contentReceiptPath(),16<<20);
         if(!hash(receipt).equals(inputs.contentReceiptSha256()))throw new IOException("Server content receipt changed");
         return receipt;
+    }
+    /** The private journal also contains credential identities. Export only bounded observations. */
+    private static void observeBaseline(Map<String,String> result,String key,Path path,String uuid,String version) {
+        if(!Files.exists(path,LinkOption.NOFOLLOW_LINKS))return;
+        try {
+            JSONObject journal=new JSONObject(new String(read(path,1<<20),StandardCharsets.UTF_8));
+            JSONObject binding=journal.getJSONObject("binding");
+            String phase=journal.getString("phase");
+            if(journal.getInt("formatVersion")==1 && uuid.equals(binding.getString("mysqlUuid")) &&
+                    version.equals(binding.getString("mysqlVersion")) && Set.of("prepared","importing","baseline-complete").contains(phase)) {
+                result.put(key+".baselinePhase",phase);
+                result.put(key+".baselineCompletedFiles",String.valueOf(journal.getJSONArray("completed").length()));
+                result.put(key+".baselinePendingFile",String.valueOf(!journal.isNull("pending")));
+            }
+        } catch(IOException|JSONException unavailable){result.put(key+".baselineInspection","unavailable");}
     }
     private static Result runGuest(Handle owner,Context context,Path root,InstalledInputs inputs,
             Path data,ServerDatabaseService.Handle service,String serviceOperation,String version,String uuid,
@@ -449,7 +468,9 @@ public final class ServerInstallationSetup {
                 owner.helperPhase=playerbots?"playerbots-launched":"core-launched";
             } catch(IOException|RuntimeException error){owner.releaseStoppedSetupProcess();throw error;}
             boolean cancelSeen=false;String lastProgress="";long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(90);
-            try {
+            Path progressFile=operationFiles.resolve("progress.json");
+            // Try-with-resources preserves the initiating exception if reaping the helper also fails.
+            try (java.io.Closeable cleanup=()->stopInstallationHelper(owner,process)) {
                 if(progress!=null)progress.update(playerbots?"installation-playerbots-started":"installation-core-started","",0,-1);
                 while(process.isAlive()) {
                     if(!service.isAlive())throw new IOException("Owned database exited during setup; staging retained");
@@ -457,14 +478,30 @@ public final class ServerInstallationSetup {
                         write(operationFiles.resolve("cancel"),new byte[0]);cancelSeen=true;
                         if(progress!=null)progress.update("installation-finishing-safe-point","",0,-1);
                     }
-                    Path path=operationFiles.resolve("progress.json");
-                    if(progress!=null && Files.exists(path,LinkOption.NOFOLLOW_LINKS)) {
-                        String current=new String(read(path,16384),StandardCharsets.UTF_8);
-                        if(!current.equals(lastProgress)) {
-                            JSONObject event=new JSONObject(current);String phase=event.getString("phase");
-                            if(!phase.matches("[a-z][a-z0-9-]{0,79}"))throw new IOException("Invalid installation progress phase");
+                    if(progress!=null && Files.exists(progressFile,LinkOption.NOFOLLOW_LINKS)) {
+                        // Only progress is advisory. A replacement or an unreadable sample
+                        // must not interrupt auto-committing SQL. Service ownership, deadline,
+                        // result receipt and four-schema verification are checked independently.
+                        JSONObject event=null;
+                        String current="";
+                        String phase="";
+                        try {
+                            current=new String(read(progressFile,16384),StandardCharsets.UTF_8);
+                            if(!current.equals(lastProgress)) {
+                                event=new JSONObject(current);
+                                phase=event.getString("phase");
+                                if(!phase.matches("[a-z][a-z0-9-]{0,79}"))
+                                    throw new JSONException("Invalid installation progress phase");
+                            }
+                        } catch(IOException|JSONException observation) {
+                            owner.unreadableProgress++;
+                            owner.lastProgressError=observation instanceof JSONException?"invalid-event":"read-failed";
+                            event=null;
+                        }
+                        if(event!=null) {
                             progress.update(phase,event.optString("path",""),event.optLong("bytes",event.optLong("files",0)),
-                                event.optLong("totalBytes",event.optLong("totalFiles",-1)));lastProgress=current;
+                                event.optLong("totalBytes",event.optLong("totalFiles",-1)));
+                            lastProgress=current;
                         }
                     }
                     if(System.nanoTime()>=deadline)throw new IOException("Installation phase timed out; staging retained");
@@ -478,14 +515,17 @@ public final class ServerInstallationSetup {
                 JSONObject report=new JSONObject(new String(read(operationFiles.resolve("result.json"),256<<10),StandardCharsets.UTF_8));
                 validate(report,selected,operation,serviceOperation,version,uuid,playerbots);
                 return new Result(report,processSession.resolve("logs"));
-            } finally {
-                try {
-                    if(process.isAlive()) {
-                        boolean interrupted=Thread.interrupted();try{process.stop(Duration.ZERO);}finally{if(interrupted)Thread.currentThread().interrupt();}
-                    }
-                } finally {owner.releaseStoppedSetupProcess();}
             }
         } catch(JSONException error){throw new IOException("Invalid installation metadata",error);}
+    }
+    private static void stopInstallationHelper(Handle owner,OwnedProcess process)throws IOException {
+        try {
+            if(process.isAlive()) {
+                boolean interrupted=Thread.interrupted();
+                try {process.stop(Duration.ZERO);}
+                finally {if(interrupted)Thread.currentThread().interrupt();}
+            }
+        } finally {owner.releaseStoppedSetupProcess();}
     }
     private static void validate(JSONObject report,JSONObject selected,String operation,String serviceOperation,String version,String uuid,boolean playerbots) throws IOException,JSONException {
         if(report.getInt("formatVersion")!=1 || !(playerbots?VERIFIED_SCOPE:"owned-server-installation-staged-pending-playerbots").equals(report.getString("scope")) ||
@@ -601,7 +641,7 @@ public final class ServerInstallationSetup {
     private static byte[] read(Path path,int maximum) throws IOException {
         if(!Files.isRegularFile(path,LinkOption.NOFOLLOW_LINKS) || !path.equals(path.toRealPath()) || Files.size(path)>maximum)
             throw new IOException("Missing or oversized installation metadata");
-        try(var stream=Files.newInputStream(path);var output=new java.io.ByteArrayOutputStream()) {
+        try(var stream=Files.newInputStream(path,LinkOption.NOFOLLOW_LINKS);var output=new java.io.ByteArrayOutputStream()) {
             byte[] buffer=new byte[4096];for(int count;(count=stream.read(buffer))!=-1;){if(output.size()+count>maximum)throw new IOException("Installation metadata exceeds bound");output.write(buffer,0,count);}return output.toByteArray();
         }
     }

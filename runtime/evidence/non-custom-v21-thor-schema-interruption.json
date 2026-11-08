@@ -1,0 +1,49 @@
+{
+  "scope": "physical-ayn-thor-stock-v21-named-database-repair",
+  "bundle": "Esteria-support-1794157810273.zip",
+  "bundleSha256": "e0d0576d5f60ae6918d40ef4822501292a5294e3a0fa185c973fff6fe176a1a0",
+  "androidProducer": "623a88115a394fc7bd433c51a60d0e0cda732b67",
+  "versionCode": 21,
+  "device": "AYN Thor / Android 13 / arm64",
+  "locale": "enUS",
+  "speed": "balanced",
+  "archiveCount": 16,
+  "importErrorCount": 0,
+  "importWarningCount": 0,
+  "operation": "5c86a6fb-23d5-4d1c-a6df-61066b2b3d79",
+  "elapsedSeconds": {
+    "worldReuse": 32,
+    "shaderReuse": 52,
+    "bootstrapPrepared": 91,
+    "coreHelperLaunched": 113,
+    "installationBaseline": 143,
+    "lastSchemaFileStarted": 205,
+    "workerFinished": 208
+  },
+  "observedSchemaFileCompleteEvents": 20,
+  "lastObservedPath": "data/sql/base/db_world/creature_loot_template.sql",
+  "reportedError": "Graceful shutdown did not complete; owned process was terminated",
+  "primaryTrigger": "Unavailable in v21. Cleanup in runGuest can replace the initiating exception.",
+  "helperStdoutBytes": 0,
+  "helperStderrBytes": 0,
+  "finalPressure": 0,
+  "cancelled": false,
+  "retainedSlots": [
+    {
+      "slot": "6583788fbe0a4a93",
+      "uuid": "3f2bd921-db7e-11f1-a7fb-060092d211c4",
+      "state": "abandoned/failed",
+      "cleanStopReceipts": 1
+    },
+    {
+      "slot": "ab7f81abf6484429",
+      "uuid": "f2364baf-db96-11f1-a869-060092d211c4",
+      "state": "abandoned/failed",
+      "cleanStopReceipts": 1
+    }
+  ],
+  "fourSchemaCompletionObserved": false,
+  "activePromotionObserved": false,
+  "worldListenerObserved": false,
+  "graphicalEntryObserved": false
+}

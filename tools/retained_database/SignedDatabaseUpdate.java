@@ -69,7 +69,8 @@ public final class SignedDatabaseUpdate {
             if(event.startsWith("database-")||event.startsWith("installation-"))
                 System.out.println("ESTERIA_PHASE "+event+" elapsedMs="+TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-start));
         };
-        if(phase.equals("seed19")) {
+        boolean seed=phase.equals("seed19") || phase.equals("seed21");
+        if(seed) {
             require(!Files.exists(root.resolve("db"))&&!Files.exists(root.resolve("runtimes")),"disposable fresh app required");
             Files.createDirectory(qa);Files.createDirectory(data);
             long bytes=server.prepare(RuntimeWork.NONE,RuntimeWork.NEVER_CANCELLED).copiedBytes;
@@ -87,8 +88,8 @@ public final class SignedDatabaseUpdate {
         client.requireWineArchive(wine.archiveSha256());bridges.requireWineArchive(wine.archiveSha256());graphics.requireWineArchive(wine.archiveSha256());
         Path[] roots={server.current(),programs.current(),content.current(),wine.current(),client.current(),
             bridges.current(),graphics.current(),dataTools.current(),shaderTools.current()};
-        verifyRetainedFiles(qa,roots,client,phase.equals("seed19"));
-        if(phase.equals("seed19"))return;
+        verifyRetainedFiles(qa,roots,client,seed);
+        if(seed)return;
         if(phase.equals("fail19")) {
             require(ServerInstallationSetup.completedOrNull(ctx,root,server,programs,content)==null,"unexpected preexisting slot");
             try(ServerInstallationSetup.Handle owner=ServerInstallationSetup.beginFresh(ctx,root,server,programs,content,data,1L<<30)) {
@@ -98,24 +99,67 @@ public final class SignedDatabaseUpdate {
             }
             return;
         }
+        if(phase.equals("masked21") || phase.equals("primary22")) {
+            require(ServerInstallationSetup.completedOrNull(ctx,root,server,programs,content)==null,"unexpected active slot");
+            try(ServerInstallationSetup.Handle owner=ServerInstallationSetup.beginFresh(ctx,root,server,programs,content,data,1L<<30)) {
+                RuntimeException injected=new IllegalStateException("qualification-progress-interruption");
+                try {
+                    owner.prepare((event,path,count,total)->{
+                        if(event.equals("schema-file-started"))throw injected;
+                    },RuntimeWork.NEVER_CANCELLED);
+                    throw new AssertionError("injected observation failure missing");
+                } catch(IOException | RuntimeException observed) {
+                    if(phase.equals("masked21")) {
+                        require(observed instanceof IOException && observed.getMessage().contains("Graceful shutdown did not complete"),
+                            "baseline did not replace initiating failure");
+                        Files.write(qa.resolve("old-slot"),owner.slotId().getBytes("US-ASCII"),StandardOpenOption.CREATE_NEW);
+                    } else {
+                        require(observed==injected && Arrays.stream(observed.getSuppressed()).anyMatch(
+                            err->err instanceof IOException && err.getMessage().contains("Graceful shutdown did not complete")),
+                            "initiating or cleanup failure lost");
+                    }
+                    System.out.println("ESTERIA_FAILURE_ORDER "+phase+" slot="+owner.slotId()+" primary="+observed.getClass().getSimpleName()
+                        +" suppressed="+observed.getSuppressed().length);
+                }
+            }
+            return;
+        }
         String old=new String(Files.readAllBytes(qa.resolve("old-slot")),"US-ASCII");
         require(old.matches("[0-9a-f]{16}"),"invalid retained slot");
         Path oldBootstrap=root.resolve("db").resolve(old).resolve("state/database-bootstrap.json");
         require(Files.isRegularFile(oldBootstrap),"v19 staging lost");
-        if(phase.equals("repair21")) {
+        if(phase.equals("repair21") || phase.equals("repair22")) {
             require(ServerInstallationSetup.completedOrNull(ctx,root,server,programs,content)==null,"incomplete v19 slot selected");
             var before=ServerInstallationSetup.retainedDiagnostics(root);
             require("abandoned/failed".equals(before.get("database.retained."+old)),"v19 failed slot journal missing");
             System.out.println("ESTERIA_RETAINED "+before);
             Files.write(qa.resolve("old-proof"),digest(oldBootstrap),StandardOpenOption.CREATE_NEW);
             try(ServerInstallationSetup.Handle owner=ServerInstallationSetup.beginFresh(ctx,root,server,programs,content,data,1L<<30)) {
-                owner.prepare(progress,RuntimeWork.NEVER_CANCELLED);
+                RuntimeWork.Progress observe=progress;
+                if(phase.equals("repair22"))observe=(event,path,count,total)->{
+                    progress.update(event,path,count,total);
+                    if(event.equals("installation-core-started")) {
+                        // Disposable operation only. Leave the genuine helper and its result untouched.
+                        Path operations=root.resolve("db").resolve(owner.slotId()).resolve("installation-operations");
+                        try(var children=Files.list(operations)) {
+                            Path operation=children.findFirst().orElseThrow();
+                            Files.write(operation.resolve("progress.json"),"{invalid".getBytes("US-ASCII"),
+                                StandardOpenOption.CREATE_NEW,StandardOpenOption.WRITE);
+                        } catch(IOException error){throw new java.io.UncheckedIOException(error);}
+                    }
+                };
+                owner.prepare(observe,RuntimeWork.NEVER_CANCELLED);
+                if(phase.equals("repair22")) {
+                    String observation=owner.diagnosticState();
+                    require(observation.matches(".*unreadableProgress=[1-9][0-9]* .*"),"invalid progress was not observed");
+                    System.out.println("ESTERIA_PROGRESS "+observation);
+                }
                 owner.finishPlayerbots(progress,RuntimeWork.NEVER_CANCELLED);
                 FreshServerInstallations.Active active=owner.stopAndPromote(Duration.ofSeconds(30));
                 require(!active.slotId.equals(old),"incomplete slot promoted");
                 Files.write(qa.resolve("active"),identity(root,active),StandardOpenOption.CREATE_NEW);
             }
-        } else if(!phase.equals("cold21"))throw new IOException("unknown phase");
+        } else if(!phase.equals("cold21") && !phase.equals("cold22"))throw new IOException("unknown phase");
         FreshServerInstallations.Active active=ServerInstallationSetup.completed(ctx,root,server,programs,new ServerContentSetup(ctx,root));
         require(Arrays.equals(identity(root,active),Files.readAllBytes(qa.resolve("active"))),"promoted identity or account changed");
         require(Arrays.equals(digest(oldBootstrap),Files.readAllBytes(qa.resolve("old-proof"))),"abandoned bootstrap changed");

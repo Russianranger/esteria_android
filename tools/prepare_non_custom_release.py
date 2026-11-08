@@ -90,7 +90,12 @@ def stage(args):
                  '**Repair local component → Database setup**, then start the local game again.\n'
                  'If a stage fails, wait for cleanup, tap **Export support bundle**, choose a\n'
                  'destination and tap **Save**. Send the whole ZIP before retrying.')
-    if signed['versionCode'] == 21:
+    if signed['versionCode'] == 22:
+        setup = ('Install over the signed Esteria Stock v21 app. Keep the ChromieCraft import, enUS, Balanced '
+                 'and both retained database attempts. Choose **Repair local component → Database setup** once. '
+                 'Wait for four-schema completion and a clean stop, then choose **Start local game**. '
+                 'If it stops, export the complete support ZIP after cleanup.')
+    elif signed['versionCode'] == 21:
         setup = ('Install over Esteria Stock. On the retained v19 Thor installation, keep enUS and Balanced. '
                  'Choose **Repair local component → Database setup**, wait for completion, then **Start local game**. '
                  'If a phase fails, wait for cleanup and export the complete support ZIP before retrying.')

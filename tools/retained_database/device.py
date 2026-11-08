@@ -68,6 +68,16 @@ if __name__ == '__main__':
         for phase in ('debug-seed', 'debug-repair', 'debug-cold', 'debug-cold', 'debug-cold'):
             run(phase, uid)
         sys.exit(0)
+    if sys.argv[2:] == ['v22']:
+        old = install('previous.apk', 21)
+        run('seed21', old)
+        run('masked21', old)
+        new = install('candidate.apk', 22)
+        assert new == old
+        run('primary22', new)
+        run('repair22', new)
+        run('cold22', new)
+        sys.exit(0)
     old = install('previous.apk', 19)
     run('seed19', old)
     run('fail19', old)
