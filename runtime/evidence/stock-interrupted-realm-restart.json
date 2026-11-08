@@ -1,0 +1,66 @@
+{
+  "environment": {
+    "allocatedRamMiB": 4608,
+    "cores": 3,
+    "guest": "No-NIC AArch64 Debian under x86_64 QEMU, disposable writable overlay of earlier stock SQL disk",
+    "guestCleanPoweroff": true,
+    "guestQualificationExit": 1,
+    "qemuExit": 0
+  },
+  "flagObservation": {
+    "authExcludedValue": 3,
+    "authOfflineBit": 2,
+    "endpoint": "127.0.0.1",
+    "gamebuild": 12340,
+    "id": 1,
+    "method": "read-only active clustered-primary-index record in the original closed ext4 donor and its distinct closed COW; physical parent/child identities and read-only bounds checked",
+    "worldBit": 1,
+    "worldPort": 8085
+  },
+  "formatVersion": 1,
+  "interruptedWorld": {
+    "dbCleanStop": true,
+    "nativeLimitSeconds": 180,
+    "persistedStockRealmFlag": 1,
+    "worldExit": -9,
+    "worldListenerReady": false,
+    "worldWaitSeconds": 180.612
+  },
+  "nextColdBoot": {
+    "actualNativeError": "No valid realms specified",
+    "authListenerReady": false,
+    "authWaitEnteredAtSeconds": 504.333,
+    "authWaitLeftAtSeconds": 521.059,
+    "dbWorkerEnterSeconds": 54.536,
+    "elapsedSeconds": 750.227,
+    "engineAuthenticatedReadySeconds": 36.608,
+    "fourSourceSchemasReverified": true,
+    "freshDataInitialized": false,
+    "nativeProcessExitCodeObserved": false,
+    "outerCleanupRaised": "previously exited original child",
+    "ownedDatabaseCleanlyStopped": true,
+    "persistedStockRealmFlag": 3,
+    "previousOwnedCharacters": 0,
+    "sameUuidAndOrdinaryAccount": true
+  },
+  "privateInputEvidenceHashes": {
+    "host-create.json": "8ec6179e0184462aa0e448f45cae3daf858ef7dc5201d5217a0d3e2a7104e271",
+    "non-custom-v18-full-source-partial-native-world.json": "f0ce9d92ea2ab323f9b120f7c4ac6861a792a4890e249b6ff83ba526f790802e",
+    "wire-create.json": "1f992915555bed7836926dd3d429e81259483d44017f25b03cc810744661c55d"
+  },
+  "scope": "Real owned stock SQL restart after an interrupted native world load. No complete prepared-data, graphical login, or character claim.",
+  "selected": {
+    "dataRecipe": "c8e53e9694a7f11ca09b777d3b0de3ec0b0a121a61b173cc3e4ae2795ed04153",
+    "importGeneration": "a6800cb53df18cea0012ea4c7c86991edaf49f49433528ec237678454bea09cb",
+    "readyData": "sealed real maps, DBC, cameras and complete VMaps. Navigation still building.",
+    "server": "f35f04d01689f034778e3474b3c820092f51e461",
+    "serverPatches": 7,
+    "signedProviderBuild": "075ed711bd8be7aaeac8bdfca2be8c607afb8f4b"
+  },
+  "source": {
+    "auth": "src/server/apps/authserver/Main.cpp",
+    "authSourceSha256": "9cbab69199081c637ac99c55ed87a76c0bc2a567f26b54ec67d9f321aa82cd8f",
+    "world": "src/server/apps/worldserver/Main.cpp",
+    "worldSourceSha256": "4d0b79acce983880492425fbe792146fc05eaa99d9f94368f2458ec9cff67282"
+  }
+}

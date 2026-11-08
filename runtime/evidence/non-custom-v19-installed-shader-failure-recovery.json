@@ -1,0 +1,128 @@
+{
+  "formatVersion": 1,
+  "scope": "Reproduction of the supplied v13 Thor shader failure, signed in-place update and named repair in an offline ARM64 Android installation.",
+  "physicalEvidence": {
+    "ownerZipSha256": "f7c6e579320197243d4152839f8e443840e89439df8f139ecb80d0ce9c39817f",
+    "versionCode": 13,
+    "source": "2a9daba045da516a6ae7212d7bac94262f559d59",
+    "operation": "Repair local component / Shaders",
+    "importGeneration": "28630307246576f05c91f811f23f1ad34acbf0a7d9b8c8cd16b955fa74ee6d93",
+    "translatorExit": 2,
+    "failedLegacyTerrainRecords": 10,
+    "physicalPostUpdateExportAvailable": false
+  },
+  "run": {
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/42467088351",
+    "jobId": 128688988229,
+    "artifactId": 13612396750,
+    "artifactSha256": "95234fed4a739cdfbe2a13d5c83e283b3e1f0395b144d1f125b33036d78bdda9",
+    "qaSource": "62e22b346f30aa489d7120d1e4c01c51ea4f3922",
+    "conclusion": "success",
+    "kernel": "7.0.0-1017-azure",
+    "sdk": 33,
+    "arch": "aarch64",
+    "abi": "arm64-v8a",
+    "android": "Redroid Android 13, same installed package UID, native Linux ARM64, SELinux disabled, only loopback inside Android",
+    "androidProcessCountAfterClose": 0
+  },
+  "androidPackage": {
+    "package": "io.github.russianranger.esteria.stock",
+    "originalV13ApkSha256": "9d9809d5e04b4bac5d1f0826d4fb0255a53318fe3220f5a7d19e8a077b01dbae",
+    "v19ApkSha256": "c0d251847496c64170bb31d534a925afd1d8e7f92c21687e0e1cbf82c056e6fa",
+    "v19Source": "c99dbaef634412729742e120d2457d5c7b8bf1a1",
+    "singleSigningCertificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+    "retainedUid": 10077,
+    "inPlacePackageManagerUpdate": true,
+    "v19BytesMatchedPublicArtifact": true
+  },
+  "input": {
+    "scope": "official-stock-shader-windows-with-private-qa-journal",
+    "providers": 16,
+    "intervals": 40,
+    "verifiedBytes": 41645637,
+    "importFixture": "bef34b45e7ece99f092d8e2865556cce461e4144b3ab59a754a7765d56052699",
+    "rangeLockSha256": "a5f62abdcd6feff6d4a908757c083d9f6357c39ed5432343522ff6d437d725aa"
+  },
+  "v13Failure": {
+    "failedLegacyPermutations": 10,
+    "workerExit": 2,
+    "noCurrentPointer": true,
+    "wineGeneration": "dda9221e408dd167796e8a80042f5d7e7e168185eef63dfea088053b0a965c9d",
+    "toolGeneration": "1607c300f598b348201f8f2ddf1db4f9527b09bf645240e996cabc69e40db24d",
+    "authenticatedInput": {
+      "grantedCalls": 833,
+      "grantedBytes": 12885680,
+      "denied": 0
+    },
+    "elapsedMs": 37205,
+    "closed": true
+  },
+  "v19NamedRepair": {
+    "generation": "1fcd9acf103c708da5118f5fe0b96570b7c9923f7b93c3aa6fcb705934c99cee",
+    "outputFiles": 4742,
+    "outputBytes": 102091054,
+    "newValidatedModules": 1580,
+    "verifiedRuntimeHashes": 3162,
+    "receiptSha256": "85da14abf5dc86c708f4c2451ba3eed509fc689ef0ce7c6602bbcc5f6dd59f3a",
+    "freshSessionAdmission": true,
+    "authenticatedInput": {
+      "grantedCalls": 836,
+      "grantedBytes": 12897968,
+      "denied": 0
+    },
+    "elapsedMs": 198771,
+    "closed": true
+  },
+  "freshOrdinaryV19Admission": {
+    "files": 4742,
+    "bytes": 102091054,
+    "generation": "1fcd9acf103c708da5118f5fe0b96570b7c9923f7b93c3aa6fcb705934c99cee",
+    "elapsedMs": 1443,
+    "ownedTranslatorLaunched": false,
+    "authenticatedInput": {
+      "grantedCalls": 0,
+      "grantedBytes": 0,
+      "denied": 0
+    },
+    "fullShaderAdmission": true,
+    "closed": true,
+    "originalImportAndProviderControlsPreserved": 5,
+    "shaderPointerAndReceiptPreserved": true
+  },
+  "separateExplicitCachedProviderPreparation": {
+    "wineCopiedBytes": 0,
+    "toolsCopiedBytes": 0,
+    "ownedTranslatorLaunched": false,
+    "elapsedMs": 1541,
+    "sessionReceiptAdmitted": true,
+    "authenticatedInput": {
+      "grantedCalls": 0,
+      "grantedBytes": 0,
+      "denied": 0
+    },
+    "replacedPointersWithUnchangedBytes": [
+      "wine/current",
+      "shader-tools/current"
+    ],
+    "pointerBytesEach": 65
+  },
+  "earlierAttempts": [
+    {
+      "run": 42465868017,
+      "result": "Gradle wrapper download failed before shader observer. Replaced this observer-only online dependency with the byte-verified javac and D8 build."
+    },
+    {
+      "run": 42466267737,
+      "freshResult": "JDK download returned HTTP 504. Recovery used the original JDK 17.0.13+11 release asset and SHA-256.",
+      "legacyResult": "The original v13 failure, signed update, full v19 repair and session admission passed. The test then expected explicit cached provider installation to preserve two pointer inodes. The subsequent run measured normal read-only selection separately from explicit installation."
+    },
+    {
+      "run": 42466491282,
+      "result": "Android installed and launched v19. The external fixture exited before ART shader entry while selecting package metadata and the existing boot environment. Its combined preflight exposed no exact subcommand. Later run recorded individual conditions and bounded zygote selection."
+    }
+  ],
+  "limits": [
+    "The guarded fixture authenticates all stock shader inputs used by the translator from 16 MPQs. Its retained journal differs from the owner import.",
+    "This tests the signed shader preparation and admission routines. Physical Thor execution, entry into the graphical client and character-state persistence are separate gates."
+  ]
+}

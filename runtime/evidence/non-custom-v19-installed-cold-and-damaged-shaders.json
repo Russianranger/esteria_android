@@ -1,0 +1,78 @@
+{
+  "formatVersion": 1,
+  "scope": "Signed v19 stock shader first use, independent warm owner and named damaged component recovery on network-isolated Android 13 ARM64.",
+  "sourceCommit": "c99dbaef634412729742e120d2457d5c7b8bf1a1",
+  "package": "io.github.russianranger.esteria.stock",
+  "packageUid": 10077,
+  "publicApkSha256": "c0d251847496c64170bb31d534a925afd1d8e7f92c21687e0e1cbf82c056e6fa",
+  "signerSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+  "run": {
+    "url": "https://github.com/Russianranger/esteria_android/actions/runs/42467088351",
+    "qaSource": "62e22b346f30aa489d7120d1e4c01c51ea4f3922",
+    "jobId": 128688988416,
+    "artifactId": 13612173035,
+    "artifactSha256": "5cf43accbbd1b54c16143079d61791a7f313fefc05fb8f530efb74a317b10d69",
+    "result": "success"
+  },
+  "authenticatedSource": {
+    "providers": 16,
+    "ranges": 40,
+    "bytes": 41645637,
+    "inputGeneration": "bef34b45e7ece99f092d8e2865556cce461e4144b3ab59a754a7765d56052699",
+    "scope": "Complete original stock shader inputs read by Android inside guarded original archive intervals. Manually source-bound private input journal."
+  },
+  "cold": {
+    "generation": "1fcd9acf103c708da5118f5fe0b96570b7c9923f7b93c3aa6fcb705934c99cee",
+    "modules": 1580,
+    "files": 4742,
+    "bytes": 102079994,
+    "receiptSha256": "8a818cb0a73c5d3c5d54c086a28a607202324a990053c9739689b3b5abeb48b2",
+    "elapsedMs": 223144,
+    "wineCopiedBytes": 1325744204,
+    "toolsCopiedBytes": 16690219,
+    "authenticatedInput": {
+      "grantedCalls": 836,
+      "grantedBytes": 12897968,
+      "denied": 0
+    }
+  },
+  "warm": {
+    "elapsedMs": 1642,
+    "wineCopiedBytes": 0,
+    "toolsCopiedBytes": 0,
+    "ownedTranslatorLaunched": false,
+    "authenticatedInput": {
+      "grantedCalls": 0,
+      "grantedBytes": 0,
+      "denied": 0
+    },
+    "sessionReceiptAdmitted": true
+  },
+  "warmShaderReceiptSameInodeAndBytes": true,
+  "namedRepair": {
+    "generation": "1fcd9acf103c708da5118f5fe0b96570b7c9923f7b93c3aa6fcb705934c99cee",
+    "importGeneration": "bef34b45e7ece99f092d8e2865556cce461e4144b3ab59a754a7765d56052699",
+    "initialReceipt": "8a818cb0a73c5d3c5d54c086a28a607202324a990053c9739689b3b5abeb48b2",
+    "repairedReceipt": "ef7be722aeeb47de37dea1d63adf43823e25deee9e2134c2a08268853a1cb1b5",
+    "pointerRestored": true,
+    "pointerRecompiled": false,
+    "damagedRejectedByFullAdmission": true,
+    "sameSizeAndInodeAtInjection": true,
+    "javaMillisecondMtimePreserved": true,
+    "javaExactMtimePreserved": true,
+    "nativeRebuiltModulesValidated": 1580,
+    "runtimeFileDigestsPreserved": 3162,
+    "files": 4742,
+    "fullSessionReceiptAdmitted": true,
+    "previousRejectedGenerationRetained": true,
+    "sourceAndProviderPointersUnchanged": true,
+    "warmRecompiled": false,
+    "ownersClosed": true,
+    "pointerMs": 22680,
+    "rebuildAndAdmissionMs": 240189,
+    "warmMs": 22377
+  },
+  "androidPackageUidProcessesAfterClose": 0,
+  "physicalThor": false,
+  "normalGameplay": false
+}
