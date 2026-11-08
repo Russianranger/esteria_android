@@ -1,0 +1,176 @@
+{
+  "android13X86Instrumentation": {
+    "artifact": 13598360974,
+    "artifactIdentity": {
+      "bytes": 26642,
+      "sha256": "cda77bd3650d77f9799c75c29dd05f98a4cc6b31670d60affa73993d24e0cf18"
+    },
+    "components": {
+      "import-memory": 14,
+      "preparation-controls": 4,
+      "python-receipt": 3,
+      "saf-import": 3,
+      "stock-shader": 2
+    },
+    "countsAsReportedByNamedComponents": 26,
+    "job": 128580240987,
+    "ownerSigningIdentityTestedByX86Job": false,
+    "run": 42431197118,
+    "runtimeFilesystemQualified": true,
+    "sameJobDebugKeyUpdate": true,
+    "singleTestTranscripts": [
+      "actualBundledHelpersInstallAndRepeatWithoutRewriting",
+      "changedExistingHelperIsPreservedAndRefused",
+      "completeDataHelperClosureInstallsAndReusesExactBytes",
+      "completeInstallationHelperClosureInstallsAndReusesExactBytes",
+      "completeSessionHelperClosureInstallsAndReusesExactBytes",
+      "expectedHelperSymlinkNeverReplacesOrWritesItsTarget",
+      "extraModulesNativeExtensionsAndCachesCannotEnterImportPath",
+      "linkedResourceDirectoryIsPreservedAndRefused",
+      "nestedOriginalSourcesInstallAndResumeWithoutRewriting",
+      "partialGenerationResumesAndRetainsHarmlessInterruptedWrite",
+      "privateDataMetadataBindingRejectsChangedAncestryAndQualificationClaims",
+      "privateLocalLoginHandoffContracts",
+      "runtimeContracts",
+      "seedBeforeUpdate",
+      "temporarySymlinkDoesNotBypassClosure",
+      "unexpectedNestedModuleIsPreservedAndRefused",
+      "verifyAfterUpdate"
+    ]
+  },
+  "branch": "non-custom",
+  "clientRevision": "fa3e74b7f332fef0f212e954a0de18f685ead8bd",
+  "detachedStaging": {
+    "artifact": 13597693134,
+    "artifactBytes": 6286,
+    "artifactSha256": "24a2c9615816c865247ca2928ab39995bd49f6961525161c58edf4cd0ab9e5d5",
+    "job": 128584575630,
+    "publicationEvidenceAndReleaseAndSigningReceiptMatchPublicBytes": true,
+    "revision": "1f5998440d933238605328b9d03ee20a7fd5a215",
+    "run": 42432608303,
+    "signedUpdateAndroid13": {
+      "baselineApk": {
+        "apkBytes": 336862047,
+        "apkSha256": "f6aa8c4ad674e71d3aed59099f0b952efc44a0ae2333a77efdbff81188489510",
+        "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+        "debuggable": false,
+        "minSdk": 26,
+        "packageId": "io.github.russianranger.esteria.stock",
+        "targetSdk": 35,
+        "versionCode": 15,
+        "versionName": "0.1.0-non-custom.15"
+      },
+      "buildFingerprint": "google/sdk_gphone64_x86_64/emu64x:13/TE1A.240213.009/12342917:userdebug/dev-keys",
+      "characterPersistenceQualified": false,
+      "databaseSchemaQualified": false,
+      "emulatorAbis": [
+        "x86_64"
+      ],
+      "fixtureDataOnly": true,
+      "formatVersion": 1,
+      "gameplayQualified": false,
+      "installDiagnostic": "Performing Streamed Install\nadb: failed to install /home/runner/work/_temp/signed-stock-baseline.apk: Failure [INSTALL_FAILED_NO_MATCHING_ABIS: INSTALL_FAILED_NO_MATCHING_ABIS: Failed to extract native libraries, res=-113]",
+      "packageManagerUpdateExecuted": false,
+      "scope": "android13-emulator-signed-apk-filesystem-update",
+      "sourceCommit": "b12fe53270a62677a625564582e264a8e5733d8b",
+      "status": "skipped-incompatible-emulator-abi",
+      "thorQualified": false,
+      "updateApk": {
+        "apkBytes": 336887065,
+        "apkSha256": "de9d108a725aeb7a8eea1041bd1a72eb7a5acde811595cf71c886f6937f74ab4",
+        "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+        "debuggable": false,
+        "minSdk": 26,
+        "packageId": "io.github.russianranger.esteria.stock",
+        "targetSdk": 35,
+        "versionCode": 16,
+        "versionName": "0.1.0-non-custom.16"
+      }
+    }
+  },
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "hostSuite": {
+    "elapsedSeconds": 109.981,
+    "environment": "Clean detached Linux x86_64 worktree, pinned JDK 17.0.13+11, original extracted server tool sources and selected 471ee42 client sources",
+    "passed": 1585,
+    "producer": "b12fe53270a62677a625564582e264a8e5733d8b",
+    "run": 1671,
+    "skipGroups": {
+      "Managed host child/socket proc projection differs; no actual inode ownership proof claimed": 1,
+      "This host denies AF_UNIX creation; actual socket qualification requires CI": 3,
+      "actual SDK/pre-existing disposable key not supplied": 2,
+      "actual host GCC and Ninja required": 26,
+      "actual host GCC, GNU ld, Ninja and ar required": 5,
+      "actual prepared revision recipe and host CMake not supplied": 1,
+      "exact NDK fixture not supplied": 1,
+      "exact NDK toolchain fixture not supplied": 15,
+      "exact local NDK ELF fixture not supplied": 1,
+      "exact local NDK toolchain fixture not supplied": 2,
+      "exact original source package not supplied": 1,
+      "exact retained engine/source inputs not supplied": 1,
+      "exact retained extractor inputs not supplied": 2,
+      "exact retained isolated preparation not supplied": 1,
+      "isolated real MySQL fixture not enabled": 1,
+      "pinned canonical SQL unavailable; actual gate verifies bytes before import": 1,
+      "pinned source checkout unavailable; actual SQL gate verifies bytes before import": 1,
+      "real SDK/key fixture not supplied; no key is generated": 3,
+      "requires actual pinned server C++ SRP6 reference binary": 2,
+      "requires actual source-built ConfigMgr module reference": 2,
+      "requires actual source-built ConfigMgr reference executable": 1,
+      "requires actual source-built probe provider": 1,
+      "requires actual source-built x64 probe": 2,
+      "requires exact client checkout and upstream Xvid archive": 1,
+      "requires exact measured client artifact and pinned source checkout": 2,
+      "requires exact measured reconstructed-client artifact and clean checkout": 1,
+      "requires explicit disposable real MySQL 8 binaries": 1,
+      "requires explicit disposable real MySQL 8 realm fixture": 1,
+      "requires explicit disposable real MySQL 8 service": 1,
+      "requires pinned server Git objects": 1,
+      "requires pinned server checkout and actual CMake": 1,
+      "requires the exact pinned Wine virtual.c": 1
+    },
+    "skips": 86
+  },
+  "nativeSql": {
+    "artifact": 13598215205,
+    "artifactIdentity": {
+      "bytes": 14235,
+      "sha256": "266610b63c85d6ea0eefbc542b80772f7a26fa390fb3a4ff620b90ac61d07d94"
+    },
+    "cleanStop": true,
+    "firstMysqlReadyMs": 753,
+    "job": 128580241081,
+    "mysqlRestartPersistenceVerified": true,
+    "newMysqlInitializationMs": 5359,
+    "playerbotsFinishExecuted": true,
+    "qualified": true,
+    "restartedMysqlReadyMs": 1255,
+    "run": 42431197088
+  },
+  "package": {
+    "artifact": 13598211504,
+    "artifactIdentity": "sha256:7210372e95cd433850f29f6b70c5d28b9779c7270638eb54c3ef9da32584769c",
+    "inputUnsignedApkSha256": "1c7dd138c9948d6b5b237cb44e701ef229105a1969151dc0f77f3c3331bc4b8d",
+    "job": 128580276349,
+    "nativeShaderTranslationJob": 128580276345,
+    "run": 42431197126
+  },
+  "previousPublic": {
+    "apkSha256": "f6aa8c4ad674e71d3aed59099f0b952efc44a0ae2333a77efdbff81188489510",
+    "versionCode": 15
+  },
+  "scope": "stock-v16-ci-gates-and-source-signature",
+  "signedApk": {
+    "apkBytes": 336887065,
+    "apkSha256": "de9d108a725aeb7a8eea1041bd1a72eb7a5acde811595cf71c886f6937f74ab4",
+    "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+    "debuggable": false,
+    "minSdk": 26,
+    "packageId": "io.github.russianranger.esteria.stock",
+    "targetSdk": 35,
+    "versionCode": 16,
+    "versionName": "0.1.0-non-custom.16"
+  },
+  "sourceRevision": "b12fe53270a62677a625564582e264a8e5733d8b"
+}

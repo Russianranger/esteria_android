@@ -139,6 +139,39 @@
       "createdNtdllBytes": 1769472,
       "createdKernel32Bytes": 1114112,
       "terminal": "start.exe c0000135; Wine reported gdi32/shell32/user32 imports missing during incomplete prefix creation."
+    },
+    "freshProcessWithRetainedBootstrap": {
+      "command": "wine cmd.exe /c ver in a fresh package-UID private prefix with one PRoot owner and separate authenticated X11 display :166",
+      "firstExitCode": 53,
+      "firstElapsedSeconds": 486,
+      "firstFailure": "Wine internal 5-minute boot event timeout, then could not load kernel32.dll c0000135",
+      "observedChildren": [
+        "wineserver",
+        "wineboot.exe",
+        "services.exe",
+        "rundll32.exe"
+      ],
+      "continuationAtElapsedSeconds": 725,
+      "observedContinuationSecondsAfterParentExit": 239,
+      "system32RegularFilesDuringContinuation": 1,
+      "qualification": "The unmodified loader and packaged Wine assets are present; a normal child cannot use the incomplete prefix during this emulated bootstrap. No working Windows command, actual client frame or physical-device timing follows from this trace.",
+      "outerRuntimeLostAt": "2026-11-08T00:43Z",
+      "finalContinuationStatus": "The host worker stopped the VM. No later terminal result was observed before the interruption.",
+      "retainedFilteredTraceSha256": "5b4e3d38a6eb44eb8197dbebd4a09af63a2cd00fb1cb3b2f0473f9792b40c40b",
+      "lastPersistentStatus": "ESTERIA_BOOTSTRAP_PROGRESSION=140,count=1,elapsed=725",
+      "traceBytes": 417792,
+      "traceNonPaddingBytes": 414110,
+      "postmortemFiles": {
+        "system32/winedevice.exe": 458752,
+        "system.reg": 47368,
+        "user.reg": 6100,
+        "userdef.reg": 123
+      },
+      "observedAfterTimeout": [
+        "RPC_S_SERVER_UNAVAILABLE and Failed to open RpcSs service",
+        "Winedevice1 failed to start",
+        "wineboot subsequently launched rundll32.exe setupapi,InstallHinfSection DefaultInstall for the packaged wine.inf"
+      ]
     }
   },
   "qualified": {

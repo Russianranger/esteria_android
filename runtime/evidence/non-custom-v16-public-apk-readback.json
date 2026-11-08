@@ -1,0 +1,59 @@
+{
+  "appRevision": "b12fe53270a62677a625564582e264a8e5733d8b",
+  "assets": [
+    {
+      "assetId": 722465522,
+      "bytes": 336887065,
+      "completeAnonymousReadback": true,
+      "name": "Esteria-Stock-3.3.5a-arm64.apk",
+      "sha256": "de9d108a725aeb7a8eea1041bd1a72eb7a5acde811595cf71c886f6937f74ab4"
+    },
+    {
+      "assetId": 722465819,
+      "bytes": 4069,
+      "completeAnonymousReadback": true,
+      "name": "NON-CUSTOM-TESTING.md",
+      "sha256": "75729c6a2f345f812823af0d01e622da83346be2ce2dc2caee770ca1263f9aff"
+    },
+    {
+      "assetId": 722465840,
+      "bytes": 19234,
+      "completeAnonymousReadback": true,
+      "name": "publication-evidence.json",
+      "sha256": "78578ceff2c0563a4b1ccd24a24e1f4f102a16c5b7d58df5d5313b4e0caf0704"
+    },
+    {
+      "assetId": 722465844,
+      "bytes": 2904,
+      "completeAnonymousReadback": true,
+      "name": "release.json",
+      "sha256": "7b8774782820ff71eb03de2b4c0f9f53e4b57f59323d93040368c4d987c816b2"
+    },
+    {
+      "assetId": 722465825,
+      "bytes": 97,
+      "completeAnonymousReadback": true,
+      "name": "SHA256SUMS",
+      "sha256": "5cd81601434f80868c5ec97bb0c787146905bf30c34e2e4d1bba2175a7c7ea81"
+    },
+    {
+      "assetId": 722465863,
+      "bytes": 1053,
+      "completeAnonymousReadback": true,
+      "name": "signing-receipt.json",
+      "sha256": "29dd23d09d2b59a9cf34257121b44a4b0432a7cc976cceb7e457b8664ad323de"
+    }
+  ],
+  "formatVersion": 1,
+  "gameplayQualified": false,
+  "persistentCertificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+  "publicationRoute": "Independent CI detached staging and authorized browser publication",
+  "releaseId": 437952517,
+  "releaseUrl": "https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.16",
+  "scope": "published-stock-v16-full-asset-byte-readback",
+  "sdkManifestVerified": true,
+  "sdkV2AndV3SignatureVerified": true,
+  "tag": "non-custom-v0.1.0-non-custom.16",
+  "tagTargetExactlyMatchesProducer": true,
+  "thorQualified": false
+}
