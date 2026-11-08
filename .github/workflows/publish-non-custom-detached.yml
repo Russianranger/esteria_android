@@ -161,14 +161,7 @@ jobs:
           docker exec "$redroid_name" input keyevent KEYCODE_WAKEUP
           docker exec "$redroid_name" wm dismiss-keyguard
           docker exec "$redroid_name" am start -W -n io.github.russianranger.esteria.stock/io.github.russianranger.esteria.MainActivity
-          for attempt in {1..8}; do
-            docker exec "$redroid_name" uiautomator dump /data/local/tmp/realm-ui.xml >/dev/null || continue
-            if docker exec "$redroid_name" cat /data/local/tmp/realm-ui.xml | grep -F 'text="Start local game"' >/dev/null; then
-              docker exec "$redroid_name" screencap -p > evidence/realm-launcher.png
-              break
-            fi
-          done
-          test -s evidence/realm-launcher.png
+          python3 tools/retained_database/launcher_export.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -176,5 +169,6 @@ jobs:
           path: |
             evidence/*.jsonl
             evidence/realm-launcher.png
+            evidence/export-counts.json
           retention-days: 14
           if-no-files-found: warn

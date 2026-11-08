@@ -59,7 +59,14 @@ public final class PreparationControlsTest {
         instrumentation.sendStatus(2,bundle);
     }
     private Activity open() {
-        return instrumentation.startActivitySync(new Intent(context,MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        Activity activity=instrumentation.startActivitySync(new Intent(context,MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        ui(()->{
+            android.widget.FrameLayout content=activity.findViewById(android.R.id.content);
+            RealmLauncher launcher=(RealmLauncher)((android.widget.FrameLayout)content.getChildAt(0)).getChildAt(0);
+            launcher.select(1);
+            return null;
+        });
+        return activity;
     }
     private void close(Activity activity)throws Exception {
         if(activity!=null){ui(()->{activity.finish();return null;});waitFor(()->ui(activity::isDestroyed),"Launcher must finish before reopening");}
