@@ -2,6 +2,7 @@
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import runpy
 import sys
@@ -58,6 +59,21 @@ def qualify(work, client, tools, revision, extents, proof):
         return execute(observed, log, timeout, **kwargs)
     def count():
         return len(calls.read_bytes().splitlines())
+    def disassembly_contents(directory, pins, staging, key):
+        result = {}
+        for name in pins:
+            if not name.endswith('.spvasm'):
+                continue
+            raw = (directory / 'shaders' / name).read_bytes()
+            require(hashlib.sha256(raw).hexdigest() == pins[name]['sha256'], 'compiled disassembly differs from its receipt')
+            first, separator, body = raw.partition(b'\n')
+            expected = os.fsencode(staging / (key+'-'))
+            suffix = os.fsencode('/shaders/' + name.removesuffix('.spvasm') + '.glsl')
+            require(separator and first.startswith(expected) and first.endswith(suffix) and
+                    re.fullmatch(rb'[0-9a-f]{32}', first[len(expected):-len(suffix)]) and body.startswith(b'; SPIR-V\n'),
+                    'unexpected compiler diagnostic filename or disassembly header')
+            result[name] = hashlib.sha256(body).hexdigest()
+        return result
     args = store, game, source, tools, revision, 'enUS'
     with patch.object(stock, 'execute', side_effect=guarded):
         proof['stage'] = 'initial-production-shader-generation'
@@ -68,6 +84,7 @@ def qualify(work, client, tools, revision, extents, proof):
         proof.update(stage='corrupt-private-copy',initialCompilerInvocations=initial)
         require(initial == len(modules) == 1580, 'initial selected compiler count differs')
         dest = store / 'generations' / key
+        old_disassembly = disassembly_contents(dest,receipt['outputs'],store / 'staging',key)
         private_file = dest / 'shaders' / modules[0]
         original = private_file.read_bytes()
         private_file.write_bytes(original[:-1] + bytes([original[-1] ^ 1]))
@@ -82,16 +99,23 @@ def qualify(work, client, tools, revision, extents, proof):
         repaired, action = stock_shader_repair.repair(*args)
         rebuilt = count() - initial
         proof.update(stage='verify-repaired-outputs',repairCompilerInvocations=rebuilt)
+        after = json.loads((dest / 'receipt.json').read_bytes())
+        same_runtime = (after['outputs'].keys() == receipt['outputs'].keys() and
+                        all(after['outputs'][name] == pin for name,pin in receipt['outputs'].items() if not name.endswith('.spvasm')))
+        same_disassembly = disassembly_contents(dest,after['outputs'],store / 'repair/staging',key) == old_disassembly
+        proof.update(runtimeOutputsMatch=same_runtime, normalizedDisassembliesMatch=same_disassembly,
+                     outputGenerationMatch=repaired == key, repairedSpirvBytesMatch=private_file.read_bytes() == original)
         require(repaired == key and action == 'published-replacement' and rebuilt == initial and
-                private_file.read_bytes() == original and json.loads((dest / 'receipt.json').read_bytes()) == receipt,
-                'named repair did not restore exact stock output identity')
+                private_file.read_bytes() == original and same_runtime and same_disassembly and
+                {k:v for k,v in after.items() if k!='outputs'} == {k:v for k,v in receipt.items() if k!='outputs'},
+                'named repair did not restore selected runtime shaders and disassembly contents')
         (store / 'current').write_text('damaged fixture pointer\n')
         reused, action = stock_shader_repair.repair(*args)
         warm = count()-initial-rebuilt
         require(reused == key and action == 'verified-existing' and warm == 0 and
                 (store / 'current').read_text() == key+'\n', 'warm stock repair did not restore selection without recompiling')
     return dict(environment='native Linux ARM64, authenticated stock shader reads and fixture import metadata',
-                generation=key, outputFiles=len(receipt['outputs']), modules=len(modules), sameReceipt=True,
+                generation=key, outputFiles=len(receipt['outputs']), modules=len(modules), sameGenerationInputs=True, runtimeOutputsMatch=True, normalizedDisassembliesMatch=True,
                 initialCompilerInvocations=initial, repairCompilerInvocations=rebuilt, warmCompilerInvocations=warm,
                 compilerSha256=stock.identity(compiler,64<<20)['sha256'], fixedSameSizeSpirv=True,
                 fixedInvalidPointer=True, androidRuntimeQualified=False, gameplayQualified=False)
