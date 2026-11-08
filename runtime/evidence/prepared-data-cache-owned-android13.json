@@ -1,0 +1,106 @@
+{
+  "formatVersion": 1,
+  "scope": "Integrated candidate prepared-data admission through Android ART and the ARM64 packaged server runtime, stopping at schema verification",
+  "sourceCommit": "609c808d740c2c2c6672de7e8659d4726730ac63",
+  "sourceSha256": {
+    "runtime/prepared_data_cache.py": "6ae8cbe0ec320bb1154f84cf4d5560e5790186fe20a04906c1e2e4ddce562942",
+    "runtime/server_session.py": "8d281768abcb2a9002157d2b78296b8555558bab52df6a934a4ae0c73a0c7abd",
+    "app/src/main/java/io/github/russianranger/esteria/runtime/LocalServerSession.java": "c3801a8f812babd0faef4d86ba202f2aefe64c026ada7c94f43ddacb0a031513",
+    "core/src/main/java/io/github/russianranger/esteria/core/runtime/install/PreparedDataCachePin.java": "62812b5e379bc44cca68a42725e8b3176a6866c18d7abd62593943190c8785c7"
+  },
+  "environment": {
+    "platform": "Offline Debian 12 ARM64 kernel 6.1.0-54-arm64 guest under QEMU TCG",
+    "androidImage": "Redroid Android 13 ARM64",
+    "androidImageManifestSha256": "c815ac1b1d5bd0a099b74c3e3e0eeea3b32bed8d7ab1f788c20fb74e35891716",
+    "androidFingerprint": "redroid/redroid_arm64_only/redroid_arm64_only:13/TQ3A.230805.001.S1/eng.frank.20240527.134411:userdebug/test-keys",
+    "sdk": 33,
+    "storage": "App-private ext4 in the guest",
+    "selinux": "disabled in disposable emulator",
+    "apkSha256": "f6aa8c4ad674e71d3aed59099f0b952efc44a0ae2333a77efdbff81188489510",
+    "physicalThor": false,
+    "installedVersion": "0.1.0-non-custom.15",
+    "processUid": 10077,
+    "network": "VM with no network interface",
+    "productionSourceOverlay": "candidate Android DEX and Python session helper in the disposable store"
+  },
+  "execution": {
+    "proot": "Signed stock v15 NativeProcessBridge and PRoot, PROOT_NO_SECCOMP=1, --kill-on-exit --sysvipc -0",
+    "serverProviderArchiveSha256": "21a9e8020aac3c780114e2b3e368a643a6e830d35b6406ed99135dec9ba03ce5",
+    "serverRuntimeGeneration": "078c8dfac185688f6e2a250398c320693b8bfd8793f8bb670000507d8da9a17f",
+    "driverDexSha256": "01f4397262edb0001e960245cfc2a195ec3b6ac7a06683e29ad7044dacbbd1a2",
+    "applicationCode": "LocalServerSession.Handle.cacheSelection with retained application import and admission leases, then a fresh package-owned PRoot child calling server_session.prepare and prepared_data_cache.admit",
+    "harness": "The five generated world-format files and SQL/program inputs are fixtures. The observer counts real full audits and ends the normal data path on entry to schema verification. The warm cancellation case calls admit directly."
+  },
+  "sourceSelection": {
+    "generation": "7cd705c60aa2a1e6e83f5b1da0f0f87450c6ece6204e37b95825298618d9ba3c",
+    "helperGeneration": "06ede7399445e1aace7566a0c584d6fba2c005703393afd2f7ba0fd9e5c4fe29",
+    "toolSelectionSha256": "4c62f43498d83791dde652938cd667a01fc726a7bc849bc4bca5b58a77e749fc",
+    "clientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+    "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
+    "locale": "enUS",
+    "outputRecipe": "c911baddd7c49fa21fa4a3bc022d75c69fa66daddde3a6970129cf652dad18ff",
+    "receiptBytes": 2609,
+    "receiptSha256": "72327406c40eb87fd6f8cdc19767e9cef0c30ccd95a67643f4ca145675e816ed",
+    "outputFiles": 5,
+    "outputBytes": 109
+  },
+  "measurements": {
+    "coldSealCancellation": {
+      "uid": 10077,
+      "sealerReaped": true,
+      "generationPointerUnchanged": true,
+      "logSha256": "7d55dd449c69eb2c8805be4ea880cdfa994176379f3556d7ca4dea9ed53b897e"
+    },
+    "cold": {
+      "uid": 10077,
+      "fullSealPasses": 1,
+      "privateCandidateBytes": 3331,
+      "secondPayloadAuditCalls": 0,
+      "sessionPayloadBytesRead": 0,
+      "elapsedMs": 424082,
+      "reached": "schema-verification",
+      "logSha256": "c82e50fc1d749a60c4f970be85c4f987f2671c586bfc99893f0e7cc1ae26ae1f"
+    },
+    "freshWarmOwner": {
+      "uid": 10077,
+      "sealerInvocations": 0,
+      "fullPayloadAuditCalls": 0,
+      "sessionPayloadBytesRead": 0,
+      "privateCandidateBytes": 3331,
+      "elapsedMs": 270156,
+      "reached": "schema-verification",
+      "logSha256": "38ae6fe4c07e8c6d33685a2f1b92f6ef92a9d96c4ea70ec73a3a915c03a1e66c"
+    },
+    "deliberatelyReleasedLock": {
+      "uid": 10077,
+      "reason": "retained Android admission owner missing",
+      "fullPayloadAuditCalls": 1,
+      "elapsedMs": 387058,
+      "reached": "schema-verification",
+      "logSha256": "8ddbc89cb6a796795eb2f14b4290e82a5914d4a45557fefaa525dca900409efd"
+    },
+    "preliminarySameEmulator": {
+      "uid": 0,
+      "warmCancelRejected": true,
+      "cancelFullAuditCalls": 0,
+      "sameSizeMutationWithRestoredMtimeRejected": true,
+      "mutationFullAuditCalls": 1
+    },
+    "observer": "The initial external 420 s per-process watchdog expired for cold and owner-loss test orchestration. The actual independently launched Android owners completed and recorded the above durable results. The first emulator process ended during the separate package-UID warm cancellation trial; no cancellation or mutation result for that trial is included."
+  },
+  "privatePublicationFallback": {
+    "actor": "Separate root-launched ART trial on same emulator with private index parent deliberately left mode 0755",
+    "privateIndexWritten": false,
+    "sameOperationCandidateAccepted": true,
+    "secondPayloadAuditCalls": 0
+  },
+  "independentIoControl": {
+    "source": "Earlier same-UID authorized 32 MiB synthetic VMAP test, different operation and workload",
+    "sessionAuditDataBytesRead": 33554541,
+    "sessionAuditSeconds": 6.050135
+  },
+  "limits": [
+    "Device-local proof applies only to the selected volume and owner on that admission. The Redroid kernel does not enforce SELinux. Hard-link denial, ineffective timestamps or lock contention proof, missing/stale index, or changed source selection yields the full audit or identity rejection. Eligibility on a physical Thor is unmeasured.",
+    "These runs do not execute the subsequent SQL schema step, native auth/world service, client, gameplay or user saves. Wall times include staging and emulated Python process startup."
+  ]
+}
