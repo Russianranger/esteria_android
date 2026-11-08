@@ -1,0 +1,31 @@
+name: Disposable public-stock SQL donor
+on:
+  push:
+    branches: [qa/private-stock-sql-20261108]
+permissions:
+  contents: read
+jobs:
+  qualify:
+    if: github.repository == 'Russianranger/esteria_android' && contains(github.event.head_commit.message, '[run private stock donor]')
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install recipient encryption from Ubuntu packages
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends age zstd
+      - name: Prepare, stop, cold-verify and seal the disposable SQL store
+        run: bash tools/stock_sql_donor/run.sh
+      - name: Retain ciphertext and public provenance
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: encrypted-stock-sql-donor
+          path: |
+            ${{ runner.temp }}/esteria-donor-sealed/donor.tar.zst.age
+            ${{ runner.temp }}/esteria-donor-sealed/qualification.json
+          compression-level: 0
+          retention-days: 1
+          if-no-files-found: error
