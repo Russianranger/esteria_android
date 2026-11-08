@@ -65,13 +65,21 @@ class ShaderMemoryAdapter(unittest.TestCase):
     @staticmethod
     def files(path):return {str(p.relative_to(path)):p.read_bytes() for p in path.rglob('*') if p.is_file()}
     def test_original_manifest_index_glsl_and_companion_bytes_match(self):
-        self.prepare();original,changed=self.root/'original',self.root/'bounded'
-        args=['--data',str(self.data),'--locale','enUS','--strict','--glslang',str(self.tools/'bin/glslangValidator')]
-        with contextlib.redirect_stdout(io.StringIO()),contextlib.redirect_stderr(io.StringIO()):
-            self.assertEqual(self.translate.main(args+['--out',str(original)]),0)
-            with adapter.bounded_adapter(self.reader,self.translate,stock_vulkan=True):self.assertEqual(self.translate.main(args+['--out',str(changed)]),0)
-        self.assertEqual(self.files(original),self.files(changed));self.assertIn('companion ',(changed/'manifest.txt').read_text())
-        self.assertEqual(stock.storage.tool_identity(self.tools,stock.CLIENT_REVISION),self.manifest)
+        self.prepare()
+        out = self.root / 'translated'
+        args = ['--data', str(self.data), '--locale', 'enUS', '--strict',
+                '--glslang', str(self.tools / 'bin/glslangValidator'), '--out', str(out)]
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(self.translate.main(args), 0)
+            original = self.files(out)
+            # glslang includes the absolute input path in its assembly listing.
+            shutil.rmtree(out)
+            with adapter.bounded_adapter(self.reader, self.translate, stock_vulkan=True):
+                self.assertEqual(self.translate.main(args), 0)
+        self.assertEqual(original, self.files(out))
+        self.assertIn('companion ', (out / 'manifest.txt').read_text())
+        self.assertEqual(stock.storage.tool_identity(self.tools, stock.CLIENT_REVISION), self.manifest)
+
     def test_verified_original_entry_does_not_mutate_provider(self):
         self.prepare();out=self.root/'wrapped'
         with contextlib.redirect_stdout(io.StringIO()),contextlib.redirect_stderr(io.StringIO()):
