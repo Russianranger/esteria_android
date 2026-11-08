@@ -275,7 +275,7 @@ class Mysql:
         self.selector.register(self.process.stdout, selectors.EVENT_READ)
         self.buffer = b''
 
-    def query(self, sql: str, timeout: float = 30) -> list[str]:
+    def query(self, sql: str, timeout: float = 30, *, check_stop=None) -> list[str]:
         marker = '__esteria_' + secrets.token_hex(16)
         try:
             data = memoryview((sql.rstrip(';\n') + f";\nSELECT '{marker}';\n").encode())
@@ -290,6 +290,8 @@ class Mysql:
         rows = []
         total = 0
         while True:
+            if check_stop is not None:
+                check_stop()
             while b'\n' in self.buffer:
                 line, self.buffer = self.buffer.split(b'\n', 1)
                 decoded = line.decode('utf-8', errors='strict').rstrip('\r')

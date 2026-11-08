@@ -90,7 +90,13 @@ def stage(args):
                  '**Repair local component → Database setup**, then start the local game again.\n'
                  'If a stage fails, wait for cleanup, tap **Export support bundle**, choose a\n'
                  'destination and tap **Save**. Send the whole ZIP before retrying.')
-    if signed['versionCode'] == 17:
+    if signed['versionCode'] == 18:
+        setup = ('Install over Esteria Stock. Keep the existing import, configuration, databases and saves. '
+                 'With the client and shaders prepared, tap **Start local game**. '
+                 'If the previous failure was at shaders, choose **Repair local component → Shaders** once, then start. '
+                 'After a new failure, wait for cleanup, tap **Export support bundle**, choose a destination '
+                 'and tap **Save**. Send the complete ZIP.')
+    elif signed['versionCode'] == 17:
         setup = ('Install over Esteria Stock and keep the existing import and saves. '
                  'From v16 with the client and shaders prepared, tap **Start local game**. '
                  'For a previous shader failure, choose **Repair local component → Shaders** once, then start. '

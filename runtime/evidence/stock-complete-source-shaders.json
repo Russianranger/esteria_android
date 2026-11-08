@@ -1,0 +1,40 @@
+{
+  "environment": "Linux host Python, exact signed helpers and packaged ARM64 compiler under offline QEMU user emulation, AOSP JSON in signed-source Java consumer",
+  "android": false,
+  "physicalThor": false,
+  "sourceApkSha256": "dc68c5ced8f0f4a155d86135f70a8522766e483957df06e0ce5544d488ac2ace",
+  "clientRevision": "471ee42faadf4a97a1d0a86989cf1452621f2dc5",
+  "inputFiles": 188,
+  "sourcePayloadCopiedBytes": 0,
+  "originalMemberDigest": "e0dd435c07d7cf3552556188eb2830e978ac93104b39cded94054a212ab52d95",
+  "receiptSha256": "67640ae968737c56a2b0e4b3dd78cfeda9bd640370e4841e818de6482214e520",
+  "attempts": [
+    {
+      "operation": "prepare",
+      "compilerInvocations": 1580,
+      "elapsedSeconds": 2972.228
+    },
+    {
+      "operation": "warm",
+      "compilerInvocations": 0,
+      "elapsedSeconds": 7.02
+    }
+  ],
+  "importGeneration": "a6800cb53df18cea0012ea4c7c86991edaf49f49433528ec237678454bea09cb",
+  "effectiveLocale": "enUS",
+  "generation": "9d5f8a86c2ef253bd5ad9cde6b493e34e789cc5ab6b9a1f49008485b34b969f1",
+  "outputFiles": 4742,
+  "outputBytesRead": 102132134,
+  "requireSameSelection": true,
+  "independentReadback": {
+    "scope": "Independent readback of two private sealed output selections under separate read leases.",
+    "fullImportGeneration": "9d5f8a86c2ef253bd5ad9cde6b493e34e789cc5ab6b9a1f49008485b34b969f1",
+    "guardedStockGeneration": "3609dd1b67e77a12a6c1641cfba7341fc1681af57bef503f7b9ce8d64dc8139f",
+    "filesPerGeneration": 4742,
+    "identicalRuntimeFiles": 3162,
+    "identicalRuntimeBytes": 38381282,
+    "sortedNameNulRawSha256Digest": "c2acd43b3f49cccee8ee3a96a782065b9128ace6e9c56cb948f6b55d68211d36",
+    "spirvAssemblyFilesDifferingOnlyInCompilerInputPathLine": 1580,
+    "everyOutputByteCountAndHashMatchedOwnReceipt": true
+  }
+}

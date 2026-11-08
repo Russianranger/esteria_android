@@ -1,5 +1,5 @@
 {
-  "stage": "First sealed phase of complete stock world preparation. Subsequent stages require their own receipts.",
+  "stage": "Sealed map/DBC/camera, raw model and assembled VMap phases of complete stock world preparation.",
   "cancellation": {
     "activeGenerationPublished": false,
     "cancelledBeforeFirstVmapExtractorChild": true,
@@ -126,5 +126,37 @@
       "providerRank": 4,
       "winner": "Data/patch.MPQ"
     }
-  ]
+  ],
+  "sealedVMapPhases": {
+    "raw-vmaps": {
+      "phaseReceiptSha256": "3fa347a02bd86cdf85bfea34bf890b86f3f9f0c1a57f96887a00c6ffddb812fb",
+      "files": 7552,
+      "bytes": 324903797
+    },
+    "assembled-vmaps": {
+      "phaseReceiptSha256": "94707e46237bf0b1ba75c17123a4b51ab1f32037375052958deb582565602117",
+      "files": 12494,
+      "bytes": 657797478
+    }
+  },
+  "startingAreaCollision": {
+    "vmaps/000.vmtree": {
+      "bytes": 2713833,
+      "present": true,
+      "productionFormatCheck": true,
+      "sha256": "555fbef8c56d297a5b11362f4cac780a74ba834af81fe42bc5db898ba735804a"
+    },
+    "vmaps/000_31_43.vmtile": {
+      "bytes": 85381,
+      "present": true,
+      "productionFormatCheck": true,
+      "sha256": "474de4d22e9f0e71e887f743c10669f5bedca67536e89f58501c556e47c16e45"
+    },
+    "vmaps/000_32_48.vmtile": {
+      "bytes": 390224,
+      "present": true,
+      "productionFormatCheck": true,
+      "sha256": "b2f990664a0bc3e3ddf82ebd0a57eba6702e48ef177fdd6ebe0c6f54c2503402"
+    }
+  }
 }

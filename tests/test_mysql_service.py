@@ -166,13 +166,73 @@ class ServiceGuards(unittest.TestCase):
         with patch.object(db, 'Mysql', return_value=inner), patch.object(service.time, 'monotonic', return_value=10):
             connection = service.LiveConnection(Path('/mysql'), Path('/options'), 10.5, check)
             connection.query('SELECT 1', timeout=30)
-            inner.query.assert_called_once_with('SELECT 1', timeout=.5)
+            inner.query.assert_called_once_with('SELECT 1', timeout=.5, check_stop=check)
             check.assert_called_once()
         with patch.object(service.time, 'monotonic', return_value=11), self.assertRaisesRegex(service.ServiceError, 'timed out'):
             connection.query('SELECT 1')
         inner.query.reset_mock(); check.side_effect = service.StopRequested('owner-signal')
         with self.assertRaises(service.StopRequested): connection.query('SELECT 1')
         inner.query.assert_not_called()
+
+    def protocol_client(self, body, check_stop=lambda: None, budget=90):
+        executable = self.root / 'client'
+        executable.write_text('#!' + sys.executable + '\nimport sys, time\n' + body)
+        executable.chmod(0o700)
+        options = self.root / 'client-options'
+        options.touch(mode=0o600)
+        connection = service.LiveConnection(executable, options, time.monotonic()+budget, check_stop)
+        self.addCleanup(connection.close)
+        return connection
+
+    def test_measured_cold_identity_and_warm_query_on_same_cli(self):
+        # Timings reproduced with the packaged ARM64 client against its ready engine.
+        row = '\t'.join((VERSION, 'MySQL', UUID, str(self.state)))
+        client = self.protocol_client(
+            'first = True\n'
+            'for line in sys.stdin:\n'
+            '    if line.startswith("quit"): break\n'
+            '    if not line.startswith("SELECT \'__esteria_"): continue\n'
+            '    time.sleep(7.510 if first else .023)\n'
+            f'    print({row!r} if first else "1")\n'
+            '    first = False\n'
+            '    print(line.split(chr(39))[1], flush=True)\n')
+        with patch.object(client.inner, 'query', wraps=client.inner.query) as query:
+            self.assertEqual(db.identity(client, VERSION)['uuid'], UUID)
+            self.assertEqual(client.query('SELECT 1'), ['1'])
+            cold, warm = query.call_args_list
+            self.assertGreater(cold.kwargs['timeout'], 7.51)
+            self.assertLessEqual(cold.kwargs['timeout'], 90)
+            self.assertEqual(warm.kwargs['timeout'], 3)
+
+    def test_session_admission_first_response_does_not_start_an_admission_deadline(self):
+        # server_session.run opens this CLI after the database worker has already reported ready.
+        for explicit, expected in ((None, 30), (.5, .5)):
+            with self.subTest(explicit=explicit), patch.object(db, 'Mysql') as mysql:
+                inner = mysql.return_value
+                connection = service.LiveConnection(Path('/mysql'), Path('/options'), None, lambda: None)
+                connection.query('first identity query', timeout=explicit)
+                self.assertEqual(inner.query.call_args.kwargs['timeout'], expected)
+                with patch.object(service.time, 'monotonic', return_value=1e12):
+                    connection.query('later identity query')
+                self.assertEqual(inner.query.call_args.kwargs['timeout'], 3)
+
+    def test_cancel_while_cold_cli_has_no_response(self):
+        start = time.monotonic()
+        def stop():
+            if time.monotonic() - start >= .3:
+                raise service.StopRequested('owner-eof')
+        client = self.protocol_client('for line in sys.stdin:\n    if line.startswith("quit"): break\n', stop)
+        with self.assertRaises(service.StopRequested) as error:
+            client.query('SELECT 1')
+        self.assertEqual(error.exception.reason, 'owner-eof')
+        self.assertLess(time.monotonic()-start, 3)
+
+    def test_first_query_fails_promptly_when_cli_exits(self):
+        client = self.protocol_client('sys.stdin.readline()\n')
+        start = time.monotonic()
+        with self.assertRaisesRegex(db.BootstrapError, 'query failed'):
+            client.query('SELECT 1')
+        self.assertLess(time.monotonic()-start, 3)
 
     def test_cancellation_before_or_during_preflight_never_starts_engine(self):
         self.identity()

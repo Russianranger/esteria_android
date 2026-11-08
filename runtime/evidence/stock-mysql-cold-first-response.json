@@ -1,0 +1,100 @@
+{
+  "environment": "Debian AArch64 full-system on x86_64 TCG, original packaged programs and stock SQL",
+  "scope": "Public v17 service on a private retained MySQL fixture and a source-matched diagnostic calibration. This records a database startup failure preceding the world process.",
+  "retainedDatabaseInitializerCalls": 0,
+  "previousStoppedEngineWasOwned": true,
+  "sameUuid": true,
+  "v17FailureStages": [
+    {
+      "elapsedSeconds": 0.127,
+      "phase": "retained-disposable-stock-sql-resume"
+    },
+    {
+      "elapsedSeconds": 1.339,
+      "phase": "packaged-sql-bootstrap"
+    },
+    {
+      "elapsedBeforeOwnedEngineSeconds": 101.967,
+      "elapsedSeconds": 103.691,
+      "phase": "database-worker-admission-complete"
+    },
+    {
+      "elapsedAfterEngineLaunchSeconds": 96.303,
+      "elapsedSeconds": 200.065,
+      "phase": "database-engine-readiness-returned"
+    },
+    {
+      "elapsedSeconds": 200.377,
+      "phase": "early-owner-failed"
+    }
+  ],
+  "v17Failure": {
+    "failureReasonCode": "unclassified-static-boundary",
+    "failureSourceFrames": [
+      {
+        "function": "run",
+        "line": 172,
+        "source": "tools/qualify_packaged_server_auth.py"
+      },
+      {
+        "function": "wait_ready",
+        "line": 253,
+        "source": "tools/qualify_server_installation.py"
+      },
+      {
+        "function": "require",
+        "line": 42,
+        "source": "tools/verify_server_build.py"
+      }
+    ],
+    "ownedOperationStages": {}
+  },
+  "calibration": {
+    "coldOnlyBudgetQualified": true,
+    "coldSeconds": 7.51,
+    "originalFirstResponseTimedOutAfter": 3.003,
+    "readyEngineMarker": true,
+    "sameExpectedIdentity": true,
+    "warmSeconds": 0.023
+  },
+  "serviceOverallReadinessSeconds": 90,
+  "knownFailureFrames": [
+    [
+      "mysql_service.py",
+      "verify_live",
+      175
+    ],
+    [
+      "mysql_bootstrap.py",
+      "identity",
+      333
+    ],
+    [
+      "mysql_service.py",
+      "query",
+      200
+    ],
+    [
+      "mysql_bootstrap.py",
+      "query",
+      300
+    ]
+  ],
+  "diagnosticAdmittedFourSchemaSetup": true,
+  "sourceOfRepair": {
+    "mysql_service.py": "55fd55b11c614794929330a92f8b19637c8e02c3471c319f5e9429346fa716d4",
+    "mysql_bootstrap.py": "212bf5bae4c947c57069fe7e816be1c2c1fad6869ef378fc609df359c7f50f2e"
+  },
+  "controls": {
+    "newServiceCLI": "Remaining original MySQL startup deadline, default 90 seconds.",
+    "newServerSessionAdmissionCLI": "30 seconds for first answer; the SQL connection has no total session-admission timer.",
+    "connectedQueries": "At most 3 seconds, with tighter caller or remaining deadline honoured.",
+    "awaitingReply": "Poll cancellation and the owned service process while the SQL pipe is idle."
+  },
+  "receiptChanges": {
+    "existingWorldShaderImportAndSqlProfile": "No input changes.",
+    "database": "Same data directory, UUID, engine version, four-schema contract and application accounts.",
+    "replaceable": "Only APK service/bootstrap helper copies and their five APK helper manifests are affected."
+  },
+  "physicalThor": false
+}

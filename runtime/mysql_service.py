@@ -192,12 +192,20 @@ class LiveConnection:
         self.inner = db.Mysql(executable, options)
         self.deadline = deadline
         self.check_stop = check_stop
+        self.awaiting_first_response = True
 
-    def query(self, sql, timeout=3):
+    def query(self, sql, timeout=None):
         self.check_stop()
-        remaining = 3 if self.deadline is None else self.deadline - time.monotonic()
+        # A fresh CLI also loads and authenticates before returning its first row. A separate
+        # session-admission connection has no service deadline and uses the ordinary SQL budget.
+        remaining = 30 if self.deadline is None else self.deadline - time.monotonic()
         require(remaining > 0, 'authenticated database readiness timed out')
-        return self.inner.query(sql, timeout=min(timeout, 3, remaining))
+        budget = remaining if self.awaiting_first_response else min(3, remaining)
+        if timeout is not None:
+            budget = min(budget, timeout)
+        rows = self.inner.query(sql, timeout=budget, check_stop=self.check_stop)
+        self.awaiting_first_response = False
+        return rows
 
     def close(self):
         self.inner.close()
@@ -302,6 +310,9 @@ def serve(state: Path, session: Path, mysql: Path, mysqld: Path, version: str,
                 capture = db.EngineCapture(command, session / 'engine-private.log')
                 try:
                     deadline = time.monotonic() + startup_timeout
+                    def check_startup():
+                        check_stop()
+                        require(capture.process.poll() is None, 'owned engine exited during startup')
                     while True:
                         require(capture.process.poll() is None, 'owned engine exited during startup')
                         if interrupted():
@@ -311,7 +322,7 @@ def serve(state: Path, session: Path, mysql: Path, mysqld: Path, version: str,
                         if reason:
                             break
                         try:
-                            connection = LiveConnection(mysql, options, deadline, check_stop)
+                            connection = LiveConnection(mysql, options, deadline, check_startup)
                             verify_live(connection, expected, session, capture.process)
                             check_stop()
                             break
