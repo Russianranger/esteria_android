@@ -1,0 +1,123 @@
+{
+  "schema": 1,
+  "androidProducer": "0c712cd9d52e54be0b329925ed72943138cf23d5",
+  "stockContent": "stock-3.3.5a",
+  "physicalOwnerReport": {
+    "device": "AYN Thor",
+    "installedVersionFromScreenshot": null,
+    "characterCreated": true,
+    "questAccepted": true,
+    "enemyDefeated": true,
+    "loggedOut": true,
+    "highTemperatureReported": true,
+    "temperatureReading": null,
+    "coldCharacterReopenObserved": false,
+    "exportError": "IOException: Support bundle entry limit exceeded"
+  },
+  "host": {
+    "priorV22Guard": {
+      "1Fact33AllowlistedRoles": "rejected before output",
+      "257Facts0Logs": "rejected before output",
+      "257Facts33Roles": "rejected before output"
+    },
+    "v23ArchiveEntriesWith257FactsAnd33LogRoles": 34,
+    "metadataBudgetBytes": 262144,
+    "perLogTailBytes": 65536,
+    "javaFeatures": [
+      "managed frame caps and v22 startup companion",
+      "other settings preserved",
+      "controller sensitivity",
+      "export count, UTF-8, redaction and path bounds"
+    ],
+    "pythonDiscovered": 1692,
+    "pythonSkipped": 139
+  },
+  "apkInventoryComparison": {
+    "unsignedSha256": "16d61445e47021295ea3e81a0767ce68bb8c7f6dc9ec7b23433bd3390e9b5e07",
+    "baselineSha256": "15f9241a643a37c7786723631cf9ef315ba657df933bc2d96c58a23207d6042b",
+    "unchangedAssetEntries": 123,
+    "unchangedNativeLibraries": 4,
+    "unchangedProviderArchives": 8,
+    "identicalPayloadBytes": 340194487
+  },
+  "signedAndroid13Arm64": {
+    "run": 42519575216,
+    "phases": [
+      {
+        "phase": "seed21",
+        "uid": 10077,
+        "returnCode": 0,
+        "observed": [
+          "ESTERIA_SEED providerCopiedBytes=2522455679 client=1783e57b784e0487ceb6456a2ad21c1ec322cda8b1b2d1f09329550fe63768db",
+          "ESTERIA_REUSE providerSeals=9 clientRequiredFiles=30 clientRequiredBytes=21517816 matchPrevious=false",
+          "ESTERIA_RESULT seed21 success"
+        ]
+      },
+      {
+        "phase": "baseline22",
+        "uid": 10077,
+        "returnCode": 0,
+        "observed": [
+          "ESTERIA_REUSE providerSeals=9 clientRequiredFiles=30 clientRequiredBytes=21517816 matchPrevious=true",
+          "ESTERIA_PHASE database-initializing elapsedMs=798",
+          "ESTERIA_PHASE database-prepared elapsedMs=8260",
+          "ESTERIA_PHASE database-service-starting elapsedMs=8260",
+          "ESTERIA_PHASE installation-core-started elapsedMs=9792",
+          "ESTERIA_PHASE installation-baseline elapsedMs=17818",
+          "ESTERIA_PHASE installation-updater elapsedMs=126128",
+          "ESTERIA_PHASE installation-updater-reentry elapsedMs=210892",
+          "ESTERIA_PHASE installation-configurations elapsedMs=216410",
+          "ESTERIA_PHASE installation-local-realm elapsedMs=216610",
+          "ESTERIA_PHASE installation-local-account elapsedMs=220522",
+          "ESTERIA_PHASE installation-verify-owned-login elapsedMs=224434",
+          "ESTERIA_PHASE installation-playerbots-started elapsedMs=232861",
+          "ESTERIA_PHASE installation-playerbots-configurations elapsedMs=250416",
+          "ESTERIA_PHASE installation-playerbots-local-verify elapsedMs=354037",
+          "ESTERIA_ACTIVE slot=c17682b4b18f4c7e uuid=8f312d4c-dbb2-11f1-9c4e-d33cafbb9cda elapsedMs=446940",
+          "ESTERIA_RESULT baseline22 success"
+        ]
+      },
+      {
+        "phase": "reopen23",
+        "uid": 10077,
+        "returnCode": 0,
+        "observed": [
+          "ESTERIA_REUSE providerSeals=9 clientRequiredFiles=30 clientRequiredBytes=21517816 matchPrevious=true",
+          "ESTERIA_ACTIVE slot=c17682b4b18f4c7e uuid=8f312d4c-dbb2-11f1-9c4e-d33cafbb9cda elapsedMs=4058",
+          "ESTERIA_RESULT reopen23 success"
+        ]
+      }
+    ],
+    "productionDocumentExport": {
+      "versionCode": 23,
+      "route": "visible launcher and Android DocumentsUI on disposable Android 13 ARM64",
+      "zipBytes": 3526,
+      "entries": 2,
+      "metadataBytes": 7908,
+      "omittedFacts": 0
+    }
+  },
+  "packageRun": 42517789979,
+  "nativeSqlRun": 42517789981,
+  "publicationRun": 42521156615,
+  "thorV23ThermalMeasured": false,
+  "thorV23PlaythroughObserved": false,
+  "androidArm64Debug": {
+    "fullPackageRun": 42517789979,
+    "artifactId": 13633125558,
+    "realmPagesGestureAndImmersiveFixture": true,
+    "sameSqlSlot": "54e4d232fb784882",
+    "sameSqlUuid": "b506d44a-dbb0-11f1-a533-d33baeb88d9a",
+    "freshSqlReopenAndStopMs": [
+      5594,
+      3590,
+      3672
+    ]
+  },
+  "sanitizedPickerReplay": {
+    "run": 42518877792,
+    "actualDownloadsZipBytes": 3520,
+    "files": 2,
+    "fixtureContainsOwnerGameData": false
+  }
+}
