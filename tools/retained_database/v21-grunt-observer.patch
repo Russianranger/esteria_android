@@ -1,0 +1,93 @@
+--- a/tools/android_stock_database/ConfirmDatabase.java
++++ b/tools/android_stock_database/ConfirmDatabase.java
+@@ -371,7 +371,7 @@
+     private static JSONObject run(Context context, Path root, String mode) throws Exception {
+         boolean seed=mode.equals("seed18");
+         android.content.pm.PackageInfo installed=context.getPackageManager().getPackageInfo(context.getPackageName(),0);
+-        if(installed.getLongVersionCode()!=(seed?18:19)) throw new IOException("Unexpected installed app version");
++        if(installed.getLongVersionCode()!=(seed?18:21)) throw new IOException("Unexpected installed app version");
+         Path data=root.resolve("qa-server-data-directory");
+         if(seed) Files.createDirectory(data);
+         if(!Files.isDirectory(data) || !data.equals(data.toRealPath()))
+--- a/tools/android_stock_database/run_database.py
++++ b/tools/android_stock_database/run_database.py
+@@ -152,7 +152,7 @@
+         original=json.loads(Path(sys.argv[1]).with_name('v18-seed.json').read_bytes())
+         checked(original['phase']=='complete' and len(original['operations'])==1,'v18 seed missing')
+         baseline=original['operations'][0]
+-    package_uid=identity(CONTAINER,18 if seed else 19)
++    package_uid=identity(CONTAINER,18 if seed else 21)
+     apk=shell(CONTAINER,'pm path "$1"',PACKAGE).strip()
+     match=re.fullmatch(r'package:(/data/app/[A-Za-z0-9_./=+~-]+/base\.apk)',apk)
+     checked(match,'single installed APK required')
+@@ -208,7 +208,7 @@
+         else:
+             unchanged=('appUid','firstInstallTime','instanceUuid','slotId','promotionProof','setupReceipt',
+                        'providerGeneration','programsGeneration','contentGeneration','wineArchive')
+-            checked(item['versionCode']==19 and item['existingBootstrapReused'] is True
++            checked(item['versionCode']==21 and item['existingBootstrapReused'] is True
+                     and item['markerConfigAccountPersisted'] and item['providerCopiedBytes']==0 and client['wineCopiedBytes']==0
+                     and all(item[k]==baseline[k] for k in unchanged)
+                     and item['sourceRevision']=='c05a3af9be6c204c40d65d0e3eb6ccc2442012b6'
+--- a/tools/android_stock_database/host_run.sh
++++ b/tools/android_stock_database/host_run.sh
+@@ -30,16 +30,10 @@
+ }
+ trap close EXIT
+ apk="$work/input/stock.apk"
+-# Original signed producer c99dbaef634412729742e120d2457d5c7b8bf1a1.
+ repo_url='https://github.com/Russianranger/esteria_android/releases/download'
+-if [[ -n "${ESTERIA_DETACHED_CANDIDATE:-}" ]]; then
+-    ln -- "$ESTERIA_DETACHED_CANDIDATE" "$apk"
+-else
+-    curl --fail --location --silent --show-error --retry 3 \
+-      "$repo_url/non-custom-v0.1.0-non-custom.19/Esteria-Stock-3.3.5a-arm64.apk" -o "$apk"
+-fi
+-test "$(stat -c %s "$apk")" = 336899353
+-echo "c0d251847496c64170bb31d534a925afd1d8e7f92c21687e0e1cbf82c056e6fa  $apk" | sha256sum -c
++release_asset "$repo_url/non-custom-v0.1.0-non-custom.21/Esteria-Stock-3.3.5a-arm64.apk" 724391618 "$apk"
++test "$(stat -c %s "$apk")" = 336903449
++echo "1036c59e2d6e75c95e2cc6918111dfa73f816b77e3cd56b729807787d9bfb11d  $apk" | sha256sum -c
+ java -jar "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" verify --verbose --print-certs "$apk" > "$work/signers"
+ test "$(grep -c '^Signer #[0-9]* certificate SHA-256 digest:' "$work/signers")" = 1
+ grep -qx 'Signer #1 certificate SHA-256 digest: 5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa' "$work/signers"
+@@ -64,7 +58,7 @@
+ bash tools/android_stock_shader/compile_driver.sh "$work/dex" "$work/input/driver.jar" database
+ # This is the exact observer-only DEX independently compiled against the original generated classpath.
+ test "$(unzip -p "$work/input/driver.jar" classes.dex | sha256sum | cut -d' ' -f1)" = \
+-    ba88149fdd56be28413f8879c265af7fb2e4a643fef8207cb4aec85c051d2355
++    c405ee5277437f2edc94f8c1a69f581b66c4bb04a798442382b6b66940c11010
+ cp tools/android_stock_database/{auth_phase,grunt_wine,wine_prefix,wine_windows,world_probe,cold_sql_control}.py tools/{client_auth_contract,prepare_runtime,stock_world_observation}.py "$work/input/"
+ chmod 0444 "$work/input/"*.py
+ chmod 755 "$work/input"
+--- a/tools/android_stock_shader/package_lifecycle.py
++++ b/tools/android_stock_shader/package_lifecycle.py
+@@ -9,8 +9,8 @@
+ 
+ PACKAGE = 'io.github.russianranger.esteria.stock'
+ ACTIVITY = 'io.github.russianranger.esteria.MainActivity'
+-NAME = '0.1.0-non-custom.19'
+-SCOPE = 'disposable Android 13 signed v19 package lifecycle'
++NAME = '0.1.0-non-custom.21'
++SCOPE = 'disposable Android 13 signed v21 package lifecycle'
+ 
+ 
+ def require(value, message):
+@@ -25,7 +25,7 @@
+     return call.stdout
+ 
+ 
+-def identity(container, version=19):
++def identity(container, version=21):
+     result = shell(container,'dumpsys package "$1"',PACKAGE)
+     require(re.search(rf'^\s*versionCode={version}\b',result,re.MULTILINE) and
+             re.search(r'^\s*versionName='+re.escape("0.1.0-non-custom."+str(version))+r'\s*$',result,re.MULTILINE),
+@@ -90,7 +90,7 @@
+     require('Success' in output.splitlines(),'package installation did not succeed')
+     uid=identity(container)
+     if replace_from is not None: require(uid==previous,'UID changed on replacement')
+-    report.update(versionCode=19,versionName=NAME,uid=uid,phase='launcher')
++    report.update(versionCode=21,versionName=NAME,uid=uid,phase='launcher')
+     try:
+         component=PACKAGE+'/'+ACTIVITY
+         result = shell(container,'am start -W --user 0 -n "$1"',component,timeout=120)

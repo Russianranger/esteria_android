@@ -1,6 +1,6 @@
 # Esteria Stock 0.1.0-non-custom.21 for AYN Thor
 
-Install the signed **Esteria Stock** APK over v19. Keep the imported ChromieCraft 3.3.5a client, **enUS**, **Balanced**, and existing saves.
+Install the [signed Esteria Stock v21 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.21/Esteria-Stock-3.3.5a-arm64.apk) over v19. Keep the imported ChromieCraft 3.3.5a client, **enUS**, **Balanced**, and existing saves.
 
 1. For the November 8 Thor failure, choose **Repair local component → Database setup**. The device already selected the stock world and 4,742 shaders. Leave those selections in place.
 2. Allow the database repair to finish. After bootstrap, the installer starts MySQL, runs the schema helper, verifies all four schemas, and waits for a clean MySQL stop before selecting the slot. An active source-matched slot is reused.

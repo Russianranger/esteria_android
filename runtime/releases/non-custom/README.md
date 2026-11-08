@@ -1,6 +1,6 @@
 # Current stock publication
 
-The v21 detached transport in [update-21](update-21) binds Android producer `623a88115a394fc7bd433c51a60d0e0cda732b67` to the original stock signer. Native Android installed it over signed v19, preserved the failed slot and reopened the promoted four-schema database in three cold processes under the same package UID. [Signed replacement and SQL evidence](../../evidence/non-custom-v21-retained-database.json) · [Detached staging](https://github.com/Russianranger/esteria_android/actions/runs/42495218508).
+[Published v21](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.21) passed [all six public readbacks](../../evidence/non-custom-v21-public-apk-readback.json). The v21 detached transport in [update-21](update-21) binds Android producer `623a88115a394fc7bd433c51a60d0e0cda732b67` to the original stock signer. Native Android installed it over signed v19, preserved the failed slot and reopened the promoted four-schema database in three cold processes under the same package UID. [Signed replacement and SQL evidence](../../evidence/non-custom-v21-retained-database.json) · [Detached staging](https://github.com/Russianranger/esteria_android/actions/runs/42495218508).
 
 ## Prior releases
 

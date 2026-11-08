@@ -1,0 +1,62 @@
+name: Qualify published v21 reconstructed Android authentication
+on:
+  push:
+    branches: [non-custom]
+    paths:
+      - .github/workflows/stock-v21-auth.yml
+      - tools/retained_database/v21-grunt-observer.patch
+permissions:
+  contents: read
+jobs:
+  authenticate:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 72
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: e9553fe7f0035a3336693046368c6ad7034ab344
+          path: auth-qa
+          persist-credentials: false
+      - name: Select public v21 readback and the version-matched observer
+        run: git -C auth-qa apply ../tools/retained_database/v21-grunt-observer.patch
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with:
+          distribution: temurin
+          java-version: '17.0.13+11'
+      - name: Stage Android platform 35, portable D8 for the package-UID observer
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdk="$RUNNER_TEMP/stock-shader-sdk"
+          mkdir -p "$sdk/platforms" "$sdk/build-tools"
+          tools_url=https://dl.google.com/android/repository
+          curl --fail --location --retry 3 "$tools_url/platform-35_r02.zip" -o "$RUNNER_TEMP/stock-sdk.zip"
+          curl --fail --location --retry 3 "$tools_url/build-tools_r35_linux.zip" -o "$RUNNER_TEMP/stock-build-tools.zip"
+          echo "0bb560a90a7a2cbd0dd8348224d518b638fe7949  $RUNNER_TEMP/stock-sdk.zip" | sha1sum -c
+          echo "2cfaa0bbb2336e9ec18ed3ecea84fa2e2af607bc  $RUNNER_TEMP/stock-build-tools.zip" | sha1sum -c
+          unzip -q "$RUNNER_TEMP/stock-sdk.zip" -d "$sdk/platforms"
+          unzip -q "$RUNNER_TEMP/stock-build-tools.zip" -d "$sdk/build-tools"
+          platform=$(find "$sdk/platforms" -mindepth 1 -maxdepth 1 -type d)
+          build=$(find "$sdk/build-tools" -mindepth 1 -maxdepth 1 -type d)
+          if [[ "$platform" != "$sdk/platforms/android-35" ]]; then mv "$platform" "$sdk/platforms/android-35"; fi
+          if [[ "$build" != "$sdk/build-tools/35.0.0" ]]; then mv "$build" "$sdk/build-tools/35.0.0"; fi
+          test -f "$sdk/platforms/android-35/android.jar"
+          test -x "$sdk/build-tools/35.0.0/d8"
+          echo "ANDROID_HOME=$sdk" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$sdk" >> "$GITHUB_ENV"
+      - name: Exercise signed v18 to v21 native client update, offline Grunt and cold SQL response
+        env:
+          PUBLIC_RELEASE_TOKEN: ${{ github.token }}
+        working-directory: auth-qa
+        run: bash tools/android_stock_database/host_run.sh
+      - name: Retain redacted results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: android-grunt-evidence
+          path: ${{ runner.temp }}/android-stock-db-evidence/*.json
+          retention-days: 7
+          if-no-files-found: warn
