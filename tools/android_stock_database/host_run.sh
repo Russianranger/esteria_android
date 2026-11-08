@@ -16,20 +16,20 @@ close() {
 }
 trap close EXIT
 apk="$work/input/stock.apk"
-# Final stock producer 2149ae6001b68d896a1fef61f905aeb5fb3115c6, verified release signing identity.
+# Final stock producer 075ed711bd8be7aaeac8bdfca2be8c607afb8f4b, verified release signing identity.
 repo_url='https://github.com/Russianranger/esteria_android/releases/download'
 curl --fail --location --silent --show-error --retry 3 \
-  "$repo_url/non-custom-v0.1.0-non-custom.17/Esteria-Stock-3.3.5a-arm64.apk" -o "$apk"
+  "$repo_url/non-custom-v0.1.0-non-custom.18/Esteria-Stock-3.3.5a-arm64.apk" -o "$apk"
 test "$(stat -c %s "$apk")" = 336899353
-echo "dc68c5ced8f0f4a155d86135f70a8522766e483957df06e0ce5544d488ac2ace  $apk" | sha256sum -c
+echo "60a90c58dfc211c53928853dbbebd04929668da69d46d4c0a027c143f6857eb6  $apk" | sha256sum -c
 java -jar "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" verify --verbose --print-certs "$apk" > "$work/signers"
 test "$(grep -c '^Signer #[0-9]* certificate SHA-256 digest:' "$work/signers")" = 1
 grep -qx 'Signer #1 certificate SHA-256 digest: 5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa' "$work/signers"
-previous="$work/input/stock-v16.apk"
+previous="$work/input/stock-v17.apk"
 curl --fail --location --silent --show-error --retry 3 \
-  "$repo_url/non-custom-v0.1.0-non-custom.16/Esteria-Stock-3.3.5a-arm64.apk" -o "$previous"
-test "$(stat -c %s "$previous")" = 336887065
-echo "de9d108a725aeb7a8eea1041bd1a72eb7a5acde811595cf71c886f6937f74ab4  $previous" | sha256sum -c
+  "$repo_url/non-custom-v0.1.0-non-custom.17/Esteria-Stock-3.3.5a-arm64.apk" -o "$previous"
+test "$(stat -c %s "$previous")" = 336899353
+echo "dc68c5ced8f0f4a155d86135f70a8522766e483957df06e0ce5544d488ac2ace  $previous" | sha256sum -c
 java -jar "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" verify --verbose --print-certs "$previous" > "$work/previous-signers"
 diff -u <(grep '^Signer #[0-9]* certificate SHA-256 digest:' "$work/signers") \
         <(grep '^Signer #[0-9]* certificate SHA-256 digest:' "$work/previous-signers")
@@ -44,10 +44,10 @@ test "$(stat -c %s "$work/input/wine.tar.gz")" = 282628308
 echo "c0e13ed15a69fa72541684ac5cef49d71d5d95ee494146bc6e40d11b6977ab46  $work/input/wine.tar.gz" | sha256sum -c
 chmod 0444 "$work/input/wine.tar.gz"
 bash tools/android_stock_shader/compile_driver.sh "$work/dex" "$work/input/driver.jar" database
-cp tools/android_stock_database/{auth_phase,grunt_wine,wine_prefix,wine_windows,world_probe}.py tools/{client_auth_contract,prepare_runtime,stock_world_observation}.py "$work/input/"
+cp tools/android_stock_database/{auth_phase,grunt_wine,wine_prefix,wine_windows,world_probe,cold_sql_control}.py tools/{client_auth_contract,prepare_runtime,stock_world_observation}.py "$work/input/"
 chmod 0444 "$work/input/"*.py
 chmod 755 "$work/input"
 chmod 644 "$apk" "$work/input/driver.jar"
 redroid_start "$work"
-python3 -m tools.android_stock_database.run_database "$out/v16-seed.json" seed16
+python3 -m tools.android_stock_database.run_database "$out/v17-seed.json" seed17
 python3 -m tools.android_stock_database.run_database "$out/owner.json"

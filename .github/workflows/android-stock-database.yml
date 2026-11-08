@@ -1,7 +1,7 @@
 name: Signed reconstructed Grunt and stock authserver on native Android
 on:
   push:
-    branches: [qa/android-arm64-grunt]
+    branches: [qa/android-arm64-grunt-v18]
 permissions:
   contents: read
 jobs:
@@ -38,7 +38,7 @@ jobs:
           test -x "$sdk/build-tools/35.0.0/d8"
           echo "ANDROID_HOME=$sdk" >> "$GITHUB_ENV"
           echo "ANDROID_SDK_ROOT=$sdk" >> "$GITHUB_ENV"
-      - name: Exercise signed Wine, reconstructed client, MySQL and authserver twice
+      - name: Exercise signed v17 to v18 update, offline Grunt and cold SQL response
         run: bash tools/android_stock_database/host_run.sh
       - name: Retain redacted results
         if: always()

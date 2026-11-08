@@ -182,7 +182,7 @@ public final class ConfirmDatabase {
             throw new IOException("Signed Android child failed or exceeded its phase budget");
     }
 
-    private static void prepareClient(Context context, Path root, Path work, RuntimeSetup wine, boolean cold) throws IOException {
+    private static long prepareClient(Context context, Path root, Path work, RuntimeSetup wine, boolean seed) throws IOException {
         ClientRuntimeSetup client=new ClientRuntimeSetup(context,root);
         client.requireWineArchive(wine.archiveSha256());
         if(!SOURCE.equals(client.sourceRevision()) || !PE.equals(client.packagePlan().required.get("bin/WowClient64.exe").sha256))
@@ -190,10 +190,10 @@ public final class ConfirmDatabase {
         RuntimeInstaller.Result wineFiles=wine.installer().install(Paths.get("/esteria-qa/input/wine.tar.gz"),
                 wine.packagePlan(),RuntimeWork.NONE,RuntimeWork.NEVER_CANCELLED);
         RuntimeInstaller.Result clientFiles=client.prepare(RuntimeWork.NONE,RuntimeWork.NEVER_CANCELLED);
-        if(cold ? (wineFiles.alreadyInstalled || clientFiles.alreadyInstalled) :
+        if(seed ? (wineFiles.alreadyInstalled || clientFiles.alreadyInstalled) :
                 (!wineFiles.alreadyInstalled || !clientFiles.alreadyInstalled || wineFiles.copiedBytes+clientFiles.copiedBytes!=0))
             throw new IOException("Unexpected Wine or reconstructed client admission");
-        if(cold) {
+        if(seed) {
             Files.createDirectories(work.getParent());
             Files.createDirectory(work);
             Files.createDirectory(work.resolve("bin"));
@@ -201,10 +201,10 @@ public final class ConfirmDatabase {
                 Files.copy(Paths.get("/esteria-qa/input/"+source),work.resolve(source));
         }
         for (String name:Arrays.asList("bin/WowClient64.exe","bin/XvidDecoder.dll")) {
-            if (cold) Files.copy(clientFiles.rootfs.resolve(name),work.resolve(name));
+            if (seed) Files.copy(clientFiles.rootfs.resolve(name),work.resolve(name));
             verifyFile(work.resolve(name),client.packagePlan().required.get(name));
         }
-
+        return wineFiles.copiedBytes+clientFiles.copiedBytes;
     }
 
     private static String auth(Context context,Path root,ServerRuntimeSetup server,ServerProgramsSetup programs,
@@ -288,18 +288,63 @@ public final class ConfirmDatabase {
         }
     }
 
+    private static void verifyExistingBootstrap(Context context, Path root, ServerRuntimeSetup server,
+            FreshServerInstallations.Active active, RuntimeWork.Progress progress) throws Exception {
+        // The public bootstrap facade chooses a legacy directory. Invoke the original workspace
+        // adapter only with the app's source-verified active SQL slot and its actual leases.
+        Path work=active.directoryFor(root);
+        if(!Files.isRegularFile(work.resolve("state/database-bootstrap.json")) ||
+                !Files.isRegularFile(work.resolve("state/server-setup-complete.json")))
+            throw new IOException("Prior bootstrap and promoted setup required");
+        java.lang.reflect.Method method=ServerDatabaseSetup.class.getDeclaredMethod("prepareWork",Context.class,
+                Path.class,Path.class,ServerDatabaseService.InstallationRuntime.class,RuntimeWork.Progress.class,
+                RuntimeWork.Cancellation.class,java.util.function.Consumer.class);
+        method.setAccessible(true);
+        ServerDatabaseSetup.Result result=(ServerDatabaseSetup.Result)method.invoke(null,context,root,work,
+                ServerDatabaseService.installedRuntime(context,server),progress,RuntimeWork.NEVER_CANCELLED,null);
+        if(!result.operation.equals("already-initialized") || !result.instanceUuid.equals(active.mysqlUuid))
+            throw new IOException("Existing selected bootstrap was not reused");
+    }
+
+    private static JSONObject coldSqlControl(Context context, Path root, ServerRuntimeSetup server,
+            FreshServerInstallations.Active active, ServerDatabaseService.Handle database) throws Exception {
+        Path work=active.directoryFor(root);
+        String generation=GuestHelperAssets.install(context,"server-session",
+                GuestHelperAssets.directory(work,"qa-auth-helpers"),LocalServerSession.HELPERS);
+        Path scratch=Files.createDirectory(work.resolve("qa-cold-sql-control"));
+        Files.copy(Paths.get("/esteria-qa/input/cold_sql_control.py"),scratch.resolve("control.py"));
+        Path session=Files.createDirectory(root.resolve("qa-controlled-sql-process"));
+        String result=database.withReadyLease(server.current(),(operation,version,uuid)->{
+            OwnedProcess control=ServerDatabaseService.installedRuntime(context,server).launch(work,session,
+                    Arrays.asList("/usr/bin/python3","-B","-s","-E","/work/qa-cold-sql-control/control.py",
+                            generation,version,uuid),Collections.emptyList());
+            try {
+                long limit=System.nanoTime()+TimeUnit.MINUTES.toNanos(2);
+                while(control.isAlive() && System.nanoTime()<limit) pause();
+                requireExit(control);
+                Path report=scratch.resolve("verified.json");
+                if(!report.toRealPath().equals(report) || Files.size(report)>4096)
+                    throw new IOException("Unexpected controlled SQL result");
+                return new String(Files.readAllBytes(report),StandardCharsets.UTF_8);
+            } finally {
+                if(control.isAlive()) control.stop(Duration.ofSeconds(15));
+            }
+        });
+        return new JSONObject(result);
+    }
+
     private static JSONObject run(Context context, Path root, String mode) throws Exception {
-        boolean seed=mode.equals("seed16"),cold=mode.equals("cold");
+        boolean seed=mode.equals("seed17"),cold=mode.equals("cold");
         android.content.pm.PackageInfo installed=context.getPackageManager().getPackageInfo(context.getPackageName(),0);
-        if(installed.getLongVersionCode()!=(seed?16:17)) throw new IOException("Unexpected installed app version");
+        if(installed.getLongVersionCode()!=(seed?17:18)) throw new IOException("Unexpected installed app version");
         Path data=root.resolve("qa-server-data-directory");
         if(seed) Files.createDirectory(data);
         if(!Files.isDirectory(data) || !data.equals(data.toRealPath()))
             throw new IllegalStateException("Disjoint QA schema config directory required");
         RuntimeSetup wine=new RuntimeSetup(context,root);
         Path clientWork=root.resolve("state/client-work");
-        if(!seed) prepareClient(context,root,clientWork,wine,cold);
-        String prefixBefore=seed?"unobserved-v16-seed":installedPrefixState(clientWork,wine);
+        long clientProviderCopied=prepareClient(context,root,clientWork,wine,seed);
+        String prefixBefore=seed?"unobserved-v17-seed":installedPrefixState(clientWork,wine);
         ServerRuntimeSetup server=new ServerRuntimeSetup(context,root);
         ServerProgramsSetup programs=new ServerProgramsSetup(context,root);
         ServerContentSetup content=new ServerContentSetup(context,root);
@@ -332,37 +377,56 @@ public final class ConfirmDatabase {
         }
         long prepared=elapsed(start);
         System.out.println("ANDROID_DB_PHASE promoted-slot-selected "+prepared);
+        if(!seed) verifyExistingBootstrap(context,root,server,active,progress);
+        long beforeService=elapsed(start);
         ServerDatabaseService.Handle database=ServerDatabaseService.startActive(context,root,server,active);
         long ready;
         String authReport;
         long authenticated;
+        JSONObject trial=null;
         try {
             ServerDatabaseService.awaitReady(database,System.nanoTime()+TimeUnit.MINUTES.toNanos(3),new AtomicBoolean(false));
             ready=elapsed(start);
             if(!active.mysqlUuid.equals(database.instanceUuid())) throw new IllegalStateException("Owned SQL service identity differs");
             authReport=seed ? "{}" : auth(context,root,server,programs,active,database,wine,cold);
+            if(mode.equals("warm")) {
+                try { trial=coldSqlControl(context,root,server,active,database); }
+                catch(Exception failure) {
+                    // Preserve the genuine production reopening and Grunt evidence if the
+                    // separately controlled query fails. The host checks the trial independently.
+                    trial=new JSONObject().put("scope","controlled-delay-on-real-first-CLI-result")
+                            .put("failureType",failure.getClass().getSimpleName());
+                    Path stage=active.directoryFor(root).resolve("qa-cold-sql-control/phase.json");
+                    if(Files.isRegularFile(stage) && Files.size(stage)<128){
+                        String phase=new JSONObject(new String(Files.readAllBytes(stage),StandardCharsets.UTF_8)).optString("phase");
+                        if(phase.matches("[a-z-]{1,40}")) trial.put("failedStage",phase);
+                    }
+                }
+            }
             authenticated=elapsed(start);
         } finally {
             database.stop(Duration.ofSeconds(30));
         }
         if(database.isAlive() || database.exitCode()!=0) throw new IllegalStateException("SQL service did not close cleanly");
-        String prefixAfter=seed?"unobserved-v16-seed":installedPrefixState(clientWork,wine);
+        String prefixAfter=seed?"unobserved-v17-seed":installedPrefixState(clientWork,wine);
         checkRetainedOperatorFiles(root,active.directoryFor(root).resolve("state"),seed);
         return new JSONObject().put("mode",mode).put("appUid",android.os.Process.myUid())
             .put("firstInstallTime",installed.firstInstallTime).put("versionCode",installed.getLongVersionCode())
             .put("stockPrefixBefore",prefixBefore).put("stockPrefixAfter",prefixAfter)
+            .put("clientAndWineProviderCopiedBytes",clientProviderCopied)
             .put("markerConfigAccountPersisted",!seed).put("instanceUuid",active.mysqlUuid)
             .put("slotId",active.slotId).put("promotionProof",active.proofSha256).put("setupReceipt",active.setupReceiptSha256)
             .put("providerGeneration",runtime.generation).put("programsGeneration",executables.generation)
             .put("contentGeneration",sql.generation).put("providerCopiedBytes",copied)
             .put("version",server.expectedMysqlVersion()).put("providerMs",providers)
-            .put("schemaSetupOrSelectionMs",prepared-providers).put("activeNativeStartupMs",ready-prepared)
+            .put("schemaSetupOrSelectionMs",prepared-providers).put("activeNativeStartupMs",ready-beforeService).put("bootstrapReentryMs",beforeService-prepared)
+            .put("existingBootstrapReused",!seed).put("controlledSql",trial)
             .put("reconstructedClientSha256",PE).put("sourceRevision",SOURCE).put("wineArchive",wine.archiveSha256())
             .put("auth",new JSONObject(authReport)).put("cleanShutdownMs",elapsed(start)-authenticated).put("sameAuthenticatedInstance",true).put("closed",true);
     }
 
     public static void main(String[] args) throws Exception {
-        if(args.length!=1 || !(args[0].equals("cold") || args[0].equals("warm") || args[0].equals("seed16"))) throw new IllegalArgumentException();
+        if(args.length!=1 || !(args[0].equals("cold") || args[0].equals("warm") || args[0].equals("seed17"))) throw new IllegalArgumentException();
         if(Looper.myLooper()==null) Looper.prepareMainLooper();
         Class<?> thread=Class.forName("android.app.ActivityThread");
         Object instance=thread.getMethod("systemMain").invoke(null);

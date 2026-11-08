@@ -107,18 +107,18 @@ def exercise(report,seed):
         result=shell(CONTAINER,'''apk=/data/local/tmp/esteria-prior-stock-qa.apk
             trap 'rm -f "$apk"' EXIT
             test ! -e "$apk"
-            cp /esteria-qa/input/stock-v16.apk "$apk"
+            cp /esteria-qa/input/stock-v17.apk "$apk"
             chmod 644 "$apk"
             pm install --user 0 "$apk"
         ''',timeout=360)
-        checked('Success' in result.splitlines(),'v16 installation failed')
+        checked('Success' in result.splitlines(),'v17 installation failed')
     else:
         report['packageUpdate']={}
-        package_lifecycle(CONTAINER,report['packageUpdate'],False,replace_from=16)
-        original=json.loads(Path(sys.argv[1]).with_name('v16-seed.json').read_bytes())
-        checked(original['phase']=='complete' and len(original['operations'])==1,'v16 seed missing')
+        package_lifecycle(CONTAINER,report['packageUpdate'],False,replace_from=17)
+        original=json.loads(Path(sys.argv[1]).with_name('v17-seed.json').read_bytes())
+        checked(original['phase']=='complete' and len(original['operations'])==1,'v17 seed missing')
         baseline=original['operations'][0]
-    package_uid=identity(CONTAINER,16 if seed else 17)
+    package_uid=identity(CONTAINER,17 if seed else 18)
     apk=shell(CONTAINER,'pm path "$1"',PACKAGE).strip()
     match=re.fullmatch(r'package:(/data/app/[A-Za-z0-9_./=+~-]+/base\.apk)',apk)
     checked(match,'single installed APK required')
@@ -130,7 +130,7 @@ def exercise(report,seed):
     report['operations']=[]
     report.update(packageUid=package_uid,selinux=shell(CONTAINER,'getenforce').strip(),
                   fingerprint=shell(CONTAINER,'getprop ro.build.fingerprint').strip())
-    for mode in (('seed16',) if seed else ('cold','warm')):
+    for mode in (('seed17',) if seed else ('cold','warm')):
         report['phase']=mode
         cmd=['docker','exec','--user',f'{package_uid}:{package_uid}',CONTAINER,
              '/system/bin/env','-i',*boot,'CLASSPATH=/esteria-qa/input/driver.jar:'+apk,
@@ -162,14 +162,15 @@ def exercise(report,seed):
         checked(item['mode']==mode and item['closed'] and item['sameAuthenticatedInstance'] and
                 re.fullmatch(r'[a-f0-9-]{36}',item['instanceUuid']),'invalid signed SQL result')
         if seed:
-            checked(item['versionCode']==16 and item['providerCopiedBytes']>0 and not item['auth'],
-                    'v16 SQL seed failed')
+            checked(item['versionCode']==17 and item['providerCopiedBytes']>0 and item['clientAndWineProviderCopiedBytes']>0 and not item['auth'],
+                    'v17 SQL seed failed')
             check_empty(CONTAINER,package_uid)
             report['operations'].append(item)
             continue
         unchanged=('appUid','firstInstallTime','instanceUuid','slotId','promotionProof','setupReceipt',
-                   'providerGeneration','programsGeneration','contentGeneration')
-        checked(item['versionCode']==17 and item['markerConfigAccountPersisted'] and item['providerCopiedBytes']==0
+                   'providerGeneration','programsGeneration','contentGeneration','reconstructedClientSha256','sourceRevision','wineArchive')
+        checked(item['versionCode']==18 and item['existingBootstrapReused'] is True
+                and item['markerConfigAccountPersisted'] and item['providerCopiedBytes']==0 and item['clientAndWineProviderCopiedBytes']==0
                 and all(item[k]==baseline[k] for k in unchanged),'in-place update failed to retain sources, account or SQL')
         report.setdefault('signedPrefixSelections',[]).append(dict(mode=mode,before=item['stockPrefixBefore'],
                                                                    after=item['stockPrefixAfter']))
@@ -187,7 +188,19 @@ def exercise(report,seed):
                     item['providerCopiedBytes']==0,'warm persisted instance or provider changed')
         check_empty(CONTAINER,package_uid)
         report['operations'].append(item)
-    if not seed: wine_details(report)
+    if not seed:
+        wine_details(report)
+        report['phase']='controlled-first-response'
+        trial=report['operations'][-1].get('controlledSql') or {}
+        checked(trial.get('scope')=='controlled-delay-on-real-first-CLI-result' and
+                trial.get('normalStartupMeasurement') is False and trial.get('inducedServerSleepSeconds')==4.25 and
+                trial.get('firstAuthenticatedDelayedResponseSeconds',0)>=4 and
+                0 <= trial.get('sameCliNormalResponseSeconds',-1) < 3 and
+                2.9 <= trial.get('sameCliInducedTimeoutSeconds',-1) < 4.25 and
+                0 <= trial.get('cancelReturnSeconds',-1) < 3 and
+                all(trial.get(k) is True for k in ('threeSecondWarmCapObserved','cancelledOutstandingColdRead',
+                    'allControlledClientsReaped','sameRealEngineAfterCancellation')),
+                'controlled first-response, connected-timeout or stop qualification failed')
     report['phase']='complete'
 
 
@@ -196,7 +209,7 @@ if __name__=='__main__':
                 installedProductionClientEnvironment=True,reconstructedGruntTarget=True,actualWorldSession=False,graphicalLogin=False,physicalThor=False)
     start=time.monotonic()
     try:
-        exercise(report,len(sys.argv)>2 and sys.argv[2]=="seed16")
+        exercise(report,len(sys.argv)>2 and sys.argv[2]=="seed17")
     except Exception as error:
         report['errorType']=type(error).__name__
         if isinstance(error,RuntimeError):report['reason']=str(error)
