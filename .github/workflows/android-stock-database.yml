@@ -62,6 +62,8 @@ jobs:
           echo "ANDROID_HOME=$sdk" >> "$GITHUB_ENV"
           echo "ANDROID_SDK_ROOT=$sdk" >> "$GITHUB_ENV"
       - name: Exercise signed v18 to v19 native client update, offline Grunt and cold SQL response
+        env:
+          PUBLIC_RELEASE_TOKEN: ${{ github.token }}
         run: bash tools/android_stock_database/host_run.sh
       - name: Retain redacted results
         if: always()
