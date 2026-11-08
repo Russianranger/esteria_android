@@ -1,12 +1,12 @@
-name: Stock signed MySQL on native Android ARM64
+name: Signed reconstructed Grunt and stock authserver on native Android
 on:
   push:
-    branches: [qa/android-arm64-database]
+    branches: [qa/android-arm64-grunt]
 permissions:
   contents: read
 jobs:
   database:
-    if: github.repository == 'Russianranger/esteria_android' && contains(github.event.head_commit.message, '[qualify signed Android database]')
+    if: github.repository == 'Russianranger/esteria_android' && contains(github.event.head_commit.message, '[qualify signed Android Grunt]')
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 72
     steps:
@@ -38,13 +38,13 @@ jobs:
           test -x "$sdk/build-tools/35.0.0/d8"
           echo "ANDROID_HOME=$sdk" >> "$GITHUB_ENV"
           echo "ANDROID_SDK_ROOT=$sdk" >> "$GITHUB_ENV"
-      - name: Exercise original signed MySQL startup, shutdown and fresh owner
+      - name: Exercise signed Wine, reconstructed client, MySQL and authserver twice
         run: bash tools/android_stock_database/host_run.sh
       - name: Retain redacted results
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: android-stock-database-evidence
+          name: android-grunt-evidence
           path: ${{ runner.temp }}/android-stock-db-evidence/*.json
           retention-days: 7
           if-no-files-found: warn

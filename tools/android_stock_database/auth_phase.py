@@ -3,7 +3,7 @@ import hmac
 import json
 from pathlib import Path
 import re
-import socket
+import secrets
 import sys
 import time
 import types
@@ -11,7 +11,7 @@ import types
 # Make the fully authenticated helper installation the runtime package for the existing
 # host test-client codec. This keeps application code in the installed signed APK.
 work=Path('/work')
-helper,operation,db_operation,version,uuid,setup_hash,program_hash,program_bytes=sys.argv[1:]
+helper,operation,db_operation,version,uuid,setup_hash,program_hash,program_bytes,world_hash,world_bytes=sys.argv[1:]
 assert all(re.fullmatch(r'[a-f0-9]{64}',v) for v in (helper,setup_hash,program_hash))
 assert re.fullmatch(r'[a-f0-9]{32}',db_operation) and operation in ('cold','warm')
 package=types.ModuleType('runtime')
@@ -23,7 +23,7 @@ from runtime import provision_local_account as accounts
 from runtime import provision_local_realm as realm
 from runtime import server_schema_baseline as baseline
 from runtime import server_session_process as processes
-import auth_protocol
+import client_auth_contract as contract
 
 def require(valid,message):
     if not valid: raise ValueError(message)
@@ -65,11 +65,25 @@ with realm.config_lock(state),db.option_file(observation,'esteria',secret) as op
             else: raise RuntimeError('Auth listener readiness deadline')
             status('build-12340-challenge')
             require(processes.auth_challenge(timeout=1),'Production challenge callback failed')
-            status('authenticate-and-read-realm-list')
-            with socket.create_connection(('127.0.0.1',3724),timeout=5) as transport:
-                realms,key=auth_protocol.login(transport,intent)
-            require(len(realms)==1 and realms[0]['id']==1 and realms[0]['address']=='127.0.0.1:8085' and
-                    realms[0]['locked']==0 and realms[0]['build'] in (None,(3,3,5,12340)),'Unexpected loopback realm')
+            status('reconstructed-grunt-authenticate')
+            peer=work/'qa-grunt'
+            nonce=secrets.token_bytes(16)
+            private=[peer/'bin'/name for name in (contract.INPUT,contract.RECEIPT,contract.KEY)]
+            require(all(not path.exists() and not path.is_symlink() for path in private),'Stale private challenge')
+            try:
+                contract.write_input(private[0],intent,nonce)
+                db.atomic_json(peer/('ready-'+operation+'.json'),{'operation':operation})
+                deadline=time.monotonic()+180
+                while time.monotonic()<deadline:
+                    require(child.alive(),'Auth child exited during Grunt')
+                    if (peer/operation/'exited').is_file(): break
+                    time.sleep(.1)
+                else: raise RuntimeError('Reconstructed client deadline')
+                receipt,digest=contract.read_receipt(private[1],nonce)
+                key=contract.read_key(private[2])
+            finally:
+                for path in private:
+                    path.unlink(missing_ok=True)
             verify_sql()
             rows=connection.query('SELECT LOWER(HEX(session_key)),os,locale FROM acore_auth.account WHERE id='+str(intent['accountId']))
             require(len(rows)==1 and hmac.compare_digest(rows[0],key.hex()+'\tWin\t0'),'Auth key differs from owned database')
@@ -79,7 +93,18 @@ with realm.config_lock(state),db.option_file(observation,'esteria',secret) as op
             child.stop(auth_timeout=30)
         require(child.closed and child.shutdown_acknowledged,'Auth shutdown not acknowledged')
         verify_sql()
+        world_result=None
+        if operation=='warm':
+            import world_probe
+            try:
+                world_result=world_probe.observe(state,state/'config/generations'/generation,observation,
+                                                world_hash,world_bytes,verify_sql)
+            except (OSError,RuntimeError,ValueError) as failure:
+                world_result={'phase':'world-observation-failed','errorClass':type(failure).__name__,
+                              'worldReadyQualified':False}
+            verify_sql()
 status('auth-cleanly-stopped')
 db.atomic_json(observation/'verified.json',dict(build=12340,sourceChallenge=True,ownedListener=True,
     srpAndRealmList=True,mysqlKeyMatched=True,worldAddress='127.0.0.1:8085',authserverExitedCleanly=True,
-    authserverSha256=program_hash,authserverElapsedMs=int((time.monotonic()-start)*1000)))
+    clientReceiptSha256=digest,gruntChecks=len(receipt['checks']),
+    supplementalWorld=world_result,commonMainStarted=receipt['commonMainStarted'],assetsLoaded=receipt['assetsLoaded'],authserverSha256=program_hash,authserverElapsedMs=int((time.monotonic()-start)*1000)))

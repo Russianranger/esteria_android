@@ -14,6 +14,10 @@ import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.concurrent.FutureTask;
@@ -25,35 +29,109 @@ import org.json.JSONObject;
 public final class ConfirmDatabase {
     private static long elapsed(long start) { return (System.nanoTime()-start)/1_000_000; }
 
+    private static final String SOURCE = "fa3e74b7f332fef0f212e954a0de18f685ead8bd";
+    private static final String PE = "fa19dd59c49dc68eda4f81d0aa52b633b9b21fb4d986d34a8285604260936317";
+
+    private static void verifyFile(Path path, RuntimePackagePlan.RequiredFile expected) throws IOException {
+        if (!path.equals(path.toRealPath()) || Files.size(path) != expected.bytes || expected.peMachine != 0xaa64)
+            throw new IOException("Selected ARM64 PE file differs");
+        try {
+            MessageDigest digest=MessageDigest.getInstance("SHA-256");
+            try (java.io.InputStream in=Files.newInputStream(path)) {
+                byte[] block=new byte[65536];
+                for (int n; (n=in.read(block))!=-1;) digest.update(block,0,n);
+            }
+            StringBuilder hash=new StringBuilder();
+            for(byte b:digest.digest()) hash.append(String.format(java.util.Locale.ROOT,"%02x",b & 255));
+            if (!hash.toString().equals(expected.sha256)) throw new IOException("ARM64 PE digest differs");
+        } catch(NoSuchAlgorithmException error) { throw new IOException(error); }
+    }
+
+    private static OwnedProcess wineGuest(Context context,Path root,Path work,RuntimeSetup wine,String mode) throws IOException {
+        Path processSession=Files.createDirectory(root.resolve("qa-wine-process-"+mode));
+        return ProotProcess.start(context,wine.installer(),wine.packagePlan(),work,processSession,
+                Arrays.asList("/usr/bin/python3","-B","-s","-E","/work/grunt_wine.py",mode),
+                wine.wineEnvironment(),null);
+    }
+
+    private static void pause() throws IOException {
+        try { Thread.sleep(100); }
+        catch(InterruptedException e) { Thread.currentThread().interrupt(); throw new IOException("Grunt observation interrupted",e); }
+    }
+
+    private static void requireExit(OwnedProcess child) throws IOException {
+        if(child.isAlive() || child.exitCode()!=0 || child.wasForced() || child.failure()!=null)
+            throw new IOException("Signed Android child failed or exceeded its phase budget");
+    }
+
+    private static void prepareClient(Context context, Path root, Path work, RuntimeSetup wine, boolean cold) throws IOException {
+        ClientRuntimeSetup client=new ClientRuntimeSetup(context,root);
+        client.requireWineArchive(wine.archiveSha256());
+        if(!SOURCE.equals(client.sourceRevision()) || !PE.equals(client.packagePlan().required.get("bin/WowClient64.exe").sha256))
+            throw new IOException("Unexpected signed client source");
+        RuntimeInstaller.Result wineFiles=wine.installer().install(Paths.get("/esteria-qa/input/wine.tar.gz"),
+                wine.packagePlan(),RuntimeWork.NONE,RuntimeWork.NEVER_CANCELLED);
+        RuntimeInstaller.Result clientFiles=client.prepare(RuntimeWork.NONE,RuntimeWork.NEVER_CANCELLED);
+        if(cold ? (wineFiles.alreadyInstalled || clientFiles.alreadyInstalled) :
+                (!wineFiles.alreadyInstalled || !clientFiles.alreadyInstalled || wineFiles.copiedBytes+clientFiles.copiedBytes!=0))
+            throw new IOException("Unexpected Wine or reconstructed client admission");
+        if(cold) {
+            Files.createDirectory(work);
+            Files.createDirectory(work.resolve("bin"));
+            Files.copy(Paths.get("/esteria-qa/input/grunt_wine.py"),work.resolve("grunt_wine.py"));
+        }
+        for (String name:Arrays.asList("bin/WowClient64.exe","bin/XvidDecoder.dll")) {
+            if (cold) Files.copy(clientFiles.rootfs.resolve(name),work.resolve(name));
+            verifyFile(work.resolve(name),client.packagePlan().required.get(name));
+        }
+        if(cold) {
+            OwnedProcess bootstrap=wineGuest(context,root,work,wine,"bootstrap");
+            try {
+                long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(11);
+                while(bootstrap.isAlive() && System.nanoTime()<deadline) pause();
+                requireExit(bootstrap);
+                if(!Files.isRegularFile(work.resolve("bootstrap/exited"))) throw new IOException("Wine prefix not proven");
+            } finally {
+                if(bootstrap.isAlive()) bootstrap.stop(Duration.ofSeconds(15));
+            }
+        }
+    }
+
     private static String auth(Context context,Path root,ServerRuntimeSetup server,ServerProgramsSetup programs,
-            FreshServerInstallations.Active active,ServerDatabaseService.Handle database,boolean cold) throws IOException {
+            FreshServerInstallations.Active active,ServerDatabaseService.Handle database,RuntimeSetup wine,boolean cold) throws IOException {
         Path work=active.directoryFor(root);
         String mode=cold?"cold":"warm";
         String generation=GuestHelperAssets.install(context,"server-session",GuestHelperAssets.directory(work,"qa-auth-helpers"),LocalServerSession.HELPERS);
         Path observer=Files.createDirectory(work.resolve("qa-auth-"+mode));
-        for(String source:Arrays.asList("auth_phase.py","auth_protocol.py"))
+        for(String source:Arrays.asList("auth_phase.py","client_auth_contract.py","prepare_runtime.py","world_probe.py","stock_world_observation.py"))
             Files.copy(new java.io.File("/esteria-qa/input/"+source).toPath(),observer.resolve(source));
         Path processSession=Files.createDirectory(root.resolve("qa-auth-process-"+mode));
         RuntimePackagePlan.RequiredFile pin=programs.packagePlan().required.get("bin/authserver");
-        if(pin==null || pin.elfMachine!=183) throw new IOException("Selected packaged ARM64 authserver required");
+        RuntimePackagePlan.RequiredFile world=programs.packagePlan().required.get("bin/worldserver");
+        if(pin==null || pin.elfMachine!=183 || world==null || world.elfMachine!=183) throw new IOException("Selected packaged ARM64 authserver required");
         return database.withReadyLease(server.current(),(operation,version,uuid)->{
             OwnedProcess child=ServerDatabaseService.installedRuntime(context,server).launch(work,processSession,
                 Arrays.asList("/usr/bin/python3","-B","-s","-E","/work/qa-auth-"+mode+"/auth_phase.py",generation,
-                    mode,operation,version,uuid,active.setupReceiptSha256,pin.sha256,Long.toString(pin.bytes)),
-                Arrays.asList(new ProotLaunch.Mount(programs.current(),ServerProgramsSetup.guestMount())));
+                    mode,operation,version,uuid,active.setupReceiptSha256,pin.sha256,Long.toString(pin.bytes),world.sha256,Long.toString(world.bytes)),
+                Arrays.asList(new ProotLaunch.Mount(programs.current(),ServerProgramsSetup.guestMount()),
+                        new ProotLaunch.Mount(root.resolve("qa-server-data-directory"),"/esteria-data")));
+            OwnedProcess grunt=null;
             try {
-                long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(3);
-                while(child.isAlive() && System.nanoTime()<deadline) {
-                    try {Thread.sleep(100);}
-                    catch(InterruptedException e) {Thread.currentThread().interrupt();throw new IOException("Auth observation interrupted",e);}
+                grunt=wineGuest(context,root,work.resolve("qa-grunt"),wine,mode);
+                long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(6);
+                while((child.isAlive() || grunt.isAlive()) && System.nanoTime()<deadline) {
+                    if(!child.isAlive()) requireExit(child);
+                    if(!grunt.isAlive()) requireExit(grunt);
+                    pause();
                 }
-                if(child.isAlive() || child.exitCode()!=0 || child.wasForced() || child.failure()!=null)
-                    throw new IOException("Signed PRoot auth owner failed");
+                requireExit(child);
+                requireExit(grunt);
                 Path result=observer.resolve("verified.json");
                 if(Files.size(result)>4096) throw new IOException("Unexpected auth observation size");
                 return new String(Files.readAllBytes(result),StandardCharsets.UTF_8);
             } finally {
-                if(child.isAlive()) child.stop(Duration.ofSeconds(15));
+                try { if(grunt!=null && grunt.isAlive()) grunt.stop(Duration.ofSeconds(15)); }
+                finally { if(child.isAlive()) child.stop(Duration.ofSeconds(15)); }
             }
         });
     }
@@ -63,6 +141,8 @@ public final class ConfirmDatabase {
         if(cold) Files.createDirectory(data);
         if(!Files.isDirectory(data) || !data.equals(data.toRealPath()))
             throw new IllegalStateException("Disjoint QA schema config directory required");
+        RuntimeSetup wine=new RuntimeSetup(context,root);
+        if(cold) prepareClient(context,root,root.resolve("qa-grunt"),wine,true);
         ServerRuntimeSetup server=new ServerRuntimeSetup(context,root);
         ServerProgramsSetup programs=new ServerProgramsSetup(context,root);
         ServerContentSetup content=new ServerContentSetup(context,root);
@@ -93,6 +173,9 @@ public final class ConfirmDatabase {
         } else {
             active=ServerInstallationSetup.completed(context,root,server,programs,content);
         }
+        Path peer=active.directoryFor(root).resolve("qa-grunt");
+        if(cold) Files.move(root.resolve("qa-grunt"),peer,StandardCopyOption.ATOMIC_MOVE);
+        else prepareClient(context,root,peer,wine,false);
         long prepared=elapsed(start);
         System.out.println("ANDROID_DB_PHASE promoted-slot-selected "+prepared);
         ServerDatabaseService.Handle database=ServerDatabaseService.startActive(context,root,server,active);
@@ -103,7 +186,7 @@ public final class ConfirmDatabase {
             ServerDatabaseService.awaitReady(database,System.nanoTime()+TimeUnit.MINUTES.toNanos(3),new AtomicBoolean(false));
             ready=elapsed(start);
             if(!active.mysqlUuid.equals(database.instanceUuid())) throw new IllegalStateException("Owned SQL service identity differs");
-            authReport=auth(context,root,server,programs,active,database,cold);
+            authReport=auth(context,root,server,programs,active,database,wine,cold);
             authenticated=elapsed(start);
         } finally {
             database.stop(Duration.ofSeconds(30));
@@ -115,6 +198,7 @@ public final class ConfirmDatabase {
             .put("contentGeneration",sql.generation).put("providerCopiedBytes",copied)
             .put("version",server.expectedMysqlVersion()).put("providerMs",providers)
             .put("schemaSetupOrSelectionMs",prepared-providers).put("activeNativeStartupMs",ready-prepared)
+            .put("reconstructedClientSha256",PE).put("sourceRevision",SOURCE).put("wineArchive",wine.archiveSha256())
             .put("auth",new JSONObject(authReport)).put("cleanShutdownMs",elapsed(start)-authenticated).put("sameAuthenticatedInstance",true).put("closed",true);
     }
 

@@ -15,6 +15,19 @@ CONTAINER='esteria-android-qa'
 
 def failure_details(report):
     root='/data/data/'+PACKAGE+'/files'
+    # Private Wine and PE logs may contain memory dumps. Export only controlled status fields.
+    report['winePhases']=[]
+    diagnostics=shell(CONTAINER,'''for f in "$1"/qa-grunt/*/phase.json "$1"/db/*/qa-grunt/*/phase.json; do
+        if test -f "$f"; then cat "$f"; echo; fi
+    done''',root)
+    for line in diagnostics.splitlines():
+        item=json.loads(line)
+        if item.get('phase') in {'display','wineboot','windows-prefix-command','prefix-ready','wait-owned-authserver',
+                                'reconstructed-grunt','grunt-exited'}:
+            allowed={'elapsedMs':int,'returnCode':int,'loaderStatus135':bool,'kernel32Mentioned':bool,
+                     'prefixKernel32':bool,'prefixWineboot':bool}
+            report['winePhases'].append(dict(phase=item['phase'],**{k:item[k] for k,t in allowed.items()
+                                               if k in item and type(item[k]) is t}))
     paths=shell(CONTAINER,'''for dir in "$1"/db/*; do if test -d "$dir"; then basename "$dir"; fi; done''',root).splitlines()
     if len(paths)!=1 or not re.fullmatch(r'[a-f0-9]{16}',paths[0]):
         report['allocatedSlots']=len(paths)
@@ -94,8 +107,11 @@ def exercise(report):
         auth=item['auth']
         checked(auth['build']==12340 and all(auth[k] is True for k in ('sourceChallenge','ownedListener','srpAndRealmList','mysqlKeyMatched','authserverExitedCleanly')) and
                 auth['worldAddress']=='127.0.0.1:8085','incomplete authserver handshake')
+        checked(auth['gruntChecks']==13 and re.fullmatch(r'[a-f0-9]{64}',auth['clientReceiptSha256']) and
+                auth['commonMainStarted'] is False and auth['assetsLoaded'] is False, 'incomplete actual PE receipt')
         if mode=='warm':
             first=report['operations'][0]
+            checked(first['auth']['clientReceiptSha256']!=auth['clientReceiptSha256'], 'same challenge receipt')
             checked(first['instanceUuid']==item['instanceUuid'] and all(first[k]==item[k] for k in ('providerGeneration','programsGeneration','contentGeneration','slotId','promotionProof','setupReceipt')) and
                     item['providerCopiedBytes']==0,'warm persisted instance or provider changed')
         check_empty(CONTAINER,package_uid)
@@ -105,7 +121,7 @@ def exercise(report):
 
 if __name__=='__main__':
     report=dict(scope='signed Android 13 ARM64 production slot, stock SQL/updater/four schemas and owned MySQL, disjoint empty world-data directory for config path',phase='initial',
-                actualWorldSession=False,physicalThor=False)
+                reconstructedGruntTarget=True,actualWorldSession=False,graphicalLogin=False,physicalThor=False)
     start=time.monotonic()
     try:
         exercise(report)
