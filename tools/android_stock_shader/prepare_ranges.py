@@ -23,11 +23,23 @@ def prepare(output, fetch, hashes):
     source = output / 'source'
     rows = json.loads(corpus.LOCK.read_bytes())
     index = json.loads(BUFFERED.read_bytes())['providers']
-    counters = {'zipRangeRequests': 0, 'zipRangeBytes': 0}
+    counters = {'zipRangeRequests': 0, 'zipRangeBytes': 0, 'windowRetriesAfterStall': 0}
     counter_lock = Lock()
 
     def observed_fetch(first, end):
-        result = fetch(first, end)
+        # A transient failure of one official range must not discard already authenticated
+        # siblings. Keep the original per-window response checks, whole-piece digest and
+        # acquisition deadline; refuse identity or integrity failures immediately.
+        for attempt in range(4):
+            try:
+                result = fetch(first, end)
+                break
+            except corpus.Invalid as failure:
+                if str(failure) != 'stock ZIP range unavailable after three attempts without progress' or attempt == 3:
+                    raise
+                with counter_lock:
+                    counters['windowRetriesAfterStall'] += 1
+                time.sleep(8 * 2**attempt)
         with counter_lock:
             counters['zipRangeRequests'] += 1
             counters['zipRangeBytes'] += len(result)
