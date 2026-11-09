@@ -1,5 +1,7 @@
 # Current stock publication
 
+The staged v25 signature is bound to the published v24 APK. The Android replacement tests verify the downloaded baseline against its locked SHA-256 before installation.
+
 The [signed v24 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.24/Esteria-Stock-3.3.5a-arm64.apk) is an in-place update over stock v23. The six-asset [public readback](../../evidence/non-custom-v24-public-apk-readback.json) and [signed Android 13 update](../../evidence/non-custom-v24-qualified-update.json) identify the exact package, signing certificate and producer. [Public transport](update-24/publication-inputs.json).
 
 ## Previous v23 publication

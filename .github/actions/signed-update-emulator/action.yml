@@ -5,13 +5,24 @@ runs:
   steps:
     - name: Configure KVM for the clean emulator and fetch the exact published baseline
       shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
       run: |
         test -c /dev/kvm
         echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
         sudo udevadm control --reload-rules
         sudo udevadm trigger --name-match=kvm
-        baseline=$(python3 -c 'import json; print(json.load(open("app/stock-signing.lock.json"))["lastPublished"]["versionCode"])')
-        curl --fail --location --retry 3 --max-time 600 "https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.$baseline/Esteria-Stock-3.3.5a-arm64.apk" -o "$RUNNER_TEMP/signed-stock-baseline.apk"
+        lock=app/stock-signing.lock.json
+        baseline=$(jq -er '.lastPublished.versionCode' "$lock")
+        expected=$(jq -er '.lastPublished.apkSha256' "$lock")
+        asset=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/non-custom-v0.1.0-non-custom.$baseline" |
+          jq -er --arg digest "sha256:$expected" '[.assets[] | select(.name == "Esteria-Stock-3.3.5a-arm64.apk" and .digest == $digest)]
+            | select(length == 1) | .[0].id')
+        curl --fail --location --silent --show-error --retry 3 --max-time 600 \
+          -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/octet-stream' \
+          "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/assets/$asset?run=$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" \
+          -o "$RUNNER_TEMP/signed-stock-baseline.apk"
+        echo "$expected  $RUNNER_TEMP/signed-stock-baseline.apk" | sha256sum -c
     - name: Exercise Android Package Manager on the public APKs
       uses: ReactiveCircus/android-emulator-runner@324029e2f414c084d8b15ba075288885e74aef9c
       with:
