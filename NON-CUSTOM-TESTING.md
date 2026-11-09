@@ -2,7 +2,7 @@
 
 ## v26 heat check
 
-Install the signed v26 APK over the existing Esteria Stock package once it is signed with the original key. Keep the existing import, world, shaders, database and character. V26 slows the local server's update tick, asks Android for a display refresh that matches the frame limit, and turns on Android's sustained performance mode during play when the device supports it. **Sustained performance** in the gear menu turns that mode on or off immediately.
+Install the v26 APK from the [v26 release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.26) over the existing Esteria Stock app. Keep the existing import, world, shaders, database and character. V26 slows the local server's update tick, asks Android for a display refresh that matches the frame limit, and turns on Android's sustained performance mode during play when the device supports it. **Sustained performance** in the gear menu turns that mode on or off immediately.
 
 1. Use the same conditions as your last hot reading: **30 FPS**, the same resolution, location, camera view, brightness, fan mode and charging state. Note the name of the temperature sensor you are reading, for example the overlay's CPU, GPU or SoC label.
 2. Play for ten minutes and take readings around minutes 2, 5 and 10. If the reading stays above 65 °C, repeat once with **Sustained performance** off so the two runs can be compared.
