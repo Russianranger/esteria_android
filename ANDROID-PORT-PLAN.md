@@ -2,11 +2,11 @@
 
 ## Current checkpoint
 
-The v13 Thor world receipt passed. V14 compiled the 2,778 selected ChromieCraft shader records on native ARM64. The matched-shader Wine run then exposed an illegal Vulkan clear on compressed textures. V15 binds the corrected executable to the original prepared identities. Run the retained import through shader admission, a visible title and the normal production session. [Current evidence and device procedure](STATUS.md).
+The owner has played the reconstructed client on Thor, created a character, accepted a quest, defeated an enemy and logged out. The later v23 export identifies a retained Start and clean stop. Stock v24 targets measured startup overhead, input and post-session diagnostics. The next owner test reopens the existing character offline. [Current release and evidence](STATUS.md).
 
 ## Current objective
 
-One local stock Wrath 3.3.5a build 12340 session on AYN Thor Max (Android 13, Snapdragon 8 Gen 2, Adreno 740, 16 GB). Import the owner's ChromieCraft client data, prepare matching world data/shaders/MySQL automatically, start the reconstructed ARM64 client with local auth/world, create a Human Warrior, enter its ordinary starting area, stop cleanly and relaunch offline with the character retained.
+One local stock Wrath 3.3.5a build 12340 session on AYN Thor Max (Android 13, Snapdragon 8 Gen 2, Adreno 740, 16 GB). Reuse the owner's ChromieCraft import, prepared world data, shaders and MySQL. Start the reconstructed ARM64 client with local auth/world, reopen the existing character and verify the saved quest and position across three clean offline cold launches.
 
 The branch is `non-custom`, created from coherent integration `0319cc00f77c97c17f01592af3fac2bff555f362`. The original integration and complete custom project remain unchanged and recoverable. The app uses a separate `.stock` package and private storage. There is no migration or reseeding of the custom app's saves.
 
@@ -14,7 +14,7 @@ The branch is `non-custom`, created from coherent integration `0319cc00f77c97c17
 
 Keep the reconstructed Windows ARM64 client under ARM64 Wine in a Debian 12 PRoot, with Linux ARM64 server/MySQL in the separate Ubuntu 24 PRoot. This is the existing compatibility architecture, with no original x86 client substitution and no device Docker requirement.
 
-- Client: `471ee42faadf4a97a1d0a86989cf1452621f2dc5`.
+- Reconstructed client: `c05a3af9be6c204c40d65d0e3eb6ccc2442012b6`. Prepared-data revision: `471ee42faadf4a97a1d0a86989cf1452621f2dc5`.
 - Server: `f35f04d01689f034778e3474b3c820092f51e461`, seven digest-pinned integration adaptations.
 - Eluna source: `58d7652138887783228b9727bd1fa4e08f00342b`; Lua disabled in stock configuration.
 - Protocol remains 254 containers / 25 quest slots / 32 client class capacity, paired to the selected server.

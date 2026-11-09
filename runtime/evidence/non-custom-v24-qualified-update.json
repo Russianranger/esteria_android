@@ -1,0 +1,184 @@
+{
+  "scope": "Qualification of the published stock v24 in-place update over v23. Tests used disposable data in each independent environment.",
+  "package": "io.github.russianranger.esteria.stock",
+  "versionCode": 24,
+  "appRevision": "277e2ba365e79ce53dad3891556417231eabc81c",
+  "packageInventoryComparedWithPublicV23": {
+    "revision": "277e2ba365e79ce53dad3891556417231eabc81c",
+    "unsigned": {
+      "bytes": 337175642,
+      "sha256": "43b02f2f5a7046c06a49db3b5b21490e24f7aed989701d4f30535d16045ba1b9"
+    },
+    "baselineSha256": "fc0e04d96eb51766cdfb7dc576cdbe9d4149e9a5c0228d4eb8e0ac4670c75ff5",
+    "packageArtifactId": 13645996787,
+    "packageRunId": 42550299161,
+    "archiveSha256": "a02ce78a600b12631ce1afd5368d4ff7c026241fd7e487942186ca7dc5d71345",
+    "changedAssetOrLibNames": [
+      "assets/server-session/manifest.json",
+      "assets/server-session/server_session.py"
+    ],
+    "identicalAssets": 121,
+    "identicalNativeLibs": 4,
+    "identicalArchives": 8,
+    "identicalPayloadBytes": 340157696
+  },
+  "hostTests": {
+    "discovered": 1696,
+    "skipped": 139,
+    "failures": 0,
+    "errors": 0
+  },
+  "nativeOfflineLinuxArm64": {
+    "run": 42550299116,
+    "job": 128944145033,
+    "artifact": 13644819682,
+    "fourSchemasVerified": true,
+    "cleanShutdownVerified": true,
+    "sessionLoginComparison": {
+      "combined": [
+        {
+          "elapsedMs": 1743,
+          "playerbotsLedgerReads": 1,
+          "sqlQueries": 90
+        },
+        {
+          "elapsedMs": 1743,
+          "playerbotsLedgerReads": 1,
+          "sqlQueries": 90
+        }
+      ],
+      "separate": [
+        {
+          "elapsedMs": 3498,
+          "playerbotsLedgerReads": 2,
+          "sqlQueries": 157
+        },
+        {
+          "elapsedMs": 3498,
+          "playerbotsLedgerReads": 2,
+          "sqlQueries": 157
+        }
+      ]
+    },
+    "scope": "Four-schema MySQL, one reopened UUID, existing local account and realm. Timing interval covers just login verification."
+  },
+  "android13X86_64": {
+    "run": 42549087605,
+    "artifact": 13645135357,
+    "appRevision": "e913694b088638d55542fec8bd8daceb519d118f",
+    "scope": "Same input and presentation sources as the final producer, Android widget with real IME, emulator surface and a protocol fixture.",
+    "surfaceAndAudioGroupsPassed": 6,
+    "inputGroupsPassed": 8,
+    "fourWidgetCornersVerified": true,
+    "deferredImeOnSurfaceReattach": true,
+    "externalImeDismissalRestoredInput": true,
+    "gameplayQualified": false
+  },
+  "android13Arm64Debug": {
+    "run": 42550299161,
+    "job": 128949994438,
+    "artifact": 13646336674,
+    "launcherAndMovableGearPassed": true,
+    "separateSqlProcessReopensMs": [
+      5586,
+      3562,
+      3681
+    ],
+    "sameSlotUuidAccountEachTime": true,
+    "eachSqlStopClean": true,
+    "graphicalLaunches": 0
+  },
+  "thor": {
+    "latestInstalledVersionConfirmedBySupport": 23,
+    "latestExport": "non-custom-v23-thor-retained-start-export.json",
+    "earlierCharacterQuestCombatLogoutReportVersion": null,
+    "v24StartupTimeMs": null,
+    "v24DeliveredGameplayFps": null,
+    "v24TemperatureC": null,
+    "threeOfflineColdSavedCharacterLaunchesVerified": false
+  },
+  "signedAndroid": {
+    "run": 42552996124,
+    "job": 128953264390,
+    "artifact": 13646168000,
+    "qualification": "Disposable offline Android 13 ARM64 signed update and SQL reopen. Synthetic game tails.",
+    "installed": [
+      {
+        "phase": "installed",
+        "versionCode": 23,
+        "uid": 10077,
+        "installedApkSha256": "fc0e04d96eb51766cdfb7dc576cdbe9d4149e9a5c0228d4eb8e0ac4670c75ff5"
+      },
+      {
+        "phase": "installed",
+        "versionCode": 24,
+        "uid": 10077,
+        "installedApkSha256": "e180d1a9014540139cf0942d21fec5a3c05fec63ddedfa25503882fbb3bb0768"
+      }
+    ],
+    "retainedIdentity": true,
+    "sqlReopenPhaseMs": 3984,
+    "launcherExport": {
+      "versionCode": 24,
+      "route": "visible launcher and Android DocumentsUI on disposable Android 13 ARM64",
+      "logInput": "cleanly stopped SQL plus synthetic client, world and cleanup markers",
+      "logRoles": [
+        "logs/game.database.stderr.log",
+        "logs/game.database.stdout.log",
+        "logs/game.presentation.client.stdout.log",
+        "logs/game.server.worldserver.log",
+        "logs/launcher.log"
+      ],
+      "zipBytes": 4514,
+      "entries": 6,
+      "metadataBytes": 7935,
+      "omittedFacts": 0
+    },
+    "lookupSamples": {
+      "v23": {
+        "programProviderBytesRead": 277916043,
+        "samples": [
+          {
+            "wallNs": 261500068,
+            "threadCpuNs": 260793728
+          },
+          {
+            "wallNs": 259548627,
+            "threadCpuNs": 259380144
+          },
+          {
+            "wallNs": 261600516,
+            "threadCpuNs": 260883280
+          }
+        ],
+        "medianWallMs": 261.5,
+        "medianThreadCpuMs": 260.79
+      },
+      "v24": {
+        "programProviderBytesRead": 185277362,
+        "samples": [
+          {
+            "wallNs": 189519142,
+            "threadCpuNs": 189392024
+          },
+          {
+            "wallNs": 190149261,
+            "threadCpuNs": 189978472
+          },
+          {
+            "wallNs": 190018854,
+            "threadCpuNs": 189727648
+          }
+        ],
+        "medianWallMs": 190.02,
+        "medianThreadCpuMs": 189.73
+      }
+    },
+    "lookupTiming": "Fresh observer process per version. Untimed counted warmup. Three uninstrumented production completed lookups, warm provider files. No game rendering.",
+    "gameplayQualified": false,
+    "retainedProviderSeals": 9,
+    "retainedClientFiles": 30,
+    "retainedClientRequiredBytes": 21517816
+  },
+  "publicationRun": 42554247702
+}

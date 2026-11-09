@@ -1,8 +1,8 @@
 # Current stock publication
 
-## Signed v24 staging
+The [signed v24 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.24/Esteria-Stock-3.3.5a-arm64.apk) is an in-place update over stock v23. The six-asset [public readback](../../evidence/non-custom-v24-public-apk-readback.json) and [signed Android 13 update](../../evidence/non-custom-v24-qualified-update.json) identify the exact package, signing certificate and producer. [Public transport](update-24/publication-inputs.json).
 
-The [Android 13 ARM64 signed update gate](https://github.com/Russianranger/esteria_android/actions/runs/42552996124/job/128953264390) installed stock v24 over the exact public v23, verified the retained SQL installation, and saved a support ZIP through DocumentsUI. The signed APK for producer `277e2ba365e79ce53dad3891556417231eabc81c` has SHA-256 `e180d1a9014540139cf0942d21fec5a3c05fec63ddedfa25503882fbb3bb0768`. [Detached signing inputs](update-24/publication-inputs.json).
+## Previous v23 publication
 
 V23 uses producer `0c712cd9d52e54be0b329925ed72943138cf23d5` and the original stock signing certificate. The signed APK SHA-256 is `fc0e04d96eb51766cdfb7dc576cdbe9d4149e9a5c0228d4eb8e0ac4670c75ff5`. On offline Android 13 ARM64, updating the exact public v22 installation to v23 retained its UID, database slot, UUID and account. The signed launcher saved a 3,526-byte support ZIP through Android DocumentsUI. [Public transport](update-23/publication-inputs.json) · [Signed replacement and export](https://github.com/Russianranger/esteria_android/actions/runs/42519575216/job/128850828066).
 
