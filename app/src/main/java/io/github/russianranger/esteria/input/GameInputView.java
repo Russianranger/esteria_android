@@ -11,6 +11,7 @@ import android.view.KeyCharacterMap;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.ViewTreeObserver;
 import android.view.WindowInsets;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
@@ -34,6 +35,7 @@ public final class GameInputView extends SurfaceView implements SurfaceHolder.Ca
     private int frameWidth, frameHeight, controller = -1, touch = -1;
     private boolean attached, ticking, failed, keyboard, surfaceReady, writerAttached, sessionPaused;
     private boolean keyboardRequested, imeWasVisible;
+    private final ViewTreeObserver.OnPreDrawListener observeIme = () -> { refreshImeVisibility(); return true; };
     private long keyboardGeneration;
     private long previousFrame;
     public GameInputView(Context context, InputSink sink, SurfaceBridge presentation, Events events) {
@@ -96,9 +98,14 @@ public final class GameInputView extends SurfaceView implements SurfaceHolder.Ca
         if (ime == null || !ime.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)) {
             invalidateKeyboard(); startTick();
             if (events != null) events.rejected("Software keyboard is unavailable");
+        } else if (Build.VERSION.SDK_INT >= 30) {
+            getViewTreeObserver().addOnPreDrawListener(observeIme);
         }
     }
     private void invalidateKeyboard() {
+        if (keyboard && Build.VERSION.SDK_INT >= 30 && getViewTreeObserver().isAlive()) {
+            getViewTreeObserver().removeOnPreDrawListener(observeIme);
+        }
         keyboardRequested = keyboard = imeWasVisible = false;
         keyboardGeneration++;
     }
@@ -129,15 +136,20 @@ public final class GameInputView extends SurfaceView implements SurfaceHolder.Ca
         super.onWindowFocusChanged(focus);
         if (focus) { openPendingKeyboard(); startTick(); } else neutralize(true);
     }
-    @Override public WindowInsets onApplyWindowInsets(WindowInsets insets) {
-        if (keyboard && Build.VERSION.SDK_INT >= 30) {
-            boolean visible = insets.isVisible(WindowInsets.Type.ime());
-            if (imeWasVisible && !visible) { invalidateKeyboard(); startTick(); }
-            imeWasVisible = visible;
+    private void refreshImeVisibility() {
+        if (!keyboard || Build.VERSION.SDK_INT < 30) return;
+        // The window decor may consume IME insets before they reach this SurfaceView.
+        WindowInsets root = getRootWindowInsets();
+        if (root == null) return;
+        if (root.isVisible(WindowInsets.Type.ime())) {
+            imeWasVisible = true;
+        } else if (imeWasVisible) {
+            invalidateKeyboard();
+            post(this::startTick);
         }
-        return super.onApplyWindowInsets(insets);
     }
     private boolean controlsReady() {
+        refreshImeVisibility();
         return attached && surfaceReady && writerAttached && frameWidth > 0 && !failed && !keyboard && !sessionPaused && hasWindowFocus();
     }
     private void startTick() {
@@ -245,6 +257,7 @@ public final class GameInputView extends SurfaceView implements SurfaceHolder.Ca
         return new BaseInputConnection(this, false) {
             private final KeyboardText.Composition composing = new KeyboardText.Composition();
             private boolean ready() {
+                refreshImeVisibility();
                 boolean valid = composing.isOpen() && !failed && keyboard && !sessionPaused && attached && surfaceReady && hasWindowFocus() && generation == keyboardGeneration;
                 if (!valid) composing.invalidate();
                 return valid;

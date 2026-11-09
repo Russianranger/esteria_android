@@ -8,8 +8,8 @@ on:
       # Versioned APK producers need a source-matched native SQL receipt.
       - .github/workflows/android-local-game-profile.yml
       - app/build.gradle
-      # Build and SQL receipts must identify the same stock APK producer.
-      - .github/workflows/android-local-game-profile.yml
+      # Java-only APK fixes also need a native SQL receipt at the producer revision.
+      - 'app/src/main/java/**'
       - tools/qualify_extractor_output.py
       - tests/test_extractor_output_qualification.py
       - .github/workflows/native-extractor-output.yml

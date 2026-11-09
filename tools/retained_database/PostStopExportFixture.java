@@ -13,7 +13,7 @@ import java.util.Map;
 /** Disposable signed-update realm only. SQL output is real. The client and
  * worldserver tails stand in for a session whose game assets are unavailable. */
 final class PostStopExportFixture {
-    static void prepare(Context ctx, Map<String,Path> database) throws IOException {
+    static void prepare(Context ctx, Map<String,Path> database, String activeSlot) throws IOException {
         Path root=ctx.getFilesDir().getCanonicalFile().toPath();
         Map<String,Path> selection=new LinkedHashMap<>();
         for(String stream : new String[]{"stdout","stderr"}) {
@@ -21,9 +21,10 @@ final class PostStopExportFixture {
             if(log==null || !Files.isRegularFile(log))throw new IOException("Missing stopped SQL wrapper stream");
             selection.put("game.database."+stream+".log",log);
         }
-        String slot="feed000000000024", operation=slot+slot;
-        Path client=root.resolve("s/"+slot+"/client/logs/stdout.log");
-        Path world=root.resolve("db/"+slot+"/server-sessions/"+operation+"/worldserver.log");
+        if(!activeSlot.matches("[a-f0-9]{16}"))throw new IOException("Expected disposable active slot");
+        String fixture="feed000000000024", operation=fixture+fixture;
+        Path client=root.resolve("s/"+fixture+"/client/logs/stdout.log");
+        Path world=root.resolve("db/"+activeSlot+"/server-sessions/"+operation+"/worldserver.log");
         Files.createDirectories(client.getParent());
         Files.createDirectories(world.getParent());
         Files.write(client,("old client marker\n"+"pwd=x\n".repeat(11000)+"fixture client logout tail\n")

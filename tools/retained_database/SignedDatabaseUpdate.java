@@ -107,7 +107,7 @@ public final class SignedDatabaseUpdate {
                 require(active.mysqlUuid.equals(service.instanceUuid()),"SQL reopened different UUID");
             }finally{service.stop(Duration.ofSeconds(30));}
             require(!service.isAlive(),"SQL did not stop");
-            if(phase.equals("reopen24"))PostStopExportFixture.prepare(ctx,service.diagnosticLogs());
+            if(phase.equals("reopen24"))PostStopExportFixture.prepare(ctx,service.diagnosticLogs(),active.slotId);
             System.out.println("ESTERIA_ACTIVE slot="+active.slotId+" uuid="+active.mysqlUuid+" elapsedMs="+TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-start));
             return;
         }
