@@ -115,6 +115,13 @@ public final class ProotMountTests {
                     fixture.temp,fixture.logs,List.of("/usr/bin/Xtigervnc"),Map.of(),List.of(),shared);
             check(presentation.arguments.contains(endpoints+":/session!")&&presentation.arguments.contains(x11+":/tmp/.X11-unix!"),"Explicit fixed shared IPC bindings");
             check(presentation.arguments.contains(fixture.temp+":/tmp")&&presentation.environment.get("PROOT_TMP_DIR").equals(fixture.temp.toString()),"Per-process temp remains isolated");
+            check(!spec.environment.containsKey("PROOT_NO_SECCOMP")&&"1".equals(spec.environment.get(ProotLaunch.SECCOMP_REPORT))&&
+                !presentation.environment.containsKey("PROOT_NO_SECCOMP"),"Seccomp acceleration is the default and reports when it engages");
+            OwnedProcess.Specification traced=ProotLaunch.create(fixture.tracer,fixture.loader,fixture.runtime,fixture.work,
+                    fixture.temp,fixture.logs,List.of("/usr/bin/Xtigervnc"),Map.of(),List.of(),shared,false);
+            check("1".equals(traced.environment.get("PROOT_NO_SECCOMP"))&&!traced.environment.containsKey(ProotLaunch.SECCOMP_REPORT)&&
+                traced.arguments.equals(presentation.arguments),"Fallback restores full tracing without changing the guest command");
+            check(!spec.arguments.contains(ProotLaunch.SECCOMP_REPORT+"=1"),"Tracer report variable never enters the guest environment");
             for(Path invalid:List.of(fixture.work,fixture.temp,fixture.logs,fixture.runtime,fixture.base,x11))
                 rejects(()->ProotLaunch.create(fixture.tracer,fixture.loader,fixture.runtime,fixture.work,fixture.temp,fixture.logs,
                         List.of("/bin/true"),Map.of(),List.of(),new ProotLaunch.PresentationBindings(invalid,x11)));

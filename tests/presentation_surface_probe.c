@@ -10,6 +10,7 @@
 static ANativeWindow window;
 static uint32_t target[64];
 static int width,height,stride,geometries,posts,locks,releases,bad_buffer;
+static int peer=-1,requests_at_lock=-1,last_requests;
 static unsigned char *cache;
 static jlong stats[6];
 static jsize array_length(JNIEnv *env,jarray array) { (void)env;(void)array;return 6; }
@@ -25,13 +26,15 @@ int32_t ANativeWindow_setBuffersGeometry(ANativeWindow *w,int32_t x,int32_t y,in
 }
 int32_t ANativeWindow_lock(ANativeWindow *w,ANativeWindow_Buffer *buffer,ARect *rect) {
     (void)rect;assert(w==&window);locks++;
+    /* Count request bytes already on the wire when posting begins (pipelining order). */
+    unsigned char seen[4];ssize_t got=recv(peer,seen,sizeof(seen),MSG_PEEK|MSG_DONTWAIT);requests_at_lock=got<0?0:(int)got;
     *buffer=(ANativeWindow_Buffer){.width=width,.height=height,.stride=bad_buffer?width-1:stride,
         .format=WINDOW_FORMAT_RGBA_8888,.bits=target};return 0;
 }
 int32_t ANativeWindow_unlockAndPost(ANativeWindow *w) { assert(w==&window);posts++;return 0; }
 void ANativeWindow_release(ANativeWindow *w) { assert(w==&window);releases++; }
-static int frame(uint32_t *header,const uint32_t *pixels,size_t pixel_bytes) {
-    int sockets[2];assert(!socketpair(AF_UNIX,SOCK_STREAM,0,sockets));
+static int frame_flags(uint32_t *header,const uint32_t *pixels,size_t pixel_bytes,jint flags) {
+    int sockets[2];assert(!socketpair(AF_UNIX,SOCK_STREAM,0,sockets));peer=sockets[0];requests_at_lock=-1;
     uint32_t wire[8];for(unsigned i=0;i<8;++i)wire[i]=htonl(header[i]);
     /* Deliberately fragment every header byte and use a separate pixel write. */
     for(size_t i=0;i<sizeof(wire);++i)assert(send(sockets[0],(char *)wire+i,1,MSG_NOSIGNAL)==1);
@@ -41,9 +44,14 @@ static int frame(uint32_t *header,const uint32_t *pixels,size_t pixel_bytes) {
         .GetDirectBufferCapacity=buffer_capacity,.SetLongArrayRegion=array_region,.ExceptionCheck=no_exception};
     JNIEnv env=&api;
     int result=Java_io_github_russianranger_esteria_presentation_SurfaceBridge_receiveFrame(&env,NULL,(jobject)&window,
-        sockets[1],(jobject)cache,(jlongArray)stats);
-    unsigned char request;assert(recv(sockets[0],&request,1,0)==1&&request==1);
-    close(sockets[0]);close(sockets[1]);return result;
+        sockets[1],(jobject)cache,(jlongArray)stats,flags);
+    unsigned char requests[4];ssize_t got=recv(sockets[0],requests,sizeof(requests),MSG_DONTWAIT);
+    last_requests=got<0?0:(int)got;
+    for(int i=0;i<last_requests;++i)assert(requests[i]==1);
+    close(sockets[0]);close(sockets[1]);peer=-1;return result;
+}
+static int frame(uint32_t *header,const uint32_t *pixels,size_t pixel_bytes) {
+    int result=frame_flags(header,pixels,pixel_bytes,0);assert(last_requests==1);return result;
 }
 int main(void) {
     signal(SIGPIPE,SIG_IGN);
@@ -68,5 +76,18 @@ int main(void) {
     assert(frame(h,NULL,0)==-3); /* Geometry exceeds fixed allocation. */
     h[1]=UINT32_MAX;h[2]=UINT32_MAX;h[3]=UINT32_MAX-3;h[6]=16;
     assert(frame(h,NULL,0)==-3);
-    free(cache);puts("SURFACE_PROTOCOL_COPY_OK full colour stride resize unchanged sequence bounds truncation");return 0;
+    /* Pipelining over the same protocol: flags 1 = request already sent, 2 = send next before posting. */
+    memset(cache,0,ESTERIA_FRAME_BYTES+16);posts=0;
+    uint32_t p[]={ESTERIA_FRAME_MAGIC,2,2,8,5,1,16,0};
+    assert(frame_flags(p,pixels,16,2)==2&&posts==1&&last_requests==2&&requests_at_lock==2); /* request + early next before lock */
+    p[5]++;
+    assert(frame_flags(p,pixels,16,3)==2&&posts==2&&last_requests==1&&requests_at_lock==1); /* outstanding: only the early next */
+    p[5]++;p[6]=0;p[7]=ESTERIA_FRAME_UNCHANGED;
+    assert(frame_flags(p,NULL,0,3)==1&&posts==2&&last_requests==0); /* unchanged reply leaves nothing outstanding */
+    p[5]++;
+    assert(frame_flags(p,NULL,0,2)==1&&last_requests==1); /* unchanged never pipelines; caller pacing applies */
+    p[5]++;p[6]=16;p[7]=0;
+    assert(frame_flags(p,pixels,8,2)==-2&&posts==2&&last_requests==1); /* truncated pixels: no early request, no post */
+    assert(frame_flags(p,pixels,16,4)==-1&&last_requests==0&&posts==2); /* unknown flags refused before any I/O */
+    free(cache);puts("SURFACE_PROTOCOL_COPY_OK full colour stride resize unchanged sequence bounds truncation pipelining");return 0;
 }

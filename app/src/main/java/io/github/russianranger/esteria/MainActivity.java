@@ -159,6 +159,7 @@ public final class MainActivity extends Activity {
         });startGame.setEnabled(completeProfile());launcher.style(startGame,true);
         if(!completeProfile())layout.addView(text("This installation has an incomplete runtime profile.",14,RealmLauncher.GOLD));
         button(layout,"Frame limit",this::showDisplaySettings);
+        button(layout,"PRoot acceleration",this::showProotSettings);
         layout=launcher.tools;
         exportSupport=button(layout,"Export support bundle",this::chooseExport);
         scanStorage=button(layout,"Check reclaimable storage",()->operation(new Intent(this,SessionService.class).setAction(SessionService.SCAN_STORAGE)));
@@ -302,6 +303,16 @@ public final class MainActivity extends Activity {
         new android.app.AlertDialog.Builder(this,R.style.RealmDialog).setTitle("Frame limit · next game start")
             .setSingleChoiceItems(choices,rate==24?0:rate==60?2:1,(d,i)->{
                 prefs.edit().putInt("frameCap",rates[i]).apply(); d.dismiss();
+            }).setNegativeButton("Cancel",null).show();
+    }
+    /** Fallback only: full tracing is the v26 behavior, slower and hotter but kept for any device where the filter misbehaves. */
+    private void showProotSettings(){
+        android.content.SharedPreferences prefs=getSharedPreferences(io.github.russianranger.esteria.runtime.ProotProcess.RUNTIME_SETTINGS,MODE_PRIVATE);
+        boolean on=io.github.russianranger.esteria.runtime.ProotProcess.seccompAcceleration(this);
+        String[] choices={"On · faster and cooler (default)","Off · full tracing, use only if the game fails to start"};
+        new android.app.AlertDialog.Builder(this,R.style.RealmDialog).setTitle("PRoot acceleration · next start")
+            .setSingleChoiceItems(choices,on?0:1,(d,i)->{
+                prefs.edit().putBoolean(io.github.russianranger.esteria.runtime.ProotProcess.SECCOMP_ACCELERATION,i==0).apply(); d.dismiss();
             }).setNegativeButton("Cancel",null).show();
     }
     private void showGameSettings(){

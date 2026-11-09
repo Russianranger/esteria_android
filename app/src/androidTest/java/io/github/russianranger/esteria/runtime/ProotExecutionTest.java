@@ -6,6 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import io.github.russianranger.esteria.BuildConfig;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
+import io.github.russianranger.esteria.core.runtime.process.ProotLaunch;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,20 +68,29 @@ public final class ProotExecutionTest {
         if(child.isAlive()){try{child.stop(Duration.ZERO);}finally{fail("Guest did not finish before deadline");}}
         assertNull(child.failure());assertEquals("Real guest process exit",expectedExit,child.exitCode());assertEquals(0,child.diagnostics()[4]);
     }
-    private static OwnedProcess.Specification ownershipSpec(Path tracer,Path loader,Path rootfs,Path work,Path temporary,Path logs,String mode) {
+    /** Production default is accelerated (ProotLaunch); the full-tracing fallback keeps PROOT_NO_SECCOMP=1. */
+    private static Map<String,String> tracerEnvironment(Path loader,Path temporary,boolean accelerated) {
         Map<String,String> environment=new HashMap<>();environment.put("PROOT_LOADER",loader.toString());
-        environment.put("PROOT_NO_SECCOMP","1");environment.put("PROOT_TMP_DIR",temporary.toString());environment.put("PATH","/system/bin");
+        if(accelerated)environment.put(ProotLaunch.SECCOMP_REPORT,"1");else environment.put("PROOT_NO_SECCOMP","1");
+        environment.put("PROOT_TMP_DIR",temporary.toString());environment.put("PATH","/system/bin");
+        return environment;
+    }
+    private static OwnedProcess.Specification ownershipSpec(Path tracer,Path loader,Path rootfs,Path work,Path temporary,Path logs,String mode,boolean accelerated) {
+        Map<String,String> environment=tracerEnvironment(loader,temporary,accelerated);
         return new OwnedProcess.Specification(tracer,Arrays.asList("--kill-on-exit","--sysvipc","-0","-r",rootfs.toString(),
             "-b","/dev","-b","/proc","-b",work+":/work","-b",temporary+":/tmp","-w","/work","/probe-owner","/work",mode),
             environment,work,logs.resolve("stdout.log"),logs.resolve("stderr.log"));
     }
     private static long ownershipCase(NativeProcessBridge backend,Path tracer,Path loader,Path rootfs,Path root,String name,boolean patched,boolean graceful) throws Exception {
+        return ownershipCase(backend,tracer,loader,rootfs,root,name,patched,graceful,false);
+    }
+    private static long ownershipCase(NativeProcessBridge backend,Path tracer,Path loader,Path rootfs,Path root,String name,boolean patched,boolean graceful,boolean accelerated) throws Exception {
         // Begin before process creation, earlier than every guest alarm. A late
         // observation must never turn the fixture's own timeout into EXITKILL proof.
         long caseStarted=System.nanoTime();
         Path session=directory(root.resolve(name));Path work=directory(session.resolve("work"));
         Path temporary=directory(session.resolve("tmp")),logs=directory(session.resolve("logs"));
-        OwnedProcess child=OwnedProcess.start(backend,ownershipSpec(tracer,loader,rootfs,work,temporary,logs,graceful?"graceful":"forced"),
+        OwnedProcess child=OwnedProcess.start(backend,ownershipSpec(tracer,loader,rootfs,work,temporary,logs,graceful?"graceful":"forced",accelerated),
             graceful?()->Files.write(work.resolve("stop"),new byte[]{1},StandardOpenOption.CREATE_NEW):null);
         List<Long> watched=new ArrayList<>();List<Integer> pids=new ArrayList<>();long tracerHandle=0;
         try {
@@ -113,10 +123,12 @@ public final class ProotExecutionTest {
                 for(int pid:pids)assertEquals("graceful-persisted\n",read(work.resolve("saved-"+pid)));
                 for(long handle:watched)assertTrue("Graceful guest exited",ProbeProcessHandles.exited(handle,1000));
                 Path verifyLogs=directory(session.resolve("verify"));
-                OwnedProcess verify=OwnedProcess.start(backend,ownershipSpec(tracer,loader,rootfs,work,temporary,verifyLogs,"verify"),null);
+                OwnedProcess verify=OwnedProcess.start(backend,ownershipSpec(tracer,loader,rootfs,work,temporary,verifyLogs,"verify",accelerated),null);
                 try{await(verify);assertEquals("ESTERIA_PROOT_OWNER_SAVE_VERIFY 3\n",read(verifyLogs.resolve("stdout.log")));}
                 finally{if(verify.isAlive())try{verify.stop(Duration.ZERO);}catch(IOException ignored){ /* Original assertion fails. */ }}
             }else{
+                if(accelerated)assertTrue("Seccomp acceleration must engage before tracer death is tested",
+                    read(logs.resolve("stderr.log")).contains(ProotLaunch.SECCOMP_OBSERVED));
                 assertTrue("Ownership intervention exceeded causal observation budget",System.nanoTime()-caseStarted<TimeUnit.SECONDS.toNanos(25));
                 ProbeProcessHandles.kill(tracerHandle);assertTrue("Only verified tracer was killed",ProbeProcessHandles.exited(tracerHandle,5000));
                 await(child,137);
@@ -198,14 +210,36 @@ public final class ProotExecutionTest {
             assertEquals(expected.getBytes(StandardCharsets.UTF_8).length,child.diagnostics()[0]);
             assertEquals("esteria-local-runtime-persistence\n",read(work.resolve("persistent-probe.txt")));
         }
+        // Same guest probes with PRoot's seccomp filter, the production default since stock v27.
+        Path acceleratedWork=directory(root.resolve("accelerated-work")),acceleratedTemporary=directory(root.resolve("accelerated-tmp"));
+        for(String mode:Arrays.asList("write","verify")){
+            Path run=directory(logs.resolve("accelerated-"+mode));
+            OwnedProcess child=OwnedProcess.start(backend,new OwnedProcess.Specification(tracer,
+                Arrays.asList("--kill-on-exit","--sysvipc","-0","-r",rootfs.toString(),"-b","/dev","-b","/proc",
+                    "-b",acceleratedWork+":/work","-b",acceleratedTemporary+":/tmp","-w","/work","/probe","/work","/probe-plugin.so","2.36",mode),
+                tracerEnvironment(loader,acceleratedTemporary,true),acceleratedWork,run.resolve("stdout.log"),run.resolve("stderr.log")),null);
+            try { await(child); }
+            finally { if(child.isAlive())try{child.stop(Duration.ZERO);}catch(IOException forced){ /* Original assertion remains failure. */ } }
+            String expected="ESTERIA_ANDROID_RENAME_PROBE legacy=1 atomicReplace=1 oldDescriptor=1 missingSourceErrno=1 symlink=1 cwd=1 persistence="+mode+"\n"
+                +"ESTERIA_ANDROID_GLIBC_PROBE glibc=2.36 dlopen=1 tls=1 fork=1 exec=1 loopback=1 persistence="+mode+" childExit=17\n";
+            assertEquals("Accelerated guest marker and counts",expected,read(run.resolve("stdout.log")));
+            assertTrue("Seccomp acceleration observed by the tracer",read(run.resolve("stderr.log")).contains(ProotLaunch.SECCOMP_OBSERVED));
+            assertEquals("esteria-local-runtime-persistence\n",read(acceleratedWork.resolve("persistent-probe.txt")));
+        }
+        for(String mode:Arrays.asList("write","verify"))
+            assertFalse("Full-tracing fallback never reports acceleration",read(logs.resolve(mode).resolve("stderr.log")).contains(ProotLaunch.SECCOMP_OBSERVED));
         long controlMillis=ownershipCase(backend,controlTracer,loader,rootfs,root,"ownership-control",false,false);
         long patchedMillis=ownershipCase(backend,tracer,loader,rootfs,root,"ownership-patched",true,false);
         ownershipCase(backend,tracer,loader,rootfs,root,"ownership-graceful",true,true);
+        long acceleratedMillis=ownershipCase(backend,tracer,loader,rootfs,root,"ownership-accelerated",true,false,true);
+        ownershipCase(backend,tracer,loader,rootfs,root,"ownership-accelerated-graceful",true,true,true);
         JSONObject ownerDeath=RemoteOwnerDeathProbe.run(context,root,tracer,loader);
         JSONObject receipt=new JSONObject().put("formatVersion",1).put("scope","android-13-x86_64-proot-glibc-execution")
             .put("sourceRevision",BuildConfig.SOURCE_REVISION).put("fingerprint",Build.FINGERPRINT).put("api",Build.VERSION.SDK_INT)
             .put("targetSdk",context.getApplicationInfo().targetSdkVersion).put("abi","x86_64").put("glibcVersion","2.36")
-            .put("guestLaunches",8).put("guestChildExit",17).put("buildEvidence",build)
+            .put("guestLaunches",13).put("guestChildExit",17).put("buildEvidence",build)
+            .put("seccompAccelerationObserved",true).put("acceleratedGuestLaunches",5).put("acceleratedPatchedSurvivors",0)
+            .put("acceleratedObservationMillis",acceleratedMillis)
             .put("legacyRenameReplacementVerified",true).put("renamePersistenceVerified",true)
             .put("androidProotExecuted",true).put("privateElfLoaderExecuted",true).put("directPrivateBionicExecRejected",true)
             .put("dynamicLibraryAndTlsVerified",true).put("forkExecLoopbackVerified",true).put("relaunchPersistenceVerified",true)

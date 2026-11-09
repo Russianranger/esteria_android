@@ -130,7 +130,13 @@ public final class ProotProcess {
         privatePath(privateRoot,home);
         return ProotLaunch.create(payload.tracer,payload.loader,rootfs,
             work,temporary,logs,guestCommand,
-            io.github.russianranger.esteria.core.runtime.install.RuntimeReadPolicy.preparationEnvironment(guestEnvironment),mounts,presentation);
+            io.github.russianranger.esteria.core.runtime.install.RuntimeReadPolicy.preparationEnvironment(guestEnvironment),mounts,presentation,
+            seccompAcceleration(context));
+    }
+    /** Launcher setting read at each process start; on unless the user chose the full-tracing fallback. */
+    public static final String RUNTIME_SETTINGS="runtime-settings",SECCOMP_ACCELERATION="prootSeccomp";
+    public static boolean seccompAcceleration(Context context){
+        return context.getSharedPreferences(RUNTIME_SETTINGS,Context.MODE_PRIVATE).getBoolean(SECCOMP_ACCELERATION,true);
     }
     private static Payload inspectQualification(Context context)throws IOException {
         requireQualificationProfile();

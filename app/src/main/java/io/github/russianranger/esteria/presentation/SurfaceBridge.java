@@ -44,7 +44,9 @@ public final class SurfaceBridge implements AutoCloseable {
         try { System.loadLibrary("esteria-presentation"); }
         catch (UnsatisfiedLinkError error) { throw new IOException("Presentation JNI is not packaged", error); }
     }
-    private static native int receiveFrame(Surface surface, int fd, ByteBuffer pixels, long[] measurements);
+    /** Flags and result for {@link #receiveFrame}; must match native/presentation/surface.c. */
+    static final int REQUEST_SENT = 1, PIPELINE = 2, POSTED_NEXT_SENT = 2;
+    private static native int receiveFrame(Surface surface, int fd, ByteBuffer pixels, long[] measurements, int flags);
     /** The session's selected frame cap: 24, 30 or 60. */
     public int frameCap() { return frameCap; }
     /** Call when SurfaceHolder creates a surface; the caller continues to own/release that surface. */
@@ -116,9 +118,12 @@ public final class SurfaceBridge implements AutoCloseable {
                         ByteBuffer pixels = ByteBuffer.allocateDirect(CACHE_BYTES);
                         long[] stats = new long[6]; int width = 0, height = 0;
                         long lastRequest = 0, lastReply = 0, lastPost = 0;
-                        boolean haveReply = false, havePost = false;
+                        boolean haveReply = false, havePost = false, outstanding = false;
+                        // At 30/60 FPS the guest paces captures, so the next request can leave
+                        // as soon as a changed frame's pixels arrive. At 24 FPS Android paces.
+                        boolean pipeline = frameCap != 24;
                         while (current(this) && !cancelled && surface.isValid()) {
-                            if (haveReply) {
+                            if (haveReply && !outstanding) {
                                 long delay;
                                 while (!cancelled && (delay = PresentationSamples.requestDelayNanos(
                                         frameCap, lastRequest, System.nanoTime(), lastPost, lastInput)) > 0) {
@@ -127,13 +132,19 @@ public final class SurfaceBridge implements AutoCloseable {
                                 }
                                 if (cancelled || !current(this) || !surface.isValid()) break;
                             }
-                            lastRequest = System.nanoTime();
-                            boolean idleRequest = havePost && PresentationSamples.idleReadback(lastRequest, lastPost, lastInput);
-                            int result = receiveFrame(surface, descriptor.getFd(), pixels, stats);
+                            // A pipelined request left just after the previous frame's pixels, never while idle.
+                            boolean idleRequest = !outstanding && havePost && PresentationSamples.idleReadback(System.nanoTime(), lastPost, lastInput);
+                            if (!outstanding) lastRequest = System.nanoTime();
+                            int result = receiveFrame(surface, descriptor.getFd(), pixels, stats,
+                                    (outstanding ? REQUEST_SENT : 0) | (pipeline ? PIPELINE : 0));
                             long completed = System.nanoTime();
-                            if (result != 0 && result != 1) throw new IOException("Presentation transport failed: " + result);
-                            samples.reply(result == 0, completed - (haveReply ? lastReply : lastRequest),
+                            if (result != 0 && result != 1 && result != POSTED_NEXT_SENT)
+                                throw new IOException("Presentation transport failed: " + result);
+                            samples.reply(result != 1, completed - (haveReply ? lastReply : lastRequest),
                                     havePost ? completed - lastPost : -1, stats, idleRequest);
+                            // The early request left just before this post; its time approximates it.
+                            outstanding = result == POSTED_NEXT_SENT;
+                            if (outstanding) lastRequest = completed;
                             lastReply = completed;
                             haveReply = true;
                             if (result == 1) continue;

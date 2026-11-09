@@ -8,6 +8,13 @@
 #include <time.h>
 
 struct frame_cache { uint32_t magic, width, height, sequence; };
+/* Android-side pipelining over the unchanged full-v1 protocol. A request byte may be
+ * sent for frame N+1 as soon as frame N's pixels have arrived, so the guest captures
+ * N+1 while Android converts and posts N. Only changed frames pipeline: an unchanged
+ * reply leaves no request outstanding, so the caller's idle pacing still applies. */
+#define ESTERIA_RECEIVE_REQUEST_SENT 1
+#define ESTERIA_RECEIVE_PIPELINE 2
+#define ESTERIA_RECEIVE_POSTED_NEXT_SENT 2
 static uint64_t clock_ns(void) {
     struct timespec now;
     clock_gettime(CLOCK_MONOTONIC, &now);
@@ -15,8 +22,9 @@ static uint64_t clock_ns(void) {
 }
 JNIEXPORT jint JNICALL
 Java_io_github_russianranger_esteria_presentation_SurfaceBridge_receiveFrame(
-        JNIEnv *env, jclass type, jobject surface, jint fd, jobject storage, jlongArray measurements) {
+        JNIEnv *env, jclass type, jobject surface, jint fd, jobject storage, jlongArray measurements, jint flags) {
     (void)type;
+    if (flags & ~(ESTERIA_RECEIVE_REQUEST_SENT | ESTERIA_RECEIVE_PIPELINE)) return -1;
     if (!storage || !measurements || (*env)->GetArrayLength(env, measurements) < 6) return -1;
     unsigned char *pixels = (*env)->GetDirectBufferAddress(env, storage);
     jlong capacity = (*env)->GetDirectBufferCapacity(env, storage);
@@ -25,7 +33,9 @@ Java_io_github_russianranger_esteria_presentation_SurfaceBridge_receiveFrame(
     unsigned char request = ESTERIA_REQUEST_FULL;
     uint32_t header[8];
     uint64_t began = clock_ns();
-    if (esteria_send(fd, &request, 1) || esteria_receive(fd, header, sizeof(header))) return -2;
+    /* With a request already outstanding, receive time is measured from this call. */
+    if ((!(flags & ESTERIA_RECEIVE_REQUEST_SENT) && esteria_send(fd, &request, 1)) ||
+            esteria_receive(fd, header, sizeof(header))) return -2;
     for (unsigned i = 0; i < 8; ++i) header[i] = ntohl(header[i]);
     if (!esteria_frame_valid(header)) return -3;
     int baseline = cache->magic == ESTERIA_FRAME_MAGIC;
@@ -37,6 +47,13 @@ Java_io_github_russianranger_esteria_presentation_SurfaceBridge_receiveFrame(
     }
     if (esteria_receive(fd, pixels, header[6])) return -2;
     uint64_t received = clock_ns();
+    /* Pixels are complete and validated; the next reply cannot overwrite them before this
+     * call returns because it is only read by the next call. */
+    int next_sent = 0;
+    if (flags & ESTERIA_RECEIVE_PIPELINE) {
+        if (esteria_send(fd, &request, 1)) return -2;
+        next_sent = 1;
+    }
     ANativeWindow *window = ANativeWindow_fromSurface(env, surface);
     if (!window) return -4;
     int result = 0;
@@ -62,5 +79,6 @@ Java_io_github_russianranger_esteria_presentation_SurfaceBridge_receiveFrame(
     jlong stats[6] = {header[1], header[2], (jlong)header[4] * 1000,
         (jlong)(received - began), (jlong)(clock_ns() - received), header[6]};
     (*env)->SetLongArrayRegion(env, measurements, 0, 6, stats);
-    return (*env)->ExceptionCheck(env) ? -1 : 0;
+    if ((*env)->ExceptionCheck(env)) return -1;
+    return next_sent ? ESTERIA_RECEIVE_POSTED_NEXT_SENT : 0;
 }

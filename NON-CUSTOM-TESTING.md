@@ -1,6 +1,15 @@
 # Esteria Stock on AYN Thor
 
-## v26 heat check
+## v27 heat and frame-rate check
+
+Install the v27 APK from the v27 release over the existing Esteria Stock app. Keep the existing import, world, shaders, database and character. V27 turns on **PRoot acceleration**, which lets most guest system calls run without stopping in the tracer. It also requests the next frame while Android shows the current one.
+
+1. Start the local game as usual. If any step that worked in v26 fails, export the support bundle first. Then open **Play → PRoot acceleration**, choose **Off**, start again and report both results.
+2. **Same conditions as your v26 bundle:** 60 FPS, the same resolution, location, camera view, brightness, fan mode and charging state, for ten minutes. Take readings around minutes 2, 5 and 10, with the sensor label. Your v26 bundle's hottest zone was `socd` at 73.0 °C. Run `/run print(GetFramerate())` in chat for the engine's frame rate and note how smooth the game looks.
+3. **Heat target:** repeat step 2 at 30 FPS. A frame limit change applies at the next game start.
+4. After each run, log out normally and wait for **Local session stopped**. Then choose **Tools → Export support bundle → Downloads → Save**. Send both ZIPs with the readings, sensor name, fan mode and frame limit. The bundle records per-process CPU, including PRoot tracers, as well as the PRoot acceleration setting and the kernel release.
+
+## Earlier v26 heat check
 
 Install the v26 APK from the [v26 release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.26) over the existing Esteria Stock app. Keep the existing import, world, shaders, database and character. V26 slows the local server's update tick, asks Android for a display refresh that matches the frame limit, and turns on Android's sustained performance mode during play when the device supports it. **Sustained performance** in the gear menu turns that mode on or off immediately.
 

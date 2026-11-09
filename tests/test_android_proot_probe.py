@@ -40,7 +40,8 @@ class ProbeContracts(unittest.TestCase):
     def test_exact_receipt_checks_all_runtime_results(self):
         build={'pinned':'fixture-only'}
         good=dict(formatVersion=1,scope=qualification.SCOPE,sourceRevision='a'*40,fingerprint='fixture',abi='x86_64',
-                  glibcVersion='2.36',api=33,targetSdk=35,guestLaunches=8,guestChildExit=17,buildEvidence=build,
+                  glibcVersion='2.36',api=33,targetSdk=35,guestLaunches=13,guestChildExit=17,buildEvidence=build,
+                  acceleratedGuestLaunches=5,acceleratedPatchedSurvivors=0,acceleratedObservationMillis=400,
                   controlSurvivors=3,patchedSurvivors=0,detachedTraceesPerCase=3,gracefulSavedFilesRestored=3,
                   controlObservationMillis=900,patchedObservationMillis=300,ownerDeathObservationMillis=1700,
                   ownerDeathVerifiedHandles=9,ownerDeathControlSurvivors=3,ownerDeathProtectedSurvivors=0,
@@ -53,6 +54,7 @@ class ProbeContracts(unittest.TestCase):
                        sourceRevision='b'*40,fingerprint='different',api=32,targetSdk=28,guestLaunches=1,guestChildExit=0,
                        controlSurvivors=0,patchedSurvivors=1,detachedTraceesPerCase=2,gracefulSavedFilesRestored=0,
                        controlObservationMillis=25000,patchedObservationMillis=-1,ownerDeathObservationMillis=25000,
+                       acceleratedGuestLaunches=4,acceleratedPatchedSurvivors=1,acceleratedObservationMillis=25000,
                        ownerDeathVerifiedHandles=8,ownerDeathControlSurvivors=0,ownerDeathProtectedSurvivors=1,
                        isolatedParentDeathSignalQualified=True,
                        glibcVersion='2.39',abi='arm64-v8a',buildEvidence={})

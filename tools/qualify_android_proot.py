@@ -19,18 +19,20 @@ FLAGS=('androidProotExecuted','privateElfLoaderExecuted','directPrivateBionicExe
        'dynamicLibraryAndTlsVerified','forkExecLoopbackVerified','relaunchPersistenceVerified',
        'legacyRenameReplacementVerified','renamePersistenceVerified',
        'androidTracerDeathQualified','pidfdIdentityVerified','gracefulGuestStopVerified','userSpaceWaitArmed',
-       'androidOwnerProcessDeathQualified','ownerDeathControlTracerSurvived','ownerDeathProtectedTracerExited')
+       'androidOwnerProcessDeathQualified','ownerDeathControlTracerSurvived','ownerDeathProtectedTracerExited',
+       'seccompAccelerationObserved')
 
 
 def validate_receipt(value,revision,fingerprint,build):
     require(type(value.get('formatVersion')) is int and value['formatVersion']==1 and value.get('scope')==SCOPE and
             value.get('sourceRevision')==revision and value.get('fingerprint')==fingerprint and value.get('abi')=='x86_64' and
             value.get('glibcVersion')=='2.36','proot-receipt-identity')
-    for key,expected in (('api',33),('targetSdk',35),('guestLaunches',8),('guestChildExit',17),
+    for key,expected in (('api',33),('targetSdk',35),('guestLaunches',13),('guestChildExit',17),
+                         ('acceleratedGuestLaunches',5),('acceleratedPatchedSurvivors',0),
                          ('controlSurvivors',3),('patchedSurvivors',0),('detachedTraceesPerCase',3),('gracefulSavedFilesRestored',3),
                          ('ownerDeathVerifiedHandles',9),('ownerDeathControlSurvivors',3),('ownerDeathProtectedSurvivors',0)):
         require(type(value.get(key)) is int and value[key]==expected,'proot-receipt-count-'+key)
-    for key in ('controlObservationMillis','patchedObservationMillis','ownerDeathObservationMillis'):
+    for key in ('controlObservationMillis','patchedObservationMillis','acceleratedObservationMillis','ownerDeathObservationMillis'):
         require(type(value.get(key)) is int and 0<=value[key]<25000,'proot-receipt-alarm-budget-'+key)
     require(value.get('buildEvidence')==build,'proot-receipt-build-differs')
     require(all(value.get(flag) is True for flag in FLAGS),'proot-receipt-missing-check')
@@ -71,7 +73,7 @@ def main():
         command('install-tests',['install',str(args.test_apk)])
         _,result=command('proot-contracts',['shell','am','instrument','-w','-r','-e','class',
             NAMESPACE+'.runtime.ProotExecutionTest#privateGlibcExecutesThroughApkLoader',
-            PACKAGE+'.test/androidx.test.runner.AndroidJUnitRunner'],timeout=240)
+            PACKAGE+'.test/androidx.test.runner.AndroidJUnitRunner'],timeout=360)
         require(instrument_passed(result),'proot-instrumentation-did-not-pass')
         _,raw=command('app-receipt',['exec-out','run-as',PACKAGE,'cat','files/proot-probe-qualification.json'])
         require(len(raw.encode())<=65536,'oversized-app-receipt')

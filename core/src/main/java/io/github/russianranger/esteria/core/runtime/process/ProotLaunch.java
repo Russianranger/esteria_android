@@ -50,6 +50,20 @@ public final class ProotLaunch {
     public static OwnedProcess.Specification create(Path tracer,Path loader,Path rootfs,Path work,
             Path temporary,Path logs,List<String> guestCommand,Map<String,String> guestEnvironment,List<Mount> mounts,
             PresentationBindings presentation) throws IOException {
+        return create(tracer,loader,rootfs,work,temporary,logs,guestCommand,guestEnvironment,mounts,presentation,true);
+    }
+    /** Pinned UO acceleration patch prints this once per tracer when seccomp filtering engaged. */
+    public static final String SECCOMP_REPORT="TRASC_PROOT_REPORT";
+    public static final String SECCOMP_OBSERVED="TRASC PRoot: seccomp acceleration observed";
+    /**
+     * @param seccompAcceleration lets PRoot install its seccomp filter so only path, socket,
+     * process and IPC syscalls it translates stop in the tracer; futex, read/write, poll and
+     * sleeps run untraced. PRoot itself falls back to full tracing if the filter cannot be
+     * installed. False sets PROOT_NO_SECCOMP=1, the previous behavior.
+     */
+    public static OwnedProcess.Specification create(Path tracer,Path loader,Path rootfs,Path work,
+            Path temporary,Path logs,List<String> guestCommand,Map<String,String> guestEnvironment,List<Mount> mounts,
+            PresentationBindings presentation,boolean seccompAcceleration) throws IOException {
         for (Path path : Arrays.asList(rootfs,work,temporary,logs)) directory(path);
         for (Path path : Arrays.asList(tracer,loader)) {
             if (!path.isAbsolute() || Files.isSymbolicLink(path) || !Files.isRegularFile(path,LinkOption.NOFOLLOW_LINKS) || !Files.isExecutable(path))
@@ -103,7 +117,9 @@ public final class ProotLaunch {
         args.addAll(guestCommand);
         Map<String,String> host=new TreeMap<>();
         host.put("PROOT_LOADER",loader.toString()); host.put("PROOT_TMP_DIR",temporary.toString());
-        host.put("PROOT_NO_SECCOMP","1"); host.put("PATH","/system/bin");
+        if (seccompAcceleration) host.put(SECCOMP_REPORT,"1");
+        else host.put("PROOT_NO_SECCOMP","1");
+        host.put("PATH","/system/bin");
         return new OwnedProcess.Specification(tracer,args,host,
             work,logs.resolve("stdout.log"),logs.resolve("stderr.log"));
     }

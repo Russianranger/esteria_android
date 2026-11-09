@@ -54,6 +54,7 @@ import io.github.russianranger.esteria.runtime.ServerExtractorsSetup;
 import io.github.russianranger.esteria.runtime.ServerContentSetup;
 import io.github.russianranger.esteria.runtime.ServerInstallationSetup;
 import io.github.russianranger.esteria.runtime.GuestBridgeSetup;
+import io.github.russianranger.esteria.runtime.ProotProcess;
 import io.github.russianranger.esteria.runtime.ClientRuntimeSetup;
 import io.github.russianranger.esteria.runtime.ClientLaunchSetup;
 import io.github.russianranger.esteria.runtime.ShaderToolsSetup;
@@ -1013,6 +1014,9 @@ public final class SessionService extends Service {
         facts.put("android.api", String.valueOf(Build.VERSION.SDK_INT)); facts.put("android.release", Build.VERSION.RELEASE);
         facts.put("device.model", Build.MODEL); facts.put("device.manufacturer", Build.MANUFACTURER);
         facts.put("device.abis", android.text.TextUtils.join(",", Build.SUPPORTED_ABIS));
+        // Kernel release decides which Wine synchronization backends are possible (futex_waitv 5.16, ntsync 6.14).
+        String kernel = System.getProperty("os.version", "");
+        facts.put("device.kernelRelease", kernel.matches("[0-9A-Za-z._+-]{1,96}") ? kernel : "unavailable");
         facts.put("status", previousStatus); facts.put("runtime.qualified", "false");
         facts.put("operation.busy", Boolean.toString(busy.get()));
         facts.put("operation.action", activeAction == null ? "none" : activeAction);
@@ -1034,6 +1038,7 @@ public final class SessionService extends Service {
         android.content.SharedPreferences display=getSharedPreferences("game-display",MODE_PRIVATE);
         facts.put("game.frameCap.nextStart",String.valueOf(display.getInt("frameCap",30)));
         facts.put("game.input.lookPercent",String.valueOf(display.getInt("lookPercent",100)));
+        facts.put("runtime.prootSeccompAcceleration.nextStart",Boolean.toString(ProotProcess.seccompAcceleration(this)));
         String lastSession=getSharedPreferences("session",MODE_PRIVATE).getString("lastSessionObservations",null);
         if(lastSession!=null && lastSession.length()<=8192)facts.put("game.lastSession.observations",lastSession);
         String lastHeat=getSharedPreferences("session",MODE_PRIVATE).getString("lastSessionThermal",null);
