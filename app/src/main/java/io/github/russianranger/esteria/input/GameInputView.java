@@ -9,6 +9,7 @@ import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.KeyCharacterMap;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewTreeObserver;
@@ -117,7 +118,22 @@ public final class GameInputView extends SurfaceView implements SurfaceHolder.Ca
     }
     @Override public void surfaceCreated(SurfaceHolder holder) {
         frameWidth = frameHeight = 0;
+        requestSurfaceFrameRate(holder.getSurface());
         surfaceReady = true; attachPresentation(); startTick();
+    }
+    /** Frames arrive at the session cap. Without this hint a 120 Hz panel composes every refresh. */
+    private void requestSurfaceFrameRate(Surface surface) {
+        String outcome = "unsupported-api";
+        if (Build.VERSION.SDK_INT >= 30) {
+            try {
+                surface.setFrameRate(presentation.frameCap(), Surface.FRAME_RATE_COMPATIBILITY_FIXED_SOURCE);
+                outcome = "requested-" + presentation.frameCap();
+            } catch (IllegalArgumentException | IllegalStateException rejected) {
+                outcome = "rejected";
+            }
+        }
+        getContext().getSharedPreferences("game-display", Context.MODE_PRIVATE).edit()
+            .putString("surfaceFrameRateHint", outcome).apply();
     }
     @Override public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) { }
     @Override public void surfaceDestroyed(SurfaceHolder holder) {

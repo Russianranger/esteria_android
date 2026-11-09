@@ -45,6 +45,8 @@ public final class SurfaceBridge implements AutoCloseable {
         catch (UnsatisfiedLinkError error) { throw new IOException("Presentation JNI is not packaged", error); }
     }
     private static native int receiveFrame(Surface surface, int fd, ByteBuffer pixels, long[] measurements);
+    /** The session's selected frame cap: 24, 30 or 60. */
+    public int frameCap() { return frameCap; }
     /** Call when SurfaceHolder creates a surface; the caller continues to own/release that surface. */
     public synchronized void attach(Surface surface) throws IOException {
         if (closed) throw new IOException("Presentation is closed");

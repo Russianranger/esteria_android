@@ -1,0 +1,25 @@
+{
+  "formatVersion": 1,
+  "scope": "Linux x86-64 host with Xvfb 1280x720x24. Production native/guest-bridges/x11_frame.c and patches/guest-bridges/0001-x11-frame-fewer-copies.patch built with the host libX11 and libXfixes. Neither PRoot, Wine, the graphical client, Android nor Thor ran. The patch is not applied to the shipped helper.",
+  "method": "A test painter filled the root window with a deterministic pattern and called XSync before each request. Each helper ran at its 60 FPS setting behind a private Unix socket. Wire headers excluding the capture-time field, and SHA-256 of each payload, were compared. CPU is the helper's user plus system clock ticks (100 per second) for 240 requests, averaged over two runs per variant.",
+  "patchSha256": "68ae8541583e4eb8d54d2a736d28d96359139157a607fd509015bcd251b44c6c",
+  "pinnedSourceSha256": "58ac751cba2add9f48911bb78eaab1432b269adba7abc44f20635836ef1684cb",
+  "patchedSourceSha256": "cd976ed7f22add9585820ebca83603dcdc0557b1ec541ffefc0b5322ab118963",
+  "equivalence": {
+    "sequence": [1, 2, 2, 2, 3, 1, 1, 4, 5, 5, 6, 2, 7, 7, 7, 8],
+    "frames": 16,
+    "unchangedReplies": 6,
+    "wireIdentical": true
+  },
+  "cpuClockTicksPer240Frames": {
+    "everyFrameChanged": {"pinned": 57.5, "patched": 42.5},
+    "everyFrameStatic": {"pinned": 43.0, "patched": 34.5}
+  },
+  "thorBaselineV25": {
+    "source": "Owner support bundle, v25, 170 s at the 30 FPS cap",
+    "postedFrames": 4188,
+    "changedCaptureMs": 43748,
+    "changedSurfaceMs": 15263
+  },
+  "notEstablished": ["ARM64 or PRoot cost", "Thor temperature", "shipped helper behavior"]
+}

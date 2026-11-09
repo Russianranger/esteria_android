@@ -23,12 +23,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
+import io.github.russianranger.esteria.core.presentation.DisplayRefreshChoice;
 import io.github.russianranger.esteria.core.runtime.install.PreparationSpeed;
 import io.github.russianranger.esteria.runtime.GameSession;
 import io.github.russianranger.esteria.presentation.GamePresentationPanel;
 import io.github.russianranger.esteria.runtime.ClientLaunchSetup;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public final class MainActivity extends Activity {
     private static final int BASE = 10, OVERLAY = 11, EXPORT = 12, BASE_FOLDER = 13, OVERLAY_FOLDER = 14;
@@ -202,6 +204,7 @@ public final class MainActivity extends Activity {
             rootView.addView(gameRoot,new FrameLayout.LayoutParams(-1,-1));launcher.setVisibility(View.GONE);boundGame=owner;
             getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             immersive(true);
+            applyGamePacing(true);
             if(resumed)gamePanel.resume();
         }
         if(owner.state()!=GameSession.State.CLIENT_STARTED&&gamePanel!=null)gamePanel.pause();
@@ -212,8 +215,47 @@ public final class MainActivity extends Activity {
         if(gamePanel!=null){gamePanel.pause();gamePanel.unbind();}
         if(gameRoot!=null)rootView.removeView(gameRoot);
         gamePanel=null;gameRoot=null;gear=null;boundGame=null;immersive(false);
+        applyGamePacing(false);
         if(launcher!=null)launcher.setVisibility(View.VISIBLE);
         getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+    /** While the game is shown, prefer the slowest display mode that fits the frame cap and,
+     * when chosen and supported, clocks the device can sustain. Both are cleared on leaving
+     * the game. Android treats both as requests; the support bundle records the observed refresh. */
+    private void applyGamePacing(boolean active){
+        android.view.Window window=getWindow();
+        int mode=0;float modeHz=0;
+        android.view.Display display=active&&boundGame!=null&&boundGame.presentation()!=null?gameDisplay():null;
+        if(display!=null) {
+            android.view.Display.Mode current=display.getMode();
+            List<DisplayRefreshChoice.Mode> modes=new ArrayList<>();
+            for(android.view.Display.Mode supported:display.getSupportedModes())
+                modes.add(new DisplayRefreshChoice.Mode(supported.getModeId(),supported.getPhysicalWidth(),supported.getPhysicalHeight(),supported.getRefreshRate()));
+            mode=DisplayRefreshChoice.preferredModeId(boundGame.presentation().frameCap(),new DisplayRefreshChoice.Mode(
+                current.getModeId(),current.getPhysicalWidth(),current.getPhysicalHeight(),current.getRefreshRate()),modes);
+            for(DisplayRefreshChoice.Mode candidate:modes)if(candidate.id==mode)modeHz=candidate.refreshHz;
+        }
+        android.view.WindowManager.LayoutParams attributes=window.getAttributes();
+        if(attributes.preferredDisplayModeId!=mode){attributes.preferredDisplayModeId=mode;window.setAttributes(attributes);}
+        boolean sustained=active&&sustainedRequested()&&sustainedSupported();
+        window.setSustainedPerformanceMode(sustained);
+        getSharedPreferences("game-display",MODE_PRIVATE).edit()
+            .putString("preferredModeHz",mode==0?"none":String.format(Locale.ROOT,"%.1f",modeHz))
+            .putBoolean("sustainedApplied",sustained).apply();
+    }
+    @SuppressWarnings("deprecation")
+    private android.view.Display gameDisplay(){
+        if(Build.VERSION.SDK_INT>=30)return getDisplay();
+        return getWindowManager().getDefaultDisplay();
+    }
+    private boolean sustainedRequested(){return getSharedPreferences("game-display",MODE_PRIVATE).getBoolean("sustainedPerformance",true);}
+    private boolean sustainedSupported(){
+        android.os.PowerManager power=getSystemService(android.os.PowerManager.class);
+        return power!=null&&power.isSustainedPerformanceModeSupported();
+    }
+    private String sustainedLabel(){
+        if(!sustainedSupported())return "Sustained performance · unavailable on this device";
+        return sustainedRequested()?"Sustained performance · On (cooler)":"Sustained performance · Off";
     }
     @SuppressWarnings("deprecation")
     void immersive(boolean active){
@@ -266,7 +308,7 @@ public final class MainActivity extends Activity {
         if(gamePanel==null || gameSettings!=null)return;
         String limit="Frame limit · "+boundGame.presentation().frameCap()+" FPS this session";
         java.util.List<String> items=new ArrayList<>(java.util.Arrays.asList(limit,"Open keyboard","Session details",
-                "Export support bundle","Reset gear position","Right-stick sensitivity · "+lookPercent()+"%","Stop session"));
+                "Export support bundle","Reset gear position","Right-stick sensitivity · "+lookPercent()+"%",sustainedLabel(),"Stop session"));
         if(service!=null && service.forceStopAvailable())items.add("Force stop · unsaved state may be lost");
         android.app.AlertDialog dialog=new android.app.AlertDialog.Builder(this,R.style.RealmDialog).setTitle("Game settings")
             .setItems(items.toArray(new String[0]),(d,i)->{
@@ -282,8 +324,12 @@ public final class MainActivity extends Activity {
                     android.widget.Toast.makeText(this,"Wait for the current operation to finish.",android.widget.Toast.LENGTH_SHORT).show();break;
                 case 4: gear.resetPosition();break;
                 case 5: showLookSettings();break;
-                case 6: gamePanel.requestStop();break;
-                case 7: if(service.forceStopAvailable())startService(new Intent(this,SessionService.class).setAction(SessionService.FORCE_STOP));break;
+                case 6:
+                    if(!sustainedSupported())break;
+                    getSharedPreferences("game-display",MODE_PRIVATE).edit().putBoolean("sustainedPerformance",!sustainedRequested()).apply();
+                    applyGamePacing(true);break;
+                case 7: gamePanel.requestStop();break;
+                case 8: if(service.forceStopAvailable())startService(new Intent(this,SessionService.class).setAction(SessionService.FORCE_STOP));break;
                 default: break;
                 }
             }).setNegativeButton("Return to game",null).create();

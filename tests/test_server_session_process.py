@@ -11,6 +11,38 @@ from unittest.mock import patch
 from runtime import server_session_process as process
 
 
+def pinned_env_name(key):
+    """Port of IniKeyToEnvVarKey/GetEnvVarName in the pinned server's Config.cpp."""
+    result = ''
+    for index, current in enumerate(key):
+        if current in ' .-':
+            result += '_'
+            continue
+        if index != len(key) - 1:
+            following = key[index + 1]
+            if (not current.isupper() and following.isupper()) or \
+                    (not current.isdigit() and following.isdigit()) or (current.isdigit() and not following.isdigit()):
+                result += current.upper() + '_'
+                continue
+        result += current.upper()
+    return 'AC_' + result
+
+
+class WorldTickEnvironmentTests(unittest.TestCase):
+    def test_tick_overrides_use_the_pinned_configuration_names(self):
+        # The two v25 names were read by the native worldserver on device.
+        self.assertEqual(pinned_env_name('Logger.playerbots'), 'AC_LOGGER_PLAYERBOTS')
+        self.assertEqual(pinned_env_name('Appender.Console'), 'AC_APPENDER_CONSOLE')
+        self.assertEqual(process.WORLDSERVER_TICK_ENVIRONMENT, {
+            pinned_env_name('MinWorldUpdateTime'): '20', pinned_env_name('MapUpdateInterval'): '50'})
+
+    def test_tick_values_stay_responsive_and_above_the_pinned_minimum(self):
+        values = {key: int(value) for key, value in process.WORLDSERVER_TICK_ENVIRONMENT.items()}
+        # TrinityCore 3.3.5 shipped 50 ms world and 100 ms map ticks; stay below both.
+        self.assertTrue(1 < values['AC_MIN_WORLD_UPDATE_TIME'] <= 50)
+        self.assertTrue(values['AC_MIN_WORLD_UPDATE_TIME'] <= values['AC_MAP_UPDATE_INTERVAL'] <= 100)
+
+
 class ServerSessionProcessTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -72,6 +104,8 @@ while True: time.sleep(.05)
 from pathlib import Path
 assert os.environ['AC_LOGGER_PLAYERBOTS'] == '4,Console Playerbots'
 assert os.environ['AC_APPENDER_CONSOLE'] == '1,4,1'
+assert os.environ['AC_MIN_WORLD_UPDATE_TIME'] == '20'
+assert os.environ['AC_MAP_UPDATE_INTERVAL'] == '50'
 s=socket.socket();s.bind(('127.0.0.1',0));s.listen()
 Path('port.tmp').write_text(str(s.getsockname()[1]));Path('port.tmp').replace('port')
 def challenge():

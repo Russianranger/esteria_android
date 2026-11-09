@@ -3,10 +3,16 @@ package io.github.russianranger.esteria.runtime;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.hardware.display.DisplayManager;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.PowerManager;
 import android.os.SystemClock;
+import android.system.Os;
+import android.system.OsConstants;
+import android.view.Display;
+import io.github.russianranger.esteria.core.diagnostics.ThermalTelemetry;
+import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.LongSupplier;
@@ -14,10 +20,13 @@ import java.util.function.Supplier;
 
 /** Worker-owned readings over the reconstructed client lifetime. Holds no listener or timer. */
 public final class SessionThermalDiagnostics {
-    static final long INTERVAL_MS = 30_000;
+    static final long INTERVAL_MS = 10_000;
     private final LongSupplier clock;
     private final Supplier<Integer> readBattery;
     private final Supplier<Integer> readStatus;
+    private final Supplier<Double> readHeadroom;
+    private final Supplier<Double> readRefresh;
+    private final ThermalTelemetry telemetry;
     private final Summary battery = new Summary();
     private final Summary status = new Summary();
     private long samples, startMs, lastMs;
@@ -36,13 +45,37 @@ public final class SessionThermalDiagnostics {
             int value = manager.getCurrentThermalStatus();
             return value >= PowerManager.THERMAL_STATUS_NONE && value <= PowerManager.THERMAL_STATUS_SHUTDOWN
                     ? value : null;
-        });
+        }, () -> headroom(context), () -> {
+            DisplayManager displays = context.getSystemService(DisplayManager.class);
+            Display display = displays == null ? null : displays.getDisplay(Display.DEFAULT_DISPLAY);
+            return display == null ? null : (double) display.getRefreshRate();
+        }, new ThermalTelemetry(Paths.get("/proc"), Paths.get("/sys"), android.os.Process.myPid(), clockTicks()));
     }
 
     SessionThermalDiagnostics(LongSupplier clock, Supplier<Integer> readBattery, Supplier<Integer> readStatus) {
+        this(clock, readBattery, readStatus, () -> null, () -> null, null);
+    }
+
+    SessionThermalDiagnostics(LongSupplier clock, Supplier<Integer> readBattery, Supplier<Integer> readStatus,
+                              Supplier<Double> readHeadroom, Supplier<Double> readRefresh, ThermalTelemetry telemetry) {
         this.clock = clock;
         this.readBattery = readBattery;
         this.readStatus = readStatus;
+        this.readHeadroom = readHeadroom;
+        this.readRefresh = readRefresh;
+        this.telemetry = telemetry;
+    }
+
+    /** Android's normalized forecast: 1.0 corresponds to severe throttling. NaN when unsupported. */
+    private static Double headroom(Context context) {
+        if (Build.VERSION.SDK_INT < 30) return null;
+        PowerManager manager = context.getSystemService(PowerManager.class);
+        return manager == null ? null : (double) manager.getThermalHeadroom(10);
+    }
+
+    private static long clockTicks() {
+        long ticks = Os.sysconf(OsConstants._SC_CLK_TCK);
+        return ticks > 0 ? ticks : 100;
     }
 
     public void sampleIfDue() {
@@ -59,14 +92,21 @@ public final class SessionThermalDiagnostics {
         if (samples == 0) startMs = now;
         battery.observe(read(readBattery), samples == 0);
         status.observe(read(readStatus), samples == 0);
+        if (telemetry != null) {
+            try {
+                telemetry.sample(now, read(readHeadroom), read(readRefresh));
+            } catch (RuntimeException unavailable) {
+                // Procfs, sysfs or vendor sensor failures must never affect gameplay or shutdown.
+            }
+        }
         lastMs = now;
         samples++;
     }
 
-    private static Integer read(Supplier<Integer> reader) {
+    private static <T> T read(Supplier<T> reader) {
         try {
-            Integer value = reader.get();
-            return value == null || value == Integer.MIN_VALUE ? null : value;
+            T value = reader.get();
+            return value == null || Integer.valueOf(Integer.MIN_VALUE).equals(value) ? null : value;
         } catch (RuntimeException unavailable) {
             // Vendor service or sensor availability must never affect gameplay or shutdown.
             return null;
@@ -107,5 +147,11 @@ public final class SessionThermalDiagnostics {
         battery.append(result, "game.thermal.batteryCelsius", true);
         status.append(result, "game.thermal.androidStatusCode", false);
         return result;
+    }
+
+    /** Device load and sensor detail for the separate bounded support field; empty without a window. */
+    public Map<String, String> detail() {
+        if (samples == 0 || telemetry == null) return Map.of();
+        return telemetry.facts();
     }
 }

@@ -1,0 +1,63 @@
+--- a/native/guest-bridges/x11_frame.c
++++ b/native/guest-bridges/x11_frame.c
+@@ -42,9 +42,14 @@
+         *target = blended;
+     }
+ }
++/* Sends straight from the X image when rows are tightly packed, which is always the case
++ * for 32-bpp ZPixmap. The previous image is kept for the unchanged-frame comparison
++ * instead of being copied. Padded rows fall back to two alternating packed buffers. */
+ static int consume(Display *display, int fd, unsigned fps) {
+-    uint32_t *pixels = malloc(ESTERIA_FRAME_BYTES), *previous = malloc(ESTERIA_FRAME_BYTES);
+-    if (!pixels || !previous) { free(pixels); free(previous); return -1; }
++    uint32_t *packed[2] = {NULL, NULL};
++    unsigned next_packed = 0;
++    XImage *kept = NULL;
++    const uint32_t *previous = NULL;
+     uint32_t sequence = 0, last_width = 0, last_height = 0;
+     uint64_t last = 0;
+     int result = 0;
+@@ -72,22 +77,35 @@
+             if (image) XDestroyImage(image);
+             result = -1; break;
+         }
+-        for (uint32_t row = 0; row < h[2]; ++row)
+-            memcpy(pixels + (size_t)row * h[1], image->data + (size_t)row * (size_t)image->bytes_per_line, h[3]);
+-        XDestroyImage(image);
++        uint32_t *pixels;
++        if (image->bytes_per_line == (int)h[3]) {
++            pixels = (uint32_t *)image->data;
++        } else {
++            if (!packed[next_packed] && !(packed[next_packed] = malloc(ESTERIA_FRAME_BYTES))) {
++                XDestroyImage(image); result = -1; break;
++            }
++            pixels = packed[next_packed]; next_packed ^= 1u;
++            for (uint32_t row = 0; row < h[2]; ++row)
++                memcpy(pixels + (size_t)row * h[1], image->data + (size_t)row * (size_t)image->bytes_per_line, h[3]);
++            XDestroyImage(image); image = NULL;
++        }
+         XFixesCursorImage *cursor = XFixesGetCursorImage(display);
+-        if (!cursor || xerror) { if (cursor) XFree(cursor); result = -1; break; }
++        if (!cursor || xerror) { if (cursor) XFree(cursor); if (image) XDestroyImage(image); result = -1; break; }
+         overlay_cursor(pixels, h[1], h[2], cursor); XFree(cursor);
+         h[4] = (uint32_t)((nanos() - began) / 1000u);
+-        if (last_width == h[1] && last_height == h[2] && !memcmp(previous, pixels, h[6])) {
++        if (previous && last_width == h[1] && last_height == h[2] && !memcmp(previous, pixels, h[6])) {
+             h[6] = 0; h[7] = ESTERIA_FRAME_UNCHANGED;
+         } else {
+-            memcpy(previous, pixels, h[6]); last_width = h[1]; last_height = h[2];
++            last_width = h[1]; last_height = h[2];
+         }
+         uint32_t wire[8]; for (unsigned i = 0; i < 8; ++i) wire[i] = htonl(h[i]);
+-        if (esteria_send(fd, wire, sizeof(wire)) || esteria_send(fd, pixels, h[6])) break;
++        int sent = esteria_send(fd, wire, sizeof(wire)) || esteria_send(fd, pixels, h[6]);
++        if (kept) XDestroyImage(kept);
++        kept = image; previous = pixels;
++        if (sent) break;
+     }
+-    free(pixels); free(previous); return result;
++    if (kept) XDestroyImage(kept);
++    free(packed[0]); free(packed[1]); return result;
+ }
+ int main(int argc, char **argv) {
+     if (argc != 3 || (strcmp(argv[2], "30") && strcmp(argv[2], "60"))) {

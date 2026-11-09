@@ -6,6 +6,7 @@ import android.system.ErrnoException;
 import android.system.Os;
 import android.system.OsConstants;
 import android.system.StructStat;
+import io.github.russianranger.esteria.core.diagnostics.ClientGraphicsSettings;
 import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
 import io.github.russianranger.esteria.core.runtime.ServiceOperationGuard;
 import io.github.russianranger.esteria.core.runtime.StockWinePrefix;
@@ -142,6 +143,8 @@ public final class GameSession {
         private volatile ClientPresentationSession presentation;
         private GameRendererObservation rendererObservation;
         private String selectedVulkanAdapter;
+        private volatile Path clientWork;
+        private volatile java.util.Map<String,String> graphicsSettings=java.util.Map.of();
         private LocalAccountHandoff handoff;
         private Thread monitor;
         private Handle(Context context,Path root,LocalWorldSetup.Result setup,ClientRuntimeSetup client,
@@ -161,6 +164,8 @@ public final class GameSession {
         public boolean clientExitAcknowledged(){return clientExitAcknowledged;}
         public ClientPresentationSession presentation(){return presentation;}
         public String selectedVulkanAdapter(){return selectedVulkanAdapter;}
+        /** Allowlisted render-cost CVars the client saved at exit; empty until confirmed cleanup. */
+        public java.util.Map<String,String> graphicsSettings(){return graphicsSettings;}
         /** Read-only fixed log selection survives known cleanup; no credential
          * record, database engine-private output or configuration is selected. */
         public java.util.Map<String,Path> diagnosticLogs() {
@@ -224,6 +229,7 @@ public final class GameSession {
                     handoff=localLogin(root,setup,client,view,database.instanceUuid());
                     check(stop);setup.data.requireUnchanged();
                     rendererObservation=GameRendererObservation.beforeStart(view.work);
+                    clientWork=view.work;
                     process=presentation.startClient(client,view,shaders,turnip);
                     state=State.CLIENT_STARTED;updates.update("client-started-not-gameplay-qualified","",0,-1);
                     monitor=new Thread(this::monitor,"esteria-game-session-owner");monitor.setDaemon(true);monitor.start();return null;
@@ -281,6 +287,7 @@ public final class GameSession {
                 // same view until the preserved file is explicitly recovered.
                 if(handoff!=null){handoffRecovery=true;handoff=null;}
                 if(process!=null && rendererObservation!=null) selectedVulkanAdapter=rendererObservation.afterExit();
+                if(process!=null && clientWork!=null) graphicsSettings=savedGraphicsSettings(clientWork);
                 leases.close();state=State.CLOSED;OWNERS.remove(root,this);
                 if(error!=null)remember(error);
                 if(failure!=null)throw failure;
@@ -310,6 +317,14 @@ public final class GameSession {
         }
         private IOException retained(String text,Throwable cause){IOException error=new IOException(text,cause);remember(error);return error;}
         private static IOException add(IOException first,IOException next){if(first==null)return next;if(first!=next&&first.getSuppressed().length<15)first.addSuppressed(next);return first;}
+        /** Diagnostics only: never let a changed or linked settings directory affect cleanup. */
+        private static java.util.Map<String,String> savedGraphicsSettings(Path work){
+            try {
+                Path wtf=work.resolve("client-state/WTF");
+                if(!wtf.toRealPath().equals(wtf))return java.util.Map.of();
+                return java.util.Collections.unmodifiableMap(ClientGraphicsSettings.read(wtf.resolve("Config.wtf")));
+            }catch(IOException|RuntimeException unavailable){return java.util.Map.of();}
+        }
     }
     private static LocalAccountHandoff localLogin(Path root,LocalWorldSetup.Result setup,ClientRuntimeSetup client,
             ClientLaunchSetup.Prepared view,String uuid)throws IOException {

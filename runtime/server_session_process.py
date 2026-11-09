@@ -30,6 +30,9 @@ LOG_LIMIT = 8 << 20
 PROC_LIMIT = 16 << 20
 WORLD_INFO = b'server info\n'
 WORLD_SHUTDOWN = b'server shutdown 1\n'
+# Pinned ConfigMgr maps MinWorldUpdateTime and MapUpdateInterval to these names and
+# reads them in WorldUpdateLoop and WorldConfig. Values are milliseconds.
+WORLDSERVER_TICK_ENVIRONMENT = {'AC_MIN_WORLD_UPDATE_TIME': '20', 'AC_MAP_UPDATE_INTERVAL': '50'}
 
 
 def require(condition, reason):
@@ -310,6 +313,10 @@ class ServerChild:
             # The native bot module logs and flushes every cached item at DEBUG. Limit this
             # process to INFO and timestamp its captured console without changing saved configs.
             env.update(AC_LOGGER_PLAYERBOTS='4,Console Playerbots', AC_APPENDER_CONSOLE='1,4,1')
+            # The pinned defaults wake the world loop every 1 ms and update maps, creatures
+            # and bot AI every 10 ms. One local player does not need that rate; a slower tick
+            # lowers device heat. Saved configs and their generation stay unchanged.
+            env.update(WORLDSERVER_TICK_ENVIRONMENT)
         # Attach Popen to the retained object before any later operation can fail.
         self.process = subprocess.Popen([str(self.executable), '--config', str(self.configuration)],
             cwd=self.working, env=env, umask=0o077,

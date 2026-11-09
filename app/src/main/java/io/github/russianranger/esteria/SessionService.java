@@ -535,7 +535,7 @@ public final class SessionService extends Service {
             if (!windowFacts.isEmpty()) collectWrapperUsage(windowFacts, "game.usage.beforeCleanup.", owner);
             windowFacts.putAll(thermal.facts());
             rememberLogs(owner.diagnosticLogs());
-            IOException cleanup=closeGame(owner,windowFacts);lastRecoveryRequired=owner.recoveryRequired();lastClientExitAcknowledged=owner.clientExitAcknowledged();
+            IOException cleanup=closeGame(owner,windowFacts,thermal.detail());lastRecoveryRequired=owner.recoveryRequired();lastClientExitAcknowledged=owner.clientExitAcknowledged();
             if(cleanup!=null){if(operationFailure!=null)operationFailure.addSuppressed(cleanup);else throw cleanup;}
         }
         status=lastRecoveryRequired?"Session stopped. Recovery checks are required before the next launch.":"Local session stopped.";
@@ -548,7 +548,7 @@ public final class SessionService extends Service {
         if(required)report.requirePreparationInputs();
         return report;
     }
-    private IOException closeGame(GameSession.Handle owner,Map<String,String> windowFacts) {
+    private IOException closeGame(GameSession.Handle owner,Map<String,String> windowFacts,Map<String,String> thermalDetail) {
         IOException failure=null;boolean interrupted=Thread.interrupted();
         while(owner.state()!=GameSession.State.CLOSED) {
             keepAwake();
@@ -589,6 +589,22 @@ public final class SessionService extends Service {
             else log("Closed session observations exceeded the support field bound");
         } catch(RuntimeException unavailable) {
             log("Closed session observations unavailable: "+unavailable.getClass().getSimpleName());
+        }
+        // Heat detail has its own bounded field so it can never displace the observations above.
+        session.remove("lastSessionThermal");
+        try {
+            Map<String,String> heat=new LinkedHashMap<>(thermalDetail);
+            android.content.SharedPreferences display=getSharedPreferences("game-display",MODE_PRIVATE);
+            heat.put("sustainedPerformance.requested",Boolean.toString(display.getBoolean("sustainedPerformance",true)));
+            heat.put("sustainedPerformance.applied",Boolean.toString(display.getBoolean("sustainedApplied",false)));
+            heat.put("display.preferredModeHz",display.getString("preferredModeHz","none"));
+            heat.put("display.surfaceFrameRateHint",display.getString("surfaceFrameRateHint","none"));
+            owner.graphicsSettings().forEach((name,value)->heat.put("graphics."+name,value));
+            String observed=new JSONObject(heat).toString();
+            if(observed.length()<=8192)session.putString("lastSessionThermal",observed);
+            else log("Closed session heat detail exceeded the support field bound");
+        } catch(RuntimeException unavailable) {
+            log("Closed session heat detail unavailable: "+unavailable.getClass().getSimpleName());
         }
         if(!session.commit())log("Closed session diagnostics could not be persisted");
         game=null;if(interrupted)Thread.currentThread().interrupt();return failure;
@@ -1020,6 +1036,8 @@ public final class SessionService extends Service {
         facts.put("game.input.lookPercent",String.valueOf(display.getInt("lookPercent",100)));
         String lastSession=getSharedPreferences("session",MODE_PRIVATE).getString("lastSessionObservations",null);
         if(lastSession!=null && lastSession.length()<=8192)facts.put("game.lastSession.observations",lastSession);
+        String lastHeat=getSharedPreferences("session",MODE_PRIVATE).getString("lastSessionThermal",null);
+        if(lastHeat!=null && lastHeat.length()<=8192)facts.put("game.lastSession.thermal",lastHeat);
         if(gameOwner!=null && gameOwner.presentation()!=null) {
             facts.put("game.frameCap.session",String.valueOf(gameOwner.presentation().frameCap()));
             facts.putAll(gameOwner.presentation().presentationFacts());

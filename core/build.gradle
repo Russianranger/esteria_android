@@ -222,3 +222,21 @@ tasks.register('serverStartupTimingTest', JavaExec) {
     maxHeapSize = '32m'
 }
 check.dependsOn serverStartupTimingTest
+
+// Session heat telemetry over procfs/sysfs-shaped temporary trees; no device sensors.
+tasks.register('thermalTelemetryTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.diagnostics.ThermalTelemetryTests'
+    maxHeapSize = '32m'
+}
+check.dependsOn thermalTelemetryTest
+
+// Pure game-window display mode selection from the session frame cap.
+tasks.register('displayRefreshChoiceTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.presentation.DisplayRefreshChoiceTests'
+    maxHeapSize = '32m'
+}
+check.dependsOn displayRefreshChoiceTest

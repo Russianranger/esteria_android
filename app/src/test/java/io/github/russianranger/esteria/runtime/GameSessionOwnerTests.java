@@ -281,7 +281,7 @@ public final class GameSessionOwnerTests {
         thermal.sampleAtClientStop();
         check(thermal.facts().isEmpty(), "Failed startup must have no client thermal window");
         thermal.sampleIfDue();
-        elapsed.addAndGet(29999);
+        elapsed.addAndGet(9999);
         thermal.sampleIfDue();
         check(batteryReads.get() == 1, "No sensor access between sample boundaries");
         elapsed.incrementAndGet();
@@ -291,7 +291,7 @@ public final class GameSessionOwnerTests {
         status.set(1);
         thermal.sampleAtClientStop();
         Map<String,String> facts = thermal.facts();
-        check("30020".equals(facts.get("game.thermal.elapsedMs")) &&
+        check("10000".equals(facts.get("game.thermal.intervalMs")) && "10020".equals(facts.get("game.thermal.elapsedMs")) &&
             "3".equals(facts.get("game.thermal.samples")), "Stop reading bounds the client sample window");
         check("29.6".equals(facts.get("game.thermal.batteryCelsius.start")) &&
             "37.7".equals(facts.get("game.thermal.batteryCelsius.max")) &&
@@ -300,6 +300,7 @@ public final class GameSessionOwnerTests {
         check("0".equals(facts.get("game.thermal.androidStatusCode.start")) &&
             "3".equals(facts.get("game.thermal.androidStatusCode.max")) &&
             "1".equals(facts.get("game.thermal.androidStatusCode.last")), "OS severity independent of unavailable battery");
+        check(thermal.detail().isEmpty(), "Fixture without procfs/sysfs telemetry has no detail field");
     }
 
     private static void rendererObservation() throws Exception {
