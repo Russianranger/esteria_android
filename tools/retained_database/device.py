@@ -15,7 +15,15 @@ def install(name, version):
     assert 'Success' in shell('pm', 'install', '-r', '--user', '0', path).splitlines()
     package = shell('dumpsys', 'package', PACKAGE)
     assert re.search(r'^\s*versionCode=' + str(version) + r'\b', package, re.M)
-    return installed_uid()
+    apk = shell('pm', 'path', PACKAGE).removeprefix('package:')
+    assert re.fullmatch(r'/data/app/[A-Za-z0-9_./=+~-]+/base\.apk', apk)
+    digest = shell('sha256sum', apk).split()[0]
+    assert re.fullmatch(r'[a-f0-9]{64}', digest) and digest == shell('sha256sum', path).split()[0]
+    uid = installed_uid()
+    with Path(sys.argv[1]).open('a') as out:
+        out.write(json.dumps({'phase': 'installed', 'versionCode': version, 'uid': int(uid),
+                              'installedApkSha256': digest}) + '\n')
+    return uid
 
 
 def installed_uid():
@@ -58,12 +66,13 @@ if __name__ == '__main__':
         for phase in ('debug-seed', 'debug-repair', 'debug-cold', 'debug-cold', 'debug-cold'):
             run(phase, uid)
         sys.exit(0)
-    if sys.argv[2:] == ['v23']:
-        old = install('previous.apk', 22)
-        run('seed21', old)  # Existing provider seeding fixture shared by modern baselines.
-        run('baseline22', old)
-        assert install('candidate.apk', 23) == old
-        run('reopen23', old)
+    if sys.argv[2:] in (['v23'], ['v24']):
+        candidate = int(sys.argv[2][1:])
+        old = install('previous.apk', candidate - 1)
+        run('seed-providers', old)
+        run('prepare-baseline', old)
+        assert install('candidate.apk', candidate) == old
+        run('reopen' + str(candidate), old)
         sys.exit(0)
     if sys.argv[2:] == ['v22']:
         old = install('previous.apk', 21)

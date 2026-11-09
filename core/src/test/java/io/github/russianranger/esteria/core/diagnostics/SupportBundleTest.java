@@ -38,6 +38,19 @@ public final class SupportBundleTest {
             }
         }
         if (count != 2) throw new AssertionError("missing diagnostics");
+        // Short secret values expand when redacted. Enforce the ZIP entry's
+        // UTF-8 size, keeping complete recent messages and their redactions.
+        Files.writeString(log,"pwd=x\n".repeat(11000)+"last event\n");
+        ByteArrayOutputStream expanded=new ByteArrayOutputStream();
+        SupportBundle.writeSession(expanded,facts,Map.of("client.log",log));
+        try(ZipInputStream zip=new ZipInputStream(new ByteArrayInputStream(expanded.toByteArray()))) {
+            zip.getNextEntry();
+            if(!"logs/client.log".equals(zip.getNextEntry().getName()))throw new AssertionError("client log missing");
+            byte[] tail=zip.readAllBytes();
+            String value=new String(tail,StandardCharsets.UTF_8);
+            if(tail.length>SupportBundle.MAX_LOG_BYTES || !value.startsWith("pwd=[redacted]\n")
+                || !value.endsWith("last event\n") || value.contains("pwd=x"))throw new AssertionError("expanded log tail");
+        }
         String[] accountMessages={"Account 'PRIVATE_ACCOUNT' has invalid credentials", "Banned account PRIVATE_ACCOUNT tried to login!",
             "account PRIVATE_ACCOUNT is using 'enUS' locale", "User 'PRIVATE_ACCOUNT' successfully authenticated",
             "account PRIVATE_ACCOUNT tried to login with invalid password!", "account PRIVATE_ACCOUNT got banned after failed logins",

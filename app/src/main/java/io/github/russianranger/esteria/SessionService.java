@@ -64,6 +64,7 @@ import io.github.russianranger.esteria.runtime.ServerDataToolsSetup;
 import io.github.russianranger.esteria.runtime.LocalWorldSetup;
 import io.github.russianranger.esteria.runtime.StockClientSetup;
 import io.github.russianranger.esteria.runtime.GameSession;
+import io.github.russianranger.esteria.runtime.SessionThermalDiagnostics;
 import io.github.russianranger.esteria.presentation.GamePresentationPanel;
 import java.time.Duration;
 
@@ -505,6 +506,8 @@ public final class SessionService extends Service {
                 public void failed(String code){relay.failed(code);}
                 public void clientExited(int exitCode,boolean forced){cancelled.set(true);log("Client process exited code="+exitCode+" forced="+forced+" saveQualified=false");}
             });
+        SessionThermalDiagnostics thermal = new SessionThermalDiagnostics(this);
+        Map<String,String> windowFacts = new LinkedHashMap<>();
         game=owner;lastRecoveryRequired=false;lastClientExitAcknowledged=false;
         Throwable operationFailure=null;
         try {
@@ -518,13 +521,21 @@ public final class SessionService extends Service {
             },cancelled::get);});
             rememberLogs(owner.diagnosticLogs());
             status="Local client started. Displayed login and world state have not been automatically verified.";
+            if (owner.state()==GameSession.State.CLIENT_STARTED && !cancelled.get()) {
+                thermal.sampleIfDue();
+                collectWrapperUsage(windowFacts, "game.usage.clientStart.", owner);
+            }
             while(!cancelled.get()&&owner.state()==GameSession.State.CLIENT_STARTED&&owner.isClientAlive()) {
+                thermal.sampleIfDue();
                 keepAwake();try{Thread.sleep(100);}catch(InterruptedException error){Thread.currentThread().interrupt();throw new IOException("Session worker interrupted",error);}
             }
         }catch(IOException|RuntimeException error){operationFailure=error;throw error;}
         finally {
+            thermal.sampleAtClientStop();
+            if (!windowFacts.isEmpty()) collectWrapperUsage(windowFacts, "game.usage.beforeCleanup.", owner);
+            windowFacts.putAll(thermal.facts());
             rememberLogs(owner.diagnosticLogs());
-            IOException cleanup=closeGame(owner);lastRecoveryRequired=owner.recoveryRequired();lastClientExitAcknowledged=owner.clientExitAcknowledged();
+            IOException cleanup=closeGame(owner,windowFacts);lastRecoveryRequired=owner.recoveryRequired();lastClientExitAcknowledged=owner.clientExitAcknowledged();
             if(cleanup!=null){if(operationFailure!=null)operationFailure.addSuppressed(cleanup);else throw cleanup;}
         }
         status=lastRecoveryRequired?"Session stopped. Recovery checks are required before the next launch.":"Local session stopped.";
@@ -537,7 +548,7 @@ public final class SessionService extends Service {
         if(required)report.requirePreparationInputs();
         return report;
     }
-    private IOException closeGame(GameSession.Handle owner) {
+    private IOException closeGame(GameSession.Handle owner,Map<String,String> windowFacts) {
         IOException failure=null;boolean interrupted=Thread.interrupted();
         while(owner.state()!=GameSession.State.CLOSED) {
             keepAwake();
@@ -554,8 +565,31 @@ public final class SessionService extends Service {
         rememberLogs(owner.diagnosticLogs());
         log("Game owner closed clientExitAcknowledged="+owner.clientExitAcknowledged()+" recoveryRequired="+owner.recoveryRequired()
             +" forced="+owner.wasForced()+" handoffRecoveryRequired="+owner.handoffRecoveryRequired()+" saveQualified=false");
-        getSharedPreferences("session",MODE_PRIVATE).edit().putBoolean("lastRecoveryRequired",owner.recoveryRequired())
-            .putBoolean("lastClientExitAcknowledged",owner.clientExitAcknowledged()).commit();
+        android.content.SharedPreferences.Editor session=getSharedPreferences("session",MODE_PRIVATE).edit()
+            .putBoolean("lastRecoveryRequired",owner.recoveryRequired())
+            .putBoolean("lastClientExitAcknowledged",owner.clientExitAcknowledged());
+        // The next-start cap may already have changed. Keep observations from this
+        // owner alongside its cleanup outcome, even after service/process recreation.
+        session.remove("lastSessionObservations");
+        try {
+            Map<String,String> last=new LinkedHashMap<>(windowFacts);
+            last.put("versionCode",Integer.toString(BuildConfig.VERSION_CODE));
+            last.put("operationId",operationIdForLog);
+            last.put("closedAtEpochMs",Long.toString(System.currentTimeMillis()));
+            last.put("clientExitAcknowledged",Boolean.toString(owner.clientExitAcknowledged()));
+            last.put("forced",Boolean.toString(owner.wasForced()));
+            last.put("recoveryRequired",Boolean.toString(owner.recoveryRequired()));
+            if(owner.presentation()!=null && owner.presentation().frameCap()>0) {
+                last.put("frameCap",Integer.toString(owner.presentation().frameCap()));
+                last.putAll(owner.presentation().presentationFacts());
+            }
+            String observed=new JSONObject(last).toString();
+            if(observed.length()<=8192)session.putString("lastSessionObservations",observed);
+            else log("Closed session observations exceeded the support field bound");
+        } catch(RuntimeException unavailable) {
+            log("Closed session observations unavailable: "+unavailable.getClass().getSimpleName());
+        }
+        if(!session.commit())log("Closed session diagnostics could not be persisted");
         game=null;if(interrupted)Thread.currentThread().interrupt();return failure;
     }
     private void prepareRuntime() throws IOException { prepareRuntime(true); }
@@ -980,8 +1014,15 @@ public final class SessionService extends Service {
         facts.put("support.ownedLogsRejected",Integer.toString(supportLogRejected));
         facts.put("support.ownedLogsRecoveryReason",supportLogRecoveryReason);
         GameSession.Handle gameOwner=game;
-        facts.put("game.frameCap.nextStart",String.valueOf(getSharedPreferences("game-display",MODE_PRIVATE).getInt("frameCap",30)));
-        if(gameOwner!=null && gameOwner.presentation()!=null) facts.put("game.frameCap.session",String.valueOf(gameOwner.presentation().frameCap()));
+        android.content.SharedPreferences display=getSharedPreferences("game-display",MODE_PRIVATE);
+        facts.put("game.frameCap.nextStart",String.valueOf(display.getInt("frameCap",30)));
+        facts.put("game.input.lookPercent",String.valueOf(display.getInt("lookPercent",100)));
+        String lastSession=getSharedPreferences("session",MODE_PRIVATE).getString("lastSessionObservations",null);
+        if(lastSession!=null && lastSession.length()<=8192)facts.put("game.lastSession.observations",lastSession);
+        if(gameOwner!=null && gameOwner.presentation()!=null) {
+            facts.put("game.frameCap.session",String.valueOf(gameOwner.presentation().frameCap()));
+            facts.putAll(gameOwner.presentation().presentationFacts());
+        }
         facts.put("game.retained",Boolean.toString(gameOwner!=null));
         facts.put("game.lastRecoveryRequired",Boolean.toString(lastRecoveryRequired));
         facts.put("game.lastClientExitAcknowledged",Boolean.toString(lastClientExitAcknowledged));
@@ -997,17 +1038,7 @@ public final class SessionService extends Service {
         }catch(IOException invalid){facts.put("import.serverData.selection","unavailable-or-invalid");}
         if(gameOwner!=null) {
             rememberLogs(gameOwner.diagnosticLogs());
-            for(Map.Entry<String,ProcessUsageSnapshot> sample:gameOwner.usage().entrySet()) {
-                ProcessUsageSnapshot usage=sample.getValue();
-                facts.put("game.usage."+sample.getKey(),"scope="+usage.scope()+"; flags="+usage.flags
-                    +"; visibleMembers="+usage.visibleMembers+"; scanned="+usage.scannedProcesses
-                    +"; rssCoverage="+usage.rssMeasuredMembers+"; pssCoverage="+usage.pssMeasuredMembers
-                    +"; cpuCoverage="+usage.cpuMeasuredMembers+"; windowNanos="+usage.durationNanos
-                    +"; visibleRssBytes="+optionalMetric(usage.visibleMembersRssBytes())
-                    +"; visiblePssBytes="+optionalMetric(usage.visibleMembersPssBytes())
-                    +"; visibleCpuNanos="+optionalMetric(usage.visibleMembersCpuNanos())
-                    +"; wholeGroupMembershipVerified=false; combinedBudgetQualified=false");
-            }
+            collectWrapperUsage(facts, "game.usage.", gameOwner);
             facts.put("game.state",gameOwner.state().name());
             facts.put("game.clientAlive",Boolean.toString(gameOwner.isClientAlive()));
             facts.put("game.needsExplicitForceStop",Boolean.toString(gameOwner.needsForceStop()));
@@ -1218,6 +1249,26 @@ public final class SessionService extends Service {
             SupportBundle.writeSession(output, facts, logs);
         }
         supportStatus = "Support bundle saved. It contains status and bounded, redacted logs; no game assets or databases.";
+    }
+    /** Cumulative CPU of currently visible members. Even equal counts across endpoints do not establish identity. */
+    private static void collectWrapperUsage(Map<String,String> facts, String prefix, GameSession.Handle owner) {
+        facts.put(prefix + "elapsedRealtimeMs", Long.toString(android.os.SystemClock.elapsedRealtime()));
+        try {
+            for(Map.Entry<String,ProcessUsageSnapshot> sample:owner.usage().entrySet()) {
+                ProcessUsageSnapshot usage=sample.getValue();
+                facts.put(prefix+sample.getKey(),"scope="+usage.scope()+"; flags="+usage.flags
+                    +"; visibleMembers="+usage.visibleMembers+"; scanned="+usage.scannedProcesses
+                    +"; rssCoverage="+usage.rssMeasuredMembers+"; pssCoverage="+usage.pssMeasuredMembers
+                    +"; cpuCoverage="+usage.cpuMeasuredMembers+"; startedMonotonicNanos="+usage.startedMonotonicNanos
+                    +"; windowNanos="+usage.durationNanos
+                    +"; visibleRssBytes="+optionalMetric(usage.visibleMembersRssBytes())
+                    +"; visiblePssBytes="+optionalMetric(usage.visibleMembersPssBytes())
+                    +"; visibleCpuNanos="+optionalMetric(usage.visibleMembersCpuNanos())
+                    +"; wholeGroupMembershipVerified=false; combinedBudgetQualified=false");
+            }
+        } catch (RuntimeException unavailable) {
+            facts.put(prefix + "status", "unavailable");
+        }
     }
     private static String optionalMetric(java.util.OptionalLong value){return value.isPresent()?Long.toString(value.getAsLong()):"unavailable";}
     @SuppressLint("ApplySharedPref") // Keep fixed log selection with the retained operation's recovery state.

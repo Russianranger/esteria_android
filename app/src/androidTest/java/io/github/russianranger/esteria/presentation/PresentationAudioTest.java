@@ -275,11 +275,13 @@ public final class PresentationAudioTest {
             };
             try (Frames producer = new Frames(root, false);
                  Readback first = new Readback(2, 2, handler); Readback second = new Readback(3, 1, handler);
-                 SurfaceBridge bridge = new SurfaceBridge(context, root.toFile(), events)) {
+                 SurfaceBridge bridge = new SurfaceBridge(context, root.toFile(), events, 24)) {
                 bridge.attach(first.reader.getSurface()); first.await();
                 waitFor(() -> bridge.counters()[1] > 0, 4000, "Unchanged Android frame response must be observed");
                 bridge.detach(); bridge.attach(second.reader.getSurface()); second.await();
                 waitFor(() -> bridge.counters()[0] >= 2, 4000, "Both native frame posts must complete");
+                assertTrue(Long.parseLong(bridge.presentationFacts().get("presentation.postedFrames")) >= 2);
+                assertTrue(Long.parseLong(bridge.presentationFacts().get("presentation.unchangedReads")) > 0);
                 assertNull("Surface recreation must not fail", surfaceFailure.get());
             }
             assertFalse(Files.exists(root.resolve("frame.sock")));

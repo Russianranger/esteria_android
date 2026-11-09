@@ -267,12 +267,48 @@ public final class GameSessionOwnerTests {
     }
     private static void settle(OwnedProcess child)throws Exception {long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(3);while(child.isAlive()&&System.nanoTime()<deadline)Thread.sleep(2);check(!child.isAlive(),"Known creating process owner completed actual cleanup");}
     private static void remove(Path root)throws IOException {try(var paths=Files.walk(root)){for(Path path:paths.sorted(Comparator.reverseOrder()).toArray(Path[]::new))Files.delete(path);}}
+    private static void thermalSampling() {
+        java.util.concurrent.atomic.AtomicLong elapsed = new java.util.concurrent.atomic.AtomicLong(45000);
+        AtomicInteger batteryReads = new AtomicInteger();
+        AtomicInteger status = new AtomicInteger(0);
+        SessionThermalDiagnostics thermal = new SessionThermalDiagnostics(elapsed::get, () -> {
+            switch (batteryReads.incrementAndGet()) {
+            case 1: return 296;
+            case 2: return 377;
+            default: throw new SecurityException("fixture sensor unavailable");
+            }
+        }, status::get);
+        thermal.sampleAtClientStop();
+        check(thermal.facts().isEmpty(), "Failed startup must have no client thermal window");
+        thermal.sampleIfDue();
+        elapsed.addAndGet(29999);
+        thermal.sampleIfDue();
+        check(batteryReads.get() == 1, "No sensor access between sample boundaries");
+        elapsed.incrementAndGet();
+        status.set(3);
+        thermal.sampleIfDue();
+        elapsed.addAndGet(20);
+        status.set(1);
+        thermal.sampleAtClientStop();
+        Map<String,String> facts = thermal.facts();
+        check("30020".equals(facts.get("game.thermal.elapsedMs")) &&
+            "3".equals(facts.get("game.thermal.samples")), "Stop reading bounds the client sample window");
+        check("29.6".equals(facts.get("game.thermal.batteryCelsius.start")) &&
+            "37.7".equals(facts.get("game.thermal.batteryCelsius.max")) &&
+            "unavailable".equals(facts.get("game.thermal.batteryCelsius.last")) &&
+            "2".equals(facts.get("game.thermal.batteryCelsius.availableSamples")), "Battery availability and Celsius units");
+        check("0".equals(facts.get("game.thermal.androidStatusCode.start")) &&
+            "3".equals(facts.get("game.thermal.androidStatusCode.max")) &&
+            "1".equals(facts.get("game.thermal.androidStatusCode.last")), "OS severity independent of unavailable battery");
+    }
+
     public static void main(String[] arguments)throws Exception {
         if(arguments.length==2&&arguments[0].equals("--probe-lease")) {
             try(ExclusiveFileLease lease=ExclusiveFileLease.acquire(Path.of(arguments[1]),"TEST_ONLY_BUSY")){System.exit(0);}
             catch(IOException busy){if("TEST_ONLY_BUSY".equals(busy.getMessage()))System.exit(73);throw busy;}
         }
+        thermalSampling();
         crossProcessDuplicateRefusal();gracefulFailureThenExplicitForce();naturalExit();prelaunch();typedViewLease();preservedForeignHandoff();persistentShutdownBudgets();startupCancellationHandoff();sourceCloseSequenceAndShaderSelection();
-        System.out.println("Game owner passed9 host groups: cross-JVM duplicate/refusal/release, real owners/import+view locks, explicit-force/reap/bindings, source close sequence and shader stale guards; no native/SQL/Android/gameplay run");
+        System.out.println("Game owner passed10 host groups: thermal summary/cadence, cross-JVM duplicate/refusal/release, real owners/import+view locks, explicit-force/reap/bindings, source close sequence and shader stale guards; no native/SQL/Android/gameplay run");
     }
 }

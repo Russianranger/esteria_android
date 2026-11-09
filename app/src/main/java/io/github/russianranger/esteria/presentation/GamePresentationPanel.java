@@ -114,7 +114,7 @@ public final class GamePresentationPanel extends FrameLayout {
     /** Activity.onStart/onResume forwards here; it does not create processes. */
     public void resume() { uiThread(); foreground = true; resumeView(); }
     /** Neutralize held input, detach rendering and mute audio immediately. */
-    public void pause() { uiThread(); foreground = false; pauseView(); }
+    public void pause() { uiThread(); foreground = false; keyboardRequested = false; pauseView(); }
     private void resumeView() {
         if (!foreground || !attached || !hasWindowFocus() || failed || stopRequested || game == null) return;
         try {
@@ -130,7 +130,7 @@ public final class GamePresentationPanel extends FrameLayout {
     }
     /** Detach a closed/replaced session; process shutdown remains with its owner. */
     public void unbind() {
-        uiThread(); pauseView();
+        uiThread(); keyboardRequested = false; pauseView();
         if (game != null) viewport.removeView(game);
         game = null; session = null;
     }

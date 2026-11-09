@@ -193,6 +193,18 @@ class StockReleaseBoundary(unittest.TestCase):
             release.stage(self.args)
         self.assertEqual(marker.read_text(), 'preserve')
 
+    def test_v24_release_uses_the_retained_character_start_path(self):
+        self.receipt['signedApk'].update(versionCode=24, versionName='0.1.0-non-custom.24')
+        self.write()
+        result = release.stage(self.args)
+        notes = (self.args.output / 'RELEASE-NOTES.md').read_text()
+        self.assertEqual(result['tag'], 'non-custom-v0.1.0-non-custom.24')
+        self.assertIn('Play → Start local game', notes)
+        self.assertIn('select your existing character', notes)
+        self.assertIn('Tools → Export support bundle', notes)
+        self.assertNotIn('Repair local component', notes)
+        self.assertNotIn('Import your complete ChromieCraft client', notes)
+
     def test_renderer_release_records_executable_and_preparation_revisions(self):
         tree = self.root / 'integration'
         assets = tree / 'runtime/client'

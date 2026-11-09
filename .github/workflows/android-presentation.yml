@@ -1,7 +1,7 @@
 name: Android 13 Surface, AudioTrack and IME input
 on:
   push:
-    branches: [android/client-server]
+    branches: [android/client-server, non-custom]
     paths:
       - native/presentation/**
       - native/CMakeLists.txt

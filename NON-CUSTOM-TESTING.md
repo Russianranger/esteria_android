@@ -6,9 +6,12 @@ Install the signed update over the existing Esteria Stock package. Open **Play �
 
 In game, tap the gear or press Android Back for settings. Drag the gear to move it. **Reset gear position** restores the upper-right placement. A swipe from the display edge reveals the Android system bars. The game fits the screen with its original aspect ratio.
 
-**Frame limit** defaults to 30 FPS. Choose 24 FPS for a lower render workload or 60 FPS for higher motion detail. Right-stick sensitivity applies immediately to camera and pointer controls. A frame limit change applies at the next ordinary game start at the same render resolution. Compare temperatures at the same location, brightness and fan setting over the same duration. Android thermal status and the selected cap are included in support.
+**Frame limit** defaults to 30 FPS. 24 and 60 FPS are also available. Right-stick sensitivity applies immediately to camera and pointer controls. A frame limit change applies at the next ordinary game start at the same render resolution. Compare temperatures at the same location, brightness and fan setting over the same duration. Android thermal status and the selected cap are included in support.
 
-Check movement and camera at all four screen edges. After logging out, use the gear's **Stop session** if the client is still running. From **Tools → Export support bundle**, save the ZIP. Reopen the same character offline three times and check the saved quest and position. If Start reports a component issue, use **Tools → Repair local component** for the named component only.
+1. Note the installed stock version in Android App info. In the world, try taps at the four corners of the game image. Drag the gear, tap it to open settings, adjust right-stick sensitivity and try the stick immediately. Check **Reset gear position**, Android Back, **Open keyboard**, dismissal and input after returning from Home.
+2. For a repeatable heat check, use **30 FPS**, the existing resolution, the same location and camera view, and ten minutes with unchanged brightness, fan mode and charging state. Record those settings. The stock chat command `/run print(GetFramerate())` displays the engine's recent frame rate. Take readings around minutes 2, 5 and 10. If you use a temperature overlay, include its sensor label. Android thermal severity, battery temperature, engine FPS and Android surface posts measure different things.
+3. Log out normally, stop the local session from the gear if needed and wait for **Local session stopped**. Choose **Tools → Export support bundle → Downloads → Save** before starting another session. Open the ZIP and send it with the observed FPS and fan setting. The v24 export retains the last session's presentation and thermal measurements after shutdown.
+4. Turn on airplane mode and explicitly turn Wi-Fi off. After each clean stop, close Esteria from Recents. Cold-open **Play → Start local game** three times. On each launch select the same saved character, check its quest and position, then log out and stop cleanly. Note any preparation, download or fallback message verbatim. If the app reports recovery, export before retrying and leave that cycle out of the success count.
 
 ## Earlier v22 recovery procedure
 
@@ -25,7 +28,7 @@ Use **Prepare / fully verify local runtime and world** for an explicit full audi
 
 ## Verify the normal session and retained state
 
-Use the managed local login. Create an ordinary **Human Warrior**, enter the stock starting area, and check rendering, movement, camera, touch/controller input and basic interaction/combat. Keep the existing resolution.
+Use the managed local login and the existing saved character on a working installation. New-character creation belongs to disposable validation realms. Keep the existing resolution.
 
 Exit normally and wait for **Local session stopped**. Reopen the same character and confirm location/progress. Enable airplane mode and disable Wi-Fi, then perform **three cold relaunches**, stopping the app between cleanly closed sessions without clearing data. Each must preserve the same character and avoid extraction, client copying or runtime downloading.
 

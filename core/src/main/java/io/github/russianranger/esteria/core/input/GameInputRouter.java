@@ -118,11 +118,16 @@ public final class GameInputRouter {
     public void touch(float x, float y, int viewWidth, int viewHeight, int frameWidth, int frameHeight, boolean down) throws IOException {
         if (!Float.isFinite(x) || !Float.isFinite(y) || viewWidth <= 0 || viewHeight <= 0 || frameWidth <= 0 || frameHeight <= 0)
             throw new IOException("Presentation geometry is unavailable");
-        int px = Math.max(0, Math.min(frameWidth - 1, (int)(x * frameWidth / viewWidth)));
-        int py = Math.max(0, Math.min(frameHeight - 1, (int)(y * frameHeight / viewHeight)));
+        int px = frameCoordinate(x, viewWidth, frameWidth);
+        int py = frameCoordinate(y, viewHeight, frameHeight);
         touchMask = down ? 1 : 0;
         int next = desiredButtons();
         sink.pointer(px, py, next); mouseMask = next;
+    }
+    private static int frameCoordinate(float coordinate, int viewSize, int frameSize) {
+        if (viewSize == 1) return 0;
+        float fraction = Math.max(0, Math.min(1, coordinate / (viewSize - 1)));
+        return Math.round(fraction * (frameSize - 1));
     }
     /** Call on focus loss, controller removal, cancellation, pause and shutdown. */
     public void release() throws IOException {

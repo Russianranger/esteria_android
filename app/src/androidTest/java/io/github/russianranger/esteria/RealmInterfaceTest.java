@@ -68,6 +68,12 @@ public final class RealmInterfaceTest {
                     assertEquals(1,opens.get());
                     measure(second,320,600);
                     assertTrue(restored.getX()>=0 && restored.getX()+restored.getWidth()<=320);
+                    assertTrue(restored.getY()>=0 && restored.getY()+restored.getHeight()<=600);
+                    restored.resetPosition();
+                    assertEquals(.97f*(320-restored.getWidth()),restored.getX(),1f);
+                    assertEquals(.08f*(600-restored.getHeight()),restored.getY(),1f);
+                    assertTrue(restored.performClick());
+                    assertEquals(2,opens.get());
                 }finally{gear.resetPosition();content.removeView(frame);}
             });
         }finally{test.runOnMainSync(screen::finish);}

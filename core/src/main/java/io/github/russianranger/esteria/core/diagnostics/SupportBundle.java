@@ -98,6 +98,14 @@ public final class SupportBundle {
         }
     }
     private static void entry(ZipOutputStream zip, String path, String content) throws IOException {
-        zip.putNextEntry(new ZipEntry(path)); zip.write(content.getBytes(StandardCharsets.UTF_8)); zip.closeEntry();
+        byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
+        int start = Math.max(0, bytes.length - MAX_LOG_BYTES);
+        // Redaction (and replacement of malformed UTF-8) can expand an input tail.
+        // Keep complete lines at the end, with the same byte ceiling on the archive.
+        if (start > 0 && bytes[start - 1] != '\n')
+            while (start < bytes.length && bytes[start++] != '\n') { }
+        zip.putNextEntry(new ZipEntry(path));
+        zip.write(bytes, start, bytes.length - start);
+        zip.closeEntry();
     }
 }

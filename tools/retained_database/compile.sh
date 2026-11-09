@@ -15,8 +15,8 @@ stub.write_text('package io.github.russianranger.esteria; public final class Bui
 PY
 platform="$ANDROID_HOME/platforms/android-35/android.jar"
 javac --release 17 -implicit:none -cp "$platform" -sourcepath "app/src/main/java:core/src/main/java:$work/generated" \
-    -d "$work/classes" tools/retained_database/SignedDatabaseUpdate.java
-if find "$work/classes" -type f ! -name 'SignedDatabaseUpdate*.class' | grep -q .; then
+    -d "$work/classes" tools/retained_database/{SignedDatabaseUpdate,PostStopExportFixture}.java
+if find "$work/classes" -type f ! -name 'SignedDatabaseUpdate*.class' ! -name 'PostStopExportFixture.class' | grep -q .; then
     echo "Unexpected product class in observer DEX" >&2
     exit 1
 fi

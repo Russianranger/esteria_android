@@ -134,7 +134,7 @@ jobs:
         with:
           name: signed-retained-update-input
           path: signed-input
-      - name: Verify the retained v22 database and signed v23 replacement on offline Android 13 ARM64
+      - name: Verify the retained v23 database and signed v24 replacement on offline Android 13 ARM64
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -143,26 +143,26 @@ jobs:
           work=$(mktemp -d "$RUNNER_TEMP/signed-retained.XXXXXXXX")
           mkdir -p "$work/input" evidence
           cp signed-input/* "$work/input/"
-          for asset in '724739530 previous.apk' '692421785 wine.tar.gz'; do
+          for asset in '725132107 previous.apk' '692421785 wine.tar.gz'; do
             read -r id name <<< "$asset"
             curl --fail --location --silent --show-error --retry 3 --max-time 600               -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/octet-stream'               "https://api.github.com/repos/Russianranger/esteria_android/releases/assets/$id?run=$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" -o "$work/input/$name"
           done
           unset GH_TOKEN
-          echo "15f9241a643a37c7786723631cf9ef315ba657df933bc2d96c58a23207d6042b  $work/input/previous.apk" | sha256sum -c
+          echo "fc0e04d96eb51766cdfb7dc576cdbe9d4149e9a5c0228d4eb8e0ac4670c75ff5  $work/input/previous.apk" | sha256sum -c
           wine=$(jq -r '.packages["wine-arm64"].archive.sha256' runtime/runtime-sources.lock.json)
           echo "$wine  $work/input/wine.tar.gz" | sha256sum -c
           chmod 755 "$work/input"
           chmod 644 "$work/input/"*
           trap 'redroid_stop "$work"' EXIT
           redroid_start "$work"
-          python3 tools/retained_database/device.py evidence/signed-update.jsonl v23
+          python3 tools/retained_database/device.py evidence/signed-update.jsonl v24
           # Disposable package with synthetic SQL. Capture only the launcher's original artwork.
           docker exec "$redroid_name" pm grant io.github.russianranger.esteria.stock android.permission.POST_NOTIFICATIONS
           if ! command -v tesseract >/dev/null || ! /usr/bin/python3 -c 'from PIL import Image'; then
             sudo apt-get update -qq
             sudo apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-eng python3-pil
           fi
-          /usr/bin/python3 tools/retained_database/launcher_export.py
+          /usr/bin/python3 tools/retained_database/launcher_export.py 24
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

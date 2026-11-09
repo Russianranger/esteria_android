@@ -94,6 +94,33 @@ public final class PcmProtocolTests {
             catch (IOException expected) { /* Correct fixed protocol rejection. */ }
         }
         groups++;
+        PresentationSamples samples = new PresentationSamples();
+        long[] nativeFrame = {1280, 720, 2_000_000, 8_000_000, 1_000_000, 1280 * 720 * 4};
+        // The first reply is a fresh baseline. An unchanged response still advances observation time;
+        // its old JNI buffer must never count as another copy or capture timing.
+        samples.reply(true, 10_000_000, -1, nativeFrame);
+        samples.reply(false, 30_000_000, -1, nativeFrame);
+        for (int i = 0; i < 18; i++) samples.reply(true, 40_000_000, 40_000_000, nativeFrame);
+        samples.reply(true, 240_000_000, 240_000_000, nativeFrame);
+        // New attachment after a pause, followed by a long frame. Paused time is excluded.
+        samples.reply(true, 20_000_000, -1, nativeFrame);
+        samples.reply(true, 280_100_000, 280_100_000, nativeFrame);
+        java.util.Map<String,String> facts = samples.facts();
+        check(facts.get("presentation.postIntervals").equals("20"));
+        check(facts.get("presentation.postIntervalP50UpperMs").equals("40"));
+        check(facts.get("presentation.postIntervalP95UpperMs").equals("240"));
+        check(facts.get("presentation.postIntervalMaxMs").equals("281"));
+        check(facts.get("presentation.postsPerSecond").equals("16.92"));
+        check(facts.get("presentation.observedMs").equals("1300"));
+        check(facts.get("presentation.changedCaptureMs").equals("44"));
+        check(facts.get("presentation.unchangedReads").equals("1"));
+        check(samples.counters()[2] == 22L * 1280 * 720 * 4);
+        check(!new PresentationSamples().facts().containsKey("presentation.postsPerSecond"));
+        check(PresentationSamples.requestDelayNanos(24, 0, 10_000_000) == 31_666_666);
+        check(PresentationSamples.requestDelayNanos(24, 0, 42_000_000) == 0);
+        check(PresentationSamples.requestDelayNanos(30, 0, 10_000_000) == 0);
+        check(PresentationSamples.requestDelayNanos(60, 0, 10_000_000) == 0);
+        groups++;
         System.out.println("Presentation protocol groups passed: " + groups);
     }
 }

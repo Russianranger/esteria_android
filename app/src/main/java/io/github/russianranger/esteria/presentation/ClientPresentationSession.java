@@ -181,7 +181,7 @@ public final class ClientPresentationSession implements AutoCloseable {
         surface=new SurfaceBridge(context,endpoints.toFile(),new SurfaceBridge.Events(){
             public void frameSize(int width,int height){if(!closing.get()&&events!=null)events.frameSize(width,height);}
             public void failed(String reason){fail("presentation-frame-failed");}
-        });
+        }, frameCap);
         check();ready=true;
         monitor=new Thread(()->{
             try {
@@ -333,6 +333,7 @@ public final class ClientPresentationSession implements AutoCloseable {
         });
     }
     public int frameCap(){return frameCap;}
+    public Map<String,String> presentationFacts(){return surface == null ? Map.of() : surface.presentationFacts();}
     private static Map<String,String> clientEnvironment(Map<String,String> presentation,Map<String,String> view,
             String contentProfile,boolean localLogin) {
         Map<String,String> environment=new java.util.TreeMap<>(presentation);

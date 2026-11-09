@@ -33,6 +33,7 @@ INPUT_FLAGS = ('realWidgetSurfaceReady', 'touchKeyboardOpenedAndHidden', 'editor
                'plain64AndShiftedCapVerified', 'backAndPauseDiscardedDraft', 'controllerKeyEventsVerified',
                'controllerKeyEventsConstructed', 'controllerRemovalCallbackConstructed',
                'controllerRemovalReleased', 'controllerModeAndPauseReleased', 'touchPointerAndCancelVerified',
+               'fourWidgetCornersVerified', 'deferredImeOnSurfaceReattach', 'externalImeDismissalRestoredInput',
                'recordingSinkOnly')
 INPUT_UNQUALIFIED = ('androidWineExecuted', 'x11GuestExecuted', 'inputBridgeSocketExecuted',
                      'physicalControllerQualified', 'productionPresentationPanelSessionQualified',

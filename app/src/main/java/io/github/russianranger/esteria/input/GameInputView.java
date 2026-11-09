@@ -2,6 +2,7 @@ package io.github.russianranger.esteria.input;
 
 import android.content.Context;
 import android.hardware.input.InputManager;
+import android.os.Build;
 import android.text.InputType;
 import android.view.Choreographer;
 import android.view.InputDevice;
@@ -10,6 +11,7 @@ import android.view.KeyCharacterMap;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.WindowInsets;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
@@ -31,6 +33,7 @@ public final class GameInputView extends SurfaceView implements SurfaceHolder.Ca
     private final InputManager inputs;
     private int frameWidth, frameHeight, controller = -1, touch = -1;
     private boolean attached, ticking, failed, keyboard, surfaceReady, writerAttached, sessionPaused;
+    private boolean keyboardRequested, imeWasVisible;
     private long keyboardGeneration;
     private long previousFrame;
     public GameInputView(Context context, InputSink sink, SurfaceBridge presentation, Events events) {
@@ -47,7 +50,7 @@ public final class GameInputView extends SurfaceView implements SurfaceHolder.Ca
         if (width <= 0 || height <= 0 || width > 1280 || height > 768 || (long)width * height > 1280 * 720) {
             fail("Invalid game frame geometry"); return;
         }
-        frameWidth = width; frameHeight = height; startTick();
+        frameWidth = width; frameHeight = height; openPendingKeyboard(); startTick();
     }
     private interface Action { void run() throws IOException; }
     private boolean act(Action action) {
@@ -58,7 +61,7 @@ public final class GameInputView extends SurfaceView implements SurfaceHolder.Ca
     }
     private void fail(String reason) {
         if (failed) return;
-        failed = true; keyboard = false; keyboardGeneration++; stopTick();
+        failed = true; invalidateKeyboard(); stopTick();
         try { sink.releaseAll(); } catch (IOException ignored) { /* Broken transport also releases on guest EOF. */ }
         if (events != null) events.failed(reason == null ? "Game input failed" : reason);
     }
@@ -73,24 +76,34 @@ public final class GameInputView extends SurfaceView implements SurfaceHolder.Ca
     private void detachPresentation() { writerAttached = false; presentation.detach(); }
     private void neutralize(boolean cancelKeyboard) {
         stopTick(); touch = -1;
-        if (cancelKeyboard) { keyboard = false; keyboardGeneration++; }
+        if (cancelKeyboard) invalidateKeyboard();
         act(router::release);
     }
     public void showKeyboard() {
-        if (sessionPaused || failed || !attached || !surfaceReady || frameWidth == 0 || !hasWindowFocus()) {
+        if (sessionPaused || failed || !attached) {
             if (events != null) events.rejected("Game input is suspended"); return;
         }
+        // Closing the settings dialog reattaches the Surface. Its first frame arrives asynchronously.
+        keyboardRequested = true;
+        openPendingKeyboard();
+    }
+    private void openPendingKeyboard() {
+        if (!keyboardRequested || !controlsReady()) return;
         neutralize(true); if (failed) return;
         keyboard = true; keyboardGeneration++; requestFocus();
         InputMethodManager ime = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         if (ime != null) ime.restartInput(this);
         if (ime == null || !ime.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)) {
-            keyboard = false; keyboardGeneration++; startTick();
+            invalidateKeyboard(); startTick();
             if (events != null) events.rejected("Software keyboard is unavailable");
         }
     }
+    private void invalidateKeyboard() {
+        keyboardRequested = keyboard = imeWasVisible = false;
+        keyboardGeneration++;
+    }
     public void hideKeyboard() {
-        keyboard = false; keyboardGeneration++;
+        invalidateKeyboard();
         InputMethodManager ime = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         if (ime != null) ime.hideSoftInputFromWindow(getWindowToken(), 0);
         startTick();
@@ -114,7 +127,15 @@ public final class GameInputView extends SurfaceView implements SurfaceHolder.Ca
     }
     @Override public void onWindowFocusChanged(boolean focus) {
         super.onWindowFocusChanged(focus);
-        if (focus) startTick(); else neutralize(true);
+        if (focus) { openPendingKeyboard(); startTick(); } else neutralize(true);
+    }
+    @Override public WindowInsets onApplyWindowInsets(WindowInsets insets) {
+        if (keyboard && Build.VERSION.SDK_INT >= 30) {
+            boolean visible = insets.isVisible(WindowInsets.Type.ime());
+            if (imeWasVisible && !visible) { invalidateKeyboard(); startTick(); }
+            imeWasVisible = visible;
+        }
+        return super.onApplyWindowInsets(insets);
     }
     private boolean controlsReady() {
         return attached && surfaceReady && writerAttached && frameWidth > 0 && !failed && !keyboard && !sessionPaused && hasWindowFocus();

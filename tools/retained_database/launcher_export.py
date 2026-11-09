@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import re
 import subprocess
+import sys
 import time
 import zipfile
 
@@ -89,6 +90,7 @@ def completed_export():
 
 
 def main():
+    version=int(sys.argv[1]) if len(sys.argv)>1 else 23
     android_tool('input','keyevent','KEYCODE_WAKEUP')
     shell('wm','dismiss-keyguard')
     shell('cmd','activity','start-activity','-W','-n',PACKAGE+'/io.github.russianranger.esteria.MainActivity')
@@ -113,10 +115,24 @@ def main():
         assert 'status.txt' in names and 'logs/launcher.log' in names
         assert all(n=='status.txt' or re.fullmatch(r'logs/[A-Za-z0-9._-]+\.log',n) for n in names)
         status=z.read('status.txt').decode()
-        assert 'app.versionCode=23\n' in status and 'game.frameCap.nextStart=30\n' in status
+        assert f'app.versionCode={version}\n' in status and 'game.frameCap.nextStart=30\n' in status
         omitted=int(re.search(r'^support.omittedFacts=(\d+)$',status,re.M).group(1))
+        if version>=24:
+            assert 'game.input.lookPercent=150\n' in status and 'game.retained=false\n' in status
+            assert 'support.ownedLogsRejected=0\n' in status
+            assert 'logs/game.database.stdout.log' in names and 'logs/game.database.stderr.log' in names
+            assert b'fixture cleanup check: observed SQL stop\n' in z.read('logs/launcher.log')
+            client=z.read('logs/game.presentation.client.stdout.log')
+            world=z.read('logs/game.server.worldserver.log')
+            assert client.endswith(b'fixture client logout tail\n') and b'old client marker' not in client
+            assert b'pwd=[redacted]' in client and b'pwd=x' not in client
+            assert world==b'password=[redacted]\nfixture world stop tail\n'
+            assert all(z.getinfo(n).file_size<=65536 for n in names if n.startswith('logs/'))
+            assert len(status.encode())<=262144
     Path('evidence/export-counts.json').write_text(json.dumps(dict(
-        versionCode=23,route='visible launcher and Android DocumentsUI on disposable Android 13 ARM64',
+        versionCode=version,route='visible launcher and Android DocumentsUI on disposable Android 13 ARM64',
+        logInput='cleanly stopped SQL plus synthetic client, world and cleanup markers' if version>=24 else 'launcher',
+        logRoles=sorted(n for n in names if n.startswith('logs/')),
         zipBytes=len(archive),entries=len(names),metadataBytes=len(status.encode()),omittedFacts=omitted))+'\n')
 
 

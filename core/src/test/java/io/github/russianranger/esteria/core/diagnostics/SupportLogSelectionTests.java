@@ -116,8 +116,43 @@ public final class SupportLogSelectionTests {
         }finally{remove(root);}
     }
     private static void remove(Path root)throws IOException {try(var paths=Files.walk(root)){for(Path path:paths.sorted(Comparator.reverseOrder()).toArray(Path[]::new))Files.delete(path);}}
+    private static void exportRecoveredSession()throws IOException {
+        Path root=Files.createTempDirectory("esteria-poststop-export-").toRealPath();
+        try {
+            Map<String,Path> owned=roles(root);
+            // Setup and gameplay SQL helpers own different operations.
+            owned.replaceAll((name,path)->name.startsWith("setup.mysql.")
+                ? root.resolve(root.relativize(path).toString().replace(OP,"c".repeat(32))) : path);
+            String saved=SupportLogSelection.encodePreference(root,owned);
+            Map<String,Path> selected=new LinkedHashMap<>(SupportLogSelection.recoverPreference(root,saved).logs);
+            for(String base:List.of("launcher","database","authserver","worldserver","client"))
+                selected.put(base+".log",root.resolve("state/logs/"+base+".log"));
+            for(var role:selected.entrySet()) {
+                Files.createDirectories(role.getValue().getParent());
+                Files.writeString(role.getValue(),"password=fixture-only\nclosed "+role.getKey()+"\n");
+            }
+            Map<String,String> facts=new LinkedHashMap<>();
+            for(int i=0;i<254;i++)facts.put("runtime.manifest.fixture"+i,"inventory");
+            facts.put("game.frameCap.nextStart","60");
+            facts.put("game.lastSession.observations","{\"frameCap\":\"30\"}");
+            facts.put("game.lastClientExitAcknowledged","true");
+            Path archive=root.resolve("support.zip");
+            SupportBundle.writeSession(Files.newOutputStream(archive),facts,selected);
+            try(var zip=new java.util.zip.ZipFile(archive.toFile())) {
+                check(zip.size()==34,"status and all concrete log roles");
+                String status=new String(zip.getInputStream(zip.getEntry("status.txt")).readAllBytes(),java.nio.charset.StandardCharsets.UTF_8);
+                check(status.contains("support.omittedFacts=2\n") && status.contains("game.lastSession.observations={\"frameCap\":\"30\"}\n")
+                    && status.contains("game.frameCap.nextStart=60\n") && status.contains("game.lastClientExitAcknowledged=true\n"),
+                    "stopped session settings and outcome survive a bounded export");
+                for(String name:selected.keySet()) {
+                    String body=new String(zip.getInputStream(zip.getEntry("logs/"+name)).readAllBytes(),java.nio.charset.StandardCharsets.UTF_8);
+                    check(body.equals("password=[redacted]\nclosed "+name+"\n"),"redacted tail for "+name);
+                }
+            }
+        } finally {remove(root);}
+    }
     public static void main(String[] arguments)throws Exception {
-        roundTripAndRotation();badMetadata();privatePathsAndSymlinks();independentRecovery();
+        roundTripAndRotation();badMetadata();privatePathsAndSymlinks();independentRecovery();exportRecoveredSession();
         System.out.println("Support log selection passed4 actual filesystem metadata groups:28 fixed roles, missing/rotated roundtrip, bounds/private/foreign/traversal/symlink refusal, independently validated recovery; no log bytes read by selector");
     }
 }

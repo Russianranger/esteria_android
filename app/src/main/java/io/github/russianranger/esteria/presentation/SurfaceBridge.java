@@ -7,13 +7,16 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.ParcelFileDescriptor;
 import android.view.Surface;
+import io.github.russianranger.esteria.core.presentation.PresentationSamples;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 
 /** Real private X11 readback into ANativeWindow. This does not start a display or client. */
 public final class SurfaceBridge implements AutoCloseable {
@@ -28,9 +31,14 @@ public final class SurfaceBridge implements AutoCloseable {
     private Run active;
     private final List<Run> workers = new ArrayList<>();
     private boolean closed;
-    private long frames, unchanged, pixelBytes, captureNanos, receiveNanos, surfaceNanos;
+    private final PresentationSamples samples = new PresentationSamples();
+    private final int frameCap;
 
     public SurfaceBridge(Context context, File sessionDirectory, Events events) throws IOException {
+        this(context, sessionDirectory, events, 30);
+    }
+    public SurfaceBridge(Context context, File sessionDirectory, Events events, int frameCap) throws IOException {
+        this.frameCap = frameCap;
         directory = BridgePaths.directory(context, sessionDirectory);
         this.events = events;
         try { System.loadLibrary("esteria-presentation"); }
@@ -66,6 +74,7 @@ public final class SurfaceBridge implements AutoCloseable {
         }
         void cancel() {
             cancelled = true;
+            LockSupport.unpark(thread);
             LocalSocket local = socket;
             if (local != null) try { local.shutdownInput(); local.shutdownOutput(); local.close(); }
             catch (IOException ignored) { try { local.close(); } catch (IOException alsoClosed) { /* Already stopped. */ } }
@@ -91,14 +100,29 @@ public final class SurfaceBridge implements AutoCloseable {
                     try (ParcelFileDescriptor descriptor = ParcelFileDescriptor.dup(local.getFileDescriptor())) {
                         ByteBuffer pixels = ByteBuffer.allocateDirect(CACHE_BYTES);
                         long[] stats = new long[6]; int width = 0, height = 0;
+                        long lastRequest = 0, lastReply = 0, lastPost = 0;
+                        boolean haveReply = false, havePost = false;
                         while (current(this) && !cancelled && surface.isValid()) {
-                            int result = receiveFrame(surface, descriptor.getFd(), pixels, stats);
-                            if (result == 1) { synchronized (SurfaceBridge.this) { unchanged++; } continue; }
-                            if (result != 0) throw new IOException("Presentation transport failed: " + result);
-                            synchronized (SurfaceBridge.this) {
-                                frames++; pixelBytes += stats[5]; captureNanos += stats[2];
-                                receiveNanos += stats[3]; surfaceNanos += stats[4];
+                            if (haveReply && frameCap == 24) {
+                                long delay;
+                                while (!cancelled && (delay = PresentationSamples.requestDelayNanos(
+                                        frameCap, lastRequest, System.nanoTime())) > 0) {
+                                    LockSupport.parkNanos(delay);
+                                    if (Thread.interrupted()) throw new InterruptedException();
+                                }
+                                if (cancelled || !current(this) || !surface.isValid()) break;
                             }
+                            lastRequest = System.nanoTime();
+                            int result = receiveFrame(surface, descriptor.getFd(), pixels, stats);
+                            long completed = System.nanoTime();
+                            if (result != 0 && result != 1) throw new IOException("Presentation transport failed: " + result);
+                            samples.reply(result == 0, completed - (haveReply ? lastReply : lastRequest),
+                                    havePost ? completed - lastPost : -1, stats);
+                            lastReply = completed;
+                            haveReply = true;
+                            if (result == 1) continue;
+                            lastPost = completed;
+                            havePost = true;
                             if (width != stats[0] || height != stats[1]) {
                                 width = (int)stats[0]; height = (int)stats[1];
                                 int w = width, h = height;
@@ -114,7 +138,8 @@ public final class SurfaceBridge implements AutoCloseable {
         }
     }
     /** Fixed numeric counters only; no captured pixels are retained in diagnostics. */
-    public synchronized long[] counters() { return new long[]{frames, unchanged, pixelBytes, captureNanos, receiveNanos, surfaceNanos}; }
+    public long[] counters() { return samples.counters(); }
+    public Map<String,String> presentationFacts() { return samples.facts(); }
     /** Call off the UI thread. Failure to stop remains an error, never a successful cleanup. */
     @Override public void close() throws IOException {
         List<Run> pending;

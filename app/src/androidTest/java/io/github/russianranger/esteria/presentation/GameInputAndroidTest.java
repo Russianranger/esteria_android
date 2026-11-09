@@ -179,6 +179,12 @@ public final class GameInputAndroidTest {
                         "The real Surface must receive a frame before input is admitted");
                 GameInputView display=view.get();Button button=keyboard.get();
 
+                int[] bounds=ui(()->new int[]{display.getWidth()-1,display.getHeight()-1});
+                for(int x:new int[]{0,1})for(int y:new int[]{0,1}) {
+                    touch(display,MotionEvent.ACTION_DOWN,x*bounds[0],y*bounds[1]);
+                    ui(()->{assertEquals(x,sink.pointerX);assertEquals(y,sink.pointerY);assertEquals(1,sink.mask);return null;});
+                    touch(display,MotionEvent.ACTION_UP,x*bounds[0],y*bounds[1]);
+                }
                 InputConnection done=open(button,display);
                 ui(()->{sink.drain();assertTrue(done.setComposingText("Ab",1));assertTrue(sink.queue.isEmpty());
                     assertFalse(done.performEditorAction(EditorInfo.IME_ACTION_SEARCH));
@@ -282,6 +288,25 @@ public final class GameInputAndroidTest {
                 touch(display,MotionEvent.ACTION_CANCEL,0,0);
                 ui(()->{assertEquals(0,sink.mask);assertTrue(sink.held.isEmpty());return null;});
 
+                // Settings returns focus and asks for the IME before the new Surface's
+                // frame-size callback can run on the UI thread.
+                ui(()->{
+                    int before=rejections.get();display.pauseInput();display.resumeInput();display.showKeyboard();
+                    assertEquals(before,rejections.get());return null;
+                });
+                waitFor(()->ui(()->imeVisible(display)),"The deferred request must open the real IME on the next frame");
+                InputConnection dismissed=ui(()->{
+                    InputConnection input=display.onCreateInputConnection(new EditorInfo());
+                    assertTrue(input.setComposingText("discard",1));
+                    display.getWindowInsetsController().hide(WindowInsets.Type.ime());
+                    return input;
+                });
+                hidden(display);
+                instrumentation.waitForIdleSync();
+                touch(display,MotionEvent.ACTION_DOWN,0,0);
+                ui(()->{assertEquals(1,sink.mask);assertFalse(dismissed.finishComposingText());return null;});
+                touch(display,MotionEvent.ACTION_UP,0,0);
+
                 InputConnection paused=open(button,display);
                 ui(()->{sink.drain();assertTrue(paused.setComposingText("discard",1));display.pauseInput();display.hideKeyboard();
                     assertFalse(paused.finishComposingText());assertFalse(paused.performEditorAction(EditorInfo.IME_ACTION_DONE));
@@ -299,6 +324,8 @@ public final class GameInputAndroidTest {
                     .put("backAndPauseDiscardedDraft",true).put("controllerKeyEventsVerified",true).put("controllerRemovalReleased",true)
                     .put("controllerKeyEventsConstructed",true).put("controllerRemovalCallbackConstructed",true)
                     .put("controllerModeAndPauseReleased",true).put("touchPointerAndCancelVerified",true)
+                    .put("fourWidgetCornersVerified",true).put("deferredImeOnSurfaceReattach",true)
+                    .put("externalImeDismissalRestoredInput",true)
                     .put("recordingSinkOnly",true).put("androidWineExecuted",false).put("x11GuestExecuted",false)
                     .put("inputBridgeSocketExecuted",false).put("registeredControllerAvailable",registeredController)
                     .put("registeredControllerUnavailableReason",unavailableController)

@@ -1,0 +1,99 @@
+{
+  "scope": "Linux x86-64 host controlled timing and capture tests",
+  "clientRevision": "c05a3af9be6c204c40d65d0e3eb6ccc2442012b6",
+  "engineLimiter": {
+    "method": "Exact CVGxMaxFPSCallback, CVGxMaxFPSBkCallback, Gx getters/setters and CGxDevice::WaitForFPSCap compiled with POSIX monotonic millisecond timer and sleeping. Ninety successive intervals with no render workload.",
+    "results": [
+      {
+        "selectedCap": 24,
+        "foreground": true,
+        "observedHz": 24.32,
+        "p50Ms": 41.1,
+        "p95Ms": 41.27
+      },
+      {
+        "selectedCap": 30,
+        "foreground": true,
+        "observedHz": 30.2,
+        "p50Ms": 33.09,
+        "p95Ms": 33.24
+      },
+      {
+        "selectedCap": 60,
+        "foreground": true,
+        "observedHz": 62.13,
+        "p50Ms": 16.09,
+        "p95Ms": 16.14
+      },
+      {
+        "selectedCap": 30,
+        "foreground": false,
+        "observedHz": 15.13,
+        "p50Ms": 66.09,
+        "p95Ms": 66.16
+      }
+    ]
+  },
+  "presentation": {
+    "method": "Production native/guest-bridges/x11_frame.c consume loop, actual copies, equality comparison and Linux Unix stream socketpair. A 1280x720 memory-backed XGetImage source changed one pixel at the given animation rate. Host Java consumer used the production request delay and histogram. Each condition ran six seconds. Changed reply times were measured after host receipt.",
+    "cases": [
+      {
+        "sourceAnimationHz": 30,
+        "requestedHz": 30,
+        "readbacks": 181,
+        "changed": 181,
+        "unchanged": 0,
+        "observedMs": 6028,
+        "pixelBytes": 667238400,
+        "changedReplyP50UpperMs": 34,
+        "changedReplyP95UpperMs": 35
+      },
+      {
+        "sourceAnimationHz": 24,
+        "requestedHz": 30,
+        "readbacks": 181,
+        "changed": 145,
+        "unchanged": 36,
+        "observedMs": 6020,
+        "pixelBytes": 534528000,
+        "changedReplyP50UpperMs": 34,
+        "changedReplyP95UpperMs": 68
+      },
+      {
+        "sourceAnimationHz": 24,
+        "requestedHz": 24,
+        "readbacks": 145,
+        "changed": 145,
+        "unchanged": 0,
+        "observedMs": 6025,
+        "pixelBytes": 534528000,
+        "changedReplyP50UpperMs": 42,
+        "changedReplyP95UpperMs": 43
+      },
+      {
+        "sourceAnimationHz": 0,
+        "requestedHz": 30,
+        "readbacks": 181,
+        "changed": 1,
+        "unchanged": 180,
+        "observedMs": 6019,
+        "pixelBytes": 3686400
+      },
+      {
+        "sourceAnimationHz": 0,
+        "requestedHz": 24,
+        "readbacks": 145,
+        "changed": 1,
+        "unchanged": 144,
+        "observedMs": 6018,
+        "pixelBytes": 3686400
+      }
+    ]
+  },
+  "physicalDevice": {
+    "graphicsClientExecuted": false,
+    "thorFps": null,
+    "thorTemperatureC": null,
+    "engineGpuTimeMeasured": false
+  }
+}

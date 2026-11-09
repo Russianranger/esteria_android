@@ -38,6 +38,17 @@ public final class GameInputRouterTest {
         router.touch(500,-5,400,200,800,400,true);check(sink.x==799&&sink.y==0,"touch coordinates clamp");
         router.button(GameInputRouter.Button.A,false);check(sink.mask==1,"touch retains its click source");
         router.touch(0,0,400,200,800,400,false);check(sink.mask==0,"all click sources release");
+        for(int[] view:new int[][]{{800,450},{1280,720},{1920,1080}}) {
+            for(int x:new int[]{0,1})for(int y:new int[]{0,1}) {
+                router.touch(x*(view[0]-1),y*(view[1]-1),view[0],view[1],1280,720,false);
+                check(sink.x==x*1279 && sink.y==y*719,"every viewport corner reaches the guest edge");
+            }
+        }
+        router.sticks(0,0,1,0,0,0);
+        router.setLookPercent(75);original=sink.dx;router.step(.04);
+        check(sink.dx-original==21 && sink.mask==0,"precise pointer sensitivity on the next tick");
+        router.setLookPercent(150);original=sink.dx;router.step(.04);
+        check(sink.dx-original==42 && sink.mask==0,"fast pointer sensitivity on the next tick");
         router.sticks(0,-1,0,0,0,0);check(sink.keys.contains(0xff52),"cursor movement navigates menus");
         router.release();check(sink.keys.isEmpty()&&sink.mask==0,"focus loss neutralizes");
         sink.events.clear();KeyboardText.commit(sink,"Az!\n");

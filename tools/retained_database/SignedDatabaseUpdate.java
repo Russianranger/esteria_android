@@ -69,7 +69,7 @@ public final class SignedDatabaseUpdate {
             if(event.startsWith("database-")||event.startsWith("installation-"))
                 System.out.println("ESTERIA_PHASE "+event+" elapsedMs="+TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-start));
         };
-        boolean seed=phase.equals("seed19") || phase.equals("seed21");
+        boolean seed=phase.equals("seed19") || phase.equals("seed21") || phase.equals("seed-providers");
         if(seed) {
             require(!Files.exists(root.resolve("db"))&&!Files.exists(root.resolve("runtimes")),"disposable fresh app required");
             Files.createDirectory(qa);Files.createDirectory(data);
@@ -90,8 +90,8 @@ public final class SignedDatabaseUpdate {
             bridges.current(),graphics.current(),dataTools.current(),shaderTools.current()};
         verifyRetainedFiles(qa,roots,client,seed);
         if(seed)return;
-        if(phase.equals("baseline22") || phase.equals("reopen23")) {
-            if(phase.equals("baseline22")) {
+        if(phase.equals("prepare-baseline") || phase.equals("reopen23") || phase.equals("reopen24")) {
+            if(phase.equals("prepare-baseline")) {
                 try(ServerInstallationSetup.Handle owner=ServerInstallationSetup.beginFresh(ctx,root,server,programs,content,data,1L<<30)){
                     owner.prepare(progress,RuntimeWork.NEVER_CANCELLED);
                     owner.finishPlayerbots(progress,RuntimeWork.NEVER_CANCELLED);
@@ -107,6 +107,7 @@ public final class SignedDatabaseUpdate {
                 require(active.mysqlUuid.equals(service.instanceUuid()),"SQL reopened different UUID");
             }finally{service.stop(Duration.ofSeconds(30));}
             require(!service.isAlive(),"SQL did not stop");
+            if(phase.equals("reopen24"))PostStopExportFixture.prepare(ctx,service.diagnosticLogs());
             System.out.println("ESTERIA_ACTIVE slot="+active.slotId+" uuid="+active.mysqlUuid+" elapsedMs="+TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-start));
             return;
         }
