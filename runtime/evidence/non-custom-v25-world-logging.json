@@ -1,0 +1,44 @@
+{
+  "formatVersion": 1,
+  "scope": "Stock worldserver logging and retained configuration",
+  "producer": "c530de5f2c7d5512a1bf934095c5dcd34bdba1f1",
+  "serverRevision": "f35f04d01689f034778e3474b3c820092f51e461",
+  "baselineApkSha256": "e180d1a9014540139cf0942d21fec5a3c05fec63ddedfa25503882fbb3bb0768",
+  "baselineThorV23": {
+    "loadedRandomItemRecords": 12640,
+    "playerbotInitializationMs": 49147,
+    "worldInitializationSecondsReported": 64,
+    "itemDebugTraversalMs": null
+  },
+  "retainedConfiguration": {
+    "environment": "Linux host with verified stock provider content and a disposable state directory",
+    "method": "Rendered the complete active configuration with the signed v24 helper, then rendered and verified it against v25 in the same directory.",
+    "configFilesPerGeneration": 54,
+    "filesDiffering": 0,
+    "sameActiveGeneration": true,
+    "sameDatabaseSecret": true
+  },
+  "nativeConsole": {
+    "environment": "Packaged Linux ARM64 worldserver under qemu-user",
+    "worldserverSha256": "9757f0bbb2ee159d18070d8f5fe7ecdf5b4b8b7171116198039f418d5ec13aa1",
+    "method": "Launched through each version's ServerChild with the same generated configuration and closed loopback SQL endpoint. Both native processes initialized logging and exited with status 1 at the expected SQL boundary.",
+    "worldserverEnvironmentV25": {
+      "AC_LOGGER_PLAYERBOTS": "4,Console Playerbots",
+      "AC_APPENDER_CONSOLE": "1,4,1"
+    },
+    "v24": {"dateTimeStringMatches": 1, "ansiEscapePrefixes": 172},
+    "v25": {"dateTimeStringMatches": 86, "ansiEscapePrefixes": 0},
+    "worldReadyReached": false
+  },
+  "itemDebugTraversal": {
+    "environment": "Linux x86-64 isolated C++ fixture",
+    "method": "Compiled the pinned bodies of RandomItemMgr::DebugCacheRandomItem, Log::ShouldLog and AppenderFile::_write with a synthetic item store, logger dispatch, the pinned fmt headers and a real file sink. Counted item lookups, submitted lines and calls to fflush.",
+    "fixture": {"validItems": 12640, "levelBuckets": 8, "itemTypes": 5, "name": "Fixture item"},
+    "v24Debug": {"itemLookups": 12640, "lines": 12680, "fileFlushes": 12680, "outputBytes": 357929},
+    "v25Info": {"itemLookups": 0, "lines": 0, "fileFlushes": 0, "outputBytes": 0},
+    "scope": "Counts cover only the optional item detail dump. The core item cache loader and enabled account bot behavior continue to run."
+  },
+  "v25ThorServerReadySeconds": null,
+  "v25ThorPlayerbotInitializationMs": null,
+  "v25ThorTemperatureChangeCelsius": null
+}

@@ -1,10 +1,10 @@
 # Esteria Stock Android
 
-Local Wrath 3.3.5a build 12340 client/server bring-up for AYN Thor Max: Android 13 ARM64, Snapdragon 8 Gen 2, Adreno 740. The reconstructed ARM64 client uses pinned Wine/PRoot with local server/MySQL; gameplay is intended to remain offline after setup.
+Esteria runs the reconstructed Wrath 3.3.5a build 12340 ARM64 client, world server and MySQL locally on the AYN Thor Max. The owner has created a character, accepted a quest, fought an enemy and logged out on the handheld.
 
-[Signed stock v15 release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.15) · [Device testing and support export](NON-CUSTOM-TESTING.md).
+[Signed stock v25 release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.25) · [Device testing and support export](NON-CUSTOM-TESTING.md).
 
-Install over Esteria Stock and retain the selected import and completed world data. Use **Repair local component → Client runtime** once for the corrected ARM64 executable, then **Shaders** if the previous attempt failed there. Choose **Start local game**. [Current startup evidence](STATUS.md).
+Install over Esteria Stock, then open **Play → Start local game** and select the existing character. V25 reuses the prepared client, world, shaders and local database. [Startup and update evidence](STATUS.md).
 
 - [Implementation plan](ANDROID-PORT-PLAN.md)
 - [Build instructions](BUILDING.md)

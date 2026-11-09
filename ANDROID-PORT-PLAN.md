@@ -2,7 +2,7 @@
 
 ## Current checkpoint
 
-The owner has played the reconstructed client on Thor, created a character, accepted a quest, defeated an enemy and logged out. The later v23 export identifies a retained Start and clean stop. Stock v24 targets measured startup overhead, input and post-session diagnostics. The next owner test reopens the existing character offline. [Current release and evidence](STATUS.md).
+The owner has played the reconstructed client on Thor, created a character, accepted a quest, defeated an enemy and logged out. The later v23 export identifies a retained Start and clean stop. Stock v25 reduces retained server admission, playerbot debug writes, and idle capture work. The next owner test reopens the existing character offline. [Current release and evidence](STATUS.md).
 
 ## Current objective
 

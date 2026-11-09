@@ -1,0 +1,153 @@
+{
+  "producer": "c530de5f2c7d5512a1bf934095c5dcd34bdba1f1",
+  "apk": {
+    "apkBytes": 337190394,
+    "apkSha256": "cf467b6293a4ca76a95ed86011132fdbb69bdba6e700d5a36d2b428249d75284",
+    "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+    "debuggable": false,
+    "minSdk": 26,
+    "packageId": "io.github.russianranger.esteria.stock",
+    "targetSdk": 35,
+    "versionCode": 25,
+    "versionName": "0.1.0-non-custom.25"
+  },
+  "providerInventory": {
+    "changed": [
+      "assets/database-service/manifest.json",
+      "assets/database-service/mysql_bootstrap.py",
+      "assets/database-setup/manifest.json",
+      "assets/database-setup/mysql_bootstrap.py",
+      "assets/server-installation/android_server_schema_setup.py",
+      "assets/server-installation/manifest.json",
+      "assets/server-installation/mysql_bootstrap.py",
+      "assets/server-installation/provision_local_realm.py",
+      "assets/server-schema/android_server_schema_setup.py",
+      "assets/server-schema/manifest.json",
+      "assets/server-schema/mysql_bootstrap.py",
+      "assets/server-session/android_server_schema_setup.py",
+      "assets/server-session/manifest.json",
+      "assets/server-session/mysql_bootstrap.py",
+      "assets/server-session/provision_local_realm.py",
+      "assets/server-session/server_session.py",
+      "assets/server-session/server_session_process.py"
+    ],
+    "matchingProviderArchives": 8,
+    "matchingNativeLibraries": 4,
+    "revision": "c530de5f2c7d5512a1bf934095c5dcd34bdba1f1"
+  },
+  "hostTests": {
+    "discovered": 1699,
+    "skipped": 139,
+    "failures": 0,
+    "errors": 0
+  },
+  "nativeArm64": {
+    "run": 42565375877,
+    "artifact": 13651745040,
+    "sessionLoginComparison": {
+      "combined": [
+        {
+          "elapsedMs": 1750,
+          "playerbotsLedgerReads": 1,
+          "sqlQueries": 72
+        },
+        {
+          "elapsedMs": 1744,
+          "playerbotsLedgerReads": 1,
+          "sqlQueries": 72
+        }
+      ],
+      "retainedAdmission": [
+        {
+          "elapsedMs": 1780,
+          "playerbotsLedgerReads": 1,
+          "sqlQueries": 72
+        },
+        {
+          "elapsedMs": 1770,
+          "playerbotsLedgerReads": 1,
+          "sqlQueries": 72
+        }
+      ],
+      "separate": [
+        {
+          "elapsedMs": 3474,
+          "playerbotsLedgerReads": 2,
+          "sqlQueries": 121
+        },
+        {
+          "elapsedMs": 3463,
+          "playerbotsLedgerReads": 2,
+          "sqlQueries": 121
+        }
+      ],
+      "v24Admission": [
+        {
+          "elapsedMs": 3406,
+          "playerbotsLedgerReads": 2,
+          "sqlQueries": 112
+        },
+        {
+          "elapsedMs": 3390,
+          "playerbotsLedgerReads": 2,
+          "sqlQueries": 112
+        }
+      ]
+    },
+    "restartPersistenceVerified": true,
+    "sourcePrivateJournalsAccountCredentialsPreserved": true
+  },
+  "signedAndroid13Arm64": {
+    "run": 42567907697,
+    "artifact": 13652583620,
+    "baselineAndCandidateVersions": [
+      24,
+      25
+    ],
+    "sameUid": true,
+    "sameSlotAccountAndDatabaseUuid": true,
+    "sqlReopenPhaseMs": 3749,
+    "supportExport": {
+      "versionCode": 25,
+      "route": "visible launcher and Android DocumentsUI on disposable Android 13 ARM64",
+      "logInput": "cleanly stopped SQL plus synthetic client, world and cleanup markers",
+      "logRoles": [
+        "logs/game.database.stderr.log",
+        "logs/game.database.stdout.log",
+        "logs/game.presentation.client.stdout.log",
+        "logs/game.server.worldserver.log",
+        "logs/launcher.log"
+      ],
+      "zipBytes": 4519,
+      "entries": 6,
+      "metadataBytes": 7935,
+      "omittedFacts": 0
+    }
+  },
+  "thorStartupSeconds": null,
+  "thorInGameTemperatureCelsius": null,
+  "threeOfflineGraphicalReopensObserved": false,
+  "android13SignedPackageManager": {
+    "run": 42567907697,
+    "artifact": 13652398083,
+    "checks": {
+      "characterPersistenceQualified": false,
+      "databaseSchemaQualified": false,
+      "fixtureDataOnly": true,
+      "gameplayQualified": false,
+      "packageManagerUpdateExecuted": false,
+      "thorQualified": false
+    },
+    "status": "skipped-incompatible-emulator-abi",
+    "emulatorAbis": [
+      "x86_64"
+    ],
+    "note": "The x86_64 emulator recorded the ARM64-only ABI boundary; the signed package replacement was exercised separately on Android 13 ARM64."
+  },
+  "initialQualificationRetry": {
+    "run": 42567613571,
+    "explanation": "The x86_64 emulator input download failed before installation with HTTP 504 on the public v24 asset. The ARM64 signed replacement passed. The complete suite passed after switching the QA download to the digest-checked release asset API.",
+    "originalSignedArm64GatePassed": true,
+    "apkBytesChanged": false
+  }
+}

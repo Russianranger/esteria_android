@@ -1,6 +1,10 @@
 # Current stock publication
 
-The v25 signature is bound to the published v24 APK. Signed Android 13 replacement tests installed the same v25 package over the verified v24 baseline. The ARM64 test retained the original UID, active slot, database UUID and account in its disposable installation.
+## Stock v25 original-identity publication
+
+The [verified public APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.25/Esteria-Stock-3.3.5a-arm64.apk) is 337,190,394 bytes with SHA-256 `cf467b6293a4ca76a95ed86011132fdbb69bdba6e700d5a36d2b428249d75284`. Producer `c530de5f2c7d5512a1bf934095c5dcd34bdba1f1`, publication run [42569891365](https://github.com/Russianranger/esteria_android/actions/runs/42569891365). The [public signature transport](update-25/publication-inputs.json) is bound to the exact published v24 APK. [Verified release assets](../../evidence/non-custom-v25-public-apk-readback.json).
+
+## Historical v24 publication
 
 The [signed v24 APK](https://github.com/Russianranger/esteria_android/releases/download/non-custom-v0.1.0-non-custom.24/Esteria-Stock-3.3.5a-arm64.apk) is an in-place update over stock v23. The six-asset [public readback](../../evidence/non-custom-v24-public-apk-readback.json) and [signed Android 13 update](../../evidence/non-custom-v24-qualified-update.json) identify the exact package, signing certificate and producer. [Public transport](update-24/publication-inputs.json).
 
