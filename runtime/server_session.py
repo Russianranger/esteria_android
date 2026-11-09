@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 from dataclasses import dataclass, field
 import hashlib
+import json
 import os
 from pathlib import Path
 import re
@@ -124,16 +125,28 @@ def _programs(programs):
     return result
 
 
+def _require_playerbots(bots, expected_uuid):
+    require(isinstance(bots, dict) and bots.get('playerbotsSchemaInitialized') is True and
+            bots.get('exactSourceLedgerVerified') is True and bots.get('preparedStatementCount') == playerbots.STATEMENTS and
+            bots.get('mysqlUuid') == expected_uuid, 'Completed same-instance playerbots schema required')
+
+
 def _verify_session_login(verified, connection, state, version, *, profile, data, mysql,
-                          expected_uuid, verify_service, lease, generation, bots, cancelled):
+                          expected_uuid, verify_service, lease, generation, bots, cancelled, progress=lambda *_: None):
     """Recheck the existing realm/account together, without rewriting installation receipts."""
+    require(not cancelled(), 'Owned session cancelled before login verification')
     schemas = {'account': account.ACCOUNT_SCHEMA_SHA256, 'realmcharacters': account.TRACKER_SCHEMA_SHA256}
     with realm._verified_context(verified, connection, state, version, profile=profile, data=data, mysql=mysql,
             expected_uuid=expected_uuid, verify_service=verify_service, account_schemas=schemas, account_lock=True,
-            state_lease=lease) as (receipt, active_generation, completed):
+            state_lease=lease, cancelled=cancelled) as (receipt, active_generation, completed):
         require(receipt['uuid'] == expected_uuid and active_generation == generation and
-                completed.get('compiledUpdaterCompleted') is True and completed.get('playerbots') == bots,
+                completed.get('compiledUpdaterCompleted') is True,
                 'Owned realm/account schema or configuration changed after preparation')
+        checked_bots = completed.get('playerbots')
+        _require_playerbots(checked_bots, expected_uuid)
+        require(bots is None or checked_bots == bots, 'Prepared playerbots proof changed before session admission')
+        if bots is None:
+            progress('configuration-verification')
         before = schema.account_identity(state)
         require(before is not None and not cancelled(), 'Owned account is missing or session cancelled')
         realm.check_schema(connection)
@@ -144,6 +157,39 @@ def _verify_session_login(verified, connection, state, version, *, profile, data
                 'Local account verification failed')
         require(schema.account_identity(state) == before and not cancelled(),
                 'Owned account changed during verification or session cancelled')
+    return checked_bots
+
+
+def _prepare_session_login(verified, connection, state, version, *, profile, data, mysql,
+                           expected_uuid, verify_service, lease, cancelled, progress):
+    current = state / 'config/current'
+    generation = None
+    if current.is_symlink():
+        expected = config.expected_private_files_verified(verified, state, data, mysql, profile=profile,
+            secret=db.read_secret(state / 'accounts/database-secret'))
+        digest = hashlib.sha256(json.dumps(expected, sort_keys=True).encode()).hexdigest()
+        if os.readlink(current) == 'generations/' + digest:
+            # The pointer selects an optimization only. The live context below
+            # verifies every config byte and holds the config and SQL locks.
+            generation = digest
+        del expected
+    require(not cancelled(), 'Owned session preparation cancelled')
+    bots = None
+    if generation is None:
+        # Before switching configurations, verify the fourth schema without
+        # making any changes to a failed or incomplete installation.
+        with realm.named_locks(connection, ('esteria-local-bootstrap', 'esteria-local-realm', 'esteria-local-account')):
+            bots = playerbots.verify_completed(verified, connection, state, version,
+                expected_uuid=expected_uuid, verify_service=verify_service, cancelled=cancelled)
+        _require_playerbots(bots, expected_uuid)
+        progress('configuration-verification')
+        rendered = config.render_verified(verified, state, data, mysql, profile=profile)
+        require(rendered.get('module_configurations_complete') is True, 'Complete source module configuration required')
+        generation = rendered['generation']
+    checked = _verify_session_login(verified, connection, state, version, profile=profile, data=data, mysql=mysql,
+        expected_uuid=expected_uuid, verify_service=verify_service, lease=lease, generation=generation,
+        bots=bots, cancelled=cancelled, progress=progress)
+    return generation, checked
 
 
 def prepare(verified, connection, state, version, *, programs, data_generation, expected_data_inputs,
@@ -173,23 +219,9 @@ def prepare(verified, connection, state, version, *, programs, data_generation, 
     require(checked_data['inputs']['serverRevision'] == realm.SERVER_REVISION, 'Prepared data server source differs')
     progress('schema-verification')
     with db.state_scope(state, state_lease) as lease:
-        # Verify the real completed compiled loader first. Missing fourth-schema
-        # proof must not change any active configuration or start any process.
-        with realm.named_locks(connection, ('esteria-local-bootstrap', 'esteria-local-realm', 'esteria-local-account')):
-            bots = playerbots.verify_completed(verified, connection, state, version,
-                expected_uuid=expected_uuid, verify_service=verify_service, cancelled=cancelled)
-        require(bots.get('playerbotsSchemaInitialized') is True and bots.get('exactSourceLedgerVerified') is True and
-                bots.get('preparedStatementCount') == playerbots.STATEMENTS and bots.get('mysqlUuid') == expected_uuid,
-                'Completed same-instance playerbots schema required')
-        # Whole prepared-generation mount: the actual server DataDir is its
-        # data child. This changes generated configs only, never setup journals.
-        progress('configuration-verification')
-        rendered = config.render_verified(verified, state, data_root / 'data', Path(mysql), profile=profile)
-        require(rendered.get('module_configurations_complete') is True, 'Complete source module configuration required')
-        generation = rendered['generation']
-        _verify_session_login(verified, connection, state, version, profile=profile, data=data_root / 'data',
-            mysql=Path(mysql), expected_uuid=expected_uuid, verify_service=verify_service, lease=lease,
-            generation=generation, bots=bots, cancelled=cancelled)
+        generation, bots = _prepare_session_login(verified, connection, state, version, profile=profile,
+            data=data_root / 'data', mysql=Path(mysql), expected_uuid=expected_uuid, verify_service=verify_service,
+            lease=lease, cancelled=cancelled, progress=progress)
         require(not cancelled() and verify_service() is not False, 'Session ownership changed during preparation')
         return Prepared(verified, state, version, expected_uuid, generation, data_root,
             baseline.file_identity(data_root / 'receipt.json'), selected, profile,

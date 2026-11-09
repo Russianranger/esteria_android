@@ -125,7 +125,8 @@ class PortableLocalProvisioning(unittest.TestCase):
 
     def verify_session_login(self, cancelled=lambda: False):
         from runtime import server_session
-        bots = {'journalIdentity': {'bytes': 1, 'sha256': 'b' * 64}}
+        bots = dict(journalIdentity={'bytes': 1, 'sha256': 'b' * 64}, playerbotsSchemaInitialized=True,
+                    exactSourceLedgerVerified=True, preparedStatementCount=server_session.playerbots.STATEMENTS, mysqlUuid=self.uuid)
         def completed(*args, **kwargs):
             self.assertEqual(set(self.connection.locks), {
                 'esteria-local-bootstrap', 'esteria-local-realm', 'esteria-local-account'})
@@ -149,6 +150,65 @@ class PortableLocalProvisioning(unittest.TestCase):
         self.assertEqual(self.connection.locks, {})
         self.assertEqual(self.writes(), [])
         self.assertEqual([(p.stat().st_ino, p.read_bytes()) for p in paths], before)
+
+    def prepare_login(self, data=None, proof=None):
+        from runtime import server_session as session
+        from unittest.mock import Mock
+        render = Mock(wraps=server_config.render_verified)
+        bots = dict(journalIdentity={'bytes': 1, 'sha256': 'b' * 64}, playerbotsSchemaInitialized=True,
+                    exactSourceLedgerVerified=True, preparedStatementCount=session.playerbots.STATEMENTS,
+                    mysqlUuid=self.uuid)
+        def completed(*args, **kwargs):
+            self.assertEqual(set(self.connection.locks), {
+                'esteria-local-bootstrap', 'esteria-local-realm', 'esteria-local-account'})
+            return self.completed_gate(*args, **kwargs) | {'playerbots': bots | (proof or {})}
+        with db.state_lock(self.state) as lease, patch.object(updates, 'verify_completed_update', side_effect=completed), \
+                patch.object(server_config, 'render_verified', render):
+            self.gate_calls = 0
+            result = session._prepare_session_login(self.content, self.connection, self.state, '8.0.46',
+                profile=self.profile, data=data or self.configuration.data, mysql=self.configuration.mysql,
+                expected_uuid=self.uuid, verify_service=self.service, lease=lease,
+                cancelled=lambda: False, progress=lambda *_: None)
+            return result, render.call_count
+
+    def test_matching_config_validates_one_complete_ledger_without_reactivation(self):
+        self.run_realm()
+        self.run_account()
+        pointer = self.state / 'config/current'
+        before = pointer.lstat()
+        (generation, proof), renders = self.prepare_login()
+        self.assertEqual((renders, self.gate_calls), (0, 1))
+        self.assertEqual(generation, pointer.resolve().name)
+        self.assertEqual(proof['mysqlUuid'], self.uuid)
+        self.assertEqual(self.connection.locks, {})
+        self.assertEqual(pointer.lstat().st_ctime_ns, before.st_ctime_ns)
+        with self.assertRaisesRegex(ValueError, 'playerbots schema'):
+            self.prepare_login(proof={'mysqlUuid': '11234567-89ab-4cde-8fab-0123456789ab'})
+        self.assertEqual(self.connection.locks, {})
+        self.assertEqual(pointer.lstat().st_ctime_ns, before.st_ctime_ns)
+        current = pointer.resolve() / 'worldserver.conf'
+        current.write_text(current.read_text() + '# changed\n')
+        with self.assertRaisesRegex(db.BootstrapError, 'generation has changed'):
+            self.prepare_login()
+        self.assertEqual(self.gate_calls, 0)
+
+    def test_new_data_selection_checks_schema_before_activation_and_rechecks_after(self):
+        self.run_realm()
+        self.run_account()
+        pointer = self.state / 'config/current'
+        original = pointer.resolve()
+        new_data = self.configuration.data.parent / 'next-generation'
+        new_data.mkdir()
+        with self.assertRaisesRegex(ValueError, 'playerbots schema'):
+            self.prepare_login(new_data, proof={'exactSourceLedgerVerified': False})
+        self.assertEqual(pointer.resolve(), original)
+        (generation, _), renders = self.prepare_login(new_data)
+        self.assertEqual((renders, self.gate_calls), (1, 2))
+        self.assertNotEqual(generation, original.name)
+        self.assertEqual(generation, pointer.resolve().name)
+        self.assertTrue(original.is_dir())
+        self.assertEqual(self.prepare_login(new_data)[1], 0)
+        self.assertEqual(self.gate_calls, 1)
 
     def test_session_login_refuses_cancellation_or_tracker_loss_and_releases_locks(self):
         self.run_account()

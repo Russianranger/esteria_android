@@ -78,11 +78,19 @@ def live_service(connection, state, service_session, version, operation, uuid):
     expected = db.read_receipt(state / 'database-bootstrap.json', version)
     service.require(expected['uuid'] == uuid and expected['datadir'] == str(state / 'database') and
                     db.datadir_uuid(state / 'database') == uuid, 'database service instance differs')
-    db.check_receipt(expected, db.identity(connection, version))
-    db.check_listener(connection, None)
-    service.require(connection.query('SELECT CURRENT_USER()') in
-                    (['esteria@127.0.0.1'], ['esteria@localhost']), 'unexpected schema database account')
-    service.require(connection.query('SELECT @@pid_file') == [str(service_session / 'mysql.pid')],
+    # Read these properties of the same live connection in one round trip.
+    # The game supervisor calls this throughout native startup and gameplay.
+    db.exact_version(version)
+    rows = connection.query('SELECT ' + db.IDENTITY_COLUMNS +
+                            ', @@port, @@bind_address, CURRENT_USER(), @@pid_file')
+    fields = rows[0].split('\t') if len(rows) == 1 else []
+    service.require(len(fields) == 8, 'malformed owned database identity response')
+    db.check_receipt(expected, db.parse_identity(fields[:4], version))
+    port, address, user, pid_file = fields[4:]
+    service.require(port == str(db.PORT) and address == '127.0.0.1',
+                    'database must bind exclusively to the owned loopback endpoint')
+    service.require(user in ('esteria@127.0.0.1', 'esteria@localhost'), 'unexpected schema database account')
+    service.require(pid_file == str(service_session / 'mysql.pid'),
                     'database is not the owned service instance')
     pid = service.read_plain(service_session / 'mysql.pid', 32).strip()
     service.require(re.fullmatch(b'[1-9][0-9]{0,9}', pid), 'invalid owned service process identity')

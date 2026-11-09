@@ -89,6 +89,7 @@ jobs:
           bash tools/retained_database/compile.sh "$RUNNER_TEMP/retained-observer"
           mkdir -p out/signed-update-input
           cp "$RUNNER_TEMP/retained-observer/observer.jar" out/signed-update-input/
+          cp out/detached-publication/signed/signing-receipt.json out/signed-update-input/
           cp out/detached-publication/release/Esteria-Stock-3.3.5a-arm64.apk out/signed-update-input/candidate.apk
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: github.event_name == 'push' && contains(github.event.head_commit.message, '[stage detached non-custom]')
@@ -134,7 +135,7 @@ jobs:
         with:
           name: signed-retained-update-input
           path: signed-input
-      - name: Verify the retained v23 database and signed v24 replacement on offline Android 13 ARM64
+      - name: Verify the published stock database and signed replacement on offline Android 13 ARM64
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -142,27 +143,37 @@ jobs:
           source previous-qa/tools/android_stock_shader/redroid.sh
           work=$(mktemp -d "$RUNNER_TEMP/signed-retained.XXXXXXXX")
           mkdir -p "$work/input" evidence
-          cp signed-input/* "$work/input/"
-          for asset in '725132107 previous.apk' '692421785 wine.tar.gz'; do
-            read -r id name <<< "$asset"
-            curl --fail --location --silent --show-error --retry 3 --max-time 600               -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/octet-stream'               "https://api.github.com/repos/Russianranger/esteria_android/releases/assets/$id?run=$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" -o "$work/input/$name"
-          done
+          cp signed-input/candidate.apk signed-input/observer.jar "$work/input/"
+          receipt=signed-input/signing-receipt.json
+          lock=app/stock-signing.lock.json
+          jq -e --slurpfile lock "$lock" '.previousPublished == $lock[0].lastPublished' "$receipt" >/dev/null
+          previous=$(jq -er '.lastPublished.versionCode' "$lock")
+          candidate=$(jq -er '.signedApk.versionCode' "$receipt")
+          gh release download "non-custom-v0.1.0-non-custom.$previous" --repo "$GITHUB_REPOSITORY" \
+            --pattern Esteria-Stock-3.3.5a-arm64.apk --output "$work/input/previous.apk"
+          curl --fail --location --silent --show-error --retry 3 --max-time 600 \
+            -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/octet-stream' \
+            "https://api.github.com/repos/Russianranger/esteria_android/releases/assets/692421785?run=$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" \
+            -o "$work/input/wine.tar.gz"
           unset GH_TOKEN
-          echo "fc0e04d96eb51766cdfb7dc576cdbe9d4149e9a5c0228d4eb8e0ac4670c75ff5  $work/input/previous.apk" | sha256sum -c
-          wine=$(jq -r '.packages["wine-arm64"].archive.sha256' runtime/runtime-sources.lock.json)
+          previous_hash=$(jq -er '.lastPublished.apkSha256' "$lock")
+          candidate_hash=$(jq -er '.signedApk.apkSha256' "$receipt")
+          wine=$(jq -er '.packages["wine-arm64"].archive.sha256' runtime/runtime-sources.lock.json)
+          echo "$previous_hash  $work/input/previous.apk" | sha256sum -c
+          echo "$candidate_hash  $work/input/candidate.apk" | sha256sum -c
           echo "$wine  $work/input/wine.tar.gz" | sha256sum -c
           chmod 755 "$work/input"
           chmod 644 "$work/input/"*
           trap 'redroid_stop "$work"' EXIT
           redroid_start "$work"
-          python3 tools/retained_database/device.py evidence/signed-update.jsonl v24
+          python3 tools/retained_database/device.py evidence/signed-update.jsonl retained-update "$previous" "$candidate"
           # Disposable package with synthetic SQL. Capture only the launcher's original artwork.
           docker exec "$redroid_name" pm grant io.github.russianranger.esteria.stock android.permission.POST_NOTIFICATIONS
           if ! command -v tesseract >/dev/null || ! /usr/bin/python3 -c 'from PIL import Image'; then
             sudo apt-get update -qq
             sudo apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-eng python3-pil
           fi
-          /usr/bin/python3 tools/retained_database/launcher_export.py 24
+          /usr/bin/python3 tools/retained_database/launcher_export.py "$candidate"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

@@ -305,9 +305,14 @@ class ServerChild:
         require(self.process is None and not self.closed, 'Server child startup is single-use')
         self.output = self.log.open('xb')
         os.chmod(self.log, 0o600)
+        env = {**os.environ, 'LC_ALL': 'C', 'LANG': 'C'}
+        if self.program == 'worldserver':
+            # The native bot module logs and flushes every cached item at DEBUG. Limit this
+            # process to INFO and timestamp its captured console without changing saved configs.
+            env.update(AC_LOGGER_PLAYERBOTS='4,Console Playerbots', AC_APPENDER_CONSOLE='1,4,1')
         # Attach Popen to the retained object before any later operation can fail.
         self.process = subprocess.Popen([str(self.executable), '--config', str(self.configuration)],
-            cwd=self.working, env={**os.environ, 'LC_ALL': 'C', 'LANG': 'C'}, umask=0o077,
+            cwd=self.working, env=env, umask=0o077,
             stdin=subprocess.PIPE if self.program == 'worldserver' else subprocess.DEVNULL,
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, start_new_session=True, bufsize=0)
         self.group = OwnedGroup(self.process)

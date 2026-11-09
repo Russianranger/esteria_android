@@ -177,11 +177,14 @@ public final class ClientPresentationSession implements AutoCloseable {
         await(frame,()->privateSocket("frame.sock"),session.resolve("frame/logs/stderr.log"),"ESTERIA_X11_FRAME_READY protocol=full-v1 capture=XGetImage");
         OwnedProcess keys=launch("input",X11SessionPlan.input());
         await(keys,()->privateSocket("input.sock"),session.resolve("input/logs/stderr.log"),"ESTERIA_X11_INPUT_READY protocol=1");
-        input=InputBridge.connect(context,endpoints.toFile(),code->fail("presentation-input-failed"));
         surface=new SurfaceBridge(context,endpoints.toFile(),new SurfaceBridge.Events(){
             public void frameSize(int width,int height){if(!closing.get()&&events!=null)events.frameSize(width,height);}
             public void failed(String reason){fail("presentation-frame-failed");}
         }, frameCap);
+        input=InputBridge.connect(context,endpoints.toFile(),new InputBridge.Events(){
+            public void failed(String code){fail("presentation-input-failed");}
+            public void inputApplied(){surface.inputApplied();}
+        });
         check();ready=true;
         monitor=new Thread(()->{
             try {

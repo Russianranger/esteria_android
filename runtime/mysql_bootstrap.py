@@ -330,12 +330,21 @@ class Mysql:
         self.close()
 
 
+IDENTITY_COLUMNS = 'VERSION(), @@version_comment, @@server_uuid, @@datadir'
+
+
 def identity(connection: Mysql, expected_version: str) -> dict:
     exact_version(expected_version)
-    rows = connection.query('SELECT VERSION(), @@version_comment, @@server_uuid, @@datadir')
-    if len(rows) != 1 or len(rows[0].split('\t')) != 4:
+    rows = connection.query('SELECT ' + IDENTITY_COLUMNS)
+    if len(rows) != 1:
         raise BootstrapError('Malformed MySQL identity response')
-    version, comment, uuid, datadir = rows[0].split('\t')
+    return parse_identity(rows[0].split('\t'), expected_version)
+
+
+def parse_identity(fields: list[str], expected_version: str) -> dict:
+    if len(fields) != 4:
+        raise BootstrapError('Malformed MySQL identity response')
+    version, comment, uuid, datadir = fields
     if version != expected_version or 'mariadb' in comment.lower():
         raise BootstrapError(f'MySQL version mismatch: required {expected_version}, observed {version}')
     if str(uuid_module.UUID(uuid)) != uuid:

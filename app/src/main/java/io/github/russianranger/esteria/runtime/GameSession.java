@@ -140,6 +140,8 @@ public final class GameSession {
         private volatile ServerDatabaseService.Handle database;
         private volatile LocalServerSession.Handle servers;
         private volatile ClientPresentationSession presentation;
+        private GameRendererObservation rendererObservation;
+        private String selectedVulkanAdapter;
         private LocalAccountHandoff handoff;
         private Thread monitor;
         private Handle(Context context,Path root,LocalWorldSetup.Result setup,ClientRuntimeSetup client,
@@ -158,6 +160,7 @@ public final class GameSession {
         /** Process exit acknowledgment alone does not establish character saving. */
         public boolean clientExitAcknowledged(){return clientExitAcknowledged;}
         public ClientPresentationSession presentation(){return presentation;}
+        public String selectedVulkanAdapter(){return selectedVulkanAdapter;}
         /** Read-only fixed log selection survives known cleanup; no credential
          * record, database engine-private output or configuration is selected. */
         public java.util.Map<String,Path> diagnosticLogs() {
@@ -220,6 +223,7 @@ public final class GameSession {
                     ServerInstallationSetup.completed(context,root,setup.server,setup.programs,setup.content);
                     handoff=localLogin(root,setup,client,view,database.instanceUuid());
                     check(stop);setup.data.requireUnchanged();
+                    rendererObservation=GameRendererObservation.beforeStart(view.work);
                     process=presentation.startClient(client,view,shaders,turnip);
                     state=State.CLIENT_STARTED;updates.update("client-started-not-gameplay-qualified","",0,-1);
                     monitor=new Thread(this::monitor,"esteria-game-session-owner");monitor.setDaemon(true);monitor.start();return null;
@@ -276,6 +280,7 @@ public final class GameSession {
                 // The strict CREATE_NEW handoff writer rejects reuse of this
                 // same view until the preserved file is explicitly recovered.
                 if(handoff!=null){handoffRecovery=true;handoff=null;}
+                if(process!=null && rendererObservation!=null) selectedVulkanAdapter=rendererObservation.afterExit();
                 leases.close();state=State.CLOSED;OWNERS.remove(root,this);
                 if(error!=null)remember(error);
                 if(failure!=null)throw failure;

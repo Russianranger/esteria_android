@@ -57,6 +57,22 @@ def run(phase, uid):
         raise RuntimeError('installed APK observer failed at ' + phase)
 
 
+def retained_update(previous, candidate):
+    if previous < 22 or candidate <= previous:
+        raise ValueError('expected the previous stock version followed by a newer retained update')
+    uid = install('previous.apk', previous)
+    run('seed-providers', uid)
+    run('prepare-baseline', uid)
+    if candidate >= 24:
+        run('measure-baseline', uid)
+    assert install('candidate.apk', candidate) == uid
+    if candidate >= 24:
+        run('measure-candidate', uid)
+        run('reopen-and-export', uid)
+    else:
+        run('reopen23', uid)
+
+
 if __name__ == '__main__':
     if sys.argv[2:] == ['interface']:
         interface_qualification(sys.argv[1])
@@ -66,17 +82,13 @@ if __name__ == '__main__':
         for phase in ('debug-seed', 'debug-repair', 'debug-cold', 'debug-cold', 'debug-cold'):
             run(phase, uid)
         sys.exit(0)
+    if sys.argv[2:3] == ['retained-update']:
+        previous, candidate = map(int, sys.argv[3:])
+        retained_update(previous, candidate)
+        sys.exit(0)
     if sys.argv[2:] in (['v23'], ['v24']):
         candidate = int(sys.argv[2][1:])
-        old = install('previous.apk', candidate - 1)
-        run('seed-providers', old)
-        run('prepare-baseline', old)
-        if candidate == 24:
-            run('measure-baseline', old)
-        assert install('candidate.apk', candidate) == old
-        if candidate == 24:
-            run('measure-candidate', old)
-        run('reopen' + str(candidate), old)
+        retained_update(candidate - 1, candidate)
         sys.exit(0)
     if sys.argv[2:] == ['v22']:
         old = install('previous.apk', 21)
@@ -88,6 +100,8 @@ if __name__ == '__main__':
         run('repair22', new)
         run('cold22', new)
         sys.exit(0)
+    if sys.argv[2:] not in ([], ['v21']):
+        raise ValueError('unrecognized stock qualification mode')
     old = install('previous.apk', 19)
     run('seed19', old)
     run('fail19', old)

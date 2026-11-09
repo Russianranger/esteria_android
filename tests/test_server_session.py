@@ -69,6 +69,7 @@ class ServerSessionPreparationTests(unittest.TestCase):
         self.assertEqual(kwargs['data'],self.data/'data');self.lease=kwargs['lease']
         self.assertEqual(kwargs['generation'],'c'*64);self.assertEqual(kwargs['bots'],self.bots)
         with session.db.state_scope(self.state,self.lease):pass
+        return self.bots
 
     def prepare(self,**extra):
         args=dict(programs={name:dict(path=self.root/name,identity=self.pin) for name in ('authserver','worldserver')},

@@ -68,8 +68,10 @@ while True: time.sleep(.05)
         self.assertEqual(child.process.returncode, 0)
 
     def test_actual_world_console_processing_challenge_and_shutdown(self):
-        child = self.child('worldserver', '''import socket,struct,sys,threading
+        child = self.child('worldserver', '''import os,socket,struct,sys,threading
 from pathlib import Path
+assert os.environ['AC_LOGGER_PLAYERBOTS'] == '4,Console Playerbots'
+assert os.environ['AC_APPENDER_CONSOLE'] == '1,4,1'
 s=socket.socket();s.bind(('127.0.0.1',0));s.listen()
 Path('port.tmp').write_text(str(s.getsockname()[1]));Path('port.tmp').replace('port')
 def challenge():

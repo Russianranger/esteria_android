@@ -578,6 +578,7 @@ public final class SessionService extends Service {
             last.put("closedAtEpochMs",Long.toString(System.currentTimeMillis()));
             last.put("clientExitAcknowledged",Boolean.toString(owner.clientExitAcknowledged()));
             last.put("forced",Boolean.toString(owner.wasForced()));
+            if(owner.selectedVulkanAdapter()!=null)last.put("game.vulkan.selectedAdapter",owner.selectedVulkanAdapter());
             last.put("recoveryRequired",Boolean.toString(owner.recoveryRequired()));
             if(owner.presentation()!=null && owner.presentation().frameCap()>0) {
                 last.put("frameCap",Integer.toString(owner.presentation().frameCap()));

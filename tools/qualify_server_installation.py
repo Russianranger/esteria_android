@@ -311,7 +311,10 @@ def private_identities(state):
 
 
 def compare_session_login(verified, connection, state, version, *, profile, data, mysql, uuid, owned, lease, generation):
-    """Exercise the v23 and consolidated login checks on the same reopened, offline four-schema fixture."""
+    """Compare login checks and v24/current admission algorithms on one reopened offline realm.
+
+    All cases use the current owned service reader, source pins and SQL connection.
+    """
     from runtime import server_session
 
     class CountedConnection:
@@ -330,26 +333,38 @@ def compare_session_login(verified, connection, state, version, *, profile, data
     common = dict(profile=profile, data=data, mysql=mysql, expected_uuid=uuid, verify_service=live)
     with realm.named_locks(measured, ('esteria-local-bootstrap', 'esteria-local-realm', 'esteria-local-account')):
         bots = playerbots.verify_completed(verified, measured, state, version, expected_uuid=uuid, verify_service=live)
-    reports = {label: [] for label in ('separate', 'combined')}
+    modes = ('separate', 'combined', 'v24Admission', 'retainedAdmission')
+    reports = {label: [] for label in modes}
     receipts = ('realm-loopback.json', 'local-account.json')
     retained = {name: baseline.file_identity(state / name) for name in receipts}
-    for mode in ('separate', 'combined', 'combined', 'separate'):
+    for mode in (*modes, *reversed(modes)):
         began, queries, ledger_reads = time.monotonic_ns(), measured.count, measured.ledger_reads
-        if mode == 'combined':
-            server_session._verify_session_login(verified, measured, state, version, **common,
-                lease=lease, generation=generation, bots=bots, cancelled=lambda: False)
-        else:
+        if mode == 'separate':
             for provider in (realm, account):
                 provider.provision_verified(verified, measured, state, version, **common, state_lease=lease, verify_only=True)
+        elif mode == 'retainedAdmission':
+            selected_generation, proof = server_session._prepare_session_login(verified, measured, state, version, **common,
+                lease=lease, cancelled=lambda: False, progress=lambda *_: None)
+            require(selected_generation == generation and proof == bots, 'Retained admission changed selected generation/schema')
+        else:
+            if mode == 'v24Admission':
+                with realm.named_locks(measured, ('esteria-local-bootstrap', 'esteria-local-realm', 'esteria-local-account')):
+                    proof = playerbots.verify_completed(verified, measured, state, version, expected_uuid=uuid, verify_service=live)
+                require(proof == bots, 'Reference session schema changed')
+                rendered = config.render_verified(verified, state, data, mysql, profile=profile)
+                require(rendered['generation'] == generation, 'Reference session configuration changed')
+            server_session._verify_session_login(verified, measured, state, version, **common,
+                lease=lease, generation=generation, bots=bots, cancelled=lambda: False)
         reports[mode].append(dict(elapsedMs=(time.monotonic_ns() - began) // 1_000_000,
                                   sqlQueries=measured.count - queries,
                                   playerbotsLedgerReads=measured.ledger_reads - ledger_reads))
-        require(reports[mode][-1]['playerbotsLedgerReads'] == (1 if mode == 'combined' else 2),
+        require(reports[mode][-1]['playerbotsLedgerReads'] == (2 if mode in ('separate', 'v24Admission') else 1),
                 'Unexpected completed ledger check count')
         require(all(baseline.file_identity(state / name) == retained[name] for name in receipts),
                 'Retained login verification receipt changed')
-    require(max(row['sqlQueries'] for row in reports['combined']) < min(row['sqlQueries'] for row in reports['separate']),
-            'Combined session login did not reduce queries on the same live SQL instance')
+    for improved, reference in (('combined', 'separate'), ('retainedAdmission', 'v24Admission')):
+        require(max(row['sqlQueries'] for row in reports[improved]) < min(row['sqlQueries'] for row in reports[reference]),
+                'Retained session login did not reduce queries on the same live SQL instance')
     return reports
 
 

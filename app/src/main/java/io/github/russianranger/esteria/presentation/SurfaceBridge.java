@@ -38,7 +38,7 @@ public final class SurfaceBridge implements AutoCloseable {
         this(context, sessionDirectory, events, 30);
     }
     public SurfaceBridge(Context context, File sessionDirectory, Events events, int frameCap) throws IOException {
-        this.frameCap = frameCap;
+        this.frameCap = frameCap == 24 || frameCap == 60 ? frameCap : 30;
         directory = BridgePaths.directory(context, sessionDirectory);
         this.events = events;
         try { System.loadLibrary("esteria-presentation"); }
@@ -61,6 +61,18 @@ public final class SurfaceBridge implements AutoCloseable {
         Run old = active; active = null;
         if (old != null) old.cancel();
     }
+    /** Called after the guest accepts an input event, including touch, stick motion or keys. */
+    synchronized void inputApplied() {
+        if (active != null) {
+            long now = System.nanoTime();
+            long previousInput = active.lastInput;
+            active.lastInput = now;
+            // A stream of stick events already holds the reader at the selected cadence.
+            if (now - previousInput >= PresentationSamples.IDLE_AFTER_NANOS) {
+                LockSupport.unpark(active.thread);
+            }
+        }
+    }
     private synchronized boolean current(Run run) { return !closed && active == run; }
     private final class Run implements Runnable {
         final Surface surface;
@@ -68,6 +80,7 @@ public final class SurfaceBridge implements AutoCloseable {
         final Thread thread;
         volatile LocalSocket socket;
         volatile boolean cancelled;
+        volatile long lastInput = System.nanoTime();
         Run(Surface surface, List<Run> predecessors) {
             this.surface = surface; this.predecessors = predecessors;
             thread = new Thread(this, "esteria-surface"); thread.setDaemon(true);
@@ -103,21 +116,22 @@ public final class SurfaceBridge implements AutoCloseable {
                         long lastRequest = 0, lastReply = 0, lastPost = 0;
                         boolean haveReply = false, havePost = false;
                         while (current(this) && !cancelled && surface.isValid()) {
-                            if (haveReply && frameCap == 24) {
+                            if (haveReply) {
                                 long delay;
                                 while (!cancelled && (delay = PresentationSamples.requestDelayNanos(
-                                        frameCap, lastRequest, System.nanoTime())) > 0) {
+                                        frameCap, lastRequest, System.nanoTime(), lastPost, lastInput)) > 0) {
                                     LockSupport.parkNanos(delay);
                                     if (Thread.interrupted()) throw new InterruptedException();
                                 }
                                 if (cancelled || !current(this) || !surface.isValid()) break;
                             }
                             lastRequest = System.nanoTime();
+                            boolean idleRequest = havePost && PresentationSamples.idleReadback(lastRequest, lastPost, lastInput);
                             int result = receiveFrame(surface, descriptor.getFd(), pixels, stats);
                             long completed = System.nanoTime();
                             if (result != 0 && result != 1) throw new IOException("Presentation transport failed: " + result);
                             samples.reply(result == 0, completed - (haveReply ? lastReply : lastRequest),
-                                    havePost ? completed - lastPost : -1, stats);
+                                    havePost ? completed - lastPost : -1, stats, idleRequest);
                             lastReply = completed;
                             haveReply = true;
                             if (result == 1) continue;

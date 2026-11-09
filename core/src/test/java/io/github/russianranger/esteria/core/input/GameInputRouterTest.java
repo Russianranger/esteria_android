@@ -24,8 +24,10 @@ public final class GameInputRouterTest {
     public static void main(String[] args)throws Exception {
         Sink sink=new Sink();GameInputRouter router=new GameInputRouter(sink);
         router.sticks(.3f,-.7f,0,0,0,0);check(sink.keys.containsAll(Arrays.asList((int)'w',(int)'e')),"forward and strafe");
+        check(!router.hasStickMotion(),"held movement uses its key edge without camera ticks");
         router.sticks(.2f,0,0,0,0,0);check(sink.keys.equals(Collections.singleton((int)'e')),"deadzone hysteresis");
         router.sticks(.1f,0,1,0,0,0);check(sink.keys.isEmpty()&&sink.mask==4,"camera holds right mouse");
+        check(router.hasStickMotion(),"deflected camera starts integration");
         router.step(.02);check(sink.dx==20,"frame integrated camera motion");
         int original=sink.dx;
         router.setLookPercent(75);router.step(.02);check(sink.dx-original==15,"precise stick sensitivity");
@@ -33,6 +35,7 @@ public final class GameInputRouterTest {
         router.setLookPercent(150);router.step(.02);check(sink.dx-original==30,"fast stick sensitivity");
         router.setLookPercent(100);
         router.sticks(0,0,0,0,0,0);check(sink.mask==0,"neutral camera releases mouse");
+        check(!router.hasStickMotion(),"centering the right stick stops integration");
         router.button(GameInputRouter.Button.Y,true);router.button(GameInputRouter.Button.Y,true);router.button(GameInputRouter.Button.Y,false);
         check(router.cursorMode(),"cursor toggle");router.button(GameInputRouter.Button.A,true);check(sink.mask==1,"cursor A clicks");
         router.touch(500,-5,400,200,800,400,true);check(sink.x==799&&sink.y==0,"touch coordinates clamp");
@@ -51,6 +54,10 @@ public final class GameInputRouterTest {
         check(sink.dx-original==42 && sink.mask==0,"fast pointer sensitivity on the next tick");
         router.sticks(0,-1,0,0,0,0);check(sink.keys.contains(0xff52),"cursor movement navigates menus");
         router.release();check(sink.keys.isEmpty()&&sink.mask==0,"focus loss neutralizes");
+        router.sticks(0,0,0,1,0,0);
+        check(router.hasStickMotion(),"deflected pointer starts integration after re-entry");
+        router.release();
+        check(!router.hasStickMotion(),"pause or focus loss ends the pointer clock");
         sink.events.clear();KeyboardText.commit(sink,"Az!\n");
         check(sink.events.equals(Arrays.asList("65505:true","97:true","97:false","65505:false","122:true","122:false","65505:true","49:true","49:false","65505:false","65293:true","65293:false")),"shift and base-key text");
         int before=sink.events.size();try{KeyboardText.commit(sink,"valid☃");throw new AssertionError("Unicode silently accepted");}catch(IOException expected){}

@@ -28,6 +28,8 @@ public final class GameInputRouter {
         if(percent!=75 && percent!=100 && percent!=150)throw new IllegalArgumentException("Unsupported stick sensitivity");
         lookPercent=percent;
     }
+    /** Only deflected camera/pointer axes need integration on display frames. */
+    public boolean hasStickMotion() { return cameraX != 0 || cameraY != 0; }
     public boolean cursorMode() { return cursorMode; }
     public void button(Button button, boolean down) throws IOException {
         boolean changed = down ? held.add(button) : held.remove(button);
@@ -107,7 +109,7 @@ public final class GameInputRouter {
     private int desiredButtons() {
         int next = touchMask;
         if (leftTrigger || held.contains(Button.LT) || (cursorMode && held.contains(Button.A))) next |= 1;
-        if (rightTrigger || held.contains(Button.RT) || (!cursorMode && (cameraX != 0 || cameraY != 0))) next |= 4;
+        if (rightTrigger || held.contains(Button.RT) || (!cursorMode && hasStickMotion())) next |= 4;
         return next;
     }
     private void updateButtons() throws IOException {

@@ -249,8 +249,7 @@ public final class LocalServerSession {
                     command,admissionEnvironment,mounts,new WorldConsoleShutdown());
                 try {
                     while(process.isAlive()) {
-                        if(result==null)readProgress(ServerStartupTiming.ReadStage.AUDIT,progress);
-                        startupStatus(progress);
+                        pollStartup(progress);
                         if(stopRequested(cancellation)||!database.isAlive()) {
                             stopping.set(true);state=State.STOPPING;
                             try{process.stop(Duration.ofSeconds(30));}catch(IOException error){remember(error);if(process.isAlive())continue;}
@@ -364,6 +363,13 @@ public final class LocalServerSession {
             if(Files.exists(meter,LinkOption.NOFOLLOW_LINKS)&&
                     ServerStartupStatus.acceptRead(object(meter),timing,now,operation,selectedReceiptSha,stage)&&progress!=null)
                 progress.update("server-session-startup-progress",timing.diagnostic(now),0,-1);
+        }
+        private void pollStartup(RuntimeWork.Progress progress)throws IOException {
+            // Readiness completes this latch once. The native process still reports
+            // liveness and gets one terminal status read when the loop ends.
+            if(startup.getCount()==0)return;
+            readProgress(ServerStartupTiming.ReadStage.AUDIT,progress);
+            startupStatus(progress);
         }
         private void startupStatus(RuntimeWork.Progress progress)throws IOException {
             Path status=guestSession.resolve("startup-status.json");

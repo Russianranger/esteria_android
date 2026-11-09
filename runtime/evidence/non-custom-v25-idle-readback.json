@@ -1,0 +1,134 @@
+{
+  "scope": "Linux x86-64 host. Production native/guest-bridges/x11_frame.c consume and Java PresentationSamples pacing over an actual Unix stream socketpair. Instrumented XGetImage supplies a memory-backed 1280x720 frame and an empty cursor. Neither Xvfb, PRoot, Wine, the graphical client nor Android SurfaceFlinger ran in this measurement.",
+  "method": "Five seconds per case. Static cases always return the same pixels. Animation changes one pixel at 30 Hz. Motion-after-idle cases begin animation after roughly 2.7 seconds and measure the first changed reply from the monotonic onset. The input case also sets lastInput and unparks the reader at onset, modeling an acknowledged input event. V24 normal reader pacing was used for the control. CPU is the process user plus system time of the guest loop including its copies and equality checks.",
+  "idlePolicy": "Wait for at least 500 ms since a changed post and input. Poll at 15 Hz for a 24/30 FPS cap and at 30 Hz for a 60 FPS cap. A pixel change or an acknowledged XTest input restores the configured cadence.",
+  "runs": [
+    {
+      "cap": 30,
+      "sourceAnimationHz": 0,
+      "reader": "v24",
+      "motionAfterIdle": "none",
+      "requests": 150,
+      "changed": 1,
+      "elapsedMs": 5001.0,
+      "guestProcessCpuMs": 106.087
+    },
+    {
+      "cap": 30,
+      "sourceAnimationHz": 0,
+      "reader": "v25",
+      "motionAfterIdle": "none",
+      "requests": 85,
+      "changed": 1,
+      "elapsedMs": 5053.9,
+      "guestProcessCpuMs": 62.791
+    },
+    {
+      "cap": 30,
+      "sourceAnimationHz": 30,
+      "reader": "v24",
+      "motionAfterIdle": "none",
+      "requests": 151,
+      "changed": 151,
+      "elapsedMs": 5018.5,
+      "guestProcessCpuMs": 188.61
+    },
+    {
+      "cap": 30,
+      "sourceAnimationHz": 30,
+      "reader": "v25",
+      "motionAfterIdle": "none",
+      "requests": 151,
+      "changed": 151,
+      "elapsedMs": 5025.7,
+      "guestProcessCpuMs": 198.997
+    },
+    {
+      "cap": 30,
+      "sourceAnimationHz": 30,
+      "reader": "v25",
+      "motionAfterIdle": "auto",
+      "requests": 119,
+      "changed": 71,
+      "elapsedMs": 5018.7,
+      "guestProcessCpuMs": 113.307,
+      "firstChangedAfterOnsetMs": 38.0,
+      "nextIntervalMs": 33.3
+    },
+    {
+      "cap": 30,
+      "sourceAnimationHz": 30,
+      "reader": "v25",
+      "motionAfterIdle": "input",
+      "requests": 120,
+      "changed": 72,
+      "elapsedMs": 5029.9,
+      "guestProcessCpuMs": 115.846,
+      "firstChangedAfterOnsetMs": 2.1,
+      "nextIntervalMs": 35.8
+    },
+    {
+      "cap": 60,
+      "sourceAnimationHz": 0,
+      "reader": "v25",
+      "motionAfterIdle": "none",
+      "requests": 167,
+      "changed": 1,
+      "elapsedMs": 5021.0,
+      "guestProcessCpuMs": 84.807
+    },
+    {
+      "cap": 24,
+      "sourceAnimationHz": 0,
+      "reader": "v25",
+      "motionAfterIdle": "none",
+      "requests": 81,
+      "changed": 1,
+      "elapsedMs": 5048.1,
+      "guestProcessCpuMs": 51.801
+    },
+    {
+      "cap": 30,
+      "sourceAnimationHz": 0,
+      "reader": "v25",
+      "motionAfterIdle": "none",
+      "requests": 85,
+      "changed": 1,
+      "elapsedMs": 5047.0,
+      "guestProcessCpuMs": 59.621
+    },
+    {
+      "cap": 30,
+      "sourceAnimationHz": 0,
+      "reader": "v24",
+      "motionAfterIdle": "none",
+      "requests": 151,
+      "changed": 1,
+      "elapsedMs": 5016.9,
+      "guestProcessCpuMs": 97.322
+    },
+    {
+      "cap": 30,
+      "sourceAnimationHz": 0,
+      "reader": "v24",
+      "motionAfterIdle": "none",
+      "requests": 151,
+      "changed": 1,
+      "elapsedMs": 5018.8,
+      "guestProcessCpuMs": 93.407
+    },
+    {
+      "cap": 30,
+      "sourceAnimationHz": 0,
+      "reader": "v25",
+      "motionAfterIdle": "none",
+      "requests": 85,
+      "changed": 1,
+      "elapsedMs": 5047.8,
+      "guestProcessCpuMs": 58.951
+    }
+  ],
+  "inputScheduling": "The Android view schedules Choreographer camera integration on stick deflection. Centered camera axes, held movement keys, touchscreen-only input, neutralization and focus loss do not require a continuing camera callback. The Android sources compiled against API 35, host controller and presentation regressions passed.",
+  "thorTemperatureC": null,
+  "thorGameplayFps": null
+}

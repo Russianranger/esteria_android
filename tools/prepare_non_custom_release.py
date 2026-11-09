@@ -90,7 +90,7 @@ def stage(args):
                  '**Repair local component → Database setup**, then start the local game again.\n'
                  'If a stage fails, wait for cleanup, tap **Export support bundle**, choose a\n'
                  'destination and tap **Save**. Send the whole ZIP before retrying.')
-    if signed['versionCode'] == 24:
+    if signed['versionCode'] >= 24:
         setup = ('Install over the existing signed Esteria Stock app. Choose **Play → Start local game** '
                  'and select your existing character. Keep the same enUS, Balanced and display settings. '
                  'After normal logout and a clean session stop, use **Tools → Export support bundle**.')

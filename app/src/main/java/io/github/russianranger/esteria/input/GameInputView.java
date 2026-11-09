@@ -153,13 +153,19 @@ public final class GameInputView extends SurfaceView implements SurfaceHolder.Ca
         return attached && surfaceReady && writerAttached && frameWidth > 0 && !failed && !keyboard && !sessionPaused && hasWindowFocus();
     }
     private void startTick() {
-        if (!controlsReady() || ticking) return;
-        ticking = true; previousFrame = 0; Choreographer.getInstance().postFrameCallback(this);
+        if (ticking || !router.hasStickMotion() || !controlsReady()) return;
+        ticking = true;
+        previousFrame = System.nanoTime();
+        Choreographer.getInstance().postFrameCallback(this);
     }
     private void stopTick() { ticking = false; previousFrame = 0; Choreographer.getInstance().removeFrameCallback(this); }
     @Override public void doFrame(long nanos) {
         if (!ticking) return;
-        if (previousFrame != 0) act(() -> router.step((nanos - previousFrame) / 1_000_000_000.0));
+        if (!router.hasStickMotion()) {
+            ticking = false;
+            return;
+        }
+        if (nanos > previousFrame) act(() -> router.step((nanos - previousFrame) / 1_000_000_000.0));
         previousFrame = nanos;
         if (ticking) Choreographer.getInstance().postFrameCallback(this);
     }
@@ -190,7 +196,8 @@ public final class GameInputView extends SurfaceView implements SurfaceHolder.Ca
                     axis(event, MotionEvent.AXIS_Z), axis(event, MotionEvent.AXIS_RZ),
                     Math.max(axis(event, MotionEvent.AXIS_LTRIGGER), axis(event, MotionEvent.AXIS_BRAKE)),
                     Math.max(axis(event, MotionEvent.AXIS_RTRIGGER), axis(event, MotionEvent.AXIS_GAS)));
-                router.hat(axis(event,MotionEvent.AXIS_HAT_X),axis(event,MotionEvent.AXIS_HAT_Y)); });
+                router.hat(axis(event,MotionEvent.AXIS_HAT_X),axis(event,MotionEvent.AXIS_HAT_Y));
+                startTick(); });
         }
         return super.onGenericMotionEvent(event);
     }

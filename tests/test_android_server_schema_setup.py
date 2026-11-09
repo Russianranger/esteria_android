@@ -122,5 +122,46 @@ print(json.dumps(dict(bytes=count,sha256=digest.hexdigest(),arguments=sys.argv[1
         path.unlink(); path.mkdir()
         with self.assertRaises((OSError, service.ServiceError)): setup.read_json(path, 1024)
 
+    def test_live_identity_uses_one_statement_and_rejects_changed_fields(self):
+        state = self.root / 'state'
+        data = state / 'database'
+        data.mkdir(parents=True)
+        uuid = '01234567-89ab-4cde-8fab-0123456789ab'
+        version = '8.0.46'
+        receipt = dict(format=db.FORMAT, engine='mysql', version=version, uuid=uuid, datadir=str(data),
+                       databases=list(db.DATABASES), application_schemas_populated=False)
+        (state / 'database-bootstrap.json').write_text(json.dumps(receipt))
+        (data / 'auto.cnf').write_text('server-uuid=' + uuid + '\n')
+        (self.session / 'ready.json').write_text(json.dumps(dict(formatVersion=1,
+            scope='owned-local-mysql-live-service', operationId='a' * 32, uuid=uuid, version=version,
+            datadir=str(data), bindAddress='127.0.0.1', port=db.PORT, databases=list(db.DATABASES),
+            liveSqlAuthenticated=True, ownedEngineIdentityVerified=True,
+            applicationSchemaUpdatesQualified=False, gameplayQualified=False)))
+        pid_file = self.session / 'mysql.pid'
+        pid_file.write_text('123\n')
+        fields = [version, 'MySQL', uuid, str(data), str(db.PORT), '127.0.0.1', 'esteria@localhost', str(pid_file)]
+
+        from unittest.mock import Mock
+        connection = Mock()
+        def verify(rows):
+            connection.query.reset_mock()
+            connection.query.return_value = rows
+            try:
+                setup.live_service(connection, state, self.session, version, 'a' * 32, uuid)
+            finally:
+                connection.query.assert_called_once_with('SELECT VERSION(), @@version_comment, @@server_uuid, '
+                    '@@datadir, @@port, @@bind_address, CURRENT_USER(), @@pid_file')
+
+        verify(['\t'.join(fields)])
+        for index, bad in enumerate(('8.0.45', 'MariaDB', '11234567-89ab-4cde-8fab-0123456789ab',
+                                     '/foreign', '3306', '0.0.0.0', 'root@localhost', '/foreign/mysql.pid')):
+            changed = list(fields)
+            changed[index] = bad
+            with self.subTest(index=index), self.assertRaises((service.ServiceError, db.BootstrapError)):
+                verify(['\t'.join(changed)])
+        for rows in ([], ['bad'], ['\t'.join(fields)] * 2):
+            with self.assertRaisesRegex(service.ServiceError, 'malformed'):
+                verify(rows)
+
 
 if __name__ == '__main__': unittest.main()

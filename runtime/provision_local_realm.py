@@ -323,7 +323,7 @@ def named_locks(connection, names):
 
 @contextmanager
 def _verified_context(content, connection, state, version, *, profile, data, mysql, expected_uuid, verify_service,
-                     account_schemas=None, account_lock=False, state_lease=None):
+                     account_schemas=None, account_lock=False, state_lease=None, cancelled=None):
     """Caller retains its live engine/service lease. This helper owns no process.
 
     The completed compiled-updater verifier is read-only and inherits these
@@ -359,7 +359,7 @@ def _verified_context(content, connection, state, version, *, profile, data, mys
             require(connection.query('SELECT CURRENT_USER()') in (['esteria@127.0.0.1'], ['esteria@localhost']),
                     'Unexpected authenticated provisioning account')
             completed = updates.verify_completed_update(content, connection, state, version,
-                expected_uuid=expected_uuid, verify_service=verify_service)
+                expected_uuid=expected_uuid, verify_service=verify_service, cancelled=cancelled)
             updater_identity = baseline.file_identity(state / updates.JOURNAL)
             yield receipt, generation, completed
             require(baseline.file_identity(state / updates.JOURNAL) == updater_identity and

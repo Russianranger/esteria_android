@@ -19,7 +19,10 @@ import java.util.Set;
 
 /** Bounded asynchronous XTest transport; never blocks the UI on guest socket writes. */
 public final class InputBridge implements InputSink, AutoCloseable {
-    public interface Events { void failed(String code); }
+    public interface Events {
+        void failed(String code);
+        default void inputApplied() { }
+    }
     private static final int QUEUE_LIMIT = 256;
     private final LocalSocket socket = new LocalSocket();
     private final ArrayDeque<byte[]> pending = new ArrayDeque<>();
@@ -113,6 +116,7 @@ public final class InputBridge implements InputSink, AutoCloseable {
                 }
                 output.write(event); output.flush();
                 if (input.readInt() != 0) throw new IOException("Guest rejected input event");
+                if (events != null) events.inputApplied();
             }
         } catch (IOException | RuntimeException error) {
             boolean failed;

@@ -302,13 +302,50 @@ public final class GameSessionOwnerTests {
             "1".equals(facts.get("game.thermal.androidStatusCode.last")), "OS severity independent of unavailable battery");
     }
 
+    private static void rendererObservation() throws Exception {
+        Path work = Files.createTempDirectory("esteria-engine-log").toRealPath();
+        try {
+            Path directory = Files.createDirectories(work.resolve("client-state/Logs"));
+            Path log = directory.resolve("vulkan.log");
+            String selected = "[debug] vulkan: chose adapter 0 'Turnip Adreno (TM) 740' out of 1: it is the only adapter. "
+                + "integrated, api 1.3.0, driver 26.1.4, VID 5143 DID 43050a01\r\n";
+            GameRendererObservation observation = GameRendererObservation.beforeStart(work);
+            check(observation.afterExit() == null, "Missing log has no selected adapter");
+            Files.writeString(log, "WineD3D: llvmpipe\n" + selected + "private unrelated line\n");
+            check("Adreno 740 integrated (VID 5143, DID 43050a01)".equals(observation.afterExit()), "Observe the engine selection");
+            Files.setLastModifiedTime(log, java.nio.file.attribute.FileTime.fromMillis(1));
+            observation = GameRendererObservation.beforeStart(work);
+            check(observation.afterExit() == null, "Unmodified previous log belongs to an earlier session");
+            String cpu = selected.replace("Turnip Adreno (TM) 740", "llvmpipe (LLVM 15.0.6, 128 bits)")
+                .replace("integrated", "cpu").replace("5143 DID 43050a01", "10005 DID 0000");
+            Files.writeString(log, cpu);
+            check("llvmpipe cpu (VID 10005, DID 0000)".equals(observation.afterExit()), "Fresh software selection");
+            Files.writeString(log, selected.replace("Turnip Adreno (TM) 740", "private device text"));
+            check("integrated (VID 5143, DID 43050a01)".equals(observation.afterExit()), "Private input is reduced to an allowlisted format");
+            Files.writeString(log, selected.replace("chose adapter", "rejected adapter"));
+            check(observation.afterExit() == null, "An enumerated device is not the selected device");
+            Files.writeString(log, "x".repeat(65536) + "\n" + selected);
+            check(observation.afterExit() == null, "A marker past the bounded prefix is omitted");
+            Path foreign = Files.writeString(work.resolve("foreign.log"), selected);
+            Files.delete(log);
+            Files.createSymbolicLink(log, foreign);
+            check(observation.afterExit() == null && GameRendererObservation.beforeStart(work) == null, "Refuse a linked log");
+            Files.delete(log);
+            Files.delete(directory);
+            Files.createSymbolicLink(directory, work);
+            check(GameRendererObservation.beforeStart(work) == null, "Refuse a linked log directory");
+        } finally {
+            remove(work);
+        }
+    }
+
     public static void main(String[] arguments)throws Exception {
         if(arguments.length==2&&arguments[0].equals("--probe-lease")) {
             try(ExclusiveFileLease lease=ExclusiveFileLease.acquire(Path.of(arguments[1]),"TEST_ONLY_BUSY")){System.exit(0);}
             catch(IOException busy){if("TEST_ONLY_BUSY".equals(busy.getMessage()))System.exit(73);throw busy;}
         }
-        thermalSampling();
+        rendererObservation();thermalSampling();
         crossProcessDuplicateRefusal();gracefulFailureThenExplicitForce();naturalExit();prelaunch();typedViewLease();preservedForeignHandoff();persistentShutdownBudgets();startupCancellationHandoff();sourceCloseSequenceAndShaderSelection();
-        System.out.println("Game owner passed10 host groups: thermal summary/cadence, cross-JVM duplicate/refusal/release, real owners/import+view locks, explicit-force/reap/bindings, source close sequence and shader stale guards; no native/SQL/Android/gameplay run");
+        System.out.println("Game owner passed11 host groups: fresh engine-selected adapter, thermal summary/cadence, cross-JVM duplicate/refusal/release, real owners/import+view locks, explicit-force/reap/bindings, source close sequence and shader stale guards; no native/SQL/Android/gameplay run");
     }
 }

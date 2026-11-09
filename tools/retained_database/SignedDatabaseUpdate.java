@@ -117,7 +117,8 @@ public final class SignedDatabaseUpdate {
             }
             return;
         }
-        if(phase.equals("prepare-baseline") || phase.equals("reopen23") || phase.equals("reopen24")) {
+        boolean exportAfterReopen = phase.equals("reopen-and-export") || phase.equals("reopen24");
+        if(phase.equals("prepare-baseline") || phase.equals("reopen23") || exportAfterReopen) {
             if(phase.equals("prepare-baseline")) {
                 try(ServerInstallationSetup.Handle owner=ServerInstallationSetup.beginFresh(ctx,root,server,programs,content,data,1L<<30)){
                     owner.prepare(progress,RuntimeWork.NEVER_CANCELLED);
@@ -134,7 +135,7 @@ public final class SignedDatabaseUpdate {
                 require(active.mysqlUuid.equals(service.instanceUuid()),"SQL reopened different UUID");
             }finally{service.stop(Duration.ofSeconds(30));}
             require(!service.isAlive(),"SQL did not stop");
-            if(phase.equals("reopen24"))PostStopExportFixture.prepare(ctx,service.diagnosticLogs(),active.slotId);
+            if(exportAfterReopen)PostStopExportFixture.prepare(ctx,service.diagnosticLogs(),active.slotId);
             System.out.println("ESTERIA_ACTIVE slot="+active.slotId+" uuid="+active.mysqlUuid+" elapsedMs="+TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-start));
             return;
         }

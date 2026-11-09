@@ -99,7 +99,7 @@ public final class PcmProtocolTests {
         // The first reply is a fresh baseline. An unchanged response still advances observation time;
         // its old JNI buffer must never count as another copy or capture timing.
         samples.reply(true, 10_000_000, -1, nativeFrame);
-        samples.reply(false, 30_000_000, -1, nativeFrame);
+        samples.reply(false, 30_000_000, -1, nativeFrame, true);
         for (int i = 0; i < 18; i++) samples.reply(true, 40_000_000, 40_000_000, nativeFrame);
         samples.reply(true, 240_000_000, 240_000_000, nativeFrame);
         // New attachment after a pause, followed by a long frame. Paused time is excluded.
@@ -114,12 +114,23 @@ public final class PcmProtocolTests {
         check(facts.get("presentation.observedMs").equals("1300"));
         check(facts.get("presentation.changedCaptureMs").equals("44"));
         check(facts.get("presentation.unchangedReads").equals("1"));
+        check(facts.get("presentation.idleReadbacks").equals("1"));
         check(samples.counters()[2] == 22L * 1280 * 720 * 4);
         check(!new PresentationSamples().facts().containsKey("presentation.postsPerSecond"));
-        check(PresentationSamples.requestDelayNanos(24, 0, 10_000_000) == 31_666_666);
-        check(PresentationSamples.requestDelayNanos(24, 0, 42_000_000) == 0);
-        check(PresentationSamples.requestDelayNanos(30, 0, 10_000_000) == 0);
-        check(PresentationSamples.requestDelayNanos(60, 0, 10_000_000) == 0);
+        check(PresentationSamples.requestDelayNanos(24, 0, 10_000_000, 0, 0) == 31_666_666);
+        check(PresentationSamples.requestDelayNanos(24, 0, 42_000_000, 0, 0) == 0);
+        check(PresentationSamples.requestDelayNanos(30, 0, 10_000_000, 0, 0) == 0);
+        check(PresentationSamples.requestDelayNanos(60, 0, 10_000_000, 0, 0) == 0);
+        long request = 1_000_000_000L, now = request + 5_000_000L;
+        check(PresentationSamples.requestDelayNanos(30, request, now, 0, 0) == 61_666_666L);
+        check(PresentationSamples.requestDelayNanos(60, request, now, 0, 0) == 28_333_333L);
+        check(PresentationSamples.requestDelayNanos(24, request, now, 0, 0) == 61_666_666L);
+        // A fresh frame or acknowledged input restores pacing immediately, respecting the 24 FPS ceiling.
+        check(PresentationSamples.requestDelayNanos(30, request, now, 0, now) == 0);
+        check(PresentationSamples.requestDelayNanos(60, request, now, now, 0) == 0);
+        check(PresentationSamples.requestDelayNanos(24, request, now, 0, now) == 36_666_666L);
+        check(PresentationSamples.requestDelayNanos(30, request, now, now - 499_999_999L, 0) == 0);
+        check(PresentationSamples.requestDelayNanos(30, request, now + 70_000_000L, 0, 0) == 0);
         groups++;
         System.out.println("Presentation protocol groups passed: " + groups);
     }

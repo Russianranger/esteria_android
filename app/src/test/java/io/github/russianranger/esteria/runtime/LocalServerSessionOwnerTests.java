@@ -2,6 +2,7 @@ package io.github.russianranger.esteria.runtime;
 
 import android.content.Context;
 import io.github.russianranger.esteria.core.runtime.install.FreshServerInstallations;
+import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import io.github.russianranger.esteria.core.runtime.process.OwnedProcess;
 import java.io.IOException;
 import io.github.russianranger.esteria.core.runtime.ExclusiveFileLease;
@@ -104,9 +105,41 @@ public final class LocalServerSessionOwnerTests {
             remove(root);
         }
     }
+    private static void startupAndExitObservations() throws Exception {
+        Path root=Files.createTempDirectory("esteria-startup-monitor-").toRealPath();
+        LocalServerSession.Handle session=null;
+        try(ExclusiveFileLease lock=ExclusiveFileLease.acquire(root.resolve(".lock"),"TEST_ONLY_BUSY")) {
+            session=owner(root,root,null,lock);
+            set(session,"guestSession",root);
+            // A directory in place of this private receipt causes every attempt
+            // to open it to fail, even with Android JSON unavailable on the host.
+            Files.createDirectory(root.resolve("startup-status.json"));
+            var poll=LocalServerSession.Handle.class.getDeclaredMethod("pollStartup",RuntimeWork.Progress.class);
+            var terminal=LocalServerSession.Handle.class.getDeclaredMethod("startupStatus",RuntimeWork.Progress.class);
+            poll.setAccessible(true);
+            terminal.setAccessible(true);
+            try {
+                poll.invoke(session,RuntimeWork.NONE);
+                throw new AssertionError("Startup must read status until ready");
+            } catch(java.lang.reflect.InvocationTargetException failure) {
+                check(failure.getCause() instanceof IOException,"Expected invalid startup status");
+            }
+            ((CountDownLatch)field(session,"startup")).countDown();
+            for(int tick=0;tick<6000;tick++)poll.invoke(session,RuntimeWork.NONE);
+            try {
+                terminal.invoke(session,RuntimeWork.NONE);
+                throw new AssertionError("Terminal status must still be inspected");
+            } catch(java.lang.reflect.InvocationTargetException failure) {
+                check(failure.getCause() instanceof IOException,"Expected invalid terminal status");
+            }
+        } finally {
+            if(session!=null)owners().remove(root,session);
+            remove(root);
+        }
+    }
     private static void remove(Path root)throws IOException {try(var paths=Files.walk(root)){for(Path path:paths.sorted(Comparator.reverseOrder()).toArray(Path[]::new))Files.delete(path);}}
     public static void main(String[] arguments)throws Exception {
-        activeLease(false);activeLease(true);completedWorkerCannotHideLiveChild();
-        System.out.println("Local auth/world owner passed3 host cleanup/dependency/prelaunch fixtures; no SQL/native/Android/gameplay execution");
+        startupAndExitObservations();activeLease(false);activeLease(true);completedWorkerCannotHideLiveChild();
+        System.out.println("Local auth/world owner passed4 host status/cleanup/dependency/prelaunch fixtures (6000 post-ready polls skipped startup status); no SQL/native/Android/gameplay execution");
     }
 }
