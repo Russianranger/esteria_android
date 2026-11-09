@@ -124,6 +124,28 @@ def _programs(programs):
     return result
 
 
+def _verify_session_login(verified, connection, state, version, *, profile, data, mysql,
+                          expected_uuid, verify_service, lease, generation, bots, cancelled):
+    """Recheck the existing realm/account together, without rewriting installation receipts."""
+    schemas = {'account': account.ACCOUNT_SCHEMA_SHA256, 'realmcharacters': account.TRACKER_SCHEMA_SHA256}
+    with realm._verified_context(verified, connection, state, version, profile=profile, data=data, mysql=mysql,
+            expected_uuid=expected_uuid, verify_service=verify_service, account_schemas=schemas, account_lock=True,
+            state_lease=lease) as (receipt, active_generation, completed):
+        require(receipt['uuid'] == expected_uuid and active_generation == generation and
+                completed.get('compiledUpdaterCompleted') is True and completed.get('playerbots') == bots,
+                'Owned realm/account schema or configuration changed after preparation')
+        before = schema.account_identity(state)
+        require(before is not None and not cancelled(), 'Owned account is missing or session cancelled')
+        realm.check_schema(connection)
+        require(realm.configure_row(connection, verify_only=True) == 'verified', 'Local realm verification failed')
+        require(not cancelled(), 'Owned session cancelled before account verification')
+        account.check_schema(connection)
+        require(account.configure_account(connection, state, receipt, verify_only=True) == 'verified-owned-account',
+                'Local account verification failed')
+        require(schema.account_identity(state) == before and not cancelled(),
+                'Owned account changed during verification or session cancelled')
+
+
 def prepare(verified, connection, state, version, *, programs, data_generation, expected_data_inputs,
             profile, mysql, expected_uuid, verify_service, state_lease=None, cancelled=lambda: False, progress=lambda *_: None,
             admission=None):
@@ -164,14 +186,10 @@ def prepare(verified, connection, state, version, *, programs, data_generation, 
         progress('configuration-verification')
         rendered = config.render_verified(verified, state, data_root / 'data', Path(mysql), profile=profile)
         require(rendered.get('module_configurations_complete') is True, 'Complete source module configuration required')
-        common = dict(profile=profile, data=data_root / 'data', mysql=Path(mysql), expected_uuid=expected_uuid,
-                      verify_service=verify_service, verify_only=True, state_lease=lease)
-        checked_realm = realm.provision_verified(verified, connection, state, version, **common)
-        checked_account = account.provision_verified(verified, connection, state, version, **common)
         generation = rendered['generation']
-        require(checked_realm.get('operation') == 'verified' and checked_account.get('operation') == 'verified-owned-account' and
-                all(row.get('mysqlUuid') == expected_uuid and row.get('configGeneration') == generation
-                    for row in (checked_realm, checked_account)), 'Owned realm/account runtime context differs')
+        _verify_session_login(verified, connection, state, version, profile=profile, data=data_root / 'data',
+            mysql=Path(mysql), expected_uuid=expected_uuid, verify_service=verify_service, lease=lease,
+            generation=generation, bots=bots, cancelled=cancelled)
         require(not cancelled() and verify_service() is not False, 'Session ownership changed during preparation')
         return Prepared(verified, state, version, expected_uuid, generation, data_root,
             baseline.file_identity(data_root / 'receipt.json'), selected, profile,

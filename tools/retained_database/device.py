@@ -71,7 +71,11 @@ if __name__ == '__main__':
         old = install('previous.apk', candidate - 1)
         run('seed-providers', old)
         run('prepare-baseline', old)
+        if candidate == 24:
+            run('measure-baseline', old)
         assert install('candidate.apk', candidate) == old
+        if candidate == 24:
+            run('measure-candidate', old)
         run('reopen' + str(candidate), old)
         sys.exit(0)
     if sys.argv[2:] == ['v22']:

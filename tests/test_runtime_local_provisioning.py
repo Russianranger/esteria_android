@@ -123,6 +123,58 @@ class PortableLocalProvisioning(unittest.TestCase):
 
     def writes(self): return [sql for sql in self.connection.calls if sql.startswith(('INSERT', 'UPDATE', 'REPLACE', 'DELETE'))]
 
+    def verify_session_login(self, cancelled=lambda: False):
+        from runtime import server_session
+        bots = {'journalIdentity': {'bytes': 1, 'sha256': 'b' * 64}}
+        def completed(*args, **kwargs):
+            self.assertEqual(set(self.connection.locks), {
+                'esteria-local-bootstrap', 'esteria-local-realm', 'esteria-local-account'})
+            return self.completed_gate(*args, **kwargs) | {'playerbots': bots}
+        with db.state_lock(self.state) as lease, patch.object(updates, 'verify_completed_update', side_effect=completed):
+            server_session._verify_session_login(self.content, self.connection, self.state, '8.0.46',
+                profile=self.profile, data=self.configuration.data, mysql=self.configuration.mysql,
+                expected_uuid=self.uuid, verify_service=self.service, lease=lease,
+                generation=(self.state/'config/current').resolve().name, bots=bots, cancelled=cancelled)
+
+    def test_session_login_keeps_provisioning_receipts_and_checks_both_transactions_under_one_proof(self):
+        self.run_realm()
+        self.run_account()
+        paths = [self.state / name for name in ('realm-loopback.json', 'local-account.json', account.JOURNAL)]
+        before = [(p.stat().st_ino, p.read_bytes()) for p in paths]
+        self.gate_calls = 0
+        self.connection.calls.clear()
+        self.verify_session_login()
+        self.assertEqual(self.gate_calls, 1)
+        self.assertEqual(self.connection.calls.count('COMMIT'), 2)
+        self.assertEqual(self.connection.locks, {})
+        self.assertEqual(self.writes(), [])
+        self.assertEqual([(p.stat().st_ino, p.read_bytes()) for p in paths], before)
+
+    def test_session_login_refuses_cancellation_or_tracker_loss_and_releases_locks(self):
+        self.run_account()
+        self.connection.calls.clear()
+        with self.assertRaisesRegex(ValueError, 'cancelled'):
+            self.verify_session_login(cancelled=lambda: 'COMMIT' in self.connection.calls)
+        self.assertEqual(self.connection.calls.count('START TRANSACTION'), 1)
+        self.assertEqual(self.connection.locks, {})
+        self.connection.tracker = False
+        with self.assertRaisesRegex(db.BootstrapError, 'tracker'):
+            self.verify_session_login()
+        self.assertIn('ROLLBACK', self.connection.calls)
+        self.assertEqual(self.connection.locks, {})
+        self.assertEqual(self.writes(), [])
+
+    def test_session_login_refuses_changed_updater_journal_before_releasing_proof(self):
+        self.run_account()
+        original = account.configure_account
+        def mutate(*args, **kwargs):
+            result = original(*args, **kwargs)
+            (self.state / updates.JOURNAL).write_text('changed after second transaction')
+            return result
+        with patch.object(account, 'configure_account', side_effect=mutate), self.assertRaisesRegex(db.BootstrapError, 'journal'):
+            self.verify_session_login()
+        self.assertEqual(self.connection.locks, {})
+
     def test_runtime_apis_never_read_root_and_preserve_private_credentials_on_repeat(self):
         secret = (self.state / 'accounts/database-secret').read_bytes()
         self.connection.realm_row = '1\t203.0.113.4\t127.0.0.1\t255.255.255.0\t9001\t99999'

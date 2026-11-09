@@ -74,15 +74,13 @@ public final class LocalServerSession {
         if(!current.proofSha256.equals(active.proofSha256)||!current.directoryFor(root).equals(work)||
                 !database.privateWorkDirectory().equals(work)||!active.mysqlUuid.equals(database.instanceUuid())||!database.isAlive())
             throw new IOException("Promoted installation and live database identities differ");
-        if(runtime.current()==null||programs.current()==null||content.current()==null||
-                !active.runtimeArchiveSha256.equals(runtime.packagePlan().archiveSha256))
+        if(!active.runtimeArchiveSha256.equals(runtime.packagePlan().archiveSha256))
             throw new IOException("Prepared pinned server providers required");
         programs.requireServerRuntimeArchive(runtime.packagePlan().archiveSha256);
         content.requireServerRuntimeArchive(runtime.packagePlan().archiveSha256);data.requireUnchanged();
         if(!data.directory.startsWith(root)||data.directory.equals(root)||!data.directory.equals(data.directory.toRealPath()))
             throw new IOException("Private canonical prepared data required");
-        for(Path other:List.of(work,runtime.current(),programs.current(),content.current()))
-            if(data.directory.startsWith(other)||other.startsWith(data.directory))throw new IOException("Prepared data overlaps a live provider/workspace");
+        requireSeparateDataDirectory(data.directory,work,runtime,programs,content);
         Path lockPath=work.resolve(".android-local-server-session.lock");
         if(Files.exists(lockPath,LinkOption.NOFOLLOW_LINKS)&&!Files.isRegularFile(lockPath,LinkOption.NOFOLLOW_LINKS))
             throw new IOException("Invalid server session lock");
@@ -94,6 +92,17 @@ public final class LocalServerSession {
             if(OWNERS.putIfAbsent(work,owner)!=null)throw new IOException("Previous local server ownership remains retained");
             return owner;
         }catch(IOException|RuntimeException|Error error){try{lease.close();}catch(IOException close){error.addSuppressed(close);}throw error;}
+    }
+    /** Resolve each source-pinned root once for this overlap check. Launch reselects providers for its actual mounts. */
+    static void requireSeparateDataDirectory(Path data, Path work, ServerRuntimeSetup runtime,
+            ServerProgramsSetup programs, ServerContentSetup content) throws IOException {
+        Path serverRoot = runtime.current(), programsRoot = programs.current(), contentRoot = content.current();
+        if (serverRoot == null || programsRoot == null || contentRoot == null)
+            throw new IOException("Prepared pinned server providers required");
+        for (Path other : List.of(work, serverRoot, programsRoot, contentRoot)) {
+            if (data.startsWith(other) || other.startsWith(data))
+                throw new IOException("Prepared data overlaps a live provider/workspace");
+        }
     }
     public static final class Handle implements AutoCloseable {
         private final Context context;

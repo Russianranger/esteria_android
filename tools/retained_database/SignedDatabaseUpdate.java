@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.os.Looper;
 import io.github.russianranger.esteria.core.runtime.install.FreshServerInstallations;
+import io.github.russianranger.esteria.core.runtime.install.RuntimeReadPolicy;
 import io.github.russianranger.esteria.core.runtime.install.RuntimeWork;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -90,6 +91,32 @@ public final class SignedDatabaseUpdate {
             bridges.current(),graphics.current(),dataTools.current(),shaderTools.current()};
         verifyRetainedFiles(qa,roots,client,seed);
         if(seed)return;
+        if(phase.equals("measure-baseline") || phase.equals("measure-candidate")) {
+            // Both versions use a new app_process and the same warm-up before sampling.
+            // Only time the production lookup. Verify the retained identity outside the interval.
+            long[] programProviderBytes={0};
+            FreshServerInstallations.Active warm;
+            try(RuntimeReadPolicy.Scope scope=RuntimeReadPolicy.install((file,offset,bytes)->{
+                if(file.startsWith(roots[1]))programProviderBytes[0]+=bytes;
+            })) {
+                warm=ServerInstallationSetup.completed(ctx,root,server,programs,content);
+            }
+            require(programProviderBytes[0]>0,"program provider read observation missing");
+            System.out.println("ESTERIA_RETAINED_WARMUP programProviderBytesRead="+programProviderBytes[0]);
+            byte[] retainedIdentity=Files.readAllBytes(qa.resolve("active"));
+            require(Arrays.equals(identity(root,warm),retainedIdentity),"warmup changed retained identity");
+            for(int sample=1;sample<=3;sample++) {
+                long wallStart=System.nanoTime();
+                long cpuStart=android.os.Debug.threadCpuTimeNanos();
+                var selected=ServerInstallationSetup.completed(ctx,root,server,programs,content);
+                long cpuNs=android.os.Debug.threadCpuTimeNanos()-cpuStart;
+                long wallNs=System.nanoTime()-wallStart;
+                require(warm.slotId.equals(selected.slotId) && warm.mysqlUuid.equals(selected.mysqlUuid) &&
+                        Arrays.equals(identity(root,selected),retainedIdentity),"timed lookup changed retained identity");
+                System.out.println("ESTERIA_RETAINED_LOOKUP sample="+sample+" wallNs="+wallNs+" threadCpuNs="+cpuNs);
+            }
+            return;
+        }
         if(phase.equals("prepare-baseline") || phase.equals("reopen23") || phase.equals("reopen24")) {
             if(phase.equals("prepare-baseline")) {
                 try(ServerInstallationSetup.Handle owner=ServerInstallationSetup.beginFresh(ctx,root,server,programs,content,data,1L<<30)){

@@ -1,0 +1,67 @@
+{
+  "scope": "Owner-supplied post-game support export from AYN Thor, stock Android 13. Latest retained Start in the launcher log and its associated server tails.",
+  "package": "io.github.russianranger.esteria.stock",
+  "installedVersionCode": 23,
+  "installedVersionName": "0.1.0-non-custom.23",
+  "producer": "0c712cd9d52e54be0b329925ed72943138cf23d5",
+  "ownerObservation": "Everything seemed to work. Server startup could improve.",
+  "selection": {
+    "locale": "enUS",
+    "speed": "balanced",
+    "reusedInstallation": true,
+    "extractionInvocations": 0,
+    "shaderCompilerInvocations": 0,
+    "runtimeDownloads": 0,
+    "clientCopiedBytes": 0,
+    "worldBytesSelected": 7303166933,
+    "worldPayloadBytesReadByCacheAdmission": 0
+  },
+  "latestStartElapsedSeconds": {
+    "retainedSelection": 81,
+    "shaderSessionIntegrityComplete": 92,
+    "databaseStartPhase": 107,
+    "serverSessionStartPhase": 142,
+    "ownedAuthAndWorldReady": 309,
+    "clientProcessStarted": 336
+  },
+  "serverHelperMonotonicMs": {
+    "sourceSelection": 0,
+    "providerVerificationBegins": 22,
+    "preparedDataVerificationBegins": 21391,
+    "schemaVerificationBegins": 42348,
+    "configurationVerificationBegins": 61071,
+    "nativeLaunch": 98387,
+    "nativeLaunchToOwnedReady": 67408
+  },
+  "worldserver": {
+    "reportedWorldInitializationSeconds": 64,
+    "reportedPlayerbotConfigurationMs": 49147,
+    "individuallyTimedBottleneckWithinPlayerbotInitialization": null
+  },
+  "shutdown": {
+    "clientExitAcknowledged": true,
+    "forced": false,
+    "recoveryRequired": false,
+    "handoffRecoveryRequired": false,
+    "threeColdOfflineGraphicalCharacterReopensObserved": false
+  },
+  "supportExport": {
+    "bytes": 32319,
+    "sha256": "61a1326f384595e6e79f62e5a4c7080e6c02b7247e32722bf4a55b114b9a6ed0",
+    "zipCrcVerified": true,
+    "entries": 30,
+    "logEntries": 29,
+    "metadataBytes": 14192,
+    "omittedFacts": 0,
+    "rejectedRoles": 0,
+    "worldserverTailEncodedBytes": 65554,
+    "documentedLogByteLimit": 65536
+  },
+  "performanceAtExport": {
+    "configuredNextStartCap": 30,
+    "androidThermalSeverity": 0,
+    "inGameTemperatureCelsius": null,
+    "deliveredFps": null
+  },
+  "physicalEvidenceBoundary": "The earlier reported character creation, quest, combat and logout remain from a working installation whose version was unspecified. This v23 export establishes the later normal Start, successful export and acknowledged cleanup. It supplies no per-corner or cold saved-character test."
+}

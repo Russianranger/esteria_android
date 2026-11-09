@@ -310,6 +310,49 @@ def private_identities(state):
     return {name: baseline.file_identity(state / name) for name in PRIVATE_FILES}
 
 
+def compare_session_login(verified, connection, state, version, *, profile, data, mysql, uuid, owned, lease, generation):
+    """Exercise the v23 and consolidated login checks on the same reopened, offline four-schema fixture."""
+    from runtime import server_session
+
+    class CountedConnection:
+        count = 0
+        ledger_reads = 0
+
+        def query(self, statement, *args, **kwargs):
+            self.count += 1
+            if statement == 'SELECT name,hash,state FROM `acore_playerbots`.`updates` ORDER BY name':
+                self.ledger_reads += 1
+            return connection.query(statement, *args, **kwargs)
+
+    measured = CountedConnection()
+    def live():
+        return owned.verify(measured, uuid)
+    common = dict(profile=profile, data=data, mysql=mysql, expected_uuid=uuid, verify_service=live)
+    with realm.named_locks(measured, ('esteria-local-bootstrap', 'esteria-local-realm', 'esteria-local-account')):
+        bots = playerbots.verify_completed(verified, measured, state, version, expected_uuid=uuid, verify_service=live)
+    reports = {label: [] for label in ('separate', 'combined')}
+    receipts = ('realm-loopback.json', 'local-account.json')
+    retained = {name: baseline.file_identity(state / name) for name in receipts}
+    for mode in ('separate', 'combined', 'combined', 'separate'):
+        began, queries, ledger_reads = time.monotonic_ns(), measured.count, measured.ledger_reads
+        if mode == 'combined':
+            server_session._verify_session_login(verified, measured, state, version, **common,
+                lease=lease, generation=generation, bots=bots, cancelled=lambda: False)
+        else:
+            for provider in (realm, account):
+                provider.provision_verified(verified, measured, state, version, **common, state_lease=lease, verify_only=True)
+        reports[mode].append(dict(elapsedMs=(time.monotonic_ns() - began) // 1_000_000,
+                                  sqlQueries=measured.count - queries,
+                                  playerbotsLedgerReads=measured.ledger_reads - ledger_reads))
+        require(reports[mode][-1]['playerbotsLedgerReads'] == (1 if mode == 'combined' else 2),
+                'Unexpected completed ledger check count')
+        require(all(baseline.file_identity(state / name) == retained[name] for name in receipts),
+                'Retained login verification receipt changed')
+    require(max(row['sqlQueries'] for row in reports['combined']) < min(row['sqlQueries'] for row in reports['separate']),
+            'Combined session login did not reduce queries on the same live SQL instance')
+    return reports
+
+
 def _complete_fields(value, helper, version, uuid, operation):
     require(type(value.get('formatVersion')) is int and value['formatVersion'] == 1 and
             value.get('scope') == COMPLETE_SCOPE and value.get('mysqlUuid') == uuid and value.get('mysqlVersion') == version and
@@ -512,6 +555,12 @@ def run(prepared, mysql, mysqld, version, output):
                     'Restarted completion differs or replayed execution')
             evidence.update(restartPersistenceVerified=True, restartedFinishReentryWithoutExecution=True,
                             restartedFinishReentry=final)
+            evidence['phase'] = 'compare-retained-session-login'
+            evidence['sessionLoginComparison'] = compare_session_login(verified, connection, state, version,
+                profile=arguments['profile'], data=final_data, mysql=mysql, uuid=uuid, owned=owned, lease=lease,
+                generation=final['configGeneration'])
+            require(private_identities(state) == stable and playerbots.preserved_core(connection) == core_rows,
+                    'Retained session login comparison modified the four-schema fixture')
         evidence['phase'] = 'production-final-clean-stop'
         final_session, final_operation = owned.session, owned.operation
         stopped = owned.stop(uuid)

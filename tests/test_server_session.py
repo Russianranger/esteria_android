@@ -43,8 +43,7 @@ class ServerSessionPreparationTests(unittest.TestCase):
         self.mock(session.data,'verify_completed',lambda *_,**__:{'inputs':{'serverRevision':session.realm.SERVER_REVISION}})
         self.mock(session.playerbots,'verify_completed',self.verify_bots)
         self.mock(session.config,'render_verified',self.render)
-        self.mock(session.realm,'provision_verified',self.realm)
-        self.mock(session.account,'provision_verified',self.account)
+        self.mock(session,'_verify_session_login',self.verify_login)
         self.mock(session.schema,'credential_identity',lambda *_:{'TEST_ONLY_CREDENTIAL_PIN':self.pin})
         self.mock(session.schema,'account_identity',lambda *_:self.pin)
 
@@ -65,16 +64,11 @@ class ServerSessionPreparationTests(unittest.TestCase):
         self.assertEqual(self.connection.locks,[])
         return dict(generation='c'*64,module_configurations_complete=True)
 
-    def realm(self,*args,**kwargs):
-        self.held();self.calls.append('verify-realm');self.assertTrue(kwargs['verify_only'])
-        self.assertEqual(kwargs['data'],self.data/'data');self.lease=kwargs['state_lease']
+    def verify_login(self,*args,**kwargs):
+        self.held();self.calls.append('verify-login')
+        self.assertEqual(kwargs['data'],self.data/'data');self.lease=kwargs['lease']
+        self.assertEqual(kwargs['generation'],'c'*64);self.assertEqual(kwargs['bots'],self.bots)
         with session.db.state_scope(self.state,self.lease):pass
-        return dict(operation='verified',mysqlUuid=self.uuid,configGeneration='c'*64)
-
-    def account(self,*args,**kwargs):
-        self.held();self.calls.append('verify-account');self.assertTrue(kwargs['verify_only'])
-        self.assertIs(kwargs['state_lease'],self.lease)
-        return dict(operation='verified-owned-account',mysqlUuid=self.uuid,configGeneration='c'*64)
 
     def prepare(self,**extra):
         args=dict(programs={name:dict(path=self.root/name,identity=self.pin) for name in ('authserver','worldserver')},
@@ -89,7 +83,7 @@ class ServerSessionPreparationTests(unittest.TestCase):
             self.assertIs(self.lease,lease)
             self.held()
         self.assertIsInstance(prepared,session.Prepared)
-        self.assertEqual(self.calls,['actual-completed-PB-gate-mocked','new-config','verify-realm','verify-account'])
+        self.assertEqual(self.calls,['actual-completed-PB-gate-mocked','new-config','verify-login'])
         self.assertEqual(self.connection.locks,[])
         self.assertEqual(prepared.mysql,Path('/usr/bin/mysql'))
         self.assertFalse(any(self.state.rglob('server-setup-complete.json')))

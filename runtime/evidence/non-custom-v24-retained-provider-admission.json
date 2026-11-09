@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "description": "Repeated validation of selected immutable server providers on a retained start",
+  "baseline": {
+    "versionCode": 23,
+    "apkSha256": "fc0e04d96eb51766cdfb7dc576cdbe9d4149e9a5c0228d4eb8e0ac4670c75ff5",
+    "androidProducer": "0c712cd9d52e54be0b329925ed72943138cf23d5"
+  },
+  "environment": "Linux x86-64 host with production Java provider installers and RuntimeReadPolicy counters. Android context and assets were supplied by the filesystem qualification facade. No pacing or pressure injection.",
+  "seed": {
+    "providerCopiedBytes": 1131934277,
+    "providers": [
+      "server-runtime",
+      "server-programs",
+      "server-content"
+    ],
+    "source": "Files extracted from verified public stock v23 APK"
+  },
+  "method": {
+    "helper": "Invoke ServerInstallationSetup.playerbotsSelection directly. This includes full provider verification and both independently pinned helper receipt checks.",
+    "overlap": "Compare the v23 LocalServerSession.begin provider resolver expressions isolated from the live database and the v24 requireSeparateDataDirectory call. The control uses the same private canonical test directories and pinned runtime archive. SQL and server work are outside the interval.",
+    "samples": "Three successive calls for each operation per version, after installation. Counts below are actual bytes seen during runtime verification."
+  },
+  "v23": {
+    "helper": {
+      "bytesRead": 185277362,
+      "elapsedMs": [
+        229.9,
+        155.3,
+        158.6
+      ]
+    },
+    "overlap": {
+      "bytesRead": 328346848,
+      "elapsedMs": [
+        318.4,
+        255.8,
+        255.6
+      ]
+    }
+  },
+  "v24": {
+    "helper": {
+      "bytesRead": 92638681,
+      "elapsedMs": [
+        129.2,
+        91.8,
+        76.5
+      ]
+    },
+    "overlap": {
+      "bytesRead": 164173424,
+      "elapsedMs": [
+        151.5,
+        144.2,
+        135.9
+      ]
+    }
+  },
+  "retainedStartCallSites": {
+    "helper": 5,
+    "overlap": 1,
+    "combinedRemovedRequiredFileReadsBytes": 627366829,
+    "basis": "Healthy retained path source call count times measured per-call reduction; preexisting ownership-boundary and launch-time verification still run."
+  },
+  "v24NegativeControls": [
+    "Both paths rejected a same-size authserver change with original file mtime restored",
+    "Both paths rejected a current pointer naming a different generation",
+    "Overlap check rejected a directory within the programs provider",
+    "Both paths accepted the restored provider and current pointer"
+  ],
+  "thorV24StartTimeMs": null
+}

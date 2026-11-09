@@ -551,7 +551,8 @@ public final class ServerInstallationSetup {
             if(report.getBoolean(field))throw new IOException("Unexpected complete setup or gameplay claim");
     }
     private static JSONObject playerbotsSelection(ServerProgramsSetup programs) throws IOException {
-        if(programs==null || programs.current()==null)throw new IOException("A sealed measured playerbots helper provider is required");
+        Path installed=programs==null?null:programs.current();
+        if(installed==null)throw new IOException("A sealed measured playerbots helper provider is required");
         RuntimePackagePlan plan=programs.packagePlan();
         RuntimePackagePlan.RequiredFile executable=plan.required.get("helpers/playerbots-schema");
         if(executable==null || executable.elfMachine!=183 || executable.bytes<=0 || executable.bytes>(64L<<20))
@@ -560,7 +561,6 @@ public final class ServerInstallationSetup {
             JSONObject selected=new JSONObject().put("executable",pin(plan,"helpers/playerbots-schema"))
                 .put("buildReceipt",pin(plan,"provenance/playerbots-helper-build.json"))
                 .put("nativeReceipt",pin(plan,"provenance/playerbots-native-sql.json"));
-            Path installed=programs.current();
             requireRecordedFile(installed.resolve("provenance/playerbots-helper-build.json"),selected.getJSONObject("buildReceipt"));
             requireRecordedFile(installed.resolve("provenance/playerbots-native-sql.json"),selected.getJSONObject("nativeReceipt"));
             JSONObject build=new JSONObject(new String(read(installed.resolve("provenance/playerbots-helper-build.json"),128<<10),StandardCharsets.UTF_8));
