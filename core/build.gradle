@@ -240,3 +240,13 @@ tasks.register('displayRefreshChoiceTest', JavaExec) {
     maxHeapSize = '32m'
 }
 check.dependsOn displayRefreshChoiceTest
+
+// Owner server settings: rendered .conf parsing, the reviewed policy and saved choices.
+tasks.register('serverConfigTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.russianranger.esteria.core.server.ServerConfigTests'
+    args rootProject.projectDir.absolutePath
+    maxHeapSize = '32m'
+}
+check.dependsOn serverConfigTest

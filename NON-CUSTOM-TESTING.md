@@ -1,6 +1,16 @@
 # Esteria Stock on AYN Thor
 
-## v27 heat and frame-rate check
+## v28 server settings check
+
+Install the v28 APK from the v28 release over the existing app. Keep everything.
+
+1. Open **Play → Server settings**. Pick **World server**, search for `Rate.XP.Kill`, set it to 2 and save. Check that it shows **Your value: 2** and that **Changed only** lists it.
+2. Start the local game. Kill one creature and check that you get twice the usual experience. Stop the session normally.
+3. Back in **Server settings**, use **Reset all changes**, then start and stop the game once more.
+4. Optional, Lumenveil: with Lumenveil on, set **Video → Lumenveil Fog → Quality** to Low and note the frame rate at the same place and settings as before.
+5. Export a support bundle after step 2 (and after step 4 if you ran it) and send it. The bundle shows the applied settings and whether the GPU clock is capped.
+
+## Earlier v27 heat and frame-rate check
 
 Install the v27 APK from the [v27 release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.27) over the existing Esteria Stock app. Keep the existing import, world, shaders, database and character. V27 turns on **PRoot acceleration**, which lets most guest system calls run without stopping in the tracer. It also requests the next frame while Android shows the current one.
 

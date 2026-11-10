@@ -1,6 +1,25 @@
 # Current stock handoff
 
-## Stock v27 PRoot acceleration and frame pipelining
+## Stock v28 server settings and GPU clock telemetry
+
+**Owner v27 measurements.** The owner's v27 support ZIP covers 411 s at the 60 FPS cap with Lumenveil off, and the owner reports a steady 60 FPS. The PRoot tracers fell from 126.5% to 24.8% of one core, and the wineserver from 14.8% to 5.7%. The hottest readable zone was a CPU zone at 63.7 °C, against `socd` at 73.0 °C in v26. Each changed frame took 6.5 ms to capture and 1.7 ms to post, and the median interval between posted frames was 19 ms. The GPU averaged 45% busy at a fixed 401 MHz. [Measurements, Lumenveil analysis and plan](PERFORMANCE-PLAN.md).
+
+**Server settings.** The launcher's **Play → Server settings** opens `worldserver.conf` and every module configuration in the prepared world, including Playerbots:
+
+- **Browsing:** settings are grouped by the files' own sections, with their documented help, a search, a **Changed only** filter and an **All files** view. Each setting has a typed editor: a switch, the listed choices, a number field or a text field.
+- **Saving:** choices are saved in app storage (`state/server-settings/world-settings.tsv`) and apply at the next start. The verified configuration generation stays byte-for-byte unchanged. Each session carries the choices in `world-overrides.json`, and the helper passes them to the worldserver as AzerothCore `AC_*` environment overrides, which the pinned `ConfigMgr` reads before the file value.
+- **Validation:** the helper accepts only keys defined in the active generation's files and enforces [the reviewed policy](config/world-config-policy.json) again. It reports accepted and refused names, never values, in its `WORLD_SETTINGS` log line and the counts in `ready.json`.
+- **Locked keys:** keys Esteria manages are shown but locked, with their values hidden. They are the database, paths, network, logging, console/RA/SOAP, update switches and the stock profile's module switches.
+- **Precedence:** an owner value wins over Esteria's lighter tick (`MinWorldUpdateTime` 20, `MapUpdateInterval` 50), which the screen shows as the default.
+- **Support:** the bundle records `server.settings.nextStart`.
+
+**Playerbots.** mod-playerbots is compiled and loads (v27 worldserver log). The sealed profile allows your own characters as bots (`AllowAccountBots` 1, `MaxAddedBots` 4). Random bots, class-account bots and the bot command port are off. The settings screen can raise the bot counts and marks them as able to raise heat. Random bots have not been run on the Thor.
+
+**Telemetry.** The thermal facts now include the KGSL clock cap (`gpu.capMinMHz`/`capMaxMHz`), the floor, the governor and the frequency steps. The client's `lumenveil` switch from `Config.wtf` is reported with the graphics settings.
+
+**CI.** Pending for this commit. No run executes the client on the Thor or measures temperature.
+
+## Historical stock v27 PRoot acceleration and frame pipelining
 
 **Owner v26 measurements.** The owner's v26 support ZIP covers 128 s of play at the 60 FPS cap. The PRoot tracers used 126.5% of one core on average, more than any other role. The Wine client used 61.8%, the worldserver 54.2%, the frame helper 33.8% and Xtigervnc 24.7%. The Adreno 740 averaged 10% busy. The hottest readable zones were `socd` at 73.0 °C and CPU zones at up to 70.0 °C. Android did not apply the requested sustained performance mode. The app posted 26.1 changed frames per second. Each frame took 14.7 ms to capture and 8.3 ms to post, and the two steps ran one after the other. [Measurements and plan](PERFORMANCE-PLAN.md).
 

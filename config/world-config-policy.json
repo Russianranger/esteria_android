@@ -1,0 +1,43 @@
+{
+  "formatVersion": 1,
+  "scope": "esteria-world-config-overrides-policy",
+  "maxOverrides": 256,
+  "maxValueLength": 255,
+  "filePattern": "^(worldserver\\.conf|modules/[A-Za-z0-9_.-]{1,96}\\.conf)$",
+  "protectedKeys": [
+    "BindIP", "RealmID", "Expansion", "DataDir", "LogsDir", "TempDir", "SourceDirectory", "MySQLExecutable", "PidFile",
+    "WorldServerPort", "RealmServerPort",
+    "LoginDatabaseInfo", "WorldDatabaseInfo", "CharacterDatabaseInfo", "PlayerbotsDatabaseInfo",
+    "Updates.EnableDatabases", "Playerbots.Updates.EnableDatabases",
+    "Console.Enable", "Ra.Enable", "SOAP.Enabled", "Network.Threads", "Wintergrasp.DeferShutdownTimer", "Eluna.Enabled",
+    "AiPlayerbot.CommandServerPort",
+    "AzerothPlex.Enable", "AzerothPlex.BindAddress", "Battlemon.Enable", "Battlemon.Sidecar.Enable", "Battlemon.Sidecar.Bind",
+    "BattlemonBattles.Enable", "BattlemonOverworld.Enable", "ChallengeModes.Enable", "ChatTransmitter.Enabled",
+    "ClasslessWildcard.Enable", "EsteriaChat.Enable", "LauncherApi.Enable", "LauncherApi.Bind", "WxlDbc.Enable",
+    "Transmogrification.Enable", "IndividualProgression.Enable", "IndividualProgression.SimpleConfigOverride",
+    "IndividualProgression.MaxMonsterSight", "IndividualProgression.DisableQuestMarkers", "IndividualProgression.DisableRDF"
+  ],
+  "protectedPatterns": [
+    "DatabaseInfo$",
+    "^(Login|World|Character|Playerbots)Database\\.",
+    "(^|\\.)Updates\\.",
+    "^(Logger|Appender)\\.",
+    "^Log",
+    "^(Ra|SOAP|Console|Network|Metric|Eluna)\\.",
+    "(Port|BindIP|Bind|BindAddress|Address|Host|Socket)$",
+    "(Dir|Directory|Path|Executable|File)$"
+  ],
+  "launchDefaults": {
+    "MinWorldUpdateTime": "20",
+    "MapUpdateInterval": "50"
+  },
+  "heavyKeys": [
+    "AiPlayerbot.MinRandomBots", "AiPlayerbot.MaxRandomBots", "AiPlayerbot.RandomBotAutologin",
+    "AiPlayerbot.RandomBotAccountCount", "AiPlayerbot.AddClassAccountPoolSize", "AiPlayerbot.MaxAddedBots",
+    "MapUpdate.Threads", "MinWorldUpdateTime", "MapUpdateInterval", "PreloadAllNonInstancedMapGrids",
+    "SetAllCreaturesWithWaypointMovementActive", "GridUnload"
+  ],
+  "heavyPatterns": [
+    "^Visibility\\.Distance\\."
+  ]
+}

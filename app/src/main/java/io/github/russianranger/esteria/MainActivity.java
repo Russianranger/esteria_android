@@ -160,6 +160,7 @@ public final class MainActivity extends Activity {
         if(!completeProfile())layout.addView(text("This installation has an incomplete runtime profile.",14,RealmLauncher.GOLD));
         button(layout,"Frame limit",this::showDisplaySettings);
         button(layout,"PRoot acceleration",this::showProotSettings);
+        button(layout,"Server settings",()->startActivity(new Intent(this,ServerSettingsActivity.class)));
         layout=launcher.tools;
         exportSupport=button(layout,"Export support bundle",this::chooseExport);
         scanStorage=button(layout,"Check reclaimable storage",()->operation(new Intent(this,SessionService.class).setAction(SessionService.SCAN_STORAGE)));

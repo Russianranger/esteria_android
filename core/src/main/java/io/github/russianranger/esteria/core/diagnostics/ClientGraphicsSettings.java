@@ -25,7 +25,9 @@ public final class ClientGraphicsSettings {
         "horizonfarclip", "shadowlevel", "extshadowquality", "waterlod", "watermaxlod", "ffxglow", "ffxdeath",
         "ffxspecial", "ffxnetherworld", "environmentdetail", "groundeffectdensity", "groundeffectdist",
         "particledensity", "spelleffectlevel", "weatherdensity", "texturefilteringmode", "projectedtextures",
-        "terrainmiplevel", "basemip", "componenttexturelevel", "skycloudlod", "timingmethod");
+        "terrainmiplevel", "basemip", "componenttexturelevel", "skycloudlod", "timingmethod",
+        // The source-built client's Lumenveil switch (fog, shafts, night lights, water), saved with the video options.
+        "lumenveil");
     private static final Pattern SET = Pattern.compile("^\\s*SET\\s+([A-Za-z0-9_]{1,48})\\s+\"([^\"\\r\\n]{0,48})\"\\s*$",
         Pattern.CASE_INSENSITIVE);
     private static final Pattern PLAIN = Pattern.compile("[A-Za-z0-9 .x-]{1,24}");

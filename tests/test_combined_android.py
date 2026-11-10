@@ -90,14 +90,15 @@ class CombinedPackageGuards(unittest.TestCase):
                 'server_schema_baseline.py', 'server_schema_adaptations.py', 'server_update_setup.py', 'server_updater.py',
                 'server_playerbots_setup.py', 'owned_process_group.py', 'server_config.py', 'provision_local_realm.py',
                 'provision_local_account.py', 'server-data-reader.sha256', 'server_data_generation.py', 'server_data_preflight.py', 'shader_generation.py',
-                'extractor_order.py', 'world_io.py', 'server/appearance-schema-v1.sql', 'server/appearance-schema.lock.json', 'local-server.json')})
+                'extractor_order.py', 'world_io.py', 'world_config_overrides.py', 'server/appearance-schema-v1.sql',
+                'server/appearance-schema.lock.json', 'local-server.json', 'world-config-policy.json')})
         repository, path = self.helper_fixture()
         with patch.object(bundle, 'ROOT', repository), zipfile.ZipFile(path) as archive:
             bundle.verify_helpers(archive)
 
     def test_session_source_closure_and_nested_manifest_tamper_refused(self):
         repository, path = self.helper_fixture()
-        self.assertEqual(len(bundle.HELPER_SETS['server-session']), 26)
+        self.assertEqual(len(bundle.HELPER_SETS['server-session']), 28)
         with zipfile.ZipFile(path) as archive:
             original = {name:archive.read(name) for name in archive.namelist()}
         prefix = 'assets/server-session/'

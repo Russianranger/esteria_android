@@ -1039,6 +1039,7 @@ public final class SessionService extends Service {
         facts.put("game.frameCap.nextStart",String.valueOf(display.getInt("frameCap",30)));
         facts.put("game.input.lookPercent",String.valueOf(display.getInt("lookPercent",100)));
         facts.put("runtime.prootSeccompAcceleration.nextStart",Boolean.toString(ProotProcess.seccompAcceleration(this)));
+        io.github.russianranger.esteria.runtime.ServerSettingsStore.supportFacts(this,facts);
         String lastSession=getSharedPreferences("session",MODE_PRIVATE).getString("lastSessionObservations",null);
         if(lastSession!=null && lastSession.length()<=8192)facts.put("game.lastSession.observations",lastSession);
         String lastHeat=getSharedPreferences("session",MODE_PRIVATE).getString("lastSessionThermal",null);

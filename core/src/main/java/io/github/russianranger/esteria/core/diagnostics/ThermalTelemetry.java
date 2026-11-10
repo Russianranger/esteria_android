@@ -71,7 +71,9 @@ public final class ThermalTelemetry {
     private Source cpufreq = Source.UNKNOWN, gpu = Source.UNKNOWN, zones = Source.UNKNOWN, processes = Source.UNKNOWN;
     private final List<Policy> policies = new ArrayList<>();
     private final List<Zone> thermalZones = new ArrayList<>();
-    private final Stat headroom = new Stat(), refresh = new Stat(), gpuBusy = new Stat(), gpuClock = new Stat(), gpuTemperature = new Stat();
+    private final Stat headroom = new Stat(), refresh = new Stat(), gpuBusy = new Stat(), gpuClock = new Stat(), gpuTemperature = new Stat(),
+        gpuCap = new Stat(), gpuFloor = new Stat();
+    private String gpuGovernor, gpuSteps;
     private Map<Integer, Seen> seen = new HashMap<>();
     private final Map<String, Role> roles = new TreeMap<>();
     private int visibleProcessesMax;
@@ -135,6 +137,27 @@ public final class ThermalTelemetry {
         if (clock != null && clock > 0) { gpuClock.observe(clock / 1_000_000.0); any = true; }
         Double celsius = celsius(temperature);
         if (celsius != null) { gpuTemperature.observe(celsius); any = true; }
+        // Limits show whether the device profile or thermal policy holds the GPU clock down.
+        Long cap = number(kgsl.resolve("max_gpuclk"));
+        Long floor = number(kgsl.resolve("devfreq/min_freq"));
+        if (cap != null && cap > 0) gpuCap.observe(cap / 1_000_000.0);
+        if (floor != null && floor > 0) gpuFloor.observe(floor / 1_000_000.0);
+        if (gpuGovernor == null) {
+            String governor = text(kgsl.resolve("devfreq/governor"));
+            if (governor != null && governor.strip().matches("[A-Za-z0-9_.-]{1,32}")) gpuGovernor = governor.strip();
+        }
+        if (gpuSteps == null) {
+            String steps = text(kgsl.resolve("gpu_available_frequencies"));
+            if (steps != null) {
+                StringBuilder megahertz = new StringBuilder();
+                for (String step : steps.strip().split("\\s+")) {
+                    if (!step.matches("[0-9]{6,10}") || megahertz.length() > 120) continue;
+                    if (megahertz.length() > 0) megahertz.append(',');
+                    megahertz.append(Long.parseLong(step) / 1_000_000);
+                }
+                if (megahertz.length() > 0) gpuSteps = megahertz.toString();
+            }
+        }
         gpu = settle(gpu, any);
     }
 
@@ -272,6 +295,10 @@ public final class ThermalTelemetry {
                 facts.put("gpu.clockMaxMHz", decimal(gpuClock.max, 0));
             }
             if (gpuTemperature.count > 0) facts.put("gpu.tempMaxC", decimal(gpuTemperature.max, 1));
+            if (gpuCap.count > 0) { facts.put("gpu.capMinMHz", decimal(gpuCap.min, 0)); facts.put("gpu.capMaxMHz", decimal(gpuCap.max, 0)); }
+            if (gpuFloor.count > 0) facts.put("gpu.floorMaxMHz", decimal(gpuFloor.max, 0));
+            if (gpuGovernor != null) facts.put("gpu.governor", gpuGovernor);
+            if (gpuSteps != null) facts.put("gpu.stepsMHz", gpuSteps);
         } else facts.put("gpu.status", "unavailable");
         if (zones == Source.AVAILABLE) {
             List<Zone> hottest = new ArrayList<>(thermalZones);

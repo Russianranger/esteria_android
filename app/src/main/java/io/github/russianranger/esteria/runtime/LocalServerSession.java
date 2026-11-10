@@ -42,7 +42,8 @@ public final class LocalServerSession {
         "server_schema_setup.py","server_schema_baseline.py","server_schema_adaptations.py","server_update_setup.py",
         "server_updater.py","server_playerbots_setup.py","owned_process_group.py","server_config.py",
         "provision_local_realm.py","provision_local_account.py","server-data-reader.sha256","server_data_generation.py","server_data_preflight.py",
-        "shader_generation.py","extractor_order.py","world_io.py","server/appearance-schema-v1.sql","server/appearance-schema.lock.json","local-server.json");
+        "shader_generation.py","extractor_order.py","world_io.py","world_config_overrides.py","server/appearance-schema-v1.sql","server/appearance-schema.lock.json",
+        "local-server.json","world-config-policy.json");
     private static final ConcurrentHashMap<Path,Handle> OWNERS=new ConcurrentHashMap<>();
     private LocalServerSession(){ }
     public enum State { ALLOCATED,STARTING,READY,STOPPING,FAILED,CLOSED }
@@ -88,6 +89,7 @@ public final class LocalServerSession {
         try {
             Files.setPosixFilePermissions(lockPath,PosixFilePermissions.fromString("rw-------"));
             Handle owner=new Handle(context.getApplicationContext(),root,work,runtime,programs,content,active,database,data,events,lease);
+            ServerSettingsStore.rememberWork(context.getApplicationContext(),work);
             owner.imported=imported;
             if(OWNERS.putIfAbsent(work,owner)!=null)throw new IOException("Previous local server ownership remains retained");
             return owner;
@@ -216,6 +218,10 @@ public final class LocalServerSession {
                 if(profile.length()==0)throw new IOException("Sealed local profile is empty");
                 privateFile(guestSession.resolve("selection.json"),(selected.toString()+"\n").getBytes(StandardCharsets.UTF_8));
                 privateFile(guestSession.resolve("content-receipt.json"),read(content.receiptPath(),16<<20));
+                // The owner's server settings; the guest admits only keys of the active generation that Esteria does not manage.
+                byte[] settings;
+                try{settings=ServerSettingsStore.sessionDocument(context);}catch(IOException unreadable){settings=null;}
+                if(settings!=null)privateFile(guestSession.resolve(ServerSettingsStore.DOCUMENT),settings);
             }catch(JSONException error){throw new IOException("Cannot bind local server selection",error);}
             if(stopRequested(cancellation))throw new RuntimeWork.CancelledException();
             if(progress!=null)progress.update("server-session-starting","",0,-1);

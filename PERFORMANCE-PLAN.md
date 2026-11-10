@@ -21,6 +21,22 @@ The Adreno 740 averaged 10% busy at 401 MHz and peaked at 55.5 °C. The hottest 
 
 The app posted 3,338 changed frames (26.1 per second) and skipped 1,729 unchanged captures. Each changed frame took 14.7 ms to capture in the guest, 18.5 ms from request to the last pixel received, and 8.3 ms to post on Android. These steps ran one after the other, so the median interval between posted frames was about 34 ms despite the 60 FPS cap. In total, 12.3 GB of pixels passed through the frame socket.
 
+## v27 measurements on the Thor
+
+The owner's v27 support ZIP covers 411 s at the 60 FPS cap with Lumenveil off. The owner reports a steady 60 FPS.
+
+| Role | v26 average | v27 average |
+| --- | ---: | ---: |
+| PRoot tracers | 126.5% | 24.8% |
+| Wine client | 61.8% | 57.8% |
+| Worldserver | 54.2% | 50.1% |
+| Frame helper | 33.8% | 36.8% |
+| Esteria app | 18.0% | 25.3% |
+| Xtigervnc | 24.7% | 18.7% |
+| Wineserver | 14.8% | 5.7% |
+
+The hottest readable zone was a CPU zone at 63.7 °C, against `socd` at 73.0 °C in v26. The GPU averaged 45% busy, peaked at 66%, and stayed at 401 MHz, as it did in v26. Each changed frame now takes 6.5 ms to capture (14.7 ms in v26) and 1.7 ms to post (8.3 ms). The median interval between posted frames was 19 ms.
+
 ## 1. PRoot seccomp acceleration (shipped in v27)
 
 Earlier builds set `PROOT_NO_SECCOMP=1` for every guest process. PRoot then stopped every guest system call twice, including futex waits, reads, writes, polls and memory mappings. V27 leaves seccomp acceleration on. PRoot installs a seccomp filter that stops only the system calls it has to rewrite: those that take paths, sockets, process creation and SysV IPC. Futex, read/write, poll/epoll, sleeps and mmap then run without stopping the tracer. If the kernel refuses the filter, PRoot falls back to full tracing on its own.
@@ -109,3 +125,25 @@ Running AzerothCore, the authserver and MySQL as native Android (bionic) program
 - **Configuration and saves.** The server configuration, database slots and save ownership checks would need a second launch path.
 
 Seccomp acceleration removes most per-call tracer cost for the server processes too, so measure v27 before choosing this.
+
+## 5. Lumenveil at 60 FPS (analysed, client work not started)
+
+Lumenveil is the source-built client's port of the Lumenveil mod: volumetric fog, sun and moon shafts, night lights, water, wet surfaces and colour grading. It runs as extra full-screen and point passes after the world draws, so its cost is almost all GPU work. With Lumenveil off, the GPU was already 45% busy at 401 MHz in v27.
+
+The default **Quality** is High: the fog march runs at half resolution (640×360 at 1280×720), with 32 fog steps and 24 shaft steps per pixel. Low runs at quarter resolution (320×180) with 16 and 12 steps, about an eighth of the march samples. Each frame also updates the shaft memory (a sun-view shadow map, scattered each frame from one depth pixel in 16), runs a temporal filter, and composites at full resolution from up to 10 inputs. Water, wet surfaces, glow, spell lights (with an asynchronous readback) and cloud shadows add further passes.
+
+The GPU clock did not move from 401 MHz in either bundle. Either the Thor's performance profile or thermal policy caps it, or the governor never needed more at 45% busy. V28 records the KGSL cap, floor, governor and frequency steps, plus the client's `lumenveil` switch, so the next bundle shows which.
+
+Next steps, in order:
+
+1. **Owner test, no build:** with Lumenveil on, set **Video → Lumenveil Fog → Quality** to Low and compare the frame rate.
+2. **Client measurement:** GPU timestamp queries around each Lumenveil stage, averaged and written to `Logs/Lumenveil.log` every 10 s. The app then extracts only those numbers into the support bundle; client logs stay private.
+3. **Client optimizations, chosen from the measurements:**
+   - a Handheld quality level: quarter resolution, fewer steps, a stronger temporal filter;
+   - shaft memory, water memory and the sky reference updated every second frame;
+   - relaxed precision in the translated shaders, so Adreno can use its faster 16-bit arithmetic;
+   - fewer separate render passes, which on a tiled GPU each load and store full targets;
+   - a frame-time governor that lowers the march resolution before the frame rate drops.
+
+Steps 2 and 3 change Russianranger/wowdecomp_esteria. They need a new client build, pinned in `runtime/client/stock-renderer-build.lock.json`.
+

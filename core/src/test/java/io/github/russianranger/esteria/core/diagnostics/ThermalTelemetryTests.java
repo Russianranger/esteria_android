@@ -69,6 +69,10 @@ public final class ThermalTelemetryTests {
         write(sys.resolve("devices/system/cpu/cpufreq/policy0/scaling_max_freq"), "2016000\n");
         write(sys.resolve("class/kgsl/kgsl-3d0/gpu_busy_percentage"), "40 %\n");
         write(sys.resolve("class/kgsl/kgsl-3d0/gpuclk"), "500000000\n");
+        write(sys.resolve("class/kgsl/kgsl-3d0/max_gpuclk"), "680000000\n");
+        write(sys.resolve("class/kgsl/kgsl-3d0/devfreq/min_freq"), "401000000\n");
+        write(sys.resolve("class/kgsl/kgsl-3d0/devfreq/governor"), "msm-adreno-tz\n");
+        write(sys.resolve("class/kgsl/kgsl-3d0/gpu_available_frequencies"), "680000000 615000000 401000000 220000000 bad\n");
         write(sys.resolve("class/thermal/thermal_zone0/type"), "cpu-1-0-usr\n");
         write(sys.resolve("class/thermal/thermal_zone0/temp"), "61000\n");
         write(sys.resolve("class/thermal/thermal_zone1/type"), "gpuss-0\n");
@@ -85,6 +89,7 @@ public final class ThermalTelemetryTests {
         write(sys.resolve("devices/system/cpu/cpufreq/policy0/scaling_cur_freq"), "2000000\n");
         write(sys.resolve("devices/system/cpu/cpufreq/policy0/scaling_max_freq"), "1500000\n");
         write(sys.resolve("class/kgsl/kgsl-3d0/gpu_busy_percentage"), "80 %\n");
+        write(sys.resolve("class/kgsl/kgsl-3d0/max_gpuclk"), "401000000\n");
         write(sys.resolve("class/thermal/thermal_zone0/temp"), "66500\n");
         process(proc, 200, "libproot.so", "/data/app/x/lib/arm64/libproot.so", 200, 0, 10);
         process(proc, 4321, "worldserver", "/esteria-server-programs/bin/worldserver", 1300, 200, 11);
@@ -107,6 +112,10 @@ public final class ThermalTelemetryTests {
             "1500".equals(facts.get("cpu.policy0.capMinMHz")) && "2016".equals(facts.get("cpu.policy0.hwMaxMHz")), "CPU policy and throttle cap");
         check("67".equals(facts.get("gpu.busyAvgPct")) && "80".equals(facts.get("gpu.busyMaxPct")) &&
             "500".equals(facts.get("gpu.clockMaxMHz")) && !facts.containsKey("gpu.tempMaxC"), "GPU without a temperature file");
+        // A thermal or profile cap fell from 680 to 401 MHz while the floor stayed at 401 MHz.
+        check("401".equals(facts.get("gpu.capMinMHz")) && "680".equals(facts.get("gpu.capMaxMHz")) &&
+            "401".equals(facts.get("gpu.floorMaxMHz")) && "msm-adreno-tz".equals(facts.get("gpu.governor")) &&
+            "680,615,401,220".equals(facts.get("gpu.stepsMHz")), "GPU clock limits");
         check("2".equals(facts.get("zones.readable")) && "66.5".equals(facts.get("zone.cpu-1-0-usr.maxC")) &&
             "58.0".equals(facts.get("zone.gpuss-0.maxC")) && !text.contains("denied"), "zones");
         check("5.0".equals(facts.get("role.worldserver.cpuSeconds")) && "25.0".equals(facts.get("role.worldserver.avgCorePct")) &&
@@ -136,11 +145,11 @@ public final class ThermalTelemetryTests {
         Path config = root.resolve("Config.wtf");
         write(config, "SET realmList \"127.0.0.1:3724\"\r\nSET gxResolution \"1280x720\"\r\nSET gxMultisample \"4\"\r\n" +
             "SET farclip \"777\"\r\nSET accountName \"someone\"\r\nSET ffxGlow \"1\"\r\nSET shadowLevel \"bad;value\"\r\n" +
-            "SET maxFPS \"30\"\r\n");
+            "SET maxFPS \"30\"\r\nSET lumenveil \"0\"\r\n");
         Map<String, String> settings = ClientGraphicsSettings.read(config);
         check("1280x720".equals(settings.get("gxresolution")) && "4".equals(settings.get("gxmultisample")) &&
-            "777".equals(settings.get("farclip")) && "1".equals(settings.get("ffxglow")) && "30".equals(settings.get("maxfps")),
-            "graphics CVars");
+            "777".equals(settings.get("farclip")) && "1".equals(settings.get("ffxglow")) && "30".equals(settings.get("maxfps")) &&
+            "0".equals(settings.get("lumenveil")), "graphics CVars, including the Lumenveil switch");
         check(!settings.containsKey("realmlist") && !settings.containsKey("accountname") && !settings.containsKey("shadowlevel"),
             "non-graphics and unsafe values are excluded");
         check(ClientGraphicsSettings.read(root.resolve("missing.wtf")).isEmpty() && ClientGraphicsSettings.read(null).isEmpty(),

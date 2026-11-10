@@ -287,8 +287,16 @@ class ServerChild:
     confirmed reaping. These generic primitives also support explicit host child
     fixtures; they are not a route around the production verifier.
     """
-    def __init__(self, program, executable, configuration, working, log):
+    def __init__(self, program, executable, configuration, working, log, *, overrides=None):
         require(program in ('authserver', 'worldserver'), 'Fixed server component required')
+        overrides = dict(overrides or {})
+        # Owner settings reach only the worldserver, only as AzerothCore AC_* names, never NUL-bearing.
+        require(not overrides or program == 'worldserver', 'Owner settings apply to the worldserver only')
+        require(all(type(name) is str and re.fullmatch('AC_[A-Z0-9_]{1,160}', name) and type(value) is str and
+                    '\x00' not in value for name, value in overrides.items()), 'Invalid owner setting environment')
+        require(not set(overrides) & {'AC_LOGGER_PLAYERBOTS', 'AC_APPENDER_CONSOLE'},
+                'Console logging the session reads stays owned by Esteria')
+        self.overrides = overrides
         self.program, self.executable = program, Path(executable)
         self.configuration, self.working, self.log = Path(configuration), Path(working), Path(log)
         require(all(path.is_absolute() for path in (self.executable, self.configuration, self.working, self.log)),
@@ -317,6 +325,8 @@ class ServerChild:
             # and bot AI every 10 ms. One local player does not need that rate; a slower tick
             # lowers device heat. Saved configs and their generation stay unchanged.
             env.update(WORLDSERVER_TICK_ENVIRONMENT)
+            # The owner's own choices from the app's server settings come last and win.
+            env.update(self.overrides)
         # Attach Popen to the retained object before any later operation can fail.
         self.process = subprocess.Popen([str(self.executable), '--config', str(self.configuration)],
             cwd=self.working, env=env, umask=0o077,

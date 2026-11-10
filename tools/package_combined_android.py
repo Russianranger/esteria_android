@@ -56,7 +56,8 @@ HELPER_SETS = {'shader-repair': ('stock_shader_repair.py',), 'stock-client': ('s
                     'server_schema_baseline.py', 'server_schema_adaptations.py', 'server_update_setup.py', 'server_updater.py',
                     'server_playerbots_setup.py', 'owned_process_group.py', 'server_config.py', 'provision_local_realm.py',
                     'provision_local_account.py', 'server-data-reader.sha256', 'server_data_generation.py', 'server_data_preflight.py', 'shader_generation.py',
-                    'extractor_order.py', 'world_io.py', 'server/appearance-schema-v1.sql', 'server/appearance-schema.lock.json', 'local-server.json')}
+                    'extractor_order.py', 'world_io.py', 'world_config_overrides.py', 'server/appearance-schema-v1.sql', 'server/appearance-schema.lock.json',
+                    'local-server.json', 'world-config-policy.json')}
 
 
 def selected_client_runtime_options():
@@ -93,7 +94,9 @@ def verify_ndk_notices(archive, expected):
 
 def helper_source_path(directory, name):
     require(directory in HELPER_SETS and name in HELPER_SETS[directory], 'combined-unknown-helper-source')
-    return 'config/local-server.json' if directory in ('server-installation', 'server-session') and name == 'local-server.json' else 'runtime/' + name
+    if directory in ('server-installation', 'server-session') and name == 'local-server.json':
+        return 'config/local-server.json'
+    return 'config/world-config-policy.json' if directory == 'server-session' and name == 'world-config-policy.json' else 'runtime/' + name
 
 
 def verify_helpers(archive):

@@ -25,6 +25,7 @@ try:
     from . import provision_local_realm as realm, provision_local_account as account
     from . import server_playerbots_setup as playerbots, server_data_generation as data, prepared_data_cache
     from . import server_session_process as processes, android_server_schema_setup as owner, mysql_service as service
+    from . import world_config_overrides as world_settings
 except ImportError:
     import mysql_bootstrap as db
     import server_content as content
@@ -39,6 +40,7 @@ except ImportError:
     import server_session_process as processes
     import android_server_schema_setup as owner
     import mysql_service as service
+    import world_config_overrides as world_settings
 
 require = processes.require
 SCOPE = 'owned-local-auth-world-session-not-gameplay-qualified'
@@ -307,6 +309,7 @@ class Session:
         self.ready = self.closed = self.started = False
         self.failure = None
         self.configuration_lease = None
+        self.world_settings = dict(worldSettingsApplied=0, worldSettingsRefused=[])
 
     def _check(self, *, world_ready=False):
         selected = self.prepared
@@ -379,8 +382,19 @@ class Session:
         check_pending_auth()
         self._check()
         progress('native-launch', 'worldserver')
+        # Owner choices from the app's server settings: keys of this generation only, never Esteria-managed ones.
+        policy = world_settings.Policy.load(world_settings.policy_path(Path(__file__).parent))
+        try:
+            overrides, applied, refused = world_settings.environment(self.operation / world_settings.OVERRIDES_NAME,
+                                                                     configurations, policy)
+        except (world_settings.Rejected, ValueError, OSError):
+            # An unreadable settings document starts the server with the verified files alone.
+            overrides, applied, refused = {}, [], ['document']
+        self.world_settings = dict(worldSettingsApplied=len(applied), worldSettingsRefused=refused[:world_settings.MAX_REPORTED])
+        print(world_settings.report(applied, refused), flush=True)
         self.world = processes.ServerChild('worldserver', selected.programs['worldserver']['path'],
-            configurations / 'worldserver.conf', selected.state / 'run/worldserver', self.operation / 'worldserver.log')
+            configurations / 'worldserver.conf', selected.state / 'run/worldserver', self.operation / 'worldserver.log',
+            overrides=overrides)
         self.world.start()
         progress('owned-world-listener', 'worldserver')
         self._await(lambda: processes.owns_loopback_listener(self.world.group, 8085), deadline, cancelled)
@@ -402,7 +416,8 @@ class Session:
             interruptedRealmRestoredOffline=recovered,
             authChallengeProcessed=True,
             worldChallengeVerified=True, worldConsoleLoopVerified=True,
-            characterPersistenceQualified=False, botAiQualified=False, androidRuntimeQualified=False, gameplayQualified=False)
+            characterPersistenceQualified=False, botAiQualified=False, androidRuntimeQualified=False, gameplayQualified=False,
+            **self.world_settings)
 
     def monitor(self):
         require(self.ready and not self.closed, 'Ready owned server session required')
