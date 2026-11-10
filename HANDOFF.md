@@ -15,7 +15,7 @@ The app's reading at client start shows 5.0 GB of memory available. Before the v
 
 Samples run every 3 s for the first two minutes after the client starts, then every 10 s. After every sample the memory readings are written synchronously to app storage. A session that ends without cleanup appears in the next support bundle as `game.interruptedSession.memory`, with the time of its last sample. A clean stop appears as `game.lastSession.memory`.
 
-**CI.** Pending for this commit. No run executes the client on the Thor.
+**CI at `a21e50e`.** [Launcher, host tests and lint](https://github.com/Russianranger/esteria_android/actions/runs/42902812675) · [Android 13 installer and APK update](https://github.com/Russianranger/esteria_android/actions/runs/42902812636) · [Android 13 Surface, AudioTrack and IME](https://github.com/Russianranger/esteria_android/actions/runs/42902812613) · [Native installation finish](https://github.com/Russianranger/esteria_android/actions/runs/42902812561) · [Native extractor](https://github.com/Russianranger/esteria_android/actions/runs/42902812594) · [ARM64 package, versionCode 29](https://github.com/Russianranger/esteria_android/actions/runs/42902812949). The host checks cover the memory readings on procfs/sysfs-shaped trees and the faster early sampling. The verified unsigned release is artifact `unsigned-local-game-profile-release-arm64-a21e50ea825ff2e8a10b59c99db585b33f476ab0` (id 13804367125, 337,231,864 bytes, retained until 2026-12-10). The owner confirms Lumenveil was off and only Firefox was open during the v28 attempt. No run executes the client on the Thor. V29 is not published yet.
 
 ## Historical stock v28 server settings and GPU clock telemetry
 
