@@ -17,7 +17,7 @@
 
 **Telemetry.** The thermal facts now include the KGSL clock cap (`gpu.capMinMHz`/`capMaxMHz`), the floor, the governor and the frequency steps. The client's `lumenveil` switch from `Config.wtf` is reported with the graphics settings.
 
-**CI.** Pending for this commit. No run executes the client on the Thor or measures temperature.
+**CI at `199877a`.** [Launcher, host tests and lint](https://github.com/Russianranger/esteria_android/actions/runs/42746277165) · [Android 13 installer and APK update](https://github.com/Russianranger/esteria_android/actions/runs/42746277372) · [Android 13 PRoot and glibc probe](https://github.com/Russianranger/esteria_android/actions/runs/42746352835) · [Android 13 Surface, AudioTrack and IME](https://github.com/Russianranger/esteria_android/actions/runs/42746277132) · [Native installation finish](https://github.com/Russianranger/esteria_android/actions/runs/42746277161) · [Native extractor](https://github.com/Russianranger/esteria_android/actions/runs/42746277321) · [Tooling](https://github.com/Russianranger/esteria_android/actions/runs/42746277125) · [ARM64 package, versionCode 28](https://github.com/Russianranger/esteria_android/actions/runs/42746277412). The installer run installs the session helpers with the new policy and override module. The core checks include the settings parser, policy and store tests. The verified unsigned release is artifact `unsigned-local-game-profile-release-arm64-199877ad33f17ed90589240ee5d3eecc5573646d` (id 13732346260, 337,228,928 bytes, retained until 2026-12-10). No CI run starts the worldserver with owner settings, executes the client on the Thor or measures temperature. V28 is not published yet.
 
 ## Historical stock v27 PRoot acceleration and frame pipelining
 
