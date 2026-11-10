@@ -507,6 +507,11 @@ public final class SessionService extends Service {
                 public void failed(String code){relay.failed(code);}
                 public void clientExited(int exitCode,boolean forced){cancelled.set(true);log("Client process exited code="+exitCode+" forced="+forced+" saveQualified=false");}
             });
+        // A record still marked live belongs to a session that never reached cleanup (for example a
+        // low-memory kill); keep it as the interrupted session before this one starts writing.
+        android.content.SharedPreferences sessionRecord=getSharedPreferences("session",MODE_PRIVATE);
+        String unfinished=sessionRecord.getString("liveSessionMemory",null);
+        if(unfinished!=null)sessionRecord.edit().putString("interruptedSessionMemory",unfinished).remove("liveSessionMemory").commit();
         SessionThermalDiagnostics thermal = new SessionThermalDiagnostics(this);
         Map<String,String> windowFacts = new LinkedHashMap<>();
         game=owner;lastRecoveryRequired=false;lastClientExitAcknowledged=false;
@@ -523,11 +528,11 @@ public final class SessionService extends Service {
             rememberLogs(owner.diagnosticLogs());
             status="Local client started. Displayed login and world state have not been automatically verified.";
             if (owner.state()==GameSession.State.CLIENT_STARTED && !cancelled.get()) {
-                thermal.sampleIfDue();
+                if(thermal.sampleIfDue())persistLiveMemory(thermal);
                 collectWrapperUsage(windowFacts, "game.usage.clientStart.", owner);
             }
             while(!cancelled.get()&&owner.state()==GameSession.State.CLIENT_STARTED&&owner.isClientAlive()) {
-                thermal.sampleIfDue();
+                if(thermal.sampleIfDue())persistLiveMemory(thermal);
                 keepAwake();try{Thread.sleep(100);}catch(InterruptedException error){Thread.currentThread().interrupt();throw new IOException("Session worker interrupted",error);}
             }
         }catch(IOException|RuntimeException error){operationFailure=error;throw error;}
@@ -548,6 +553,22 @@ public final class SessionService extends Service {
         log("Content profile="+ContentProfile.ID+"\n"+report.toText());
         if(required)report.requirePreparationInputs();
         return report;
+    }
+    /** Memory readings written synchronously after each sample, so a killed session still leaves them. */
+    private void persistLiveMemory(SessionThermalDiagnostics thermal) {
+        try {
+            Map<String,String> memory=new LinkedHashMap<>();
+            thermal.detail().forEach((key,value)->{
+                if(SessionThermalDiagnostics.memoryFact(key)||key.equals("samples")||key.equals("elapsedMs"))memory.put(key,value);
+            });
+            if(memory.isEmpty())return;
+            memory.put("versionCode",Integer.toString(BuildConfig.VERSION_CODE));
+            memory.put("sampledAtEpochMs",Long.toString(System.currentTimeMillis()));
+            String text=new JSONObject(memory).toString();
+            if(text.length()<=8192)getSharedPreferences("session",MODE_PRIVATE).edit().putString("liveSessionMemory",text).commit();
+        } catch(RuntimeException unavailable) {
+            // Diagnostics never affect the session.
+        }
     }
     private IOException closeGame(GameSession.Handle owner,Map<String,String> windowFacts,Map<String,String> thermalDetail) {
         IOException failure=null;boolean interrupted=Thread.interrupted();
@@ -593,8 +614,16 @@ public final class SessionService extends Service {
         }
         // Heat detail has its own bounded field so it can never displace the observations above.
         session.remove("lastSessionThermal");
+        session.remove("lastSessionMemory");
+        session.remove("liveSessionMemory");
         try {
-            Map<String,String> heat=new LinkedHashMap<>(thermalDetail);
+            Map<String,String> heat=new LinkedHashMap<>(), memory=new LinkedHashMap<>();
+            thermalDetail.forEach((key,value)->(SessionThermalDiagnostics.memoryFact(key)?memory:heat).put(key,value));
+            if(!memory.isEmpty()) {
+                String held=new JSONObject(memory).toString();
+                if(held.length()<=8192)session.putString("lastSessionMemory",held);
+                else log("Closed session memory detail exceeded the support field bound");
+            }
             android.content.SharedPreferences display=getSharedPreferences("game-display",MODE_PRIVATE);
             heat.put("sustainedPerformance.requested",Boolean.toString(display.getBoolean("sustainedPerformance",true)));
             heat.put("sustainedPerformance.applied",Boolean.toString(display.getBoolean("sustainedApplied",false)));
@@ -1044,6 +1073,14 @@ public final class SessionService extends Service {
         if(lastSession!=null && lastSession.length()<=8192)facts.put("game.lastSession.observations",lastSession);
         String lastHeat=getSharedPreferences("session",MODE_PRIVATE).getString("lastSessionThermal",null);
         if(lastHeat!=null && lastHeat.length()<=8192)facts.put("game.lastSession.thermal",lastHeat);
+        android.content.SharedPreferences sessionRecord=getSharedPreferences("session",MODE_PRIVATE);
+        String lastMemory=sessionRecord.getString("lastSessionMemory",null);
+        if(lastMemory!=null && lastMemory.length()<=8192)facts.put("game.lastSession.memory",lastMemory);
+        String interruptedMemory=sessionRecord.getString("interruptedSessionMemory",null);
+        if(interruptedMemory!=null && interruptedMemory.length()<=8192)facts.put("game.interruptedSession.memory",interruptedMemory);
+        String liveMemory=sessionRecord.getString("liveSessionMemory",null);
+        // Without a running owner, a live record is a session that ended before cleanup.
+        if(liveMemory!=null && liveMemory.length()<=8192)facts.put(gameOwner!=null?"game.currentSession.memory":"game.interruptedSession.memory",liveMemory);
         if(gameOwner!=null && gameOwner.presentation()!=null) {
             facts.put("game.frameCap.session",String.valueOf(gameOwner.presentation().frameCap()));
             facts.putAll(gameOwner.presentation().presentationFacts());

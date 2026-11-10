@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 
 /** Worker-owned readings over the reconstructed client lifetime. Holds no listener or timer. */
 public final class SessionThermalDiagnostics {
-    static final long INTERVAL_MS = 10_000;
+    static final long INTERVAL_MS = 10_000, EARLY_INTERVAL_MS = 3_000, EARLY_WINDOW_MS = 120_000;
     private final LongSupplier clock;
     private final Supplier<Integer> readBattery;
     private final Supplier<Integer> readStatus;
@@ -30,6 +30,8 @@ public final class SessionThermalDiagnostics {
     private final Summary battery = new Summary();
     private final Summary status = new Summary();
     private long samples, startMs, lastMs;
+    /** World entry is where memory peaks; on the device the first two minutes are read every 3 s. */
+    private long earlyWindowMs;
 
     public SessionThermalDiagnostics(Context context) {
         this(SystemClock::elapsedRealtime, () -> {
@@ -50,6 +52,7 @@ public final class SessionThermalDiagnostics {
             Display display = displays == null ? null : displays.getDisplay(Display.DEFAULT_DISPLAY);
             return display == null ? null : (double) display.getRefreshRate();
         }, new ThermalTelemetry(Paths.get("/proc"), Paths.get("/sys"), android.os.Process.myPid(), clockTicks()));
+        earlyWindowMs = EARLY_WINDOW_MS;
     }
 
     SessionThermalDiagnostics(LongSupplier clock, Supplier<Integer> readBattery, Supplier<Integer> readStatus) {
@@ -78,9 +81,13 @@ public final class SessionThermalDiagnostics {
         return ticks > 0 ? ticks : 100;
     }
 
-    public void sampleIfDue() {
+    /** True when a sample was taken, so the caller can persist it before the process can be killed. */
+    public boolean sampleIfDue() {
         long now = clock.getAsLong();
-        if (samples == 0 || now - lastMs >= INTERVAL_MS) sample(now);
+        long interval = samples > 0 && now - startMs < earlyWindowMs ? EARLY_INTERVAL_MS : INTERVAL_MS;
+        if (samples != 0 && now - lastMs < interval) return false;
+        sample(now);
+        return true;
     }
 
     public void sampleAtClientStop() {
@@ -142,6 +149,10 @@ public final class SessionThermalDiagnostics {
         if (samples == 0) return Map.of();
         Map<String, String> result = new LinkedHashMap<>();
         result.put("game.thermal.intervalMs", Long.toString(INTERVAL_MS));
+        if (earlyWindowMs > 0) {
+            result.put("game.thermal.earlyIntervalMs", Long.toString(EARLY_INTERVAL_MS));
+            result.put("game.thermal.earlyWindowMs", Long.toString(earlyWindowMs));
+        }
         result.put("game.thermal.elapsedMs", Long.toString(lastMs - startMs));
         result.put("game.thermal.samples", Long.toString(samples));
         battery.append(result, "game.thermal.batteryCelsius", true);
@@ -153,5 +164,11 @@ public final class SessionThermalDiagnostics {
     public Map<String, String> detail() {
         if (samples == 0 || telemetry == null) return Map.of();
         return telemetry.facts();
+    }
+
+    /** Memory readings only: system, stack and per-role resident, swap and GPU memory. */
+    public static boolean memoryFact(String key) {
+        return key.startsWith("memory.") || key.startsWith("stack.") || key.startsWith("gpu.pages") ||
+            (key.startsWith("role.") && key.endsWith("MiB"));
     }
 }

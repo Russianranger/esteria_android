@@ -1,6 +1,23 @@
 # Current non-custom implementation
 
-## Stock v28 server settings and GPU clock telemetry
+## Stock v29 memory telemetry after a low-memory kill
+
+**Owner v28 report.** The v28 game closed to the Android home screen while entering the world. The support ZIP contains no client or server error, and the server had reached readiness normally. Android's process-exit record for that moment is `LOW_MEMORY` at foreground importance, about 28 s after the client started. Android's low-memory killer stopped the app, and with it every process the app started.
+
+The app's reading at client start shows 5.0 GB of memory available. Before the v27 session, which played for 411 s, it was 6.0 GB, and before v26 it was 7.0 GB. No v28 change runs during play apart from the GPU clock reads. The likeliest cause is therefore the memory that entering the world adds on top of the server stack and other apps. The bundle cannot show which process grew, because readings were stored only at a clean stop.
+
+**Memory telemetry.** Each sample now records:
+
+- memory available and swap;
+- Android memory pressure (PSI), where readable;
+- KGSL GPU page allocation;
+- for each process role: resident memory (anonymous plus shared), swap and KGSL GPU memory.
+
+Samples run every 3 s for the first two minutes after the client starts, then every 10 s. After every sample the memory readings are written synchronously to app storage. A session that ends without cleanup appears in the next support bundle as `game.interruptedSession.memory`, with the time of its last sample. A clean stop appears as `game.lastSession.memory`.
+
+**CI.** Pending for this commit. No run executes the client on the Thor.
+
+## Historical stock v28 server settings and GPU clock telemetry
 
 **Owner v27 measurements.** The owner's v27 support ZIP covers 411 s at the 60 FPS cap with Lumenveil off, and the owner reports a steady 60 FPS. The PRoot tracers fell from 126.5% to 24.8% of one core, and the wineserver from 14.8% to 5.7%. The hottest readable zone was a CPU zone at 63.7 °C, against `socd` at 73.0 °C in v26. Each changed frame took 6.5 ms to capture and 1.7 ms to post, and the median interval between posted frames was 19 ms. The GPU averaged 45% busy at a fixed 401 MHz. [Measurements, Lumenveil analysis and plan](PERFORMANCE-PLAN.md).
 

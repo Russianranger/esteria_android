@@ -55,6 +55,12 @@ public final class ThermalTelemetryTests {
         check(values != null && values[0] == 150 && values[1] == 9999, "comm with spaces and parentheses");
         check(ThermalTelemetry.parseStat("7 (short) S 1 2") == null && ThermalTelemetry.parseStat(null) == null, "truncated stat");
         check(Long.valueOf(37).equals(ThermalTelemetry.leadingNumber("37 %\n")), "KGSL busy percentage");
+        check(Long.valueOf(1234).equals(ThermalTelemetry.statusKib("Name:\tx\nRssAnon:\t   1234 kB\n", "RssAnon:")) &&
+            Long.valueOf(7).equals(ThermalTelemetry.statusKib("VmSwap:\t7 kB\n", "VmSwap:")) &&
+            ThermalTelemetry.statusKib("Name:\tx\n", "RssAnon:") == null, "status fields");
+        check(Double.valueOf(1.5).equals(ThermalTelemetry.average10("some avg10=1.50 avg60=0\nfull avg10=0.25 x\n", "some")) &&
+            Double.valueOf(0.25).equals(ThermalTelemetry.average10("some avg10=1.50 avg60=0\nfull avg10=0.25 x\n", "full")) &&
+            ThermalTelemetry.average10("some avg10=x\n", "some") == null, "PSI averages");
         check(Double.valueOf(45.5).equals(ThermalTelemetry.celsius(45500L)) && Double.valueOf(41.0).equals(ThermalTelemetry.celsius(41L)),
             "millidegrees and degrees");
         check(ThermalTelemetry.celsius(-273000L) == null && ThermalTelemetry.celsius(0L) == null, "invalid sensor readings");
@@ -82,6 +88,14 @@ public final class ThermalTelemetryTests {
         process(proc, 100, "app", "/system/bin/app_process64", 500, 100, 1);
         process(proc, 200, "libproot.so", "/data/app/x/lib/arm64/libproot.so", 100, 0, 10);
         process(proc, 4321, "worldserver", "/esteria-server-programs/bin/worldserver", 1000, 0, 11);
+        write(proc.resolve("meminfo"), "MemTotal:       16000000 kB\nMemFree:  100 kB\nMemAvailable:    6000000 kB\n" +
+            "SwapTotal:       4000000 kB\nSwapFree:        3000000 kB\n");
+        write(proc.resolve("pressure/memory"), "some avg10=1.50 avg60=0.50 avg300=0.10 total=123\nfull avg10=0.20 avg60=0.00 avg300=0.00 total=9\n");
+        write(proc.resolve("100/status"), "Name:\tapp\nRssAnon:\t  100000 kB\nRssFile:\t 900000 kB\nRssShmem:\t0 kB\nVmSwap:\t0 kB\n");
+        write(proc.resolve("4321/status"), "Name:\tworldserver\nRssAnon:\t1000000 kB\nRssShmem:\t24000 kB\nVmSwap:\t2048 kB\n");
+        write(sys.resolve("class/kgsl/kgsl/proc/100/gpumem_mapped"), "104857600\n");
+        write(sys.resolve("class/kgsl/kgsl/proc/100/gpumem_unmapped"), "0\n");
+        write(sys.resolve("class/kgsl/kgsl/page_alloc"), "524288000\n");
         ThermalTelemetry telemetry = new ThermalTelemetry(proc, sys, 100, 100);
         telemetry.sample(1_000, 0.40, 120.0);
 
@@ -94,11 +108,16 @@ public final class ThermalTelemetryTests {
         process(proc, 200, "libproot.so", "/data/app/x/lib/arm64/libproot.so", 200, 0, 10);
         process(proc, 4321, "worldserver", "/esteria-server-programs/bin/worldserver", 1300, 200, 11);
         process(proc, 300, "frame", "/esteria-bridges/bin/esteria-x11-frame", 50, 0, 900);
+        write(proc.resolve("meminfo"), "MemTotal:       16000000 kB\nMemAvailable:    2000000 kB\nSwapTotal:       4000000 kB\nSwapFree:        1000000 kB\n");
+        write(proc.resolve("pressure/memory"), "some avg10=12.00 avg60=3.00 avg300=1.00 total=999\nfull avg10=4.50 avg60=1.00 avg300=0.20 total=99\n");
+        write(proc.resolve("4321/status"), "Name:\tworldserver\nRssAnon:\t1500000 kB\nRssShmem:\t24000 kB\nVmSwap:\t2048 kB\n");
+        write(proc.resolve("300/status"), "Name:\tframe\nRssAnon:\t51200 kB\n");
         telemetry.sample(11_000, 0.65, 60.0);
 
         // A reused PID with a new start time is a different process; its whole lifetime counts.
         process(proc, 300, "frame", "/esteria-bridges/bin/esteria-x11-frame", 20, 0, 2000);
         Files.delete(proc.resolve("200/stat"));
+        write(proc.resolve("4321/status"), "Name:\tworldserver\nRssAnon:\t1400000 kB\nRssShmem:\t24000 kB\nVmSwap:\t1024 kB\n");
         telemetry.sample(21_000, Double.NaN, null);
 
         Map<String, String> facts = telemetry.facts();
@@ -124,6 +143,17 @@ public final class ThermalTelemetryTests {
         check("0.7".equals(facts.get("role.frame-helper.cpuSeconds")) && "1".equals(facts.get("role.frame-helper.maxProcesses")),
             "new processes count from their start, including a reused PID");
         check("0.0".equals(facts.get("role.app.cpuSeconds")), "baseline excludes CPU before the window");
+        // Memory: the least available, swap, pressure, and resident/GPU memory by role and for the whole stack.
+        check("15625".equals(facts.get("memory.totalMiB")) && "1953".equals(facts.get("memory.availableMinMiB")) &&
+            "1953".equals(facts.get("memory.availableLastMiB")) && "3906".equals(facts.get("memory.swapTotalMiB")) &&
+            "977".equals(facts.get("memory.swapFreeMinMiB")), "system memory " + facts);
+        check("12.00".equals(facts.get("memory.pressureSomeAvg10Max")) && "4.50".equals(facts.get("memory.pressureFullAvg10Max")), "pressure");
+        check("1488".equals(facts.get("role.worldserver.residentMaxMiB")) && "1390".equals(facts.get("role.worldserver.residentLastMiB")) &&
+            "2".equals(facts.get("role.worldserver.swapMaxMiB")) && "50".equals(facts.get("role.frame-helper.residentMaxMiB")) &&
+            "97".equals(facts.get("role.app.residentMaxMiB")), "resident memory counts anonymous and shared pages, not file pages");
+        check("100".equals(facts.get("role.app.gpuMaxMiB")) && "100".equals(facts.get("stack.gpuMaxMiB")) &&
+            !facts.containsKey("role.worldserver.gpuMaxMiB") && "500".equals(facts.get("gpu.pagesMaxMiB")), "KGSL memory");
+        check("1636".equals(facts.get("stack.residentMaxMiB")) && "1538".equals(facts.get("stack.residentLastMiB")), "stack memory");
         check(!text.contains("secret") && !text.contains("/data/") && !text.contains("4321") && !text.contains("esteria-bridges"),
             "no arguments, paths or PIDs");
     }
@@ -137,7 +167,8 @@ public final class ThermalTelemetryTests {
         Map<String, String> facts = telemetry.facts();
         check("unavailable".equals(facts.get("cpu.status")) && "unavailable".equals(facts.get("gpu.status")) &&
             "unavailable".equals(facts.get("zones.status")) && "unavailable".equals(facts.get("process.status")) &&
-            "unavailable".equals(facts.get("thermalHeadroom")) && "unavailable".equals(facts.get("display.refreshHz")),
+            "unavailable".equals(facts.get("thermalHeadroom")) && "unavailable".equals(facts.get("display.refreshHz")) &&
+            "unavailable".equals(facts.get("memory.status")) && "unavailable".equals(facts.get("memory.pressure")),
             "every denied source is reported, not guessed");
     }
 

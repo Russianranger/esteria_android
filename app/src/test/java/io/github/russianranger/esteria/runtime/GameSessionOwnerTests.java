@@ -301,6 +301,10 @@ public final class GameSessionOwnerTests {
             "3".equals(facts.get("game.thermal.androidStatusCode.max")) &&
             "1".equals(facts.get("game.thermal.androidStatusCode.last")), "OS severity independent of unavailable battery");
         check(thermal.detail().isEmpty(), "Fixture without procfs/sysfs telemetry has no detail field");
+        check(!facts.containsKey("game.thermal.earlyIntervalMs"), "Fixture sampling keeps the plain interval");
+        check(SessionThermalDiagnostics.memoryFact("memory.availableMinMiB") && SessionThermalDiagnostics.memoryFact("role.wine-client.residentMaxMiB") &&
+            SessionThermalDiagnostics.memoryFact("stack.gpuMaxMiB") && !SessionThermalDiagnostics.memoryFact("role.wine-client.avgCorePct") &&
+            !SessionThermalDiagnostics.memoryFact("gpu.busyMaxPct"), "Memory facts are split from heat facts");
     }
 
     private static void rendererObservation() throws Exception {

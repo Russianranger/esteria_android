@@ -63,12 +63,27 @@ public final class ThermalTelemetry {
 
     private static final class Role {
         long ticks; int maxProcesses; double peakCorePercent;
+        long residentMaxKib = -1, residentLastKib = -1, swapMaxKib = -1, gpuMaxKib = -1, gpuLastKib = -1;
+    }
+
+    /** Resident (anonymous plus shared), swapped and KGSL GPU memory of one sample, in KiB; -1 when unreadable. */
+    private static final class Memory {
+        long resident = -1, swap = -1, gpu = -1;
+        void add(long[] reading) {
+            if (reading[0] >= 0) resident = Math.max(0, resident) + reading[0];
+            if (reading[1] >= 0) swap = Math.max(0, swap) + reading[1];
+            if (reading[2] >= 0) gpu = Math.max(0, gpu) + reading[2];
+        }
     }
 
     private final Path proc, sys;
     private final int selfPid;
     private final long ticksPerSecond;
-    private Source cpufreq = Source.UNKNOWN, gpu = Source.UNKNOWN, zones = Source.UNKNOWN, processes = Source.UNKNOWN;
+    private Source cpufreq = Source.UNKNOWN, gpu = Source.UNKNOWN, zones = Source.UNKNOWN, processes = Source.UNKNOWN,
+        meminfo = Source.UNKNOWN, pressure = Source.UNKNOWN, kgslProcesses = Source.UNKNOWN;
+    private final Stat memoryAvailable = new Stat(), swapFree = new Stat(), pressureSome = new Stat(), pressureFull = new Stat(),
+        stackResident = new Stat(), stackSwap = new Stat(), stackGpu = new Stat(), gpuPages = new Stat();
+    private long memoryTotalKib = -1, swapTotalKib = -1;
     private final List<Policy> policies = new ArrayList<>();
     private final List<Zone> thermalZones = new ArrayList<>();
     private final Stat headroom = new Stat(), refresh = new Stat(), gpuBusy = new Stat(), gpuClock = new Stat(), gpuTemperature = new Stat(),
@@ -94,6 +109,7 @@ public final class ThermalTelemetry {
         readPolicies();
         readGpu();
         readZones();
+        readMemory();
         readProcesses(interval, samples == 0);
         lastMs = nowMs;
         samples++;
@@ -193,6 +209,11 @@ public final class ThermalTelemetry {
         Map<Integer, Seen> current = new HashMap<>();
         Map<String, Long> delta = new HashMap<>();
         Map<String, Integer> count = new HashMap<>();
+        Map<String, Memory> memory = new HashMap<>();
+        Memory stack = new Memory();
+        // Per-process KGSL accounting exists only where the driver exposes its proc directory.
+        if (kgslProcesses == Source.UNKNOWN)
+            kgslProcesses = Files.isDirectory(sys.resolve("class/kgsl/kgsl/proc")) ? Source.AVAILABLE : Source.UNAVAILABLE;
         for (Path directory : children(proc, "", MAX_PROCESSES)) {
             String name = directory.getFileName().toString();
             if (!name.matches("[0-9]{1,9}")) continue;
@@ -206,9 +227,16 @@ public final class ThermalTelemetry {
             current.put(pid, new Seen(stat[1], stat[0], role));
             delta.merge(role, Math.max(0, used), Long::sum);
             count.merge(role, 1, Integer::sum);
+            long[] reading = processMemory(directory, pid);
+            memory.computeIfAbsent(role, ignored -> new Memory()).add(reading);
+            stack.add(reading);
         }
         seen = current;
         processes = settle(processes, !current.isEmpty());
+        if (stack.resident >= 0) stackResident.observe(stack.resident);
+        if (stack.swap >= 0) stackSwap.observe(stack.swap);
+        if (stack.gpu >= 0) stackGpu.observe(stack.gpu);
+
         visibleProcessesMax = Math.max(visibleProcessesMax, current.size());
         for (Map.Entry<String, Integer> entry : count.entrySet()) {
             Role role = roles.get(entry.getKey());
@@ -217,11 +245,84 @@ public final class ThermalTelemetry {
                 role = new Role(); roles.put(entry.getKey(), role);
             }
             long used = delta.getOrDefault(entry.getKey(), 0L);
+            Memory held = memory.get(entry.getKey());
+            if (held != null) {
+                if (held.resident >= 0) { role.residentMaxKib = Math.max(role.residentMaxKib, held.resident); role.residentLastKib = held.resident; }
+                if (held.swap >= 0) role.swapMaxKib = Math.max(role.swapMaxKib, held.swap);
+                if (held.gpu >= 0) { role.gpuMaxKib = Math.max(role.gpuMaxKib, held.gpu); role.gpuLastKib = held.gpu; }
+            }
             role.ticks += used;
             role.maxProcesses = Math.max(role.maxProcesses, entry.getValue());
             if (!baseline && intervalMs > 0)
                 role.peakCorePercent = Math.max(role.peakCorePercent, used * 100_000.0 / ticksPerSecond / intervalMs);
         }
+    }
+
+    /** RssAnon+RssShmem and VmSwap from /proc/PID/status, and KGSL GPU memory of that process, in KiB. */
+    private long[] processMemory(Path directory, int pid) {
+        long[] reading = {-1, -1, -1};
+        String status = text(directory.resolve("status"));
+        if (status != null) {
+            Long anonymous = statusKib(status, "RssAnon:"), shared = statusKib(status, "RssShmem:"), swapped = statusKib(status, "VmSwap:");
+            if (anonymous != null) reading[0] = anonymous + (shared == null ? 0 : shared);
+            if (swapped != null) reading[1] = swapped;
+        }
+        if (kgslProcesses != Source.UNAVAILABLE) {
+            Path kgsl = sys.resolve("class/kgsl/kgsl/proc").resolve(Integer.toString(pid));
+            Long mapped = number(kgsl.resolve("gpumem_mapped")), unmapped = number(kgsl.resolve("gpumem_unmapped"));
+            if (mapped != null || unmapped != null)
+                reading[2] = ((mapped == null ? 0 : mapped) + (unmapped == null ? 0 : unmapped)) / 1024;
+        }
+        return reading;
+    }
+
+    static Long statusKib(String status, String field) {
+        int at = status.startsWith(field) ? 0 : status.indexOf("\n" + field);
+        if (at < 0) return null;
+        if (at > 0) at++;
+        return leadingNumber(status.substring(at + field.length()).replaceFirst("^[ \t]+", ""), 12);
+    }
+
+    // ---- System memory ----
+
+    private void readMemory() {
+        if (meminfo != Source.UNAVAILABLE) {
+            String info = text(proc.resolve("meminfo"));
+            Long total = info == null ? null : statusKib(info, "MemTotal:"), available = info == null ? null : statusKib(info, "MemAvailable:");
+            if (available != null) {
+                memoryAvailable.observe(available);
+                if (total != null) memoryTotalKib = total;
+                Long swapTotal = statusKib(info, "SwapTotal:"), free = statusKib(info, "SwapFree:");
+                if (swapTotal != null) swapTotalKib = swapTotal;
+                if (free != null && swapTotal != null && swapTotal > 0) swapFree.observe(free);
+            }
+            meminfo = settle(meminfo, available != null);
+        }
+        if (pressure != Source.UNAVAILABLE) {
+            String lines = text(proc.resolve("pressure/memory"));
+            Double some = average10(lines, "some"), full = average10(lines, "full");
+            if (some != null) pressureSome.observe(some);
+            if (full != null) pressureFull.observe(full);
+            pressure = settle(pressure, some != null || full != null);
+        }
+        if (gpu != Source.UNAVAILABLE) {
+            Long pages = number(sys.resolve("class/kgsl/kgsl/page_alloc"));
+            if (pages != null && pages >= 0) gpuPages.observe(pages / 1024.0);
+        }
+    }
+
+    /** "some avg10=1.23 avg60=..." from a PSI file. */
+    static Double average10(String lines, String kind) {
+        if (lines == null) return null;
+        for (String line : lines.split("\n")) {
+            if (!line.startsWith(kind + " ")) continue;
+            int at = line.indexOf("avg10=");
+            if (at < 0) return null;
+            String value = line.substring(at + 6).split("\\s")[0];
+            try { double parsed = Double.parseDouble(value); return parsed >= 0 && parsed <= 100 ? parsed : null; }
+            catch (NumberFormatException malformed) { return null; }
+        }
+        return null;
     }
 
     /** Fixed role for a process from its first argument. Unknown programs are "other". */
@@ -308,6 +409,27 @@ public final class ThermalTelemetry {
             for (Zone zone : hottest.subList(0, Math.min(REPORTED_ZONES, hottest.size())))
                 facts.put("zone." + zone.label + ".maxC", decimal(zone.celsius.max, 1));
         } else facts.put("zones.status", "unavailable");
+        if (meminfo == Source.AVAILABLE) {
+            if (memoryTotalKib > 0) facts.put("memory.totalMiB", Long.toString(memoryTotalKib / 1024));
+            facts.put("memory.availableMinMiB", decimal(memoryAvailable.min / 1024, 0));
+            facts.put("memory.availableLastMiB", decimal(memoryAvailable.last / 1024, 0));
+            if (swapTotalKib > 0) facts.put("memory.swapTotalMiB", Long.toString(swapTotalKib / 1024));
+            if (swapFree.count > 0) { facts.put("memory.swapFreeMinMiB", decimal(swapFree.min / 1024, 0)); facts.put("memory.swapFreeLastMiB", decimal(swapFree.last / 1024, 0)); }
+        } else facts.put("memory.status", "unavailable");
+        if (pressure == Source.AVAILABLE) {
+            if (pressureSome.count > 0) facts.put("memory.pressureSomeAvg10Max", decimal(pressureSome.max, 2));
+            if (pressureFull.count > 0) facts.put("memory.pressureFullAvg10Max", decimal(pressureFull.max, 2));
+        } else facts.put("memory.pressure", "unavailable");
+        if (gpuPages.count > 0) facts.put("gpu.pagesMaxMiB", decimal(gpuPages.max / 1024, 0));
+        if (stackResident.count > 0) {
+            facts.put("stack.residentMaxMiB", decimal(stackResident.max / 1024, 0));
+            facts.put("stack.residentLastMiB", decimal(stackResident.last / 1024, 0));
+        }
+        if (stackSwap.count > 0) facts.put("stack.swapMaxMiB", decimal(stackSwap.max / 1024, 0));
+        if (stackGpu.count > 0) {
+            facts.put("stack.gpuMaxMiB", decimal(stackGpu.max / 1024, 0));
+            facts.put("stack.gpuLastMiB", decimal(stackGpu.last / 1024, 0));
+        }
         if (processes == Source.AVAILABLE) {
             double seconds = Math.max(1, lastMs - firstMs) / 1000.0;
             facts.put("process.visibleMax", Integer.toString(visibleProcessesMax));
@@ -322,6 +444,15 @@ public final class ThermalTelemetry {
                 facts.put(prefix + ".avgCorePct", decimal(cpuSeconds * 100 / seconds, 1));
                 facts.put(prefix + ".peakCorePct", decimal(role.peakCorePercent, 1));
                 facts.put(prefix + ".maxProcesses", Integer.toString(role.maxProcesses));
+                if (role.residentMaxKib >= 0) {
+                    facts.put(prefix + ".residentMaxMiB", Long.toString(role.residentMaxKib / 1024));
+                    facts.put(prefix + ".residentLastMiB", Long.toString(role.residentLastKib / 1024));
+                }
+                if (role.swapMaxKib > 0) facts.put(prefix + ".swapMaxMiB", Long.toString(role.swapMaxKib / 1024));
+                if (role.gpuMaxKib > 0) {
+                    facts.put(prefix + ".gpuMaxMiB", Long.toString(role.gpuMaxKib / 1024));
+                    facts.put(prefix + ".gpuLastMiB", Long.toString(role.gpuLastKib / 1024));
+                }
             }
         } else facts.put("process.status", "unavailable");
         return facts;
@@ -380,12 +511,14 @@ public final class ThermalTelemetry {
         catch (NumberFormatException malformed) { return null; }
     }
 
-    static Long leadingNumber(String value) {
+    static Long leadingNumber(String value) { return leadingNumber(value, 9); }
+
+    static Long leadingNumber(String value, int maxDigits) {
         if (value == null) return null;
         String trimmed = value.trim();
         int end = 0;
         while (end < trimmed.length() && Character.isDigit(trimmed.charAt(end))) end++;
-        if (end == 0 || end > 9) return null;
+        if (end == 0 || end > maxDigits) return null;
         return Long.parseLong(trimmed.substring(0, end));
     }
 
