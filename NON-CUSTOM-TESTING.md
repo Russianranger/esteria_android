@@ -2,7 +2,7 @@
 
 ## v29 world entry check
 
-Install the v29 APK from the v29 release over the existing app. Keep everything. V29 records how much memory each part of the game uses while you enter the world, and keeps that record even if Android closes the app.
+Install the v29 APK from the [v29 release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.29) over the existing app. Keep everything. V29 records how much memory each part of the game uses while you enter the world, and keeps that record even if Android closes the app.
 
 1. Start the local game with the same settings and apps open as in the v28 attempt, and enter the world.
 2. If the game closes to the home screen again, open Esteria Stock straight away and choose **Tools → Export support bundle → Downloads → Save**.
