@@ -2,7 +2,7 @@
 
 ## v27 heat and frame-rate check
 
-Install the v27 APK from the v27 release over the existing Esteria Stock app. Keep the existing import, world, shaders, database and character. V27 turns on **PRoot acceleration**, which lets most guest system calls run without stopping in the tracer. It also requests the next frame while Android shows the current one.
+Install the v27 APK from the [v27 release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.27) over the existing Esteria Stock app. Keep the existing import, world, shaders, database and character. V27 turns on **PRoot acceleration**, which lets most guest system calls run without stopping in the tracer. It also requests the next frame while Android shows the current one.
 
 1. Start the local game as usual. If any step that worked in v26 fails, export the support bundle first. Then open **Play → PRoot acceleration**, choose **Off**, start again and report both results.
 2. **Same conditions as your v26 bundle:** 60 FPS, the same resolution, location, camera view, brightness, fan mode and charging state, for ten minutes. Take readings around minutes 2, 5 and 10, with the sensor label. Your v26 bundle's hottest zone was `socd` at 73.0 °C. Run `/run print(GetFramerate())` in chat for the engine's frame rate and note how smooth the game looks.
