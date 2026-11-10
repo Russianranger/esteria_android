@@ -2,7 +2,7 @@
 
 ## v28 server settings check
 
-Install the v28 APK from the v28 release over the existing app. Keep everything.
+Install the v28 APK from the [v28 release](https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.28) over the existing app. Keep everything.
 
 1. Open **Play → Server settings**. Pick **World server**, search for `Rate.XP.Kill`, set it to 2 and save. Check that it shows **Your value: 2** and that **Changed only** lists it.
 2. Start the local game. Kill one creature and check that you get twice the usual experience. Stop the session normally.

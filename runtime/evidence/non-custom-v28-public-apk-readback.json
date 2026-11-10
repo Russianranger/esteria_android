@@ -1,0 +1,66 @@
+{
+ "appRevision": "0beae3f07c5a4cbae011899cc631c5f2e0566180",
+ "assets": [
+  {
+   "assetId": 730047506,
+   "bytes": 337223347,
+   "completeAnonymousReadback": true,
+   "finalPublicReadRoute": "GitHub public release download URL",
+   "name": "Esteria-Stock-3.3.5a-arm64.apk",
+   "sha256": "561700f9b8900ab64e78cf9c32375be6aad2fb3bad06c370f463398d53f96013"
+  },
+  {
+   "assetId": 730047502,
+   "bytes": 10822,
+   "completeAnonymousReadback": true,
+   "finalPublicReadRoute": "GitHub public release download URL",
+   "name": "NON-CUSTOM-TESTING.md",
+   "sha256": "2855e49db21ddd637cbdd07b32b0e4435894fe04732c1f169db4102f697cdf00"
+  },
+  {
+   "assetId": 730047513,
+   "bytes": 97,
+   "completeAnonymousReadback": true,
+   "finalPublicReadRoute": "GitHub public release download URL",
+   "name": "SHA256SUMS",
+   "sha256": "7a7813932c501d42b513637efb2f561f294b604a698934774ddb3b8c95545a53"
+  },
+  {
+   "assetId": 730047505,
+   "bytes": 2904,
+   "completeAnonymousReadback": true,
+   "finalPublicReadRoute": "GitHub public release download URL",
+   "name": "release.json",
+   "sha256": "aba8d7ad15a40a3686eaf84c3ee9fb143ee26e7fdb810552a7c2a858acfeff80"
+  },
+  {
+   "assetId": 730047509,
+   "bytes": 1053,
+   "completeAnonymousReadback": true,
+   "finalPublicReadRoute": "GitHub public release download URL",
+   "name": "signing-receipt.json",
+   "sha256": "6d310d628b4e17692401ba57422226ceadf588d9151463cda926eec615302020"
+  }
+ ],
+ "formatVersion": 1,
+ "gameplayQualified": false,
+ "persistentCertificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+ "publicationRoute": "Persistent key from repository Actions secrets, CI signing and additive GitHub Actions publication (run 42752379786)",
+ "releaseId": 439935087,
+ "releaseUrl": "https://github.com/Russianranger/esteria_android/releases/tag/non-custom-v0.1.0-non-custom.28",
+ "scope": "complete-anonymous-original-identity-stock-v28-release-readback",
+ "sdkV2AndV3SignatureVerified": true,
+ "signatureVerification": "CI apksigner verification in the signing step; independent host extraction found APK Signature Scheme v2 and v3 blocks whose certificate SHA-256 equals the pinned persistent certificate",
+ "signedApk": {
+  "apkBytes": 337223347,
+  "apkSha256": "561700f9b8900ab64e78cf9c32375be6aad2fb3bad06c370f463398d53f96013",
+  "certificateSha256": "5e6921a036142cf2da217ddd17a3f7bb734706268e4ee913e2037da898b4d9fa",
+  "debuggable": false,
+  "minSdk": 26,
+  "packageId": "io.github.russianranger.esteria.stock",
+  "targetSdk": 35,
+  "versionCode": 28,
+  "versionName": "0.1.0-non-custom.28"
+ },
+ "tag": "non-custom-v0.1.0-non-custom.28"
+}
